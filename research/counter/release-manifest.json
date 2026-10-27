@@ -8,7 +8,8 @@
     "python": "3.12.14",
     "cubing": "0.66.1",
     "three": "0.180.0",
-    "notoSansPackage": "5.2.10"
+    "notoSansPackage": "5.2.10",
+    "vite": "7.3.7"
   },
   "oldArtifactsPreserved": [
     "research/counter/manifest.json",
@@ -27,7 +28,7 @@
     "research/counter/verify.py": "0c8b31e87dcd544bdab4fa0ab8d1586469561aa4659f9b125aa88bc11bdb96dc",
     "public/counter-proof.json": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
     "public/fonts/noto-sans-latin-600.woff2": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed",
-    "package-lock.json": "b94f879327d5500d426f7dc0b59fd4fcb56bb08b184a129cc5ab5e881b558144",
+    "package-lock.json": "c02c37ec7bb94a2ae89dbfec79e3b9581a9730d9fe4daa2c92ed621fdcf6a6aa",
     "research/counter/verification-v3.json": "4e5c14281418c8077f9f07aac66cb3dcfc307457a8cd702204b38fe3908cfef9"
   },
   "validation": {
@@ -37,6 +38,7 @@
     "independentProof": "PASS",
     "productionBuild": "PASS",
     "spelling": "typos 1.49.0 PASS",
-    "localLinks": "lychee 0.24.2 PASS"
+    "localLinks": "lychee 0.24.2 PASS",
+    "dependencyAudit": "npm audit: zero vulnerabilities"
   }
 }
