@@ -1,0 +1,2 @@
+# Exact finite permutation-group verification; no numerical solver.
+sympy==1.14.0

@@ -61,3 +61,40 @@ test('refined inventory catches obstruction hidden by pooled 115 estimate', () =
   assert.equal(req.orbits.positive.symbols.I,2);
   assert.equal(req.orbits.positive.symbols.R,2);
 });
+
+test('single-language inventory selection does not accidentally mix locales', async () => {
+  const {coupledRequirements} = await import('../scripts/experiment.mjs');
+  const english=coupledRequirements('EN');
+  const german=coupledRequirements('DE');
+  assert.equal(english.counting.positiveRequiredTokens,23);
+  assert.equal(german.counting.positiveRequiredTokens,21);
+  for(const r of [english,german]) {
+    assert.equal(r.counting.negativeRequiredTokens,16);
+    assert.deepEqual(r.neverCooccurs,[{positive:[9,'B'],negative:[5,'3']}]);
+    assert.equal(r.counting.contradiction,true);
+  }
+  assert.throws(()=>requirements(undefined,[]),/locale/);
+  assert.throws(()=>requirements(undefined,['FR']),/locale/);
+});
+
+test('English peak-inventory proof survives completely unrestricted rotations', async () => {
+  const {peakProof}=await import('../scripts/wing-proof.mjs');
+  const en=peakProof('EN'),de=peakProof('DE');
+  assert.equal(en.contradiction,true);
+  assert.deepEqual(en.branches.map(b=>[b.minimumTightB,b.maximumNonTightA+b.maximumExceptionalPairs]),[[4,3],[5,4]]);
+  assert.equal(de.contradiction,false);
+});
+
+test('one shared glyph model and a fixed full German design', async () => {
+  const glyphs=await import('../src/Glyphs.res.mjs');
+  const {constructGerman,matchPieces,projectedTargets}=await import('../scripts/german-design.mjs');
+  assert.deepEqual(glyphs.quarterTurns('0'),[0,1,2,3]);
+  assert.deepEqual(glyphs.quarterTurns('O'),[0,2]);
+  assert.deepEqual(glyphs.quarterTurns('I'),[0,2]);
+  assert.deepEqual(glyphs.quarterTurns('R'),[0]);
+  const d=constructGerman();
+  assert.equal(d.stickers.length,150);
+  assert.equal(new Set(d.stickers.map(s=>s.id)).size,150);
+  for(const target of projectedTargets('wings'))assert.ok(matchPieces(d.packings.wings.pieces,target));
+  assert.equal(d.packings.wings.projectedTargets,9360);
+});

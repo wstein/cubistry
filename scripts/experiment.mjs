@@ -13,9 +13,9 @@ export const counts = chars => {
 const mergeMax = (a, b) => {
   for (const [char, n] of Object.entries(b)) a[char] = Math.max(a[char] ?? 0, n);
 };
-export function requirements(selectedSlots = slots) {
+export function requirements(selectedSlots = slots, languages = ['DE', 'EN']) {
+  if (!languages.length || languages.some(l => !['DE','EN'].includes(l))) throw new Error('Unsupported locale selection');
   const groupNames = Object.keys(selectedSlots);
-  const languages = ['DE', 'EN'];
   const dateMax = Object.fromEntries(groupNames.map(n => [n, {}]));
   const timeMax = Object.fromEntries(groupNames.map(n => [n, {}]));
   const datePatterns = Object.fromEntries(groupNames.map(n => [n, new Set()]));
@@ -131,5 +131,55 @@ export function run() {
   writeFileSync('results/feasibility.json',JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify({status:report.status,validDates:report.validDates,totalDisplays:report.totalDisplays,pooledLowerBound:report.pooledInventoryLowerBound,obstruction:report.obstruction},null,2));
   return report;
+}
+
+
+// A fixed upright sticker can serve at most one front slot: p·up and
+// p·(up×normal) are invariant under every rigid turn. Once normal=+Z and
+// up=+Y, they uniquely determine the front row and column.
+export const wingRoles = {positive:[1,9,15,23], negative:[3,5,19,21]};
+const token = (slot, symbol) => JSON.stringify([slot,symbol]);
+export function coupledRequirements(language) {
+  if (!['EN','DE'].includes(language)) throw new Error('Unsupported locale');
+  const domains = {positive:new Set(),negative:new Set()};
+  const dateDomains = {positive:new Set(),negative:new Set()};
+  const timeDomains = {positive:new Set(),negative:new Set()};
+  const cooccurs = new Set();
+  const pairKey = (a,b) => JSON.stringify([a,b]);
+  const record = (text, isTime) => {
+    const active = {};
+    for(const side of ['positive','negative']) {
+      active[side] = wingRoles[side].filter(i=>(i>=20)===isTime).map(i=>token(i,text[isTime?i-20:i]));
+      for(const t of active[side]) {
+        domains[side].add(t);
+        (isTime?timeDomains:dateDomains)[side].add(t);
+      }
+    }
+    for(const a of active.positive) for(const b of active.negative) cooccurs.add(pairKey(a,b));
+  };
+  let validDates = 0;
+  for(let ms=Date.UTC(2020,0,1);ms<Date.UTC(2050,0,1);ms+=86400000) {
+    validDates++;
+    const d=new Date(ms);
+    record([...Display.rows(language,(d.getUTCDay()+6)%7,d.getUTCDate(),d.getUTCMonth(),d.getUTCFullYear(),0).slice(0,4).join('')],false);
+  }
+  for(let minute=0;minute<1440;minute++) record([...Display.rows(language,0,1,0,2020,minute)[4]],true);
+  // Cross date/time pairs are possible because all minutes are required for
+  // every valid date. Date/date and time/time correlations were kept above.
+  for(const a of dateDomains.positive) for(const b of timeDomains.negative) cooccurs.add(pairKey(a,b));
+  for(const a of timeDomains.positive) for(const b of dateDomains.negative) cooccurs.add(pairKey(a,b));
+  const positive=[...domains.positive].sort().map(JSON.parse);
+  const negative=[...domains.negative].sort().map(JSON.parse);
+  const neverCooccurs=[];
+  for(const a of positive) for(const b of negative) if(!cooccurs.has(pairKey(JSON.stringify(a),JSON.stringify(b)))) neverCooccurs.push({positive:a,negative:b});
+  const exceptionalNegativeTokens=new Set(neverCooccurs.map(p=>JSON.stringify(p.negative))).size;
+  const N=24, a=positive.length, b=negative.length;
+  const minimumNegativeSingletons=2*b-N;
+  const maximumNonessentialPositiveStickers=2*(N-a);
+  const maximumNegativeSingletons=maximumNonessentialPositiveStickers+exceptionalNegativeTokens;
+  return {validDates,positive,negative,neverCooccurs,exceptionalNegativeTokens,
+    counting:{physicalWingCubies:N,positiveRequiredTokens:a,negativeRequiredTokens:b,positiveSlack:N-a,
+      minimumNegativeSingletons,maximumNonessentialPositiveStickers,maximumNegativeSingletons,
+      contradiction:minimumNegativeSingletons>maximumNegativeSingletons}};
 }
 if (process.argv[1]?.endsWith('/experiment.mjs')) run();

@@ -4,13 +4,20 @@
   "version": "0.0.0",
   "type": "module",
   "license": "AGPL-3.0-or-later",
-  "engines": {"node": ">=22", "npm": ">=10"},
+  "engines": {
+    "node": ">=22",
+    "npm": ">=10"
+  },
   "scripts": {
     "build": "rescript",
-    "experiment": "npm run build && node scripts/experiment.mjs",
-    "verify": "python3 scripts/verify.py",
+    "experiment": "npm run build && node scripts/experiment.mjs && node scripts/single-language.mjs && python3 scripts/verify_single.py --certify",
+    "verify": "python3 scripts/verify.py && python3 scripts/verify_single.py",
     "test": "npm run build && node --test tests/*.test.mjs",
-    "check": "npm test && npm run experiment && npm run verify"
+    "check": "npm test && npm run experiment && python3 scripts/verify.py",
+    "experiment:en": "npm run build && node scripts/single-language.mjs EN && python3 scripts/verify_single.py --language EN",
+    "experiment:de": "npm run build && node scripts/single-language.mjs DE && python3 scripts/verify_single.py --certify --language DE"
   },
-  "devDependencies": {"rescript": "12.3.1"}
+  "devDependencies": {
+    "rescript": "12.3.1"
+  }
 }
