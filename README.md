@@ -51,7 +51,9 @@ viewer/browser asset loader. The canonical naming/language decision is
 [issue #21](https://github.com/wstein/cubistry/issues/21); the hosted
 repository is [PuzlWerk](https://github.com/wstein/puzlwerk), with the
 `@puzlwerk/*` scope used for shared-package naming. No package publication or
-consumer migration is implied; the existing `@cubistry/*` workspaces stay unchanged. [M1 contracts and data flow](docs/SHARED_CUBE_M1.md)
+broader core migration is implied; the existing `@cubistry/*` workspaces stay unchanged.
+The counter now consumes the pinned private `@puzlwerk/solver-2x2` package in
+`exactPhysical` mode; see [dependency setup and verification](docs/COUNTER_SHARED_SOLVER.md). [M1 contracts and data flow](docs/SHARED_CUBE_M1.md)
 document the validated v2 design, loadable oriented images, independent replay,
 and the explicit size-2 limits. Sizes 3–7 and external migrations remain planned.
 
@@ -80,8 +82,9 @@ records existing renderer/solver choices, licenses, and sizes. The
 
 The UI uses actual image stickers on eight rigid corner cubies. Title text is
 not a front-face HTML overlay. Solver-generated move words are independently
-replayed, and arbitrary target sequences use verified paths through a common
-complete source state. No shortest-path claim is made. No deployment is required.
+replayed. Transitions now solve from the actual complete physical state directly
+to the selected complete target, including exact print orientation. The shared
+solver plus any frame correction is not claimed HTM-optimal. No deployment is required.
 
 ## Preview
 
@@ -98,7 +101,8 @@ cover issue #21's five-point DoD. With `npm run dev`, open
 `/solver-acceptance.html` to compute fresh paths for fixed representative goals,
 or `/library-example.html` for a standalone consumer with its own image/text
 print and no counter modules. The live solver harness is development-only;
-the regular counter keeps its fast verified witness paths.
+the regular counter uses the shared direct solver. The witness catalog still
+defines complete targets and initial states, not transition detours.
 
 The counter reports committed / planned HTM moves during playback.
 [Move progress and Stop after this value](docs/COUNTER_MOVE_PROGRESS.md) document
