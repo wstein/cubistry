@@ -1,0 +1,396 @@
+
+> cubistry-feasibility-spike@0.0.0 verify:baselines
+> npm run verify:baseline-en && npm run verify:baseline-de
+
+
+> cubistry-feasibility-spike@0.0.0 verify:baseline-en
+> python3 scripts/verify_english_baseline_1900.py results/baseline-1900-2099/english-candidate.json
+
+{
+  "status": "UNSAT",
+  "issue": 4,
+  "model": {
+    "language": "EN",
+    "years": [
+      1900,
+      2099
+    ],
+    "calendar": "proleptic Gregorian",
+    "weekdays": [
+      "MON",
+      "TUE",
+      "WED",
+      "THU",
+      "FRI",
+      "SAT",
+      "SUN"
+    ],
+    "months": [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC"
+    ],
+    "dayPadding": "zero",
+    "hourPadding": "zero",
+    "minutePadding": "zero",
+    "yearLayout": "thousands,hundreds,blank,tens,units",
+    "row4": [
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "palette": {
+      "weekdayLetters": "weekday-black",
+      "monthLetters": "date-red",
+      "dateDigits": "date-red",
+      "yearDigits": "year-gray",
+      "timeDigits": "time-blue",
+      "colon": "date-red",
+      "wordmark": "immutable multicolor images",
+      "blank": "none"
+    },
+    "opticalRelaxation": "all rotations allowed for every glyph; no character substitutions",
+    "legalMoves": "12 noncentral single-layer quarter turns on a labeled 5x5; inverses and compositions"
+  },
+  "candidateSHA256": "9cc1b30814d114e5ea87b6439082ead15606b9781e26f5c4d76da7de08942d41",
+  "checkerSHA256": "9164c383cd44e5ba180435859c0a1b3e40249d1d751312e8386f8d97f951ae19",
+  "validDates": 73049,
+  "totalDisplays": 105190560,
+  "checkedLegalQuarterTurns": 12,
+  "checkedLabeledFacelets": 150,
+  "physicalWingCubies": 24,
+  "allGlyphRotationsAllowed": true,
+  "counting": {
+    "requiredA": 23,
+    "requiredB": 16,
+    "slackA": 1,
+    "slackB": 8,
+    "maximumLooseA": 2,
+    "minimumTightB": 7,
+    "maximumExceptionalPairs": 1
+  },
+  "contradiction": "7 > 2 + 1",
+  "scope": "No immutable English printing exists for this exact colored split-year/wordmark target model; not a universal English calendar-cube impossibility claim.",
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "solver": "none; exhaustive projection enumeration and integer counting"
+  },
+  "run": {
+    "elapsedSeconds": 0.76,
+    "maxResidentKiB": 26880
+  }
+}
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+
+> cubistry-feasibility-spike@0.0.0 verify:baseline-de
+> python3 scripts/verify_german_baseline_1900.py
+
+Computing exact full labeled 5x5 group order (Schreier–Sims)...
+Physical design and exact simultaneous completion verified in 41.1s.
+{
+  "status": "SAT",
+  "issue": 5,
+  "language": "DE",
+  "years": [
+    1900,
+    2099
+  ],
+  "calendar": "proleptic Gregorian",
+  "yearLayout": "thousands,hundreds,blank,tens,units",
+  "dayPadding": "zero",
+  "hourPadding": "zero",
+  "sourceWitness": "results/german-century-09.json",
+  "sourcePrintPlan": "results/german-century-09-printing.csv",
+  "sourceWitnessSHA256": "a1df97595df3b995597737ccb06dd29e9d816ecdacb8b86c5e6744d9d0aede6d",
+  "sourcePrintPlanSHA256": "377afebd397d59bcec4ea0cddd2ae769692c159a98868b6ebb2211a0169f52c7",
+  "checkerSHA256": "2783894be1f44f4b7249e560822db6dbbe8a31801bed60ac36f1fbd39bbf140a",
+  "validDates": 73049,
+  "totalDisplays": 105190560,
+  "oneImmutablePrintingForEntireInterval": true,
+  "physicalPrintingModified": false,
+  "allNonfixedPrintedGlyphsUpright": true,
+  "artworkScope": "three fixed distinct upright full-image tokens, including all internal colors; production artwork pixels not validated",
+  "palette": {
+    "weekdayLetters": "weekday-black",
+    "monthLetters": "date-red",
+    "dateDigits": "date-red",
+    "yearDigits": "year-gray",
+    "timeDigits": "time-blue",
+    "separator": "wordmark-image-assets",
+    "colon": "date-red"
+  },
+  "boundaryDateCells": {
+    "1900-01-01": [
+      "M",
+      "O",
+      "N",
+      " ",
+      " ",
+      "0",
+      "1",
+      "J",
+      "A",
+      "N",
+      "1",
+      "9",
+      " ",
+      "0",
+      "0",
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "1900-02-28": [
+      "M",
+      "I",
+      "T",
+      " ",
+      " ",
+      "2",
+      "8",
+      "F",
+      "E",
+      "B",
+      "1",
+      "9",
+      " ",
+      "0",
+      "0",
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "1900-03-01": [
+      "D",
+      "O",
+      "N",
+      " ",
+      " ",
+      "0",
+      "1",
+      "M",
+      "Ä",
+      "R",
+      "1",
+      "9",
+      " ",
+      "0",
+      "0",
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "1999-12-31": [
+      "F",
+      "R",
+      "E",
+      " ",
+      " ",
+      "3",
+      "1",
+      "D",
+      "E",
+      "Z",
+      "1",
+      "9",
+      " ",
+      "9",
+      "9",
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "2000-01-01": [
+      "S",
+      "A",
+      "M",
+      " ",
+      " ",
+      "0",
+      "1",
+      "J",
+      "A",
+      "N",
+      "2",
+      "0",
+      " ",
+      "0",
+      "0",
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "2000-02-29": [
+      "D",
+      "I",
+      "E",
+      " ",
+      " ",
+      "2",
+      "9",
+      "F",
+      "E",
+      "B",
+      "2",
+      "0",
+      " ",
+      "0",
+      "0",
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "2000-03-01": [
+      "M",
+      "I",
+      "T",
+      " ",
+      " ",
+      "0",
+      "1",
+      "M",
+      "Ä",
+      "R",
+      "2",
+      "0",
+      " ",
+      "0",
+      "0",
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "2099-12-31": [
+      "D",
+      "O",
+      "N",
+      " ",
+      " ",
+      "3",
+      "1",
+      "D",
+      "E",
+      "Z",
+      "2",
+      "0",
+      " ",
+      "9",
+      "9",
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ]
+  },
+  "negativeControls": {
+    "blue date zero": {
+      "rejected": true,
+      "reason": "No rigid printed-cubie matching for wings: ((1, 'A'), (9, 'B'), (15, ' '), (23, '0'), (3, ' '), (5, '0'), (19, ' '), (21, '0'))"
+    },
+    "rotated middle logo": {
+      "rejected": true,
+      "reason": "No rigid printed-cubie matching for axialCenters: ((7, 'A'), (11, '0'), (13, '0'), (17, 'wordmark:middle'))"
+    },
+    "nonblank fixed center": {
+      "rejected": true,
+      "reason": "Front fixed center printing"
+    }
+  },
+  "reachabilityCertificate": {
+    "method": "exact Schreier–Sims and even-subgroup partial-placement transitivity",
+    "sympyVersion": "1.14.0",
+    "fullGroupOrder": "2582636272886959379162819698174683585918088940054237132144778804568925405184000000000000000",
+    "parityFiberProductOrder": "2582636272886959379162819698174683585918088940054237132144778804568925405184000000000000000",
+    "localGroups": {
+      "corners": {
+        "order": "88179840",
+        "evenOrder": "44089920",
+        "partialPlacementOrbit": "136080",
+        "frontPieces": 4
+      },
+      "middleEdges": {
+        "order": "980995276800",
+        "evenOrder": "490497638400",
+        "partialPlacementOrbit": "190080",
+        "frontPieces": 4
+      },
+      "wings": {
+        "order": "620448401733239439360000",
+        "evenOrder": "310224200866619719680000",
+        "partialPlacementOrbit": "29654190720",
+        "frontPieces": 8
+      },
+      "axialCenters": {
+        "order": "620448401733239439360000",
+        "evenOrder": "310224200866619719680000",
+        "partialPlacementOrbit": "255024",
+        "frontPieces": 4
+      },
+      "diagonalCenters": {
+        "order": "620448401733239439360000",
+        "evenOrder": "310224200866619719680000",
+        "partialPlacementOrbit": "255024",
+        "frontPieces": 4
+      }
+    },
+    "checkedProjectionCounts": {
+      "corners": 120,
+      "middleEdges": 80,
+      "wings": 9360,
+      "axialCenters": 160,
+      "diagonalCenters": 70
+    },
+    "fixedCenterReason": "all six fixed-center stickers are blank; all spins optically equivalent",
+    "simultaneousCompletion": true
+  },
+  "environment": {
+    "python": "3.12.14",
+    "sympy": "1.14.0",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41"
+  },
+  "run": {
+    "elapsedSeconds": 42.757,
+    "maxResidentKiB": 60280
+  }
+}
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

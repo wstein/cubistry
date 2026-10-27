@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "reviewedCommit": "200c5231710b1aa0435cb63c9e0d4cc2305f4323",
+  "reviewMethod": "clean git archive of committed baseline checker code and frozen input artifacts; no additional branch or solver experiment",
+  "command": "timeout 180 npm run verify:baselines",
+  "exitStatus": 0,
+  "executionOrder": [
+    "English issue #4",
+    "German issue #5"
+  ],
+  "results": {
+    "English": "UNSAT",
+    "German": "SAT"
+  },
+  "yearInterval": [
+    1900,
+    2099
+  ],
+  "nodeRegressionTests": {
+    "passed": 19,
+    "failed": 0
+  },
+  "documentationChecks": {
+    "typosVersion": "1.49.0",
+    "typosScope": "entire tracked research workspace, respecting typos.toml and gitignore",
+    "typosExitStatus": 0,
+    "lycheeVersion": "0.24.2",
+    "lycheeScope": "README.md and both new baseline research notes; offline links",
+    "lycheeExitStatus": 0
+  },
+  "broaderCenturySynthesisInvoked": false,
+  "bilingualInvestigationStarted": false,
+  "logSHA256": "69519c19f57164401e77154a545eb390e4848fbf106e5666a5c191c955252426"
+}
