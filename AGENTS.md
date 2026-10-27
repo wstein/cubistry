@@ -42,3 +42,12 @@ Skill instructions are task-specific and do not override accepted project ADRs o
 - Prefer US spellings (for example, `color`, `center`, `behavior`) over British variants.
 - Run repository spelling and link checks on changed documentation before submitting a PR. Maintain narrowly scoped dictionary exceptions for domain terms; do not globally disable checks for convenience.
 - Treat broken repository-relative links as blockers. Investigate external link failures separately because upstream sites can be transient or block CI.
+
+## Git history and atomic commits
+
+- Keep the history of protected branches strictly linear. Prefer **Rebase and Merge** over Squash and Merge; do not introduce merge commits.
+- Use small, focused, **atomic Conventional Commits**. Each commit should represent one coherent, independently understandable change, with its relevant tests or documentation when applicable.
+- Preserve meaningful individual commits; do not squash merely to reduce the commit count. Clean up only redundant fixups or incomplete intermediate commits when needed.
+- Do not rewrite shared or protected branch history, force-push a shared branch, change branch protection, mark PRs ready, or merge without the required human approval. Coordinate any necessary feature-branch history rewrite with collaborators.
+- For stacked PRs, preserve their dependencies and avoid duplicated commits; verify the resulting diffs and relevant checks after rebasing.
+
