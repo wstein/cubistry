@@ -5,7 +5,7 @@ A browser-first twisty-puzzle platform. The first local MVP is a **real fixed-pr
 
 ## Run the counter locally
 
-Requires Node 22.12+ (tested with 24.19.0), npm, and Python 3 for proof checks.
+Requires Node 24+ (tested with 24.19.0), npm, and Python 3 for proof checks.
 
 ```sh
 npm ci
@@ -27,12 +27,21 @@ Changing the number format also requires this new-print operation. Editing the
 form alone never changes sticker images during counting. Label fragments may
 separate while turning and return upright after each completed value.
 
+## Shared framework path
+
+The counter is the first consumer of actual private TypeScript workspaces for
+core, mechanics, assets, and viewing. [M1 contracts and data flow](docs/SHARED_CUBE_M1.md)
+document the validated v2 design, loadable oriented images, independent replay,
+and the explicit size-2 limits. Sizes 3–7 and external migrations remain planned.
+
 ## Evidence and checks
 
 ```sh
+npm run typecheck
 npm test
 npm run test:proof
 python3 research/counter/verify.py
+python3 research/architecture/verify_design.py
 npm run build
 npx playwright install chromium
 npm run test:e2e

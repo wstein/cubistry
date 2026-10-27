@@ -100,7 +100,7 @@ admissible display states.
 ## MVP integration
 
 The counter ports `clampPitch` and `viewTurn` into
-[`src/vendor/orbit-input.mjs`](../src/vendor/orbit-input.mjs), preserving the
+[`src/vendor/orbit-input.mjs`](../packages/cube-viewer/src/orbit-input.ts), preserving the
 [MIT copyright/license](../src/vendor/CUBE_ASSEMBLER_LICENSE.txt). This is actual
 camera-input reuse; it never changes physical cube state. Three.js 0.180.0
 provides the WebGL scene, while a narrow image-sticker adapter attaches the
