@@ -33,7 +33,31 @@
           <div class="cube-footer">
             <span id="status" role="status" aria-live="polite"
               >Preparing the fixed print…</span
-            ><span class="hint">DRAG TO LOOK AROUND · SCROLL TO ZOOM</span>
+            >
+            <div class="move-summary">
+              <span
+                id="move-progress"
+                role="progressbar"
+                aria-label="Committed moves (HTM)"
+                aria-live="off"
+                aria-valuemin="0"
+                aria-valuemax="0"
+                aria-valuenow="0"
+                aria-valuetext="No move sequence planned"
+                >0 / 0 moves</span
+              >
+              <button
+                id="stop-turns"
+                class="quiet"
+                type="button"
+                disabled
+                title="Finish the current value, discard queued values, and stop the timer."
+              >
+                Stop after this value
+              </button>
+            </div>
+            <span class="hint">HTM: ONE QUARTER OR HALF TURN = ONE MOVE</span>
+            <span class="hint">DRAG TO LOOK AROUND · SCROLL TO ZOOM</span>
           </div>
         </div>
         <aside class="controls">

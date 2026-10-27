@@ -405,3 +405,16 @@ footer a {
     transition: none !important;
   }
 }
+
+.move-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  font-size: 12px;
+}
+#move-progress {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
