@@ -14,7 +14,6 @@ This directory is a portable, Markdown-first knowledge base and an optional Obsi
 - [Specifications](specs/index.md) — testable product and technical requirements
 - [Plans](plans/index.md) — implementation approach
 - [Milestones](milestones/index.md) — delivery outcomes
-- [Tasks](tasks/index.md) — only durable task notes; use GitHub Issues for actionable work
 - [Assets](assets/index.md) — locally owned illustrations and supporting media
 - [Conventions](CONVENTIONS.md) — metadata, links, lifecycle and templates
 
