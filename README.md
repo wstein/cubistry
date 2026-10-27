@@ -95,3 +95,7 @@ strictly upright-digit model. This is separate from the 5×5 calendar results.
 include independently verified five-HTM maximum step routes for 19:50 and 59:50,
 printable vector nets, and complete transition statistics. Global print
 optimality remains UNKNOWN.
+
+[Move-optimized fixed-title 00–99 counter](research/counter-2x2-optimization/REPORT.md)
+provides the COUNTER print, all reversible ±1 words, and independent verification
+of five-HTM maximum step routes. Global print optimality remains UNKNOWN.

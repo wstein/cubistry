@@ -1,0 +1,317 @@
+{
+  "HTM": {
+    "count": 99,
+    "minimum": 1,
+    "maximum": 5,
+    "mean": 3.4242424242424243,
+    "median": 3,
+    "p95": 5,
+    "total": 339,
+    "histogram": {
+      "1": 6,
+      "2": 8,
+      "3": 40,
+      "4": 28,
+      "5": 17
+    }
+  },
+  "QTM": {
+    "count": 99,
+    "minimum": 1,
+    "maximum": 8,
+    "mean": 4.222222222222222,
+    "median": 4,
+    "p95": 8,
+    "total": 418,
+    "histogram": {
+      "1": 5,
+      "2": 3,
+      "3": 34,
+      "4": 19,
+      "5": 14,
+      "6": 16,
+      "7": 1,
+      "8": 7
+    }
+  },
+  "baselineDirect": {
+    "count": 99,
+    "minimum": 1,
+    "maximum": 6,
+    "mean": 4.656565656565657,
+    "median": 5,
+    "p95": 6,
+    "total": 461,
+    "histogram": {
+      "1": 1,
+      "3": 17,
+      "4": 18,
+      "5": 41,
+      "6": 22
+    }
+  },
+  "legacyHubRaw": {
+    "count": 99,
+    "minimum": 17,
+    "maximum": 20,
+    "mean": 19.11111111111111,
+    "median": 19,
+    "p95": 20,
+    "total": 1892,
+    "histogram": {
+      "17": 5,
+      "18": 14,
+      "19": 45,
+      "20": 35
+    }
+  },
+  "totalReductionPercent": 26.464208242950107,
+  "categories": {
+    "units only": {
+      "count": 90,
+      "minimum": 1,
+      "maximum": 5,
+      "mean": 3.3666666666666667,
+      "median": 3.0,
+      "p95": 5,
+      "total": 303,
+      "histogram": {
+        "1": 6,
+        "2": 6,
+        "3": 40,
+        "4": 25,
+        "5": 13
+      }
+    },
+    "tens rollover": {
+      "count": 9,
+      "minimum": 2,
+      "maximum": 5,
+      "mean": 4,
+      "median": 4,
+      "p95": 5,
+      "total": 36,
+      "histogram": {
+        "2": 2,
+        "4": 3,
+        "5": 4
+      }
+    }
+  },
+  "faceTurns": {
+    "B": 79,
+    "D": 14,
+    "F": 7,
+    "L": 6,
+    "R": 142,
+    "U": 91
+  },
+  "halfTurns": 79,
+  "titleCopies": {
+    "title-left": 2,
+    "title-right": 2
+  },
+  "printingByCubie": {
+    "0": [
+      "TL:title-left",
+      "DT:9",
+      "DT:7"
+    ],
+    "1": [
+      "TL:title-left",
+      "DT:2",
+      "DT:5"
+    ],
+    "2": [
+      "DT:0",
+      "DT:8",
+      "DT:6"
+    ],
+    "3": [
+      "DT:3",
+      "DT:4",
+      "DT:1"
+    ],
+    "4": [
+      "TR:title-right",
+      "DU:1",
+      "DU:6"
+    ],
+    "5": [
+      "TR:title-right",
+      "DU:7",
+      "DU:3"
+    ],
+    "6": [
+      "DU:5",
+      "DU:9",
+      "DU:2"
+    ],
+    "7": [
+      "DU:4",
+      "DU:8",
+      "DU:0"
+    ]
+  },
+  "endpoints": {
+    "ticks": 100,
+    "zeroWord": "U2 F' L U' R'",
+    "maximumWord": "F U' R' U F2 U2 L F' L2 U2",
+    "maximumHTM": 10
+  },
+  "worstTransitions": [
+    {
+      "fromValue": "00",
+      "toValue": "01",
+      "increment": "R2 B' U2 B' U2",
+      "decrement": "U2 B U2 B R2",
+      "HTM": 5,
+      "QTM": 8,
+      "category": "units only"
+    },
+    {
+      "fromValue": "09",
+      "toValue": "10",
+      "increment": "R' B2 R B' D'",
+      "decrement": "D B R' B2 R",
+      "HTM": 5,
+      "QTM": 6,
+      "category": "tens rollover"
+    },
+    {
+      "fromValue": "16",
+      "toValue": "17",
+      "increment": "U2 R U2 R' U2",
+      "decrement": "U2 R U2 R' U2",
+      "HTM": 5,
+      "QTM": 8,
+      "category": "units only"
+    },
+    {
+      "fromValue": "24",
+      "toValue": "25",
+      "increment": "U F D2 F' U'",
+      "decrement": "U F D2 F' U'",
+      "HTM": 5,
+      "QTM": 6,
+      "category": "units only"
+    },
+    {
+      "fromValue": "26",
+      "toValue": "27",
+      "increment": "U2 R U2 R' U2",
+      "decrement": "U2 R U2 R' U2",
+      "HTM": 5,
+      "QTM": 8,
+      "category": "units only"
+    },
+    {
+      "fromValue": "42",
+      "toValue": "43",
+      "increment": "R B' R2 B' R'",
+      "decrement": "R B R2 B R'",
+      "HTM": 5,
+      "QTM": 6,
+      "category": "units only"
+    },
+    {
+      "fromValue": "49",
+      "toValue": "50",
+      "increment": "B R D' F2 D'",
+      "decrement": "D F2 D R' B'",
+      "HTM": 5,
+      "QTM": 6,
+      "category": "tens rollover"
+    },
+    {
+      "fromValue": "55",
+      "toValue": "56",
+      "increment": "R' U R' U' R2",
+      "decrement": "R2 U R U' R",
+      "HTM": 5,
+      "QTM": 6,
+      "category": "units only"
+    },
+    {
+      "fromValue": "56",
+      "toValue": "57",
+      "increment": "U2 R U2 R' U2",
+      "decrement": "U2 R U2 R' U2",
+      "HTM": 5,
+      "QTM": 8,
+      "category": "units only"
+    },
+    {
+      "fromValue": "62",
+      "toValue": "63",
+      "increment": "R B' R2 B' R'",
+      "decrement": "R B R2 B R'",
+      "HTM": 5,
+      "QTM": 6,
+      "category": "units only"
+    },
+    {
+      "fromValue": "72",
+      "toValue": "73",
+      "increment": "R' B' R2 B' R",
+      "decrement": "R' B R2 B R",
+      "HTM": 5,
+      "QTM": 6,
+      "category": "units only"
+    },
+    {
+      "fromValue": "75",
+      "toValue": "76",
+      "increment": "R2 F2 R U2 L",
+      "decrement": "L' U2 R' F2 R2",
+      "HTM": 5,
+      "QTM": 8,
+      "category": "units only"
+    },
+    {
+      "fromValue": "76",
+      "toValue": "77",
+      "increment": "U2 R U2 R' U2",
+      "decrement": "U2 R U2 R' U2",
+      "HTM": 5,
+      "QTM": 8,
+      "category": "units only"
+    },
+    {
+      "fromValue": "79",
+      "toValue": "80",
+      "increment": "R2 B' L2 F L",
+      "decrement": "L' F' L2 B R2",
+      "HTM": 5,
+      "QTM": 7,
+      "category": "tens rollover"
+    },
+    {
+      "fromValue": "85",
+      "toValue": "86",
+      "increment": "B' R2 U R U'",
+      "decrement": "U R' U' R2 B",
+      "HTM": 5,
+      "QTM": 6,
+      "category": "units only"
+    },
+    {
+      "fromValue": "89",
+      "toValue": "90",
+      "increment": "D B R' B2 R",
+      "decrement": "R' B2 R B' D'",
+      "HTM": 5,
+      "QTM": 6,
+      "category": "tens rollover"
+    },
+    {
+      "fromValue": "96",
+      "toValue": "97",
+      "increment": "U2 R' B2 R U2",
+      "decrement": "U2 R' B2 R U2",
+      "HTM": 5,
+      "QTM": 8,
+      "category": "units only"
+    }
+  ]
+}
