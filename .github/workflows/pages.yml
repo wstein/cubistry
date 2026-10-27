@@ -22,6 +22,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - run: npm run prepare:solver
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       # The regression builds dist with /cubistry/ and serves plain static files.

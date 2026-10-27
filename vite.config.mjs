@@ -3,6 +3,9 @@ import { fileURLToPath } from "node:url";
 import { solverAcceptancePlugin } from "./src/dev/acceptance-plugin.ts";
 export default defineConfig({
   base: process.env.VITE_BASE_PATH || "/",
+  // Keep module-relative provider assets available in development and builds.
+  optimizeDeps: { exclude: ["@puzlwerk/solver-2x2"] },
+  assetsInclude: ["**/*.bin"],
   plugins: [solverAcceptancePlugin()],
   build: {
     rollupOptions: {
