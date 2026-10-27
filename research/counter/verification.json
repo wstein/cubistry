@@ -1,0 +1,30 @@
+{
+  "verdicts": {
+    "paddedTextMovable": "SAT",
+    "unpaddedTextMovable": "SAT",
+    "paddedTextFixedCubies": "UNSAT",
+    "unpaddedTextFixedCubies": "UNSAT",
+    "blankFallback": "NOT_RUN_TEXT_SAT",
+    "externalOverlay": "SAT_as_weaker_target_not_used"
+  },
+  "witnessSHA256": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+  "independentCheckerSHA256": "f2c5142cb14f98a573f1bb80735f70bfadff38ebd207fbebed42e81b85b14518",
+  "physicalCubies": 8,
+  "physicalStickers": 24,
+  "titleCopies": {
+    "left": 2,
+    "right": 2
+  },
+  "valuesVerified": 100,
+  "orderedTransitionsByHubFactorization": 10000,
+  "chainedTransitions": 800,
+  "allMovesLegal": true,
+  "allVisiblePrintedGlyphsUpright": true,
+  "actualPrintRotationTamperRejected": true,
+  "fixedCubieProof": {
+    "availableDigitFaces": 18,
+    "requiredPadded": 20,
+    "requiredUnpadded": 20
+  },
+  "runtimeSeconds": 3.395
+}
