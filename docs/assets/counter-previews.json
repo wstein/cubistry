@@ -1,0 +1,19 @@
+{
+  "kind": "Browser screenshots, not production sticker exports",
+  "browser": "Chromium 141.0.7390.37, Playwright 1.56.1",
+  "deviceScaleFactor": 1,
+  "images": [
+    {
+      "file": "counter-desktop.png",
+      "pixelWidth": 1280,
+      "pixelHeight": 1258,
+      "sha256": "fcf9d191844b93640105ea08ff7644f552cf7deea7e82454a2938689addb55f9"
+    },
+    {
+      "file": "counter-mobile.png",
+      "pixelWidth": 390,
+      "pixelHeight": 1562,
+      "sha256": "bcd53ac3c5d6b1200c418cac6d95ce85e66a50111c8390b19d7cad77290e73fa"
+    }
+  ]
+}

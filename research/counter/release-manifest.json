@@ -1,0 +1,42 @@
+{
+  "generatedProofCommit": "37e3e0c",
+  "checkerHardeningCommit": "7ca41f4",
+  "numericConvention": "Distinct upright images, no 6/9 cross-character rotation aliases; SVG baseline marker enforces this.",
+  "proofEvidence": "research/counter/verification-v3.json",
+  "versions": {
+    "node": "v24.19.0",
+    "python": "3.12.14",
+    "cubing": "0.66.1",
+    "three": "0.180.0",
+    "notoSansPackage": "5.2.10"
+  },
+  "oldArtifactsPreserved": [
+    "research/counter/manifest.json",
+    "research/counter/verification.json",
+    "research/counter/manifest-v2.json",
+    "research/counter/verification-v2.json"
+  ],
+  "browserRuntimeUsesSolver": false,
+  "witnessBytes": 19793,
+  "sha256": {
+    "src/cube.mjs": "2bcdeaee79ef7f1244aa75d181785c447fe9d4f1eda7df9ffa5ffdf1e591abba",
+    "src/renderer.mjs": "a6572b340eb9c08c0c03ebbd2d60d1685c85d9994dd593f6698026c2be4bab9d",
+    "src/main.mjs": "91f56e70a819d4e599904c89346a75bbd2a2ad18c41d6a5fca5feae2ff085bef",
+    "src/counter.mjs": "ce57c7ddcd6a86d1e4d48b96dbf4ef42f8020d78f95cc89a8faaf90957d635e6",
+    "src/vendor/orbit-input.mjs": "38709a495354f44e6e4a0d477a8725c578c2bfc409c065d09b1a50f100c9f752",
+    "research/counter/verify.py": "0c8b31e87dcd544bdab4fa0ab8d1586469561aa4659f9b125aa88bc11bdb96dc",
+    "public/counter-proof.json": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+    "public/fonts/noto-sans-latin-600.woff2": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed",
+    "package-lock.json": "b94f879327d5500d426f7dc0b59fd4fcb56bb08b184a129cc5ab5e881b558144",
+    "research/counter/verification-v3.json": "4e5c14281418c8077f9f07aac66cb3dcfc307457a8cd702204b38fe3908cfef9"
+  },
+  "validation": {
+    "nodeTests": 7,
+    "pythonTamperTests": 5,
+    "browserTests": 7,
+    "independentProof": "PASS",
+    "productionBuild": "PASS",
+    "spelling": "typos 1.49.0 PASS",
+    "localLinks": "lychee 0.24.2 PASS"
+  }
+}

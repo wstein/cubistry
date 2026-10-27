@@ -3,7 +3,9 @@
 Issue [#18](https://github.com/wstein/cubistry/issues/18) is evaluated before the
 interactive implementation. The numeric range is 0–99, the lower two front
 stickers show the digits, and the upper two show a once-configured arbitrary
-two-fragment title. Every completed target is upright in the same world frame.
+two-fragment title. Digit images are distinct and upright; cross-character
+rotation aliases such as 6 becoming 9 are excluded. The renderer includes a
+baseline mark in each numeric SVG to enforce that convention. Every completed target is upright in the same world frame.
 
 | Numeric printing | Title condition | Verdict |
 | --- | --- | --- |
@@ -59,7 +61,8 @@ same complete source state. Thus `inverse(word[A]) + word[B]` is legal for
 transitions per numeric format are additionally replayed without resetting state. No claim of
 shortest paths to a display or shortest arbitrary transitions is made.
 
-The stronger fixed-cubie condition is impossible independently of solver choice:
+Within that explicit distinct-glyph model, the stronger fixed-cubie condition
+is impossible independently of solver choice:
 the two immovable upper cubies cannot supply any of their six stickers to the
 lower target positions. The other six corners have only 18 sticker faces.
 Padded digits require two distinct physical copies of each digit because dd
@@ -75,8 +78,8 @@ node research/counter/generate.mjs
 python3 research/counter/verify.py
 ```
 
-The committed [independent result](../research/counter/verification-v2.json) and
-[manifest](../research/counter/manifest-v2.json) record hashes and versions. No
+The committed [independent result](../research/counter/verification-v3.json) and
+[manifest](../research/counter/release-manifest.json) record hashes and versions. No
 traditional cube colors are assumed: these are actual immutable custom images.
 Glyph recognition is symbolic here; the browser renderer must preserve the
 same source frames and use the same move replayer. Title artwork is instantiated

@@ -24,3 +24,7 @@ Cubistry = "Cubistry"
 cubie = "cubie"
 cubies = "cubies"
 Zettel = "Zettel"
+
+# Upstream font license names the standard OpenType width axis literally.
+[default.extend-identifiers]
+wdth = "wdth"
