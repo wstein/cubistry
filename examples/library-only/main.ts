@@ -7,14 +7,21 @@ const host = document.querySelector<HTMLElement>("#cube")!,
   turn = document.querySelector<HTMLButtonElement>("#turn")!,
   inverse = document.querySelector<HTMLButtonElement>("#inverse")!;
 try {
-  const response = await fetch("/examples/library-design.json");
+  const response = await fetch(
+    `${import.meta.env.BASE_URL}examples/library-design.json`,
+  );
   if (!response.ok) throw Error("Independent design could not be loaded");
   const {
       print,
       state: source,
       assets,
     } = await parseDesignState(await response.text()),
-    loaded = await loadAssets(assets, [print]),
+    loaded = await loadAssets(
+      assets,
+      [print],
+      undefined,
+      import.meta.env.BASE_URL,
+    ),
     viewer = new CubeViewer(host);
   let state = source;
   viewer.configure(print, state, loaded);
