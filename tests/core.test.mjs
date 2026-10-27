@@ -139,3 +139,12 @@ test("cross-language state JSON ordering is irrelevant but changed transitions s
     /legal state transition/,
   );
 });
+
+test("ReScript interop rejects coercible move faces and integer overflow references", async () => {
+  const {validateMove,serializeMove} = await import("@cubistry/cube-mechanics");
+  for (const face of [["R"],{toString:()=>"R"},false,1,null]) {
+    assert.throws(()=>validateMove({face,turns:1}));
+    assert.throws(()=>serializeMove({face,turns:1}));
+  }
+  const bad=structuredClone(source);bad.stickers[0].cubie=4294967296;assert.throws(()=>validatePrint(bad),/integer/);
+});

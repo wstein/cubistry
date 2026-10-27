@@ -6,6 +6,7 @@
   "license": "AGPL-3.0-or-later",
   "exports": "./src/index.ts",
   "dependencies": {
-    "@cubistry/cube-core": "*"
+    "@cubistry/cube-core": "*",
+    "@rescript/runtime": "12.3.1"
   }
 }

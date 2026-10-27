@@ -1,10 +1,6 @@
 import {
   deepFreeze,
   demand,
-  identifier,
-  record,
-  validatePrint,
-  validateState,
   type PrintDefinition,
 } from "@cubistry/cube-core";
 export interface FontAsset {
@@ -63,167 +59,12 @@ export interface LoadedAssets {
   readonly materials: ReadonlyMap<string, Material>;
   readonly dispose: () => void;
 }
-export const ASSET_LIMITS = deepFreeze({
-  count: 64,
-  bytesPerFile: 262144,
-  totalBytes: 4194304,
-  pixelsPerSide: 1024,
-  decodedPixels: 8388608,
-  textCodePoints: 512,
-  timeoutMs: 10000,
-});
-const color = (s: unknown): s is string =>
-  typeof s === "string" && /^#[0-9a-fA-F]{6}$/.test(s);
-const hash = (s: unknown): s is string =>
-  typeof s === "string" && /^[0-9a-f]{64}$/.test(s);
-export function safeAssetPath(value: unknown): string {
-  demand(
-    typeof value === "string" &&
-      value.length <= 256 &&
-      /^\/[A-Za-z0-9_/-]+\.(svg|png|webp|woff2)$/.test(value) &&
-      !value.includes("//") &&
-      !value.split("/").includes(".."),
-    "Asset URL must be a bounded same-origin static path",
-  );
-  return value;
-}
-const unique = (items: readonly { id: string }[], name: string) =>
-  demand(
-    new Set(items.map((i) => i.id)).size === items.length,
-    `Duplicate ${name} ID`,
-  );
-export function validateAssets(
-  raw: unknown,
-  prints: readonly PrintDefinition[] = [],
-): AssetManifest {
-  const a = record(raw, "assets");
-  demand(
-    a.schema === "cubistry.assets" && a.version === 1,
-    "Unsupported asset schema/version",
-  );
-  for (const k of ["fonts", "materials", "documents", "images"])
-    demand(
-      Array.isArray(a[k]) && (a[k] as unknown[]).length <= ASSET_LIMITS.count,
-      `Invalid ${k} list`,
-    );
-  for (const raw of a.fonts as unknown[]) {
-    const f = record(raw, "font");
-    demand(
-      identifier(f.id) &&
-        f.format === "woff2" &&
-        hash(f.sha256) &&
-        typeof f.family === "string" &&
-        /^[A-Za-z][A-Za-z0-9 _-]{0,63}$/.test(f.family) &&
-        Number.isInteger(f.weight) &&
-        Number(f.weight) >= 100 &&
-        Number(f.weight) <= 900 &&
-        typeof f.license === "string" &&
-        f.license.length <= 128,
-      "Invalid font metadata",
-    );
-    demand(safeAssetPath(f.url).endsWith(".woff2"), "Font URL/format mismatch");
-  }
-  for (const raw of a.materials as unknown[]) {
-    const m = record(raw, "material");
-    demand(
-      identifier(m.id) &&
-        color(m.color) &&
-        typeof m.roughness === "number" &&
-        Number.isFinite(m.roughness) &&
-        m.roughness >= 0 &&
-        m.roughness <= 1,
-      "Invalid material",
-    );
-  }
-  const fonts = new Set((a.fonts as FontAsset[]).map((f) => f.id));
-  for (const raw of a.documents as unknown[]) {
-    const d = record(raw, "text document");
-    demand(
-      identifier(d.id) &&
-        typeof d.text === "string" &&
-        Array.from(d.text).length <= ASSET_LIMITS.textCodePoints &&
-        d.text.split("\n").length <= 16 &&
-        identifier(d.fontId) &&
-        fonts.has(d.fontId) &&
-        color(d.color) &&
-        color(d.background),
-      "Invalid text/font reference",
-    );
-    for (const k of [
-      "width",
-      "height",
-      "fontSize",
-      "minFontSize",
-      "lineHeight",
-    ])
-      demand(
-        Number.isInteger(d[k]) &&
-          Number(d[k]) > 0 &&
-          Number(d[k]) <= ASSET_LIMITS.pixelsPerSide,
-        `Invalid text ${k}`,
-      );
-    demand(
-      Number(d.minFontSize) <= Number(d.fontSize),
-      "Invalid text font-size range",
-    );
-  }
-  const documents = new Map(
-    (a.documents as TextDocument[]).map((d) => [d.id, d]),
-  );
-  for (const raw of a.images as unknown[]) {
-    const i = record(raw, "image");
-    demand(identifier(i.id), "Invalid image ID");
-    if (i.kind === "color") demand(color(i.color), "Invalid flat image color");
-    else if (i.kind === "image") {
-      demand(
-        typeof i.format === "string" &&
-          ["svg", "png", "webp"].includes(i.format) &&
-          hash(i.sha256),
-        "Unsupported image format or missing integrity hash",
-      );
-      demand(
-        safeAssetPath(i.url).endsWith("." + i.format),
-        "Image URL/format mismatch",
-      );
-    } else if (i.kind === "text") {
-      demand(identifier(i.documentId), "Invalid text-document reference type");
-      const d = documents.get(i.documentId);
-      demand(
-        d &&
-          Array.isArray(i.crop) &&
-          i.crop.length === 4 &&
-          i.crop.every(Number.isInteger),
-        "Invalid text image reference/crop",
-      );
-      const [x, y, w, h] = i.crop;
-      demand(
-        x >= 0 &&
-          y >= 0 &&
-          w > 0 &&
-          h > 0 &&
-          x + w <= d.width &&
-          y + h <= d.height,
-        "Text crop exceeds document",
-      );
-    } else throw Error("Unsupported asset kind");
-  }
-  const typed = a as unknown as AssetManifest;
-  for (const [name, list] of [
-    ["font", typed.fonts],
-    ["material", typed.materials],
-    ["document", typed.documents],
-    ["image", typed.images],
-  ] as const)
-    unique(list, name);
-  const ids = new Set(typed.images.map((i) => i.id)),
-    materials = new Set(typed.materials.map((i) => i.id));
-  for (const p of prints)
-    for (const s of p.stickers)
-      demand(
-        ids.has(s.assetId) && materials.has(s.materialId),
-        "Unresolved physical sticker asset/material",
-      );
-  return deepFreeze(structuredClone(typed));
+/** Pure schema and JSON transport implementation is owned by ReScript. */
+import * as Assets from "../res/PwAssets.res.mjs";
+export const ASSET_LIMITS = Assets.limits;
+export const safeAssetPath = Assets.safeAssetPath;
+export function validateAssets(raw: unknown, prints: readonly PrintDefinition[] = []): AssetManifest {
+  return Assets.validateAssets(raw, prints);
 }
 const allowedTags = new Set([
   "svg",
@@ -599,38 +440,8 @@ export async function loadAssets(
     },
   });
 }
-/** Lossless physical JSON transport. Color-facelet codecs are not substituted. */
-export function serializeDesignState(
-  print: PrintDefinition,
-  state: import("@cubistry/cube-core").CubeState,
-  assets: AssetManifest,
-): string {
-  print = validatePrint(print);
-  state = validateState(state, print);
-  assets = validateAssets(assets, [print]);
-  return JSON.stringify({
-    schema: "cubistry.design-state",
-    version: 1,
-    print,
-    state,
-    assets,
-  });
-}
-export async function parseDesignState(
-  text: string,
-): Promise<{
-  print: PrintDefinition;
-  state: import("@cubistry/cube-core").CubeState;
-  assets: AssetManifest;
-}> {
-  demand(text.length <= 2097152, "Design-state JSON exceeds limit");
-  const raw = record(JSON.parse(text), "design-state");
-  demand(
-    raw.schema === "cubistry.design-state" && raw.version === 1,
-    "Unsupported design-state schema/version",
-  );
-  const print = validatePrint(raw.print),
-    state = validateState(raw.state, print),
-    assets = validateAssets(raw.assets, [print]);
-  return deepFreeze({ print, state, assets });
+/** ReScript-owned lossless JSON codec; Promise shape retained for consumers. */
+export const serializeDesignState = Assets.serializeDesignState;
+export async function parseDesignState(text: string): Promise<{print: PrintDefinition; state: import("@cubistry/cube-core").CubeState; assets: AssetManifest}> {
+  return Assets.parseDesignState(text);
 }
