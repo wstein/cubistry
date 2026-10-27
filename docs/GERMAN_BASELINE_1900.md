@@ -1,5 +1,9 @@
 # German baseline, 1900–2099: frozen printing independently verified SAT
 
+The separate [four-right-fragment logo investigation](GERMAN_FOUR_LOGO.md)
+proves UNSAT for that changed logo occupancy. The three-fragment printing and
+SAT certificate reviewed on this page remain unchanged.
+
 This is the scoped baseline review for [issue #5](https://github.com/wstein/cubistry/issues/5),
 performed after the [English investigation](ENGLISH_BASELINE_1900.md).
 No new printing was synthesized, no wider-century experiment was run, and the

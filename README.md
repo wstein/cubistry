@@ -12,6 +12,8 @@ UNSAT](docs/ENGLISH_BASELINE_1900.md) for the exact colored split-year/wordmark
 model; [German is independently verified SAT](docs/GERMAN_BASELINE_1900.md)
 using the existing two-hundreds printing unchanged. Reproduce with
 `npm run verify:baselines` after activating the pinned Python environment.
+The [four-right-fragment logo variant](docs/GERMAN_FOUR_LOGO.md) is independently
+UNSAT with the same German baseline colors and date formatting.
 The bilingual investigation remains deferred. Earlier wider-century results
 below are preserved research evidence, not an expansion of this baseline.
 

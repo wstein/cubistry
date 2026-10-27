@@ -1,0 +1,42 @@
+{
+  "status": "UNSAT",
+  "baselineCommit": "d5dc8a8caa74d44341622e71c532a294a6f6e1bd",
+  "branch": "spike/5x5-en-de-feasibility",
+  "years": [
+    1900,
+    2099
+  ],
+  "change": "four visible upright image fragments in row 4 columns 2\u20135; column 1 blank",
+  "versions": {
+    "node": "v24.19.0",
+    "python": "3.12.14",
+    "solver": "none"
+  },
+  "commands": [
+    "npm run build",
+    "timeout 60 node scripts/german-four-logo.mjs > /tmp/german-four-logo-candidate.json",
+    "timeout 60 python3 scripts/verify_german_four_logo.py /tmp/german-four-logo-candidate.json > /tmp/german-four-logo-verification.json"
+  ],
+  "timeoutSeconds": 60,
+  "checkerExitStatus": 0,
+  "negativeControls": {
+    "fourth logo removed": {
+      "rejected": true,
+      "reason": "Exact four-fragment German scope differs"
+    },
+    "false singleton bound": {
+      "rejected": true,
+      "reason": "Counting certificate differs"
+    }
+  },
+  "oldPrintingModified": false,
+  "sha256": {
+    "src/Display.res": "4bcbcd91a1ccf174641ff8b961ead66cb39045927b0863dd210d50d95d7fdcca",
+    "scripts/german-four-logo.mjs": "21844f969a1203e4a697950b644e8ccbe6046a9f1832796e65219d6490d476dd",
+    "scripts/verify_german_four_logo.py": "4bf958b037eae38f6d3831b936f865a0957fc197ef02f36cc677371036fd6450",
+    "results/baseline-1900-2099/german-four-logo-candidate.json": "94c95adc598d63f0ddacf59d6435e19f4ef1094c6de9cb376e5e9161c5c3cdc9",
+    "results/baseline-1900-2099/german-four-logo-verification.json": "7553eec888d5ea017c694353c22594f232f7e9640de16d6ac8ed3f6190985635",
+    "results/german-century-09.json": "a1df97595df3b995597737ccb06dd29e9d816ecdacb8b86c5e6744d9d0aede6d",
+    "results/german-century-09-printing.csv": "377afebd397d59bcec4ea0cddd2ae769692c159a98868b6ebb2211a0169f52c7"
+  }
+}
