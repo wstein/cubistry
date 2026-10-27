@@ -252,3 +252,11 @@ test("SVG paint escapes cannot hide external references", async ({ page }) => {
   });
   expect(result).toContain("Unsafe SVG attribute");
 });
+
+test("missing secure Web Crypto gives an actionable startup and asset diagnostic", async ({page}) => {
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.addInitScript(()=>Object.defineProperty(globalThis.crypto,'subtle',{value:undefined,configurable:true}));
+  await page.goto('/');await expect(page.locator('#error')).toContainText('Secure Web Crypto is unavailable');await expect(page.locator('#error')).toContainText('http://localhost:');await expect(page.locator('#error')).toContainText('HTTPS');await expect(page.locator('#cube')).not.toHaveAttribute('data-value','15');
+  const diagnostic=await page.evaluate(async()=>{const {loadAssets}=await import('/packages/cube-assets/src/index.ts');const wire=await(await fetch('/counter-design.v2.json')).json();try{await loadAssets(wire.assets,[]);return 'accepted without integrity';}catch(error){return error.message;}});
+  expect(diagnostic).toContain('Secure Web Crypto is unavailable');expect(diagnostic).toContain('localhost');expect(diagnostic).toContain('HTTPS');expect(errors).toEqual([]);
+});

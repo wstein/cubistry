@@ -9,7 +9,7 @@ import {
   type DisplayTarget,
   type Vec3,
 } from "@cubistry/cube-core";
-import { validateAssets, type AssetManifest } from "@cubistry/cube-assets";
+import { sha256, validateAssets, type AssetManifest } from "@cubistry/cube-assets";
 import {
   initialState,
   applyMoves,
@@ -194,9 +194,7 @@ export async function configurePrint(
   const bytes = new TextEncoder().encode(
     JSON.stringify({ print: base, assets }),
   );
-  const hash = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))]
-    .map((v) => v.toString(16).padStart(2, "0"))
-    .join("");
+  const hash = await sha256(bytes);
   return { print: validatePrint({ ...base, id: "counter_" + hash }), assets };
 }
 
