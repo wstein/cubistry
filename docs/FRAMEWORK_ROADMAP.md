@@ -12,8 +12,11 @@ a resolver into the viewer. Keep camera and product timer logic separate.
 Use genuine ReScript-owned domain/mechanics/validation/notation/codecs and an
 explicit checked JS/TypeScript interop contract; keep viewing/interaction in
 TypeScript. This follows the binding PuzWerk addition to issue #21 (updated
-2026-10-27T15:00:50Z), superseding the earlier TS-core hypothesis. PuzWerk is the
-brand; `wstein/puzwerk` and `@puzwerk/*` remain planned/unpublished. No new Rust
+2026-10-27T15:00:50Z), superseding the earlier TS-core hypothesis. The current brand is PuzlWerk;
+[`wstein/puzlwerk`](https://github.com/wstein/puzlwerk) exists and the package scope
+is `@puzlwerk/*`. Publication and consumer integration remain separate approvals.
+The dated decision above retains its historical name and does not rename local
+`@cubistry/*` workspaces. No new Rust
 project belongs in that framework; a versioned external adapter is the boundary.
 Run the counter using those actual shared modules, not parallel legacy physics.
 A solver facade prototype lives outside core and truthfully reports capabilities.

@@ -45,11 +45,13 @@ separate while turning and return upright after each completed value.
 
 ## Shared framework path
 
-The counter is the first consumer of **PuzWerk**: actual private shared workspaces
+The counter is the first consumer of **PuzlWerk**: actual private shared workspaces
 with a ReScript-owned domain/mechanics/validation/JSON codec and a TypeScript
 viewer/browser asset loader. The canonical naming/language decision is
-[issue #21](https://github.com/wstein/cubistry/issues/21); the planned hosted
-repository and `@puzwerk/*` namespace have not been created or published. [M1 contracts and data flow](docs/SHARED_CUBE_M1.md)
+[issue #21](https://github.com/wstein/cubistry/issues/21); the hosted
+repository is [PuzlWerk](https://github.com/wstein/puzlwerk), with the
+`@puzlwerk/*` scope used for shared-package naming. No package publication or
+consumer migration is implied; the existing `@cubistry/*` workspaces stay unchanged. [M1 contracts and data flow](docs/SHARED_CUBE_M1.md)
 document the validated v2 design, loadable oriented images, independent replay,
 and the explicit size-2 limits. Sizes 3–7 and external migrations remain planned.
 
