@@ -1,0 +1,53 @@
+{
+  "status": "UNSAT",
+  "experiment": "independent red-weekend study; three-fragment logo baseline",
+  "baselineCommit": "09070014c1650a304e10f591c5db9f031c90cd2a",
+  "branch": "spike/5x5-en-de-feasibility",
+  "years": [
+    1900,
+    2099
+  ],
+  "versions": {
+    "node": "v24.19.0",
+    "python": "3.12.14",
+    "solver": "none"
+  },
+  "commands": [
+    "npm run build",
+    "timeout 60 node scripts/weekend-color.mjs > /tmp/weekend-color-candidate.json",
+    "timeout 60 python3 scripts/verify_weekend_color.py /tmp/weekend-color-candidate.json > /tmp/weekend-color-verification.json"
+  ],
+  "timeoutSeconds": 60,
+  "checkerExitStatus": 0,
+  "negativeControls": {
+    "weekend ink rule removed": {
+      "rejected": true,
+      "reason": "Exact weekend-color baseline scope differs"
+    },
+    "colored O identity erased": {
+      "rejected": true,
+      "reason": "Required multiplicities differ"
+    },
+    "false tight bound": {
+      "rejected": true,
+      "reason": "Counting certificate differs"
+    }
+  },
+  "oldPrintingModified": false,
+  "sha256": {
+    "src/Display.res": "4bcbcd91a1ccf174641ff8b961ead66cb39045927b0863dd210d50d95d7fdcca",
+    "scripts/weekend-color.mjs": "ac87c12dc015cabd5da557431a7fdc238f31242f82dd167e3bffb3d0e55b57f1",
+    "scripts/verify_weekend_color.py": "53a2fad0d7d7cc0e6f614cb94c49d7759fa64b8640046d61d987d9eb6e0c2212",
+    "results/german-century-09.json": "a1df97595df3b995597737ccb06dd29e9d816ecdacb8b86c5e6744d9d0aede6d",
+    "results/german-century-09-printing.csv": "377afebd397d59bcec4ea0cddd2ae769692c159a98868b6ebb2211a0169f52c7",
+    "results/baseline-1900-2099/weekend-color-candidate.json": "b3a99587c025a8b24615d73eb7046ade2983652f4dafad8882e6966154c9bffc",
+    "results/baseline-1900-2099/weekend-color-verification.json": "55e94c6aa29e3f57ab69036de48bc1d5fadc4ffffdd8800eded9867f1a329411",
+    "results/baseline-1900-2099/weekend-color-capacity-audit.json": "9f7be798a77ac990f7c842ed6dd8645ee274566fdd70263b57c5c45729a6c3a8"
+  },
+  "review": {
+    "generatorReplayByteIdentical": true,
+    "checkerReplayProofFieldsIdentical": true,
+    "spelling": "typos 1.49.0 passed",
+    "localLinks": "lychee 0.24.2 passed"
+  }
+}

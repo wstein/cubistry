@@ -1,0 +1,152 @@
+{
+  "status": "UNSAT",
+  "weekdayImageInventories": [
+    [
+      [
+        "D",
+        "weekday-black"
+      ],
+      [
+        "F",
+        "weekday-black"
+      ],
+      [
+        "M",
+        "weekday-black"
+      ],
+      [
+        "S",
+        "date-red"
+      ]
+    ],
+    [
+      [
+        "A",
+        "date-red"
+      ],
+      [
+        "I",
+        "weekday-black"
+      ],
+      [
+        "O",
+        "date-red"
+      ],
+      [
+        "O",
+        "weekday-black"
+      ],
+      [
+        "R",
+        "weekday-black"
+      ]
+    ],
+    [
+      [
+        "E",
+        "weekday-black"
+      ],
+      [
+        "M",
+        "date-red"
+      ],
+      [
+        "N",
+        "date-red"
+      ],
+      [
+        "N",
+        "weekday-black"
+      ],
+      [
+        "T",
+        "weekday-black"
+      ]
+    ]
+  ],
+  "weekdayImageTypeCount": 14,
+  "experiment": "German red weekends with three-fragment logo",
+  "model": {
+    "language": "DE",
+    "years": [
+      1900,
+      2099
+    ],
+    "calendar": "proleptic Gregorian",
+    "weekdays": [
+      "MON",
+      "DIE",
+      "MIT",
+      "DON",
+      "FRE",
+      "SAM",
+      "SON"
+    ],
+    "months": [
+      "JAN",
+      "FEB",
+      "MÄR",
+      "APR",
+      "MAI",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OKT",
+      "NOV",
+      "DEZ"
+    ],
+    "dayPadding": "zero",
+    "hourPadding": "zero",
+    "minutePadding": "zero",
+    "yearLayout": "thousands,hundreds,blank,tens,units",
+    "row4": [
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "palette": {
+      "weekdayLetters": "weekday-black except SAM/SON date-red",
+      "monthLetters": "date-red",
+      "dateDigits": "date-red",
+      "yearDigits": "year-gray",
+      "timeDigits": "time-blue",
+      "colon": "date-red",
+      "wordmark": "immutable multicolor images",
+      "blank": "none"
+    },
+    "weekendColorRule": "SAM and SON entirely date-red; MON through FRE entirely weekday-black",
+    "opticalRelaxation": "all rotations allowed for every glyph; no character substitutions",
+    "legalMoves": "12 noncentral single-layer quarter turns on a labeled 5x5; inverses and compositions"
+  },
+  "candidateSHA256": "b3a99587c025a8b24615d73eb7046ade2983652f4dafad8882e6966154c9bffc",
+  "checkerSHA256": "53a2fad0d7d7cc0e6f614cb94c49d7759fa64b8640046d61d987d9eb6e0c2212",
+  "validDates": 73049,
+  "totalDisplays": 105190560,
+  "checkedLegalQuarterTurns": 12,
+  "checkedLabeledFacelets": 150,
+  "physicalWingCubies": 24,
+  "allGlyphRotationsAllowed": true,
+  "counting": {
+    "requiredA": 22,
+    "requiredB": 16,
+    "slackA": 2,
+    "slackB": 8,
+    "maximumLooseA": 4,
+    "minimumTightB": 7,
+    "maximumExceptionalPairs": 1
+  },
+  "contradiction": "7 > 4 + 1",
+  "scope": "No immutable German printing exists for this exact red-weekend colored split-year/three-fragment model; not a general impossibility claim for red weekends in other layouts.",
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "solver": "none; exhaustive projection enumeration and integer counting"
+  },
+  "run": {
+    "elapsedSeconds": 0.39,
+    "maxResidentKiB": 24320
+  }
+}

@@ -14,6 +14,8 @@ using the existing two-hundreds printing unchanged. Reproduce with
 `npm run verify:baselines` after activating the pinned Python environment.
 The [four-right-fragment logo variant](docs/GERMAN_FOUR_LOGO.md) is independently
 UNSAT with the same German baseline colors and date formatting.
+The separate [red-weekend study](docs/WEEKEND_COLOR.md) is independently UNSAT
+for SAM/SON in red with the otherwise unchanged three-fragment baseline.
 The bilingual investigation remains deferred. Earlier wider-century results
 below are preserved research evidence, not an expansion of this baseline.
 

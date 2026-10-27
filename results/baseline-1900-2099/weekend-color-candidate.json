@@ -1,0 +1,452 @@
+{
+  "weekdayImageInventories": [
+    [
+      [
+        "D",
+        "weekday-black"
+      ],
+      [
+        "F",
+        "weekday-black"
+      ],
+      [
+        "M",
+        "weekday-black"
+      ],
+      [
+        "S",
+        "date-red"
+      ]
+    ],
+    [
+      [
+        "A",
+        "date-red"
+      ],
+      [
+        "I",
+        "weekday-black"
+      ],
+      [
+        "O",
+        "date-red"
+      ],
+      [
+        "O",
+        "weekday-black"
+      ],
+      [
+        "R",
+        "weekday-black"
+      ]
+    ],
+    [
+      [
+        "E",
+        "weekday-black"
+      ],
+      [
+        "M",
+        "date-red"
+      ],
+      [
+        "N",
+        "date-red"
+      ],
+      [
+        "N",
+        "weekday-black"
+      ],
+      [
+        "T",
+        "weekday-black"
+      ]
+    ]
+  ],
+  "claimedOutcome": "UNSAT",
+  "model": {
+    "language": "DE",
+    "years": [
+      1900,
+      2099
+    ],
+    "calendar": "proleptic Gregorian",
+    "weekdays": [
+      "MON",
+      "DIE",
+      "MIT",
+      "DON",
+      "FRE",
+      "SAM",
+      "SON"
+    ],
+    "months": [
+      "JAN",
+      "FEB",
+      "MÄR",
+      "APR",
+      "MAI",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OKT",
+      "NOV",
+      "DEZ"
+    ],
+    "dayPadding": "zero",
+    "hourPadding": "zero",
+    "minutePadding": "zero",
+    "yearLayout": "thousands,hundreds,blank,tens,units",
+    "row4": [
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "weekendColorRule": "SAM and SON entirely date-red; MON through FRE entirely weekday-black",
+    "palette": {
+      "weekdayLetters": "weekday-black except SAM/SON date-red",
+      "monthLetters": "date-red",
+      "dateDigits": "date-red",
+      "yearDigits": "year-gray",
+      "timeDigits": "time-blue",
+      "colon": "date-red",
+      "wordmark": "immutable multicolor images",
+      "blank": "none"
+    },
+    "opticalRelaxation": "all rotations allowed for every glyph; no character substitutions",
+    "legalMoves": "12 noncentral single-layer quarter turns on a labeled 5x5; inverses and compositions"
+  },
+  "validDates": 73049,
+  "totalDisplays": 105190560,
+  "dateWingProjections": 195,
+  "timeWingProjections": 60,
+  "combinedWingProjections": 11700,
+  "inventory": {
+    "A": [
+      {
+        "token": [
+          -1,
+          " ",
+          "none"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "A",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "I",
+          "weekday-black"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "O",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "O",
+          "weekday-black"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "R",
+          "weekday-black"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "0",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "1",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "2",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "3",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "4",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "5",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "B",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "G",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "I",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "L",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "N",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "P",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "R",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "T",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "V",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "Z",
+          "date-red"
+        ],
+        "demand": 1
+      }
+    ],
+    "B": [
+      {
+        "token": [
+          -1,
+          " ",
+          "none"
+        ],
+        "demand": 2
+      },
+      {
+        "token": [
+          21,
+          "0",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "1",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "2",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "3",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "4",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "5",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "6",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "7",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "8",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "9",
+          "time-blue"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          5,
+          "0",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          5,
+          "1",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          5,
+          "2",
+          "date-red"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          5,
+          "3",
+          "date-red"
+        ],
+        "demand": 1
+      }
+    ]
+  },
+  "peakNeverCooccurs": [
+    [
+      [
+        9,
+        "B",
+        "date-red"
+      ],
+      [
+        5,
+        "3",
+        "date-red"
+      ]
+    ]
+  ],
+  "counting": {
+    "requiredA": 22,
+    "requiredB": 16,
+    "slackA": 2,
+    "slackB": 8,
+    "maximumLooseA": 4,
+    "minimumTightB": 7,
+    "maximumExceptionalPairs": 1
+  }
+}

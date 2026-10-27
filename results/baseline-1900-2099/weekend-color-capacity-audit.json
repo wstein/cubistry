@@ -1,0 +1,83 @@
+{
+  "source": "results/german-century-09.json",
+  "sourceSHA256": "a1df97595df3b995597737ccb06dd29e9d816ecdacb8b86c5e6744d9d0aede6d",
+  "meaning": "Unassigned means no declared target role in this particular source printing, not interchangeable global spare capacity. Fixed centers cannot enter moving-piece positions and are excluded from movable reserves.",
+  "orbits": {
+    "corners": {
+      "physicalCubies": 8,
+      "physicalStickerPositions": 24,
+      "sourceUnassignedStickerIds": [],
+      "globallyMaximizedReserves": false
+    },
+    "wings": {
+      "physicalCubies": 24,
+      "physicalStickerPositions": 48,
+      "sourceUnassignedStickerIds": [],
+      "globallyMaximizedReserves": false
+    },
+    "middleEdges": {
+      "physicalCubies": 12,
+      "physicalStickerPositions": 24,
+      "sourceUnassignedStickerIds": [
+        85,
+        89,
+        114,
+        135
+      ],
+      "globallyMaximizedReserves": false
+    },
+    "diagonalCenters": {
+      "physicalCubies": 24,
+      "physicalStickerPositions": 24,
+      "sourceUnassignedStickerIds": [
+        118,
+        131,
+        133,
+        141,
+        143
+      ],
+      "globallyMaximizedReserves": false
+    },
+    "axialCenters": {
+      "physicalCubies": 24,
+      "physicalStickerPositions": 24,
+      "sourceUnassignedStickerIds": [
+        136,
+        138,
+        142
+      ],
+      "globallyMaximizedReserves": false
+    },
+    "fixedCenters": {
+      "physicalCubies": 6,
+      "physicalStickerPositions": 6,
+      "sourceUnassignedStickerIds": [],
+      "globallyMaximizedReserves": false
+    }
+  },
+  "weekdayImageTypes": {
+    "baseline": [
+      4,
+      4,
+      4
+    ],
+    "redWeekend": [
+      4,
+      5,
+      5
+    ],
+    "netAdditionalTypes": 2
+  },
+  "localReview": {
+    "corners": "S occurs only on weekends at the first weekday position; recoloring its dedicated glyph preserves the existing local matchings.",
+    "middleEdges": "Five weekday-final glyph/ink identities fit on three dedicated two-sticker cubies, versus two before; the source uses ten of twelve middle edges, so eleven would suffice for this local role grouping.",
+    "wings": "All 24 source cubies allocated; independent all-printings contradiction 7 > 4 + 1 proves UNSAT."
+  },
+  "existingPrintCounterexample": {
+    "date": "1900-01-07",
+    "weekday": "SON",
+    "time": "00:00",
+    "required": "red O at front row 1 column 2",
+    "matchingWingStickerIds": []
+  }
+}
