@@ -37,3 +37,18 @@ git worktree prune
 ## Repository instructions
 
 Read [AGENTS.md](AGENTS.md) for Codex rules and [knowledge/CONVENTIONS.md](knowledge/CONVENTIONS.md) for the Obsidian-compatible knowledge base. Evidence and independent mathematical validation requirements apply to all feasibility work.
+
+## Writing and documentation checks
+
+Use **US English (`en-US`)** consistently for source comments, documentation, descriptions and project prose; keep API names, quotations and externally required identifiers unchanged.
+
+Documentation CI runs [typos](https://github.com/crate-ci/typos) with `typos.toml` and [lychee](https://github.com/lycheeverse/lychee) for Markdown links. Repository-local broken links fail the PR; remote URL checks are advisory while external sites may rate-limit or block automation. Prefer repository-relative Markdown paths that work on GitHub and in Obsidian.
+
+Run the equivalent tools locally before requesting review when installed:
+
+```sh
+typos --config typos.toml .
+lychee --offline --root-dir . --exclude-file .lycheeignore './**/*.md'
+```
+
+Keep any dictionary exceptions in `typos.toml` specific and documented. Do not suppress entire documentation directories to hide spelling or link errors.
