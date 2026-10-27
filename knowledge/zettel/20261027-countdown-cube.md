@@ -19,6 +19,8 @@ concept**, not a proven 4×4×4 sticker/solver construction.
 ## Concept
 
 - Target events include concerts, the new year, the Olympics, or a personal event.
+- Set the target timestamp through configuration or URL parameters, with an
+  explicitly specified timezone.
 - Freely chosen **title**, such as "Until the concert," **not** encoded in the
   physical sticker print or wordmark; probably an independent HTML/UI overlay
   above or beside the cube.
