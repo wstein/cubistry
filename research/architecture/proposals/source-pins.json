@@ -1,0 +1,72 @@
+{
+  "cube-assembler": {
+    "commit": "d62d1715e041c6b808fcce08c597fcb4a3ce5c98",
+    "url": "https://github.com/wstein/cube-assembler",
+    "sha256": {
+      "LICENSE": "5f7a8ffe18b439f23ab9acb904ee9074dce526dd0de7a3c64cf4d3c824a514b4",
+      "README.md": "9153a76357f2c69759959792c10aeb67cb70fe418fd3e892fd9ac1c5d0796951",
+      "package.json": "c82ab96bd8651ca0b34d591b8ca275e7f6374db07dcbe4f005cd45a2df09bddc"
+    },
+    "audit": "source inspection only; suites/builds not executed"
+  },
+  "cubelab": {
+    "commit": "89053d06df0a992acf68506d0dec5082c71dfaab",
+    "url": "https://github.com/wstein/cubelab",
+    "sha256": {
+      "LICENSE": "801aef05fae8e878ae0901cd8b66f8b4884876b284f9366466d3967470904f6c",
+      "README.md": "683cbf5dbd47f74aeaca3f57d4967c13fedd07e076c116b2223dd58864a57459",
+      "NOTICE": "e70c5c6ed2629d25b87941aec18640001670187df1ac74e6523b2eddbe9d3646",
+      "package.json": "12e77a7305a54b2f7b66f74a18677c25ae767d942aa88ba9119831df39e463b1"
+    },
+    "audit": "source inspection only; suites/builds not executed"
+  },
+  "cubacle": {
+    "commit": "233045908fe3b3a2ef5e57e410549d438614c820",
+    "url": "https://github.com/wstein/cubacle",
+    "sha256": {
+      "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+      "README.md": "2bda2d096b7ef0f5e0d5469a17559dc0c1e6b03af6b4b968fb802af196023c93",
+      "Cargo.toml": "cc5dd18b5a05dff3528df6de5c451519cb1ec4b6f43c2828f10913db1a5cee18",
+      "NOTICE.md": "7260473d1b24e5bb3195518635ebaafb45749ca2626066be83c4deba09451b74"
+    },
+    "audit": "source inspection only; suites/builds not executed"
+  },
+  "flix-cubesolve": {
+    "commit": "be17cd13d6695b5f3a6ea17bfc04157a8a406848",
+    "url": "https://github.com/wstein/flix-cubesolve",
+    "sha256": {
+      "LICENSE": "d8a6cc31abc16b6748c7a21f21611f5a1ec33f67d22ca23d7da1c19b95496bee",
+      "README.md": "992849ff95113c708eeb89f95f44b3c38e121c18860ca819e11c061e81127800",
+      "flix.toml": "feeb38dd2a0b2da3bdcf930c41a6221666f653dea5462f77cf07ee0336a1556d"
+    },
+    "audit": "source inspection only; suites/builds not executed"
+  },
+  "flix-orbit64": {
+    "commit": "9a6c9bbe8431f01068ae0a083ec36913abbd78e1",
+    "url": "https://github.com/wstein/flix-orbit64",
+    "sha256": {
+      "LICENSE": "a374e06d00fbfd62b9e8054112136441917ad484bec50d6ea710aa2bb0c060e4",
+      "README.md": "46bf86767a067db143be8432f5a362eecb8efef5f7297d8fbcba4e82f5845d59",
+      "flix.toml": "c846cd1f5f7e8522988898f975757471f0915b6f1eb6c82ee9299bc8fdd9dba8"
+    },
+    "audit": "source inspection only; suites/builds not executed"
+  },
+  "regrip": {
+    "commit": "ef0c3ef2be10ed8e0d0303e9d61fb576753d78cf",
+    "url": "https://github.com/wstein/regrip",
+    "sha256": {
+      "LICENSE": "bf0f5253e958599d3290de5ae04c0505aac93683c0e2ac9176f09d3f260609f9",
+      "README.md": "ff3b2e2ed02ac74515416abdc06cd007b410c7353ae8b2e3c41f64571fbb1258",
+      "package.json": "c502a357741f7997ccdde635208ed4f5d70c77c7d2d7348e66f32bb84cac7798"
+    },
+    "audit": "source inspection only; suites/builds not executed"
+  },
+  "cubistry-pr20": {
+    "commit": "ff617dc41a4e50d073d3708598d9ad6ddd4a6232",
+    "sources": {
+      "pr20-renderer.mjs": "a6572b340eb9c08c0c03ebbd2d60d1685c85d9994dd593f6698026c2be4bab9d",
+      "pr20-cube.mjs": "2bcdeaee79ef7f1244aa75d181785c447fe9d4f1eda7df9ffa5ffdf1e591abba",
+      "pr20-package.json": "ddcde4a931edfd9444dfca622baa0680853c049ee7479bf5af5f169314ecddc2"
+    }
+  }
+}

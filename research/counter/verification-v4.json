@@ -1,0 +1,39 @@
+{
+  "verdicts": {
+    "paddedTextMovable": "SAT",
+    "unpaddedTextMovable": "SAT",
+    "paddedTextFixedCubies": "UNSAT",
+    "unpaddedTextFixedCubies": "UNSAT",
+    "externalOverlayUnconstrainedUpper": "SAT"
+  },
+  "notRun": [
+    {
+      "model": "blank upper fields",
+      "reason": "Text is SAT; user requested no blank fallback experiment after success."
+    }
+  ],
+  "overlayScope": "Weaker unconstrained upper-face target; existing physical title witnesses suffice. Not used as a UI substitute.",
+  "digitConvention": "Ten distinct upright numeral images; no cross-character rotation aliases such as 6 becoming 9.",
+  "witnessSHA256": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+  "independentCheckerSHA256": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+  "physicalCubies": 8,
+  "physicalStickers": 24,
+  "titleCopies": {
+    "left": 2,
+    "right": 2
+  },
+  "valuesVerified": 100,
+  "orderedTransitionsByHubFactorization": 10000,
+  "chainedTransitionsPerFormat": 800,
+  "forwardWordsReplayed": 100,
+  "inverseWordsReplayed": 100,
+  "allMovesLegal": true,
+  "allVisiblePrintedGlyphsUpright": true,
+  "actualPrintRotationTamperRejected": true,
+  "fixedCubieProof": {
+    "availableDigitFaces": 18,
+    "requiredPadded": 20,
+    "requiredUnpadded": 20
+  },
+  "runtimeSeconds": 1.097
+}

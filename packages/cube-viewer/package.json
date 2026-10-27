@@ -1,0 +1,14 @@
+{
+  "name": "@cubistry/cube-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@cubistry/cube-core": "*",
+    "@cubistry/cube-mechanics": "*",
+    "@cubistry/cube-assets": "*",
+    "three": "0.180.0"
+  }
+}

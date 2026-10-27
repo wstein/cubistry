@@ -1,0 +1,16 @@
+{
+  "schema": "cubistry.architecture-size-plan",
+  "version": 1,
+  "runtimeSupportedSizes": [2],
+  "coordinateRule": "2*i-(n-1)",
+  "orientationRule": "24 proper signed-permutation body frames; local sticker up remains separate from optical symmetry",
+  "geometryExamplesOnly": [
+    {"size":2,"facelets":24,"surfaceCubies":8,"runtimeImplemented":true},
+    {"size":3,"facelets":54,"surfaceCubies":26,"runtimeImplemented":false},
+    {"size":4,"facelets":96,"surfaceCubies":56,"runtimeImplemented":false},
+    {"size":5,"facelets":150,"surfaceCubies":98,"runtimeImplemented":false},
+    {"size":6,"facelets":216,"surfaceCubies":152,"runtimeImplemented":false},
+    {"size":7,"facelets":294,"surfaceCubies":218,"runtimeImplemented":false}
+  ],
+  "notImplemented": ["inner layers", "wide turns", "slice notation", "whole-cube notation", "facelet/color codecs", "Orbit64", "general partial-image solving", "external repository migration"]
+}
