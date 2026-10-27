@@ -1,0 +1,158 @@
+{
+  "capabilities": {
+    "sizes": [
+      2
+    ],
+    "completeSource": "catalog states only",
+    "partialImage": "only the 100 registered complete front goals",
+    "frame": "exact",
+    "optimality": "unknown",
+    "generalPartialSearch": false
+  },
+  "completeReference": {
+    "status": "solution",
+    "moves": [
+      {
+        "face": "U",
+        "turns": 1
+      },
+      {
+        "face": "F",
+        "turns": 2
+      },
+      {
+        "face": "L",
+        "turns": 1
+      },
+      {
+        "face": "U",
+        "turns": -1
+      },
+      {
+        "face": "L",
+        "turns": 2
+      },
+      {
+        "face": "U",
+        "turns": 2
+      },
+      {
+        "face": "R",
+        "turns": -1
+      },
+      {
+        "face": "U",
+        "turns": -1
+      },
+      {
+        "face": "L",
+        "turns": 2
+      },
+      {
+        "face": "F",
+        "turns": -1
+      }
+    ],
+    "metric": "HTM",
+    "optimality": "unknown",
+    "replayVerified": true,
+    "frame": "exact",
+    "goalKind": "complete-source",
+    "preparationMs": 17.572397000000024,
+    "estimatedCatalogBytes": 68421,
+    "budgetPolicy": "Bounded 101-state catalog and cooperative cancellation; memory is serialized-data estimate, not a hard JavaScript heap limit."
+  },
+  "knownCounterDisplay": {
+    "status": "solution",
+    "moves": [
+      {
+        "face": "U",
+        "turns": 1
+      },
+      {
+        "face": "F",
+        "turns": 2
+      },
+      {
+        "face": "L",
+        "turns": 1
+      },
+      {
+        "face": "U",
+        "turns": -1
+      },
+      {
+        "face": "L",
+        "turns": 2
+      },
+      {
+        "face": "U",
+        "turns": 2
+      },
+      {
+        "face": "R",
+        "turns": -1
+      },
+      {
+        "face": "U",
+        "turns": -1
+      },
+      {
+        "face": "L",
+        "turns": 2
+      },
+      {
+        "face": "F",
+        "turns": -1
+      },
+      {
+        "face": "F",
+        "turns": 2
+      },
+      {
+        "face": "U",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": 2
+      },
+      {
+        "face": "L",
+        "turns": 1
+      },
+      {
+        "face": "U",
+        "turns": 1
+      },
+      {
+        "face": "L",
+        "turns": 1
+      },
+      {
+        "face": "U",
+        "turns": -1
+      },
+      {
+        "face": "F",
+        "turns": 1
+      },
+      {
+        "face": "U",
+        "turns": -1
+      }
+    ],
+    "metric": "HTM",
+    "optimality": "unknown",
+    "replayVerified": true,
+    "frame": "exact",
+    "goalKind": "known-counter-display",
+    "preparationMs": 17.572397000000024,
+    "estimatedCatalogBytes": 68421,
+    "budgetPolicy": "Bounded 101-state catalog and cooperative cancellation; memory is serialized-data estimate, not a hard JavaScript heap limit."
+  },
+  "arbitraryPartial": {
+    "status": "UNKNOWN",
+    "reason": "general partial-image search is not implemented"
+  }
+}

@@ -9,7 +9,12 @@ code without the separately required approval. Preserve proof paths and
 independent replay as integration tests; do not rewrite the MVP from scratch.
 Load validated fixed image/text assets through a versioned manifest and inject
 a resolver into the viewer. Keep camera and product timer logic separate.
-Use actual TypeScript public contracts plus tested DOM-free low-level code.
+Use genuine ReScript-owned domain/mechanics/validation/notation/codecs and an
+explicit checked JS/TypeScript interop contract; keep viewing/interaction in
+TypeScript. This follows the binding PuzWerk addition to issue #21 (updated
+2026-10-27T15:00:50Z), superseding the earlier TS-core hypothesis. PuzWerk is the
+brand; `wstein/puzwerk` and `@puzwerk/*` remain planned/unpublished. No new Rust
+project belongs in that framework; a versioned external adapter is the boundary.
 Run the counter using those actual shared modules, not parallel legacy physics.
 A solver facade prototype lives outside core and truthfully reports capabilities.
 
