@@ -1,4 +1,4 @@
-import importlib.util,json,tempfile,unittest
+import importlib.util,json,tempfile,unittest,shutil,hashlib
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('design_checker',ROOT/'research/architecture/verify_design.py');checker=importlib.util.module_from_spec(spec);spec.loader.exec_module(checker)
@@ -16,6 +16,20 @@ class DesignWireTests(unittest.TestCase):
     def test_boolean_cubie_reference(self):self.reject(lambda d:d['prints']['padded']['stickers'][0].update(cubie=False))
     def test_boolean_sticker_id(self):self.reject(lambda d:d['prints']['padded']['stickers'][0].update(id=False))
     def test_boolean_cubie_id(self):self.reject(lambda d:d['prints']['padded']['cubies'][0].update(id=False))
+    def test_pure_asset_metadata_profile(self):
+        cases=[lambda a:a['documents'][0].update(text=['BREAK','MINUTES']),lambda a:a['materials'][0].update(color='not-a-color'),lambda a:a['documents'][0].update(text='x\n'*16),lambda a:a['documents'][0].update(background='red'),lambda a:a['documents'][0].update(fontId=0),lambda a:a['documents'][0].update(minFontSize=1000),lambda a:a['fonts'][0].update(family='<script>'),lambda a:a['fonts'][0].update(license=False),lambda a:a['fonts'][0].update(weight=True)]
+        for index,mutate in enumerate(cases):
+            with self.subTest(case=index):self.reject(lambda d:mutate(d['assets']))
+    def test_svg_css_escape_reference_rejected_independently(self):
+        original_root=checker.ROOT
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);shutil.copytree(ROOT/'public',root/'public')
+            d=json.loads((root/'public/counter-design.v2.json').read_text());asset=next(a for a in d['assets']['images'] if a['kind']=='image')
+            path=root/'public'/asset['url'][1:];text=path.read_text().replace('fill="', 'fill="u'+chr(92)+'72l('+chr(92)+'68ttps'+chr(92)+'3a//example.invalid/paint) ',1);path.write_text(text);asset['sha256']=hashlib.sha256(path.read_bytes()).hexdigest()
+            wire=root/'bad.json';wire.write_text(json.dumps(d));checker.ROOT=root
+            try:
+                with self.assertRaisesRegex(AssertionError,'Unsafe SVG attribute'):checker.verify(wire)
+            finally:checker.ROOT=original_root
     def test_integral_numeric_literals_match_javascript(self):
         d=json.loads((ROOT/'public/counter-design.v2.json').read_text());d['prints']['padded']['stickers'][0]['cubie']=0.0
         with tempfile.TemporaryDirectory() as directory:
