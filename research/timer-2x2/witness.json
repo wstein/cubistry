@@ -1,0 +1,2682 @@
+{
+  "schema": "cubistry.timer-2x2-proof",
+  "version": 1,
+  "puzzle": "2x2x2",
+  "stepSeconds": 10,
+  "maxSeconds": 3590,
+  "faceFrame": "+x right,+y up,+z front; slots TL TR BL BR",
+  "model": "fixed upright distinct digits; no cross-digit rotational aliases; arbitrary legal face turns between settled displays",
+  "solver": {
+    "package": "cubing",
+    "version": "0.66.1",
+    "method": "experimentalSolve2x2x2; complete source-to-target states; no shortest-path claim"
+  },
+  "printing": [
+    {
+      "id": 0,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "image": "0",
+      "slot": 0,
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 1,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "image": "1",
+      "slot": 0,
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "image": "2",
+      "slot": 0,
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "image": "3",
+      "slot": 0,
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 4,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "image": "4",
+      "slot": 0,
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 5,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "image": "5",
+      "slot": 0,
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 6,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "image": "0",
+      "slot": 1,
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 7,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "image": "1",
+      "slot": 1,
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 8,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "image": "2",
+      "slot": 1,
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 9,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "image": "3",
+      "slot": 1,
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 10,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "image": "4",
+      "slot": 1,
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 11,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "image": "5",
+      "slot": 1,
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 12,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "image": "6",
+      "slot": 1,
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 13,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "image": "7",
+      "slot": 1,
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 14,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "image": "0",
+      "slot": 3,
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 15,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "image": "8",
+      "slot": 1,
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 16,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "image": "9",
+      "slot": 1,
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 17,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "image": "0",
+      "slot": 3,
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 18,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "image": "0",
+      "slot": 2,
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 19,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "image": "1",
+      "slot": 2,
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 20,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "image": "2",
+      "slot": 2,
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 21,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "image": "3",
+      "slot": 2,
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 22,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "image": "4",
+      "slot": 2,
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 23,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "image": "5",
+      "slot": 2,
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    }
+  ],
+  "witnesses": [
+    {
+      "tick": 0,
+      "minute": 0,
+      "second": 0,
+      "word": "F L2 U R L2 U' F2 L F'"
+    },
+    {
+      "tick": 1,
+      "minute": 0,
+      "second": 10,
+      "word": "F2 R U2 F' L U R2 F2"
+    },
+    {
+      "tick": 2,
+      "minute": 0,
+      "second": 20,
+      "word": "F L F L2 F R2 F U"
+    },
+    {
+      "tick": 3,
+      "minute": 0,
+      "second": 30,
+      "word": "F U' L' F2 L2 F' R2 F L' U"
+    },
+    {
+      "tick": 4,
+      "minute": 0,
+      "second": 40,
+      "word": "L' F U R2 F2 U' R F' L2 U'"
+    },
+    {
+      "tick": 5,
+      "minute": 0,
+      "second": 50,
+      "word": "F U' F2 U' R L F' U F2 U2"
+    },
+    {
+      "tick": 6,
+      "minute": 1,
+      "second": 0,
+      "word": "R2 F2 L U R2 F L' F' L2 U'"
+    },
+    {
+      "tick": 7,
+      "minute": 1,
+      "second": 10,
+      "word": "F U2 L' F U' L' U R2 F U"
+    },
+    {
+      "tick": 8,
+      "minute": 1,
+      "second": 20,
+      "word": "L' F R F2 U' F' R U' L2 F"
+    },
+    {
+      "tick": 9,
+      "minute": 1,
+      "second": 30,
+      "word": "F U' F U2 L2 F U R2 L F"
+    },
+    {
+      "tick": 10,
+      "minute": 1,
+      "second": 40,
+      "word": "U R2 F' R' F R' U F2 L F' U'"
+    },
+    {
+      "tick": 11,
+      "minute": 1,
+      "second": 50,
+      "word": "U R2 F U' F2 U2 R2 L U'"
+    },
+    {
+      "tick": 12,
+      "minute": 2,
+      "second": 0,
+      "word": "U R' F R' U R2 L' U' F2 U"
+    },
+    {
+      "tick": 13,
+      "minute": 2,
+      "second": 10,
+      "word": "U L' F' R' U' L F' R2 F'"
+    },
+    {
+      "tick": 14,
+      "minute": 2,
+      "second": 20,
+      "word": "L' F2 U' R2 F2 U2 F' L U2"
+    },
+    {
+      "tick": 15,
+      "minute": 2,
+      "second": 30,
+      "word": "F2 U2 R' U2 R' F L U' R2"
+    },
+    {
+      "tick": 16,
+      "minute": 2,
+      "second": 40,
+      "word": "U' R F' U2 F2 R U' F2 L U'"
+    },
+    {
+      "tick": 17,
+      "minute": 2,
+      "second": 50,
+      "word": "U' F2 R' F U' R L F2 U'"
+    },
+    {
+      "tick": 18,
+      "minute": 3,
+      "second": 0,
+      "word": "U2 R L2 F R' U' L2 U' F2"
+    },
+    {
+      "tick": 19,
+      "minute": 3,
+      "second": 10,
+      "word": "L2 U2 L F' U L' F2 U2 R2 F"
+    },
+    {
+      "tick": 20,
+      "minute": 3,
+      "second": 20,
+      "word": "U' L' F' L U R2 F2 R' F'"
+    },
+    {
+      "tick": 21,
+      "minute": 3,
+      "second": 30,
+      "word": "F R2 F' L' F' U' R L F'"
+    },
+    {
+      "tick": 22,
+      "minute": 3,
+      "second": 40,
+      "word": "R2 U R2 U2 L' U' F' L2 F' U"
+    },
+    {
+      "tick": 23,
+      "minute": 3,
+      "second": 50,
+      "word": "L' F' U' R L F' U F2 U'"
+    },
+    {
+      "tick": 24,
+      "minute": 4,
+      "second": 0,
+      "word": "F' L F' U' R2 F L' U L' U'"
+    },
+    {
+      "tick": 25,
+      "minute": 4,
+      "second": 10,
+      "word": "L2 F' U' F2 R F2 L F' U2"
+    },
+    {
+      "tick": 26,
+      "minute": 4,
+      "second": 20,
+      "word": "F U L2 U R F2 L' U2 L' F"
+    },
+    {
+      "tick": 27,
+      "minute": 4,
+      "second": 30,
+      "word": "F2 R U' R2 U' L' U' L2 F2 U'"
+    },
+    {
+      "tick": 28,
+      "minute": 4,
+      "second": 40,
+      "word": "F R2 F2 R' F' R2 U F' L F' U'"
+    },
+    {
+      "tick": 29,
+      "minute": 4,
+      "second": 50,
+      "word": "F' R2 F' R F' R2 U F' L U'"
+    },
+    {
+      "tick": 30,
+      "minute": 5,
+      "second": 0,
+      "word": "U R L2 F U' R' L2 F U' F2"
+    },
+    {
+      "tick": 31,
+      "minute": 5,
+      "second": 10,
+      "word": "F2 U L' U2 F2 L U2 R2 F U'"
+    },
+    {
+      "tick": 32,
+      "minute": 5,
+      "second": 20,
+      "word": "F2 U L2 U' F2 R2 F"
+    },
+    {
+      "tick": 33,
+      "minute": 5,
+      "second": 30,
+      "word": "R2 F R' F U L2 F2 U2 R U"
+    },
+    {
+      "tick": 34,
+      "minute": 5,
+      "second": 40,
+      "word": "L' U2 F R2 F U L F2 R' F2"
+    },
+    {
+      "tick": 35,
+      "minute": 5,
+      "second": 50,
+      "word": "F' R' F2 R2 U F' L U' R2"
+    },
+    {
+      "tick": 36,
+      "minute": 6,
+      "second": 0,
+      "word": "L' U2 F U R' F' L' U L2"
+    },
+    {
+      "tick": 37,
+      "minute": 6,
+      "second": 10,
+      "word": "R F2 R F R' U L2 U' F'"
+    },
+    {
+      "tick": 38,
+      "minute": 6,
+      "second": 20,
+      "word": "R' F' U' F2 U' F2 R U2 L U'"
+    },
+    {
+      "tick": 39,
+      "minute": 6,
+      "second": 30,
+      "word": "R U' R2 U2 F2 L F' U L' U2"
+    },
+    {
+      "tick": 40,
+      "minute": 6,
+      "second": 40,
+      "word": "F U F' R' L' F U' R U2"
+    },
+    {
+      "tick": 41,
+      "minute": 6,
+      "second": 50,
+      "word": "U' R2 U2 F L U2 F L2 F' U"
+    },
+    {
+      "tick": 42,
+      "minute": 7,
+      "second": 0,
+      "word": "U2 F U' F2 U' R' U' R2 L U'"
+    },
+    {
+      "tick": 43,
+      "minute": 7,
+      "second": 10,
+      "word": "R' F2 U2 F' U' L2 F R U2"
+    },
+    {
+      "tick": 44,
+      "minute": 7,
+      "second": 20,
+      "word": "R' U' F2 R' F U' L F R' U'"
+    },
+    {
+      "tick": 45,
+      "minute": 7,
+      "second": 30,
+      "word": "U' R2 L' F L2 U2 F L' F"
+    },
+    {
+      "tick": 46,
+      "minute": 7,
+      "second": 40,
+      "word": "F2 R F U2 R' F' L2 F' L'"
+    },
+    {
+      "tick": 47,
+      "minute": 7,
+      "second": 50,
+      "word": "F U' F2 R2 U2 R' U2 L F' U'"
+    },
+    {
+      "tick": 48,
+      "minute": 8,
+      "second": 0,
+      "word": "L F L U' L2 F U2 R2 F U2"
+    },
+    {
+      "tick": 49,
+      "minute": 8,
+      "second": 10,
+      "word": "F U' F2 R2 U2 R' U2 L F U'"
+    },
+    {
+      "tick": 50,
+      "minute": 8,
+      "second": 20,
+      "word": "F U F2 R' L2 U2 L U F'"
+    },
+    {
+      "tick": 51,
+      "minute": 8,
+      "second": 30,
+      "word": "R2 U' R2 L' F2 U' F L U2"
+    },
+    {
+      "tick": 52,
+      "minute": 8,
+      "second": 40,
+      "word": "F' L2 F U' L' U2 R2 F L U"
+    },
+    {
+      "tick": 53,
+      "minute": 8,
+      "second": 50,
+      "word": "L2 U2 F R F' L2 U' R2 U"
+    },
+    {
+      "tick": 54,
+      "minute": 9,
+      "second": 0,
+      "word": "F L' U R2 F2 R' F' U2 L"
+    },
+    {
+      "tick": 55,
+      "minute": 9,
+      "second": 10,
+      "word": "F U R2 F2 U R' U F' L U'"
+    },
+    {
+      "tick": 56,
+      "minute": 9,
+      "second": 20,
+      "word": "L' F2 U' F R' U R' U L"
+    },
+    {
+      "tick": 57,
+      "minute": 9,
+      "second": 30,
+      "word": "F L' U' F' R L F' U F2 U'"
+    },
+    {
+      "tick": 58,
+      "minute": 9,
+      "second": 40,
+      "word": "F' R2 F U' R2 U2 F2 L U'"
+    },
+    {
+      "tick": 59,
+      "minute": 9,
+      "second": 50,
+      "word": "U L' F' U' R' U2 L U2 R2 F'"
+    },
+    {
+      "tick": 60,
+      "minute": 10,
+      "second": 0,
+      "word": "F2 U F' U L2 U R2 F L"
+    },
+    {
+      "tick": 61,
+      "minute": 10,
+      "second": 10,
+      "word": "L U2 F L U' L2 F R2 F"
+    },
+    {
+      "tick": 62,
+      "minute": 10,
+      "second": 20,
+      "word": "R' U R2 L' F' U2 R U2 L"
+    },
+    {
+      "tick": 63,
+      "minute": 10,
+      "second": 30,
+      "word": "R2 F U L' F R U' R U F'"
+    },
+    {
+      "tick": 64,
+      "minute": 10,
+      "second": 40,
+      "word": "R L2 F2 R2 U F' U2 R' L2 U"
+    },
+    {
+      "tick": 65,
+      "minute": 10,
+      "second": 50,
+      "word": "F2 U' R' U2 R' F' L' U' F"
+    },
+    {
+      "tick": 66,
+      "minute": 11,
+      "second": 0,
+      "word": "U L' F' U2 L F R2 F"
+    },
+    {
+      "tick": 67,
+      "minute": 11,
+      "second": 10,
+      "word": "F U L' F R U F' U' R2"
+    },
+    {
+      "tick": 68,
+      "minute": 11,
+      "second": 20,
+      "word": "F' R F U' R U2 L' F R'"
+    },
+    {
+      "tick": 69,
+      "minute": 11,
+      "second": 30,
+      "word": "U L' F' L F' U' R' U R'"
+    },
+    {
+      "tick": 70,
+      "minute": 11,
+      "second": 40,
+      "word": "F U F2 L' U R U2 R F"
+    },
+    {
+      "tick": 71,
+      "minute": 11,
+      "second": 50,
+      "word": "U2 R F R' L' U' F U2 L' U2"
+    },
+    {
+      "tick": 72,
+      "minute": 12,
+      "second": 0,
+      "word": "F' L U F2 R' U2 L F' U' L'"
+    },
+    {
+      "tick": 73,
+      "minute": 12,
+      "second": 10,
+      "word": "L' F' U' R2 U2 R' U2 L F U2"
+    },
+    {
+      "tick": 74,
+      "minute": 12,
+      "second": 20,
+      "word": "L F L2 F' L F R2 F"
+    },
+    {
+      "tick": 75,
+      "minute": 12,
+      "second": 30,
+      "word": "L2 F U' L2 U2 F' U' R2 F"
+    },
+    {
+      "tick": 76,
+      "minute": 12,
+      "second": 40,
+      "word": "L F U' L' F R2 F U L2 U2"
+    },
+    {
+      "tick": 77,
+      "minute": 12,
+      "second": 50,
+      "word": "U R U2 L2 F' U R' F2 L U"
+    },
+    {
+      "tick": 78,
+      "minute": 13,
+      "second": 0,
+      "word": "F L' F R2 L U L' F2 U' F2"
+    },
+    {
+      "tick": 79,
+      "minute": 13,
+      "second": 10,
+      "word": "R F R' U2 L2 F' U' F2 L' U"
+    },
+    {
+      "tick": 80,
+      "minute": 13,
+      "second": 20,
+      "word": "U F' R U F U2 R' L' U' F"
+    },
+    {
+      "tick": 81,
+      "minute": 13,
+      "second": 30,
+      "word": "L' F2 U' F L2 F' R2 F L'"
+    },
+    {
+      "tick": 82,
+      "minute": 13,
+      "second": 40,
+      "word": "L F' L2 F' U2 L U R2 F U2"
+    },
+    {
+      "tick": 83,
+      "minute": 13,
+      "second": 50,
+      "word": "U R2 U' F' U2 R2 U' L' F"
+    },
+    {
+      "tick": 84,
+      "minute": 14,
+      "second": 0,
+      "word": "U2 R' F R2 U L' U R F"
+    },
+    {
+      "tick": 85,
+      "minute": 14,
+      "second": 10,
+      "word": "F2 R' F' U2 L' F R2 U2 F U2"
+    },
+    {
+      "tick": 86,
+      "minute": 14,
+      "second": 20,
+      "word": "U R F' L2 F' U L2 F2 R' U'"
+    },
+    {
+      "tick": 87,
+      "minute": 14,
+      "second": 30,
+      "word": "L F L F' U' L2 F R2 F U'"
+    },
+    {
+      "tick": 88,
+      "minute": 14,
+      "second": 40,
+      "word": "U' F U2 F U' R2 L' F"
+    },
+    {
+      "tick": 89,
+      "minute": 14,
+      "second": 50,
+      "word": "F' U R2 F2 U' R' F2 L' F"
+    },
+    {
+      "tick": 90,
+      "minute": 15,
+      "second": 0,
+      "word": "U2 R2 L2 F' U' L2 U' F2 R2 U2"
+    },
+    {
+      "tick": 91,
+      "minute": 15,
+      "second": 10,
+      "word": "F U F' R F R' L' U' F"
+    },
+    {
+      "tick": 92,
+      "minute": 15,
+      "second": 20,
+      "word": "F2 R' F U' R U' L U2 F'"
+    },
+    {
+      "tick": 93,
+      "minute": 15,
+      "second": 30,
+      "word": "F' L U2 L F R2 F U L' U"
+    },
+    {
+      "tick": 94,
+      "minute": 15,
+      "second": 40,
+      "word": "L' U R U F R2 F L F'"
+    },
+    {
+      "tick": 95,
+      "minute": 15,
+      "second": 50,
+      "word": "U R L2 F U2 R' F L U' F'"
+    },
+    {
+      "tick": 96,
+      "minute": 16,
+      "second": 0,
+      "word": "L' U2 L F' U2 R F U2 L' F"
+    },
+    {
+      "tick": 97,
+      "minute": 16,
+      "second": 10,
+      "word": "R' F L' U' F' R U2 L"
+    },
+    {
+      "tick": 98,
+      "minute": 16,
+      "second": 20,
+      "word": "U L' F' R2 U L U2 R2 F U'"
+    },
+    {
+      "tick": 99,
+      "minute": 16,
+      "second": 30,
+      "word": "L U' R F' R' U L2 F' L"
+    },
+    {
+      "tick": 100,
+      "minute": 16,
+      "second": 40,
+      "word": "L F' U2 L U' R' L2 U"
+    },
+    {
+      "tick": 101,
+      "minute": 16,
+      "second": 50,
+      "word": "F U' F L2 F' R U2 L2 F2 U'"
+    },
+    {
+      "tick": 102,
+      "minute": 17,
+      "second": 0,
+      "word": "U' F' U' F R' U L' F' L F2"
+    },
+    {
+      "tick": 103,
+      "minute": 17,
+      "second": 10,
+      "word": "U' R2 U2 F' U' F L' F' L F2"
+    },
+    {
+      "tick": 104,
+      "minute": 17,
+      "second": 20,
+      "word": "L U2 F' L U2 R' F' U2 F L'"
+    },
+    {
+      "tick": 105,
+      "minute": 17,
+      "second": 30,
+      "word": "L' U2 F' R U2 F2 R F L"
+    },
+    {
+      "tick": 106,
+      "minute": 17,
+      "second": 40,
+      "word": "R2 U L' F' R2 U L U2 R2 U'"
+    },
+    {
+      "tick": 107,
+      "minute": 17,
+      "second": 50,
+      "word": "L U F' U2 R' L2 F' U' L U'"
+    },
+    {
+      "tick": 108,
+      "minute": 18,
+      "second": 0,
+      "word": "U2 L' U R2 F L U L'"
+    },
+    {
+      "tick": 109,
+      "minute": 18,
+      "second": 10,
+      "word": "L' U2 F' R U2 R F L"
+    },
+    {
+      "tick": 110,
+      "minute": 18,
+      "second": 20,
+      "word": "F2 U' R' U2 L' U' R2 F R'"
+    },
+    {
+      "tick": 111,
+      "minute": 18,
+      "second": 30,
+      "word": "U2 R2 L' F2 L' F L U' R2 U2"
+    },
+    {
+      "tick": 112,
+      "minute": 18,
+      "second": 40,
+      "word": "L F' R' U2 L F' U' L2 U"
+    },
+    {
+      "tick": 113,
+      "minute": 18,
+      "second": 50,
+      "word": "R2 U' L' F U2 F' R2 L' F2"
+    },
+    {
+      "tick": 114,
+      "minute": 19,
+      "second": 0,
+      "word": "U' R2 U' F L2 U L' F L2"
+    },
+    {
+      "tick": 115,
+      "minute": 19,
+      "second": 10,
+      "word": "F L2 U' R F2 L' F L2 F' U2"
+    },
+    {
+      "tick": 116,
+      "minute": 19,
+      "second": 20,
+      "word": "U2 F' U' F2 U L' U R2 F"
+    },
+    {
+      "tick": 117,
+      "minute": 19,
+      "second": 30,
+      "word": "F L' U' R F2 L F' U2 L' U2"
+    },
+    {
+      "tick": 118,
+      "minute": 19,
+      "second": 40,
+      "word": "F R U' F2 L U' R2 U' F'"
+    },
+    {
+      "tick": 119,
+      "minute": 19,
+      "second": 50,
+      "word": "U2 F' L' U R2 F U' L' U"
+    },
+    {
+      "tick": 120,
+      "minute": 20,
+      "second": 0,
+      "word": "R2 F R' U L' F' U R U"
+    },
+    {
+      "tick": 121,
+      "minute": 20,
+      "second": 10,
+      "word": "F R' U2 F L' U' F R2 L' U'"
+    },
+    {
+      "tick": 122,
+      "minute": 20,
+      "second": 20,
+      "word": "R2 L U R2 U L2 F' L U"
+    },
+    {
+      "tick": 123,
+      "minute": 20,
+      "second": 30,
+      "word": "F2 U2 L' U R2 F L2 F' L F U'"
+    },
+    {
+      "tick": 124,
+      "minute": 20,
+      "second": 40,
+      "word": "L2 F' L F' L U R2 F' R' F2"
+    },
+    {
+      "tick": 125,
+      "minute": 20,
+      "second": 50,
+      "word": "U' F2 U L2 F' U2 F' R2 F U2"
+    },
+    {
+      "tick": 126,
+      "minute": 21,
+      "second": 0,
+      "word": "L2 U2 F' U L' U F2 U R2 F U2"
+    },
+    {
+      "tick": 127,
+      "minute": 21,
+      "second": 10,
+      "word": "U F2 U' R2 U' F U F L2"
+    },
+    {
+      "tick": 128,
+      "minute": 21,
+      "second": 20,
+      "word": "L2 U2 R2 U R2 U L2 U2 F' U'"
+    },
+    {
+      "tick": 129,
+      "minute": 21,
+      "second": 30,
+      "word": "R2 U' L2 F2 R' U R' F2 L U2"
+    },
+    {
+      "tick": 130,
+      "minute": 21,
+      "second": 40,
+      "word": "F2 U2 F U' L2 F2 R' U R' U2"
+    },
+    {
+      "tick": 131,
+      "minute": 21,
+      "second": 50,
+      "word": "F' U F2 R' F U2 L F' L"
+    },
+    {
+      "tick": 132,
+      "minute": 22,
+      "second": 0,
+      "word": "R F U' R' F2 L2 U F2 U'"
+    },
+    {
+      "tick": 133,
+      "minute": 22,
+      "second": 10,
+      "word": "F2 U2 R' L2 F U R' L' U'"
+    },
+    {
+      "tick": 134,
+      "minute": 22,
+      "second": 20,
+      "word": "R U2 R L2 U' L2 U2 F R' U'"
+    },
+    {
+      "tick": 135,
+      "minute": 22,
+      "second": 30,
+      "word": "R U F2 U L2 F2 U' F R' F"
+    },
+    {
+      "tick": 136,
+      "minute": 22,
+      "second": 40,
+      "word": "R F R2 U L' U' F2 R F' U2"
+    },
+    {
+      "tick": 137,
+      "minute": 22,
+      "second": 50,
+      "word": "L U' L F2 U' R2 L' F L'"
+    },
+    {
+      "tick": 138,
+      "minute": 23,
+      "second": 0,
+      "word": "F2 U' R2 F L' U L'"
+    },
+    {
+      "tick": 139,
+      "minute": 23,
+      "second": 10,
+      "word": "F L' F2 U F' R2 F U L"
+    },
+    {
+      "tick": 140,
+      "minute": 23,
+      "second": 20,
+      "word": "U R F U' R' F2 U F2 U' L2"
+    },
+    {
+      "tick": 141,
+      "minute": 23,
+      "second": 30,
+      "word": "U2 F2 U' F U2 F' R2 F L2"
+    },
+    {
+      "tick": 142,
+      "minute": 23,
+      "second": 40,
+      "word": "F2 R U F' U2 R2 U' F2 L2"
+    },
+    {
+      "tick": 143,
+      "minute": 23,
+      "second": 50,
+      "word": "R2 F U L' U' F R' F R' F2"
+    },
+    {
+      "tick": 144,
+      "minute": 24,
+      "second": 0,
+      "word": "F U L' F R' U R' F U2 F'"
+    },
+    {
+      "tick": 145,
+      "minute": 24,
+      "second": 10,
+      "word": "L' F' L U R2 F2 R' U2 F' U'"
+    },
+    {
+      "tick": 146,
+      "minute": 24,
+      "second": 20,
+      "word": "F2 U' R2 U' F2 L2 U F U'"
+    },
+    {
+      "tick": 147,
+      "minute": 24,
+      "second": 30,
+      "word": "U2 F U L' F2 R U' R F U'"
+    },
+    {
+      "tick": 148,
+      "minute": 24,
+      "second": 40,
+      "word": "U F' U' F' U L2 F' U' R2 F"
+    },
+    {
+      "tick": 149,
+      "minute": 24,
+      "second": 50,
+      "word": "L2 F2 R' U' R2 L F2 U2 L'"
+    },
+    {
+      "tick": 150,
+      "minute": 25,
+      "second": 0,
+      "word": "L F2 L' F L U' R2 F L2 U"
+    },
+    {
+      "tick": 151,
+      "minute": 25,
+      "second": 10,
+      "word": "F2 U2 F U' L2 F2 R2 F U2"
+    },
+    {
+      "tick": 152,
+      "minute": 25,
+      "second": 20,
+      "word": "U2 F R' U' R U' F U' R2 L2"
+    },
+    {
+      "tick": 153,
+      "minute": 25,
+      "second": 30,
+      "word": "U F2 U F' U2 R2 F L2"
+    },
+    {
+      "tick": 154,
+      "minute": 25,
+      "second": 40,
+      "word": "F U2 R2 F' U L2 F2 U' R2 U2"
+    },
+    {
+      "tick": 155,
+      "minute": 25,
+      "second": 50,
+      "word": "R F R' U2 L' U' F L' U'"
+    },
+    {
+      "tick": 156,
+      "minute": 26,
+      "second": 0,
+      "word": "F U F L' F U2 R' U"
+    },
+    {
+      "tick": 157,
+      "minute": 26,
+      "second": 10,
+      "word": "F' L F2 U R' L' F U' R2 U2"
+    },
+    {
+      "tick": 158,
+      "minute": 26,
+      "second": 20,
+      "word": "R' F U2 F U F R U L2"
+    },
+    {
+      "tick": 159,
+      "minute": 26,
+      "second": 30,
+      "word": "L' U2 F U2 R' F' U L"
+    },
+    {
+      "tick": 160,
+      "minute": 26,
+      "second": 40,
+      "word": "R' U L2 U' L2 U' F U' R U'"
+    },
+    {
+      "tick": 161,
+      "minute": 26,
+      "second": 50,
+      "word": "R2 U' R F' R F U' F2 L2"
+    },
+    {
+      "tick": 162,
+      "minute": 27,
+      "second": 0,
+      "word": "F' U' R' F' R2 F' L2 U R2 U'"
+    },
+    {
+      "tick": 163,
+      "minute": 27,
+      "second": 10,
+      "word": "F U2 R' U2 L U F2 R' L' F'"
+    },
+    {
+      "tick": 164,
+      "minute": 27,
+      "second": 20,
+      "word": "U L2 U L' F2 R' F2 U' L U'"
+    },
+    {
+      "tick": 165,
+      "minute": 27,
+      "second": 30,
+      "word": "L' F' R U2 L F R' F2"
+    },
+    {
+      "tick": 166,
+      "minute": 27,
+      "second": 40,
+      "word": "R' U' R2 U' F2 U2 L F' L"
+    },
+    {
+      "tick": 167,
+      "minute": 27,
+      "second": 50,
+      "word": "U' R2 U' F U' F L F L"
+    },
+    {
+      "tick": 168,
+      "minute": 28,
+      "second": 0,
+      "word": "R U' R F2 R U F' L2"
+    },
+    {
+      "tick": 169,
+      "minute": 28,
+      "second": 10,
+      "word": "U' R2 U2 F' L' F2 U L' U2 F'"
+    },
+    {
+      "tick": 170,
+      "minute": 28,
+      "second": 20,
+      "word": "U' R2 F2 L F L' F' U L2"
+    },
+    {
+      "tick": 171,
+      "minute": 28,
+      "second": 30,
+      "word": "L F' U2 R' U' L F2 U' L2 U"
+    },
+    {
+      "tick": 172,
+      "minute": 28,
+      "second": 40,
+      "word": "L' F' R' U2 F R' F' U L F'"
+    },
+    {
+      "tick": 173,
+      "minute": 28,
+      "second": 50,
+      "word": "R F U2 F R' F2 U R F L2"
+    },
+    {
+      "tick": 174,
+      "minute": 29,
+      "second": 0,
+      "word": "L' F U2 L' U F R2 F U2"
+    },
+    {
+      "tick": 175,
+      "minute": 29,
+      "second": 10,
+      "word": "U2 F' U R2 F L2 U' L' U"
+    },
+    {
+      "tick": 176,
+      "minute": 29,
+      "second": 20,
+      "word": "F2 R2 L U R2 U L2 U F' U"
+    },
+    {
+      "tick": 177,
+      "minute": 29,
+      "second": 30,
+      "word": "U' L' U' F' L2 U R2 F2 U F'"
+    },
+    {
+      "tick": 178,
+      "minute": 29,
+      "second": 40,
+      "word": "U2 R' U R F R2 U2 L' U' L'"
+    },
+    {
+      "tick": 179,
+      "minute": 29,
+      "second": 50,
+      "word": "F U L' F U2 R' U R'"
+    },
+    {
+      "tick": 180,
+      "minute": 30,
+      "second": 0,
+      "word": "F2 U2 R' F R' F U'"
+    },
+    {
+      "tick": 181,
+      "minute": 30,
+      "second": 10,
+      "word": "R' F2 R2 U2 F' U' F R2 U"
+    },
+    {
+      "tick": 182,
+      "minute": 30,
+      "second": 20,
+      "word": "R2 U2 R' F U' R U' F U'"
+    },
+    {
+      "tick": 183,
+      "minute": 30,
+      "second": 30,
+      "word": "R F' U' F' U' R2 U' F2"
+    },
+    {
+      "tick": 184,
+      "minute": 30,
+      "second": 40,
+      "word": "L F' U' R U' F2 L F' U'"
+    },
+    {
+      "tick": 185,
+      "minute": 30,
+      "second": 50,
+      "word": "F L F L' F U' R2 F U"
+    },
+    {
+      "tick": 186,
+      "minute": 31,
+      "second": 0,
+      "word": "R2 F R' F U' F2 U2 R"
+    },
+    {
+      "tick": 187,
+      "minute": 31,
+      "second": 10,
+      "word": "R' U R' U' F2 U2 R2 U'"
+    },
+    {
+      "tick": 188,
+      "minute": 31,
+      "second": 20,
+      "word": "F2 U' R2 U' F2 U F U'"
+    },
+    {
+      "tick": 189,
+      "minute": 31,
+      "second": 30,
+      "word": "R U' R F R2 U' R U' F2 U'"
+    },
+    {
+      "tick": 190,
+      "minute": 31,
+      "second": 40,
+      "word": "R F2 U R' U F' R' F U'"
+    },
+    {
+      "tick": 191,
+      "minute": 31,
+      "second": 50,
+      "word": "R' U2 F' R2 F R' F U F2"
+    },
+    {
+      "tick": 192,
+      "minute": 32,
+      "second": 0,
+      "word": "F' U F' U F2 U F R2 F"
+    },
+    {
+      "tick": 193,
+      "minute": 32,
+      "second": 10,
+      "word": "R F2 U2 R' F' R' F2 U'"
+    },
+    {
+      "tick": 194,
+      "minute": 32,
+      "second": 20,
+      "word": "L' F L' F R2 U' L2 U F"
+    },
+    {
+      "tick": 195,
+      "minute": 32,
+      "second": 30,
+      "word": "F U F' R F' U2 R U' F2 U'"
+    },
+    {
+      "tick": 196,
+      "minute": 32,
+      "second": 40,
+      "word": "U F' R2 F' R F' R2 F'"
+    },
+    {
+      "tick": 197,
+      "minute": 32,
+      "second": 50,
+      "word": "F' U F' U2 R' F' R' F U'"
+    },
+    {
+      "tick": 198,
+      "minute": 33,
+      "second": 0,
+      "word": "U' R U R2 F' R' F2 R2 F'"
+    },
+    {
+      "tick": 199,
+      "minute": 33,
+      "second": 10,
+      "word": "U' F' R2 F' U R2 U' R F2"
+    },
+    {
+      "tick": 200,
+      "minute": 33,
+      "second": 20,
+      "word": "R U R2 F R2 F' U F2 U"
+    },
+    {
+      "tick": 201,
+      "minute": 33,
+      "second": 30,
+      "word": "F2 U' R F' R F U F"
+    },
+    {
+      "tick": 202,
+      "minute": 33,
+      "second": 40,
+      "word": "F R2 F' R F U' R' U F2"
+    },
+    {
+      "tick": 203,
+      "minute": 33,
+      "second": 50,
+      "word": "F2 R U' R2 U L' U L F'"
+    },
+    {
+      "tick": 204,
+      "minute": 34,
+      "second": 0,
+      "word": "R F2 U R U F' R' F U'"
+    },
+    {
+      "tick": 205,
+      "minute": 34,
+      "second": 10,
+      "word": "L2 F' U' R F2 L' F' L2 F'"
+    },
+    {
+      "tick": 206,
+      "minute": 34,
+      "second": 20,
+      "word": "F U' L2 U R F2 L F' L U"
+    },
+    {
+      "tick": 207,
+      "minute": 34,
+      "second": 30,
+      "word": "R2 U' F U F2 U R2 U F' U"
+    },
+    {
+      "tick": 208,
+      "minute": 34,
+      "second": 40,
+      "word": "U2 R' U R U' F2 U' R2 F2"
+    },
+    {
+      "tick": 209,
+      "minute": 34,
+      "second": 50,
+      "word": "R F2 U2 F' R' F2 U F' U2"
+    },
+    {
+      "tick": 210,
+      "minute": 35,
+      "second": 0,
+      "word": "R' F2 U F2 U' F R2 F R'"
+    },
+    {
+      "tick": 211,
+      "minute": 35,
+      "second": 10,
+      "word": "U2 F' U F' U2 R2 F' R' F2 U'"
+    },
+    {
+      "tick": 212,
+      "minute": 35,
+      "second": 20,
+      "word": "F2 R' U2 F' R' F U2 R' F"
+    },
+    {
+      "tick": 213,
+      "minute": 35,
+      "second": 30,
+      "word": "F U' R' F2 U R' F2 R' F2 U'"
+    },
+    {
+      "tick": 214,
+      "minute": 35,
+      "second": 40,
+      "word": "F R U' R2 F U' R' U2 R'"
+    },
+    {
+      "tick": 215,
+      "minute": 35,
+      "second": 50,
+      "word": "U R F' U2 F R U' F2 U"
+    },
+    {
+      "tick": 216,
+      "minute": 36,
+      "second": 0,
+      "word": "R' F' U R2 F2 U R' F2 R'"
+    },
+    {
+      "tick": 217,
+      "minute": 36,
+      "second": 10,
+      "word": "L' U2 F R' F' U L"
+    },
+    {
+      "tick": 218,
+      "minute": 36,
+      "second": 20,
+      "word": "F R F U F' U2 R U F"
+    },
+    {
+      "tick": 219,
+      "minute": 36,
+      "second": 30,
+      "word": "U R U' F R' F' R2 F2 U"
+    },
+    {
+      "tick": 220,
+      "minute": 36,
+      "second": 40,
+      "word": "U L' U2 L F2 R' U2 R2 U'"
+    },
+    {
+      "tick": 221,
+      "minute": 36,
+      "second": 50,
+      "word": "R2 F' R F' U F' U' R"
+    },
+    {
+      "tick": 222,
+      "minute": 37,
+      "second": 0,
+      "word": "L' F2 U2 F' U2 F' R F' L"
+    },
+    {
+      "tick": 223,
+      "minute": 37,
+      "second": 10,
+      "word": "F' U F' R2 F R' F R' U"
+    },
+    {
+      "tick": 224,
+      "minute": 37,
+      "second": 20,
+      "word": "F U' F2 U' F2 U F2 R F'"
+    },
+    {
+      "tick": 225,
+      "minute": 37,
+      "second": 30,
+      "word": "U F' U2 R2 F' U2 F U"
+    },
+    {
+      "tick": 226,
+      "minute": 37,
+      "second": 40,
+      "word": "U F2 R2 F U R' F R' U"
+    },
+    {
+      "tick": 227,
+      "minute": 37,
+      "second": 50,
+      "word": "U2 F' U R' U' F2 U2 R F' U"
+    },
+    {
+      "tick": 228,
+      "minute": 38,
+      "second": 0,
+      "word": "R2 F' L' U L2 F' R' F L'"
+    },
+    {
+      "tick": 229,
+      "minute": 38,
+      "second": 10,
+      "word": "R2 F2 R F R' U F2 U' F2"
+    },
+    {
+      "tick": 230,
+      "minute": 38,
+      "second": 20,
+      "word": "U2 F2 L F' L' F2 U R' U R'"
+    },
+    {
+      "tick": 231,
+      "minute": 38,
+      "second": 30,
+      "word": "F R2 F2 R' F' R2 F' R2"
+    },
+    {
+      "tick": 232,
+      "minute": 38,
+      "second": 40,
+      "word": "U' R' U R' F2 U F2 U' F2"
+    },
+    {
+      "tick": 233,
+      "minute": 38,
+      "second": 50,
+      "word": "U F2 U F2 R' F R' F U2"
+    },
+    {
+      "tick": 234,
+      "minute": 39,
+      "second": 0,
+      "word": "R2 U' R2 F U' L' F2 U2 L'"
+    },
+    {
+      "tick": 235,
+      "minute": 39,
+      "second": 10,
+      "word": "U R2 F' R' F' U2 R2 F'"
+    },
+    {
+      "tick": 236,
+      "minute": 39,
+      "second": 20,
+      "word": "U' F2 U F' U2 F' R' U R' U2"
+    },
+    {
+      "tick": 237,
+      "minute": 39,
+      "second": 30,
+      "word": "F2 U' F2 U' R2 F U'"
+    },
+    {
+      "tick": 238,
+      "minute": 39,
+      "second": 40,
+      "word": "F2 R F' U2 F2 R U' F2 U2"
+    },
+    {
+      "tick": 239,
+      "minute": 39,
+      "second": 50,
+      "word": "F' R' U2 R2 F U' R2 U2"
+    },
+    {
+      "tick": 240,
+      "minute": 40,
+      "second": 0,
+      "word": "F2 U2 F' U R2 F2 L F2 L' F'"
+    },
+    {
+      "tick": 241,
+      "minute": 40,
+      "second": 10,
+      "word": "U2 F2 U' R F2 R2 U' R' U"
+    },
+    {
+      "tick": 242,
+      "minute": 40,
+      "second": 20,
+      "word": "L U' R' U L' F' R2 F R' U"
+    },
+    {
+      "tick": 243,
+      "minute": 40,
+      "second": 30,
+      "word": "U2 R U' F2 U F U2 R' U'"
+    },
+    {
+      "tick": 244,
+      "minute": 40,
+      "second": 40,
+      "word": "L F2 U' R2 F U L2"
+    },
+    {
+      "tick": 245,
+      "minute": 40,
+      "second": 50,
+      "word": "F' U2 L F2 L' F' R2 F U'"
+    },
+    {
+      "tick": 246,
+      "minute": 41,
+      "second": 0,
+      "word": "U' F U2 F U' R2 F2 U2 F'"
+    },
+    {
+      "tick": 247,
+      "minute": 41,
+      "second": 10,
+      "word": "F' U R2 F2 U' R' U2 F'"
+    },
+    {
+      "tick": 248,
+      "minute": 41,
+      "second": 20,
+      "word": "U R F2 R2 U2 F' R' F U2"
+    },
+    {
+      "tick": 249,
+      "minute": 41,
+      "second": 30,
+      "word": "F R2 F U2 F U R2 F' U"
+    },
+    {
+      "tick": 250,
+      "minute": 41,
+      "second": 40,
+      "word": "R U F R F2 U' R U R"
+    },
+    {
+      "tick": 251,
+      "minute": 41,
+      "second": 50,
+      "word": "U R2 F L' U' L F2 R' F2"
+    },
+    {
+      "tick": 252,
+      "minute": 42,
+      "second": 0,
+      "word": "U' R2 F R' F R' U2 F2"
+    },
+    {
+      "tick": 253,
+      "minute": 42,
+      "second": 10,
+      "word": "U2 L F2 U2 R' F R' F L2"
+    },
+    {
+      "tick": 254,
+      "minute": 42,
+      "second": 20,
+      "word": "U' F' U R U2 R F U'"
+    },
+    {
+      "tick": 255,
+      "minute": 42,
+      "second": 30,
+      "word": "F R' F2 U R U2 R F2 U'"
+    },
+    {
+      "tick": 256,
+      "minute": 42,
+      "second": 40,
+      "word": "U F R F2 U' R U2 F2 U'"
+    },
+    {
+      "tick": 257,
+      "minute": 42,
+      "second": 50,
+      "word": "R' F' R2 F R' F2 U F2 U"
+    },
+    {
+      "tick": 258,
+      "minute": 43,
+      "second": 0,
+      "word": "F2 R2 F' U F2 U' R F2"
+    },
+    {
+      "tick": 259,
+      "minute": 43,
+      "second": 10,
+      "word": "U2 F2 U' R2 F' L' U' L F' U2"
+    },
+    {
+      "tick": 260,
+      "minute": 43,
+      "second": 20,
+      "word": "R' U F2 R' U R2 F U' F U'"
+    },
+    {
+      "tick": 261,
+      "minute": 43,
+      "second": 30,
+      "word": "L' F L' F U' L2 U R2 F U2"
+    },
+    {
+      "tick": 262,
+      "minute": 43,
+      "second": 40,
+      "word": "U' F2 U R' F U2 R' U' R'"
+    },
+    {
+      "tick": 263,
+      "minute": 43,
+      "second": 50,
+      "word": "F2 R' U' R2 U2 F' U' F"
+    },
+    {
+      "tick": 264,
+      "minute": 44,
+      "second": 0,
+      "word": "U F U2 F U' R' U R' U"
+    },
+    {
+      "tick": 265,
+      "minute": 44,
+      "second": 10,
+      "word": "U' F2 R2 F U' F2 R F2"
+    },
+    {
+      "tick": 266,
+      "minute": 44,
+      "second": 20,
+      "word": "R' U F' R2 F2 U F' R'"
+    },
+    {
+      "tick": 267,
+      "minute": 44,
+      "second": 30,
+      "word": "U R2 F' L F L' U R2 U'"
+    },
+    {
+      "tick": 268,
+      "minute": 44,
+      "second": 40,
+      "word": "R' U R U' F2 R U' R2 F2 U'"
+    },
+    {
+      "tick": 269,
+      "minute": 44,
+      "second": 50,
+      "word": "R' F R' F2 U F' U' F R' F'"
+    },
+    {
+      "tick": 270,
+      "minute": 45,
+      "second": 0,
+      "word": "R' U2 F' U R F' U' R F U2"
+    },
+    {
+      "tick": 271,
+      "minute": 45,
+      "second": 10,
+      "word": "R F' U R2 F2 R' U R"
+    },
+    {
+      "tick": 272,
+      "minute": 45,
+      "second": 20,
+      "word": "F2 R F U' F2 R U F U2"
+    },
+    {
+      "tick": 273,
+      "minute": 45,
+      "second": 30,
+      "word": "R F' U2 F' R F U' F2 U'"
+    },
+    {
+      "tick": 274,
+      "minute": 45,
+      "second": 40,
+      "word": "F' U' F' R F U' F2 U F2 U2"
+    },
+    {
+      "tick": 275,
+      "minute": 45,
+      "second": 50,
+      "word": "U' R2 U F2 R U' F2 R2 U'"
+    },
+    {
+      "tick": 276,
+      "minute": 46,
+      "second": 0,
+      "word": "F' U F2 U' R2 F R2 F' R'"
+    },
+    {
+      "tick": 277,
+      "minute": 46,
+      "second": 10,
+      "word": "R F2 L F' L' U R2 F2 R'"
+    },
+    {
+      "tick": 278,
+      "minute": 46,
+      "second": 20,
+      "word": "L U' R' F U2 R U' L2"
+    },
+    {
+      "tick": 279,
+      "minute": 46,
+      "second": 30,
+      "word": "F2 U R2 F2 U R F' R"
+    },
+    {
+      "tick": 280,
+      "minute": 46,
+      "second": 40,
+      "word": "U F U2 R2 F2 U' F2 U F"
+    },
+    {
+      "tick": 281,
+      "minute": 46,
+      "second": 50,
+      "word": "R2 F L U' R U' F2 L U"
+    },
+    {
+      "tick": 282,
+      "minute": 47,
+      "second": 0,
+      "word": "R' F U' F2 R2 U' R' F"
+    },
+    {
+      "tick": 283,
+      "minute": 47,
+      "second": 10,
+      "word": "F2 U F' U' F' R F'"
+    },
+    {
+      "tick": 284,
+      "minute": 47,
+      "second": 20,
+      "word": "F L U' R U F2 L' U2 F' U'"
+    },
+    {
+      "tick": 285,
+      "minute": 47,
+      "second": 30,
+      "word": "U2 F' U2 F' R' F U' R2 U' F"
+    },
+    {
+      "tick": 286,
+      "minute": 47,
+      "second": 40,
+      "word": "L U' R' U' F U2 R U L2"
+    },
+    {
+      "tick": 287,
+      "minute": 47,
+      "second": 50,
+      "word": "F R' F U' R U F2 R2 F'"
+    },
+    {
+      "tick": 288,
+      "minute": 48,
+      "second": 0,
+      "word": "U F2 L' U L U2 R2 F"
+    },
+    {
+      "tick": 289,
+      "minute": 48,
+      "second": 10,
+      "word": "R' U' R' U2 F U' F' R'"
+    },
+    {
+      "tick": 290,
+      "minute": 48,
+      "second": 20,
+      "word": "F' R2 F' U2 R F R' U2 F2"
+    },
+    {
+      "tick": 291,
+      "minute": 48,
+      "second": 30,
+      "word": "F2 U R F2 U F' U2 R' U'"
+    },
+    {
+      "tick": 292,
+      "minute": 48,
+      "second": 40,
+      "word": "R2 F' U' F2 U' F2 R U F"
+    },
+    {
+      "tick": 293,
+      "minute": 48,
+      "second": 50,
+      "word": "R2 F R' F R' F2 R2"
+    },
+    {
+      "tick": 294,
+      "minute": 49,
+      "second": 0,
+      "word": "F2 R F2 R U2 F' R' F U2"
+    },
+    {
+      "tick": 295,
+      "minute": 49,
+      "second": 10,
+      "word": "U' R' U F2 R' F2 R'"
+    },
+    {
+      "tick": 296,
+      "minute": 49,
+      "second": 20,
+      "word": "F R' F R' F2 R2 U F' U'"
+    },
+    {
+      "tick": 297,
+      "minute": 49,
+      "second": 30,
+      "word": "F2 R U' R F' R F' R2 F' U'"
+    },
+    {
+      "tick": 298,
+      "minute": 49,
+      "second": 40,
+      "word": "R F' R F' R F2 R F' R'"
+    },
+    {
+      "tick": 299,
+      "minute": 49,
+      "second": 50,
+      "word": "F' R' U2 F U2 F' U R2 U"
+    },
+    {
+      "tick": 300,
+      "minute": 50,
+      "second": 0,
+      "word": "U' R F' U F' R' U R F'"
+    },
+    {
+      "tick": 301,
+      "minute": 50,
+      "second": 10,
+      "word": "F U2 F U2 F' U R2 F"
+    },
+    {
+      "tick": 302,
+      "minute": 50,
+      "second": 20,
+      "word": "F2 U' R2 F2 U' F'"
+    },
+    {
+      "tick": 303,
+      "minute": 50,
+      "second": 30,
+      "word": "R' U F' U F U' R2 F R'"
+    },
+    {
+      "tick": 304,
+      "minute": 50,
+      "second": 40,
+      "word": "U2 F' U' F U' R U R F"
+    },
+    {
+      "tick": 305,
+      "minute": 50,
+      "second": 50,
+      "word": "R U2 F2 U' R2 F' R' F2 R2"
+    },
+    {
+      "tick": 306,
+      "minute": 51,
+      "second": 0,
+      "word": "U F2 U' R' U R'"
+    },
+    {
+      "tick": 307,
+      "minute": 51,
+      "second": 10,
+      "word": "U2 R F' R U F2 U R F'"
+    },
+    {
+      "tick": 308,
+      "minute": 51,
+      "second": 20,
+      "word": "U2 R' F U R' U R2 U2 F2"
+    },
+    {
+      "tick": 309,
+      "minute": 51,
+      "second": 30,
+      "word": "R2 U2 F U F2 R' U F2 U2"
+    },
+    {
+      "tick": 310,
+      "minute": 51,
+      "second": 40,
+      "word": "U2 F R2 U' F U F' U2 R2 U'"
+    },
+    {
+      "tick": 311,
+      "minute": 51,
+      "second": 50,
+      "word": "F' U2 R U R F U"
+    },
+    {
+      "tick": 312,
+      "minute": 52,
+      "second": 0,
+      "word": "F' U' R U F' U F2 U"
+    },
+    {
+      "tick": 313,
+      "minute": 52,
+      "second": 10,
+      "word": "R2 U R' F2 R2 F' R2 F' R'"
+    },
+    {
+      "tick": 314,
+      "minute": 52,
+      "second": 20,
+      "word": "U2 F2 R' U R' F U2 R2 F'"
+    },
+    {
+      "tick": 315,
+      "minute": 52,
+      "second": 30,
+      "word": "R F2 R' U F' U2 R' U'"
+    },
+    {
+      "tick": 316,
+      "minute": 52,
+      "second": 40,
+      "word": "U R2 F2 L' U R2 U' L F'"
+    },
+    {
+      "tick": 317,
+      "minute": 52,
+      "second": 50,
+      "word": "U' R2 F' U F U F' R2 U2"
+    },
+    {
+      "tick": 318,
+      "minute": 53,
+      "second": 0,
+      "word": "F' R2 U R F R F2 R2 U"
+    },
+    {
+      "tick": 319,
+      "minute": 53,
+      "second": 10,
+      "word": "R U F U' F2 U R2 F2 U"
+    },
+    {
+      "tick": 320,
+      "minute": 53,
+      "second": 20,
+      "word": "F2 R2 F U2 R' U R U2"
+    },
+    {
+      "tick": 321,
+      "minute": 53,
+      "second": 30,
+      "word": "U2 R' U R2 F' R' U2 R F2"
+    },
+    {
+      "tick": 322,
+      "minute": 53,
+      "second": 40,
+      "word": "R F2 U R' U2 F' R' U' F U2"
+    },
+    {
+      "tick": 323,
+      "minute": 53,
+      "second": 50,
+      "word": "R' U2 F' U' R2 F U' R' U'"
+    },
+    {
+      "tick": 324,
+      "minute": 54,
+      "second": 0,
+      "word": "R' U2 F' R F2 U' R F' R U"
+    },
+    {
+      "tick": 325,
+      "minute": 54,
+      "second": 10,
+      "word": "U R' F U R U' R2 U R2 U'"
+    },
+    {
+      "tick": 326,
+      "minute": 54,
+      "second": 20,
+      "word": "U' R U F R F' R F"
+    },
+    {
+      "tick": 327,
+      "minute": 54,
+      "second": 30,
+      "word": "F' U' F' R U2 F' U F2 U"
+    },
+    {
+      "tick": 328,
+      "minute": 54,
+      "second": 40,
+      "word": "U2 F' U' R' F2 U R F2 R2"
+    },
+    {
+      "tick": 329,
+      "minute": 54,
+      "second": 50,
+      "word": "F' U R' F2 R' U' F2 U F U2"
+    },
+    {
+      "tick": 330,
+      "minute": 55,
+      "second": 0,
+      "word": "F' U2 R' U R U2 F2"
+    },
+    {
+      "tick": 331,
+      "minute": 55,
+      "second": 10,
+      "word": "F R' U' F2 U F2 U R'"
+    },
+    {
+      "tick": 332,
+      "minute": 55,
+      "second": 20,
+      "word": "F' U' R' U R2 F U' R U"
+    },
+    {
+      "tick": 333,
+      "minute": 55,
+      "second": 30,
+      "word": "U F2 U' F L F' R2 F L'"
+    },
+    {
+      "tick": 334,
+      "minute": 55,
+      "second": 40,
+      "word": "F2 L' F' L2 F' R2 F' R F2 L2"
+    },
+    {
+      "tick": 335,
+      "minute": 55,
+      "second": 50,
+      "word": "U' L F2 L' U R2 F' R2 F2 U2"
+    },
+    {
+      "tick": 336,
+      "minute": 56,
+      "second": 0,
+      "word": "F2 R F R' F' U F2 U'"
+    },
+    {
+      "tick": 337,
+      "minute": 56,
+      "second": 10,
+      "word": "R U' R2 F U F L F' L'"
+    },
+    {
+      "tick": 338,
+      "minute": 56,
+      "second": 20,
+      "word": "R F2 U R' F R2 F R' U2"
+    },
+    {
+      "tick": 339,
+      "minute": 56,
+      "second": 30,
+      "word": "U F' U2 F' U' F R' U"
+    },
+    {
+      "tick": 340,
+      "minute": 56,
+      "second": 40,
+      "word": "R' F2 U2 R F R' U2 F'"
+    },
+    {
+      "tick": 341,
+      "minute": 56,
+      "second": 50,
+      "word": "F2 U F2 R' U' R F' R F' U2"
+    },
+    {
+      "tick": 342,
+      "minute": 57,
+      "second": 0,
+      "word": "R F' U F2 U F2 R' U F2 U2"
+    },
+    {
+      "tick": 343,
+      "minute": 57,
+      "second": 10,
+      "word": "R U2 F' R2 F U' F U' R2"
+    },
+    {
+      "tick": 344,
+      "minute": 57,
+      "second": 20,
+      "word": "F' R' F2 R' F U' F2 R2 U'"
+    },
+    {
+      "tick": 345,
+      "minute": 57,
+      "second": 30,
+      "word": "R F U' F' R F U2 F2 U'"
+    },
+    {
+      "tick": 346,
+      "minute": 57,
+      "second": 40,
+      "word": "F U' R U F'"
+    },
+    {
+      "tick": 347,
+      "minute": 57,
+      "second": 50,
+      "word": "U F U' F R' F' R2 F'"
+    },
+    {
+      "tick": 348,
+      "minute": 58,
+      "second": 0,
+      "word": "F U' R U F' U F2 U'"
+    },
+    {
+      "tick": 349,
+      "minute": 58,
+      "second": 10,
+      "word": "U' R2 F U' F U F' U"
+    },
+    {
+      "tick": 350,
+      "minute": 58,
+      "second": 20,
+      "word": "U' R' U R2 F R"
+    },
+    {
+      "tick": 351,
+      "minute": 58,
+      "second": 30,
+      "word": "F' R' F2 R' F' R2 F2"
+    },
+    {
+      "tick": 352,
+      "minute": 58,
+      "second": 40,
+      "word": "U' F R' F' R2 F' U' R2 U2"
+    },
+    {
+      "tick": 353,
+      "minute": 58,
+      "second": 50,
+      "word": "R2 F2 R' F R' U R2 U' F2 U"
+    },
+    {
+      "tick": 354,
+      "minute": 59,
+      "second": 0,
+      "word": "U R2 F2 U R' F R' F2"
+    },
+    {
+      "tick": 355,
+      "minute": 59,
+      "second": 10,
+      "word": "U2 L2 U R' U R' U2 L' U2"
+    },
+    {
+      "tick": 356,
+      "minute": 59,
+      "second": 20,
+      "word": "R2 F2 R F R' F' U F' U'"
+    },
+    {
+      "tick": 357,
+      "minute": 59,
+      "second": 30,
+      "word": "U' R' U R' F U F' U'"
+    },
+    {
+      "tick": 358,
+      "minute": 59,
+      "second": 40,
+      "word": "F' R U' F' U2 R2 F U R2"
+    },
+    {
+      "tick": 359,
+      "minute": 59,
+      "second": 50,
+      "word": "R2 U L' U L U2 R2 F2"
+    }
+  ]
+}

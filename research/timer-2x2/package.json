@@ -1,0 +1,7 @@
+{
+  "name": "cubistry-timer-2x2-proof",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "dependencies": { "cubing": "0.66.1" }
+}

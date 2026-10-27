@@ -1,0 +1,121 @@
+{
+  "status": "SAT",
+  "maxDisplay": "59:50",
+  "stepSeconds": 10,
+  "settledDisplays": 360,
+  "minimumRequirement": "15:00",
+  "minimumRequirementCovered": true,
+  "forwardWordsReplayed": 360,
+  "inverseWordsReplayed": 360,
+  "descendingTransitionsReplayed": 359,
+  "allOrderedTransitionsBySourceFactorization": 129600,
+  "physicalCubies": 8,
+  "physicalStickers": 24,
+  "orientationAndDigitTamperingRejected": true,
+  "upperBound": {
+    "status": "UNSAT",
+    "firstExcludedSeconds": 3600,
+    "method": "rigid-frame slot invariant and exhaustive zero-copy budget cases",
+    "cases": [
+      {
+        "secondsZeroCopies": 1,
+        "requiredStickerBudget": 26
+      },
+      {
+        "secondsZeroCopies": 2,
+        "requiredStickerBudget": 25
+      },
+      {
+        "secondsZeroCopies": 3,
+        "requiredStickerBudget": 26
+      },
+      {
+        "secondsZeroCopies": 4,
+        "requiredStickerBudget": 27
+      },
+      {
+        "secondsZeroCopies": 5,
+        "requiredStickerBudget": 28
+      },
+      {
+        "secondsZeroCopies": 6,
+        "requiredStickerBudget": 29
+      },
+      {
+        "secondsZeroCopies": 7,
+        "requiredStickerBudget": 30
+      },
+      {
+        "secondsZeroCopies": 8,
+        "requiredStickerBudget": 31
+      },
+      {
+        "secondsZeroCopies": 9,
+        "requiredStickerBudget": 32
+      },
+      {
+        "secondsZeroCopies": 10,
+        "requiredStickerBudget": 33
+      },
+      {
+        "secondsZeroCopies": 11,
+        "requiredStickerBudget": 34
+      },
+      {
+        "secondsZeroCopies": 12,
+        "requiredStickerBudget": 35
+      },
+      {
+        "secondsZeroCopies": 13,
+        "requiredStickerBudget": 36
+      },
+      {
+        "secondsZeroCopies": 14,
+        "requiredStickerBudget": 37
+      },
+      {
+        "secondsZeroCopies": 15,
+        "requiredStickerBudget": 38
+      },
+      {
+        "secondsZeroCopies": 16,
+        "requiredStickerBudget": 39
+      },
+      {
+        "secondsZeroCopies": 17,
+        "requiredStickerBudget": 40
+      },
+      {
+        "secondsZeroCopies": 18,
+        "requiredStickerBudget": 41
+      },
+      {
+        "secondsZeroCopies": 19,
+        "requiredStickerBudget": 42
+      },
+      {
+        "secondsZeroCopies": 20,
+        "requiredStickerBudget": 43
+      },
+      {
+        "secondsZeroCopies": 21,
+        "requiredStickerBudget": 44
+      },
+      {
+        "secondsZeroCopies": 22,
+        "requiredStickerBudget": 45
+      },
+      {
+        "secondsZeroCopies": 23,
+        "requiredStickerBudget": 46
+      },
+      {
+        "secondsZeroCopies": 24,
+        "requiredStickerBudget": 47
+      }
+    ]
+  },
+  "witnessSHA256": "2ec912661947b955493774769fe817dc15e8ac91f792b4a5a7d849da4b99de7c",
+  "checkerSHA256": "01a1810a0d14f87f49a1d701ec992d8ea089214261f055cea7de7ee2a40f7f2b",
+  "runtimeSeconds": 0.233
+}

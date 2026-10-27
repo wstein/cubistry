@@ -84,3 +84,9 @@ geometry, Node for enumeration, and independent Python verifiers with exact SymP
 ## License
 
 AGPL-3.0-or-later.
+
+## 2×2 timer research
+
+[Fixed-print timer capacity](docs/TIMER_2X2.md): independently replayed coverage
+from 00:00 through 59:50 in ten-second steps, with an exact upper bound in the
+strictly upright-digit model. This is separate from the 5×5 calendar results.
