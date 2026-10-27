@@ -4,7 +4,7 @@
 
 - One enduring idea per Zettel; connect ideas rather than duplicating long passages.
 - Keep research and hypotheses in `zettel/`; use `adr/` only for explicit, consequential decisions; use `specs/` for normative/testable requirements.
-- `plans/` describe how work may happen; `milestones/` define outcomes. Routine execution tasks belong in GitHub Issues, not duplicated task files.
+- `plans/` describe approaches; `milestones/` capture durable outcomes. Track actionable work and status exclusively in GitHub Issues; use PRs for implementation, review and delivery. Do not create task lists or task mirrors in the vault.
 - Treat the repository Markdown as authoritative. Obsidian may be used without proprietary plugins, configuration, or external services.
 - Prefer relative Markdown links, which work in GitHub and Obsidian. Optional `[[wikilinks]]` may help local navigation but should not be the only route to an important document.
 - Use short, descriptive filenames; Zettel IDs use UTC date plus a unique descriptive slug (`YYYYMMDD-topic`). Never reuse an ID.
