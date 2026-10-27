@@ -1,0 +1,48 @@
+name: Documentation quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  spelling:
+    name: US English spelling
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check spelling
+        uses: crate-ci/typos@v1.49.0
+        with:
+          config: typos.toml
+
+  links:
+    name: Markdown links (local)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check local links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --offline --root-dir . --no-progress
+            --exclude-file .lycheeignore
+            './**/*.md'
+          fail: true
+
+  external-links:
+    name: Markdown links (external, advisory)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check remote links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress --max-retries 2 --timeout 15
+            --exclude-file .lycheeignore
+            './**/*.md'
+          fail: false
