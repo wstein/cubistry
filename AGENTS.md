@@ -1,0 +1,28 @@
+# Cubistry — Agent instructions
+
+## Mission
+Cubistry is a browser-first twisty-puzzle platform. Chronocube is a reference application; its calendar/clock display must be physically realizable, not merely visually plausible.
+
+## Sources of truth
+- Read `knowledge/Home.md` and `knowledge/CONVENTIONS.md` before modifying architecture, specs or research.
+- Accepted ADRs govern decisions; specs govern requirements; Zettel capture hypotheses and findings. Do not silently rewrite accepted decisions.
+- Keep experimentally verified facts distinct from proposals and assumptions.
+- Existing results, scripts, and certificates in research branches are evidence; preserve their provenance.
+
+## Work discipline
+- Clarify assumptions and acceptance criteria in the relevant spec or task.
+- Make small, focused Conventional Commits and provide a concise PR summary with verification commands and outstanding risks.
+- Never merge a draft PR without explicit approval. Never overwrite proof artifacts without retaining reproducibility.
+- Keep proof research on its dedicated spike branch; keep foundational design changes on feature branches.
+- Do not claim SAT or UNSAT from sticker capacity, a screenshot, solver log alone, or a candidate layout.
+- Use exactly `SAT` (validated witness), `UNSAT` (independently checkable proof under explicit assumptions), or `UNKNOWN` (anything else) for feasibility outcomes.
+- Prefer SVG/vector artwork for final print output; PNG is optional raster interchange/preview. Preserve font licensing, embedded asset provenance, dimensions, and sticker orientation.
+- Run available tests and validators; disclose tests you could not run. Do not fabricate validation.
+
+## Skills
+For repeated workflows follow:
+- `.agents/skills/feasibility-spike/SKILL.md` for mathematical investigations;
+- `.agents/skills/proof-review/SKILL.md` for independent validation;
+- `.agents/skills/validate-artwork/SKILL.md` for SVG, typography and printable output.
+
+Skill instructions are task-specific and do not override accepted project ADRs or specs.
