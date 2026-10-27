@@ -1,0 +1,652 @@
+{
+  "status": "UNSAT",
+  "language": "EN",
+  "reason": "Orientation-free paired wing-sticker inventory contradiction.",
+  "glyphModel": {
+    "quarterTurns": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0
+      ],
+      "2": [
+        0
+      ],
+      "3": [
+        0
+      ],
+      "4": [
+        0
+      ],
+      "5": [
+        0
+      ],
+      "6": [
+        0
+      ],
+      "7": [
+        0
+      ],
+      "8": [
+        0
+      ],
+      "9": [
+        0
+      ],
+      "A": [
+        0
+      ],
+      "B": [
+        0
+      ],
+      "C": [
+        0
+      ],
+      "D": [
+        0
+      ],
+      "E": [
+        0
+      ],
+      "F": [
+        0
+      ],
+      "G": [
+        0
+      ],
+      "H": [
+        0
+      ],
+      "I": [
+        0,
+        2
+      ],
+      "J": [
+        0
+      ],
+      "K": [
+        0
+      ],
+      "L": [
+        0
+      ],
+      "M": [
+        0
+      ],
+      "N": [
+        0
+      ],
+      "O": [
+        0,
+        2
+      ],
+      "P": [
+        0
+      ],
+      "Q": [
+        0
+      ],
+      "R": [
+        0
+      ],
+      "S": [
+        0
+      ],
+      "T": [
+        0
+      ],
+      "U": [
+        0
+      ],
+      "V": [
+        0
+      ],
+      "W": [
+        0
+      ],
+      "X": [
+        0
+      ],
+      "Y": [
+        0
+      ],
+      "Z": [
+        0
+      ],
+      "Ä": [
+        0
+      ],
+      "─": [
+        0,
+        2
+      ],
+      ":": [
+        0
+      ],
+      " ": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "definitions": {
+      "0": "centered circle",
+      "O": "centered elongated ellipse",
+      "I": "centered vertical bar",
+      "─": "centered horizontal bar",
+      " ": "empty"
+    },
+    "scope": "identical convention for EN and DE; additional unused symmetries may be admitted"
+  },
+  "conventions": {
+    "rotation": "optically identical rotations allowed; font not otherwise fixed",
+    "symbol": "one immutable glyph; no reinterpretation as a different character",
+    "layout": "unchanged"
+  },
+  "validDates": 10958,
+  "totalDisplays": 15779520,
+  "orbits": {
+    "corners": {
+      "frontSlots": [
+        0,
+        4,
+        20,
+        24
+      ],
+      "availableStickers": 24,
+      "symbols": {
+        "0": 2,
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        " ": 1,
+        "F": 1,
+        "M": 1,
+        "S": 1,
+        "T": 1,
+        "W": 1
+      },
+      "lowerBound": 19,
+      "dateProjections": 5,
+      "timeProjections": 30
+    },
+    "wings": {
+      "frontSlots": [
+        1,
+        3,
+        5,
+        9,
+        15,
+        19,
+        21,
+        23
+      ],
+      "availableStickers": 48,
+      "symbols": {
+        "0": 3,
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 2,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        " ": 1,
+        "A": 1,
+        "B": 1,
+        "C": 1,
+        "E": 1,
+        "G": 1,
+        "H": 1,
+        "L": 1,
+        "N": 1,
+        "O": 1,
+        "P": 1,
+        "R": 2,
+        "T": 1,
+        "U": 1,
+        "V": 1,
+        "Y": 1,
+        "─": 2
+      },
+      "lowerBound": 39,
+      "dateProjections": 234,
+      "timeProjections": 60
+    },
+    "middleEdges": {
+      "frontSlots": [
+        2,
+        10,
+        14,
+        22
+      ],
+      "availableStickers": 24,
+      "symbols": {
+        "0": 1,
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        " ": 1,
+        ":": 1,
+        "D": 1,
+        "E": 1,
+        "I": 1,
+        "N": 1,
+        "T": 1,
+        "U": 1
+      },
+      "lowerBound": 18,
+      "dateProjections": 60,
+      "timeProjections": 1
+    },
+    "axialCenters": {
+      "frontSlots": [
+        7,
+        11,
+        13,
+        17
+      ],
+      "availableStickers": 24,
+      "symbols": {
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "A": 1,
+        "D": 1,
+        "F": 1,
+        "J": 1,
+        "M": 1,
+        "N": 1,
+        "O": 1,
+        "S": 1,
+        "─": 1
+      },
+      "lowerBound": 13,
+      "dateProjections": 24,
+      "timeProjections": 1
+    },
+    "diagonalCenters": {
+      "frontSlots": [
+        6,
+        8,
+        16,
+        18
+      ],
+      "availableStickers": 24,
+      "symbols": {
+        "0": 1,
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "A": 1,
+        "C": 1,
+        "E": 1,
+        "O": 1,
+        "P": 1,
+        "U": 1,
+        "─": 2
+      },
+      "lowerBound": 18,
+      "dateProjections": 60,
+      "timeProjections": 1
+    },
+    "fixedCenters": {
+      "frontSlots": [
+        12
+      ],
+      "availableStickers": 1,
+      "symbols": {
+        "0": 1
+      },
+      "lowerBound": 1,
+      "dateProjections": 1,
+      "timeProjections": 1
+    }
+  },
+  "pooledInventoryLowerBound": 108,
+  "wingStickerOrbits": {
+    "positive": {
+      "frontSlots": [
+        1,
+        9,
+        15,
+        23
+      ],
+      "availableStickers": 24,
+      "symbols": {
+        "0": 1,
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "A": 1,
+        "B": 1,
+        "C": 1,
+        "E": 1,
+        "G": 1,
+        "H": 1,
+        "L": 1,
+        "N": 1,
+        "O": 1,
+        "P": 1,
+        "R": 2,
+        "T": 1,
+        "U": 1,
+        "V": 1,
+        "Y": 1,
+        "─": 1
+      },
+      "lowerBound": 23,
+      "dateProjections": 60,
+      "timeProjections": 6
+    },
+    "negative": {
+      "frontSlots": [
+        3,
+        5,
+        19,
+        21
+      ],
+      "availableStickers": 24,
+      "symbols": {
+        "0": 2,
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        " ": 1,
+        "─": 1
+      },
+      "lowerBound": 16,
+      "dateProjections": 4,
+      "timeProjections": 10
+    }
+  },
+  "uprightOnly": {
+    "status": "UNSAT",
+    "scope": "conditional; not assumed for the primary result",
+    "validDates": 10958,
+    "positive": [
+      [
+        1,
+        "A"
+      ],
+      [
+        1,
+        "E"
+      ],
+      [
+        1,
+        "H"
+      ],
+      [
+        1,
+        "O"
+      ],
+      [
+        1,
+        "R"
+      ],
+      [
+        1,
+        "U"
+      ],
+      [
+        15,
+        "─"
+      ],
+      [
+        23,
+        "0"
+      ],
+      [
+        23,
+        "1"
+      ],
+      [
+        23,
+        "2"
+      ],
+      [
+        23,
+        "3"
+      ],
+      [
+        23,
+        "4"
+      ],
+      [
+        23,
+        "5"
+      ],
+      [
+        9,
+        "B"
+      ],
+      [
+        9,
+        "C"
+      ],
+      [
+        9,
+        "G"
+      ],
+      [
+        9,
+        "L"
+      ],
+      [
+        9,
+        "N"
+      ],
+      [
+        9,
+        "P"
+      ],
+      [
+        9,
+        "R"
+      ],
+      [
+        9,
+        "T"
+      ],
+      [
+        9,
+        "V"
+      ],
+      [
+        9,
+        "Y"
+      ]
+    ],
+    "negative": [
+      [
+        19,
+        "─"
+      ],
+      [
+        21,
+        "0"
+      ],
+      [
+        21,
+        "1"
+      ],
+      [
+        21,
+        "2"
+      ],
+      [
+        21,
+        "3"
+      ],
+      [
+        21,
+        "4"
+      ],
+      [
+        21,
+        "5"
+      ],
+      [
+        21,
+        "6"
+      ],
+      [
+        21,
+        "7"
+      ],
+      [
+        21,
+        "8"
+      ],
+      [
+        21,
+        "9"
+      ],
+      [
+        3,
+        " "
+      ],
+      [
+        5,
+        "0"
+      ],
+      [
+        5,
+        "1"
+      ],
+      [
+        5,
+        "2"
+      ],
+      [
+        5,
+        "3"
+      ]
+    ],
+    "neverCooccurs": [
+      {
+        "positive": [
+          9,
+          "B"
+        ],
+        "negative": [
+          5,
+          "3"
+        ]
+      }
+    ],
+    "exceptionalNegativeTokens": 1,
+    "counting": {
+      "physicalWingCubies": 24,
+      "positiveRequiredTokens": 23,
+      "negativeRequiredTokens": 16,
+      "positiveSlack": 1,
+      "minimumNegativeSingletons": 8,
+      "maximumNonessentialPositiveStickers": 2,
+      "maximumNegativeSingletons": 3,
+      "contradiction": true
+    }
+  },
+  "orientationFreeWingProof": {
+    "model": "orientation-free single-symbol wing stickers",
+    "requiredA": {
+      "0": 1,
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "A": 1,
+      "B": 1,
+      "C": 1,
+      "E": 1,
+      "G": 1,
+      "H": 1,
+      "L": 1,
+      "N": 1,
+      "O": 1,
+      "P": 1,
+      "R": 2,
+      "T": 1,
+      "U": 1,
+      "V": 1,
+      "Y": 1,
+      "─": 1
+    },
+    "requiredB": {
+      "0": 2,
+      "1": 2,
+      "2": 2,
+      "3": 2,
+      "4": 1,
+      "5": 1,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      " ": 1,
+      "─": 1
+    },
+    "slackA": 1,
+    "slackB": 8,
+    "projectedTargets": 14040,
+    "peakNeverCooccurs": [
+      [
+        "B",
+        "3"
+      ]
+    ],
+    "branches": [
+      {
+        "threeTight": false,
+        "minimumTightB": 4,
+        "maximumNonTightA": 3,
+        "maximumExceptionalPairs": 0,
+        "contradiction": true
+      },
+      {
+        "threeTight": true,
+        "minimumTightB": 5,
+        "maximumNonTightA": 3,
+        "maximumExceptionalPairs": 1,
+        "contradiction": true
+      }
+    ],
+    "contradiction": true
+  },
+  "proof": "docs/MONOCHROME.md"
+}

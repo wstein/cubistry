@@ -179,7 +179,7 @@ if __name__=='__main__':
     parser.add_argument('--language',choices=['EN','DE'])
     args=parser.parse_args()
     check_upright_role_invariant()
-    for language,filename in [('EN','english.json'),('DE','german.json')]:
+    for language,filename in [('EN','english-monochrome.json'),('DE','german-monochrome.json')]:
         if args.language and args.language!=language:
             continue
         report=json.loads((ROOT/'results'/filename).read_text())
@@ -190,7 +190,7 @@ if __name__=='__main__':
         require(report['glyphModel']['quarterTurns']==expected_glyphs,'Shared per-glyph symmetries')
         if language=='EN':
             require(proves_unsat and report['status']=='UNSAT','English conclusion not established')
-            print('VERIFIED EN UNSAT: both orientation-free inventory cases contradict wing cubie coupling.')
+            print('VERIFIED EN MONOCHROME UNSAT: both orientation-free inventory cases contradict wing cubie coupling.')
         else:
             require(not proves_unsat,'German inventory is not an UNSAT proof')
             from verify_german import verify_design_and_group
@@ -202,4 +202,4 @@ if __name__=='__main__':
                 (ROOT/'results'/filename).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
             else:
                 require(report['status']=='SAT' and report['reachabilityCertificate']==certificate,'German SAT certificate mismatch')
-            print('VERIFIED DE SAT: immutable full design, all projected targets, and simultaneous physical reachability.')
+            print('VERIFIED DE MONOCHROME SAT: immutable full design, all projected targets, and simultaneous physical reachability.')

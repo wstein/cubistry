@@ -1,8 +1,9 @@
 # Bilingual 5×5 clock/calendar feasibility: UNSAT
 
-The separate investigations now establish EN UNSAT and DE SAT with a circular
-zero; see [SINGLE_LANGUAGE.md](SINGLE_LANGUAGE.md). This page proves only the
-combined-design obstruction.
+The required color-aware single-language cases are both UNSAT; see
+[SINGLE_LANGUAGE.md](SINGLE_LANGUAGE.md). A one-color German SAT reference is
+retained in [MONOCHROME.md](MONOCHROME.md). This page proves the combined-design
+obstruction even without the additional ink constraints.
 
 No single immutable sticker printing can satisfy the specified display for
 both languages. A 24-sticker invariant orbit requires at least 26 stickers.
@@ -173,7 +174,7 @@ npm ci --cache /tmp/cubistry-npm-cache --ignore-scripts
 npm run check
 ```
 
-`npm run check` compiles ReScript, runs eight focused Node regression tests,
+`npm run check` compiles ReScript, runs nine focused Node regression tests,
 regenerates `results/feasibility.json`, and executes `scripts/verify.py`.
 The combined check takes seconds; the full single-language group verification
 takes approximately 30 seconds. No service, credential, numerical solver,

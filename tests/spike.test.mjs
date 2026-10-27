@@ -98,3 +98,16 @@ test('one shared glyph model and a fixed full German design', async () => {
   for(const target of projectedTargets('wings'))assert.ok(matchPieces(d.packings.wings.pieces,target));
   assert.equal(d.packings.wings.projectedTargets,9360);
 });
+
+test('binding ink colors forbid reusing red zero as blue zero, without banning rotations', async () => {
+  const {coloredProof,targetInk}=await import('../scripts/colored-language.mjs');
+  assert.notEqual(targetInk(5,'0'),targetInk(21,'0'));
+  assert.equal(targetInk(22,':'),'date-red');
+  const en=coloredProof('EN'),de=coloredProof('DE');
+  assert.equal(en.status,'UNSAT');
+  assert.equal(de.status,'UNSAT');
+  assert.equal(en.counting.minimumWingCubies,26);
+  assert.equal(de.counting.minimumWingCubies,25);
+  assert.equal(de.counting.minimumNegativeSingletons,8);
+  assert.equal(de.counting.maximumNegativeSingletons,7);
+});

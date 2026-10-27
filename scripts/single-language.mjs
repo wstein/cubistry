@@ -20,11 +20,11 @@ for(const language of args.length?args:['EN','DE']) {
     wingStickerOrbits:Object.fromEntries(Object.entries(refined.orbits).map(([name,o])=>[name,{...o,availableStickers:24}])),
     uprightOnly:{status:'UNSAT',scope:'conditional; not assumed for the primary result',...coupledRequirements(language)},
     orientationFreeWingProof:peak,
-    proof:'docs/SINGLE_LANGUAGE.md',
+    proof:'docs/MONOCHROME.md',
   };
   if(language==='DE')report.design=constructGerman();
   mkdirSync('results',{recursive:true});
   const filename=language==='EN'?'english':'german';
-  writeFileSync(`results/${filename}.json`,JSON.stringify(report,null,2)+'\n');
-  console.log(`${language}: ${report.status}${language==='DE'?' pending independent group and design verification':''}`);
+  writeFileSync(`results/${filename}-monochrome.json`,JSON.stringify(report,null,2)+'\n');
+  console.log(`${language} monochrome reference: ${report.status}${language==='DE'?' pending independent group and design verification':''}`);
 }
