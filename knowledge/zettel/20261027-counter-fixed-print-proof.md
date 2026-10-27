@@ -13,7 +13,9 @@ twice and its physical cubies may move. A separate fixed print replaces the
 tens-zero image with a blank for unpadded values. Both are **SAT**, established
 by complete legal words and an independent labeled-facelet replayer.
 
-Requiring the same two top cubies to remain fixed is **UNSAT**: the remaining
+Within the explicit distinct-upright-digit model (no cross-character rotation
+aliases such as 6 becoming 9), requiring the same two top cubies to remain fixed
+is **UNSAT**: the remaining
 six corners provide 18 image positions, while either numeric format requires
 20. Constant completed text does not imply constant physical cubies.
 
