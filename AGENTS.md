@@ -12,6 +12,7 @@ Cubistry is a browser-first twisty-puzzle platform. Chronocube is a reference ap
 ## Work discipline
 - Clarify assumptions and acceptance criteria in the relevant spec or task.
 - Make small, focused Conventional Commits and provide a concise PR summary with verification commands and outstanding risks.
+- Agent-authored PRs follow the independent author/reviewer workflow in [CONTRIBUTING.md](CONTRIBUTING.md#independent-agent-review). The author opens a draft and fixes findings; a separate reviewer publishes the final review and marks it ready only after clearance. Authors do not mark their own PRs ready.
 - Never merge a draft PR without explicit approval. Never overwrite proof artifacts without retaining reproducibility.
 - Keep proof research on its dedicated spike branch; keep foundational design changes on feature branches.
 - Do not claim SAT or UNSAT from sticker capacity, a screenshot, solver log alone, or a candidate layout.
@@ -23,7 +24,8 @@ Cubistry is a browser-first twisty-puzzle platform. Chronocube is a reference ap
 For repeated workflows follow:
 - `.agents/skills/feasibility-spike/SKILL.md` for mathematical investigations;
 - `.agents/skills/proof-review/SKILL.md` for independent validation;
-- `.agents/skills/validate-artwork/SKILL.md` for SVG, typography and printable output.
+- `.agents/skills/validate-artwork/SKILL.md` for SVG, typography and printable output;
+- [pr-review](.agents/skills/pr-review/SKILL.md) for independent PR review, findings, and reviewer-owned readiness.
 
 Skill instructions are task-specific and do not override accepted project ADRs or specs.
 
