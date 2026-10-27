@@ -1,3 +1,4 @@
+import { deploymentBasePath } from "@cubistry/cube-assets";
 import {
   deepFreeze,
   demand,
@@ -200,15 +201,19 @@ export async function configurePrint(
 
 export async function loadCounterDesign(
   signal?: AbortSignal,
+  basePath = "/",
 ): Promise<CounterDesign> {
   signal = signal
     ? AbortSignal.any([signal, AbortSignal.timeout(10000)])
     : AbortSignal.timeout(10000);
-  const response = await fetch("/counter-design.v2.json", {
-    signal,
-    redirect: "error",
-    credentials: "same-origin",
-  });
+  const response = await fetch(
+    `${deploymentBasePath(basePath)}counter-design.v2.json`,
+    {
+      signal,
+      redirect: "error",
+      credentials: "same-origin",
+    },
+  );
   demand(response.ok, "Counter design could not be loaded");
   demand(
     (response.headers.get("content-type") || "").split(";")[0] ===

@@ -16,9 +16,16 @@ document
 let state: CubeState;
 try {
   const fixture = acceptanceFixture(
-      await (await fetch("/counter-design.v2.json")).json(),
+      await (
+        await fetch(`${import.meta.env.BASE_URL}counter-design.v2.json`)
+      ).json(),
     ),
-    assets = await loadAssets(fixture.design.assets, [fixture.print]);
+    assets = await loadAssets(
+      fixture.design.assets,
+      [fixture.print],
+      undefined,
+      import.meta.env.BASE_URL,
+    );
   state = fixture.start;
   viewer.configure(fixture.print, state, assets);
   host.dataset.ready = "true";

@@ -1,4 +1,5 @@
 import "./style.css";
+import { loadAssets } from "@cubistry/cube-assets";
 import { CubeViewer } from "@cubistry/cube-viewer";
 import { CounterController } from "./apps/counter/controller.ts";
 import { validLabel, loadCounterDesign } from "./apps/counter/design.ts";
@@ -224,8 +225,14 @@ window.addEventListener("keydown", (e) => {
 async function initialize() {
   if (!viewer) return;
   try {
-    proof = await loadCounterDesign();
-    view = new CounterController(viewer, proof, onPhysicalState);
+    proof = await loadCounterDesign(undefined, import.meta.env.BASE_URL);
+    view = new CounterController(
+      viewer,
+      proof,
+      onPhysicalState,
+      (manifest, prints, signal) =>
+        loadAssets(manifest, prints, signal, import.meta.env.BASE_URL),
+    );
     let saved;
     try {
       saved = JSON.parse(localStorage.getItem("cubistry-counter-v1"));

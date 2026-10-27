@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 import { solverAcceptancePlugin } from "./src/dev/acceptance-plugin.ts";
 export default defineConfig({
+  base: process.env.VITE_BASE_PATH || "/",
   plugins: [solverAcceptancePlugin()],
   build: {
     rollupOptions: {

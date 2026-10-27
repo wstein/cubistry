@@ -196,14 +196,28 @@ function context(c: HTMLCanvasElement): CanvasRenderingContext2D {
   demand(ctx, "2D image context unavailable");
   return ctx;
 }
+/** Deployment prefix changes transport only; canonical manifest URLs and hashes stay intact. */
+export function deploymentBasePath(basePath: string): string {
+  demand(
+    typeof basePath === "string" &&
+      basePath.length <= 256 &&
+      /^\/(?:[A-Za-z0-9_-]+\/)*$/.test(basePath),
+    "Invalid asset base path",
+  );
+  return basePath;
+}
+export function assetTransportPath(path: string, basePath = "/"): string {
+  return deploymentBasePath(basePath) + safeAssetPath(path).slice(1);
+}
 async function fetchBounded(
   path: string,
   expected: string,
   kind: "svg" | "png" | "webp" | "woff2",
   budget: { bytes: number },
   signal?: AbortSignal,
+  basePath = "/",
 ): Promise<Uint8Array> {
-  const response = await fetch(safeAssetPath(path), {
+  const response = await fetch(assetTransportPath(path, basePath), {
     signal,
     redirect: "error",
     credentials: "same-origin",
@@ -259,7 +273,9 @@ export async function loadAssets(
   raw: unknown,
   prints: readonly PrintDefinition[],
   signal?: AbortSignal,
+  basePath = "/",
 ): Promise<LoadedAssets> {
+  basePath = deploymentBasePath(basePath);
   signal = signal
     ? AbortSignal.any([signal, AbortSignal.timeout(ASSET_LIMITS.timeoutMs)])
     : AbortSignal.timeout(ASSET_LIMITS.timeoutMs);
@@ -286,6 +302,7 @@ export async function loadAssets(
         "woff2",
         budget,
         signal,
+        basePath,
       );
       demand(
         new TextDecoder().decode(bytes.slice(0, 4)) === "wOF2",
@@ -357,6 +374,7 @@ export async function loadAssets(
           asset.format,
           budget,
           signal,
+          basePath,
         );
         if (asset.format === "svg")
           validateSvg(new TextDecoder().decode(bytes));
