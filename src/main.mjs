@@ -206,11 +206,7 @@ async function initialize() {
       saved.value <= 99
     ) {
       value = saved.value;
-      if (
-        typeof saved.label === "string" &&
-        saved.label.length <= 80 &&
-        validLabel(saved.label)
-      )
+      if (typeof saved.label === "string" && validLabel(saved.label))
         $("label").value = saved.label;
       $("format").value = saved.padded === false ? "unpadded" : "padded";
       if (
