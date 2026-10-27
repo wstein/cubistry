@@ -3,6 +3,18 @@
 A browser-first twisty-puzzle platform. The first local MVP is a **real fixed-print
 2×2 counter**: two constant upper title stickers and two lower digits, 0–99.
 
+## Development preview
+
+Expected Pages URL: https://wstein.github.io/cubistry/. Publication awaits the
+first human-approved merge and successful main-only Pages workflow; this link
+is not a claim that the preview is already online. The static counter needs no
+dev server. The existing solver acceptance page remains development-only.
+
+This MVP preview is separate from the selective Hugo/documentation roadmap in
+[issue #10](https://github.com/wstein/cubistry/issues/10); it does not publish the
+knowledge tree. Reproduce the project-path build with
+`VITE_BASE_PATH=/cubistry/ npm run build` and `npm run test:pages`.
+
 ## Run the counter locally
 
 Requires Node 24+ (tested with 24.19.0), npm, and Python 3 for proof checks.
