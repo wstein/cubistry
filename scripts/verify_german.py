@@ -2,6 +2,7 @@
 then exact simultaneous reachability in the labeled 5x5 move group.
 No source geometry, move tables, or matching code is imported from JS/ReScript.
 """
+import copy
 import collections
 import datetime as dt
 import itertools
@@ -48,18 +49,28 @@ def chirality(p,n):
     return dot(n,cross(m,q))
 
 
+_GROUP_CERTIFICATE = None
+
+def palette_ink(palette,slot,char):
+    if char==' ': return 'none'
+    row=slot//5
+    field=('weekdayLetters' if row==0 else ('dateDigits' if char.isdigit() else 'monthLetters') if row==1 else 'yearDigits' if row==2 else 'separator' if row==3 else 'colon' if char==':' else 'timeDigits')
+    return palette[field]
+
+
 SLOTS={'corners':(0,4,20,24),'middleEdges':(2,10,14,22),
        'wings':(1,9,15,23,3,5,19,21),'axialCenters':(7,11,13,17),'diagonalCenters':(6,8,16,18)}
 
 
-def target_projections():
+def target_projections(day_padding='zero'):
+    require(day_padding in ('zero','space'),'Unknown day padding')
     dates={k:set() for k in SLOTS}
     times={k:set() for k in SLOTS}
     day=dt.date(2020,1,1)
     weekdays='MON DIE MIT DON FRE SAM SON'.split()
     months='JAN FEB MÄR APR MAI JUN JUL AUG SEP OKT NOV DEZ'.split()
     while day<dt.date(2050,1,1):
-        text=weekdays[day.weekday()]+'  '+f'{day.day:02}'+months[day.month-1]+' '+str(day.year)+'─────'
+        text=weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+' '+str(day.year)+'─────'
         require(text[12]=='0','Front fixed center must be zero')
         for k,positions in SLOTS.items():
             dates[k].add(tuple(text[i] for i in positions if i<20))
@@ -77,7 +88,8 @@ def target_projections():
     return result
 
 
-def verify_design_and_group(report):
+def verify_design_and_group(report, *, reuse_group=False):
+    global _GROUP_CERTIFICATE
     require(sympy.__version__=='1.14.0','Install pinned requirements-verifier.txt')
     start=time.monotonic()
     # Independent sticker lattice and IDs, unrelated to the face-order IDs of D.
@@ -101,10 +113,16 @@ def verify_design_and_group(report):
     require(len(by_piece)==98,'Full physical cubie count')
     fixed=design_by_slot[((0,0,2),(0,0,1))]
     require(fixed['symbol']=='0','Front fixed center printing')
+    require(report['glyphModel']['quarterTurns']['0']==[0,1,2,3] and report['glyphModel']['quarterTurns'][' ']==[0,1,2,3],'Fixed-center spins must be optically irrelevant')
+    if 'palette' in report:
+        require(fixed.get('ink')==report['palette']['yearDigits'],'Front fixed-center ink')
+        require(all(s.get('ink')=='none' for s in design if s['symbol']==' '),'Blank printing has no ink')
     require(all(s['symbol']==' ' for s in design if piece_class(s['position'])=='fixedCenters' and s is not fixed),'Other fixed centers must be blank')
 
     # Actual rigid poses, not the claimed targetSlots fields, decide matching.
     # No two slots may select stickers of the same physical cubie.
+    allowed=report.get('matchingQuarterTurns',report['glyphModel']['quarterTurns'])
+    require(all(set(q)<=set(report['glyphModel']['quarterTurns'][c]) for c,q in allowed.items()),'Matching cannot admit an optically invalid orientation')
     candidates={}
     for p,stickers in by_piece.items():
         for s in stickers:
@@ -118,14 +136,15 @@ def verify_design_and_group(report):
                 if normal!=(0,0,1):
                     continue
                 q={(0,1,0):0,(-1,0,0):1,(0,-1,0):2,(1,0,0):3}[tangent]
-                if q in report['glyphModel']['quarterTurns'][s['symbol']]:
+                if q in allowed[s['symbol']]:
                     slot=(2-dst[1])*5+dst[0]+2
-                    candidates.setdefault((slot,s['symbol']),set()).add(p)
+                    if 'palette' not in report or s.get('ink')==palette_ink(report['palette'],slot,s['symbol']):
+                        candidates.setdefault((slot,s['symbol']),set()).add(p)
             # A nonfixed physical sticker's in-plane orientation is fixed by
             # its source and destination facelets; the 150-point action loses
             # no extra glyph-spin variable.
             require(all(len(t)==1 for t in destinations.values()),'Unmodeled nonfixed sticker spin')
-    targets=target_projections()
+    targets=target_projections(report.get('dayPadding','zero'))
     checked={}
     for k,patterns in targets.items():
         for target in patterns:
@@ -144,6 +163,11 @@ def verify_design_and_group(report):
             require(match(0),f'No rigid printed-cubie matching for {k}: {target}')
         checked[k]=len(patterns)
         require(report['design']['packings'][k]['projectedTargets']==len(patterns),'Projection certificate count')
+
+    if reuse_group:
+        require(_GROUP_CERTIFICATE is not None,'A serialized group certificate is not enough: verify the group in this process first')
+        require(_GROUP_CERTIFICATE['checkedProjectionCounts']==checked,'Changed partial-placement target model')
+        return copy.deepcopy(_GROUP_CERTIFICATE)
 
     generators=[]
     labels=[]
@@ -214,4 +238,5 @@ def verify_design_and_group(report):
                      fixedCenterReason='front zero is circular; other five fixed-center stickers are blank; all spins optically equivalent',
                      simultaneousCompletion=True)
     print(f'Physical design and exact simultaneous completion verified in {time.monotonic()-start:.1f}s.',flush=True)
+    _GROUP_CERTIFICATE=copy.deepcopy(certificate)
     return certificate

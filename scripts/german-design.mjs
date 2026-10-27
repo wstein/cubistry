@@ -73,7 +73,7 @@ const units=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
 const rotations=units.flatMap(x=>units.filter(y=>dot(x,y)===0).map(y=>[x,y,cross(x,y)]));
 const rotate=(v,R)=>[0,1,2].map(i=>v.reduce((s,x,j)=>s+x*R[j][i],0));
 const eq=(a,b)=>a.every((x,i)=>x===b[i]);
-function printing(sticker,token) {
+export function printing(sticker,token) {
   const slot=token.slots[0],p=[slot%5-2,2-Math.floor(slot/5),2];
   const R=rotations.find(R=>eq(rotate(sticker.position,R),p)&&eq(rotate(sticker.normal,R),[0,0,1]));
   if(!R)throw new Error('Printing role is not geometrically reachable');

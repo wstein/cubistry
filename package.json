@@ -10,12 +10,14 @@
   },
   "scripts": {
     "build": "rescript",
-    "experiment": "npm run build && node scripts/experiment.mjs && node scripts/single-language.mjs && python3 scripts/verify_single.py --certify && node scripts/colored-language.mjs && python3 scripts/verify_colored.py",
-    "verify": "python3 scripts/verify.py && python3 scripts/verify_single.py && python3 scripts/verify_colored.py",
+    "experiment": "npm run build && node scripts/experiment.mjs && node scripts/single-language.mjs && node scripts/palette-analysis.mjs && node scripts/space-day.mjs && python3 scripts/verify_single.py --certify --palettes --space-day && node scripts/colored-language.mjs && python3 scripts/verify_colored.py",
+    "verify": "python3 scripts/verify.py && python3 scripts/verify_single.py --palettes --space-day && python3 scripts/verify_colored.py",
     "test": "npm run build && node --test tests/*.test.mjs",
     "check": "npm test && npm run experiment && python3 scripts/verify.py",
     "experiment:en": "npm run build && node scripts/single-language.mjs EN && python3 scripts/verify_single.py --language EN",
-    "experiment:de": "npm run build && node scripts/single-language.mjs DE && python3 scripts/verify_single.py --certify --language DE"
+    "experiment:de": "npm run build && node scripts/single-language.mjs DE && python3 scripts/verify_single.py --certify --language DE",
+    "experiment:palette": "npm run build && node scripts/palette-analysis.mjs && python3 scripts/verify_single.py --certify --language DE --palettes",
+    "experiment:space-day": "npm run build && node scripts/space-day.mjs && python3 scripts/verify_single.py --certify --language DE --space-day"
   },
   "devDependencies": {
     "rescript": "12.3.1"

@@ -1,0 +1,76 @@
+{
+  "language": "EN",
+  "dayPadding": "space",
+  "status": "UNSAT",
+  "validDates": 10958,
+  "totalDisplays": 15779520,
+  "reason": "Even space-padded days fail the orientation-free paired-wing peak-inventory proof.",
+  "orientationFreeWingProof": {
+    "model": "orientation-free single-symbol wing stickers",
+    "requiredA": {
+      "0": 1,
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "A": 1,
+      "B": 1,
+      "C": 1,
+      "E": 1,
+      "G": 1,
+      "H": 1,
+      "L": 1,
+      "N": 1,
+      "O": 1,
+      "P": 1,
+      "R": 2,
+      "T": 1,
+      "U": 1,
+      "V": 1,
+      "Y": 1,
+      "─": 1
+    },
+    "requiredB": {
+      "0": 1,
+      "1": 2,
+      "2": 2,
+      "3": 2,
+      "4": 1,
+      "5": 1,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      " ": 2,
+      "─": 1
+    },
+    "slackA": 1,
+    "slackB": 8,
+    "projectedTargets": 14040,
+    "peakNeverCooccurs": [
+      [
+        "B",
+        "3"
+      ]
+    ],
+    "branches": [
+      {
+        "threeTight": false,
+        "minimumTightB": 4,
+        "maximumNonTightA": 3,
+        "maximumExceptionalPairs": 0,
+        "contradiction": true
+      },
+      {
+        "threeTight": true,
+        "minimumTightB": 5,
+        "maximumNonTightA": 3,
+        "maximumExceptionalPairs": 1,
+        "contradiction": true
+      }
+    ],
+    "contradiction": true
+  },
+  "proof": "docs/DAY_PADDING.md"
+}

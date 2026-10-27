@@ -1,10 +1,10 @@
 import * as D from '../src/Display.res.mjs';
 import {counts,requirements,wingRoles} from './experiment.mjs';
 
-export function wingTargets(language) {
+export function wingTargets(language,dayPadding='zero') {
   const dates=new Set(),times=new Set();
   for(let ms=Date.UTC(2020,0,1);ms<Date.UTC(2050,0,1);ms+=86400000) {
-    const d=new Date(ms),f=[...D.rows(language,(d.getUTCDay()+6)%7,d.getUTCDate(),d.getUTCMonth(),d.getUTCFullYear(),0).join('')];
+    const d=new Date(ms),f=[...D.rowsWithDayPadding(language,(d.getUTCDay()+6)%7,d.getUTCDate(),d.getUTCMonth(),d.getUTCFullYear(),0,dayPadding==='space').join('')];
     dates.add([1,9,15,3,5,19].map(i=>f[i]).join(''));
   }
   for(let minute=0;minute<1440;minute++) {
@@ -15,11 +15,11 @@ export function wingTargets(language) {
 }
 // Orientation-free: give every printed glyph all in-plane rotations. Each
 // physical sticker still has exactly one symbol and belongs to one sign orbit.
-export function peakProof(language) {
-  const r=requirements(wingRoles,[language]);
+export function peakProof(language,dayPadding='zero') {
+  const r=requirements(wingRoles,[language],dayPadding);
   const A=r.orbits.positive.symbols,B=r.orbits.negative.symbols;
   const coexists=new Set();
-  const targets=wingTargets(language);
+  const targets=wingTargets(language,dayPadding);
   for(const t of targets) {
     const a=counts(t.slice(0,4)),b=counts(t.slice(4));
     for(const x of Object.keys(a)) if(a[x]===A[x]) for(const y of Object.keys(b)) if(b[y]===B[y]) coexists.add(JSON.stringify([x,y]));

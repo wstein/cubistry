@@ -6,17 +6,21 @@ let monthsEN = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "
 
 let two = n => (n < 10 ? "0" : "") ++ Int.toString(n)
 
-let rows = (language, weekday, day, month, year, minute) => {
+let rowsWithDayPadding = (language, weekday, day, month, year, minute, spacePadDay) => {
   let weekdays = language == "DE" ? weekdaysDE : weekdaysEN
   let months = language == "DE" ? monthsDE : monthsEN
   [
     weekdays->Array.getUnsafe(weekday) ++ "  ",
-    two(day) ++ months->Array.getUnsafe(month),
+    (spacePadDay && day < 10 ? " " ++ Int.toString(day) : two(day)) ++ months->Array.getUnsafe(month),
     " " ++ Int.toString(year),
     "─────",
     two(minute / 60) ++ ":" ++ two(mod(minute, 60)),
   ]
 }
+
+// Preserve the original zero-padded specification for existing experiments.
+let rows = (language, weekday, day, month, year, minute) =>
+  rowsWithDayPadding(language, weekday, day, month, year, minute, false)
 
 // Names describe physical piece orbits, not merely facelet positions.
 let orbit = (row, col) => {

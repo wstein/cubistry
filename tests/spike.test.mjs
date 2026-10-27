@@ -111,3 +111,62 @@ test('binding ink colors forbid reusing red zero as blue zero, without banning r
   assert.equal(de.counting.minimumNegativeSingletons,8);
   assert.equal(de.counting.maximumNegativeSingletons,7);
 });
+
+test('palette variants share only the required date/time digits and keep year optional', async () => {
+  const {variants,inkAt,classify}=await import('../scripts/palette-analysis.mjs');
+  assert.equal(inkAt(variants.minimal,5,'0'),inkAt(variants.minimal,21,'0'));
+  assert.notEqual(inkAt(variants.minimal,12,'0'),inkAt(variants.minimal,21,'0'));
+  assert.notEqual(inkAt(variants.minimal,1,'I'),inkAt(variants.minimal,9,'I'));
+  assert.equal(classify(variants.B_originalDigitColors),'UNSAT');
+  assert.equal(classify(variants.B),'UNKNOWN');
+  assert.equal(classify(variants.A),'UNKNOWN'); // no SAT before independent physical verification
+  assert.equal(classify(variants.C),'UNKNOWN');
+  assert.deepEqual([variants.minimalChange.monthLetters,variants.minimalChange.dateDigits],['date-red','time-blue']);
+});
+
+test('all original four-color coarsenings are covered on one branch of the palette analysis', async () => {
+  const {partitions,originalClassPalette,classify}=await import('../scripts/palette-analysis.mjs');
+  const all=partitions(4);
+  assert.equal(all.length,15);
+  assert.equal(new Set(all.map(JSON.stringify)).size,15);
+  const candidates=all.filter(p=>classify(originalClassPalette(p))==='UNKNOWN');
+  assert.equal(candidates.length,5);
+  assert.deepEqual(candidates.filter(p=>new Set(p).size===3),[[0,1,2,1]]);
+});
+
+test('space-padded days preserve five columns, real day digits, and the original zero mode', () => {
+  const row=day=>D.rowsWithDayPadding('DE',5,day,9,2026,14*60+37,true)[1];
+  assert.equal(row(1),' 1OKT');
+  assert.equal(row(3),' 3OKT');
+  assert.equal(row(9),' 9OKT');
+  assert.equal(row(10),'10OKT');
+  assert.equal(row(31),'31OKT');
+  assert.equal(D.rows('DE',5,3,9,2026,0)[1],'03OKT');
+});
+
+test('the space-day print is immutable and moves the shared wing resource from zeros to blanks', async () => {
+  const {constructSpaceDay}=await import('../scripts/space-day.mjs');
+  const {constructGerman}=await import('../scripts/german-design.mjs');
+  const base={design:constructGerman(),conventions:{}};
+  const before=JSON.stringify(base);
+  const variant=constructSpaceDay(base);
+  assert.equal(JSON.stringify(base),before);
+  assert.equal(variant.status,'UNKNOWN');
+  assert.equal(variant.fixedWingGlyphChanges.length,5);
+  const blank=variant.fixedWingGlyphChanges.filter(c=>c.to===' ');
+  assert.equal(blank.length,3);
+  for(const c of blank)assert.equal(variant.design.stickers[c.id].ink,'none');
+  const zeros=variant.fixedWingGlyphChanges.filter(c=>c.to==='0');
+  assert.equal(zeros.length,2);
+  for(const c of zeros)assert.equal(variant.design.stickers[c.id].ink,'time-blue');
+  assert.notEqual(variant.palette.dateDigits,variant.palette.timeDigits);
+});
+
+test('English space-day impossibility is recalculated with two blanks instead of two zeros', async () => {
+  const {peakProof}=await import('../scripts/wing-proof.mjs');
+  const r=peakProof('EN','space');
+  assert.equal(r.requiredB['0'],1);
+  assert.equal(r.requiredB[' '],2);
+  assert.equal(r.contradiction,true);
+  assert.equal(peakProof('EN','zero').requiredB['0'],2);
+});

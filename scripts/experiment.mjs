@@ -13,8 +13,9 @@ export const counts = chars => {
 const mergeMax = (a, b) => {
   for (const [char, n] of Object.entries(b)) a[char] = Math.max(a[char] ?? 0, n);
 };
-export function requirements(selectedSlots = slots, languages = ['DE', 'EN']) {
+export function requirements(selectedSlots = slots, languages = ['DE', 'EN'], dayPadding = 'zero') {
   if (!languages.length || languages.some(l => !['DE','EN'].includes(l))) throw new Error('Unsupported locale selection');
+  if (!['zero','space'].includes(dayPadding)) throw new Error('Unsupported day padding');
   const groupNames = Object.keys(selectedSlots);
   const dateMax = Object.fromEntries(groupNames.map(n => [n, {}]));
   const timeMax = Object.fromEntries(groupNames.map(n => [n, {}]));
@@ -26,7 +27,7 @@ export function requirements(selectedSlots = slots, languages = ['DE', 'EN']) {
     dates++;
     const d = new Date(ms);
     for (const language of languages) {
-      const chars = [...Display.rows(language, (d.getUTCDay() + 6) % 7, d.getUTCDate(), d.getUTCMonth(), d.getUTCFullYear(), 0).slice(0, 4).join('')];
+      const chars = [...Display.rowsWithDayPadding(language, (d.getUTCDay() + 6) % 7, d.getUTCDate(), d.getUTCMonth(), d.getUTCFullYear(), 0, dayPadding === 'space').slice(0, 4).join('')];
       if (chars.length !== 20) throw new Error('Bad Unicode row width');
       for (const name of groupNames) {
         const projection = selectedSlots[name].filter(i => i < 20).map(i => chars[i]);

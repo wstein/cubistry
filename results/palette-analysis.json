@@ -1,0 +1,2871 @@
+{
+  "status": "COMPLETE",
+  "language": "DE",
+  "layout": "unchanged",
+  "scope": "documented shared glyph model; circular zero; no glyph reinterpretation",
+  "glyphModel": {
+    "quarterTurns": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0
+      ],
+      "2": [
+        0
+      ],
+      "3": [
+        0
+      ],
+      "4": [
+        0
+      ],
+      "5": [
+        0
+      ],
+      "6": [
+        0
+      ],
+      "7": [
+        0
+      ],
+      "8": [
+        0
+      ],
+      "9": [
+        0
+      ],
+      "A": [
+        0
+      ],
+      "B": [
+        0
+      ],
+      "C": [
+        0
+      ],
+      "D": [
+        0
+      ],
+      "E": [
+        0
+      ],
+      "F": [
+        0
+      ],
+      "G": [
+        0
+      ],
+      "H": [
+        0
+      ],
+      "I": [
+        0,
+        2
+      ],
+      "J": [
+        0
+      ],
+      "K": [
+        0
+      ],
+      "L": [
+        0
+      ],
+      "M": [
+        0
+      ],
+      "N": [
+        0
+      ],
+      "O": [
+        0,
+        2
+      ],
+      "P": [
+        0
+      ],
+      "Q": [
+        0
+      ],
+      "R": [
+        0
+      ],
+      "S": [
+        0
+      ],
+      "T": [
+        0
+      ],
+      "U": [
+        0
+      ],
+      "V": [
+        0
+      ],
+      "W": [
+        0
+      ],
+      "X": [
+        0
+      ],
+      "Y": [
+        0
+      ],
+      "Z": [
+        0
+      ],
+      "Ä": [
+        0
+      ],
+      "─": [
+        0,
+        2
+      ],
+      ":": [
+        0
+      ],
+      " ": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "definitions": {
+      "0": "centered circle",
+      "O": "centered elongated ellipse",
+      "I": "centered vertical bar",
+      "─": "centered horizontal bar",
+      " ": "empty"
+    },
+    "scope": "identical convention for EN and DE; additional unused symmetries may be admitted"
+  },
+  "fieldNames": [
+    "weekdayLetters",
+    "monthLetters",
+    "dateDigits",
+    "yearDigits",
+    "timeDigits",
+    "separator",
+    "colon"
+  ],
+  "variants": [
+    {
+      "name": "A",
+      "palette": {
+        "weekdayLetters": "weekday-ink",
+        "monthLetters": "month-ink",
+        "dateDigits": "date-time-digit-ink",
+        "yearDigits": "date-time-digit-ink",
+        "timeDigits": "date-time-digit-ink",
+        "separator": "separator-ink",
+        "colon": "colon-ink"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "weekday-ink",
+        "month-ink": "month-ink",
+        "date-time-digit-ink": "date-time-digit-ink",
+        "year-ink": "date-time-digit-ink",
+        "separator-ink": "separator-ink",
+        "colon-ink": "colon-ink",
+        "none": "none"
+      }
+    },
+    {
+      "name": "B",
+      "palette": {
+        "weekdayLetters": "letter-ink",
+        "monthLetters": "letter-ink",
+        "dateDigits": "date-time-digit-ink",
+        "yearDigits": "year-ink",
+        "timeDigits": "date-time-digit-ink",
+        "separator": "separator-ink",
+        "colon": "colon-ink"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "letter-ink",
+        "month-ink": "letter-ink",
+        "date-time-digit-ink": "date-time-digit-ink",
+        "year-ink": "year-ink",
+        "separator-ink": "separator-ink",
+        "colon-ink": "colon-ink",
+        "none": "none"
+      }
+    },
+    {
+      "name": "B_originalDigitColors",
+      "palette": {
+        "weekdayLetters": "letter-ink",
+        "monthLetters": "letter-ink",
+        "dateDigits": "date-digit-ink",
+        "yearDigits": "year-ink",
+        "timeDigits": "time-digit-ink",
+        "separator": "separator-ink",
+        "colon": "colon-ink"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "name": "C",
+      "palette": {
+        "weekdayLetters": "text-ink",
+        "monthLetters": "text-ink",
+        "dateDigits": "text-ink",
+        "yearDigits": "text-ink",
+        "timeDigits": "text-ink",
+        "separator": "separator-ink",
+        "colon": "colon-ink"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "text-ink",
+        "month-ink": "text-ink",
+        "date-time-digit-ink": "text-ink",
+        "year-ink": "text-ink",
+        "separator-ink": "separator-ink",
+        "colon-ink": "colon-ink",
+        "none": "none"
+      }
+    },
+    {
+      "name": "minimal",
+      "palette": {
+        "weekdayLetters": "weekday-ink",
+        "monthLetters": "month-ink",
+        "dateDigits": "date-time-digit-ink",
+        "yearDigits": "year-ink",
+        "timeDigits": "date-time-digit-ink",
+        "separator": "separator-ink",
+        "colon": "colon-ink"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "weekday-ink",
+        "month-ink": "month-ink",
+        "date-time-digit-ink": "date-time-digit-ink",
+        "year-ink": "year-ink",
+        "separator-ink": "separator-ink",
+        "colon-ink": "colon-ink",
+        "none": "none"
+      }
+    },
+    {
+      "name": "minimalChange",
+      "palette": {
+        "weekdayLetters": "weekday-black",
+        "monthLetters": "date-red",
+        "dateDigits": "time-blue",
+        "yearDigits": "year-gray",
+        "timeDigits": "time-blue",
+        "separator": "year-gray",
+        "colon": "date-red"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "weekday-black",
+        "month-ink": "date-red",
+        "date-time-digit-ink": "time-blue",
+        "year-ink": "year-gray",
+        "separator-ink": "year-gray",
+        "colon-ink": "date-red",
+        "none": "none"
+      }
+    }
+  ],
+  "originalFourClasses": [
+    "weekday",
+    "date (digits and month letters)",
+    "year and separator",
+    "time digits"
+  ],
+  "originalClassPartitions": [
+    {
+      "partition": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-0",
+        "dateDigits": "ink-0",
+        "yearDigits": "ink-0",
+        "timeDigits": "ink-0",
+        "separator": "ink-0",
+        "colon": "ink-0"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "ink-0",
+        "month-ink": "ink-0",
+        "date-time-digit-ink": "ink-0",
+        "year-ink": "ink-0",
+        "separator-ink": "ink-0",
+        "colon-ink": "ink-0",
+        "none": "none"
+      }
+    },
+    {
+      "partition": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-0",
+        "dateDigits": "ink-0",
+        "yearDigits": "ink-0",
+        "timeDigits": "ink-1",
+        "separator": "ink-0",
+        "colon": "ink-0"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "partition": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-0",
+        "dateDigits": "ink-0",
+        "yearDigits": "ink-1",
+        "timeDigits": "ink-0",
+        "separator": "ink-1",
+        "colon": "ink-0"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "ink-0",
+        "month-ink": "ink-0",
+        "date-time-digit-ink": "ink-0",
+        "year-ink": "ink-1",
+        "separator-ink": "ink-1",
+        "colon-ink": "ink-0",
+        "none": "none"
+      }
+    },
+    {
+      "partition": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-0",
+        "dateDigits": "ink-0",
+        "yearDigits": "ink-1",
+        "timeDigits": "ink-1",
+        "separator": "ink-1",
+        "colon": "ink-0"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "partition": [
+        0,
+        0,
+        1,
+        2
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-0",
+        "dateDigits": "ink-0",
+        "yearDigits": "ink-1",
+        "timeDigits": "ink-2",
+        "separator": "ink-1",
+        "colon": "ink-0"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-0",
+        "timeDigits": "ink-0",
+        "separator": "ink-0",
+        "colon": "ink-1"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-0",
+        "timeDigits": "ink-1",
+        "separator": "ink-0",
+        "colon": "ink-1"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "ink-0",
+        "month-ink": "ink-1",
+        "date-time-digit-ink": "ink-1",
+        "year-ink": "ink-0",
+        "separator-ink": "ink-0",
+        "colon-ink": "ink-1",
+        "none": "none"
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        0,
+        2
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-0",
+        "timeDigits": "ink-2",
+        "separator": "ink-0",
+        "colon": "ink-1"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        1,
+        0
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-1",
+        "timeDigits": "ink-0",
+        "separator": "ink-1",
+        "colon": "ink-1"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-1",
+        "timeDigits": "ink-1",
+        "separator": "ink-1",
+        "colon": "ink-1"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "ink-0",
+        "month-ink": "ink-1",
+        "date-time-digit-ink": "ink-1",
+        "year-ink": "ink-1",
+        "separator-ink": "ink-1",
+        "colon-ink": "ink-1",
+        "none": "none"
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        1,
+        2
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-1",
+        "timeDigits": "ink-2",
+        "separator": "ink-1",
+        "colon": "ink-1"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        2,
+        0
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-2",
+        "timeDigits": "ink-0",
+        "separator": "ink-2",
+        "colon": "ink-1"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        2,
+        1
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-2",
+        "timeDigits": "ink-1",
+        "separator": "ink-2",
+        "colon": "ink-1"
+      },
+      "status": "SAT",
+      "proofKind": "fixed immutable design; independent rigid pose matching and verified common legal completion",
+      "inkProjectionFromFine": {
+        "weekday-ink": "ink-0",
+        "month-ink": "ink-1",
+        "date-time-digit-ink": "ink-1",
+        "year-ink": "ink-2",
+        "separator-ink": "ink-2",
+        "colon-ink": "ink-1",
+        "none": "none"
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        2,
+        2
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-2",
+        "timeDigits": "ink-2",
+        "separator": "ink-2",
+        "colon": "ink-1"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    },
+    {
+      "partition": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "palette": {
+        "weekdayLetters": "ink-0",
+        "monthLetters": "ink-1",
+        "dateDigits": "ink-1",
+        "yearDigits": "ink-2",
+        "timeDigits": "ink-3",
+        "separator": "ink-2",
+        "colon": "ink-1"
+      },
+      "status": "UNSAT",
+      "proofKind": "glyph-aware role separation and paired-wing singleton contradiction",
+      "counting": {
+        "positiveRequiredRoles": 21,
+        "negativeRequiredRoles": 16,
+        "minimumSingletonB": 8,
+        "maximumSupportableSingletonB": 7,
+        "minimumWingCubies": 25,
+        "roleSeparationCheckedByAllProperRotations": true
+      }
+    }
+  ],
+  "mostSeparatedWitness": {
+    "palette": {
+      "weekdayLetters": "weekday-ink",
+      "monthLetters": "month-ink",
+      "dateDigits": "date-time-digit-ink",
+      "yearDigits": "year-ink",
+      "timeDigits": "date-time-digit-ink",
+      "separator": "separator-ink",
+      "colon": "colon-ink"
+    },
+    "inkCount": 6,
+    "sourceDesign": "german-monochrome.json",
+    "stickerInks": [
+      "date-time-digit-ink",
+      "separator-ink",
+      "year-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "separator-ink",
+      "year-ink",
+      "separator-ink",
+      "weekday-ink",
+      "year-ink",
+      "year-ink",
+      "none",
+      "year-ink",
+      "year-ink",
+      "weekday-ink",
+      "date-time-digit-ink",
+      "year-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "weekday-ink",
+      "month-ink",
+      "weekday-ink",
+      "date-time-digit-ink",
+      "month-ink",
+      "year-ink",
+      "date-time-digit-ink",
+      "weekday-ink",
+      "none",
+      "date-time-digit-ink",
+      "separator-ink",
+      "date-time-digit-ink",
+      "weekday-ink",
+      "year-ink",
+      "month-ink",
+      "none",
+      "month-ink",
+      "year-ink",
+      "month-ink",
+      "date-time-digit-ink",
+      "month-ink",
+      "date-time-digit-ink",
+      "separator-ink",
+      "weekday-ink",
+      "date-time-digit-ink",
+      "year-ink",
+      "month-ink",
+      "date-time-digit-ink",
+      "none",
+      "month-ink",
+      "weekday-ink",
+      "date-time-digit-ink",
+      "weekday-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "month-ink",
+      "date-time-digit-ink",
+      "month-ink",
+      "year-ink",
+      "month-ink",
+      "year-ink",
+      "month-ink",
+      "year-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "month-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "year-ink",
+      "month-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "separator-ink",
+      "none",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "month-ink",
+      "month-ink",
+      "month-ink",
+      "date-time-digit-ink",
+      "weekday-ink",
+      "none",
+      "none",
+      "none",
+      "year-ink",
+      "date-time-digit-ink",
+      "month-ink",
+      "none",
+      "month-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "year-ink",
+      "month-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "weekday-ink",
+      "year-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "month-ink",
+      "none",
+      "month-ink",
+      "date-time-digit-ink",
+      "weekday-ink",
+      "none",
+      "none",
+      "none",
+      "year-ink",
+      "date-time-digit-ink",
+      "month-ink",
+      "none",
+      "none",
+      "date-time-digit-ink",
+      "none",
+      "none",
+      "year-ink",
+      "month-ink",
+      "date-time-digit-ink",
+      "weekday-ink",
+      "weekday-ink",
+      "weekday-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "none",
+      "none",
+      "none",
+      "month-ink",
+      "year-ink",
+      "none",
+      "none",
+      "none",
+      "year-ink",
+      "date-time-digit-ink",
+      "none",
+      "none",
+      "none",
+      "date-time-digit-ink",
+      "date-time-digit-ink",
+      "separator-ink",
+      "colon-ink",
+      "weekday-ink",
+      "weekday-ink"
+    ],
+    "reachabilityCertificate": {
+      "method": "exact Schreier–Sims and even-subgroup partial-placement transitivity",
+      "sympyVersion": "1.14.0",
+      "fullGroupOrder": "2582636272886959379162819698174683585918088940054237132144778804568925405184000000000000000",
+      "parityFiberProductOrder": "2582636272886959379162819698174683585918088940054237132144778804568925405184000000000000000",
+      "localGroups": {
+        "corners": {
+          "order": "88179840",
+          "evenOrder": "44089920",
+          "partialPlacementOrbit": "136080",
+          "frontPieces": 4
+        },
+        "middleEdges": {
+          "order": "980995276800",
+          "evenOrder": "490497638400",
+          "partialPlacementOrbit": "190080",
+          "frontPieces": 4
+        },
+        "wings": {
+          "order": "620448401733239439360000",
+          "evenOrder": "310224200866619719680000",
+          "partialPlacementOrbit": "29654190720",
+          "frontPieces": 8
+        },
+        "axialCenters": {
+          "order": "620448401733239439360000",
+          "evenOrder": "310224200866619719680000",
+          "partialPlacementOrbit": "255024",
+          "frontPieces": 4
+        },
+        "diagonalCenters": {
+          "order": "620448401733239439360000",
+          "evenOrder": "310224200866619719680000",
+          "partialPlacementOrbit": "255024",
+          "frontPieces": 4
+        }
+      },
+      "checkedProjectionCounts": {
+        "corners": 120,
+        "middleEdges": 40,
+        "wings": 9360,
+        "axialCenters": 24,
+        "diagonalCenters": 70
+      },
+      "fixedCenterReason": "front zero is circular; other five fixed-center stickers are blank; all spins optically equivalent",
+      "simultaneousCompletion": true
+    }
+  },
+  "minimumOriginalClassMerges": 1,
+  "minimumRecoloredComponentFields": 1,
+  "minimallyRecoloredField": "dateDigits",
+  "minimalOriginalClassPair": [
+    "date (digits and month letters)",
+    "time digits"
+  ],
+  "rotationCertificate": {
+    "status": "VERIFIED",
+    "note": "Print angles are relative to each source face; display symmetry requirements are verified separately.",
+    "printRotations": [
+      {
+        "id": 0,
+        "face": "U",
+        "row": 1,
+        "col": 1,
+        "symbol": "6",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 1,
+        "face": "U",
+        "row": 1,
+        "col": 2,
+        "symbol": "─",
+        "ink": "separator-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          15
+        ]
+      },
+      {
+        "id": 2,
+        "face": "U",
+        "row": 1,
+        "col": 3,
+        "symbol": "3",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 3,
+        "face": "U",
+        "row": 1,
+        "col": 4,
+        "symbol": "2",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 4,
+        "face": "U",
+        "row": 1,
+        "col": 5,
+        "symbol": "7",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 5,
+        "face": "U",
+        "row": 2,
+        "col": 1,
+        "symbol": "3",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 6,
+        "face": "U",
+        "row": 2,
+        "col": 2,
+        "symbol": "─",
+        "ink": "separator-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          16
+        ]
+      },
+      {
+        "id": 7,
+        "face": "U",
+        "row": 2,
+        "col": 3,
+        "symbol": "2",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          11
+        ]
+      },
+      {
+        "id": 8,
+        "face": "U",
+        "row": 2,
+        "col": 4,
+        "symbol": "─",
+        "ink": "separator-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          18
+        ]
+      },
+      {
+        "id": 9,
+        "face": "U",
+        "row": 2,
+        "col": 5,
+        "symbol": "O",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          1
+        ]
+      },
+      {
+        "id": 10,
+        "face": "U",
+        "row": 3,
+        "col": 1,
+        "symbol": "2",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 11,
+        "face": "U",
+        "row": 3,
+        "col": 2,
+        "symbol": "2",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          13
+        ]
+      },
+      {
+        "id": 12,
+        "face": "U",
+        "row": 3,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 13,
+        "face": "U",
+        "row": 3,
+        "col": 4,
+        "symbol": "3",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          13
+        ]
+      },
+      {
+        "id": 14,
+        "face": "U",
+        "row": 3,
+        "col": 5,
+        "symbol": "0",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 15,
+        "face": "U",
+        "row": 4,
+        "col": 1,
+        "symbol": "I",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          1
+        ]
+      },
+      {
+        "id": 16,
+        "face": "U",
+        "row": 4,
+        "col": 2,
+        "symbol": "0",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 17,
+        "face": "U",
+        "row": 4,
+        "col": 3,
+        "symbol": "4",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          13
+        ]
+      },
+      {
+        "id": 18,
+        "face": "U",
+        "row": 4,
+        "col": 4,
+        "symbol": "1",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 19,
+        "face": "U",
+        "row": 4,
+        "col": 5,
+        "symbol": "2",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          5
+        ]
+      },
+      {
+        "id": 20,
+        "face": "U",
+        "row": 5,
+        "col": 1,
+        "symbol": "4",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 21,
+        "face": "U",
+        "row": 5,
+        "col": 2,
+        "symbol": "3",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          5
+        ]
+      },
+      {
+        "id": 22,
+        "face": "U",
+        "row": 5,
+        "col": 3,
+        "symbol": "N",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          2
+        ]
+      },
+      {
+        "id": 23,
+        "face": "U",
+        "row": 5,
+        "col": 4,
+        "symbol": "N",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 24,
+        "face": "U",
+        "row": 5,
+        "col": 5,
+        "symbol": "M",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          0
+        ]
+      },
+      {
+        "id": 25,
+        "face": "D",
+        "row": 1,
+        "col": 1,
+        "symbol": "8",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 26,
+        "face": "D",
+        "row": 1,
+        "col": 2,
+        "symbol": "R",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 27,
+        "face": "D",
+        "row": 1,
+        "col": 3,
+        "symbol": "3",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 28,
+        "face": "D",
+        "row": 1,
+        "col": 4,
+        "symbol": "0",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          5,
+          21
+        ]
+      },
+      {
+        "id": 29,
+        "face": "D",
+        "row": 1,
+        "col": 5,
+        "symbol": "D",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          0
+        ]
+      },
+      {
+        "id": 30,
+        "face": "D",
+        "row": 2,
+        "col": 1,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          3
+        ]
+      },
+      {
+        "id": 31,
+        "face": "D",
+        "row": 2,
+        "col": 2,
+        "symbol": "2",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 32,
+        "face": "D",
+        "row": 2,
+        "col": 3,
+        "symbol": "─",
+        "ink": "separator-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          17
+        ]
+      },
+      {
+        "id": 33,
+        "face": "D",
+        "row": 2,
+        "col": 4,
+        "symbol": "3",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 34,
+        "face": "D",
+        "row": 2,
+        "col": 5,
+        "symbol": "R",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          1
+        ]
+      },
+      {
+        "id": 35,
+        "face": "D",
+        "row": 3,
+        "col": 1,
+        "symbol": "8",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 36,
+        "face": "D",
+        "row": 3,
+        "col": 2,
+        "symbol": "A",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          7
+        ]
+      },
+      {
+        "id": 37,
+        "face": "D",
+        "row": 3,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 38,
+        "face": "D",
+        "row": 3,
+        "col": 4,
+        "symbol": "D",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          7
+        ]
+      },
+      {
+        "id": 39,
+        "face": "D",
+        "row": 3,
+        "col": 5,
+        "symbol": "4",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 40,
+        "face": "D",
+        "row": 4,
+        "col": 1,
+        "symbol": "L",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 41,
+        "face": "D",
+        "row": 4,
+        "col": 2,
+        "symbol": "4",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 42,
+        "face": "D",
+        "row": 4,
+        "col": 3,
+        "symbol": "F",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          7
+        ]
+      },
+      {
+        "id": 43,
+        "face": "D",
+        "row": 4,
+        "col": 4,
+        "symbol": "5",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 44,
+        "face": "D",
+        "row": 4,
+        "col": 5,
+        "symbol": "─",
+        "ink": "separator-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          19
+        ]
+      },
+      {
+        "id": 45,
+        "face": "D",
+        "row": 5,
+        "col": 1,
+        "symbol": "S",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          0
+        ]
+      },
+      {
+        "id": 46,
+        "face": "D",
+        "row": 5,
+        "col": 2,
+        "symbol": "5",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 47,
+        "face": "D",
+        "row": 5,
+        "col": 3,
+        "symbol": "6",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 48,
+        "face": "D",
+        "row": 5,
+        "col": 4,
+        "symbol": "T",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 49,
+        "face": "D",
+        "row": 5,
+        "col": 5,
+        "symbol": "0",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          20
+        ]
+      },
+      {
+        "id": 50,
+        "face": "F",
+        "row": 1,
+        "col": 1,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          4
+        ]
+      },
+      {
+        "id": 51,
+        "face": "F",
+        "row": 1,
+        "col": 2,
+        "symbol": "B",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 52,
+        "face": "F",
+        "row": 1,
+        "col": 3,
+        "symbol": "N",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          2
+        ]
+      },
+      {
+        "id": 53,
+        "face": "F",
+        "row": 1,
+        "col": 4,
+        "symbol": "0",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          5,
+          21
+        ]
+      },
+      {
+        "id": 54,
+        "face": "F",
+        "row": 1,
+        "col": 5,
+        "symbol": "F",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          0
+        ]
+      },
+      {
+        "id": 55,
+        "face": "F",
+        "row": 2,
+        "col": 1,
+        "symbol": "6",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 56,
+        "face": "F",
+        "row": 2,
+        "col": 2,
+        "symbol": "6",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 57,
+        "face": "F",
+        "row": 2,
+        "col": 3,
+        "symbol": "J",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          7
+        ]
+      },
+      {
+        "id": 58,
+        "face": "F",
+        "row": 2,
+        "col": 4,
+        "symbol": "7",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 59,
+        "face": "F",
+        "row": 2,
+        "col": 5,
+        "symbol": "Z",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 60,
+        "face": "F",
+        "row": 3,
+        "col": 1,
+        "symbol": "6",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 61,
+        "face": "F",
+        "row": 3,
+        "col": 2,
+        "symbol": "M",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          7
+        ]
+      },
+      {
+        "id": 62,
+        "face": "F",
+        "row": 3,
+        "col": 3,
+        "symbol": "0",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          12
+        ]
+      },
+      {
+        "id": 63,
+        "face": "F",
+        "row": 3,
+        "col": 4,
+        "symbol": "N",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          7
+        ]
+      },
+      {
+        "id": 64,
+        "face": "F",
+        "row": 3,
+        "col": 5,
+        "symbol": "2",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 65,
+        "face": "F",
+        "row": 4,
+        "col": 1,
+        "symbol": "0",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          23
+        ]
+      },
+      {
+        "id": 66,
+        "face": "F",
+        "row": 4,
+        "col": 2,
+        "symbol": "8",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 67,
+        "face": "F",
+        "row": 4,
+        "col": 3,
+        "symbol": "O",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          7
+        ]
+      },
+      {
+        "id": 68,
+        "face": "F",
+        "row": 4,
+        "col": 4,
+        "symbol": "9",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          6
+        ]
+      },
+      {
+        "id": 69,
+        "face": "F",
+        "row": 4,
+        "col": 5,
+        "symbol": "7",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 70,
+        "face": "F",
+        "row": 5,
+        "col": 1,
+        "symbol": "3",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 71,
+        "face": "F",
+        "row": 5,
+        "col": 2,
+        "symbol": "0",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          5,
+          21
+        ]
+      },
+      {
+        "id": 72,
+        "face": "F",
+        "row": 5,
+        "col": 3,
+        "symbol": "5",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 73,
+        "face": "F",
+        "row": 5,
+        "col": 4,
+        "symbol": "I",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 74,
+        "face": "F",
+        "row": 5,
+        "col": 5,
+        "symbol": "9",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 75,
+        "face": "B",
+        "row": 1,
+        "col": 1,
+        "symbol": "1",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          20
+        ]
+      },
+      {
+        "id": 76,
+        "face": "B",
+        "row": 1,
+        "col": 2,
+        "symbol": "─",
+        "ink": "separator-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          15
+        ]
+      },
+      {
+        "id": 77,
+        "face": "B",
+        "row": 1,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          10
+        ]
+      },
+      {
+        "id": 78,
+        "face": "B",
+        "row": 1,
+        "col": 4,
+        "symbol": "1",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 79,
+        "face": "B",
+        "row": 1,
+        "col": 5,
+        "symbol": "2",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 80,
+        "face": "B",
+        "row": 2,
+        "col": 1,
+        "symbol": "8",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 81,
+        "face": "B",
+        "row": 2,
+        "col": 2,
+        "symbol": "A",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          8
+        ]
+      },
+      {
+        "id": 82,
+        "face": "B",
+        "row": 2,
+        "col": 3,
+        "symbol": "S",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          7
+        ]
+      },
+      {
+        "id": 83,
+        "face": "B",
+        "row": 2,
+        "col": 4,
+        "symbol": "E",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          8
+        ]
+      },
+      {
+        "id": 84,
+        "face": "B",
+        "row": 2,
+        "col": 5,
+        "symbol": "3",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          23
+        ]
+      },
+      {
+        "id": 85,
+        "face": "B",
+        "row": 3,
+        "col": 1,
+        "symbol": "E",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          2
+        ]
+      },
+      {
+        "id": 86,
+        "face": "B",
+        "row": 3,
+        "col": 2,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 87,
+        "face": "B",
+        "row": 3,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 88,
+        "face": "B",
+        "row": 3,
+        "col": 4,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 89,
+        "face": "B",
+        "row": 3,
+        "col": 5,
+        "symbol": "8",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 90,
+        "face": "B",
+        "row": 4,
+        "col": 1,
+        "symbol": "4",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          23
+        ]
+      },
+      {
+        "id": 91,
+        "face": "B",
+        "row": 4,
+        "col": 2,
+        "symbol": "K",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          8
+        ]
+      },
+      {
+        "id": 92,
+        "face": "B",
+        "row": 4,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 93,
+        "face": "B",
+        "row": 4,
+        "col": 4,
+        "symbol": "O",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          8
+        ]
+      },
+      {
+        "id": 94,
+        "face": "B",
+        "row": 4,
+        "col": 5,
+        "symbol": "9",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 95,
+        "face": "B",
+        "row": 5,
+        "col": 1,
+        "symbol": "0",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 96,
+        "face": "B",
+        "row": 5,
+        "col": 2,
+        "symbol": "5",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 97,
+        "face": "B",
+        "row": 5,
+        "col": 3,
+        "symbol": "1",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 98,
+        "face": "B",
+        "row": 5,
+        "col": 4,
+        "symbol": "P",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 99,
+        "face": "B",
+        "row": 5,
+        "col": 5,
+        "symbol": "5",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 100,
+        "face": "R",
+        "row": 1,
+        "col": 1,
+        "symbol": "4",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 101,
+        "face": "R",
+        "row": 1,
+        "col": 2,
+        "symbol": "I",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          1
+        ]
+      },
+      {
+        "id": 102,
+        "face": "R",
+        "row": 1,
+        "col": 3,
+        "symbol": "1",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 103,
+        "face": "R",
+        "row": 1,
+        "col": 4,
+        "symbol": "4",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 104,
+        "face": "R",
+        "row": 1,
+        "col": 5,
+        "symbol": "2",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          20
+        ]
+      },
+      {
+        "id": 105,
+        "face": "R",
+        "row": 2,
+        "col": 1,
+        "symbol": "6",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 106,
+        "face": "R",
+        "row": 2,
+        "col": 2,
+        "symbol": "P",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          8
+        ]
+      },
+      {
+        "id": 107,
+        "face": "R",
+        "row": 2,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 108,
+        "face": "R",
+        "row": 2,
+        "col": 4,
+        "symbol": "U",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          8
+        ]
+      },
+      {
+        "id": 109,
+        "face": "R",
+        "row": 2,
+        "col": 5,
+        "symbol": "2",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          23
+        ]
+      },
+      {
+        "id": 110,
+        "face": "R",
+        "row": 3,
+        "col": 1,
+        "symbol": "T",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          2
+        ]
+      },
+      {
+        "id": 111,
+        "face": "R",
+        "row": 3,
+        "col": 2,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 112,
+        "face": "R",
+        "row": 3,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 113,
+        "face": "R",
+        "row": 3,
+        "col": 4,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 114,
+        "face": "R",
+        "row": 3,
+        "col": 5,
+        "symbol": "5",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 115,
+        "face": "R",
+        "row": 4,
+        "col": 1,
+        "symbol": "1",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          23
+        ]
+      },
+      {
+        "id": 116,
+        "face": "R",
+        "row": 4,
+        "col": 2,
+        "symbol": "Ä",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          8
+        ]
+      },
+      {
+        "id": 117,
+        "face": "R",
+        "row": 4,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 118,
+        "face": "R",
+        "row": 4,
+        "col": 4,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 119,
+        "face": "R",
+        "row": 4,
+        "col": 5,
+        "symbol": "9",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 120,
+        "face": "R",
+        "row": 5,
+        "col": 1,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          4
+        ]
+      },
+      {
+        "id": 121,
+        "face": "R",
+        "row": 5,
+        "col": 2,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          3
+        ]
+      },
+      {
+        "id": 122,
+        "face": "R",
+        "row": 5,
+        "col": 3,
+        "symbol": "7",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 123,
+        "face": "R",
+        "row": 5,
+        "col": 4,
+        "symbol": "G",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 124,
+        "face": "R",
+        "row": 5,
+        "col": 5,
+        "symbol": "1",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 125,
+        "face": "L",
+        "row": 1,
+        "col": 1,
+        "symbol": "S",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          0
+        ]
+      },
+      {
+        "id": 126,
+        "face": "L",
+        "row": 1,
+        "col": 2,
+        "symbol": "O",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          1
+        ]
+      },
+      {
+        "id": 127,
+        "face": "L",
+        "row": 1,
+        "col": 3,
+        "symbol": "M",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          2
+        ]
+      },
+      {
+        "id": 128,
+        "face": "L",
+        "row": 1,
+        "col": 4,
+        "symbol": "1",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          5
+        ]
+      },
+      {
+        "id": 129,
+        "face": "L",
+        "row": 1,
+        "col": 5,
+        "symbol": "7",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          24
+        ]
+      },
+      {
+        "id": 130,
+        "face": "L",
+        "row": 2,
+        "col": 1,
+        "symbol": "8",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 131,
+        "face": "L",
+        "row": 2,
+        "col": 2,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 132,
+        "face": "L",
+        "row": 2,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 133,
+        "face": "L",
+        "row": 2,
+        "col": 4,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 134,
+        "face": "L",
+        "row": 2,
+        "col": 5,
+        "symbol": "V",
+        "ink": "month-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          9
+        ]
+      },
+      {
+        "id": 135,
+        "face": "L",
+        "row": 3,
+        "col": 1,
+        "symbol": "9",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 136,
+        "face": "L",
+        "row": 3,
+        "col": 2,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 137,
+        "face": "L",
+        "row": 3,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 138,
+        "face": "L",
+        "row": 3,
+        "col": 4,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 139,
+        "face": "L",
+        "row": 3,
+        "col": 5,
+        "symbol": "7",
+        "ink": "year-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          14
+        ]
+      },
+      {
+        "id": 140,
+        "face": "L",
+        "row": 4,
+        "col": 1,
+        "symbol": "5",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          23
+        ]
+      },
+      {
+        "id": 141,
+        "face": "L",
+        "row": 4,
+        "col": 2,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 142,
+        "face": "L",
+        "row": 4,
+        "col": 3,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 143,
+        "face": "L",
+        "row": 4,
+        "col": 4,
+        "symbol": " ",
+        "ink": "none",
+        "minimalChangeInk": "none",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": []
+      },
+      {
+        "id": 144,
+        "face": "L",
+        "row": 4,
+        "col": 5,
+        "symbol": "7",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 90,
+        "plannedFrontSlots": [
+          21
+        ]
+      },
+      {
+        "id": 145,
+        "face": "L",
+        "row": 5,
+        "col": 1,
+        "symbol": "0",
+        "ink": "date-time-digit-ink",
+        "minimalChangeInk": "time-blue",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          20
+        ]
+      },
+      {
+        "id": 146,
+        "face": "L",
+        "row": 5,
+        "col": 2,
+        "symbol": "─",
+        "ink": "separator-ink",
+        "minimalChangeInk": "year-gray",
+        "printRotationDegrees": 270,
+        "plannedFrontSlots": [
+          19
+        ]
+      },
+      {
+        "id": 147,
+        "face": "L",
+        "row": 5,
+        "col": 3,
+        "symbol": ":",
+        "ink": "colon-ink",
+        "minimalChangeInk": "date-red",
+        "printRotationDegrees": 0,
+        "plannedFrontSlots": [
+          22
+        ]
+      },
+      {
+        "id": 148,
+        "face": "L",
+        "row": 5,
+        "col": 4,
+        "symbol": "A",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          1
+        ]
+      },
+      {
+        "id": 149,
+        "face": "L",
+        "row": 5,
+        "col": 5,
+        "symbol": "D",
+        "ink": "weekday-ink",
+        "minimalChangeInk": "weekday-black",
+        "printRotationDegrees": 180,
+        "plannedFrontSlots": [
+          0
+        ]
+      }
+    ],
+    "zeroQuarterTurnNecessaryWithinGlyphModel": true,
+    "nonzeroDisplayRotationNeededForOtherNonblankGlyphs": false,
+    "criticalWingZeroStickers": [
+      {
+        "id": 28,
+        "dayTensRotationDegrees": 0,
+        "hourUnitsRotationDegrees": 90
+      },
+      {
+        "id": 53,
+        "dayTensRotationDegrees": 0,
+        "hourUnitsRotationDegrees": 90
+      },
+      {
+        "id": 71,
+        "dayTensRotationDegrees": 0,
+        "hourUnitsRotationDegrees": 90
+      }
+    ],
+    "sourcePrintingConvention": "CCW around outward face normal from the canonical source-face up vector",
+    "displayConvention": "angle relative to upright text on the target front; all three critical zeros use 0 degrees at day tens and 90 degrees at hour units"
+  },
+  "proof": "docs/PALETTE.md"
+}

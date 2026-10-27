@@ -29,7 +29,7 @@ POOLED = {'corners':(0,4,20,24), 'wings':(1,3,5,9,15,19,21,23),
 CAPACITIES = dict(corners=24, wings=48, middleEdges=24, axialCenters=24, diagonalCenters=24, fixedCenters=1)
 
 
-def independent_requirements(language):
+def independent_requirements(language,day_padding='zero'):
     weekdays, months = LOCALES[language]
     domains = {k:set() for k in SLOTS}
     date_domains = {k:set() for k in SLOTS}
@@ -59,7 +59,7 @@ def independent_requirements(language):
     day = dt.date(2020,1,1)
     dates = 0
     while day < dt.date(2050,1,1):
-        record(weekdays[day.weekday()]+'  '+f'{day.day:02}'+months[day.month-1]+' '+str(day.year)+'─────',False)
+        record(weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+' '+str(day.year)+'─────',False)
         day += dt.timedelta(days=1)
         dates += 1
     for minute in range(1440):
@@ -141,7 +141,7 @@ def check_upright_role_invariant():
 
 
 def check_peak_proof(report):
-    data=independent_requirements(report['language'])
+    data=independent_requirements(report['language'],report.get('dayPadding','zero'))
     A,B=data['inventory']['positive'],data['inventory']['negative']
     pairs=set()
     targets=0
@@ -176,6 +176,8 @@ if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser()
     parser.add_argument('--certify',action='store_true')
+    parser.add_argument('--palettes',action='store_true')
+    parser.add_argument('--space-day',action='store_true')
     parser.add_argument('--language',choices=['EN','DE'])
     args=parser.parse_args()
     check_upright_role_invariant()
@@ -203,3 +205,13 @@ if __name__=='__main__':
             else:
                 require(report['status']=='SAT' and report['reachabilityCertificate']==certificate,'German SAT certificate mismatch')
             print('VERIFIED DE MONOCHROME SAT: immutable full design, all projected targets, and simultaneous physical reachability.')
+
+    if args.palettes:
+        require(args.language!='EN','Palette verification requires the freshly checked German legal group')
+        from verify_palette import verify_palettes
+        verify_palettes(certify=args.certify)
+
+    if args.space_day:
+        require(args.language!='EN','Space-day verification requires the freshly checked German legal group')
+        from verify_space_day import verify_space_day
+        verify_space_day(certify=args.certify)
