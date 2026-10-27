@@ -30,6 +30,16 @@ class DesignWireTests(unittest.TestCase):
             try:
                 with self.assertRaisesRegex(AssertionError,'Unsafe SVG attribute'):checker.verify(wire)
             finally:checker.ROOT=original_root
+    def test_configurable_title_linkage(self):
+        def solid(d):
+            for i,image in enumerate(d['assets']['images']):
+                if image['id'] in ('title-left','title-right'):d['assets']['images'][i]=dict(id=image['id'],kind='color',color='#ffffff')
+        def other_document(d):
+            d['assets']['documents'].append(dict(d['assets']['documents'][0],id='other-title'))
+            next(i for i in d['assets']['images'] if i['id']=='title-left')['documentId']='other-title'
+        def wrong_crop(d):next(i for i in d['assets']['images'] if i['id']=='title-right')['crop']=[0,0,256,256]
+        for mutation in (solid,other_document,wrong_crop):
+            with self.subTest(mutation=mutation.__name__):self.reject(mutation)
     def test_integral_numeric_literals_match_javascript(self):
         d=json.loads((ROOT/'public/counter-design.v2.json').read_text());d['prints']['padded']['stickers'][0]['cubie']=0.0
         with tempfile.TemporaryDirectory() as directory:

@@ -154,10 +154,10 @@ asset hashes/safe SVG source, and the immutable correspondence with the original
 printing. Independent metadata regressions include invalid text/material fields
 and CSS-escaped SVG references in a temporary asset tree. It converts to the preserved independent facelet-replay contract and
 checks all 100 values, both prints, every ordered transition by hub factorization,
-and chained transitions. The current [independent result](../research/architecture/verification-m1-rescript.json)
+and chained transitions. The current [independent result](../research/architecture/verification-m1-title-link.json)
 records the hardened metadata checker and preserved design digest. The original Python checker now rejects incorrect
 legacy schema/puzzle metadata as well; its new [v4 output](../research/counter/verification-v4.json)
-does not overwrite the earlier outputs. The separate [ReScript M1 manifest](../research/architecture/manifest-m1-rescript.json)
+does not overwrite the earlier outputs. The separate [ReScript M1 manifest](../research/architecture/manifest-m1-title-link.json)
 records the current source/generated code, assets, dependency lock, checker and
 evidence hashes. Both earlier counter and TypeScript-M1 manifests remain
 historical snapshots tied to their recorded commits.

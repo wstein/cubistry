@@ -52,6 +52,9 @@ def verify(path):
         elif asset['kind']=='image':require(asset.get('format') in ('svg','png','webp') and integrity(asset.get('sha256')) and asset['url'].endswith('.'+asset['format']),'Invalid image format/integrity/path')
         elif asset['kind']=='text':
             require(identifier(asset.get('documentId')) and asset['documentId'] in docs,'Unknown text document');require(isinstance(asset.get('crop'),list) and len(asset['crop'])==4 and all(integral(v) for v in asset['crop']),'Invalid crop integer types');x,y,w,h=asset['crop'];doc=docs[asset['documentId']];require(x>=0 and y>=0 and w>0 and h>0 and x+w<=doc['width'] and y+h<=doc['height'],'Invalid text crop')
+    require('counter-title' in docs,'Missing configurable title document')
+    title=docs['counter-title'];half=title['width']/2
+    require(integral(half) and all(byid.get(name,{}).get('kind')=='text' and byid[name].get('documentId')=='counter-title' and byid[name].get('crop')==[index*half,0,half,title['height']] for index,name in enumerate(('title-left','title-right'))),'Counter title images must be complementary crops of counter-title')
     def convert(printing):
         require(printing.get('schema')=='cubistry.print' and integral(printing.get('version')) and printing['version']==1 and printing.get('topology')=={'kind':'cube','size':2},'Unsupported print or topology')
         require(all(integral(c.get('id')) for c in printing['cubies']),'Cubie IDs must be integers, not booleans');positions={c['id']:c['position'] for c in printing['cubies']};require(sorted(positions)==list(range(8)) and len(printing['cubies'])==8,'Eight distinct source cubies')

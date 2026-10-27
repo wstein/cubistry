@@ -133,3 +133,12 @@ test("lossless generic design/state JSON retains immutable images and frames", a
     parseDesignState('{"schema":"cubistry.design-state","version":99}'),
   );
 });
+
+test("configurable title identities remain linked to complementary document crops", () => {
+  for (const mutate of [
+    d=>{for(const id of ['title-left','title-right'])d.assets.images[d.assets.images.findIndex(i=>i.id===id)]={id,kind:'color',color:'#ffffff'};},
+    d=>{d.assets.documents.push({...d.assets.documents[0],id:'other-title'});d.assets.images.find(i=>i.id==='title-left').documentId='other-title';},
+    d=>{d.assets.images.find(i=>i.id==='title-right').crop=[0,0,256,256];},
+    d=>{d.assets.images.find(i=>i.id==='title-left').crop=[0,0,128,256];},
+  ]) {const broken=structuredClone(raw);mutate(broken);assert.throws(()=>validateCounterDesign(broken),/title/);}
+});
