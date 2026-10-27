@@ -1,0 +1,28 @@
+{
+  "schema": "cubistry.m1-acceptance-requirements",
+  "version": 1,
+  "canonicalIssue": "https://github.com/wstein/cubistry/issues/21",
+  "updatedAt": "2026-10-27T15:59:51Z",
+  "bodySHA256": "ca9932b0856304438536b2a0072f839bfa6e7ebf3cbcc15cfc0e9e6fb3c67495",
+  "commentBodySHA256": [
+    "54348ba18ed7711bd0f1c98d011a8eb88ad02bd747d5883eec0f770d83bab2c7",
+    "1d5b932694c9a64686ac9a44d6f7ea73246c28e48964b105d774bb8b81449d1a"
+  ],
+  "dependencyPR": 20,
+  "dependencyHead": "e9ded21852d79a0a7382f027c3c185572013c913",
+  "scope": [
+    "Live existing 2x2 solver from a reproducible start to representative counter targets with independent replay and visible pixels",
+    "Versioned fixed color/image/text designs and diagnostics",
+    "Immutable identity, orientation, symmetry and viewer synchronization",
+    "Deterministic replay and exact inverse restoration",
+    "Standalone library-only consumer without counter application modules"
+  ],
+  "excluded": [
+    "New solver or search engine",
+    "3x3+ pilot",
+    "Rust changes",
+    "Cross-repository migration",
+    "PuzWerk repository creation or modifications",
+    "Automatic PR promotion or merge"
+  ]
+}
