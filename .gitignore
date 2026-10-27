@@ -8,3 +8,6 @@ __pycache__/
 # ReScript compiler caches; generated .res.mjs sources remain versioned.
 lib/
 .rescript/
+
+# Rebuilt, integrity-pinned shared solver dependency; never version source/table.
+.puzlwerk-dependency/

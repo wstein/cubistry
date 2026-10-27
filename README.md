@@ -17,10 +17,10 @@ knowledge tree. Reproduce the project-path build with
 
 ## Run the counter locally
 
-Requires Node 24+ (tested with 24.19.0), npm, and Python 3 for proof checks.
+Requires Node 24+ (tested with 24.19.0), npm, Git, and Python 3 for proof checks.
 
 ```sh
-npm ci
+npm run setup
 npm run dev
 ```
 
@@ -69,7 +69,7 @@ npm run test:e2e
 ```
 
 In a cloud sandbox with an unwritable home cache, use
-`npm ci --cache /tmp/cubistry-npm-cache` and set
+`npm_config_cache=/tmp/cubistry-npm-cache npm run setup` and set
 `PLAYWRIGHT_BROWSERS_PATH=/tmp/cubistry-playwright` for browser installation/tests.
 
 [The independent feasibility proof](docs/COUNTER_FEASIBILITY.md) establishes
