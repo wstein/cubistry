@@ -1,0 +1,120 @@
+fromDisplay,toDisplay,increment,decrement,HTM,QTM,category
+00:00,00:10,D2,D2,1,2,seconds only
+00:10,00:20,B U' L2 U,U' L2 U B',4,5,seconds only
+00:20,00:30,B' D2,D2 B,2,3,seconds only
+00:30,00:40,B' R D R',R D' R' B,4,4,seconds only
+00:40,00:50,B D B2 D,D' B2 D' B',4,5,seconds only
+00:50,01:00,R' U R' D' R',R D R U' R,5,5,minute rollover
+01:00,01:10,L U B2 U' L',L U B2 U' L',5,6,seconds only
+01:10,01:20,R D R',R D' R',3,3,seconds only
+01:20,01:30,U B U' L2,L2 U B' U',4,5,seconds only
+01:30,01:40,U' L U,U' L' U,3,3,seconds only
+01:40,01:50,R D R',R D' R',3,3,seconds only
+01:50,02:00,B2 L2 B U2,U2 B' L2 B2,4,7,minute rollover
+02:00,02:10,U' L' U,U' L U,3,3,seconds only
+02:10,02:20,B U' L' U,U' L U B',4,4,seconds only
+02:20,02:30,L2,L2,1,2,seconds only
+02:30,02:40,U' L U,U' L' U,3,3,seconds only
+02:40,02:50,L B L',L B' L',3,3,seconds only
+02:50,03:00,R2 L F2 U',U F2 L' R2,4,6,minute rollover
+03:00,03:10,R D R',R D' R',3,3,seconds only
+03:10,03:20,D' B2 D',D B2 D,3,4,seconds only
+03:20,03:30,B L2,L2 B',2,3,seconds only
+03:30,03:40,U' L U,U' L' U,3,3,seconds only
+03:40,03:50,R D R',R D' R',3,3,seconds only
+03:50,04:00,D F D R2,R2 D' F' D',4,5,minute rollover
+04:00,04:10,U' L2 U,U' L2 U,3,4,seconds only
+04:10,04:20,R D2 R',R D2 R',3,4,seconds only
+04:20,04:30,U' L2 U,U' L2 U,3,4,seconds only
+04:30,04:40,R D2 R',R D2 R',3,4,seconds only
+04:40,04:50,U' L2 U,U' L2 U,3,4,seconds only
+04:50,05:00,B2 U' L' B U,U' B' L U B2,5,6,minute rollover
+05:00,05:10,L B2 L,L' B2 L',3,4,seconds only
+05:10,05:20,L' B L2,L2 B' L,3,4,seconds only
+05:20,05:30,R D R',R D' R',3,3,seconds only
+05:30,05:40,D2,D2,1,2,seconds only
+05:40,05:50,L B' L',L B L',3,3,seconds only
+05:50,06:00,U2 L' U2,U2 L U2,3,5,minute rollover
+06:00,06:10,U' L2 U,U' L2 U,3,4,seconds only
+06:10,06:20,R D2 R',R D2 R',3,4,seconds only
+06:20,06:30,U' L2 U,U' L2 U,3,4,seconds only
+06:30,06:40,R D2 R',R D2 R',3,4,seconds only
+06:40,06:50,U' L2 U,U' L2 U,3,4,seconds only
+06:50,07:00,U2 L U2,U2 L' U2,3,5,minute rollover
+07:00,07:10,R D R',R D' R',3,3,seconds only
+07:10,07:20,D2,D2,1,2,seconds only
+07:20,07:30,L2 B' L',L B L2,3,4,seconds only
+07:30,07:40,U' L2 U,U' L2 U,3,4,seconds only
+07:40,07:50,B' D' B2 D',D B2 D B,4,5,seconds only
+07:50,08:00,D2 B2 U L',L U' B2 D2,4,6,minute rollover
+08:00,08:10,L' B L2,L2 B' L,3,4,seconds only
+08:10,08:20,R2 F R2 B' L2,L2 B R2 F' R2,5,8,seconds only
+08:20,08:30,L2 B' L,L' B L2,3,4,seconds only
+08:30,08:40,U' L2 U,U' L2 U,3,4,seconds only
+08:40,08:50,L' B L2,L2 B' L,3,4,seconds only
+08:50,09:00,B' L' U L' U2,U2 L U' L B,5,6,minute rollover
+09:00,09:10,U' L' U,U' L U,3,3,seconds only
+09:10,09:20,B U' L' U,U' L U B',4,4,seconds only
+09:20,09:30,L2,L2,1,2,seconds only
+09:30,09:40,U' L U,U' L' U,3,3,seconds only
+09:40,09:50,R D R',R D' R',3,3,seconds only
+09:50,10:00,R F' R2 B' L',L B R2 F R',5,6,decade rollover
+10:00,10:10,L B' L',L B L',3,3,seconds only
+10:10,10:20,L2 B' L,L' B L2,3,4,seconds only
+10:20,10:30,L B2 L',L B2 L',3,4,seconds only
+10:30,10:40,L' B L2,L2 B' L,3,4,seconds only
+10:40,10:50,D2 B' D',D B D2,3,4,seconds only
+10:50,11:00,R B D B' D,D' B D' B' R',5,5,minute rollover
+11:00,11:10,L B' L',L B L',3,3,seconds only
+11:10,11:20,L2 B' L,L' B L2,3,4,seconds only
+11:20,11:30,L B2 L',L B2 L',3,4,seconds only
+11:30,11:40,L' B L2,L2 B' L,3,4,seconds only
+11:40,11:50,L B L',L B' L',3,3,seconds only
+11:50,12:00,U B2 L2,L2 B2 U',3,5,minute rollover
+12:00,12:10,B' L' B2 L',L B2 L B,4,5,seconds only
+12:10,12:20,U' L U,U' L' U,3,3,seconds only
+12:20,12:30,L B L',L B' L',3,3,seconds only
+12:30,12:40,B L' B L2,L2 B' L B',4,5,seconds only
+12:40,12:50,D2 B2 D',D B2 D2,3,5,seconds only
+12:50,13:00,B L2 U L2,L2 U' L2 B',4,6,minute rollover
+13:00,13:10,B L B L,L' B' L' B',4,4,seconds only
+13:10,13:20,D' B2 D',D B2 D,3,4,seconds only
+13:20,13:30,B L2,L2 B',2,3,seconds only
+13:30,13:40,U' L U,U' L' U,3,3,seconds only
+13:40,13:50,R D R',R D' R',3,3,seconds only
+13:50,14:00,D F D R2,R2 D' F' D',4,5,minute rollover
+14:00,14:10,U' L2 U,U' L2 U,3,4,seconds only
+14:10,14:20,R D2 R',R D2 R',3,4,seconds only
+14:20,14:30,U' L2 U,U' L2 U,3,4,seconds only
+14:30,14:40,R D2 R',R D2 R',3,4,seconds only
+14:40,14:50,U' L2 U,U' L2 U,3,4,seconds only
+14:50,15:00,L U2 L U,U' L' U2 L',4,5,minute rollover
+15:00,15:10,D B D' L2,L2 D B' D',4,5,seconds only
+15:10,15:20,U' L U,U' L' U,3,3,seconds only
+15:20,15:30,D2 B2 D',D B2 D2,3,5,seconds only
+15:30,15:40,U' L U,U' L' U,3,3,seconds only
+15:40,15:50,R D R',R D' R',3,3,seconds only
+15:50,16:00,B' R' B D2 R',R D2 B' R B,5,6,minute rollover
+16:00,16:10,U' L2 U,U' L2 U,3,4,seconds only
+16:10,16:20,L B2 L',L B2 L',3,4,seconds only
+16:20,16:30,U' L2 U,U' L2 U,3,4,seconds only
+16:30,16:40,R D2 R',R D2 R',3,4,seconds only
+16:40,16:50,U' L2 U,U' L2 U,3,4,seconds only
+16:50,17:00,B2 L' B U2,U2 B' L B2,4,6,minute rollover
+17:00,17:10,U' L2 U,U' L2 U,3,4,seconds only
+17:10,17:20,R D2 R',R D2 R',3,4,seconds only
+17:20,17:30,U' L2 U,U' L2 U,3,4,seconds only
+17:30,17:40,L B2 L',L B2 L',3,4,seconds only
+17:40,17:50,D B2 D,D' B2 D',3,4,seconds only
+17:50,18:00,U2 B U' L2 U,U' L2 U B' U2,5,7,minute rollover
+18:00,18:10,L B L2,L2 B' L',3,4,seconds only
+18:10,18:20,B2 L B2 L,L' B2 L' B2,4,6,seconds only
+18:20,18:30,U' L2 U,U' L2 U,3,4,seconds only
+18:30,18:40,R D2 R',R D2 R',3,4,seconds only
+18:40,18:50,U' L2 U,U' L2 U,3,4,seconds only
+18:50,19:00,B2 U2 L' B' U2,U2 B L U2 B2,5,8,minute rollover
+19:00,19:10,U' L2 U,U' L2 U,3,4,seconds only
+19:10,19:20,R D2 R',R D2 R',3,4,seconds only
+19:20,19:30,U' L2 U,U' L2 U,3,4,seconds only
+19:30,19:40,L2 B2 L',L B2 L2,3,5,seconds only
+19:40,19:50,R D' R',R D R',3,3,seconds only

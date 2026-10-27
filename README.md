@@ -90,3 +90,8 @@ AGPL-3.0-or-later.
 [Fixed-print timer capacity](docs/TIMER_2X2.md): independently replayed coverage
 from 00:00 through 59:50 in ten-second steps, with an exact upper bound in the
 strictly upright-digit model. This is separate from the 5×5 calendar results.
+
+[Move-optimized 2×2 timer prints](research/timer-2x2/optimization/REPORT.md)
+include independently verified five-HTM maximum step routes for 19:50 and 59:50,
+printable vector nets, and complete transition statistics. Global print
+optimality remains UNKNOWN.

@@ -1,0 +1,1310 @@
+[
+  {
+    "tag": "19m50",
+    "displays": 120,
+    "HTM": {
+      "count": 119,
+      "minimum": 1,
+      "maximum": 5,
+      "total": 384,
+      "mean": 3.226890756302521,
+      "median": 3,
+      "p95": 5,
+      "histogram": {
+        "1": 5,
+        "2": 3,
+        "3": 81,
+        "4": 20,
+        "5": 10
+      }
+    },
+    "QTM": {
+      "count": 119,
+      "minimum": 2,
+      "maximum": 8,
+      "total": 489,
+      "mean": 4.109243697478991,
+      "median": 4,
+      "p95": 6,
+      "histogram": {
+        "2": 5,
+        "3": 29,
+        "4": 53,
+        "5": 18,
+        "6": 10,
+        "7": 2,
+        "8": 2
+      }
+    },
+    "categories": {
+      "decade rollover": {
+        "count": 1,
+        "minimum": 5,
+        "maximum": 5,
+        "total": 5,
+        "mean": 5,
+        "median": 5,
+        "p95": 5,
+        "histogram": {
+          "5": 1
+        }
+      },
+      "minute rollover": {
+        "count": 18,
+        "minimum": 3,
+        "maximum": 5,
+        "total": 76,
+        "mean": 4.222222222222222,
+        "median": 4.0,
+        "p95": 5,
+        "histogram": {
+          "3": 3,
+          "4": 8,
+          "5": 7
+        }
+      },
+      "seconds only": {
+        "count": 100,
+        "minimum": 1,
+        "maximum": 5,
+        "total": 303,
+        "mean": 3.03,
+        "median": 3.0,
+        "p95": 4,
+        "histogram": {
+          "1": 5,
+          "2": 3,
+          "3": 78,
+          "4": 12,
+          "5": 2
+        }
+      }
+    },
+    "directBaseline": {
+      "count": 119,
+      "minimum": 3,
+      "maximum": 6,
+      "total": 496,
+      "mean": 4.168067226890757,
+      "median": 4,
+      "p95": 5,
+      "histogram": {
+        "3": 25,
+        "4": 50,
+        "5": 43,
+        "6": 1
+      }
+    },
+    "legacyHubRaw": {
+      "count": 119,
+      "minimum": 16,
+      "maximum": 21,
+      "total": 2246,
+      "mean": 18.873949579831933,
+      "median": 19,
+      "p95": 20,
+      "histogram": {
+        "16": 2,
+        "17": 9,
+        "18": 26,
+        "19": 50,
+        "20": 29,
+        "21": 3
+      }
+    },
+    "directBaselineTotalReductionPercent": 22.580645161290324,
+    "faceTurns": {
+      "B": 69,
+      "D": 52,
+      "F": 5,
+      "L": 111,
+      "R": 55,
+      "U": 92
+    },
+    "halfTurns": 105,
+    "maximumSetup": {
+      "ticks": 120,
+      "zeroWord": "U' L2 B' U2",
+      "maximumWord": "R' U L' F R2 U' L2 U' F' U2",
+      "maximumHTM": 10
+    },
+    "printingByCubie": {
+      "0": [
+        "MT:0",
+        "MT:1",
+        "MT:0"
+      ],
+      "1": [
+        "MT:1",
+        "MT:1",
+        "MT:0"
+      ],
+      "2": [
+        "MU:0",
+        "MU:2",
+        "MU:5"
+      ],
+      "3": [
+        "MU:3",
+        "MU:4",
+        "MU:7"
+      ],
+      "4": [
+        "MU:1",
+        "MU:6",
+        "SU:0"
+      ],
+      "5": [
+        "MU:8",
+        "MU:9",
+        "SU:0"
+      ],
+      "6": [
+        "ST:0",
+        "ST:2",
+        "ST:4"
+      ],
+      "7": [
+        "ST:1",
+        "ST:3",
+        "ST:5"
+      ]
+    },
+    "worstTransitions": [
+      {
+        "fromDisplay": "00:50",
+        "toDisplay": "01:00",
+        "increment": "R' U R' D' R'",
+        "decrement": "R D R U' R",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "01:00",
+        "toDisplay": "01:10",
+        "increment": "L U B2 U' L'",
+        "decrement": "L U B2 U' L'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "04:50",
+        "toDisplay": "05:00",
+        "increment": "B2 U' L' B U",
+        "decrement": "U' B' L U B2",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "08:10",
+        "toDisplay": "08:20",
+        "increment": "R2 F R2 B' L2",
+        "decrement": "L2 B R2 F' R2",
+        "HTM": 5,
+        "QTM": 8,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "08:50",
+        "toDisplay": "09:00",
+        "increment": "B' L' U L' U2",
+        "decrement": "U2 L U' L B",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "09:50",
+        "toDisplay": "10:00",
+        "increment": "R F' R2 B' L'",
+        "decrement": "L B R2 F R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "decade rollover"
+      },
+      {
+        "fromDisplay": "10:50",
+        "toDisplay": "11:00",
+        "increment": "R B D B' D",
+        "decrement": "D' B D' B' R'",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "15:50",
+        "toDisplay": "16:00",
+        "increment": "B' R' B D2 R'",
+        "decrement": "R D2 B' R B",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "17:50",
+        "toDisplay": "18:00",
+        "increment": "U2 B U' L2 U",
+        "decrement": "U' L2 U B' U2",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "18:50",
+        "toDisplay": "19:00",
+        "increment": "B2 U2 L' B' U2",
+        "decrement": "U2 B L U2 B2",
+        "HTM": 5,
+        "QTM": 8,
+        "category": "minute rollover"
+      }
+    ]
+  },
+  {
+    "tag": "59m50",
+    "displays": 360,
+    "HTM": {
+      "count": 359,
+      "minimum": 1,
+      "maximum": 5,
+      "total": 1324,
+      "mean": 3.6880222841225625,
+      "median": 3,
+      "p95": 5,
+      "histogram": {
+        "1": 2,
+        "2": 6,
+        "3": 190,
+        "4": 65,
+        "5": 96
+      }
+    },
+    "QTM": {
+      "count": 359,
+      "minimum": 2,
+      "maximum": 8,
+      "total": 1654,
+      "mean": 4.607242339832869,
+      "median": 4,
+      "p95": 7,
+      "histogram": {
+        "2": 2,
+        "3": 89,
+        "4": 112,
+        "5": 58,
+        "6": 45,
+        "7": 49,
+        "8": 4
+      }
+    },
+    "categories": {
+      "decade rollover": {
+        "count": 5,
+        "minimum": 4,
+        "maximum": 5,
+        "total": 23,
+        "mean": 4.6,
+        "median": 5,
+        "p95": 5,
+        "histogram": {
+          "4": 2,
+          "5": 3
+        }
+      },
+      "minute rollover": {
+        "count": 54,
+        "minimum": 2,
+        "maximum": 5,
+        "total": 230,
+        "mean": 4.2592592592592595,
+        "median": 4.5,
+        "p95": 5,
+        "histogram": {
+          "2": 2,
+          "3": 9,
+          "4": 16,
+          "5": 27
+        }
+      },
+      "seconds only": {
+        "count": 300,
+        "minimum": 1,
+        "maximum": 5,
+        "total": 1071,
+        "mean": 3.57,
+        "median": 3.0,
+        "p95": 5,
+        "histogram": {
+          "1": 2,
+          "2": 4,
+          "3": 181,
+          "4": 47,
+          "5": 66
+        }
+      }
+    },
+    "directBaseline": {
+      "count": 359,
+      "minimum": 1,
+      "maximum": 6,
+      "total": 1709,
+      "mean": 4.7604456824512535,
+      "median": 5,
+      "p95": 6,
+      "histogram": {
+        "1": 9,
+        "3": 56,
+        "4": 62,
+        "5": 108,
+        "6": 124
+      }
+    },
+    "legacyHubRaw": {
+      "count": 359,
+      "minimum": 13,
+      "maximum": 21,
+      "total": 6535,
+      "mean": 18.2033426183844,
+      "median": 18,
+      "p95": 20,
+      "histogram": {
+        "13": 2,
+        "14": 3,
+        "15": 7,
+        "16": 23,
+        "17": 63,
+        "18": 100,
+        "19": 102,
+        "20": 54,
+        "21": 5
+      }
+    },
+    "directBaselineTotalReductionPercent": 22.527794031597427,
+    "faceTurns": {
+      "B": 196,
+      "D": 266,
+      "F": 14,
+      "L": 140,
+      "R": 413,
+      "U": 295
+    },
+    "halfTurns": 330,
+    "maximumSetup": {
+      "ticks": 360,
+      "zeroWord": "L' B U2 L2 U'",
+      "maximumWord": "F R2 F2 L' U' F2 U L2 F",
+      "maximumHTM": 9
+    },
+    "printingByCubie": {
+      "0": [
+        "MT:0",
+        "MT:4",
+        "MT:2"
+      ],
+      "1": [
+        "MT:1",
+        "MT:5",
+        "MT:3"
+      ],
+      "2": [
+        "MU:4",
+        "MU:9",
+        "MU:2"
+      ],
+      "3": [
+        "MU:5",
+        "MU:7",
+        "MU:0"
+      ],
+      "4": [
+        "MU:1",
+        "MU:3",
+        "SU:0"
+      ],
+      "5": [
+        "MU:8",
+        "MU:6",
+        "SU:0"
+      ],
+      "6": [
+        "ST:5",
+        "ST:1",
+        "ST:3"
+      ],
+      "7": [
+        "ST:2",
+        "ST:4",
+        "ST:0"
+      ]
+    },
+    "worstTransitions": [
+      {
+        "fromDisplay": "00:00",
+        "toDisplay": "00:10",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "00:10",
+        "toDisplay": "00:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "01:10",
+        "toDisplay": "01:20",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "01:30",
+        "toDisplay": "01:40",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "01:50",
+        "toDisplay": "02:00",
+        "increment": "R2 B2 D R2 D",
+        "decrement": "D' R2 D' B2 R2",
+        "HTM": 5,
+        "QTM": 8,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "02:50",
+        "toDisplay": "03:00",
+        "increment": "U' L B' L U",
+        "decrement": "U' L' B L' U",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "03:20",
+        "toDisplay": "03:30",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "03:40",
+        "toDisplay": "03:50",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "03:50",
+        "toDisplay": "04:00",
+        "increment": "U' B' U' L U2",
+        "decrement": "U2 L' U B U",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "04:00",
+        "toDisplay": "04:10",
+        "increment": "U' B' L2 B U",
+        "decrement": "U' B' L2 B U",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "05:50",
+        "toDisplay": "06:00",
+        "increment": "D2 R2 B2 R' D",
+        "decrement": "D' R B2 R2 D2",
+        "HTM": 5,
+        "QTM": 8,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "06:10",
+        "toDisplay": "06:20",
+        "increment": "R B D2 B' R'",
+        "decrement": "R B D2 B' R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "07:10",
+        "toDisplay": "07:20",
+        "increment": "U' R2 D' F2 D'",
+        "decrement": "D F2 D R2 U",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "09:10",
+        "toDisplay": "09:20",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "10:50",
+        "toDisplay": "11:00",
+        "increment": "B' R U2 F U2",
+        "decrement": "U2 F' U2 R' B",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "11:10",
+        "toDisplay": "11:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "11:50",
+        "toDisplay": "12:00",
+        "increment": "U' L B' L U",
+        "decrement": "U' L' B L' U",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "12:30",
+        "toDisplay": "12:40",
+        "increment": "U' R2 D' F2 D'",
+        "decrement": "D F2 D R2 U",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "12:50",
+        "toDisplay": "13:00",
+        "increment": "B' R D B R'",
+        "decrement": "R B' D' R' B",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "13:00",
+        "toDisplay": "13:10",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "13:20",
+        "toDisplay": "13:30",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "13:40",
+        "toDisplay": "13:50",
+        "increment": "R' D2 R D2 R",
+        "decrement": "R' D2 R' D2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "13:50",
+        "toDisplay": "14:00",
+        "increment": "B2 U' L2 B U",
+        "decrement": "U' B' L2 U B2",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "15:30",
+        "toDisplay": "15:40",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "15:50",
+        "toDisplay": "16:00",
+        "increment": "R2 B2 D2 B' R",
+        "decrement": "R' B D2 B2 R2",
+        "HTM": 5,
+        "QTM": 8,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "16:50",
+        "toDisplay": "17:00",
+        "increment": "U' L2 U B' R'",
+        "decrement": "R B U' L2 U",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "17:10",
+        "toDisplay": "17:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "18:10",
+        "toDisplay": "18:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "19:50",
+        "toDisplay": "20:00",
+        "increment": "R' U2 F2 U' R",
+        "decrement": "R' U F2 U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "decade rollover"
+      },
+      {
+        "fromDisplay": "21:10",
+        "toDisplay": "21:20",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "21:30",
+        "toDisplay": "21:40",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "22:10",
+        "toDisplay": "22:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "22:50",
+        "toDisplay": "23:00",
+        "increment": "U' L B' L U",
+        "decrement": "U' L' B L' U",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "23:20",
+        "toDisplay": "23:30",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "23:40",
+        "toDisplay": "23:50",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "23:50",
+        "toDisplay": "24:00",
+        "increment": "U' B' U' L U2",
+        "decrement": "U2 L' U B U",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "24:00",
+        "toDisplay": "24:10",
+        "increment": "U' B' L2 B U",
+        "decrement": "U' B' L2 B U",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "25:50",
+        "toDisplay": "26:00",
+        "increment": "R' U F' R U'",
+        "decrement": "U R' F U' R",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "26:00",
+        "toDisplay": "26:10",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "26:10",
+        "toDisplay": "26:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "27:00",
+        "toDisplay": "27:10",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "27:20",
+        "toDisplay": "27:30",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "27:50",
+        "toDisplay": "28:00",
+        "increment": "R2 D' R' D' R'",
+        "decrement": "R D R D R2",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "28:00",
+        "toDisplay": "28:10",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "28:10",
+        "toDisplay": "28:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "29:10",
+        "toDisplay": "29:20",
+        "increment": "U2 F' U2 B D2",
+        "decrement": "D2 B' U2 F U2",
+        "HTM": 5,
+        "QTM": 8,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "29:50",
+        "toDisplay": "30:00",
+        "increment": "L B U' B' L",
+        "decrement": "L' B U B' L'",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "decade rollover"
+      },
+      {
+        "fromDisplay": "30:50",
+        "toDisplay": "31:00",
+        "increment": "R' U F' R U'",
+        "decrement": "U R' F U' R",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "31:00",
+        "toDisplay": "31:10",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "31:10",
+        "toDisplay": "31:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "32:50",
+        "toDisplay": "33:00",
+        "increment": "B2 D R' D R'",
+        "decrement": "R D' R D' B2",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "34:10",
+        "toDisplay": "34:20",
+        "increment": "R D' B2 D2 R",
+        "decrement": "R' D2 B2 D R'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "34:20",
+        "toDisplay": "34:30",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "34:40",
+        "toDisplay": "34:50",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "35:00",
+        "toDisplay": "35:10",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "35:20",
+        "toDisplay": "35:30",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "35:40",
+        "toDisplay": "35:50",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "36:00",
+        "toDisplay": "36:10",
+        "increment": "R B D2 B' R'",
+        "decrement": "R B D2 B' R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "36:30",
+        "toDisplay": "36:40",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "37:10",
+        "toDisplay": "37:20",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "37:30",
+        "toDisplay": "37:40",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "38:50",
+        "toDisplay": "39:00",
+        "increment": "B R2 D2 B D",
+        "decrement": "D' B' D2 R2 B'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "39:30",
+        "toDisplay": "39:40",
+        "increment": "U' R2 D' F2 D'",
+        "decrement": "D F2 D R2 U",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "39:50",
+        "toDisplay": "40:00",
+        "increment": "B2 U' B' L U2",
+        "decrement": "U2 L' B U B2",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "decade rollover"
+      },
+      {
+        "fromDisplay": "40:10",
+        "toDisplay": "40:20",
+        "increment": "U F U' R' D2",
+        "decrement": "D2 R U F' U'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "40:30",
+        "toDisplay": "40:40",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "40:50",
+        "toDisplay": "41:00",
+        "increment": "B U' B' L2 U",
+        "decrement": "U' L2 B U B'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "41:50",
+        "toDisplay": "42:00",
+        "increment": "U' L B' L U",
+        "decrement": "U' L' B L' U",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "42:30",
+        "toDisplay": "42:40",
+        "increment": "U' R2 D' F2 D'",
+        "decrement": "D F2 D R2 U",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "42:50",
+        "toDisplay": "43:00",
+        "increment": "B' R D B R'",
+        "decrement": "R B' D' R' B",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "43:00",
+        "toDisplay": "43:10",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "43:20",
+        "toDisplay": "43:30",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "43:40",
+        "toDisplay": "43:50",
+        "increment": "R' D2 R D2 R",
+        "decrement": "R' D2 R' D2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "43:50",
+        "toDisplay": "44:00",
+        "increment": "B2 U' L2 B U",
+        "decrement": "U' B' L2 U B2",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "44:50",
+        "toDisplay": "45:00",
+        "increment": "B D2 R' B' D",
+        "decrement": "D' B R D2 B'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "46:10",
+        "toDisplay": "46:20",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "46:30",
+        "toDisplay": "46:40",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "47:10",
+        "toDisplay": "47:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "47:50",
+        "toDisplay": "48:00",
+        "increment": "U' L B' L U",
+        "decrement": "U' L' B L' U",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "48:20",
+        "toDisplay": "48:30",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "48:40",
+        "toDisplay": "48:50",
+        "increment": "R' D2 R D2 R",
+        "decrement": "R' D2 R' D2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "48:50",
+        "toDisplay": "49:00",
+        "increment": "B2 U' L2 B U",
+        "decrement": "U' B' L2 U B2",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "51:10",
+        "toDisplay": "51:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "51:50",
+        "toDisplay": "52:00",
+        "increment": "R' U F' R U'",
+        "decrement": "U R' F U' R",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "52:00",
+        "toDisplay": "52:10",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "52:10",
+        "toDisplay": "52:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "52:50",
+        "toDisplay": "53:00",
+        "increment": "R' U F' R U'",
+        "decrement": "U R' F U' R",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "53:00",
+        "toDisplay": "53:10",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "53:10",
+        "toDisplay": "53:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "54:10",
+        "toDisplay": "54:20",
+        "increment": "R B2 D2 B' R",
+        "decrement": "R' B D2 B2 R'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "56:10",
+        "toDisplay": "56:20",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "56:30",
+        "toDisplay": "56:40",
+        "increment": "U R2 U' B2 D'",
+        "decrement": "D B2 U R2 U'",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "57:10",
+        "toDisplay": "57:20",
+        "increment": "R B' R D R2",
+        "decrement": "R2 D' R' B R'",
+        "HTM": 5,
+        "QTM": 6,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "57:50",
+        "toDisplay": "58:00",
+        "increment": "U' L B' L U",
+        "decrement": "U' L' B L' U",
+        "HTM": 5,
+        "QTM": 5,
+        "category": "minute rollover"
+      },
+      {
+        "fromDisplay": "58:20",
+        "toDisplay": "58:30",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      },
+      {
+        "fromDisplay": "58:40",
+        "toDisplay": "58:50",
+        "increment": "R' U2 R B2 L",
+        "decrement": "L' B2 R' U2 R",
+        "HTM": 5,
+        "QTM": 7,
+        "category": "seconds only"
+      }
+    ]
+  }
+]

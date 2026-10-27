@@ -1,0 +1,42 @@
+{
+  "status": "SAT",
+  "shortestTransitionClaim": "All increment edges are exact shortest paths from their actual starting state to any matching next display. Reverse words restore the canonical prior state; they need not be shortest to any prior display.",
+  "globalPrintOptimality": "UNKNOWN",
+  "bfsStates": 136080,
+  "bfsHistogram": {
+    "0": 1,
+    "1": 15,
+    "2": 198,
+    "3": 2030,
+    "4": 15396,
+    "5": 61768,
+    "6": 53528,
+    "7": 3144
+  },
+  "runs": [
+    {
+      "ticks": 120,
+      "incrementTransitions": 119,
+      "decrementTransitions": 119,
+      "incrementShortestVerified": 119,
+      "setupHTM": 4,
+      "maxHTM": 5,
+      "totalHTM": 384,
+      "decrementShortestToAnyDisplay": 89,
+      "decrementAlternativeMinimumTotalHTM": 346
+    },
+    {
+      "ticks": 360,
+      "incrementTransitions": 359,
+      "decrementTransitions": 359,
+      "incrementShortestVerified": 359,
+      "setupHTM": 5,
+      "maxHTM": 5,
+      "totalHTM": 1324,
+      "decrementShortestToAnyDisplay": 230,
+      "decrementAlternativeMinimumTotalHTM": 1138
+    }
+  ],
+  "candidateSHA256": "85bcc8efd88c86b7b6b433ff263438d388861ba28d13234b2dcd752ad44161a1",
+  "runtimeSeconds": 0.75
+}
