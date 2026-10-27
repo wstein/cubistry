@@ -1,4 +1,20 @@
 import { defineConfig } from "vite";
+import { fileURLToPath } from "node:url";
+import { solverAcceptancePlugin } from "./src/dev/acceptance-plugin.ts";
 export default defineConfig({
-  build: { rollupOptions: { output: { manualChunks: { three: ["three"] } } } },
+  plugins: [solverAcceptancePlugin()],
+  build: {
+    rollupOptions: {
+      input: {
+        counter: fileURLToPath(new URL("./index.html", import.meta.url)),
+        acceptance: fileURLToPath(
+          new URL("./solver-acceptance.html", import.meta.url),
+        ),
+        library: fileURLToPath(
+          new URL("./library-example.html", import.meta.url),
+        ),
+      },
+      output: { manualChunks: { three: ["three"] } },
+    },
+  },
 });

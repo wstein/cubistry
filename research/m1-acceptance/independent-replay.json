@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "values": [
+    0,
+    7,
+    42,
+    58,
+    99
+  ],
+  "startWord": "R U F2 L' D B",
+  "fullPhysicalTargets": 5,
+  "exactInverseRestorations": 5,
+  "stickerIdentities": 24,
+  "independentOfJavaScriptAndSolver": true,
+  "sourceSHA256": "b3936648e0a59808194c7e21a47050b69bfe1e502e6c96f7c3ee74a8d20a9d31",
+  "checkerSHA256": "b97e971991d1ea500f279592ae142e1ef65da28456c8f4e4bf902dd2f5e7c0c5"
+}
