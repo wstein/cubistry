@@ -1,3 +1,4 @@
+import { prepareTestSolver, expectedHtm } from "./helpers/shared-solver.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -12,9 +13,7 @@ const design = validateCounterDesign(
     readFileSync(new URL("../public/counter-design.v2.json", import.meta.url)),
   ),
 );
-const total = (a, b) =>
-  parseAlg(design.witnesses[a].word).length +
-  parseAlg(design.witnesses[b].word).length;
+const total = expectedHtm;
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 async function harness() {
   const events = [],
@@ -54,6 +53,7 @@ async function harness() {
         dispose() {},
       };
     },
+    prepareTestSolver,
   );
   await controller.configure("FIXED TITLE", true, 15);
   const step = async () => {

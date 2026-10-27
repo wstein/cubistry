@@ -1,5 +1,10 @@
 import {
+  createCounterSolver,
+  type CounterSolver,
+} from "../../adapters/puzlwerk-2x2.ts";
+import {
   demand,
+  stateEquals,
   type CubeState,
   type LegalMove,
   type PrintDefinition,
@@ -8,7 +13,6 @@ import {
   initialState,
   applyMoves,
   parseAlg,
-  inverseMoves,
   presentMove,
   matchesTarget,
   type MovePresentation,
@@ -49,6 +53,7 @@ export interface MoveProgress {
 /** Product target selection and queue live here, outside the generic viewer. */
 export class CounterController {
   private print: PrintDefinition | null = null;
+  private solver: CounterSolver | null = null;
   private authoritative: CubeState | null = null;
   private configuration: CounterConfig | null = null;
   private assets: LoadedAssets | null = null;
@@ -75,6 +80,7 @@ export class CounterController {
     progress?: MoveProgress,
   ) => void;
   private readonly resolveAssets: typeof loadAssets;
+  private readonly prepareSolver: typeof createCounterSolver;
   constructor(
     view: CounterView,
     design: CounterDesign,
@@ -85,11 +91,13 @@ export class CounterController {
       progress?: MoveProgress,
     ) => void,
     resolveAssets: typeof loadAssets = loadAssets,
+    prepareSolver: typeof createCounterSolver = createCounterSolver,
   ) {
     this.view = view;
     this.design = design;
     this.onState = onState;
     this.resolveAssets = resolveAssets;
+    this.prepareSolver = prepareSolver;
   }
   get state(): CubeState | null {
     return this.authoritative;
@@ -116,7 +124,11 @@ export class CounterController {
   resetCamera(): void {
     this.view.resetCamera();
   }
-  async configure(label: string, padded: boolean, value = 15): Promise<void> {
+  async configure(
+    label: string,
+    padded: boolean,
+    value = 15,
+  ): Promise<void> {
     demand(
       !this.queued && !this.configuring,
       "Wait for current work before applying a new print",
@@ -137,6 +149,7 @@ export class CounterController {
       });
       const instance = await configurePrint(this.design, config);
       fresh = await this.resolveAssets(instance.assets, [instance.print]);
+      const solver = await this.prepareSolver(instance.print);
       const state = applyMoves(
         initialState(instance.print),
         parseAlg(this.design.witnesses[value].word),
@@ -151,6 +164,7 @@ export class CounterController {
       fresh = null;
       previous?.dispose();
       this.print = instance.print;
+      this.solver = solver;
       this.authoritative = state;
       this.configuration = config;
       this.current = this.desired = value;
@@ -210,19 +224,21 @@ export class CounterController {
   }
   private async drain(): Promise<void> {
     demand(
-      this.print && this.authoritative && this.configuration,
+      this.print &&
+        this.authoritative &&
+        this.configuration &&
+        this.solver,
       "Counter is not configured",
     );
     this.queued = true;
     try {
       while (this.current !== this.desired) {
         const target = this.desired;
-        // Current route is witness(current)^-1 + witness(target), via the
-        // reference state. Legal and verified, not shortest HTM; see issue #23.
-        const moves = [
-          ...inverseMoves(parseAlg(this.design.witnesses[this.current].word)),
-          ...parseAlg(this.design.witnesses[target].word),
-        ];
+        const targetState = applyMoves(
+          initialState(this.print),
+          parseAlg(this.design.witnesses[target].word),
+        );
+        const moves = this.solver.solve(this.authoritative, targetState);
         this.activeTarget = target;
         this.progressUpdate({
           completed: 0,
@@ -237,6 +253,10 @@ export class CounterController {
           this.authoritative = presentation.to;
           this.progressUpdate({ completed: this.playback.completed + 1 });
         }
+        demand(
+          stateEquals(this.authoritative, targetState),
+          "Incorrect completed physical counter state",
+        );
         demand(
           matchesTarget(
             this.print,

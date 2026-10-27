@@ -1,3 +1,4 @@
+import { prepareTestSolver } from "./helpers/shared-solver.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -103,6 +104,7 @@ test("counter adapter consumes one core state while a generic view only receives
       materials: new Map(),
       dispose() {},
     }),
+    prepareTestSolver,
   );
   await controller.configure("A fixed title", true, 15);
   controller.request(99);
