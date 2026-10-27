@@ -33,6 +33,8 @@ function timerUi() {
     el.disabled = !ready;
   for (const id of ["label", "format"]) $(id).disabled = !ready;
   $("apply-print").disabled = !ready || !!view?.busy;
+  $("stop-turns").disabled =
+    !ready || !view?.busy || view?.progress.status === "stopping";
   $("mode").textContent =
     timer.state === "running"
       ? "Counting down"
@@ -70,7 +72,21 @@ function action(fn) {
   }
 }
 let view, viewer;
-const onPhysicalState = (physical, busy, failure) => {
+const onPhysicalState = (physical, busy, failure, progress) => {
+  if (progress) {
+    const meter = $("move-progress");
+    meter.textContent = `${progress.completed} / ${progress.total} moves`;
+    meter.setAttribute("aria-valuenow", String(progress.completed));
+    meter.setAttribute("aria-valuemax", String(progress.total));
+    meter.setAttribute(
+      "aria-valuetext",
+      `${progress.completed} of ${progress.total} moves committed`,
+    );
+    meter.dataset.state = progress.status;
+    meter.dataset.target = String(progress.target ?? "");
+    meter.dataset.queued = String(progress.queuedTarget ?? "");
+  }
+  $("stop-turns").disabled = !ready || !busy || progress?.status === "stopping";
   if (failure) {
     ready = false;
     timerUi();
@@ -83,9 +99,19 @@ const onPhysicalState = (physical, busy, failure) => {
   }
   $("cube").setAttribute("aria-busy", String(busy));
   $("cube").dataset.value = String(physical);
-  $("status").textContent = busy
-    ? "Turning toward " + value + "…"
-    : "Showing " + physical + " · label restored";
+  const message = busy
+    ? progress?.status === "stopping"
+      ? "Finishing " + progress.target + " before stopping…"
+      : "Turning toward " +
+        (progress?.target ?? value) +
+        (progress?.queuedTarget != null
+          ? " · next " + progress.queuedTarget
+          : "…")
+    : progress?.status === "stopped"
+      ? "Stopped at " + physical + " · label restored"
+      : "Showing " + physical + " · label restored";
+  // The count changes once per committed token; don't repeat the same live status.
+  if ($("status").textContent !== message) $("status").textContent = message;
   $("apply-print").disabled = busy || !ready;
 };
 try {
@@ -133,6 +159,18 @@ $("pause").addEventListener("click", () => {
 });
 $("reset").addEventListener("click", () => setValue(timer.reset()));
 $("front").addEventListener("click", () => view?.resetCamera());
+$("stop-turns").addEventListener("click", () =>
+  action(() => {
+    const target = view?.stopAfterCurrent();
+    if (target == null) return;
+    // Do not request again: that would reinstate the queue just cancelled.
+    timer.reset(target);
+    value = target;
+    $("value").value = String(target);
+    timerUi();
+    save();
+  }),
+);
 let proof;
 $("print-form").addEventListener("submit", async (e) => {
   e.preventDefault();

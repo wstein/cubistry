@@ -1,6 +1,7 @@
 import {
   demand,
   type CubeState,
+  type LegalMove,
   type PrintDefinition,
 } from "@cubistry/cube-core";
 import {
@@ -29,6 +30,22 @@ export interface CounterView {
   animate(presentation: MovePresentation): Promise<void>;
   resetCamera(): void;
 }
+/** HTM counts each already-validated outer-face token once, including half turns. */
+export const countHtmMoves = (moves: readonly LegalMove[]): number =>
+  moves.length;
+export interface MoveProgress {
+  readonly completed: number;
+  readonly total: number;
+  readonly target: number | null;
+  readonly queuedTarget: number | null;
+  readonly status:
+    | "idle"
+    | "playing"
+    | "stopping"
+    | "completed"
+    | "stopped"
+    | "failed";
+}
 /** Product target selection and queue live here, outside the generic viewer. */
 export class CounterController {
   private print: PrintDefinition | null = null;
@@ -40,18 +57,33 @@ export class CounterController {
   private current = 15;
   private queued = false;
   private failed = false;
+  private activeTarget: number | null = null;
+  private stopping = false;
+  private playback: MoveProgress = Object.freeze({
+    completed: 0,
+    total: 0,
+    target: null,
+    queuedTarget: null,
+    status: "idle",
+  });
   private readonly view: CounterView;
   private readonly design: CounterDesign;
   private readonly onState: (
     value: number,
     busy: boolean,
     error?: Error,
+    progress?: MoveProgress,
   ) => void;
   private readonly resolveAssets: typeof loadAssets;
   constructor(
     view: CounterView,
     design: CounterDesign,
-    onState: (value: number, busy: boolean, error?: Error) => void,
+    onState: (
+      value: number,
+      busy: boolean,
+      error?: Error,
+      progress?: MoveProgress,
+    ) => void,
     resolveAssets: typeof loadAssets = loadAssets,
   ) {
     this.view = view;
@@ -61,6 +93,16 @@ export class CounterController {
   }
   get state(): CubeState | null {
     return this.authoritative;
+  }
+  get progress(): MoveProgress {
+    return this.playback;
+  }
+  private notify(error?: Error): void {
+    this.onState(this.current, this.queued, error, this.playback);
+  }
+  private progressUpdate(patch: Partial<MoveProgress>): void {
+    this.playback = Object.freeze({ ...this.playback, ...patch });
+    this.notify();
   }
   get busy(): boolean {
     return this.queued;
@@ -113,11 +155,20 @@ export class CounterController {
       this.configuration = config;
       this.current = this.desired = value;
       this.failed = false;
-      this.onState(value, false);
+      this.activeTarget = null;
+      this.stopping = false;
+      this.playback = Object.freeze({
+        completed: 0,
+        total: 0,
+        target: value,
+        queuedTarget: null,
+        status: "idle",
+      });
     } finally {
       fresh?.dispose();
       this.configuring = false;
     }
+    this.notify();
   }
 
   request(value: number): void {
@@ -126,8 +177,36 @@ export class CounterController {
       Number.isInteger(value) && value >= 0 && value <= 99,
       "Invalid counter value",
     );
+    demand(
+      this.authoritative && this.configuration,
+      "Counter is not configured",
+    );
     this.desired = value;
+    this.stopping = false;
+    if (!this.queued && !this.failed && value === this.current) {
+      this.progressUpdate({
+        completed: 0,
+        total: 0,
+        target: value,
+        queuedTarget: null,
+        status: "completed",
+      });
+      return;
+    }
+    if (this.queued)
+      this.progressUpdate({
+        status: "playing",
+        queuedTarget: value === this.activeTarget ? null : value,
+      });
     if (!this.queued && !this.failed) void this.drain();
+  }
+  /** Cancel queued work by finishing the active value, never an idle partial face. */
+  stopAfterCurrent(): number | null {
+    if (!this.queued || this.activeTarget === null) return null;
+    this.desired = this.activeTarget;
+    this.stopping = true;
+    this.progressUpdate({ status: "stopping", queuedTarget: null });
+    return this.activeTarget;
   }
   private async drain(): Promise<void> {
     demand(
@@ -135,18 +214,28 @@ export class CounterController {
       "Counter is not configured",
     );
     this.queued = true;
-    this.onState(this.current, true);
     try {
       while (this.current !== this.desired) {
         const target = this.desired;
+        // Current route is witness(current)^-1 + witness(target), via the
+        // reference state. Legal and verified, not shortest HTM; see issue #23.
         const moves = [
           ...inverseMoves(parseAlg(this.design.witnesses[this.current].word)),
           ...parseAlg(this.design.witnesses[target].word),
         ];
+        this.activeTarget = target;
+        this.progressUpdate({
+          completed: 0,
+          total: countHtmMoves(moves),
+          target,
+          queuedTarget: null,
+          status: "playing",
+        });
         for (const move of moves) {
           const presentation = presentMove(this.authoritative, move);
           await this.view.animate(presentation);
           this.authoritative = presentation.to;
+          this.progressUpdate({ completed: this.playback.completed + 1 });
         }
         demand(
           matchesTarget(
@@ -157,18 +246,29 @@ export class CounterController {
           "Incorrect completed counter target",
         );
         this.current = target;
-        this.onState(target, true);
+        this.activeTarget = null;
+        this.progressUpdate({
+          status: this.stopping ? "stopped" : "completed",
+          queuedTarget: this.desired === target ? null : this.desired,
+        });
       }
     } catch (e) {
       this.failed = true;
+      this.playback = Object.freeze({
+        ...this.playback,
+        status: "failed",
+        queuedTarget: null,
+      });
+      this.queued = false;
       this.onState(
         this.current,
         false,
         e instanceof Error ? e : Error(String(e)),
+        this.playback,
       );
     } finally {
       this.queued = false;
-      if (!this.failed) this.onState(this.current, false);
+      if (!this.failed) this.notify();
     }
   }
 }
