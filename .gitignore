@@ -4,3 +4,7 @@ playwright-report/
 test-results/
 __pycache__/
 *.pyc
+
+# ReScript compiler caches; generated .res.mjs sources remain versioned.
+lib/
+.rescript/

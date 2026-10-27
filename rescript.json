@@ -1,0 +1,1 @@
+{"name":"cubistry-counter","sources":["packages/cube-core/res","packages/cube-mechanics/res","packages/cube-assets/res"],"package-specs":{"module":"esmodule","in-source":true},"suffix":".res.mjs"}
