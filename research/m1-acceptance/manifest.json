@@ -1,0 +1,59 @@
+{
+  "schema": "cubistry.m1-acceptance-provenance",
+  "version": 1,
+  "stackedBasePR": 20,
+  "stackedBaseBranch": "feat/18-two-by-two-counter",
+  "stackedBaseCommit": "e9ded21852d79a0a7382f027c3c185572013c913",
+  "requirements": "research/m1-acceptance/requirements.json",
+  "runtimeSupportedSizes": [
+    2
+  ],
+  "backend": "cubing/experimentalSolve2x2x2@0.66.1",
+  "startWord": "R U F2 L' D B",
+  "goalValues": [
+    0,
+    7,
+    42,
+    58,
+    99
+  ],
+  "counterProductionPath": "preserved prerecorded witnesses",
+  "liveAcceptancePath": "local development endpoint calls existing solver for each selection",
+  "validation": {
+    "strictReScriptAndTypeScript": true,
+    "nodeTests": 26,
+    "pythonTests": 21,
+    "browserTests": 21,
+    "freshSolverCasesIndependentlyReplayed": 5,
+    "visiblePixelGoals": 5,
+    "auditVulnerabilities": 0
+  },
+  "sha256": {
+    "examples/library-only/main.ts": "015992df754783f10823fd39f76dc31b66d3c3fa416d424b0ac500766c00460a",
+    "examples/solver-acceptance/main.ts": "09a164abf860f96f0f40af8a9abba08f577566beb77f8f7100aafbbf0f60217a",
+    "library-example.html": "184b373946dffeadb2a6f00f8d746505481b9ee485c9b8e3dd1db2640630b20f",
+    "package-lock.json": "cf1d915b3d13ccae20706c76d0787a6c647506abac8e518e31754f51d2a7cb09",
+    "package.json": "8308a6d5200d3dc275e9af7b918d1d92071e8acc2ef2258eab9a3b62765c7d91",
+    "playwright.config.mjs": "872e0a6b657829f4ae61afa2fffd8648c06aef88f34fff73aa07ea1dc7200d8a",
+    "public/counter-design.v2.json": "8e7755d0e34292e5b4c2fb4bca9e839b6bc8d9e6e9d0cd898b52a89345b6c027",
+    "public/counter-proof.json": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+    "public/examples/arrow.svg": "adef66586205f58694bc4a967a1c3cf167a8c82a48b487c578e486d38aa59747",
+    "public/examples/example.css": "db84023ec35931bdba6e1d798a732855b3d4892e370a47a5762f928e66b6a1ca",
+    "public/examples/library-design.json": "3956c092febd6ff4819afdfa327a1a5e1a12d622d07e0b86cbfb122ada74e04e",
+    "research/m1-acceptance/independent-replay.json": "bd72a473894add79d71a516d25e5bfdbe912444236bdc5736b1fba13065cf96e",
+    "research/m1-acceptance/live-solver-output.json": "b3936648e0a59808194c7e21a47050b69bfe1e502e6c96f7c3ee74a8d20a9d31",
+    "research/m1-acceptance/requirements.json": "6c57265b11e9eb319730e5da7cf1df1c711b1f0655c8797de16bb892c2bed330",
+    "research/m1-acceptance/run-live-solver.mjs": "f5d42a6eed7e75f1ea86dcdd37738adf598acfb48633dbb6dc9fb80722fbc90b",
+    "research/m1-acceptance/verify_live_solver.py": "b97e971991d1ea500f279592ae142e1ef65da28456c8f4e4bf902dd2f5e7c0c5",
+    "solver-acceptance.html": "9836d9d4e873c02b3aa93d4bf51da0d62a557316dbecf3bd2c03a72455ce3277",
+    "src/adapters/cubing-2x2.ts": "b1d1dec6610d75eab1943da3828dbf89e16ec0e95d1798ee0a0ae4a0b76ebf9d",
+    "src/dev/acceptance-fixture.ts": "d3630feed5964b19cae02784f2465a288096220bfa0da3aabd60280c34e16b32",
+    "src/dev/acceptance-plugin.ts": "25a42a955c2f0da8226dab165953a54387b1f87ff793e414acd38a1b4f7698a6",
+    "tests/browser/acceptance.spec.mjs": "3acf66c7751181f091e335d8a34fdb14f9bd8181aa3ffe3b2a4c5332e37cd89d",
+    "tests/library-only.test.mjs": "30027e33b319623a778ea0d2e9e9d091ec89a6822a9cb85e91144b5eb76ae05a",
+    "tests/live-solver.test.mjs": "5f5c6690e8b45b261a975a57296229374860bccdd44211c696212e7b6510e116",
+    "tests/live_solver_test.py": "6f6e1531a9d2559c81b47f5b12cbb706e1c7b2451c4bc23e313e1e838fe11051",
+    "tsconfig.json": "b86c22f5893a29326461d709ffa94cc0d964240151d87d3e325a3f99a44c6cc7",
+    "vite.config.mjs": "ddcb52942ab8fc29ed24ad65941fc8d29ed3cca3a8a88c1ec642e197024e5196"
+  }
+}

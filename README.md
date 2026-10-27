@@ -76,3 +76,12 @@ complete source state. No shortest-path claim is made. No deployment is required
 [Mobile preview](docs/assets/counter-mobile.png). These are browser screenshots,
 not print exports; their pixel dimensions and hashes are
 [recorded separately](docs/assets/counter-previews.json).
+
+## Focused M1 acceptance examples
+
+[Live existing-solver acceptance and independent library use](docs/M1_ACCEPTANCE.md)
+cover issue #21's five-point DoD. With `npm run dev`, open
+`/solver-acceptance.html` to compute fresh paths for fixed representative goals,
+or `/library-example.html` for a standalone consumer with its own image/text
+print and no counter modules. The live solver harness is development-only;
+the regular counter keeps its fast verified witness paths.
