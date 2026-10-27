@@ -1,0 +1,38 @@
+{
+  "issue": 4,
+  "status": "UNSAT",
+  "baselineCommit": "fbfb2f628b2c75936453b566d2a9a1b21ce65295",
+  "instructionsCommit": "ee670ec43ddb73f4c654e1ff5f72e65d40d50126",
+  "branch": "spike/5x5-en-de-feasibility",
+  "modelFile": "results/baseline-1900-2099/english-candidate.json",
+  "versions": {
+    "node": "v24.19.0",
+    "python": "3.12.14",
+    "solver": "none"
+  },
+  "commands": [
+    "npm run build",
+    "timeout 60 node scripts/english-baseline-1900.mjs > /tmp/english-1900-candidate.json",
+    "timeout 60 python3 scripts/verify_english_baseline_1900.py /tmp/english-1900-candidate.json > /tmp/english-1900-verification.json"
+  ],
+  "limits": {
+    "timeoutSecondsPerCommand": 60,
+    "randomSeed": "not applicable; deterministic exhaustive enumeration"
+  },
+  "exitStatuses": {
+    "generator": 0,
+    "independentChecker": 0
+  },
+  "sha256": {
+    "src/Display.res": "4bcbcd91a1ccf174641ff8b961ead66cb39045927b0863dd210d50d95d7fdcca",
+    "src/Geometry.res": "3c32a75a178a88d4a2f1dcc93055903b54f4d0cfa5129a397f22062d2499f614",
+    "scripts/english-baseline-1900.mjs": "d7c9526386514bc8efa521db1aa634ff6340c048eb8ecb30b66ce20c71097561",
+    "scripts/verify_english_baseline_1900.py": "9164c383cd44e5ba180435859c0a1b3e40249d1d751312e8386f8d97f951ae19",
+    "results/english-monochrome.json": "22be2c1815907f5850e2cd0c7088e8c5e07660410f97d57722c834a4b62700af",
+    "results/english-short-separator.json": "a5c92922379254f715a4d3a71cbce1b2984b6204e93fbc7d2cc5438f65ebd849",
+    "results/german-century-09.json": "a1df97595df3b995597737ccb06dd29e9d816ecdacb8b86c5e6744d9d0aede6d",
+    "results/baseline-1900-2099/english-candidate.json": "9cc1b30814d114e5ea87b6439082ead15606b9781e26f5c4d76da7de08942d41",
+    "results/baseline-1900-2099/english-verification.json": "000a972e38b6ffde23fd0a8a3b863ab6b8ba33f02e13bedd9b62ed59b98da56a",
+    "results/baseline-1900-2099/english-review.json": "d49534ebe1c8737b01b269e7b79f99ca259fc663a98f780461dc14960b4a5509"
+  }
+}

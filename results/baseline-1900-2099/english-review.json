@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "boundedReplayExitStatus": 0,
+  "generatorReplayByteIdentical": true,
+  "checkerReplayProofFieldsIdentical": true,
+  "negativeControls": {
+    "wrong padding": {
+      "rejected": true,
+      "reason": "Exact scope differs from issue #4"
+    },
+    "wrong bound": {
+      "rejected": true,
+      "reason": "Counting certificate differs"
+    },
+    "missing calendar exception": {
+      "rejected": true,
+      "reason": "Exception certificate differs"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "status": "UNSAT",
+  "issue": 4,
+  "model": {
+    "language": "EN",
+    "years": [
+      1900,
+      2099
+    ],
+    "calendar": "proleptic Gregorian",
+    "weekdays": [
+      "MON",
+      "TUE",
+      "WED",
+      "THU",
+      "FRI",
+      "SAT",
+      "SUN"
+    ],
+    "months": [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC"
+    ],
+    "dayPadding": "zero",
+    "hourPadding": "zero",
+    "minutePadding": "zero",
+    "yearLayout": "thousands,hundreds,blank,tens,units",
+    "row4": [
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "palette": {
+      "weekdayLetters": "weekday-black",
+      "monthLetters": "date-red",
+      "dateDigits": "date-red",
+      "yearDigits": "year-gray",
+      "timeDigits": "time-blue",
+      "colon": "date-red",
+      "wordmark": "immutable multicolor images",
+      "blank": "none"
+    },
+    "opticalRelaxation": "all rotations allowed for every glyph; no character substitutions",
+    "legalMoves": "12 noncentral single-layer quarter turns on a labeled 5x5; inverses and compositions"
+  },
+  "candidateSHA256": "9cc1b30814d114e5ea87b6439082ead15606b9781e26f5c4d76da7de08942d41",
+  "checkerSHA256": "9164c383cd44e5ba180435859c0a1b3e40249d1d751312e8386f8d97f951ae19",
+  "validDates": 73049,
+  "totalDisplays": 105190560,
+  "checkedLegalQuarterTurns": 12,
+  "checkedLabeledFacelets": 150,
+  "physicalWingCubies": 24,
+  "allGlyphRotationsAllowed": true,
+  "counting": {
+    "requiredA": 23,
+    "requiredB": 16,
+    "slackA": 1,
+    "slackB": 8,
+    "maximumLooseA": 2,
+    "minimumTightB": 7,
+    "maximumExceptionalPairs": 1
+  },
+  "contradiction": "7 > 2 + 1",
+  "scope": "No immutable English printing exists for this exact colored split-year/wordmark target model; not a universal English calendar-cube impossibility claim.",
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "solver": "none; exhaustive projection enumeration and integer counting"
+  },
+  "run": {
+    "elapsedSeconds": 0.373,
+    "maxResidentKiB": 26880
+  }
+}

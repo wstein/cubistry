@@ -1,0 +1,355 @@
+{
+  "claimedOutcome": "UNSAT",
+  "model": {
+    "language": "EN",
+    "years": [
+      1900,
+      2099
+    ],
+    "calendar": "proleptic Gregorian",
+    "weekdays": [
+      "MON",
+      "TUE",
+      "WED",
+      "THU",
+      "FRI",
+      "SAT",
+      "SUN"
+    ],
+    "months": [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC"
+    ],
+    "dayPadding": "zero",
+    "hourPadding": "zero",
+    "minutePadding": "zero",
+    "yearLayout": "thousands,hundreds,blank,tens,units",
+    "row4": [
+      " ",
+      "wordmark:left",
+      "wordmark:middle",
+      "wordmark:right",
+      " "
+    ],
+    "palette": {
+      "weekdayLetters": "weekday-black",
+      "monthLetters": "date-red",
+      "dateDigits": "date-red",
+      "yearDigits": "year-gray",
+      "timeDigits": "time-blue",
+      "colon": "date-red",
+      "wordmark": "immutable multicolor images",
+      "blank": "none"
+    },
+    "opticalRelaxation": "all rotations allowed for every glyph; no character substitutions",
+    "legalMoves": "12 noncentral single-layer quarter turns on a labeled 5x5; inverses and compositions"
+  },
+  "validDates": 73049,
+  "totalDisplays": 105190560,
+  "dateWingProjections": 234,
+  "timeWingProjections": 60,
+  "combinedWingProjections": 14040,
+  "inventory": {
+    "A": [
+      {
+        "token": [
+          -1,
+          " "
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "A"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "E"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "H"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "O"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "R"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          1,
+          "U"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "0"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "1"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "2"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "3"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "4"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          23,
+          "5"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "B"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "C"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "G"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "L"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "N"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "P"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "R"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "T"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "V"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          9,
+          "Y"
+        ],
+        "demand": 1
+      }
+    ],
+    "B": [
+      {
+        "token": [
+          -1,
+          " "
+        ],
+        "demand": 2
+      },
+      {
+        "token": [
+          21,
+          "0"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "1"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "2"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "3"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "4"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "5"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "6"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "7"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "8"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          21,
+          "9"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          5,
+          "0"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          5,
+          "1"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          5,
+          "2"
+        ],
+        "demand": 1
+      },
+      {
+        "token": [
+          5,
+          "3"
+        ],
+        "demand": 1
+      }
+    ]
+  },
+  "peakNeverCooccurs": [
+    [
+      [
+        9,
+        "B"
+      ],
+      [
+        5,
+        "3"
+      ]
+    ]
+  ],
+  "counting": {
+    "requiredA": 23,
+    "requiredB": 16,
+    "slackA": 1,
+    "slackB": 8,
+    "maximumLooseA": 2,
+    "minimumTightB": 7,
+    "maximumExceptionalPairs": 1
+  }
+}
