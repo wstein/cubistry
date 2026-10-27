@@ -1,10 +1,10 @@
 import * as D from '../src/Display.res.mjs';
 import {counts,requirements,wingRoles} from './experiment.mjs';
 
-export function wingTargets(language,dayPadding='zero') {
+export function wingTargets(language,dayPadding='zero',separatorStyle='five') {
   const dates=new Set(),times=new Set();
   for(let ms=Date.UTC(2020,0,1);ms<Date.UTC(2050,0,1);ms+=86400000) {
-    const d=new Date(ms),f=[...D.rowsWithDayPadding(language,(d.getUTCDay()+6)%7,d.getUTCDate(),d.getUTCMonth(),d.getUTCFullYear(),0,dayPadding==='space').join('')];
+    const d=new Date(ms),f=[...D.rowsWithFormat(language,(d.getUTCDay()+6)%7,d.getUTCDate(),d.getUTCMonth(),d.getUTCFullYear(),0,dayPadding==='space',false,separatorStyle==='three').join('')];
     dates.add([1,9,15,3,5,19].map(i=>f[i]).join(''));
   }
   for(let minute=0;minute<1440;minute++) {

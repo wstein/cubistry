@@ -6,17 +6,33 @@ let monthsEN = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "
 
 let two = n => (n < 10 ? "0" : "") ++ Int.toString(n)
 
-let rowsWithDayPadding = (language, weekday, day, month, year, minute, spacePadDay) => {
+let rowsWithFormat = (
+  language,
+  weekday,
+  day,
+  month,
+  year,
+  minute,
+  spacePadDay,
+  spacePadHour,
+  shortSeparator,
+) => {
   let weekdays = language == "DE" ? weekdaysDE : weekdaysEN
   let months = language == "DE" ? monthsDE : monthsEN
   [
     weekdays->Array.getUnsafe(weekday) ++ "  ",
-    (spacePadDay && day < 10 ? " " ++ Int.toString(day) : two(day)) ++ months->Array.getUnsafe(month),
+    (spacePadDay && day < 10 ? " " ++ Int.toString(day) : two(day)) ++
+    months->Array.getUnsafe(month),
     " " ++ Int.toString(year),
-    "─────",
-    two(minute / 60) ++ ":" ++ two(mod(minute, 60)),
+    shortSeparator ? " ─── " : "─────",
+    (spacePadHour && minute / 60 < 10 ? " " ++ Int.toString(minute / 60) : two(minute / 60)) ++
+    ":" ++
+    two(mod(minute, 60)),
   ]
 }
+
+let rowsWithDayPadding = (language, weekday, day, month, year, minute, spacePadDay) =>
+  rowsWithFormat(language, weekday, day, month, year, minute, spacePadDay, false, false)
 
 // Preserve the original zero-padded specification for existing experiments.
 let rows = (language, weekday, day, month, year, minute) =>

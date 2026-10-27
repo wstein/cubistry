@@ -62,21 +62,22 @@ SLOTS={'corners':(0,4,20,24),'middleEdges':(2,10,14,22),
        'wings':(1,9,15,23,3,5,19,21),'axialCenters':(7,11,13,17),'diagonalCenters':(6,8,16,18)}
 
 
-def target_projections(day_padding='zero'):
-    require(day_padding in ('zero','space'),'Unknown day padding')
+def target_projections(day_padding='zero',hour_padding='zero',separator_style='five'):
+    require(day_padding in ('zero','space') and hour_padding in ('zero','space') and separator_style in ('five','three'),'Unknown display format')
     dates={k:set() for k in SLOTS}
     times={k:set() for k in SLOTS}
     day=dt.date(2020,1,1)
     weekdays='MON DIE MIT DON FRE SAM SON'.split()
     months='JAN FEB MÄR APR MAI JUN JUL AUG SEP OKT NOV DEZ'.split()
     while day<dt.date(2050,1,1):
-        text=weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+' '+str(day.year)+'─────'
+        text=weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+' '+str(day.year)+(' ─── ' if separator_style=='three' else '─────')
         require(text[12]=='0','Front fixed center must be zero')
         for k,positions in SLOTS.items():
             dates[k].add(tuple(text[i] for i in positions if i<20))
         day+=dt.timedelta(days=1)
     for minute in range(1440):
-        text=f'{minute//60:02}:{minute%60:02}'
+        hour=f'{minute//60:2}' if hour_padding=='space' else f'{minute//60:02}'
+        text=hour+f':{minute%60:02}'
         for k,positions in SLOTS.items():
             times[k].add(tuple(text[i-20] for i in positions if i>=20))
     result={}
@@ -123,10 +124,14 @@ def verify_design_and_group(report, *, reuse_group=False):
     # No two slots may select stickers of the same physical cubie.
     allowed=report.get('matchingQuarterTurns',report['glyphModel']['quarterTurns'])
     require(all(set(q)<=set(report['glyphModel']['quarterTurns'][c]) for c,q in allowed.items()),'Matching cannot admit an optically invalid orientation')
+    ignored=set(report.get('ignoredStickerIds',[]))
+    require(ignored<=set(range(150)) and fixed['id'] not in ignored,'Invalid supposedly unused printing positions')
     candidates={}
     for p,stickers in by_piece.items():
         for s in stickers:
             n,up=tuple(s['normal']),tuple(s['up'])
+            if s['id'] in ignored:
+                continue
             if piece_class(p)=='fixedCenters':
                 continue
             destinations=collections.defaultdict(set)
@@ -144,7 +149,7 @@ def verify_design_and_group(report, *, reuse_group=False):
             # its source and destination facelets; the 150-point action loses
             # no extra glyph-spin variable.
             require(all(len(t)==1 for t in destinations.values()),'Unmodeled nonfixed sticker spin')
-    targets=target_projections(report.get('dayPadding','zero'))
+    targets=target_projections(report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'))
     checked={}
     for k,patterns in targets.items():
         for target in patterns:

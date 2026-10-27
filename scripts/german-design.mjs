@@ -3,14 +3,14 @@ import * as D from '../src/Display.res.mjs';
 import {chirality} from './experiment.mjs';
 
 export const frontSlots={corners:[0,4,20,24],middleEdges:[2,10,14,22],axialCenters:[7,11,13,17],diagonalCenters:[6,8,16,18],wings:[1,9,15,23,3,5,19,21]};
-export function projectedTargets(pieceClass) {
+export function projectedTargets(pieceClass,format={}) {
   const slots=frontSlots[pieceClass],date=new Set(),time=new Set();
   for(let ms=Date.UTC(2020,0,1);ms<Date.UTC(2050,0,1);ms+=86400000) {
-    const d=new Date(ms), f=[...D.rows('DE',(d.getUTCDay()+6)%7,d.getUTCDate(),d.getUTCMonth(),d.getUTCFullYear(),0).join('')];
+    const d=new Date(ms), f=[...D.rowsWithFormat('DE',(d.getUTCDay()+6)%7,d.getUTCDate(),d.getUTCMonth(),d.getUTCFullYear(),0,format.dayPadding==='space',format.hourPadding==='space',format.separatorStyle==='three').join('')];
     date.add(slots.filter(i=>i<20).map(i=>f[i]).join(''));
   }
   for(let minute=0;minute<1440;minute++) {
-    const f=[...D.rows('DE',0,1,0,2020,minute)[4]];
+    const f=[...D.rowsWithFormat('DE',0,1,0,2020,minute,format.dayPadding==='space',format.hourPadding==='space',format.separatorStyle==='three')[4]];
     time.add(slots.filter(i=>i>=20).map(i=>f[i-20]).join(''));
   }
   // Keep tuple order according to slots even if time/date slots interleave.
@@ -33,8 +33,8 @@ export function matchPieces(pieces,target) {
   };
   return dfs(0)?solution:null;
 }
-function pack(pieceClass,width,n) {
-  const targets=projectedTargets(pieceClass);
+export function pack(pieceClass,width,n,format={}) {
+  const targets=projectedTargets(pieceClass,format);
   const domain=[...new Set(targets.flat().map(tokenKey))].sort().map(JSON.parse);
   const inventory=domain.map(([slot,symbol])=>({symbol,slots:[slot]}));
   let seed=26052020;

@@ -170,3 +170,45 @@ test('English space-day impossibility is recalculated with two blanks instead of
   assert.equal(r.contradiction,true);
   assert.equal(peakProof('EN','zero').requiredB['0'],2);
 });
+
+test('hour padding and trimmed separator retain five columns and all minute digits', () => {
+  const rows=minute=>D.rowsWithFormat('DE',5,3,9,2026,minute,true,true,true);
+  assert.deepEqual(rows(9*60+33),['SAM  ',' 3OKT',' 2026',' ─── ',' 9:33']);
+  assert.equal(rows(0)[4],' 0:00');
+  assert.equal(rows(9*60+3)[4],' 9:03');
+  assert.equal(rows(10*60)[4],'10:00');
+  assert.equal(rows(23*60+59)[4],'23:59');
+  assert.equal(D.rowsWithFormat('DE',5,3,9,2026,9*60+33,true,false,true)[4],'09:33');
+  assert.equal(D.rowsWithFormat('DE',5,3,9,2026,9*60+33,true,true,false)[3],'─────');
+  for(let minute=0;minute<1440;minute++)for(const row of rows(minute))assert.equal([...row].length,5);
+});
+
+test('short separator replaces wing printing with blanks and preserves the three center dashes', async () => {
+  const {constructGerman}=await import('../scripts/german-design.mjs');
+  const {constructSpaceDay}=await import('../scripts/space-day.mjs');
+  const {constructCompact}=await import('../scripts/compact-formats.mjs');
+  const source=constructSpaceDay({design:constructGerman(),conventions:{}});
+  const before=JSON.stringify(source);
+  const candidate=constructCompact(source,{hourPadding:'space',separatorStyle:'three'});
+  assert.equal(JSON.stringify(source),before);
+  assert.equal(candidate.status,'UNKNOWN');
+  const old=source.design.stickers;
+  const wings=old.filter(s=>G.orbit(s.position)==='wings'&&s.symbol==='─');
+  assert.equal(wings.length,4);
+  for(const s of wings){assert.equal(candidate.design.stickers[s.id].symbol,' ');assert.equal(candidate.design.stickers[s.id].ink,'none');}
+  const centers=old.filter(s=>G.orbit(s.position)!=='wings'&&s.symbol==='─');
+  assert.equal(centers.length,3);
+  for(const s of centers)assert.equal(candidate.design.stickers[s.id].symbol,'─');
+  assert.notEqual(candidate.palette.dateDigits,candidate.palette.timeDigits);
+});
+
+test('trimmed-separator English proof recomputes blank multiplicity and paired-wing demand', async () => {
+  const {compactEnglishProof,fields,finePalette}=await import('../scripts/compact-formats.mjs');
+  const p=compactEnglishProof();
+  assert.equal(p.required.A['[-1," "]'],1);
+  assert.equal(p.required.B['[-1," "]'],3);
+  assert.equal(p.counting.minimumTightB,6);
+  assert.equal(p.counting.maximumLooseA+p.counting.maximumExceptionalPairs,3);
+  assert.equal(p.counting.contradiction,true);
+  assert.equal(new Set(fields.map(f=>finePalette[f])).size,7);
+});

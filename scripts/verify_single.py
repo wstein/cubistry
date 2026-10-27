@@ -29,7 +29,7 @@ POOLED = {'corners':(0,4,20,24), 'wings':(1,3,5,9,15,19,21,23),
 CAPACITIES = dict(corners=24, wings=48, middleEdges=24, axialCenters=24, diagonalCenters=24, fixedCenters=1)
 
 
-def independent_requirements(language,day_padding='zero'):
+def independent_requirements(language,day_padding='zero',hour_padding='zero',separator_style='five'):
     weekdays, months = LOCALES[language]
     domains = {k:set() for k in SLOTS}
     date_domains = {k:set() for k in SLOTS}
@@ -59,11 +59,12 @@ def independent_requirements(language,day_padding='zero'):
     day = dt.date(2020,1,1)
     dates = 0
     while day < dt.date(2050,1,1):
-        record(weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+' '+str(day.year)+'─────',False)
+        record(weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+' '+str(day.year)+(' ─── ' if separator_style=='three' else '─────'),False)
         day += dt.timedelta(days=1)
         dates += 1
     for minute in range(1440):
-        record(f'{minute//60:02}:{minute%60:02}',True)
+        hour=f'{minute//60:2}' if hour_padding=='space' else f'{minute//60:02}'
+        record(hour+f':{minute%60:02}',True)
     cooccurs.update(itertools.product(date_domains['positive'], time_domains['negative']))
     cooccurs.update(itertools.product(time_domains['positive'], date_domains['negative']))
     all_pairs = set(itertools.product(domains['positive'], domains['negative']))
@@ -141,7 +142,7 @@ def check_upright_role_invariant():
 
 
 def check_peak_proof(report):
-    data=independent_requirements(report['language'],report.get('dayPadding','zero'))
+    data=independent_requirements(report['language'],report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'))
     A,B=data['inventory']['positive'],data['inventory']['negative']
     pairs=set()
     targets=0
@@ -178,6 +179,7 @@ if __name__=='__main__':
     parser.add_argument('--certify',action='store_true')
     parser.add_argument('--palettes',action='store_true')
     parser.add_argument('--space-day',action='store_true')
+    parser.add_argument('--compact-formats',action='store_true')
     parser.add_argument('--language',choices=['EN','DE'])
     args=parser.parse_args()
     check_upright_role_invariant()
@@ -215,3 +217,8 @@ if __name__=='__main__':
         require(args.language!='EN','Space-day verification requires the freshly checked German legal group')
         from verify_space_day import verify_space_day
         verify_space_day(certify=args.certify)
+
+    if args.compact_formats:
+        require(args.language!='EN' and args.space_day,'Compact verification requires the freshly checked German day-space baseline')
+        from verify_compact import verify_compact
+        verify_compact(certify=args.certify)
