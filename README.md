@@ -7,6 +7,14 @@ A browser-first engine for twisty-puzzle artwork and display states.
 Can one immutable sticker printing on a physical 5×5×5 display every valid
 2020–2049 calendar date and every minute in both German and English?
 
+**Current research baseline: 1900–2099.** [English is independently verified
+UNSAT](docs/ENGLISH_BASELINE_1900.md) for the exact colored split-year/wordmark
+model; [German is independently verified SAT](docs/GERMAN_BASELINE_1900.md)
+using the existing two-hundreds printing unchanged. Reproduce with
+`npm run verify:baselines` after activating the pinned Python environment.
+The bilingual investigation remains deferred. Earlier wider-century results
+below are preserved research evidence, not an expansion of this baseline.
+
 **Historical-year layout:** with the year split as `19·89` / `20·26`
 (the dot is an unprinted fixed center), one printing supports thousands blank/1/2
 and hundreds **0,9,8,7**. Two further candidates support an additional **6**

@@ -22,7 +22,10 @@
     "experiment:wordmark": "npm run build && node scripts/single-language.mjs && node scripts/space-day.mjs && node scripts/compact-formats.mjs && node scripts/wordmark.mjs && python3 scripts/verify_single.py --certify --language DE --space-day --compact-formats --wordmark",
     "experiment:zero-day-wordmark": "npm run build && node scripts/zero-day-wordmark.mjs && python3 scripts/verify_zero_day_wordmark.py --certify",
     "experiment:years": "python3 scripts/extend-years.py",
-    "experiment:centuries": "npm run build && python3 scripts/split-century.py"
+    "experiment:centuries": "npm run build && python3 scripts/split-century.py",
+    "verify:baseline-en": "python3 scripts/verify_english_baseline_1900.py results/baseline-1900-2099/english-candidate.json",
+    "verify:baseline-de": "python3 scripts/verify_german_baseline_1900.py",
+    "verify:baselines": "npm run verify:baseline-en && npm run verify:baseline-de"
   },
   "devDependencies": {
     "rescript": "12.3.1"

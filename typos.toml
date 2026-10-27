@@ -1,0 +1,28 @@
+# US English for documentation and source identifiers.
+[default]
+locale = "en-us"
+
+[files]
+extend-exclude = [
+  ".git/**",
+  "node_modules/**",
+  "dist/**",
+  "build/**",
+  "coverage/**",
+  "results/**",
+  "**/*.lock",
+  "**/*.svg",
+  "**/*.png",
+  "**/*.jpg",
+  "**/*.pdf"
+]
+
+[default.extend-words]
+# Project-specific terms, not blanket spelling suppressions.
+Chronocube = "Chronocube"
+Cubistry = "Cubistry"
+cubie = "cubie"
+cubies = "cubies"
+Zettel = "Zettel"
+# Required German Friday abbreviation in independently checked calendar data.
+FRE = "FRE"

@@ -1,0 +1,36 @@
+{
+  "issue": 5,
+  "status": "SAT",
+  "sourceWitnessCommit": "fbfb2f628b2c75936453b566d2a9a1b21ce65295",
+  "executionBaseCommit": "e70ca464a5be1d69d009e471c123f2dce40c1df5",
+  "instructionsCommit": "ee670ec43ddb73f4c654e1ff5f72e65d40d50126",
+  "branch": "spike/5x5-en-de-feasibility",
+  "years": [
+    1900,
+    2099
+  ],
+  "sourceWitness": "results/german-century-09.json",
+  "sourcePrintPlan": "results/german-century-09-printing.csv",
+  "physicalPrintingChanges": 0,
+  "sourceAlternative": "two hundreds classes, original 21/24 axial-center construction; no 24/24 alternative",
+  "versions": {
+    "python": "3.12.14",
+    "sympy": "1.14.0",
+    "node": "v24.19.0"
+  },
+  "command": "timeout 180 .venv/bin/python scripts/verify_german_baseline_1900.py > results/baseline-1900-2099/german-verification.json 2> results/baseline-1900-2099/german-verifier.log",
+  "limits": {
+    "timeoutSeconds": 180,
+    "randomSeed": "not applicable; deterministic target enumeration and exact finite-group algorithms"
+  },
+  "exitStatus": 0,
+  "sha256": {
+    "results/german-century-09.json": "a1df97595df3b995597737ccb06dd29e9d816ecdacb8b86c5e6744d9d0aede6d",
+    "results/german-century-09-printing.csv": "377afebd397d59bcec4ea0cddd2ae769692c159a98868b6ebb2211a0169f52c7",
+    "scripts/verify_german_baseline_1900.py": "2783894be1f44f4b7249e560822db6dbbe8a31801bed60ac36f1fbd39bbf140a",
+    "scripts/verify_german.py": "11ae619bbdf6edaabd90d888cbebd17d69f79dcf5472131e2f87501585eeabf3",
+    "requirements-verifier.txt": "ebe68ea57bb5e4d1015e008f86f82b786308d7666f0a9059079d1e41aaeb95e7",
+    "results/baseline-1900-2099/german-verification.json": "cb43a609a3c4605fae11b123731c2c4343480153cd5a1dc610e0b5dabb90f60b",
+    "results/baseline-1900-2099/german-verifier.log": "722d54db139850cc06449413db56745268e1e234822292d7d54853c83c955c1d"
+  }
+}

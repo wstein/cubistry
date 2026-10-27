@@ -102,7 +102,7 @@ def target_projections(day_padding='zero',hour_padding='zero',separator_style='f
     return result
 
 
-def verify_design_and_group(report, *, reuse_group=False):
+def verify_design_and_group(report, *, reuse_group=False, target_patterns=None):
     global _GROUP_CERTIFICATE
     require(sympy.__version__=='1.14.0','Install pinned requirements-verifier.txt')
     start=time.monotonic()
@@ -163,7 +163,11 @@ def verify_design_and_group(report, *, reuse_group=False):
             # its source and destination facelets; the 150-point action loses
             # no extra glyph-spin variable.
             require(all(len(t)==1 for t in destinations.values()),'Unmodeled nonfixed sticker spin')
-    targets=target_projections(report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'),report.get('row4Artwork'),report.get('yearRange',(2020,2049)),report.get('yearFields'))
+    targets=(target_projections(report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'),report.get('row4Artwork'),report.get('yearRange',(2020,2049)),report.get('yearFields'))
+             if target_patterns is None else target_patterns)
+    require(set(targets)==set(SLOTS),'Every moving cubie class needs target coverage')
+    for klass,patterns in targets.items():
+        require(patterns and all(tuple(slot for slot,_ in target)==SLOTS[klass] for target in patterns),'Target projection positions must match the physical front')
     checked={}
     for k,patterns in targets.items():
         for target in patterns:
