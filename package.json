@@ -1,0 +1,16 @@
+{
+  "name": "cubistry-feasibility-spike",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "engines": {"node": ">=22", "npm": ">=10"},
+  "scripts": {
+    "build": "rescript",
+    "experiment": "npm run build && node scripts/experiment.mjs",
+    "verify": "python3 scripts/verify.py",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "check": "npm test && npm run experiment && npm run verify"
+  },
+  "devDependencies": {"rescript": "12.3.1"}
+}
