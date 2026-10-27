@@ -177,7 +177,7 @@ npm ci --cache /tmp/cubistry-npm-cache --ignore-scripts
 npm run check
 ```
 
-`npm run check` compiles ReScript, runs 17 focused Node regression tests,
+`npm run check` compiles ReScript, runs 18 focused Node regression tests,
 regenerates `results/feasibility.json`, and executes `scripts/verify.py`.
 The combined check takes seconds; the full single-language group verification
 takes approximately 30 seconds. No service, credential, numerical solver,

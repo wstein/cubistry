@@ -254,7 +254,7 @@ npm ci --cache /tmp/cubistry-npm-cache --ignore-scripts
 npm run check
 ```
 
-`npm run check` runs 17 focused regression tests, regenerates all results,
+`npm run check` runs 18 focused regression tests, regenerates all results,
 independently verifies EN then DE, and rechecks the original combined proof.
 The full exact group calculation takes approximately 30 seconds on the current
 machine. `npm run verify` rechecks the saved certificates independently.

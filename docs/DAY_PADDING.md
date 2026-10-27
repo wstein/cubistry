@@ -126,5 +126,5 @@ npm run experiment:space-day
 
 The German candidate starts UNKNOWN. Only successful independent colored
 matching and common legal completion write SAT. `npm run check` also checks
-all previous modes, palette variants, print angles, and 17 regression tests.
+all previous modes, palette variants, print angles, and 18 regression tests.
 `npm run verify` validates saved results without replacing them.

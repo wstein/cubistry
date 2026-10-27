@@ -163,7 +163,7 @@ Use the installation commands in [README.md](../README.md), then:
 npm run check
 ```
 
-This runs 17 focused tests, rebuilds all certificates, independently verifies
+This runs 18 focused tests, rebuilds all certificates, independently verifies
 both current colored cases and the original combined impossibility, and checks
 the preserved one-color references (including the approximately 30-second
 exact group calculation). To check only the current color counting after

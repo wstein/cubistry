@@ -188,7 +188,7 @@ This regenerates palette candidates, independently certifies the unchanged
 physical group, checks all successful fixed colorings, verifies all impossibility
 arguments and rotation records, and writes final statuses. Successful candidates
 start as UNKNOWN until those checks complete. The full `npm run check` also
-runs 17 focused regression tests and preserves previous EN/DE/reference results.
+runs 18 focused regression tests and preserves previous EN/DE/reference results.
 `npm run verify` checks saved certificates rather than replacing them.
 
 This investigation changes color constraints as requested. It does not change

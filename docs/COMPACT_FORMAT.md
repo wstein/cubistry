@@ -1,5 +1,8 @@
 # Four-format result matrix and proof review
 
+The later [wordmark extension](WORDMARK.md) independently certifies the preferred
+German layout with three upright full-image center fragments, retaining 22 reserves.
+
 All four rows below use **space-padded single-digit dates**, e.g. ` 3OKT`,
 not `03OKT`. Days 10–31 remain two digits. The original ink categories remain:
 weekday dark, day/month red, year gray, separator gray, time digits blue,
@@ -231,7 +234,7 @@ npm run experiment:compact
 ```
 
 This rebuilds candidates and independently certifies the baseline and all three
-new combinations. `npm run check` includes all prior experiments and 17 focused
+new combinations. `npm run check` includes all prior experiments and 18 focused
 regressions. `npm run verify` verifies saved results without replacing them.
 One fresh legal-group calculation is reused in that same process for unchanged
 geometry, while every color/format/reserve matching is checked anew.

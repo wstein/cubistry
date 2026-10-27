@@ -180,6 +180,7 @@ if __name__=='__main__':
     parser.add_argument('--palettes',action='store_true')
     parser.add_argument('--space-day',action='store_true')
     parser.add_argument('--compact-formats',action='store_true')
+    parser.add_argument('--wordmark',action='store_true')
     parser.add_argument('--language',choices=['EN','DE'])
     args=parser.parse_args()
     check_upright_role_invariant()
@@ -222,3 +223,8 @@ if __name__=='__main__':
         require(args.language!='EN' and args.space_day,'Compact verification requires the freshly checked German day-space baseline')
         from verify_compact import verify_compact
         verify_compact(certify=args.certify)
+
+    if args.wordmark:
+        require(args.language!='EN' and args.compact_formats,'Branding requires fresh preferred-format and legal-group verification')
+        from verify_wordmark import verify_wordmark
+        verify_wordmark(certify=args.certify)

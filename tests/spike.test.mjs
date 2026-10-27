@@ -212,3 +212,20 @@ test('trimmed-separator English proof recomputes blank multiplicity and paired-w
   assert.equal(p.counting.contradiction,true);
   assert.equal(new Set(fields.map(f=>finePalette[f])).size,7);
 });
+
+test('wordmark candidate fixes three distinct oriented center images without changing other printing', async () => {
+  const {readFileSync}=await import('node:fs');
+  const {constructWordmark}=await import('../scripts/wordmark.mjs');
+  const source=JSON.parse(readFileSync(new URL('../results/german-short-separator.json',import.meta.url),'utf8'));
+  const before=JSON.stringify(source);
+  const r=constructWordmark(source);
+  assert.equal(JSON.stringify(source),before);
+  assert.equal(r.status,'UNKNOWN'); // branding must be independently certified
+  assert.deepEqual(r.row4Artwork,['wordmark:left','wordmark:middle','wordmark:right']);
+  assert.equal(r.wordmark.fragmentStickers.length,3);
+  assert.deepEqual(r.wordmark.fragmentStickers.map(s=>s.pieceClass).sort(),['axialCenters','diagonalCenters','diagonalCenters']);
+  const changed=r.design.stickers.filter((s,i)=>s.symbol!==source.design.stickers[i].symbol);
+  assert.equal(changed.length,3);
+  for(const s of changed){assert.deepEqual(r.glyphModel.quarterTurns[s.symbol],[0]);assert.deepEqual(s.up,source.design.stickers[s.id].up);}
+  assert.equal(new Set(changed.map(s=>s.position.join(','))).size,3);
+});

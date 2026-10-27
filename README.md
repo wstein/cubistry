@@ -7,6 +7,12 @@ A browser-first engine for twisty-puzzle artwork and display states.
 Can one immutable sticker printing on a physical 5×5×5 display every valid
 2020–2049 calendar date and every minute in both German and English?
 
+**Branding extension:** the preferred German design also remains SAT with
+three distinct upright wordmark image fragments across row 4's interior centers.
+Outer cells stay blank, original calendar/time colors and 22 verified reserve
+printing positions are retained. See [WORDMARK.md](docs/WORDMARK.md) for the
+new proof, full printing plan, orientation requirements, and artwork scope.
+
 **Latest result: with space-padded dates (` 3OKT`), all four hour/separator
 combinations are SAT for German with the original separate row colors.**
 

@@ -62,8 +62,10 @@ SLOTS={'corners':(0,4,20,24),'middleEdges':(2,10,14,22),
        'wings':(1,9,15,23,3,5,19,21),'axialCenters':(7,11,13,17),'diagonalCenters':(6,8,16,18)}
 
 
-def target_projections(day_padding='zero',hour_padding='zero',separator_style='five'):
+def target_projections(day_padding='zero',hour_padding='zero',separator_style='five',row4_artwork=None):
     require(day_padding in ('zero','space') and hour_padding in ('zero','space') and separator_style in ('five','three'),'Unknown display format')
+    if row4_artwork is not None:
+        require(separator_style=='three' and isinstance(row4_artwork,list) and len(row4_artwork)==3 and len(set(row4_artwork))==3 and all(isinstance(v,str) and v for v in row4_artwork),'Artwork must be three distinct immutable images with blank outer positions')
     dates={k:set() for k in SLOTS}
     times={k:set() for k in SLOTS}
     day=dt.date(2020,1,1)
@@ -85,7 +87,10 @@ def target_projections(day_padding='zero',hour_padding='zero',separator_style='f
         result[k]=[]
         for d,t in itertools.product(dates[k],times[k]):
             di,ti=iter(d),iter(t)
-            result[k].append(tuple(zip(positions,(next(di) if i<20 else next(ti) for i in positions))))
+            target=tuple(zip(positions,(next(di) if i<20 else next(ti) for i in positions)))
+            if row4_artwork is not None:
+                target=tuple((slot,row4_artwork[slot-16] if 16<=slot<=18 else char) for slot,char in target)
+            result[k].append(target)
     return result
 
 
@@ -149,7 +154,7 @@ def verify_design_and_group(report, *, reuse_group=False):
             # its source and destination facelets; the 150-point action loses
             # no extra glyph-spin variable.
             require(all(len(t)==1 for t in destinations.values()),'Unmodeled nonfixed sticker spin')
-    targets=target_projections(report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'))
+    targets=target_projections(report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'),report.get('row4Artwork'))
     checked={}
     for k,patterns in targets.items():
         for target in patterns:
