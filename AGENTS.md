@@ -34,3 +34,9 @@ Skill instructions are task-specific and do not override accepted project ADRs o
 - `spike/5x5-en-de-feasibility` is a long-lived protected research branch: never delete it, force-push it, or retarget research into `main` without a separate approved PR. Ordinary non-force research commits are permitted.
 - For concurrent agents, use separate branches and worktrees, and never clean up a worktree owned by another active agent. `git fetch --prune` does **not** delete local branches or active worktrees.
 - Follow [CONTRIBUTING.md](CONTRIBUTING.md) for review and safe local cleanup.
+
+## Language and documentation quality
+- Write all project documentation, code comments, identifier prose, PR descriptions, and contributor-facing text in **US English (`en-US`)**. Preserve externally specified names, legal notices, quotations and data formats when required.
+- Prefer US spellings (for example, `color`, `center`, `behavior`) over British variants.
+- Run repository spelling and link checks on changed documentation before submitting a PR. Maintain narrowly scoped dictionary exceptions for domain terms; do not globally disable checks for convenience.
+- Treat broken repository-relative links as blockers. Investigate external link failures separately because upstream sites can be transient or block CI.
