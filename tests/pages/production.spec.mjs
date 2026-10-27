@@ -73,7 +73,7 @@ test("built Pages counter resolves immutable assets under project base and rende
   ).toBeVisible();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  for (const value of [42, 7, 99]) {
+  for (const value of [42, 43, 7, 99]) {
     await page.locator("#value").fill(String(value));
     await page.locator("#jump-form button").click();
     await expect(page.locator("#cube")).toHaveAttribute(
@@ -85,6 +85,8 @@ test("built Pages counter resolves immutable assets under project base and rende
       "data-state",
       "completed",
     );
+    if (value === 43)
+      await expect(page.locator("#move-progress")).toHaveText("10 / 10 moves");
     const image = PNG.sync.read(
       await page.locator("#cube canvas").screenshot(),
     );
@@ -105,6 +107,13 @@ test("built Pages counter resolves immutable assets under project base and rende
   expect(requests.some((p) => p.endsWith(".woff2"))).toBe(true);
   expect(requests.some((p) => p.endsWith(".js"))).toBe(true);
   expect(requests.some((p) => p.endsWith(".css"))).toBe(true);
+  expect(requests.filter((p) => p.endsWith(".bin"))).toHaveLength(1);
+  const source = await page.request.get("./licenses/puzlwerk/source.json");
+  expect(source.ok()).toBe(true);
+  expect((await source.json()).commit).toBe(JSON.parse(await readFile("puzlwerk-source.json", "utf8")).commit);
+  const license = await page.request.get("./licenses/puzlwerk/COPYING");
+  expect(license.ok()).toBe(true);
+  expect(await license.text()).toContain("GNU AFFERO GENERAL PUBLIC LICENSE");
   expect(failures).toEqual([]);
   expect(errors).toEqual([]);
   await page.screenshot({

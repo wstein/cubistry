@@ -1,13 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { readFileSync } from "node:fs";
-const design = JSON.parse(
-    readFileSync(
-      new URL("../../public/counter-design.v2.json", import.meta.url),
-    ),
-  ),
-  tokens = (s) => (s.trim() ? s.trim().split(/\s+/).length : 0),
-  total = (a, b) =>
-    tokens(design.witnesses[a].word) + tokens(design.witnesses[b].word);
+import { expectedHtm as total } from "../helpers/shared-solver.mjs";
 async function ready(page) {
   await page.goto("/");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
