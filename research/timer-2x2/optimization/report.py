@@ -39,7 +39,7 @@ def export(run):
         rows.append(dict(fromDisplay=label(tick-1),toDisplay=label(tick),increment=word,decrement=inverse(word),
                          HTM=len(word.split()),QTM=sum(2 if t.endswith('2') else 1 for t in word.split()),category=kind))
     with (HERE/f'{tag}-transitions.csv').open('w') as f:
-        writer=csv.DictWriter(f,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
+        writer=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator="\n");writer.writeheader();writer.writerows(rows)
     sticker_rows=[];svg=['<svg xmlns="http://www.w3.org/2000/svg" width="196mm" height="162mm" viewBox="0 0 196 162">',
        f'<title>{tag} timer fixed-print net: 20 mm stickers</title>',
        f'<text x="6" y="7" font-size="4">{tag}: source-state net, outward views; print at 100%</text>']
@@ -64,7 +64,7 @@ def export(run):
                 '<text x="30" y="158" font-size="3">20 mm calibration; asymmetric marker defines upright.</text></svg>'])
     (HERE/f'{tag}-print.svg').write_text('\n'.join(svg)+'\n')
     with (HERE/f'{tag}-stickers.csv').open('w') as f:
-        writer=csv.DictWriter(f,fieldnames=list(sticker_rows[0]));writer.writeheader();writer.writerows(sorted(sticker_rows,key=lambda r:r['sticker']))
+        writer=csv.DictWriter(f,fieldnames=list(sticker_rows[0]),lineterminator="\n");writer.writeheader();writer.writerows(sorted(sticker_rows,key=lambda r:r['sticker']))
     setup=next(s for s in SETUPS['runs'] if s['ticks']==run['ticks'])
     stats=dict(tag=tag,displays=run['ticks'],HTM=metrics([r['HTM'] for r in rows]),QTM=metrics([r['QTM'] for r in rows]),
                categories={kind:metrics([r['HTM'] for r in rows if r['category']==kind]) for kind in sorted({r['category'] for r in rows})},
