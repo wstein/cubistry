@@ -56,7 +56,7 @@ checks both fixed prints, all 100 displayed values, and a negative control that
 rotates an actual title sticker. Every goal word and inverse returns to the
 same complete source state. Thus `inverse(word[A]) + word[B]` is legal for
 **all 10,000 ordered transitions**, including A=B. Eight hundred sequential
-transitions are additionally replayed without resetting state. No claim of
+transitions per numeric format are additionally replayed without resetting state. No claim of
 shortest paths to a display or shortest arbitrary transitions is made.
 
 The stronger fixed-cubie condition is impossible independently of solver choice:
@@ -75,8 +75,8 @@ node research/counter/generate.mjs
 python3 research/counter/verify.py
 ```
 
-The committed [independent result](../research/counter/verification.json) and
-[manifest](../research/counter/manifest.json) record hashes and versions. No
+The committed [independent result](../research/counter/verification-v2.json) and
+[manifest](../research/counter/manifest-v2.json) record hashes and versions. No
 traditional cube colors are assumed: these are actual immutable custom images.
 Glyph recognition is symbolic here; the browser renderer must preserve the
 same source frames and use the same move replayer. Title artwork is instantiated
