@@ -2,10 +2,10 @@
 
 Tracks [Cubistry #23](https://github.com/wstein/cubistry/issues/23) and
 [PuzlWerk #5](https://github.com/wstein/puzlwerk/issues/5). The solver implementation
-was accepted in provider PR #13. Its lowercase package naming is in ongoing
-[provider #14](https://github.com/wstein/puzlwerk/pull/14); this consumer PR is stacked
-on [Cubistry #29](https://github.com/wstein/cubistry/pull/29). Neither rename branch
-is modified by the integration. Merge dependencies require human acceptance first.
+was accepted in provider PR #13. Its lowercase package naming was accepted in
+[provider #14](https://github.com/wstein/puzlwerk/pull/14); this consumer starts from main after merged
+[Cubistry #29](https://github.com/wstein/cubistry/pull/29). Neither rename branch
+is modified by the integration; this consumer remains a separate Draft PR.
 
 ## Reproducible dependency, without publication or vendoring
 
@@ -36,10 +36,10 @@ artifact can be reused. Provider compiler/runtime dependencies stay pinned in th
 provider lock. Existing consumer dependency versions and `@cubistry/*` names remain
 unchanged; only the shared solver dependency is added.
 
-The current pin comes from provider rename PR #14. It does not claim #14 is merged
-or a released API distribution. Before human acceptance of this consumer, coordinate
-#14/#29 and repin to their accepted immutable provider revision if rebase changes
-that identity. Never silently follow a mutable branch name or use another scope.
+The pin is the accepted provider main revision after merged #14; #29 is also
+merged in the consumer base. This is still not a registry release. The reviewed
+provider tree produces the same verified package bytes as its pre-merge source.
+Never silently follow a mutable branch name or use another scope.
 
 ## Physical contract and HTM
 

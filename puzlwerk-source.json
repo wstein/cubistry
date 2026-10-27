@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/wstein/puzlwerk.git",
-  "commit": "f9240a5493a3b756bfef02aea35eb4fc97144a8d",
+  "commit": "c0826027e5c4b369edbee0f05d239fc7f35e737a",
   "package": "@puzlwerk/solver-2x2",
   "version": "0.1.0",
   "providerRenamePR": "https://github.com/wstein/puzlwerk/pull/14",
