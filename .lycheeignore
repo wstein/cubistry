@@ -1,0 +1,5 @@
+# Ignore URLs requiring credentials and non-web URI schemes.
+^mailto:
+^file:
+^https?://localhost(?::[0-9]+)?/
+^https?://127\.0\.0\.1(?::[0-9]+)?/
