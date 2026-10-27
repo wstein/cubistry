@@ -1,0 +1,23 @@
+{
+  "baselineCommit": "aff7d34",
+  "versions": {
+    "node": "v24.19.0",
+    "python": "3.12.14",
+    "cubing": "0.66.1"
+  },
+  "commands": [
+    "node research/counter/generate.mjs",
+    "python3 research/counter/verify.py"
+  ],
+  "solver": "cubing experimentalSolve2x2x2; UFLR; no shortest-display claim",
+  "randomSeed": 18,
+  "exitStatus": 0,
+  "sha256": {
+    "research/counter/generate.mjs": "fc47ff648d3dd3e922dc7ff5ff474a0f43269e45839b31b3db3ca944c66a5fd3",
+    "research/counter/verify.py": "d8cbc55c2136858b377689ec1c4f652fc3d691c8fea240db8ee0baa8f0decc6e",
+    "src/cube.mjs": "d72c7e43a097a84dde219fbeec227ff267f2832f7c49ec27771732536b11fd6a",
+    "public/counter-proof.json": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+    "package-lock.json": "7904b0890ce9835f7285d5b82209c6a8c14d38182d988f377d9f51e22ad1c47e"
+  },
+  "supersedesCheckerReview": "37e3e0c"
+}
