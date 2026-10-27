@@ -21,7 +21,7 @@
   "sha256": {
     "src/cube.mjs": "2bcdeaee79ef7f1244aa75d181785c447fe9d4f1eda7df9ffa5ffdf1e591abba",
     "src/renderer.mjs": "a6572b340eb9c08c0c03ebbd2d60d1685c85d9994dd593f6698026c2be4bab9d",
-    "src/main.mjs": "91f56e70a819d4e599904c89346a75bbd2a2ad18c41d6a5fca5feae2ff085bef",
+    "src/main.mjs": "f43d003a079147c5460b546707b551bd76d7afc665aab8e88a655dc34d9640f8",
     "src/counter.mjs": "ce57c7ddcd6a86d1e4d48b96dbf4ef42f8020d78f95cc89a8faaf90957d635e6",
     "src/vendor/orbit-input.mjs": "38709a495354f44e6e4a0d477a8725c578c2bfc409c065d09b1a50f100c9f752",
     "research/counter/verify.py": "0c8b31e87dcd544bdab4fa0ab8d1586469561aa4659f9b125aa88bc11bdb96dc",
@@ -33,7 +33,7 @@
   "validation": {
     "nodeTests": 7,
     "pythonTamperTests": 5,
-    "browserTests": 7,
+    "browserTests": 9,
     "independentProof": "PASS",
     "productionBuild": "PASS",
     "spelling": "typos 1.49.0 PASS",

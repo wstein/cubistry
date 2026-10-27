@@ -214,3 +214,33 @@ test("pausing between a wall-clock minute boundary and the next timer tick synch
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "14");
   await expect(page.locator("#mode")).toHaveText("Timer paused");
 });
+
+for (const [name, label] of [
+  ["two 40-character lines", "W".repeat(40) + "\n" + "W".repeat(40)],
+  [
+    "40 Unicode code points per line",
+    "é".repeat(40) + "\n" + "😀".repeat(10) + "i".repeat(30),
+  ],
+]) {
+  test(`the applied fixed label survives reload at the supported boundary: ${name}`, async ({
+    page,
+  }) => {
+    await ready(page);
+    await page.locator("summary").click();
+    await page.locator("#label").fill(label);
+    await page.locator("#apply-print").click();
+    await expect(page.locator("#apply-print")).toBeEnabled();
+    await expect(page.locator("#error")).toBeEmpty();
+    await go(page, 42);
+    expect(
+      await page.evaluate(
+        () => JSON.parse(localStorage.getItem("cubistry-counter-v1")).label,
+      ),
+    ).toBe(label);
+    await page.reload();
+    await expect(page.locator("#cube")).toHaveAttribute("data-value", "42");
+    await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+    await expect(page.locator("#label")).toHaveValue(label);
+    await expect(page.locator("#error")).toBeEmpty();
+  });
+}
