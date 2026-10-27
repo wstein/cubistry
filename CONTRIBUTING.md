@@ -86,3 +86,13 @@ lychee --offline --root-dir . --exclude-file .lycheeignore './**/*.md'
 ```
 
 Keep any dictionary exceptions in `typos.toml` specific and documented. Do not suppress entire documentation directories to hide spelling or link errors.
+
+## Shared solver dependency setup
+
+Run `npm run setup` before the first build/check (Node 24+, npm, Git and Python 3).
+This first verifies or rebuilds the immutable provider package pinned in
+`puzlwerk-source.json`, then runs the existing `npm ci`. It does not publish a
+package or version solver source/table bytes in Cubistry. CI and Pages perform
+the same preparation before installation. See the
+[shared solver integration contract](docs/COUNTER_SHARED_SOLVER.md) for provenance,
+stacked PR dependencies and verification.
