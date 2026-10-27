@@ -12,6 +12,9 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
+// Git, ReScript and npm must create the same archive modes on every runner.
+// This affects only this bootstrap process and its temporary provider build.
+process.umask(0o022);
 const root = fileURLToPath(new URL("../", import.meta.url));
 const source = JSON.parse(
   readFileSync(join(root, "puzlwerk-source.json"), "utf8"),
@@ -73,7 +76,7 @@ if (
     const actual = integrity(bytes);
     if (actual !== expected)
       throw new Error(
-        "Rebuilt provider artifact differs from the pinned integrity",
+        `Rebuilt provider artifact differs from the pinned integrity: ${actual}`,
       );
     mkdirSync(join(root, ".puzlwerk-dependency"), { recursive: true });
     copyFileSync(join(temporary, packed.filename), output);

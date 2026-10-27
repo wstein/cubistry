@@ -22,7 +22,9 @@ npm run dev
 `setup` runs `prepare:solver` before `npm ci`. The standard-library-only preparation
 script checks a cached artifact's integrity or fetches the pinned provider into
 its **own temporary checkout outside the repository**, installs its locked build
-toolchain and compiles/packs its real workspace. The temporary checkout is removed.
+toolchain and compiles/packs its real workspace. The bootstrap uses a fixed `0022`
+umask so archive permissions do not depend on the local or CI runner defaults.
+The temporary checkout is removed.
 Only the ignored `.puzlwerk-dependency/solver-2x2.tgz` installation artifact remains;
 `npm ci` installs it as an ordinary file dependency. No solver implementation or
 separate lookup table is maintained or versioned in Cubistry. There is no registry
