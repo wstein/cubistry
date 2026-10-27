@@ -28,11 +28,15 @@ hypothesis. The earlier working TS prototype remains reproducible at commit
 `a374b854ac313753e98a84e2b0820d7373fe61d6`; its saved M1 manifest is historical,
 not a claim that it satisfied the later language requirement.
 
-The brand is **PuzWerk**; `wstein/puzwerk` and `@puzwerk/*` are planned names,
-not an existing hosted repository or published packages. Local private
-`@cubistry/*` names remain transitional to avoid pretending namespace ownership.
-[Issue #21](https://github.com/wstein/cubistry/issues/21) remains canonical until
-separately approved repository creation. No PureScript or new Rust package is
+The current brand is **PuzlWerk**; the existing repository is
+[`wstein/puzlwerk`](https://github.com/wstein/puzlwerk), and technical package
+references use lowercase `@puzlwerk/*`. This naming does not claim publication
+or authorize consumer integration. Local private `@cubistry/*` names remain
+unchanged. The dated snapshot above retains its original name, URL and hash;
+it is historical evidence, not the current repository naming convention.
+[Issue #21](https://github.com/wstein/cubistry/issues/21) remains the architecture
+source; shared-package consumption requires a separately approved migration.
+No PureScript or new Rust package is
 introduced. The user's name “Cube Backhaul” and the audited `wstein/cubacle`
 repository are not assumed to denote the same project; that mapping must be
 confirmed before any Rust changes. Existing solvers stay behind versioned
