@@ -1,0 +1,109 @@
+{
+  "schema": "cubistry.live-solver-evidence",
+  "version": 1,
+  "puzzle": "2x2x2",
+  "startWord": "R U F2 L' D B",
+  "designSHA256": "8e7755d0e34292e5b4c2fb4bca9e839b6bc8d9e6e9d0cd898b52a89345b6c027",
+  "cases": [
+    {
+      "value": 0,
+      "schema": "cubistry.live-solver-result",
+      "version": 1,
+      "word": "F' R' U' L2 F R2 U2 L U L F' L' U F' R U L' U'",
+      "backend": {
+        "id": "cubing/experimentalSolve2x2x2",
+        "version": "0.66.1",
+        "license": "MPL-2.0 OR GPL-3.0-or-later",
+        "supportedSizes": [
+          2
+        ],
+        "goal": "complete-corner-state",
+        "frame": "exact",
+        "optimality": "unknown"
+      },
+      "solverInvocations": 2,
+      "elapsedMs": 292.62398199999996,
+      "verified": true
+    },
+    {
+      "value": 7,
+      "schema": "cubistry.live-solver-result",
+      "version": 1,
+      "word": "F' R' U' L2 F R2 U2 L R2 F U2 R' U F' U2 R2 L'",
+      "backend": {
+        "id": "cubing/experimentalSolve2x2x2",
+        "version": "0.66.1",
+        "license": "MPL-2.0 OR GPL-3.0-or-later",
+        "supportedSizes": [
+          2
+        ],
+        "goal": "complete-corner-state",
+        "frame": "exact",
+        "optimality": "unknown"
+      },
+      "solverInvocations": 2,
+      "elapsedMs": 16.877355999999963,
+      "verified": true
+    },
+    {
+      "value": 42,
+      "schema": "cubistry.live-solver-result",
+      "version": 1,
+      "word": "F' R' U' L2 F R2 U2 L F2 U R2 L U L U' F U'",
+      "backend": {
+        "id": "cubing/experimentalSolve2x2x2",
+        "version": "0.66.1",
+        "license": "MPL-2.0 OR GPL-3.0-or-later",
+        "supportedSizes": [
+          2
+        ],
+        "goal": "complete-corner-state",
+        "frame": "exact",
+        "optimality": "unknown"
+      },
+      "solverInvocations": 2,
+      "elapsedMs": 9.91216099999997,
+      "verified": true
+    },
+    {
+      "value": 58,
+      "schema": "cubistry.live-solver-result",
+      "version": 1,
+      "word": "F' R' U' L2 F R2 U2 L F L' U L2 U2 F' R' U L",
+      "backend": {
+        "id": "cubing/experimentalSolve2x2x2",
+        "version": "0.66.1",
+        "license": "MPL-2.0 OR GPL-3.0-or-later",
+        "supportedSizes": [
+          2
+        ],
+        "goal": "complete-corner-state",
+        "frame": "exact",
+        "optimality": "unknown"
+      },
+      "solverInvocations": 2,
+      "elapsedMs": 18.799488999999994,
+      "verified": true
+    },
+    {
+      "value": 99,
+      "schema": "cubistry.live-solver-result",
+      "version": 1,
+      "word": "F' R' U' L2 F R2 U2 L F L2 U R U2 L2 U L' F2 U'",
+      "backend": {
+        "id": "cubing/experimentalSolve2x2x2",
+        "version": "0.66.1",
+        "license": "MPL-2.0 OR GPL-3.0-or-later",
+        "supportedSizes": [
+          2
+        ],
+        "goal": "complete-corner-state",
+        "frame": "exact",
+        "optimality": "unknown"
+      },
+      "solverInvocations": 2,
+      "elapsedMs": 25.85504400000002,
+      "verified": true
+    }
+  ]
+}
