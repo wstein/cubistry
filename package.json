@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "npm run build:core && vite --host 0.0.0.0",
-    "build": "npm run build:core && vite build",
+    "build": "npm run build:core && vite build && node scripts/copy-solver-notices.mjs",
     "test": "npm run build:core && node --test tests/*.test.mjs",
     "proof": "node research/counter/generate.mjs && python3 research/counter/verify.py",
     "test:proof": "python3 -m unittest discover -s tests -p \"*_test.py\"",
@@ -15,14 +15,17 @@
     "build:design": "npm run build:core && node research/architecture/build_counter_design.mjs",
     "build:core": "rescript build",
     "test:live-solver": "npm run build:core && node research/m1-acceptance/run-live-solver.mjs /tmp/cubistry-live-solver.json && python3 research/m1-acceptance/verify_live_solver.py /tmp/cubistry-live-solver.json",
-    "test:pages": "playwright test --config playwright.pages.config.mjs"
+    "test:pages": "playwright test --config playwright.pages.config.mjs",
+    "prepare:solver": "node scripts/prepare-puzlwerk.mjs",
+    "setup": "npm run prepare:solver && npm ci"
   },
   "dependencies": {
     "@cubistry/cube-assets": "*",
     "@cubistry/cube-core": "*",
     "@cubistry/cube-mechanics": "*",
     "@cubistry/cube-viewer": "*",
-    "three": "0.180.0"
+    "three": "0.180.0",
+    "@puzlwerk/solver-2x2": "file:.puzlwerk-dependency/solver-2x2.tgz"
   },
   "devDependencies": {
     "@fontsource/noto-sans": "5.2.10",
