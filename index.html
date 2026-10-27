@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f3eb" />
+    <title>Cubistry · Counter</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="brand" href="./" aria-label="Cubistry counter home"
+          ><span class="brand-mark">▦</span> CUBISTRY</a
+        ><span class="eyebrow">THE LITTLE BREAK CUBE</span>
+      </header>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">COUNT SOMETHING GOOD</p>
+          <h1>A little time.<br />A different perspective.</h1>
+          <p>
+            A counter for coffee breaks, workshops, and everything that adds up.
+          </p>
+        </div>
+        <span class="edition">01 / COUNTER</span>
+      </section>
+      <section class="workspace" aria-label="Cube counter">
+        <div class="cube-card">
+          <div class="card-top">
+            <span class="pill"><i></i> REAL CUBE · FIXED STICKERS</span
+            ><button id="front" class="quiet">Front view ↗</button>
+          </div>
+          <div id="cube" aria-busy="true"></div>
+          <div class="cube-footer">
+            <span id="status" role="status" aria-live="polite"
+              >Preparing the fixed print…</span
+            ><span class="hint">DRAG TO LOOK AROUND · SCROLL TO ZOOM</span>
+          </div>
+        </div>
+        <aside class="controls">
+          <div class="control-heading">
+            <p class="eyebrow">YOUR COUNTER</p>
+            <span id="mode">Manual</span>
+          </div>
+          <form id="jump-form">
+            <label for="value">Go to a value</label>
+            <div class="value-entry">
+              <input
+                id="value"
+                type="text"
+                inputmode="numeric"
+                value="15"
+                aria-describedby="bounds"
+              /><button type="submit" class="primary">Go ↗</button>
+            </div>
+          </form>
+          <p id="bounds" class="small">
+            0–99. Stops at either end unless wrap is enabled.
+          </p>
+          <div class="increments">
+            <button data-delta="-10">−10</button
+            ><button data-delta="-1">−1</button
+            ><button data-delta="1">+1</button
+            ><button data-delta="10">+10</button>
+          </div>
+          <div class="custom-step">
+            <label for="step">Custom step</label
+            ><input
+              id="step"
+              type="text"
+              inputmode="numeric"
+              value="5"
+            /><button id="subtract" aria-label="Subtract custom step">−</button
+            ><button id="add" aria-label="Add custom step">+</button>
+          </div>
+          <label class="check"
+            ><input id="wrap" type="checkbox" /> Wrap between 99 and 0</label
+          >
+          <div class="divider"></div>
+          <p class="eyebrow">TAKE A BREAK</p>
+          <h2>Make these minutes yours.</h2>
+          <p class="small">
+            Start a countdown from the selected value. Only whole minutes appear
+            on the cube.
+          </p>
+          <div class="timer-buttons">
+            <button id="start" class="primary">Start timer</button
+            ><button id="pause" disabled>Pause</button
+            ><button id="reset">Reset</button>
+          </div>
+          <p class="small" id="timer-status" aria-live="polite">
+            Ready for 15 minutes.
+          </p>
+          <p id="error" role="alert"></p>
+        </aside>
+      </section>
+      <details class="print-settings">
+        <summary>
+          Personalize the fixed print <span>LABEL & NUMBER FORMAT</span>
+        </summary>
+        <form id="print-form">
+          <div>
+            <label for="label"
+              >Upper two sticker label · up to 40 characters per line</label
+            ><textarea id="label" rows="2">
+BREAK
+MINUTES</textarea
+            >
+            <p class="small">
+              The label is split across two real sticker images, each printed
+              twice. It is restored after every turn sequence.
+            </p>
+          </div>
+          <div>
+            <label for="format">Number format</label
+            ><select id="format">
+              <option value="padded">Leading zero · 00–99</option>
+              <option value="unpadded">Blank tens · 0–99</option>
+            </select>
+            <p class="small">
+              Applying creates a new fixed print and resets the counter to 15.
+              Counting never changes a sticker image.
+            </p>
+            <button id="apply-print" type="submit">Apply new print</button>
+          </div>
+        </form>
+      </details>
+      <footer>
+        <span>SMALL MOMENTS. A FEW GOOD TURNS.</span
+        ><a
+          href="https://github.com/wstein/cubistry/issues/18"
+          target="_blank"
+          rel="noreferrer"
+          >Open research ↗</a
+        >
+      </footer>
+    </main>
+    <script type="module" src="/src/main.mjs"></script>
+  </body>
+</html>
