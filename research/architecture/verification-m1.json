@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "schema": "cubistry.counter-design",
+  "version": 2,
+  "puzzle": "2x2x2",
+  "designSHA256": "8e7755d0e34292e5b4c2fb4bca9e839b6bc8d9e6e9d0cd898b52a89345b6c027",
+  "checkerSHA256": "44c309bef68d0468a3d20a7bdf5f880cdcbb95ba043f4993a42e1811e81897ba",
+  "legacyWitnessPreserved": true,
+  "immutableImageReferencesChecked": true,
+  "assetBytes": 17341,
+  "physical": {
+    "verdicts": {
+      "paddedTextMovable": "SAT",
+      "unpaddedTextMovable": "SAT",
+      "paddedTextFixedCubies": "UNSAT",
+      "unpaddedTextFixedCubies": "UNSAT",
+      "externalOverlayUnconstrainedUpper": "SAT"
+    },
+    "notRun": [
+      {
+        "model": "blank upper fields",
+        "reason": "Text is SAT; user requested no blank fallback experiment after success."
+      }
+    ],
+    "overlayScope": "Weaker unconstrained upper-face target; existing physical title witnesses suffice. Not used as a UI substitute.",
+    "digitConvention": "Ten distinct upright numeral images; no cross-character rotation aliases such as 6 becoming 9.",
+    "witnessSHA256": "6373a50e21cde16620218c06f9074323e1ec07fba4d348739e5a3d0e32170ff2",
+    "independentCheckerSHA256": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+    "physicalCubies": 8,
+    "physicalStickers": 24,
+    "titleCopies": {
+      "left": 2,
+      "right": 2
+    },
+    "valuesVerified": 100,
+    "orderedTransitionsByHubFactorization": 10000,
+    "chainedTransitionsPerFormat": 800,
+    "forwardWordsReplayed": 100,
+    "inverseWordsReplayed": 100,
+    "allMovesLegal": true,
+    "allVisiblePrintedGlyphsUpright": true,
+    "actualPrintRotationTamperRejected": true,
+    "fixedCubieProof": {
+      "availableDigitFaces": 18,
+      "requiredPadded": 20,
+      "requiredUnpadded": 20
+    },
+    "runtimeSeconds": 1.129
+  }
+}

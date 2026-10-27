@@ -10,16 +10,31 @@
     "proof": "node research/counter/generate.mjs && python3 research/counter/verify.py",
     "test:proof": "python3 -m unittest discover -s tests -p \"*_test.py\"",
     "test:e2e": "playwright test",
-    "check": "npm test && npm run test:proof && python3 research/counter/verify.py && npm run build"
+    "check": "npm run typecheck && npm test && npm run test:proof && python3 research/counter/verify.py && python3 research/architecture/verify_design.py && npm run build",
+    "typecheck": "tsc --noEmit",
+    "build:design": "node research/architecture/build_counter_design.mjs"
   },
   "dependencies": {
-    "three": "0.180.0"
+    "three": "0.180.0",
+    "@cubistry/cube-core": "*",
+    "@cubistry/cube-mechanics": "*",
+    "@cubistry/cube-assets": "*",
+    "@cubistry/cube-viewer": "*"
   },
   "devDependencies": {
     "@fontsource/noto-sans": "5.2.10",
     "@playwright/test": "1.56.1",
+    "@types/node": "24.10.1",
+    "@types/three": "0.180.0",
     "cubing": "0.66.1",
     "pngjs": "7.0.0",
+    "typescript": "5.9.3",
     "vite": "7.3.7"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24"
   }
 }

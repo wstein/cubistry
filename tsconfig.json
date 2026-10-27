@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "skipLibCheck": true,
+    "erasableSyntaxOnly": true
+  },
+  "include": [
+    "packages/**/*.ts",
+    "src/apps/**/*.ts",
+    "research/architecture/proposals/*.ts"
+  ]
+}

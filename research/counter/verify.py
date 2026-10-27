@@ -3,11 +3,13 @@
 No JS, solver, KPuzzle, or generator imports. Every sticker identity, physical
 position, normal, and print-up vector is retained through legal turns.
 """
-import hashlib,json,itertools,random,re,sys,time
+import hashlib,json,itertools,random,re,sys,time,math
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 MOVES={'R':(0,1,-1),'L':(0,-1,1),'U':(1,1,-1),'D':(1,-1,1),'F':(2,1,-1),'B':(2,-1,1)}
 FRONT=[(-1,1,1),(1,1,1),(-1,-1,1),(1,-1,1)]
+
+def integral(value):return type(value) is int or type(value) is float and math.isfinite(value) and value.is_integer()
 
 def require(ok,message):
     if not ok:raise AssertionError(message)
@@ -32,7 +34,10 @@ def show(state,value,padded):
         require(faces[0][5]==image,'Wrong immutable image at '+str((value,p,image,faces[0][5])))
         require(image==' ' or faces[0][4]==(0,1,0),'Image not upright')
 def check(path):
-    start=time.monotonic();raw=Path(path).read_bytes();data=json.loads(raw);printing=data['printing']
+    start=time.monotonic();raw=Path(path).read_bytes();data=json.loads(raw)
+    require(integral(data.get('schema')) and data['schema']==1 and data.get('puzzle')=='2x2x2','Unsupported legacy witness schema/version/puzzle')
+    printing=data['printing']
+    require(all(integral(s.get('id')) and integral(s.get('cubie')) for s in printing),'Sticker/cubie IDs must be integer wire values, not booleans')
     require(len(printing)==24 and sorted(s['id'] for s in printing)==list(range(24)),'24 distinct sticker IDs')
     require(len({(tuple(s['p']),tuple(s['n'])) for s in printing})==24,'Unique lattice facelets')
     axes={tuple(sign if i==axis else 0 for i in range(3)) for axis in range(3) for sign in [-1,1]}
@@ -41,6 +46,7 @@ def check(path):
     require(sorted({s['cubie'] for s in printing})==list(range(8)),'Eight distinct physical cubie IDs')
     groups={}
     for s in printing:
+        require(all(isinstance(s.get(k),list) and len(s[k])==3 and all(integral(v) for v in s[k]) for k in ('p','n','up')),'Frames require integer vectors, not booleans')
         p,n,u=map(tuple,(s['p'],s['n'],s['up']));require(all(abs(x)==1 for x in p),'2x2 corner position')
         require(n in axes and u in axes,'Normals and print-up vectors must be signed coordinate axes')
         require(sum(x*x for x in n)==sum(x*x for x in u)==1 and sum(a*b for a,b in zip(n,u))==0,'Rigid tangent frame')
@@ -49,6 +55,7 @@ def check(path):
     require(len(groups)==8 and all(len(v)==3 and len({tuple(s['p']) for s in v})==1 for v in groups.values()),'Eight whole three-sticker cubies')
     require(len({tuple(v[0]['p']) for v in groups.values()})==8,'Cubies must occupy eight distinct positions')
     source=tuple((s['id'],s['cubie'],tuple(s['p']),tuple(s['n']),tuple(s['up']),s['image']) for s in printing)
+    require(all(integral(w.get('value')) and isinstance(w.get('word'),str) for w in data['witnesses']),'Invalid witness value/word types')
     require([w['value'] for w in data['witnesses']]==list(range(100)),'Every value once')
     words=[w['word'] for w in data['witnesses']];states=[]
     for value,word in enumerate(words):

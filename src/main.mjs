@@ -1,18 +1,13 @@
 import "./style.css";
-import { CubeView } from "./renderer.mjs";
+import { CubeViewer } from "@cubistry/cube-viewer";
+import { CounterController } from "./apps/counter/controller.ts";
+import { validLabel, loadCounterDesign } from "./apps/counter/design.ts";
 import { MinuteTimer, parseValue, shifted } from "./counter.mjs";
 const $ = (id) => document.getElementById(id),
   timer = new MinuteTimer();
 let value = 15,
   ready = false;
 let printConfig = { label: "BREAK\nMINUTES", padded: true };
-const validLabel = (label) =>
-  label.trim() &&
-  label.trim().split("\n").length <= 2 &&
-  label
-    .trim()
-    .split("\n")
-    .every((line) => Array.from(line).length <= 40);
 const error = (message) => {
   $("error").textContent = message || "";
 };
@@ -74,26 +69,27 @@ function action(fn) {
     error(e.message);
   }
 }
-let view;
+let view, viewer;
+const onPhysicalState = (physical, busy, failure) => {
+  if (failure) {
+    ready = false;
+    timerUi();
+    $("cube").setAttribute("aria-busy", "false");
+    $("status").textContent = "Turn sequence stopped. Reload to recover.";
+    error(
+      "The cube could not complete its legal turn sequence. Reload to recover.",
+    );
+    return;
+  }
+  $("cube").setAttribute("aria-busy", String(busy));
+  $("cube").dataset.value = String(physical);
+  $("status").textContent = busy
+    ? "Turning toward " + value + "…"
+    : "Showing " + physical + " · label restored";
+  $("apply-print").disabled = busy || !ready;
+};
 try {
-  view = new CubeView($("cube"), (physical, busy, failure) => {
-    if (failure) {
-      ready = false;
-      timerUi();
-      $("cube").setAttribute("aria-busy", "false");
-      $("status").textContent = "Turn sequence stopped. Reload to recover.";
-      error(
-        "The cube could not complete its legal turn sequence. Reload to recover.",
-      );
-      return;
-    }
-    $("cube").setAttribute("aria-busy", String(busy));
-    $("cube").dataset.value = String(physical);
-    $("status").textContent = busy
-      ? "Turning toward " + value + "…"
-      : "Showing " + physical + " · label restored";
-    $("apply-print").disabled = busy || !ready;
-  });
+  viewer = new CubeViewer($("cube"));
 } catch (e) {
   error(
     "WebGL is unavailable. Enable hardware acceleration or try another browser.",
@@ -152,7 +148,7 @@ $("print-form").addEventListener("submit", async (e) => {
   $("apply-print").disabled = true;
   timerUi();
   try {
-    await view.configure(proof, label, padded, 15);
+    await view.configure(label, padded, 15);
     printConfig = { label, padded };
     timer.reset(15);
     ready = true;
@@ -188,11 +184,10 @@ window.addEventListener("keydown", (e) => {
   }
 });
 async function initialize() {
-  if (!view) return;
+  if (!viewer) return;
   try {
-    const response = await fetch("/counter-proof.json");
-    if (!response.ok) throw Error("Proof asset could not be loaded.");
-    proof = await response.json();
+    proof = await loadCounterDesign();
+    view = new CounterController(viewer, proof, onPhysicalState);
     let saved;
     try {
       saved = JSON.parse(localStorage.getItem("cubistry-counter-v1"));
@@ -216,7 +211,6 @@ async function initialize() {
         value = timer.value();
     }
     await view.configure(
-      proof,
       $("label").value,
       $("format").value === "padded",
       value,

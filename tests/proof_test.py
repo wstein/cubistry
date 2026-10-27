@@ -17,4 +17,10 @@ class GeometryTests(unittest.TestCase):
         self.reject(change)
     def test_missing_facelet_identity(self):self.reject(lambda d:d['printing'].__setitem__(1,d['printing'][0].copy()))
     def test_silent_unpadded_repaint(self):self.reject(lambda d:d['unpaddedPrinting'][0].update(image='9'))
+
+class MetadataTests(unittest.TestCase):
+    reject=GeometryTests.reject
+    def test_unknown_version(self):self.reject(lambda d:d.update(schema=999))
+    def test_wrong_puzzle_tag(self):self.reject(lambda d:d.update(puzzle='5x5x5'))
+
 if __name__=='__main__':unittest.main()
