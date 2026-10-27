@@ -23,7 +23,7 @@
     "strictReScriptAndTypeScript": true,
     "nodeTests": 26,
     "pythonTests": 21,
-    "browserTests": 21,
+    "browserTests": 22,
     "freshSolverCasesIndependentlyReplayed": 5,
     "visiblePixelGoals": 5,
     "auditVulnerabilities": 0
@@ -54,6 +54,13 @@
     "tests/live-solver.test.mjs": "5f5c6690e8b45b261a975a57296229374860bccdd44211c696212e7b6510e116",
     "tests/live_solver_test.py": "6f6e1531a9d2559c81b47f5b12cbb706e1c7b2451c4bc23e313e1e838fe11051",
     "tsconfig.json": "b86c22f5893a29326461d709ffa94cc0d964240151d87d3e325a3f99a44c6cc7",
-    "vite.config.mjs": "ddcb52942ab8fc29ed24ad65941fc8d29ed3cca3a8a88c1ec642e197024e5196"
-  }
+    "vite.config.mjs": "ddcb52942ab8fc29ed24ad65941fc8d29ed3cca3a8a88c1ec642e197024e5196",
+    "packages/cube-assets/src/crypto.ts": "99c826000787c86e650b9f6d4ea2aee830b65ac6a3226913439b9dc28b329590",
+    "packages/cube-assets/src/index.ts": "0866ed130ceeb083884c778420dbe0173b1259ac6447bc64077818c60f8d1214",
+    "src/apps/counter/design.ts": "2cf53fba1e1e1f38569d4efb8e0c0dee996698ec2d7d0ce8af675e945996b437",
+    "tests/browser/counter.spec.mjs": "085aae29ed6c53bf93116398a2777d9ded1c636f3b726cc09f7c6071f3c1a3b5",
+    "tests/browser/framework.spec.mjs": "30a37c8da4a096465365f8f30ff00d0e69c3340983d01acd63adda6752b7d7bb"
+  },
+  "synchronizedDependencyFixCommit": "507fb46d9ca01c5d0d40ccbd628cbea7154371b5",
+  "dependencyFixMethod": "ordinary cherry-pick; no published history rewritten"
 }

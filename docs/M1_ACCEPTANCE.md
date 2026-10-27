@@ -3,7 +3,9 @@
 This focused delta depends on [PR #20](https://github.com/wstein/cubistry/pull/20)
 and uses its actual ReScript core and TypeScript viewer unchanged. Its stacked
 base is `feat/18-two-by-two-counter` at
-`e9ded21852d79a0a7382f027c3c185572013c913`. It does not merge or rewrite that PR.
+`e9ded21852d79a0a7382f027c3c185572013c913`. It does not merge or rewrite that PR. Its later Web Crypto fix `507fb46` is
+mirrored with an ordinary cherry-pick so this head also gives actionable
+localhost/HTTPS guidance; the temporary duplicate dependency patch is explicit.
 The [requirements snapshot](../research/m1-acceptance/requirements.json) records
 [issue #21](https://github.com/wstein/cubistry/issues/21) at
 **2026-10-27T15:59:51Z**, including body/comment digests. The latest five-point
