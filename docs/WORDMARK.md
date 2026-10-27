@@ -1,5 +1,9 @@
 # Three-sticker wordmark: German SAT
 
+A later [new zero-padded-day wordmark construction](ZERO_DAY_WORDMARK.md) is SAT
+with distinct red date and blue time inks and blank outer logo cells. This page
+retains its original space-padded-day scope and reserve certificate.
+
 The preferred German design remains **SAT** when its three interior separator
 stickers are replaced with the supplied wordmark as three separate, upright
 image fragments. This is a newly verified branding extension, not an automatic

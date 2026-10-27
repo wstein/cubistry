@@ -1,5 +1,9 @@
 # German palette experiment: one critical color equality
 
+A later [new zero-padded-day wordmark construction](ZERO_DAY_WORDMARK.md) is SAT
+with distinct red date and blue time inks and blank outer logo cells. Earlier
+negative claims here retain their original five-dash-layout scope.
+
 The completed [four-format matrix and proof review](COMPACT_FORMAT.md) additionally compare hour padding and short separators, including scoped EN/DE outcomes and verified reserves.
 The later [space-padded-day investigation](DAY_PADDING.md) separately proves DE SAT with original row colors for ` 3OKT`; the zero-padded findings here are unchanged.
 The layout, abbreviations, physical cubies, and glyph model are unchanged.

@@ -1,5 +1,9 @@
 # Leading day space: German SAT with the original row colors
 
+A later [new zero-padded-day wordmark construction](ZERO_DAY_WORDMARK.md) is SAT
+with distinct red date and blue time inks and blank outer logo cells. Earlier
+negative claims here retain their original five-dash-layout scope.
+
 The completed [four-format matrix and proof review](COMPACT_FORMAT.md) additionally compare hour padding and short separators, including scoped EN/DE outcomes and verified reserves.
 Replacing `03OKT` with ` 3OKT` changes the answer for German:
 
