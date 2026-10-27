@@ -124,6 +124,17 @@ export function validateCounterDesign(raw: unknown): CounterDesign {
       ),
     "Missing required counter image identities",
   );
+  const title = assets.documents.find((v) => v.id === "counter-title")!;
+  const half = title.width / 2;
+  demand(
+    Number.isInteger(half) &&
+      ["title-left", "title-right"].every((id, index) => {
+        const image = assets.images.find((v) => v.id === id)!;
+        return image.kind === "text" && image.documentId === title.id &&
+          image.crop.every((v, i) => v === [index * half, 0, half, title.height][i]);
+      }),
+    "Counter title images must be complementary crops of counter-title",
+  );
   demand(
     Array.isArray(d.witnesses) && d.witnesses.length === 100,
     "Counter needs 100 complete witnessed targets",
