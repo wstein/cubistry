@@ -1,0 +1,22 @@
+{
+  "schema": "cubistry.requirements-snapshot",
+  "version": 1,
+  "canonicalDecision": "https://github.com/wstein/cubistry/issues/21",
+  "issueUpdatedAt": "2026-10-27T15:00:50Z",
+  "issueBodySHA256": "ec790a830ff33f182c7706e13de5f020069b5d58eab06855f6e86ed58098a250",
+  "bindingSection": "Verbindliche PuzWerk-Entscheidung und Agent-Handoff (2026-10-27)",
+  "brand": "PuzWerk",
+  "plannedRepository": "wstein/puzwerk",
+  "plannedPackages": "@puzwerk/*",
+  "hostedRepositoryCreationAuthorized": false,
+  "namespacePublicationAuthorized": false,
+  "reusableDomainOwner": "ReScript",
+  "viewerInteractionOwner": "TypeScript",
+  "rustProjectChangesAuthorized": false,
+  "externalMigrationsAuthorized": false,
+  "runtimeSupportedSizes": [
+    2
+  ],
+  "supersededPrototypeCommit": "a374b854ac313753e98a84e2b0820d7373fe61d6",
+  "existingRustBackendNameMapping": "User label Cube Backhaul versus audited wstein/cubacle remains unconfirmed; no Rust changes."
+}

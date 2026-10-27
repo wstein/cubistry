@@ -80,8 +80,8 @@ python3 research/counter/verify.py
 
 The original [independent result](../research/counter/verification-v3.json) and
 [release manifest](../research/counter/release-manifest.json) preserve the earlier MVP snapshot.
-The current shared implementation has a separate [M1 manifest](../research/architecture/manifest-m1.json)
-and [v2 independent replay](../research/architecture/verification-m1.json); see
+The current shared implementation has a separate [M1 manifest](../research/architecture/manifest-m1-rescript.json)
+and [v2 independent replay](../research/architecture/verification-m1-rescript.json); see
 [the executed architecture](SHARED_CUBE_M1.md) for the explicit adapter and validation boundaries. No
 traditional cube colors are assumed: these are actual immutable custom images.
 Glyph recognition is symbolic here; the browser renderer must preserve the

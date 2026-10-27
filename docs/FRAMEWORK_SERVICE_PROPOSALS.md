@@ -16,7 +16,9 @@ Use integer lattice coordinates `2*i-(n-1)` so even/odd and future 6/7 need no
 floating half-cell convention change. A signed-permutation 3×3 orientation is
 one of 24 proper cube rotations. Camera orientation is not in physical state.
 
-A minimal canonical TS shape can be:
+The binding PuzWerk decision in issue #21 assigns this domain to ReScript.
+The following TypeScript shape illustrates its JS interop surface, not a
+TypeScript-owned physical implementation:
 
 ```ts
 type Vec3i = readonly [number, number, number];

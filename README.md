@@ -29,8 +29,11 @@ separate while turning and return upright after each completed value.
 
 ## Shared framework path
 
-The counter is the first consumer of actual private TypeScript workspaces for
-core, mechanics, assets, and viewing. [M1 contracts and data flow](docs/SHARED_CUBE_M1.md)
+The counter is the first consumer of **PuzWerk**: actual private shared workspaces
+with a ReScript-owned domain/mechanics/validation/JSON codec and a TypeScript
+viewer/browser asset loader. The canonical naming/language decision is
+[issue #21](https://github.com/wstein/cubistry/issues/21); the planned hosted
+repository and `@puzwerk/*` namespace have not been created or published. [M1 contracts and data flow](docs/SHARED_CUBE_M1.md)
 document the validated v2 design, loadable oriented images, independent replay,
 and the explicit size-2 limits. Sizes 3–7 and external migrations remain planned.
 
