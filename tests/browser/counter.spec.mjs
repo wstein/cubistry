@@ -208,7 +208,11 @@ test("pausing between a wall-clock minute boundary and the next timer tick synch
   await page.clock.install({ time: start });
   await ready(page);
   await page.locator("#start").click();
-  await page.clock.setSystemTime(new Date(start.getTime() + 61000));
+  const timerStart = await page.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem("cubistry-counter-v1"));
+    return saved.timer.deadline - saved.timer.initialMinutes * 60000;
+  });
+  await page.clock.setSystemTime(new Date(timerStart + 61000));
   await page.locator("#pause").click();
   await expect(page.locator("#value")).toHaveValue("14");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "14");

@@ -157,7 +157,7 @@ checks all 100 values, both prints, every ordered transition by hub factorizatio
 and chained transitions. The current [independent result](../research/architecture/verification-m1-title-link.json)
 records the hardened metadata checker and preserved design digest. The original Python checker now rejects incorrect
 legacy schema/puzzle metadata as well; its new [v4 output](../research/counter/verification-v4.json)
-does not overwrite the earlier outputs. The separate [ReScript M1 manifest](../research/architecture/manifest-m1-title-link.json)
+does not overwrite the earlier outputs. The separate [ReScript M1 manifest](../research/architecture/manifest-m1-webcrypto.json)
 records the current source/generated code, assets, dependency lock, checker and
 evidence hashes. Both earlier counter and TypeScript-M1 manifests remain
 historical snapshots tied to their recorded commits.

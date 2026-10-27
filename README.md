@@ -12,7 +12,11 @@ npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. Use +1/−1, +10/−10, a custom step, or a direct
+Open `http://localhost:5173` on the same computer (keep Vite's current port if
+it differs). Print IDs and asset integrity require Web Crypto; remote/LAN
+clients need HTTPS because plain HTTP on an IP address does not expose it.
+
+Use +1/−1, +10/−10, a custom step, or a direct
 value. Bounds clamp by default; wrap is an explicit option. Drag to orbit the
 camera and use **Front view** to return. Manual layer turns are disabled.
 

@@ -1,3 +1,5 @@
+import {sha256} from "./crypto.ts";
+export {sha256,requireWebCrypto} from "./crypto.ts";
 import {
   deepFreeze,
   demand,
@@ -194,15 +196,6 @@ function context(c: HTMLCanvasElement): CanvasRenderingContext2D {
   demand(ctx, "2D image context unavailable");
   return ctx;
 }
-async function digest(bytes: Uint8Array): Promise<string> {
-  return [
-    ...new Uint8Array(
-      await crypto.subtle.digest("SHA-256", new Uint8Array(bytes).buffer),
-    ),
-  ]
-    .map((n) => n.toString(16).padStart(2, "0"))
-    .join("");
-}
 async function fetchBounded(
   path: string,
   expected: string,
@@ -259,7 +252,7 @@ async function fetchBounded(
     bytes.set(p, at);
     at += p.length;
   }
-  demand((await digest(bytes)) === expected, "Asset integrity check failed");
+  demand((await sha256(bytes)) === expected, "Asset integrity check failed");
   return bytes;
 }
 export async function loadAssets(
