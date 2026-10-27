@@ -1,5 +1,7 @@
 # Bilingual 5×5 clock/calendar feasibility: UNSAT
 
+The later [space-padded-day investigation](DAY_PADDING.md) separately proves DE SAT with original row colors for ` 3OKT`; the zero-padded findings here are unchanged.
+The subsequent [palette investigation](PALETTE.md) gives the controlled German color relaxations and all required glyph/printing rotations.
 The required color-aware single-language cases are both UNSAT; see
 [SINGLE_LANGUAGE.md](SINGLE_LANGUAGE.md). A one-color German SAT reference is
 retained in [MONOCHROME.md](MONOCHROME.md). This page proves the combined-design
@@ -174,7 +176,7 @@ npm ci --cache /tmp/cubistry-npm-cache --ignore-scripts
 npm run check
 ```
 
-`npm run check` compiles ReScript, runs nine focused Node regression tests,
+`npm run check` compiles ReScript, runs 14 focused Node regression tests,
 regenerates `results/feasibility.json`, and executes `scripts/verify.py`.
 The combined check takes seconds; the full single-language group verification
 takes approximately 30 seconds. No service, credential, numerical solver,
