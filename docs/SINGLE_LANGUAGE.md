@@ -1,5 +1,6 @@
 # Required row colors: English UNSAT, German UNSAT
 
+The completed [four-format matrix and proof review](COMPACT_FORMAT.md) additionally compare hour padding and short separators, including scoped EN/DE outcomes and verified reserves.
 The later [space-padded-day investigation](DAY_PADDING.md) separately proves DE SAT with original row colors for ` 3OKT`; the zero-padded findings here are unchanged.
 The subsequent [palette investigation](PALETTE.md) gives the controlled German color relaxations and all required glyph/printing rotations.
 The user made the reference image's row colors binding after the one-color
@@ -162,7 +163,7 @@ Use the installation commands in [README.md](../README.md), then:
 npm run check
 ```
 
-This runs 14 focused tests, rebuilds all certificates, independently verifies
+This runs 17 focused tests, rebuilds all certificates, independently verifies
 both current colored cases and the original combined impossibility, and checks
 the preserved one-color references (including the approximately 30-second
 exact group calculation). To check only the current color counting after

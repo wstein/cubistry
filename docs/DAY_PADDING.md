@@ -1,5 +1,6 @@
 # Leading day space: German SAT with the original row colors
 
+The completed [four-format matrix and proof review](COMPACT_FORMAT.md) additionally compare hour padding and short separators, including scoped EN/DE outcomes and verified reserves.
 Replacing `03OKT` with ` 3OKT` changes the answer for German:
 
 | Day style | Date and time digit inks | DE | EN |
@@ -125,5 +126,5 @@ npm run experiment:space-day
 
 The German candidate starts UNKNOWN. Only successful independent colored
 matching and common legal completion write SAT. `npm run check` also checks
-all previous modes, palette variants, print angles, and 14 regression tests.
+all previous modes, palette variants, print angles, and 17 regression tests.
 `npm run verify` validates saved results without replacing them.

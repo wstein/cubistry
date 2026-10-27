@@ -1,5 +1,6 @@
 # Monochrome reference: separate English and German investigations
 
+The completed [four-format matrix and proof review](COMPACT_FORMAT.md) additionally compare hour padding and short separators, including scoped EN/DE outcomes and verified reserves.
 The later [space-padded-day investigation](DAY_PADDING.md) separately proves DE SAT with original row colors for ` 3OKT`; the zero-padded findings here are unchanged.
 The subsequent [palette investigation](PALETTE.md) gives the controlled German color relaxations and all required glyph/printing rotations.
 **Scope:** These are the original one-color results. The subsequently required
@@ -253,7 +254,7 @@ npm ci --cache /tmp/cubistry-npm-cache --ignore-scripts
 npm run check
 ```
 
-`npm run check` runs 14 focused regression tests, regenerates all results,
+`npm run check` runs 17 focused regression tests, regenerates all results,
 independently verifies EN then DE, and rechecks the original combined proof.
 The full exact group calculation takes approximately 30 seconds on the current
 machine. `npm run verify` rechecks the saved certificates independently.

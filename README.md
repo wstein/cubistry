@@ -7,26 +7,30 @@ A browser-first engine for twisty-puzzle artwork and display states.
 Can one immutable sticker printing on a physical 5×5×5 display every valid
 2020–2049 calendar date and every minute in both German and English?
 
-**Latest result: German is SAT with the original separate row colors if
-single-digit days use a leading space (` 3OKT`) instead of zero (`03OKT`).**
-No date/time ink merger is needed in that mode. The fixed 150-sticker printing
-and exact simultaneous physical reachability are independently verified.
-English and combined DE+EN remain UNSAT.
+**Latest result: with space-padded dates (` 3OKT`), all four hour/separator
+combinations are SAT for German with the original separate row colors.**
 
-Read [the day-padding proof and new printing plan](docs/DAY_PADDING.md).
-The quarter-turn reuse now concerns blanks; movable printed characters can
-all remain upright. The shared font still uses a circular fixed-center zero.
+| Hours | Separator | DE | EN | EN+DE |
+| --- | --- | --- | --- | --- |
+| `09:37` | `─────` | SAT | UNSAT | UNSAT |
+| ` 9:37` | `─────` | SAT | UNSAT | UNSAT |
+| `09:37` | `·───·` | SAT | UNSAT | UNSAT |
+| ` 9:37` | `·───·` | SAT | UNSAT | UNSAT |
 
-For the original `03OKT` format, the [palette investigation](docs/PALETTE.md)
-shows that merging only date/time digit ink suffices for German. Year digits,
-letters, separator, and colon may retain separate colors; A/B/C each have a
-SAT witness. Keeping distinct date/time digit inks is impossible in the
-documented glyph model. All 150 source print angles are supplied for both modes.
+Dots mean unprinted blanks. EN/EN+DE verdicts are scoped to the documented
+configurations; they are not general calendar-cube impossibility claims.
+Read the [matrix, full proof review, reserve counts, and printing plans](docs/COMPACT_FORMAT.md).
+The two-digit-hour/short-separator variant is certified, with at least 22
+simultaneously reservable printing positions (a conservative bound).
 
-The [original row-color proofs](docs/SINGLE_LANGUAGE.md),
-[one-color reference](docs/MONOCHROME.md), and
-[combined impossibility](docs/FEASIBILITY.md) remain scoped to zero padding.
-Machine-readable certificates and printing CSVs are in [results](results/).
+Every DE row also has a seven-component-ink witness. All nonfixed printed
+glyphs may remain upright; rotational reuse uses blanks. A circular front
+fixed-center zero remains part of the font model.
+
+Previous [day-padding](docs/DAY_PADDING.md), [palette](docs/PALETTE.md),
+[original row-color](docs/SINGLE_LANGUAGE.md), [monochrome](docs/MONOCHROME.md),
+and [combined](docs/FEASIBILITY.md) results retain their explicit scopes.
+Machine-readable certificates and 150-sticker CSV plans are in [results](results/).
 
 With Node ≥22, npm ≥10, Python ≥3.10, and SymPy 1.14.0:
 

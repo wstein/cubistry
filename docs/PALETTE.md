@@ -1,5 +1,6 @@
 # German palette experiment: one critical color equality
 
+The completed [four-format matrix and proof review](COMPACT_FORMAT.md) additionally compare hour padding and short separators, including scoped EN/DE outcomes and verified reserves.
 The later [space-padded-day investigation](DAY_PADDING.md) separately proves DE SAT with original row colors for ` 3OKT`; the zero-padded findings here are unchanged.
 The layout, abbreviations, physical cubies, and glyph model are unchanged.
 The existing German fixed sticker design is reused, not rediscovered by a new
@@ -187,7 +188,7 @@ This regenerates palette candidates, independently certifies the unchanged
 physical group, checks all successful fixed colorings, verifies all impossibility
 arguments and rotation records, and writes final statuses. Successful candidates
 start as UNKNOWN until those checks complete. The full `npm run check` also
-runs 14 focused regression tests and preserves previous EN/DE/reference results.
+runs 17 focused regression tests and preserves previous EN/DE/reference results.
 `npm run verify` checks saved certificates rather than replacing them.
 
 This investigation changes color constraints as requested. It does not change
