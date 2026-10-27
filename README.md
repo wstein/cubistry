@@ -85,3 +85,7 @@ cover issue #21's five-point DoD. With `npm run dev`, open
 or `/library-example.html` for a standalone consumer with its own image/text
 print and no counter modules. The live solver harness is development-only;
 the regular counter keeps its fast verified witness paths.
+
+The counter reports committed / planned HTM moves during playback.
+[Move progress and Stop after this value](docs/COUNTER_MOVE_PROGRESS.md) document
+queue/reset behavior and the existing non-optimal reference-state route.
