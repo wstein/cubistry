@@ -51,3 +51,10 @@ Skill instructions are task-specific and do not override accepted project ADRs o
 - Do not rewrite shared or protected branch history, force-push a shared branch, change branch protection, mark PRs ready, or merge without the required human approval. Coordinate any necessary feature-branch history rewrite with collaborators.
 - For stacked PRs, preserve their dependencies and avoid duplicated commits; verify the resulting diffs and relevant checks after rebasing.
 
+## PuzlWerk naming conventions
+
+- Display/branding: **PuzlWerk**. Technical identifiers, paths, directory names and imports always use lowercase `puzlwerk`.
+- GitHub repository: `wstein/puzlwerk`. npm scope: `@puzlwerk/*`; a scope name does not imply a published package or authorize a new dependency.
+- Apply exact-case, context-aware edits to active references; never use global case-insensitive replacements.
+- Preserve historical ADR wording, immutable snapshots, source URLs/revisions/hashes, quotations and license/copyright notices. Classify old-name occurrences as historical, active or uncertain; report uncertain cases for review instead of silently changing them.
+- Naming-only work does not authorize a solver/application change, package publication or migration. Preserve existing `@cubistry/*` packages.
