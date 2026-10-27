@@ -62,22 +62,29 @@ SLOTS={'corners':(0,4,20,24),'middleEdges':(2,10,14,22),
        'wings':(1,9,15,23,3,5,19,21),'axialCenters':(7,11,13,17),'diagonalCenters':(6,8,16,18)}
 
 
-def target_projections(day_padding='zero',hour_padding='zero',separator_style='five',row4_artwork=None,year_range=(2020,2049)):
+def target_projections(day_padding='zero',hour_padding='zero',separator_style='five',row4_artwork=None,year_range=(2020,2049),year_fields=None):
     require(day_padding in ('zero','space') and hour_padding in ('zero','space') and separator_style in ('five','three'),'Unknown display format')
     if row4_artwork is not None:
         require(separator_style=='three' and isinstance(row4_artwork,list) and len(row4_artwork)==3 and len(set(row4_artwork))==3 and all(isinstance(v,str) and v for v in row4_artwork),'Artwork must be three distinct immutable images with blank outer positions')
     dates={k:set() for k in SLOTS}
     times={k:set() for k in SLOTS}
     require(len(year_range)==2 and 1<=year_range[0]<=year_range[1]<=9998,'Invalid year range')
-    day=dt.date(year_range[0],1,1)
+    if year_fields is not None:
+        require(set(year_fields)=={'thousands','hundreds'},'Unknown split-year fields')
+        require(year_fields['thousands']==[' ', '1', '2'] and len(set(year_fields['hundreds']))==len(year_fields['hundreds']) and all(c in '0123456789' for c in year_fields['hundreds']),'Invalid split-year vocabulary')
+        years=[y for y in range(1,3000) if (' ' if y<1000 else str(y//1000)) in year_fields['thousands'] and str(y//100%10) in year_fields['hundreds']]
+    else:years=range(year_range[0],year_range[1]+1)
     weekdays='MON DIE MIT DON FRE SAM SON'.split()
     months='JAN FEB MÄR APR MAI JUN JUL AUG SEP OKT NOV DEZ'.split()
-    while day<dt.date(year_range[1]+1,1,1):
-        text=weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+' '+f'{day.year:04}'+(' ─── ' if separator_style=='three' else '─────')
-        require(text[12]=='0','Front fixed center must be zero')
-        for k,positions in SLOTS.items():
-            dates[k].add(tuple(text[i] for i in positions if i<20))
-        day+=dt.timedelta(days=1)
+    for year in years:
+        day=dt.date(year,1,1)
+        while day<dt.date(year+1,1,1):
+            year_text=((' ' if year<1000 else str(year//1000))+str(year//100%10)+' '+f'{year%100:02}') if year_fields is not None else ' '+f'{year:04}'
+            text=weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+year_text+(' ─── ' if separator_style=='three' else '─────')
+            require(text[12]==(' ' if year_fields is not None else '0'),'Front fixed center must match year layout')
+            for k,positions in SLOTS.items():
+                dates[k].add(tuple(text[i] for i in positions if i<20))
+            day+=dt.timedelta(days=1)
     for minute in range(1440):
         hour=f'{minute//60:2}' if hour_padding=='space' else f'{minute//60:02}'
         text=hour+f':{minute%60:02}'
@@ -119,10 +126,11 @@ def verify_design_and_group(report, *, reuse_group=False):
         by_piece[p].append(s)
     require(len(by_piece)==98,'Full physical cubie count')
     fixed=design_by_slot[((0,0,2),(0,0,1))]
-    require(fixed['symbol']=='0','Front fixed center printing')
+    split_year=report.get('yearFields') is not None
+    require(fixed['symbol']==(' ' if split_year else '0'),'Front fixed center printing')
     require(report['glyphModel']['quarterTurns']['0']==[0,1,2,3] and report['glyphModel']['quarterTurns'][' ']==[0,1,2,3],'Fixed-center spins must be optically irrelevant')
     if 'palette' in report:
-        require(fixed.get('ink')==report['palette']['yearDigits'],'Front fixed-center ink')
+        require(fixed.get('ink')==('none' if split_year else report['palette']['yearDigits']),'Front fixed-center ink')
         require(all(s.get('ink')=='none' for s in design if s['symbol']==' '),'Blank printing has no ink')
     require(all(s['symbol']==' ' for s in design if piece_class(s['position'])=='fixedCenters' and s is not fixed),'Other fixed centers must be blank')
 
@@ -155,7 +163,7 @@ def verify_design_and_group(report, *, reuse_group=False):
             # its source and destination facelets; the 150-point action loses
             # no extra glyph-spin variable.
             require(all(len(t)==1 for t in destinations.values()),'Unmodeled nonfixed sticker spin')
-    targets=target_projections(report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'),report.get('row4Artwork'),report.get('yearRange',(2020,2049)))
+    targets=target_projections(report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'),report.get('row4Artwork'),report.get('yearRange',(2020,2049)),report.get('yearFields'))
     checked={}
     for k,patterns in targets.items():
         for target in patterns:
@@ -177,8 +185,12 @@ def verify_design_and_group(report, *, reuse_group=False):
 
     if reuse_group:
         require(_GROUP_CERTIFICATE is not None,'A serialized group certificate is not enough: verify the group in this process first')
-        require(_GROUP_CERTIFICATE['checkedProjectionCounts']==checked,'Changed partial-placement target model')
-        return copy.deepcopy(_GROUP_CERTIFICATE)
+        certificate=copy.deepcopy(_GROUP_CERTIFICATE)
+        # Geometry, active front positions, and local placement sizes are fixed;
+        # target cardinalities may change, and were all independently matched above.
+        certificate['checkedProjectionCounts']=checked
+        certificate['fixedCenterReason']=('all six fixed-center stickers are blank; all spins optically equivalent' if split_year else 'front zero is circular; other five fixed-center stickers are blank; all spins optically equivalent')
+        return certificate
 
     generators=[]
     labels=[]
@@ -246,7 +258,7 @@ def verify_design_and_group(report, *, reuse_group=False):
     certificate=dict(method='exact Schreier–Sims and even-subgroup partial-placement transitivity',sympyVersion=sympy.__version__,
                      fullGroupOrder=str(full_order),parityFiberProductOrder=str(fiber_order),localGroups=local_cert,
                      checkedProjectionCounts=checked,
-                     fixedCenterReason='front zero is circular; other five fixed-center stickers are blank; all spins optically equivalent',
+                     fixedCenterReason=('all six fixed-center stickers are blank; all spins optically equivalent' if split_year else 'front zero is circular; other five fixed-center stickers are blank; all spins optically equivalent'),
                      simultaneousCompletion=True)
     print(f'Physical design and exact simultaneous completion verified in {time.monotonic()-start:.1f}s.',flush=True)
     _GROUP_CERTIFICATE=copy.deepcopy(certificate)

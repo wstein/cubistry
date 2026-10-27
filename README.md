@@ -7,6 +7,13 @@ A browser-first engine for twisty-puzzle artwork and display states.
 Can one immutable sticker printing on a physical 5×5×5 display every valid
 2020–2049 calendar date and every minute in both German and English?
 
+**Historical-year layout:** with the year split as `19·89` / `20·26`
+(the dot is an unprinted fixed center), one printing supports thousands blank/1/2
+and hundreds **0,9,8,7**. Two further candidates support an additional **6**
+or **1**. All are independently SAT with the original colors and wordmark.
+The exact maximum is five complete hundreds classes in this layout; six require
+25 axial centers but only 24 exist. See [the ranges and proof](docs/SPLIT_CENTURY.md).
+
 **Year extension:** a single fixed colored wordmark printing now covers
 **2000–2099**, independently verified. Seven additional gray decade stickers
 suffice. See [year capacity and the fixed-center limit](docs/YEAR_CAPACITY.md)

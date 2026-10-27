@@ -1,5 +1,9 @@
 # Year capacity: 2000–2099 certified, fixed-center limit identified
 
+The later [split-century investigation](SPLIT_CENTURY.md) certifies a changed
+layout `19 89` / `20 26` with blank fixed center and broad past/future windows.
+This page retains the older contiguous-year layout's fixed-zero limitations.
+
 The German zero-day wordmark design now has a separately certified extension
 covering **all 36,525 dates in 2000–2099 and all 1,440 minutes per date**.
 This includes the Gregorian leap day in 2000. Red date digits, blue time digits,

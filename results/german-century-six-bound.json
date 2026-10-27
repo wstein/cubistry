@@ -1,0 +1,471 @@
+{
+  "status": "UNSAT",
+  "yearFields": {
+    "thousands": [
+      " ",
+      "1",
+      "2"
+    ],
+    "hundreds": [
+      "0",
+      "9",
+      "8",
+      "7",
+      "6",
+      "1"
+    ]
+  },
+  "yearLayout": "thousands,hundreds,blank,tens,units",
+  "palette": {
+    "weekdayLetters": "weekday-black",
+    "monthLetters": "date-red",
+    "dateDigits": "date-red",
+    "yearDigits": "year-gray",
+    "timeDigits": "time-blue",
+    "separator": "wordmark-image-assets",
+    "colon": "date-red"
+  },
+  "availableAxialStickers": 24,
+  "requiredAxialStickers": 25,
+  "checkedAxialProjections": 480,
+  "requiredIdentityMultiplicities": [
+    {
+      "symbol": "0",
+      "ink": "year-gray",
+      "count": 2,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "1",
+      "ink": "year-gray",
+      "count": 2,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "1"
+        ],
+        [
+          13,
+          "1"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "2",
+      "ink": "year-gray",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "2"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "3",
+      "ink": "year-gray",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "3"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "4",
+      "ink": "year-gray",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "4"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "5",
+      "ink": "year-gray",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "5"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "6",
+      "ink": "year-gray",
+      "count": 2,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "6"
+        ],
+        [
+          13,
+          "6"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "7",
+      "ink": "year-gray",
+      "count": 2,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "7"
+        ],
+        [
+          13,
+          "7"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "8",
+      "ink": "year-gray",
+      "count": 2,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "8"
+        ],
+        [
+          13,
+          "8"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "9",
+      "ink": "year-gray",
+      "count": 2,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "9"
+        ],
+        [
+          13,
+          "9"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "A",
+      "ink": "date-red",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "D",
+      "ink": "date-red",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "D"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "F",
+      "ink": "date-red",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "F"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "J",
+      "ink": "date-red",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "J"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "M",
+      "ink": "date-red",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "M"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "N",
+      "ink": "date-red",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "N"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "O",
+      "ink": "date-red",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "O"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "S",
+      "ink": "date-red",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "S"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    },
+    {
+      "symbol": "wordmark:middle",
+      "ink": "wordmark-image-assets",
+      "count": 1,
+      "witnessTarget": [
+        [
+          7,
+          "A"
+        ],
+        [
+          11,
+          "0"
+        ],
+        [
+          13,
+          "0"
+        ],
+        [
+          17,
+          "wordmark:middle"
+        ]
+      ]
+    }
+  ],
+  "scope": "six full hundreds classes; all ten decades; immutable glyph/image identities, fixed inks and split-year positions; rotation symmetries unrestricted"
+}

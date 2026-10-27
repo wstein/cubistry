@@ -229,3 +229,11 @@ test('wordmark candidate fixes three distinct oriented center images without cha
   for(const s of changed){assert.deepEqual(r.glyphModel.quarterTurns[s.symbol],[0]);assert.deepEqual(s.up,source.design.stickers[s.id].up);}
   assert.equal(new Set(changed.map(s=>s.position.join(','))).size,3);
 });
+
+test('split-century year rows keep the fixed center blank for past and future years', () => {
+  for(const [year,row] of [[1,' 0 01'],[789,' 7 89'],[1989,'19 89'],[2026,'20 26'],[2799,'27 99']]) {
+    assert.equal(D.splitYearRow(year),row);
+    assert.equal(row.length,5);
+    assert.equal(row[2],' ');
+  }
+});

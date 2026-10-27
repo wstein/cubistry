@@ -51,3 +51,8 @@ let orbit = (row, col) => {
   | _ => "fixedCenters"
   }
 }
+
+// Split century from decade: fixed center is blank; no year zero is implied.
+let splitYearRow = year =>
+  (year < 1000 ? " " : Int.toString(year / 1000)) ++
+  Int.toString(mod(year / 100, 10)) ++ " " ++ two(mod(year, 100))
