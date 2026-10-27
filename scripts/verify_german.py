@@ -62,17 +62,18 @@ SLOTS={'corners':(0,4,20,24),'middleEdges':(2,10,14,22),
        'wings':(1,9,15,23,3,5,19,21),'axialCenters':(7,11,13,17),'diagonalCenters':(6,8,16,18)}
 
 
-def target_projections(day_padding='zero',hour_padding='zero',separator_style='five',row4_artwork=None):
+def target_projections(day_padding='zero',hour_padding='zero',separator_style='five',row4_artwork=None,year_range=(2020,2049)):
     require(day_padding in ('zero','space') and hour_padding in ('zero','space') and separator_style in ('five','three'),'Unknown display format')
     if row4_artwork is not None:
         require(separator_style=='three' and isinstance(row4_artwork,list) and len(row4_artwork)==3 and len(set(row4_artwork))==3 and all(isinstance(v,str) and v for v in row4_artwork),'Artwork must be three distinct immutable images with blank outer positions')
     dates={k:set() for k in SLOTS}
     times={k:set() for k in SLOTS}
-    day=dt.date(2020,1,1)
+    require(len(year_range)==2 and 1<=year_range[0]<=year_range[1]<=9998,'Invalid year range')
+    day=dt.date(year_range[0],1,1)
     weekdays='MON DIE MIT DON FRE SAM SON'.split()
     months='JAN FEB MÄR APR MAI JUN JUL AUG SEP OKT NOV DEZ'.split()
-    while day<dt.date(2050,1,1):
-        text=weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+' '+str(day.year)+(' ─── ' if separator_style=='three' else '─────')
+    while day<dt.date(year_range[1]+1,1,1):
+        text=weekdays[day.weekday()]+'  '+(f'{day.day:2}' if day_padding=='space' else f'{day.day:02}')+months[day.month-1]+' '+f'{day.year:04}'+(' ─── ' if separator_style=='three' else '─────')
         require(text[12]=='0','Front fixed center must be zero')
         for k,positions in SLOTS.items():
             dates[k].add(tuple(text[i] for i in positions if i<20))
@@ -154,7 +155,7 @@ def verify_design_and_group(report, *, reuse_group=False):
             # its source and destination facelets; the 150-point action loses
             # no extra glyph-spin variable.
             require(all(len(t)==1 for t in destinations.values()),'Unmodeled nonfixed sticker spin')
-    targets=target_projections(report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'),report.get('row4Artwork'))
+    targets=target_projections(report.get('dayPadding','zero'),report.get('hourPadding','zero'),report.get('separatorStyle','five'),report.get('row4Artwork'),report.get('yearRange',(2020,2049)))
     checked={}
     for k,patterns in targets.items():
         for target in patterns:

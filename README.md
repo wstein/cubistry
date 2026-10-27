@@ -7,6 +7,11 @@ A browser-first engine for twisty-puzzle artwork and display states.
 Can one immutable sticker printing on a physical 5×5×5 display every valid
 2020–2049 calendar date and every minute in both German and English?
 
+**Year extension:** a single fixed colored wordmark printing now covers
+**2000–2099**, independently verified. Seven additional gray decade stickers
+suffice. See [year capacity and the fixed-center limit](docs/YEAR_CAPACITY.md)
+for historical-year implications and the remaining four unprinted axial centers.
+
 **New result: zero-padded German dates (`09OKT`) also work with the wordmark,
 two-digit hours, red date digits, blue time digits, and blank outer row-4 cells.**
 A new 24-wing printing is independently certified SAT for every date/minute.
