@@ -1,5 +1,9 @@
 # Bilingual 5×5 clock/calendar feasibility: UNSAT
 
+The separate investigations now establish EN UNSAT and DE SAT with a circular
+zero; see [SINGLE_LANGUAGE.md](SINGLE_LANGUAGE.md). This page proves only the
+combined-design obstruction.
+
 No single immutable sticker printing can satisfy the specified display for
 both languages. A 24-sticker invariant orbit requires at least 26 stickers.
 This is a finite counting impossibility proof, independently checked by Python;
@@ -157,18 +161,23 @@ is required for this negative proof.
 
 ## Reproduction and independent verification
 
-Prerequisites: Node ≥22, npm ≥10, Python ≥3.10. ReScript is pinned to 12.3.1.
+Prerequisites: Node ≥22, npm ≥10, Python ≥3.10, and SymPy 1.14.0
+for the additional single-language verification. ReScript is pinned to 12.3.1.
 From the repository root:
 
 ```sh
+python3 -m venv --system-site-packages .venv
+. .venv/bin/activate
+python3 -m pip install --cache-dir /tmp/cubistry-pip-cache -r requirements-verifier.txt
 npm ci --cache /tmp/cubistry-npm-cache --ignore-scripts
 npm run check
 ```
 
-`npm run check` compiles ReScript, runs five focused Node regression tests,
+`npm run check` compiles ReScript, runs eight focused Node regression tests,
 regenerates `results/feasibility.json`, and executes `scripts/verify.py`.
-The complete check takes seconds and needs no solver, service, credential,
-or heavyweight testing framework. Exit code zero means verification succeeded;
+The combined check takes seconds; the full single-language group verification
+takes approximately 30 seconds. No service, credential, numerical solver,
+or heavyweight testing framework is needed. Exit code zero means verification succeeded;
 read the result's `status` field for the mathematical outcome.
 
 The Python verifier imports none of the ReScript/JavaScript implementation.
