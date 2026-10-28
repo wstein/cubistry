@@ -1,24 +1,51 @@
 /** Monotonic deadline clock. Physical playback is deliberately not a clock. */
+export type TimerMode = "countdown" | "stopwatch";
+const MAX_MS = 3590000;
+/** One anchored virtual clock for both directions; animation never changes its rate. */
 export class WorkshopClock {
-  private deadline = 0;
+  private anchor = 0;
   private frozen = 900000;
   private active = false;
   private duration = 900;
+  private multiplier = 1;
+  private direction: TimerMode = "countdown";
   private readonly now: () => number;
   constructor(now: () => number = () => performance.now()) {
     this.now = now;
   }
+  get mode(): TimerMode {
+    return this.direction;
+  }
+  get speed(): number {
+    return this.multiplier;
+  }
+  get valueMs(): number {
+    const delta = this.active
+      ? (this.now() - this.anchor) * this.multiplier
+      : 0;
+    return Math.max(
+      0,
+      Math.min(
+        MAX_MS,
+        this.frozen + (this.direction === "countdown" ? -delta : delta),
+      ),
+    );
+  }
   get running(): boolean {
-    return this.active;
+    return this.active && !this.elapsed;
   }
   get remainingMs(): number {
-    return this.active ? Math.max(0, this.deadline - this.now()) : this.frozen;
+    return this.valueMs;
   }
   get bucket(): number {
-    return Math.ceil(this.remainingMs / 10000);
+    return this.direction === "countdown"
+      ? Math.ceil(this.valueMs / 10000)
+      : Math.floor(this.valueMs / 10000);
   }
   get elapsed(): boolean {
-    return this.remainingMs === 0;
+    return this.direction === "countdown"
+      ? this.valueMs === 0
+      : this.valueMs === MAX_MS;
   }
   configure(seconds: number): void {
     if (
@@ -31,18 +58,32 @@ export class WorkshopClock {
     this.duration = seconds;
     this.reset();
   }
+  setMode(mode: TimerMode): void {
+    if (mode !== "countdown" && mode !== "stopwatch")
+      throw Error("Invalid timer mode");
+    this.direction = mode;
+    this.reset();
+  }
+  setSpeed(rate: number): void {
+    if (![1, 10, 20, 50, 100].includes(rate))
+      throw Error("Invalid timer speed");
+    const value = this.valueMs;
+    this.anchor = this.now();
+    this.frozen = value;
+    this.multiplier = rate;
+  }
   start(): void {
-    if (this.active) return;
-    this.deadline = this.now() + this.frozen;
+    if (this.running || this.elapsed) return;
+    this.anchor = this.now();
     this.active = true;
   }
   pause(): void {
-    this.frozen = this.remainingMs;
+    this.frozen = this.valueMs;
     this.active = false;
   }
   reset(): void {
     this.active = false;
-    this.frozen = this.duration * 1000;
+    this.frozen = this.direction === "countdown" ? this.duration * 1000 : 0;
   }
 }
 export function formatTimer(bucket: number): string {
