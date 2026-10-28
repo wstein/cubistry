@@ -36,7 +36,7 @@ const settled = async (page, value) => {
 };
 async function duration(page, value) {
   await page.fill("#timer-duration", value);
-  await page.click("#timer-set-duration");
+  await page.locator("#timer-duration").press("Enter");
   await settled(page, value);
 }
 const active = [
@@ -95,7 +95,7 @@ test("Workshop Timer is a separate upright MMSS print; invalid durations do not 
   }
   for (const invalid of ["60:00", "00:15"]) {
     await page.fill("#timer-duration", invalid);
-    await page.click("#timer-set-duration");
+    await page.locator("#timer-duration").press("Enter");
     await expect(page.locator("#error")).not.toBeEmpty();
     await settled(page, "15:00");
   }
@@ -145,9 +145,7 @@ test("absolute fifteen-minute deadline visits all91 actual displays and independ
   }
   expect(offset).toBe(331);
   await expect(page.locator("#session-moves")).toHaveText("331");
-  await expect(page.locator("#timer-status")).toHaveText(
-    "Complete · Cube 00:00",
-  );
+  await expect(page.locator("#status")).toHaveText("Countdown · Complete");
   await expect(page.locator("#timer-start")).toHaveText("Start");
   await expect(page.locator("#timer-start")).toBeDisabled();
   const source = await page.evaluate(() => ({
@@ -188,15 +186,15 @@ test("pause freezes a lagged clock and settles one frozen bucket; reset never te
   await page.clock.fastForward(10000);
   await page.clock.runFor(100);
   await expect(page.locator("#timer-logical")).toHaveText("00:20");
-  await page.click("#timer-pause");
-  await expect(page.locator("#timer-status")).toContainText("Paused");
+  await page.click("#timer-start");
+  await expect(page.locator("#status")).toContainText("Paused");
   for (let i = 0; i < 35; i++) {
     await page.clock.fastForward(2100);
     await page.clock.runFor(20);
   }
   await settled(page, "00:20");
   await expect(page.locator("#timer-logical")).toHaveText("00:20");
-  await expect(page.locator("#timer-status")).toHaveText("Paused · 00:20");
+  await expect(page.locator("#status")).toHaveText("Countdown · Paused");
   await page.click("#timer-start");
   await page.clock.fastForward(10000);
   await page.clock.runFor(100);
@@ -212,7 +210,7 @@ test("pause freezes a lagged clock and settles one frozen bucket; reset never te
   expect(
     Number(await page.locator("#session-moves").innerText()),
   ).toBeGreaterThan(before);
-  await expect(page.locator("#timer-status")).toHaveText("Ready · 00:40");
+  await expect(page.locator("#status")).toHaveText("Countdown · Ready");
 });
 test("timer panel fits mobile and preserves all six inherited speed stops", async ({
   page,
@@ -228,25 +226,25 @@ test("timer panel fits mobile and preserves all six inherited speed stops", asyn
     await expect(page.locator("#rotation-speed")).toHaveValue(stop);
   }
   await page.locator("#timer-start").click();
-  await expect(page.locator("#timer-pause")).toBeEnabled();
-  await page.locator("#timer-pause").click();
+  await expect(page.locator("#timer-start")).toBeEnabled();
+  await page.locator("#timer-start").click();
   await expect(page.locator("#timer-start")).toHaveText("Resume");
 });
 
-test("real animation budgets measure committed five-move edges at default100ms, optional250ms and slow2s", async ({
+test("real animation budgets measure committed five-move edges at default250ms, optional100ms and slow2s", async ({
   page,
 }) => {
   test.setTimeout(90000);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await chooseTimer(page);
-  await expect(page.locator("#rotation-speed")).toHaveValue("4");
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
   // Configure zero using the actual shared solver; exclude this reset from edge timings.
   await page.locator("#rotation-speed").fill("5");
   await duration(page, "00:00");
   const measurements = [];
   for (const [stop, ms, target] of [
-    ["4", 100, "00:10"],
-    ["3", 250, "00:20"],
+    ["3", 250, "00:10"],
+    ["4", 100, "00:20"],
     ["0", 2000, "00:10"],
   ]) {
     await page.locator("#rotation-speed").fill(stop);
@@ -276,39 +274,33 @@ test("real animation budgets measure committed five-move edges at default100ms, 
   );
 });
 
-test("Timer preserves global speed on reload without overwriting Counter state, including a missing saved record", async ({
+test("application switches apply Timer250 and Counter100 defaults while preserving Counter state", async ({
   page,
 }) => {
   await page.goto("/");
   await expect(page.locator("#application")).toBeEnabled();
+  await page.locator("#rotation-speed").fill("5");
   await page.fill("#value", "42");
   await page.click("#set");
   await settled(page, "42");
+  await page.locator("#format").uncheck();
   await page.selectOption("#application", "timer");
   await settled(page, "15:00");
-  await page.locator("#rotation-speed").fill("5");
-  let saved = await page.evaluate(() =>
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
+  await page.locator("#rotation-speed").fill("0");
+  const saved = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("cubistry-counter-v2")),
   );
   expect(saved.value).toBe(42);
-  expect(saved.padded).toBe(true);
   expect(saved.moveDuration).toBe(50);
-  await page.reload();
-  await expect(page.locator("#application")).toBeEnabled();
+  expect(saved.padded).toBe(false);
+  await page.selectOption("#application", "certified");
   await settled(page, "42");
-  await expect(page.locator("#rotation-speed")).toHaveValue("5");
+  await expect(page.locator("#rotation-speed")).toHaveValue("4");
+  await expect(page.locator("#format")).not.toBeChecked();
   await page.selectOption("#application", "timer");
   await settled(page, "15:00");
-  await page.evaluate(() => localStorage.removeItem("cubistry-counter-v2"));
-  await page.locator("#rotation-speed").fill("4");
-  saved = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("cubistry-counter-v2")),
-  );
-  expect(saved.value).toBe(42);
-  expect(saved.moveDuration).toBe(100);
-  await page.reload();
-  await expect(page.locator("#rotation-speed")).toHaveValue("4");
-  await settled(page, "42");
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
 });
 
 test("tab-resume catch-up reads the monotonic deadline, ignores wall-clock jumps and retains one latest target", async ({
@@ -332,9 +324,7 @@ test("tab-resume catch-up reads the monotonic deadline, ignores wall-clock jumps
   await page.clock.fastForward(30000);
   await page.clock.runFor(1000);
   await settled(page, "00:00");
-  await expect(page.locator("#timer-status")).toHaveText(
-    "Complete · Cube 00:00",
-  );
+  await expect(page.locator("#status")).toHaveText("Countdown · Complete");
   expect(await page.locator("#move-progress").getAttribute("data-queued")).toBe(
     "",
   );
@@ -385,4 +375,200 @@ test("Counter's presentation-only blank tens never masks any Timer zero and surv
   await page.locator('[data-delta="1"]').click();
   await settled(page, "1");
   await expect(page.locator("#session-moves")).toHaveText("5");
+});
+
+async function verifyActualTimerMoves(page, startValue, finalValue, path) {
+  const data = await page.evaluate(() => ({
+    print: window.timerPrint,
+    start: window.timerStart,
+    moves: window.timerMoves,
+  }));
+  const word = data.moves
+    .map(
+      (p) =>
+        p.move.face +
+        (p.move.turns === 2 ? "2" : p.move.turns === -1 ? "'" : ""),
+    )
+    .join(" ");
+  writeFileSync(
+    path,
+    JSON.stringify({
+      kind: "jumps",
+      print: data.print,
+      start: data.start,
+      startValue,
+      transitions: [
+        { value: finalValue, word, state: data.moves.at(-1)?.to ?? data.start },
+      ],
+    }),
+  );
+  const result = JSON.parse(
+    execFileSync("python3", ["research/workshop-timer/verify.py", path], {
+      encoding: "utf8",
+    }),
+  );
+  expect(result.actualHTM).toBe(data.moves.length);
+  expect(Number(await page.locator("#session-moves").innerText())).toBe(
+    data.moves.length,
+  );
+  return data.moves.length;
+}
+test("exact Timer name, single focused action, dirty duration and independent speed controls", async ({
+  page,
+}) => {
+  await chooseTimer(page);
+  await expect(page.locator("#application option:checked")).toHaveText(
+    "60-Minute Timer",
+  );
+  await expect(
+    page.getByRole("heading", { name: "60-Minute Timer", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("#timer-pause")).toHaveCount(0);
+  await expect(page.locator(".timer-actions button")).toHaveCount(2);
+  await expect(page.locator("#timer-speed option")).toHaveText([
+    "1×",
+    "10×",
+    "20×",
+    "50×",
+    "100×",
+  ]);
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
+  await page.fill("#timer-duration", "00:20");
+  await page.locator("#timer-start").focus();
+  await page.locator("#timer-start").press("Space");
+  await expect(page.locator("#timer-logical")).toHaveText("00:20");
+  await expect(page.locator("#timer-start")).toHaveText("Pause");
+  await expect(page.locator("#timer-start")).toBeFocused();
+  await page.locator("#timer-start").press("Space");
+  await expect(page.locator("#timer-start")).toHaveText("Resume");
+  await expect(page.locator("#timer-start")).toBeFocused();
+  await page.selectOption("#timer-speed", "20");
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
+  await page.locator("#rotation-speed").fill("4");
+  await expect(page.locator("#timer-speed")).toHaveValue("20");
+  await page.click("#timer-reset");
+  await settled(page, "00:20");
+  await expect(page.locator("#timer-start")).toHaveText("Start");
+  await page.fill("#timer-duration", "60:00");
+  await page.click("#timer-start");
+  await expect(page.locator("#error")).not.toBeEmpty();
+  await expect(page.locator("#timer-start")).toHaveText("Start");
+  await settled(page, "00:20");
+});
+test("Stopwatch floors partial intervals, resumes fractions and stops at exact59:50 with actual full-state replay", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await chooseTimer(page);
+  await page.selectOption("#timer-mode", "stopwatch");
+  await settled(page, "00:00");
+  await expect(page.locator("#timer-duration-setting")).toBeHidden();
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await page.click("#timer-start");
+  await page.clock.fastForward(9999);
+  await expect(page.locator("#timer-logical")).toHaveText("00:00");
+  await page.clock.runFor(2501);
+  await settled(page, "00:10");
+  await page.click("#timer-start");
+  await expect(page.locator("#timer-start")).toHaveText("Resume");
+  await page.clock.fastForward(50000);
+  await expect(page.locator("#timer-logical")).toHaveText("00:10");
+  await page.selectOption("#timer-speed", "100");
+  await page.click("#timer-start");
+  await page.clock.fastForward(36000);
+  await page.clock.runFor(1000);
+  await settled(page, "59:50");
+  await expect(page.locator("#status")).toHaveText("Stopwatch · Limit reached");
+  await expect(page.locator("#timer-start")).toHaveText("Start");
+  await expect(page.locator("#timer-start")).toBeDisabled();
+  await verifyActualTimerMoves(
+    page,
+    90,
+    359,
+    "/tmp/cubistry-stopwatch-browser-commits.json",
+  );
+  await page.click("#timer-reset");
+  await page.clock.runFor(1000);
+  await settled(page, "00:00");
+  await expect(page.locator("#timer-start")).toHaveText("Start");
+  await expect(page.locator("#timer-start")).toBeEnabled();
+});
+test("switching modes during slow accelerated playback stops and resets through one bounded legal catch-up", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.clock.install();
+  await chooseTimer(page);
+  await page.locator("#rotation-speed").fill("0");
+  await page.selectOption("#timer-speed", "100");
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await page.click("#timer-start");
+  await page.clock.fastForward(200);
+  await page.clock.runFor(20);
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
+  await page.selectOption("#timer-mode", "stopwatch");
+  await expect(page.locator("#timer-logical")).toHaveText("00:00");
+  await expect(page.locator("#timer-start")).toHaveText("Start");
+  await expect(page.locator("#timer-speed")).toHaveValue("100");
+  await expect(page.locator("#rotation-speed")).toHaveValue("0");
+  for (let i = 0; i < 45; i++) {
+    await page.clock.fastForward(2100);
+    await page.clock.runFor(20);
+  }
+  await settled(page, "00:00");
+  await expect(page.locator("#status")).toHaveText("Stopwatch · Ready");
+  await verifyActualTimerMoves(
+    page,
+    90,
+    0,
+    "/tmp/cubistry-mode-switch-browser-commits.json",
+  );
+});
+test("interactive100x full-range countdown visibly lags slow-enough rotations and eventually verifies physical zero", async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await chooseTimer(page);
+  await duration(page, "59:50");
+  await page.click("#reset-session-moves");
+  await page.evaluate(() => {
+    window.timerStart = window.timerMoves.at(-1).to;
+    window.timerMoves = [];
+    window.timerTimes = [];
+  });
+  await page.selectOption("#timer-speed", "100");
+  const start = Date.now();
+  await page.click("#timer-start");
+  await expect(page.locator("#timer-sync")).toBeVisible({ timeout: 5000 });
+  await expect(page.locator("#timer-logical")).toHaveText("00:00", {
+    timeout: 45000,
+  });
+  await expect(page.locator("#status")).toHaveText("Countdown · Complete", {
+    timeout: 45000,
+  });
+  await settled(page, "00:00");
+  const moves = await verifyActualTimerMoves(
+    page,
+    359,
+    0,
+    "/tmp/cubistry-timelapse-browser-commits.json",
+  );
+  writeFileSync(
+    "/tmp/cubistry-timer-interactive-observation.json",
+    JSON.stringify(
+      {
+        timerSpeed: 100,
+        rotationMilliseconds: 250,
+        virtualSeconds: 3590,
+        wallMilliseconds: Date.now() - start,
+        committedHTM: moves,
+        observedLag: true,
+        allIntermediateDisplaysPromised: false,
+        physicalEnd: "00:00",
+      },
+      null,
+      2,
+    ),
+  );
 });

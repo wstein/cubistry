@@ -203,14 +203,13 @@ test("built Pages Workshop Timer loads its immutable certificate below the proje
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "15:00");
   await expect(page.locator("#timer-controls")).toBeVisible();
   await page.fill("#timer-duration", "00:10");
-  await page.click("#timer-set-duration");
+  await page.locator("#timer-duration").press("Enter");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "00:10");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.click("#timer-start");
-  await expect(page.locator("#timer-status")).toHaveText(
-    "Complete · Cube 00:00",
-    { timeout: 15000 },
-  );
+  await expect(page.locator("#status")).toHaveText("Countdown · Complete", {
+    timeout: 15000,
+  });
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "00:00");
   const image = PNG.sync.read(await page.locator("#cube canvas").screenshot());
   for (const center of [-0.52, 0.52]) {

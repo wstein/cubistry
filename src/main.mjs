@@ -27,30 +27,14 @@ let padded = true;
 let application = "certified",
   timerRoute,
   timerStarted = false;
+let durationDirty = false,
+  configuredSeconds = 900;
 const clock = new WorkshopClock();
 const error = (message = "") => {
   $("error").textContent = message;
 };
 function save() {
-  if (application === "timer") {
-    try {
-      const raw = JSON.parse(localStorage.getItem("cubistry-counter-v2"));
-      const prior =
-        raw && typeof raw === "object" && !Array.isArray(raw)
-          ? raw
-          : { value, label: "COUNTER", padded, application: "certified" };
-      localStorage.setItem(
-        "cubistry-counter-v2",
-        JSON.stringify({
-          ...prior,
-          moveDuration: durations[Number($("rotation-speed").value)],
-        }),
-      );
-    } catch {
-      /* Storage is optional; never substitute Timer state for Counter state. */
-    }
-    return;
-  }
+  if (application === "timer") return;
   try {
     localStorage.setItem(
       "cubistry-counter-v2",
@@ -78,12 +62,18 @@ function controlsUi() {
     (application === "timer" && clock.running && !clock.elapsed);
   $("counter-controls").hidden = application === "timer";
   $("timer-controls").hidden = application !== "timer";
-  $("timer-pause").disabled = !ready || !clock.running || clock.elapsed;
-  $("timer-start").disabled = !ready || clock.running || clock.elapsed;
-  $("timer-start").textContent =
-    timerStarted && !clock.elapsed ? "Resume" : "Start";
-  $("timer-set-duration").disabled = !ready;
-  $("timer-duration").disabled = !ready;
+  $("timer-start").disabled = !ready || (clock.elapsed && !durationDirty);
+  $("timer-start").textContent = clock.running
+    ? "Pause"
+    : timerStarted && !clock.elapsed && !durationDirty
+      ? "Resume"
+      : "Start";
+  $("timer-start").setAttribute("aria-pressed", String(clock.running));
+  $("timer-duration").disabled = !ready || clock.running;
+  $("timer-mode").disabled = !ready;
+  $("timer-speed").disabled = !ready;
+  $("timer-duration-setting").hidden = clock.mode === "stopwatch";
+  if (application !== "timer") $("timer-sync").hidden = true;
   $("reset-session-moves").disabled =
     !ready ||
     !!view?.busy ||
@@ -255,7 +245,10 @@ $("rotation-speed").addEventListener("input", () => {
 function tick() {
   if (!ready) return;
   if (application === "timer") {
-    if (clock.running && (view.currentValue !== clock.bucket || view.busy)) {
+    if (
+      (clock.running || (timerStarted && clock.elapsed)) &&
+      (view.currentValue !== clock.bucket || view.busy)
+    ) {
       const desired = clock.bucket;
       if (
         view.progress.queuedTarget !== desired &&
@@ -298,35 +291,49 @@ function timerUi() {
   text("timer-logical", formatTimer(logical));
   text("timer-physical", formatTimer(physical));
   const settling = !!view?.busy || physical !== logical;
-  const message = clock.elapsed
+  $("timer-sync").hidden = !settling;
+  const phase = clock.elapsed
     ? settling
-      ? "Time elapsed; cube settling to 00:00…"
-      : "Complete · Cube 00:00"
+      ? "Elapsed · settling"
+      : clock.mode === "stopwatch"
+        ? "Limit reached"
+        : "Complete"
     : clock.running
-      ? settling
-        ? `Running · Cube settling to ${formatTimer(logical)}…`
-        : `Running · ${formatTimer(logical)}`
-      : settling
-        ? `Paused; settling to ${formatTimer(logical)}…`
-        : timerStarted
-          ? `Paused · ${formatTimer(logical)}`
-          : `Ready · ${formatTimer(logical)}`;
-  text("timer-status", message);
-  text("status", message);
+      ? "Running"
+      : timerStarted
+        ? "Paused"
+        : "Ready";
+  text(
+    "status",
+    `${clock.mode === "countdown" ? "Countdown" : "Stopwatch"} · ${phase}`,
+  );
+}
+$("timer-duration").addEventListener("input", () => {
+  durationDirty = true;
+  controlsUi();
+});
+function applyDuration() {
+  const seconds = parseDuration($("timer-duration").value);
+  clock.configure(seconds);
+  configuredSeconds = seconds;
+  durationDirty = false;
+  timerStarted = false;
+  $("timer-duration").value = formatTimer(seconds / 10);
+  view.request(clock.bucket);
 }
 $("timer-start").addEventListener("click", () =>
   action(() => {
     if (!ready || application !== "timer") return;
-    timerStarted = true;
-    clock.start();
+    if (clock.running) {
+      clock.pause();
+      view.request(clock.bucket);
+    } else {
+      if (clock.mode === "countdown" && (!timerStarted || durationDirty))
+        applyDuration();
+      timerStarted = true;
+      clock.start();
+    }
     tick();
-  }),
-);
-$("timer-pause").addEventListener("click", () =>
-  action(() => {
-    if (!ready || application !== "timer") return;
-    clock.pause();
-    view.request(clock.bucket);
     timerUi();
     controlsUi();
   }),
@@ -336,6 +343,8 @@ $("timer-reset").addEventListener("click", () =>
     if (!ready || application !== "timer") return;
     clock.reset();
     timerStarted = false;
+    durationDirty = false;
+    $("timer-duration").value = formatTimer(configuredSeconds / 10);
     view.request(clock.bucket);
     timerUi();
     controlsUi();
@@ -344,16 +353,31 @@ $("timer-reset").addEventListener("click", () =>
 $("timer-duration-form").addEventListener("submit", (event) => {
   event.preventDefault();
   action(() => {
-    if (!ready || application !== "timer") return;
-    const seconds = parseDuration($("timer-duration").value);
-    clock.configure(seconds);
-    timerStarted = false;
-    $("timer-duration").value = formatTimer(seconds / 10);
-    view.request(clock.bucket);
+    if (!ready || application !== "timer" || clock.running) return;
+    applyDuration();
     timerUi();
     controlsUi();
   });
 });
+$("timer-mode").addEventListener("change", () =>
+  action(() => {
+    if (!ready || application !== "timer") return;
+    clock.setMode($("timer-mode").value);
+    timerStarted = false;
+    durationDirty = false;
+    $("timer-duration").value = formatTimer(configuredSeconds / 10);
+    view.request(clock.bucket);
+    timerUi();
+    controlsUi();
+  }),
+);
+$("timer-speed").addEventListener("change", () =>
+  action(() => {
+    if (!ready || application !== "timer") return;
+    clock.setSpeed(Number($("timer-speed").value));
+    tick();
+  }),
+);
 $("application").addEventListener("change", async () => {
   if (
     !ready ||
@@ -385,7 +409,13 @@ $("application").addEventListener("change", async () => {
         resolveAssets,
       );
       await candidate.configure(90);
+      clock.setMode("countdown");
       clock.configure(900);
+      clock.setSpeed(1);
+      $("timer-mode").value = "countdown";
+      $("timer-speed").value = "1";
+      configuredSeconds = 900;
+      durationDirty = false;
       timerStarted = false;
       $("timer-duration").value = "15:00";
     } else {
@@ -395,6 +425,8 @@ $("application").addEventListener("change", async () => {
     previous.dispose();
     view = candidate;
     application = requested;
+    $("rotation-speed").value = application === "timer" ? "3" : "4";
+    speedUi();
     formatUi();
     ready = true;
     error();
