@@ -1,0 +1,22 @@
+{
+  "status": "SAT",
+  "maximumRangeProven": true,
+  "maxSeconds": 2395,
+  "maximumDisplay": "39:55",
+  "inclusiveStates": 480,
+  "adjacentEdges": 479,
+  "totalHTM": 2261,
+  "meanHTM": 4.720250521920668,
+  "maximumHTM": 6,
+  "reverseHTM": 2261,
+  "setupHTM": 5,
+  "thirtyMinuteStates": 361,
+  "thirtyMinuteEdges": 360,
+  "thirtyMinuteHTM": 1703,
+  "firstExcludedSeconds": 2400,
+  "upperBound": "UNSAT",
+  "shortestDisplayEdgesVerified": 479,
+  "globalPrintMoveOptimality": "UNKNOWN",
+  "certificateSHA256": "629bce3f88b434798b5067a59ea3f3675e3a2ece5eecadafcce0e840f215384c",
+  "runtimeSeconds": 0.592
+}

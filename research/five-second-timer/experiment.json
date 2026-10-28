@@ -1,0 +1,68 @@
+{
+  "schema": "cubistry.five-second-experiment",
+  "version": 1,
+  "baseCommit": "39cb33ba730ddf4b66b1a52c67fc0f220ae43a21",
+  "authorization": "User explicitly authorized starting now on isolated branch from feat/30-workshop-countdown despite the initial dependency gate. Do not alter PR56.",
+  "question": "Largest continuous inclusive five-second MM/SS range on strict fixed-print2x2; then implement proven maximum.",
+  "priorResearchCommit": "7c05d28e97ecf30848220f5c70cb3100a4f3628d",
+  "priorGeometrySHA256": "d1616f23f88fc6ff1d9f502070652b6290e48d51bbb1fd6c7f503056a7d01264",
+  "testedRequestedMinutes": [
+    20,
+    30,
+    40,
+    50,
+    60
+  ],
+  "constructionCandidateMaxSeconds": 2395,
+  "firstExcludedCandidateSeconds": 2400,
+  "model": [
+    "8 rigid corners;24 fixed stickers",
+    "exact upright distinct digits;no optical aliases",
+    "fixed MM top,SS bottom;legal outer face turns",
+    "every five-second state from00:00 through exact top included"
+  ],
+  "search": {
+    "seed": 271028,
+    "trials": 512,
+    "objective": "lexicographic max then total consecutive HTM;no global move-optimality claim"
+  },
+  "status": "SAT through39:55; independently checkable UNSAT40:00; exact maximum under strict upright model",
+  "commands": [
+    "node research/five-second-timer/generate.mjs work/five-second-candidate.json",
+    "python3 research/five-second-timer/verify.py work/five-second-candidate.json"
+  ],
+  "candidateMetrics": {
+    "status": "SAT",
+    "maximumRangeProven": true,
+    "maxSeconds": 2395,
+    "maximumDisplay": "39:55",
+    "inclusiveStates": 480,
+    "adjacentEdges": 479,
+    "totalHTM": 2261,
+    "meanHTM": 4.720250521920668,
+    "maximumHTM": 6,
+    "reverseHTM": 2261,
+    "setupHTM": 5,
+    "thirtyMinuteStates": 361,
+    "thirtyMinuteEdges": 360,
+    "thirtyMinuteHTM": 1703,
+    "firstExcludedSeconds": 2400,
+    "upperBound": "UNSAT",
+    "shortestDisplayEdgesVerified": 479,
+    "globalPrintMoveOptimality": "UNKNOWN",
+    "certificateSHA256": "629bce3f88b434798b5067a59ea3f3675e3a2ece5eecadafcce0e840f215384c",
+    "runtimeSeconds": 0.592
+  },
+  "generatorProvenance": {
+    "geometry": "byte-identical from source commit",
+    "routeSearch": "adapted prior four-corner BFS and bounded within-slot search; no provider solver/table changes"
+  },
+  "runtimeCertificateSHA256": "0a718f652bae0e9e63414e329b5be536cacc2cbd52c209781f543bd96e28ed7b",
+  "reproductionNote": "Generation runtime is observational metadata; core runtime certificate excludes that metadata and is deterministic for the pinned source/seed.",
+  "independentUpperAuditSourceSHA256": "3684f72e865af7cad2829f8c4fb71c7c6ab4701f578dba8a4a523177b7ad743d",
+  "researchBranch": "research/cube-display-feasibility",
+  "featureBranch": "feat/58-five-second-timer",
+  "independentGate": "PROOF_GATE.md",
+  "researchSeparation": "User explicitly requires proofs, solver outputs and benchmarks on Research; feature will pin and reference a Research commit rather than duplicate research evidence.",
+  "independentReplaySHA256": "c174e332a72bd0607f3308f88cf4bfe3d85c46167f3c53574bd721470123af7a"
+}

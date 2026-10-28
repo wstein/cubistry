@@ -1,0 +1,14 @@
+{
+  "status": "SAT",
+  "physicalStates": 480,
+  "adjacentEdges": 479,
+  "totalHTM": 2261,
+  "maximumHTM": 6,
+  "meanHTM": 4.720250521920668,
+  "setupHTM": 5,
+  "thirtyMinuteStates": 361,
+  "thirtyMinuteEdges": 360,
+  "thirtyMinuteHTM": 1703,
+  "fullReverseEdgesVerified": 479,
+  "candidateSHA256": "629bce3f88b434798b5067a59ea3f3675e3a2ece5eecadafcce0e840f215384c"
+}
