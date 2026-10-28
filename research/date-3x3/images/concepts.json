@@ -1,0 +1,165 @@
+{
+  "schema": "cubistry.calendar-concept-images",
+  "version": 1,
+  "generator": "ChatGPT image_gen",
+  "purpose": "Original aesthetic front-view concepts; not canonical sticker artwork or physical proofs",
+  "referenceArtworkCopied": false,
+  "style": "Original ivory stickers,forest-green frame,teal digits,copper month lettering,charcoal weekdays; no logo or stand",
+  "reproducibility": "Exact cell contents are specified; generative bitmap output is not deterministic; final font/path production remains separate",
+  "images": [
+    {
+      "file": "four-proposals.png",
+      "sha256": "e6ac670f5bdf36b6f221a455fa6e9d674d481feaa60def1729766a66aef6c64d",
+      "exampleDate": "2026-07-08",
+      "frontCells": {
+        "en-3": [
+          "WED",
+          "",
+          "",
+          "J",
+          "U",
+          "L",
+          "0",
+          "",
+          "8"
+        ],
+        "de-3": [
+          "M",
+          "IT",
+          "",
+          "",
+          "0",
+          "8",
+          "J",
+          "U",
+          "L"
+        ],
+        "de-2": [
+          "M",
+          "I",
+          "",
+          "",
+          "0",
+          "8",
+          "J",
+          "U",
+          "L"
+        ],
+        "en-2": [
+          "WE",
+          "",
+          "",
+          "J",
+          "U",
+          "L",
+          "0",
+          "",
+          "8"
+        ]
+      }
+    },
+    {
+      "file": "february-proposals.png",
+      "sha256": "dcf74e545491825153717ce16c52cf1eb8643893ff59dd26684c08eb14a421f9",
+      "exampleDate": "2026-02-07",
+      "frontCells": {
+        "en-3": [
+          "S",
+          "AT",
+          "",
+          "F",
+          "E",
+          "B",
+          "0",
+          "",
+          "7"
+        ],
+        "de-3": [
+          "S",
+          "AM",
+          "",
+          "",
+          "0",
+          "7",
+          "",
+          "FEB",
+          ""
+        ],
+        "de-2": [
+          "S",
+          "A",
+          "",
+          "",
+          "0",
+          "7",
+          "F",
+          "E",
+          "B"
+        ],
+        "en-2": [
+          "S",
+          "A",
+          "",
+          "F",
+          "E",
+          "B",
+          "0",
+          "",
+          "7"
+        ]
+      }
+    },
+    {
+      "file": "english-adjacent-proposals.png",
+      "sha256": "117fcd12ff2544e6fee607bbb4df9bada7b990795a6dfb0eaeb6a37b600c7619",
+      "exampleDate": "2026-07-08",
+      "frontCells": {
+        "en-adjacent-3-zero": [
+          "WED",
+          "",
+          "",
+          "J",
+          "U",
+          "L",
+          "",
+          "0",
+          "8"
+        ],
+        "en-adjacent-3-unpadded": [
+          "WED",
+          "",
+          "",
+          "J",
+          "U",
+          "L",
+          "",
+          "",
+          "8"
+        ],
+        "en-adjacent-2-zero": [
+          "WE",
+          "",
+          "",
+          "J",
+          "U",
+          "L",
+          "",
+          "0",
+          "8"
+        ],
+        "en-adjacent-2-unpadded": [
+          "WE",
+          "",
+          "",
+          "J",
+          "U",
+          "L",
+          "",
+          "",
+          "8"
+        ]
+      },
+      "selectionStatus": "Revised English candidates; old B excluded"
+    }
+  ]
+}
