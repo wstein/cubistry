@@ -1,0 +1,41 @@
+{
+  "scope": "Source-to-display full legal witnesses; not consecutive-day costs or optimality claims",
+  "rows": [
+    {
+      "candidate": "de-2",
+      "targets": 2562,
+      "minimumOuterHTM": 16,
+      "maximumOuterHTM": 41,
+      "meanOuterHTM": 33.7088212334114,
+      "maximumWholeCubeRotations": 3,
+      "centerCorrections": 1890
+    },
+    {
+      "candidate": "de-3",
+      "targets": 2562,
+      "minimumOuterHTM": 15,
+      "maximumOuterHTM": 41,
+      "meanOuterHTM": 33.124121779859486,
+      "maximumWholeCubeRotations": 3,
+      "centerCorrections": 1789
+    },
+    {
+      "candidate": "en-2",
+      "targets": 2562,
+      "minimumOuterHTM": 14,
+      "maximumOuterHTM": 41,
+      "meanOuterHTM": 33.724043715846996,
+      "maximumWholeCubeRotations": 3,
+      "centerCorrections": 1912
+    },
+    {
+      "candidate": "en-3",
+      "targets": 2562,
+      "minimumOuterHTM": 13,
+      "maximumOuterHTM": 41,
+      "meanOuterHTM": 33.71623731459797,
+      "maximumWholeCubeRotations": 3,
+      "centerCorrections": 1918
+    }
+  ]
+}

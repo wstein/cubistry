@@ -26,3 +26,6 @@ cubies = "cubies"
 Zettel = "Zettel"
 # Required German Friday abbreviation in independently checked calendar data.
 FRE = "FRE"
+
+# Required fixed calendar fragment from the English Tuesday abbreviation.
+UE = "UE"

@@ -1,0 +1,50 @@
+{
+  "schema": "cubistry.3x3-center-corrections",
+  "version": 1,
+  "scope": "Fix only visible center orientation while restoring all noncenter frames; hidden center orientations are unconstrained",
+  "witnesses": [
+    {
+      "word": "R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+      "htm": 18,
+      "frontCenterSourceUp": [
+        0,
+        1,
+        0
+      ],
+      "frontCenterFinalUp": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "word": "R F R' F R F R' F R F R' F R F R' F R F R' F",
+      "htm": 20,
+      "frontCenterSourceUp": [
+        0,
+        1,
+        0
+      ],
+      "frontCenterFinalUp": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "word": "L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+      "htm": 18,
+      "frontCenterSourceUp": [
+        0,
+        1,
+        0
+      ],
+      "frontCenterFinalUp": [
+        -1,
+        0,
+        0
+      ]
+    }
+  ],
+  "globalOptimality": "UNKNOWN"
+}

@@ -1,0 +1,32 @@
+{
+  "status": "SAT",
+  "candidate": "en-3",
+  "locale": "EN",
+  "weekdayWidth": 3,
+  "physicalStickers": 54,
+  "gregorianDaysEnumerated": 146097,
+  "datePatternsVerified": 2562,
+  "allNonblankFramesUpright": true,
+  "visibleCenterOrientationVerified": true,
+  "blankUpIgnored": true,
+  "fullInverseRestorations": 2562,
+  "sourceToTargetHTM": {
+    "minimum": 13,
+    "maximum": 41,
+    "total": 86381,
+    "mean": 33.71623731459797
+  },
+  "wholeCubePreludeTokens": {
+    "minimum": 0,
+    "maximum": 3
+  },
+  "centerCorrectionHTMHistogram": {
+    "0": 644,
+    "18": 1334,
+    "20": 584
+  },
+  "witnessSHA256": "c79c0557a8ef2b84034aa064389d03006d44a1e114340934e7a60cac48101a72",
+  "constructiveSHA256": "ba9e12619be37628662cb758ef6627d388de98834b944270c7f071c040611679",
+  "globalMoveOptimality": "UNKNOWN",
+  "scope": "One immutable 3x3 print per candidate; outer-face turns plus explicit whole-cube preludes; fixed fragments; exact nonblank upright frames; all weekday/day/month patterns in the Gregorian 2000..2399 cycle."
+}

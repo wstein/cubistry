@@ -1,0 +1,56 @@
+{
+  "schema": "cubistry.date-3x3-revised-model",
+  "version": 2,
+  "supersedes": "model.json layout assumptions; its lexicons remain unchanged",
+  "source": "User clarification: fragments permitted, DE day middle, EN month middle",
+  "rows": {
+    "DE": [
+      "weekday",
+      "day",
+      "month"
+    ],
+    "EN": [
+      "weekday",
+      "month",
+      "day"
+    ]
+  },
+  "dayCells": {
+    "DE": [
+      "blank",
+      "tens",
+      "units"
+    ],
+    "EN": [
+      "tens",
+      "blank",
+      "units"
+    ]
+  },
+  "printing": "54 immutable images; fixed letter/digit fragments with explicit upright print frames; unprinted blanks have no required up direction",
+  "legalMoves": "All outer face turns and explicit whole-cube x/y/z rotations; center print-up tracked through every move",
+  "weekdays": "Two or three letters; two-letter names start in left column; multi-letter fragments may occupy one sticker",
+  "calendar": "All proleptic Gregorian dates in2000..2399, covering a complete400-year cycle; no year display",
+  "centerImages": {
+    "DE": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "",
+      ""
+    ],
+    "EN": [
+      "A",
+      "E",
+      "P",
+      "U",
+      "C",
+      "O"
+    ]
+  },
+  "combinedStatus": "UNKNOWN for unrestricted allowed fragments. The two exact proposed center-image inventories cannot coexist:10distinct nonblank images require more than6centers. This is not a universal impossibility proof for other bilingual segmentations.",
+  "excluded": "Retracted year/weekend-color features; application implementation; any copied reference artwork",
+  "reference": "http://www.chosi.org/puzzles/pics/5/d/5d_rubiks_cube_calendar.jpg",
+  "referenceUse": "Inspected only; not copied into repository or rendered proposals"
+}

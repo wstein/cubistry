@@ -1,0 +1,175 @@
+{
+  "schema": "cubistry.date-3x3-independent-review",
+  "version": 1,
+  "status": "SAT",
+  "verifiedVariants": 4,
+  "datePatternsVerified": 10248,
+  "modelSHA256": "756df6d51f84df64ef4813711ea66ee98e54a0fe17fb97b6302b1b020e905727",
+  "checkerSHA256": "c8ff97acdad91cc47fef09e1f4352b4f414613908ecef67e03f0148a3d3e5e7d",
+  "variants": [
+    {
+      "status": "SAT",
+      "candidate": "de-2",
+      "locale": "DE",
+      "weekdayWidth": 2,
+      "physicalStickers": 54,
+      "gregorianDaysEnumerated": 146097,
+      "datePatternsVerified": 2562,
+      "allNonblankFramesUpright": true,
+      "visibleCenterOrientationVerified": true,
+      "blankUpIgnored": true,
+      "fullInverseRestorations": 2562,
+      "sourceToTargetHTM": {
+        "minimum": 16,
+        "maximum": 41,
+        "total": 86362,
+        "mean": 33.7088212334114
+      },
+      "wholeCubePreludeTokens": {
+        "minimum": 0,
+        "maximum": 3
+      },
+      "centerCorrectionHTMHistogram": {
+        "0": 672,
+        "18": 1273,
+        "20": 617
+      },
+      "witnessSHA256": "f367e0ba9c5195801d1f10d2eb220bff329ee9de58452684abb201ce35e0c235",
+      "constructiveSHA256": "c3b765a181e7a9f0714f8392625f44ab207ff74680ba5305787c9342a845d826",
+      "globalMoveOptimality": "UNKNOWN",
+      "scope": "One immutable 3x3 print per candidate; outer-face turns plus explicit whole-cube preludes; fixed fragments; exact nonblank upright frames; all weekday/day/month patterns in the Gregorian 2000..2399 cycle."
+    },
+    {
+      "status": "SAT",
+      "candidate": "de-3",
+      "locale": "DE",
+      "weekdayWidth": 3,
+      "physicalStickers": 54,
+      "gregorianDaysEnumerated": 146097,
+      "datePatternsVerified": 2562,
+      "allNonblankFramesUpright": true,
+      "visibleCenterOrientationVerified": true,
+      "blankUpIgnored": true,
+      "fullInverseRestorations": 2562,
+      "sourceToTargetHTM": {
+        "minimum": 15,
+        "maximum": 41,
+        "total": 84864,
+        "mean": 33.124121779859486
+      },
+      "wholeCubePreludeTokens": {
+        "minimum": 0,
+        "maximum": 3
+      },
+      "centerCorrectionHTMHistogram": {
+        "0": 773,
+        "18": 954,
+        "20": 835
+      },
+      "witnessSHA256": "1ad7159614a452f872efbdd3c218874ea4997f341bc5c4153568cd1c68b31693",
+      "constructiveSHA256": "3cac27bf656c7e7f388b50c5ad2e2dc06eaac74a2697608959fcdb446f10cdc2",
+      "globalMoveOptimality": "UNKNOWN",
+      "scope": "One immutable 3x3 print per candidate; outer-face turns plus explicit whole-cube preludes; fixed fragments; exact nonblank upright frames; all weekday/day/month patterns in the Gregorian 2000..2399 cycle."
+    },
+    {
+      "status": "SAT",
+      "candidate": "en-2",
+      "locale": "EN",
+      "weekdayWidth": 2,
+      "physicalStickers": 54,
+      "gregorianDaysEnumerated": 146097,
+      "datePatternsVerified": 2562,
+      "allNonblankFramesUpright": true,
+      "visibleCenterOrientationVerified": true,
+      "blankUpIgnored": true,
+      "fullInverseRestorations": 2562,
+      "sourceToTargetHTM": {
+        "minimum": 14,
+        "maximum": 41,
+        "total": 86401,
+        "mean": 33.724043715846996
+      },
+      "wholeCubePreludeTokens": {
+        "minimum": 0,
+        "maximum": 3
+      },
+      "centerCorrectionHTMHistogram": {
+        "0": 650,
+        "18": 1316,
+        "20": 596
+      },
+      "witnessSHA256": "3a30b474e84f836adc72dece0aed86c4920e5ac1d5d645077cec9dce094b8d05",
+      "constructiveSHA256": "46763740d3a7c513f3c671c2a4b6a1c256528f67bc5e680617b3c7148cac084b",
+      "globalMoveOptimality": "UNKNOWN",
+      "scope": "One immutable 3x3 print per candidate; outer-face turns plus explicit whole-cube preludes; fixed fragments; exact nonblank upright frames; all weekday/day/month patterns in the Gregorian 2000..2399 cycle."
+    },
+    {
+      "status": "SAT",
+      "candidate": "en-3",
+      "locale": "EN",
+      "weekdayWidth": 3,
+      "physicalStickers": 54,
+      "gregorianDaysEnumerated": 146097,
+      "datePatternsVerified": 2562,
+      "allNonblankFramesUpright": true,
+      "visibleCenterOrientationVerified": true,
+      "blankUpIgnored": true,
+      "fullInverseRestorations": 2562,
+      "sourceToTargetHTM": {
+        "minimum": 13,
+        "maximum": 41,
+        "total": 86381,
+        "mean": 33.71623731459797
+      },
+      "wholeCubePreludeTokens": {
+        "minimum": 0,
+        "maximum": 3
+      },
+      "centerCorrectionHTMHistogram": {
+        "0": 644,
+        "18": 1334,
+        "20": 584
+      },
+      "witnessSHA256": "c79c0557a8ef2b84034aa064389d03006d44a1e114340934e7a60cac48101a72",
+      "constructiveSHA256": "ba9e12619be37628662cb758ef6627d388de98834b944270c7f071c040611679",
+      "globalMoveOptimality": "UNKNOWN",
+      "scope": "One immutable 3x3 print per candidate; outer-face turns plus explicit whole-cube preludes; fixed fragments; exact nonblank upright frames; all weekday/day/month patterns in the Gregorian 2000..2399 cycle."
+    }
+  ],
+  "centerHelpers": {
+    "status": "PASS",
+    "noncenterFramesRestored": true,
+    "helpers": [
+      {
+        "htm": 18,
+        "frontCenterFinalUp": [
+          1,
+          0,
+          0
+        ]
+      },
+      {
+        "htm": 20,
+        "frontCenterFinalUp": [
+          0,
+          -1,
+          0
+        ]
+      },
+      {
+        "htm": 18,
+        "frontCenterFinalUp": [
+          -1,
+          0,
+          0
+        ]
+      }
+    ],
+    "hiddenCenterOrientations": "Unconstrained"
+  },
+  "corruptionControls": 20,
+  "unittestMethods": 4,
+  "combinedLanguageStatus": "UNKNOWN for unrestricted word-fragment models; the exact proposed DE/EN center inventories cannot coexist",
+  "dailyTransitionOptimality": "UNKNOWN",
+  "artworkScope": "Front concept only; no production typography or physical print-sheet certification"
+}

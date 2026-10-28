@@ -1,0 +1,1343 @@
+{
+  "schema": "cubistry.date-3x3-capacity",
+  "version": 1,
+  "modelSHA256": "ec0c0eeec5f01fc7ebef31dcc83f11935be58cc9f69e2611809427272a6f6475",
+  "calendarDates": 146097,
+  "distinctWeekdayDayMonthPatterns": 2562,
+  "scope": "Necessary orbit/slot bounds only; no capacity-feasible row is called SAT",
+  "rows": [
+    {
+      "language": "DE",
+      "weekdayWidth": 2,
+      "dayLayout": "right",
+      "slotInventories": [
+        "DFMS",
+        "AIOR",
+        " ",
+        " ",
+        "0123",
+        "0123456789",
+        "ADFJMNOS",
+        "AEKOPUÄ",
+        "BGILNPRTVZ"
+      ],
+      "cornerTypeCount": 23,
+      "cornerLowerBound": 24,
+      "edgeTypeCount": 22,
+      "centerTypeCount": 4,
+      "blankCopyCases": [
+        {
+          "blankCopies": 1,
+          "minimumStickerBudget": 25
+        },
+        {
+          "blankCopies": 2,
+          "minimumStickerBudget": 24
+        },
+        {
+          "blankCopies": 3,
+          "minimumStickerBudget": 25
+        },
+        {
+          "blankCopies": 4,
+          "minimumStickerBudget": 26
+        },
+        {
+          "blankCopies": 5,
+          "minimumStickerBudget": 27
+        },
+        {
+          "blankCopies": 6,
+          "minimumStickerBudget": 28
+        },
+        {
+          "blankCopies": 7,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 8,
+          "minimumStickerBudget": 30
+        },
+        {
+          "blankCopies": 9,
+          "minimumStickerBudget": 31
+        },
+        {
+          "blankCopies": 10,
+          "minimumStickerBudget": 32
+        },
+        {
+          "blankCopies": 11,
+          "minimumStickerBudget": 33
+        },
+        {
+          "blankCopies": 12,
+          "minimumStickerBudget": 34
+        },
+        {
+          "blankCopies": 13,
+          "minimumStickerBudget": 35
+        },
+        {
+          "blankCopies": 14,
+          "minimumStickerBudget": 36
+        },
+        {
+          "blankCopies": 15,
+          "minimumStickerBudget": 37
+        },
+        {
+          "blankCopies": 16,
+          "minimumStickerBudget": 38
+        },
+        {
+          "blankCopies": 17,
+          "minimumStickerBudget": 39
+        },
+        {
+          "blankCopies": 18,
+          "minimumStickerBudget": 40
+        },
+        {
+          "blankCopies": 19,
+          "minimumStickerBudget": 41
+        },
+        {
+          "blankCopies": 20,
+          "minimumStickerBudget": 42
+        },
+        {
+          "blankCopies": 21,
+          "minimumStickerBudget": 43
+        },
+        {
+          "blankCopies": 22,
+          "minimumStickerBudget": 44
+        },
+        {
+          "blankCopies": 23,
+          "minimumStickerBudget": 45
+        },
+        {
+          "blankCopies": 24,
+          "minimumStickerBudget": 46
+        }
+      ],
+      "status": "UNKNOWN",
+      "contradictions": []
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 2,
+      "dayLayout": "split",
+      "slotInventories": [
+        "DFMS",
+        "AIOR",
+        " ",
+        "0123",
+        " ",
+        "0123456789",
+        "ADFJMNOS",
+        "AEKOPUÄ",
+        "BGILNPRTVZ"
+      ],
+      "cornerTypeCount": 23,
+      "cornerLowerBound": 24,
+      "edgeTypeCount": 25,
+      "centerTypeCount": 1,
+      "blankCopyCases": [
+        {
+          "blankCopies": 1,
+          "minimumStickerBudget": 25
+        },
+        {
+          "blankCopies": 2,
+          "minimumStickerBudget": 24
+        },
+        {
+          "blankCopies": 3,
+          "minimumStickerBudget": 25
+        },
+        {
+          "blankCopies": 4,
+          "minimumStickerBudget": 26
+        },
+        {
+          "blankCopies": 5,
+          "minimumStickerBudget": 27
+        },
+        {
+          "blankCopies": 6,
+          "minimumStickerBudget": 28
+        },
+        {
+          "blankCopies": 7,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 8,
+          "minimumStickerBudget": 30
+        },
+        {
+          "blankCopies": 9,
+          "minimumStickerBudget": 31
+        },
+        {
+          "blankCopies": 10,
+          "minimumStickerBudget": 32
+        },
+        {
+          "blankCopies": 11,
+          "minimumStickerBudget": 33
+        },
+        {
+          "blankCopies": 12,
+          "minimumStickerBudget": 34
+        },
+        {
+          "blankCopies": 13,
+          "minimumStickerBudget": 35
+        },
+        {
+          "blankCopies": 14,
+          "minimumStickerBudget": 36
+        },
+        {
+          "blankCopies": 15,
+          "minimumStickerBudget": 37
+        },
+        {
+          "blankCopies": 16,
+          "minimumStickerBudget": 38
+        },
+        {
+          "blankCopies": 17,
+          "minimumStickerBudget": 39
+        },
+        {
+          "blankCopies": 18,
+          "minimumStickerBudget": 40
+        },
+        {
+          "blankCopies": 19,
+          "minimumStickerBudget": 41
+        },
+        {
+          "blankCopies": 20,
+          "minimumStickerBudget": 42
+        },
+        {
+          "blankCopies": 21,
+          "minimumStickerBudget": 43
+        },
+        {
+          "blankCopies": 22,
+          "minimumStickerBudget": 44
+        },
+        {
+          "blankCopies": 23,
+          "minimumStickerBudget": 45
+        },
+        {
+          "blankCopies": 24,
+          "minimumStickerBudget": 46
+        }
+      ],
+      "status": "UNSAT",
+      "contradictions": [
+        "edge upright-slot types 25 exceed 24"
+      ]
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 2,
+      "dayLayout": "left",
+      "slotInventories": [
+        "DFMS",
+        "AIOR",
+        " ",
+        "0123",
+        "0123456789",
+        " ",
+        "ADFJMNOS",
+        "AEKOPUÄ",
+        "BGILNPRTVZ"
+      ],
+      "cornerTypeCount": 23,
+      "cornerLowerBound": 24,
+      "edgeTypeCount": 16,
+      "centerTypeCount": 10,
+      "blankCopyCases": [
+        {
+          "blankCopies": 1,
+          "minimumStickerBudget": 25
+        },
+        {
+          "blankCopies": 2,
+          "minimumStickerBudget": 24
+        },
+        {
+          "blankCopies": 3,
+          "minimumStickerBudget": 25
+        },
+        {
+          "blankCopies": 4,
+          "minimumStickerBudget": 26
+        },
+        {
+          "blankCopies": 5,
+          "minimumStickerBudget": 27
+        },
+        {
+          "blankCopies": 6,
+          "minimumStickerBudget": 28
+        },
+        {
+          "blankCopies": 7,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 8,
+          "minimumStickerBudget": 30
+        },
+        {
+          "blankCopies": 9,
+          "minimumStickerBudget": 31
+        },
+        {
+          "blankCopies": 10,
+          "minimumStickerBudget": 32
+        },
+        {
+          "blankCopies": 11,
+          "minimumStickerBudget": 33
+        },
+        {
+          "blankCopies": 12,
+          "minimumStickerBudget": 34
+        },
+        {
+          "blankCopies": 13,
+          "minimumStickerBudget": 35
+        },
+        {
+          "blankCopies": 14,
+          "minimumStickerBudget": 36
+        },
+        {
+          "blankCopies": 15,
+          "minimumStickerBudget": 37
+        },
+        {
+          "blankCopies": 16,
+          "minimumStickerBudget": 38
+        },
+        {
+          "blankCopies": 17,
+          "minimumStickerBudget": 39
+        },
+        {
+          "blankCopies": 18,
+          "minimumStickerBudget": 40
+        },
+        {
+          "blankCopies": 19,
+          "minimumStickerBudget": 41
+        },
+        {
+          "blankCopies": 20,
+          "minimumStickerBudget": 42
+        },
+        {
+          "blankCopies": 21,
+          "minimumStickerBudget": 43
+        },
+        {
+          "blankCopies": 22,
+          "minimumStickerBudget": 44
+        },
+        {
+          "blankCopies": 23,
+          "minimumStickerBudget": 45
+        },
+        {
+          "blankCopies": 24,
+          "minimumStickerBudget": 46
+        }
+      ],
+      "status": "UNSAT",
+      "contradictions": [
+        "center glyphs 10 exceed 6"
+      ]
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 3,
+      "dayLayout": "right",
+      "slotInventories": [
+        "DFMS",
+        "AIOR",
+        "EMNT",
+        " ",
+        "0123",
+        "0123456789",
+        "ADFJMNOS",
+        "AEKOPUÄ",
+        "BGILNPRTVZ"
+      ],
+      "cornerTypeCount": 26,
+      "cornerLowerBound": 26,
+      "edgeTypeCount": 22,
+      "centerTypeCount": 4,
+      "blankCopyCases": [],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 26 exceeds 24"
+      ]
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 3,
+      "dayLayout": "split",
+      "slotInventories": [
+        "DFMS",
+        "AIOR",
+        "EMNT",
+        "0123",
+        " ",
+        "0123456789",
+        "ADFJMNOS",
+        "AEKOPUÄ",
+        "BGILNPRTVZ"
+      ],
+      "cornerTypeCount": 26,
+      "cornerLowerBound": 26,
+      "edgeTypeCount": 25,
+      "centerTypeCount": 1,
+      "blankCopyCases": [],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 26 exceeds 24",
+        "edge upright-slot types 25 exceed 24"
+      ]
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 3,
+      "dayLayout": "left",
+      "slotInventories": [
+        "DFMS",
+        "AIOR",
+        "EMNT",
+        "0123",
+        "0123456789",
+        " ",
+        "ADFJMNOS",
+        "AEKOPUÄ",
+        "BGILNPRTVZ"
+      ],
+      "cornerTypeCount": 26,
+      "cornerLowerBound": 26,
+      "edgeTypeCount": 16,
+      "centerTypeCount": 10,
+      "blankCopyCases": [],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 26 exceeds 24",
+        "center glyphs 10 exceed 6"
+      ]
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 2,
+      "dayLayout": "right",
+      "slotInventories": [
+        "FMSTW",
+        "AEHORU",
+        " ",
+        " ",
+        "0123",
+        "0123456789",
+        "ADFJMNOS",
+        "ACEOPU",
+        "BCGLNPRTVY"
+      ],
+      "cornerTypeCount": 24,
+      "cornerLowerBound": 25,
+      "edgeTypeCount": 23,
+      "centerTypeCount": 4,
+      "blankCopyCases": [
+        {
+          "blankCopies": 1,
+          "minimumStickerBudget": 26
+        },
+        {
+          "blankCopies": 2,
+          "minimumStickerBudget": 25
+        },
+        {
+          "blankCopies": 3,
+          "minimumStickerBudget": 26
+        },
+        {
+          "blankCopies": 4,
+          "minimumStickerBudget": 27
+        },
+        {
+          "blankCopies": 5,
+          "minimumStickerBudget": 28
+        },
+        {
+          "blankCopies": 6,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 7,
+          "minimumStickerBudget": 30
+        },
+        {
+          "blankCopies": 8,
+          "minimumStickerBudget": 31
+        },
+        {
+          "blankCopies": 9,
+          "minimumStickerBudget": 32
+        },
+        {
+          "blankCopies": 10,
+          "minimumStickerBudget": 33
+        },
+        {
+          "blankCopies": 11,
+          "minimumStickerBudget": 34
+        },
+        {
+          "blankCopies": 12,
+          "minimumStickerBudget": 35
+        },
+        {
+          "blankCopies": 13,
+          "minimumStickerBudget": 36
+        },
+        {
+          "blankCopies": 14,
+          "minimumStickerBudget": 37
+        },
+        {
+          "blankCopies": 15,
+          "minimumStickerBudget": 38
+        },
+        {
+          "blankCopies": 16,
+          "minimumStickerBudget": 39
+        },
+        {
+          "blankCopies": 17,
+          "minimumStickerBudget": 40
+        },
+        {
+          "blankCopies": 18,
+          "minimumStickerBudget": 41
+        },
+        {
+          "blankCopies": 19,
+          "minimumStickerBudget": 42
+        },
+        {
+          "blankCopies": 20,
+          "minimumStickerBudget": 43
+        },
+        {
+          "blankCopies": 21,
+          "minimumStickerBudget": 44
+        },
+        {
+          "blankCopies": 22,
+          "minimumStickerBudget": 45
+        },
+        {
+          "blankCopies": 23,
+          "minimumStickerBudget": 46
+        },
+        {
+          "blankCopies": 24,
+          "minimumStickerBudget": 47
+        }
+      ],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 25 exceeds 24"
+      ]
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 2,
+      "dayLayout": "split",
+      "slotInventories": [
+        "FMSTW",
+        "AEHORU",
+        " ",
+        "0123",
+        " ",
+        "0123456789",
+        "ADFJMNOS",
+        "ACEOPU",
+        "BCGLNPRTVY"
+      ],
+      "cornerTypeCount": 24,
+      "cornerLowerBound": 25,
+      "edgeTypeCount": 26,
+      "centerTypeCount": 1,
+      "blankCopyCases": [
+        {
+          "blankCopies": 1,
+          "minimumStickerBudget": 26
+        },
+        {
+          "blankCopies": 2,
+          "minimumStickerBudget": 25
+        },
+        {
+          "blankCopies": 3,
+          "minimumStickerBudget": 26
+        },
+        {
+          "blankCopies": 4,
+          "minimumStickerBudget": 27
+        },
+        {
+          "blankCopies": 5,
+          "minimumStickerBudget": 28
+        },
+        {
+          "blankCopies": 6,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 7,
+          "minimumStickerBudget": 30
+        },
+        {
+          "blankCopies": 8,
+          "minimumStickerBudget": 31
+        },
+        {
+          "blankCopies": 9,
+          "minimumStickerBudget": 32
+        },
+        {
+          "blankCopies": 10,
+          "minimumStickerBudget": 33
+        },
+        {
+          "blankCopies": 11,
+          "minimumStickerBudget": 34
+        },
+        {
+          "blankCopies": 12,
+          "minimumStickerBudget": 35
+        },
+        {
+          "blankCopies": 13,
+          "minimumStickerBudget": 36
+        },
+        {
+          "blankCopies": 14,
+          "minimumStickerBudget": 37
+        },
+        {
+          "blankCopies": 15,
+          "minimumStickerBudget": 38
+        },
+        {
+          "blankCopies": 16,
+          "minimumStickerBudget": 39
+        },
+        {
+          "blankCopies": 17,
+          "minimumStickerBudget": 40
+        },
+        {
+          "blankCopies": 18,
+          "minimumStickerBudget": 41
+        },
+        {
+          "blankCopies": 19,
+          "minimumStickerBudget": 42
+        },
+        {
+          "blankCopies": 20,
+          "minimumStickerBudget": 43
+        },
+        {
+          "blankCopies": 21,
+          "minimumStickerBudget": 44
+        },
+        {
+          "blankCopies": 22,
+          "minimumStickerBudget": 45
+        },
+        {
+          "blankCopies": 23,
+          "minimumStickerBudget": 46
+        },
+        {
+          "blankCopies": 24,
+          "minimumStickerBudget": 47
+        }
+      ],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 25 exceeds 24",
+        "edge upright-slot types 26 exceed 24"
+      ]
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 2,
+      "dayLayout": "left",
+      "slotInventories": [
+        "FMSTW",
+        "AEHORU",
+        " ",
+        "0123",
+        "0123456789",
+        " ",
+        "ADFJMNOS",
+        "ACEOPU",
+        "BCGLNPRTVY"
+      ],
+      "cornerTypeCount": 24,
+      "cornerLowerBound": 25,
+      "edgeTypeCount": 17,
+      "centerTypeCount": 10,
+      "blankCopyCases": [
+        {
+          "blankCopies": 1,
+          "minimumStickerBudget": 26
+        },
+        {
+          "blankCopies": 2,
+          "minimumStickerBudget": 25
+        },
+        {
+          "blankCopies": 3,
+          "minimumStickerBudget": 26
+        },
+        {
+          "blankCopies": 4,
+          "minimumStickerBudget": 27
+        },
+        {
+          "blankCopies": 5,
+          "minimumStickerBudget": 28
+        },
+        {
+          "blankCopies": 6,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 7,
+          "minimumStickerBudget": 30
+        },
+        {
+          "blankCopies": 8,
+          "minimumStickerBudget": 31
+        },
+        {
+          "blankCopies": 9,
+          "minimumStickerBudget": 32
+        },
+        {
+          "blankCopies": 10,
+          "minimumStickerBudget": 33
+        },
+        {
+          "blankCopies": 11,
+          "minimumStickerBudget": 34
+        },
+        {
+          "blankCopies": 12,
+          "minimumStickerBudget": 35
+        },
+        {
+          "blankCopies": 13,
+          "minimumStickerBudget": 36
+        },
+        {
+          "blankCopies": 14,
+          "minimumStickerBudget": 37
+        },
+        {
+          "blankCopies": 15,
+          "minimumStickerBudget": 38
+        },
+        {
+          "blankCopies": 16,
+          "minimumStickerBudget": 39
+        },
+        {
+          "blankCopies": 17,
+          "minimumStickerBudget": 40
+        },
+        {
+          "blankCopies": 18,
+          "minimumStickerBudget": 41
+        },
+        {
+          "blankCopies": 19,
+          "minimumStickerBudget": 42
+        },
+        {
+          "blankCopies": 20,
+          "minimumStickerBudget": 43
+        },
+        {
+          "blankCopies": 21,
+          "minimumStickerBudget": 44
+        },
+        {
+          "blankCopies": 22,
+          "minimumStickerBudget": 45
+        },
+        {
+          "blankCopies": 23,
+          "minimumStickerBudget": 46
+        },
+        {
+          "blankCopies": 24,
+          "minimumStickerBudget": 47
+        }
+      ],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 25 exceeds 24",
+        "center glyphs 10 exceed 6"
+      ]
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 3,
+      "dayLayout": "right",
+      "slotInventories": [
+        "FMSTW",
+        "AEHORU",
+        "DEINTU",
+        " ",
+        "0123",
+        "0123456789",
+        "ADFJMNOS",
+        "ACEOPU",
+        "BCGLNPRTVY"
+      ],
+      "cornerTypeCount": 29,
+      "cornerLowerBound": 29,
+      "edgeTypeCount": 23,
+      "centerTypeCount": 4,
+      "blankCopyCases": [],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 29 exceeds 24"
+      ]
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 3,
+      "dayLayout": "split",
+      "slotInventories": [
+        "FMSTW",
+        "AEHORU",
+        "DEINTU",
+        "0123",
+        " ",
+        "0123456789",
+        "ADFJMNOS",
+        "ACEOPU",
+        "BCGLNPRTVY"
+      ],
+      "cornerTypeCount": 29,
+      "cornerLowerBound": 29,
+      "edgeTypeCount": 26,
+      "centerTypeCount": 1,
+      "blankCopyCases": [],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 29 exceeds 24",
+        "edge upright-slot types 26 exceed 24"
+      ]
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 3,
+      "dayLayout": "left",
+      "slotInventories": [
+        "FMSTW",
+        "AEHORU",
+        "DEINTU",
+        "0123",
+        "0123456789",
+        " ",
+        "ADFJMNOS",
+        "ACEOPU",
+        "BCGLNPRTVY"
+      ],
+      "cornerTypeCount": 29,
+      "cornerLowerBound": 29,
+      "edgeTypeCount": 17,
+      "centerTypeCount": 10,
+      "blankCopyCases": [],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 29 exceeds 24",
+        "center glyphs 10 exceed 6"
+      ]
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 2,
+      "dayLayout": "right",
+      "slotInventories": [
+        "DFMSTW",
+        "AEHIORU",
+        " ",
+        " ",
+        "0123",
+        "0123456789",
+        "ADFJMNOS",
+        "ACEKOPUÄ",
+        "BCGILNPRTVYZ"
+      ],
+      "cornerTypeCount": 27,
+      "cornerLowerBound": 28,
+      "edgeTypeCount": 26,
+      "centerTypeCount": 4,
+      "blankCopyCases": [
+        {
+          "blankCopies": 1,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 2,
+          "minimumStickerBudget": 28
+        },
+        {
+          "blankCopies": 3,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 4,
+          "minimumStickerBudget": 30
+        },
+        {
+          "blankCopies": 5,
+          "minimumStickerBudget": 31
+        },
+        {
+          "blankCopies": 6,
+          "minimumStickerBudget": 32
+        },
+        {
+          "blankCopies": 7,
+          "minimumStickerBudget": 33
+        },
+        {
+          "blankCopies": 8,
+          "minimumStickerBudget": 34
+        },
+        {
+          "blankCopies": 9,
+          "minimumStickerBudget": 35
+        },
+        {
+          "blankCopies": 10,
+          "minimumStickerBudget": 36
+        },
+        {
+          "blankCopies": 11,
+          "minimumStickerBudget": 37
+        },
+        {
+          "blankCopies": 12,
+          "minimumStickerBudget": 38
+        },
+        {
+          "blankCopies": 13,
+          "minimumStickerBudget": 39
+        },
+        {
+          "blankCopies": 14,
+          "minimumStickerBudget": 40
+        },
+        {
+          "blankCopies": 15,
+          "minimumStickerBudget": 41
+        },
+        {
+          "blankCopies": 16,
+          "minimumStickerBudget": 42
+        },
+        {
+          "blankCopies": 17,
+          "minimumStickerBudget": 43
+        },
+        {
+          "blankCopies": 18,
+          "minimumStickerBudget": 44
+        },
+        {
+          "blankCopies": 19,
+          "minimumStickerBudget": 45
+        },
+        {
+          "blankCopies": 20,
+          "minimumStickerBudget": 46
+        },
+        {
+          "blankCopies": 21,
+          "minimumStickerBudget": 47
+        },
+        {
+          "blankCopies": 22,
+          "minimumStickerBudget": 48
+        },
+        {
+          "blankCopies": 23,
+          "minimumStickerBudget": 49
+        },
+        {
+          "blankCopies": 24,
+          "minimumStickerBudget": 50
+        }
+      ],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 28 exceeds 24",
+        "edge upright-slot types 26 exceed 24"
+      ]
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 2,
+      "dayLayout": "split",
+      "slotInventories": [
+        "DFMSTW",
+        "AEHIORU",
+        " ",
+        "0123",
+        " ",
+        "0123456789",
+        "ADFJMNOS",
+        "ACEKOPUÄ",
+        "BCGILNPRTVYZ"
+      ],
+      "cornerTypeCount": 27,
+      "cornerLowerBound": 28,
+      "edgeTypeCount": 29,
+      "centerTypeCount": 1,
+      "blankCopyCases": [
+        {
+          "blankCopies": 1,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 2,
+          "minimumStickerBudget": 28
+        },
+        {
+          "blankCopies": 3,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 4,
+          "minimumStickerBudget": 30
+        },
+        {
+          "blankCopies": 5,
+          "minimumStickerBudget": 31
+        },
+        {
+          "blankCopies": 6,
+          "minimumStickerBudget": 32
+        },
+        {
+          "blankCopies": 7,
+          "minimumStickerBudget": 33
+        },
+        {
+          "blankCopies": 8,
+          "minimumStickerBudget": 34
+        },
+        {
+          "blankCopies": 9,
+          "minimumStickerBudget": 35
+        },
+        {
+          "blankCopies": 10,
+          "minimumStickerBudget": 36
+        },
+        {
+          "blankCopies": 11,
+          "minimumStickerBudget": 37
+        },
+        {
+          "blankCopies": 12,
+          "minimumStickerBudget": 38
+        },
+        {
+          "blankCopies": 13,
+          "minimumStickerBudget": 39
+        },
+        {
+          "blankCopies": 14,
+          "minimumStickerBudget": 40
+        },
+        {
+          "blankCopies": 15,
+          "minimumStickerBudget": 41
+        },
+        {
+          "blankCopies": 16,
+          "minimumStickerBudget": 42
+        },
+        {
+          "blankCopies": 17,
+          "minimumStickerBudget": 43
+        },
+        {
+          "blankCopies": 18,
+          "minimumStickerBudget": 44
+        },
+        {
+          "blankCopies": 19,
+          "minimumStickerBudget": 45
+        },
+        {
+          "blankCopies": 20,
+          "minimumStickerBudget": 46
+        },
+        {
+          "blankCopies": 21,
+          "minimumStickerBudget": 47
+        },
+        {
+          "blankCopies": 22,
+          "minimumStickerBudget": 48
+        },
+        {
+          "blankCopies": 23,
+          "minimumStickerBudget": 49
+        },
+        {
+          "blankCopies": 24,
+          "minimumStickerBudget": 50
+        }
+      ],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 28 exceeds 24",
+        "edge upright-slot types 29 exceed 24"
+      ]
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 2,
+      "dayLayout": "left",
+      "slotInventories": [
+        "DFMSTW",
+        "AEHIORU",
+        " ",
+        "0123",
+        "0123456789",
+        " ",
+        "ADFJMNOS",
+        "ACEKOPUÄ",
+        "BCGILNPRTVYZ"
+      ],
+      "cornerTypeCount": 27,
+      "cornerLowerBound": 28,
+      "edgeTypeCount": 20,
+      "centerTypeCount": 10,
+      "blankCopyCases": [
+        {
+          "blankCopies": 1,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 2,
+          "minimumStickerBudget": 28
+        },
+        {
+          "blankCopies": 3,
+          "minimumStickerBudget": 29
+        },
+        {
+          "blankCopies": 4,
+          "minimumStickerBudget": 30
+        },
+        {
+          "blankCopies": 5,
+          "minimumStickerBudget": 31
+        },
+        {
+          "blankCopies": 6,
+          "minimumStickerBudget": 32
+        },
+        {
+          "blankCopies": 7,
+          "minimumStickerBudget": 33
+        },
+        {
+          "blankCopies": 8,
+          "minimumStickerBudget": 34
+        },
+        {
+          "blankCopies": 9,
+          "minimumStickerBudget": 35
+        },
+        {
+          "blankCopies": 10,
+          "minimumStickerBudget": 36
+        },
+        {
+          "blankCopies": 11,
+          "minimumStickerBudget": 37
+        },
+        {
+          "blankCopies": 12,
+          "minimumStickerBudget": 38
+        },
+        {
+          "blankCopies": 13,
+          "minimumStickerBudget": 39
+        },
+        {
+          "blankCopies": 14,
+          "minimumStickerBudget": 40
+        },
+        {
+          "blankCopies": 15,
+          "minimumStickerBudget": 41
+        },
+        {
+          "blankCopies": 16,
+          "minimumStickerBudget": 42
+        },
+        {
+          "blankCopies": 17,
+          "minimumStickerBudget": 43
+        },
+        {
+          "blankCopies": 18,
+          "minimumStickerBudget": 44
+        },
+        {
+          "blankCopies": 19,
+          "minimumStickerBudget": 45
+        },
+        {
+          "blankCopies": 20,
+          "minimumStickerBudget": 46
+        },
+        {
+          "blankCopies": 21,
+          "minimumStickerBudget": 47
+        },
+        {
+          "blankCopies": 22,
+          "minimumStickerBudget": 48
+        },
+        {
+          "blankCopies": 23,
+          "minimumStickerBudget": 49
+        },
+        {
+          "blankCopies": 24,
+          "minimumStickerBudget": 50
+        }
+      ],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 28 exceeds 24",
+        "center glyphs 10 exceed 6"
+      ]
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 3,
+      "dayLayout": "right",
+      "slotInventories": [
+        "DFMSTW",
+        "AEHIORU",
+        "DEIMNTU",
+        " ",
+        "0123",
+        "0123456789",
+        "ADFJMNOS",
+        "ACEKOPUÄ",
+        "BCGILNPRTVYZ"
+      ],
+      "cornerTypeCount": 33,
+      "cornerLowerBound": 33,
+      "edgeTypeCount": 26,
+      "centerTypeCount": 4,
+      "blankCopyCases": [],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 33 exceeds 24",
+        "edge upright-slot types 26 exceed 24"
+      ]
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 3,
+      "dayLayout": "split",
+      "slotInventories": [
+        "DFMSTW",
+        "AEHIORU",
+        "DEIMNTU",
+        "0123",
+        " ",
+        "0123456789",
+        "ADFJMNOS",
+        "ACEKOPUÄ",
+        "BCGILNPRTVYZ"
+      ],
+      "cornerTypeCount": 33,
+      "cornerLowerBound": 33,
+      "edgeTypeCount": 29,
+      "centerTypeCount": 1,
+      "blankCopyCases": [],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 33 exceeds 24",
+        "edge upright-slot types 29 exceed 24"
+      ]
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 3,
+      "dayLayout": "left",
+      "slotInventories": [
+        "DFMSTW",
+        "AEHIORU",
+        "DEIMNTU",
+        "0123",
+        "0123456789",
+        " ",
+        "ADFJMNOS",
+        "ACEKOPUÄ",
+        "BCGILNPRTVYZ"
+      ],
+      "cornerTypeCount": 33,
+      "cornerLowerBound": 33,
+      "edgeTypeCount": 20,
+      "centerTypeCount": 10,
+      "blankCopyCases": [],
+      "status": "UNSAT",
+      "contradictions": [
+        "corner lower bound 33 exceeds 24",
+        "center glyphs 10 exceed 6"
+      ]
+    }
+  ]
+}

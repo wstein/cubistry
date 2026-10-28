@@ -1,0 +1,11 @@
+{
+  "name": "cubistry-date-3x3-proof",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "cubing": "0.66.1"
+  }
+}

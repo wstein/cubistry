@@ -1,0 +1,1276 @@
+[
+  {
+    "locales": [
+      "DE",
+      "EN"
+    ],
+    "weekdayWidth": 2,
+    "solverStatus": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+    "physicalFeasibility": "UNKNOWN",
+    "scope": "Inventory-budget screening only; rigid cubie assignments and legal moves unverified",
+    "cornerImages": 24,
+    "edgeImagesIncludingDay": 18,
+    "seconds": 0.6587035250013287,
+    "selected": [
+      {
+        "row": 0,
+        "word": "DI",
+        "parts": [
+          "D",
+          "I",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "DO",
+        "parts": [
+          "D",
+          "O",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "FR",
+        "parts": [
+          "FR",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MI",
+        "parts": [
+          "M",
+          "I",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MO",
+        "parts": [
+          "M",
+          "O",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SA",
+        "parts": [
+          "S",
+          "A",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SO",
+        "parts": [
+          "S",
+          "O",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SU",
+        "parts": [
+          "S",
+          "U",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "TH",
+        "parts": [
+          "T",
+          "H",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "TU",
+        "parts": [
+          "T",
+          "U",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "WE",
+        "parts": [
+          "WE",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "APR",
+        "parts": [
+          "APR",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "AUG",
+        "parts": [
+          "AUG",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "DEC",
+        "parts": [
+          "DEC",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "DEZ",
+        "parts": [
+          "DEZ",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "FEB",
+        "parts": [
+          "FEB",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JAN",
+        "parts": [
+          "JAN",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUL",
+        "parts": [
+          "JUL",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUN",
+        "parts": [
+          "JUN",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAI",
+        "parts": [
+          "MAI",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAR",
+        "parts": [
+          "MAR",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAY",
+        "parts": [
+          "MAY",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MÄR",
+        "parts": [
+          "MÄR",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "NOV",
+        "parts": [
+          "NOV",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "OCT",
+        "parts": [
+          "OCT",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "OKT",
+        "parts": [
+          "OKT",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "SEP",
+        "parts": [
+          "SEP",
+          "",
+          ""
+        ]
+      }
+    ]
+  },
+  {
+    "locales": [
+      "DE",
+      "EN"
+    ],
+    "weekdayWidth": 3,
+    "solverStatus": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+    "physicalFeasibility": "UNKNOWN",
+    "scope": "Inventory-budget screening only; rigid cubie assignments and legal moves unverified",
+    "cornerImages": 21,
+    "edgeImagesIncludingDay": 24,
+    "seconds": 6.380363740001485,
+    "selected": [
+      {
+        "row": 0,
+        "word": "DIE",
+        "parts": [
+          "",
+          "DIE",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "DON",
+        "parts": [
+          "",
+          "DON",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "FRE",
+        "parts": [
+          "",
+          "FRE",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "FRI",
+        "parts": [
+          "",
+          "FRI",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MIT",
+        "parts": [
+          "",
+          "MIT",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MON",
+        "parts": [
+          "",
+          "MON",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SAM",
+        "parts": [
+          "",
+          "SA",
+          "M"
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SAT",
+        "parts": [
+          "",
+          "SA",
+          "T"
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SON",
+        "parts": [
+          "",
+          "SON",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SUN",
+        "parts": [
+          "",
+          "SUN",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "THU",
+        "parts": [
+          "",
+          "THU",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "TUE",
+        "parts": [
+          "",
+          "TUE",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "WED",
+        "parts": [
+          "",
+          "WED",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "APR",
+        "parts": [
+          "",
+          "",
+          "APR"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "AUG",
+        "parts": [
+          "",
+          "",
+          "AUG"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "DEC",
+        "parts": [
+          "",
+          "",
+          "DEC"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "DEZ",
+        "parts": [
+          "",
+          "",
+          "DEZ"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "FEB",
+        "parts": [
+          "",
+          "",
+          "FEB"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JAN",
+        "parts": [
+          "",
+          "",
+          "JAN"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUL",
+        "parts": [
+          "",
+          "",
+          "JUL"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUN",
+        "parts": [
+          "",
+          "",
+          "JUN"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAI",
+        "parts": [
+          "",
+          "",
+          "MAI"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAR",
+        "parts": [
+          "",
+          "",
+          "MAR"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAY",
+        "parts": [
+          "",
+          "",
+          "MAY"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MÄR",
+        "parts": [
+          "",
+          "",
+          "MÄR"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "NOV",
+        "parts": [
+          "",
+          "",
+          "NOV"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "OCT",
+        "parts": [
+          "",
+          "",
+          "OCT"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "OKT",
+        "parts": [
+          "",
+          "",
+          "OKT"
+        ]
+      },
+      {
+        "row": 1,
+        "word": "SEP",
+        "parts": [
+          "",
+          "",
+          "SEP"
+        ]
+      }
+    ]
+  },
+  {
+    "locales": [
+      "DE"
+    ],
+    "weekdayWidth": 2,
+    "solverStatus": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+    "physicalFeasibility": "UNKNOWN",
+    "scope": "Inventory-budget screening only; rigid cubie assignments and legal moves unverified",
+    "cornerImages": 10,
+    "edgeImagesIncludingDay": 24,
+    "seconds": 0.14174200400157133,
+    "selected": [
+      {
+        "row": 0,
+        "word": "DI",
+        "parts": [
+          "DI",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "DO",
+        "parts": [
+          "DO",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "FR",
+        "parts": [
+          "FR",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MI",
+        "parts": [
+          "MI",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MO",
+        "parts": [
+          "MO",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SA",
+        "parts": [
+          "SA",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SO",
+        "parts": [
+          "SO",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "APR",
+        "parts": [
+          "",
+          "APR",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "AUG",
+        "parts": [
+          "",
+          "AUG",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "DEZ",
+        "parts": [
+          "",
+          "DEZ",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "FEB",
+        "parts": [
+          "",
+          "FEB",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JAN",
+        "parts": [
+          "",
+          "JAN",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUL",
+        "parts": [
+          "",
+          "JUL",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUN",
+        "parts": [
+          "",
+          "JUN",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAI",
+        "parts": [
+          "",
+          "MAI",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MÄR",
+        "parts": [
+          "",
+          "MÄR",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "NOV",
+        "parts": [
+          "",
+          "NOV",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "OKT",
+        "parts": [
+          "",
+          "OKT",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "SEP",
+        "parts": [
+          "",
+          "SEP",
+          ""
+        ]
+      }
+    ]
+  },
+  {
+    "locales": [
+      "DE"
+    ],
+    "weekdayWidth": 3,
+    "solverStatus": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+    "physicalFeasibility": "UNKNOWN",
+    "scope": "Inventory-budget screening only; rigid cubie assignments and legal moves unverified",
+    "cornerImages": 10,
+    "edgeImagesIncludingDay": 24,
+    "seconds": 0.4136697459980496,
+    "selected": [
+      {
+        "row": 0,
+        "word": "DIE",
+        "parts": [
+          "DIE",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "DON",
+        "parts": [
+          "DON",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "FRE",
+        "parts": [
+          "FRE",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MIT",
+        "parts": [
+          "MIT",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MON",
+        "parts": [
+          "MON",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SAM",
+        "parts": [
+          "SAM",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SON",
+        "parts": [
+          "SON",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "APR",
+        "parts": [
+          "",
+          "APR",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "AUG",
+        "parts": [
+          "",
+          "AUG",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "DEZ",
+        "parts": [
+          "",
+          "DEZ",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "FEB",
+        "parts": [
+          "",
+          "FEB",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JAN",
+        "parts": [
+          "",
+          "JAN",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUL",
+        "parts": [
+          "",
+          "JUL",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUN",
+        "parts": [
+          "",
+          "JUN",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAI",
+        "parts": [
+          "",
+          "MAI",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MÄR",
+        "parts": [
+          "",
+          "MÄR",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "NOV",
+        "parts": [
+          "",
+          "NOV",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "OKT",
+        "parts": [
+          "",
+          "OKT",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "SEP",
+        "parts": [
+          "",
+          "SEP",
+          ""
+        ]
+      }
+    ]
+  },
+  {
+    "locales": [
+      "EN"
+    ],
+    "weekdayWidth": 2,
+    "solverStatus": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+    "physicalFeasibility": "UNKNOWN",
+    "scope": "Inventory-budget screening only; rigid cubie assignments and legal moves unverified",
+    "cornerImages": 10,
+    "edgeImagesIncludingDay": 24,
+    "seconds": 0.08168127799945069,
+    "selected": [
+      {
+        "row": 0,
+        "word": "FR",
+        "parts": [
+          "FR",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MO",
+        "parts": [
+          "MO",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SA",
+        "parts": [
+          "SA",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SU",
+        "parts": [
+          "SU",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "TH",
+        "parts": [
+          "TH",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "TU",
+        "parts": [
+          "TU",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "WE",
+        "parts": [
+          "WE",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "APR",
+        "parts": [
+          "",
+          "APR",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "AUG",
+        "parts": [
+          "",
+          "AUG",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "DEC",
+        "parts": [
+          "",
+          "DEC",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "FEB",
+        "parts": [
+          "",
+          "FEB",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JAN",
+        "parts": [
+          "",
+          "JAN",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUL",
+        "parts": [
+          "",
+          "JUL",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUN",
+        "parts": [
+          "",
+          "JUN",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAR",
+        "parts": [
+          "",
+          "MAR",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAY",
+        "parts": [
+          "",
+          "MAY",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "NOV",
+        "parts": [
+          "",
+          "NOV",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "OCT",
+        "parts": [
+          "",
+          "OCT",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "SEP",
+        "parts": [
+          "",
+          "SEP",
+          ""
+        ]
+      }
+    ]
+  },
+  {
+    "locales": [
+      "EN"
+    ],
+    "weekdayWidth": 3,
+    "solverStatus": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+    "physicalFeasibility": "UNKNOWN",
+    "scope": "Inventory-budget screening only; rigid cubie assignments and legal moves unverified",
+    "cornerImages": 10,
+    "edgeImagesIncludingDay": 24,
+    "seconds": 0.30716209700040054,
+    "selected": [
+      {
+        "row": 0,
+        "word": "FRI",
+        "parts": [
+          "FRI",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "MON",
+        "parts": [
+          "MON",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SAT",
+        "parts": [
+          "SAT",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "SUN",
+        "parts": [
+          "SUN",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "THU",
+        "parts": [
+          "THU",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "TUE",
+        "parts": [
+          "TUE",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 0,
+        "word": "WED",
+        "parts": [
+          "WED",
+          "",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "APR",
+        "parts": [
+          "",
+          "APR",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "AUG",
+        "parts": [
+          "",
+          "AUG",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "DEC",
+        "parts": [
+          "",
+          "DEC",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "FEB",
+        "parts": [
+          "",
+          "FEB",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JAN",
+        "parts": [
+          "",
+          "JAN",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUL",
+        "parts": [
+          "",
+          "JUL",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "JUN",
+        "parts": [
+          "",
+          "JUN",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAR",
+        "parts": [
+          "",
+          "MAR",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "MAY",
+        "parts": [
+          "",
+          "MAY",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "NOV",
+        "parts": [
+          "",
+          "NOV",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "OCT",
+        "parts": [
+          "",
+          "OCT",
+          ""
+        ]
+      },
+      {
+        "row": 1,
+        "word": "SEP",
+        "parts": [
+          "",
+          "SEP",
+          ""
+        ]
+      }
+    ]
+  }
+]

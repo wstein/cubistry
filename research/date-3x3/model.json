@@ -1,0 +1,35 @@
+{
+  "schema": "cubistry.date-3x3-model",
+  "version": 1,
+  "scope": "New investigation; prior year and weekend-color requests were retracted",
+  "puzzle": "3x3x3",
+  "printing": "54 immutable one-character stickers; required letters and digits upright; no cross-glyph rotational aliases",
+  "moves": "All outer face turns plus whole-cube x/y/z rotations; fixed observation frame",
+  "blank": "An actual unprinted sticker, not an unconstrained cell",
+  "rows": ["weekday", "two-digit day with leading zero", "three-letter month"],
+  "weekdayTwoAlignment": "left; third cell blank",
+  "dayLayouts": {
+    "right": ["blank", "tens", "units"],
+    "split": ["tens", "blank", "units"],
+    "left": ["tens", "units", "blank"]
+  },
+  "provisionalPrimaryDayLayout": "right; user clarification pending",
+  "calendar": "Proleptic Gregorian, exhaustive 400-year cycle 2000..2399; no year display",
+  "languages": {
+    "DE": {
+      "weekdays2": ["MO", "DI", "MI", "DO", "FR", "SA", "SO"],
+      "weekdays3": ["MON", "DIE", "MIT", "DON", "FRE", "SAM", "SON"],
+      "months": ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"]
+    },
+    "EN": {
+      "weekdays2": ["MO", "TU", "WE", "TH", "FR", "SA", "SU"],
+      "weekdays3": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"],
+      "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+    }
+  },
+  "reference": {
+    "url": "http://www.chosi.org/puzzles/pics/5/d/5d_rubiks_cube_calendar.jpg",
+    "observation": "Photograph uses Mon/day word fragments on separate stickers, month in middle row and day below; different from this model",
+    "use": "Visual reference only; no artwork or exact print copied or committed"
+  }
+}

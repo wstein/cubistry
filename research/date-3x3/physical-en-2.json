@@ -1,0 +1,14 @@
+{
+  "schema": "cubistry.date-3x3-piece-candidate",
+  "version": 1,
+  "locales": [
+    "EN"
+  ],
+  "weekdayWidth": 2,
+  "timeoutSeconds": 30.0,
+  "solver": "z3-solver4.15.3.0",
+  "solverResult": "unknown",
+  "status": "UNKNOWN",
+  "scope": "Unverified rigid-piece candidate; not a legal-move proof",
+  "seconds": 30.08270938699934
+}
