@@ -56,7 +56,10 @@ It may reconcile through an arbitrary jump; such a run is not advertised as the
 Turning Auto off finishes the active legal value, drops queued automatic
 progression and reconciles the input to that value. Manual changes remain
 available; they explicitly rebase the running Auto clock to the new requested
-value. Stop-after-value, Reset and application/format changes turn Auto off.
+value. An edited Go input is a draft: automatic ticks continue updating the
+physical/logical counter without overwriting that draft. Submitting Go commits
+the entered value and rebases Auto from it; explicit numeric actions or new
+configuration clear the draft. Stop-after-value, Reset and application/format changes turn Auto off.
 Auto is off on reload. Value/application/format/speed persist in a versioned UI
 record; obsolete personalization records are not silently reapplied as a hidden
 print selection.

@@ -14,7 +14,8 @@ const $ = (id) => document.getElementById(id),
   timer = new MinuteTimer(),
   auto = new CounterAuto();
 let value = 0,
-  ready = false;
+  ready = false,
+  valueDraftDirty = false;
 let printConfig = { label: "COUNTER", padded: true, application: "certified" };
 const error = (message) => {
   $("error").textContent = message || "";
@@ -69,6 +70,7 @@ function timerUi() {
 function setValue(next, { manual = true } = {}) {
   if (!ready) return;
   if (manual) {
+    valueDraftDirty = false;
     timer.reset(next);
     if (auto.enabled)
       auto.start(
@@ -78,11 +80,11 @@ function setValue(next, { manual = true } = {}) {
       );
   }
   value = next;
-  $("value").value = String(next);
+  if (!valueDraftDirty) $("value").value = String(next);
   view.request(next);
   timerUi();
   save();
-  error();
+  if (!valueDraftDirty) error();
 }
 function action(fn) {
   try {
@@ -146,6 +148,9 @@ try {
   );
   $("status").textContent = "3D rendering unavailable.";
 }
+$("value").addEventListener("input", () => {
+  valueDraftDirty = true;
+});
 $("jump-form").addEventListener("submit", (e) => {
   e.preventDefault();
   action(() => setValue(parseValue($("value").value)));
@@ -198,7 +203,7 @@ $("stop-turns").addEventListener("click", () =>
     // Do not request again: that would reinstate the queue just cancelled.
     timer.reset(target);
     value = target;
-    $("value").value = String(target);
+    if (!valueDraftDirty) $("value").value = String(target);
     timerUi();
     save();
   }),
@@ -272,7 +277,7 @@ $("auto").addEventListener("change", () => {
     const active = view?.stopAfterCurrent();
     if (active != null) {
       value = active;
-      $("value").value = String(active);
+      if (!valueDraftDirty) $("value").value = String(active);
     }
   }
   timerUi();
