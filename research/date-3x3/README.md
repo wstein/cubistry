@@ -121,7 +121,9 @@ solver runs retain earlier assumptions with the day in the middle for both
 languages. They are historical experiments superseded by the user's revised
 English row order. Their qualified single-character bounds do not exclude
 current word-fragment proposals. The bounded Z3 runs timed out with UNKNOWN;
-inventory-only MILP candidates were never treated as physical SAT.
+inventory-only MILP candidates were never treated as physical SAT. The qualified
+historical bounds were also [independently checked](independent/initial-capacity-review.json);
+that check applies only to the superseded exact geometric single-character model.
 
 ## Reproduction
 

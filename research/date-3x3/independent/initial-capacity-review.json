@@ -1,0 +1,188 @@
+{
+  "schema": "cubistry.historical-capacity-independent-review",
+  "version": 1,
+  "reviewStatus": "PASS",
+  "rowsChecked": 18,
+  "qualifiedUNSATRows": 17,
+  "capacitySurvivorRows": 1,
+  "properRigidRotationsChecked": 24,
+  "frameInvariantChecks": 5184,
+  "calendarDays": 146097,
+  "datePatterns": 2562,
+  "blankCopyCasesChecked": 216,
+  "modelSHA256": "ec0c0eeec5f01fc7ebef31dcc83f11935be58cc9f69e2611809427272a6f6475",
+  "capacitySHA256": "96a5d38be0fa72849c5f2afae61c75ca08eb6d67e5948555dfa20e5d67bca0a3",
+  "rows": [
+    {
+      "language": "DE",
+      "weekdayWidth": 2,
+      "dayLayout": "right",
+      "cornerLowerBound": 24,
+      "edgeTypeCount": 22,
+      "centerTypeCount": 4,
+      "validatedStatus": "UNKNOWN"
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 2,
+      "dayLayout": "split",
+      "cornerLowerBound": 24,
+      "edgeTypeCount": 25,
+      "centerTypeCount": 1,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 2,
+      "dayLayout": "left",
+      "cornerLowerBound": 24,
+      "edgeTypeCount": 16,
+      "centerTypeCount": 10,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 3,
+      "dayLayout": "right",
+      "cornerLowerBound": 26,
+      "edgeTypeCount": 22,
+      "centerTypeCount": 4,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 3,
+      "dayLayout": "split",
+      "cornerLowerBound": 26,
+      "edgeTypeCount": 25,
+      "centerTypeCount": 1,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE",
+      "weekdayWidth": 3,
+      "dayLayout": "left",
+      "cornerLowerBound": 26,
+      "edgeTypeCount": 16,
+      "centerTypeCount": 10,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 2,
+      "dayLayout": "right",
+      "cornerLowerBound": 25,
+      "edgeTypeCount": 23,
+      "centerTypeCount": 4,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 2,
+      "dayLayout": "split",
+      "cornerLowerBound": 25,
+      "edgeTypeCount": 26,
+      "centerTypeCount": 1,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 2,
+      "dayLayout": "left",
+      "cornerLowerBound": 25,
+      "edgeTypeCount": 17,
+      "centerTypeCount": 10,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 3,
+      "dayLayout": "right",
+      "cornerLowerBound": 29,
+      "edgeTypeCount": 23,
+      "centerTypeCount": 4,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 3,
+      "dayLayout": "split",
+      "cornerLowerBound": 29,
+      "edgeTypeCount": 26,
+      "centerTypeCount": 1,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "EN",
+      "weekdayWidth": 3,
+      "dayLayout": "left",
+      "cornerLowerBound": 29,
+      "edgeTypeCount": 17,
+      "centerTypeCount": 10,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 2,
+      "dayLayout": "right",
+      "cornerLowerBound": 28,
+      "edgeTypeCount": 26,
+      "centerTypeCount": 4,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 2,
+      "dayLayout": "split",
+      "cornerLowerBound": 28,
+      "edgeTypeCount": 29,
+      "centerTypeCount": 1,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 2,
+      "dayLayout": "left",
+      "cornerLowerBound": 28,
+      "edgeTypeCount": 20,
+      "centerTypeCount": 10,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 3,
+      "dayLayout": "right",
+      "cornerLowerBound": 33,
+      "edgeTypeCount": 26,
+      "centerTypeCount": 4,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 3,
+      "dayLayout": "split",
+      "cornerLowerBound": 33,
+      "edgeTypeCount": 29,
+      "centerTypeCount": 1,
+      "validatedStatus": "UNSAT"
+    },
+    {
+      "language": "DE+EN",
+      "weekdayWidth": 3,
+      "dayLayout": "left",
+      "cornerLowerBound": 33,
+      "edgeTypeCount": 20,
+      "centerTypeCount": 10,
+      "validatedStatus": "UNSAT"
+    }
+  ],
+  "strictAssumptions": [
+    "Historical model.json: weekday/day/month rows in both languages",
+    "Exactly one character per nonblank sticker; no word fragments",
+    "Every nonblank glyph requires the exact geometric upright frame, including O and I; no self-rotation or cross-glyph optical aliases",
+    "Blank images are actual unprinted stickers; blank up is irrelevant",
+    "Rigid corner/edge/center orbits; proper outer-face and whole-cube rotations"
+  ],
+  "argument": "The invariant (p dot up, p dot (up cross normal)) uniquely fixes an upright nonblank sticker front slot. Each corner/edge has at most 24 stickers in its orbit and centers have six. For the sole TR blank, one copy wastes the other two stickers of its always-occupied corner; all copy counts1..24 are exhausted as necessary budget lower bounds.",
+  "scopeWarning": "These are conditional UNSAT proofs for a superseded strict model. They do not exclude current word-fragment prints, revised English row orders, or unrestricted bilingual proposals. The single surviving capacity row remains UNKNOWN here, not SAT."
+}

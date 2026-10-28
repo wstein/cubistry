@@ -39,7 +39,7 @@
     "node research/date-3x3/generate-witness.mjs ADJACENT_CANDIDATE ANOTHER_NEW_OUTPUT 2562 unpadded"
   ],
   "files": {
-    "README.md": "6c7048921c57cba5effe2c2418e2e4b0777e456f894687f549d27752008b42df",
+    "README.md": "7cf9ec31639dced7467c736c4863e84ea17ba686f60340ef52b0934dd410fe82",
     "adjacent/README.md": "97e66fff6be3d0a0ddbdf18c007687d3a00ed7a86baa1c1a6825290f3ec3af60",
     "adjacent/constructive/en-adjacent-2.json": "c2e03af7604b17a7c61cbb5ec17d2c3e8329168179c46383f0ce0be5d5589e99",
     "adjacent/constructive/en-adjacent-3.json": "aaf38f133ce16e8d1ef14e843f030d727324fc09ceb2177048b487ff9b9d0ea6",
@@ -92,6 +92,9 @@
     "witnesses/de-2.json": "f367e0ba9c5195801d1f10d2eb220bff329ee9de58452684abb201ce35e0c235",
     "witnesses/de-3.json": "1ad7159614a452f872efbdd3c218874ea4997f341bc5c4153568cd1c68b31693",
     "witnesses/en-2.json": "3a30b474e84f836adc72dece0aed86c4920e5ac1d5d645077cec9dce094b8d05",
-    "witnesses/en-3.json": "c79c0557a8ef2b84034aa064389d03006d44a1e114340934e7a60cac48101a72"
-  }
+    "witnesses/en-3.json": "c79c0557a8ef2b84034aa064389d03006d44a1e114340934e7a60cac48101a72",
+    "independent/verify_initial_capacity.py": "2b2123940fc9f11f8d1bb7daa3ce697b44c89d899965d1be6193db409c5c204b",
+    "independent/initial-capacity-review.json": "62bd687e1db594606c5d8eb86c89dc46c91c6a6217504023377a59a03d3f319c"
+  },
+  "historicalCapacityReview": "independent/initial-capacity-review.json"
 }
