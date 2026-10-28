@@ -692,6 +692,14 @@ for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844
       expect(Math.abs(box.x - initial.x), phase).toBeLessThan(0.5);
       expect(box.width, phase).toBe(initial.width);
     };
+    const capture = async (phase) => {
+      const path = testInfo.outputPath(`${phase}.png`);
+      if (viewport.width < 760) {
+        await page.locator(".cube-footer").screenshot({ path });
+      } else {
+        await page.screenshot({ path, fullPage: true });
+      }
+    };
     await page.evaluate(() => {
       window.sliderSamples = [];
       window.sampleSlider = true;
@@ -702,7 +710,7 @@ for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844
       };
       requestAnimationFrame(sample);
     });
-    await page.screenshot({ path: testInfo.outputPath("before.png"), fullPage: true });
+    await capture("before");
     // DOM activation avoids scrolling away from the pointer on mobile; actual turns still animate.
     await page.evaluate(() => document.querySelector("#timer-start").click());
     await page.clock.fastForward(10000);
@@ -711,7 +719,7 @@ for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844
     await expect(sync).toHaveAttribute("data-state", "moving");
     await expect(sync).toHaveText("Moving", { useInnerText: true });
     await stable("Running / Moving");
-    await page.screenshot({ path: testInfo.outputPath("moving.png"), fullPage: true });
+    await capture("moving");
     await page.mouse.move(initial.x + 8, initial.y + initial.height / 2);
     await page.mouse.down();
     await page.mouse.move(initial.x + initial.width * 0.8, initial.y + initial.height / 2, { steps: 5 });
@@ -725,7 +733,7 @@ for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844
     await page.mouse.up();
     await expect(slider).toHaveValue("2");
     await expect(page.locator("#timer-speed")).toHaveValue("1");
-    await page.screenshot({ path: testInfo.outputPath("synchronizing.png"), fullPage: true });
+    await capture("synchronizing");
     await page.evaluate(() => document.querySelector("#timer-start").click());
     await expect(page.locator("#status")).toHaveText("Countdown · Paused");
     await stable("Paused / Synchronizing");
@@ -740,7 +748,7 @@ for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844
     await expect(sync).toHaveText("", { useInnerText: true });
     await expect(page.locator("#timer-last-settled")).toBeHidden();
     await stable("Ready / Idle");
-    await page.screenshot({ path: testInfo.outputPath("after.png"), fullPage: true });
+    await capture("after");
     const samples = await page.evaluate(() => {
       window.sampleSlider = false;
       return window.sliderSamples;
