@@ -36,6 +36,9 @@ function draw() {
         state = snapshot.motion[i];
       node.dataset.state = state;
       node.textContent = `${String(u.controller.currentValue).padStart(2, "0")}${state === "idle" ? "" : state === "moving" ? " · Moving" : " · Synchronizing"}`;
+      const quarter = u.scheduledQuarterDuration ?? u.duration;
+      $(names[i] + "-timing").textContent =
+        `Scheduled: quarter ${quarter.toFixed(1)} ms · half ${(quarter * 2).toFixed(1)} ms${quarter < u.duration - 0.05 ? " · fitted to live time" : ""}`;
     });
   } catch (e) {
     fail(e);
@@ -109,7 +112,7 @@ async function initialize() {
       owned.push(controller);
       const duration = Number($(names[i] + "-speed").value),
         setDuration = (ms) =>
-          viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / ms);
+          viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / ms, "quarter-turn");
       setDuration(duration);
       units.push({ controller, duration, setDuration });
       $(names[i] + "-speed").disabled = false;

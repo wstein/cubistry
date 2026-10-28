@@ -9,7 +9,6 @@ import {
   type CubeState,
   type LegalMove,
 } from "@cubistry/cube-core";
-import type { MotionTiming } from "@cubistry/cube-viewer";
 import type { MovePresentation } from "@cubistry/cube-mechanics";
 import {
   applyMoves,
@@ -20,6 +19,7 @@ import {
 import { loadAssets, type AssetManifest } from "@cubistry/cube-assets";
 import { hsmTarget, type HsmDesign, type Letter } from "./design.ts";
 import { HsmPlanner } from "./planner.ts";
+import { routeTurnTiming } from "../shared/turn-timing.ts";
 export class HsmController extends PhysicalPlayback {
   private readonly design: HsmDesign;
   private readonly manifest: AssetManifest;
@@ -35,18 +35,32 @@ export class HsmController extends PhysicalPlayback {
     moves: readonly LegalMove[];
     target: CubeState;
   } | null = null;
-  private timing: { target: number; motion: MotionTiming } | null = null;
+  private timing: {
+    target: number;
+    endAt: number;
+    quarterDurationMs: number;
+    revision: number;
+  } | null = null;
   private revision = 0;
-  setDeadline(target: number, endAt: number, durationMs: number): void {
+  /** Clock-only angular schedule; standalone counting keeps its existing speed contract. */
+  setDeadline(target: number, endAt: number, quarterDurationMs: number): void {
+    demand(
+      Number.isFinite(endAt) &&
+        Number.isFinite(quarterDurationMs) &&
+        quarterDurationMs >= 10,
+      "Invalid HSM angular deadline",
+    );
     if (
       this.timing?.target === target &&
-      this.timing.motion.endAt === endAt &&
-      this.timing.motion.durationMs === durationMs
+      this.timing.endAt === endAt &&
+      this.timing.quarterDurationMs === quarterDurationMs
     )
       return;
     this.timing = {
       target,
-      motion: { endAt, durationMs, revision: ++this.revision },
+      endAt,
+      quarterDurationMs,
+      revision: ++this.revision,
     };
   }
   clearDeadline(): void {
@@ -54,13 +68,19 @@ export class HsmController extends PhysicalPlayback {
     this.revision++;
   }
   protected animateMove(presentation: MovePresentation): Promise<void> {
-    const final = this.playback.completed + 1 === this.playback.total;
+    const index = this.playback.completed;
     return this.view.animate(
       presentation,
-      final
+      this.timing
         ? () =>
             this.timing?.target === this.playback.target
-              ? this.timing.motion
+              ? routeTurnTiming(
+                  this.planned,
+                  index,
+                  this.timing.endAt,
+                  this.timing.quarterDurationMs,
+                  this.timing.revision,
+                )
               : null
         : undefined,
     );

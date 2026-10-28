@@ -17,29 +17,50 @@ the current local `HH:MM:SS` beside the cubes, or above them on narrow screens.
 It reads the same wall-clock snapshot for all units and remains live during
 physical motion. The browser's local time zone is displayed explicitly.
 
-Preferred move durations are H: 500 ms, M: 250 ms, S: 100 ms. All three retain
-the seven existing speed stops. Values slower than the available interval can
-lag; the physical status then says Synchronizing rather than claiming that an
-old pose is current. The digital control stays on actual time.
+Preferred quarter-turn durations are H: 500 ms, M: 250 ms, S: 100 ms. A half
+turn takes twice the scheduled quarter-turn duration. All three retain the seven
+existing preference stops. The clock shows both the preferred setting and the
+calculated scheduled quarter/half durations; these are plans, not measurements
+of browser latency. Long or deliberately slow routes shorten the angular period
+uniformly to fit the next live boundary. Standalone counters and timers retain
+their existing speed semantics.
 
 ## Predictive playback
 
-The scheduler prepares shortest HSM routes only from committed, idle full
-poses. It starts with a per-move frame margin, then times the final legal turn
-to the next relevant time boundary. Units sharing a boundary also share the
-exact monotonic endpoint. Hours, minutes, and seconds therefore target the
-same instant at midnight rather than being driven by three interval counters.
+The scheduler prepares shortest HTM routes only from committed, idle full poses.
+For a route, angular work is `Q = sum(abs(move.turns))`: a quarter turn contributes
+one unit and a half turn two. The nominal route duration is `Q * preferredMs`.
+At launch, `scheduledQuarterMs = min(preferredMs, availableMs / Q)`. Every turn
+gets a contiguous absolute window proportional to its angular work, and the last
+window ends at the shared live boundary. No per-move reserve is accumulated as
+an artificial pause before the final turn. Polling lateness is spread uniformly
+across the sequence instead of being hidden in its last turn.
+
+The minimum scheduled quarter turn is 10 ms. An insufficient remaining window
+stays Synchronizing rather than snapping an unfinished physical route. Recovery
+uses at most half the remaining local slot when possible, leaving time to plan
+the next value; it also honors the 10 ms minimum and the quarter/half ratio. A
+missed absolute turn window still plays incrementally with that ratio. Actual
+rendering can finish late if the browser or OS is delayed; the digital readout
+continues to show the shared current time.
+
+Units sharing a boundary share the exact monotonic endpoint. Hours, minutes,
+and seconds target the same instant at midnight rather than being driven by
+three interval counters.
 
 Hour boundaries are found from local-time changes, including DST repeats,
 spring skips, and half-hour offsets. A suspended tab or wall-clock jump clears
 outdated deadlines and retains only the latest current target. No missed-second
 backlog is replayed, no cube is teleported, and no sticker image is replaced.
 
-The HSM controller adds idle preparation and optional final-turn timing without
+The HSM controller adds idle preparation and optional all-turn angular timing without
 changing standalone counting defaults. It can install an initial current-time
 pose during application setup; later changes use actual legal moves. Its
 six-move general bound is inherited from the pinned [HSM proof](HSM_COUNTER.md).
 The narrower canonical five-move claim is not used as a universal clock promise.
+These proof bounds count a half turn as one HTM, whereas clock timing counts it
+as two angular units. A six-HTM route can therefore require up to twelve angular
+units before the live schedule is fitted.
 
 ## Verification
 
@@ -50,8 +71,11 @@ npm run test:e2e -- tests/browser/live-clock.spec.mjs
 
 Node regressions cover the shared midnight endpoint, DST changes and fractional
 time-zone offsets, wall-clock jumps, bounded suspended-tab catch-up, exact-pose
-preparation, current-value setup, and timing only on the final physical move.
-Browser cases cover live local initialization, independent speeds and blank
+preparation, current-value setup, and contiguous weighted timing on every physical move, slot fitting, and minimum-duration recovery.
+Browser regressions measure real mixed quarter/half turns and check that no turn
+waits in its start pose across multiple rendered frames. Separate recovery tests
+confirm quarter-based clock pacing and unchanged default viewer pacing.
+Browser cases also cover live local initialization, independent speeds and blank
 faces, responsive layout, synchronized midnight, suspended-tab recovery,
 navigation to the standalone HSM counter, and actual three-cube animation in one viewport
 against a shared midnight deadline. Physical endpoint checks use the committed
