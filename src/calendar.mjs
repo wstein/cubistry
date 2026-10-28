@@ -186,9 +186,15 @@ function tick() {
 }
 async function initialize() {
   try {
-    await document.fonts.load('600 168px "Counter Sans"');
+    await Promise.all(
+      [600, 800].map((weight) =>
+        document.fonts.load(`${weight} 168px "Counter Sans"`),
+      ),
+    );
     demand(
-      document.fonts.check('600 168px "Counter Sans"'),
+      [600, 800].every((weight) =>
+        document.fonts.check(`${weight} 168px "Counter Sans"`),
+      ),
       "Calendar font unavailable",
     );
     viewer = new CalendarViewer($("calendar-viewer"));

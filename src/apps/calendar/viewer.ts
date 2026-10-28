@@ -134,7 +134,7 @@ export class CalendarViewer {
       ctx.fillRect(0, 0, 256, 256);
       const art = stickerArt(s);
       ctx.fillStyle = art.color;
-      ctx.font = `600 ${art.size}px "Counter Sans"`;
+      ctx.font = `${art.weight} ${art.size}px "Counter Sans"`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(s.image, 128, 133);

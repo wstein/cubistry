@@ -1,22 +1,28 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { stickerSvg } from "../src/apps/calendar/artwork.ts";
-const font = readFileSync("public/fonts/noto-sans-latin-600.woff2");
+import { stickerArt, stickerSvg } from "../src/apps/calendar/artwork.ts";
+const fontFiles = [600, 800].map((weight) => ({
+  weight,
+  path: `public/fonts/noto-sans-latin-${weight}.woff2`,
+}));
+const fontData = Object.fromEntries(
+  fontFiles.map((f) => [f.weight, readFileSync(f.path)]),
+);
 const dir = "assets/calendar";
 mkdirSync(dir, { recursive: true });
 const manifest = {
   schema: "cubistry.calendar-artwork",
-  version: 1,
+  version: 2,
   dimensions: "14 mm square; 256-unit viewBox",
-  font: {
+  fonts: fontFiles.map((f) => ({
     family: "Noto Sans",
     package: "@fontsource/noto-sans@5.2.10",
-    weight: 600,
+    weight: f.weight,
     license: "SIL-OFL-1.1",
-    path: "public/fonts/noto-sans-latin-600.woff2",
-    sha256: createHash("sha256").update(font).digest("hex"),
+    path: f.path,
+    sha256: createHash("sha256").update(fontData[f.weight]).digest("hex"),
     licensePath: "public/fonts/OFL.txt",
-  },
+  })),
   designs: {},
 };
 for (const id of ["de-a", "en-3-zero"]) {
@@ -27,10 +33,19 @@ for (const id of ["de-a", "en-3-zero"]) {
     const key = `${s.slot}-${s.image || "blank"}`;
     if (!glyphs[key]) {
       const file = `${label}-${Object.keys(glyphs).length}.svg`;
-      const svg = stickerSvg(s, font.toString("base64"));
+      const svg = stickerSvg(
+        s,
+        Object.fromEntries(
+          Object.entries(fontData).map(([weight, bytes]) => [
+            weight,
+            bytes.toString("base64"),
+          ]),
+        ),
+      );
       writeFileSync(`${dir}/${file}`, svg + "\n");
       glyphs[key] = {
         file,
+        art: stickerArt(s),
         sha256: createHash("sha256")
           .update(svg + "\n")
           .digest("hex"),
