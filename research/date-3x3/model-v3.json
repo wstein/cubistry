@@ -1,0 +1,35 @@
+{
+  "schema": "cubistry.date-3x3-revised-model",
+  "version": 3,
+  "supersedes": "English split day and irregular weekday-fragment proposals in model-v2.json; old artifacts retained",
+  "userPriorities": [
+    "Visual consistency first",
+    "Proposal B rejected",
+    "No irregular word joining or splitting",
+    "English day digits adjacent",
+    "Permit omission of leading zero if needed"
+  ],
+  "activeProposals": {
+    "German": "de-2 (A), weekday/day/month",
+    "English": [
+      "en-adjacent-2",
+      "en-adjacent-3"
+    ]
+  },
+  "englishRows": [
+    "weekday",
+    "month",
+    "day"
+  ],
+  "englishWeekday": "Every complete2or3letter abbreviation occupies upper-left sticker; other two upper stickers unprinted",
+  "englishMonth": "Always three individual letters across middle row",
+  "englishDay": [
+    "blank",
+    "tens",
+    "units"
+  ],
+  "padding": "Both padded01..31 and unpadded1..31 on same immutable54sticker print per weekday width",
+  "legalMoves": "Outer-face turns and explicit whole-cube rotations, exact nonblank print-up including front center",
+  "combinedLanguage": "UNKNOWN in unrestricted fragment model; no universal impossibility claim",
+  "excluded": "B/de-3 rejected aesthetically despite mathematical SAT; old en-2/en-3 split day superseded; no year or red-weekend feature"
+}

@@ -1,0 +1,165 @@
+{
+  "schema": "cubistry.adjacent-calendar-independent-review",
+  "version": 1,
+  "status": "SAT",
+  "physicalPrints": 2,
+  "paddingModesPerPrint": 2,
+  "datePatternsVerified": 10248,
+  "sameImmutablePrintAcrossPaddingModes": true,
+  "variants": [
+    {
+      "status": "SAT",
+      "candidate": "en-adjacent-2",
+      "paddingMode": "zero",
+      "weekdayWidth": 2,
+      "physicalStickers": 54,
+      "datePatternsVerified": 2562,
+      "gregorianDaysEnumerated": 146097,
+      "dayColumns": [
+        "blank",
+        "tens-or-unprinted",
+        "units"
+      ],
+      "uniformWeekdayInTopLeft": true,
+      "monthThreeCharactersInMiddle": true,
+      "nonblankFramesIncludingCenterUpright": true,
+      "blankUpIgnored": true,
+      "fullInverseRestorations": 2562,
+      "sourceToTargetHTM": {
+        "minimum": 15,
+        "maximum": 41,
+        "total": 82376,
+        "mean": 32.15300546448088
+      },
+      "wholeCubePreludeTokens": {
+        "minimum": 0,
+        "maximum": 3
+      },
+      "centerCorrectionHTMHistogram": {
+        "0": 896,
+        "18": 826,
+        "20": 840
+      },
+      "sourcePrintDefinitionSHA256": "77839de731a36319a065ba3880fe00b3cbd683148bd49ca5a4a0091610b17dae",
+      "witnessSHA256": "4c48e393ca4eac09393af9c933afd7f7ea9c72cf485fe897797a55a0fbf42167",
+      "constructiveSHA256": "c2e03af7604b17a7c61cbb5ec17d2c3e8329168179c46383f0ce0be5d5589e99",
+      "dailyTransitionOptimality": "UNKNOWN"
+    },
+    {
+      "status": "SAT",
+      "candidate": "en-adjacent-2",
+      "paddingMode": "unpadded",
+      "weekdayWidth": 2,
+      "physicalStickers": 54,
+      "datePatternsVerified": 2562,
+      "gregorianDaysEnumerated": 146097,
+      "dayColumns": [
+        "blank",
+        "tens-or-unprinted",
+        "units"
+      ],
+      "uniformWeekdayInTopLeft": true,
+      "monthThreeCharactersInMiddle": true,
+      "nonblankFramesIncludingCenterUpright": true,
+      "blankUpIgnored": true,
+      "fullInverseRestorations": 2562,
+      "sourceToTargetHTM": {
+        "minimum": 16,
+        "maximum": 41,
+        "total": 82796,
+        "mean": 32.31693989071038
+      },
+      "wholeCubePreludeTokens": {
+        "minimum": 0,
+        "maximum": 3
+      },
+      "centerCorrectionHTMHistogram": {
+        "0": 865,
+        "18": 897,
+        "20": 800
+      },
+      "sourcePrintDefinitionSHA256": "77839de731a36319a065ba3880fe00b3cbd683148bd49ca5a4a0091610b17dae",
+      "witnessSHA256": "6bb247403bac4a47a6fef2812526a41100e5956ef6f2291f32ab362e7850e6f0",
+      "constructiveSHA256": "c2e03af7604b17a7c61cbb5ec17d2c3e8329168179c46383f0ce0be5d5589e99",
+      "dailyTransitionOptimality": "UNKNOWN"
+    },
+    {
+      "status": "SAT",
+      "candidate": "en-adjacent-3",
+      "paddingMode": "zero",
+      "weekdayWidth": 3,
+      "physicalStickers": 54,
+      "datePatternsVerified": 2562,
+      "gregorianDaysEnumerated": 146097,
+      "dayColumns": [
+        "blank",
+        "tens-or-unprinted",
+        "units"
+      ],
+      "uniformWeekdayInTopLeft": true,
+      "monthThreeCharactersInMiddle": true,
+      "nonblankFramesIncludingCenterUpright": true,
+      "blankUpIgnored": true,
+      "fullInverseRestorations": 2562,
+      "sourceToTargetHTM": {
+        "minimum": 15,
+        "maximum": 41,
+        "total": 82376,
+        "mean": 32.15300546448088
+      },
+      "wholeCubePreludeTokens": {
+        "minimum": 0,
+        "maximum": 3
+      },
+      "centerCorrectionHTMHistogram": {
+        "0": 896,
+        "18": 826,
+        "20": 840
+      },
+      "sourcePrintDefinitionSHA256": "931a8c98d145210dcc382624d9c402891bdadaab007ef3962e19fe61d1b15b0f",
+      "witnessSHA256": "871f3f2a093f7594adce82c307ed8e7f656f8adaaaf9ae60f290bfc9891382f2",
+      "constructiveSHA256": "aaf38f133ce16e8d1ef14e843f030d727324fc09ceb2177048b487ff9b9d0ea6",
+      "dailyTransitionOptimality": "UNKNOWN"
+    },
+    {
+      "status": "SAT",
+      "candidate": "en-adjacent-3",
+      "paddingMode": "unpadded",
+      "weekdayWidth": 3,
+      "physicalStickers": 54,
+      "datePatternsVerified": 2562,
+      "gregorianDaysEnumerated": 146097,
+      "dayColumns": [
+        "blank",
+        "tens-or-unprinted",
+        "units"
+      ],
+      "uniformWeekdayInTopLeft": true,
+      "monthThreeCharactersInMiddle": true,
+      "nonblankFramesIncludingCenterUpright": true,
+      "blankUpIgnored": true,
+      "fullInverseRestorations": 2562,
+      "sourceToTargetHTM": {
+        "minimum": 16,
+        "maximum": 41,
+        "total": 82796,
+        "mean": 32.31693989071038
+      },
+      "wholeCubePreludeTokens": {
+        "minimum": 0,
+        "maximum": 3
+      },
+      "centerCorrectionHTMHistogram": {
+        "0": 865,
+        "18": 897,
+        "20": 800
+      },
+      "sourcePrintDefinitionSHA256": "931a8c98d145210dcc382624d9c402891bdadaab007ef3962e19fe61d1b15b0f",
+      "witnessSHA256": "d1c224d5bf1226d2cd36405f7eda4e85b75776a29128c8bbd13587553c2ac437",
+      "constructiveSHA256": "aaf38f133ce16e8d1ef14e843f030d727324fc09ceb2177048b487ff9b9d0ea6",
+      "dailyTransitionOptimality": "UNKNOWN"
+    }
+  ],
+  "scope": "English only: whole weekday TL, month across middle, adjacent tens/units BM/BR; the tens sticker is blank for unpadded days 1..9.",
+  "limitations": "No global print optimum, shortest daily-transition claim, application, print-sheet export, or bilingual feasibility assertion."
+}
