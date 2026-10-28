@@ -1,0 +1,58 @@
+{
+  "schema": "cubistry.five-second-endpoint-observations",
+  "version": 1,
+  "observedAtUTC": "2026-10-28T16:48:33.492408+00:00",
+  "featureCommit": "31781457631d9b45b34417813d50f159d80251ef",
+  "parentCommit": "9036675e75645447727018e358fff0947a1f0ff8",
+  "runtimeSHA256": "fe46391d03877698633d87b5874763362f0c626ef83cade74d7c32656e990865",
+  "sourceSHA256": {
+    "src/apps/timer/clock.ts": "c36f09667cb52d46c23dd66222476bb5a1d9b49ee7e34b5ac26ff288c1b56265",
+    "src/apps/timer/controller.ts": "2d7f360e66e7f57a0f887d69eee4a45020aecd196ca40ce7dc571b94f10ff490",
+    "src/apps/timer/scheduler.ts": "564f9fbaa53ec2b9cd1db4058fad9b71e2158dd57289094f21e36d9d156caf57",
+    "src/main.mjs": "c10344c00c6bb595bdfd9dd8b573d1c5285d358b70368897a4dac41bbcabdbd6",
+    "packages/cube-viewer/src/index.ts": "6075b46c5cc91f3aa1270b03726997e7556b57147ebae623501f0862f5a9c80c",
+    "packages/cube-viewer/src/motion-timing.ts": "cf6124e011854d849e1cbd805c758b74d7e3d1178074c5808672759a3eec8a5a",
+    "tests/browser/five-second-timer.spec.mjs": "a1d002472c4476beddfaa992cedebb01b3edaca34d64453a3f1aa7debb9cbbf9"
+  },
+  "environment": "Local Linux container, Chromium141 SwiftShader, no reduced motion; current endpoint cases serialized at800x700; no hardware scheduling guarantee",
+  "endpointToleranceMilliseconds": 20,
+  "intervalMilliseconds": 5000,
+  "halfBudgetMilliseconds": 2500,
+  "rows": [
+    {
+      "file": "endpoint-250ms.json",
+      "kind": "current-endpoint",
+      "sha256": "292e70024d95a3b6c3e9aa1e23dcc47b6baacc0ab113935d332542390da48797",
+      "preferredMilliseconds": 250,
+      "effectiveMilliseconds": 250,
+      "deadlineDeltaMilliseconds": 2.0,
+      "actualHTM": 6
+    },
+    {
+      "file": "endpoint-10ms.json",
+      "kind": "current-endpoint",
+      "sha256": "21d479bd7266877ef926e7a17496e02dcef698c3a6f440327a11b76c3178d554",
+      "preferredMilliseconds": 10,
+      "effectiveMilliseconds": 10,
+      "deadlineDeltaMilliseconds": 2.5,
+      "actualHTM": 6
+    },
+    {
+      "file": "endpoint-2000ms.json",
+      "kind": "current-endpoint",
+      "sha256": "dbb589c7f3031c83a3c0d2ec20a0218425058c49b4729c451eddf75bd0f07ca9",
+      "preferredMilliseconds": 2000,
+      "effectiveMilliseconds": 337,
+      "deadlineDeltaMilliseconds": 3.0,
+      "actualHTM": 6
+    },
+    {
+      "file": "historical-pre-endpoint-late-10ms.json",
+      "kind": "historical-pre-endpoint",
+      "sha256": "4cef7c25b5082275147d31ced567297eb40aae6c0fa12d3e47fc120ee5027d26",
+      "localRevision": "6d0869374dcfb5630802f90bcb5f4592a69c4603",
+      "parentRevision": "89830b8dabd732d8b05978e99538adff76f422a2",
+      "publicationStatus": "Unpublished local pre-rebase experiment before final-turn endpoint timing; not a measurement of the current endpoint implementation"
+    }
+  ]
+}

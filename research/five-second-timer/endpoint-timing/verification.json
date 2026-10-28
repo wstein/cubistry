@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "featureCommit": "31781457631d9b45b34417813d50f159d80251ef",
+  "observations": [
+    {
+      "file": "endpoint-250ms.json",
+      "kind": "current-endpoint",
+      "actualHTM": 6,
+      "deadlineDeltaMilliseconds": 2.0,
+      "physical": {
+        "status": "PASS",
+        "actualTransitions": 1,
+        "actualHTM": 16,
+        "batches": 1
+      }
+    },
+    {
+      "file": "endpoint-10ms.json",
+      "kind": "current-endpoint",
+      "actualHTM": 6,
+      "deadlineDeltaMilliseconds": 2.5,
+      "physical": {
+        "status": "PASS",
+        "actualTransitions": 1,
+        "actualHTM": 16,
+        "batches": 1
+      }
+    },
+    {
+      "file": "endpoint-2000ms.json",
+      "kind": "current-endpoint",
+      "actualHTM": 6,
+      "deadlineDeltaMilliseconds": 3.0,
+      "physical": {
+        "status": "PASS",
+        "actualTransitions": 1,
+        "actualHTM": 16,
+        "batches": 1
+      }
+    },
+    {
+      "file": "historical-pre-endpoint-late-10ms.json",
+      "kind": "historical-pre-endpoint",
+      "actualHTM": 6,
+      "deadlineDeltaMilliseconds": 108.40000000037253,
+      "physical": {
+        "status": "PASS",
+        "actualTransitions": 1,
+        "actualHTM": 16,
+        "batches": 1
+      }
+    }
+  ],
+  "timestampAuthenticity": "Recorded browser observations, not an independently provable wall-clock guarantee"
+}
