@@ -1,3 +1,4 @@
+import { frontPoint } from "../helpers/front-projection.mjs";
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 import { readFile } from "node:fs/promises";
@@ -14,17 +15,9 @@ const active = [
   "abcdfg",
 ];
 function renderedDigit(image, centerX) {
-  const scale =
-    image.height / (2 * Math.tan((36 * Math.PI) / 360) * (5.3 - 1.021));
   const blue = ([r, g, b]) => b > r * 1.25 && b > g * 1.05;
   const sample = (px, py) => {
-    const x = Math.round(
-        image.width / 2 + (centerX + (px / 256 - 0.5) * 0.87) * scale,
-      ),
-      y = Math.round(
-        image.height / 2 - (-0.52 + (0.5 - py / 256) * 0.87) * scale,
-      ),
-      colors = [];
+    const [x, y] = frontPoint(image, centerX + (px / 256 - 0.5) * 0.87, -0.52 + (0.5 - py / 256) * 0.87), colors = [];
     for (let dy = -2; dy <= 2; dy++)
       for (let dx = -2; dx <= 2; dx++) {
         const at = ((y + dy) * image.width + x + dx) * 4;
@@ -70,14 +63,14 @@ test("built Pages counter resolves immutable assets under project base and rende
   });
   await page.goto("./");
   await expect(
-    page.getByText("Development Preview", { exact: true }),
+    page.getByRole("heading", { name: "Counter", exact: true }),
   ).toBeVisible();
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await expect(page.locator("#application")).toHaveValue("certified");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
   for (const value of [42, 43, 7, 99]) {
     await page.locator("#value").fill(String(value));
-    await page.locator("#jump-form button").click();
+    await page.locator("#set").click();
     await expect(page.locator("#cube")).toHaveAttribute(
       "data-value",
       String(value),
