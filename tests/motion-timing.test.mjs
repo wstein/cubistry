@@ -9,7 +9,7 @@ function harness(duration=250,endAt=1000) {
     cancelTimer(n){timers.delete(n);}};
   const promise=animateTimedProgress(()=>plan,()=>fallback,p=>samples.push({at,p}),runtime);
   return {samples,promise,all,frames,timers,
-    frame(time){at=time;const callbacks=[...frames.values()];frames.clear();for(const cb of callbacks)cb(at);},
+    frame(time,actual=time){at=actual;const callbacks=[...frames.values()];frames.clear();for(const cb of callbacks)cb(time);},
     timer(time){at=time;const callbacks=[...timers.entries()].filter(([,v])=>v.at<=at);for(const[n,v]of callbacks){timers.delete(n);v.cb();}},
     revise(time,durationMs=duration){plan={endAt:time,durationMs,revision:(plan?.revision??1)+1};},
     cancel(){plan=null;},fallback(value){fallback=value;},
@@ -62,4 +62,17 @@ test("a rounded zero-length remaining window still finishes with finite monotoni
   assert.ok(h.samples.at(-1).p>.99999999);
   h.revise(1e9);h.frame(1000);h.timer(1e9);await h.promise;
   assert.equal(h.samples.at(-1).p,1);assert.ok(h.samples.every(s=>Number.isFinite(s.p)));
+});
+test("a missed clock half turn retains twice the quarter-turn incremental duration",async()=>{
+  async function sample(durationMs){let at=0,callback;const samples=[];
+    const runtime={now:()=>at,frame(cb){callback=cb;return 1;},cancelFrame(){},timer(){throw Error('Expired timing must not install a timer');},cancelTimer(){}};
+    const promise=animateTimedProgress(()=>({endAt:-1,durationMs:100,lateDurationMs:durationMs,revision:1}),()=>100,p=>samples.push(p),runtime);
+    at=10;callback(10);const halfway=samples.at(-1);at=20;callback(20);await promise;return halfway;
+  }
+  assert.equal(await sample(10),1);assert.equal(await sample(20),.5);
+});
+test("a late RAF callback uses actual monotonic time instead of holding on a stale frame timestamp",async()=>{
+  const h=harness(200,200);
+  h.frame(0,100);assert.equal(h.samples.at(-1).p,.5);
+  h.frame(100,200);await h.promise;assert.equal(h.samples.at(-1).p,1);
 });
