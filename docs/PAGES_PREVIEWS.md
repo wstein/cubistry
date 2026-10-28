@@ -59,7 +59,10 @@ Pages settings migration, force push or protected research change.
   It strips modes and never executes content. A standard-library HTML parser
   locates actual document tags, ignoring comments/script/style/title/textarea
   text and inert template/noscript fragments; ambiguous/self-closing document
-  containers are rejected rather than rewritten. Every preview HTML gets noindex
+  containers are rejected rather than rewritten. The accepted contract is the
+  current Vite document structure (explicit HTML/body and optional implicit
+  head); iframe/xmp/noembed/noframes/plaintext containers and malformed document
+  nesting fail closed instead of attempting an HTML5 rewrite. Every preview HTML gets noindex
   and a visible non-production PR/SHA banner before Ross receives it.
 - Same-repository previews share the site's origin and can execute client-side
   JS in visitors' browsers. This is not a hostile-code sandbox; only authorized

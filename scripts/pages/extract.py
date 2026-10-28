@@ -5,27 +5,42 @@ from html.parser import HTMLParser
 MAX_TOTAL=64*1024*1024
 
 class DocumentBoundaries(HTMLParser):
-    """Locate real document tags without rewriting or executing artifact markup."""
+    """Strict Vite HTML document boundaries; never rewrite or execute markup."""
     CDATA_CONTENT_ELEMENTS=('script','style','title','textarea')
+    unsupported=('iframe','xmp','noembed','noframes','plaintext')
+    containers=('html','head','body','template','noscript','script','style','title','textarea')
     def __init__(self,text):
         super().__init__(convert_charrefs=False)
         self.offsets=[0]+[m.end() for m in re.finditer('\n',text)]
-        self.positions={};self.inert=[];self.feed(text);self.close()
+        self.positions={};self.inert=[];self.document=[];self.feed(text);self.close()
     def handle_starttag(self,tag,attrs):
+        if tag in self.unsupported:raise ValueError('Unsupported ambiguous raw-text container')
         if tag in ('template','noscript'):
             self.inert.append(tag);return
-        if self.inert or tag not in ('html','head','body'):return
+        if self.inert:return
+        if tag not in ('html','head','body'):
+            if 'body' not in self.positions and tag not in ('meta','link','base','title','style','script'):
+                raise ValueError('Unsupported markup before explicit body')
+            return
         if tag in self.positions:raise ValueError('Ambiguous document boundaries')
+        if (tag=='html' and self.document) or (tag in ('head','body') and self.document!=['html']):
+            raise ValueError('Document container is not an HTML child')
+        if tag=='head' and 'body' in self.positions:raise ValueError('Misordered document boundaries')
         line,column=self.getpos();start=self.offsets[line-1]+column
-        self.positions[tag]=(start,start+len(self.get_starttag_text()))
+        self.positions[tag]=(start,start+len(self.get_starttag_text()));self.document.append(tag)
     def handle_startendtag(self,tag,attrs):
-        if tag in ('html','head','body','template','noscript','title','textarea'):
+        if tag in self.containers or tag in self.unsupported:
             raise ValueError('Ambiguous self-closing document container')
         self.handle_starttag(tag,attrs)
     def handle_endtag(self,tag):
+        if tag in self.unsupported:raise ValueError('Unsupported ambiguous raw-text container')
         if tag in ('template','noscript'):
             if not self.inert or self.inert[-1]!=tag:raise ValueError('Ambiguous inert document markup')
-            self.inert.pop()
+            self.inert.pop();return
+        if self.inert:return
+        if tag in ('html','head','body'):
+            if not self.document or self.document[-1]!=tag:raise ValueError('Misnested document boundary')
+            self.document.pop()
 
 def mark_preview(text,number,sha):
     boundaries=DocumentBoundaries(text).positions

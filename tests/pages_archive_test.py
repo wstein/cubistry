@@ -37,15 +37,17 @@ class StaticArchiveTests(unittest.TestCase):
    def __init__(self):super().__init__();self.asides=0;self.metas=0
    def handle_starttag(self,tag,attrs):
     self.asides+=tag=='aside';self.metas+=tag=='meta' and ('name','robots') in attrs
-  for prefix in ['<!-- <head><body> -->', '<script>const example="<head><body>";</script>', '<title>literal <head><body> title</title>', '<textarea>literal <head><body> text</textarea>', '<template><head><body></body></head></template>', '<noscript><head><body></body></head></noscript>']:
+  for prefix in ['<!-- <head><body> -->', '<script>const example="<head><body>";</script>', '<title>literal <head><body> title</title>', '<template><head><body></body></head></template>', '<noscript><head><body></body></head></noscript>']:
    document='<html><head>'+prefix+'</head><body>app</body></html>'
    marked=E.mark_preview(document,52,'a'*40)
    self.assertIn('</head><body><aside ',marked)
    self.assertIn('<head><meta name="robots" content="noindex,nofollow">',marked)
    self.assertIn(prefix,marked)
+  marked=E.mark_preview('<html><head></head><body><textarea>literal <head><body> text</textarea></body></html>',52,'a'*40)
+  self.assertIn('</head><body><aside ',marked)
   with self.assertRaises(ValueError):E.mark_preview('<html><head><template><body>inert only</body></template></head></html>',52,'a'*40)
  def test_reject_ambiguous_document_containers(self):
-  for document in ['<html><head><template/></head><body>inert</body></html>', '<html><head><noscript/></head><body>ambiguous</body></html>', '<html><head></head><body>one<body>two</body></html>', '<html><head></head><head></head><body>duplicate</body></html>']:
+  for document in ['<html><head><template/></head><body>inert</body></html>', '<html><head><script/>const sample="<body>";</script></head><div>app</div></html>', '<html><head></head><iframe><body>fallback</iframe><div>app</div></html>', '<html><head><noscript/></head><body>ambiguous</body></html>', '<html><head></head><body>one<body>two</body></html>', '<html><head></head><head></head><body>duplicate</body></html>']:
    with self.subTest(document=document),self.assertRaises(ValueError):E.mark_preview(document,52,'a'*40)
  def test_reject_directory_or_empty_root_index(self):
   for items in [[('index.html/','')],[('index.html','')],[('index.html','not an HTML document')]]:
