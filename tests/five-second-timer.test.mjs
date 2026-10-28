@@ -201,6 +201,7 @@ test("five-second snapshots preserve exact next deadlines across both directions
         const s = c.snapshot();
         assert.equal(s.bucket, mode === "countdown" ? 479 - i : i);
         assert.equal(s.running, true);
+        assert.equal(s.liveSeconds,mode === "countdown" ? 2395-i*5 : i*5);
         assert.equal(s.next.target, mode === "countdown" ? 478 - i : i + 1);
         assert.ok(Math.abs(s.next.interval - 5000 / speed) < 1e-7);
         assert.ok(
