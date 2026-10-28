@@ -174,12 +174,14 @@
                 value="15:00"
                 aria-describedby="timer-bounds"
               />
-              <p id="timer-bounds" class="small">
-                00:00–59:50 · 10-second steps
-              </p>
             </div>
           </form>
-          <output id="timer-logical" class="timer-time" aria-label="Timer time"
+          <p id="timer-bounds" class="small">00:00–59:50 · 10-second steps</p>
+          <output
+            id="timer-logical"
+            class="timer-time"
+            aria-label="Timer time"
+            aria-describedby="timer-bounds"
             >15:00</output
           >
           <label for="timer-speed">Timer speed</label>

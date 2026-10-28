@@ -572,3 +572,36 @@ test("interactive100x full-range countdown visibly lags slow-enough rotations an
     ),
   );
 });
+
+test("all five Timer rates integrate continuously while running and remain independent of rotation speed", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await chooseTimer(page);
+  await duration(page, "01:00");
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await page.click("#timer-start");
+  for (const [rate, realMs, expected] of [
+    ["1", 1000, "01:00"],
+    ["10", 1000, "00:50"],
+    ["20", 500, "00:40"],
+    ["50", 200, "00:30"],
+    ["100", 100, "00:20"],
+  ]) {
+    await page.selectOption("#timer-speed", rate);
+    await page.clock.fastForward(realMs);
+    await expect(page.locator("#timer-logical")).toHaveText(expected);
+    await expect(page.locator("#timer-start")).toHaveText("Pause");
+    await expect(page.locator("#rotation-speed")).toHaveValue("3");
+  }
+  await page.click("#timer-start");
+  await page.clock.runFor(1000);
+  await settled(page, "00:20");
+  await expect(page.locator("#timer-start")).toHaveText("Resume");
+  await verifyActualTimerMoves(
+    page,
+    90,
+    2,
+    "/tmp/cubistry-rate-change-browser-commits.json",
+  );
+});

@@ -1,0 +1,17 @@
+{
+  "timerSpeed": 100,
+  "rotationMilliseconds": 250,
+  "virtualSeconds": 3590,
+  "wallMilliseconds": 40110,
+  "committedHTM": 134,
+  "observedLag": true,
+  "allIntermediateDisplaysPromised": false,
+  "physicalEnd": "00:00",
+  "schema": "cubistry.timer-observation",
+  "version": 1,
+  "codeCommit": "68f9b0e350c08e36b22b11adb6865a2dfd91482f",
+  "browser": "Chromium 154.0.8037.57 built on Debian GNU/Linux 13 (trixie)",
+  "clock": "real monotonic time; no reduced motion",
+  "configurationExcluded": true,
+  "traceSHA256": "bcb74a490e20fe261c265a0063b8a61628a9f49c3739c227a14c9f43c46d9fb9"
+}
