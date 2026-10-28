@@ -1,0 +1,16 @@
+{
+  "baselineResearchCommit": "6714710",
+  "sourceSHA256": {
+    "constructive/de-2.json": "c3b765a181e7a9f0714f8392625f44ab207ff74680ba5305787c9342a845d826",
+    "witnesses/de-2.json": "f367e0ba9c5195801d1f10d2eb220bff329ee9de58452684abb201ce35e0c235",
+    "adjacent/witnesses/en-adjacent-3-zero.json": "871f3f2a093f7594adce82c307ed8e7f656f8adaaaf9ae60f290bfc9891382f2"
+  },
+  "artifacts": {
+    "generate-certificate.py": "2dd107d4d1c00645133e17be671564375376e9d2fabd3646c811f34440cdcd61",
+    "model.json": "c66142c64a2aa55d4c46b1a3367288d9cfeb88b3dcdb95c314912f907f7c3770",
+    "verify-certificate.py": "3fde271406dff47b7b853997dfaf18ec55f9e1aaa192ce9ba570c070bfdc040d",
+    "README.md": "5b31601a10ebb5db4ca19c49fe5e1d65e6c0598feac52b1dc94bd7c9f1ac996e",
+    "test_certificate.py": "bcc5a0a39e6c7ee4550d932397dc80eb0d747f030c9f6612cffe74a98d030897",
+    "certificate.json": "eec12bfa56f2568e7ce391a4d1b5e178d24f6b00311681541302ff0986f9e6d7"
+  }
+}

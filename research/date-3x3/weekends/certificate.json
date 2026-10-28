@@ -1,0 +1,5645 @@
+{
+  "schema": "cubistry.calendar-weekend-edge-certificate",
+  "version": 1,
+  "modelSHA256": "c66142c64a2aa55d4c46b1a3367288d9cfeb88b3dcdb95c314912f907f7c3770",
+  "status": "UNSAT",
+  "scope": "Only the explicit German A layout/style model in model.json",
+  "sourceDates": 146097,
+  "fields": {
+    "weekday": [
+      "weekday:A:weekend",
+      "weekday:I:regularWeekday",
+      "weekday:O:regularWeekday",
+      "weekday:O:weekend",
+      "weekday:R:regularWeekday"
+    ],
+    "month": [
+      "month:A",
+      "month:E",
+      "month:K",
+      "month:O",
+      "month:P",
+      "month:U",
+      "month:Ä"
+    ],
+    "units": [
+      "units:0",
+      "units:1",
+      "units:2",
+      "units:3",
+      "units:4",
+      "units:5",
+      "units:6",
+      "units:7",
+      "units:8",
+      "units:9"
+    ]
+  },
+  "productSize": 350,
+  "coverage": [
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:0"
+      ],
+      "date": "2000-05-20"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:1"
+      ],
+      "date": "2000-01-01"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:2"
+      ],
+      "date": "2000-01-22"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:3"
+      ],
+      "date": "2000-05-13"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:4"
+      ],
+      "date": "2002-05-04"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:5"
+      ],
+      "date": "2000-01-15"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:6"
+      ],
+      "date": "2000-05-06"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:7"
+      ],
+      "date": "2000-05-27"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:8"
+      ],
+      "date": "2000-01-08"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:A",
+        "units:9"
+      ],
+      "date": "2000-01-29"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:0"
+      ],
+      "date": "2000-09-30"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:1"
+      ],
+      "date": "2001-09-01"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:2"
+      ],
+      "date": "2000-02-12"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:3"
+      ],
+      "date": "2000-09-23"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:4"
+      ],
+      "date": "2001-02-24"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:5"
+      ],
+      "date": "2000-02-05"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:6"
+      ],
+      "date": "2000-02-26"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:7"
+      ],
+      "date": "2001-02-17"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:8"
+      ],
+      "date": "2001-09-08"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:E",
+        "units:9"
+      ],
+      "date": "2000-02-19"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:0"
+      ],
+      "date": "2001-10-20"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:1"
+      ],
+      "date": "2000-10-21"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:2"
+      ],
+      "date": "2002-10-12"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:3"
+      ],
+      "date": "2001-10-13"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:4"
+      ],
+      "date": "2000-10-14"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:5"
+      ],
+      "date": "2002-10-05"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:6"
+      ],
+      "date": "2001-10-06"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:7"
+      ],
+      "date": "2000-10-07"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:8"
+      ],
+      "date": "2000-10-28"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:K",
+        "units:9"
+      ],
+      "date": "2002-10-19"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:0"
+      ],
+      "date": "2001-11-10"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:1"
+      ],
+      "date": "2000-11-11"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:2"
+      ],
+      "date": "2002-11-02"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:3"
+      ],
+      "date": "2001-11-03"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:4"
+      ],
+      "date": "2000-11-04"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:5"
+      ],
+      "date": "2000-11-25"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:6"
+      ],
+      "date": "2002-11-16"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:7"
+      ],
+      "date": "2001-11-17"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:8"
+      ],
+      "date": "2000-11-18"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:O",
+        "units:9"
+      ],
+      "date": "2002-11-09"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:0"
+      ],
+      "date": "2002-04-20"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:1"
+      ],
+      "date": "2000-04-01"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:2"
+      ],
+      "date": "2000-04-22"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:3"
+      ],
+      "date": "2002-04-13"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:4"
+      ],
+      "date": "2001-04-14"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:5"
+      ],
+      "date": "2000-04-15"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:6"
+      ],
+      "date": "2002-04-06"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:7"
+      ],
+      "date": "2001-04-07"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:8"
+      ],
+      "date": "2000-04-08"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:P",
+        "units:9"
+      ],
+      "date": "2000-04-29"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:0"
+      ],
+      "date": "2000-06-10"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:1"
+      ],
+      "date": "2000-07-01"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:2"
+      ],
+      "date": "2000-07-22"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:3"
+      ],
+      "date": "2000-06-03"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:4"
+      ],
+      "date": "2000-06-24"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:5"
+      ],
+      "date": "2000-07-15"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:6"
+      ],
+      "date": "2000-08-26"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:7"
+      ],
+      "date": "2000-06-17"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:8"
+      ],
+      "date": "2000-07-08"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:U",
+        "units:9"
+      ],
+      "date": "2000-07-29"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:0"
+      ],
+      "date": "2001-03-10"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:1"
+      ],
+      "date": "2000-03-11"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:2"
+      ],
+      "date": "2002-03-02"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:3"
+      ],
+      "date": "2001-03-03"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:4"
+      ],
+      "date": "2000-03-04"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:5"
+      ],
+      "date": "2000-03-25"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:6"
+      ],
+      "date": "2002-03-16"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:7"
+      ],
+      "date": "2001-03-17"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:8"
+      ],
+      "date": "2000-03-18"
+    },
+    {
+      "labels": [
+        "weekday:A:weekend",
+        "month:Ä",
+        "units:9"
+      ],
+      "date": "2002-03-09"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:0"
+      ],
+      "date": "2000-05-10"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:1"
+      ],
+      "date": "2000-01-11"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:2"
+      ],
+      "date": "2000-01-12"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:3"
+      ],
+      "date": "2000-05-03"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:4"
+      ],
+      "date": "2000-01-04"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:5"
+      ],
+      "date": "2000-01-05"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:6"
+      ],
+      "date": "2000-01-26"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:7"
+      ],
+      "date": "2000-05-17"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:8"
+      ],
+      "date": "2000-01-18"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:A",
+        "units:9"
+      ],
+      "date": "2000-01-19"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:0"
+      ],
+      "date": "2000-09-20"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:1"
+      ],
+      "date": "2000-02-01"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:2"
+      ],
+      "date": "2000-02-02"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:3"
+      ],
+      "date": "2000-02-23"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:4"
+      ],
+      "date": "2001-02-14"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:5"
+      ],
+      "date": "2000-02-15"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:6"
+      ],
+      "date": "2000-02-16"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:7"
+      ],
+      "date": "2000-09-27"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:8"
+      ],
+      "date": "2000-02-08"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:E",
+        "units:9"
+      ],
+      "date": "2000-02-09"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:0"
+      ],
+      "date": "2000-10-10"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:1"
+      ],
+      "date": "2000-10-11"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:2"
+      ],
+      "date": "2001-10-02"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:3"
+      ],
+      "date": "2000-10-03"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:4"
+      ],
+      "date": "2000-10-04"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:5"
+      ],
+      "date": "2000-10-25"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:6"
+      ],
+      "date": "2001-10-16"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:7"
+      ],
+      "date": "2000-10-17"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:8"
+      ],
+      "date": "2000-10-18"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:K",
+        "units:9"
+      ],
+      "date": "2001-10-09"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:0"
+      ],
+      "date": "2001-11-20"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:1"
+      ],
+      "date": "2000-11-01"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:2"
+      ],
+      "date": "2000-11-22"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:3"
+      ],
+      "date": "2001-11-13"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:4"
+      ],
+      "date": "2000-11-14"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:5"
+      ],
+      "date": "2000-11-15"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:6"
+      ],
+      "date": "2001-11-06"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:7"
+      ],
+      "date": "2000-11-07"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:8"
+      ],
+      "date": "2000-11-08"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:O",
+        "units:9"
+      ],
+      "date": "2000-11-29"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:0"
+      ],
+      "date": "2001-04-10"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:1"
+      ],
+      "date": "2000-04-11"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:2"
+      ],
+      "date": "2000-04-12"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:3"
+      ],
+      "date": "2001-04-03"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:4"
+      ],
+      "date": "2000-04-04"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:5"
+      ],
+      "date": "2000-04-05"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:6"
+      ],
+      "date": "2000-04-26"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:7"
+      ],
+      "date": "2001-04-17"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:8"
+      ],
+      "date": "2000-04-18"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:P",
+        "units:9"
+      ],
+      "date": "2000-04-19"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:0"
+      ],
+      "date": "2000-06-20"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:1"
+      ],
+      "date": "2000-06-21"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:2"
+      ],
+      "date": "2000-07-12"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:3"
+      ],
+      "date": "2000-06-13"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:4"
+      ],
+      "date": "2000-06-14"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:5"
+      ],
+      "date": "2000-07-05"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:6"
+      ],
+      "date": "2000-06-06"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:7"
+      ],
+      "date": "2000-06-07"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:8"
+      ],
+      "date": "2000-06-28"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:U",
+        "units:9"
+      ],
+      "date": "2000-07-19"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:0"
+      ],
+      "date": "2001-03-20"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:1"
+      ],
+      "date": "2000-03-01"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:2"
+      ],
+      "date": "2000-03-22"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:3"
+      ],
+      "date": "2001-03-13"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:4"
+      ],
+      "date": "2000-03-14"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:5"
+      ],
+      "date": "2000-03-15"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:6"
+      ],
+      "date": "2001-03-06"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:7"
+      ],
+      "date": "2000-03-07"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:8"
+      ],
+      "date": "2000-03-08"
+    },
+    {
+      "labels": [
+        "weekday:I:regularWeekday",
+        "month:Ä",
+        "units:9"
+      ],
+      "date": "2000-03-29"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:0"
+      ],
+      "date": "2000-01-10"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:1"
+      ],
+      "date": "2000-01-31"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:2"
+      ],
+      "date": "2000-05-22"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:3"
+      ],
+      "date": "2000-01-03"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:4"
+      ],
+      "date": "2000-01-24"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:5"
+      ],
+      "date": "2000-05-15"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:6"
+      ],
+      "date": "2000-01-06"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:7"
+      ],
+      "date": "2000-01-17"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:8"
+      ],
+      "date": "2000-05-08"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:A",
+        "units:9"
+      ],
+      "date": "2000-05-29"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:0"
+      ],
+      "date": "2000-02-10"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:1"
+      ],
+      "date": "2000-02-21"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:2"
+      ],
+      "date": "2001-02-12"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:3"
+      ],
+      "date": "2000-02-03"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:4"
+      ],
+      "date": "2000-02-14"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:5"
+      ],
+      "date": "2000-09-25"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:6"
+      ],
+      "date": "2001-02-26"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:7"
+      ],
+      "date": "2000-02-07"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:8"
+      ],
+      "date": "2000-02-28"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:E",
+        "units:9"
+      ],
+      "date": "2001-02-19"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:0"
+      ],
+      "date": "2000-10-30"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:1"
+      ],
+      "date": "2001-10-01"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:2"
+      ],
+      "date": "2000-10-02"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:3"
+      ],
+      "date": "2000-10-23"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:4"
+      ],
+      "date": "2001-10-04"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:5"
+      ],
+      "date": "2000-10-05"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:6"
+      ],
+      "date": "2000-10-16"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:7"
+      ],
+      "date": "2002-10-07"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:8"
+      ],
+      "date": "2001-10-08"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:K",
+        "units:9"
+      ],
+      "date": "2000-10-09"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:0"
+      ],
+      "date": "2000-11-20"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:1"
+      ],
+      "date": "2001-11-01"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:2"
+      ],
+      "date": "2000-11-02"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:3"
+      ],
+      "date": "2000-11-13"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:4"
+      ],
+      "date": "2002-11-04"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:5"
+      ],
+      "date": "2001-11-05"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:6"
+      ],
+      "date": "2000-11-06"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:7"
+      ],
+      "date": "2000-11-27"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:8"
+      ],
+      "date": "2001-11-08"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:O",
+        "units:9"
+      ],
+      "date": "2000-11-09"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:0"
+      ],
+      "date": "2000-04-10"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:1"
+      ],
+      "date": "2002-04-01"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:2"
+      ],
+      "date": "2001-04-02"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:3"
+      ],
+      "date": "2000-04-03"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:4"
+      ],
+      "date": "2000-04-24"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:5"
+      ],
+      "date": "2001-04-05"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:6"
+      ],
+      "date": "2000-04-06"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:7"
+      ],
+      "date": "2000-04-17"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:8"
+      ],
+      "date": "2002-04-08"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:P",
+        "units:9"
+      ],
+      "date": "2001-04-09"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:0"
+      ],
+      "date": "2000-07-10"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:1"
+      ],
+      "date": "2000-06-01"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:2"
+      ],
+      "date": "2000-06-12"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:3"
+      ],
+      "date": "2000-07-03"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:4"
+      ],
+      "date": "2000-07-24"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:5"
+      ],
+      "date": "2000-06-05"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:6"
+      ],
+      "date": "2000-06-26"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:7"
+      ],
+      "date": "2000-07-17"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:8"
+      ],
+      "date": "2000-06-08"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:U",
+        "units:9"
+      ],
+      "date": "2000-06-19"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:0"
+      ],
+      "date": "2000-03-20"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:1"
+      ],
+      "date": "2001-03-01"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:2"
+      ],
+      "date": "2000-03-02"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:3"
+      ],
+      "date": "2000-03-13"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:4"
+      ],
+      "date": "2002-03-04"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:5"
+      ],
+      "date": "2001-03-05"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:6"
+      ],
+      "date": "2000-03-06"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:7"
+      ],
+      "date": "2000-03-27"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:8"
+      ],
+      "date": "2001-03-08"
+    },
+    {
+      "labels": [
+        "weekday:O:regularWeekday",
+        "month:Ä",
+        "units:9"
+      ],
+      "date": "2000-03-09"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:0"
+      ],
+      "date": "2000-01-30"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:1"
+      ],
+      "date": "2000-05-21"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:2"
+      ],
+      "date": "2000-01-02"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:3"
+      ],
+      "date": "2000-01-23"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:4"
+      ],
+      "date": "2000-05-14"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:5"
+      ],
+      "date": "2002-05-05"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:6"
+      ],
+      "date": "2000-01-16"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:7"
+      ],
+      "date": "2000-05-07"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:8"
+      ],
+      "date": "2000-05-28"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:A",
+        "units:9"
+      ],
+      "date": "2000-01-09"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:0"
+      ],
+      "date": "2000-02-20"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:1"
+      ],
+      "date": "2000-12-31"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:2"
+      ],
+      "date": "2001-09-02"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:3"
+      ],
+      "date": "2000-02-13"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:4"
+      ],
+      "date": "2000-09-24"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:5"
+      ],
+      "date": "2001-02-25"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:6"
+      ],
+      "date": "2000-02-06"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:7"
+      ],
+      "date": "2000-02-27"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:8"
+      ],
+      "date": "2001-02-18"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:E",
+        "units:9"
+      ],
+      "date": "2001-09-09"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:0"
+      ],
+      "date": "2002-10-20"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:1"
+      ],
+      "date": "2000-10-01"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:2"
+      ],
+      "date": "2000-10-22"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:3"
+      ],
+      "date": "2002-10-13"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:4"
+      ],
+      "date": "2001-10-14"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:5"
+      ],
+      "date": "2000-10-15"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:6"
+      ],
+      "date": "2002-10-06"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:7"
+      ],
+      "date": "2001-10-07"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:8"
+      ],
+      "date": "2000-10-08"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:K",
+        "units:9"
+      ],
+      "date": "2000-10-29"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:0"
+      ],
+      "date": "2002-11-10"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:1"
+      ],
+      "date": "2001-11-11"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:2"
+      ],
+      "date": "2000-11-12"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:3"
+      ],
+      "date": "2002-11-03"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:4"
+      ],
+      "date": "2001-11-04"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:5"
+      ],
+      "date": "2000-11-05"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:6"
+      ],
+      "date": "2000-11-26"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:7"
+      ],
+      "date": "2002-11-17"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:8"
+      ],
+      "date": "2001-11-18"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:O",
+        "units:9"
+      ],
+      "date": "2000-11-19"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:0"
+      ],
+      "date": "2000-04-30"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:1"
+      ],
+      "date": "2001-04-01"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:2"
+      ],
+      "date": "2000-04-02"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:3"
+      ],
+      "date": "2000-04-23"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:4"
+      ],
+      "date": "2002-04-14"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:5"
+      ],
+      "date": "2001-04-15"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:6"
+      ],
+      "date": "2000-04-16"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:7"
+      ],
+      "date": "2002-04-07"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:8"
+      ],
+      "date": "2001-04-08"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:P",
+        "units:9"
+      ],
+      "date": "2000-04-09"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:0"
+      ],
+      "date": "2000-07-30"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:1"
+      ],
+      "date": "2000-06-11"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:2"
+      ],
+      "date": "2000-07-02"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:3"
+      ],
+      "date": "2000-07-23"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:4"
+      ],
+      "date": "2000-06-04"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:5"
+      ],
+      "date": "2000-06-25"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:6"
+      ],
+      "date": "2000-07-16"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:7"
+      ],
+      "date": "2000-08-27"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:8"
+      ],
+      "date": "2000-06-18"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:U",
+        "units:9"
+      ],
+      "date": "2000-07-09"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:0"
+      ],
+      "date": "2002-03-10"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:1"
+      ],
+      "date": "2001-03-11"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:2"
+      ],
+      "date": "2000-03-12"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:3"
+      ],
+      "date": "2002-03-03"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:4"
+      ],
+      "date": "2001-03-04"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:5"
+      ],
+      "date": "2000-03-05"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:6"
+      ],
+      "date": "2000-03-26"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:7"
+      ],
+      "date": "2002-03-17"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:8"
+      ],
+      "date": "2001-03-18"
+    },
+    {
+      "labels": [
+        "weekday:O:weekend",
+        "month:Ä",
+        "units:9"
+      ],
+      "date": "2000-03-19"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:0"
+      ],
+      "date": "2002-05-10"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:1"
+      ],
+      "date": "2000-01-21"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:2"
+      ],
+      "date": "2000-05-12"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:3"
+      ],
+      "date": "2002-05-03"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:4"
+      ],
+      "date": "2000-01-14"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:5"
+      ],
+      "date": "2000-05-05"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:6"
+      ],
+      "date": "2000-05-26"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:7"
+      ],
+      "date": "2000-01-07"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:8"
+      ],
+      "date": "2000-01-28"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:A",
+        "units:9"
+      ],
+      "date": "2000-05-19"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:0"
+      ],
+      "date": "2002-09-20"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:1"
+      ],
+      "date": "2000-02-11"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:2"
+      ],
+      "date": "2000-09-22"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:3"
+      ],
+      "date": "2001-02-23"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:4"
+      ],
+      "date": "2000-02-04"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:5"
+      ],
+      "date": "2000-02-25"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:6"
+      ],
+      "date": "2001-02-16"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:7"
+      ],
+      "date": "2001-09-07"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:8"
+      ],
+      "date": "2000-02-18"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:E",
+        "units:9"
+      ],
+      "date": "2000-09-29"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:0"
+      ],
+      "date": "2000-10-20"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:1"
+      ],
+      "date": "2002-10-11"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:2"
+      ],
+      "date": "2001-10-12"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:3"
+      ],
+      "date": "2000-10-13"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:4"
+      ],
+      "date": "2002-10-04"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:5"
+      ],
+      "date": "2001-10-05"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:6"
+      ],
+      "date": "2000-10-06"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:7"
+      ],
+      "date": "2000-10-27"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:8"
+      ],
+      "date": "2002-10-18"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:K",
+        "units:9"
+      ],
+      "date": "2001-10-19"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:0"
+      ],
+      "date": "2000-11-10"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:1"
+      ],
+      "date": "2002-11-01"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:2"
+      ],
+      "date": "2001-11-02"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:3"
+      ],
+      "date": "2000-11-03"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:4"
+      ],
+      "date": "2000-11-24"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:5"
+      ],
+      "date": "2002-11-15"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:6"
+      ],
+      "date": "2001-11-16"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:7"
+      ],
+      "date": "2000-11-17"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:8"
+      ],
+      "date": "2002-11-08"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:O",
+        "units:9"
+      ],
+      "date": "2001-11-09"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:0"
+      ],
+      "date": "2001-04-20"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:1"
+      ],
+      "date": "2000-04-21"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:2"
+      ],
+      "date": "2002-04-12"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:3"
+      ],
+      "date": "2001-04-13"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:4"
+      ],
+      "date": "2000-04-14"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:5"
+      ],
+      "date": "2002-04-05"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:6"
+      ],
+      "date": "2001-04-06"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:7"
+      ],
+      "date": "2000-04-07"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:8"
+      ],
+      "date": "2000-04-28"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:P",
+        "units:9"
+      ],
+      "date": "2002-04-19"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:0"
+      ],
+      "date": "2000-06-30"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:1"
+      ],
+      "date": "2000-07-21"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:2"
+      ],
+      "date": "2000-06-02"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:3"
+      ],
+      "date": "2000-06-23"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:4"
+      ],
+      "date": "2000-07-14"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:5"
+      ],
+      "date": "2000-08-25"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:6"
+      ],
+      "date": "2000-06-16"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:7"
+      ],
+      "date": "2000-07-07"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:8"
+      ],
+      "date": "2000-07-28"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:U",
+        "units:9"
+      ],
+      "date": "2000-06-09"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:0"
+      ],
+      "date": "2000-03-10"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:1"
+      ],
+      "date": "2000-03-31"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:2"
+      ],
+      "date": "2001-03-02"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:3"
+      ],
+      "date": "2000-03-03"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:4"
+      ],
+      "date": "2000-03-24"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:5"
+      ],
+      "date": "2002-03-15"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:6"
+      ],
+      "date": "2001-03-16"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:7"
+      ],
+      "date": "2000-03-17"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:8"
+      ],
+      "date": "2002-03-08"
+    },
+    {
+      "labels": [
+        "weekday:R:regularWeekday",
+        "month:Ä",
+        "units:9"
+      ],
+      "date": "2001-03-09"
+    }
+  ],
+  "edgeBlankCases": {
+    "zero": "No blank front edge can be shown",
+    "one": {
+      "remainingFaces": 22,
+      "fieldCounts": [
+        5,
+        7,
+        10
+      ],
+      "reason": "Remove the sole blank-bearing edge; all 22 mandatory labels must remain, once each"
+    },
+    "twoOnOneBody": {
+      "remainingFaces": 22,
+      "fieldCounts": [
+        5,
+        7,
+        10
+      ],
+      "reason": "Remove the blank-only body; all mandatory labels remain unique"
+    },
+    "twoOnDifferentBodies": [
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "weekday:I:regularWeekday"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "weekday:O:regularWeekday"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "weekday:O:weekend"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "weekday:R:regularWeekday"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "month:A"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "month:E"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "month:K"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "month:O"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "month:P"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:A:weekend",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "weekday:O:regularWeekday"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "weekday:O:weekend"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "weekday:R:regularWeekday"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "month:A"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "month:E"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "month:K"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "month:O"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "month:P"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:I:regularWeekday",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "weekday:O:weekend"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "weekday:R:regularWeekday"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "month:A"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "month:E"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "month:K"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "month:O"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "month:P"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:regularWeekday",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "weekday:R:regularWeekday"
+        ],
+        "remainingFieldCounts": [
+          3,
+          7,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "month:A"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "month:E"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "month:K"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "month:O"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "month:P"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:O:weekend",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "month:A"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "month:E"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "month:K"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "month:O"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "month:P"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "weekday:R:regularWeekday",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "month:E"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "month:K"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "month:O"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "month:P"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:A",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "month:K"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "month:O"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "month:P"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:E",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "month:O"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "month:P"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:K",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "month:P"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:O",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "month:U"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:P",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "month:Ä"
+        ],
+        "remainingFieldCounts": [
+          5,
+          5,
+          10
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:U",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:0"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "month:Ä",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          10
+        ],
+        "obstruction": "Both unique labels occur together and occupy both blank-bearing bodies"
+      },
+      {
+        "otherLabels": [
+          "units:0",
+          "units:1"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:0",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:0",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:0",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:0",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:0",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:0",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:0",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:0",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:1",
+          "units:2"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:1",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:1",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:1",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:1",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:1",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:1",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:1",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:2",
+          "units:3"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:2",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:2",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:2",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:2",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:2",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:2",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:3",
+          "units:4"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:3",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:3",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:3",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:3",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:3",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:4",
+          "units:5"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:4",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:4",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:4",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:4",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:5",
+          "units:6"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:5",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:5",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:5",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:6",
+          "units:7"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:6",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:6",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:7",
+          "units:8"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:7",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      },
+      {
+        "otherLabels": [
+          "units:8",
+          "units:9"
+        ],
+        "remainingFieldCounts": [
+          5,
+          7,
+          8
+        ],
+        "obstruction": "Remaining unique faces cannot pair within their fields: odd counts remain"
+      }
+    ],
+    "threeOrMore": {
+      "minimumMandatoryFaces": 25,
+      "availableFaces": 24
+    }
+  },
+  "limitations": [
+    "Not a theorem about arbitrary German layouts, fragments or palettes",
+    "SAT is not claimed for any replacement layout",
+    "Independent review is required before publishing this result"
+  ]
+}
