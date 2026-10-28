@@ -73,6 +73,14 @@ visible targets have different hidden poses. During motion, neighbor estimates
 are explicitly unavailable until the full endpoint commits. These are exact
 counts for the current playback policy, not shortest-path claims.
 
+The controller also accepts an optional asynchronous route provider. Prepared
+plans and estimates are bound to the exact source pose and retained reference
+word. Only strictly shorter routes that replay to the required upright face are
+accepted; invalid or failed solver output uses the checked baseline route. A
+noncanonical endpoint retains its actual source-to-pose path rather than being
+replaced by a canonical setup. The default application still uses the baseline
+until a separately validated optimizer is connected.
+
 ## Original artwork
 
 The immutable [vector sticker sources](../assets/calendar/manifest.json) use the
