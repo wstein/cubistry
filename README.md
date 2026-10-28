@@ -3,6 +3,32 @@
 A browser-first twisty-puzzle platform. The first local MVP is a **real fixed-print
 2×2 counter**: two constant upper title stickers and two lower digits, 0–99.
 
+## Architecture and ecosystem
+
+Cubistry is the reusable cube-display framework between the
+[PuzlWerk](https://github.com/wstein/puzlwerk) puzzle/solver foundation and
+application-level products. Dependencies flow from applications to Cubistry to
+PuzlWerk, never in reverse.
+
+Cubistry owns generic physical-display composition, the 3D viewer and animator,
+rendering of permanent sticker prints, validation, and a planned declarative
+application runtime. Its viewer is a reusable module within this monorepo, not
+a separate repository; a future print/design studio will *use* the viewer,
+not be required by it.
+
+The neutral 00–99 counter belongs in Cubistry as a reference example. The
+planned **ChronoCube** application belongs above the framework and focuses
+strictly on time-related uses (clocks, calendars, countdowns). Its application
+definitions, physical print designs, visual themes, and certified transition
+data should remain separable, with as little application-specific code as
+practical. Changing the appearance of a screen-only theme should not change
+physical state semantics; changing physical sticker art or placement requires
+appropriate revalidation.
+
+This describes the intended architectural boundary. The current counter is
+an MVP, not evidence that the full declarative runtime, ChronoCube, or studio
+has already been delivered. Cubistry must remain usable without ChronoCube.
+
 ## Development preview
 
 Expected Pages URL: https://wstein.github.io/cubistry/. Publication awaits the
