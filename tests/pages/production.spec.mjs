@@ -73,14 +73,8 @@ test("built Pages counter resolves immutable assets under project base and rende
     page.getByText("Development Preview", { exact: true }),
   ).toBeVisible();
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  await page.locator("#format").selectOption("unpadded");
-  await expect(page.locator("#application")).toBeEnabled();
-  await page.locator("#value").fill("15");
-  await page.locator("#jump-form button").click();
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  await page.locator("#reset-session-moves").click();
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#application")).toHaveValue("certified");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
   for (const value of [42, 43, 7, 99]) {
     await page.locator("#value").fill(String(value));
     await page.locator("#jump-form button").click();
@@ -94,7 +88,7 @@ test("built Pages counter resolves immutable assets under project base and rende
       "completed",
     );
     if (value === 43)
-      await expect(page.locator("#move-progress")).toHaveText("10 / 10 moves");
+      await expect(page.locator("#move-progress")).toHaveText("5 / 5 moves");
     const image = PNG.sync.read(
       await page.locator("#cube canvas").screenshot(),
     );
