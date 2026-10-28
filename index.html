@@ -168,12 +168,15 @@
           <form id="timer-duration-form">
             <div id="timer-duration-setting">
               <label for="timer-duration">Duration MM:SS</label>
-              <input
-                id="timer-duration"
-                type="text"
-                value="15:00"
-                aria-describedby="timer-bounds"
-              />
+              <div class="duration-actions">
+                <input
+                  id="timer-duration"
+                  type="text"
+                  value="15:00"
+                  aria-describedby="timer-bounds"
+                />
+                <button id="timer-set" type="submit">Set</button>
+              </div>
             </div>
           </form>
           <p id="timer-bounds" class="small">00:00–59:50 · 10-second steps</p>
