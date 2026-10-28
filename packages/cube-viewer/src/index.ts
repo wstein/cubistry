@@ -42,18 +42,24 @@ export class CubeViewer {
   }
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
-  readonly camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+  readonly camera = new THREE.PerspectiveCamera(18, 1, 0.1, 100);
   private meshes: THREE.Group[] = [];
   private materials: THREE.Material[] = [];
   private textures: THREE.Texture[] = [];
   private print: PrintDefinition | null = null;
   private presented: CubeState | null = null;
-  private yaw = 0;
-  private pitch = 0;
-  private radius = 5.3;
+  private yaw = Math.PI / 18;
+  private pitch = (7 * Math.PI) / 180;
+  private radius = 10.5;
   private busy = false;
-  private drag: { id: number; x: number; y: number; time: number } | null =
-    null;
+  private drag: {
+    id: number;
+    x: number;
+    y: number;
+    time: number;
+    startX: number;
+    startY: number;
+  } | null = null;
   private readonly resize: ResizeObserver;
   readonly host: HTMLElement;
   constructor(host: HTMLElement) {
@@ -86,11 +92,19 @@ export class CubeViewer {
         x: e.clientX,
         y: e.clientY,
         time: e.timeStamp,
+        startX: e.clientX,
+        startY: e.clientY,
       };
       el.setPointerCapture(e.pointerId);
     });
     el.addEventListener("pointermove", (e) => {
       if (!this.drag || this.drag.id !== e.pointerId) return;
+      if (
+        Math.hypot(e.clientX - this.drag.startX, e.clientY - this.drag.startY) <
+        4
+      )
+        return;
+      this.host.dispatchEvent(new Event("cube-camera-change"));
       const d = viewTurn(
         e.clientX - this.drag.x,
         e.clientY - this.drag.y,
@@ -103,6 +117,8 @@ export class CubeViewer {
         x: e.clientX,
         y: e.clientY,
         time: e.timeStamp,
+        startX: this.drag.startX,
+        startY: this.drag.startY,
       };
     });
     const release = () => (this.drag = null);
@@ -113,10 +129,10 @@ export class CubeViewer {
       "wheel",
       (e) => {
         e.preventDefault();
-        this.radius = Math.max(
-          3.4,
-          Math.min(9, this.radius + e.deltaY * 0.005),
-        );
+        const previous = this.radius;
+        this.radius = Math.max(6, Math.min(18, this.radius + e.deltaY * 0.005));
+        if (this.radius !== previous)
+          this.host.dispatchEvent(new Event("cube-camera-change"));
       },
       { passive: false },
     );
@@ -131,9 +147,9 @@ export class CubeViewer {
     });
   }
   resetCamera(): void {
-    this.yaw = 0;
-    this.pitch = 0;
-    this.radius = 5.3;
+    this.yaw = Math.PI / 18;
+    this.pitch = (7 * Math.PI) / 180;
+    this.radius = 10.5;
   }
   get presentedState(): CubeState | null {
     return this.presented;
