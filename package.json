@@ -10,7 +10,7 @@
     "proof": "node research/counter/generate.mjs && python3 research/counter/verify.py",
     "test:proof": "python3 -m unittest discover -s tests -p \"*_test.py\"",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm test && npm run test:proof && python3 research/counter/verify.py && python3 research/architecture/verify_design.py && npm run build",
+    "check": "npm run typecheck && npm test && npm run test:proof && python3 research/counter/verify.py && python3 research/architecture/verify_design.py && python3 research/certified-counter/verify.py && npm run build",
     "typecheck": "npm run build:core && tsc --noEmit",
     "build:design": "npm run build:core && node research/architecture/build_counter_design.mjs",
     "build:core": "rescript build",

@@ -148,3 +148,14 @@ test("published proof and design bytes retain canonical identity and missing pat
   expect((await request.get("assets/missing.svg")).status()).toBe(404);
   expect((await request.get("/counter-design.v2.json")).status()).toBe(404);
 });
+
+test("built project-path optimized print loads its pinned certificate and executes the canonical first edge",async({page})=>{
+  const errors=[],failures=[];page.on("pageerror",e=>errors.push(e.message));
+  page.on("response",r=>{if(r.status()>=400)failures.push(r.url());});
+  await page.goto("./");await expect(page.locator("#cube")).toHaveAttribute("aria-busy","false");
+  await page.locator("summary").click();await page.locator("#printing").selectOption("certified");await page.locator("#apply-print").click();
+  await expect(page.locator("#apply-print")).toBeEnabled();await expect(page.locator("#cube")).toHaveAttribute("data-value","0");
+  await page.locator('[data-delta="1"]').click();await expect(page.locator("#cube")).toHaveAttribute("data-value","1");await expect(page.locator("#cube")).toHaveAttribute("aria-busy","false");
+  await expect(page.locator("#move-progress")).toHaveText("5 / 5 moves");await expect(page.locator("#session-moves")).toHaveText("Session: 5 moves");
+  expect(errors).toEqual([]);expect(failures).toEqual([]);
+});

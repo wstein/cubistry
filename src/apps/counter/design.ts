@@ -181,8 +181,9 @@ export function validateCounterDesign(raw: unknown): CounterDesign {
 export async function configurePrint(
   design: CounterDesign,
   config: CounterConfig,
+  selectedPrint?: PrintDefinition,
 ): Promise<{ print: PrintDefinition; assets: AssetManifest }> {
-  const base = design.prints[config.padded ? "padded" : "unpadded"];
+  const base = selectedPrint ?? design.prints[config.padded ? "padded" : "unpadded"];
   const assets = validateAssets(
     {
       ...design.assets,

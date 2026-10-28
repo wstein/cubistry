@@ -1,9 +1,11 @@
+import { certifiedStep, type CertifiedCounter } from "./certified.ts";
 import {
   createCounterSolver,
   type CounterSolver,
 } from "../../adapters/puzlwerk-2x2.ts";
 import {
   demand,
+  deepFreeze,
   stateEquals,
   type CubeState,
   type LegalMove,
@@ -54,6 +56,7 @@ export interface MoveProgress {
 /** Product target selection and queue live here, outside the generic viewer. */
 export class CounterController {
   private print: PrintDefinition | null = null;
+  private certified: CertifiedCounter | null = null;
   private solver: CounterSolver | null = null;
   private authoritative: CubeState | null = null;
   private configuration: CounterConfig | null = null;
@@ -135,6 +138,7 @@ export class CounterController {
     label: string,
     padded: boolean,
     value = 15,
+    certified: CertifiedCounter | null = null,
   ): Promise<void> {
     demand(
       !this.queued && !this.configuring,
@@ -144,6 +148,7 @@ export class CounterController {
       Number.isInteger(value) && value >= 0 && value <= 99,
       "Invalid initial value",
     );
+    demand(!certified || padded, "Certified print requires leading-zero format");
     this.configuring = true;
     let fresh: LoadedAssets | null = null;
     try {
@@ -154,10 +159,14 @@ export class CounterController {
         minimum: 0,
         maximum: 99,
       });
-      const instance = await configurePrint(this.design, config);
+      const instance = await configurePrint(this.design, config, certified?.print);
       fresh = await this.resolveAssets(instance.assets, [instance.print]);
       const solver = await this.prepareSolver(instance.print);
-      const state = applyMoves(
+      const configuredRoute = certified ? deepFreeze({
+        ...certified, print:instance.print,
+        states:certified.states.map(state=>({...state,printId:instance.print.id})),
+      }) : null;
+      const state = configuredRoute?.states[value] ?? applyMoves(
         initialState(instance.print),
         parseAlg(this.design.witnesses[value].word),
       );
@@ -172,6 +181,7 @@ export class CounterController {
       previous?.dispose();
       this.print = instance.print;
       this.solver = solver;
+      this.certified = configuredRoute;
       this.authoritative = state;
       this.configuration = config;
       this.current = this.desired = value;
@@ -242,11 +252,13 @@ export class CounterController {
     try {
       while (this.current !== this.desired) {
         const target = this.desired;
-        const targetState = applyMoves(
+        const targetState = this.certified?.states[target] ?? applyMoves(
           initialState(this.print),
           parseAlg(this.design.witnesses[target].word),
         );
-        const moves = this.solver.solve(this.authoritative, targetState);
+        // A visually identical state is insufficient: certifiedStep checks all body frames.
+        const moves = (this.certified && certifiedStep(this.certified,this.authoritative,this.current,target))
+          ?? this.solver.solve(this.authoritative, targetState);
         this.activeTarget = target;
         this.progressUpdate({
           completed: 0,

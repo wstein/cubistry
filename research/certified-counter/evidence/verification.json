@@ -1,0 +1,27 @@
+{
+  "status": "SAT",
+  "values": 100,
+  "incrementEdgesVerified": 99,
+  "decrementEdgesVerified": 99,
+  "incrementShortestVerified": 99,
+  "shortestToAnyPriorDisplayInReverse": 59,
+  "reverseAlternativeMinimumTotal": 292,
+  "maximumHTM": 5,
+  "totalHTM": 339,
+  "bfsStates": 136080,
+  "bfsHistogram": {
+    "0": 1,
+    "1": 15,
+    "2": 198,
+    "3": 2030,
+    "4": 15396,
+    "5": 61768,
+    "6": 53528,
+    "7": 3144
+  },
+  "titleImagesFixed": true,
+  "titleContinuouslyReadableDuringMoves": false,
+  "globalPrintOptimality": "UNKNOWN",
+  "candidateSHA256": "5d484e2fdd3f52497dc3686f7e8dcb4dc1bcb91222784708db2f25db39f18708",
+  "runtimeSeconds": 0.995
+}

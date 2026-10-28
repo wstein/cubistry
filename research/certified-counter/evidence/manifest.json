@@ -1,0 +1,124 @@
+{
+  "schema": "cubistry.fixed-title-counter-optimization-manifest",
+  "version": 1,
+  "baselineCommit": "ac575f74dfeabcb6034509785149f1ce7800401d",
+  "researchBranch": "spike/5x5-en-de-feasibility",
+  "originalCounterSourceCommit": "f2d23f3be7df48738f934a963447e72cde70cf40",
+  "baselineCopies": {
+    "public/counter-proof.json": "baseline-witness.json",
+    "research/counter/verify.py": "baseline-verify.py"
+  },
+  "question": "Optimize a fixed-print 00\u201399 counter for reversible \u00b11 steps with a permanent two-fragment upper title.",
+  "model": {
+    "cubies": 8,
+    "stickers": 24,
+    "digitStickers": 20,
+    "titleFragmentStickers": 4,
+    "leadingZero": true,
+    "uprightMatching": true,
+    "title": "COUNTER",
+    "titleCopyCounts": {
+      "left": 2,
+      "right": 2
+    },
+    "titleMustReturnUprightAtSettledStates": true,
+    "titleMaySeparateDuringTurns": true,
+    "wraparound": false
+  },
+  "search": {
+    "seed": 271028,
+    "attemptedSwaps": 8000,
+    "fixed": "Title images, cubie grouping, assigned slots, physical up frames.",
+    "varied": "Digit assignments within tens/units slots and 18 shortest-path tie policies with one-display lookahead.",
+    "objective": "Worst HTM first, total HTM second; repeated/no-op proposals allowed.",
+    "globalPrintOptimality": "UNKNOWN",
+    "runtimeSeconds": 5.054
+  },
+  "verifiedResult": {
+    "status": "SAT",
+    "values": 100,
+    "directedEdgesReplayed": 198,
+    "shortestIncrementEdges": 99,
+    "maximumHTM": 5,
+    "totalHTM": 339,
+    "meanHTM": 3.4242424242424243,
+    "maximumQTM": 8,
+    "directBaselineTotalHTM": 461,
+    "directBaselineMaximumHTM": 6,
+    "totalReductionPercent": 26.464208242950107,
+    "independentBFSStates": 136080,
+    "verifierRuntimeSeconds": 0.995
+  },
+  "tools": {
+    "node": "24.19.0",
+    "python": "3.12.14",
+    "endpointSolver": "cubing@0.66.1, frozen local lockfile",
+    "edgeOptimizer": "Node standard library; prior timer geometry",
+    "verifier": "Python standard library; original counter physical replayer and independent timer BFS"
+  },
+  "validation": {
+    "negativeAndPrintTestsPassed": 11,
+    "seededRepeat": "All semantic fields matched; runtimeSeconds excluded.",
+    "freshCandidateAndSetupVerification": "Passed with /tmp/counter-optimization-repeat.json and /tmp/counter-repeat-setups.json.",
+    "SVG": "Rendered and visually inspected in Chromium; all exported up vectors and rotations checked independently.",
+    "spelling": "Repository typos check passed.",
+    "localLinks": "All report and README local links checked.",
+    "priorProofArtifacts": "All previously recorded timer artifact hashes preserved; source counter copies match original Git blobs."
+  },
+  "commands": [
+    {
+      "command": "node research/counter-2x2-optimization/optimize.mjs /tmp/counter-optimization-repeat.json",
+      "exitStatus": 0
+    },
+    {
+      "command": "node research/counter-2x2-optimization/setups.mjs /tmp/counter-repeat-setups.json /tmp/counter-optimization-repeat.json",
+      "exitStatus": 0
+    },
+    {
+      "command": "python3 research/counter-2x2-optimization/verify.py /tmp/counter-optimization-repeat.json /tmp/counter-repeat-setups.json",
+      "exitStatus": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s research/counter-2x2-optimization -p 'test_*.py'",
+      "exitStatus": 0,
+      "testsPassed": 11
+    },
+    {
+      "command": "python3 research/counter-2x2-optimization/report.py",
+      "exitStatus": 0
+    }
+  ],
+  "limitations": [
+    "No global print or full-sequence optimality claim.",
+    "Inverse canonical decrement edges need not be shortest to every matching prior display.",
+    "No physical build, timing, runtime integration, unpadded counter, arbitrary-jump, or wraparound validation.",
+    "Print outlines are scalable 20 mm samples without bleed or corner rounding."
+  ],
+  "sha256": {
+    "REPORT.md": "f6186482247dec7bae50eb8b9dfca51f7ab609a191bd7f2424e5c664dc469138",
+    "baseline-verify.py": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+    "baseline-witness.json": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+    "counter-print.svg": "c0980e28ff12212ea5b3fa3e8409cb2da55e1743f0758a0385a2638c1697cc18",
+    "optimize.mjs": "beff71c817f45d9ae7061e3461654117e896f437bd7fbd1d24103357246f99f2",
+    "optimized.json": "5d484e2fdd3f52497dc3686f7e8dcb4dc1bcb91222784708db2f25db39f18708",
+    "package-lock.json": "3ef016b5942d2fdbdd8a19a03eb1aad0d1a29dcbfb1dd0ce3619c11c89c6bdf1",
+    "package.json": "57c0543ed9e79e7ad0dfe536faf0fdd3bc32c37470b36320fd45ee8a2bc9cfa8",
+    "report.py": "4e09c23d0d7d43a55a724105cfcb59520d1e270a302ad5fbc5b0e9d9e81c29b4",
+    "search.stderr.log": "395a7c4c1e152932b1f432f3ca7b114c4a0a9583cb8f93158bbdf6fa6be06394",
+    "search.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "setups.json": "0c7cb62592e4f64cb304f3c08b179a8076bb3e3ffdcf7f27e413dcd376c062a6",
+    "setups.mjs": "a003febfaaed032ca7794dacb60e6d4a43af9eb5ed199f0839da198e6b7fe235",
+    "statistics.json": "82375157edf55418fa440d350bbda3fd60f90786a5bd4288a753109ce6ea4f69",
+    "stickers.csv": "5953a224d1468c0d1c84799c295d22bb772e8ae19a675145208979703d105907",
+    "test_verify.py": "03a6967bbae294443b36f9429b6d16ca43b20d38347c8926fa1d3ea1b6110829",
+    "tests.log": "d483ac052834b188fe244c6198af2eb41b8c8cfc934e6d3f4c14092e6b7a3080",
+    "transitions.csv": "a0b8c17e64245213b9a2e5cc5483f4bacc7c45aa692b373e57e32467323422ec",
+    "verification.json": "1ef52135337a831499ca6aaed2a6a4731b6e0357fbce0c00c1eca91335171685",
+    "verify.py": "bdadd8847b0dfe1b258735e77bdaa88e01cb0c75ee38b54a91064665c257c382"
+  },
+  "sharedInputsSHA256": {
+    "research/timer-2x2/geometry.mjs": "d1616f23f88fc6ff1d9f502070652b6290e48d51bbb1fd6c7f503056a7d01264",
+    "research/timer-2x2/optimization/verify.py": "5a30e0736f575a5235a4a97028cd19e195a1cb13b705cf9f5940076d4e597058",
+    "research/timer-2x2/verify.py": "01a1810a0d14f87f49a1d701ec992d8ea089214261f055cea7de7ee2a40f7f2b"
+  }
+}
