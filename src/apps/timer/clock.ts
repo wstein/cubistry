@@ -4,6 +4,7 @@ const MAX_MS = 3590000;
 export interface ClockSnapshot {
   readonly at: number;
   readonly bucket: number;
+  readonly liveSeconds: number;
   readonly running: boolean;
   readonly next: null | { target: number; deadline: number; interval: number };
 }
@@ -37,7 +38,8 @@ export class WorkshopClock {
     const target = bucket + (this.direction === "countdown" ? -1 : 1);
     const distance = this.direction === "countdown"
       ? value - target * 10000 : target * 10000 - value;
-    return { at, bucket, running, next: running
+    return { at, bucket, liveSeconds: this.direction === "countdown"
+      ? Math.ceil(value / 1000) : Math.floor(value / 1000), running, next: running
       ? { target, deadline: at + distance / this.multiplier, interval: 10000 / this.multiplier }
       : null };
   }
@@ -110,7 +112,12 @@ export class WorkshopClock {
 export function formatTimer(bucket: number): string {
   if (!Number.isInteger(bucket) || bucket < 0 || bucket > 359)
     throw Error("Invalid timer bucket");
-  const seconds = bucket * 10;
+  return formatLiveTimer(bucket * 10);
+}
+/** One-second control-panel readout; physical targets still use ten-second buckets. */
+export function formatLiveTimer(seconds: number): string {
+  if (!Number.isInteger(seconds) || seconds < 0 || seconds > 3590)
+    throw Error("Invalid live timer seconds");
   return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 }
 export function parseDuration(text: string): number {

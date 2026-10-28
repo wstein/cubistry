@@ -8,10 +8,18 @@ does not imply a 60:00 display. Counter remains the default application.
 
 **Countdown** defaults to 15:00. **Stopwatch** starts at 00:00 and stops at 59:50
 without wrapping. Both use the same monotonic, anchored virtual clock, physical
-controller and fixed print. Countdown rounds remaining time up to ten seconds;
+controller and fixed print. For physical targets, Countdown rounds remaining time up to ten seconds;
 Stopwatch shows completed ten-second intervals. For example, pausing Stopwatch
 at 12.5 seconds shows 00:10 but retains the extra 2.5 seconds for Resume. The
 cube does not claim single-second precision.
+
+The large right-hand live readout uses **one-second resolution** from the same
+monotonic sample: Countdown rounds remaining seconds up; Stopwatch rounds elapsed
+seconds down. For example, Stopwatch paused at 12.5 seconds shows **00:12** in
+the controls while its physical bucket remains **00:10**. At normal speed the
+live readout changes each second; accelerated rates may visually skip seconds
+between the existing 50 ms UI updates. This does not add a second clock, change
+the immutable print, or request one-second cube states.
 
 One button stays in place: **Start**, **Pause**, or **Resume**, with a separate
 **Reset**. **Set** beside Duration applies the value without starting; Enter is

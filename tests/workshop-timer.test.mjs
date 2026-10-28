@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import {
   WorkshopClock,
   formatTimer,
+  formatLiveTimer,
   parseDuration,
 } from "../src/apps/timer/clock.ts";
 import {
@@ -269,4 +270,38 @@ test("prepared exact sequences are cached but invalid hidden sources never reuse
   h.c.request(24); await settle(h.c);
   assert.equal(h.calls, 2);
   assert.equal(stateEquals(h.c.state, route.states[24]), true);
+});
+
+
+test("one-second live readout shares the physical clock sample, rounds by direction and retains paused fractions", () => {
+  for (const mode of ["countdown", "stopwatch"]) for (const rate of [1,10,20,50,100]) {
+    let now=0,samples=0;
+    const c=new WorkshopClock(()=>{samples++;return now;});
+    c.configure(20);c.setMode(mode);c.setSpeed(rate);c.start();
+    now=12500/rate;
+    const before=samples,s=c.snapshot();
+    assert.equal(samples,before+1);
+    assert.equal(s.liveSeconds,mode === "countdown" ? 8 : 12);
+    assert.equal(s.bucket,1);
+    assert.equal(formatLiveTimer(s.liveSeconds),mode === "countdown" ? "00:08" : "00:12");
+    c.pause();now+=100000;assert.equal(c.snapshot().liveSeconds,s.liveSeconds);
+    c.start();now+=500/rate;
+    assert.equal(c.snapshot().liveSeconds,mode === "countdown" ? 7 : 13);
+    now+=4000000/rate;
+    assert.equal(c.snapshot().liveSeconds,mode === "countdown" ? 0 : 3590);
+    assert.equal(c.snapshot().next,null);
+    c.reset();assert.equal(c.snapshot().liveSeconds,mode === "countdown" ? 20 : 0);
+  }
+  for (const invalid of [-1,3591,0.5,NaN]) assert.throws(()=>formatLiveTimer(invalid));
+  assert.equal(formatLiveTimer(3590),"59:50");
+});
+test("exact ten-second clock boundaries retain next-event and terminal semantics", () => {
+  let now=0;
+  for(const mode of ["countdown","stopwatch"]) {
+    now=0;const c=new WorkshopClock(()=>now);c.configure(20);c.setMode(mode);c.start();
+    now=10000;const s=c.snapshot();
+    assert.equal(s.bucket,1);assert.equal(s.liveSeconds,10);
+    assert.equal(s.next.target,mode === "countdown" ? 0 : 2);assert.equal(s.next.deadline,20000);
+    now=4000000;assert.equal(c.snapshot().next,null);
+  }
 });
