@@ -1,0 +1,84 @@
+{
+  "kind": "local-foreground-endpoint-acceptance",
+  "sourceImplementationHead": "06e392ed93775b9b87148d334c82c915ac87dc61",
+  "observedAt": "2026-10-28T16:32:40.757Z",
+  "endpointToleranceMs": 20,
+  "localValidation": {
+    "status": "PASS",
+    "node": 94,
+    "python": 43,
+    "sourceVerifierControls": 18,
+    "browser": 85,
+    "pages": 5,
+    "preview": 4
+  },
+  "browserVersion": "Chromium 154.0.8037.57 built on Debian GNU/Linux 13 (trixie)",
+  "renderer": "SwiftShader",
+  "endpointObservations": [
+    {
+      "case": "Countdown 250 ms",
+      "nominalMoveMs": 250,
+      "renderOffsetMs": 2.3999999994412065,
+      "commitOffsetMs": 3.0,
+      "actualSequenceMs": 1632.5,
+      "committedHTM": 5,
+      "liveAtCommit": "00:10",
+      "exactFullState": true
+    },
+    {
+      "case": "Countdown 2000 ms",
+      "nominalMoveMs": 919.4,
+      "renderOffsetMs": 1.5,
+      "commitOffsetMs": 2.0,
+      "actualSequenceMs": 4981.299999999814,
+      "committedHTM": 5,
+      "liveAtCommit": "00:10",
+      "exactFullState": true
+    },
+    {
+      "case": "Countdown 10 ms",
+      "nominalMoveMs": 10,
+      "renderOffsetMs": 2.099999999627471,
+      "commitOffsetMs": 2.7000000001862645,
+      "actualSequenceMs": 434.79999999981374,
+      "committedHTM": 5,
+      "liveAtCommit": "00:10",
+      "exactFullState": true
+    },
+    {
+      "case": "Stopwatch 250 ms",
+      "nominalMoveMs": 250,
+      "renderOffsetMs": 4.0,
+      "commitOffsetMs": 4.5,
+      "actualSequenceMs": 1636.4000000003725,
+      "committedHTM": 5,
+      "liveAtCommit": "00:10",
+      "exactFullState": true
+    },
+    {
+      "case": "Terminal 250 ms",
+      "nominalMoveMs": 250,
+      "renderOffsetMs": 1.900000000372529,
+      "commitOffsetMs": 2.7000000001862645,
+      "actualSequenceMs": 1634.5999999996275,
+      "committedHTM": 5,
+      "liveAtCommit": "00:00",
+      "exactFullState": true
+    }
+  ],
+  "sliderGeometry": {
+    "1280": {
+      "maxFrameDisplacementPx": 0.0,
+      "phases": 5
+    },
+    "390": {
+      "maxFrameDisplacementPx": 0.0,
+      "phases": 5
+    },
+    "320": {
+      "maxFrameDisplacementPx": 0.0,
+      "phases": 5
+    }
+  },
+  "schedulingLimit": "Foreground observations; browser/OS stalls and background scheduling are not universally bounded."
+}

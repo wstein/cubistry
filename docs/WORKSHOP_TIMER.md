@@ -255,3 +255,26 @@ These are foreground observations on the test machine. They do not establish a
 portable scheduling guarantee. The immutable route, all 360 states, Counter's
 339-HTM paths, the actual 331-HTM ordinary countdown, and production path checks
 remain required.
+
+## Final local validation
+
+The [acceptance summary](assets/issue-30-deadlines/acceptance-summary.json) records
+production source `06e392ed93775b9b87148d334c82c915ac87dc61` and the observations'
+actual timestamps. Its complete local checks passed: **94 Node tests, 43 Python
+tests, 18 copied source-verifier controls, 85 browser cases, 5 production Pages
+cases, and 4 preview cases**, plus build and typecheck. The 85-case run took
+9.1 minutes. Both 339-HTM Counter sweeps and the 331-HTM ordinary Timer replay
+remain unchanged. All three viewport frame samples measured 0 px slider movement.
+
+| Observed case | Nominal move | Canonical render relative to T | Verified commit relative to T |
+| --- | --- | --- | --- |
+| Countdown 250 ms | 250 ms | +2.4 ms | +3.0 ms |
+| Countdown 2000 ms | 919.4 ms | +1.5 ms | +2.0 ms |
+| Countdown 10 ms | 10 ms | +2.1 ms | +2.7 ms |
+| Stopwatch 250 ms | 250 ms | +4.0 ms | +4.5 ms |
+| Terminal 250 ms | 250 ms | +1.9 ms | +2.7 ms |
+
+All five observed endpoints met the accepted 20 ms tolerance, with the live
+readout updated at the verified commit. The linked raw data retain intermediate
+rendered angles and exact clock deadlines; these observations do not bound
+background or blocked-main-thread scheduling.
