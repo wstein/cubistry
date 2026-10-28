@@ -3,7 +3,14 @@ import {
   type PhysicalView,
   type MoveProgress,
 } from "../shared/playback.ts";
-import { demand, type CubeState, type LegalMove } from "@cubistry/cube-core";
+import {
+  demand,
+  stateEquals,
+  type CubeState,
+  type LegalMove,
+} from "@cubistry/cube-core";
+import type { MotionTiming } from "@cubistry/cube-viewer";
+import type { MovePresentation } from "@cubistry/cube-mechanics";
 import {
   applyMoves,
   initialState,
@@ -22,11 +29,54 @@ export class HsmController extends PhysicalPlayback {
   readonly letter: Letter;
   private range = 59;
   private direction = 1;
+  private prepared: {
+    source: CubeState;
+    value: number;
+    moves: readonly LegalMove[];
+    target: CubeState;
+  } | null = null;
+  private timing: { target: number; motion: MotionTiming } | null = null;
+  private revision = 0;
+  setDeadline(target: number, endAt: number, durationMs: number): void {
+    if (
+      this.timing?.target === target &&
+      this.timing.motion.endAt === endAt &&
+      this.timing.motion.durationMs === durationMs
+    )
+      return;
+    this.timing = {
+      target,
+      motion: { endAt, durationMs, revision: ++this.revision },
+    };
+  }
+  clearDeadline(): void {
+    this.timing = null;
+    this.revision++;
+  }
+  protected animateMove(presentation: MovePresentation): Promise<void> {
+    const final = this.playback.completed + 1 === this.playback.total;
+    return this.view.animate(
+      presentation,
+      final
+        ? () =>
+            this.timing?.target === this.playback.target
+              ? this.timing.motion
+              : null
+        : undefined,
+    );
+  }
+  prepare(value: number): readonly LegalMove[] {
+    demand(!this.busy, "HSM must be settled before preparation");
+    this.prepareTarget(value);
+    return this.planned;
+  }
   setMode(range: number, direction: number): void {
     demand(
       [11, 23, 59].includes(range) && [1, -1].includes(direction),
       "Invalid HSM counting mode",
     );
+    if (this.range !== range || this.direction !== direction)
+      this.prepared = null;
     this.range = range;
     this.direction = direction;
   }
@@ -53,7 +103,21 @@ export class HsmController extends PhysicalPlayback {
     return 59;
   }
   protected targetState(value: number): CubeState {
+    return this.prepareTarget(value);
+  }
+  private prepareTarget(value: number): CubeState {
     demand(this.state, "HSM counter not configured");
+    demand(
+      Number.isInteger(value) && value >= 0 && value <= 59,
+      "Invalid HSM target",
+    );
+    if (
+      this.prepared?.value === value &&
+      stateEquals(this.prepared.source, this.state)
+    ) {
+      this.planned = this.prepared.moves;
+      return this.prepared.target;
+    }
     const next = (value + this.direction + this.range + 1) % (this.range + 1);
     this.planned = this.planner.plan(
       this.design.print,
@@ -65,7 +129,9 @@ export class HsmController extends PhysicalPlayback {
         ? 1
         : 13,
     );
-    return applyMoves(this.state, this.planned);
+    const target = applyMoves(this.state, this.planned);
+    this.prepared = { source: this.state, value, moves: this.planned, target };
+    return target;
   }
   protected targetMoves(): readonly LegalMove[] {
     return this.planned;
@@ -77,17 +143,28 @@ export class HsmController extends PhysicalPlayback {
       hsmTarget(this.letter, value),
     );
   }
-  async configure(): Promise<void> {
+  async configure(value = 0): Promise<void> {
     demand(!this.busy && !this.configuring, "Wait for HSM motion");
+    demand(
+      Number.isInteger(value) && value >= 0 && value <= 59,
+      "Invalid HSM initial value",
+    );
     this.configuring = true;
     let assets;
     try {
       assets = await this.resolveAssets(this.manifest, [this.design.print]);
-      const state = applyMoves(
+      let state = applyMoves(
         initialState(this.design.print),
         parseAlg(this.design.zeroWords[this.letter]),
       );
-      this.install(this.design.print, state, assets, 0);
+      if (value !== 0)
+        state = applyMoves(
+          state,
+          this.planner.plan(this.design.print, state, this.letter, value),
+        );
+      this.prepared = null;
+      this.clearDeadline();
+      this.install(this.design.print, state, assets, value);
       assets = undefined;
     } finally {
       assets?.dispose();
