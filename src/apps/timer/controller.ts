@@ -83,7 +83,11 @@ export class TimerController extends PhysicalPlayback {
     return this.route.states[value];
   }
   protected matchesDisplay(state: CubeState, value: number): boolean {
-    return matchesTarget(this.route.print, state, timerTarget(value, this.route.profile));
+    return matchesTarget(
+      this.route.print,
+      state,
+      timerTarget(value, this.route.profile),
+    );
   }
   protected targetMoves(
     from: CubeState,
@@ -99,7 +103,9 @@ export class TimerController extends PhysicalPlayback {
       this.solver.solve(from, target, { coordinateFrames: true })
     );
   }
-  async configure(value = this.route.profile.defaultSeconds / this.route.profile.stepSeconds): Promise<void> {
+  async configure(
+    value = this.route.profile.defaultSeconds / this.route.profile.stepSeconds,
+  ): Promise<void> {
     demand(
       !this.busy && !this.configuring,
       "Wait for the current timer sequence",
