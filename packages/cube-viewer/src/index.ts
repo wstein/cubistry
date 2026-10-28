@@ -35,6 +35,14 @@ const frame = (normal: Vec3, up: Vec3) =>
 export const BASE_MOVE_DURATION_MS = 75;
 export const MIN_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 2000;
 export const MAX_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 10;
+/** A caller-owned viewport can render several independent physical cubes. */
+export interface SharedCubeViewport {
+  readonly renderer: THREE.WebGLRenderer;
+  readonly scene: THREE.Scene;
+  readonly camera: THREE.PerspectiveCamera;
+  readonly position: Vec3;
+  readonly resetCamera?: () => void;
+}
 export class CubeViewer {
   private animationSpeed = 1;
   setAnimationSpeed(speed: number): void {
@@ -47,8 +55,8 @@ export class CubeViewer {
     this.animationSpeed = speed;
   }
   readonly renderer: THREE.WebGLRenderer;
-  readonly scene = new THREE.Scene();
-  readonly camera = new THREE.PerspectiveCamera(18, 1, 0.1, 100);
+  readonly scene: THREE.Scene | THREE.Group;
+  readonly camera: THREE.PerspectiveCamera;
   private meshes: THREE.Group[] = [];
   private materials: THREE.Material[] = [];
   private textures: THREE.Texture[] = [];
@@ -61,6 +69,7 @@ export class CubeViewer {
   private pitch = (7 * Math.PI) / 180;
   private radius = 10.5;
   private busy = false;
+  private destroyed = false;
   private drag: {
     id: number;
     x: number;
@@ -69,10 +78,28 @@ export class CubeViewer {
     startX: number;
     startY: number;
   } | null = null;
-  private readonly resize: ResizeObserver;
+  private readonly resize: ResizeObserver | null = null;
+  private readonly shared: boolean;
+  private readonly resetSharedCamera?: () => void;
   readonly host: HTMLElement;
-  constructor(host: HTMLElement) {
+  constructor(host: HTMLElement, viewport?: SharedCubeViewport) {
     this.host = host;
+    this.shared = Boolean(viewport);
+    this.scene = viewport ? new THREE.Group() : new THREE.Scene();
+    this.camera =
+      viewport?.camera ?? new THREE.PerspectiveCamera(18, 1, 0.1, 100);
+    this.resetSharedCamera = viewport?.resetCamera;
+    if (viewport) {
+      demand(
+        viewport.position.length === 3 &&
+          viewport.position.every(Number.isFinite),
+        "Invalid cube placement",
+      );
+      this.renderer = viewport.renderer;
+      this.scene.position.set(...viewport.position);
+      viewport.scene.add(this.scene);
+      return;
+    }
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setPixelRatio(Math.min(2, devicePixelRatio));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -156,6 +183,10 @@ export class CubeViewer {
     });
   }
   resetCamera(): void {
+    if (this.shared) {
+      this.resetSharedCamera?.();
+      return;
+    }
     this.yaw = Math.PI / 18;
     this.pitch = (7 * Math.PI) / 180;
     this.radius = 10.5;
@@ -349,22 +380,27 @@ export class CubeViewer {
       this.sync(presentation.to);
       this.updateFaceletImage();
       // Timed endpoint and the controller/UI commit must share the next paint.
-      if (timing) this.renderer.render(this.scene, this.camera);
+      if (timing && !this.shared) this.renderer.render(this.scene, this.camera);
     } finally {
       this.busy = false;
     }
   }
   destroy(): void {
+    if (this.destroyed) return;
     demand(!this.busy, "Cannot destroy an animating viewer");
-    this.renderer.setAnimationLoop(null);
-    this.resize.disconnect();
+    this.destroyed = true;
+    if (!this.shared) this.renderer.setAnimationLoop(null);
+    this.resize?.disconnect();
+    this.scene.removeFromParent();
     for (const mesh of this.meshes)
       mesh.traverse((o) => {
         if (o instanceof THREE.Mesh) o.geometry.dispose();
       });
     for (const m of this.materials) m.dispose();
     for (const t of this.textures) t.dispose();
-    this.renderer.dispose();
-    this.renderer.domElement.remove();
+    if (!this.shared) {
+      this.renderer.dispose();
+      this.renderer.domElement.remove();
+    }
   }
 }

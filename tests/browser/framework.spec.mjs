@@ -260,3 +260,66 @@ test("missing secure Web Crypto gives an actionable startup and asset diagnostic
   const diagnostic=await page.evaluate(async()=>{const {loadAssets}=await import('/packages/cube-assets/src/index.ts');const wire=await(await fetch('/counter-design.v2.json')).json();try{await loadAssets(wire.assets,[]);return 'accepted without integrity';}catch(error){return error.message;}});
   expect(diagnostic).toContain('Secure Web Crypto is unavailable');expect(diagnostic).toContain('localhost');expect(diagnostic).toContain('HTTPS');expect(errors).toEqual([]);
 });
+
+test("destroying a shared cube preserves the caller-owned canvas and other cube", async ({
+  page,
+}) => {
+  await ready(page);
+  const result = await page.evaluate(async () => {
+    const { ClockStage } = await import("/src/apps/clock/stage.ts");
+    const { loadCounterDesign } = await import("/src/apps/counter/design.ts");
+    const { loadAssets } = await import("/packages/cube-assets/src/index.ts");
+    const { initialState, presentMove, parseMove, applyMove } = await import(
+      "/packages/cube-mechanics/src/index.ts"
+    );
+    const { stateEquals } = await import("/packages/cube-core/src/index.ts");
+    const design = await loadCounterDesign();
+    const host = document.createElement("div");
+    host.style.cssText = "width:600px;height:250px";
+    document.body.append(host);
+    const stage = new ClockStage(host),
+      first = stage.createCube(document.createElement("div"), 0),
+      second = stage.createCube(document.createElement("div"), 1);
+    const print = design.prints.padded,
+      assets = await loadAssets(design.assets, [print]);
+    const state = initialState(print);
+    first.configure(print, state, assets);
+    second.configure(print, state, assets);
+    let disposed = 0,
+      stopped = 0;
+    const dispose = stage.renderer.dispose.bind(stage.renderer);
+    stage.renderer.dispose = () => {
+      disposed++;
+      dispose();
+    };
+    const loop = stage.renderer.setAnimationLoop.bind(stage.renderer);
+    stage.renderer.setAnimationLoop = (fn) => {
+      if (fn === null) stopped++;
+      return loop(fn);
+    };
+    first.destroy();
+    await second.animate(presentMove(state, parseMove("R")));
+    stage.renderer.render(stage.scene, stage.camera);
+    const result = {
+      canvasAlive: host.querySelectorAll("canvas").length === 1,
+      disposed,
+      stopped,
+      otherCubeValid: stateEquals(
+        second.presentedState,
+        applyMove(state, parseMove("R")),
+      ),
+      roots: stage.scene.children.filter((o) => o.type === "Group").length,
+    };
+    stage.destroy();
+    assets.dispose();
+    host.remove();
+    return result;
+  });
+  expect(result).toEqual({
+    canvasAlive: true,
+    disposed: 0,
+    stopped: 0,
+    otherCubeValid: true,
+    roots: 1,
+  });
+});
