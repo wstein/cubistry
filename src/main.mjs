@@ -14,8 +14,7 @@ let ready = false,
   value = 0,
   view,
   viewer,
-  proof,
-  certified;
+  proof;
 let padded = true;
 const error = (message = "") => {
   $("error").textContent = message;
@@ -42,7 +41,7 @@ function controlsUi() {
   ))
     el.disabled = !ready;
   $("application").disabled = !ready || !!view?.busy || run.running;
-  $("format").disabled = !ready || !!view?.busy || run.running;
+  $("format").disabled = !ready;
   $("reset-session-moves").disabled = !ready || !!view?.busy || run.running;
   const active = run.running || !!view?.busy;
   $("run").textContent = active ? "Stop" : "Run";
@@ -160,38 +159,26 @@ for (const button of document.querySelectorAll("[data-delta]"))
 $("reset-session-moves").addEventListener("click", () =>
   action(() => view.resetSessionMoves()),
 );
-async function selectedRoute() {
-  if (!$("format").checked) return null;
-  certified ??= await loadCertifiedCounter(proof, import.meta.env.BASE_URL);
-  return certified;
+// This screen-only field rule never selects a different permanent print or solver.
+function formatUi() {
+  viewer.setFaceletImageOverride(
+    $("format").checked
+      ? null
+      : {
+          position: [-1, -1, 1],
+          normal: [0, 0, 1],
+          sourceAssetId: "0",
+          replacementAssetId: "blank",
+        },
+  );
 }
-async function changeFormat() {
-  if (!ready || view.busy || run.running) return;
-  ready = false;
-  controlsUi();
-  const previous = view.state;
-  try {
-    await view.configure(
-      "COUNTER",
-      $("format").checked,
-      0,
-      await selectedRoute(),
-    );
+$("format").addEventListener("change", () =>
+  action(() => {
+    formatUi();
     padded = $("format").checked;
-    value = 0;
-    $("value").value = "0";
-    ready = true;
     save();
-    error();
-  } catch (e) {
-    if (view.state === previous) ready = true;
-    $("format").checked = padded;
-    error(e.message);
-  } finally {
-    controlsUi();
-  }
-}
-$("format").addEventListener("change", () => void changeFormat());
+  }),
+);
 function speedUi() {
   const stop = Number($("rotation-speed").value);
   viewer?.setAnimationSpeed(BASE_MOVE_DURATION_MS / durations[stop]);
@@ -272,10 +259,11 @@ async function initialize() {
     speedUi();
     await view.configure(
       "COUNTER",
-      $("format").checked,
+      true,
       value,
-      await selectedRoute(),
+      await loadCertifiedCounter(proof, import.meta.env.BASE_URL),
     );
+    formatUi();
     padded = $("format").checked;
     ready = true;
     $("value").value = String(value);
