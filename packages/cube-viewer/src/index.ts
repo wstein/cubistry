@@ -16,6 +16,10 @@ import {
   type MovePresentation,
 } from "@cubistry/cube-mechanics";
 import type { LoadedAssets } from "@cubistry/cube-assets";
+import {
+  overriddenSticker,
+  type FaceletImageOverride,
+} from "./facelet-image.ts";
 import { clampPitch, viewTurn } from "./orbit-input.ts";
 const spacing = 0.52;
 const vector = (a: Vec3) => new THREE.Vector3(...a);
@@ -47,6 +51,9 @@ export class CubeViewer {
   private materials: THREE.Material[] = [];
   private textures: THREE.Texture[] = [];
   private print: PrintDefinition | null = null;
+  private imageMaps = new Map<string, THREE.Texture>();
+  private stickerMaterials = new Map<number, THREE.MeshStandardMaterial>();
+  private faceletImageOverride: FaceletImageOverride | null = null;
   private presented: CubeState | null = null;
   private yaw = Math.PI / 18;
   private pitch = (7 * Math.PI) / 180;
@@ -151,6 +158,43 @@ export class CubeViewer {
     this.pitch = (7 * Math.PI) / 180;
     this.radius = 10.5;
   }
+  get presentedPrint(): PrintDefinition | null {
+    return this.print;
+  }
+  /** Change screen formatting only, including during a turn; retain all geometry and physics. */
+  setFaceletImageOverride(rule: FaceletImageOverride | null): void {
+    demand(this.print && this.presented, "Viewer is not configured");
+    if (rule)
+      demand(
+        this.imageMaps.has(rule.sourceAssetId) &&
+          this.imageMaps.has(rule.replacementAssetId),
+        "Unknown facelet image override",
+      );
+    this.faceletImageOverride = rule
+      ? { ...rule, position: [...rule.position], normal: [...rule.normal] }
+      : null;
+    this.updateFaceletImage();
+  }
+  private updateFaceletImage(): void {
+    if (!this.print || !this.presented) return;
+    const selected = overriddenSticker(
+      this.print,
+      this.presented,
+      this.faceletImageOverride,
+    );
+    for (const s of this.print.stickers) {
+      const material = this.stickerMaterials.get(s.id)!;
+      const asset =
+        s.id === selected
+          ? this.faceletImageOverride!.replacementAssetId
+          : s.assetId;
+      const map = this.imageMaps.get(asset)!;
+      if (material.map !== map) {
+        material.map = map;
+        material.needsUpdate = true;
+      }
+    }
+  }
   get presentedState(): CubeState | null {
     return this.presented;
   }
@@ -185,9 +229,11 @@ export class CubeViewer {
     this.meshes = [];
     this.materials = [];
     this.textures = [];
+    this.faceletImageOverride = null;
     this.print = validatePrint(print);
     this.presented = validateState(state, this.print);
-    const maps = new Map(
+    this.stickerMaterials.clear();
+    const maps = (this.imageMaps = new Map(
       [...assets.images].map(([id, image]) => {
         const t = new THREE.Texture(image);
         t.colorSpace = THREE.SRGBColorSpace;
@@ -196,7 +242,7 @@ export class CubeViewer {
         this.textures.push(t);
         return [id, t];
       }),
-    );
+    ));
     const plasticDef = assets.materials.get("plastic");
     const plastic = new THREE.MeshStandardMaterial({
       color: plasticDef?.color ?? "#202329",
@@ -216,18 +262,21 @@ export class CubeViewer {
           roughness: materialDef.roughness,
         });
         this.materials.push(material);
+        this.stickerMaterials.set(s.id, material);
         const plane = new THREE.Mesh(
           new THREE.PlaneGeometry(0.87, 0.87),
           material,
         );
         plane.position.copy(vector(s.normal).multiplyScalar(0.501));
         plane.quaternion.setFromRotationMatrix(frame(s.normal, s.up));
+        plane.userData.stickerId = s.id;
         mesh.add(plane);
       }
       this.scene.add(mesh);
       this.meshes[c.id] = mesh;
     }
     this.sync(state);
+    this.updateFaceletImage();
   }
   private sync(state: CubeState): void {
     const print = this.print!;
@@ -287,6 +336,7 @@ export class CubeViewer {
       }
       this.presented = presentation.to;
       this.sync(presentation.to);
+      this.updateFaceletImage();
     } finally {
       this.busy = false;
     }
