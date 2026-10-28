@@ -4,7 +4,8 @@ import {
   type MoveProgress,
 } from "../shared/playback.ts";
 import { demand, stateEquals, type CubeState, type LegalMove } from "@cubistry/cube-core";
-import { matchesTarget } from "@cubistry/cube-mechanics";
+import type { MotionTiming } from "@cubistry/cube-viewer";
+import { matchesTarget, type MovePresentation } from "@cubistry/cube-mechanics";
 import {
   loadAssets,
   validateAssets,
@@ -23,6 +24,20 @@ export class TimerController extends PhysicalPlayback {
   private readonly resolveAssets: typeof loadAssets;
   private readonly prepareSolver: typeof createCounterSolver;
   private solver: CounterSolver | null = null;
+  private timing: { target: number; motion: MotionTiming } | null = null;
+  private timingRevision = 0;
+  setDeadline(target: number, endAt: number, durationMs: number): void {
+    if (this.timing?.target === target && this.timing.motion.endAt === endAt &&
+      this.timing.motion.durationMs === durationMs) return;
+    this.timing = { target, motion: { endAt, durationMs, revision: ++this.timingRevision } };
+  }
+  clearDeadline(): void { this.timing = null; this.timingRevision++; }
+  protected animateMove(presentation: MovePresentation): Promise<void> {
+    const finalMove = this.playback.completed + 1 === this.playback.total;
+    const timed = finalMove && this.timing?.target === this.playback.target;
+    return this.view.animate(presentation, timed ? () =>
+      this.timing?.target === this.playback.target ? this.timing.motion : null : undefined);
+  }
   private prepared: { source: CubeState; value: number; moves: readonly LegalMove[] } | null = null;
   /** Prepare only from a committed idle source, including all hidden poses. */
   prepare(value: number): readonly LegalMove[] {
