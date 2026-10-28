@@ -237,6 +237,7 @@ test("Stopwatch floors five-second fractions and terminates exactly39:55 at100x;
   await choose(page, false);
   await page.selectOption("#timer-mode", "stopwatch");
   await settled(page, "00:00");
+  await expect(page.locator("#timer-bounds")).toHaveText("Cube: 5-second steps · limit 39:55");
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
   await page.clock.fastForward(4500);

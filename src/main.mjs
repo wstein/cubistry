@@ -101,7 +101,7 @@ function controlsUi() {
   text(
     "timer-bounds",
     clock.mode === "stopwatch"
-      ? "Cube: 10-second steps · limit 59:50"
+      ? `Cube: ${clock.profile.stepSeconds}-second steps · limit ${formatTime(clock.profile.maxSeconds / clock.profile.stepSeconds)}`
       : `00:00–${formatTime(clock.profile.maxSeconds / clock.profile.stepSeconds)} · ${clock.profile.stepSeconds}-second steps`,
   );
   $("timer-sync").hidden = !isTimer();

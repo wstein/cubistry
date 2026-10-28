@@ -169,7 +169,7 @@ export function formatTimer(
     throw Error("Invalid timer bucket");
   return formatLiveTimer(bucket * profile.stepSeconds);
 }
-/** One-second control-panel readout; physical targets still use ten-second buckets. */
+/** One-second control-panel readout; physical targets use application-specific buckets. */
 export function formatLiveTimer(seconds: number): string {
   if (!Number.isInteger(seconds) || seconds < 0 || seconds > 3590)
     throw Error("Invalid live timer seconds");
