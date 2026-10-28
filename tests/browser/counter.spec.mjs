@@ -99,7 +99,7 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
     controls = await page.locator(".controls").boundingBox();
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(cube.y);
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(controls.y);
-  await expect(page.locator("#application option")).toHaveCount(1);
+  await expect(page.locator("#application option")).toHaveText(["Counter 0–99", "Workshop Timer MM:SS"]);
   await expect(page.locator("#application")).toHaveValue("certified");
   await expect(page.locator("#auto,#step,#start,#pause,#front")).toHaveCount(0);
   await page.locator("#value").fill("42");
