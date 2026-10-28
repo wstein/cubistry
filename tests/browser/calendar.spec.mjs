@@ -119,9 +119,7 @@ test("live date crosses leap-day midnight and inspection validates Gregorian dat
   ]);
   await page.fill("#calendar-date", "");
   await page.click("#calendar-set");
-  await expect(page.locator("#calendar-error")).toContainText(
-    "Use YYYY-MM-DD",
-  );
+  await expect(page.locator("#calendar-error")).toContainText("Use YYYY-MM-DD");
   await page.fill("#calendar-date", "2000-02-29");
   await page.click("#calendar-set");
   await expect(page.locator("#calendar-state")).toHaveText("Selected date");
@@ -191,4 +189,30 @@ test("calendar rejects altered runtime and retains navigation", async ({
   await expect(page.locator("#calendar-design")).toBeDisabled();
   await page.selectOption("#calendar-application", "clock.html");
   await expect(page).toHaveURL(/clock.html$/);
+});
+test("selecting today refreshes Live and Inspecting status without moving stickers", async ({
+  page,
+}) => {
+  await ready(page);
+  const before = await physical(page);
+  await page.click("#calendar-set");
+  await expect(page.locator("#calendar-state")).toHaveText("Selected date");
+  await expect(page.locator("#calendar-zone")).toHaveText(
+    "Europe/Berlin · Inspecting",
+  );
+  await expect(page.locator("#calendar-live")).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+  expect(await physical(page)).toEqual(before);
+  await page.click("#calendar-live");
+  await expect(page.locator("#calendar-state")).toHaveText("Live · local date");
+  await expect(page.locator("#calendar-zone")).toHaveText(
+    "Europe/Berlin · Live",
+  );
+  await expect(page.locator("#calendar-live")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  expect(await physical(page)).toEqual(before);
 });
