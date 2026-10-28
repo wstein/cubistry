@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 import { writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 const active = [
   "abcdef",
   "bc",
@@ -67,6 +68,14 @@ async function chooseCertified(page) {
       window.executed.push(p);
     };
   });
+  // The direct default configured before this instrumentation. Exercise two
+  // real application changes so the captured print/start belong to this viewer.
+  await page.locator("#application").selectOption("countdown");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "10");
+  await expect(page.locator("#application")).toBeEnabled();
+  await page.locator("#application").selectOption("certified");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
+  await expect(page.locator("#application")).toBeEnabled();
   await expect(page.locator("#application")).toHaveValue("certified");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
 }
@@ -134,10 +143,23 @@ test("optimized permanent print executes all 99 adjacent transitions with exactl
     print: window.configuredPrint,
     start: window.configuredStart,
   }));
+  expect(initial.print).toBeDefined();
+  expect(initial.start).toBeDefined();
   writeFileSync(
     "/tmp/cubistry-certified-browser-commits.json",
     JSON.stringify({ ...initial, transitions }),
   );
+  const verified = JSON.parse(
+    execFileSync(
+      "python3",
+      [
+        "research/certified-counter/verify.py",
+        "/tmp/cubistry-certified-browser-commits.json",
+      ],
+      { encoding: "utf8" },
+    ),
+  );
+  expect(verified.actualCommittedHTM).toBe(339);
   await page.screenshot({
     path: "/tmp/cubistry-certified-99.png",
     fullPage: true,
