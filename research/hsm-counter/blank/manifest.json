@@ -1,0 +1,31 @@
+{
+  "schema": "cubistry.hsm-blank-experiment",
+  "version": 1,
+  "baseResearchCommit": "89d3c37f22396b86107dc69cfd4e09c7c98c2a01",
+  "status": "SAT",
+  "blankRequired": true,
+  "generalMaximumHTM": 6,
+  "canonicalMaximumHTM": 5,
+  "canonicalModes": 18,
+  "canonicalVerifiedEdges": 8292,
+  "distinctDisplays": 180,
+  "userDecision": "Real blank required; six moves accepted for arbitrary targets/other starting poses",
+  "tests": 3,
+  "negativeControls": 10,
+  "regressionExitStatus": 0,
+  "globalPrintOptimality": "UNKNOWN",
+  "geometryDependency": "research/five-second-timer/geometry.mjs",
+  "geometrySHA256": "d1616f23f88fc6ff1d9f502070652b6290e48d51bbb1fd6c7f503056a7d01264",
+  "node": "v24.19.0",
+  "python": "3.12.14",
+  "files": {
+    "README.md": "374eaa37978c9b5a12dba86a6d64fda2a504e0281f51e8c18bdee8559b2429f6",
+    "REVIEW.md": "49a8b668a0b8cf8cbbb537ada8bbe5562dbe5e65301ef49a9c6872589dd71166",
+    "generate.mjs": "412f3036b22c45940861ccbf4f11152cb8373c3e1e2a3199e6a1bf95653193c5",
+    "test_verify.py": "d5012541ab84b989038a305155143f4999402b92245e28d6952514f566440cc9",
+    "verification.json": "ee495d516d9ac1910a837d7c71b06d52c690c5a35b8415f1bd7c08bde732a707",
+    "verify.py": "88e299b4a728118818953670e19801c05b6234c6384ff18045896286da15e80c",
+    "witness-policy13.json": "71f795813de7e78189a1ac0f3e211c4c645534007e20fa00367f2339563ce7ff",
+    "witness.json": "13eea2a1ad88561775158a70633b80e25d06f883e42d44aafb4e6808699be47b"
+  }
+}

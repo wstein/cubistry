@@ -1,0 +1,740 @@
+{
+  "status": "SAT",
+  "witnessSHA256": "13eea2a1ad88561775158a70633b80e25d06f883e42d44aafb4e6808699be47b",
+  "realBlankTopLeftVerified": true,
+  "distinctDisplays": 180,
+  "independentFourCornerGraph": {
+    "graphStates": 136080,
+    "validBlankGoalTwists": 3,
+    "globalMaximumHTM": 6,
+    "correctTopSourceStates": 810,
+    "correctTopDistanceHistogram": {
+      "0": 3,
+      "1": 9,
+      "2": 27,
+      "3": 99,
+      "4": 273,
+      "5": 363,
+      "6": 36
+    },
+    "universalFiveMoveClaim": "NOT established; distance-six sources exist",
+    "scope": "All three unprinted-corner twists allowed; no blank-up constraint"
+  },
+  "canonicalModes": [
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "policy": 13,
+      "preperiodEdges": 120,
+      "periodEdges": 252,
+      "verifiedEdges": 372,
+      "maximumHTM": 5,
+      "periodHTM": 1113,
+      "setupHTM": 4
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "policy": 13,
+      "preperiodEdges": 60,
+      "periodEdges": 12,
+      "verifiedEdges": 72,
+      "maximumHTM": 5,
+      "periodHTM": 54,
+      "setupHTM": 4
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "policy": 13,
+      "preperiodEdges": 72,
+      "periodEdges": 120,
+      "verifiedEdges": 192,
+      "maximumHTM": 5,
+      "periodHTM": 532,
+      "setupHTM": 4
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "policy": 13,
+      "preperiodEdges": 72,
+      "periodEdges": 360,
+      "verifiedEdges": 432,
+      "maximumHTM": 5,
+      "periodHTM": 1625,
+      "setupHTM": 4
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": 1,
+      "policy": 13,
+      "preperiodEdges": 480,
+      "periodEdges": 960,
+      "verifiedEdges": 1440,
+      "maximumHTM": 5,
+      "periodHTM": 4332,
+      "setupHTM": 4
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": -1,
+      "policy": 13,
+      "preperiodEdges": 300,
+      "periodEdges": 120,
+      "verifiedEdges": 420,
+      "maximumHTM": 5,
+      "periodHTM": 544,
+      "setupHTM": 4
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": 1,
+      "policy": 13,
+      "preperiodEdges": 96,
+      "periodEdges": 252,
+      "verifiedEdges": 348,
+      "maximumHTM": 5,
+      "periodHTM": 1113,
+      "setupHTM": 5
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": -1,
+      "policy": 13,
+      "preperiodEdges": 288,
+      "periodEdges": 12,
+      "verifiedEdges": 300,
+      "maximumHTM": 5,
+      "periodHTM": 54,
+      "setupHTM": 5
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": 1,
+      "policy": 13,
+      "preperiodEdges": 216,
+      "periodEdges": 72,
+      "verifiedEdges": 288,
+      "maximumHTM": 5,
+      "periodHTM": 327,
+      "setupHTM": 5
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": -1,
+      "policy": 13,
+      "preperiodEdges": 48,
+      "periodEdges": 360,
+      "verifiedEdges": 408,
+      "maximumHTM": 5,
+      "periodHTM": 1625,
+      "setupHTM": 5
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "policy": 13,
+      "preperiodEdges": 720,
+      "periodEdges": 300,
+      "verifiedEdges": 1020,
+      "maximumHTM": 5,
+      "periodHTM": 1342,
+      "setupHTM": 5
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "policy": 13,
+      "preperiodEdges": 180,
+      "periodEdges": 840,
+      "verifiedEdges": 1020,
+      "maximumHTM": 5,
+      "periodHTM": 3775,
+      "setupHTM": 5
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": 1,
+      "policy": 13,
+      "preperiodEdges": 108,
+      "periodEdges": 252,
+      "verifiedEdges": 360,
+      "maximumHTM": 5,
+      "periodHTM": 1113,
+      "setupHTM": 4
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": -1,
+      "policy": 13,
+      "preperiodEdges": 240,
+      "periodEdges": 12,
+      "verifiedEdges": 252,
+      "maximumHTM": 5,
+      "periodHTM": 54,
+      "setupHTM": 4
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": 1,
+      "policy": 13,
+      "preperiodEdges": 216,
+      "periodEdges": 72,
+      "verifiedEdges": 288,
+      "maximumHTM": 5,
+      "periodHTM": 327,
+      "setupHTM": 4
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": -1,
+      "policy": 13,
+      "preperiodEdges": 192,
+      "periodEdges": 288,
+      "verifiedEdges": 480,
+      "maximumHTM": 5,
+      "periodHTM": 1303,
+      "setupHTM": 4
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "policy": 13,
+      "preperiodEdges": 240,
+      "periodEdges": 60,
+      "verifiedEdges": 300,
+      "maximumHTM": 5,
+      "periodHTM": 266,
+      "setupHTM": 4
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "policy": 1,
+      "preperiodEdges": 120,
+      "periodEdges": 180,
+      "verifiedEdges": 300,
+      "maximumHTM": 5,
+      "periodHTM": 792,
+      "setupHTM": 4
+    }
+  ],
+  "canonicalMaximumHTM": 5,
+  "sixMoveArbitraryJumpExample": {
+    "sourceLetter": "H",
+    "sourceValue": 0,
+    "targetValue": 34,
+    "minimumHTM": 6,
+    "mode": {
+      "maximum": 11,
+      "direction": 1
+    },
+    "beforeStep": 0,
+    "legalSourceWord": "U D2 B D'",
+    "sourceState": [
+      [
+        0,
+        0,
+        [
+          -1,
+          -1,
+          1
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        "0"
+      ],
+      [
+        1,
+        0,
+        [
+          -1,
+          -1,
+          1
+        ],
+        [
+          0,
+          -1,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        "1"
+      ],
+      [
+        2,
+        0,
+        [
+          -1,
+          -1,
+          1
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          -1
+        ],
+        "2"
+      ],
+      [
+        3,
+        1,
+        [
+          1,
+          1,
+          -1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        "3"
+      ],
+      [
+        4,
+        1,
+        [
+          1,
+          1,
+          -1
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          -1,
+          0
+        ],
+        "4"
+      ],
+      [
+        5,
+        1,
+        [
+          1,
+          1,
+          -1
+        ],
+        [
+          0,
+          0,
+          -1
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        "5"
+      ],
+      [
+        6,
+        2,
+        [
+          -1,
+          1,
+          -1
+        ],
+        [
+          0,
+          0,
+          -1
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        "0"
+      ],
+      [
+        7,
+        2,
+        [
+          -1,
+          1,
+          -1
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        [
+          0,
+          -1,
+          0
+        ],
+        "1"
+      ],
+      [
+        8,
+        2,
+        [
+          -1,
+          1,
+          -1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        "2"
+      ],
+      [
+        9,
+        3,
+        [
+          1,
+          -1,
+          -1
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        "3"
+      ],
+      [
+        10,
+        3,
+        [
+          1,
+          -1,
+          -1
+        ],
+        [
+          0,
+          0,
+          -1
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        "4"
+      ],
+      [
+        11,
+        3,
+        [
+          1,
+          -1,
+          -1
+        ],
+        [
+          0,
+          -1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        "5"
+      ],
+      [
+        12,
+        4,
+        [
+          -1,
+          -1,
+          -1
+        ],
+        [
+          0,
+          0,
+          -1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        "6"
+      ],
+      [
+        13,
+        4,
+        [
+          -1,
+          -1,
+          -1
+        ],
+        [
+          0,
+          -1,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        "7"
+      ],
+      [
+        14,
+        4,
+        [
+          -1,
+          -1,
+          -1
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        "8"
+      ],
+      [
+        15,
+        5,
+        [
+          1,
+          -1,
+          1
+        ],
+        [
+          0,
+          -1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        "9"
+      ],
+      [
+        16,
+        5,
+        [
+          1,
+          -1,
+          1
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        "0"
+      ],
+      [
+        17,
+        5,
+        [
+          1,
+          -1,
+          1
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          -1
+        ],
+        "9"
+      ],
+      [
+        18,
+        6,
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        "H"
+      ],
+      [
+        19,
+        6,
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        "S"
+      ],
+      [
+        20,
+        6,
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        "M"
+      ],
+      [
+        21,
+        7,
+        [
+          -1,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        ""
+      ],
+      [
+        22,
+        7,
+        [
+          -1,
+          1,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        ""
+      ],
+      [
+        23,
+        7,
+        [
+          -1,
+          1,
+          1
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        ""
+      ]
+    ],
+    "meaning": "A valid real-blank settled source needs six moves to this exact arbitrary target for this print.",
+    "legalSixMoveTargetWord": "R F' D F2 R' D"
+  },
+  "scope": "Canonical full-pose periods may repeat indefinitely at their recorded maximum; this does not make five moves a universal arbitrary-source guarantee.",
+  "globalPrintOptimality": "UNKNOWN"
+}
