@@ -17,9 +17,9 @@ async function chooseTimer(page) {
       window.timerStart = s;
       return configure.call(this, p, s, a);
     };
-    CubeViewer.prototype.animate = async function (p) {
+    CubeViewer.prototype.animate = async function (p, ...options) {
       const before = performance.now();
-      await animate.call(this, p);
+      await animate.call(this, p, ...options);
       window.timerMoves.push(p);
       window.timerTimes.push(performance.now() - before);
     };
@@ -591,6 +591,7 @@ test("all five Timer rates integrate continuously while running and remain indep
   ]) {
     await page.selectOption("#timer-speed", rate);
     await page.clock.fastForward(realMs);
+    await page.clock.runFor(1); // Sample beyond the exact floating-point second boundary.
     // A paused fake clock needs an explicit UI sample, independent of poll phase.
     await page.evaluate(() => window.dispatchEvent(new Event("pageshow")));
     await expect(page.locator("#timer-logical")).toHaveText(expected);
@@ -834,63 +835,110 @@ test("Sequence numbers identify actual starts, retain the finished number and ig
   await expect(number).toHaveText("1");
 });
 
-test("real predictive Timer settles full physical state by deadlines with250ms and adaptive2s preferences", async ({ page }, testInfo) => {
+async function observeEndpoints(page) {
+  await page.evaluate(async () => {
+    const { WorkshopClock } = await import("/src/apps/timer/clock.ts");
+    const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
+    const { stateEquals } = await import("/packages/cube-core/src/index.ts");
+    const start = WorkshopClock.prototype.start;
+    WorkshopClock.prototype.start = function (...args) {
+      const result = start.apply(this, args);
+      window.actualDeadline = this.snapshot().next?.deadline;
+      return result;
+    };
+    const cube = document.querySelector("#cube");
+    new MutationObserver(() => {
+      if (cube.getAttribute("aria-busy") === "false") window.deadlineCommits.push({
+        at: performance.now(), value: cube.dataset.value,
+        live: document.querySelector("#timer-logical").textContent });
+    }).observe(cube, { attributes: true });
+    const animate = CubeViewer.prototype.animate;
+    CubeViewer.prototype.animate = async function (p, ...options) {
+      window.sequenceStartedAt ??= performance.now();
+      window.nominalDurations.push(75 / this.animationSpeed);
+      const render = this.renderer.render, viewer = this;
+      if (options[0]) this.renderer.render = function (...args) {
+        const result = render.apply(this, args);
+        const pivot = viewer.scene.children.find(o => o.type === "Group" && !viewer.meshes.includes(o));
+        if (pivot) window.endpointAngles.push({ at: performance.now(),
+          angle: Math.max(Math.abs(pivot.rotation.x), Math.abs(pivot.rotation.y), Math.abs(pivot.rotation.z)),
+          fullAngle: Math.abs(p.move.turns) * Math.PI / 2 });
+        if (stateEquals(viewer.presented, p.to))
+          window.endpointRenders.push({ at: performance.now(), state: viewer.presented });
+        return result;
+      };
+      try { await animate.call(this, p, ...options); window.finalPhysicalState = p.to; }
+      finally { this.renderer.render = render; }
+    };
+  });
+}
+async function clearEndpointObservation(page) {
+  await page.evaluate(() => {
+    window.sequenceStartedAt = null; window.deadlineCommits = []; window.timerTimes = [];
+    window.nominalDurations = []; window.endpointRenders = []; window.endpointAngles = [];
+  });
+}
+async function endpointObservation(page, value = 1) {
+  return page.evaluate(async (value) => {
+    const { validateTimerRoute } = await import("/src/apps/timer/design.ts");
+    const { stateEquals } = await import("/packages/cube-core/src/index.ts");
+    const route = validateTimerRoute(await (await fetch("/workshop-timer.v1.json")).json());
+    const { formatTimer } = await import("/src/apps/timer/clock.ts");
+    const target = formatTimer(value);
+    const committed = window.deadlineCommits.find(e => e.value === target);
+    const rendered = window.endpointRenders.find(e => stateEquals(e.state, route.states[value]));
+    return { target, deadline: window.actualDeadline, startedAt: window.sequenceStartedAt,
+      settledAt: committed.at, liveAtCommit: committed.live, renderedAt: rendered?.at,
+      exactFullState: stateEquals(window.finalPhysicalState, route.states[value]),
+      nominalDurations: window.nominalDurations, actualMoveDurations: window.timerTimes,
+      intermediateAngles: window.endpointAngles.filter(s => s.angle > .001 && s.angle < s.fullAngle - .001),
+      samples: window.endpointAngles };
+  }, value);
+}
+function expectEndpoint(observation, preferred) {
+  expect(observation.exactFullState).toBe(true);
+  expect(observation.actualMoveDurations).toHaveLength(5);
+  if (preferred <= 250) expect(observation.nominalDurations).toEqual(Array(5).fill(preferred));
+  else expect(Math.max(...observation.nominalDurations)).toBeLessThan(preferred);
+  expect(Math.abs(observation.settledAt - observation.deadline)).toBeLessThanOrEqual(20);
+  expect(Math.abs(observation.renderedAt - observation.deadline)).toBeLessThanOrEqual(20);
+  expect(observation.renderedAt).toBeLessThanOrEqual(observation.settledAt);
+  expect(observation.liveAtCommit).toBe(observation.target);
+  expect(observation.settledAt - observation.startedAt).toBeLessThanOrEqual(5000);
+  if (preferred > 10) expect(observation.intermediateAngles.length).toBeGreaterThan(1);
+}
+test("real Timer final turn meets the actual clock endpoint within20ms at250ms, adaptive2s and10ms", async ({ page }, testInfo) => {
   test.setTimeout(60000);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await chooseTimer(page);
-  await page.locator("#rotation-speed").fill("6");
-  await duration(page,"00:20");
-  await page.evaluate(() => {
-    window.deadlineCommits=[];
-    window.nominalDurations=[];
-    const cube=document.querySelector("#cube");
-    new MutationObserver(() => {
-      if(cube.getAttribute("aria-busy")==="false") window.deadlineCommits.push({at:performance.now(),value:cube.dataset.value});
-    }).observe(cube,{attributes:true});
-    document.querySelector("#timer-start").addEventListener("click",()=>{window.startedAt=performance.now();},{capture:true});
-    return import("/packages/cube-viewer/src/index.ts").then(({CubeViewer})=>{
-      const animate=CubeViewer.prototype.animate;
-      CubeViewer.prototype.animate=async function(p){
-        window.sequenceStartedAt ??= performance.now();
-        window.nominalDurations.push(75/this.animationSpeed);
-        await animate.call(this,p);
-        window.finalPhysicalState=p.to;
-      };
-    });
-  });
-  const observations=[];
-  for(const [stop,preferred] of [["3",250],["0",2000],["6",10]]) {
-    await page.locator("#rotation-speed").fill("6");
-    await duration(page,"00:20");
-    await page.locator("#rotation-speed").fill(stop);
-    await page.evaluate(()=>{window.sequenceStartedAt=null;window.deadlineCommits=[];window.timerTimes=[];window.nominalDurations=[];});
-    await page.click("#timer-start");
-    await settled(page,"00:10");
-    const observation=await page.evaluate(async()=>{
-      const {validateTimerRoute}=await import("/src/apps/timer/design.ts");
-      const {stateEquals}=await import("/packages/cube-core/src/index.ts");
-      const route=validateTimerRoute(await(await fetch("/workshop-timer.v1.json")).json());
-      return {deadline:window.startedAt+10000,startedAt:window.sequenceStartedAt,
-        settledAt:window.deadlineCommits.find(e=>e.value==="00:10").at,
-        exactFullState:stateEquals(window.finalPhysicalState,route.states[1]),
-        nominalDurations:window.nominalDurations, actualMoveDurations:window.timerTimes};
-    });
-    expect(observation.exactFullState).toBe(true);
-    expect(observation.actualMoveDurations).toHaveLength(5);
-    if(preferred<=250) expect(observation.nominalDurations).toEqual(Array(5).fill(preferred));
-    else expect(Math.max(...observation.nominalDurations)).toBeLessThan(preferred);
-    expect(observation.startedAt).toBeLessThan(observation.deadline);
-    expect(observation.settledAt).toBeLessThanOrEqual(observation.deadline);
-    expect(observation.settledAt-observation.startedAt).toBeLessThanOrEqual(5000);
+  await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
+  await observeEndpoints(page);
+  const observations = [];
+  for (const [stop, preferred] of [["3", 250], ["0", 2000], ["6", 10]]) {
+    await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
+    await page.locator("#rotation-speed").fill(stop); await clearEndpointObservation(page);
+    await page.click("#timer-start"); await settled(page, "00:10");
+    const observation = await endpointObservation(page); expectEndpoint(observation, preferred);
     await expect(page.locator("#rotation-speed")).toHaveValue(stop);
-    await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","idle");
-    observations.push({preferredMilliseconds:preferred,...observation});
-    await expect(page.locator("#timer-logical")).toHaveText("00:10",{timeout:12000});
+    observations.push({ preferredMilliseconds: preferred, ...observation });
     await page.click("#timer-start");
   }
-  const path=testInfo.outputPath("deadline-observations.json");
-  writeFileSync(path,JSON.stringify({kind:"foreground-real-clock",implementationHead:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),observedAt:new Date().toISOString(),frameAllowanceMs:75,dispatchAllowanceMs:8,observations},null,2));
-  await testInfo.attach("deadline-observations",{path,contentType:"application/json"});
+  const path = testInfo.outputPath("endpoint-observations.json");
+  writeFileSync(path, JSON.stringify({ kind: "foreground-real-clock-endpoint", toleranceMs: 20,
+    implementationHead: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+    observedAt: new Date().toISOString(), observations }, null, 2));
+  await testInfo.attach("endpoint-observations", { path, contentType: "application/json" });
+});
+test("real Stopwatch final physical state and live clock share the target endpoint within20ms", async ({ page }, testInfo) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" }); await chooseTimer(page);
+  await page.locator("#rotation-speed").fill("6"); await page.selectOption("#timer-mode", "stopwatch");
+  await settled(page, "00:00"); await page.locator("#rotation-speed").fill("3");
+  await observeEndpoints(page); await clearEndpointObservation(page);
+  await page.click("#timer-start"); await settled(page, "00:10");
+  const observation = await endpointObservation(page); expectEndpoint(observation, 250);
+  const path = testInfo.outputPath("stopwatch-endpoint.json");
+  writeFileSync(path, JSON.stringify(observation, null, 2));
+  await testInfo.attach("stopwatch-endpoint", { path, contentType: "application/json" });
 });
 
 test("100x10ms reports infeasible budget honestly and still commits a full legal final state", async ({page})=>{
@@ -907,13 +955,13 @@ test("100x10ms reports infeasible budget honestly and still commits a full legal
   await expect(page.locator("#rotation-speed")).toHaveValue("6");
 });
 
-test("pause reconciles active and already-settled future targets through legal moves and Resume keeps fractions", async({page})=>{
+test("pause reconciles active sequences and a final-turn hold through legal moves; Resume keeps fractions", async({page})=>{
   test.setTimeout(60000);
   await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.install();
   await chooseTimer(page);
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
-  for(const [stop,advance] of [["0",5500],["3",9900]]) {
+  for(const [stop,advance] of [["0",5500],["3",9500]]) {
     await page.locator("#rotation-speed").fill("6");
     await page.fill("#timer-duration","00:20");
     await page.locator("#timer-duration").press("Enter");
@@ -926,13 +974,9 @@ test("pause reconciles active and already-settled future targets through legal m
     await page.clock.fastForward(idle);
     await page.clock.runFor(advance-idle);
     await expect(page.locator("#timer-logical")).toHaveText(advance===5500 ? "00:15" : "00:11");
-    if(advance===5500) {
-      await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
-      await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","moving");
-    } else {
-      await settled(page,"00:10");
-      await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","idle");
-    }
+    await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
+    await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","moving");
+    if(advance===9500) await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
     const before=Number(await page.locator("#session-moves").innerText());
     await page.click("#timer-start");
     await expect(page.locator("#timer-sync")).not.toContainText("Late");
@@ -945,6 +989,7 @@ test("pause reconciles active and already-settled future targets through legal m
     await page.click("#timer-start");
     await page.clock.runFor(10000-advance+1000);
     await settled(page,"00:10");
+    await page.clock.runFor(1);
     await page.evaluate(() => window.dispatchEvent(new Event("pageshow")));
     await expect(page.locator("#timer-logical")).toHaveText("00:09");
     await page.click("#timer-start");
@@ -978,4 +1023,79 @@ test("live readout advances each second while cube keeps ten-second buckets, inc
   await expect(page.locator("#timer-logical")).toHaveText("00:13");await settled(page,"00:10");
   await page.click("#timer-reset");await page.clock.runFor(1000);
   await expect(page.locator("#timer-logical")).toHaveText("00:00");await settled(page,"00:00");
+});
+
+test("automatic terminal tick preserves the real final turn endpoint and commits zero within20ms",async({page},testInfo)=>{
+  await page.emulateMedia({reducedMotion:"no-preference"});await chooseTimer(page);
+  await page.locator("#rotation-speed").fill("6");await duration(page,"00:10");
+  await page.locator("#rotation-speed").fill("3");await observeEndpoints(page);await clearEndpointObservation(page);
+  await page.click("#timer-start");await settled(page,"00:00");
+  const observation=await endpointObservation(page,0);expectEndpoint(observation,250);
+  await expect(page.locator("#status")).toHaveText("Countdown · Complete");
+  const path=testInfo.outputPath("terminal-endpoint.json");writeFileSync(path,JSON.stringify(observation,null,2));
+  await testInfo.attach("terminal-endpoint",{path,contentType:"application/json"});
+});
+
+test("a held final turn cancels on Reset and a rate extension rebases active motion without reversing or stale completion",async({page})=>{
+  test.setTimeout(60000);await page.emulateMedia({reducedMotion:"no-preference"});
+  await page.clock.install();await chooseTimer(page);await page.locator("#rotation-speed").fill("6");
+  await duration(page,"00:20");await observeEndpoints(page);await clearEndpointObservation(page);
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  await page.locator("#rotation-speed").fill("3");await page.click("#timer-start");
+  await page.clock.fastForward(8000);await page.clock.runFor(1500);
+  await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
+  expect(await page.evaluate(()=>window.endpointAngles.at(-1).angle)).toBe(0);
+  await page.click("#timer-reset");await page.clock.runFor(2200);await settled(page,"00:20");
+  await expect(page.locator("#status")).toHaveText("Countdown · Ready");
+  // This immutable adjacent edge has exactly one legal move, allowing a visible
+  // 250 ms final turn at 10x before extending its deadline by returning to 1x.
+  await page.locator("#rotation-speed").fill("6");await page.fill("#timer-duration","20:10");
+  await page.click("#timer-set");await page.clock.runFor(1000);await settled(page,"20:10");
+  await page.locator("#rotation-speed").fill("3");await page.selectOption("#timer-speed","10");
+  await clearEndpointObservation(page);await page.click("#timer-start");await page.clock.runFor(900);
+  const before=await page.evaluate(()=>window.endpointAngles.at(-1).angle);expect(before).toBeGreaterThan(0);
+  await page.selectOption("#timer-speed","1");await page.clock.runFor(200);
+  await expect(page.locator("#cube")).toHaveAttribute("data-value","20:10");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
+  const after=await page.evaluate(()=>window.endpointAngles.at(-1).angle);expect(after).toBeGreaterThanOrEqual(before);
+  await page.clock.runFor(1000);await settled(page,"20:00");
+  const samples=await page.evaluate(()=>window.endpointAngles.map(s=>s.angle));
+  expect(samples.every((a,i)=>i===0||a>=samples[i-1]-1e-9)).toBe(true);
+  await verifyActualTimerMoves(page,90,120,"/tmp/cubistry-endpoint-lifecycle-commits.json");
+});
+
+test("an initially infeasible final turn accepts a later feasible endpoint when rate slows",async({page})=>{
+  await page.emulateMedia({reducedMotion:"no-preference"});await page.clock.install();await chooseTimer(page);
+  await page.locator("#rotation-speed").fill("6");await duration(page,"20:10");
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  await page.locator("#rotation-speed").fill("3");await page.selectOption("#timer-speed","100");
+  await page.click("#timer-start");await page.clock.runFor(8);
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
+  await page.selectOption("#timer-speed","1");await page.clock.runFor(200);
+  await expect(page.locator("#cube")).toHaveAttribute("data-value","20:10");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
+  await page.clock.fastForward(8000);await page.clock.runFor(1100);await settled(page,"20:00");
+  await verifyActualTimerMoves(page,90,120,"/tmp/cubistry-attachable-endpoint-commits.json");
+});
+
+test("a reduced-motion preference change cannot run an active presentation twice",async({page})=>{
+  await page.emulateMedia({reducedMotion:"no-preference"});await page.clock.install();await chooseTimer(page);
+  await duration(page,"00:20");await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  await page.evaluate(async()=>{
+    const originalMedia=window.matchMedia.bind(window);window.mediaQueries=0;
+    window.matchMedia=(query)=>{if(query==="(prefers-reduced-motion: reduce)")window.mediaQueries++;return originalMedia(query);};
+    const {CubeViewer}=await import("/packages/cube-viewer/src/index.ts"),animate=CubeViewer.prototype.animate;
+    CubeViewer.prototype.animate=async function(p,...args){
+      const before=window.mediaQueries;try{return await animate.call(this,p,...args);}
+      finally{if(args[0])window.finalMediaQueries=window.mediaQueries-before;}
+    };
+  });
+  await page.click("#timer-start");await page.clock.fastForward(8000);await page.clock.runFor(1500);
+  await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
+  const before=Number(await page.locator("#session-moves").innerText());
+  await page.emulateMedia({reducedMotion:"reduce"});await page.clock.runFor(520);
+  await settled(page,"00:10");expect(Number(await page.locator("#session-moves").innerText())).toBe(before+1);
+  await page.clock.runFor(100);await settled(page,"00:10");
+  expect(Number(await page.locator("#session-moves").innerText())).toBe(before+1);
+  expect(await page.evaluate(()=>window.finalMediaQueries)).toBe(1);
 });
