@@ -502,6 +502,10 @@ $("application").addEventListener("change", async () => {
     $("application").value = application;
     return;
   }
+  if ($("application").value === "live-clock") {
+    location.assign(new URL("clock.html", location.href));
+    return;
+  }
   if (application === "certified") rememberedCounterValue = view.currentValue;
   const requested = $("application").value,
     previous = view;
@@ -740,6 +744,11 @@ async function initialize() {
     $("value").value = String(value);
     controlsUi();
     save();
+    const requested = new URLSearchParams(location.search).get("application");
+    if (["hsm-counter", "timer", "five-second-timer"].includes(requested)) {
+      $("application").value = requested;
+      $("application").dispatchEvent(new Event("change"));
+    }
   } catch (e) {
     error("Counter setup failed: " + e.message);
     $("status").textContent = "Unable to load the verified fixed print.";

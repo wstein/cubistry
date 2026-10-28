@@ -10,6 +10,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
+        clock: fileURLToPath(new URL("./clock.html", import.meta.url)),
         counter: fileURLToPath(new URL("./index.html", import.meta.url)),
         acceptance: fileURLToPath(
           new URL("./solver-acceptance.html", import.meta.url),
