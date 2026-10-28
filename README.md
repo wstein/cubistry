@@ -64,12 +64,14 @@ restarting Run.
 
 Manual −10/−1/+1/+10 actions clamp at the bounds unless **Wrap 99 ↔ 0** is
 checked. Run always follows the direct numeric route, regardless of Wrap.
-**Leading Zero** switches between 05 and a blank tens sticker followed by 5.
-Changing it configures a new permanent print and resets value/session to zero;
-the blank-tens print has no certified 339-HTM route.
+**Leading Zero** only shows or hides the leading 0 in the existing optimized
+layout. It never selects a legacy print or resets the value, physical state,
+Run, move counters, or camera. Both checkbox states use the same certified
+339-HTM traversal. The unchecked option is screen formatting; the permanent
+print/sticker identities remain unchanged.
 
 Drag to orbit and scroll to zoom. **Rotation Speed** has six stops: 2 s, 1 s,
-500 ms, 250 ms (default), 100 ms, and 50 ms per HTM move. It changes animation
+500 ms, 250 ms, 100 ms (default), and 50 ms per HTM move. It changes animation
 only. The same **Run** button changes to **Stop** in place while work is active.
 Current state, session moves, the current move sequence, and **Reset session
 moves** are always visible together below the cube, above Rotation Speed.
