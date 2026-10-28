@@ -29,7 +29,7 @@ async function artFits(page) {
     const ctx = document.createElement("canvas").getContext("2d");
     return calendarApp.controller.design.printing
       .filter((s) => {
-        ctx.font = `600 ${stickerArt(s).size}px "Counter Sans"`;
+        ctx.font = `${stickerArt(s).weight} ${stickerArt(s).size}px "Counter Sans"`;
         const m = ctx.measureText(s.image);
         return (
           m.width > 228 ||
@@ -363,4 +363,67 @@ test.describe("high-density calendar framing", () => {
       }
     }
   });
+});
+test("English Saturday and both Sunday source stickers stay permanently red and extra-bold", async ({
+  page,
+}) => {
+  await ready(page, "2026-11-07T11:00:00Z");
+  await page.selectOption("#calendar-design", "en-3");
+  await expect(page.locator("#calendar-design")).toBeEnabled();
+  const seen = [];
+  for (const [iso, image] of [
+    ["2026-11-07", "SAT"],
+    ["2026-11-08", "SUN"],
+    ["2026-11-01", "SUN"],
+    ["2026-11-09", "MON"],
+  ]) {
+    await page.fill("#calendar-date", iso);
+    await page.click("#calendar-set");
+    await expect(page.locator("#calendar-viewer")).toHaveAttribute(
+      "aria-busy",
+      "false",
+    );
+    const actual = await page.evaluate(async () => {
+      const { calendarApp } = await import("/src/calendar.mjs");
+      const { front } = await import("/src/apps/calendar/model.ts");
+      const sticker = front(calendarApp.controller.physicalState)[0];
+      let texture;
+      calendarApp.viewer.scene.traverse((mesh) => {
+        if (mesh.userData.stickerId === sticker.id)
+          texture = mesh.material.map.image.getContext("2d");
+      });
+      const permanent = [];
+      calendarApp.viewer.scene.traverse((mesh) => {
+        if ([20, 33, 40].includes(mesh.userData.stickerId)) {
+          const ctx = mesh.material.map.image.getContext("2d");
+          permanent.push({
+            id: mesh.userData.stickerId,
+            font: ctx.font,
+            color: ctx.fillStyle,
+          });
+        }
+      });
+      return {
+        id: sticker.id,
+        image: sticker.image,
+        font: texture.font,
+        color: texture.fillStyle,
+        permanent,
+      };
+    });
+    expect(actual.image).toBe(image);
+    const weekend = image !== "MON";
+    expect(actual.font).toContain(weekend ? "800" : "600");
+    expect(actual.color).toBe(weekend ? "#ba302c" : "#25343e");
+    expect(actual.permanent.map((s) => s.id).sort((a, b) => a - b)).toEqual([
+      20, 33, 40,
+    ]);
+    expect(
+      actual.permanent.every(
+        (s) => s.font.includes("800") && s.color === "#ba302c",
+      ),
+    ).toBe(true);
+    if (weekend) seen.push(actual.id);
+  }
+  expect([...new Set(seen)].sort((a, b) => a - b)).toEqual([20, 33, 40]);
 });

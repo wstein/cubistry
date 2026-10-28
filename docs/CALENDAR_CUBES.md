@@ -12,7 +12,13 @@ timers, or live clock.
 English supports a leading zero or a real unprinted tens sticker for single-digit
 days. Both modes use exactly the same physical print. German retains its leading
 zero. Changing language explicitly installs a different print during setup.
-There is no year printed on the cube and no special weekend color.
+There is no year printed on the cube. English SAT and both SUN stickers carry
+permanent red, extra-bold (800) artwork; regular weekday stickers retain 600.
+This is source artwork, not a date-driven rendering override. German A retains
+its original artwork: its O sticker is shared by MO, DO and SO, and the exact
+fixed-layout fully red/bold requirement has a separate conditional impossibility
+proof under Research `055b38f`. A different German treatment requires an explicit
+layout or styling decision; a partial red S is not silently substituted.
 
 ## Provenance and physical playback
 
@@ -56,7 +62,7 @@ adjacent controls on desktop and within the narrow mobile viewport.
 ## Original artwork
 
 The immutable [vector sticker sources](../assets/calendar/manifest.json) use the
-locally distributed Noto Sans 600 font, package version and SHA-256 recorded in
+locally distributed Noto Sans 600/800 fonts, package version and SHA-256 hashes recorded in
 that manifest. The SIL Open Font License is retained in
 [OFL.txt](../public/fonts/OFL.txt). Each SVG embeds the licensed font, uses a
 256-unit viewBox and 14 mm square dimensions, and maps back to exact sticker IDs.
