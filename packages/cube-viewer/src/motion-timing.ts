@@ -3,6 +3,8 @@ export interface MotionTiming {
   readonly endAt: number;
   readonly durationMs: number;
   readonly revision: number;
+  /** Optional incremental duration when the absolute window has already expired. */
+  readonly lateDurationMs?: number;
 }
 export type MotionTimingSource = () => MotionTiming | null;
 export interface MotionRuntime {
@@ -67,7 +69,11 @@ export function animateTimedProgress(
           progress = Math.max(progress, window.from + (1 - window.from) *
             Math.min(1, (at - window.start) / (window.end - window.start)));
       } else {
-        progress = Math.min(1, progress + Math.max(0, at - previous) / (current ? 10 : duration()));
+        const late = current?.lateDurationMs;
+        const incrementalDuration = current
+          ? late !== undefined && Number.isFinite(late) && late >= 10 ? late : 10
+          : duration();
+        progress = Math.min(1, progress + Math.max(0, at - previous) / incrementalDuration);
       }
       previous = at;
       if (progress >= 1) { finish(); return; }
@@ -79,7 +85,10 @@ export function animateTimedProgress(
     };
     const tick = (at: number) => {
       frame = null;
-      advance(at);
+      // Earlier RAF callbacks (for example a shared WebGL render) can overrun
+      // this frame. Absolute deadlines use the current monotonic clock, never
+      // a stale frame-start timestamp from before the turn was created.
+      advance(Math.max(at, runtime.now()));
       if (!done) frame = runtime.frame(tick);
     };
     advance(previous);

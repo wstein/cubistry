@@ -45,14 +45,23 @@ export interface SharedCubeViewport {
 }
 export class CubeViewer {
   private animationSpeed = 1;
-  setAnimationSpeed(speed: number): void {
+  private durationUnit: "move" | "quarter-turn" = "move";
+  setAnimationSpeed(
+    speed: number,
+    durationUnit: "move" | "quarter-turn" = "move",
+  ): void {
     demand(
       Number.isFinite(speed) &&
         speed >= MIN_ANIMATION_SPEED &&
         speed <= MAX_ANIMATION_SPEED,
       "Invalid animation speed",
     );
+    demand(
+      ["move", "quarter-turn"].includes(durationUnit),
+      "Invalid animation duration unit",
+    );
     this.animationSpeed = speed;
+    this.durationUnit = durationUnit;
   }
   readonly renderer: THREE.WebGLRenderer;
   readonly scene: THREE.Scene | THREE.Group;
@@ -335,6 +344,9 @@ export class CubeViewer {
       "Viewer state is out of sync with authoritative controller",
     );
     this.busy = true;
+    const moveDuration = () =>
+      BASE_MOVE_DURATION_MS / this.animationSpeed *
+      (this.durationUnit === "quarter-turn" ? Math.abs(presentation.move.turns) : 1);
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     try {
       if (!reducedMotion) {
@@ -347,19 +359,19 @@ export class CubeViewer {
         this.scene.add(pivot);
         for (const c of selected) pivot.add(this.meshes[c.id]);
         if (timing) {
-          await animateTimedProgress(timing, () => BASE_MOVE_DURATION_MS / this.animationSpeed,
+          await animateTimedProgress(timing, moveDuration,
             (t) => { pivot.rotation[(["x", "y", "z"] as const)[axis]] =
               angle * (t * t * (3 - 2 * t)); });
         } else {
         let previous = performance.now(),
           progress = 0;
         await new Promise<void>((resolve) => {
-          const tick = (now: number) => {
+          const tick = (frameAt: number) => {
+            const now = Math.max(frameAt, performance.now());
             progress = Math.min(
               1,
               progress +
-                ((now - previous) * this.animationSpeed) /
-                  BASE_MOVE_DURATION_MS,
+                Math.max(0, now - previous) / moveDuration(),
             );
             previous = now;
             const t = progress;
@@ -375,7 +387,7 @@ export class CubeViewer {
         this.scene.remove(pivot);
       }
       if (reducedMotion && timing?.())
-        await animateTimedProgress(timing, () => BASE_MOVE_DURATION_MS / this.animationSpeed, () => {});
+        await animateTimedProgress(timing, moveDuration, () => {});
       this.presented = presentation.to;
       this.sync(presentation.to);
       this.updateFaceletImage();
