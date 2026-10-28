@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head><meta name="robots" content="noindex,nofollow">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f3eb" />
+    <title>Cubistry · Live clock</title>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-64/assets/clock-BCEg-P4s.js"></script>
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-64/assets/three-M-x_o2kR.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-64/assets/index-B6DO2egM.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-64/assets/images-CxyFpz5k.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-64/assets/design-BlK-HWYQ.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-64/assets/images-C1BhtRSx.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-64/assets/clock-UdETV4s2.css">
+  </head>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #64 — non-production preview · 9a2851946fd8</aside>
+    <main class="live-clock-page">
+      <header>
+        <a class="brand" href="./" aria-label="Cubistry home"
+          ><span class="brand-mark">▦</span> CUBISTRY</a
+        >
+        <div class="application-choice">
+          <label for="clock-application">Cube / application</label
+          ><select id="clock-application">
+            <option value="index.html">Counter 0–99</option>
+            <option value="index.html?application=hsm-counter">
+              H/S/M Counter 00–59
+            </option>
+            <option value="clock.html" selected>Live H–M–S Clock</option>
+          </select>
+        </div>
+      </header>
+      <div class="clock-heading">
+        <div>
+          <h1>Live clock</h1>
+          <p class="small">One current time. Three physical cubes.</p>
+        </div>
+      </div>
+      <div class="clock-workspace">
+        <section class="clock-cubes" aria-label="Live hour minute second cubes">
+          <article class="clock-card">
+            <h2>Hours</h2>
+            <div
+              id="clock-hours"
+              class="clock-viewer"
+              data-unit="H"
+              aria-busy="true"
+            ></div>
+            <p id="hours-state" class="clock-state" role="status">Preparing…</p>
+            <label for="hours-speed">Rotation Speed</label
+            ><select id="hours-speed" disabled>
+              <option value="2000">2 s</option>
+              <option value="1000">1 s</option>
+              <option value="500" selected>500 ms</option>
+              <option value="250">250 ms</option>
+              <option value="100">100 ms</option>
+              <option value="50">50 ms</option>
+              <option value="10">10 ms</option>
+            </select>
+          </article>
+          <article class="clock-card">
+            <h2>Minutes</h2>
+            <div
+              id="clock-minutes"
+              class="clock-viewer"
+              data-unit="M"
+              aria-busy="true"
+            ></div>
+            <p id="minutes-state" class="clock-state" role="status">
+              Preparing…
+            </p>
+            <label for="minutes-speed">Rotation Speed</label
+            ><select id="minutes-speed" disabled>
+              <option value="2000">2 s</option>
+              <option value="1000">1 s</option>
+              <option value="500">500 ms</option>
+              <option value="250" selected>250 ms</option>
+              <option value="100">100 ms</option>
+              <option value="50">50 ms</option>
+              <option value="10">10 ms</option>
+            </select>
+          </article>
+          <article class="clock-card">
+            <h2>Seconds</h2>
+            <div
+              id="clock-seconds"
+              class="clock-viewer"
+              data-unit="S"
+              aria-busy="true"
+            ></div>
+            <p id="seconds-state" class="clock-state" role="status">
+              Preparing…
+            </p>
+            <label for="seconds-speed">Rotation Speed</label
+            ><select id="seconds-speed" disabled>
+              <option value="2000">2 s</option>
+              <option value="1000">1 s</option>
+              <option value="500">500 ms</option>
+              <option value="250">250 ms</option>
+              <option value="100" selected>100 ms</option>
+              <option value="50">50 ms</option>
+              <option value="10">10 ms</option>
+            </select>
+          </article>
+        </section>
+        <aside class="clock-control" aria-label="Live clock control display">
+          <h2>Live time</h2>
+          <div class="clock-digital">
+            <output
+              id="clock-digital"
+              aria-label="Current local time"
+              aria-live="off"
+              >--:--:--</output
+            ><span id="clock-zone" class="small"></span>
+          </div>
+          <p id="clock-status" class="small" role="status">
+            Preparing the verified fixed prints…
+          </p>
+        </aside>
+      </div>
+
+      <p id="clock-error" class="error" role="alert"></p>
+      <p class="small">
+        Drag a cube to look around. The letters stay fixed and the upper-left
+        stickers stay blank. Slow playback synchronizes directly to the current
+        time.
+      </p>
+    </main>
+  </body>
+</html>
