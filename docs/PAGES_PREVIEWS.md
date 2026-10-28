@@ -16,8 +16,12 @@ setting is changed. Production remains at the same URL and uses the same
 [issue #10](https://github.com/wstein/cubistry/issues/10) remains separate;
 no documentation tree is copied into the demo.
 
-`PAGES_PREVIEWS_ENABLED` is an **explicit maintainer activation gate**, initially
-absent/false. Until separately approved activation, the existing main-only
+`PAGES_PREVIEWS_ENABLED` is an **explicit maintainer activation gate**. Its
+intended inactive value is absent/false. The current integration cannot read
+repository variables (HTTP 403), so the present value is **not asserted**.
+The maintainer must confirm absent/false **before merging this PR**: a preexisting
+true value would activate the new default-branch workflow immediately on merge.
+With the gate confirmed inactive, until separately approved activation, the existing main-only
 Actions Pages deployment remains active and no preview storage write/comment
 or deployment runs. Read-only PR/main builds may produce artifacts.
 
@@ -90,8 +94,10 @@ not vendored or modified.
 This PR prepares a reviewable pipeline; it does not activate, dispatch, merge or
 actually deploy it. The following are explicit maintainer operations:
 
-1. Review/approve the PR and merge through the normal protected main workflow.
-   Leave `PAGES_PREVIEWS_ENABLED` absent/false. Confirm the ordinary production
+1. **Before merge**, an authorized maintainer must inspect the repository Actions
+   variable and confirm `PAGES_PREVIEWS_ENABLED` is absent/false. If this cannot be
+   verified, do not merge or activate. Then review/approve and merge through the
+   normal protected main workflow; leave that verified gate inactive. Confirm the ordinary production
    deployment succeeds and the new `pages-site` main artifact is retained.
 2. Drain any in-flight legacy Pages writers. Verify current main's successful
    build artifact/root is available; never bootstrap from a PR-only snapshot.
