@@ -255,7 +255,9 @@ test.describe("high-density shared clock viewport", () => {
   test("one canvas fits all three cubes without overflowing into controls", async ({
     page,
   }) => {
-    await page.clock.setFixedTime(new Date("2026-10-28T11:34:56Z"));
+    await page.addInitScript(() => {
+      Date.now = () => Date.parse("2026-10-28T11:34:56Z");
+    });
     await page.goto("/clock.html");
     await expect(page.locator("#seconds-speed")).toBeEnabled();
     for (const viewport of [
