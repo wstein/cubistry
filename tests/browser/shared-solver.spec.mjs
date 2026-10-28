@@ -7,18 +7,20 @@ test("counter commits the shared 42→43 direct path and independent replay reta
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await page.locator("#format").selectOption("unpadded");
+  await expect(page.locator("#application")).toBeEnabled();
+  await page.locator("#value").fill("15");
+  await page.locator("#jump-form button").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await page.locator("#reset-session-moves").click();
   await page.locator("#value").fill("42");
   await page.locator("#jump-form button").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "42");
-  await expect(page.locator("#cube")).toHaveAttribute(
-    "aria-busy",
-    "false",
-  );
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.evaluate(async () => {
-    const { CubeViewer } = await import(
-      "/packages/cube-viewer/src/index.ts"
-    );
+    const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
     const original = CubeViewer.prototype.animate;
     window.sharedCommits = [];
     CubeViewer.prototype.animate = async function (p) {
@@ -29,10 +31,7 @@ test("counter commits the shared 42→43 direct path and independent replay reta
   await page.locator("#value").fill("43");
   await page.locator("#jump-form button").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "43");
-  await expect(page.locator("#cube")).toHaveAttribute(
-    "aria-busy",
-    "false",
-  );
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await expect(page.locator("#move-progress")).toHaveText("10 / 10 moves");
   const commits = await page.evaluate(() => window.sharedCommits);
   expect(commits).toHaveLength(10);
@@ -53,7 +52,7 @@ test("counter commits the shared 42→43 direct path and independent replay reta
         providerCommit: pin.commit,
         cases: [
           {
-            padded: true,
+            padded: false,
             from: 42,
             to: 43,
             word,
@@ -78,10 +77,7 @@ test("a missing shared table fails setup without enabling moves or a witness fal
   await expect(page.locator("#error")).toContainText(
     "Shared solver table could not be loaded",
   );
-  await expect(page.locator("#cube")).not.toHaveAttribute(
-    "data-value",
-    /.+/,
-  );
+  await expect(page.locator("#cube")).not.toHaveAttribute("data-value", /.+/);
   await expect(page.locator("#start")).toBeDisabled();
   await expect(page.locator("#jump-form button")).toBeDisabled();
 });

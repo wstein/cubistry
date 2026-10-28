@@ -26,7 +26,20 @@ const frame = (normal: Vec3, up: Vec3) =>
     vector(normal),
   );
 /** Generic size-2 viewer. It cannot select counter values, solve, or advance physics. */
+export const BASE_MOVE_DURATION_MS = 75;
+export const MIN_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 2000;
+export const MAX_ANIMATION_SPEED = 2;
 export class CubeViewer {
+  private animationSpeed = 1;
+  setAnimationSpeed(speed: number): void {
+    demand(
+      Number.isFinite(speed) &&
+        speed >= MIN_ANIMATION_SPEED &&
+        speed <= MAX_ANIMATION_SPEED,
+      "Invalid animation speed",
+    );
+    this.animationSpeed = speed;
+  }
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
@@ -134,7 +147,10 @@ export class CubeViewer {
     assets: LoadedAssets,
   ): void {
     demand(!this.busy, "Cannot replace a print during a physical turn");
-    demand(assets.textureOrigin === "bottom-left", "Unsupported texture upload origin");
+    demand(
+      assets.textureOrigin === "bottom-left",
+      "Unsupported texture upload origin",
+    );
     validatePrint(print);
     validateState(state, print);
     for (const s of print.stickers)
@@ -231,10 +247,18 @@ export class CubeViewer {
         const pivot = new THREE.Group();
         this.scene.add(pivot);
         for (const c of selected) pivot.add(this.meshes[c.id]);
-        const start = performance.now();
+        let previous = performance.now(),
+          progress = 0;
         await new Promise<void>((resolve) => {
           const tick = (now: number) => {
-            const t = Math.min(1, (now - start) / 75);
+            progress = Math.min(
+              1,
+              progress +
+                ((now - previous) * this.animationSpeed) /
+                  BASE_MOVE_DURATION_MS,
+            );
+            previous = now;
+            const t = progress;
             pivot.rotation[(["x", "y", "z"] as const)[axis]] =
               angle * (t * t * (3 - 2 * t));
             if (t < 1) requestAnimationFrame(tick);

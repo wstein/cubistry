@@ -418,3 +418,17 @@ footer a {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+.application-choice {
+  padding: 0 0 12px;
+}
+.application-choice select {
+  width: 100%;
+  margin-top: 6px;
+}
+.speed-control {
+  margin-top: 12px;
+}
+#rotation-speed {
+  max-width: 280px;
+  width: 100%;
+}
