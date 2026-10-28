@@ -53,7 +53,7 @@ The existing shared exactPhysical solver handles arbitrary/reset/catch-up target
 with full replay. No new solver, search, table, or claim of globally optimal
 partial-display paths is introduced. Counter's presentation-only blank-tens mask
 is cleared for Timer; all four Timer digits remain printed, upright digits.
-Returning to Counter restores its presentation preference and certified339 route.
+Returning to Counter restores its presentation preference and certified 339-HTM route.
 
 ## Evidence and timing
 
@@ -98,10 +98,12 @@ python3 research/workshop-timer/verify.py research/workshop-timer/observations/1
 ```
 
 The check command includes the original and optimized independent checkers,
-18 copied controls, all360 runtime states and actual countdown replay. Browser
+18 copied controls, all 360 runtime states and actual countdown replay. Browser
 cases additionally cover all five rates and mid-run changes, Stopwatch fractions
-and cap, single-button focus/labels, mode changes during lag, real visible100×
+and cap, single-button focus/labels, mode changes during lag, real visible 100×
 playback, mobile, mask isolation, per-application defaults and built Pages paths.
 
-This feature is stacked on PR #54 (`feat/53-cube-first-ui`) for issue #30. It does
-not modify that externally owned branch, protected research, or preview workflows.
+This feature started on PR #54 (`feat/53-cube-first-ui`) for issue #30. After
+that parent was merged, PR #56 was retargeted to `main`. The external history
+restack preserved all implementation trees and atomic patches; this author did
+not modify the parent, protected research, or preview workflows.
