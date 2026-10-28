@@ -1,0 +1,413 @@
+{
+  "schema": "cubistry.hsm-counter-comparison",
+  "version": 1,
+  "metric": "HTM; setup excluded; one visible 00-to-00 pass including wrap",
+  "candidateScope": "All three retained complete candidates; not all random search proposals",
+  "cycleLimits": [
+    23,
+    11,
+    59
+  ],
+  "independentBFS": {
+    "states": 9072,
+    "histogram": {
+      "0": 1,
+      "1": 15,
+      "2": 177,
+      "3": 1397,
+      "4": 4981,
+      "5": 2497,
+      "6": 4
+    }
+  },
+  "candidates": [
+    {
+      "candidate": "initial",
+      "witnessSHA256": "6c5d749fdbfd11df99c48dfded767daaab8bc20617c407fa004780a8d51dcd76",
+      "searchTrials": 512,
+      "rows": [
+        {
+          "letter": "H",
+          "setupHTM": 3,
+          "maximumIncrementHTM": 4,
+          "cycles": {
+            "23": {
+              "transitions": 24,
+              "forwardHTM": 76,
+              "wrapWord": "L D",
+              "wrapHTM": 2,
+              "totalHTM": 78,
+              "meanHTM": 3.25,
+              "sameFullPoseAfterWrap": false
+            },
+            "11": {
+              "transitions": 12,
+              "forwardHTM": 38,
+              "wrapWord": "D' L'",
+              "wrapHTM": 2,
+              "totalHTM": 40,
+              "meanHTM": 3.3333333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "59": {
+              "transitions": 60,
+              "forwardHTM": 195,
+              "wrapWord": "B' D2",
+              "wrapHTM": 2,
+              "totalHTM": 197,
+              "meanHTM": 3.283333333333333,
+              "sameFullPoseAfterWrap": false
+            }
+          }
+        },
+        {
+          "letter": "S",
+          "setupHTM": 3,
+          "maximumIncrementHTM": 4,
+          "cycles": {
+            "23": {
+              "transitions": 24,
+              "forwardHTM": 76,
+              "wrapWord": "L D",
+              "wrapHTM": 2,
+              "totalHTM": 78,
+              "meanHTM": 3.25,
+              "sameFullPoseAfterWrap": false
+            },
+            "11": {
+              "transitions": 12,
+              "forwardHTM": 37,
+              "wrapWord": "L2 D L'",
+              "wrapHTM": 3,
+              "totalHTM": 40,
+              "meanHTM": 3.3333333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "59": {
+              "transitions": 60,
+              "forwardHTM": 195,
+              "wrapWord": "L B2 D",
+              "wrapHTM": 3,
+              "totalHTM": 198,
+              "meanHTM": 3.3,
+              "sameFullPoseAfterWrap": false
+            }
+          }
+        },
+        {
+          "letter": "M",
+          "setupHTM": 3,
+          "maximumIncrementHTM": 4,
+          "cycles": {
+            "23": {
+              "transitions": 24,
+              "forwardHTM": 78,
+              "wrapWord": "L D",
+              "wrapHTM": 2,
+              "totalHTM": 80,
+              "meanHTM": 3.3333333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "11": {
+              "transitions": 12,
+              "forwardHTM": 35,
+              "wrapWord": "L2 B D",
+              "wrapHTM": 3,
+              "totalHTM": 38,
+              "meanHTM": 3.1666666666666665,
+              "sameFullPoseAfterWrap": false
+            },
+            "59": {
+              "transitions": 60,
+              "forwardHTM": 193,
+              "wrapWord": "D2 B L2",
+              "wrapHTM": 3,
+              "totalHTM": 196,
+              "meanHTM": 3.2666666666666666,
+              "sameFullPoseAfterWrap": false
+            }
+          }
+        }
+      ],
+      "aggregates": {
+        "23": {
+          "letters": 3,
+          "transitions": 72,
+          "totalHTM": 236,
+          "meanHTM": 3.2777777777777777
+        },
+        "11": {
+          "letters": 3,
+          "transitions": 36,
+          "totalHTM": 118,
+          "meanHTM": 3.2777777777777777
+        },
+        "59": {
+          "letters": 3,
+          "transitions": 180,
+          "totalHTM": 591,
+          "meanHTM": 3.283333333333333
+        }
+      }
+    },
+    {
+      "candidate": "intermediate",
+      "witnessSHA256": "3dbaf98e8acd7ab8abb21a09bab1779a57edf14284d3287a69d669985e6bb933",
+      "searchTrials": 512,
+      "rows": [
+        {
+          "letter": "H",
+          "setupHTM": 4,
+          "maximumIncrementHTM": 4,
+          "cycles": {
+            "23": {
+              "transitions": 24,
+              "forwardHTM": 74,
+              "wrapWord": "L' D",
+              "wrapHTM": 2,
+              "totalHTM": 76,
+              "meanHTM": 3.1666666666666665,
+              "sameFullPoseAfterWrap": false
+            },
+            "11": {
+              "transitions": 12,
+              "forwardHTM": 35,
+              "wrapWord": "B' L' D",
+              "wrapHTM": 3,
+              "totalHTM": 38,
+              "meanHTM": 3.1666666666666665,
+              "sameFullPoseAfterWrap": false
+            },
+            "59": {
+              "transitions": 60,
+              "forwardHTM": 183,
+              "wrapWord": "D' L'",
+              "wrapHTM": 2,
+              "totalHTM": 185,
+              "meanHTM": 3.0833333333333335,
+              "sameFullPoseAfterWrap": false
+            }
+          }
+        },
+        {
+          "letter": "S",
+          "setupHTM": 5,
+          "maximumIncrementHTM": 4,
+          "cycles": {
+            "23": {
+              "transitions": 24,
+              "forwardHTM": 74,
+              "wrapWord": "D2 L' D",
+              "wrapHTM": 3,
+              "totalHTM": 77,
+              "meanHTM": 3.2083333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "11": {
+              "transitions": 12,
+              "forwardHTM": 34,
+              "wrapWord": "B' L2 D2",
+              "wrapHTM": 3,
+              "totalHTM": 37,
+              "meanHTM": 3.0833333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "59": {
+              "transitions": 60,
+              "forwardHTM": 185,
+              "wrapWord": "L2 D L'",
+              "wrapHTM": 3,
+              "totalHTM": 188,
+              "meanHTM": 3.1333333333333333,
+              "sameFullPoseAfterWrap": false
+            }
+          }
+        },
+        {
+          "letter": "M",
+          "setupHTM": 4,
+          "maximumIncrementHTM": 4,
+          "cycles": {
+            "23": {
+              "transitions": 24,
+              "forwardHTM": 72,
+              "wrapWord": "D' L2 D2",
+              "wrapHTM": 3,
+              "totalHTM": 75,
+              "meanHTM": 3.125,
+              "sameFullPoseAfterWrap": false
+            },
+            "11": {
+              "transitions": 12,
+              "forwardHTM": 34,
+              "wrapWord": "R F' R'",
+              "wrapHTM": 3,
+              "totalHTM": 37,
+              "meanHTM": 3.0833333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "59": {
+              "transitions": 60,
+              "forwardHTM": 187,
+              "wrapWord": "L D L2",
+              "wrapHTM": 3,
+              "totalHTM": 190,
+              "meanHTM": 3.1666666666666665,
+              "sameFullPoseAfterWrap": false
+            }
+          }
+        }
+      ],
+      "aggregates": {
+        "23": {
+          "letters": 3,
+          "transitions": 72,
+          "totalHTM": 228,
+          "meanHTM": 3.1666666666666665
+        },
+        "11": {
+          "letters": 3,
+          "transitions": 36,
+          "totalHTM": 112,
+          "meanHTM": 3.111111111111111
+        },
+        "59": {
+          "letters": 3,
+          "transitions": 180,
+          "totalHTM": 563,
+          "meanHTM": 3.1277777777777778
+        }
+      }
+    },
+    {
+      "candidate": "final",
+      "witnessSHA256": "7ec93660867a367ad79d7af28acb2b0f1035450bcac76d0c1afaa7bcdac93cd5",
+      "searchTrials": 4096,
+      "rows": [
+        {
+          "letter": "H",
+          "setupHTM": 4,
+          "maximumIncrementHTM": 4,
+          "cycles": {
+            "23": {
+              "transitions": 24,
+              "forwardHTM": 78,
+              "wrapWord": "L B2 D",
+              "wrapHTM": 3,
+              "totalHTM": 81,
+              "meanHTM": 3.375,
+              "sameFullPoseAfterWrap": false
+            },
+            "11": {
+              "transitions": 12,
+              "forwardHTM": 37,
+              "wrapWord": "L' D2",
+              "wrapHTM": 2,
+              "totalHTM": 39,
+              "meanHTM": 3.25,
+              "sameFullPoseAfterWrap": false
+            },
+            "59": {
+              "transitions": 60,
+              "forwardHTM": 192,
+              "wrapWord": "D' B2 L'",
+              "wrapHTM": 3,
+              "totalHTM": 195,
+              "meanHTM": 3.25,
+              "sameFullPoseAfterWrap": false
+            }
+          }
+        },
+        {
+          "letter": "S",
+          "setupHTM": 5,
+          "maximumIncrementHTM": 4,
+          "cycles": {
+            "23": {
+              "transitions": 24,
+              "forwardHTM": 77,
+              "wrapWord": "D2 L' D",
+              "wrapHTM": 3,
+              "totalHTM": 80,
+              "meanHTM": 3.3333333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "11": {
+              "transitions": 12,
+              "forwardHTM": 38,
+              "wrapWord": "B2 D2",
+              "wrapHTM": 2,
+              "totalHTM": 40,
+              "meanHTM": 3.3333333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "59": {
+              "transitions": 60,
+              "forwardHTM": 194,
+              "wrapWord": "D' B D2",
+              "wrapHTM": 3,
+              "totalHTM": 197,
+              "meanHTM": 3.283333333333333,
+              "sameFullPoseAfterWrap": false
+            }
+          }
+        },
+        {
+          "letter": "M",
+          "setupHTM": 4,
+          "maximumIncrementHTM": 4,
+          "cycles": {
+            "23": {
+              "transitions": 24,
+              "forwardHTM": 77,
+              "wrapWord": "B L' D",
+              "wrapHTM": 3,
+              "totalHTM": 80,
+              "meanHTM": 3.3333333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "11": {
+              "transitions": 12,
+              "forwardHTM": 35,
+              "wrapWord": "L2 D2",
+              "wrapHTM": 2,
+              "totalHTM": 37,
+              "meanHTM": 3.0833333333333335,
+              "sameFullPoseAfterWrap": false
+            },
+            "59": {
+              "transitions": 60,
+              "forwardHTM": 199,
+              "wrapWord": "L2 B2 D",
+              "wrapHTM": 3,
+              "totalHTM": 202,
+              "meanHTM": 3.3666666666666667,
+              "sameFullPoseAfterWrap": false
+            }
+          }
+        }
+      ],
+      "aggregates": {
+        "23": {
+          "letters": 3,
+          "transitions": 72,
+          "totalHTM": 241,
+          "meanHTM": 3.3472222222222223
+        },
+        "11": {
+          "letters": 3,
+          "transitions": 36,
+          "totalHTM": 116,
+          "meanHTM": 3.2222222222222223
+        },
+        "59": {
+          "letters": 3,
+          "transitions": 180,
+          "totalHTM": 594,
+          "meanHTM": 3.3
+        }
+      }
+    }
+  ],
+  "limitations": "Wrap can change hidden pose. Repeated cycles need replanning; averages are not steady-state guarantees or global optima."
+}

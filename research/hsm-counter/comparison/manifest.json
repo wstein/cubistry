@@ -1,0 +1,34 @@
+{
+  "schema": "cubistry.hsm-counter-comparison-experiment",
+  "version": 1,
+  "baseResearchCommit": "73f40fbe68c9f773cb24ec45c4bf417c7f87dc81",
+  "candidateScope": "All three retained complete witnesses; not all random search proposals",
+  "candidateOrigin": {
+    "initial": "Preserved unpublished512proposal pre11resetdraft",
+    "intermediate": "Preserved unpublished512proposal combinedobjectivedraft",
+    "final": "Byteidentical publishedwitness at73f40fb"
+  },
+  "commands": [
+    "python3 research/hsm-counter/compare.py --write",
+    "python3 -m unittest discover -s research/hsm-counter -p 'test_*.py' -v"
+  ],
+  "generationExitStatus": 0,
+  "regressionExitStatus": 0,
+  "testMethods": 6,
+  "negativeControls": 24,
+  "status": "SAT",
+  "globalCycleOptimality": "UNKNOWN",
+  "files": {
+    "compare.py": "ab5ce23f2859df69b00e77d7b48bc81213399f06a1ceba73797c0ea06ab06a89",
+    "test_compare.py": "42bf525c08897c7299cf726a363aeb95d53543ece47cbae76edc4214fc551470",
+    "verify.py": "9523bf9430f4fdbdf3de48e5f3e75bc5da5ef1bbebade05d79cf13fd70d7ee2a",
+    "witness.json": "7ec93660867a367ad79d7af28acb2b0f1035450bcac76d0c1afaa7bcdac93cd5",
+    "comparison/PROVENANCE.md": "e2b88b0f53fcf1b249123c4bcd5ea654c6c4ec6e15f7ef26f1639406224f597c",
+    "comparison/README.md": "5f5959c38c42f071ec51986d1dd521b775737ab2a3bf8a90d006f80db580416d",
+    "comparison/REVIEW.md": "c46d417d55f92bb598fcb8eab4734efe55028b75f71ce2d6d714f47536828d06",
+    "comparison/candidates/final.json": "7ec93660867a367ad79d7af28acb2b0f1035450bcac76d0c1afaa7bcdac93cd5",
+    "comparison/candidates/initial.json": "6c5d749fdbfd11df99c48dfded767daaab8bc20617c407fa004780a8d51dcd76",
+    "comparison/candidates/intermediate.json": "3dbaf98e8acd7ab8abb21a09bab1779a57edf14284d3287a69d669985e6bb933",
+    "comparison/results.json": "20a20f22cc9c9bf136c8aacfcdc2db1461d3580189be35fe16390b4dbd255636"
+  }
+}
