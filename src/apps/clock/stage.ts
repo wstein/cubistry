@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { clockCameraRadius } from "./framing.ts";
 import { CubeViewer } from "@cubistry/cube-viewer";
 import { demand } from "@cubistry/cube-core";
 /** One WebGL context, scene, camera and frame loop for the entire H–M–S row. */
@@ -34,10 +35,6 @@ export class ClockStage {
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
-      this.radius =
-        Math.max(1.75, 4.4 / this.camera.aspect) /
-          Math.tan(THREE.MathUtils.degToRad(14)) +
-        2.2;
     });
     this.resize.observe(host);
     el.addEventListener("pointerdown", (e) => {
@@ -63,6 +60,12 @@ export class ClockStage {
     el.addEventListener("pointercancel", release);
     el.addEventListener("lostpointercapture", release);
     this.renderer.setAnimationLoop(() => {
+      this.radius = clockCameraRadius(
+        this.camera.aspect,
+        this.yaw,
+        this.pitch,
+        this.camera.fov,
+      );
       this.camera.position.set(
         Math.sin(this.yaw) * Math.cos(this.pitch) * this.radius,
         Math.sin(this.pitch) * this.radius,
