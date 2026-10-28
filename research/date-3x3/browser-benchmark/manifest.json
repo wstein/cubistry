@@ -1,0 +1,28 @@
+{
+  "implementationCommit": "3f1bdc7",
+  "implementationBranch": "feat/calendar-cubes",
+  "pullRequest": 65,
+  "test": "tests/browser/calendar.spec.mjs",
+  "actualMoves": 75,
+  "target": {
+    "weekday": 1,
+    "day": 29,
+    "month": 2,
+    "cells": [
+      "D",
+      "I",
+      "",
+      "",
+      "2",
+      "9",
+      "F",
+      "E",
+      "B"
+    ]
+  },
+  "artifacts": {
+    "de-a.png": "01abebb2e8dc64a7133e6cb12fd7b85d8d92e5af1f54a459da40eff82bcfb290",
+    "en-3.png": "c7551b6d651019a636166dfd3789f0bde2e0005ef786a1b56f6fc7311fe59cde",
+    "presentations.json": "8a5fb532e40cf2f334ec013f2d84adf063c858e3f711adde7d1975e5dcac86ef"
+  }
+}
