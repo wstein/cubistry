@@ -38,8 +38,15 @@ Pages settings migration, force push or protected research change.
 - `pull_request` opened/reopened/synchronize builds check out the exact head,
   use contents-read only, do not persist credentials and have no publishing
   secrets or write permissions. Fork builds are excluded from this preview path.
-- Trusted `workflow_run` completion and closed/merged `pull_request_target`
-  cleanup check out **main only**. The latter never builds/checks out PR code.
+- Trusted `workflow_run` completion and main-ref manual reconciliation check out
+  **main only**. Closed/merged `pull_request_target` performs a metadata-only
+  fixed `workflow_dispatch` to main: no checkout, build, artifact consumption or
+  PR code. Its isolated signal job has only `actions: write` for that fixed
+  dispatch, no content/Pages/OIDC write. Dispatch failure stops visibly.
+  It cannot signal itself on workflow_dispatch, and uses a unique concurrency
+  group so it never evicts a pending publisher. Actual publication accepts only
+  main context: the existing github-pages environment permits main deployments,
+  including cleanup for stacked PRs whose base was a feature branch.
   Privileged jobs run only trusted standard-library scripts and pinned actions;
   there is no npm installation or artifact script execution in those jobs.
 - API data, not artifact metadata, determines repository, current open PR/head,

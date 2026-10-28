@@ -12,7 +12,7 @@ test("inactive publisher cannot coalesce away a pending legacy production deploy
   );
   assert.match(
     publisher,
-    /group: \$\{\{ vars\.PAGES_PREVIEWS_ENABLED == 'true' && 'counter-pages-publish' \|\| format\('disabled-pages-preview-\{0\}', github\.run_id\) \}\}/,
+    /group: \$\{\{ vars\.PAGES_PREVIEWS_ENABLED == 'true' && github\.event_name != 'pull_request_target' && github\.ref == 'refs\/heads\/main' && 'counter-pages-publish' \|\| format\('inactive-or-signal-pages-\{0\}', github\.run_id\) \}\}/,
   );
   assert.match(builder, /concurrency:\n  group: pages-build-/);
   assert.match(
@@ -75,4 +75,70 @@ test("preview smoke's default config passes its resolved port to the static serv
   const config = JSON.parse(output);
   assert.equal(config.url, "http://127.0.0.1:5199/cubistry/");
   assert.match(config.command, /PLAYWRIGHT_PORT=5199 STATIC_ROOT=/);
+});
+
+test("stacked-PR closure signals fixed main context without PR execution or a dispatch loop", async () => {
+  const { mkdtempSync, writeFileSync, readFileSync, rmSync, mkdirSync } =
+    await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { execFileSync } = await import("node:child_process");
+  const workflow = readFileSync(
+    new URL("../.github/workflows/pages-publish.yml", import.meta.url),
+    "utf8",
+  );
+  const signal = workflow.split("  closed-signal:\n")[1].split("  plan:\n")[0];
+  assert.match(signal, /github.event_name == 'pull_request_target'/);
+  assert.match(signal, /permissions:\n      actions: write/);
+  assert.doesNotMatch(
+    signal,
+    /uses:|contents: write|pages:|id-token:|artifact/,
+  );
+  assert.match(
+    workflow,
+    /if: vars.PAGES_PREVIEWS_ENABLED == 'true' && github.event_name != 'pull_request_target' && github.ref == 'refs\/heads\/main'/,
+  );
+  const run = signal
+    .match(/        run: \|\n((?:          .*\n)+)/)[1]
+    .split("\n")
+    .map((x) => x.slice(10))
+    .join("\n")
+    .trim();
+  assert.equal(
+    run,
+    "gh api --method POST repos/wstein/cubistry/actions/workflows/pages-publish.yml/dispatches -f ref=main",
+  );
+  const dir = mkdtempSync(join(tmpdir(), "pages-dispatch-"));
+  try {
+    mkdirSync(join(dir, "bin"));
+    writeFileSync(
+      join(dir, "bin/gh"),
+      '#!/bin/sh\nprintf "%s\\n" "$@" > "$DISPATCH_ARGS"\n',
+      { mode: 0o755 },
+    );
+    const env = {
+      ...process.env,
+      PATH: join(dir, "bin") + ":" + process.env.PATH,
+      GH_TOKEN: "unit-test-only",
+      DISPATCH_ARGS: join(dir, "args"),
+      GITHUB_REF: "refs/heads/stacked-feature",
+      GITHUB_EVENT_NAME: "pull_request_target",
+    };
+    execFileSync("bash", ["-e", "-c", run], { env });
+    assert.deepEqual(
+      readFileSync(join(dir, "args"), "utf8").trim().split("\n"),
+      [
+        "api",
+        "--method",
+        "POST",
+        "repos/wstein/cubistry/actions/workflows/pages-publish.yml/dispatches",
+        "-f",
+        "ref=main",
+      ],
+    );
+    writeFileSync(join(dir, "bin/gh"), "#!/bin/sh\nexit 1\n", { mode: 0o755 });
+    assert.throws(() => execFileSync("bash", ["-e", "-c", run], { env }));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
