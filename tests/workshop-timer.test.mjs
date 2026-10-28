@@ -1,3 +1,4 @@
+import { animateTimedProgress } from "../packages/cube-viewer/src/motion-timing.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -33,15 +34,16 @@ const settle = async (c) => {
   assert.notEqual(c.progress.status, "failed");
 };
 const token = (m) => m.face + (m.turns === 2 ? "2" : m.turns === -1 ? "'" : "");
-async function harness(value = 90) {
+async function harness(value = 90, onAnimate = async () => {}) {
   let calls = 0;
   const moves = [];
   const c = new TimerController(
     {
       configure() {},
       resetCamera() {},
-      async animate(p) {
+      async animate(p, timing) {
         moves.push(p.move);
+        await onAnimate(p, timing);
       },
     },
     route,
@@ -304,4 +306,35 @@ test("exact ten-second clock boundaries retain next-event and terminal semantics
     assert.equal(s.next.target,mode === "countdown" ? 0 : 2);assert.equal(s.next.deadline,20000);
     now=4000000;assert.equal(c.snapshot().next,null);
   }
+});
+test("Timer final-move timing remains attachable after an initially untimed turn starts", async () => {
+  let release, source;
+  const gate=new Promise(r=>release=r), seen=[];
+  const h=await harness(90,async(_p,timing)=>{
+    seen.push(timing);
+    if(timing) { source=timing;await gate; }
+  });
+  h.c.request(89);
+  for(let i=0;!source&&i<20;i++)await new Promise(r=>setImmediate(r));
+  assert.equal(typeof source,"function");assert.equal(source(),null);
+  assert.equal(seen.slice(0,-1).every(s=>s===undefined),true);
+  h.c.setDeadline(89,10000,250);assert.equal(source().endAt,10000);
+  h.c.clearDeadline();assert.equal(source(),null);
+  release();await settle(h.c);assert.equal(stateEquals(h.c.state,route.states[89]),true);
+});
+test("a blocked endpoint callback records lateness but commits the final legal move and HTM only once", async () => {
+  let now=0,id=0;const timers=[],frames=[];
+  const runtime={now:()=>now,frame(cb){frames.push(cb);return++id;},cancelFrame(){},
+    timer(cb){timers.push(cb);return++id;},cancelTimer(){}};
+  const h=await harness(2,async(_p,timing)=>{
+    if(timing)await animateTimedProgress(timing,()=>250,()=>{},runtime);
+  });
+  h.c.setDeadline(1,1000,250);h.c.request(1);
+  for(let i=0;timers.length===0&&i<20;i++)await new Promise(r=>setImmediate(r));
+  assert.equal(h.c.progress.sessionTotal,4);
+  now=1035;timers[0]();await settle(h.c);
+  assert.equal(now-1000,35);assert.equal(h.c.progress.sessionTotal,5);
+  for(const callback of [...timers,...frames])callback(now);
+  assert.equal(h.c.progress.sessionTotal,5);assert.equal(h.moves.length,5);
+  assert.equal(stateEquals(h.c.state,route.states[1]),true);
 });
