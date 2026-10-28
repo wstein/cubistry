@@ -82,7 +82,7 @@ const go = async (page, value) => {
 for (const leadingZero of [true, false])
   test(`optimized permanent print executes all 99 adjacent transitions with exactly 339 committed HTM (leading zero ${leadingZero})`, async ({
     page,
-  }) => {
+  }, testInfo) => {
     test.setTimeout(120000);
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
@@ -138,23 +138,18 @@ for (const leadingZero of [true, false])
     }));
     expect(initial.print).toBeDefined();
     expect(initial.start).toBeDefined();
-    writeFileSync(
-      "/tmp/cubistry-certified-browser-commits.json",
-      JSON.stringify({ ...initial, transitions }),
-    );
+    const evidencePath = testInfo.outputPath("certified-browser-commits.json");
+    writeFileSync(evidencePath, JSON.stringify({ ...initial, transitions }));
     const verified = JSON.parse(
       execFileSync(
         "python3",
-        [
-          "research/certified-counter/verify.py",
-          "/tmp/cubistry-certified-browser-commits.json",
-        ],
+        ["research/certified-counter/verify.py", evidencePath],
         { encoding: "utf8" },
       ),
     );
     expect(verified.actualCommittedHTM).toBe(339);
     await page.screenshot({
-      path: "/tmp/cubistry-certified-99.png",
+      path: testInfo.outputPath("certified-99.png"),
       fullPage: true,
     });
     expect(errors).toEqual([]);
