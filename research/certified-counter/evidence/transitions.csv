@@ -1,0 +1,100 @@
+fromValue,toValue,increment,decrement,HTM,QTM,category
+00,01,R2 B' U2 B' U2,U2 B U2 B R2,5,8,units only
+01,02,U R2 U',U R2 U',3,4,units only
+02,03,B2 R B' R,R' B R' B2,4,5,units only
+03,04,B2 R' B R',R B' R B2,4,5,units only
+04,05,R2,R2,1,2,units only
+05,06,R2 U R U',U R' U' R2,4,5,units only
+06,07,U2 B2 U' R,R' U B2 U2,4,6,units only
+07,08,U R' U',U R U',3,3,units only
+08,09,R B2 R,R' B2 R',3,4,units only
+09,10,R' B2 R B' D',D B R' B2 R,5,6,tens rollover
+10,11,U R U',U R' U',3,3,units only
+11,12,U R2 U',U R2 U',3,4,units only
+12,13,U' R2 U',U R2 U,3,4,units only
+13,14,B' U R U',U R' U' B,4,4,units only
+14,15,B' R2,R2 B,2,3,units only
+15,16,U R U',U R' U',3,3,units only
+16,17,U2 R U2 R' U2,U2 R U2 R' U2,5,8,units only
+17,18,B' R,R' B,2,2,units only
+18,19,R' B' R,R' B R,3,3,units only
+19,20,D2 L,L' D2,2,3,tens rollover
+20,21,B' U R U',U R' U' B,4,4,units only
+21,22,U R2 U',U R2 U',3,4,units only
+22,23,U' R2 B2 U',U B2 R2 U,4,6,units only
+23,24,B' U R U',U R' U' B,4,4,units only
+24,25,U F D2 F' U',U F D2 F' U',5,6,units only
+25,26,B2 R',R B2,2,3,units only
+26,27,U2 R U2 R' U2,U2 R U2 R' U2,5,8,units only
+27,28,B' R,R' B,2,2,units only
+28,29,B' U R2 U',U R2 U' B,4,5,units only
+29,30,D R' B2 R,R' B2 R D',4,5,tens rollover
+30,31,U R' U',U R U',3,3,units only
+31,32,B' U R2 U',U R2 U' B,4,5,units only
+32,33,B2 R B' R,R' B R' B2,4,5,units only
+33,34,R' B R,R' B' R,3,3,units only
+34,35,B' U2 R U2,U2 R' U2 B,4,6,units only
+35,36,U' B U R2,R2 U' B' U,4,5,units only
+36,37,B' R' B2 U2,U2 B2 R B,4,6,units only
+37,38,B2 R,R' B2,2,3,units only
+38,39,U R U',U R' U',3,3,units only
+39,40,R D R' D2,D2 R D' R',4,5,tens rollover
+40,41,R' B2 R,R' B2 R,3,4,units only
+41,42,R' B' R,R' B R,3,3,units only
+42,43,R B' R2 B' R',R B R2 B R',5,6,units only
+43,44,U R' U',U R U',3,3,units only
+44,45,B R' B' R,R' B R B',4,4,units only
+45,46,R',R,1,1,units only
+46,47,B' U2 B2 R,R' B2 U2 B,4,6,units only
+47,48,U R' U',U R U',3,3,units only
+48,49,L' D2 L,L' D2 L,3,4,units only
+49,50,B R D' F2 D',D F2 D R' B',5,6,tens rollover
+50,51,B2 R' B R,R' B' R B2,4,5,units only
+51,52,R' B R',R B' R,3,3,units only
+52,53,R' B' R,R' B R,3,3,units only
+53,54,U R U',U R' U',3,3,units only
+54,55,B2 R B R2,R2 B' R' B2,4,6,units only
+55,56,R' U R' U' R2,R2 U R U' R,5,6,units only
+56,57,U2 R U2 R' U2,U2 R U2 R' U2,5,8,units only
+57,58,B2 R,R' B2,2,3,units only
+58,59,B2 U R' U',U R U' B2,4,5,units only
+59,60,B' D2,D2 B,2,3,tens rollover
+60,61,R' B2 R,R' B2 R,3,4,units only
+61,62,R' B' R,R' B R,3,3,units only
+62,63,R B' R2 B' R',R B R2 B R',5,6,units only
+63,64,U R' U',U R U',3,3,units only
+64,65,B R' B' R,R' B R B',4,4,units only
+65,66,R',R,1,1,units only
+66,67,B' U2 B2 R,R' B2 U2 B,4,6,units only
+67,68,U R' U',U R U',3,3,units only
+68,69,R' B2 R,R' B2 R,3,4,units only
+69,70,D' B' D' R2,R2 D B D,4,5,tens rollover
+70,71,R' B' R,R' B R,3,3,units only
+71,72,R' B2 R,R' B2 R,3,4,units only
+72,73,R' B' R2 B' R,R' B R2 B R,5,6,units only
+73,74,U R' U',U R U',3,3,units only
+74,75,U R' U',U R U',3,3,units only
+75,76,R2 F2 R U2 L,L' U2 R' F2 R2,5,8,units only
+76,77,U2 R U2 R' U2,U2 R U2 R' U2,5,8,units only
+77,78,F D' F' R,R' F D F',4,4,units only
+78,79,R B R2,R2 B' R',3,4,units only
+79,80,R2 B' L2 F L,L' F' L2 B R2,5,7,tens rollover
+80,81,B' U R U',U R' U' B,4,4,units only
+81,82,R' B R,R' B' R,3,3,units only
+82,83,R B' R,R' B R',3,3,units only
+83,84,B' U R2 U',U R2 U' B,4,5,units only
+84,85,U R' U',U R U',3,3,units only
+85,86,B' R2 U R U',U R' U' R2 B,5,6,units only
+86,87,U2 B2 R,R' B2 U2,3,5,units only
+87,88,R,R',1,1,units only
+88,89,U R U',U R' U',3,3,units only
+89,90,D B R' B2 R,R' B2 R B' D',5,6,tens rollover
+90,91,R' B' R,R' B R,3,3,units only
+91,92,R' B R',R B' R,3,3,units only
+92,93,R' B' R,R' B R,3,3,units only
+93,94,U R' U',U R U',3,3,units only
+94,95,B R' B' R,R' B R B',4,4,units only
+95,96,R',R,1,1,units only
+96,97,U2 R' B2 R U2,U2 R' B2 R U2,5,8,units only
+97,98,R,R',1,1,units only
+98,99,R' B R,R' B' R,3,3,units only

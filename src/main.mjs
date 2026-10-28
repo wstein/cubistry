@@ -1,3 +1,4 @@
+import { loadCertifiedCounter } from "./apps/counter/certified.ts";
 import "./style.css";
 import { loadAssets } from "@cubistry/cube-assets";
 import { CubeViewer } from "@cubistry/cube-viewer";
@@ -8,7 +9,7 @@ const $ = (id) => document.getElementById(id),
   timer = new MinuteTimer();
 let value = 15,
   ready = false;
-let printConfig = { label: "BREAK\nMINUTES", padded: true };
+let printConfig = { label: "BREAK\nMINUTES", padded: true, printing: "classic" };
 const error = (message) => {
   $("error").textContent = message || "";
 };
@@ -20,6 +21,7 @@ function save() {
         value,
         label: printConfig.label,
         padded: printConfig.padded,
+        printing: printConfig.printing,
         timer: timer.serialize(),
       }),
     );
@@ -32,7 +34,7 @@ function timerUi() {
     ".controls button,.controls input",
   ))
     el.disabled = !ready;
-  for (const id of ["label", "format"]) $(id).disabled = !ready;
+  for (const id of ["label", "format", "printing"]) $(id).disabled = !ready;
   $("apply-print").disabled = !ready || !!view?.busy;
   $("reset-session-moves").disabled = !ready || !!view?.busy;
   $("stop-turns").disabled =
@@ -177,7 +179,13 @@ $("stop-turns").addEventListener("click", () =>
     save();
   }),
 );
-let proof;
+let proof, certified;
+async function selectedRoute() {
+  if ($("printing").value !== "certified") return null;
+  if ($("format").value !== "padded") throw Error("Certified print requires leading-zero format (00–99).");
+  certified ??= await loadCertifiedCounter(proof, import.meta.env.BASE_URL);
+  return certified;
+}
 $("print-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!ready || view.busy) return;
@@ -192,12 +200,14 @@ $("print-form").addEventListener("submit", async (e) => {
   $("apply-print").disabled = true;
   timerUi();
   try {
-    await view.configure(label, padded, 15);
-    printConfig = { label, padded };
-    timer.reset(15);
+    const route = await selectedRoute();
+    const initial = route ? 0 : 15;
+    await view.configure(label, padded, initial, route);
+    printConfig = { label, padded, printing: $("printing").value };
+    timer.reset(initial);
     ready = true;
-    setValue(15);
-    $("status").textContent = "New fixed print applied · showing 15";
+    setValue(initial);
+    $("status").textContent = `New fixed print applied · showing ${initial}`;
   } catch (e) {
     if (view.state === previousState) ready = true;
     error(e.message);
@@ -254,6 +264,7 @@ async function initialize() {
       if (typeof saved.label === "string" && validLabel(saved.label))
         $("label").value = saved.label;
       $("format").value = saved.padded === false ? "unpadded" : "padded";
+      $("printing").value = saved.printing === "certified" ? "certified" : "classic";
       if (
         timer.restore(saved.timer) &&
         ["running", "paused", "finished"].includes(saved.timer.state)
@@ -264,10 +275,12 @@ async function initialize() {
       $("label").value,
       $("format").value === "padded",
       value,
+      await selectedRoute(),
     );
     printConfig = {
       label: $("label").value,
       padded: $("format").value === "padded",
+      printing: $("printing").value,
     };
     ready = true;
     $("value").value = String(value);
