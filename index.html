@@ -38,9 +38,17 @@
               <p id="status" role="status" aria-live="polite">
                 Preparing the fixed print…
               </p>
-              <p id="timer-sync" class="small" hidden>
-                Cube last settled <output id="timer-physical">15:00</output> ·
-                synchronizing
+              <p
+                id="timer-sync"
+                class="small timer-motion"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                hidden
+              >
+                <span id="timer-motion-label"></span><span id="timer-last-settled" hidden>
+                  · last settled <output id="timer-physical">15:00</output></span
+                >
               </p>
               <div class="stats-summary">
                 <dl class="move-summary">
@@ -55,7 +63,7 @@
                     </dd>
                   </div>
                   <div>
-                    <dt>Current sequence</dt>
+                    <dt>Sequence</dt>
                     <dd>
                       <span
                         id="move-progress"
