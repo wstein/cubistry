@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/wstein/cubistry",
+  "layoutCommit": "72ddc83f4010a8e9741a7fef19c7266fb6317a60",
+  "layoutPath": "research/hsm-counter/comparison/candidates/intermediate.json",
+  "layoutSHA256": "3dbaf98e8acd7ab8abb21a09bab1779a57edf14284d3287a69d669985e6bb933",
+  "runtimeSHA256": "86aa5d77987dfd4a3e1ff34eb1eb0220a6e0e57c9d9a2fc252ea0be3848e9aef",
+  "proofCommit": "140b4ba0ae38473f402925a2c15bf095cf1647c2",
+  "proofPath": "research/hsm-counter/periodic/REVIEW.md"
+}
