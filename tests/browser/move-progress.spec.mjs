@@ -68,9 +68,9 @@ test("planned/committed counts stay attached to the active value through queued 
     `1 / ${total(15, 42)} moves`,
   );
   await release(page);
-  // After the first committed turn, the remaining physical turns at 250 ms already
-  // need a duration-based budget plus frame scheduling.
-  const expectedDuration = (total(15, 42) - 1 + total(42, 44)) * 250;
+  // Budget the remaining optimized turns at the selected default plus frame
+  // scheduling, preserving every queued physical turn.
+  const expectedDuration = (total(15, 42) - 1 + total(42, 44)) * 100;
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false", {
     timeout: expectedDuration + 5000,
   });

@@ -120,7 +120,7 @@ test("six exact keyboard speed stops persist and remain separate from Run cadenc
 }) => {
   await ready(page);
   const slider = page.getByLabel("Rotation Speed");
-  await expect(slider).toHaveValue("3");
+  await expect(slider).toHaveValue("4");
   await expect(slider).toHaveAttribute("min", "0");
   await expect(slider).toHaveAttribute("max", "5");
   await expect(slider).toHaveAttribute("step", "1");
@@ -338,6 +338,7 @@ for (const width of [1440, 768, 390, 320])
 for (const saved of [
   { value: 7 },
   { value: 7, moveDuration: 100 },
+  { value: 7, moveDuration: 250 },
   { value: 7, speed: 0.3 },
 ])
   test(`default and saved speed preferences restore predictably: ${JSON.stringify(saved)}`, async ({
@@ -351,6 +352,6 @@ for (const saved of [
     await page.goto("/");
     await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
     await expect(page.locator("#rotation-speed")).toHaveValue(
-      saved.moveDuration === 100 ? "4" : "3",
+      saved.moveDuration === 250 || saved.speed === 0.3 ? "3" : "4",
     );
   });
