@@ -1,6 +1,7 @@
 import "./style.css";
 import "./clock.css";
-import { CubeViewer, BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
+import { BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
+import { ClockStage } from "./apps/clock/stage.ts";
 import { loadAssets } from "@cubistry/cube-assets";
 import { loadCounterDesign } from "./apps/counter/design.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";
@@ -17,6 +18,7 @@ const $ = (id) => document.getElementById(id),
   letters = ["H", "M", "S"];
 const scheduler = new LiveClockScheduler(),
   units = [];
+let stage = null;
 let ready = false,
   failed = false;
 function draw() {
@@ -49,7 +51,6 @@ $("clock-application").addEventListener("change", () =>
 );
 async function initialize() {
   const owned = [],
-    viewers = [],
     unclaimed = [];
   try {
     const [proof, design] = await Promise.all([
@@ -86,10 +87,10 @@ async function initialize() {
     const initial = localValues(Date.now());
     $("clock-zone").textContent =
       Intl.DateTimeFormat().resolvedOptions().timeZone;
+    stage = new ClockStage($("clock-scene"));
     for (let i = 0; i < 3; i++) {
       const host = $("clock-" + names[i]),
-        viewer = new CubeViewer(host);
-      viewers.push(viewer);
+        viewer = stage.createCube(host, i);
       const controller = new HsmController(
         viewer,
         design,
@@ -124,10 +125,10 @@ async function initialize() {
     window.addEventListener("pageshow", draw);
   } catch (e) {
     for (const controller of owned) controller.dispose();
-    for (const viewer of viewers) viewer.destroy();
+    stage?.destroy();
     for (const assets of unclaimed) assets.dispose();
     fail(e);
   }
 }
 void initialize();
-export { units as clockUnits };
+export { units as clockUnits, stage as clockStage };
