@@ -1,11 +1,12 @@
 # Certified fixed-print counter traversal
 
-Select **Certified 00–99 · 339 HTM traversal** under **Personalize the fixed print**,
-keep leading zeros, and apply the new print. This explicitly configures a new
-immutable printing at canonical 00 and resets session accounting to zero. The
-original padded/unpadded print remains available. Title customization is still
-an explicit new-print operation: two identical copies of each fixed title half
-retain the certified source cubies and upright frames. No counting operation
+The prominent **Application** selector defaults directly to certified Counter
+00–99 at canonical 00. Leading-zero formatting uses this immutable print;
+Blank tens next to Wrap selects the compatible original unpadded print and
+clearly removes the certified-route claim. Configuration resets session
+accounting to zero. The title is permanently printed as COUNTER; the underlying
+explicit immutable-title APIs retain their orientation/copy requirements.
+See [current control semantics](COUNTER_CONTROLS.md). No counting operation
 replaces sticker images.
 
 ## Route and accounting
