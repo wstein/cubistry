@@ -1,0 +1,23 @@
+[
+  {
+    "id": "H",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/hsm/H.svg",
+    "sha256": "4f3e8ad1a98e14a2ec5693221e9f0a32f8b721190ee6c30c70c010723787eb73"
+  },
+  {
+    "id": "S",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/hsm/S.svg",
+    "sha256": "415fad7494edd4600dc28e9641e31cfe88cb05fe61f0737db515d91af09d9ff0"
+  },
+  {
+    "id": "M",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/hsm/M.svg",
+    "sha256": "fdc8b06d1319852607bb16839b6a5a4662c97403eee80bbb38ff7d3f577d522c"
+  }
+]
