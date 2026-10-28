@@ -42,3 +42,16 @@ test("pending speed/rate changes replan, and an obsolete active target coalesces
   s.tick(snapshot(6300,6400,87),c,2000,()=>{});assert.deepEqual(requests,[89,87]);
   assert.equal(s.warning,"Late");s.invalidate();
 });
+test("manual and paused settling never invent missed deadlines, while terminal misses stay visible", () => {
+  const s = new TimerScheduler(), {c}=mock();
+  c.busy=true;c.progress.target=89;
+  s.tick({at:100,bucket:89,running:false,next:null},c,250,()=>{});
+  assert.equal(s.warning,"");
+  s.invalidate();c.busy=false;c.currentValue=90;
+  s.tick(snapshot(9000),c,250,()=>{});
+  s.tick({at:10001,bucket:89,running:false,next:null},c,250,()=>{});
+  assert.equal(s.warning,"Late");
+  s.invalidate();
+  s.tick({at:10002,bucket:90,running:false,next:null},c,250,()=>{});
+  assert.equal(s.warning,"");s.invalidate();
+});
