@@ -8,15 +8,16 @@ test("counter commits the shared 42→43 direct path and independent replay reta
 }) => {
   await page.goto("/");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  await page.locator("#format").selectOption("unpadded");
+  await page.locator("#format").uncheck();
   await expect(page.locator("#application")).toBeEnabled();
   await page.locator("#value").fill("15");
-  await page.locator("#jump-form button").click();
+  await page.locator("#set").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await page.locator(".move-details").evaluate(el => el.open = true);
   await page.locator("#reset-session-moves").click();
   await page.locator("#value").fill("42");
-  await page.locator("#jump-form button").click();
+  await page.locator("#set").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "42");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.evaluate(async () => {
@@ -29,7 +30,7 @@ test("counter commits the shared 42→43 direct path and independent replay reta
     };
   });
   await page.locator("#value").fill("43");
-  await page.locator("#jump-form button").click();
+  await page.locator("#set").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "43");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await expect(page.locator("#move-progress")).toHaveText("10 / 10 moves");
@@ -78,6 +79,6 @@ test("a missing shared table fails setup without enabling moves or a witness fal
     "Shared solver table could not be loaded",
   );
   await expect(page.locator("#cube")).not.toHaveAttribute("data-value", /.+/);
-  await expect(page.locator("#start")).toBeDisabled();
-  await expect(page.locator("#jump-form button")).toBeDisabled();
+  await expect(page.locator("#run")).toBeDisabled();
+  await expect(page.locator("#set")).toBeDisabled();
 });

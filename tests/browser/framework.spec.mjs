@@ -25,7 +25,7 @@ for (const [field, value] of [
       "Unsupported counter design",
     );
     await expect(page.locator("#cube")).not.toHaveAttribute("data-value", /.+/);
-    await expect(page.locator("#start")).toBeDisabled();
+    await expect(page.locator("#run")).toBeDisabled();
   });
 test("generic viewer consumes a core state and legal transition without counter code", async ({
   page,

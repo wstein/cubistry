@@ -1,3 +1,4 @@
+import { frontPoint } from "../helpers/front-projection.mjs";
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 import { writeFileSync } from "node:fs";
@@ -15,17 +16,9 @@ const active = [
   "abcdfg",
 ];
 function renderedDigit(image, centerX) {
-  const scale =
-    image.height / (2 * Math.tan((36 * Math.PI) / 360) * (5.3 - 1.021));
   const blue = ([r, g, b]) => b > r * 1.25 && b > g * 1.05;
   const sample = (px, py) => {
-    const x = Math.round(
-        image.width / 2 + (centerX + (px / 256 - 0.5) * 0.87) * scale,
-      ),
-      y = Math.round(
-        image.height / 2 - (-0.52 + (0.5 - py / 256) * 0.87) * scale,
-      ),
-      colors = [];
+    const [x, y] = frontPoint(image, centerX + (px / 256 - 0.5) * 0.87, -0.52 + (0.5 - py / 256) * 0.87), colors = [];
     for (let dy = -2; dy <= 2; dy++)
       for (let dx = -2; dx <= 2; dx++) {
         const at = ((y + dy) * image.width + x + dx) * 4;
@@ -68,20 +61,15 @@ async function chooseCertified(page) {
       window.executed.push(p);
     };
   });
-  // The direct default configured before this instrumentation. Exercise two
-  // real application changes so the captured print/start belong to this viewer.
-  await page.locator("#application").selectOption("countdown");
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "10");
+  await page.locator("#format").uncheck();
   await expect(page.locator("#application")).toBeEnabled();
-  await page.locator("#application").selectOption("certified");
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
+  await page.locator("#format").check();
   await expect(page.locator("#application")).toBeEnabled();
-  await expect(page.locator("#application")).toHaveValue("certified");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
 }
 const go = async (page, value) => {
   await page.locator("#value").fill(String(value));
-  await page.locator("#jump-form button[type=submit]").click();
+  await page.locator("#set").click();
   await expect(page.locator("#cube")).toHaveAttribute(
     "data-value",
     String(value),
@@ -182,13 +170,14 @@ test("optimized arbitrary jump returns to certified state, reset and original pr
   );
   expect(after - before).toBeGreaterThan(0);
   expect(after - before).toBeLessThanOrEqual(5);
+  await page.locator(".move-details").evaluate(el => el.open = true);
   await page.getByRole("button", { name: "Reset session moves" }).click();
   await expect(page.locator("#session-moves")).toHaveText("Session: 0 moves");
   await page.reload();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "79");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await expect(page.locator("#application")).toHaveValue("certified");
-  await page.locator("#format").selectOption("unpadded");
+  await page.locator("#format").uncheck();
   await expect(page.locator("#application")).toBeEnabled();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
   await expect(page.locator("#session-moves")).toHaveText("Session: 0 moves");
