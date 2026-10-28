@@ -13,5 +13,8 @@
   "browser": "Chromium 154.0.8037.57 built on Debian GNU/Linux 13 (trixie)",
   "clock": "real monotonic time; no reduced motion",
   "configurationExcluded": true,
-  "traceSHA256": "bcb74a490e20fe261c265a0063b8a61628a9f49c3739c227a14c9f43c46d9fb9"
+  "traceSHA256": "bcb74a490e20fe261c265a0063b8a61628a9f49c3739c227a14c9f43c46d9fb9",
+  "equivalentPublishedCodeCommit": "25d8eef8f6347b6fcbd143fa3d41ec5773757dbf",
+  "codeTree": "3bd5d928f7845ecd664a3742eb648b039f4bd8e6",
+  "historyNote": "Original observed code commit was externally rebased; the published replacement has the identical complete Git tree."
 }
