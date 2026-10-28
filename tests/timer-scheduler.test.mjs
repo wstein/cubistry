@@ -125,3 +125,12 @@ for(const ordering of ["terminal-first","commit-first"]) test(`terminal/endpoint
   s.tick({at:10001,bucket:89,running:false,next:null},c,250,()=>{});
   assert.equal(s.warning,"");assert.deepEqual(requests,[89]);s.invalidate();
 });
+test("a clock jump beyond the planned target clears published pacing before latest-target catch-up",()=>{
+  const s=new TimerScheduler(),{c,requests}=mock();let published=null,effective;
+  c.setDeadline=(target,endAt,durationMs)=>published={target,endAt,durationMs};c.clearDeadline=()=>published=null;
+  s.tick(snapshot(0),c,250,v=>effective=v);s.tick(snapshot(9000),c,250,v=>effective=v);
+  assert.equal(published.target,89);
+  s.tick({at:9050,bucket:80,running:true,next:{target:79,deadline:9150,interval:100}},c,250,v=>effective=v);
+  assert.equal(published,null);assert.equal(effective,10);assert.equal(s.warning,"Late");
+  assert.deepEqual(requests,[89,80]);s.invalidate();
+});
