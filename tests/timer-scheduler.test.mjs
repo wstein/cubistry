@@ -80,3 +80,10 @@ test("a changed full prepared source forces preparation again before dispatch", 
   s.tick(snapshot(100),c,250,()=>{});
   assert.equal(preparations,2);s.invalidate();
 });
+test("Start or Resume during initial manual settling has no late boundary until the clock crosses one", () => {
+  const s=new TimerScheduler(),{c}=mock();
+  c.busy=true;c.progress.target=90;
+  s.tick(snapshot(0),c,250,()=>{});assert.equal(s.warning,"");
+  s.tick(snapshot(100),c,250,()=>{});assert.equal(s.warning,"");
+  s.tick(snapshot(10000,20000,89),c,250,()=>{});assert.equal(s.warning,"Late");s.invalidate();
+});
