@@ -41,7 +41,7 @@ export class TimerController extends PhysicalPlayback {
   /** Prepare only from a committed idle source, including all hidden poses. */
   prepare(value: number): readonly LegalMove[] {
     demand(!this.busy && this.state && this.solver, "Timer must be settled before preparation");
-    demand(Number.isInteger(value) && value >= 0 && value <= 359, "Invalid timer target");
+    demand(Number.isInteger(value) && value >= 0 && value <= this.maximumValue, "Invalid timer target");
     if (this.prepared?.value === value && stateEquals(this.prepared.source, this.state))
       return this.prepared.moves;
     const moves = timerStep(this.route, this.state, this.current, value)

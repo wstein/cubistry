@@ -15,7 +15,7 @@ import {
 import { TimerController } from "../src/apps/timer/controller.ts";
 import { validateCounterDesign } from "../src/apps/counter/design.ts";
 import { stateEquals } from "@cubistry/cube-core";
-import { matchesTarget } from "@cubistry/cube-mechanics";
+import { applyMoves, parseAlg, matchesTarget } from "@cubistry/cube-mechanics";
 import { prepareTestSolver } from "./helpers/shared-solver.mjs";
 const raw = JSON.parse(readFileSync("public/five-second-timer.v1.json"));
 const route = validateFiveSecondRoute(raw);
@@ -122,6 +122,11 @@ test("optimized fixed print replays all479 forward and reverse controller edges,
   ])
     for (const value of values) {
       const before = moves.length;
+      const prepared = c.prepare(value);
+      assert.strictEqual(c.prepare(value), prepared);
+      assert.ok(
+        stateEquals(applyMoves(c.state, prepared), route.states[value]),
+      );
       c.request(value);
       await settle(c);
       assert.ok(stateEquals(c.state, route.states[value]));
@@ -149,9 +154,18 @@ test("optimized fixed print replays all479 forward and reverse controller edges,
     "test-results/five-second-commits.json",
     JSON.stringify({ print: route.print, start, startValue: 0, transitions }),
   );
+  for (const invalid of [-1, 480, NaN]) assert.throws(() => c.prepare(invalid));
+  const prepared = c.prepare(479);
+  assert.strictEqual(c.prepare(479), prepared);
+  assert.equal(calls, 1);
+  // A visually unchanged front is insufficient for the prepared full-state cache.
+  c.authoritative = applyMoves(c.state, parseAlg("B"));
+  const revised = c.prepare(479);
+  assert.equal(calls, 2);
+  assert.ok(stateEquals(applyMoves(c.state, revised), route.states[479]));
   c.request(479);
   await settle(c);
-  assert.equal(calls, 1);
+  assert.equal(calls, 2);
   assert.ok(stateEquals(c.state, route.states[479]));
   assert.equal(timerStep(route, c.state, 479, 0), null);
   c.dispose();
@@ -170,4 +184,125 @@ test("five-second certificate rejects damaged glyphs, edges, identities and coun
     mutate(d);
     assert.throws(() => validateFiveSecondRoute(d));
   }
+});
+
+test("five-second snapshots preserve exact next deadlines across both directions and every supported rate", () => {
+  for (const mode of ["countdown", "stopwatch"])
+    for (const speed of [1, 10, 20, 50, 100]) {
+      let now = 1200;
+      const epoch = now,
+        c = new WorkshopClock(() => now, FIVE_SECOND_TIMER);
+      c.configure(2395);
+      c.setMode(mode);
+      c.setSpeed(speed);
+      c.start();
+      for (let i = 0; i < 479; i++) {
+        now = epoch + (i * 5000) / speed;
+        const s = c.snapshot();
+        assert.equal(s.bucket, mode === "countdown" ? 479 - i : i);
+        assert.equal(s.running, true);
+        assert.equal(s.next.target, mode === "countdown" ? 478 - i : i + 1);
+        assert.ok(Math.abs(s.next.interval - 5000 / speed) < 1e-7);
+        assert.ok(
+          Math.abs(s.next.deadline - (epoch + ((i + 1) * 5000) / speed)) < 1e-7,
+        );
+      }
+      now = epoch + 2395000 / speed;
+      assert.equal(c.snapshot().running, false);
+      assert.equal(c.snapshot().next, null);
+      assert.equal(c.snapshot().bucket, mode === "countdown" ? 0 : 479);
+    }
+  let now = 0;
+  const c = new WorkshopClock(() => now, FIVE_SECOND_TIMER);
+  c.start();
+  now = 1250;
+  c.pause();
+  now = 100000;
+  assert.equal(c.snapshot().next, null);
+  c.setSpeed(20);
+  c.start();
+  assert.equal(c.snapshot().next.deadline, 100000 + 3750 / 20);
+});
+
+test("five-second scheduler fits six-move normal/adaptive plans into half an interval and reports100x infeasibility", async () => {
+  const { TimerScheduler, planSequence } = await import(
+    "../src/apps/timer/scheduler.ts"
+  );
+  for (const preferred of [250, 2000, 10]) {
+    const word = timerStep(route, route.states[1], 1, 0);
+    assert.equal(word.length, 6);
+    const planned = planSequence(word.length, preferred, 5000);
+    assert.ok(planned.feasible);
+    assert.ok(planned.duration <= 2500);
+    assert.ok(planned.effective <= preferred);
+    const requests = [],
+      s = new TimerScheduler();
+    let effective;
+    const c = {
+      state: route.states[1],
+      currentValue: 1,
+      busy: false,
+      progress: { target: null, queuedTarget: null, total: 0, completed: 0 },
+      prepare(value) {
+        return timerStep(route, this.state, this.currentValue, value);
+      },
+      request(value) {
+        requests.push(value);
+        this.state = applyMoves(this.state, word);
+        this.currentValue = value;
+      },
+    };
+    const snapshot = (at) => ({
+      at,
+      bucket: 1,
+      running: true,
+      next: { target: 0, deadline: 5000, interval: 5000 },
+    });
+    s.tick(snapshot(0), c, preferred, (v) => (effective = v));
+    assert.equal(requests.length, 0);
+    s.tick(
+      snapshot(5000 - planned.duration),
+      c,
+      preferred,
+      (v) => (effective = v),
+    );
+    assert.deepEqual(requests, [0]);
+    assert.ok(stateEquals(c.state, route.states[0]));
+    assert.equal(effective, planned.effective);
+    s.tick(snapshot(4999), c, preferred, () => {});
+    assert.deepEqual(requests, [0]);
+    assert.equal(s.warning, "");
+    s.invalidate();
+  }
+  const p = planSequence(6, 250, 50);
+  assert.equal(p.feasible, false);
+  assert.equal(p.effective, 10);
+  const s = new TimerScheduler(),
+    c = {
+      state: route.states[1],
+      currentValue: 1,
+      busy: false,
+      progress: { target: null, queuedTarget: null, total: 6, completed: 0 },
+      prepare() {
+        return Array(6);
+      },
+      request(value) {
+        this.busy = true;
+        this.progress.target = value;
+      },
+    };
+  s.tick(
+    {
+      at: 0,
+      bucket: 1,
+      running: true,
+      next: { target: 0, deadline: 50, interval: 50 },
+    },
+    c,
+    250,
+    () => {},
+  );
+  assert.equal(s.warning, "Budget infeasible");
+  assert.equal(c.busy, true);
+  s.invalidate();
 });
