@@ -31,3 +31,7 @@ class TimerControls(unittest.TestCase):
  def test_missing_countdown_display(self):
   d=json.loads(self.trace.read_text());d['transitions'].pop();self.trace.write_text(json.dumps(d))
   with self.assertRaises(AssertionError):V.check(self.trace)
+
+ def test_explicit_trace_kind_required(self):
+  d=json.loads(self.trace.read_text());d.pop('kind');self.trace.write_text(json.dumps(d))
+  with self.assertRaises(AssertionError):V.check(self.trace)
