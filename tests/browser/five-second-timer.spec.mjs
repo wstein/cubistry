@@ -110,7 +110,7 @@ test("full thirty-minute countdown visits all361 actual states and independently
     await page.clock.fastForward(
       Math.max(0, epoch + (360 - value) * 5000 - now),
     );
-    await page.clock.runFor(300);
+    await page.clock.runFor(100);
     await settled(page, formatted(value));
     const step = await page.evaluate((offset) => {
       const moves = window.fiveMoves.slice(offset);
