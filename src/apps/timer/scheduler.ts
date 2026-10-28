@@ -6,12 +6,13 @@ import type { TimerController } from "./controller.ts";
 export const FRAME_ALLOWANCE_MS = 75;
 export const WAKE_ALLOWANCE_MS = 8;
 export const MIN_MOVE_MS = 10;
+export const ENDPOINT_TOLERANCE_MS = 20;
 export function planSequence(moves: number, preferred: number, interval: number, available = interval) {
   const budget = Math.min(interval / 2, Math.max(0, available));
   const overhead = WAKE_ALLOWANCE_MS + moves * FRAME_ALLOWANCE_MS;
-  const feasible = overhead + moves * MIN_MOVE_MS <= budget;
+  const feasible = overhead + moves * MIN_MOVE_MS + ENDPOINT_TOLERANCE_MS <= budget;
   const effective = moves === 0 ? preferred : Math.min(preferred,
-    Math.max(MIN_MOVE_MS, (budget - overhead) / moves));
+    Math.max(MIN_MOVE_MS, (budget - overhead - ENDPOINT_TOLERANCE_MS) / moves));
   return { effective, duration: moves === 0 ? 0 : overhead + moves * effective, feasible };
 }
 interface Plan {
@@ -29,6 +30,7 @@ interface Plan {
 /** Predictive Timer presentation; playback retains sole ownership of physical state. */
 export class TimerScheduler {
   private plan: Plan | null = null;
+  private controller: TimerController | null = null;
   private wake: ReturnType<typeof setTimeout> | null = null;
   private lastBucket: number | null = null;
   private missedBoundary = false;
@@ -40,6 +42,7 @@ export class TimerScheduler {
   }
   warning: "" | "Budget infeasible" | "Late" = "";
   invalidate(): void {
+    this.controller?.clearDeadline();
     if (this.wake !== null) clearTimeout(this.wake);
     this.wake = null; this.plan = null; this.warning = "";
     this.lastBucket = null; this.missedBoundary = false; this.initial = null;
@@ -51,6 +54,7 @@ export class TimerScheduler {
   }
   tick(snapshot: ClockSnapshot, controller: TimerController, preferred: number,
     setDuration: (duration: number) => void): void {
+    this.controller = controller;
     const { bucket, next } = snapshot;
     let at = snapshot.at;
     const crossedBoundary = this.lastBucket !== null && bucket !== this.lastBucket;
@@ -60,6 +64,14 @@ export class TimerScheduler {
     let p = this.plan;
     const intentional = p && (p.target === bucket || p.target === next?.target);
     if (!snapshot.running) {
+      // A terminal clock tick must not cancel the final turn scheduled for T.
+      // Explicit user actions already invalidate this plan before requesting work.
+      if (p?.started && p.feasible && p.target === bucket && controller.busy) {
+        controller.setDeadline(p.target, p.deadline, p.effective);
+        setDuration(at > p.deadline + ENDPOINT_TOLERANCE_MS ? MIN_MOVE_MS : p.effective);
+        this.warning = at > p.deadline + ENDPOINT_TOLERANCE_MS ? "Late" : "";
+        return;
+      }
       const missedDeadline = this.missedBoundary || this.warning === "Late" || !!(p && at >= p.deadline);
       this.invalidate();
       if (missedDeadline && (controller.currentValue !== bucket || controller.busy)) this.warning = "Late";
@@ -79,11 +91,14 @@ export class TimerScheduler {
           p.feasible = revised.feasible;
           p.preferred = preferred;
         }
+        if (p.feasible) controller.setDeadline(p.target, p.deadline, p.effective);
+        else controller.clearDeadline();
         // Keep a faster preference unchanged during ordinary playback. Rebudget only
         // after user changes, rather than counting an in-progress move as unstarted.
         setDuration(at >= p.deadline ? MIN_MOVE_MS : p.effective);
-        this.warning = !p.feasible ? "Budget infeasible" : at >= p.deadline ? "Late" : "";
+        this.warning = !p.feasible ? "Budget infeasible" : at > p.deadline + ENDPOINT_TOLERANCE_MS ? "Late" : "";
       } else {
+        controller.clearDeadline();
         if (!this.missedBoundary && next && controller.progress.target === bucket) {
           const remaining = Math.max(1, controller.progress.total - controller.progress.completed);
           const initial = this.initial;
@@ -104,6 +119,7 @@ export class TimerScheduler {
       return;
     }
     this.initial = null;
+    controller.clearDeadline();
     if (controller.currentValue !== bucket && controller.currentValue !== next?.target) {
       this.plan = null;
       this.warning = this.missedBoundary ? "Late" : "";
@@ -137,6 +153,7 @@ export class TimerScheduler {
     setDuration(p.effective);
     if (at >= p.deadline - p.duration) {
       p.started = true;
+      if (p.feasible) controller.setDeadline(p.target, p.deadline, p.effective);
       controller.request(p.target);
     }
   }

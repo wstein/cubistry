@@ -6,6 +6,7 @@ import {
   type PrintDefinition,
 } from "@cubistry/cube-core";
 import { presentMove, type MovePresentation } from "@cubistry/cube-mechanics";
+import type { MotionTimingSource } from "@cubistry/cube-viewer";
 import { type LoadedAssets } from "@cubistry/cube-assets";
 export interface PhysicalView {
   configure(
@@ -13,7 +14,7 @@ export interface PhysicalView {
     state: CubeState,
     assets: LoadedAssets,
   ): void;
-  animate(presentation: MovePresentation): Promise<void>;
+  animate(presentation: MovePresentation, timing?: MotionTimingSource): Promise<void>;
   resetCamera(): void;
 }
 /** HTM counts each already-validated outer-face token once, including half turns. */
@@ -179,6 +180,9 @@ export abstract class PhysicalPlayback {
     this.progressUpdate({ status: "stopping", queuedTarget: null });
     return this.activeTarget;
   }
+  protected animateMove(presentation: MovePresentation): Promise<void> {
+    return this.view.animate(presentation);
+  }
   private async drain(): Promise<void> {
     demand(this.print && this.authoritative, "Display is not configured");
     this.queued = true;
@@ -197,7 +201,7 @@ export abstract class PhysicalPlayback {
         });
         for (const move of moves) {
           const presentation = presentMove(this.authoritative, move);
-          await this.view.animate(presentation);
+          await this.animateMove(presentation);
           this.authoritative = presentation.to;
           this.progressUpdate({
             completed: this.playback.completed + 1,

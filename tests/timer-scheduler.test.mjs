@@ -18,7 +18,7 @@ test("adaptive plans reserve real overhead, never slow preference, and explicitl
 function mock() {
   const requests = [];
   const c = {state:route.states[90],currentValue:90,busy:false, progress:{target:90,queuedTarget:null,total:5,completed:0},
-    prepare(){return Array(5)}, request(value){requests.push(value);this.busy=true;this.progress.target=value;} };
+    prepare(){return Array(5)}, setDeadline(){},clearDeadline(){}, request(value){requests.push(value);this.busy=true;this.progress.target=value;} };
   return {c,requests};
 }
 const snapshot = (at, deadline=10000, bucket=90) => ({at,bucket,running:true,next:{target:bucket-1,deadline,interval:10000}});
@@ -37,7 +37,8 @@ test("scheduler starts before deadline, holds early settled target and pause rec
 test("pending speed/rate changes replan, and an obsolete active target coalesces only latest logical target", () => {
   const s = new TimerScheduler(), {c,requests}=mock();
   s.tick(snapshot(0),c,250,()=>{});
-  s.tick(snapshot(6000),c,2000,()=>{});assert.deepEqual(requests,[89]);
+  s.tick(snapshot(6000),c,2000,()=>{});assert.deepEqual(requests,[]);
+  s.tick(snapshot(6030),c,2000,()=>{});assert.deepEqual(requests,[89]);
   s.tick(snapshot(6100,6200),c,2000,()=>{});assert.equal(s.warning,"Budget infeasible");
   s.tick(snapshot(6300,6400,87),c,2000,()=>{});assert.deepEqual(requests,[89,87]);
   assert.equal(s.warning,"Late");s.invalidate();
@@ -59,8 +60,11 @@ test("solver preparation time is included in dispatch and crossed deadlines inva
   const {c,requests}=mock();
   let fresh = snapshot(8500);
   const s = new TimerScheduler(()=>{},()=>fresh);
-  s.tick(snapshot(8000),c,250,()=>{});
-  assert.deepEqual(requests,[89]); // Preparation passed the absolute planned start.
+  let effective;
+  s.tick(snapshot(8000),c,250,v=>effective=v);
+  assert.equal(effective,219.4); // Fresh 1,500 ms budget includes preparation time and tolerance.
+  s.tick(snapshot(8530),c,250,()=>{});
+  assert.deepEqual(requests,[89]);
   s.invalidate();c.busy=false;requests.length=0;
   fresh=snapshot(10010,20000,89);
   s.tick(snapshot(9900),c,250,()=>{});
@@ -91,7 +95,7 @@ test("fitting initial manual settlement preserves preferred speed and slow initi
   for(const preferred of [250,10,2000]) {
     const s=new TimerScheduler(),{c}=mock();c.busy=true;c.progress.target=90;let effective;
     s.tick(snapshot(0),c,preferred,v=>effective=v);
-    assert.equal(effective,preferred===2000 ? 923.4 : preferred);
+    assert.equal(effective,preferred===2000 ? 919.4 : preferred);
     const first=effective;c.progress.completed=1;
     s.tick(snapshot(100),c,preferred,v=>effective=v);
     assert.equal(effective,first);assert.equal(s.warning,"");s.invalidate();
@@ -105,4 +109,19 @@ test("terminal deadline misses retain minimum catch-up speed while manual settli
   c.busy=false;s.invalidate();s.tick(snapshot(9000),c,2000,v=>effective=v);
   s.tick({at:11000,bucket:89,running:false,next:null},c,2000,v=>effective=v);
   assert.equal(effective,10);assert.equal(s.warning,"Late");s.invalidate();
+});
+for(const ordering of ["terminal-first","commit-first"]) test(`terminal/endpoint ordering preserves final timing: ${ordering}`,()=>{
+  const s=new TimerScheduler(),{c,requests}=mock();let cleared=0;const deadlines=[];
+  c.clearDeadline=()=>cleared++;c.setDeadline=(...args)=>deadlines.push(args);
+  s.tick(snapshot(0),c,250,()=>{});
+  s.tick(snapshot(9000),c,250,()=>{});assert.deepEqual(requests,[89]);
+  const before=cleared;
+  if(ordering==="terminal-first") {
+    s.tick({at:10000,bucket:89,running:false,next:null},c,250,()=>{});
+    assert.equal(cleared,before);assert.equal(s.warning,"");
+    assert.deepEqual(deadlines.at(-1),[89,10000,250]);
+  }
+  c.busy=false;c.currentValue=89;c.state=route.states[89];
+  s.tick({at:10001,bucket:89,running:false,next:null},c,250,()=>{});
+  assert.equal(s.warning,"");assert.deepEqual(requests,[89]);s.invalidate();
 });

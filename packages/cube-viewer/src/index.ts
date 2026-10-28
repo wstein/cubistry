@@ -21,6 +21,8 @@ import {
   type FaceletImageOverride,
 } from "./facelet-image.ts";
 import { clampPitch, viewTurn } from "./orbit-input.ts";
+import { animateTimedProgress, type MotionTimingSource } from "./motion-timing.ts";
+export type { MotionTiming, MotionTimingSource } from "./motion-timing.ts";
 const spacing = 0.52;
 const vector = (a: Vec3) => new THREE.Vector3(...a);
 const frame = (normal: Vec3, up: Vec3) =>
@@ -293,7 +295,7 @@ export class CubeViewer {
       this.meshes[c.id].quaternion.setFromRotationMatrix(matrix);
     }
   }
-  async animate(presentation: MovePresentation): Promise<void> {
+  async animate(presentation: MovePresentation, timing?: MotionTimingSource): Promise<void> {
     demand(this.print && this.presented, "Viewer is not configured");
     demand(!this.busy, "Viewer already animating");
     presentation = validatePresentation(presentation, this.print);
@@ -312,6 +314,11 @@ export class CubeViewer {
         const pivot = new THREE.Group();
         this.scene.add(pivot);
         for (const c of selected) pivot.add(this.meshes[c.id]);
+        if (timing) {
+          await animateTimedProgress(timing, () => BASE_MOVE_DURATION_MS / this.animationSpeed,
+            (t) => { pivot.rotation[(["x", "y", "z"] as const)[axis]] =
+              angle * (t * t * (3 - 2 * t)); });
+        } else {
         let previous = performance.now(),
           progress = 0;
         await new Promise<void>((resolve) => {
@@ -331,12 +338,17 @@ export class CubeViewer {
           };
           requestAnimationFrame(tick);
         });
+        }
         for (const c of selected) this.scene.add(this.meshes[c.id]);
         this.scene.remove(pivot);
       }
+      if (timing && matchMedia("(prefers-reduced-motion: reduce)").matches)
+        await animateTimedProgress(timing, () => BASE_MOVE_DURATION_MS / this.animationSpeed, () => {});
       this.presented = presentation.to;
       this.sync(presentation.to);
       this.updateFaceletImage();
+      // Timed endpoint and the controller/UI commit must share the next paint.
+      if (timing) this.renderer.render(this.scene, this.camera);
     } finally {
       this.busy = false;
     }
