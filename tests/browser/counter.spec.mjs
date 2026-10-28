@@ -45,7 +45,7 @@ test("manual steps, rapid chains, both wrap boundaries and validation preserve s
   await expect(page.locator("#format")).not.toBeChecked();
   expect(errors).toEqual([]);
 });
-test("physical title pixels and upright original-print digits survive Set goals", async ({
+test("physical title pixels and upright optimized-print digits survive Set goals", async ({
   page,
 }) => {
   await ready(page);

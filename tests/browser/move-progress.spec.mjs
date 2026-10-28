@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { expectedHtm as total } from "../helpers/shared-solver.mjs";
+import { expectedCertifiedHtm as total } from "../helpers/certified-counts.mjs";
 async function ready(page) {
   await page.goto("/");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
@@ -68,8 +68,8 @@ test("planned/committed counts stay attached to the active value through queued 
     `1 / ${total(15, 42)} moves`,
   );
   await release(page);
-  // After the first committed turn, the remaining 21 turns at 250 ms already
-  // exceed the old five-second assertion budget, before frame scheduling.
+  // After the first committed turn, the remaining physical turns at 250 ms already
+  // need a duration-based budget plus frame scheduling.
   const expectedDuration = (total(15, 42) - 1 + total(42, 44)) * 250;
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false", {
     timeout: expectedDuration + 5000,
@@ -117,7 +117,9 @@ test("explicit stop finishes the active value, drops queue and persists the comp
     `${total(42, 7)} / ${total(42, 7)} moves`,
   );
 });
-test("no-op Set and a new print reset planned moves", async ({ page }) => {
+test("no-op Set and formatting preserve zero planned moves", async ({
+  page,
+}) => {
   await ready(page);
   await go(page, 15);
   await expect(page.locator("#move-progress")).toHaveText("0 / 0 moves");
@@ -183,7 +185,8 @@ test("session total counts committed turns, survives a no-op Set and has an inde
   await expect(session).toHaveText(`${total(42, 7)}`);
   await page.locator("#format").check();
   await expect(page.locator("#application")).toBeEnabled();
-  await expect(session).toHaveText("0");
+  await expect(session).toHaveText(`${total(42, 7)}`);
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "7");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

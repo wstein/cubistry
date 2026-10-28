@@ -25,19 +25,14 @@ test("all eight jump previews agree with actual committed moves and complete pin
   await ready(page);
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
-    const animate = CubeViewer.prototype.animate,
-      configure = CubeViewer.prototype.configure;
+    const animate = CubeViewer.prototype.animate;
     window.record = [];
-    CubeViewer.prototype.configure = function (p, s, a) {
-      window.print = p;
-      window.state = s;
-      return configure.call(this, p, s, a);
-    };
     CubeViewer.prototype.animate = async function (p) {
       if (window.holdNext) {
         window.holdNext = false;
         await new Promise((r) => (window.release = r));
       }
+      window.print = this.presentedPrint;
       await animate.call(this, p);
       window.state = p.to;
       window.record.push(p);
