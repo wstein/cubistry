@@ -100,6 +100,7 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(cube.y);
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(controls.y);
   await expect(page.locator("#application option")).toHaveText([
+    "Calendar · Deutsch / English",
     "Live H–M–S Clock",
     "H/S/M Counter 00–59",
     "Counter 0–99",

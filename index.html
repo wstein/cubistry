@@ -19,6 +19,7 @@
         <div class="application-choice">
           <label for="application">Cube / application</label>
           <select id="application">
+            <option value="calendar">Calendar · Deutsch / English</option>
             <option value="live-clock">Live H–M–S Clock</option>
             <option value="hsm-counter">H/S/M Counter 00–59</option>
             <option value="certified" selected>Counter 0–99</option>
@@ -50,7 +51,9 @@
                 hidden
               >
                 <span id="timer-motion-label"></span><br />
-                <span id="timer-last-settled" hidden>Last <output id="timer-physical">15:00</output> · </span><span id="timer-effective" hidden></span>
+                <span id="timer-last-settled" hidden
+                  >Last <output id="timer-physical">15:00</output> · </span
+                ><span id="timer-effective" hidden></span>
               </p>
               <div class="stats-summary">
                 <dl class="move-summary">
@@ -67,7 +70,12 @@
                   <div>
                     <dt>
                       <span>Sequence</span>
-                      <output id="sequence-number" aria-label="Sequence number" aria-live="off">—</output>
+                      <output
+                        id="sequence-number"
+                        aria-label="Sequence number"
+                        aria-live="off"
+                        >—</output
+                      >
                     </dt>
                     <dd>
                       <span
@@ -167,24 +175,56 @@
             and moves stay the same.
           </p>
         </aside>
-        <aside id="hsm-controls" class="controls" aria-label="HSM counter controls" hidden>
+        <aside
+          id="hsm-controls"
+          class="controls"
+          aria-label="HSM counter controls"
+          hidden
+        >
           <h1>H/S/M Counter</h1>
           <label for="hsm-lettering">Sticker lettering</label>
           <select id="hsm-lettering"><option value="symbols">Large H / M / S</option><option value="words">Small hour / min / sec</option></select>
           <label for="hsm-letter">Unit</label>
-          <select id="hsm-letter"><option>H</option><option>S</option><option>M</option></select>
+          <select id="hsm-letter">
+            <option>H</option>
+            <option>S</option>
+            <option>M</option>
+          </select>
           <label for="hsm-range">Count range</label>
-          <select id="hsm-range"><option value="59">00–59</option><option value="23">00–23</option><option value="11">00–11</option></select>
+          <select id="hsm-range">
+            <option value="59">00–59</option>
+            <option value="23">00–23</option>
+            <option value="11">00–11</option>
+          </select>
           <label for="hsm-direction">Direction</label>
-          <select id="hsm-direction"><option value="1">Up</option><option value="-1">Down</option></select>
+          <select id="hsm-direction">
+            <option value="1">Up</option>
+            <option value="-1">Down</option>
+          </select>
           <form id="hsm-set-form">
             <label for="hsm-value">Set value</label>
             <input id="hsm-value" type="text" inputmode="numeric" value="00" />
             <button type="submit">Set</button>
           </form>
-          <div class="target-actions"><button id="hsm-run" type="button" class="primary" aria-pressed="false">Run</button><button id="hsm-reset" type="button">Reset</button></div>
-          <div class="increments"><button data-hsm-delta="-1">−1</button><button data-hsm-delta="1">+1</button></div>
-          <p class="small">Counts one step per second, wrapping through 00. Upper-left stays blank. Any number target takes at most six moves. Changing the unit sets up a fresh 00 display.</p>
+          <div class="target-actions">
+            <button
+              id="hsm-run"
+              type="button"
+              class="primary"
+              aria-pressed="false"
+            >
+              Run</button
+            ><button id="hsm-reset" type="button">Reset</button>
+          </div>
+          <div class="increments">
+            <button data-hsm-delta="-1">−1</button
+            ><button data-hsm-delta="1">+1</button>
+          </div>
+          <p class="small">
+            Counts one step per second, wrapping through 00. Upper-left stays
+            blank. Any number target takes at most six moves. Changing the unit
+            sets up a fresh 00 display.
+          </p>
         </aside>
         <aside
           id="timer-controls"
