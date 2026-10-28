@@ -240,3 +240,33 @@ test("rate changes sample the monotonic source once so preemption cannot discard
   assert.equal(samples, before + 1);
   assert.equal(c.remainingMs, 58900);
 });
+
+test("read-only next boundaries use one monotonic sample in both modes and every rate", () => {
+  for (const mode of ["countdown", "stopwatch"]) for (const rate of [1,10,20,50,100]) {
+    let now = 100, samples = 0;
+    const c = new WorkshopClock(() => { samples++; return now; });
+    c.configure(20); c.setMode(mode); c.setSpeed(rate); c.start();
+    now += 1250 / rate;
+    const before = samples, s = c.snapshot();
+    assert.equal(samples, before + 1);
+    assert.equal(s.bucket, mode === "countdown" ? 2 : 0);
+    assert.equal(s.next.target, 1);
+    assert.equal(s.next.deadline, 100 + 10000 / rate);
+    assert.equal(s.next.interval, 10000 / rate);
+    c.pause(); assert.equal(c.snapshot().next, null);
+  }
+});
+
+test("prepared exact sequences are cached but invalid hidden sources never reuse them", async () => {
+  const h = await harness();
+  const moves = h.c.prepare(25);
+  assert.equal(h.calls, 1);
+  assert.equal(h.c.prepare(25), moves);
+  h.c.request(25); await settle(h.c);
+  assert.equal(h.calls, 1);
+  h.c.prepare(24);
+  h.c.authoritative = applyMoves(h.c.state, parseAlg("B"));
+  h.c.request(24); await settle(h.c);
+  assert.equal(h.calls, 2);
+  assert.equal(stateEquals(h.c.state, route.states[24]), true);
+});

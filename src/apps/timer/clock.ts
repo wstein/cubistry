@@ -1,6 +1,12 @@
 /** Monotonic deadline clock. Physical playback is deliberately not a clock. */
 export type TimerMode = "countdown" | "stopwatch";
 const MAX_MS = 3590000;
+export interface ClockSnapshot {
+  readonly at: number;
+  readonly bucket: number;
+  readonly running: boolean;
+  readonly next: null | { target: number; deadline: number; interval: number };
+}
 /** One anchored virtual clock for both directions; animation never changes its rate. */
 export class WorkshopClock {
   private anchor = 0;
@@ -21,6 +27,19 @@ export class WorkshopClock {
   }
   get valueMs(): number {
     return this.valueAt(this.now());
+  }
+  /** Read every deadline field from one monotonic sample; never advance anchors. */
+  snapshot(): ClockSnapshot {
+    const at = this.now(), value = this.valueAt(at);
+    const bucket = this.direction === "countdown"
+      ? Math.ceil(value / 10000) : Math.floor(value / 10000);
+    const running = this.active && (this.direction === "countdown" ? value > 0 : value < MAX_MS);
+    const target = bucket + (this.direction === "countdown" ? -1 : 1);
+    const distance = this.direction === "countdown"
+      ? value - target * 10000 : target * 10000 - value;
+    return { at, bucket, running, next: running
+      ? { target, deadline: at + distance / this.multiplier, interval: 10000 / this.multiplier }
+      : null };
   }
   private valueAt(at: number): number {
     const delta = this.active ? (at - this.anchor) * this.multiplier : 0;
