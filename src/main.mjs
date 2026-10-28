@@ -21,7 +21,8 @@ let ready = false,
   value = 0,
   view,
   viewer,
-  proof;
+  proof,
+  certified;
 let padded = true;
 let application = "certified",
   timerRoute,
@@ -216,6 +217,10 @@ $("reset-session-moves").addEventListener("click", () =>
 );
 // This screen-only field rule never selects a different permanent print or solver.
 function formatUi() {
+  if (application === "timer") {
+    viewer.setFaceletImageOverride(null);
+    return;
+  }
   viewer.setFaceletImageOverride(
     $("format").checked
       ? null
@@ -385,16 +390,12 @@ $("application").addEventListener("change", async () => {
       $("timer-duration").value = "15:00";
     } else {
       candidate = new CounterController(viewer, proof, callback, resolveAssets);
-      await candidate.configure(
-        "COUNTER",
-        padded,
-        value,
-        padded ? certified : null,
-      );
+      await candidate.configure("COUNTER", true, value, certified);
     }
     previous.dispose();
     view = candidate;
     application = requested;
+    formatUi();
     ready = true;
     error();
     onPhysicalState(view.currentValue, view.busy, undefined, view.progress);
@@ -448,12 +449,8 @@ async function initialize() {
       );
     }
     speedUi();
-    await view.configure(
-      "COUNTER",
-      true,
-      value,
-      await loadCertifiedCounter(proof, import.meta.env.BASE_URL),
-    );
+    certified = await loadCertifiedCounter(proof, import.meta.env.BASE_URL);
+    await view.configure("COUNTER", true, value, certified);
     formatUi();
     padded = $("format").checked;
     ready = true;

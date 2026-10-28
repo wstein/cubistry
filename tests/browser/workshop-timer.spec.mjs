@@ -233,20 +233,20 @@ test("timer panel fits mobile and preserves all six inherited speed stops", asyn
   await expect(page.locator("#timer-start")).toHaveText("Resume");
 });
 
-test("real animation budgets measure committed five-move edges at default250ms, fast100ms and slow2s", async ({
+test("real animation budgets measure committed five-move edges at default100ms, optional250ms and slow2s", async ({
   page,
 }) => {
   test.setTimeout(90000);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await chooseTimer(page);
-  await expect(page.locator("#rotation-speed")).toHaveValue("3");
+  await expect(page.locator("#rotation-speed")).toHaveValue("4");
   // Configure zero using the actual shared solver; exclude this reset from edge timings.
   await page.locator("#rotation-speed").fill("5");
   await duration(page, "00:00");
   const measurements = [];
   for (const [stop, ms, target] of [
-    ["3", 250, "00:10"],
-    ["4", 100, "00:20"],
+    ["4", 100, "00:10"],
+    ["3", 250, "00:20"],
     ["0", 2000, "00:10"],
   ]) {
     await page.locator("#rotation-speed").fill(stop);
@@ -357,4 +357,32 @@ test("a rejected Timer certificate leaves the existing Counter and its physical 
   await settled(page, "42");
   await page.locator('[data-delta="1"]').click();
   await settled(page, "43");
+});
+
+test("Counter's presentation-only blank tens never masks any Timer zero and survives application return", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator("#application")).toBeEnabled();
+  await page.locator("#format").uncheck();
+  await page.selectOption("#application", "timer");
+  await settled(page, "15:00");
+  await duration(page, "00:00");
+  const image = PNG.sync.read(await page.locator("#cube canvas").screenshot());
+  for (const [cx, cy] of [
+    [-0.52, 0.52],
+    [0.52, 0.52],
+    [-0.52, -0.52],
+    [0.52, -0.52],
+  ]) {
+    const d = digit(image, cx, cy);
+    expect(d.segments).toBe(active[0]);
+    expect(d.up).toBe(true);
+  }
+  await page.selectOption("#application", "certified");
+  await settled(page, "0");
+  await expect(page.locator("#format")).not.toBeChecked();
+  await page.locator('[data-delta="1"]').click();
+  await settled(page, "1");
+  await expect(page.locator("#session-moves")).toHaveText("5");
 });
