@@ -106,9 +106,12 @@ async function update() {
             ? "en-3-zero"
             : "en-3-unpadded",
       key = id + "/" + date.iso;
-    if (key === requested) return;
-    requested = key;
     showControl();
+    if (key === requested) {
+      changed(controller.current, controller.busy);
+      return;
+    }
+    requested = key;
     const design = await load(id);
     if (!ready || key !== requested) return;
     controller.request(findTarget(design, date));
@@ -162,6 +165,7 @@ $("calendar-set").addEventListener("click", () => {
   }
 });
 $("calendar-live").addEventListener("click", () => {
+  $("calendar-error").textContent = "";
   live = true;
   date = localDate(Date.now());
   $("calendar-date").value = date.iso;
