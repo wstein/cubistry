@@ -102,6 +102,7 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
   await expect(page.locator("#application option")).toHaveText([
     "Counter 0–99",
     "60-Minute Timer",
+    "5-Second Timer",
   ]);
   await expect(page.locator("#application")).toHaveValue("certified");
   await expect(page.locator("#auto,#step,#start,#pause,#front")).toHaveCount(0);
