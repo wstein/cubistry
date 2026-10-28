@@ -1,0 +1,15 @@
+{
+  "repository": "wstein/cubistry",
+  "branch": "research/cube-display-feasibility",
+  "commit": "d2b364ce1447869e1c4f9944ed3cfed853d711f6",
+  "sources": {
+    "research/date-3x3/witnesses/de-2.json": "f367e0ba9c5195801d1f10d2eb220bff329ee9de58452684abb201ce35e0c235",
+    "research/date-3x3/adjacent/witnesses/en-adjacent-3-zero.json": "871f3f2a093f7594adce82c307ed8e7f656f8adaaaf9ae60f290bfc9891382f2",
+    "research/date-3x3/adjacent/witnesses/en-adjacent-3-unpadded.json": "d1c224d5bf1226d2cd36405f7eda4e85b75776a29128c8bbd13587553c2ac437"
+  },
+  "runtime": {
+    "en-3-unpadded.json": "156e6b4d642f9737ee03597bf84a940b3d36f0271c46345bac4083eb99a36022",
+    "de-a.json": "1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56",
+    "en-3-zero.json": "cb6a556d02f03806b1742bf7720216222934bc0652dd4ace12dcd97de876da0c"
+  }
+}

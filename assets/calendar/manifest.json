@@ -1,0 +1,698 @@
+{
+  "schema": "cubistry.calendar-artwork",
+  "version": 1,
+  "dimensions": "14 mm square; 256-unit viewBox",
+  "font": {
+    "family": "Noto Sans",
+    "package": "@fontsource/noto-sans@5.2.10",
+    "weight": 600,
+    "license": "SIL-OFL-1.1",
+    "path": "public/fonts/noto-sans-latin-600.woff2",
+    "sha256": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed",
+    "licensePath": "public/fonts/OFL.txt"
+  },
+  "designs": {
+    "de-a": {
+      "0-M": {
+        "file": "de-a-0.svg",
+        "sha256": "9264a97f0b244f34d31fabaf21265ab0395a20576ecde03be0af0a5af2a9d846",
+        "stickers": [
+          0
+        ]
+      },
+      "0-D": {
+        "file": "de-a-1.svg",
+        "sha256": "16b2f64a3744f5c7eb740df9592085809af7765c6673725f29eb315a6447157d",
+        "stickers": [
+          1
+        ]
+      },
+      "-1-blank": {
+        "file": "de-a-2.svg",
+        "sha256": "dba018080f3b6a509045cbde38beca458485eb0359c8aceed2dd96e264e87fd6",
+        "stickers": [
+          2,
+          7,
+          49,
+          50
+        ]
+      },
+      "1-O": {
+        "file": "de-a-3.svg",
+        "sha256": "50061bdc83921bd1683a608c001c4a624a0fd09e07c4f588a8a071d656047c15",
+        "stickers": [
+          3
+        ]
+      },
+      "1-I": {
+        "file": "de-a-4.svg",
+        "sha256": "f2d0734880ba2add40fcd9acb5f00881dc1ad1c14eeba9d3c53f2d246bd7a2fd",
+        "stickers": [
+          4
+        ]
+      },
+      "0-F": {
+        "file": "de-a-5.svg",
+        "sha256": "84e6c681a157d4055202e3a652c7c8cd264d0c0908593920b5c87530e952429a",
+        "stickers": [
+          5
+        ]
+      },
+      "0-S": {
+        "file": "de-a-6.svg",
+        "sha256": "3ebd61c36492becc4610606a3fdd8c29779d0d0a4d4e1584de5ab46f6a89ab3c",
+        "stickers": [
+          6
+        ]
+      },
+      "1-R": {
+        "file": "de-a-7.svg",
+        "sha256": "1d043950d11fd860386c12cf612d2745a97b3f16c324912d732fa9549a7e6de9",
+        "stickers": [
+          8
+        ]
+      },
+      "1-A": {
+        "file": "de-a-8.svg",
+        "sha256": "40186ecbf85ec9fd792d7de2436849cc36b2b7b77b92c0bab42dd800e9928423",
+        "stickers": [
+          9
+        ]
+      },
+      "4-0": {
+        "file": "de-a-9.svg",
+        "sha256": "a24517f80dcef1f4346ae03ced943f492912fb71a8f3a551b73b902badd62372",
+        "stickers": [
+          10
+        ]
+      },
+      "7-A": {
+        "file": "de-a-10.svg",
+        "sha256": "861be88eada3c42d53ab87d8f5d21047fc553ceca763ab3a38d440649197ed1a",
+        "stickers": [
+          11
+        ]
+      },
+      "7-E": {
+        "file": "de-a-11.svg",
+        "sha256": "f3f5f8918d5933af0369c950b87ac23b81351144e1ecf897d41d252632004a06",
+        "stickers": [
+          12
+        ]
+      },
+      "6-J": {
+        "file": "de-a-12.svg",
+        "sha256": "7609bf240f77d225ec5f1bfd938a0beb8ff38b2a4c5be6231cec21d5832e771f",
+        "stickers": [
+          13
+        ]
+      },
+      "6-F": {
+        "file": "de-a-13.svg",
+        "sha256": "b28d397906e2357ddf985631dd2e8be35178e5dc411bbefa07727961d1dcbbbc",
+        "stickers": [
+          14
+        ]
+      },
+      "6-M": {
+        "file": "de-a-14.svg",
+        "sha256": "3d635bc6914a6aae7d785927e1e57b258a40630ac2a7c4844186d7a7eb8c39c4",
+        "stickers": [
+          15
+        ]
+      },
+      "7-Ä": {
+        "file": "de-a-15.svg",
+        "sha256": "11bac6da76b43566d556b3257cc1c70c0d490d5565ee7f09495b326085e47398",
+        "stickers": [
+          16
+        ]
+      },
+      "7-P": {
+        "file": "de-a-16.svg",
+        "sha256": "e03dfedac74e23f7ba756817fba06485e1717d81c124fda815d0ad2414d94c84",
+        "stickers": [
+          17
+        ]
+      },
+      "6-A": {
+        "file": "de-a-17.svg",
+        "sha256": "861be88eada3c42d53ab87d8f5d21047fc553ceca763ab3a38d440649197ed1a",
+        "stickers": [
+          18
+        ]
+      },
+      "6-S": {
+        "file": "de-a-18.svg",
+        "sha256": "a4c63ad165c81ca58c5eef04a61c49db21e30aa2a3cc051ef550df5524a70579",
+        "stickers": [
+          19
+        ]
+      },
+      "6-O": {
+        "file": "de-a-19.svg",
+        "sha256": "7683bd682cd42d771c8b76f3ef06b8008add9655b0fb68e4a81ffea2e3913cf3",
+        "stickers": [
+          20
+        ]
+      },
+      "7-U": {
+        "file": "de-a-20.svg",
+        "sha256": "98106250d391e239256746e80b070a4684dee4444de67c278f175ab7f4ebf7ea",
+        "stickers": [
+          21
+        ]
+      },
+      "7-K": {
+        "file": "de-a-21.svg",
+        "sha256": "e369f0e82bb8c5201c25f1e4d5d80fa3982b1e2516a4d0b76a686b62190b5e36",
+        "stickers": [
+          22
+        ]
+      },
+      "4-1": {
+        "file": "de-a-22.svg",
+        "sha256": "bc94026bc268cf854241afe84e8bf3bc476a6af5ee2dcc151159fe7d14eb0a57",
+        "stickers": [
+          23
+        ]
+      },
+      "7-O": {
+        "file": "de-a-23.svg",
+        "sha256": "7683bd682cd42d771c8b76f3ef06b8008add9655b0fb68e4a81ffea2e3913cf3",
+        "stickers": [
+          24,
+          25
+        ]
+      },
+      "4-2": {
+        "file": "de-a-24.svg",
+        "sha256": "0992f3bd43b0f0e794d9942521ed0e37b0815394b5870be4b0cc0fe88095070b",
+        "stickers": [
+          26
+        ]
+      },
+      "4-3": {
+        "file": "de-a-25.svg",
+        "sha256": "79e43db6dc9e659d1dbc0e945762ee147b4cd8826b27590884556d6494e99781",
+        "stickers": [
+          27
+        ]
+      },
+      "5-0": {
+        "file": "de-a-26.svg",
+        "sha256": "a24517f80dcef1f4346ae03ced943f492912fb71a8f3a551b73b902badd62372",
+        "stickers": [
+          28
+        ]
+      },
+      "5-1": {
+        "file": "de-a-27.svg",
+        "sha256": "bc94026bc268cf854241afe84e8bf3bc476a6af5ee2dcc151159fe7d14eb0a57",
+        "stickers": [
+          29
+        ]
+      },
+      "4-blank": {
+        "file": "de-a-28.svg",
+        "sha256": "9176c3ed99c1d2a026bb9890ee2ece89aae852d83c8ea8e258669facea509178",
+        "stickers": [
+          30,
+          43
+        ]
+      },
+      "5-2": {
+        "file": "de-a-29.svg",
+        "sha256": "0992f3bd43b0f0e794d9942521ed0e37b0815394b5870be4b0cc0fe88095070b",
+        "stickers": [
+          31
+        ]
+      },
+      "5-3": {
+        "file": "de-a-30.svg",
+        "sha256": "79e43db6dc9e659d1dbc0e945762ee147b4cd8826b27590884556d6494e99781",
+        "stickers": [
+          32
+        ]
+      },
+      "6-N": {
+        "file": "de-a-31.svg",
+        "sha256": "71fb5b00913863f8644c3430b12ecb57baabf890af4e616308a03721f4a2bf15",
+        "stickers": [
+          33
+        ]
+      },
+      "6-D": {
+        "file": "de-a-32.svg",
+        "sha256": "adba55327758448bb193147db731a88bcd176e5e32ae00529024ca1290a8c3bb",
+        "stickers": [
+          34
+        ]
+      },
+      "8-R": {
+        "file": "de-a-33.svg",
+        "sha256": "f2c840357d7fdbcad61a2cd1fe017f0554a73c297dae56e7b2ab902548f7c4d0",
+        "stickers": [
+          35
+        ]
+      },
+      "5-4": {
+        "file": "de-a-34.svg",
+        "sha256": "627cf33d07ce4c1e3165210291b0966631a740a37f014f97c30dd221baaf0c1e",
+        "stickers": [
+          36
+        ]
+      },
+      "5-5": {
+        "file": "de-a-35.svg",
+        "sha256": "bd2a31e4c88e5633e1a3983f1dd950c50a14708e05c0e5583fe9b917d74787e2",
+        "stickers": [
+          37
+        ]
+      },
+      "8-N": {
+        "file": "de-a-36.svg",
+        "sha256": "71fb5b00913863f8644c3430b12ecb57baabf890af4e616308a03721f4a2bf15",
+        "stickers": [
+          38
+        ]
+      },
+      "8-B": {
+        "file": "de-a-37.svg",
+        "sha256": "6ba0d3fd9eb114419495e00dd273f14c9c0af2ee775c3dd6a8a96c3b291a33fb",
+        "stickers": [
+          39
+        ]
+      },
+      "8-I": {
+        "file": "de-a-38.svg",
+        "sha256": "9b555d7df433ff5fa0d801a4ccab16d000695f7c5be7f8c9d12b0461bda4249d",
+        "stickers": [
+          40
+        ]
+      },
+      "5-6": {
+        "file": "de-a-39.svg",
+        "sha256": "cdc80a924079360d749838f40da6d1fdf0232a6cd3e852a9379c3525d8ef0d97",
+        "stickers": [
+          41
+        ]
+      },
+      "5-7": {
+        "file": "de-a-40.svg",
+        "sha256": "c3808e3d14e51975142cb8d18b4ad09293ee7ebda0c3b7a9cd8250919dd79107",
+        "stickers": [
+          42
+        ]
+      },
+      "5-8": {
+        "file": "de-a-41.svg",
+        "sha256": "ba21d0b24b6d85a0f64bf2f28bf5b00ab89d17f975ade7aa5723d90441de4d0e",
+        "stickers": [
+          44
+        ]
+      },
+      "5-9": {
+        "file": "de-a-42.svg",
+        "sha256": "c5c274c1ee6973e48dae655c1327420dba906586cd59c4401a1db4fda0b38633",
+        "stickers": [
+          45
+        ]
+      },
+      "8-L": {
+        "file": "de-a-43.svg",
+        "sha256": "eb3edf10588bfa62a9850babe511c7dfcb9de0c317180cf740ef7a7bd100bd7b",
+        "stickers": [
+          46
+        ]
+      },
+      "8-G": {
+        "file": "de-a-44.svg",
+        "sha256": "af54363288077c114446f6447bf5a241afabc7aa08d366452682ee03959d3067",
+        "stickers": [
+          47
+        ]
+      },
+      "8-P": {
+        "file": "de-a-45.svg",
+        "sha256": "e03dfedac74e23f7ba756817fba06485e1717d81c124fda815d0ad2414d94c84",
+        "stickers": [
+          48
+        ]
+      },
+      "8-T": {
+        "file": "de-a-46.svg",
+        "sha256": "64ce8f2b375aa59a06c9be34e4369c8d44705bb1e264c70c6dac190f91e5b187",
+        "stickers": [
+          51
+        ]
+      },
+      "8-V": {
+        "file": "de-a-47.svg",
+        "sha256": "528c839e7a33bd8dfc292303134a5dad2efaff608e8d4b62a58a17521b922cc3",
+        "stickers": [
+          52
+        ]
+      },
+      "8-Z": {
+        "file": "de-a-48.svg",
+        "sha256": "883ce58156c0d24e740a9e50405b8eddb6e4d1718545d7884e747cc774393c9b",
+        "stickers": [
+          53
+        ]
+      }
+    },
+    "en-3": {
+      "-1-blank": {
+        "file": "en-3-0.svg",
+        "sha256": "dba018080f3b6a509045cbde38beca458485eb0359c8aceed2dd96e264e87fd6",
+        "stickers": [
+          0,
+          1,
+          2,
+          5,
+          6,
+          7,
+          42,
+          45
+        ]
+      },
+      "3-J": {
+        "file": "en-3-1.svg",
+        "sha256": "7609bf240f77d225ec5f1bfd938a0beb8ff38b2a4c5be6231cec21d5832e771f",
+        "stickers": [
+          3
+        ]
+      },
+      "3-F": {
+        "file": "en-3-2.svg",
+        "sha256": "b28d397906e2357ddf985631dd2e8be35178e5dc411bbefa07727961d1dcbbbc",
+        "stickers": [
+          4
+        ]
+      },
+      "3-M": {
+        "file": "en-3-3.svg",
+        "sha256": "3d635bc6914a6aae7d785927e1e57b258a40630ac2a7c4844186d7a7eb8c39c4",
+        "stickers": [
+          8
+        ]
+      },
+      "3-A": {
+        "file": "en-3-4.svg",
+        "sha256": "861be88eada3c42d53ab87d8f5d21047fc553ceca763ab3a38d440649197ed1a",
+        "stickers": [
+          9
+        ]
+      },
+      "4-A": {
+        "file": "en-3-5.svg",
+        "sha256": "861be88eada3c42d53ab87d8f5d21047fc553ceca763ab3a38d440649197ed1a",
+        "stickers": [
+          10
+        ]
+      },
+      "3-S": {
+        "file": "en-3-6.svg",
+        "sha256": "a4c63ad165c81ca58c5eef04a61c49db21e30aa2a3cc051ef550df5524a70579",
+        "stickers": [
+          11
+        ]
+      },
+      "3-O": {
+        "file": "en-3-7.svg",
+        "sha256": "7683bd682cd42d771c8b76f3ef06b8008add9655b0fb68e4a81ffea2e3913cf3",
+        "stickers": [
+          12
+        ]
+      },
+      "0-MON": {
+        "file": "en-3-8.svg",
+        "sha256": "a1da1bf8bfa0dfaf1af9259c1fa20d1d47cdffcdb96eb58996fdbff253f47992",
+        "stickers": [
+          13
+        ]
+      },
+      "0-TUE": {
+        "file": "en-3-9.svg",
+        "sha256": "53af8ad9f0cb75ea8154c0a5f63d0eb91900a030766caf8500e88d0a7081a4f5",
+        "stickers": [
+          14
+        ]
+      },
+      "0-WED": {
+        "file": "en-3-10.svg",
+        "sha256": "30fe44a4d224064225e5f0b5f3ba46ac1a46020e5f9c57a4dbe585ecea7551bd",
+        "stickers": [
+          15
+        ]
+      },
+      "3-N": {
+        "file": "en-3-11.svg",
+        "sha256": "71fb5b00913863f8644c3430b12ecb57baabf890af4e616308a03721f4a2bf15",
+        "stickers": [
+          16
+        ]
+      },
+      "3-D": {
+        "file": "en-3-12.svg",
+        "sha256": "adba55327758448bb193147db731a88bcd176e5e32ae00529024ca1290a8c3bb",
+        "stickers": [
+          17
+        ]
+      },
+      "0-THU": {
+        "file": "en-3-13.svg",
+        "sha256": "dbac630b2c9e49226912e9310ab7991f7e51a433be8b81e1dac8f386c79b2077",
+        "stickers": [
+          18
+        ]
+      },
+      "0-FRI": {
+        "file": "en-3-14.svg",
+        "sha256": "73979d91d69892e04f56f52f9dbba80e42e3f356ebc0b51019e6344ca7a8c4fc",
+        "stickers": [
+          19
+        ]
+      },
+      "0-SAT": {
+        "file": "en-3-15.svg",
+        "sha256": "7e11f6ce31e857df97f4c4d8ed4049b90eb4577e1bc0ce8eb7dde1ad5db31a9d",
+        "stickers": [
+          20
+        ]
+      },
+      "5-N": {
+        "file": "en-3-16.svg",
+        "sha256": "71fb5b00913863f8644c3430b12ecb57baabf890af4e616308a03721f4a2bf15",
+        "stickers": [
+          21
+        ]
+      },
+      "5-B": {
+        "file": "en-3-17.svg",
+        "sha256": "6ba0d3fd9eb114419495e00dd273f14c9c0af2ee775c3dd6a8a96c3b291a33fb",
+        "stickers": [
+          22
+        ]
+      },
+      "4-E": {
+        "file": "en-3-18.svg",
+        "sha256": "f3f5f8918d5933af0369c950b87ac23b81351144e1ecf897d41d252632004a06",
+        "stickers": [
+          23
+        ]
+      },
+      "5-R": {
+        "file": "en-3-19.svg",
+        "sha256": "f2c840357d7fdbcad61a2cd1fe017f0554a73c297dae56e7b2ab902548f7c4d0",
+        "stickers": [
+          24
+        ]
+      },
+      "5-Y": {
+        "file": "en-3-20.svg",
+        "sha256": "6af4636170045db034ff773e6a3bec456791e759b473d4413620f06b5608c436",
+        "stickers": [
+          25
+        ]
+      },
+      "4-P": {
+        "file": "en-3-21.svg",
+        "sha256": "e03dfedac74e23f7ba756817fba06485e1717d81c124fda815d0ad2414d94c84",
+        "stickers": [
+          26
+        ]
+      },
+      "4-U": {
+        "file": "en-3-22.svg",
+        "sha256": "98106250d391e239256746e80b070a4684dee4444de67c278f175ab7f4ebf7ea",
+        "stickers": [
+          27
+        ]
+      },
+      "5-L": {
+        "file": "en-3-23.svg",
+        "sha256": "eb3edf10588bfa62a9850babe511c7dfcb9de0c317180cf740ef7a7bd100bd7b",
+        "stickers": [
+          28
+        ]
+      },
+      "5-G": {
+        "file": "en-3-24.svg",
+        "sha256": "af54363288077c114446f6447bf5a241afabc7aa08d366452682ee03959d3067",
+        "stickers": [
+          29
+        ]
+      },
+      "4-C": {
+        "file": "en-3-25.svg",
+        "sha256": "0398037c849a11306047936f48da1b9306406edda81eb7e7f18272aec1ff58f0",
+        "stickers": [
+          30
+        ]
+      },
+      "5-P": {
+        "file": "en-3-26.svg",
+        "sha256": "e03dfedac74e23f7ba756817fba06485e1717d81c124fda815d0ad2414d94c84",
+        "stickers": [
+          31
+        ]
+      },
+      "5-T": {
+        "file": "en-3-27.svg",
+        "sha256": "64ce8f2b375aa59a06c9be34e4369c8d44705bb1e264c70c6dac190f91e5b187",
+        "stickers": [
+          32
+        ]
+      },
+      "0-SUN": {
+        "file": "en-3-28.svg",
+        "sha256": "4df0418d92883c87467370d7c3ce8cf5a6ca6aacf59443db131b81a0d381920e",
+        "stickers": [
+          33,
+          40
+        ]
+      },
+      "8-8": {
+        "file": "en-3-29.svg",
+        "sha256": "ba21d0b24b6d85a0f64bf2f28bf5b00ab89d17f975ade7aa5723d90441de4d0e",
+        "stickers": [
+          34
+        ]
+      },
+      "8-9": {
+        "file": "en-3-30.svg",
+        "sha256": "c5c274c1ee6973e48dae655c1327420dba906586cd59c4401a1db4fda0b38633",
+        "stickers": [
+          35
+        ]
+      },
+      "5-V": {
+        "file": "en-3-31.svg",
+        "sha256": "528c839e7a33bd8dfc292303134a5dad2efaff608e8d4b62a58a17521b922cc3",
+        "stickers": [
+          36
+        ]
+      },
+      "5-C": {
+        "file": "en-3-32.svg",
+        "sha256": "0398037c849a11306047936f48da1b9306406edda81eb7e7f18272aec1ff58f0",
+        "stickers": [
+          37
+        ]
+      },
+      "8-0": {
+        "file": "en-3-33.svg",
+        "sha256": "a24517f80dcef1f4346ae03ced943f492912fb71a8f3a551b73b902badd62372",
+        "stickers": [
+          38
+        ]
+      },
+      "8-1": {
+        "file": "en-3-34.svg",
+        "sha256": "bc94026bc268cf854241afe84e8bf3bc476a6af5ee2dcc151159fe7d14eb0a57",
+        "stickers": [
+          39
+        ]
+      },
+      "7-0": {
+        "file": "en-3-35.svg",
+        "sha256": "a24517f80dcef1f4346ae03ced943f492912fb71a8f3a551b73b902badd62372",
+        "stickers": [
+          41
+        ]
+      },
+      "4-O": {
+        "file": "en-3-36.svg",
+        "sha256": "7683bd682cd42d771c8b76f3ef06b8008add9655b0fb68e4a81ffea2e3913cf3",
+        "stickers": [
+          43
+        ]
+      },
+      "7-1": {
+        "file": "en-3-37.svg",
+        "sha256": "bc94026bc268cf854241afe84e8bf3bc476a6af5ee2dcc151159fe7d14eb0a57",
+        "stickers": [
+          44
+        ]
+      },
+      "8-2": {
+        "file": "en-3-38.svg",
+        "sha256": "0992f3bd43b0f0e794d9942521ed0e37b0815394b5870be4b0cc0fe88095070b",
+        "stickers": [
+          46
+        ]
+      },
+      "8-3": {
+        "file": "en-3-39.svg",
+        "sha256": "79e43db6dc9e659d1dbc0e945762ee147b4cd8826b27590884556d6494e99781",
+        "stickers": [
+          47
+        ]
+      },
+      "8-4": {
+        "file": "en-3-40.svg",
+        "sha256": "627cf33d07ce4c1e3165210291b0966631a740a37f014f97c30dd221baaf0c1e",
+        "stickers": [
+          48
+        ]
+      },
+      "7-2": {
+        "file": "en-3-41.svg",
+        "sha256": "0992f3bd43b0f0e794d9942521ed0e37b0815394b5870be4b0cc0fe88095070b",
+        "stickers": [
+          49
+        ]
+      },
+      "7-3": {
+        "file": "en-3-42.svg",
+        "sha256": "79e43db6dc9e659d1dbc0e945762ee147b4cd8826b27590884556d6494e99781",
+        "stickers": [
+          50
+        ]
+      },
+      "8-5": {
+        "file": "en-3-43.svg",
+        "sha256": "bd2a31e4c88e5633e1a3983f1dd950c50a14708e05c0e5583fe9b917d74787e2",
+        "stickers": [
+          51
+        ]
+      },
+      "8-6": {
+        "file": "en-3-44.svg",
+        "sha256": "cdc80a924079360d749838f40da6d1fdf0232a6cd3e852a9379c3525d8ef0d97",
+        "stickers": [
+          52
+        ]
+      },
+      "8-7": {
+        "file": "en-3-45.svg",
+        "sha256": "c3808e3d14e51975142cb8d18b4ad09293ee7ebda0c3b7a9cd8250919dd79107",
+        "stickers": [
+          53
+        ]
+      }
+    }
+  }
+}
