@@ -31,7 +31,10 @@ export class TimerScheduler {
   private plan: Plan | null = null;
   private wake: ReturnType<typeof setTimeout> | null = null;
   private readonly refresh: () => void;
-  constructor(refresh: () => void = () => {}) { this.refresh = refresh; }
+  private readonly readClock?: () => ClockSnapshot;
+  constructor(refresh: () => void = () => {}, readClock?: () => ClockSnapshot) {
+    this.refresh = refresh; this.readClock = readClock;
+  }
   warning: "" | "Budget infeasible" | "Late" = "";
   invalidate(): void {
     if (this.wake !== null) clearTimeout(this.wake);
@@ -44,7 +47,8 @@ export class TimerScheduler {
   }
   tick(snapshot: ClockSnapshot, controller: TimerController, preferred: number,
     setDuration: (duration: number) => void): void {
-    const { at, bucket, next } = snapshot;
+    const { bucket, next } = snapshot;
+    let at = snapshot.at;
     let p = this.plan;
     const intentional = p && (p.target === bucket || p.target === next?.target);
     if (!snapshot.running) {
@@ -64,7 +68,7 @@ export class TimerScheduler {
           const remaining = Math.max(1, controller.progress.total - controller.progress.completed);
           const revised = planSequence(remaining, preferred, p.interval, p.deadline - at);
           p.effective = Math.min(p.effective, revised.effective);
-          p.feasible = p.feasible && revised.feasible;
+          p.feasible = revised.feasible;
           p.preferred = preferred;
         }
         // Keep a faster preference unchanged during ordinary playback. Rebudget only
@@ -92,6 +96,14 @@ export class TimerScheduler {
     }
     if (!p || p.started || p.target !== next.target || Math.abs(p.deadline - next.deadline) > 0.01 || p.preferred !== preferred || !controller.state || !stateEquals(p.source, controller.state)) {
       const moves = controller.prepare(next.target).length;
+      const fresh = this.readClock?.() ?? snapshot;
+      if (!fresh.running || fresh.bucket !== bucket || fresh.next?.target !== next.target ||
+        Math.abs(fresh.next.deadline - next.deadline) > 0.01) {
+        this.invalidate();
+        this.wake = setTimeout(() => { this.wake = null; this.refresh(); }, 0);
+        return;
+      }
+      at = fresh.at;
       p = this.plan = { ...next, source: controller.state!, preferred, moves,
         ...planSequence(moves, preferred, next.interval, next.deadline - at), started: false };
       if (this.wake !== null) clearTimeout(this.wake);

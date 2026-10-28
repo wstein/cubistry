@@ -5,7 +5,7 @@ import { validateTimerRoute } from "../src/apps/timer/design.ts";
 import { readFileSync } from "node:fs";
 const route = validateTimerRoute(JSON.parse(readFileSync(new URL("../public/workshop-timer.v1.json", import.meta.url))));
 test("adaptive plans reserve real overhead, never slow preference, and explicitly reject impossible half budgets", () => {
-  for (const rate of [1,10,20,50,100]) for (const n of [1,3,5]) {
+  for (const rate of [1,10,20,50,100]) for (const n of [1,3,5,14]) {
     const p = planSequence(n, 2000, 10000/rate);
     if(p.feasible) assert.ok(p.duration <= 5000/rate + 1e-9);
     assert.ok(p.effective >= 10 && p.effective <= 2000);
@@ -54,4 +54,29 @@ test("manual and paused settling never invent missed deadlines, while terminal m
   s.invalidate();
   s.tick({at:10002,bucket:90,running:false,next:null},c,250,()=>{});
   assert.equal(s.warning,"");s.invalidate();
+});
+test("solver preparation time is included in dispatch and crossed deadlines invalidate stale plans", () => {
+  const {c,requests}=mock();
+  let fresh = snapshot(8500);
+  const s = new TimerScheduler(()=>{},()=>fresh);
+  s.tick(snapshot(8000),c,250,()=>{});
+  assert.deepEqual(requests,[89]); // Preparation passed the absolute planned start.
+  s.invalidate();c.busy=false;requests.length=0;
+  fresh=snapshot(10010,20000,89);
+  s.tick(snapshot(9900),c,250,()=>{});
+  assert.equal(requests.length,0);assert.equal(s.presentationTarget(fresh),null);s.invalidate();
+});
+test("slowing an active infeasible clock clears an obsolete budget warning", () => {
+  const s=new TimerScheduler(),{c}=mock();
+  const fast={at:0,bucket:90,running:true,next:{target:89,deadline:100,interval:100}};
+  s.tick(fast,c,250,()=>{});assert.equal(s.warning,"Budget infeasible");
+  s.tick(snapshot(1),c,250,()=>{});assert.equal(s.warning,"");s.invalidate();
+});
+test("a changed full prepared source forces preparation again before dispatch", () => {
+  const s=new TimerScheduler(),{c}=mock();let preparations=0;
+  c.prepare=()=>{preparations++;return Array(5);};
+  s.tick(snapshot(0),c,250,()=>{});
+  c.state=route.states[20];
+  s.tick(snapshot(100),c,250,()=>{});
+  assert.equal(preparations,2);s.invalidate();
 });
