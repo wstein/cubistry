@@ -71,3 +71,18 @@
     height: 390px;
   }
 }
+
+.calendar-day-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.calendar-move-counts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+#calendar-moves {
+  font-size: 0.9rem;
+}
