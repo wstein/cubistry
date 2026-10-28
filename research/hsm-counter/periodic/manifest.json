@@ -1,0 +1,33 @@
+{
+  "schema": "cubistry.hsm-recurrent-experiment",
+  "version": 1,
+  "baseResearchCommit": "72ddc83f4010a8e9741a7fef19c7266fb6317a60",
+  "policy": 13,
+  "cycleBudgetPerMode": 10000,
+  "modes": 18,
+  "verifiedEdges": 10548,
+  "fixedLetterSourceTriples": 378,
+  "maximumCountingHTM": 5,
+  "status": "SAT",
+  "globalLayoutOptimality": "UNKNOWN",
+  "files": {
+    "generate-periodic.mjs": "d040b36750f3275b4ac72020a9497c43c5280e0fa732cecc9a81eafbd0a22008",
+    "periodic-planner.mjs": "f63db6e36957f16a566881083cb33428da49ab1b8582850614fe1b5fdddbd265",
+    "verify_periodic.py": "067f3c4ccff2251b8d8e475ea29376ba81f8a6767a65bcc3631aa9e75a7a3169",
+    "test_verify_periodic.py": "dc70c8ee8906012122a9bb780e1d77b41858e7c9258ae68c8000ec58e8400880",
+    "periodic/witness.json": "b94f7d6263777d25b1070eba6d8e5e95fe362ea35ae4f9d2b3bc83eefc7434d7",
+    "periodic/verification.json": "5d6b37ab571f038d1ccb4944351c27d04b39674906812593d9b526bd29f69927",
+    "periodic/README.md": "f43451acf92efa449efa3339f6c8708cd443a3542d9e710b04f872597372e31b",
+    "periodic/REVIEW.md": "02be299502acaff4dfe83fa9947d8cb01d6d9dfd7b78b06e4dc508e80bc2343a",
+    "comparison/candidates/intermediate.json": "3dbaf98e8acd7ab8abb21a09bab1779a57edf14284d3287a69d669985e6bb933",
+    "verify.py": "9523bf9430f4fdbdf3de48e5f3e75bc5da5ef1bbebade05d79cf13fd70d7ee2a"
+  },
+  "commands": [
+    "node research/hsm-counter/generate-periodic.mjs NEW_OUTPUT_PATH",
+    "python3 research/hsm-counter/verify_periodic.py research/hsm-counter/periodic/witness.json",
+    "python3 -m unittest discover -s research/hsm-counter -p 'test_*.py' -v"
+  ],
+  "independentReview": "periodic/REVIEW.md",
+  "regressionTestMethods": 9,
+  "negativeControls": 32
+}
