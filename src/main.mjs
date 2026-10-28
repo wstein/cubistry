@@ -73,6 +73,12 @@ function controlsUi() {
   $("timer-mode").disabled = !ready;
   $("timer-speed").disabled = !ready;
   $("timer-duration-setting").hidden = clock.mode === "stopwatch";
+  text(
+    "timer-bounds",
+    clock.mode === "stopwatch"
+      ? "Completed 10-second intervals · limit 59:50"
+      : "00:00–59:50 · 10-second steps",
+  );
   if (application !== "timer") $("timer-sync").hidden = true;
   $("reset-session-moves").disabled =
     !ready ||
