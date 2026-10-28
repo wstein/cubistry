@@ -61,7 +61,8 @@ function controlsUi() {
   $("timer-controls").hidden = application !== "timer";
   $("timer-pause").disabled = !ready || !clock.running || clock.elapsed;
   $("timer-start").disabled = !ready || clock.running || clock.elapsed;
-  $("timer-start").textContent = timerStarted ? "Resume" : "Start";
+  $("timer-start").textContent =
+    timerStarted && !clock.elapsed ? "Resume" : "Start";
   $("timer-set-duration").disabled = !ready;
   $("timer-duration").disabled = !ready;
   $("reset-session-moves").disabled =

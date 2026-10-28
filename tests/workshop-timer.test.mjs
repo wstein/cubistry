@@ -134,7 +134,13 @@ test("actual fifteen-minute countdown commits 331 HTM, 90 edges and 91 displays 
   mkdirSync("test-results", { recursive: true });
   writeFileSync(
     "test-results/workshop-timer-commits.json",
-    JSON.stringify({ print: route.print, start, startValue: 90, transitions }),
+    JSON.stringify({
+      kind: "countdown",
+      print: route.print,
+      start,
+      startValue: 90,
+      transitions,
+    }),
   );
 });
 test("timer arbitrary/catch-up/reset uses shared solver and full-state-only route eligibility", async () => {

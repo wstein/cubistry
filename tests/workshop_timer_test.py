@@ -20,3 +20,14 @@ class TimerControls(unittest.TestCase):
  def test_hidden_actual_pose(self):
   d=json.loads(self.trace.read_text());d['transitions'][0]['state']['cubies'][0]['position']=[1,1,1];self.trace.write_text(json.dumps(d))
   with self.assertRaises(AssertionError):V.check(self.trace)
+
+ def test_duplicate_or_reordered_countdown(self):
+  for values in ([89]*89+[0],list(range(88,-1,-1))+[0]):
+   d=json.loads(self.trace.read_text())
+   for t,value in zip(d['transitions'],values):t['value']=value
+   self.trace.write_text(json.dumps(d))
+   with self.assertRaises(AssertionError):V.check(self.trace)
+
+ def test_missing_countdown_display(self):
+  d=json.loads(self.trace.read_text());d['transitions'].pop();self.trace.write_text(json.dumps(d))
+  with self.assertRaises(AssertionError):V.check(self.trace)
