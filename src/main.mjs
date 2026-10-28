@@ -34,7 +34,7 @@ let application = "certified",
 let durationDirty = false,
   configuredSeconds = 900;
 const clock = new WorkshopClock();
-const timerScheduler = new TimerScheduler(() => tick());
+const timerScheduler = new TimerScheduler(() => tick(), () => clock.snapshot());
 let effectiveMoveDuration = 250;
 const error = (message = "") => {
   $("error").textContent = message;
@@ -297,11 +297,11 @@ function text(id, value) {
   if ($(id).textContent !== value) $(id).textContent = value;
 }
 function timerUi() {
-  const logical = clock.bucket,
+  const snapshot = clock.snapshot();
+  const logical = snapshot.bucket,
     physical = view?.currentValue ?? logical;
   text("timer-logical", formatTimer(logical));
   text("timer-physical", formatTimer(physical));
-  const snapshot = clock.snapshot();
   const motion = timerMotion({
     physical,
     logical,
