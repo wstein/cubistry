@@ -265,3 +265,133 @@ test("transition estimates use the actual retained source pose and physical prog
     assert(sameState(c.physicalState, sourcePose(design, next)));
   }
 });
+// Synthetic upright print isolates route-planner contracts from the date corpus.
+const uprightPlannerDesign = () => ({
+  ...designs[0],
+  printing: designs[0].printing.map((s) => ({
+    ...s,
+    up: Math.abs(s.n[1]) === 1 ? [0, 0, -s.n[1]] : [0, 1, 0],
+  })),
+});
+test("checked async plans are cached by exact pose and retain noncanonical hidden-state references", async () => {
+  const design = uprightPlannerDesign(),
+    initial = {
+      weekday: 0,
+      month: 1,
+      day: 1,
+      cells: front(design.printing).map((s) => s.image),
+      word: "",
+    };
+  const target = {
+    ...initial,
+    cells: front(apply(design.printing, "y")).map((s) => s.image),
+    word: "y R L R' L'",
+  };
+  const following = {
+    ...initial,
+    cells: front(apply(design.printing, "y2")).map((s) => s.image),
+    word: "y2",
+  };
+  let physical,
+    resolveFirst,
+    calls = 0;
+  const moves = [];
+  const c = new CalendarController(
+    design,
+    initial,
+    {
+      configure(_d, s) {
+        physical = s;
+      },
+      async animate(from, token, to) {
+        assert(sameState(physical, from));
+        assert(sameState(apply(from, token), to));
+        physical = to;
+        moves.push(token);
+      },
+    },
+    () => {},
+    async (context) => {
+      calls++;
+      assert(
+        sameState(apply(design.printing, context.sourceWord), context.from),
+      );
+      if (context.target === target)
+        return await new Promise((resolve) => (resolveFirst = resolve));
+      return "Q"; // Invalid solver output must choose the checked legal fallback.
+    },
+  );
+  assert.equal(c.estimate(target), null);
+  const prepared = c.prepare(target);
+  assert.equal(c.estimate(target), null);
+  resolveFirst("y B");
+  assert.deepEqual(await prepared, { htm: 1, rotations: 1 });
+  assert.deepEqual(c.estimate(target), { htm: 1, rotations: 1 });
+  c.request(target);
+  while (c.busy) await new Promise((r) => setImmediate(r));
+  assert.equal(calls, 1);
+  assert.deepEqual(moves, ["y", "B"]);
+  assert(sameState(physical, apply(design.printing, "y B")));
+  assert(!sameState(physical, sourcePose(design, target)));
+  assert.equal(c.progress.route, "optimized");
+  const nextEstimate = await c.prepare(following);
+  assert.deepEqual(nextEstimate, { htm: 1, rotations: 1 });
+  c.request(following);
+  while (c.busy) await new Promise((r) => setImmediate(r));
+  assert(sameState(physical, sourcePose(design, following)));
+  assert.equal(c.progress.route, "fallback");
+  assert.deepEqual(c.progress.completed, nextEstimate);
+  assert.equal(calls, 2);
+});
+test("asynchronous preparation is discarded after the physical source changes", async () => {
+  const design = uprightPlannerDesign(),
+    initial = {
+      weekday: 0,
+      month: 1,
+      day: 1,
+      cells: front(design.printing).map((s) => s.image),
+      word: "",
+    };
+  const first = {
+    ...initial,
+    cells: front(apply(design.printing, "y")).map((s) => s.image),
+    word: "y",
+  };
+  const next = {
+    ...initial,
+    cells: front(apply(design.printing, "y2")).map((s) => s.image),
+    word: "y2",
+  };
+  let release,
+    firstCall = true,
+    physical;
+  const c = new CalendarController(
+    design,
+    initial,
+    {
+      configure(_d, s) {
+        physical = s;
+      },
+      async animate(from, token, to) {
+        assert(sameState(physical, from));
+        physical = to;
+      },
+    },
+    () => {},
+    async (context) => {
+      if (context.target === first && firstCall) {
+        firstCall = false;
+        return await new Promise((resolve) => (release = resolve));
+      }
+      return context.fallbackWord;
+    },
+  );
+  const stale = c.prepare(first);
+  c.request(next);
+  while (c.busy) await new Promise((r) => setImmediate(r));
+  release("y");
+  assert.equal(await stale, null);
+  assert.equal(c.estimate(first), null);
+  assert(sameState(physical, sourcePose(design, next)));
+  assert.deepEqual(await c.prepare(first), { htm: 0, rotations: 1 });
+});
