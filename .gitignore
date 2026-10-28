@@ -11,3 +11,8 @@ lib/
 
 # Rebuilt, integrity-pinned shared solver dependency; never version source/table.
 .puzlwerk-dependency/
+
+# Integrity-pinned five-second Research evidence and derived runtime certificate.
+.five-second-research/
+public/five-second-timer.v1.json
+work/

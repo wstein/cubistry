@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/wstein/cubistry.git",
+  "commit": "a768d810b483837a171d9cf8f94c3cc5c8ed868c",
+  "runtime": "research/five-second-timer/optimized-runtime.json",
+  "sha256": {
+    "research/five-second-timer/optimized-runtime.json": "fe46391d03877698633d87b5874763362f0c626ef83cade74d7c32656e990865",
+    "research/five-second-timer/optimized-certificate.json": "6eaf8b36a585338d8536c0f84b24b1924488de0086eac623f4e937373c363b89",
+    "research/five-second-timer/certificate.json": "629bce3f88b434798b5067a59ea3f3675e3a2ece5eecadafcce0e840f215384c",
+    "research/five-second-timer/verify.py": "db5137a0c4d74567af91cf3cc406944306d8c2c1d5fb54c4133d896470f166a7",
+    "research/five-second-timer/upper_bound.py": "3684f72e865af7cad2829f8c4fb71c7c6ab4701f578dba8a4a523177b7ad743d",
+    "research/five-second-timer/physical_replay.py": "c174e332a72bd0607f3308f88cf4bfe3d85c46167f3c53574bd721470123af7a",
+    "research/five-second-timer/verify_trace.py": "fbe53e9b1ffab489c0a52eb494d4a0287b5b358ec088a903376cfe7fa1687472",
+    "research/five-second-timer/test_verify.py": "922256be0e0601aa047d6e088bab361cffe50ee472172875c62aed32d71cb8db",
+    "research/timer-2x2/verify.py": "01a1810a0d14f87f49a1d701ec992d8ea089214261f055cea7de7ee2a40f7f2b",
+    "research/timer-2x2/optimization/verify.py": "5a30e0736f575a5235a4a97028cd19e195a1cb13b705cf9f5940076d4e597058"
+  }
+}
