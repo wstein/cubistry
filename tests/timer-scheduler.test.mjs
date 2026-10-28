@@ -87,3 +87,22 @@ test("Start or Resume during initial manual settling has no late boundary until 
   s.tick(snapshot(100),c,250,()=>{});assert.equal(s.warning,"");
   s.tick(snapshot(10000,20000,89),c,250,()=>{});assert.equal(s.warning,"Late");s.invalidate();
 });
+test("fitting initial manual settlement preserves preferred speed and slow initial paths adapt once", () => {
+  for(const preferred of [250,10,2000]) {
+    const s=new TimerScheduler(),{c}=mock();c.busy=true;c.progress.target=90;let effective;
+    s.tick(snapshot(0),c,preferred,v=>effective=v);
+    assert.equal(effective,preferred===2000 ? 923.4 : preferred);
+    const first=effective;c.progress.completed=1;
+    s.tick(snapshot(100),c,preferred,v=>effective=v);
+    assert.equal(effective,first);assert.equal(s.warning,"");s.invalidate();
+  }
+});
+test("terminal deadline misses retain minimum catch-up speed while manual settling keeps preference", () => {
+  const s=new TimerScheduler(),{c}=mock();let effective;
+  c.busy=true;c.progress.target=90;
+  s.tick({at:0,bucket:90,running:false,next:null},c,250,v=>effective=v);
+  assert.equal(effective,250);assert.equal(s.warning,"");
+  c.busy=false;s.invalidate();s.tick(snapshot(9000),c,2000,v=>effective=v);
+  s.tick({at:11000,bucket:89,running:false,next:null},c,2000,v=>effective=v);
+  assert.equal(effective,10);assert.equal(s.warning,"Late");s.invalidate();
+});

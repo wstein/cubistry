@@ -32,6 +32,7 @@ export class TimerScheduler {
   private wake: ReturnType<typeof setTimeout> | null = null;
   private lastBucket: number | null = null;
   private missedBoundary = false;
+  private initial: { target: number; total: number; preferred: number; deadline: number; effective: number; feasible: boolean } | null = null;
   private readonly refresh: () => void;
   private readonly readClock?: () => ClockSnapshot;
   constructor(refresh: () => void = () => {}, readClock?: () => ClockSnapshot) {
@@ -41,7 +42,7 @@ export class TimerScheduler {
   invalidate(): void {
     if (this.wake !== null) clearTimeout(this.wake);
     this.wake = null; this.plan = null; this.warning = "";
-    this.lastBucket = null; this.missedBoundary = false;
+    this.lastBucket = null; this.missedBoundary = false; this.initial = null;
   }
   /** A future target is intentional only while it remains the next clock bucket. */
   presentationTarget(snapshot: ClockSnapshot): number | null {
@@ -62,7 +63,7 @@ export class TimerScheduler {
       const missedDeadline = this.missedBoundary || this.warning === "Late" || !!(p && at >= p.deadline);
       this.invalidate();
       if (missedDeadline && (controller.currentValue !== bucket || controller.busy)) this.warning = "Late";
-      setDuration(preferred);
+      setDuration(missedDeadline && (controller.currentValue !== bucket || controller.busy) ? MIN_MOVE_MS : preferred);
       if (controller.currentValue !== bucket || controller.busy) this.request(controller, bucket);
       return;
     }
@@ -83,12 +84,26 @@ export class TimerScheduler {
         setDuration(at >= p.deadline ? MIN_MOVE_MS : p.effective);
         this.warning = !p.feasible ? "Budget infeasible" : at >= p.deadline ? "Late" : "";
       } else {
-        setDuration(MIN_MOVE_MS);
-        this.warning = this.missedBoundary ? "Late" : "";
+        if (!this.missedBoundary && next && controller.progress.target === bucket) {
+          const remaining = Math.max(1, controller.progress.total - controller.progress.completed);
+          const initial = this.initial;
+          if (!initial || initial.target !== bucket || initial.total !== controller.progress.total ||
+            initial.preferred !== preferred || Math.abs(initial.deadline - next.deadline) > 0.01) {
+            const budget = planSequence(remaining, preferred, next.interval, next.deadline - at);
+            this.initial = { target: bucket, total: controller.progress.total, preferred,
+              deadline: next.deadline, effective: budget.effective, feasible: budget.feasible };
+          }
+          setDuration(this.initial!.effective);
+          this.warning = this.initial!.feasible ? "" : "Budget infeasible";
+        } else {
+          setDuration(MIN_MOVE_MS);
+          this.warning = this.missedBoundary ? "Late" : "";
+        }
         this.request(controller, bucket);
       }
       return;
     }
+    this.initial = null;
     if (controller.currentValue !== bucket && controller.currentValue !== next?.target) {
       this.plan = null;
       this.warning = this.missedBoundary ? "Late" : "";
