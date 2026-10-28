@@ -53,15 +53,13 @@ async function chooseCertified(page) {
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
-    const configure = CubeViewer.prototype.configure,
-      animate = CubeViewer.prototype.animate;
+    const animate = CubeViewer.prototype.animate;
     window.executed = [];
-    CubeViewer.prototype.configure = function (print, state, assets) {
-      window.configuredPrint = print;
-      window.configuredStart = state;
-      return configure.call(this, print, state, assets);
-    };
     CubeViewer.prototype.animate = async function (p) {
+      if (!window.configuredPrint) {
+        window.configuredPrint = this.presentedPrint;
+        window.configuredStart = p.from;
+      }
       await animate.call(this, p);
       window.executed.push(p);
     };
@@ -81,85 +79,87 @@ const go = async (page, value) => {
   );
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 };
-test("optimized permanent print executes all 99 adjacent transitions with exactly 339 committed HTM", async ({
-  page,
-}) => {
-  test.setTimeout(120000);
-  const errors = [];
-  page.on("pageerror", (e) => errors.push(e.message));
-  await chooseCertified(page);
-  await expect(page.locator("#session-moves")).toHaveText("0");
-  const transitions = [];
-  let offset = 0;
-  for (let value = 1; value <= 99; value++) {
-    await page.locator('[data-delta="1"]').click();
-    await expect(page.locator("#cube")).toHaveAttribute(
-      "data-value",
-      String(value),
-    );
-    await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-    const moves = await page.evaluate(
-      (offset) => window.executed.slice(offset),
-      offset,
-    );
-    expect(moves.length).toBeGreaterThan(0);
-    expect(moves.length).toBeLessThanOrEqual(5);
-    offset += moves.length;
-    transitions.push({
-      value,
-      word: moves
-        .map(
-          (p) =>
-            p.move.face +
-            (p.move.turns === 2 ? "2" : p.move.turns === -1 ? "'" : ""),
-        )
-        .join(" "),
-      state: moves.at(-1).to,
-    });
-    if ([42, 99].includes(value)) {
-      const img = PNG.sync.read(
-        await page.locator("#cube canvas").screenshot(),
+for (const leadingZero of [true, false])
+  test(`optimized permanent print executes all 99 adjacent transitions with exactly 339 committed HTM (leading zero ${leadingZero})`, async ({
+    page,
+  }) => {
+    test.setTimeout(120000);
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    await chooseCertified(page);
+    if (!leadingZero) await page.locator("#format").uncheck();
+    await expect(page.locator("#session-moves")).toHaveText("0");
+    const transitions = [];
+    let offset = 0;
+    for (let value = 1; value <= 99; value++) {
+      await page.locator('[data-delta="1"]').click();
+      await expect(page.locator("#cube")).toHaveAttribute(
+        "data-value",
+        String(value),
       );
-      for (const [digit, center] of [
-        [Math.floor(value / 10), -0.52],
-        [value % 10, 0.52],
-      ]) {
-        const actual = renderedDigit(img, center);
-        expect(actual.segments).toBe(active[digit]);
-        expect(actual.uprightBaseline).toBe(true);
+      await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+      const moves = await page.evaluate(
+        (offset) => window.executed.slice(offset),
+        offset,
+      );
+      expect(moves.length).toBeGreaterThan(0);
+      expect(moves.length).toBeLessThanOrEqual(5);
+      offset += moves.length;
+      transitions.push({
+        value,
+        word: moves
+          .map(
+            (p) =>
+              p.move.face +
+              (p.move.turns === 2 ? "2" : p.move.turns === -1 ? "'" : ""),
+          )
+          .join(" "),
+        state: moves.at(-1).to,
+      });
+      if ([42, 99].includes(value)) {
+        const img = PNG.sync.read(
+          await page.locator("#cube canvas").screenshot(),
+        );
+        for (const [digit, center] of [
+          [Math.floor(value / 10), -0.52],
+          [value % 10, 0.52],
+        ]) {
+          const actual = renderedDigit(img, center);
+          expect(actual.segments).toBe(active[digit]);
+          expect(actual.uprightBaseline).toBe(true);
+        }
       }
     }
-  }
-  expect(offset).toBe(339);
-  await expect(page.locator("#session-moves")).toHaveText("339");
-  const initial = await page.evaluate(() => ({
-    print: window.configuredPrint,
-    start: window.configuredStart,
-  }));
-  expect(initial.print).toBeDefined();
-  expect(initial.start).toBeDefined();
-  writeFileSync(
-    "/tmp/cubistry-certified-browser-commits.json",
-    JSON.stringify({ ...initial, transitions }),
-  );
-  const verified = JSON.parse(
-    execFileSync(
-      "python3",
-      [
-        "research/certified-counter/verify.py",
-        "/tmp/cubistry-certified-browser-commits.json",
-      ],
-      { encoding: "utf8" },
-    ),
-  );
-  expect(verified.actualCommittedHTM).toBe(339);
-  await page.screenshot({
-    path: "/tmp/cubistry-certified-99.png",
-    fullPage: true,
+    expect(offset).toBe(339);
+    await expect(page.locator("#session-moves")).toHaveText("339");
+    const initial = await page.evaluate(() => ({
+      print: window.configuredPrint,
+      start: window.configuredStart,
+    }));
+    expect(initial.print).toBeDefined();
+    expect(initial.start).toBeDefined();
+    writeFileSync(
+      "/tmp/cubistry-certified-browser-commits.json",
+      JSON.stringify({ ...initial, transitions }),
+    );
+    const verified = JSON.parse(
+      execFileSync(
+        "python3",
+        [
+          "research/certified-counter/verify.py",
+          "/tmp/cubistry-certified-browser-commits.json",
+        ],
+        { encoding: "utf8" },
+      ),
+    );
+    expect(verified.actualCommittedHTM).toBe(339);
+    await page.screenshot({
+      path: "/tmp/cubistry-certified-99.png",
+      fullPage: true,
+    });
+    expect(errors).toEqual([]);
   });
-  expect(errors).toEqual([]);
-});
-test("optimized arbitrary jump returns to certified state, reset and original print remain independent on mobile", async ({
+test("optimized arbitrary jump returns to certified state, reset and screen formatting remain independent on mobile", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -183,7 +183,7 @@ test("optimized arbitrary jump returns to certified state, reset and original pr
   await expect(page.locator("#application")).toHaveValue("certified");
   await page.locator("#format").uncheck();
   await expect(page.locator("#application")).toBeEnabled();
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "79");
   await expect(page.locator("#session-moves")).toHaveText("0");
   expect(
     await page.evaluate(
