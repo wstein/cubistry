@@ -15,7 +15,8 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: counter-pages-publish
+  # An inactive workflow must not evict a pending legacy production deployment.
+  group: ${{ vars.PAGES_PREVIEWS_ENABLED == 'true' && 'counter-pages-publish' || format('disabled-pages-preview-{0}', github.run_id) }}
   cancel-in-progress: false
 
 jobs:
