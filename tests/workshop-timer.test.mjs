@@ -176,3 +176,56 @@ test("timer route rejects unsupported versions, counterfeit identities and damag
     assert.throws(() => validateTimerRoute(d));
   }
 });
+
+test("one virtual clock supports Stopwatch floor granularity, fractional pause, rate changes and terminal cap", () => {
+  let now = 0;
+  const c = new WorkshopClock(() => now);
+  c.setMode("stopwatch");
+  assert.equal(c.bucket, 0);
+  c.start();
+  now = 9999;
+  assert.equal(c.bucket, 0);
+  now = 10000;
+  assert.equal(c.bucket, 1);
+  now = 12500;
+  c.pause();
+  now = 50000;
+  assert.equal(c.valueMs, 12500);
+  c.setSpeed(10);
+  c.start();
+  now += 750;
+  assert.equal(c.bucket, 2);
+  assert.equal(c.valueMs, 20000);
+  c.setSpeed(100);
+  now += 40000;
+  assert.equal(c.bucket, 359);
+  assert.equal(c.elapsed, true);
+  assert.equal(c.running, false);
+  c.reset();
+  assert.equal(c.bucket, 0);
+  assert.equal(c.speed, 100);
+  c.setMode("countdown");
+  assert.equal(c.bucket, 90);
+  assert.equal(c.running, false);
+  for (const rate of [0, 2, NaN, Infinity])
+    assert.throws(() => c.setSpeed(rate));
+});
+test("accelerated countdown retains an absolute deadline across speed changes without rounding away fractions", () => {
+  let now = 0;
+  const c = new WorkshopClock(() => now);
+  c.configure(60);
+  c.start();
+  now = 1250;
+  c.setSpeed(10);
+  assert.equal(c.remainingMs, 58750);
+  now += 5000;
+  assert.equal(c.remainingMs, 8750);
+  c.pause();
+  now += 100000;
+  assert.equal(c.remainingMs, 8750);
+  c.setSpeed(20);
+  c.start();
+  now += 437.5;
+  assert.equal(c.bucket, 0);
+  assert.equal(c.elapsed, true);
+});
