@@ -10,7 +10,7 @@
     "proof": "node research/counter/generate.mjs && python3 research/counter/verify.py",
     "test:proof": "python3 -m unittest discover -s tests -p \"*_test.py\"",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm test && npm run test:proof && python3 research/counter/verify.py && python3 research/architecture/verify_design.py && python3 research/certified-counter/verify.py && npm run build && npm run test:timer-proof",
+    "check": "npm run typecheck && npm test && npm run test:proof && python3 research/counter/verify.py && python3 research/architecture/verify_design.py && python3 research/certified-counter/verify.py && npm run build && npm run test:timer-proof && npm run test:five-second-proof",
     "typecheck": "npm run build:core && tsc --noEmit",
     "build:design": "npm run build:core && node research/architecture/build_counter_design.mjs",
     "build:core": "rescript build",
@@ -24,7 +24,8 @@
     "predev": "npm run prepare:five-second",
     "prebuild": "npm run prepare:five-second",
     "pretest": "npm run prepare:five-second",
-    "pretypecheck": "npm run prepare:five-second"
+    "pretypecheck": "npm run prepare:five-second",
+    "test:five-second-proof": "npm run prepare:five-second && python3 .five-second-research/research/five-second-timer/verify.py .five-second-research/research/five-second-timer/optimized-certificate.json && python3 .five-second-research/research/five-second-timer/physical_replay.py .five-second-research/research/five-second-timer/optimized-certificate.json && python3 -m unittest discover -s .five-second-research/research/five-second-timer -p test_verify.py && python3 .five-second-research/research/five-second-timer/verify_trace.py test-results/five-second-commits.json"
   },
   "dependencies": {
     "@cubistry/cube-assets": "*",
