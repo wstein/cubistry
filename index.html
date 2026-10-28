@@ -21,6 +21,7 @@
           <select id="application">
             <option value="certified">Counter 0–99</option>
             <option value="timer">60-Minute Timer</option>
+            <option value="five-second-timer">5-Second Timer</option>
           </select>
         </div>
       </header>
@@ -170,7 +171,7 @@
           aria-label="60-Minute Timer controls"
           hidden
         >
-          <h1>60-Minute Timer</h1>
+          <h1 id="timer-heading">60-Minute Timer</h1>
           <label for="timer-mode">Mode</label>
           <select id="timer-mode">
             <option value="countdown">Countdown</option>

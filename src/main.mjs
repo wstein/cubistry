@@ -1,5 +1,7 @@
 import {
   WorkshopClock,
+  TEN_SECOND_TIMER,
+  FIVE_SECOND_TIMER,
   formatTimer,
   formatLiveTimer,
   parseDuration,
@@ -7,7 +9,7 @@ import {
 import { TimerController } from "./apps/timer/controller.ts";
 import { TimerScheduler } from "./apps/timer/scheduler.ts";
 import { timerMotion } from "./apps/timer/status.ts";
-import { loadTimerRoute } from "./apps/timer/design.ts";
+import { loadTimerRoute, loadFiveSecondRoute } from "./apps/timer/design.ts";
 import { CounterRun } from "./apps/counter/run.mjs";
 import { SequenceNumber } from "./apps/shared/sequence-number.ts";
 import { loadCertifiedCounter } from "./apps/counter/certified.ts";
@@ -31,17 +33,20 @@ let ready = false,
 let padded = true;
 let application = "certified",
   timerRoute,
+  fiveSecondRoute,
   timerStarted = false;
 let durationDirty = false,
   configuredSeconds = 900;
-const clock = new WorkshopClock();
+let clock = new WorkshopClock();
+const isTimer = () => application === "timer" || application === "five-second-timer";
+const formatTime = (bucket) => formatTimer(bucket, clock.profile);
 const timerScheduler = new TimerScheduler(() => tick(), () => clock.snapshot());
 let effectiveMoveDuration = 250;
 const error = (message = "") => {
   $("error").textContent = message;
 };
 function save() {
-  if (application === "timer") return;
+  if (isTimer()) return;
   try {
     localStorage.setItem(
       "cubistry-counter-v2",
@@ -66,9 +71,9 @@ function controlsUi() {
     !ready ||
     !!view?.busy ||
     run.running ||
-    (application === "timer" && clock.running && !clock.elapsed);
-  $("counter-controls").hidden = application === "timer";
-  $("timer-controls").hidden = application !== "timer";
+    (isTimer() && clock.running && !clock.elapsed);
+  $("counter-controls").hidden = isTimer();
+  $("timer-controls").hidden = !isTimer();
   $("timer-start").disabled = !ready || (clock.elapsed && !durationDirty);
   $("timer-start").textContent = clock.running
     ? "Pause"
@@ -85,14 +90,14 @@ function controlsUi() {
     "timer-bounds",
     clock.mode === "stopwatch"
       ? "Cube: 10-second steps · limit 59:50"
-      : "00:00–59:50 · 10-second steps",
+      : `00:00–${formatTime(clock.profile.maxSeconds / clock.profile.stepSeconds)} · ${clock.profile.stepSeconds}-second steps`,
   );
-  $("timer-sync").hidden = application !== "timer";
+  $("timer-sync").hidden = !isTimer();
   $("reset-session-moves").disabled =
     !ready ||
     !!view?.busy ||
     run.running ||
-    (application === "timer" && clock.running && !clock.elapsed);
+    (isTimer() && clock.running && !clock.elapsed);
   $("format").disabled = !ready;
 
   const active = run.running || !!view?.busy;
@@ -146,17 +151,17 @@ const onPhysicalState = (physical, busy, failure, progress) => {
   }
   $("cube").setAttribute("aria-busy", String(busy));
   $("cube").dataset.value =
-    application === "timer" ? formatTimer(physical) : String(physical);
+    isTimer() ? formatTime(physical) : String(physical);
   $("cube").dataset.application = application;
   if (failure) {
     ready = false;
     run.stop();
-    if (application === "timer") { clock.pause(); timerScheduler.invalidate(); }
+    if (isTimer()) { clock.pause(); timerScheduler.invalidate(); }
     error(
       "The cube could not complete its legal turn sequence. Reload to recover.",
     );
   }
-  if (application === "timer") {
+  if (isTimer()) {
     timerUi();
     controlsUi();
     return;
@@ -222,7 +227,7 @@ $("reset-session-moves").addEventListener("click", () =>
 );
 // This screen-only field rule never selects a different permanent print or solver.
 function formatUi() {
-  if (application === "timer") {
+  if (isTimer()) {
     viewer.setFaceletImageOverride(null);
     return;
   }
@@ -246,9 +251,9 @@ $("format").addEventListener("change", () =>
 );
 function speedUi() {
   const stop = Number($("rotation-speed").value);
-  if (application !== "timer" || !ready)
+  if (!isTimer() || !ready)
     viewer?.setAnimationSpeed(BASE_MOVE_DURATION_MS / durations[stop]);
-  $("speed-label").textContent = application === "timer"
+  $("speed-label").textContent = isTimer()
     ? `${speedLabels[stop]} preferred` : `${speedLabels[stop]} per HTM move`;
   $("rotation-speed").setAttribute(
     "aria-valuetext",
@@ -257,12 +262,12 @@ function speedUi() {
 }
 $("rotation-speed").addEventListener("input", () => {
   speedUi();
-  if (application === "timer") tick();
+  if (isTimer()) tick();
   save();
 });
 function tick() {
   if (!ready) return;
-  if (application === "timer") {
+  if (isTimer()) {
     timerScheduler.tick(clock.snapshot(), view, durations[Number($("rotation-speed").value)],
       duration => {
         effectiveMoveDuration = duration;
@@ -285,7 +290,7 @@ window.addEventListener("keydown", (event) => {
       event.target.tagName,
     ) ||
     !ready ||
-    application === "timer"
+    isTimer()
   )
     return;
   const steps = { ArrowUp: 1, ArrowDown: -1, PageUp: 10, PageDown: -10 };
@@ -302,7 +307,7 @@ function timerUi() {
   const logical = snapshot.bucket,
     physical = view?.currentValue ?? logical;
   text("timer-logical", formatLiveTimer(snapshot.liveSeconds));
-  text("timer-physical", formatTimer(physical));
+  text("timer-physical", formatTime(physical));
   const motion = timerMotion({
     physical,
     logical,
@@ -320,7 +325,7 @@ function timerUi() {
   $("timer-last-settled").hidden = motion !== "synchronizing";
   text("timer-effective", `${Math.round(effectiveMoveDuration)} ms effective`);
   $("timer-effective").hidden = motion === "idle" && !timerScheduler.warning;
-  $("timer-sync").hidden = application !== "timer";
+  $("timer-sync").hidden = !isTimer();
   const phase = clock.elapsed
     ? settling
       ? "Elapsed · settling"
@@ -347,17 +352,17 @@ function reconcileTimer() {
   view.request(clock.bucket);
 }
 function applyDuration() {
-  const seconds = parseDuration($("timer-duration").value);
+  const seconds = parseDuration($("timer-duration").value, clock.profile);
   clock.configure(seconds);
   configuredSeconds = seconds;
   durationDirty = false;
   timerStarted = false;
-  $("timer-duration").value = formatTimer(seconds / 10);
+  $("timer-duration").value = formatTime(seconds / clock.profile.stepSeconds);
   reconcileTimer();
 }
 $("timer-start").addEventListener("click", () =>
   action(() => {
-    if (!ready || application !== "timer") return;
+    if (!ready || !isTimer()) return;
     if (clock.running) {
       clock.pause();
       reconcileTimer();
@@ -374,11 +379,11 @@ $("timer-start").addEventListener("click", () =>
 );
 $("timer-reset").addEventListener("click", () =>
   action(() => {
-    if (!ready || application !== "timer") return;
+    if (!ready || !isTimer()) return;
     clock.reset();
     timerStarted = false;
     durationDirty = false;
-    $("timer-duration").value = formatTimer(configuredSeconds / 10);
+    $("timer-duration").value = formatTime(configuredSeconds / clock.profile.stepSeconds);
     reconcileTimer();
     timerUi();
     controlsUi();
@@ -387,7 +392,7 @@ $("timer-reset").addEventListener("click", () =>
 $("timer-duration-form").addEventListener("submit", (event) => {
   event.preventDefault();
   action(() => {
-    if (!ready || application !== "timer" || clock.running) return;
+    if (!ready || !isTimer() || clock.running) return;
     applyDuration();
     timerUi();
     controlsUi();
@@ -395,11 +400,11 @@ $("timer-duration-form").addEventListener("submit", (event) => {
 });
 $("timer-mode").addEventListener("change", () =>
   action(() => {
-    if (!ready || application !== "timer") return;
+    if (!ready || !isTimer()) return;
     clock.setMode($("timer-mode").value);
     timerStarted = false;
     durationDirty = false;
-    $("timer-duration").value = formatTimer(configuredSeconds / 10);
+    $("timer-duration").value = formatTime(configuredSeconds / clock.profile.stepSeconds);
     reconcileTimer();
     timerUi();
     controlsUi();
@@ -407,7 +412,7 @@ $("timer-mode").addEventListener("change", () =>
 );
 $("timer-speed").addEventListener("change", () =>
   action(() => {
-    if (!ready || application !== "timer") return;
+    if (!ready || !isTimer()) return;
     clock.setSpeed(Number($("timer-speed").value));
     tick();
   }),
@@ -417,7 +422,7 @@ $("application").addEventListener("change", async () => {
     !ready ||
     view.busy ||
     run.running ||
-    (application === "timer" && clock.running && !clock.elapsed)
+    (isTimer() && clock.running && !clock.elapsed)
   ) {
     $("application").value = application;
     return;
@@ -433,26 +438,30 @@ $("application").addEventListener("change", async () => {
     };
     const resolveAssets = (manifest, prints, signal) =>
       loadAssets(manifest, prints, signal, import.meta.env.BASE_URL);
-    if (requested === "timer") {
-      timerRoute ??= await loadTimerRoute(import.meta.env.BASE_URL);
+    if (requested === "timer" || requested === "five-second-timer") {
+      const profile = requested === "five-second-timer" ? FIVE_SECOND_TIMER : TEN_SECOND_TIMER;
+      const route = requested === "five-second-timer"
+        ? (fiveSecondRoute ??= await loadFiveSecondRoute(import.meta.env.BASE_URL))
+        : (timerRoute ??= await loadTimerRoute(import.meta.env.BASE_URL));
       candidate = new TimerController(
         viewer,
-        timerRoute,
+        route,
         proof.assets,
         callback,
         resolveAssets,
       );
-      await candidate.configure(90);
+      await candidate.configure(profile.defaultSeconds / profile.stepSeconds);
+      clock = new WorkshopClock(undefined, profile);
       timerScheduler.invalidate();
       clock.setMode("countdown");
-      clock.configure(900);
+      clock.configure(profile.defaultSeconds);
       clock.setSpeed(1);
       $("timer-mode").value = "countdown";
       $("timer-speed").value = "1";
-      configuredSeconds = 900;
+      configuredSeconds = profile.defaultSeconds;
       durationDirty = false;
       timerStarted = false;
-      $("timer-duration").value = "15:00";
+      $("timer-duration").value = formatTime(profile.defaultSeconds / profile.stepSeconds);
     } else {
       candidate = new CounterController(viewer, proof, callback, resolveAssets);
       await candidate.configure("COUNTER", true, value, certified);
@@ -461,7 +470,10 @@ $("application").addEventListener("change", async () => {
     previous.dispose();
     view = candidate;
     application = requested;
-    $("rotation-speed").value = application === "timer" ? "3" : "4";
+    const timerName = requested === "five-second-timer" ? "5-Second Timer" : "60-Minute Timer";
+    text("timer-heading", timerName);
+    $("timer-controls").setAttribute("aria-label", `${timerName} controls`);
+    $("rotation-speed").value = isTimer() ? "3" : "4";
     speedUi();
     formatUi();
     ready = true;
