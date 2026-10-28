@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 for (const number of [52, 53])
@@ -71,4 +72,26 @@ test("production root remains present, indexable and interactive beside both pre
   expect((await request.get("pr-preview/pr-999/index.html")).status()).toBe(
     404,
   );
+});
+
+test("ambiguous raw-text documents are rejected rather than receiving an invisible preview badge", async ({
+  page,
+}) => {
+  const cases = [
+    '<html><head><script/>const sample="<body>";</script></head><div>app</div></html>',
+    "<html><head></head><iframe><body>fallback</iframe><div>app</div></html>",
+  ];
+  for (const document of cases) {
+    await page.setContent(document);
+    expect(await page.locator("body > aside").count()).toBe(0);
+    const result = execFileSync(
+      "python3",
+      [
+        "-c",
+        "import sys; from scripts.pages.extract import mark_preview\ntry: mark_preview(sys.stdin.read(),52,'a'*40)\nexcept ValueError: print('rejected')\nelse: raise AssertionError('ambiguous preview HTML accepted')",
+      ],
+      { input: document, encoding: "utf8" },
+    );
+    expect(result.trim()).toBe("rejected");
+  }
 });
