@@ -17,7 +17,12 @@ const active = [
 function renderedDigit(image, centerX) {
   const blue = ([r, g, b]) => b > r * 1.25 && b > g * 1.05;
   const sample = (px, py) => {
-    const [x, y] = frontPoint(image, centerX + (px / 256 - 0.5) * 0.87, -0.52 + (0.5 - py / 256) * 0.87), colors = [];
+    const [x, y] = frontPoint(
+        image,
+        centerX + (px / 256 - 0.5) * 0.87,
+        -0.52 + (0.5 - py / 256) * 0.87,
+      ),
+      colors = [];
     for (let dy = -2; dy <= 2; dy++)
       for (let dx = -2; dx <= 2; dx++) {
         const at = ((y + dy) * image.width + x + dx) * 4;
@@ -172,4 +177,49 @@ test("built project-path optimized print loads its pinned certificate and execut
   await expect(page.locator("#session-moves")).toHaveText("5");
   expect(errors).toEqual([]);
   expect(failures).toEqual([]);
+});
+
+test("built Pages Workshop Timer loads its immutable certificate below the project base and settles physical zero", async ({
+  page,
+}) => {
+  const errors = [],
+    requests = [],
+    failures = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("console", (m) => {
+    if (m.type() === "error") errors.push(m.text());
+  });
+  page.on("request", (r) => {
+    const u = new URL(r.url());
+    if (u.protocol === "http:" || u.protocol === "https:")
+      requests.push(u.pathname);
+  });
+  page.on("response", (r) => {
+    if (r.status() >= 400) failures.push(r.url());
+  });
+  await page.goto("./");
+  await expect(page.locator("#application")).toBeEnabled();
+  await page.selectOption("#application", "timer");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "15:00");
+  await expect(page.locator("#timer-controls")).toBeVisible();
+  await page.fill("#timer-duration", "00:10");
+  await page.click("#timer-set-duration");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "00:10");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await page.click("#timer-start");
+  await expect(page.locator("#timer-status")).toHaveText(
+    "Complete · Cube 00:00",
+    { timeout: 15000 },
+  );
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "00:00");
+  const image = PNG.sync.read(await page.locator("#cube canvas").screenshot());
+  for (const center of [-0.52, 0.52]) {
+    const digit = renderedDigit(image, center);
+    expect(digit.segments).toBe(active[0]);
+    expect(digit.uprightBaseline).toBe(true);
+  }
+  expect(requests).toContain("/cubistry/workshop-timer.v1.json");
+  expect(requests.filter((p) => !p.startsWith("/cubistry/"))).toEqual([]);
+  expect(failures).toEqual([]);
+  expect(errors).toEqual([]);
 });

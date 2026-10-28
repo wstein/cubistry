@@ -40,12 +40,20 @@ Reset freezes the clock and queues the configured initial duration. Deadline
 zero is reported as elapsed while the physical cube is still settling; completion
 requires the verified physical 00:00 state.
 
-The inherited six rotation-speed stops and camera controls are unchanged. The
+The inherited six rotation-speed stops and camera controls are unchanged. Global
+rotation speed persists even while Timer is selected; Counter value and format
+remain separate. Reload returns to the saved idle Counter and never silently
+resumes a Timer deadline. The
 current parent UI default is 250 ms per move. Slow playback at two seconds per
 move plus rendering overhead can exceed a ten-second tick for a five-move edge;
 there is no guarantee that every intermediate display is shown at that speed.
 The logical clock remains correct and the bounded latest-target policy catches
-up safely. Reduced-motion tests do not establish real animation timing budgets.
+up safely.
+
+On this cloud Chromium/SwiftShader run, actual five-move animation commitments
+took 1,453 ms at the 250 ms default, 685 ms at 100 ms, and 10,147 ms at the slow
+2,000 ms setting. These are measured observations, not hardware-independent
+guarantees; the slow edge demonstrably exceeded the ten-second tick. Reduced-motion tests do not establish real animation timing budgets.
 
 ## Reproduction
 
