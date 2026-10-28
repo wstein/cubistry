@@ -34,16 +34,59 @@ Reduced motion retains immediate physical commits and requires no hint fade.
 
 | Issue | Result under #53 | Remaining / recommendation |
 | --- | --- | --- |
-| [#42](https://github.com/wstein/cubistry/issues/42) | Chooser above both columns; certified counter default; no personalization/apply detour; exhaustive certified replay retained. | Timer and application switching remain deferred to #30. Do not close the full issue as delivered. |
+| [#42](https://github.com/wstein/cubistry/issues/42) | Shared chooser in the header above both columns; certified counter default; no personalization/apply detour; exhaustive certified replay retained. | Timer and application switching remain deferred to #30. Do not close the full issue as delivered. |
 | [#43](https://github.com/wstein/cubistry/issues/43) | One Leading Zero checkbox next to Wrap; explicit permanent-print reset; checked/blank-tens persistence and validation. | Counter portion fulfilled. Future timer-specific visibility/switching remains open. |
-| [#45](https://github.com/wstein/cubistry/issues/45) | Six exact duration stops, default 100 ms, keyboard operation, persistence and adjustment during playback. | Continuous multiplier requirement superseded by #53. Recommend marking that design superseded after review. |
+| [#45](https://github.com/wstein/cubistry/issues/45) | Six exact duration stops, default 250 ms, keyboard operation, persistence and adjustment during playback. | Continuous multiplier requirement superseded by #53. Recommend marking that design superseded after review. |
 | [#46](https://github.com/wstein/cubistry/issues/46) | Target-based Set/Run/Stop replaces Auto, with adjacent progression and bounded physical work. | UI design superseded by #53; historical code/tests retained. Recommend recording supersession after review. |
 | [#37](https://github.com/wstein/cubistry/issues/37) | Larger readable cube, distant narrow-FOV oblique camera, orbit/zoom and responsive screenshots. | Presets and broader camera controls remain outside #53. Do not close the partial issue. |
 
 No related issues are automatically closed. Custom fonts/colors (#49/#50),
 preview infrastructure (#51), and 60-minute functionality (#30) are excluded.
 
-## Before and after
+## Acceptance-feedback polish
+
+The follow-up section of Issue #53 and the maintainer's PR #54 handoff supersede
+the initial optional disclosure and 100-ms default. The same feature branch and
+existing commits are retained; the follow-up adds focused commits without
+rewriting the accepted implementation's history.
+
+- One shared application selector sits next to Cubistry in the header, wrapping
+  within the header on narrow screens. The viewer and Counter panel have the
+  same top alignment on two-column layouts.
+- Session moves and current-sequence progress use aligned label/value rows in
+  one directly visible block below the canvas, together with Current/live action
+  state and Reset session moves. No statistics overlap the cube. Move Details
+  and everyday certification/print-route jargon are removed; physical checks and
+  genuine errors remain intact.
+- Rotation Speed is the bottom-most viewer control, defaults to 250 ms, and
+  retains all six approved stops/labels. Saved speed choices are preserved;
+  saved state without a speed uses the new default.
+- Set remains adjacent to one stable-position Run/Stop button. Its text,
+  accessible name and pressed state update in place, including keyboard use.
+  While a Set/manual transition is active the same button can stop queued work.
+  Stop retains the existing complete-value semantics, then returns to Run.
+- The approved camera, Wrap/Leading Zero placement, removed Custom Step, and
+  all physical controller/solver/print/certificate bytes are unchanged.
+
+Polish screenshots use the same fresh 00 state, viewport sizes and Chromium
+settings as the earlier implementation; the earlier screenshots remain below.
+
+| View | Before acceptance polish | After acceptance polish |
+| --- | --- | --- |
+| Desktop | ![Before polish desktop](assets/issue-53/after-desktop.png) | ![Polished desktop](assets/issue-53/polished-desktop.png) |
+| Mobile | ![Before polish mobile](assets/issue-53/after-mobile.png) | ![Polished mobile](assets/issue-53/polished-mobile.png) |
+
+The follow-up retains the 54 Node and 35 Python regressions and adds eight
+browser cases (42 total), covering the stable toggle's geometry/focus/accessible
+state, header fit, visible/aligned statistics, paired checkboxes at widths
+1440/768/390/320, speed defaults, and saved speed preferences. The animated
+queue test still checks every committed count and queued target; its completion
+budget now accounts for 21 remaining turns at 250 ms plus rendering overhead.
+Static-path and deep-base suites run sequentially because both build `dist`.
+Final test and independent-review results are recorded in
+[PR #54](https://github.com/wstein/cubistry/pull/54).
+
+## Initial before and after
 
 Captured locally at counter value 00 with fresh storage and reduced motion,
 using system Chromium with SwiftShader. Desktop viewport: 1440 × 1000;
@@ -64,7 +107,7 @@ configuration override. CI retains the repository's pinned Playwright browser.
 
 After that main update, `npm run check` passes with 54 Node tests and 35 Python
 tests, plus typecheck, physical validators, and build. The UI browser suite
-passes 34/34, static production-path checks pass 4/4, and the unchanged preview
+initially passed 34/34, static production-path checks pass 4/4, and the unchanged preview
 browser suite now on main passes 4/4. The canonical browser traversal still
 independently replays exactly 339 HTM with a maximum of five per adjacent edge.
 
