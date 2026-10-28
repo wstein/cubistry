@@ -1,0 +1,70 @@
+{
+  "kind": "foreground-real-clock",
+  "frameAllowanceMs": 75,
+  "dispatchAllowanceMs": 8,
+  "observations": [
+    {
+      "preferredMilliseconds": 250,
+      "deadline": 13318.19999999972,
+      "startedAt": 11686.600000000093,
+      "settledAt": 13069.299999999814,
+      "exactFullState": true,
+      "nominalDurations": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ],
+      "actualMoveDurations": [
+        276.29999999981374,
+        277.79999999981374,
+        264.10000000009313,
+        269.5,
+        289.70000000018626
+      ]
+    },
+    {
+      "preferredMilliseconds": 2000,
+      "deadline": 24289.899999999907,
+      "startedAt": 19294.100000000093,
+      "settledAt": 24064,
+      "exactFullState": true,
+      "nominalDurations": [
+        923.4000000000001,
+        923.4000000000001,
+        923.4000000000001,
+        923.4000000000001,
+        923.4000000000001
+      ],
+      "actualMoveDurations": [
+        967.1999999997206,
+        943.8999999999069,
+        938.9000000003725,
+        963.8000000002794,
+        952.6000000000931
+      ]
+    },
+    {
+      "preferredMilliseconds": 10,
+      "deadline": 35140.799999999814,
+      "startedAt": 34709,
+      "settledAt": 34945,
+      "exactFullState": true,
+      "nominalDurations": [
+        10,
+        10,
+        10,
+        10,
+        10
+      ],
+      "actualMoveDurations": [
+        43.1999999997206,
+        38.1999999997206,
+        51.60000000009313,
+        33.700000000186265,
+        67.8000000002794
+      ]
+    }
+  ]
+}
