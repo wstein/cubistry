@@ -280,3 +280,18 @@ export function sourcePose(design: Design, t: Target): State {
   demand(matches(state, t.cells), "Calendar route failed its visible target");
   return state;
 }
+/** Shift the selected civil date, preserving Gregorian semantics across DST. */
+export function shiftDate(date: CivilDate, direction: -1 | 1): CivilDate {
+  demand(
+    direction === -1 || direction === 1,
+    "Expected one day forward or backward",
+  );
+  const d = new Date(0);
+  d.setUTCFullYear(date.year, date.month - 1, date.day + direction);
+  d.setUTCHours(0, 0, 0, 0);
+  demand(
+    d.getUTCFullYear() >= 1 && d.getUTCFullYear() <= 9999,
+    "Date is outside 0001-01-01 through 9999-12-31",
+  );
+  return civilDate(d.toISOString().slice(0, 10));
+}

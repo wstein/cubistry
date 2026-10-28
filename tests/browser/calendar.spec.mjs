@@ -427,3 +427,82 @@ test("English Saturday and both Sunday source stickers stay permanently red and 
   }
   expect([...new Set(seen)].sort((a, b) => a - b)).toEqual([20, 33, 40]);
 });
+test("date picking starts legal motion immediately and day buttons preserve latest intent and counts", async ({
+  page,
+}) => {
+  await ready(page, "2024-02-28T11:00:00Z");
+  await page.evaluate(async () => {
+    const { CalendarViewer } = await import("/src/apps/calendar/viewer.ts");
+    const animate = CalendarViewer.prototype.animate;
+    window.dateMoveTrace = [];
+    let first = true;
+    CalendarViewer.prototype.animate = async function (from, token, to) {
+      if (first) {
+        first = false;
+        await new Promise((resolve) => (window.releaseCalendarMove = resolve));
+      }
+      await animate.call(this, from, token, to);
+      window.dateMoveTrace.push(token);
+    };
+  });
+  await page.fill("#calendar-date", "2024-02-29");
+  await page.locator("#calendar-date").dispatchEvent("change");
+  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
+    "aria-busy",
+    "true",
+  );
+  await expect(page.locator("#calendar-estimates")).toContainText(
+    "after motion",
+  );
+  await expect(page.locator("#calendar-moves")).not.toHaveText(
+    "0 / 0 HTM · 0 / 0 cube rotations",
+  );
+  await page.click("#calendar-increment");
+  await page.click("#calendar-increment");
+  await page.click("#calendar-decrement");
+  await expect(page.locator("#calendar-date")).toHaveValue("2024-03-01");
+  await expect(page.locator("#calendar-queue")).toContainText("queued");
+  await page.evaluate(() => window.releaseCalendarMove());
+  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
+    "aria-busy",
+    "false",
+  );
+  expect((await physical(page)).cells).toEqual([
+    "F",
+    "R",
+    "",
+    "",
+    "0",
+    "1",
+    "M",
+    "Ä",
+    "R",
+  ]);
+  const state = await page.evaluate(async () => {
+    const { calendarApp } = await import("/src/calendar.mjs");
+    return { p: calendarApp.controller.progress, trace: window.dateMoveTrace };
+  });
+  expect(state.p.completed).toEqual(state.p.total);
+  expect(state.trace.length).toBeGreaterThan(0);
+  await expect(page.locator("#calendar-estimates")).toContainText("−1 day:");
+  await expect(page.locator("#calendar-estimates")).toContainText("+1 day:");
+  const before = await physical(page);
+  await page.fill("#calendar-date", "");
+  await page.locator("#calendar-date").dispatchEvent("change");
+  await expect(page.locator("#calendar-error")).toContainText("Use YYYY-MM-DD");
+  expect(await physical(page)).toEqual(before);
+  await page.fill("#calendar-date", "0001-01-01");
+  await page.locator("#calendar-date").dispatchEvent("change");
+  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
+    "aria-busy",
+    "false",
+  );
+  await expect(page.locator("#calendar-decrement")).toBeDisabled();
+  await page.fill("#calendar-date", "9999-12-31");
+  await page.locator("#calendar-date").dispatchEvent("change");
+  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
+    "aria-busy",
+    "false",
+  );
+  await expect(page.locator("#calendar-increment")).toBeDisabled();
+});

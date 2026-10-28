@@ -14,8 +14,12 @@ import {
   findTarget,
   front,
   tokens,
+  shiftDate,
 } from "../src/apps/calendar/model.ts";
-import { CalendarController } from "../src/apps/calendar/controller.ts";
+import {
+  CalendarController,
+  countCalendarMoves,
+} from "../src/apps/calendar/controller.ts";
 const pin = JSON.parse(readFileSync("calendar-source.json", "utf8"));
 const designs = Object.keys(pin.runtime).map((file) => {
   const bytes = readFileSync("public/calendar/" + file);
@@ -92,6 +96,8 @@ test("calendar requests preserve exact poses, coalesce pending requests and prop
   c.request(next);
   c.request(d.targets[300]);
   c.request(latest);
+  assert.equal(c.progress.queued, latest);
+  assert.equal(c.estimate(initial), null);
   release();
   while (c.busy) await new Promise((r) => setImmediate(r));
   assert.equal(c.current, latest);
@@ -189,4 +195,73 @@ test("English weekend artwork is fixed red extra-bold on SAT and both SUN source
   const german = designs.find((d) => d.id === "de-a");
   assert.equal(stickerArt(german.printing[3]).weight, 600);
   assert.notEqual(stickerArt(german.printing[3]).color, "#ba302c");
+});
+test("day stepping follows Gregorian boundaries and rejects dates outside the supported domain", () => {
+  for (const [from, direction, to] of [
+    ["2024-02-28", 1, "2024-02-29"],
+    ["2024-02-29", 1, "2024-03-01"],
+    ["1900-02-28", 1, "1900-03-01"],
+    ["2000-03-01", -1, "2000-02-29"],
+    ["2026-12-31", 1, "2027-01-01"],
+    ["2027-01-01", -1, "2026-12-31"],
+    ["0001-01-02", -1, "0001-01-01"],
+    ["9999-12-30", 1, "9999-12-31"],
+  ])
+    assert.equal(shiftDate(civilDate(from), direction).iso, to);
+  assert.throws(() => shiftDate(civilDate("0001-01-01"), -1));
+  assert.throws(() => shiftDate(civilDate("9999-12-31"), 1));
+  assert.throws(() => shiftDate(civilDate("2026-01-01"), 2));
+  assert.deepEqual(countCalendarMoves("R2 U' x2 y F"), {
+    htm: 3,
+    rotations: 2,
+  });
+});
+test("transition estimates use the actual retained source pose and physical progress excludes setup", async () => {
+  for (const design of designs) {
+    const initial = findTarget(design, civilDate("2026-11-07")),
+      next = findTarget(design, civilDate("2026-11-08"));
+    let physical, release;
+    const actual = [];
+    const port = {
+      configure(_d, state) {
+        physical = state;
+      },
+      async animate(from, token, to) {
+        assert(sameState(physical, from));
+        assert(sameState(apply(from, token), to));
+        if (actual.length === 0) await new Promise((r) => (release = r));
+        actual.push(token);
+        physical = to;
+      },
+    };
+    const c = new CalendarController(design, initial, port, () => {});
+    assert.deepEqual(c.progress.completed, { htm: 0, rotations: 0 });
+    assert.deepEqual(c.progress.total, { htm: 0, rotations: 0 });
+    const estimate = c.estimate(next),
+      before = c.physicalState;
+    const alias = { ...initial, word: initial.word + " B" };
+    assert(matches(sourcePose(design, alias), initial.cells));
+    assert(!sameState(sourcePose(design, alias), before));
+    c.request(alias);
+    assert.equal(c.busy, false);
+    assert(sameState(c.physicalState, before));
+    assert.deepEqual(c.estimate(next), estimate);
+    c.request(next);
+    assert.equal(c.estimate(initial), null);
+    assert.deepEqual(c.progress.total, estimate);
+    assert.deepEqual(c.progress.completed, { htm: 0, rotations: 0 });
+    release();
+    while (c.busy) await new Promise((r) => setImmediate(r));
+    assert.deepEqual(c.progress.completed, estimate);
+    assert.deepEqual(c.progress.total, estimate);
+    assert.equal(
+      actual.filter((t) => /^[RLUDFB]/.test(t)).length,
+      estimate.htm,
+    );
+    assert.equal(
+      actual.filter((t) => /^[xyz]/.test(t)).length,
+      estimate.rotations,
+    );
+    assert(sameState(c.physicalState, sourcePose(design, next)));
+  }
 });
