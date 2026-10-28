@@ -58,21 +58,32 @@ existing digit assets. Image digests are recorded in
 [images.json](../src/apps/hsm/images.json). These are display assets; a physical
 print-sheet export is outside this change.
 
-## Three-cube clock proposal
+## Sticker lettering variants
 
-The user's intended follow-up places three copies of this print in H–M–S order,
-with the letter fixed once per cube. Number transitions, not unit changes, are
-the optimization priority. The proposed preferred durations are S: 100 ms,
-M: 250 ms, and H: 500 ms per HTM, giving general six-move motion budgets of 0.6, 1.5,
-and 3 seconds respectively. Hours are not inherently harder to solve; their
-slower presentation is a visual choice.
+Choose either a large H/M/S symbol or only the small word `hour`, `min`, or `sec`
+at the bottom of R1C2. They are separate fixed physical prints, never both on one
+sticker. The word variant replaces each entire unit image before setup; it is
+not a position-dependent overlay. Changing lettering in the single-cube counter
+installs the selected print at the current value. Choosing a new unit retains
+the existing reset-to-zero behavior.
 
-A clock should read all three targets from one time source, use independent
-physical poses and motion budgets, and time final turns to the same relevant
-second/minute/hour boundary. After a suspended tab it should replan directly
-to the current time rather than replay a backlog. Browser timing needs its own
-acceptance evidence. This PR implements the single-cube application; the
-three-cube clock remains a proposal and is not silently included in its scope.
+[Word artwork provenance](../public/assets/hsm/words/provenance.json) pins the
+local Noto Sans 600 font and maps each unit to an outlined vector path with ink
+inside the bottom safe area. Reproduce it with `python3 scripts/export-hsm-word-art.py`
+using the pinned [font tooling](../scripts/hsm-art-requirements.txt). The licensed
+font is converted to paths; the runtime SVGs need no external fonts. Geometry,
+immutable face IDs, actual blank and legal routes are shared by both variants.
+
+## Three-cube live clock
+
+The separate [live clock](LIVE_CLOCK.md), PR #64, uses one view for all three cubes.
+Its preferred H/M/S timings are 500/250/100 ms **per quarter turn**. A half turn
+uses two quarter units. Six HTM loosely permit twelve quarter units, with nominal
+H/M/S budgets of 6/3/1.2 seconds before fitting. Canonical verified upward routes
+for the selected initial cycles use at most eight quarter units; this narrower
+result does not cover arbitrary poses. The clock shows scheduled quarter/half
+times when it fits a route into the available live interval. Standalone counter
+rotation settings retain their existing per-move behavior.
 
 ## Validation
 
