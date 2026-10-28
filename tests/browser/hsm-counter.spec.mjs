@@ -24,6 +24,11 @@ async function choose(page) {
     };
   });
   await page.selectOption("#application", "hsm-counter");
+  await expect(page.locator("#cube")).toHaveAttribute(
+    "data-application",
+    "hsm-counter",
+  );
+  await expect(page.locator("#application")).toBeEnabled();
   await settled(page, 0);
 }
 async function physical(page, letter, value) {
@@ -59,6 +64,7 @@ test("all nine HSM variants wrap both ways within five moves and render fixed gl
   for (const letter of ["H", "S", "M"]) {
     await page.selectOption("#hsm-letter", letter);
     await settled(page, 0);
+    await expect(page.locator("#status")).toContainText(`${letter} · 00`);
     for (const maximum of [59, 23, 11]) {
       await page.selectOption("#hsm-range", String(maximum));
       await page.fill("#hsm-value", String(maximum));
