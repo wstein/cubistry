@@ -62,19 +62,19 @@ The minute timer supports Start, Pause, Resume, and Reset. It derives remaining
 minutes from a stored wall-clock deadline, so a background tab or reload does
 not lose elapsed time. No seconds are shown on the cube.
 
-The default title is BREAK / MINUTES. **Personalize the fixed print** accepts
-one or two lines, up to 40 characters per line. **Apply new print** explicitly
-creates a new immutable title/number printing and resets the counter to 15.
-Changing the number format also requires this new-print operation. Editing the
-form alone never changes sticker images during counting. Label fragments may
-separate while turning and return upright after each completed value.
+The direct default is **Counter 00–99 (Certified)** at 00. The prominent
+Application selector also provides a numeric 10→00 countdown; the future
+60-minute Break Timer is explicitly deferred. Leading zero / Blank tens sits
+next to Wrap and configures a real permanent print, with clear certification
+status. A single Auto toggle uses fixed one-second wall-clock progression,
+independent of the continuous animation-speed slider. The existing whole-minute
+countdown remains available. See [controls and semantics](docs/COUNTER_CONTROLS.md).
 
-The original print remains available. A selectable
-[certified 00–99 print](docs/COUNTER_CERTIFIED_TRAVERSAL.md) executes the canonical
-99 adjacent increments in 339 committed HTM (maximum five per edge), excluding
-setup. Arbitrary jumps retain the shared exactPhysical solver; the claim does
-not apply to arbitrary paths. Session moves accumulate across values and can be
-reset independently of the timer.
+The [certified route](docs/COUNTER_CERTIFIED_TRAVERSAL.md) retains 339 committed
+HTM over 99 adjacent increments, maximum five per edge, excluding setup.
+[Exact-frame arbitrary-jump planning](docs/COUNTER_ARBITRARY_JUMPS.md) reuses the
+same shared solver while correcting coordinate-frame bias; it does not claim
+global exactPhysical optimality or an arbitrary-path 339-HTM bound.
 
 ## Shared framework path
 
