@@ -1,0 +1,20 @@
+{
+  "sourceRepository": "wstein/cubistry",
+  "sourceRef": "research/cube-display-feasibility",
+  "sourceCommit": "7c05d28e97ecf30848220f5c70cb3100a4f3628d",
+  "originalProofCommit": "22ad143168f814a1d7513d7ac2349b9c77c97a2d",
+  "license": "AGPL-3.0-or-later",
+  "sha256": {
+    "verification.json": "3388e25874349cd5b265af7ce0eed0f87a40e56a2422dd975f6591386aed5667",
+    "witness.json": "2ec912661947b955493774769fe817dc15e8ac91f792b4a5a7d849da4b99de7c",
+    "manifest.json": "ffbefde9d1b0fd80325d1ba7fd90867e6f4713fc255f8ccd9540e167c2ac43b3",
+    "verify.py": "01a1810a0d14f87f49a1d701ec992d8ea089214261f055cea7de7ee2a40f7f2b",
+    "test_verify.py": "b58d63fe4c072a42565d300b0d76de05df096a484bea0af0e5046c032b575541",
+    "optimization/setups.json": "df3c16ee226703a16e2c3846674b5a0d28bc4701e1b741b13526ff9fc55832c0",
+    "optimization/verification.json": "95c247d6e41d8fff29d67abfeca5d7b37d519eeb060065d4d9c594f99802300e",
+    "optimization/manifest.json": "d98c40d92f365dcd334f35c23f726b1c86e4a2c2e9d14d963e5ac4f5c716b2b9",
+    "optimization/verify.py": "5a30e0736f575a5235a4a97028cd19e195a1cb13b705cf9f5940076d4e597058",
+    "optimization/test_verify.py": "c0156d1637136d0d2a8d4b53ddc29da065fbd883f386e2457bdae38c01ad534b",
+    "optimization/optimized.json": "85bcc8efd88c86b7b6b433ff263438d388861ba28d13234b2dcd752ad44161a1"
+  }
+}

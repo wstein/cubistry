@@ -1,0 +1,92 @@
+{
+  "schema": "cubistry.timer-2x2-experiment",
+  "version": 1,
+  "researchBranch": "spike/5x5-en-de-feasibility",
+  "baselineCommit": "9a3faf6522db78fc89a7dc6fae48ffc32b94b73f",
+  "priorCounterSourceCommit": "f2d23f3be7df48738f934a963447e72cde70cf40",
+  "provenance": "Generator orientation mapping and independent sticker replayer adapted from the existing 2x2 counter proof; separate timer files, no previous certificate modified.",
+  "question": "Does a fixed-print 2x2 support at least 15:00 in zero-padded MM/SS ten-second steps, and what is its contiguous capacity?",
+  "model": {
+    "size": 2,
+    "fixedStickers": 24,
+    "rigidCubies": 8,
+    "slots": [
+      "minute tens",
+      "minute units",
+      "second tens",
+      "second units"
+    ],
+    "stepSeconds": 10,
+    "uprightDigits": true,
+    "crossDigitAliases": false,
+    "opticalSymmetryRelaxation": false,
+    "allSixFaceTurns": true,
+    "allCubiesMayMove": true,
+    "settledDisplaysOnly": true
+  },
+  "results": {
+    "constructive": "SAT",
+    "maximumSeconds": 3590,
+    "maximumDisplay": "59:50",
+    "targets": 360,
+    "firstExcludedSeconds": 3600,
+    "upperBound": "UNSAT under the strict upright-digit model",
+    "minimumRequiredSeconds": 900,
+    "minimumRequirementMet": true,
+    "allOrderedTransitionsByFactorization": 129600,
+    "countdownTransitionsActuallyReplayed": 359
+  },
+  "toolchain": {
+    "node": "24.19.0",
+    "npm": "11.9.0",
+    "python": "3.12.14",
+    "solver": "cubing@0.66.1",
+    "dependencyLock": "package-lock.json",
+    "solverParameters": "library defaults; sequential target requests; no shortest-path or deterministic-seed claim",
+    "seed": null,
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "architecture": "x86_64",
+    "availableLogicalCPUs": 5,
+    "availableMemoryApproxGiB": 33
+  },
+  "execution": {
+    "generationCommand": "node research/timer-2x2/generate.mjs /tmp/timer-2x2-final-candidate.json",
+    "generationExitStatus": 0,
+    "generationRuntimeSeconds": 3.136,
+    "verificationCommand": "python3 research/timer-2x2/verify.py",
+    "verificationExitStatus": 0,
+    "verificationRuntimeSeconds": 0.233,
+    "testsCommand": "python3 -m unittest discover -s research/timer-2x2 -p 'test_*.py'",
+    "testsExitStatus": 0,
+    "testsPassed": 9,
+    "generationTimeLimitSeconds": null,
+    "repeatability": "Fresh solver installation and separately generated candidate independently verified; bytes happened to match the original witness.",
+    "boundedWork": "Exactly 360 sequential target solves; measured completion in 3.136 seconds, no enforced timeout."
+  },
+  "verificationBoundaries": [
+    "Python verifier imports no JS, generator geometry, or solver.",
+    "360 forward and 360 exact inverse replays; 359 actual descending transitions.",
+    "Upper bound uses slot invariants and zero-copy capacity cases, not a failed search.",
+    "No speed guarantee, animation implementation, or 15-second-step result.",
+    "Legacy 5x5 suites were not rerun; existing files were not changed except the README research link."
+  ],
+  "sha256": {
+    "generate.mjs": "b7cf8ec44c056c3c057e43008e9af14b6116ddd87b222c6a730fb0bd5add6846",
+    "geometry.mjs": "d1616f23f88fc6ff1d9f502070652b6290e48d51bbb1fd6c7f503056a7d01264",
+    "verify.py": "01a1810a0d14f87f49a1d701ec992d8ea089214261f055cea7de7ee2a40f7f2b",
+    "test_verify.py": "b58d63fe4c072a42565d300b0d76de05df096a484bea0af0e5046c032b575541",
+    "package.json": "5031d7d982eb3a4c25e5637926778dfe3b80c1359455616c9cf8ecedad657a08",
+    "package-lock.json": "16924eddc850c7fdb7e7bc512dceedb9a063cfa540f75ad6e37011ae98c9ce29",
+    "witness.json": "2ec912661947b955493774769fe817dc15e8ac91f792b4a5a7d849da4b99de7c",
+    "verification.json": "3388e25874349cd5b265af7ce0eed0f87a40e56a2422dd975f6591386aed5667",
+    "tests.log": "212d7f3f8085850412f7dd751ef30309fa2a5c6cfc44fe45b2db05bc1c185736",
+    "generation.stderr.log": "3730d31bb3b6db3d62fc612318fe5e68535cf59d926e235f694c85ab74290e62",
+    "generation.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "documentationSHA256": "5e3c4d7edb45b174aadd56e7a67284cc1dbe95fdfc47e5b0f0f0ea64bfa9a96d",
+  "documentationChecks": {
+    "spelling": "uvx typos --config typos.toml on changed documentation and proof sources: exit 0",
+    "localLinks": "All local Markdown targets in README.md and docs/TIMER_2X2.md exist.",
+    "manifestHashes": "All recorded artifact hashes independently recomputed and matched."
+  }
+}
