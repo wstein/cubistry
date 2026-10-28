@@ -1,3 +1,10 @@
+import {
+  WorkshopClock,
+  formatTimer,
+  parseDuration,
+} from "./apps/timer/clock.ts";
+import { TimerController } from "./apps/timer/controller.ts";
+import { loadTimerRoute } from "./apps/timer/design.ts";
 import { CounterRun } from "./apps/counter/run.mjs";
 import { loadCertifiedCounter } from "./apps/counter/certified.ts";
 import "./style.css";
@@ -16,10 +23,15 @@ let ready = false,
   viewer,
   proof;
 let padded = true;
+let application = "certified",
+  timerRoute,
+  timerStarted = false;
+const clock = new WorkshopClock();
 const error = (message = "") => {
   $("error").textContent = message;
 };
 function save() {
+  if (application === "timer") return;
   try {
     localStorage.setItem(
       "cubistry-counter-v2",
@@ -40,9 +52,25 @@ function controlsUi() {
     ".controls button,.controls input",
   ))
     el.disabled = !ready;
-  $("application").disabled = !ready || !!view?.busy || run.running;
+  $("application").disabled =
+    !ready ||
+    !!view?.busy ||
+    run.running ||
+    (application === "timer" && clock.running && !clock.elapsed);
+  $("counter-controls").hidden = application === "timer";
+  $("timer-controls").hidden = application !== "timer";
+  $("timer-pause").disabled = !ready || !clock.running || clock.elapsed;
+  $("timer-start").disabled = !ready || clock.running || clock.elapsed;
+  $("timer-start").textContent = timerStarted ? "Resume" : "Start";
+  $("timer-set-duration").disabled = !ready;
+  $("timer-duration").disabled = !ready;
+  $("reset-session-moves").disabled =
+    !ready ||
+    !!view?.busy ||
+    run.running ||
+    (application === "timer" && clock.running && !clock.elapsed);
   $("format").disabled = !ready;
-  $("reset-session-moves").disabled = !ready || !!view?.busy || run.running;
+
   const active = run.running || !!view?.busy;
   $("run").textContent = active ? "Stop" : "Run";
   $("run").setAttribute("aria-pressed", String(active));
@@ -92,13 +120,21 @@ const onPhysicalState = (physical, busy, failure, progress) => {
     $("session-moves").dataset.total = String(progress.sessionTotal);
   }
   $("cube").setAttribute("aria-busy", String(busy));
-  $("cube").dataset.value = String(physical);
+  $("cube").dataset.value =
+    application === "timer" ? formatTimer(physical) : String(physical);
+  $("cube").dataset.application = application;
   if (failure) {
     ready = false;
     run.stop();
+    if (application === "timer") clock.pause();
     error(
       "The cube could not complete its legal turn sequence. Reload to recover.",
     );
+  }
+  if (application === "timer") {
+    timerUi();
+    controlsUi();
+    return;
   }
   if (!busy) {
     value = physical;
@@ -194,6 +230,19 @@ $("rotation-speed").addEventListener("input", () => {
 });
 function tick() {
   if (!ready) return;
+  if (application === "timer") {
+    if (clock.running && (view.currentValue !== clock.bucket || view.busy)) {
+      const desired = clock.bucket;
+      if (
+        view.progress.queuedTarget !== desired &&
+        view.progress.target !== desired
+      )
+        view.request(desired);
+    }
+    timerUi();
+    controlsUi();
+    return;
+  }
   const next = run.next(view.currentValue, view.busy);
   if (next !== null) request(next);
   controlsUi();
@@ -206,7 +255,8 @@ window.addEventListener("keydown", (event) => {
     ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "SUMMARY"].includes(
       event.target.tagName,
     ) ||
-    !ready
+    !ready ||
+    application === "timer"
   )
     return;
   const steps = { ArrowUp: 1, ArrowDown: -1, PageUp: 10, PageDown: -10 };
@@ -214,6 +264,128 @@ window.addEventListener("keydown", (event) => {
     event.preventDefault();
     action(() => manual(shifted(value, steps[event.key], $("wrap").checked)));
   }
+});
+function text(id, value) {
+  if ($(id).textContent !== value) $(id).textContent = value;
+}
+function timerUi() {
+  const logical = clock.bucket,
+    physical = view?.currentValue ?? logical;
+  text("timer-logical", formatTimer(logical));
+  text("timer-physical", formatTimer(physical));
+  const settling = !!view?.busy || physical !== logical;
+  const message = clock.elapsed
+    ? settling
+      ? "Time elapsed; cube settling to 00:00…"
+      : "Complete · Cube 00:00"
+    : clock.running
+      ? settling
+        ? `Running · Cube settling to ${formatTimer(logical)}…`
+        : `Running · ${formatTimer(logical)}`
+      : settling
+        ? `Paused; settling to ${formatTimer(logical)}…`
+        : timerStarted
+          ? `Paused · ${formatTimer(logical)}`
+          : `Ready · ${formatTimer(logical)}`;
+  text("timer-status", message);
+  text("status", message);
+}
+$("timer-start").addEventListener("click", () =>
+  action(() => {
+    if (!ready || application !== "timer") return;
+    timerStarted = true;
+    clock.start();
+    tick();
+  }),
+);
+$("timer-pause").addEventListener("click", () =>
+  action(() => {
+    if (!ready || application !== "timer") return;
+    clock.pause();
+    view.request(clock.bucket);
+    timerUi();
+    controlsUi();
+  }),
+);
+$("timer-reset").addEventListener("click", () =>
+  action(() => {
+    if (!ready || application !== "timer") return;
+    clock.reset();
+    timerStarted = false;
+    view.request(clock.bucket);
+    timerUi();
+    controlsUi();
+  }),
+);
+$("timer-duration-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  action(() => {
+    if (!ready || application !== "timer") return;
+    const seconds = parseDuration($("timer-duration").value);
+    clock.configure(seconds);
+    timerStarted = false;
+    $("timer-duration").value = formatTimer(seconds / 10);
+    view.request(clock.bucket);
+    timerUi();
+    controlsUi();
+  });
+});
+$("application").addEventListener("change", async () => {
+  if (
+    !ready ||
+    view.busy ||
+    run.running ||
+    (application === "timer" && clock.running && !clock.elapsed)
+  ) {
+    $("application").value = application;
+    return;
+  }
+  const requested = $("application").value,
+    previous = view;
+  ready = false;
+  controlsUi();
+  let candidate;
+  try {
+    const callback = (...args) => {
+      if (view === candidate) onPhysicalState(...args);
+    };
+    const resolveAssets = (manifest, prints, signal) =>
+      loadAssets(manifest, prints, signal, import.meta.env.BASE_URL);
+    if (requested === "timer") {
+      timerRoute ??= await loadTimerRoute(import.meta.env.BASE_URL);
+      candidate = new TimerController(
+        viewer,
+        timerRoute,
+        proof.assets,
+        callback,
+        resolveAssets,
+      );
+      await candidate.configure(90);
+      clock.configure(900);
+      timerStarted = false;
+      $("timer-duration").value = "15:00";
+    } else {
+      candidate = new CounterController(viewer, proof, callback, resolveAssets);
+      await candidate.configure(
+        "COUNTER",
+        padded,
+        value,
+        padded ? certified : null,
+      );
+    }
+    previous.dispose();
+    view = candidate;
+    application = requested;
+    ready = true;
+    error();
+    onPhysicalState(view.currentValue, view.busy, undefined, view.progress);
+  } catch (e) {
+    candidate?.dispose();
+    ready = true;
+    $("application").value = application;
+    error(e.message);
+  }
+  controlsUi();
 });
 async function initialize() {
   if (!viewer) return;
