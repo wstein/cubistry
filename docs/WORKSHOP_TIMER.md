@@ -42,70 +42,86 @@ applications while physically idle applies **250 ms per move for Timer** and
 **100 ms for Counter**. In Timer this is a preferred duration; the effective duration during a scheduled
 sequence appears in the motion status. Rotation changes within Timer do not overwrite Counter's
 saved value/format/speed record. No new cross-application preference persistence
-is implied. Mode changes retain the current rotation setting and do not change
-an in-flight animation. Reload returns to the saved idle Counter and never
+is implied. Mode changes retain the selected rotation preference and never cancel an
+in-flight legal turn. Effective presentation speed can reconcile when the old
+deadline is invalidated. Reload returns to the saved idle Counter and never
 silently resumes a Timer deadline.
 
 ## Physical synchronization
 
-For a scheduled ten-second boundary, playback prepares the exact legal word from
-its full committed source state and starts **before** the boundary. Countdown's
-ceiling and Stopwatch's floor remain logical clock rules: the physical next
-bucket can intentionally appear early. Once its complete canonical state is
-verified, the cube holds that state until the boundary instead of turning back.
+For a feasible scheduled ten-second boundary, the exact **last legal turn ends
+at the absolute clock timestamp `T`**, with a **20 ms observed foreground
+completion tolerance**. The cube must not finish hundreds of milliseconds early.
+This supersedes the earlier conservative before-boundary policy recorded below.
+Countdown's ceiling, Stopwatch's floor, and the independent one-second live
+readout still come from the same monotonic clock.
 
-Let `I = 10000 / Timer speed` milliseconds, `N` be the prepared move count, and
-`B = min(I / 2, deadline - preparationFinishedAt)`. The preferred duration is the
-slider value. The scheduler reserves **75 ms per move** for frame/render/commit
-work plus **8 ms** for dispatch, then uses:
+The controller prepares the complete legal word from its full committed source
+state. For `N > 0` moves, let `I = 10000 / Timer speed` milliseconds and
+`B = min(I / 2, deadline - preparationFinishedAt)`. The scheduler reserves 75 ms
+per move for frame/render/commit work, 8 ms for dispatch, and the accepted 20 ms
+endpoint tolerance **inside** the half-interval budget:
 
 ```text
 overhead = 75 * N + 8
-effective = min(preferred, max(10, (B - overhead) / N))
+effective = min(preferred, max(10, (B - overhead - 20) / N))
 plannedSequenceDuration = overhead + N * effective
-startAt = deadline - plannedSequenceDuration
+startAt = T - plannedSequenceDuration
+finalMotionStart = T - effective
 ```
 
-For feasible budgets, this includes overhead within half the interval and never
-slows a faster preference. A normal five-move edge at a 2,000 ms preference uses
-923.4 ms nominal turns within a 5,000 ms planned sequence. A 250 ms preference
-stays 250 ms; a 10 ms preference stays 10 ms. A guarded one-shot wake targets the
-absolute start time; the existing 50 ms polling callback only reconciles clocks
-and delayed work. Preparation time is included by resampling the same monotonic
-clock after preparation. A prepared word is reused only if its complete source
-state still matches, including hidden sticker poses.
+A feasible plan satisfies `plannedSequenceDuration + 20 <= B`. A normal five-move
+edge at a 2,000 ms preference uses 919.4 ms nominal turns in a 4,980 ms planned
+sequence. Faster 250 ms and 10 ms preferences remain unchanged when they fit.
+The earlier turns run normally. The final turn holds **its starting pose**, then
+rotates during its nominal motion window ending at `T`. It does not reach the
+final pose early and merely delay the displayed value or move count.
 
-Playback retains one active legal target and one replaceable latest target. An
-active sequence always finishes. Faster virtual ticks may replace the pending
-target, so accelerated or background playback can skip intermediate *displays*,
-never moves inside an active sequence or its verification. **Moving** includes an
-intentional early next target. **Synchronizing** means a genuine mismatch with
-the current or planned target; it shows the last settled time. An idle cube that
-has already verified the next target has no backlog message. The reserved
-two-line status shows effective speed and **Budget infeasible** or **Late** when
-applicable; slider preference and control position remain stable.
+A guarded one-shot wake starts the word. Final-turn interpolation uses the same
+absolute endpoint, with a guarded timer at `T` competing safely with animation
+frames. Completion happens once: the final mesh state is synchronized and drawn
+before the animation promise resolves, then the controller verifies the full
+canonical state, commits the HTM, and updates the live UI in the same task and
+microtask chain before paint. Counter uses its original untimed presentation path.
+Reduced-motion preference is captured once per presentation.
 
-A budget is infeasible under this calibrated policy if `overhead + 10 * N > B`.
-The scheduler keeps legal 10 ms nominal turns while running and uses the same
-bounded latest-target catch-up. This is not a proof that faster hardware cannot
-fit the word. At 100×, the interval is 100 ms and its half budget is 50 ms. Even
-without render work, five turns requiring one animation frame each need about
-83 ms at 60 Hz. The current conservative render allowance also rejects a
-one-move 100× half budget. Actual browser refresh rates and scheduling vary;
-no browser or OS timing guarantee is claimed, especially in background tabs.
-A missed scheduled boundary remains visibly late until physical verification.
-Ordinary stopped-clock Set, Reset, or paused settling does not invent a missed
-deadline.
+Preparation time is included by resampling the same monotonic clock after
+preparation. A prepared word is reused only if its complete source still matches,
+including hidden poses. The 50 ms polling callback reconciles clocks and delayed
+work; it does not add clock drift. Playback retains one active legal target and
+one replaceable latest target. An active legal sequence always finishes. Faster
+virtual ticks can skip intermediate *displays*, never moves or verification.
 
-Pause freezes the logical clock immediately. If playback has started or already
-settled the next bucket early, it finishes the legal target and then returns to
-the frozen bucket using actual moves. Resume retains the fraction and replans
-against the time still available. Reset, Set, and mode changes invalidate future
-plans and reconcile their stopped target through the same legal bounded policy.
-Unstarted plans are recomputed after rate or rotation preference changes; an
-active sequence is never canceled, and its remaining budget is reassessed.
-At a terminal boundary completion/limit reached is reported only after the exact
-physical 00:00/59:50 state is verified. Until then, status says settling.
+**Moving** includes a normal future target and its intentional final-turn hold.
+**Synchronizing** means a genuine mismatch with the current or planned target;
+it shows the last settled time. The reserved two-line area reports effective
+speed, **Budget infeasible**, or **Late** without moving the slider. The slider
+always shows the selected preference. Ordinary initial or paused physical
+settling does not invent a missed deadline.
+
+A budget is infeasible under this policy if `overhead + 10 * N + 20 > B`.
+Infeasible or expired plans release endpoint pacing and retain legal 10 ms
+nominal catch-up with one latest pending target. They do not claim exact endpoint
+alignment. At 100×, the interval is 100 ms and half is 50 ms. Five turns needing
+one frame each take about 83 ms at 60 Hz even before render work. The conservative
+policy also rejects a one-move 100× half budget; this is not a proof that faster
+hardware cannot fit it. No turn or whole cube state is teleported to catch up.
+
+Pause freezes the clock and releases a scheduled hold. A partially animated turn
+continues forward, then the legal sequence reconciles the frozen bucket. Reset,
+Set, mode changes, and application replacement invalidate old pacing similarly.
+Resume preserves fractions. Rate and speed changes rebase remaining progress
+without reversing the angle; an initially untimed final turn can acquire a newly
+feasible deadline. Automatic terminal clock ticks preserve a valid final-turn
+endpoint until physical completion instead of canceling its timer at `T`.
+Completion/limit reached still requires the exact physical 00:00/59:50 state.
+
+Browser and OS scheduling cannot provide an unconditional 20 ms guarantee. A
+blocked main thread, background tab, or unavailable render cycle can miss the
+window; the clock continues honestly and legal bounded catch-up remains the
+exception. A controlled callback stalled to `T + 35 ms` verifies the recorded
+miss, exactly one final HTM, and full-state integrity rather than claiming it
+met the tolerance.
 
 The move-progress label is **Sequence N**, where N identifies an actual nonempty
 physical sequence. Numbering advances at its start, not for queued/coalesced
@@ -175,7 +191,7 @@ that parent was merged, PR #56 was retargeted to `main`. The external history
 restack preserved all implementation trees and atomic patches; this author did
 not modify the parent, protected research, or preview workflows.
 
-## UX acceptance evidence
+## Earlier UX acceptance evidence
 
 The focused browser regressions exercise Set/Enter equivalence, Set without
 starting, pending-duration replacement, and the Moving → Synchronizing → idle
@@ -196,32 +212,46 @@ application; mobile captures focus on the footer under pointer interaction.
 These UI checks use Playwright's controlled clock with actual turn animation;
 they do not replace the separate real-time animation-budget measurements above.
 
-## Deadline acceptance evidence
+## Earlier before-boundary observations
 
-The [foreground observations](assets/issue-30-deadlines/foreground-observations.json)
-record actual monotonic start, deadline, and settled timestamps for five-move
-countdown transitions at preferred 250 ms, 2,000 ms, and 10 ms. Browser assertions
-compare the full final physical state with its canonical target and require its
-verified settled callback at or before the deadline. They additionally inspect
-the viewer's nominal durations: the faster 250 ms and 10 ms preferences stay
-unchanged, while 2,000 ms adapts. These are foreground observations on the test
-machine, not portable timing guarantees.
+The [before-boundary observations](assets/issue-30-deadlines/foreground-observations.json)
+retain the prior source revision's measurements at preferred 250 ms, 2,000 ms,
+and 10 ms. Those assertions required full settlement before the boundary. They
+are historical evidence, superseded by the target-time endpoint acceptance below.
 
 The initial 17 ms per-move allowance passed the 250 ms and adaptive 2,000 ms
 cases but missed a 10 ms case by **53.3 ms**. The 75 ms allowance incorporates
 the earlier measured 33–55 ms per-move overhead with additional margin. This
 calibration failure is not suppressed or presented as successful evidence.
 
-New regressions cover infeasible 100×/10 ms playback with independent full move
-replay, active and already-settled early-target pause/resume, never-started Set
-without a false Late warning, preparation that crosses a deadline, stale hidden
-sources, all rates in both clock directions, and rate/speed plan invalidation.
-The existing immutable path, all 360 states, Counter, and production path tests
-remain required.
-
-The held-slider tests include early movement, accelerated backlog and effective
-speed/warning text in the same reserved two-line area. Raw new-stage geometry:
+The held-slider tests include movement, accelerated backlog, and effective
+speed/warning text in the same reserved two-line area. Raw geometry:
 [1280 px](assets/issue-30-deadlines/slider-1280.json),
 [390 px](assets/issue-30-deadlines/slider-390.json), and
-[320 px](assets/issue-30-deadlines/slider-320.json). The earlier screenshots and
-observations above retain their original provenance.
+[320 px](assets/issue-30-deadlines/slider-320.json). Earlier screenshots and
+observations retain their original provenance.
+
+## Target-time endpoint acceptance
+
+[Countdown observations](assets/issue-30-deadlines/endpoint-observations.json),
+[Stopwatch](assets/issue-30-deadlines/stopwatch-endpoint.json), and
+[terminal zero](assets/issue-30-deadlines/terminal-endpoint.json) capture the actual
+clock deadline, canonical render timestamp, verified physical commit timestamp,
+and live readout in that commit. The three preferred speeds are 250 ms, 2,000 ms,
+and 10 ms. The tests require render and commit within 20 ms of `T`, full canonical
+state equality, the unchanged faster nominal durations, and actual intermediate
+rendered angles for the 250 ms and adaptive paths. This checks real legal motion
+and canvas synchronization, not a delayed DOM label after early settlement.
+
+Deterministic cases cover timer/RAF completion races, terminal-tick ordering,
+released holds, nondecreasing rate changes, initially infeasible-to-feasible
+attachment, reduced-motion changes, stale full sources, and a blocked callback.
+Browser cases also replay actual moves after Reset, paused reconciliation, and
+retiming. Exact live-readout assertions explicitly sample the existing pageshow
+handler and avoid floating-point whole-second boundaries while preserving the
+clock arithmetic and physical target assertions.
+
+These are foreground observations on the test machine. They do not establish a
+portable scheduling guarantee. The immutable route, all 360 states, Counter's
+339-HTM paths, the actual 331-HTM ordinary countdown, and production path checks
+remain required.

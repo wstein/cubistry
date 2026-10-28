@@ -1,13 +1,15 @@
 {
   "kind": "foreground-real-clock",
+  "implementationHead": "72ca4bce0e20af5d7d18289695eedd01edacc4c0",
+  "observedAt": "2026-10-28T15:51:36.755Z",
   "frameAllowanceMs": 75,
   "dispatchAllowanceMs": 8,
   "observations": [
     {
       "preferredMilliseconds": 250,
-      "deadline": 13318.19999999972,
-      "startedAt": 11686.600000000093,
-      "settledAt": 13069.299999999814,
+      "deadline": 12956.700000000186,
+      "startedAt": 11325.200000000186,
+      "settledAt": 12750,
       "exactFullState": true,
       "nominalDurations": [
         250,
@@ -17,18 +19,18 @@
         250
       ],
       "actualMoveDurations": [
-        276.29999999981374,
-        277.79999999981374,
-        264.10000000009313,
-        269.5,
-        289.70000000018626
+        346,
+        264.70000000018626,
+        259.79999999981374,
+        282.79999999981374,
+        268
       ]
     },
     {
       "preferredMilliseconds": 2000,
-      "deadline": 24289.899999999907,
-      "startedAt": 19294.100000000093,
-      "settledAt": 24064,
+      "deadline": 23847,
+      "startedAt": 18853.5,
+      "settledAt": 23697.400000000373,
       "exactFullState": true,
       "nominalDurations": [
         923.4000000000001,
@@ -38,18 +40,18 @@
         923.4000000000001
       ],
       "actualMoveDurations": [
-        967.1999999997206,
-        943.8999999999069,
-        938.9000000003725,
-        963.8000000002794,
-        952.6000000000931
+        976.9000000003725,
+        969.9000000003725,
+        973.7999999998137,
+        954,
+        966.8999999994412
       ]
     },
     {
       "preferredMilliseconds": 10,
-      "deadline": 35140.799999999814,
-      "startedAt": 34709,
-      "settledAt": 34945,
+      "deadline": 34946.59999999963,
+      "startedAt": 34523.5,
+      "settledAt": 34744.59999999963,
       "exactFullState": true,
       "nominalDurations": [
         10,
@@ -59,11 +61,11 @@
         10
       ],
       "actualMoveDurations": [
-        43.1999999997206,
-        38.1999999997206,
-        51.60000000009313,
-        33.700000000186265,
-        67.8000000002794
+        21.40000000037253,
+        34.39999999944121,
+        51.59999999962747,
+        26.200000000186265,
+        85.19999999925494
       ]
     }
   ]
