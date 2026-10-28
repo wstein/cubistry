@@ -102,15 +102,20 @@
           <p id="clock-status" class="small" role="status">
             Preparing the verified fixed prints…
           </p>
+          <label for="clock-lettering">Sticker lettering</label>
+          <select id="clock-lettering" disabled>
+            <option value="symbols">Large H / M / S</option>
+            <option value="words">Small hour / min / sec</option>
+          </select>
         </aside>
       </div>
 
       <p id="clock-error" class="error" role="alert"></p>
       <p class="small">
-        Drag the shared view to look around all three cubes. The letters stay
-        fixed and the upper-left stickers stay blank. A half turn takes twice
-        the scheduled quarter-turn time. Preferred timings may be shortened to
-        keep live time.
+        Drag the shared view to look around all three cubes. The unit labels
+        stay fixed and the upper-left stickers stay blank. A half turn takes
+        twice the scheduled quarter-turn time. Preferred timings may be
+        shortened to keep live time.
       </p>
     </main>
     <script type="module" src="/src/clock.mjs"></script>

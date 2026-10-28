@@ -1,7 +1,11 @@
 import { HsmController } from "./apps/hsm/controller.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";
 import hsmPin from "../hsm-source.json";
-import hsmImages from "./apps/hsm/images.json";
+import {
+  hsmImagesFor,
+  hsmDesignFor,
+  parseLettering,
+} from "./apps/hsm/lettering.ts";
 import {
   WorkshopClock,
   TEN_SECOND_TIMER,
@@ -24,6 +28,9 @@ import { CounterController } from "./apps/counter/controller.ts";
 import { loadCounterDesign } from "./apps/counter/design.ts";
 import { parseValue, shifted } from "./counter.mjs";
 const $ = (id) => document.getElementById(id);
+$("hsm-lettering").value = parseLettering(
+  new URLSearchParams(location.search).get("lettering"),
+);
 const run = new CounterRun();
 const sequenceNumber = new SequenceNumber();
 const durations = [2000, 1000, 500, 250, 100, 50, 10];
@@ -101,7 +108,12 @@ function controlsUi() {
   $("hsm-controls").hidden = !isHsm();
   for (const el of $("hsm-controls").querySelectorAll("button,input,select"))
     el.disabled = !ready;
-  for (const id of ["hsm-letter", "hsm-range", "hsm-direction"])
+  for (const id of [
+    "hsm-letter",
+    "hsm-lettering",
+    "hsm-range",
+    "hsm-direction",
+  ])
     $(id).disabled = !ready || !!view?.busy || hsmRunning;
   $("hsm-run").textContent =
     hsmRunning || (isHsm() && view?.busy) ? "Stop" : "Run";
@@ -525,7 +537,7 @@ $("application").addEventListener("change", async () => {
       );
       candidate = new HsmController(
         viewer,
-        hsmDesign,
+        hsmDesignFor(hsmDesign, parseLettering($("hsm-lettering").value)),
         hsmAssets(),
         $("hsm-letter").value,
         callback,
@@ -605,7 +617,7 @@ function hsmAssets() {
       ...proof.assets.images.filter(
         (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
       ),
-      ...hsmImages,
+      ...hsmImagesFor(parseLettering($("hsm-lettering").value)),
     ],
   };
 }
@@ -661,39 +673,48 @@ $("hsm-range").addEventListener("change", () =>
     if (value > hsmMaximum()) request(0);
   }),
 );
-$("hsm-letter").addEventListener("change", async () => {
-  if (!ready || !isHsm() || hsmRunning || view.busy) return;
-  const previous = view;
-  ready = false;
-  controlsUi();
-  let candidate;
-  try {
-    candidate = new HsmController(
-      viewer,
-      hsmDesign,
-      hsmAssets(),
-      $("hsm-letter").value,
-      (...args) => {
-        if (view === candidate) onPhysicalState(...args);
-      },
-      (manifest, prints, signal) =>
-        loadAssets(manifest, prints, signal, import.meta.env.BASE_URL),
-    );
-    await candidate.configure();
-    previous.dispose();
-    view = candidate;
-    value = 0;
-    ready = true;
-    error();
-    onPhysicalState(0, false, undefined, view.progress);
-  } catch (e) {
-    candidate?.dispose();
-    ready = true;
-    $("hsm-letter").value = previous.letter;
-    error(e.message);
-  }
-  controlsUi();
-});
+for (const id of ["hsm-letter", "hsm-lettering"])
+  $(id).addEventListener("change", async (event) => {
+    if (!ready || !isHsm() || hsmRunning || view.busy) return;
+    const previous = view,
+      initial =
+        event.currentTarget.id === "hsm-lettering" ? view.currentValue : 0,
+      previousLettering =
+        viewer.presentedPrint?.id === "hsm_counter_blank_words"
+          ? "words"
+          : "symbols";
+    ready = false;
+    controlsUi();
+    let candidate;
+    try {
+      candidate = new HsmController(
+        viewer,
+        hsmDesignFor(hsmDesign, parseLettering($("hsm-lettering").value)),
+        hsmAssets(),
+        $("hsm-letter").value,
+        (...args) => {
+          if (view === candidate) onPhysicalState(...args);
+        },
+        (manifest, prints, signal) =>
+          loadAssets(manifest, prints, signal, import.meta.env.BASE_URL),
+      );
+      candidate.setMode(hsmMaximum(), Number($("hsm-direction").value));
+      await candidate.configure(initial);
+      previous.dispose();
+      view = candidate;
+      value = initial;
+      ready = true;
+      error();
+      onPhysicalState(initial, false, undefined, view.progress);
+    } catch (e) {
+      candidate?.dispose();
+      ready = true;
+      $("hsm-letter").value = previous.letter;
+      $("hsm-lettering").value = previousLettering;
+      error(e.message);
+    }
+    controlsUi();
+  });
 async function initialize() {
   if (!viewer) return;
   try {

@@ -12,6 +12,11 @@ state and move pivot; turn speeds stay independent. The caller-owned viewport
 extension leaves standalone viewers in control of their own renderer. Timed
 shared endpoints are painted together by the stage frame loop.
 
+The sticker lettering selector chooses either large H/M/S or only small
+`hour`/`min`/`sec` at the bottom of R1C2. It reloads a different immutable print
+at current local time, preserving the three preferred turn settings. The two
+styles never appear together on a sticker. See [artwork provenance](HSM_COUNTER.md#sticker-lettering-variants).
+
 The shared control panel follows the five-second timer's typography and shows
 the current local `HH:MM:SS` beside the cubes, or above them on narrow screens.
 It reads the same wall-clock snapshot for all units and remains live during
