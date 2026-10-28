@@ -31,7 +31,25 @@ const error = (message = "") => {
   $("error").textContent = message;
 };
 function save() {
-  if (application === "timer") return;
+  if (application === "timer") {
+    try {
+      const raw = JSON.parse(localStorage.getItem("cubistry-counter-v2"));
+      const prior =
+        raw && typeof raw === "object" && !Array.isArray(raw)
+          ? raw
+          : { value, label: "COUNTER", padded, application: "certified" };
+      localStorage.setItem(
+        "cubistry-counter-v2",
+        JSON.stringify({
+          ...prior,
+          moveDuration: durations[Number($("rotation-speed").value)],
+        }),
+      );
+    } catch {
+      /* Storage is optional; never substitute Timer state for Counter state. */
+    }
+    return;
+  }
   try {
     localStorage.setItem(
       "cubistry-counter-v2",
