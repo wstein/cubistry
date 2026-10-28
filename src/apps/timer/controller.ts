@@ -3,7 +3,12 @@ import {
   type PhysicalView,
   type MoveProgress,
 } from "../shared/playback.ts";
-import { demand, stateEquals, type CubeState, type LegalMove } from "@cubistry/cube-core";
+import {
+  demand,
+  stateEquals,
+  type CubeState,
+  type LegalMove,
+} from "@cubistry/cube-core";
 import type { MotionTiming } from "@cubistry/cube-viewer";
 import { matchesTarget, type MovePresentation } from "@cubistry/cube-mechanics";
 import {
@@ -27,25 +32,58 @@ export class TimerController extends PhysicalPlayback {
   private timing: { target: number; motion: MotionTiming } | null = null;
   private timingRevision = 0;
   setDeadline(target: number, endAt: number, durationMs: number): void {
-    if (this.timing?.target === target && this.timing.motion.endAt === endAt &&
-      this.timing.motion.durationMs === durationMs) return;
-    this.timing = { target, motion: { endAt, durationMs, revision: ++this.timingRevision } };
+    if (
+      this.timing?.target === target &&
+      this.timing.motion.endAt === endAt &&
+      this.timing.motion.durationMs === durationMs
+    )
+      return;
+    this.timing = {
+      target,
+      motion: { endAt, durationMs, revision: ++this.timingRevision },
+    };
   }
-  clearDeadline(): void { this.timing = null; this.timingRevision++; }
+  clearDeadline(): void {
+    this.timing = null;
+    this.timingRevision++;
+  }
   protected animateMove(presentation: MovePresentation): Promise<void> {
     const finalMove = this.playback.completed + 1 === this.playback.total;
-    return this.view.animate(presentation, finalMove ? () =>
-      this.timing?.target === this.playback.target ? this.timing.motion : null : undefined);
+    return this.view.animate(
+      presentation,
+      finalMove
+        ? () =>
+            this.timing?.target === this.playback.target
+              ? this.timing.motion
+              : null
+        : undefined,
+    );
   }
-  private prepared: { source: CubeState; value: number; moves: readonly LegalMove[] } | null = null;
+  private prepared: {
+    source: CubeState;
+    value: number;
+    moves: readonly LegalMove[];
+  } | null = null;
   /** Prepare only from a committed idle source, including all hidden poses. */
   prepare(value: number): readonly LegalMove[] {
-    demand(!this.busy && this.state && this.solver, "Timer must be settled before preparation");
-    demand(Number.isInteger(value) && value >= 0 && value <= this.maximumValue, "Invalid timer target");
-    if (this.prepared?.value === value && stateEquals(this.prepared.source, this.state))
+    demand(
+      !this.busy && this.state && this.solver,
+      "Timer must be settled before preparation",
+    );
+    demand(
+      Number.isInteger(value) && value >= 0 && value <= this.maximumValue,
+      "Invalid timer target",
+    );
+    if (
+      this.prepared?.value === value &&
+      stateEquals(this.prepared.source, this.state)
+    )
       return this.prepared.moves;
-    const moves = timerStep(this.route, this.state, this.current, value)
-      ?? this.solver.solve(this.state, this.route.states[value], { coordinateFrames: true });
+    const moves =
+      timerStep(this.route, this.state, this.current, value) ??
+      this.solver.solve(this.state, this.route.states[value], {
+        coordinateFrames: true,
+      });
     this.prepared = { source: this.state, value, moves };
     return moves;
   }
@@ -97,7 +135,8 @@ export class TimerController extends PhysicalPlayback {
     demand(this.solver, "Timer is not configured");
     const prepared = this.prepared;
     this.prepared = null;
-    if (prepared?.value === value && stateEquals(prepared.source, from)) return prepared.moves;
+    if (prepared?.value === value && stateEquals(prepared.source, from))
+      return prepared.moves;
     return (
       timerStep(this.route, from, this.current, value) ??
       this.solver.solve(from, target, { coordinateFrames: true })
