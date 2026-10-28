@@ -19,7 +19,8 @@
         <div class="application-choice">
           <label for="application">Cube / application</label>
           <select id="application">
-            <option value="certified">Counter 0–99</option>
+            <option value="hsm-counter">H/S/M Counter 00–59</option>
+            <option value="certified" selected>Counter 0–99</option>
             <option value="timer">60-Minute Timer</option>
             <option value="five-second-timer">5-Second Timer</option>
           </select>
@@ -164,6 +165,23 @@
             Leading Zero shows or hides only the leading 0. The layout, value,
             and moves stay the same.
           </p>
+        </aside>
+        <aside id="hsm-controls" class="controls" aria-label="HSM counter controls" hidden>
+          <h1>H/S/M Counter</h1>
+          <label for="hsm-letter">Unit</label>
+          <select id="hsm-letter"><option>H</option><option>S</option><option>M</option></select>
+          <label for="hsm-range">Count range</label>
+          <select id="hsm-range"><option value="59">00–59</option><option value="23">00–23</option><option value="11">00–11</option></select>
+          <label for="hsm-direction">Direction</label>
+          <select id="hsm-direction"><option value="1">Up</option><option value="-1">Down</option></select>
+          <form id="hsm-set-form">
+            <label for="hsm-value">Set value</label>
+            <input id="hsm-value" type="text" inputmode="numeric" value="00" />
+            <button type="submit">Set</button>
+          </form>
+          <div class="target-actions"><button id="hsm-run" type="button" class="primary" aria-pressed="false">Run</button><button id="hsm-reset" type="button">Reset</button></div>
+          <div class="increments"><button data-hsm-delta="-1">−1</button><button data-hsm-delta="1">+1</button></div>
+          <p class="small">Counts one step per second, wrapping through 00. Every number transition takes at most five moves. Changing the unit sets up a fresh 00 display.</p>
         </aside>
         <aside
           id="timer-controls"

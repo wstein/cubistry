@@ -1,3 +1,7 @@
+import { HsmController } from "./apps/hsm/controller.ts";
+import { loadHsmDesign } from "./apps/hsm/design.ts";
+import hsmPin from "../hsm-source.json";
+import hsmImages from "./apps/hsm/images.json";
 import {
   WorkshopClock,
   TEN_SECOND_TIMER,
@@ -39,6 +43,14 @@ let ready = false,
   proof,
   certified;
 let padded = true;
+let hsmDesign,
+  hsmRunning = false,
+  hsmNextAt = 0,
+  rememberedCounterValue = 0;
+const isHsm = () => application === "hsm-counter";
+const hsmMaximum = () => Number($("hsm-range").value);
+const hsmShift = (delta) =>
+  (value + delta + hsmMaximum() + 1) % (hsmMaximum() + 1);
 let application = "certified",
   timerRoute,
   fiveSecondRoute,
@@ -58,7 +70,7 @@ const error = (message = "") => {
   $("error").textContent = message;
 };
 function save() {
-  if (isTimer()) return;
+  if (isTimer() || isHsm()) return;
   try {
     localStorage.setItem(
       "cubistry-counter-v2",
@@ -83,8 +95,17 @@ function controlsUi() {
     !ready ||
     !!view?.busy ||
     run.running ||
+    hsmRunning ||
     (isTimer() && clock.running && !clock.elapsed);
-  $("counter-controls").hidden = isTimer();
+  $("counter-controls").hidden = isTimer() || isHsm();
+  $("hsm-controls").hidden = !isHsm();
+  for (const el of $("hsm-controls").querySelectorAll("button,input,select"))
+    el.disabled = !ready;
+  for (const id of ["hsm-letter", "hsm-range", "hsm-direction"])
+    $(id).disabled = !ready || !!view?.busy || hsmRunning;
+  $("hsm-run").textContent =
+    hsmRunning || (isHsm() && view?.busy) ? "Stop" : "Run";
+  $("hsm-run").setAttribute("aria-pressed", String(hsmRunning));
   $("timer-controls").hidden = !isTimer();
   $("timer-start").disabled = !ready || (clock.elapsed && !durationDirty);
   $("timer-start").textContent = clock.running
@@ -109,8 +130,9 @@ function controlsUi() {
     !ready ||
     !!view?.busy ||
     run.running ||
+    hsmRunning ||
     (isTimer() && clock.running && !clock.elapsed);
-  $("format").disabled = !ready;
+  $("format").disabled = !ready || isHsm();
 
   const active = run.running || !!view?.busy;
   $("run").textContent = active ? "Stop" : "Run";
@@ -127,6 +149,7 @@ function action(fn) {
 }
 function request(next) {
   value = next;
+  if (isHsm()) view.setMode(hsmMaximum(), Number($("hsm-direction").value));
   view.request(next);
   controlsUi();
 }
@@ -167,6 +190,7 @@ const onPhysicalState = (physical, busy, failure, progress) => {
   if (failure) {
     ready = false;
     run.stop();
+    hsmRunning = false;
     if (isTimer()) {
       clock.pause();
       timerScheduler.invalidate();
@@ -177,6 +201,17 @@ const onPhysicalState = (physical, busy, failure, progress) => {
   }
   if (isTimer()) {
     timerUi();
+    controlsUi();
+    return;
+  }
+  if (isHsm()) {
+    if (!busy) value = physical;
+    text(
+      "status",
+      failure
+        ? "Turn sequence stopped."
+        : `${view.letter} · ${String(physical).padStart(2, "0")} · ${hsmRunning ? "Running" : busy ? "Moving" : "Ready"}`,
+    );
     controlsUi();
     return;
   }
@@ -241,7 +276,7 @@ $("reset-session-moves").addEventListener("click", () =>
 );
 // This screen-only field rule never selects a different permanent print or solver.
 function formatUi() {
-  if (isTimer()) {
+  if (isTimer() || isHsm()) {
     viewer.setFaceletImageOverride(null);
     return;
   }
@@ -282,6 +317,13 @@ $("rotation-speed").addEventListener("input", () => {
 });
 function tick() {
   if (!ready) return;
+  if (isHsm()) {
+    if (hsmRunning && !view.busy && performance.now() >= hsmNextAt) {
+      hsmNextAt = performance.now() + 1000;
+      request(hsmShift(Number($("hsm-direction").value)));
+    }
+    return;
+  }
   if (isTimer()) {
     timerScheduler.tick(
       clock.snapshot(),
@@ -309,7 +351,8 @@ window.addEventListener("keydown", (event) => {
       event.target.tagName,
     ) ||
     !ready ||
-    isTimer()
+    isTimer() ||
+    isHsm()
   )
     return;
   const steps = { ArrowUp: 1, ArrowDown: -1, PageUp: 10, PageDown: -10 };
@@ -453,11 +496,13 @@ $("application").addEventListener("change", async () => {
     !ready ||
     view.busy ||
     run.running ||
+    hsmRunning ||
     (isTimer() && clock.running && !clock.elapsed)
   ) {
     $("application").value = application;
     return;
   }
+  if (application === "certified") rememberedCounterValue = view.currentValue;
   const requested = $("application").value,
     previous = view;
   ready = false;
@@ -469,7 +514,21 @@ $("application").addEventListener("change", async () => {
     };
     const resolveAssets = (manifest, prints, signal) =>
       loadAssets(manifest, prints, signal, import.meta.env.BASE_URL);
-    if (requested === "timer" || requested === "five-second-timer") {
+    if (requested === "hsm-counter") {
+      hsmDesign ??= await loadHsmDesign(
+        import.meta.env.BASE_URL,
+        hsmPin.runtimeSHA256,
+      );
+      candidate = new HsmController(
+        viewer,
+        hsmDesign,
+        hsmAssets(),
+        $("hsm-letter").value,
+        callback,
+        resolveAssets,
+      );
+      await candidate.configure();
+    } else if (requested === "timer" || requested === "five-second-timer") {
       const profile =
         requested === "five-second-timer"
           ? FIVE_SECOND_TIMER
@@ -503,12 +562,18 @@ $("application").addEventListener("change", async () => {
       );
     } else {
       candidate = new CounterController(viewer, proof, callback, resolveAssets);
-      await candidate.configure("COUNTER", true, value, certified);
+      await candidate.configure(
+        "COUNTER",
+        true,
+        rememberedCounterValue,
+        certified,
+      );
     }
     timerScheduler.invalidate();
     previous.dispose();
     view = candidate;
     application = requested;
+    if (!isTimer()) value = view.currentValue;
     const timerName =
       requested === "five-second-timer" ? "5-Second Timer" : "60-Minute Timer";
     text("timer-heading", timerName);
@@ -523,6 +588,102 @@ $("application").addEventListener("change", async () => {
     candidate?.dispose();
     ready = true;
     $("application").value = application;
+    error(e.message);
+  }
+  controlsUi();
+});
+function hsmAssets() {
+  return {
+    ...proof.assets,
+    fonts: [],
+    documents: [],
+    images: [
+      ...proof.assets.images.filter((i) => /^[0-9]$/.test(i.id)),
+      ...hsmImages,
+    ],
+  };
+}
+function stopHsm() {
+  hsmRunning = false;
+  const active = view.stopAfterCurrent();
+  value = active ?? view.currentValue;
+  controlsUi();
+}
+$("hsm-run").addEventListener("click", () =>
+  action(() => {
+    if (!ready || !isHsm()) return;
+    if (hsmRunning || view.busy) stopHsm();
+    else {
+      hsmRunning = true;
+      hsmNextAt = performance.now();
+      tick();
+      controlsUi();
+    }
+  }),
+);
+for (const button of document.querySelectorAll("[data-hsm-delta]"))
+  button.addEventListener("click", () =>
+    action(() => {
+      if (!ready || !isHsm()) return;
+      stopHsm();
+      request(hsmShift(Number(button.dataset.hsmDelta)));
+    }),
+  );
+$("hsm-reset").addEventListener("click", () =>
+  action(() => {
+    if (ready && isHsm()) {
+      stopHsm();
+      request(0);
+    }
+  }),
+);
+$("hsm-set-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  action(() => {
+    if (!ready || !isHsm()) return;
+    const raw = $("hsm-value").value.trim(),
+      n = Number(raw);
+    if (!/^\d{1,2}$/.test(raw) || n > hsmMaximum())
+      throw Error(`Enter an integer from 00 to ${hsmMaximum()}.`);
+    stopHsm();
+    request(n);
+  });
+});
+$("hsm-range").addEventListener("change", () =>
+  action(() => {
+    if (!ready || !isHsm() || hsmRunning || view.busy) return;
+    if (value > hsmMaximum()) request(0);
+  }),
+);
+$("hsm-letter").addEventListener("change", async () => {
+  if (!ready || !isHsm() || hsmRunning || view.busy) return;
+  const previous = view;
+  ready = false;
+  controlsUi();
+  let candidate;
+  try {
+    candidate = new HsmController(
+      viewer,
+      hsmDesign,
+      hsmAssets(),
+      $("hsm-letter").value,
+      (...args) => {
+        if (view === candidate) onPhysicalState(...args);
+      },
+      (manifest, prints, signal) =>
+        loadAssets(manifest, prints, signal, import.meta.env.BASE_URL),
+    );
+    await candidate.configure();
+    previous.dispose();
+    view = candidate;
+    value = 0;
+    ready = true;
+    error();
+    onPhysicalState(0, false, undefined, view.progress);
+  } catch (e) {
+    candidate?.dispose();
+    ready = true;
+    $("hsm-letter").value = previous.letter;
     error(e.message);
   }
   controlsUi();
