@@ -514,8 +514,13 @@ $("application").addEventListener("change", async () => {
     $("application").value = application;
     return;
   }
-  if ($("application").value === "live-clock") {
-    location.assign(new URL("clock.html", location.href));
+  if (["live-clock", "calendar"].includes($("application").value)) {
+    location.assign(
+      new URL(
+        $("application").value === "calendar" ? "calendar.html" : "clock.html",
+        location.href,
+      ),
+    );
     return;
   }
   if (application === "certified") rememberedCounterValue = view.currentValue;

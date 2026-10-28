@@ -10,6 +10,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
+        calendar: fileURLToPath(new URL("./calendar.html", import.meta.url)),
         clock: fileURLToPath(new URL("./clock.html", import.meta.url)),
         counter: fileURLToPath(new URL("./index.html", import.meta.url)),
         acceptance: fileURLToPath(
