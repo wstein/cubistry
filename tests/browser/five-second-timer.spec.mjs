@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-async function choose(page) {
+async function choose(page, leadingZero = true) {
   await page.goto("/");
   await expect(page.locator("#application")).toBeEnabled();
+  if (!leadingZero) await page.locator("#format").uncheck();
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
     const configure = CubeViewer.prototype.configure,
@@ -99,7 +100,7 @@ test("full thirty-minute countdown visits all361 actual states and independently
   test.setTimeout(240000);
   await page.clock.install();
   await choose(page);
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
   const epoch = await page.evaluate(() => performance.now());
   let offset = 0;
@@ -146,7 +147,7 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
   await duration(page, "00:30");
   await page.locator("#rotation-speed").fill("0");
   await page.selectOption("#timer-speed", "100");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
   await page.clock.fastForward(100);
   await page.clock.runFor(20);
@@ -193,14 +194,10 @@ test("Stopwatch floors five-second fractions and terminates exactly39:55 at100x;
   page,
 }) => {
   await page.clock.install();
-  await page.goto("/");
-  await expect(page.locator("#application")).toBeEnabled();
-  await page.locator("#format").uncheck();
-  // Install trace hooks before selecting the new print.
-  await choose(page);
+  await choose(page, false);
   await page.selectOption("#timer-mode", "stopwatch");
   await settled(page, "00:00");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
   await page.clock.fastForward(4999);
   await expect(page.locator("#timer-logical")).toHaveText("00:00");
