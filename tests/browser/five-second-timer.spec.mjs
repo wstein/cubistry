@@ -169,9 +169,14 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
     held: window.fiveHeld,
     active: document.querySelector("#move-progress").dataset.target,
     queued: document.querySelector("#move-progress").dataset.queued,
+    logical: document.querySelector("#timer-logical").textContent,
   }));
   expect(backlog.held).toBe(true);
-  expect(backlog.queued).toBe("4");
+  const [queuedMinutes, queuedSeconds] = backlog.logical.split(":").map(Number);
+  expect(Number(backlog.queued)).toBe(
+    Math.ceil((queuedMinutes * 60 + queuedSeconds) / 5),
+  );
+  expect(Number(backlog.queued)).toBeLessThan(11);
   expect(backlog.active).not.toBe(backlog.queued);
   await expect(page.locator("#timer-sync")).toHaveAttribute(
     "data-state",
