@@ -10,7 +10,7 @@
     "proof": "node research/counter/generate.mjs && python3 research/counter/verify.py",
     "test:proof": "python3 -m unittest discover -s tests -p \"*_test.py\"",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm test && npm run test:proof && python3 research/counter/verify.py && python3 research/architecture/verify_design.py && python3 research/certified-counter/verify.py && npm run build",
+    "check": "npm run typecheck && npm test && npm run test:proof && python3 research/counter/verify.py && python3 research/architecture/verify_design.py && python3 research/certified-counter/verify.py && npm run build && npm run test:timer-proof",
     "typecheck": "npm run build:core && tsc --noEmit",
     "build:design": "npm run build:core && node research/architecture/build_counter_design.mjs",
     "build:core": "rescript build",
@@ -18,7 +18,8 @@
     "test:pages": "playwright test --config playwright.pages.config.mjs",
     "prepare:solver": "node scripts/prepare-puzlwerk.mjs",
     "setup": "npm run prepare:solver && npm ci",
-    "test:pr-preview": "playwright test --config playwright.preview.config.mjs"
+    "test:pr-preview": "playwright test --config playwright.preview.config.mjs",
+    "test:timer-proof": "python3 research/workshop-timer/evidence/verify.py && python3 research/workshop-timer/evidence/optimization/verify.py && python3 -m unittest discover -s research/workshop-timer/evidence -p test_verify.py && python3 -m unittest discover -s research/workshop-timer/evidence/optimization -p test_verify.py && python3 research/workshop-timer/verify.py test-results/workshop-timer-commits.json"
   },
   "dependencies": {
     "@cubistry/cube-assets": "*",
