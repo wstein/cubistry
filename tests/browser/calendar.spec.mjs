@@ -120,7 +120,7 @@ test("live date crosses leap-day midnight and inspection validates Gregorian dat
   await page.fill("#calendar-date", "");
   await page.click("#calendar-set");
   await expect(page.locator("#calendar-error")).toContainText(
-    "Invalid Gregorian date",
+    "Use YYYY-MM-DD",
   );
   await page.fill("#calendar-date", "2000-02-29");
   await page.click("#calendar-set");
