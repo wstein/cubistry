@@ -56,7 +56,10 @@ Pages settings migration, force push or protected research change.
   a newer head; failed latest builds do not reuse older artifacts as current.
 - ZIP extraction rejects absolute/traversal/ambiguous paths, symlinks/special
   modes, Git metadata, reserved preview namespaces and bounded-size violations.
-  It strips modes and never executes content. Every preview HTML gets noindex
+  It strips modes and never executes content. A standard-library HTML parser
+  locates actual document tags, ignoring comments/script/style/title/textarea
+  text and inert template/noscript fragments; ambiguous/self-closing document
+  containers are rejected rather than rewritten. Every preview HTML gets noindex
   and a visible non-production PR/SHA banner before Ross receives it.
 - Same-repository previews share the site's origin and can execute client-side
   JS in visitors' browsers. This is not a hostile-code sandbox; only authorized

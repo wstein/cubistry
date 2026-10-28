@@ -31,6 +31,22 @@ class StaticArchiveTests(unittest.TestCase):
   site=self.root/'site';(site/'pr-preview/pr-1').mkdir(parents=True);(site/'pr-preview/pr-2').mkdir();(site/'index.html').write_text('PRODUCTION');(site/'pr-preview/pr-1/index.html').write_text('A');(site/'pr-preview/pr-2/index.html').write_text('B')
   S.snapshot(site,self.root/'snapshot');self.assertEqual((self.root/'snapshot/index.html').read_text(),'PRODUCTION');self.assertEqual((self.root/'snapshot/pr-preview/pr-2/index.html').read_text(),'B')
   shutil.rmtree(site/'pr-preview/pr-1');S.snapshot(site,self.root/'updated');self.assertFalse((self.root/'updated/pr-preview/pr-1').exists());self.assertTrue((self.root/'updated/pr-preview/pr-2/index.html').exists())
+ def test_preview_marker_ignores_comments_scripts_and_inert_fragments(self):
+  from html.parser import HTMLParser
+  class Visible(HTMLParser):
+   def __init__(self):super().__init__();self.asides=0;self.metas=0
+   def handle_starttag(self,tag,attrs):
+    self.asides+=tag=='aside';self.metas+=tag=='meta' and ('name','robots') in attrs
+  for prefix in ['<!-- <head><body> -->', '<script>const example="<head><body>";</script>', '<title>literal <head><body> title</title>', '<textarea>literal <head><body> text</textarea>', '<template><head><body></body></head></template>', '<noscript><head><body></body></head></noscript>']:
+   document='<html><head>'+prefix+'</head><body>app</body></html>'
+   marked=E.mark_preview(document,52,'a'*40)
+   self.assertIn('</head><body><aside ',marked)
+   self.assertIn('<head><meta name="robots" content="noindex,nofollow">',marked)
+   self.assertIn(prefix,marked)
+  with self.assertRaises(ValueError):E.mark_preview('<html><head><template><body>inert only</body></template></head></html>',52,'a'*40)
+ def test_reject_ambiguous_document_containers(self):
+  for document in ['<html><head><template/></head><body>inert</body></html>', '<html><head><noscript/></head><body>ambiguous</body></html>', '<html><head></head><body>one<body>two</body></html>', '<html><head></head><head></head><body>duplicate</body></html>']:
+   with self.subTest(document=document),self.assertRaises(ValueError):E.mark_preview(document,52,'a'*40)
  def test_reject_directory_or_empty_root_index(self):
   for items in [[('index.html/','')],[('index.html','')],[('index.html','not an HTML document')]]:
    with self.subTest(items=items),self.assertRaises(ValueError):E.extract(self.archive(items),self.root/'invalid-index')
