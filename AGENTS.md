@@ -14,7 +14,7 @@ Cubistry is a browser-first twisty-puzzle platform. Chronocube is a reference ap
 - Make small, focused Conventional Commits and provide a concise PR summary with verification commands and outstanding risks.
 - Agent-authored PRs follow the independent author/reviewer workflow in [CONTRIBUTING.md](CONTRIBUTING.md#independent-agent-review). The author opens a draft and fixes findings; a separate reviewer publishes the final review and marks it ready only after clearance. Authors do not mark their own PRs ready.
 - Never merge a draft PR without explicit approval. Never overwrite proof artifacts without retaining reproducibility.
-- Keep proof research on its dedicated spike branch; keep foundational design changes on feature branches.
+- Keep proof research on its dedicated research branch; keep foundational design changes on feature branches.
 - Do not claim SAT or UNSAT from sticker capacity, a screenshot, solver log alone, or a candidate layout.
 - Use exactly `SAT` (validated witness), `UNSAT` (independently checkable proof under explicit assumptions), or `UNKNOWN` (anything else) for feasibility outcomes.
 - Prefer SVG/vector artwork for final print output; PNG is optional raster interchange/preview. Preserve font licensing, embedded asset provenance, dimensions, and sticker orientation.
@@ -33,7 +33,7 @@ Skill instructions are task-specific and do not override accepted project ADRs o
 - Keep `main` linear. Use GitHub **Rebase and merge** for approved PRs; do not use merge commits or squash merges.
 - Preserve small, meaningful Conventional Commits. Do not force-push `main`.
 - Leave automatic remote branch deletion enabled for merged short-lived feature branches.
-- `spike/5x5-en-de-feasibility` is a long-lived protected research branch: never delete it, force-push it, or retarget research into `main` without a separate approved PR. Ordinary non-force research commits are permitted.
+- `research/cube-display-feasibility` is the active long-lived protected research branch: never delete it, force-push it, or retarget research into `main` without a separate approved PR. Ordinary non-force research commits are permitted. The former `spike/5x5-en-de-feasibility` branch is temporarily retained as a protected recovery reference pending a separately verified retirement.
 - For concurrent agents, use separate branches and worktrees, and never clean up a worktree owned by another active agent. `git fetch --prune` does **not** delete local branches or active worktrees.
 - Follow [CONTRIBUTING.md](CONTRIBUTING.md) for review and safe local cleanup.
 
