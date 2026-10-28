@@ -6,10 +6,10 @@ import {
   type PrintDefinition,
   type LegalMove,
 } from "@cubistry/cube-core";
-import { applyMoves, parseAlg } from "@cubistry/cube-mechanics";
+import { applyMoves, parseAlg, initialState } from "@cubistry/cube-mechanics";
 
 export interface CounterSolver {
-  solve(from: CubeState, target: CubeState): readonly LegalMove[];
+  solve(from: CubeState, target: CubeState, options?: { coordinateFrames: boolean }): readonly LegalMove[];
 }
 let sharedTable: Promise<Uint8Array> | undefined;
 async function loadTable(): Promise<Uint8Array> {
@@ -51,27 +51,50 @@ export async function createCounterSolver(
       topology: { kind: "cube" as const, size: 2 as const },
     };
   };
+  // Re-express both endpoints in the 24 proper cube frames. These are virtual
+  // coordinates only: no regrip/setup is animated or added to the physical path.
+  const normals = { R:[1,0,0], L:[-1,0,0], U:[0,1,0], D:[0,-1,0], F:[0,0,1], B:[0,0,-1] } as const;
+  const source = initialState(print), frames: {word: readonly LegalMove[]; rotation: CubeState["cubies"][number]["orientation"]}[] = [];
+  const queue: (readonly LegalMove[])[] = [[]], seen = new Set<string>();
+  for (let at=0; at<queue.length; at++) {
+    const word=queue[at], rotation=applyMoves(source,word).cubies[0].orientation;
+    const key=JSON.stringify(rotation); if(seen.has(key))continue;
+    seen.add(key);frames.push({word,rotation});
+    for(const regrip of ["R L'","U D'","F B'"])queue.push([...word,...parseAlg(regrip)]);
+  }
+  demand(frames.length===24,"Invalid coordinate-frame catalog");
+  const inverse = (moves: readonly LegalMove[]): readonly LegalMove[] => [...moves].reverse().map(m=>({face:m.face,turns:m.turns===2?2:m.turns===1?-1:1}));
+  // Opposite faces commute; combine/cancel adjacent same-axis blocks without
+  // changing physical endpoints or counting half turns as two HTM.
+  const normalize = (moves: readonly LegalMove[]): readonly LegalMove[] => {
+    const blocks: {axis: number; moves: Map<LegalMove["face"],number>}[]=[];
+    for(const m of moves){const axis="RL".includes(m.face)?0:"UD".includes(m.face)?1:2;let b=blocks.at(-1);if(!b||b.axis!==axis)blocks.push(b={axis,moves:new Map()});b.moves.set(m.face,((b.moves.get(m.face)||0)+m.turns+4)%4);if([...b.moves.values()].every(n=>n===0))blocks.pop();}
+    return blocks.flatMap(b=>[...b.moves].filter(([,n])=>n!==0).map(([face,n])=>({face,turns:(n===3?-1:n) as LegalMove["turns"]})));
+  };
   return Object.freeze({
-    solve(from: CubeState, target: CubeState) {
-      const result = solver.solve2x2(wireState(from), wireState(target), {
-        mode: "exactPhysical",
-      });
-      demand(
-        result.metric === "HTM" && result.mode === "exactPhysical",
-        "Shared solver returned an incompatible result",
-      );
-      const moves = parseAlg(result.moves.join(" "));
-      demand(
-        moves.length === result.moveCount,
-        "Shared solver move count mismatch",
-      );
-      // Replay through Cubistry's independent physical mechanics, not the
-      // provider's corner coordinates or just the visible front predicate.
-      demand(
-        stateEquals(applyMoves(from, moves), target),
-        "Shared solver failed complete physical replay",
-      );
-      return moves;
+    solve(from: CubeState, target: CubeState, options?: { coordinateFrames: boolean }) {
+      if(stateEquals(from,target))return [];
+      let best: readonly LegalMove[] | null=null;
+      for(const frame of options?.coordinateFrames ? frames : frames.slice(0,1)){
+        const rotatedFrom=wireState(applyMoves(from,frame.word)), rotatedTarget=wireState(applyMoves(target,frame.word));
+        for(const reverse of options?.coordinateFrames ? [false,true] : [false]){
+          const result=solver.solve2x2(reverse?rotatedTarget:rotatedFrom,reverse?rotatedFrom:rotatedTarget,{mode:"exactPhysical"});
+          demand(result.metric==="HTM"&&result.mode==="exactPhysical","Shared solver returned an incompatible result");
+          const raw=parseAlg(result.moves.join(" "));
+          demand(raw.length===result.moveCount,"Shared solver move count mismatch");
+          const mapped=raw.map(m=>{
+            const n=normals[m.face];
+            const original=frame.rotation.map(column=>column.reduce((sum,v,i)=>sum+v*n[i],0));
+            const face=(Object.keys(normals) as LegalMove["face"][]).find(f=>normals[f].every((v,i)=>v===original[i]));
+            demand(face,"Invalid mapped physical face");return {face,turns:m.turns};
+          });
+          const oriented = reverse?inverse(mapped):mapped;
+          const candidate=options?.coordinateFrames ? normalize(oriented) : oriented;
+          demand(stateEquals(applyMoves(from,candidate),target),"Shared solver failed complete physical replay");
+          if(best===null||candidate.length<best.length)best=candidate;
+        }
+      }
+      demand(best!==null,"No complete physical route");return best;
     },
   });
 }
