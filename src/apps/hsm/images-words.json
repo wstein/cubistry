@@ -1,0 +1,23 @@
+[
+  {
+    "id": "H",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/hsm/words/H.svg",
+    "sha256": "e931c303952e231569c12ffdcee427e9e8f64dc5acbe88084eca57a4228c03a0"
+  },
+  {
+    "id": "M",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/hsm/words/M.svg",
+    "sha256": "01979a11c9bf928927eedc764a07714eca3ce1de0f8b0096544fcec1c60b556d"
+  },
+  {
+    "id": "S",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/hsm/words/S.svg",
+    "sha256": "df74a9f73ebaa4dde0c60a74855d6b0b0b61b87a56730b9dc7908c4270e36439"
+  }
+]
