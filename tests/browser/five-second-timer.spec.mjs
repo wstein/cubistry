@@ -10,14 +10,17 @@ async function choose(page, leadingZero = true) {
     const configure = CubeViewer.prototype.configure,
       animate = CubeViewer.prototype.animate;
     window.fiveMoves = [];
+    window.fiveTimes = [];
     CubeViewer.prototype.configure = function (p, s, a) {
       window.fivePrint = p;
       window.fiveStart = s;
       return configure.call(this, p, s, a);
     };
     CubeViewer.prototype.animate = async function (p) {
+      const began = performance.now();
       await animate.call(this, p);
       window.fiveMoves.push(p);
+      window.fiveTimes.push({ began, settled: performance.now() });
     };
   });
   await page.selectOption("#application", "five-second-timer");
@@ -151,7 +154,10 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
   await page.clock.runFor(400);
-  await expect(page.locator("#timer-sync")).toHaveAttribute("data-state", "synchronizing");
+  await expect(page.locator("#timer-sync")).toHaveAttribute(
+    "data-state",
+    "synchronizing",
+  );
   await expect(page.locator("#timer-last-settled")).toBeVisible();
   await page.click("#timer-start");
   await expect(page.locator("#status")).toContainText("Paused");
@@ -245,3 +251,103 @@ test("damaged five-second certificate leaves current Counter usable", async ({
   await page.locator('[data-delta="1"]').click();
   await settled(page, "1");
 });
+
+for (const [stop, preferred] of [
+  ["3", 250],
+  ["0", 2000],
+  ["6", 10],
+])
+  test(`five-second six-move sequence settles by its deadline at ${preferred}ms preference`, async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout(45000);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await choose(page);
+    await page.locator("#rotation-speed").fill("6");
+    await duration(page, "00:05");
+    await page.locator("#rotation-speed").fill(stop);
+    const offset = await page.evaluate(() => window.fiveMoves.length);
+    const epoch = await page.evaluate(() => {
+      const at = performance.now();
+      document.querySelector("#timer-start").click();
+      return at;
+    });
+    await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
+    await expect(page.locator("#timer-logical")).toHaveText("00:05");
+    await expect(page.locator("#timer-sync")).toHaveAttribute(
+      "data-state",
+      "moving",
+    );
+    const effective = Number(
+      (await page.locator("#timer-effective").innerText()).match(/[\d.]+/)[0],
+    );
+    await settled(page, "00:00");
+    const trace = await page.evaluate(
+      ({ offset, epoch, preferred, effective }) => {
+        const moves = window.fiveMoves,
+          times = window.fiveTimes.slice(offset);
+        return {
+          print: window.fivePrint,
+          start: window.fiveStart,
+          startValue: 360,
+          transitions: [
+            {
+              value: 0,
+              word: moves
+                .map(
+                  (p) =>
+                    p.move.face +
+                    (p.move.turns === 2 ? "2" : p.move.turns === -1 ? "'" : ""),
+                )
+                .join(" "),
+              state: moves.at(-1).to,
+              moves,
+            },
+          ],
+          observation: {
+            preferredMilliseconds: preferred,
+            effectiveMilliseconds: effective,
+            deadlineMilliseconds: epoch + 5000,
+            firstMoveMilliseconds: times[0].began,
+            settledMilliseconds: times.at(-1).settled,
+            actualHTM: times.length,
+            intervalMilliseconds: 5000,
+            viewport: [innerWidth, innerHeight],
+            userAgent: navigator.userAgent,
+            reducedMotion: false,
+          },
+        };
+      },
+      { offset, epoch, preferred, effective },
+    );
+    const path = testInfo.outputPath("deadline-observation.json");
+    writeFileSync(path, JSON.stringify(trace, null, 2));
+    const result = JSON.parse(
+      execFileSync(
+        "python3",
+        [
+          ".five-second-research/research/five-second-timer/verify_trace.py",
+          path,
+        ],
+        { encoding: "utf8" },
+      ),
+    );
+    expect(result.status).toBe("PASS");
+    expect(trace.observation.actualHTM).toBe(6);
+    expect(effective).toBeLessThanOrEqual(preferred);
+    expect(trace.observation.firstMoveMilliseconds).toBeGreaterThanOrEqual(
+      epoch + 2500 - 50,
+    );
+    expect(trace.observation.settledMilliseconds).toBeLessThanOrEqual(
+      trace.observation.deadlineMilliseconds,
+    );
+    expect(
+      trace.observation.settledMilliseconds -
+        trace.observation.firstMoveMilliseconds,
+    ).toBeLessThanOrEqual(2500);
+    await expect(page.locator("#rotation-speed")).toHaveValue(stop);
+    await expect(page.locator("#speed-label")).toHaveText(
+      `${preferred === 2000 ? "2 s" : preferred + " ms"} preferred`,
+    );
+    await expect(page.locator("#timer-sync")).not.toContainText("Late");
+  });
