@@ -4,6 +4,7 @@ import {
   parseDuration,
 } from "./apps/timer/clock.ts";
 import { TimerController } from "./apps/timer/controller.ts";
+import { TimerScheduler } from "./apps/timer/scheduler.ts";
 import { timerMotion } from "./apps/timer/status.ts";
 import { loadTimerRoute } from "./apps/timer/design.ts";
 import { CounterRun } from "./apps/counter/run.mjs";
@@ -33,6 +34,8 @@ let application = "certified",
 let durationDirty = false,
   configuredSeconds = 900;
 const clock = new WorkshopClock();
+const timerScheduler = new TimerScheduler(() => tick());
+let effectiveMoveDuration = 250;
 const error = (message = "") => {
   $("error").textContent = message;
 };
@@ -147,7 +150,7 @@ const onPhysicalState = (physical, busy, failure, progress) => {
   if (failure) {
     ready = false;
     run.stop();
-    if (application === "timer") clock.pause();
+    if (application === "timer") { clock.pause(); timerScheduler.invalidate(); }
     error(
       "The cube could not complete its legal turn sequence. Reload to recover.",
     );
@@ -242,8 +245,10 @@ $("format").addEventListener("change", () =>
 );
 function speedUi() {
   const stop = Number($("rotation-speed").value);
-  viewer?.setAnimationSpeed(BASE_MOVE_DURATION_MS / durations[stop]);
-  $("speed-label").textContent = `${speedLabels[stop]} per HTM move`;
+  if (application !== "timer" || !ready)
+    viewer?.setAnimationSpeed(BASE_MOVE_DURATION_MS / durations[stop]);
+  $("speed-label").textContent = application === "timer"
+    ? `${speedLabels[stop]} preferred` : `${speedLabels[stop]} per HTM move`;
   $("rotation-speed").setAttribute(
     "aria-valuetext",
     $("speed-label").textContent,
@@ -251,22 +256,17 @@ function speedUi() {
 }
 $("rotation-speed").addEventListener("input", () => {
   speedUi();
+  if (application === "timer") tick();
   save();
 });
 function tick() {
   if (!ready) return;
   if (application === "timer") {
-    if (
-      (clock.running || (timerStarted && clock.elapsed)) &&
-      (view.currentValue !== clock.bucket || view.busy)
-    ) {
-      const desired = clock.bucket;
-      if (
-        view.progress.queuedTarget !== desired &&
-        view.progress.target !== desired
-      )
-        view.request(desired);
-    }
+    timerScheduler.tick(clock.snapshot(), view, durations[Number($("rotation-speed").value)],
+      duration => {
+        effectiveMoveDuration = duration;
+        viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / duration);
+      });
     timerUi();
     controlsUi();
     return;
@@ -301,11 +301,13 @@ function timerUi() {
     physical = view?.currentValue ?? logical;
   text("timer-logical", formatTimer(logical));
   text("timer-physical", formatTimer(physical));
+  const snapshot = clock.snapshot();
   const motion = timerMotion({
     physical,
     logical,
     busy: !!view?.busy,
     activeTarget: view?.progress.target ?? null,
+    anticipatedTarget: timerScheduler.presentationTarget(snapshot),
   });
   const settling = motion !== "idle";
   $("timer-sync").dataset.state = motion;
@@ -313,8 +315,10 @@ function timerUi() {
     idle: "",
     moving: "Moving",
     synchronizing: "Synchronizing",
-  }[motion]);
+  }[motion] + (timerScheduler.warning ? `${motion === "idle" ? "" : " · "}${timerScheduler.warning}` : ""));
   $("timer-last-settled").hidden = motion !== "synchronizing";
+  text("timer-effective", `${Math.round(effectiveMoveDuration)} ms effective`);
+  $("timer-effective").hidden = motion === "idle" && !timerScheduler.warning;
   $("timer-sync").hidden = application !== "timer";
   const phase = clock.elapsed
     ? settling
@@ -336,6 +340,11 @@ $("timer-duration").addEventListener("input", () => {
   durationDirty = true;
   controlsUi();
 });
+function reconcileTimer() {
+  timerScheduler.invalidate();
+  viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / durations[Number($("rotation-speed").value)]);
+  view.request(clock.bucket);
+}
 function applyDuration() {
   const seconds = parseDuration($("timer-duration").value);
   clock.configure(seconds);
@@ -343,14 +352,14 @@ function applyDuration() {
   durationDirty = false;
   timerStarted = false;
   $("timer-duration").value = formatTimer(seconds / 10);
-  view.request(clock.bucket);
+  reconcileTimer();
 }
 $("timer-start").addEventListener("click", () =>
   action(() => {
     if (!ready || application !== "timer") return;
     if (clock.running) {
       clock.pause();
-      view.request(clock.bucket);
+      reconcileTimer();
     } else {
       if (clock.mode === "countdown" && (!timerStarted || durationDirty))
         applyDuration();
@@ -369,7 +378,7 @@ $("timer-reset").addEventListener("click", () =>
     timerStarted = false;
     durationDirty = false;
     $("timer-duration").value = formatTimer(configuredSeconds / 10);
-    view.request(clock.bucket);
+    reconcileTimer();
     timerUi();
     controlsUi();
   }),
@@ -390,7 +399,7 @@ $("timer-mode").addEventListener("change", () =>
     timerStarted = false;
     durationDirty = false;
     $("timer-duration").value = formatTimer(configuredSeconds / 10);
-    view.request(clock.bucket);
+    reconcileTimer();
     timerUi();
     controlsUi();
   }),
@@ -433,6 +442,7 @@ $("application").addEventListener("change", async () => {
         resolveAssets,
       );
       await candidate.configure(90);
+      timerScheduler.invalidate();
       clock.setMode("countdown");
       clock.configure(900);
       clock.setSpeed(1);
@@ -446,6 +456,7 @@ $("application").addEventListener("change", async () => {
       candidate = new CounterController(viewer, proof, callback, resolveAssets);
       await candidate.configure("COUNTER", true, value, certified);
     }
+    timerScheduler.invalidate();
     previous.dispose();
     view = candidate;
     application = requested;

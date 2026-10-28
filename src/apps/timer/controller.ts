@@ -3,7 +3,7 @@ import {
   type PhysicalView,
   type MoveProgress,
 } from "../shared/playback.ts";
-import { demand, type CubeState, type LegalMove } from "@cubistry/cube-core";
+import { demand, stateEquals, type CubeState, type LegalMove } from "@cubistry/cube-core";
 import { matchesTarget } from "@cubistry/cube-mechanics";
 import {
   loadAssets,
@@ -23,6 +23,18 @@ export class TimerController extends PhysicalPlayback {
   private readonly resolveAssets: typeof loadAssets;
   private readonly prepareSolver: typeof createCounterSolver;
   private solver: CounterSolver | null = null;
+  private prepared: { source: CubeState; value: number; moves: readonly LegalMove[] } | null = null;
+  /** Prepare only from a committed idle source, including all hidden poses. */
+  prepare(value: number): readonly LegalMove[] {
+    demand(!this.busy && this.state && this.solver, "Timer must be settled before preparation");
+    demand(Number.isInteger(value) && value >= 0 && value <= 359, "Invalid timer target");
+    if (this.prepared?.value === value && stateEquals(this.prepared.source, this.state))
+      return this.prepared.moves;
+    const moves = timerStep(this.route, this.state, this.current, value)
+      ?? this.solver.solve(this.state, this.route.states[value], { coordinateFrames: true });
+    this.prepared = { source: this.state, value, moves };
+    return moves;
+  }
   constructor(
     view: PhysicalView,
     route: TimerRoute,
@@ -65,6 +77,9 @@ export class TimerController extends PhysicalPlayback {
     value: number,
   ): readonly LegalMove[] {
     demand(this.solver, "Timer is not configured");
+    const prepared = this.prepared;
+    this.prepared = null;
+    if (prepared?.value === value && stateEquals(prepared.source, from)) return prepared.moves;
     return (
       timerStep(this.route, from, this.current, value) ??
       this.solver.solve(from, target, { coordinateFrames: true })
