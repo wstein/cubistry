@@ -1,27 +1,34 @@
+import { CounterAuto } from "./apps/counter/auto.mjs";
 import { loadCertifiedCounter } from "./apps/counter/certified.ts";
 import "./style.css";
 import { loadAssets } from "@cubistry/cube-assets";
-import { CubeViewer } from "@cubistry/cube-viewer";
+import {
+  CubeViewer,
+  MIN_ANIMATION_SPEED,
+  MAX_ANIMATION_SPEED,
+} from "@cubistry/cube-viewer";
 import { CounterController } from "./apps/counter/controller.ts";
-import { validLabel, loadCounterDesign } from "./apps/counter/design.ts";
+import { loadCounterDesign } from "./apps/counter/design.ts";
 import { MinuteTimer, parseValue, shifted } from "./counter.mjs";
 const $ = (id) => document.getElementById(id),
-  timer = new MinuteTimer();
-let value = 15,
+  timer = new MinuteTimer(),
+  auto = new CounterAuto();
+let value = 0,
   ready = false;
-let printConfig = { label: "BREAK\nMINUTES", padded: true, printing: "classic" };
+let printConfig = { label: "COUNTER", padded: true, application: "certified" };
 const error = (message) => {
   $("error").textContent = message || "";
 };
 function save() {
   try {
     localStorage.setItem(
-      "cubistry-counter-v1",
+      "cubistry-counter-v2",
       JSON.stringify({
         value,
         label: printConfig.label,
         padded: printConfig.padded,
-        printing: printConfig.printing,
+        application: printConfig.application,
+        speed: Number($("rotation-speed").value),
         timer: timer.serialize(),
       }),
     );
@@ -34,13 +41,15 @@ function timerUi() {
     ".controls button,.controls input",
   ))
     el.disabled = !ready;
-  for (const id of ["label", "format", "printing"]) $(id).disabled = !ready;
-  $("apply-print").disabled = !ready || !!view?.busy;
+  for (const id of ["application", "format"])
+    $(id).disabled = !ready || !!view?.busy;
+  $("auto").disabled = !ready;
   $("reset-session-moves").disabled = !ready || !!view?.busy;
   $("stop-turns").disabled =
     !ready || !view?.busy || view?.progress.status === "stopping";
-  $("mode").textContent =
-    timer.state === "running"
+  $("mode").textContent = auto.enabled
+    ? "Auto"
+    : timer.state === "running"
       ? "Counting down"
       : timer.state === "paused"
         ? "Timer paused"
@@ -59,7 +68,15 @@ function timerUi() {
 }
 function setValue(next, { manual = true } = {}) {
   if (!ready) return;
-  if (manual) timer.reset(next);
+  if (manual) {
+    timer.reset(next);
+    if (auto.enabled)
+      auto.start(
+        next,
+        printConfig.application === "countdown" ? -1 : 1,
+        Date.now(),
+      );
+  }
   value = next;
   $("value").value = String(next);
   view.request(next);
@@ -93,6 +110,7 @@ const onPhysicalState = (physical, busy, failure, progress) => {
     meter.dataset.queued = String(progress.queuedTarget ?? "");
   }
   $("reset-session-moves").disabled = !ready || busy;
+  for (const id of ["application", "format"]) $(id).disabled = !ready || busy;
   $("stop-turns").disabled = !ready || !busy || progress?.status === "stopping";
   if (failure) {
     ready = false;
@@ -119,7 +137,6 @@ const onPhysicalState = (physical, busy, failure, progress) => {
       : "Showing " + physical + " · label restored";
   // The count changes once per committed token; don't repeat the same live status.
   if ($("status").textContent !== message) $("status").textContent = message;
-  $("apply-print").disabled = busy || !ready;
 };
 try {
   viewer = new CubeViewer($("cube"));
@@ -153,6 +170,7 @@ for (const [id, sign] of [
 $("start").addEventListener("click", () =>
   action(() => {
     if (!ready) return;
+    stopAuto();
     timer.start(value);
     timerUi();
     save();
@@ -164,11 +182,17 @@ $("pause").addEventListener("click", () => {
   timerUi();
   save();
 });
-$("reset").addEventListener("click", () => setValue(timer.reset()));
-$("reset-session-moves").addEventListener("click", () => action(() => view?.resetSessionMoves()));
+$("reset").addEventListener("click", () => {
+  stopAuto();
+  setValue(timer.reset());
+});
+$("reset-session-moves").addEventListener("click", () =>
+  action(() => view?.resetSessionMoves()),
+);
 $("front").addEventListener("click", () => view?.resetCamera());
 $("stop-turns").addEventListener("click", () =>
   action(() => {
+    stopAuto();
     const target = view?.stopAfterCurrent();
     if (target == null) return;
     // Do not request again: that would reinstate the queue just cancelled.
@@ -180,52 +204,110 @@ $("stop-turns").addEventListener("click", () =>
   }),
 );
 let proof, certified;
+const initialValue = (app) => (app === "countdown" ? 10 : 0);
+function applicationStatus() {
+  $("application").options[0].textContent = printConfig.padded
+    ? "Counter 00–99 (Certified)"
+    : "Counter 0–99 (Blank tens)";
+  $("application").options[1].textContent = printConfig.padded
+    ? "Counter countdown 10–00 (Certified)"
+    : "Counter countdown 10–0 (Blank tens)";
+  $("application-status").textContent = !printConfig.padded
+    ? "Original permanent print · no certified 339-HTM route."
+    : "Certified adjacent route: 339 HTM / 99 steps, maximum 5 per edge. Setup excluded; arbitrary jumps differ.";
+}
+function stopAuto() {
+  auto.stop();
+  $("auto").checked = false;
+  $("auto-status").textContent = "Auto off · fixed one-second cadence.";
+}
 async function selectedRoute() {
-  if ($("printing").value !== "certified") return null;
-  if ($("format").value !== "padded") throw Error("Certified print requires leading-zero format (00–99).");
+  if ($("format").value === "unpadded") return null;
   certified ??= await loadCertifiedCounter(proof, import.meta.env.BASE_URL);
   return certified;
 }
-$("print-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
+async function changeApplication(formatChange = false) {
   if (!ready || view.busy) return;
-  const label = $("label").value.trim(),
+  stopAuto();
+  if (!formatChange) $("format").value = "padded";
+  const app = $("application").value,
     padded = $("format").value === "padded";
-  if (!validLabel(label)) {
-    error("Use one or two lines, up to 40 characters per line.");
-    return;
-  }
   const previousState = view.state;
   ready = false;
-  $("apply-print").disabled = true;
   timerUi();
   try {
-    const route = await selectedRoute();
-    const initial = route ? 0 : 15;
-    await view.configure(label, padded, initial, route);
-    printConfig = { label, padded, printing: $("printing").value };
+    const route = await selectedRoute(),
+      initial = initialValue(app);
+    await view.configure("COUNTER", padded, initial, route);
+    printConfig = { label: "COUNTER", padded, application: app };
     timer.reset(initial);
     ready = true;
     setValue(initial);
-    $("status").textContent = `New fixed print applied · showing ${initial}`;
+    applicationStatus();
+    $("status").textContent =
+      `Application configured · showing ${initial} · new physical print/session`;
   } catch (e) {
     if (view.state === previousState) ready = true;
+    $("application").value = printConfig.application;
+    $("format").value = printConfig.padded ? "padded" : "unpadded";
     error(e.message);
   } finally {
-    $("apply-print").disabled = !ready;
     timerUi();
   }
+}
+$("application").addEventListener("change", () => void changeApplication());
+$("format").addEventListener("change", () => void changeApplication(true));
+$("auto").addEventListener("change", () => {
+  if ($("auto").checked) {
+    timer.reset(value);
+    auto.start(
+      value,
+      printConfig.application === "countdown" ? -1 : 1,
+      Date.now(),
+    );
+    $("auto-status").textContent =
+      "Auto on · wall-clock steps every second; latest target only.";
+  } else {
+    stopAuto();
+    const active = view?.stopAfterCurrent();
+    if (active != null) {
+      value = active;
+      $("value").value = String(active);
+    }
+  }
+  timerUi();
+  save();
+});
+function speedUi() {
+  const speed = Number($("rotation-speed").value);
+  viewer?.setAnimationSpeed(speed);
+  $("speed-label").textContent = `${Number(speed.toFixed(3))}×`;
+}
+$("rotation-speed").addEventListener("input", () => {
+  speedUi();
+  save();
 });
 function tick() {
   if (!ready) return;
-  if (timer.state === "running") {
+  if (auto.enabled) {
+    const next = auto.value(Date.now(), $("wrap").checked);
+    if (next !== value) setValue(next, { manual: false });
+    if (
+      !$("wrap").checked &&
+      ((printConfig.application === "countdown" && next === 0) ||
+        (printConfig.application !== "countdown" && next === 99))
+    )
+      stopAuto();
+    timerUi();
+    save();
+  } else if (timer.state === "running") {
     const next = timer.value();
     if (next !== value) setValue(next, { manual: false });
     timerUi();
     save();
   }
 }
-setInterval(tick, 500);
+setInterval(tick, 100);
 document.addEventListener("visibilitychange", tick);
 window.addEventListener("pageshow", tick);
 window.addEventListener("keydown", (e) => {
@@ -250,7 +332,7 @@ async function initialize() {
     );
     let saved;
     try {
-      saved = JSON.parse(localStorage.getItem("cubistry-counter-v1"));
+      saved = JSON.parse(localStorage.getItem("cubistry-counter-v2"));
     } catch {
       /* Start with the default print. */
     }
@@ -261,10 +343,19 @@ async function initialize() {
       saved.value <= 99
     ) {
       value = saved.value;
-      if (typeof saved.label === "string" && validLabel(saved.label))
-        $("label").value = saved.label;
+
       $("format").value = saved.padded === false ? "unpadded" : "padded";
-      $("printing").value = saved.printing === "certified" ? "certified" : "classic";
+      $("application").value = ["certified", "countdown"].includes(
+        saved.application,
+      )
+        ? saved.application
+        : "certified";
+      if (
+        Number.isFinite(saved.speed) &&
+        saved.speed >= MIN_ANIMATION_SPEED &&
+        saved.speed <= MAX_ANIMATION_SPEED
+      )
+        $("rotation-speed").value = String(saved.speed);
       if (
         timer.restore(saved.timer) &&
         ["running", "paused", "finished"].includes(saved.timer.state)
@@ -272,19 +363,20 @@ async function initialize() {
         value = timer.value();
     }
     await view.configure(
-      $("label").value,
+      "COUNTER",
       $("format").value === "padded",
       value,
       await selectedRoute(),
     );
     printConfig = {
-      label: $("label").value,
+      label: "COUNTER",
       padded: $("format").value === "padded",
-      printing: $("printing").value,
+      application: $("application").value,
     };
     ready = true;
     $("value").value = String(value);
-    $("apply-print").disabled = false;
+    applicationStatus();
+    speedUi();
     timerUi();
   } catch (e) {
     error("Counter setup failed: " + e.message);

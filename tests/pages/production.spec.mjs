@@ -62,7 +62,8 @@ test("built Pages counter resolves immutable assets under project base and rende
   page.on("request", (r) => {
     const url = new URL(r.url());
     // Locally created immutable bitmap blob URLs are not HTTP asset requests.
-    if (url.protocol === "http:" || url.protocol === "https:") requests.push(url.pathname);
+    if (url.protocol === "http:" || url.protocol === "https:")
+      requests.push(url.pathname);
   });
   page.on("response", (r) => {
     if (r.status() >= 400) failures.push(r.url());
@@ -71,7 +72,14 @@ test("built Pages counter resolves immutable assets under project base and rende
   await expect(
     page.getByText("Development Preview", { exact: true }),
   ).toBeVisible();
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await page.locator("#format").selectOption("unpadded");
+  await expect(page.locator("#application")).toBeEnabled();
+  await page.locator("#value").fill("15");
+  await page.locator("#jump-form button").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await page.locator("#reset-session-moves").click();
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   for (const value of [42, 43, 7, 99]) {
     await page.locator("#value").fill(String(value));
@@ -96,7 +104,9 @@ test("built Pages counter resolves immutable assets under project base and rende
     ]) {
       const actual = renderedDigit(image, center);
       expect(actual.segments).toBe(active[digit]);
-      expect(actual.uprightBaseline, `upright baseline ${value}/${digit}`).toBe(true);
+      expect(actual.uprightBaseline, `upright baseline ${value}/${digit}`).toBe(
+        true,
+      );
     }
   }
   expect(requests.filter((p) => !p.startsWith("/cubistry/"))).toEqual([]);
@@ -110,7 +120,9 @@ test("built Pages counter resolves immutable assets under project base and rende
   expect(requests.filter((p) => p.endsWith(".bin"))).toHaveLength(1);
   const source = await page.request.get("./licenses/puzlwerk/source.json");
   expect(source.ok()).toBe(true);
-  expect((await source.json()).commit).toBe(JSON.parse(await readFile("puzlwerk-source.json", "utf8")).commit);
+  expect((await source.json()).commit).toBe(
+    JSON.parse(await readFile("puzlwerk-source.json", "utf8")).commit,
+  );
   const license = await page.request.get("./licenses/puzlwerk/COPYING");
   expect(license.ok()).toBe(true);
   expect(await license.text()).toContain("GNU AFFERO GENERAL PUBLIC LICENSE");
@@ -138,24 +150,39 @@ test("built examples retain asset base and solver acceptance stays disabled", as
   await expect(page.locator("#cube")).toHaveAttribute("data-at-source", "true");
 });
 
-test("published proof and design bytes retain canonical identity and missing paths really fail", async ({ request }) => {
+test("published proof and design bytes retain canonical identity and missing paths really fail", async ({
+  request,
+}) => {
   for (const path of ["counter-proof.json", "counter-design.v2.json"]) {
     const response = await request.get(path);
     expect(response.status()).toBe(200);
     expect(response.headers()["content-type"]).toBe("application/json");
-    expect(Buffer.compare(await response.body(), await readFile(`public/${path}`))).toBe(0);
+    expect(
+      Buffer.compare(await response.body(), await readFile(`public/${path}`)),
+    ).toBe(0);
   }
   expect((await request.get("assets/missing.svg")).status()).toBe(404);
   expect((await request.get("/counter-design.v2.json")).status()).toBe(404);
 });
 
-test("built project-path optimized print loads its pinned certificate and executes the canonical first edge",async({page})=>{
-  const errors=[],failures=[];page.on("pageerror",e=>errors.push(e.message));
-  page.on("response",r=>{if(r.status()>=400)failures.push(r.url());});
-  await page.goto("./");await expect(page.locator("#cube")).toHaveAttribute("aria-busy","false");
-  await page.locator("summary").click();await page.locator("#printing").selectOption("certified");await page.locator("#apply-print").click();
-  await expect(page.locator("#apply-print")).toBeEnabled();await expect(page.locator("#cube")).toHaveAttribute("data-value","0");
-  await page.locator('[data-delta="1"]').click();await expect(page.locator("#cube")).toHaveAttribute("data-value","1");await expect(page.locator("#cube")).toHaveAttribute("aria-busy","false");
-  await expect(page.locator("#move-progress")).toHaveText("5 / 5 moves");await expect(page.locator("#session-moves")).toHaveText("Session: 5 moves");
-  expect(errors).toEqual([]);expect(failures).toEqual([]);
+test("built project-path optimized print loads its pinned certificate and executes the canonical first edge", async ({
+  page,
+}) => {
+  const errors = [],
+    failures = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("response", (r) => {
+    if (r.status() >= 400) failures.push(r.url());
+  });
+  await page.goto("./");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#application")).toHaveValue("certified");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
+  await page.locator('[data-delta="1"]').click();
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#move-progress")).toHaveText("5 / 5 moves");
+  await expect(page.locator("#session-moves")).toHaveText("Session: 5 moves");
+  expect(errors).toEqual([]);
+  expect(failures).toEqual([]);
 });

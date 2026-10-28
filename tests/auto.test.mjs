@@ -1,0 +1,21 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { CounterAuto } from "../src/apps/counter/auto.mjs";
+test("fixed Auto cadence depends on wall time, clamps/wraps and stops without a queue", () => {
+  const a = new CounterAuto();
+  a.start(0, 1, 10000);
+  assert.equal(a.value(10999), 0);
+  assert.equal(a.value(11000), 1);
+  assert.equal(a.value(15000), 5);
+  assert.equal(a.value(200000), 99);
+  assert.equal(a.value(200000, true), 90);
+  a.start(10, -1, 10000);
+  assert.equal(a.value(11000), 9);
+  assert.equal(a.value(21000), 0);
+  assert.equal(a.value(21000, true), 99);
+  a.stop();
+  assert.equal(a.value(999999), null);
+  a.start(42, 1, 500);
+  assert.equal(a.value(499), 42);
+  assert.throws(() => a.value(NaN));
+});

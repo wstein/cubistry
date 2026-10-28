@@ -6,7 +6,7 @@ const design = JSON.parse(
 );
 async function ready(page) {
   await page.goto("/");
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 }
 for (const [field, value] of [
@@ -188,7 +188,7 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
   expect(result.closed).toBe(1);
   expect(result.after).toBe(result.before);
   await page.locator('[data-delta="1"]').click();
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "16");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
 });
 test("PNG and WebP assets are actually decoded as immutable bounded images", async ({
   page,

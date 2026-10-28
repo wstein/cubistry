@@ -2,7 +2,14 @@ import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 async function ready(page) {
   await page.goto("/");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await page.locator("#format").selectOption("unpadded");
+  await expect(page.locator("#application")).toBeEnabled();
+  await page.locator("#value").fill("15");
+  await page.locator("#jump-form button").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await page.locator("#reset-session-moves").click();
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 }
 async function go(page, value) {
@@ -37,29 +44,25 @@ test("manual controls, rapid chains, bounds, validation and immutable draft prin
   await page.locator("#jump-form button").click();
   await expect(page.locator("#error")).toContainText("whole number");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "93");
-  await page.locator("summary").click();
-  await page.locator("#label").fill("UNAPPLIED");
   await page.locator("#format").selectOption("unpadded");
-  await page.locator('[data-delta="-1"]').click();
+  await expect(page.locator("#application")).toBeEnabled();
+  await go(page, 7);
   const saved = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("cubistry-counter-v1")),
+    JSON.parse(localStorage.getItem("cubistry-counter-v2")),
   );
-  expect(saved.label).toBe("BREAK\nMINUTES");
-  expect(saved.padded).toBe(true);
+  expect(saved.label).toBe("COUNTER");
+  expect(saved.padded).toBe(false);
   await page.reload();
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "92");
-  await expect(page.locator("#label")).toHaveValue("BREAK\nMINUTES");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "7");
+  await expect(page.locator("#format")).toHaveValue("unpadded");
   expect(errors).toEqual([]);
 });
 test("explicit new fixed print, physical SVG orientation and title pixels survive goals", async ({
   page,
 }) => {
   await ready(page);
-  await page.locator("summary").click();
-  await page.locator("#label").fill("COFFEE\nBREAK");
   await page.locator("#format").selectOption("unpadded");
-  await page.locator("#apply-print").click();
-  await expect(page.locator("#apply-print")).toBeEnabled();
+  await expect(page.locator("#application")).toBeEnabled();
   await go(page, 7);
   const first = PNG.sync.read(await page.locator("#cube canvas").screenshot());
   // The actual WebGL front projection: sample the vector baseline marker at
@@ -137,8 +140,7 @@ test("animated turns, camera drag and apply guard preserve legal final state", a
   await ready(page);
   await page.locator('[data-delta="1"]').click();
   await page.locator('[data-delta="10"]').click();
-  await page.locator("summary").click();
-  await expect(page.locator("#apply-print")).toBeDisabled();
+  await expect(page.locator("#application")).toBeDisabled();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "26", {
     timeout: 15000,
   });
@@ -180,7 +182,7 @@ test("an expired running timer restores the cube at zero, not its stale saved co
   await ready(page);
   await page.evaluate(() => {
     const saved = JSON.parse(
-      localStorage.getItem("cubistry-counter-v1") || "{}",
+      localStorage.getItem("cubistry-counter-v2") || "{}",
     );
     Object.assign(saved, {
       value: 15,
@@ -193,7 +195,7 @@ test("an expired running timer restores the cube at zero, not its stale saved co
         deadline: Date.now() - 1000,
       },
     });
-    localStorage.setItem("cubistry-counter-v1", JSON.stringify(saved));
+    localStorage.setItem("cubistry-counter-v2", JSON.stringify(saved));
   });
   await page.reload();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
@@ -209,7 +211,7 @@ test("pausing between a wall-clock minute boundary and the next timer tick synch
   await ready(page);
   await page.locator("#start").click();
   const timerStart = await page.evaluate(() => {
-    const saved = JSON.parse(localStorage.getItem("cubistry-counter-v1"));
+    const saved = JSON.parse(localStorage.getItem("cubistry-counter-v2"));
     return saved.timer.deadline - saved.timer.initialMinutes * 60000;
   });
   await page.clock.setSystemTime(new Date(timerStart + 61000));
@@ -219,32 +221,20 @@ test("pausing between a wall-clock minute boundary and the next timer tick synch
   await expect(page.locator("#mode")).toHaveText("Timer paused");
 });
 
-for (const [name, label] of [
-  ["two 40-character lines", "W".repeat(40) + "\n" + "W".repeat(40)],
-  [
-    "40 Unicode code points per line",
-    "é".repeat(40) + "\n" + "😀".repeat(10) + "i".repeat(30),
-  ],
-]) {
-  test(`the applied fixed label survives reload at the supported boundary: ${name}`, async ({
+for (const application of ["certified", "countdown"]) {
+  test(`application, format and speed persist across reload: ${application}`, async ({
     page,
   }) => {
     await ready(page);
-    await page.locator("summary").click();
-    await page.locator("#label").fill(label);
-    await page.locator("#apply-print").click();
-    await expect(page.locator("#apply-print")).toBeEnabled();
-    await expect(page.locator("#error")).toBeEmpty();
+    await page.locator("#application").selectOption(application);
+    await expect(page.locator("#application")).toBeEnabled();
+    await page.locator("#rotation-speed").fill("2");
+    await page.locator("#rotation-speed").dispatchEvent("input");
     await go(page, 42);
-    expect(
-      await page.evaluate(
-        () => JSON.parse(localStorage.getItem("cubistry-counter-v1")).label,
-      ),
-    ).toBe(label);
     await page.reload();
     await expect(page.locator("#cube")).toHaveAttribute("data-value", "42");
-    await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-    await expect(page.locator("#label")).toHaveValue(label);
-    await expect(page.locator("#error")).toBeEmpty();
+    await expect(page.locator("#application")).toHaveValue(application);
+    await expect(page.locator("#rotation-speed")).toHaveValue("2");
+    await expect(page.locator("#format")).toHaveValue("padded");
   });
 }
