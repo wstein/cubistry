@@ -23,6 +23,7 @@ export class CalendarViewer {
   private resize: ResizeObserver;
   private yaw = Math.PI / 24;
   private pitch = Math.PI / 30;
+  private radius = 14.1;
   private drag: { id: number; x: number; y: number } | null = null;
   private current: State | null = null;
   private print: State | null = null;
@@ -52,6 +53,11 @@ export class CalendarViewer {
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
+      // Fit the entire turn/orbit envelope, including at narrow aspect ratios.
+      const halfVertical = THREE.MathUtils.degToRad(this.camera.fov / 2),
+        halfHorizontal = Math.atan(Math.tan(halfVertical) * this.camera.aspect);
+      this.radius =
+        (2.7 * 1.08) / Math.sin(Math.min(halfVertical, halfHorizontal));
     });
     this.resize.observe(host);
     const el = this.renderer.domElement;
@@ -81,9 +87,9 @@ export class CalendarViewer {
     el.addEventListener("lostpointercapture", release);
     this.renderer.setAnimationLoop(() => {
       this.camera.position.set(
-        Math.sin(this.yaw) * Math.cos(this.pitch) * 12,
-        Math.sin(this.pitch) * 12,
-        Math.cos(this.yaw) * Math.cos(this.pitch) * 12,
+        Math.sin(this.yaw) * Math.cos(this.pitch) * this.radius,
+        Math.sin(this.pitch) * this.radius,
+        Math.cos(this.yaw) * Math.cos(this.pitch) * this.radius,
       );
       this.camera.lookAt(0, 0, 0);
       this.renderer.render(this.scene, this.camera);
