@@ -253,3 +253,114 @@ test("selecting today refreshes Live and Inspecting status without moving sticke
   );
   expect(await physical(page)).toEqual(before);
 });
+test.describe("high-density calendar framing", () => {
+  test.use({ deviceScaleFactor: 2 });
+  test("German and English cubes stay inside the viewport and clear of date controls", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.addInitScript(() => {
+      const epoch = Date.parse("2026-11-07T11:00:00Z");
+      Date.now = () => epoch;
+    });
+    await page.goto("/calendar.html");
+    await expect(page.locator("#calendar-design")).toBeEnabled();
+    await page.click("#calendar-set");
+    for (const design of ["de-a", "en-3"]) {
+      await page.selectOption("#calendar-design", design);
+      await expect(page.locator("#calendar-design")).toBeEnabled();
+      if (design === "en-3") {
+        await page.uncheck("#calendar-padding");
+        await expect(page.locator("#calendar-viewer")).toHaveAttribute(
+          "aria-busy",
+          "false",
+        );
+        expect((await physical(page)).cells).toEqual([
+          "SAT",
+          "",
+          "",
+          "N",
+          "O",
+          "V",
+          "",
+          "",
+          "7",
+        ]);
+      }
+      for (const viewport of [
+        { width: 1440, height: 1100 },
+        { width: 390, height: 844 },
+      ]) {
+        const previousFrame = await page.evaluate(async () => {
+          const { calendarApp } = await import("/src/calendar.mjs");
+          return calendarApp.viewer.renderer.info.render.frame;
+        });
+        await page.setViewportSize(viewport);
+        await page.locator("#calendar-viewer").scrollIntoViewIfNeeded();
+        await expect
+          .poll(
+            async () =>
+              page.evaluate(async () => {
+                const { calendarApp } = await import("/src/calendar.mjs");
+                return calendarApp.viewer.renderer.info.render.frame;
+              }),
+            { timeout: 15000 },
+          )
+          .toBeGreaterThan(previousFrame + 1);
+        await expect(page.locator("#calendar-viewer canvas")).toHaveCount(1);
+        const host = await page.locator("#calendar-viewer").boundingBox(),
+          canvas = await page.locator("#calendar-viewer canvas").boundingBox(),
+          controls = await page.locator(".calendar-controls").boundingBox();
+        expect(Math.abs(canvas.width - host.width)).toBeLessThan(1);
+        expect(Math.abs(canvas.height - host.height)).toBeLessThan(1);
+        expect(canvas.x).toBeGreaterThanOrEqual(host.x);
+        expect(canvas.y).toBeGreaterThanOrEqual(host.y);
+        expect(canvas.x + canvas.width).toBeLessThanOrEqual(
+          host.x + host.width + 1,
+        );
+        expect(canvas.y + canvas.height).toBeLessThanOrEqual(
+          host.y + host.height + 1,
+        );
+        expect(
+          canvas.x + canvas.width <= controls.x ||
+            controls.y + controls.height <= canvas.y,
+        ).toBe(true);
+        expect(
+          await page.locator("html").evaluate((e) => e.scrollWidth),
+        ).toBeLessThanOrEqual(viewport.width);
+        const framing = await page.evaluate(async () => {
+          const { calendarApp } = await import("/src/calendar.mjs");
+          const viewer = calendarApp.viewer;
+          viewer.camera.updateMatrixWorld();
+          const projected = [-1.55, 1.55].flatMap((x) =>
+            [-1.55, 1.55].flatMap((y) =>
+              [-1.55, 1.55].map((z) =>
+                viewer.camera.position
+                  .clone()
+                  .set(x, y, z)
+                  .project(viewer.camera)
+                  .toArray(),
+              ),
+            ),
+          );
+          return { projected, distance: viewer.camera.position.length() };
+        });
+        expect(framing.distance).toBeGreaterThan(12);
+        expect(
+          framing.projected.every(
+            (p) =>
+              Math.abs(p[0]) < 0.9 &&
+              Math.abs(p[1]) < 0.9 &&
+              p[2] > -1 &&
+              p[2] < 1,
+          ),
+        ).toBe(true);
+        expect((await physical(page)).valid).toBe(true);
+        await page.screenshot({
+          path: `test-results/calendar-framing-${design}-${viewport.width}-dpr2.png`,
+          fullPage: true,
+        });
+      }
+    }
+  });
+});

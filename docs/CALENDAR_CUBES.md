@@ -48,6 +48,11 @@ commits after its legal route finishes. Date inspection accepts Gregorian dates
 from 0001-01-01 through 9999-12-31, rejects invalid days, and does not interpret an
 ISO civil date as a local UTC timestamp. Live returns to the current local date.
 
+The drawing buffer follows the display pixel ratio, while the canvas retains the
+CSS dimensions of its viewport. The camera fits the complete cube turn/orbit
+envelope to both viewport axes after resizing, keeping the cube clear of the
+adjacent controls on desktop and within the narrow mobile viewport.
+
 ## Original artwork
 
 The immutable [vector sticker sources](../assets/calendar/manifest.json) use the
