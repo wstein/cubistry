@@ -144,15 +144,15 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.clock.install();
   await choose(page);
-  await duration(page, "00:30");
+  await duration(page, "01:00");
   await page.locator("#rotation-speed").fill("0");
   await page.selectOption("#timer-speed", "100");
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
   await page.clock.fastForward(100);
-  await page.clock.runFor(20);
-  await page.clock.fastForward(70);
-  await page.clock.runFor(20);
+  await page.clock.runFor(100);
+  await page.clock.fastForward(100);
+  await page.clock.runFor(100);
   await expect(page.locator("#timer-sync")).toBeVisible();
   await page.click("#timer-start");
   await expect(page.locator("#status")).toContainText("Paused");
@@ -175,10 +175,10 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
     await page.clock.fastForward(2100);
     await page.clock.runFor(20);
   }
-  await settled(page, "00:30");
+  await settled(page, "01:00");
   await expect(page.locator("#status")).toHaveText("Countdown · Ready");
   const t = await page.evaluate(() => ({
-    value: 6,
+    value: 12,
     word: window.fiveMoves
       .map(
         (p) =>
@@ -199,9 +199,9 @@ test("Stopwatch floors five-second fractions and terminates exactly39:55 at100x;
   await settled(page, "00:00");
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
-  await page.clock.fastForward(4999);
+  await page.clock.fastForward(4500);
   await expect(page.locator("#timer-logical")).toHaveText("00:00");
-  await page.clock.runFor(2501);
+  await page.clock.runFor(3000);
   await settled(page, "00:05");
   await page.click("#timer-start");
   await page.clock.fastForward(50000);

@@ -65,6 +65,16 @@ test("five-second fractions survive pause/resume/rate changes and unsupported ti
   c.start();
   now += 0.1;
   assert.equal(c.bucket, 359);
+  c.setMode("stopwatch");
+  c.setSpeed(1);
+  c.start();
+  now += 4999;
+  assert.equal(c.bucket, 0);
+  now++;
+  assert.equal(c.bucket, 1);
+  c.pause();
+  now += 10000;
+  assert.equal(c.bucket, 1);
   for (const x of ["40:00", "39:56", "00:01", "60:00", "0:60"])
     assert.throws(() => parseDuration(x, FIVE_SECOND_TIMER));
   for (const x of [-5, 2400, 2396, NaN]) assert.throws(() => c.configure(x));
