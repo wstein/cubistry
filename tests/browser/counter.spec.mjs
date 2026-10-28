@@ -96,10 +96,11 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
   ).toBe(true);
   const chooser = await page.locator(".application-choice").boundingBox(),
     cube = await page.locator(".cube-card").boundingBox(),
-    controls = await page.locator(".controls").boundingBox();
+    controls = await page.locator("#counter-controls").boundingBox();
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(cube.y);
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(controls.y);
   await expect(page.locator("#application option")).toHaveText([
+    "H/S/M Counter 00–59",
     "Counter 0–99",
     "60-Minute Timer",
     "5-Second Timer",
