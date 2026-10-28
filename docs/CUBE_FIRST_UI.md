@@ -2,7 +2,9 @@
 
 [Issue #53](https://github.com/wstein/cubistry/issues/53) defines this change.
 It starts from `76415c48600c61c2cb41e0f839f138b404ce8f64` on `main`, independently
-of [PR #52](https://github.com/wstein/cubistry/pull/52).
+of [PR #52](https://github.com/wstein/cubistry/pull/52). During implementation,
+#52 merged into main; the feature rebased cleanly onto `5ba6109`. No unmerged
+#52 branch was used as a development base.
 
 ## Interaction contract
 
@@ -60,6 +62,12 @@ validators, typecheck and build); the existing browser suite passes 36/36.
 Local browser checks use the installed `/usr/bin/chromium` via an uncommitted
 configuration override. CI retains the repository's pinned Playwright browser.
 
+After that main update, `npm run check` passes with 54 Node tests and 35 Python
+tests, plus typecheck, physical validators, and build. The UI browser suite
+passes 34/34, static production-path checks pass 4/4, and the unchanged preview
+browser suite now on main passes 4/4. The canonical browser traversal still
+independently replays exactly 339 HTM with a maximum of five per adjacent edge.
+
 The updated regression suite replaces removed timer/Auto/custom-step UI
 expectations with Set/Run/Stop tests while retaining their core unit tests.
 It preserves exhaustive 00–99 browser execution, independent Python replay,
@@ -70,10 +78,12 @@ Run deliberately slows below one value per second when a physical transition
 takes longer. Stop finishes the active value rather than freezing a partial
 face. The blank-tens variant does not acquire the certified traversal guarantee.
 
-PR #52 changes preview workflows, helpers, package scripts, and preview browser
-tests. This PR changes none of its infrastructure. Both touch the browser-facing
-counter contract: preview tests expecting the removed Development Preview badge
-or a generic `#jump-form button` selector must use the Counter heading and
-`#set`; pixel checks must project the new default camera. Coordinate those test
-adaptations when combining the PRs. No merge, deployment, preview activation,
-Pages settings, or production configuration changes are part of this work.
+PR #52 changed preview workflows, helpers, package scripts, and preview browser
+tests while this work was in progress. Rebasing onto its merged main state had
+no textual conflicts. Its existing preview browser suite passes unchanged,
+including both deep preview bases and the interactive production root. The
+feature diff changes no preview workflows, helpers, deployment configuration,
+or CI infrastructure. Future assertions should target the Counter heading and
+`#set` and use the default-camera projection for digit pixel samples.
+No merge, deployment, preview activation, Pages settings, or production
+configuration changes are part of this work.
