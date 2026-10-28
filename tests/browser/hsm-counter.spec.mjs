@@ -38,6 +38,7 @@ async function physical(page, letter, value) {
     );
     const poses = stickerPoses(window.hsmPrint, window.hsmState);
     return [
+      [-1, 1, 1],
       [1, 1, 1],
       [-1, -1, 1],
       [1, -1, 1],
@@ -51,13 +52,13 @@ async function physical(page, letter, value) {
     });
   });
   expect(glyphs).toEqual(
-    [letter, ...String(value).padStart(2, "0")].map((assetId) => ({
+    ["blank", letter, ...String(value).padStart(2, "0")].map((assetId) => ({
       assetId,
       up: [0, 1, 0],
     })),
   );
 }
-test("all nine HSM variants wrap both ways within five moves and render fixed glyphs", async ({
+test("all nine HSM variants wrap both ways within six moves and render fixed glyphs", async ({
   page,
 }) => {
   await choose(page);
@@ -80,7 +81,7 @@ test("all nine HSM variants wrap both ways within five moves and render fixed gl
             .split("/")[1]
             .split("moves")[0],
         ),
-      ).toBeLessThanOrEqual(5);
+      ).toBeLessThanOrEqual(6);
       await page.locator('[data-hsm-delta="-1"]').click();
       await settled(page, maximum);
       await physical(page, letter, maximum);
@@ -129,4 +130,20 @@ test("HSM run stop resume, validation, mobile and existing application state rem
   await settled(page, 42);
   await page.selectOption("#application", "five-second-timer");
   await settled(page, "30:00");
+});
+test("M33 has a physical unprinted upper-left corner", async ({ page }) => {
+  await choose(page);
+  await page.selectOption("#hsm-letter", "M");
+  await expect(page.locator("#status")).toContainText("M · 00");
+  await page.fill("#hsm-value", "33");
+  await page.locator("#hsm-set-form").evaluate((f) => f.requestSubmit());
+  await settled(page, 33);
+  await physical(page, "M", 33);
+  expect(
+    await page.evaluate(
+      () =>
+        window.hsmPrint.stickers.filter((s) => s.assetId === "blank").length,
+    ),
+  ).toBe(3);
+  await page.screenshot({ path: "test-results/hsm-blank-M33.png" });
 });
