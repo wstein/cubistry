@@ -60,7 +60,7 @@ async function replay(page, transitions, path) {
   expect(result.status).toBe("PASS");
   return result;
 }
-test("five-second option has exact cap, six rotation stops, independent print and preserved legacy defaults", async ({
+test("five-second option has exact cap, inherited rotation stops, independent print and preserved legacy defaults", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -72,10 +72,11 @@ test("five-second option has exact cap, six rotation stops, independent print an
     "00:00–39:55 · 5-second steps",
   );
   await expect(page.locator("#rotation-speed")).toHaveValue("3");
+  await expect(page.locator("#rotation-speed")).toHaveAttribute("max", "6");
   expect(
     await page.locator("html").evaluate((e) => e.scrollWidth),
   ).toBeLessThanOrEqual(390);
-  for (const stop of ["0", "1", "2", "3", "4", "5"])
+  for (const stop of ["0", "1", "2", "3", "4", "5", "6"])
     await page.locator("#rotation-speed").fill(stop);
   for (const invalid of ["40:00", "39:56", "00:01"]) {
     await page.fill("#timer-duration", invalid);
@@ -150,7 +151,8 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
   await page.clock.runFor(400);
-  await expect(page.locator("#timer-sync")).toBeVisible();
+  await expect(page.locator("#timer-sync")).toHaveAttribute("data-state", "synchronizing");
+  await expect(page.locator("#timer-last-settled")).toBeVisible();
   await page.click("#timer-start");
   await expect(page.locator("#status")).toContainText("Paused");
   const frozen = await page.locator("#timer-logical").innerText();
