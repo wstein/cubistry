@@ -32,7 +32,7 @@ const frame = (normal: Vec3, up: Vec3) =>
 /** Generic size-2 viewer. It cannot select counter values, solve, or advance physics. */
 export const BASE_MOVE_DURATION_MS = 75;
 export const MIN_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 2000;
-export const MAX_ANIMATION_SPEED = 2;
+export const MAX_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 10;
 export class CubeViewer {
   private animationSpeed = 1;
   setAnimationSpeed(speed: number): void {
