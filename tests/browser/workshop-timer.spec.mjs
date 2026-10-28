@@ -937,7 +937,7 @@ test("real Stopwatch final physical state and live clock share the target endpoi
   await page.click("#timer-start"); await settled(page, "00:10");
   const observation = await endpointObservation(page); expectEndpoint(observation, 250);
   const path = testInfo.outputPath("stopwatch-endpoint.json");
-  writeFileSync(path, JSON.stringify(observation, null, 2));
+  writeFileSync(path, JSON.stringify({ implementationHead: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(), observedAt: new Date().toISOString(), ...observation }, null, 2));
   await testInfo.attach("stopwatch-endpoint", { path, contentType: "application/json" });
 });
 
@@ -1032,7 +1032,7 @@ test("automatic terminal tick preserves the real final turn endpoint and commits
   await page.click("#timer-start");await settled(page,"00:00");
   const observation=await endpointObservation(page,0);expectEndpoint(observation,250);
   await expect(page.locator("#status")).toHaveText("Countdown · Complete");
-  const path=testInfo.outputPath("terminal-endpoint.json");writeFileSync(path,JSON.stringify(observation,null,2));
+  const path=testInfo.outputPath("terminal-endpoint.json");writeFileSync(path,JSON.stringify({implementationHead:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),observedAt:new Date().toISOString(),...observation},null,2));
   await testInfo.attach("terminal-endpoint",{path,contentType:"application/json"});
 });
 
