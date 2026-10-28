@@ -69,6 +69,13 @@ Changing the number format also requires this new-print operation. Editing the
 form alone never changes sticker images during counting. Label fragments may
 separate while turning and return upright after each completed value.
 
+The original print remains available. A selectable
+[certified 00–99 print](docs/COUNTER_CERTIFIED_TRAVERSAL.md) executes the canonical
+99 adjacent increments in 339 committed HTM (maximum five per edge), excluding
+setup. Arbitrary jumps retain the shared exactPhysical solver; the claim does
+not apply to arbitrary paths. Session moves accumulate across values and can be
+reset independently of the timer.
+
 ## Shared framework path
 
 The counter is the first consumer of **PuzlWerk**: actual private shared workspaces
