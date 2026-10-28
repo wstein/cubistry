@@ -149,10 +149,7 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
   await page.selectOption("#timer-speed", "100");
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
-  await page.clock.fastForward(100);
-  await page.clock.runFor(100);
-  await page.clock.fastForward(100);
-  await page.clock.runFor(100);
+  await page.clock.runFor(400);
   await expect(page.locator("#timer-sync")).toBeVisible();
   await page.click("#timer-start");
   await expect(page.locator("#status")).toContainText("Paused");
