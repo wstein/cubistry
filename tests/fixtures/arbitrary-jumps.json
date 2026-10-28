@@ -1,0 +1,8164 @@
+[
+  {
+    "a": 6,
+    "b": 16,
+    "from": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        }
+      ]
+    },
+    "target": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "print": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    },
+    "raw": {
+      "moves": [
+        "U",
+        "R'",
+        "U",
+        "F'",
+        "U2",
+        "R",
+        "U2",
+        "R'",
+        "F2",
+        "R",
+        "L'"
+      ],
+      "mode": "exactPhysical",
+      "metric": "HTM",
+      "moveCount": 11,
+      "quotientDistance": 9,
+      "frameCorrectionMoves": 2,
+      "optimality": "not-guaranteed"
+    },
+    "selected": [
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "R",
+        "turns": 1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "R",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      }
+    ]
+  },
+  {
+    "a": 16,
+    "b": 6,
+    "from": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "target": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        }
+      ]
+    },
+    "print": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    },
+    "raw": {
+      "moves": [
+        "U2",
+        "R",
+        "F2",
+        "R'",
+        "U2",
+        "F",
+        "R'",
+        "U",
+        "R'",
+        "R",
+        "L'",
+        "R",
+        "L'",
+        "F'",
+        "B"
+      ],
+      "mode": "exactPhysical",
+      "metric": "HTM",
+      "moveCount": 15,
+      "quotientDistance": 9,
+      "frameCorrectionMoves": 6,
+      "optimality": "not-guaranteed"
+    },
+    "selected": [
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "R",
+        "turns": 1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "R",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "B",
+        "turns": 1
+      },
+      {
+        "face": "D",
+        "turns": -1
+      },
+      {
+        "face": "B",
+        "turns": 1
+      },
+      {
+        "face": "D",
+        "turns": -1
+      }
+    ]
+  },
+  {
+    "a": 0,
+    "b": 10,
+    "from": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "target": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "print": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    },
+    "raw": {
+      "moves": [
+        "R2",
+        "F",
+        "R",
+        "F2",
+        "R",
+        "F",
+        "U'",
+        "R2",
+        "F",
+        "F",
+        "B'",
+        "F",
+        "B'"
+      ],
+      "mode": "exactPhysical",
+      "metric": "HTM",
+      "moveCount": 13,
+      "quotientDistance": 9,
+      "frameCorrectionMoves": 4,
+      "optimality": "not-guaranteed"
+    },
+    "selected": [
+      {
+        "face": "R",
+        "turns": 2
+      },
+      {
+        "face": "B",
+        "turns": 1
+      },
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": 2
+      },
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "B",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "B",
+        "turns": 1
+      }
+    ]
+  },
+  {
+    "a": 10,
+    "b": 20,
+    "from": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "target": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "print": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    },
+    "raw": {
+      "moves": [
+        "U",
+        "R2",
+        "U",
+        "R2",
+        "F2",
+        "U",
+        "R'",
+        "U2",
+        "R'",
+        "U2",
+        "R",
+        "L'",
+        "U",
+        "D'"
+      ],
+      "mode": "exactPhysical",
+      "metric": "HTM",
+      "moveCount": 14,
+      "quotientDistance": 10,
+      "frameCorrectionMoves": 4,
+      "optimality": "not-guaranteed"
+    },
+    "selected": [
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": 2
+      },
+      {
+        "face": "B",
+        "turns": 2
+      },
+      {
+        "face": "D",
+        "turns": -1
+      },
+      {
+        "face": "R",
+        "turns": 2
+      },
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "R",
+        "turns": 2
+      }
+    ]
+  },
+  {
+    "a": 20,
+    "b": 30,
+    "from": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "target": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "print": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    },
+    "raw": {
+      "moves": [
+        "U",
+        "F'",
+        "R2",
+        "U'",
+        "R",
+        "U",
+        "F2",
+        "U",
+        "R'",
+        "R",
+        "L'",
+        "U",
+        "D'",
+        "U",
+        "D'"
+      ],
+      "mode": "exactPhysical",
+      "metric": "HTM",
+      "moveCount": 15,
+      "quotientDistance": 9,
+      "frameCorrectionMoves": 6,
+      "optimality": "not-guaranteed"
+    },
+    "selected": [
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": -1
+      },
+      {
+        "face": "B",
+        "turns": 2
+      },
+      {
+        "face": "D",
+        "turns": -1
+      },
+      {
+        "face": "R",
+        "turns": 1
+      },
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": 2
+      },
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": -1
+      }
+    ]
+  },
+  {
+    "a": 30,
+    "b": 40,
+    "from": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "target": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "print": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    },
+    "raw": {
+      "moves": [
+        "F",
+        "U'",
+        "R",
+        "F",
+        "U2",
+        "R'",
+        "F",
+        "R2",
+        "R",
+        "L'",
+        "U",
+        "D'"
+      ],
+      "mode": "exactPhysical",
+      "metric": "HTM",
+      "moveCount": 12,
+      "quotientDistance": 8,
+      "frameCorrectionMoves": 4,
+      "optimality": "not-guaranteed"
+    },
+    "selected": [
+      {
+        "face": "B",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": -1
+      },
+      {
+        "face": "B",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": 1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "B",
+        "turns": 2
+      }
+    ]
+  },
+  {
+    "a": 40,
+    "b": 50,
+    "from": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "target": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "print": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    },
+    "raw": {
+      "moves": [
+        "F'",
+        "R2",
+        "U",
+        "F'",
+        "R",
+        "F'",
+        "R'",
+        "F2",
+        "U2",
+        "R",
+        "L'",
+        "U",
+        "D'"
+      ],
+      "mode": "exactPhysical",
+      "metric": "HTM",
+      "moveCount": 13,
+      "quotientDistance": 9,
+      "frameCorrectionMoves": 4,
+      "optimality": "not-guaranteed"
+    },
+    "selected": [
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "R",
+        "turns": 1
+      },
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "R",
+        "turns": 1
+      },
+      {
+        "face": "D",
+        "turns": -1
+      },
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": 2
+      },
+      {
+        "face": "R",
+        "turns": 2
+      }
+    ]
+  },
+  {
+    "a": 50,
+    "b": 60,
+    "from": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "target": {
+      "schema": "cubistry.state",
+      "version": 1,
+      "printId": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ]
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            -1,
+            1,
+            -1
+          ],
+          "orientation": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            -1,
+            -1,
+            -1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            -1,
+            1
+          ],
+          "orientation": [
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "print": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "certified_00_99",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    },
+    "raw": {
+      "moves": [
+        "U",
+        "F2",
+        "U'",
+        "F'",
+        "U2",
+        "F'",
+        "U'",
+        "R",
+        "U'",
+        "R'",
+        "L",
+        "F'",
+        "B"
+      ],
+      "mode": "exactPhysical",
+      "metric": "HTM",
+      "moveCount": 13,
+      "quotientDistance": 9,
+      "frameCorrectionMoves": 4,
+      "optimality": "not-guaranteed"
+    },
+    "selected": [
+      {
+        "face": "D",
+        "turns": 1
+      },
+      {
+        "face": "R",
+        "turns": 2
+      },
+      {
+        "face": "D",
+        "turns": -1
+      },
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "R",
+        "turns": 2
+      },
+      {
+        "face": "B",
+        "turns": -1
+      },
+      {
+        "face": "D",
+        "turns": -1
+      },
+      {
+        "face": "R",
+        "turns": 1
+      },
+      {
+        "face": "B",
+        "turns": -1
+      }
+    ]
+  }
+]

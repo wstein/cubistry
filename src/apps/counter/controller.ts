@@ -258,7 +258,7 @@ export class CounterController {
         );
         // A visually identical state is insufficient: certifiedStep checks all body frames.
         const moves = (this.certified && certifiedStep(this.certified,this.authoritative,this.current,target))
-          ?? this.solver.solve(this.authoritative, targetState);
+          ?? this.solver.solve(this.authoritative, targetState, {coordinateFrames: this.certified !== null});
         this.activeTarget = target;
         this.progressUpdate({
           completed: 0,
