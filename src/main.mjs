@@ -67,7 +67,7 @@ function save() {
 }
 function controlsUi() {
   for (const el of document.querySelectorAll(
-    ".controls button,.controls input",
+    ".controls button,.controls input,.timer-controls button,.timer-controls input",
   ))
     el.disabled = !ready;
   $("application").disabled =
