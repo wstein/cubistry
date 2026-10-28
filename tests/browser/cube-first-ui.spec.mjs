@@ -294,6 +294,9 @@ for (const width of [1440, 768, 390, 320])
       chooser = page.locator("header #application");
     await expect(chooser).toHaveCount(1);
     await expect(chooser).toBeVisible();
+    const wrap = await page.locator("#wrap").boundingBox();
+    const format = await page.locator("#format").boundingBox();
+    expect(wrap.y).toBe(format.y);
     await expect(page.locator("#status")).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Reset session moves" }),

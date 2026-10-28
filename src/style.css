@@ -300,6 +300,9 @@ h1 {
   #cube {
     height: clamp(300px, 90vw, 500px);
   }
+  .options {
+    gap: 8px;
+  }
   .controls {
     margin: 0;
     padding: 24px;

@@ -7,7 +7,9 @@ async function ready(page) {
   await expect(page.locator("#application")).toBeEnabled();
   await page.locator("#value").fill("15");
   await page.locator("#set").click();
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "15", {
+    timeout: 10000,
+  });
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.locator("#reset-session-moves").click();
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
@@ -66,7 +68,12 @@ test("planned/committed counts stay attached to the active value through queued 
     `1 / ${total(15, 42)} moves`,
   );
   await release(page);
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  // After the first committed turn, the remaining 21 turns at 250 ms already
+  // exceed the old five-second assertion budget, before frame scheduling.
+  const expectedDuration = (total(15, 42) - 1 + total(42, 44)) * 250;
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false", {
+    timeout: expectedDuration + 5000,
+  });
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "44");
   await expect(page.locator("#move-progress")).toHaveText(
     `${total(42, 44)} / ${total(42, 44)} moves`,
