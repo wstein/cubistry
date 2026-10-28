@@ -1,0 +1,160 @@
+name: Reconcile Pages previews
+
+on:
+  workflow_run:
+    workflows: [Pages build]
+    types: [completed]
+  # Trusted base workflow only; never check out or execute PR code here.
+  pull_request_target:
+    types: [closed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: counter-pages-publish
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      pages: read
+    if: vars.PAGES_PREVIEWS_ENABLED == 'true' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      production: ${{ steps.plan.outputs.production }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - id: plan
+        run: node scripts/pages/plan.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+  production:
+    if: vars.PAGES_PREVIEWS_ENABLED == 'true'
+    needs: plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - id: stage
+        run: node scripts/pages/stage.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ENTRY: ${{ needs.plan.outputs.production }}
+      - if: steps.stage.outputs.action == 'deploy'
+        uses: JamesIves/github-pages-deploy-action@4a3abc783e1a24aeb44c16e869ad83caf6b4cc23 # v4.7.4; same pin used by Ross
+        with:
+          branch: gh-pages
+          folder: artifact-site
+          clean: true
+          clean-exclude: pr-preview/
+          force: false
+          commit-message: Update production snapshot from verified main build
+  previews:
+    if: vars.PAGES_PREVIEWS_ENABLED == 'true'
+    needs: [plan, production]
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    permissions:
+      contents: write
+      actions: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - id: stage
+        if: matrix.number != 0
+        continue-on-error: true
+        run: node scripts/pages/stage.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ENTRY: ${{ toJSON(matrix) }}
+      - if: steps.stage.outputs.action == 'deploy' || steps.stage.outputs.action == 'remove'
+        uses: rossjrw/pr-preview-action@873417d2df72380da1f3978378fb58560bcde976 # v1.8.2
+        with:
+          action: ${{ steps.stage.outputs.action }}
+          pr-number: ${{ matrix.number }}
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          source-dir: artifact-site
+          pages-base-url: wstein.github.io/cubistry
+          comment: false
+          qr-code: false
+          wait-for-pages-deployment: false
+  deploy:
+    if: always() && needs.plan.result == 'success' && needs.production.result == 'success' && vars.PAGES_PREVIEWS_ENABLED == 'true'
+    needs: [plan, production, previews]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+          path: code
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: gh-pages
+          persist-credentials: false
+          path: site
+      - run: python3 code/scripts/pages/snapshot.py site combined-site
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
+        with:
+          path: combined-site
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
+  notify:
+    if: always() && needs.plan.result == 'success' && vars.PAGES_PREVIEWS_ENABLED == 'true'
+    needs: [plan, production, previews, deploy]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - run: node scripts/pages/notify.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOY_OK: ${{ needs.deploy.result == 'success' }}
