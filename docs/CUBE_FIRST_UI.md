@@ -3,7 +3,7 @@
 [Issue #53](https://github.com/wstein/cubistry/issues/53) defines this change.
 It starts from `76415c48600c61c2cb41e0f839f138b404ce8f64` on `main`, independently
 of [PR #52](https://github.com/wstein/cubistry/pull/52). During implementation,
-#52 merged into main; the feature rebased cleanly onto `5ba6109`. No unmerged
+#52 merged into main; the feature rebased cleanly onto `5ba6109e628ebd93825cd5a5bd8a0c9a92d42846`. No unmerged
 #52 branch was used as a development base.
 
 ## Interaction contract
