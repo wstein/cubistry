@@ -27,6 +27,9 @@ def check(trace=None):
             word=transition['word'];total+=len(word.split());state=P.apply(state,word);value=transition['value'];P.show(state,value//6,(value%6)*10)
             P.require(state==wire(printing,transition['state'])==states[value],'Actual committed pose mismatch')
         result.update(actualTransitions=len(data['transitions']),actualHTM=total,finalValue=data['transitions'][-1]['value']if data['transitions']else start)
-        if start==90 and len(data['transitions'])==90:P.require(total==331 and result['finalValue']==0,'Incorrect actual fifteen-minute traversal')
+        if data.get('kind')=='countdown':
+            P.require(start==90 and len(data['transitions'])==90,'Countdown needs 90 edges and initial 15:00')
+            P.require([t['value'] for t in data['transitions']]==list(range(89,-1,-1)),'Countdown must visit all 91 states in order')
+            P.require(total==331 and result['finalValue']==0,'Incorrect actual fifteen-minute traversal')
     return result
 if __name__=='__main__':print(json.dumps(check(sys.argv[1]if len(sys.argv)>1 else None),indent=2))

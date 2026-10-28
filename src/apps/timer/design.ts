@@ -52,12 +52,10 @@ export function timerTarget(bucket: number): DisplayTarget {
 export function inverseTimerMoves(
   moves: readonly LegalMove[],
 ): readonly LegalMove[] {
-  return [...moves]
-    .reverse()
-    .map((m) => ({
-      face: m.face,
-      turns: m.turns === 2 ? 2 : m.turns === 1 ? -1 : 1,
-    }));
+  return [...moves].reverse().map((m) => ({
+    face: m.face,
+    turns: m.turns === 2 ? 2 : m.turns === 1 ? -1 : 1,
+  }));
 }
 export function validateTimerRoute(raw: unknown): TimerRoute {
   const d = record(raw, "workshop timer");
@@ -89,6 +87,11 @@ export function validateTimerRoute(raw: unknown): TimerRoute {
       demand(
         s.id === i && typeof s.image === "string" && /^[0-9]$/.test(s.image),
         "Invalid timer sticker",
+      );
+      demand(
+        JSON.stringify(s.p) ===
+          JSON.stringify(cubies.find((c) => c.id === s.cubie)?.position),
+        "Timer source position mismatch",
       );
       return {
         id: s.id,
