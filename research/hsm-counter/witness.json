@@ -1,0 +1,849 @@
+{
+  "schema": "cubistry.hsm-counter",
+  "version": 1,
+  "puzzle": "2x2x2",
+  "model": "24 immutable upright glyph stickers; legal outer face turns; fixed front frame; TL unconstrained,TR letter,BL tens,BR units",
+  "printing": [
+    {
+      "id": 0,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 1,
+      "image": "4",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 1,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 1,
+      "image": "1",
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 2,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 1,
+      "image": "2",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 1,
+      "image": "0",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 4,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 1,
+      "image": "4",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 5,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 1,
+      "image": "5",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 6,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 2,
+      "image": "7",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 7,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 2,
+      "image": "4",
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 8,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 2,
+      "image": "1",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 9,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 2,
+      "image": "3",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 10,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 2,
+      "image": "0",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 11,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 2,
+      "image": "5",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 12,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 2,
+      "image": "6",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 13,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 2,
+      "image": "0",
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 14,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 2,
+      "image": "8",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 15,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 2,
+      "image": "2",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 16,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 2,
+      "image": "9",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 17,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 2,
+      "image": "1",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 18,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 0,
+      "image": "H",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 19,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 0,
+      "image": "S",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 20,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 0,
+      "image": "M",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 21,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 1,
+      "image": "2",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 22,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 1,
+      "image": "0",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 23,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 1,
+      "image": "3",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "letter": "H",
+      "setup": "U L' D2 L2",
+      "increments": [
+        "D' L2 D2",
+        "L' D2 L' D",
+        "D' L2",
+        "U R' U'",
+        "L' B' D2 L",
+        "L2 D' L2",
+        "L2 D2 L2",
+        "L' B2 D' L",
+        "L2 D L2",
+        "L2 D B2 L'",
+        "U B' R U'",
+        "L' B2 D' L",
+        "B L2 B2 D2",
+        "L2 D L2",
+        "U R U'",
+        "L' B D2 L",
+        "L' B D2 L",
+        "U R2 U'",
+        "D B D'",
+        "B2 D2",
+        "L2 D L'",
+        "L' B D' L",
+        "L' B D2 L",
+        "B' D2 L2",
+        "D' L2 B D'",
+        "B2 L' D L",
+        "B' L2 D",
+        "F' L2 B R2",
+        "L' D2 L",
+        "D2 B2 D",
+        "L' D' L",
+        "U R' U'",
+        "U2 B2 R2",
+        "L2 D L2",
+        "U R U'",
+        "L2 D' L2",
+        "L2 B2 D2",
+        "L' D L",
+        "U R' U'",
+        "D' L",
+        "U2 R2 U2",
+        "D2 B L'",
+        "L' D L",
+        "B D2 L2",
+        "D' L2 B D'",
+        "U2 B2 R2",
+        "L2 D L2",
+        "L' B' D2 L",
+        "U R' U'",
+        "L' D",
+        "U R' U'",
+        "U R2 U'",
+        "B U2 R' U2",
+        "U2 B2 R2",
+        "U R' U'",
+        "U2 B2 R2",
+        "L2 D L2",
+        "L' B' D2 L",
+        "L' B D2 L"
+      ],
+      "from23To00": "L B2 D",
+      "from11To00": "L' D2"
+    },
+    {
+      "letter": "S",
+      "setup": "L D R2 B' R",
+      "increments": [
+        "U B2 R U'",
+        "L2 D L2",
+        "B L' D2 L",
+        "L2 B2 D2",
+        "B D' L2",
+        "U2 B2 R2",
+        "D2 L B D'",
+        "U R U'",
+        "L' D L",
+        "D2 L2 B D2",
+        "L' B D' L",
+        "L' D' L",
+        "U R' U'",
+        "F D' F' R",
+        "U2 B2 R2",
+        "B U2 B2 R2",
+        "U R U'",
+        "L2 B2 D2",
+        "D L2 B D'",
+        "B2 D2",
+        "L2 D L'",
+        "L' B D' L",
+        "D L' D",
+        "L2 D2",
+        "B2 D B' D'",
+        "D2 B2 L2",
+        "L2 D L2",
+        "B' D2 L",
+        "L2 D2",
+        "B2 R F R'",
+        "U R2 U'",
+        "U R' U'",
+        "B L' D2 L",
+        "U R' U'",
+        "L' B' D2 L",
+        "U B2 R U'",
+        "U2 B2 R2",
+        "B2 L' D L",
+        "L' D2 L",
+        "D' B2 D'",
+        "L' D2",
+        "B' D2 L",
+        "B2 L' D L",
+        "L' D2 L",
+        "L' B D' L",
+        "B L2 B2 D2",
+        "L2 D L2",
+        "B' D2 L",
+        "B L' D2 L",
+        "L D",
+        "L' D L",
+        "U B' R U'",
+        "L' D L",
+        "L2 B2 D2",
+        "B2 U R' U'",
+        "B L' D2 L",
+        "U R' U'",
+        "L' D' L",
+        "U R U'"
+      ],
+      "from23To00": "D2 L' D",
+      "from11To00": "B2 D2"
+    },
+    {
+      "letter": "M",
+      "setup": "U2 R' F L",
+      "increments": [
+        "L' D L",
+        "U2 R' U2",
+        "L2 D2 L2",
+        "D B2 D'",
+        "L' D2 L",
+        "B2 U R' U'",
+        "B' L2 B2 D2",
+        "L' D L",
+        "F' R F D'",
+        "L2 D2",
+        "L2 D2 L2",
+        "B L' D' L",
+        "L' B D2 L",
+        "L' B' D2 L",
+        "L' B D' L",
+        "L' D2 L",
+        "L' B' D2 L",
+        "U R2 U'",
+        "B2 L' D L",
+        "B' D2",
+        "L' D L'",
+        "B' D B' D2",
+        "L2 B2 D2",
+        "D2 L D2",
+        "D B D2",
+        "L' B2 D' L",
+        "L2 D' L2",
+        "B D2 L",
+        "B D2 L' D2",
+        "D' L'",
+        "U2 R U2",
+        "U2 R U2",
+        "U R U'",
+        "U R U'",
+        "B L' D2 L",
+        "U B' R2 U'",
+        "F' R F D'",
+        "L2 B2 D2",
+        "L' B D' L",
+        "B2 L' D",
+        "D L' D",
+        "F L F' D2",
+        "L' B D' L",
+        "U R U'",
+        "F' R F D'",
+        "L' B D2 L",
+        "L' B D2 L",
+        "L2 D L2",
+        "D B2 D'",
+        "D B D2",
+        "L' D2 L",
+        "B U2 R' U2",
+        "L2 D2 L2",
+        "L2 D L2",
+        "U R U'",
+        "B2 U R' U'",
+        "U2 B2 R2",
+        "F' R F D'",
+        "L' B D2 L"
+      ],
+      "from23To00": "B L' D",
+      "from11To00": "L2 D2"
+    }
+  ],
+  "metrics": {
+    "maximumIncrementHTM": 4,
+    "totalIncrementHTM": 585,
+    "meanIncrementHTM": 3.305084745762712,
+    "maximum23To00HTM": 3,
+    "maximum11To00HTM": 2
+  },
+  "search": {
+    "seed": 281028,
+    "trials": 4096,
+    "policy": 4,
+    "baseline": {
+      "max": 5,
+      "total": 674,
+      "maxJump": 3,
+      "maxJump11": 4,
+      "score": 547674
+    },
+    "history": [
+      {
+        "trial": 1,
+        "max": 5,
+        "total": 664,
+        "maxJump": 3,
+        "maxJump11": 4
+      },
+      {
+        "trial": 2,
+        "max": 5,
+        "total": 648,
+        "maxJump": 3,
+        "maxJump11": 4
+      },
+      {
+        "trial": 4,
+        "max": 5,
+        "total": 643,
+        "maxJump": 3,
+        "maxJump11": 4
+      },
+      {
+        "trial": 13,
+        "max": 5,
+        "total": 639,
+        "maxJump": 3,
+        "maxJump11": 4
+      },
+      {
+        "trial": 17,
+        "max": 5,
+        "total": 636,
+        "maxJump": 3,
+        "maxJump11": 4
+      },
+      {
+        "trial": 21,
+        "max": 5,
+        "total": 617,
+        "maxJump": 4,
+        "maxJump11": 3
+      },
+      {
+        "trial": 22,
+        "max": 5,
+        "total": 628,
+        "maxJump": 3,
+        "maxJump11": 3
+      },
+      {
+        "trial": 37,
+        "max": 5,
+        "total": 620,
+        "maxJump": 3,
+        "maxJump11": 3
+      },
+      {
+        "trial": 46,
+        "max": 5,
+        "total": 601,
+        "maxJump": 3,
+        "maxJump11": 3
+      },
+      {
+        "trial": 62,
+        "max": 4,
+        "total": 586,
+        "maxJump": 3,
+        "maxJump11": 3
+      },
+      {
+        "trial": 66,
+        "max": 4,
+        "total": 573,
+        "maxJump": 3,
+        "maxJump11": 3
+      },
+      {
+        "trial": 245,
+        "max": 4,
+        "total": 572,
+        "maxJump": 3,
+        "maxJump11": 3
+      },
+      {
+        "trial": 344,
+        "max": 4,
+        "total": 555,
+        "maxJump": 3,
+        "maxJump11": 3
+      },
+      {
+        "trial": 3240,
+        "max": 4,
+        "total": 585,
+        "maxJump": 3,
+        "maxJump11": 2
+      }
+    ],
+    "globalLayoutOptimality": "UNKNOWN"
+  },
+  "bfs": {
+    "states": 9072,
+    "histogram": {
+      "0": 1,
+      "1": 15,
+      "2": 177,
+      "3": 1397,
+      "4": 4981,
+      "5": 2497,
+      "6": 4
+    },
+    "sha256": "6a119e543f69034c7ba591f495d8584e97852be0ba223f098c3ba390019436af"
+  },
+  "runtimeSeconds": 4.159
+}
