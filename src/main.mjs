@@ -7,6 +7,7 @@ import { TimerController } from "./apps/timer/controller.ts";
 import { timerMotion } from "./apps/timer/status.ts";
 import { loadTimerRoute } from "./apps/timer/design.ts";
 import { CounterRun } from "./apps/counter/run.mjs";
+import { SequenceNumber } from "./apps/shared/sequence-number.ts";
 import { loadCertifiedCounter } from "./apps/counter/certified.ts";
 import "./style.css";
 import { loadAssets } from "@cubistry/cube-assets";
@@ -16,6 +17,7 @@ import { loadCounterDesign } from "./apps/counter/design.ts";
 import { parseValue, shifted } from "./counter.mjs";
 const $ = (id) => document.getElementById(id);
 const run = new CounterRun();
+const sequenceNumber = new SequenceNumber();
 const durations = [2000, 1000, 500, 250, 100, 50, 10];
 const speedLabels = ["2 s", "1 s", "500 ms", "250 ms", "100 ms", "50 ms", "10 ms"];
 let ready = false,
@@ -121,6 +123,7 @@ function manual(next, updateInput = true) {
 }
 const onPhysicalState = (physical, busy, failure, progress) => {
   if (progress) {
+    text("sequence-number", String(sequenceNumber.observe(progress) || "—"));
     const meter = $("move-progress");
     meter.textContent = `${progress.completed} / ${progress.total} moves`;
     meter.setAttribute("aria-valuenow", String(progress.completed));
