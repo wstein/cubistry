@@ -17,6 +17,13 @@ async function choose(page, leadingZero = true) {
       return configure.call(this, p, s, a);
     };
     CubeViewer.prototype.animate = async function (p) {
+      if (window.fiveHoldNext) {
+        window.fiveHoldNext = false;
+        window.fiveHeld = true;
+        await new Promise((resolve) => {
+          window.fiveRelease = resolve;
+        });
+      }
       const began = performance.now();
       await animate.call(this, p);
       window.fiveMoves.push(p);
@@ -152,8 +159,20 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
   await page.locator("#rotation-speed").fill("0");
   await page.selectOption("#timer-speed", "100");
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  // Simulate one stalled presentation; all moves still use the actual viewer.
+  await page.evaluate(() => {
+    window.fiveHoldNext = true;
+  });
   await page.click("#timer-start");
   await page.clock.runFor(400);
+  const backlog = await page.evaluate(() => ({
+    held: window.fiveHeld,
+    active: document.querySelector("#move-progress").dataset.target,
+    queued: document.querySelector("#move-progress").dataset.queued,
+  }));
+  expect(backlog.held).toBe(true);
+  expect(backlog.queued).toBe("4");
+  expect(backlog.active).not.toBe(backlog.queued);
   await expect(page.locator("#timer-sync")).toHaveAttribute(
     "data-state",
     "synchronizing",
@@ -162,11 +181,14 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
   await page.click("#timer-start");
   await expect(page.locator("#status")).toContainText("Paused");
   const frozen = await page.locator("#timer-logical").innerText();
+  const [minutes, seconds] = frozen.split(":").map(Number);
+  const frozenPhysical = formatted(Math.ceil((minutes * 60 + seconds) / 5));
+  await page.evaluate(() => window.fiveRelease());
   for (let i = 0; i < 45; i++) {
     await page.clock.fastForward(2100);
     await page.clock.runFor(20);
   }
-  await settled(page, frozen);
+  await settled(page, frozenPhysical);
   await expect(page.locator("#timer-logical")).toHaveText(frozen);
   await expect(page.locator("#move-progress")).toHaveAttribute(
     "data-queued",
@@ -261,6 +283,7 @@ for (const [stop, preferred] of [
     page,
   }, testInfo) => {
     test.setTimeout(45000);
+    await page.setViewportSize({ width: 800, height: 700 });
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await choose(page);
     await page.locator("#rotation-speed").fill("6");
@@ -268,20 +291,34 @@ for (const [stop, preferred] of [
     await page.locator("#rotation-speed").fill(stop);
     const offset = await page.evaluate(() => window.fiveMoves.length);
     const epoch = await page.evaluate(() => {
+      window.fiveMovingSample = null;
+      const sample = () => {
+        const cube = document.querySelector("#cube"),
+          motion = document.querySelector("#timer-sync").dataset.state;
+        if (cube.getAttribute("aria-busy") === "true" && motion === "moving") {
+          window.fiveMovingSample = {
+            at: performance.now(),
+            physical: cube.dataset.value,
+            logical: document.querySelector("#timer-logical").textContent,
+            effective: Number(
+              document
+                .querySelector("#timer-effective")
+                .textContent.match(/[\d.]+/)[0],
+            ),
+          };
+        } else if (!window.fiveMovingSample) requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
       const at = performance.now();
       document.querySelector("#timer-start").click();
       return at;
     });
-    await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
-    await expect(page.locator("#timer-logical")).toHaveText("00:05");
-    await expect(page.locator("#timer-sync")).toHaveAttribute(
-      "data-state",
-      "moving",
-    );
-    const effective = Number(
-      (await page.locator("#timer-effective").innerText()).match(/[\d.]+/)[0],
-    );
     await settled(page, "00:00");
+    const moving = await page.evaluate(() => window.fiveMovingSample);
+    expect(moving).not.toBeNull();
+    expect(moving.physical).toBe("00:05");
+    expect(moving.at).toBeLessThan(epoch + 5000);
+    const effective = moving.effective;
     const trace = await page.evaluate(
       ({ offset, epoch, preferred, effective }) => {
         const moves = window.fiveMoves,
@@ -307,6 +344,7 @@ for (const [stop, preferred] of [
           observation: {
             preferredMilliseconds: preferred,
             effectiveMilliseconds: effective,
+            movingSample: window.fiveMovingSample,
             deadlineMilliseconds: epoch + 5000,
             firstMoveMilliseconds: times[0].began,
             settledMilliseconds: times.at(-1).settled,
