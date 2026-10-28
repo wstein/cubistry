@@ -169,7 +169,7 @@ test("built project-path optimized print loads its pinned certificate and execut
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await expect(page.locator("#move-progress")).toHaveText("5 / 5 moves");
-  await expect(page.locator("#session-moves")).toHaveText("Session: 5 moves");
+  await expect(page.locator("#session-moves")).toHaveText("5");
   expect(errors).toEqual([]);
   expect(failures).toEqual([]);
 });

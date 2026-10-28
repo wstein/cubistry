@@ -14,7 +14,6 @@ test("counter commits the shared 42→43 direct path and independent replay reta
   await page.locator("#set").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "15");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  await page.locator(".move-details").evaluate(el => el.open = true);
   await page.locator("#reset-session-moves").click();
   await page.locator("#value").fill("42");
   await page.locator("#set").click();
