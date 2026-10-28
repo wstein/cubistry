@@ -74,8 +74,9 @@ function controls() {
 function showMoves() {
   if (!controller) return;
   const p = controller.progress;
-  $("calendar-moves").textContent =
-    `${p.completed.htm} / ${p.total.htm} HTM · ${p.completed.rotations} / ${p.total.rotations} cube rotations`;
+  $("calendar-moves").textContent = p.planning
+    ? "Planning legal route…"
+    : `${p.completed.htm} / ${p.total.htm} HTM · ${p.completed.rotations} / ${p.total.rotations} cube rotations`;
   $("calendar-queue").textContent = p.queued
     ? "Latest requested date is queued."
     : "";
@@ -101,12 +102,26 @@ function showMoves() {
   }
   const cost = (direction) => {
     try {
-      const counts = controller.estimate(
-        findTarget(design, shiftDate(date, direction)),
-      );
-      return counts
-        ? `${counts.htm} HTM + ${counts.rotations} cube rotations`
-        : "Unavailable during motion";
+      const target = findTarget(design, shiftDate(date, direction));
+      const counts = controller.estimate(target);
+      if (counts)
+        return `${counts.htm} HTM + ${counts.rotations} cube rotations`;
+      const active = controller,
+        key = requested;
+      void active
+        .prepare(target)
+        .then((result) => {
+          if (
+            result &&
+            ready &&
+            controller === active &&
+            !active.busy &&
+            key === requested
+          )
+            showMoves();
+        })
+        .catch(() => {});
+      return "Planning route…";
     } catch {
       return "Date limit";
     }
@@ -121,7 +136,9 @@ function changed(target, busy, error) {
   }
   $("calendar-viewer").setAttribute("aria-busy", String(busy));
   $("calendar-state").textContent = busy
-    ? "Updating · physical date in motion"
+    ? controller?.progress.planning
+      ? "Planning legal date route…"
+      : "Updating · physical date in motion"
     : live
       ? "Live · local date"
       : "Selected date";
