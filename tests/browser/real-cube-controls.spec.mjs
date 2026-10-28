@@ -50,7 +50,6 @@ test("all eight jump previews agree with actual committed moves and complete pin
   const actual = [];
   for (const c of cases) {
     await go(page, c.a);
-    await page.locator(".move-details").evaluate(el => el.open = true);
     await page.getByRole("button", { name: "Reset session moves" }).click();
     const from = await page.evaluate(() => window.state);
     expect(stateEquals({ ...from, printId: c.from.printId }, c.from)).toBe(
@@ -76,9 +75,7 @@ test("all eight jump previews agree with actual committed moves and complete pin
     expect(
       stateEquals({ ...record.at(-1).to, printId: c.target.printId }, c.target),
     ).toBe(true);
-    await expect(page.locator("#session-moves")).toHaveText(
-      `Session: ${record.length} moves`,
-    );
+    await expect(page.locator("#session-moves")).toHaveText(`${record.length}`);
     actual.push({
       from,
       to: record.at(-1).to,

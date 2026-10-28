@@ -18,7 +18,12 @@ const active = [
 function renderedDigit(image, centerX) {
   const blue = ([r, g, b]) => b > r * 1.25 && b > g * 1.05;
   const sample = (px, py) => {
-    const [x, y] = frontPoint(image, centerX + (px / 256 - 0.5) * 0.87, -0.52 + (0.5 - py / 256) * 0.87), colors = [];
+    const [x, y] = frontPoint(
+        image,
+        centerX + (px / 256 - 0.5) * 0.87,
+        -0.52 + (0.5 - py / 256) * 0.87,
+      ),
+      colors = [];
     for (let dy = -2; dy <= 2; dy++)
       for (let dx = -2; dx <= 2; dx++) {
         const at = ((y + dy) * image.width + x + dx) * 4;
@@ -83,7 +88,7 @@ test("optimized permanent print executes all 99 adjacent transitions with exactl
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await chooseCertified(page);
-  await expect(page.locator("#session-moves")).toHaveText("Session: 0 moves");
+  await expect(page.locator("#session-moves")).toHaveText("0");
   const transitions = [];
   let offset = 0;
   for (let value = 1; value <= 99; value++) {
@@ -126,7 +131,7 @@ test("optimized permanent print executes all 99 adjacent transitions with exactl
     }
   }
   expect(offset).toBe(339);
-  await expect(page.locator("#session-moves")).toHaveText("Session: 339 moves");
+  await expect(page.locator("#session-moves")).toHaveText("339");
   const initial = await page.evaluate(() => ({
     print: window.configuredPrint,
     start: window.configuredStart,
@@ -170,9 +175,8 @@ test("optimized arbitrary jump returns to certified state, reset and original pr
   );
   expect(after - before).toBeGreaterThan(0);
   expect(after - before).toBeLessThanOrEqual(5);
-  await page.locator(".move-details").evaluate(el => el.open = true);
   await page.getByRole("button", { name: "Reset session moves" }).click();
-  await expect(page.locator("#session-moves")).toHaveText("Session: 0 moves");
+  await expect(page.locator("#session-moves")).toHaveText("0");
   await page.reload();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "79");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
@@ -180,7 +184,7 @@ test("optimized arbitrary jump returns to certified state, reset and original pr
   await page.locator("#format").uncheck();
   await expect(page.locator("#application")).toBeEnabled();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
-  await expect(page.locator("#session-moves")).toHaveText("Session: 0 moves");
+  await expect(page.locator("#session-moves")).toHaveText("0");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
