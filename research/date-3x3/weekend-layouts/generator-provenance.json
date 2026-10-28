@@ -1,0 +1,11 @@
+{
+  "baselineResearchCommit": "055b38f193be6c656350b5d48c1aa86d8cd2ded0",
+  "generatorSource": "research/date-3x3/generate-witness.mjs",
+  "sourceSHA256": "baaa9c9a9a48187d32e876d1a3d787cc874a8236b88c6014e665ddf4a5065c84",
+  "changes": [
+    "Import existing geometry and center helpers from parent",
+    "Use explicit candidate row order",
+    "Pin fixed artwork style on each immutable source sticker"
+  ],
+  "solver": "cubing@0.66.1"
+}

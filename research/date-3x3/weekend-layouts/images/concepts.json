@@ -1,0 +1,201 @@
+{
+  "schema": "cubistry.weekend-front-concepts",
+  "version": 1,
+  "canvasPixels": [
+    1800,
+    1240
+  ],
+  "previewDPI": 144,
+  "schematicNotPhysicalScale": true,
+  "targets": [
+    {
+      "candidate": "de-weekend-c1-2",
+      "weekday": 5,
+      "day": 7,
+      "month": 11,
+      "cells": [
+        "SA",
+        "",
+        "",
+        "",
+        "0",
+        "7",
+        "NOV",
+        "",
+        ""
+      ],
+      "witnessSHA256": "f9abac22d673d85bee98c10a69c4756c2ab1d4ff558607ae476be77524b91727",
+      "fixedWeekendStyle": {
+        "color": "#ba302c",
+        "weight": 800
+      }
+    },
+    {
+      "candidate": "de-weekend-c1-2",
+      "weekday": 6,
+      "day": 8,
+      "month": 11,
+      "cells": [
+        "SO",
+        "",
+        "",
+        "",
+        "0",
+        "8",
+        "NOV",
+        "",
+        ""
+      ],
+      "witnessSHA256": "f9abac22d673d85bee98c10a69c4756c2ab1d4ff558607ae476be77524b91727",
+      "fixedWeekendStyle": {
+        "color": "#ba302c",
+        "weight": 800
+      }
+    },
+    {
+      "candidate": "de-weekend-c1-3",
+      "weekday": 5,
+      "day": 7,
+      "month": 11,
+      "cells": [
+        "SAM",
+        "",
+        "",
+        "",
+        "0",
+        "7",
+        "NOV",
+        "",
+        ""
+      ],
+      "witnessSHA256": "be3626cc9c7c0fb3a4efed53f29684d593e37d41bc1d9297cdffed738bd32f50",
+      "fixedWeekendStyle": {
+        "color": "#ba302c",
+        "weight": 800
+      }
+    },
+    {
+      "candidate": "de-weekend-c1-3",
+      "weekday": 6,
+      "day": 8,
+      "month": 11,
+      "cells": [
+        "SON",
+        "",
+        "",
+        "",
+        "0",
+        "8",
+        "NOV",
+        "",
+        ""
+      ],
+      "witnessSHA256": "be3626cc9c7c0fb3a4efed53f29684d593e37d41bc1d9297cdffed738bd32f50",
+      "fixedWeekendStyle": {
+        "color": "#ba302c",
+        "weight": 800
+      }
+    },
+    {
+      "candidate": "de-weekend-c2-2",
+      "weekday": 5,
+      "day": 7,
+      "month": 11,
+      "cells": [
+        "SA",
+        "",
+        "",
+        "NOV",
+        "",
+        "",
+        "",
+        "0",
+        "7"
+      ],
+      "witnessSHA256": "0e3cb08fcfeaef1ad3dc3a04442d5283a75c311f13607d24947b32866a4471e9",
+      "fixedWeekendStyle": {
+        "color": "#ba302c",
+        "weight": 800
+      }
+    },
+    {
+      "candidate": "de-weekend-c2-2",
+      "weekday": 6,
+      "day": 8,
+      "month": 11,
+      "cells": [
+        "SO",
+        "",
+        "",
+        "NOV",
+        "",
+        "",
+        "",
+        "0",
+        "8"
+      ],
+      "witnessSHA256": "0e3cb08fcfeaef1ad3dc3a04442d5283a75c311f13607d24947b32866a4471e9",
+      "fixedWeekendStyle": {
+        "color": "#ba302c",
+        "weight": 800
+      }
+    },
+    {
+      "candidate": "de-weekend-c2-3",
+      "weekday": 5,
+      "day": 7,
+      "month": 11,
+      "cells": [
+        "SAM",
+        "",
+        "",
+        "NOV",
+        "",
+        "",
+        "",
+        "0",
+        "7"
+      ],
+      "witnessSHA256": "5ce006b99456990bac52a1bafa4c3f5d13464ec0431410027d460832ef596dab",
+      "fixedWeekendStyle": {
+        "color": "#ba302c",
+        "weight": 800
+      }
+    },
+    {
+      "candidate": "de-weekend-c2-3",
+      "weekday": 6,
+      "day": 8,
+      "month": 11,
+      "cells": [
+        "SON",
+        "",
+        "",
+        "NOV",
+        "",
+        "",
+        "",
+        "0",
+        "8"
+      ],
+      "witnessSHA256": "5ce006b99456990bac52a1bafa4c3f5d13464ec0431410027d460832ef596dab",
+      "fixedWeekendStyle": {
+        "color": "#ba302c",
+        "weight": 800
+      }
+    }
+  ],
+  "fontPackage": "@fontsource/noto-sans@5.2.10",
+  "fontLicense": "SIL-OFL-1.1",
+  "fonts": {
+    "noto-sans-latin-600.woff2": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed",
+    "noto-sans-latin-800.woff2": "a5650ea2e07952bc6cd44f67cea720697ac9fdc9e35f33e76ccc5004370c21a6",
+    "noto-sans-latin-600.ttf": "a74f2bd5487b672c3eaf82a28201e6730af0a68be09a4ae41895a739815fd011",
+    "noto-sans-latin-800.ttf": "d25c05ecfe082daad3ef517a65189cb1b5dc514a7c74dd3293e8b99197ee50cd",
+    "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1"
+  },
+  "exports": {
+    "four-german-weekend-proposals.svg": "602a7aa03ad56af7426891fe74629bb4c2a0cd59d20ec9135983dcd8c9888fb3",
+    "four-german-weekend-proposals.png": "2b74b5c309f170fee61b7cc8014ea7409506a1dc651a0edc873aa09e5ab2049b"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "status": "SAT",
+  "candidate": "de-weekend-c2-3",
+  "verifiedTargets": 2562,
+  "gregorianDomainDays": 146097,
+  "physicalBodies": 26,
+  "physicalStickers": 54,
+  "fixedWeekendStyle": {
+    "color": "#ba302c",
+    "weight": 800
+  },
+  "exactUprightNonblankFrames": true,
+  "visibleCenterOrientation": "verified (blank orientation ignored)",
+  "fullInverseRestorations": 2562,
+  "sourceToTargetHTM": {
+    "min": 16,
+    "max": 21,
+    "sum": 51447,
+    "mean": 20.0807962529274
+  },
+  "wholeCubePreludeTokens": {
+    "min": 0,
+    "max": 0
+  },
+  "centerCorrectionHTMHistogram": {
+    "0": 2562
+  },
+  "candidateSHA256": "7a73e26d96c971154346d48175a3fbcb08c6a2f8e4509e3f4bea4d039cb52d54",
+  "witnessSHA256": "5ce006b99456990bac52a1bafa4c3f5d13464ec0431410027d460832ef596dab",
+  "shortestTransitions": "UNKNOWN",
+  "independentAgentReview": "pending"
+}
