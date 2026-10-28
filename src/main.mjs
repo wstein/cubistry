@@ -245,14 +245,14 @@ async function initialize() {
         saved.moveDuration ??
         (Number.isFinite(saved.speed) && saved.speed > 0
           ? BASE_MOVE_DURATION_MS / saved.speed
-          : 250);
+          : 100);
       $("rotation-speed").value = String(
         durations.reduce(
           (best, n, i) =>
             Math.abs(n - duration) < Math.abs(durations[best] - duration)
               ? i
               : best,
-          3,
+          4,
         ),
       );
     }
