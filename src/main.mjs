@@ -34,6 +34,7 @@ function timerUi() {
     el.disabled = !ready;
   for (const id of ["label", "format"]) $(id).disabled = !ready;
   $("apply-print").disabled = !ready || !!view?.busy;
+  $("reset-session-moves").disabled = !ready || !!view?.busy;
   $("stop-turns").disabled =
     !ready || !view?.busy || view?.progress.status === "stopping";
   $("mode").textContent =
@@ -83,10 +84,13 @@ const onPhysicalState = (physical, busy, failure, progress) => {
       "aria-valuetext",
       `${progress.completed} of ${progress.total} moves committed`,
     );
+    $("session-moves").textContent = `Session: ${progress.sessionTotal} moves`;
+    $("session-moves").dataset.total = String(progress.sessionTotal);
     meter.dataset.state = progress.status;
     meter.dataset.target = String(progress.target ?? "");
     meter.dataset.queued = String(progress.queuedTarget ?? "");
   }
+  $("reset-session-moves").disabled = !ready || busy;
   $("stop-turns").disabled = !ready || !busy || progress?.status === "stopping";
   if (failure) {
     ready = false;
@@ -159,6 +163,7 @@ $("pause").addEventListener("click", () => {
   save();
 });
 $("reset").addEventListener("click", () => setValue(timer.reset()));
+$("reset-session-moves").addEventListener("click", () => action(() => view?.resetSessionMoves()));
 $("front").addEventListener("click", () => view?.resetCamera());
 $("stop-turns").addEventListener("click", () =>
   action(() => {

@@ -38,6 +38,7 @@ export interface CounterView {
 export const countHtmMoves = (moves: readonly LegalMove[]): number =>
   moves.length;
 export interface MoveProgress {
+  readonly sessionTotal: number;
   readonly completed: number;
   readonly total: number;
   readonly target: number | null;
@@ -65,6 +66,7 @@ export class CounterController {
   private activeTarget: number | null = null;
   private stopping = false;
   private playback: MoveProgress = Object.freeze({
+    sessionTotal: 0,
     completed: 0,
     total: 0,
     target: null,
@@ -104,6 +106,11 @@ export class CounterController {
   }
   get progress(): MoveProgress {
     return this.playback;
+  }
+  /** Reset accounting only, never the authoritative physical state or timer. */
+  resetSessionMoves(): void {
+    demand(!this.queued && !this.configuring, "Wait for current work before resetting session moves");
+    this.progressUpdate({ sessionTotal: 0 });
   }
   private notify(error?: Error): void {
     this.onState(this.current, this.queued, error, this.playback);
@@ -172,6 +179,7 @@ export class CounterController {
       this.activeTarget = null;
       this.stopping = false;
       this.playback = Object.freeze({
+        sessionTotal: 0,
         completed: 0,
         total: 0,
         target: value,
@@ -251,7 +259,7 @@ export class CounterController {
           const presentation = presentMove(this.authoritative, move);
           await this.view.animate(presentation);
           this.authoritative = presentation.to;
-          this.progressUpdate({ completed: this.playback.completed + 1 });
+          this.progressUpdate({ completed: this.playback.completed + 1, sessionTotal: this.playback.sessionTotal + 1 });
         }
         demand(
           stateEquals(this.authoritative, targetState),

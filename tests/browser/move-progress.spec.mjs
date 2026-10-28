@@ -179,3 +179,34 @@ test("move progress and stop control fit a small screen and expose accessible va
   await release(page);
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 });
+
+test("session total counts committed turns, survives timer reset and has an independent accessible reset", async ({page}) => {
+  await page.setViewportSize({width:390,height:844});
+  await ready(page);
+  const session = page.locator("#session-moves");
+  const reset = page.getByRole("button", {name:"Reset session moves"});
+  await expect(session).toHaveText("Session: 0 moves");
+  await holdTurns(page);
+  await go(page,42);
+  await expect(reset).toBeDisabled();
+  await expect(session).toHaveText("Session: 0 moves");
+  await release(page);
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy","false");
+  await expect(session).toHaveText(`Session: ${total(15,42)} moves`);
+  await page.locator("#reset").click();
+  await expect(page.locator("#cube")).toHaveAttribute("data-value","42");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy","false");
+  await expect(session).toHaveText(`Session: ${total(15,42)} moves`);
+  await reset.click();
+  await expect(session).toHaveText("Session: 0 moves");
+  await expect(page.locator("#move-progress")).toHaveText("0 / 0 moves");
+  await go(page,7);
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy","false");
+  await expect(session).toHaveText(`Session: ${total(42,7)} moves`);
+  await page.locator("summary").click();
+  await page.locator("#label").fill("NEW SESSION");
+  await page.locator("#apply-print").click();
+  await expect(page.locator("#apply-print")).toBeEnabled();
+  await expect(session).toHaveText("Session: 0 moves");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

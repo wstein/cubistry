@@ -97,6 +97,7 @@ test("planned total precedes animation; only resolved authoritative commits adva
   c.request(42);
   const first = c.progress;
   assert.deepEqual(first, {
+    sessionTotal: 0,
     completed: 0,
     total: total(15, 42),
     target: 42,
@@ -184,6 +185,7 @@ test("reset queues behind active work; reconfiguration resets metrics only after
   h.failAssets(false);
   await c.configure("NEW TITLE", false, 7);
   assert.deepEqual(c.progress, {
+    sessionTotal: 0,
     completed: 0,
     total: 0,
     target: 7,
@@ -210,4 +212,38 @@ test("an interrupted rejected turn is not counted or mislabeled complete", async
   await c.configure("RECOVER", true, 15);
   assert.equal(c.progress.completed, 0);
   assert.equal(c.progress.total, 0);
+});
+
+test("session accounting commits only resolved turns across queues, stops, resets and failed configuration", async () => {
+  const h = await harness(), c = h.controller;
+  assert.equal(c.progress.sessionTotal, 0);
+  c.request(42);
+  assert.equal(c.progress.sessionTotal, 0);
+  assert.throws(() => c.resetSessionMoves(), /Wait/);
+  await h.step();
+  assert.equal(c.progress.sessionTotal, 1);
+  c.request(44);
+  c.stopAfterCurrent();
+  await h.finish();
+  const first = c.progress.sessionTotal;
+  assert.equal(first, total(15,42));
+  c.request(42); // no-op must preserve the session
+  assert.equal(c.progress.sessionTotal, first);
+  c.request(15); // the timer reset uses the same request path
+  await h.finish();
+  assert.equal(c.progress.sessionTotal, first + total(42,15));
+  h.failAssets(true);
+  await assert.rejects(c.configure("OTHER",true), /asset failure/);
+  assert.equal(c.progress.sessionTotal, first + total(42,15));
+  c.resetSessionMoves();
+  assert.equal(c.progress.sessionTotal,0);
+  const state = c.state;
+  c.request(7); await h.step();
+  h.pending.shift().reject(Error("turn failed")); await flush();
+  assert.equal(c.progress.sessionTotal,1);
+  assert.equal(c.progress.status,"failed");
+  assert.notEqual(c.state,state);
+  h.failAssets(false);
+  await c.configure("NEW PRINT",true);
+  assert.equal(c.progress.sessionTotal,0);
 });

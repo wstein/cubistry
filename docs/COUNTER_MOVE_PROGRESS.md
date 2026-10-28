@@ -82,3 +82,17 @@ and configuration. Browser regressions hold and release the real viewer's turn
 promises, then execute its normal animation; they check visible counts, queued
 targets, timer/input persistence, reset, accessibility and mobile layout. The
 existing proof, printing, timer and renderer checks remain in the full suite.
+
+## Session accounting
+
+The separate session total counts only successfully committed physical HTM
+moves across completed values, queues, timer ticks/resets and stopped work.
+Planned or rejected turns never increase it. R, R′ and R2 each add one after
+the animation commits its authoritative state. The per-plan completed/planned
+indicator retains its existing meaning.
+
+**Reset session moves** changes accounting only and is disabled during active
+work. It does not reset the value, timer, print, physical state or per-plan
+progress. Successful new-print configuration starts a new session at zero;
+failed configuration retains the old session. The total is in-memory for this
+page session, not persisted or reconstructed from planned paths after reload.
