@@ -16,13 +16,13 @@
         <a class="brand" href="./" aria-label="Cubistry counter home"
           ><span class="brand-mark">▦</span> CUBISTRY</a
         >
+        <div class="application-choice">
+          <label for="application">Cube / application</label>
+          <select id="application">
+            <option value="certified">Counter 0–99</option>
+          </select>
+        </div>
       </header>
-      <div class="application-choice">
-        <label for="application">Cube / application</label>
-        <select id="application">
-          <option value="certified">Counter 0–99</option>
-        </select>
-      </div>
       <section class="workspace" aria-label="Cube counter">
         <div class="cube-card">
           <div class="viewer-stage">
@@ -30,9 +30,55 @@
             <span id="viewer-hint">Drag to rotate · Scroll to zoom</span>
           </div>
           <div class="cube-footer">
+            <section
+              class="counter-stats"
+              aria-label="Counter status and moves"
+            >
+              <p id="status" role="status" aria-live="polite">
+                Preparing the fixed print…
+              </p>
+              <div class="stats-summary">
+                <dl class="move-summary">
+                  <div>
+                    <dt>Session moves</dt>
+                    <dd
+                      id="session-moves"
+                      aria-live="off"
+                      aria-label="Session committed moves (HTM)"
+                    >
+                      0
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Current sequence</dt>
+                    <dd>
+                      <span
+                        id="move-progress"
+                        role="progressbar"
+                        aria-label="Committed moves (HTM)"
+                        aria-live="off"
+                        aria-valuemin="0"
+                        aria-valuemax="0"
+                        aria-valuenow="0"
+                        aria-valuetext="No move sequence planned"
+                        >0 / 0 moves</span
+                      >
+                    </dd>
+                  </div>
+                </dl>
+                <button
+                  id="reset-session-moves"
+                  class="quiet"
+                  type="button"
+                  disabled
+                >
+                  Reset session moves
+                </button>
+              </div>
+            </section>
             <label class="speed-control" for="rotation-speed"
               >Rotation Speed
-              <output id="speed-label">100 ms per HTM move</output></label
+              <output id="speed-label">250 ms per HTM move</output></label
             >
             <input
               id="rotation-speed"
@@ -40,7 +86,7 @@
               min="0"
               max="5"
               step="1"
-              value="4"
+              value="3"
               list="speed-marks"
               aria-describedby="speed-label"
             />
@@ -52,37 +98,6 @@
               <option value="4" label="100 ms"></option>
               <option value="5" label="50 ms"></option>
             </datalist>
-            <div class="move-summary">
-              <span
-                id="session-moves"
-                aria-live="off"
-                aria-label="Session committed moves (HTM)"
-                >Session: 0 moves</span
-              >
-              <span
-                id="move-progress"
-                role="progressbar"
-                aria-label="Committed moves (HTM)"
-                aria-live="off"
-                aria-valuemin="0"
-                aria-valuemax="0"
-                aria-valuenow="0"
-                aria-valuetext="No move sequence planned"
-                >0 / 0 moves</span
-              >
-            </div>
-            <details class="move-details">
-              <summary>Move details</summary>
-              <p id="application-status" class="small"></p>
-              <button
-                id="reset-session-moves"
-                class="quiet"
-                type="button"
-                disabled
-              >
-                Reset session moves
-              </button>
-            </details>
           </div>
         </div>
         <aside class="controls" aria-label="Counter controls">
@@ -98,8 +113,14 @@
             />
             <div class="target-actions">
               <button id="set" type="submit">Set</button
-              ><button id="run" type="button" class="primary">Run</button
-              ><button id="stop-turns" type="button" hidden>Stop</button>
+              ><button
+                id="run"
+                type="button"
+                class="primary"
+                aria-pressed="false"
+              >
+                Run
+              </button>
             </div>
           </form>
           <p id="bounds" class="small">
@@ -121,9 +142,6 @@
           <p class="small">
             Leading Zero changes the permanent print and resets the value and
             session.
-          </p>
-          <p id="status" role="status" aria-live="polite">
-            Preparing the fixed print…
           </p>
           <p id="error" role="alert"></p>
         </aside>

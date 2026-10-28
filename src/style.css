@@ -26,6 +26,11 @@ main {
   padding: 28px 40px 40px;
 }
 header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px 40px;
+  margin-bottom: 24px;
   padding-bottom: 24px;
   border-bottom: 1px solid #d9ded7;
 }
@@ -97,7 +102,7 @@ label {
   display: flex;
   align-items: center;
   gap: 18px;
-  margin: 24px 0;
+  margin: 0;
 }
 .application-choice label {
   margin: 0;
@@ -166,22 +171,36 @@ label {
   margin: 10px auto 16px;
   accent-color: #315d4e;
 }
+.counter-stats {
+  max-width: 400px;
+  margin: 0 auto 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #c8d0c5;
+  text-align: left;
+}
+.stats-summary {
+  display: grid;
+  gap: 12px;
+}
 .move-summary {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px 20px;
+  display: grid;
+  gap: 10px;
+  margin: 0;
   font-size: 12px;
   color: #4f6254;
   font-variant-numeric: tabular-nums;
 }
-.move-details {
-  margin-top: 12px;
-  font-size: 12px;
-  color: #4f6254;
+.move-summary > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 16px;
 }
-summary {
-  cursor: pointer;
+.move-summary dd {
+  margin: 0;
+}
+#reset-session-moves {
+  justify-self: end;
 }
 .quiet {
   background: transparent;
@@ -193,7 +212,7 @@ summary {
   border-radius: 22px;
   padding: 26px;
   background: #fbfaf5;
-  margin-top: 28px;
+  margin-top: 0;
 }
 h1 {
   font-size: 26px;
@@ -246,7 +265,7 @@ h1 {
   accent-color: #315d4e;
 }
 #status {
-  margin-top: 24px;
+  margin: 0 0 16px;
   font-size: 14px;
   color: #315d4e;
   min-height: 22px;
@@ -267,7 +286,12 @@ h1 {
   .application-choice {
     gap: 12px;
     flex-wrap: wrap;
-    margin: 20px 0;
+    margin: 0;
+    width: 100%;
+  }
+  .application-choice select {
+    flex: 1;
+    min-width: 0;
   }
   .workspace {
     grid-template-columns: 1fr;
