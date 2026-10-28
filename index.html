@@ -20,6 +20,7 @@
           <label for="application">Cube / application</label>
           <select id="application">
             <option value="certified">Counter 0–99</option>
+            <option value="timer">Workshop Timer MM:SS</option>
           </select>
         </div>
       </header>
@@ -100,7 +101,11 @@
             </datalist>
           </div>
         </div>
-        <aside class="controls" aria-label="Counter controls">
+        <aside
+          id="counter-controls"
+          class="controls"
+          aria-label="Counter controls"
+        >
           <h1>Counter</h1>
           <form id="jump-form">
             <label for="value">Target 0–99</label>
@@ -143,9 +148,46 @@
             Leading Zero shows or hides only the leading 0. The layout, value,
             and moves stay the same.
           </p>
-          <p id="error" role="alert"></p>
+        </aside>
+        <aside
+          id="timer-controls"
+          class="controls"
+          aria-label="Workshop Timer controls"
+          hidden
+        >
+          <h1>Workshop Timer</h1>
+          <form id="timer-duration-form">
+            <label for="timer-duration">Duration MM:SS</label>
+            <input
+              id="timer-duration"
+              type="text"
+              inputmode="numeric"
+              value="15:00"
+              aria-describedby="timer-bounds"
+            />
+            <button type="submit" id="timer-set-duration">Set duration</button>
+          </form>
+          <p id="timer-bounds" class="small">
+            00:00–59:50, in 10-second steps. Minutes above seconds on a separate
+            fixed print.
+          </p>
+          <p>
+            Clock <output id="timer-logical">15:00</output> · Cube
+            <output id="timer-physical">15:00</output>
+          </p>
+          <div class="target-actions">
+            <button id="timer-start" class="primary" type="button">Start</button
+            ><button id="timer-pause" type="button" disabled>Pause</button
+            ><button id="timer-reset" type="button">Reset</button>
+          </div>
+          <p id="timer-status" role="status" aria-live="polite">Ready.</p>
+          <p class="small">
+            Slow turns may lag the clock. The active legal sequence finishes
+            before the cube catches up to the latest time.
+          </p>
         </aside>
       </section>
+      <p id="error" role="alert"></p>
     </main>
     <script type="module" src="/src/main.mjs"></script>
   </body>
