@@ -175,3 +175,24 @@ test("speed slider changes only presentation duration, can change during a move,
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "4");
   await expect(page.locator("#rotation-speed")).toHaveValue("2");
 });
+
+test("Auto preserves an edited Go draft and submitted target rebases the next wall-clock step", async ({
+  page,
+}) => {
+  await page.clock.install({ time: new Date("2026-10-28T12:00:00Z") });
+  await ready(page);
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 500));
+  await page.locator("#auto").check();
+  await page.clock.runFor(2100);
+  await expect(page.locator("#value")).toHaveValue("2");
+  await page.locator("#value").fill("40");
+  await page.clock.runFor(1100);
+  await expect(page.locator("#value")).toHaveValue("40");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "3");
+  await page.locator("#jump-form button").click();
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "40");
+  await expect(page.locator("#auto")).toBeChecked();
+  await page.clock.runFor(1100);
+  await expect(page.locator("#value")).toHaveValue("41");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "41");
+});
