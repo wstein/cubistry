@@ -63,7 +63,18 @@ async function snapshot(page) {
         position: v.camera.position.toArray(),
         orientation: v.camera.quaternion.toArray(),
       },
-      progress: { ...document.querySelector("#move-progress").dataset },
+      progress: {
+        ...document.querySelector("#move-progress").dataset,
+        completed: document
+          .querySelector("#move-progress")
+          .getAttribute("aria-valuenow"),
+        total: document
+          .querySelector("#move-progress")
+          .getAttribute("aria-valuemax"),
+        text: document.querySelector("#move-progress").textContent,
+      },
+      animating: v.animating,
+      cubeBusy: document.querySelector("#cube").getAttribute("aria-busy"),
       session: document.querySelector("#session-moves").dataset.total,
       current: document.querySelector("#cube").dataset.value,
       status: document.querySelector("#status").textContent,
@@ -201,4 +212,51 @@ test("unchecked format reloads the same optimized print and value and retains ad
   );
   expect(total).toBeGreaterThan(0);
   expect(total).toBeLessThanOrEqual(5);
+});
+
+test("toggling preserves an explicitly orbited and zoomed camera", async ({
+  page,
+}) => {
+  await ready(page);
+  await go(page, 7);
+  const canvas = page.locator("#cube canvas"),
+    box = await canvas.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(
+    box.x + box.width / 2 + 70,
+    box.y + box.height / 2 + 25,
+    { steps: 6 },
+  );
+  await page.mouse.up();
+  await canvas.hover();
+  await page.mouse.wheel(0, 250);
+  await canvas.screenshot();
+  const a = await snapshot(page);
+  await page.locator("#format").uncheck();
+  const b = await snapshot(page);
+  compare(a, b, 1);
+  await page.locator("#format").check();
+  expect(await snapshot(page)).toEqual(a);
+});
+
+test("unchecked saved formatting cannot select a legacy fallback when the optimized route is unavailable", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      "cubistry-counter-v2",
+      JSON.stringify({ value: 7, padded: false }),
+    ),
+  );
+  await page.route("**/counter-certified.v1.json", (route) =>
+    route.fulfill({ status: 404, body: "missing optimized route" }),
+  );
+  await page.goto("/");
+  await expect(page.locator("#error")).toContainText(
+    "Certified route could not be loaded",
+  );
+  await expect(page.locator("#cube")).not.toHaveAttribute("data-value", /.+/);
+  await expect(page.locator("#set")).toBeDisabled();
+  await expect(page.locator("#run")).toBeDisabled();
 });
