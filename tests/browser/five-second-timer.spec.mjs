@@ -152,13 +152,16 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
   page,
 }) => {
   test.setTimeout(90000);
-  await page.emulateMedia({ reducedMotion: "no-preference" });
+  // Register application intervals on an already paused clock. Setup moves still
+  // commit legally; real animation is enabled before the intentional stall.
   await page.clock.install();
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await choose(page);
   await duration(page, "01:00");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.locator("#rotation-speed").fill("0");
   await page.selectOption("#timer-speed", "100");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   // Simulate one stalled presentation; all moves still use the actual viewer.
   await page.evaluate(() => {
     window.fiveHoldNext = true;
