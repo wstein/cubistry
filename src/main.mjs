@@ -44,9 +44,10 @@ function controlsUi() {
   $("application").disabled = !ready || !!view?.busy || run.running;
   $("format").disabled = !ready || !!view?.busy || run.running;
   $("reset-session-moves").disabled = !ready || !!view?.busy || run.running;
-  $("run").hidden = run.running;
-  $("stop-turns").hidden = !run.running && !view?.busy;
-  $("stop-turns").disabled = !ready || view?.progress.status === "stopping";
+  const active = run.running || !!view?.busy;
+  $("run").textContent = active ? "Stop" : "Run";
+  $("run").setAttribute("aria-pressed", String(active));
+  $("run").disabled = !ready || view?.progress.status === "stopping";
 }
 function action(fn) {
   try {
@@ -88,7 +89,7 @@ const onPhysicalState = (physical, busy, failure, progress) => {
       target: String(progress.target ?? ""),
       queued: String(progress.queuedTarget ?? ""),
     });
-    $("session-moves").textContent = `Session: ${progress.sessionTotal} moves`;
+    $("session-moves").textContent = String(progress.sessionTotal);
     $("session-moves").dataset.total = String(progress.sessionTotal);
   }
   $("cube").setAttribute("aria-busy", String(busy));
@@ -135,23 +136,19 @@ $("jump-form").addEventListener("submit", (event) => {
 $("run").addEventListener("click", () =>
   action(() => {
     if (!ready) return;
+    if (run.running || view.busy) {
+      stopRun();
+      $("status").textContent = view.busy
+        ? `Finishing ${value} before stopping…`
+        : `Current ${value}`;
+      return;
+    }
     const target = parseValue($("value").value);
-    // A pending Set finishes first; Run always starts at a complete physical value.
-    stopRun();
-    const start = view.busy ? view.progress.target : view.currentValue;
-    run.start(start, target);
+    run.start(view.currentValue, target);
     controlsUi();
     $("status").textContent = run.running
       ? `Running to ${target} · Current ${view.currentValue}`
       : `Current ${view.currentValue}`;
-  }),
-);
-$("stop-turns").addEventListener("click", () =>
-  action(() => {
-    stopRun();
-    $("status").textContent = view.busy
-      ? `Finishing ${value} before stopping…`
-      : `Current ${value}`;
   }),
 );
 for (const button of document.querySelectorAll("[data-delta]"))
@@ -167,11 +164,6 @@ async function selectedRoute() {
   if (!$("format").checked) return null;
   certified ??= await loadCertifiedCounter(proof, import.meta.env.BASE_URL);
   return certified;
-}
-function printUi() {
-  $("application-status").textContent = padded
-    ? "Certified adjacent route: 339 HTM / 99 steps, maximum 5 per edge. Setup excluded; arbitrary jumps differ."
-    : "Original permanent print · no certified 339-HTM route.";
 }
 async function changeFormat() {
   if (!ready || view.busy || run.running) return;
@@ -189,7 +181,6 @@ async function changeFormat() {
     value = 0;
     $("value").value = "0";
     ready = true;
-    printUi();
     save();
     error();
   } catch (e) {
@@ -267,14 +258,14 @@ async function initialize() {
         saved.moveDuration ??
         (Number.isFinite(saved.speed) && saved.speed > 0
           ? BASE_MOVE_DURATION_MS / saved.speed
-          : 100);
+          : 250);
       $("rotation-speed").value = String(
         durations.reduce(
           (best, n, i) =>
             Math.abs(n - duration) < Math.abs(durations[best] - duration)
               ? i
               : best,
-          4,
+          3,
         ),
       );
     }
@@ -288,7 +279,6 @@ async function initialize() {
     padded = $("format").checked;
     ready = true;
     $("value").value = String(value);
-    printUi();
     controlsUi();
     save();
   } catch (e) {
