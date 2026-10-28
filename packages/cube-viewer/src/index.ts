@@ -304,8 +304,9 @@ export class CubeViewer {
       "Viewer state is out of sync with authoritative controller",
     );
     this.busy = true;
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     try {
-      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (!reducedMotion) {
         const [axis, layer, dir] = FACE_LAYERS[presentation.move.face],
           angle = (presentation.move.turns * dir * Math.PI) / 2;
         const selected = presentation.from.cubies.filter(
@@ -342,7 +343,7 @@ export class CubeViewer {
         for (const c of selected) this.scene.add(this.meshes[c.id]);
         this.scene.remove(pivot);
       }
-      if (timing && matchMedia("(prefers-reduced-motion: reduce)").matches)
+      if (reducedMotion && timing?.())
         await animateTimedProgress(timing, () => BASE_MOVE_DURATION_MS / this.animationSpeed, () => {});
       this.presented = presentation.to;
       this.sync(presentation.to);

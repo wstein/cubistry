@@ -34,8 +34,7 @@ export class TimerController extends PhysicalPlayback {
   clearDeadline(): void { this.timing = null; this.timingRevision++; }
   protected animateMove(presentation: MovePresentation): Promise<void> {
     const finalMove = this.playback.completed + 1 === this.playback.total;
-    const timed = finalMove && this.timing?.target === this.playback.target;
-    return this.view.animate(presentation, timed ? () =>
+    return this.view.animate(presentation, finalMove ? () =>
       this.timing?.target === this.playback.target ? this.timing.motion : null : undefined);
   }
   private prepared: { source: CubeState; value: number; moves: readonly LegalMove[] } | null = null;
