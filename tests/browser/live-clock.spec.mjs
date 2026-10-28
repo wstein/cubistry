@@ -262,9 +262,26 @@ test.describe("high-density shared clock viewport", () => {
       { width: 1440, height: 1000 },
       { width: 390, height: 844 },
     ]) {
-      const previous=await page.evaluate(async()=>{const {clockStage}=await import('/src/clock.mjs');return clockStage.renderer.info.render.frame;});
+      const previous = await page.evaluate(async () => {
+        const { clockStage } = await import("/src/clock.mjs");
+        return clockStage.renderer.info.render.frame;
+      });
       await page.setViewportSize(viewport);
-      await expect.poll(()=>page.evaluate(async(previous)=>{const {clockStage}=await import('/src/clock.mjs');return clockStage.renderer.info.render.frame>previous+2&&clockStage.renderer.domElement.width===Math.floor(document.getElementById('clock-scene').clientWidth*clockStage.renderer.getPixelRatio());},previous))).toBe(true);
+      await expect
+        .poll(() =>
+          page.evaluate(async (previous) => {
+            const { clockStage } = await import("/src/clock.mjs");
+            return (
+              clockStage.renderer.info.render.frame > previous + 2 &&
+              clockStage.renderer.domElement.width ===
+                Math.floor(
+                  document.getElementById("clock-scene").clientWidth *
+                    clockStage.renderer.getPixelRatio(),
+                )
+            );
+          }, previous),
+        )
+        .toBe(true);
       await expect(page.locator("canvas")).toHaveCount(1);
       const host = await page.locator("#clock-scene").boundingBox(),
         canvas = await page.locator("#clock-scene canvas").boundingBox(),
