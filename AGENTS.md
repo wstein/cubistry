@@ -33,7 +33,7 @@ Skill instructions are task-specific and do not override accepted project ADRs o
 - Keep `main` linear. Use GitHub **Rebase and merge** for approved PRs; do not use merge commits or squash merges.
 - Preserve small, meaningful Conventional Commits. Do not force-push `main`.
 - Leave automatic remote branch deletion enabled for merged short-lived feature branches.
-- `research/cube-display-feasibility` is the active long-lived protected research branch: never delete it, force-push it, or retarget research into `main` without a separate approved PR. Ordinary non-force research commits are permitted. The former `spike/5x5-en-de-feasibility` branch is temporarily retained as a protected recovery reference pending a separately verified retirement.
+- `research/cube-display-feasibility` is the active long-lived protected research branch: never delete it, force-push it, or retarget research into `main` without a separate approved PR. Ordinary non-force research commits are permitted.
 - For concurrent agents, use separate branches and worktrees, and never clean up a worktree owned by another active agent. `git fetch --prune` does **not** delete local branches or active worktrees.
 - Follow [CONTRIBUTING.md](CONTRIBUTING.md) for review and safe local cleanup.
 
