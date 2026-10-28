@@ -226,12 +226,12 @@ h1 {
   padding: 10px 16px;
   font-variant-numeric: tabular-nums;
 }
-.target-actions {
+:is(.target-actions, .timer-actions) {
   display: flex;
   gap: 10px;
   margin-top: 12px;
 }
-.target-actions button {
+:is(.target-actions, .timer-actions) button {
   flex: 1;
 }
 .small {
