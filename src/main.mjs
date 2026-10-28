@@ -1,6 +1,7 @@
 import {
   WorkshopClock,
   formatTimer,
+  formatLiveTimer,
   parseDuration,
 } from "./apps/timer/clock.ts";
 import { TimerController } from "./apps/timer/controller.ts";
@@ -83,7 +84,7 @@ function controlsUi() {
   text(
     "timer-bounds",
     clock.mode === "stopwatch"
-      ? "Completed 10-second intervals · limit 59:50"
+      ? "Cube: 10-second steps · limit 59:50"
       : "00:00–59:50 · 10-second steps",
   );
   $("timer-sync").hidden = application !== "timer";
@@ -300,7 +301,7 @@ function timerUi() {
   const snapshot = clock.snapshot();
   const logical = snapshot.bucket,
     physical = view?.currentValue ?? logical;
-  text("timer-logical", formatTimer(logical));
+  text("timer-logical", formatLiveTimer(snapshot.liveSeconds));
   text("timer-physical", formatTimer(physical));
   const motion = timerMotion({
     physical,

@@ -314,13 +314,13 @@ test("tab-resume catch-up reads the monotonic deadline, ignores wall-clock jumps
   await page.clock.fastForward(35500);
   await page.clock.runFor(1000);
   await settled(page, "00:30");
-  await expect(page.locator("#timer-logical")).toHaveText("00:30");
+  await expect(page.locator("#timer-logical")).toHaveText("00:24");
   await page.clock.setSystemTime(new Date("2040-01-01T00:00:00Z"));
   await page.evaluate(() => {
     document.dispatchEvent(new Event("visibilitychange"));
     window.dispatchEvent(new Event("pageshow"));
   });
-  await expect(page.locator("#timer-logical")).toHaveText("00:30");
+  await expect(page.locator("#timer-logical")).toHaveText("00:24");
   await page.clock.fastForward(30000);
   await page.clock.runFor(1000);
   await settled(page, "00:00");
@@ -467,13 +467,13 @@ test("Stopwatch floors partial intervals, resumes fractions and stops at exact59
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
   await page.click("#timer-start");
   await page.clock.fastForward(9999);
-  await expect(page.locator("#timer-logical")).toHaveText("00:00");
+  await expect(page.locator("#timer-logical")).toHaveText("00:09");
   await page.clock.runFor(2501);
   await settled(page, "00:10");
   await page.click("#timer-start");
   await expect(page.locator("#timer-start")).toHaveText("Resume");
   await page.clock.fastForward(50000);
-  await expect(page.locator("#timer-logical")).toHaveText("00:10");
+  await expect(page.locator("#timer-logical")).toHaveText("00:12");
   await page.selectOption("#timer-speed", "100");
   await page.click("#timer-start");
   await page.clock.fastForward(36000);
@@ -583,11 +583,11 @@ test("all five Timer rates integrate continuously while running and remain indep
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
   await page.click("#timer-start");
   for (const [rate, realMs, expected] of [
-    ["1", 1000, "01:00"],
-    ["10", 1000, "00:50"],
-    ["20", 500, "00:40"],
-    ["50", 200, "00:30"],
-    ["100", 100, "00:20"],
+    ["1", 1000, "00:59"],
+    ["10", 1000, "00:49"],
+    ["20", 500, "00:39"],
+    ["50", 200, "00:29"],
+    ["100", 100, "00:19"],
   ]) {
     await page.selectOption("#timer-speed", rate);
     await page.clock.fastForward(realMs);
@@ -920,7 +920,7 @@ test("pause reconciles active and already-settled future targets through legal m
     await page.locator("#rotation-speed").fill(stop);
     await page.click("#timer-start");
     await page.clock.runFor(advance);
-    await expect(page.locator("#timer-logical")).toHaveText("00:20");
+    await expect(page.locator("#timer-logical")).toHaveText(advance===5500 ? "00:15" : "00:11");
     if(advance===5500) {
       await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
       await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","moving");
@@ -936,12 +936,39 @@ test("pause reconciles active and already-settled future targets through legal m
     } else await page.clock.runFor(2000);
     await settled(page,"00:20");
     expect(Number(await page.locator("#session-moves").innerText())).toBeGreaterThan(before);
-    await expect(page.locator("#timer-logical")).toHaveText("00:20");
+    await expect(page.locator("#timer-logical")).toHaveText(advance===5500 ? "00:15" : "00:11");
     await page.click("#timer-start");
     await page.clock.runFor(10000-advance+1000);
     await settled(page,"00:10");
-    await expect(page.locator("#timer-logical")).toHaveText("00:10");
+    await expect(page.locator("#timer-logical")).toHaveText("00:09");
     await page.click("#timer-start");
   }
   await verifyActualTimerMoves(page,90,1,"/tmp/cubistry-predictive-pause-commits.json");
+});
+
+test("live readout advances each second while cube keeps ten-second buckets, including fractional Stopwatch pause",async({page})=>{
+  await page.clock.install();await chooseTimer(page);await duration(page,"00:20");
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  const moves=await page.locator("#session-moves").innerText();
+  await page.click("#timer-start");
+  for(const [elapsed,live] of [[1050,"00:19"],[1000,"00:18"]]) {
+    await page.clock.runFor(elapsed);
+    await expect(page.locator("#timer-logical")).toHaveText(live);
+    await settled(page,"00:20");
+    await expect(page.locator("#session-moves")).toHaveText(moves);
+  }
+  await page.clock.runFor(250);await page.click("#timer-start");
+  await page.clock.fastForward(50000);
+  await expect(page.locator("#timer-logical")).toHaveText("00:18");
+  await page.click("#timer-reset");
+  await expect(page.locator("#timer-logical")).toHaveText("00:20");
+  await page.selectOption("#timer-mode","stopwatch");await page.clock.runFor(1000);await settled(page,"00:00");
+  await page.click("#timer-start");await page.clock.runFor(12500);await settled(page,"00:10");
+  await expect(page.locator("#timer-logical")).toHaveText("00:12");
+  await page.click("#timer-start");await page.clock.fastForward(50000);
+  await expect(page.locator("#timer-logical")).toHaveText("00:12");await settled(page,"00:10");
+  await page.click("#timer-start");await page.clock.runFor(550);
+  await expect(page.locator("#timer-logical")).toHaveText("00:13");await settled(page,"00:10");
+  await page.click("#timer-reset");await page.clock.runFor(1000);
+  await expect(page.locator("#timer-logical")).toHaveText("00:00");await settled(page,"00:00");
 });
