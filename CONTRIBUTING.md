@@ -42,7 +42,9 @@ approval, or auto-merge. Leave the user's final merge decision intact.
 
 ## Dedicated research branch
 
-`spike/5x5-en-de-feasibility` is a long-lived mathematical research branch with a separate protection ruleset (block deletion and non-fast-forward updates). Continue proof experiments there with regular, non-force commits. Never merge the whole research branch into `main`; independently verified findings may be promoted in their own focused PRs. Preserve reproducible proof artifacts and provenance.
+`research/cube-display-feasibility` is the active long-lived mathematical research branch. Both research protection rulesets block deletion and non-fast-forward updates. Continue proof experiments on the new branch with regular, non-force commits. Never merge the whole research branch into `main`; independently verified findings may be promoted in their own focused PRs. Preserve reproducible proof artifacts and provenance.
+
+The former `spike/5x5-en-de-feasibility` remains protected temporarily as a recovery reference. Retire it only after verifying all active agents, worktrees, tracking references, and CI links have switched to the new branch, with a separately approved removal of the old-name protection rules and old remote ref. Preserve historical source references unchanged.
 
 **Automatic deletion of merged PR head branches stays enabled** for ordinary feature branches. This is intentional to limit remote branch buildup. Do not depend on post-merge cleanup to retain the research branch; keep its protection rules enabled and do not merge a PR whose head is that branch.
 
