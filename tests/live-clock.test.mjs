@@ -116,9 +116,9 @@ test("suspended playback keeps only the current target and never enumerates miss
   const boundary = Date.UTC(2026, 0, 1, 12, 35, 0),
     u = units([12, 34, 59]),
     s = new LiveClockScheduler(utc);
-  s.tick(boundary - 700, 0, u);
+  s.tick(boundary - 600, 0, u);
   assert.equal(u[2].controller.busy, true);
-  s.tick(boundary + 31000, 31700, u);
+  s.tick(boundary + 31000, 31600, u);
   assert.deepEqual(u[2].controller.requests, [0, 31]);
   assert.equal(u[2].controller.queued, 31);
   assert.equal(u[2].controller.deadline, null);
@@ -139,7 +139,7 @@ test("wall-clock jumps cancel anticipated deadlines and replan against the new s
   assert.equal(u[2].controller.deadline, null);
   assert.equal(u[0].controller.requests.at(-1), 11);
 });
-test("HSM prepares from exact full poses, initializes current values and forwards timing only on the last move", async () => {
+test("HSM prepares exact full poses and gives every turn contiguous angular timing", async () => {
   const d = validateHsmDesign(
       JSON.parse(readFileSync("public/hsm-counter.v2.json")),
     ),
@@ -170,9 +170,19 @@ test("HSM prepares from exact full poses, initializes current values and forward
     await new Promise((r) => setImmediate(r));
   assert.equal(c.busy, false);
   assert.equal(c.currentValue, 43);
-  assert.equal(calls.filter((v) => v.timing).length, 1);
+  assert.equal(calls.filter((v) => v.timing).length, moves.length);
+  for (let i = 0; i < calls.length; i++) {
+    const { timing, p } = calls[i];
+    assert.equal(timing.durationMs, Math.abs(p.move.turns) * 100);
+    assert.equal(timing.lateDurationMs, Math.abs(p.move.turns) * 10);
+    if (i)
+      assert.equal(timing.endAt - timing.durationMs, calls[i - 1].timing.endAt);
+  }
   assert.equal(calls.at(-1).timing.endAt, 12345);
-  assert.equal(calls.at(-1).timing.durationMs, 100);
+  assert.equal(
+    calls.at(-1).timing.durationMs,
+    Math.abs(moves.at(-1).turns) * 100,
+  );
   assert.ok(
     Number.isInteger(calls.at(-1).timing.revision) &&
       calls.at(-1).timing.revision > 0,
@@ -180,4 +190,64 @@ test("HSM prepares from exact full poses, initializes current values and forward
   assert.ok(matchesTarget(d.print, c.state, hsmTarget("S", 43)));
   c.clearDeadline();
   c.dispose();
+});
+test("a mixed quarter/half route starts from its angular budget without a reserved final hold", () => {
+  const boundary = Date.UTC(2026, 0, 1, 12, 35, 0),
+    u = units([12, 34, 59]),
+    s = new LiveClockScheduler(utc);
+  u[2].controller.prepare = () => [
+    { face: "R", turns: 1 },
+    { face: "U", turns: 2 },
+    { face: "F", turns: -1 },
+  ];
+  s.tick(boundary - 401, 1000, u);
+  assert.equal(u[2].controller.busy, false);
+  s.tick(boundary - 397, 1004, u);
+  assert.equal(u[2].controller.busy, true);
+  assert.equal(u[2].controller.deadline.durationMs, 397 / 4);
+  assert.equal(u[2].controller.deadline.endAt, 1401);
+  assert.equal(u[2].scheduledQuarterDuration, 397 / 4);
+});
+test("long and deliberately slow routes fit their shared slot uniformly with a visible scheduled rate", () => {
+  for (const [preferred, moves] of [
+    [100, Array(6).fill({ face: "R", turns: 2 })],
+    [
+      2000,
+      [
+        { face: "R", turns: 1 },
+        { face: "U", turns: 2 },
+      ],
+    ],
+  ]) {
+    const boundary = Date.UTC(2026, 0, 1, 12, 35, 0),
+      u = units([12, 34, 59]),
+      s = new LiveClockScheduler(utc);
+    u[2].duration = preferred;
+    u[2].controller.prepare = () => moves;
+    const changed = [];
+    u[2].setDuration = (ms) => changed.push(ms);
+    s.tick(boundary - 1000, 1000, u);
+    const work = moves.reduce((n, m) => n + Math.abs(m.turns), 0),
+      duration = 1000 / work;
+    assert.equal(u[2].controller.deadline.durationMs, duration);
+    assert.equal(changed.at(-1), duration);
+    assert.equal(u[2].scheduledQuarterDuration, duration);
+    assert.equal(u[2].duration, preferred);
+    assert.equal(u[2].controller.deadline.endAt, 2000);
+  }
+});
+test("an impossibly short remaining slot stays Synchronizing instead of snapping a physical route", () => {
+  const boundary = Date.UTC(2026, 0, 1, 12, 35, 0),
+    u = units([12, 34, 59]),
+    s = new LiveClockScheduler(utc);
+  const snapshot = s.tick(boundary - 30, 1000, u);
+  assert.equal(snapshot.motion[2], "synchronizing");
+  assert.equal(u[2].controller.busy, false);
+  assert.equal(u[2].controller.deadline, null);
+  const next = s.tick(boundary + 5, 1035, u);
+  assert.equal(next.motion[2], "synchronizing");
+  assert.equal(u[2].controller.pending, 0);
+  assert.ok(
+    u[2].scheduledQuarterDuration >= 10 && u[2].scheduledQuarterDuration < 100,
+  );
 });

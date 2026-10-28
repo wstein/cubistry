@@ -39,7 +39,7 @@
               <p id="hours-state" class="clock-state" role="status">
                 Preparing…
               </p>
-              <label for="hours-speed">Rotation Speed</label
+              <label for="hours-speed">Preferred quarter-turn time</label
               ><select id="hours-speed" disabled>
                 <option value="2000">2 s</option>
                 <option value="1000">1 s</option>
@@ -49,6 +49,7 @@
                 <option value="50">50 ms</option>
                 <option value="10">10 ms</option>
               </select>
+              <p id="hours-timing" class="small clock-timing"></p>
             </article>
             <article class="clock-card">
               <h2>Minutes</h2>
@@ -56,7 +57,7 @@
               <p id="minutes-state" class="clock-state" role="status">
                 Preparing…
               </p>
-              <label for="minutes-speed">Rotation Speed</label
+              <label for="minutes-speed">Preferred quarter-turn time</label
               ><select id="minutes-speed" disabled>
                 <option value="2000">2 s</option>
                 <option value="1000">1 s</option>
@@ -66,6 +67,7 @@
                 <option value="50">50 ms</option>
                 <option value="10">10 ms</option>
               </select>
+              <p id="minutes-timing" class="small clock-timing"></p>
             </article>
             <article class="clock-card">
               <h2>Seconds</h2>
@@ -73,7 +75,7 @@
               <p id="seconds-state" class="clock-state" role="status">
                 Preparing…
               </p>
-              <label for="seconds-speed">Rotation Speed</label
+              <label for="seconds-speed">Preferred quarter-turn time</label
               ><select id="seconds-speed" disabled>
                 <option value="2000">2 s</option>
                 <option value="1000">1 s</option>
@@ -83,6 +85,7 @@
                 <option value="50">50 ms</option>
                 <option value="10">10 ms</option>
               </select>
+              <p id="seconds-timing" class="small clock-timing"></p>
             </article>
           </div>
         </section>
@@ -105,8 +108,9 @@
       <p id="clock-error" class="error" role="alert"></p>
       <p class="small">
         Drag the shared view to look around all three cubes. The letters stay
-        fixed and the upper-left stickers stay blank. Slow playback synchronizes
-        directly to the current time.
+        fixed and the upper-left stickers stay blank. A half turn takes twice
+        the scheduled quarter-turn time. Preferred timings may be shortened to
+        keep live time.
       </p>
     </main>
     <script type="module" src="/src/clock.mjs"></script>
