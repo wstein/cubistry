@@ -591,6 +591,8 @@ test("all five Timer rates integrate continuously while running and remain indep
   ]) {
     await page.selectOption("#timer-speed", rate);
     await page.clock.fastForward(realMs);
+    // A paused fake clock needs an explicit UI sample, independent of poll phase.
+    await page.evaluate(() => window.dispatchEvent(new Event("pageshow")));
     await expect(page.locator("#timer-logical")).toHaveText(expected);
     await expect(page.locator("#timer-start")).toHaveText("Pause");
     await expect(page.locator("#rotation-speed")).toHaveValue("3");
@@ -919,7 +921,10 @@ test("pause reconciles active and already-settled future targets through legal m
     await settled(page,"00:20");
     await page.locator("#rotation-speed").fill(stop);
     await page.click("#timer-start");
-    await page.clock.runFor(advance);
+    // Skip idle preroll, then animate the entire scheduled active window.
+    const idle = advance===5500 ? 4900 : 8000;
+    await page.clock.fastForward(idle);
+    await page.clock.runFor(advance-idle);
     await expect(page.locator("#timer-logical")).toHaveText(advance===5500 ? "00:15" : "00:11");
     if(advance===5500) {
       await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
@@ -940,6 +945,7 @@ test("pause reconciles active and already-settled future targets through legal m
     await page.click("#timer-start");
     await page.clock.runFor(10000-advance+1000);
     await settled(page,"00:10");
+    await page.evaluate(() => window.dispatchEvent(new Event("pageshow")));
     await expect(page.locator("#timer-logical")).toHaveText("00:09");
     await page.click("#timer-start");
   }
@@ -963,7 +969,8 @@ test("live readout advances each second while cube keeps ten-second buckets, inc
   await page.click("#timer-reset");
   await expect(page.locator("#timer-logical")).toHaveText("00:20");
   await page.selectOption("#timer-mode","stopwatch");await page.clock.runFor(1000);await settled(page,"00:00");
-  await page.click("#timer-start");await page.clock.runFor(12500);await settled(page,"00:10");
+  await page.click("#timer-start");
+  await page.clock.fastForward(11000);await page.clock.runFor(1500);await settled(page,"00:10");
   await expect(page.locator("#timer-logical")).toHaveText("00:12");
   await page.click("#timer-start");await page.clock.fastForward(50000);
   await expect(page.locator("#timer-logical")).toHaveText("00:12");await settled(page,"00:10");
