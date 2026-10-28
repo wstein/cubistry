@@ -118,12 +118,19 @@ test("midnight wrap schedules all three final turns to the same target instant",
   await ready(page, "2026-12-31T22:59:56Z");
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
+    const { clockUnits } = await import("/src/clock.mjs");
     const animate = CubeViewer.prototype.animate;
     window.clockEndpoints = [];
     CubeViewer.prototype.animate = async function (p, timing) {
       const end = timing?.();
+      const controller = clockUnits.find(
+        (u) => u.controller.view === this,
+      ).controller;
+      const final =
+        controller.progress.completed + 1 === controller.progress.total &&
+        controller.progress.target === 0;
       await animate.call(this, p, timing);
-      if (end)
+      if (end && final)
         window.clockEndpoints.push({
           unit: this.host.dataset.unit,
           endAt: end.endAt,
@@ -180,17 +187,24 @@ test("real animation ends all three midnight sequences at the shared live deadli
   await expect(page.locator("#seconds-speed")).toBeEnabled();
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
+    const { clockUnits } = await import("/src/clock.mjs");
     const animate = CubeViewer.prototype.animate;
     window.realClockEndpoints = [];
     window.realClockMoves = [];
     CubeViewer.prototype.animate = async function (p, timing) {
       const endpoint = timing?.();
+      const controller = clockUnits.find(
+        (u) => u.controller.view === this,
+      ).controller;
+      const final =
+        controller.progress.completed + 1 === controller.progress.total &&
+        controller.progress.target === 0;
       await animate.call(this, p, timing);
       window.realClockMoves.push({
         unit: this.host.dataset.unit,
         presentation: p,
       });
-      if (endpoint)
+      if (endpoint && final)
         window.realClockEndpoints.push({
           unit: this.host.dataset.unit,
           endAt: endpoint.endAt,
@@ -329,4 +343,201 @@ test.describe("high-density shared clock viewport", () => {
       });
     }
   });
+});
+test("slow preferences show fitted quarter and half durations without relabeling the selected speed", async ({
+  page,
+}) => {
+  await ready(page, "2026-10-28T11:34:56Z");
+  await page.selectOption("#seconds-speed", "2000");
+  await expect(page.locator('label[for="seconds-speed"]')).toHaveText(
+    "Preferred quarter-turn time",
+  );
+  await expect(page.locator("#seconds-timing")).toContainText(
+    "fitted to live time",
+  );
+  await expect(page.locator("#seconds-speed")).toHaveValue("2000");
+  const rate = await page.evaluate(async () => {
+    const { clockUnits } = await import("/src/clock.mjs");
+    return {
+      preferred: clockUnits[2].duration,
+      quarter: clockUnits[2].scheduledQuarterDuration,
+    };
+  });
+  expect(rate.preferred).toBe(2000);
+  expect(rate.quarter).toBeGreaterThanOrEqual(10);
+  expect(rate.quarter).toBeLessThan(2000);
+});
+test("actual mixed quarter and half turns keep 2:1 durations without a final-turn dwell", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.addInitScript(() => {
+    Date.now = () => Date.parse("2026-10-28T11:34:56Z");
+  });
+  await page.goto("/clock.html");
+  await expect(page.locator("#seconds-speed")).toBeEnabled();
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        const { clockStage } = await import("/src/clock.mjs");
+        return clockStage.renderer.info.render.frame;
+      }),
+    )
+    .toBeGreaterThan(3);
+  await page.evaluate(async () => {
+    const { clockUnits, clockStage } = await import("/src/clock.mjs");
+    const { LiveClockScheduler } = await import("/src/apps/clock/scheduler.ts");
+    const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
+    // Freeze only automatic scheduling; RAF, physical motion and timers stay native.
+    LiveClockScheduler.prototype.tick = () => ({
+      values: [12, 34, 56],
+      motion: ["idle", "idle", "idle"],
+    });
+    const unit = clockUnits[2],
+      moves = unit.controller.prepare(57),
+      work = moves.reduce((n, m) => n + Math.abs(m.turns), 0),
+      quarter = 120;
+    window.angularTrace = [];
+    const active = new Map(),
+      animate = CubeViewer.prototype.animate,
+      render = clockStage.renderer.render.bind(clockStage.renderer);
+    CubeViewer.prototype.animate = async function (p, timing) {
+      const record = {
+        move: p.move,
+        presentation: p,
+        started: performance.now(),
+        timing: timing?.() ?? null,
+        firstMotion: null,
+        zeroFrames: 0,
+        finished: null,
+      };
+      window.angularTrace.push(record);
+      active.set(this, record);
+      try {
+        await animate.call(this, p, timing);
+        record.finished = performance.now();
+      } finally {
+        active.delete(this);
+      }
+    };
+    clockStage.renderer.render = function (scene, camera) {
+      for (const [viewer, record] of active) {
+        const pivot = viewer.scene.children.find(
+          (o) => o.type === "Group" && !viewer.meshes.includes(o),
+        );
+        if (pivot && record.firstMotion === null) {
+          if (
+            pivot.rotation
+              .toArray()
+              .slice(0, 3)
+              .some((v) => Math.abs(v) > 1e-5)
+          )
+            record.firstMotion = performance.now();
+          else record.zeroFrames++;
+        }
+      }
+      return render(scene, camera);
+    };
+    unit.setDuration(quarter);
+    window.angularEndAt = performance.now() + work * quarter;
+    unit.controller.setDeadline(57, window.angularEndAt, quarter);
+    unit.controller.request(57);
+  });
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        const { clockUnits } = await import("/src/clock.mjs");
+        return clockUnits[2].controller.busy;
+      }),
+    )
+    .toBe(false);
+  const evidence = await page.evaluate(() => ({
+    endAt: window.angularEndAt,
+    turns: window.angularTrace,
+  }));
+  writeFileSync(
+    "test-results/live-clock-angular-runtime.json",
+    JSON.stringify(evidence),
+  );
+  expect(evidence.turns.some((t) => Math.abs(t.move.turns) === 2)).toBe(true);
+  expect(evidence.turns.some((t) => Math.abs(t.move.turns) === 1)).toBe(true);
+  for (const t of evidence.turns) {
+    const weight = Math.abs(t.move.turns);
+    expect(t.timing.durationMs).toBe(weight * 120);
+    expect(t.firstMotion).not.toBeNull();
+    // Stage rendering can precede the progress RAF once, but no turn should
+    // spend multiple rendered frames deliberately waiting in its start pose.
+    expect(t.zeroFrames).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs((t.finished - t.started) / weight - 120),
+    ).toBeLessThanOrEqual(45);
+  }
+  for (let i = 1; i < evidence.turns.length; i++)
+    expect(
+      evidence.turns[i].timing.endAt - evidence.turns[i].timing.durationMs,
+    ).toBe(evidence.turns[i - 1].timing.endAt);
+  expect(
+    Math.abs(evidence.turns.at(-1).finished - evidence.endAt),
+  ).toBeLessThanOrEqual(150);
+  writeFileSync(
+    "test-results/live-clock-angular-runtime.json",
+    JSON.stringify(evidence),
+  );
+});
+test("untimed recovery honors quarter-based clock speed while the default viewer metric stays unchanged", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.addInitScript(() => {
+    Date.now = () => Date.parse("2026-10-28T11:34:56Z");
+  });
+  await page.goto("/clock.html");
+  await expect(page.locator("#seconds-speed")).toBeEnabled();
+  const run = async (metric) =>
+    page.evaluate(async (metric) => {
+      const { clockUnits, clockStage } = await import("/src/clock.mjs"),
+        { LiveClockScheduler } = await import("/src/apps/clock/scheduler.ts");
+      LiveClockScheduler.prototype.tick = () => ({
+        values: [12, 34, 56],
+        motion: ["idle", "idle", "idle"],
+      });
+      const unit = clockUnits[2],
+        viewer = unit.controller.view,
+        base = 75,
+        period = 180;
+      viewer.setAnimationSpeed(base / period, metric);
+      unit.controller.clearDeadline();
+      const candidate = [57, 58, 59, 0, 1, 2, 3, 4].find((value) => {
+        if (value === unit.controller.currentValue) return false;
+        const m = unit.controller.prepare(value);
+        return m.some((m) => m.turns === 2) && m.some((m) => m.turns !== 2);
+      });
+      if (candidate === undefined)
+        throw Error("Missing mixed recovery fixture");
+      const samples = [],
+        animate = viewer.animate.bind(viewer);
+      viewer.animate = async (p, timing) => {
+        const at = performance.now();
+        await animate(p, timing);
+        samples.push({
+          weight: Math.abs(p.move.turns),
+          ms: performance.now() - at,
+          timed: Boolean(timing),
+        });
+      };
+      unit.controller.request(candidate);
+      while (unit.controller.busy) await new Promise((r) => setTimeout(r, 10));
+      viewer.animate = animate;
+      return samples;
+    }, metric);
+  const weighted = await run("quarter-turn"),
+    legacy = await run("move");
+  const mean = (samples, weight) => {
+    const a = samples.filter((t) => t.weight === weight);
+    return a.reduce((n, t) => n + t.ms, 0) / a.length;
+  };
+  expect(weighted.every((t) => !t.timed)).toBe(true);
+  expect(legacy.every((t) => !t.timed)).toBe(true);
+  expect(mean(weighted, 2) / mean(weighted, 1)).toBeGreaterThan(1.4);
+  expect(Math.abs(mean(legacy, 2) - mean(legacy, 1))).toBeLessThanOrEqual(90);
 });

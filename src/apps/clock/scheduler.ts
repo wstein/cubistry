@@ -1,4 +1,5 @@
 import { demand, type LegalMove } from "@cubistry/cube-core";
+import { quarterTurnUnits } from "../shared/turn-timing.ts";
 export type ClockValues = readonly [number, number, number];
 export const localValues = (epoch: number): ClockValues => {
   const date = new Date(epoch);
@@ -17,6 +18,8 @@ export interface ClockPort {
 export interface ClockUnit {
   controller: ClockPort;
   duration: number;
+  /** Calculated schedule, not a measurement of browser rendering latency. */
+  scheduledQuarterDuration?: number;
   setDuration: (duration: number) => void;
 }
 export type ClockMotion = "idle" | "moving" | "synchronizing";
@@ -102,21 +105,44 @@ export class LiveClockScheduler {
         c.clearDeadline();
         this.anticipation[i] = null;
       }
+      unit.scheduledQuarterDuration = unit.duration;
       unit.setDuration(unit.duration);
       if (c.currentValue !== logical) {
         c.clearDeadline();
+        const work = quarterTurnUnits(c.prepare(logical));
+        // Recover the current value using at most half the remaining slot, so
+        // there is time to prepare its successor. Never use an instant turn.
+        const available =
+          nextChange(epoch, i as 0 | 1 | 2, this.read).epoch - epoch;
+        const duration = work
+          ? Math.max(10, Math.min(unit.duration, available / (2 * work)))
+          : unit.duration;
+        unit.scheduledQuarterDuration = duration;
+        unit.setDuration(duration);
         c.request(logical);
         motion[i] = "synchronizing";
         return;
       }
       const boundary = nextChange(epoch, i as 0 | 1 | 2, this.read),
         moves = c.prepare(boundary.value);
-      const budget = moves.length * unit.duration + (moves.length + 1) * 20;
+      const work = quarterTurnUnits(moves),
+        remaining = boundary.epoch - epoch,
+        budget = work * unit.duration;
+      demand(work > 0, "Empty clock successor route");
       if (epoch >= boundary.epoch - budget) {
+        if (remaining < work * 10) {
+          motion[i] = "synchronizing";
+          return;
+        }
+        // Fit the entire route, not only its final turn. Polling lateness and
+        // long/slow routes reduce the shared angular period uniformly.
+        const duration = Math.min(unit.duration, remaining / work);
+        unit.scheduledQuarterDuration = duration;
+        unit.setDuration(duration);
         const endAt =
           this.endpoints.get(boundary.epoch) ?? mono + boundary.epoch - epoch;
         this.endpoints.set(boundary.epoch, endAt);
-        c.setDeadline(boundary.value, endAt, unit.duration);
+        c.setDeadline(boundary.value, endAt, duration);
         this.anticipation[i] = {
           source: logical,
           target: boundary.value,
