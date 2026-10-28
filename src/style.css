@@ -321,3 +321,14 @@ h1 {
     transition: none !important;
   }
 }
+.timer-time {
+  display: block;
+  font-size: 2.4rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  margin: 1rem 0;
+}
+.timer-controls select {
+  width: 100%;
+  margin: 0.4rem 0 1rem;
+}
