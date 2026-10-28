@@ -17,9 +17,14 @@
     "test:live-solver": "npm run build:core && node research/m1-acceptance/run-live-solver.mjs /tmp/cubistry-live-solver.json && python3 research/m1-acceptance/verify_live_solver.py /tmp/cubistry-live-solver.json",
     "test:pages": "playwright test --config playwright.pages.config.mjs",
     "prepare:solver": "node scripts/prepare-puzlwerk.mjs",
-    "setup": "npm run prepare:solver && npm ci",
+    "setup": "npm run prepare:solver && npm ci && npm run prepare:five-second",
     "test:pr-preview": "playwright test --config playwright.preview.config.mjs",
-    "test:timer-proof": "python3 research/workshop-timer/evidence/verify.py && python3 research/workshop-timer/evidence/optimization/verify.py && python3 -m unittest discover -s research/workshop-timer/evidence -p test_verify.py && python3 -m unittest discover -s research/workshop-timer/evidence/optimization -p test_verify.py && python3 research/workshop-timer/verify.py test-results/workshop-timer-commits.json"
+    "test:timer-proof": "python3 research/workshop-timer/evidence/verify.py && python3 research/workshop-timer/evidence/optimization/verify.py && python3 -m unittest discover -s research/workshop-timer/evidence -p test_verify.py && python3 -m unittest discover -s research/workshop-timer/evidence/optimization -p test_verify.py && python3 research/workshop-timer/verify.py test-results/workshop-timer-commits.json",
+    "prepare:five-second": "node scripts/prepare-five-second.mjs",
+    "predev": "npm run prepare:five-second",
+    "prebuild": "npm run prepare:five-second",
+    "pretest": "npm run prepare:five-second",
+    "pretypecheck": "npm run prepare:five-second"
   },
   "dependencies": {
     "@cubistry/cube-assets": "*",
