@@ -30,6 +30,8 @@ interface Plan {
 export class TimerScheduler {
   private plan: Plan | null = null;
   private wake: ReturnType<typeof setTimeout> | null = null;
+  private lastBucket: number | null = null;
+  private missedBoundary = false;
   private readonly refresh: () => void;
   private readonly readClock?: () => ClockSnapshot;
   constructor(refresh: () => void = () => {}, readClock?: () => ClockSnapshot) {
@@ -39,6 +41,7 @@ export class TimerScheduler {
   invalidate(): void {
     if (this.wake !== null) clearTimeout(this.wake);
     this.wake = null; this.plan = null; this.warning = "";
+    this.lastBucket = null; this.missedBoundary = false;
   }
   /** A future target is intentional only while it remains the next clock bucket. */
   presentationTarget(snapshot: ClockSnapshot): number | null {
@@ -49,10 +52,14 @@ export class TimerScheduler {
     setDuration: (duration: number) => void): void {
     const { bucket, next } = snapshot;
     let at = snapshot.at;
+    const crossedBoundary = this.lastBucket !== null && bucket !== this.lastBucket;
+    this.lastBucket = bucket;
+    if (crossedBoundary && controller.currentValue !== bucket && controller.currentValue !== next?.target)
+      this.missedBoundary = true;
     let p = this.plan;
     const intentional = p && (p.target === bucket || p.target === next?.target);
     if (!snapshot.running) {
-      const missedDeadline = this.warning === "Late" || !!(p?.started && at >= p.deadline);
+      const missedDeadline = this.missedBoundary || this.warning === "Late" || !!(p && at >= p.deadline);
       this.invalidate();
       if (missedDeadline && (controller.currentValue !== bucket || controller.busy)) this.warning = "Late";
       setDuration(preferred);
@@ -77,18 +84,19 @@ export class TimerScheduler {
         this.warning = !p.feasible ? "Budget infeasible" : at >= p.deadline ? "Late" : "";
       } else {
         setDuration(MIN_MOVE_MS);
-        this.warning = "Late";
+        this.warning = this.missedBoundary ? "Late" : "";
         this.request(controller, bucket);
       }
       return;
     }
     if (controller.currentValue !== bucket && controller.currentValue !== next?.target) {
       this.plan = null;
-      this.warning = "Late";
+      this.warning = this.missedBoundary ? "Late" : "";
       setDuration(MIN_MOVE_MS);
       this.request(controller, bucket);
       return;
     }
+    this.missedBoundary = false;
     if (!next) return;
     if (controller.currentValue === next.target) {
       this.warning = p && !p.feasible ? "Budget infeasible" : "";
