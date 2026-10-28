@@ -19,10 +19,24 @@ A reload restores the last completed value and physical format, never a running
 operation. Former minute-timer/Auto persistence does not resume hidden work.
 The old timer and Auto modules and their unit regressions remain in the repository.
 
-Leading Zero explicitly reconfigures the permanent print and resets value and
-session to zero. The checked format uses the existing certified states/route;
-the unchecked blank-tens format uses the existing original print and solver.
-There are no solver, physical print, certificate, or proof-artifact changes.
+Leading Zero is presentation-only. Both checkbox states configure the same
+optimized permanent print and canonical states with the existing certified
+route. OFF replaces only the leading field's rendered zero image with the
+preloaded blank image; units zero and every other glyph/field/position remain
+unchanged. No print definition, asset identity, geometry, physical state,
+solver goal, move sequence, progress, Run/Set, counters, or camera is reset.
+The checkbox remains available during operations and persists on reload.
+Reload retains existing restore semantics: it reconstructs the saved value on
+the same optimized layout, without promising session/camera persistence or
+resuming Run. Legacy library/proof support remains separately testable and is
+not exposed through the normal counter checkbox.
+
+The generic viewer's conditional facelet-image override only updates one
+existing sticker material's texture map. Its blank follows that rigid sticker
+during a turn and is selected again from the committed poses after each move.
+This is screen formatting, not a changed physical printing or a new physical
+blank-glyph certificate. All canonical 339-HTM/max-five guarantees still apply
+to the unchanged underlying optimized print in both screen formats.
 
 The default camera uses 10° yaw, 7° elevation, radius 10.5, and 18° vertical
 field of view. Orbit and zoom affect the camera only. The transient hint is
@@ -35,18 +49,52 @@ Reduced motion retains immediate physical commits and requires no hint fade.
 | Issue | Result under #53 | Remaining / recommendation |
 | --- | --- | --- |
 | [#42](https://github.com/wstein/cubistry/issues/42) | Shared chooser in the header above both columns; certified counter default; no personalization/apply detour; exhaustive certified replay retained. | Timer and application switching remain deferred to #30. Do not close the full issue as delivered. |
-| [#43](https://github.com/wstein/cubistry/issues/43) | One Leading Zero checkbox next to Wrap; explicit permanent-print reset; checked/blank-tens persistence and validation. | Counter portion fulfilled. Future timer-specific visibility/switching remains open. |
-| [#45](https://github.com/wstein/cubistry/issues/45) | Six exact duration stops, default 250 ms, keyboard operation, persistence and adjustment during playback. | Continuous multiplier requirement superseded by #53. Recommend marking that design superseded after review. |
+| [#43](https://github.com/wstein/cubistry/issues/43) | One Leading Zero checkbox next to Wrap; presentation-only zero suppression; same optimized print and traversal in both states; no reset. | Counter portion fulfilled. Future timer-specific visibility/switching remains open. |
+| [#45](https://github.com/wstein/cubistry/issues/45) | Six exact duration stops, default 100 ms, keyboard operation, persistence and adjustment during playback. | Continuous multiplier requirement superseded by #53. Recommend marking that design superseded after review. |
 | [#46](https://github.com/wstein/cubistry/issues/46) | Target-based Set/Run/Stop replaces Auto, with adjacent progression and bounded physical work. | UI design superseded by #53; historical code/tests retained. Recommend recording supersession after review. |
 | [#37](https://github.com/wstein/cubistry/issues/37) | Larger readable cube, distant narrow-FOV oblique camera, orbit/zoom and responsive screenshots. | Presets and broader camera controls remain outside #53. Do not close the partial issue. |
 
 No related issues are automatically closed. Custom fonts/colors (#49/#50),
 preview infrastructure (#51), and 60-minute functionality (#30) are excluded.
 
-## Acceptance-feedback polish
+## Final Leading Zero correction and acceptance preparation
+
+The latest explicit user instruction restores the Rotation Speed default to
+**100 ms**, because 250 ms is too slow for one-second Run. The six stops and
+saved preferences remain unchanged. This supersedes the intermediate 250-ms
+walkthrough decision documented in the historical polish section below.
+
+Issue #53 is the active implementation tracker: all 33 original checklist
+entries are preserved under O01–O33 and mapped to 17 consolidated technical
+requirements. Superseded/duplicate wording remains traceable rather than being
+checked as delivered. User visual/functional acceptance remains distinct from
+technical completion, independent review, Ready status, and merge approval.
+
+Focused regressions inspect immutable print/state, all scene/geometry/material
+identities, texture maps, full progress/counts, Run/Set, nondefault camera, and
+rendered pixels at 0/1/7/9/10/42/99. They cover toggling during real animation,
+persistence, and fail-closed behavior if the mandatory optimized route is
+missing. Both on/off 00–99 browser traversals retain separate Playwright output
+artifacts and independently replay their own 339 committed moves through Python.
+The historical nonoptimized shared-solver replay remains in an isolated library
+consumer, never selected by the checkbox.
+
+Current screenshots use identical target/value 7 and nine committed moves on
+desktop; toggling only the leading field retains that state and all statistics.
+The mobile screenshot at zero confirms the units zero remains visible.
+
+| Leading Zero ON | Leading Zero OFF |
+| --- | --- |
+| ![Optimized 07](assets/issue-53/leading-zero-07-on.png) | ![Same optimized state, leading zero hidden](assets/issue-53/leading-zero-07-off.png) |
+
+[Mobile zero, leading zero hidden](assets/issue-53/leading-zero-0-mobile-off.png).
+
+## Historical acceptance-feedback polish at b386b38
 
 The follow-up section of Issue #53 and the maintainer's PR #54 handoff supersede
-the initial optional disclosure and 100-ms default. The same feature branch and
+the initial optional disclosure and (at that stage) 100-ms default. The later
+Leading Zero/100-ms correction above supersedes the old format/reset coupling
+and the intermediate 250-ms preference. The same feature branch and
 existing commits are retained; the follow-up adds focused commits without
 rewriting the accepted implementation's history.
 
@@ -81,7 +129,7 @@ browser cases (42 total), covering the stable toggle's geometry/focus/accessible
 state, header fit, visible/aligned statistics, paired checkboxes at widths
 1440/768/390/320, speed defaults, and saved speed preferences. The animated
 queue test still checks every committed count and queued target; its completion
-budget now accounts for 21 remaining turns at 250 ms plus rendering overhead.
+budget at that stage accounted for the remaining 250-ms turns plus rendering overhead.
 Static-path and deep-base suites run sequentially because both build `dist`.
 Final test and independent-review results are recorded in
 [PR #54](https://github.com/wstein/cubistry/pull/54).
@@ -119,7 +167,8 @@ accounting, asset failure diagnostics, and production-path static smoke tests.
 
 Run deliberately slows below one value per second when a physical transition
 takes longer. Stop finishes the active value rather than freezing a partial
-face. The blank-tens variant does not acquire the certified traversal guarantee.
+face. Leading Zero suppression does not alter the underlying optimized physical
+traversal or acquire a new physical blank-print certificate.
 
 PR #52 changed preview workflows, helpers, package scripts, and preview browser
 tests while this work was in progress. Rebasing onto its merged main state had

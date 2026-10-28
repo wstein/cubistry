@@ -1,13 +1,14 @@
 # Certified fixed-print counter traversal
 
-The prominent **Application** selector defaults directly to certified Counter
-00–99 at canonical 00. Leading-zero formatting uses this immutable print;
-Blank tens next to Wrap selects the compatible original unpadded print and
-clearly removes the certified-route claim. Configuration resets session
-accounting to zero. The title is permanently printed as COUNTER; the underlying
-explicit immutable-title APIs retain their orientation/copy requirements.
-See [current control semantics](COUNTER_CONTROLS.md). No counting operation
-replaces sticker images.
+The shared header selector offers Counter 0–99, starting at canonical 00.
+Both Leading Zero checkbox states retain this same optimized immutable print
+and certified traversal. The checkbox only masks the leading zero on screen;
+it never selects the legacy print, resets accounting, or changes physical state.
+The title is permanently printed as COUNTER; the underlying explicit
+immutable-title APIs retain their orientation/copy requirements.
+See [current control semantics](CUBE_FIRST_UI.md). Counting never replaces the
+physical print definition; screen formatting only changes the designated
+leading-zero field's presentation.
 
 ## Route and accounting
 
