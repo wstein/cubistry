@@ -20,9 +20,10 @@ export class WorkshopClock {
     return this.multiplier;
   }
   get valueMs(): number {
-    const delta = this.active
-      ? (this.now() - this.anchor) * this.multiplier
-      : 0;
+    return this.valueAt(this.now());
+  }
+  private valueAt(at: number): number {
+    const delta = this.active ? (at - this.anchor) * this.multiplier : 0;
     return Math.max(
       0,
       Math.min(
@@ -67,8 +68,9 @@ export class WorkshopClock {
   setSpeed(rate: number): void {
     if (![1, 10, 20, 50, 100].includes(rate))
       throw Error("Invalid timer speed");
-    const value = this.valueMs;
-    this.anchor = this.now();
+    const at = this.now();
+    const value = this.valueAt(at);
+    this.anchor = at;
     this.frozen = value;
     this.multiplier = rate;
   }

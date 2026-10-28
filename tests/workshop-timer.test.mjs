@@ -229,3 +229,14 @@ test("accelerated countdown retains an absolute deadline across speed changes wi
   assert.equal(c.bucket, 0);
   assert.equal(c.elapsed, true);
 });
+
+test("rate changes sample the monotonic source once so preemption cannot discard old-rate time", () => {
+  let samples = 0;
+  const c = new WorkshopClock(() => samples++ * 100);
+  c.configure(60);
+  c.start();
+  const before = samples;
+  c.setSpeed(10);
+  assert.equal(samples, before + 1);
+  assert.equal(c.remainingMs, 58900);
+});
