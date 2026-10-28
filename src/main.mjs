@@ -598,7 +598,9 @@ function hsmAssets() {
     fonts: [],
     documents: [],
     images: [
-      ...proof.assets.images.filter((i) => /^[0-9]$/.test(i.id)),
+      ...proof.assets.images.filter(
+        (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
+      ),
       ...hsmImages,
     ],
   };
