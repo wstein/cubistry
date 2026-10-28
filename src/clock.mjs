@@ -12,10 +12,30 @@ import {
   clockText,
 } from "./apps/clock/scheduler.ts";
 import pin from "../hsm-source.json";
-import images from "./apps/hsm/images.json";
+import {
+  hsmImagesFor,
+  hsmDesignFor,
+  parseLettering,
+} from "./apps/hsm/lettering.ts";
 const $ = (id) => document.getElementById(id),
   names = ["hours", "minutes", "seconds"],
   letters = ["H", "M", "S"];
+const lettering = parseLettering(
+  new URLSearchParams(location.search).get("lettering"),
+);
+$("clock-lettering").value = lettering;
+for (const name of names) {
+  const preferred = new URLSearchParams(location.search).get(name + "-speed");
+  if (["2000", "1000", "500", "250", "100", "50", "10"].includes(preferred))
+    $(name + "-speed").value = preferred;
+}
+$("clock-lettering").addEventListener("change", () => {
+  const url = new URL(location.href);
+  url.searchParams.set("lettering", $("clock-lettering").value);
+  for (const name of names)
+    url.searchParams.set(name + "-speed", $(name + "-speed").value);
+  location.assign(url);
+});
 const scheduler = new LiveClockScheduler(),
   units = [];
 let stage = null;
@@ -56,10 +76,11 @@ async function initialize() {
   const owned = [],
     unclaimed = [];
   try {
-    const [proof, design] = await Promise.all([
+    const [proof, sourceDesign] = await Promise.all([
       loadCounterDesign(undefined, import.meta.env.BASE_URL),
       loadHsmDesign(import.meta.env.BASE_URL, pin.runtimeSHA256),
     ]);
+    const design = hsmDesignFor(sourceDesign, lettering);
     const manifest = {
       ...proof.assets,
       fonts: [],
@@ -68,7 +89,7 @@ async function initialize() {
         ...proof.assets.images.filter(
           (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
         ),
-        ...images,
+        ...hsmImagesFor(lettering),
       ],
     };
     const results = await Promise.allSettled(
@@ -122,6 +143,7 @@ async function initialize() {
       });
     }
     ready = true;
+    $("clock-lettering").disabled = false;
     draw();
     setInterval(draw, 25);
     document.addEventListener("visibilitychange", draw);

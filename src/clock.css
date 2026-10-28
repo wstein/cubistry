@@ -101,3 +101,12 @@
     height: 230px;
   }
 }
+
+.clock-control > label {
+  display: block;
+  margin-top: 16px;
+}
+.clock-control > select {
+  width: 100%;
+  margin-top: 8px;
+}
