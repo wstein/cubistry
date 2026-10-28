@@ -57,3 +57,9 @@ test("an expired or subminimum endpoint falls back to a legal 10 ms incremental 
     h.frame(10);await h.promise;assert.equal(h.samples.at(-1).p,1);
   }
 });
+test("a rounded zero-length remaining window still finishes with finite monotonic progress",async()=>{
+  const h=harness();h.frame(999.9999999999999);
+  assert.ok(h.samples.at(-1).p>.99999999);
+  h.revise(1e9);h.frame(1000);h.timer(1e9);await h.promise;
+  assert.equal(h.samples.at(-1).p,1);assert.ok(h.samples.every(s=>Number.isFinite(s.p)));
+});
