@@ -777,3 +777,45 @@ test("10ms is a seventh independent rotation preset and commits verified physica
   await expect(page.locator("#timer-start")).toHaveText("Start");
   await verifyActualTimerMoves(page, 90, 3, "/tmp/cubistry-10ms-browser-commits.json");
 });
+
+test("Sequence numbers identify actual starts, retain the finished number and ignore coalesced targets or move-stat resets", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.clock.install();
+  await chooseTimer(page);
+  const number = page.locator("#sequence-number");
+  await expect(number).toHaveText("—");
+  await duration(page, "00:40");
+  await expect(number).toHaveText("1");
+  await page.click("#timer-set");
+  await expect(number).toHaveText("1");
+  await page.locator("#rotation-speed").fill("0");
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await page.fill("#timer-duration", "00:30");
+  await page.click("#timer-set");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
+  await expect(number).toHaveText("2");
+  for (const value of ["00:20", "00:10"]) {
+    await page.fill("#timer-duration", value);
+    await page.click("#timer-set");
+    await expect(number).toHaveText("2");
+  }
+  for (let i = 0; i < 40; i++) {
+    await page.clock.fastForward(2100);
+    await page.clock.runFor(20);
+  }
+  await settled(page, "00:10");
+  await expect(number).toHaveText("3");
+  await page.click("#reset-session-moves");
+  await expect(page.locator("#session-moves")).toHaveText("0");
+  await expect(number).toHaveText("3");
+  await page.click("#timer-reset");
+  await expect(number).toHaveText("3");
+  await page.selectOption("#application", "certified");
+  await expect(page.locator("#application")).toBeEnabled();
+  await expect(number).toHaveText("—");
+  await page.locator("#value").fill("1");
+  await page.click("#set");
+  await page.clock.runFor(1000);
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
+  await expect(number).toHaveText("1");
+});
