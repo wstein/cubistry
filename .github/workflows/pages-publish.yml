@@ -25,7 +25,7 @@ jobs:
       actions: read
       pull-requests: read
       pages: read
-    if: vars.PAGES_PREVIEWS_ENABLED == 'true' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository)
+    if: vars.PAGES_PREVIEWS_ENABLED == 'true'
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}

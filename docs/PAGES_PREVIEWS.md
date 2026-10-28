@@ -39,7 +39,8 @@ Pages settings migration, force push or protected research change.
   Privileged jobs run only trusted standard-library scripts and pinned actions;
   there is no npm installation or artifact script execution in those jobs.
 - API data, not artifact metadata, determines repository, current open PR/head,
-  workflow path, event, successful run and artifact identity. These are rechecked
+  workflow path, event, explicit PR-number/head/repository association,
+  successful run and artifact identity. These are rechecked
   immediately before each Ross operation. Stale completions cannot publish over
   a newer head; failed latest builds do not reuse older artifacts as current.
 - ZIP extraction rejects absolute/traversal/ambiguous paths, symlinks/special
@@ -55,7 +56,9 @@ Pages settings migration, force push or protected research change.
 
 GitHub concurrency can replace pending events. Each trusted publisher therefore
 reconciles **all** current open internal PR heads, current main and existing
-preview directories, rather than replaying only its triggering event. API
+preview directories, rather than replaying only its triggering event. Even a fork completion may
+wake this trusted reconciliation: filtering that last event could discard a
+coalesced internal update/cleanup. Fork artifacts remain ineligible. API
 pagination and tree inventories fail closed if incomplete. Ross operations are
 serialized, with supported explicit `pr-number` and `action: deploy/remove`
 inputs; there are no event-context hacks. Reopened PRs are rechecked before

@@ -31,6 +31,9 @@ jobs:
       - run: npm run test:pages
         env:
           CI: '1'
+      - run: npm run test:pr-preview
+        env:
+          CI: '1'
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

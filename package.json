@@ -17,7 +17,8 @@
     "test:live-solver": "npm run build:core && node research/m1-acceptance/run-live-solver.mjs /tmp/cubistry-live-solver.json && python3 research/m1-acceptance/verify_live_solver.py /tmp/cubistry-live-solver.json",
     "test:pages": "playwright test --config playwright.pages.config.mjs",
     "prepare:solver": "node scripts/prepare-puzlwerk.mjs",
-    "setup": "npm run prepare:solver && npm ci"
+    "setup": "npm run prepare:solver && npm ci",
+    "test:pr-preview": "playwright test --config playwright.preview.config.mjs"
   },
   "dependencies": {
     "@cubistry/cube-assets": "*",

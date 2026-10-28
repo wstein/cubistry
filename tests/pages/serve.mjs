@@ -2,7 +2,7 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, extname } from "node:path";
-const root = resolve("dist"),
+const root = resolve(process.env.STATIC_ROOT || "dist"),
   prefix = "/cubistry/";
 const mime = {
   ".html": "text/html",
@@ -20,7 +20,7 @@ createServer(async (req, res) => {
       new URL(req.url, "http://localhost").pathname,
     );
     if (!pathname.startsWith(prefix)) throw Error("outside base");
-    const file = resolve(root, pathname.slice(prefix.length) || "index.html");
+    const file = resolve(root, pathname.slice(prefix.length) + (pathname.endsWith("/") ? "index.html" : ""));
     if (!file.startsWith(root + "/")) throw Error("outside root");
     const bytes = await readFile(file);
     res.writeHead(200, {

@@ -21,7 +21,11 @@ def extract(archive,destination,number=0,sha=''):
             seen.add(name);total+=info.file_size
             if total>MAX_TOTAL or info.file_size>16*1024*1024:raise ValueError('Artifact expands beyond budget')
             records.append(info)
-        if 'index.html' not in seen:raise ValueError('Missing static root index')
+        index=next((i for i in records if i.filename=='index.html' and not i.is_dir()),None)
+        if index is None or index.file_size==0:raise ValueError('Missing nonempty regular static root index')
+        try:document=z.read(index).decode('utf-8')
+        except UnicodeError:raise ValueError('Root index is not UTF-8 HTML')
+        if not re.search(r'<html\b',document,re.I):raise ValueError('Root index lacks an HTML document')
         root.mkdir(parents=True,exist_ok=True)
         for info in records:
             path=root/info.filename
@@ -30,7 +34,9 @@ def extract(archive,destination,number=0,sha=''):
             data=z.read(info)
             if number and path.suffix=='.html':
                 text=data.decode('utf-8')
-                text=re.sub(r'(<head\b[^>]*>)',r'\1<meta name="robots" content="noindex,nofollow">',text,count=1,flags=re.I)
+                marker='<meta name="robots" content="noindex,nofollow">'
+                if re.search(r'<head\b',text,re.I):text=re.sub(r'(<head\b[^>]*>)',lambda m:m[0]+marker,text,count=1,flags=re.I)
+                else:text=re.sub(r'(<body\b)',lambda m:marker+m[0],text,count=1,flags=re.I)
                 banner=f'<aside style="padding:12px;background:#fff0b3;color:#222">PR #{number} — non-production preview · {html.escape(sha[:12])}</aside>'
                 text=re.sub(r'(<body\b[^>]*>)',lambda m:m[0]+banner,text,count=1,flags=re.I)
                 if 'noindex,nofollow' not in text or banner not in text:raise ValueError('Preview HTML lacks a document boundary')
