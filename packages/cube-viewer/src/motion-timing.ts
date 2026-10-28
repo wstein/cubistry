@@ -55,14 +55,15 @@ export function animateTimedProgress(
         previous = at;
         // An already missed/too-short endpoint must not snap an unplayed turn.
         const remainingMs = current ? current.durationMs * (1 - progress) : 0;
-        if (current && Number.isFinite(current.endAt) && current.durationMs >= 10 &&
+        if (current && Number.isFinite(current.endAt) && Number.isFinite(current.durationMs) && current.durationMs >= 10 &&
           current.endAt - at >= Math.min(10, remainingMs)) {
           window = { start: Math.max(at, current.endAt - remainingMs),
             end: current.endAt, from: progress };
         }
       }
       if (window) {
-        if (at >= window.start)
+        if (at >= window.end) progress = 1;
+        else if (at >= window.start)
           progress = Math.max(progress, window.from + (1 - window.from) *
             Math.min(1, (at - window.start) / (window.end - window.start)));
       } else {
