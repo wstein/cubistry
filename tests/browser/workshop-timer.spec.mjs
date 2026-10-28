@@ -197,7 +197,7 @@ test("pause freezes a lagged clock and settles one frozen bucket; reset never te
   await expect(page.locator("#status")).toHaveText("Countdown · Paused");
   await page.click("#timer-start");
   await page.clock.fastForward(10000);
-  await page.clock.runFor(100);
+  await page.clock.runFor(1);
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
   const before = Number(await page.locator("#session-moves").innerText());
   await page.click("#timer-reset");
@@ -438,6 +438,7 @@ test("exact Timer name, single focused action, dirty duration and independent sp
   await page.locator("#timer-start").press("Space");
   await expect(page.locator("#timer-logical")).toHaveText("00:20");
   await expect(page.locator("#timer-start")).toHaveText("Pause");
+  await expect(page.locator("#timer-sync")).not.toContainText("Late");
   await expect(page.locator("#timer-start")).toBeFocused();
   await page.locator("#timer-start").press("Space");
   await expect(page.locator("#timer-start")).toHaveText("Resume");
@@ -650,6 +651,9 @@ test("Set replaces a pending duration safely during an active legal animation wi
   await page.click("#timer-set");
   await page.clock.runFor(20);
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
+  await expect(page.locator("#timer-sync")).not.toContainText("Late");
+  await page.clock.runFor(100);
+  await expect(page.locator("#timer-sync")).not.toContainText("Late");
   await page.fill("#timer-duration", "00:20");
   await page.click("#timer-set");
   await expect(page.locator("#timer-start")).toHaveText("Start");
@@ -713,26 +717,26 @@ for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844
     await capture("before");
     // DOM activation avoids scrolling away from the pointer on mobile; actual turns still animate.
     await page.evaluate(() => document.querySelector("#timer-start").click());
-    await page.clock.fastForward(10000);
-    await page.clock.runFor(40);
+    await page.clock.runFor(5500);
     await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
     await expect(sync).toHaveAttribute("data-state", "moving");
-    await expect(sync).toHaveText("Moving", { useInnerText: true });
+    await expect(sync).toContainText("Moving");
+    await expect(sync).toContainText("ms effective");
     await stable("Running / Moving");
     await capture("moving");
     await page.mouse.move(initial.x + 8, initial.y + initial.height / 2);
     await page.mouse.down();
     await page.mouse.move(initial.x + initial.width * 0.8, initial.y + initial.height / 2, { steps: 5 });
     await expect(slider).not.toHaveValue("0");
-    await page.clock.fastForward(10000);
-    await page.clock.runFor(40);
+    await page.selectOption("#timer-speed", "100");
+    await page.clock.fastForward(200);
     await expect(sync).toHaveAttribute("data-state", "synchronizing");
-    await expect(sync).toContainText("Synchronizing · last settled 00:40");
+    await expect(sync).toContainText("Synchronizing");
     await stable("Running / Synchronizing with pointer held");
     await page.mouse.move(initial.x + initial.width * 0.4, initial.y + initial.height / 2, { steps: 5 });
     await page.mouse.up();
     await expect(slider).toHaveValue("2");
-    await expect(page.locator("#timer-speed")).toHaveValue("1");
+    await expect(page.locator("#timer-speed")).toHaveValue("100");
     await capture("synchronizing");
     await page.evaluate(() => document.querySelector("#timer-start").click());
     await expect(page.locator("#status")).toHaveText("Countdown · Paused");
@@ -765,7 +769,7 @@ test("10ms is a seventh independent rotation preset and commits verified physica
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await chooseTimer(page);
   await page.locator("#rotation-speed").fill("6");
-  await expect(page.locator("#rotation-speed")).toHaveAttribute("aria-valuetext", "10 ms per HTM move");
+  await expect(page.locator("#rotation-speed")).toHaveAttribute("aria-valuetext", "10 ms preferred");
   await expect(page.locator("#timer-speed")).toHaveValue("1");
   const boundaries = await page.evaluate(async () => {
     const { CubeViewer, MAX_ANIMATION_SPEED } = await import("/packages/cube-viewer/src/index.ts");
@@ -826,4 +830,118 @@ test("Sequence numbers identify actual starts, retain the finished number and ig
   await page.clock.runFor(1000);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
   await expect(number).toHaveText("1");
+});
+
+test("real predictive Timer settles full physical state by deadlines with250ms and adaptive2s preferences", async ({ page }, testInfo) => {
+  test.setTimeout(60000);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await chooseTimer(page);
+  await page.locator("#rotation-speed").fill("6");
+  await duration(page,"00:20");
+  await page.evaluate(() => {
+    window.deadlineCommits=[];
+    window.nominalDurations=[];
+    const cube=document.querySelector("#cube");
+    new MutationObserver(() => {
+      if(cube.getAttribute("aria-busy")==="false") window.deadlineCommits.push({at:performance.now(),value:cube.dataset.value});
+    }).observe(cube,{attributes:true});
+    document.querySelector("#timer-start").addEventListener("click",()=>{window.startedAt=performance.now();},{capture:true});
+    return import("/packages/cube-viewer/src/index.ts").then(({CubeViewer})=>{
+      const animate=CubeViewer.prototype.animate;
+      CubeViewer.prototype.animate=async function(p){
+        window.sequenceStartedAt ??= performance.now();
+        window.nominalDurations.push(75/this.animationSpeed);
+        await animate.call(this,p);
+        window.finalPhysicalState=p.to;
+      };
+    });
+  });
+  const observations=[];
+  for(const [stop,preferred] of [["3",250],["0",2000],["6",10]]) {
+    await page.locator("#rotation-speed").fill("6");
+    await duration(page,"00:20");
+    await page.locator("#rotation-speed").fill(stop);
+    await page.evaluate(()=>{window.sequenceStartedAt=null;window.deadlineCommits=[];window.timerTimes=[];window.nominalDurations=[];});
+    await page.click("#timer-start");
+    await settled(page,"00:10");
+    const observation=await page.evaluate(async()=>{
+      const {validateTimerRoute}=await import("/src/apps/timer/design.ts");
+      const {stateEquals}=await import("/packages/cube-core/src/index.ts");
+      const route=validateTimerRoute(await(await fetch("/workshop-timer.v1.json")).json());
+      return {deadline:window.startedAt+10000,startedAt:window.sequenceStartedAt,
+        settledAt:window.deadlineCommits.find(e=>e.value==="00:10").at,
+        exactFullState:stateEquals(window.finalPhysicalState,route.states[1]),
+        nominalDurations:window.nominalDurations, actualMoveDurations:window.timerTimes};
+    });
+    expect(observation.exactFullState).toBe(true);
+    expect(observation.actualMoveDurations).toHaveLength(5);
+    if(preferred<=250) expect(observation.nominalDurations).toEqual(Array(5).fill(preferred));
+    else expect(Math.max(...observation.nominalDurations)).toBeLessThan(preferred);
+    expect(observation.startedAt).toBeLessThan(observation.deadline);
+    expect(observation.settledAt).toBeLessThanOrEqual(observation.deadline);
+    expect(observation.settledAt-observation.startedAt).toBeLessThanOrEqual(5000);
+    await expect(page.locator("#rotation-speed")).toHaveValue(stop);
+    await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","idle");
+    observations.push({preferredMilliseconds:preferred,...observation});
+    await expect(page.locator("#timer-logical")).toHaveText("00:10",{timeout:12000});
+    await page.click("#timer-start");
+  }
+  const path=testInfo.outputPath("deadline-observations.json");
+  writeFileSync(path,JSON.stringify({kind:"foreground-real-clock",implementationHead:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),observedAt:new Date().toISOString(),frameAllowanceMs:75,dispatchAllowanceMs:8,observations},null,2));
+  await testInfo.attach("deadline-observations",{path,contentType:"application/json"});
+});
+
+test("100x10ms reports infeasible budget honestly and still commits a full legal final state", async ({page})=>{
+  await page.emulateMedia({reducedMotion:"no-preference"});
+  await chooseTimer(page);
+  await page.locator("#rotation-speed").fill("6");
+  await duration(page,"00:20");
+  await page.selectOption("#timer-speed","100");
+  await page.click("#timer-start");
+  await expect(page.locator("#timer-sync")).toContainText(/Budget infeasible|Late/);
+  await settled(page,"00:00");
+  await verifyActualTimerMoves(page,90,0,"/tmp/cubistry-adaptive-infeasible-commits.json");
+  await expect(page.locator("#status")).toHaveText("Countdown · Complete");
+  await expect(page.locator("#rotation-speed")).toHaveValue("6");
+});
+
+test("pause reconciles active and already-settled future targets through legal moves and Resume keeps fractions", async({page})=>{
+  test.setTimeout(60000);
+  await page.emulateMedia({reducedMotion:"no-preference"});
+  await page.clock.install();
+  await chooseTimer(page);
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  for(const [stop,advance] of [["0",5500],["3",9900]]) {
+    await page.locator("#rotation-speed").fill("6");
+    await page.fill("#timer-duration","00:20");
+    await page.locator("#timer-duration").press("Enter");
+    await page.clock.runFor(1000);
+    await settled(page,"00:20");
+    await page.locator("#rotation-speed").fill(stop);
+    await page.click("#timer-start");
+    await page.clock.runFor(advance);
+    await expect(page.locator("#timer-logical")).toHaveText("00:20");
+    if(advance===5500) {
+      await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
+      await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","moving");
+    } else {
+      await settled(page,"00:10");
+      await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","idle");
+    }
+    const before=Number(await page.locator("#session-moves").innerText());
+    await page.click("#timer-start");
+    await expect(page.locator("#timer-sync")).not.toContainText("Late");
+    if(advance===5500) {
+      for(let i=0;i<12;i++) { await page.clock.fastForward(2100); await page.clock.runFor(20); }
+    } else await page.clock.runFor(2000);
+    await settled(page,"00:20");
+    expect(Number(await page.locator("#session-moves").innerText())).toBeGreaterThan(before);
+    await expect(page.locator("#timer-logical")).toHaveText("00:20");
+    await page.click("#timer-start");
+    await page.clock.runFor(10000-advance+1000);
+    await settled(page,"00:10");
+    await expect(page.locator("#timer-logical")).toHaveText("00:10");
+    await page.click("#timer-start");
+  }
+  await verifyActualTimerMoves(page,90,1,"/tmp/cubistry-predictive-pause-commits.json");
 });
