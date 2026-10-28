@@ -48,8 +48,9 @@ export class TimerScheduler {
     let p = this.plan;
     const intentional = p && (p.target === bucket || p.target === next?.target);
     if (!snapshot.running) {
+      const missedDeadline = this.warning === "Late" || !!(p?.started && at >= p.deadline);
       this.invalidate();
-      if (controller.currentValue !== bucket || controller.busy) this.warning = "Late";
+      if (missedDeadline && (controller.currentValue !== bucket || controller.busy)) this.warning = "Late";
       setDuration(preferred);
       if (controller.currentValue !== bucket || controller.busy) this.request(controller, bucket);
       return;
@@ -57,18 +58,18 @@ export class TimerScheduler {
     if (p && !intentional) { this.plan = p = null; }
     if (controller.busy) {
       if (p?.started && controller.progress.target === p.target && intentional) {
-        if (next?.target === p.target && Math.abs(p.deadline - next.deadline) > 0.01) {
-          p.deadline = next.deadline;
-          p.interval = next.interval;
-          const revised = planSequence(p.moves, preferred, next.interval, next.deadline - at);
-          p.effective = revised.effective; p.feasible = revised.feasible;
+        const changedDeadline = next?.target === p.target && Math.abs(p.deadline - next.deadline) > 0.01;
+        if (changedDeadline || preferred !== p.preferred) {
+          if (changedDeadline && next) { p.deadline = next.deadline; p.interval = next.interval; }
+          const remaining = Math.max(1, controller.progress.total - controller.progress.completed);
+          const revised = planSequence(remaining, preferred, p.interval, p.deadline - at);
+          p.effective = Math.min(p.effective, revised.effective);
+          p.feasible = p.feasible && revised.feasible;
+          p.preferred = preferred;
         }
-        const remaining = Math.max(1, controller.progress.total - controller.progress.completed);
-        // Rebudget live changes once against the fixed deadline, never half the remaining time.
-        const remainingBudget = Math.max(0, p.deadline - at - FRAME_ALLOWANCE_MS);
-        const effective = Math.min(preferred, p.effective,
-          Math.max(MIN_MOVE_MS, remainingBudget / remaining - FRAME_ALLOWANCE_MS));
-        setDuration(effective);
+        // Keep a faster preference unchanged during ordinary playback. Rebudget only
+        // after user changes, rather than counting an in-progress move as unstarted.
+        setDuration(at >= p.deadline ? MIN_MOVE_MS : p.effective);
         this.warning = !p.feasible ? "Budget infeasible" : at >= p.deadline ? "Late" : "";
       } else {
         setDuration(MIN_MOVE_MS);
