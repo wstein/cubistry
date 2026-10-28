@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Live clock</title>
-    <script type="module" crossorigin src="/cubistry/pr-preview/pr-65/assets/clock-CGeznJ5A.js"></script>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-65/assets/clock-DaSE8Axf.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/index-BLm24CbA.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/three-CMRukwtc.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/index-DWMSf8Ku.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/design-DdzaZu_d.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/images-BPX-eNb4.js">
-    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-65/assets/clock-orCkQ-C4.css">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/index-DdZKgPB2.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/design-05icCBHi.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/lettering-g_CQnBha.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-65/assets/clock-2ppoBgPB.css">
     <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-65/assets/style-Gvnaknp7.css">
   </head>
-  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #65 — non-production preview · d3106f21ac88</aside>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #65 — non-production preview · e38f88722740</aside>
     <main class="live-clock-page">
       <header>
         <a class="brand" href="./" aria-label="Cubistry home"
@@ -48,7 +48,7 @@
               <p id="hours-state" class="clock-state" role="status">
                 Preparing…
               </p>
-              <label for="hours-speed">Rotation Speed</label
+              <label for="hours-speed">Preferred quarter-turn time</label
               ><select id="hours-speed" disabled>
                 <option value="2000">2 s</option>
                 <option value="1000">1 s</option>
@@ -58,6 +58,7 @@
                 <option value="50">50 ms</option>
                 <option value="10">10 ms</option>
               </select>
+              <p id="hours-timing" class="small clock-timing"></p>
             </article>
             <article class="clock-card">
               <h2>Minutes</h2>
@@ -65,7 +66,7 @@
               <p id="minutes-state" class="clock-state" role="status">
                 Preparing…
               </p>
-              <label for="minutes-speed">Rotation Speed</label
+              <label for="minutes-speed">Preferred quarter-turn time</label
               ><select id="minutes-speed" disabled>
                 <option value="2000">2 s</option>
                 <option value="1000">1 s</option>
@@ -75,6 +76,7 @@
                 <option value="50">50 ms</option>
                 <option value="10">10 ms</option>
               </select>
+              <p id="minutes-timing" class="small clock-timing"></p>
             </article>
             <article class="clock-card">
               <h2>Seconds</h2>
@@ -82,7 +84,7 @@
               <p id="seconds-state" class="clock-state" role="status">
                 Preparing…
               </p>
-              <label for="seconds-speed">Rotation Speed</label
+              <label for="seconds-speed">Preferred quarter-turn time</label
               ><select id="seconds-speed" disabled>
                 <option value="2000">2 s</option>
                 <option value="1000">1 s</option>
@@ -92,6 +94,7 @@
                 <option value="50">50 ms</option>
                 <option value="10">10 ms</option>
               </select>
+              <p id="seconds-timing" class="small clock-timing"></p>
             </article>
           </div>
         </section>
@@ -108,14 +111,20 @@
           <p id="clock-status" class="small" role="status">
             Preparing the verified fixed prints…
           </p>
+          <label for="clock-lettering">Sticker lettering</label>
+          <select id="clock-lettering" disabled>
+            <option value="symbols">Large H / M / S</option>
+            <option value="words">Small hour / min / sec</option>
+          </select>
         </aside>
       </div>
 
       <p id="clock-error" class="error" role="alert"></p>
       <p class="small">
-        Drag the shared view to look around all three cubes. The letters stay
-        fixed and the upper-left stickers stay blank. Slow playback synchronizes
-        directly to the current time.
+        Drag the shared view to look around all three cubes. The unit labels
+        stay fixed and the upper-left stickers stay blank. A half turn takes
+        twice the scheduled quarter-turn time. Preferred timings may be
+        shortened to keep live time.
       </p>
     </main>
   </body>
