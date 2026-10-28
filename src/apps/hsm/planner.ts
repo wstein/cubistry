@@ -16,9 +16,11 @@ import {
 import { hsmTarget, positions, type Letter } from "./design.ts";
 type Pose = { p: Vec3; n: Vec3; up: Vec3 };
 const key = (p: Pose) => JSON.stringify([p.p, p.n, p.up]);
-const encode = (a: readonly number[]) => a[0] * 576 + a[1] * 24 + a[2];
+const encode = (a: readonly number[]) =>
+  a[0] * 13824 + a[1] * 576 + a[2] * 24 + a[3];
 const decode = (k: number) => [
-  Math.floor(k / 576),
+  Math.floor(k / 13824),
+  Math.floor(k / 576) % 24,
   Math.floor(k / 24) % 24,
   k % 24,
 ];
@@ -31,11 +33,11 @@ function turn(p: Pose, m: LegalMove): Pose {
     ? { p: turnVector(p.p, m), n: turnVector(p.n, m), up: turnVector(p.up, m) }
     : p;
 }
-/** Exact three-corner BFS; hidden poses remain in the authoritative full state. */
+/** Exact four-corner BFS; hidden poses remain in the authoritative full state. */
 export class HsmPlanner {
   private readonly maps: Map<string, number>[] = [];
   private readonly transitions: number[][][] = [];
-  private readonly distances = new Uint8Array(24 ** 3).fill(255);
+  private readonly distances = new Uint8Array(24 ** 4).fill(255);
   constructor() {
     for (const p of positions) {
       const poses: Pose[] = [{ p, n: [0, 0, 1], up: [0, 1, 0] }],
@@ -66,14 +68,7 @@ export class HsmPlanner {
           queue.push(k);
         }
       }
-    demand(queue.length === 9072, "Incomplete HSM corner graph");
-    // The selected letter already upright in TR has coordinate zero.
-    demand(
-      queue
-        .filter((k) => decode(k)[0] === 0)
-        .every((k) => this.distances[k] <= 5),
-      "HSM five-move invariant failed",
-    );
+    demand(queue.length === 136080, "Incomplete HSM corner graph");
   }
   private step(a: readonly number[], m: number): number[] {
     return a.map((p, s) => this.transitions[s][m][p]);
@@ -93,15 +88,17 @@ export class HsmPlanner {
       distance = 255;
     for (const a of lists[0])
       for (const b of lists[1])
-        for (const c of lists[2]) {
-          if (new Set([a.cubie, b.cubie, c.cubie]).size !== 3) continue;
-          const ids = [a, b, c].map((p, s) => this.maps[s].get(key(p))!),
-            d = this.distances[encode(ids)];
-          if (d < distance) {
-            distance = d;
-            chosen = ids;
+        for (const c of lists[2])
+          for (const d of lists[3]) {
+            if (new Set([a.cubie, b.cubie, c.cubie, d.cubie]).size !== 4)
+              continue;
+            const ids = [a, b, c, d].map((p, s) => this.maps[s].get(key(p))!),
+              cost = this.distances[encode(ids)];
+            if (cost < distance) {
+              distance = cost;
+              chosen = ids;
+            }
           }
-        }
     demand(chosen && distance < 255, "No reachable HSM display");
     return { chosen, distance };
   }
@@ -111,23 +108,24 @@ export class HsmPlanner {
     letter: Letter,
     value: number,
     nextValue?: number,
+    policy = 13,
   ): readonly LegalMove[] {
     const target = hsmTarget(letter, value);
     demand(
       matchesTarget(print, state, {
         ...target,
-        facelets: [target.facelets[0]],
+        facelets: [target.facelets[0], target.facelets[1]],
       }),
-      "Set up the upright letter before counting",
+      "Set up the blank and upright letter before counting",
     );
     let { chosen: a, distance } = this.goal(print, state, letter, value);
-    demand(distance <= 5, "No certified HSM route");
+    demand(distance <= 6, "No certified HSM route");
     const result: LegalMove[] = [];
     while (distance) {
       let m = -1,
         look = 256;
       for (let j = 0; j < 18; j++) {
-        const candidate = (j + 13) % 18;
+        const candidate = (j + policy) % 18;
         if (this.distances[encode(this.step(a, candidate))] !== distance - 1)
           continue;
         const cost =

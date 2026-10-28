@@ -61,6 +61,9 @@ export class HsmController extends PhysicalPlayback {
       this.letter,
       value,
       next,
+      this.letter === "M" && this.range === 59 && this.direction === -1
+        ? 1
+        : 13,
     );
     return applyMoves(this.state, this.planned);
   }

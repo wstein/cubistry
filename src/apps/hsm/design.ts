@@ -20,6 +20,7 @@ export interface HsmDesign {
   readonly zeroWords: Readonly<Record<Letter, string>>;
 }
 export const positions: readonly Vec3[] = [
+  [-1, 1, 1],
   [1, 1, 1],
   [-1, -1, 1],
   [1, -1, 1],
@@ -35,20 +36,22 @@ export function hsmTarget(letter: Letter, value: number): DisplayTarget {
   return deepFreeze({
     schema: "cubistry.target",
     version: 1,
-    facelets: [letter, ...String(value).padStart(2, "0")].map((assetId, i) => ({
-      position: positions[i],
-      normal: [0, 0, 1],
-      up: [0, 1, 0],
-      assetId,
-      matching: "exact",
-    })),
+    facelets: ["blank", letter, ...String(value).padStart(2, "0")].map(
+      (assetId, i) => ({
+        position: positions[i],
+        normal: [0, 0, 1],
+        up: [0, 1, 0],
+        assetId,
+        matching: "exact",
+      }),
+    ),
   });
 }
 export function validateHsmDesign(raw: unknown): HsmDesign {
   const d = record(raw, "HSM counter");
   demand(
     d.schema === "cubistry.hsm-runtime" &&
-      d.version === 1 &&
+      d.version === 2 &&
       Array.isArray(d.printing) &&
       d.printing.length === 24,
     "Invalid HSM runtime",
@@ -61,12 +64,14 @@ export function validateHsmDesign(raw: unknown): HsmDesign {
   const print = validatePrint({
     schema: "cubistry.print",
     version: 1,
-    id: "hsm_counter_intermediate",
+    id: "hsm_counter_blank",
     topology: { kind: "cube", size: 2 },
     cubies,
     stickers: printing.map((s, i) => {
       demand(
-        s.id === i && typeof s.image === "string" && /^[0-9HSM]$/.test(s.image),
+        s.id === i &&
+          typeof s.image === "string" &&
+          (s.image === "" || /^[0-9HSM]$/.test(s.image)),
         "Invalid immutable HSM glyph",
       );
       demand(
@@ -79,9 +84,9 @@ export function validateHsmDesign(raw: unknown): HsmDesign {
         cubie: s.cubie,
         normal: s.n,
         up: s.up,
-        assetId: s.image,
+        assetId: s.image || "blank",
         materialId: "sticker",
-        equivalentQuarterTurns: [0],
+        equivalentQuarterTurns: s.image ? [0] : [0, 1, 2, 3],
       };
     }),
   });
@@ -104,7 +109,7 @@ export async function loadHsmDesign(
   expectedHash: string,
 ): Promise<HsmDesign> {
   const response = await fetch(
-    `${deploymentBasePath(basePath)}hsm-counter.v1.json`,
+    `${deploymentBasePath(basePath)}hsm-counter.v2.json`,
   );
   demand(response.ok, "Unable to load HSM print");
   const bytes = await response.arrayBuffer();
