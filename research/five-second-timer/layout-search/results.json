@@ -1,0 +1,539 @@
+{
+  "schema": "cubistry.five-second-layout-search",
+  "version": 1,
+  "primaryUseCase": "Consecutive five-second steps over full00:00..39:55; lexicographic maximum then total HTM",
+  "scope": "Two constructive cubie-group families, both spare seconds-unit glyphs, nine mixed-family face placements each; seeded bounded swaps; not global layout optimum",
+  "baseline": {
+    "maximumHTM": 6,
+    "totalHTM": 2261
+  },
+  "proposals": 8608,
+  "rows": [
+    {
+      "family": "A",
+      "extra": "0",
+      "mixedFaces": [
+        0,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2266,
+      "meanHTM": 4.7306889352818375,
+      "coreSHA256": "8ae67af51ced32358f1a878c80e86e3deb89311377d248c5692e6143fc9846e2",
+      "file": "A-0-0-0.json"
+    },
+    {
+      "family": "A",
+      "extra": "0",
+      "mixedFaces": [
+        0,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2263,
+      "meanHTM": 4.724425887265136,
+      "coreSHA256": "73fe5b7f4fcf4c13d23cd4bbe78a6c27e47bc198439b50641426babd8829e6ff",
+      "file": "A-0-0-1.json"
+    },
+    {
+      "family": "A",
+      "extra": "0",
+      "mixedFaces": [
+        0,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2262,
+      "meanHTM": 4.722338204592902,
+      "coreSHA256": "c2d613b4059ea3f3f214469bfdc0ae08a39dee70328560ab64c31358f75b0e88",
+      "file": "A-0-0-2.json"
+    },
+    {
+      "family": "A",
+      "extra": "0",
+      "mixedFaces": [
+        1,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2257,
+      "meanHTM": 4.711899791231732,
+      "coreSHA256": "5e47b2fcf77663b1df105af7c4f3fa5fee8c543c11841a10b87e4fa2867bb2ee",
+      "file": "A-0-1-0.json"
+    },
+    {
+      "family": "A",
+      "extra": "0",
+      "mixedFaces": [
+        1,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2264,
+      "meanHTM": 4.72651356993737,
+      "coreSHA256": "e61961c01e35927af079f5fad710a05f3bb4bafecf332b0b11bbe83b18274fbb",
+      "file": "A-0-1-1.json"
+    },
+    {
+      "family": "A",
+      "extra": "0",
+      "mixedFaces": [
+        1,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2264,
+      "meanHTM": 4.72651356993737,
+      "coreSHA256": "ba911f1222946caa769eaf8367391f47338b605850274d112f2a1a45f6eedd65",
+      "file": "A-0-1-2.json"
+    },
+    {
+      "family": "A",
+      "extra": "0",
+      "mixedFaces": [
+        2,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2255,
+      "meanHTM": 4.707724425887265,
+      "coreSHA256": "364f5cafc4db5c52ea410ca1cb891662f45db46384c24e1a9b5238a59712ca72",
+      "file": "A-0-2-0.json"
+    },
+    {
+      "family": "A",
+      "extra": "0",
+      "mixedFaces": [
+        2,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2270,
+      "meanHTM": 4.739039665970773,
+      "coreSHA256": "eba2335897caa40cfd8cf8ae3174238bdd679e97473ee8d325145b1fbcaa5235",
+      "file": "A-0-2-1.json"
+    },
+    {
+      "family": "A",
+      "extra": "0",
+      "mixedFaces": [
+        2,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2257,
+      "meanHTM": 4.711899791231732,
+      "coreSHA256": "3024078f0047cac887a2308883ad18fcdaf0e834f35da1dd2e8127f61e11ed33",
+      "file": "A-0-2-2.json"
+    },
+    {
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        0,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2275,
+      "meanHTM": 4.749478079331942,
+      "coreSHA256": "89c4234e56721ea91400e6c18013524c2853bfaef6ec45faf7a369ffbf1f7f9a",
+      "file": "A-5-0-0.json"
+    },
+    {
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        0,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2299,
+      "meanHTM": 4.799582463465553,
+      "coreSHA256": "d201e5d76a64a831ed4ced25d46e3a6ba4ba5202a19bf766be70c1752bf17f7e",
+      "file": "A-5-0-1.json"
+    },
+    {
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        0,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2291,
+      "meanHTM": 4.782881002087683,
+      "coreSHA256": "b2ca964eb6e595a3f88cb567434c63a366c98ba61088042f130318e2f3a76e11",
+      "file": "A-5-0-2.json"
+    },
+    {
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        1,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2282,
+      "meanHTM": 4.764091858037578,
+      "coreSHA256": "8ecb6dcad10eeecb746133b7e408bdca56c950ea6e17bf3cf588d4cc88dbd822",
+      "file": "A-5-1-0.json"
+    },
+    {
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        1,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2414,
+      "meanHTM": 5.039665970772442,
+      "coreSHA256": "f672ef0b067d5b44fcecb400cb78a7678fc84eb9e2014aefcd98015b642ec73e",
+      "file": "A-5-1-1.json"
+    },
+    {
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        1,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2287,
+      "meanHTM": 4.774530271398747,
+      "coreSHA256": "34e6c2c75b571a85ce468a546d8db147b357ca041fe8369e47c822b3cf4c77b2",
+      "file": "A-5-1-2.json"
+    },
+    {
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        2,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2287,
+      "meanHTM": 4.774530271398747,
+      "coreSHA256": "7a8c8619c0a62f545be2c58c848acb55383e442f200b2101c3fd7ae5a4bbd629",
+      "file": "A-5-2-0.json"
+    },
+    {
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        2,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2436,
+      "meanHTM": 5.085594989561587,
+      "coreSHA256": "2e9e95d8a174cff8a1e5bc86ee614bec43ecb17aca63a310fb0f0b22d2c236b3",
+      "file": "A-5-2-1.json"
+    },
+    {
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        2,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2432,
+      "meanHTM": 5.077244258872652,
+      "coreSHA256": "48bde5f0cfabe9a00e4b30d22bc203971723ddd3180b4873225886c31094599d",
+      "file": "A-5-2-2.json"
+    },
+    {
+      "family": "B",
+      "extra": "0",
+      "mixedFaces": [
+        0,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2256,
+      "meanHTM": 4.709812108559499,
+      "coreSHA256": "ae232106d201ddfe0b4ac96f78bd4f6837e3a2a6adf87b9d7fcf88b9ad597f72",
+      "file": "B-0-0-0.json"
+    },
+    {
+      "family": "B",
+      "extra": "0",
+      "mixedFaces": [
+        0,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2268,
+      "meanHTM": 4.734864300626305,
+      "coreSHA256": "8f74e9e442041e4bdd3cdea59aad7f68876bfca2dea630b50371cf58b893de78",
+      "file": "B-0-0-1.json"
+    },
+    {
+      "family": "B",
+      "extra": "0",
+      "mixedFaces": [
+        0,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2250,
+      "meanHTM": 4.697286012526096,
+      "coreSHA256": "e3af164f5b58e15d8b572470e8920d577f4c5aef0cc6da4b47f1ed51aa6d0d44",
+      "file": "B-0-0-2.json"
+    },
+    {
+      "family": "B",
+      "extra": "0",
+      "mixedFaces": [
+        1,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2262,
+      "meanHTM": 4.722338204592902,
+      "coreSHA256": "1917ce23cea304206d585a281cd1f3fa64613097a16890d9c4a4888b2dc61c9a",
+      "file": "B-0-1-0.json"
+    },
+    {
+      "family": "B",
+      "extra": "0",
+      "mixedFaces": [
+        1,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2256,
+      "meanHTM": 4.709812108559499,
+      "coreSHA256": "fcd76fbef26897dbc095b184194619e3c0b676f5a8c698db1b70186bef45bfe8",
+      "file": "B-0-1-1.json"
+    },
+    {
+      "family": "B",
+      "extra": "0",
+      "mixedFaces": [
+        1,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2271,
+      "meanHTM": 4.741127348643007,
+      "coreSHA256": "5681de78c4719fa639bd5756de20c5c7872a2761afebd919428868c57dabe64d",
+      "file": "B-0-1-2.json"
+    },
+    {
+      "family": "B",
+      "extra": "0",
+      "mixedFaces": [
+        2,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2257,
+      "meanHTM": 4.711899791231732,
+      "coreSHA256": "134e290c5f6e9e58f35a623a7d414820e588ff721fdcd40b6b657cc5be4f7019",
+      "file": "B-0-2-0.json"
+    },
+    {
+      "family": "B",
+      "extra": "0",
+      "mixedFaces": [
+        2,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2258,
+      "meanHTM": 4.713987473903966,
+      "coreSHA256": "932723a58e89c04649b5ba3ee7867fa81caa62f0aa52005d5c6e8e99a165634e",
+      "file": "B-0-2-1.json"
+    },
+    {
+      "family": "B",
+      "extra": "0",
+      "mixedFaces": [
+        2,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2256,
+      "meanHTM": 4.709812108559499,
+      "coreSHA256": "6686045c1ee4debb2cacb6c90a846d8dc3d40a93e7774b268907e85792c71dab",
+      "file": "B-0-2-2.json"
+    },
+    {
+      "family": "B",
+      "extra": "5",
+      "mixedFaces": [
+        0,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2307,
+      "meanHTM": 4.8162839248434235,
+      "coreSHA256": "2f244db69b92074cd9fb00a6f5803cd241bab6a3d71830fe25316aa3797b38be",
+      "file": "B-5-0-0.json"
+    },
+    {
+      "family": "B",
+      "extra": "5",
+      "mixedFaces": [
+        0,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2308,
+      "meanHTM": 4.818371607515657,
+      "coreSHA256": "9d03d5ed5b5784617ab99bbd287bd5a87b930cd583f73012b4e8c8f06ed59805",
+      "file": "B-5-0-1.json"
+    },
+    {
+      "family": "B",
+      "extra": "5",
+      "mixedFaces": [
+        0,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2422,
+      "meanHTM": 5.056367432150314,
+      "coreSHA256": "ff156cff3f8826fad3e6bbcb62ee3f84054014fcb0d051ebe4b7c46dda1b8175",
+      "file": "B-5-0-2.json"
+    },
+    {
+      "family": "B",
+      "extra": "5",
+      "mixedFaces": [
+        1,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2304,
+      "meanHTM": 4.810020876826722,
+      "coreSHA256": "484bfd9c33b574a38e9bd599b14e4a6c6e06a10ed1c1101a5fcc273534891def",
+      "file": "B-5-1-0.json"
+    },
+    {
+      "family": "B",
+      "extra": "5",
+      "mixedFaces": [
+        1,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2303,
+      "meanHTM": 4.807933194154488,
+      "coreSHA256": "b932a854dd620b0ec9302f2bfb0df5da6ed6ef071da9b999d267f53c27e60f0e",
+      "file": "B-5-1-1.json"
+    },
+    {
+      "family": "B",
+      "extra": "5",
+      "mixedFaces": [
+        1,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2428,
+      "meanHTM": 5.068893528183716,
+      "coreSHA256": "9770b235477015a378192c9ec0bfd1382996a2f95d221620f0bb19a6802812f0",
+      "file": "B-5-1-2.json"
+    },
+    {
+      "family": "B",
+      "extra": "5",
+      "mixedFaces": [
+        2,
+        0
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2305,
+      "meanHTM": 4.812108559498956,
+      "coreSHA256": "a1409d06c9c385c3490ff1a3d6dff384b1675cf1bebbab5b90e5f03a5c800f2a",
+      "file": "B-5-2-0.json"
+    },
+    {
+      "family": "B",
+      "extra": "5",
+      "mixedFaces": [
+        2,
+        1
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2300,
+      "meanHTM": 4.801670146137787,
+      "coreSHA256": "293b75ee61ba0867f5c85febf3e1f884961294f222b15613d98ba6f0c52ebd01",
+      "file": "B-5-2-1.json"
+    },
+    {
+      "family": "B",
+      "extra": "5",
+      "mixedFaces": [
+        2,
+        2
+      ],
+      "trials": 128,
+      "maxHTM": 6,
+      "totalHTM": 2423,
+      "meanHTM": 5.058455114822547,
+      "coreSHA256": "58e1350e8fad6a5f1257114cafc37977f5a49741a002bdc8537df17d0bb681d5",
+      "file": "B-5-2-2.json"
+    }
+  ],
+  "selectedFamily": {
+    "family": "B",
+    "extra": "0",
+    "mixedFaces": [
+      0,
+      2
+    ],
+    "trials": 128,
+    "maxHTM": 6,
+    "totalHTM": 2250,
+    "meanHTM": 4.697286012526096,
+    "coreSHA256": "e3af164f5b58e15d8b572470e8920d577f4c5aef0cc6da4b47f1ed51aa6d0d44",
+    "file": "B-0-0-2.json"
+  },
+  "selected": {
+    "maximumHTM": 6,
+    "totalHTM": 2237,
+    "meanHTM": 4.670146137787056,
+    "extraRefinementTrials": 4000
+  },
+  "globalPrintMoveOptimality": "UNKNOWN",
+  "candidateStatus": "Selected witness must pass both independent physical replayers"
+}

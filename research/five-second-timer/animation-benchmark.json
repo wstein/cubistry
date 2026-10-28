@@ -1,0 +1,6014 @@
+{
+  "sourceFeatureCommit": "39cb33ba730ddf4b66b1a52c67fc0f220ae43a21",
+  "renderer": "Chromium SwiftShader software rendering; local observations, no hardware guarantee",
+  "tickFrom": 0,
+  "word": "U2 R' U' B R2 U'",
+  "print": {
+    "schema": "cubistry.print",
+    "version": 1,
+    "id": "five_second_benchmark",
+    "topology": {
+      "kind": "cube",
+      "size": 2
+    },
+    "cubies": [
+      {
+        "id": 0,
+        "position": [
+          -1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "id": 1,
+        "position": [
+          -1,
+          -1,
+          1
+        ]
+      },
+      {
+        "id": 2,
+        "position": [
+          -1,
+          1,
+          -1
+        ]
+      },
+      {
+        "id": 3,
+        "position": [
+          -1,
+          1,
+          1
+        ]
+      },
+      {
+        "id": 4,
+        "position": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "id": 5,
+        "position": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "id": 6,
+        "position": [
+          1,
+          1,
+          -1
+        ]
+      },
+      {
+        "id": 7,
+        "position": [
+          1,
+          1,
+          1
+        ]
+      }
+    ],
+    "stickers": [
+      {
+        "id": 0,
+        "cubie": 0,
+        "normal": [
+          -1,
+          0,
+          0
+        ],
+        "up": [
+          0,
+          0,
+          -1
+        ],
+        "assetId": "3",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 1,
+        "cubie": 0,
+        "normal": [
+          0,
+          -1,
+          0
+        ],
+        "up": [
+          -1,
+          0,
+          0
+        ],
+        "assetId": "1",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 2,
+        "cubie": 0,
+        "normal": [
+          0,
+          0,
+          -1
+        ],
+        "up": [
+          -1,
+          0,
+          0
+        ],
+        "assetId": "9",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 3,
+        "cubie": 1,
+        "normal": [
+          -1,
+          0,
+          0
+        ],
+        "up": [
+          0,
+          0,
+          1
+        ],
+        "assetId": "9",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 4,
+        "cubie": 1,
+        "normal": [
+          0,
+          -1,
+          0
+        ],
+        "up": [
+          0,
+          0,
+          1
+        ],
+        "assetId": "0",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 5,
+        "cubie": 1,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "up": [
+          -1,
+          0,
+          0
+        ],
+        "assetId": "2",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 6,
+        "cubie": 2,
+        "normal": [
+          -1,
+          0,
+          0
+        ],
+        "up": [
+          0,
+          0,
+          -1
+        ],
+        "assetId": "0",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 7,
+        "cubie": 2,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "up": [
+          -1,
+          0,
+          0
+        ],
+        "assetId": "4",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 8,
+        "cubie": 2,
+        "normal": [
+          0,
+          0,
+          -1
+        ],
+        "up": [
+          0,
+          1,
+          0
+        ],
+        "assetId": "2",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 9,
+        "cubie": 3,
+        "normal": [
+          -1,
+          0,
+          0
+        ],
+        "up": [
+          0,
+          1,
+          0
+        ],
+        "assetId": "3",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 10,
+        "cubie": 3,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "up": [
+          0,
+          0,
+          1
+        ],
+        "assetId": "1",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 11,
+        "cubie": 3,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "up": [
+          -1,
+          0,
+          0
+        ],
+        "assetId": "5",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 12,
+        "cubie": 4,
+        "normal": [
+          1,
+          0,
+          0
+        ],
+        "up": [
+          0,
+          0,
+          -1
+        ],
+        "assetId": "6",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 13,
+        "cubie": 4,
+        "normal": [
+          0,
+          -1,
+          0
+        ],
+        "up": [
+          1,
+          0,
+          0
+        ],
+        "assetId": "7",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 14,
+        "cubie": 4,
+        "normal": [
+          0,
+          0,
+          -1
+        ],
+        "up": [
+          0,
+          -1,
+          0
+        ],
+        "assetId": "8",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 15,
+        "cubie": 5,
+        "normal": [
+          1,
+          0,
+          0
+        ],
+        "up": [
+          0,
+          1,
+          0
+        ],
+        "assetId": "4",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 16,
+        "cubie": 5,
+        "normal": [
+          0,
+          -1,
+          0
+        ],
+        "up": [
+          0,
+          0,
+          -1
+        ],
+        "assetId": "0",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 17,
+        "cubie": 5,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "up": [
+          -1,
+          0,
+          0
+        ],
+        "assetId": "2",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 18,
+        "cubie": 6,
+        "normal": [
+          1,
+          0,
+          0
+        ],
+        "up": [
+          0,
+          -1,
+          0
+        ],
+        "assetId": "3",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 19,
+        "cubie": 6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "up": [
+          0,
+          0,
+          1
+        ],
+        "assetId": "5",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 20,
+        "cubie": 6,
+        "normal": [
+          0,
+          0,
+          -1
+        ],
+        "up": [
+          -1,
+          0,
+          0
+        ],
+        "assetId": "1",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 21,
+        "cubie": 7,
+        "normal": [
+          1,
+          0,
+          0
+        ],
+        "up": [
+          0,
+          -1,
+          0
+        ],
+        "assetId": "0",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 22,
+        "cubie": 7,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "up": [
+          0,
+          0,
+          -1
+        ],
+        "assetId": "0",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      },
+      {
+        "id": 23,
+        "cubie": 7,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "up": [
+          -1,
+          0,
+          0
+        ],
+        "assetId": "5",
+        "materialId": "sticker",
+        "equivalentQuarterTurns": [
+          0
+        ]
+      }
+    ]
+  },
+  "start": {
+    "schema": "cubistry.state",
+    "version": 1,
+    "printId": "five_second_benchmark",
+    "topology": {
+      "kind": "cube",
+      "size": 2
+    },
+    "cubies": [
+      {
+        "id": 0,
+        "position": [
+          -1,
+          -1,
+          -1
+        ],
+        "orientation": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ]
+      },
+      {
+        "id": 1,
+        "position": [
+          -1,
+          1,
+          1
+        ],
+        "orientation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -1
+          ],
+          [
+            0,
+            1,
+            0
+          ]
+        ]
+      },
+      {
+        "id": 2,
+        "position": [
+          1,
+          1,
+          1
+        ],
+        "orientation": [
+          [
+            0,
+            0,
+            -1
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            -1,
+            0
+          ]
+        ]
+      },
+      {
+        "id": 3,
+        "position": [
+          1,
+          1,
+          -1
+        ],
+        "orientation": [
+          [
+            -1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 4,
+        "position": [
+          -1,
+          1,
+          -1
+        ],
+        "orientation": [
+          [
+            0,
+            0,
+            -1
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            -1,
+            0
+          ]
+        ]
+      },
+      {
+        "id": 5,
+        "position": [
+          -1,
+          -1,
+          1
+        ],
+        "orientation": [
+          [
+            -1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -1
+          ],
+          [
+            0,
+            -1,
+            0
+          ]
+        ]
+      },
+      {
+        "id": 6,
+        "position": [
+          1,
+          -1,
+          -1
+        ],
+        "orientation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -1
+          ],
+          [
+            0,
+            1,
+            0
+          ]
+        ]
+      },
+      {
+        "id": 7,
+        "position": [
+          1,
+          -1,
+          1
+        ],
+        "orientation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            -1,
+            0
+          ]
+        ]
+      }
+    ]
+  },
+  "observations": [
+    {
+      "durationPerMove": 250,
+      "milliseconds": 1764.699999999255,
+      "moves": [
+        {
+          "move": {
+            "face": "U",
+            "turns": 2
+          },
+          "milliseconds": 295.90000000037253,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "R",
+            "turns": -1
+          },
+          "milliseconds": 314,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "U",
+            "turns": -1
+          },
+          "milliseconds": 283.90000000037253,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "B",
+            "turns": 1
+          },
+          "milliseconds": 312.80000000074506,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "R",
+            "turns": 2
+          },
+          "milliseconds": 293.7999999988824,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "U",
+            "turns": -1
+          },
+          "milliseconds": 263.90000000037253,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "durationPerMove": 250,
+      "milliseconds": 1697.800000000745,
+      "moves": [
+        {
+          "move": {
+            "face": "U",
+            "turns": 2
+          },
+          "milliseconds": 271.09999999962747,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "R",
+            "turns": -1
+          },
+          "milliseconds": 297.90000000037253,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "U",
+            "turns": -1
+          },
+          "milliseconds": 283.19999999925494,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "B",
+            "turns": 1
+          },
+          "milliseconds": 270.2000000011176,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "R",
+            "turns": 2
+          },
+          "milliseconds": 272.5,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "U",
+            "turns": -1
+          },
+          "milliseconds": 302.69999999925494,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "durationPerMove": 250,
+      "milliseconds": 1714.800000000745,
+      "moves": [
+        {
+          "move": {
+            "face": "U",
+            "turns": 2
+          },
+          "milliseconds": 270.5,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "R",
+            "turns": -1
+          },
+          "milliseconds": 286.2999999988824,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "U",
+            "turns": -1
+          },
+          "milliseconds": 264.09999999962747,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "B",
+            "turns": 1
+          },
+          "milliseconds": 291.30000000074506,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "R",
+            "turns": 2
+          },
+          "milliseconds": 318.7000000011176,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "U",
+            "turns": -1
+          },
+          "milliseconds": 283.69999999925494,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "durationPerMove": 2000,
+      "milliseconds": 12282.599999999627,
+      "moves": [
+        {
+          "move": {
+            "face": "U",
+            "turns": 2
+          },
+          "milliseconds": 2023,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "R",
+            "turns": -1
+          },
+          "milliseconds": 2029.7999999988824,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "U",
+            "turns": -1
+          },
+          "milliseconds": 2063.60000000149,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "B",
+            "turns": 1
+          },
+          "milliseconds": 2078.5,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "R",
+            "turns": 2
+          },
+          "milliseconds": 2020.4000000003725,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "move": {
+            "face": "U",
+            "turns": -1
+          },
+          "milliseconds": 2067.199999999255,
+          "to": {
+            "schema": "cubistry.state",
+            "version": 1,
+            "printId": "five_second_benchmark",
+            "topology": {
+              "kind": "cube",
+              "size": 2
+            },
+            "cubies": [
+              {
+                "id": 0,
+                "position": [
+                  1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 1,
+                "position": [
+                  -1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "position": [
+                  1,
+                  1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 3,
+                "position": [
+                  1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 4,
+                "position": [
+                  -1,
+                  1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 5,
+                "position": [
+                  -1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    -1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 6,
+                "position": [
+                  -1,
+                  -1,
+                  -1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 7,
+                "position": [
+                  1,
+                  -1,
+                  1
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+  "viewport": [
+    1280,
+    1000
+  ],
+  "reducedMotion": false
+}

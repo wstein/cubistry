@@ -1,0 +1,1079 @@
+{
+  "schema": "cubistry.five-second-timer",
+  "version": 1,
+  "puzzle": "2x2x2",
+  "stepSeconds": 5,
+  "maxSeconds": 2395,
+  "printing": [
+    {
+      "id": 0,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 0,
+      "image": "0",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 1,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 0,
+      "image": "1",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 0,
+      "image": "2",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 1,
+      "image": "0",
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 4,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 1,
+      "image": "1",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 5,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 1,
+      "image": "2",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 6,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 1,
+      "image": "3",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 7,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 1,
+      "image": "4",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 8,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 1,
+      "image": "8",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 9,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 1,
+      "image": "6",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 10,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 1,
+      "image": "7",
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 11,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 0,
+      "image": "3",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 12,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 1,
+      "image": "9",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 13,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 0,
+      "image": "3",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 14,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 1,
+      "image": "5",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 15,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 2,
+      "image": "3",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 16,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 2,
+      "image": "1",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 17,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 2,
+      "image": "5",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 18,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 2,
+      "image": "2",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 19,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 2,
+      "image": "0",
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 20,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 2,
+      "image": "4",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 21,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 3,
+      "image": "5",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 22,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 3,
+      "image": "5",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 23,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 3,
+      "image": "0",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    }
+  ],
+  "zeroWord": "B' L D' R2 B' D2",
+  "increments": [
+    "D F' R2 D F L'",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D R2 B R'",
+    "D B2 R' B R D2",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D R2 B R'",
+    "D B2 R' B R D2",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "R' D R' B R",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D R2 B R'",
+    "D B2 R' B R D2",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D F' U F R",
+    "D' R D R2 B' R",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D F' R2 D F L'",
+    "B' D R2 B2 R'",
+    "D' R D R2 B' R",
+    "F D' F' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D B2 R' B R D2",
+    "B2 D2 R2 D' R",
+    "D' R D R2 B' R",
+    "D B' D' B' D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "R' D R' B R",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D B' D2 R D R'",
+    "B' D R2 B' R'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "U R' D' B' U' L",
+    "D B2 D2 F' L' D2",
+    "D F' R2 D F L'",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D R2 B R'",
+    "D B2 R' B R D2",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D R2 B R'",
+    "D B2 R' B R D2",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D F' U F R",
+    "D' R D R2 B' R",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D R2 B R'",
+    "D B2 R' B R D2",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D' R D R2 B' R",
+    "D R D' B R' D",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D' R D R2 B' R",
+    "R2 B D2 B2 D'",
+    "D B2 R' B R D2",
+    "B D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D B2 R' B R D2",
+    "B2 D2 R2 D' R",
+    "D' R D R2 B' R",
+    "D B' D' B' D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D F' R2 D F L'",
+    "R B2 R2 B' D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D' R D R2 B' R",
+    "D R D' B R' D",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "U R' D' B' U' L",
+    "D B2 D2 F' L' D2",
+    "D F' R2 D F L'",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D R2 B R'",
+    "D B2 R' B R D2",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D R2 B R'",
+    "D B2 R' B R D2",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D F' U F R",
+    "D' R D R2 B' R",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D R D2 R' B D'",
+    "D R2 B R'",
+    "D B2 R' B R D2",
+    "R' B' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D' R D R2 B' R",
+    "D R D' B R' D",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D B' D2 R D R'",
+    "B' D R2 B' R'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D B2 R' B R D2",
+    "B2 D2 R2 D' R",
+    "D' R D R2 B' R",
+    "D B' D' B' D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D F' R2 D F L'",
+    "B' D R2 B2 R'",
+    "D' R D R2 B' R",
+    "F D' F' R D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D' R D R2 B' R",
+    "R2 B D2 B2 D'",
+    "D B2 R' B R D2",
+    "B D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "L2 D L B' D2 L",
+    "D R B' U2",
+    "D' R D R2 B' R",
+    "B2 R' B' R D2",
+    "D2 B D' B L2",
+    "D2 R' B R",
+    "D L' B2 L' B D'",
+    "L D2 B D' L",
+    "L B' D2 L' D",
+    "L' D' B' L D2",
+    "R D' F2 R' D",
+    "D B' L' D",
+    "D2 L D' B2 D'",
+    "F2 D F' D L2",
+    "D B2 D L' D2",
+    "L B' D B' D2",
+    "D' R F2 D R'",
+    "B2 D B' D2",
+    "R' B U' B2 R",
+    "L D2 B D' L",
+    "L B' D2 L' D",
+    "L' D' B' L D2",
+    "R D' F2 R' D",
+    "D B' L' D",
+    "D2 L D' B2 D'",
+    "F2 D F' D L2",
+    "D B2 D L' D2",
+    "L B' D B' D2",
+    "D' R F2 D R'",
+    "B2 D B' D2",
+    "R' B U' B2 R",
+    "L D2 B D' L",
+    "L B' D2 L' D",
+    "L' D' B' L D2",
+    "R D' F2 R' D",
+    "D B' L' D",
+    "D2 L D' B2 D'",
+    "F' L' U F2 L'",
+    "L2 B' D B' D2",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D B' D' L' D' L",
+    "F U2 R D",
+    "F2 L' B D' F2 R",
+    "L B D' L D2",
+    "D2 B D B D' L2",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "R' D R' B R",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D' R D R2 B' R",
+    "R' F2 B D R2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D B2 R' B R D2",
+    "B2 D2 R2 D' R",
+    "D' R D R2 B' R",
+    "D B' D' B' D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "U F D2 F' R U'",
+    "F D' F' D2",
+    "R2 B' R B' U2",
+    "F' R2 F D'",
+    "R' B2 R' U R2",
+    "F D' F' R D2",
+    "R2 U' R B2 R",
+    "B R F2 R' D",
+    "D B2 L' B D'",
+    "B D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D F' R2 D F L'",
+    "R B2 R2 B' D2",
+    "R2 D B D' B2 R",
+    "B2 D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "R2 D B D' B2 R",
+    "D2 B D'",
+    "D F' R2 D F L'"
+  ],
+  "totalHTM": 2299,
+  "maximumHTM": 6,
+  "evidence": {
+    "generator": "research/five-second-timer/optimize-candidate.mjs",
+    "sourceCommit": "7c05d28e97ecf30848220f5c70cb3100a4f3628d",
+    "strictModel": "fixed24 immutable distinct-digit upright stickers,8 rigid corners,MM/SS,no optical aliases",
+    "bfs": {
+      "states": 136080,
+      "histogram": {
+        "0": 1,
+        "1": 15,
+        "2": 198,
+        "3": 2030,
+        "4": 15396,
+        "5": 61768,
+        "6": 53528,
+        "7": 3144
+      },
+      "sha256": "57a79ac9d840bb24048d9dbe29b9cb70440dd172d6aba69ce61fbcaafaa1df09"
+    },
+    "search": {
+      "startingCoreSHA256": null,
+      "seed": 271028,
+      "family": "A",
+      "extra": "5",
+      "mixedFaces": [
+        0,
+        1
+      ],
+      "trials": 128,
+      "policy": 9,
+      "history": [
+        {
+          "trial": 0,
+          "max": 6,
+          "total": 2605
+        },
+        {
+          "trial": 1,
+          "max": 6,
+          "total": 2584
+        },
+        {
+          "trial": 2,
+          "max": 6,
+          "total": 2484
+        },
+        {
+          "trial": 25,
+          "max": 6,
+          "total": 2467
+        },
+        {
+          "trial": 28,
+          "max": 6,
+          "total": 2458
+        },
+        {
+          "trial": 30,
+          "max": 6,
+          "total": 2441
+        },
+        {
+          "trial": 54,
+          "max": 6,
+          "total": 2430
+        },
+        {
+          "trial": 58,
+          "max": 6,
+          "total": 2420
+        },
+        {
+          "trial": 126,
+          "max": 6,
+          "total": 2299
+        }
+      ],
+      "baselineMax": 7,
+      "baselineTotal": 2631,
+      "globalPrintMoveOptimality": "UNKNOWN"
+    },
+    "runtimeSeconds": 0.77
+  }
+}

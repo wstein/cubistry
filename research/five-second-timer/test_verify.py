@@ -13,6 +13,8 @@ class CertificateControls(unittest.TestCase):
             with self.assertRaises((AssertionError,KeyError,ValueError)):V.check(path,shortest=False)
     def test_full_replay_and_maximum(self):
         result=V.check(HERE/'certificate.json');self.assertEqual((result['inclusiveStates'],result['adjacentEdges'],result['totalHTM'],result['maximumHTM']),(480,479,2261,6));self.assertTrue(result['maximumRangeProven'])
+    def test_optimized_full_replay(self):
+        result=V.check(HERE/'optimized-certificate.json');self.assertEqual((result['totalHTM'],result['maximumHTM'],result['thirtyMinuteHTM']),(2237,6,1681))
     def test_wrong_printed_digit(self):self.reject(lambda d:d['printing'][0].update(image='9'))
     def test_wrong_upright_frame(self):self.reject(lambda d:d['printing'][0].update(up=[-v for v in d['printing'][0]['up']]))
     def test_missing_edge(self):self.reject(lambda d:d['increments'].pop())
