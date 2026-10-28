@@ -1,3 +1,4 @@
+import { TEN_SECOND_TIMER, FIVE_SECOND_TIMER, type TimerProfile } from "./clock.ts";
 import {
   demand,
   deepFreeze,
@@ -18,6 +19,7 @@ import {
 } from "@cubistry/cube-mechanics";
 import { deploymentBasePath, sha256 } from "@cubistry/cube-assets";
 export interface TimerRoute {
+  readonly profile: TimerProfile;
   readonly print: PrintDefinition;
   readonly states: readonly CubeState[];
   readonly increments: readonly (readonly LegalMove[])[];
@@ -28,12 +30,12 @@ const FRONT: readonly Vec3[] = [
   [-1, -1, 1],
   [1, -1, 1],
 ];
-export function timerTarget(bucket: number): DisplayTarget {
+export function timerTarget(bucket: number, profile: TimerProfile = TEN_SECOND_TIMER): DisplayTarget {
   demand(
-    Number.isInteger(bucket) && bucket >= 0 && bucket <= 359,
+    Number.isInteger(bucket) && bucket >= 0 && bucket <= profile.maxSeconds / profile.stepSeconds,
     "Invalid timer target",
   );
-  const seconds = bucket * 10;
+  const seconds = bucket * profile.stepSeconds;
   const digits =
     String(Math.floor(seconds / 60)).padStart(2, "0") +
     String(seconds % 60).padStart(2, "0");
@@ -58,13 +60,22 @@ export function inverseTimerMoves(
   }));
 }
 export function validateTimerRoute(raw: unknown): TimerRoute {
+  return validateRoute(raw, false);
+}
+export function validateFiveSecondRoute(raw: unknown): TimerRoute {
+  return validateRoute(raw, true);
+}
+function validateRoute(raw: unknown, five: boolean): TimerRoute {
+  const profile = five ? FIVE_SECOND_TIMER : TEN_SECOND_TIMER;
+  const edges = profile.maxSeconds / profile.stepSeconds;
+  const totalHTM = five ? 2237 : 1324, maximumHTM = five ? 6 : 5;
   const d = record(raw, "workshop timer");
   demand(
-    d.schema === "cubistry.workshop-timer" &&
+    d.schema === (five ? "cubistry.five-second-timer" : "cubistry.workshop-timer") &&
       d.version === 1 &&
       d.puzzle === "2x2x2" &&
-      d.stepSeconds === 10 &&
-      d.maxSeconds === 3590,
+      d.stepSeconds === profile.stepSeconds &&
+      d.maxSeconds === profile.maxSeconds,
     "Unsupported workshop timer",
   );
   demand(
@@ -80,7 +91,7 @@ export function validateTimerRoute(raw: unknown): TimerRoute {
   const print = validatePrint({
     schema: "cubistry.print",
     version: 1,
-    id: "workshop_timer_59m50",
+    id: five ? "five_second_timer_39m55" : "workshop_timer_59m50",
     topology: { kind: "cube", size: 2 },
     cubies,
     stickers: printing.map((s, i) => {
@@ -105,30 +116,30 @@ export function validateTimerRoute(raw: unknown): TimerRoute {
     }),
   });
   demand(
-    typeof d.zeroWord === "string" && parseAlg(d.zeroWord).length === 5,
+    typeof d.zeroWord === "string" && parseAlg(d.zeroWord).length === (five ? 6 : 5),
     "Invalid timer zero setup",
   );
   demand(
-    Array.isArray(d.increments) && d.increments.length === 359,
-    "Timer needs 359 edges",
+    Array.isArray(d.increments) && d.increments.length === edges,
+    "Incorrect timer edge count",
   );
   const increments = (d.increments as unknown[]).map((w) => {
     demand(typeof w === "string", "Invalid timer word");
     return parseAlg(w);
   });
   demand(
-    d.totalHTM === 1324 &&
-      d.maximumHTM === 5 &&
-      increments.reduce((n, w) => n + w.length, 0) === 1324 &&
-      Math.max(...increments.map((w) => w.length)) === 5,
+    d.totalHTM === totalHTM &&
+      d.maximumHTM === maximumHTM &&
+      increments.reduce((n, w) => n + w.length, 0) === totalHTM &&
+      Math.max(...increments.map((w) => w.length)) === maximumHTM,
     "Incorrect timer certificate statistics",
   );
   const states = [applyMoves(initialState(print), parseAlg(d.zeroWord))];
-  demand(matchesTarget(print, states[0], timerTarget(0)), "Invalid timer zero");
-  for (let i = 0; i < 359; i++) {
+  demand(matchesTarget(print, states[0], timerTarget(0, profile)), "Invalid timer zero");
+  for (let i = 0; i < edges; i++) {
     const next = applyMoves(states[i], increments[i]);
     demand(
-      matchesTarget(print, next, timerTarget(i + 1)),
+      matchesTarget(print, next, timerTarget(i + 1, profile)),
       "Invalid timer display",
     );
     demand(
@@ -140,7 +151,7 @@ export function validateTimerRoute(raw: unknown): TimerRoute {
     );
     states.push(next);
   }
-  return deepFreeze({ print, states, increments });
+  return deepFreeze({ profile, print, states, increments });
 }
 export function timerStep(
   route: TimerRoute,
@@ -158,8 +169,14 @@ export function timerStep(
     : inverseTimerMoves(route.increments[target]);
 }
 export async function loadTimerRoute(basePath = "/"): Promise<TimerRoute> {
+  return loadRoute(basePath, false);
+}
+export async function loadFiveSecondRoute(basePath = "/"): Promise<TimerRoute> {
+  return loadRoute(basePath, true);
+}
+async function loadRoute(basePath: string, five: boolean): Promise<TimerRoute> {
   const response = await fetch(
-    `${deploymentBasePath(basePath)}workshop-timer.v1.json`,
+    `${deploymentBasePath(basePath)}${five ? "five-second-timer" : "workshop-timer"}.v1.json`,
     {
       signal: AbortSignal.timeout(10000),
       redirect: "error",
@@ -194,8 +211,8 @@ export async function loadTimerRoute(basePath = "/"): Promise<TimerRoute> {
   }
   demand(
     (await sha256(bytes)) ===
-      "7dbc7ba98d93a71c084feada89a2f2d24de98aa03034fda0649c0af5f3463790",
+      (five ? "fe46391d03877698633d87b5874763362f0c626ef83cade74d7c32656e990865" : "7dbc7ba98d93a71c084feada89a2f2d24de98aa03034fda0649c0af5f3463790"),
     "Timer certificate integrity check failed",
   );
-  return validateTimerRoute(JSON.parse(new TextDecoder().decode(bytes)));
+  return (five ? validateFiveSecondRoute : validateTimerRoute)(JSON.parse(new TextDecoder().decode(bytes)));
 }

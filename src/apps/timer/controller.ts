@@ -77,13 +77,13 @@ export class TimerController extends PhysicalPlayback {
     );
   }
   protected get maximumValue(): number {
-    return 359;
+    return this.route.states.length - 1;
   }
   protected targetState(value: number): CubeState {
     return this.route.states[value];
   }
   protected matchesDisplay(state: CubeState, value: number): boolean {
-    return matchesTarget(this.route.print, state, timerTarget(value));
+    return matchesTarget(this.route.print, state, timerTarget(value, this.route.profile));
   }
   protected targetMoves(
     from: CubeState,
@@ -99,13 +99,13 @@ export class TimerController extends PhysicalPlayback {
       this.solver.solve(from, target, { coordinateFrames: true })
     );
   }
-  async configure(value = 90): Promise<void> {
+  async configure(value = this.route.profile.defaultSeconds / this.route.profile.stepSeconds): Promise<void> {
     demand(
       !this.busy && !this.configuring,
       "Wait for the current timer sequence",
     );
     demand(
-      Number.isInteger(value) && value >= 0 && value <= 359,
+      Number.isInteger(value) && value >= 0 && value <= this.maximumValue,
       "Invalid timer duration",
     );
     this.configuring = true;

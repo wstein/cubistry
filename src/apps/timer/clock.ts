@@ -1,6 +1,26 @@
 /** Monotonic deadline clock. Physical playback is deliberately not a clock. */
 export type TimerMode = "countdown" | "stopwatch";
-const MAX_MS = 3590000;
+export interface TimerProfile {
+  readonly stepSeconds: number;
+  readonly maxSeconds: number;
+  readonly defaultSeconds: number;
+  readonly stepName: string;
+}
+export const TEN_SECOND_TIMER: TimerProfile = Object.freeze({
+  stepSeconds: 10,
+  maxSeconds: 3590,
+  defaultSeconds: 900,
+  stepName: "ten-second",
+});
+export const FIVE_SECOND_TIMER: TimerProfile = Object.freeze({
+  stepSeconds: 5,
+  maxSeconds: 2395,
+  defaultSeconds: 1800,
+  stepName: "five-second",
+});
+const durationError = (p: TimerProfile) =>
+  `Duration must be 00:00–${formatTimer(p.maxSeconds / p.stepSeconds, p)} in ${p.stepName} steps`;
+
 export interface ClockSnapshot {
   readonly at: number;
   readonly bucket: number;
@@ -17,8 +37,12 @@ export class WorkshopClock {
   private multiplier = 1;
   private direction: TimerMode = "countdown";
   private readonly now: () => number;
-  constructor(now: () => number = () => performance.now()) {
+  readonly profile: TimerProfile;
+  constructor(now: () => number = () => performance.now(), profile: TimerProfile = TEN_SECOND_TIMER) {
     this.now = now;
+    this.profile = profile;
+    this.duration = profile.defaultSeconds;
+    this.frozen = this.duration * 1000;
   }
   get mode(): TimerMode {
     return this.direction;
@@ -33,14 +57,14 @@ export class WorkshopClock {
   snapshot(): ClockSnapshot {
     const at = this.now(), value = this.valueAt(at);
     const bucket = this.direction === "countdown"
-      ? Math.ceil(value / 10000) : Math.floor(value / 10000);
-    const running = this.active && (this.direction === "countdown" ? value > 0 : value < MAX_MS);
+      ? Math.ceil(value / (this.profile.stepSeconds * 1000)) : Math.floor(value / (this.profile.stepSeconds * 1000));
+    const running = this.active && (this.direction === "countdown" ? value > 0 : value < (this.profile.maxSeconds * 1000));
     const target = bucket + (this.direction === "countdown" ? -1 : 1);
     const distance = this.direction === "countdown"
-      ? value - target * 10000 : target * 10000 - value;
+      ? value - target * (this.profile.stepSeconds * 1000) : target * (this.profile.stepSeconds * 1000) - value;
     return { at, bucket, liveSeconds: this.direction === "countdown"
       ? Math.ceil(value / 1000) : Math.floor(value / 1000), running, next: running
-      ? { target, deadline: at + distance / this.multiplier, interval: 10000 / this.multiplier }
+      ? { target, deadline: at + distance / this.multiplier, interval: (this.profile.stepSeconds * 1000) / this.multiplier }
       : null };
   }
   private valueAt(at: number): number {
@@ -48,7 +72,7 @@ export class WorkshopClock {
     return Math.max(
       0,
       Math.min(
-        MAX_MS,
+        (this.profile.maxSeconds * 1000),
         this.frozen + (this.direction === "countdown" ? -delta : delta),
       ),
     );
@@ -61,22 +85,22 @@ export class WorkshopClock {
   }
   get bucket(): number {
     return this.direction === "countdown"
-      ? Math.ceil(this.valueMs / 10000)
-      : Math.floor(this.valueMs / 10000);
+      ? Math.ceil(this.valueMs / (this.profile.stepSeconds * 1000))
+      : Math.floor(this.valueMs / (this.profile.stepSeconds * 1000));
   }
   get elapsed(): boolean {
     return this.direction === "countdown"
       ? this.valueMs === 0
-      : this.valueMs === MAX_MS;
+      : this.valueMs === (this.profile.maxSeconds * 1000);
   }
   configure(seconds: number): void {
     if (
       !Number.isInteger(seconds) ||
       seconds < 0 ||
-      seconds > 3590 ||
-      seconds % 10 !== 0
+      seconds > this.profile.maxSeconds ||
+      seconds % this.profile.stepSeconds !== 0
     )
-      throw Error("Duration must be 00:00–59:50 in ten-second steps");
+      throw Error(durationError(this.profile));
     this.duration = seconds;
     this.reset();
   }
@@ -109,10 +133,10 @@ export class WorkshopClock {
     this.frozen = this.direction === "countdown" ? this.duration * 1000 : 0;
   }
 }
-export function formatTimer(bucket: number): string {
-  if (!Number.isInteger(bucket) || bucket < 0 || bucket > 359)
+export function formatTimer(bucket: number, profile: TimerProfile = TEN_SECOND_TIMER): string {
+  if (!Number.isInteger(bucket) || bucket < 0 || bucket > profile.maxSeconds / profile.stepSeconds)
     throw Error("Invalid timer bucket");
-  return formatLiveTimer(bucket * 10);
+  return formatLiveTimer(bucket * profile.stepSeconds);
 }
 /** One-second control-panel readout; physical targets still use ten-second buckets. */
 export function formatLiveTimer(seconds: number): string {
@@ -120,12 +144,12 @@ export function formatLiveTimer(seconds: number): string {
     throw Error("Invalid live timer seconds");
   return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 }
-export function parseDuration(text: string): number {
+export function parseDuration(text: string, profile: TimerProfile = TEN_SECOND_TIMER): number {
   if (!/^\d{1,2}:[0-5]\d$/.test(text))
-    throw Error("Enter MM:SS in ten-second steps");
+    throw Error(`Enter MM:SS in ${profile.stepName} steps`);
   const [m, s] = text.split(":").map(Number);
   const seconds = m * 60 + s;
-  if (seconds > 3590 || seconds % 10 !== 0)
-    throw Error("Duration must be 00:00–59:50 in ten-second steps");
+  if (seconds > profile.maxSeconds || seconds % profile.stepSeconds !== 0)
+    throw Error(durationError(profile));
   return seconds;
 }
