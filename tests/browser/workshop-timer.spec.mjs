@@ -212,7 +212,7 @@ test("pause freezes a lagged clock and settles one frozen bucket; reset never te
   ).toBeGreaterThan(before);
   await expect(page.locator("#status")).toHaveText("Countdown · Ready");
 });
-test("timer panel fits mobile and preserves all six inherited speed stops", async ({
+test("timer panel fits mobile and preserves six inherited speed stops plus 10ms", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -221,7 +221,7 @@ test("timer panel fits mobile and preserves all six inherited speed stops", asyn
   expect(
     await page.locator("html").evaluate((e) => e.scrollWidth),
   ).toBeLessThanOrEqual(390);
-  for (const stop of ["0", "1", "2", "3", "4", "5"]) {
+  for (const stop of ["0", "1", "2", "3", "4", "5", "6"]) {
     await page.locator("#rotation-speed").fill(stop);
     await expect(page.locator("#rotation-speed")).toHaveValue(stop);
   }
@@ -752,3 +752,28 @@ for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844
     await testInfo.attach("slider-positions", { path: evidence, contentType: "application/json" });
   });
 }
+
+test("10ms is a seventh independent rotation preset and commits verified physical moves", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await chooseTimer(page);
+  await page.locator("#rotation-speed").fill("6");
+  await expect(page.locator("#rotation-speed")).toHaveAttribute("aria-valuetext", "10 ms per HTM move");
+  await expect(page.locator("#timer-speed")).toHaveValue("1");
+  const boundaries = await page.evaluate(async () => {
+    const { CubeViewer, MAX_ANIMATION_SPEED } = await import("/packages/cube-viewer/src/index.ts");
+    const receiver = {};
+    CubeViewer.prototype.setAnimationSpeed.call(receiver, 7.5);
+    let rejected = 0;
+    for (const speed of [7.51, Infinity, NaN, 0]) {
+      try { CubeViewer.prototype.setAnimationSpeed.call(receiver, speed); }
+      catch { rejected++; }
+    }
+    return { maximum: MAX_ANIMATION_SPEED, accepted: receiver.animationSpeed, rejected };
+  });
+  expect(boundaries).toEqual({ maximum: 7.5, accepted: 7.5, rejected: 4 });
+  await page.fill("#timer-duration", "00:30");
+  await page.click("#timer-set");
+  await settled(page, "00:30");
+  await expect(page.locator("#timer-start")).toHaveText("Start");
+  await verifyActualTimerMoves(page, 90, 3, "/tmp/cubistry-10ms-browser-commits.json");
+});

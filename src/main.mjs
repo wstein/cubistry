@@ -16,8 +16,8 @@ import { loadCounterDesign } from "./apps/counter/design.ts";
 import { parseValue, shifted } from "./counter.mjs";
 const $ = (id) => document.getElementById(id);
 const run = new CounterRun();
-const durations = [2000, 1000, 500, 250, 100, 50];
-const speedLabels = ["2 s", "1 s", "500 ms", "250 ms", "100 ms", "50 ms"];
+const durations = [2000, 1000, 500, 250, 100, 50, 10];
+const speedLabels = ["2 s", "1 s", "500 ms", "250 ms", "100 ms", "50 ms", "10 ms"];
 let ready = false,
   value = 0,
   view,

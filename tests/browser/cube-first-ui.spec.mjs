@@ -115,16 +115,16 @@ test("slow physical Run never skips a value and Stop completes the active value 
   await page.clock.runFor(5000);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
 });
-test("six exact keyboard speed stops persist and remain separate from Run cadence", async ({
+test("seven exact keyboard speed stops persist and remain separate from Run cadence", async ({
   page,
 }) => {
   await ready(page);
   const slider = page.getByLabel("Rotation Speed");
   await expect(slider).toHaveValue("4");
   await expect(slider).toHaveAttribute("min", "0");
-  await expect(slider).toHaveAttribute("max", "5");
+  await expect(slider).toHaveAttribute("max", "6");
   await expect(slider).toHaveAttribute("step", "1");
-  const labels = ["2 s", "1 s", "500 ms", "250 ms", "100 ms", "50 ms"];
+  const labels = ["2 s", "1 s", "500 ms", "250 ms", "100 ms", "50 ms", "10 ms"];
   await slider.focus();
   await slider.press("Home");
   for (let i = 0; i < labels.length; i++) {
@@ -133,14 +133,14 @@ test("six exact keyboard speed stops persist and remain separate from Run cadenc
       "aria-valuetext",
       `${labels[i]} per HTM move`,
     );
-    if (i < 5) await slider.press("ArrowRight");
+    if (i < labels.length - 1) await slider.press("ArrowRight");
   }
   await target(page, 2);
   await page.locator("#run").click();
   await step(page, 1);
   await step(page, 2);
   await page.reload();
-  await expect(slider).toHaveValue("5");
+  await expect(slider).toHaveValue("6");
 });
 test("viewer hint ignores clicks, dismisses on drag or zoom, stays hidden, and times out with reduced motion", async ({
   page,
@@ -176,7 +176,7 @@ test("viewer hint ignores clicks, dismisses on drag or zoom, stays hidden, and t
   await expect(hint).toBeHidden();
 });
 
-test("real six-stop speed can change during playback without changing legal moves", async ({
+test("real seven-stop speed can change during playback without changing legal moves", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -195,7 +195,7 @@ test("real six-stop speed can change during playback without changing legal move
   await expect(page.locator("#move-progress")).toHaveText("1 / 1 moves");
   await page.locator('[data-delta="-1"]').click();
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
-  await slider.fill("5");
+  await slider.fill("6");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "4");
   await expect(page.locator("#move-progress")).toHaveText("1 / 1 moves");
 });
