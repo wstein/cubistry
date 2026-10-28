@@ -270,6 +270,10 @@ h1 {
   color: #315d4e;
   min-height: 22px;
 }
+.timer-motion {
+  min-block-size: 3.3em;
+  margin: 0 0 12px;
+}
 #error {
   font-size: 13px;
   color: #9e3526;

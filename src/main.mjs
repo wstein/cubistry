@@ -4,6 +4,7 @@ import {
   parseDuration,
 } from "./apps/timer/clock.ts";
 import { TimerController } from "./apps/timer/controller.ts";
+import { timerMotion } from "./apps/timer/status.ts";
 import { loadTimerRoute } from "./apps/timer/design.ts";
 import { CounterRun } from "./apps/counter/run.mjs";
 import { loadCertifiedCounter } from "./apps/counter/certified.ts";
@@ -80,7 +81,7 @@ function controlsUi() {
       ? "Completed 10-second intervals · limit 59:50"
       : "00:00–59:50 · 10-second steps",
   );
-  if (application !== "timer") $("timer-sync").hidden = true;
+  $("timer-sync").hidden = application !== "timer";
   $("reset-session-moves").disabled =
     !ready ||
     !!view?.busy ||
@@ -297,8 +298,21 @@ function timerUi() {
     physical = view?.currentValue ?? logical;
   text("timer-logical", formatTimer(logical));
   text("timer-physical", formatTimer(physical));
-  const settling = !!view?.busy || physical !== logical;
-  $("timer-sync").hidden = !settling;
+  const motion = timerMotion({
+    physical,
+    logical,
+    busy: !!view?.busy,
+    activeTarget: view?.progress.target ?? null,
+  });
+  const settling = motion !== "idle";
+  $("timer-sync").dataset.state = motion;
+  text("timer-motion-label", {
+    idle: "",
+    moving: "Moving",
+    synchronizing: "Synchronizing",
+  }[motion]);
+  $("timer-last-settled").hidden = motion !== "synchronizing";
+  $("timer-sync").hidden = application !== "timer";
   const phase = clock.elapsed
     ? settling
       ? "Elapsed · settling"

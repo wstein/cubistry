@@ -540,7 +540,7 @@ test("interactive100x full-range countdown visibly lags slow-enough rotations an
   await page.selectOption("#timer-speed", "100");
   const start = Date.now();
   await page.click("#timer-start");
-  await expect(page.locator("#timer-sync")).toBeVisible({ timeout: 5000 });
+  await expect(page.locator("#timer-sync")).toHaveAttribute("data-state", "synchronizing", { timeout: 5000 });
   await expect(page.locator("#timer-logical")).toHaveText("00:00", {
     timeout: 45000,
   });
@@ -662,3 +662,93 @@ test("Set replaces a pending duration safely during an active legal animation wi
   await expect(page.locator("#status")).toHaveText("Countdown · Ready");
   await verifyActualTimerMoves(page, 90, 2, "/tmp/cubistry-set-browser-commits.json");
 });
+
+for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844 }, { width: 320, height: 740 }]) {
+  test(`Timer status distinguishes movement from backlog and keeps the active slider stable at ${viewport.width}px`, async ({ page }, testInfo) => {
+    test.setTimeout(60000);
+    await page.setViewportSize(viewport);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.clock.install();
+    await chooseTimer(page);
+    await duration(page, "00:40");
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator("#rotation-speed").fill("0");
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+    const slider = page.locator("#rotation-speed");
+    await slider.scrollIntoViewIfNeeded();
+    const initial = await slider.boundingBox();
+    const sync = page.locator("#timer-sync");
+    await expect(sync).toHaveAttribute("data-state", "idle");
+    await expect(sync).toHaveText("", { useInnerText: true });
+    await expect(page.locator("#timer-last-settled")).toBeHidden();
+    await expect(page.getByText("Sequence", { exact: true })).toBeVisible();
+    await expect(page.getByText("Current sequence", { exact: true })).toHaveCount(0);
+    expect(await page.locator("html").evaluate(e => e.scrollWidth)).toBeLessThanOrEqual(viewport.width);
+    const positions = [];
+    const stable = async (phase) => {
+      const box = await slider.boundingBox();
+      positions.push({ phase, ...box });
+      expect(Math.abs(box.y - initial.y), phase).toBeLessThan(0.5);
+      expect(Math.abs(box.x - initial.x), phase).toBeLessThan(0.5);
+      expect(box.width, phase).toBe(initial.width);
+    };
+    await page.evaluate(() => {
+      window.sliderSamples = [];
+      window.sampleSlider = true;
+      const sample = () => {
+        if (!window.sampleSlider) return;
+        window.sliderSamples.push(document.querySelector("#rotation-speed").getBoundingClientRect().y);
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+    await page.screenshot({ path: testInfo.outputPath("before.png"), fullPage: true });
+    // DOM activation avoids scrolling away from the pointer on mobile; actual turns still animate.
+    await page.evaluate(() => document.querySelector("#timer-start").click());
+    await page.clock.fastForward(10000);
+    await page.clock.runFor(40);
+    await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
+    await expect(sync).toHaveAttribute("data-state", "moving");
+    await expect(sync).toHaveText("Moving", { useInnerText: true });
+    await stable("Running / Moving");
+    await page.screenshot({ path: testInfo.outputPath("moving.png"), fullPage: true });
+    await page.mouse.move(initial.x + 8, initial.y + initial.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(initial.x + initial.width * 0.8, initial.y + initial.height / 2, { steps: 5 });
+    await expect(slider).not.toHaveValue("0");
+    await page.clock.fastForward(10000);
+    await page.clock.runFor(40);
+    await expect(sync).toHaveAttribute("data-state", "synchronizing");
+    await expect(sync).toContainText("Synchronizing · last settled 00:40");
+    await stable("Running / Synchronizing with pointer held");
+    await page.mouse.move(initial.x + initial.width * 0.4, initial.y + initial.height / 2, { steps: 5 });
+    await page.mouse.up();
+    await expect(slider).toHaveValue("2");
+    await expect(page.locator("#timer-speed")).toHaveValue("1");
+    await page.screenshot({ path: testInfo.outputPath("synchronizing.png"), fullPage: true });
+    await page.evaluate(() => document.querySelector("#timer-start").click());
+    await expect(page.locator("#status")).toHaveText("Countdown · Paused");
+    await stable("Paused / Synchronizing");
+    await page.evaluate(() => document.querySelector("#timer-reset").click());
+    await stable("Ready / Settling");
+    for (let i = 0; i < 40; i++) {
+      await page.clock.fastForward(2100);
+      await page.clock.runFor(20);
+    }
+    await settled(page, "00:40");
+    await expect(sync).toHaveAttribute("data-state", "idle");
+    await expect(sync).toHaveText("", { useInnerText: true });
+    await expect(page.locator("#timer-last-settled")).toBeHidden();
+    await stable("Ready / Idle");
+    await page.screenshot({ path: testInfo.outputPath("after.png"), fullPage: true });
+    const samples = await page.evaluate(() => {
+      window.sampleSlider = false;
+      return window.sliderSamples;
+    });
+    expect(samples.length).toBeGreaterThan(20);
+    expect(Math.max(...samples) - Math.min(...samples)).toBeLessThan(0.5);
+    const evidence = testInfo.outputPath("slider-positions.json");
+    writeFileSync(evidence, JSON.stringify({ viewport, positions, samples }, null, 2));
+    await testInfo.attach("slider-positions", { path: evidence, contentType: "application/json" });
+  });
+}
