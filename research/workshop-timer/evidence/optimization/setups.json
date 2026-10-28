@@ -1,0 +1,18 @@
+{
+  "candidateSHA256": "85bcc8efd88c86b7b6b433ff263438d388861ba28d13234b2dcd752ad44161a1",
+  "solver": "cubing@0.66.1; exact full-state setup, no shortest-path claim",
+  "runs": [
+    {
+      "ticks": 120,
+      "zeroWord": "U' L2 B' U2",
+      "maximumWord": "R' U L' F R2 U' L2 U' F' U2",
+      "maximumHTM": 10
+    },
+    {
+      "ticks": 360,
+      "zeroWord": "L' B U2 L2 U'",
+      "maximumWord": "F R2 F2 L' U' F2 U L2 F",
+      "maximumHTM": 9
+    }
+  ]
+}

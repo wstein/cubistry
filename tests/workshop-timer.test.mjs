@@ -1,0 +1,172 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import {
+  WorkshopClock,
+  formatTimer,
+  parseDuration,
+} from "../src/apps/timer/clock.ts";
+import {
+  validateTimerRoute,
+  timerTarget,
+  timerStep,
+} from "../src/apps/timer/design.ts";
+import { TimerController } from "../src/apps/timer/controller.ts";
+import { validateCounterDesign } from "../src/apps/counter/design.ts";
+import { matchesTarget, applyMoves, parseAlg } from "@cubistry/cube-mechanics";
+import { stateEquals } from "@cubistry/cube-core";
+import { prepareTestSolver } from "./helpers/shared-solver.mjs";
+const raw = JSON.parse(
+  readFileSync(new URL("../public/workshop-timer.v1.json", import.meta.url)),
+);
+const route = validateTimerRoute(raw);
+const design = validateCounterDesign(
+  JSON.parse(
+    readFileSync(new URL("../public/counter-design.v2.json", import.meta.url)),
+  ),
+);
+const settle = async (c) => {
+  for (let i = 0; c.busy && i < 300; i++)
+    await new Promise((r) => setImmediate(r));
+  assert.equal(c.busy, false);
+  assert.notEqual(c.progress.status, "failed");
+};
+const token = (m) => m.face + (m.turns === 2 ? "2" : m.turns === -1 ? "'" : "");
+async function harness(value = 90) {
+  let calls = 0;
+  const moves = [];
+  const c = new TimerController(
+    {
+      configure() {},
+      resetCamera() {},
+      async animate(p) {
+        moves.push(p.move);
+      },
+    },
+    route,
+    design.assets,
+    (_v, _b, e) => assert.equal(e, undefined),
+    async (manifest) => ({
+      manifest,
+      images: new Map(),
+      materials: new Map(),
+      textureOrigin: "bottom-left",
+      dispose() {},
+    }),
+    async (p) => {
+      const solver = await prepareTestSolver(p);
+      return {
+        solve(from, to, options) {
+          calls++;
+          return solver.solve(from, to, options);
+        },
+      };
+    },
+  );
+  await c.configure(value);
+  return {
+    c,
+    moves,
+    get calls() {
+      return calls;
+    },
+  };
+}
+test("workshop clock uses absolute monotonic deadlines, ten-second ceiling and frozen pause", () => {
+  let now = 500;
+  const c = new WorkshopClock(() => now);
+  assert.equal(c.bucket, 90);
+  c.start();
+  now += 9999;
+  assert.equal(c.bucket, 90);
+  now++;
+  assert.equal(c.bucket, 89);
+  now += 25432;
+  c.pause();
+  const frozen = c.remainingMs;
+  now += 100000;
+  assert.equal(c.remainingMs, frozen);
+  c.start();
+  now += frozen;
+  assert.equal(c.bucket, 0);
+  assert.equal(c.elapsed, true);
+  c.reset();
+  assert.equal(c.bucket, 90);
+  assert.equal(c.running, false);
+  for (const x of [-10, 3600, 15, NaN]) assert.throws(() => c.configure(x));
+  assert.equal(parseDuration("59:50"), 3590);
+  assert.equal(formatTimer(90), "15:00");
+  for (const x of ["60:00", "15:01", "1:70", "9"])
+    assert.throws(() => parseDuration(x));
+});
+test("all 360 immutable MMSS states and full 1324-HTM route independently preserve canonical poses", async () => {
+  const h = await harness(0);
+  for (let i = 1; i < 360; i++) {
+    h.c.request(i);
+    await settle(h.c);
+    assert.equal(matchesTarget(route.print, h.c.state, timerTarget(i)), true);
+    assert.equal(stateEquals(h.c.state, route.states[i]), true);
+  }
+  assert.equal(h.moves.length, 1324);
+  assert.equal(h.calls, 0);
+  assert.equal(Math.max(...route.increments.map((m) => m.length)), 5);
+});
+test("actual fifteen-minute countdown commits 331 HTM, 90 edges and 91 displays without setup", async () => {
+  const h = await harness();
+  const start = h.c.state;
+  const transitions = [];
+  assert.equal(h.c.progress.sessionTotal, 0);
+  for (let value = 89; value >= 0; value--) {
+    const before = h.moves.length;
+    h.c.request(value);
+    await settle(h.c);
+    transitions.push({
+      value,
+      word: h.moves.slice(before).map(token).join(" "),
+      state: h.c.state,
+    });
+  }
+  assert.equal(transitions.length, 90);
+  assert.equal(h.moves.length, 331);
+  assert.equal(h.c.progress.sessionTotal, 331);
+  assert.equal(stateEquals(h.c.state, route.states[0]), true);
+  assert.equal(h.calls, 0);
+  mkdirSync("test-results", { recursive: true });
+  writeFileSync(
+    "test-results/workshop-timer-commits.json",
+    JSON.stringify({ print: route.print, start, startValue: 90, transitions }),
+  );
+});
+test("timer arbitrary/catch-up/reset uses shared solver and full-state-only route eligibility", async () => {
+  const h = await harness();
+  h.c.request(25);
+  await settle(h.c);
+  assert.equal(h.calls, 1);
+  h.c.request(24);
+  await settle(h.c);
+  assert.equal(h.calls, 1);
+  const altered = applyMoves(h.c.state, parseAlg("B"));
+  assert.equal(matchesTarget(route.print, altered, timerTarget(24)), true);
+  assert.equal(timerStep(route, altered, 24, 23), null);
+  h.c.authoritative = altered;
+  h.c.request(23);
+  await settle(h.c);
+  assert.equal(h.calls, 2);
+  h.c.request(90);
+  await settle(h.c);
+  assert.equal(h.calls, 3);
+  assert.ok(h.c.progress.sessionTotal > 0);
+});
+test("timer route rejects unsupported versions, counterfeit identities and damaged edges", () => {
+  for (const mutate of [
+    (d) => (d.version = 2),
+    (d) => (d.maxSeconds = 3600),
+    (d) => (d.printing[0].cubie = false),
+    (d) => (d.increments[0] = "R"),
+    (d) => (d.printing[0].image = "title-left"),
+  ]) {
+    const d = structuredClone(raw);
+    mutate(d);
+    assert.throws(() => validateTimerRoute(d));
+  }
+});
