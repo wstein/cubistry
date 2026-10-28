@@ -1,5 +1,9 @@
 # Real Cube counter controls
 
+> Historical controls before Issue #53. The current UI uses
+> [Set/Run/Stop and six rotation-speed stops](CUBE_FIRST_UI.md). Auto and the
+> separate minute-timer block are superseded in the counter UI.
+
 The prominent Application selector opens directly on **Counter 00–99
 (Certified)** at canonical 00, with the permanent COUNTER title and leading
 zero. **Counter countdown 10–00** is the same neutral numeric example with a

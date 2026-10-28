@@ -54,21 +54,26 @@ Open `http://localhost:5173` on the same computer (keep Vite's current port if
 it differs). Print IDs and asset integrity require Web Crypto; remote/LAN
 clients need HTTPS because plain HTTP on an IP address does not expose it.
 
-Use +1/−1, +10/−10, a custom step, or a direct
-value. Bounds clamp by default; wrap is an explicit option. Drag to orbit the
-camera and use **Front view** to return. Manual layer turns are disabled.
+The chooser above the workspace offers **Counter 0–99**, starting at 00 with the
+certified print. **Set** moves directly to the target; **Run** counts toward it
+by one per second, automatically choosing up or down. Editing the input alone
+does not change a running target. Set or a manual step interrupts Run. **Stop**
+finishes the active complete physical value. Slow animation delays progression
+instead of skipping values. Reload restores the last completed value without
+restarting Run.
 
-The minute timer supports Start, Pause, Resume, and Reset. It derives remaining
-minutes from a stored wall-clock deadline, so a background tab or reload does
-not lose elapsed time. No seconds are shown on the cube.
+Manual −10/−1/+1/+10 actions clamp at the bounds unless **Wrap 99 ↔ 0** is
+checked. Run always follows the direct numeric route, regardless of Wrap.
+**Leading Zero** switches between 05 and a blank tens sticker followed by 5.
+Changing it configures a new permanent print and resets value/session to zero;
+the blank-tens print has no certified 339-HTM route.
 
-The direct default is **Counter 00–99 (Certified)** at 00. The prominent
-Application selector also provides a numeric 10→00 countdown; the future
-60-minute Break Timer is explicitly deferred. Leading zero / Blank tens sits
-next to Wrap and configures a real permanent print, with clear certification
-status. A single Auto toggle uses fixed one-second wall-clock progression,
-independent of the continuous animation-speed slider. The existing whole-minute
-countdown remains available. See [controls and semantics](docs/COUNTER_CONTROLS.md).
+Drag to orbit and scroll to zoom. **Rotation Speed** has six stops: 2 s, 1 s,
+500 ms, 250 ms, 100 ms (default), and 50 ms per HTM move. It changes animation
+only. Expand **Move details** for route scope and session reset. The 60-minute
+timer remains a future independent application under
+[issue #30](https://github.com/wstein/cubistry/issues/30). See
+[cube-first controls and verification](docs/CUBE_FIRST_UI.md).
 
 The [certified route](docs/COUNTER_CERTIFIED_TRAVERSAL.md) retains 339 committed
 HTM over 99 adjacent increments, maximum five per edge, excluding setup.
