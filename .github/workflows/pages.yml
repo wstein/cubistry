@@ -1,41 +1,54 @@
-name: Counter development preview
+name: Pages build
 
 on:
   push:
     branches: [main]
+  pull_request:
+    types: [opened, reopened, synchronize]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: counter-pages
-  cancel-in-progress: false
+  group: pages-build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.3.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
           cache: npm
       - run: npm run prepare:solver
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      # The regression builds dist with /cubistry/ and serves plain static files.
-      - run: npm run test:pages
+      - run: npm run build
         env:
-          CI: "1"
-          VITE_BASE_PATH: /cubistry/
-      - uses: actions/upload-pages-artifact@v3
+          VITE_BASE_PATH: ${{ github.event_name == 'pull_request' && format('/cubistry/pr-preview/pr-{0}/', github.event.pull_request.number) || '/cubistry/' }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pages-site
+          path: dist/
+          retention-days: 14
+          overwrite: true
+      # Until explicit activation, preserve the current main-only Actions deploy.
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        if: github.ref == 'refs/heads/main' && vars.PAGES_PREVIEWS_ENABLED != 'true'
         with:
           path: dist
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.PAGES_PREVIEWS_ENABLED != 'true'
     needs: build
+    concurrency:
+      group: counter-pages-publish
+      cancel-in-progress: false
     permissions:
       pages: write
       id-token: write
@@ -44,6 +57,5 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy approved main build
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
