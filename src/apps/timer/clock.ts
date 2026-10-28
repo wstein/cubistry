@@ -38,7 +38,10 @@ export class WorkshopClock {
   private direction: TimerMode = "countdown";
   private readonly now: () => number;
   readonly profile: TimerProfile;
-  constructor(now: () => number = () => performance.now(), profile: TimerProfile = TEN_SECOND_TIMER) {
+  constructor(
+    now: () => number = () => performance.now(),
+    profile: TimerProfile = TEN_SECOND_TIMER,
+  ) {
     this.now = now;
     this.profile = profile;
     this.duration = profile.defaultSeconds;
@@ -55,24 +58,45 @@ export class WorkshopClock {
   }
   /** Read every deadline field from one monotonic sample; never advance anchors. */
   snapshot(): ClockSnapshot {
-    const at = this.now(), value = this.valueAt(at);
-    const bucket = this.direction === "countdown"
-      ? Math.ceil(value / (this.profile.stepSeconds * 1000)) : Math.floor(value / (this.profile.stepSeconds * 1000));
-    const running = this.active && (this.direction === "countdown" ? value > 0 : value < (this.profile.maxSeconds * 1000));
+    const at = this.now(),
+      value = this.valueAt(at);
+    const bucket =
+      this.direction === "countdown"
+        ? Math.ceil(value / (this.profile.stepSeconds * 1000))
+        : Math.floor(value / (this.profile.stepSeconds * 1000));
+    const running =
+      this.active &&
+      (this.direction === "countdown"
+        ? value > 0
+        : value < this.profile.maxSeconds * 1000);
     const target = bucket + (this.direction === "countdown" ? -1 : 1);
-    const distance = this.direction === "countdown"
-      ? value - target * (this.profile.stepSeconds * 1000) : target * (this.profile.stepSeconds * 1000) - value;
-    return { at, bucket, liveSeconds: this.direction === "countdown"
-      ? Math.ceil(value / 1000) : Math.floor(value / 1000), running, next: running
-      ? { target, deadline: at + distance / this.multiplier, interval: (this.profile.stepSeconds * 1000) / this.multiplier }
-      : null };
+    const distance =
+      this.direction === "countdown"
+        ? value - target * (this.profile.stepSeconds * 1000)
+        : target * (this.profile.stepSeconds * 1000) - value;
+    return {
+      at,
+      bucket,
+      liveSeconds:
+        this.direction === "countdown"
+          ? Math.ceil(value / 1000)
+          : Math.floor(value / 1000),
+      running,
+      next: running
+        ? {
+            target,
+            deadline: at + distance / this.multiplier,
+            interval: (this.profile.stepSeconds * 1000) / this.multiplier,
+          }
+        : null,
+    };
   }
   private valueAt(at: number): number {
     const delta = this.active ? (at - this.anchor) * this.multiplier : 0;
     return Math.max(
       0,
       Math.min(
-        (this.profile.maxSeconds * 1000),
+        this.profile.maxSeconds * 1000,
         this.frozen + (this.direction === "countdown" ? -delta : delta),
       ),
     );
@@ -91,7 +115,7 @@ export class WorkshopClock {
   get elapsed(): boolean {
     return this.direction === "countdown"
       ? this.valueMs === 0
-      : this.valueMs === (this.profile.maxSeconds * 1000);
+      : this.valueMs === this.profile.maxSeconds * 1000;
   }
   configure(seconds: number): void {
     if (
@@ -133,8 +157,15 @@ export class WorkshopClock {
     this.frozen = this.direction === "countdown" ? this.duration * 1000 : 0;
   }
 }
-export function formatTimer(bucket: number, profile: TimerProfile = TEN_SECOND_TIMER): string {
-  if (!Number.isInteger(bucket) || bucket < 0 || bucket > profile.maxSeconds / profile.stepSeconds)
+export function formatTimer(
+  bucket: number,
+  profile: TimerProfile = TEN_SECOND_TIMER,
+): string {
+  if (
+    !Number.isInteger(bucket) ||
+    bucket < 0 ||
+    bucket > profile.maxSeconds / profile.stepSeconds
+  )
     throw Error("Invalid timer bucket");
   return formatLiveTimer(bucket * profile.stepSeconds);
 }
@@ -144,7 +175,10 @@ export function formatLiveTimer(seconds: number): string {
     throw Error("Invalid live timer seconds");
   return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 }
-export function parseDuration(text: string, profile: TimerProfile = TEN_SECOND_TIMER): number {
+export function parseDuration(
+  text: string,
+  profile: TimerProfile = TEN_SECOND_TIMER,
+): number {
   if (!/^\d{1,2}:[0-5]\d$/.test(text))
     throw Error(`Enter MM:SS in ${profile.stepName} steps`);
   const [m, s] = text.split(":").map(Number);

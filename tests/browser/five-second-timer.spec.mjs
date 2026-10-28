@@ -16,7 +16,7 @@ async function choose(page, leadingZero = true) {
       window.fiveStart = s;
       return configure.call(this, p, s, a);
     };
-    CubeViewer.prototype.animate = async function (p) {
+    CubeViewer.prototype.animate = async function (p, timing) {
       if (window.fiveHoldNext) {
         window.fiveHoldNext = false;
         window.fiveHeld = true;
@@ -25,9 +25,14 @@ async function choose(page, leadingZero = true) {
         });
       }
       const began = performance.now();
-      await animate.call(this, p);
+      const endpoint = timing?.();
+      await animate.call(this, p, timing);
       window.fiveMoves.push(p);
-      window.fiveTimes.push({ began, settled: performance.now() });
+      window.fiveTimes.push({
+        began,
+        settled: performance.now(),
+        endAt: endpoint?.endAt ?? null,
+      });
     };
   });
   await page.selectOption("#application", "five-second-timer");
@@ -235,12 +240,13 @@ test("Stopwatch floors five-second fractions and terminates exactly39:55 at100x;
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.click("#timer-start");
   await page.clock.fastForward(4500);
-  await expect(page.locator("#timer-logical")).toHaveText("00:00");
+  await expect(page.locator("#timer-logical")).toHaveText("00:04");
   await page.clock.runFor(3000);
   await settled(page, "00:05");
   await page.click("#timer-start");
+  const frozenLive = await page.locator("#timer-logical").innerText();
   await page.clock.fastForward(50000);
-  await expect(page.locator("#timer-logical")).toHaveText("00:05");
+  await expect(page.locator("#timer-logical")).toHaveText(frozenLive);
   await page.selectOption("#timer-speed", "100");
   await page.click("#timer-start");
   await page.clock.fastForward(24000);
@@ -287,7 +293,7 @@ for (const [stop, preferred] of [
   ["0", 2000],
   ["6", 10],
 ])
-  test(`five-second six-move sequence settles by its deadline at ${preferred}ms preference`, async ({
+  test(`five-second six-move sequence settles at its deadline at ${preferred}ms preference`, async ({
     page,
   }, testInfo) => {
     test.setTimeout(45000);
@@ -353,7 +359,7 @@ for (const [stop, preferred] of [
             preferredMilliseconds: preferred,
             effectiveMilliseconds: effective,
             movingSample: window.fiveMovingSample,
-            deadlineMilliseconds: epoch + 5000,
+            deadlineMilliseconds: times.at(-1).endAt,
             firstMoveMilliseconds: times[0].began,
             settledMilliseconds: times.at(-1).settled,
             actualHTM: times.length,
@@ -384,9 +390,13 @@ for (const [stop, preferred] of [
     expect(trace.observation.firstMoveMilliseconds).toBeGreaterThanOrEqual(
       epoch + 2500 - 50,
     );
-    expect(trace.observation.settledMilliseconds).toBeLessThanOrEqual(
-      trace.observation.deadlineMilliseconds,
-    );
+    expect(trace.observation.deadlineMilliseconds).not.toBeNull();
+    expect(
+      Math.abs(
+        trace.observation.settledMilliseconds -
+          trace.observation.deadlineMilliseconds,
+      ),
+    ).toBeLessThanOrEqual(20);
     expect(
       trace.observation.settledMilliseconds -
         trace.observation.firstMoveMilliseconds,

@@ -243,6 +243,12 @@ test("five-second scheduler fits six-move normal/adaptive plans into half an int
       currentValue: 1,
       busy: false,
       progress: { target: null, queuedTarget: null, total: 0, completed: 0 },
+      setDeadline(target, endAt, durationMs) {
+        this.timing = { target, endAt, durationMs };
+      },
+      clearDeadline() {
+        this.timing = null;
+      },
       prepare(value) {
         return timerStep(route, this.state, this.currentValue, value);
       },
@@ -267,6 +273,8 @@ test("five-second scheduler fits six-move normal/adaptive plans into half an int
       (v) => (effective = v),
     );
     assert.deepEqual(requests, [0]);
+    assert.equal(c.timing.endAt, 5000);
+    assert.equal(c.timing.target, 0);
     assert.ok(stateEquals(c.state, route.states[0]));
     assert.equal(effective, planned.effective);
     s.tick(snapshot(4999), c, preferred, () => {});
@@ -283,6 +291,8 @@ test("five-second scheduler fits six-move normal/adaptive plans into half an int
       currentValue: 1,
       busy: false,
       progress: { target: null, queuedTarget: null, total: 6, completed: 0 },
+      setDeadline() {},
+      clearDeadline() {},
       prepare() {
         return Array(6);
       },
