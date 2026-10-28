@@ -16,17 +16,30 @@ permissions:
 
 concurrency:
   # An inactive workflow must not evict a pending legacy production deployment.
-  group: ${{ vars.PAGES_PREVIEWS_ENABLED == 'true' && 'counter-pages-publish' || format('disabled-pages-preview-{0}', github.run_id) }}
+  group: ${{ vars.PAGES_PREVIEWS_ENABLED == 'true' && github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main' && 'counter-pages-publish' || format('inactive-or-signal-pages-{0}', github.run_id) }}
   cancel-in-progress: false
 
 jobs:
+  closed-signal:
+    if: vars.PAGES_PREVIEWS_ENABLED == 'true' && github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      # Metadata only. A stacked PR can target a feature branch, but the
+      # github-pages environment permits only main-context deployments.
+      - name: Request trusted main-context reconciliation
+        run: |
+          gh api --method POST repos/wstein/cubistry/actions/workflows/pages-publish.yml/dispatches -f ref=main
+        env:
+          GH_TOKEN: ${{ github.token }}
   plan:
     permissions:
       contents: read
       actions: read
       pull-requests: read
       pages: read
-    if: vars.PAGES_PREVIEWS_ENABLED == 'true'
+    if: vars.PAGES_PREVIEWS_ENABLED == 'true' && github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
