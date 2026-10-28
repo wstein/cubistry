@@ -12,20 +12,35 @@ import {
   inverseMoves,
 } from "@cubistry/cube-mechanics";
 import { stateEquals } from "@cubistry/cube-core";
-const raw = JSON.parse(readFileSync("public/hsm-counter.v1.json"));
+const raw = JSON.parse(readFileSync("public/hsm-counter.v2.json"));
 const design = validateHsmDesign(raw);
 const planner = new HsmPlanner();
+test("real blank is part of every physical target and the known free jump needs six moves", () => {
+  assert.equal(hsmTarget("M", 33).facelets.length, 4);
+  assert.equal(hsmTarget("M", 33).facelets[0].assetId, "blank");
+  assert.equal(
+    design.print.stickers.filter((s) => s.assetId === "blank").length,
+    3,
+  );
+  const source = applyMoves(initialState(design.print), parseAlg("U D2 B D'"));
+  assert.ok(matchesTarget(design.print, source, hsmTarget("H", 0)));
+  const moves = planner.plan(design.print, source, "H", 34);
+  assert.equal(moves.length, 6);
+  assert.ok(
+    matchesTarget(design.print, applyMoves(source, moves), hsmTarget("H", 34)),
+  );
+});
 const settled = async (c) => {
   for (let n = 0; c.busy && n < 100; n++)
     await new Promise((r) => setImmediate(r));
   assert.equal(c.busy, false);
   assert.notEqual(c.progress.status, "failed");
 };
-test("preferred print preserves independently checked 00–59 prefix totals including overflow", () => {
+test("real blank print preserves independently checked 00–59 prefix totals including overflow", () => {
   for (const [letter, total] of [
-    ["H", 185],
-    ["S", 188],
-    ["M", 190],
+    ["H", 267],
+    ["S", 269],
+    ["M", 262],
   ]) {
     let state = applyMoves(
         initialState(design.print),
@@ -41,7 +56,7 @@ test("preferred print preserves independently checked 00–59 prefix totals incl
           value,
           n === 60 ? undefined : (value + 1) % 60,
         );
-      assert.ok(moves.length <= 5);
+      assert.ok(moves.length <= 6);
       sum += moves.length;
       const old = state;
       state = applyMoves(state, moves);
@@ -51,7 +66,7 @@ test("preferred print preserves independently checked 00–59 prefix totals incl
     assert.equal(sum, total);
   }
 });
-test("controller repeats all eighteen modes, changes ranges/direction and replans arbitrary targets within five HTM", async () => {
+test("controller repeats all eighteen modes, changes ranges/direction and replans arbitrary targets within six HTM", async () => {
   const traces = [];
   for (const letter of ["H", "S", "M"]) {
     const committed = [];
@@ -83,7 +98,7 @@ test("controller repeats all eighteen modes, changes ranges/direction and replan
           c.request(target);
           await settled(c);
           assert.equal(c.currentValue, target);
-          assert.ok(c.progress.sessionTotal - before <= 5);
+          assert.ok(c.progress.sessionTotal - before <= 6);
           assert.ok(
             matchesTarget(design.print, c.state, hsmTarget(letter, target)),
           );
@@ -93,7 +108,7 @@ test("controller repeats all eighteen modes, changes ranges/direction and replan
       const before = c.progress.sessionTotal;
       c.request(value);
       await settled(c);
-      assert.ok(c.progress.sessionTotal - before <= 5);
+      assert.ok(c.progress.sessionTotal - before <= 6);
     }
     traces.push({ letter, start, committed });
     c.dispose();
@@ -134,7 +149,7 @@ test("HSM stop finishes active target, drops queued work and retains authoritati
   assert.equal(c.progress.status, "stopped");
   c.request(0);
   await settled(c);
-  assert.ok(c.progress.total <= 5);
+  assert.ok(c.progress.total <= 6);
   c.resetSessionMoves();
   assert.equal(c.progress.sessionTotal, 0);
   c.dispose();
