@@ -5,6 +5,13 @@ copies of the corrected HSM print from #61. Hours use 00–23; minutes and secon
 use 00–59. Each unit keeps its own full physical state, assets, animation speed,
 and immutable H/M/S label. The upper-left stickers are genuinely blank.
 
+All three cubes share one WebGL canvas, one scene, one camera and one render
+loop. They remain together in a horizontal row on mobile. Dragging the view
+orbits the entire clock. Each cube has its own group of eight bodies, physical
+state and move pivot; turn speeds stay independent. The caller-owned viewport
+extension leaves standalone viewers in control of their own renderer. Timed
+shared endpoints are painted together by the stage frame loop.
+
 The shared control panel follows the five-second timer's typography and shows
 the current local `HH:MM:SS` beside the cubes, or above them on narrow screens.
 It reads the same wall-clock snapshot for all units and remains live during
@@ -46,7 +53,7 @@ time-zone offsets, wall-clock jumps, bounded suspended-tab catch-up, exact-pose
 preparation, current-value setup, and timing only on the final physical move.
 Browser cases cover live local initialization, independent speeds and blank
 faces, responsive layout, synchronized midnight, suspended-tab recovery,
-navigation to the standalone HSM counter, and actual three-viewer animation
+navigation to the standalone HSM counter, and actual three-cube animation in one viewport
 against a shared midnight deadline. Physical endpoint checks use the committed
 endpoint itself because the seconds cube may already be moving again when a
 later browser inspection runs.

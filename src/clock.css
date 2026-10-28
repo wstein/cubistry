@@ -19,17 +19,20 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
+.clock-stage {
+  min-width: 0;
+  background: #e9eee7;
+  border: 1px solid #d9ded7;
+  border-radius: 24px;
+  padding: 20px;
+}
 .clock-cubes {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 .clock-card {
   min-width: 0;
-  border: 1px solid #d9ded7;
-  background: #e9eee7;
-  border-radius: 24px;
-  padding: 20px;
 }
 .clock-card h2 {
   font-size: 1rem;
@@ -37,12 +40,14 @@
   color: #315d4e;
 }
 .clock-viewer {
-  height: clamp(230px, 28vw, 410px);
+  height: clamp(230px, 32vw, 450px);
   width: 100%;
   touch-action: none;
 }
 .clock-viewer canvas {
   display: block;
+  width: 100%;
+  height: 100%;
 }
 .clock-card select {
   width: 100%;
@@ -55,21 +60,6 @@
 .clock-state[data-state="synchronizing"] {
   color: #855122;
 }
-@media (max-width: 700px) {
-  .clock-cubes {
-    grid-template-columns: 1fr;
-  }
-  .clock-viewer {
-    height: 310px;
-  }
-  .clock-heading {
-    align-items: center;
-  }
-  .clock-digital output {
-    font-size: 2.4rem;
-  }
-}
-
 .clock-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 260px;
@@ -92,5 +82,22 @@
   }
   .clock-control {
     grid-row: 1;
+  }
+}
+@media (max-width: 500px) {
+  .clock-stage {
+    padding: 12px;
+  }
+  .clock-cubes {
+    gap: 8px;
+  }
+  .clock-card label {
+    font-size: 0.8rem;
+  }
+  .clock-card select {
+    padding: 10px 4px;
+  }
+  .clock-viewer {
+    height: 230px;
   }
 }
