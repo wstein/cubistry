@@ -1,0 +1,59 @@
+{
+  "status": "SAT",
+  "physicalStates": 180,
+  "routes": [
+    {
+      "letter": "H",
+      "states": 60,
+      "forwardEdges": 59,
+      "reverseEdges": 59,
+      "totalHTM": 192,
+      "maximumHTM": 4,
+      "meanHTM": 3.2542372881355934,
+      "reset23HTM": 3,
+      "reset11HTM": 2,
+      "setupHTM": 4
+    },
+    {
+      "letter": "S",
+      "states": 60,
+      "forwardEdges": 59,
+      "reverseEdges": 59,
+      "totalHTM": 194,
+      "maximumHTM": 4,
+      "meanHTM": 3.288135593220339,
+      "reset23HTM": 3,
+      "reset11HTM": 2,
+      "setupHTM": 5
+    },
+    {
+      "letter": "M",
+      "states": 60,
+      "forwardEdges": 59,
+      "reverseEdges": 59,
+      "totalHTM": 199,
+      "maximumHTM": 4,
+      "meanHTM": 3.3728813559322033,
+      "reset23HTM": 3,
+      "reset11HTM": 2,
+      "setupHTM": 4
+    }
+  ],
+  "independentBFS": {
+    "states": 9072,
+    "histogram": {
+      "0": 1,
+      "1": 15,
+      "2": 177,
+      "3": 1397,
+      "4": 4981,
+      "5": 2497,
+      "6": 4
+    }
+  },
+  "shortestForwardEdges": 177,
+  "shortestResetEdges": 6,
+  "candidateSHA256": "7ec93660867a367ad79d7af28acb2b0f1035450bcac76d0c1afaa7bcdac93cd5",
+  "scope": "Fixed upright print; TR letter, BL tens, BR units; TL unconstrained",
+  "globalLayoutOptimality": "UNKNOWN"
+}
