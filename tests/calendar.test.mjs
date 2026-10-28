@@ -131,12 +131,18 @@ test("calendar runtime rejects malformed geometry and unsupported moves", () => 
 test("vector artwork retains licensed font, immutable IDs, dimensions and embedded glyphs", () => {
   const art = JSON.parse(readFileSync("assets/calendar/manifest.json", "utf8"));
   const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
-  assert.equal(hash(readFileSync(art.font.path)), art.font.sha256);
-  assert.equal(art.font.license, "SIL-OFL-1.1");
-  assert.match(
-    readFileSync(art.font.licensePath, "utf8"),
-    /SIL OPEN FONT LICENSE/,
+  assert.deepEqual(
+    art.fonts.map((f) => f.weight),
+    [600, 800],
   );
+  for (const font of art.fonts) {
+    assert.equal(hash(readFileSync(font.path)), font.sha256);
+    assert.equal(font.license, "SIL-OFL-1.1");
+    assert.match(
+      readFileSync(font.licensePath, "utf8"),
+      /SIL OPEN FONT LICENSE/,
+    );
+  }
   for (const [id, glyphs] of Object.entries(art.designs)) {
     const print = designs.find(
       (d) => d.id === (id === "en-3" ? "en-3-zero" : id),
@@ -147,6 +153,8 @@ test("vector artwork retains licensed font, immutable IDs, dimensions and embedd
         svg = bytes.toString();
       assert.equal(hash(bytes), glyph.sha256);
       assert.match(svg, /width="14mm" height="14mm" viewBox="0 0 256 256"/);
+      assert(svg.includes(`font-weight="${glyph.art.weight}"`));
+      assert(svg.includes(`fill="${glyph.art.color}"`));
       assert.match(svg, /data:font\/woff2;base64,/);
       assert.doesNotMatch(svg, /(?:href|url)\s*\(?["']?https?:/);
       for (const sid of glyph.stickers) {
@@ -161,4 +169,24 @@ test("vector artwork retains licensed font, immutable IDs, dimensions and embedd
       Array.from({ length: 54 }, (_, i) => i),
     );
   }
+});
+
+test("English weekend artwork is fixed red extra-bold on SAT and both SUN source stickers", async () => {
+  const { stickerArt } = await import("../src/apps/calendar/artwork.ts");
+  for (const d of designs.filter((d) => d.id.startsWith("en"))) {
+    const weekends = d.printing.filter((s) => ["SAT", "SUN"].includes(s.image));
+    assert.deepEqual(
+      weekends.map((s) => s.id),
+      [20, 33, 40],
+    );
+    for (const s of d.printing) {
+      const art = stickerArt(s),
+        weekend = weekends.includes(s);
+      assert.equal(art.weight, weekend ? 800 : 600);
+      assert.equal(art.color === "#ba302c", weekend);
+    }
+  }
+  const german = designs.find((d) => d.id === "de-a");
+  assert.equal(stickerArt(german.printing[3]).weight, 600);
+  assert.notEqual(stickerArt(german.printing[3]).color, "#ba302c");
 });
