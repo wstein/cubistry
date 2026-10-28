@@ -70,6 +70,7 @@ function controlsUi() {
       : "Start";
   $("timer-start").setAttribute("aria-pressed", String(clock.running));
   $("timer-duration").disabled = !ready || clock.running;
+  $("timer-set").disabled = !ready || clock.running;
   $("timer-mode").disabled = !ready;
   $("timer-speed").disabled = !ready;
   $("timer-duration-setting").hidden = clock.mode === "stopwatch";

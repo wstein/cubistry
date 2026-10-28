@@ -605,3 +605,60 @@ test("all five Timer rates integrate continuously while running and remain indep
     "/tmp/cubistry-rate-change-browser-commits.json",
   );
 });
+
+test("visible Set and Enter apply the same duration without starting; Reset retains the configured duration", async ({ page }) => {
+  await page.clock.install();
+  await chooseTimer(page);
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  const set = page.getByRole("button", { name: "Set", exact: true });
+  await expect(set).toBeVisible();
+  await page.fill("#timer-duration", "00:40");
+  await set.click();
+  await page.clock.runFor(1000);
+  await settled(page, "00:40");
+  const expected = await page.evaluate(() => window.timerMoves.at(-1).to);
+  await expect(page.locator("#timer-start")).toHaveText("Start");
+  await expect(page.locator("#status")).toHaveText("Countdown · Ready");
+  await page.clock.fastForward(30000);
+  await expect(page.locator("#timer-logical")).toHaveText("00:40");
+  await duration(page, "00:20");
+  await page.fill("#timer-duration", "00:40");
+  await page.locator("#timer-duration").press("Enter");
+  await page.clock.runFor(1000);
+  await settled(page, "00:40");
+  expect(await page.evaluate(() => window.timerMoves.at(-1).to)).toEqual(expected);
+  await expect(page.locator("#timer-start")).toHaveText("Start");
+  await page.click("#timer-start");
+  await expect(set).toBeDisabled();
+  await page.clock.fastForward(10000);
+  await page.clock.runFor(1000);
+  await page.click("#timer-start");
+  await page.click("#timer-reset");
+  await page.clock.runFor(1000);
+  await settled(page, "00:40");
+  await expect(page.locator("#status")).toHaveText("Countdown · Ready");
+});
+
+test("Set replaces a pending duration safely during an active legal animation without starting", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.clock.install();
+  await chooseTimer(page);
+  await duration(page, "00:40");
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await page.locator("#rotation-speed").fill("0");
+  await page.fill("#timer-duration", "00:30");
+  await page.click("#timer-set");
+  await page.clock.runFor(20);
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
+  await page.fill("#timer-duration", "00:20");
+  await page.click("#timer-set");
+  await expect(page.locator("#timer-start")).toHaveText("Start");
+  for (let i = 0; i < 40; i++) {
+    await page.clock.fastForward(2100);
+    await page.clock.runFor(20);
+  }
+  await settled(page, "00:20");
+  await expect(page.locator("#timer-logical")).toHaveText("00:20");
+  await expect(page.locator("#status")).toHaveText("Countdown · Ready");
+  await verifyActualTimerMoves(page, 90, 2, "/tmp/cubistry-set-browser-commits.json");
+});
