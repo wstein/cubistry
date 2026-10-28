@@ -49,7 +49,11 @@ error rather than installing an unverified pose.
 
 Live mode follows the browser's current local date. A visibility change or return
 from suspension checks today's date directly, without replaying missed days.
-The control display shows the requested date and time zone. The physical face
+The control display shows the requested date and time zone. Choosing a date
+starts its legal route immediately; the Show date button remains available as
+an explicit alternative. The −1 day and +1 day controls operate on the latest
+selected date, so rapid presses retain the latest civil-date intent while only
+one physical route and one pending request exist. The physical face
 commits after its legal route finishes. Date inspection accepts Gregorian dates
 from 0001-01-01 through 9999-12-31, rejects invalid days, and does not interpret an
 ISO civil date as a local UTC timestamp. Live returns to the current local date.
@@ -58,6 +62,16 @@ The drawing buffer follows the display pixel ratio, while the canvas retains the
 CSS dimensions of its viewport. The camera fits the complete cube turn/orbit
 envelope to both viewport axes after resizing, keeping the cube clear of the
 adjacent controls on desktop and within the narrow mobile viewport.
+
+## Transition counts
+
+The move display reports completed/total outer-face HTM and completed/total
+whole-cube rotations separately. A half turn counts as one HTM; x/y/z rotations
+never count as HTM. Initial setup is excluded. Idle −1/+1 previews use the actual
+committed physical pose and its retained source route, including when identical
+visible targets have different hidden poses. During motion, neighbor estimates
+are explicitly unavailable until the full endpoint commits. These are exact
+counts for the current playback policy, not shortest-path claims.
 
 ## Original artwork
 

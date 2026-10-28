@@ -4,6 +4,7 @@ import { sha256, deploymentBasePath } from "@cubistry/cube-assets";
 import {
   validateDesign,
   civilDate,
+  shiftDate,
   localDate,
   findTarget,
   front,
@@ -35,6 +36,8 @@ function fail(error) {
     "calendar-date",
     "calendar-set",
     "calendar-live",
+    "calendar-decrement",
+    "calendar-increment",
   ])
     $(id).disabled = true;
 }
@@ -64,6 +67,52 @@ function controls() {
   $("calendar-set").disabled = !ready;
   $("calendar-live").disabled = !ready;
   $("calendar-live").setAttribute("aria-pressed", String(live));
+  $("calendar-decrement").disabled = !ready || date.iso === "0001-01-01";
+  $("calendar-increment").disabled = !ready || date.iso === "9999-12-31";
+  showMoves();
+}
+function showMoves() {
+  if (!controller) return;
+  const p = controller.progress;
+  $("calendar-moves").textContent =
+    `${p.completed.htm} / ${p.total.htm} HTM · ${p.completed.rotations} / ${p.total.rotations} cube rotations`;
+  $("calendar-queue").textContent = p.queued
+    ? "Latest requested date is queued."
+    : "";
+  if (!ready) {
+    $("calendar-estimates").textContent = "Preparing move estimates…";
+    return;
+  }
+  if (controller.busy) {
+    $("calendar-estimates").textContent =
+      "Day estimates available after motion.";
+    return;
+  }
+  const id =
+      $("calendar-design").value === "de-a"
+        ? "de-a"
+        : $("calendar-padding").checked
+          ? "en-3-zero"
+          : "en-3-unpadded",
+    design = cache.get(id);
+  if (!design) {
+    $("calendar-estimates").textContent = "Preparing move estimates…";
+    return;
+  }
+  const cost = (direction) => {
+    try {
+      const counts = controller.estimate(
+        findTarget(design, shiftDate(date, direction)),
+      );
+      return counts
+        ? `${counts.htm} HTM + ${counts.rotations} cube rotations`
+        : "Unavailable during motion";
+    } catch {
+      return "Date limit";
+    }
+  };
+  $("calendar-estimates").textContent =
+    `−1 day: ${cost(-1)} · +1 day: ${cost(1)}`;
 }
 function changed(target, busy, error) {
   if (error) {
@@ -152,7 +201,8 @@ $("calendar-application").addEventListener("change", () =>
 );
 $("calendar-design").addEventListener("change", () => void configure());
 $("calendar-padding").addEventListener("change", () => void update());
-$("calendar-set").addEventListener("click", () => {
+function inspectDate() {
+  if (!ready || failed) return;
   try {
     const chosen = civilDate($("calendar-date").value);
     $("calendar-error").textContent = "";
@@ -163,7 +213,25 @@ $("calendar-set").addEventListener("click", () => {
   } catch (e) {
     $("calendar-error").textContent = e.message;
   }
-});
+}
+$("calendar-date").addEventListener("change", inspectDate);
+$("calendar-set").addEventListener("click", inspectDate);
+function stepDate(direction) {
+  if (!ready || failed) return;
+  try {
+    const next = shiftDate(date, direction);
+    date = next;
+    live = false;
+    $("calendar-date").value = date.iso;
+    $("calendar-error").textContent = "";
+    void update();
+    controls();
+  } catch (e) {
+    $("calendar-error").textContent = e.message;
+  }
+}
+$("calendar-decrement").addEventListener("click", () => stepDate(-1));
+$("calendar-increment").addEventListener("click", () => stepDate(1));
 $("calendar-live").addEventListener("click", () => {
   $("calendar-error").textContent = "";
   live = true;

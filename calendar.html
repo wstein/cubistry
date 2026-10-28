@@ -63,10 +63,33 @@
             min="0001-01-01"
             max="9999-12-31"
             disabled
-          /><button id="calendar-set" disabled>Show date</button
+          />
+          <div class="calendar-day-buttons">
+            <button id="calendar-decrement" aria-label="Previous day" disabled>
+              −1 day
+            </button>
+            <button id="calendar-increment" aria-label="Next day" disabled>
+              +1 day
+            </button>
+          </div>
+          <p
+            id="calendar-estimates"
+            class="small"
+            aria-label="Day transition move estimates"
+          ></p>
+          <button id="calendar-set" disabled>Show date</button
           ><button id="calendar-live" class="primary" disabled>
             Live · today
           </button>
+          <div class="calendar-move-counts">
+            <span>Transition moves</span>
+            <output
+              id="calendar-moves"
+              aria-label="Physical transition move progress"
+              >0 / 0 HTM · 0 / 0 cube rotations</output
+            >
+            <p id="calendar-queue" class="small"></p>
+          </div>
           <label for="calendar-speed">Rotation Speed</label
           ><select id="calendar-speed">
             <option value="500">500 ms</option>
