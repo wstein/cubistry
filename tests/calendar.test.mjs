@@ -128,7 +128,7 @@ test("calendar runtime rejects malformed geometry and unsupported moves", () => 
   assert.throws(() => apply(designs[0].printing, "R garbage"));
 });
 
-test("vector artwork retains licensed font, immutable IDs, dimensions and safe glyph widths", () => {
+test("vector artwork retains licensed font, immutable IDs, dimensions and embedded glyphs", () => {
   const art = JSON.parse(readFileSync("assets/calendar/manifest.json", "utf8"));
   const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
   assert.equal(hash(readFileSync(art.font.path)), art.font.sha256);

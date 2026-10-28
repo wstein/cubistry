@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { writeFileSync } from "node:fs";
 test.use({ timezoneId: "Europe/Berlin" });
 async function ready(page, time = "2026-01-03T11:00:00Z") {
   await page.clock.install({ time: new Date(time) });
@@ -21,6 +22,24 @@ async function physical(page) {
     };
   });
 }
+async function artFits(page) {
+  const bad = await page.evaluate(async () => {
+    const { calendarApp } = await import("/src/calendar.mjs");
+    const { stickerArt } = await import("/src/apps/calendar/artwork.ts");
+    const ctx = document.createElement("canvas").getContext("2d");
+    return calendarApp.controller.design.printing
+      .filter((s) => {
+        ctx.font = `600 ${stickerArt(s).size}px "Counter Sans"`;
+        const m = ctx.measureText(s.image);
+        return (
+          m.width > 228 ||
+          m.actualBoundingBoxAscent + m.actualBoundingBoxDescent > 228
+        );
+      })
+      .map((s) => s.image);
+  });
+  expect(bad).toEqual([]);
+}
 test("German A shows a physical weekday/day/month and renders responsively", async ({
   page,
 }) => {
@@ -32,6 +51,7 @@ test("German A shows a physical weekday/day/month and renders responsively", asy
     stickers: 54,
     busy: false,
   });
+  await artFits(page);
   await expect(page.locator("#calendar-digital")).toContainText("2024");
   await expect(page.locator("#calendar-padding-label")).toBeHidden();
   await page.screenshot({
@@ -65,6 +85,7 @@ test("English 3 keeps the day adjacent and removes the zero with legal moves", a
     "0",
     "3",
   ]);
+  await artFits(page);
   const source = await page.evaluate(async () => {
     const { calendarApp } = await import("/src/calendar.mjs");
     return calendarApp.controller.design.printing;
@@ -159,18 +180,34 @@ test("real 3 by 3 animation preserves every legal intermediate pose", async ({
         throw Error("Invalid actual physical move");
       await animate.call(this, from, token, to);
       window.calendarMoves.push({
+        from,
         token,
+        to,
         ok: sameState(this.presentedState, to),
       });
     };
   });
   await page.fill("#calendar-date", "2000-02-29");
   await page.click("#calendar-set");
-  await expect(page.locator("#calendar-state")).toHaveText("Selected date");
+  await expect(page.locator("#calendar-state")).toHaveText("Selected date", {
+    timeout: 15000,
+  });
   expect((await physical(page)).valid).toBe(true);
   const trace = await page.evaluate(() => window.calendarMoves);
   expect(trace.length).toBeGreaterThan(0);
   expect(trace.every((m) => m.ok)).toBe(true);
+  const evidence = await page.evaluate(async () => {
+    const { calendarApp } = await import("/src/calendar.mjs");
+    return {
+      printing: calendarApp.controller.design.printing,
+      moves: window.calendarMoves,
+      target: calendarApp.controller.current,
+    };
+  });
+  writeFileSync(
+    "test-results/calendar-physical-trace.json",
+    JSON.stringify(evidence),
+  );
 });
 test("calendar rejects altered runtime and retains navigation", async ({
   page,
