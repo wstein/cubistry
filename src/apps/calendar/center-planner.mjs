@@ -241,6 +241,7 @@ export function tryCenterPortfolio(
   const started = performance.now();
   const maximumNodes = options.maximumNodes ?? 100000;
   const attempts = [];
+  let improvementSkippedReason;
   let best = tryCenterAware(context, directWord, options);
   let alignmentMoves;
   try {
@@ -274,7 +275,7 @@ export function tryCenterPortfolio(
         18,
         total(best.word) - rotations - 1,
       );
-      if (depth >= 0) {
+      if (depth >= 0 && depth < attempts[0].maximumDepth) {
         const candidate = tryCenterAware(context, best.word, {
           ...options,
           threshold: 0,
@@ -282,6 +283,8 @@ export function tryCenterPortfolio(
         });
         record(candidate, depth, best.word);
         if (total(candidate.word) < total(best.word)) best = candidate;
+      } else {
+        improvementSkippedReason = "native-depth-not-strictly-smaller";
       }
     } catch (error) {
       attempts.push({
@@ -297,6 +300,7 @@ export function tryCenterPortfolio(
     attempts,
     maximumAttempts: 2,
     maximumTotalNodes: maximumNodes * 2,
+    improvementSkippedReason,
   };
 }
 /** Node benchmark entry point. Browsers call the same candidate checker in a worker. */
@@ -353,6 +357,7 @@ export async function createPlanner({ design, options = {} }) {
       maximumTotalNodes: (options.maximumNodes ?? 100000) * maximumAttempts,
       maximumAttempts,
       attempts: planner.lastResult.attempts ?? [],
+      improvementSkippedReason: planner.lastResult.improvementSkippedReason,
       maximumDepth: options.maximumDepth ?? 24,
       centerElapsedMs: planner.lastResult.elapsedMs ?? 0,
       planningElapsedMs: performance.now() - started,
@@ -395,7 +400,7 @@ export async function createPlanner({ design, options = {} }) {
         ? "direct-v1"
         : options.policy === "default"
           ? "default-v1"
-          : "default-then-shorter-cap18-v1",
+          : "default-then-shorter-cap18-v2",
     maximumAttempts,
     maximumTotalNodes: (options.maximumNodes ?? 100000) * maximumAttempts,
     package: "@puzlwerk/solver-3x3-picture@0.1.0",

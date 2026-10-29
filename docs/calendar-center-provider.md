@@ -44,9 +44,13 @@ fixture evidence, not a guarantee for every date or arbitrary starting state.
 
 ## Bounded search portfolio (follow-up)
 
-The `default-then-shorter-cap18-v1` policy retains the original bounded candidate
+The `default-then-shorter-cap18-v2` policy retains the original bounded candidate
 first, then tries a shorter native outer-turn depth: at most 18, at most the
 first candidate's outer HTM minus one, and no more than the configured depth.
+The second call runs only when its effective depth is strictly smaller than the
+first call's effective depth: repeating the same deterministic search with an
+unchanged node ceiling cannot improve an unknown result. Skips are recorded in
+`improvementSkippedReason`.
 Whole-cube alignment rotations are reported separately and do not consume this
 native outer-turn cap. Both attempts retain the same physical replay and exact
 reference requirements. A failed, unknown or non-improving second attempt keeps
