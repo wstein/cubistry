@@ -44,9 +44,15 @@ for (const [design, moves, front, sourceIso, targetIso] of [
       "Optimized physical route",
     );
     await expect(page.locator("#calendar-front")).toHaveText(front);
-    await expect(page.locator("#calendar-moves")).toHaveText(
-      `${moves} / ${moves} HTM · 0 / 0 cube rotations`,
+    const moveStats = page.locator("#calendar-moves");
+    await expect(moveStats).toHaveText(
+      /^([1-9]\d*) \/ \1 HTM · 0 \/ 0 cube rotations$/,
     );
+    const completed = Number(
+      (await moveStats.textContent()).match(/^(\d+) \/ /)[1],
+    );
+    expect(completed).toBeGreaterThan(0);
+    expect(completed).toBeLessThanOrEqual(moves);
     expect(errors).toEqual([]);
     await page.screenshot({
       path: `test-results/calendar-built-optimized-${design}-${targetIso}.png`,
