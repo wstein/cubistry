@@ -1,6 +1,6 @@
 {
   "status": "INVESTIGATION_ONLY",
-  "sourceRevisionPrefix": "f75",
+  "sourceRevision": "f75f47d2de76a156c835af00afc4e8886056314a",
   "sharedProviderRevision": "ffe513c43f5d622810b9a3c9aff2fac88163d0f0",
   "suppliedBy": "calendar_center_integration",
   "description": "Author-supplied raw root-cause and native-depth sweeps. Not the final clean consecutive benchmark or independent proof. Exact long revision and fixture provenance are in consumer tests/fixtures/calendar-portfolio-contexts.json at the final capture revision.",

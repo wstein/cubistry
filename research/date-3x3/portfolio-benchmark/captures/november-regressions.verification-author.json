@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "complete": true,
+  "cases": 30,
+  "series": 18,
+  "providers": [
+    "baseline-center",
+    "portfolio"
+  ],
+  "all54FrameInverseRestorations": 30,
+  "obsoleteSingleTurns": 0,
+  "sourcePrintingUnchanged": true,
+  "candidate54FrameReplays": 30,
+  "retainedFirstProposalChecks": 15,
+  "optimality": "UNKNOWN",
+  "universalMoveBound": "UNKNOWN",
+  "browserTiming": "NOT_MEASURED"
+}

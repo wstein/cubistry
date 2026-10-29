@@ -1,0 +1,8 @@
+{
+  "output": "/tmp/portfolio-final-regressions.json",
+  "complete": true,
+  "cases": 30,
+  "expectedCases": 30,
+  "elapsedMs": 6529.331964999999,
+  "stopReason": null
+}
