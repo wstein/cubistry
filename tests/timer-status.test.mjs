@@ -15,6 +15,32 @@ test("timer movement status compares the logical target to the active transition
     [90, 90, true, 89, "synchronizing"],
     [90, 89, true, null, "moving"],
   ]) {
-    assert.equal(timerMotion({ physical, logical, busy, activeTarget }), expected);
+    assert.equal(
+      timerMotion({ physical, logical, busy, activeTarget }),
+      expected,
+    );
   }
+});
+
+test("late catch-up remains visible when preemption already targets the newest bucket", () => {
+  assert.equal(
+    timerMotion({
+      physical: 90,
+      logical: 88,
+      busy: true,
+      activeTarget: 88,
+      catchingUp: true,
+    }),
+    "synchronizing",
+  );
+  assert.equal(
+    timerMotion({
+      physical: 88,
+      logical: 88,
+      busy: false,
+      activeTarget: 88,
+      catchingUp: true,
+    }),
+    "idle",
+  );
 });
