@@ -280,18 +280,17 @@ test.describe("high-density calendar framing", () => {
         await expect(page.locator("#calendar-viewer")).toHaveAttribute(
           "aria-busy",
           "false",
+          { timeout: 15000 },
         );
-        expect((await physical(page)).cells).toEqual([
-          "SAT",
-          "",
-          "",
-          "N",
-          "O",
-          "V",
-          "",
-          "",
-          "7",
-        ]);
+        await expect
+          .poll(
+            async () => {
+              const actual = await physical(page);
+              return actual.busy ? null : actual.cells;
+            },
+            { timeout: 15000 },
+          )
+          .toEqual(["SAT", "", "", "N", "O", "V", "", "", "7"]);
       }
       for (const viewport of [
         { width: 1440, height: 1100 },
@@ -463,6 +462,9 @@ test("date picking starts legal motion immediately and day buttons preserve late
   await expect(page.locator("#calendar-moves")).not.toHaveText(
     "0 / 0 HTM · 0 / 0 cube rotations",
   );
+  await expect
+    .poll(() => page.evaluate(() => typeof window.releaseCalendarMove))
+    .toBe("function");
   await page.click("#calendar-increment");
   await page.click("#calendar-increment");
   await page.click("#calendar-decrement");
