@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Calendar cubes</title>
-    <script type="module" crossorigin src="/cubistry/pr-preview/pr-65/assets/calendar-kRevXwKC.js"></script>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-65/assets/calendar-C0qpIWzC.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/index-BLm24CbA.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-65/assets/three-CMRukwtc.js">
     <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-65/assets/calendar-VXR3YaGu.css">
     <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-65/assets/style-Gvnaknp7.css">
   </head>
-  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #65 — non-production preview · e38f88722740</aside>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #65 — non-production preview · da835efeb43b</aside>
     <main>
       <header>
         <a class="brand" href="./"
@@ -82,10 +82,7 @@
             class="small"
             aria-label="Day transition move estimates"
           ></p>
-          <button id="calendar-set" disabled>Show date</button
-          ><button id="calendar-live" class="primary" disabled>
-            Live · today
-          </button>
+          <button id="calendar-live" class="primary" disabled>Today</button>
           <div class="calendar-move-counts">
             <span>Transition moves</span>
             <output
@@ -93,6 +90,7 @@
               aria-label="Physical transition move progress"
               >0 / 0 HTM · 0 / 0 cube rotations</output
             >
+            <p id="calendar-route" class="small">Initial display</p>
             <p id="calendar-queue" class="small"></p>
           </div>
           <label for="calendar-speed">Rotation Speed</label
