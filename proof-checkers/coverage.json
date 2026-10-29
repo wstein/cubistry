@@ -3,8 +3,8 @@
   "issue": 74,
   "contract": "proof-checkers/SPEC.md",
   "status": {
-    "Flix": "NOT_IMPLEMENTED",
-    "Julia": "NOT_IMPLEMENTED"
+    "Flix": "IMPLEMENTED_INDEPENDENTLY_REPLAYED",
+    "Julia": "IMPLEMENTED_INDEPENDENTLY_REPLAYED"
   },
   "counter": {
     "cases": 41,
@@ -102,5 +102,17 @@
     "Cubacle-engine-or-adapter-changes",
     "other-language-ports"
   ],
-  "lifecycle": "one fresh process, setup/build separate, first complete two-group conformance plus three fresh-state complete repeats, observed exit tail"
+  "lifecycle": "one fresh process, setup/build separate, first complete two-group conformance plus three fresh-state complete repeats, observed exit tail",
+  "evidence": {
+    "results": "proof-checkers/RESULTS.md",
+    "exportedStates": 2413,
+    "fullStickerFrames": 124302,
+    "geometryWitnessesReplayed": 121,
+    "geometryWitnessOuterHTM": 628,
+    "geometryWitnessWholeRotations": 369,
+    "geometryWitnessRotationQuarterTurns": 469,
+    "aggregateSHA256": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
+    "Julia": "proof-checkers/julia/evidence/provenance.json",
+    "Flix": "proof-checkers/flix/evidence/provenance.json"
+  }
 }
