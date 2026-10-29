@@ -55,15 +55,17 @@ Follow these steps exactly. "Dissent" is defined in step 4.
 2. Never use Python verifiers to confirm a proof or to settle a disagreement, and
    never run them to break a tie.
 3. Never vote. Two of three is not an answer.
-4. Dissent means Flix and Julia differ in accept/reject, in the witness/replay
-   result, or in a hash or count. If that happens: set the result to `UNKNOWN`,
+4. Dissent means Flix and Julia differ from each other, or either differs from
+   the pinned expected outcome, in accept/reject, in the witness/replay result,
+   or in a hash or count. If that happens: set the result to `UNKNOWN`,
    stop, and do not edit either checker to make them agree. Start a root-cause
    investigation by a Claude Opus or Codex Sol agent and write the findings down.
    Only then fix the checker or the spec and rerun BOTH checkers. If only the
    status class differs (for example `UNSUPPORTED` vs `INVALID`) and the
    accept/reject decision is the same, it is NOT a dissent: list it separately
-   and itemize it in [coverage.json](coverage.json) (the ledger has no entry type
-   for it yet; see rule 3 above).
+   and report it to the owner for itemizing in [coverage.json](coverage.json).
+   Do not edit that ledger yourself: it is pinned (step 6) and has no entry type
+   for it yet (rule 3 above).
 5. After a proof review, report: the checkers run, the exact commands, their
    versions, the corpus pin and audit result, the verdict, and class-only
    differences in their own list.
