@@ -1,0 +1,5 @@
+artifact/
+build/
+lib/
+*.jar
+crash_report_*.txt
