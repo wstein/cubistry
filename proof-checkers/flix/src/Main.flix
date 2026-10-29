@@ -52,7 +52,8 @@ def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
             case "state3" :: path :: Nil => stateCommand(path)
             case "conformance" :: root :: Nil => conformanceCommand(root,None)
             case "conformance" :: root :: destination :: Nil => conformanceCommand(root,Some(destination))
-            case _ => throw new IllegalArgumentException("UNSUPPORTED: expected counter, state3, or conformance")
+            case "lifecycle" :: root :: Nil => lifecycleCommand(root)
+            case _ => throw new IllegalArgumentException("UNSUPPORTED: expected counter, state3, conformance, or lifecycle")
         }
     } catch {
         case ex: JsonProcessingException => emitFailure("INVALID_JSON",ex.toString(),1)
