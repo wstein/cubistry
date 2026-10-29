@@ -1,0 +1,5205 @@
+{
+  "schema": "cubistry.print-sheet",
+  "version": 1,
+  "design": "de-a",
+  "size": 3,
+  "stickersPerCube": 54,
+  "copies": 2,
+  "layout": "compact",
+  "stickerCount": 108,
+  "pages": 1,
+  "pageMm": [
+    210,
+    297
+  ],
+  "parameters": {
+    "sizeMm": 16,
+    "gapMm": 4,
+    "bleedMm": 2,
+    "cornerRadiusMm": 1,
+    "safeMm": 1
+  },
+  "cut": {
+    "spotColor": "kiss_cut",
+    "cmyk": [
+      0,
+      1,
+      0,
+      0
+    ],
+    "overprint": true,
+    "strokeMm": 0.1,
+    "method": "kiss-cut; backing remains intact"
+  },
+  "source": {
+    "path": "public/calendar/de-a.json",
+    "sha256": "1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56"
+  },
+  "setupExamples": {
+    "2026-10-29": "y y B2 U2 B' D2 B' R2 B' L2 D2 F' L2 D2 R U' L2 R B2 F' D U R F R' F R F R' F R F R' F R F R' F R F R' F"
+  },
+  "artInputs": {
+    "public/fonts/noto-sans-latin-600.woff2": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed"
+  },
+  "generator": {
+    "path": "scripts/print-sticker-sheets.py",
+    "sha256": "37e37c30de2240e794b0f99f4c5ec226725e3f5c69675310e524ad68f48e72cf",
+    "artInputAdapter": "5e43a14f9648ff45896196b388257954b3f134fedb631e3ff564657ba2f2912a",
+    "tools": {
+      "reportlab": "4.4.9",
+      "fonttools": "4.61.1",
+      "brotli": "1.2.1"
+    }
+  },
+  "font": {
+    "family": "Noto Sans",
+    "weights": [
+      600
+    ],
+    "role": "Calendar glyph outlines",
+    "package": "@fontsource/noto-sans@5.2.10",
+    "license": "SIL-OFL-1.1",
+    "licenseFile": "OFL.txt"
+  },
+  "artworkLicense": {
+    "spdx": "AGPL-3.0-or-later",
+    "file": "ARTWORK-LICENSE.txt"
+  },
+  "orientation": "Outside view of each source face. Positive glyph rotation is clockwise on the sheet.",
+  "providerStatus": "Generic vector export. Confirm size, tolerance, radius, bleed and spot-color requirements with the chosen printer; not a PDF/X certification.",
+  "stickers": [
+    {
+      "id": 14,
+      "cubie": 6,
+      "face": "U",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "F",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 18,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-14",
+      "sheetRow": 0,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        98.43199999999999,
+        78.23199999999999,
+        166.47199999999998,
+        198.184
+      ],
+      "cutPathMm": "M11 18H25C25.552285 18 26 18.447715 26 19V33C26 33.552285 25.552285 34 25 34H11C10.447715 34 10 33.552285 10 33V19C10 18.447715 10.447715 18 11 18Z"
+    },
+    {
+      "id": 28,
+      "cubie": 14,
+      "face": "U",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "0",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 18,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-28",
+      "sheetRow": 0,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.84,
+        76.38399999999999,
+        168.99200000000002,
+        199.864
+      ],
+      "cutPathMm": "M31 18H45C45.552285 18 46 18.447715 46 19V33C46 33.552285 45.552285 34 45 34H31C30.447715 34 30 33.552285 30 33V19C30 18.447715 30.447715 18 31 18Z"
+    },
+    {
+      "id": 47,
+      "cubie": 23,
+      "face": "U",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "G",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 18,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-47",
+      "sheetRow": 0,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        76.928,
+        76.55199999999999,
+        175.88,
+        199.864
+      ],
+      "cutPathMm": "M51 18H65C65.552285 18 66 18.447715 66 19V33C66 33.552285 65.552285 34 65 34H51C50.447715 34 50 33.552285 50 33V19C50 18.447715 50.447715 18 51 18Z"
+    },
+    {
+      "id": 17,
+      "cubie": 7,
+      "face": "U",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        0
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "P",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 18,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-17",
+      "sheetRow": 0,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        91.292,
+        78.23199999999999,
+        172.10000000000002,
+        198.184
+      ],
+      "cutPathMm": "M71 18H85C85.552285 18 86 18.447715 86 19V33C86 33.552285 85.552285 34 85 34H71C70.447715 34 70 33.552285 70 33V19C70 18.447715 70.447715 18 71 18Z"
+    },
+    {
+      "id": 30,
+      "cubie": 15,
+      "face": "U",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 18,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-30",
+      "sheetRow": 0,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M91 18H105C105.552285 18 106 18.447715 106 19V33C106 33.552285 105.552285 34 105 34H91C90.447715 34 90 33.552285 90 33V19C90 18.447715 90.447715 18 91 18Z"
+    },
+    {
+      "id": 50,
+      "cubie": 24,
+      "face": "U",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 18,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-50",
+      "sheetRow": 0,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M111 18H125C125.552285 18 126 18.447715 126 19V33C126 33.552285 125.552285 34 125 34H111C110.447715 34 110 33.552285 110 33V19C110 18.447715 110.447715 18 111 18Z"
+    },
+    {
+      "id": 19,
+      "cubie": 8,
+      "face": "U",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "S",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 18,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-19",
+      "sheetRow": 0,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.864,
+        76.55199999999999,
+        167.144,
+        199.864
+      ],
+      "cutPathMm": "M131 18H145C145.552285 18 146 18.447715 146 19V33C146 33.552285 145.552285 34 145 34H131C130.447715 34 130 33.552285 130 33V19C130 18.447715 130.447715 18 131 18Z"
+    },
+    {
+      "id": 31,
+      "cubie": 16,
+      "face": "U",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "2",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 18,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-31",
+      "sheetRow": 0,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        87.176,
+        76.55199999999999,
+        169.328,
+        198.184
+      ],
+      "cutPathMm": "M151 18H165C165.552285 18 166 18.447715 166 19V33C166 33.552285 165.552285 34 165 34H151C150.447715 34 150 33.552285 150 33V19C150 18.447715 150.447715 18 151 18Z"
+    },
+    {
+      "id": 52,
+      "cubie": 25,
+      "face": "U",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "V",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 18,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-52",
+      "sheetRow": 0,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        74.996,
+        78.23199999999999,
+        181.00400000000002,
+        198.184
+      ],
+      "cutPathMm": "M171 18H185C185.552285 18 186 18.447715 186 19V33C186 33.552285 185.552285 34 185 34H171C170.447715 34 170 33.552285 170 33V19C170 18.447715 170.447715 18 171 18Z"
+    },
+    {
+      "id": 13,
+      "cubie": 6,
+      "face": "L",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "J",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 38,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-13",
+      "sheetRow": 1,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.276,
+        78.23199999999999,
+        138.836,
+        232.12
+      ],
+      "cutPathMm": "M11 38H25C25.552285 38 26 38.447715 26 39V53C26 53.552285 25.552285 54 25 54H11C10.447715 54 10 53.552285 10 53V39C10 38.447715 10.447715 38 11 38Z"
+    },
+    {
+      "id": 16,
+      "cubie": 7,
+      "face": "L",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "Ä",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 38,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-16",
+      "sheetRow": 1,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.55199999999999,
+        44.29600000000001,
+        184.28,
+        198.184
+      ],
+      "cutPathMm": "M31 38H45C45.552285 38 46 38.447715 46 39V53C46 53.552285 45.552285 54 45 54H31C30.447715 54 30 53.552285 30 53V39C30 38.447715 30.447715 38 31 38Z"
+    },
+    {
+      "id": 18,
+      "cubie": 8,
+      "face": "L",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "A",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 38,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-18",
+      "sheetRow": 1,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.55199999999999,
+        77.728,
+        184.28,
+        198.184
+      ],
+      "cutPathMm": "M51 38H65C65.552285 38 66 38.447715 66 39V53C66 53.552285 65.552285 54 65 54H51C50.447715 54 50 53.552285 50 53V39C50 38.447715 50.447715 38 51 38Z"
+    },
+    {
+      "id": 8,
+      "cubie": 3,
+      "face": "L",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "R",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 38,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-8",
+      "sheetRow": 1,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        88.94,
+        78.23199999999999,
+        181.17200000000003,
+        198.184
+      ],
+      "cutPathMm": "M71 38H85C85.552285 38 86 38.447715 86 39V53C86 53.552285 85.552285 54 85 54H71C70.447715 54 70 53.552285 70 53V39C70 38.447715 70.447715 38 71 38Z"
+    },
+    {
+      "id": 10,
+      "cubie": 4,
+      "face": "L",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        0
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "0",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 38,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-10",
+      "sheetRow": 1,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.84,
+        76.38399999999999,
+        168.99200000000002,
+        199.864
+      ],
+      "cutPathMm": "M91 38H105C105.552285 38 106 38.447715 106 39V53C106 53.552285 105.552285 54 105 54H91C90.447715 54 90 53.552285 90 53V39C90 38.447715 90.447715 38 91 38Z"
+    },
+    {
+      "id": 11,
+      "cubie": 5,
+      "face": "L",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "A",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 38,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-11",
+      "sheetRow": 1,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.55199999999999,
+        77.728,
+        184.28,
+        198.184
+      ],
+      "cutPathMm": "M111 38H125C125.552285 38 126 38.447715 126 39V53C126 53.552285 125.552285 54 125 54H111C110.447715 54 110 53.552285 110 53V39C110 38.447715 110.447715 38 111 38Z"
+    },
+    {
+      "id": 0,
+      "cubie": 0,
+      "face": "L",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "M",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 38,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-0",
+      "sheetRow": 1,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        65.588,
+        78.23199999999999,
+        190.58,
+        198.184
+      ],
+      "cutPathMm": "M131 38H145C145.552285 38 146 38.447715 146 39V53C146 53.552285 145.552285 54 145 54H131C130.447715 54 130 53.552285 130 53V39C130 38.447715 130.447715 38 131 38Z"
+    },
+    {
+      "id": 3,
+      "cubie": 1,
+      "face": "L",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "O",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 38,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-3",
+      "sheetRow": 1,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.46799999999999,
+        76.38399999999999,
+        184.53199999999998,
+        199.864
+      ],
+      "cutPathMm": "M151 38H165C165.552285 38 166 38.447715 166 39V53C166 53.552285 165.552285 54 165 54H151C150.447715 54 150 53.552285 150 53V39C150 38.447715 150.447715 38 151 38Z"
+    },
+    {
+      "id": 5,
+      "cubie": 2,
+      "face": "L",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "F",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 38,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-5",
+      "sheetRow": 1,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        98.43199999999999,
+        78.23199999999999,
+        166.47199999999998,
+        198.184
+      ],
+      "cutPathMm": "M171 38H185C185.552285 38 186 38.447715 186 39V53C186 53.552285 185.552285 54 185 54H171C170.447715 54 170 53.552285 170 53V39C170 38.447715 170.447715 38 171 38Z"
+    },
+    {
+      "id": 20,
+      "cubie": 8,
+      "face": "F",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "O",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 58,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-20",
+      "sheetRow": 2,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.46799999999999,
+        76.38399999999999,
+        184.53199999999998,
+        199.864
+      ],
+      "cutPathMm": "M11 58H25C25.552285 58 26 58.447715 26 59V73C26 73.552285 25.552285 74 25 74H11C10.447715 74 10 73.552285 10 73V59C10 58.447715 10.447715 58 11 58Z"
+    },
+    {
+      "id": 32,
+      "cubie": 16,
+      "face": "F",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "3",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 58,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-32",
+      "sheetRow": 2,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.84,
+        76.55199999999999,
+        168.32,
+        199.864
+      ],
+      "cutPathMm": "M31 58H45C45.552285 58 46 58.447715 46 59V73C46 73.552285 45.552285 74 45 74H31C30.447715 74 30 73.552285 30 73V59C30 58.447715 30.447715 58 31 58Z"
+    },
+    {
+      "id": 53,
+      "cubie": 25,
+      "face": "F",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "Z",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 58,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-53",
+      "sheetRow": 2,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        84.488,
+        78.23199999999999,
+        171.512,
+        198.184
+      ],
+      "cutPathMm": "M51 58H65C65.552285 58 66 58.447715 66 59V73C66 73.552285 65.552285 74 65 74H51C50.447715 74 50 73.552285 50 73V59C50 58.447715 50.447715 58 51 58Z"
+    },
+    {
+      "id": 12,
+      "cubie": 5,
+      "face": "F",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "E",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 58,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-12",
+      "sheetRow": 2,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        96.752,
+        78.23199999999999,
+        164.96,
+        198.184
+      ],
+      "cutPathMm": "M71 58H85C85.552285 58 86 58.447715 86 59V73C86 73.552285 85.552285 74 85 74H71C70.447715 74 70 73.552285 70 73V59C70 58.447715 70.447715 58 71 58Z"
+    },
+    {
+      "id": 27,
+      "cubie": 13,
+      "face": "F",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        0,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "3",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 58,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-27",
+      "sheetRow": 2,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.84,
+        76.55199999999999,
+        168.32,
+        199.864
+      ],
+      "cutPathMm": "M91 58H105C105.552285 58 106 58.447715 106 59V73C106 73.552285 105.552285 74 105 74H91C90.447715 74 90 73.552285 90 73V59C90 58.447715 90.447715 58 91 58Z"
+    },
+    {
+      "id": 45,
+      "cubie": 22,
+      "face": "F",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "9",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 58,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-45",
+      "sheetRow": 2,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.504,
+        76.71999999999998,
+        168.99200000000002,
+        199.864
+      ],
+      "cutPathMm": "M111 58H125C125.552285 58 126 58.447715 126 59V73C126 73.552285 125.552285 74 125 74H111C110.447715 74 110 73.552285 110 73V59C110 58.447715 110.447715 58 111 58Z"
+    },
+    {
+      "id": 7,
+      "cubie": 2,
+      "face": "F",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 58,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-7",
+      "sheetRow": 2,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M131 58H145C145.552285 58 146 58.447715 146 59V73C146 73.552285 145.552285 74 145 74H131C130.447715 74 130 73.552285 130 73V59C130 58.447715 130.447715 58 131 58Z"
+    },
+    {
+      "id": 25,
+      "cubie": 11,
+      "face": "F",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "O",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 58,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-25",
+      "sheetRow": 2,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.46799999999999,
+        76.38399999999999,
+        184.53199999999998,
+        199.864
+      ],
+      "cutPathMm": "M151 58H165C165.552285 58 166 58.447715 166 59V73C166 73.552285 165.552285 74 165 74H151C150.447715 74 150 73.552285 150 73V59C150 58.447715 150.447715 58 151 58Z"
+    },
+    {
+      "id": 40,
+      "cubie": 19,
+      "face": "F",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "I",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 58,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-40",
+      "sheetRow": 2,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        102.8,
+        78.23199999999999,
+        153.2,
+        198.184
+      ],
+      "cutPathMm": "M171 58H185C185.552285 58 186 58.447715 186 59V73C186 73.552285 185.552285 74 185 74H171C170.447715 74 170 73.552285 170 73V59C170 58.447715 170.447715 58 171 58Z"
+    },
+    {
+      "id": 51,
+      "cubie": 25,
+      "face": "R",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "T",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 78,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-51",
+      "sheetRow": 3,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        82.892,
+        78.23199999999999,
+        173.108,
+        198.184
+      ],
+      "cutPathMm": "M11 78H25C25.552285 78 26 78.447715 26 79V93C26 93.552285 25.552285 94 25 94H11C10.447715 94 10 93.552285 10 93V79C10 78.447715 10.447715 78 11 78Z"
+    },
+    {
+      "id": 49,
+      "cubie": 24,
+      "face": "R",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 78,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-49",
+      "sheetRow": 3,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M31 78H45C45.552285 78 46 78.447715 46 79V93C46 93.552285 45.552285 94 45 94H31C30.447715 94 30 93.552285 30 93V79C30 78.447715 30.447715 78 31 78Z"
+    },
+    {
+      "id": 46,
+      "cubie": 23,
+      "face": "R",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "L",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 78,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-46",
+      "sheetRow": 3,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        97.088,
+        78.23199999999999,
+        168.824,
+        198.184
+      ],
+      "cutPathMm": "M51 78H65C65.552285 78 66 78.447715 66 79V93C66 93.552285 65.552285 94 65 94H51C50.447715 94 50 93.552285 50 93V79C50 78.447715 50.447715 78 51 78Z"
+    },
+    {
+      "id": 44,
+      "cubie": 22,
+      "face": "R",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "8",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 78,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-44",
+      "sheetRow": 3,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.672,
+        76.71999999999998,
+        169.16000000000003,
+        199.864
+      ],
+      "cutPathMm": "M71 78H85C85.552285 78 86 78.447715 86 79V93C86 93.552285 85.552285 94 85 94H71C70.447715 94 70 93.552285 70 93V79C70 78.447715 70.447715 78 71 78Z"
+    },
+    {
+      "id": 43,
+      "cubie": 21,
+      "face": "R",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        0
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 78,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-43",
+      "sheetRow": 3,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M91 78H105C105.552285 78 106 78.447715 106 79V93C106 93.552285 105.552285 94 105 94H91C90.447715 94 90 93.552285 90 93V79C90 78.447715 90.447715 78 91 78Z"
+    },
+    {
+      "id": 41,
+      "cubie": 20,
+      "face": "R",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "6",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 78,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-41",
+      "sheetRow": 3,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        87.176,
+        76.71999999999998,
+        169.664,
+        199.864
+      ],
+      "cutPathMm": "M111 78H125C125.552285 78 126 78.447715 126 79V93C126 93.552285 125.552285 94 125 94H111C110.447715 94 110 93.552285 110 93V79C110 78.447715 110.447715 78 111 78Z"
+    },
+    {
+      "id": 38,
+      "cubie": 19,
+      "face": "R",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "N",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 78,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-38",
+      "sheetRow": 3,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        77.01199999999999,
+        78.23199999999999,
+        178.988,
+        198.184
+      ],
+      "cutPathMm": "M131 78H145C145.552285 78 146 78.447715 146 79V93C146 93.552285 145.552285 94 145 94H131C130.447715 94 130 93.552285 130 93V79C130 78.447715 130.447715 78 131 78Z"
+    },
+    {
+      "id": 36,
+      "cubie": 18,
+      "face": "R",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "4",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 78,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-36",
+      "sheetRow": 3,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        83.144,
+        77.89599999999999,
+        173.024,
+        198.184
+      ],
+      "cutPathMm": "M151 78H165C165.552285 78 166 78.447715 166 79V93C166 93.552285 165.552285 94 165 94H151C150.447715 94 150 93.552285 150 93V79C150 78.447715 150.447715 78 151 78Z"
+    },
+    {
+      "id": 33,
+      "cubie": 17,
+      "face": "R",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "N",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 78,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-33",
+      "sheetRow": 3,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        77.01199999999999,
+        78.23199999999999,
+        178.988,
+        198.184
+      ],
+      "cutPathMm": "M171 78H185C185.552285 78 186 78.447715 186 79V93C186 93.552285 185.552285 94 185 94H171C170.447715 94 170 93.552285 170 93V79C170 78.447715 170.447715 78 171 78Z"
+    },
+    {
+      "id": 48,
+      "cubie": 23,
+      "face": "B",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "P",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 98,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-48",
+      "sheetRow": 4,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        91.292,
+        78.23199999999999,
+        172.10000000000002,
+        198.184
+      ],
+      "cutPathMm": "M11 98H25C25.552285 98 26 98.447715 26 99V113C26 113.552285 25.552285 114 25 114H11C10.447715 114 10 113.552285 10 113V99C10 98.447715 10.447715 98 11 98Z"
+    },
+    {
+      "id": 29,
+      "cubie": 14,
+      "face": "B",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "1",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 98,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-29",
+      "sheetRow": 4,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        91.712,
+        78.23199999999999,
+        145.64,
+        198.184
+      ],
+      "cutPathMm": "M31 98H45C45.552285 98 46 98.447715 46 99V113C46 113.552285 45.552285 114 45 114H31C30.447715 114 30 113.552285 30 113V99C30 98.447715 30.447715 98 31 98Z"
+    },
+    {
+      "id": 15,
+      "cubie": 6,
+      "face": "B",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "M",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 98,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-15",
+      "sheetRow": 4,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        65.588,
+        78.23199999999999,
+        190.58,
+        198.184
+      ],
+      "cutPathMm": "M51 98H65C65.552285 98 66 98.447715 66 99V113C66 113.552285 65.552285 114 65 114H51C50.447715 114 50 113.552285 50 113V99C50 98.447715 50.447715 98 51 98Z"
+    },
+    {
+      "id": 42,
+      "cubie": 20,
+      "face": "B",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "7",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 98,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-42",
+      "sheetRow": 4,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        85.496,
+        78.23199999999999,
+        169.496,
+        198.184
+      ],
+      "cutPathMm": "M71 98H85C85.552285 98 86 98.447715 86 99V113C86 113.552285 85.552285 114 85 114H71C70.447715 114 70 113.552285 70 113V99C70 98.447715 70.447715 98 71 98Z"
+    },
+    {
+      "id": 26,
+      "cubie": 12,
+      "face": "B",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "2",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 98,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-26",
+      "sheetRow": 4,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": [
+        87.176,
+        76.55199999999999,
+        169.328,
+        198.184
+      ],
+      "cutPathMm": "M91 98H105C105.552285 98 106 98.447715 106 99V113C106 113.552285 105.552285 114 105 114H91C90.447715 114 90 113.552285 90 113V99C90 98.447715 90.447715 98 91 98Z"
+    },
+    {
+      "id": 9,
+      "cubie": 3,
+      "face": "B",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "A",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 98,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-9",
+      "sheetRow": 4,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.55199999999999,
+        77.728,
+        184.28,
+        198.184
+      ],
+      "cutPathMm": "M111 98H125C125.552285 98 126 98.447715 126 99V113C126 113.552285 125.552285 114 125 114H111C110.447715 114 110 113.552285 110 113V99C110 98.447715 110.447715 98 111 98Z"
+    },
+    {
+      "id": 35,
+      "cubie": 17,
+      "face": "B",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "R",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 98,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-35",
+      "sheetRow": 4,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        88.94,
+        78.23199999999999,
+        181.17200000000003,
+        198.184
+      ],
+      "cutPathMm": "M131 98H145C145.552285 98 146 98.447715 146 99V113C146 113.552285 145.552285 114 145 114H131C130.447715 114 130 113.552285 130 113V99C130 98.447715 130.447715 98 131 98Z"
+    },
+    {
+      "id": 22,
+      "cubie": 9,
+      "face": "B",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "K",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 98,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-22",
+      "sheetRow": 4,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.27599999999998,
+        78.23199999999999,
+        182.348,
+        198.184
+      ],
+      "cutPathMm": "M151 98H165C165.552285 98 166 98.447715 166 99V113C166 113.552285 165.552285 114 165 114H151C150.447715 114 150 113.552285 150 113V99C150 98.447715 150.447715 98 151 98Z"
+    },
+    {
+      "id": 2,
+      "cubie": 0,
+      "face": "B",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 98,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-2",
+      "sheetRow": 4,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M171 98H185C185.552285 98 186 98.447715 186 99V113C186 113.552285 185.552285 114 185 114H171C170.447715 114 170 113.552285 170 113V99C170 98.447715 170.447715 98 171 98Z"
+    },
+    {
+      "id": 6,
+      "cubie": 2,
+      "face": "D",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "S",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 118,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-6",
+      "sheetRow": 5,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.864,
+        76.55199999999999,
+        167.144,
+        199.864
+      ],
+      "cutPathMm": "M11 118H25C25.552285 118 26 118.447715 26 119V133C26 133.552285 25.552285 134 25 134H11C10.447715 134 10 133.552285 10 133V119C10 118.447715 10.447715 118 11 118Z"
+    },
+    {
+      "id": 24,
+      "cubie": 11,
+      "face": "D",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "O",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 118,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-24",
+      "sheetRow": 5,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.46799999999999,
+        76.38399999999999,
+        184.53199999999998,
+        199.864
+      ],
+      "cutPathMm": "M31 118H45C45.552285 118 46 118.447715 46 119V133C46 133.552285 45.552285 134 45 134H31C30.447715 134 30 133.552285 30 133V119C30 118.447715 30.447715 118 31 118Z"
+    },
+    {
+      "id": 39,
+      "cubie": 19,
+      "face": "D",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "B",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 118,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-39",
+      "sheetRow": 5,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        87.596,
+        78.23199999999999,
+        174.788,
+        198.184
+      ],
+      "cutPathMm": "M51 118H65C65.552285 118 66 118.447715 66 119V133C66 133.552285 65.552285 134 65 134H51C50.447715 134 50 133.552285 50 133V119C50 118.447715 50.447715 118 51 118Z"
+    },
+    {
+      "id": 4,
+      "cubie": 1,
+      "face": "D",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "I",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 118,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-4",
+      "sheetRow": 5,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        102.8,
+        78.23199999999999,
+        153.2,
+        198.184
+      ],
+      "cutPathMm": "M71 118H85C85.552285 118 86 118.447715 86 119V133C86 133.552285 85.552285 134 85 134H71C70.447715 134 70 133.552285 70 133V119C70 118.447715 70.447715 118 71 118Z"
+    },
+    {
+      "id": 23,
+      "cubie": 10,
+      "face": "D",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "1",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 118,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-23",
+      "sheetRow": 5,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": [
+        91.712,
+        78.23199999999999,
+        145.64,
+        198.184
+      ],
+      "cutPathMm": "M91 118H105C105.552285 118 106 118.447715 106 119V133C106 133.552285 105.552285 134 105 134H91C90.447715 134 90 133.552285 90 133V119C90 118.447715 90.447715 118 91 118Z"
+    },
+    {
+      "id": 37,
+      "cubie": 18,
+      "face": "D",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "5",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 118,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-37",
+      "sheetRow": 5,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.024,
+        78.23199999999999,
+        167.64800000000002,
+        199.864
+      ],
+      "cutPathMm": "M111 118H125C125.552285 118 126 118.447715 126 119V133C126 133.552285 125.552285 134 125 134H111C110.447715 134 110 133.552285 110 133V119C110 118.447715 110.447715 118 111 118Z"
+    },
+    {
+      "id": 1,
+      "cubie": 0,
+      "face": "D",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "D",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 118,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-1",
+      "sheetRow": 5,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        81.464,
+        78.23199999999999,
+        179.74400000000003,
+        198.184
+      ],
+      "cutPathMm": "M131 118H145C145.552285 118 146 118.447715 146 119V133C146 133.552285 145.552285 134 145 134H131C130.447715 134 130 133.552285 130 133V119C130 118.447715 130.447715 118 131 118Z"
+    },
+    {
+      "id": 21,
+      "cubie": 9,
+      "face": "D",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "U",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 118,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-21",
+      "sheetRow": 5,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        79.868,
+        78.23199999999999,
+        175.964,
+        199.864
+      ],
+      "cutPathMm": "M151 118H165C165.552285 118 166 118.447715 166 119V133C166 133.552285 165.552285 134 165 134H151C150.447715 134 150 133.552285 150 133V119C150 118.447715 150.447715 118 151 118Z"
+    },
+    {
+      "id": 34,
+      "cubie": 17,
+      "face": "D",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "D",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 118,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 1,
+      "uid": "copy-1-sticker-34",
+      "sheetRow": 5,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        81.464,
+        78.23199999999999,
+        179.74400000000003,
+        198.184
+      ],
+      "cutPathMm": "M171 118H185C185.552285 118 186 118.447715 186 119V133C186 133.552285 185.552285 134 185 134H171C170.447715 134 170 133.552285 170 133V119C170 118.447715 170.447715 118 171 118Z"
+    },
+    {
+      "id": 14,
+      "cubie": 6,
+      "face": "U",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "F",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 138,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-14",
+      "sheetRow": 6,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        98.43199999999999,
+        78.23199999999999,
+        166.47199999999998,
+        198.184
+      ],
+      "cutPathMm": "M11 138H25C25.552285 138 26 138.447715 26 139V153C26 153.552285 25.552285 154 25 154H11C10.447715 154 10 153.552285 10 153V139C10 138.447715 10.447715 138 11 138Z"
+    },
+    {
+      "id": 28,
+      "cubie": 14,
+      "face": "U",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "0",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 138,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-28",
+      "sheetRow": 6,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.84,
+        76.38399999999999,
+        168.99200000000002,
+        199.864
+      ],
+      "cutPathMm": "M31 138H45C45.552285 138 46 138.447715 46 139V153C46 153.552285 45.552285 154 45 154H31C30.447715 154 30 153.552285 30 153V139C30 138.447715 30.447715 138 31 138Z"
+    },
+    {
+      "id": 47,
+      "cubie": 23,
+      "face": "U",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "G",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 138,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-47",
+      "sheetRow": 6,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        76.928,
+        76.55199999999999,
+        175.88,
+        199.864
+      ],
+      "cutPathMm": "M51 138H65C65.552285 138 66 138.447715 66 139V153C66 153.552285 65.552285 154 65 154H51C50.447715 154 50 153.552285 50 153V139C50 138.447715 50.447715 138 51 138Z"
+    },
+    {
+      "id": 17,
+      "cubie": 7,
+      "face": "U",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        0
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "P",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 138,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-17",
+      "sheetRow": 6,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        91.292,
+        78.23199999999999,
+        172.10000000000002,
+        198.184
+      ],
+      "cutPathMm": "M71 138H85C85.552285 138 86 138.447715 86 139V153C86 153.552285 85.552285 154 85 154H71C70.447715 154 70 153.552285 70 153V139C70 138.447715 70.447715 138 71 138Z"
+    },
+    {
+      "id": 30,
+      "cubie": 15,
+      "face": "U",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 138,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-30",
+      "sheetRow": 6,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M91 138H105C105.552285 138 106 138.447715 106 139V153C106 153.552285 105.552285 154 105 154H91C90.447715 154 90 153.552285 90 153V139C90 138.447715 90.447715 138 91 138Z"
+    },
+    {
+      "id": 50,
+      "cubie": 24,
+      "face": "U",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 138,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-50",
+      "sheetRow": 6,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M111 138H125C125.552285 138 126 138.447715 126 139V153C126 153.552285 125.552285 154 125 154H111C110.447715 154 110 153.552285 110 153V139C110 138.447715 110.447715 138 111 138Z"
+    },
+    {
+      "id": 19,
+      "cubie": 8,
+      "face": "U",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "S",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 138,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-19",
+      "sheetRow": 6,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.864,
+        76.55199999999999,
+        167.144,
+        199.864
+      ],
+      "cutPathMm": "M131 138H145C145.552285 138 146 138.447715 146 139V153C146 153.552285 145.552285 154 145 154H131C130.447715 154 130 153.552285 130 153V139C130 138.447715 130.447715 138 131 138Z"
+    },
+    {
+      "id": 31,
+      "cubie": 16,
+      "face": "U",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "2",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 138,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-31",
+      "sheetRow": 6,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        87.176,
+        76.55199999999999,
+        169.328,
+        198.184
+      ],
+      "cutPathMm": "M151 138H165C165.552285 138 166 138.447715 166 139V153C166 153.552285 165.552285 154 165 154H151C150.447715 154 150 153.552285 150 153V139C150 138.447715 150.447715 138 151 138Z"
+    },
+    {
+      "id": 52,
+      "cubie": 25,
+      "face": "U",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        -1
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "V",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 138,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-52",
+      "sheetRow": 6,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        74.996,
+        78.23199999999999,
+        181.00400000000002,
+        198.184
+      ],
+      "cutPathMm": "M171 138H185C185.552285 138 186 138.447715 186 139V153C186 153.552285 185.552285 154 185 154H171C170.447715 154 170 153.552285 170 153V139C170 138.447715 170.447715 138 171 138Z"
+    },
+    {
+      "id": 13,
+      "cubie": 6,
+      "face": "L",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "J",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 158,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-13",
+      "sheetRow": 7,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.276,
+        78.23199999999999,
+        138.836,
+        232.12
+      ],
+      "cutPathMm": "M11 158H25C25.552285 158 26 158.447715 26 159V173C26 173.552285 25.552285 174 25 174H11C10.447715 174 10 173.552285 10 173V159C10 158.447715 10.447715 158 11 158Z"
+    },
+    {
+      "id": 16,
+      "cubie": 7,
+      "face": "L",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "Ä",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 158,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-16",
+      "sheetRow": 7,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.55199999999999,
+        44.29600000000001,
+        184.28,
+        198.184
+      ],
+      "cutPathMm": "M31 158H45C45.552285 158 46 158.447715 46 159V173C46 173.552285 45.552285 174 45 174H31C30.447715 174 30 173.552285 30 173V159C30 158.447715 30.447715 158 31 158Z"
+    },
+    {
+      "id": 18,
+      "cubie": 8,
+      "face": "L",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "A",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 158,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-18",
+      "sheetRow": 7,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.55199999999999,
+        77.728,
+        184.28,
+        198.184
+      ],
+      "cutPathMm": "M51 158H65C65.552285 158 66 158.447715 66 159V173C66 173.552285 65.552285 174 65 174H51C50.447715 174 50 173.552285 50 173V159C50 158.447715 50.447715 158 51 158Z"
+    },
+    {
+      "id": 8,
+      "cubie": 3,
+      "face": "L",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "R",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 158,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-8",
+      "sheetRow": 7,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        88.94,
+        78.23199999999999,
+        181.17200000000003,
+        198.184
+      ],
+      "cutPathMm": "M71 158H85C85.552285 158 86 158.447715 86 159V173C86 173.552285 85.552285 174 85 174H71C70.447715 174 70 173.552285 70 173V159C70 158.447715 70.447715 158 71 158Z"
+    },
+    {
+      "id": 10,
+      "cubie": 4,
+      "face": "L",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        0
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "0",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 158,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-10",
+      "sheetRow": 7,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.84,
+        76.38399999999999,
+        168.99200000000002,
+        199.864
+      ],
+      "cutPathMm": "M91 158H105C105.552285 158 106 158.447715 106 159V173C106 173.552285 105.552285 174 105 174H91C90.447715 174 90 173.552285 90 173V159C90 158.447715 90.447715 158 91 158Z"
+    },
+    {
+      "id": 11,
+      "cubie": 5,
+      "face": "L",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "A",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 158,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-11",
+      "sheetRow": 7,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.55199999999999,
+        77.728,
+        184.28,
+        198.184
+      ],
+      "cutPathMm": "M111 158H125C125.552285 158 126 158.447715 126 159V173C126 173.552285 125.552285 174 125 174H111C110.447715 174 110 173.552285 110 173V159C110 158.447715 110.447715 158 111 158Z"
+    },
+    {
+      "id": 0,
+      "cubie": 0,
+      "face": "L",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "M",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 158,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-0",
+      "sheetRow": 7,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        65.588,
+        78.23199999999999,
+        190.58,
+        198.184
+      ],
+      "cutPathMm": "M131 158H145C145.552285 158 146 158.447715 146 159V173C146 173.552285 145.552285 174 145 174H131C130.447715 174 130 173.552285 130 173V159C130 158.447715 130.447715 158 131 158Z"
+    },
+    {
+      "id": 3,
+      "cubie": 1,
+      "face": "L",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "O",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 158,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-3",
+      "sheetRow": 7,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.46799999999999,
+        76.38399999999999,
+        184.53199999999998,
+        199.864
+      ],
+      "cutPathMm": "M151 158H165C165.552285 158 166 158.447715 166 159V173C166 173.552285 165.552285 174 165 174H151C150.447715 174 150 173.552285 150 173V159C150 158.447715 150.447715 158 151 158Z"
+    },
+    {
+      "id": 5,
+      "cubie": 2,
+      "face": "L",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "F",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 158,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-5",
+      "sheetRow": 7,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        98.43199999999999,
+        78.23199999999999,
+        166.47199999999998,
+        198.184
+      ],
+      "cutPathMm": "M171 158H185C185.552285 158 186 158.447715 186 159V173C186 173.552285 185.552285 174 185 174H171C170.447715 174 170 173.552285 170 173V159C170 158.447715 170.447715 158 171 158Z"
+    },
+    {
+      "id": 20,
+      "cubie": 8,
+      "face": "F",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "O",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 178,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-20",
+      "sheetRow": 8,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.46799999999999,
+        76.38399999999999,
+        184.53199999999998,
+        199.864
+      ],
+      "cutPathMm": "M11 178H25C25.552285 178 26 178.447715 26 179V193C26 193.552285 25.552285 194 25 194H11C10.447715 194 10 193.552285 10 193V179C10 178.447715 10.447715 178 11 178Z"
+    },
+    {
+      "id": 32,
+      "cubie": 16,
+      "face": "F",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "3",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 178,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-32",
+      "sheetRow": 8,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.84,
+        76.55199999999999,
+        168.32,
+        199.864
+      ],
+      "cutPathMm": "M31 178H45C45.552285 178 46 178.447715 46 179V193C46 193.552285 45.552285 194 45 194H31C30.447715 194 30 193.552285 30 193V179C30 178.447715 30.447715 178 31 178Z"
+    },
+    {
+      "id": 53,
+      "cubie": 25,
+      "face": "F",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "Z",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 178,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-53",
+      "sheetRow": 8,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        84.488,
+        78.23199999999999,
+        171.512,
+        198.184
+      ],
+      "cutPathMm": "M51 178H65C65.552285 178 66 178.447715 66 179V193C66 193.552285 65.552285 194 65 194H51C50.447715 194 50 193.552285 50 193V179C50 178.447715 50.447715 178 51 178Z"
+    },
+    {
+      "id": 12,
+      "cubie": 5,
+      "face": "F",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "E",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 178,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-12",
+      "sheetRow": 8,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        96.752,
+        78.23199999999999,
+        164.96,
+        198.184
+      ],
+      "cutPathMm": "M71 178H85C85.552285 178 86 178.447715 86 179V193C86 193.552285 85.552285 194 85 194H71C70.447715 194 70 193.552285 70 193V179C70 178.447715 70.447715 178 71 178Z"
+    },
+    {
+      "id": 27,
+      "cubie": 13,
+      "face": "F",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        0,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "3",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 178,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-27",
+      "sheetRow": 8,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.84,
+        76.55199999999999,
+        168.32,
+        199.864
+      ],
+      "cutPathMm": "M91 178H105C105.552285 178 106 178.447715 106 179V193C106 193.552285 105.552285 194 105 194H91C90.447715 194 90 193.552285 90 193V179C90 178.447715 90.447715 178 91 178Z"
+    },
+    {
+      "id": 45,
+      "cubie": 22,
+      "face": "F",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "9",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 178,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-45",
+      "sheetRow": 8,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.504,
+        76.71999999999998,
+        168.99200000000002,
+        199.864
+      ],
+      "cutPathMm": "M111 178H125C125.552285 178 126 178.447715 126 179V193C126 193.552285 125.552285 194 125 194H111C110.447715 194 110 193.552285 110 193V179C110 178.447715 110.447715 178 111 178Z"
+    },
+    {
+      "id": 7,
+      "cubie": 2,
+      "face": "F",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 178,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-7",
+      "sheetRow": 8,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M131 178H145C145.552285 178 146 178.447715 146 179V193C146 193.552285 145.552285 194 145 194H131C130.447715 194 130 193.552285 130 193V179C130 178.447715 130.447715 178 131 178Z"
+    },
+    {
+      "id": 25,
+      "cubie": 11,
+      "face": "F",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "O",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 178,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-25",
+      "sheetRow": 8,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.46799999999999,
+        76.38399999999999,
+        184.53199999999998,
+        199.864
+      ],
+      "cutPathMm": "M151 178H165C165.552285 178 166 178.447715 166 179V193C166 193.552285 165.552285 194 165 194H151C150.447715 194 150 193.552285 150 193V179C150 178.447715 150.447715 178 151 178Z"
+    },
+    {
+      "id": 40,
+      "cubie": 19,
+      "face": "F",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "I",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 178,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-40",
+      "sheetRow": 8,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        102.8,
+        78.23199999999999,
+        153.2,
+        198.184
+      ],
+      "cutPathMm": "M171 178H185C185.552285 178 186 178.447715 186 179V193C186 193.552285 185.552285 194 185 194H171C170.447715 194 170 193.552285 170 193V179C170 178.447715 170.447715 178 171 178Z"
+    },
+    {
+      "id": 51,
+      "cubie": 25,
+      "face": "R",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "T",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 198,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-51",
+      "sheetRow": 9,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        82.892,
+        78.23199999999999,
+        173.108,
+        198.184
+      ],
+      "cutPathMm": "M11 198H25C25.552285 198 26 198.447715 26 199V213C26 213.552285 25.552285 214 25 214H11C10.447715 214 10 213.552285 10 213V199C10 198.447715 10.447715 198 11 198Z"
+    },
+    {
+      "id": 49,
+      "cubie": 24,
+      "face": "R",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 198,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-49",
+      "sheetRow": 9,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M31 198H45C45.552285 198 46 198.447715 46 199V213C46 213.552285 45.552285 214 45 214H31C30.447715 214 30 213.552285 30 213V199C30 198.447715 30.447715 198 31 198Z"
+    },
+    {
+      "id": 46,
+      "cubie": 23,
+      "face": "R",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "L",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 198,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-46",
+      "sheetRow": 9,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        97.088,
+        78.23199999999999,
+        168.824,
+        198.184
+      ],
+      "cutPathMm": "M51 198H65C65.552285 198 66 198.447715 66 199V213C66 213.552285 65.552285 214 65 214H51C50.447715 214 50 213.552285 50 213V199C50 198.447715 50.447715 198 51 198Z"
+    },
+    {
+      "id": 44,
+      "cubie": 22,
+      "face": "R",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "8",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 198,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-44",
+      "sheetRow": 9,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        86.672,
+        76.71999999999998,
+        169.16000000000003,
+        199.864
+      ],
+      "cutPathMm": "M71 198H85C85.552285 198 86 198.447715 86 199V213C86 213.552285 85.552285 214 85 214H71C70.447715 214 70 213.552285 70 213V199C70 198.447715 70.447715 198 71 198Z"
+    },
+    {
+      "id": 43,
+      "cubie": 21,
+      "face": "R",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        0
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 198,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-43",
+      "sheetRow": 9,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M91 198H105C105.552285 198 106 198.447715 106 199V213C106 213.552285 105.552285 214 105 214H91C90.447715 214 90 213.552285 90 213V199C90 198.447715 90.447715 198 91 198Z"
+    },
+    {
+      "id": 41,
+      "cubie": 20,
+      "face": "R",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "6",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 198,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-41",
+      "sheetRow": 9,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        87.176,
+        76.71999999999998,
+        169.664,
+        199.864
+      ],
+      "cutPathMm": "M111 198H125C125.552285 198 126 198.447715 126 199V213C126 213.552285 125.552285 214 125 214H111C110.447715 214 110 213.552285 110 213V199C110 198.447715 110.447715 198 111 198Z"
+    },
+    {
+      "id": 38,
+      "cubie": 19,
+      "face": "R",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "N",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 198,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-38",
+      "sheetRow": 9,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        77.01199999999999,
+        78.23199999999999,
+        178.988,
+        198.184
+      ],
+      "cutPathMm": "M131 198H145C145.552285 198 146 198.447715 146 199V213C146 213.552285 145.552285 214 145 214H131C130.447715 214 130 213.552285 130 213V199C130 198.447715 130.447715 198 131 198Z"
+    },
+    {
+      "id": 36,
+      "cubie": 18,
+      "face": "R",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "4",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 198,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-36",
+      "sheetRow": 9,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        83.144,
+        77.89599999999999,
+        173.024,
+        198.184
+      ],
+      "cutPathMm": "M151 198H165C165.552285 198 166 198.447715 166 199V213C166 213.552285 165.552285 214 165 214H151C150.447715 214 150 213.552285 150 213V199C150 198.447715 150.447715 198 151 198Z"
+    },
+    {
+      "id": 33,
+      "cubie": 17,
+      "face": "R",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        1,
+        0,
+        0
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "N",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 198,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-33",
+      "sheetRow": 9,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        77.01199999999999,
+        78.23199999999999,
+        178.988,
+        198.184
+      ],
+      "cutPathMm": "M171 198H185C185.552285 198 186 198.447715 186 199V213C186 213.552285 185.552285 214 185 214H171C170.447715 214 170 213.552285 170 213V199C170 198.447715 170.447715 198 171 198Z"
+    },
+    {
+      "id": 48,
+      "cubie": 23,
+      "face": "B",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "P",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 218,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-48",
+      "sheetRow": 10,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        91.292,
+        78.23199999999999,
+        172.10000000000002,
+        198.184
+      ],
+      "cutPathMm": "M11 218H25C25.552285 218 26 218.447715 26 219V233C26 233.552285 25.552285 234 25 234H11C10.447715 234 10 233.552285 10 233V219C10 218.447715 10.447715 218 11 218Z"
+    },
+    {
+      "id": 29,
+      "cubie": 14,
+      "face": "B",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        1,
+        0,
+        0
+      ],
+      "image": "1",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 218,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-29",
+      "sheetRow": 10,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        91.712,
+        78.23199999999999,
+        145.64,
+        198.184
+      ],
+      "cutPathMm": "M31 218H45C45.552285 218 46 218.447715 46 219V233C46 233.552285 45.552285 234 45 234H31C30.447715 234 30 233.552285 30 233V219C30 218.447715 30.447715 218 31 218Z"
+    },
+    {
+      "id": 15,
+      "cubie": 6,
+      "face": "B",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "M",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 218,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-15",
+      "sheetRow": 10,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        65.588,
+        78.23199999999999,
+        190.58,
+        198.184
+      ],
+      "cutPathMm": "M51 218H65C65.552285 218 66 218.447715 66 219V233C66 233.552285 65.552285 234 65 234H51C50.447715 234 50 233.552285 50 233V219C50 218.447715 50.447715 218 51 218Z"
+    },
+    {
+      "id": 42,
+      "cubie": 20,
+      "face": "B",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        -1,
+        0
+      ],
+      "image": "7",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 218,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-42",
+      "sheetRow": 10,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        85.496,
+        78.23199999999999,
+        169.496,
+        198.184
+      ],
+      "cutPathMm": "M71 218H85C85.552285 218 86 218.447715 86 219V233C86 233.552285 85.552285 234 85 234H71C70.447715 234 70 233.552285 70 233V219C70 218.447715 70.447715 218 71 218Z"
+    },
+    {
+      "id": 26,
+      "cubie": 12,
+      "face": "B",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "2",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 218,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-26",
+      "sheetRow": 10,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": [
+        87.176,
+        76.55199999999999,
+        169.328,
+        198.184
+      ],
+      "cutPathMm": "M91 218H105C105.552285 218 106 218.447715 106 219V233C106 233.552285 105.552285 234 105 234H91C90.447715 234 90 233.552285 90 233V219C90 218.447715 90.447715 218 91 218Z"
+    },
+    {
+      "id": 9,
+      "cubie": 3,
+      "face": "B",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        0,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "A",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 218,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-9",
+      "sheetRow": 10,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.55199999999999,
+        77.728,
+        184.28,
+        198.184
+      ],
+      "cutPathMm": "M111 218H125C125.552285 218 126 218.447715 126 219V233C126 233.552285 125.552285 234 125 234H111C110.447715 234 110 233.552285 110 233V219C110 218.447715 110.447715 218 111 218Z"
+    },
+    {
+      "id": 35,
+      "cubie": 17,
+      "face": "B",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "R",
+      "rotationDeg": 90,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 218,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-35",
+      "sheetRow": 10,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        88.94,
+        78.23199999999999,
+        181.17200000000003,
+        198.184
+      ],
+      "cutPathMm": "M131 218H145C145.552285 218 146 218.447715 146 219V233C146 233.552285 145.552285 234 145 234H131C130.447715 234 130 233.552285 130 233V219C130 218.447715 130.447715 218 131 218Z"
+    },
+    {
+      "id": 22,
+      "cubie": 9,
+      "face": "B",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "K",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 218,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-22",
+      "sheetRow": 10,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.27599999999998,
+        78.23199999999999,
+        182.348,
+        198.184
+      ],
+      "cutPathMm": "M151 218H165C165.552285 218 166 218.447715 166 219V233C166 233.552285 165.552285 234 165 234H151C150.447715 234 150 233.552285 150 233V219C150 218.447715 150.447715 218 151 218Z"
+    },
+    {
+      "id": 2,
+      "cubie": 0,
+      "face": "B",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "faceUp": [
+        0,
+        1,
+        0
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 218,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-2",
+      "sheetRow": 10,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": null,
+      "cutPathMm": "M171 218H185C185.552285 218 186 218.447715 186 219V233C186 233.552285 185.552285 234 185 234H171C170.447715 234 170 233.552285 170 233V219C170 218.447715 170.447715 218 171 218Z"
+    },
+    {
+      "id": 6,
+      "cubie": 2,
+      "face": "D",
+      "row": 0,
+      "column": 0,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "S",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 10,
+      "yMm": 238,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-6",
+      "sheetRow": 11,
+      "sheetColumn": 0,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.864,
+        76.55199999999999,
+        167.144,
+        199.864
+      ],
+      "cutPathMm": "M11 238H25C25.552285 238 26 238.447715 26 239V253C26 253.552285 25.552285 254 25 254H11C10.447715 254 10 253.552285 10 253V239C10 238.447715 10.447715 238 11 238Z"
+    },
+    {
+      "id": 24,
+      "cubie": 11,
+      "face": "D",
+      "row": 0,
+      "column": 1,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        -1
+      ],
+      "image": "O",
+      "rotationDeg": 180,
+      "page": 1,
+      "xMm": 30,
+      "yMm": 238,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-24",
+      "sheetRow": 11,
+      "sheetColumn": 1,
+      "artScale": 1,
+      "sourceInkBounds": [
+        71.46799999999999,
+        76.38399999999999,
+        184.53199999999998,
+        199.864
+      ],
+      "cutPathMm": "M31 238H45C45.552285 238 46 238.447715 46 239V253C46 253.552285 45.552285 254 45 254H31C30.447715 254 30 253.552285 30 253V239C30 238.447715 30.447715 238 31 238Z"
+    },
+    {
+      "id": 39,
+      "cubie": 19,
+      "face": "D",
+      "row": 0,
+      "column": 2,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "B",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 50,
+      "yMm": 238,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-39",
+      "sheetRow": 11,
+      "sheetColumn": 2,
+      "artScale": 1,
+      "sourceInkBounds": [
+        87.596,
+        78.23199999999999,
+        174.788,
+        198.184
+      ],
+      "cutPathMm": "M51 238H65C65.552285 238 66 238.447715 66 239V253C66 253.552285 65.552285 254 65 254H51C50.447715 254 50 253.552285 50 253V239C50 238.447715 50.447715 238 51 238Z"
+    },
+    {
+      "id": 4,
+      "cubie": 1,
+      "face": "D",
+      "row": 1,
+      "column": 0,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "I",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 70,
+      "yMm": 238,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-4",
+      "sheetRow": 11,
+      "sheetColumn": 3,
+      "artScale": 1,
+      "sourceInkBounds": [
+        102.8,
+        78.23199999999999,
+        153.2,
+        198.184
+      ],
+      "cutPathMm": "M71 238H85C85.552285 238 86 238.447715 86 239V253C86 253.552285 85.552285 254 85 254H71C70.447715 254 70 253.552285 70 253V239C70 238.447715 70.447715 238 71 238Z"
+    },
+    {
+      "id": 23,
+      "cubie": 10,
+      "face": "D",
+      "row": 1,
+      "column": 1,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "1",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 90,
+      "yMm": 238,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-23",
+      "sheetRow": 11,
+      "sheetColumn": 4,
+      "artScale": 1,
+      "sourceInkBounds": [
+        91.712,
+        78.23199999999999,
+        145.64,
+        198.184
+      ],
+      "cutPathMm": "M91 238H105C105.552285 238 106 238.447715 106 239V253C106 253.552285 105.552285 254 105 254H91C90.447715 254 90 253.552285 90 253V239C90 238.447715 90.447715 238 91 238Z"
+    },
+    {
+      "id": 37,
+      "cubie": 18,
+      "face": "D",
+      "row": 1,
+      "column": 2,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        0
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "5",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 110,
+      "yMm": 238,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-37",
+      "sheetRow": 11,
+      "sheetColumn": 5,
+      "artScale": 1,
+      "sourceInkBounds": [
+        89.024,
+        78.23199999999999,
+        167.64800000000002,
+        199.864
+      ],
+      "cutPathMm": "M111 238H125C125.552285 238 126 238.447715 126 239V253C126 253.552285 125.552285 254 125 254H111C110.447715 254 110 253.552285 110 253V239C110 238.447715 110.447715 238 111 238Z"
+    },
+    {
+      "id": 1,
+      "cubie": 0,
+      "face": "D",
+      "row": 2,
+      "column": 0,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        -1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "D",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 130,
+      "yMm": 238,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-1",
+      "sheetRow": 11,
+      "sheetColumn": 6,
+      "artScale": 1,
+      "sourceInkBounds": [
+        81.464,
+        78.23199999999999,
+        179.74400000000003,
+        198.184
+      ],
+      "cutPathMm": "M131 238H145C145.552285 238 146 238.447715 146 239V253C146 253.552285 145.552285 254 145 254H131C130.447715 254 130 253.552285 130 253V239C130 238.447715 130.447715 238 131 238Z"
+    },
+    {
+      "id": 21,
+      "cubie": 9,
+      "face": "D",
+      "row": 2,
+      "column": 1,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        0,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        0,
+        0,
+        1
+      ],
+      "image": "U",
+      "rotationDeg": 0,
+      "page": 1,
+      "xMm": 150,
+      "yMm": 238,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-21",
+      "sheetRow": 11,
+      "sheetColumn": 7,
+      "artScale": 1,
+      "sourceInkBounds": [
+        79.868,
+        78.23199999999999,
+        175.964,
+        199.864
+      ],
+      "cutPathMm": "M151 238H165C165.552285 238 166 238.447715 166 239V253C166 253.552285 165.552285 254 165 254H151C150.447715 254 150 253.552285 150 253V239C150 238.447715 150.447715 238 151 238Z"
+    },
+    {
+      "id": 34,
+      "cubie": 17,
+      "face": "D",
+      "row": 2,
+      "column": 2,
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "faceUp": [
+        0,
+        0,
+        1
+      ],
+      "sourcePosition": [
+        1,
+        -1,
+        -1
+      ],
+      "sourceUp": [
+        -1,
+        0,
+        0
+      ],
+      "image": "D",
+      "rotationDeg": 270,
+      "page": 1,
+      "xMm": 170,
+      "yMm": 238,
+      "sizeMm": 16,
+      "cornerRadiusMm": 1,
+      "bleedMm": 2,
+      "safeMm": 1,
+      "copy": 2,
+      "uid": "copy-2-sticker-34",
+      "sheetRow": 11,
+      "sheetColumn": 8,
+      "artScale": 1,
+      "sourceInkBounds": [
+        81.464,
+        78.23199999999999,
+        179.74400000000003,
+        198.184
+      ],
+      "cutPathMm": "M171 238H185C185.552285 238 186 238.447715 186 239V253C186 253.552285 185.552285 254 185 254H171C170.447715 254 170 253.552285 170 253V239C170 238.447715 170.447715 238 171 238Z"
+    }
+  ],
+  "files": {
+    "print.pdf": "fab84a9733b90f0e02d60af5365873d91cdb27436142ed50d66861f9b0430824",
+    "assembly.pdf": "4d8bd29f2044c57d313a41aa3357d7fcfd38e86d11c4bc5e7327ee9566c6b773",
+    "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+    "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
+    "README.txt": "5de43b1e07ca02cd4b3918330d4743f8ff48a5c769dc353da57edfc1efaab196",
+    "artwork-1.svg": "7d3f40c4f6d1b97a74e2b3f7e5537d9d1ea509d6b77bcdb88ea3906761e21820",
+    "cuts-1.svg": "bd6e5ad784bf465212b3257dac4ada28e632a0e348e344bf88c0c8e86b838e2e"
+  }
+}
