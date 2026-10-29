@@ -19,6 +19,7 @@ Use for every mathematical or combinatorial feasibility experiment, including al
 5. Classify results:
    - **SAT** only with saved witness and independently executed validator success.
    - **UNSAT** only with a certificate or independently checkable exhaustive proof for the specified model; a timeout or unsuccessful search is NOT UNSAT.
+   - For proofs and certificates, "independent" means the Flix and Julia checkers; both must accept, and Python alone never confirms ([authority rule](../../../proof-checkers/AUTHORITY.md)).
    - **UNKNOWN** for timeout, errors, incomplete search, unverified witness/certificate, or insufficient evidence.
 6. Compare changes to prior runs; never silently broaden an earlier result to new assumptions.
 7. Commit an analysis note under `knowledge/zettel/` or the appropriate research path and link to outputs. Never modify a prior certificate in place.
