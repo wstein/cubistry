@@ -45,7 +45,8 @@ of `evidence-manifest.json` was re-pinned for this wording change.
 Follow these steps exactly. "Dissent" is defined in step 4.
 
 1. CONFIRMED means both checkers accepted the same input. Run both from the
-   repository root, with the commands in [flix/README.md](flix/README.md)
+   repository root, after the build and setup steps in the same READMEs, with the
+   commands in [flix/README.md](flix/README.md)
    (`java -Xmx768m -jar proof-checkers/flix/artifact/flix.jar counter FILE .`,
    or `state3 FILE`) and [julia/README.md](julia/README.md)
    (`julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/check.jl counter FILE`,
@@ -60,8 +61,9 @@ Follow these steps exactly. "Dissent" is defined in step 4.
    investigation by a Claude Opus or Codex Sol agent and write the findings down.
    Only then fix the checker or the spec and rerun BOTH checkers. If only the
    status class differs (for example `UNSUPPORTED` vs `INVALID`) and the
-   accept/reject decision is the same, it is NOT a dissent: record it in
-   [coverage.json](coverage.json) (follow-up, see rule 3) and list it separately.
+   accept/reject decision is the same, it is NOT a dissent: list it separately
+   and itemize it in [coverage.json](coverage.json) (the ledger has no entry type
+   for it yet; see rule 3 above).
 5. After a proof review, report: the checkers run, the exact commands, their
    versions, the corpus pin and audit result, the verdict, and class-only
    differences in their own list.
