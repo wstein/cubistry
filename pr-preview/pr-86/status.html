@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head><meta name="robots" content="noindex,nofollow">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f3eb" />
+    <title>Cubistry · Status Cube</title>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-86/assets/status-CteMCY99.js"></script>
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-86/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-86/assets/three-CMRukwtc.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-86/assets/index-BSoFjRRp.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-86/assets/index-CUScq6S6.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-86/assets/playback-DlljDKMy.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-86/assets/status-JTuVTlmb.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-86/assets/style-Df5Ad_T9.css">
+  </head>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #86 — non-production preview · c8f9d51ad213</aside>
+    <main>
+      <header>
+        <a class="brand" href="./"
+          ><span class="brand-mark">▦</span> CUBISTRY</a
+        >
+        <nav aria-label="Reference applications">
+          <a href="index.html">Counter</a> · <a href="clock.html">Clock</a> ·
+          <a href="calendar.html">Calendar</a>
+        </nav>
+      </header>
+      <h1>Status Cube</h1>
+      <p class="small">
+        One fixed physical print. Six workflow states. Local simulated events
+        only.
+      </p>
+      <div class="status-workspace">
+        <section class="status-stage" aria-label="Physical workflow cube">
+          <div id="status-viewer" aria-busy="true"></div>
+          <p
+            id="status-front"
+            class="sr-only"
+            aria-label="Committed front sticker letters"
+          ></p>
+          <p id="status-sync" role="status" aria-live="polite">
+            Loading the fixed workflow print…
+          </p>
+          <p class="small">
+            Drag to look around. Each letter belongs permanently to its physical
+            sticker.
+          </p>
+        </section>
+        <aside class="status-controls" aria-label="Workflow controls">
+          <dl class="status-values">
+            <div>
+              <dt>Displayed status</dt>
+              <dd id="status-current">—</dd>
+            </div>
+            <div>
+              <dt>Requested status</dt>
+              <dd id="status-requested">—</dd>
+            </div>
+          </dl>
+          <label for="status-select">Manual status</label>
+          <select id="status-select" disabled></select>
+          <label for="status-event">Simulated agent event</label>
+          <select id="status-event" disabled></select>
+          <button id="status-send" disabled>Send event</button>
+          <div class="status-buttons">
+            <button id="status-demo" disabled>Run demo</button>
+            <button id="status-burst" disabled>Send rapid sequence</button>
+          </div>
+          <button id="status-finish" disabled>Finish active status</button>
+          <label for="status-speed">Quarter-turn time</label>
+          <select id="status-speed">
+            <option value="500">500 ms</option>
+            <option value="250" selected>250 ms</option>
+            <option value="100">100 ms</option>
+            <option value="50">50 ms</option>
+          </select>
+          <p id="status-moves" aria-label="Committed status move progress">
+            0 / 0 HTM · Session 0
+          </p>
+          <p id="status-fault" role="status" aria-live="polite"></p>
+          <h2>Recent local events</h2>
+          <ol
+            id="status-history"
+            aria-label="Recent simulated workflow events"
+          ></ol>
+          <p class="small">
+            New requests finish the active legal turn, discard obsolete moves,
+            then replan. A half turn takes twice the selected quarter-turn time.
+          </p>
+        </aside>
+      </div>
+      <p id="status-error" class="error" role="alert"></p>
+      <button id="status-reload" hidden>Reload application</button>
+    </main>
+  </body>
+</html>
