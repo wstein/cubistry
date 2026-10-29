@@ -5,7 +5,7 @@ exitcode(result)=result["valid"] ? 0 : result["status"]=="UNSUPPORTED" ? 2 : res
 function main(args)
     root=normpath(joinpath(@__DIR__,"../.."))
     try
-        length(args)>=2 || throw(IndependentProof.Invalid("UNSUPPORTED","counter FILE or state3 FILE required"))
+        length(args)>=2 || throw(IndependentProof.Invalid("UNSUPPORTED","counter FILE, state3 FILE, or conformance ROOT required"))
         result=if args[1]=="conformance"
             IndependentProof.conformance(args[2];export_path=length(args)>=3 ? args[3] : nothing)
         elseif args[1] in ("counter","state3")
