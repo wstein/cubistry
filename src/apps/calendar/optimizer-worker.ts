@@ -1,12 +1,21 @@
 import { KPattern } from "cubing/kpuzzle";
 import { puzzles } from "cubing/puzzles";
-import { experimentalSolve3x3x3IgnoringCenters } from "cubing/search";
+import {
+  experimentalSolve3x3x3IgnoringCenters,
+  setSearchDebug,
+} from "cubing/search";
 import { createTransitionOptimizer } from "./transition/planner.mjs";
 import corrections from "./transition/center-corrections.json";
 import type { CalendarPlanningContext } from "./controller.ts";
 
 // This worker owns cubing's nested solver worker. Terminating it also terminates
 // its child workers; no timed-out solve survives in the page's task queue.
+// Use cubing's bundler-aware entry URL directly; the package-relative filename
+// used by import.meta.resolve is renamed in a production build.
+setSearchDebug({
+  prioritizeEsbuildWorkaroundForWorkerInstantiation: true,
+  logPerf: false,
+});
 const optimizers = new Map<
   string,
   ReturnType<typeof createTransitionOptimizer>

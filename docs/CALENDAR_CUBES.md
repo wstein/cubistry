@@ -95,7 +95,11 @@ results, or a candidate that is not strictly shorter preserve the checked
 fallback. A single worker handles one solve and one replaceable pending request;
 no unbounded queue of solver jobs is retained. Browser restoration from the
 back/forward cache preserves the provider. The solver is `cubing@0.66.1`;
-production builds use ES worker chunks with module-relative asset paths.
+production builds use ES worker chunks with module-relative asset paths. Shared
+solver code is isolated in a vendor chunk, while nested search entry points stay
+separate from the calendar worker message handler. The bundler-aware search entry
+URL is used directly. Production browser regressions exercise both prints from
+a static build under the deployment base path.
 
 ## Original artwork
 

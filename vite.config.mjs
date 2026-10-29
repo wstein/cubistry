@@ -7,7 +7,23 @@ export default defineConfig({
   optimizeDeps: { exclude: ["@puzlwerk/solver-2x2", "cubing"] },
   assetsInclude: ["**/*.bin"],
   plugins: [solverAcceptancePlugin()],
-  worker: { format: "es" },
+  worker: {
+    format: "es",
+    rollupOptions: {
+      output: {
+        // cubing's nested search entry shares its API with the outer worker.
+        // Keep that API in a vendor chunk so importing it never reruns the
+        // calendar worker's onmessage handler inside the nested solver worker.
+        manualChunks(id) {
+          if (
+            id.includes("/node_modules/") &&
+            !/\/(?:search-worker-entry|inside-[^/]+)\.js$/.test(id)
+          )
+            return "calendar-solver-vendor";
+        },
+      },
+    },
+  },
   build: {
     rollupOptions: {
       input: {
