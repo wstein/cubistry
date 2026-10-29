@@ -90,10 +90,14 @@ non-goal. These conditions prove exact graph distance, rather than trusting BFS.
 The separately implemented canonical physical checker checks the geometry and
 all saved words against the pinned existing mechanics.
 
-The first Julia script took 7.84 seconds including model loading/JIT, generation,
-checks, scoring and JSON output; graph build plus BFS took 0.238 seconds within
-that process. These are one local run on a shared execution host, not a universal
-performance estimate. Nothing is reported as zero startup or teardown cost.
+The first Julia run recorded 7.84 seconds on its internal script timer, including
+model loading/JIT, generation, checks, scoring and the witness JSON output;
+graph build plus BFS took 0.238 seconds within that interval. The timer starts
+at the first Julia statement and ends before the final summary write. It does
+not measure process launch, shutdown, or dependency installation; those costs
+must be measured externally for an end-to-end comparison. These are one local
+run on a shared execution host, not a universal performance estimate. Nothing
+is reported as zero startup or teardown cost.
 
 ## Independently reviewed lower-bound extension
 
