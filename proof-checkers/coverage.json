@@ -73,8 +73,8 @@
     ]
   },
   "marked3x3": {
-    "cases": 152,
-    "validCases": 127,
+    "cases": 154,
+    "validCases": 129,
     "rejectedCases": 25,
     "requiredChecks": [
       "54-immutable-id-body-frame-image-records",

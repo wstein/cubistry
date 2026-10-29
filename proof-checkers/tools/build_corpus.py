@@ -16,9 +16,9 @@ def extend_schema_cases(manifest):
  base=json.loads((ROOT/'proof-checkers/conformance/geometry/identity.json').read_bytes())
  rbase=json.loads((ROOT/'proof-checkers/conformance/geometry/outer-R-quarter.json').read_bytes())
  cases=manifest['cases']
- def add(name,edit,expected=False,seed=base,goal=None):
+ def add(name,edit,expected=False,seed=base,goal=None,literal=False):
   data=copy.deepcopy(seed);edit(data)
-  path=HERE/'conformance/geometry'/(name+'.json');raw=(json.dumps(data,separators=(',',':'))+'\n').encode()
+  path=HERE/'conformance/geometry'/(name+'.json');raw=(json.dumps(data,separators=(',',':'),ensure_ascii=not literal)+'\n').encode()
   with path.open('xb') as f:f.write(raw)
   wire=sorted((x['id'],x['cubie'],x['p'],x['n'],x['up'],x['image']) for x in data.get('state',[]) if isinstance(x,dict) and all(k in x for k in ('id','cubie','p','n','up','image'))) if isinstance(data.get('state'),list) else []
   row={'group':'geometry','name':name,'path':str(path.relative_to(ROOT)),'sha256':sha(raw),'expectedValid':expected,'expectedStateSHA256':sha(json.dumps(wire,separators=(',',':')).encode())}
@@ -64,6 +64,11 @@ def extend_schema_cases(manifest):
   def setimage(d,image=image):
    d['printing'][0]['image']=image;d['state'][0]['image']=image
   add(name,setimage,True)
+
+ for name,image in [('unicode-bmp-literal-image','Ä'),('unicode-supplementary-literal-image','😀')]:
+  def literalimage(d,image=image):
+   d['printing'][0]['image']=image;d['state'][0]['image']=image
+  add(name,literalimage,True,literal=True)
  data=copy.deepcopy(base);raw=(json.dumps(data,separators=(',',':'))+'\n').encode().replace(b'sticker-0',b'\\ud800')
  path=HERE/'conformance/geometry/unpaired-surrogate-image.json'
  with path.open('xb') as f:f.write(raw)
