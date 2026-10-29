@@ -17,7 +17,9 @@ Cubistry is a browser-first twisty-puzzle platform. Chronocube is a reference ap
 - Keep proof research on its dedicated research branch; keep foundational design changes on feature branches.
 - Do not claim SAT or UNSAT from sticker capacity, a screenshot, solver log alone, or a candidate layout.
 - Use exactly `SAT` (validated witness), `UNSAT` (independently checkable proof under explicit assumptions), or `UNKNOWN` (anything else) for feasibility outcomes.
-- A proof counts as confirmed only when both the Flix and the Julia checker accept it; any dissent is `UNKNOWN` (no voting), and Python verifiers play no role in confirmation. See [proof-checkers/AUTHORITY.md](proof-checkers/AUTHORITY.md).
+- Proofs are confirmed only when both the Flix and the Julia checker accept; read [proof-checkers/AUTHORITY.md](proof-checkers/AUTHORITY.md) (section "For agents") before any proof work.
+  - We never vote, and Python verifiers are never a tie-break.
+  - Any Flix/Julia dissent means `UNKNOWN` plus a root-cause investigation by a Claude Opus or Codex Sol agent.
 - Prefer SVG/vector artwork for final print output; PNG is optional raster interchange/preview. Preserve font licensing, embedded asset provenance, dimensions, and sticker orientation.
 - Run available tests and validators; disclose tests you could not run. Do not fabricate validation.
 
