@@ -1,0 +1,21 @@
+{
+  "schema": "cubistry.calendar-repair-regression",
+  "baselineApp": "cc7b5abc0c72005ed6b67bf88de5d71e607a31a6",
+  "capture": "calendar-2024-v3.json",
+  "captureCase": 2467,
+  "id": "de-a",
+  "fromISO": "2024-04-19",
+  "toISO": "2024-04-20",
+  "sourceWord": "x R2 U' B2 U2 L2 B2 D' B2 U B2 L2 B2 R' F' D' F D R' U2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 U L U' L U L U' L U L U' L U L U' L U L U' L2 D L' D L D L' D L D L' D L D L' D L D L' D",
+  "oldWord": "x z2 U2 D' B' D' B2 U' F2 L D R2 B R2 D2 R2 L2 B2 R2 U2 F U2 B2 D U L2 R2 D' U' B D U L2 R2 D' U' F'",
+  "oldCounts": {
+    "total": 37,
+    "htm": 35,
+    "qtm": 52,
+    "global": 2
+  },
+  "sourceReferenceSHA256": "ddab82a6c856d1be44a5b519e64f513dcd1da8c62e0dc9f5ced403967533bbf2",
+  "printingSHA256": "1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56",
+  "repairHTM": 14,
+  "expectedConstructedHTM": 34
+}
