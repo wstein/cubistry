@@ -1,0 +1,6 @@
+Running 1 tests...
+
+   TEST  completeProbe
+   PASS  completeProbe 66.9ms
+
+Passed: 1, Failed: 0. Skipped: 0. Elapsed: 76.6ms.
