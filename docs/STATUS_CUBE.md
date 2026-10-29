@@ -122,6 +122,9 @@ Browser tests exercise native keyboard selection, all rendered statuses,
 physical viewer/controller agreement, real non-reduced animation interruption,
 invalid events, simulated failure, corrupt font bytes and fresh-load recovery.
 A built-Pages case checks all assets under `/cubistry/` and event playback.
+Desktop and mobile DPR2 checks keep the canvas CSS bounds inside its host while
+retaining the high-resolution drawing buffer, and verify that camera dragging
+does not change physical state before another status transition.
 
 ```sh
 npm run typecheck

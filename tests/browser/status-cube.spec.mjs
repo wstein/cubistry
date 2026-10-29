@@ -212,3 +212,110 @@ test("a corrupted pinned font fails fresh load without claiming a physical statu
   await expect(page.locator("#status-select")).toBeDisabled();
   await expect(page.locator("#status-reload")).toBeVisible();
 });
+
+for (const [name, viewport] of [
+  ["desktop", { width: 1280, height: 1000 }],
+  ["mobile", { width: 390, height: 844 }],
+]) {
+  test(`DPR2 ${name} contains its high-resolution canvas and camera interaction preserves physical state`, async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({
+      baseURL,
+      viewport,
+      deviceScaleFactor: 2,
+      reducedMotion: "reduce",
+    });
+    const page = await context.newPage();
+    try {
+      await ready(page);
+      const geometry = await page.evaluate(() => {
+        const host = document.querySelector("#status-viewer");
+        const canvas = host.querySelector("canvas");
+        const bounds = (node) => {
+          const r = node.getBoundingClientRect();
+          return {
+            x: r.x,
+            y: r.y,
+            width: r.width,
+            height: r.height,
+            right: r.right,
+            bottom: r.bottom,
+          };
+        };
+        return {
+          host: bounds(host),
+          canvas: bounds(canvas),
+          buffer: { width: canvas.width, height: canvas.height },
+          dpr: devicePixelRatio,
+          pageWidth: document.documentElement.scrollWidth,
+          viewportWidth: innerWidth,
+        };
+      });
+      expect(geometry.dpr).toBe(2);
+      expect(
+        Math.abs(geometry.canvas.width - geometry.host.width),
+      ).toBeLessThanOrEqual(1);
+      expect(
+        Math.abs(geometry.canvas.height - geometry.host.height),
+      ).toBeLessThanOrEqual(1);
+      expect(geometry.canvas.x).toBeGreaterThanOrEqual(geometry.host.x - 1);
+      expect(geometry.canvas.y).toBeGreaterThanOrEqual(geometry.host.y - 1);
+      expect(geometry.canvas.right).toBeLessThanOrEqual(
+        geometry.host.right + 1,
+      );
+      expect(geometry.canvas.bottom).toBeLessThanOrEqual(
+        geometry.host.bottom + 1,
+      );
+      expect(
+        Math.abs(geometry.buffer.width - geometry.host.width * 2),
+      ).toBeLessThanOrEqual(2);
+      expect(
+        Math.abs(geometry.buffer.height - geometry.host.height * 2),
+      ).toBeLessThanOrEqual(2);
+      expect(geometry.pageWidth).toBeLessThanOrEqual(geometry.viewportWidth);
+      const before = await page.evaluate(async () => {
+        const { statusController: c } = await import("/src/status.mjs");
+        return {
+          state: JSON.stringify(c.state),
+          camera: c.view.camera.position.toArray(),
+          moves: c.progress.sessionTotal,
+        };
+      });
+      const { x, y, width, height } = geometry.canvas;
+      await page.mouse.move(x + width / 2, y + height / 2);
+      await page.mouse.down();
+      await page.mouse.move(x + width / 2 + 45, y + height / 2 + 25, {
+        steps: 5,
+      });
+      await page.mouse.up();
+      await expect
+        .poll(async () =>
+          page.evaluate(async () => {
+            const { statusController: c } = await import("/src/status.mjs");
+            return c.view.camera.position.toArray();
+          }),
+        )
+        .not.toEqual(before.camera);
+      const after = await page.evaluate(async () => {
+        const { statusController: c } = await import("/src/status.mjs");
+        return {
+          state: JSON.stringify(c.state),
+          moves: c.progress.sessionTotal,
+        };
+      });
+      expect(after.state).toBe(before.state);
+      expect(after.moves).toBe(before.moves);
+      await page.selectOption("#status-select", "testing");
+      await exact(page, "testing");
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    } finally {
+      await context.close();
+    }
+  });
+}
