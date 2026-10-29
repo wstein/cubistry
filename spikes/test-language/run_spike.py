@@ -24,6 +24,7 @@ def digest(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--julia", required=True)
+    parser.add_argument("--julia-mode", choices=("default", "low-optimization"), default="default")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repetitions", type=int, default=20)
     args = parser.parse_args()
@@ -79,7 +80,10 @@ def main():
                 checksum += sum(a*b for a,b in zip(frame[2] + frame[4], (1,3,7,11,17,23)))
         python_times.append((time.perf_counter() - started) * 1000)
     output = args.output / "julia.json"
-    command = [args.julia, "--startup-file=no", "--project=" + str(HERE / "julia"),
+    command = [args.julia, "--startup-file=no"]
+    if args.julia_mode == "low-optimization":
+        command.append("--optimize=0")
+    command += ["--project=" + str(HERE / "julia"),
                str(HERE / "julia/checker.jl"), str(witness), str(cases), str(output), str(args.repetitions)]
     started = time.perf_counter()
     process = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, timeout=180)
@@ -107,7 +111,7 @@ def main():
         "inputSHA256": digest(witness), "codeSHA256": {str(p.relative_to(ROOT)): digest(p) for p in tracked},
         "fullPythonProductionCheckerMs": full_python_ms,
         "fullPythonProductionCheckerResult": full_python,
-        "pythonControls": python_controls, "juliaCommand": command, "juliaExitCode": process.returncode,
+        "pythonControls": python_controls, "juliaCommand": command, "juliaMode": args.julia_mode, "juliaExitCode": process.returncode,
         "juliaFreshProcessIncludingCompilationAndAllSamplesMs": process_ms,
         "juliaValidationIncludingJITMs": result["validationIncludingJITMs"],
         "kernelWordsPerSample": 100 * args.repetitions,
