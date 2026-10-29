@@ -3,13 +3,13 @@
 import hashlib,json
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
-PIN='124e6d7277f307806c3d73aef2f96a21c08cc4bc11a8cfc58c2eec17f21c4e75'
+PIN='fcae7e6ad5cb19518234b8fd60120fa3840c275a83084b475751c290dabd3556'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
  manifest=ROOT/'proof-checkers/conformance/manifest.json';assert sha(manifest)==PIN,'Changed conformance manifest'
  data=json.loads(manifest.read_text());pin=json.loads((ROOT/'proof-checkers/conformance-pin.json').read_text())
- assert pin['manifestSHA256']==PIN and data['caseCount']==193
- for group,count in [('counter',41),('geometry',152)]:
+ assert pin['manifestSHA256']==PIN and data['caseCount']==195
+ for group,count in [('counter',41),('geometry',154)]:
   rows=[r for r in data['cases'] if r['group']==group];assert len(rows)==count
   assert len({r['name'] for r in rows})==count
   assert sorted(r['name'] for r in rows)==sorted(pin[group+'Cases'])
@@ -23,5 +23,5 @@ def main():
  assert {r['i'] for r in kernel['rows']}=={i for i in range(4096) if sum((i>>(2*j))&3 for j in range(6))%2==0}
  assert all(r['i']==sum(v<<(2*j) for j,v in enumerate(r['o'])) for r in kernel['rows'])
  chain=json.loads((ROOT/data['counterChain']['path']).read_text());assert len(chain)==801
- print(json.dumps({'status':'PASS_DATA_PINS','cases':193,'counter':41,'geometry':152,'kernel':2048,'generators':36,'chainValues':801,'manifestSHA256':PIN},indent=2))
+ print(json.dumps({'status':'PASS_DATA_PINS','cases':195,'counter':41,'geometry':154,'kernel':2048,'generators':36,'chainValues':801,'manifestSHA256':PIN},indent=2))
 if __name__=='__main__':main()
