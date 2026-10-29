@@ -1,8 +1,12 @@
 # CI Quality Cube: fixed-print 2×2 research
 
-Evidence status: **UNKNOWN** until the generated witnesses and finite checks have
-been independently executed and reviewed. This is research, not an application
-change or an accepted replacement for the existing Status Cube.
+Evidence status: **SAT** for the selected fixed abstract print and all 625
+upright displays, after [independent review](independent-review/REVIEW.md).
+The reviewed single-category policy has a universal six-HTM bound; arbitrary
+targets have a seven-HTM bound. A universal five-HTM bound is **UNSAT only within
+the specified five-state pair construction**. Global print optimization remains
+**UNKNOWN**. This is research, not an application change or approval of final
+typography and manufacturing. Generated pending-review snapshots remain intact.
 
 ## Question and physical assumptions
 
@@ -23,7 +27,7 @@ Whole-cube rotations are not free operations. Front-up is exact, including for
 apparently symmetric icons, because the printed words are asymmetric.
 
 The construction assigns two of the eight corner bodies to each category. Their
-six physical stickers provide candidate positions for the four state artworks.
+six physical stickers provide candidate positions for the four or five state artworks.
 This prevents two categories from demanding different stickers on the same body
 at the same time. It is a construction hypothesis, not by itself a reachability
 proof.
@@ -59,7 +63,7 @@ multi-category jumps separately. Preserve an actual complete physical pose
 through every saved sequence; setup words and hidden back-corner arrangements
 must not silently reset between transitions.
 
-## Finite model and planned checks
+## Finite model and checks
 
 The Julia model uses the 24 proper rigid corner poses and the canonical 18-move
 action. Four labeled tracked corners have 8P4 × 3⁴ = 136,080 partial poses.
@@ -70,19 +74,20 @@ completions, subject to independently checking the orientation convention.
 The pose coordinates use M = R_position C^twist, where C cycles the three axes
 around (1,1,1). A move updates twist by a position-dependent additive offset.
 Subtracting a constant target twist from each tracked corner commutes with all
-moves. If executable checks confirm this, one BFS to the canonical front target
-can supply exact distances to every fixed four-sticker target, without solving
-256 separate full-cube problems.
+moves. Independent executable checks confirm that one BFS to the canonical
+front target supplies exact distances to every fixed four-sticker target,
+without solving 625 separate full-cube problems.
 
 The generator and reviewer must check rank/unrank bijection, all legal transition
 edges, inverse restoration, complete BFS coverage, distance recurrence, saved
-legal paths, all 256 upright displays, immutable IDs, and comparison with the
+legal paths, all 625 priority displays and 256 baseline displays, immutable IDs, and comparison with the
 existing pinned Cubistry mechanics. An upper-bound policy that preserves the
 three unchanged physical front stickers must be distinguished from a globally
 shortest route that may replace them with equal-artwork copies.
 
-No universal five-move bound, global print-layout optimality, or SAT conclusion is
-claimed in advance. New proof code uses Julia, not Python. The JSON dependency
+The reviewed conclusions and their limits are in the
+[analysis](ANALYSIS.md) and [independent report](independent-review/REVIEW.md).
+New proof code uses Julia, not Python. The JSON dependency
 and lock follow the already pinned independent Julia checker setup; they do not
 reuse its verifier implementation.
 

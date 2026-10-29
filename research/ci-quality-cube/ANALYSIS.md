@@ -1,8 +1,12 @@
 # First finite CI Quality Cube measurements
 
-Evidence classification: **UNKNOWN — independent proof review pending**.
-The generator and the existing canonical mechanics have executed successfully;
-that is not a substitute for a separate agent's mathematical review.
+Evidence classification: **SAT** for all 625 fixed-print upright displays and
+the universal six-HTM single-category policy, confirmed by the separate
+[independent review](independent-review/REVIEW.md) of author commit `13ad01a`.
+A universal five-HTM bound is **UNSAT within the specified five-state pair
+construction**, not for arbitrary other prints. Global print and unrestricted
+mean optimization remain **UNKNOWN**. Original generated pending-review
+snapshots are preserved; the review supplies the subsequent classification.
 
 ## Executed construction and witnesses
 
@@ -90,7 +94,7 @@ checks, scoring and JSON output; graph build plus BFS took 0.238 seconds within
 that process. These are one local run on a shared execution host, not a universal
 performance estimate. Nothing is reported as zero startup or teardown cost.
 
-## Executed lower-bound extension awaiting independent review
+## Independently reviewed lower-bound extension
 
 `lower-bounds.jl` saved one reachable full source and six-move
 target path for each of the 100 five-state fully labeled pattern representatives.
@@ -98,11 +102,16 @@ For its obstruction, the other three category artworks occur only once, and all
 copies of the changed target state are on the currently front body. Every target
 therefore requires a nonzero twist of that front body while restoring the other
 three exact front bodies. The table's two nonzero front-twist distances are both
-six. The proposed finite argument rules out a universal five-HTM bound **inside this print family**,
+six. The independently checked finite argument rules out a universal five-HTM bound **inside this print family**,
 including alternative equal-artwork target copies. It is not an impossibility
-claim for arbitrary other print constructions. Canonical physical replay of all
-100 source/target pairs passed. Separate review of the exact lower-bound argument
-and its distance certificate remains required before claiming the conclusion.
+claim for arbitrary other print constructions. Canonical physical replay and
+the separate review of all 100 source/target pairs passed. Those saved examples
+repeat one pattern across the four categories; they are not a literal search
+over all mixed pattern combinations. The review gives the separability argument
+for mixed labels with the same fixed pairing and upright-frame construction.
+It also independently verifies identical per-slot profiles, which supports
+separable policy scoring. Final vector artwork and browser behavior are outside
+this proof's scope.
 
 ## Reproduction
 
