@@ -114,13 +114,13 @@
         "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
         "README.txt": "8f4241fc1233b83c789137f1e97329d860340c24f256cc8125975fb63b76dc6c",
-        "WORD-ART-PROVENANCE.json": "446f73079b92e9f22f4fb46df0666d6bfb63110ca9e44a8d2d28c09e79f5abcd",
-        "artwork-1.svg": "4b58c4da1afb20f3630a914ca9980a095a79e309c3e6408aafc8a222e674c134",
+        "WORD-ART-PROVENANCE.json": "0bf977437621b2b6cc23232cac7ead4a4c93074910a063fca0ab1e4a1cff26d4",
+        "artwork-1.svg": "25eba605890dbb8b041c8d14edc7430226691c26fd887c8a1a40222381c20a60",
         "assembly.pdf": "dd6384e5be603e60559f5517d8eb2da8c5e05c0d5cf24cfb969685d94ab32045",
-        "bundle.zip": "734ea128afc7d2fd19ab187ca0b05431330a0296ae2aef74d39cd883201c9c21",
+        "bundle.zip": "992cc181db48b5584db54a988499bcb6ac4747576e32945e5bf8f0c4920a1b24",
         "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
-        "manifest.json": "59f5c217432027757ab4467be5dfaff55dc0d3808ac3a0b0675bea8b9bb5b003",
-        "print.pdf": "3e136d80db7a2984d8a67bbd5b22377011b2c8088b4faf93d71b5a6a5151f33d"
+        "manifest.json": "d50f627ba0be9c22f92e800689d4e247a941b9b9c66f23879c58a3819994f265",
+        "print.pdf": "d17bf86629bc848408f6c26e9498088afafc3e160cac5c03b43699a0541b7726"
       }
     }
   ]
