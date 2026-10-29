@@ -73,6 +73,8 @@ try {
   }
 } catch (error) {
   $("print-error").textContent = error.message;
+  $("print-summary").textContent = "No print files are available.";
+  $("print-preview").hidden = true;
   for (const id of [
     "print-pdf",
     "print-guide",
