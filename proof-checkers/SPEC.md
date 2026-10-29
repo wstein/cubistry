@@ -22,7 +22,8 @@ not a smaller successful suite. Unknown schema versions/commands fail closed.
 
 ## Raw JSON and bounded input policy
 
-Both CLIs read original raw UTF-8 JSON bytes, not typed source generated from
+All decoded strings must consist of valid Unicode scalar values; reject unpaired
+surrogates. Both CLIs read original raw UTF-8 JSON bytes, not typed source generated from
 Python. Reject invalid JSON/encoding, duplicate object keys, NaN/Infinity, missing
 required fields, wrong types and unsupported versions. Bound input to 16 MiB,
 object/array nesting to 64 and an unquoted numeric token to 128 bytes. Semantic
@@ -150,8 +151,12 @@ unsupported formats and bounded resource failures never produce SAT/UNSAT claims
 The exact stdout result schema may include language/runtime diagnostics, but
 shared outcomes/counts/digests and failure names must be machine comparable.
 Canonical full-state wire output is an ID-sorted array of
-`[id,cubie,[p0,p1,p2],[n0,n1,n2],[up0,up1,up2],image]`, compact UTF-8 JSON.
-Conformance images are ASCII, so its SHA-256 is unambiguous across serializers.
+`[id,cubie,[p0,p1,p2],[n0,n1,n2],[up0,up1,up2],image]`, compact ASCII JSON using the standard Python `json.dumps(..., ensure_ascii=True,
+separators=(",",":"))` string escaping: quote/backslash escaped, slash unescaped,
+short escapes for backspace/tab/newline/form-feed/carriage-return, all other
+control code points and code points >=127 as lowercase `\uXXXX`; supplementary
+scalars use their two lowercase UTF-16 surrogate escapes. Integer output has no
+leading zero or exponent. This defines the full-state SHA-256 for Unicode too.
 Single-state commands return the full wire state when valid. Complete conformance
 can normally emit counts/digests, but must offer a full-state JSONL export for
 independent comparison (including every kernel endpoint); repeated lifecycle

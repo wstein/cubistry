@@ -11,7 +11,7 @@ Full ports are restricted to the counter-certificate checks and marked 3×3
 replay/reachability groups. No solver, optimality claim, new layout proof or
 Cubacle adaptation is included.
 
-The corpus contains 41 raw counter cases, 147 marked-state cases, the exact
+The corpus contains 41 raw counter cases, 152 marked-state cases, the exact
 801-value incumbent chain, 36 center generators and 2,048 center references.
 The metadata records deliberately stricter JSON policies and original oracle
 acceptance, rather than silently claiming identical accepted-input sets.

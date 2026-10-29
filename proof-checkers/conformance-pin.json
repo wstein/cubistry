@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "manifestSHA256": "e375a0e722af3c121e77efb1038826dae8d81053927d2b12eb5a826e06e6f919",
+  "manifestSHA256": "124e6d7277f307806c3d73aef2f96a21c08cc4bc11a8cfc58c2eec17f21c4e75",
   "counterCases": [
     "boolean-cubie",
     "boolean-identity",
@@ -176,7 +176,12 @@
     "state-cubie-identity-changed",
     "state-image-changed",
     "state-not-array",
+    "unicode-bmp-image",
+    "unicode-control-image",
+    "unicode-quoted-image",
+    "unicode-supplementary-image",
     "unknown-geometry-schema",
+    "unpaired-surrogate-image",
     "valid-center-half",
     "valid-declared-center-quarter",
     "valid-quarter-exact-optical-goal",

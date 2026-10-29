@@ -59,6 +59,15 @@ def extend_schema_cases(manifest):
  def repair_center_parity(d):
   x=next(x for x in d['state'] if x['p']==[0,0,1] and x['n']==[0,0,1]);x['up']=[1,0,0]
  add('odd-corners-plus-center-quarter',repair_center_parity,False,odd)
+
+ for name,image in [('unicode-bmp-image','Ä'),('unicode-supplementary-image','😀'),('unicode-control-image','\b\t\n\f\r\x00\x0b\x7f'),('unicode-quoted-image','quote\"slash/and-backslash\\')]:
+  def setimage(d,image=image):
+   d['printing'][0]['image']=image;d['state'][0]['image']=image
+  add(name,setimage,True)
+ data=copy.deepcopy(base);raw=(json.dumps(data,separators=(',',':'))+'\n').encode().replace(b'sticker-0',b'\\ud800')
+ path=HERE/'conformance/geometry/unpaired-surrogate-image.json'
+ with path.open('xb') as f:f.write(raw)
+ cases.append({'group':'geometry','name':'unpaired-surrogate-image','path':str(path.relative_to(ROOT)),'sha256':sha(raw),'expectedValid':False})
  manifest['caseCount']=len(cases);manifest['counterCaseCount']=sum(c['group']=='counter' for c in cases);manifest['geometryCaseCount']=sum(c['group']=='geometry' for c in cases)
  return manifest
 
