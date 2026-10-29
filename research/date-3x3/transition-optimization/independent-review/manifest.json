@@ -1,0 +1,17 @@
+{
+  "reviewer": "calendar_optimizer_proof_review",
+  "date": "2026-10-29",
+  "latestPlannerCoverage": "12 fresh canonical examples and 24 chained actual poses; not full V1 corpus",
+  "sha256": {
+    "../planner.mjs": "518c38a0f3ab32dea39fed79b73b2d161c1d2a4bbe7a71536b1539272ce78776",
+    "../planner-v1.mjs": "c71de1aa2426cf404c5166e6b785957368c0e0e60a5987370ff8618d09cb9a70",
+    "../daily-witness-v1.json": "efd454d3510bf01359730084beaf9e8ce4f9f11839fbabb87daab5607f9cd6dc",
+    "examples.json": "0c1a4e2f43697d8db82eb85fdaebcc14ea01fd8ca41668f5422e540ef8efcebf",
+    "chained.json": "61aef9a20ff5c7a7ba72092d0152cfd41564a42084154851c9fee50a8331cc2e",
+    "replay-result.json": "0ac67ff036a4751eeaf462c896e2edc12e065983d34bfd2f2e4fb3b1dec5fb70",
+    "v1-replay-result.json": "e7bbc79667a58c4be01f3e919ca7c3cabb180cdc2ac9ac79031a29caa04b036c",
+    "generate-chained.mjs": "0ab34e59170a4123c46b1fa8ab0f51279726721cbc931da6c35158d8b0d80c54",
+    "replay.py": "f984bc3b7efc43b41f05320e255ce1b2ecf60c8dd2b4f3e186729f07e0f5c511",
+    "generation.log": "b751e9589c56380df0fbf74e57621fe9e19b7c90e3e4f99285df873c2e5da282"
+  }
+}

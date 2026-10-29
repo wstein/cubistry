@@ -1,0 +1,128 @@
+[
+  {
+    "id": "de-a",
+    "direction": 1,
+    "uniqueTransitions": 2569,
+    "representedCalendarTransitions": 146097,
+    "totalBefore": 9792113,
+    "totalAfter": 3443981,
+    "meanBefore": 67.02473698980815,
+    "meanAfter": 23.573249279588218,
+    "maximumBefore": 83,
+    "maximumAfter": 43,
+    "strictlyImprovedUnique": 2562,
+    "over20Unique": 832,
+    "over20Weighted": 47100,
+    "solverErrors": 0,
+    "elapsedPlanMs": {
+      "median": 4.72619300000224,
+      "p95": 38.76928500000031,
+      "maximum": 275.8848050000015
+    }
+  },
+  {
+    "id": "de-a",
+    "direction": -1,
+    "uniqueTransitions": 2569,
+    "representedCalendarTransitions": 146097,
+    "totalBefore": 9792113,
+    "totalAfter": 3454231,
+    "meanBefore": 67.02473698980815,
+    "meanAfter": 23.6434081466423,
+    "maximumBefore": 83,
+    "maximumAfter": 43,
+    "strictlyImprovedUnique": 2558,
+    "over20Unique": 827,
+    "over20Weighted": 46831,
+    "solverErrors": 0,
+    "elapsedPlanMs": {
+      "median": 4.226547999998729,
+      "p95": 35.10713699999906,
+      "maximum": 176.14435300000332
+    }
+  },
+  {
+    "id": "en-3-zero",
+    "direction": 1,
+    "uniqueTransitions": 2569,
+    "representedCalendarTransitions": 146097,
+    "totalBefore": 9308064,
+    "totalAfter": 3031091,
+    "meanBefore": 63.71153411774369,
+    "meanAfter": 20.747113219299507,
+    "maximumBefore": 82,
+    "maximumAfter": 43,
+    "strictlyImprovedUnique": 2553,
+    "over20Unique": 502,
+    "over20Weighted": 28293,
+    "solverErrors": 0,
+    "elapsedPlanMs": {
+      "median": 3.4198430000033113,
+      "p95": 22.03589600000123,
+      "maximum": 279.3075200000021
+    }
+  },
+  {
+    "id": "en-3-zero",
+    "direction": -1,
+    "uniqueTransitions": 2569,
+    "representedCalendarTransitions": 146097,
+    "totalBefore": 9308064,
+    "totalAfter": 3039628,
+    "meanBefore": 63.71153411774369,
+    "meanAfter": 20.80554699959616,
+    "maximumBefore": 82,
+    "maximumAfter": 42,
+    "strictlyImprovedUnique": 2549,
+    "over20Unique": 505,
+    "over20Weighted": 28465,
+    "solverErrors": 0,
+    "elapsedPlanMs": {
+      "median": 3.520904999997583,
+      "p95": 18.917093999989447,
+      "maximum": 295.8104500000045
+    }
+  },
+  {
+    "id": "en-3-unpadded",
+    "direction": 1,
+    "uniqueTransitions": 2569,
+    "representedCalendarTransitions": 146097,
+    "totalBefore": 9348592,
+    "totalAfter": 3004514,
+    "meanBefore": 63.988938855691764,
+    "meanAfter": 20.565199832987673,
+    "maximumBefore": 84,
+    "maximumAfter": 43,
+    "strictlyImprovedUnique": 2554,
+    "over20Unique": 483,
+    "over20Weighted": 27217,
+    "solverErrors": 0,
+    "elapsedPlanMs": {
+      "median": 3.5091079999983776,
+      "p95": 19.889123000000836,
+      "maximum": 287.6971140000096
+    }
+  },
+  {
+    "id": "en-3-unpadded",
+    "direction": -1,
+    "uniqueTransitions": 2569,
+    "representedCalendarTransitions": 146097,
+    "totalBefore": 9348592,
+    "totalAfter": 3024694,
+    "meanBefore": 63.988938855691764,
+    "meanAfter": 20.703327241490243,
+    "maximumBefore": 84,
+    "maximumAfter": 43,
+    "strictlyImprovedUnique": 2547,
+    "over20Unique": 488,
+    "over20Weighted": 27489,
+    "solverErrors": 0,
+    "elapsedPlanMs": {
+      "median": 3.4199439999938477,
+      "p95": 17.629021000000648,
+      "maximum": 242.3185999999987
+    }
+  }
+]

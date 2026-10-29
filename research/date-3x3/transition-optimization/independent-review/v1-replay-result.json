@@ -1,0 +1,11 @@
+{
+  "status": "SAT",
+  "scope": "Pointwise canonical full-pose starts for every distinct Gregorian day increment/decrement pattern across 2000..2399; actual resulting hidden centers remain tracked, not reset",
+  "uniqueTransitionsVerified": 15414,
+  "calendarTransitionsRepresented": 876582,
+  "allImmutableFramesInverseVerified": true,
+  "allVisibleNonblankFramesIncludingCenterUpright": true,
+  "overTwentyUnique": 3637,
+  "optimality": "UNKNOWN",
+  "universalTwentyMoveBound": "UNKNOWN"
+}

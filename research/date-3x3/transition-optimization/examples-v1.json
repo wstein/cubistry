@@ -1,0 +1,542 @@
+[
+  {
+    "id": "de-a",
+    "from": "2026-10-28",
+    "to": "2026-10-29",
+    "word": "D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 19,
+      "htm": 19,
+      "qtm": 28,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 79,
+      "htm": 79,
+      "qtm": 98,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 181.157916,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 28,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 28,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "from": "2026-07-11",
+    "to": "2026-07-12",
+    "word": "F' L F L2 D R U' R U D' R2 D' F2 D2 R2 F2 D2 L2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 18,
+      "htm": 18,
+      "qtm": 26,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 36,
+      "htm": 36,
+      "qtm": 56,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 10.692872000000023,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 18,
+          "htm": 18,
+          "qtm": 26,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 18,
+          "htm": 18,
+          "qtm": 26,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "from": "2026-10-29",
+    "to": "2026-10-28",
+    "word": "R U' R U' B U B U2 B2 U B2 U2 R2 D' F2 D' L2 F2 D2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 19,
+      "htm": 19,
+      "qtm": 28,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 79,
+      "htm": 79,
+      "qtm": 98,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 6.737633000000017,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 28,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 28,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "from": "2026-07-12",
+    "to": "2026-07-11",
+    "word": "L2 D2 F2 R2 D2 F2 D R2 D U' R' U R' D' L2 F' L' F",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 18,
+      "htm": 18,
+      "qtm": 26,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 36,
+      "htm": 36,
+      "qtm": 56,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 2.8597090000000094,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 18,
+          "htm": 18,
+          "qtm": 26,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 18,
+          "htm": 18,
+          "qtm": 26,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "from": "2026-10-28",
+    "to": "2026-10-29",
+    "word": "L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 17,
+      "htm": 17,
+      "qtm": 24,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 77,
+      "htm": 77,
+      "qtm": 108,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 15.22306900000001,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "from": "2026-07-11",
+    "to": "2026-07-12",
+    "word": "B D2 B' D2 F R2 B' L2 B R2 F' R F L2 F' R'",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 16,
+      "htm": 16,
+      "qtm": 22,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 75,
+      "htm": 75,
+      "qtm": 106,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 13.976420000000019,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 16,
+          "htm": 16,
+          "qtm": 22,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 36,
+          "htm": 36,
+          "qtm": 46,
+          "global": 0
+        },
+        "repairHTM": 20
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "from": "2026-10-29",
+    "to": "2026-10-28",
+    "word": "D B2 D F2 D B2 D' F2 U R2 D2 U' L' U R2 U' L",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 17,
+      "htm": 17,
+      "qtm": 24,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 77,
+      "htm": 77,
+      "qtm": 108,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 5.050760999999966,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "from": "2026-07-12",
+    "to": "2026-07-11",
+    "word": "R F L2 F' R' F R2 B' L2 B R2 F' D2 B D2 B'",
+    "optimized": true,
+    "method": "relative-bidirectional-plus-visible-center",
+    "counts": {
+      "total": 16,
+      "htm": 16,
+      "qtm": 22,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 75,
+      "htm": 75,
+      "qtm": 106,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 6.035165000000006,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 34,
+          "htm": 34,
+          "qtm": 46,
+          "global": 0
+        },
+        "repairHTM": 20
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 16,
+          "htm": 16,
+          "qtm": 22,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "from": "2026-10-28",
+    "to": "2026-10-29",
+    "word": "L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 17,
+      "htm": 17,
+      "qtm": 24,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 77,
+      "htm": 77,
+      "qtm": 108,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 12.730312000000026,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "from": "2026-07-11",
+    "to": "2026-07-12",
+    "word": "B D2 B' D2 F R2 B' L2 B R2 F' R F L2 F' R'",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 16,
+      "htm": 16,
+      "qtm": 22,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 75,
+      "htm": 75,
+      "qtm": 106,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 14.721544999999992,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 16,
+          "htm": 16,
+          "qtm": 22,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 36,
+          "htm": 36,
+          "qtm": 46,
+          "global": 0
+        },
+        "repairHTM": 20
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "from": "2026-10-29",
+    "to": "2026-10-28",
+    "word": "D B2 D F2 D B2 D' F2 U R2 D2 U' L' U R2 U' L",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 17,
+      "htm": 17,
+      "qtm": 24,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 77,
+      "htm": 77,
+      "qtm": 108,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 4.942858000000001,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "from": "2026-07-12",
+    "to": "2026-07-11",
+    "word": "R F L2 F' R' F R2 B' L2 B R2 F' D2 B D2 B'",
+    "optimized": true,
+    "method": "relative-bidirectional-plus-visible-center",
+    "counts": {
+      "total": 16,
+      "htm": 16,
+      "qtm": 22,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 75,
+      "htm": 75,
+      "qtm": 106,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 5.9570659999999975,
+    "error": null,
+    "candidates": [
+      {
+        "reverse": false,
+        "counts": {
+          "total": 34,
+          "htm": 34,
+          "qtm": 46,
+          "global": 0
+        },
+        "repairHTM": 20
+      },
+      {
+        "reverse": true,
+        "counts": {
+          "total": 16,
+          "htm": 16,
+          "qtm": 22,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  }
+]

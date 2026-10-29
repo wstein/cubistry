@@ -1,0 +1,2166 @@
+[
+  {
+    "id": "de-a",
+    "date": "2026-10-29",
+    "sourceWord": "y y U D B' D F2 U' L B2 U' L2 D L2 U R2 U' L2 F2 L2 F2 R F R' F R F R' F R F R' F R F R' F R F R' F ",
+    "cells": [
+      "D",
+      "O",
+      "",
+      "",
+      "2",
+      "9",
+      "O",
+      "K",
+      "T"
+    ],
+    "word": "D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 19,
+      "htm": 19,
+      "qtm": 28,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 79,
+      "htm": 79,
+      "qtm": 98,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 176.266715,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 28,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 28,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "date": "2026-10-30",
+    "sourceWord": "y y U D B' D F2 U' L B2 U' L2 D L2 U R2 U' L2 F2 L2 F2 R F R' F R F R' F R F R' F R F R' F R F R' F  D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R' ",
+    "cells": [
+      "F",
+      "R",
+      "",
+      "",
+      "3",
+      "0",
+      "O",
+      "K",
+      "T"
+    ],
+    "word": "y2 F2 U' L U F D' F' L F' U2 L2 D2 B R2 F' L2 F D2 B L2 D",
+    "optimized": true,
+    "method": "relative-bidirectional-plus-visible-center",
+    "counts": {
+      "total": 22,
+      "htm": 21,
+      "qtm": 29,
+      "global": 1
+    },
+    "baselineCounts": {
+      "total": 99,
+      "htm": 98,
+      "qtm": 125,
+      "global": 1
+    },
+    "attempts": 6,
+    "elapsedMs": 123.07686900000002,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 61,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 22,
+          "htm": 21,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 61,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 22,
+          "htm": 21,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 61,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 38,
+          "htm": 37,
+          "qtm": 59,
+          "global": 1
+        },
+        "repairHTM": 18
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "date": "2026-10-29",
+    "sourceWord": "y y U D B' D F2 U' L B2 U' L2 D L2 U R2 U' L2 F2 L2 F2 R F R' F R F R' F R F R' F R F R' F R F R' F  D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'  y2 F2 U' L U F D' F' L F' U2 L2 D2 B R2 F' L2 F D2 B L2 D ",
+    "cells": [
+      "D",
+      "O",
+      "",
+      "",
+      "2",
+      "9",
+      "O",
+      "K",
+      "T"
+    ],
+    "word": "y2 D' R2 F' D2 B' R2 B L2 F' D2 R2 U2 B R' B D B' U' R' U B2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 22,
+      "htm": 21,
+      "qtm": 29,
+      "global": 1
+    },
+    "baselineCounts": {
+      "total": 120,
+      "htm": 119,
+      "qtm": 155,
+      "global": 1
+    },
+    "attempts": 6,
+    "elapsedMs": 110.55522099999996,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 22,
+          "htm": 21,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 22,
+          "htm": 21,
+          "qtm": 31,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 22,
+          "htm": 21,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 40,
+          "qtm": 49,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 63,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 22,
+          "htm": 21,
+          "qtm": 31,
+          "global": 1
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "date": "2026-11-01",
+    "sourceWord": "y y U D B' D F2 U' L B2 U' L2 D L2 U R2 U' L2 F2 L2 F2 R F R' F R F R' F R F R' F R F R' F R F R' F  D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'  y2 F2 U' L U F D' F' L F' U2 L2 D2 B R2 F' L2 F D2 B L2 D  y2 D' R2 F' D2 B' R2 B L2 F' D2 R2 U2 B R' B D B' U' R' U B2 x",
+    "cells": [
+      "S",
+      "O",
+      "",
+      "",
+      "0",
+      "1",
+      "N",
+      "O",
+      "V"
+    ],
+    "word": "x' y B D F L2 B2 D' R2 F L' U' L2 U2 F2 B2 L2 D F2 D L2 U2 L2",
+    "optimized": true,
+    "method": "relative-bidirectional-plus-visible-center",
+    "counts": {
+      "total": 23,
+      "htm": 21,
+      "qtm": 33,
+      "global": 2
+    },
+    "baselineCounts": {
+      "total": 125,
+      "htm": 121,
+      "qtm": 165,
+      "global": 4
+    },
+    "attempts": 6,
+    "elapsedMs": 89.72466899999995,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 42,
+          "htm": 40,
+          "qtm": 53,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 23,
+          "htm": 21,
+          "qtm": 33,
+          "global": 2
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 65,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 23,
+          "htm": 21,
+          "qtm": 33,
+          "global": 2
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 23,
+          "htm": 21,
+          "qtm": 33,
+          "global": 2
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "date": "2026-12-31",
+    "sourceWord": "y y U D B' D F2 U' L B2 U' L2 D L2 U R2 U' L2 F2 L2 F2 R F R' F R F R' F R F R' F R F R' F R F R' F  D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'  y2 F2 U' L U F D' F' L F' U2 L2 D2 B R2 F' L2 F D2 B L2 D  y2 D' R2 F' D2 B' R2 B L2 F' D2 R2 U2 B R' B D B' U' R' U B2 x x' y B D F L2 B2 D' R2 F L' U' L2 U2 F2 B2 L2 D F2 D L2 U2 L2 y'",
+    "cells": [
+      "D",
+      "O",
+      "",
+      "",
+      "3",
+      "1",
+      "D",
+      "E",
+      "Z"
+    ],
+    "word": "y2 F' D L2 D2 R2 L' U L B' R' B2 U2 R' F2 L U2 R2 B2 R' D2 F R' F R F R' F R F R' F R F R' F R F R' F",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 40,
+      "htm": 39,
+      "qtm": 49,
+      "global": 1
+    },
+    "baselineCounts": {
+      "total": 165,
+      "htm": 160,
+      "qtm": 229,
+      "global": 5
+    },
+    "attempts": 6,
+    "elapsedMs": 156.438178,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 49,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 49,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 49,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 49,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 49,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 49,
+          "global": 1
+        },
+        "repairHTM": 20
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "date": "2027-01-01",
+    "sourceWord": "y y U D B' D F2 U' L B2 U' L2 D L2 U R2 U' L2 F2 L2 F2 R F R' F R F R' F R F R' F R F R' F R F R' F  D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'  y2 F2 U' L U F D' F' L F' U2 L2 D2 B R2 F' L2 F D2 B L2 D  y2 D' R2 F' D2 B' R2 B L2 F' D2 R2 U2 B R' B D B' U' R' U B2 x x' y B D F L2 B2 D' R2 F L' U' L2 U2 F2 B2 L2 D F2 D L2 U2 L2 y' y2 F' D L2 D2 R2 L' U L B' R' B2 U2 R' F2 L U2 R2 B2 R' D2 F R' F R F R' F R F R' F R F R' F R F R' F ",
+    "cells": [
+      "F",
+      "R",
+      "",
+      "",
+      "0",
+      "1",
+      "J",
+      "A",
+      "N"
+    ],
+    "word": "y' F' D2 L2 U B' D B2 L' D B2 L2 B2 U' R2 D' F2 D2 F2 D' L2 R F R' F R F R' F R F R' F R F R' F R F R' F",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 41,
+      "htm": 40,
+      "qtm": 51,
+      "global": 1
+    },
+    "baselineCounts": {
+      "total": 202,
+      "htm": 197,
+      "qtm": 275,
+      "global": 5
+    },
+    "attempts": 6,
+    "elapsedMs": 51.35679200000004,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 40,
+          "qtm": 51,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 40,
+          "qtm": 51,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 40,
+          "qtm": 51,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 40,
+          "qtm": 51,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 40,
+          "qtm": 51,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 40,
+          "qtm": 51,
+          "global": 1
+        },
+        "repairHTM": 20
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "date": "2024-02-29",
+    "sourceWord": "y y U D B' D F2 U' L B2 U' L2 D L2 U R2 U' L2 F2 L2 F2 R F R' F R F R' F R F R' F R F R' F R F R' F  D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'  y2 F2 U' L U F D' F' L F' U2 L2 D2 B R2 F' L2 F D2 B L2 D  y2 D' R2 F' D2 B' R2 B L2 F' D2 R2 U2 B R' B D B' U' R' U B2 x x' y B D F L2 B2 D' R2 F L' U' L2 U2 F2 B2 L2 D F2 D L2 U2 L2 y' y2 F' D L2 D2 R2 L' U L B' R' B2 U2 R' F2 L U2 R2 B2 R' D2 F R' F R F R' F R F R' F R F R' F R F R' F  y' F' D2 L2 U B' D B2 L' D B2 L2 B2 U' R2 D' F2 D2 F2 D' L2 R F R' F R F R' F R F R' F R F R' F R F R' F z2",
+    "cells": [
+      "D",
+      "O",
+      "",
+      "",
+      "2",
+      "9",
+      "F",
+      "E",
+      "B"
+    ],
+    "word": "x2 y R F' D2 F2 U D2 F' L2 F2 R2 B2 D' B2 U' D2 R2 U L2 B2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 39,
+      "htm": 37,
+      "qtm": 61,
+      "global": 2
+    },
+    "baselineCounts": {
+      "total": 243,
+      "htm": 237,
+      "qtm": 325,
+      "global": 6
+    },
+    "attempts": 6,
+    "elapsedMs": 132.97113000000002,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 39,
+          "htm": 37,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 39,
+          "htm": 37,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 39,
+          "htm": 37,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 39,
+          "htm": 37,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 39,
+          "htm": 37,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 39,
+          "htm": 37,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      }
+    ]
+  },
+  {
+    "id": "de-a",
+    "date": "2024-03-01",
+    "sourceWord": "y y U D B' D F2 U' L B2 U' L2 D L2 U R2 U' L2 F2 L2 F2 R F R' F R F R' F R F R' F R F R' F R F R' F  D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'  y2 F2 U' L U F D' F' L F' U2 L2 D2 B R2 F' L2 F D2 B L2 D  y2 D' R2 F' D2 B' R2 B L2 F' D2 R2 U2 B R' B D B' U' R' U B2 x x' y B D F L2 B2 D' R2 F L' U' L2 U2 F2 B2 L2 D F2 D L2 U2 L2 y' y2 F' D L2 D2 R2 L' U L B' R' B2 U2 R' F2 L U2 R2 B2 R' D2 F R' F R F R' F R F R' F R F R' F R F R' F  y' F' D2 L2 U B' D B2 L' D B2 L2 B2 U' R2 D' F2 D2 F2 D' L2 R F R' F R F R' F R F R' F R F R' F R F R' F z2 x2 y R F' D2 F2 U D2 F' L2 F2 R2 B2 D' B2 U' D2 R2 U L2 B2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 ",
+    "cells": [
+      "F",
+      "R",
+      "",
+      "",
+      "0",
+      "1",
+      "M",
+      "Ä",
+      "R"
+    ],
+    "word": "y D2 F2 R2 U2 B2 R2 F D2 B2 U2 F' D2 L D L2 U' L' B2 F D",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 21,
+      "htm": 20,
+      "qtm": 32,
+      "global": 1
+    },
+    "baselineCounts": {
+      "total": 285,
+      "htm": 276,
+      "qtm": 390,
+      "global": 9
+    },
+    "attempts": 6,
+    "elapsedMs": 56.41517799999997,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 32,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 62,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 32,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 62,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 32,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 62,
+          "global": 1
+        },
+        "repairHTM": 18
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "date": "2026-10-29",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F ",
+    "cells": [
+      "THU",
+      "",
+      "",
+      "O",
+      "C",
+      "T",
+      "",
+      "2",
+      "9"
+    ],
+    "word": "L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 17,
+      "htm": 17,
+      "qtm": 24,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 77,
+      "htm": 77,
+      "qtm": 108,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 18.536313000000064,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "date": "2026-10-30",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D' ",
+    "cells": [
+      "FRI",
+      "",
+      "",
+      "O",
+      "C",
+      "T",
+      "",
+      "3",
+      "0"
+    ],
+    "word": "B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 19,
+      "htm": 19,
+      "qtm": 27,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 96,
+      "htm": 96,
+      "qtm": 121,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 23.95047999999997,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 27,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 20,
+          "htm": 20,
+          "qtm": 29,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "date": "2026-10-29",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U ",
+    "cells": [
+      "THU",
+      "",
+      "",
+      "O",
+      "C",
+      "T",
+      "",
+      "2",
+      "9"
+    ],
+    "word": "U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2",
+    "optimized": true,
+    "method": "relative-bidirectional-plus-visible-center",
+    "counts": {
+      "total": 19,
+      "htm": 19,
+      "qtm": 27,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 113,
+      "htm": 113,
+      "qtm": 159,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 4.733821999999918,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 20,
+          "htm": 20,
+          "qtm": 29,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 27,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "date": "2026-11-01",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x",
+    "cells": [
+      "SUN",
+      "",
+      "",
+      "N",
+      "O",
+      "V",
+      "",
+      "0",
+      "1"
+    ],
+    "word": "y B D' L2 D B2 L2 U2 L2 U' L2 U F2 R B2 L' B R2 F U R",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 21,
+      "htm": 20,
+      "qtm": 29,
+      "global": 1
+    },
+    "baselineCounts": {
+      "total": 77,
+      "htm": 74,
+      "qtm": 99,
+      "global": 3
+    },
+    "attempts": 6,
+    "elapsedMs": 115.72511599999984,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "date": "2026-12-31",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x y B D' L2 D B2 L2 U2 L2 U' L2 U F2 R B2 L' B R2 F U R y'",
+    "cells": [
+      "THU",
+      "",
+      "",
+      "D",
+      "E",
+      "C",
+      "",
+      "3",
+      "1"
+    ],
+    "word": "x U F' L' F2 L2 U2 R' F2 R B2 F2 R2 F2 B' R' D' F' D2 R' F L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 39,
+      "htm": 38,
+      "qtm": 59,
+      "global": 1
+    },
+    "baselineCounts": {
+      "total": 98,
+      "htm": 94,
+      "qtm": 129,
+      "global": 4
+    },
+    "attempts": 6,
+    "elapsedMs": 128.7703180000001,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 59,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 61,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 40,
+          "qtm": 49,
+          "global": 1
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 61,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 59,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 39,
+          "qtm": 61,
+          "global": 1
+        },
+        "repairHTM": 18
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "date": "2027-01-01",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x y B D' L2 D B2 L2 U2 L2 U' L2 U F2 R B2 L' B R2 F U R y' x U F' L' F2 L2 U2 R' F2 R B2 F2 R2 F2 B' R' D' F' D2 R' F L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 ",
+    "cells": [
+      "FRI",
+      "",
+      "",
+      "J",
+      "A",
+      "N",
+      "",
+      "0",
+      "1"
+    ],
+    "word": "x' y' D R' F2 U2 R2 D' R2 D B2 U B2 F2 D' F' L F' L' D U' R' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 40,
+      "htm": 38,
+      "qtm": 57,
+      "global": 2
+    },
+    "baselineCounts": {
+      "total": 156,
+      "htm": 150,
+      "qtm": 217,
+      "global": 6
+    },
+    "attempts": 6,
+    "elapsedMs": 53.407859000000144,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 57,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 49,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 57,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "date": "2024-02-29",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x y B D' L2 D B2 L2 U2 L2 U' L2 U F2 R B2 L' B R2 F U R y' x U F' L' F2 L2 U2 R' F2 R B2 F2 R2 F2 B' R' D' F' D2 R' F L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2  x' y' D R' F2 U2 R2 D' R2 D B2 U B2 F2 D' F' L F' L' D U' R' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 z2",
+    "cells": [
+      "THU",
+      "",
+      "",
+      "F",
+      "E",
+      "B",
+      "",
+      "2",
+      "9"
+    ],
+    "word": "x' z D2 U2 F2 L2 R2 B L2 F L2 F R2 F' R' U L2 B2 D' L' U L' B",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 23,
+      "htm": 21,
+      "qtm": 31,
+      "global": 2
+    },
+    "baselineCounts": {
+      "total": 196,
+      "htm": 188,
+      "qtm": 273,
+      "global": 8
+    },
+    "attempts": 6,
+    "elapsedMs": 117.34802200000013,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 23,
+          "htm": 21,
+          "qtm": 31,
+          "global": 2
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 23,
+          "htm": 21,
+          "qtm": 31,
+          "global": 2
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 23,
+          "htm": 21,
+          "qtm": 31,
+          "global": 2
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 23,
+          "htm": 21,
+          "qtm": 31,
+          "global": 2
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 51,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 51,
+          "global": 2
+        },
+        "repairHTM": 20
+      }
+    ]
+  },
+  {
+    "id": "en-3-zero",
+    "date": "2024-03-01",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x y B D' L2 D B2 L2 U2 L2 U' L2 U F2 R B2 L' B R2 F U R y' x U F' L' F2 L2 U2 R' F2 R B2 F2 R2 F2 B' R' D' F' D2 R' F L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2  x' y' D R' F2 U2 R2 D' R2 D B2 U B2 F2 D' F' L F' L' D U' R' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 z2 x' z D2 U2 F2 L2 R2 B L2 F L2 F R2 F' R' U L2 B2 D' L' U L' B ",
+    "cells": [
+      "FRI",
+      "",
+      "",
+      "M",
+      "A",
+      "R",
+      "",
+      "0",
+      "1"
+    ],
+    "word": "x' y' B' U2 L B L D R U' R U B2 U2 R2 U B2 U B2 L2 F2 R2 D2",
+    "optimized": true,
+    "method": "relative-bidirectional-plus-visible-center",
+    "counts": {
+      "total": 23,
+      "htm": 21,
+      "qtm": 31,
+      "global": 2
+    },
+    "baselineCounts": {
+      "total": 203,
+      "htm": 192,
+      "qtm": 277,
+      "global": 11
+    },
+    "attempts": 6,
+    "elapsedMs": 73.26623199999995,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 45,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 45,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 23,
+          "htm": 21,
+          "qtm": 31,
+          "global": 2
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "date": "2026-10-29",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F ",
+    "cells": [
+      "THU",
+      "",
+      "",
+      "O",
+      "C",
+      "T",
+      "",
+      "2",
+      "9"
+    ],
+    "word": "L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 17,
+      "htm": 17,
+      "qtm": 24,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 77,
+      "htm": 77,
+      "qtm": 108,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 16.52115599999979,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 17,
+          "htm": 17,
+          "qtm": 24,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "date": "2026-10-30",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D' ",
+    "cells": [
+      "FRI",
+      "",
+      "",
+      "O",
+      "C",
+      "T",
+      "",
+      "3",
+      "0"
+    ],
+    "word": "B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 19,
+      "htm": 19,
+      "qtm": 27,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 96,
+      "htm": 96,
+      "qtm": 121,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 13.228798000000097,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 27,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 20,
+          "htm": 20,
+          "qtm": 29,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "date": "2026-10-29",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U ",
+    "cells": [
+      "THU",
+      "",
+      "",
+      "O",
+      "C",
+      "T",
+      "",
+      "2",
+      "9"
+    ],
+    "word": "U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2",
+    "optimized": true,
+    "method": "relative-bidirectional-plus-visible-center",
+    "counts": {
+      "total": 19,
+      "htm": 19,
+      "qtm": 27,
+      "global": 0
+    },
+    "baselineCounts": {
+      "total": 113,
+      "htm": 113,
+      "qtm": 159,
+      "global": 0
+    },
+    "attempts": 2,
+    "elapsedMs": 5.834552999999914,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 20,
+          "htm": 20,
+          "qtm": 29,
+          "global": 0
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 19,
+          "htm": 19,
+          "qtm": 27,
+          "global": 0
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "date": "2026-11-01",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x",
+    "cells": [
+      "SUN",
+      "",
+      "",
+      "N",
+      "O",
+      "V",
+      "",
+      "",
+      "1"
+    ],
+    "word": "y F2 D2 L' F2 R F2 L2 B2 R D2 R' F2 B' D' L R' D U2 B R' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 39,
+      "htm": 38,
+      "qtm": 59,
+      "global": 1
+    },
+    "baselineCounts": {
+      "total": 94,
+      "htm": 91,
+      "qtm": 127,
+      "global": 3
+    },
+    "attempts": 6,
+    "elapsedMs": 28.428454999999985,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 59,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 59,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 59,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 59,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 59,
+          "global": 1
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 39,
+          "htm": 38,
+          "qtm": 59,
+          "global": 1
+        },
+        "repairHTM": 18
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "date": "2026-12-31",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x y F2 D2 L' F2 R F2 L2 B2 R D2 R' F2 B' D' L R' D U2 B R' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 y'",
+    "cells": [
+      "THU",
+      "",
+      "",
+      "D",
+      "E",
+      "C",
+      "",
+      "3",
+      "1"
+    ],
+    "word": "x B' R' U' R' B U' R' U' R F2 U2 B2 D2 B2 R U2 L' D2 R2 U2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 21,
+      "htm": 20,
+      "qtm": 29,
+      "global": 1
+    },
+    "baselineCounts": {
+      "total": 116,
+      "htm": 112,
+      "qtm": 159,
+      "global": 4
+    },
+    "attempts": 6,
+    "elapsedMs": 73.198891,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 21,
+          "htm": 20,
+          "qtm": 29,
+          "global": 1
+        },
+        "repairHTM": 0
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "date": "2027-01-01",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x y F2 D2 L' F2 R F2 L2 B2 R D2 R' F2 B' D' L R' D U2 B R' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 y' x B' R' U' R' B U' R' U' R F2 U2 B2 D2 B2 R U2 L' D2 R2 U2 ",
+    "cells": [
+      "FRI",
+      "",
+      "",
+      "J",
+      "A",
+      "N",
+      "",
+      "",
+      "1"
+    ],
+    "word": "x' y' D2 U2 R2 D2 L F2 L' F2 D2 R' U2 L2 D' R2 F' L F L2 B2 D L R F R' F R F R' F R F R' F R F R' F R F R' F",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 43,
+      "htm": 41,
+      "qtm": 53,
+      "global": 2
+    },
+    "baselineCounts": {
+      "total": 159,
+      "htm": 153,
+      "qtm": 207,
+      "global": 6
+    },
+    "attempts": 6,
+    "elapsedMs": 144.56697200000008,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 43,
+          "htm": 41,
+          "qtm": 53,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 43,
+          "htm": 41,
+          "qtm": 53,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 43,
+          "htm": 41,
+          "qtm": 53,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 43,
+          "htm": 41,
+          "qtm": 53,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 43,
+          "htm": 41,
+          "qtm": 53,
+          "global": 2
+        },
+        "repairHTM": 20
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 43,
+          "htm": 41,
+          "qtm": 53,
+          "global": 2
+        },
+        "repairHTM": 20
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "date": "2024-02-29",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x y F2 D2 L' F2 R F2 L2 B2 R D2 R' F2 B' D' L R' D U2 B R' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 y' x B' R' U' R' B U' R' U' R F2 U2 B2 D2 B2 R U2 L' D2 R2 U2  x' y' D2 U2 R2 D2 L F2 L' F2 D2 R' U2 L2 D' R2 F' L F L2 B2 D L R F R' F R F R' F R F R' F R F R' F R F R' F z2",
+    "cells": [
+      "THU",
+      "",
+      "",
+      "F",
+      "E",
+      "B",
+      "",
+      "2",
+      "9"
+    ],
+    "word": "x' z L B R2 D2 B2 R' L2 F' B2 U' L2 D2 R2 D F2 R2 D F2 B2 U' B' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 41,
+      "htm": 39,
+      "qtm": 63,
+      "global": 2
+    },
+    "baselineCounts": {
+      "total": 199,
+      "htm": 191,
+      "qtm": 269,
+      "global": 8
+    },
+    "attempts": 6,
+    "elapsedMs": 107.52890400000001,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 41,
+          "htm": 39,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      }
+    ]
+  },
+  {
+    "id": "en-3-unpadded",
+    "date": "2024-03-01",
+    "sourceWord": "x x x U' F2 U' L2 D R2 U' B2 D' B2 F2 L2 F L D B2 F' L' U' F2 R' R F R' F R F R' F R F R' F R F R' F R F R' F  L' U R2 U' L U D2 R2 U' F2 D B2 D' F2 D' B2 D'  B2 L2 U2 R2 U' R2 B2 D' B2 D' U' F' D2 F U' L D L U  U' L' D' L' U F' D2 F U D B2 D B2 R2 U R2 U2 L2 B2 x y F2 D2 L' F2 R F2 L2 B2 R D2 R' F2 B' D' L R' D U2 B R' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 y' x B' R' U' R' B U' R' U' R F2 U2 B2 D2 B2 R U2 L' D2 R2 U2  x' y' D2 U2 R2 D2 L F2 L' F2 D2 R' U2 L2 D' R2 F' L F L2 B2 D L R F R' F R F R' F R F R' F R F R' F R F R' F z2 x' z L B R2 D2 B2 R' L2 F' B2 U' L2 D2 R2 D F2 R2 D F2 B2 U' B' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 ",
+    "cells": [
+      "FRI",
+      "",
+      "",
+      "M",
+      "A",
+      "R",
+      "",
+      "",
+      "1"
+    ],
+    "word": "x' y' U2 F' L2 U2 F' U2 F2 L2 R2 B' L2 B R D2 L2 D' B R' U2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+    "optimized": true,
+    "method": "relative-canonical-cubies-plus-visible-center",
+    "counts": {
+      "total": 40,
+      "htm": 38,
+      "qtm": 61,
+      "global": 2
+    },
+    "baselineCounts": {
+      "total": 244,
+      "htm": 233,
+      "qtm": 327,
+      "global": 11
+    },
+    "attempts": 6,
+    "elapsedMs": 45.674463999999944,
+    "budgetExceeded": false,
+    "error": null,
+    "candidates": [
+      {
+        "frame": "",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "x",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": false,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 61,
+          "global": 2
+        },
+        "repairHTM": 18
+      },
+      {
+        "frame": "y",
+        "reverse": true,
+        "counts": {
+          "total": 40,
+          "htm": 38,
+          "qtm": 63,
+          "global": 2
+        },
+        "repairHTM": 18
+      }
+    ]
+  }
+]

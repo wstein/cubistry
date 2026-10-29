@@ -1,0 +1,34 @@
+{
+  "schema": "cubistry.calendar-transition-experiment",
+  "version": 1,
+  "baseResearchCommit": "055b38f",
+  "status": "UNKNOWN; independently implemented replay passed, separate agent review pending",
+  "claim": "Legal strictly shorter-or-equal transitions from every canonical current weekday/month/day pose to the next/previous Gregorian day for DE A, English adjacent3 zero and unpadded",
+  "physicalPrintChanged": false,
+  "domain": {
+    "gregorianDays": 146097,
+    "uniqueForwardEdges": 2569,
+    "uniqueCases": 15414,
+    "weightedCases": 876582
+  },
+  "solver": "cubing@0.66.1",
+  "parameters": {
+    "directionsPerRelativePattern": 2,
+    "solverCacheEntries": 512,
+    "maximumBenchmarkMs": 300000
+  },
+  "reproduction": "node research/date-3x3/transition-optimization/benchmark-v1.mjs NEW_OUTPUT.json; python3 research/date-3x3/transition-optimization/verify.py NEW_OUTPUT.json",
+  "limits": [
+    "No minimum-path claim",
+    "No universal twenty-move bound",
+    "Pointwise canonical starts do not reset actual runtime hidden centers"
+  ],
+  "artifacts": {
+    "statistics-v1.json": "cea788794e537f82b502bda1c0df03f052018ce61636514f7baa0c456c443958",
+    "benchmark-v1.mjs": "2e306e204ce1c11bbf7ca0631edd661762b1861b066c6ee85313c472a01a0ddb",
+    "examples-v1.json": "53c11598d474cfb94860230ece6b52b7c019002a02be2fc2be08331a001b797b",
+    "verification-author-v1.json": "e7bbc79667a58c4be01f3e919ca7c3cabb180cdc2ac9ac79031a29caa04b036c",
+    "planner-v1.mjs": "c71de1aa2426cf404c5166e6b785957368c0e0e60a5987370ff8618d09cb9a70",
+    "daily-witness-v1.json": "efd454d3510bf01359730084beaf9e8ce4f9f11839fbabb87daab5607f9cd6dc"
+  }
+}
