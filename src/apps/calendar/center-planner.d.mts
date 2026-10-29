@@ -54,4 +54,5 @@ export function tryCenterPortfolio(
   attempts: ReadonlyArray<unknown>;
   maximumAttempts: number;
   maximumTotalNodes: number;
+  improvementSkippedReason?: string;
 };
