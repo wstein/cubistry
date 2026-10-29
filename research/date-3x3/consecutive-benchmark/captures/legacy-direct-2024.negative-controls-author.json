@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "captureSHA256": "e0eca88879f13017972b1ae9222cb97bbd4defd7fa178c0b5c943a6eb37e9b55",
+  "verifiedCases": 4716,
+  "negativeControlsRejected": [
+    "source identity",
+    "illegal token",
+    "wrong legal route",
+    "dishonest count",
+    "broken state chain",
+    "incorrect Gregorian request",
+    "wrong reference length",
+    "wrong baseline count",
+    "false interruption count",
+    "false summary"
+  ]
+}

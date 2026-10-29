@@ -1,0 +1,55 @@
+Committed 100 requests; 592 ms; legacy de-a year
+Committed 200 requests; 1122 ms; legacy de-a year
+Committed 300 requests; 1807 ms; legacy de-a year
+Committed 400 requests; 2485 ms; legacy de-a year
+Committed 500 requests; 3076 ms; legacy de-a year
+Committed 600 requests; 3764 ms; legacy de-a year
+Committed 700 requests; 4407 ms; legacy de-a year
+Committed 800 requests; 5231 ms; legacy en-3-zero year
+Committed 900 requests; 5835 ms; legacy en-3-zero year
+Committed 1000 requests; 6470 ms; legacy en-3-zero year
+Committed 1100 requests; 7094 ms; legacy en-3-zero year
+Committed 1200 requests; 7631 ms; legacy en-3-zero year
+Committed 1300 requests; 8237 ms; legacy en-3-zero year
+Committed 1400 requests; 8850 ms; legacy en-3-zero year
+Committed 1500 requests; 9431 ms; legacy en-3-zero year
+Committed 1600 requests; 10130 ms; legacy en-3-unpadded year
+Committed 1700 requests; 10737 ms; legacy en-3-unpadded year
+Committed 1800 requests; 11338 ms; legacy en-3-unpadded year
+Committed 1900 requests; 11926 ms; legacy en-3-unpadded year
+Committed 2000 requests; 12451 ms; legacy en-3-unpadded year
+Committed 2100 requests; 13066 ms; legacy en-3-unpadded year
+Committed 2200 requests; 13704 ms; legacy en-3-unpadded year
+Committed 2300 requests; 14312 ms; legacy en-3-unpadded year
+Committed 2400 requests; 17107 ms; direct de-a year
+Committed 2500 requests; 24946 ms; direct de-a year
+Committed 2600 requests; 33820 ms; direct de-a year
+Committed 2700 requests; 58298 ms; direct de-a year
+Committed 2800 requests; 88073 ms; direct de-a year
+Committed 2900 requests; 122050 ms; direct de-a year
+Committed 3000 requests; 166824 ms; direct de-a year
+Committed 3100 requests; 216389 ms; direct de-a jumps
+Committed 3200 requests; 222686 ms; direct en-3-zero year
+Committed 3300 requests; 231944 ms; direct en-3-zero year
+Committed 3400 requests; 248203 ms; direct en-3-zero year
+Committed 3500 requests; 272189 ms; direct en-3-zero year
+Committed 3600 requests; 302068 ms; direct en-3-zero year
+Committed 3700 requests; 337751 ms; direct en-3-zero year
+Committed 3800 requests; 380077 ms; direct en-3-zero year
+Committed 3900 requests; 419594 ms; direct en-3-zero interrupt-move
+Committed 4000 requests; 424640 ms; direct en-3-unpadded year
+Committed 4100 requests; 436872 ms; direct en-3-unpadded year
+Committed 4200 requests; 454673 ms; direct en-3-unpadded year
+Committed 4300 requests; 462045 ms; direct en-3-unpadded year
+Committed 4400 requests; 476282 ms; direct en-3-unpadded year
+Committed 4500 requests; 495845 ms; direct en-3-unpadded year
+Committed 4600 requests; 522817 ms; direct en-3-unpadded year
+Committed 4700 requests; 545152 ms; direct en-3-unpadded interrupt-planning
+{
+  "output": "/tmp/cubistry-consecutive-baseline-full.json",
+  "complete": true,
+  "cases": 4716,
+  "expectedCases": 4716,
+  "elapsedMs": 546011.6049779999,
+  "stopReason": null
+}

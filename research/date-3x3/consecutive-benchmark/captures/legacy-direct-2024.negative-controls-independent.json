@@ -1,0 +1,45 @@
+{
+  "source": "/tmp/cubistry-consecutive-baseline-full.json",
+  "negativeControls": [
+    {
+      "control": "physical source image",
+      "rejected": true,
+      "reason": "One immutable fragment image"
+    },
+    {
+      "control": "chain source hash",
+      "rejected": true,
+      "reason": "Previous complete pose carried into next request"
+    },
+    {
+      "control": "illegal turn",
+      "rejected": true,
+      "reason": "Legal face or explicit whole-cube move"
+    },
+    {
+      "control": "false move count",
+      "rejected": true,
+      "reason": "Exact HTM/QTM/xyz counts"
+    },
+    {
+      "control": "false reference length",
+      "rejected": true,
+      "reason": "Exact actual full-pose source reference length"
+    },
+    {
+      "control": "false baseline count",
+      "rejected": true,
+      "reason": "Correct counterfactual baseline from actual source"
+    },
+    {
+      "control": "omitted stream row",
+      "rejected": true,
+      "reason": "Declared full request coverage and actual complete or partial count"
+    },
+    {
+      "control": "incomplete budget result",
+      "rejected": true,
+      "reason": "Complete run or explicitly requested partial validation"
+    }
+  ]
+}
