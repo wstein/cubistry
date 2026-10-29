@@ -1,3 +1,4 @@
+import { installPrintLink } from "./apps/print/link.ts";
 import { HsmController } from "./apps/hsm/controller.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";
 import hsmPin from "../hsm-source.json";
@@ -783,3 +784,5 @@ async function initialize() {
 }
 controlsUi();
 void initialize();
+
+installPrintLink(() => $("application").value === "hsm-counter" ? $("hsm-lettering").value === "words" ? "hsm-words" : "hsm-symbols" : null);

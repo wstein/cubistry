@@ -1,3 +1,4 @@
+import { installPrintLink } from "./apps/print/link.ts";
 import "./style.css";
 import "./calendar.css";
 import "./presentation.css";
@@ -313,3 +314,5 @@ export const calendarApp = {
 window.addEventListener("pagehide", (event) => {
   if (!event.persisted) optimizer.dispose();
 });
+
+installPrintLink(() => $("calendar-design").value === "de-a" ? "de-a" : "en-3");
