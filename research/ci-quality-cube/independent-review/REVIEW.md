@@ -1,7 +1,23 @@
 # Independent fixed-print Quality Cube review
 
-Reviewed author commit: `13ad01a` (the complete author commit is the parent of
-the review commit). This reviewer is separate from the Julia generator author.
+Reviewed publication author commit:
+`e9e544c0b2cfdffc55918e4ef9e8ef4d78d84d9b`. The original frozen author commit
+was `13ad01abc39298d240fc6f90a78339afcfa397f8`, on which the executions below
+were performed. This reviewer independently checked that the complete
+`research/ci-quality-cube/` tree is byte-identical between those two commits.
+The publication author commit is based on
+`8a85fd8c93f6d0305174e63767bda366cae7544b`, the actual remote research tip found
+after a stale local tracking reference caused a safe non-fast-forward push
+rejection. Only the unpushed Quality Cube commits were rebased; existing remote
+research history and all generated evidence were preserved. The original input
+baseline `7c05d28e97ecf30848220f5c70cb3100a4f3628d` in the manifest remains
+historical provenance, rather than a mutable publication target.
+
+The reviewer then inspected the classification and scope clarifications in
+publication documentation commit `797aba41f3a969360affbbb5ab86d2d877939de4`.
+They preserve the restricted lower-bound and policy-mean qualifications below.
+The byte-identity and documentation-only changes require no repeated physics
+search or certificate run. This reviewer is separate from the Julia generator author.
 The checks below import none of the author's model, search, scoring, or canonical
 checker implementation. They read the frozen evidence and distance certificate.
 
