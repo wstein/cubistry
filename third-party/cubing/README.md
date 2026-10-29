@@ -64,3 +64,5 @@ The wasip2 Apache/LLVM-exception license directory is retained in full.
 `dist/licenses/cubing/` in every production build. `provenance.json` records the
 exact upstream attribution paths and hashes. No license text or copyright notice
 has been rewritten to follow the application's spelling conventions.
+
+The two retained Cargo VCS metadata files use the visible name `cargo-vcs-info.json` so static artifacts meet the existing path rules. Their bytes are unchanged; the inventory records the original `.cargo_vcs_info.json` name.
