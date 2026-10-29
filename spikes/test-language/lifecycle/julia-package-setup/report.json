@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/tmp/julia-1.13.3/bin/julia",
+    "--startup-file=no",
+    "--project=spikes/test-language/julia",
+    "-e",
+    "using Pkg; Pkg.offline(true); Pkg.instantiate(); Pkg.precompile()"
+  ],
+  "elapsedMs": 694.228571,
+  "exitCode": 0,
+  "scope": "cached offline package instantiate/precompile check; not a cold installation and not full checker-function JIT",
+  "manifestSHA256": "136ee9a307e16429f3f89ba1505e1b0f9c51502156c32b3647d554590315d965",
+  "depotSelector": "/tmp/cubistry-julia-depot"
+}

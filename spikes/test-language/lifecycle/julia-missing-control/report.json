@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/tmp/julia-1.13.3/bin/julia",
+    "--startup-file=no",
+    "--optimize=0",
+    "--project=spikes/test-language/julia",
+    "-e",
+    "include(ARGS[1]); verify_suite(ARGS[2],ARGS[3])",
+    "--",
+    "spikes/test-language/julia/checker.jl",
+    "public/counter-proof.json",
+    "/tmp/tmpeovc5j04"
+  ],
+  "fixtureCount": 9,
+  "removedFixture": "wrong-target.json",
+  "exitCode": 1,
+  "expectedDiagnosticObserved": true
+}

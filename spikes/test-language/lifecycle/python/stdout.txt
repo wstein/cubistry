@@ -1,0 +1,7 @@
+CUBISTRY_PHASE {"event": "READY"}
+CUBISTRY_PHASE {"event": "LOAD", "elapsedMs": 2.705205, "scope": "load unchanged Python oracle and its standard-library modules"}
+CUBISTRY_PHASE {"event": "RESULT", "iteration": 0, "elapsedMs": 564.563875, "values": 100, "inverseChecks": 100, "negativeControls": 10, "fullStickerFrames": 2400, "checksum": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5", "scope": "unchanged full checker, chains/proof checks, ten corruptions and full-state audit"}
+CUBISTRY_PHASE {"event": "RESULT", "iteration": 1, "elapsedMs": 546.752593, "values": 100, "inverseChecks": 100, "negativeControls": 10, "fullStickerFrames": 2400, "checksum": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5", "scope": "unchanged full checker, chains/proof checks, ten corruptions and full-state audit"}
+CUBISTRY_PHASE {"event": "RESULT", "iteration": 2, "elapsedMs": 536.784257, "values": 100, "inverseChecks": 100, "negativeControls": 10, "fullStickerFrames": 2400, "checksum": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5", "scope": "unchanged full checker, chains/proof checks, ten corruptions and full-state audit"}
+CUBISTRY_PHASE {"event": "RESULT", "iteration": 3, "elapsedMs": 532.239721, "values": 100, "inverseChecks": 100, "negativeControls": 10, "fullStickerFrames": 2400, "checksum": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5", "scope": "unchanged full checker, chains/proof checks, ten corruptions and full-state audit"}
+CUBISTRY_PHASE {"event": "DONE", "completedRuns": 4}
