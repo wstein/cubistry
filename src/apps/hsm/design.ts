@@ -42,7 +42,8 @@ export function hsmTarget(letter: Letter, value: number): DisplayTarget {
         normal: [0, 0, 1],
         up: [0, 1, 0],
         assetId,
-        matching: "exact",
+        // The unprinted sticker's up vector has no visible meaning.
+        matching: assetId === "blank" ? "equivalent" : "exact",
       }),
     ),
   });
