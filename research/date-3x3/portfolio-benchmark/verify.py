@@ -252,6 +252,8 @@ def verify(document, allow_partial=False):
                     need(attempt['maximumNodes'] == 100000, 'Each attempt node ceiling is 100k')
                     depth = attempt['maximumDepth']
                     need(depth is None or type(depth) is int and 0 <= depth <= (24 if a == 0 else 18), 'Improvement attempt has bounded outer-face depth')
+                    if attempt.get('status') == 'solved' and attempt.get('attempted'):
+                        need(c['htm'] <= depth, 'Solved native candidate fits its recorded outer-face cap')
                     if a > 0 and (series.get('providerMetadata') or {}).get('policy') == 'default-then-shorter-cap18-v2':
                         need(depth < attempts[0]['maximumDepth'], 'V2 never repeats an equal or greater native depth')
                     candidate_replays += 1
