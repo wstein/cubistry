@@ -4,8 +4,8 @@ Owner decision (final). The independent Flix and Julia checkers in this director
 are the AUTHORITATIVE verification for proofs and certificates. Python becomes a
 third voice. This page supersedes the statement in the [contract](SPEC.md) header,
 written at the time of issue 74, that the Python proof gates and production code
-remain authoritative. The contract header is kept byte-identical because
-`evidence-manifest.json` pins its hash.
+remain authoritative. That header line now points here; only the `SPEC.md` entry
+of `evidence-manifest.json` was re-pinned for this wording change.
 
 ## Rule, in order of strength
 

@@ -3,7 +3,7 @@
   "scope": "retained contract, author evidence and independent review; source and raw export hashes additionally checked by language provenance",
   "sha256": {
     "proof-checkers/INTERFACE.md": "2f2f415650b48fd0a53b7bd908bef00f538f1fe110fe0035910b2850192ecfc3",
-    "proof-checkers/SPEC.md": "d5a29b35ea633b8eba7e23915dcfbae95a4364157c7f4ee2c6852b7ab891f31c",
+    "proof-checkers/SPEC.md": "cba48d515b9e5d1b4773475eb1cb754bcb6345030135aef58ea1a9860a8c2e82",
     "proof-checkers/conformance-pin.json": "5b2b8a8ef98a3c4f5e4982c54ce6c2978911add7667a058f6092bf81e88cf845",
     "proof-checkers/coverage.json": "437300399d6dd99ad002a90d360930f401ffd6063cbcb2e025d7ff753293ecb6",
     "proof-checkers/flix/evidence/build.json": "1a31a6c07338ab50f3e1ec954cc3dc6f638f76449cc65be4759594bad58f7956",

@@ -2,8 +2,10 @@
 
 Status: approved bounded implementation scope from [issue 74](https://github.com/wstein/cubistry/issues/74).
 Base: finalized lifecycle spike `285e8348e35e3bfc2a974bc6d77e8d9d5baf0bd6`.
-Python proof gates and production code remain authoritative and unchanged. These
-are validators/replayers, not solvers or new layout/optimality/UNSAT experiments.
+At issue 74, Python proof gates and production code were authoritative and
+unchanged. Since the 2026-10-29 [authority change](AUTHORITY.md), Flix and Julia
+are the authoritative verifiers and Python is a third voice. These are
+validators/replayers, not solvers or new layout/optimality/UNSAT experiments.
 
 ## Ownership and trust boundary
 
