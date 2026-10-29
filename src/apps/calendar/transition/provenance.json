@@ -1,0 +1,29 @@
+{
+  "repository": "https://github.com/wstein/cubistry",
+  "researchCommit": "2455cef82040822bb601191c801e4052602c0db9",
+  "researchReviewPath": "research/date-3x3/transition-optimization/INDEPENDENT_REVIEW.md",
+  "solver": "cubing@0.66.1",
+  "files": [
+    {
+      "researchPath": "research/date-3x3/transition-optimization/planner.mjs",
+      "researchSHA256": "518c38a0f3ab32dea39fed79b73b2d161c1d2a4bbe7a71536b1539272ce78776",
+      "localPath": "planner.mjs",
+      "localSHA256": "3e5563a4df9f207983b0899c8dddb139edbce9f47bd3174fd26f77f10bbb2e91",
+      "changes": "Only geometry import path changed to ./geometry.mjs"
+    },
+    {
+      "researchPath": "research/date-3x3/geometry.mjs",
+      "researchSHA256": "115d58243b28c6932319879f8377e077f4680ebf96aa2b987e9ec5692bb89c76",
+      "localPath": "geometry.mjs",
+      "localSHA256": "115d58243b28c6932319879f8377e077f4680ebf96aa2b987e9ec5692bb89c76",
+      "changes": "Byte-identical"
+    },
+    {
+      "researchPath": "research/date-3x3/center-corrections.json",
+      "researchSHA256": "e7be2e10c58737533d245d17ad7bf7a04aa0fd4d44e723f96fbf38538a4900fa",
+      "localPath": "center-corrections.json",
+      "localSHA256": "e7be2e10c58737533d245d17ad7bf7a04aa0fd4d44e723f96fbf38538a4900fa",
+      "changes": "Byte-identical"
+    }
+  ]
+}
