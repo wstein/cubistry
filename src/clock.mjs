@@ -1,3 +1,4 @@
+import { installPrintLink } from "./apps/print/link.ts";
 import "./style.css";
 import "./clock.css";
 import "./presentation.css";
@@ -165,3 +166,5 @@ async function initialize() {
 }
 void initialize();
 export { units as clockUnits, stage as clockStage };
+
+installPrintLink(() => $("clock-lettering").value === "words" ? "hsm-words" : "hsm-symbols");
