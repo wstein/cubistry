@@ -219,5 +219,25 @@ test("obsolete solver load cannot play after a new session; viewer failure freez
   await expect(page.locator("#cube")).toHaveAttribute("data-frozen", "true");
   await expect(page.locator("#cube")).toHaveAttribute("data-cursor", cursor);
   await expect(page.locator("#status")).toContainText("Reload");
+  await expect(page.locator("#exact")).toHaveText("Unknown");
+  await expect(page.locator("#equivalent")).toHaveText("Unknown");
   await expect(page.locator("#solve")).toBeDisabled();
+});
+
+test("untrusted picture assets fail startup explicitly without a canvas or enabled turns", async ({
+  page,
+}) => {
+  await page.route("**/playground/F_0_0.svg", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "image/svg+xml",
+      body: '<svg xmlns="http://www.w3.org/2000/svg"><script/></svg>',
+    }),
+  );
+  await page.goto("/playground.html");
+  await expect(page.locator("#status")).toContainText("Unable to start");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#exact")).toHaveText("Unavailable");
+  await expect(page.locator("canvas")).toHaveCount(0);
+  await expect(page.locator("#apply")).toBeDisabled();
 });
