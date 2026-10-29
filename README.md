@@ -31,6 +31,10 @@ has already been delivered. Cubistry must remain usable without ChronoCube.
 
 ## Development preview
 
+The [Status Cube reference](docs/STATUS_CUBE.md) is a small declarative workflow
+prototype with six fixed physical faces and local simulated events. Open
+`status.html` directly or select it from the counter's application chooser.
+
 Expected Pages URL: https://wstein.github.io/cubistry/. Publication awaits the
 first human-approved merge and successful main-only Pages workflow; this link
 is not a claim that the preview is already online. The static counter needs no
