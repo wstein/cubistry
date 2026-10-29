@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "baseline": "377747515be034cf19f656244a20449421b12b1d",
+  "input": "public/counter-proof.json",
+  "pythonOracle": "research/counter/verify.py",
+  "juliaVersion": "1.13.3",
+  "juliaArchive": "https://julialang-s3.julialang.org/bin/linux/x64/1.13/julia-1.13.3-linux-x86_64.tar.gz",
+  "juliaArchiveSHA256": "5c61cb4b40332cb5a3504e7779e2f5dac093caa4a1116ded19f01413f85c63e4",
+  "productionMigration": false,
+  "status": "UNKNOWN"
+}
