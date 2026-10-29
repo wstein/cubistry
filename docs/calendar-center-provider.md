@@ -72,3 +72,22 @@ repair (37 total); the original center search found 24; the shorter-depth attemp
 finds 18. Tests replay all 18 recorded source contexts (three source histories,
 three printings and both prior backend histories), including hidden poses and
 exact references. Other dates may retain longer checked routes.
+
+## Shorter visible-center repairs
+
+Repair table version 2 uses face-renamed conjugates of the algorithms published
+in [Kociemba's picture-cube discussion](https://kociemba.org/twisted.htm): 12 HTM
+for a half-turn correction and 14 HTM for either quarter-turn correction. Every
+word restores all noncenter positions and orientations. A quarter correction
+also turns the hidden back center; its orientation is unconstrained by the
+calendar goal and remains part of the actual physical state. The shared solver
+and its exact-reference kernel are unchanged. Metadata records the repair table
+version separately from the search policy and provider pin.
+
+On the exact captured German A 20→19 April 2024 source, replacing the old 20-turn
+half correction constructs a 32-HTM route plus two whole-cube rotations, with the
+same full 54-pose endpoint as the old 41-HTM route. Its ordinary prefix is still
+21 HTM; adjacent F turns merge at the repair boundary. This is a checked improvement
+for that source, not a new global maximum or optimality proof. Quarter repairs
+can change hidden endpoints and later chained routes, so previous full-year
+statistics remain historical; a new continuous capture is needed for new maxima.
