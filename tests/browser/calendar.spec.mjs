@@ -139,10 +139,10 @@ test("live date crosses leap-day midnight and inspection validates Gregorian dat
     "B",
   ]);
   await page.fill("#calendar-date", "");
-  await page.click("#calendar-set");
+  await page.locator("#calendar-date").dispatchEvent("change");
   await expect(page.locator("#calendar-error")).toContainText("Use YYYY-MM-DD");
   await page.fill("#calendar-date", "2000-02-29");
-  await page.click("#calendar-set");
+  await page.locator("#calendar-date").dispatchEvent("change");
   await expect(page.locator("#calendar-state")).toHaveText("Selected date");
   expect((await physical(page)).cells).toEqual([
     "D",
@@ -188,7 +188,7 @@ test("real 3 by 3 animation preserves every legal intermediate pose", async ({
     };
   });
   await page.fill("#calendar-date", "2000-02-29");
-  await page.click("#calendar-set");
+  await page.locator("#calendar-date").dispatchEvent("change");
   await expect(page.locator("#calendar-state")).toHaveText("Selected date", {
     timeout: 15000,
   });
@@ -231,8 +231,14 @@ test("selecting today refreshes Live and Inspecting status without moving sticke
   page,
 }) => {
   await ready(page);
+  await expect(
+    page.getByRole("button", { name: "Today", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Show date", exact: true }),
+  ).toHaveCount(0);
   const before = await physical(page);
-  await page.click("#calendar-set");
+  await page.locator("#calendar-date").dispatchEvent("change");
   await expect(page.locator("#calendar-state")).toHaveText("Selected date");
   await expect(page.locator("#calendar-zone")).toHaveText(
     "Europe/Berlin · Inspecting",
@@ -265,7 +271,7 @@ test.describe("high-density calendar framing", () => {
     });
     await page.goto("/calendar.html");
     await expect(page.locator("#calendar-design")).toBeEnabled();
-    await page.click("#calendar-set");
+    await page.locator("#calendar-date").dispatchEvent("change");
     for (const design of ["de-a", "en-3"]) {
       await page.selectOption("#calendar-design", design);
       await expect(page.locator("#calendar-design")).toBeEnabled();
@@ -378,7 +384,7 @@ test("English Saturday and both Sunday source stickers stay permanently red and 
     ["2026-11-09", "MON"],
   ]) {
     await page.fill("#calendar-date", iso);
-    await page.click("#calendar-set");
+    await page.locator("#calendar-date").dispatchEvent("change");
     await expect(page.locator("#calendar-viewer")).toHaveAttribute(
       "aria-busy",
       "false",
