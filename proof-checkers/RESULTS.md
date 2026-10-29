@@ -36,7 +36,8 @@ An independent reviewer additionally executed raw-input boundary controls,
 reordered and relabeled bodies/identities, arbitrary printed reference frames,
 Unicode aliases, exact resource limits, and 52 rotated-reference center/optical
 checks. Both engines passed. Each language's four complete lifecycle calls were
-also independently rerun. The final review reports are retained with the delivery. Review found and fixed
+also independently rerun. The [contract review](review/CONTRACT_REVIEW.md) and
+[implementation review](review/IMPLEMENTATION_REVIEW.md) are retained verbatim. Review found and fixed
 a Flix input-order discrepancy: reordering only `unpaddedPrinting` now rejects,
 matching Python and Julia; permuting both printing arrays together remains valid.
 Three raw-CLI regressions also preserve equivalent integer `-0` handling.
