@@ -164,7 +164,9 @@ export class CalendarOptimizer {
           backendUsed: "direct",
           solverStatus: error.message.includes("deadline")
             ? "deadline"
-            : "worker-failure",
+            : error.message.includes("superseded")
+              ? "superseded"
+              : "worker-failure",
         });
         request.resolve(request.interimWord);
       } else request.reject(error);
