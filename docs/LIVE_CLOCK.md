@@ -78,7 +78,8 @@ units before the live schedule is fitted.
 
 A status block under the cubes shows, per cube (Hours, Minutes, Seconds) and in
 total, the committed HTM moves and whole-cube rotations of the session, the cost
-of the last completed tick, and the largest tick cost so far. It reuses the
+of the last completed tick, the largest tick cost so far, and the mean and
+median cost per tick. It reuses the
 counting conventions of the counter and calendar: an outer-face token counts
 once, a half turn included. Whole-cube x/y/z rotations are counted separately;
 HSM routes consist of outer-face moves only, so that column stays at zero.
@@ -90,11 +91,22 @@ HSM routes consist of outer-face moves only, so that column stays at zero.
   display change, including turns of a superseded route. Changes that complete
   between two display polls form one tick, so a midnight rollover is one tick.
   A dash means no tick has completed yet.
+- Mean and median use exactly the completed costs behind last and max, so
+  zero-cost changes count. A cube row covers that cube's completed changes. The
+  Total row covers clock ticks, each costing the sum over the cubes that changed
+  in it, not the pooled changes of the three cubes.
+- Mean is the exact total cost divided by the number of completed ticks, shown
+  with two decimals. Median is the middle cost; for an even count it is the mean
+  of the two middle costs, shown without padding (for example 1.5). Both show a
+  dash before the first completed tick and restart with Reset session moves.
+- The median needs the distribution, so each row keeps a count per distinct
+  cost (a small histogram) instead of every tick; memory does not grow with the
+  length of the session.
 - Session counters restart on page load or when the print changes, and with the
   Reset session moves button. They survive re-rendering and presentation mode
   and are not stored in the browser. Presentation mode hides the block, like the
   per-cube status lines.
-- Only exact counts are shown, no averages or estimates.
+- Only exact figures are shown, no estimates; the mean is rounded for display.
 
 ## Verification
 
