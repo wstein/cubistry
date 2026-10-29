@@ -70,3 +70,10 @@ because Julia's package manager marked it deprecated; final measurements use JSO
 - [Julia runtime license](https://github.com/JuliaLang/julia/blob/v1.13.3/LICENSE.md)
 
 - [Flix executable probe and pinned wrapper setup](flix/README.md)
+
+## Full-call lifecycle follow-up
+
+[Load, first complete validation, same-process repeats and observed exit](LIFECYCLE.md)
+separates upfront setup/build from runtime/JIT, four complete checks and nonzero
+exit tails. The repeated calls retain their full positive/negative scope; they are
+not the earlier optional replay microbenchmark.
