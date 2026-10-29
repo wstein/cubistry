@@ -17,6 +17,7 @@ import {
   matches,
   tokens,
 } from "../src/apps/calendar/model.ts";
+import { appendCenterRepair } from "../src/apps/calendar/transition/planner.mjs";
 const corrections = JSON.parse(
   fs.readFileSync("src/apps/calendar/transition/center-corrections.json"),
 );
@@ -119,4 +120,96 @@ test("transition provenance hashes match local sources while retaining historica
     repair.verification.sha256,
     "47d6a817c0b69ec69685df8bb92b24a46d871478aeea293cd5814cdda0cc55ff",
   );
+});
+
+test("all52 verified repair shifts preserve exact poses on156 arbitrary source states", () => {
+  const d = load("de-a");
+  let checked = 0;
+  for (const repair of corrections.witnesses) {
+    for (const family of [repair.word, ...(repair.equivalentWords ?? [])]) {
+      const ts = tokens(family);
+      for (let offset = 0; offset < ts.length; offset++) {
+        const shifted = ts.slice(offset).concat(ts.slice(0, offset)).join(" ");
+        for (const prefix of ["", "R U F'", "x z2 R2 D'"]) {
+          const from = apply(d.printing, prefix),
+            end = apply(from, shifted);
+          assert(sameState(end, apply(from, repair.word)));
+          assert(sameState(apply(end, inverse(shifted)), from));
+          checked++;
+        }
+      }
+    }
+  }
+  assert.equal(checked, 156);
+  assert.throws(() => appendCenterRepair("R", "x F x'"), /outer-only/i);
+});
+test("quarter repair cyclic joins save at least one HTM for each outer prefix face", () => {
+  for (const repair of corrections.witnesses.filter((r) => r.htm === 14))
+    for (const face of ["U", "D", "F", "B", "R", "L"])
+      for (const suffix of ["", "2", "'"]) {
+        const r = appendCenterRepair(face + suffix, repair.word);
+        assert(r.repairBoundarySavings >= 1);
+        assert(tokens(r.word).length <= 14);
+      }
+  const half = corrections.witnesses.find((r) => r.htm === 12);
+  assert.equal(appendCenterRepair("R", half.word).repairBoundarySavings, 0);
+});
+test("actual V3 worst35HTM source has exact-endpoint cyclic34HTM route and no-worse selected route", async () => {
+  const f = JSON.parse(
+      fs.readFileSync("tests/fixtures/calendar-cyclic-worst-context.json"),
+    ),
+    d = load(f.id);
+  assert.equal(
+    createHash("sha256")
+      .update(fs.readFileSync(`public/calendar/${f.id}.json`))
+      .digest("hex"),
+    f.printingSHA256,
+  );
+  assert.equal(
+    createHash("sha256").update(f.sourceWord).digest("hex"),
+    f.sourceReferenceSHA256,
+  );
+  const from = apply(d.printing, f.sourceWord),
+    target = findTarget(d, civilDate(f.toISO)),
+    ts = tokens(f.oldWord),
+    prefix = ts.slice(0, -f.repairHTM).join(" "),
+    repair = ts.slice(-f.repairHTM).join(" "),
+    r = appendCenterRepair(prefix, repair),
+    end = apply(from, r.word);
+  assert.equal(tokens(r.word).filter((t) => /^[ULFRBD]/.test(t)).length, 34);
+  assert.equal(r.repairOffset, 6);
+  assert.equal(r.repairBoundarySavings, 1);
+  assert(sameState(end, apply(from, f.oldWord)));
+  assert(matches(end, target.cells));
+  const ctx = {
+      design: d,
+      from,
+      target,
+      sourceWord: f.sourceWord,
+      fallbackWord: simplify(inverse(f.sourceWord) + " " + target.word),
+    },
+    planner = await createPlanner({ design: d }),
+    word = await planner(ctx),
+    refs = referencesForPlan(ctx, word);
+  assert(tokens(word).filter((t) => /^[ULFRBD]/.test(t)).length <= 34);
+  assert(matches(apply(from, word), target.cells));
+  assert(
+    sameState(apply(d.printing, refs.endReferenceWord), apply(from, word)),
+  );
+});
+
+test("verified inverse-half family improves historical41HTM source to31 with identical full endpoint", () => {
+  const f = JSON.parse(
+      fs.readFileSync("tests/fixtures/calendar-worst-repair-context.json"),
+    ),
+    d = load(f.id),
+    from = apply(d.printing, f.sourceWord),
+    half = corrections.witnesses.find((r) => r.htm === 12),
+    prefix = tokens(f.oldWord).slice(0, -f.oldRepairHTM).join(" "),
+    r = appendCenterRepair(prefix, half.word, half.equivalentWords);
+  assert.equal(tokens(r.word).filter((t) => /^[ULFRBD]/.test(t)).length, 31);
+  assert.equal(r.repairVariant, 1);
+  assert.equal(r.repairOffset, 5);
+  assert.equal(r.repairBoundarySavings, 2);
+  assert(sameState(apply(from, r.word), apply(from, f.oldWord)));
 });

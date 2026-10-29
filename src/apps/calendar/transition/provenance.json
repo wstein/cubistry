@@ -8,8 +8,13 @@
       "researchPath": "research/date-3x3/transition-optimization/planner.mjs",
       "researchSHA256": "518c38a0f3ab32dea39fed79b73b2d161c1d2a4bbe7a71536b1539272ce78776",
       "localPath": "planner.mjs",
-      "localSHA256": "3e5563a4df9f207983b0899c8dddb139edbce9f47bd3174fd26f77f10bbb2e91",
-      "changes": "Only geometry import path changed to ./geometry.mjs"
+      "localSHA256": "9bdddf0954fe2c4dafa98e8a1490500e2e094a606db367218e8ff1179542ec57",
+      "changes": "Geometry import path changed to ./geometry.mjs; matching repairs now minimize simplified prefix joins over verified cyclic shifts and the explicitly supplied inverse-half family, with variant/offset/saving diagnostics. Original research SHA remains historical.",
+      "verification": {
+        "researchCommit": "f0f6ebb41413c6f79ddea78793e045c8ebd028f6",
+        "path": "research/date-3x3/center-bound-investigation/cyclic-verification.json",
+        "sha256": "6a162033b04dba66fdec65533d94930191b72a5dbb3d8d5b791635c3e690aefe"
+      }
     },
     {
       "researchPath": "research/date-3x3/geometry.mjs",
@@ -22,12 +27,17 @@
       "researchPath": "research/date-3x3/center-corrections.json",
       "researchSHA256": "e7be2e10c58737533d245d17ad7bf7a04aa0fd4d44e723f96fbf38538a4900fa",
       "localPath": "center-corrections.json",
-      "localSHA256": "c6acdc2ab88bb2167ee8c7646db9787da3766175f1b9ce71313761327be49f8c",
-      "changes": "Version 2 replaces the original 18/20/18 HTM witnesses with independently verified 14/12/14 HTM face-renamed Kociemba algorithms; quarter repairs also turn the unconstrained hidden back center. Original research path and SHA256 remain historical provenance.",
+      "localSHA256": "3c0ea6d35e41555fd13f9f1a6a9bd42d68012d395e3806eec05fe88553b78a0e",
+      "changes": "Version 3 uses independently verified 14/12/14 HTM witnesses with the same full54 effects as the original macros, plus an explicit equivalent inverse-half word. Original research path and SHA remain historical.",
       "verification": {
         "researchCommit": "9e736592563885322451b99fb118c79889c25855",
         "path": "research/date-3x3/center-bound-investigation/verification.json",
         "sha256": "47d6a817c0b69ec69685df8bb92b24a46d871478aeea293cd5814cdda0cc55ff"
+      },
+      "equivalentFamilyVerification": {
+        "researchCommit": "f0f6ebb41413c6f79ddea78793e045c8ebd028f6",
+        "path": "research/date-3x3/center-bound-investigation/cyclic-verification.json",
+        "sha256": "6a162033b04dba66fdec65533d94930191b72a5dbb3d8d5b791635c3e690aefe"
       }
     }
   ]

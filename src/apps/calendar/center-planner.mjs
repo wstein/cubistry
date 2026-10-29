@@ -356,6 +356,7 @@ export async function createPlanner({ design, options = {} }) {
       maximumNodes: options.maximumNodes ?? 100000,
       maximumTotalNodes: (options.maximumNodes ?? 100000) * maximumAttempts,
       maximumAttempts,
+      centerRepairJoinPolicy: "cyclic-with-verified-half-inverse-v1",
       centerRepairVersion: corrections.version,
       attempts: planner.lastResult.attempts ?? [],
       improvementSkippedReason: planner.lastResult.improvementSkippedReason,
@@ -396,6 +397,7 @@ export async function createPlanner({ design, options = {} }) {
   planner.metadata = {
     providerPin,
     backend: options.backend ?? "center-aware",
+    centerRepairJoinPolicy: "cyclic-with-verified-half-inverse-v1",
     centerRepairVersion: corrections.version,
     centerRepairHTM: corrections.witnesses.map((w) => w.htm),
     policy:

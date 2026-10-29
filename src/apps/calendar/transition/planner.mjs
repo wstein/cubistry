@@ -6,6 +6,23 @@ export const tokens=word=>{const out=word.split(/\s+/).filter(Boolean);need(out.
 export const inverse=word=>tokens(word).reverse().map(t=>t.endsWith('2')?t:t.endsWith("'")?t[0]:t+"'").join(' ');
 export function simplify(word){const out=[];for(const t of tokens(word)){const prev=out.at(-1);if(prev?.[0]===t[0]){out.pop();const turns=((prev.endsWith('2')?2:prev.endsWith("'")?3:1)+(t.endsWith('2')?2:t.endsWith("'")?3:1))%4;if(turns)out.push(t[0]+(turns===2?'2':turns===3?"'":''));}else out.push(t);}return out.join(' ');}
 export const count=word=>{const t=tokens(word);return {total:t.length,htm:t.filter(t=>faces.includes(t[0])).length,qtm:t.filter(t=>faces.includes(t[0])).reduce((n,t)=>n+(t.endsWith('2')?2:1),0),global:t.filter(t=>!faces.includes(t[0])).length};};
+/** Cyclic shifts preserve this center-only kernel because every token is an
+ * outer face turn. Whole-cube rotations do not satisfy that commutation rule.
+ */
+export function appendCenterRepair(prefix, repairWord, equivalentWords=[]) {
+ const families=[repairWord,...equivalentWords].map(tokens);
+ need(families.length<=2&&families.every(repair=>repair.length>0&&repair.every(t=>faces.includes(t[0]))), 'At most two verified outer-only center repair words required');
+ let word=simplify(prefix+' '+families[0].join(' ')),repairOffset=0,repairVariant=0;
+ for(let variant=0;variant<families.length;variant++){
+  const repair=families[variant];
+  for(let offset=0;offset<repair.length;offset++){
+   const candidate=simplify(prefix+' '+repair.slice(offset).concat(repair.slice(0,offset)).join(' '));
+   if(tokens(candidate).length<tokens(word).length){word=candidate;repairOffset=offset;repairVariant=variant;}
+  }
+ }
+ const repairHTM=families[repairVariant].length;
+ return {word,repairOffset,repairVariant,repairHTM,repairBoundarySavings:tokens(prefix).length+repairHTM-tokens(word).length};
+}
 export function shows(state,cells){return G.front.every((p,i)=>{const s=state.find(s=>G.eq(s.p,p)&&G.eq(s.n,[0,0,1]));return s&&s.image===cells[i]&&(!s.image||G.eq(s.up,[0,1,0]));});}
 const center=s=>s.p.filter(Boolean).length===1;
 const frame=(n,u)=>[n,u,G.cross(n,u)];
@@ -75,15 +92,15 @@ export function createTransitionOptimizer({printing,kpuzzle,KPattern,solve,corre
       attempts++;
       const solution=await cachedSolve((reverse?conjugated.invert():conjugated).toKPattern()),outer=mapWord(normalize(reverse?solution:solution.invert()),solverFrame.map);
      need(tokens(outer).every(t=>faces.includes(t[0])),'Solver returned a non-outer move');
-     let candidate=simplify(align.word+' '+outer),state=G.apply(from,candidate),repairHTM=0;
+     let candidate=simplify(align.word+' '+outer),state=G.apply(from,candidate),repairHTM=0,repairOffset=null,repairVariant=null,repairBoundarySavings=0;
      need(goal.filter(s=>!center(s)).every(s=>{const t=state.find(t=>t.id===s.id);return G.eq(s.p,t.p)&&G.eq(s.n,t.n)&&G.eq(s.up,t.up);}), 'Relative solver missed a canonical noncenter frame');
      // Hidden center orientations may differ; only the visible center is required.
      const front=state.find(s=>s.id===frontGoal.id);
      if(target.cells[4]&&!G.eq(front.up,[0,1,0])){
-      const repair=corrections.find(c=>G.eq(G.apply([front],c.word)[0].up,[0,1,0]));need(repair,'Missing legal center correction');candidate=simplify(candidate+' '+repair.word);repairHTM=count(repair.word).htm;state=G.apply(from,candidate);
+      const repair=corrections.find(c=>G.eq(G.apply([front],c.word)[0].up,[0,1,0]));need(repair,'Missing legal center correction');const joined=appendCenterRepair(candidate,repair.word,repair.equivalentWords??[]);candidate=joined.word;repairHTM=joined.repairHTM;repairOffset=joined.repairOffset;repairVariant=joined.repairVariant;repairBoundarySavings=joined.repairBoundarySavings;state=G.apply(from,candidate);
      }
      need(shows(state,target.cells),'Optimized physical route misses its target');
-     candidates.push({frame:solverFrame.word,reverse,counts:count(candidate),repairHTM});
+     candidates.push({frame:solverFrame.word,reverse,counts:count(candidate),repairHTM,repairOffset,repairVariant,repairBoundarySavings});
      if(count(candidate).total<count(word).total){word=candidate;method=reverse?'relative-bidirectional-plus-visible-center':'relative-canonical-cubies-plus-visible-center';}
      }
     }
