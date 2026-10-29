@@ -75,7 +75,7 @@ exact references. Other dates may retain longer checked routes.
 
 ## Shorter visible-center repairs
 
-Repair table version 2 uses face-renamed conjugates of the algorithms published
+Repair table version 3 uses face-renamed conjugates of the algorithms published
 in [Kociemba's picture-cube discussion](https://kociemba.org/twisted.htm): 12 HTM
 for a half-turn correction and 14 HTM for either quarter-turn correction. Every
 word restores all noncenter positions and orientations. A quarter correction
@@ -90,6 +90,31 @@ On the exact captured German A 20→19 April 2024 source, replacing the old 20-t
 half correction constructs a 32-HTM route plus two whole-cube rotations, with the
 same full 54-pose endpoint as the old 41-HTM route. Its ordinary prefix is still
 21 HTM; adjacent F turns merge at the repair boundary. This is a checked improvement
-for that source, not a new global maximum or optimality proof. Quarter repairs
-can change hidden endpoints and later chained routes, so previous full-year
-statistics remain historical; a new continuous capture is needed for new maxima.
+for that source, not a new global maximum or optimality proof. Each new repair has the same full 54-pose transformation as its corresponding old
+repair, including the hidden back-center twist. Shorter repair costs can select
+a different ordinary-solver candidate and therefore change later chained poses;
+previous full-year statistics remain historical and new maxima need a fresh capture.
+
+## Cyclic repair joins
+
+A center-only repair commutes with outer face turns. Cyclic token shifts of the
+verified 12/14/14-turn words therefore preserve their full 54-pose effect. The
+direct planner checks the14/12/14 cyclic families plus12 verified inverse-half
+shifts (52 candidates across all three corrections) and keeps the shortest simplified
+prefix-plus-repair word, retaining the earliest offset on ties. Whole-cube
+rotations are prohibited inside repair words because this commutation argument
+does not apply to them. Physical replay still checks the resulting whole route.
+
+Both quarter words contain all six outer faces, so any nonempty ordinary prefix
+can merge at least its last turn with a suitable repair start. The half word
+contains only F/U/D, so that guarantee does not apply to every prefix. Diagnostic
+`repairHTM` is the selected witness length; `repairVariant`, `repairOffset` and
+`repairBoundarySavings` describe the join. Budgets and the worker deadline are
+unchanged. On the exact captured V3 German A 19→20 April source, the35-HTM route
+has a checked34-HTM cyclic join with the same full54-pose endpoint. This is not an
+optimality proof or a global maximum claim. The explicitly supplied inverse-half
+family also constructs31HTM on the historical41HTM source with the same full
+endpoint. Inverting quarter families is not an additional same-angle candidate;
+the opposite angle remains its own matching correction.
+
+The finite family is pinned by [independent cyclic verification](https://github.com/wstein/cubistry/blob/f0f6ebb41413c6f79ddea78793e045c8ebd028f6/research/date-3x3/center-bound-investigation/cyclic-verification.json); provenance records its immutable commit and artifact hash.
