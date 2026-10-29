@@ -1,0 +1,350 @@
+{
+  "status": "SAT",
+  "witnessSHA256": "2780c128bdba4c135f8edb2e5e30486e80d59a621db8a5e74f1446ae69da1737",
+  "label": "current-app-print",
+  "printCode": "T0 T1 T2 | T3 T4 T5 | U0 U1 U2 | U3 U4 U5 | U6 U7 U8 | U9 U0 U9 | H S M | _ _ _",
+  "realBlankTopLeftVerified": true,
+  "universalBound": {
+    "boundHTM": 6,
+    "holds": true,
+    "displays": 180,
+    "searchNodes": 0,
+    "meaning": "Every display is within this many HTM of every legal full pose"
+  },
+  "modes": [
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "periodEdges": 240,
+      "laps": 4,
+      "periodHTM": 1002,
+      "meanHTM": "167/40",
+      "perLapHTM": "501/2",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 5,
+        "perLapMean": "15/4"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "periodEdges": 60,
+      "laps": 1,
+      "periodHTM": 250,
+      "meanHTM": "25/6",
+      "perLapHTM": "250",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 3,
+        "perLapMean": "3"
+      },
+      "setupHTM": 10
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "periodEdges": 120,
+      "laps": 2,
+      "periodHTM": 501,
+      "meanHTM": "167/40",
+      "perLapHTM": "501/2",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 5,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "periodEdges": 60,
+      "laps": 1,
+      "periodHTM": 250,
+      "meanHTM": "25/6",
+      "perLapHTM": "250",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 3,
+        "perLapMean": "3"
+      },
+      "setupHTM": 10
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "periodEdges": 168,
+      "laps": 7,
+      "periodHTM": 700,
+      "meanHTM": "25/6",
+      "perLapHTM": "100",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 4,
+        "perLapMean": "24/7"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "periodEdges": 72,
+      "laps": 3,
+      "periodHTM": 298,
+      "meanHTM": "149/36",
+      "perLapHTM": "298/3",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 5,
+        "perLapMean": "4"
+      },
+      "setupHTM": 10
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "periodEdges": 24,
+      "laps": 2,
+      "periodHTM": 98,
+      "meanHTM": "49/12",
+      "perLapHTM": "49",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "periodEdges": 120,
+      "laps": 10,
+      "periodHTM": 495,
+      "meanHTM": "33/8",
+      "perLapHTM": "99/2",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 4,
+        "perLapMean": "37/10"
+      },
+      "setupHTM": 9
+    }
+  ],
+  "sUpInverseTraversal": {
+    "periodHTM": 1002,
+    "maximumHTM": 5,
+    "meanHTM": "167/40",
+    "edgesNotShortestForDown": 12,
+    "wrap00To59HTM": [
+      3,
+      3,
+      4,
+      5
+    ]
+  },
+  "optimalityCertificates": [
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 139968,
+      "graphEdges": 283680,
+      "aliveNodes": 139968,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 72,
+        "2": 216,
+        "3": 29880,
+        "4": 18504,
+        "5": 91260,
+        "6": 36
+      },
+      "bellmanFordPasses": 9,
+      "certifiedMinimumMeanHTM": "167/40",
+      "perEdgeBestPoseFloorPerLapHTM": 236,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 139968,
+      "graphEdges": 284292,
+      "aliveNodes": 139968,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 72,
+        "2": 216,
+        "3": 31968,
+        "4": 19080,
+        "5": 88560,
+        "6": 72
+      },
+      "bellmanFordPasses": 5,
+      "certifiedMinimumMeanHTM": "25/6",
+      "perEdgeBestPoseFloorPerLapHTM": 236,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 139968,
+      "graphEdges": 283680,
+      "aliveNodes": 139914,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 72,
+        "2": 216,
+        "3": 29880,
+        "4": 18504,
+        "5": 91260,
+        "6": 36
+      },
+      "bellmanFordPasses": 9,
+      "certifiedMinimumMeanHTM": "167/40",
+      "perEdgeBestPoseFloorPerLapHTM": 236,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 139968,
+      "graphEdges": 284292,
+      "aliveNodes": 139896,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 72,
+        "2": 216,
+        "3": 31968,
+        "4": 19080,
+        "5": 88560,
+        "6": 72
+      },
+      "bellmanFordPasses": 5,
+      "certifiedMinimumMeanHTM": "25/6",
+      "perEdgeBestPoseFloorPerLapHTM": 236,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "graphNodes": 56376,
+      "graphEdges": 112860,
+      "aliveNodes": 56376,
+      "htmCap": 6,
+      "costHistogram": {
+        "3": 11988,
+        "4": 7632,
+        "5": 36756
+      },
+      "bellmanFordPasses": 7,
+      "certifiedMinimumMeanHTM": "25/6",
+      "perEdgeBestPoseFloorPerLapHTM": 94,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "graphNodes": 56376,
+      "graphEdges": 116964,
+      "aliveNodes": 56376,
+      "htmCap": 6,
+      "costHistogram": {
+        "3": 12636,
+        "4": 8424,
+        "5": 35316
+      },
+      "bellmanFordPasses": 7,
+      "certifiedMinimumMeanHTM": "149/36",
+      "perEdgeBestPoseFloorPerLapHTM": 94,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "graphNodes": 29160,
+      "graphEdges": 59130,
+      "aliveNodes": 29160,
+      "htmCap": 6,
+      "costHistogram": {
+        "3": 5994,
+        "4": 4212,
+        "5": 18954
+      },
+      "bellmanFordPasses": 3,
+      "certifiedMinimumMeanHTM": "49/12",
+      "perEdgeBestPoseFloorPerLapHTM": 46,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "graphNodes": 29160,
+      "graphEdges": 58482,
+      "aliveNodes": 29160,
+      "htmCap": 6,
+      "costHistogram": {
+        "3": 6318,
+        "4": 4050,
+        "5": 18792
+      },
+      "bellmanFordPasses": 8,
+      "certifiedMinimumMeanHTM": "33/8",
+      "perEdgeBestPoseFloorPerLapHTM": 46,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    }
+  ],
+  "physicalFloor": {
+    "unitsOnlyEdgeHistogram": {
+      "3": 6,
+      "4": 2,
+      "5": 6
+    },
+    "decadeEdgeHistogram": {
+      "1": 3,
+      "2": 9,
+      "3": 27,
+      "4": 89,
+      "5": 115,
+      "6": 12
+    },
+    "unitsOnlyEdgeMinimumHTM": 3,
+    "decadeEdgeMinimumHTM": 1,
+    "unitsCornerTwistedInPlaceHTM": 5,
+    "sLapLowerBoundHTM": 168,
+    "assumptions": "single S sticker, single sticker per tens digit, every blank on one fully blank corner; any route, shortest or not, recurrent or not"
+  },
+  "versusAppPrint": {
+    "appPrintSHA256": "13eea2a1ad88561775158a70633b80e25d06f883e42d44aafb4e6808699be47b",
+    "changedStickers": 0,
+    "unchangedStickers": 24,
+    "changes": []
+  },
+  "scope": "Each period is closed over all 24 sticker frames and may repeat indefinitely; every edge is a shortest path from its actual source pose.",
+  "globalPrintOptimality": "UNKNOWN"
+}
