@@ -243,6 +243,38 @@ test("superseding a target terminates obsolete planning and starts a fresh worke
   optimizer.dispose();
 });
 
+test("superseding after the interim route resolves it as superseded, not as a worker failure", async () => {
+  let worker;
+  const optimizer = new CalendarOptimizer(
+    () =>
+      (worker = {
+        onmessage: null,
+        onerror: null,
+        onmessageerror: null,
+        postMessage(message) {
+          this.message = message;
+        },
+        terminate() {
+          this.dead = true;
+        },
+      }),
+    8000,
+  );
+  const obsolete = optimizer.plan({
+    design: {},
+    from: [],
+    target: {},
+    sourceWord: "",
+    fallbackWord: "R U",
+  });
+  worker.onmessage({ data: { id: worker.message.id, interimWord: "R" } });
+  optimizer.plan.cancelPlanning();
+  assert.equal(await obsolete, "R");
+  assert.equal(worker.dead, true);
+  assert.equal(optimizer.diagnostics.solverStatus, "superseded");
+  optimizer.dispose();
+});
+
 test("bounded search and a route that cannot be shortened retain the checked direct word", () => {
   const design = load("de-a"),
     target = findTarget(design, civilDate("2026-10-29"));
