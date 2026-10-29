@@ -115,9 +115,9 @@ int main(int argc, char **argv) {
     if (v >= 1e9)
       continue;
     if (v <= cur || urand() < exp((cur - v) / T)) {
-      if (universalBound(&Q, &wl, &wv) > 6)
-        continue;
       if (!mOK(&Q))
+        continue;
+      if (universalBound(&Q, &wl, &wv) > 6)
         continue;
       P = Q;
       cur = v;
