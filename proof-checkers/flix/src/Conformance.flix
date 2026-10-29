@@ -87,7 +87,7 @@ def kernelItem(row: J, source: List[Sticker], group: String, index: Int32, out: 
     require(List.length(ms) == integer(field(row,"htm")),"ERROR: center reference move count mismatch");
     let actual=apply(source,ms);
     let qs=reachability(source,actual);
-    let expected=six(field(row,if (group == "generator") "delta" else "o"),false);
+    let expected=six(field(row,if (group == "generators") "delta" else "o"),false);
     require(qs == expected,"center reference quarter indices mismatch");
     require(noncenters(actual) == noncenters(source),"center reference moved noncenter physical frames");
     require(apply(actual,inverse(ms)) == source,"center reference inverse failed full restoration");
@@ -142,7 +142,7 @@ def conformance(root: String, out: Option[PrintWriter]): J \ IO = {
         },List.zipWithIndex(o)));
         require(integer(field(row,"i")) == encoded and Int32.modulo(sum(o),2) == 0,"ERROR: invalid kernel orientation index")
     };
-    let generatorHashes=List.map(pair -> { let (i,row)=pair; kernelItem(row,source,"generator",i,out) },List.zipWithIndex(generators));
+    let generatorHashes=List.map(pair -> { let (i,row)=pair; kernelItem(row,source,"generators",i,out) },List.zipWithIndex(generators));
     let kernelHashes=List.map(row -> kernelItem(row,source,"kernel",integer(field(row,"i")),out),rows);
     let caseHashes=List.map(r -> text(field(r,"stateSHA256")),List.filter(r -> flag(field(r,"valid")),results));
     let allHashes=List.append(caseHashes,List.append(generatorHashes,kernelHashes));
