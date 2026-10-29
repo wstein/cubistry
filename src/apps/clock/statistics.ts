@@ -24,52 +24,11 @@ export interface ClockUnitStatistics {
   readonly max: number | null;
   /** Completed display changes this session. */
   readonly changes: number;
-  /** Exact mean HTM cost per completed change or tick; null before the first. */
+  /**
+   * Exact mean HTM per completed change (total cost / changes); null before
+   * the first. Always null for the grand total, which shows no mean.
+   */
   readonly mean: number | null;
-  /** Median HTM cost per completed change or tick; null before the first. */
-  readonly median: number | null;
-}
-/** Mean for display: a fixed two decimals, rounded only here. Null is a dash. */
-export const formatMean = (value: number | null): string =>
-  value === null ? "—" : value.toFixed(2);
-/** Median for display: an integer or a half step such as 1.5, never padded. */
-export const formatMedian = (value: number | null): string =>
-  value === null ? "—" : String(value);
-
-/**
- * Costs are small non-negative integers, so the distribution is kept as counts
- * per distinct cost: memory grows with the number of distinct costs, not ticks.
- */
-class CostHistogram {
-  private readonly counts = new Map<number, number>();
-  private n = 0;
-  private sum = 0;
-  get size(): number {
-    return this.counts.size;
-  }
-  add(cost: number): void {
-    this.counts.set(cost, (this.counts.get(cost) ?? 0) + 1);
-    this.n++;
-    this.sum += cost;
-  }
-  mean(): number | null {
-    return this.n ? this.sum / this.n : null;
-  }
-  median(): number | null {
-    if (!this.n) return null;
-    const costs = [...this.counts.keys()].sort((a, b) => a - b),
-      // 0-based ranks of the middle value(s); equal for an odd count.
-      lo = Math.floor((this.n - 1) / 2),
-      hi = Math.floor(this.n / 2);
-    let seen = 0,
-      low: number | null = null;
-    for (const cost of costs) {
-      seen += this.counts.get(cost) ?? 0;
-      if (low === null && seen > lo) low = cost;
-      if (seen > hi) return ((low ?? cost) + cost) / 2;
-    }
-    return null;
-  }
 }
 export interface ClockStatisticsSnapshot {
   readonly units: readonly ClockUnitStatistics[];
@@ -77,6 +36,9 @@ export interface ClockStatisticsSnapshot {
   /** Increments whenever any displayed number may have changed. */
   readonly revision: number;
 }
+/** Mean for display: a fixed two decimals, rounded only here. Null is a dash. */
+export const formatMean = (value: number | null): string =>
+  value === null ? "—" : value.toFixed(2);
 const add = (a: MoveCounts, b: MoveCounts): MoveCounts =>
   Object.freeze({ htm: a.htm + b.htm, rotations: a.rotations + b.rotations });
 const settled = (status: MoveProgress["status"]) =>
@@ -93,9 +55,9 @@ const moving = (status: MoveProgress["status"] | null) =>
  * previous completed display change, including turns of an interrupted route.
  * Changes that complete before the same `closeTick()` form one clock tick.
  *
- * Mean and median are over the same completed costs as last and max: zero-cost
- * changes count. A cube row aggregates that cube's completed changes; the total
- * row aggregates ticks, each tick costing the sum over the cubes that changed.
+ * A cube's mean is over the same completed costs as its last and max, so
+ * zero-cost changes count: two integers (cost sum, change count), no history.
+ * The grand total row has no mean.
  */
 export class ClockMoveStatistics {
   private readonly count: number;
@@ -104,8 +66,7 @@ export class ClockMoveStatistics {
   private last: (number | null)[] = [];
   private max: (number | null)[] = [];
   private changes: number[] = [];
-  private costs: CostHistogram[] = [];
-  private tickCosts = new CostHistogram();
+  private cost: number[] = [];
   private seenTotal: (number | null)[] = [];
   private seenStatus: (MoveProgress["status"] | null)[] = [];
   private open: number[] = [];
@@ -133,8 +94,7 @@ export class ClockMoveStatistics {
     this.last = Array(this.count).fill(null);
     this.max = Array(this.count).fill(null);
     this.changes = Array(this.count).fill(0);
-    this.costs = Array.from({ length: this.count }, () => new CostHistogram());
-    this.tickCosts = new CostHistogram();
+    this.cost = Array(this.count).fill(0);
     this.open = [];
     this.tickLast = null;
     this.tickMax = null;
@@ -164,7 +124,7 @@ export class ClockMoveStatistics {
     this.last[index] = cost;
     this.max[index] = Math.max(this.max[index] ?? 0, cost);
     this.changes[index]++;
-    this.costs[index].add(cost);
+    this.cost[index] += cost;
     this.open.push(cost);
     this.revision++;
   }
@@ -176,7 +136,6 @@ export class ClockMoveStatistics {
     this.tickLast = cost;
     this.tickMax = Math.max(this.tickMax ?? 0, cost);
     this.ticks++;
-    this.tickCosts.add(cost);
     this.revision++;
   }
   /**
@@ -196,12 +155,6 @@ export class ClockMoveStatistics {
       this.settle(index);
     this.seenStatus[index] = progress.status;
   }
-  /** Distinct costs held for a unit (or the total tick row): the memory bound. */
-  distinctCosts(index: number | "total"): number {
-    if (index === "total") return this.tickCosts.size;
-    this.unit(index);
-    return this.costs[index].size;
-  }
   snapshot(): ClockStatisticsSnapshot {
     const units = this.session.map((session, i) =>
       Object.freeze({
@@ -209,8 +162,7 @@ export class ClockMoveStatistics {
         last: this.last[i],
         max: this.max[i],
         changes: this.changes[i],
-        mean: this.costs[i].mean(),
-        median: this.costs[i].median(),
+        mean: this.changes[i] ? this.cost[i] / this.changes[i] : null,
       }),
     );
     return Object.freeze({
@@ -220,8 +172,7 @@ export class ClockMoveStatistics {
         last: this.tickLast,
         max: this.tickMax,
         changes: this.ticks,
-        mean: this.tickCosts.mean(),
-        median: this.tickCosts.median(),
+        mean: null,
       }),
       revision: this.revision,
     });

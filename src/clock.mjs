@@ -17,7 +17,6 @@ import {
 import {
   ClockMoveStatistics,
   formatMean,
-  formatMedian,
 } from "./apps/clock/statistics.ts";
 import pin from "../hsm-source.json";
 import {
@@ -66,8 +65,7 @@ function statisticsUi() {
     show(name + "-session-rotations", unit.session.rotations);
     show(name + "-last-moves", unit.last);
     show(name + "-max-moves", unit.max);
-    show(name + "-mean-moves", unit.mean, formatMean);
-    show(name + "-median-moves", unit.median, formatMedian);
+    if (i < names.length) show(name + "-mean-moves", unit.mean, formatMean);
   });
 }
 let stage = null;
