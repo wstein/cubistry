@@ -65,6 +65,14 @@ is rejected. Six protocol-corruption regressions cover missing calls, early exit
 markers, coverage drift, absent negatives and changed state. The first six Julia
 language assertions run again in every complete call.
 
+Only the Julia capture was recorded with this hardened observer (driver SHA-256
+`e0070289…`). The Python, Flix and GNU Octave captures retain the earlier observer
+`9441f40a…` from `2b8ed3d`, which accepted four or more results without checking
+phase order. Their saved event sequences were re-checked against the hardened
+order, iteration, checksum and coverage rules and pass. Flix emits its RESULT
+coverage counts as constants, so the coverage-drift check is vacuous there; its
+per-call coverage evidence is the recomputed checksum matched by Python.
+
 Julia and Python produce the same complete-state SHA-256 on all four calls.
 Octave retains all four actual exports: **9,600 sticker frames** independently
 match the unchanged Python oracle. Flix independently verifies numeric checksum
