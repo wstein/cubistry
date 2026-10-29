@@ -127,8 +127,30 @@ export class HsmPlanner {
       }),
       "Set up the blank and upright letter before counting",
     );
+    const result = this.planFromPose(
+      print,
+      state,
+      letter,
+      value,
+      nextValue,
+      policy,
+    );
+    demand(result.length <= 6, "No certified HSM route");
+    return result;
+  }
+  /** Reuse the exact graph after a partially completed route has moved the unit.
+   * The settled blank/unit six-move bound does not apply to this entry point.
+   */
+  planFromPose(
+    print: PrintDefinition,
+    state: CubeState,
+    letter: Letter,
+    value: number,
+    nextValue?: number,
+    policy = 13,
+  ): readonly LegalMove[] {
+    const target = hsmTarget(letter, value);
     let { chosen: a, distance } = this.goal(print, state, letter, value);
-    demand(distance <= 6, "No certified HSM route");
     const result: LegalMove[] = [];
     while (distance) {
       let m = -1,
