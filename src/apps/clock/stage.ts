@@ -8,8 +8,8 @@ export class ClockStage {
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
   private readonly resize: ResizeObserver;
-  private yaw = 0;
-  private pitch = 0.1;
+  private yaw = 0.2;
+  private pitch = 0.16;
   private radius = 12;
   private drag: { id: number; x: number; y: number } | null = null;
   private cubes: CubeViewer[] = [];
@@ -89,8 +89,8 @@ export class ClockStage {
       camera: this.camera,
       position: [(index - 1) * 2.8, 0, 0],
       resetCamera: () => {
-        this.yaw = 0;
-        this.pitch = 0.1;
+        this.yaw = 0.2;
+        this.pitch = 0.16;
       },
     });
     this.cubes.push(cube);
