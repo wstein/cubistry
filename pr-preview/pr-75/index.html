@@ -9,13 +9,17 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23254f43'/%3E%3C/svg%3E"
     />
-    <script type="module" crossorigin src="/cubistry/pr-preview/pr-75/assets/counter-Ce4RXTRT.js"></script>
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/three-M-x_o2kR.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/index-BGl6ajD5.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/design-DJZefyZe.js">
-    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-75/assets/counter-v95T6SZD.css">
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-75/assets/counter-hR7TcZVh.js"></script>
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/link-DR-RiidG.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/index-DM0Y5EEr.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/three-CMRukwtc.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/index-uAYbfbFG.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/lettering-Bc363wi7.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-75/assets/design-Eq1KBamp.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-75/assets/style-TNepDPY9.css">
   </head>
-  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #75 — non-production preview · 232a1d11bc6f</aside>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #75 — non-production preview · a62d9cf79b68</aside>
     <main>
       <header>
         <a class="brand" href="./" aria-label="Cubistry counter home"
@@ -24,8 +28,12 @@
         <div class="application-choice">
           <label for="application">Cube / application</label>
           <select id="application">
-            <option value="certified">Counter 0–99</option>
+            <option value="calendar">Calendar · Deutsch / English</option>
+            <option value="live-clock">Live H–M–S Clock</option>
+            <option value="hsm-counter">H/S/M Counter 00–59</option>
+            <option value="certified" selected>Counter 0–99</option>
             <option value="timer">60-Minute Timer</option>
+            <option value="five-second-timer">5-Second Timer</option>
           </select>
         </div>
       </header>
@@ -52,7 +60,9 @@
                 hidden
               >
                 <span id="timer-motion-label"></span><br />
-                <span id="timer-last-settled" hidden>Last <output id="timer-physical">15:00</output> · </span><span id="timer-effective" hidden></span>
+                <span id="timer-last-settled" hidden
+                  >Last <output id="timer-physical">15:00</output> · </span
+                ><span id="timer-effective" hidden></span>
               </p>
               <div class="stats-summary">
                 <dl class="move-summary">
@@ -69,7 +79,12 @@
                   <div>
                     <dt>
                       <span>Sequence</span>
-                      <output id="sequence-number" aria-label="Sequence number" aria-live="off">—</output>
+                      <output
+                        id="sequence-number"
+                        aria-label="Sequence number"
+                        aria-live="off"
+                        >—</output
+                      >
                     </dt>
                     <dd>
                       <span
@@ -170,12 +185,64 @@
           </p>
         </aside>
         <aside
+          id="hsm-controls"
+          class="controls"
+          aria-label="HSM counter controls"
+          hidden
+        >
+          <h1>H/S/M Counter</h1>
+          <label for="hsm-lettering">Sticker lettering</label>
+          <select id="hsm-lettering"><option value="symbols">Large H / M / S</option><option value="words">Small hour / min / sec</option></select>
+          <label for="hsm-letter">Unit</label>
+          <select id="hsm-letter">
+            <option>H</option>
+            <option>S</option>
+            <option>M</option>
+          </select>
+          <label for="hsm-range">Count range</label>
+          <select id="hsm-range">
+            <option value="59">00–59</option>
+            <option value="23">00–23</option>
+            <option value="11">00–11</option>
+          </select>
+          <label for="hsm-direction">Direction</label>
+          <select id="hsm-direction">
+            <option value="1">Up</option>
+            <option value="-1">Down</option>
+          </select>
+          <form id="hsm-set-form">
+            <label for="hsm-value">Set value</label>
+            <input id="hsm-value" type="text" inputmode="numeric" value="00" />
+            <button type="submit">Set</button>
+          </form>
+          <div class="target-actions">
+            <button
+              id="hsm-run"
+              type="button"
+              class="primary"
+              aria-pressed="false"
+            >
+              Run</button
+            ><button id="hsm-reset" type="button">Reset</button>
+          </div>
+          <div class="increments">
+            <button data-hsm-delta="-1">−1</button
+            ><button data-hsm-delta="1">+1</button>
+          </div>
+          <p class="small">
+            Counts one step per second, wrapping through 00. Upper-left stays
+            blank. Settled number changes take at most six moves. A new target
+            replaces old work after the current turn. Changing the unit sets up
+            a fresh 00 display.
+          </p>
+        </aside>
+        <aside
           id="timer-controls"
           class="timer-controls"
           aria-label="60-Minute Timer controls"
           hidden
         >
-          <h1>60-Minute Timer</h1>
+          <h1 id="timer-heading">60-Minute Timer</h1>
           <label for="timer-mode">Mode</label>
           <select id="timer-mode">
             <option value="countdown">Countdown</option>
