@@ -9,8 +9,10 @@ export const LOWER_THIRD_Y = (256 * 2) / 3;
 // unit is 20/256 mm = 0.078 mm on a 20 mm sticker, so 0.1 units is 0.008 mm. The
 // tightest word (H) clears the line by only 0.047 units; with this allowance a
 // re-export may move that top edge by up to 0.147 units before the rule flips,
-// while a real change still fails: font size 82 puts the top about 0.8 units
-// above the line and a one-unit baseline shift moves it by a full unit.
+// while a real change still fails: font size 82 puts the top of H about 1.0 unit
+// above the line and a one-unit baseline shift moves it by a full unit. The
+// allowance alone would admit H up to font size 80.83, so the font-size cap
+// below, not the bounds rule, is what pins the size.
 export const BOUNDS_TOLERANCE = 0.1;
 
 // provenance: parsed public/assets/hsm/words/provenance.json
