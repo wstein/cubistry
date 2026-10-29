@@ -26,7 +26,10 @@ All decoded strings must consist of valid Unicode scalar values; reject unpaired
 surrogates. Both CLIs read original raw UTF-8 JSON bytes, not typed source generated from
 Python. Reject invalid JSON/encoding, duplicate object keys, NaN/Infinity, missing
 required fields, wrong types and unsupported versions. Bound input to 16 MiB,
-object/array nesting to 64 and an unquoted numeric token to 128 bytes. Semantic
+object/array nesting to 64 and an unquoted numeric token to 128 bytes. The
+root container has depth 1 (a scalar root has depth 0 but is unsupported here);
+each nested object/array adds one. Numeric-token length includes a leading minus,
+decimal point and exponent/sign characters, not only its digits. Semantic
 integer fields use JSON **integer tokens** with no fraction or exponent; reject
 Booleans, `1.0`, `1e0`, rounded fractions and underflow forms before machine-integer
 conversion. Range-check before conversion; no wrap, saturation or truncation.
