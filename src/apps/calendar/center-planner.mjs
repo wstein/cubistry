@@ -356,6 +356,7 @@ export async function createPlanner({ design, options = {} }) {
       maximumNodes: options.maximumNodes ?? 100000,
       maximumTotalNodes: (options.maximumNodes ?? 100000) * maximumAttempts,
       maximumAttempts,
+      centerRepairVersion: corrections.version,
       attempts: planner.lastResult.attempts ?? [],
       improvementSkippedReason: planner.lastResult.improvementSkippedReason,
       maximumDepth: options.maximumDepth ?? 24,
@@ -395,6 +396,8 @@ export async function createPlanner({ design, options = {} }) {
   planner.metadata = {
     providerPin,
     backend: options.backend ?? "center-aware",
+    centerRepairVersion: corrections.version,
+    centerRepairHTM: corrections.witnesses.map((w) => w.htm),
     policy:
       options.backend === "direct"
         ? "direct-v1"
