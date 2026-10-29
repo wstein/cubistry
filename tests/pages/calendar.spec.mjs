@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 for (const [design, moves, front] of [
-  ["de-a", 19, "D · O · blank · blank · 2 · 9 · O · K · T"],
-  ["en-3", 17, "THU · blank · blank · O · C · T · blank · 2 · 9"],
+  ["de-a", 18, "D · O · blank · blank · 2 · 9 · O · K · T"],
+  ["en-3", 15, "THU · blank · blank · O · C · T · blank · 2 · 9"],
 ])
   test(`built calendar ${design} loads its nested solver workers beneath the deployment base`, async ({
     page,

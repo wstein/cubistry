@@ -1,3 +1,4 @@
+import { tryCenterAware, referencesForPlan } from "./center-planner.mjs";
 import { KPattern } from "cubing/kpuzzle";
 import { puzzles } from "cubing/puzzles";
 import {
@@ -45,7 +46,37 @@ self.onmessage = async (
         timeBudgetMs: 500,
       },
     );
-    self.postMessage({ id, word: result.word });
+    let references;
+    try {
+      references = referencesForPlan(context, result.word);
+    } catch {
+      /* Keep the checked direct route if reference compaction is unavailable. */
+    }
+    self.postMessage({ id, interimWord: result.word, references });
+    const candidate = tryCenterAware(context, result.word);
+    if (candidate.word !== result.word) {
+      try {
+        references = referencesForPlan(context, candidate.word);
+      } catch {
+        references = undefined;
+      }
+    }
+    self.postMessage({
+      id,
+      word: candidate.word,
+      references,
+      diagnostics: {
+        backendUsed: candidate.method,
+        attempted: candidate.attempted,
+        solverStatus: candidate.status ?? "not-attempted",
+        reason: candidate.reason,
+        directMoves: result.word.split(/\s+/).filter(Boolean).length,
+        chosenMoves: candidate.word.split(/\s+/).filter(Boolean).length,
+        maximumNodes: 100000,
+        maximumDepth: 24,
+        centerElapsedMs: candidate.elapsedMs ?? 0,
+      },
+    });
   } catch (error) {
     self.postMessage({
       id,

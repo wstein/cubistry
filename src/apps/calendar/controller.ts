@@ -31,9 +31,18 @@ export interface CalendarPlanningContext {
   readonly target: Target;
   readonly fallbackWord: string;
 }
-export type CalendarRoutePlanner = (
+export interface CalendarReferenceContext {
+  readonly design: Design;
+  readonly state: State;
+  readonly target: Target;
+  readonly referenceWord: string;
+}
+export type CalendarRoutePlanner = ((
   context: CalendarPlanningContext,
-) => string | Promise<string>;
+) => string | Promise<string>) & {
+  compactReference?: (context: CalendarReferenceContext) => string;
+  cancelPlanning?: () => void;
+};
 interface CheckedPlan {
   readonly word: string;
   readonly end: State;
@@ -76,6 +85,12 @@ export class CalendarController {
   current: Target;
   get busy(): boolean {
     return this.active;
+  }
+  get sourceReferenceWord(): string {
+    return this.sourceWord;
+  }
+  get referenceMoveCount(): number {
+    return tokens(this.sourceWord).length;
   }
   get physicalState(): State {
     return this.state;
@@ -207,9 +222,36 @@ export class CalendarController {
     }
     return { ...fallback, route: "fallback" };
   }
+  private compactReference(target: Target): void {
+    if (!this.planner?.compactReference) return;
+    try {
+      const word = this.planner.compactReference({
+        design: this.design,
+        state: this.state,
+        target,
+        referenceWord: this.sourceWord,
+      });
+      if (
+        typeof word === "string" &&
+        word.length < this.sourceWord.length &&
+        tokens(word).length < tokens(this.sourceWord).length &&
+        sameState(apply(this.design.printing, word), this.state)
+      )
+        this.sourceWord = word;
+    } catch {
+      /* Reference compression cannot invalidate completed physical work. */
+    }
+  }
   request(target: Target): void {
     demand(!this.failed, "Calendar stopped after a failed physical route");
     this.desired = target;
+    if (this.active && this.planning && target !== this.progressTarget) {
+      try {
+        this.planner?.cancelPlanning?.();
+      } catch {
+        /* An optional cancellation hook cannot invalidate physical work. */
+      }
+    }
     if (!this.active) void this.drain();
     else this.changed(this.current, true);
   }
@@ -232,6 +274,7 @@ export class CalendarController {
           plan = await this.preparedFor(target).promise;
         } else plan = this.baseline(target, this.state, reference);
         this.planning = false;
+        this.compactReference(target);
         // A date selected during planning supersedes the result before any turn.
         if (this.desired) continue;
         this.routeKind = plan.route;
@@ -264,6 +307,7 @@ export class CalendarController {
           tokens(target.word).length < tokens(actualReference).length
             ? target.word
             : actualReference;
+        this.compactReference(target);
         this.current = target;
       }
     } catch (e) {
