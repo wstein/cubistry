@@ -118,9 +118,9 @@ future work and no unreleased producer interface is assumed.
 ## Port backlog
 
 Under the 2026-10-29 [authority change](AUTHORITY.md),
-existing proofs whose only verifier is Python remain verified by that Python
-verifier and are not re-labeled. They are candidates for porting to Flix and
-Julia. The backlog below lists the Python verifiers under `research/` on the
+existing proofs whose only verifier is Python keep their recorded Python
+verification and are not re-labeled, but are not CONFIRMED until both Flix and
+Julia accept them. They are candidates for porting. The backlog below lists the Python verifiers under `research/` on the
 research branch, grouped by proof family, in suggested port order. Sizes and
 effort are intentionally not estimated.
 
@@ -132,7 +132,8 @@ effort are intentionally not estimated.
 3. `research/counter-2x2-optimization/`: `verify.py`, `baseline-verify.py`;
    tests `test_verify.py`.
 4. `research/date-3x3/` family:
-   - top level: `verify_adjacent.py`, `verify_witness.py` (tests
+   - top level: `verify_adjacent.py`, `verify_witness.py` (the oracle of the
+     issue 74 marked 3×3 groups; only those bounded groups are ported) (tests
      `test_verify_adjacent.py`, `test_verify_witness.py`);
    - `center-bound-investigation/`: `verify-cyclic-repairs.py`,
      `verify-short-repairs.py`;
@@ -147,4 +148,9 @@ effort are intentionally not estimated.
 
 Not yet placed in the order: `research/timer-2x2/` (`verify.py`, `optimization/verify.py`), which is also
 Python-only. The `scripts/verify*.py` files are not under `research/` and are not
-part of this backlog; they would need a separate review.
+part of this backlog; they would need a separate review. Python verifiers on
+`main` are not listed either: `research/counter/verify.py` (oracle of the ported
+issue 74 counter group), `research/certified-counter/verify.py`,
+`research/workshop-timer/verify.py` (with `evidence/verify.py` and
+`evidence/optimization/verify.py`), `research/m1-acceptance/verify_live_solver.py`,
+`research/architecture/verify_design.py` and `scripts/print/verify_exports.py`.
