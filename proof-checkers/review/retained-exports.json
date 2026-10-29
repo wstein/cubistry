@@ -1,0 +1,26 @@
+{
+  "julia-rotated-optical-results.jsonl": {
+    "rawSHA256": "26b7ae4eb3e8a36ab4e3b2bc9d9441688de4c325e6a29318ccf1c6aedbe1a00e",
+    "rawBytes": 70191,
+    "gzipFile": "julia-rotated-optical-results.jsonl.gz",
+    "gzipSHA256": "c378e88909662a25d56a8d9521b3d720175658c39b4d3dc392b296491e13beaa"
+  },
+  "julia-extra-cli-results.json": {
+    "rawSHA256": "68ec3cffa40f1c327f964c28b83c280de76afac0578e9b87908b505f24fbc869",
+    "rawBytes": 1047778,
+    "gzipFile": "julia-extra-cli-results.json.gz",
+    "gzipSHA256": "1174bbd14c7b6b09a0ae460405bdbff2506cfd0f5ee48a470cca8f32f1f12266"
+  },
+  "flix-rotated-optical-results.json": {
+    "rawSHA256": "c82c440d7c8eea1db1f14868b508b85bca732d02f7cfddbc58375d0c9d2ee424",
+    "rawBytes": 84802,
+    "gzipFile": "flix-rotated-optical-results.json.gz",
+    "gzipSHA256": "56a7e72965661aec44ed27e6bd120d3ef893312ee4a955de0415bd194749eb25"
+  },
+  "julia-resource-boundary-results.json": {
+    "rawSHA256": "c64d485b560300c48db4437c592769b4c04c7d895e35c0a6635121152914b8b2",
+    "rawBytes": 31478,
+    "gzipFile": "julia-resource-boundary-results.json.gz",
+    "gzipSHA256": "7176140ebafcb1cc8402fd3b04902380438f171153e52c4084564cf8234c3f03"
+  }
+}
