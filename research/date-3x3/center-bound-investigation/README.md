@@ -94,3 +94,14 @@ no application geometry, JavaScript planner or solver. Input/checker hashes are
 in [manifest](manifest.json). The original correction table and V1/V2 captures
 remain unchanged. A new application integration and fresh benchmark are separate
 work, and must not silently replace the historical evidence.
+
+## Cyclic-family follow-up and corrected interpretation
+
+The [cyclic repair addendum](CYCLIC_REPAIRS.md) verifies 52 finite candidate slots,
+including inverse half-turn shifts, and actual retained-pose improvements from
+35 to34HTM (V3) and41 to31HTM (V2), with complete endpoints unchanged. It also
+corrects an earlier inference: the old18/20/18 and new14/12/14 repairs already
+have identical all54-frame transformations. Both quarter variants rotate the
+same hidden back center; replacing these exact words does not by itself change
+hidden endpoints. Changed search rankings/bounds can still select different
+routes and alter a later stream. Original verification artifacts remain intact.

@@ -1,0 +1,18 @@
+{
+  "schema": "cubistry.cyclic-center-repair-investigation",
+  "version": 1,
+  "baselineResearchCommit": "5b2465e298971371ec15e581c4d2c7bc27f4250b",
+  "finiteFamilySlots": 52,
+  "wholeCubeConjugationsIncluded": false,
+  "scope": "Exact all54-frame center-kernel equivalence, not global shortest paths",
+  "files": {
+    "research/date-3x3/center-bound-investigation/verify-cyclic-repairs.py": "390f926922fa4c7b41c1aaec198e9c11b41da1a304fd13b3f3f41526245907a2",
+    "research/date-3x3/center-bound-investigation/cyclic-verification.json": "6a162033b04dba66fdec65533d94930191b72a5dbb3d8d5b791635c3e690aefe",
+    "research/date-3x3/center-bound-investigation/verification.json": "47d6a817c0b69ec69685df8bb92b24a46d871478aeea293cd5814cdda0cc55ff",
+    "research/date-3x3/verify_witness.py": "c8ff97acdad91cc47fef09e1f4352b4f414613908ecef67e03f0148a3d3e5e7d",
+    "research/date-3x3/portfolio-benchmark/verify.py": "c3b9de2c8eb26b8c6ca211b40fbaf2670d0c0fe4a9979135fd71116809859d71",
+    "research/date-3x3/portfolio-benchmark/captures/calendar-2024-v3.json": "3262fd53e0444312b3cb79c67792724c823eaa5bd5e2ed55ba0ee4a3c47dd6b7",
+    "research/date-3x3/portfolio-benchmark/captures/calendar-2024-v2.json": "c74b7ddb58dd6769ed26aaa0aa18d3f8d58300ab745f18f93c86957152f50b14",
+    "research/date-3x3/center-corrections.json": "e7be2e10c58737533d245d17ad7bf7a04aa0fd4d44e723f96fbf38538a4900fa"
+  }
+}

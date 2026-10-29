@@ -1,0 +1,868 @@
+{
+  "status": "SAT",
+  "scope": "Fifty-two shifts:14+12+12inverse-half+14; no quarter inverse added",
+  "legacyAndShorterAll54EffectsIdentical": true,
+  "cyclicWitnesses": [
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 0,
+      "family": "direct",
+      "word": "F U D R2 L2 U' D' B' U D R2 L2 U' D'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 1,
+      "family": "direct",
+      "word": "U D R2 L2 U' D' B' U D R2 L2 U' D' F",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 2,
+      "family": "direct",
+      "word": "D R2 L2 U' D' B' U D R2 L2 U' D' F U",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 3,
+      "family": "direct",
+      "word": "R2 L2 U' D' B' U D R2 L2 U' D' F U D",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 4,
+      "family": "direct",
+      "word": "L2 U' D' B' U D R2 L2 U' D' F U D R2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 5,
+      "family": "direct",
+      "word": "U' D' B' U D R2 L2 U' D' F U D R2 L2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 6,
+      "family": "direct",
+      "word": "D' B' U D R2 L2 U' D' F U D R2 L2 U'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 7,
+      "family": "direct",
+      "word": "B' U D R2 L2 U' D' F U D R2 L2 U' D'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 8,
+      "family": "direct",
+      "word": "U D R2 L2 U' D' F U D R2 L2 U' D' B'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 9,
+      "family": "direct",
+      "word": "D R2 L2 U' D' F U D R2 L2 U' D' B' U",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 10,
+      "family": "direct",
+      "word": "R2 L2 U' D' F U D R2 L2 U' D' B' U D",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 11,
+      "family": "direct",
+      "word": "L2 U' D' F U D R2 L2 U' D' B' U D R2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 12,
+      "family": "direct",
+      "word": "U' D' F U D R2 L2 U' D' B' U D R2 L2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "offset": 13,
+      "family": "direct",
+      "word": "D' F U D R2 L2 U' D' B' U D R2 L2 U'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 0,
+      "family": "direct",
+      "word": "F U D F2 U' D' F U D F2 U' D'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 1,
+      "family": "direct",
+      "word": "U D F2 U' D' F U D F2 U' D' F",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 2,
+      "family": "direct",
+      "word": "D F2 U' D' F U D F2 U' D' F U",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 3,
+      "family": "direct",
+      "word": "F2 U' D' F U D F2 U' D' F U D",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 4,
+      "family": "direct",
+      "word": "U' D' F U D F2 U' D' F U D F2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 5,
+      "family": "direct",
+      "word": "D' F U D F2 U' D' F U D F2 U'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 6,
+      "family": "direct",
+      "word": "F U D F2 U' D' F U D F2 U' D'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 7,
+      "family": "direct",
+      "word": "U D F2 U' D' F U D F2 U' D' F",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 8,
+      "family": "direct",
+      "word": "D F2 U' D' F U D F2 U' D' F U",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 9,
+      "family": "direct",
+      "word": "F2 U' D' F U D F2 U' D' F U D",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 10,
+      "family": "direct",
+      "word": "U' D' F U D F2 U' D' F U D F2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 11,
+      "family": "direct",
+      "word": "D' F U D F2 U' D' F U D F2 U'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 0,
+      "family": "inverse-half",
+      "word": "D U F2 D' U' F' D U F2 D' U' F'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 1,
+      "family": "inverse-half",
+      "word": "U F2 D' U' F' D U F2 D' U' F' D",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 2,
+      "family": "inverse-half",
+      "word": "F2 D' U' F' D U F2 D' U' F' D U",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 3,
+      "family": "inverse-half",
+      "word": "D' U' F' D U F2 D' U' F' D U F2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 4,
+      "family": "inverse-half",
+      "word": "U' F' D U F2 D' U' F' D U F2 D'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 5,
+      "family": "inverse-half",
+      "word": "F' D U F2 D' U' F' D U F2 D' U'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 6,
+      "family": "inverse-half",
+      "word": "D U F2 D' U' F' D U F2 D' U' F'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 7,
+      "family": "inverse-half",
+      "word": "U F2 D' U' F' D U F2 D' U' F' D",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 8,
+      "family": "inverse-half",
+      "word": "F2 D' U' F' D U F2 D' U' F' D U",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 9,
+      "family": "inverse-half",
+      "word": "D' U' F' D U F2 D' U' F' D U F2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 10,
+      "family": "inverse-half",
+      "word": "U' F' D U F2 D' U' F' D U F2 D'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-half",
+      "offset": 11,
+      "family": "inverse-half",
+      "word": "F' D U F2 D' U' F' D U F2 D' U'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 0,
+      "family": "direct",
+      "word": "D U L2 R2 D' U' B D U L2 R2 D' U' F'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 1,
+      "family": "direct",
+      "word": "U L2 R2 D' U' B D U L2 R2 D' U' F' D",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 2,
+      "family": "direct",
+      "word": "L2 R2 D' U' B D U L2 R2 D' U' F' D U",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 3,
+      "family": "direct",
+      "word": "R2 D' U' B D U L2 R2 D' U' F' D U L2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 4,
+      "family": "direct",
+      "word": "D' U' B D U L2 R2 D' U' F' D U L2 R2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 5,
+      "family": "direct",
+      "word": "U' B D U L2 R2 D' U' F' D U L2 R2 D'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 6,
+      "family": "direct",
+      "word": "B D U L2 R2 D' U' F' D U L2 R2 D' U'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 7,
+      "family": "direct",
+      "word": "D U L2 R2 D' U' F' D U L2 R2 D' U' B",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 8,
+      "family": "direct",
+      "word": "U L2 R2 D' U' F' D U L2 R2 D' U' B D",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 9,
+      "family": "direct",
+      "word": "L2 R2 D' U' F' D U L2 R2 D' U' B D U",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 10,
+      "family": "direct",
+      "word": "R2 D' U' F' D U L2 R2 D' U' B D U L2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 11,
+      "family": "direct",
+      "word": "D' U' F' D U L2 R2 D' U' B D U L2 R2",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 12,
+      "family": "direct",
+      "word": "U' F' D U L2 R2 D' U' B D U L2 R2 D'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "offset": 13,
+      "family": "direct",
+      "word": "F' D U L2 R2 D' U' B D U L2 R2 D' U'",
+      "sameAll54Transformation": true,
+      "fullInverseRestored": true
+    }
+  ],
+  "additionalPrefixChecks": 156,
+  "all18OuterBoundaryCasesPerRepair": [
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "R",
+      "offset": 3,
+      "savingHTM": 1,
+      "word": "R' L2 U' D' B' U D R2 L2 U' D' F U D"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "R'",
+      "offset": 3,
+      "savingHTM": 1,
+      "word": "R L2 U' D' B' U D R2 L2 U' D' F U D"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "R2",
+      "offset": 3,
+      "savingHTM": 2,
+      "word": "L2 U' D' B' U D R2 L2 U' D' F U D"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "L",
+      "offset": 4,
+      "savingHTM": 1,
+      "word": "L' U' D' B' U D R2 L2 U' D' F U D R2"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "L'",
+      "offset": 4,
+      "savingHTM": 1,
+      "word": "L U' D' B' U D R2 L2 U' D' F U D R2"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "L2",
+      "offset": 4,
+      "savingHTM": 2,
+      "word": "U' D' B' U D R2 L2 U' D' F U D R2"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "U",
+      "offset": 5,
+      "savingHTM": 2,
+      "word": "D' B' U D R2 L2 U' D' F U D R2 L2"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "U'",
+      "offset": 1,
+      "savingHTM": 2,
+      "word": "D R2 L2 U' D' B' U D R2 L2 U' D' F"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "U2",
+      "offset": 1,
+      "savingHTM": 1,
+      "word": "U' D R2 L2 U' D' B' U D R2 L2 U' D' F"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "D",
+      "offset": 6,
+      "savingHTM": 2,
+      "word": "B' U D R2 L2 U' D' F U D R2 L2 U'"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "D'",
+      "offset": 2,
+      "savingHTM": 2,
+      "word": "R2 L2 U' D' B' U D R2 L2 U' D' F U"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "D2",
+      "offset": 2,
+      "savingHTM": 1,
+      "word": "D' R2 L2 U' D' B' U D R2 L2 U' D' F U"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "F",
+      "offset": 0,
+      "savingHTM": 1,
+      "word": "F2 U D R2 L2 U' D' B' U D R2 L2 U' D'"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "F'",
+      "offset": 0,
+      "savingHTM": 2,
+      "word": "U D R2 L2 U' D' B' U D R2 L2 U' D'"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "F2",
+      "offset": 0,
+      "savingHTM": 1,
+      "word": "F' U D R2 L2 U' D' B' U D R2 L2 U' D'"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "B",
+      "offset": 7,
+      "savingHTM": 2,
+      "word": "U D R2 L2 U' D' F U D R2 L2 U' D'"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "B'",
+      "offset": 7,
+      "savingHTM": 1,
+      "word": "B2 U D R2 L2 U' D' F U D R2 L2 U' D'"
+    },
+    {
+      "repair": "front-quarter-clockwise",
+      "prefix": "B2",
+      "offset": 7,
+      "savingHTM": 1,
+      "word": "B U D R2 L2 U' D' F U D R2 L2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "R",
+      "offset": 0,
+      "savingHTM": 0,
+      "word": "R F U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "R'",
+      "offset": 0,
+      "savingHTM": 0,
+      "word": "R' F U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "R2",
+      "offset": 0,
+      "savingHTM": 0,
+      "word": "R2 F U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "L",
+      "offset": 0,
+      "savingHTM": 0,
+      "word": "L F U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "L'",
+      "offset": 0,
+      "savingHTM": 0,
+      "word": "L' F U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "L2",
+      "offset": 0,
+      "savingHTM": 0,
+      "word": "L2 F U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "U",
+      "offset": 4,
+      "savingHTM": 2,
+      "word": "D' F U D F2 U' D' F U D F2"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "U'",
+      "offset": 1,
+      "savingHTM": 2,
+      "word": "D F2 U' D' F U D F2 U' D' F"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "U2",
+      "offset": 1,
+      "savingHTM": 1,
+      "word": "U' D F2 U' D' F U D F2 U' D' F"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "D",
+      "offset": 5,
+      "savingHTM": 2,
+      "word": "F U D F2 U' D' F U D F2 U'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "D'",
+      "offset": 2,
+      "savingHTM": 2,
+      "word": "F2 U' D' F U D F2 U' D' F U"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "D2",
+      "offset": 2,
+      "savingHTM": 1,
+      "word": "D' F2 U' D' F U D F2 U' D' F U"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "F",
+      "offset": 17,
+      "savingHTM": 2,
+      "word": "D U F2 D' U' F' D U F2 D' U'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "F'",
+      "offset": 0,
+      "savingHTM": 2,
+      "word": "U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "F2",
+      "offset": 3,
+      "savingHTM": 2,
+      "word": "U' D' F U D F2 U' D' F U D"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "B",
+      "offset": 0,
+      "savingHTM": 0,
+      "word": "B F U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "B'",
+      "offset": 0,
+      "savingHTM": 0,
+      "word": "B' F U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-half",
+      "prefix": "B2",
+      "offset": 0,
+      "savingHTM": 0,
+      "word": "B2 F U D F2 U' D' F U D F2 U' D'"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "R",
+      "offset": 3,
+      "savingHTM": 1,
+      "word": "R' D' U' B D U L2 R2 D' U' F' D U L2"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "R'",
+      "offset": 3,
+      "savingHTM": 1,
+      "word": "R D' U' B D U L2 R2 D' U' F' D U L2"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "R2",
+      "offset": 3,
+      "savingHTM": 2,
+      "word": "D' U' B D U L2 R2 D' U' F' D U L2"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "L",
+      "offset": 2,
+      "savingHTM": 1,
+      "word": "L' R2 D' U' B D U L2 R2 D' U' F' D U"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "L'",
+      "offset": 2,
+      "savingHTM": 1,
+      "word": "L R2 D' U' B D U L2 R2 D' U' F' D U"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "L2",
+      "offset": 2,
+      "savingHTM": 2,
+      "word": "R2 D' U' B D U L2 R2 D' U' F' D U"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "U",
+      "offset": 5,
+      "savingHTM": 2,
+      "word": "B D U L2 R2 D' U' F' D U L2 R2 D'"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "U'",
+      "offset": 1,
+      "savingHTM": 2,
+      "word": "L2 R2 D' U' B D U L2 R2 D' U' F' D"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "U2",
+      "offset": 1,
+      "savingHTM": 1,
+      "word": "U' L2 R2 D' U' B D U L2 R2 D' U' F' D"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "D",
+      "offset": 4,
+      "savingHTM": 2,
+      "word": "U' B D U L2 R2 D' U' F' D U L2 R2"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "D'",
+      "offset": 0,
+      "savingHTM": 2,
+      "word": "U L2 R2 D' U' B D U L2 R2 D' U' F'"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "D2",
+      "offset": 0,
+      "savingHTM": 1,
+      "word": "D' U L2 R2 D' U' B D U L2 R2 D' U' F'"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "F",
+      "offset": 13,
+      "savingHTM": 2,
+      "word": "D U L2 R2 D' U' B D U L2 R2 D' U'"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "F'",
+      "offset": 13,
+      "savingHTM": 1,
+      "word": "F2 D U L2 R2 D' U' B D U L2 R2 D' U'"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "F2",
+      "offset": 13,
+      "savingHTM": 1,
+      "word": "F D U L2 R2 D' U' B D U L2 R2 D' U'"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "B",
+      "offset": 6,
+      "savingHTM": 1,
+      "word": "B2 D U L2 R2 D' U' F' D U L2 R2 D' U'"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "B'",
+      "offset": 6,
+      "savingHTM": 2,
+      "word": "D U L2 R2 D' U' F' D U L2 R2 D' U'"
+    },
+    {
+      "repair": "front-quarter-counterclockwise",
+      "prefix": "B2",
+      "offset": 6,
+      "savingHTM": 1,
+      "word": "B' D U L2 R2 D' U' F' D U L2 R2 D' U'"
+    }
+  ],
+  "negativeControlsRejected": 5,
+  "captureSHA256": "3262fd53e0444312b3cb79c67792724c823eaa5bd5e2ed55ba0ee4a3c47dd6b7",
+  "actualV3Worst": {
+    "index": 2467,
+    "design": "de-a",
+    "fromISO": "2024-04-19",
+    "toISO": "2024-04-20",
+    "sourceWord": "x R2 U' B2 U2 L2 B2 D' B2 U B2 L2 B2 R' F' D' F D R' U2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 U L U' L U L U' L U L U' L U L U' L U L U' L2 D L' D L D L' D L D L' D L D L' D L D L' D",
+    "sourceReferenceSHA256": "ddab82a6c856d1be44a5b519e64f513dcd1da8c62e0dc9f5ced403967533bbf2",
+    "fromStateHash": "c1dc97800a2df28850c7b768bca9c8a849c0b2db10256856f3b7471b71495a69",
+    "toStateHash": "c3104a52395e6cb9827e6c135d71e9cfe37b34771c816f7de6d399c411b5db00",
+    "oldWord": "x z2 U2 D' B' D' B2 U' F2 L D R2 B R2 D2 R2 L2 B2 R2 U2 F U2 B2 D U L2 R2 D' U' B D U L2 R2 D' U' F'",
+    "oldCounts": {
+      "total": 37,
+      "htm": 35,
+      "qtm": 52,
+      "global": 2
+    },
+    "ordinaryPrefix": "x z2 U2 D' B' D' B2 U' F2 L D R2 B R2 D2 R2 L2 B2 R2 U2 F U2 B2",
+    "ordinaryPrefixCounts": {
+      "total": 23,
+      "htm": 21,
+      "qtm": 34,
+      "global": 2
+    },
+    "repairOffset": 6,
+    "newWord": "x z2 U2 D' B' D' B2 U' F2 L D R2 B R2 D2 R2 L2 B2 R2 U2 F U2 B' D U L2 R2 D' U' F' D U L2 R2 D' U'",
+    "newCounts": {
+      "total": 36,
+      "htm": 34,
+      "qtm": 50,
+      "global": 2
+    },
+    "sameAll54Endpoint": true,
+    "fullInverseRestored": true
+  },
+  "v2CaptureSHA256": "c74b7ddb58dd6769ed26aaa0aa18d3f8d58300ab745f18f93c86957152f50b14",
+  "actualV2HalfImprovement": {
+    "index": 2980,
+    "fromISO": "2024-04-20",
+    "toISO": "2024-04-19",
+    "fromStateHash": "ca9c0e1548988400787f8957140fa3fd763665ea54624cb41c275e3d93bce522",
+    "toStateHash": "f622e6a8d68b8247778124c7145a792e5a9c558073cbf3440410f0e22e3449fc",
+    "oldWord": "x z2 U2 B2 D' B2 L2 U2 L2 R2 F2 L2 U' L2 F' R' D2 B U2 F U B2 F R F R' F R F R' F R F R' F R F R' F R F R' F",
+    "oldCounts": {
+      "total": 43,
+      "htm": 41,
+      "qtm": 54,
+      "global": 2
+    },
+    "family": "inverse-half",
+    "repairOffset": 5,
+    "newWord": "x z2 U2 B2 D' B2 L2 U2 L2 R2 F2 L2 U' L2 F' R' D2 B U2 F U B2 D U F2 D' U' F' D U F2 D' U'",
+    "newCounts": {
+      "total": 33,
+      "htm": 31,
+      "qtm": 46,
+      "global": 2
+    },
+    "sameAll54Endpoint": true,
+    "fullInverseRestored": true
+  },
+  "globalOptimality": "UNKNOWN",
+  "universalTwentyOneBound": "UNKNOWN"
+}
