@@ -1,0 +1,84 @@
+{
+  "label": "octave",
+  "command": [
+    "/tmp/cubistry-octave-runtime/usr/bin/octave-cli",
+    "--no-init-file",
+    "--no-site-file",
+    "--no-history",
+    "--quiet",
+    "--eval",
+    "fprintf('CUBISTRY_PHASE {\"event\":\"READY\"}\\n'); fflush(stdout); addpath('spikes/test-language/octave'); lifecycle_probe('public/counter-proof.json', '/tmp/cubistry-octave-lifecycle-0539/exports', 3);"
+  ],
+  "workingDirectory": "/workspace/cubistry-octave-spike",
+  "clock": "parent time.monotonic_ns for observed startup/exit; child elapsed durations only",
+  "startupToReadyMs": 67.802958,
+  "observedDoneToExitMs": 9.498779,
+  "totalProcessWallMs": 17555.672619,
+  "exitCode": 0,
+  "events": [
+    {
+      "event": "READY",
+      "parentReceivedMs": 67.802958
+    },
+    {
+      "event": "LOAD",
+      "elapsedMs": 1.0569095611572266,
+      "scope": "Checker parse/load through function metadata lookup; no test body",
+      "parentReceivedMs": 75.867758
+    },
+    {
+      "event": "RESULT",
+      "iteration": 0,
+      "elapsedMs": 4332.2389125823975,
+      "values": 100,
+      "inverseChecks": 100,
+      "negativeControls": 6,
+      "fullStickerFrames": 2400,
+      "checksum": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+      "parentReceivedMs": 4410.090943
+    },
+    {
+      "event": "RESULT",
+      "iteration": 1,
+      "elapsedMs": 4299.642086029053,
+      "values": 100,
+      "inverseChecks": 100,
+      "negativeControls": 6,
+      "fullStickerFrames": 2400,
+      "checksum": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+      "parentReceivedMs": 8710.3363
+    },
+    {
+      "event": "RESULT",
+      "iteration": 2,
+      "elapsedMs": 4481.5380573272705,
+      "values": 100,
+      "inverseChecks": 100,
+      "negativeControls": 6,
+      "fullStickerFrames": 2400,
+      "checksum": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+      "parentReceivedMs": 13192.516121
+    },
+    {
+      "event": "RESULT",
+      "iteration": 3,
+      "elapsedMs": 4352.915048599243,
+      "values": 100,
+      "inverseChecks": 100,
+      "negativeControls": 6,
+      "fullStickerFrames": 2400,
+      "checksum": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+      "parentReceivedMs": 17546.131536
+    },
+    {
+      "event": "DONE",
+      "parentReceivedMs": 17546.17384
+    }
+  ],
+  "driverSHA256": "9441f40adfd55acf88e5510400b602d8201f5b362a5f2ce52204aa30c94141d9",
+  "limits": [
+    "shared machine; no forced garbage collection",
+    "marker creation/flush, pipe delivery, scheduling and runtime cleanup are included in observed phases",
+    "DONE-to-exit is an observed tail, not isolated destructor CPU time or a zero-cost guarantee"
+  ]
+}
