@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "captureSHA256": "235b91c60b3e9521ff62cb10807e16067f59a57b5cc035f21c0076d4f4187952",
+  "verifiedCases": 4716,
+  "negativeControlsRejected": [
+    "source identity",
+    "illegal token",
+    "wrong legal route",
+    "dishonest count",
+    "broken state chain",
+    "incorrect Gregorian request",
+    "wrong reference length",
+    "wrong baseline count",
+    "false interruption count",
+    "false summary",
+    "wrong saved candidate",
+    "dishonest total node ceiling",
+    "lost checked first candidate"
+  ]
+}
