@@ -22,8 +22,13 @@
       "researchPath": "research/date-3x3/center-corrections.json",
       "researchSHA256": "e7be2e10c58737533d245d17ad7bf7a04aa0fd4d44e723f96fbf38538a4900fa",
       "localPath": "center-corrections.json",
-      "localSHA256": "e7be2e10c58737533d245d17ad7bf7a04aa0fd4d44e723f96fbf38538a4900fa",
-      "changes": "Byte-identical"
+      "localSHA256": "c6acdc2ab88bb2167ee8c7646db9787da3766175f1b9ce71313761327be49f8c",
+      "changes": "Version 2 replaces the original 18/20/18 HTM witnesses with independently verified 14/12/14 HTM face-renamed Kociemba algorithms; quarter repairs also turn the unconstrained hidden back center. Original research path and SHA256 remain historical provenance.",
+      "verification": {
+        "researchCommit": "9e736592563885322451b99fb118c79889c25855",
+        "path": "research/date-3x3/center-bound-investigation/verification.json",
+        "sha256": "47d6a817c0b69ec69685df8bb92b24a46d871478aeea293cd5814cdda0cc55ff"
+      }
     }
   ]
 }

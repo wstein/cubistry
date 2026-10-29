@@ -89,3 +89,34 @@ test("actual captured41HTM source has a checked32HTM repair substitution and a n
   assert(sameState(apply(d.printing, refs.fromReferenceWord), from));
   assert(sameState(apply(d.printing, refs.endReferenceWord), end));
 });
+
+test("transition provenance hashes match local sources while retaining historical research", () => {
+  const provenance = JSON.parse(
+    fs.readFileSync("src/apps/calendar/transition/provenance.json"),
+  );
+  for (const entry of provenance.files) {
+    const actual = createHash("sha256")
+      .update(
+        fs.readFileSync("src/apps/calendar/transition/" + entry.localPath),
+      )
+      .digest("hex");
+    assert.equal(actual, entry.localSHA256, entry.localPath);
+    if (entry.researchSHA256 !== entry.localSHA256)
+      assert.notEqual(entry.changes, "Byte-identical");
+  }
+  const repair = provenance.files.find(
+    (e) => e.localPath === "center-corrections.json",
+  );
+  assert.equal(
+    repair.researchSHA256,
+    "e7be2e10c58737533d245d17ad7bf7a04aa0fd4d44e723f96fbf38538a4900fa",
+  );
+  assert.equal(
+    repair.verification.researchCommit,
+    "9e736592563885322451b99fb118c79889c25855",
+  );
+  assert.equal(
+    repair.verification.sha256,
+    "47d6a817c0b69ec69685df8bb92b24a46d871478aeea293cd5814cdda0cc55ff",
+  );
+});
