@@ -121,31 +121,39 @@ function language_contracts()
     return 6
 end
 
+const EXPECTED_CONTROLS = sort(["boolean-schema.json", "boolean-vector.json",
+    "duplicate-identity.json", "fractional-normal.json", "illegal-token.json",
+    "out-of-range-identity.json", "out-of-range-position.json",
+    "repainted-unpadded.json", "rotated-print-up.json", "wrong-target.json"])
 function verify_suite(input,casesdir)
+    files = sort(filter(f -> endswith(f,".json"), readdir(casesdir)))
+    require(files == EXPECTED_CONTROLS, "Complete suite requires the exact ten corruption fixtures")
     contracts = language_contracts()
     started = time_ns()
-    data = JSON.parse(read(input,String))
+    source_raw = read(input,String)
+    data = JSON.parse(source_raw)
     source,words,states = check(data)
     validation_ms = (time_ns()-started)/1e6
     controls = Dict{String,Any}[]
-    for file in sort(readdir(casesdir))
-        endswith(file,".json") || continue
+    for file in files
+        control_raw = read(joinpath(casesdir,file),String)
         rejected, reason = false,""
         try
-            check(JSON.parse(read(joinpath(casesdir,file),String)))
+            check(JSON.parse(control_raw))
         catch err
             rejected = true
             reason = sprint(showerror,err)
         end
         require(rejected, "corruption accepted: "*file)
-        push!(controls,Dict("case"=>file,"rejected"=>rejected,"reason"=>reason))
+        push!(controls,Dict("case"=>file,"rejected"=>rejected,"reason"=>reason,
+                            "sha256"=>bytes2hex(sha256(control_raw))))
     end
-    return source,words,states,controls,validation_ms,contracts
+    return source,words,states,controls,validation_ms,contracts,bytes2hex(sha256(source_raw))
 end
 
 function main(args)
     input, casesdir, output, repetitions = args[1],args[2],args[3],parse(Int,args[4])
-    source,words,states,controls,validation_ms,_ = verify_suite(input,casesdir)
+    source,words,states,controls,validation_ms,_,source_sha = verify_suite(input,casesdir)
     # Exact same 100 source/word replays as the Python benchmark, excluding validation.
     if repetitions > 0
         for word in words
@@ -162,7 +170,7 @@ function main(args)
         end
         push!(timings,(time_ns()-t)/1e6)
     end
-    result = Dict("juliaVersion"=>string(VERSION), "inputSHA256"=>bytes2hex(sha256(read(input))),
+    result = Dict("juliaVersion"=>string(VERSION), "inputSHA256"=>source_sha,
                   "canonicalStates"=>[wire(s) for s in states],"corruptionControls"=>controls,
                   "validationIncludingJITMs"=>validation_ms,"warmKernelSamplesMs"=>timings,
                   "repetitions"=>repetitions,"kernelWordsPerSample"=>100repetitions,

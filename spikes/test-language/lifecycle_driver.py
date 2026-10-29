@@ -67,8 +67,12 @@ def observe(command, output, label, timeout=180):
             child.stdout.close()
             (output / "stdout.txt").write_text("\n".join(lines) + "\n")
     results = [e for e in events if e["event"] == "RESULT"]
-    if exit_code or ready_ns is None or done_ns is None or len(results) < 4:
+    if exit_code or ready_ns is None or done_ns is None or len(results) != 4:
         raise RuntimeError("missing complete lifecycle markers or nonzero exit")
+    phases = [event["event"] for event in events]
+    expected = ["READY"] + (["LOAD"] if "LOAD" in phases else []) + ["RESULT"] * 4 + ["DONE"]
+    if phases != expected:
+        raise ValueError("lifecycle phase order must be READY, optional LOAD, four RESULTS, DONE")
     if [r["iteration"] for r in results] != list(range(len(results))):
         raise ValueError("iterations must be contiguous, starting with zero")
     if any(not r.get("checksum") for r in results):
