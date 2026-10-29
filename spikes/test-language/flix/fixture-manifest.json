@@ -1,0 +1,10 @@
+{
+  "baselineMain": "377747515be034cf19f656244a20449421b12b1d",
+  "input": "public/counter-proof.json",
+  "inputSHA256": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+  "oracle": "research/counter/verify.py",
+  "oracleSHA256": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+  "canonicalFullStates": 100,
+  "stickersPerState": 24,
+  "typedAdapterLimitation": "Python decodes raw JSON and move tokens. Flix validates typed legal-move geometry and full expected frames, not the complete raw witness schema."
+}
