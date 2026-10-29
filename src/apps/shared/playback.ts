@@ -47,6 +47,7 @@ export abstract class PhysicalPlayback {
   protected failed = false;
   protected activeTarget: number | null = null;
   protected stopping = false;
+  private betweenTargets = false;
   protected playback: MoveProgress = Object.freeze({
     sessionTotal: 0,
     completed: 0,
@@ -137,6 +138,7 @@ export abstract class PhysicalPlayback {
     this.failed = false;
     this.activeTarget = null;
     this.stopping = false;
+    this.betweenTargets = false;
     this.playback = Object.freeze({
       sessionTotal: 0,
       completed: 0,
@@ -187,7 +189,9 @@ export abstract class PhysicalPlayback {
     demand(this.print && this.authoritative, "Display is not configured");
     this.queued = true;
     try {
-      while (this.current !== this.desired) {
+      // A superseded route can leave a legal intermediate pose even when the
+      // latest requested number equals the last completed display.
+      while (this.current !== this.desired || this.betweenTargets) {
         const target = this.desired;
         const targetState = this.targetState(target);
         const moves = this.targetMoves(this.authoritative, targetState, target);
@@ -199,7 +203,12 @@ export abstract class PhysicalPlayback {
           queuedTarget: null,
           status: "playing",
         });
+        let superseded = false;
         for (const move of moves) {
+          if (this.desired !== target) {
+            superseded = true;
+            break;
+          }
           const presentation = presentMove(this.authoritative, move);
           await this.animateMove(presentation);
           this.authoritative = presentation.to;
@@ -207,6 +216,13 @@ export abstract class PhysicalPlayback {
             completed: this.playback.completed + 1,
             sessionTotal: this.playback.sessionTotal + 1,
           });
+        }
+        // Requests may change during an awaited turn or its progress callback.
+        // Commit that turn once, then replan directly from its complete state.
+        if (superseded || this.desired !== target) {
+          this.betweenTargets = true;
+          this.activeTarget = null;
+          continue;
         }
         demand(
           stateEquals(this.authoritative, targetState),
@@ -217,6 +233,7 @@ export abstract class PhysicalPlayback {
           "Incorrect completed display target",
         );
         this.current = target;
+        this.betweenTargets = false;
         this.activeTarget = null;
         this.progressUpdate({
           status: this.stopping ? "stopped" : "completed",
