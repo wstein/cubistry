@@ -128,6 +128,23 @@ test("suspended playback keeps only the current target and never enumerates miss
   assert.equal(u[2].controller.currentValue, 31);
   assert.equal(u[2].controller.busy, false);
 });
+test("an anticipated route still running after its boundary reports Synchronizing, not Moving", () => {
+  const boundary = Date.UTC(2026, 0, 1, 12, 35, 0),
+    u = units([12, 34, 59]),
+    s = new LiveClockScheduler(utc);
+  assert.equal(s.tick(boundary - 600, 0, u).motion[2], "moving");
+  assert.ok(u[2].controller.deadline);
+  // Slightly late but within the tolerated endpoint window.
+  assert.equal(s.tick(boundary + 50, 650, u).motion[2], "moving");
+  assert.ok(u[2].controller.deadline);
+  // Clearly overdue: the deadline is abandoned and the current value is requested.
+  assert.equal(s.tick(boundary + 150, 750, u).motion[2], "synchronizing");
+  assert.equal(u[2].controller.deadline, null);
+  assert.equal(u[2].controller.requests.at(-1), 0);
+  u[2].controller.settle();
+  assert.equal(u[2].controller.currentValue, 0);
+  assert.equal(s.tick(boundary + 200, 800, u).motion[2], "idle");
+});
 test("wall-clock jumps cancel anticipated deadlines and replan against the new shared time", () => {
   const now = Date.UTC(2026, 0, 1, 12, 34, 59, 500),
     u = units([12, 34, 59]),
