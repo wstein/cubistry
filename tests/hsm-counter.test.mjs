@@ -198,3 +198,39 @@ test("blank up vectors are free while printed glyphs stay oriented", () => {
     if (/^[HSM]$/.test(s.image)) s.up = s.up.map((x) => -x + 0);
   assert.throws(() => validateHsmDesign(letter), /Invalid HSM setup/);
 });
+test("each fresh 00 setup reaches a full-state counting period within five HTM per step", async () => {
+  for (const letter of ["H", "S", "M"])
+    for (const maximum of [59, 23, 11])
+      for (const direction of [1, -1]) {
+        const c = new HsmController(
+          { configure() {}, animate: async () => {}, resetCamera() {} },
+          design,
+          {},
+          letter,
+          () => {},
+          async () => ({ dispose() {} }),
+        );
+        await c.configure();
+        c.setMode(maximum, direction);
+        const seen = new Set([JSON.stringify(c.state)]);
+        let closed = false;
+        for (let pass = 0; pass < 40 && !closed; pass++) {
+          for (let i = 0; i <= maximum; i++) {
+            const target =
+              (c.currentValue + direction + maximum + 1) % (maximum + 1);
+            c.request(target);
+            await settled(c);
+            assert.equal(c.currentValue, target);
+            assert.ok(
+              c.progress.total <= 5,
+              `${letter}/${maximum}/${direction} step to ${target} took ${c.progress.total} HTM`,
+            );
+          }
+          const key = JSON.stringify(c.state);
+          closed = seen.has(key);
+          seen.add(key);
+        }
+        assert.ok(closed, `${letter}/${maximum}/${direction} did not close`);
+        c.dispose();
+      }
+});

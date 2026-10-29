@@ -83,7 +83,10 @@ npm run test:e2e -- tests/browser/hsm-counter.spec.mjs
 
 The HSM Node regressions cover repeated traversal of all eighteen letter/range/
 direction modes, arbitrary targets, shortest-path prefix totals, invalid inputs,
-full-state inverses, and bounded stop behavior. Browser tests cover all nine
+full-state inverses, and bounded stop behavior. From each unit's fresh 00
+setup, every mode is counted until its full physical state repeats, with at
+most five HTM per step; this pins the M/00–59/down policy. A positive control
+turns the blank's up vectors without changing any plan. Browser tests cover all nine
 letter/range variants in both wrap directions, run/stop/resume, mobile layout,
 isolation from the existing counter and timer applications, and the exact
 blank/M/33 regression. A known six-move free jump is pinned as a Node regression.
