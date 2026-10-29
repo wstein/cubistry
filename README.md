@@ -162,3 +162,10 @@ selected calendars and HSM lettering variants. Example dimensions must be
 checked on the actual cube before ordering. See the
 [print/export contract](docs/PRINT_STICKERS.md) for source-face assembly maps,
 cut contours, licenses and reproducible custom-size exports.
+
+## Picture Puzzle Playground
+
+Open `playground.html` or choose Picture Puzzle Playground in the application
+chooser. Explore a physical 2×2 with original landscape stickers or classic
+colors, legal face turns, seeded scrambles, undo/redo and verified exact Solve.
+See [behavior, supported capabilities and architecture lessons](docs/PICTURE_PLAYGROUND.md).
