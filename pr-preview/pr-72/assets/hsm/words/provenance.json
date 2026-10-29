@@ -1,0 +1,52 @@
+{
+  "schema": "cubistry.hsm-unit-lettering",
+  "version": 1,
+  "variant": "words",
+  "description": "Small hour/min/sec at the bottom; no large H/M/S in this variant.",
+  "canvas": [
+    256,
+    256
+  ],
+  "fontSize": 56,
+  "baseline": 232,
+  "font": {
+    "family": "Noto Sans",
+    "weight": 600,
+    "package": "@fontsource/noto-sans@5.2.10",
+    "path": "public/fonts/noto-sans-latin-600.woff2",
+    "sha256": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed",
+    "license": "SIL-OFL-1.1",
+    "licensePath": "public/fonts/OFL.txt"
+  },
+  "generator": "scripts/export-hsm-word-art.py",
+  "fontToolsVersion": "4.61.1",
+  "stickers": {
+    "H": {
+      "text": "hour",
+      "inkBounds": [
+        67.21199999999999,
+        189.44,
+        192.428,
+        232.56
+      ]
+    },
+    "M": {
+      "text": "min",
+      "inkBounds": [
+        79.69999999999999,
+        189.888,
+        176.468,
+        232.0
+      ]
+    },
+    "S": {
+      "text": "sec",
+      "inkBounds": [
+        86.448,
+        201.088,
+        170.56,
+        232.56
+      ]
+    }
+  }
+}
