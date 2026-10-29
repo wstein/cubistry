@@ -19,8 +19,8 @@ of `evidence-manifest.json` was re-pinned for this wording change.
    pinned data, not a verdict.
 3. WE DO NOT VOTE. Any dissent between the Flix and Julia checkers, or between
    either of them and the pinned expected outcomes, makes the status `UNKNOWN`
-   (never `SAT` or `UNSAT`) and a root-cause (RC) investigation is mandatory: an
-   Opus-class agent (or stronger) finds and documents the cause, and only then is
+   (never `SAT` or `UNSAT`) and a root-cause (RC) investigation is mandatory: a
+   Claude Opus or Codex Sol agent finds and documents the cause, and only then is
    the result re-evaluated (fix the checker or the spec, re-run both checkers).
    There is no majority vote and no tie-breaking by any third source, Python
    included. A dissent is a different accept/reject decision, a different
@@ -39,6 +39,36 @@ of `evidence-manifest.json` was re-pinned for this wording change.
 5. This is a governance change only. No checker code, corpus data, hash, CI
    workflow or Research evidence changes, and no claim about any existing proof
    changes.
+
+## For agents (Claude Code, Codex, others)
+
+Follow these steps exactly. "Dissent" is defined in step 4.
+
+1. CONFIRMED means both checkers accepted the same input. Run both from the
+   repository root, with the commands in [flix/README.md](flix/README.md)
+   (`java -Xmx768m -jar proof-checkers/flix/artifact/flix.jar counter FILE .`,
+   or `state3 FILE`) and [julia/README.md](julia/README.md)
+   (`julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/check.jl counter FILE`,
+   or `state3 FILE`). Also run `python3 proof-checkers/tools/audit_corpus.py`
+   to check the corpus pin (the script only checks data hashes and counts).
+2. Never use Python verifiers to confirm a proof or to settle a disagreement, and
+   never run them to break a tie.
+3. Never vote. Two of three is not an answer.
+4. Dissent means Flix and Julia differ in accept/reject, in the witness/replay
+   result, or in a hash or count. If that happens: set the result to `UNKNOWN`,
+   stop, and do not edit either checker to make them agree. Start a root-cause
+   investigation by a Claude Opus or Codex Sol agent and write the findings down.
+   Only then fix the checker or the spec and rerun BOTH checkers. If only the
+   status class differs (for example `UNSUPPORTED` vs `INVALID`) and the
+   accept/reject decision is the same, it is NOT a dissent: record it in
+   [coverage.json](coverage.json) (follow-up, see rule 3) and list it separately.
+5. After a proof review, report: the checkers run, the exact commands, their
+   versions, the corpus pin and audit result, the verdict, and class-only
+   differences in their own list.
+6. Never edit pinned files without the owner's approval and a re-pin:
+   `SPEC.md` (hash pinned in `evidence-manifest.json`), every other file listed
+   in `evidence-manifest.json`, the corpus under `conformance/` including
+   `conformance/manifest.json`, and `conformance-pin.json`.
 
 ## Status of existing proofs
 
