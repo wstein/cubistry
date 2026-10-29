@@ -1,0 +1,6 @@
+[package]
+version = "0.1.0"
+flix = "0.79.0"
+
+[mvn-dependencies]
+"com.fasterxml.jackson.core:jackson-core" = "2.22.4"
