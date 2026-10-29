@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 async function choose(page, leadingZero = true) {
@@ -116,7 +117,7 @@ test("full thirty-minute countdown visits all361 actual states and independently
   test.setTimeout(240000);
   await page.clock.install();
   await choose(page);
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  await pauseSoon(page, 1000);
   await page.click("#timer-start");
   const epoch = await page.evaluate(() => performance.now());
   let offset = 0;
@@ -160,7 +161,7 @@ test("slow accelerated playback retains one latest target, pauses fractions, res
   // Register application intervals on an already paused clock. Setup moves still
   // commit legally; real animation is enabled before the intentional stall.
   await page.clock.install();
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  await pauseSoon(page, 1000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await choose(page);
   await duration(page, "01:00");
@@ -238,7 +239,7 @@ test("Stopwatch floors five-second fractions and terminates exactly39:55 at100x;
   await page.selectOption("#timer-mode", "stopwatch");
   await settled(page, "00:00");
   await expect(page.locator("#timer-bounds")).toHaveText("Cube: 5-second steps · limit 39:55");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  await pauseSoon(page, 1000);
   await page.click("#timer-start");
   await page.clock.fastForward(4500);
   await expect(page.locator("#timer-logical")).toHaveText("00:04");

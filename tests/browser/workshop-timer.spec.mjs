@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { PNG } from "pngjs";
@@ -111,7 +112,7 @@ test("absolute fifteen-minute deadline visits all91 actual displays and independ
   test.setTimeout(120000);
   await page.clock.install();
   await chooseTimer(page);
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   await page.click("#timer-start");
   const epoch = await page.evaluate(() => performance.now());
   let offset = 0;
@@ -179,7 +180,7 @@ test("pause freezes a lagged clock and settles one frozen bucket; reset never te
   await chooseTimer(page);
   await duration(page, "00:40");
   await page.locator("#rotation-speed").fill("0");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   await page.click("#timer-start");
   await page.clock.fastForward(10000);
   await page.clock.runFor(100);
@@ -309,7 +310,7 @@ test("tab-resume catch-up reads the monotonic deadline, ignores wall-clock jumps
   await page.clock.install();
   await chooseTimer(page);
   await duration(page, "01:00");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   await page.click("#timer-start");
   await page.clock.fastForward(35500);
   await page.clock.runFor(1000);
@@ -464,7 +465,7 @@ test("Stopwatch floors partial intervals, resumes fractions and stops at exact59
   await page.selectOption("#timer-mode", "stopwatch");
   await settled(page, "00:00");
   await expect(page.locator("#timer-duration-setting")).toBeHidden();
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   await page.click("#timer-start");
   await page.clock.fastForward(9999);
   await expect(page.locator("#timer-logical")).toHaveText("00:09");
@@ -502,7 +503,7 @@ test("switching modes during slow accelerated playback stops and resets through 
   await chooseTimer(page);
   await page.locator("#rotation-speed").fill("0");
   await page.selectOption("#timer-speed", "100");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   await page.click("#timer-start");
   await page.clock.fastForward(200);
   await page.clock.runFor(20);
@@ -580,7 +581,7 @@ test("all five Timer rates integrate continuously while running and remain indep
   await page.clock.install();
   await chooseTimer(page);
   await duration(page, "01:00");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   await page.click("#timer-start");
   for (const [rate, realMs, expected] of [
     ["1", 1000, "00:59"],
@@ -613,7 +614,7 @@ test("all five Timer rates integrate continuously while running and remain indep
 test("visible Set and Enter apply the same duration without starting; Reset retains the configured duration", async ({ page }) => {
   await page.clock.install();
   await chooseTimer(page);
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   const set = page.getByRole("button", { name: "Set", exact: true });
   await expect(set).toBeVisible();
   await page.fill("#timer-duration", "00:40");
@@ -648,7 +649,7 @@ test("Set replaces a pending duration safely during an active legal animation wi
   await page.clock.install();
   await chooseTimer(page);
   await duration(page, "00:40");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   await page.locator("#rotation-speed").fill("0");
   await page.fill("#timer-duration", "00:30");
   await page.click("#timer-set");
@@ -680,7 +681,7 @@ for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844
     await duration(page, "00:40");
     await page.evaluate(() => document.fonts.ready);
     await page.locator("#rotation-speed").fill("0");
-    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+    await pauseSoon(page);
     const slider = page.locator("#rotation-speed");
     await slider.scrollIntoViewIfNeeded();
     const initial = await slider.boundingBox();
@@ -804,7 +805,7 @@ test("Sequence numbers identify actual starts, retain the finished number and ig
   await page.click("#timer-set");
   await expect(number).toHaveText("1");
   await page.locator("#rotation-speed").fill("0");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   await page.fill("#timer-duration", "00:30");
   await page.click("#timer-set");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
@@ -960,7 +961,7 @@ test("pause reconciles active sequences and a final-turn hold through legal move
   await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.install();
   await chooseTimer(page);
-  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  await pauseSoon(page);
   for(const [stop,advance] of [["0",5500],["3",9500]]) {
     await page.locator("#rotation-speed").fill("6");
     await page.fill("#timer-duration","00:20");
@@ -999,7 +1000,7 @@ test("pause reconciles active sequences and a final-turn hold through legal move
 
 test("live readout advances each second while cube keeps ten-second buckets, including fractional Stopwatch pause",async({page})=>{
   await page.clock.install();await chooseTimer(page);await duration(page,"00:20");
-  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  await pauseSoon(page);
   const moves=await page.locator("#session-moves").innerText();
   await page.click("#timer-start");
   for(const [elapsed,live] of [[1050,"00:19"],[1000,"00:18"]]) {
@@ -1040,7 +1041,7 @@ test("a held final turn cancels on Reset and a rate extension rebases active mot
   test.setTimeout(60000);await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.install();await chooseTimer(page);await page.locator("#rotation-speed").fill("6");
   await duration(page,"00:20");await observeEndpoints(page);await clearEndpointObservation(page);
-  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  await pauseSoon(page);
   await page.locator("#rotation-speed").fill("3");await page.click("#timer-start");
   await page.clock.fastForward(8000);await page.clock.runFor(1500);
   await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
@@ -1067,7 +1068,7 @@ test("a held final turn cancels on Reset and a rate extension rebases active mot
 test("an initially infeasible final turn accepts a later feasible endpoint when rate slows",async({page})=>{
   await page.emulateMedia({reducedMotion:"no-preference"});await page.clock.install();await chooseTimer(page);
   await page.locator("#rotation-speed").fill("6");await duration(page,"20:10");
-  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  await pauseSoon(page);
   await page.locator("#rotation-speed").fill("3");await page.selectOption("#timer-speed","100");
   await page.click("#timer-start");await page.clock.runFor(8);
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
@@ -1080,7 +1081,7 @@ test("an initially infeasible final turn accepts a later feasible endpoint when 
 
 test("a reduced-motion preference change cannot run an active presentation twice",async({page})=>{
   await page.emulateMedia({reducedMotion:"no-preference"});await page.clock.install();await chooseTimer(page);
-  await duration(page,"00:20");await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  await duration(page,"00:20");await pauseSoon(page);
   await page.evaluate(async()=>{
     const originalMedia=window.matchMedia.bind(window);window.mediaQueries=0;
     window.matchMedia=(query)=>{if(query==="(prefers-reduced-motion: reduce)")window.mediaQueries++;return originalMedia(query);};
