@@ -38,6 +38,7 @@ function conformance(root;export_path=nothing)
     export_path!==nothing && need(!ispath(export_path),"export path must be new";code="ERROR")
     exports=export_path===nothing ? nothing : open(export_path,"w")
     reports=Any[];hashes=String[]
+    geometry_witnesses=0;outer_htm=0;whole_rotations=0;rotation_quarters=0
     try
         for row in manifest["cases"]
             command=row["group"]=="counter" ? "counter" : "state3"
@@ -49,6 +50,20 @@ function conformance(root;export_path=nothing)
                 key=row["group"]=="counter" ? "canonicalStateSHA256" : "stateSHA256"
                 expected=row["group"]=="counter" ? row["canonicalStateSHA256"] : row["expectedStateSHA256"]
                 need(result[key]==expected,"full state digest "*row["name"];code="CONFORMANCE_ERROR")
+                if row["group"]=="geometry" && haskey(row,"word") && row["word"]!==nothing
+                    raw,_=read_json(joinpath(root,row["path"]))
+                    reference=stickers(raw["printing"],3);declared=stickers(raw["state"],3)
+                    ts=moves(row["word"];whole=true);replayed=apply_tokens(reference,ts)
+                    need(state_wire(replayed)==state_wire(declared),"actual geometry witness replay "*row["name"];code="CONFORMANCE_ERROR")
+                    need(state_wire(apply_tokens(replayed,inverse_tokens(ts)))==state_wire(reference),"geometry witness inverse "*row["name"];code="CONFORMANCE_ERROR")
+                    geometry_witnesses+=1
+                    for t in ts
+                        if first(t) in ('x','y','z')
+                            whole_rotations+=1;rotation_quarters+=endswith(t,"2") ? 2 : 1
+                        else;outer_htm+=1
+                        end
+                    end
+                end
                 record[key]=result[key];push!(hashes,result[key])
                 if haskey(row,"expectedGoalMatches")
                     need(result["goalMatches"]==row["expectedGoalMatches"],"optical goal "*row["name"];code="CONFORMANCE_ERROR")
@@ -82,12 +97,13 @@ function conformance(root;export_path=nothing)
                 need(length(ts)==row["htm"],"actual reference move count";code="CONFORMANCE_ERROR")
                 push!(hashes,result["stateSHA256"])
                 if exports!==nothing
-                    println(exports,JSON.json(Dict("group"=>group,"name"=>index,"state"=>JSON.parse(state_wire(state)))))
+                    println(exports,JSON.json(Dict("group"=>group,"name"=>string(group=="kernel" ? row["i"] : index-1),"state"=>JSON.parse(state_wire(state)))))
                 end
             end
         end
         Dict("valid"=>true,"status"=>"VALID","counterCases"=>41,"counterAccepted"=>2,"counterRejected"=>39,
              "geometryCases"=>154,"geometryAccepted"=>129,"geometryRejected"=>25,"kernelReferences"=>2048,"centerGenerators"=>36,
+             "geometryWitnessesReplayed"=>geometry_witnesses,"geometryOuterHTM"=>outer_htm,"geometryWholeRotations"=>whole_rotations,"geometryRotationQuarterTurns"=>rotation_quarters,
              "caseReports"=>reports,"fullStateAggregateSHA256"=>bytes2hex(sha256(join(hashes,"\n"))),"manifestSHA256"=>MANIFEST_PIN)
     finally
         exports!==nothing && close(exports)
