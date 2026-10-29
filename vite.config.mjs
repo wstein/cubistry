@@ -4,9 +4,10 @@ import { solverAcceptancePlugin } from "./src/dev/acceptance-plugin.ts";
 export default defineConfig({
   base: process.env.VITE_BASE_PATH || "/",
   // Keep module-relative provider assets available in development and builds.
-  optimizeDeps: { exclude: ["@puzlwerk/solver-2x2"] },
+  optimizeDeps: { exclude: ["@puzlwerk/solver-2x2", "cubing"] },
   assetsInclude: ["**/*.bin"],
   plugins: [solverAcceptancePlugin()],
+  worker: { format: "es" },
   build: {
     rollupOptions: {
       input: {
