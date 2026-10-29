@@ -10,6 +10,8 @@ import {
 import {
   ClockMoveStatistics,
   countClockMoves,
+  formatMean,
+  formatMedian,
 } from "../src/apps/clock/statistics.ts";
 import { LiveClockScheduler } from "../src/apps/clock/scheduler.ts";
 import { countCalendarMoves } from "../src/apps/calendar/controller.ts";
@@ -208,7 +210,11 @@ test("reset zeros the session and drops moves of a change already in flight", ()
     assert.equal(unit.last, null);
     assert.equal(unit.max, null);
     assert.equal(unit.changes, 0);
+    assert.equal(unit.mean, null);
+    assert.equal(unit.median, null);
   }
+  assert.equal(s.distinctCosts("total"), 0);
+  assert.equal(s.distinctCosts(0), 0);
   s.commit(2, { htm: 1, rotations: 0 });
   s.settle(2);
   s.closeTick();
@@ -292,4 +298,159 @@ test("the first progress report already carrying a committed move is counted", (
   s.observe(0, progress(1, "playing"));
   assert.equal(s.snapshot().units[0].session.htm, 1);
   assert.throws(() => s.observe(3, progress(1, "playing")));
+});
+
+/** Complete one change of a cube with the given HTM cost. */
+const change = (s, index, cost) => {
+  if (cost) s.commit(index, { htm: cost, rotations: 0 });
+  s.settle(index);
+};
+/** One tick: each listed [cube, cost] change completes before one close. */
+const tick = (s, ...changes) => {
+  for (const [index, cost] of changes) change(s, index, cost);
+  s.closeTick();
+};
+
+test("mean and median show a dash before the first completed tick", () => {
+  const s = new ClockMoveStatistics();
+  s.commit(2, { htm: 5, rotations: 0 });
+  const snap = s.snapshot();
+  for (const unit of [...snap.units, snap.total]) {
+    assert.equal(unit.mean, null);
+    assert.equal(unit.median, null);
+  }
+  assert.equal(formatMean(null), "—");
+  assert.equal(formatMedian(null), "—");
+});
+
+test("a single tick has that cost as mean and median", () => {
+  const s = new ClockMoveStatistics();
+  tick(s, [2, 7]);
+  const snap = s.snapshot();
+  assert.equal(snap.units[2].mean, 7);
+  assert.equal(snap.units[2].median, 7);
+  assert.equal(snap.total.mean, 7);
+  assert.equal(snap.total.median, 7);
+  assert.equal(snap.units[0].mean, null, "a cube without changes has none");
+  assert.equal(snap.units[0].median, null);
+});
+
+test("odd count: the median is the middle cost, not the mean", () => {
+  const s = new ClockMoveStatistics();
+  for (const cost of [9, 1, 2]) tick(s, [2, cost]);
+  const u = s.snapshot().units[2];
+  assert.equal(u.median, 2);
+  assert.equal(u.mean, 4);
+});
+
+test("even count: the median is the mean of the two middle costs", () => {
+  const s = new ClockMoveStatistics();
+  for (const cost of [1, 2, 10, 4]) tick(s, [2, cost]);
+  assert.equal(s.snapshot().units[2].median, 3);
+  const t = new ClockMoveStatistics();
+  for (const cost of [1, 2]) tick(t, [2, cost]);
+  assert.equal(t.snapshot().units[2].median, 1.5);
+  assert.equal(formatMedian(1.5), "1.5");
+  assert.equal(formatMedian(3), "3");
+  // Both middle ranks inside one bucket.
+  const u = new ClockMoveStatistics();
+  for (const cost of [0, 4, 4, 9]) tick(u, [2, cost]);
+  assert.equal(u.snapshot().units[2].median, 4);
+});
+
+test("mean is exact from integers and rounded to two decimals only for display", () => {
+  const s = new ClockMoveStatistics();
+  for (const cost of [1, 0, 0]) tick(s, [2, cost]);
+  const mean = s.snapshot().units[2].mean;
+  assert.equal(mean, 1 / 3);
+  assert.equal(formatMean(mean), "0.33");
+  assert.equal(formatMean(2), "2.00");
+  assert.equal(formatMean(2 / 3), "0.67");
+});
+
+test("zero-cost completed changes are included, like in last and max", () => {
+  const s = new ClockMoveStatistics();
+  tick(s, [2, 4]);
+  tick(s, [2, 0]);
+  const snap = s.snapshot();
+  assert.equal(snap.units[2].last, 0);
+  assert.equal(snap.units[2].mean, 2);
+  assert.equal(snap.units[2].median, 2);
+  assert.equal(snap.total.mean, 2);
+  // A closeTick without a completed change is not a tick.
+  s.closeTick();
+  assert.equal(s.snapshot().total.mean, 2);
+  // A cost that is only committed, not settled, does not enter the statistics.
+  s.commit(2, { htm: 100, rotations: 0 });
+  assert.equal(s.snapshot().units[2].mean, 2);
+});
+
+test("the total row aggregates ticks: the per-tick sum over the cubes", () => {
+  const s = new ClockMoveStatistics();
+  tick(s, [2, 3]);
+  tick(s, [1, 4], [2, 6]);
+  tick(s, [0, 1], [1, 1], [2, 1]);
+  const snap = s.snapshot();
+  // Tick costs are 3, 10 and 3, not the five pooled cube changes.
+  assert.equal(snap.total.changes, 3);
+  assert.equal(snap.total.mean, 16 / 3);
+  assert.equal(snap.total.median, 3);
+  assert.equal(snap.units[2].mean, 10 / 3);
+  assert.equal(snap.units[2].median, 3);
+  assert.equal(snap.units[1].mean, 2.5);
+  assert.equal(snap.units[1].median, 2.5);
+  assert.equal(snap.units[0].mean, 1);
+});
+
+test("a large session keeps one counter per distinct cost", () => {
+  const s = new ClockMoveStatistics();
+  const n = 200000;
+  for (let i = 0; i < n; i++) tick(s, [2, i % 5]);
+  assert.equal(s.distinctCosts(2), 5);
+  assert.equal(s.distinctCosts("total"), 5);
+  const snap = s.snapshot();
+  assert.equal(snap.total.changes, n);
+  assert.equal(snap.total.mean, 2);
+  assert.equal(snap.total.median, 2);
+  // Skew the distribution so the median moves off the mean.
+  for (let i = 0; i < n / 2; i++) tick(s, [2, 0]);
+  assert.equal(s.snapshot().units[2].median, 1);
+  assert.equal(s.snapshot().units[2].mean, 4 / 3);
+  for (let i = 0; i < n; i++) tick(s, [2, 0]);
+  assert.equal(s.snapshot().units[2].median, 0);
+  assert.equal(s.distinctCosts(2), 5);
+});
+
+test("reset clears mean, median and the stored distribution", () => {
+  const s = new ClockMoveStatistics();
+  tick(s, [2, 3], [1, 8]);
+  tick(s, [2, 5]);
+  s.reset();
+  let snap = s.snapshot();
+  assert.equal(snap.total.mean, null);
+  assert.equal(snap.units[2].median, null);
+  assert.equal(s.distinctCosts(2), 0);
+  tick(s, [2, 2]);
+  snap = s.snapshot();
+  assert.equal(snap.units[2].mean, 2, "earlier ticks no longer count");
+  assert.equal(snap.total.median, 2);
+});
+
+test("midnight rollover feeds one tick into the total mean and median", async () => {
+  const stats = new ClockMoveStatistics(),
+    { units, gates } = await clockUnits(stats, [23, 59, 59]);
+  const scheduler = new LiveClockScheduler(utc);
+  scheduler.tick(Date.UTC(2027, 0, 1) - 50, 0, units);
+  for (let i = 0; i < 3; i++) await gates[i].finish(units[i].controller);
+  stats.closeTick();
+  const snap = stats.snapshot(),
+    costs = gates.map((g) => g.committed.length),
+    sum = costs[0] + costs[1] + costs[2];
+  assert.equal(snap.total.mean, sum);
+  assert.equal(snap.total.median, sum);
+  snap.units.forEach((u, i) => {
+    assert.equal(u.mean, costs[i]);
+    assert.equal(u.median, costs[i]);
+  });
+  for (const u of units) u.controller.dispose();
 });
