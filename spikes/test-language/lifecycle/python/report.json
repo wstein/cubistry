@@ -1,0 +1,85 @@
+{
+  "label": "python",
+  "command": [
+    "python3",
+    "spikes/test-language/python_lifecycle.py",
+    "spikes/test-language/evidence/julia-verify-low-optimization/controls"
+  ],
+  "workingDirectory": "/workspace/cubistry-flix-spike",
+  "clock": "parent time.monotonic_ns for observed startup/exit; child elapsed durations only",
+  "startupToReadyMs": 21.491224,
+  "observedDoneToExitMs": 5.342047,
+  "totalProcessWallMs": 2210.426658,
+  "exitCode": 0,
+  "events": [
+    {
+      "event": "READY",
+      "parentReceivedMs": 21.491224
+    },
+    {
+      "event": "LOAD",
+      "elapsedMs": 2.705205,
+      "scope": "load unchanged Python oracle and its standard-library modules",
+      "parentReceivedMs": 24.206655
+    },
+    {
+      "event": "RESULT",
+      "iteration": 0,
+      "elapsedMs": 564.563875,
+      "values": 100,
+      "inverseChecks": 100,
+      "negativeControls": 10,
+      "fullStickerFrames": 2400,
+      "checksum": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5",
+      "scope": "unchanged full checker, chains/proof checks, ten corruptions and full-state audit",
+      "parentReceivedMs": 589.136712
+    },
+    {
+      "event": "RESULT",
+      "iteration": 1,
+      "elapsedMs": 546.752593,
+      "values": 100,
+      "inverseChecks": 100,
+      "negativeControls": 10,
+      "fullStickerFrames": 2400,
+      "checksum": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5",
+      "scope": "unchanged full checker, chains/proof checks, ten corruptions and full-state audit",
+      "parentReceivedMs": 1135.883616
+    },
+    {
+      "event": "RESULT",
+      "iteration": 2,
+      "elapsedMs": 536.784257,
+      "values": 100,
+      "inverseChecks": 100,
+      "negativeControls": 10,
+      "fullStickerFrames": 2400,
+      "checksum": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5",
+      "scope": "unchanged full checker, chains/proof checks, ten corruptions and full-state audit",
+      "parentReceivedMs": 1672.729245
+    },
+    {
+      "event": "RESULT",
+      "iteration": 3,
+      "elapsedMs": 532.239721,
+      "values": 100,
+      "inverseChecks": 100,
+      "negativeControls": 10,
+      "fullStickerFrames": 2400,
+      "checksum": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5",
+      "scope": "unchanged full checker, chains/proof checks, ten corruptions and full-state audit",
+      "parentReceivedMs": 2205.045322
+    },
+    {
+      "event": "DONE",
+      "completedRuns": 4,
+      "parentReceivedMs": 2205.084611
+    }
+  ],
+  "driverSHA256": "9441f40adfd55acf88e5510400b602d8201f5b362a5f2ce52204aa30c94141d9",
+  "limits": [
+    "shared machine; no forced garbage collection",
+    "marker creation/flush, pipe delivery, scheduling and runtime cleanup are included in observed phases",
+    "DONE-to-exit is an observed tail, not isolated destructor CPU time or a zero-cost guarantee"
+  ]
+}

@@ -124,3 +124,8 @@ replayed the prototypes, added 126 noncanonical/group-identity frame cases,
 checked numeric boundaries, repeated startup experiments and reviewed the final
 verification-only default. No blocking findings remain within the stated finite
 scope. Complete replacement remains UNKNOWN; retain Draft for human review.
+
+The additive [lifecycle experiment](LIFECYCLE.md) now measures one-time setup,
+runtime/load, first complete validation, three complete same-process repeats and
+observed exit. It preserves every prototype check and shows nonzero exit tails;
+it does not estimate the cost of an unimplemented complete project-suite port.

@@ -1,0 +1,14 @@
+ERROR: ArgumentError: Complete suite requires the exact ten corruption fixtures
+Stacktrace:
+ [1] require
+   @ /workspace/cubistry-flix-spike/spikes/test-language/julia/checker.jl:15 [inlined]
+ [2] verify_suite(input::String, casesdir::String)
+   @ Main /workspace/cubistry-flix-spike/spikes/test-language/julia/checker.jl:130
+ [3] top-level scope
+   @ none:1
+ [4] eval(m::Module, e::Any)
+   @ Core ./boot.jl:489
+ [5] exec_options(opts::Base.JLOptions)
+   @ Base ./client.jl:310
+ [6] _start()
+   @ Base ./client.jl:577
