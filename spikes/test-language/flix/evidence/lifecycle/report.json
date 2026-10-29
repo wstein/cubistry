@@ -1,0 +1,82 @@
+{
+  "label": "flix",
+  "command": [
+    "java",
+    "-jar",
+    "artifact/flix-lifecycle.jar"
+  ],
+  "workingDirectory": "/workspace/cubistry-flix-probe/spikes/test-language/flix",
+  "clock": "parent time.monotonic_ns for observed startup/exit; child elapsed durations only",
+  "startupToReadyMs": 38.46582,
+  "observedDoneToExitMs": 7.100064,
+  "totalProcessWallMs": 259.647675,
+  "exitCode": 0,
+  "events": [
+    {
+      "event": "READY",
+      "parentReceivedMs": 38.46582
+    },
+    {
+      "event": "RESULT",
+      "iteration": 0,
+      "elapsedNs": 134079769,
+      "elapsedMs": 134.079769,
+      "canonicalStates": 100,
+      "inverseChecks": 100,
+      "negativeControls": 6,
+      "auditReplays": 100,
+      "checksum": 29748,
+      "passed": true,
+      "parentReceivedMs": 190.602899
+    },
+    {
+      "event": "RESULT",
+      "iteration": 1,
+      "elapsedNs": 19022175,
+      "elapsedMs": 19.022175,
+      "canonicalStates": 100,
+      "inverseChecks": 100,
+      "negativeControls": 6,
+      "auditReplays": 100,
+      "checksum": 29748,
+      "passed": true,
+      "parentReceivedMs": 216.85927
+    },
+    {
+      "event": "RESULT",
+      "iteration": 2,
+      "elapsedNs": 9852697,
+      "elapsedMs": 9.852697,
+      "canonicalStates": 100,
+      "inverseChecks": 100,
+      "negativeControls": 6,
+      "auditReplays": 100,
+      "checksum": 29748,
+      "passed": true,
+      "parentReceivedMs": 232.936669
+    },
+    {
+      "event": "RESULT",
+      "iteration": 3,
+      "elapsedNs": 13648129,
+      "elapsedMs": 13.648129,
+      "canonicalStates": 100,
+      "inverseChecks": 100,
+      "negativeControls": 6,
+      "auditReplays": 100,
+      "checksum": 29748,
+      "passed": true,
+      "parentReceivedMs": 252.508351
+    },
+    {
+      "event": "DONE",
+      "parentReceivedMs": 252.547611
+    }
+  ],
+  "driverSHA256": "9441f40adfd55acf88e5510400b602d8201f5b362a5f2ce52204aa30c94141d9",
+  "limits": [
+    "shared machine; no forced garbage collection",
+    "marker creation/flush, pipe delivery, scheduling and runtime cleanup are included in observed phases",
+    "DONE-to-exit is an observed tail, not isolated destructor CPU time or a zero-cost guarantee"
+  ]
+}

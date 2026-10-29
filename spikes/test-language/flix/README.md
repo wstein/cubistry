@@ -115,3 +115,14 @@ remains in that invocation. The build cost is outside all runtime phases.
 
 The lifecycle build retains a separate `artifact/flix-lifecycle.jar`, so rebuilding
 the original startup probe cannot silently replace the lifecycle executable.
+
+The retained [lifecycle capture](evidence/lifecycle/report.json) observes startup
+**38.47 ms**, first complete invocation **134.08 ms**, and three later complete
+invocations **19.02 / 9.85 / 13.65 ms** in the same JVM. Every invocation reported
+checksum **29748**, independently checked against the unchanged Python geometry.
+The measured DONE-to-exit tail was **7.10 ms**, not zero. Whole-process observed
+wall time was **259.65 ms**; marker construction, flushing, pipe delivery and
+scheduling are included outside the child validation timers. The separately
+recorded [upfront build](evidence/lifecycle/build.json) took **8,907.17 ms**.
+These are one shared-machine observation; earlier exploratory repeats are not
+silently averaged into it. No standalone certificate-load time is claimed.

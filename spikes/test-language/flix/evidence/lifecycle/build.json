@@ -1,0 +1,30 @@
+{
+  "command": [
+    "./flixw",
+    "build-fatjar",
+    "--entrypoint",
+    "lifecycleMain",
+    "--no-install",
+    "--threads",
+    "2"
+  ],
+  "buildElapsedMs": 8907.174134,
+  "exitCode": 0,
+  "compiledArtifact": "artifact/flix-lifecycle.jar",
+  "compiledArtifactSHA256": "45b3c40a7ed74d7ee8a92707cf1a5175327a25805299e1c9c2d248c833274ede",
+  "compiledArtifactBytes": 711433,
+  "sourceSHA256": {
+    "src/Main.flix": "c0eee74ea15fbfe15a1063b97207d0508edbd30566f0eb96c2c8fd14b182c815",
+    "src/Fixtures.flix": "1327b2a498c9f9dc8e0e56fa3baa05895091212ebf92db7c4ff35fc5db08bcf0",
+    "src/Lifecycle.flix": "2c4c919e7ac6046007a56478baeccd0f0fb0ad54cf31cc9643d77d903ed19318",
+    ".flixw/lock.toml": "75135dd33bc9c1749b5fda8374d3b02afa13602204d6ca0a75f2f9487e44604d",
+    "build_lifecycle.py": "6f97a3b513cccb43236a89763149949dfeb0fbff8c899200de8dd1ce02bb1b8e"
+  },
+  "coveragePerInvocation": {
+    "canonicalStates": 100,
+    "inverseChecks": 100,
+    "negativeControls": 6,
+    "auditReplays": 100
+  },
+  "scope": "unchanged geometryChecks plus identical full-state numeric checksum audit on each invocation"
+}
