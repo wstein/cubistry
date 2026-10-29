@@ -5,13 +5,16 @@ export function timerMotion({
   busy,
   activeTarget,
   anticipatedTarget = null,
+  catchingUp = false,
 }: {
   physical: number;
   logical: number;
   busy: boolean;
   activeTarget: number | null;
   anticipatedTarget?: number | null;
+  catchingUp?: boolean;
 }): "idle" | "moving" | "synchronizing" {
+  if (catchingUp && (busy || physical !== logical)) return "synchronizing";
   if (!busy) return physical === logical || physical === anticipatedTarget ? "idle" : "synchronizing";
   return activeTarget !== null && activeTarget !== logical && activeTarget !== anticipatedTarget
     ? "synchronizing"

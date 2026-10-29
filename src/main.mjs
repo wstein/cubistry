@@ -388,6 +388,7 @@ function timerUi() {
     busy: !!view?.busy,
     activeTarget: view?.progress.target ?? null,
     anticipatedTarget: timerScheduler.presentationTarget(snapshot),
+    catchingUp: timerScheduler.warning === "Late",
   });
   const settling = motion !== "idle";
   $("timer-sync").dataset.state = motion;
