@@ -2,7 +2,8 @@
 
 Evidence classification: **SAT** for all 625 fixed-print upright displays and
 the universal six-HTM single-category policy, confirmed by the separate
-[independent review](independent-review/REVIEW.md) of author commit `13ad01a`.
+[independent review](independent-review/REVIEW.md) of publication author commit
+`e9e544c`, byte-identical to the original reviewed Quality Cube snapshot `13ad01a`.
 A universal five-HTM bound is **UNSAT within the specified five-state pair
 construction**, not for arbitrary other prints. Global print and unrestricted
 mean optimization remain **UNKNOWN**. Original generated pending-review
