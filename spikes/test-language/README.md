@@ -1,5 +1,7 @@
 # Test-language migration spike
 
+[Measured results and recommendation](RESULTS.md).
+
 This isolated feature branch investigates replacing Python proof/regression tests
 with Julia, GNU Octave, or Flix. Existing tests, production sources,
 certificates and CI remain unchanged. This is an experiment, not an approved
@@ -66,3 +68,5 @@ because Julia's package manager marked it deprecated; final measurements use JSO
 - [Julia startup and compilation considerations](https://docs.julialang.org/en/v1/manual/performance-tips/)
 - [Julia JSON package and migration documentation](https://github.com/JuliaIO/JSON.jl)
 - [Julia runtime license](https://github.com/JuliaLang/julia/blob/v1.13.3/LICENSE.md)
+
+- [Flix executable probe and pinned wrapper setup](flix/README.md)
