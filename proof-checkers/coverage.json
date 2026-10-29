@@ -73,9 +73,9 @@
     ]
   },
   "marked3x3": {
-    "cases": 147,
-    "validCases": 123,
-    "rejectedCases": 24,
+    "cases": 152,
+    "validCases": 127,
+    "rejectedCases": 25,
     "requiredChecks": [
       "54-immutable-id-body-frame-image-records",
       "26-rigid-bodies-and-unique-occupancy",
@@ -90,7 +90,8 @@
       "declared-twist-full-frame-agreement",
       "optical-periods-1-2-4-with-physical-state-retained",
       "36-generators-all-full-frames-and-inverse",
-      "2048-kernel-references-all-full-frames-and-inverse"
+      "2048-kernel-references-all-full-frames-and-inverse",
+      "canonical-ascii-escaping-and-unicode-scalars"
     ]
   },
   "outOfScope": [

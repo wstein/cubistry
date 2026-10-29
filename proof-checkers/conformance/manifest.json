@@ -1540,11 +1540,50 @@
     },
     {
       "group": "geometry",
+      "name": "unicode-bmp-image",
+      "path": "proof-checkers/conformance/geometry/unicode-bmp-image.json",
+      "sha256": "ba6e8c4d2a83dcd9fb118039c8a035953a321df9d9643413660e6bd9bb81ac52",
+      "expectedValid": true,
+      "expectedStateSHA256": "ed40ab405b412aec9422c766c1039c06ce0c8a3fbdc341b07186c58f82b4cf2f"
+    },
+    {
+      "group": "geometry",
+      "name": "unicode-control-image",
+      "path": "proof-checkers/conformance/geometry/unicode-control-image.json",
+      "sha256": "18b35f30be5ec35892977702c789e67435175632bb8ca488d7da8e8a9378aaab",
+      "expectedValid": true,
+      "expectedStateSHA256": "f4b3712f701d82f6f4afccd5c53b082227a6ef6fb958530a767c590eb6a1cbb8"
+    },
+    {
+      "group": "geometry",
+      "name": "unicode-quoted-image",
+      "path": "proof-checkers/conformance/geometry/unicode-quoted-image.json",
+      "sha256": "abdd681888af5a0821b76af31027cccf01a299f630cd0168ae9e313fe44c4b6b",
+      "expectedValid": true,
+      "expectedStateSHA256": "2696bc8054b66d68eeb627715c84dc9f7c1ab442967ea8d7a1df0c7b776408bb"
+    },
+    {
+      "group": "geometry",
+      "name": "unicode-supplementary-image",
+      "path": "proof-checkers/conformance/geometry/unicode-supplementary-image.json",
+      "sha256": "b56600c7ecd28b1cb642866c8625a9fb31e43a9a1e2beb1f43a074d9f895449f",
+      "expectedValid": true,
+      "expectedStateSHA256": "068ff3a5a431783715449b06c44156df81da2b4d88621103f1ba7061298159bb"
+    },
+    {
+      "group": "geometry",
       "name": "unknown-geometry-schema",
       "path": "proof-checkers/conformance/geometry/unknown-geometry-schema.json",
       "sha256": "406fb7baff14679e55b79e2fe76ae390786b68c7dc99a8a5715cd8ed1880d443",
       "expectedValid": false,
       "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "unpaired-surrogate-image",
+      "path": "proof-checkers/conformance/geometry/unpaired-surrogate-image.json",
+      "sha256": "5841577c0cf96215627eb69c6f0e2ff85d9e335c89334995cc6c66b3f2a38d1b",
+      "expectedValid": false
     },
     {
       "group": "geometry",
@@ -1683,9 +1722,9 @@
       "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
     }
   ],
-  "caseCount": 188,
+  "caseCount": 193,
   "counterCaseCount": 41,
-  "geometryCaseCount": 147,
+  "geometryCaseCount": 152,
   "counterChain": {
     "path": "proof-checkers/conformance/counter-chain.json",
     "sha256": "e051e2f4a14293dbeecc7cf123b914481bdcc0c2452c156e099102f1eeb07a88",
