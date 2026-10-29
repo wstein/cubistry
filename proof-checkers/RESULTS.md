@@ -36,7 +36,10 @@ An independent reviewer additionally executed raw-input boundary controls,
 reordered and relabeled bodies/identities, arbitrary printed reference frames,
 Unicode aliases, exact resource limits, and 52 rotated-reference center/optical
 checks. Both engines passed. Each language's four complete lifecycle calls were
-also independently rerun. The final review reports are retained with the delivery.
+also independently rerun. The final review reports are retained with the delivery. Review found and fixed
+a Flix input-order discrepancy: reordering only `unpaddedPrinting` now rejects,
+matching Python and Julia; permuting both printing arrays together remains valid.
+Three raw-CLI regressions also preserve equivalent integer `-0` handling.
 
 Six deliberately stricter counter inputs are explicitly listed in the ledger:
 Boolean unpadded coordinates, duplicate keys, exponent/float schema versions,
@@ -53,13 +56,13 @@ microkernel substitution or forced garbage collection is used.
 
 | Phase | Julia 1.13.3, normal optimization | Flix 0.79.0, Java 21 fat JAR |
 | --- | ---: | ---: |
-| Process start to flushed READY | 98.95 ms | 69.33 ms |
-| Child-reported load/preflight | 907.26 ms | 113.13 ms |
-| LOAD receipt to first RESULT receipt | 11,047.19 ms | 3,567.34 ms |
-| First complete call, child timer | 8,510.06 ms | 3,566.31 ms |
-| Three warm complete calls, child timers | 3,478.05 / 3,567.14 / 3,519.45 ms | 2,706.98 / 2,587.12 / 2,500.94 ms |
-| Flushed DONE receipt to observed exit | 18.80 ms | 17.43 ms |
-| Complete fresh process, four calls | 22,693.78 ms | 11,565.03 ms |
+| Process start to flushed READY | 98.95 ms | 77.51 ms |
+| Child-reported load/preflight | 907.26 ms | 105.87 ms |
+| LOAD receipt to first RESULT receipt | 11,047.19 ms | 3,473.01 ms |
+| First complete call, child timer | 8,510.06 ms | 3,472.54 ms |
+| Three warm complete calls, child timers | 3,478.05 / 3,567.14 / 3,519.45 ms | 2,806.31 / 2,918.35 / 2,478.50 ms |
+| Flushed DONE receipt to observed exit | 18.80 ms | 17.59 ms |
+| Complete fresh process, four calls | 22,693.78 ms | 11,880.58 ms |
 
 [Julia raw lifecycle](julia/evidence/lifecycle/report.json) and
 [Flix raw lifecycle](flix/evidence/lifecycle/report.json) include both clocks.
@@ -69,7 +72,7 @@ subtracted from child absolute clocks. Load phases differ: Julia loads modules;
 Flix preflights corpus files. Intervals include reporting/scheduling overhead and
 cannot isolate JIT, GC or OS shutdown individually. Teardown is observably nonzero.
 
-Flix source-to-fat-JAR build took 12,969.65 ms separately, with dependencies already
+Flix source-to-fat-JAR build took 12,753.39 ms separately, with dependencies already
 available ([build capture](flix/evidence/build.json)). Compiler/parser downloads,
 network setup and Julia package installation/precompile are not included in runtime
 figures. Versions, hashes and licenses are documented in each language README.
