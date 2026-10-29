@@ -87,7 +87,14 @@ plans and estimates are bound to the exact source pose and retained reference
 word. Only strictly shorter routes that replay to the required upright face are
 accepted; invalid or failed solver output uses the checked baseline route. A
 noncanonical endpoint retains its actual source-to-pose path rather than being
-replaced by a canonical setup. The default application connects this provider to the pinned Research
+replaced by a canonical setup. Optimized endpoints usually keep noncanonical
+hidden center orientations, so this retained reference, and with it the inverse
+reference plus setup fallback, grows by roughly each executed route's length per
+committed date change. In a local 40-day chain of +1 days, the fallback grew from
+79 to 1,012 turns for German A and from 77 to 759 for English 3 while the
+optimized routes stayed at 11–41 turns. The fallback remains legal and checked,
+but after a long session it can be hundreds of turns; bounding it is open work.
+The default application connects this provider to the pinned Research
 [transition optimizer](../src/apps/calendar/transition/provenance.json). It has
 a soft 500 ms search budget between at most six solver attempts and a hard
 8-second worker deadline including cold startup. Timeout, worker errors, invalid
