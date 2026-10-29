@@ -3,8 +3,8 @@
 Implementation of [issue 74](https://github.com/wstein/cubistry/issues/74), stacked
 on the finalized lifecycle spike. The shared [contract](SPEC.md),
 [coverage ledger](coverage.json) and [hash-pinned corpus](conformance/manifest.json)
-precede parallel Flix/Julia implementation. They do not claim the engines are
-already complete: implementation status is explicit in the ledger.
+precede parallel Flix/Julia implementation. Both bounded engines are implemented and independently replayed; see the
+[results and lifecycle comparison](RESULTS.md).
 
 Existing Python, Research evidence, production code and CI are unchanged.
 Full ports are restricted to the counter-certificate checks and marked 3×3
@@ -23,6 +23,6 @@ python3 proof-checkers/tools/audit_corpus.py
 
 `tools/build_corpus.py` reproduces the draft data only into a fresh source tree,
 using unchanged independent Python/Research oracles at their recorded hashes.
-It never supplies runtime preprocessing to either language's validator. Runtime
-interfaces, dependencies and measured lifecycle results will be documented with
-each completed implementation and independently reviewed before Draft delivery.
+It never supplies runtime preprocessing to either language's validator. Runtime interfaces and reproducible commands are documented in the
+[Julia](julia/README.md) and [Flix](flix/README.md) guides. Source, complete-state
+exports, lifecycle captures and independent review evidence accompany this Draft.
