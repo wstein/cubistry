@@ -48,6 +48,16 @@ rounded fractional values and underflow fractional values. The legacy Python
 checker accepts these; both new engines reject them by contract. Acceptance sets
 are therefore deliberately different, rather than silently claimed identical.
 
+Conformance compares the Boolean outcome of every case, not the diagnostic status
+string. Both engines agree on accept/reject for all 195 cases, but independent
+review found four rejected fixtures whose status class differs. For
+`counter/float-schema` and `counter/exponent-schema`, Julia reports `UNSUPPORTED`
+(exit 2) and Flix reports `INVALID` (exit 1). For `counter/invalid-utf8` and
+`geometry/unpaired-surrogate-image`, Julia reports `INVALID` and Flix reports
+`INVALID_JSON` (both exit 1). No invalid input is accepted by either engine.
+Harmonizing these status classes is open follow-up work and needs a rerun of the
+retained Julia evidence.
+
 ## Complete-suite lifecycle
 
 These are warm-dependency-cache, fresh-process observations on the shared machine.
