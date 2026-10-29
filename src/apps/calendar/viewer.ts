@@ -21,8 +21,8 @@ export class CalendarViewer {
   private meshes = new Map<number, THREE.Group>();
   private resources: { dispose(): void }[] = [];
   private resize: ResizeObserver;
-  private yaw = Math.PI / 24;
-  private pitch = Math.PI / 30;
+  private yaw = 0.2;
+  private pitch = 0.18;
   private radius = 14.1;
   private drag: { id: number; x: number; y: number } | null = null;
   private current: State | null = null;
