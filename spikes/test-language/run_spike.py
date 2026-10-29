@@ -24,7 +24,7 @@ def digest(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--julia", required=True)
-    parser.add_argument("--julia-mode", choices=("default", "low-optimization", "minimal-compilation"), default="default")
+    parser.add_argument("--julia-mode", choices=("default", "low-optimization", "minimal-compilation"), default="low-optimization")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repetitions", type=int, default=20)
     mode = parser.add_mutually_exclusive_group()
@@ -118,6 +118,8 @@ def main():
         "fullPythonProductionCheckerMs": full_python_ms,
         "fullPythonProductionCheckerResult": full_python,
         "pythonControls": python_controls, "juliaCommand": command, "juliaMode": args.julia_mode, "juliaExitCode": process.returncode,
+        "juliaFreshProcessWallMs": process_ms,
+        "juliaFreshVerificationOnlyMs": process_ms if not args.benchmark else None,
         "juliaFreshProcessIncludingCompilationAndAllSamplesMs": process_ms,
         "juliaValidationIncludingJITMs": result["validationIncludingJITMs"],
         "measurementMode": "benchmark" if args.benchmark else "verify-only",
