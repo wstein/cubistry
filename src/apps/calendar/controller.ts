@@ -246,6 +246,8 @@ export class CalendarController {
     demand(!this.failed, "Calendar stopped after a failed physical route");
     this.desired = target;
     if (this.active && this.planning && target !== this.progressTarget) {
+      // A cancelled promise may resolve to fallback; never cache it for a revisit.
+      if (this.progressTarget) this.prepared.delete(this.progressTarget);
       try {
         this.planner?.cancelPlanning?.();
       } catch {
