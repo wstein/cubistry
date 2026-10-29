@@ -395,8 +395,17 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
     });
     const unit = clockUnits[2],
       moves = unit.controller.prepare(57),
-      work = moves.reduce((n, m) => n + Math.abs(m.turns), 0),
-      quarter = 120;
+      work = moves.reduce((n, m) => n + Math.abs(m.turns), 0);
+    // Software rendering on CI can miss an entire 120 ms turn. Choose a
+    // feasible fixture period from native RAF cadence while preserving the
+    // timing, angular-ratio and no-deliberate-dwell assertions below.
+    const frames = [];
+    for (let i = 0; i < 7; i++)
+      frames.push(await new Promise((resolve) => requestAnimationFrame(resolve)));
+    const frameGap = Math.max(...frames.slice(1).map((t, i) => t - frames[i]));
+    const quarter = Math.max(120, Math.ceil(frameGap * 3));
+    window.angularQuarter = quarter;
+    window.angularFrameGap = frameGap;
     window.angularTrace = [];
     const active = new Map(),
       animate = CubeViewer.prototype.animate,
@@ -453,6 +462,8 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
     .toBe(false);
   const evidence = await page.evaluate(() => ({
     endAt: window.angularEndAt,
+    quarter: window.angularQuarter,
+    sampledFrameGap: window.angularFrameGap,
     turns: window.angularTrace,
   }));
   writeFileSync(
@@ -463,13 +474,13 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
   expect(evidence.turns.some((t) => Math.abs(t.move.turns) === 1)).toBe(true);
   for (const t of evidence.turns) {
     const weight = Math.abs(t.move.turns);
-    expect(t.timing.durationMs).toBe(weight * 120);
+    expect(t.timing.durationMs).toBe(weight * evidence.quarter);
     expect(t.firstMotion).not.toBeNull();
     // Stage rendering can precede the progress RAF once, but no turn should
     // spend multiple rendered frames deliberately waiting in its start pose.
     expect(t.zeroFrames).toBeLessThanOrEqual(1);
     expect(
-      Math.abs((t.finished - t.started) / weight - 120),
+      Math.abs((t.finished - t.started) / weight - evidence.quarter),
     ).toBeLessThanOrEqual(45);
   }
   for (let i = 1; i < evidence.turns.length; i++)
