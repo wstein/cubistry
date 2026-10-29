@@ -1,0 +1,1561 @@
+{
+  "schema": "cubistry.de-layout-inventory",
+  "version": 1,
+  "evidenceStatus": "UNKNOWN; independent replay pending",
+  "sourceSHA256": "1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56",
+  "targets": 2562,
+  "frontChecks": 23058,
+  "counts": {
+    "corners": {
+      "weekday:M": 1,
+      "weekday:D": 1,
+      "blank:": 2,
+      "weekday:F": 1,
+      "weekday:S": 1,
+      "month:J": 1,
+      "month:F": 1,
+      "month:M": 1,
+      "month:A": 1,
+      "month:S": 1,
+      "month:O": 1,
+      "month:N": 2,
+      "month:D": 1,
+      "month:R": 1,
+      "month:B": 1,
+      "month:I": 1,
+      "month:L": 1,
+      "month:G": 1,
+      "month:P": 1,
+      "month:T": 1,
+      "month:V": 1,
+      "month:Z": 1
+    },
+    "edges": {
+      "weekday:O": 1,
+      "weekday:I": 1,
+      "weekday:R": 1,
+      "weekday:A": 1,
+      "month:A": 1,
+      "month:E": 1,
+      "month:Ä": 1,
+      "month:P": 1,
+      "month:U": 1,
+      "month:K": 1,
+      "month:O": 2,
+      "day:0": 1,
+      "day:1": 1,
+      "day:2": 1,
+      "day:3": 1,
+      "day:4": 1,
+      "day:5": 1,
+      "day:6": 1,
+      "day:7": 1,
+      "day:8": 1,
+      "day:9": 1,
+      "blank:": 2
+    },
+    "centers": {
+      "day:0": 1,
+      "day:1": 1,
+      "day:2": 1,
+      "day:3": 1,
+      "blank:": 2
+    }
+  },
+  "neverFront": [
+    {
+      "id": 25,
+      "cubie": 11,
+      "p": [
+        0,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "image": "O",
+      "slot": 7,
+      "role": "month",
+      "frontUses": 0,
+      "frontSlots": []
+    },
+    {
+      "id": 30,
+      "cubie": 15,
+      "p": [
+        0,
+        1,
+        0
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 4,
+      "image": "",
+      "role": "blank",
+      "frontUses": 0,
+      "frontSlots": []
+    },
+    {
+      "id": 43,
+      "cubie": 21,
+      "p": [
+        1,
+        0,
+        0
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "slot": 4,
+      "image": "",
+      "role": "blank",
+      "frontUses": 0,
+      "frontSlots": []
+    },
+    {
+      "id": 50,
+      "cubie": 24,
+      "p": [
+        1,
+        1,
+        0
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "",
+      "slot": -1,
+      "role": "blank",
+      "frontUses": 0,
+      "frontSlots": []
+    }
+  ],
+  "stickers": [
+    {
+      "id": 0,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "M",
+      "slot": 0,
+      "role": "weekday",
+      "frontUses": 732,
+      "frontSlots": [
+        0
+      ]
+    },
+    {
+      "id": 1,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "D",
+      "slot": 0,
+      "role": "weekday",
+      "frontUses": 732,
+      "frontSlots": [
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "slot": -1,
+      "role": "blank",
+      "frontUses": 1098,
+      "frontSlots": [
+        2
+      ]
+    },
+    {
+      "id": 3,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        0
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "image": "O",
+      "slot": 1,
+      "role": "weekday",
+      "frontUses": 1098,
+      "frontSlots": [
+        1
+      ]
+    },
+    {
+      "id": 4,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        0
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "I",
+      "slot": 1,
+      "role": "weekday",
+      "frontUses": 732,
+      "frontSlots": [
+        1
+      ]
+    },
+    {
+      "id": 5,
+      "cubie": 2,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "image": "F",
+      "slot": 0,
+      "role": "weekday",
+      "frontUses": 366,
+      "frontSlots": [
+        0
+      ]
+    },
+    {
+      "id": 6,
+      "cubie": 2,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "image": "S",
+      "slot": 0,
+      "role": "weekday",
+      "frontUses": 732,
+      "frontSlots": [
+        0
+      ]
+    },
+    {
+      "id": 7,
+      "cubie": 2,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "slot": -1,
+      "role": "blank",
+      "frontUses": 1464,
+      "frontSlots": [
+        2
+      ]
+    },
+    {
+      "id": 8,
+      "cubie": 3,
+      "p": [
+        -1,
+        0,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "R",
+      "slot": 1,
+      "role": "weekday",
+      "frontUses": 366,
+      "frontSlots": [
+        1
+      ]
+    },
+    {
+      "id": 9,
+      "cubie": 3,
+      "p": [
+        -1,
+        0,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "A",
+      "slot": 1,
+      "role": "weekday",
+      "frontUses": 366,
+      "frontSlots": [
+        1
+      ]
+    },
+    {
+      "id": 10,
+      "cubie": 4,
+      "p": [
+        -1,
+        0,
+        0
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "slot": 4,
+      "image": "0",
+      "role": "day",
+      "frontUses": 756,
+      "frontSlots": [
+        4
+      ]
+    },
+    {
+      "id": 11,
+      "cubie": 5,
+      "p": [
+        -1,
+        0,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "A",
+      "slot": 7,
+      "role": "month",
+      "frontUses": 434,
+      "frontSlots": [
+        7
+      ]
+    },
+    {
+      "id": 12,
+      "cubie": 5,
+      "p": [
+        -1,
+        0,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        1,
+        0,
+        0
+      ],
+      "image": "E",
+      "slot": 7,
+      "role": "month",
+      "frontUses": 630,
+      "frontSlots": [
+        7
+      ]
+    },
+    {
+      "id": 13,
+      "cubie": 6,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "image": "J",
+      "slot": 6,
+      "role": "month",
+      "frontUses": 644,
+      "frontSlots": [
+        6
+      ]
+    },
+    {
+      "id": 14,
+      "cubie": 6,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        1,
+        0,
+        0
+      ],
+      "image": "F",
+      "slot": 6,
+      "role": "month",
+      "frontUses": 203,
+      "frontSlots": [
+        6
+      ]
+    },
+    {
+      "id": 15,
+      "cubie": 6,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "image": "M",
+      "slot": 6,
+      "role": "month",
+      "frontUses": 434,
+      "frontSlots": [
+        6
+      ]
+    },
+    {
+      "id": 16,
+      "cubie": 7,
+      "p": [
+        -1,
+        1,
+        0
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "image": "Ä",
+      "slot": 7,
+      "role": "month",
+      "frontUses": 217,
+      "frontSlots": [
+        7
+      ]
+    },
+    {
+      "id": 17,
+      "cubie": 7,
+      "p": [
+        -1,
+        1,
+        0
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        1,
+        0,
+        0
+      ],
+      "image": "P",
+      "slot": 7,
+      "role": "month",
+      "frontUses": 210,
+      "frontSlots": [
+        7
+      ]
+    },
+    {
+      "id": 18,
+      "cubie": 8,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "image": "A",
+      "slot": 6,
+      "role": "month",
+      "frontUses": 427,
+      "frontSlots": [
+        6
+      ]
+    },
+    {
+      "id": 19,
+      "cubie": 8,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "S",
+      "slot": 6,
+      "role": "month",
+      "frontUses": 210,
+      "frontSlots": [
+        6
+      ]
+    },
+    {
+      "id": 20,
+      "cubie": 8,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        1,
+        0,
+        0
+      ],
+      "image": "O",
+      "slot": 6,
+      "role": "month",
+      "frontUses": 217,
+      "frontSlots": [
+        6
+      ]
+    },
+    {
+      "id": 21,
+      "cubie": 9,
+      "p": [
+        0,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "image": "U",
+      "slot": 7,
+      "role": "month",
+      "frontUses": 644,
+      "frontSlots": [
+        7
+      ]
+    },
+    {
+      "id": 22,
+      "cubie": 9,
+      "p": [
+        0,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "image": "K",
+      "slot": 7,
+      "role": "month",
+      "frontUses": 217,
+      "frontSlots": [
+        7
+      ]
+    },
+    {
+      "id": 23,
+      "cubie": 10,
+      "p": [
+        0,
+        -1,
+        0
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "slot": 4,
+      "image": "1",
+      "role": "day",
+      "frontUses": 840,
+      "frontSlots": [
+        4
+      ]
+    },
+    {
+      "id": 24,
+      "cubie": 11,
+      "p": [
+        0,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "O",
+      "slot": 7,
+      "role": "month",
+      "frontUses": 210,
+      "frontSlots": [
+        7
+      ]
+    },
+    {
+      "id": 25,
+      "cubie": 11,
+      "p": [
+        0,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "image": "O",
+      "slot": 7,
+      "role": "month",
+      "frontUses": 0,
+      "frontSlots": []
+    },
+    {
+      "id": 26,
+      "cubie": 12,
+      "p": [
+        0,
+        0,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "slot": 4,
+      "image": "2",
+      "role": "day",
+      "frontUses": 840,
+      "frontSlots": [
+        4
+      ]
+    },
+    {
+      "id": 27,
+      "cubie": 13,
+      "p": [
+        0,
+        0,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "slot": 4,
+      "image": "3",
+      "role": "day",
+      "frontUses": 126,
+      "frontSlots": [
+        4
+      ]
+    },
+    {
+      "id": 28,
+      "cubie": 14,
+      "p": [
+        0,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "0",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 245,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 29,
+      "cubie": 14,
+      "p": [
+        0,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "up": [
+        1,
+        0,
+        0
+      ],
+      "image": "1",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 301,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 30,
+      "cubie": 15,
+      "p": [
+        0,
+        1,
+        0
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 4,
+      "image": "",
+      "role": "blank",
+      "frontUses": 0,
+      "frontSlots": []
+    },
+    {
+      "id": 31,
+      "cubie": 16,
+      "p": [
+        0,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        1,
+        0,
+        0
+      ],
+      "image": "2",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 252,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 32,
+      "cubie": 16,
+      "p": [
+        0,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "3",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 252,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 33,
+      "cubie": 17,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "image": "N",
+      "slot": 6,
+      "role": "month",
+      "frontUses": 210,
+      "frontSlots": [
+        6
+      ]
+    },
+    {
+      "id": 34,
+      "cubie": 17,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "D",
+      "slot": 6,
+      "role": "month",
+      "frontUses": 217,
+      "frontSlots": [
+        6
+      ]
+    },
+    {
+      "id": 35,
+      "cubie": 17,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "R",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 427,
+      "frontSlots": [
+        8
+      ]
+    },
+    {
+      "id": 36,
+      "cubie": 18,
+      "p": [
+        1,
+        -1,
+        0
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "4",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 252,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 37,
+      "cubie": 18,
+      "p": [
+        1,
+        -1,
+        0
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "image": "5",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 252,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 38,
+      "cubie": 19,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "N",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 427,
+      "frontSlots": [
+        8
+      ]
+    },
+    {
+      "id": 39,
+      "cubie": 19,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "B",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 203,
+      "frontSlots": [
+        8
+      ]
+    },
+    {
+      "id": 40,
+      "cubie": 19,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "image": "I",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 217,
+      "frontSlots": [
+        8
+      ]
+    },
+    {
+      "id": 41,
+      "cubie": 20,
+      "p": [
+        1,
+        0,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "image": "6",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 252,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 42,
+      "cubie": 20,
+      "p": [
+        1,
+        0,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "image": "7",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 252,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 43,
+      "cubie": 21,
+      "p": [
+        1,
+        0,
+        0
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "slot": 4,
+      "image": "",
+      "role": "blank",
+      "frontUses": 0,
+      "frontSlots": []
+    },
+    {
+      "id": 44,
+      "cubie": 22,
+      "p": [
+        1,
+        0,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "image": "8",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 252,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 45,
+      "cubie": 22,
+      "p": [
+        1,
+        0,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "image": "9",
+      "slot": 5,
+      "role": "day",
+      "frontUses": 252,
+      "frontSlots": [
+        5
+      ]
+    },
+    {
+      "id": 46,
+      "cubie": 23,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "image": "L",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 217,
+      "frontSlots": [
+        8
+      ]
+    },
+    {
+      "id": 47,
+      "cubie": 23,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "G",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 217,
+      "frontSlots": [
+        8
+      ]
+    },
+    {
+      "id": 48,
+      "cubie": 23,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "image": "P",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 210,
+      "frontSlots": [
+        8
+      ]
+    },
+    {
+      "id": 49,
+      "cubie": 24,
+      "p": [
+        1,
+        1,
+        0
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "image": "",
+      "slot": -1,
+      "role": "blank",
+      "frontUses": 2562,
+      "frontSlots": [
+        3
+      ]
+    },
+    {
+      "id": 50,
+      "cubie": 24,
+      "p": [
+        1,
+        1,
+        0
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "",
+      "slot": -1,
+      "role": "blank",
+      "frontUses": 0,
+      "frontSlots": []
+    },
+    {
+      "id": 51,
+      "cubie": 25,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "image": "T",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 217,
+      "frontSlots": [
+        8
+      ]
+    },
+    {
+      "id": 52,
+      "cubie": 25,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "up": [
+        0,
+        0,
+        -1
+      ],
+      "image": "V",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 210,
+      "frontSlots": [
+        8
+      ]
+    },
+    {
+      "id": 53,
+      "cubie": 25,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "image": "Z",
+      "slot": 8,
+      "role": "month",
+      "frontUses": 217,
+      "frontSlots": [
+        8
+      ]
+    }
+  ]
+}

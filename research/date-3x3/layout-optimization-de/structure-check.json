@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "sourceSHA256": "f367e0ba9c5195801d1f10d2eb220bff329ee9de58452684abb201ce35e0c235",
+  "rigidRotations": 24,
+  "orientedFaceletFrames": 216,
+  "rotationFrameChecks": 5184,
+  "weekdayPrefixImages": [
+    "D",
+    "F",
+    "M",
+    "S"
+  ],
+  "monthCornerPositionTokens": 18,
+  "allRequiredWeekdayMonthCooccurrences": 72,
+  "oneBlankAssignmentsChecked": 1440,
+  "oneBlankAssignmentsValid": 0,
+  "twoBlankAssignmentsChecked": 360,
+  "twoBlankAssignmentsValid": 216,
+  "weekdayBodyPairings": [
+    [
+      "DF",
+      "MS"
+    ],
+    [
+      "DM",
+      "FS"
+    ],
+    [
+      "DS",
+      "FM"
+    ]
+  ],
+  "globalMoveOptimality": "UNKNOWN"
+}
