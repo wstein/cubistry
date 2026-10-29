@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "name": "unknown-command",
+      "exitCode": 2,
+      "status": "UNSUPPORTED"
+    },
+    {
+      "name": "missing-arguments",
+      "exitCode": 2,
+      "status": "UNSUPPORTED"
+    },
+    {
+      "name": "missing-input",
+      "exitCode": 3,
+      "status": "ERROR"
+    },
+    {
+      "name": "invalid-certificate",
+      "exitCode": 1,
+      "status": "INVALID"
+    },
+    {
+      "name": "tampered-direct-counter-chain",
+      "exitCode": 3,
+      "status": "ERROR"
+    }
+  ]
+}
