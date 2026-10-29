@@ -32,5 +32,6 @@ for index,row in enumerate(data['rows']):
   c=V.counts(a['word']);V.need((c['total'],c['htm'],c['global'])==(a['moves'],a['outerHTM'],a['rotations']),'Candidate physical counts')
   depth=a['maximumDepth']
   V.need(a['maximumNodes']==100000 and type(depth) is int and 0<=depth<=(24 if n==0 else 18),'Explicit typed nonnegative per-attempt depth bounds')
+  if n>0:V.need(depth<attempts[0]['maximumDepth'],'Strictly smaller second native depth')
  V.need(V.counts(b['word'])['htm']<=f['expectedMoves'],'Recorded fixture regression threshold')
 print(json.dumps({'status':'PASS','captureSHA256':sha256(raw).hexdigest(),'contexts':18,'all54CandidateReplaysAndInverses':replays,'sameSourceDefaultRetained':18,'optimality':'UNKNOWN','universalMoveBound':'UNKNOWN'},indent=2))

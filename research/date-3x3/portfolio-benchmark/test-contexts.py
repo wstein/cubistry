@@ -7,6 +7,7 @@ subprocess.run([sys.executable,str(checker),str(path)],check=True,stdout=subproc
 controls=[
  ('wrong source pose',lambda d:d['rows'][0]['fixture'].update(sourceWord='R')),
  ('wrong saved candidate',lambda d:d['rows'][0]['portfolio']['attempts'][0].update(word='R')),
+ ('duplicate second native depth',lambda d:d['rows'][0]['portfolio']['attempts'][0].update(maximumDepth=d['rows'][0]['portfolio']['attempts'][1]['maximumDepth'])),
  ('negative attempt depth',lambda d:d['rows'][0]['portfolio']['attempts'][0].update(maximumDepth=-1)),
  ('boolean attempt depth',lambda d:d['rows'][0]['portfolio']['attempts'][0].update(maximumDepth=True)),
  ('fractional attempt depth',lambda d:d['rows'][0]['portfolio']['attempts'][0].update(maximumDepth=1.5)),

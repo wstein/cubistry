@@ -237,6 +237,8 @@ def verify(document, allow_partial=False):
                     need(diagnostics['maximumAttempts'] == 2 and diagnostics['maximumTotalNodes'] == 200000, 'Explicit two-attempt 200k total node ceiling')
                     need(p['returnedCounts']['total'] == diagnostics['chosenMoves'], 'Returned route equals diagnostic chosen length')
                     need(diagnostics['chosenMoves'] <= attempts[0]['moves'], 'Portfolio never loses its own checked first proposal')
+                    if (series.get('providerMetadata') or {}).get('policy') == 'default-then-shorter-cap18-v2' and len(attempts) == 1 and attempts[0].get('attempted'):
+                        need(diagnostics.get('improvementSkippedReason') == 'native-depth-not-strictly-smaller', 'Skipped V2 improvement is explicitly diagnosed')
                     retained_first_checks += 1
                 for a, attempt in enumerate(attempts):
                     if 'word' not in attempt:
@@ -250,6 +252,8 @@ def verify(document, allow_partial=False):
                     need(attempt['maximumNodes'] == 100000, 'Each attempt node ceiling is 100k')
                     depth = attempt['maximumDepth']
                     need(depth is None or type(depth) is int and 0 <= depth <= (24 if a == 0 else 18), 'Improvement attempt has bounded outer-face depth')
+                    if a > 0 and (series.get('providerMetadata') or {}).get('policy') == 'default-then-shorter-cap18-v2':
+                        need(depth < attempts[0]['maximumDepth'], 'V2 never repeats an equal or greater native depth')
                     candidate_replays += 1
                 if 'elapsedMs' in p:
                     need(math.isfinite(p['elapsedMs']) and p['elapsedMs'] >= 0, 'Measured provider elapsed time')

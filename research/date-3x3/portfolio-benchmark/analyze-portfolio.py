@@ -21,6 +21,8 @@ for provider in data['manifest']['parameters']['providers']:
   'secondAttemptImprovedCalls':sum(len(d.get('attempts',[]))>1 and d['chosenMoves']<d['attempts'][0]['moves']for d in ds),
   'secondAttemptMovesSaved':sum(d['attempts'][0]['moves']-d['chosenMoves']for d in ds if d.get('attempts')),
   'attemptOutcomes':[{'attempt':i+1,'attempted':attempted,'status':status,'count':n}for(i,attempted,status),n in counts.items()],
+  'strictNativeDepthSkipCalls':sum(d.get('improvementSkippedReason')=='native-depth-not-strictly-smaller'for d in ds),
+  'equalOrGreaterDepthSecondAttempts':sum(len(d.get('attempts',[]))>1 and d['attempts'][1].get('maximumDepth',-1)>=d['attempts'][0]['maximumDepth']for d in ds),
   'retainedFirstProposalCalls':sum(bool(d.get('attempts'))and d['chosenMoves']==d['attempts'][0]['moves']for d in ds),
  }
 print(json.dumps(out,indent=2))
