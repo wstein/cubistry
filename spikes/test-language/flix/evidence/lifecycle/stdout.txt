@@ -1,0 +1,6 @@
+CUBISTRY_PHASE {"event":"READY"}
+CUBISTRY_PHASE {"event":"RESULT","iteration":0,"elapsedNs":134079769,"elapsedMs":134.079769,"canonicalStates":100,"inverseChecks":100,"negativeControls":6,"auditReplays":100,"checksum":29748,"passed":true}
+CUBISTRY_PHASE {"event":"RESULT","iteration":1,"elapsedNs":19022175,"elapsedMs":19.022175,"canonicalStates":100,"inverseChecks":100,"negativeControls":6,"auditReplays":100,"checksum":29748,"passed":true}
+CUBISTRY_PHASE {"event":"RESULT","iteration":2,"elapsedNs":9852697,"elapsedMs":9.852697,"canonicalStates":100,"inverseChecks":100,"negativeControls":6,"auditReplays":100,"checksum":29748,"passed":true}
+CUBISTRY_PHASE {"event":"RESULT","iteration":3,"elapsedNs":13648129,"elapsedMs":13.648129,"canonicalStates":100,"inverseChecks":100,"negativeControls":6,"auditReplays":100,"checksum":29748,"passed":true}
+CUBISTRY_PHASE {"event":"DONE"}
