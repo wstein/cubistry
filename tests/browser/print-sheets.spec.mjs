@@ -81,4 +81,8 @@ test("a rejected print catalog leaves no clickable manufacturing downloads", asy
   );
   await expect(page.locator("#print-pdf")).toBeHidden();
   await expect(page.locator("#print-design")).toBeDisabled();
+  await expect(page.locator("#print-summary")).toHaveText(
+    "No print files are available.",
+  );
+  await expect(page.locator("#print-preview")).toBeHidden();
 });
