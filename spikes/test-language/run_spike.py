@@ -27,6 +27,10 @@ def main():
     parser.add_argument("--julia-mode", choices=("default", "low-optimization", "minimal-compilation"), default="default")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repetitions", type=int, default=20)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--benchmark", dest="benchmark", action="store_true")
+    mode.add_argument("--verify-only", dest="benchmark", action="store_false")
+    parser.set_defaults(benchmark=False)
     args = parser.parse_args()
     if args.output.exists() or args.repetitions < 1:
         parser.error("output must be new and repetitions positive")
@@ -72,7 +76,7 @@ def main():
     expected = json.loads(json.dumps([oracle.apply(source, word) for word in words]))
     python_times = []
     checksum = 0
-    for _ in range(5):
+    for _ in range(5 if args.benchmark else 0):
         started = time.perf_counter()
         for _ in range(args.repetitions):
             for word in words:
@@ -86,7 +90,7 @@ def main():
     if args.julia_mode == "minimal-compilation":
         command.append("--compile=min")
     command += ["--project=" + str(HERE / "julia"),
-               str(HERE / "julia/checker.jl"), str(witness), str(cases), str(output), str(args.repetitions)]
+               str(HERE / "julia/checker.jl"), str(witness), str(cases), str(output), str(args.repetitions if args.benchmark else 0)]
     started = time.perf_counter()
     process = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, timeout=180)
     process_ms = (time.perf_counter() - started) * 1000
@@ -116,10 +120,11 @@ def main():
         "pythonControls": python_controls, "juliaCommand": command, "juliaMode": args.julia_mode, "juliaExitCode": process.returncode,
         "juliaFreshProcessIncludingCompilationAndAllSamplesMs": process_ms,
         "juliaValidationIncludingJITMs": result["validationIncludingJITMs"],
-        "kernelWordsPerSample": 100 * args.repetitions,
+        "measurementMode": "benchmark" if args.benchmark else "verify-only",
+        "kernelWordsPerSample": 100 * args.repetitions if args.benchmark else 0,
         "pythonWarmKernelSamplesMs": python_times, "juliaWarmKernelSamplesMs": result["warmKernelSamplesMs"],
-        "pythonWarmMedianMs": statistics.median(python_times),
-        "juliaWarmMedianMs": statistics.median(result["warmKernelSamplesMs"]),
+        "pythonWarmMedianMs": statistics.median(python_times) if python_times else None,
+        "juliaWarmMedianMs": statistics.median(result["warmKernelSamplesMs"]) if result["warmKernelSamplesMs"] else None,
         "all100FullStatesEqual": True, "negativeControlsRejectedByBoth": len(python_controls),
     }
     (args.output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
