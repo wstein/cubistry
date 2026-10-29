@@ -126,3 +126,57 @@ reports are retained as new `*-v2.*independent.json` and
 review section, or German-layout file was modified. No remaining blocking V2
 evidence finding was identified. No Ready transition, publication, merge or
 deployment was performed.
+
+## V3 independent follow-up: shorter center repairs
+
+Reviewed the frozen V3 evidence at Research `5b2465e298971371ec15e581c4d2c7bc27f4250b` with the same independent
+Rodrigues replay, using captured clean application
+`cc7b5abc0c72005ed6b67bf88de5d71e607a31a6`. Raw capture SHA-256:
+`3262fd53e0444312b3cb79c67792724c823eaa5bd5e2ed55ba0ee4a3c47dd6b7`.
+All **4,716 retained-pose request groups**, 24 streams, **4,254 saved candidate
+replays/inverses**, **2,418 own-first retention checks**, and 120 obsolete committed
+turns pass. All fifteen corruption controls are rejected. Actual source references,
+hidden frames, targets, move counts, strict native-depth/skipping policy and measured
+summaries are checked throughout; no canonical reset substitutes for a retained pose.
+
+The independently confirmed new captured maximum is **35 outer HTM plus two XYZ
+tokens**, for German A April 19→20, 2024, portfolio row 2467. Both bounded searches
+at that source returned UNKNOWN; this is a retained legal route, not a necessary
+distance or an optimality certificate. The V2 41-HTM maximum remains valid historical
+evidence and is not relabeled as a V3 measurement. The separate old V2 source's
+41→32 HTM replacement was also independently replayed to exactly the same full
+54-frame endpoint, including inverse restoration.
+
+V3 uses correction-table **schema version 2**, with 14/12/14-HTM witnesses and
+SHA-256 `c6acdc2ab88bb2167ee8c7646db9787da3766175f1b9ce71313761327be49f8c`.
+The reviewer compared all three old/new repair pairs on three prints and seven
+prefixes (63 full-frame comparisons): every pair has the **same complete physical
+transform**, restores all ordinary frames and inverts correctly. Old and new
+quarter repairs both turn the hidden back center identically. Later hidden poses
+can nevertheless differ through changed candidate costs, ranking and native search
+caps; the substitutions themselves do not introduce a different macro endpoint.
+
+Final reviewed application `1e051a44ab5e43f912089d4742728d75fc7f976f` differs from
+the captured source only in documentation, provenance metadata and its regression
+test. Runtime/planner/worker/table/printing data are unchanged. The final local table
+hash matches the actual version-2 bytes; its historical Research hash still matches
+the original version-1 18/20/18 table. The raw capture keeps its original source
+commit and actual hashes; it is not retargeted to the later metadata-only commit.
+Original V1/V2 raw capture hashes independently remain unchanged.
+
+All V2/V3 ordered request identities still agree, but complete endpoints match only
+282/2,358 default groups and 739/2,358 portfolio groups. These are different measured
+physical streams, not pointwise same-source comparisons. Portfolio total HTM changes
+40,984→40,610; default changes 43,669→42,960. German portfolio year means are
+19.186 forward / 18.907 backward, with maxima 35/34. Not every mean improves:
+English unpadded decrement changes 15.984→16.008. The full V3 run took 418.486 seconds
+versus V2's 397.839 seconds, so no wall-clock speed improvement is established.
+Node immediate-commit timings exclude browser animation/network and retain shared
+machine/cache limitations.
+
+New independent replay, control, macro/provenance and comparison outputs are
+retained beside the immutable V3 captures. No universal 18/20/21/34-move implementation
+bound or optimality claim follows from the capture. No previous raw evidence,
+review section, German-layout file, runtime source or deployment was modified.
+No remaining blocking V3 evidence finding was identified. No Ready transition,
+review publication, merge or deployment was performed.

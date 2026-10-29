@@ -1,0 +1,45 @@
+{
+  "status": "PASS_INDEPENDENT_V3_MEASURED_COMPARISON",
+  "v2CaptureSHA256": "c74b7ddb58dd6769ed26aaa0aa18d3f8d58300ab745f18f93c86957152f50b14",
+  "v3CaptureSHA256": "3262fd53e0444312b3cb79c67792724c823eaa5bd5e2ed55ba0ee4a3c47dd6b7",
+  "providers": [
+    {
+      "provider": "baseline-center",
+      "groups": 2358,
+      "identicalFullEndpointsV2V3": 282,
+      "v2HTMTotal": 43669,
+      "v3HTMTotal": 42960,
+      "v3MaxHTM": 35,
+      "v3MaxRow": 109,
+      "v3MaxPhysicalCounts": {
+        "total": 37,
+        "htm": 35,
+        "qtm": 52,
+        "global": 2
+      },
+      "v3MaxFromStateHash": "023c0ec97d4c06a198e5c8e9ecf1b19c11064f3ba59b37616cf05f455455593a",
+      "v3MaxToStateHash": "4c484d1d0f4bb85722a1dcf0552976d07a0c9547b2d2d178a7590bcc54a0d413"
+    },
+    {
+      "provider": "portfolio",
+      "groups": 2358,
+      "identicalFullEndpointsV2V3": 739,
+      "v2HTMTotal": 40984,
+      "v3HTMTotal": 40610,
+      "v3MaxHTM": 35,
+      "v3MaxRow": 2467,
+      "v3MaxPhysicalCounts": {
+        "total": 37,
+        "htm": 35,
+        "qtm": 52,
+        "global": 2
+      },
+      "v3MaxFromStateHash": "c1dc97800a2df28850c7b768bca9c8a849c0b2db10256856f3b7471b71495a69",
+      "v3MaxToStateHash": "c3104a52395e6cb9827e6c135d71e9cfe37b34771c816f7de6d399c411b5db00"
+    }
+  ],
+  "optimality": "UNKNOWN",
+  "universalMoveBound": "UNKNOWN",
+  "browserTiming": "NOT_MEASURED",
+  "wallClockSpeedup": "NOT_ESTABLISHED"
+}

@@ -1,0 +1,28 @@
+{
+  "status": "PASS_V3_MACRO_AND_PROVENANCE",
+  "v3CaptureSHA256": "3262fd53e0444312b3cb79c67792724c823eaa5bd5e2ed55ba0ee4a3c47dd6b7",
+  "captureAppHead": "cc7b5abc0c72005ed6b67bf88de5d71e607a31a6",
+  "finalReviewedAppHead": "1e051a44ab5e43f912089d4742728d75fc7f976f",
+  "correctionTableVersion": 2,
+  "oldHTM": [
+    18,
+    20,
+    18
+  ],
+  "newHTM": [
+    14,
+    12,
+    14
+  ],
+  "macroPrefixFullFrameComparisons": 63,
+  "originalTableSHA256": "e7be2e10c58737533d245d17ad7bf7a04aa0fd4d44e723f96fbf38538a4900fa",
+  "runtimeTableSHA256": "c6acdc2ab88bb2167ee8c7646db9787da3766175f1b9ce71313761327be49f8c",
+  "allOldNewMacroFull54EndpointsEqual": true,
+  "captureFinalRuntimeAndTableEquivalent": true,
+  "finalHistoricalAndLocalProvenanceHashesMatch": true,
+  "v1V2RawCapturesUnchanged": {
+    "calendar-2024.json": "235b91c60b3e9521ff62cb10807e16067f59a57b5cc035f21c0076d4f4187952",
+    "calendar-2024-v2.json": "c74b7ddb58dd6769ed26aaa0aa18d3f8d58300ab745f18f93c86957152f50b14"
+  },
+  "optimality": "UNKNOWN"
+}
