@@ -52,3 +52,31 @@ edge pairing, center copies or move trajectories.
 ```sh
 python3 research/date-3x3/layout-optimization-de/check_structure.py
 ```
+
+## Candidate and measurement boundaries
+
+Canonical variants change only the four weekday-prefix corner labels and/or the
+four weekday-second-letter edge labels. `c0/c1/c2` mean `MD|FS`, `MF|DS`,
+`MS|DF`; `e0/e1/e2` mean `OI|RA`, `OR|IA`, `OA|IR`. The current month/day
+printing, colors, front grammar and permanent glyph orientations remain fixed.
+A definition without a saved, independently checked witness is still UNKNOWN.
+
+The witness generator is a research-only adaptation of the existing date witness
+generator; it uses the installed application's pinned cubing dependency. The
+separate Python validator calls the unchanged standard-library Rodrigues checker,
+then verifies captured retained-pose paths, all 54 frames and inverses.
+
+```sh
+CUBISTRY_APP_ROOT=/path/to/pinned-app node research/date-3x3/layout-optimization-de/generate-witness.mjs research/date-3x3/layout-optimization-de/candidates/c1-e0/constructive.json /tmp/NEW-witness.json 2562
+python3 research/date-3x3/layout-optimization-de/verify.py coverage research/date-3x3/layout-optimization-de/candidates/c1-e0
+node research/date-3x3/layout-optimization-de/measure.mjs /path/to/pinned-app /tmp/NEW-pilot.json research/date-3x3/layout-optimization-de/candidates/c0-e0/witness.json research/date-3x3/layout-optimization-de/candidates/c1-e0/witness.json
+python3 research/date-3x3/layout-optimization-de/verify.py /tmp/NEW-pilot.json
+DE_YEAR=1 node research/date-3x3/layout-optimization-de/measure.mjs /path/to/pinned-app /tmp/NEW-year.json research/date-3x3/layout-optimization-de/candidates/c0-e0/witness.json research/date-3x3/layout-optimization-de/candidates/c1-e0/witness.json
+```
+
+Each measured variant gets a separate, checked October 28→29 warmup, recorded
+outside the counted paths. The year path is 366 forward plus 366 reverse steps
+without resetting at reversal; the leap/year boundary is included. Every print
+uses the same portfolio policy and node limits. Physical source references and
+actual move words are retained. Timing and solver soft-budget effects remain
+machine-dependent. Finite path results do not prove global print optimality.

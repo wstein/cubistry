@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "captureSHA256": "f5df4dec6684722544534e8e69b8fb9dc24c0cdb548998aef5fa755c1f04487f",
+  "requestsVerified": 115,
+  "printsVerified": 5,
+  "all54Frames": true,
+  "inverseChecks": 115,
+  "domain": "targeted-pilot",
+  "optimality": "UNKNOWN"
+}
