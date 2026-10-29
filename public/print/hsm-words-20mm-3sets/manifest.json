@@ -59,7 +59,7 @@
   },
   "generator": {
     "path": "scripts/print-sticker-sheets.py",
-    "sha256": "37e37c30de2240e794b0f99f4c5ec226725e3f5c69675310e524ad68f48e72cf",
+    "sha256": "c318c0a5b51ab5d013e827ef92e3949492aa508e19f9a3120acc381f88708efd",
     "artInputAdapter": "5e43a14f9648ff45896196b388257954b3f134fedb631e3ff564657ba2f2912a",
     "tools": {
       "reportlab": "4.4.9",
@@ -3499,7 +3499,7 @@
   ],
   "files": {
     "print.pdf": "3e136d80db7a2984d8a67bbd5b22377011b2c8088b4faf93d71b5a6a5151f33d",
-    "assembly.pdf": "54cedaec0ff2bc268a86d79a1673af20abdf1eda75eccb3c9b1b4d5440382fab",
+    "assembly.pdf": "dd6384e5be603e60559f5517d8eb2da8c5e05c0d5cf24cfb969685d94ab32045",
     "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
     "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
     "WORD-ART-PROVENANCE.json": "446f73079b92e9f22f4fb46df0666d6bfb63110ca9e44a8d2d28c09e79f5abcd",

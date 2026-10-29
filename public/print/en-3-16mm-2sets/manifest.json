@@ -44,7 +44,7 @@
   },
   "generator": {
     "path": "scripts/print-sticker-sheets.py",
-    "sha256": "37e37c30de2240e794b0f99f4c5ec226725e3f5c69675310e524ad68f48e72cf",
+    "sha256": "c318c0a5b51ab5d013e827ef92e3949492aa508e19f9a3120acc381f88708efd",
     "artInputAdapter": "5e43a14f9648ff45896196b388257954b3f134fedb631e3ff564657ba2f2912a",
     "tools": {
       "reportlab": "4.4.9",
@@ -5177,7 +5177,7 @@
   ],
   "files": {
     "print.pdf": "0d71f38cd69c6302384a9279191fdabaf5ba99252059c81a0635ec35e743c73c",
-    "assembly.pdf": "b4fb6a57bf9199f65f670a2e24527b374d93d9f0977cc8778d0d23f5ef9097c6",
+    "assembly.pdf": "c2804fcabceaf5a14fcd66ebe3a7c6dd135e6303fef15af52d83ba79c0b55abc",
     "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
     "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
     "README.txt": "c7c9121507ad28c4d00fc8815830fc9bfc69f6c81abed4bde879f2bbf28534c8",
