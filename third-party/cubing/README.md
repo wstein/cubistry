@@ -13,6 +13,8 @@ The unmodified source files are bundled/minified by Vite, not edited in place.
   and downloadable source at
   https://github.com/cubing/cubing.js/archive/8544249ff1e662557df912065a26b5f90f4df574.tar.gz.
   The package's exact README, metadata and MPL/GPL texts are retained.
+  The README is stored as `cubing-README.upstream.txt`, byte-for-byte unchanged;
+  its original relative links refer to the upstream source tree, not this app.
 - Vendored min2phase/csTimer/FTO: Chen Shuang and the upstream contributors.
   The exact cubing release above contains the corresponding vendored source.
   The retained original min2phase README includes its dual GPL/MIT license;
