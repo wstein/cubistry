@@ -149,3 +149,34 @@ test("the short native cap counts outer turns separately from global alignment",
     ),
   );
 });
+
+test("captured January unknown bounds are not searched twice with identical budgets", () => {
+  const design = load("de-a"),
+    target = findTarget(design, civilDate("2024-01-02")),
+    ctx = context(
+      design,
+      target,
+      findTarget(design, civilDate("2024-01-01")).word,
+    );
+  // First recorded year transition, historical corpus case2358:18 checked HTM.
+  const direct = "F' D2 B L2 B' D2 R2 F D2 B' D2 U F' U F R' U R'";
+  for (const maximumDepth of [0, 16, 17]) {
+    const interims = [],
+      r = tryCenterPortfolio(ctx, direct, { threshold: 0, maximumDepth }, (a) =>
+        interims.push(a),
+      );
+    assert.equal(r.attempts.length, 1);
+    assert.equal(r.attempts[0].status, "unknown");
+    assert.equal(r.attempts[0].maximumDepth, maximumDepth);
+    assert.equal(r.word, direct);
+    assert.equal(
+      r.improvementSkippedReason,
+      "native-depth-not-strictly-smaller",
+    );
+    assert.equal(interims.length, 1);
+    const refs = referencesForPlan(ctx, r.word),
+      end = apply(ctx.from, r.word);
+    assert(matches(end, target.cells));
+    assert(sameState(apply(design.printing, refs.endReferenceWord), end));
+  }
+});
