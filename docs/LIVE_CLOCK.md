@@ -74,6 +74,28 @@ These proof bounds count a half turn as one HTM, whereas clock timing counts it
 as two angular units. A six-HTM route can therefore require up to twelve angular
 units before the live schedule is fitted.
 
+## Move statistics
+
+A status block under the cubes shows, per cube (Hours, Minutes, Seconds) and in
+total, the committed HTM moves and whole-cube rotations of the session, the cost
+of the last completed tick, and the largest tick cost so far. It reuses the
+counting conventions of the counter and calendar: an outer-face token counts
+once, a half turn included. Whole-cube x/y/z rotations are counted separately;
+HSM routes consist of outer-face moves only, so that column stays at zero.
+
+- Only moves that were physically committed are counted, taken from each
+  controller's committed session total. Planned but unplayed moves of an
+  interrupted or superseded route are never counted.
+- A cube's tick cost is every move it committed since its previous completed
+  display change, including turns of a superseded route. Changes that complete
+  between two display polls form one tick, so a midnight rollover is one tick.
+  A dash means no tick has completed yet.
+- Session counters restart on page load or when the print changes, and with the
+  Reset session moves button. They survive re-rendering and presentation mode
+  and are not stored in the browser. Presentation mode hides the block, like the
+  per-cube status lines.
+- Only exact counts are shown, no averages or estimates.
+
 ## Verification
 
 ```sh
