@@ -31,6 +31,10 @@ printing and streamed words, rather than repeated cumulative source words, keep
 the evidence bounded. From/to hashes cover every sticker identity, body, position,
 normal, printed up direction and image.
 
+When an implementation compacts its source reference, only that replacement word
+is recorded. The verifier replays it from the immutable source and requires all
+54 frames to equal the actual planning source. A matching front alone is insufficient.
+
 The separate Python verifier uses the historical Rodrigues engine, not JavaScript
 solver geometry. It checks the exact Gregorian request sequence, source print,
 continuous full poses, upright nonblank glyphs including the visible center,
@@ -69,7 +73,7 @@ saved move words are authoritative; fresh timing and paths may vary.
 
 ## Optional center-aware provider
 
-Append `--provider /path/to/provider.mjs --provider-name center-aware`. The module
+Append `--provider /path/to/provider.mjs --provider-name center-aware`.
 For explicit bounded options, add `--provider-options '{"threshold":14,"maximumNodes":100000}'`. It
 exports `async createPlanner({design, appRoot, options})`, returning an async
 `CalendarPlanningContext => string` function. The context includes the immutable
@@ -78,19 +82,32 @@ fallback word. Export `metadata`, or attach `planner.metadata`, with package
 version, source revision/hash and bounded solver parameters. The module hash alone
 is insufficient to pin transitive provider code. [Cubistry issue 67](https://github.com/wstein/cubistry/issues/67) tracks integration.
 
+For a fair comparison with the same compaction policy, add
+`--direct-provider /path/to/provider.mjs`. The `direct` series then calls that
+factory with `backend: "direct"` and `threshold: 1000`, recording these options;
+the center-aware series uses the requested center options. The captured metadata
+and diagnostics distinguish this policy from the preserved original direct run.
+
+The instrumentation forwards optional `compactReference`, `cancel`, and
+`cancelPlanning` hooks so wrapping a provider does not disable its public lifecycle.
 A provider may attach `planner.dispose()`; the runner calls and awaits it after every
 series, including failures, to release owned workers and caches.
 
 All providers are subject to the controller's physical validation. A failed,
 invalid or non-improving proposal retains the legal fallback. Fallback rate can
 therefore include an already equally short reference; it is not an error rate.
-Provider diagnostics and explicit thrown errors are retained separately.
+Provider diagnostics and explicit thrown errors are retained separately. Planned
+retargeting fires after the provider promise has started; expected superseded
+rejections are counted as canceled plans, separately from provider failures.
 
 ## Interpretation
 
 Node elapsed times include planning and immediate verified move commits; they do
 not measure browser animation, rendering, network startup or a hard browser
-worker deadline. Provider construction is measured separately. Mean/median/p95/max
+worker deadline. Provider construction is measured separately. Lazy solver-table initialization, if
+performed on the first request, remains included in that request. Providers run in
+the recorded order within one process; underlying library tables may stay warm
+across series. Mean/median/p95/max
 move and elapsed counts describe the captured sequences and machine, not shortest
 paths or a universal 20/21-move bound. All optical and physical print assignments
 remain unchanged. Independent agent review is required before certifying results.

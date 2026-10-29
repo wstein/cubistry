@@ -184,10 +184,34 @@ def verify(document, allow_partial=False):
             need(type(row['elapsedMs']) in (int, float) and math.isfinite(row['elapsedMs']) and row['elapsedMs'] >= 0, 'Measured nonnegative elapsed time')
             need(row['firstMotionMs'] is None or (0 <= row['firstMotionMs'] <= row['elapsedMs']), 'Measured first-motion time within full request')
             need(len(row['planning']) == (2 if scenario == 'interrupt-planning' else 2 if scenario == 'interrupt-move' else 1), 'Bounded planning count, with stale or interrupted target replacement')
+            word_tokens = row['word'].split()
+            events = row.get('referenceEvents', [])
+            indices = [e['beforeMove'] for e in events]
+            need(indices == sorted(set(indices)) and all(type(i) is int and 0 <= i < len(word_tokens) for i in indices), 'Ordered unique pre-turn compaction events')
+            by_index = {e['beforeMove']: e for e in events}
+            def advance_reference(value, start, end):
+                for i in [i for i in indices if start <= i < end]:
+                    value = reduced(value+' '+' '.join(word_tokens[start:i]))
+                    event = by_index[i]
+                    need(event['wordHash'] == sha256(event['word'].encode()).hexdigest(), 'Pre-turn reference hash')
+                    need(replay(sources[identity], event['word']) == replay(before, ' '.join(word_tokens[:i])), 'Pre-turn compaction preserves every current hidden frame')
+                    need(len(event['word'].split()) < len(value.split()), 'Pre-turn compaction strictly shortens the actual reference')
+                    value = event['word']
+                    start = i
+                return reduced(value+' '+' '.join(word_tokens[start:end]))
             for n, p in enumerate(row['planning']):
                 plan_target = requests[0] if n == 0 else requests[-1]
-                plan_reference = reduced(reference+' '+row['word'].split()[0]) if scenario == 'interrupt-move' and n == 1 else reference
+                if scenario == 'interrupt-move' and n == 1:
+                    reference = advance_reference(reference, 0, 1)
+                plan_reference = reference
                 plan_source = replay(before, row['word'].split()[0]) if scenario == 'interrupt-move' and n == 1 else before
+                if 'sourceReferenceReplacement' in p:
+                    replacement = p['sourceReferenceReplacement']
+                    need(replay(sources[identity], replacement) == plan_source, 'Compacted reference restores all 54 actual frames, not just the front')
+                    need(len(replacement.split()) < len(plan_reference.split()), 'Reference compaction strictly shortens the inferred reference')
+                    reference = plan_reference = replacement
+                if 'sourceReferenceHash' in p:
+                    need(p['sourceReferenceHash'] == sha256(plan_reference.encode()).hexdigest(), 'Exact complete source reference hash')
                 target_word = goals[identity][tuple(key(plan_target))]
                 try:
                     W.show(plan_source, cells(identity, plan_target))
@@ -199,10 +223,16 @@ def verify(document, allow_partial=False):
                 need(p['baselineCounts'] == counts(fallback), 'Correct counterfactual baseline from actual source')
                 if 'elapsedMs' in p:
                     need(math.isfinite(p['elapsedMs']) and p['elapsedMs'] >= 0, 'Measured provider elapsed time')
-            reference = reduced(reference+' '+row['word'])
+            reference = advance_reference(reference, obsolete, len(word_tokens))
             canonical_word = goals[identity][tuple(key(requests[-1]))]
             if state == replay(sources[identity], canonical_word) and len(canonical_word.split()) < len(reference.split()):
                 reference = canonical_word
+            if 'endReferenceReplacement' in row:
+                need(replay(sources[identity], row['endReferenceReplacement']) == state, 'Final compacted reference restores every actual hidden frame')
+                need(len(row['endReferenceReplacement'].split()) < len(reference.split()), 'Final reference compaction strictly shortens the inferred reference')
+                reference = row['endReferenceReplacement']
+            if 'referenceEndTokens' in row:
+                need(row['referenceEndTokens'] == len(reference.split()), 'Exact final source reference length')
             obsolete_turns += obsolete
             rows.append(row)
             current = date.fromisoformat(requests[-1])
@@ -217,13 +247,15 @@ def verify(document, allow_partial=False):
                 need(stat[field] == metric([r['counts'][source] for r in subset]), 'Independently recomputed move statistics')
             need(same_metrics(stat['elapsedMs'], metric([r['elapsedMs'] for r in subset])), 'Summary timing from captured measurements')
             need(same_metrics(stat['firstMotionMs'], metric([r['firstMotionMs'] for r in subset if r['firstMotionMs'] is not None])), 'First-motion statistics exclude no-motion groups')
+            if 'canceledPlans' in stat:
+                need(stat['canceledPlans'] == sum(bool(p.get('providerCanceled')) for r in subset for p in r['planning']), 'Expected superseded plans are separate from provider errors')
             need(stat['providerErrors'] == sum(bool(p.get('providerError') or (p.get('diagnostics') or {}).get('error')) for r in subset for p in r['planning']), 'Provider error diagnostics remain separate from equal-short fallback')
             need(stat['fallbackCases'] == sum(r['route'] == 'fallback' for r in subset), 'Fallback count')
             statistics.append(stat)
     need((len(seen_series) == len(providers)*3*4 if complete else len(seen_series) <= len(providers)*3*4) and
          observed_indices == list(range(len(document['cases']))), 'Every declared complete or partial actual stream row covered')
     need(len(statistics) == len(document['statistics']), 'No unverified summary rows')
-    return {'status': 'PASS' if complete else 'PASS_PARTIAL', 'complete': complete, 'cases': len(document['cases']), 'series': len(seen_series), 'providers': providers, 'all54FrameInverseRestorations': expected_cases, 'obsoleteSingleTurns': obsolete_turns, 'sourcePrintingUnchanged': True, 'optimality': 'UNKNOWN', 'universalMoveBound': 'UNKNOWN', 'browserTiming': 'NOT_MEASURED'}
+    return {'status': 'PASS' if complete else 'PASS_PARTIAL', 'complete': complete, 'cases': len(document['cases']), 'series': len(seen_series), 'providers': providers, 'all54FrameInverseRestorations': len(document['cases']), 'obsoleteSingleTurns': obsolete_turns, 'sourcePrintingUnchanged': True, 'optimality': 'UNKNOWN', 'universalMoveBound': 'UNKNOWN', 'browserTiming': 'NOT_MEASURED'}
 
 
 if __name__ == '__main__':

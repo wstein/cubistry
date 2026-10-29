@@ -27,6 +27,7 @@ const allowed = new Set([
   "provider",
   "provider-name",
   "provider-options",
+  "direct-provider",
   "providers",
 ]);
 need(
@@ -102,6 +103,15 @@ const { KPattern } = await cubingImport("kpuzzle"),
   { puzzles } = await cubingImport("puzzles"),
   { experimentalSolve3x3x3IgnoringCenters: solve } =
     await cubingImport("search");
+const directExternal = args["direct-provider"]
+  ? await import(pathToFileURL(resolve(args["direct-provider"])))
+  : null;
+if (directExternal)
+  need(
+    typeof directExternal.createPlanner === "function" &&
+      selected.includes("direct"),
+    "direct-provider requires selected direct and createPlanner",
+  );
 const external = args.provider
   ? await import(pathToFileURL(resolve(args.provider)))
   : null;
@@ -120,11 +130,13 @@ const corrections = JSON.parse(
 const stamp = (s) =>
   hash(JSON.stringify(s.map((t) => [t.id, t.cubie, t.p, t.n, t.up, t.image])));
 const sourceFiles = [
-  "src/apps/calendar/controller.ts",
-  "src/apps/calendar/model.ts",
-  "src/apps/calendar/transition/planner.mjs",
-  "src/apps/calendar/transition/geometry.mjs",
-  "src/apps/calendar/transition/center-corrections.json",
+  ...execFileSync("git", ["ls-files", "src/apps/calendar"], {
+    cwd: appRoot,
+    encoding: "utf8",
+  })
+    .trim()
+    .split("\n")
+    .filter(Boolean),
   "package-lock.json",
 ];
 const pinned = Object.fromEntries(
@@ -170,6 +182,13 @@ const traces = [],
     appHead,
     appTrackedFilesDirty: appDirty,
     sourceHashes: pinned,
+    directProvider: args["direct-provider"]
+      ? {
+          moduleSHA256: hash(readFileSync(resolve(args["direct-provider"]))),
+          metadata: directExternal.metadata ?? null,
+          options: { ...externalOptions, backend: "direct", threshold: 1000 },
+        }
+      : null,
     externalProvider: args.provider
       ? {
           moduleSHA256: hash(readFileSync(resolve(args.provider))),
@@ -185,6 +204,12 @@ const traces = [],
       externalOptions,
     },
     machine: {
+      cpuQuota: existsSync("/sys/fs/cgroup/cpu.max")
+        ? readFileSync("/sys/fs/cgroup/cpu.max", "utf8").trim()
+        : null,
+      memoryLimit: existsSync("/sys/fs/cgroup/memory.max")
+        ? readFileSync("/sys/fs/cgroup/memory.max", "utf8").trim()
+        : null,
       node: process.version,
       platform: process.platform,
       arch: process.arch,
@@ -236,10 +261,17 @@ async function runSeries(provider, id, scenario) {
     capture = null,
     trigger = null,
     latestContext = null,
-    failure = null;
+    failure = null,
+    reference = initial.word;
   const startup = performance.now();
   let plan;
   if (provider === "legacy") plan = async (context) => context.fallbackWord;
+  else if (provider === "direct" && directExternal)
+    plan = await directExternal.createPlanner({
+      design,
+      appRoot,
+      options: { ...externalOptions, backend: "direct", threshold: 1000 },
+    });
   else if (provider === "direct") {
     const optimizer = createTransitionOptimizer({
       printing: design.printing,
@@ -286,25 +318,40 @@ async function runSeries(provider, id, scenario) {
       sourceReferenceTokens: model.tokens(context.sourceWord).length,
       baselineCounts: count(context.fallbackWord),
     };
-    if (capture) capture.planning.push(measurement);
-    if (trigger?.kind === "planning") {
-      const hook = trigger;
-      trigger = null;
-      for (const iso of hook.queued) controller.request(source(design, iso));
+    if (context.sourceWord !== reference) {
+      measurement.sourceReferenceReplacement = context.sourceWord;
+      reference = context.sourceWord;
     }
+    measurement.sourceReferenceHash = hash(context.sourceWord);
+    if (capture) capture.planning.push(measurement);
     const at = performance.now();
     try {
-      const word = await plan(context);
+      const pending = plan(context);
+      if (trigger?.kind === "planning") {
+        const hook = trigger;
+        trigger = null;
+        measurement.superseded = true;
+        for (const iso of hook.queued) controller.request(source(design, iso));
+      }
+      const word = await pending;
       measurement.elapsedMs = performance.now() - at;
       measurement.returnedCounts = count(word);
       measurement.diagnostics = plan.lastDiagnostics ?? plan.lastResult ?? null;
       return word;
     } catch (error) {
       measurement.elapsedMs = performance.now() - at;
-      measurement.providerError = error.message;
+      if (
+        measurement.superseded &&
+        /supersed|cancel|abort/i.test(error.message)
+      )
+        measurement.providerCanceled = error.message;
+      else measurement.providerError = error.message;
       throw error;
     }
   };
+  for (const name of ["compactReference", "cancel", "cancelPlanning"])
+    if (typeof plan[name] === "function")
+      wrapped[name] = (...values) => plan[name](...values);
   controller = new CalendarController(
     design,
     initial,
@@ -319,6 +366,17 @@ async function runSeries(provider, id, scenario) {
           "Incorrect physical move destination",
         );
         if (capture) {
+          if (
+            typeof controller.sourceReferenceWord === "string" &&
+            controller.sourceReferenceWord !== reference
+          ) {
+            capture.referenceEvents.push({
+              beforeMove: capture.moves.length,
+              word: controller.sourceReferenceWord,
+              wordHash: hash(controller.sourceReferenceWord),
+            });
+            reference = controller.sourceReferenceWord;
+          }
           capture.moves.push(token);
           capture.moveTargets.push([
             controller.progress.target.weekday,
@@ -335,6 +393,7 @@ async function runSeries(provider, id, scenario) {
             controller.request(source(design, iso));
         }
         pose = to;
+        reference = model.simplify(reference + " " + token);
       },
     },
     (_target, _busy, error) => {
@@ -350,7 +409,14 @@ async function runSeries(provider, id, scenario) {
     initialWord: initial.word,
     initialStateHash: stamp(pose),
     startupMs,
-    providerMetadata: plan.metadata ?? external?.metadata ?? null,
+    providerMetadata:
+      plan.metadata ??
+      (provider === "direct"
+        ? directExternal?.metadata
+        : provider === "legacy"
+          ? null
+          : external?.metadata) ??
+      null,
     rowIndexes: [],
   };
   series.push(item);
@@ -359,6 +425,7 @@ async function runSeries(provider, id, scenario) {
     capture = {
       started: performance.now(),
       moves: [],
+      referenceEvents: [],
       moveTargets: [],
       planning: [],
       firstMotionMs: null,
@@ -418,10 +485,26 @@ async function runSeries(provider, id, scenario) {
       planning: capture.planning,
       obsoleteCommitted,
       moveTargets: capture.moveTargets,
+      referenceEvents: capture.referenceEvents,
     };
+    const canonicalTarget = source(design, last);
+    if (
+      model.sameState(pose, model.sourcePose(design, canonicalTarget)) &&
+      model.tokens(canonicalTarget.word).length < model.tokens(reference).length
+    )
+      reference = canonicalTarget.word;
+    if (
+      typeof controller.sourceReferenceWord === "string" &&
+      controller.sourceReferenceWord !== reference
+    ) {
+      record.endReferenceReplacement = controller.sourceReferenceWord;
+      reference = controller.sourceReferenceWord;
+    }
+    record.referenceEndTokens = model.tokens(reference).length;
     item.rowIndexes.push(traces.length);
     traces.push(record);
     rows.push(record);
+
     currentISO = last;
     capture = null;
     latestContext = null;
@@ -529,6 +612,11 @@ const statistics = series.flatMap((s) =>
           .map((r) => r.firstMotionMs),
       ),
       noMotionCases: rows.filter((r) => r.firstMotionMs === null).length,
+      canceledPlans: rows.reduce(
+        (n, r) =>
+          n + r.planning.filter((p) => Boolean(p.providerCanceled)).length,
+        0,
+      ),
       providerErrors: rows.reduce(
         (n, r) =>
           n +
