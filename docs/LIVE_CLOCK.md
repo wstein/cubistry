@@ -22,7 +22,7 @@ the current local `HH:MM:SS` beside the cubes, or above them on narrow screens.
 It reads the same wall-clock snapshot for all units and remains live during
 physical motion. The browser's local time zone is displayed explicitly.
 
-Preferred quarter-turn durations are H: 500 ms, M: 250 ms, S: 100 ms. A half
+Preferred quarter-turn durations are H: 250 ms, M: 100 ms, S: 50 ms. A half
 turn takes twice the scheduled quarter-turn duration. All three retain the seven
 existing preference stops. The clock shows both the preferred setting and the
 calculated scheduled quarter/half durations; these are plans, not measurements

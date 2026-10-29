@@ -81,9 +81,9 @@ immutable face IDs, actual blank and legal routes are shared by both variants.
 ## Three-cube live clock
 
 The separate [live clock](LIVE_CLOCK.md), PR #64, uses one view for all three cubes.
-Its preferred H/M/S timings are 500/250/100 ms **per quarter turn**. A half turn
+Its preferred H/M/S timings are 250/100/50 ms **per quarter turn**. A half turn
 uses two quarter units. Six HTM loosely permit twelve quarter units, with nominal
-H/M/S budgets of 6/3/1.2 seconds before fitting. Canonical verified upward routes
+H/M/S budgets of 3/1.2/0.6 seconds before fitting. Canonical verified upward routes
 for the selected initial cycles use at most eight quarter units; this narrower
 result does not cover arbitrary poses. The clock shows scheduled quarter/half
 times when it fits a route into the available live interval. Standalone counter
