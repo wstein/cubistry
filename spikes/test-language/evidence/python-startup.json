@@ -1,0 +1,158 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "casesPerTrial": 11,
+  "results": [
+    [
+      {
+        "case": "counter-proof.json",
+        "status": "accepted"
+      },
+      {
+        "case": "boolean-schema.json",
+        "status": "rejected"
+      },
+      {
+        "case": "boolean-vector.json",
+        "status": "rejected"
+      },
+      {
+        "case": "duplicate-identity.json",
+        "status": "rejected"
+      },
+      {
+        "case": "fractional-normal.json",
+        "status": "rejected"
+      },
+      {
+        "case": "illegal-token.json",
+        "status": "rejected"
+      },
+      {
+        "case": "out-of-range-identity.json",
+        "status": "rejected"
+      },
+      {
+        "case": "out-of-range-position.json",
+        "status": "rejected"
+      },
+      {
+        "case": "repainted-unpadded.json",
+        "status": "rejected"
+      },
+      {
+        "case": "rotated-print-up.json",
+        "status": "rejected"
+      },
+      {
+        "case": "wrong-target.json",
+        "status": "rejected"
+      }
+    ],
+    [
+      {
+        "case": "counter-proof.json",
+        "status": "accepted"
+      },
+      {
+        "case": "boolean-schema.json",
+        "status": "rejected"
+      },
+      {
+        "case": "boolean-vector.json",
+        "status": "rejected"
+      },
+      {
+        "case": "duplicate-identity.json",
+        "status": "rejected"
+      },
+      {
+        "case": "fractional-normal.json",
+        "status": "rejected"
+      },
+      {
+        "case": "illegal-token.json",
+        "status": "rejected"
+      },
+      {
+        "case": "out-of-range-identity.json",
+        "status": "rejected"
+      },
+      {
+        "case": "out-of-range-position.json",
+        "status": "rejected"
+      },
+      {
+        "case": "repainted-unpadded.json",
+        "status": "rejected"
+      },
+      {
+        "case": "rotated-print-up.json",
+        "status": "rejected"
+      },
+      {
+        "case": "wrong-target.json",
+        "status": "rejected"
+      }
+    ],
+    [
+      {
+        "case": "counter-proof.json",
+        "status": "accepted"
+      },
+      {
+        "case": "boolean-schema.json",
+        "status": "rejected"
+      },
+      {
+        "case": "boolean-vector.json",
+        "status": "rejected"
+      },
+      {
+        "case": "duplicate-identity.json",
+        "status": "rejected"
+      },
+      {
+        "case": "fractional-normal.json",
+        "status": "rejected"
+      },
+      {
+        "case": "illegal-token.json",
+        "status": "rejected"
+      },
+      {
+        "case": "out-of-range-identity.json",
+        "status": "rejected"
+      },
+      {
+        "case": "out-of-range-position.json",
+        "status": "rejected"
+      },
+      {
+        "case": "repainted-unpadded.json",
+        "status": "rejected"
+      },
+      {
+        "case": "rotated-print-up.json",
+        "status": "rejected"
+      },
+      {
+        "case": "wrong-target.json",
+        "status": "rejected"
+      }
+    ]
+  ],
+  "perCaseFreshProcessSamplesMs": [
+    970.3995329982718,
+    966.551815996354,
+    986.5736830033711
+  ],
+  "singleBatchProcessSamplesMs": [
+    568.7188070005504,
+    552.8467969998019,
+    591.2394410042907
+  ],
+  "perCaseMedianMs": 970.3995329982718,
+  "batchMedianMs": 568.7188070005504,
+  "scope": "the same full Python checker on one valid certificate and ten rejected corruptions",
+  "existingCINote": "unittest already batches cases; this is not a measured existing-CI improvement"
+}

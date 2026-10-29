@@ -1,0 +1,10 @@
+{
+  "status": "TIMEOUT",
+  "exitCode": 124,
+  "supervisorSeconds": 90,
+  "spikeHead": "ab001bd",
+  "compilerArguments": ["--startup-file=no", "--optimize=0", "--compile=min"],
+  "workload": "Complete prototype validation plus five samples of 2000 replay words",
+  "scopeLimit": "No separate completion time for validation was emitted; this does not establish that validation-only startup exceeded 90 seconds.",
+  "reproduceWithCurrentHarness": "timeout 90s env JULIA_DEPOT_PATH=/tmp/cubistry-julia-depot python3 spikes/test-language/run_spike.py --julia /path/to/julia --julia-mode minimal-compilation --benchmark --output NEWPATH"
+}
