@@ -2,9 +2,12 @@
 
 Both optional engines implement the two bounded groups in [issue 74](https://github.com/wstein/cubistry/issues/74).
 The [contract](SPEC.md), [interface](INTERFACE.md) and [coverage ledger](coverage.json)
-define the accepted formats. Existing Python checks and CI remain authoritative
-and unchanged. This completes the scoped implementation, not a migration of all
-project tests or formal verification of either checker program.
+define the accepted formats. At the time of issue 74, existing Python checks and
+CI were authoritative and unchanged. Since the 2026-10-29
+[authority change](AUTHORITY.md), Flix and Julia are the
+authoritative verifiers (both must accept; disagreement is `UNKNOWN`) and Python
+is a third voice. This completes the scoped implementation, not a migration of
+all project tests or formal verification of either checker program.
 
 ## Correctness and independent review
 
@@ -111,3 +114,37 @@ claimed. The longest pinned kernel word is reference evidence, not an optimized
 calendar transition. Other production tests and proof formats remain unported;
 their full-suite lifecycle and migration cost are unknown. Cubacle integration is
 future work and no unreleased producer interface is assumed.
+
+## Port backlog
+
+Under the 2026-10-29 [authority change](AUTHORITY.md),
+existing proofs whose only verifier is Python remain verified by that Python
+verifier and are not re-labeled. They are candidates for porting to Flix and
+Julia. The backlog below lists the Python verifiers under `research/` on the
+research branch, grouped by proof family, in suggested port order. Sizes and
+effort are intentionally not estimated.
+
+1. `research/hsm-counter/` (first): `blank/verify.py` (blank), `verify.py`,
+   `verify_periodic.py` (periodic); tests `blank/test_verify.py`,
+   `test_verify.py`, `test_verify_periodic.py`.
+2. `research/five-second-timer/`: `verify.py`, `verify_endpoints.py`,
+   `verify_trace.py`; test `test_verify.py`.
+3. `research/counter-2x2-optimization/`: `verify.py`, `baseline-verify.py`;
+   tests `test_verify.py`.
+4. `research/date-3x3/` family:
+   - top level: `verify_adjacent.py`, `verify_witness.py` (tests
+     `test_verify_adjacent.py`, `test_verify_witness.py`);
+   - `center-bound-investigation/`: `verify-cyclic-repairs.py`,
+     `verify-short-repairs.py`;
+   - `consecutive-benchmark/verify.py`;
+   - `independent/verify_initial_capacity.py`;
+   - `layout-optimization-de/`: `verify.py`, `check_structure.py`;
+   - `portfolio-benchmark/`: `verify.py`, `verify-contexts.py`;
+   - `transition-optimization/verify.py`;
+   - `weekend-layouts/verify-layout.py`;
+   - `weekends/verify-certificate.py`;
+   - `whole-weekday-separated-month/verify.py`.
+
+Not yet placed in the order: `research/timer-2x2/` (`verify.py`, `optimization/verify.py`), which is also
+Python-only. The `scripts/verify*.py` files are not under `research/` and are not
+part of this backlog; they would need a separate review.
