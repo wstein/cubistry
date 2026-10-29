@@ -17,7 +17,8 @@ const total = expectedHtm;
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 async function harness() {
   const events = [],
-    pending = [];
+    pending = [],
+    plans = [];
   let presented = null,
     failAssets = false;
   const view = {
@@ -53,7 +54,16 @@ async function harness() {
         dispose() {},
       };
     },
-    prepareTestSolver,
+    async (print) => {
+      const solver = await prepareTestSolver(print);
+      return {
+        solve(from, to, options) {
+          const moves = solver.solve(from, to, options);
+          plans.push({ from, to, moves });
+          return moves;
+        },
+      };
+    },
   );
   await controller.configure("FIXED TITLE", true, 15);
   const step = async () => {
@@ -69,6 +79,7 @@ async function harness() {
     controller,
     events,
     pending,
+    plans,
     step,
     finish,
     get presented() {
@@ -120,7 +131,7 @@ test("planned total precedes animation; only resolved authoritative commits adva
   assert.equal(c.progress.completed, 0);
   assert.equal(h.pending.length, 0);
 });
-test("queued values preserve active counts and latest target starts a separate actual plan", async () => {
+test("latest target replaces old work after the committed turn and plans from its physical pose", async () => {
   const h = await harness(),
     { controller: c } = h;
   c.request(42);
@@ -131,6 +142,16 @@ test("queued values preserve active counts and latest target starts a separate a
   assert.equal(c.progress.queuedTarget, 44);
   assert.equal(c.progress.completed, 1);
   assert.equal(c.progress.total, total(15, 42));
+  const boundary = h.pending[0].p.to;
+  await h.step();
+  assert.equal(c.progress.target, 44);
+  assert.equal(
+    c.currentValue,
+    15,
+    "abandoned display must not be reported complete",
+  );
+  assert.equal(h.plans.length, 2);
+  assert.equal(h.plans[1].from, boundary);
   await h.finish();
   assert.equal(c.currentValue, 44);
   const starts = h.events.filter(
@@ -140,7 +161,8 @@ test("queued values preserve active counts and latest target starts a separate a
     starts.map((e) => e.progress.target),
     [42, 44],
   );
-  assert.equal(c.progress.total, total(42, 44));
+  assert.equal(c.progress.total, h.plans[1].moves.length);
+  assert.equal(c.progress.sessionTotal, 2 + h.plans[1].moves.length);
   assert.equal(c.state, h.presented);
 });
 test("stop-after-value discards queue, finishes a legal target and permits a correct later plan", async () => {
@@ -163,7 +185,7 @@ test("stop-after-value discards queue, finishes a legal target and permits a cor
   await h.finish();
   assert.equal(c.currentValue, 7);
 });
-test("reset queues behind active work; reconfiguration resets metrics only after success", async () => {
+test("reset replans from the current turn even when returning to the last completed value", async () => {
   const h = await harness(),
     { controller: c } = h;
   c.request(42);
@@ -175,7 +197,12 @@ test("reset queues behind active work; reconfiguration resets metrics only after
   await assert.rejects(c.configure("OTHER", true), /Wait/);
   await h.finish();
   assert.equal(c.currentValue, 15);
-  assert.equal(c.progress.total, total(42, 15));
+  assert.equal(c.progress.total, h.plans[1].moves.length);
+  assert.equal(
+    c.progress.total,
+    2,
+    "reset should reverse only the two committed turns",
+  );
   const old = c.progress,
     state = c.state;
   h.failAssets(true);

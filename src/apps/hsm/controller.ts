@@ -139,7 +139,12 @@ export class HsmController extends PhysicalPlayback {
       return this.prepared.target;
     }
     const next = (value + this.direction + this.range + 1) % (this.range + 1);
-    this.planned = this.planner.plan(
+    const front = hsmTarget(this.letter, value),
+      settledUnit = matchesTarget(this.design.print, this.state, {
+        ...front,
+        facelets: front.facelets.slice(0, 2),
+      });
+    this.planned = this.planner[settledUnit ? "plan" : "planFromPose"](
       this.design.print,
       this.state,
       this.letter,

@@ -61,9 +61,9 @@ test("certified queues and rejected turns preserve authoritative commits and ses
   h.c.view.animate=p=>new Promise((resolve,reject)=>pending.push({p,resolve,reject}));
   const step=async()=>{assert.ok(pending.length);pending.shift().resolve();await new Promise(r=>setImmediate(r));};
   h.c.request(1);h.c.request(2);assert.equal(h.c.progress.sessionTotal,0);
+  assert.equal(h.c.stopAfterCurrent(),1); // Stop cancels queued work before the move commits.
   await step();assert.equal(h.c.progress.sessionTotal,1);
   assert.throws(()=>h.c.resetSessionMoves(),/Wait/);
-  h.c.stopAfterCurrent();
   while(h.c.busy)await step();
   assert.equal(h.c.currentValue,1);assert.equal(h.c.progress.sessionTotal,route.increments[0].length);
   h.c.request(2);await step();const committed=h.c.progress.sessionTotal;
