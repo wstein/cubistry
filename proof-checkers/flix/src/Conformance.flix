@@ -41,8 +41,8 @@ def caseConformance(row: J, root: String, chain: List[Int32], out: Option[PrintW
     let valid=match accepted { case None => false
         case Some(_) => true };
     require(valid == expected,"ERROR: unexpected conformance acceptance: "+group+"/"+name+" "+reason);
-    let (digest,outer,whole)=match accepted {
-        case None => ("",0,0)
+    let (digest,outer,whole,quarters,replayed)=match accepted {
+        case None => ("",0,0,0,0)
         case Some(Checked.Counter(canonical)) => {
             let hash=shaText(json(J.Arr(List.map(wire,canonical))));
             require(hash == text(field(row,"canonicalStateSHA256")),"ERROR: counter canonical full-state digest mismatch");
@@ -51,7 +51,7 @@ def caseConformance(row: J, root: String, chain: List[Int32], out: Option[PrintW
                 match out { case None => ()
                     case Some(w) => w.println(json(object(List#{("group",J.Str("counter")),("name",J.Str(name)),("value",intJ(value)),("state",wire(physical))}))) }
             };
-            (hash,0,0)
+            (hash,0,0,0,0)
         }
         case Some(Checked.Marked(raw,actual,_,matched)) => {
             let hash=shaText(json(wire(actual)));
@@ -60,23 +60,23 @@ def caseConformance(row: J, root: String, chain: List[Int32], out: Option[PrintW
                 case Some(v) => require(matched == flag(v),"ERROR: optical goal comparison mismatch")
                 case None => ()
             };
-            let (htm,xyz)=match optional(row,"word") {
+            let (htm,xyz,qtm,witness)=match optional(row,"word") {
                 case Some(J.Str(word)) => {
                     let printing=state(field(raw,"printing"),3);
                     let ms=moves(word,true);
                     require(apply(printing,ms) == actual,"ERROR: move replay differs from every declared frame");
                     require(apply(actual,inverse(ms)) == printing,"ERROR: move inverse did not restore reference frames");
-                    (List.length(ms)-rotations(ms),rotations(ms))
+                    (List.length(ms)-rotations(ms),rotations(ms),sum(List.map(m -> match m { case Move.M(_,_,amount,whole) => if (whole) Int32.abs(amount) else 0 },ms)),1)
                 }
-                case Some(J.Null) => (0,0)
-                case None => (0,0)
+                case Some(J.Null) => (0,0,0,0)
+                case None => (0,0,0,0)
                 case _ => throw new IllegalArgumentException("ERROR: invalid manifest move word")
             };
             emitState(out,group,name,wire(actual));
-            (hash,htm,xyz)
+            (hash,htm,xyz,qtm,witness)
         }
     };
-    object(List#{("group",J.Str(group)),("name",J.Str(name)),("sourceSHA256",J.Str(sourceHash)),("valid",J.Bool(valid)),("stateSHA256",J.Str(digest)),("outerHTM",intJ(outer)),("wholeRotations",intJ(whole)),("reason",J.Str(reason))})
+    object(List#{("group",J.Str(group)),("name",J.Str(name)),("sourceSHA256",J.Str(sourceHash)),("valid",J.Bool(valid)),("stateSHA256",J.Str(digest)),("outerHTM",intJ(outer)),("wholeRotations",intJ(whole)),("rotationQuarterTurns",intJ(quarters)),("geometryWitnessesReplayed",intJ(replayed)),("reason",J.Str(reason))})
 }
 
 def noncenters(xs: List[Sticker]): List[Sticker] = List.filter(s -> nonzero(pos(s))>1,xs)
@@ -122,6 +122,11 @@ def conformance(root: String, out: Option[PrintWriter]): J \ IO = {
     let counterAccepted=List.count(r -> text(field(r,"group")) == "counter" and flag(field(r,"valid")),results);
     let geometryAccepted=List.count(r -> text(field(r,"group")) == "geometry" and flag(field(r,"valid")),results);
     require(counterAccepted == 2 and geometryAccepted == 129,"ERROR: accepted/rejected coverage changed");
+    let witnessCount=sum(List.map(r -> integer(field(r,"geometryWitnessesReplayed")),results));
+    let outerCount=sum(List.map(r -> integer(field(r,"outerHTM")),results));
+    let wholeCount=sum(List.map(r -> integer(field(r,"wholeRotations")),results));
+    let quarterCount=sum(List.map(r -> integer(field(r,"rotationQuarterTurns")),results));
+    require(witnessCount==121 and outerCount==628 and wholeCount==369 and quarterCount==469,"ERROR: actual geometry replay coverage changed");
     let kernelInfo=field(manifest,"kernel");
     let kernelPath=root+"/"+text(field(kernelInfo,"path"));
     require(shaFile(kernelPath) == text(field(kernelInfo,"sha256")),"ERROR: kernel input hash mismatch");
@@ -148,5 +153,5 @@ def conformance(root: String, out: Option[PrintWriter]): J \ IO = {
     let allHashes=List.append(caseHashes,List.append(generatorHashes,kernelHashes));
     require(List.length(allHashes)==2215,"ERROR: full-state aggregate coverage changed");
     let checksum=shaText(String.intercalate("\n",allHashes));
-    object(List#{("valid",J.Bool(true)),("status",J.Str("VALID")),("manifestSHA256",J.Str(manifestPin())),("counterCases",intJ(41)),("counterAccepted",intJ(counterAccepted)),("counterRejected",intJ(39)),("geometryCases",intJ(154)),("geometryAccepted",intJ(geometryAccepted)),("geometryRejected",intJ(25)),("kernelReferences",intJ(2048)),("centerGenerators",intJ(36)),("canonicalValuesPerCounter",intJ(100)),("inverseChecksPerCounter",intJ(100)),("chainedTransitionsPerFormat",intJ(800)),("checksum",J.Str(checksum)),("fullStateAggregateSHA256",J.Str(checksum)),("cases",J.Arr(results))})
+    object(List#{("valid",J.Bool(true)),("status",J.Str("VALID")),("manifestSHA256",J.Str(manifestPin())),("counterCases",intJ(41)),("counterAccepted",intJ(counterAccepted)),("counterRejected",intJ(39)),("geometryCases",intJ(154)),("geometryAccepted",intJ(geometryAccepted)),("geometryRejected",intJ(25)),("geometryWitnessesReplayed",intJ(witnessCount)),("geometryOuterHTM",intJ(outerCount)),("geometryWholeRotations",intJ(wholeCount)),("geometryRotationQuarterTurns",intJ(quarterCount)),("kernelReferences",intJ(2048)),("centerGenerators",intJ(36)),("canonicalValuesPerCounter",intJ(100)),("inverseChecksPerCounter",intJ(100)),("chainedTransitionsPerFormat",intJ(800)),("checksum",J.Str(checksum)),("fullStateAggregateSHA256",J.Str(checksum)),("cases",J.Arr(results))})
 }
