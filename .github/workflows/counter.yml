@@ -2,11 +2,16 @@ name: Counter checks
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize, labeled]
   push:
     branches: [main]
 
 permissions:
   contents: read
+
+concurrency:
+  group: counter-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   counter:
@@ -24,14 +29,18 @@ jobs:
       - run: npm run prepare:solver
       - run: npm ci
       - run: npm run check
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
+        run: npx playwright install --with-deps chromium
+      - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
+        run: npm run test:e2e
         env:
           CI: '1'
-      - run: npm run test:pages
+      - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
+        run: npm run test:pages
         env:
           CI: '1'
-      - run: npm run test:pr-preview
+      - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
+        run: npm run test:pr-preview
         env:
           CI: '1'
       - uses: actions/upload-artifact@v4
