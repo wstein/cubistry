@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 source = ROOT.parent / 'constructive/de-2.json'
 raw = source.read_bytes()
+assert hashlib.sha256(raw).hexdigest() == 'c3b765a181e7a9f0714f8392625f44ab207ff74680ba5305787c9342a845d826'
 model = json.loads(raw)
 assert model['rows'] == ['weekday', 'day', 'month']
 assert model['dayCells'] == ['blank', 'tens', 'units']
