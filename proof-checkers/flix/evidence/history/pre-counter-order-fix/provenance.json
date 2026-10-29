@@ -1,0 +1,31 @@
+{
+  "schema": "cubistry.flix-proof-evidence.v1",
+  "sourceRevision": "8f52bb7d4ca9101745e37d8f9a5bd5029c171e16",
+  "manifestSHA256": "c0d0fa2fc6d692c7c89e436fe5a2670503d8a8a6c86a2cc0d1397be983832e01",
+  "parserSHA256": "2d30c375cddea9657a1e1ef97547a2694b663b355facb4de53a097782b312d1a",
+  "runtimeArtifactSHA256": "db93cf586d2e43bb813ba2356f32133d535b2ef9ec22227480c06d509d788d59",
+  "sourceSHA256": {
+    "src/Conformance.flix": "89f69390edb1846559a33f90ad41234262349e9eb27bbc665cc224b5906b6336",
+    "src/Counter.flix": "0592e86d2df6eb4fbc677117e7ce10cbe8a284a09e27cc671aa0327ef5329b68",
+    "src/Geometry.flix": "3d68686ec1285425e522cf7b959b99830fa82554814403e3a81468fca0824f59",
+    "src/JsonRead.flix": "e087082a4cdf6881c7bce2500b8668dce4295415dbdd1ca08880e5f59c0a356d",
+    "src/Lifecycle.flix": "41208965e193797400bb20d2902d48333c6ac9b8617f83db6fb688e70beeaa01",
+    "src/Main.flix": "b44aca9598a15582cabfa48a1d66ff1f469c1168c19305dd287ad4879273c836"
+  },
+  "fullStateAggregateSHA256": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
+  "rawExportSHA256": "e4aad044ed3058689356521d9cf243ac28284c919357722236b241274e941f03",
+  "gzipExportSHA256": "171830cce3c9cfc3c3ea5136dcc00829acf8e550c96ea6fec5d2e54c6a0652eb",
+  "rawExportBytes": 5672170,
+  "gzipExportBytes": 64771,
+  "records": 2413,
+  "fullStickerFrames": 124302,
+  "runtime": "Java 21 / Flix 0.79.0 / flixw 0.34.9",
+  "javaVersion": "openjdk version \"21.0.12.1\" 2026-08-18\nOpenJDK Runtime Environment (build 21.0.12.1+1-1-deb13u1-Debian)\nOpenJDK 64-Bit Server VM (build 21.0.12.1+1-1-deb13u1-Debian, mixed mode, sharing)\n",
+  "scope": "complete two-group conformance; all input parsers, schema checks and math rerun in every lifecycle iteration",
+  "status": "PASS_COMPLETE_CONTRACT",
+  "limits": [
+    "finite conformance and independent replay, not formal verification of all checker source",
+    "other Python certificate formats/CI remain authoritative and unchanged",
+    "shared-machine observations, no universal latency or optimality guarantee"
+  ]
+}
