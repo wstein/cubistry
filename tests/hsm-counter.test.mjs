@@ -171,3 +171,30 @@ test("HSM rejects unsupported prints, values and counting modes", () => {
   assert.throws(() => c.setMode(99, 1));
   assert.throws(() => c.setMode(59, 0));
 });
+test("blank up vectors are free while printed glyphs stay oriented", () => {
+  const cross = (a, b) => [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+  const turned = structuredClone(raw);
+  for (const s of turned.printing)
+    if (s.image === "") s.up = cross(s.n, s.up).map((x) => x + 0);
+  const variant = validateHsmDesign(turned);
+  const source = applyMoves(initialState(design.print), parseAlg("U D2 B D'"));
+  const moved = applyMoves(initialState(variant.print), parseAlg("U D2 B D'"));
+  for (const value of [34, 0, 59, 17])
+    assert.deepEqual(
+      planner
+        .plan(variant.print, moved, "H", value)
+        .map((m) => JSON.stringify(m)),
+      planner
+        .plan(design.print, source, "H", value)
+        .map((m) => JSON.stringify(m)),
+    );
+  assert.equal(planner.plan(variant.print, moved, "H", 34).length, 6);
+  const letter = structuredClone(raw);
+  for (const s of letter.printing)
+    if (/^[HSM]$/.test(s.image)) s.up = s.up.map((x) => -x + 0);
+  assert.throws(() => validateHsmDesign(letter), /Invalid HSM setup/);
+});

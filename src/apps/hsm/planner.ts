@@ -16,6 +16,8 @@ import {
 import { hsmTarget, positions, type Letter } from "./design.ts";
 type Pose = { p: Vec3; n: Vec3; up: Vec3 };
 const key = (p: Pose) => JSON.stringify([p.p, p.n, p.up]);
+/** Position and normal identify one rigid corner frame; the blank ignores up. */
+const frame = (p: Pose) => JSON.stringify([p.p, p.n]);
 const encode = (a: readonly number[]) =>
   a[0] * 13824 + a[1] * 576 + a[2] * 24 + a[3];
 const decode = (k: number) => [
@@ -36,6 +38,7 @@ function turn(p: Pose, m: LegalMove): Pose {
 /** Exact four-corner BFS; hidden poses remain in the authoritative full state. */
 export class HsmPlanner {
   private readonly maps: Map<string, number>[] = [];
+  private readonly frames: Map<string, number>[] = [];
   private readonly transitions: number[][][] = [];
   private readonly distances = new Uint8Array(24 ** 4).fill(255);
   constructor() {
@@ -53,6 +56,8 @@ export class HsmPlanner {
         }
       demand(poses.length === 24, "Incomplete HSM sticker graph");
       this.maps.push(map);
+      this.frames.push(new Map(poses.map((q, i) => [frame(q), i])));
+      demand(this.frames.at(-1)!.size === 24, "Ambiguous HSM corner frame");
       this.transitions.push(
         moves.map((m) => poses.map((p) => map.get(key(turn(p, m)))!)),
       );
@@ -81,8 +86,12 @@ export class HsmPlanner {
   ): { chosen: number[]; distance: number } {
     const target = hsmTarget(letter, value),
       poses = stickerPoses(print, state);
+    const index = (p: Pose, s: number) =>
+      target.facelets[s].assetId === "blank"
+        ? this.frames[s].get(frame(p))
+        : this.maps[s].get(key(p));
     const lists = target.facelets.map((f, s) =>
-      poses.filter((p) => p.assetId === f.assetId && this.maps[s].has(key(p))),
+      poses.filter((p) => p.assetId === f.assetId && index(p, s) !== undefined),
     );
     let chosen: number[] | undefined,
       distance = 255;
@@ -92,7 +101,7 @@ export class HsmPlanner {
           for (const d of lists[3]) {
             if (new Set([a.cubie, b.cubie, c.cubie, d.cubie]).size !== 4)
               continue;
-            const ids = [a, b, c, d].map((p, s) => this.maps[s].get(key(p))!),
+            const ids = [a, b, c, d].map((p, s) => index(p, s)!),
               cost = this.distances[encode(ids)];
             if (cost < distance) {
               distance = cost;
