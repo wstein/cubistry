@@ -1,5 +1,7 @@
 import "./style.css";
 import "./calendar.css";
+import "./presentation.css";
+import { installPresentation } from "./apps/shared/presentation.ts";
 import { sha256, deploymentBasePath } from "@cubistry/cube-assets";
 import {
   validateDesign,
@@ -268,6 +270,11 @@ function tick() {
     void update();
   }
 }
+const presentation = installPresentation({
+  app: "calendar",
+  hide: ["main > header", "main > h1", "main > p.small", ".calendar-controls > :not(#calendar-digital):not(#calendar-zone)"],
+  resetView: () => viewer?.resetReferenceView(),
+});
 async function initialize() {
   try {
     await Promise.all(
@@ -284,6 +291,7 @@ async function initialize() {
     viewer = new CalendarViewer($("calendar-viewer"));
     $("calendar-date").value = date.iso;
     await configure();
+    presentation.setReady(!failed);
     setInterval(tick, 1000);
     document.addEventListener("visibilitychange", tick);
     window.addEventListener("pageshow", tick);
