@@ -1,0 +1,142 @@
+[
+  {
+    "id": "quality-build-open",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-build-open.svg",
+    "sha256": "b1705f9ce97497a911cce95a721a90975a0ce390f84628dfcb9cac5ac7edb740"
+  },
+  {
+    "id": "quality-build-running",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-build-running.svg",
+    "sha256": "2e88571623a703c831f77abe04d3a2651c84757aca3af8f36d916359cc3bdf3b"
+  },
+  {
+    "id": "quality-build-ok",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-build-ok.svg",
+    "sha256": "fd5335c37d2ad0ba82c41298f252d9983cb85842750ba1b92f6433ec581d8e44"
+  },
+  {
+    "id": "quality-build-error",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-build-error.svg",
+    "sha256": "ab32762a1e9511f524426fffebca2020b1c1092030fff76dad1b9eb76c775e16"
+  },
+  {
+    "id": "quality-build-blocked",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-build-blocked.svg",
+    "sha256": "6ae6806db3496879400a6f00b20ad4ff6be351181e501084ca40e8f6b1ac5b55"
+  },
+  {
+    "id": "quality-test-open",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-test-open.svg",
+    "sha256": "567a0512b69b155fda14419abcf6c81441417f5f97509bd66ba11f606f49bd16"
+  },
+  {
+    "id": "quality-test-running",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-test-running.svg",
+    "sha256": "26f06d53d2eebc948d8747098f8fa8499e35540d33c1c6ec7a9fe397f7018472"
+  },
+  {
+    "id": "quality-test-ok",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-test-ok.svg",
+    "sha256": "8edd3b48994e946fd36ac20a7e481531f273f6a4c291ac3f33f5fe38ea2cd581"
+  },
+  {
+    "id": "quality-test-error",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-test-error.svg",
+    "sha256": "e3e5e57c0e7a5877d4c4a7a96a71fcb84f64f25452e9ab91ccd76653b62cf50c"
+  },
+  {
+    "id": "quality-test-blocked",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-test-blocked.svg",
+    "sha256": "f56fa6915132ebbfbee1fc6729331748edf5c9a2bc19a5ace092a6af708fa994"
+  },
+  {
+    "id": "quality-analyze-open",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-analyze-open.svg",
+    "sha256": "da6c01c2287b831a08cf20e300132dc08895eb33c0e8f959fc47ad43e76501d0"
+  },
+  {
+    "id": "quality-analyze-running",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-analyze-running.svg",
+    "sha256": "193dc99fd77de04ada41bdcb860561a5d8381e66c729de04011b5badfccac95a"
+  },
+  {
+    "id": "quality-analyze-ok",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-analyze-ok.svg",
+    "sha256": "5501eaebf18055870c40fa0aa5789744edd2ede015ed1131a999cf44160b498c"
+  },
+  {
+    "id": "quality-analyze-error",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-analyze-error.svg",
+    "sha256": "02d0f1d98d37f7d4fc3d3eb91b242cb3dc86c006304c950ae296e03cddd1fcaf"
+  },
+  {
+    "id": "quality-analyze-blocked",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-analyze-blocked.svg",
+    "sha256": "427d85bfc2f2a8227e541ae29c957febdc808dedd5c14870808663b307b6f202"
+  },
+  {
+    "id": "quality-review-open",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-review-open.svg",
+    "sha256": "fd1b9a6e0bd6381216fc85fc9cecf8d6e49490e98e5492b6ca66b199bd7c4d2b"
+  },
+  {
+    "id": "quality-review-running",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-review-running.svg",
+    "sha256": "786735eb6ee66f6f70c71afd478a24a2b58e3611b04eff0ad229c6e8d0c9f057"
+  },
+  {
+    "id": "quality-review-ok",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-review-ok.svg",
+    "sha256": "50beceba336e97e36df4eec619d532d3539b243ec193fb2d6e7252f6524ef5b6"
+  },
+  {
+    "id": "quality-review-error",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-review-error.svg",
+    "sha256": "5ebcc8e43443c6581ce6ec4b478a1511dec59c6c5c9cba98b68d3501a534671e"
+  },
+  {
+    "id": "quality-review-blocked",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/quality/quality-review-blocked.svg",
+    "sha256": "f8822da7944cbbfa29f3142cfda6ae4e1b8fd8c6349a0995a288e19100eb9db7"
+  }
+]
