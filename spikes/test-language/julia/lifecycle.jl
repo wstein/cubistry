@@ -14,13 +14,15 @@ emit_phase(Dict("event"=>"LOAD", "elapsedMs"=>load_elapsed,
 function lifecycle(input,casesdir)
     for iteration in 0:3
         started = time_ns()
-        _,_,states,controls,_,contracts = verify_suite(input,casesdir)
+        _,_,states,controls,_,contracts,source_sha = verify_suite(input,casesdir)
         checksum = bytes2hex(sha256(JSON.json([wire(s) for s in states])))
         elapsed = (time_ns()-started)/1e6
         emit_phase(Dict("event"=>"RESULT", "iteration"=>iteration, "elapsedMs"=>elapsed,
                         "values"=>length(states), "fullStickerFrames"=>24length(states),
                         "inverseChecks"=>length(states), "negativeControls"=>length(controls),
                         "languageAssertions"=>contracts, "checksum"=>checksum,
+                        "inputSHA256"=>source_sha,
+                        "controlSHA256"=>Dict(c["case"]=>c["sha256"] for c in controls),
                         "scope"=>"fresh JSON, full padded/unpadded suite, all negatives and output checksum"))
     end
     emit_phase(Dict("event"=>"DONE", "completedRuns"=>4))
