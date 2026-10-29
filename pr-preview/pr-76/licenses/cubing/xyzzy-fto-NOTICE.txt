@@ -1,0 +1,12 @@
+/* ftosolver.js - An FTO solver
+version 0.5.1 (2021-04-20)
+
+Copyright (c) 2016, 2020, 2021
+
+From https://gist.github.com/torchlight/9a5c53da09d8e090756a228f4b5f3471
+Originally MIT licensed, added to `cubing.js` under the GPL license by permission from the author (@torchlight/xyzzy).
+
+Compatibility note:
+This is targeted at Firefox / Spidermonkey releases from 2019 and onwards. It might not run on older
+JavaScript engines. Recent Chrome / Node releases should also work, but are not tested as much.
+*/
