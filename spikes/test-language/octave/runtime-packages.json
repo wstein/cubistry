@@ -1,0 +1,30 @@
+[
+  {
+    "url": "https://deb.debian.org/debian/pool/main/o/octave/octave_9.4.0-1_amd64.deb",
+    "sha256": "ace088de791f79e3b6ddd5d81c08434f8511dcc4435f8d3608269e4cb1dbf6c6"
+  },
+  {
+    "url": "https://deb.debian.org/debian/pool/main/o/octave/octave-common_9.4.0-1_all.deb",
+    "sha256": "435d31a9d3dfa436dc3afd75e8aa4b5f7eb95674d1f2a02fe118a59d596a5e1d"
+  },
+  {
+    "url": "https://deb.debian.org/debian/pool/main/g/graphicsmagick/libgraphicsmagick++-q16-12t64_1.4+really1.3.45+hg17696-1_amd64.deb",
+    "sha256": "f75e67793deba6a6ef9a949e51559ab9517063c92393759b69b046d702991b16"
+  },
+  {
+    "url": "https://deb.debian.org/debian/pool/main/g/graphicsmagick/libgraphicsmagick-q16-3t64_1.4+really1.3.45+hg17696-1_amd64.deb",
+    "sha256": "131af2e5834dda7cea3aec428ace948637298e3f41b56b0ba8f2cc688d69b606"
+  },
+  {
+    "url": "https://deb.debian.org/debian/pool/main/s/suitesparse/libcxsparse4_7.10.1+dfsg-1_amd64.deb",
+    "sha256": "fce916ace35e2ab4a08769e01390ecdbb8d55335e20d709d99035f2cb26fa85d"
+  },
+  {
+    "url": "https://deb.debian.org/debian/pool/main/s/suitesparse/libspqr4_7.10.1+dfsg-1_amd64.deb",
+    "sha256": "38aba4010b9a29cd5bcffaa63837e470e531dd1c0d9dd2626c8677f79bc83c27"
+  },
+  {
+    "url": "https://deb.debian.org/debian/pool/main/q/qrupdate/libqrupdate1_1.1.5-1_amd64.deb",
+    "sha256": "f438585d6feb537094f80be8903a203839e4583d25c3de69e0b218ee0dab3f22"
+  }
+]

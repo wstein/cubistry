@@ -1,0 +1,11 @@
+{
+  "public/counter-proof.json": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+  "research/counter/verify.py": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+  "spikes/test-language/octave/counter_probe.m": "5efaaccf981e7f5958e6aabba1c853c529b767ae431bc3ea4f91f28efbc56d11",
+  "spikes/test-language/octave/cross-validation.json": "77aab906a37bc4264a4495cc727d446083a7e50f5ccacb76ebdff01b41a9ab41",
+  "spikes/test-language/octave/cross_validate.py": "3860f846591b8842c853f798b69f3a8de922ababe9e11e5c842f0378c7990c2d",
+  "spikes/test-language/octave/json-semantics.json": "262b5d20c650338d7bb1406cf0c9847e35697dd07a2616673e0bff7c067082e1",
+  "spikes/test-language/octave/results.json": "d344637797505ade65c81f37ef65d8b515252617ca5bc7a676d4f0be832ce420",
+  "spikes/test-language/octave/runtime-packages.json": "e87981235db480533723207a64c379b66d38cf432dc8899e4fa7392747221bc4",
+  "spikes/test-language/octave/states.json": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+}
