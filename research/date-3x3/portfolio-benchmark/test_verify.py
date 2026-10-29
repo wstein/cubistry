@@ -25,6 +25,14 @@ controls = [
     ('dishonest total node ceiling', lambda d: next(p for r in d['cases'] if r['provider']=='portfolio' for p in r['planning'] if (p.get('diagnostics') or {}).get('attempts'))['diagnostics'].update(maximumTotalNodes=300000)),
     ('lost checked first candidate', lambda d: next(p for r in d['cases'] if r['provider']=='portfolio' for p in r['planning'] if (p.get('diagnostics') or {}).get('attempts'))['diagnostics']['attempts'][0].update(moves=-1)),
 ]
+if any((series.get('providerMetadata') or {}).get('policy') == 'default-then-shorter-cap18-v2' for series in document['series']):
+    def duplicate_depth(d):
+        p = next(p for r in d['cases'] if r['provider']=='portfolio' for p in r['planning'] if len((p.get('diagnostics') or {}).get('attempts', [])) == 2 and p['diagnostics']['attempts'][0]['maximumDepth'] <= 18)
+        p['diagnostics']['attempts'][1]['maximumDepth'] = p['diagnostics']['attempts'][0]['maximumDepth']
+    def missing_skip(d):
+        p = next(p for r in d['cases'] if r['provider']=='portfolio' for p in r['planning'] if (p.get('diagnostics') or {}).get('improvementSkippedReason'))
+        del p['diagnostics']['improvementSkippedReason']
+    controls.extend([('duplicate second native depth', duplicate_depth), ('missing explicit native-depth skip reason', missing_skip)])
 rejected = []
 for name, change in controls:
     altered = copy.deepcopy(document)
