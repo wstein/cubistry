@@ -1,0 +1,266 @@
+[
+  {
+    "id": "de-a",
+    "path": [
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "direct",
+    "moves": 18,
+    "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 1960.7648789999998
+  },
+  {
+    "id": "de-a",
+    "path": [
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "center-aware",
+    "moves": 18,
+    "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 19.55786500000022
+  },
+  {
+    "id": "de-a",
+    "path": [
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "direct",
+    "moves": 18,
+    "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 17.514574999999695
+  },
+  {
+    "id": "de-a",
+    "path": [
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "center-aware",
+    "moves": 18,
+    "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 15.864716999999928
+  },
+  {
+    "id": "de-a",
+    "path": [
+      "2026-10-29",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "direct",
+    "moves": 18,
+    "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 16.7294109999998
+  },
+  {
+    "id": "de-a",
+    "path": [
+      "2026-10-29",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "center-aware",
+    "moves": 18,
+    "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 14.504543000000012
+  },
+  {
+    "id": "en-3-zero",
+    "path": [
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "direct",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 6.1651959999999235
+  },
+  {
+    "id": "en-3-zero",
+    "path": [
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "center-aware",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 6.924779999999828
+  },
+  {
+    "id": "en-3-zero",
+    "path": [
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "direct",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 6.34121499999992
+  },
+  {
+    "id": "en-3-zero",
+    "path": [
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "center-aware",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 7.523627999999917
+  },
+  {
+    "id": "en-3-zero",
+    "path": [
+      "2026-10-29",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "direct",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 8.070464999999786
+  },
+  {
+    "id": "en-3-zero",
+    "path": [
+      "2026-10-29",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "center-aware",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 5.529582000000119
+  },
+  {
+    "id": "en-3-unpadded",
+    "path": [
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "direct",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 7.77454200000011
+  },
+  {
+    "id": "en-3-unpadded",
+    "path": [
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "center-aware",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 9.179775000000063
+  },
+  {
+    "id": "en-3-unpadded",
+    "path": [
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "direct",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 6.513519999999971
+  },
+  {
+    "id": "en-3-unpadded",
+    "path": [
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "center-aware",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 6.553210999999919
+  },
+  {
+    "id": "en-3-unpadded",
+    "path": [
+      "2026-10-29",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "direct",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 8.546415999999681
+  },
+  {
+    "id": "en-3-unpadded",
+    "path": [
+      "2026-10-29",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "sourceBackend": "center-aware",
+    "moves": 14,
+    "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+    "method": "center-aware",
+    "attempted": true,
+    "status": "solved",
+    "elapsedMs": 6.369388999999956
+  }
+]

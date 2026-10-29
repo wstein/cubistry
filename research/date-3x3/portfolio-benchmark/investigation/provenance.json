@@ -1,0 +1,21 @@
+{
+  "status": "INVESTIGATION_ONLY",
+  "sourceRevisionPrefix": "f75",
+  "sharedProviderRevision": "ffe513c43f5d622810b9a3c9aff2fac88163d0f0",
+  "suppliedBy": "calendar_center_integration",
+  "description": "Author-supplied raw root-cause and native-depth sweeps. Not the final clean consecutive benchmark or independent proof. Exact long revision and fixture provenance are in consumer tests/fixtures/calendar-portfolio-contexts.json at the final capture revision.",
+  "artifacts": [
+    {
+      "file": "calendar-november-investigation.json",
+      "sha256": "6e9a548d07be64d96d59e595ff2a6d2265334d95797ef8905ed1d177ec55e37f"
+    },
+    {
+      "file": "calendar-november-short.json",
+      "sha256": "b84e753b2079f02c72185a5f6091621130c8af06bd7bf25fd92c74e20a526afe"
+    },
+    {
+      "file": "calendar-november-depth.log",
+      "sha256": "976d4a1a2815b344c99a82a594e57ea991fb5e97516e73a09cd96725374387ee"
+    }
+  ]
+}
