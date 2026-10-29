@@ -3,6 +3,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { resolve } from "node:path";
+import {
+  assertWordRules,
+  MAX_WORD_FONT_SIZE,
+  WORD_BASELINE,
+} from "./helpers/hsm-word-rules.mjs";
 const root = "public/print/";
 const read = (path) => JSON.parse(readFileSync(path));
 const sha = (path) =>
@@ -164,8 +169,8 @@ test("HSM unit words print at full size on their unchanged baseline", () => {
     m = read(dir + "manifest.json"),
     words = read("public/assets/hsm/words/provenance.json");
   assert.deepEqual(read(dir + "WORD-ART-PROVENANCE.json"), words);
-  assert.equal(words.fontSize, 80.64);
-  assert.equal(words.baseline, 232);
+  assert.equal(words.fontSize, MAX_WORD_FONT_SIZE);
+  assert.equal(words.baseline, WORD_BASELINE);
   for (const id of ["H", "M", "S"]) {
     const printed = m.stickers.filter((s) => s.image === id);
     assert.equal(printed.length, m.copies);
@@ -173,6 +178,7 @@ test("HSM unit words print at full size on their unchanged baseline", () => {
       // Safe fitting must not shrink the word art (that would move the baseline).
       assert.equal(s.artScale, 1);
       assert.deepEqual(s.sourceInkBounds, words.stickers[id].inkBounds);
+      assertWordRules(words, id, s.sourceInkBounds);
     }
   }
 });
