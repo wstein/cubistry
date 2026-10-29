@@ -1,7 +1,10 @@
 # Independent Flix proof checkers
 
 This optional checker implements the frozen [issue 74 contract](../SPEC.md).
-Existing Python proof gates, production code and CI remain unchanged. The Flix
+Since the 2026-10-29 [authority change](../AUTHORITY.md)
+this checker and the Julia one are the authoritative verifiers; Python is a third
+voice. The issue 74 delivery left existing Python proof gates, production code and
+CI unchanged. The Flix
 entry point reads original raw UTF-8 files; no Python-generated typed input or
 production/solver move implementation is used.
 

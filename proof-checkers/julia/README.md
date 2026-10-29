@@ -1,8 +1,10 @@
 # Independent Julia checker
 
 This optional checker implements the two bounded groups in [issue 74](https://github.com/wstein/cubistry/issues/74)
-against the shared [specification](../SPEC.md). Existing Python, production and CI
-remain unchanged. It reads raw certificate/state JSON directly; Python is used
+against the shared [specification](../SPEC.md). Since the 2026-10-29
+[authority change](../AUTHORITY.md) it is, together with
+the Flix checker, the authoritative verifier; Python is a third voice. The issue
+74 delivery left existing Python, production and CI unchanged. It reads raw certificate/state JSON directly; Python is used
 only for separate conformance/audit tooling.
 
 Use Julia 1.13.3 and the committed Project/Manifest (JSON 1.13.0, MIT licensed).

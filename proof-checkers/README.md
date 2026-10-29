@@ -6,7 +6,12 @@ on the finalized lifecycle spike. The shared [contract](SPEC.md),
 precede parallel Flix/Julia implementation. Both bounded engines are implemented and independently replayed; see the
 [results and lifecycle comparison](RESULTS.md).
 
-Existing Python, Research evidence, production code and CI are unchanged.
+As of the 2026-10-29 [authority change](AUTHORITY.md), the
+Flix and Julia checkers are the authoritative verification: a proof is confirmed
+only when both accept it, and any disagreement is `UNKNOWN`. Python is a third
+voice for differential testing. At the time of issue 74 the existing Python,
+Research evidence, production code and CI were unchanged, and that delivery
+changed none of them; neither does the authority change.
 Full ports are restricted to the counter-certificate checks and marked 3×3
 replay/reachability groups. No solver, optimality claim, new layout proof or
 Cubacle adaptation is included.
