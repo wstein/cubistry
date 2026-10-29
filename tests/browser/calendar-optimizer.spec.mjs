@@ -10,11 +10,20 @@ async function ready(page) {
 async function pick(page, iso) {
   await page.fill("#calendar-date", iso);
   await page.locator("#calendar-date").dispatchEvent("change");
-  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
-    "aria-busy",
-    "false",
-    { timeout: 15000 },
-  );
+  // update() loads the print asynchronously; an initial aria-busy=false can
+  // precede request(). Wait for the requested endpoint as well as idle.
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async (date) => {
+          const { calendarApp } = await import("/src/calendar.mjs");
+          const c = calendarApp.controller;
+          const [, month, day] = date.split("-").map(Number);
+          return !c.busy && c.current.month === month && c.current.day === day;
+        }, iso),
+      { timeout: 15000 },
+    )
+    .toBe(true);
 }
 for (const design of ["de-a", "en-3"])
   test(`real worker shortens ${design} date changes and retains the selected print`, async ({
@@ -24,6 +33,13 @@ for (const design of ["de-a", "en-3"])
     if (design !== "de-a") await page.selectOption("#calendar-design", design);
     await expect(page.locator("#calendar-design")).toBeEnabled();
     const before = await page.evaluate(async () => {
+      const { CalendarViewer } = await import("/src/apps/calendar/viewer.ts");
+      const animate = CalendarViewer.prototype.animate;
+      window.calendarFirstMoveTimes = [];
+      CalendarViewer.prototype.animate = function (...args) {
+        window.calendarFirstMoveTimes.push(performance.now());
+        return animate.apply(this, args);
+      };
       const { calendarApp } = await import("/src/calendar.mjs");
       return calendarApp.controller.design.printing;
     });
@@ -34,10 +50,12 @@ for (const design of ["de-a", "en-3"])
       "2026-10-29",
       "2026-10-28",
     ]) {
+      const timingStart = await page.evaluate(() => performance.now());
       await pick(page, iso);
       if (records.length === 0)
         await expect(page.locator("#calendar-route")).toHaveText(
           "Optimized physical route",
+          { timeout: 15000 },
         );
       else
         await expect(page.locator("#calendar-route")).toHaveText(
@@ -63,7 +81,15 @@ for (const design of ["de-a", "en-3"])
         ).toBeLessThanOrEqual(22);
       if (design === "de-a")
         expect(state.cells.slice(6)).toEqual(["O", "K", "T"]);
-      records.push({ iso, ...state.progress });
+      const timing = await page.evaluate(
+        (started) => ({
+          firstMoveMs:
+            window.calendarFirstMoveTimes.find((t) => t >= started) - started,
+          settledMs: performance.now() - started,
+        }),
+        timingStart,
+      );
+      records.push({ iso, ...state.progress, timing });
     }
     writeFileSync(
       `test-results/calendar-optimized-${design}.json`,
@@ -134,6 +160,7 @@ test("changing a date during motion finishes one turn then replans from that exa
     window.interruptedMoves = [];
     window.interruptedRequests = [];
     let first = true;
+    window.interruptedPlanningStart = performance.now();
     CalendarController.prototype.request = function (target) {
       window.interruptedRequests.push(target.day);
       return request.call(this, target);
@@ -148,6 +175,8 @@ test("changing a date during motion finishes one turn then replans from that exa
       const day = calendarApp.controller.progress.target.day;
       if (first) {
         first = false;
+        window.interruptedFirstMoveMs =
+          performance.now() - window.interruptedPlanningStart;
         await new Promise((resolve) => {
           window.releaseInterruptedMove = resolve;
         });
@@ -165,7 +194,9 @@ test("changing a date during motion finishes one turn then replans from that exa
   await page.fill("#calendar-date", "2026-10-29");
   await page.locator("#calendar-date").dispatchEvent("change");
   await expect
-    .poll(() => page.evaluate(() => typeof window.releaseInterruptedMove))
+    .poll(() => page.evaluate(() => typeof window.releaseInterruptedMove), {
+      timeout: 15000,
+    })
     .toBe("function");
   for (const iso of ["2026-10-30", "2026-11-01"]) {
     await page.fill("#calendar-date", iso);
@@ -192,6 +223,7 @@ test("changing a date during motion finishes one turn then replans from that exa
         (t, i) => t.valid && (!i || sameState(trace[i - 1].to, t.from)),
       ),
       progress: c.progress,
+      firstMoveMs: window.interruptedFirstMoveMs,
       trace,
     };
   });
