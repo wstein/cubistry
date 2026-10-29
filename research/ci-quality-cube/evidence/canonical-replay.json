@@ -1,0 +1,54 @@
+{
+  "valid": true,
+  "scope": "Existing canonical mechanics replay; independent research review still required.",
+  "pinnedSource": "35db0e1929979f569e4758cd105f4df805a6c6d3",
+  "checkoutHead": "29e402affab30bf5b61e1f93c6375fa84c6c1078",
+  "sourceHashes": {
+    "packages/cube-core/res/PwCore.res": "d3becd3f8f25944a237e07b43dddbea5fb8aa8bb42388c41f8adee20aa16963c",
+    "packages/cube-mechanics/res/PwMechanics.res": "1c31398cccd3d287f8c66f7923a2df58ee32c2f17e3a74ed87403062913ff462",
+    "packages/cube-core/src/index.ts": "d8f980ec8566483f17e707dee8a098df57043a323a39d19e6fa40e644d840d5d",
+    "packages/cube-mechanics/src/index.ts": "be7ee4f1a7274422b83b531a0d791f2e1299492b7c19ad44976cc612f1d2e0e2"
+  },
+  "results": [
+    {
+      "name": "4-state-neutral",
+      "setups": 256,
+      "continuousTransitions": 512,
+      "validWholeCubeRotations": 0,
+      "negativeControls": 3,
+      "witnessSHA256": "f038ad9895b784bd3c418bc3e5c3a786f190f2afe043c9f344f57113e67abec5"
+    },
+    {
+      "name": "4-state-labeled",
+      "setups": 256,
+      "continuousTransitions": 512,
+      "validWholeCubeRotations": 1,
+      "negativeControls": 3,
+      "witnessSHA256": "7c2f63aa34c890643e2f04af41f56c7e2b1d3cf3455a7542368063eb02bc8213"
+    },
+    {
+      "name": "5-state-neutral",
+      "setups": 625,
+      "continuousTransitions": 1250,
+      "validWholeCubeRotations": 0,
+      "negativeControls": 3,
+      "witnessSHA256": "9b97eb80b63929f845527b89145c7632fe477d0be291224585cebfa6d7b17ac8"
+    },
+    {
+      "name": "5-state-labeled",
+      "setups": 625,
+      "continuousTransitions": 1250,
+      "validWholeCubeRotations": 1,
+      "negativeControls": 3,
+      "witnessSHA256": "f713b9ca09b172b41deff573ab2facdd1126733bb529ca566c0d6909762e1ef8"
+    }
+  ],
+  "lowerBoundResults": [
+    {
+      "candidates": 100,
+      "reachableSourceWitnesses": 100,
+      "sixMoveTargetWitnesses": 100,
+      "scope": "Physical witnesses and target-copy obstruction; distance lower bound needs the separate finite certificate check."
+    }
+  ]
+}

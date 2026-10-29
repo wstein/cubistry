@@ -1,0 +1,52 @@
+{
+  "schema": "cubistry.ci-quality-experiment",
+  "version": 1,
+  "status": "UNKNOWN",
+  "independentReview": "pending",
+  "baselineResearch": "7c05d28e97ecf30848220f5c70cb3100a4f3628d",
+  "canonicalSource": "35db0e1929979f569e4758cd105f4df805a6c6d3",
+  "juliaVersion": "1.13.3",
+  "jsonVersion": "1.13.0",
+  "categories": [
+    "Build",
+    "Test",
+    "Analyze",
+    "Review"
+  ],
+  "priorityStates": [
+    "open",
+    "running",
+    "OK",
+    "error",
+    "blocked"
+  ],
+  "priorityDisplays": 625,
+  "baselineDisplays": 256,
+  "moves": "18 outer-face HTM generators; no free global rotations",
+  "goal": "Exact upright front category/state words; immutable sticker IDs",
+  "comparisonDistribution": "Equal directed logical edges, then uniform displayed artwork copy and 12 abstract alternate-body back poses; no claim of empirical or uniform full-completion distribution",
+  "execution": {
+    "juliaThreads": 1,
+    "nice": 10,
+    "generatorExitStatus": 0,
+    "canonicalReplayExitStatus": 0,
+    "lowerBoundsExitStatus": 0
+  },
+  "hashes": {
+    "Project.toml": "8e44eb68d33587f674f530e8118dd0d898e8a52017d28fc5b55ae345cf3717bb",
+    "Manifest.toml": "136ee9a307e16429f3f89ba1505e1b0f9c51502156c32b3647d554590315d965",
+    "model.jl": "988731dbc6514870463bf8726ee1ba31aad33c7645e54dec4f4306af24cdda97",
+    "evaluate.jl": "98d55d14ce7b4828b8e23705bf0c2436fe862479fe096b688f7562bdf12e9e38",
+    "lower-bounds.jl": "982920e235c6c3be94afd516937cc6092b4e97bfcb9e170405bc0bc5a47519ad",
+    "check-canonical.mjs": "2fb60b95876778a79dc7bd154b444b082ef08ff3b64a527a2d4672272069a6b6",
+    "evidence/4-state-labeled-witnesses.json": "7c2f63aa34c890643e2f04af41f56c7e2b1d3cf3455a7542368063eb02bc8213",
+    "evidence/4-state-neutral-witnesses.json": "f038ad9895b784bd3c418bc3e5c3a786f190f2afe043c9f344f57113e67abec5",
+    "evidence/5-state-labeled-witnesses.json": "f713b9ca09b172b41deff573ab2facdd1126733bb529ca566c0d6909762e1ef8",
+    "evidence/5-state-neutral-witnesses.json": "9b97eb80b63929f845527b89145c7632fe477d0be291224585cebfa6d7b17ac8",
+    "evidence/candidates.json": "10808357c05ef51de5cf4d51544578d5b9b37d73bf7bd6e5c074ca5905d1d660",
+    "evidence/canonical-replay.json": "640ca7f9053af300518cb54bd932b082707fb85490b567952491aeed3393dde0",
+    "evidence/distances.u8": "f56224ee1b76e2bdaac4bb8441df5881e6b7c9a51dd6a14e62eff58e78e396d6",
+    "evidence/five-state-family-lower-bounds.json": "b6292da3dc6e4fc8ee3ac83a2846f825948f2260bbc12de60496f5f90a2fa816",
+    "evidence/summary.json": "8e5ce59350af701e99f16b3ba853710e65789b6f28e5d5ca595f059aab2dfd35"
+  }
+}

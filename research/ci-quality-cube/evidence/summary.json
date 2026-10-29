@@ -1,0 +1,182 @@
+{
+  "arbitraryFixedTargetMaximumHTM": 7,
+  "backPoseProfile": [
+    [
+      [
+        5,
+        3,
+        4
+      ],
+      [
+        3,
+        5,
+        3
+      ],
+      [
+        3,
+        5,
+        3
+      ],
+      [
+        5,
+        4,
+        3
+      ]
+    ],
+    [
+      [
+        3,
+        3,
+        5
+      ],
+      [
+        5,
+        3,
+        4
+      ],
+      [
+        5,
+        4,
+        3
+      ],
+      [
+        3,
+        3,
+        5
+      ]
+    ],
+    [
+      [
+        3,
+        3,
+        5
+      ],
+      [
+        5,
+        4,
+        3
+      ],
+      [
+        5,
+        3,
+        4
+      ],
+      [
+        3,
+        3,
+        5
+      ]
+    ],
+    [
+      [
+        5,
+        4,
+        3
+      ],
+      [
+        3,
+        5,
+        3
+      ],
+      [
+        3,
+        5,
+        3
+      ],
+      [
+        5,
+        3,
+        4
+      ]
+    ]
+  ],
+  "bfsBuildSeconds": 0.237644679,
+  "candidateSummaries": [
+    {
+      "displayCount": 256,
+      "name": "4-state-neutral",
+      "policyMaximumHTM": 6,
+      "policyMeanHTM": 4.314814814814815,
+      "sequenceLength": 512,
+      "sequenceMaximumHTM": 7,
+      "sequenceMeanHTM": 5.162109375,
+      "setupMaximumHTM": 7,
+      "setupMeanHTM": 5.1875
+    },
+    {
+      "displayCount": 256,
+      "name": "4-state-labeled",
+      "policyMaximumHTM": 6,
+      "policyMeanHTM": 3.888888888888889,
+      "sequenceLength": 512,
+      "sequenceMaximumHTM": 6,
+      "sequenceMeanHTM": 4.1640625,
+      "setupMaximumHTM": 6,
+      "setupMeanHTM": 4.515625
+    },
+    {
+      "displayCount": 625,
+      "name": "5-state-neutral",
+      "policyMaximumHTM": 6,
+      "policyMeanHTM": 4.166666666666668,
+      "sequenceLength": 1250,
+      "sequenceMaximumHTM": 7,
+      "sequenceMeanHTM": 5.3888,
+      "setupMaximumHTM": 7,
+      "setupMeanHTM": 5.3312
+    },
+    {
+      "displayCount": 625,
+      "name": "5-state-labeled",
+      "policyMaximumHTM": 6,
+      "policyMeanHTM": 4.012820512820513,
+      "sequenceLength": 1250,
+      "sequenceMaximumHTM": 7,
+      "sequenceMeanHTM": 5.0304,
+      "setupMaximumHTM": 7,
+      "setupMeanHTM": 4.9952
+    }
+  ],
+  "distanceHistogram": [
+    1,
+    15,
+    198,
+    2030,
+    15396,
+    61768,
+    53528,
+    3144
+  ],
+  "distanceSHA256": "f56224ee1b76e2bdaac4bb8441df5881e6b7c9a51dd6a14e62eff58e78e396d6",
+  "domainSize": 136080,
+  "evidenceStatus": "UNKNOWN",
+  "frontTwistProfile": [
+    [
+      0,
+      6,
+      6
+    ],
+    [
+      0,
+      6,
+      6
+    ],
+    [
+      0,
+      6,
+      6
+    ],
+    [
+      0,
+      6,
+      6
+    ]
+  ],
+  "goalIndex": 66259,
+  "independentReview": "pending",
+  "juliaVersion": "1.13.3",
+  "schema": "cubistry.ci-quality-research",
+  "scope": "Finite pair construction; preserving other three physical front IDs; no global print optimality claim.",
+  "scriptSeconds": 7.839688885,
+  "version": 1
+}
