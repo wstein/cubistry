@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "reviewedRevision": "bea01b6",
+  "seed": 531,
+  "additionalFullFrameComparisons": 126,
+  "seededNoncanonicalWords": 120,
+  "faceFourfoldIdentityCases": 6,
+  "oracle": "unchanged research/counter/verify.py",
+  "wordCorpusSHA256": "0afae0121eb649a902d31a03fc3ede88960bc25b19635eeadddfb7dc372c54ec"
+}
