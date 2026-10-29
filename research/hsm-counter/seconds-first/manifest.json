@@ -1,0 +1,57 @@
+{
+  "schema": "cubistry.hsm-seconds-first-experiment",
+  "version": 1,
+  "baseResearchCommit": "8a85fd8c93f6d0305174e63767bda366cae7544b",
+  "status": "SAT",
+  "appPrint": {
+    "path": "research/hsm-counter/blank/witness.json",
+    "sha256": "13eea2a1ad88561775158a70633b80e25d06f883e42d44aafb4e6808699be47b",
+    "pinnedBy": "hsm-source.json on main"
+  },
+  "objective": "lexicographic: feasibility (180 displays, universal six, M recurrent edges <= 5 both directions), S +1 recurrent shortest-edge per-lap HTM, S max, M, H",
+  "sPlusOnePerLapHTM": {
+    "baseline": "501/2",
+    "new": 159
+  },
+  "sMinusOnePerLapHTM": {
+    "baselineOwnShortest": 250,
+    "newOwnShortest": 171,
+    "newInverseTraversal": 159
+  },
+  "changedStickersVersusApp": 14,
+  "globalPrintOptimality": "UNKNOWN",
+  "perPrintRecurrentShortestEdgeOptimality": "certified",
+  "seeds": [
+    281028,
+    281029,
+    281030,
+    281031
+  ],
+  "tests": 6,
+  "negativeControls": 17,
+  "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "python": "3.13.18",
+  "files": {
+    "README.md": "24ad7501344e6dcdfd91adaf692b560b09ae9b046eaf2c838369d004a63983b4",
+    "baseline-verification.json": "75a3b9fe08398b550f7db7ab89724117dfdebf53f7464e7d6a2871a08027e1fc",
+    "baseline-witness.json": "2780c128bdba4c135f8edb2e5e30486e80d59a621db8a5e74f1446ae69da1737",
+    "engine.h": "f16d6dbd367f804789eb1302985a9dc75969247f85f97c4a49bf7e5d003ff941",
+    "generate.c": "c3b0b15f5a37ef8a3e0c3444fa2f4de5de6d1b3022e51564c41a105915ef15b3",
+    "inspect.c": "b8c9a8371e221574efcf7c3f4e94d7b90060160cd6bc6d3a6439ecdf8ed64e9c",
+    "logs/generate-baseline.log": "eb4ed024735b4ec30f7620ab375d405e8fe62f6c01e52ee69b7f2dbd8c171102",
+    "logs/generate-witness.log": "8cbf61c6f51ba801dc3e59dc8cdd34eb1c9e7fcfdcec44fef45d55881a9055af",
+    "logs/polish_159.log": "2d5e2b0963164b5d2dfa04c697de26f9206ccd6764f2663343b87433024f4d6e",
+    "logs/search_281028.log": "6e9f6a4b6f82562d47f5203c2c8061d52675ac818dec35a8abed6ddcbf774c98",
+    "logs/search_281029.log": "c22b6ae89468ddb2f97a283e78083fcb09f95593879e355ec767d3a5ae85a3ca",
+    "logs/search_281030.log": "f5511de9322b37771b73a2a64cc1a6b0b59e02385e25ac2d4df9a80e4d071fbe",
+    "logs/search_281031.log": "c6c0af6bc84f3677edea75e053dc20679cfcf467633009afb555297f797cf1ce",
+    "logs/tiebreak_159.log": "2cd1c8f5c4d44c30ed2d820e6ee1ad4a9d25d29740d8fc2eb397a431e70d53e3",
+    "polish.c": "015b1797382b22b032b3272a3db2323002fb9411f0e252e25b3a76626a8e350a",
+    "search.c": "79e5eac129ab128fee5d3371f824eb03ec02529126a0b65322cbbaf2b0f44ea1",
+    "test_verify.py": "fad220515e9b9f10071b05c4ac0ed11aa524b62e5e1a22cca0eb6b7df6e55bf7",
+    "tiebreak.c": "c2a3271c1bdada1ed303a6cea8eee563b1ba5bb6cbd4ce1b499cc0e138a964ff",
+    "verification.json": "ea9e422aefef94855924a90334f8a8d0383a4da5e0b3f93c3424e4885ecbde3c",
+    "verify.py": "c5a2cf5f7fa3f6e953c071f482d37e9081fb24a4d1c0e81689489e27c5fe956e",
+    "witness.json": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3"
+  }
+}
