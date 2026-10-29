@@ -7,6 +7,10 @@ import {
   parseLettering,
   hsmDesignFor,
 } from "../src/apps/hsm/lettering.ts";
+import {
+  assertWordRules,
+  MAX_WORD_FONT_SIZE,
+} from "./helpers/hsm-word-rules.mjs";
 import { validateHsmDesign, hsmTarget } from "../src/apps/hsm/design.ts";
 import {
   initialState,
@@ -21,7 +25,7 @@ test("unit lettering is a fixed vector print with only small bottom words", () =
   );
   assert.equal(hash(readFileSync(p.font.path)), p.font.sha256);
   assert.equal(p.font.license, "SIL-OFL-1.1");
-  assert.equal(p.fontSize, 80.64);
+  assert.equal(p.fontSize, MAX_WORD_FONT_SIZE);
   for (const a of hsmImagesFor("words")) {
     const bytes = readFileSync("public" + a.url),
       svg = bytes.toString();
@@ -29,10 +33,10 @@ test("unit lettering is a fixed vector print with only small bottom words", () =
     assert.match(svg, /viewBox="0 0 256 256"/);
     assert.equal((svg.match(/<path\b/g) || []).length, 1);
     assert.doesNotMatch(svg, /<text|href=|url\(|stroke=/);
-    const b = p.stickers[a.id].inkBounds;
     // Lower third of the canvas, at least 2.5 mm (32 units) from the side edges
-    // (beyond the 1 mm print safe inset) and 1.5 mm from the bottom.
-    assert(b[0] >= 32 && b[1] >= (256 * 2) / 3 && b[2] <= 224 && b[3] <= 236);
+    // (beyond the 1 mm print safe inset) and 1.5 mm from the bottom, checked
+    // against the exporter-recorded bounds with a documented tolerance.
+    assertWordRules(p, a.id);
     assert.equal(
       p.stickers[a.id].text,
       { H: "hour", M: "min", S: "sec" }[a.id],
