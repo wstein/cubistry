@@ -517,15 +517,19 @@ $("application").addEventListener("change", async () => {
     return;
   }
   if (
-    ["live-clock", "calendar", "status-cube"].includes($("application").value)
+    ["live-clock", "calendar", "status-cube", "playground"].includes(
+      $("application").value,
+    )
   ) {
     location.assign(
       new URL(
-        $("application").value === "calendar"
-          ? "calendar.html"
-          : $("application").value === "status-cube"
-            ? "status.html"
-            : "clock.html",
+        $("application").value === "playground"
+          ? "playground.html"
+          : $("application").value === "calendar"
+            ? "calendar.html"
+            : $("application").value === "status-cube"
+              ? "status.html"
+              : "clock.html",
         location.href,
       ),
     );
