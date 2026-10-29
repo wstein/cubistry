@@ -55,13 +55,13 @@ error rather than installing an unverified pose.
 Live mode follows the browser's current local date. A visibility change or return
 from suspension checks today's date directly, without replaying missed days.
 The control display shows the requested date and time zone. Choosing a date
-starts its legal route immediately; the Show date button remains available as
-an explicit alternative. The −1 day and +1 day controls operate on the latest
+starts its legal route immediately; Enter applies the date from the keyboard.
+The Today button returns directly to live local-date tracking. The −1 day and +1 day controls operate on the latest
 selected date, so rapid presses retain the latest civil-date intent while only
 one physical route and one pending request exist. The physical face
 commits after its legal route finishes. Date inspection accepts Gregorian dates
 from 0001-01-01 through 9999-12-31, rejects invalid days, and does not interpret an
-ISO civil date as a local UTC timestamp. Live returns to the current local date.
+ISO civil date as a local UTC timestamp.
 
 The drawing buffer follows the display pixel ratio, while the canvas retains the
 CSS dimensions of its viewport. The camera fits the complete cube turn/orbit

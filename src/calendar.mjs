@@ -36,7 +36,6 @@ function fail(error) {
     "calendar-design",
     "calendar-padding",
     "calendar-date",
-    "calendar-set",
     "calendar-live",
     "calendar-decrement",
     "calendar-increment",
@@ -66,7 +65,6 @@ function controls() {
   $("calendar-design").disabled = !ready || controller?.busy;
   $("calendar-padding").disabled = !ready;
   $("calendar-date").disabled = !ready;
-  $("calendar-set").disabled = !ready;
   $("calendar-live").disabled = !ready;
   $("calendar-live").setAttribute("aria-pressed", String(live));
   $("calendar-decrement").disabled = !ready || date.iso === "0001-01-01";
@@ -228,7 +226,12 @@ function inspectDate() {
   }
 }
 $("calendar-date").addEventListener("change", inspectDate);
-$("calendar-set").addEventListener("click", inspectDate);
+$("calendar-date").addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    inspectDate();
+  }
+});
 function stepDate(direction) {
   if (!ready || failed) return;
   try {
