@@ -79,3 +79,35 @@ language-wide speedup. The separate build and empty-cache setup costs remain in
 [the raw report](evidence/report.json). The compiler download was 37.5 MiB; the
 produced executable fat JAR was about 682 KiB. Existing Python tests were neither
 removed nor modified.
+
+## One-process lifecycle instrumentation
+
+`src/Lifecycle.flix` provides a separate `lifecycleMain` entry point. It emits and
+flushes `CUBISTRY_PHASE` JSON markers for READY, four RESULT records and DONE.
+Every invocation calls the original `geometryChecks()` unchanged, including all
+100 canonical full-frame comparisons, 100 inverse checks and six negative
+controls. All checker data is immutable; each call has its own locally constructed
+source/reached lists, with no mutable validator state shared across calls.
+
+Each invocation additionally replays the 100 words to compute a numeric checksum
+over all reached IDs, cubies, positions, normals, up vectors and image lengths.
+That extra audit is inside every invocation's timer. It is explicitly additional
+work relative to the original startup probe, so lifecycle timings are not compared
+as identical-work measurements with the earlier startup table. The checksum audit
+is not a replacement for the complete frame/image equality assertions.
+
+Compile first, separately, then observe one fresh JVM process:
+
+```sh
+python3 build_lifecycle.py --output /tmp/NEW-flix-build.json
+python3 ../lifecycle_driver.py --output /tmp/NEW-flix-lifecycle --label flix -- java -jar artifact/flix.jar
+```
+
+The common Python observer uses its own monotonic clock for process-start → READY
+and flushed DONE receipt → `Popen.wait()` completion. Child validation durations
+use `System.nanoTime()` only within the JVM; no timestamps from different clocks
+are subtracted. The first validation and three later full validations are all
+retained. JVM/JIT/class caches may affect later calls; no forced collection,
+assertion disabling or forced-zero exit tail is used. Class loading before READY
+is included in observed startup, while any first-use loading inside validation
+remains in that invocation. The build cost is outside all runtime phases.
