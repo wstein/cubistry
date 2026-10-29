@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "manifestSHA256": "fcae7e6ad5cb19518234b8fd60120fa3840c275a83084b475751c290dabd3556",
+  "manifestSHA256": "c0d0fa2fc6d692c7c89e436fe5a2670503d8a8a6c86a2cc0d1397be983832e01",
   "counterCases": [
     "boolean-cubie",
     "boolean-identity",
