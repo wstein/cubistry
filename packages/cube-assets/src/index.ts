@@ -209,7 +209,15 @@ export function deploymentBasePath(basePath: string): string {
 export function assetTransportPath(path: string, basePath = "/"): string {
   return deploymentBasePath(basePath) + safeAssetPath(path).slice(1);
 }
-async function fetchBounded(
+/**
+ * Fetches one pinned asset. The first attempt may be served by the HTTP cache,
+ * which can hold an older file at the same URL (for example during a deploy);
+ * on an integrity mismatch alone it retries once with `cache: "reload"`, which
+ * bypasses the cache. Bytes that still do not match fail closed. Exported for
+ * tests only; not part of the package API.
+ * @internal
+ */
+export async function fetchBounded(
   path: string,
   expected: string,
   kind: "svg" | "png" | "webp" | "woff2",
@@ -217,10 +225,28 @@ async function fetchBounded(
   signal?: AbortSignal,
   basePath = "/",
 ): Promise<Uint8Array> {
+  for (const cache of ["default", "reload"] as const) {
+    const before = budget.bytes;
+    const bytes = await fetchOnce(path, kind, budget, signal, basePath, cache);
+    if ((await sha256(bytes)) === expected) return bytes;
+    budget.bytes = before;
+  }
+  demand(false, "Asset integrity check failed");
+  throw new Error("unreachable");
+}
+async function fetchOnce(
+  path: string,
+  kind: "svg" | "png" | "webp" | "woff2",
+  budget: { bytes: number },
+  signal: AbortSignal | undefined,
+  basePath: string,
+  cache: RequestCache,
+): Promise<Uint8Array> {
   const response = await fetch(assetTransportPath(path, basePath), {
     signal,
     redirect: "error",
     credentials: "same-origin",
+    cache,
   });
   demand(response.ok, "Asset could not be loaded");
   const mime = (response.headers.get("content-type") || "").split(";")[0];
@@ -266,7 +292,6 @@ async function fetchBounded(
     bytes.set(p, at);
     at += p.length;
   }
-  demand((await sha256(bytes)) === expected, "Asset integrity check failed");
   return bytes;
 }
 export async function loadAssets(
