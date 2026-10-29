@@ -7,5 +7,8 @@
   "spikes/test-language/octave/json-semantics.json": "262b5d20c650338d7bb1406cf0c9847e35697dd07a2616673e0bff7c067082e1",
   "spikes/test-language/octave/results.json": "d344637797505ade65c81f37ef65d8b515252617ca5bc7a676d4f0be832ce420",
   "spikes/test-language/octave/runtime-packages.json": "e87981235db480533723207a64c379b66d38cf432dc8899e4fa7392747221bc4",
-  "spikes/test-language/octave/states.json": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+  "spikes/test-language/octave/states.json": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+  "spikes/test-language/octave/startup_benchmark.py": "965b083c3698ca05d1ddef9c989c9334588d4a13d6a35032e94190440745633d",
+  "spikes/test-language/octave/startup-results.json": "44fa65c95450ba95aeaf6d8d2fdb8326b60961c1a7531d9e8fd805820db93dcc",
+  "spikes/test-language/octave/report.md": "d82c9497229861f183ea12e0c697ec05d1ead22ad4a78fdd0c6ac485f1313970"
 }
