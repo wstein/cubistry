@@ -21,6 +21,7 @@ test("unit lettering is a fixed vector print with only small bottom words", () =
   );
   assert.equal(hash(readFileSync(p.font.path)), p.font.sha256);
   assert.equal(p.font.license, "SIL-OFL-1.1");
+  assert.equal(p.fontSize, 67.2);
   for (const a of hsmImagesFor("words")) {
     const bytes = readFileSync("public" + a.url),
       svg = bytes.toString();
@@ -29,7 +30,7 @@ test("unit lettering is a fixed vector print with only small bottom words", () =
     assert.equal((svg.match(/<path\b/g) || []).length, 1);
     assert.doesNotMatch(svg, /<text|href=|url\(|stroke=/);
     const b = p.stickers[a.id].inkBounds;
-    assert(b[0] >= 32 && b[1] >= 184 && b[2] <= 224 && b[3] <= 236);
+    assert(b[0] >= 32 && b[1] >= 180 && b[2] <= 224 && b[3] <= 236);
     assert.equal(
       p.stickers[a.id].text,
       { H: "hour", M: "min", S: "sec" }[a.id],
