@@ -80,8 +80,10 @@ in [Kociemba's picture-cube discussion](https://kociemba.org/twisted.htm): 12 HT
 for a half-turn correction and 14 HTM for either quarter-turn correction. Every
 word restores all noncenter positions and orientations. A quarter correction
 also turns the hidden back center; its orientation is unconstrained by the
-calendar goal and remains part of the actual physical state. The shared solver
-and its exact-reference kernel are unchanged. Metadata records the repair table
+calendar goal and remains part of the actual physical state. The pinned [independent repair verification](https://github.com/wstein/cubistry/blob/9e736592563885322451b99fb118c79889c25855/research/date-3x3/center-bound-investigation/verification.json)
+and its hash are recorded in `transition/provenance.json`, alongside the original
+research hashes and the updated local table hash. The shared solver and its
+exact-reference kernel are unchanged. Metadata records the repair table
 version separately from the search policy and provider pin.
 
 On the exact captured German A 20→19 April 2024 source, replacing the old 20-turn
