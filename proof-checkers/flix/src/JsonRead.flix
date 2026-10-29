@@ -143,7 +143,7 @@ def parseArray(p: JsonParser, depth: Int32, xs: List[J]): J \ IO = {
 
 def parseJson(raw: String): J \ IO = {
     require(Vector.length(String.toBytes(raw))<=16777216,"INVALID_JSON: input exceeds 16 MiB");
-    let limits = StreamReadConstraints.builder().maxNestingDepth(64).maxNumberLength(128).build();
+    let limits = StreamReadConstraints.builder().maxNestingDepth(64).maxNumberLength(128).maxNameLength(16777216).maxStringLength(16777216).build();
     let factory = new JsonFactory();
     let _ = factory.setStreamReadConstraints(limits);
     let parser = factory.createParser(raw);
