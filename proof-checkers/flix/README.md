@@ -73,6 +73,7 @@ java -Xmx768m -jar proof-checkers/flix/artifact/flix.jar conformance . /tmp/NEW-
 python3 proof-checkers/tools/audit_exports.py /tmp/NEW-flix-states.jsonl --research-root /path/to/pinned-research-checkout
 python3 spikes/test-language/lifecycle_driver.py --output /tmp/NEW-flix-lifecycle --label flix-complete -- java -Xmx768m -jar proof-checkers/flix/artifact/flix.jar lifecycle .
 python3 proof-checkers/flix/tests/parser_limits.py
+python3 proof-checkers/flix/tests/counter_order.py
 ```
 
 Run these commands from the repository root. The separate Research checkout is
@@ -81,6 +82,11 @@ imports it. The original 195-case CLI regression also checks unknown-command,
 I/O-error and direct-chain-integrity exit behavior. Eleven additional raw boundary
 controls cover depth 64/65, positive/negative/decimal numeric tokens of 128/129
 bytes, scalar Unicode and a valid 60,000-character informational member name.
+
+Three additional counter-order controls require matching input ID order between
+`printing` and `unpaddedPrinting`: permuting only one rejects, permuting both
+identically accepts, and integer ID tokens `-0` and `0` compare equally. This
+check runs before canonical ID sorting.
 
 All 195 fixtures pass their declared outcomes: 41 counter cases (2 valid, 39
 rejected) and 154 marked cases (129 valid, 25 rejected). Every valid geometry row
@@ -108,9 +114,9 @@ rejections and all mathematical replay/inverse/hash checks. No AST or accepted/
 rejected verdict is reused. Only output volume is suppressed during repeats.
 
 The final [lifecycle capture](evidence/lifecycle/report.json) measured startup
-69.33 ms, preflight 113.13 ms, first complete validation 3,566.31 ms, three complete
-warm validations 2,706.98 / 2,587.12 / 2,500.94 ms, and observed DONE-to-exit
-17.43 ms. Upfront build was separately 12,969.65 ms. Java/JIT/OS caches naturally
+77.51 ms, preflight 105.87 ms, first complete validation 3,472.54 ms, three complete
+warm validations 2,806.31 / 2,918.35 / 2,478.50 ms, and observed DONE-to-exit
+17.59 ms. Upfront build was separately 12,753.39 ms. Java/JIT/OS caches naturally
 warm; no forced collection or disabled assertions are used. Parent observations
 use one monotonic clock and child validation durations use another only locally;
 no cross-process timestamps are subtracted. Exit is natural and its measured tail

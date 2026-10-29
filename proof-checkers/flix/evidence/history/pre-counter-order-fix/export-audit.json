@@ -1,0 +1,15 @@
+{
+  "status": "PASS_INDEPENDENT_FULL_FRAMES",
+  "records": 2413,
+  "fullStickerFrames": 124302,
+  "groups": {
+    "counter": 200,
+    "geometry": 129,
+    "generators": 36,
+    "kernel": 2048
+  },
+  "exportSHA256": "e4aad044ed3058689356521d9cf243ac28284c919357722236b241274e941f03",
+  "manifestSHA256": "c0d0fa2fc6d692c7c89e436fe5a2670503d8a8a6c86a2cc0d1397be983832e01",
+  "counterOracleSHA256": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+  "researchOracleSHA256": "c8ff97acdad91cc47fef09e1f4352b4f414613908ecef67e03f0148a3d3e5e7d"
+}

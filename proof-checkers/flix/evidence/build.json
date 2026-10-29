@@ -5,14 +5,14 @@
     "--threads",
     "2"
   ],
-  "buildElapsedMs": 12969.648125,
+  "buildElapsedMs": 12753.386989,
   "parser": "com.fasterxml.jackson.core:jackson-core:2.22.4",
   "parserSHA256": "2d30c375cddea9657a1e1ef97547a2694b663b355facb4de53a097782b312d1a",
-  "artifactSHA256": "db93cf586d2e43bb813ba2356f32133d535b2ef9ec22227480c06d509d788d59",
-  "artifactBytes": 1219259,
+  "artifactSHA256": "9602959e2fc33b431f595018484faf65ae33d0bcf0309cb2f371c103d0603442",
+  "artifactBytes": 1223448,
   "sourceSHA256": {
     "src/Conformance.flix": "89f69390edb1846559a33f90ad41234262349e9eb27bbc665cc224b5906b6336",
-    "src/Counter.flix": "0592e86d2df6eb4fbc677117e7ce10cbe8a284a09e27cc671aa0327ef5329b68",
+    "src/Counter.flix": "7406ecb3aee977fbfdffedab2fbfb7b098e359d797ec718143b009b023f3ae81",
     "src/Geometry.flix": "3d68686ec1285425e522cf7b959b99830fa82554814403e3a81468fca0824f59",
     "src/JsonRead.flix": "e087082a4cdf6881c7bce2500b8668dce4295415dbdd1ca08880e5f59c0a356d",
     "src/Lifecycle.flix": "41208965e193797400bb20d2902d48333c6ac9b8617f83db6fb688e70beeaa01",
