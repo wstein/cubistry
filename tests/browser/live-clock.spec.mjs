@@ -2,8 +2,11 @@ import { test, expect } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 test.use({ timezoneId: "Europe/Berlin" });
 async function ready(page, time) {
-  await page.clock.install({ time: new Date(time) });
-  await page.clock.pauseAt(new Date(time));
+  // Install the fake clock slightly in the past: pauseAt() rejects a target
+  // that real time has already overtaken, which happens under CPU load.
+  const target = new Date(time);
+  await page.clock.install({ time: new Date(target.getTime() - 10_000) });
+  await page.clock.pauseAt(target);
   await page.goto("/clock.html");
   await expect(page.locator("#seconds-speed")).toBeEnabled();
 }
