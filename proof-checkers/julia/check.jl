@@ -1,6 +1,7 @@
 include("Checker.jl")
 using .IndependentProof
 using JSON
+exitcode(result)=result["valid"] ? 0 : result["status"]=="UNSUPPORTED" ? 2 : result["status"]=="ERROR" ? 3 : 1
 function main(args)
     root=normpath(joinpath(@__DIR__,"../.."))
     try
@@ -12,9 +13,9 @@ function main(args)
         else
             throw(IndependentProof.Invalid("UNSUPPORTED","unknown command"))
         end
-        println(JSON.json(result));return result["valid"] ? 0 : result["status"]=="UNSUPPORTED" ? 2 : result["status"]=="ERROR" ? 3 : 1
+        println(JSON.json(result));return exitcode(result)
     catch e
-        println(JSON.json(IndependentProof.invalid_result(e)));return 1
+        result=IndependentProof.invalid_result(e);println(JSON.json(result));return exitcode(result)
     end
 end
 exit(main(ARGS))
