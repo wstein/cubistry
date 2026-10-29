@@ -104,7 +104,12 @@ def main():
    states=[sorted(C.apply(s,w['word'])) for w in d['witnesses']]
    row['canonicalStateSHA256']=sha(json.dumps(states,separators=(',',':')).encode())
  counter('valid-source',expected=True)
- counter('valid-reordered-arrays',lambda d:(d['printing'].reverse(),d['unpaddedPrinting'].reverse()),True)
+ def reorder_and_space(d):
+  d['printing'].reverse();d['unpaddedPrinting'].reverse()
+  separators=[chr(v) for v in list(range(9,14))+list(range(28,33))+[0x85,0xa0,0x1680]+list(range(0x2000,0x200b))+[0x2028,0x2029,0x202f,0x205f,0x3000]]
+  for i,w in enumerate(d['witnesses']):
+   sep=separators[i%len(separators)];w['word']=sep+sep.join(w['word'].split())+sep
+ counter('valid-reordered-arrays',reorder_and_space,True)
  counter('unknown-schema',lambda d:d.update(schema=999))
  counter('wrong-puzzle',lambda d:d.update(puzzle='5x5x5'))
  counter('missing-witnesses',lambda d:d.pop('witnesses'))

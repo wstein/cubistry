@@ -321,7 +321,7 @@
       "group": "counter",
       "name": "valid-reordered-arrays",
       "path": "proof-checkers/conformance/counter/valid-reordered-arrays.json",
-      "sha256": "c943060231a2f4cc9236e7a659bd5b65669e4ecf1a4fdd5ceec3e8763df56e1d",
+      "sha256": "2e3aea33e383a30388cd7ed512abfec73dc5904b00f1c4829596bb7e0439f58d",
       "expectedValid": true,
       "policy": "incumbent-parity",
       "incumbentValid": true,
