@@ -90,22 +90,30 @@ test("English 3 keeps the day adjacent and removes the zero with legal moves", a
     const { calendarApp } = await import("/src/calendar.mjs");
     return calendarApp.controller.design.printing;
   });
+  // Hold the first unpadded runtime fetch so the test observes the load window.
+  let releaseTarget;
+  const targetReleased = new Promise((resolve) => (releaseTarget = resolve));
+  let markRequested;
+  const targetRequested = new Promise((resolve) => (markRequested = resolve));
+  await page.route("**/calendar/en-3-unpadded.json", async (route) => {
+    markRequested();
+    await targetReleased;
+    await route.continue();
+  });
   await page.uncheck("#calendar-padding");
+  await targetRequested;
+  // While the target is still loading, the previous physical pose stays idle.
+  expect((await physical(page)).cells[7]).toBe("0");
+  releaseTarget();
   await expect(page.locator("#calendar-viewer")).toHaveAttribute(
     "aria-busy",
     "false",
   );
-  expect((await physical(page)).cells).toEqual([
-    "SAT",
-    "",
-    "",
-    "J",
-    "A",
-    "N",
-    "",
-    "",
-    "3",
-  ]);
+  // An idle viewer can precede the controller request for the loaded target,
+  // so wait for the unpadded physical endpoint itself.
+  await expect
+    .poll(async () => (await physical(page)).cells)
+    .toEqual(["SAT", "", "", "J", "A", "N", "", "", "3"]);
   expect(
     await page.evaluate(async () => {
       const { calendarApp } = await import("/src/calendar.mjs");
