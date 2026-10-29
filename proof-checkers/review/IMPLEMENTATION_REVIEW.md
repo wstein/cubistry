@@ -44,7 +44,7 @@ and finite fractional/exponent numbers in ignored metadata.
 
 A substantive initial conformance gap was fixed before candidate freeze: state
 validity and expected input hashes did not replay ordinary geometry fixture words,
-leaving XYZ actions unexercised. `b4fa161` adds actual full-state word replay and
+leaving XYZ actions unexercised. `b4fa161e87c29772c3fb64f64bca71b781aefaff` adds actual full-state word replay and
 inverse restoration, now independently verified. A minor CLI exit-code consistency
 suggestion was sent to the author: the outer catch currently returns code 1 for an
 UNSUPPORTED command, although schema-path failures can return code 2. Both fail
