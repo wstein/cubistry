@@ -1,6 +1,6 @@
 {
   "schema": "cubistry.julia-proof-evidence.v1",
-  "sourceRevision": "9abe7e0",
+  "sourceRevision": "9abe7e04972af1aebe92a2e40dd746b0e25fe8c3",
   "manifestSHA256": "c0d0fa2fc6d692c7c89e436fe5a2670503d8a8a6c86a2cc0d1397be983832e01",
   "sourceSHA256": {
     "Checker.jl": "4cbd782b2bac4dc8392bbad7d8487a1f98cc76bde97a8a4090cd439a0db52ddb",
