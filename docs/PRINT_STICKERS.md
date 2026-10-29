@@ -57,8 +57,13 @@ how accurately a particular printer or cutter will manufacture it.
 
 ## Custom sizes and reproducibility
 
-Python export tools are development-only; existing application builds and CI do
-not install or require them. Install the pinned dependencies into a virtual
+Python export tools are development-only; application builds do not install or
+require them. The Counter checks workflow installs the pinned requirements in a
+virtual environment and runs `npm run test:print-exports`, which verifies the
+committed presets (catalog hashes, then `verify_exports.py` on each preset) and
+runs the negative controls. It never regenerates bytes, so it does not depend on
+the zlib build described below. It is opt-in locally because `npm run check`
+stays free of pip packages. Install the pinned dependencies into a virtual
 environment, with Node 24+ available:
 
 ```sh

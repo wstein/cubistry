@@ -8,6 +8,7 @@
     "build": "npm run build:core && vite build && node scripts/copy-solver-notices.mjs",
     "test": "npm run build:core && node --test tests/*.test.mjs",
     "proof": "node research/counter/generate.mjs && python3 research/counter/verify.py",
+    "test:print-exports": "python3 scripts/print/check_committed_exports.py && python3 scripts/print/negative_controls.py",
     "test:proof": "python3 -m unittest discover -s tests -p \"*_test.py\"",
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm test && npm run test:proof && python3 research/counter/verify.py && python3 research/architecture/verify_design.py && python3 research/certified-counter/verify.py && npm run build && npm run test:timer-proof && npm run test:five-second-proof",
