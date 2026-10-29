@@ -24,7 +24,8 @@ over. The corrected print has one corner with three unprinted faces, two tens
 corners, four units corners, and one H/S/M corner. Every target now includes all
 four visible stickers; no screen mask or image override hides an extra digit.
 
-The general guarantee is **at most six HTM** from any legal physical pose.
+The general guarantee is **at most six HTM** from a settled legal pose whose
+blank and upright unit are already in their required front slots.
 The independent four-corner graph covers 136,080 states with all three blank
 orientations allowed. A real blank/H/00 to blank/H/34 example requires exactly
 six moves. The user explicitly accepted this corrected general bound.
@@ -35,7 +36,10 @@ stronger statement depends on the recorded starting pose and policy. It does
 not automatically cover Run after arbitrary Set, Reset to a different 00 pose,
 or range/direction changes. The runtime retains physical continuity and uses
 the honest six-move general ceiling for those states rather than teleporting
-to a canonical pose.
+to a canonical pose. If a changed target interrupts a route after one turn,
+the blank or unit may no longer be in those slots. That intermediate source uses
+the same exact graph through `planFromPose`, without extending the settled
+six-move assertion. See [target interruption](TARGET_INTERRUPTION.md).
 
 The runtime reconstructs the four-corner graph from shared physical move
 primitives and plans shortest routes from the authoritative full state. Among

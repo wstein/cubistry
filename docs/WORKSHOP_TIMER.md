@@ -89,7 +89,9 @@ Preparation time is included by resampling the same monotonic clock after
 preparation. A prepared word is reused only if its complete source still matches,
 including hidden poses. The 50 ms polling callback reconciles clocks and delayed
 work; it does not add clock drift. Playback retains one active legal target and
-one replaceable latest target. An active legal sequence always finishes. Faster
+one replaceable latest target. An unchanged target finishes its legal sequence;
+a changed target replaces it after the current committed turn and replans from
+the actual full pose. See [target interruption](TARGET_INTERRUPTION.md). Faster
 virtual ticks can skip intermediate *displays*, never moves or verification.
 
 **Moving** includes a normal future target and its intentional final-turn hold.
