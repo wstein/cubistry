@@ -4,6 +4,11 @@ This focused change depends directly on PR #20 at `507fb46`, not PR #22. It
 counts the existing physical counter paths; it changes neither solver, fixed
 printing, mechanics nor timer implementation.
 
+The original Phase A queue policy below is historical. The current
+[target interruption contract](TARGET_INTERRUPTION.md) supersedes finishing an
+obsolete full plan when a new target is selected; explicit Stop still finishes
+its active value.
+
 ## Metric and state contract
 
 The display shows **completed / planned moves**. The metric is HTM: `R`, `R2`
