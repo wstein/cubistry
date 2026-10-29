@@ -14,6 +14,7 @@ import {
   localValues,
   clockText,
 } from "./apps/clock/scheduler.ts";
+import { ClockMoveStatistics } from "./apps/clock/statistics.ts";
 import pin from "../hsm-source.json";
 import {
   hsmImagesFor,
@@ -40,7 +41,29 @@ $("clock-lettering").addEventListener("change", () => {
   location.assign(url);
 });
 const scheduler = new LiveClockScheduler(),
-  units = [];
+  units = [],
+  // Session statistics live as long as this page's controllers: reloading or
+  // changing the print restarts them; re-rendering and presentation do not.
+  statistics = new ClockMoveStatistics(names.length);
+let shownStatistics = -1;
+function statisticsUi() {
+  const snapshot = statistics.snapshot();
+  if (snapshot.revision === shownStatistics) return;
+  shownStatistics = snapshot.revision;
+  const show = (id, value) => {
+    const node = $(id),
+      text = value === null ? "—" : String(value);
+    if (node.textContent !== text) node.textContent = text;
+    node.dataset.value = value === null ? "" : String(value);
+  };
+  [...snapshot.units, snapshot.total].forEach((unit, i) => {
+    const name = names[i] ?? "total";
+    show(name + "-session-moves", unit.session.htm);
+    show(name + "-session-rotations", unit.session.rotations);
+    show(name + "-last-moves", unit.last);
+    show(name + "-max-moves", unit.max);
+  });
+}
 let stage = null;
 let ready = false,
   failed = false;
@@ -50,6 +73,9 @@ function draw() {
     const epoch = Date.now(),
       mono = performance.now(),
       snapshot = scheduler.tick(epoch, mono, units);
+    // Changes completed since the previous poll form one displayed tick.
+    statistics.closeTick();
+    statisticsUi();
     $("clock-digital").textContent = clockText(snapshot.values);
     $("clock-status").textContent = snapshot.motion.includes("synchronizing")
       ? "Synchronizing to current time"
@@ -72,12 +98,17 @@ function fail(e) {
   $("clock-error").textContent = e?.message ?? "Clock initialization failed";
   $("clock-status").textContent = "Clock stopped. Reload to recover.";
 }
+$("reset-clock-moves").addEventListener("click", () => {
+  statistics.reset();
+  statisticsUi();
+});
 $("clock-application").addEventListener("change", () =>
   location.assign(new URL($("clock-application").value, location.href)),
 );
 const presentation = installPresentation({
   app: "clock",
-  hide: ["main > header", ".clock-heading", ".clock-cubes", ".clock-control > h2", ".clock-control > label", ".clock-control > select", "main > p.small"],
+  // Statistics follow the per-cube status lines and the calendar's move counts.
+  hide: ["main > header", ".clock-heading", ".clock-cubes", ".clock-stats", ".clock-stats-reset", ".clock-control > h2", ".clock-control > label", ".clock-control > select", "main > p.small"],
   resetView: () => stage?.resetCamera(),
 });
 async function initialize() {
@@ -128,7 +159,8 @@ async function initialize() {
         design,
         manifest,
         letters[i],
-        (value, busy, error) => {
+        (value, busy, error, progress) => {
+          if (progress) statistics.observe(i, progress);
           host.dataset.value = String(value);
           host.setAttribute("aria-busy", String(busy));
           if (error) fail(error);
@@ -152,6 +184,7 @@ async function initialize() {
     }
     ready = true;
     presentation.setReady(true);
+    $("reset-clock-moves").disabled = false;
     $("clock-lettering").disabled = false;
     draw();
     setInterval(draw, 25);
@@ -165,6 +198,10 @@ async function initialize() {
   }
 }
 void initialize();
-export { units as clockUnits, stage as clockStage };
+export {
+  units as clockUnits,
+  stage as clockStage,
+  statistics as clockStatistics,
+};
 
 installPrintLink(() => $("clock-lettering").value === "words" ? "hsm-words" : "hsm-symbols");

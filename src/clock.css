@@ -110,3 +110,52 @@
   width: 100%;
   margin-top: 8px;
 }
+
+/* Session move statistics: the counter's compact tabular-number summary style. */
+.clock-stats {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #c8d0c5;
+}
+.clock-move-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: #4f6254;
+  font-variant-numeric: tabular-nums;
+}
+.clock-move-table caption {
+  text-align: left;
+  font-weight: 600;
+  color: #315d4e;
+  padding-bottom: 6px;
+}
+.clock-move-table th,
+.clock-move-table td {
+  padding: 3px 4px;
+  text-align: right;
+  font-weight: normal;
+}
+.clock-move-table :is(thead th, tbody th, tfoot th):first-child {
+  text-align: left;
+}
+.clock-move-table thead th {
+  vertical-align: bottom;
+}
+.clock-move-table tfoot :is(th, td) {
+  border-top: 1px solid #c8d0c5;
+  font-weight: 600;
+}
+.clock-stats-reset {
+  display: block;
+  margin: 8px 0 0 auto;
+}
+@media (max-width: 500px) {
+  .clock-move-table {
+    font-size: 11px;
+  }
+  .clock-move-table th,
+  .clock-move-table td {
+    padding: 3px 2px;
+  }
+}
