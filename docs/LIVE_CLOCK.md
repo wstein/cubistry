@@ -30,6 +30,10 @@ of browser latency. Long or deliberately slow routes shorten the angular period
 uniformly to fit the next live boundary. Standalone counters and timers retain
 their existing speed semantics.
 
+Use **Present** for the [presentation layout](PRESENTATION_MODE.md), with native
+fullscreen when supported. **Reference view** restores the camera without
+changing the displayed value, print, date or active motion.
+
 ## Predictive playback
 
 The scheduler prepares shortest HTM routes only from committed, idle full poses.

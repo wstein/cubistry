@@ -20,6 +20,10 @@ fixed-layout fully red/bold requirement has a separate conditional impossibility
 proof under Research `055b38f`. A different German treatment requires an explicit
 layout or styling decision; a partial red S is not silently substituted.
 
+Use **Present** for the [presentation layout](PRESENTATION_MODE.md), with native
+fullscreen when supported. **Reference view** restores the camera without
+changing the displayed value, print, date or active motion.
+
 ## Provenance and physical playback
 
 [calendar-source.json](../calendar-source.json) pins the protected Research commit,
