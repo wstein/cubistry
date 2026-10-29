@@ -148,7 +148,15 @@ test("a blocked worker visibly uses the verified baseline rather than claiming o
 test("changing a date during motion finishes one turn then replans from that exact physical pose", async ({
   page,
 }) => {
+  let documentNavigations = 0;
+  page.on("framenavigated", (frame) => {
+    if (frame === page.mainFrame()) documentNavigations++;
+  });
   await ready(page);
+  const documentToken = await page.evaluate(() => {
+    window.calendarDocumentToken = crypto.randomUUID();
+    return window.calendarDocumentToken;
+  });
   await page.evaluate(async () => {
     const { CalendarViewer } = await import("/src/apps/calendar/viewer.ts");
     const { CalendarController } = await import(
@@ -227,6 +235,10 @@ test("changing a date during motion finishes one turn then replans from that exa
       trace,
     };
   });
+  expect(documentNavigations).toBe(1);
+  expect(await page.evaluate(() => window.calendarDocumentToken)).toBe(
+    documentToken,
+  );
   expect(result.valid).toBe(true);
   expect(result.day).toBe(1);
   expect(result.month).toBe(11);
