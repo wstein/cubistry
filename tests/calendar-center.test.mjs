@@ -74,7 +74,11 @@ test("actual printed goal avoids the posthoc center repair and improves the reco
     a = findTarget(design, civilDate("2026-10-28")),
     b = findTarget(design, civilDate("2026-10-29"));
   const ctx = context(design, b, a.word),
-    result = tryCenterAware(ctx, "D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'", { threshold: 0 });
+    result = tryCenterAware(
+      ctx,
+      "D2 F2 L2 D F2 D R2 U2 B2 U' B2 U2 B' U' B' U R' U R'",
+      { threshold: 0 },
+    );
   assert.equal(result.method, "center-aware");
   assert.equal(tokens(result.word).length, 18);
   const references = referencesForPlan(ctx, result.word);
@@ -206,14 +210,26 @@ test("superseding a target terminates obsolete planning and starts a fresh worke
   const workers = [];
   const optimizer = new CalendarOptimizer(() => {
     const worker = {
-      onmessage: null, onerror: null, onmessageerror: null,
-      postMessage(message) { this.message = message; },
-      terminate() { this.dead = true; },
+      onmessage: null,
+      onerror: null,
+      onmessageerror: null,
+      postMessage(message) {
+        this.message = message;
+      },
+      terminate() {
+        this.dead = true;
+      },
     };
     workers.push(worker);
     return worker;
   }, 8000);
-  const context = { design: {}, from: [], target: {}, sourceWord: "", fallbackWord: "R" };
+  const context = {
+    design: {},
+    from: [],
+    target: {},
+    sourceWord: "",
+    fallbackWord: "R",
+  };
   const obsolete = optimizer.plan(context);
   const rejection = assert.rejects(obsolete, /superseded/);
   optimizer.plan.cancelPlanning();
@@ -221,17 +237,46 @@ test("superseding a target terminates obsolete planning and starts a fresh worke
   assert.equal(workers[0].dead, true);
   const fresh = optimizer.plan(context);
   assert.equal(workers.length, 2);
-  workers[0].onmessage({data: {id: workers[0].message.id, word: "U"}});
-  workers[1].onmessage({data: {id: workers[1].message.id, word: "R"}});
+  workers[0].onmessage({ data: { id: workers[0].message.id, word: "U" } });
+  workers[1].onmessage({ data: { id: workers[1].message.id, word: "R" } });
   assert.equal(await fresh, "R");
   optimizer.dispose();
 });
 
 test("bounded search and a route that cannot be shortened retain the checked direct word", () => {
-  const design = load("de-a"), target = findTarget(design, civilDate("2026-10-29"));
+  const design = load("de-a"),
+    target = findTarget(design, civilDate("2026-10-29"));
   const ctx = context(design, target, target.word + " R");
-  const result = tryCenterAware(ctx, "R'", {threshold: 0, maximumNodes: 1});
+  const result = tryCenterAware(ctx, "R'", { threshold: 0, maximumNodes: 1 });
   assert.equal(result.word, "R'");
   assert.equal(result.method, "direct");
   assert(matches(apply(ctx.from, result.word), target.cells));
+});
+
+test("a cancelled date revisited before settling gets a fresh optimized plan", async () => {
+  const design = load("de-a"),
+    initial = findTarget(design, civilDate("2026-10-28")),
+    a = findTarget(design, civilDate("2026-10-29")),
+    b = findTarget(design, civilDate("2026-10-30"));
+  let calls = 0,
+    reject;
+  const planner = () => {
+    if (++calls === 1) return new Promise((_, r) => (reject = r));
+    return "U R2 U2 B U' B' R' U2 R U' R2 F2 U' R2 U' R2 U F2";
+  };
+  planner.cancelPlanning = () => reject?.(Error("superseded"));
+  const c = new CalendarController(
+    design,
+    initial,
+    { configure() {}, async animate() {} },
+    (_t, _b, e) => assert.ifError(e),
+    planner,
+  );
+  c.request(a);
+  c.request(b);
+  c.request(a);
+  await settled(c);
+  assert.equal(calls, 2);
+  assert.equal(c.progress.route, "optimized");
+  assert.equal(c.progress.total.htm, 18);
 });
