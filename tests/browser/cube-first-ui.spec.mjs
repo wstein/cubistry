@@ -256,7 +256,7 @@ test("one stable Run/Stop button supports keyboard operation and returns to Run 
   await target(page, 9);
   const button = page.locator("#run"),
     set = page.locator("#set");
-  await expect(page.locator(".target-actions button")).toHaveCount(2);
+  await expect(page.locator("#counter-controls .target-actions button")).toHaveCount(2);
   await expect(page.locator("#stop-turns")).toHaveCount(0);
   const before = await button.boundingBox(),
     setBefore = await set.boundingBox();
@@ -302,14 +302,14 @@ for (const width of [1440, 768, 390, 320])
       page.getByRole("button", { name: "Reset session moves" }),
     ).toBeVisible();
     await expect(page.locator("details,#application-status")).toHaveCount(0);
-    await expect(page.locator(".controls #status")).toHaveCount(0);
+    await expect(page.locator("#counter-controls #status")).toHaveCount(0);
     await expect(page.locator(".counter-stats")).not.toContainText(
       /certified|permanent print/i,
     );
     const rect = async (selector) => page.locator(selector).boundingBox();
     const h = await header.boundingBox(),
       c = await rect(".cube-card"),
-      a = await rect(".controls"),
+      a = await rect("#counter-controls"),
       canvas = await rect("#cube"),
       stats = await rect(".counter-stats"),
       speed = await rect(".speed-control"),
