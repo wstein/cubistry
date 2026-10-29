@@ -1,0 +1,105 @@
+{
+  "schema": "cubistry.proof-coverage.v1",
+  "issue": 74,
+  "contract": "proof-checkers/SPEC.md",
+  "status": {
+    "Flix": "NOT_IMPLEMENTED",
+    "Julia": "NOT_IMPLEMENTED"
+  },
+  "counter": {
+    "cases": 41,
+    "validCases": 2,
+    "rejectedCases": 39,
+    "requiredChecks": [
+      "strict-raw-json-and-required-types",
+      "complete-24-id-lattice",
+      "eight-whole-cubies",
+      "rigid-outward-axis-frames",
+      "100-padded-displays",
+      "100-full-inverses",
+      "100-unpadded-displays",
+      "800-chained-transitions-per-format",
+      "10000-hub-factorization-argument",
+      "fixed-upper-body-counting-premises",
+      "rotated-title-physical-tamper",
+      "all-pinned-corruptions-enforced"
+    ],
+    "incumbentTestMapping": {
+      "test_nonaxis_normal": "fractional-normal",
+      "test_nonaxis_print_up": "nonaxis-up",
+      "test_two_cubies_share_position": "duplicate-body-position",
+      "test_missing_facelet_identity": "duplicate-identity",
+      "test_silent_unpadded_repaint": "repainted-unpadded",
+      "test_unknown_version": "unknown-schema",
+      "test_wrong_puzzle_tag": "wrong-puzzle"
+    },
+    "deliberatelyStricter": [
+      {
+        "name": "boolean-unpadded-coordinate",
+        "newExpectedValid": false,
+        "incumbentValid": true,
+        "policy": "strict-unpadded-types"
+      },
+      {
+        "name": "duplicate-object-key",
+        "newExpectedValid": false,
+        "incumbentValid": true,
+        "policy": "strict-duplicate-keys"
+      },
+      {
+        "name": "exponent-schema",
+        "newExpectedValid": false,
+        "incumbentValid": true,
+        "policy": "strict-integer-tokens"
+      },
+      {
+        "name": "float-schema",
+        "newExpectedValid": false,
+        "incumbentValid": true,
+        "policy": "strict-integer-tokens"
+      },
+      {
+        "name": "rounded-fraction-value",
+        "newExpectedValid": false,
+        "incumbentValid": true,
+        "policy": "strict-integer-tokens"
+      },
+      {
+        "name": "underflow-fraction-value",
+        "newExpectedValid": false,
+        "incumbentValid": true,
+        "policy": "strict-integer-tokens"
+      }
+    ]
+  },
+  "marked3x3": {
+    "cases": 147,
+    "validCases": 123,
+    "rejectedCases": 24,
+    "requiredChecks": [
+      "54-immutable-id-body-frame-image-records",
+      "26-rigid-bodies-and-unique-occupancy",
+      "18-outer-moves-and-nine-xyz-tokens",
+      "inverse-and-fourfold-identities",
+      "24-rigid-frames-and-24-rotated-sources",
+      "seeded-multiface-words",
+      "corner-twist-sum",
+      "edge-flip-sum",
+      "corner-edge-permutation-parity",
+      "physical-center-parity",
+      "declared-twist-full-frame-agreement",
+      "optical-periods-1-2-4-with-physical-state-retained",
+      "36-generators-all-full-frames-and-inverse",
+      "2048-kernel-references-all-full-frames-and-inverse"
+    ]
+  },
+  "outOfScope": [
+    "new-solvers",
+    "layout-search-or-optimality-certification",
+    "Python-gate-or-CI-replacement",
+    "other-proof-certificate-formats",
+    "Cubacle-engine-or-adapter-changes",
+    "other-language-ports"
+  ],
+  "lifecycle": "one fresh process, setup/build separate, first complete two-group conformance plus three fresh-state complete repeats, observed exit tail"
+}
