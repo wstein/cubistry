@@ -16,7 +16,7 @@
     "build:core": "rescript build",
     "test:live-solver": "npm run build:core && node research/m1-acceptance/run-live-solver.mjs /tmp/cubistry-live-solver.json && python3 research/m1-acceptance/verify_live_solver.py /tmp/cubistry-live-solver.json",
     "test:pages": "playwright test --config playwright.pages.config.mjs",
-    "prepare:solver": "node scripts/prepare-puzlwerk.mjs",
+    "prepare:solver": "node scripts/prepare-puzlwerk.mjs && node scripts/prepare-puzlwerk.mjs --picture",
     "setup": "npm run prepare:solver && npm ci && npm run prepare:five-second",
     "test:pr-preview": "playwright test --config playwright.preview.config.mjs",
     "test:timer-proof": "python3 research/workshop-timer/evidence/verify.py && python3 research/workshop-timer/evidence/optimization/verify.py && python3 -m unittest discover -s research/workshop-timer/evidence -p test_verify.py && python3 -m unittest discover -s research/workshop-timer/evidence/optimization -p test_verify.py && python3 research/workshop-timer/verify.py test-results/workshop-timer-commits.json",
@@ -32,8 +32,9 @@
     "@cubistry/cube-core": "*",
     "@cubistry/cube-mechanics": "*",
     "@cubistry/cube-viewer": "*",
-    "three": "0.180.0",
-    "@puzlwerk/solver-2x2": "file:.puzlwerk-dependency/solver-2x2.tgz"
+    "@puzlwerk/solver-2x2": "file:.puzlwerk-dependency/solver-2x2.tgz",
+    "@puzlwerk/solver-3x3-picture": "file:.puzlwerk-dependency/solver-3x3-picture.tgz",
+    "three": "0.180.0"
   },
   "devDependencies": {
     "@fontsource/noto-sans": "5.2.10",
