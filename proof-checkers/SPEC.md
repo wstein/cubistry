@@ -62,6 +62,11 @@ cubies exactly 0–7, 24 unique outward facelets on {-1,+1}³, three co-located
 stickers per body, eight distinct body positions, and signed-axis normal/up
 vectors forming outward orthogonal tangent frames. Preserve ID/body/image through
 all moves. Validate declared unpadded fields with the same strict types and frames.
+As in the incumbent certificate verifier, `unpaddedPrinting` must retain the
+matching ID order of `printing` before the one-sticker image substitution is
+compared. Both arrays may be permuted together; permuting only one is invalid.
+Canonical state hashing subsequently sorts by ID and does not relax this input
+relationship.
 
 Witnesses contain each value 0–99 exactly once in order, with a legal word. Replay
 all 100 padded displays, 100 exact inverses and all 100 unpadded displays. The
