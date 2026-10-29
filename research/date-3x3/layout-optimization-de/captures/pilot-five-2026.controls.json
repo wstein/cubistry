@@ -1,6 +1,14 @@
 {
   "status": "PASS",
   "controls": {
+    "boolean-count": "REJECTED",
+    "negative-elapsed": "REJECTED",
+    "missing-summaries": "REJECTED",
+    "duplicate-summary": "REJECTED",
+    "runner-hash": "REJECTED",
+    "app-head": "REJECTED",
+    "budget": "REJECTED",
+    "nonfinite-elapsed": "REJECTED",
     "dirty-app": "REJECTED",
     "input-hash": "REJECTED",
     "missing-request": "REJECTED",
@@ -10,5 +18,5 @@
     "illegal-turn": "REJECTED",
     "wrong-date": "REJECTED"
   },
-  "controlsRejected": 8
+  "controlsRejected": 16
 }

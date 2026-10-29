@@ -141,7 +141,7 @@ has been established by rearranging these weekday labels.
 - Every transition records its complete actual retained source pose/reference,
   returned word, final pose hash, diagnostics and elapsed planning wall time.
   The independent Rodrigues replay checks all 54 frames, the exact desired date,
-  chain continuity and inverse restoration. Eight mutated-capture controls are
+  chain continuity and inverse restoration. Sixteen mutated-capture controls are
   rejected. `results.json` contains per-print totals, timing distributions and
   capture hashes; timing is shared-machine wall time, not isolated CPU cost.
 - Color roles and upright glyph positions are preserved on the physical source
@@ -189,3 +189,16 @@ c1-e0 HTM). It is superseded by the saved warmed 500-versus-442 pilot, not mixed
 into the table. An initial sandbox refusal to spawn local Git was an environment
 failure, not a rejected layout. The checked runs used an authorized local-process
 execution context. No external service, deployment or printer order was invoked.
+
+### Independent review and verifier hardening
+
+An independent agent replayed all six feasibility catalogs, all 3,660 year
+transitions, the full baseline equivalence and the structural enumeration.
+The mathematical and measured results passed. Additional corruption probes found
+that the first capture verifier accepted Boolean zero counts, negative elapsed
+time, omitted summaries and a forged runner hash. Those metadata checks are now
+strict: integer counts exclude Boolean values; times must be finite and
+nonnegative; summary variants must be unique and complete; the runner bytes and
+application revision are pinned; and the recorded solver node/attempt/depth
+budgets are enforced. Sixteen negative controls now pass. No measured capture,
+generator or application source was changed by this hardening.

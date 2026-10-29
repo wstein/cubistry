@@ -3,6 +3,7 @@ import datetime as dt
 import hashlib
 import importlib.util
 import json
+import math
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -28,10 +29,29 @@ def expected_paths(mode):
  assert mode=='targeted-pilot'
  return {'november':[f'2026-11-{i:02}' for i in range(1,16)],'jump':['2026-10-29','2026-11-03','2026-11-04'],'wrap':['2024-02-28','2024-02-29','2024-03-01','2024-03-02','2024-03-03','2024-12-30','2024-12-31','2025-01-01']}
 
+def nonnegative(value,integer=False):
+ assert type(value) in ((int,) if integer else (int,float))
+ assert math.isfinite(value) and value>=0
+
+def verify_diagnostics(d):
+ assert isinstance(d,dict)
+ for key,value in {'maximumNodes':100000,'maximumTotalNodes':200000,'maximumAttempts':2,'maximumDepth':24}.items():
+  assert type(d[key]) is int and d[key]==value
+ assert type(d['attempts']) is list and len(d['attempts'])<=2
+ for attempt in d['attempts']:
+  assert type(attempt['maximumNodes']) is int and attempt['maximumNodes']==100000
+  assert type(attempt['maximumDepth']) is int and 0<=attempt['maximumDepth']<=24
+  for key in ('moves','outerHTM','rotations'):nonnegative(attempt[key],True)
+  nonnegative(attempt['elapsedMs'])
+ for key in ('directMoves','chosenMoves','referenceFromMoves','referenceEndMoves'):nonnegative(d[key],True)
+ for key in ('centerElapsedMs','planningElapsedMs'):nonnegative(d[key])
+
 def verify_capture(path):
  raw=Path(path).read_bytes();data=json.loads(raw)
  assert data['schema']=='cubistry.de-layout-measurement'
  assert data['appDirty'] is False
+ assert data['appHead']=='3d4c179308b74b1242eaf17cafd4e1d70400b587'
+ assert data['runnerSHA256']==sha((ROOT/'measure.mjs').read_bytes())
  paths=expected_paths(data['mode']);inputs={}
  for row in data['inputs']:
   file=Path(row['file']);b=file.read_bytes();assert sha(b)==row['sha256'];w=json.loads(b)
@@ -39,6 +59,12 @@ def verify_capture(path):
   source=V.source_state(w['printing'],candidate)
   inputs[file.parent.name]=(w,candidate,source)
  assert len(inputs)==len(data['inputs'])
+ assert len(data['warmups'])==len(inputs)
+ assert {r['variant'] for r in data['warmups']}==set(inputs)
+ for warm in data['warmups']:
+  nonnegative(warm['elapsedMs']);verify_diagnostics(warm['diagnostics'])
+ assert len(data['summaries'])==len(inputs)
+ assert {r['variant'] for r in data['summaries']}==set(inputs)
  grouped=defaultdict(list)
  for row in data['records']:grouped[(row['variant'],row['scenario'])].append(row)
  assert set(grouped)=={(v,s) for v in inputs for s in paths}
@@ -48,6 +74,8 @@ def verify_capture(path):
   assert [r['iso'] for r in rows]==dates[1:]
   previous=None
   for index,row in enumerate(rows):
+   nonnegative(row['htm'],True);nonnegative(row['rotations'],True)
+   nonnegative(row['elapsedMs']);verify_diagnostics(row['diagnostics'])
    state=replay(source,row['sourceReference']);assert stamp(state)==row['fromHash']
    if previous is not None:assert state==previous,'Hidden state reset between requests'
    before=dt.date.fromisoformat(dates[index]);after=dt.date.fromisoformat(row['iso'])
@@ -58,11 +86,16 @@ def verify_capture(path):
    assert row['rotations']==sum(t[0] in 'xyz' for t in tokens)
    previous=end;verified+=1
  for summary in data['summaries']:
+  for key in ('cases','totalHTM','maxHTM'):nonnegative(summary[key],True)
+  nonnegative(summary['meanHTM'])
   rows=[r for r in data['records'] if r['variant']==summary['variant']]
   assert summary['cases']==len(rows)
   assert summary['totalHTM']==sum(r['htm'] for r in rows)
   assert abs(summary['meanHTM']-sum(r['htm'] for r in rows)/len(rows))<1e-10
   assert summary['maxHTM']==max(r['htm'] for r in rows)
+  assert type(summary['november3to4']) is list
+  for value in summary['november3to4']:nonnegative(value,True)
+  assert summary['november3to4']==[r['htm'] for r in rows if r['iso']=='2026-11-04']
  return {'status':'PASS','captureSHA256':sha(raw),'requestsVerified':verified,'printsVerified':len(inputs),'all54Frames':True,'inverseChecks':verified,'domain':data['mode'],'optimality':'UNKNOWN'}
 def verify_baseline(runtime_path):
  runtime_raw=Path(runtime_path).read_bytes();runtime=json.loads(runtime_raw)

@@ -10,6 +10,14 @@ s=importlib.util.spec_from_file_location('layout_verify',root/'verify.py');v=imp
 original=json.loads(Path(sys.argv[1]).read_text())
 assert v.verify_capture(sys.argv[1])['status']=='PASS'
 mutations={
+ 'boolean-count':lambda d:d['records'][0].update(rotations=False),
+ 'negative-elapsed':lambda d:d['records'][0].update(elapsedMs=-1),
+ 'missing-summaries':lambda d:d.update(summaries=[]),
+ 'duplicate-summary':lambda d:d['summaries'].__setitem__(1,copy.deepcopy(d['summaries'][0])),
+ 'runner-hash':lambda d:d.update(runnerSHA256='0'*64),
+ 'app-head':lambda d:d.update(appHead='0'*40),
+ 'budget':lambda d:d['records'][0]['diagnostics'].update(maximumNodes=100001),
+ 'nonfinite-elapsed':lambda d:d['records'][0].update(elapsedMs=float('nan')),
  'dirty-app':lambda d:d.update(appDirty=True),
  'input-hash':lambda d:d['inputs'][0].update(sha256='0'*64),
  'missing-request':lambda d:d['records'].pop(),
