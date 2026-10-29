@@ -64,7 +64,22 @@ def verify_capture(path):
   assert abs(summary['meanHTM']-sum(r['htm'] for r in rows)/len(rows))<1e-10
   assert summary['maxHTM']==max(r['htm'] for r in rows)
  return {'status':'PASS','captureSHA256':sha(raw),'requestsVerified':verified,'printsVerified':len(inputs),'all54Frames':True,'inverseChecks':verified,'domain':data['mode'],'optimality':'UNKNOWN'}
+def verify_baseline(runtime_path):
+ runtime_raw=Path(runtime_path).read_bytes();runtime=json.loads(runtime_raw)
+ folder=ROOT/'candidates/c0-e0';w=json.loads((folder/'witness.json').read_bytes())
+ candidate,_=V.candidate_model(folder/'constructive.json')
+ source=V.source_state(w['printing'],candidate)
+ old_source=V.source_state(runtime['printing'],candidate)
+ assert source==old_source
+ assert len(runtime['targets'])==len(w['targets'])==2562
+ for old,new in zip(runtime['targets'],w['targets']):
+  assert [old[k] for k in ('weekday','day','month','cells')]==[new[k] for k in ('weekday','day','month','cells')]
+  word=' '.join(new[k] for k in ('prelude','word','centerCorrection') if new[k])
+  assert replay(old_source,old['word'])==replay(source,word)
+ return {'status':'PASS','runtimeSHA256':sha(runtime_raw),'witnessSHA256':sha((folder/'witness.json').read_bytes()),'full54FrameTargetsEquivalent':2562,'printingIdentical':True}
+
 if __name__=='__main__':
- if sys.argv[1]=='coverage':result=verify_coverage(sys.argv[2])
+ if sys.argv[1]=='baseline':result=verify_baseline(sys.argv[2])
+ elif sys.argv[1]=='coverage':result=verify_coverage(sys.argv[2])
  else:result=verify_capture(sys.argv[1])
  print(json.dumps(result,indent=2,ensure_ascii=False))

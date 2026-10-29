@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "captureSHA256": "0fae1af8889425a28be8e772719a824b285a43b55a185a23186eedf922fee407",
+  "requestsVerified": 2928,
+  "printsVerified": 4,
+  "all54Frames": true,
+  "inverseChecks": 2928,
+  "domain": "leap-year-forward-reverse",
+  "optimality": "UNKNOWN"
+}

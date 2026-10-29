@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "controls": {
+    "dirty-app": "REJECTED",
+    "input-hash": "REJECTED",
+    "missing-request": "REJECTED",
+    "source-frame-hash": "REJECTED",
+    "end-frame-hash": "REJECTED",
+    "move-count": "REJECTED",
+    "illegal-turn": "REJECTED",
+    "wrong-date": "REJECTED"
+  },
+  "controlsRejected": 8
+}
