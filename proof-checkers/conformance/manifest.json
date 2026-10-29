@@ -1,0 +1,1709 @@
+{
+  "schema": "cubistry.proof-conformance.v1",
+  "baseline": "285e8348e35e3bfc2a974bc6d77e8d9d5baf0bd6",
+  "cases": [
+    {
+      "group": "counter",
+      "name": "boolean-cubie",
+      "path": "proof-checkers/conformance/counter/boolean-cubie.json",
+      "sha256": "29dfb6064a1852c3e9cea7fca10dc18d1ded3aad87663e35001b9d7e693dbb79",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "boolean-identity",
+      "path": "proof-checkers/conformance/counter/boolean-identity.json",
+      "sha256": "acfb7902bad13009fb0e835f48f28e9b5675688c7e286c1d5cb4d5c4a49b8580",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "boolean-positive-coordinate",
+      "path": "proof-checkers/conformance/counter/boolean-positive-coordinate.json",
+      "sha256": "efa104c90b8d376de0048d196171dc6497895d86bd8d21baf0f85611a82e9670",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "boolean-unpadded-coordinate",
+      "path": "proof-checkers/conformance/counter/boolean-unpadded-coordinate.json",
+      "sha256": "7d461b3104dad1ba8bc053e6f3be24665a5f44edbd92bae802f0853d1bbb6cbc",
+      "expectedValid": false,
+      "policy": "strict-unpadded-types",
+      "incumbentValid": true
+    },
+    {
+      "group": "counter",
+      "name": "boolean-witness-value",
+      "path": "proof-checkers/conformance/counter/boolean-witness-value.json",
+      "sha256": "7b338be8e6ec415f9784972ebe24f06d77540ac163db5bd89035e6ab0dfaccdd",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "duplicate-body-position",
+      "path": "proof-checkers/conformance/counter/duplicate-body-position.json",
+      "sha256": "8abf4d1c3a4209ac5d996ec888064d3cc7ccae4c2c258d2ab14dca24dd1c90d5",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "duplicate-identity",
+      "path": "proof-checkers/conformance/counter/duplicate-identity.json",
+      "sha256": "20ca8391387fc42100f9e97a57614753309b4725c19bcb7314b7d9d5f3e9690b",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "duplicate-object-key",
+      "path": "proof-checkers/conformance/counter/duplicate-object-key.json",
+      "sha256": "00826d251027ea386a24501a3586e71b4ad85a5acc229de0726ddff820090ad7",
+      "expectedValid": false,
+      "policy": "strict-duplicate-keys",
+      "incumbentValid": true
+    },
+    {
+      "group": "counter",
+      "name": "duplicate-witness-value",
+      "path": "proof-checkers/conformance/counter/duplicate-witness-value.json",
+      "sha256": "6d4e87101b518d59152448ff41bb85a77a0cd10ed4136557ba25acbd3225837a",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "exponent-schema",
+      "path": "proof-checkers/conformance/counter/exponent-schema.json",
+      "sha256": "83330542885af7a28d7fc6ae484aab58824b4137b1626357fce51382e8e4d502",
+      "expectedValid": false,
+      "policy": "strict-integer-tokens",
+      "incumbentValid": true
+    },
+    {
+      "group": "counter",
+      "name": "float-schema",
+      "path": "proof-checkers/conformance/counter/float-schema.json",
+      "sha256": "d58f9ead274532b52f42ae3a98f1f2e91ca82a57ffb8bfd2a746187486eff712",
+      "expectedValid": false,
+      "policy": "strict-integer-tokens",
+      "incumbentValid": true
+    },
+    {
+      "group": "counter",
+      "name": "fractional-normal",
+      "path": "proof-checkers/conformance/counter/fractional-normal.json",
+      "sha256": "666d307e50781d4dbd657c60f70445e1f09c8bcbb419bb7704d614141dcab1f3",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "illegal-double-suffix",
+      "path": "proof-checkers/conformance/counter/illegal-double-suffix.json",
+      "sha256": "342fce81033cd07028c4eadb5d4fb526aa0be49467f39625b1950a0deeb99b19",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "illegal-wide-token",
+      "path": "proof-checkers/conformance/counter/illegal-wide-token.json",
+      "sha256": "8ad82ab83a83e692ba49fe1474f7496e36ec5e167a08a5f1dafc46816fb5e0d2",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "invalid-utf8",
+      "path": "proof-checkers/conformance/counter/invalid-utf8.json",
+      "sha256": "e62c639079eeeb99e6ad25c6df9d60b8710dd3be155232faf781c1d3296e5754",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "missing-sticker",
+      "path": "proof-checkers/conformance/counter/missing-sticker.json",
+      "sha256": "e753cd7777dc22d322ff0e4fbff14b2c99f68d4d05b203904878cd91587243e4",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "missing-sticker-up",
+      "path": "proof-checkers/conformance/counter/missing-sticker-up.json",
+      "sha256": "3a1c7e7dcebee3d8d47e0fd25307dc2dab5a899c82298b526d7050a56907b6c4",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "missing-unpadded-sticker",
+      "path": "proof-checkers/conformance/counter/missing-unpadded-sticker.json",
+      "sha256": "7ee3738a1bed14150a458d71f2c5b1355470fad2ef2fb446e430acd7ac2fb9b5",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "missing-witness",
+      "path": "proof-checkers/conformance/counter/missing-witness.json",
+      "sha256": "2b42867ad5d905cf3e700148ef9e58efc0d56363fcabae053b0288de25a17b53",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "missing-witnesses",
+      "path": "proof-checkers/conformance/counter/missing-witnesses.json",
+      "sha256": "cf957ff7159eb4bab2a4b06461db0bcf88d09dd4b0bc485cf95d30e717f0e6bd",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "nonaxis-up",
+      "path": "proof-checkers/conformance/counter/nonaxis-up.json",
+      "sha256": "1bdad394417e345f0fc688d8c881a5d539099452b86b2ecb43cfff19566e7abc",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "nonoutward-normal",
+      "path": "proof-checkers/conformance/counter/nonoutward-normal.json",
+      "sha256": "2c6e0bfbb5552eeececb1bf4b31261d63f3457e15446bcb1de4f5b9b7dbb5776",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "out-of-range-identity",
+      "path": "proof-checkers/conformance/counter/out-of-range-identity.json",
+      "sha256": "90731f45914f62acee4269b7fed606c62ff476230ab9130fb08536a8b2a12da7",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "out-of-range-position",
+      "path": "proof-checkers/conformance/counter/out-of-range-position.json",
+      "sha256": "7cdb077867da13f6d18d261e830d490a39956d3f70bad4bf52d5561727017e3d",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "overflow-coordinate-wrap",
+      "path": "proof-checkers/conformance/counter/overflow-coordinate-wrap.json",
+      "sha256": "7804a140e5606dc3e9e3f0aada434f778724fd0f1d972504b219d202806055dc",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "overflow-cubie-wrap",
+      "path": "proof-checkers/conformance/counter/overflow-cubie-wrap.json",
+      "sha256": "4648118085e0bc0b6d3c601fd78174211655549856c5dc89ba6d97c0b49e8531",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "overflow-witness-value-wrap",
+      "path": "proof-checkers/conformance/counter/overflow-witness-value-wrap.json",
+      "sha256": "1731ede9f0bec97df38bdca1d588869c2eec53c867417aff22b9441463dff6f7",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "printing-not-array",
+      "path": "proof-checkers/conformance/counter/printing-not-array.json",
+      "sha256": "f59fe977e4f85a6f6cf9bee2422e0571ab97357a7ec9c46f086c39773f0f5936",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "repainted-unpadded",
+      "path": "proof-checkers/conformance/counter/repainted-unpadded.json",
+      "sha256": "e693cdb93d8f8f0b3fdcdcd3b4a75e39427afab4305fb0083f05e8d30f4e7abd",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "rotated-print-up",
+      "path": "proof-checkers/conformance/counter/rotated-print-up.json",
+      "sha256": "950ae334acc3c6c082a3b9bed99880fd75268968b9f7c57cd00d018e834a071c",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "rounded-fraction-value",
+      "path": "proof-checkers/conformance/counter/rounded-fraction-value.json",
+      "sha256": "c64eed8e88f397958dae201c52b809b6b66c14a322c83b9c569c9c74a5b45264",
+      "expectedValid": false,
+      "policy": "strict-integer-tokens",
+      "incumbentValid": true
+    },
+    {
+      "group": "counter",
+      "name": "short-vector",
+      "path": "proof-checkers/conformance/counter/short-vector.json",
+      "sha256": "6d16553b41cd51cd590e49d08d51ba95fe75d064be94c647de36701059dfc089",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "trailing-root",
+      "path": "proof-checkers/conformance/counter/trailing-root.json",
+      "sha256": "786e8259e17e781ddaeda733b9fb7e5fdb5b3b75d6d581638fef21b4115ee2be",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "underflow-fraction-value",
+      "path": "proof-checkers/conformance/counter/underflow-fraction-value.json",
+      "sha256": "48d742533034ee3ed394f6128b2715e0eb38f7221632b3c7e55891f061bac81c",
+      "expectedValid": false,
+      "policy": "strict-integer-tokens",
+      "incumbentValid": true
+    },
+    {
+      "group": "counter",
+      "name": "unknown-schema",
+      "path": "proof-checkers/conformance/counter/unknown-schema.json",
+      "sha256": "15ee8413ad174cfd511c2b5f8ffdc0a61b4e0c5e8ca7066cf32481f52558dc04",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "valid-reordered-arrays",
+      "path": "proof-checkers/conformance/counter/valid-reordered-arrays.json",
+      "sha256": "c943060231a2f4cc9236e7a659bd5b65669e4ecf1a4fdd5ceec3e8763df56e1d",
+      "expectedValid": true,
+      "policy": "incumbent-parity",
+      "incumbentValid": true,
+      "canonicalStateSHA256": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5"
+    },
+    {
+      "group": "counter",
+      "name": "valid-source",
+      "path": "proof-checkers/conformance/counter/valid-source.json",
+      "sha256": "ecd8b141bd5b2d222ae91fd3d47f5c0975c8843522126de176d741e2e341bc4c",
+      "expectedValid": true,
+      "policy": "incumbent-parity",
+      "incumbentValid": true,
+      "canonicalStateSHA256": "56bf3dc8ba791d5d70a18486970b6c6297895f0be7f4c59a1c699c96dcebb9f5"
+    },
+    {
+      "group": "counter",
+      "name": "word-not-string",
+      "path": "proof-checkers/conformance/counter/word-not-string.json",
+      "sha256": "fce8cc3ff8672782835374e6bb3130a550a6466a0f8243d8b8c727e405ef836a",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "wrong-cubie-group",
+      "path": "proof-checkers/conformance/counter/wrong-cubie-group.json",
+      "sha256": "7c30ca6905b0cd703ac0741e5abc3ab6fd7c4f8f09ac661da925050917644f81",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "wrong-puzzle",
+      "path": "proof-checkers/conformance/counter/wrong-puzzle.json",
+      "sha256": "7e1936a03cfedc1b217add34959a8d961d1e9732029518a589e1a0f452d65ba2",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "counter",
+      "name": "wrong-target-word",
+      "path": "proof-checkers/conformance/counter/wrong-target-word.json",
+      "sha256": "a334229cb7f9e071e82f6c0e2c9c5080a1dad0b2de63fe50c6092692558bf62e",
+      "expectedValid": false,
+      "policy": "incumbent-parity",
+      "incumbentValid": false
+    },
+    {
+      "group": "geometry",
+      "name": "boolean-positive-state-coordinate",
+      "path": "proof-checkers/conformance/geometry/boolean-positive-state-coordinate.json",
+      "sha256": "e7f310d285976a1a0c90b2f561ea022566434f550397bac3da879c5a00b905bb",
+      "expectedValid": false,
+      "expectedStateSHA256": "e23a6bf20162fc0168a3fe9da743f644926d262a1826cd0b074eda6e98b614df"
+    },
+    {
+      "group": "geometry",
+      "name": "center-half-goal-mismatch",
+      "path": "proof-checkers/conformance/geometry/center-half-goal-mismatch.json",
+      "sha256": "c229e1fd8c995e4c0311b772bd004f4c4156fd0dfae57cebd1050e451af51d7c",
+      "expectedValid": true,
+      "word": "U F U' F U F U' F U F U' F U F U' F U F U' F",
+      "expectedStateSHA256": "9817a6a7edad5fbf007696a17ed4736014d1ba97d522536f32619d5c204fcae1",
+      "expectedGoalMatches": false
+    },
+    {
+      "group": "geometry",
+      "name": "duplicate-state-id",
+      "path": "proof-checkers/conformance/geometry/duplicate-state-id.json",
+      "sha256": "2bc56aa6d43bff59c8be21f7b19aace4b5e60eef3ac4c5ffa92ee41bf4aaeb3b",
+      "expectedValid": false,
+      "word": null,
+      "expectedStateSHA256": "98bfd46f75952c71b23f8af1e4a202869605aa2f4f099e818c9a22f531f90563"
+    },
+    {
+      "group": "geometry",
+      "name": "float-state-coordinate",
+      "path": "proof-checkers/conformance/geometry/float-state-coordinate.json",
+      "sha256": "28d6f134823215d6094c01a2fa0f5f1c267fc568ce3397ad6f81072c2cee6212",
+      "expectedValid": false,
+      "expectedStateSHA256": "87b2922883b86585d1ffed98218b8491bad3d54d9a55a2cbb7dab3ee67bfc996"
+    },
+    {
+      "group": "geometry",
+      "name": "fourfold-B",
+      "path": "proof-checkers/conformance/geometry/fourfold-B.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "B B B B",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "fourfold-D",
+      "path": "proof-checkers/conformance/geometry/fourfold-D.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "D D D D",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "fourfold-F",
+      "path": "proof-checkers/conformance/geometry/fourfold-F.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "F F F F",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "fourfold-L",
+      "path": "proof-checkers/conformance/geometry/fourfold-L.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "L L L L",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "fourfold-R",
+      "path": "proof-checkers/conformance/geometry/fourfold-R.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "R R R R",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "fourfold-U",
+      "path": "proof-checkers/conformance/geometry/fourfold-U.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "U U U U",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "fourfold-x",
+      "path": "proof-checkers/conformance/geometry/fourfold-x.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "x x x x",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "fourfold-y",
+      "path": "proof-checkers/conformance/geometry/fourfold-y.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "y y y y",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "fourfold-z",
+      "path": "proof-checkers/conformance/geometry/fourfold-z.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "z z z z",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-00",
+      "path": "proof-checkers/conformance/geometry/frame-00.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-01",
+      "path": "proof-checkers/conformance/geometry/frame-01.json",
+      "sha256": "ea93b4ee4e7df5b2d80dfa59f1518c528974da41d244335b2d3c5b7ae7c28313",
+      "expectedValid": true,
+      "word": "x",
+      "expectedStateSHA256": "2e81b5047b2fffd7d0745763d916529bb3712c0e9a6d141bda96500936957a38"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-02",
+      "path": "proof-checkers/conformance/geometry/frame-02.json",
+      "sha256": "2e89bd8df9ac17a803b287ac1b197f70417b565b6ae5ac102688356b7d6dea5a",
+      "expectedValid": true,
+      "word": "y",
+      "expectedStateSHA256": "7b0cd9c61fc0267a15ccca4eb2bb98e271a65ba7558e01de9701f7a9cbd3ee36"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-03",
+      "path": "proof-checkers/conformance/geometry/frame-03.json",
+      "sha256": "cf0ad6119a9a4abcd6801a27a6b62e2982b13e3ea6e49a4cb6e42a63c8459da3",
+      "expectedValid": true,
+      "word": "z",
+      "expectedStateSHA256": "7becddfe52ab69b6ff41afca576df148bdb72d6412bfffda32a2088a19b52d38"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-04",
+      "path": "proof-checkers/conformance/geometry/frame-04.json",
+      "sha256": "27071e34f980d46e9c2360582f304ec55e8ae9d4367c131b93faaa5069c4842a",
+      "expectedValid": true,
+      "word": "x x",
+      "expectedStateSHA256": "d4d18ad3b6993e1cc613d6281d13a0cec8626eff3d7193d3e114c2eeb497b180"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-05",
+      "path": "proof-checkers/conformance/geometry/frame-05.json",
+      "sha256": "51cefafc7af0cca6220422ee286353ef50f27072d0b6d7fed1b4f52aef3b2265",
+      "expectedValid": true,
+      "word": "x y",
+      "expectedStateSHA256": "83846240b4cd87c0407fc1d15785a0914ac74950fb5fa1a7852e96c26a2178a3"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-06",
+      "path": "proof-checkers/conformance/geometry/frame-06.json",
+      "sha256": "85ea1c7b07f3202530bfccadbfffcfb5dc3732f3010c09bf0ffe12d3b1aec7cd",
+      "expectedValid": true,
+      "word": "x z",
+      "expectedStateSHA256": "736c51c1842d430735c625eb00bb45c436c4adc8ac89ab87d59a5b398b43bdc0"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-07",
+      "path": "proof-checkers/conformance/geometry/frame-07.json",
+      "sha256": "d1a35ebbc825275a33c82ca9c5afff17575f74582f1eedd6aa4f40dddcf48fba",
+      "expectedValid": true,
+      "word": "y x",
+      "expectedStateSHA256": "70b752b58fa4b7073eaeabea7ba2d8a848d6183b29b0a791183fc56f42b8969c"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-08",
+      "path": "proof-checkers/conformance/geometry/frame-08.json",
+      "sha256": "4806dfe96a7708e7c40809795262d895bc6b33e4a721d689c83e04b895b7f367",
+      "expectedValid": true,
+      "word": "y y",
+      "expectedStateSHA256": "b6e0cf65799fec8f98bb40da7c2f3dfaed9ded0edd480e9381d7f94f96c203ae"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-09",
+      "path": "proof-checkers/conformance/geometry/frame-09.json",
+      "sha256": "480ebea3cc2d082c8917ec5300690654432b8c36ab54dbd31dadbb1fc776a2c6",
+      "expectedValid": true,
+      "word": "z y",
+      "expectedStateSHA256": "d8985c86fe6443176e77166fbce23f64ebcd0b21a37c685f1a3fa45a764264a3"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-10",
+      "path": "proof-checkers/conformance/geometry/frame-10.json",
+      "sha256": "f59c68fd0bfb74752d3919774a0aecfff7996b5dd80c58c5b6e32b5bebcb9355",
+      "expectedValid": true,
+      "word": "z z",
+      "expectedStateSHA256": "2cc3d3f6a08a49e3916f60285a48dad62ae5a79fe6f78d896909e5c613751168"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-11",
+      "path": "proof-checkers/conformance/geometry/frame-11.json",
+      "sha256": "0be6dfb07367367d094f30301596fc43f4fb06a1dfd95306b972f03186e27470",
+      "expectedValid": true,
+      "word": "x x x",
+      "expectedStateSHA256": "be3db6b7e7d11d4807b19e021862fbd12d830a659b4243c3a11c49449eae5f35"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-12",
+      "path": "proof-checkers/conformance/geometry/frame-12.json",
+      "sha256": "f975384071f480ed19f3e2fa413e63341ba602fb331ac6077941811d26fbe0ce",
+      "expectedValid": true,
+      "word": "x x y",
+      "expectedStateSHA256": "199971c9cfcffac4cab978986eec179e51d8d43929b6893cf0f04e3add683e8e"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-13",
+      "path": "proof-checkers/conformance/geometry/frame-13.json",
+      "sha256": "522e2f30e37a374f8e008a2ca9cb4bb92fdfd2f74ed1c9be3a69cafbdd954972",
+      "expectedValid": true,
+      "word": "x x z",
+      "expectedStateSHA256": "c01f7fd80f7988ea49521aa65c16298f9490c8833c5cd31ffd5947519750f782"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-14",
+      "path": "proof-checkers/conformance/geometry/frame-14.json",
+      "sha256": "ffa2aa18312bc5f442e55230aacd4a10bc916212f054b4a12b32a3b4d28849c8",
+      "expectedValid": true,
+      "word": "x y x",
+      "expectedStateSHA256": "04633ebdce116c54f8a7a0c41b5a0ff4fb4d19e49a928b994a1bd13c17348446"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-15",
+      "path": "proof-checkers/conformance/geometry/frame-15.json",
+      "sha256": "7945ceeb0e0e714a9c64378289e654a0b296f29c8568c2dc54da4ecf325f1f2d",
+      "expectedValid": true,
+      "word": "x y y",
+      "expectedStateSHA256": "462f2a676e46bacd071b1bfd53616aff459f4d2636631a9f37b3de48e1f1a971"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-16",
+      "path": "proof-checkers/conformance/geometry/frame-16.json",
+      "sha256": "1e85dbac54eb18f7f7fbc2a4b4e789928ee75083836716f6f334d09177e5d393",
+      "expectedValid": true,
+      "word": "x z z",
+      "expectedStateSHA256": "c83f82a1d289d43b6de506bb72c006f3e2297b82dae408880fce9d90cda1edc9"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-17",
+      "path": "proof-checkers/conformance/geometry/frame-17.json",
+      "sha256": "1aa06373fa6e19dc1a3ccaaf07a802755ab0cde2ab9bc9aeeb27d995de7b6093",
+      "expectedValid": true,
+      "word": "y x x",
+      "expectedStateSHA256": "6da4426a7ef00ae788eebf03b0a0a95bc4d53f3514f396fc9fa659d01220baf5"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-18",
+      "path": "proof-checkers/conformance/geometry/frame-18.json",
+      "sha256": "786395d879e9a41240cdd37a7286483c52b7f4726cd4270317e9e57832478aaa",
+      "expectedValid": true,
+      "word": "y y y",
+      "expectedStateSHA256": "0b2b4d4aaa2b546958127d46f9c9e294e9584d8ac3be19036f5c252353db48e2"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-19",
+      "path": "proof-checkers/conformance/geometry/frame-19.json",
+      "sha256": "1b80414cc7073f2771505633cc00416417d639092858bdd16db77e1dfe79a015",
+      "expectedValid": true,
+      "word": "z z z",
+      "expectedStateSHA256": "d5318cdeb3a4818efd2d7e9f802f61278f169c55e54e6ea7e7bedc716804624e"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-20",
+      "path": "proof-checkers/conformance/geometry/frame-20.json",
+      "sha256": "883dbbc3017a860dbfbad69ac483c2d08bdaa74da2f1c117fb7e0f186b0fb6e1",
+      "expectedValid": true,
+      "word": "x x x y",
+      "expectedStateSHA256": "5a25a585aca92851d744733ba33bc820cbfb69526938891b6d06628c4440ced7"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-21",
+      "path": "proof-checkers/conformance/geometry/frame-21.json",
+      "sha256": "4b4f8fdf4ef0c7e045ccc1756ecfe8bf329b3331e5e412013512d14fb6c19dcf",
+      "expectedValid": true,
+      "word": "x x y x",
+      "expectedStateSHA256": "439485e0085e44a796ed0d73b04a164e00ae8f432f34136acd4e99d2db8e9b17"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-22",
+      "path": "proof-checkers/conformance/geometry/frame-22.json",
+      "sha256": "7a23b54218972de1019998771b7e6f4c6314b4bd3d3502f5a627646cc5e88da8",
+      "expectedValid": true,
+      "word": "x y x x",
+      "expectedStateSHA256": "334e5ab46e25ae269ab38c2a45af9c7a720374881f4b133b13bdad20f039ffa1"
+    },
+    {
+      "group": "geometry",
+      "name": "frame-23",
+      "path": "proof-checkers/conformance/geometry/frame-23.json",
+      "sha256": "808fafc24b3d0ce3d81a936e6bbf7d5cd502c6d12ec5840735245c016c68747d",
+      "expectedValid": true,
+      "word": "x y y y",
+      "expectedStateSHA256": "bc04ca59a328477959f44d94d5aaac9d44578cf10a4d5afad4816e88e0ccb66d"
+    },
+    {
+      "group": "geometry",
+      "name": "identity",
+      "path": "proof-checkers/conformance/geometry/identity.json",
+      "sha256": "7da976dd907c275b4693a331d20e8148db11eca8ff40a6d9b41e32f9c1698a7a",
+      "expectedValid": true,
+      "word": "",
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "inconsistent-declared-center-quarter",
+      "path": "proof-checkers/conformance/geometry/inconsistent-declared-center-quarter.json",
+      "sha256": "360d223f7ff41dfde931f1ccaec97824760ae6ee3e104a4d3906ca74958bf658",
+      "expectedValid": false,
+      "expectedStateSHA256": "5fb4051ac8e7cf00b74c4ac60ea983c65b0b0e19cca90b14cb696b139e4b4b97"
+    },
+    {
+      "group": "geometry",
+      "name": "invalid-optical-goal-index",
+      "path": "proof-checkers/conformance/geometry/invalid-optical-goal-index.json",
+      "sha256": "371efe7eb344d9de7f6d2815983402910478d3124557f0f5f8588387bf0b9af8",
+      "expectedValid": false,
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "invalid-optical-period",
+      "path": "proof-checkers/conformance/geometry/invalid-optical-period.json",
+      "sha256": "d05af6322d44049f30ee4dd69dce67193afec0438cd55886dabc86e70c3fd5e2",
+      "expectedValid": false,
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "invalid-state-up-axis",
+      "path": "proof-checkers/conformance/geometry/invalid-state-up-axis.json",
+      "sha256": "9e5c666cecf00a1daafa17af2f244eb8ea5c0c72127ed73d3d90d7e86bfe28d7",
+      "expectedValid": false,
+      "expectedStateSHA256": "38f2c0ee2a0eed0a117e4e9a9f1d446ba394d9f309819324f0dede97799d4d32"
+    },
+    {
+      "group": "geometry",
+      "name": "isolated-center-quarter",
+      "path": "proof-checkers/conformance/geometry/isolated-center-quarter.json",
+      "sha256": "dfc744ff03a7d36def358513183c7cfd8a509fefd84f422d3651532ba26f284e",
+      "expectedValid": false,
+      "word": null,
+      "expectedStateSHA256": "f52bcb9ba51a28e3bc574f09537f147f58565d76e67224bd105c3f16b33d9720"
+    },
+    {
+      "group": "geometry",
+      "name": "missing-source-sticker",
+      "path": "proof-checkers/conformance/geometry/missing-source-sticker.json",
+      "sha256": "eaa2f0966696c3ae3fb9860b4dccdf00472141c9bdcea66d6453c7ceba01443f",
+      "expectedValid": false,
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "missing-state",
+      "path": "proof-checkers/conformance/geometry/missing-state.json",
+      "sha256": "fa394946e87b2ae1bf1bb8888b1e0c4cb688fdc19eae67dd0292bca5274fc33e",
+      "expectedValid": false,
+      "expectedStateSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "group": "geometry",
+      "name": "missing-state-sticker",
+      "path": "proof-checkers/conformance/geometry/missing-state-sticker.json",
+      "sha256": "852f073d670d2dda7ac457f12dacaad56ed16c5ea18dedfcff362d3513f57538",
+      "expectedValid": false,
+      "expectedStateSHA256": "e24a4ee30b927ce540114c8090dd16c9a855c743c76efea8d4800d4c7a59562e"
+    },
+    {
+      "group": "geometry",
+      "name": "nonrigid-one-sticker-up",
+      "path": "proof-checkers/conformance/geometry/nonrigid-one-sticker-up.json",
+      "sha256": "ac6e886337d12c9c13645ef04d295c9bc0c8db2a39cc67c54d3bb422f5487966",
+      "expectedValid": false,
+      "word": null,
+      "expectedStateSHA256": "ae6532ae87e6fd5fb125e7315aaad4b5f6490f207534155c05400a32f395435e"
+    },
+    {
+      "group": "geometry",
+      "name": "odd-corner-only-swap",
+      "path": "proof-checkers/conformance/geometry/odd-corner-only-swap.json",
+      "sha256": "1aed0f1ad219f2a926f5f536be02348096c11d8d1c1fdea93813a31dc3294cff",
+      "expectedValid": false,
+      "word": null,
+      "expectedStateSHA256": "a7133fb9d149eaf3d6f0e5d8df59c06d29b8bfd164f903f41c0425da0190e89f"
+    },
+    {
+      "group": "geometry",
+      "name": "odd-corners-plus-center-quarter",
+      "path": "proof-checkers/conformance/geometry/odd-corners-plus-center-quarter.json",
+      "sha256": "122e2ea78f221370d47a8f9785bcfa86b43c1b317dfa1f71ed3fe5fac7d4186e",
+      "expectedValid": false,
+      "expectedStateSHA256": "6bfcb734b45fb9927ca2439de06df3dec9548c1b29e300e6f41971781fae8df1"
+    },
+    {
+      "group": "geometry",
+      "name": "odd-edge-only-swap",
+      "path": "proof-checkers/conformance/geometry/odd-edge-only-swap.json",
+      "sha256": "868cd26ba67c4209c811c651e0a3067c8707a4852808c4ee25739fa6924c2f08",
+      "expectedValid": false,
+      "word": null,
+      "expectedStateSHA256": "419a079a47da74590c5838b650d76089feab8296c98a80fdf6df71b79b2e68a7"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-B-half",
+      "path": "proof-checkers/conformance/geometry/outer-B-half.json",
+      "sha256": "325050e1a3957036acb9b824065a65c571b8ba48ada91157a8f4fb8a6258ee42",
+      "expectedValid": true,
+      "word": "B2",
+      "expectedStateSHA256": "dbbc3df22c4896f54202129b1a4df9289c7a4fb2a8e1c7bf4d9a21d5b6bbff52"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-B-inverse",
+      "path": "proof-checkers/conformance/geometry/outer-B-inverse.json",
+      "sha256": "07229be3515f3383c10e503ec7a33d41461a4dac1653cb0763509169ed876007",
+      "expectedValid": true,
+      "word": "B'",
+      "expectedStateSHA256": "754c8329f7d7a5a1916afe41f242d40330909c13eb79b0277f96ff4a4c515767"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-B-quarter",
+      "path": "proof-checkers/conformance/geometry/outer-B-quarter.json",
+      "sha256": "d93fa816e8db2d15e1674a746d49d54ab7d9c2b4fa698de4fa54c7d9acd7c6dc",
+      "expectedValid": true,
+      "word": "B",
+      "expectedStateSHA256": "885d3c909899d49ffbdf196ad3806bbf7632910265b612527c104228862db311"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-D-half",
+      "path": "proof-checkers/conformance/geometry/outer-D-half.json",
+      "sha256": "92bb9576a7565981665daace09476e926631c640afba3f7f59a5e692f6574e51",
+      "expectedValid": true,
+      "word": "D2",
+      "expectedStateSHA256": "68c7427c8ab360ca1dcfe8528f7ca033675a3f41dfc8e9c81f0a90235721af5f"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-D-inverse",
+      "path": "proof-checkers/conformance/geometry/outer-D-inverse.json",
+      "sha256": "e2de584c753d7a3e312ef04c51edd193cc01c8e021e7bd5cbf3d6f15c3d6a555",
+      "expectedValid": true,
+      "word": "D'",
+      "expectedStateSHA256": "a0f46f14fae2ae320456503da7ac645cb42d36e5a47792eb3ecc659778143453"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-D-quarter",
+      "path": "proof-checkers/conformance/geometry/outer-D-quarter.json",
+      "sha256": "f2a2ab70d74313896bec67ebcbd3ccf99fd2c744fbed47998c6d55d8c3028fd9",
+      "expectedValid": true,
+      "word": "D",
+      "expectedStateSHA256": "ae1232ee3bc33673114408e010b54a139b2a6a4cecb153aeb301a6601c21b56e"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-F-half",
+      "path": "proof-checkers/conformance/geometry/outer-F-half.json",
+      "sha256": "46964e525a4f5593aed2b2570f5e465776b70650c3311a6117d045927b93d79f",
+      "expectedValid": true,
+      "word": "F2",
+      "expectedStateSHA256": "7a2d9717a379dfd2107e285bcdb4612a659c495c916feeabd721bb3fdb51fa70"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-F-inverse",
+      "path": "proof-checkers/conformance/geometry/outer-F-inverse.json",
+      "sha256": "366ac3f5ad80ca36414f2ceccad5361f0432ce629fbaea83601bd68e6827722e",
+      "expectedValid": true,
+      "word": "F'",
+      "expectedStateSHA256": "e6acbd1be60d48034c982130c1dbe6e30f8fb1d2a795e23f58a1273eab7f4447"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-F-quarter",
+      "path": "proof-checkers/conformance/geometry/outer-F-quarter.json",
+      "sha256": "626e36d3628fa087a723367b64e46009e90d36f952e0cbdfb716646c48288641",
+      "expectedValid": true,
+      "word": "F",
+      "expectedStateSHA256": "ac87dfb7dc695a29227b412298f5a80cb7f06fc3b764e3364ee6edb13b2080b7"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-L-half",
+      "path": "proof-checkers/conformance/geometry/outer-L-half.json",
+      "sha256": "ab42951b7f2671101fe71fc6a7c3c7820d9ef47251649f4a65d524366d25834f",
+      "expectedValid": true,
+      "word": "L2",
+      "expectedStateSHA256": "5e441637d0c4d69dcbd5b68632d1716dc233bd798f8f545b295971d04d5616a6"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-L-inverse",
+      "path": "proof-checkers/conformance/geometry/outer-L-inverse.json",
+      "sha256": "29ce646ddf0e914d18fe1e17a30973659a2d1d7d1c82e34bde1f8d675a3754c1",
+      "expectedValid": true,
+      "word": "L'",
+      "expectedStateSHA256": "1dea59e4acc933e1b65bff009aae3190792b8059d9330edf7e6590956925772f"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-L-quarter",
+      "path": "proof-checkers/conformance/geometry/outer-L-quarter.json",
+      "sha256": "e5080899a572d3dec216f2336d58bea958510a22376dd4a4dd9fd1fa7f239a6d",
+      "expectedValid": true,
+      "word": "L",
+      "expectedStateSHA256": "e89e4cf955541da45b910af645e77839b15144c313bd8e0d52745e9619c821ac"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-R-half",
+      "path": "proof-checkers/conformance/geometry/outer-R-half.json",
+      "sha256": "cc3b1e41f0931f3c9879d1185cdeaa75be4be8e9a2f2b6d3a8d7433ea44bb6a8",
+      "expectedValid": true,
+      "word": "R2",
+      "expectedStateSHA256": "e78981cc00a6d20e5909d96b70b2df30e0e1af126f3c9922b7e0c82e88a2f81e"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-R-inverse",
+      "path": "proof-checkers/conformance/geometry/outer-R-inverse.json",
+      "sha256": "6a6e8de0577c0f8c2015bb9fcdb272a95b2f2041cdd0b5078f3f6da33b1a9da6",
+      "expectedValid": true,
+      "word": "R'",
+      "expectedStateSHA256": "a1d0eab900fa1dc32af02711d5002e3154f57b2403dad5fc7185c94f1dfd829b"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-R-quarter",
+      "path": "proof-checkers/conformance/geometry/outer-R-quarter.json",
+      "sha256": "c497f7dd681927b5f540b5c135c9bddc61415ac6a5afcdc7716fd2145e5cfc01",
+      "expectedValid": true,
+      "word": "R",
+      "expectedStateSHA256": "5fb4051ac8e7cf00b74c4ac60ea983c65b0b0e19cca90b14cb696b139e4b4b97"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-U-half",
+      "path": "proof-checkers/conformance/geometry/outer-U-half.json",
+      "sha256": "bddf4124eac8a7e10618d25af8279ba9db5dc5bcea786a3eb78196368392faab",
+      "expectedValid": true,
+      "word": "U2",
+      "expectedStateSHA256": "99902b5b3b65c5dc84eca1b2d8f0b4b0c5b8028bc4bef132df868a284b13352f"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-U-inverse",
+      "path": "proof-checkers/conformance/geometry/outer-U-inverse.json",
+      "sha256": "0432659f84eb139485be6801c032b6ccc9d52dc4a589f913fb57ad1645ea5af0",
+      "expectedValid": true,
+      "word": "U'",
+      "expectedStateSHA256": "0bfae58b205537e976b03ca5e147e1b35a8efda16c66ab55835acd4983ed2f8e"
+    },
+    {
+      "group": "geometry",
+      "name": "outer-U-quarter",
+      "path": "proof-checkers/conformance/geometry/outer-U-quarter.json",
+      "sha256": "579cb301c0ce7623ec1acbe65467a1ce23c34977cea09687fd20903752b178e7",
+      "expectedValid": true,
+      "word": "U",
+      "expectedStateSHA256": "5d247663e7ff78370046964a881a6df26d77dd9bafeaaeecd7b15042dcb8e7f1"
+    },
+    {
+      "group": "geometry",
+      "name": "reflected-center-frame",
+      "path": "proof-checkers/conformance/geometry/reflected-center-frame.json",
+      "sha256": "260c4fe28e9e1f9ecea6bf5a77c8310ebb9527f9a4bab63a104795f973ad4a85",
+      "expectedValid": false,
+      "expectedStateSHA256": "a6b73bb3eff3a838d6709bd1a7590e1b5b547e3ca47b8ed32234deaaec9af70a"
+    },
+    {
+      "group": "geometry",
+      "name": "reflected-corner-body",
+      "path": "proof-checkers/conformance/geometry/reflected-corner-body.json",
+      "sha256": "3ea9a24b13d45acd8c9c9dd066d6bd365a8ec551cf0d731c94b5b8dd35b420fb",
+      "expectedValid": false,
+      "expectedStateSHA256": "cab630f84599bf30632808f33a333568eb53c212c8e70f1edc295ffd7aa0ab5e"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-00",
+      "path": "proof-checkers/conformance/geometry/rotated-source-00.json",
+      "sha256": "fe63c4bdb95abc86665ea3865b3b54c0971d6bf7e06a92b771ea76bb299b95af",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "691deeda1875aba954af8035802aa1bd46c515b73a64cef0523c1e08236e02e6"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-01",
+      "path": "proof-checkers/conformance/geometry/rotated-source-01.json",
+      "sha256": "1ac81263455f33b7437367c8cd3c7460ba5d608667ecaf0bd72ff33dd5781b2c",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "cd234802002bcade69a7947dbd4f9fde3f80f41a6dac473fbd765dbed96c2d1c"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-02",
+      "path": "proof-checkers/conformance/geometry/rotated-source-02.json",
+      "sha256": "e11c8272a99c809a9defd2d76ed0ca1ae6f1169d2624829790fb03c54f7ba1f0",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "4dfa5e484adeb5b670e4501bdf3c0abc1afcd8e3c22eef3f9d65716a5d69b28d"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-03",
+      "path": "proof-checkers/conformance/geometry/rotated-source-03.json",
+      "sha256": "093e42baf9d75731ba65a0898ac6f3c1dc22a2bee064a98893b67ced78b6b62e",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "0b1919f037d60e6da835270496257181dcff64e92f4ca9ca0aef6952e46fb506"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-04",
+      "path": "proof-checkers/conformance/geometry/rotated-source-04.json",
+      "sha256": "8cec37d11ad20bb02ad13fe82940fc450464227abfc7c22cda870fadc2af9c28",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "11d8cab2d8248f114a4162c1ebbe20d7f1cd9a2fec44e0872b02d3a914a93240"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-05",
+      "path": "proof-checkers/conformance/geometry/rotated-source-05.json",
+      "sha256": "ef7c4bca90b7bec0f6aa5a3d2abbbfd7325d10339d544a974a685870f113302e",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "274f79bd62db77970b7bfb060632955e32e3f59a80263aa1858e8e8da7c2f2c8"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-06",
+      "path": "proof-checkers/conformance/geometry/rotated-source-06.json",
+      "sha256": "ac37f3385d7fc20399c02b4cbdf9607f10efeb31afd2036840f1d8b0e8ae9a06",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "d7f911c39dc56236eef8d959f524d44453f5619ad9d428ea81c2cd59327b5569"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-07",
+      "path": "proof-checkers/conformance/geometry/rotated-source-07.json",
+      "sha256": "70c562d8b3854459e6e5a9da264212f69750e10e9996161a848cd8cb91a46cfa",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "fb949c235d574e204779816e62147145aa14a9bae2e64bdd07854b3f673a1b81"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-08",
+      "path": "proof-checkers/conformance/geometry/rotated-source-08.json",
+      "sha256": "009999c2ce27c9b390a6b4f30c05818194a31251bd63ec09e74c1536a937d16b",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "f024a9bea367d3c8d2e13ce71952c865d0691c9d5048bddf699c6244663d0b8c"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-09",
+      "path": "proof-checkers/conformance/geometry/rotated-source-09.json",
+      "sha256": "dddd803877d017cecca8ab2da266aa07147024ecca56b342b42b65e5185e022f",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "5a35391e8c7c3d4f94c7119315a157307b110ab4002f525ed7d98a1381500057"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-10",
+      "path": "proof-checkers/conformance/geometry/rotated-source-10.json",
+      "sha256": "dcd3b648106370426b953ef86c71cdeee82ef663e6571b7d0604a63be9c88c89",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "3bc2b7cdd746aad7e42be757fcb8eca492bcdce22fdea5c31c8facc095d09aba"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-11",
+      "path": "proof-checkers/conformance/geometry/rotated-source-11.json",
+      "sha256": "fe12c5a76c6f6c13427c061a3b463c6ede2e09534c31a199e13051fdf63179b1",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "db921344a6eb4551a62d3e34331122cb02894b5b7298c2e45bf20301ea187e5b"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-12",
+      "path": "proof-checkers/conformance/geometry/rotated-source-12.json",
+      "sha256": "6dc7202534752b892a8d662b5abc6463c51cbe19daeaf21cbafa96c1935187fe",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "bf28a49692485135166ae30c9aa1800edcbc29a04a941072e4dd9899368e6d07"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-13",
+      "path": "proof-checkers/conformance/geometry/rotated-source-13.json",
+      "sha256": "13655c7c4453364c86878f86ee26d4fa2fc6ddc4020eabb5b76df836b2a86e0d",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "3c707a4b1370ef3ebc289b8a33e8bac0d18be458147fec7f9bdae29ea794d4a2"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-14",
+      "path": "proof-checkers/conformance/geometry/rotated-source-14.json",
+      "sha256": "862202404006cd6689b16ee3ce66818e931e926bf91e77025b2023717d155c58",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "d7c493880865fd97fbaab6d8a433c070dcb67f7704f16690745f4078d2202cd7"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-15",
+      "path": "proof-checkers/conformance/geometry/rotated-source-15.json",
+      "sha256": "3ffee403f0278443f56e3a9575fccd5f5fa394a810b1c86e2d98c95996bbaf67",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "84800848fee68d1a01c31778ed9e6ad5a7c7eaea557365654a3ba2783ad286c8"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-16",
+      "path": "proof-checkers/conformance/geometry/rotated-source-16.json",
+      "sha256": "84fdf7b963bc76bb0f2a7d625983023b7b30270b824e2d701da296053829ced6",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "8cf5b952eb10118b756cc1e96de2bfb922307c01b9fab42e0e2ff95ee2c2e787"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-17",
+      "path": "proof-checkers/conformance/geometry/rotated-source-17.json",
+      "sha256": "a9c3385a29188bce97fcbdc2b9fd608001e048a8e24637b4383d281522c61e7f",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "d67fa4aa6bd87466c513d4da26c5bfd8caa3c168f700dcdd856e007e4c8e5f81"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-18",
+      "path": "proof-checkers/conformance/geometry/rotated-source-18.json",
+      "sha256": "87bd42b41add45e2a1a5524b26373b464e2b1cda547dcc9a4a5779567ed7dabe",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "84e2c882a28a7adabfc55795da45a673b198980aa6671cbf15e3c389434b60c1"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-19",
+      "path": "proof-checkers/conformance/geometry/rotated-source-19.json",
+      "sha256": "4b2ba253282586ba71a0177ad9111bb8517603ba36b5d24d9594494dd766ec1d",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "b72c4a100b99b86edfccace5ca6286786a2e8a68ac67cc7bfffa82b7990627a6"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-20",
+      "path": "proof-checkers/conformance/geometry/rotated-source-20.json",
+      "sha256": "9db9d22bca37e9816a98c38afdbc91a7d52bad10246b0b3c0175c36ebe446746",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "134368fa4875ec940a7ba3efb317dbbb1cb5c194bec0946a87e633c76d6cd463"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-21",
+      "path": "proof-checkers/conformance/geometry/rotated-source-21.json",
+      "sha256": "8703d869e3e8c6f788f4a8e0569733d71b3d71b6942e6ba2b0882e76846c789e",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "7f9f9583276b9e913ea4de96be1bfb1659a600f50017156b800ae86a0894c92c"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-22",
+      "path": "proof-checkers/conformance/geometry/rotated-source-22.json",
+      "sha256": "419444e5f79a9f569d6a1166a90ef44622b2d5fcb5734c0f94e58f0dc9948f4f",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "5f839927ef6c65242d067b9655d5e991fe4550754508f57d364838cec9bf1d9f"
+    },
+    {
+      "group": "geometry",
+      "name": "rotated-source-23",
+      "path": "proof-checkers/conformance/geometry/rotated-source-23.json",
+      "sha256": "65956313c4aa44cb3846eb23e0ef8bdd8fb71179cac7e5c0f34c7115e8aba494",
+      "expectedValid": true,
+      "word": "F R U' B2 L D x y'",
+      "expectedStateSHA256": "84f61e44100e52acd14f51731c3357e100fd5eefd57d488158d993af3338cf3a"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-00",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-00.json",
+      "sha256": "3c069528aff97c04954c7ab06466aeb76990434ded66545fa3b029912c5b8a82",
+      "expectedValid": true,
+      "word": "z B F D' L' y2 F' U' F2 R2 z U y x F' x z U2 R2 D2",
+      "expectedStateSHA256": "923a15261ba5074c737d71d7ff38fb938d466e6699fa038491cb37ed12c6389c"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-01",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-01.json",
+      "sha256": "c955230e7997b0a5c64890ab1c79bef6364fba7c758e47f730832e8b3703872a",
+      "expectedValid": true,
+      "word": "B R L' y2 x U2 U' y' x2 L U y' U' U F2 R' z' z2 F' U'",
+      "expectedStateSHA256": "41937870788e99e6f58ed28a004ad19257bee059aabd3e5db69ee00373394447"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-02",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-02.json",
+      "sha256": "ba192293a35c42dfe1654d7a1c333180fbe8848421dc05f80badf063421f7d1b",
+      "expectedValid": true,
+      "word": "L U2 z' x2 D2 B L2 y U2 F' z R2 z2 y2 L' y x2 R2 D x'",
+      "expectedStateSHA256": "f67c24d0d6e43d37954a69a5074f14c7a20a19f8b9c82ba50f48a6a7f0f48a22"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-03",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-03.json",
+      "sha256": "85fe36e3d5bafdb296df39d0258ee476cf6b4adaa4c8be64a86d37a7e3f089ea",
+      "expectedValid": true,
+      "word": "z2 U2 y2 U2 F2 z' y2 x U F2 U x2 F F x y D B D U",
+      "expectedStateSHA256": "d2f2e87f331d397f3abdef28ce2bce6a6677792e277275bf59bfa5d61e6b94b7"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-04",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-04.json",
+      "sha256": "3750d4d770e15417ca4a5fb84f1f58546dff8df26b24802789d7e6cec3b3bac0",
+      "expectedValid": true,
+      "word": "x2 D y x2 U U L2 x z' F' B2 z' B L F2 y2 D y D' R",
+      "expectedStateSHA256": "901e7add5ec06f27ae20fb99687e6c948c3215f15684e0215f548686aa87ccb3"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-05",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-05.json",
+      "sha256": "e57226743039c05b0894e2f0f0864153b73495e4beb62a4fa4e6a284656adba6",
+      "expectedValid": true,
+      "word": "z2 x' x y2 F' x' z R2 x2 L L' x2 y F' R2 L y2 D2 D B2",
+      "expectedStateSHA256": "74b47ed1e57d694abf5195e3aace2ed2ec1bf30db90489dd46f23a31e8dd32ae"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-06",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-06.json",
+      "sha256": "1f57d6a4b9fec68d82e5fd39764f9678a8697d73fdac3c4ee70f1acfb53f54e1",
+      "expectedValid": true,
+      "word": "D D B U2 D' z x2 x2 z' R' D2 R' z U D2 L' z D' x' y",
+      "expectedStateSHA256": "299a2f99ba6b1abe2ae7e84ede442c5756b8d88970a03990a6b5073a7556cc3a"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-07",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-07.json",
+      "sha256": "5b643a25ede69b80d17e843e0fabd2ed5599f3c099b6dd429ba38b26b9112363",
+      "expectedValid": true,
+      "word": "z' x' D' x' y' R2 U2 y2 U U B' x2 B' U2 z2 z' y2 F L2 U2",
+      "expectedStateSHA256": "ed59806355c0886f3ff53849ecef8873dc601814d2e0da88bd0095d30348ec1f"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-08",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-08.json",
+      "sha256": "424fd408e67fcb18e2b8a22add6a3965153ede0081e282c7dead3602208a5ad9",
+      "expectedValid": true,
+      "word": "B F D2 D2 L U z2 x' D B' U' x' z2 y2 D2 F2 F2 z2 R F'",
+      "expectedStateSHA256": "d71c289fdcf0312aae51b870622e622d4b4327d9b340475b8a3ff5e251a25859"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-09",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-09.json",
+      "sha256": "216960424de85b68b80fce9d39c5ff89b68a83c91f10ca370cb505a8b116334e",
+      "expectedValid": true,
+      "word": "y y' B2 z B x y D2 x2 D2 D D B2 U2 y L' L2 B' F2 x2",
+      "expectedStateSHA256": "f31495321944b02abe9242519578e8133607c6a9fac8afa92a4aaec88d9f1435"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-10",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-10.json",
+      "sha256": "abb63c86b20a2b721b81f350d1bd7a1d1b898cb20d85a7369af78c1c4ef51fa4",
+      "expectedValid": true,
+      "word": "L' B U' L2 F2 U' D U2 z2 R D2 z2 y2 L' U' R B U R' B2",
+      "expectedStateSHA256": "c3552e897e8042ce1ea15168460eef64ea49c4589407cb0f870ab8f16b89d1f0"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-11",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-11.json",
+      "sha256": "451d4b5e5adf73421b38462513dc7932dd4e9cc2563ec1c05ab160cbc2045cc3",
+      "expectedValid": true,
+      "word": "z' D D2 L2 R2 D z' R2 y2 R' F' L L F x y' x R2 z' z2",
+      "expectedStateSHA256": "ded6dcbbbc0fee0fbf1b66a1186fcd36f6039baaccb26f2db393a4ef9fe3f7c8"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-12",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-12.json",
+      "sha256": "673662e3f3c0c5ee3b4af9249bec9cd62c20ef78f518edbae8769106db6a0c51",
+      "expectedValid": true,
+      "word": "U2 x y2 x L' U' L2 z F' F' U2 L2 F2 F2 U R2 y2 L y x",
+      "expectedStateSHA256": "949de8088b68fd9700d27f553b850c565860902e73a4662fb75d92298f2b60c9"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-13",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-13.json",
+      "sha256": "064026b50d24ed8769d8b060426460aa37474626061ad17c71b66801b2aafb42",
+      "expectedValid": true,
+      "word": "B' z D' U' B' z y' x2 D z' x2 F' B2 z F x2 z2 y' L B2",
+      "expectedStateSHA256": "5060d56cd44445bdc10b7f0c0974618eaf27641001ab3e7a088120d3c5ab0dc8"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-14",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-14.json",
+      "sha256": "420d2e94521469b35aba83ca21e90dcc8fe2a476205cd1424833017baeade989",
+      "expectedValid": true,
+      "word": "B2 B B D' U' D y2 x2 y R' F' L2 R F' D' y' x z2 R2 L'",
+      "expectedStateSHA256": "663c01c5eac06b9cafa0b9962583b0735593a8ae99529d2c27a91e522aa6db7d"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-15",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-15.json",
+      "sha256": "006634efb6fe3b97423aa569441c4552b1636f0bf83ea4df269ddd5007bf0380",
+      "expectedValid": true,
+      "word": "F' R z' F' B D2 x2 U2 z2 D2 y2 R y' U2 x2 L x y B2 x'",
+      "expectedStateSHA256": "450084f80d284e3421505e92f97a90e2048589486ab089b75ff3eb68c83ddc9d"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-16",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-16.json",
+      "sha256": "0e013a3854327f350cf153b0189c5efc062de45efff66f6b1912333ce27d18a4",
+      "expectedValid": true,
+      "word": "R' x' L' U2 x' B' x' F2 R' L2 y B2 B2 y' R L' y2 L2 L2 x2",
+      "expectedStateSHA256": "05709019331391c69adbb38b92e89961a7fe2e98cd62bf2777e4ebdb5371394b"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-17",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-17.json",
+      "sha256": "987c92e34b418ca3b06f02ec5d2a868bd1de7b6366839f0def87043b8df7093e",
+      "expectedValid": true,
+      "word": "U' B' F' x2 F' D' D' B R' U2 L' z U2 R U' x2 z' z2 U B",
+      "expectedStateSHA256": "491ad56bede69fffdc4792e938a54aee007b2b88cdbef6636da8a0db78d014cf"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-18",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-18.json",
+      "sha256": "010cca54dacd2c66cc0113cc54ed9ed2b5b6700c50e6234ad828d2fc9e5e8e6a",
+      "expectedValid": true,
+      "word": "L L L2 F2 y D' z z y2 D2 B' R x2 F2 L2 F' F2 D z2 z",
+      "expectedStateSHA256": "aa849ab1d9c42f6b3b38b67bc14fb992be792686988dd076d33565e619b4df0b"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-19",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-19.json",
+      "sha256": "e691f1a015ac87b5f9969b8eb9540381c2dd0f1c544218771850f72953924345",
+      "expectedValid": true,
+      "word": "D L2 R2 D' D B R2 F2 z U L' y B2 L L2 x z' F' z F2",
+      "expectedStateSHA256": "578b480fc96a8b19d6a5a67916e26724ae9ff8480e66d8e5b60cb32bb4e6494a"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-20",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-20.json",
+      "sha256": "c7a4506d8b28c7708592f7e44d8b1b50475368439a9302167f0f3c8abea0e7a3",
+      "expectedValid": true,
+      "word": "L' F y2 x L2 U D' U' x' z' z' D x F' R2 B U F F2 B2",
+      "expectedStateSHA256": "1c55bfe16cf7a5b0aa68f241d48c984629a119f82433dd74de0a290a4060b715"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-21",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-21.json",
+      "sha256": "90f6978390866f1b65e714b88ee53816a0859348dd860326e73e5f2a93dbcec9",
+      "expectedValid": true,
+      "word": "F B L2 B L' L2 x U' D2 D F2 y y' x' U2 z' x z2 x2 B'",
+      "expectedStateSHA256": "e6c79902c360dcf3f395c8b2f27d965b0ced99ad2dc5ebee07aa4851a973e191"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-22",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-22.json",
+      "sha256": "59efd5f201656ae5ba099d94b5e83aeda99b94e6cb30fa968ec5e30246909a69",
+      "expectedValid": true,
+      "word": "R y' y' F' z F L R' y y' F B2 z z2 L x2 U' U2 L' F",
+      "expectedStateSHA256": "76421faa17fd896f94bdac61ba1397d14aec7d4a5ba165c4010cf64481bb4176"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-23",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-23.json",
+      "sha256": "148e3ab60b677dc2c51a79e5c5115160ebe655fdd0fbc964cf8e93c4400b771e",
+      "expectedValid": true,
+      "word": "F' y z' y2 L2 x2 B2 y2 x z' z2 x2 L2 y' R z L2 D y2 z'",
+      "expectedStateSHA256": "bbe06e937e07a5d93817ac83c6f6294f6fbef3d613604a7617a585edc9b756ba"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-24",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-24.json",
+      "sha256": "7a6f38753cb2f0fe5b48b03365a10dea9b3ae383aaf7b325a78eca9d502e7090",
+      "expectedValid": true,
+      "word": "R' L' U' x2 x F y2 U2 F' D2 U' R B D' L2 U2 D' x2 F D",
+      "expectedStateSHA256": "5636cdf5dac2ffa1a9a8fb29c881933d748e86cb6627630621f6cdf3411b960d"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-25",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-25.json",
+      "sha256": "f3e122f63fe80505ecd5ac3b6804b69bac5b72da33e6286fa2cf7f1e42a2ca81",
+      "expectedValid": true,
+      "word": "z F' z2 x' U y' x F' U2 L' z' F F' z' U' L' B' R2 F2 R2",
+      "expectedStateSHA256": "712835c241ac8945ec83d5658130d50d0cc0e9e28bf5dd4787d27323ae8aa8f1"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-26",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-26.json",
+      "sha256": "a0540715a7e398c6346e99512851c61bfed365a31889c9eb9b4c73eaffd831a7",
+      "expectedValid": true,
+      "word": "y' L U R U' x2 B2 B D2 x2 R2 B R2 y' R' D2 y2 y2 F D",
+      "expectedStateSHA256": "d26b98e8b6186dd72a13937dae97c8d113a984888ccad76163598672551f3e1e"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-27",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-27.json",
+      "sha256": "cb735da3913b4e0282e3410d758a74a12ecffe960dba28ccc2804c5da2e00042",
+      "expectedValid": true,
+      "word": "z L' D' z' y2 L' L y U' F' B2 F z' F x' x R2 B2 D2 D2",
+      "expectedStateSHA256": "0ebcaac7ea7fe29200803569a0f5963120a0842922b797fbfd9e2e9e7d25c62d"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-28",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-28.json",
+      "sha256": "438457ee8a621d9f31d14b8e52f76e64c4a2dd67b6d47a1d2d9450a397188741",
+      "expectedValid": true,
+      "word": "y B D' R2 F2 R y2 z2 F U B' U2 y2 B' R x z' z' F B",
+      "expectedStateSHA256": "6a4839db66979f6d893ccdb32b77b73b00ecfd34329bee9f04b9521f63d443c4"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-29",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-29.json",
+      "sha256": "0e33a506e0628998468228dfe911c83d1e5b07387a61c7483d1836995b794f35",
+      "expectedValid": true,
+      "word": "z z2 y2 R R2 L R' B z2 D2 y' y2 x2 F' B2 F2 z2 x2 U' F2",
+      "expectedStateSHA256": "ea1a0ef10da2713c70093225f5925ff75fe60619c52c4af38af40a968edc9207"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-30",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-30.json",
+      "sha256": "38a71655dbbc0fb2828571b065f4f8aa1b7da47891c55eb6b056ad25d9300037",
+      "expectedValid": true,
+      "word": "y2 B2 L z x' B2 x2 F' F y2 R' z2 D2 R D B' x2 x' y2 z2",
+      "expectedStateSHA256": "d3880266d6158d179e426326ba968e9fd244df7e1754c956d8b92a5c68a70133"
+    },
+    {
+      "group": "geometry",
+      "name": "seeded-mixed-31",
+      "path": "proof-checkers/conformance/geometry/seeded-mixed-31.json",
+      "sha256": "8de4f7aac18a765885122cb1c4ee0bccdd27ba63b336a690e5d61e30a7ac118f",
+      "expectedValid": true,
+      "word": "z' y' R2 D2 L' D' z U' z' x L2 B L y2 R R2 U x2 R2 x'",
+      "expectedStateSHA256": "65312fd71dd92f6302249f5c8f237719c60d885536a23ae41d3de398a5d9d449"
+    },
+    {
+      "group": "geometry",
+      "name": "single-corner-twist",
+      "path": "proof-checkers/conformance/geometry/single-corner-twist.json",
+      "sha256": "10a45196680423206788d699ebcba130b41c28595debecfa752ffb6d669ebc6e",
+      "expectedValid": false,
+      "word": null,
+      "expectedStateSHA256": "3fbe4ca987eceed569cf019c554c4b44c77259b0a3d56a194c3dd639b1a47cda"
+    },
+    {
+      "group": "geometry",
+      "name": "single-edge-flip",
+      "path": "proof-checkers/conformance/geometry/single-edge-flip.json",
+      "sha256": "cee7b353a69c62e2cc5729ff160695dddbd77f387f0dad6c66b329af4574a202",
+      "expectedValid": false,
+      "word": null,
+      "expectedStateSHA256": "c3e8f72a503ab1c217a8879e4a6d50b46f229302f99e42d65da5156f121609b9"
+    },
+    {
+      "group": "geometry",
+      "name": "state-cubie-identity-changed",
+      "path": "proof-checkers/conformance/geometry/state-cubie-identity-changed.json",
+      "sha256": "af4e9780d7f27044404c7de888ddb2dba47a3efc16dace626a1583a6da28047c",
+      "expectedValid": false,
+      "expectedStateSHA256": "6918e8cb52fd6d5f13a459422b71cfbc8d30ea4413b3dda6dabb24802cf00448"
+    },
+    {
+      "group": "geometry",
+      "name": "state-image-changed",
+      "path": "proof-checkers/conformance/geometry/state-image-changed.json",
+      "sha256": "09ada612808f9f19f8730adca749d988b966f2f6341046c8144f48ed827f255e",
+      "expectedValid": false,
+      "expectedStateSHA256": "c7f9452aef2850a8253fc2592dd989685cbfc2dbef79c35933601860975fd6af"
+    },
+    {
+      "group": "geometry",
+      "name": "state-not-array",
+      "path": "proof-checkers/conformance/geometry/state-not-array.json",
+      "sha256": "87875c892f68590f70463b686a38f8759341ccbee1538f0310e74e4d2c0fe6c4",
+      "expectedValid": false,
+      "expectedStateSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "group": "geometry",
+      "name": "unknown-geometry-schema",
+      "path": "proof-checkers/conformance/geometry/unknown-geometry-schema.json",
+      "sha256": "406fb7baff14679e55b79e2fe76ae390786b68c7dc99a8a5715cd8ed1880d443",
+      "expectedValid": false,
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    },
+    {
+      "group": "geometry",
+      "name": "valid-center-half",
+      "path": "proof-checkers/conformance/geometry/valid-center-half.json",
+      "sha256": "979166136e9f47640af942fa251db25aed437093141b5133a9c583f815f5c765",
+      "expectedValid": true,
+      "word": "U F U' F U F U' F U F U' F U F U' F U F U' F",
+      "expectedStateSHA256": "9817a6a7edad5fbf007696a17ed4736014d1ba97d522536f32619d5c204fcae1",
+      "expectedGoalMatches": true
+    },
+    {
+      "group": "geometry",
+      "name": "valid-declared-center-quarter",
+      "path": "proof-checkers/conformance/geometry/valid-declared-center-quarter.json",
+      "sha256": "7fe2d0bb03d88c65195a4c5a4437d49afd1e8c9e1a04f4c57813ca19422ecef5",
+      "expectedValid": true,
+      "expectedStateSHA256": "5fb4051ac8e7cf00b74c4ac60ea983c65b0b0e19cca90b14cb696b139e4b4b97"
+    },
+    {
+      "group": "geometry",
+      "name": "valid-quarter-exact-optical-goal",
+      "path": "proof-checkers/conformance/geometry/valid-quarter-exact-optical-goal.json",
+      "sha256": "79633e734c5bfd20fbcb07a0ea7f9eca2e2d222d3f3d60d315243636344a01aa",
+      "expectedValid": true,
+      "expectedStateSHA256": "5fb4051ac8e7cf00b74c4ac60ea983c65b0b0e19cca90b14cb696b139e4b4b97",
+      "expectedGoalMatches": true
+    },
+    {
+      "group": "geometry",
+      "name": "valid-quarter-period-one",
+      "path": "proof-checkers/conformance/geometry/valid-quarter-period-one.json",
+      "sha256": "0373b9f60670c426c10dfbb36eded29abbcef99f87a806b19419c9a9e02ee0be",
+      "expectedValid": true,
+      "word": "R",
+      "expectedStateSHA256": "5fb4051ac8e7cf00b74c4ac60ea983c65b0b0e19cca90b14cb696b139e4b4b97",
+      "expectedGoalMatches": true
+    },
+    {
+      "group": "geometry",
+      "name": "valid-quarter-period-two-mismatch",
+      "path": "proof-checkers/conformance/geometry/valid-quarter-period-two-mismatch.json",
+      "sha256": "28ac287cef5d8301c178cbeaf671d8f40c424f3d7509a72d2840f4a4d9f8761e",
+      "expectedValid": true,
+      "word": "R",
+      "expectedStateSHA256": "5fb4051ac8e7cf00b74c4ac60ea983c65b0b0e19cca90b14cb696b139e4b4b97",
+      "expectedGoalMatches": false
+    },
+    {
+      "group": "geometry",
+      "name": "whole-x-half",
+      "path": "proof-checkers/conformance/geometry/whole-x-half.json",
+      "sha256": "27071e34f980d46e9c2360582f304ec55e8ae9d4367c131b93faaa5069c4842a",
+      "expectedValid": true,
+      "word": "x2",
+      "expectedStateSHA256": "d4d18ad3b6993e1cc613d6281d13a0cec8626eff3d7193d3e114c2eeb497b180"
+    },
+    {
+      "group": "geometry",
+      "name": "whole-x-inverse",
+      "path": "proof-checkers/conformance/geometry/whole-x-inverse.json",
+      "sha256": "0be6dfb07367367d094f30301596fc43f4fb06a1dfd95306b972f03186e27470",
+      "expectedValid": true,
+      "word": "x'",
+      "expectedStateSHA256": "be3db6b7e7d11d4807b19e021862fbd12d830a659b4243c3a11c49449eae5f35"
+    },
+    {
+      "group": "geometry",
+      "name": "whole-x-quarter",
+      "path": "proof-checkers/conformance/geometry/whole-x-quarter.json",
+      "sha256": "ea93b4ee4e7df5b2d80dfa59f1518c528974da41d244335b2d3c5b7ae7c28313",
+      "expectedValid": true,
+      "word": "x",
+      "expectedStateSHA256": "2e81b5047b2fffd7d0745763d916529bb3712c0e9a6d141bda96500936957a38"
+    },
+    {
+      "group": "geometry",
+      "name": "whole-y-half",
+      "path": "proof-checkers/conformance/geometry/whole-y-half.json",
+      "sha256": "4806dfe96a7708e7c40809795262d895bc6b33e4a721d689c83e04b895b7f367",
+      "expectedValid": true,
+      "word": "y2",
+      "expectedStateSHA256": "b6e0cf65799fec8f98bb40da7c2f3dfaed9ded0edd480e9381d7f94f96c203ae"
+    },
+    {
+      "group": "geometry",
+      "name": "whole-y-inverse",
+      "path": "proof-checkers/conformance/geometry/whole-y-inverse.json",
+      "sha256": "786395d879e9a41240cdd37a7286483c52b7f4726cd4270317e9e57832478aaa",
+      "expectedValid": true,
+      "word": "y'",
+      "expectedStateSHA256": "0b2b4d4aaa2b546958127d46f9c9e294e9584d8ac3be19036f5c252353db48e2"
+    },
+    {
+      "group": "geometry",
+      "name": "whole-y-quarter",
+      "path": "proof-checkers/conformance/geometry/whole-y-quarter.json",
+      "sha256": "2e89bd8df9ac17a803b287ac1b197f70417b565b6ae5ac102688356b7d6dea5a",
+      "expectedValid": true,
+      "word": "y",
+      "expectedStateSHA256": "7b0cd9c61fc0267a15ccca4eb2bb98e271a65ba7558e01de9701f7a9cbd3ee36"
+    },
+    {
+      "group": "geometry",
+      "name": "whole-z-half",
+      "path": "proof-checkers/conformance/geometry/whole-z-half.json",
+      "sha256": "f59c68fd0bfb74752d3919774a0aecfff7996b5dd80c58c5b6e32b5bebcb9355",
+      "expectedValid": true,
+      "word": "z2",
+      "expectedStateSHA256": "2cc3d3f6a08a49e3916f60285a48dad62ae5a79fe6f78d896909e5c613751168"
+    },
+    {
+      "group": "geometry",
+      "name": "whole-z-inverse",
+      "path": "proof-checkers/conformance/geometry/whole-z-inverse.json",
+      "sha256": "1b80414cc7073f2771505633cc00416417d639092858bdd16db77e1dfe79a015",
+      "expectedValid": true,
+      "word": "z'",
+      "expectedStateSHA256": "d5318cdeb3a4818efd2d7e9f802f61278f169c55e54e6ea7e7bedc716804624e"
+    },
+    {
+      "group": "geometry",
+      "name": "whole-z-quarter",
+      "path": "proof-checkers/conformance/geometry/whole-z-quarter.json",
+      "sha256": "cf0ad6119a9a4abcd6801a27a6b62e2982b13e3ea6e49a4cb6e42a63c8459da3",
+      "expectedValid": true,
+      "word": "z",
+      "expectedStateSHA256": "7becddfe52ab69b6ff41afca576df148bdb72d6412bfffda32a2088a19b52d38"
+    },
+    {
+      "group": "geometry",
+      "name": "wrong-source-body-group",
+      "path": "proof-checkers/conformance/geometry/wrong-source-body-group.json",
+      "sha256": "957f035bd33e9b49de70f1443f42a246ef8eb68923b29a59260ed4ce813d93af",
+      "expectedValid": false,
+      "expectedStateSHA256": "a770908fe3d4ce3e40b6e662a1e79efd73ef74e811e8ee03aea2f276c209869a"
+    }
+  ],
+  "caseCount": 188,
+  "counterCaseCount": 41,
+  "geometryCaseCount": 147,
+  "counterChain": {
+    "path": "proof-checkers/conformance/counter-chain.json",
+    "sha256": "e051e2f4a14293dbeecc7cf123b914481bdcc0c2452c156e099102f1eeb07a88",
+    "values": 801,
+    "transitionsPerFormat": 800
+  },
+  "kernel": {
+    "path": "proof-checkers/conformance/center-kernel.json",
+    "sha256": "7e3a81b80463d2392d2101f0dbb8a98ce6869997c15e17c843c4e70522b3fa89",
+    "rows": 2048,
+    "generators": 36
+  },
+  "oraclePins": {
+    "counterPath": "research/counter/verify.py",
+    "counterSHA256": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+    "researchRevision": "0013522f65ccd0c1fb27d8ce63e0d48661fa18fc",
+    "researchOraclePath": "research/date-3x3/verify_witness.py",
+    "researchOracleSHA256": "c8ff97acdad91cc47fef09e1f4352b4f414613908ecef67e03f0148a3d3e5e7d",
+    "originalKernelSHA256": "e57911a10fdb522cf6e756f75fa624d196cf4899b547cbaff32f34ab40b8b3b0"
+  }
+}
