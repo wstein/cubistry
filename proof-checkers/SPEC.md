@@ -39,6 +39,10 @@ syntax and resource bounds are still checked. The conformance manifest identifie
 strict-only rejections that incumbent Python may accept, especially declared
 unpadded fields that compare equal under Python's Boolean/integer equality.
 
+Move separators are exactly Python 3.12 `str.split()` whitespace: U+0009–000D,
+U+001C–0020, U+0085, U+00A0, U+1680, U+2000–200A, U+2028, U+2029, U+202F,
+U+205F and U+3000. Runs/leading/trailing separators are ignored; no other code
+point is a separator. The reordered-array positive fixture exercises the set.
 Move words are strings of explicit whitespace-separated `R L U D F B` tokens,
 optionally suffixed `2` or `'`; 3×3 also supports `x y z`. Reject lowercase face
 moves, slices, wide turns, duplicate suffixes and nonstrings. Bound a word to

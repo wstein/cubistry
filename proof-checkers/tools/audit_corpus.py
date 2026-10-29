@@ -3,7 +3,7 @@
 import hashlib,json
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
-PIN='fcae7e6ad5cb19518234b8fd60120fa3840c275a83084b475751c290dabd3556'
+PIN='c0d0fa2fc6d692c7c89e436fe5a2670503d8a8a6c86a2cc0d1397be983832e01'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
  manifest=ROOT/'proof-checkers/conformance/manifest.json';assert sha(manifest)==PIN,'Changed conformance manifest'
