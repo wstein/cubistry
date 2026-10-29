@@ -5,8 +5,8 @@ The [contract](SPEC.md), [interface](INTERFACE.md) and [coverage ledger](coverag
 define the accepted formats. At the time of issue 74, existing Python checks and
 CI were authoritative and unchanged. Since the 2026-10-29
 [authority change](AUTHORITY.md), Flix and Julia are the
-authoritative verifiers (both must accept; disagreement is `UNKNOWN`) and Python
-is a third voice. This completes the scoped implementation, not a migration of
+authoritative verifiers (both must accept; any dissent is `UNKNOWN`) and Python
+verifiers play no role in confirmation. This completes the scoped implementation, not a migration of
 all project tests or formal verification of either checker program.
 
 ## Correctness and independent review

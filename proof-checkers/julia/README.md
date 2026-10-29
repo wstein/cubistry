@@ -3,7 +3,7 @@
 This optional checker implements the two bounded groups in [issue 74](https://github.com/wstein/cubistry/issues/74)
 against the shared [specification](../SPEC.md). Since the 2026-10-29
 [authority change](../AUTHORITY.md) it is, together with
-the Flix checker, the authoritative verifier; Python is a third voice. The issue
+the Flix checker, the authoritative verifier; Python verifiers play no role in confirmation. The issue
 74 delivery left existing Python, production and CI unchanged. It reads raw certificate/state JSON directly; Python is used
 only for separate conformance/audit tooling.
 
