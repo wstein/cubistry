@@ -561,17 +561,16 @@ test("move statistics block is present, stable in layout and updates after clock
   await expect(block).toHaveAttribute("aria-label", "Clock moves");
   await expect(page.locator("#total-session-moves")).toHaveText("0");
   await expect(page.locator("#total-last-moves")).toHaveText("—");
-  for (const name of ["hours", "minutes", "seconds", "total"])
-    for (const column of ["mean", "median"])
-      await expect(page.locator(`#${name}-${column}-moves`)).toHaveText("—");
+  for (const name of ["hours", "minutes", "seconds"])
+    await expect(page.locator(`#${name}-mean-moves`)).toHaveText("—");
+  await expect(page.locator("#total-mean-moves")).toHaveCount(0);
   await expect(page.locator(".clock-move-table thead th")).toHaveText([
     "Cube",
-    "Session HTM",
+    "Total HTM",
     "Cube rotations",
     "Last tick",
     "Max / tick",
-    "Mean / tick",
-    "Median / tick",
+    "Average / tick",
   ]);
   const before = await page.locator(".clock-cubes").boundingBox();
   await page.clock.runFor(4000);
@@ -595,28 +594,17 @@ test("move statistics block is present, stable in layout and updates after clock
     await read("seconds-last-moves"),
   );
   expect(await page.locator(".clock-cubes").boundingBox()).toEqual(before);
-  // Mean and median appear with the first completed tick and stay in range.
+  // The average appears with the first completed change and stays in range.
   await expect
     .poll(() => page.locator("#seconds-mean-moves").textContent())
     .toMatch(/^\d+\.\d\d$/);
-  await expect(page.locator("#seconds-median-moves")).toHaveText(
-    /^\d+(\.5)?$/,
-  );
-  const secondsStats = {
-    mean: await read("seconds-mean-moves"),
-    median: await read("seconds-median-moves"),
-    max: await read("seconds-max-moves"),
-  };
-  expect(secondsStats.mean).toBeGreaterThanOrEqual(0);
-  expect(secondsStats.mean).toBeLessThanOrEqual(secondsStats.max);
-  expect(secondsStats.median).toBeLessThanOrEqual(secondsStats.max);
-  expect(await read("total-mean-moves")).toBeGreaterThanOrEqual(0);
-  expect(await read("total-median-moves")).toBeGreaterThanOrEqual(0);
+  const average = await read("seconds-mean-moves");
+  expect(average).toBeGreaterThanOrEqual(0);
+  expect(average).toBeLessThanOrEqual(await read("seconds-max-moves"));
   await page.locator("#reset-clock-moves").click();
   await expect(page.locator("#total-session-moves")).toHaveText("0");
   await expect(page.locator("#seconds-last-moves")).toHaveText("—");
   await expect(page.locator("#seconds-mean-moves")).toHaveText("—");
-  await expect(page.locator("#total-median-moves")).toHaveText("—");
   await page.setViewportSize({ width: 390, height: 844 });
   expect(
     await page.locator("html").evaluate((e) => e.scrollWidth),
