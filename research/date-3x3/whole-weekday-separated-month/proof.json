@@ -1,0 +1,52 @@
+{
+  "status": "UNSAT",
+  "sourceSHA256": "c3b765a181e7a9f0714f8392625f44ab207ff74680ba5305787c9342a845d826",
+  "scope": "Whole three-letter weekday on one top-row sticker, other top cells genuinely blank; existing German A day and month rows retained",
+  "imageModel": "Exact immutable upright glyph images; no rotated-glyph reinterpretation or shared O/0 image",
+  "weekdayAtR1C1OrR1C3": {
+    "orbit": "corners",
+    "availableFaces": 24,
+    "requiredDistinctImages": 25,
+    "monthCornerAlphabet": [
+      "A",
+      "B",
+      "D",
+      "F",
+      "G",
+      "I",
+      "J",
+      "L",
+      "M",
+      "N",
+      "O",
+      "P",
+      "R",
+      "S",
+      "T",
+      "V",
+      "Z"
+    ],
+    "reason": "Whole weekday + month outer letters + blank opposite top corner"
+  },
+  "weekdayAtR1C2": {
+    "orbit": "edges",
+    "availableFaces": 24,
+    "requiredDistinctImages": 25,
+    "monthMiddleAlphabet": [
+      "A",
+      "E",
+      "K",
+      "O",
+      "P",
+      "U",
+      "Ä"
+    ],
+    "reason": "Whole weekday + month middle letters + day units + blank R2C1"
+  },
+  "doesNotProve": [
+    "Distributed weekday letters",
+    "Different day layout",
+    "Different row order",
+    "Word fragments or alternative month lexicon"
+  ]
+}
