@@ -552,3 +552,42 @@ test("untimed recovery honors quarter-based clock speed while the default viewer
   expect(mean(weighted, 2) / mean(weighted, 1)).toBeGreaterThan(1.4);
   expect(Math.abs(mean(legacy, 2) - mean(legacy, 1))).toBeLessThanOrEqual(90);
 });
+test("move statistics block is present, stable in layout and updates after clock ticks", async ({
+  page,
+}) => {
+  await ready(page, "2026-10-28T11:34:56Z");
+  const block = page.locator("#clock-stats");
+  await expect(block).toHaveAttribute("role", "status");
+  await expect(block).toHaveAttribute("aria-label", "Clock moves");
+  await expect(page.locator("#total-session-moves")).toHaveText("0");
+  await expect(page.locator("#total-last-moves")).toHaveText("—");
+  const before = await page.locator(".clock-cubes").boundingBox();
+  await page.clock.runFor(4000);
+  await expect
+    .poll(() => page.locator("#seconds-session-moves").textContent())
+    .not.toBe("0");
+  const read = (id) =>
+    page.locator("#" + id).evaluate((e) => Number(e.dataset.value));
+  const seconds = await read("seconds-session-moves");
+  expect(await read("hours-session-moves")).toBe(0);
+  expect(await read("total-session-moves")).toBe(
+    seconds +
+      (await read("minutes-session-moves")) +
+      (await read("hours-session-moves")),
+  );
+  expect(await read("seconds-session-rotations")).toBe(0);
+  await expect
+    .poll(() => page.locator("#seconds-last-moves").textContent())
+    .not.toBe("—");
+  expect(await read("seconds-max-moves")).toBeGreaterThanOrEqual(
+    await read("seconds-last-moves"),
+  );
+  expect(await page.locator(".clock-cubes").boundingBox()).toEqual(before);
+  await page.locator("#reset-clock-moves").click();
+  await expect(page.locator("#total-session-moves")).toHaveText("0");
+  await expect(page.locator("#seconds-last-moves")).toHaveText("—");
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.locator("html").evaluate((e) => e.scrollWidth),
+  ).toBeLessThanOrEqual(390);
+});
