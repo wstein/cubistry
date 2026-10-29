@@ -263,14 +263,14 @@ int main(int argc, char **argv) {
                 c + j ? ", " : "", c * 3 + j, p[0], p[1], p[2], n[0], n[1], n[2], up[0], up[1], up[2]);
       }
     fprintf(f, "],\n     \"steps\": [\n");
-    for (int i = 0; i < best.clen; i++) {
-      int a = best.cyc[i], b = best.cyc[(i + 1) % best.clen];
+    for (int i = 0; i < best.cycleLength; i++) {
+      int a = best.cyc[i], b = best.cyc[(i + 1) % best.cycleLength];
       int nv = G.layer[b];
       int d = edgeWord(G.key[a], G.key[b], gop[nv], gno[nv]);
       char ws[64];
       wordStr(fw, d, ws);
       fprintf(f, "       {\"from\": %d, \"to\": %d, \"word\": \"%s\"}%s\n", G.layer[a], nv, ws,
-              i + 1 < best.clen ? "," : "");
+              i + 1 < best.cycleLength ? "," : "");
     }
     fprintf(f, "     ]}%s\n", mi < 7 ? "," : "");
     fprintf(stderr,

@@ -626,8 +626,8 @@ static int buildGraph(const Print *P, char L, int N, int dir, Graph *G) {
         if (!posUsed[p])
           rp[np++] = p;
       for (int pm = 0; pm < 24; pm++)
-        for (int ot = 0; ot < 81; ot++) {
-          int o3[4] = {ot % 3, ot / 3 % 3, ot / 9 % 3, ot / 27};
+        for (int orient = 0; orient < 81; orient++) {
+          int o3[4] = {orient % 3, orient / 3 % 3, orient / 9 % 3, orient / 27};
           int t = tws;
           for (int k = 0; k < 4; k++) {
             int c = rc[k];
@@ -734,7 +734,7 @@ typedef struct {
   long A;
   long L;
   int *cyc;
-  int clen;
+  int cycleLength;
   int maxc;
 } MMC;
 static int computeAlive(Graph *G, int cap, uint8_t *alive) {
@@ -908,7 +908,7 @@ static int howard(Graph *G, uint8_t *alive, MMC *res) {
   res->A = sum;
   res->L = len;
   res->cyc = malloc(len * 4);
-  res->clen = len;
+  res->cycleLength = len;
   u = start < 0 ? v : start;
   res->maxc = 0;
   for (int i = 0; i < len; i++) {
