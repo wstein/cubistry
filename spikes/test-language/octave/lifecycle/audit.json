@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "calls": [
+    {
+      "iteration": 0,
+      "states": 100,
+      "stickerFrames": 2400,
+      "negativeControls": 6,
+      "stateSHA256": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+    },
+    {
+      "iteration": 1,
+      "states": 100,
+      "stickerFrames": 2400,
+      "negativeControls": 6,
+      "stateSHA256": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+    },
+    {
+      "iteration": 2,
+      "states": 100,
+      "stickerFrames": 2400,
+      "negativeControls": 6,
+      "stateSHA256": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+    },
+    {
+      "iteration": 3,
+      "states": 100,
+      "stickerFrames": 2400,
+      "negativeControls": 6,
+      "stateSHA256": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+    }
+  ],
+  "totalStates": 400,
+  "totalStickerFrames": 9600,
+  "totalInverseChecks": 400,
+  "totalNegativeControls": 24,
+  "proofSHA256": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+  "pythonCheckerSHA256": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+  "scope": "Actual frame exports replayed with unchanged Python geometry; counts checked against complete checker logs"
+}
