@@ -4,6 +4,7 @@ import type {
 } from "./controller.ts";
 export interface CenterOptions {
   backend?: "direct" | "center-aware";
+  policy?: "default" | "portfolio";
   maximumNodes?: number;
   maximumDepth?: number;
   threshold?: number;
@@ -39,3 +40,18 @@ export function createPlanner(options: {
   appRoot?: string;
   options?: CenterOptions;
 }): Promise<CalendarRoutePlanner>;
+
+export function tryCenterPortfolio(
+  context: CalendarPlanningContext,
+  directWord: string,
+  options?: CenterOptions,
+  onCandidate?: (
+    result: ReturnType<typeof tryCenterAware> & {
+      attempts: ReadonlyArray<unknown>;
+    },
+  ) => void,
+): ReturnType<typeof tryCenterAware> & {
+  attempts: ReadonlyArray<unknown>;
+  maximumAttempts: number;
+  maximumTotalNodes: number;
+};

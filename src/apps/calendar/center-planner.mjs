@@ -229,6 +229,76 @@ export function tryCenterAware(context, directWord, options = {}) {
     };
   }
 }
+/** Two bounded attempts: retain the default result, then search a shorter cap.
+ * Node and browser callers share the policy and its physical candidate checker.
+ */
+export function tryCenterPortfolio(
+  context,
+  directWord,
+  options = {},
+  onCandidate,
+) {
+  const started = performance.now();
+  const maximumNodes = options.maximumNodes ?? 100000;
+  const attempts = [];
+  let best = tryCenterAware(context, directWord, options);
+  let alignmentMoves;
+  try {
+    alignmentMoves = total(pictureRequest(context).alignment);
+  } catch {}
+  const record = (result, requestedDepth, upperBound) => {
+    const maximumDepth =
+      alignmentMoves === undefined
+        ? null
+        : Math.min(requestedDepth, total(upperBound) - alignmentMoves - 1);
+    attempts.push({
+      maximumNodes,
+      maximumDepth,
+      status: result.status ?? "not-attempted",
+      attempted: result.attempted,
+      moves: total(result.word),
+      word: result.word,
+      outerHTM: tokens(result.word).filter((t) => /^[ULFRBD]/.test(t)).length,
+      rotations: tokens(result.word).filter((t) => /^[xyz]/.test(t)).length,
+      elapsedMs: result.elapsedMs ?? 0,
+      reason: result.reason,
+    });
+  };
+  record(best, options.maximumDepth ?? 24, directWord);
+  if (best.attempted) onCandidate?.({ ...best, attempts: [...attempts] });
+  if (best.attempted) {
+    try {
+      const rotations = total(pictureRequest(context).alignment);
+      const depth = Math.min(
+        options.maximumDepth ?? 24,
+        18,
+        total(best.word) - rotations - 1,
+      );
+      if (depth >= 0) {
+        const candidate = tryCenterAware(context, best.word, {
+          ...options,
+          threshold: 0,
+          maximumDepth: depth,
+        });
+        record(candidate, depth, best.word);
+        if (total(candidate.word) < total(best.word)) best = candidate;
+      }
+    } catch (error) {
+      attempts.push({
+        attempted: false,
+        status: "error",
+        reason: error.message,
+      });
+    }
+  }
+  return {
+    ...best,
+    elapsedMs: performance.now() - started,
+    attempts,
+    maximumAttempts: 2,
+    maximumTotalNodes: maximumNodes * 2,
+  };
+}
 /** Node benchmark entry point. Browsers call the same candidate checker in a worker. */
 export async function createPlanner({ design, options = {} }) {
   const [
@@ -248,6 +318,8 @@ export async function createPlanner({ design, options = {} }) {
     corrections: corrections.witnesses,
   });
   const references = new Map();
+  const maximumAttempts =
+    options.backend === "direct" ? 0 : options.policy === "default" ? 1 : 2;
   let generation = 0;
   const planner = async (context) => {
     const started = performance.now(),
@@ -263,7 +335,9 @@ export async function createPlanner({ design, options = {} }) {
     planner.lastResult =
       options.backend === "direct"
         ? { word: baseline.word, method: "direct", attempted: false }
-        : tryCenterAware(context, baseline.word, options);
+        : options.policy === "default"
+          ? tryCenterAware(context, baseline.word, options)
+          : tryCenterPortfolio(context, baseline.word, options);
     planner.lastDiagnostics = {
       backendUsed:
         planner.lastResult.method === "center-aware"
@@ -276,6 +350,9 @@ export async function createPlanner({ design, options = {} }) {
       directMoves: total(baseline.word),
       chosenMoves: total(planner.lastResult.word),
       maximumNodes: options.maximumNodes ?? 100000,
+      maximumTotalNodes: (options.maximumNodes ?? 100000) * maximumAttempts,
+      maximumAttempts,
+      attempts: planner.lastResult.attempts ?? [],
       maximumDepth: options.maximumDepth ?? 24,
       centerElapsedMs: planner.lastResult.elapsedMs ?? 0,
       planningElapsedMs: performance.now() - started,
@@ -313,6 +390,14 @@ export async function createPlanner({ design, options = {} }) {
   planner.metadata = {
     providerPin,
     backend: options.backend ?? "center-aware",
+    policy:
+      options.backend === "direct"
+        ? "direct-v1"
+        : options.policy === "default"
+          ? "default-v1"
+          : "default-then-shorter-cap18-v1",
+    maximumAttempts,
+    maximumTotalNodes: (options.maximumNodes ?? 100000) * maximumAttempts,
     package: "@puzlwerk/solver-3x3-picture@0.1.0",
     upstream: "08e079f3bc211777d8980f75ec6a7f61979dd2ac",
     maximumNodes: options.maximumNodes ?? 100000,
