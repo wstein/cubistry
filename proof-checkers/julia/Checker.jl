@@ -188,13 +188,17 @@ function check_counter(data,chain)
         show_counter(apply_tokens(unpadded,words[value+1]),value,false);push!(states,state)
     end
     need(length(chain)==801 && all(x->x isa Integer && !(x isa Bool) && 0<=x<=99,chain),"pinned 801-value chain")
+    chain_counts=Int[]
     for (printing,padded) in [(source,true),(unpadded,false)]
+        completed=0
         state=apply_tokens(printing,words[1]);current=0
         for value in chain[2:end]
             state=apply_tokens(state,vcat(inverse_tokens(words[current+1]),words[value+1]));show_counter(state,value,padded)
-            need(state==apply_tokens(printing,words[value+1]),"chained full state differs");current=value
+            need(state==apply_tokens(printing,words[value+1]),"chained full state differs");current=value;completed+=1
         end
+        push!(chain_counts,completed)
     end
+    need(chain_counts==[800,800],"all chained transitions completed")
     need(8*3==24 && (8-2)*3==18 && 10*2==20 && 9*2+1+1==20,"fixed upper-body proof premises")
     bad=copy(source);j=findfirst(s->s.image=="title-left",bad);s=bad[j];bad[j]=Sticker(s.id,s.cubie,s.p,s.n,ntuple(i->-s.up[i],3),s.image)
     rejected=false
@@ -205,7 +209,7 @@ function check_counter(data,chain)
     end
     need(rejected,"actual rotated-title tamper must reject")
     canonical="["*join((state_wire(s) for s in states),",")*"]"
-    Dict("valid"=>true,"status"=>"VALID","values"=>100,"inverseChecks"=>100,"chainedTransitionsPerFormat"=>800,
+    Dict("valid"=>true,"status"=>"VALID","values"=>100,"inverseChecks"=>100,"chainedTransitionsPerFormat"=>minimum(chain_counts),
          "hubOrderedTransitions"=>10000,"fixedBodyPremises"=>true,"rotatedTitleRejected"=>true,
          "canonicalStateSHA256"=>bytes2hex(sha256(canonical)),"canonicalStates"=>[JSON.parse(state_wire(s)) for s in states])
 end
@@ -286,8 +290,11 @@ function check_state_parts(source,actual,data;include_state=true)
     result
 end
 function invalid_result(error)
-    error isa Invalid ? Dict("valid"=>false,"status"=>error.code,"reason"=>error.message) :
-        Dict("valid"=>false,"status"=>"ERROR","reason"=>sprint(showerror,error))
+    if error isa Invalid
+        status=error.code in ("CORPUS_ERROR","CONFORMANCE_ERROR","ERROR") ? "ERROR" : error.code
+        return Dict("valid"=>false,"status"=>status,"diagnosticCode"=>error.code,"reason"=>error.message)
+    end
+    Dict("valid"=>false,"status"=>"ERROR","reason"=>sprint(showerror,error))
 end
 include("Conformance.jl")
 end

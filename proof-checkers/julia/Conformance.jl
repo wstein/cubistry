@@ -38,7 +38,7 @@ function conformance(root;export_path=nothing)
     export_path!==nothing && need(!ispath(export_path),"export path must be new";code="ERROR")
     exports=export_path===nothing ? nothing : open(export_path,"w")
     reports=Any[];hashes=String[]
-    geometry_witnesses=0;outer_htm=0;whole_rotations=0;rotation_quarters=0
+    geometry_witnesses=0;outer_htm=0;whole_rotations=0;rotation_quarters=0;kernel_count=0;generator_count=0
     try
         for row in manifest["cases"]
             command=row["group"]=="counter" ? "counter" : "state3"
@@ -87,6 +87,7 @@ function conformance(root;export_path=nothing)
         need(length(Set(row["i"] for row in kernel["rows"]))==2048,"unique kernel indices";code="CORPUS_ERROR")
         for (group,rows) in [("generators",kernel["generators"]),("kernel",kernel["rows"])]
             for (index,row) in enumerate(rows)
+                group=="kernel" ? (kernel_count+=1) : (generator_count+=1)
                 ts=moves(row["word"];whole=true);state=apply_tokens(source,ts)
                 result=check_state_parts(source,state,Dict();include_state=false)
                 expected=group=="kernel" ? row["o"] : row["delta"]
@@ -101,8 +102,12 @@ function conformance(root;export_path=nothing)
                 end
             end
         end
-        Dict("valid"=>true,"status"=>"VALID","counterCases"=>41,"counterAccepted"=>2,"counterRejected"=>39,
-             "geometryCases"=>154,"geometryAccepted"=>129,"geometryRejected"=>25,"kernelReferences"=>2048,"centerGenerators"=>36,
+        counter_cases=count(r->r["group"]=="counter",reports);counter_accepted=count(r->r["group"]=="counter" && r["valid"],reports)
+        geometry_cases=count(r->r["group"]=="geometry",reports);geometry_accepted=count(r->r["group"]=="geometry" && r["valid"],reports)
+        need((counter_cases,counter_accepted,geometry_cases,geometry_accepted,kernel_count,generator_count,length(hashes))==(41,2,154,129,2048,36,2215),"all complete suite outcomes";code="CONFORMANCE_ERROR")
+        need((geometry_witnesses,outer_htm,whole_rotations,rotation_quarters)==(121,628,369,469),"all explicit geometry witness actions";code="CONFORMANCE_ERROR")
+        Dict("valid"=>true,"status"=>"VALID","counterCases"=>counter_cases,"counterAccepted"=>counter_accepted,"counterRejected"=>counter_cases-counter_accepted,
+             "geometryCases"=>geometry_cases,"geometryAccepted"=>geometry_accepted,"geometryRejected"=>geometry_cases-geometry_accepted,"kernelReferences"=>kernel_count,"centerGenerators"=>generator_count,
              "geometryWitnessesReplayed"=>geometry_witnesses,"geometryOuterHTM"=>outer_htm,"geometryWholeRotations"=>whole_rotations,"geometryRotationQuarterTurns"=>rotation_quarters,
              "caseReports"=>reports,"fullStateAggregateSHA256"=>bytes2hex(sha256(join(hashes,"\n"))),"manifestSHA256"=>MANIFEST_PIN)
     finally
