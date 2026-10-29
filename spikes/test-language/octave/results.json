@@ -1,0 +1,38 @@
+{
+  "baseline": "377747515be034cf19f656244a20449421b12b1d",
+  "command": [
+    "/tmp/cubistry-octave-runtime/usr/bin/octave-cli",
+    "--no-init-file",
+    "--no-site-file",
+    "--no-history",
+    "--quiet",
+    "--eval",
+    "addpath('spikes/test-language/octave'); counter_probe('public/counter-proof.json', 'spikes/test-language/octave/states.json');"
+  ],
+  "environment": {
+    "OCTAVE_HOME": "/tmp/cubistry-octave-runtime/usr",
+    "LD_LIBRARY_PATH": "/tmp/cubistry-octave-runtime/usr/lib:/tmp/cubistry-octave-runtime/usr/lib/x86_64-linux-gnu/octave/9.4.0:/tmp/cubistry-octave-runtime/usr/lib/x86_64-linux-gnu",
+    "OPENBLAS_NUM_THREADS": "1"
+  },
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "runs": [
+    {
+      "wallSeconds": 4.323072582999885,
+      "exitCode": 0,
+      "stdout": "{\"runtime\":\"9.4.0\",\"values\":100,\"inverseWords\":100,\"stickers\":24,\"negativeControls\":6,\"elapsedSeconds\":3.0509579181671144,\"scope\":\"padded canonical witnesses only; not full Python replacement\"}\n",
+      "stderr": ""
+    },
+    {
+      "wallSeconds": 5.0128670089980005,
+      "exitCode": 0,
+      "stdout": "{\"runtime\":\"9.4.0\",\"values\":100,\"inverseWords\":100,\"stickers\":24,\"negativeControls\":6,\"elapsedSeconds\":3.267575979232788,\"scope\":\"padded canonical witnesses only; not full Python replacement\"}\n",
+      "stderr": ""
+    },
+    {
+      "wallSeconds": 4.887450706999516,
+      "exitCode": 0,
+      "stdout": "{\"runtime\":\"9.4.0\",\"values\":100,\"inverseWords\":100,\"stickers\":24,\"negativeControls\":6,\"elapsedSeconds\":3.4816930294036867,\"scope\":\"padded canonical witnesses only; not full Python replacement\"}\n",
+      "stderr": ""
+    }
+  ]
+}

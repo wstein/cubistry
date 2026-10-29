@@ -1,0 +1,14 @@
+{
+  "runtime": "9.4.0",
+  "mixedArrayExpression": "jsondecode('[true,1,-1]')",
+  "mixedArrayClass": "cell",
+  "mixedBooleanPositionRejected": true,
+  "rejectionIdentifier": "cube:invalid",
+  "distinctLargeIntegersAlias": true,
+  "largeIntegerTexts": [
+    "9007199254740993",
+    "9007199254740992"
+  ],
+  "int8OverflowSaturates": true,
+  "negativeModulo": 3
+}
