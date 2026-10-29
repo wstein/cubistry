@@ -61,3 +61,13 @@ words and measured diagnostics are authoritative. Unknown search results are ret
 separately from errors, cancellation, direct retention and legacy fallback. Neither
 an unknown search nor a long route establishes impossibility or optimality. No
 universal 18/20/21-move bound is claimed.
+
+`probe-contexts.mjs APP_ROOT NEW.json` tests all eighteen historical same-source
+contexts (six per print), using each stored direct proposal. `verify-contexts.py`
+replays all candidate words and inverses independently and checks the portfolio's
+first result equals the old policy at that identical source. `test-contexts.py`
+adds five corruption controls. The exact fixture bytes are preserved in
+`investigation/portfolio-contexts.json` (SHA256
+`c8fd5d9601f931b8896db54709b729fff22599936c8a3d1f8ef57289fe568812`).
+These targeted same-source probes complement, and do not replace, independently
+chained year and November-path measurements.
