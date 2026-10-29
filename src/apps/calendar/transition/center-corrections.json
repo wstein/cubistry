@@ -1,6 +1,6 @@
 {
   "schema": "cubistry.3x3-center-corrections",
-  "version": 2,
+  "version": 3,
   "scope": "Fix only visible center orientation while restoring all noncenter frames; hidden center orientations are unconstrained",
   "witnesses": [
     {
@@ -29,6 +29,9 @@
         0,
         -1,
         0
+      ],
+      "equivalentWords": [
+        "D U F2 D' U' F' D U F2 D' U' F'"
       ]
     },
     {
@@ -49,6 +52,6 @@
   "globalOptimality": "UNKNOWN",
   "provenance": {
     "primarySource": "https://kociemba.org/twisted.htm",
-    "derivation": "Face-renamed conjugates of the published 12-turn half-center and 14-turn paired-quarter-center algorithms; quarter repairs also rotate the hidden back center. Independently checked with Rodrigues rotations; global optimality is not claimed."
+    "derivation": "Face-renamed conjugates of the published 12-turn half-center and 14-turn paired-quarter-center algorithms; quarter repairs also rotate the hidden back center. Independently checked with Rodrigues rotations; global optimality is not claimed. The explicitly listed inverse half word has the same full transformation; only its verified family is included."
   }
 }

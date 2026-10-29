@@ -7,7 +7,7 @@ export function createTransitionOptimizer(options: {
   solve: (
     pattern: KPattern,
   ) => Promise<{ toString(): string; invert(): { toString(): string } }>;
-  corrections: readonly { word: string }[];
+  corrections: readonly { word: string; equivalentWords?: readonly string[] }[];
 }): {
   plan(
     from: State,
@@ -18,4 +18,16 @@ export function createTransitionOptimizer(options: {
       timeBudgetMs?: number;
     },
   ): Promise<{ word: string }>;
+};
+
+export function appendCenterRepair(
+  prefix: string,
+  repairWord: string,
+  equivalentWords?: readonly string[],
+): {
+  word: string;
+  repairOffset: number;
+  repairVariant: number;
+  repairHTM: number;
+  repairBoundarySavings: number;
 };
