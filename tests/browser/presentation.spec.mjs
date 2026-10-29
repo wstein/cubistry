@@ -167,6 +167,20 @@ test("calendar physical motion continues through presentation and reference-view
   await ready(page, "/calendar.html");
   await page.selectOption("#calendar-speed", "10");
   await page.evaluate(async () => {
+    const { calendarApp } = await import("/src/calendar.mjs");
+    window.presentationProgress = () => calendarApp.controller.progress;
+    // Hold planning independently of animation so this test cannot confuse
+    // the valid solver planning phase with a missing first physical turn.
+    const postMessage = Worker.prototype.postMessage;
+    let firstPlan = true;
+    Worker.prototype.postMessage = function (...args) {
+      if (firstPlan && args[0]?.context?.design?.id === "de-a") {
+        firstPlan = false;
+        window.releasePresentationPlan = () => postMessage.apply(this, args);
+        return;
+      }
+      return postMessage.apply(this, args);
+    };
     const { CalendarViewer } = await import("/src/apps/calendar/viewer.ts");
     const animate = CalendarViewer.prototype.animate;
     let first = true;
@@ -182,6 +196,28 @@ test("calendar physical motion continues through presentation and reference-view
   });
   await page.fill("#calendar-date", "2026-11-01");
   await page.locator("#calendar-date").dispatchEvent("change");
+  await expect
+    .poll(() => page.evaluate(() => typeof window.releasePresentationPlan))
+    .toBe("function");
+  expect(
+    await page.evaluate(() => window.presentationProgress().planning),
+  ).toBe(true);
+  expect(
+    await page.evaluate(() => typeof window.releasePresentationTurn),
+  ).toBe("undefined");
+  await page.evaluate(() => window.releasePresentationPlan());
+  // The optimizer may legitimately plan for up to eight seconds. Wait for
+  // this request's planning phase within the existing test budget, then apply
+  // the ordinary first-turn assertion. Do not impose a five-second solve SLA.
+  await page.waitForFunction(() => {
+    const progress = window.presentationProgress();
+    return (
+      progress.target?.weekday === 6 &&
+      progress.target.day === 1 &&
+      progress.target.month === 11 &&
+      !progress.planning
+    );
+  });
   await expect
     .poll(() => page.evaluate(() => typeof window.releasePresentationTurn))
     .toBe("function");
