@@ -109,17 +109,20 @@ function check(data)
 end
 wire(state) = [[s.id,s.cubie,collect(s.p),collect(s.n),collect(s.up),s.image] for s in state]
 
-@testset "integer conventions" begin
-    @test mod(-1,4)==3
-    @test !wireint(true)
-    @test wireint(1.0)
-    @test !wireint(0.5)
-    @test quarter((1,0,0),3)==(0,1,0)
-    @test rotated((1,2,3),2,-1)==(-3,2,1)
+function language_contracts()
+    @testset "integer conventions" begin
+        @test mod(-1,4)==3
+        @test !wireint(true)
+        @test wireint(1.0)
+        @test !wireint(0.5)
+        @test quarter((1,0,0),3)==(0,1,0)
+        @test rotated((1,2,3),2,-1)==(-3,2,1)
+    end
+    return 6
 end
 
-function main(args)
-    input, casesdir, output, repetitions = args[1],args[2],args[3],parse(Int,args[4])
+function verify_suite(input,casesdir)
+    contracts = language_contracts()
     started = time_ns()
     data = JSON.parse(read(input,String))
     source,words,states = check(data)
@@ -137,6 +140,12 @@ function main(args)
         require(rejected, "corruption accepted: "*file)
         push!(controls,Dict("case"=>file,"rejected"=>rejected,"reason"=>reason))
     end
+    return source,words,states,controls,validation_ms,contracts
+end
+
+function main(args)
+    input, casesdir, output, repetitions = args[1],args[2],args[3],parse(Int,args[4])
+    source,words,states,controls,validation_ms,_ = verify_suite(input,casesdir)
     # Exact same 100 source/word replays as the Python benchmark, excluding validation.
     if repetitions > 0
         for word in words
