@@ -64,8 +64,10 @@ test("word print replaces large unit symbols and keeps the counter value", async
       await expect(page.locator("#hsm-letter")).toBeEnabled();
     }
     const b = await bounds(page, letter);
-    expect(b.minY).toBeGreaterThanOrEqual(180);
-    expect(b.minY).toBeLessThanOrEqual(195);
+    // Raster top of the ascender/x-height ink at font size 80.64.
+    const top = { H: 171, M: 171, S: 187 }[letter];
+    expect(b.minY).toBeGreaterThanOrEqual(top - 3);
+    expect(b.minY).toBeLessThanOrEqual(top + 3);
     expect(b.maxY).toBeLessThanOrEqual(236);
     expect(b.ink).toBeGreaterThan(50);
     expect(
