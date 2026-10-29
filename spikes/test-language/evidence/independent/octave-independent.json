@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "reviewedRevision": "92d9b75d3f4866e525a37790a1342900b17f5979",
+  "states": 100,
+  "completeStickerFrames": 2400,
+  "rawBooleanPositionRejected": true,
+  "rawMixedBooleanVectorClass": "cell",
+  "distinctLargeJSONIntegersAlias": true,
+  "exportSHA256": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+}

@@ -1,0 +1,8 @@
+{
+  "status": "PASS_FINITE_SCOPE",
+  "juliaFreshProcessIncludingCompilationAndAllSamplesMs": 2400.138845005131,
+  "pythonWarmMedianMs": null,
+  "juliaWarmMedianMs": null,
+  "all100FullStatesEqual": true,
+  "negativeControlsRejectedByBoth": 10
+}

@@ -118,3 +118,9 @@ separate `baselineMain` and `spikeHead`. Proof inputs and the incumbent checker 
 unchanged. Measurement artifacts include their actual repository status; some
 runs occurred while documentation/evidence files were being prepared. Loaded
 checker and harness hashes identify the executed code independently of that state.
+
+The [independent review](evidence/independent/INDEPENDENT_REVIEW.md) separately
+replayed the prototypes, added 126 noncanonical/group-identity frame cases,
+checked numeric boundaries, repeated startup experiments and reviewed the final
+verification-only default. No blocking findings remain within the stated finite
+scope. Complete replacement remains UNKNOWN; retain Draft for human review.
