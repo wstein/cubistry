@@ -24,7 +24,7 @@ def digest(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--julia", required=True)
-    parser.add_argument("--julia-mode", choices=("default", "low-optimization"), default="default")
+    parser.add_argument("--julia-mode", choices=("default", "low-optimization", "minimal-compilation"), default="default")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repetitions", type=int, default=20)
     args = parser.parse_args()
@@ -81,8 +81,10 @@ def main():
         python_times.append((time.perf_counter() - started) * 1000)
     output = args.output / "julia.json"
     command = [args.julia, "--startup-file=no"]
-    if args.julia_mode == "low-optimization":
+    if args.julia_mode in ("low-optimization", "minimal-compilation"):
         command.append("--optimize=0")
+    if args.julia_mode == "minimal-compilation":
+        command.append("--compile=min")
     command += ["--project=" + str(HERE / "julia"),
                str(HERE / "julia/checker.jl"), str(witness), str(cases), str(output), str(args.repetitions)]
     started = time.perf_counter()
