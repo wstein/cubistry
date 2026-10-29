@@ -41,3 +41,30 @@ Regression coverage includes rotated nonzero goal frames, the recorded German
 wrong reference, bounded-search fallback, interim-candidate deadline fallback and
 immediate cancellation with stale messages ignored. Performance improvements are
 fixture evidence, not a guarantee for every date or arbitrary starting state.
+
+## Bounded search portfolio (follow-up)
+
+The `default-then-shorter-cap18-v1` policy retains the original bounded candidate
+first, then tries a shorter native outer-turn depth: at most 18, at most the
+first candidate's outer HTM minus one, and no more than the configured depth.
+Whole-cube alignment rotations are reported separately and do not consume this
+native outer-turn cap. Both attempts retain the same physical replay and exact
+reference requirements. A failed, unknown or non-improving second attempt keeps
+the first checked result; this is a portfolio, not an optimal solver.
+
+Each attempt permits at most 100,000 nodes by default: **at most two attempts and
+200,000 nodes total**, in addition to the unchanged existing direct planner. The
+worker's eight-second hard deadline is unchanged. It posts the first center-aware
+candidate and its exact references before the improvement attempt, so a deadline
+retains that best known candidate with its actual backend identity. Diagnostics
+record each attempt's word, native depth ceiling, node ceiling, status, elapsed
+time, outer HTM and alignment rotations. Node counts are ceilings, not measured
+visited nodes. Benchmark metadata distinguishes this policy from `default-v1`;
+`options.policy: "default"` reproduces the previous single-attempt policy.
+
+The reported German A 03→04 November 2026 case illustrates the distinction:
+the earlier direct route was 19 ordinary moves plus an 18-move visible-center
+repair (37 total); the original center search found 24; the shorter-depth attempt
+finds 18. Tests replay all 18 recorded source contexts (three source histories,
+three printings and both prior backend histories), including hidden poses and
+exact references. Other dates may retain longer checked routes.
