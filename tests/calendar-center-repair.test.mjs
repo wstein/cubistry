@@ -44,7 +44,7 @@ test("short visible-center repair witnesses restore every noncenter frame and re
     }
   }
 });
-test("actual captured41HTM source has a checked32HTM repair substitution and a no-worse planned route", async () => {
+test("actual captured 41-HTM source has a checked 32-HTM repair substitution and a no-worse planned route", async () => {
   const f = JSON.parse(
       fs.readFileSync("tests/fixtures/calendar-worst-repair-context.json"),
     ),
@@ -122,7 +122,7 @@ test("transition provenance hashes match local sources while retaining historica
   );
 });
 
-test("all52 verified repair shifts preserve exact poses on156 arbitrary source states", () => {
+test("all 52 verified repair shifts preserve exact poses on 156 arbitrary source states", () => {
   const d = load("de-a");
   let checked = 0;
   for (const repair of corrections.witnesses) {
@@ -154,7 +154,7 @@ test("quarter repair cyclic joins save at least one HTM for each outer prefix fa
   const half = corrections.witnesses.find((r) => r.htm === 12);
   assert.equal(appendCenterRepair("R", half.word).repairBoundarySavings, 0);
 });
-test("actual V3 worst35HTM source has exact-endpoint cyclic34HTM route and no-worse selected route", async () => {
+test("actual V3 worst 35-HTM source has exact-endpoint cyclic 34-HTM route and no-worse selected route", async () => {
   const f = JSON.parse(
       fs.readFileSync("tests/fixtures/calendar-cyclic-worst-context.json"),
     ),
@@ -198,7 +198,7 @@ test("actual V3 worst35HTM source has exact-endpoint cyclic34HTM route and no-wo
   );
 });
 
-test("verified inverse-half family improves historical41HTM source to31 with identical full endpoint", () => {
+test("verified inverse-half family improves historical 41-HTM source to 31 with identical full endpoint", () => {
   const f = JSON.parse(
       fs.readFileSync("tests/fixtures/calendar-worst-repair-context.json"),
     ),

@@ -99,7 +99,7 @@ previous full-year statistics remain historical and new maxima need a fresh capt
 
 A center-only repair commutes with outer face turns. Cyclic token shifts of the
 verified 12/14/14-turn words therefore preserve their full 54-pose effect. The
-direct planner checks the14/12/14 cyclic families plus12 verified inverse-half
+direct planner checks the 14/12/14 cyclic families plus 12 verified inverse-half
 shifts (52 candidates across all three corrections) and keeps the shortest simplified
 prefix-plus-repair word, retaining the earliest offset on ties. Whole-cube
 rotations are prohibited inside repair words because this commutation argument
@@ -110,10 +110,10 @@ can merge at least its last turn with a suitable repair start. The half word
 contains only F/U/D, so that guarantee does not apply to every prefix. Diagnostic
 `repairHTM` is the selected witness length; `repairVariant`, `repairOffset` and
 `repairBoundarySavings` describe the join. Budgets and the worker deadline are
-unchanged. On the exact captured V3 German A 19→20 April source, the35-HTM route
-has a checked34-HTM cyclic join with the same full54-pose endpoint. This is not an
+unchanged. On the exact captured V3 German A 19→20 April source, the 35-HTM route
+has a checked 34-HTM cyclic join with the same full 54-pose endpoint. This is not an
 optimality proof or a global maximum claim. The explicitly supplied inverse-half
-family also constructs31HTM on the historical41HTM source with the same full
+family also constructs 31 HTM on the historical 41-HTM source with the same full
 endpoint. Inverting quarter families is not an additional same-angle candidate;
 the opposite angle remains its own matching correction.
 
