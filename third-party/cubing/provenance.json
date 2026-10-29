@@ -1,0 +1,88 @@
+{
+  "cubingVersion": "0.66.1",
+  "cubingSourceCommit": "8544249ff1e662557df912065a26b5f90f4df574",
+  "selectedOriginalCodeLicense": "MPL-2.0",
+  "additionalVendoredLicenses": "Retained independently; the package-wide selection does not relabel GPL, MIT or Apache components.",
+  "files": [
+    {
+      "path": "LICENSE-MPL.md",
+      "sha256": "61571dc4c616bf39d5724198cde756eca8fd8f50629c24bdec8c34faf36314a7",
+      "source": "https://github.com/cubing/cubing.js/blob/8544249ff1e662557df912065a26b5f90f4df574/LICENSE-MPL.md"
+    },
+    {
+      "path": "LICENSE-GPL.md",
+      "sha256": "c81eb76186478bfdba969e6feb26910fbef0dbba496416423f27b9fced6e46a9",
+      "source": "https://github.com/cubing/cubing.js/blob/8544249ff1e662557df912065a26b5f90f4df574/LICENSE-GPL.md"
+    },
+    {
+      "path": "comlink-LICENSE",
+      "sha256": "bcf29b4fd3ec2cb5f9d40a0866da446f6da62170d2ccedf4aeca9cf9406dd20c",
+      "source": "https://registry.npmjs.org/@cubing/comlink-everywhere/-/comlink-everywhere-0.1.3.tgz (package/LICENSE)"
+    },
+    {
+      "path": "random-uint-below-LICENSE.md",
+      "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
+      "source": "https://registry.npmjs.org/random-uint-below/-/random-uint-below-3.3.0.tgz (package/LICENSE.md)"
+    },
+    {
+      "path": "cubing-package.json",
+      "sha256": "c4c626f22b24f10c627a2900c910f056d9e55baedc585e6f3f0b87fc36f4dca0",
+      "source": "https://registry.npmjs.org/cubing/-/cubing-0.66.1.tgz (package/package.json)"
+    },
+    {
+      "path": "lazy-promise-package.json",
+      "sha256": "463b6a3e970dd6473642a97ec2985b49f3ade04891de8c79a0915a21960a529e",
+      "source": "https://registry.npmjs.org/@cubing/lazy-promise/-/lazy-promise-0.1.3.tgz (package/package.json)"
+    },
+    {
+      "path": "cubing-README.md",
+      "sha256": "c2994936fdedb174ab811b92dbb9e85060dfca7dc1338c76c5b79cbfa5804f79",
+      "source": "https://registry.npmjs.org/cubing/-/cubing-0.66.1.tgz (package/README.md)"
+    },
+    {
+      "path": "csTimer-LICENSE",
+      "sha256": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2",
+      "source": "https://github.com/cubing/cubing.js/blob/8544249ff1e662557df912065a26b5f90f4df574/src/cubing/vendor/mit/cs0x7f/cstimer/LICENSE"
+    },
+    {
+      "path": "fto-MIT-NOTICE.txt",
+      "sha256": "e80bdf850640d741705df934b73de8f8f797b1cd47e3ac8858f9342fca6f0002",
+      "source": "https://github.com/cubing/cubing.js/blob/8544249ff1e662557df912065a26b5f90f4df574/src/cubing/vendor/mit/cs0x7f/fto/scramble_fto_standalone.ts (verbatim first copyright/license comment)"
+    },
+    {
+      "path": "xyzzy-fto-NOTICE.txt",
+      "sha256": "96e3810c8b7786b0d25b19c6536132abbb34695fb2478b365c8d5a9953e754bf",
+      "source": "https://github.com/cubing/cubing.js/blob/8544249ff1e662557df912065a26b5f90f4df574/src/cubing/vendor/mpl/xyzzy/fto-solver.ts (verbatim first copyright/license comment)"
+    },
+    {
+      "path": "xyzzy-kilominx-NOTICE.txt",
+      "sha256": "9cc1008af1ad5187c2b0cf875412efee7f753cc18bf41df509f9b84c08d05703",
+      "source": "https://github.com/cubing/cubing.js/blob/8544249ff1e662557df912065a26b5f90f4df574/src/cubing/vendor/mpl/xyzzy/kilosolver.ts (verbatim first copyright/license comment)"
+    },
+    {
+      "path": "min2phase-README.md",
+      "sha256": "73df62360ff74266b42ca0fa7204d5aa18a8ab1b5abb7e26b21eb5fcee4d0206",
+      "source": "https://github.com/cs0x7f/min2phase/blob/4d183b9eff8119cac72bc50ef35a7d8990740e06/README.md"
+    },
+    {
+      "path": "twips-version.txt",
+      "sha256": "0c9f9d3b23486b420c7e22afdff1b078232d74fa70ad936e5ae041bbe77af591",
+      "source": "https://github.com/cubing/cubing.js/blob/8544249ff1e662557df912065a26b5f90f4df574/src/cubing/vendor/mpl/twips/vendored-twips-git-version.txt"
+    },
+    {
+      "path": "twips-Cargo.lock",
+      "sha256": "a76e58971fd95ade03d54ce243dc06177932a20d5334431eb8d5fec5d0408ec6",
+      "source": "https://github.com/cubing/twips/blob/2bde869a68254163a1cf16300d1ce7d98c4f8493/Cargo.lock"
+    },
+    {
+      "path": "xyzzy-master-tetraminx-NOTICE.txt",
+      "sha256": "3c0f7fd6ee33044f4e2e93fa58bba4fc684b4697f93c5895ff88aa83d722225a",
+      "source": "https://github.com/cubing/cubing.js/blob/8544249ff1e662557df912065a26b5f90f4df574/src/cubing/vendor/mpl/xyzzy/master_tetraminx-solver.ts (verbatim license comment)"
+    },
+    {
+      "path": "MIT-TERMS.txt",
+      "sha256": "fd80a26fbb3f644af1fa994134446702932968519797227e07a1368dea80f0bc",
+      "source": "Permission and warranty paragraphs reproduced verbatim from the retained attributed fto-MIT-NOTICE.txt; no additional copyright owner is asserted."
+    }
+  ]
+}
