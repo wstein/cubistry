@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build first, separately from the lifecycle runtime measurement."""
-import argparse, hashlib, json, os, subprocess, time
+import argparse, hashlib, json, os, shutil, subprocess, time
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
@@ -19,10 +19,11 @@ def main():
     if process.returncode:
         raise RuntimeError("build failed; see saved stdout/stderr")
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-    jar = HERE / "artifact/flix.jar"
+    jar = HERE / "artifact/flix-lifecycle.jar"
+    shutil.copyfile(HERE / "artifact/flix.jar", jar)
     inputs = [HERE / x for x in ("src/Main.flix", "src/Fixtures.flix", "src/Lifecycle.flix", ".flixw/lock.toml", "build_lifecycle.py")]
     record = {"command": command, "buildElapsedMs": elapsed_ms, "exitCode": process.returncode,
-              "compiledArtifactSHA256": sha(jar), "compiledArtifactBytes": jar.stat().st_size,
+              "compiledArtifact": str(jar.relative_to(HERE)), "compiledArtifactSHA256": sha(jar), "compiledArtifactBytes": jar.stat().st_size,
               "sourceSHA256": {str(p.relative_to(HERE)): sha(p) for p in inputs},
               "coveragePerInvocation": {"canonicalStates": 100, "inverseChecks": 100, "negativeControls": 6, "auditReplays": 100},
               "scope": "unchanged geometryChecks plus identical full-state numeric checksum audit on each invocation"}
