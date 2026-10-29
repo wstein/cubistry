@@ -111,3 +111,7 @@ across series. Mean/median/p95/max
 move and elapsed counts describe the captured sequences and machine, not shortest
 paths or a universal 20/21-move bound. All optical and physical print assignments
 remain unchanged. Independent agent review is required before certifying results.
+
+## Completed captures
+
+The [original 4,716-group baseline](BASELINE.md) and [final 7,074-group comparison](COMPARISON.md) retain separate raw evidence and independent reviews. Run `analyze.py CAPTURE.json` to reproduce the compact move/timing table and provider diagnostic totals; physical validity is checked separately with `verify.py`.

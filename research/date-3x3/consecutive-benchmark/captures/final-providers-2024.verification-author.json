@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "complete": true,
+  "cases": 7074,
+  "series": 36,
+  "providers": [
+    "legacy",
+    "direct",
+    "center-aware"
+  ],
+  "all54FrameInverseRestorations": 7074,
+  "obsoleteSingleTurns": 180,
+  "sourcePrintingUnchanged": true,
+  "optimality": "UNKNOWN",
+  "universalMoveBound": "UNKNOWN",
+  "browserTiming": "NOT_MEASURED"
+}
