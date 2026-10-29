@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Live clock</title>
-    <script type="module" crossorigin src="/cubistry/assets/clock-DjSMz5Ec.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/clock-ktzwLKVI.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/link-DR-RiidG.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-CujBCk4I.js">
@@ -115,10 +115,11 @@
               <thead>
                 <tr>
                   <th scope="col">Cube</th>
-                  <th scope="col" abbr="Session HTM">Session HTM</th>
+                  <th scope="col" abbr="Total HTM">Total HTM</th>
                   <th scope="col" abbr="Cube rotations">Cube rotations</th>
                   <th scope="col" abbr="Last tick HTM">Last tick</th>
                   <th scope="col" abbr="Max HTM per tick">Max / tick</th>
+                  <th scope="col" abbr="Average HTM per tick">Average / tick</th>
                 </tr>
               </thead>
               <tbody>
@@ -128,6 +129,7 @@
                   <td id="hours-session-rotations">0</td>
                   <td id="hours-last-moves">—</td>
                   <td id="hours-max-moves">—</td>
+                  <td id="hours-mean-moves">—</td>
                 </tr>
                 <tr data-unit="M">
                   <th scope="row">Minutes</th>
@@ -135,6 +137,7 @@
                   <td id="minutes-session-rotations">0</td>
                   <td id="minutes-last-moves">—</td>
                   <td id="minutes-max-moves">—</td>
+                  <td id="minutes-mean-moves">—</td>
                 </tr>
                 <tr data-unit="S">
                   <th scope="row">Seconds</th>
@@ -142,6 +145,7 @@
                   <td id="seconds-session-rotations">0</td>
                   <td id="seconds-last-moves">—</td>
                   <td id="seconds-max-moves">—</td>
+                  <td id="seconds-mean-moves">—</td>
                 </tr>
               </tbody>
               <tfoot>
@@ -151,6 +155,7 @@
                   <td id="total-session-rotations">0</td>
                   <td id="total-last-moves">—</td>
                   <td id="total-max-moves">—</td>
+                  <td aria-label="No average for the total"></td>
                 </tr>
               </tfoot>
             </table>
