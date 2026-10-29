@@ -117,9 +117,9 @@ def verify(document, allow_partial=False):
     domain = m['parameters']['domain']
     need(domain in ('calendar', 'regressions'), 'Known capture domain')
     regression_starts = {'nov3': '2026-11-03', 'nov2': '2026-11-02', 'oct29': '2026-10-29'}
-    regression_lengths = {'nov3': 1, 'nov2': 2, 'oct29': 6}
+    regression_lengths = {'nov3': 1, 'nov2': 2, 'oct29': 2}
     scenarios = SCENARIOS if domain == 'calendar' else tuple(regression_starts)
-    expected_cases = len(providers)*3*(2*days+len(JUMPS)+2*groups if domain == 'calendar' else 9)
+    expected_cases = len(providers)*3*(2*days+len(JUMPS)+2*groups if domain == 'calendar' else 5)
     need(document['expectedCases'] == expected_cases and
          (len(document['cases']) == expected_cases if complete else len(document['cases']) <= expected_cases),
          'Declared full request coverage and actual complete or partial count')
@@ -162,7 +162,7 @@ def verify(document, allow_partial=False):
             row = document['cases'][index]
             need((row['index'], row['provider'], row['design'], row['scenario']) == (index, provider, identity, scenario), 'Exact row-to-series identity')
             if scenario in regression_starts:
-                direction, requests = 1, [(current + timedelta(days=1)).isoformat()]
+                direction, requests = 1, ['2026-11-03' if scenario == 'oct29' and step == 0 else (current + timedelta(days=1)).isoformat()]
             elif scenario == 'year':
                 direction = 1 if step < days else -1
                 requests = [(current + timedelta(days=direction)).isoformat()]

@@ -22,8 +22,8 @@ baseline options and two independent domains:
   deterministic jumps, twenty move-interruption and twenty planning-interruption
   groups per print/provider: **4,716 groups** for the two policies and three prints.
 - `--domain regressions`: canonical 2026-11-03 → 04, actual chained Nov 02 → 03 → 04,
-  and Oct 29 → 30 → 31 → Nov 01 → 02 → 03 → 04. All three prints, both policies:
-  **54 groups**. Initial canonical setup occurs only once per path.
+  and Oct 29 → Nov 03 → 04 (a deliberate free jump). All three prints, both policies:
+  **30 groups**. Initial canonical setup occurs only once per path.
 
 Example after freezing the application/provider source (replace paths/revisions
 with those recorded in the final capture manifest):

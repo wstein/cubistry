@@ -57,7 +57,7 @@ need(
 const domain = args.domain ?? "calendar";
 need(["calendar", "regressions"].includes(domain), "domain must be calendar or regressions");
 const regressionStarts = {"nov3": "2026-11-03", "nov2": "2026-11-02", "oct29": "2026-10-29"};
-const regressionLengths = {"nov3": 1, "nov2": 2, "oct29": 6};
+const regressionLengths = {"nov3": 1, "nov2": 2, "oct29": 2};
 const scenarios = domain === "calendar" ? ["year", "jumps", "interrupt-move", "interrupt-planning"] : Object.keys(regressionStarts);
 const providerOptions = args["provider-options"]
   ? JSON.parse(args["provider-options"])
@@ -533,7 +533,7 @@ async function runSeries(provider, id, scenario) {
   }
   try {
     if (scenario in regressionStarts) {
-      for (let n = 0; n < regressionLengths[scenario]; n++) await request([model.shiftDate(model.civilDate(currentISO), 1).iso], 1);
+      for (let n = 0; n < regressionLengths[scenario]; n++) await request([scenario === "oct29" && n === 0 ? "2026-11-03" : model.shiftDate(model.civilDate(currentISO), 1).iso], 1);
     } else if (scenario === "year") {
       for (const direction of [1, -1])
         for (let n = 0; n < days; n++) {
@@ -662,7 +662,7 @@ const report = {
   complete,
   stopReason,
   elapsedMs: performance.now() - begun,
-  expectedCases: selected.length * 3 * (domain === "calendar" ? days * 2 + jumps.length + groups * 2 : 9),
+  expectedCases: selected.length * 3 * (domain === "calendar" ? days * 2 + jumps.length + groups * 2 : 5),
   manifest,
   series,
   statistics,
