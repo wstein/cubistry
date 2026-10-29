@@ -114,7 +114,7 @@ test("the shared live clock offers bottom-only words and retains preferred speed
       return clockUnits.map((u) => u.controller.view.presentedPrint.id);
     }),
   ).toEqual(Array(3).fill("hsm_counter_blank_words"));
-  await page.selectOption("#hours-speed", "250");
+  await page.selectOption("#hours-speed", "500");
   await expect
     .poll(() =>
       page.evaluate(async () => {
@@ -129,9 +129,9 @@ test("the shared live clock offers bottom-only words and retains preferred speed
   });
   await page.selectOption("#clock-lettering", "symbols");
   await expect(page.locator("#clock-lettering")).toBeEnabled();
-  await expect(page.locator("#hours-speed")).toHaveValue("250");
-  await expect(page.locator("#minutes-speed")).toHaveValue("250");
-  await expect(page.locator("#seconds-speed")).toHaveValue("100");
+  await expect(page.locator("#hours-speed")).toHaveValue("500");
+  await expect(page.locator("#minutes-speed")).toHaveValue("100");
+  await expect(page.locator("#seconds-speed")).toHaveValue("50");
   expect(
     await page.evaluate(async () => {
       const { clockUnits } = await import("/src/clock.mjs");
