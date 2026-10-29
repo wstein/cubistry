@@ -14,7 +14,11 @@ extend-exclude = [
   "**/*.svg",
   "**/*.png",
   "**/*.jpg",
-  "**/*.pdf"
+  "**/*.pdf",
+  # Exact upstream notices: retain their original legal wording verbatim.
+  "third-party/cubing/xyzzy-kilominx-NOTICE.txt",
+  "third-party/cubing/fto-MIT-NOTICE.txt",
+  "third-party/cubing/twips-crates/minimal-lexical-0.2.1/LICENSE.md"
 ]
 
 [default.extend-words]
@@ -28,3 +32,11 @@ Zettel = "Zettel"
 # Upstream font license names the standard OpenType width axis literally.
 [default.extend-identifiers]
 wdth = "wdth"
+
+# Preserve one immutable upstream crate identifier in its provenance inventory.
+# This does not permit the spelling in application code or authored prose.
+[type.cubing-crate-inventory]
+extend-glob = ["twips-crate-notices.json"]
+
+[type.cubing-crate-inventory.extend-words]
+writeable = "writeable"
