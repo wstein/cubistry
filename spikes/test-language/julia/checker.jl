@@ -138,12 +138,14 @@ function main(args)
         push!(controls,Dict("case"=>file,"rejected"=>rejected,"reason"=>reason))
     end
     # Exact same 100 source/word replays as the Python benchmark, excluding validation.
-    for word in words
-        apply(source,word)
+    if repetitions > 0
+        for word in words
+            apply(source,word)
+        end
     end
     timings = Float64[]
     checksum = 0
-    for _ in 1:5
+    for _ in 1:(repetitions > 0 ? 5 : 0)
         t = time_ns()
         for _ in 1:repetitions, word in words
             frame = apply(source,word)[1]
