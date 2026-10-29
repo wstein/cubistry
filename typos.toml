@@ -32,6 +32,8 @@ Zettel = "Zettel"
 # Upstream font license names the standard OpenType width axis literally.
 [default.extend-identifiers]
 wdth = "wdth"
+# Preserve ReportLab's exact public method name.
+drawCentredString = "drawCentredString"
 
 # Preserve one immutable upstream crate identifier in its provenance inventory.
 # This does not permit the spelling in application code or authored prose.
