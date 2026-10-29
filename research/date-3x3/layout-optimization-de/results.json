@@ -1,0 +1,314 @@
+{
+  "scope": "Measured fixed print/catalog packages; global optimality UNKNOWN",
+  "candidates": [
+    {
+      "candidate": "c0-e0",
+      "frontFeasibility": "SAT",
+      "paths": {
+        "pilot-five-2026.json": {
+          "transitions": 23,
+          "totalHTM": 500,
+          "meanHTM": 21.73913043478261,
+          "maximumHTM": 39,
+          "cubeRotations": 6,
+          "planningWallSeconds": 2.8572525330000005,
+          "medianPlanningMs": 118.327092,
+          "p95PlanningMs": 195.70946399999957,
+          "november3to4": [
+            18,
+            18
+          ]
+        },
+        "year-four-2024.json": {
+          "transitions": 732,
+          "totalHTM": 14167,
+          "meanHTM": 19.353825136612024,
+          "maximumHTM": 41,
+          "cubeRotations": 142,
+          "planningWallSeconds": 79.10604412000002,
+          "medianPlanningMs": 98.21512399999847,
+          "p95PlanningMs": 226.94054399999914,
+          "forward": {
+            "transitions": 366,
+            "totalHTM": 7169,
+            "meanHTM": 19.58743169398907,
+            "maximumHTM": 40,
+            "cubeRotations": 71,
+            "planningWallSeconds": 42.19052476899998,
+            "medianPlanningMs": 107.17822849999902,
+            "p95PlanningMs": 224.96649099999922
+          },
+          "reverse": {
+            "transitions": 366,
+            "totalHTM": 6998,
+            "meanHTM": 19.120218579234972,
+            "maximumHTM": 41,
+            "cubeRotations": 71,
+            "planningWallSeconds": 36.91551935100004,
+            "medianPlanningMs": 89.04081149999547,
+            "p95PlanningMs": 224.60630499999388
+          }
+        }
+      },
+      "fronts": 2562,
+      "printingSHA256": "c3b765a181e7a9f0714f8392625f44ab207ff74680ba5305787c9342a845d826",
+      "witnessSHA256": "f367e0ba9c5195801d1f10d2eb220bff329ee9de58452684abb201ce35e0c235"
+    },
+    {
+      "candidate": "c0-e1",
+      "frontFeasibility": "SAT",
+      "paths": {
+        "pilot-five-2026.json": {
+          "transitions": 23,
+          "totalHTM": 455,
+          "meanHTM": 19.782608695652176,
+          "maximumHTM": 36,
+          "cubeRotations": 6,
+          "planningWallSeconds": 3.187734443000001,
+          "medianPlanningMs": 151.6143890000003,
+          "p95PlanningMs": 199.97223200000008,
+          "november3to4": [
+            18,
+            18
+          ]
+        },
+        "year-four-2024.json": {
+          "transitions": 732,
+          "totalHTM": 14481,
+          "meanHTM": 19.7827868852459,
+          "maximumHTM": 40,
+          "cubeRotations": 142,
+          "planningWallSeconds": 89.23577912699999,
+          "medianPlanningMs": 111.03398900001775,
+          "p95PlanningMs": 218.75521500001196,
+          "forward": {
+            "transitions": 366,
+            "totalHTM": 7332,
+            "meanHTM": 20.0327868852459,
+            "maximumHTM": 40,
+            "cubeRotations": 71,
+            "planningWallSeconds": 44.614007669999815,
+            "medianPlanningMs": 112.35009700001683,
+            "p95PlanningMs": 209.3454780000029
+          },
+          "reverse": {
+            "transitions": 366,
+            "totalHTM": 7149,
+            "meanHTM": 19.5327868852459,
+            "maximumHTM": 40,
+            "cubeRotations": 71,
+            "planningWallSeconds": 44.62177145700017,
+            "medianPlanningMs": 109.38780499997665,
+            "p95PlanningMs": 223.42740599997342
+          }
+        }
+      },
+      "fronts": 2562,
+      "printingSHA256": "e838a16116967686ec6fda162a3cdc7dfe6f4efd171515e452ef072e6f46df77",
+      "witnessSHA256": "6a7701f44a813a4e6f74d8302ff7b39cf9b7296b49c8315d9cf52851eee9803f"
+    },
+    {
+      "candidate": "c0-e2",
+      "frontFeasibility": "SAT",
+      "paths": {
+        "pilot-five-2026.json": {
+          "transitions": 23,
+          "totalHTM": 499,
+          "meanHTM": 21.695652173913043,
+          "maximumHTM": 41,
+          "cubeRotations": 6,
+          "planningWallSeconds": 3.075415982000004,
+          "medianPlanningMs": 139.55801900000006,
+          "p95PlanningMs": 195.3645949999991,
+          "november3to4": [
+            18,
+            18
+          ]
+        }
+      },
+      "fronts": 2562,
+      "printingSHA256": "253a811a170aa11feac94d880190acde9f89cfea52ad083a8467ab89d0c31a3a",
+      "witnessSHA256": "6d049e8be21f3d8a7361cb47c5bc0fac6fabb481222028f638cbd097f58d6387"
+    },
+    {
+      "candidate": "c1-e0",
+      "frontFeasibility": "SAT",
+      "paths": {
+        "pilot-five-2026.json": {
+          "transitions": 23,
+          "totalHTM": 442,
+          "meanHTM": 19.217391304347824,
+          "maximumHTM": 38,
+          "cubeRotations": 6,
+          "planningWallSeconds": 2.791398853999999,
+          "medianPlanningMs": 123.4005960000004,
+          "p95PlanningMs": 199.96043999999983,
+          "november3to4": [
+            17,
+            17
+          ]
+        },
+        "year-four-2024.json": {
+          "transitions": 732,
+          "totalHTM": 13903,
+          "meanHTM": 18.993169398907103,
+          "maximumHTM": 40,
+          "cubeRotations": 142,
+          "planningWallSeconds": 90.62896870499996,
+          "medianPlanningMs": 115.83650200000557,
+          "p95PlanningMs": 262.58224200000404,
+          "forward": {
+            "transitions": 366,
+            "totalHTM": 6980,
+            "meanHTM": 19.07103825136612,
+            "maximumHTM": 40,
+            "cubeRotations": 71,
+            "planningWallSeconds": 44.932139294999985,
+            "medianPlanningMs": 113.0508384999921,
+            "p95PlanningMs": 265.6300120000087
+          },
+          "reverse": {
+            "transitions": 366,
+            "totalHTM": 6923,
+            "meanHTM": 18.915300546448087,
+            "maximumHTM": 40,
+            "cubeRotations": 71,
+            "planningWallSeconds": 45.69682940999998,
+            "medianPlanningMs": 119.28321350000624,
+            "p95PlanningMs": 242.13761299999896
+          }
+        }
+      },
+      "fronts": 2562,
+      "printingSHA256": "191ff88677b53ce5a16b5e6cdf8e72b0979d780ac061aa730eb81256d80c2f77",
+      "witnessSHA256": "0cb1303a6354e73c34321e2f8e48e70dff7028742b4de6f243c451d4fb48e1b1"
+    },
+    {
+      "candidate": "c1-e1",
+      "frontFeasibility": "SAT",
+      "paths": {
+        "pilot-combined-2026.json": {
+          "transitions": 23,
+          "totalHTM": 491,
+          "meanHTM": 21.347826086956523,
+          "maximumHTM": 39,
+          "cubeRotations": 6,
+          "planningWallSeconds": 3.644960967999999,
+          "medianPlanningMs": 135.56066800000008,
+          "p95PlanningMs": 242.13262200000008,
+          "november3to4": [
+            17,
+            17
+          ]
+        },
+        "year-combined-2024.json": {
+          "transitions": 732,
+          "totalHTM": 14804,
+          "meanHTM": 20.224043715846996,
+          "maximumHTM": 41,
+          "cubeRotations": 142,
+          "planningWallSeconds": 90.09202602699992,
+          "medianPlanningMs": 111.98189599999932,
+          "p95PlanningMs": 227.20588300000236,
+          "forward": {
+            "transitions": 366,
+            "totalHTM": 7538,
+            "meanHTM": 20.595628415300546,
+            "maximumHTM": 41,
+            "cubeRotations": 71,
+            "planningWallSeconds": 47.063845437999966,
+            "medianPlanningMs": 117.73127349999777,
+            "p95PlanningMs": 233.1992879999998
+          },
+          "reverse": {
+            "transitions": 366,
+            "totalHTM": 7266,
+            "meanHTM": 19.852459016393443,
+            "maximumHTM": 40,
+            "cubeRotations": 71,
+            "planningWallSeconds": 43.02818058899995,
+            "medianPlanningMs": 106.59178849999444,
+            "p95PlanningMs": 215.18501200000173
+          }
+        }
+      },
+      "fronts": 2562,
+      "printingSHA256": "251306cca9f02442f8f2e89ffa17ee98b426da9d75c923a01c08f3c8ace3db5d",
+      "witnessSHA256": "f4bad9cbf88ec5f2fde459c2f5b31f4a489a9c2cde2f66ab33c932ca424b4e6a"
+    },
+    {
+      "candidate": "c1-e2",
+      "frontFeasibility": "UNKNOWN",
+      "paths": {}
+    },
+    {
+      "candidate": "c2-e0",
+      "frontFeasibility": "SAT",
+      "paths": {
+        "pilot-five-2026.json": {
+          "transitions": 23,
+          "totalHTM": 450,
+          "meanHTM": 19.565217391304348,
+          "maximumHTM": 39,
+          "cubeRotations": 6,
+          "planningWallSeconds": 2.530307770999998,
+          "medianPlanningMs": 106.33011299999998,
+          "p95PlanningMs": 196.25411499999973,
+          "november3to4": [
+            17,
+            17
+          ]
+        },
+        "year-four-2024.json": {
+          "transitions": 732,
+          "totalHTM": 13866,
+          "meanHTM": 18.942622950819672,
+          "maximumHTM": 40,
+          "cubeRotations": 142,
+          "planningWallSeconds": 81.3315590130004,
+          "medianPlanningMs": 105.61853050001082,
+          "p95PlanningMs": 227.38782500001253,
+          "forward": {
+            "transitions": 366,
+            "totalHTM": 6944,
+            "meanHTM": 18.972677595628415,
+            "maximumHTM": 40,
+            "cubeRotations": 71,
+            "planningWallSeconds": 36.218331373000225,
+            "medianPlanningMs": 97.84202300001925,
+            "p95PlanningMs": 211.84233000001404
+          },
+          "reverse": {
+            "transitions": 366,
+            "totalHTM": 6922,
+            "meanHTM": 18.91256830601093,
+            "maximumHTM": 40,
+            "cubeRotations": 71,
+            "planningWallSeconds": 45.11322764000017,
+            "medianPlanningMs": 115.23636949999491,
+            "p95PlanningMs": 233.02507299999706
+          }
+        }
+      },
+      "fronts": 2562,
+      "printingSHA256": "158376463f4bc027e17988a9f46aa4577d3b9d1d9e2e1cbb38c65b93230e3688",
+      "witnessSHA256": "2f4d516c9eae06461240ed2a8f18b2049169e094ae27d571621e8ea43f0853fe"
+    },
+    {
+      "candidate": "c2-e1",
+      "frontFeasibility": "UNKNOWN",
+      "paths": {}
+    },
+    {
+      "candidate": "c2-e2",
+      "frontFeasibility": "UNKNOWN",
+      "paths": {}
+    }
+  ],
+  "captureSHA256": {
+    "pilot-combined-2026.json": "93ec7391aefd4fe1bf0af5fca2cfc5f5931102ae61c7213ef7738f84ae54eb96",
+    "pilot-five-2026.json": "f5df4dec6684722544534e8e69b8fb9dc24c0cdb548998aef5fa755c1f04487f",
+    "year-combined-2024.json": "96301615d7c7b1ec7c892cc9ab7defaf0db2a4cb389fc8d090ffb470b4c8aca6",
+    "year-four-2024.json": "0fae1af8889425a28be8e772719a824b285a43b55a185a23186eedf922fee407"
+  }
+}
