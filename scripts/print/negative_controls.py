@@ -1,5 +1,5 @@
 """Independent reviewer-authored corrupt-export controls; portable path adaptation only."""
-import io,json,hashlib,subprocess,tempfile,shutil,sys
+import io,json,hashlib,re,subprocess,tempfile,shutil,sys
 from pathlib import Path
 import xml.etree.ElementTree as ET
 from pypdf import PdfReader,PdfWriter
@@ -18,6 +18,21 @@ def mutate(kind,folder,m):
   p=folder/'artwork-1.svg';s=p.read_text();s=s.replace('scale(', 'scale(-',1);p.write_text(s)
  elif kind=='open cut contour':
   p=folder/'cuts-1.svg';s=p.read_text();s=s.replace('Z"','"',1);p.write_text(s)
+ elif kind=='consistently swapped glyph art':
+  # Swap two labeled identities' art in both SVG and PDF so placement and PDF/SVG parity still agree.
+  p=folder/'artwork-1.svg';s=p.read_text();label={r['uid']:r['image'] for r in m['stickers']}
+  labeled=[r['uid'] for r in m['stickers'] if r['copy']==1 and r['image']]
+  a,b=sorted([labeled[0],next(u for u in labeled if label[u]!=label[labeled[0]])],key=s.index)
+  span=lambda uid:(s.index('<path',s.index(f'<g id="{uid}"')),s.index('</g></g>',s.index(f'<g id="{uid}"')))
+  (i,j),(k,l)=span(a),span(b);s=s[:i]+s[k:l]+s[j:k]+s[i:j]+s[l:];p.write_text(s)
+  q=folder/'print.pdf';r=PdfReader(io.BytesIO(q.read_bytes()));w=PdfWriter();w.clone_document_from_reader(r);page=w.pages[0]
+  stream=page.get_contents();ops=stream.operations;blocks=[]
+  for n,(args,op) in enumerate(ops):
+   if [o for _,o in ops[n:n+5]]==[b'q',b'cm',b'rg',b'n',b'm']:blocks.append([n+2,next(e for e in range(n,len(ops)) if ops[e][1]==b'Q')])
+  order=[g for g in re.findall(r'<g id="(copy-\d+-sticker-\d+)"',s) if label[g]]
+  (i,j),(k,l)=blocks[order.index(a)],blocks[order.index(b)]
+  stream.operations=ops[:i]+ops[k:l]+ops[j:k]+ops[i:j]+ops[l:];page.replace_contents(stream)
+  with q.open('wb') as f:w.write(f)
  elif kind in ('PDF overprint disabled','wrong PDF cut spot','wrong PDF cut geometry'):
   p=folder/'print.pdf';r=PdfReader(io.BytesIO(p.read_bytes()));w=PdfWriter();w.clone_document_from_reader(r);page=w.pages[0]
   if kind=='PDF overprint disabled':
@@ -36,7 +51,7 @@ def mutate(kind,folder,m):
  (folder/'manifest.json').write_text(json.dumps(m))
 
 results=[]
-for index,kind in enumerate(['duplicate physical identity','wrong face normal','wrong glyph rotation','mirrored SVG glyph','open cut contour','PDF overprint disabled','wrong PDF cut spot','wrong PDF cut geometry']):
+for index,kind in enumerate(['duplicate physical identity','wrong face normal','wrong glyph rotation','mirrored SVG glyph','open cut contour','PDF overprint disabled','wrong PDF cut spot','wrong PDF cut geometry','consistently swapped glyph art']):
  folder=base/f'bad-{index}';shutil.copytree(base/'positive',folder);m=json.loads((folder/'manifest.json').read_text());mutate(kind,folder,m)
  result=run(folder);assert result.returncode!=0,kind+' was accepted'
  lines=(result.stdout+result.stderr).splitlines();results.append({'control':kind,'rejected':True,'reason':lines[-1]})

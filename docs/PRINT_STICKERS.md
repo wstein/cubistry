@@ -93,4 +93,8 @@ symbol-only HSM print is not described as font-derived.
 The physical/PDF checker and eight corruption controls were independently authored
 by the artwork reviewer. They do not import the generator: actual PDF paths,
 SVG transforms, source frames, spot color, overprint and setup-word inverses are
-replayed separately.
+replayed separately. A ninth control, added in PR review, swaps two identities'
+glyphs consistently in SVG and PDF; the checker rejects it because every copy of
+a source identity must carry identical art and each printed label must map to
+one distinct glyph geometry. A label mapping that is wrong identically in every
+copy still needs the visual artwork review.
