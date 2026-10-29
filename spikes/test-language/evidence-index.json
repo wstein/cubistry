@@ -106,6 +106,13 @@
     "flix/evidence/compiler-test-1.stdout.txt": "489dbea6635cd4acd12add79db7b6dfa35b1d013f18fb32b61c80dd097efbace",
     "flix/evidence/compiler-test-2.stderr.txt": "66c77e5d3bb6c53002c4817e757e199d47a5d2162beb77d48ee03d3ea5883aa0",
     "flix/evidence/compiler-test-2.stdout.txt": "ae4c9c9f78500c4cba77e1c904b9f6e4f70acdd5b659a77b76c76d99ae3e1f6c",
+    "flix/evidence/lifecycle/build.json": "d347995a10f4f92c04c1b91ec977560bc6733c3484f6e684f4bf540ced2504fe",
+    "flix/evidence/lifecycle/build.stderr.txt": "7bd806a93408fb1f94f6d3ddf5dd82cb5986dce21953c491a6e73cac14cea79e",
+    "flix/evidence/lifecycle/build.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flix/evidence/lifecycle/python-audit.txt": "bac91bcb348af0bae1cdfda7b54b2f080e17ea6eb6f578930be49dcd7b368ce8",
+    "flix/evidence/lifecycle/report.json": "b9443018bcc694b6168ce34069f7694f21a7321515387e07150c9747f280ba06",
+    "flix/evidence/lifecycle/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flix/evidence/lifecycle/stdout.txt": "81b092725550338e72c00a33d20f55948ea26aaddfd600183395e3948a47c216",
     "flix/evidence/report.json": "4d9ec715e98c9f38c97eed8949e83e36bcbc4e59cef0a4310e9d74feef6bdb75"
   }
 }
