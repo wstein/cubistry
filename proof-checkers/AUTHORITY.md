@@ -7,7 +7,7 @@ written at the time of issue 74, that the Python proof gates and production code
 remain authoritative. That header line now points here; only the `SPEC.md` entry
 of `evidence-manifest.json` was re-pinned for this wording change.
 
-## Rule, in order of strength
+## Rule
 
 1. A proof or certificate counts as CONFIRMED only when BOTH the Flix and the
    Julia checker accept it, each reading the raw input itself as the contract
@@ -18,8 +18,8 @@ of `evidence-manifest.json` was re-pinned for this wording change.
    confirms a proof.
 3. Disagreement between Flix and Julia, or between either of them and the pinned
    expected outcomes, is fail-closed: the status is `UNKNOWN` (never `SAT` or
-   `UNSAT`) until the cause is understood and documented. There is no majority
-   vote and no averaging.
+   `UNSAT`). There is no majority vote and no averaging. Documenting the cause
+   does not confirm the proof; only rule 1 does.
 4. Deliberately stricter rejections stay listed one by one in the
    [coverage ledger](coverage.json) (`deliberatelyStricter`): Boolean unpadded
    coordinates, duplicate object keys, exponent schema versions, float schema
@@ -31,6 +31,7 @@ of `evidence-manifest.json` was re-pinned for this wording change.
 
 ## Status of existing proofs
 
-Existing proofs whose only verifier is Python are not retroactively re-labeled.
-They remain verified by their Python verifier and are candidates for porting to
-the two checkers. The port backlog is in [RESULTS.md](RESULTS.md#port-backlog).
+Existing proofs whose only verifier is Python are not retroactively re-labeled;
+their recorded results and Python verification stay as recorded. Under rule 1
+they are not CONFIRMED until both Flix and Julia accept them, and they are
+candidates for porting to the two checkers. The port backlog is in [RESULTS.md](RESULTS.md#port-backlog).
