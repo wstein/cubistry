@@ -108,7 +108,7 @@ comparison. All eleven outcomes were identical in every trial. Medians were
 997.90 ms versus 553.74 ms. The existing repository already batches unittest
 cases; this experiment is not a demonstrated existing-CI improvement.
 
-Reviewed and ran Octave `4547daa` fresh/batch experiment. Both modes execute
+Reviewed and ran Octave `4547daae232de537acda15fffa32cd597539c34b` fresh/batch experiment. Both modes execute
 300 positive witnesses, 300 inverse words, 18 corruptions, and 7,200 exported
 sticker frames, whose hashes equal the previously Python-checked output.
 Reviewer result: fresh total 13.346 seconds, batch 13.738 seconds, ratio 1.029.
