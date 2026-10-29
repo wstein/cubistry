@@ -14,7 +14,8 @@ OUT = ROOT / 'public/assets/hsm/words'
 OUT.mkdir(parents=True, exist_ok=True)
 font = TTFont(FONT)
 glyphs, cmap = font.getGlyphSet(), font.getBestCmap()
-scale, baseline = 56 / font['head'].unitsPerEm, 232
+font_size, baseline = 67.2, 232
+scale = font_size / font['head'].unitsPerEm
 images, bounds = [], {}
 for letter, word in [('H', 'hour'), ('M', 'min'), ('S', 'sec')]:
     advance = sum(font['hmtx'][cmap[ord(c)]][0] for c in word)
@@ -37,7 +38,7 @@ for letter, word in [('H', 'hour'), ('M', 'min'), ('S', 'sec')]:
 (OUT / 'provenance.json').write_text(json.dumps({
     'schema': 'cubistry.hsm-unit-lettering', 'version': 1, 'variant': 'words',
     'description': 'Small hour/min/sec at the bottom; no large H/M/S in this variant.',
-    'canvas': [256, 256], 'fontSize': 56, 'baseline': baseline,
+    'canvas': [256, 256], 'fontSize': font_size, 'baseline': baseline,
     'font': {'family': 'Noto Sans', 'weight': 600, 'package': '@fontsource/noto-sans@5.2.10',
              'path': str(FONT.relative_to(ROOT)), 'sha256': hashlib.sha256(FONT.read_bytes()).hexdigest(),
              'license': 'SIL-OFL-1.1', 'licensePath': 'public/fonts/OFL.txt'},
