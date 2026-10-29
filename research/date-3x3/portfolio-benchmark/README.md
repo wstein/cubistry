@@ -82,3 +82,7 @@ include `-v2`. See [V2 findings](RESULTS-V2.md).
 [Post-repair V3 findings](RESULTS-V3.md) retain a fresh continuous capture at
 repair table version 2 with the V2 search policy unchanged. The earlier 41-HTM
 maximum remains historical; use the V3 report for the newly observed maximum.
+
+[Final V4 finite-family findings](RESULTS-V4.md) retain the fresh capture at
+repair table 3/cyclic join policy. Historical V1–V3 artifacts are preserved; use
+V4 for the final measured maximum, alongside its HTM/QTM/XYZ definitions.
