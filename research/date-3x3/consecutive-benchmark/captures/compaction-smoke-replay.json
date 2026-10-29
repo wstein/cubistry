@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "complete": true,
+  "cases": 72,
+  "series": 12,
+  "providers": [
+    "direct"
+  ],
+  "all54FrameInverseRestorations": 72,
+  "obsoleteSingleTurns": 6,
+  "sourcePrintingUnchanged": true,
+  "optimality": "UNKNOWN",
+  "universalMoveBound": "UNKNOWN",
+  "browserTiming": "NOT_MEASURED"
+}

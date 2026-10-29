@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "rigidFrameCases": 72,
+  "prints": 3,
+  "budgetFallbackCases": 3,
+  "invalidBudgetFallbackCases": 3,
+  "thresholdCases": 3,
+  "shorterCandidateAndReferencePhysicalReplay": true
+}

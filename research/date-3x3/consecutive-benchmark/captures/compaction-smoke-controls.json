@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "source": "/tmp/cubistry-consecutive-reference-smoke.json",
+  "negativeControls": [
+    {
+      "control": "color-equivalent hidden-center-wrong pre-turn reference",
+      "rejected": true,
+      "reason": "Pre-turn compaction preserves every current hidden frame"
+    },
+    {
+      "control": "dishonest pre-turn word hash",
+      "rejected": true,
+      "reason": "Pre-turn reference hash"
+    },
+    {
+      "control": "color-equivalent hidden-center-wrong endpoint reference",
+      "rejected": true,
+      "reason": "Final compacted reference restores every actual hidden frame"
+    },
+    {
+      "control": "dishonest final reference length",
+      "rejected": true,
+      "reason": "Exact final source reference length"
+    },
+    {
+      "control": "dishonest source reference hash",
+      "rejected": true,
+      "reason": "Exact complete source reference hash"
+    }
+  ]
+}

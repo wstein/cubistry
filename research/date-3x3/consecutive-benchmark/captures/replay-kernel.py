@@ -1,8 +1,9 @@
 import sys,json,hashlib
 from pathlib import Path
-sys.path.insert(0,'/workspace/cubistry-consecutive-review/research/date-3x3')
+# Usage: python3 replay-kernel.py kernel-2048.json
+sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 import verify_witness as W
-p=Path('/tmp/calendar-backend-review/kernel-2048.json');d=json.loads(p.read_bytes())
+p=Path(sys.argv[1]);d=json.loads(p.read_bytes())
 faces=['U','L','F','R','B','D']; normals=[(0,1,0),(-1,0,0),(0,0,1),(1,0,0),(0,0,-1),(0,-1,0)]
 s=[]
 for n in normals:
