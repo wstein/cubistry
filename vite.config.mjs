@@ -29,6 +29,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
+        status: fileURLToPath(new URL("./status.html", import.meta.url)),
         print: fileURLToPath(new URL("./print.html", import.meta.url)),
         calendar: fileURLToPath(new URL("./calendar.html", import.meta.url)),
         clock: fileURLToPath(new URL("./clock.html", import.meta.url)),

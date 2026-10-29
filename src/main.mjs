@@ -516,10 +516,16 @@ $("application").addEventListener("change", async () => {
     $("application").value = application;
     return;
   }
-  if (["live-clock", "calendar"].includes($("application").value)) {
+  if (
+    ["live-clock", "calendar", "status-cube"].includes($("application").value)
+  ) {
     location.assign(
       new URL(
-        $("application").value === "calendar" ? "calendar.html" : "clock.html",
+        $("application").value === "calendar"
+          ? "calendar.html"
+          : $("application").value === "status-cube"
+            ? "status.html"
+            : "clock.html",
         location.href,
       ),
     );
