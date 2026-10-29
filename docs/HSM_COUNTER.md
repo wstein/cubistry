@@ -79,8 +79,9 @@ font is converted to paths; the runtime SVGs need no external fonts. The words a
 set at font size 80.64 on the unchanged baseline 232 (1.2 times the previous 67.2,
 which was itself 1.2 times the original 56). The widest word, `hour`, keeps at least
 2.7 mm of clear space to the side edges of a 20 mm sticker, and all three words stay
-inside the lower third of the 256-unit canvas, which is what limits further growth. Geometry, immutable face IDs, actual blank and
-legal routes are shared by both variants.
+inside the lower third of the 256-unit canvas, which is what limits further
+growth. Geometry, immutable face IDs, actual blank and legal routes are shared by
+both variants.
 
 ## Three-cube live clock
 
