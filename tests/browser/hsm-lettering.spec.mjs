@@ -64,7 +64,8 @@ test("word print replaces large unit symbols and keeps the counter value", async
       await expect(page.locator("#hsm-letter")).toBeEnabled();
     }
     const b = await bounds(page, letter);
-    expect(b.minY).toBeGreaterThanOrEqual(184);
+    expect(b.minY).toBeGreaterThanOrEqual(180);
+    expect(b.minY).toBeLessThanOrEqual(195);
     expect(b.maxY).toBeLessThanOrEqual(236);
     expect(b.ink).toBeGreaterThan(50);
     expect(
