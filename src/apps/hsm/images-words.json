@@ -4,20 +4,20 @@
     "kind": "image",
     "format": "svg",
     "url": "/assets/hsm/words/H.svg",
-    "sha256": "e931c303952e231569c12ffdcee427e9e8f64dc5acbe88084eca57a4228c03a0"
+    "sha256": "f8a88141158828d04b5622f9c00f08ce91c68784eff18d93de955d569e18656e"
   },
   {
     "id": "M",
     "kind": "image",
     "format": "svg",
     "url": "/assets/hsm/words/M.svg",
-    "sha256": "01979a11c9bf928927eedc764a07714eca3ce1de0f8b0096544fcec1c60b556d"
+    "sha256": "9beec45f4471913c68025347426e173dd094178e0fa8b0d5026f2422b40a9725"
   },
   {
     "id": "S",
     "kind": "image",
     "format": "svg",
     "url": "/assets/hsm/words/S.svg",
-    "sha256": "df74a9f73ebaa4dde0c60a74855d6b0b0b61b87a56730b9dc7908c4270e36439"
+    "sha256": "3e508633221b647128a47c7edf88deaabcba6e7e809ad7b7338a1c9a8f10f253"
   }
 ]
