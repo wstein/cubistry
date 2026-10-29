@@ -1,11 +1,11 @@
 {
   "schema": "cubistry.3x3-center-corrections",
-  "version": 1,
+  "version": 2,
   "scope": "Fix only visible center orientation while restoring all noncenter frames; hidden center orientations are unconstrained",
   "witnesses": [
     {
-      "word": "R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
-      "htm": 18,
+      "word": "F U D R2 L2 U' D' B' U D R2 L2 U' D'",
+      "htm": 14,
       "frontCenterSourceUp": [
         0,
         1,
@@ -18,8 +18,8 @@
       ]
     },
     {
-      "word": "R F R' F R F R' F R F R' F R F R' F R F R' F",
-      "htm": 20,
+      "word": "F U D F2 U' D' F U D F2 U' D'",
+      "htm": 12,
       "frontCenterSourceUp": [
         0,
         1,
@@ -32,8 +32,8 @@
       ]
     },
     {
-      "word": "L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
-      "htm": 18,
+      "word": "D U L2 R2 D' U' B D U L2 R2 D' U' F'",
+      "htm": 14,
       "frontCenterSourceUp": [
         0,
         1,
@@ -46,5 +46,9 @@
       ]
     }
   ],
-  "globalOptimality": "UNKNOWN"
+  "globalOptimality": "UNKNOWN",
+  "provenance": {
+    "primarySource": "https://kociemba.org/twisted.htm",
+    "derivation": "Face-renamed conjugates of the published 12-turn half-center and 14-turn paired-quarter-center algorithms; quarter repairs also rotate the hidden back center. Independently checked with Rodrigues rotations; global optimality is not claimed."
+  }
 }

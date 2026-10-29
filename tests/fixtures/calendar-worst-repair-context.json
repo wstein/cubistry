@@ -1,0 +1,22 @@
+{
+  "schema": "cubistry.calendar-repair-regression",
+  "baselineApp": "0c9b166ca66d252ecd096a73042d322f52d987a0",
+  "capture": "calendar-2024-v2.json",
+  "captureCase": 2980,
+  "id": "de-a",
+  "fromISO": "2024-04-20",
+  "toISO": "2024-04-19",
+  "sourceWord": "y2 U' R D2 R2 L F2 U R D2 B U2 F2 D2 B' R2 D2 B U2 F D2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U L U' L U L U' L U L U' L U L U' L U L U' L B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D",
+  "oldWord": "x z2 U2 B2 D' B2 L2 U2 L2 R2 F2 L2 U' L2 F' R' D2 B U2 F U B2 F R F R' F R F R' F R F R' F R F R' F R F R' F",
+  "oldCounts": {
+    "total": 43,
+    "htm": 41,
+    "qtm": 54,
+    "global": 2
+  },
+  "sourceReferenceSHA256": "1d41873fc838d2ee05d14676c57aecf2ab9d587a3781cec13bf6e40992dbfc44",
+  "printingSHA256": "1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56",
+  "shortHalfRepair": "F U D F2 U' D' F U D F2 U' D'",
+  "oldRepairHTM": 20,
+  "newConstructedHTM": 32
+}
