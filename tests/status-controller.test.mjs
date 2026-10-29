@@ -17,8 +17,18 @@ import {
 const definition = validateStatusDefinition(
   JSON.parse(readFileSync("src/apps/status/definition.json")),
 );
+import { QualityPolicy } from "../src/apps/status/policy.ts";
+import { displayTarget, valueSnapshot } from "../src/apps/status/definition.ts";
+const policy = new QualityPolicy(
+  definition,
+  readFileSync("public/assets/quality/distances.u8"),
+);
 const flush = () => new Promise((resolve) => setImmediate(resolve));
-function fixture({ loadError = false, configureError = false } = {}) {
+function fixture({
+  loadError = false,
+  configureError = false,
+  policyError = false,
+} = {}) {
   let pose,
     printing,
     configurations = 0,
@@ -72,6 +82,10 @@ function fixture({ loadError = false, configureError = false } = {}) {
         },
       };
     },
+    async () => {
+      if (policyError) throw Error("Synthetic certificate integrity failure");
+      return policy;
+    },
   );
   return {
     controller,
@@ -93,15 +107,6 @@ function fixture({ loadError = false, configureError = false } = {}) {
       pending.shift().resolve();
       await flush();
       assert(stateEquals(controller.state, pose));
-      assert(
-        stateEquals(
-          applyMoves(
-            initialState(definition.print),
-            controller.sourceReference,
-          ),
-          pose,
-        ),
-      );
     },
     async finish() {
       for (let n = 0; controller.busy && n < 40; n++) await this.step();
@@ -111,125 +116,98 @@ function fixture({ loadError = false, configureError = false } = {}) {
   };
 }
 
-test("all status transitions retain one immutable print and report only committed moves", async () => {
+test("all625 controller requests retain immutable print and assets with exact shared playback", async () => {
   const f = fixture(),
     c = f.controller;
   await c.configure();
-  assert.equal(c.currentStatus, "idle");
-  for (const from of definition.statuses) {
-    for (const to of definition.statuses) {
-      c.requestStatus(from.id);
-      await f.finish();
-      c.requestStatus(to.id);
-      await f.finish();
-      assert.equal(c.currentStatus, to.id);
-      assert(stateEquals(c.state, to.state));
-      assert(matchesTarget(definition.print, c.state, to.target));
-      assert.equal(c.progress.sessionTotal, f.committed.length);
-      assert(c.sourceReference.length <= 4);
-    }
+  assert.deepEqual(c.currentStatus, definition.initial);
+  for (const target of definition.targets) {
+    c.requestStatus(target.states);
+    await f.finish();
+    assert.deepEqual(c.currentStatus, target.states);
+    assert(matchesTarget(definition.print, c.state, target.target));
+    assert.equal(c.progress.sessionTotal, f.committed.length);
   }
-  assert.equal(
-    f.configurations,
-    1,
-    "Events must not replace the print or installed assets",
-  );
+  assert.equal(f.configurations, 1);
   assert.deepEqual(f.errors, []);
   c.dispose();
   assert.equal(f.disposed, 1);
 });
-
-test("rapid declarative events supersede after one legal turn and replan from its committed pose", async () => {
+test("rapid events commit one legal turn then replan latest snapshot from its actual pose", async () => {
   const f = fixture(),
     c = f.controller,
-    workflow = new StatusWorkflow(definition);
+    w = new StatusWorkflow(definition);
   await c.configure();
-  for (const event of definition.demonstration) {
-    workflow.dispatch(event);
-    c.requestStatus(workflow.requested);
+  for (const step of definition.demonstration) {
+    w.dispatch(step.category, step.event);
+    c.requestStatus(w.requested);
   }
-  assert.equal(workflow.requested, "done");
-  assert.equal(c.currentStatus, "idle");
+  assert.deepEqual(w.requested, ["ok", "ok", "ok", "ok"]);
+  assert.deepEqual(c.currentStatus, definition.initial);
   assert.equal(f.committed.length, 0);
   const first = f.pending[0].p;
   await f.step();
   assert(stateEquals(c.state, first.to));
-  assert.equal(
-    c.progress.target,
-    definition.statuses.findIndex((s) => s.id === "done"),
-  );
-  assert.equal(
-    serializeMove(f.pending[0].p.move),
-    "U'",
-    "Obsolete opposite-layer D' must never begin",
-  );
+  assert.equal(c.progress.target, 312);
+  assert(c.progress.total <= 7);
   await f.finish();
-  assert.equal(c.currentStatus, "done");
-  assert(
-    stateEquals(
-      c.state,
-      definition.statuses.find((s) => s.id === "done").state,
-    ),
-  );
-  assert(
-    !f.notices.some((n) => n.value === 1 && n.progress.status === "completed"),
-  );
+  assert.deepEqual(c.currentStatus, w.requested);
+  assert(matchesTarget(definition.print, c.state, displayTarget(w.requested)));
   assert.equal(c.progress.sessionTotal, f.committed.length);
 });
-
-test("returning to the last displayed state still repairs an interrupted partial cube", async () => {
+test("returning to last completed snapshot repairs interrupted intermediate pose", async () => {
   const f = fixture(),
     c = f.controller;
   await c.configure();
-  c.requestStatus("coding");
-  c.requestStatus("idle");
+  c.requestStatus(["running", "open", "open", "open"]);
+  c.requestStatus(definition.initial);
   await f.step();
-  assert.equal(c.currentStatus, "idle");
   assert.equal(c.busy, true);
-  assert(!stateEquals(c.state, definition.statuses[0].state));
+  assert.deepEqual(c.currentStatus, definition.initial);
+  assert(c.progress.total <= 7);
   await f.finish();
-  assert.equal(f.committed.length, 2);
-  assert(stateEquals(c.state, definition.statuses[0].state));
-  assert.equal(c.currentStatus, "idle");
+  assert(
+    matchesTarget(definition.print, c.state, displayTarget(definition.initial)),
+  );
 });
-
-test("finish-active discards the queued target while completing a full requested display", async () => {
+test("finish active snapshot drops queued target and completes its full endpoint", async () => {
   const f = fixture(),
     c = f.controller;
   await c.configure();
-  c.requestStatus("coding");
-  c.requestStatus("done");
-  assert.equal(c.stopAfterCurrent(), 2);
+  const active = ["running", "open", "open", "open"];
+  c.requestStatus(active);
+  c.requestStatus(["error", "blocked", "ok", "running"]);
+  assert.equal(c.stopAfterCurrent(), 125);
   await f.finish();
-  assert.equal(c.currentStatus, "coding");
+  assert.deepEqual(c.currentStatus, active);
   assert.equal(c.progress.status, "stopped");
-  assert.equal(f.committed.length, 2);
+  assert(matchesTarget(definition.print, c.state, displayTarget(active)));
 });
-
-test("animation failure freezes the last committed pose and does not invent a turn or auto-reset", async () => {
+test("animation failure freezes committed full pose, progress and requests until reload", async () => {
   const f = fixture(),
     c = f.controller;
   await c.configure();
-  c.requestStatus("coding");
+  c.requestStatus(["running", "open", "open", "open"]);
   await f.step();
-  const retained = c.state,
-    reference = c.sourceReference;
+  const retained = c.state;
   f.pending.shift().reject(Error("Synthetic interrupted animation"));
   await flush();
   assert.equal(c.busy, false);
   assert.equal(c.progress.status, "failed");
   assert.equal(c.progress.sessionTotal, 1);
-  assert.equal(f.committed.length, 1);
   assert(stateEquals(c.state, retained));
-  assert.deepEqual(c.sourceReference, reference);
-  assert.equal(c.currentStatus, "idle");
-  assert.throws(() => c.requestStatus("done"), /Reload/);
+  assert.throws(() => c.requestStatus(["ok", "ok", "ok", "ok"]), /Reload/);
   assert.equal(f.configurations, 1);
   assert.equal(f.errors.length, 1);
+  c.dispose();
+  assert.equal(f.disposed, 1);
 });
-
-test("failed asset load or viewer installation leaves no falsely configured state and releases owned images", async () => {
-  for (const options of [{ loadError: true }, { configureError: true }]) {
+test("certificate, asset and installation failures never claim configuration and dispose owned resources", async () => {
+  for (const options of [
+    { loadError: true },
+    { configureError: true },
+    { policyError: true },
+  ]) {
     const f = fixture(options),
       c = f.controller;
     await assert.rejects(c.configure(), /Synthetic/);
@@ -237,6 +215,9 @@ test("failed asset load or viewer installation leaves no falsely configured stat
     assert.equal(c.busy, false);
     assert.equal(f.configurations, 0);
     assert.equal(f.disposed, options.configureError ? 1 : 0);
-    assert.throws(() => c.requestStatus("done"), /not configured/);
+    assert.throws(
+      () => c.requestStatus(["ok", "ok", "ok", "ok"]),
+      /not configured/,
+    );
   }
 });

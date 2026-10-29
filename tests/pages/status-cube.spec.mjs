@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-test("built status cube loads fixed assets below the deployment prefix and performs physical event playback", async ({
+test("built Quality Cube loads certificate and20 vector assets below Pages prefix and performs category events", async ({
   page,
 }) => {
   const errors = [],
@@ -14,38 +14,35 @@ test("built status cube loads fixed assets below the deployment prefix and perfo
     if (u.protocol === "http:") paths.push(u.pathname);
   });
   await page.goto("./status.html");
-  await expect(page.locator("#status-select")).toBeEnabled();
+  await expect(page.locator("#status-build")).toBeEnabled();
   await expect(page.locator("canvas")).toHaveCount(1);
-  for (const [id, label] of [
-    ["planning", "P L A N"],
-    ["coding", "C O D E"],
-    ["testing", "T E S T"],
-    ["review", "R E V W"],
-    ["done", "D O N E"],
-  ]) {
-    await page.selectOption("#status-select", id);
+  for (const state of ["running", "ok", "error", "blocked", "open"]) {
+    await page.selectOption("#status-build", state);
     await expect(page.locator("#status-viewer")).toHaveAttribute(
       "data-current",
-      id,
+      `${state},open,open,open`,
     );
     await expect(page.locator("#status-viewer")).toHaveAttribute(
       "data-sync",
       "idle",
     );
-    await expect(page.locator("#status-front")).toHaveText(label);
   }
   await page.click("#status-burst");
   await expect(page.locator("#status-viewer")).toHaveAttribute(
     "data-current",
-    "done",
+    "ok,ok,ok,ok",
   );
   await expect(page.locator("#status-viewer")).toHaveAttribute(
     "data-sync",
     "idle",
   );
+  expect(paths.some((p) => p.endsWith("/assets/quality/distances.u8"))).toBe(
+    true,
+  );
   expect(
-    paths.some((p) => p.endsWith("/fonts/noto-sans-latin-800.woff2")),
-  ).toBe(true);
+    new Set(paths.filter((p) => p.endsWith(".svg") && p.includes("/quality/")))
+      .size,
+  ).toBe(20);
   expect(paths.every((p) => p.startsWith("/cubistry/"))).toBe(true);
   expect(failed).toEqual([]);
   expect(errors).toEqual([]);

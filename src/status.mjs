@@ -7,7 +7,10 @@ import { stickerPoses } from "@cubistry/cube-mechanics";
 import {
   StatusWorkflow,
   validateStatusDefinition,
+  FRONT,
+  valueSnapshot,
 } from "./apps/status/definition.ts";
+import { QualityPolicy } from "./apps/status/policy.ts";
 import { StatusController } from "./apps/status/controller.ts";
 const $ = (id) => document.getElementById(id);
 export let statusController = null;
@@ -19,22 +22,20 @@ let workflow,
   commandError = "",
   demoGeneration = 0,
   demoRunning = false;
-const label = (id) =>
-  statusDefinition.statuses.find((s) => s.id === id)?.label ?? "—";
+const label = (snapshot) =>
+  snapshot
+    .map(
+      (state, i) =>
+        `${statusDefinition.categories[i].label}: ${statusDefinition.states.find((s) => s.id === state).label}`,
+    )
+    .join(" · ");
 function stopDemo() {
   demoGeneration++;
   demoRunning = false;
 }
 function controls() {
-  for (const id of [
-    "status-select",
-    "status-event",
-    "status-send",
-    "status-demo",
-    "status-burst",
-    "status-speed",
-  ])
-    $(id).disabled = !ready || fatal;
+  for (const element of document.querySelectorAll("[data-quality-control]"))
+    element.disabled = !ready || fatal;
   $("status-finish").disabled = !ready || fatal || !statusController?.busy;
   $("status-demo").textContent = demoRunning ? "Stop demo" : "Run demo";
   $("status-demo").setAttribute("aria-pressed", String(demoRunning));
@@ -47,7 +48,9 @@ function show() {
     ? label(c.currentStatus)
     : "Not configured";
   $("status-requested").textContent = label(workflow.requested);
-  $("status-select").value = workflow.requested;
+  statusDefinition.categories.forEach((category, i) => {
+    $(`status-${category.id}`).value = workflow.requested[i];
+  });
   $("status-fault").textContent = workflow.fault ?? "";
   $("status-moves").textContent =
     `${p.completed} / ${p.total} HTM · Session ${p.sessionTotal}`;
@@ -56,33 +59,30 @@ function show() {
       ? "Playback failed. The last committed pose is retained; reload to recover."
       : "Initialization failed. Reload to recover."
     : c.busy
-      ? `Moving toward ${label(workflow.requested)}. Last completed display: ${label(c.currentStatus)}.`
+      ? "Moving toward the requested snapshot."
       : "In sync · " + label(c.currentStatus);
   $("status-viewer").setAttribute("aria-busy", String(c.busy));
   Object.assign($("status-viewer").dataset, {
-    current: c.state ? c.currentStatus : "",
-    requested: workflow.requested,
+    current: c.state ? c.currentStatus.join(",") : "",
+    requested: workflow.requested.join(","),
     sync: fatal ? "failed" : c.busy ? "moving" : "idle",
     sessionMoves: String(p.sessionTotal),
   });
   if (c.state) {
     const poses = stickerPoses(statusDefinition.print, c.state);
-    $("status-front").textContent = [
-      [-1, 1, 1],
-      [1, 1, 1],
-      [-1, -1, 1],
-      [1, -1, 1],
-    ]
-      .map((position) => {
-        const s = poses.find(
-          (s) => s.n.join() === "0,0,1" && s.p.join() === position.join(),
-        );
-        return (
-          statusDefinition.assets.documents.find((d) => d.id === s?.assetId)
-            ?.text ?? "?"
-        );
-      })
-      .join(" ");
+    $("status-front").textContent = FRONT.map((position) => {
+      const s = poses.find(
+        (s) => s.n.join() === "0,0,1" && s.p.join() === position.join(),
+      );
+      if (!s) return "?";
+      const category = statusDefinition.categories.find((c) =>
+        s.assetId.startsWith(`quality-${c.id}-`),
+      );
+      const state = statusDefinition.states.find(
+        (t) => s.assetId === `quality-${category?.id}-${t.id}`,
+      );
+      return `${category?.label ?? "?"} ${state?.word ?? "?"}${s.up.join() !== "0,1,0" ? " (turning)" : ""}`;
+    }).join(" · ");
   }
   $("status-history").replaceChildren(
     ...workflow.history.map((message) => {
@@ -97,7 +97,7 @@ function show() {
 function fail(error) {
   fatal = true;
   stopDemo();
-  commandError = error?.message ?? "Status application failed";
+  commandError = error?.message ?? "Quality application failed";
   $("status-error").textContent = commandError;
   $("status-sync").textContent = "Application stopped. Reload to recover.";
   $("status-reload").hidden = false;
@@ -117,16 +117,22 @@ function action(update, cancelDemo = true) {
   }
   show();
 }
-$("status-select").addEventListener("change", () =>
-  action(() => workflow.select($("status-select").value)),
-);
 $("status-send").addEventListener("click", () =>
-  action(() => workflow.dispatch($("status-event").value)),
+  action(() =>
+    workflow.dispatch(
+      $("status-event-category").value,
+      $("status-event").value,
+    ),
+  ),
 );
+function prepareDemo() {
+  action(() => workflow.selectSnapshot(statusDefinition.initial), false);
+}
 $("status-burst").addEventListener("click", () => {
   stopDemo();
-  for (const event of statusDefinition.demonstration)
-    action(() => workflow.dispatch(event), false);
+  prepareDemo();
+  for (const step of statusDefinition.demonstration)
+    action(() => workflow.dispatch(step.category, step.event), false);
 });
 $("status-demo").addEventListener("click", async () => {
   if (demoRunning) {
@@ -137,10 +143,11 @@ $("status-demo").addEventListener("click", async () => {
   if (!ready || fatal) return;
   const generation = ++demoGeneration;
   demoRunning = true;
+  prepareDemo();
   show();
-  for (const event of statusDefinition.demonstration) {
+  for (const step of statusDefinition.demonstration) {
     if (generation !== demoGeneration || fatal) break;
-    action(() => workflow.dispatch(event), false);
+    action(() => workflow.dispatch(step.category, step.event), false);
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
   if (generation === demoGeneration) {
@@ -152,7 +159,7 @@ $("status-finish").addEventListener("click", () => {
   if (!ready || fatal) return;
   stopDemo();
   const active = statusController.stopAfterCurrent();
-  if (active !== null) workflow.select(statusDefinition.statuses[active].id);
+  if (active !== null) workflow.selectSnapshot(valueSnapshot(active));
   commandError = "";
   show();
 });
@@ -167,8 +174,15 @@ async function initialize() {
   try {
     statusDefinition = validateStatusDefinition(raw);
     workflow = new StatusWorkflow(statusDefinition);
-    for (const s of statusDefinition.statuses)
-      $("status-select").add(new Option(s.label, s.id));
+    for (const category of statusDefinition.categories) {
+      const select = $(`status-${category.id}`);
+      for (const state of statusDefinition.states)
+        select.add(new Option(state.label, state.id));
+      select.addEventListener("change", () =>
+        action(() => workflow.select(category.id, select.value)),
+      );
+      $("status-event-category").add(new Option(category.label, category.id));
+    }
     for (const event of statusDefinition.events)
       $("status-event").add(new Option(event.label, event.id));
     viewer = new CubeViewer($("status-viewer"));
@@ -185,6 +199,7 @@ async function initialize() {
       },
       (manifest, prints) =>
         loadAssets(manifest, prints, undefined, import.meta.env.BASE_URL),
+      () => QualityPolicy.load(statusDefinition, import.meta.env.BASE_URL),
     );
     await statusController.configure();
     ready = true;

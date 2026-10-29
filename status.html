@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
-    <title>Cubistry · Status Cube</title>
+    <title>Cubistry · CI Quality Cube</title>
   </head>
   <body>
     <main>
@@ -17,10 +17,10 @@
           <a href="calendar.html">Calendar</a>
         </nav>
       </header>
-      <h1>Status Cube</h1>
+      <h1>CI Quality Cube</h1>
       <p class="small">
-        One fixed physical print. Six workflow states. Local simulated events
-        only.
+        Four categories. Five states each. One immutable physical print. Local
+        simulated events only.
       </p>
       <div class="status-workspace">
         <section class="status-stage" aria-label="Physical workflow cube">
@@ -28,39 +28,57 @@
           <p
             id="status-front"
             class="sr-only"
-            aria-label="Committed front sticker letters"
+            aria-label="Committed category and state words"
           ></p>
           <p id="status-sync" role="status" aria-live="polite">
             Loading the fixed workflow print…
           </p>
           <p class="small">
-            Drag to look around. Each letter belongs permanently to its physical
-            sticker.
+            Drag to look around. Each category, icon and state word belongs
+            permanently to its physical sticker.
           </p>
         </section>
         <aside class="status-controls" aria-label="Workflow controls">
           <dl class="status-values">
             <div>
-              <dt>Displayed status</dt>
+              <dt>Last completed snapshot</dt>
               <dd id="status-current">—</dd>
             </div>
             <div>
-              <dt>Requested status</dt>
+              <dt>Requested snapshot</dt>
               <dd id="status-requested">—</dd>
             </div>
           </dl>
-          <label for="status-select">Manual status</label>
-          <select id="status-select" disabled></select>
+          <label for="status-build">BUILD</label>
+          <select id="status-build" data-quality-control disabled></select>
+          <label for="status-test">TEST</label>
+          <select id="status-test" data-quality-control disabled></select>
+          <label for="status-analyze">ANALYZE</label>
+          <select id="status-analyze" data-quality-control disabled></select>
+          <label for="status-review">REVIEW</label>
+          <select id="status-review" data-quality-control disabled></select>
+          <label for="status-event-category">Event category</label>
+          <select
+            id="status-event-category"
+            data-quality-control
+            disabled
+          ></select>
           <label for="status-event">Simulated agent event</label>
-          <select id="status-event" disabled></select>
-          <button id="status-send" disabled>Send event</button>
+          <select id="status-event" data-quality-control disabled></select>
+          <button id="status-send" data-quality-control disabled>
+            Send event
+          </button>
           <div class="status-buttons">
-            <button id="status-demo" disabled>Run demo</button>
-            <button id="status-burst" disabled>Send rapid sequence</button>
+            <button id="status-demo" data-quality-control disabled>
+              Run demo
+            </button>
+            <button id="status-burst" data-quality-control disabled>
+              Send rapid sequence
+            </button>
           </div>
-          <button id="status-finish" disabled>Finish active status</button>
+          <button id="status-finish" disabled>Finish active snapshot</button>
           <label for="status-speed">Quarter-turn time</label>
-          <select id="status-speed">
+          <select id="status-speed" data-quality-control>
             <option value="500">500 ms</option>
             <option value="250" selected>250 ms</option>
             <option value="100">100 ms</option>

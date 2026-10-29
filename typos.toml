@@ -28,6 +28,8 @@ Cubistry = "Cubistry"
 cubie = "cubie"
 cubies = "cubies"
 Zettel = "Zettel"
+# User-specified German state word on immutable Quality Cube physical artwork.
+OFFEN = "OFFEN"
 
 # Upstream font license names the standard OpenType width axis literally.
 [default.extend-identifiers]
