@@ -1,0 +1,150 @@
+{
+  "scope": "100 full canonical states; padded/unpadded displays and exact inverse frames; ten corruptions",
+  "status": "PASS_FINITE_SCOPE",
+  "notEstablished": [
+    "all Python verifier schemas",
+    "large certificate throughput",
+    "full migration equivalence",
+    "formal proof of checker correctness"
+  ],
+  "baselineMain": "377747515be034cf19f656244a20449421b12b1d",
+  "spikeHead": "939f71c9a0895e59613b752c4c49bf939ca58ae6",
+  "gitStatus": [],
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "cpu": "",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "inputSHA256": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+  "codeSHA256": {
+    "public/counter-proof.json": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+    "research/counter/verify.py": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+    "spikes/test-language/run_spike.py": "ee8bb55bce4be501aab2f4c1abc430c76243b7b7c5cbbd6289f06e1be6e69121",
+    "spikes/test-language/julia/checker.jl": "2d9dae795c50d83eb12f4003fd0c65f326748616f6b39b4e1c53dfeea99e78d8",
+    "spikes/test-language/julia/Project.toml": "8e44eb68d33587f674f530e8118dd0d898e8a52017d28fc5b55ae345cf3717bb",
+    "spikes/test-language/julia/Manifest.toml": "136ee9a307e16429f3f89ba1505e1b0f9c51502156c32b3647d554590315d965"
+  },
+  "fullPythonProductionCheckerMs": 498.90186300035566,
+  "fullPythonProductionCheckerResult": {
+    "verdicts": {
+      "paddedTextMovable": "SAT",
+      "unpaddedTextMovable": "SAT",
+      "paddedTextFixedCubies": "UNSAT",
+      "unpaddedTextFixedCubies": "UNSAT",
+      "externalOverlayUnconstrainedUpper": "SAT"
+    },
+    "notRun": [
+      {
+        "model": "blank upper fields",
+        "reason": "Text is SAT; user requested no blank fallback experiment after success."
+      }
+    ],
+    "overlayScope": "Weaker unconstrained upper-face target; existing physical title witnesses suffice. Not used as a UI substitute.",
+    "digitConvention": "Ten distinct upright numeral images; no cross-character rotation aliases such as 6 becoming 9.",
+    "witnessSHA256": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+    "independentCheckerSHA256": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+    "physicalCubies": 8,
+    "physicalStickers": 24,
+    "titleCopies": {
+      "left": 2,
+      "right": 2
+    },
+    "valuesVerified": 100,
+    "orderedTransitionsByHubFactorization": 10000,
+    "chainedTransitionsPerFormat": 800,
+    "forwardWordsReplayed": 100,
+    "inverseWordsReplayed": 100,
+    "allMovesLegal": true,
+    "allVisiblePrintedGlyphsUpright": true,
+    "actualPrintRotationTamperRejected": true,
+    "fixedCubieProof": {
+      "availableDigitFaces": 18,
+      "requiredPadded": 20,
+      "requiredUnpadded": 20
+    },
+    "runtimeSeconds": 0.498
+  },
+  "pythonControls": [
+    {
+      "case": "boolean-schema.json",
+      "rejected": true,
+      "reason": "Unsupported legacy witness schema/version/puzzle"
+    },
+    {
+      "case": "boolean-vector.json",
+      "rejected": true,
+      "reason": "Complete physical 24-facelet lattice"
+    },
+    {
+      "case": "duplicate-identity.json",
+      "rejected": true,
+      "reason": "24 distinct sticker IDs"
+    },
+    {
+      "case": "fractional-normal.json",
+      "rejected": true,
+      "reason": "Complete physical 24-facelet lattice"
+    },
+    {
+      "case": "illegal-token.json",
+      "rejected": true,
+      "reason": "Illegal move notation Rw"
+    },
+    {
+      "case": "out-of-range-identity.json",
+      "rejected": true,
+      "reason": "24 distinct sticker IDs"
+    },
+    {
+      "case": "out-of-range-position.json",
+      "rejected": true,
+      "reason": "Complete physical 24-facelet lattice"
+    },
+    {
+      "case": "repainted-unpadded.json",
+      "rejected": true,
+      "reason": "Declared second fixed print differs"
+    },
+    {
+      "case": "rotated-print-up.json",
+      "rejected": true,
+      "reason": "Image not upright"
+    },
+    {
+      "case": "wrong-target.json",
+      "rejected": true,
+      "reason": "Wrong immutable image at (1, (1, -1, 1), '1', '0')"
+    }
+  ],
+  "juliaCommand": [
+    "/tmp/julia-1.13.3/bin/julia",
+    "--startup-file=no",
+    "--project=/workspace/cubistry-flix-spike/spikes/test-language/julia",
+    "/workspace/cubistry-flix-spike/spikes/test-language/julia/checker.jl",
+    "/workspace/cubistry-flix-spike/public/counter-proof.json",
+    "/tmp/cubistry-language-default-4/controls",
+    "/tmp/cubistry-language-default-4/julia.json",
+    "20"
+  ],
+  "juliaMode": "default",
+  "juliaExitCode": 0,
+  "juliaFreshProcessIncludingCompilationAndAllSamplesMs": 3962.8011849999893,
+  "juliaValidationIncludingJITMs": 1217.057036,
+  "kernelWordsPerSample": 2000,
+  "pythonWarmKernelSamplesMs": [
+    328.77890300005674,
+    293.861868995009,
+    275.03765799338,
+    264.0176819986664,
+    251.80999899748713
+  ],
+  "juliaWarmKernelSamplesMs": [
+    65.635058,
+    32.303707,
+    25.479133,
+    21.741303,
+    21.410461
+  ],
+  "pythonWarmMedianMs": 275.03765799338,
+  "juliaWarmMedianMs": 25.479133,
+  "all100FullStatesEqual": true,
+  "negativeControlsRejectedByBoth": 10
+}

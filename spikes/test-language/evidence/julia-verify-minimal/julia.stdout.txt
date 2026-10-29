@@ -1,0 +1,2 @@
+Test Summary:       | Pass  Total  Time
+integer conventions |    6      6  0.0s
