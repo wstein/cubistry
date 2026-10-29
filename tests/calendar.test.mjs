@@ -355,6 +355,50 @@ test("checked async plans are cached by exact pose and retain noncanonical hidde
   assert.deepEqual(c.progress.completed, nextEstimate);
   assert.equal(calls, 2);
 });
+test("legal planner words that miss the face or are not shorter use the checked fallback", async () => {
+  const design = uprightPlannerDesign(),
+    initial = {
+      weekday: 0,
+      month: 1,
+      day: 1,
+      cells: front(design.printing).map((s) => s.image),
+      word: "",
+    };
+  const target = {
+    ...initial,
+    cells: front(apply(design.printing, "y")).map((s) => s.image),
+    word: "y R L R' L'",
+  };
+  // Precondition: the wrong legal candidate really shows a different face.
+  assert(!matches(apply(design.printing, "y2"), target.cells));
+  for (const word of ["y2", "y U D U' D' R L R' L'"]) {
+    let physical;
+    const moves = [],
+      errors = [];
+    const c = new CalendarController(
+      design,
+      initial,
+      {
+        configure(_d, s) {
+          physical = s;
+        },
+        async animate(from, token, to) {
+          assert(sameState(physical, from));
+          physical = to;
+          moves.push(token);
+        },
+      },
+      (_target, _busy, error) => error && errors.push(error),
+      async () => word,
+    );
+    c.request(target);
+    while (c.busy) await new Promise((r) => setImmediate(r));
+    assert.deepEqual(errors, []);
+    assert.equal(c.progress.route, "fallback");
+    assert.deepEqual(moves, tokens(target.word));
+    assert(matches(physical, target.cells));
+  }
+});
 test("asynchronous preparation is discarded after the physical source changes", async () => {
   const design = uprightPlannerDesign(),
     initial = {
