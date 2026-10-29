@@ -1,0 +1,1 @@
+PASS: 100 full 24-sticker states, 100 inverses, 6 negative controls
