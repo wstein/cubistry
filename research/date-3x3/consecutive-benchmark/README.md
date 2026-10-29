@@ -35,7 +35,9 @@ The separate Python verifier uses the historical Rodrigues engine, not JavaScrip
 solver geometry. It checks the exact Gregorian request sequence, source print,
 continuous full poses, upright nonblank glyphs including the visible center,
 inverse restoration, interruption boundaries, reference lengths, baseline costs,
-move accounting and recomputed summary statistics.
+move accounting and recomputed summary statistics. Run
+`python3 research/date-3x3/consecutive-benchmark/test_verify.py CAPTURE.json`
+to reject ten independent corruptions of an actual complete capture.
 
 ## Run and reproduce
 
@@ -49,12 +51,15 @@ node research/date-3x3/consecutive-benchmark/run.mjs \
 python3 research/date-3x3/consecutive-benchmark/verify.py /path/to/NEW-capture.json
 ```
 
-For a quick smoke run, add `--days 3 --interruption-groups 2`. The full default
+Use `--providers legacy` or `--providers direct` for a selected-provider pilot; the
+verifier checks exactly the declared selected providers. For a quick smoke run, add `--days 3 --interruption-groups 2`. The full default
 uses `--days 366 --interruption-groups 20 --max-ms 600000`. The elapsed budget is
 checked between request groups; controller waiting has a separate 60-second limit.
 For a hard process deadline, run through a process supervisor. An incomplete run
 is saved with `complete: false`, an explicit reason and exit code 2; it remains
-**UNKNOWN**, never a complete measurement or impossibility result.
+**UNKNOWN**, never a complete measurement or impossibility result. Use
+`verify.py CAPTURE.json --allow-incomplete` to validate only its saved ordered
+prefix; the checker then reports `PASS_PARTIAL`, not full-domain coverage.
 
 The runner writes `.manifest.json`, `.summary.csv` and `.summary.md` sidecars.
 It records source/lockfile/script hashes, application commit and tracked dirty
@@ -65,13 +70,13 @@ saved move words are authoritative; fresh timing and paths may vary.
 ## Optional center-aware provider
 
 Append `--provider /path/to/provider.mjs --provider-name center-aware`. The module
-For explicit bounded options, add `--provider-options '{"threshold":14,"maximumNodes":100000}'`. The module
+For explicit bounded options, add `--provider-options '{"threshold":14,"maximumNodes":100000}'`. It
 exports `async createPlanner({design, appRoot, options})`, returning an async
 `CalendarPlanningContext => string` function. The context includes the immutable
 design, actual `from` state, legal source reference, requested target and verified
 fallback word. Export `metadata`, or attach `planner.metadata`, with package
 version, source revision/hash and bounded solver parameters. The module hash alone
-is insufficient to pin transitive provider code. Root issue 67 tracks integration.
+is insufficient to pin transitive provider code. [Cubistry issue 67](https://github.com/wstein/cubistry/issues/67) tracks integration.
 
 A provider may attach `planner.dispose()`; the runner calls and awaits it after every
 series, including failures, to release owned workers and caches.

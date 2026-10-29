@@ -93,15 +93,31 @@ def metric(values):
     return {'mean': sum(values)/len(values) if values else None, 'median': q(.5), 'p95': q(.95), 'maximum': max(values) if values else None, 'total': sum(values)}
 
 
-def verify(document):
+def same_metrics(observed, expected):
+    return set(observed) == set(expected) and all(
+        observed[k] is None if value is None else
+        type(observed[k]) in (int, float) and math.isfinite(observed[k]) and
+        math.isclose(observed[k], value, rel_tol=1e-12, abs_tol=1e-9)
+        for k, value in expected.items())
+
+
+def verify(document, allow_partial=False):
     need(document['schema'] == 'cubistry.calendar-consecutive-benchmark' and document['version'] == 1, 'Exact benchmark schema')
-    need(document['complete'] is True and document['stopReason'] is None, 'Complete run, not a partial budget output')
+    complete = document['complete']
+    need(type(complete) is bool and (complete and document['stopReason'] is None or
+         allow_partial and not complete and type(document['stopReason']) is str and bool(document['stopReason'])),
+         'Complete run or explicitly requested partial validation')
     m = document['manifest']
     days, groups, providers = m['parameters']['days'], m['parameters']['interruptionGroups'], m['parameters']['providers']
     need(type(days) is int and 1 <= days <= 366 and type(groups) is int and 1 <= groups <= 100, 'Bounded benchmark domain')
-    need(len(providers) == len(set(providers)) and {'legacy', 'direct'} <= set(providers), 'Distinct baseline/direct providers')
+    need(len(providers) == len(set(providers)) and bool({'legacy', 'direct'} & set(providers))
+         and len(set(providers)-{'legacy', 'direct'}) <= 1
+         and all(type(p) is str and re.fullmatch('[a-z][a-z0-9-]+', p) for p in providers),
+         'Distinct selected baseline/direct providers and at most one optional provider')
     expected_cases = len(providers)*3*(2*days+len(JUMPS)+2*groups)
-    need(document['expectedCases'] == expected_cases and len(document['cases']) == expected_cases, 'Exact complete request coverage')
+    need(document['expectedCases'] == expected_cases and
+         (len(document['cases']) == expected_cases if complete else len(document['cases']) <= expected_cases),
+         'Declared full request coverage and actual complete or partial count')
     sources, goals = {}, {}
     for spec in m['sources']:
         identity = spec['id']
@@ -116,10 +132,12 @@ def verify(document):
         goals[identity] = {(t['weekday'], t['day'], t['month']): canonical(t) for t in witness['targets']}
     need(set(sources) == set(SOURCES), 'All selected prints')
     seen_series, observed_indices, statistics = set(), [], []
+    expected_series = [(p, identity, scenario) for p in providers for identity in SOURCES for scenario in SCENARIOS]
     obsolete_turns = 0
     for series in document['series']:
         provider, identity, scenario = series['provider'], series['design'], series['scenario']
         sid = provider, identity, scenario
+        need(sid == expected_series[len(seen_series)], 'Series are an exact ordered prefix of the declared experiment')
         need(provider in providers and identity in SOURCES and scenario in SCENARIOS and sid not in seen_series, 'Unique allowed series')
         seen_series.add(sid)
         initial_iso = '2024-01-01' if scenario == 'year' else '2024-02-28'
@@ -188,21 +206,27 @@ def verify(document):
             obsolete_turns += obsolete
             rows.append(row)
             current = date.fromisoformat(requests[-1])
-        need(len(rows) == (2*days if scenario == 'year' else len(JUMPS) if scenario == 'jumps' else groups), 'Complete series length')
+        expected_length = 2*days if scenario == 'year' else len(JUMPS) if scenario == 'jumps' else groups
+        need(len(rows) == expected_length or not complete and
+             series is document['series'][-1] and len(rows) < expected_length, 'Complete series or the final partial series')
         for direction in ((1, -1) if scenario == 'year' else (0,)):
             subset = [r for r in rows if scenario != 'year' or r['direction'] == direction]
             stat = next(s for s in document['statistics'] if (s['provider'], s['design'], s['scenario'], s['direction']) == (*sid, direction))
             need(stat['cases'] == len(subset), 'Summary case count')
             for field, source in [('htm', 'htm'), ('qtm', 'qtm'), ('rotations', 'global'), ('allMoves', 'total')]:
                 need(stat[field] == metric([r['counts'][source] for r in subset]), 'Independently recomputed move statistics')
-            need(stat['elapsedMs'] == metric([r['elapsedMs'] for r in subset]), 'Summary timing from captured measurements')
+            need(same_metrics(stat['elapsedMs'], metric([r['elapsedMs'] for r in subset])), 'Summary timing from captured measurements')
+            need(same_metrics(stat['firstMotionMs'], metric([r['firstMotionMs'] for r in subset if r['firstMotionMs'] is not None])), 'First-motion statistics exclude no-motion groups')
+            need(stat['providerErrors'] == sum(bool(p.get('providerError') or (p.get('diagnostics') or {}).get('error')) for r in subset for p in r['planning']), 'Provider error diagnostics remain separate from equal-short fallback')
             need(stat['fallbackCases'] == sum(r['route'] == 'fallback' for r in subset), 'Fallback count')
             statistics.append(stat)
-    need(len(seen_series) == len(providers)*3*4 and observed_indices == list(range(expected_cases)), 'Every provider/print/scenario and actual stream row covered')
-    need(len(statistics) == len(document['statistics']) == len(providers)*3*5, 'No unverified summary rows')
-    return {'status': 'PASS', 'cases': expected_cases, 'series': len(seen_series), 'providers': providers, 'all54FrameInverseRestorations': expected_cases, 'obsoleteSingleTurns': obsolete_turns, 'sourcePrintingUnchanged': True, 'optimality': 'UNKNOWN', 'universalMoveBound': 'UNKNOWN', 'browserTiming': 'NOT_MEASURED'}
+    need((len(seen_series) == len(providers)*3*4 if complete else len(seen_series) <= len(providers)*3*4) and
+         observed_indices == list(range(len(document['cases']))), 'Every declared complete or partial actual stream row covered')
+    need(len(statistics) == len(document['statistics']), 'No unverified summary rows')
+    return {'status': 'PASS' if complete else 'PASS_PARTIAL', 'complete': complete, 'cases': len(document['cases']), 'series': len(seen_series), 'providers': providers, 'all54FrameInverseRestorations': expected_cases, 'obsoleteSingleTurns': obsolete_turns, 'sourcePrintingUnchanged': True, 'optimality': 'UNKNOWN', 'universalMoveBound': 'UNKNOWN', 'browserTiming': 'NOT_MEASURED'}
 
 
 if __name__ == '__main__':
     path = Path(sys.argv[1])
-    print(json.dumps(verify(json.loads(path.read_bytes())), indent=2))
+    need(sys.argv[2:] in ([], ['--allow-incomplete']), 'Only optional --allow-incomplete is accepted')
+    print(json.dumps(verify(json.loads(path.read_bytes()), allow_partial=bool(sys.argv[2:])), indent=2))
