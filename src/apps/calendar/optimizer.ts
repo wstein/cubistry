@@ -17,6 +17,7 @@ interface Request {
   readonly resolve: (word: string) => void;
   readonly reject: (error: Error) => void;
   interimWord?: string;
+  interimDiagnostics?: Readonly<Record<string, unknown>>;
 }
 /** At most one solve and one replaceable pending request; hard worker deadline. */
 export class CalendarOptimizer {
@@ -88,6 +89,8 @@ export class CalendarOptimizer {
           return;
         if (typeof data.interimWord === "string") {
           request.interimWord = data.interimWord;
+          if (data.diagnostics && typeof data.diagnostics === "object")
+            request.interimDiagnostics = Object.freeze({ ...data.diagnostics });
           this.retainReferences(request, data.interimWord, data.references);
           return;
         }
@@ -162,6 +165,8 @@ export class CalendarOptimizer {
       if (request.interimWord !== undefined && !this.disposed) {
         this.diagnostics = Object.freeze({
           backendUsed: "direct",
+          ...request.interimDiagnostics,
+          retainedCandidateStatus: request.interimDiagnostics?.solverStatus,
           solverStatus: error.message.includes("deadline")
             ? "deadline"
             : error.message.includes("superseded")

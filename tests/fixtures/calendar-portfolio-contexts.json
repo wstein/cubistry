@@ -1,0 +1,221 @@
+{
+  "baselineCommit": "f75f47d2de76a156c835af00afc4e8886056314a",
+  "providerCommit": "ffe513c43f5d622810b9a3c9aff2fac88163d0f0",
+  "printingSHA256": {
+    "de-a": "1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56",
+    "en-3-zero": "cb6a556d02f03806b1742bf7720216222934bc0652dd4ace12dcd97de876da0c",
+    "en-3-unpadded": "156e6b4d642f9737ee03597bf84a940b3d36f0271c46345bac4083eb99a36022"
+  },
+  "contexts": [
+    {
+      "id": "de-a",
+      "path": [
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "direct",
+      "sourceWord": "y y y D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+      "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+      "expectedMoves": 18
+    },
+    {
+      "id": "de-a",
+      "path": [
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "center-aware",
+      "sourceWord": "y y y D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+      "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+      "expectedMoves": 18
+    },
+    {
+      "id": "de-a",
+      "path": [
+        "2026-11-02",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "direct",
+      "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 L U L' U L U L' U L U L' U L U L' U L U L' U B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R'",
+      "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+      "expectedMoves": 18
+    },
+    {
+      "id": "de-a",
+      "path": [
+        "2026-11-02",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "center-aware",
+      "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B",
+      "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+      "expectedMoves": 18
+    },
+    {
+      "id": "de-a",
+      "path": [
+        "2026-10-29",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "direct",
+      "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U' L U' L U L U' L U L U' L U L U' L U L U' L2 D L' D L D L' D L D L' D L D L' D L D L' D",
+      "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+      "expectedMoves": 18
+    },
+    {
+      "id": "de-a",
+      "path": [
+        "2026-10-29",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "center-aware",
+      "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' U L' U L U L' U L U L' U L U L' U L U L' U2 B U' B U B U' B U B U' B U B U' B U B U' B",
+      "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+      "expectedMoves": 18
+    },
+    {
+      "id": "en-3-zero",
+      "path": [
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "direct",
+      "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-zero",
+      "path": [
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "center-aware",
+      "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-zero",
+      "path": [
+        "2026-11-02",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "direct",
+      "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' U L' U L U L' U L U L' U L U L' U L U L' U",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-zero",
+      "path": [
+        "2026-11-02",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "center-aware",
+      "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' U L' U L U L' U L U L' U L U L' U L U L' U",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-zero",
+      "path": [
+        "2026-10-29",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "direct",
+      "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U B U' B U B U' B U B U' B U B U' B U B U' B L D L' D L D L' D L D L' D L D L' D L D L' D L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U'",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-zero",
+      "path": [
+        "2026-10-29",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "center-aware",
+      "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U B U' B U B U' B U B U' B U B U' B U B U' B L D L' D L D L' D L D L' D L D L' D L D L' D L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U'",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-unpadded",
+      "path": [
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "direct",
+      "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-unpadded",
+      "path": [
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "center-aware",
+      "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-unpadded",
+      "path": [
+        "2026-11-02",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "direct",
+      "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U B U' B U B U' B U B U' B U B U' B U B U' B2 D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-unpadded",
+      "path": [
+        "2026-11-02",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "center-aware",
+      "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U B U' B U B U' B U B U' B U B U' B U B U' B2 D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-unpadded",
+      "path": [
+        "2026-10-29",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "direct",
+      "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' D L' D L D L' D L D L' D L D L' D L D L' D R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    },
+    {
+      "id": "en-3-unpadded",
+      "path": [
+        "2026-10-29",
+        "2026-11-03",
+        "2026-11-04"
+      ],
+      "backend": "center-aware",
+      "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' D L' D L D L' D L D L' D L D L' D L D L' D R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B",
+      "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+      "expectedMoves": 14
+    }
+  ]
+}

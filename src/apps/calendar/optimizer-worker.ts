@@ -1,4 +1,4 @@
-import { tryCenterAware, referencesForPlan } from "./center-planner.mjs";
+import { tryCenterPortfolio, referencesForPlan } from "./center-planner.mjs";
 import { KPattern } from "cubing/kpuzzle";
 import { puzzles } from "cubing/puzzles";
 import {
@@ -52,8 +52,43 @@ self.onmessage = async (
     } catch {
       /* Keep the checked direct route if reference compaction is unavailable. */
     }
-    self.postMessage({ id, interimWord: result.word, references });
-    const candidate = tryCenterAware(context, result.word);
+    self.postMessage({
+      id,
+      interimWord: result.word,
+      references,
+      diagnostics: {
+        backendUsed: result.word !== context.fallbackWord ? "direct" : "legacy",
+        solverStatus: "not-attempted",
+        chosenMoves: result.word.split(/\s+/).filter(Boolean).length,
+      },
+    });
+    const candidate = tryCenterPortfolio(context, result.word, {}, (first) => {
+      let firstReferences;
+      try {
+        firstReferences = referencesForPlan(context, first.word);
+      } catch {}
+      self.postMessage({
+        id,
+        interimWord: first.word,
+        references: firstReferences,
+        diagnostics: {
+          backendUsed:
+            first.method === "center-aware"
+              ? "center-aware"
+              : result.word !== context.fallbackWord
+                ? "direct"
+                : "legacy",
+          solverStatus: first.status ?? "not-attempted",
+          attempted: first.attempted,
+          attempts: first.attempts,
+          directMoves: result.word.split(/\s+/).filter(Boolean).length,
+          chosenMoves: first.word.split(/\s+/).filter(Boolean).length,
+          maximumNodes: 100000,
+          maximumAttempts: 2,
+          maximumTotalNodes: 200000,
+        },
+      });
+    });
     if (candidate.word !== result.word) {
       try {
         references = referencesForPlan(context, candidate.word);
@@ -66,13 +101,21 @@ self.onmessage = async (
       word: candidate.word,
       references,
       diagnostics: {
-        backendUsed: candidate.method,
+        backendUsed:
+          candidate.method === "center-aware"
+            ? "center-aware"
+            : result.word !== context.fallbackWord
+              ? "direct"
+              : "legacy",
         attempted: candidate.attempted,
         solverStatus: candidate.status ?? "not-attempted",
         reason: candidate.reason,
         directMoves: result.word.split(/\s+/).filter(Boolean).length,
         chosenMoves: candidate.word.split(/\s+/).filter(Boolean).length,
         maximumNodes: 100000,
+        maximumAttempts: 2,
+        maximumTotalNodes: 200000,
+        attempts: candidate.attempts,
         maximumDepth: 24,
         centerElapsedMs: candidate.elapsedMs ?? 0,
       },
