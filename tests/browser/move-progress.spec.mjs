@@ -36,7 +36,7 @@ async function release(page, keepHolding = false) {
     window.releaseTurn();
   }, keepHolding);
 }
-test("planned/committed counts stay attached to the active value through queued changes", async ({
+test("new targets replace obsolete work after the active turn and publish fresh move counts", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -68,16 +68,20 @@ test("planned/committed counts stay attached to the active value through queued 
     `1 / ${total(15, 42)} moves`,
   );
   await release(page);
-  // Budget the remaining optimized turns at the selected default plus frame
-  // scheduling, preserving every queued physical turn.
-  const expectedDuration = (total(15, 42) - 1 + total(42, 44)) * 100;
+  // Only the held second old turn commits; the new plan uses that actual pose.
+  const expectedDuration = 2000;
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false", {
     timeout: expectedDuration + 5000,
   });
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "44");
-  await expect(page.locator("#move-progress")).toHaveText(
-    `${total(42, 44)} / ${total(42, 44)} moves`,
+  const planned = Number(
+    await page.locator("#move-progress").getAttribute("aria-valuemax"),
   );
+  expect(planned).toBeGreaterThan(0);
+  await expect(page.locator("#move-progress")).toHaveText(
+    `${planned} / ${planned} moves`,
+  );
+  await expect(page.locator("#session-moves")).toHaveText(String(planned + 2));
   await expect(page.locator("#move-progress")).toHaveAttribute(
     "data-state",
     "completed",
