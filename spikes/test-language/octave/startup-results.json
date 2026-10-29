@@ -1,0 +1,149 @@
+{
+  "scope": "Three complete identical probes in each mode; one paired local observation",
+  "fresh": [
+    {
+      "command": [
+        "/tmp/cubistry-octave-runtime/usr/bin/octave-cli",
+        "--no-init-file",
+        "--no-site-file",
+        "--no-history",
+        "--quiet",
+        "--eval",
+        "addpath('spikes/test-language/octave'); counter_probe('public/counter-proof.json', '/tmp/cubistry-octave-startup-7nynop4c/fresh-0.json');"
+      ],
+      "wallSeconds": 4.538008028001059,
+      "exitCode": 0,
+      "records": [
+        {
+          "runtime": "9.4.0",
+          "values": 100,
+          "inverseWords": 100,
+          "stickers": 24,
+          "negativeControls": 6,
+          "elapsedSeconds": 3.0796940326690674,
+          "scope": "padded canonical witnesses only; not full Python replacement"
+        }
+      ],
+      "stderr": "",
+      "stateHashes": [
+        "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+      ]
+    },
+    {
+      "command": [
+        "/tmp/cubistry-octave-runtime/usr/bin/octave-cli",
+        "--no-init-file",
+        "--no-site-file",
+        "--no-history",
+        "--quiet",
+        "--eval",
+        "addpath('spikes/test-language/octave'); counter_probe('public/counter-proof.json', '/tmp/cubistry-octave-startup-7nynop4c/fresh-1.json');"
+      ],
+      "wallSeconds": 4.253075067004829,
+      "exitCode": 0,
+      "records": [
+        {
+          "runtime": "9.4.0",
+          "values": 100,
+          "inverseWords": 100,
+          "stickers": 24,
+          "negativeControls": 6,
+          "elapsedSeconds": 2.987839937210083,
+          "scope": "padded canonical witnesses only; not full Python replacement"
+        }
+      ],
+      "stderr": "",
+      "stateHashes": [
+        "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+      ]
+    },
+    {
+      "command": [
+        "/tmp/cubistry-octave-runtime/usr/bin/octave-cli",
+        "--no-init-file",
+        "--no-site-file",
+        "--no-history",
+        "--quiet",
+        "--eval",
+        "addpath('spikes/test-language/octave'); counter_probe('public/counter-proof.json', '/tmp/cubistry-octave-startup-7nynop4c/fresh-2.json');"
+      ],
+      "wallSeconds": 4.191166567004984,
+      "exitCode": 0,
+      "records": [
+        {
+          "runtime": "9.4.0",
+          "values": 100,
+          "inverseWords": 100,
+          "stickers": 24,
+          "negativeControls": 6,
+          "elapsedSeconds": 2.9339330196380615,
+          "scope": "padded canonical witnesses only; not full Python replacement"
+        }
+      ],
+      "stderr": "",
+      "stateHashes": [
+        "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+      ]
+    }
+  ],
+  "batch": {
+    "command": [
+      "/tmp/cubistry-octave-runtime/usr/bin/octave-cli",
+      "--no-init-file",
+      "--no-site-file",
+      "--no-history",
+      "--quiet",
+      "--eval",
+      "addpath('spikes/test-language/octave'); counter_probe('public/counter-proof.json', '/tmp/cubistry-octave-startup-7nynop4c/batch-0.json'); counter_probe('public/counter-proof.json', '/tmp/cubistry-octave-startup-7nynop4c/batch-1.json'); counter_probe('public/counter-proof.json', '/tmp/cubistry-octave-startup-7nynop4c/batch-2.json');"
+    ],
+    "wallSeconds": 12.76623986499908,
+    "exitCode": 0,
+    "records": [
+      {
+        "runtime": "9.4.0",
+        "values": 100,
+        "inverseWords": 100,
+        "stickers": 24,
+        "negativeControls": 6,
+        "elapsedSeconds": 2.873784065246582,
+        "scope": "padded canonical witnesses only; not full Python replacement"
+      },
+      {
+        "runtime": "9.4.0",
+        "values": 100,
+        "inverseWords": 100,
+        "stickers": 24,
+        "negativeControls": 6,
+        "elapsedSeconds": 3.0086748600006104,
+        "scope": "padded canonical witnesses only; not full Python replacement"
+      },
+      {
+        "runtime": "9.4.0",
+        "values": 100,
+        "inverseWords": 100,
+        "stickers": 24,
+        "negativeControls": 6,
+        "elapsedSeconds": 2.999969005584717,
+        "scope": "padded canonical witnesses only; not full Python replacement"
+      }
+    ],
+    "stderr": "",
+    "stateHashes": [
+      "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+      "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+      "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"
+    ]
+  },
+  "freshTotalSeconds": 12.982249662010872,
+  "batchTotalSeconds": 12.76623986499908,
+  "batchOverFreshRatio": 0.9833611428962201,
+  "checksPerMode": {
+    "values": 300,
+    "inverseWords": 300,
+    "negativeControls": 18,
+    "exportedStickerFrames": 7200
+  },
+  "processesBefore": 3,
+  "processesAfter": 1,
+  "interpretation": "No test is skipped; runtime ratios are not a universal speedup guarantee"
+}

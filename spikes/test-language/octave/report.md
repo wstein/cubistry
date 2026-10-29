@@ -84,3 +84,28 @@ serve as an additional independent geometry checker, but replacing the complete
 suite still needs schema/negative-control parity, large-certificate and chained
 measurements, and independent review. Matrix syntax alone provides no measured
 benefit for these small exact frame operations.
+
+## Startup experiment with identical coverage
+
+The follow-up runner executes three complete probes either in three fresh Octave
+processes or sequentially in one process. Both modes read the proof three times,
+verify 300 displays and 300 inverse words, reject 18 corruptions and export 7,200
+sticker frames. Every export must hash identically to the Python-checked states.
+No test or negative control is skipped to make the batch faster.
+
+In the saved single paired observation, fresh processes total **12.982 seconds**
+and the batch totals **12.766 seconds** (ratio 0.983, about 1.7% less elapsed
+wall time). This is a small difference and does not establish a material or
+repeatable performance improvement. The batch reduces process starts from three
+to one; most of this prototype's cost is the interpreted verification work.
+Do not choose Octave or change production CI based on this measurement alone.
+
+```sh
+python3 spikes/test-language/octave/startup_benchmark.py --output /tmp/NEW-octave-startup.json
+```
+
+The output path must be new. `--octave` and `--private-prefix` reproduce the
+recorded private runtime; omit them for a normal installed `octave-cli`.
+Exact commands, complete checker results, exit codes and output hashes are in
+`startup-results.json`. Timings include local machine variation and run order;
+there is no claim that this one observation predicts another host's startup cost.
