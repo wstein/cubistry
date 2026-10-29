@@ -49,6 +49,9 @@ def chainCounter(source: List[Sticker], words: List[List[Move]], canonical: List
 
 def checkCounter(j: J, chain: List[Int32]): List[List[Sticker]] \ IO = {
     require(integer(field(j,"schema")) == 1 and text(field(j,"puzzle")) == "2x2x2","UNSUPPORTED: counter schema");
+    let sourceIds=List.map(s -> integer(field(s,"id")),array(field(j,"printing")));
+    let declaredIds=List.map(s -> integer(field(s,"id")),array(field(j,"unpaddedPrinting")));
+    require(sourceIds == declaredIds,"printing and unpaddedPrinting must retain matching input ID order");
     let source=state(field(j,"printing"),2);
     let declared=state(field(j,"unpaddedPrinting"),2);
     let witnesses=array(field(j,"witnesses"));
