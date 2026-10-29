@@ -1,0 +1,722 @@
+{
+  "status": "SAT",
+  "witnessSHA256": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3",
+  "label": "seconds-first-best",
+  "printCode": "T0 T2 T4 | T1 T3 T5 | U3 U1 U9 | U8 S U5 | U2 U7 S | U4 U0 U6 | S H M | _ _ _",
+  "realBlankTopLeftVerified": true,
+  "universalBound": {
+    "boundHTM": 6,
+    "holds": true,
+    "displays": 180,
+    "searchNodes": 0,
+    "meaning": "Every display is within this many HTM of every legal full pose"
+  },
+  "modes": [
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "periodEdges": 60,
+      "laps": 1,
+      "periodHTM": 159,
+      "meanHTM": "53/20",
+      "perLapHTM": "159",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 3,
+        "perLapMean": "3"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "periodEdges": 60,
+      "laps": 1,
+      "periodHTM": 171,
+      "meanHTM": "57/20",
+      "perLapHTM": "171",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "periodEdges": 120,
+      "laps": 2,
+      "periodHTM": 408,
+      "meanHTM": "17/5",
+      "perLapHTM": "204",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "periodEdges": 240,
+      "laps": 4,
+      "periodHTM": 819,
+      "meanHTM": "273/80",
+      "perLapHTM": "819/4",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 2,
+        "maximum": 4,
+        "perLapMean": "7/2"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "periodEdges": 48,
+      "laps": 2,
+      "periodHTM": 164,
+      "meanHTM": "41/12",
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "periodEdges": 24,
+      "laps": 1,
+      "periodHTM": 82,
+      "meanHTM": "41/12",
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 40,
+      "meanHTM": "10/3",
+      "perLapHTM": "40",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 8
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "periodEdges": 84,
+      "laps": 7,
+      "periodHTM": 288,
+      "meanHTM": "24/7",
+      "perLapHTM": "288/7",
+      "maximumHTM": 6,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 5,
+        "perLapMean": "4"
+      },
+      "setupHTM": 10
+    }
+  ],
+  "sUpInverseTraversal": {
+    "periodHTM": 159,
+    "maximumHTM": 4,
+    "meanHTM": "53/20",
+    "edgesNotShortestForDown": 24,
+    "wrap00To59HTM": [
+      3
+    ]
+  },
+  "optimalityCertificates": [
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 303264,
+      "graphEdges": 696420,
+      "aliveNodes": 303264,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 9720,
+        "2": 26568,
+        "3": 119772,
+        "4": 110772,
+        "5": 36432
+      },
+      "bellmanFordPasses": 3,
+      "certifiedMinimumMeanHTM": "53/20",
+      "perEdgeBestPoseFloorPerLapHTM": 60,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 303264,
+      "graphEdges": 698796,
+      "aliveNodes": 303264,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 9720,
+        "2": 27864,
+        "3": 117504,
+        "4": 108720,
+        "5": 39456
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "57/20",
+      "perEdgeBestPoseFloorPerLapHTM": 60,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 116640,
+      "graphEdges": 234468,
+      "aliveNodes": 115188,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 108,
+        "2": 324,
+        "3": 53784,
+        "4": 21492,
+        "5": 40176,
+        "6": 756
+      },
+      "bellmanFordPasses": 3,
+      "certifiedMinimumMeanHTM": "17/5",
+      "perEdgeBestPoseFloorPerLapHTM": 168,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 116640,
+      "graphEdges": 234468,
+      "aliveNodes": 114966,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 108,
+        "2": 324,
+        "3": 53784,
+        "4": 21492,
+        "5": 40176,
+        "6": 756
+      },
+      "bellmanFordPasses": 5,
+      "certifiedMinimumMeanHTM": "273/80",
+      "perEdgeBestPoseFloorPerLapHTM": 168,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "graphNodes": 46656,
+      "graphEdges": 93546,
+      "aliveNodes": 46656,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 21006,
+        "4": 9108,
+        "5": 16146,
+        "6": 252
+      },
+      "bellmanFordPasses": 5,
+      "certifiedMinimumMeanHTM": "41/12",
+      "perEdgeBestPoseFloorPerLapHTM": 68,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "graphNodes": 46656,
+      "graphEdges": 92898,
+      "aliveNodes": 46656,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 21006,
+        "4": 8946,
+        "5": 16308,
+        "6": 252
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "41/12",
+      "perEdgeBestPoseFloorPerLapHTM": 68,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "graphNodes": 23328,
+      "graphEdges": 48348,
+      "aliveNodes": 23328,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 10152,
+        "4": 4572,
+        "5": 8208,
+        "6": 252
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "10/3",
+      "perEdgeBestPoseFloorPerLapHTM": 32,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "graphNodes": 23328,
+      "graphEdges": 48348,
+      "aliveNodes": 23328,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 10152,
+        "4": 4572,
+        "5": 8208,
+        "6": 252
+      },
+      "bellmanFordPasses": 13,
+      "certifiedMinimumMeanHTM": "24/7",
+      "perEdgeBestPoseFloorPerLapHTM": 32,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    }
+  ],
+  "physicalFloor": {
+    "unitsOnlyEdgeHistogram": {
+      "3": 6,
+      "4": 2,
+      "5": 6
+    },
+    "decadeEdgeHistogram": {
+      "1": 3,
+      "2": 9,
+      "3": 27,
+      "4": 89,
+      "5": 115,
+      "6": 12
+    },
+    "unitsOnlyEdgeMinimumHTM": 3,
+    "decadeEdgeMinimumHTM": 1,
+    "unitsCornerTwistedInPlaceHTM": 5,
+    "sLapLowerBoundHTM": 168,
+    "assumptions": "single S sticker, single sticker per tens digit, every blank on one fully blank corner; any route, shortest or not, recurrent or not"
+  },
+  "versusAppPrint": {
+    "appPrintSHA256": "13eea2a1ad88561775158a70633b80e25d06f883e42d44aafb4e6808699be47b",
+    "changedStickers": 14,
+    "unchangedStickers": 10,
+    "changes": [
+      {
+        "id": 1,
+        "cubie": 0,
+        "p": [
+          -1,
+          -1,
+          -1
+        ],
+        "n": [
+          0,
+          -1,
+          0
+        ],
+        "app": "tens 1",
+        "new": "tens 2",
+        "appUp": [
+          0,
+          0,
+          1
+        ],
+        "newUp": [
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": 2,
+        "cubie": 0,
+        "p": [
+          -1,
+          -1,
+          -1
+        ],
+        "n": [
+          0,
+          0,
+          -1
+        ],
+        "app": "tens 2",
+        "new": "tens 4",
+        "appUp": [
+          1,
+          0,
+          0
+        ],
+        "newUp": [
+          1,
+          0,
+          0
+        ]
+      },
+      {
+        "id": 3,
+        "cubie": 1,
+        "p": [
+          -1,
+          -1,
+          1
+        ],
+        "n": [
+          -1,
+          0,
+          0
+        ],
+        "app": "tens 3",
+        "new": "tens 1",
+        "appUp": [
+          0,
+          0,
+          -1
+        ],
+        "newUp": [
+          0,
+          0,
+          -1
+        ]
+      },
+      {
+        "id": 4,
+        "cubie": 1,
+        "p": [
+          -1,
+          -1,
+          1
+        ],
+        "n": [
+          0,
+          -1,
+          0
+        ],
+        "app": "tens 4",
+        "new": "tens 3",
+        "appUp": [
+          1,
+          0,
+          0
+        ],
+        "newUp": [
+          1,
+          0,
+          0
+        ]
+      },
+      {
+        "id": 6,
+        "cubie": 2,
+        "p": [
+          -1,
+          1,
+          -1
+        ],
+        "n": [
+          -1,
+          0,
+          0
+        ],
+        "app": "units 0",
+        "new": "units 3",
+        "appUp": [
+          0,
+          -1,
+          0
+        ],
+        "newUp": [
+          0,
+          -1,
+          0
+        ]
+      },
+      {
+        "id": 8,
+        "cubie": 2,
+        "p": [
+          -1,
+          1,
+          -1
+        ],
+        "n": [
+          0,
+          0,
+          -1
+        ],
+        "app": "units 2",
+        "new": "units 9",
+        "appUp": [
+          1,
+          0,
+          0
+        ],
+        "newUp": [
+          1,
+          0,
+          0
+        ]
+      },
+      {
+        "id": 9,
+        "cubie": 3,
+        "p": [
+          -1,
+          1,
+          1
+        ],
+        "n": [
+          -1,
+          0,
+          0
+        ],
+        "app": "units 3",
+        "new": "units 8",
+        "appUp": [
+          0,
+          0,
+          -1
+        ],
+        "newUp": [
+          0,
+          0,
+          -1
+        ]
+      },
+      {
+        "id": 10,
+        "cubie": 3,
+        "p": [
+          -1,
+          1,
+          1
+        ],
+        "n": [
+          0,
+          1,
+          0
+        ],
+        "app": "units 4",
+        "new": "letter S",
+        "appUp": [
+          1,
+          0,
+          0
+        ],
+        "newUp": [
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": 12,
+        "cubie": 4,
+        "p": [
+          1,
+          -1,
+          -1
+        ],
+        "n": [
+          1,
+          0,
+          0
+        ],
+        "app": "units 6",
+        "new": "units 2",
+        "appUp": [
+          0,
+          1,
+          0
+        ],
+        "newUp": [
+          0,
+          1,
+          0
+        ]
+      },
+      {
+        "id": 14,
+        "cubie": 4,
+        "p": [
+          1,
+          -1,
+          -1
+        ],
+        "n": [
+          0,
+          0,
+          -1
+        ],
+        "app": "units 8",
+        "new": "letter S",
+        "appUp": [
+          -1,
+          0,
+          0
+        ],
+        "newUp": [
+          0,
+          -1,
+          0
+        ]
+      },
+      {
+        "id": 15,
+        "cubie": 5,
+        "p": [
+          1,
+          -1,
+          1
+        ],
+        "n": [
+          1,
+          0,
+          0
+        ],
+        "app": "units 9",
+        "new": "units 4",
+        "appUp": [
+          0,
+          0,
+          -1
+        ],
+        "newUp": [
+          0,
+          0,
+          -1
+        ]
+      },
+      {
+        "id": 17,
+        "cubie": 5,
+        "p": [
+          1,
+          -1,
+          1
+        ],
+        "n": [
+          0,
+          0,
+          1
+        ],
+        "app": "units 9",
+        "new": "units 6",
+        "appUp": [
+          0,
+          1,
+          0
+        ],
+        "newUp": [
+          0,
+          1,
+          0
+        ]
+      },
+      {
+        "id": 18,
+        "cubie": 6,
+        "p": [
+          1,
+          1,
+          -1
+        ],
+        "n": [
+          1,
+          0,
+          0
+        ],
+        "app": "letter H",
+        "new": "letter S",
+        "appUp": [
+          0,
+          1,
+          0
+        ],
+        "newUp": [
+          0,
+          1,
+          0
+        ]
+      },
+      {
+        "id": 19,
+        "cubie": 6,
+        "p": [
+          1,
+          1,
+          -1
+        ],
+        "n": [
+          0,
+          1,
+          0
+        ],
+        "app": "letter S",
+        "new": "letter H",
+        "appUp": [
+          0,
+          0,
+          -1
+        ],
+        "newUp": [
+          0,
+          0,
+          -1
+        ]
+      }
+    ]
+  },
+  "scope": "Each period is closed over all 24 sticker frames and may repeat indefinitely; every edge is a shortest path from its actual source pose.",
+  "globalPrintOptimality": "UNKNOWN"
+}
