@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Live clock</title>
-    <script type="module" crossorigin src="/cubistry/pr-preview/pr-83/assets/clock-DHi4cLuZ.js"></script>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-83/assets/clock-BL1lNhIJ.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-83/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-83/assets/link-DR-RiidG.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-83/assets/presentation-CujBCk4I.js">
@@ -18,7 +18,7 @@
     <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-83/assets/clock-DqGfkQSZ.css">
     <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-83/assets/style-CQuvSXsr.css">
   </head>
-  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #83 — non-production preview · 2beda162dc12</aside>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">PR #83 — non-production preview · e2f4ccce6e97</aside>
     <main class="live-clock-page">
       <header>
         <a class="brand" href="./" aria-label="Cubistry home"
@@ -115,12 +115,11 @@
               <thead>
                 <tr>
                   <th scope="col">Cube</th>
-                  <th scope="col" abbr="Session HTM">Session HTM</th>
+                  <th scope="col" abbr="Total HTM">Total HTM</th>
                   <th scope="col" abbr="Cube rotations">Cube rotations</th>
                   <th scope="col" abbr="Last tick HTM">Last tick</th>
                   <th scope="col" abbr="Max HTM per tick">Max / tick</th>
-                  <th scope="col" abbr="Mean HTM per tick">Mean / tick</th>
-                  <th scope="col" abbr="Median HTM per tick">Median / tick</th>
+                  <th scope="col" abbr="Average HTM per tick">Average / tick</th>
                 </tr>
               </thead>
               <tbody>
@@ -131,7 +130,6 @@
                   <td id="hours-last-moves">—</td>
                   <td id="hours-max-moves">—</td>
                   <td id="hours-mean-moves">—</td>
-                  <td id="hours-median-moves">—</td>
                 </tr>
                 <tr data-unit="M">
                   <th scope="row">Minutes</th>
@@ -140,7 +138,6 @@
                   <td id="minutes-last-moves">—</td>
                   <td id="minutes-max-moves">—</td>
                   <td id="minutes-mean-moves">—</td>
-                  <td id="minutes-median-moves">—</td>
                 </tr>
                 <tr data-unit="S">
                   <th scope="row">Seconds</th>
@@ -149,7 +146,6 @@
                   <td id="seconds-last-moves">—</td>
                   <td id="seconds-max-moves">—</td>
                   <td id="seconds-mean-moves">—</td>
-                  <td id="seconds-median-moves">—</td>
                 </tr>
               </tbody>
               <tfoot>
@@ -159,8 +155,7 @@
                   <td id="total-session-rotations">0</td>
                   <td id="total-last-moves">—</td>
                   <td id="total-max-moves">—</td>
-                  <td id="total-mean-moves">—</td>
-                  <td id="total-median-moves">—</td>
+                  <td aria-label="No average for the total"></td>
                 </tr>
               </tfoot>
             </table>
