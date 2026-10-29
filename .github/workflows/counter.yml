@@ -29,6 +29,14 @@ jobs:
       - run: npm run prepare:solver
       - run: npm ci
       - run: npm run check
+      # Verifies the committed print presets only (no regeneration, so the zlib
+      # build does not matter). Needs the pinned Python packages, so it is not
+      # part of `npm run check`.
+      - name: Verify committed print exports
+        run: |
+          python3 -m venv "$RUNNER_TEMP/print-venv"
+          "$RUNNER_TEMP/print-venv/bin/pip" install -r scripts/print-requirements.txt
+          PATH="$RUNNER_TEMP/print-venv/bin:$PATH" npm run test:print-exports
       - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
         run: npx playwright install --with-deps chromium
       - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
