@@ -158,6 +158,25 @@ test("A4 imposition keeps real cuts, bleed and conservative ink safety inside ea
   }
 });
 
+test("HSM unit words print at full size on their unchanged baseline", () => {
+  const entry = catalog.entries.find((e) => e.design === "hsm-words"),
+    dir = root + entry.directory,
+    m = read(dir + "manifest.json"),
+    words = read("public/assets/hsm/words/provenance.json");
+  assert.deepEqual(read(dir + "WORD-ART-PROVENANCE.json"), words);
+  assert.equal(words.fontSize, 80.64);
+  assert.equal(words.baseline, 232);
+  for (const id of ["H", "M", "S"]) {
+    const printed = m.stickers.filter((s) => s.image === id);
+    assert.equal(printed.length, m.copies);
+    for (const s of printed) {
+      // Safe fitting must not shrink the word art (that would move the baseline).
+      assert.equal(s.artScale, 1);
+      assert.deepEqual(s.sourceInkBounds, words.stickers[id].inkBounds);
+    }
+  }
+});
+
 test("print downloads are pinned, original geometric art and font-derived outlines have correct licenses", () => {
   for (const entry of catalog.entries) {
     const dir = root + entry.directory,
