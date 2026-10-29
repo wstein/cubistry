@@ -14,7 +14,11 @@ import {
   localValues,
   clockText,
 } from "./apps/clock/scheduler.ts";
-import { ClockMoveStatistics } from "./apps/clock/statistics.ts";
+import {
+  ClockMoveStatistics,
+  formatMean,
+  formatMedian,
+} from "./apps/clock/statistics.ts";
 import pin from "../hsm-source.json";
 import {
   hsmImagesFor,
@@ -50,9 +54,9 @@ function statisticsUi() {
   const snapshot = statistics.snapshot();
   if (snapshot.revision === shownStatistics) return;
   shownStatistics = snapshot.revision;
-  const show = (id, value) => {
+  const show = (id, value, format = (v) => (v === null ? "—" : String(v))) => {
     const node = $(id),
-      text = value === null ? "—" : String(value);
+      text = format(value);
     if (node.textContent !== text) node.textContent = text;
     node.dataset.value = value === null ? "" : String(value);
   };
@@ -62,6 +66,8 @@ function statisticsUi() {
     show(name + "-session-rotations", unit.session.rotations);
     show(name + "-last-moves", unit.last);
     show(name + "-max-moves", unit.max);
+    show(name + "-mean-moves", unit.mean, formatMean);
+    show(name + "-median-moves", unit.median, formatMedian);
   });
 }
 let stage = null;
