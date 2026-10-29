@@ -21,7 +21,7 @@
       ],
       "authors": [
         "Thomas Bahn <thomas@thomas-bahn.net>",
-        "Torbj\u00f8rn Birch Moltu <t.b.moltu@lyse.net>",
+        "Torbjørn Birch Moltu <t.b.moltu@lyse.net>",
         "Simon Sapin <simon.sapin@exyr.org>"
       ],
       "repository": "https://github.com/tomprogrammer/rust-ascii"
@@ -181,8 +181,9 @@
       "licenseFile": null,
       "files": [
         {
-          "path": "twips-crates/convert_case-0.4.0/.cargo_vcs_info.json",
-          "sha256": "6767418947faf807ea6d3c9be160eb052da1d035f4d0d86fe8d2285e491083a3"
+          "path": "twips-crates/convert_case-0.4.0/cargo-vcs-info.json",
+          "sha256": "6767418947faf807ea6d3c9be160eb052da1d035f4d0d86fe8d2285e491083a3",
+          "upstreamFilename": ".cargo_vcs_info.json"
         }
       ],
       "authors": [
@@ -393,7 +394,7 @@
         }
       ],
       "authors": [
-        "Torbj\u00f8rn Birch Moltu <t.b.moltu@lyse.net>"
+        "Torbjørn Birch Moltu <t.b.moltu@lyse.net>"
       ],
       "repository": "https://github.com/tormol/encode_unicode"
     },
@@ -411,7 +412,7 @@
         }
       ],
       "authors": [
-        "Ma\u00ebl Obr\u00e9jan <mael.obrejan@protonmail.com>"
+        "Maël Obréjan <mael.obrejan@protonmail.com>"
       ],
       "repository": "https://github.com/malobre/erased_set"
     },
@@ -451,7 +452,7 @@
         }
       ],
       "authors": [
-        "Bart\u0142omiej Kami\u0144ski <fizyk20@gmail.com>",
+        "Bartłomiej Kamiński <fizyk20@gmail.com>",
         "Aaron Trent <novacrazy@gmail.com>"
       ],
       "repository": "https://github.com/fizyk20/generic-array.git"
@@ -1718,8 +1719,9 @@
       "licenseFile": null,
       "files": [
         {
-          "path": "twips-crates/wasip2-1.0.1+wasi-0.2.4/.cargo_vcs_info.json",
-          "sha256": "009488b807b23328fe46f6eef637e16f791a3bb01e494bcbfc27767fa4558e59"
+          "path": "twips-crates/wasip2-1.0.1+wasi-0.2.4/cargo-vcs-info.json",
+          "sha256": "009488b807b23328fe46f6eef637e16f791a3bb01e494bcbfc27767fa4558e59",
+          "upstreamFilename": ".cargo_vcs_info.json"
         },
         {
           "path": "wasip2-licenses/LICENSE-APACHE",

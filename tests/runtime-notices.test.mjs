@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, mkdtempSync, rmSync } from "node:fs";
+import { readFileSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -59,6 +59,33 @@ test("production builds retain exact cubing and bundled WebAssembly dependency n
     assert(
       readFileSync(join(output, "licenses/puzlwerk/LICENSE"), "utf8").length >
         100,
+    );
+  } finally {
+    rmSync(output, { recursive: true, force: true });
+  }
+});
+
+test("runtime notices remain compatible with the unchanged static artifact extractor", () => {
+  const output = mkdtempSync(join(tmpdir(), "cubistry-notices-artifact-"));
+  try {
+    const site = join(output, "site"),
+      archive = join(output, "site.zip"),
+      extracted = join(output, "extracted");
+    execFileSync(process.execPath, ["scripts/copy-solver-notices.mjs", site]);
+    writeFileSync(
+      join(site, "index.html"),
+      "<!doctype html><html><head></head><body>Notice fixture</body></html>",
+    );
+    execFileSync("python3", [
+      "-c",
+      "import pathlib,sys,zipfile; root=pathlib.Path(sys.argv[1]); z=zipfile.ZipFile(sys.argv[2],'w',zipfile.ZIP_DEFLATED); [z.write(p,str(p.relative_to(root))) for p in root.rglob('*') if p.is_file()]; z.close()",
+      site,
+      archive,
+    ]);
+    execFileSync("python3", ["scripts/pages/extract.py", archive, extracted]);
+    assert(
+      readFileSync(join(extracted, "licenses/cubing/twips-crate-notices.json"))
+        .length > 100,
     );
   } finally {
     rmSync(output, { recursive: true, force: true });
