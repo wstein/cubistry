@@ -16,3 +16,6 @@ lib/
 .five-second-research/
 public/five-second-timer.v1.json
 work/
+
+# Optional pinned Python tools for reproducible vector print exports.
+.print-venv/
