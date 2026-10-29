@@ -1,0 +1,64 @@
+{
+  "captureSHA256": "235b91c60b3e9521ff62cb10807e16067f59a57b5cc035f21c0076d4f4187952",
+  "appHead": "1ef2ffc64b9eeb2d8065de75021ff5e6053cfffc",
+  "elapsedMs": 462204.255081,
+  "providers": {
+    "baseline-center": {
+      "groups": 2358,
+      "fallbackGroups": 0,
+      "canceledPlans": 60,
+      "providerErrors": 0,
+      "maximumHTM": 41,
+      "maximumPhysicalMovesIncludingXYZ": 43,
+      "maximumReferenceEndpointTokens": 361,
+      "secondAttemptImprovedCalls": 0,
+      "secondAttemptMovesSaved": 0,
+      "attemptOutcomes": [],
+      "retainedFirstProposalCalls": 0
+    },
+    "portfolio": {
+      "groups": 2358,
+      "fallbackGroups": 0,
+      "canceledPlans": 60,
+      "providerErrors": 0,
+      "maximumHTM": 41,
+      "maximumPhysicalMovesIncludingXYZ": 43,
+      "maximumReferenceEndpointTokens": 323,
+      "secondAttemptImprovedCalls": 1059,
+      "secondAttemptMovesSaved": 2799,
+      "attemptOutcomes": [
+        {
+          "attempt": 1,
+          "attempted": true,
+          "status": "unknown",
+          "count": 864
+        },
+        {
+          "attempt": 2,
+          "attempted": true,
+          "status": "unknown",
+          "count": 1317
+        },
+        {
+          "attempt": 1,
+          "attempted": true,
+          "status": "solved",
+          "count": 1512
+        },
+        {
+          "attempt": 2,
+          "attempted": true,
+          "status": "solved",
+          "count": 1059
+        },
+        {
+          "attempt": 1,
+          "attempted": false,
+          "status": "not-attempted",
+          "count": 42
+        }
+      ],
+      "retainedFirstProposalCalls": 1359
+    }
+  }
+}

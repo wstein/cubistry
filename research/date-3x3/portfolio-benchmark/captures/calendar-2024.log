@@ -1,0 +1,55 @@
+Committed 100 requests; 9894 ms; baseline-center de-a year
+Committed 200 requests; 16730 ms; baseline-center de-a year
+Committed 300 requests; 23439 ms; baseline-center de-a year
+Committed 400 requests; 30962 ms; baseline-center de-a year
+Committed 500 requests; 39290 ms; baseline-center de-a year
+Committed 600 requests; 45379 ms; baseline-center de-a year
+Committed 700 requests; 52039 ms; baseline-center de-a year
+Committed 800 requests; 63048 ms; baseline-center en-3-zero year
+Committed 900 requests; 69430 ms; baseline-center en-3-zero year
+Committed 1000 requests; 75414 ms; baseline-center en-3-zero year
+Committed 1100 requests; 82426 ms; baseline-center en-3-zero year
+Committed 1200 requests; 87842 ms; baseline-center en-3-zero year
+Committed 1300 requests; 93720 ms; baseline-center en-3-zero year
+Committed 1400 requests; 99453 ms; baseline-center en-3-zero year
+Committed 1500 requests; 105612 ms; baseline-center en-3-zero year
+Committed 1600 requests; 115638 ms; baseline-center en-3-unpadded year
+Committed 1700 requests; 121528 ms; baseline-center en-3-unpadded year
+Committed 1800 requests; 127714 ms; baseline-center en-3-unpadded year
+Committed 1900 requests; 134459 ms; baseline-center en-3-unpadded year
+Committed 2000 requests; 140020 ms; baseline-center en-3-unpadded year
+Committed 2100 requests; 145576 ms; baseline-center en-3-unpadded year
+Committed 2200 requests; 151361 ms; baseline-center en-3-unpadded year
+Committed 2300 requests; 156501 ms; baseline-center en-3-unpadded year
+Committed 2400 requests; 169629 ms; portfolio de-a year
+Committed 2500 requests; 185875 ms; portfolio de-a year
+Committed 2600 requests; 196178 ms; portfolio de-a year
+Committed 2700 requests; 207632 ms; portfolio de-a year
+Committed 2800 requests; 218855 ms; portfolio de-a year
+Committed 2900 requests; 228168 ms; portfolio de-a year
+Committed 3000 requests; 239835 ms; portfolio de-a year
+Committed 3100 requests; 252153 ms; portfolio de-a jumps
+Committed 3200 requests; 268428 ms; portfolio en-3-zero year
+Committed 3300 requests; 280614 ms; portfolio en-3-zero year
+Committed 3400 requests; 293062 ms; portfolio en-3-zero year
+Committed 3500 requests; 305440 ms; portfolio en-3-zero year
+Committed 3600 requests; 317143 ms; portfolio en-3-zero year
+Committed 3700 requests; 329013 ms; portfolio en-3-zero year
+Committed 3800 requests; 339738 ms; portfolio en-3-zero year
+Committed 3900 requests; 354471 ms; portfolio en-3-zero interrupt-move
+Committed 4000 requests; 370994 ms; portfolio en-3-unpadded year
+Committed 4100 requests; 383256 ms; portfolio en-3-unpadded year
+Committed 4200 requests; 395577 ms; portfolio en-3-unpadded year
+Committed 4300 requests; 408077 ms; portfolio en-3-unpadded year
+Committed 4400 requests; 420613 ms; portfolio en-3-unpadded year
+Committed 4500 requests; 431907 ms; portfolio en-3-unpadded year
+Committed 4600 requests; 443380 ms; portfolio en-3-unpadded year
+Committed 4700 requests; 459080 ms; portfolio en-3-unpadded interrupt-planning
+{
+  "output": "/tmp/portfolio-final-calendar.json",
+  "complete": true,
+  "cases": 4716,
+  "expectedCases": 4716,
+  "elapsedMs": 462204.255081,
+  "stopReason": null
+}
