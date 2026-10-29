@@ -66,7 +66,7 @@ universal 18/20/21-move bound is claimed.
 contexts (six per print), using each stored direct proposal. `verify-contexts.py`
 replays all candidate words and inverses independently and checks the portfolio's
 first result equals the old policy at that identical source. `test-contexts.py`
-adds five corruption controls. The exact fixture bytes are preserved in
+adds eight corruption controls, including negative, boolean and fractional attempt depths. The exact fixture bytes are preserved in
 `investigation/portfolio-contexts.json` (SHA256
 `c8fd5d9601f931b8896db54709b729fff22599936c8a3d1f8ef57289fe568812`).
 These targeted same-source probes complement, and do not replace, independently

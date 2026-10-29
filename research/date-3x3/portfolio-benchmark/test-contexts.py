@@ -7,6 +7,9 @@ subprocess.run([sys.executable,str(checker),str(path)],check=True,stdout=subproc
 controls=[
  ('wrong source pose',lambda d:d['rows'][0]['fixture'].update(sourceWord='R')),
  ('wrong saved candidate',lambda d:d['rows'][0]['portfolio']['attempts'][0].update(word='R')),
+ ('negative attempt depth',lambda d:d['rows'][0]['portfolio']['attempts'][0].update(maximumDepth=-1)),
+ ('boolean attempt depth',lambda d:d['rows'][0]['portfolio']['attempts'][0].update(maximumDepth=True)),
+ ('fractional attempt depth',lambda d:d['rows'][0]['portfolio']['attempts'][0].update(maximumDepth=1.5)),
  ('dishonest total node ceiling',lambda d:d['rows'][0]['portfolio'].update(maximumTotalNodes=300000)),
  ('lost default first proposal',lambda d:d['rows'][0]['baseline'].update(word='R')),
  ('false regression threshold',lambda d:d['rows'][0]['fixture'].update(expectedMoves=-1)),

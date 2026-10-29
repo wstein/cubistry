@@ -29,7 +29,10 @@ print: prior direct and prior center-aware paths, for each of the three source
 histories. All eighteen same-source comparisons retained the exact old first
 proposal and improved to the same 18/13/13 counts above. The independent Python
 Rodrigues checker replayed 72 saved candidate words and full 54-frame inverses,
-including hidden center orientations. Five author corruption controls were rejected.
+including hidden center orientations. Five original author corruption controls were rejected. A review follow-up added
+strict integer/nonnegative depth checks and three more controls (negative, boolean
+and fractional depths); all eight passed. Original raw captures and five-control
+outputs remain unchanged; the later depth-guard outputs are separate.
 These probes use stored direct proposals, avoiding nondeterministic soft-budget
 variation in a freshly invoked ordinary solver. They establish the reported
 same-source results, rather than treating different chained hidden poses as equal.
@@ -99,3 +102,7 @@ UNKNOWN and retains the checked best. No result here proves an optimum or a
 universal 18/20/21-move limit. Browser worker hard deadlines and production behavior
 are covered by the implementation's separate tests; these immediate-port timings
 do not measure animation or a hard browser deadline.
+
+The final consumer follow-up `3d4c179308b74b1242eaf17cafd4e1d70400b587`
+changes only browser expectations relative to the captured `1ef2ffc` revision;
+runtime/model/provider code is unchanged. The capture retains its exact original pin.

@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "captureSHA256": "1c2319e5711d9688b7fe73c14d9aee3b222ddee85c0030cabbbeadae5a11d3e2",
+  "negativeControlsRejected": [
+    "wrong source pose",
+    "wrong saved candidate",
+    "negative attempt depth",
+    "boolean attempt depth",
+    "fractional attempt depth",
+    "dishonest total node ceiling",
+    "lost default first proposal",
+    "false regression threshold"
+  ]
+}
