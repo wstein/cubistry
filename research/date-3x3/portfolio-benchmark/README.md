@@ -78,3 +78,7 @@ requires explicit skip diagnostics. `compare-versions.py V1.json V2.json` report
 measured word/endpoint identity, timing and duplicate-native-call counts without
 claiming universal speed gains. V1 captures are immutable; V2 capture filenames
 include `-v2`. See [V2 findings](RESULTS-V2.md).
+
+[Post-repair V3 findings](RESULTS-V3.md) retain a fresh continuous capture at
+repair table version 2 with the V2 search policy unchanged. The earlier 41-HTM
+maximum remains historical; use the V3 report for the newly observed maximum.

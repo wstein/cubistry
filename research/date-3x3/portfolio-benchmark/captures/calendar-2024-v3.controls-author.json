@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "captureSHA256": "3262fd53e0444312b3cb79c67792724c823eaa5bd5e2ed55ba0ee4a3c47dd6b7",
+  "verifiedCases": 4716,
+  "negativeControlsRejected": [
+    "source identity",
+    "illegal token",
+    "wrong legal route",
+    "dishonest count",
+    "broken state chain",
+    "incorrect Gregorian request",
+    "wrong reference length",
+    "wrong baseline count",
+    "false interruption count",
+    "false summary",
+    "wrong saved candidate",
+    "dishonest total node ceiling",
+    "lost checked first candidate",
+    "duplicate second native depth",
+    "missing explicit native-depth skip reason"
+  ]
+}
