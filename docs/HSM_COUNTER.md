@@ -71,6 +71,10 @@ not a position-dependent overlay. Changing lettering in the single-cube counter
 installs the selected print at the current value. Choosing a new unit retains
 the existing reset-to-zero behavior.
 
+The word SVGs are fetched by their unversioned URL and verified against the
+pinned SHA-256; a stale HTTP-cache entry triggers one reload retry (see
+[shared cube loading rules](SHARED_CUBE_M1.md)).
+
 [Word artwork provenance](../public/assets/hsm/words/provenance.json) pins the
 local Noto Sans 600 font and maps each unit to an outlined vector path with ink
 inside the bottom safe area. Reproduce it with `python3 scripts/export-hsm-word-art.py`

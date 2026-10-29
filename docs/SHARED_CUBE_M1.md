@@ -132,6 +132,12 @@ Loading restrictions are executable, not merely recommendations:
 * SHA-256 integrity, exact media type, 256 KiB per fetched file, 4 MiB per load,
   64 entries per list, dimensions at most 1024 per side, and an 8-megapixel
   decoded-image budget. The stream is bounded even without Content-Length.
+* Asset URLs carry no version or hash, so the HTTP cache may serve an older file
+  at the same URL after a deploy (for example old art with new code). On a
+  SHA-256 mismatch alone, the loader retries once with `cache: "reload"`, which
+  bypasses the cache; bytes that still differ fail closed with "Asset integrity
+  check failed". The retry does not change URLs, pinned hashes or the budget
+  (rejected bytes are not charged). Covered by `tests/asset-cache.test.mjs`.
 * Fetch cancellation/deadline uses AbortSignal (10 seconds). Native font/image
   decode is bounded by validated input size; no hard CPU-preemption claim.
 * SVG accepts only a bounded drawing subset. Scripts, event attributes, styles,
