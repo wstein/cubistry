@@ -117,6 +117,7 @@ self.onmessage = async (
         maximumTotalNodes: 200000,
         attempts: candidate.attempts,
         improvementSkippedReason: candidate.improvementSkippedReason,
+        centerRepairVersion: corrections.version,
         maximumDepth: 24,
         centerElapsedMs: candidate.elapsedMs ?? 0,
       },
