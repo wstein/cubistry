@@ -1,7 +1,9 @@
 import type {
   CalendarPlanningContext,
   CalendarRoutePlanner,
+  CalendarReferenceContext,
 } from "./controller.ts";
+import { apply, sameState, type State, type Target } from "./model.ts";
 export interface PlanningWorker {
   onmessage: ((event: MessageEvent) => void) | null;
   onerror: ((event: ErrorEvent) => void) | null;
@@ -14,6 +16,7 @@ interface Request {
   readonly context: CalendarPlanningContext;
   readonly resolve: (word: string) => void;
   readonly reject: (error: Error) => void;
+  interimWord?: string;
 }
 /** At most one solve and one replaceable pending request; hard worker deadline. */
 export class CalendarOptimizer {
@@ -25,6 +28,16 @@ export class CalendarOptimizer {
   private disposed = false;
   private readonly createWorker: () => PlanningWorker;
   private readonly timeoutMs: number;
+  private references = new Map<
+    Target,
+    {
+      from: State;
+      end: State;
+      fromReferenceWord: string;
+      endReferenceWord: string;
+    }
+  >();
+  diagnostics: Readonly<Record<string, unknown>> | null = null;
   constructor(
     createWorker: () => PlanningWorker = () =>
       new Worker(new URL("./optimizer-worker.ts", import.meta.url), {
@@ -34,6 +47,23 @@ export class CalendarOptimizer {
   ) {
     this.createWorker = createWorker;
     this.timeoutMs = timeoutMs;
+    this.plan.cancelPlanning = () => {
+      this.pending?.reject(Error("Calendar planning superseded"));
+      this.pending = null;
+      if (this.active) this.finish(Error("Calendar planning superseded"));
+    };
+    this.plan.compactReference = ({
+      state,
+      target,
+      referenceWord,
+    }: CalendarReferenceContext) => {
+      const record = this.references.get(target);
+      return record && sameState(record.from, state)
+        ? record.fromReferenceWord
+        : record && sameState(record.end, state)
+          ? record.endReferenceWord
+          : referenceWord;
+    };
   }
   readonly plan: CalendarRoutePlanner = (context) =>
     new Promise((resolve, reject) => {
@@ -56,6 +86,15 @@ export class CalendarOptimizer {
           request.id !== data?.id
         )
           return;
+        if (typeof data.interimWord === "string") {
+          request.interimWord = data.interimWord;
+          this.retainReferences(request, data.interimWord, data.references);
+          return;
+        }
+        if (data.diagnostics && typeof data.diagnostics === "object")
+          this.diagnostics = Object.freeze({ ...data.diagnostics });
+        if (typeof data.word === "string")
+          this.retainReferences(request, data.word, data.references);
         this.finish(
           typeof data.word === "string"
             ? null
@@ -80,6 +119,37 @@ export class CalendarOptimizer {
       this.finish(Error("Calendar solver worker unavailable"));
     }
   }
+  private retainReferences(
+    request: Request,
+    word: string,
+    value: unknown,
+  ): void {
+    if (!value || typeof value !== "object") return;
+    const reference = value as {
+      fromReferenceWord?: unknown;
+      endReferenceWord?: unknown;
+    };
+    if (
+      typeof reference.fromReferenceWord !== "string" ||
+      typeof reference.endReferenceWord !== "string" ||
+      reference.fromReferenceWord.length > 8192 ||
+      reference.endReferenceWord.length > 8192
+    )
+      return;
+    try {
+      this.references.delete(request.context.target);
+      this.references.set(request.context.target, {
+        from: request.context.from,
+        end: apply(request.context.from, word),
+        fromReferenceWord: reference.fromReferenceWord,
+        endReferenceWord: reference.endReferenceWord,
+      });
+      while (this.references.size > 4)
+        this.references.delete(this.references.keys().next().value!);
+    } catch {
+      /* The controller still validates every returned route and reference. */
+    }
+  }
   private finish(error: Error | null, word = ""): void {
     const request = this.active;
     if (!request) return;
@@ -89,7 +159,15 @@ export class CalendarOptimizer {
     if (error) {
       this.worker?.terminate();
       this.worker = null;
-      request.reject(error);
+      if (request.interimWord !== undefined && !this.disposed) {
+        this.diagnostics = Object.freeze({
+          backendUsed: "direct",
+          solverStatus: error.message.includes("deadline")
+            ? "deadline"
+            : "worker-failure",
+        });
+        request.resolve(request.interimWord);
+      } else request.reject(error);
     } else request.resolve(word);
     const next = this.pending;
     this.pending = null;
