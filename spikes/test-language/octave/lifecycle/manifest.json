@@ -1,0 +1,22 @@
+{
+  "runtime": "GNU Octave 9.4.0",
+  "prototypeCommit": "4547daae232de537acda15fffa32cd597539c34b",
+  "commonDriverSHA256": "9441f40adfd55acf88e5510400b602d8201f5b362a5f2ce52204aa30c94141d9",
+  "sha256": {
+    "public/counter-proof.json": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+    "research/counter/verify.py": "afe45e2a8b4b6a721d499d124db51e354eb73e934fd0aaa112f2b032ad8bf202",
+    "spikes/test-language/octave/counter_probe.m": "5efaaccf981e7f5958e6aabba1c853c529b767ae431bc3ea4f91f28efbc56d11",
+    "spikes/test-language/octave/lifecycle/README.md": "0cee8fac2b866e2a8c7951869a3dcafa01c18a64c79a9f530860a033ca7e66fb",
+    "spikes/test-language/octave/lifecycle/audit.json": "2c7d52c4c9a3642a70260f7fb32955ac6c07aa46172bb4a11f0b3556c6d09f93",
+    "spikes/test-language/octave/lifecycle/exports/lifecycle-0.json": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+    "spikes/test-language/octave/lifecycle/exports/lifecycle-1.json": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+    "spikes/test-language/octave/lifecycle/exports/lifecycle-2.json": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+    "spikes/test-language/octave/lifecycle/exports/lifecycle-3.json": "c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a",
+    "spikes/test-language/octave/lifecycle/report.json": "d95436bb75b0eff95d95deebaed19e6cbdb15448f8b98483e81012e8ae9070b2",
+    "spikes/test-language/octave/lifecycle/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spikes/test-language/octave/lifecycle/stdout.txt": "4bde302a93982a39a92b377d0ba5c31a936e0fe1973e96467662ee409d5f46fe",
+    "spikes/test-language/octave/lifecycle_audit.py": "68675976a17b1ae27ccaddc0d455c79edfe0012d7220a1e192e690e80cd309bd",
+    "spikes/test-language/octave/lifecycle_probe.m": "51a593574d6db60e56ca01143e2d8072085bbaee9c5f89c6125aa779298acc82",
+    "spikes/test-language/octave/runtime-packages.json": "e87981235db480533723207a64c379b66d38cf432dc8899e4fa7392747221bc4"
+  }
+}

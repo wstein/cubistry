@@ -1,0 +1,11 @@
+CUBISTRY_PHASE {"event":"READY"}
+CUBISTRY_PHASE {"event":"LOAD","elapsedMs":1.0569095611572266,"scope":"Checker parse/load through function metadata lookup; no test body"}
+{"runtime":"9.4.0","values":100,"inverseWords":100,"stickers":24,"negativeControls":6,"elapsedSeconds":3.1295719146728517,"scope":"padded canonical witnesses only; not full Python replacement"}
+CUBISTRY_PHASE {"event":"RESULT","iteration":0,"elapsedMs":4332.2389125823979,"values":100,"inverseChecks":100,"negativeControls":6,"fullStickerFrames":2400,"checksum":"c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"}
+{"runtime":"9.4.0","values":100,"inverseWords":100,"stickers":24,"negativeControls":6,"elapsedSeconds":3.0073249340057375,"scope":"padded canonical witnesses only; not full Python replacement"}
+CUBISTRY_PHASE {"event":"RESULT","iteration":1,"elapsedMs":4299.642086029053,"values":100,"inverseChecks":100,"negativeControls":6,"fullStickerFrames":2400,"checksum":"c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"}
+{"runtime":"9.4.0","values":100,"inverseWords":100,"stickers":24,"negativeControls":6,"elapsedSeconds":3.2024059295654299,"scope":"padded canonical witnesses only; not full Python replacement"}
+CUBISTRY_PHASE {"event":"RESULT","iteration":2,"elapsedMs":4481.5380573272709,"values":100,"inverseChecks":100,"negativeControls":6,"fullStickerFrames":2400,"checksum":"c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"}
+{"runtime":"9.4.0","values":100,"inverseWords":100,"stickers":24,"negativeControls":6,"elapsedSeconds":3.008650064468384,"scope":"padded canonical witnesses only; not full Python replacement"}
+CUBISTRY_PHASE {"event":"RESULT","iteration":3,"elapsedMs":4352.915048599243,"values":100,"inverseChecks":100,"negativeControls":6,"fullStickerFrames":2400,"checksum":"c95848ef838078d19bdef47100ceebf5eefc2808d4f8e68a26d67f195d35f82a"}
+CUBISTRY_PHASE {"event":"DONE"}
