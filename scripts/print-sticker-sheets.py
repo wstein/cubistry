@@ -388,6 +388,8 @@ def write_design(design, output, size, gap, bleed, radius, safe, artwork, copies
         'U face top points toward B; D top toward F; all side face tops point toward U.',
         'C1, C2, ... identify complete copies. Blank stickers are required physical stickers.',
         'After application the cube is in its source pose. Use the setup words below.',
+        "R/L/U/D/F/B turn that face clockwise from outside; apostrophe reverses it, 2 is a half turn.",
+        'x/y/z rotate the whole cube in the R/U/F direction. Read left to right in the current view.',
     ]
     for i, line in enumerate(lines):
         guide.drawString(12*mm, (277-i*4)*mm, line)
@@ -407,7 +409,7 @@ def write_design(design, output, size, gap, bleed, radius, safe, artwork, copies
             guide.setFont('Helvetica', 6)
             guide.drawCentredString((cx+cell/2)*mm, (PAGE[1]-cy-cell+1.5)*mm, item['image'] or 'blank')
     guide.setFont('Helvetica-Bold', 9)
-    guide.drawString(12*mm, 53*mm, 'Setup examples (standard outer-face notation)')
+    guide.drawString(12*mm, 53*mm, 'Setup examples (face and whole-cube notation)')
     import textwrap
     at = 48
     for name, word in design['setupExamples'].items():
