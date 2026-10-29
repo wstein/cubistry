@@ -13,7 +13,9 @@ captures a numeric target and requests only the next adjacent value, at most
 once per second and only after physical completion. It does not reconcile a
 slow or suspended tab by jumping over values. Animation duration is separate
 from this cadence. Editing the target during Run leaves the captured target
-unchanged; Set or manual steps interrupt Run. Stop discards queued goals and
+unchanged; Set or manual steps interrupt Run. A changed numeric target finishes
+only the current turn before replanning from its actual full pose, as described
+in [target interruption](TARGET_INTERRUPTION.md). Stop discards queued goals and
 finishes the active complete value, preserving every required legal move.
 A reload restores the last completed value and physical format, never a running
 operation. Former minute-timer/Auto persistence does not resume hidden work.

@@ -61,8 +61,11 @@ backlog is replayed, no cube is teleported, and no sticker image is replaced.
 The HSM controller adds idle preparation and optional all-turn angular timing without
 changing standalone counting defaults. It can install an initial current-time
 pose during application setup; later changes use actual legal moves. Its
-six-move general bound is inherited from the pinned [HSM proof](HSM_COUNTER.md).
-The narrower canonical five-move claim is not used as a universal clock promise.
+six-move bound for settled blank-and-unit sources is inherited from the pinned
+[HSM proof](HSM_COUNTER.md). Interrupted partial sources are replanned through
+the same exact graph without asserting that bound; see
+[target interruption](TARGET_INTERRUPTION.md). The narrower canonical five-move
+claim is not used as a universal clock promise.
 These proof bounds count a half turn as one HTM, whereas clock timing counts it
 as two angular units. A six-HTM route can therefore require up to twelve angular
 units before the live schedule is fitted.
