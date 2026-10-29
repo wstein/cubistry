@@ -1,0 +1,200 @@
+{
+  "status": "SAT",
+  "claim": "Legal shorter visible-center repair witnesses, not shortest paths",
+  "primarySource": "https://kociemba.org/twisted.htm",
+  "capturePath": "research/date-3x3/portfolio-benchmark/captures/calendar-2024-v2.json",
+  "captureSHA256": "c74b7ddb58dd6769ed26aaa0aa18d3f8d58300ab745f18f93c86957152f50b14",
+  "repairs": [
+    {
+      "name": "front-quarter-clockwise",
+      "word": "F U D R2 L2 U' D' B' U D R2 L2 U' D'",
+      "htm": 14,
+      "up": [
+        1,
+        0,
+        0
+      ],
+      "changedCenters": [
+        {
+          "position": [
+            0,
+            0,
+            -1
+          ],
+          "beforeUp": [
+            0,
+            1,
+            0
+          ],
+          "afterUp": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "position": [
+            0,
+            0,
+            1
+          ],
+          "beforeUp": [
+            0,
+            1,
+            0
+          ],
+          "afterUp": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "allNoncenterFramesRestored": true,
+      "all54InverseRestored": true
+    },
+    {
+      "name": "front-half",
+      "word": "F U D F2 U' D' F U D F2 U' D'",
+      "htm": 12,
+      "up": [
+        0,
+        -1,
+        0
+      ],
+      "changedCenters": [
+        {
+          "position": [
+            0,
+            0,
+            1
+          ],
+          "beforeUp": [
+            0,
+            1,
+            0
+          ],
+          "afterUp": [
+            0,
+            -1,
+            0
+          ]
+        }
+      ],
+      "allNoncenterFramesRestored": true,
+      "all54InverseRestored": true
+    },
+    {
+      "name": "front-quarter-counterclockwise",
+      "word": "D U L2 R2 D' U' B D U L2 R2 D' U' F'",
+      "htm": 14,
+      "up": [
+        -1,
+        0,
+        0
+      ],
+      "changedCenters": [
+        {
+          "position": [
+            0,
+            0,
+            -1
+          ],
+          "beforeUp": [
+            0,
+            1,
+            0
+          ],
+          "afterUp": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "position": [
+            0,
+            0,
+            1
+          ],
+          "beforeUp": [
+            0,
+            1,
+            0
+          ],
+          "afterUp": [
+            -1,
+            0,
+            0
+          ]
+        }
+      ],
+      "allNoncenterFramesRestored": true,
+      "all54InverseRestored": true
+    }
+  ],
+  "prefixOrientationChecks": 15,
+  "negativeControlsRejected": 5,
+  "worstRoute": {
+    "captureIndex": 2980,
+    "design": "de-a",
+    "fromISO": "2024-04-20",
+    "toISO": "2024-04-19",
+    "fromStateHash": "ca9c0e1548988400787f8957140fa3fd763665ea54624cb41c275e3d93bce522",
+    "toStateHash": "f622e6a8d68b8247778124c7145a792e5a9c558073cbf3440410f0e22e3449fc",
+    "oldWord": "x z2 U2 B2 D' B2 L2 U2 L2 R2 F2 L2 U' L2 F' R' D2 B U2 F U B2 F R F R' F R F R' F R F R' F R F R' F R F R' F",
+    "oldCounts": {
+      "total": 43,
+      "htm": 41,
+      "qtm": 54,
+      "global": 2
+    },
+    "ordinaryPrefix": "x z2 U2 B2 D' B2 L2 U2 L2 R2 F2 L2 U' L2 F' R' D2 B U2 F U B2 F",
+    "ordinaryPrefixCounts": {
+      "total": 23,
+      "htm": 21,
+      "qtm": 34,
+      "global": 2
+    },
+    "legacyRepairHTM": 20,
+    "replacementRepairHTM": 12,
+    "newWord": "x z2 U2 B2 D' B2 L2 U2 L2 R2 F2 L2 U' L2 F' R' D2 B U2 F U B2 F2 U D F2 U' D' F U D F2 U' D'",
+    "newCounts": {
+      "total": 34,
+      "htm": 32,
+      "qtm": 48,
+      "global": 2
+    },
+    "sameFull54FrameEndpoint": true,
+    "frontVerified": true,
+    "all54InverseRestored": true,
+    "boundedSearchAttempts": [
+      {
+        "maximumNodes": 100000,
+        "maximumDepth": 24,
+        "status": "unknown",
+        "attempted": true,
+        "moves": 43,
+        "word": "x z2 U2 B2 D' B2 L2 U2 L2 R2 F2 L2 U' L2 F' R' D2 B U2 F U B2 F R F R' F R F R' F R F R' F R F R' F R F R' F",
+        "outerHTM": 41,
+        "rotations": 2,
+        "elapsedMs": 13.568949999986216,
+        "reason": "The center-aware search reached its node budget; no conclusion about solvability was made."
+      },
+      {
+        "maximumNodes": 100000,
+        "maximumDepth": 18,
+        "status": "unknown",
+        "attempted": true,
+        "moves": 43,
+        "word": "x z2 U2 B2 D' B2 L2 U2 L2 R2 F2 L2 U' L2 F' R' D2 B U2 F U B2 F R F R' F R F R' F R F R' F R F R' F R F R' F",
+        "outerHTM": 41,
+        "rotations": 2,
+        "elapsedMs": 33.23346200000378,
+        "reason": "The center-aware search reached its node budget; no conclusion about solvability was made."
+      }
+    ]
+  },
+  "optimality": "UNKNOWN",
+  "fullPictureTwentyOneBound": "UNKNOWN"
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "cubistry.center-repair-investigation",
+  "version": 1,
+  "baselineResearchCommit": "2ed6b79f0d85dba372c4706835d1424a1ff7fdc8",
+  "legalMoves": "Outer face HTM; explicit xyz rotations counted separately",
+  "claim": "Validated shorter visible-center repair witnesses, not optimality or universal21",
+  "primarySources": [
+    {
+      "url": "https://kociemba.org/twisted.htm",
+      "scope": "2048 residual center twists after ordinary solve;21face-turn bound"
+    },
+    {
+      "url": "https://www.cube20.org/",
+      "scope": "Ordinary color cube20HTM"
+    },
+    {
+      "url": "https://cube20.org/qtm/",
+      "scope": "Ordinary color cube26QTM"
+    }
+  ],
+  "files": {
+    "research/date-3x3/verify_witness.py": "c8ff97acdad91cc47fef09e1f4352b4f414613908ecef67e03f0148a3d3e5e7d",
+    "research/date-3x3/portfolio-benchmark/verify.py": "c3b9de2c8eb26b8c6ca211b40fbaf2670d0c0fe4a9979135fd71116809859d71",
+    "research/date-3x3/portfolio-benchmark/captures/calendar-2024-v2.json": "c74b7ddb58dd6769ed26aaa0aa18d3f8d58300ab745f18f93c86957152f50b14",
+    "research/date-3x3/center-corrections.json": "e7be2e10c58737533d245d17ad7bf7a04aa0fd4d44e723f96fbf38538a4900fa",
+    "research/date-3x3/center-bound-investigation/verify-short-repairs.py": "2da4e056107cbf872129948b8f9e644d81fa1b3a710d3cc20bc4a432bf9e7e8d",
+    "research/date-3x3/center-bound-investigation/verification.json": "47d6a817c0b69ec69685df8bb92b24a46d871478aeea293cd5814cdda0cc55ff"
+  }
+}
