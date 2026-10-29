@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { PNG } from "pngjs";
 import { frontPoint } from "../helpers/front-projection.mjs";
 async function ready(page) {
@@ -160,7 +161,7 @@ test("formatting remains available during actual Set animation and Run without r
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.clock.install();
   await ready(page);
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
   await page.locator("#value").fill("7");
   await page.locator("#set").click();
   await page.clock.runFor(100);

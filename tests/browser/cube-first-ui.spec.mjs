@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
+import { pauseSoon } from "../helpers/pause-clock.mjs";
 async function ready(page) {
   await page.clock.install();
   await page.goto("/");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await pauseSoon(page);
 }
 async function target(page, n) {
   await page.locator("#value").fill(String(n));
