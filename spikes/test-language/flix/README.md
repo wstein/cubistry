@@ -100,7 +100,8 @@ Compile first, separately, then observe one fresh JVM process:
 
 ```sh
 python3 build_lifecycle.py --output /tmp/NEW-flix-build.json
-python3 ../lifecycle_driver.py --output /tmp/NEW-flix-lifecycle --label flix -- java -jar artifact/flix.jar
+python3 ../lifecycle_driver.py --output /tmp/NEW-flix-lifecycle --label flix -- java -jar artifact/flix-lifecycle.jar
+python3 verify_lifecycle.py /tmp/NEW-flix-lifecycle/report.json
 ```
 
 The common Python observer uses its own monotonic clock for process-start → READY
@@ -111,3 +112,6 @@ retained. JVM/JIT/class caches may affect later calls; no forced collection,
 assertion disabling or forced-zero exit tail is used. Class loading before READY
 is included in observed startup, while any first-use loading inside validation
 remains in that invocation. The build cost is outside all runtime phases.
+
+The lifecycle build retains a separate `artifact/flix-lifecycle.jar`, so rebuilding
+the original startup probe cannot silently replace the lifecycle executable.
