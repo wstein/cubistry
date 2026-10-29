@@ -47,7 +47,11 @@ reduces the October 28 → 29, 2026 examples from 79 to 19 HTM for German A and
 require more than 20 moves, particularly visible-center orientation repairs.
 The UI identifies optimized routes and verified fallback routes honestly. No
 five-move bound from the HSM counter is claimed for a 3×3. A busy controller keeps
-one active route and only the latest pending date. A failed route stops with an
+one active turn and only the latest pending date. Changing the date during
+motion finishes the current legal turn, abandons the remaining obsolete route,
+and replans from the exact committed 54-sticker pose. The source reference is
+updated after every turn, so partial routes never reset hidden states. A date
+selected during planning supersedes that plan before its first turn. A failed route stops with an
 error rather than installing an unverified pose.
 
 ## Live date and inspection
@@ -58,7 +62,7 @@ The control display shows the requested date and time zone. Choosing a date
 starts its legal route immediately; Enter applies the date from the keyboard.
 The Today button returns directly to live local-date tracking. The −1 day and +1 day controls operate on the latest
 selected date, so rapid presses retain the latest civil-date intent while only
-one physical route and one pending request exist. The physical face
+one active physical turn and one pending request exist. The physical face
 commits after its legal route finishes. Date inspection accepts Gregorian dates
 from 0001-01-01 through 9999-12-31, rejects invalid days, and does not interpret an
 ISO civil date as a local UTC timestamp.

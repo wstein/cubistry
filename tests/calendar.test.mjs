@@ -105,8 +105,20 @@ test("calendar requests preserve exact poses, coalesce pending requests and prop
   assert.equal(errors.length, 0);
   assert.equal(
     count,
-    tokens(simplify(inverse(initial.word) + " " + next.word)).length +
-      tokens(simplify(inverse(next.word) + " " + latest.word)).length,
+    1 +
+      tokens(
+        simplify(
+          inverse(
+            simplify(
+              initial.word +
+                " " +
+                tokens(simplify(inverse(initial.word) + " " + next.word))[0],
+            ),
+          ) +
+            " " +
+            latest.word,
+        ),
+      ).length,
   );
   const broken = new CalendarController(
     d,
@@ -394,4 +406,55 @@ test("asynchronous preparation is discarded after the physical source changes", 
   assert.equal(c.estimate(first), null);
   assert(sameState(physical, sourcePose(design, next)));
   assert.deepEqual(await c.prepare(first), { htm: 0, rotations: 1 });
+});
+
+test("a date selected during asynchronous planning discards the old plan before its first move", async () => {
+  const d = designs[0],
+    initial = d.targets[0],
+    next = d.targets[100],
+    latest = d.targets[500];
+  let release,
+    pose,
+    count = 0,
+    first = true;
+  const starts = [];
+  const c = new CalendarController(
+    d,
+    initial,
+    {
+      configure(_design, state) {
+        pose = state;
+      },
+      async animate(from, token, to) {
+        assert(sameState(pose, from));
+        assert(sameState(apply(from, token), to));
+        pose = to;
+        count++;
+      },
+    },
+    (_t, _b, error) => assert.ifError(error),
+    async (context) => {
+      starts.push({ target: context.target, from: context.from });
+      if (first) {
+        first = false;
+        await new Promise((resolve) => {
+          release = resolve;
+        });
+      }
+      return context.fallbackWord;
+    },
+  );
+  c.request(next);
+  c.request(latest);
+  release();
+  while (c.busy) await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(starts.length, 2);
+  assert.equal(starts[1].target, latest);
+  assert(sameState(starts[1].from, sourcePose(d, initial)));
+  assert.equal(
+    count,
+    tokens(simplify(inverse(initial.word) + " " + latest.word)).length,
+  );
+  assert(sameState(pose, sourcePose(d, latest)));
+  assert.equal(c.current, latest);
 });

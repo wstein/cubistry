@@ -118,3 +118,92 @@ test("a blocked worker visibly uses the verified baseline rather than claiming o
     valid: true,
   });
 });
+
+test("changing a date during motion finishes one turn then replans from that exact physical pose", async ({
+  page,
+}) => {
+  await ready(page);
+  await page.evaluate(async () => {
+    const { CalendarViewer } = await import("/src/apps/calendar/viewer.ts");
+    const { CalendarController } = await import(
+      "/src/apps/calendar/controller.ts"
+    );
+    const { apply, sameState } = await import("/src/apps/calendar/model.ts");
+    const animate = CalendarViewer.prototype.animate;
+    const request = CalendarController.prototype.request;
+    window.interruptedMoves = [];
+    window.interruptedRequests = [];
+    let first = true;
+    CalendarController.prototype.request = function (target) {
+      window.interruptedRequests.push(target.day);
+      return request.call(this, target);
+    };
+    CalendarViewer.prototype.animate = async function (from, token, to) {
+      if (
+        !sameState(this.presentedState, from) ||
+        !sameState(apply(from, token), to)
+      )
+        throw Error("Broken partial-route frame");
+      const { calendarApp } = await import("/src/calendar.mjs");
+      const day = calendarApp.controller.progress.target.day;
+      if (first) {
+        first = false;
+        await new Promise((resolve) => {
+          window.releaseInterruptedMove = resolve;
+        });
+      }
+      await animate.call(this, from, token, to);
+      window.interruptedMoves.push({
+        day,
+        token,
+        from,
+        to,
+        valid: sameState(this.presentedState, to),
+      });
+    };
+  });
+  await page.fill("#calendar-date", "2026-10-29");
+  await page.locator("#calendar-date").dispatchEvent("change");
+  await expect
+    .poll(() => page.evaluate(() => typeof window.releaseInterruptedMove))
+    .toBe("function");
+  for (const iso of ["2026-10-30", "2026-11-01"]) {
+    await page.fill("#calendar-date", iso);
+    await page.locator("#calendar-date").dispatchEvent("change");
+  }
+  await page.evaluate(() => window.releaseInterruptedMove());
+  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
+    "aria-busy",
+    "false",
+    { timeout: 15000 },
+  );
+  const result = await page.evaluate(async () => {
+    const { calendarApp } = await import("/src/calendar.mjs");
+    const { matches, sameState } = await import("/src/apps/calendar/model.ts");
+    const c = calendarApp.controller,
+      trace = window.interruptedMoves;
+    return {
+      valid: matches(c.physicalState, c.current.cells),
+      day: c.current.day,
+      month: c.current.month,
+      oldMoves: trace.filter((t) => t.day === 29).length,
+      discardedMoves: trace.filter((t) => t.day === 30).length,
+      continuity: trace.every(
+        (t, i) => t.valid && (!i || sameState(trace[i - 1].to, t.from)),
+      ),
+      progress: c.progress,
+      trace,
+    };
+  });
+  expect(result.valid).toBe(true);
+  expect(result.day).toBe(1);
+  expect(result.month).toBe(11);
+  expect(result.oldMoves).toBe(1);
+  expect(result.discardedMoves).toBe(0);
+  expect(result.continuity).toBe(true);
+  expect(result.progress.completed).toEqual(result.progress.total);
+  writeFileSync(
+    "test-results/calendar-interrupted-route.json",
+    JSON.stringify(result, null, 2),
+  );
+});
