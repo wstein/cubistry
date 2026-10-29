@@ -88,13 +88,14 @@ export class ClockStage {
       scene: this.scene,
       camera: this.camera,
       position: [(index - 1) * 2.8, 0, 0],
-      resetCamera: () => {
-        this.yaw = 0.2;
-        this.pitch = 0.16;
-      },
+      resetCamera: () => this.resetCamera(),
     });
     this.cubes.push(cube);
     return cube;
+  }
+  resetCamera(): void {
+    this.yaw = 0.2;
+    this.pitch = 0.16;
   }
   destroy(): void {
     demand(

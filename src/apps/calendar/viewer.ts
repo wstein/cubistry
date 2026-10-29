@@ -95,6 +95,10 @@ export class CalendarViewer {
       this.renderer.render(this.scene, this.camera);
     });
   }
+  resetReferenceView(): void {
+    this.yaw = 0.2;
+    this.pitch = 0.18;
+  }
   private clear(): void {
     for (const mesh of this.meshes.values()) this.scene.remove(mesh);
     this.meshes.clear();

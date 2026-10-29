@@ -1,5 +1,7 @@
 import "./style.css";
 import "./clock.css";
+import "./presentation.css";
+import { installPresentation } from "./apps/shared/presentation.ts";
 import { BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
 import { ClockStage } from "./apps/clock/stage.ts";
 import { loadAssets } from "@cubistry/cube-assets";
@@ -72,6 +74,11 @@ function fail(e) {
 $("clock-application").addEventListener("change", () =>
   location.assign(new URL($("clock-application").value, location.href)),
 );
+const presentation = installPresentation({
+  app: "clock",
+  hide: ["main > header", ".clock-heading", ".clock-cubes", ".clock-control > h2", ".clock-control > label", ".clock-control > select", "main > p.small"],
+  resetView: () => stage?.resetCamera(),
+});
 async function initialize() {
   const owned = [],
     unclaimed = [];
@@ -143,6 +150,7 @@ async function initialize() {
       });
     }
     ready = true;
+    presentation.setReady(true);
     $("clock-lettering").disabled = false;
     draw();
     setInterval(draw, 25);
