@@ -71,3 +71,10 @@ adds eight corruption controls, including negative, boolean and fractional attem
 `c8fd5d9601f931b8896db54709b729fff22599936c8a3d1f8ef57289fe568812`).
 These targeted same-source probes complement, and do not replace, independently
 chained year and November-path measurements.
+
+V2 metadata policy `default-then-shorter-cap18-v2` executes the second native call
+only when its effective depth is strictly smaller. `verify.py` checks that rule and
+requires explicit skip diagnostics. `compare-versions.py V1.json V2.json` reports
+measured word/endpoint identity, timing and duplicate-native-call counts without
+claiming universal speed gains. V1 captures are immutable; V2 capture filenames
+include `-v2`. See [V2 findings](RESULTS-V2.md).

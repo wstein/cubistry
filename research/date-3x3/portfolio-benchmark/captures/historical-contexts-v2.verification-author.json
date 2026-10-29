@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "captureSHA256": "9873aa9d6e177396aeeae6546dc1aa972ddf2b6a542d94a8bbbba0e1d8a87d07",
+  "contexts": 18,
+  "all54CandidateReplaysAndInverses": 72,
+  "sameSourceDefaultRetained": 18,
+  "optimality": "UNKNOWN",
+  "universalMoveBound": "UNKNOWN"
+}

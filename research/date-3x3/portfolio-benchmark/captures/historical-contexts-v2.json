@@ -1,0 +1,1245 @@
+{
+  "schema": "cubistry.calendar-portfolio-fixture-probes",
+  "appHead": "0c9b166ca66d252ecd096a73042d322f52d987a0",
+  "fixtureSHA256": "c8fd5d9601f931b8896db54709b729fff22599936c8a3d1f8ef57289fe568812",
+  "scriptSHA256": "2e5619a6e69287012c2f05ebc021aa8309996a319682a1a262572da3469ff723",
+  "providerPin": {
+    "repository": "https://github.com/wstein/puzlwerk.git",
+    "commit": "ffe513c43f5d622810b9a3c9aff2fac88163d0f0",
+    "package": "@puzlwerk/solver-3x3-picture",
+    "version": "0.1.0",
+    "integrity": "sha512-+KJAbCSZiMmT+RgGhRM+rZVGSxAtOzObwMaLLJteZUhHl812IfR5pErqlBoGahoUipSVj4OHd2AvZoa2iQ5T8w==",
+    "upstreamCubeLabCommit": "08e079f3bc211777d8980f75ec6a7f61979dd2ac",
+    "issue": "https://github.com/wstein/puzlwerk/issues/6"
+  },
+  "fixture": {
+    "baselineCommit": "f75f47d2de76a156c835af00afc4e8886056314a",
+    "providerCommit": "ffe513c43f5d622810b9a3c9aff2fac88163d0f0",
+    "printingSHA256": {
+      "de-a": "1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56",
+      "en-3-zero": "cb6a556d02f03806b1742bf7720216222934bc0652dd4ace12dcd97de876da0c",
+      "en-3-unpadded": "156e6b4d642f9737ee03597bf84a940b3d36f0271c46345bac4083eb99a36022"
+    },
+    "contexts": [
+      {
+        "id": "de-a",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y y y D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      {
+        "id": "de-a",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y y y D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      {
+        "id": "de-a",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 L U L' U L U L' U L U L' U L U L' U L U L' U B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R'",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      {
+        "id": "de-a",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      {
+        "id": "de-a",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U' L U' L U L U' L U L U' L U L U' L U L U' L2 D L' D L D L' D L D L' D L D L' D L D L' D",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      {
+        "id": "de-a",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' U L' U L U L' U L U L' U L U L' U L U L' U2 B U' B U B U' B U B U' B U B U' B U B U' B",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      {
+        "id": "en-3-zero",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-zero",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-zero",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' U L' U L U L' U L U L' U L U L' U L U L' U",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-zero",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' U L' U L U L' U L U L' U L U L' U L U L' U",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-zero",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U B U' B U B U' B U B U' B U B U' B U B U' B L D L' D L D L' D L D L' D L D L' D L D L' D L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U'",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-zero",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U B U' B U B U' B U B U' B U B U' B U B U' B L D L' D L D L' D L D L' D L D L' D L D L' D L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U'",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U B U' B U B U' B U B U' B U B U' B U B U' B2 D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U B U' B U B U' B U B U' B U B U' B U B U' B2 D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' D L' D L D L' D L D L' D L D L' D L D L' D R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' D L' D L D L' D L D L' D L D L' D L D L' D R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      }
+    ]
+  },
+  "options": {
+    "threshold": 14,
+    "maximumNodes": 100000,
+    "maximumDepth": 24
+  },
+  "rows": [
+    {
+      "fixture": {
+        "id": "de-a",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y y y D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      "baseline": {
+        "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 1908.972225
+      },
+      "portfolio": {
+        "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 26.029160000000047,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 24,
+            "status": "solved",
+            "attempted": true,
+            "moves": 24,
+            "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+            "outerHTM": 24,
+            "rotations": 0,
+            "elapsedMs": 3.065784999999778
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 18,
+            "status": "solved",
+            "attempted": true,
+            "moves": 18,
+            "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+            "outerHTM": 18,
+            "rotations": 0,
+            "elapsedMs": 19.61468799999966
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 1909.0822519999997,
+      "portfolioMs": 26.150955000000067
+    },
+    {
+      "fixture": {
+        "id": "de-a",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y y y D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      "baseline": {
+        "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 2.535898999999972
+      },
+      "portfolio": {
+        "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 19.372529000000213,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 24,
+            "status": "solved",
+            "attempted": true,
+            "moves": 24,
+            "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+            "outerHTM": 24,
+            "rotations": 0,
+            "elapsedMs": 2.2080000000000837
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 18,
+            "status": "solved",
+            "attempted": true,
+            "moves": 18,
+            "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+            "outerHTM": 18,
+            "rotations": 0,
+            "elapsedMs": 14.651264000000083
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 2.543982000000142,
+      "portfolioMs": 19.377317000000403
+    },
+    {
+      "fixture": {
+        "id": "de-a",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 L U L' U L U L' U L U L' U L U L' U L U L' U B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R' B' R'",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      "baseline": {
+        "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 2.449757999999747
+      },
+      "portfolio": {
+        "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 17.449052000000393,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 24,
+            "status": "solved",
+            "attempted": true,
+            "moves": 24,
+            "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+            "outerHTM": 24,
+            "rotations": 0,
+            "elapsedMs": 1.885349000000133
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 18,
+            "status": "solved",
+            "attempted": true,
+            "moves": 18,
+            "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+            "outerHTM": 18,
+            "rotations": 0,
+            "elapsedMs": 13.208920000000035
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 2.46139600000015,
+      "portfolioMs": 17.454921000000013
+    },
+    {
+      "fixture": {
+        "id": "de-a",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      "baseline": {
+        "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 2.0178510000000642
+      },
+      "portfolio": {
+        "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 18.54475999999977,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 24,
+            "status": "solved",
+            "attempted": true,
+            "moves": 24,
+            "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+            "outerHTM": 24,
+            "rotations": 0,
+            "elapsedMs": 2.3884039999998095
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 18,
+            "status": "solved",
+            "attempted": true,
+            "moves": 18,
+            "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+            "outerHTM": 18,
+            "rotations": 0,
+            "elapsedMs": 13.668408999999883
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 2.0526230000000396,
+      "portfolioMs": 18.55017799999996
+    },
+    {
+      "fixture": {
+        "id": "de-a",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U' L U' L U L U' L U L U' L U L U' L U L U' L2 D L' D L D L' D L D L' D L D L' D L D L' D",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      "baseline": {
+        "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 1.995726999999988
+      },
+      "portfolio": {
+        "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 18.41870800000015,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 24,
+            "status": "solved",
+            "attempted": true,
+            "moves": 24,
+            "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+            "outerHTM": 24,
+            "rotations": 0,
+            "elapsedMs": 1.759197000000313
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 18,
+            "status": "solved",
+            "attempted": true,
+            "moves": 18,
+            "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+            "outerHTM": 18,
+            "rotations": 0,
+            "elapsedMs": 14.448636000000079
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 2.0061829999999645,
+      "portfolioMs": 18.42524800000001
+    },
+    {
+      "fixture": {
+        "id": "de-a",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y' D2 B2 D R2 F2 D B2 U B2 U F2 U' L U2 R' U' R2 B2 R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 U2 L' U2 D2 R D2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' U L' U L U L' U L U L' U L U L' U L U L' U2 B U' B U B U' B U B U' B U B U' B U B U' B",
+        "directWord": "L2 B' D2 B R2 D2 F L2 D2 B U2 F' U' F U2 B' U' D2 B L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "expectedMoves": 18
+      },
+      "baseline": {
+        "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 2.117342000000008
+      },
+      "portfolio": {
+        "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 16.660381999999572,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 24,
+            "status": "solved",
+            "attempted": true,
+            "moves": 24,
+            "word": "U D2 L2 B' D R2 D' B U D R2 U D R2 L2 U B2 U B2 U' L2 D L2 D'",
+            "outerHTM": 24,
+            "rotations": 0,
+            "elapsedMs": 1.919090000000324
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 18,
+            "status": "solved",
+            "attempted": true,
+            "moves": 18,
+            "word": "U' R2 U2 F' U' B U F B' U2 F2 U B2 D' L2 F2 D B2",
+            "outerHTM": 18,
+            "rotations": 0,
+            "elapsedMs": 12.75594000000001
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 2.1287090000000717,
+      "portfolioMs": 16.67080799999985
+    },
+    {
+      "fixture": {
+        "id": "en-3-zero",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.479118000000199
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 79.05320699999993,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.873345999999856
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 72.13719200000014
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.4900940000002265,
+      "portfolioMs": 79.06584500000008
+    },
+    {
+      "fixture": {
+        "id": "en-3-zero",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.109365000000253
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 73.56431499999962,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 5.006207999999788
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 66.8505070000001
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.119130000000041,
+      "portfolioMs": 73.57556099999965
+    },
+    {
+      "fixture": {
+        "id": "en-3-zero",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' U L' U L U L' U L U L' U L U L' U L U L' U",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.060460000000148
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 79.1436950000002,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.855968999999732
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 72.49224299999969
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.074391999999989,
+      "portfolioMs": 79.18090100000018
+    },
+    {
+      "fixture": {
+        "id": "en-3-zero",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' U L' U L U L' U L U L' U L U L' U L U L' U",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 4.648103999999876
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 70.33516999999983,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.603434000000107
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 64.03074699999979
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 4.658969999999954,
+      "portfolioMs": 70.36486599999989
+    },
+    {
+      "fixture": {
+        "id": "en-3-zero",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U B U' B U B U' B U B U' B U B U' B U B U' B L D L' D L D L' D L D L' D L D L' D L D L' D L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U'",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 4.838502999999946
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 71.35621399999991,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.6524200000003475
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 64.83458999999993
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 4.849498999999923,
+      "portfolioMs": 71.37224800000013
+    },
+    {
+      "fixture": {
+        "id": "en-3-zero",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y R2 B2 D R2 U' B2 D' U2 F2 D2 U' R2 B L2 U2 L U L B F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U B U' B U B U' B U B U' B U B U' B U B U' B L D L' D L D L' D L D L' D L D L' D L D L' D L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U' L' U'",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.209928999999647
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 76.42450499999995,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 5.2408040000000256
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 69.49384999999984
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.225883000000067,
+      "portfolioMs": 76.44139099999984
+    },
+    {
+      "fixture": {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.432096000000001
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 80.265312,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.959577999999965
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 73.35078099999964
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.443844999999783,
+      "portfolioMs": 80.28328999999985
+    },
+    {
+      "fixture": {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.583389999999781
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 72.87319000000025,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.851861000000099
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 65.96518000000015
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.597080000000005,
+      "portfolioMs": 72.89014499999985
+    },
+    {
+      "fixture": {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U B U' B U B U' B U B U' B U B U' B U B U' B2 D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.202878000000055
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 73.97452699999985,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.940533999999843
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 67.04497300000003
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.219853999999941,
+      "portfolioMs": 73.99257399999988
+    },
+    {
+      "fixture": {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U B U' B U B U' B U B U' B U B U' B U B U' B2 D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D B D",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.24650500000007
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 72.08660899999995,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.5884360000000015
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 65.47319100000004
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.2595940000001065,
+      "portfolioMs": 72.10361499999999
+    },
+    {
+      "fixture": {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "direct",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' D L' D L D L' D L D L' D L D L' D L D L' D R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.110769999999775
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 74.81156299999975,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.717560000000049
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 67.98090899999988
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.126533999999992,
+      "portfolioMs": 74.8274879999999
+    },
+    {
+      "fixture": {
+        "id": "en-3-unpadded",
+        "path": [
+          "2026-10-29",
+          "2026-11-03",
+          "2026-11-04"
+        ],
+        "backend": "center-aware",
+        "sourceWord": "y D' R2 D' L2 U' R2 D R2 D2 R2 B2 U F' U2 R' U R F' R2 U' F' L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 D2 R' D2 U2 L U2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L2 R2 D' R2 L2 U L' D L' D L D L' D L D L' D L D L' D L D L' D R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B R B",
+        "directWord": "D B2 D' F2 D B2 D' F2 U R2 U' L' U R2 U' L",
+        "expectedMoves": 14
+      },
+      "baseline": {
+        "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 5.982010000000173
+      },
+      "portfolio": {
+        "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+        "method": "center-aware",
+        "attempted": true,
+        "status": "solved",
+        "elapsedMs": 74.5036710000004,
+        "attempts": [
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 15,
+            "status": "solved",
+            "attempted": true,
+            "moves": 14,
+            "word": "R U' R2 D' R2 U R' F2 U F2 U' R2 D R2",
+            "outerHTM": 14,
+            "rotations": 0,
+            "elapsedMs": 4.709606999999778
+          },
+          {
+            "maximumNodes": 100000,
+            "maximumDepth": 13,
+            "status": "solved",
+            "attempted": true,
+            "moves": 13,
+            "word": "R F2 D' F2 D R2 U' R U F2 U F2 U'",
+            "outerHTM": 13,
+            "rotations": 0,
+            "elapsedMs": 67.86215099999981
+          }
+        ],
+        "maximumAttempts": 2,
+        "maximumTotalNodes": 200000
+      },
+      "baselineMs": 5.99621100000013,
+      "portfolioMs": 74.52157800000032
+    }
+  ]
+}
