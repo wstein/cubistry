@@ -232,6 +232,8 @@ export class CalendarController {
           plan = await this.preparedFor(target).promise;
         } else plan = this.baseline(target, this.state, reference);
         this.planning = false;
+        // A date selected during planning supersedes the result before any turn.
+        if (this.desired) continue;
         this.routeKind = plan.route;
         this.total = countCalendarMoves(plan.word);
         this.changed(this.current, true);
@@ -239,18 +241,23 @@ export class CalendarController {
           const next = apply(this.state, token);
           await this.port.animate(this.state, token, next);
           this.state = next;
+          // Retain the real full-state reference even if this route is interrupted.
+          this.sourceWord = simplify(this.sourceWord + " " + token);
           const cost = countCalendarMoves(token);
           this.completed = {
             htm: this.completed.htm + cost.htm,
             rotations: this.completed.rotations + cost.rotations,
           };
           this.changed(this.current, true);
+          // Complete the active physical turn, then solve directly for the latest date.
+          if (this.desired) break;
         }
+        if (this.desired) continue;
         demand(
           sameState(this.state, plan.end) && matches(this.state, target.cells),
           "Calendar endpoint disagrees with its checked route",
         );
-        const actualReference = simplify(reference + " " + plan.word),
+        const actualReference = this.sourceWord,
           canonical = sourcePose(this.design, target);
         this.sourceWord =
           sameState(this.state, canonical) &&
