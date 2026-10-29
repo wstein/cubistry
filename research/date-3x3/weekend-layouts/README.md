@@ -64,3 +64,14 @@ under `images/fonts/`; hashes and preview provenance are in
 [concept metadata](images/concepts.json). Reproduce the previews with
 `python render-concepts.py` after installing `requirements-art.txt` in an isolated
 environment. The existing English artwork is unchanged.
+
+## Rejected presentation scope (October 29, 2026)
+
+The user rejected whole-month abbreviations on one sticker. All C1/C2 candidates
+above use that presentation and therefore are **not accepted product proposals**,
+even though their physical feasibility evidence remains valid. Keep the existing
+German A front: weekday / day / month, with the month spread across three cells.
+A future whole-weekday sticker may be considered only if it retains that month
+presentation. No new layout or red-weekend feasibility claim follows from the
+rejection; the saved candidates and witnesses remain unchanged as historical
+research.
