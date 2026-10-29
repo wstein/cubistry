@@ -1,0 +1,113 @@
+{
+  "label": "flix-complete-quiet",
+  "command": [
+    "java",
+    "-Xmx768m",
+    "-jar",
+    "proof-checkers/flix/artifact/flix.jar",
+    "lifecycle",
+    "."
+  ],
+  "workingDirectory": "/workspace/cubistry-proof-flix",
+  "clock": "parent time.monotonic_ns for observed startup/exit; child elapsed durations only",
+  "startupToReadyMs": 69.453113,
+  "observedDoneToExitMs": 18.567478,
+  "totalProcessWallMs": 11454.774248,
+  "exitCode": 0,
+  "events": [
+    {
+      "event": "READY",
+      "parentReceivedMs": 69.453113
+    },
+    {
+      "event": "LOAD",
+      "elapsedMs": 104.726955,
+      "files": 199,
+      "bytes": 3135813,
+      "scope": "raw-input integrity preflight; no semantic result cache",
+      "parentReceivedMs": 175.169328
+    },
+    {
+      "event": "RESULT",
+      "iteration": 0,
+      "elapsedMs": 3461.421998,
+      "valid": true,
+      "negativeControls": 64,
+      "counterCases": 41,
+      "counterAccepted": 2,
+      "counterRejected": 39,
+      "geometryCases": 154,
+      "geometryAccepted": 129,
+      "geometryRejected": 25,
+      "kernelReferences": 2048,
+      "centerGenerators": 36,
+      "chainedTransitionsPerFormat": 800,
+      "checksum": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
+      "parentReceivedMs": 3637.512389
+    },
+    {
+      "event": "RESULT",
+      "iteration": 1,
+      "elapsedMs": 2697.657017,
+      "valid": true,
+      "negativeControls": 64,
+      "counterCases": 41,
+      "counterAccepted": 2,
+      "counterRejected": 39,
+      "geometryCases": 154,
+      "geometryAccepted": 129,
+      "geometryRejected": 25,
+      "kernelReferences": 2048,
+      "centerGenerators": 36,
+      "chainedTransitionsPerFormat": 800,
+      "checksum": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
+      "parentReceivedMs": 6335.443143
+    },
+    {
+      "event": "RESULT",
+      "iteration": 2,
+      "elapsedMs": 2556.100632,
+      "valid": true,
+      "negativeControls": 64,
+      "counterCases": 41,
+      "counterAccepted": 2,
+      "counterRejected": 39,
+      "geometryCases": 154,
+      "geometryAccepted": 129,
+      "geometryRejected": 25,
+      "kernelReferences": 2048,
+      "centerGenerators": 36,
+      "chainedTransitionsPerFormat": 800,
+      "checksum": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
+      "parentReceivedMs": 8891.717691
+    },
+    {
+      "event": "RESULT",
+      "iteration": 3,
+      "elapsedMs": 2543.615738,
+      "valid": true,
+      "negativeControls": 64,
+      "counterCases": 41,
+      "counterAccepted": 2,
+      "counterRejected": 39,
+      "geometryCases": 154,
+      "geometryAccepted": 129,
+      "geometryRejected": 25,
+      "kernelReferences": 2048,
+      "centerGenerators": 36,
+      "chainedTransitionsPerFormat": 800,
+      "checksum": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
+      "parentReceivedMs": 11435.66938
+    },
+    {
+      "event": "DONE",
+      "parentReceivedMs": 11436.20677
+    }
+  ],
+  "driverSHA256": "e00702897ffb9a5aa4b92b8fa2d3932cb961f83b3d25b0f8eba8684b03d0170d",
+  "limits": [
+    "shared machine; no forced garbage collection",
+    "marker creation/flush, pipe delivery, scheduling and runtime cleanup are included in observed phases",
+    "DONE-to-exit is an observed tail, not isolated destructor CPU time or a zero-cost guarantee"
+  ]
+}

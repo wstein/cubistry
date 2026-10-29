@@ -29,7 +29,7 @@ The build guard checks the resolved parser JAR's SHA-256 before the executable i
 used and records the built artifact and source hashes. Build/setup costs are
 separate from validation. The Python build/test utilities are launch/integrity
 harnesses; they do not preprocess certificate data or implement the checker engine.
-No binary or local cache is committed. A managed proxy may require the normal
+No compiler/runtime binary or local cache is committed. A managed proxy may require the normal
 Java HTTP/HTTPS proxy properties in `JAVA_TOOL_OPTIONS`; caches stay in `/tmp`.
 
 ## Checks and deliberate input policy
@@ -58,3 +58,61 @@ Result records contain `valid`, `status` and diagnostics. Exit codes are 0 for
 valid, 1 for semantic/parser-invalid, 2 for unsupported commands/schemas and 3 for
 unexpected runtime, I/O or integrity errors. Valid execution returns naturally.
 These validators do not solve cubes or prove an optimal move bound.
+
+## Complete corpus and lifecycle
+
+The executable enforces the embedded manifest SHA-256, every declared case name
+and input hash, the exact 801-value chain, all 36 generators and all 2,048 kernel
+references. Missing or substituted data is an error. Expected-invalid fixtures
+must be rejected by the parser/semantic checker; digest and witness comparisons
+run outside that rejection catch, so a comparison failure cannot masquerade as a
+successful negative control.
+
+```sh
+java -Xmx768m -jar proof-checkers/flix/artifact/flix.jar conformance . /tmp/NEW-flix-states.jsonl
+python3 proof-checkers/tools/audit_exports.py /tmp/NEW-flix-states.jsonl --research-root /path/to/pinned-research-checkout
+python3 spikes/test-language/lifecycle_driver.py --output /tmp/NEW-flix-lifecycle --label flix-complete -- java -Xmx768m -jar proof-checkers/flix/artifact/flix.jar lifecycle .
+python3 proof-checkers/flix/tests/parser_limits.py
+```
+
+Run these commands from the repository root. The separate Research checkout is
+needed only by the independent Python audit utility; the Flix runtime never
+imports it. The original 195-case CLI regression also checks unknown-command,
+I/O-error and direct-chain-integrity exit behavior. Eleven additional raw boundary
+controls cover depth 64/65, positive/negative/decimal numeric tokens of 128/129
+bytes, scalar Unicode and a valid 60,000-character informational member name.
+
+All 195 fixtures pass their declared outcomes: 41 counter cases (2 valid, 39
+rejected) and 154 marked cases (129 valid, 25 rejected). Every valid geometry row
+with a word is actually replayed and inverted: 121 witnesses, 628 outer HTM,
+369 physical whole-rotation tokens and 469 whole-rotation quarter equivalents.
+Those totals are derived from the executed branches and asserted, not inferred
+from the presence of files. All generators and kernel endpoints retain every
+hidden/blank center frame and restore the complete source under inversion.
+
+The ID-sorted ASCII full-state aggregate is
+`2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661`,
+matching Julia. The independently audited 2,413 actual output states contain
+124,302 complete physical sticker frames. They are retained losslessly in
+[evidence/full-states.jsonl.gz](evidence/full-states.jsonl.gz); decompress to a new
+JSONL path for the audit command. [Provenance](evidence/provenance.json),
+[conformance](evidence/conformance.json), [build](evidence/build.json) and
+[full-frame audit](evidence/export-audit.json) retain source/input/artifact hashes.
+Compiler/runtime binaries and local caches remain excluded.
+
+`lifecycle REPO_ROOT` uses one fresh JVM. READY is flushed before input work; LOAD
+is a raw-byte integrity preflight over 199 files and retains no semantic cache.
+**Each** of the four later complete invocations rereads, pins and reparses every
+certificate/state, manifest, chain and kernel input, redoes all expected negative
+rejections and all mathematical replay/inverse/hash checks. No AST or accepted/
+rejected verdict is reused. Only output volume is suppressed during repeats.
+
+The final [lifecycle capture](evidence/lifecycle/report.json) measured startup
+69.33 ms, preflight 113.13 ms, first complete validation 3,566.31 ms, three complete
+warm validations 2,706.98 / 2,587.12 / 2,500.94 ms, and observed DONE-to-exit
+17.43 ms. Upfront build was separately 12,969.65 ms. Java/JIT/OS caches naturally
+warm; no forced collection or disabled assertions are used. Parent observations
+use one monotonic clock and child validation durations use another only locally;
+no cross-process timestamps are subtracted. Exit is natural and its measured tail
+is not assumed zero. These are shared-machine observations, not universal timing
+promises or an identical-algorithm language benchmark.
