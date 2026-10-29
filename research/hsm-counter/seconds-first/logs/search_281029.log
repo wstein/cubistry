@@ -1,0 +1,40 @@
+start 250.500 T0 T1 T2 | T3 T4 T5 | U0 U1 U2 | U3 U4 U5 | U6 U7 U8 | U9 U0 U9 | H S M | _ _ _
+it 0 T 1.000 cur 250.500 best 250.500
+it 23 best 250.000 T0 T3 T4 | T2 T1 T5 | U1 U2 U0 | U3 U4 U5 | U7 U8 U6 | H U0 U9 | U9 S M | _ _ _
+it 27 best 224.000 T0 T3 T4 | T2 T1 T5 | U1 U7 U0 | U3 U4 U5 | U2 U8 U6 | H U0 U9 | U9 S M | _ _ _
+it 69 best 223.500 T0 T3 T4 | T1 T5 T2 | U7 U1 U0 | U4 U5 U3 | U2 U8 U6 | H U0 U9 | S M U9 | _ _ _
+it 74 best 221.000 T0 T3 T4 | T5 T2 T1 | U1 U0 U7 | U4 U5 U3 | U2 U6 U8 | H U0 U9 | S M U9 | _ _ _
+it 97 best 217.000 T0 T3 T4 | T2 T1 T5 | U1 U0 U3 | U4 U5 U7 | U2 U6 U8 | H U0 U9 | M S U9 | _ _ _
+it 98 best 216.000 T0 T3 T4 | T2 T1 T5 | U3 U0 U1 | U4 U5 U7 | U2 U6 U8 | H U0 U9 | M S U9 | _ _ _
+it 111 best 211.000 T0 T2 T4 | T3 T1 T5 | U3 U8 U1 | U4 U5 U7 | U6 U0 U2 | U0 U9 H | M S U9 | _ _ _
+it 152 best 209.000 T2 T5 T4 | T1 T3 T0 | U3 U8 U1 | U4 U5 U7 | U2 U0 U6 | U9 U0 H | U9 S M | _ _ _
+it 165 best 208.000 T2 T1 T4 | T5 T3 T0 | U3 U8 U1 | U4 U5 U7 | U0 U6 U2 | U9 U0 H | U9 S M | _ _ _
+it 206 best 203.667 T2 T1 T4 | T5 T3 T0 | U5 U3 U8 | U7 U4 U1 | U6 U2 U0 | U9 U0 H | S M U9 | _ _ _
+it 274 best 203.000 T2 T1 T4 | T5 T3 T0 | U8 U5 U3 | U1 U7 U4 | U6 U2 U0 | H U9 S | U9 M U0 | _ _ _
+it 286 best 202.500 T4 T2 T1 | T5 T3 T0 | U8 U5 U3 | U7 U4 U1 | U2 U6 U0 | H U9 S | U9 M U0 | _ _ _
+it 293 best 201.000 T4 T2 T1 | T5 T3 T0 | U0 U5 U3 | U7 U4 U1 | U2 U6 U8 | U9 H S | M U0 U9 | _ _ _
+it 322 best 200.000 T2 T1 T4 | T3 T0 T5 | U5 U3 U0 | U7 U1 U4 | U2 U6 U8 | H S M | U9 U0 U9 | _ _ _
+it 348 best 199.000 T1 T3 T2 | T5 T4 T0 | U3 U0 U5 | U1 U4 U7 | U6 U8 U2 | H S M | U9 U0 T4 | _ _ _
+it 372 best 198.500 T1 T3 T5 | T2 T4 T0 | U0 U5 U3 | U0 U4 U7 | U8 U2 U6 | H S M | T4 U9 U1 | _ _ _
+it 373 best 198.000 T1 T5 T3 | T2 T4 T0 | U0 U5 U3 | U0 U4 U7 | U8 U2 U6 | H S M | T4 U9 U1 | _ _ _
+it 379 best 197.000 T1 T5 T3 | T2 T4 T0 | U0 U3 U5 | U0 U4 U7 | U8 U2 U6 | H S M | U9 U1 T4 | _ _ _
+it 419 best 196.000 T1 T4 T3 | T2 T5 T0 | U0 U3 U5 | U0 T0 U6 | U8 U2 U4 | M H S | U1 U7 U9 | _ _ _
+it 500 T 0.747 cur 196.000 best 196.000
+it 613 best 192.000 T4 T0 T1 | T5 T3 T2 | U3 U5 T0 | U0 U4 U0 | U8 U2 U6 | M S H | U9 U1 U7 | _ _ _
+it 646 best 182.000 T0 T1 T4 | T3 T2 T5 | U5 T0 U3 | U0 U4 S | U6 U8 U2 | H M S | U9 U1 U7 | _ _ _
+it 739 best 181.000 T2 T0 T4 | T5 T3 T1 | U3 U9 U1 | U4 U0 U2 | U6 U8 S | H S M | U7 U5 T0 | _ _ _
+it 744 best 178.000 T2 T0 T4 | T5 T3 T1 | U3 U9 U1 | U4 U0 U2 | U5 U8 S | H S M | U6 T0 U7 | _ _ _
+it 790 best 176.000 T2 T0 T4 | T5 T3 T1 | U9 U3 U1 | U4 U0 U2 | S U5 U8 | H M S | U6 T0 U7 | _ _ _
+it 1000 T 0.557 cur 176.000 best 176.000
+it 1487 best 174.000 T3 T4 T1 | T0 T5 T2 | U1 U9 U3 | U4 U0 U2 | U5 U8 S | S M H | U6 T0 U7 | _ _ _
+it 1500 T 0.416 cur 174.000 best 174.000
+it 2000 T 0.311 cur 174.000 best 174.000
+it 2500 T 0.232 cur 174.000 best 174.000
+it 3120 best 172.000 T4 T1 T3 | T0 T5 T2 | U1 U9 U3 | U2 U4 U0 | S U5 U8 | S H M | U7 U6 S | _ _ _
+it 3189 best 168.000 T4 T1 T3 | T2 T0 T5 | U1 U9 U3 | U4 U0 U6 | U5 U8 S | H M S | U7 U2 S | _ _ _
+it 3214 best 166.000 T4 T1 T5 | T0 T3 T2 | U1 U9 U3 | U4 U0 U6 | U5 U8 S | H M S | U7 U2 S | _ _ _
+it 3229 best 164.000 T4 T1 T2 | T0 T3 T5 | U1 U9 U3 | U4 U0 U6 | U8 S U5 | H M S | S U7 U2 | _ _ _
+it 3500 T 0.129 cur 164.000 best 164.000
+it 3717 best 162.000 T4 T0 T2 | T5 T1 T3 | U1 U9 U3 | U0 U6 U4 | S U5 U8 | M H S | U2 S U7 | _ _ _
+it 3797 best 159.000 T0 T2 T4 | T5 T1 T3 | U9 U3 U1 | U6 U4 U0 | U5 S U8 | S H M | U2 S U7 | _ _ _
+it 4000 T 0.097 cur 159.000 best 159.000

@@ -1,0 +1,8 @@
+S 59 +1: mean 1002/240=4.1750 lap 250.50 max 5 (cap 6) nodes 139968 edges 283680 passes 8 | app13 pre 720 per 300 HTM 1342 lap 268.40 max 5 | setup 9
+S 59 -1: mean 250/60=4.1667 lap 250.00 max 5 (cap 6) nodes 139968 edges 284292 passes 175 | app13 pre 180 per 840 HTM 3775 lap 269.64 max 5 | setup 10
+M 59 +1: mean 501/120=4.1750 lap 250.50 max 5 (cap 5) nodes 139968 edges 283680 passes 8 | app13 pre 240 per 60 HTM 266 lap 266.00 max 5 | setup 9
+M 59 -1: mean 250/60=4.1667 lap 250.00 max 5 (cap 5) nodes 139968 edges 284292 passes 175 | app13 pre 780 per 180 HTM 805 lap 268.33 max 6 | setup 10
+H 23 +1: mean 700/168=4.1667 lap 100.00 max 5 (cap 6) nodes 56376 edges 112860 passes 6 | app13 pre 72 per 120 HTM 532 lap 106.40 max 5 | setup 9
+H 23 -1: mean 298/72=4.1389 lap 99.33 max 5 (cap 6) nodes 56376 edges 116964 passes 107 | app13 pre 72 per 360 HTM 1625 lap 108.33 max 5 | setup 10
+H 11 +1: mean 98/24=4.0833 lap 49.00 max 5 (cap 6) nodes 29160 edges 59130 passes 2 | app13 pre 120 per 252 HTM 1113 lap 53.00 max 5 | setup 9
+H 11 -1: mean 495/120=4.1250 lap 49.50 max 5 (cap 6) nodes 29160 edges 58482 passes 59 | app13 pre 60 per 12 HTM 54 lap 54.00 max 5 | setup 9

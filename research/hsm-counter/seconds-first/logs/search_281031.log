@@ -1,0 +1,23 @@
+start 250.500 T0 T1 T2 | T3 T4 T5 | U0 U1 U2 | U3 U4 U5 | U6 U7 U8 | U9 U0 U9 | H S M | _ _ _
+it 5 best 248.000 T0 T1 T3 | T2 T4 T5 | U0 U1 U2 | U4 U5 U3 | U6 U7 U8 | U9 U0 U9 | H S M | _ _ _
+it 8 best 238.200 T0 T1 T3 | T4 T5 T2 | U0 U1 U9 | U4 U5 U3 | U6 U7 U8 | U9 U0 U2 | H S M | _ _ _
+it 11 best 236.000 T1 T3 T0 | T4 T5 T2 | U0 U1 U9 | U4 U2 U3 | U6 U7 U8 | U9 U0 U5 | H S M | _ _ _
+it 13 best 220.000 T1 T3 T0 | T4 T5 T2 | U0 U1 U7 | U4 U2 U3 | U6 U9 U8 | U9 U0 U5 | H S M | _ _ _
+it 21 best 219.500 T1 T3 T0 | T4 T5 T2 | U0 U1 U7 | U4 U2 U3 | U6 U9 U8 | U9 T3 U5 | S M H | _ _ _
+it 23 best 219.000 T1 T3 T4 | T0 T5 T2 | U0 U1 U7 | U4 U2 U3 | U6 U9 U8 | U9 T3 U5 | S M H | _ _ _
+it 38 best 218.000 T1 T3 T4 | T2 T5 T0 | U1 U7 U0 | U4 U2 U3 | U9 U8 U6 | U9 T3 U5 | S M H | _ _ _
+it 42 best 204.500 T1 T3 T4 | T2 T5 T0 | U1 U7 U0 | U2 U6 U4 | U9 U8 U3 | U9 T3 U5 | S M H | _ _ _
+it 59 best 201.000 T1 T0 T4 | T5 T3 T2 | U1 U7 U0 | U2 U6 U4 | U9 U8 U3 | U9 T3 U5 | H S M | _ _ _
+it 102 best 196.000 T1 T0 T4 | T3 T2 T5 | U1 U7 U9 | U2 U6 U4 | U9 U8 U3 | T3 U5 U0 | S M H | _ _ _
+it 134 best 193.000 T4 T1 T0 | T2 T5 U9 | U7 U9 U1 | U2 U6 U4 | U3 T3 U8 | T3 U5 U0 | H M S | _ _ _
+it 208 best 189.000 T1 T3 T4 | T0 T2 T5 | U1 U7 U9 | U4 U2 U6 | U8 U3 U3 | U5 U0 T3 | H S M | _ _ _
+it 500 T 0.606 cur 190.000 best 189.000
+it 513 best 180.500 T2 T3 T4 | T5 T0 T1 | U9 U1 U7 | U6 U4 U2 | S U3 U8 | T3 U5 U0 | S H M | _ _ _
+it 720 best 179.500 T2 T3 T4 | T5 T0 T1 | U9 U1 U7 | U4 U2 U6 | U5 U3 U8 | T3 S U0 | S M H | _ _ _
+it 745 best 178.667 T3 T4 T2 | T1 T0 T5 | U9 U4 U7 | U2 U5 U1 | U3 U8 U6 | S U0 T3 | S H M | _ _ _
+it 836 best 178.000 T2 T5 T4 | T1 T0 T3 | U9 U4 U7 | U5 U1 U2 | U6 U3 U8 | S U0 T3 | H M S | _ _ _
+it 1000 T 0.367 cur 178.000 best 178.000
+it 1067 best 176.000 T2 T0 T4 | T3 T1 T5 | U9 U4 U7 | U1 U2 U5 | U3 U8 U6 | U0 T3 S | H M S | _ _ _
+it 1335 best 175.333 T4 T2 T0 | T1 T5 T3 | U4 U7 U9 | U5 U1 U0 | U3 U8 U6 | S U2 T3 | S H M | _ _ _
+it 1360 best 174.000 T5 T2 T0 | T4 T3 T1 | U4 U7 U9 | U5 U1 U0 | U3 U8 U6 | U2 T3 S | M H S | _ _ _
+it 1435 best 173.000 T5 T1 T0 | T2 T4 T3 | U4 U7 U9 | U1 U0 U5 | U3 U8 U6 | U2 T3 S | H S M | _ _ _
