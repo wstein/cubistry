@@ -10,27 +10,27 @@
   ],
   "workingDirectory": "/workspace/cubistry-proof-flix",
   "clock": "parent time.monotonic_ns for observed startup/exit; child elapsed durations only",
-  "startupToReadyMs": 69.329662,
-  "observedDoneToExitMs": 17.429414,
-  "totalProcessWallMs": 11565.033583,
+  "startupToReadyMs": 77.507133,
+  "observedDoneToExitMs": 17.586894,
+  "totalProcessWallMs": 11880.579127,
   "exitCode": 0,
   "events": [
     {
       "event": "READY",
-      "parentReceivedMs": 69.329662
+      "parentReceivedMs": 77.507133
     },
     {
       "event": "LOAD",
-      "elapsedMs": 113.131752,
+      "elapsedMs": 105.872824,
       "files": 199,
       "bytes": 3135813,
       "scope": "raw-input integrity preflight; no semantic result cache",
-      "parentReceivedMs": 183.99855
+      "parentReceivedMs": 185.404998
     },
     {
       "event": "RESULT",
       "iteration": 0,
-      "elapsedMs": 3566.30691,
+      "elapsedMs": 3472.538737,
       "valid": true,
       "negativeControls": 64,
       "counterCases": 41,
@@ -47,12 +47,12 @@
       "centerGenerators": 36,
       "chainedTransitionsPerFormat": 800,
       "checksum": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
-      "parentReceivedMs": 3751.341464
+      "parentReceivedMs": 3658.41899
     },
     {
       "event": "RESULT",
       "iteration": 1,
-      "elapsedMs": 2706.984098,
+      "elapsedMs": 2806.314769,
       "valid": true,
       "negativeControls": 64,
       "counterCases": 41,
@@ -69,12 +69,12 @@
       "centerGenerators": 36,
       "chainedTransitionsPerFormat": 800,
       "checksum": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
-      "parentReceivedMs": 6458.494361
+      "parentReceivedMs": 6465.06256
     },
     {
       "event": "RESULT",
       "iteration": 2,
-      "elapsedMs": 2587.124708,
+      "elapsedMs": 2918.354382,
       "valid": true,
       "negativeControls": 64,
       "counterCases": 41,
@@ -91,12 +91,12 @@
       "centerGenerators": 36,
       "chainedTransitionsPerFormat": 800,
       "checksum": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
-      "parentReceivedMs": 9045.86857
+      "parentReceivedMs": 9383.626608
     },
     {
       "event": "RESULT",
       "iteration": 3,
-      "elapsedMs": 2500.937637,
+      "elapsedMs": 2478.495308,
       "valid": true,
       "negativeControls": 64,
       "counterCases": 41,
@@ -113,11 +113,11 @@
       "centerGenerators": 36,
       "chainedTransitionsPerFormat": 800,
       "checksum": "2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661",
-      "parentReceivedMs": 11547.064105
+      "parentReceivedMs": 11862.643588
     },
     {
       "event": "DONE",
-      "parentReceivedMs": 11547.604169
+      "parentReceivedMs": 11862.992233
     }
   ],
   "driverSHA256": "e00702897ffb9a5aa4b92b8fa2d3932cb961f83b3d25b0f8eba8684b03d0170d",
