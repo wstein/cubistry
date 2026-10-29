@@ -76,6 +76,9 @@ test("an unknown shorter search retains the successful default route and emits i
   assert.equal(result.attempts[1].status, "unknown");
   assert.equal(tokens(result.word).length, 1);
   assert.equal(result.word, interims[0].word);
+  // The unknown second call must not replace the checked first result's identity.
+  assert.equal(result.method, "center-aware");
+  assert.equal(result.status, "solved");
   assert(matches(apply(ctx.from, result.word), target.cells));
 });
 test("deadline preserves an interim center-aware candidate and its backend truth", async () => {
