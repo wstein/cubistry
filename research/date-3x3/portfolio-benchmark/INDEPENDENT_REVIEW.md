@@ -77,3 +77,52 @@ No remaining blocking evidence finding was identified. Existing 7,074-group
 historical evidence is preserved. No Ready transition, review-comment publication,
 merge or deployment was performed. This review certifies the bounded captured
 physical replays and reported statistics, not a solver completeness theorem.
+
+## V2 independent follow-up: duplicate native search removal
+
+Reviewed frozen Research `2ed6b79f0d85dba372c4706835d1424a1ff7fdc8` (including the V2 evidence and strengthened
+verifiers) in a separate detached checkout. Captured application source is clean
+`0c9b166ca66d252ecd096a73042d322f52d987a0`. The frozen run source is unchanged;
+all original V1 captures and the independent V1 findings above remain preserved.
+
+V2 raw capture SHA-256:
+`c74b7ddb58dd6769ed26aaa0aa18d3f8d58300ab745f18f93c86957152f50b14`.
+Independent full replay passes all **4,716 request groups**, 24 streams, 120 obsolete
+committed turns, **4,254 saved candidate full-frame replays/inverses**, and **2,418
+own-first-proposal retention checks**. All fifteen full-capture corruption controls
+are rejected, including equal-depth second calls and missing skip diagnostics.
+The V2 November paths pass all 30 groups. All 18 historical contexts pass 72
+candidate/inverse replays, with all nine context corruption controls rejected.
+The strengthened checks retain exact integer/nonnegative depths and require every
+reported solved candidate to fit its recorded native outer-face cap.
+
+The reviewer additionally compared every ordered V1/V2 row, rather than accepting
+summary equality: all **4,716 chosen words, complete source and endpoint hashes,
+physical move counts and committed-interruption counts are identical**. V2 has
+**exactly 540 explicitly diagnosed skipped second searches**, 1,836 actual second
+native calls and **zero second calls at an equal or greater depth**. All actual solved
+candidate words fit their native cap. This independently confirms preserved
+captured physical behavior while eliminating the redundant calls. It is not a
+claim that all future soft-budget runs must choose identical paths.
+
+The comparison reproduces unchanged HTM totals of 43,669 for default and 40,984
+for portfolio across each policy's 2,358 groups. V1's 540 equal-depth second calls
+recorded 43.535 seconds of attempt time. Whole run time changed from 462.204 to
+397.839 seconds; portfolio request time sums changed from 296.255 to 239.647
+seconds, while default also varied from 161.019 to 153.441 seconds. The entire
+64.366-second difference cannot be attributed solely to skipping duplicate work.
+These remain descriptive shared-machine/immediate-port measurements with differing
+cache/order conditions, not a latency guarantee or isolated browser benchmark.
+
+V2 year portfolio means are approximately 91–102 ms, versus default 54–72 ms.
+Move paths and the existing maximum of 41 HTM remain unchanged; physical XYZ turns
+are still retained separately. No universal 18/20/21-move bound, optimality or
+zero-cost fallback is established. Build/deployment/browser hard-deadline behavior
+was not measured by this Node capture.
+
+Machine-readable independent replay, corruption, strict-policy and version-identity
+reports are retained as new `*-v2.*independent.json` and
+`calendar-v1-v2.comparison-independent.json` sidecars. No raw capture, original
+review section, or German-layout file was modified. No remaining blocking V2
+evidence finding was identified. No Ready transition, publication, merge or
+deployment was performed.

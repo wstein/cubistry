@@ -1,0 +1,14 @@
+{
+  "status": "PASS_INDEPENDENT_V2_IDENTITY_AND_POLICY",
+  "groups": 4716,
+  "identicalChosenWords": 4716,
+  "identicalFullSourceAndEndpointHashes": 4716,
+  "identicalPhysicalCountsAndCommittedInterruptions": 4716,
+  "explicitSkips": 540,
+  "secondNativeCalls": 1836,
+  "equalOrGreaterSecondNativeDepths": 0,
+  "allSolvedWordsWithinNativeCap": true,
+  "v1CaptureSHA256": "235b91c60b3e9521ff62cb10807e16067f59a57b5cc035f21c0076d4f4187952",
+  "v2CaptureSHA256": "c74b7ddb58dd6769ed26aaa0aa18d3f8d58300ab745f18f93c86957152f50b14",
+  "latencyGuarantee": "UNKNOWN"
+}

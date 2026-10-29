@@ -1,0 +1,38 @@
+{
+  "status": "MEASURED_COMPARISON",
+  "v1CaptureSHA256": "235b91c60b3e9521ff62cb10807e16067f59a57b5cc035f21c0076d4f4187952",
+  "v2CaptureSHA256": "c74b7ddb58dd6769ed26aaa0aa18d3f8d58300ab745f18f93c86957152f50b14",
+  "v1AppHead": "1ef2ffc64b9eeb2d8065de75021ff5e6053cfffc",
+  "v2AppHead": "0c9b166ca66d252ecd096a73042d322f52d987a0",
+  "v1ElapsedMs": 462204.255081,
+  "v2ElapsedMs": 397838.70146300003,
+  "providers": [
+    {
+      "provider": "baseline-center",
+      "groups": 2358,
+      "identicalChosenWords": 2358,
+      "identicalFullPhysicalEndpoints": 2358,
+      "v1HTMTotal": 43669,
+      "v2HTMTotal": 43669,
+      "v1RequestMsTotal": 161019.34699300048,
+      "v2RequestMsTotal": 153440.993385,
+      "v1EqualDepthSecondNativeCalls": 0,
+      "v1EqualDepthSecondElapsedMs": 0,
+      "v2EqualDepthSecondNativeCalls": 0
+    },
+    {
+      "provider": "portfolio",
+      "groups": 2358,
+      "identicalChosenWords": 2358,
+      "identicalFullPhysicalEndpoints": 2358,
+      "v1HTMTotal": 40984,
+      "v2HTMTotal": 40984,
+      "v1RequestMsTotal": 296255.04381900013,
+      "v2RequestMsTotal": 239647.2221170014,
+      "v1EqualDepthSecondNativeCalls": 540,
+      "v1EqualDepthSecondElapsedMs": 43534.80195100003,
+      "v2EqualDepthSecondNativeCalls": 0
+    }
+  ],
+  "latencyGuarantee": "UNKNOWN; shared-machine measurements and process cache/order differ"
+}
