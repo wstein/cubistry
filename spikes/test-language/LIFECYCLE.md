@@ -105,3 +105,8 @@ python3 spikes/test-language/lifecycle_contract_test.py
 
 Existing production code, Python verifiers and CI remain unchanged. Historical
 startup/throughput observations are preserved; the lifecycle experiment is additive.
+
+The [independent lifecycle review](lifecycle/independent/LIFECYCLE_REVIEW.md)
+separately executed all four runtimes, checked the nine-control rejection and
+protocol regressions, reconciled the timeline table and verified the source/input
+hashes. No unresolved findings remain within this finite prototype scope.
