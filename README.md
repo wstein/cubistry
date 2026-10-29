@@ -150,3 +150,11 @@ defines complete targets and initial states, not transition detours.
 The counter reports committed / planned HTM moves during playback.
 [Move progress and Stop after this value](docs/COUNTER_MOVE_PROGRESS.md) document
 queue/reset behavior and the existing non-optimal reference-state route.
+
+## Physical sticker sheets
+
+The separate Print stickers page provides compact vector print/cut PDFs for the
+selected calendars and HSM lettering variants. Example dimensions must be
+checked on the actual cube before ordering. See the
+[print/export contract](docs/PRINT_STICKERS.md) for source-face assembly maps,
+cut contours, licenses and reproducible custom-size exports.
