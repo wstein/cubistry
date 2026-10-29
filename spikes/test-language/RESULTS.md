@@ -53,6 +53,10 @@ roughly 0.5–0.8 s measurements are not an equivalent cross-language speed rati
   Ten corrupted inputs are rejected, including Boolean/fractional values, an
   oversized identity, out-of-range position, duplicate identity, illegal notation,
   wrong target, changed unpadded print and rotated print-up vector.
+  The recorded Julia reasons show that two controls are caught indirectly:
+  the oversized identity by a checked `Int` conversion (`InexactError`) and
+  the rotated print-up vector by the fixed unpadded-print consistency check,
+  whereas Python reports `Image not upright` for the latter.
 - **GNU Octave:** all 2,400 full exported sticker frames agree with Python, with
   100 padded witnesses, inverses and six corruption controls. Its intentionally
   incomplete schema/cubie validation means the prototype must not replace the
@@ -71,7 +75,8 @@ roughly 0.5–0.8 s measurements are not an equivalent cross-language speed rati
   timer trace, 3×3 center proof, corruption suite or print-artwork checker.
 
 Julia has fixed-width integers as well as explicit arbitrary-precision types;
-this prototype bounds identities and coordinates before using machine integers.
+this prototype accepts only integral JSON numbers and converts them with checked
+`Int` conversion, so out-of-range values raise instead of wrapping.
 Its modulo operation is chosen explicitly for negative quarter turns. Typed
 arithmetic or a new language does not itself prove a checker correct. The Julia
 JSON dependency is locked; the prototype no longer uses deprecated JSON3.
