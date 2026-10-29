@@ -1,140 +1,159 @@
-# Declarative Status Cube reference
+# CI Quality Cube reference
 
-The [Status Cube](../status.html) is the focused prototype for
-[issue #84](https://github.com/wstein/cubistry/issues/84). One immutable 2×2 print
-shows six local workflow states. Manual selection and simulated events share
-the same physical controller. There are no live agent, GitHub or WorkHarbor
-integrations.
+The [CI Quality Cube](../status.html) implements
+[issue #84](https://github.com/wstein/cubistry/issues/84) with four fixed front
+categories in row-major order: **BUILD, TEST, ANALYZE, REVIEW**. Each category
+independently shows Open, Running, OK, Error, or Blocked. All 625 manual
+combinations are supported. Events are local simulations; external services and
+agent integrations remain outside this reference application.
 
-## Fixed physical definition
+## Immutable print and artwork
 
-[`definition.json`](../src/apps/status/definition.json) separates the print and
-asset manifest from the application state machine:
+Every physical sticker permanently carries its category at the top, a large
+vector icon in the center, and its state word at the bottom. The user-specified
+physical words are **OFFEN, LÄUFT, OK, FEHLER, BLOCKIERT**; these intentional German
+print labels do not change the English application controls or documentation.
+Open uses a gray hollow circle; Running a blue circular arrow; OK a green check;
+Error a red cross; Blocked an amber circle with a slash. Meaning is conveyed by
+words and shape as well as color, against a light warm background.
+
+The chosen print assigns two corner bodies to each category. In target-twist
+order the first carries Open / Open / Running and the second OK / Error /
+Blocked. Thus all 24 stickers are labeled, using 20 distinct artworks. All
+stickers retain their IDs, local normals, up vectors and asset references while
+turning. A state change never replaces or repaints artwork.
+
+The authoritative [SVG artwork](../public/assets/quality/) contains paths rather
+than platform emoji or SVG text. The existing shared asset loader checks its
+hashes, SVG allowlist and resource bounds. Text is outlined from the existing
+Noto Sans 800 asset, `@fontsource/noto-sans@5.2.10`, under the accompanying
+[SIL Open Font License](../public/fonts/OFL.txt).
+[Artwork provenance](../public/assets/quality/provenance.json) records the font
+hash, fontTools version, dimensions, safe area and ink bounds for every label.
+Editable words, colors and icon paths remain in the
+[export script](../scripts/export-quality-art.py). SVG dimensions are 256×256
+with a 14-unit safe area. This prototype does not add a printable sheet exporter.
+
+## Reviewed finite policy and provenance
+
+The promoted data comes from immutable research commit
+[`6058f4dc59e36ce226f5840c2e3f5ca635a96b4a`](https://github.com/wstein/cubistry/tree/6058f4dc59e36ce226f5840c2e3f5ca635a96b4a/research/ci-quality-cube).
+The publication author snapshot is `e9e544c0b2cfdffc55918e4ef9e8ef4d78d84d9b`.
+The separate [independent research review](https://github.com/wstein/cubistry/blob/6058f4dc59e36ce226f5840c2e3f5ca635a96b4a/research/ci-quality-cube/independent-review/REVIEW.md)
+classifies all 625 upright displays and the policy as **SAT**. The app promotes
+only the chosen fixed print, 625 setup references, a small coordinate catalog,
+and the exact 136,080-byte four-tracked-corner distance certificate. It does not
+merge the research branch, comparison prints, generators or a new generic solver.
+
+The certificate SHA256 is
+`f56224ee1b76e2bdaac4bb8441df5881e6b7c9a51dd6a14e62eff58e78e396d6`.
+Its exact-distance histogram for HTM distances zero through seven is
+`1,15,198,2030,15396,61768,53528,3144`. The app checks certificate and catalog
+hashes before accepting them. Unit tests independently check rank/unrank, the
+unique zero, every move inequality and a descending edge for every non-goal.
+The catalog's 24-pose action is generated using the existing shared mechanics;
+tests compare all 18 actions for all 24 poses on all eight bodies.
+
+The app-specific [policy consumer](../src/apps/status/policy.ts) projects the
+actual complete committed cube state into this reviewed coordinate catalog.
+For a valid front with one changed category, it preserves the actual IDs of the
+three unchanged front stickers, enumerates the changed artwork copies, and
+selects a descending certificate route with at most **six HTM**. This bound also
+holds after repeated transitions, independently of hidden back-corner poses.
+For arbitrary jumps or an interrupted pose without a valid upright category
+front, it enumerates at most sixteen target-copy combinations and uses at most
+**seven HTM**. Every resulting route is replayed with shared `applyMoves`, and
+its complete eight-body endpoint and upright visible target are checked before
+animation. There is no inverse-to-setup detour.
+
+Some transitions require six HTM for this fixed print. A universal five-HTM bound
+is **UNSAT within the specified five-state paired-body print construction**;
+global print optimization remains **UNKNOWN**. The research mean of 4.012821 HTM
+uses uniform logical edges followed by uniform source copies and alternate-body
+back poses. It is a comparison distribution, not a runtime average promise.
+
+## Declarative application and controls
+
+[`definition.json`](../src/apps/status/definition.json) is the primary app data:
 
 | Field                     | Responsibility                                                   |
 | ------------------------- | ---------------------------------------------------------------- |
-| `schema`, `version`, `id` | Bounded, versioned app-local configuration                       |
-| `initial`                 | Initial logical and physical status                              |
-| `print`, `assets`         | Permanent cubie/sticker IDs, local frames and artwork            |
-| `statuses`                | IDs, labels, four fixed glyph tiles and legal setup references   |
-| `events`                  | Event IDs, allowed source states, destination and optional fault |
-| `demonstration`           | Deterministic local event sequence                               |
+| `schema`, `version`, `id` | Bounded app-local format                                         |
+| `categories`, `states`    | Fixed front order, logical IDs, UI labels and physical words     |
+| `print`, `assets`         | Immutable physical sticker frames and hashed vector artwork      |
+| `initial`, `targets`      | Initial snapshot and all 625 legal setup references              |
+| `edges`, `events`         | Allowed logical transitions and event source/destination table   |
+| `demonstration`           | Deterministic category/event sequence                            |
+| `policy`                  | Research revision, artifact hashes and verified bound references |
 
-The six faces read **IDLE**, **PLAN**, **CODE**, **TEST**, **REVW**, and **DONE**
-in row-major order. Each face has its own color, but the letters and full UI
-labels carry meaning independently of color. Text tiles use the existing pinned
-Noto Sans 800 font, its SHA256, the shared asset loader and the accompanying
-[SIL Open Font License](../public/fonts/OFL.txt). Images are created once at
-initialization; status changes never replace sticker images or reconfigure the
-print. This is not a printable-sheet export.
+Four native selects permit every manual combination. Event category and event
+controls use the same requested snapshot and controller. The 13 directed edges
+are Open→Running/Error/Blocked, Running→OK/Error/Blocked/Open,
+OK→Running/Open, Error→Running/Open, and Blocked→Running/Open. An event rejected
+by its source-state rule leaves the requested snapshot unchanged. Error means
+an attempt failed; Blocked means a prerequisite is unavailable.
 
-Each status has a short legal setup word. For example `U D'` turns the two
-opposite layers of a physical 2×2; it is a physical whole-cube reorientation,
-not a camera command. Every animated token remains an existing outer face turn.
-The generator assigns source print-up vectors through those actual rigid frames.
-The schema validator then replays every setup and checks the exact upright
-front through the canonical mechanics contract. Unit tests replay all 36 target
-pairs, including inverse restoration. These explicit witnesses establish
-reachability for this fixed six-state design; they do not establish arbitrary
-workflow capacity, globally shortest paths or support for other puzzle sizes.
+The current snapshot is the last fully completed display; requested snapshot,
+committed move progress, synchronization and errors are shown separately. Rapid
+requests finish the current legal turn, discard obsolete remaining moves, and
+replan from the actual committed full pose toward the latest request. Returning
+to the previous completed snapshot still repairs an interrupted intermediate
+pose. **Finish active snapshot** drops the queued target and completes the active
+snapshot. **Stop demo** cancels future simulated events while the already
+requested physical display finishes. Each demo begins with an explicit request
+for the initial snapshot so it is deterministic from any manual selection.
 
-Reproduce the definition after building the existing core:
-
-```sh
-npm run build:core
-node scripts/generate-status-design.mjs
-node --test --test-isolation=none tests/status-definition.test.mjs tests/status-controller.test.mjs
-```
-
-The generator is deterministic and contains no solver, search or alternative
-physical engine. It is an application-data construction rather than a change
-to the accepted mechanics model.
-
-## Logical events and committed physical state
-
-`StatusWorkflow` applies the declarative event table to the **requested** logical
-state. For example a rapid queued → coding → testing → review → done sequence
-can finish logically before the physical cube catches up. Invalid events leave
-that state unchanged and produce a visible error. A simulated `agent.failed`
-event requests Review and displays an explicit fault; it does not invent a
-seventh physical face. A subsequent normal event or manual override clears the
-workflow fault.
-
-`StatusController` adapts string status IDs to the existing
-[`PhysicalPlayback`](../src/apps/shared/playback.ts) contract. It records only
-successfully completed turns. From any committed intermediate pose it verifies
-a legal route back through its source reference and onward to the chosen
-status. The latest request replaces obsolete queued moves after the active
-legal turn finishes. A return to the last completed status still repairs any
-intermediate physical pose. Routes are bounded for this small catalog and are
-not advertised as optimal.
-
-The UI distinguishes requested status, last completed status, current move
-progress, synchronization and errors. **Finish active status** discards the
-queued target and finishes the current full display. **Stop demo** cancels only
-future simulated events; the already requested physical display still finishes.
-The quarter-turn setting uses the viewer's existing angular timing, with a half
-turn taking twice as long.
-
-An asset-integrity or initialization failure never claims a configured physical
-status. An animation failure stops further requests, retains the authoritative
-last committed pose and move count, and exposes **Reload application**. Recovery
-starts a new page session; there is no unverified runtime teleport or guessed
-completion of a failed turn. A viewer that fails partway through a turn may be
-visually out of sync until that explicit reload.
+Certificate, artwork or initialization failure never claims a configured
+physical display. Animation failure retains the last committed state and count,
+freezes further requests, and exposes **Reload application**. If rendering failed
+partway through a turn, the visual pose can remain uncertain until that explicit
+reload; it is never guessed to have committed.
 
 ## Architecture learning report
 
-- **Declarative part:** states, fixed artwork references, allowed event sources,
-  destinations, initial state and demonstration sequence are data. Ingress
-  checks unknown references, duplicates, bounds and physical target witnesses.
-- **Imperative remainder:** DOM binding, local demo timing, physical source
-  references, resource ownership and error presentation remain small app-local
-  adapters. No general runtime or new framework package is extracted.
-- **Physical boundary:** the app imports the existing `@cubistry/cube-core`
-  and `@cubistry/cube-mechanics` contracts and reuses `CubeViewer` and
-  `PhysicalPlayback`. These current private workspaces contain the ReScript
-  physical implementation described in [the M1 contract](SHARED_CUBE_M1.md).
-  PuzlWerk remains the intended foundation owner; this prototype neither
-  migrates that boundary nor duplicates its state, mechanics or orientation
-  rules. It needs no runtime solver because all targets have checked setup
-  references. Existing pinned PuzlWerk dependencies remain unchanged.
-- **Extensibility friction:** `PhysicalPlayback` uses numeric display values,
-  while workflow IDs are strings. A thin index adapter is sufficient here;
-  do not redesign that shared interface from one example. Likewise, the main
-  chooser and Vite entry list require explicit registration. A future
-  consolidation can compare these points with other reference apps first.
-- **Error handling hotspot:** general resumable failures need a clearer viewer
-  rollback/resynchronization contract. This MVP deliberately freezes and offers
-  explicit fresh-load recovery rather than pretending a rejected animation
-  committed.
-- **Next consolidation evidence:** compare target IDs, event coalescing,
-  committed-pose notifications and app registration with the other reference
-  applications before deciding on a shared declarative runtime. This report
-  does not accept a new architecture decision or start that consolidation.
+PuzlWerk owns physical state, identities, orientation, mechanics and solver
+capabilities. The existing private `@cubistry/cube-core` and
+`@cubistry/cube-mechanics` ReScript contracts remain the accepted transitional
+boundary described in [the M1 contract](SHARED_CUBE_M1.md). This reference changes
+no provider, generic solver API, shared domain implementation or other repository.
+The finite app policy is a consumer of a reviewed certificate, not another
+physical engine: only shared mechanics advance full states or validate turns.
 
-## Validation and boundaries
+Cubistry owns declarative application composition, category controls, demo timing,
+visualization, resource ownership and error presentation. The existing
+`PhysicalPlayback` numeric API encodes four base-five fields in a thin adapter.
+The endpoint is chosen dynamically from the actual pose, cached with its route,
+and passed to the existing exact-state completion checks. That avoids requiring
+one canonical hidden pose for every logical snapshot or changing the playback
+framework. The viewer and its camera behavior remain shared and unchanged.
 
-Focused Node tests cover all six targets, all target pairs, strict definition
-rejection controls, deterministic events, source-reference continuity, rapid
-preemption, finish-active behavior, resource cleanup and failure freezing.
-Browser tests exercise native keyboard selection, all rendered statuses,
-physical viewer/controller agreement, real non-reduced animation interruption,
-invalid events, simulated failure, corrupt font bytes and fresh-load recovery.
-A built-Pages case checks all assets under `/cubistry/` and event playback.
-Desktop and mobile DPR2 checks keep the canvas CSS bounds inside its host while
-retaining the high-resolution drawing buffer, and verify that camera dragging
-does not change physical state before another status transition.
+The imperative remainder is DOM binding, local demo timing and the app-specific
+certificate decoder. Potential consolidation lessons are snapshot encoding,
+target predicates versus complete endpoint plans, and a clearer failed-animation
+recovery contract. Compare these with other reference apps before extracting any
+shared runtime. This work does not begin that consolidation.
+
+## Reproduction and validation
+
+Use the existing fontTools artwork environment with Brotli support, then supply
+the exact pinned research checkout to the data generator:
 
 ```sh
-npm run typecheck
+python3 scripts/export-quality-art.py
+node scripts/generate-status-design.mjs /path/to/pinned-research-checkout
+node --test --test-isolation=none tests/status-definition.test.mjs tests/status-controller.test.mjs
 npm run check
 npx playwright test tests/browser/status-cube.spec.mjs
 npx playwright test --config playwright.pages.config.mjs tests/pages/status-cube.spec.mjs
 ```
 
-Existing Counter, Timer, HSM, Clock and Calendar keep their implementations and
-physical designs. Their existing regression gates remain applicable. The only
-existing application change is a chooser link to this separate page. External
-agents, workflow persistence, arbitrary uploaded definitions, additional error
-faces and larger puzzles are outside this prototype.
+The focused tests cover all target witness hashes, full-body replay and inverse
+restoration, certificate edges, repeated per-field routes, strict declarations,
+all manual snapshots and event edges, interruptions, resource disposal and fault
+freezing. Browser tests inspect installed bitmap colors and vector artwork,
+physical viewer/controller agreement, words for every category/state, keyboard
+selection, real animation preemption, corruption, and desktop/mobile DPR2 canvas
+bounds and camera interaction. Pages tests check the certificate and all twenty
+SVG assets under `/cubistry/`. Existing Counter, Timer, HSM, Clock and Calendar
+regression gates continue to apply. The retained `status.html` URL and `status-cube`
+chooser value remain compatible; the chooser label is now CI Quality Cube.
