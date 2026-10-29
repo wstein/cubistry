@@ -29,6 +29,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
+        playground: fileURLToPath(new URL("./playground.html", import.meta.url)),
         status: fileURLToPath(new URL("./status.html", import.meta.url)),
         print: fileURLToPath(new URL("./print.html", import.meta.url)),
         calendar: fileURLToPath(new URL("./calendar.html", import.meta.url)),
