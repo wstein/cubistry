@@ -14,7 +14,7 @@ OUT = ROOT / 'public/assets/hsm/words'
 OUT.mkdir(parents=True, exist_ok=True)
 font = TTFont(FONT)
 glyphs, cmap = font.getGlyphSet(), font.getBestCmap()
-font_size, baseline = 67.2, 232
+font_size, baseline = 80.64, 232
 scale = font_size / font['head'].unitsPerEm
 images, bounds = [], {}
 for letter, word in [('H', 'hour'), ('M', 'min'), ('S', 'sec')]:
