@@ -71,6 +71,18 @@ for page in range(1,M['pages']+1):
      need(sdf<=3e-5,'actual vector ink bounds inside rounded safe cut inset')
    safe_paths+=1
 need(set(seen)==set(rec) and len(seen)==len(rec),'all artwork source UIDs')
+# Placement checks alone accept consistently swapped glyphs; tie each identity's art to its printed label.
+art={}
+for page in range(1,M['pages']+1):
+ for group in ET.parse(OUT/f'artwork-{page}.svg').getroot().findall('s:g',ns):
+  art[group.attrib['id']]=tuple((p.attrib['d'],p.attrib.get('fill')) for p in group.findall('s:g/s:path',ns))
+for i in src:need(len({art[r['uid']] for r in rec.values() if r['id']==i})==1,'identical art for one source identity in every copy')
+shapes={}
+for r in rec.values():
+ need(bool(art[r['uid']])==bool(r['image']),'blank stickers carry no ink and labeled stickers carry ink')
+ shapes.setdefault(r['image'],set()).add(tuple(d for d,_ in art[r['uid']]))
+need(all(len(v)==1 for v in shapes.values()),'one glyph geometry per printed label')
+need(len({next(iter(v)) for v in shapes.values()})==len(shapes),'distinct printed labels have distinct glyph geometry')
 
 pdf=PdfReader(OUT/'print.pdf');need(len(pdf.pages)==M['pages'],'PDF page count')
 for page in pdf.pages:
