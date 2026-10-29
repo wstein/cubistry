@@ -12,7 +12,9 @@ import {
 } from "./apps/calendar/model.ts";
 import { CalendarViewer } from "./apps/calendar/viewer.ts";
 import { CalendarController } from "./apps/calendar/controller.ts";
+import { CalendarOptimizer } from "./apps/calendar/optimizer.ts";
 import pin from "../calendar-source.json";
+const optimizer = new CalendarOptimizer();
 const $ = (id) => document.getElementById(id),
   base = deploymentBasePath(import.meta.env.BASE_URL),
   cache = new Map();
@@ -77,6 +79,14 @@ function showMoves() {
   $("calendar-moves").textContent = p.planning
     ? "Planning legal route…"
     : `${p.completed.htm} / ${p.total.htm} HTM · ${p.completed.rotations} / ${p.total.rotations} cube rotations`;
+  $("calendar-moves").dataset.route = p.route;
+  $("calendar-route").textContent = p.planning
+    ? "Finding a shorter legal route…"
+    : p.route === "optimized"
+      ? "Optimized physical route"
+      : p.route === "fallback"
+        ? "Verified baseline route (shorter route unavailable)"
+        : "Initial display";
   $("calendar-queue").textContent = p.queued
     ? "Latest requested date is queued."
     : "";
@@ -106,22 +116,7 @@ function showMoves() {
       const counts = controller.estimate(target);
       if (counts)
         return `${counts.htm} HTM + ${counts.rotations} cube rotations`;
-      const active = controller,
-        key = requested;
-      void active
-        .prepare(target)
-        .then((result) => {
-          if (
-            result &&
-            ready &&
-            controller === active &&
-            !active.busy &&
-            key === requested
-          )
-            showMoves();
-        })
-        .catch(() => {});
-      return "Planning route…";
+      return "Calculated when selected";
     } catch {
       return "Date limit";
     }
@@ -203,6 +198,7 @@ async function configure() {
       findTarget(design, date),
       viewer,
       changed,
+      optimizer.plan,
     );
     ready = true;
     showControl();
@@ -302,3 +298,7 @@ export const calendarApp = {
     return viewer;
   },
 };
+
+window.addEventListener("pagehide", (event) => {
+  if (!event.persisted) optimizer.dispose();
+});

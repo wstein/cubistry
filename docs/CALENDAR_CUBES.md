@@ -34,13 +34,18 @@ their inverse routes, including upright centers and every nonblank glyph.
 The scoped calendar engine models all 26 bodies and 54 immutable sticker frames.
 It supports only legal outer face turns and whole-cube rotations. The existing
 size-2 core/viewer contracts remain unchanged. The initial date is installed by
-replaying its source route during setup. Subsequent changes follow the inverse
-of the actual committed source route and the new date's route, canceling adjacent
-turns of the same face. Full endpoint equality is checked before committing.
+replaying its source route during setup. Subsequent changes use a bounded, worker-based direct relative solver from the
+actual physical pose. The inverse actual source route followed by the new setup
+route remains a checked fallback, not the default optimization strategy. Every
+selected move is replayed and the full endpoint is checked before committing.
 Identical visible dates may retain their existing full pose and source route.
 
-These are validated feasible paths, not shortest date transitions. A date change
-can require dozens of turns; the UI explicitly says Updating during motion. No
+These are validated feasible paths, not shortest date transitions. The earlier
+unconnected optimizer caused 40–85-turn setup detours. The connected solver
+reduces the October 28 → 29, 2026 examples from 79 to 19 HTM for German A and
+77 to 17 HTM for English 3, preserving both prints. Some transitions can still
+require more than 20 moves, particularly visible-center orientation repairs.
+The UI identifies optimized routes and verified fallback routes honestly. No
 five-move bound from the HSM counter is claimed for a 3×3. A busy controller keeps
 one active route and only the latest pending date. A failed route stops with an
 error rather than installing an unverified pose.
@@ -67,19 +72,26 @@ adjacent controls on desktop and within the narrow mobile viewport.
 
 The move display reports completed/total outer-face HTM and completed/total
 whole-cube rotations separately. A half turn counts as one HTM; x/y/z rotations
-never count as HTM. Initial setup is excluded. Idle −1/+1 previews use the actual
-committed physical pose and its retained source route, including when identical
-visible targets have different hidden poses. During motion, neighbor estimates
-are explicitly unavailable until the full endpoint commits. These are exact
-counts for the current playback policy, not shortest-path claims.
+never count as HTM. Initial setup is excluded. Counts use the actual committed
+physical pose, including hidden orientations. Neighbor routes are calculated
+when selected; the page does not start competing background solver jobs merely
+to populate idle estimates. These are exact counts for the selected playback
+route, not shortest-path claims.
 
 The controller also accepts an optional asynchronous route provider. Prepared
 plans and estimates are bound to the exact source pose and retained reference
 word. Only strictly shorter routes that replay to the required upright face are
 accepted; invalid or failed solver output uses the checked baseline route. A
 noncanonical endpoint retains its actual source-to-pose path rather than being
-replaced by a canonical setup. The default application still uses the baseline
-until a separately validated optimizer is connected.
+replaced by a canonical setup. The default application connects this provider to the pinned Research
+[transition optimizer](../src/apps/calendar/transition/provenance.json). It has
+a soft 500 ms search budget between at most six solver attempts and a hard
+8-second worker deadline including cold startup. Timeout, worker errors, invalid
+results, or a candidate that is not strictly shorter preserve the checked
+fallback. A single worker handles one solve and one replaceable pending request;
+no unbounded queue of solver jobs is retained. Browser restoration from the
+back/forward cache preserves the provider. The solver is `cubing@0.66.1`;
+production builds use ES worker chunks with module-relative asset paths.
 
 ## Original artwork
 
@@ -98,7 +110,7 @@ the referenced commercial calendar cube artwork.
 
 ```sh
 npm run check
-npm run test:e2e -- tests/browser/calendar.spec.mjs
+npm run test:e2e -- tests/browser/calendar.spec.mjs tests/browser/calendar-optimizer.spec.mjs
 node scripts/export-calendar-art.mjs
 ```
 
