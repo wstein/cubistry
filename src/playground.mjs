@@ -27,18 +27,26 @@ function update() {
   $("cube").setAttribute("aria-busy", String(s.busy));
   Object.assign($("cube").dataset, {
     ready: "true",
-    exact: String(s.exact),
-    equivalent: String(s.rotationEquivalent),
+    exact: s.frozen ? "unknown" : String(s.exact),
+    equivalent: s.frozen ? "unknown" : String(s.rotationEquivalent),
     cursor: String(s.cursor),
     style: s.style,
     solver: s.solverStatus,
     turning: String(s.turning),
     frozen: String(s.frozen),
   });
-  $("exact").textContent = s.exact ? "Solved" : "Unsolved";
-  $("exact").dataset.solved = String(s.exact);
-  $("equivalent").textContent = s.rotationEquivalent ? "Solved" : "Unsolved";
-  $("equivalent").dataset.solved = String(s.rotationEquivalent);
+  $("exact").textContent = s.frozen
+    ? "Unknown"
+    : s.exact
+      ? "Solved"
+      : "Unsolved";
+  $("exact").dataset.solved = String(!s.frozen && s.exact);
+  $("equivalent").textContent = s.frozen
+    ? "Unknown"
+    : s.rotationEquivalent
+      ? "Solved"
+      : "Unsolved";
+  $("equivalent").dataset.solved = String(!s.frozen && s.rotationEquivalent);
   for (const el of manual) el.disabled = s.busy || s.frozen;
   $("undo").disabled = s.busy || s.frozen || s.cursor === 0;
   $("redo").disabled = s.busy || s.frozen || s.cursor === s.history.length;
@@ -144,6 +152,11 @@ try {
   );
   update();
 } catch (error) {
+  for (const session of sessions.values()) session.assets.dispose();
+  viewer?.destroy();
+  $("cube").setAttribute("aria-busy", "false");
+  $("exact").textContent = "Unavailable";
+  $("equivalent").textContent = "Unavailable";
   $("status").textContent =
     `Unable to start: ${error.message}. Reload to try again.`;
 }
