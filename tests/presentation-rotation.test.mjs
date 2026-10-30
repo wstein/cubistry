@@ -39,3 +39,40 @@ test("orientation-independent fitting contains single cubes and rigid clock asse
   for (const args of [[0, 1, 24], [1, 0, 24], [1, 1, NaN], [1, 1, 180]]) assert.throws(() => presentationCameraRadius(...args));
   assert.throws(() => rotatePresentation(new THREE.Group(), NaN, 0));
 });
+
+test("production pointer routing is reversible across the click threshold and stops on release/cancel", async () => {
+  const { installPresentationDrag } = await import("../packages/cube-viewer/src/presentation-input.ts");
+  const { viewTurn } = await import("../packages/cube-viewer/src/orbit-input.ts");
+  class Target extends EventTarget {
+    captured = new Set();
+    setPointerCapture(id) { this.captured.add(id); }
+    hasPointerCapture(id) { return this.captured.has(id); }
+    releasePointerCapture(id) { this.captured.delete(id); }
+    send(type, x, y, id = 1) {
+      const event = new Event(type); Object.assign(event, { pointerId: id, clientX: x, clientY: y });
+      this.dispatchEvent(event);
+    }
+  }
+  const element = new Target(), root = new THREE.Group(), camera = new THREE.PerspectiveCamera();
+  fitPresentationCamera(camera, cubePresentationRadius(1));
+  const cameraBefore = { position: camera.position.toArray(), quaternion: camera.quaternion.toArray(), projection: camera.projectionMatrix.toArray() };
+  let yaw = .2, pitch = .1, calls = 0;
+  rotatePresentation(root, yaw, pitch); const initial = root.quaternion.clone();
+  const cancel = installPresentationDrag(element, (dx, dy, dt) => {
+    const delta = viewTurn(dx, dy, dt); yaw -= delta.yaw; pitch += delta.pitch;
+    rotatePresentation(root, yaw, pitch); calls++;
+  }, 4);
+  element.send("pointerdown", 100, 100); element.send("pointermove", 102, 101);
+  assert.equal(calls, 0);
+  element.send("pointermove", 140, 120); assert(root.quaternion.angleTo(initial) > .1);
+  element.send("pointermove", 100, 100); assert(root.quaternion.angleTo(initial) < 1e-7);
+  for (const terminal of ["pointerup", "pointercancel", "lostpointercapture"]) {
+    element.send(terminal, 100, 100); const before = calls;
+    element.send("pointermove", 200, 200); assert.equal(calls, before);
+    assert.equal(element.captured.size, 0);
+    element.send("pointerdown", 100, 100);
+  }
+  cancel(); element.send("pointermove", 300, 300);
+  assert(root.quaternion.angleTo(initial) < 1e-7);
+  assert.deepEqual({ position: camera.position.toArray(), quaternion: camera.quaternion.toArray(), projection: camera.projectionMatrix.toArray() }, cameraBefore);
+});

@@ -12,8 +12,9 @@ export function createPresentationStudio(
   halfCubeExtent = 1,
   horizontalExtent = halfCubeExtent,
   host?: HTMLElement,
+  presentationRadius = Math.SQRT2 * halfCubeExtent,
 ) {
-  const lights = addPresentationLighting(scene, Math.max(halfCubeExtent, horizontalExtent) * 1.7 + 1,
+  const lights = addPresentationLighting(scene, Math.max(halfCubeExtent, horizontalExtent, presentationRadius) * 1.7 + 1,
     PRESENTATION_PRESET.shadowSoftness * halfCubeExtent);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),
     // ShadowMaterial is transparent outside actual geometric occlusion. A
@@ -22,8 +23,8 @@ export function createPresentationStudio(
       depthWrite: false, side: THREE.FrontSide }));
   floor.name = "studio-shadow-receiver";
   floor.rotation.x = -Math.PI / 2;
-  // Conservative face-turn sweep. The floor never intersects a moving layer.
-  floor.position.y = -Math.SQRT2 * halfCubeExtent - 0.08;
+  // Keep the receiver below the entire rigid assembly, including local turn sweeps.
+  floor.position.y = -presentationRadius - 0.08;
   floor.receiveShadow = true;
   scene.add(floor);
   const backgrounds = new Map<HTMLElement, string>();
