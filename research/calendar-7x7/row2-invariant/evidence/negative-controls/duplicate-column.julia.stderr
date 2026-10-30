@@ -1,0 +1,1 @@
+INVALID	AssertionError: col == column && (1 <= id <= 294 && 1 <= piece <= 218)

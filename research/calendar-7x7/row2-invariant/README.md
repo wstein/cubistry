@@ -15,8 +15,12 @@ legal existence witness from PR #99, commit
 `1bd783245abaa0d10946945be309e9fe8392d392`. It changes no printing, calendar
 layout, physical model, old checker, proof input or application code.
 
-Status: **UNKNOWN pending both native checks**. This document will record the
-actual matching receipts before asserting the scoped result.
+Status: **research-local SAT for the checked endpoint-invariance claim**.
+The independent native Julia and Flix runs accept all 91 existing states and
+five continuous chains, and their 114-line row-invariant receipts are
+byte-identical. All four certificate-corruption controls are rejected by both.
+Independent agent review remains pending; no canonical proof registration or
+production promotion is claimed.
 
 ## Why the existing printing is promising
 
@@ -73,7 +77,26 @@ are [Main.flix](flix/src/Main.flix) and [build.sh](flix/build.sh). The Flix buil
 copies the unchanged native English geometry, calendar, printing and DAG
 modules, preserving their independent implementation.
 
-Exact executable commands, source and artifact hashes, receipts, negative
-controls, and independent review will accompany the completed result. Python
-is not a proof authority. No browser E2E, merge, deployment or release is part
-of this research.
+From the repository root, with Julia 1.13.3, Flix 0.79.0, wrapper 0.34.9
+and Java 21:
+
+```sh
+# Fetch the pinned PR #115 dependency if its commit is not present locally.
+git fetch origin 545e342b75d883e88159fd31d8acfcdee3b95f59
+JULIA_BIN=julia research/calendar-7x7/row2-invariant/reproduce.sh /tmp/calendar7-row2
+```
+
+The [manifest](experiment.json) pins the print, original DAG, practical source
+commit and raw input hashes, new checker sources, and saved receipts. The
+[Julia](evidence/julia.tsv) and [Flix](evidence/flix.tsv) receipts agree on
+seven unique oriented surfaces, all 91 complete-state hashes, five chain
+sources, ten retained endpoints, and the same row serialization hash:
+`2592f05dad652f99ad8f6bfed0cf77b86061747856edb6bf75bb63f7cbacb95a`.
+The [full Flix log](evidence/flix-full.tsv) additionally contains unchanged
+DAG-reader progress messages, which are excluded from receipt comparison.
+
+The [negative-control matrix](evidence/negative-results.tsv) records rejection
+of a wrong weekday ID, wrong up vector, duplicate column and wrong row position.
+The shell drivers only prepare bytes, invoke native checkers and compare their
+receipts. Python is not a proof authority. No browser E2E, merge, deployment or
+release is part of this research.

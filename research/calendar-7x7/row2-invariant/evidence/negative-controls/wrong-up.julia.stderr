@@ -1,0 +1,1 @@
+INVALID	AssertionError: p == (column - 4, 2, 3) && (n == FRONT_NORMAL && u == (0, 1, 0))
