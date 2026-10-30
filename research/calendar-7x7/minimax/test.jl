@@ -1,6 +1,14 @@
 using Test,Random
 include(joinpath(@__DIR__,"chains.jl"))
 const M=Minimax
+@testset "Word-context ties do not depend on pool insertion order" begin
+    # Ordering-only labels, not a physical-state feasibility certificate.
+    p=Tuple(UInt16.(1:24));constraints=[(1,Set(UInt16[2]))]
+    a=M.Node(p,2,[1],[1,8]);b=M.Node(p,2,[2],[8,1])
+    rank(n)=M.node_rank(n,constraints,8,2)
+    @test rank(a)!=rank(b)
+    @test map(n->n.word,sort([a,b];by=rank))==map(n->n.word,sort([b,a];by=rank))
+end
 @testset "HTM and exact endpoint algebra" begin
     action=M.P.pose_action();a=M.Algebra(action)
     @test M.htm([1,1,7,-8,14,14])==2
