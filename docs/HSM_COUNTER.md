@@ -53,9 +53,14 @@ identity changed, so no new glyph SVG exists. The word variant (`hour`, `min`,
 ## Proof and implementation boundary
 
 The exact print and runtime digest are pinned in [hsm-source.json](../hsm-source.json).
-The pin names the research branch `research/hsm-seconds-first`, commit
-`24240a3b2dbd691de99d5bf1170b5695fc62a320`, and the SHA-256 of the witness and of its
-README, verification and manifest files. A verbatim copy of the witness lives at
+The pin names the long-lived research branch `research/cube-display-feasibility`,
+commit `4d9ef771305def5c4f6e9b1f2eec7689a03ed21b`, where the research landed with
+its independent review, and the SHA-256 of the witness and of its README,
+verification, manifest and checker files there. The research was first published
+on `research/hsm-seconds-first` at `24240a3b2dbd691de99d5bf1170b5695fc62a320`
+(recorded as `firstPublished`). The witness, `verification.json` and `verify.py`
+are byte-identical at both commits; only the README (the added review section)
+and the manifest's README hash differ. A verbatim copy of the witness lives at
 [data/hsm/seconds-first/witness.json](../data/hsm/seconds-first/witness.json);
 `node scripts/derive-hsm-runtime.mjs` derives the runtime file
 [public/hsm-counter.v2.json](../public/hsm-counter.v2.json) from it (`--check`
@@ -64,9 +69,13 @@ calendar print manifests pin the print input adapter by hash; its schema version
 is 3, and the digest pin makes a stale cached copy fail loudly instead of
 loading a mismatched print.
 
-> **Review status.** The research branch is not merged and the independent review
-> of the seconds-first proof is pending. The application consumes the pinned
-> witness; it does not claim the research result is confirmed. The previous pin
+> **Review status: reviewed, not CONFIRMED.** The independent review recorded in
+> the research README found no blocking proof issue and recomputed the 159, 204,
+> 82 and 40 figures with its own Python model; the review of this application
+> change recomputed the same laps through the real controller. Under
+> [proof-checkers/AUTHORITY.md](../proof-checkers/AUTHORITY.md) the result is not
+> CONFIRMED until both the Flix and the Julia checker accept it, which has not
+> been done. The application consumes the pinned witness. The previous pin
 > (`blank/witness.json`, SHA-256 `13eea2a1…`, review commit `8e9ad5c0…`) is retained
 > in `hsm-source.json` under `supersedes`. Print optimality remains UNKNOWN; the
 > research README states what is proved and what is best-found.

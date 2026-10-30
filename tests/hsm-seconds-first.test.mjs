@@ -41,10 +41,16 @@ const planner = new HsmPlanner();
 // ---------------------------------------------------------------- provenance
 
 test("the witness copy and runtime file are pinned to the research commit", () => {
-  assert.equal(pin.layoutBranch, "research/hsm-seconds-first");
+  // The research landed on the long-lived research branch together with its
+  // independent review; the first publication stays recorded.
+  assert.equal(pin.layoutBranch, "research/cube-display-feasibility");
   assert.match(pin.layoutCommit, /^[0-9a-f]{40}$/);
-  assert.equal(pin.layoutCommit, "24240a3b2dbd691de99d5bf1170b5695fc62a320");
+  assert.equal(pin.layoutCommit, "4d9ef771305def5c4f6e9b1f2eec7689a03ed21b");
   assert.equal(pin.proofCommit, pin.layoutCommit);
+  assert.deepEqual(
+    [pin.firstPublished.branch, pin.firstPublished.commit],
+    ["research/hsm-seconds-first", "24240a3b2dbd691de99d5bf1170b5695fc62a320"],
+  );
   assert.equal(
     pin.layoutPath,
     "research/hsm-counter/seconds-first/witness.json",
@@ -55,7 +61,8 @@ test("the witness copy and runtime file are pinned to the research commit", () =
     assert.match(path, /^research\/hsm-counter\/seconds-first\/[A-Za-z.]+$/);
     assert.match(hash, /^[0-9a-f]{64}$/);
   }
-  assert.match(pin.reviewStatus, /^pending/);
+  // Reviewed, but not CONFIRMED in the sense of proof-checkers/AUTHORITY.md.
+  assert.match(pin.reviewStatus, /^reviewed, not CONFIRMED/);
   assert.equal(sha(runtimeBytes), pin.runtimeSHA256);
   // The previous pin is kept as history and still names the old print.
   assert.equal(
