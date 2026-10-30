@@ -56,7 +56,7 @@ test("flick inertia is capped, a tap interrupts return, and Free/Classic/reduced
   await mode(page, "classic"); await drag(page, 80, 20, 50, 0); expect((await snapshot(page)).phase).toBe("idle");
   await mode(page, "free"); await drag(page, 80, 20, 50, 0); expect((await snapshot(page)).phase).toBe("coasting"); await page.clock.runFor(12000);
   const free = await snapshot(page); expect(free.phase).toBe("idle"); expect(free.deadline).toBeNull();
-  await page.emulateMedia({ reducedMotion: "reduce" }); await mode(page, "smart"); await drag(page, 80, 20, 50, 0);
+  await page.emulateMedia({ reducedMotion: "reduce" }); await mode(page, "smart"); await drag(page, 80, 20, 50, 0); await page.clock.runFor(180);
   expect((await snapshot(page)).phase).toBe("idle"); await page.clock.runFor(10000); const end = await snapshot(page);
   expect(end.phase).toBe("idle"); expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
 });
@@ -75,4 +75,22 @@ test("real touch release coasts and the clock rotates one rigid assembly with a 
   });
   expect(geometry.midpoint).toBeLessThan(1e-7); expect(geometry.span).toBeCloseTo(5.6, 7); expect(geometry.children).toBe(true);
   const end = await snapshot(page, "clock"); expect(end.orientation).not.toEqual(before.orientation); expect(end.camera).toEqual(before.camera); await client.detach();
+});
+
+// Owner follow-up: upright default / optional Free. Source only, NOT RUN.
+test("upright defaults retain vertical up through drag/coast/return; Free mode levels continuously when leaving it", async ({page})=>{
+ await ready(page);const initial=await snapshot(page);
+ await drag(page,100,80,100,0);
+ const upright=async()=>page.evaluate(async()=>{const v=(await import('/src/apps/picture3/page.ts')).picture3App.viewer;
+  const q=v.presentation.quaternion,up=v.camera.up.clone().set(0,1,0).applyQuaternion(q);return [up.x,up.y];});
+ for(let i=0;i<40;i++){const up=await upright();expect(Math.abs(up[0])).toBeLessThan(1e-7);expect(up[1]).toBeGreaterThan(.049);await page.clock.runFor(100);}
+ await mode(page,'free');await drag(page,80,40);await drag(page,-30,70);const rolled=await snapshot(page);
+ await mode(page,'smart');const start=await snapshot(page);expect(start.orientation).toEqual(rolled.orientation);expect(start.phase).toBe('leveling');
+ await page.clock.runFor(400);const beforeTap=await snapshot(page),box=await page.locator('#cube canvas').boundingBox();
+ await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.clock.runFor(200);
+ expect((await snapshot(page)).orientation).toEqual(beforeTap.orientation);await page.mouse.up();await page.clock.runFor(1050);
+ const up=await upright();expect(Math.abs(up[0])).toBeLessThan(1e-7);expect(up[1]).toBeGreaterThan(.049);
+ expect((await snapshot(page)).state).toBe(initial.state);expect((await snapshot(page)).camera).toEqual(initial.camera);
+ await mode(page,'free');await drag(page,80,40);await drag(page,-30,70);await page.emulateMedia({reducedMotion:'reduce'});await mode(page,'classic');
+ expect((await snapshot(page)).phase).toBe('leveling');await page.clock.runFor(180);expect((await snapshot(page)).phase).toBe('idle');
 });
