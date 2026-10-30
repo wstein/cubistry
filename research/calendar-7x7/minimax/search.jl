@@ -12,8 +12,33 @@ struct Node
     path::Vector{Int}
 end
 
-function cached_catalogues(action,a;relax_budget=0)
+function extra_seeds!(raw,action,a;seed_budget=46656)
+    legal=[i for i in 1:21 if i%7!=0]
+    setups=[([x,y,-x],P.macro_word_perm([x,y,-x],a.generators))
+        for x in legal for y in legal if div(x-1,7)!=div(y-1,7)]
+    attempts=0;improved=zeros(Int,10)
+    for (wa,pa) in setups,(wb,pb) in setups
+        attempts>=seed_budget && break
+        attempts+=1
+        p=P.compose(P.compose(P.compose(pa,pb),P.invert(pa)),P.invert(pb))
+        affected=[k for k in 1:11 if any(p[i]!=i for i in (24k-23):24k)]
+        length(affected)==1 || continue
+        k=only(affected);k in (4,7,10) || continue
+        count(i->p[i]!=i,(24k-23):24k)==(k==4 ? 6 : 3) || continue
+        key=Tuple(UInt8.(p[(24k-23):24k].-(24k-24)))
+        word=simplify(vcat(wa,wb,P.macro_inverse(wa),P.macro_inverse(wb)),a)
+        old=get(raw[k],key,nothing)
+        if isnothing(old) || (htm(word),length(word),word)<(htm(old),length(old),old)
+            raw[k][key]=word;improved[k]+=1
+        end
+    end
+    println("seeds12\t",attempts,'\t',join(improved,','))
+end
+
+function cached_catalogues(action,a;relax_budget=0,seed_budget=0)
+    @assert relax_budget>=0 && seed_budget>=0
     raw=P.chain_catalogues(action);alphabet=P.chain_alphabet(action)
+    seed_budget>0 && extra_seeds!(raw,action,a;seed_budget)
     for k in 1:10
         for key in sort!(collect(keys(raw[k])))
             raw[k][key]=simplify(raw[k][key],a)
@@ -67,7 +92,8 @@ function greedy(occupants,constraints,actions)
 end
 path_word(path,actions)=reduce(vcat,(actions[i].word for i in path);init=Int[])
 
-function orbit_search(occupants,constraints,actions,a; width=8,maxdepth=6,budget=150000)
+function orbit_search(occupants,constraints,actions,a; width=8,maxdepth=6,budget=150000,weight=2)
+    @assert width>=0 && maxdepth>=0 && budget>=0 && weight>0
     score(v)=count(v[i] in allowed for (i,allowed) in constraints)
     total=length(constraints);incumbent=greedy(occupants,constraints,actions)
     best=isnothing(incumbent) ? nothing : simplify(path_word(incumbent.path,actions),a)
@@ -87,7 +113,10 @@ function orbit_search(occupants,constraints,actions,a; width=8,maxdepth=6,budget
             matched=score(next)
             if matched==total
                 word=simplify(path_word(path,actions),a);price=htm(word)
-                if isnothing(best) || (price,length(word),word)<(bound,length(best),best)
+                better=isnothing(best) || price<bound ||
+                    (price==bound && (length(word)<length(best) ||
+                    (length(word)==length(best) && (weight==1 ? word<best : word>best))))
+                if better
                     best=word;bound=price
                 end
             elseif cost<bound
@@ -95,7 +124,7 @@ function orbit_search(occupants,constraints,actions,a; width=8,maxdepth=6,budget
             end
         end
         isempty(pool) && break
-        rank(n)=(n.cost+2cld(total-score(n.occupants),3)*cheapest,n.cost,-score(n.occupants),n.occupants)
+        rank(n)=(n.cost+weight*cld(total-score(n.occupants),3)*cheapest,n.cost,-score(n.occupants),n.occupants)
         nodes=sort!(collect(values(pool));by=rank)
         beam=nodes[1:min(width,length(nodes))]
         attempts>=budget && break
@@ -103,13 +132,13 @@ function orbit_search(occupants,constraints,actions,a; width=8,maxdepth=6,budget
     best
 end
 
-function solve_month(source,start,target,action,cache,a; width=8,budget=150000)
+function solve_month(source,start,target,action,cache,a; width=8,budget=150000,weight=2)
     prefix=P.chain_core_prefix(source,start,target,action)
     state=prefix.state;word=copy(prefix.word)
     for k in 1:10
         constraints=P.macro_front_constraints(source,target,action,k)
         occupants=Tuple(P.invert(state)[(24k-23):24k])
-        selected=orbit_search(occupants,constraints,cache[k],a;width,budget)
+        selected=orbit_search(occupants,constraints,cache[k],a;width,budget,weight)
         isnothing(selected) && error("UNKNOWN SEARCH_BUDGET_EXHAUSTED orbit=$k width=$width budget=$budget")
         state=P.compose(state,P.macro_word_perm(selected,a.generators));append!(word,selected)
     end
@@ -117,10 +146,10 @@ function solve_month(source,start,target,action,cache,a; width=8,budget=150000)
     (;word=improve_word(word,a),state)
 end
 
-function generate(dag,out;relax_budget=0,width=8,budget=150000)
+function generate(dag,out;relax_budget=0,seed_budget=0,width=8,budget=150000)
     mkpath(out);proof=P.replay_dag(dag);action=proof.action;a=Algebra(action)
     source=P.read_physical(joinpath(@__DIR__,"..","english","evidence","physical-print.tsv"))
-    cache=cached_catalogues(action,a;relax_budget)
+    cache=cached_catalogues(action,a;relax_budget,seed_budget)
     open(joinpath(out,"attempts.tsv"),"w") do log
         println(log,"chain\tedge\tstatus\thtm\tseconds\treason")
         for i in (3,2,1,4)
@@ -146,6 +175,6 @@ function generate(dag,out;relax_budget=0,width=8,budget=150000)
 end
 end
 if abspath(PROGRAM_FILE)==@__FILE__
-    @assert length(ARGS)==5 "DAG OUT RELAX_BUDGET BEAM_WIDTH EXPANSION_BUDGET"
-    Minimax.generate(ARGS[1],ARGS[2];relax_budget=parse(Int,ARGS[3]),width=parse(Int,ARGS[4]),budget=parse(Int,ARGS[5]))
+    @assert length(ARGS) in (5,6) "DAG OUT RELAX_BUDGET BEAM_WIDTH EXPANSION_BUDGET [SEED_BUDGET]"
+    Minimax.generate(ARGS[1],ARGS[2];relax_budget=parse(Int,ARGS[3]),width=parse(Int,ARGS[4]),budget=parse(Int,ARGS[5]),seed_budget=length(ARGS)==6 ? parse(Int,ARGS[6]) : 0)
 end
