@@ -110,5 +110,15 @@
       "investigator": "Codex Sol",
       "scope": "Input decimal exactness; mathematical graph code unaffected"
     }
+  ],
+  "reviews": [
+    {
+      "scope": "Independent Julia static review; no heavy execution or final proof clearance",
+      "sourceCommit": "f5cad26b39d80e32a7bbe4f21674f35184699fb7",
+      "sourcePath": "proof-checkers/review/HSM-RECOVERY-JULIA-STATIC.md",
+      "archivedCopy": "reviews/julia-static-review.txt",
+      "sha256": "f2f9e4993b52547a8ba11482eff7768342302150c4775c027c4a035819cdc0ae",
+      "result": "No blocking static findings; complete native confirmation still UNKNOWN"
+    }
   ]
 }
