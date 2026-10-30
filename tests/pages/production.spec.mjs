@@ -43,7 +43,13 @@ function renderedDigit(image, centerX) {
     segments: centers
       .map((p, i) => (sample(...p) ? "abcdefg"[i] : ""))
       .join(""),
-    uprightBaseline: sample(128, 234),
+    // The small underline sits close to the lower edge of the artwork.
+    // Perspective foreshortening and GPU rasterization can move a single
+    // projected pixel off its stroke. Probe a narrow lower band rather than
+    // requiring one exact pixel; exclude the seven-segment bottom bar at 208.
+    uprightBaseline: [224, 230, 236, 242].some((y) =>
+      [112, 120, 128, 136, 144].some((x) => sample(x, y)),
+    ),
   };
 }
 
