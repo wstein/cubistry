@@ -21,6 +21,7 @@ import {
   createCounterSolver,
   type CounterSolver,
 } from "../../adapters/puzlwerk-2x2.ts";
+import { routeTurnTiming } from "../shared/turn-timing.ts";
 import { timerTarget, timerStep, type TimerRoute } from "./design.ts";
 /** A separate physical print/application; it never reinterprets Counter stickers. */
 export class TimerController extends PhysicalPlayback {
@@ -31,6 +32,7 @@ export class TimerController extends PhysicalPlayback {
   private solver: CounterSolver | null = null;
   private timing: { target: number; motion: MotionTiming } | null = null;
   private timingRevision = 0;
+  private planned: readonly LegalMove[] = [];
   setDeadline(target: number, endAt: number, durationMs: number): void {
     if (
       this.timing?.target === target &&
@@ -48,15 +50,14 @@ export class TimerController extends PhysicalPlayback {
     this.timingRevision++;
   }
   protected animateMove(presentation: MovePresentation): Promise<void> {
-    const finalMove = this.playback.completed + 1 === this.playback.total;
-    return this.view.animate(
-      presentation,
-      finalMove
-        ? () =>
-            this.timing?.target === this.playback.target
-              ? this.timing.motion
-              : null
-        : undefined,
+    const index = this.playback.completed, route = this.planned, target = this.playback.target;
+    // Every turn can acquire/revise/release timing after it has started.
+    // Capture this route/target so a queued target cannot lend it a deadline.
+    return this.view.animate(presentation, () =>
+      this.timing?.target === target
+        ? routeTurnTiming(route, index, this.timing.motion.endAt,
+            this.timing.motion.durationMs, this.timing.motion.revision, "htm")
+        : null,
     );
   }
   private prepared: {
@@ -136,8 +137,8 @@ export class TimerController extends PhysicalPlayback {
     const prepared = this.prepared;
     this.prepared = null;
     if (prepared?.value === value && stateEquals(prepared.source, from))
-      return prepared.moves;
-    return (
+      return this.planned = prepared.moves;
+    return this.planned = (
       timerStep(this.route, from, this.current, value) ??
       this.solver.solve(from, target, { coordinateFrames: true })
     );
