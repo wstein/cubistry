@@ -19,7 +19,6 @@ import {
   overriddenSticker,
   type FaceletImageOverride,
 } from "./facelet-image.ts";
-import { clampPitch, viewTurn } from "./orbit-input.ts";
 import { animateTimedProgress, type MotionTimingSource } from "./motion-timing.ts";
 export { clampPitch, pitchLimit } from "./orbit-input.ts";
 export type { MotionTiming, MotionTimingSource } from "./motion-timing.ts";
@@ -37,7 +36,9 @@ export {
   createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
 } from "./presentation-preset.ts";
 export { PhysicalCubeScene, stickerFrame, type PhysicalStickerFrame } from "./physical-scene.ts";
-import { installPresentationDrag } from "./presentation-input.ts";
+import { bindSmartRotation, type SmartRotationBinding } from "./rotation-binding.ts";
+export { bindSmartRotation, type SmartRotationBinding } from "./rotation-binding.ts";
+export { SmartRotation, ROTATION_TUNING, type RotationMode, type RotationPhase } from "./smart-rotation.ts";
 export { installPresentationDrag } from "./presentation-input.ts";
 import { rotatePresentation, cubePresentationRadius, fitPresentationCamera } from "./presentation-rotation.ts";
 export { rotatePresentation, cubePresentationRadius, presentationCameraRadius, fitPresentationCamera } from "./presentation-rotation.ts";
@@ -92,12 +93,10 @@ export class CubeViewer {
   private stickerMaterials = new Map<number, THREE.MeshStandardMaterial>();
   private faceletImageOverride: FaceletImageOverride | null = null;
   private presented: CubeState | null = null;
-  private yaw = Math.PI / 18;
-  private pitch = (7 * Math.PI) / 180;
   private radius = 10.5;
   private busy = false;
   private destroyed = false;
-  private cancelDrag?: () => void;
+  private rotation?: SmartRotationBinding;
   private readonly resize: ResizeObserver | null = null;
   private readonly shared: boolean;
   private readonly resetSharedCamera?: () => void;
@@ -145,17 +144,17 @@ export class CubeViewer {
       "Physical cube viewer. Drag to rotate the cube.",
     );
     el.setAttribute("role", "img");
-    this.cancelDrag = installPresentationDrag(el, (dx, dy, elapsed) => {
-      // Historical event name retained for app hints and existing consumers.
-      this.host.dispatchEvent(new Event("cube-camera-change"));
-      const d = viewTurn(dx, dy, elapsed);
-      this.yaw -= d.yaw;
-      this.pitch = clampPitch(this.pitch + d.pitch);
-    }, 4);
+    rotatePresentation(this.presentation, Math.PI / 18, (7 * Math.PI) / 180);
+    this.rotation = bindSmartRotation(el, this.presentation, { sensitivity: .008, threshold: 4,
+      panel: this.appearanceControls.panel,
+      // Historical event name retained for hints and existing consumers.
+      changed: () => this.host.dispatchEvent(new Event("cube-camera-change")),
+    });
     el.addEventListener(
       "wheel",
       (e) => {
         e.preventDefault();
+        this.rotation?.interact();
         const previous = this.radius;
         this.radius = Math.max(6, Math.min(18, this.radius + e.deltaY * 0.005));
         if (this.radius !== previous) {
@@ -167,7 +166,7 @@ export class CubeViewer {
     );
     this.fitCamera();
     this.renderer.setAnimationLoop(() => {
-      rotatePresentation(this.presentation, this.yaw, this.pitch);
+      this.rotation?.step();
       this.renderer.render(this.scene, this.camera);
     });
   }
@@ -181,10 +180,7 @@ export class CubeViewer {
       this.resetSharedCamera?.();
       return;
     }
-    this.yaw = Math.PI / 18;
-    this.pitch = (7 * Math.PI) / 180;
-    this.cancelDrag?.();
-    rotatePresentation(this.presentation, this.yaw, this.pitch);
+    this.rotation?.reset();
   }
   private fitCamera(): void {
     fitPresentationCamera(this.camera, cubePresentationRadius(1), this.radius / 10.5);
@@ -366,6 +362,7 @@ export class CubeViewer {
     this.destroyed = true;
     if (!this.shared) this.renderer.setAnimationLoop(null);
     this.resize?.disconnect();
+    this.rotation?.dispose();
     this.studio?.dispose();
     this.appearanceControls?.dispose();
     this.scene.removeFromParent();

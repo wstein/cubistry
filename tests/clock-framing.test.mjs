@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { PerspectiveCamera, Vector3, Group } from "three";
+import { PerspectiveCamera, Vector3, Group, Quaternion, Euler } from "three";
+import { rotationHarness } from "./helpers/rotation-harness.mjs";
 import { rotatePresentation } from "../packages/cube-viewer/src/presentation-rotation.ts";
 import { clockCameraRadius, clockBounds } from "../src/apps/clock/framing.ts";
 test("stationary shared clock camera contains the rigid turn envelope at every presentation extreme", () => {
@@ -37,7 +38,7 @@ test("shared clock camera rejects invalid projection input", () => {
 });
 
 
-test("whole-group orbit reaches rear and bottom without crossing the poles and resets without moving cubes", async () => {
+test("legacy input bounds and shared quaternion reset preserve placement and explicit zoom", async () => {
   const { groupOrbit, groupZoom } = await import("../src/apps/clock/orbit.ts");
   const { ClockStage } = await import("../src/apps/clock/stage.ts");
   const start = { yaw: .2, pitch: .16 };
@@ -50,9 +51,16 @@ test("whole-group orbit reaches rear and bottom without crossing the poles and r
   assert(Math.abs(full.yaw - start.yaw) < 1e-8);
   const cubes = [{ position: [-2.8, 0, 0] }, { position: [0, 0, 0] }, { position: [2.8, 0, 0] }];
   const snapshot = structuredClone(cubes);
-  const stage = Object.assign(Object.create(ClockStage.prototype), { ...rear, zoom: 1.8, cubes, presentation: new Group(), camera: new PerspectiveCamera(28, 1, .1, 1000) });
+  const presentation = new Group(), initial = new Quaternion().setFromEuler(new Euler(.16, -.2, 0));
+  const h = rotationHarness({root:presentation,initial});
+  const stage = Object.assign(Object.create(ClockStage.prototype), { zoom: 1.8, cubes, presentation,
+    camera: new PerspectiveCamera(28, 1, .1, 1000), rotation:h.binding });
+  rotatePresentation(presentation, rear.yaw, rear.pitch);
   stage.resetCamera();
-  assert.deepEqual({ yaw: stage.yaw, pitch: stage.pitch, zoom: stage.zoom }, { ...start, zoom: 1.8 });
+  assert(presentation.quaternion.angleTo(initial)<1e-7);
+  assert.equal(stage.zoom,1.8);
+  assert.equal(h.binding.controller.phase,"idle");
+  h.binding.dispose();
   assert.deepEqual(cubes, snapshot);
   assert.equal(groupZoom(1, -10000), .8);
   assert.equal(groupZoom(1, 10000), 2);
