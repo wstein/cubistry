@@ -1,0 +1,33 @@
+{
+  "schema": "cubistry.hsm-seconds-first-modes-experiment",
+  "version": 1,
+  "baseResearchCommit": "4d9ef771305def5c4f6e9b1f2eec7689a03ed21b",
+  "status": "SAT",
+  "print": {
+    "path": "research/hsm-counter/seconds-first/witness.json",
+    "sha256": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3",
+    "unchanged": true
+  },
+  "edgeLimitHTM": 5,
+  "modes": 18,
+  "unsatModes": [],
+  "unknownModes": [],
+  "witnessSchema": "cubistry.hsm-seconds-first-modes",
+  "recoverySchema": "cubistry.hsm-seconds-first-recovery",
+  "selection": "+1 own period forward / backward with inverted words; the -1 own period only if strictly cheaper per lap, or equal with a smaller maximum (never)",
+  "certification": "independent Python checker only (verify_modes.py); not CONFIRMED under proof-checkers/AUTHORITY.md",
+  "seed": 281028,
+  "tests": 7,
+  "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "python": "3.13.18",
+  "files": {
+    "README.md": "6af8fa3b66ed7406314ea7bcc9d33e04badcbf6e722c5442c518763fef5403d2",
+    "generate_modes.c": "3f9a2992b2526a71dd518bff299f5da62755fc1e35733e80786aeeec825561d8",
+    "logs/generate-modes.log": "b36f698d5e34add4c390e68c1aec9a30ce95823fdc3b53b2a5c5b1c27c0c5d27",
+    "recovery.json": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda",
+    "test_verify_modes.py": "ef91c99aede367b4c2f74c3f58467fce1b57eb1dc4f67eb45907796d61a92711",
+    "verification.json": "5747b9d3e2e12e8f8798c6c1dc789ab309ffbc0f047a5b53ffa1a26d72ec1b3d",
+    "verify_modes.py": "d140f88bedbc920f46fcba9fe5cc0e8bcee3e8263a4feee175942a2ad06e08f6",
+    "witness.json": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae"
+  }
+}

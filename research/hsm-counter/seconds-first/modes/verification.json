@@ -1,0 +1,1952 @@
+{
+  "status": "SAT",
+  "witnessSHA256": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae",
+  "recoverySHA256": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda",
+  "baseWitnessSHA256": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3",
+  "printCode": "T0 T2 T4 | T1 T3 T5 | U3 U1 U9 | U8 S U5 | U2 U7 S | U4 U0 U6 | S H M | _ _ _",
+  "edgeLimitHTM": 5,
+  "ownPeriods": [
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "periodEdges": 60,
+      "laps": 1,
+      "periodHTM": 159,
+      "meanHTM": "53/20",
+      "perLapHTM": "159",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 3,
+        "perLapMean": "3"
+      },
+      "setupHTM": 9,
+      "htmCap": 6
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "periodEdges": 60,
+      "laps": 1,
+      "periodHTM": 171,
+      "meanHTM": "57/20",
+      "perLapHTM": "171",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9,
+      "htmCap": 6
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": 1,
+      "periodEdges": 24,
+      "laps": 1,
+      "periodHTM": 68,
+      "meanHTM": "17/6",
+      "perLapHTM": "68",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 5,
+        "maximum": 5,
+        "perLapMean": "5"
+      },
+      "setupHTM": 10,
+      "htmCap": 6
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": -1,
+      "periodEdges": 96,
+      "laps": 4,
+      "periodHTM": 281,
+      "meanHTM": "281/96",
+      "perLapHTM": "281/4",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 4,
+        "perLapMean": "15/4"
+      },
+      "setupHTM": 10,
+      "htmCap": 6
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": 1,
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 32,
+      "meanHTM": "8/3",
+      "perLapHTM": "32",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9,
+      "htmCap": 6
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": -1,
+      "periodEdges": 48,
+      "laps": 4,
+      "periodHTM": 135,
+      "meanHTM": "45/16",
+      "perLapHTM": "135/4",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 2,
+        "maximum": 4,
+        "perLapMean": "13/4"
+      },
+      "setupHTM": 9,
+      "htmCap": 6
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "periodEdges": 120,
+      "laps": 2,
+      "periodHTM": 408,
+      "meanHTM": "17/5",
+      "perLapHTM": "204",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9,
+      "htmCap": 5
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "periodEdges": 240,
+      "laps": 4,
+      "periodHTM": 819,
+      "meanHTM": "273/80",
+      "perLapHTM": "819/4",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 2,
+        "maximum": 4,
+        "perLapMean": "7/2"
+      },
+      "setupHTM": 9,
+      "htmCap": 5
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": 1,
+      "periodEdges": 48,
+      "laps": 2,
+      "periodHTM": 164,
+      "meanHTM": "41/12",
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9,
+      "htmCap": 5
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": -1,
+      "periodEdges": 24,
+      "laps": 1,
+      "periodHTM": 82,
+      "meanHTM": "41/12",
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 8,
+      "htmCap": 5
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": 1,
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 40,
+      "meanHTM": "10/3",
+      "perLapHTM": "40",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9,
+      "htmCap": 5
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": -1,
+      "periodEdges": 60,
+      "laps": 5,
+      "periodHTM": 206,
+      "meanHTM": "103/30",
+      "perLapHTM": "206/5",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 5,
+        "perLapMean": "21/5"
+      },
+      "setupHTM": 9,
+      "htmCap": 5
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": 1,
+      "periodEdges": 120,
+      "laps": 2,
+      "periodHTM": 408,
+      "meanHTM": "17/5",
+      "perLapHTM": "204",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 10,
+      "htmCap": 6
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": -1,
+      "periodEdges": 240,
+      "laps": 4,
+      "periodHTM": 819,
+      "meanHTM": "273/80",
+      "perLapHTM": "819/4",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 2,
+        "maximum": 4,
+        "perLapMean": "7/2"
+      },
+      "setupHTM": 9,
+      "htmCap": 6
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "periodEdges": 48,
+      "laps": 2,
+      "periodHTM": 164,
+      "meanHTM": "41/12",
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9,
+      "htmCap": 6
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "periodEdges": 24,
+      "laps": 1,
+      "periodHTM": 82,
+      "meanHTM": "41/12",
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 9,
+      "htmCap": 6
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 40,
+      "meanHTM": "10/3",
+      "perLapHTM": "40",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4,
+        "perLapMean": "4"
+      },
+      "setupHTM": 8,
+      "htmCap": 6
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "periodEdges": 60,
+      "laps": 5,
+      "periodHTM": 206,
+      "meanHTM": "103/30",
+      "perLapHTM": "206/5",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 5,
+        "perLapMean": "21/5"
+      },
+      "setupHTM": 10,
+      "htmCap": 5
+    }
+  ],
+  "applicationModes": [
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodEdges": 60,
+      "laps": 1,
+      "periodHTM": 159,
+      "perLapHTM": "159",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 3
+      },
+      "setupHTM": 9,
+      "certifiedClass": "shortest-edge recurrent schedules of this direction"
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodEdges": 60,
+      "laps": 1,
+      "periodHTM": 159,
+      "perLapHTM": "159",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 3,
+        "maximum": 3
+      },
+      "setupHTM": 9,
+      "certifiedClass": "inverses of shortest-edge recurrent schedules of the opposite direction"
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodEdges": 24,
+      "laps": 1,
+      "periodHTM": 68,
+      "perLapHTM": "68",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 5,
+        "maximum": 5
+      },
+      "setupHTM": 10,
+      "certifiedClass": "shortest-edge recurrent schedules of this direction"
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodEdges": 24,
+      "laps": 1,
+      "periodHTM": 68,
+      "perLapHTM": "68",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 5,
+        "maximum": 5
+      },
+      "setupHTM": 10,
+      "certifiedClass": "inverses of shortest-edge recurrent schedules of the opposite direction"
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 32,
+      "perLapHTM": "32",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "shortest-edge recurrent schedules of this direction"
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 32,
+      "perLapHTM": "32",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "inverses of shortest-edge recurrent schedules of the opposite direction"
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodEdges": 120,
+      "laps": 2,
+      "periodHTM": 408,
+      "perLapHTM": "204",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "shortest-edge recurrent schedules of this direction"
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodEdges": 120,
+      "laps": 2,
+      "periodHTM": 408,
+      "perLapHTM": "204",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "inverses of shortest-edge recurrent schedules of the opposite direction"
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodEdges": 48,
+      "laps": 2,
+      "periodHTM": 164,
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "shortest-edge recurrent schedules of this direction"
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodEdges": 48,
+      "laps": 2,
+      "periodHTM": 164,
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "inverses of shortest-edge recurrent schedules of the opposite direction"
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 40,
+      "perLapHTM": "40",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "shortest-edge recurrent schedules of this direction"
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 40,
+      "perLapHTM": "40",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "inverses of shortest-edge recurrent schedules of the opposite direction"
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodEdges": 120,
+      "laps": 2,
+      "periodHTM": 408,
+      "perLapHTM": "204",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 10,
+      "certifiedClass": "shortest-edge recurrent schedules of this direction"
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodEdges": 120,
+      "laps": 2,
+      "periodHTM": 408,
+      "perLapHTM": "204",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 10,
+      "certifiedClass": "inverses of shortest-edge recurrent schedules of the opposite direction"
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodEdges": 48,
+      "laps": 2,
+      "periodHTM": 164,
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "shortest-edge recurrent schedules of this direction"
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodEdges": 48,
+      "laps": 2,
+      "periodHTM": 164,
+      "perLapHTM": "82",
+      "maximumHTM": 5,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 9,
+      "certifiedClass": "inverses of shortest-edge recurrent schedules of the opposite direction"
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 40,
+      "perLapHTM": "40",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 8,
+      "certifiedClass": "shortest-edge recurrent schedules of this direction"
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 40,
+      "perLapHTM": "40",
+      "maximumHTM": 4,
+      "wrapHTM": {
+        "minimum": 4,
+        "maximum": 4
+      },
+      "setupHTM": 8,
+      "certifiedClass": "inverses of shortest-edge recurrent schedules of the opposite direction"
+    }
+  ],
+  "optimalityCertificates": [
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 303264,
+      "graphEdges": 696420,
+      "aliveNodes": 303264,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 9720,
+        "2": 26568,
+        "3": 119772,
+        "4": 110772,
+        "5": 36432
+      },
+      "bellmanFordPasses": 3,
+      "certifiedMinimumMeanHTM": "53/20",
+      "perEdgeBestPoseFloorPerLapHTM": 60,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 303264,
+      "graphEdges": 698796,
+      "aliveNodes": 303264,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 9720,
+        "2": 27864,
+        "3": 117504,
+        "4": 108720,
+        "5": 39456
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "57/20",
+      "perEdgeBestPoseFloorPerLapHTM": 60,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": 1,
+      "graphNodes": 122472,
+      "graphEdges": 285924,
+      "aliveNodes": 122472,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 3420,
+        "2": 9396,
+        "3": 48330,
+        "4": 46032,
+        "5": 15294
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "17/6",
+      "perEdgeBestPoseFloorPerLapHTM": 26,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": -1,
+      "graphNodes": 122472,
+      "graphEdges": 290946,
+      "aliveNodes": 122472,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 3420,
+        "2": 9828,
+        "3": 47466,
+        "4": 44628,
+        "5": 17130
+      },
+      "bellmanFordPasses": 11,
+      "certifiedMinimumMeanHTM": "281/96",
+      "perEdgeBestPoseFloorPerLapHTM": 26,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": 1,
+      "graphNodes": 62208,
+      "graphEdges": 149034,
+      "aliveNodes": 62208,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 1782,
+        "2": 4914,
+        "3": 24012,
+        "4": 23334,
+        "5": 8166
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "8/3",
+      "perEdgeBestPoseFloorPerLapHTM": 12,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": -1,
+      "graphNodes": 62208,
+      "graphEdges": 149430,
+      "aliveNodes": 62208,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 1782,
+        "2": 5130,
+        "3": 23634,
+        "4": 22992,
+        "5": 8670
+      },
+      "bellmanFordPasses": 7,
+      "certifiedMinimumMeanHTM": "45/16",
+      "perEdgeBestPoseFloorPerLapHTM": 12,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 116640,
+      "graphEdges": 234468,
+      "aliveNodes": 115188,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 108,
+        "2": 324,
+        "3": 53784,
+        "4": 21492,
+        "5": 40176,
+        "6": 756
+      },
+      "bellmanFordPasses": 3,
+      "certifiedMinimumMeanHTM": "17/5",
+      "perEdgeBestPoseFloorPerLapHTM": 168,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 116640,
+      "graphEdges": 234468,
+      "aliveNodes": 114966,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 108,
+        "2": 324,
+        "3": 53784,
+        "4": 21492,
+        "5": 40176,
+        "6": 756
+      },
+      "bellmanFordPasses": 5,
+      "certifiedMinimumMeanHTM": "273/80",
+      "perEdgeBestPoseFloorPerLapHTM": 168,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": 1,
+      "graphNodes": 46656,
+      "graphEdges": 93546,
+      "aliveNodes": 46172,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 21006,
+        "4": 9108,
+        "5": 16146,
+        "6": 252
+      },
+      "bellmanFordPasses": 5,
+      "certifiedMinimumMeanHTM": "41/12",
+      "perEdgeBestPoseFloorPerLapHTM": 68,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": -1,
+      "graphNodes": 46656,
+      "graphEdges": 92898,
+      "aliveNodes": 46095,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 21006,
+        "4": 8946,
+        "5": 16308,
+        "6": 252
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "41/12",
+      "perEdgeBestPoseFloorPerLapHTM": 68,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": 1,
+      "graphNodes": 23328,
+      "graphEdges": 48348,
+      "aliveNodes": 22924,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 10152,
+        "4": 4572,
+        "5": 8208,
+        "6": 252
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "10/3",
+      "perEdgeBestPoseFloorPerLapHTM": 32,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": -1,
+      "graphNodes": 23328,
+      "graphEdges": 48348,
+      "aliveNodes": 22818,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 10152,
+        "4": 4572,
+        "5": 8208,
+        "6": 252
+      },
+      "bellmanFordPasses": 9,
+      "certifiedMinimumMeanHTM": "103/30",
+      "perEdgeBestPoseFloorPerLapHTM": 32,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 116640,
+      "graphEdges": 234468,
+      "aliveNodes": 116640,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 108,
+        "2": 324,
+        "3": 53784,
+        "4": 21492,
+        "5": 40176,
+        "6": 756
+      },
+      "bellmanFordPasses": 3,
+      "certifiedMinimumMeanHTM": "17/5",
+      "perEdgeBestPoseFloorPerLapHTM": 168,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 116640,
+      "graphEdges": 234468,
+      "aliveNodes": 116640,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 108,
+        "2": 324,
+        "3": 53784,
+        "4": 21492,
+        "5": 40176,
+        "6": 756
+      },
+      "bellmanFordPasses": 5,
+      "certifiedMinimumMeanHTM": "273/80",
+      "perEdgeBestPoseFloorPerLapHTM": 168,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "graphNodes": 46656,
+      "graphEdges": 93546,
+      "aliveNodes": 46656,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 21006,
+        "4": 9108,
+        "5": 16146,
+        "6": 252
+      },
+      "bellmanFordPasses": 5,
+      "certifiedMinimumMeanHTM": "41/12",
+      "perEdgeBestPoseFloorPerLapHTM": 68,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "graphNodes": 46656,
+      "graphEdges": 92898,
+      "aliveNodes": 46656,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 21006,
+        "4": 8946,
+        "5": 16308,
+        "6": 252
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "41/12",
+      "perEdgeBestPoseFloorPerLapHTM": 68,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "graphNodes": 23328,
+      "graphEdges": 48348,
+      "aliveNodes": 23328,
+      "htmCap": 6,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 10152,
+        "4": 4572,
+        "5": 8208,
+        "6": 252
+      },
+      "bellmanFordPasses": 4,
+      "certifiedMinimumMeanHTM": "10/3",
+      "perEdgeBestPoseFloorPerLapHTM": 32,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "graphNodes": 23328,
+      "graphEdges": 48348,
+      "aliveNodes": 22818,
+      "htmCap": 5,
+      "costHistogram": {
+        "1": 36,
+        "2": 108,
+        "3": 10152,
+        "4": 4572,
+        "5": 8208,
+        "6": 252
+      },
+      "bellmanFordPasses": 9,
+      "certifiedMinimumMeanHTM": "103/30",
+      "perEdgeBestPoseFloorPerLapHTM": 32,
+      "meaning": "No recurrent schedule of shortest edges within the cap has a lower mean"
+    }
+  ],
+  "recovery": [
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "samplesReplayed": 14,
+      "sampleSteps": [
+        6,
+        6,
+        3,
+        4,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "sampleWorstEdgeHTM": 5,
+      "maximumSteps": 6,
+      "poseWithoutEdgeAtMostLimit": 0
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "samplesReplayed": 14,
+      "sampleSteps": [
+        6,
+        6,
+        4,
+        3,
+        4,
+        4,
+        4,
+        3,
+        3,
+        3,
+        3,
+        2,
+        4,
+        3
+      ],
+      "sampleWorstEdgeHTM": 5,
+      "maximumSteps": 6,
+      "poseWithoutEdgeAtMostLimit": 0
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": 1,
+      "samplesReplayed": 14,
+      "sampleSteps": [
+        6,
+        6,
+        3,
+        2,
+        3,
+        3,
+        1,
+        5,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "sampleWorstEdgeHTM": 5,
+      "maximumSteps": 6,
+      "poseWithoutEdgeAtMostLimit": 0
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": -1,
+      "samplesReplayed": 14,
+      "sampleSteps": [
+        6,
+        6,
+        4,
+        3,
+        3,
+        4,
+        4,
+        3,
+        3,
+        4,
+        4,
+        4,
+        4,
+        3
+      ],
+      "sampleWorstEdgeHTM": 5,
+      "maximumSteps": 6,
+      "poseWithoutEdgeAtMostLimit": 0
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": 1,
+      "samplesReplayed": 14,
+      "sampleSteps": [
+        5,
+        5,
+        3,
+        4,
+        4,
+        4,
+        3,
+        5,
+        3,
+        4,
+        3,
+        4,
+        4,
+        3
+      ],
+      "sampleWorstEdgeHTM": 5,
+      "maximumSteps": 5,
+      "poseWithoutEdgeAtMostLimit": 0
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": -1,
+      "samplesReplayed": 14,
+      "sampleSteps": [
+        6,
+        6,
+        3,
+        2,
+        3,
+        3,
+        3,
+        4,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4
+      ],
+      "sampleWorstEdgeHTM": 5,
+      "maximumSteps": 6,
+      "poseWithoutEdgeAtMostLimit": 0
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        7,
+        7,
+        3,
+        5,
+        4,
+        4,
+        5,
+        4,
+        4,
+        4,
+        3,
+        5,
+        3,
+        4,
+        3
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 7,
+      "poseWithoutEdgeAtMostLimit": 756
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        6,
+        6,
+        3,
+        4,
+        4,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        5,
+        3,
+        4
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 6,
+      "poseWithoutEdgeAtMostLimit": 756
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": 1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        6,
+        6,
+        3,
+        4,
+        4,
+        4,
+        5,
+        3,
+        4,
+        3,
+        4,
+        3,
+        3,
+        3,
+        3
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 6,
+      "poseWithoutEdgeAtMostLimit": 252
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": -1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        7,
+        7,
+        4,
+        4,
+        5,
+        3,
+        4,
+        3,
+        4,
+        4,
+        3,
+        4,
+        4,
+        5,
+        4
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 7,
+      "poseWithoutEdgeAtMostLimit": 252
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": 1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        7,
+        7,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        4,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 7,
+      "poseWithoutEdgeAtMostLimit": 252
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": -1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        7,
+        7,
+        3,
+        4,
+        5,
+        4,
+        5,
+        2,
+        4,
+        4,
+        3,
+        4,
+        4,
+        4,
+        4
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 7,
+      "poseWithoutEdgeAtMostLimit": 252
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": 1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        7,
+        7,
+        3,
+        4,
+        3,
+        4,
+        4,
+        3,
+        4,
+        4,
+        4,
+        4,
+        5,
+        4,
+        4
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 7,
+      "poseWithoutEdgeAtMostLimit": 756
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": -1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        6,
+        6,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        2,
+        3,
+        5
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 6,
+      "poseWithoutEdgeAtMostLimit": 756
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        6,
+        6,
+        3,
+        4,
+        3,
+        3,
+        4,
+        3,
+        2,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 6,
+      "poseWithoutEdgeAtMostLimit": 252
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        7,
+        7,
+        4,
+        3,
+        3,
+        4,
+        4,
+        3,
+        5,
+        3,
+        5,
+        4,
+        3,
+        4,
+        3
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 7,
+      "poseWithoutEdgeAtMostLimit": 252
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        7,
+        7,
+        4,
+        4,
+        3,
+        4,
+        4,
+        4,
+        3,
+        4,
+        3,
+        3,
+        3,
+        4,
+        3
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 7,
+      "poseWithoutEdgeAtMostLimit": 252
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "samplesReplayed": 15,
+      "sampleSteps": [
+        7,
+        7,
+        4,
+        4,
+        4,
+        5,
+        5,
+        4,
+        3,
+        4,
+        4,
+        5,
+        4,
+        4,
+        4
+      ],
+      "sampleWorstEdgeHTM": 6,
+      "maximumSteps": 7,
+      "poseWithoutEdgeAtMostLimit": 252
+    }
+  ],
+  "recoveryRecomputed": [
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 303264,
+      "edgesAtMostLimitOrForced": 6377508,
+      "poseWithoutEdgeAtMostLimit": 0,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 60,
+        "1": 1440,
+        "2": 18945,
+        "3": 159762,
+        "4": 122205,
+        "5": 846,
+        "6": 6
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 303264
+      },
+      "maximumSteps": 6,
+      "meanSteps": "3.3360",
+      "maximumRecoveryHTM": 28
+    },
+    {
+      "letter": "S",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 303264,
+      "edgesAtMostLimitOrForced": 6377508,
+      "poseWithoutEdgeAtMostLimit": 0,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 60,
+        "1": 1317,
+        "2": 17136,
+        "3": 144891,
+        "4": 137679,
+        "5": 2175,
+        "6": 6
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 303264
+      },
+      "maximumSteps": 6,
+      "meanSteps": "3.4026",
+      "maximumRecoveryHTM": 27
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": 1,
+      "graphNodes": 122472,
+      "edgesAtMostLimitOrForced": 2549178,
+      "poseWithoutEdgeAtMostLimit": 0,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 24,
+        "1": 581,
+        "2": 7672,
+        "3": 63832,
+        "4": 49891,
+        "5": 471,
+        "6": 1
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 122472
+      },
+      "maximumSteps": 6,
+      "meanSteps": "3.3424",
+      "maximumRecoveryHTM": 26
+    },
+    {
+      "letter": "S",
+      "maximum": 23,
+      "direction": -1,
+      "graphNodes": 122472,
+      "edgesAtMostLimitOrForced": 2549178,
+      "poseWithoutEdgeAtMostLimit": 0,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 24,
+        "1": 541,
+        "2": 6613,
+        "3": 59313,
+        "4": 55051,
+        "5": 929,
+        "6": 1
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 122472
+      },
+      "maximumSteps": 6,
+      "meanSteps": "3.4013",
+      "maximumRecoveryHTM": 27
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": 1,
+      "graphNodes": 62208,
+      "edgesAtMostLimitOrForced": 1308546,
+      "poseWithoutEdgeAtMostLimit": 0,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 12,
+        "1": 317,
+        "2": 4126,
+        "3": 33260,
+        "4": 24292,
+        "5": 201
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 62208
+      },
+      "maximumSteps": 5,
+      "meanSteps": "3.3199",
+      "maximumRecoveryHTM": 24
+    },
+    {
+      "letter": "S",
+      "maximum": 11,
+      "direction": -1,
+      "graphNodes": 62208,
+      "edgesAtMostLimitOrForced": 1308546,
+      "poseWithoutEdgeAtMostLimit": 0,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 12,
+        "1": 232,
+        "2": 3316,
+        "3": 29609,
+        "4": 28510,
+        "5": 528,
+        "6": 1
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 62208
+      },
+      "maximumSteps": 6,
+      "meanSteps": "3.4140",
+      "maximumRecoveryHTM": 26
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 116640,
+      "edgesAtMostLimitOrForced": 1301508,
+      "poseWithoutEdgeAtMostLimit": 756,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 120,
+        "1": 1743,
+        "2": 8277,
+        "3": 39456,
+        "4": 55785,
+        "5": 11019,
+        "6": 234,
+        "7": 6
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 115884,
+        "1": 756
+      },
+      "maximumSteps": 7,
+      "meanSteps": "3.5695",
+      "maximumRecoveryHTM": 32
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 116640,
+      "edgesAtMostLimitOrForced": 1301508,
+      "poseWithoutEdgeAtMostLimit": 756,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 120,
+        "1": 1686,
+        "2": 8709,
+        "3": 39051,
+        "4": 56205,
+        "5": 10692,
+        "6": 177
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 115884,
+        "1": 756
+      },
+      "maximumSteps": 6,
+      "meanSteps": "3.5631",
+      "maximumRecoveryHTM": 30
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": 1,
+      "graphNodes": 46656,
+      "edgesAtMostLimitOrForced": 514026,
+      "poseWithoutEdgeAtMostLimit": 252,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 48,
+        "1": 609,
+        "2": 3253,
+        "3": 16123,
+        "4": 21868,
+        "5": 4593,
+        "6": 162
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 46404,
+        "1": 252
+      },
+      "maximumSteps": 6,
+      "meanSteps": "3.5771",
+      "maximumRecoveryHTM": 30
+    },
+    {
+      "letter": "M",
+      "maximum": 23,
+      "direction": -1,
+      "graphNodes": 46656,
+      "edgesAtMostLimitOrForced": 514026,
+      "poseWithoutEdgeAtMostLimit": 252,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 48,
+        "1": 593,
+        "2": 2956,
+        "3": 14789,
+        "4": 22468,
+        "5": 5595,
+        "6": 206,
+        "7": 1
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 46404,
+        "1": 252
+      },
+      "maximumSteps": 7,
+      "meanSteps": "3.6429",
+      "maximumRecoveryHTM": 32
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": 1,
+      "graphNodes": 23328,
+      "edgesAtMostLimitOrForced": 253692,
+      "poseWithoutEdgeAtMostLimit": 252,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 12,
+        "1": 191,
+        "2": 1023,
+        "3": 5456,
+        "4": 11891,
+        "5": 4485,
+        "6": 259,
+        "7": 11
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 23076,
+        "1": 252
+      },
+      "maximumSteps": 7,
+      "meanSteps": "3.8677",
+      "maximumRecoveryHTM": 35
+    },
+    {
+      "letter": "M",
+      "maximum": 11,
+      "direction": -1,
+      "graphNodes": 23328,
+      "edgesAtMostLimitOrForced": 253692,
+      "poseWithoutEdgeAtMostLimit": 252,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 12,
+        "1": 184,
+        "2": 966,
+        "3": 5288,
+        "4": 12220,
+        "5": 4475,
+        "6": 180,
+        "7": 3
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 23076,
+        "1": 252
+      },
+      "maximumSteps": 7,
+      "meanSteps": "3.8724",
+      "maximumRecoveryHTM": 32
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": 1,
+      "graphNodes": 116640,
+      "edgesAtMostLimitOrForced": 1301508,
+      "poseWithoutEdgeAtMostLimit": 756,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 120,
+        "1": 1743,
+        "2": 8277,
+        "3": 39456,
+        "4": 55785,
+        "5": 11019,
+        "6": 234,
+        "7": 6
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 115884,
+        "1": 756
+      },
+      "maximumSteps": 7,
+      "meanSteps": "3.5695",
+      "maximumRecoveryHTM": 32
+    },
+    {
+      "letter": "H",
+      "maximum": 59,
+      "direction": -1,
+      "graphNodes": 116640,
+      "edgesAtMostLimitOrForced": 1301508,
+      "poseWithoutEdgeAtMostLimit": 756,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 120,
+        "1": 1686,
+        "2": 8709,
+        "3": 39051,
+        "4": 56205,
+        "5": 10692,
+        "6": 177
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 115884,
+        "1": 756
+      },
+      "maximumSteps": 6,
+      "meanSteps": "3.5631",
+      "maximumRecoveryHTM": 30
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "graphNodes": 46656,
+      "edgesAtMostLimitOrForced": 514026,
+      "poseWithoutEdgeAtMostLimit": 252,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 48,
+        "1": 609,
+        "2": 3253,
+        "3": 16123,
+        "4": 21868,
+        "5": 4593,
+        "6": 162
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 46404,
+        "1": 252
+      },
+      "maximumSteps": 6,
+      "meanSteps": "3.5771",
+      "maximumRecoveryHTM": 30
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "graphNodes": 46656,
+      "edgesAtMostLimitOrForced": 514026,
+      "poseWithoutEdgeAtMostLimit": 252,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 48,
+        "1": 593,
+        "2": 2956,
+        "3": 14789,
+        "4": 22468,
+        "5": 5595,
+        "6": 206,
+        "7": 1
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 46404,
+        "1": 252
+      },
+      "maximumSteps": 7,
+      "meanSteps": "3.6429",
+      "maximumRecoveryHTM": 32
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "graphNodes": 23328,
+      "edgesAtMostLimitOrForced": 253692,
+      "poseWithoutEdgeAtMostLimit": 252,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 12,
+        "1": 191,
+        "2": 1023,
+        "3": 5456,
+        "4": 11891,
+        "5": 4485,
+        "6": 259,
+        "7": 11
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 23076,
+        "1": 252
+      },
+      "maximumSteps": 7,
+      "meanSteps": "3.8677",
+      "maximumRecoveryHTM": 35
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "graphNodes": 23328,
+      "edgesAtMostLimitOrForced": 253692,
+      "poseWithoutEdgeAtMostLimit": 252,
+      "unreachable": 0,
+      "stepsHistogram": {
+        "0": 12,
+        "1": 184,
+        "2": 966,
+        "3": 5288,
+        "4": 12220,
+        "5": 4475,
+        "6": 180,
+        "7": 3
+      },
+      "edgesAboveLimitHistogram": {
+        "0": 23076,
+        "1": 252
+      },
+      "maximumSteps": 7,
+      "meanSteps": "3.8724",
+      "maximumRecoveryHTM": 32
+    }
+  ],
+  "scope": "Each application period is closed over all 24 sticker frames and may repeat indefinitely; every edge is at most five HTM."
+}

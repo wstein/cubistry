@@ -1,0 +1,36 @@
+S 59 +1: cap 6 mean 159/60=2.6500 lap 159.00 max 4 nodes 303264 edges 696420 passes 2 | app13 per 60 lap 186.00 max 5 | setup 9
+S 59 -1: cap 6 mean 171/60=2.8500 lap 171.00 max 5 nodes 303264 edges 698796 passes 104 | app13 per 300 lap 196.20 max 5 | setup 9
+S 23 +1: cap 6 mean 68/24=2.8333 lap 68.00 max 5 nodes 122472 edges 285924 passes 3 | app13 per 144 lap 78.83 max 5 | setup 10
+S 23 -1: cap 6 mean 281/96=2.9271 lap 70.25 max 5 nodes 122472 edges 290946 passes 226 | app13 per 120 lap 86.60 max 5 | setup 10
+S 11 +1: cap 6 mean 32/12=2.6667 lap 32.00 max 4 nodes 62208 edges 149034 passes 3 | app13 per 168 lap 41.79 max 5 | setup 9
+S 11 -1: cap 6 mean 135/48=2.8125 lap 33.75 max 5 nodes 62208 edges 149430 passes 53 | app13 per 252 lap 41.57 max 5 | setup 9
+M 59 +1: cap 5 mean 408/120=3.4000 lap 204.00 max 5 nodes 116640 edges 234468 passes 2 | app13 per 120 lap 244.50 max 5 | setup 9
+M 59 -1: cap 5 mean 819/240=3.4125 lap 204.75 max 5 nodes 116640 edges 234468 passes 149 | app13 per 300 lap 234.00 max 6 | setup 9
+M 23 +1: cap 5 mean 164/48=3.4167 lap 82.00 max 5 nodes 46656 edges 93546 passes 4 | app13 per 72 lap 97.00 max 5 | setup 9
+M 23 -1: cap 5 mean 82/24=3.4167 lap 82.00 max 5 nodes 46656 edges 92898 passes 46 | app13 per 48 lap 92.50 max 6 | setup 8
+M 11 +1: cap 5 mean 40/12=3.3333 lap 40.00 max 4 nodes 23328 edges 48348 passes 3 | app13 per 48 lap 50.00 max 5 | setup 9
+M 11 -1: cap 5 mean 206/60=3.4333 lap 41.20 max 5 nodes 23328 edges 48348 passes 84 | app13 per 48 lap 46.50 max 5 | setup 9
+H 59 +1: cap 6 mean 408/120=3.4000 lap 204.00 max 5 nodes 116640 edges 234468 passes 2 | app13 per 120 lap 228.00 max 5 | setup 10
+H 59 -1: cap 6 mean 819/240=3.4125 lap 204.75 max 5 nodes 116640 edges 234468 passes 166 | app13 per 60 lap 225.00 max 6 | setup 9
+H 23 +1: cap 6 mean 164/48=3.4167 lap 82.00 max 5 nodes 46656 edges 93546 passes 4 | app13 per 96 lap 94.00 max 6 | setup 9
+H 23 -1: cap 6 mean 82/24=3.4167 lap 82.00 max 5 nodes 46656 edges 92898 passes 46 | app13 per 96 lap 93.50 max 6 | setup 9
+H 11 +1: cap 6 mean 40/12=3.3333 lap 40.00 max 4 nodes 23328 edges 48348 passes 3 | app13 per 204 lap 47.53 max 6 | setup 8
+H 11 -1: cap 5 mean 206/60=3.4333 lap 41.20 max 5 nodes 23328 edges 48348 passes 84 | app13 per 48 lap 48.25 max 5 | setup 10
+recovery S 59 +1 (forward): nodes 303264 edges 6377508 unreachable 0 forced6 0 maxSteps 6 mean 3.336 maxHTM 28 sixes[0..2] 303264 0 0
+recovery S 59 -1 (inverse): nodes 303264 edges 6377508 unreachable 0 forced6 0 maxSteps 6 mean 3.403 maxHTM 27 sixes[0..2] 303264 0 0
+recovery S 23 +1 (forward): nodes 122472 edges 2549178 unreachable 0 forced6 0 maxSteps 6 mean 3.342 maxHTM 26 sixes[0..2] 122472 0 0
+recovery S 23 -1 (inverse): nodes 122472 edges 2549178 unreachable 0 forced6 0 maxSteps 6 mean 3.401 maxHTM 27 sixes[0..2] 122472 0 0
+recovery S 11 +1 (forward): nodes 62208 edges 1308546 unreachable 0 forced6 0 maxSteps 5 mean 3.320 maxHTM 24 sixes[0..2] 62208 0 0
+recovery S 11 -1 (inverse): nodes 62208 edges 1308546 unreachable 0 forced6 0 maxSteps 6 mean 3.414 maxHTM 26 sixes[0..2] 62208 0 0
+recovery M 59 +1 (forward): nodes 116640 edges 1301508 unreachable 0 forced6 756 maxSteps 7 mean 3.569 maxHTM 32 sixes[0..2] 115884 756 0
+recovery M 59 -1 (inverse): nodes 116640 edges 1301508 unreachable 0 forced6 756 maxSteps 6 mean 3.563 maxHTM 30 sixes[0..2] 115884 756 0
+recovery M 23 +1 (forward): nodes 46656 edges 514026 unreachable 0 forced6 252 maxSteps 6 mean 3.577 maxHTM 30 sixes[0..2] 46404 252 0
+recovery M 23 -1 (inverse): nodes 46656 edges 514026 unreachable 0 forced6 252 maxSteps 7 mean 3.643 maxHTM 32 sixes[0..2] 46404 252 0
+recovery M 11 +1 (forward): nodes 23328 edges 253692 unreachable 0 forced6 252 maxSteps 7 mean 3.868 maxHTM 35 sixes[0..2] 23076 252 0
+recovery M 11 -1 (inverse): nodes 23328 edges 253692 unreachable 0 forced6 252 maxSteps 7 mean 3.872 maxHTM 32 sixes[0..2] 23076 252 0
+recovery H 59 +1 (forward): nodes 116640 edges 1301508 unreachable 0 forced6 756 maxSteps 7 mean 3.569 maxHTM 32 sixes[0..2] 115884 756 0
+recovery H 59 -1 (inverse): nodes 116640 edges 1301508 unreachable 0 forced6 756 maxSteps 6 mean 3.563 maxHTM 30 sixes[0..2] 115884 756 0
+recovery H 23 +1 (forward): nodes 46656 edges 514026 unreachable 0 forced6 252 maxSteps 6 mean 3.577 maxHTM 30 sixes[0..2] 46404 252 0
+recovery H 23 -1 (inverse): nodes 46656 edges 514026 unreachable 0 forced6 252 maxSteps 7 mean 3.643 maxHTM 32 sixes[0..2] 46404 252 0
+recovery H 11 +1 (forward): nodes 23328 edges 253692 unreachable 0 forced6 252 maxSteps 7 mean 3.868 maxHTM 35 sixes[0..2] 23076 252 0
+recovery H 11 -1 (inverse): nodes 23328 edges 253692 unreachable 0 forced6 252 maxSteps 7 mean 3.872 maxHTM 32 sixes[0..2] 23076 252 0
