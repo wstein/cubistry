@@ -700,11 +700,11 @@ $("hsm-range").addEventListener("change", () =>
   }),
 );
 for (const id of ["hsm-letter", "hsm-lettering"])
-  $(id).addEventListener("change", async (event) => {
+  $(id).addEventListener("change", async () => {
     if (!ready || !isHsm() || hsmRunning || view.busy) return;
     const previous = view,
       initial =
-        event.currentTarget.id === "hsm-lettering" ? view.currentValue : 0,
+        id === "hsm-lettering" ? view.currentValue : 0,
       previousLettering =
         viewer.presentedPrint?.id === "hsm_counter_seconds_first_words"
           ? "words"
@@ -729,7 +729,7 @@ for (const id of ["hsm-letter", "hsm-lettering"])
       previous.dispose();
       view = candidate;
       value = initial;
-      if (event.currentTarget.id === "hsm-letter") {
+      if (id === "hsm-letter") {
         $("rotation-speed").value = String(
           hsmDefaultStops[$("hsm-letter").value] ?? 4,
         );

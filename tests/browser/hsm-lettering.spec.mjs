@@ -51,10 +51,14 @@ test("word print replaces large unit symbols and keeps the counter value", async
   await page.locator("#hsm-set-form button").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "33");
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
+  await page.locator("#rotation-speed").fill("5");
   await capture(page);
   await page.selectOption("#hsm-lettering", "words");
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "33");
+  await expect(page.locator("#rotation-speed")).toHaveValue("5");
+  await expect(page.locator("#error")).toBeEmpty();
   expect(await page.evaluate(() => window.letteringPrint.id)).toBe(
     "hsm_counter_seconds_first_words",
   );
