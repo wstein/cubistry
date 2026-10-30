@@ -1,22 +1,27 @@
 {
   "repository": "https://github.com/wstein/cubistry",
-  "layoutBranch": "research/hsm-seconds-first",
-  "layoutCommit": "24240a3b2dbd691de99d5bf1170b5695fc62a320",
+  "layoutBranch": "research/cube-display-feasibility",
+  "layoutCommit": "4d9ef771305def5c4f6e9b1f2eec7689a03ed21b",
   "layoutPath": "research/hsm-counter/seconds-first/witness.json",
   "layoutSHA256": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3",
   "researchFiles": {
-    "research/hsm-counter/seconds-first/README.md": "24ad7501344e6dcdfd91adaf692b560b09ae9b046eaf2c838369d004a63983b4",
+    "research/hsm-counter/seconds-first/README.md": "165f8c36449fdc1fa0581dffe26c0be5766fb0855953a6505c5f1377a5cd219e",
     "research/hsm-counter/seconds-first/verification.json": "ea9e422aefef94855924a90334f8a8d0383a4da5e0b3f93c3424e4885ecbde3c",
-    "research/hsm-counter/seconds-first/manifest.json": "cd91895a7505084e35ae9c5c10aea15619df7e65dd9c89283e706f4ebbc9db59",
+    "research/hsm-counter/seconds-first/manifest.json": "4f4c5630da80f8346e174751d68b9cfd8af2ce7e8420894bb35aef55ea452c98",
     "research/hsm-counter/seconds-first/verify.py": "c5a2cf5f7fa3f6e953c071f482d37e9081fb24a4d1c0e81689489e27c5fe956e",
     "research/hsm-counter/seconds-first/witness.json": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3"
+  },
+  "firstPublished": {
+    "branch": "research/hsm-seconds-first",
+    "commit": "24240a3b2dbd691de99d5bf1170b5695fc62a320",
+    "note": "Same witness, verification.json and verify.py bytes; README.md (no review section) and manifest.json (its README hash) differ."
   },
   "appCopy": "data/hsm/seconds-first/witness.json",
   "runtimePath": "public/hsm-counter.v2.json",
   "runtimeSHA256": "32f0fdc7eb4aafdcfea64f6cf4f1f5b84e23b3bf41fcf635a96ae631bcd244ae",
-  "proofCommit": "24240a3b2dbd691de99d5bf1170b5695fc62a320",
+  "proofCommit": "4d9ef771305def5c4f6e9b1f2eec7689a03ed21b",
   "proofPath": "research/hsm-counter/seconds-first/README.md",
-  "reviewStatus": "pending: the independent review of the seconds-first proof is not complete and the research branch is not merged",
+  "reviewStatus": "reviewed, not CONFIRMED: the independent review recorded in the proof README (section \"Independent review (Opus)\") found no blocking proof issue and recomputed 159/204/82/40 with its own Python model; PR #92 review recomputed the same laps through the application. Under proof-checkers/AUTHORITY.md the result is not CONFIRMED until both the Flix and the Julia checker accept it, which has not been done. Print optimality is UNKNOWN.",
   "supersedes": {
     "layoutCommit": "8e9ad5c05e93efa2b1f841590f725416abf226f4",
     "layoutPath": "research/hsm-counter/blank/witness.json",
