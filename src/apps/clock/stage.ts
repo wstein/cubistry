@@ -86,6 +86,8 @@ export class ClockStage {
     this.radius = clockCameraRadius(this.camera.aspect, 0, 0, this.camera.fov) * this.zoom;
     this.camera.position.set(0, 0, this.radius);
     this.camera.lookAt(0, 0, 0);
+    // Very narrow viewports can require a distance beyond the initial far plane.
+    this.camera.far = Math.max(100, this.radius + 2.8 + clockCubeRadius + 1);
     this.camera.updateProjectionMatrix();
     this.updatePresentationBounds();
   }
