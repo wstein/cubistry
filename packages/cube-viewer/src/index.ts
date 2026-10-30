@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import {
-  cross,
   demand,
   validatePrint,
   validateState,
@@ -23,15 +22,10 @@ import {
 import { clampPitch, viewTurn } from "./orbit-input.ts";
 import { animateTimedProgress, type MotionTimingSource } from "./motion-timing.ts";
 export type { MotionTiming, MotionTimingSource } from "./motion-timing.ts";
+import { PhysicalCubeScene } from "./physical-scene.ts";
+export { PhysicalCubeScene, stickerFrame, type PhysicalStickerFrame } from "./physical-scene.ts";
 const spacing = 0.52;
-const vector = (a: Vec3) => new THREE.Vector3(...a);
-const frame = (normal: Vec3, up: Vec3) =>
-  new THREE.Matrix4().makeBasis(
-    vector(cross(up, normal)),
-    vector(up),
-    vector(normal),
-  );
-/** Generic size-2 viewer. It cannot select counter values, solve, or advance physics. */
+/** Physical-state viewer: no target selection, solver or mechanics ownership. */
 export const BASE_MOVE_DURATION_MS = 75;
 export const MIN_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 2000;
 export const MAX_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 10;
@@ -66,7 +60,7 @@ export class CubeViewer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene: THREE.Scene | THREE.Group;
   readonly camera: THREE.PerspectiveCamera;
-  private meshes: THREE.Group[] = [];
+  private cube: PhysicalCubeScene | null = null;
   private materials: THREE.Material[] = [];
   private textures: THREE.Texture[] = [];
   private print: PrintDefinition | null = null;
@@ -260,15 +254,9 @@ export class CubeViewer {
         assets.images.has(s.assetId) && assets.materials.has(s.materialId),
         "Viewer has an unresolved asset/material",
       );
-    for (const mesh of this.meshes) {
-      this.scene.remove(mesh);
-      mesh.traverse((o) => {
-        if (o instanceof THREE.Mesh) o.geometry.dispose();
-      });
-    }
+    this.cube?.dispose();
     for (const m of this.materials) m.dispose();
     for (const t of this.textures) t.dispose();
-    this.meshes = [];
     this.materials = [];
     this.textures = [];
     this.faceletImageOverride = null;
@@ -291,50 +279,28 @@ export class CubeViewer {
       roughness: plasticDef?.roughness ?? 0.45,
     });
     this.materials.push(plastic);
-    for (const c of print.cubies) {
-      const mesh = new THREE.Group();
-      mesh.add(
-        new THREE.Mesh(new THREE.BoxGeometry(0.99, 0.99, 0.99), plastic),
-      );
-      for (const s of print.stickers.filter((s) => s.cubie === c.id)) {
-        const materialDef = assets.materials.get(s.materialId)!;
-        const material = new THREE.MeshStandardMaterial({
-          map: maps.get(s.assetId),
-          color: materialDef.color,
-          roughness: materialDef.roughness,
-        });
-        this.materials.push(material);
-        this.stickerMaterials.set(s.id, material);
-        const plane = new THREE.Mesh(
-          new THREE.PlaneGeometry(0.87, 0.87),
-          material,
-        );
-        plane.position.copy(vector(s.normal).multiplyScalar(0.501));
-        plane.quaternion.setFromRotationMatrix(frame(s.normal, s.up));
-        plane.userData.stickerId = s.id;
-        mesh.add(plane);
-      }
-      this.scene.add(mesh);
-      this.meshes[c.id] = mesh;
+    for (const s of print.stickers) {
+      const materialDef = assets.materials.get(s.materialId)!;
+      const material = new THREE.MeshStandardMaterial({
+        map: maps.get(s.assetId),
+        color: materialDef.color,
+        roughness: materialDef.roughness,
+      });
+      this.materials.push(material);
+      this.stickerMaterials.set(s.id, material);
     }
+    this.cube = new PhysicalCubeScene(this.scene,
+      print.stickers.map((s) => ({ ...s, p: print.cubies.find((c) => c.id === s.cubie)!.position, n: s.normal })),
+      this.stickerMaterials, plastic, spacing,
+      { body: new THREE.BoxGeometry(0.99, 0.99, 0.99),
+        sticker: new THREE.PlaneGeometry(0.87, 0.87), stickerOffset: 0.501 });
     this.sync(state);
     this.updateFaceletImage();
   }
   private sync(state: CubeState): void {
-    const print = this.print!;
-    const poses = stickerPoses(print, state);
-    for (const c of state.cubies) {
-      const source = print.stickers.find((s) => s.cubie === c.id)!,
-        target = poses.find((s) => s.id === source.id)!;
-      const matrix = frame(target.n, target.up).multiply(
-        frame(source.normal, source.up).transpose(),
-      );
-      this.meshes[c.id].position.copy(
-        vector(c.position).multiplyScalar(spacing),
-      );
-      this.meshes[c.id].quaternion.setFromRotationMatrix(matrix);
-    }
+    this.cube!.sync(stickerPoses(this.print!, state));
   }
+
   async animate(presentation: MovePresentation, timing?: MotionTimingSource): Promise<void> {
     demand(this.print && this.presented, "Viewer is not configured");
     demand(!this.busy, "Viewer already animating");
@@ -348,6 +314,7 @@ export class CubeViewer {
       BASE_MOVE_DURATION_MS / this.animationSpeed *
       (this.durationUnit === "quarter-turn" ? Math.abs(presentation.move.turns) : 1);
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let turn: ReturnType<PhysicalCubeScene["beginTurn"]> | undefined;
     try {
       if (!reducedMotion) {
         const [axis, layer, dir] = FACE_LAYERS[presentation.move.face],
@@ -355,13 +322,10 @@ export class CubeViewer {
         const selected = presentation.from.cubies.filter(
           (c) => c.position[axis] === layer,
         );
-        const pivot = new THREE.Group();
-        this.scene.add(pivot);
-        for (const c of selected) pivot.add(this.meshes[c.id]);
+        turn = this.cube!.beginTurn(selected.map((c) => c.id), axis, angle);
         if (timing) {
           await animateTimedProgress(timing, moveDuration,
-            (t) => { pivot.rotation[(["x", "y", "z"] as const)[axis]] =
-              angle * (t * t * (3 - 2 * t)); });
+            (t) => turn!.update(t * t * (3 - 2 * t)));
         } else {
         let previous = performance.now(),
           progress = 0;
@@ -375,16 +339,15 @@ export class CubeViewer {
             );
             previous = now;
             const t = progress;
-            pivot.rotation[(["x", "y", "z"] as const)[axis]] =
-              angle * (t * t * (3 - 2 * t));
+            turn!.update(t * t * (3 - 2 * t));
             if (t < 1) requestAnimationFrame(tick);
             else resolve();
           };
           requestAnimationFrame(tick);
         });
         }
-        for (const c of selected) this.scene.add(this.meshes[c.id]);
-        this.scene.remove(pivot);
+        turn.dispose();
+        turn = undefined;
       }
       if (reducedMotion && timing?.())
         await animateTimedProgress(timing, moveDuration, () => {});
@@ -394,6 +357,11 @@ export class CubeViewer {
       // Timed endpoint and the controller/UI commit must share the next paint.
       if (timing && !this.shared) this.renderer.render(this.scene, this.camera);
     } finally {
+      // A rejected presentation must not strand meshes beneath a turn pivot.
+      if (turn) {
+        turn.dispose();
+        this.sync(this.presented!);
+      }
       this.busy = false;
     }
   }
@@ -404,10 +372,7 @@ export class CubeViewer {
     if (!this.shared) this.renderer.setAnimationLoop(null);
     this.resize?.disconnect();
     this.scene.removeFromParent();
-    for (const mesh of this.meshes)
-      mesh.traverse((o) => {
-        if (o instanceof THREE.Mesh) o.geometry.dispose();
-      });
+    this.cube?.dispose();
     for (const m of this.materials) m.dispose();
     for (const t of this.textures) t.dispose();
     if (!this.shared) {
