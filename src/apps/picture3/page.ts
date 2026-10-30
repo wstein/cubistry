@@ -82,7 +82,7 @@ el("solve").onclick = () => { void physical(() => controller?.solve() ?? Promise
 el("undo").onclick = () => { void physical(() => controller?.undo() ?? Promise.resolve()); };
 el("redo").onclick = () => { void physical(() => controller?.redo() ?? Promise.resolve()); };
 el("cancel").onclick = () => controller?.cancel();
-el("restore").onclick = () => { controller?.restore(); update(); };
+el("restore").onclick = () => { void physical(() => controller?.restore() ?? Promise.resolve()); };
 el("reference").onclick = () => viewer?.resetReferenceView();
 el("retry-render").onclick = () => { initializeRenderer(); update(); };
 el("speed").onchange = () => { if (viewer) viewer.duration = Number(el<HTMLSelectElement>("speed").value); };
