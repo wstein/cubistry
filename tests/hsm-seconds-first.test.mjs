@@ -227,6 +227,38 @@ test("negative controls: a corrupted sticker breaks the replayed periods", () =>
     mutate(d);
     assert.throws(() => validateHsmDesign(d));
   }
+  // Each remaining load check, alone: these corruptions pass every other check.
+  const length = (words) => words.reduce((n, w) => n + parseAlg(w).length, 0);
+  for (const [mutate, reason] of [
+    [
+      // One lap of the two-lap hours period shows the right values but ends on
+      // a different full pose.
+      (d) => {
+        d.periods[2].words = d.periods[2].words.slice(0, 24);
+        d.periods[2].periodHTM = length(d.periods[2].words);
+      },
+      /HSM period does not close/,
+    ],
+    [
+      // Same 00 display and pose, but not the period's own setup word.
+      (d) => (d.zeroWords.S = d.periods[0].setup + " U U'"),
+      /HSM setup is not the first period's setup/,
+    ],
+    [
+      // Same pose after the edge, but a seven-move word.
+      (d) => {
+        let w = d.periods[0].words[0];
+        while (parseAlg(w).length < 7) w += " U U'";
+        d.periods[0].words[0] = w;
+        d.periods[0].periodHTM = length(d.periods[0].words);
+      },
+      /HSM period edge too long/,
+    ],
+  ]) {
+    const d = structuredClone(raw);
+    mutate(d);
+    assert.throws(() => validateHsmDesign(d), reason);
+  }
   // The unmutated clone is accepted, so each throw above is the mutation.
   assert.doesNotThrow(() => validateHsmDesign(structuredClone(raw)));
 });
@@ -274,6 +306,9 @@ test("each period starts at the witness's saved full pose, closes, and every edg
         "a period never repeats a pose early",
       );
       seen.add(poseKey(state));
+      // The install pose for a value is this replayed first-lap node.
+      if (i <= maximum)
+        assert.ok(stateEquals(periods.poseFor(letter, maximum, i), state));
       // Shortest from the actual pose: nothing reaches the next display faster.
       assert.equal(
         moves.length,
@@ -406,11 +441,17 @@ test("a free jump keeps the six-move bound and leaves the period; recounting sta
       assert.equal(c.currentValue, target);
       assert.ok(c.progress.total <= 6, `${letter} jump to ${target}`);
     }
+    let largest = 0;
     for (let i = 0; i < 2 * (maximum + 1); i++) {
       c.request((c.currentValue + 1) % (maximum + 1));
       await settled(c);
       assert.ok(c.progress.total <= 6);
+      largest = Math.max(largest, c.progress.total);
     }
+    // Off the period the five-HTM edge maximum is gone: after these jumps the
+    // minutes cube needs six HTM on a step (owner's M <= 5 limit, see docs).
+    if (letter === "M") assert.equal(largest, 6, "M 00–59 off the period");
+    assert.equal(periods.nodeOf(letter, maximum, c.state), -1);
     c.dispose();
   }
 });
@@ -421,6 +462,18 @@ test("reinstalling at a value starts on that node of the period", async () => {
   for (const value of [0, 1, 37, 59]) {
     await c.configure(value);
     assert.equal(periods.nodeOf("S", 59, c.state), value);
+    // Independently replayed: the setup word, then the first `value` words.
+    const p = spec("S", 59);
+    assert.ok(
+      stateEquals(
+        c.state,
+        applyMoves(
+          initialState(design.print),
+          parseAlg([p.setup, ...p.words.slice(0, value)].join(" ")),
+        ),
+      ),
+      `configure(${value}) installs the period node directly`,
+    );
     const before = c.progress.sessionTotal;
     c.request((value + 1) % 60);
     await settled(c);
@@ -432,19 +485,35 @@ test("reinstalling at a value starts on that node of the period", async () => {
   c.dispose();
 });
 
-test("modes without a saved period keep the exact planner and the general six-move bound", async () => {
-  for (const [letter, maximum] of [
-    ["S", 23],
-    ["S", 11],
-    ["M", 23],
-    ["M", 11],
-    ["H", 59],
-  ])
-    for (const direction of [1, -1])
-      assert.ok(
-        Math.max(...(await costs(design, letter, maximum, direction, 3))) <= 6,
-        `${letter}/${maximum}/${direction}`,
-      );
+// OWNER DECISION, not hidden: on the previous print every one of the 18 modes
+// counted at most five HTM per step from a fresh setup. On this print the modes
+// without a saved period use the exact planner, and M 00–23 (both directions),
+// M 00–11 down and H 00–59 down need six HTM on some steps. That exceeds the
+// owner's M <= 5 limit. The largest step of each mode is pinned exactly so a
+// change in either direction is visible (docs/HSM_COUNTER.md, "Largest step").
+const NO_PERIOD_MAX = {
+  "S/23/1": 5,
+  "S/23/-1": 5,
+  "S/11/1": 5,
+  "S/11/-1": 5,
+  "M/23/1": 6,
+  "M/23/-1": 6,
+  "M/11/1": 5,
+  "M/11/-1": 6,
+  "H/59/1": 5,
+  "H/59/-1": 6,
+};
+test("modes without a saved period keep the six-move bound; M 00–23 and M 00–11 down need six", async () => {
+  for (const [mode, max] of Object.entries(NO_PERIOD_MAX)) {
+    const [letter, maximum, direction] = mode.split("/");
+    assert.equal(
+      Math.max(
+        ...(await costs(design, letter, +maximum, +direction, 3)),
+      ),
+      max,
+      mode,
+    );
+  }
 });
 
 test("the retained inverse is exact: an inverted period word undoes its edge", () => {

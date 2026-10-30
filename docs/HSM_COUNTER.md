@@ -121,6 +121,30 @@ period for good; a unit change or lettering change reinstalls it. Shared
 playback still checks exact physical completion including all hidden cubies, and
 the blank is a permanent color asset with no text.
 
+### Largest step per mode: M can now need six HTM
+
+> **Owner decision.** On the previous print all 18 modes counted at most five
+> HTM per step from a fresh setup. **On this print that holds only on the four
+> saved periods.** The other modes use the exact planner and still respect the
+> six-move bound, but **M 00–23 (up and down) and M 00–11 down need six HTM on
+> some steps**, which exceeds the owner's M ≤ 5 limit, and so does H 00–59
+> down. Off a period (after Set, Reset, a range change or live-clock catch-up),
+> M 00–59 can also need six HTM, and so can H 00–23 and H 00–11. Whether this
+> is acceptable is the owner's decision; this change does not lower it to five.
+
+Largest step from a fresh setup over three laps, as pinned in
+`tests/hsm-seconds-first.test.mjs`:
+
+| Unit | 00–59 up / down | 00–23 up / down | 00–11 up / down |
+| --- | ---: | ---: | ---: |
+| S | 4 / 4 (period) | 5 / 5 | 5 / 5 |
+| M | 5 / 5 (period) | **6 / 6** | 5 / **6** |
+| H | 5 / **6** | 5 / 5 (period) | 4 / 4 (period) |
+
+The earlier independent review found a recurrent counting mode with at most five
+HTM per step for each of these ten modes on this print. Those modes are not saved
+as witnesses, so the application cannot follow them yet.
+
 ### Before and after
 
 HTM per lap while counting up. Before is the previous print through the app's
@@ -142,7 +166,7 @@ The seconds cube of the [live clock](LIVE_CLOCK.md#move-statistics) averages
 **2.65 HTM per tick (159 per lap) instead of 4.49** over three simulated laps
 from 00 (808 HTM per 180 ticks before, 477 after). These are settled-display
 results. A manual Set, letter or range change can need up to
-six HTM, and the setup word from the solved print to the period start (8–10 HTM)
+six HTM, and the setup word from the solved print to the period start (8–9 HTM)
 is excluded from the laps.
 
 ## Artwork
@@ -202,7 +226,8 @@ The HSM Node regressions cover repeated traversal of all eighteen letter/range/
 direction modes, arbitrary targets, fallback prefix totals, invalid inputs,
 full-state inverses, and bounded stop behavior. From each unit's fresh setup, the
 eight modes with a period close over the full pose within one period at most five
-HTM per step; the ten modes without one stay within the six-move bound. A positive
+HTM per step; the ten modes without one stay within the six-move bound, and their
+exact largest steps (six for M 00–23, M 00–11 down and H 00–59 down) are pinned. A positive
 control turns the blank's up vectors without changing any plan.
 `tests/hsm-seconds-first.test.mjs` pins the research commit and file hashes, the
 derived runtime file, the print code and the 14 changed identities against a
