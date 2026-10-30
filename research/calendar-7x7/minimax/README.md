@@ -26,5 +26,7 @@ accepted by unchanged native Julia and Flix replay. See
 [evidence and open review findings](evidence/README.md). Primary maximum is
 446 HTM; the 100–120 and 200-HTM objectives remain UNKNOWN. The owner subsequently authorized Phase A completion before application
 integration. [Corrected verification](verification/README.md) records the fixed
-implementation and fresh native receipts; final independent review is pending.
+implementation and fresh native receipts. [Independent review](review/REVIEW.md)
+clears Phase A for the documented five-chain scope, with all blocking findings
+closed. Optimization targets and general solver completeness remain UNKNOWN.
 This PR remains Draft for owner research acceptance; no parent PR is changed.
