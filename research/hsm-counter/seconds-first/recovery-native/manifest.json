@@ -59,5 +59,15 @@
         "source/recovery.jl": "cd6e72a893c52d1a8ff1dc3235acd6f01d9856d9e8f499f59032c7ba38edac54"
       }
     }
+  ],
+  "findings": [
+    {
+      "id": "mean-decimal-exactness",
+      "path": "findings/mean-decimal-rc.md",
+      "sha256": "581f9df875dfea34cfd5e1988682fb3d9a8921d7ecc5684942d9e5af8e1a882b",
+      "status": "UNKNOWN pending documented parser correction and native validation",
+      "investigator": "Codex Sol",
+      "scope": "Input decimal exactness; mathematical graph code unaffected"
+    }
   ]
 }
