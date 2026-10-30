@@ -1,6 +1,6 @@
 # HSM recovery raw-input profile
 
-Status: draft contract frozen before Julia implementation. Confirmation remains
+Status: draft contract proposed before Julia implementation. Confirmation remains
 **UNKNOWN** until the independently implemented Julia and Flix checkers accept
 the same two raw files and a separate review clears their implementation.
 
@@ -102,8 +102,9 @@ mean steps as well as the four-place representation; no wall-clock timings in
 the verdict. Both implementations must produce byte-identical valid outputs.
 Global print optimality and runtime reachability of forced poses remain UNKNOWN /
 NOT_CHECKED. In particular this profile must not claim universal five-HTM recovery:
-raw tables explicitly include forced six-HTM M/H poses. The owner's acceptance of
-six-step hours does not waive the application's five-step minute/second policy.
+raw tables explicitly include forced six-HTM M/H poses. The owner accepts six HTM
+for minutes and up to ten HTM for hours; normal second counting retains its
+five-HTM priority. Those runtime policies do not change this unrestricted graph.
 
 Execution order is Julia first, then independently implemented Flix on identical
 raw files. Julia acceptance alone is not CONFIRMED. Any actual dissent invokes
