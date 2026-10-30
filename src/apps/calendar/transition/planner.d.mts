@@ -9,6 +9,7 @@ export function createTransitionOptimizer(options: {
   ) => Promise<{ toString(): string; invert(): { toString(): string } }>;
   corrections: readonly { word: string; equivalentWords?: readonly string[] }[];
 }): {
+  toPattern(state: State): KPattern;
   plan(
     from: State,
     target: Target,
