@@ -70,7 +70,8 @@ test("real touch release coasts and the clock rotates one rigid assembly with a 
   const geometry = await page.evaluate(async () => {
     const { clockStage, clockUnits } = await import("/src/clock.mjs"); clockStage.scene.updateMatrixWorld(true);
     const centers = clockUnits.map(u => u.controller.view.scene.getWorldPosition(clockStage.camera.position.clone()));
-    return { midpoint: centers[0].clone().add(centers[2]).length(), span: centers[0].distanceTo(centers[2]),
+    return { midpoint: centers[0].clone().add(centers[2]).length(), // Presentation containment is one uniform scale; local rigid spacing stays 5.6.
+      span: centers[0].distanceTo(centers[2]) / clockStage.presentation.scale.x,
       children: clockUnits.every(u => u.controller.view.scene.parent === clockStage.presentation && !u.controller.view.rotation) };
   });
   expect(geometry.midpoint).toBeLessThan(1e-7); expect(geometry.span).toBeCloseTo(5.6, 7); expect(geometry.children).toBe(true);

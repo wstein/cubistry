@@ -279,22 +279,25 @@ test("real shared viewport construction rotates all three placements rigidly abo
 
 test("production shared gestures inspect rear/bottom and preserve rigid placements, canonical frames and active layer pivots through coast/return",async()=>{
  const {ClockStage}=await import("../src/apps/clock/stage.ts");
- const {DEFAULT_APPEARANCE}=await import("@cubistry/cube-viewer");
+ const {DEFAULT_APPEARANCE,createPresentationStudio}=await import("@cubistry/cube-viewer");
  const {stickerPoses}=await import("@cubistry/cube-mechanics");
  const design=createDesign("picture"),state=initialState(design.print),scene=new THREE.Scene(),root=new THREE.Group();scene.add(root);
  const initial=new THREE.Quaternion().setFromEuler(new THREE.Euler(.16,-.2,0)),h=rotationHarness({root,initial,sensitivity:.004,threshold:0});
  const camera=new THREE.PerspectiveCamera(28,1,.1,1000);camera.position.set(0,0,30);camera.lookAt(0,0,0);
- const stage=Object.assign(Object.create(ClockStage.prototype),{scene,presentation:root,camera,renderer:{},cubes:[],zoom:1.8,rotation:h.binding,
+ const studio=createPresentationStudio(scene,1,4.3);
+ const stage=Object.assign(Object.create(ClockStage.prototype),{scene,presentation:root,camera,renderer:{},cubes:[],zoom:1.8,rotation:h.binding,studio,casterCenters:[new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3()],
  appearance:DEFAULT_APPEARANCE,appearanceControls:{setDefaultColor(){}}});
  const assets={textureOrigin:"bottom-left",images:new Map(design.assets.images.map(image=>[image.id,{width:64,height:64}])),materials:new Map(design.assets.materials.map(material=>[material.id,material]))};
  const cubes=[0,1,2].map(i=>stage.createCube({},i));cubes.forEach(c=>c.configure(design.print,state,assets));
  assert(cubes.every(c=>c.rotation===undefined),"only the shared scene owns a motion controller");
+ stage.fitCamera();
  const print=JSON.stringify(design.print),cameraBefore={p:camera.position.toArray(),q:camera.quaternion.toArray()},placement=cubes.map(c=>c.scene.position.toArray());
  const verify=()=>{
   const up=new THREE.Vector3(0,1,0).applyQuaternion(root.quaternion);
   assert(Math.abs(up.x)<1e-12 && up.y>=Math.sin(.05)-1e-12,"the actual shared Smart root stays upright");
+  stage.updatePresentationBounds();
   scene.updateMatrixWorld(true);const centers=cubes.map(c=>c.scene.getWorldPosition(new THREE.Vector3()));
-  assert(centers[1].length()<1e-10);assert(Math.abs(centers[0].distanceTo(centers[2])-5.6)<1e-10);
+  assert(centers[1].length()<1e-10);assert(Math.abs(centers[0].distanceTo(centers[2])/root.scale.x-5.6)<1e-10);
   for(const c of cubes){const objects=new Map();c.scene.traverse(o=>{if(o.userData.stickerId!==undefined)objects.set(o.userData.stickerId,o);});
    for(const pose of stickerPoses(design.print,c.presentedState)){const q=objects.get(pose.id).getWorldQuaternion(new THREE.Quaternion());
     assert(new THREE.Vector3(0,0,1).applyQuaternion(q).distanceTo(new THREE.Vector3(...pose.n).applyQuaternion(root.quaternion))<1e-6);
@@ -314,13 +317,20 @@ test("production shared gestures inspect rear/bottom and preserve rigid placemen
  try{await withMotion(false,async()=>{
    const animation=cubes[2].animate(event);const bodies=new Set(cubes[2].cube.bodies.values());const pivot=cubes[2].scene.children.find(o=>!bodies.has(o));assert(pivot);assert.equal(pivot.parent,cubes[2].scene);
    h.time(deadline+.31);h.element.pointer("pointerdown");h.time(deadline+.4);h.element.pointer("pointermove",150,130);
-   frames.shift()(performance.now()+40);assert(pivot.rotation.x!==0);assert(stateEquals(cubes[2].presentedState,state));
+   frames.shift()(performance.now()+40);assert(pivot.rotation.x!==0);
+   stage.updatePresentationBounds();const scaleDuring=root.scale.x,floorDuring=studio.floor.position.y;stage.updatePresentationBounds();
+   assert.equal(root.scale.x,scaleDuring);assert.equal(studio.floor.position.y,floorDuring);assert(stateEquals(cubes[2].presentedState,state));
    const parent=pivot.parent;h.element.pointer("pointerup",150,130);h.step(deadline+.5);assert.equal(h.binding.controller.phase,"coasting");assert.equal(pivot.parent,parent);
    frames.shift()?.(performance.now()+200);await animation;verify();assert(stateEquals(cubes[2].presentedState,event.to));
   });
   h.step(deadline+3);verify();const next=h.binding.controller.returnDeadline;if(next!==null){h.step(next+.5);assert.equal(h.binding.controller.phase,"returning");verify();}
+  // Explicit zoom changes the observer distance without cancelling containment.
+  const scaleBefore=root.scale.x, distanceBefore=camera.position.z;
+  stage.zoom=.8;stage.fitCamera();assert.equal(root.scale.x,scaleBefore);
+  assert(Math.abs(camera.position.z/distanceBefore-.8/1.8)<1e-12);
+  stage.zoom=1.8;stage.fitCamera();
   cubes[0].resetCamera();assert(root.quaternion.angleTo(initial)<1e-7);assert(h.binding.controller.anchor.angleTo(initial)<1e-7);assert.equal(stage.zoom,1.8);verify();
- }finally{if(oldRAF)globalThis.requestAnimationFrame=oldRAF;else delete globalThis.requestAnimationFrame;h.binding.dispose();cubes.forEach(c=>c.destroy());}
+ }finally{if(oldRAF)globalThis.requestAnimationFrame=oldRAF;else delete globalThis.requestAnimationFrame;h.binding.dispose();studio.dispose();cubes.forEach(c=>c.destroy());}
 });
 
 test('standalone 2x2 and shared Calendar/Picture 3x3 bindings level rolled Free views without changing any canonical sticker frame or camera',async()=>{

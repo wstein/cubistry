@@ -18,6 +18,9 @@ function projectedShadow(scene, light, floorY) {
     const positions = object.geometry.getAttribute("position");
     for (let i = 0; i < positions.count; i++) {
       const point = new THREE.Vector3().fromBufferAttribute(positions, i).applyMatrix4(object.matrixWorld);
+      const casterNdc = point.clone().project(light.shadow.camera);
+      assert(Math.abs(casterNdc.x) <= 1 && Math.abs(casterNdc.y) <= 1 && casterNdc.z > -1 && casterNdc.z < 1,
+        "caster itself exceeds the shadow frustum");
       point.addScaledVector(direction, (floorY - point.y) / direction.y);
       const ndc = point.clone().project(light.shadow.camera);
       assert(Math.abs(ndc.x) <= 1 && Math.abs(ndc.y) <= 1 && ndc.z > -1 && ndc.z < 1,
@@ -124,5 +127,22 @@ test("rotated rigid clock and active layers stay above the receiver and inside s
     projectedShadow(scene, key, studio.floor.position.y);
   }
   assert.deepEqual(key.shadow.mapSize.toArray(), [1024, 1024]);
+  assert(Math.abs((key.shadow.camera.right-key.shadow.camera.left)-(key.shadow.camera.top-key.shadow.camera.bottom))<1e-12);
+  rotatePresentation(root,.2,.16);root.scale.setScalar(1);clockWorldCenters(root.quaternion,1,centers);
+  studio.fitCasters(centers,clockCubeRadius,.08);
+  const floorAtDefault=studio.floor.position.y, widthAtDefault=key.shadow.camera.right-key.shadow.camera.left;
+  assert(floorAtDefault>-2.3 && floorAtDefault<-1.8,"cube-sized clearance, not the old -4.87 row sphere floor");
+  assert(widthAtDefault<12,"tighter coverage than the old 18.3-wide shadow map");
+  key.shadow.updateMatrices(key);
+  const filterPadding=key.shadow.radius*widthAtDefault/1024 + widthAtDefault/1024;
+  for(const center of centers){const lightPoint=center.clone().applyMatrix4(key.shadow.camera.matrixWorldInverse);
+    assert(lightPoint.x-clockCubeRadius-key.shadow.camera.left>=filterPadding);
+    assert(key.shadow.camera.right-lightPoint.x-clockCubeRadius>=filterPadding);
+    assert(lightPoint.y-clockCubeRadius-key.shadow.camera.bottom>=filterPadding);
+    assert(key.shadow.camera.top-lightPoint.y-clockCubeRadius>=filterPadding);}
+  const worldSoftness=key.shadow.radius*widthAtDefault/1024;
+  assert(Math.abs(worldSoftness-PRESENTATION_PRESET.shadowSoftness*clockCubeRadius/Math.sqrt(3))<1e-10);
+  for(const progress of [0,.2,.5,.8,1]){turn.update(progress);studio.fitCasters(centers,clockCubeRadius,.08);
+    assert.equal(studio.floor.position.y,floorAtDefault);assert.equal(key.shadow.camera.right-key.shadow.camera.left,widthAtDefault);}
   turn.dispose(); for (const cube of cubes) cube.dispose(); studio.dispose(); material.dispose();
 });

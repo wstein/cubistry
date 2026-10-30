@@ -26,7 +26,7 @@ export function clockRequiredDistance(aspect: number, quaternion: Quaternion, fo
 
 /** Camera fitting depends on resize/explicit zoom, never the current drag pose. */
 export function clockCameraRadius(aspect: number, yaw = 0, pitch = 0, fov = 28): number {
-  if (![yaw, pitch].every(Number.isFinite)) throw Error("Invalid clock camera");
+  if (!Number.isFinite(yaw) || !Number.isFinite(pitch)) throw Error("Invalid clock camera");
   return clockRequiredDistance(aspect, clockDefaultQuaternion, fov);
 }
 
