@@ -9,7 +9,7 @@ import {
   type Design,
 } from "./model.ts";
 import {
-  installPresentationDrag, rotatePresentation, cubePresentationRadius, fitPresentationCamera,
+  bindSmartRotation, type SmartRotationBinding, rotatePresentation, cubePresentationRadius, fitPresentationCamera,
   PhysicalCubeScene, createPresentationGeometry, createPlasticMaterial,
   createStickerMaterial, configurePresentationRenderer, createPresentationStudio,
   DEFAULT_APPEARANCE, validateAppearance, installAppearanceControls, type ViewerAppearance,
@@ -28,10 +28,8 @@ export class CalendarViewer {
   private studio: ReturnType<typeof createPresentationStudio>;
   private resources: { dispose(): void }[] = [];
   private resize: ResizeObserver;
-  private yaw = 0.2;
-  private pitch = 0.18;
   private radius = 14.1;
-  private cancelDrag?: () => void;
+  private rotation?: SmartRotationBinding;
   private current: State | null = null;
   private busy = false;
   duration = 100;
@@ -67,13 +65,11 @@ export class CalendarViewer {
       "aria-label",
       "Physical 3 by 3 calendar cube. Drag to rotate the cube.",
     );
-    this.cancelDrag = installPresentationDrag(el, (dx, dy) => {
-      this.yaw -= dx * 0.007;
-      this.pitch = Math.max(-1.2, Math.min(1.2, this.pitch + dy * 0.007));
-    });
+    rotatePresentation(this.presentation, .2, .18);
+    this.rotation = bindSmartRotation(el, this.presentation, { sensitivity: .007, panel: this.appearanceControls.panel });
     this.radius = fitPresentationCamera(this.camera, cubePresentationRadius(1.5));
     this.renderer.setAnimationLoop(() => {
-      rotatePresentation(this.presentation, this.yaw, this.pitch);
+      this.rotation?.step();
       this.renderer.render(this.scene, this.camera);
     });
   }
@@ -83,10 +79,7 @@ export class CalendarViewer {
     this.cube?.setConstruction(this.appearance.construction);
   }
   resetReferenceView(): void {
-    this.yaw = 0.2;
-    this.pitch = 0.18;
-    this.cancelDrag?.();
-    rotatePresentation(this.presentation, this.yaw, this.pitch);
+    this.rotation?.reset();
   }
   private clear(): void {
     this.cube?.dispose();
@@ -210,6 +203,7 @@ export class CalendarViewer {
     demand(!this.busy, "Cannot destroy an animating calendar");
     this.renderer.setAnimationLoop(null);
     this.resize.disconnect();
+    this.rotation?.dispose();
     this.studio.dispose();
     this.appearanceControls.dispose();
     this.clear();
