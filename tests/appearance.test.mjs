@@ -82,3 +82,48 @@ test("per-application appearance preferences are bounded, fail closed, and reset
   assert.deepEqual(validateAppearance({ construction: "stickered", frameColor: null }), DEFAULT_APPEARANCE);
   assert.throws(() => validateAppearance({ construction: "stickerless", frameColor: "#abcd" }));
 });
+
+test("appearance controls apply saved construction, restore style color and release host resources without a browser", async () => {
+  const { installAppearanceControls } = await import("../packages/cube-viewer/src/appearance.ts");
+  class Element {
+    constructor(tagName) { this.tagName = tagName; this.style = {}; this.children = []; this.listeners = {}; }
+    append(...children) { for (const child of children) { this.children.push(child); child.parent = this; } }
+    setAttribute(name, value) { this[name] = value; }
+    addEventListener(type, callback) { this.listeners[type] = callback; }
+    remove() { this.parent.children = this.parent.children.filter(child => child !== this); }
+  }
+  const names = ["document", "location", "localStorage"];
+  const originals = names.map(name => Object.getOwnPropertyDescriptor(globalThis, name));
+  const key = appearanceStorageKey("/clock.html"), data = new Map([[key,
+    JSON.stringify({ version: 1, construction: "stickerless", frameColor: "#abc123" })]]);
+  const host = new Element("div"); host.style.position = "static";
+  const values = [];
+  const globals = { document: { createElement: tag => new Element(tag) }, location: { pathname: "/clock.html" },
+    localStorage: { getItem: k => data.get(k) ?? null, setItem: (k, value) => data.set(k, value) } };
+  for (const name of names) Object.defineProperty(globalThis, name, { value: globals[name], configurable: true });
+  try {
+    const controls = installAppearanceControls(host, value => values.push(value));
+    controls.setDefaultColor("#243d35");
+    const elements = [], visit = node => { elements.push(node); for (const child of node.children) visit(child); };
+    visit(host);
+    const mode = elements.find(node => node.tagName === "select");
+    const color = elements.find(node => node.tagName === "input");
+    const reset = elements.find(node => node.tagName === "button");
+    assert.equal(mode.value, "stickerless"); assert.equal(color.disabled, true);
+    assert.equal(values.at(-1).construction, "stickerless");
+    mode.value = "stickered"; mode.listeners.change();
+    assert.equal(color.disabled, false); assert.equal(color.value, "#abc123");
+    color.value = "#556677"; color.listeners.input();
+    assert.equal(JSON.parse(data.get(key)).frameColor, "#556677");
+    reset.listeners.click();
+    assert.equal(values.at(-1).frameColor, null); assert.equal(color.value, "#243d35");
+    assert.equal(JSON.parse(data.get(key)).frameColor, null);
+    controls.dispose();
+    assert.equal(host.children.length, 0); assert.equal(host.style.position, "static");
+  } finally {
+    names.forEach((name, index) => {
+      if (originals[index]) Object.defineProperty(globalThis, name, originals[index]);
+      else delete globalThis[name];
+    });
+  }
+});

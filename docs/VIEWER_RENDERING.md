@@ -80,91 +80,176 @@ and eventual declarative application lifecycle consolidation. Neither 7×7
 research nor PR #97 is part of this change. No solver, scanner, CubeLab or
 application-framework migration is authorized here.
 
-## Implemented presentation and adapter
+## Owner review and implemented follow-up
+
+The owner **did not accept** the initial preview. Issue #60 Section 7 now governs
+visual acceptance. R01's rounded plastic/reflections are retained. Source/numeric
+review is evidence for correctness, not an owner's visual sign-off. The owner's
+reference screenshots were not available to the author; use the preview handoff
+below to compare against them.
 
 [`PhysicalCubeScene`](../packages/cube-viewer/src/physical-scene.ts) consumes the
-version-1 render projection `{id, cubie, p, n, up}`. The 2×2 viewer projects
-`stickerPoses(print, state)`; Calendar passes its existing 3×3 sticker state.
-One immutable printed normal/up frame per body establishes the local-to-current
-rotation. Legal move selection and angle come from each existing mechanics
-module. A temporary pivot interpolates those selected meshes; it never produces
-a target state. The caller commits its validated endpoint after animation.
-Failed timing restores the previous authoritative frame and releases the pivot.
+render projection `{id, cubie, p, n, up}`. The 2×2 viewer projects canonical
+`stickerPoses(print, state)`; Calendar passes its existing scoped 3×3 sticker
+state. One immutable source normal/up frame per body establishes the current
+rotation. Caller-validated legal selection/angle drive a temporary turn pivot;
+controllers own state, deadlines and commit. Appearance changes replace mesh
+materials in place, including during an active turn, without changing that state.
 
-[`PRESENTATION_PRESET`](../packages/cube-viewer/src/presentation-preset.ts),
-version 1, replaces square boxes with Three.js `RoundedBoxGeometry`: 0.99-unit
-bodies, 0.055-unit bevel radius and three bevel segments. Existing center spacing
-retains 0.05-unit plastic gaps. Stickers are raised 0.007 units above each body's
-flat face, with a 0.87-unit width and rounded corners. Standard image coordinates
-remain affine and unflipped: local +x is image right and +y is print up.
-**Rounded corners mask the outer corner pixels**, including in Playground photo
-mosaics; this is a visual contour change, not a change to asset bytes, UV scale,
-identity or physical orientation. Art whose meaning depends on exact corner
-pixels needs human acceptance before using this presentation preset. Print
-exports retain their original complete source artwork.
+### R02: connected plastic geometry
 
-Before, both renderers used square boxes/stickers and ambient plus one key
-light; Calendar used unlit sticker materials. After, both use smoothed plastic
-bevels, opaque interior bodies, rounded sticker contours and restrained
-nonmetallic clearcoat. A hemisphere/ambient base and key/fill/rim rig illuminate
-the scene. Neutral tone mapping compresses bright highlights. Material colors,
-asset textures and supplied roughness remain intact. All faces receive light
-when orbiting, with no shadow-map or floor-layout dependency. Existing camera
-angles, orbit/zoom behavior, easing and absolute-deadline timing are retained.
-The shared clock installs the rig once, not once per cube. Its single WebGL
-context, camera, render loop and physical cube placements remain unchanged.
+The initial design combined a 1.04-unit center pitch, 0.99-unit bodies and
+symmetric 0.055-unit bevels. Its 0.05-unit air gaps widened at beveled junctions,
+explaining the disconnected look. CubeAssembler instead uses unit pitch,
+seam-specific bevel coverage and interior cut-face caps. Both consumers now use
+unit pitch (0.5 times the size-2 ±1 lattice), retaining the approved 0.99-unit
+rounded outer shell and 0.055-unit bevels. The visible shell seam is 0.01 units.
+
+Concealed plastic cores extend to internal half-pitch seams while retreating to
+0.43 on immutable source exterior faces, below the shell. A 0.0005-unit overlap
+on internal sides prevents floating-point cracks at interpolated four-piece
+junctions. Exterior geometry never grows. Cores follow the same canonical body
+frames and legal turn pivots as artwork. Numeric rays cover 2×2/3×3 scrambled
+poses on all six sides and 25/50/75/100% layer turns, rather than only a front
+reference pose.
+
+### R05/R06: dynamic cast shadows and warm studio
+
+CubeAssembler's `cubeShadow.ts`/`CubeShadow.res` projects a rotated cube outline
+onto a soft floor, but its API receives only size/pitch/yaw, not active-layer
+geometry. Copying it would miss the requested changing turn silhouette. The
+shared [`studio.ts`](../packages/cube-viewer/src/studio.ts) instead uses actual
+moving shell/core/sticker meshes as shadow casters, one 1024×1024 key-light
+shadow map per viewport, PCF filtering with radius 4, and a receiving ground
+surface. Key/fill/rim lighting and approved nonmetallic clearcoat are retained.
+The three-cube clock has one rig and floor for the entire synchronized scene.
+
+A warm radial/vertical gradient replaces flat green on the viewport and its
+stage. The semi-opaque warm ground sits below the conservative turn sweep;
+its upper face alone renders, so camera travel below the floor can inspect
+bottoms without an opaque obstruction. Lights, floor geometry/material and
+shadow targets are disposed by the scene owner. The adapter does not own shared
+stage renderers. Numeric projection tests show that a moving layer changes the
+cast silhouette within the light frustum. They do not measure GPU shadow softness,
+artifacts, frame rate or perceived depth; these remain owner preview checks.
+
+### R07: whole-group camera travel
+
+The shared clock camera now permits a full 360° horizontal orbit and vertical
+travel to ±(π/2 − 0.05), avoiding polar singularities. Yaw wraps to retain numeric
+precision. The existing camera-basis fit still contains the whole row and turn
+bounds, tested at rear/side/near-polar views and portrait aspect ratios. Camera
+input does not rotate individual cubes or alter canonical state. Wheel zoom is
+bounded to 0.8–2 times the fitted distance; deliberate zoom-in can crop the row.
+Reference view resets yaw, pitch, zoom and drag, restoring default full-group fit.
+
+### R10 and limited R11: construction and appearance
+
+One **Appearance** panel per viewport provides **Stickered / Stickerless**.
+Stickerless assigns actual colored materials to the rounded body's six local
+geometry groups. Colors are keyed by immutable source sticker IDs/normals, not
+current world-facing sides. Canonical body quaternions keep those materials
+correct after legal moves, nontrivial loaded poses and interrupted presentations.
+This reuses CubeAssembler's colored-body construction technique without importing
+its palette/physics engine. Interior cut-facing plastic remains opaque.
+
+Full printed glyph/image planes remain attached in both constructions; no image
+pixels are sampled, white is never erased, and transparency is not guessed.
+Color assets provide explicit face colors; text assets provide declared document
+backgrounds; image assets retain their material tint as the neutral plastic color
+when no background metadata exists. Calendar explicitly uses its cream background.
+Photos remain original overlays, so this mode does not promise a seamless
+photo-colored bevel or remove the printed-face contour. That limitation preserves
+picture/glyph meaning instead of silently dropping artwork.
+
+The optional frame-color picker accepts a six-digit hex color and can reset to
+the loaded style's default. It is disabled in Stickerless; exterior face colors
+continue to derive from source appearance. Preferences are versioned, validated,
+bounded and optional when storage is unavailable. **Persistence is per page**:
+Counter, Timer and HSM modes on the same main page share it. Full per-application
+R11 isolation is deferred, not claimed as complete. No application settings
+framework was introduced. The three-cube stage presents one control and applies
+its choice to all three cubes.
+
+Rounded sticker contours mask outer image corner pixels. Affine UV scale/right/up,
+asset bytes, sticker identity and physical orientation remain unchanged. Inspect
+asymmetric photo corners in the preview. Print exports retain complete original
+artwork and are not modified by appearance settings.
 
 ## Resource and performance boundaries
 
-There are two geometries per cube, shared among its meshes: 588 triangles per
-body and 18 per sticker. Current sizes use 5,136 triangles for one 2×2, 16,260 for
-one 3×3 Calendar, and 15,408 for the three-cube clock. Mesh/draw counts remain
-32, 80 and 96 respectively before renderer batching; no per-frame geometry or
-texture rebuilding is introduced. Frame matrices and a turn pivot allocate at
-configuration/commit/turn boundaries. Geometry, materials and textures are
-released on reconfiguration/destruction. Shared viewers do not dispose their
-stage's renderer. Pixel ratio is capped at 2, as before; there is no automatic
-mobile quality switching or new global geometry cache.
+There are three shared geometries per cube: rounded shell (588 triangles),
+interior core (12) and artwork plane (18 per printed face). Current cube totals
+are 5,232 triangles per 2×2, 16,572 per Calendar and 15,696 for the three-cube
+clock, plus two ground triangles per viewport. Geometry/texture construction
+never runs per frame. A face material clone per printed source face supports
+Stickerless and is disposed with the adapter.
 
-The production build reports a Three.js chunk of approximately 500.60 kB
-minified / 126.36 kB gzip and warns at the existing 500 kB threshold. This is an
-observed output size, not a measured before/after performance improvement.
-Physical materials and rounded geometry increase shading/triangle cost; no
-frame-rate or memory benchmark was run. Existing continuous render loops remain;
-idle rendering and adaptive quality are separate lifecycle work.
+Upper-bound main-pass mesh/group draws before culling are 41/107/121 for
+Stickered 2×2/Calendar/clock, and 81/237/241 for Stickerless (body face groups
+increase draws). One additional 1024×1024 shadow pass renders the actual casters;
+there are no per-cube shadow maps, static shadow sprites or accumulation buffers.
+DPI remains capped at 2. The production Three chunk exceeds the existing 500 kB
+warning threshold. GPU timing and memory were not measured; bounded allocations
+are not a performance guarantee. Idle render loops and adaptive quality remain
+separate lifecycle work.
 
-Three.js's existing WebGL context-loss/restoration handling remains in charge
-of GPU recovery. JS scene resources and canonical controller state are retained;
-there is no new alternate physical state or custom GPU recovery path. Context
-loss, restoration during a timed move, GPU fallback and device-specific frame
-rates have not been exercised in a browser. Failure to create a WebGL context
-retains the existing application behavior; this change does not add a 2D fallback.
+Three.js retains context-loss/restoration ownership. Canonical JS state and scene
+resources remain authoritative. No custom recovery state, 2D fallback or changed
+WebGL-creation failure policy is introduced. Restoration during a timed move is
+still a manual browser check.
 
-## Human presentation handoff
+## Validation and owner preview handoff
 
-E2E NOT RUN (per owner instruction). No screenshot, touch-device, GPU or browser
-rendering result is claimed. Reviewers can compare the source-level before/after
-above and the numerical evidence in
-[`physical-scene.test.mjs`](../tests/physical-scene.test.mjs),
-[`presentation-preset.test.mjs`](../tests/presentation-preset.test.mjs) and
-[`viewer-rendering.test.mjs`](../tests/viewer-rendering.test.mjs).
+**E2E NOT RUN (per owner instruction).** No screenshot, browser, touch-device or
+GPU result is claimed. Tests exercise source-level geometry, real Three transforms
+and real viewer methods with small JS stubs, without a browser engine. Relevant
+fast suites include:
 
-For final visual acceptance, inspect desktop and narrow mobile layouts at 1×/2×
-DPI in Counter, both timers, HSM, Live Clock, German/English Calendar and the
-picture Playground. Check front/back sticker contrast and highlights, corner
-masking on asymmetric pictures, orbit/zoom/reset, resize while hidden/visible,
-turns at the slowest/fastest speeds, reduced motion, app switching, and simulated
-WebGL context loss/restoration during a turn. Confirm move counters, countdown
-catch-up and print exports retain their established semantics. Calendar and
-Live Clock retain their existing orbit controls; the single-cube 2×2 viewer
-retains wheel zoom. This change introduces no layer-turn gesture in any app.
+- [`physical-scene.test.mjs`](../tests/physical-scene.test.mjs): immutable frames,
+  shared placements, all-side and moving-layer seam coverage.
+- [`studio.test.mjs`](../tests/studio.test.mjs): changing geometric cast silhouette,
+  shared frustum, floor visibility and resource ownership.
+- [`clock-framing.test.mjs`](../tests/clock-framing.test.mjs): full orbit/polar fit,
+  bounded zoom and reset without moving physical cubes.
+- [`appearance.test.mjs`](../tests/appearance.test.mjs): source-face colors in
+  canonical 2×2/3×3 poses, retained art, interrupted toggles, preferences, control
+  initialization/reset and disposal.
+- [`presentation-preset.test.mjs`](../tests/presentation-preset.test.mjs) and
+  [`viewer-rendering.test.mjs`](../tests/viewer-rendering.test.mjs): geometry/UV
+  bounds, materials, rejected timing recovery and reduced-motion commits.
 
-The architectural lesson is to share physical frame projection and bounded
-render resources while leaving existing mechanics, assets and application
-lifecycles authoritative. The inherited Calendar mechanics remain a scoped
-3×3 implementation; a shared render adapter does not migrate them into the
-size-2 PuzlWerk solver contract. Eventual provider extraction must preserve both
-conformance suites before changing that ownership boundary. Larger-size work
-needs new budgets and independent conformance, not a size ceiling in this scene
-adapter. PR #97 may adopt this presentation boundary later through its own
-reviewed integration; no research compatibility or 7×7 capability is claimed.
+For owner acceptance at the reported head, inspect:
+
+1. 2×2 HSM close-up and the full three-cube group front, slight-angle, rear and
+   bottom: compact connected cubies, tiny opaque seams and retained rounded
+   reflections; no exterior protrusion during legal turns.
+2. German Calendar **FR 30 OKT**: face alignment, original green/cream/copper
+   colors, legible text and no offset/protruding faces.
+3. Soft cast-shadow silhouettes during layer turns and camera orbit, all three
+   cubes sharing the same ground/light; warm gradient/depth and readable contrast
+   at desktop/mobile sizes and 1×/2× DPI.
+4. Stickered/Stickerless on Counter, both timers, HSM, Live Clock, Calendar and
+   Picture Playground, including mid-turn toggles: retained art/IDs, source-face
+   colors, close seams and no white-removal/transparency artifacts.
+5. Group Reference view and zoom, presentation-mode layout, resize and app
+   switching, reduced motion, deadlines/catch-up/counters, print exports, and
+   simulated context loss/restoration during a timed move.
+
+Only the owner can mark this visual review accepted. Independent source review
+and green non-E2E CI establish readiness eligibility, not a visual pass.
+
+## Architectural lessons and P1
+
+Share frame projection, construction materials and bounded studio resources;
+leave mechanics, solvers and app lifecycles authoritative. Calendar remains its
+existing scoped 3×3 implementation, not a migrated size-2 provider contract.
+Provider extraction needs both conformance suites. No larger-size claim follows
+from a size-neutral render seam, and PR #97 remains untouched and independent.
+
+Explicit P1 follow-ups are R04 TrueType/OpenType consistency without replacing
+SVG/image artwork; R08 declarative Calendar style selection preserving the
+current green/cream/copper design; R09 canonical-state 2D net for single-cube
+apps; full R11 per-application preference isolation; broader size conformance and
+budgets; eventual declarative application lifecycle consolidation. None is a
+hidden current P0 gate.
