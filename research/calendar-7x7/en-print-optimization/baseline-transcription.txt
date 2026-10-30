@@ -1,0 +1,3 @@
+Source SHA256 2f33a6943a3b9c0ab98c858b6cdc5cb86b9fabbf6c2ffca006a2b9dc50c2a02b
+TSV SHA256 a4edd758eeb7daec4a3cbe6a9c59af56f81a58af2e2cc539c1869e69ec3ad1cf
+Python transcribes stored model data only; no proof or capacity calculation.

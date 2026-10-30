@@ -1,0 +1,295 @@
+component	piece	face	orbit-x	orbit-y	text	quarter-turn	ink
+corner	1	1	-3	-3		0	blank
+corner	1	2	-3	-3	0	0	month
+corner	1	3	-3	-3	L	2	month
+corner	2	1	-3	-3		0	blank
+corner	2	2	-3	-3	D	1	month
+corner	2	3	-3	-3	Y	2	month
+corner	3	1	-3	-3		0	blank
+corner	3	2	-3	-3	G	2	month
+corner	3	3	-3	-3	N	1	month
+corner	4	1	-3	-3	23	0	red
+corner	4	2	-3	-3	26	0	red
+corner	4	3	-3	-3	28	0	red
+corner	5	1	-3	-3	24	0	red
+corner	5	2	-3	-3	29	0	red
+corner	5	3	-3	-3	29	3	red
+corner	6	1	-3	-3	25	0	red
+corner	6	2	-3	-3	N	0	month
+corner	6	3	-3	-3	P	2	month
+corner	7	1	-3	-3	25	0	red
+corner	7	2	-3	-3	B	2	month
+corner	7	3	-3	-3	R	2	month
+corner	8	1	-3	-3	27	0	red
+corner	8	2	-3	-3	30	3	red
+corner	8	3	-3	-3	31	3	red
+midge	1	1	-3	0		0	blank
+midge	1	2	-3	0	12	2	red
+midge	2	1	-3	0		0	blank
+midge	2	2	-3	0	14	2	red
+midge	3	1	-3	0		0	blank
+midge	3	2	-3	0	28	3	dark
+midge	4	1	-3	0	01	0	red
+midge	4	2	-3	0	2	0	red
+midge	5	1	-3	0	11	0	red
+midge	5	2	-3	0	6	0	red
+midge	6	1	-3	0	13	2	red
+midge	6	2	-3	0	5	0	red
+midge	7	1	-3	0	26	3	dark
+midge	7	2	-3	0	30	3	dark
+midge	8	1	-3	0	26	3	dark
+midge	8	2	-3	0	8	0	red
+midge	9	1	-3	0	27	3	dark
+midge	9	2	-3	0	3	0	red
+midge	10	1	-3	0	27	3	dark
+midge	10	2	-3	0	7	0	red
+midge	11	1	-3	0	28	3	dark
+midge	11	2	-3	0	4	0	red
+midge	12	1	-3	0	29	3	dark
+midge	12	2	-3	0	31	3	dark
+wing1	1	1	-3	-1	27	3	dark
+wing1	1	2	-3	1		0	blank
+wing1	2	1	-3	-1		0	blank
+wing1	2	2	-3	1		0	blank
+wing1	3	1	-3	-1	11	0	red
+wing1	3	2	-3	1	02	0	red
+wing1	4	1	-3	-1	30	3	dark
+wing1	4	2	-3	1	1	0	red
+wing1	5	1	-3	-1	5	0	red
+wing1	5	2	-3	1	12	0	red
+wing1	6	1	-3	-1	4	2	red
+wing1	6	2	-3	1	15	2	red
+wing1	7	1	-3	-1	7	2	red
+wing1	7	2	-3	1	16	2	red
+wing1	8	1	-3	-1	6	2	red
+wing1	8	2	-3	1	17	2	red
+wing1	9	1	-3	-1	29	3	dark
+wing1	9	2	-3	1	18	2	red
+wing1	10	1	-3	-1	12	0	red
+wing1	10	2	-3	1	19	2	red
+wing1	11	1	-3	-1	3	2	red
+wing1	11	2	-3	1	25	3	dark
+wing1	12	1	-3	-1	13	0	red
+wing1	12	2	-3	1	26	3	dark
+wing1	13	1	-3	-1	28	3	dark
+wing1	13	2	-3	1	27	3	dark
+wing1	14	1	-3	-1	2	0	red
+wing1	14	2	-3	1	28	3	dark
+wing1	15	1	-3	-1	14	0	red
+wing1	15	2	-3	1	29	3	dark
+wing1	16	1	-3	-1	15	0	red
+wing1	16	2	-3	1	30	3	dark
+wing1	17	1	-3	-1	01	2	red
+wing1	17	2	-3	1	30↶	0	red
+wing1	18	1	-3	-1	V	1	month
+wing1	18	2	-3	1	31	3	dark
+wing1	19	1	-3	-1	1	0	red
+wing1	19	2	-3	1	31↶	0	red
+wing1	20	1	-3	-1		0	blank
+wing1	20	2	-3	1	A	1	month
+wing1	21	1	-3	-1	T	1	month
+wing1	21	2	-3	1	F	1	month
+wing1	22	1	-3	-1	C	1	month
+wing1	22	2	-3	1	J	1	month
+wing1	23	1	-3	-1		0	blank
+wing1	23	2	-3	1	M	1	month
+wing1	24	1	-3	-1	31	3	dark
+wing1	24	2	-3	1	S	1	month
+wing2	1	1	-3	-2		0	blank
+wing2	1	2	-3	2	23	2	red
+wing2	2	1	-3	-2		0	blank
+wing2	2	2	-3	2	P	1	month
+wing2	3	1	-3	-2		0	blank
+wing2	3	2	-3	2	27	3	dark
+wing2	4	1	-3	-2		0	blank
+wing2	4	2	-3	2	U	1	month
+wing2	5	1	-3	-2		0	blank
+wing2	5	2	-3	2	22	0	red
+wing2	6	1	-3	-2		0	blank
+wing2	6	2	-3	2	27	2	red
+wing2	7	1	-3	-2	0	0	month
+wing2	7	2	-3	2	E	1	month
+wing2	8	1	-3	-2	02	2	red
+wing2	8	2	-3	2	28	2	red
+wing2	9	1	-3	-2	12	2	red
+wing2	9	2	-3	2	SUN	0	red
+wing2	10	1	-3	-2	16	0	red
+wing2	10	2	-3	2	29	3	dark
+wing2	11	1	-3	-2	17	0	red
+wing2	11	2	-3	2	26	2	red
+wing2	12	1	-3	-2	18	0	red
+wing2	12	2	-3	2	25	2	red
+wing2	13	1	-3	-2	19	0	red
+wing2	13	2	-3	2	30	3	dark
+wing2	14	1	-3	-2	22	0	red
+wing2	14	2	-3	2		0	blank
+wing2	15	1	-3	-2	22	0	red
+wing2	15	2	-3	2	25	3	dark
+wing2	16	1	-3	-2	28	3	dark
+wing2	16	2	-3	2	26	3	dark
+wing2	17	1	-3	-2	29	3	dark
+wing2	17	2	-3	2	27	3	dark
+wing2	18	1	-3	-2	30	3	dark
+wing2	18	2	-3	2		0	blank
+wing2	19	1	-3	-2	31	3	dark
+wing2	19	2	-3	2	24	3	dark
+wing2	20	1	-3	-2	C	1	month
+wing2	20	2	-3	2	A	1	month
+wing2	21	1	-3	-2	E	1	month
+wing2	21	2	-3	2	SUN	0	red
+wing2	22	1	-3	-2	E	1	month
+wing2	22	2	-3	2	24	2	red
+wing2	23	1	-3	-2	SAT	2	red
+wing2	23	2	-3	2	28	3	dark
+wing2	24	1	-3	-2	SAT	2	red
+wing2	24	2	-3	2	SUN	0	red
+center_-2_-2	1	1	-2	-2	02	2	dark
+center_-2_-2	2	1	-2	-2	12	1	dark
+center_-2_-2	3	1	-2	-2	12	2	dark
+center_-2_-2	4	1	-2	-2	17	0	dark
+center_-2_-2	5	1	-2	-2	18	0	dark
+center_-2_-2	6	1	-2	-2	19	0	dark
+center_-2_-2	7	1	-2	-2	22	0	dark
+center_-2_-2	8	1	-2	-2	22	1	dark
+center_-2_-2	9	1	-2	-2	23	0	dark
+center_-2_-2	10	1	-2	-2	23	3	dark
+center_-2_-2	11	1	-2	-2	24	3	dark
+center_-2_-2	12	1	-2	-2	25	3	dark
+center_-2_-2	13	1	-2	-2	26	3	dark
+center_-2_-2	14	1	-2	-2	27	3	dark
+center_-2_-2	15	1	-2	-2	FR1	2	weekday
+center_-2_-2	16	1	-2	-2	M0N	1	weekday
+center_-2_-2	17	1	-2	-2		0	blank
+center_-2_-2	18	1	-2	-2		0	blank
+center_-2_-2	19	1	-2	-2		0	blank
+center_-2_-2	20	1	-2	-2		0	blank
+center_-2_-2	21	1	-2	-2		0	blank
+center_-2_-2	22	1	-2	-2		0	blank
+center_-2_-2	23	1	-2	-2		0	blank
+center_-2_-2	24	1	-2	-2		0	blank
+center_-2_-1	1	1	-2	-1	01	2	dark
+center_-2_-1	2	1	-2	-1	02	1	dark
+center_-2_-1	3	1	-2	-1	1	0	dark
+center_-2_-1	4	1	-2	-1	11	0	dark
+center_-2_-1	5	1	-2	-1	12	0	dark
+center_-2_-1	6	1	-2	-1	12	1	dark
+center_-2_-1	7	1	-2	-1	13	0	dark
+center_-2_-1	8	1	-2	-1	14	0	dark
+center_-2_-1	9	1	-2	-1	15	0	dark
+center_-2_-1	10	1	-2	-1	16	0	dark
+center_-2_-1	11	1	-2	-1	2	0	dark
+center_-2_-1	12	1	-2	-1	22	1	dark
+center_-2_-1	13	1	-2	-1	23	3	dark
+center_-2_-1	14	1	-2	-1	24	3	dark
+center_-2_-1	15	1	-2	-1	25	3	dark
+center_-2_-1	16	1	-2	-1	26	3	dark
+center_-2_-1	17	1	-2	-1	3	2	dark
+center_-2_-1	18	1	-2	-1	4	2	dark
+center_-2_-1	19	1	-2	-1	5	0	dark
+center_-2_-1	20	1	-2	-1	6	2	dark
+center_-2_-1	21	1	-2	-1	TUE	1	weekday
+center_-2_-1	22	1	-2	-1		0	blank
+center_-2_-1	23	1	-2	-1		0	blank
+center_-2_-1	24	1	-2	-1		0	blank
+center_-2_0	1	1	-2	0	01	0	dark
+center_-2_0	2	1	-2	0	02	1	dark
+center_-2_0	3	1	-2	0	11	0	dark
+center_-2_0	4	1	-2	0	12	1	dark
+center_-2_0	5	1	-2	0	12	2	dark
+center_-2_0	6	1	-2	0	13	2	dark
+center_-2_0	7	1	-2	0	19	3	dark
+center_-2_0	8	1	-2	0	22	1	dark
+center_-2_0	9	1	-2	0	23	3	dark
+center_-2_0	10	1	-2	0	24	3	dark
+center_-2_0	11	1	-2	0	25	3	dark
+center_-2_0	12	1	-2	0	3	0	dark
+center_-2_0	13	1	-2	0	4	0	dark
+center_-2_0	14	1	-2	0	5	0	dark
+center_-2_0	15	1	-2	0	6	0	dark
+center_-2_0	16	1	-2	0	6	2	dark
+center_-2_0	17	1	-2	0	7	0	dark
+center_-2_0	18	1	-2	0	7	2	dark
+center_-2_0	19	1	-2	0	8	0	dark
+center_-2_0	20	1	-2	0	WED	1	weekday
+center_-2_0	21	1	-2	0		0	blank
+center_-2_0	22	1	-2	0		0	blank
+center_-2_0	23	1	-2	0		0	blank
+center_-2_0	24	1	-2	0		0	blank
+center_-2_1	1	1	-2	1	02	0	dark
+center_-2_1	2	1	-2	1	02	1	dark
+center_-2_1	3	1	-2	1	1	0	dark
+center_-2_1	4	1	-2	1	12	1	dark
+center_-2_1	5	1	-2	1	14	2	dark
+center_-2_1	6	1	-2	1	15	2	dark
+center_-2_1	7	1	-2	1	16	2	dark
+center_-2_1	8	1	-2	1	17	2	dark
+center_-2_1	9	1	-2	1	18	2	dark
+center_-2_1	10	1	-2	1	18	3	dark
+center_-2_1	11	1	-2	1	19	2	dark
+center_-2_1	12	1	-2	1	19	3	dark
+center_-2_1	13	1	-2	1	2	0	dark
+center_-2_1	14	1	-2	1	22	1	dark
+center_-2_1	15	1	-2	1	23	3	dark
+center_-2_1	16	1	-2	1	24	3	dark
+center_-2_1	17	1	-2	1	31↶	0	dark
+center_-2_1	18	1	-2	1	THU	1	weekday
+center_-2_1	19	1	-2	1		0	blank
+center_-2_1	20	1	-2	1		0	blank
+center_-2_1	21	1	-2	1		0	blank
+center_-2_1	22	1	-2	1		0	blank
+center_-2_1	23	1	-2	1		0	blank
+center_-2_1	24	1	-2	1		0	blank
+center_-1_-1	1	1	-1	-1	1	0	dark
+center_-1_-1	2	1	-1	-1	1	1	dark
+center_-1_-1	3	1	-1	-1	11	0	dark
+center_-1_-1	4	1	-1	-1	12	0	dark
+center_-1_-1	5	1	-1	-1	13	0	dark
+center_-1_-1	6	1	-1	-1	13	3	dark
+center_-1_-1	7	1	-1	-1	14	0	dark
+center_-1_-1	8	1	-1	-1	14	3	dark
+center_-1_-1	9	1	-1	-1	15	0	dark
+center_-1_-1	10	1	-1	-1	15	3	dark
+center_-1_-1	11	1	-1	-1	16	0	dark
+center_-1_-1	12	1	-1	-1	16	3	dark
+center_-1_-1	13	1	-1	-1	17	0	dark
+center_-1_-1	14	1	-1	-1	17	3	dark
+center_-1_-1	15	1	-1	-1	18	3	dark
+center_-1_-1	16	1	-1	-1	19	3	dark
+center_-1_-1	17	1	-1	-1	2	0	dark
+center_-1_-1	18	1	-1	-1	2	1	dark
+center_-1_-1	19	1	-1	-1	3	1	dark
+center_-1_-1	20	1	-1	-1	3	2	dark
+center_-1_-1	21	1	-1	-1	4	2	dark
+center_-1_-1	22	1	-1	-1	5	0	dark
+center_-1_-1	23	1	-1	-1		0	blank
+center_-1_-1	24	1	-1	-1		0	blank
+center_-1_0	1	1	-1	0	01	0	dark
+center_-1_0	2	1	-1	0	01	2	dark
+center_-1_0	3	1	-1	0	1	1	dark
+center_-1_0	4	1	-1	0	11	0	dark
+center_-1_0	5	1	-1	0	12	2	dark
+center_-1_0	6	1	-1	0	12	3	dark
+center_-1_0	7	1	-1	0	13	3	dark
+center_-1_0	8	1	-1	0	14	3	dark
+center_-1_0	9	1	-1	0	15	3	dark
+center_-1_0	10	1	-1	0	16	3	dark
+center_-1_0	11	1	-1	0	17	3	dark
+center_-1_0	12	1	-1	0	18	3	dark
+center_-1_0	13	1	-1	0	2	1	dark
+center_-1_0	14	1	-1	0	3	1	dark
+center_-1_0	15	1	-1	0	4	0	dark
+center_-1_0	16	1	-1	0	4	1	dark
+center_-1_0	17	1	-1	0	5	0	dark
+center_-1_0	18	1	-1	0	6	0	dark
+center_-1_0	19	1	-1	0	6	2	dark
+center_-1_0	20	1	-1	0	7	0	dark
+center_-1_0	21	1	-1	0	7	2	dark
+center_-1_0	22	1	-1	0	8	0	dark
+center_-1_0	23	1	-1	0		0	blank
+center_-1_0	24	1	-1	0		0	blank
+core	1	1	0	0	01	0	dark
+core	2	1	0	0	11	0	dark
+core	3	1	0	0	5	0	dark
+core	4	1	0	0	6	0	dark
+core	5	1	0	0	7	0	dark
+core	6	1	0	0	8	0	dark

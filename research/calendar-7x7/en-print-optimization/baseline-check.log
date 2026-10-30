@@ -1,0 +1,4 @@
+PASS native Julia: 294 fixed sticker rows; 250 nonblank / 44 blank; required-inventory lower bound240 not attained.
+PASS: all coupled corner/midge/wing target fronts have injective piece matchings; every center inventory covers its target demand.
+SHA256: db52208e15aa77a028d0daa2c52f2788212fa529c961a66f9752d7a7e34ec25b
+UNKNOWN full physical feasibility: no legal whole-cube move replay or canonical proof profile is claimed.
