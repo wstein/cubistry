@@ -42,7 +42,11 @@ for the current local value (hours 00–23, minutes and seconds 00–59), so the
 counts along the pinned routes (seconds 159 HTM per lap, minutes 204, hours 82 on
 average) rather than along routes planned from scratch. Catch-up after a suspended
 tab or wall-clock jump still replans from the actual pose with the exact planner
-(at most six HTM) and may leave the period until the page reloads.
+(at most six HTM) and may leave the period until the page reloads. Off the
+period the laps are longer (in simulation after jumps, seconds about 186–197
+HTM and minutes about 204–231 HTM per lap) and the minutes and hours cubes can
+need six HTM on a step, above the owner's M ≤ 5 limit (see
+[HSM counter](HSM_COUNTER.md#largest-step-per-mode-m-can-now-need-six-htm)).
 
 The scheduler prepares shortest HTM routes only from committed, idle full poses.
 For a route, angular work is `Q = sum(abs(move.turns))`: a quarter turn contributes
