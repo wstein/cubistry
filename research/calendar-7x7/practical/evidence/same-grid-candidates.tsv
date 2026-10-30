@@ -1,0 +1,57 @@
+year	source-id	status	htm	qtm	file	reason
+2026	2	CANDIDATE	48	50	feb-mar-2026.moves.tsv	independent native replay required
+2027	14	UNKNOWN				unsupported changed physical orbit
+2029	38	CANDIDATE	57	60	feb-mar-2029.moves.tsv	independent native replay required
+2030	50	CANDIDATE	62	66	feb-mar-2030.moves.tsv	independent native replay required
+2031	62	UNKNOWN				unsupported changed physical orbit
+2033	74	UNKNOWN				unsupported changed physical orbit
+2034	86	UNKNOWN				unsupported changed physical orbit
+2035	38	CANDIDATE	57	60	feb-mar-2035.moves.tsv	independent native replay required
+2037	2	CANDIDATE	48	50	feb-mar-2037.moves.tsv	independent native replay required
+2038	14	UNKNOWN				unsupported changed physical orbit
+2039	74	UNKNOWN				unsupported changed physical orbit
+2041	50	CANDIDATE	62	66	feb-mar-2041.moves.tsv	independent native replay required
+2042	62	UNKNOWN				unsupported changed physical orbit
+2043	2	CANDIDATE	48	50	feb-mar-2043.moves.tsv	independent native replay required
+2045	86	UNKNOWN				unsupported changed physical orbit
+2046	38	CANDIDATE	57	60	feb-mar-2046.moves.tsv	independent native replay required
+2047	50	CANDIDATE	62	66	feb-mar-2047.moves.tsv	independent native replay required
+2049	14	UNKNOWN				unsupported changed physical orbit
+2050	74	UNKNOWN				unsupported changed physical orbit
+2051	86	UNKNOWN				unsupported changed physical orbit
+2053	62	UNKNOWN				unsupported changed physical orbit
+2054	2	CANDIDATE	48	50	feb-mar-2054.moves.tsv	independent native replay required
+2055	14	UNKNOWN				unsupported changed physical orbit
+2057	38	CANDIDATE	57	60	feb-mar-2057.moves.tsv	independent native replay required
+2058	50	CANDIDATE	62	66	feb-mar-2058.moves.tsv	independent native replay required
+2059	62	UNKNOWN				unsupported changed physical orbit
+2061	74	UNKNOWN				unsupported changed physical orbit
+2062	86	UNKNOWN				unsupported changed physical orbit
+2063	38	CANDIDATE	57	60	feb-mar-2063.moves.tsv	independent native replay required
+2065	2	CANDIDATE	48	50	feb-mar-2065.moves.tsv	independent native replay required
+2066	14	UNKNOWN				unsupported changed physical orbit
+2067	74	UNKNOWN				unsupported changed physical orbit
+2069	50	CANDIDATE	62	66	feb-mar-2069.moves.tsv	independent native replay required
+2070	62	UNKNOWN				unsupported changed physical orbit
+2071	2	CANDIDATE	48	50	feb-mar-2071.moves.tsv	independent native replay required
+2073	86	UNKNOWN				unsupported changed physical orbit
+2074	38	CANDIDATE	57	60	feb-mar-2074.moves.tsv	independent native replay required
+2075	50	CANDIDATE	62	66	feb-mar-2075.moves.tsv	independent native replay required
+2077	14	UNKNOWN				unsupported changed physical orbit
+2078	74	UNKNOWN				unsupported changed physical orbit
+2079	86	UNKNOWN				unsupported changed physical orbit
+2081	62	UNKNOWN				unsupported changed physical orbit
+2082	2	CANDIDATE	48	50	feb-mar-2082.moves.tsv	independent native replay required
+2083	14	UNKNOWN				unsupported changed physical orbit
+2085	38	CANDIDATE	57	60	feb-mar-2085.moves.tsv	independent native replay required
+2086	50	CANDIDATE	62	66	feb-mar-2086.moves.tsv	independent native replay required
+2087	62	UNKNOWN				unsupported changed physical orbit
+2089	74	UNKNOWN				unsupported changed physical orbit
+2090	86	UNKNOWN				unsupported changed physical orbit
+2091	38	CANDIDATE	57	60	feb-mar-2091.moves.tsv	independent native replay required
+2093	2	CANDIDATE	48	50	feb-mar-2093.moves.tsv	independent native replay required
+2094	14	UNKNOWN				unsupported changed physical orbit
+2095	74	UNKNOWN				unsupported changed physical orbit
+2097	50	CANDIDATE	62	66	feb-mar-2097.moves.tsv	independent native replay required
+2098	62	UNKNOWN				unsupported changed physical orbit
+2099	2	CANDIDATE	48	50	feb-mar-2099.moves.tsv	independent native replay required
