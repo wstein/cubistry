@@ -33,3 +33,17 @@ test('camera envelope rejects invalid projection and non-unit quaternion inputs'
     assert.throws(()=>clockPresentationScale(2.3,q));
   assert.equal(clockCenters.length,3);
 });
+
+test('actual stage fitting retains depth coverage at narrow aspects and explicit zoom',async()=>{
+  const { ClockStage }=await import('../src/apps/clock/stage.ts');
+  for(const aspect of [.001,.01,.03,.25,2.3])for(const zoom of [.8,1,2]){
+    const camera=new PerspectiveCamera(28,aspect,.1,1000), presentation={quaternion:clockDefaultQuaternion};
+    const stage=Object.assign(Object.create(ClockStage.prototype),{camera,presentation,zoom,updatePresentationBounds(){}});
+    stage.fitCamera();camera.updateMatrixWorld();
+    assert.equal(camera.position.z,clockCameraRadius(aspect)*zoom);
+    for(const center of clockCenters)for(const offset of [-clockCubeRadius,clockCubeRadius]){
+      const point=new Vector3(center,0,offset).applyQuaternion(clockDefaultQuaternion).project(camera);
+      assert(point.z>-1&&point.z<1,JSON.stringify({aspect,zoom,point}));
+    }
+  }
+});
