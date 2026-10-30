@@ -171,9 +171,14 @@ test("HSM unit words print at full size on their unchanged baseline", () => {
   assert.deepEqual(read(dir + "WORD-ART-PROVENANCE.json"), words);
   assert.equal(words.fontSize, MAX_WORD_FONT_SIZE);
   assert.equal(words.baseline, WORD_BASELINE);
-  for (const id of ["H", "M", "S"]) {
+  // The seconds-first print has one H, one M and three S stickers per cube.
+  for (const [id, perCube] of [
+    ["H", 1],
+    ["M", 1],
+    ["S", 3],
+  ]) {
     const printed = m.stickers.filter((s) => s.image === id);
-    assert.equal(printed.length, m.copies);
+    assert.equal(printed.length, m.copies * perCube);
     for (const s of printed) {
       // Safe fitting must not shrink the word art (that would move the baseline).
       assert.equal(s.artScale, 1);
