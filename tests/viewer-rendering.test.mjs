@@ -291,6 +291,8 @@ test("production shared gestures inspect rear/bottom and preserve rigid placemen
  assert(cubes.every(c=>c.rotation===undefined),"only the shared scene owns a motion controller");
  const print=JSON.stringify(design.print),cameraBefore={p:camera.position.toArray(),q:camera.quaternion.toArray()},placement=cubes.map(c=>c.scene.position.toArray());
  const verify=()=>{
+  const up=new THREE.Vector3(0,1,0).applyQuaternion(root.quaternion);
+  assert(Math.abs(up.x)<1e-12 && up.y>=Math.sin(.05)-1e-12,"the actual shared Smart root stays upright");
   scene.updateMatrixWorld(true);const centers=cubes.map(c=>c.scene.getWorldPosition(new THREE.Vector3()));
   assert(centers[1].length()<1e-10);assert(Math.abs(centers[0].distanceTo(centers[2])-5.6)<1e-10);
   for(const c of cubes){const objects=new Map();c.scene.traverse(o=>{if(o.userData.stickerId!==undefined)objects.set(o.userData.stickerId,o);});
@@ -319,4 +321,27 @@ test("production shared gestures inspect rear/bottom and preserve rigid placemen
   h.step(deadline+3);verify();const next=h.binding.controller.returnDeadline;if(next!==null){h.step(next+.5);assert.equal(h.binding.controller.phase,"returning");verify();}
   cubes[0].resetCamera();assert(root.quaternion.angleTo(initial)<1e-7);assert(h.binding.controller.anchor.angleTo(initial)<1e-7);assert.equal(stage.zoom,1.8);verify();
  }finally{if(oldRAF)globalThis.requestAnimationFrame=oldRAF;else delete globalThis.requestAnimationFrame;h.binding.dispose();cubes.forEach(c=>c.destroy());}
+});
+
+test('standalone 2x2 and shared Calendar/Picture 3x3 bindings level rolled Free views without changing any canonical sticker frame or camera',async()=>{
+ const {validateDesign}=await import('../src/apps/calendar/model.ts');
+ const {PhysicalCubeScene,createPresentationGeometry}=await import('@cubistry/cube-viewer');
+ const {stickerPoses}=await import('@cubistry/cube-mechanics');
+ const two=fixture(),pin=JSON.parse(readFileSync('calendar-source.json'));
+ const design=validateDesign(JSON.parse(readFileSync('public/calendar/'+Object.keys(pin.runtime)[0])));
+ const root=new THREE.Group(),material=new THREE.MeshStandardMaterial();
+ const three=new PhysicalCubeScene(root,design.printing,new Map(design.printing.map(s=>[s.id,material])),material,1,createPresentationGeometry());three.sync(design.printing);
+ for(const [presentation,poses] of [[two.scene,stickerPoses(two.design.print,two.state)],[root,design.printing]]){
+  const camera=new THREE.PerspectiveCamera();camera.position.z=20;
+  const before=JSON.stringify(poses),cameraBefore=JSON.stringify(camera.toJSON());
+  const h=rotationHarness({root:presentation,mode:'free'}),objects=new Map();presentation.traverse(o=>{if(o.userData.stickerId!==undefined)objects.set(o.userData.stickerId,o);});
+  const verify=()=>{presentation.updateMatrixWorld(true);for(const pose of poses){const q=objects.get(pose.id).getWorldQuaternion(new THREE.Quaternion());
+   for(const [local,expected] of [[[0,0,1],pose.n],[[0,1,0],pose.up]])assert(new THREE.Vector3(...local).applyQuaternion(q).distanceTo(new THREE.Vector3(...expected).applyQuaternion(presentation.quaternion))<1e-6);}
+   assert.equal(JSON.stringify(poses),before);assert.equal(JSON.stringify(camera.toJSON()),cameraBefore);};
+  h.element.pointer('pointerdown');h.time(.1);h.element.pointer('pointermove',170,140);h.time(.2);h.element.pointer('pointermove',140,190);h.time(.4);h.element.pointer('pointerup');verify();
+  h.time(1);const rolled=presentation.quaternion.clone();h.select.value='smart';h.select.dispatchEvent(new Event('change'));assert(presentation.quaternion.angleTo(rolled)<1e-7);
+  for(const at of [1.2,1.4,1.8,2,3,4,5]){h.step(at);verify();if(at>=2){const up=new THREE.Vector3(0,1,0).applyQuaternion(presentation.quaternion);assert(Math.abs(up.x)<1e-12&&up.y>0);}}
+  h.binding.dispose();
+ }
+ two.viewer.destroy();three.dispose();material.dispose();
 });
