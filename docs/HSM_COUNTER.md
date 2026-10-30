@@ -86,7 +86,7 @@ application no longer loads it.
 
 > **Proof status.**
 >
-> - **CONFIRMED** only for the two pinned witnesses, by both native checkers
+> - **CONFIRMED** for the two original pinned witnesses, by both native checkers
 >   (Flix and Julia, merged in PR 95, independent review at `477ac51`, profile in
 >   [proof-checkers/HSM-PROFILE.md](../proof-checkers/HSM-PROFILE.md)):
 >   `data/hsm/seconds-first/witness.json` (SHA-256 `f71d4237…`, profile
@@ -97,9 +97,16 @@ application no longer loads it.
 >   24-sticker print, the 18 mode periods with every edge at most 5 HTM, the
 >   lap, maximum and mean figures (159, 204, 82, 40) and the 6 HTM universal
 >   bound. Run it with `hsm FILE`.
-> - **UNSUPPORTED**: the recovery table `data/hsm/seconds-first/modes/recovery.json`.
->   Neither checker accepts that schema. The research's Python verifier
->   (`verify_modes.py --recovery-full all`) is evidence, not proof.
+> - **CONFIRMED** for the recovery table, bound to the all-mode witness, by
+>   separate native Julia and Flix recovery entrypoints. Both exhaustively
+>   rebuilt all 18 graphs and returned byte-identical results. See the
+>   [recovery results](../proof-checkers/HSM-RECOVERY-RESULTS.md) and
+>   [final independent review](../proof-checkers/review/HSM-RECOVERY-FINAL.md).
+>   The old `hsm FILE` command still returns UNSUPPORTED for this schema;
+>   that preserved command is not the new recovery validator.
+> - **NOT_CHECKED by the recovery proof**: runtime reachability of forced
+>   six-HTM poses. The graph permits forced six-HTM M/H steps; it does not
+>   assert every runtime transition needs at most five.
 > - **UNKNOWN**: global print optimality. The research README states what is
 >   proved and what is best-found.
 > - **Software-tested, not proof**: what the app does at run time
