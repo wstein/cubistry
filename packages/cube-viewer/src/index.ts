@@ -23,6 +23,8 @@ import { clampPitch, viewTurn } from "./orbit-input.ts";
 import { animateTimedProgress, type MotionTimingSource } from "./motion-timing.ts";
 export { clampPitch, pitchLimit } from "./orbit-input.ts";
 export type { MotionTiming, MotionTimingSource } from "./motion-timing.ts";
+import { DEFAULT_APPEARANCE, validateAppearance, sourceFaceColor, installAppearanceControls, type ViewerAppearance } from "./appearance.ts";
+export { DEFAULT_APPEARANCE, validateAppearance, sourceFaceColor, installAppearanceControls, type ViewerAppearance, type Construction } from "./appearance.ts";
 import { createPresentationStudio } from "./studio.ts";
 export { createPresentationStudio, STUDIO_BACKGROUND } from "./studio.ts";
 import { PhysicalCubeScene } from "./physical-scene.ts";
@@ -47,6 +49,7 @@ export interface SharedCubeViewport {
   readonly camera: THREE.PerspectiveCamera;
   readonly position: Vec3;
   readonly resetCamera?: () => void;
+  readonly onDefaultPlasticColor?: (color: string) => void;
 }
 export class CubeViewer {
   private animationSpeed = 1;
@@ -71,6 +74,10 @@ export class CubeViewer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene: THREE.Scene | THREE.Group;
   readonly camera: THREE.PerspectiveCamera;
+  private appearance: ViewerAppearance = DEFAULT_APPEARANCE;
+  private plastic?: THREE.MeshPhysicalMaterial;
+  private defaultPlasticColor = "#202329";
+  private appearanceControls?: ReturnType<typeof installAppearanceControls>;
   private cube: PhysicalCubeScene | null = null;
   private studio?: ReturnType<typeof createPresentationStudio>;
   private materials: THREE.Material[] = [];
@@ -96,6 +103,7 @@ export class CubeViewer {
   private readonly resize: ResizeObserver | null = null;
   private readonly shared: boolean;
   private readonly resetSharedCamera?: () => void;
+  private readonly defaultColorChanged?: (color: string) => void;
   readonly host: HTMLElement;
   constructor(host: HTMLElement, viewport?: SharedCubeViewport) {
     this.host = host;
@@ -104,6 +112,7 @@ export class CubeViewer {
     this.camera =
       viewport?.camera ?? new THREE.PerspectiveCamera(18, 1, 0.1, 100);
     this.resetSharedCamera = viewport?.resetCamera;
+    this.defaultColorChanged = viewport?.onDefaultPlasticColor;
     if (viewport) {
       demand(
         viewport.position.length === 3 &&
@@ -119,6 +128,7 @@ export class CubeViewer {
     configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
     this.studio = createPresentationStudio(this.scene, 1, 1, host);
+    this.appearanceControls = installAppearanceControls(host, (value) => this.setAppearance(value));
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;
@@ -193,6 +203,11 @@ export class CubeViewer {
       this.camera.lookAt(0, 0, 0);
       this.renderer.render(this.scene, this.camera);
     });
+  }
+  setAppearance(value: ViewerAppearance): void {
+    this.appearance = validateAppearance(value);
+    this.plastic?.color.set(this.appearance.frameColor ?? this.defaultPlasticColor);
+    this.cube?.setConstruction(this.appearance.construction);
   }
   resetCamera(): void {
     if (this.shared) {
@@ -284,6 +299,10 @@ export class CubeViewer {
     ));
     const plasticDef = assets.materials.get("plastic");
     const plastic = createPlasticMaterial(plasticDef?.color, plasticDef?.roughness);
+    this.plastic = plastic;
+    this.defaultPlasticColor = `#${plastic.color.getHexString()}`;
+    this.appearanceControls?.setDefaultColor(this.defaultPlasticColor);
+    this.defaultColorChanged?.(this.defaultPlasticColor);
     this.materials.push(plastic);
     for (const s of print.stickers) {
       const materialDef = assets.materials.get(s.materialId)!;
@@ -294,7 +313,10 @@ export class CubeViewer {
     this.cube = new PhysicalCubeScene(this.scene,
       print.stickers.map((s) => ({ ...s, p: print.cubies.find((c) => c.id === s.cubie)!.position, n: s.normal })),
       this.stickerMaterials, plastic, spacing,
-      createPresentationGeometry());
+      createPresentationGeometry(),
+      new Map(print.stickers.map((s) => [s.id,
+        sourceFaceColor(s.assetId, assets.manifest, assets.materials.get(s.materialId)!.color)])));
+    this.setAppearance(this.appearance ?? DEFAULT_APPEARANCE);
     this.sync(state);
     this.updateFaceletImage();
   }
@@ -373,6 +395,7 @@ export class CubeViewer {
     if (!this.shared) this.renderer.setAnimationLoop(null);
     this.resize?.disconnect();
     this.studio?.dispose();
+    this.appearanceControls?.dispose();
     this.scene.removeFromParent();
     this.cube?.dispose();
     for (const m of this.materials) m.dispose();

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type { Construction } from "./appearance.ts";
 import { cross, demand, type Vec3 } from "@cubistry/cube-core";
 
 /** Render-only projection of canonical sticker frames; never an authoritative state. */
@@ -21,9 +22,12 @@ export const stickerFrame = (normal: Vec3, up: Vec3): THREE.Matrix4 =>
 export class PhysicalCubeScene {
   private readonly bodies = new Map<number, THREE.Group>();
   private readonly references = new Map<number, { id: number; inverse: THREE.Matrix4 }>();
+  private readonly shells = new Map<number, { mesh: THREE.Mesh; stickerless: THREE.Material[] }>();
+  private readonly faceMaterials: THREE.Material[] = [];
   private readonly geometries: THREE.BufferGeometry[];
   private readonly parent: THREE.Scene | THREE.Group;
   private readonly spacing: number;
+  private readonly plastic: THREE.Material;
   constructor(
     parent: THREE.Scene | THREE.Group,
     printed: readonly PhysicalStickerFrame[],
@@ -31,9 +35,11 @@ export class PhysicalCubeScene {
     plastic: THREE.Material,
     spacing: number,
     geometry: { body: THREE.BufferGeometry; core?: THREE.BufferGeometry; sticker: THREE.BufferGeometry; stickerOffset: number },
+    faceColors: ReadonlyMap<number, string> = new Map(),
   ) {
     demand(Number.isFinite(spacing) && spacing > 0, "Invalid viewer spacing");
     this.parent = parent;
+    this.plastic = plastic;
     this.spacing = spacing;
     this.geometries = [geometry.body, geometry.sticker, ...(geometry.core ? [geometry.core] : [])];
     for (const s of printed) {
@@ -44,6 +50,23 @@ export class PhysicalCubeScene {
         const shell = new THREE.Mesh(geometry.body, plastic);
         shell.castShadow = shell.receiveShadow = true;
         body.add(shell);
+        // Box/RoundedBox geometry groups are +X,-X,+Y,-Y,+Z,-Z. These
+        // materials belong to immutable LOCAL source faces, never world axes.
+        const faceMaterials: THREE.Material[] = Array(6).fill(plastic);
+        const sourceIds = Array(6).fill(null);
+        for (const face of printed.filter((face) => face.cubie === s.cubie)) {
+          const axis = face.n.findIndex(component => component !== 0);
+          const index = axis * 2 + (face.n[axis] < 0 ? 1 : 0);
+          const material = plastic instanceof THREE.MeshStandardMaterial
+            ? plastic.clone() : new THREE.MeshPhysicalMaterial();
+          const art = materials.get(face.id);
+          const fallback = art instanceof THREE.MeshStandardMaterial ? `#${art.color.getHexString()}` : "#fffdf6";
+          material.color.set(faceColors.get(face.id) ?? fallback);
+          faceMaterials[index] = material; sourceIds[index] = face.id;
+          this.faceMaterials.push(material);
+        }
+        shell.userData.sourceFaceStickerIds = sourceIds;
+        this.shells.set(s.cubie, { mesh: shell, stickerless: faceMaterials });
         if (geometry.core) {
           // Seal internal seams/junctions without squaring the approved exterior
           // bevels. Exterior sides retreat beneath the rounded shell; internal
@@ -75,6 +98,12 @@ export class PhysicalCubeScene {
       sticker.castShadow = sticker.receiveShadow = true;
       body.add(sticker);
     }
+  }
+  /** Materials change in place, including during a turn; source frames stay fixed. */
+  setConstruction(construction: Construction): void {
+    demand(["stickered", "stickerless"].includes(construction), "Invalid cube construction");
+    for (const { mesh, stickerless } of this.shells.values())
+      mesh.material = construction === "stickerless" ? stickerless : this.plastic;
   }
   sync(poses: readonly PhysicalStickerFrame[]): void {
     const byId = new Map(poses.map((s) => [s.id, s]));
@@ -110,6 +139,8 @@ export class PhysicalCubeScene {
     for (const body of this.bodies.values()) body.removeFromParent();
     this.bodies.clear();
     this.references.clear();
+    this.shells.clear();
+    for (const material of this.faceMaterials) material.dispose();
     for (const geometry of this.geometries) geometry.dispose();
   }
 }
