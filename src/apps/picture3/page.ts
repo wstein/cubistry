@@ -2,12 +2,13 @@ import { CalendarViewer } from "../calendar/viewer.ts";
 import { scramble } from "../playground/model.ts";
 import { FACE_FRAMES, scrambleWord, type Face } from "./model.ts";
 import { PRESETS, type Preset } from "./presets.ts";
+import { bindPictureLifecycle } from "./lifecycle.ts";
 import { PictureEditor } from "./editor.ts";
 import { Cube3Controller } from "./controller.ts";
 import { PictureStore, openPictureDatabase, type PictureSet } from "./storage.ts";
 const el = <T extends HTMLElement = HTMLElement>(id: string): T => { const value = document.getElementById(id); if (!value) throw Error(`Missing control: ${id}`); return value as T; };
 let disposed = false, released = false, viewer: CalendarViewer | undefined, controller: Cube3Controller | undefined;
-let style: "picture" | "classic" = "picture", store: PictureStore | undefined, rows: PictureSet[] = [], storageBusy = false, rendererAttempted = false;
+let style: "picture" | "classic" = "picture", store: PictureStore | undefined, rows: PictureSet[] = [], storageBusy = false, rendererAttempted = false, storageEpoch = 0;
 const faceLabels: Record<Face, string> = { U: "U · Up", D: "D · Down", F: "F · Front", B: "B · Back", L: "L · Left", R: "R · Right" };
 const fields = new Map<Face, { preview: HTMLElement; file: HTMLInputElement; controls: HTMLInputElement[]; outputs: HTMLOutputElement[]; error: HTMLElement; reset: HTMLButtonElement }>();
 const physicalButtons: HTMLButtonElement[] = [];
@@ -33,6 +34,7 @@ function initializeRenderer() {
 }
 function update() {
   if (disposed) { releaseIfIdle(); return; }
+  viewer?.renderer.domElement.setAttribute("aria-label", `Physical 3 by 3 ${style === "picture" ? "Super Picture" : "classic color"} cube. Drag to rotate the cube.`);
   const snapshot = controller?.snapshot, blocked = !snapshot || snapshot.busy || snapshot.frozen;
   for (const button of physicalButtons) button.disabled = blocked;
   el<HTMLInputElement>("notation").disabled = blocked; el<HTMLInputElement>("seed").disabled = blocked; el<HTMLInputElement>("count").disabled = blocked;
@@ -110,21 +112,21 @@ for (const { face } of FACE_FRAMES) {
 el("preset").onchange = async () => { const id = el<HTMLSelectElement>("preset").value; if (disposed || !PRESETS.some(p => p.id === id)) return;
   try { if (await editor.preset(id as Preset)) report("image-status", "Example set ready. Your puzzle state is unchanged."); } catch (error) { report("image-status", error); } update(); };
 async function refreshLibrary() {
-  if (!store || disposed) return; const result = await store.list(); if (disposed) return; rows = result;
+  if (!store || disposed) return; const active = store, result = await active.list(); if (disposed || store !== active) return; rows = result;
   const select = el<HTMLSelectElement>("saved-sets"), selected = select.value;
   select.replaceChildren(new Option("Choose a saved set", ""), ...rows.map(row => new Option(row.name, row.id))); select.value = rows.some(r => r.id === selected) ? selected : ""; update();
 }
 async function initializeStorage() {
-  if (disposed || storageBusy) return; storageBusy = true; update();
-  try { const database = await openPictureDatabase(); if (disposed) { database.close(); return; } store?.close(); store = new PictureStore(database); await refreshLibrary(); report("storage-status", "Local storage ready. Pictures are saved only when you choose Save."); }
-  catch (error) { report("storage-status", error); } finally { storageBusy = false; update(); }
+  if (disposed || storageBusy) return; const epoch = ++storageEpoch; storageBusy = true; update();
+  try { const database = await openPictureDatabase(); if (disposed || epoch !== storageEpoch) { database.close(); return; } store?.close(); store = new PictureStore(database); await refreshLibrary(); if (disposed || epoch !== storageEpoch) return; report("storage-status", "Local storage ready. Pictures are saved only when you choose Save."); }
+  catch (error) { if (epoch === storageEpoch) report("storage-status", error); } finally { if (epoch === storageEpoch) { storageBusy = false; update(); } }
 }
 el("retry-storage").onclick = () => { void initializeStorage(); };
 el("saved-sets").onchange = update;
 el("save-form").onsubmit = async event => { event.preventDefault(); if (!store || disposed || editor.pending || storageBusy) return;
   storageBusy = true; update(); const name = el<HTMLInputElement>("set-name").value.trim(), existing = rows.find(r => r.name === name);
   try { const record: PictureSet = { version: 1, id: existing?.id ?? crypto.randomUUID(), name, updatedAt: Date.now(), faces: editor.snapshot() };
-    await store.save(record); if (disposed) return; await refreshLibrary(); el<HTMLSelectElement>("saved-sets").value = record.id; report("storage-status", `Saved “${name}” on this device.`); }
+    await store.save(record); if (disposed) return; await refreshLibrary(); if (disposed) return; el<HTMLSelectElement>("saved-sets").value = record.id; report("storage-status", `Saved “${name}” on this device.`); }
   catch (error) { report("storage-status", error); } finally { storageBusy = false; update(); }
 };
 el("load-set").onclick = async () => { const row = rows.find(r => r.id === el<HTMLSelectElement>("saved-sets").value); if (!row || disposed || storageBusy) return;
@@ -136,7 +138,11 @@ function releaseIfIdle() {
   if (!disposed || released || viewer?.animating) return;
   released = true; viewer?.destroy(); editor.dispose(); store?.close();
 }
-addEventListener("pagehide", () => { disposed = true; editor.cancelPending(); controller?.dispose(); releaseIfIdle(); }, { once: true });
+bindPictureLifecycle(window, {
+  suspend() { storageEpoch++; store?.close(); store = undefined; storageBusy = false; },
+  resume() { update(); void initializeStorage(); },
+  dispose() { disposed = true; storageEpoch++; editor.cancelPending(); controller?.dispose(); releaseIfIdle(); },
+});
 update();
 void initializeStorage();
 void editor.preset("coast").then(ok => { if (ok) report("image-status", "Coastal landscapes ready. Choose your own six images or another example set."); }).catch(error => report("image-status", error));
