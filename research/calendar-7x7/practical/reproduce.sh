@@ -25,4 +25,14 @@ CALENDAR7_FLIX_TEST_DIR="$out/flix-tests" bash "$here/flix/test.sh" "$dag" "$can
 # The inherited DAG progress records are diagnostic, not verifier verdicts.
 tail -n 4 "$out/flix-tests/valid.tsv" > "$out/flix.tsv"
 cmp "$out/julia.tsv" "$out/flix.tsv"
+for entry in '38 2029' '50 2030'; do
+    read -r source_id year <<< "$entry"
+    selected="$here/evidence/feb-mar-$year.tsv"
+    "$julia_bin" --startup-file=no "$here/solver_macros.jl" "$dag" "$out/generated-$year" "$source_id" "$year" 3 > "$out/generator-$year.log" 2>&1
+    cmp "$selected" "$out/generated-$year/feb-mar-$year.moves.tsv"
+    "$julia_bin" --startup-file=no "$here/verify.jl" "$dag" "$selected" > "$out/julia-$year.tsv"
+    java -Xmx8g -jar "${CALENDAR7_FLIX_BUILD_DIR:-/tmp/cubistry-calendar7-practical-flix}/artifact/flix.jar" transition "$here/../english/evidence" "$here/../en-physical-review" "$dag" "$selected" > "$out/flix-$year-full.tsv"
+    tail -n 4 "$out/flix-$year-full.tsv" > "$out/flix-$year.tsv"
+    cmp "$out/julia-$year.tsv" "$out/flix-$year.tsv"
+done
 printf 'Both native replays agree; receipts: %s\n' "$out"
