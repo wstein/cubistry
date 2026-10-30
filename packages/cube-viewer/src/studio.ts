@@ -64,9 +64,13 @@ export function createPresentationStudio(
         // The furthest ground intersection comes from the upper support point.
         far = Math.max(far, -lightCenter.z + radius + (center.y + radius - floorY) / direction.y);
       }
-      const padding = .04 * radius;
-      Object.assign(camera, { left: left - padding, right: right + padding,
-        bottom: bottom - padding, top: top + padding, near: Math.max(.01, near - padding), far: far + padding });
+      // Square coverage keeps isotropic PCF softness. Padding exceeds its
+      // cube-scaled filter footprint, so edge casters retain their penumbra.
+      const padding = .12 * radius, half = Math.max(right - left, top - bottom) / 2 + padding;
+      const cx = (left + right) / 2, cy = (bottom + top) / 2;
+      camera.left = cx - half; camera.right = cx + half;
+      camera.bottom = cy - half; camera.top = cy + half;
+      camera.near = Math.max(.01, near - padding); camera.far = far + padding;
       camera.updateProjectionMatrix();
       key.shadow.radius = Math.max(2, Math.min(24,
         PRESENTATION_PRESET.shadowSoftness * (radius / Math.sqrt(3)) * PRESENTATION_PRESET.shadowMapSize /
