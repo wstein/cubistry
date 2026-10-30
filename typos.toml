@@ -34,6 +34,8 @@ OFFEN = "OFFEN"
 # Upstream font license names the standard OpenType width axis literally.
 [default.extend-identifiers]
 wdth = "wdth"
+# Preserve Three.js material property spelling (not prose).
+metalness = "metalness"
 # Preserve ReportLab's exact public method name.
 drawCentredString = "drawCentredString"
 

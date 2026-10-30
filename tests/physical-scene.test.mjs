@@ -24,10 +24,11 @@ function fixture(printed, spacing) {
     assert.equal(stickers.size, printed.length);
     for (const pose of poses) {
       const sticker = stickers.get(pose.id);
-      const q = sticker.getWorldQuaternion(new THREE.Quaternion());
+      const q = sticker.getWorldQuaternion(new THREE.Quaternion())
+        .premultiply(parent.getWorldQuaternion(new THREE.Quaternion()).invert());
       near(new THREE.Vector3(0, 0, 1).applyQuaternion(q).toArray(), pose.n);
       near(new THREE.Vector3(0, 1, 0).applyQuaternion(q).toArray(), pose.up);
-      near(sticker.getWorldPosition(new THREE.Vector3()).toArray(),
+      near(parent.worldToLocal(sticker.getWorldPosition(new THREE.Vector3())).toArray(),
         pose.p.map((x, i) => x * spacing + pose.n[i] * geometry.stickerOffset));
     }
   };
@@ -85,4 +86,29 @@ test("canceling a render-only turn restores the supplied authoritative frame and
   h.adapter.dispose();
   assert.deepEqual([bodies, stickers, materials], [1, 1, 0]);
   h.material.dispose();
+});
+
+test("shared clock placements and camera-space transforms stay outside physical frame mapping", () => {
+  const { print } = createDesign("picture");
+  const poses = stickerPoses(print, initialState(print));
+  const stage = new THREE.Scene();
+  const cubes = [-2.8, 0, 2.8].map(x => {
+    const h = fixture(poses, .52);
+    h.parent.position.set(x, 0, 0);
+    h.parent.rotation.set(.16, .2, 0);
+    stage.add(h.parent);
+    h.adapter.sync(poses);
+    return h;
+  });
+  stage.updateMatrixWorld(true);
+  for (const h of cubes) h.verify(poses);
+  const turn = cubes[1].adapter.beginTurn([0, 1], 1, Math.PI / 2);
+  turn.update(.5);
+  cubes[0].verify(poses); cubes[2].verify(poses);
+  turn.dispose(); cubes[1].adapter.sync(poses);
+  for (const h of cubes) h.verify(poses);
+  cubes[1].adapter.dispose();
+  assert.equal(cubes[0].parent.children.length, 8);
+  assert.equal(cubes[2].parent.children.length, 8);
+  for (const h of cubes) { if (h !== cubes[1]) h.adapter.dispose(); h.material.dispose(); }
 });
