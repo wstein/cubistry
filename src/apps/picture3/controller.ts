@@ -70,11 +70,18 @@ export class Cube3Controller {
     this.generation++; this.solver.cancel();
     this.message = "Cancelled. Any active legal turn finishes before playback stops."; this.changed();
   }
-  restore(): void {
+  async restore(): Promise<void> {
     if (this.busy || this.frozen) return;
-    this.viewer.configure(this.design, this.design.printing, this.artwork());
-    this.state = this.design.printing; this.entries = []; this.cursor = 0; this.turns = 0;
-    this.message = "Target restored. Your pictures and crop settings are retained."; this.changed();
+    if (exactGoal(this.design, this.state)) { this.message = "Already at the exact target, including centers."; this.changed(); return; }
+    const moves = tokens(inverse(this.entries.slice(0, this.cursor).join(" ")));
+    if (!sameState(apply(this.state, moves.join(" ")), this.design.printing))
+      throw Error("Unavailable: applied history does not verify against the exact target.");
+    const generation = ++this.generation; this.busy = true;
+    this.message = `Restoring via ${moves.length} verified inverse-history turns.`; this.changed();
+    // Trusted history may exceed the 100-move manual-input limit. Undo each
+    // committed entry so cancellation retains a coherent cursor and redo path.
+    try { await this.run(moves, "undo", generation); }
+    finally { this.busy = false; this.changed(); }
   }
   dispose(): void { this.cancel(); this.solver.dispose(); }
 }
