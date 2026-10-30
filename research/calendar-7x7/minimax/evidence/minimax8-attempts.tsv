@@ -1,0 +1,25 @@
+chain	edge	variant	status	htm	seconds	reason
+3	1	1/1	CANDIDATE	451	8.476932947	native verification required
+3	1	1/2	CANDIDATE	453	3.375407039	native verification required
+3	2	1/1	CANDIDATE	407	3.007293678	native verification required
+3	2	1/2	CANDIDATE	407	2.94841658	native verification required
+3	2	2/1	CANDIDATE	407	3.027096522	native verification required
+3	2	2/2	CANDIDATE	407	3.065755238	native verification required
+2	1	1/1	CANDIDATE	48	0.125674973	native verification required
+2	1	1/2	CANDIDATE	48	0.101043549	native verification required
+2	2	1/1	CANDIDATE	409	3.159930076	native verification required
+2	2	1/2	CANDIDATE	409	3.314313237	native verification required
+2	2	2/1	CANDIDATE	414	3.615506878	native verification required
+2	2	2/2	CANDIDATE	414	3.82133916	native verification required
+1	1	1/1	CANDIDATE	358	3.224019952	native verification required
+1	1	1/2	CANDIDATE	358	3.219155752	native verification required
+1	2	1/1	CANDIDATE	57	0.31916473	native verification required
+1	2	1/2	DUPLICATE	57	0.313578036	same complete physical endpoint
+1	2	2/1	CANDIDATE	57	0.309197457	native verification required
+1	2	2/2	DUPLICATE	57	0.327523759	same complete physical endpoint
+4	1	1/1	CANDIDATE	363	3.000049323	native verification required
+4	1	1/2	CANDIDATE	363	2.772430241	native verification required
+4	2	1/1	CANDIDATE	361	2.025841176	native verification required
+4	2	1/2	CANDIDATE	362	2.044096879	native verification required
+4	2	2/1	CANDIDATE	378	2.105775196	native verification required
+4	2	2/2	CANDIDATE	379	2.529912547	native verification required

@@ -1,0 +1,7 @@
+chain	edge	variant	status	htm	seconds	reason
+3	1	1/1	CANDIDATE	446	18.167502667	native verification required
+3	1	1/2	CANDIDATE	448	14.852751523	native verification required
+3	2	1/1	CANDIDATE	401	12.530230025	native verification required
+3	2	1/2	CANDIDATE	401	12.736626826	native verification required
+3	2	2/1	CANDIDATE	401	12.429996708	native verification required
+3	2	2/2	CANDIDATE	401	12.633108071	native verification required

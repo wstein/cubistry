@@ -21,5 +21,9 @@ source provenance, raw words, metrics, timings, budgets and failures are saved.
 Any native dissent yields UNKNOWN and the prescribed independent root-cause
 investigation. Search failure is never an impossibility proof.
 
-**Current status: UNKNOWN.** No improved bound or candidate is claimed yet.
+**Checkpoint status: scoped SAT for five saved raw chains**, independently
+accepted by unchanged native Julia and Flix replay. See
+[evidence and open review findings](evidence/README.md). Primary maximum is
+446 HTM; the 100–120 and 200-HTM objectives remain UNKNOWN. Further
+optimization is paused by the owner. Solver review is not cleared.
 This PR remains Draft for owner research acceptance; no parent PR is changed.

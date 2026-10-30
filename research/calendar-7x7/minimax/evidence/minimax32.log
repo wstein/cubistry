@@ -1,0 +1,15 @@
+chain catalog orbit=1 count=1008
+chain catalog orbit=2 count=4048
+chain catalog orbit=3 count=4048
+chain catalog orbit=4 count=1760
+chain catalog orbit=5 count=4048
+chain catalog orbit=6 count=4048
+chain catalog orbit=7 count=4048
+chain catalog orbit=8 count=4048
+chain catalog orbit=9 count=4048
+chain catalog orbit=10 count=4048
+relax	4	60000	3648
+relax	7	60000	5492
+relax	10	60000	5490
+selection	3	MINIMAX_CANDIDATE	446,401
+resources	103.960275378	37301947584	11.040755515	1022656512
