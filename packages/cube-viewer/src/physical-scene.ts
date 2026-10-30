@@ -23,6 +23,8 @@ export class PhysicalCubeScene {
   private readonly bodies = new Map<number, THREE.Group>();
   private readonly references = new Map<number, { id: number; inverse: THREE.Matrix4 }>();
   private readonly shells = new Map<number, { mesh: THREE.Mesh; stickerless: THREE.Material[] }>();
+  private readonly cores: THREE.Mesh[] = [];
+  private readonly innerPlastic: THREE.MeshStandardMaterial;
   private readonly faceMaterials: THREE.Material[] = [];
   private readonly geometries: THREE.BufferGeometry[];
   private readonly parent: THREE.Scene | THREE.Group;
@@ -40,6 +42,12 @@ export class PhysicalCubeScene {
     demand(Number.isFinite(spacing) && spacing > 0, "Invalid viewer spacing");
     this.parent = parent;
     this.plastic = plastic;
+    // Interior separation belongs to construction, never a selected frame color.
+    this.innerPlastic = plastic instanceof THREE.MeshStandardMaterial
+      ? plastic.clone() : new THREE.MeshPhysicalMaterial();
+    this.innerPlastic.color.set("#202329");
+    this.innerPlastic.map = null;
+    this.faceMaterials.push(this.innerPlastic);
     this.spacing = spacing;
     this.geometries = [geometry.body, geometry.sticker, ...(geometry.core ? [geometry.core] : [])];
     for (const s of printed) {
@@ -52,7 +60,7 @@ export class PhysicalCubeScene {
         body.add(shell);
         // Box/RoundedBox geometry groups are +X,-X,+Y,-Y,+Z,-Z. These
         // materials belong to immutable LOCAL source faces, never world axes.
-        const faceMaterials: THREE.Material[] = Array(6).fill(plastic);
+        const faceMaterials: THREE.Material[] = Array(6).fill(this.innerPlastic);
         const sourceIds = Array(6).fill(null);
         for (const face of printed.filter((face) => face.cubie === s.cubie)) {
           const axis = face.n.findIndex(component => component !== 0);
@@ -85,6 +93,7 @@ export class PhysicalCubeScene {
           core.scale.set(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
           core.position.set((max[0] + min[0]) / 2, (max[1] + min[1]) / 2, (max[2] + min[2]) / 2);
           body.add(core);
+          this.cores.push(core);
         }
         this.bodies.set(s.cubie, body);
         this.references.set(s.cubie, {
@@ -106,6 +115,8 @@ export class PhysicalCubeScene {
     demand(["stickered", "stickerless"].includes(construction), "Invalid cube construction");
     for (const { mesh, stickerless } of this.shells.values())
       mesh.material = construction === "stickerless" ? stickerless : this.plastic;
+    for (const core of this.cores)
+      core.material = construction === "stickerless" ? this.innerPlastic : this.plastic;
   }
   sync(poses: readonly PhysicalStickerFrame[]): void {
     const byId = new Map(poses.map((s) => [s.id, s]));
@@ -142,6 +153,7 @@ export class PhysicalCubeScene {
     this.bodies.clear();
     this.references.clear();
     this.shells.clear();
+    this.cores.length = 0;
     for (const material of this.faceMaterials) material.dispose();
     for (const geometry of this.geometries) geometry.dispose();
   }
