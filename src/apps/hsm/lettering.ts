@@ -12,6 +12,9 @@ export function hsmDesignFor(design: HsmDesign, value: Lettering): HsmDesign {
   if (value === "symbols") return design;
   return deepFreeze({
     ...design,
-    print: validatePrint({ ...design.print, id: "hsm_counter_blank_words" }),
+    print: validatePrint({
+      ...design.print,
+      id: "hsm_counter_seconds_first_words",
+    }),
   });
 }

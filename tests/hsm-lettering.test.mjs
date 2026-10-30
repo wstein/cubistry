@@ -55,7 +55,7 @@ test("both lettering choices retain the same physical print and valid upright HS
     assert.deepEqual(d.print.stickers, original.print.stickers);
     assert.equal(
       d.print.id,
-      style === "words" ? "hsm_counter_blank_words" : original.print.id,
+      style === "words" ? "hsm_counter_seconds_first_words" : original.print.id,
     );
     for (const letter of ["H", "M", "S"])
       assert(

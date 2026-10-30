@@ -560,6 +560,8 @@ $("application").addEventListener("change", async () => {
         callback,
         resolveAssets,
       );
+      // The selected range decides which saved counting period is installed.
+      candidate.setMode(hsmMaximum(), Number($("hsm-direction").value));
       await candidate.configure();
     } else if (requested === "timer" || requested === "five-second-timer") {
       const profile =
@@ -697,7 +699,7 @@ for (const id of ["hsm-letter", "hsm-lettering"])
       initial =
         event.currentTarget.id === "hsm-lettering" ? view.currentValue : 0,
       previousLettering =
-        viewer.presentedPrint?.id === "hsm_counter_blank_words"
+        viewer.presentedPrint?.id === "hsm_counter_seconds_first_words"
           ? "words"
           : "symbols";
     ready = false;

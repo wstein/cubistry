@@ -56,7 +56,7 @@ test("word print replaces large unit symbols and keeps the counter value", async
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "33");
   expect(await page.evaluate(() => window.letteringPrint.id)).toBe(
-    "hsm_counter_blank_words",
+    "hsm_counter_seconds_first_words",
   );
   for (const letter of ["M", "H", "S"]) {
     if (letter !== "M") {
@@ -116,7 +116,7 @@ test("the shared live clock offers bottom-only words and retains preferred speed
       const { clockUnits } = await import("/src/clock.mjs");
       return clockUnits.map((u) => u.controller.view.presentedPrint.id);
     }),
-  ).toEqual(Array(3).fill("hsm_counter_blank_words"));
+  ).toEqual(Array(3).fill("hsm_counter_seconds_first_words"));
   await page.selectOption("#hours-speed", "500");
   await expect
     .poll(() =>
@@ -140,7 +140,7 @@ test("the shared live clock offers bottom-only words and retains preferred speed
       const { clockUnits } = await import("/src/clock.mjs");
       return clockUnits.map((u) => u.controller.view.presentedPrint.id);
     }),
-  ).toEqual(Array(3).fill("hsm_counter_blank"));
+  ).toEqual(Array(3).fill("hsm_counter_seconds_first"));
 });
 test("an invalid word asset leaves the existing fixed print and value usable", async ({
   page,

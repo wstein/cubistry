@@ -1,9 +1,28 @@
 {
   "repository": "https://github.com/wstein/cubistry",
-  "layoutCommit": "8e9ad5c05e93efa2b1f841590f725416abf226f4",
-  "layoutPath": "research/hsm-counter/blank/witness.json",
-  "layoutSHA256": "13eea2a1ad88561775158a70633b80e25d06f883e42d44aafb4e6808699be47b",
-  "runtimeSHA256": "8c6b4426be5d6d317f43fd6b7063877feb36af1a5140cb4f282ae2463e3a7cf2",
-  "proofCommit": "8e9ad5c05e93efa2b1f841590f725416abf226f4",
-  "proofPath": "research/hsm-counter/blank/REVIEW.md"
+  "layoutBranch": "research/hsm-seconds-first",
+  "layoutCommit": "24240a3b2dbd691de99d5bf1170b5695fc62a320",
+  "layoutPath": "research/hsm-counter/seconds-first/witness.json",
+  "layoutSHA256": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3",
+  "researchFiles": {
+    "research/hsm-counter/seconds-first/README.md": "24ad7501344e6dcdfd91adaf692b560b09ae9b046eaf2c838369d004a63983b4",
+    "research/hsm-counter/seconds-first/verification.json": "ea9e422aefef94855924a90334f8a8d0383a4da5e0b3f93c3424e4885ecbde3c",
+    "research/hsm-counter/seconds-first/manifest.json": "cd91895a7505084e35ae9c5c10aea15619df7e65dd9c89283e706f4ebbc9db59",
+    "research/hsm-counter/seconds-first/verify.py": "c5a2cf5f7fa3f6e953c071f482d37e9081fb24a4d1c0e81689489e27c5fe956e",
+    "research/hsm-counter/seconds-first/witness.json": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3"
+  },
+  "appCopy": "data/hsm/seconds-first/witness.json",
+  "runtimePath": "public/hsm-counter.v2.json",
+  "runtimeSHA256": "32f0fdc7eb4aafdcfea64f6cf4f1f5b84e23b3bf41fcf635a96ae631bcd244ae",
+  "proofCommit": "24240a3b2dbd691de99d5bf1170b5695fc62a320",
+  "proofPath": "research/hsm-counter/seconds-first/README.md",
+  "reviewStatus": "pending: the independent review of the seconds-first proof is not complete and the research branch is not merged",
+  "supersedes": {
+    "layoutCommit": "8e9ad5c05e93efa2b1f841590f725416abf226f4",
+    "layoutPath": "research/hsm-counter/blank/witness.json",
+    "layoutSHA256": "13eea2a1ad88561775158a70633b80e25d06f883e42d44aafb4e6808699be47b",
+    "runtimeSHA256": "8c6b4426be5d6d317f43fd6b7063877feb36af1a5140cb4f282ae2463e3a7cf2",
+    "proofCommit": "8e9ad5c05e93efa2b1f841590f725416abf226f4",
+    "proofPath": "research/hsm-counter/blank/REVIEW.md"
+  }
 }

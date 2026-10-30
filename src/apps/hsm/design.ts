@@ -13,11 +13,64 @@ import {
   parseAlg,
   matchesTarget,
 } from "@cubistry/cube-mechanics";
+import { stateEquals } from "@cubistry/cube-core";
 import { deploymentBasePath, sha256 } from "@cubistry/cube-assets";
 export type Letter = "H" | "S" | "M";
+/**
+ * One closed counting period of the pinned print. Node `i` shows value
+ * `i mod (maximum + 1)`; `words[i]` is the route from node `i` to `i + 1`, and
+ * the last word returns to node 0. Counting down walks the same period backward.
+ */
+export interface HsmPeriod {
+  readonly letter: Letter;
+  readonly maximum: number;
+  /** Route from the solved print to node 0, which displays 00. */
+  readonly setup: string;
+  readonly periodHTM: number;
+  readonly words: readonly string[];
+}
 export interface HsmDesign {
   readonly print: PrintDefinition;
   readonly zeroWords: Readonly<Record<Letter, string>>;
+  readonly periods: readonly HsmPeriod[];
+}
+function validatePeriod(print: PrintDefinition, raw: unknown): HsmPeriod {
+  const p = record(raw, "HSM period");
+  demand(
+    ["H", "S", "M"].includes(p.letter as string) &&
+      [11, 23, 59].includes(p.maximum as number) &&
+      typeof p.setup === "string" &&
+      Array.isArray(p.words) &&
+      p.words.length > 0 &&
+      p.words.length % ((p.maximum as number) + 1) === 0 &&
+      p.words.every((w) => typeof w === "string" && w.length > 0),
+    "Invalid HSM period",
+  );
+  const letter = p.letter as Letter,
+    modulus = (p.maximum as number) + 1,
+    words = p.words as string[];
+  const start = applyMoves(initialState(print), parseAlg(p.setup as string));
+  let state = start,
+    total = 0;
+  words.forEach((word, i) => {
+    demand(
+      matchesTarget(print, state, hsmTarget(letter, i % modulus)),
+      "HSM period node shows the wrong value",
+    );
+    const moves = parseAlg(word);
+    demand(moves.length >= 1 && moves.length <= 6, "HSM period edge too long");
+    total += moves.length;
+    state = applyMoves(state, moves);
+  });
+  demand(stateEquals(state, start), "HSM period does not close");
+  demand(total === p.periodHTM, "HSM period length mismatch");
+  return deepFreeze({
+    letter,
+    maximum: p.maximum as number,
+    setup: p.setup as string,
+    periodHTM: total,
+    words,
+  });
 }
 export const positions: readonly Vec3[] = [
   [-1, 1, 1],
@@ -52,7 +105,7 @@ export function validateHsmDesign(raw: unknown): HsmDesign {
   const d = record(raw, "HSM counter");
   demand(
     d.schema === "cubistry.hsm-runtime" &&
-      d.version === 2 &&
+      d.version === 3 &&
       Array.isArray(d.printing) &&
       d.printing.length === 24,
     "Invalid HSM runtime",
@@ -65,7 +118,7 @@ export function validateHsmDesign(raw: unknown): HsmDesign {
   const print = validatePrint({
     schema: "cubistry.print",
     version: 1,
-    id: "hsm_counter_blank",
+    id: "hsm_counter_seconds_first",
     topology: { kind: "cube", size: 2 },
     cubies,
     stickers: printing.map((s, i) => {
@@ -103,7 +156,25 @@ export function validateHsmDesign(raw: unknown): HsmDesign {
       "Invalid HSM setup",
     );
   }
-  return deepFreeze({ print, zeroWords: zero as Record<Letter, string> });
+  demand(Array.isArray(d.periods), "Missing HSM periods");
+  const periods = (d.periods as unknown[]).map((p) => validatePeriod(print, p));
+  demand(
+    new Set(periods.map((p) => `${p.letter}/${p.maximum}`)).size ===
+      periods.length,
+    "Duplicate HSM period",
+  );
+  for (const letter of ["H", "S", "M"] as const) {
+    const first = periods.find((p) => p.letter === letter);
+    demand(
+      !first || first.setup === zero[letter],
+      "HSM setup is not the first period's setup",
+    );
+  }
+  return deepFreeze({
+    print,
+    zeroWords: zero as Record<Letter, string>,
+    periods,
+  });
 }
 export async function loadHsmDesign(
   basePath: string,
@@ -115,7 +186,7 @@ export async function loadHsmDesign(
   demand(response.ok, "Unable to load HSM print");
   const bytes = await response.arrayBuffer();
   demand(
-    bytes.byteLength < 20000 &&
+    bytes.byteLength < 32768 &&
       (await sha256(new Uint8Array(bytes))) === expectedHash,
     "HSM print integrity mismatch",
   );
