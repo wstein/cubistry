@@ -1,0 +1,4 @@
+PASS: all 780 baseline orbit triples agree.
+PASS: 2030/2031 orientation-screen counts agree: DE 6/0, EN 9/0.
+PASS: all 15 passing candidate identities and all 195 candidate orbit triples agree.
+Scope: specified font profile and searched header family; physical feasibility UNKNOWN.

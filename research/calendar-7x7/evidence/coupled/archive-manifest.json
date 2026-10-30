@@ -1,0 +1,80 @@
+[
+  {
+    "path": "DE-corner.smt2.gz",
+    "raw_sha256": "cb301306b4200b6f1df6ab32fafce0e2e102fb26b0904eb8bcafa4bf4610b796",
+    "compressed_sha256": "154a535f0580a609ad46abb63e07ad8f4fab881984acb41df3be687af5efbc02",
+    "raw_bytes": 3148429
+  },
+  {
+    "path": "DE-midge.smt2.gz",
+    "raw_sha256": "5572d9fdf285f3ab734e280cfff0130d5b82481ef6f845d28820376d98c03a43",
+    "compressed_sha256": "6be65a7843d3301f5f1f9b572f4a2480774fd84d0d247fe9d033cf59b02d417a",
+    "raw_bytes": 408210
+  },
+  {
+    "path": "DE-wing1.smt2.gz",
+    "raw_sha256": "18141adb253e9e8f2440f92ed5083fc68edce63553baa83d49c857ef6aff97f6",
+    "compressed_sha256": "7c01b0fac6b83ec2444725c1ad4ca4efa64b80ca7c93ba67db9340666af84115",
+    "raw_bytes": 5398842
+  },
+  {
+    "path": "DE-wing2.smt2.gz",
+    "raw_sha256": "1701b4550d073fcb3f6849d850aa7a1bc37357e365fb10c2d65624e25ce7297c",
+    "compressed_sha256": "9ec117729a7a479093b36aff4ca87c4a59168d015bc9727d4aa3064e46ce4847",
+    "raw_bytes": 5145663
+  },
+  {
+    "path": "EN-corner.smt2.gz",
+    "raw_sha256": "c14ab5690e335ea48292a307b31b17e912c6223657232b58460917d5512682f5",
+    "compressed_sha256": "8fd5e5ba0f096d3672d6cfe076b99067aef36e23f5d400c0b83684d7b9521654",
+    "raw_bytes": 3148357
+  },
+  {
+    "path": "EN-midge.smt2.gz",
+    "raw_sha256": "4a55dd456f9d4a7bf8b2d87bc9859bfd21ce47f4f18e72a8a7dbf61c9e733161",
+    "compressed_sha256": "4a0cf6ef993d3f583018c1061193b31592ce288d8462bf873a114785308c87b2",
+    "raw_bytes": 408210
+  },
+  {
+    "path": "EN-wing1.smt2.gz",
+    "raw_sha256": "4750b703ca19701f7ed3f37ce27309ecb4992c92090f061796833d4570f59a10",
+    "compressed_sha256": "6f53717c6463ec0534cc482461feffb472787a6990778a8309d2a8cadcc1e254",
+    "raw_bytes": 5398842
+  },
+  {
+    "path": "EN-wing2.smt2.gz",
+    "raw_sha256": "f126458be0bf5f394a8cd5f9796bbd7949f385b7b30da76d14c8764ae8d87b69",
+    "compressed_sha256": "eb4044f5944f766fa2ab30f8758d840365160e49b57994a14bc8b539ccb648e2",
+    "raw_bytes": 4552536
+  },
+  {
+    "path": "parser-attempt1-DE-corner.smt2.gz",
+    "raw_sha256": "c82d015179fb9def368494ca81f6637e0cbce37b65d9a6dce4c41b25f8214dcc",
+    "compressed_sha256": "4944b36cedc66e2873dbf96a58b24e6e8a45189e4e6e7b3b62eb7640ea0ecda8",
+    "raw_bytes": 807881
+  },
+  {
+    "path": "tight/DE-wing1-extra0.smt2.gz",
+    "raw_sha256": "55f3666ad4fd3e01446fb5c715f8687147990a7d79db302c3e9f57b0f702bdbe",
+    "compressed_sha256": "19266d8d329ba6da3e7891968b9e897a9adf83383288d7b3dd8a9e6e16fb3631",
+    "raw_bytes": 5517163
+  },
+  {
+    "path": "tight/EN-wing1-extra0.smt2.gz",
+    "raw_sha256": "2385d207c6b9d5c8e6b4e3107937ee46411bb2e858b8a9e62de094d6b3f10ca2",
+    "compressed_sha256": "a1fe0d63c193963ff60b1b1fed3da52a4e82a48ac9c9e05653da19244d99750a",
+    "raw_bytes": 5517162
+  },
+  {
+    "path": "tight/EN-wing1-extra1.smt2.gz",
+    "raw_sha256": "2cdd40e0f664f02e93ef7cd99aa6fc7027e4738e88c9b1b28f9d1d1a35735b82",
+    "compressed_sha256": "2ed6400161cbb85e9b8560fa14f7b2055f14beb397736091f738d8a8fdd603cf",
+    "raw_bytes": 5517162
+  },
+  {
+    "path": "tight/EN-wing1-extra2.smt2.gz",
+    "raw_sha256": "2dd5953b916705fd85cf22ae980c8862effa96319431ec8ca03c038d10a29807",
+    "compressed_sha256": "d599b9cdc4b4c007303719b79bc085991ba2f09e373c4317a6b133c6c411e3c6",
+    "raw_bytes": 5517162
+  }
+]

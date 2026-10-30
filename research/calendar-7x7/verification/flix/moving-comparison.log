@@ -1,0 +1,5 @@
+PASS: all 34 candidate verdicts and all 442 native orbit records match Julia output.
+PASS: all 32550 grouped schedules independently enumerated; halfyear DE0/EN0, quarter DE1/EN3, pair DE0/EN55.
+Common candidate: starts 555555555111 passes necessary bounds in both languages, 2026–2099.
+Blank demand computed as max over actual month/year states of date blanks plus that month schedule top blanks.
+Necessary inventory bounds only; physical feasibility UNKNOWN.
