@@ -215,9 +215,19 @@ following records were re-pinned, and nothing else in them:
 The older lifecycle/build/conformance captures describe the earlier artifact and the 195-case
 corpus; they were not regenerated.
 
-WORK IN PROGRESS: the re-pin above has NOT been performed yet, and the 195-case regression and
-`audit_corpus.py` have NOT been re-run on the changed sources. This paragraph will be replaced
-by the real result once they have been.
+Re-pinned (minimal): in `flix/evidence/provenance.json` the `Main.flix` hash, a new
+`Hsm.flix` entry and `runtimeArtifactSHA256` of the rebuilt jar; in
+`julia/evidence/provenance.json` the `check.jl` hash and a new `Hsm.jl` entry; in
+`evidence-manifest.json` the hashes of those two provenance files. Nothing else changed.
+
+Regression after the change (rebuilt jar, changed Julia sources): the 195-case `conformance`
+command in Flix and in Julia, and `tools/audit_corpus.py`, still report the pinned full-state
+aggregate `2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661`; the raw exports
+equal the hashes already recorded in the two provenance files. `hsm-conformance` gives the
+identical result in both checkers (41 cases, 3 accepted, 38 rejected). On a shared 2-core box
+Julia needs about 9 minutes and Flix about 1.2 minutes for it; the 18-mode witness alone takes Flix
+about 3.5 minutes. CI must therefore give `hsm-conformance` a generous timeout (at least 20
+minutes); nothing is weakened to save time.
 
 ## For agents (Codex, Claude Code)
 
