@@ -53,26 +53,43 @@ identity changed, so no new glyph SVG exists. The word variant (`hour`, `min`,
 ## Proof and implementation boundary
 
 The exact print and runtime digest are pinned in [hsm-source.json](../hsm-source.json).
-The pin names the long-lived research branch `research/cube-display-feasibility`,
-commit `4d9ef771305def5c4f6e9b1f2eec7689a03ed21b`, where the research landed with
-its independent review, and the SHA-256 of the witness and of its README,
-verification, manifest and checker files there. The research was first published
-on `research/hsm-seconds-first` at `24240a3b2dbd691de99d5bf1170b5695fc62a320`
-(recorded as `firstPublished`). The witness, `verification.json` and `verify.py`
-are byte-identical at both commits; only the README (the added review section)
-and the manifest's README hash differ. A verbatim copy of the witness lives at
-[data/hsm/seconds-first/witness.json](../data/hsm/seconds-first/witness.json);
-`node scripts/derive-hsm-runtime.mjs` derives the runtime file
-[public/hsm-counter.v2.json](../public/hsm-counter.v2.json) from it (`--check`
-fails when the file or its pin is stale). The file name is kept because the
-calendar print manifests pin the print input adapter by hash; its schema version
-is 3, and the digest pin makes a stale cached copy fail loudly instead of
-loading a mismatched print.
+The pin names the research branch `research/hsm-seconds-first-modes`, commit
+`30b6d022da60c366d79de5498497df0a07e28caf`, and the SHA-256 of every file the application relies on there.
+That branch adds the all-mode research
+(`research/hsm-counter/seconds-first/modes/`) on top of the long-lived research
+branch `research/cube-display-feasibility` at
+`4d9ef771305def5c4f6e9b1f2eec7689a03ed21b`, where the seconds-first print landed
+with its independent review (recorded as `basePublished`). The print was first
+published on `research/hsm-seconds-first` at
+`24240a3b2dbd691de99d5bf1170b5695fc62a320` (recorded as `firstPublished`). The
+print research files are unchanged at all three commits, except that the first
+publication's README has no review section and its manifest's README hash
+differs. Verbatim copies live in
+[data/hsm/seconds-first/](../data/hsm/seconds-first/):
+
+- `witness.json`, the seconds-first print;
+- `modes/witness.json`, the same print with one period for each of the 18 modes;
+- `modes/recovery.json`, the research recovery table.
+
+`node scripts/derive-hsm-runtime.mjs` derives the application runtime
+[public/hsm-counter.v3.json](../public/hsm-counter.v3.json) from the modes
+witness; `--check` fails when the file or its pin is stale. Its schema version
+is 4, with one period per counting mode. The digest pin makes a stale cached
+copy fail loudly instead of loading a mismatched print.
+
+The previous runtime [public/hsm-counter.v2.json](../public/hsm-counter.v2.json)
+stays byte-identical. It is the frozen print source of the committed HSM sticker
+sheets, whose manifests pin its SHA-256; it has the same 24 sticker records and
+the same 00 setups as the application runtime. The same script checks that it
+still derives exactly from the base witness, and never rewrites it. The
+application no longer loads it.
 
 > **Review status: reviewed, not CONFIRMED.** The independent review recorded in
 > the research README found no blocking proof issue and recomputed the 159, 204,
 > 82 and 40 figures with its own Python model; the review of this application
-> change recomputed the same laps through the real controller. Under
+> change recomputed the same laps through the real controller. The all-mode
+> periods and the recovery table are checked by the research's independent
+> Python verifier only. Under
 > [proof-checkers/AUTHORITY.md](../proof-checkers/AUTHORITY.md) the result is not
 > CONFIRMED until both the Flix and the Julia checker accept it, which has not
 > been done. The application consumes the pinned witness. The previous pin
@@ -89,77 +106,138 @@ this general bound.
 ### Counting modes
 
 The best sustainable way to count on a fixed print is a **period**: a closed
-sequence of poses over the full 24-sticker state, hidden stickers included, in
-which every edge is a shortest word from its actual pose. The witness holds one
-period per mode. The application replays them on the loaded print and keeps
-four, counting up:
+sequence of poses over the full 24-sticker state, hidden stickers included. It
+repeats indefinitely. Every one of the 18 counting modes has one, and **no step
+of any period exceeds five HTM**. Counting up follows the research's
+shortest-edge period. Counting down runs the same period backward with every
+word inverted. The runtime file writes both out, one period per mode:
 
 | Unit and range | Period edges | Lap HTM | Largest edge | Wrap |
 | --- | ---: | ---: | ---: | ---: |
 | S 00–59 | 60 (one lap) | 159 | 4 | 59→00 in 3 |
+| S 00–23 | 24 (one lap) | 68 | 5 | 5 |
+| S 00–11 | 12 (one lap) | 32 | 4 | 4 |
 | M 00–59 | 120 (two laps) | 204 average | 5 | 4 |
+| M 00–23 | 48 (two laps) | 82 average | 5 | 4 |
+| M 00–11 | 12 (one lap) | 40 | 4 | 4 |
+| H 00–59 | 120 (two laps) | 204 average | 5 | 4 |
 | H 00–23 | 48 (two laps) | 82 average | 5 | 4 |
 | H 00–11 | 12 (one lap) | 40 | 4 | 4 |
 
+Lap, largest edge and wrap are the same counting down; the down wrap is 00→59
+(00→23, 00→11). The S 00–59, M 00–59, H 00–23 and H 00–11 rows are the four
+periods published first, unchanged.
+
 Move-count frequencies below cover the **complete saved period**, including
-all wraps, with setup excluded. M and H 00–23 each span two laps; their integer
+all wraps, with setup excluded. Some periods span two laps; their integer
 frequencies must not be read as counts for one lap. Each half turn counts as one
 HTM. Mean HTM per transition is the weighted total divided by period edges.
 
 | Unit and range | Transitions | 1 HTM | 2 HTM | 3 HTM | 4 HTM | 5 HTM | Total HTM | Mean HTM/transition |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | S 00–59 | 60 | 12 | 6 | 33 | 9 | 0 | 159 | 2.6500 |
+| S 00–23 | 24 | 3 | 3 | 14 | 3 | 1 | 68 | 2.8333 |
+| S 00–11 | 12 | 3 | 0 | 7 | 2 | 0 | 32 | 2.6667 |
 | M 00–59 | 120 | 0 | 0 | 81 | 30 | 9 | 408 | 3.4000 |
+| M 00–23 | 48 | 2 | 0 | 29 | 10 | 7 | 164 | 3.4167 |
+| M 00–11 | 12 | 0 | 0 | 8 | 4 | 0 | 40 | 3.3333 |
+| H 00–59 | 120 | 0 | 0 | 81 | 30 | 9 | 408 | 3.4000 |
 | H 00–23 | 48 | 2 | 0 | 29 | 10 | 7 | 164 | 3.4167 |
 | H 00–11 | 12 | 0 | 0 | 8 | 4 | 0 | 40 | 3.3333 |
 
 These are descriptive counts of the pinned route words, not an independent
-confirmation of feasibility or optimality. Reversing the saved period preserves
-the histogram and mean.
+confirmation of feasibility or optimality. Reversing a period preserves the
+histogram and mean.
 
-Counting down walks the same period backward with every word inverted. It
-closes the same poses and costs the same HTM, but is not necessarily the shortest
-word toward the lower display. The research gives 159 for the seconds inverse and
-a certified 171 for shortest-edge counting down; the inverse is also used for M
-and H, where it is never longer than the research's own down periods
-(M 204 against 204.75, H 82 and 40 against 82 and 41.14) and keeps the largest
-edge at five or less. Switching direction therefore never leaves the period.
+The inverse used for counting down closes the same poses and costs the same
+HTM. It is not necessarily the shortest word toward the lower display. In every
+mode it is cheaper than the research's own down period, or equal to it:
+
+| Unit | 00–59 | 00–23 | 00–11 |
+| --- | --- | --- | --- |
+| S | 159 against 171 | 68 against 70.25 | 32 against 33.75 |
+| M | 204 against 204.75 | 82 against 82 | 40 against 41.2 |
+| H | 204 against 204.75 | 82 against 82 | 40 against 41.2 |
+
+The inverse also keeps the largest edge at five or less. Switching direction
+therefore never leaves the period.
 
 A unit starts on its period: a fresh setup, a unit change and a lettering change
-install the period's pose for the current value and range instead of setting
-up 00 and jumping. In the live clock the same install happens for the current
-time. After a free jump (Set, Reset, range change), an interrupted route or in a
-mode without a period (S 00–23 and 00–11, M 00–23 and 00–11, H 00–59), no period
-pose is on the cube. The exact planner (shortest routes, one-step lookahead,
-policy 13) then plans from the authoritative pose within the six-move bound;
-that fallback needs no certificate beyond the six. A free jump can leave the
-period for good; a unit change or lettering change reinstalls it. Shared
-playback still checks exact physical completion including all hidden cubies, and
-the blank is a permanent color asset with no text.
+install the period's pose for the current value, range and direction instead of
+setting up 00 and jumping. In the live
+clock the same install happens for the current time. Shared playback still checks
+exact physical completion including all hidden cubies, and the blank is a
+permanent color asset with no text.
 
-### Largest step per mode: M can now need six HTM
+### Leaving and returning to the period
 
-> **Owner decision.** On the previous print all 18 modes counted at most five
-> HTM per step from a fresh setup. **On this print that holds only on the four
-> saved periods.** The other modes use the exact planner and still respect the
-> six-move bound, but **M 00–23 (up and down) and M 00–11 down need six HTM on
-> some steps**, which exceeds the owner's M ≤ 5 limit, and so does H 00–59
-> down. Off a period (after Set, Reset, a range change or live-clock catch-up),
-> M 00–59 can also need six HTM, and so can H 00–23 and H 00–11. Whether this
-> is acceptable is the owner's decision; this change does not lower it to five.
+A free jump leaves the period: Set, Reset, a range change, a live-clock catch-up
+or an interrupted route. The counter then returns to it as follows.
 
-Largest step from a fresh setup over three laps, as pinned in
-`tests/hsm-seconds-first.test.mjs`:
+- **The jump** takes a least route to the requested display, as before, and
+  never exceeds the universal six. Among the least routes it prefers one that
+  lands on a period node. Otherwise it prefers a pose from which the next step
+  needs at most five HTM. Only if every least route lands on a pose without such
+  a step would it spend one HTM more, and never beyond six. In 5,400 measured
+  jumps (300 per mode) that never happened, and no jump took longer than the
+  least route.
+- **Counting on** recovers. Each step shows the next value, as ordinary
+  counting does, and may use any legal word of at most five HTM, not only a
+  shortest one. An exact bidirectional search over settled full poses
+  (`src/apps/hsm/recovery.ts`) picks the plan with the fewest steps, then the
+  fewest HTM, that ends on a period node. The plan is followed while the cube
+  stays where it predicts and recomputed otherwise. Once on the period,
+  counting follows the saved words again.
+
+Research bound ([recovery.json](../data/hsm/seconds-first/modes/recovery.json),
+recomputed in full by the independent research verifier): from **every**
+settled pose of a mode, the period is at most this many steps away. The
+recovery HTM is the most HTM over all those steps together.
+
+| Unit | Steps, 00–59 up / down | Steps, 00–23 | Steps, 00–11 | Most recovery HTM |
+| --- | ---: | ---: | ---: | ---: |
+| S | 6 / 6 | 6 / 6 | 5 / 6 | 28 |
+| M | 7 / 6 | 6 / 7 | 7 / 7 | 35 |
+| H | 7 / 6 | 6 / 7 | 7 / 7 | 35 |
+
+The mean is 3.3–3.9 steps. Every step is at most five HTM, with one exception.
+On M or H, 756 poses of 116,640 (00–59) or 252 (00–23, 00–11) have no route of
+five to the next display. From such a pose the first step is its unavoidable
+six-HTM shortest word. It happens once and only from such a pose; S has none.
+The jump above avoids landing on these poses.
+
+Measured through the real controller (5,400 random jumps, 300 per mode):
+
+- 0–6 steps back to the period, with 3–4 typical;
+- at most five HTM on every step;
+- no six-HTM step;
+- at most 28 HTM per recovery;
+- at most 249 ms for one recovery search.
+
+The live seconds after a 40-second catch-up are back on the period within six
+ticks; a test pins this.
+
+The exact shortest-path planner (policy 13) remains only as the last fallback,
+if no recovery plan or jump route is found. With the pinned print that does not
+happen.
+
+### Largest step per mode
+
+**All 18 modes count at most five HTM per step**, from a fresh setup and, after
+recovery, after any jump. The largest step over three laps from a fresh setup is
+pinned in `tests/hsm-seconds-first.test.mjs` and `tests/hsm-counter.test.mjs`:
 
 | Unit | 00–59 up / down | 00–23 up / down | 00–11 up / down |
 | --- | ---: | ---: | ---: |
-| S | 4 / 4 (period) | 5 / 5 | 5 / 5 |
-| M | 5 / 5 (period) | **6 / 6** | 5 / **6** |
-| H | 5 / **6** | 5 / 5 (period) | 4 / 4 (period) |
+| S | 4 / 4 | 5 / 5 | 4 / 4 |
+| M | 5 / 5 | 5 / 5 | 4 / 4 |
+| H | 5 / 5 | 5 / 5 | 4 / 4 |
 
-The earlier independent review found a recurrent counting mode with at most five
-HTM per step for each of these ten modes on this print. Those modes are not saved
-as witnesses, so the application cannot follow them yet.
+A free jump itself can still need six HTM; the user accepted the six-move bound
+for free jumps. Before the all-mode periods, M 00–23 (up and down), M 00–11
+down and H 00–59 down needed six HTM on ordinary counting steps, and so could M
+00–59 after leaving its period. A negative-control test keeps that regression
+visible: removing the M 00–23 periods brings the six back.
 
 ### Before and after
 
@@ -182,8 +260,8 @@ The seconds cube of the [live clock](LIVE_CLOCK.md#move-statistics) averages
 **2.65 HTM per tick (159 per lap) instead of 4.49** over three simulated laps
 from 00 (808 HTM per 180 ticks before, 477 after). These are settled-display
 results. A manual Set, letter or range change can need up to
-six HTM, and the setup word from the solved print to the period start (8–9 HTM)
-is excluded from the laps.
+six HTM for the jump itself, and the setup word from the solved print to the
+period start (8–10 HTM) is excluded from the laps.
 
 ## Artwork
 
@@ -227,7 +305,8 @@ Its preferred H/M/S timings are 250/100/50 ms **per quarter turn**. A half turn
 uses two quarter units. Six HTM loosely permit twelve quarter units, with nominal
 H/M/S budgets of 3/1.2/0.6 seconds before fitting. Saved period routes use at most five quarter units
 for seconds and eight for minutes and hours; this narrower result does not cover
-arbitrary poses. The clock shows scheduled quarter/half
+arbitrary poses. A recovery step after a catch-up has at most five HTM, so at
+most ten quarter units. The clock shows scheduled quarter/half
 times when it fits a route into the available live interval. Standalone counter
 rotation settings retain their existing per-move behavior.
 
@@ -240,21 +319,46 @@ npm run test:e2e -- tests/browser/hsm-counter.spec.mjs
 
 The HSM Node regressions cover repeated traversal of all eighteen letter/range/
 direction modes, arbitrary targets, fallback prefix totals, invalid inputs,
-full-state inverses, and bounded stop behavior. From each unit's fresh setup, the
-eight modes with a period close over the full pose within one period at most five
-HTM per step; the ten modes without one stay within the six-move bound, and their
-exact largest steps (six for M 00–23, M 00–11 down and H 00–59 down) are pinned. A positive
-control turns the blank's up vectors without changing any plan.
-`tests/hsm-seconds-first.test.mjs` pins the research commit and file hashes, the
-derived runtime file, the print code and the 14 changed identities against a
-fixture of the previous print, replays each period on the app's mechanics (the
-saved start frames, closure, and every edge shortest from its actual pose), and
-counts three laps of every researched mode up and down through the real
-controller: S 159, M 204 and H 82 / 40 per lap with the largest edges 4, 5, 5 and 4
-and the S wrap at 3. It then runs the three-cube live-clock scheduler with the move
-statistics for 180 ticks, before and after, and checks bounded catch-up. Negative
-controls corrupt the witness bytes, the derived runtime, a sticker, a period word and
-its length, and each must fail. Browser tests cover all nine letter/range variants in
-both wrap directions, run/stop/resume, mobile layout, isolation from the existing
-counter and timer applications, and the exact blank/M/33 regression. A known
-six-move free jump is pinned as a Node regression.
+full-state inverses, and bounded stop behavior. From each unit's fresh setup,
+every one of the 18 modes closes over the full pose within one period at most
+five HTM per step. A positive control turns the blank's up vectors without
+changing any plan.
+
+`tests/hsm-seconds-first.test.mjs` covers the following:
+
+- the research commit and file hashes;
+- the derived runtime file;
+- the print code and the 14 changed identities, against a fixture of the
+  previous print;
+- each of the 18 periods replayed on the app's mechanics: the saved start
+  frames, closure, at most five HTM, every forward edge shortest from its
+  actual pose, and every backward word the inverse of its research word;
+- three laps of every mode up and down through the real controller, against
+  the per-mode lap, largest-edge and wrap pins above.
+
+It checks recovery four ways:
+
+- after free jumps in every mode, the period returns within the research step
+  bound at most five HTM per step;
+- after an interrupted route in every mode, the same holds;
+- the recovery search from every saved research pose gives exactly the
+  research's step count and HTM;
+- from the poses without a route of five, exactly one six-HTM step comes
+  first.
+
+It runs the three-cube live-clock scheduler with the move statistics for 180
+ticks, before and after, and checks that a bounded catch-up returns the seconds
+to their period within six ticks.
+
+Negative controls each must fail:
+
+- corrupting the witness bytes, the derived runtime, a sticker, a period word
+  and its length, a direction or traversal;
+- a six-move witness word;
+- an application mode the derivation cannot find;
+- a design without the M 00–23 periods: it needs six HTM again.
+
+Browser tests cover all nine letter/range variants in both wrap directions,
+run/stop/resume, mobile layout, isolation from the existing counter and timer
+applications, and the exact blank/M/33 regression. A known six-move free jump is
+pinned as a Node regression.

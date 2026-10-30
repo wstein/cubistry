@@ -40,15 +40,21 @@ changing the displayed value, print, date or active motion.
 Each cube starts on its saved counting period: at load it installs the period pose
 for the current local value (hours 00–23, minutes and seconds 00–59), so the clock
 counts along the pinned routes (seconds 159 HTM per lap, minutes 204, hours 82 on
-average) rather than along routes planned from scratch. Catch-up after a suspended
-tab or wall-clock jump still replans from the actual pose with the exact planner
-(at most six HTM) and may leave the period until the page reloads. Off the
-period the laps are longer (in simulation after jumps, seconds about 186–197
-HTM and minutes about 204–231 HTM per lap) and the minutes and hours cubes can
-need six HTM on a step, above the owner's M ≤ 5 limit (see
-[HSM counter](HSM_COUNTER.md#largest-step-per-mode-m-can-now-need-six-htm)).
+average) rather than along routes planned from scratch. Catch-up after a
+suspended tab or wall-clock jump is a free jump: a least route to the current
+time (at most six HTM) that prefers a period node. Otherwise it prefers a pose
+whose next step needs at most five HTM. The following ticks then recover onto
+the period. Each tick shows the next value and costs at most five HTM. The
+only exception is a jump that lands on one of the rare poses with no such step,
+which the jump avoids and which was never observed. The research bounds the
+return at six steps for seconds and hours (00–23) and seven for minutes:
+seconds are back within six ticks, minutes within seven minutes, and hours
+within six hours. Measured returns usually take three or four steps.
+A test pins the seconds' return after a 40-second catch-up. See
+[HSM counter](HSM_COUNTER.md#leaving-and-returning-to-the-period).
 
-The scheduler prepares shortest HTM routes only from committed, idle full poses.
+The scheduler prepares routes (saved period words, recovery steps or least
+jumps) only from committed, idle full poses.
 For a route, angular work is `Q = sum(abs(move.turns))`: a quarter turn contributes
 one unit and a half turn two. The nominal route duration is `Q * preferredMs`.
 At launch, `scheduledQuarterMs = min(preferredMs, availableMs / Q)`. Every turn
