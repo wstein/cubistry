@@ -112,12 +112,12 @@ export class SmartRotation {
       this.beginLevel(at); return;
     }
     this.levelingRequested = false;
-    if (this.modeValue !== "smart" || this.reduced) return;
+    if (this.modeValue !== "smart") return;
     const distance = this.quaternion.angleTo(this.anchor);
     if (this.anchorCandidate && distance <= ROTATION_TUNING.toleranceRadians + 1e-12) {
       this.anchor.copy(this.quaternion); this.anchorPitch = this.pitch; this.anchorYaw = this.yaw;
     }
-    else if (distance > 1e-7) { this.phaseValue = "awaiting-return"; this.returnAt = at + ROTATION_TUNING.idleSeconds; }
+    else if (!this.reduced && distance > 1e-7) { this.phaseValue = "awaiting-return"; this.returnAt = at + ROTATION_TUNING.idleSeconds; }
     // Only an actual user rotation can propose a new anchor. Automatic
     // interpolation, taps, settings and visibility changes cannot walk it.
     this.anchorCandidate = false;

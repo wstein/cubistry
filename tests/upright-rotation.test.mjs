@@ -97,3 +97,16 @@ test('dragging either pitch boundary discards outward filtered momentum before a
   const after=new Vector3(0,1,0).applyQuaternion(c.quaternion);assert(Math.abs(Math.atan2(after.z,after.y))<before,'reverse release must continue away from the pole');upright(c.quaternion);
  }
 });
+
+test('reduced Smart classifies genuine settled gestures and requested leveling while disabling only automatic motion',()=>{
+ for(const degrees of [10,26])for(const bridge of [false,true]){
+  const c=new SmartRotation(pose(),bridge?'free':'smart',true);c.down(0);c.drag(0,degrees*Math.PI/180,.2);
+  if(bridge){c.drag(.03,0,.3);c.drag(0,.03,.4);c.drag(-.03,0,.5);c.drag(0,-.03,.6);}c.up(.8);
+  if(bridge){c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(1.15);}
+  const settled=c.quaternion.clone();assert.equal(c.phase,'idle');assert.equal(c.returnDeadline,null);
+  if(degrees===10)same(c.anchor,settled);else same(c.anchor,pose());
+  c.step(20);same(c.quaternion,settled);c.setReducedMotion(false,21);
+  if(degrees===10){assert.equal(c.phase,'idle');same(c.anchor,settled);c.step(30);same(c.quaternion,settled);}
+  else {assert.equal(c.returnDeadline,23);c.step(24);same(c.quaternion,pose());}
+ }
+});
