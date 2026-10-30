@@ -1,0 +1,1 @@
+{"valid":false,"status":"UNSUPPORTED","reason":"java.lang.IllegalArgumentException: UNSUPPORTED: recovery schema"}

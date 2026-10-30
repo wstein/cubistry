@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/tmp/julia-1.13.3/bin/julia",
+    "--startup-file=no",
+    "--project=proof-checkers/julia",
+    "proof-checkers/julia/recovery.jl",
+    "/tmp/hsm-recovery-source.json",
+    "/tmp/hsm-modes-source.json"
+  ],
+  "cwd": "/workspace/cubistry-hsm-recovery-julia",
+  "startedUTC": "2026-10-30T10:34:14Z",
+  "elapsedSeconds": 1489.6072677740012,
+  "exitCode": 0,
+  "userSeconds": 1488.835671,
+  "systemSeconds": 0.71534,
+  "maximumResidentKiB": 657952,
+  "hashes": {
+    "/tmp/hsm-recovery-julia-sol-exact-full18/stdout.jsonl": "0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70",
+    "/tmp/hsm-recovery-julia-sol-exact-full18/stderr.txt": "13e5a20f75c3ce237a58f8245733852bbb40d178586cba790590318a288d5f65",
+    "proof-checkers/julia/Recovery.jl": "9c044527b808e04f55daa080da366ec237565dfccf0b2df972a41023be4c48dc",
+    "proof-checkers/julia/recovery.jl": "cd6e72a893c52d1a8ff1dc3235acd6f01d9856d9e8f499f59032c7ba38edac54",
+    "/tmp/hsm-recovery-source.json": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda",
+    "/tmp/hsm-modes-source.json": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae"
+  }
+}
