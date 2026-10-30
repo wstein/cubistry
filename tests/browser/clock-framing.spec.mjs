@@ -44,6 +44,7 @@ test("the shared clock stays framed at simultaneous yaw and pitch extremes", asy
         clockStage.camera.position
           .clone()
           .set(...p)
+          .applyMatrix4(clockStage.presentation.matrixWorld)
           .project(clockStage.camera)
           .toArray(),
       );
@@ -87,10 +88,7 @@ test("the reference top-right viewpoint resets and fits the shared row on deskto
       .poll(async () =>
         page.evaluate(async () => {
           const { clockStage } = await import("/src/clock.mjs");
-          return Math.atan2(
-            clockStage.camera.position.x,
-            clockStage.camera.position.z,
-          );
+          return -clockStage.presentation.rotation.y;
         }),
       )
       .toBeCloseTo(0.2, 5);
@@ -113,6 +111,7 @@ test("the reference top-right viewpoint resets and fits the shared row on deskto
         const q = clockStage.camera.position
           .clone()
           .set(...p)
+          .applyMatrix4(clockStage.presentation.matrixWorld)
           .project(clockStage.camera);
         return Math.abs(q.x) < 0.96 && Math.abs(q.y) < 0.96;
       });

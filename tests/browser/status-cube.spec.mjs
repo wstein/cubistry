@@ -308,6 +308,7 @@ for (const [name, viewport] of [
         return {
           state: JSON.stringify(c.state),
           camera: c.view.camera.position.toArray(),
+          presentation: c.view.presentation.quaternion.toArray(),
           moves: c.progress.sessionTotal,
         };
       });
@@ -322,10 +323,10 @@ for (const [name, viewport] of [
         .poll(async () =>
           page.evaluate(async () => {
             const { statusController: c } = await import("/src/status.mjs");
-            return c.view.camera.position.toArray();
+            return c.view.presentation.quaternion.toArray();
           }),
         )
-        .not.toEqual(before.camera);
+        .not.toEqual(before.presentation);
       const after = await page.evaluate(async () => {
         const { statusController: c } = await import("/src/status.mjs");
         return {
@@ -333,6 +334,10 @@ for (const [name, viewport] of [
           moves: c.progress.sessionTotal,
         };
       });
+      expect(await page.evaluate(async () => {
+        const { statusController: c } = await import("/src/status.mjs");
+        return c.view.camera.position.toArray();
+      })).toEqual(before.camera);
       expect(after.state).toBe(before.state);
       expect(after.moves).toBe(before.moves);
       await page.selectOption("#status-build", "running");

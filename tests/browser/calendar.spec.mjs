@@ -354,6 +354,7 @@ test.describe("high-density calendar framing", () => {
                 viewer.camera.position
                   .clone()
                   .set(x, y, z)
+                  .applyMatrix4(viewer.presentation.matrixWorld)
                   .project(viewer.camera)
                   .toArray(),
               ),
