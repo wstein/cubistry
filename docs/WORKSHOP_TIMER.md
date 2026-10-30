@@ -67,18 +67,25 @@ overhead = 75 * N + 8
 effective = min(preferred, max(10, (B - overhead - 20) / N))
 plannedSequenceDuration = overhead + N * effective
 startAt = T - plannedSequenceDuration
-finalMotionStart = T - effective
+firstMotionStart = T - N * effective
+turnWindow(i) = [T - (N-i) * effective, T - (N-i-1) * effective]
 ```
 
 A feasible plan satisfies `plannedSequenceDuration + 20 <= B`. A normal five-move
 edge at a 2,000 ms preference uses 919.4 ms nominal turns in a 4,980 ms planned
 sequence. Faster 250 ms and 10 ms preferences remain unchanged when they fit.
-The earlier turns run normally. The final turn holds **its starting pose**, then
-rotates during its nominal motion window ending at `T`. It does not reach the
-final pose early and merely delay the displayed value or move count.
+The owner follow-up removes the legacy final-turn hold. Every move now has a
+live absolute timing source and adjacent windows through `T`, using one HTM unit
+for either a quarter or half turn. The unchanged reserve is consumed before the
+first motion window, not between turns. For the real three-HTM 90→89 edge at
+250 ms, request dispatch is 9017, first motion starts at 9250, and commits occur
+at 9500, 9750 and 10000. At 10 ms the same reserve precedes three contiguous
+10 ms turns. The cube does not reach its final pose early and delay its display
+or count. See [continuous timer timing](TIMER_CONTIGUOUS_TIMING.md) for diagnosis
+and deterministic verification; Live H–M–S retains its separate angular metric.
 
-A guarded one-shot wake starts the word. Final-turn interpolation uses the same
-absolute endpoint, with a guarded timer at `T` competing safely with animation
+A guarded one-shot wake starts the word. Every turn interpolates to its own
+absolute endpoint, with a guarded timer competing safely with animation
 frames. Completion happens once: the final mesh state is synchronized and drawn
 before the animation promise resolves, then the controller verifies the full
 canonical state, commits the HTM, and updates the live UI in the same task and
@@ -94,7 +101,7 @@ a changed target replaces it after the current committed turn and replans from
 the actual full pose. See [target interruption](TARGET_INTERRUPTION.md). Faster
 virtual ticks can skip intermediate *displays*, never moves or verification.
 
-**Moving** includes a normal future target and its intentional final-turn hold.
+**Moving** includes a normal future target and the pre-route reserve before its first turn.
 **Synchronizing** means a genuine mismatch with the current or planned target;
 it shows the last settled time. The reserved two-line area reports effective
 speed, **Budget infeasible**, or **Late** without moving the slider. The slider
@@ -113,8 +120,10 @@ Pause freezes the clock and releases a scheduled hold. A partially animated turn
 continues forward, then the legal sequence reconciles the frozen bucket. Reset,
 Set, mode changes, and application replacement invalidate old pacing similarly.
 Resume preserves fractions. Rate and speed changes rebase remaining progress
-without reversing the angle; an initially untimed final turn can acquire a newly
-feasible deadline. Automatic terminal clock ticks preserve a valid final-turn
+without reversing the angle; an initially untimed turn at any route index can
+acquire a newly feasible deadline. Explicit user retiming may intentionally hold
+the current angle to honor the revised endpoint/preference; the no-interior-dwell
+policy applies to an unchanged feasible route. Automatic terminal clock ticks preserve a valid final-turn
 endpoint until physical completion instead of canceling its timer at `T`.
 Completion/limit reached still requires the exact physical 00:00/59:50 state.
 
@@ -135,6 +144,19 @@ with full replay. No new solver, search, table, or claim of globally optimal
 partial-display paths is introduced. Counter's presentation-only blank-tens mask
 is cleared for Timer; all four Timer digits remain printed, upright digits.
 Returning to Counter restores its presentation preference and certified 339-HTM route.
+
+## Continuous-route follow-up acceptance
+
+The historical browser observations below predate the removal of the final-turn
+hold and do not certify this follow-up. New deterministic tests drive the actual
+TimerController and production interpolation across both profiles/directions,
+real profile budgets, mixed HTM moves, every sampled junction, revisions,
+clearing, queued targets, pause/reset and missed windows. Existing browser test
+source now checks every scheduled window and moves its four-commit checkpoints
+to the continuous final-window start. Browser/E2E/Playwright tests are **NOT RUN**;
+source syntax and numeric evidence are separate from owner native-browser feel
+and the 20 ms foreground timing acceptance. No new screenshots or measurements
+replace the preserved historical artifacts.
 
 ## Evidence and timing
 

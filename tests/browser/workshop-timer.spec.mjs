@@ -853,6 +853,7 @@ async function observeEndpoints(page) {
     CubeViewer.prototype.animate = async function (p, ...options) {
       window.sequenceStartedAt ??= performance.now();
       window.nominalDurations.push(75 / this.animationSpeed);
+      const motionWindow=options[0]?.();if(motionWindow)(window.motionWindows??=[]).push(motionWindow);
       const render = this.renderer.render, viewer = this;
       if (options[0]) this.renderer.render = function (...args) {
         const result = render.apply(this, args);
@@ -872,7 +873,7 @@ async function observeEndpoints(page) {
 async function clearEndpointObservation(page) {
   await page.evaluate(() => {
     window.sequenceStartedAt = null; window.deadlineCommits = []; window.timerTimes = [];
-    window.nominalDurations = []; window.endpointRenders = []; window.endpointAngles = [];
+    window.nominalDurations = []; window.motionWindows = []; window.endpointRenders = []; window.endpointAngles = [];
   });
 }
 async function endpointObservation(page, value = 1) {
@@ -887,7 +888,7 @@ async function endpointObservation(page, value = 1) {
     return { target, deadline: window.actualDeadline, startedAt: window.sequenceStartedAt,
       settledAt: committed.at, liveAtCommit: committed.live, renderedAt: rendered?.at,
       exactFullState: stateEquals(window.finalPhysicalState, route.states[value]),
-      nominalDurations: window.nominalDurations, actualMoveDurations: window.timerTimes,
+      motionWindows: window.motionWindows, nominalDurations: window.nominalDurations, actualMoveDurations: window.timerTimes,
       intermediateAngles: window.endpointAngles.filter(s => s.angle > .001 && s.angle < s.fullAngle - .001),
       samples: window.endpointAngles };
   }, value);
@@ -895,6 +896,9 @@ async function endpointObservation(page, value = 1) {
 function expectEndpoint(observation, preferred) {
   expect(observation.exactFullState).toBe(true);
   expect(observation.actualMoveDurations).toHaveLength(5);
+  expect(observation.motionWindows).toHaveLength(5);
+  for(let i=1;i<5;i++)expect(Math.abs(observation.motionWindows[i].endAt-observation.motionWindows[i].durationMs-observation.motionWindows[i-1].endAt)).toBeLessThan(1e-6);
+  expect(observation.motionWindows.at(-1).endAt).toBe(observation.deadline);
   if (preferred <= 250) expect(observation.nominalDurations).toEqual(Array(5).fill(preferred));
   else expect(Math.max(...observation.nominalDurations)).toBeLessThan(preferred);
   expect(Math.abs(observation.settledAt - observation.deadline)).toBeLessThanOrEqual(20);
@@ -952,13 +956,13 @@ test("100x10ms reports infeasible budget honestly and still commits a full legal
   await expect(page.locator("#rotation-speed")).toHaveValue("6");
 });
 
-test("pause reconciles active sequences and a final-turn hold through legal moves; Resume keeps fractions", async({page})=>{
+test("pause reconciles active sequences and a final-turn start through legal moves; Resume keeps fractions", async({page})=>{
   test.setTimeout(60000);
   await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.install();
   await chooseTimer(page);
   await pauseSoon(page);
-  for(const [stop,advance] of [["0",5500],["3",9500]]) {
+  for(const [stop,advance] of [["0",5500],["3",9750]]) {
     await page.locator("#rotation-speed").fill("6");
     await page.fill("#timer-duration","00:20");
     await page.locator("#timer-duration").press("Enter");
@@ -973,7 +977,7 @@ test("pause reconciles active sequences and a final-turn hold through legal move
     await expect(page.locator("#timer-logical")).toHaveText(advance===5500 ? "00:15" : "00:11");
     await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
     await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","moving");
-    if(advance===9500) await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
+    if(advance===9750) await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
     const before=Number(await page.locator("#session-moves").innerText());
     await page.click("#timer-start");
     await expect(page.locator("#timer-sync")).not.toContainText("Late");
@@ -1033,13 +1037,13 @@ test("automatic terminal tick preserves the real final turn endpoint and commits
   await testInfo.attach("terminal-endpoint",{path,contentType:"application/json"});
 });
 
-test("a held final turn cancels on Reset and a rate extension rebases active motion without reversing or stale completion",async({page})=>{
+test("a final turn starting without an interior hold cancels on Reset and a rate extension rebases active motion without reversing or stale completion",async({page})=>{
   test.setTimeout(60000);await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.install();await chooseTimer(page);await page.locator("#rotation-speed").fill("6");
   await duration(page,"00:20");await observeEndpoints(page);await clearEndpointObservation(page);
   await pauseSoon(page);
   await page.locator("#rotation-speed").fill("3");await page.click("#timer-start");
-  await page.clock.fastForward(8000);await page.clock.runFor(1500);
+  await page.clock.fastForward(8000);await page.clock.runFor(1750);
   await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
   expect(await page.evaluate(()=>window.endpointAngles.at(-1).angle)).toBe(0);
   await page.click("#timer-reset");await page.clock.runFor(2200);await settled(page,"00:20");
@@ -1087,7 +1091,7 @@ test("a reduced-motion preference change cannot run an active presentation twice
       finally{if(args[0])window.finalMediaQueries=window.mediaQueries-before;}
     };
   });
-  await page.click("#timer-start");await page.clock.fastForward(8000);await page.clock.runFor(1500);
+  await page.click("#timer-start");await page.clock.fastForward(8000);await page.clock.runFor(1750);
   await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
   const before=Number(await page.locator("#session-moves").innerText());
   await page.emulateMedia({reducedMotion:"reduce"});await page.clock.runFor(520);
