@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { groupOrbit, groupZoom } from "./orbit.ts";
+import { groupZoom } from "./orbit.ts";
 import { clockPresentationRadius } from "./framing.ts";
-import { installPresentationDrag, rotatePresentation, fitPresentationCamera, CubeViewer, configurePresentationRenderer, createPresentationStudio, DEFAULT_APPEARANCE, installAppearanceControls, type ViewerAppearance } from "@cubistry/cube-viewer";
+import { bindSmartRotation, type SmartRotationBinding, rotatePresentation, fitPresentationCamera, CubeViewer, configurePresentationRenderer, createPresentationStudio, DEFAULT_APPEARANCE, installAppearanceControls, type ViewerAppearance } from "@cubistry/cube-viewer";
 import { demand } from "@cubistry/cube-core";
 /** One WebGL context, scene, camera and frame loop for the entire H–M–S row. */
 export class ClockStage {
@@ -13,11 +13,9 @@ export class ClockStage {
   private appearance: ViewerAppearance = DEFAULT_APPEARANCE;
   private readonly appearanceControls: ReturnType<typeof installAppearanceControls>;
   private readonly studio: ReturnType<typeof createPresentationStudio>;
-  private yaw = 0.2;
-  private pitch = 0.16;
   private radius = 12;
   private zoom = 1;
-  private cancelDrag?: () => void;
+  private rotation?: SmartRotationBinding;
   private cubes: CubeViewer[] = [];
   constructor(host: HTMLElement) {
     this.presentation.name = "clock-presentation";
@@ -45,17 +43,17 @@ export class ClockStage {
       this.fitCamera();
     });
     this.resize.observe(host);
-    this.cancelDrag = installPresentationDrag(el, (dx, dy) => {
-      Object.assign(this, groupOrbit(this.yaw, this.pitch, dx, dy));
-    });
+    rotatePresentation(this.presentation, .2, .16);
+    this.rotation = bindSmartRotation(el, this.presentation, { sensitivity: .004, panel: this.appearanceControls.panel });
     el.addEventListener("wheel", (e) => {
       e.preventDefault();
+      this.rotation?.interact();
       this.zoom = groupZoom(this.zoom, e.deltaY);
       this.fitCamera();
     }, { passive: false });
     this.fitCamera();
     this.renderer.setAnimationLoop(() => {
-      rotatePresentation(this.presentation, this.yaw, this.pitch);
+      this.rotation?.step();
       this.renderer.render(this.scene, this.camera);
     });
   }
@@ -80,10 +78,7 @@ export class ClockStage {
     return cube;
   }
   resetCamera(): void {
-    this.yaw = 0.2;
-    this.pitch = 0.16;
-    this.cancelDrag?.();
-    rotatePresentation(this.presentation, this.yaw, this.pitch);
+    this.rotation?.reset();
   }
   private fitCamera(): void {
     this.radius = fitPresentationCamera(this.camera, clockPresentationRadius, this.zoom);
@@ -95,6 +90,7 @@ export class ClockStage {
     );
     this.renderer.setAnimationLoop(null);
     this.resize.disconnect();
+    this.rotation?.dispose();
     this.studio.dispose();
     this.appearanceControls.dispose();
     for (const cube of this.cubes) cube.destroy();

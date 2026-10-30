@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { validateCounterDesign } from "../src/apps/counter/design.ts";
 import { validateCertifiedCounter } from "../src/apps/counter/certified.ts";
 import { overriddenSticker } from "../packages/cube-viewer/src/facelet-image.ts";
+import { rotationHarness } from "./helpers/rotation-harness.mjs";
 import { CubeViewer } from "@cubistry/cube-viewer";
 import { createDesign } from "../src/apps/playground/model.ts";
 import { initialState, presentMove, parseMove } from "@cubistry/cube-mechanics";
@@ -137,8 +138,10 @@ test("presentation reset preserves zoom, scramble, artwork and a live legal laye
   // Exercise the standalone reset method on real configured geometry without WebGL.
   h.viewer.shared = false; h.viewer.camera = new THREE.PerspectiveCamera(18, 1, .1, 100);
   h.viewer.camera.position.set(0, 0, 19); h.viewer.camera.lookAt(0, 0, 0);
-  h.viewer.radius = 14; h.viewer.yaw = -2; h.viewer.pitch = .8;
-  rotatePresentation(h.scene, h.viewer.yaw, h.viewer.pitch);
+  h.viewer.radius = 14;
+  const rotation = rotationHarness({ root: h.scene, initial: new THREE.Quaternion().setFromEuler(new THREE.Euler(7 * Math.PI / 180, -Math.PI / 18, 0)) });
+  h.viewer.rotation = rotation.binding;
+  rotatePresentation(h.scene, -2, .8);
   const physicalBefore = JSON.stringify({ print: h.viewer.presentedPrint, state: h.viewer.presentedState });
   const cameraBefore = { p: h.viewer.camera.position.toArray(), q: h.viewer.camera.quaternion.toArray() };
   const event = presentMove(scrambled, parseMove("R")), frames = [];
@@ -194,7 +197,8 @@ test("Calendar presentation reset and active 3x3 layer turns preserve every immu
   cube.sync(from);
   const camera = new THREE.PerspectiveCamera(24, .5, .1, 100); camera.position.z = 30;
   const viewer = Object.assign(Object.create(CalendarViewer.prototype), {
-    current: from, cube, presentation: root, camera, busy: false, duration: 100, yaw: 2, pitch: 1,
+    current: from, cube, presentation: root, camera, busy: false, duration: 100,
+    rotation: rotationHarness({ root, initial: new THREE.Quaternion().setFromEuler(new THREE.Euler(.18, -.2, 0)) }).binding,
   });
   const initial = JSON.stringify({ print: design.printing, state: from });
   const frames = [], oldRAF = globalThis.requestAnimationFrame;
@@ -222,7 +226,7 @@ test("Calendar presentation reset and active 3x3 layer turns preserve every immu
     }
   } finally {
     if (oldRAF) globalThis.requestAnimationFrame = oldRAF; else delete globalThis.requestAnimationFrame;
-    cube.dispose(); material.dispose();
+    viewer.rotation.dispose(); cube.dispose(); material.dispose();
   }
 });
 
@@ -271,4 +275,48 @@ test("real shared viewport construction rotates all three placements rigidly abo
     });
   }
   cubes.forEach(c => c.destroy()); assert.equal(presentation.children.length, 0);
+});
+
+test("production shared gestures inspect rear/bottom and preserve rigid placements, canonical frames and active layer pivots through coast/return",async()=>{
+ const {ClockStage}=await import("../src/apps/clock/stage.ts");
+ const {DEFAULT_APPEARANCE}=await import("@cubistry/cube-viewer");
+ const {stickerPoses}=await import("@cubistry/cube-mechanics");
+ const design=createDesign("picture"),state=initialState(design.print),scene=new THREE.Scene(),root=new THREE.Group();scene.add(root);
+ const initial=new THREE.Quaternion().setFromEuler(new THREE.Euler(.16,-.2,0)),h=rotationHarness({root,initial,sensitivity:.004,threshold:0});
+ const camera=new THREE.PerspectiveCamera(28,1,.1,1000);camera.position.set(0,0,30);camera.lookAt(0,0,0);
+ const stage=Object.assign(Object.create(ClockStage.prototype),{scene,presentation:root,camera,renderer:{},cubes:[],zoom:1.8,rotation:h.binding,
+ appearance:DEFAULT_APPEARANCE,appearanceControls:{setDefaultColor(){}}});
+ const assets={textureOrigin:"bottom-left",images:new Map(design.assets.images.map(image=>[image.id,{width:64,height:64}])),materials:new Map(design.assets.materials.map(material=>[material.id,material]))};
+ const cubes=[0,1,2].map(i=>stage.createCube({},i));cubes.forEach(c=>c.configure(design.print,state,assets));
+ assert(cubes.every(c=>c.rotation===undefined),"only the shared scene owns a motion controller");
+ const print=JSON.stringify(design.print),cameraBefore={p:camera.position.toArray(),q:camera.quaternion.toArray()},placement=cubes.map(c=>c.scene.position.toArray());
+ const verify=()=>{
+  scene.updateMatrixWorld(true);const centers=cubes.map(c=>c.scene.getWorldPosition(new THREE.Vector3()));
+  assert(centers[1].length()<1e-10);assert(Math.abs(centers[0].distanceTo(centers[2])-5.6)<1e-10);
+  for(const c of cubes){const objects=new Map();c.scene.traverse(o=>{if(o.userData.stickerId!==undefined)objects.set(o.userData.stickerId,o);});
+   for(const pose of stickerPoses(design.print,c.presentedState)){const q=objects.get(pose.id).getWorldQuaternion(new THREE.Quaternion());
+    assert(new THREE.Vector3(0,0,1).applyQuaternion(q).distanceTo(new THREE.Vector3(...pose.n).applyQuaternion(root.quaternion))<1e-6);
+    assert(new THREE.Vector3(0,1,0).applyQuaternion(q).distanceTo(new THREE.Vector3(...pose.up).applyQuaternion(root.quaternion))<1e-6);
+   }
+  }
+  assert.deepEqual(cubes.map(c=>c.scene.position.toArray()),placement);assert.equal(JSON.stringify(design.print),print);
+  assert.deepEqual({p:camera.position.toArray(),q:camera.quaternion.toArray()},cameraBefore);
+ };
+ h.time(0);h.element.pointer("pointerdown");h.time(.2);h.element.pointer("pointermove",100+Math.PI/.004,100);h.time(.4);h.element.pointer("pointerup");
+ assert(new THREE.Vector3(0,0,1).applyQuaternion(root.quaternion).z<-.9);verify();
+ stage.resetCamera();h.time(1);h.element.pointer("pointerdown");h.time(1.2);h.element.pointer("pointermove",100,100-1.4/.004);h.time(1.4);h.element.pointer("pointerup");
+ assert(new THREE.Vector3(0,-1,0).applyQuaternion(root.quaternion).z>.9);verify();
+ const deadline=h.binding.controller.returnDeadline;h.step(deadline+.3);assert.equal(h.binding.controller.phase,"returning");verify();
+ const event=presentMove(state,parseMove("R")),frames=[],oldRAF=globalThis.requestAnimationFrame;
+ globalThis.requestAnimationFrame=cb=>(frames.push(cb),frames.length);
+ try{await withMotion(false,async()=>{
+   const animation=cubes[2].animate(event);const bodies=new Set(cubes[2].cube.bodies.values());const pivot=cubes[2].scene.children.find(o=>!bodies.has(o));assert(pivot);assert.equal(pivot.parent,cubes[2].scene);
+   h.time(deadline+.31);h.element.pointer("pointerdown");h.time(deadline+.4);h.element.pointer("pointermove",150,130);
+   frames.shift()(performance.now()+40);assert(pivot.rotation.x!==0);assert(stateEquals(cubes[2].presentedState,state));
+   const parent=pivot.parent;h.element.pointer("pointerup",150,130);h.step(deadline+.5);assert.equal(h.binding.controller.phase,"coasting");assert.equal(pivot.parent,parent);
+   frames.shift()?.(performance.now()+200);await animation;verify();assert(stateEquals(cubes[2].presentedState,event.to));
+  });
+  h.step(deadline+3);verify();const next=h.binding.controller.returnDeadline;if(next!==null){h.step(next+.5);assert.equal(h.binding.controller.phase,"returning");verify();}
+  cubes[0].resetCamera();assert(root.quaternion.angleTo(initial)<1e-7);assert(h.binding.controller.anchor.angleTo(initial)<1e-7);assert.equal(stage.zoom,1.8);verify();
+ }finally{if(oldRAF)globalThis.requestAnimationFrame=oldRAF;else delete globalThis.requestAnimationFrame;h.binding.dispose();cubes.forEach(c=>c.destroy());}
 });
