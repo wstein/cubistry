@@ -1,0 +1,59 @@
+{
+  "status": "UNKNOWN",
+  "phase": "JULIA_COMPLETE_INDEPENDENT_FLIX_PENDING",
+  "sourceCommit": "249df9d31b1d2c6daa617e88f898ff0c25906300",
+  "documentationHead": "6a92fa8179a88c4c067a09b375f24e6a4d90f049",
+  "profileSHA256": "532e0157c241f5086e59ff0fad2f46fe24aae01dbb13e03b674656dfbb9ecd52",
+  "researchSource": "30b6d022da60c366d79de5498497df0a07e28caf",
+  "inputSHA256": {
+    "modes.json": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae",
+    "recovery.json": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda"
+  },
+  "checkerSourceSHA256": {
+    "recovery-tests.jl": "afc204f28e9add368350c779ae1db6fff34c94904c38f49edf353d6f65b7a453",
+    "recovery-parser-tests.jl": "8bca97b87972087b9e526cb46058c1eb0df7a5da9a1601c94e0d70a73a47ea64",
+    "recovery.jl": "cd6e72a893c52d1a8ff1dc3235acd6f01d9856d9e8f499f59032c7ba38edac54",
+    "check.jl": "e7fd7b764f09660f9ce5e983d92653aec7ad2de9ccf19db3057ab7d08e3dd3e2",
+    "Manifest.toml": "136ee9a307e16429f3f89ba1505e1b0f9c51502156c32b3647d554590315d965",
+    "Project.toml": "8e44eb68d33587f674f530e8118dd0d898e8a52017d28fc5b55ae345cf3717bb",
+    "Recovery.jl": "9c044527b808e04f55daa080da366ec237565dfccf0b2df972a41023be4c48dc",
+    "Hsm.jl": "0326ab44cb742f82fe33ae5c8f1f3ab7c11a0ea55fe6cffc5ec658f053150765",
+    "Conformance.jl": "fa327f80eb92276e20ee1d6783f4af3cc770a5c975225645e6702d96ec133b9c",
+    "Checker.jl": "4cbd782b2bac4dc8392bbad7d8487a1f98cc76bde97a8a4090cd439a0db52ddb"
+  },
+  "positive": {
+    "nativeValid": true,
+    "nativeStatus": "VALID",
+    "modes": 18,
+    "capture": "runs/complete-positive/capture.json",
+    "stdoutSHA256": "0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70",
+    "graphNodesAcrossModes": 1722384,
+    "graphEdgesAcrossModes": 28747368,
+    "samples": 264,
+    "forwardSteps": 1061,
+    "claims": {
+      "recoveryReturnOntoPeriod": "VERIFIED",
+      "globalPrintOptimality": "UNKNOWN",
+      "runtimeReachabilityOfForcedPoses": "NOT_CHECKED",
+      "minimumMeanPeriodCertificates": "NOT_CHECKED"
+    }
+  },
+  "controls": {
+    "focusedParserAssertionsPassed": 23,
+    "semanticAssertionsPassed": 78,
+    "rawCLIControlsPassed": 8
+  },
+  "regressions": {
+    "issue74NativeCaseReports": 195,
+    "issue74NativeResult": "VALID",
+    "oldHsmRecoveryResult": "UNSUPPORTED",
+    "oldHsmRecoveryExit": 2,
+    "hsm46": "PASS_DATA_PINS_ONLY_NO_FULL_NATIVE_RERUN"
+  },
+  "history": {
+    "partialSmoke": "UNKNOWN",
+    "obsoleteBaseline": "INTERRUPTED_UNKNOWN",
+    "meanRC": "docs/HSM-RECOVERY-MEAN-RC.md"
+  },
+  "externalPublication": "DEFERRED_TO_COMPLETE_PROOF_PR_STEP"
+}

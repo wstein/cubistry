@@ -19,7 +19,12 @@
   "contract": {
     "commit": "eb151a96928c47588816c931e863fa879ad6cfb9",
     "path": "proof-checkers/HSM-RECOVERY-PROFILE.md",
-    "sha256": "758e95d60b04e0dfa4fb756451510e6abe0ea44d67574669f52e0fb5302c05d6"
+    "sha256": "758e95d60b04e0dfa4fb756451510e6abe0ea44d67574669f52e0fb5302c05d6",
+    "wireClarification": {
+      "commit": "ef3602c",
+      "sha256": "532e0157c241f5086e59ff0fad2f46fe24aae01dbb13e03b674656dfbb9ecd52",
+      "scope": "Documentation-only deterministic output clarification; frozen mathematics unchanged"
+    }
   },
   "executionOrder": [
     "Julia",
@@ -108,7 +113,12 @@
       "sha256": "581f9df875dfea34cfd5e1988682fb3d9a8921d7ecc5684942d9e5af8e1a882b",
       "status": "UNKNOWN pending documented parser correction and native validation",
       "investigator": "Codex Sol",
-      "scope": "Input decimal exactness; mathematical graph code unaffected"
+      "scope": "Input decimal exactness; mathematical graph code unaffected",
+      "parserResolution": {
+        "sourceCommit": "249df9d31b1d2c6daa617e88f898ff0c25906300",
+        "focusedAssertions": 23,
+        "status": "PASS_COMPONENT_AND_FULL_JULIA; independent Flix pending"
+      }
     }
   ],
   "reviews": [
@@ -120,5 +130,17 @@
       "sha256": "f2f9e4993b52547a8ba11482eff7768342302150c4775c027c4a035819cdc0ae",
       "result": "No blocking static findings; complete native confirmation still UNKNOWN"
     }
-  ]
+  ],
+  "juliaDelivery": {
+    "status": "JULIA_VALID_OVERALL_UNKNOWN_FLIX_PENDING",
+    "sourceCommit": "249df9d31b1d2c6daa617e88f898ff0c25906300",
+    "path": "deliveries/julia",
+    "files": {
+      "evidence.tar.gz": "6832386c1400c9e90e2546262ae8d9a3c54872d810819509ff94b15e171758e5",
+      "summary.json": "2ed7ad2acf0a775efd782473bbdc6cba40a1c83f004855e7070c880c6f001f77",
+      "manifest.json": "2c833dbf7fcb195cf6dc0c56c14b32a95fa72b932d4322d762d437ac8ee3bb6a",
+      "positive.jsonl": "0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70",
+      "positive-capture.json": "a243f3fec67c65b517d44f2b4a7de3ffe55e1a23e7cf293686d6b39ebd3443c6"
+    }
+  }
 }
