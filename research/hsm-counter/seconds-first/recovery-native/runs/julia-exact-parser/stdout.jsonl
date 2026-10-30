@@ -1,0 +1,5 @@
+Test Summary:                 | Pass  Total  Time
+canonical exact JSON decimals |   16     16  0.0s
+Test Summary:                                      | Pass  Total  Time
+raw tokens, escaped keys, decoys and input binding |    7      7  8.8s
+{"status":"PASS","recoveryInputSHA256":"0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda","controls":{"exact-canonical-decimal-controls":{"passed":true},"scientific-equivalent-raw-number":{"passed":true},"float-colliding-raw-number-rejected-exactly":{"passed":true},"escaped-real-keys-and-label-string-decoys":{"passed":true},"changed-raw-input-binding-rejected":{"passed":true}}}

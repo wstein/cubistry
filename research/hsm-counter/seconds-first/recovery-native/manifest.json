@@ -58,6 +58,47 @@
         "source/Recovery.jl": "1b9a04cdff84ff4283be2c12de499867cca4eed167a2561b2ba9108fb29d16b8",
         "source/recovery.jl": "cd6e72a893c52d1a8ff1dc3235acd6f01d9856d9e8f499f59032c7ba38edac54"
       }
+    },
+    {
+      "id": "julia-c997-cancelled",
+      "scope": "Operator-cancelled obsolete full baseline; no verdict",
+      "result": "INTERRUPTED_UNKNOWN",
+      "confirmation": "NOT_CONFIRMED",
+      "sourceCommit": "c997f268f451748086c0aaedd32f804ce0f745c6",
+      "capture": "runs/julia-c997-cancelled/capture.json",
+      "files": {
+        "capture.json": "8174272868b1f84c4eae6dcd2feb05a08408dde3bd5b9dc01f0b188ea9b75c7b",
+        "capture.py": "8089e27be3b17218ab46872f55ed88319e5a463a0e3812f39181e2ae400ad56c",
+        "context.json": "086a333ff4cc146b214a2a3efff146a0bd1e25213140e16ee64529e8f5473941",
+        "source/Checker.jl": "4cbd782b2bac4dc8392bbad7d8487a1f98cc76bde97a8a4090cd439a0db52ddb",
+        "source/Conformance.jl": "fa327f80eb92276e20ee1d6783f4af3cc770a5c975225645e6702d96ec133b9c",
+        "source/Hsm.jl": "0326ab44cb742f82fe33ae5c8f1f3ab7c11a0ea55fe6cffc5ec658f053150765",
+        "source/Manifest.toml": "136ee9a307e16429f3f89ba1505e1b0f9c51502156c32b3647d554590315d965",
+        "source/Project.toml": "8e44eb68d33587f674f530e8118dd0d898e8a52017d28fc5b55ae345cf3717bb",
+        "source/Recovery.jl": "ec3f101666c6eb7866d9c97fac583f02dd0b340d644a53167d4e6ed8cc5e5c77",
+        "source/recovery.jl": "cd6e72a893c52d1a8ff1dc3235acd6f01d9856d9e8f499f59032c7ba38edac54",
+        "stderr.txt": "76a18e717725b9e29914feb45a8e65d8cb7f9aa2f880f42730244ee997afd1f4",
+        "stdout.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "julia-exact-parser",
+      "scope": "Exact decimal parser controls only: 23 assertions, no recovery graph",
+      "result": "PASS_COMPONENT_ONLY",
+      "confirmation": "NOT_CONFIRMED",
+      "sourceCommit": "249df9d31b1d2c6daa617e88f898ff0c25906300",
+      "capture": "runs/julia-exact-parser/capture.json",
+      "files": {
+        "capture.json": "d41b61d25efe74856838ad6dc564f62601ad7ab5962f5b2972c5e0354994e1b7",
+        "source/Checker.jl": "4cbd782b2bac4dc8392bbad7d8487a1f98cc76bde97a8a4090cd439a0db52ddb",
+        "source/Hsm.jl": "0326ab44cb742f82fe33ae5c8f1f3ab7c11a0ea55fe6cffc5ec658f053150765",
+        "source/Manifest.toml": "136ee9a307e16429f3f89ba1505e1b0f9c51502156c32b3647d554590315d965",
+        "source/Project.toml": "8e44eb68d33587f674f530e8118dd0d898e8a52017d28fc5b55ae345cf3717bb",
+        "source/Recovery.jl": "9c044527b808e04f55daa080da366ec237565dfccf0b2df972a41023be4c48dc",
+        "source/recovery-parser-tests.jl": "8bca97b87972087b9e526cb46058c1eb0df7a5da9a1601c94e0d70a73a47ea64",
+        "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout.jsonl": "34dd3bb366bf109bb0120e3bdd8b087675d764250b0000e0b9566f70154b53f6"
+      }
     }
   ],
   "findings": [

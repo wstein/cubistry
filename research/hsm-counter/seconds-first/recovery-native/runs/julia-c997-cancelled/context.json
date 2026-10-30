@@ -1,0 +1,26 @@
+{
+  "sourceCommit": "c997f268f451748086c0aaedd32f804ce0f745c6",
+  "checkerSourceUnchangedSinceStart": true,
+  "profileSHA256": "758e95d60b04e0dfa4fb756451510e6abe0ea44d67574669f52e0fb5302c05d6",
+  "JuliaVersion": "julia version 1.13.3",
+  "JSONVersion": "1.13.0 (pinned Manifest.toml)",
+  "environment": {
+    "JULIA_DEPOT_PATH": "/tmp/cubistry-julia-depot"
+  },
+  "instrumentation": "capture.py uses subprocess, resource.getrusage, wall clock and file hashes only; no proof verdict logic",
+  "interventions": [
+    {
+      "action": "kill -USR1 324555",
+      "processElapsed": "01:43",
+      "purpose": "Julia documented information request: inspect actual graph execution while redirected diagnostics were buffered",
+      "effect": "one-second profile and stack report retained in stderr; timing and RSS include this intervention"
+    }
+  ],
+  "outcome": "INTERRUPTED_UNKNOWN",
+  "cancellation": {
+    "signal": "SIGINT",
+    "processElapsedAtRequest": "21:33",
+    "reason": "Deliberate operator cancellation of obsolete baseline after exact mean-token defect was documented and the coordinator approved correction; corrected full native run is mandatory. No positive witness failure or Flix dissent occurred.",
+    "stdoutWasEmpty": true
+  }
+}
