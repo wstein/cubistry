@@ -53,7 +53,7 @@ function macro_catalogues(action; orbits=[1,2,3])
     end
     for k in orbits
         catalog = catalogs[k]
-        queue = collect(keys(catalog)); cursor = 1
+        queue = sort!(collect(keys(catalog))); cursor = 1
         localgens = [Tuple(Int.(g[(24k-23):24k] .- (24k-24))) for g in generators]
         localinverses = [invperm(collect(g)) for g in localgens]
         while cursor <= length(queue)
