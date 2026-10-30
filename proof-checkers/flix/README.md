@@ -125,3 +125,17 @@ use one monotonic clock and child validation durations use another only locally;
 no cross-process timestamps are subtracted. Exit is natural and its measured tail
 is not assumed zero. These are shared-machine observations, not universal timing
 promises or an identical-algorithm language benchmark.
+
+## HSM seconds-first profile
+
+`hsm FILE` and `hsm-conformance REPO_ROOT` verify the raw HSM witnesses of
+[HSM-PROFILE.md](../HSM-PROFILE.md) (source `src/Hsm.flix`, independent of the Julia
+implementation). They are additive; `counter`, `state3` and `conformance` are unchanged.
+
+```sh
+java -Xmx768m -jar proof-checkers/flix/artifact/flix.jar hsm proof-checkers/conformance-hsm/cases/witness.json
+java -Xmx768m -jar proof-checkers/flix/artifact/flix.jar hsm-conformance .
+```
+
+Run time on a shared two-core machine: about two minutes for the eight-mode witness and a few
+minutes for the all-modes witness; `-Xmx768m` suffices. Run them in the background with a log.

@@ -7,8 +7,9 @@ function main(args)
     root=normpath(joinpath(@__DIR__,"../.."))
     try
         length(args)>=2 || throw(IndependentProof.Invalid("UNSUPPORTED","counter FILE, state3 FILE, or conformance ROOT required"))
-        if args[1]=="hsm"
-            valid,status,text=IndependentHsm.evaluate(args[2]);println(text);return valid ? 0 : status=="UNSUPPORTED" ? 2 : status=="ERROR" ? 3 : 1
+        if args[1] in ("hsm","hsm-conformance")
+            valid,status,text=args[1]=="hsm" ? IndependentHsm.evaluate(args[2]) : IndependentHsm.conformance_command(args[2])
+            println(text);return valid ? 0 : status=="UNSUPPORTED" ? 2 : status=="ERROR" ? 3 : 1
         end
         result=if args[1]=="conformance"
             IndependentProof.conformance(args[2];export_path=length(args)>=3 ? args[3] : nothing)

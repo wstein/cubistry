@@ -74,6 +74,19 @@ Follow these steps exactly. "Dissent" is defined in step 4.
    in `evidence-manifest.json`, the corpus under `conformance/` including
    `conformance/manifest.json`, and `conformance-pin.json`.
 
+## HSM seconds-first witnesses
+
+The raw-input profile for the `cubistry.hsm-seconds-first` and `cubistry.hsm-seconds-first-modes`
+witnesses is specified in [HSM-PROFILE.md](HSM-PROFILE.md). It is additive: the commands are
+`hsm FILE` and `hsm-conformance ROOT` in both checkers
+(`java -Xmx768m -jar proof-checkers/flix/artifact/flix.jar hsm FILE`,
+`julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/check.jl hsm FILE`).
+The rules above apply unchanged: CONFIRMED only when both accept the same raw file, no voting, no
+Python gate. Claims the witness gives no checkable evidence for (for example global print
+optimality) are reported `UNKNOWN` or `NOT_CHECKED` in the result and must stay so in any report.
+The recovery-table schema `cubistry.hsm-seconds-first-recovery` has no native checker and is
+answered `UNSUPPORTED`; its claims are `UNKNOWN`.
+
 ## Status of existing proofs
 
 Existing proofs whose only verifier is Python are not retroactively re-labeled;

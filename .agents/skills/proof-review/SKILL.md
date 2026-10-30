@@ -23,3 +23,5 @@ Follow [proof-checkers/AUTHORITY.md](../../../proof-checkers/AUTHORITY.md). A pr
 
 ## Output
 A short review report stating claim, scope, evidence paths, verdict (SAT/UNSAT/UNKNOWN), independent checks (checkers run, commands, versions, corpus pin), class-only differences listed separately, concrete findings with severity, and exact next steps. Do not rewrite source evidence to make a review pass.
+
+For HSM seconds-first witnesses (`cubistry.hsm-seconds-first*`) use the `hsm FILE` commands of both checkers and read [proof-checkers/HSM-PROFILE.md](../../../proof-checkers/HSM-PROFILE.md): report the `claims` block (UNKNOWN / NOT_CHECKED items) with the verdict and compare the two output lines byte for byte.

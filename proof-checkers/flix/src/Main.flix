@@ -54,6 +54,7 @@ def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
             case "conformance" :: root :: destination :: Nil => conformanceCommand(root,Some(destination))
             case "lifecycle" :: root :: Nil => lifecycleCommand(root)
             case "hsm" :: path :: Nil => hsmCommand(path)
+            case "hsm-conformance" :: root :: Nil => hsmConformanceCommand(root)
             case _ => throw new IllegalArgumentException("UNSUPPORTED: expected counter, state3, conformance, or lifecycle")
         }
     } catch {

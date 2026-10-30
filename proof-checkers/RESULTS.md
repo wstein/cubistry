@@ -102,8 +102,10 @@ ranking for workloads not ported here.
 
 ## Limits and recommendation
 
-Keep both as independent optional proof checkers and retain Python as the existing
-gate. Julia offers compact exact mathematical code; Flix offers typed validation
+Keep both as independent proof checkers. Since the 2026-10-29 [authority change](AUTHORITY.md)
+they, not Python, are the gate for every proof they cover: a proof is confirmed only
+when both accept it, and the existing Python verifiers are historical evidence and port sources.
+Julia offers compact exact mathematical code; Flix offers typed validation
 and a reusable compiled JVM artifact. Their independent rotation implementations
 and complete-state exports provide useful cross-checks beyond matching summaries.
 

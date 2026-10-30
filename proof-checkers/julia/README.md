@@ -66,3 +66,17 @@ old small-spike `-O0` startup win did not carry over: measured four-call totals 
 22.69 seconds with normal optimization versus 38.09 seconds with `-O0`. Those are
 shared-machine observations, not universal timings or a claim that all project
 proof formats have been ported. Full production-suite migration remains out of scope.
+
+## HSM seconds-first profile
+
+`hsm FILE` and `hsm-conformance REPO_ROOT` verify the raw HSM witnesses of
+[HSM-PROFILE.md](../HSM-PROFILE.md) (source `Hsm.jl`, independent of the Flix
+implementation). They are additive; `counter`, `state3` and `conformance` are unchanged.
+
+```sh
+julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/check.jl hsm proof-checkers/conformance-hsm/cases/witness.json
+julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/check.jl hsm-conformance "$PWD"
+```
+
+Run time on a shared two-core machine: about 35 seconds for the eight-mode witness and about
+50 seconds for the all-modes witness (includes first-call compilation).
