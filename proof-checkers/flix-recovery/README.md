@@ -3,7 +3,9 @@
 This additive command implements the frozen [recovery profile](../HSM-RECOVERY-PROFILE.md).
 It reads both raw JSON files itself. All geometry, full-pose enumeration, bounded
 endpoint graph construction, exact integer shortest paths, decimal comparison and
-sample replay are Flix. It shares only the existing native Flix HSM model/parser.
+sample replay are Flix. Each strict UTF-8 raw text is read once and supplies
+both the parsed input and its digest. Build hashes describe the actual copied
+compiler inputs, checked before and after compilation against unchanged origins. It shares only the existing native Flix HSM model/parser.
 It does not invoke the Julia checker or any Python proof verifier.
 
 The standalone build copies the old Flix sources except `Main.flix` into an
@@ -39,8 +41,8 @@ For `N` nodes, an optimal positive-cost route can be simple, with fewer than `N`
 edges and at most `6N` total HTM. The native heap Dijkstra therefore encodes the
 integer triple exactly with `unit = 6N + 1` and `above = (N + 1) * unit`:
 `aboveEdges * above + steps * unit + HTM`. These bounds prohibit a carry between
-components. The enumerated graph sizes also keep every packed value within signed
-64-bit arithmetic. Native tiny-graph controls separately exercise each priority
+components. An explicit one-million-node capacity guard keeps every packed value within signed
+64-bit arithmetic, including one extra candidate edge during relaxation. Native tiny-graph controls separately exercise each priority
 level and forced-six behavior. Raw decimal means use significant ASCII digits
 and base-ten exponents; no finite-precision equality decides acceptance.
 
