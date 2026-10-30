@@ -23,6 +23,14 @@ import { clampPitch, viewTurn } from "./orbit-input.ts";
 import { animateTimedProgress, type MotionTimingSource } from "./motion-timing.ts";
 export type { MotionTiming, MotionTimingSource } from "./motion-timing.ts";
 import { PhysicalCubeScene } from "./physical-scene.ts";
+import {
+  createPresentationGeometry, createPlasticMaterial, createStickerMaterial,
+  configurePresentationRenderer, addPresentationLighting,
+} from "./presentation-preset.ts";
+export {
+  PRESENTATION_PRESET, createPresentationGeometry, createPlasticMaterial,
+  createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
+} from "./presentation-preset.ts";
 export { PhysicalCubeScene, stickerFrame, type PhysicalStickerFrame } from "./physical-scene.ts";
 const spacing = 0.52;
 /** Physical-state viewer: no target selection, solver or mechanics ownership. */
@@ -104,16 +112,13 @@ export class CubeViewer {
       return;
     }
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    this.renderer.setPixelRatio(Math.min(2, devicePixelRatio));
-    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
-    this.scene.add(new THREE.AmbientLight(0xffffff, 2));
-    const light = new THREE.DirectionalLight(0xffffff, 3);
-    light.position.set(3, 5, 6);
-    this.scene.add(light);
+    addPresentationLighting(this.scene);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;
+      if (!w || !h) return;
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
@@ -274,26 +279,18 @@ export class CubeViewer {
       }),
     ));
     const plasticDef = assets.materials.get("plastic");
-    const plastic = new THREE.MeshStandardMaterial({
-      color: plasticDef?.color ?? "#202329",
-      roughness: plasticDef?.roughness ?? 0.45,
-    });
+    const plastic = createPlasticMaterial(plasticDef?.color, plasticDef?.roughness);
     this.materials.push(plastic);
     for (const s of print.stickers) {
       const materialDef = assets.materials.get(s.materialId)!;
-      const material = new THREE.MeshStandardMaterial({
-        map: maps.get(s.assetId),
-        color: materialDef.color,
-        roughness: materialDef.roughness,
-      });
+      const material = createStickerMaterial(maps.get(s.assetId)!, materialDef.color, materialDef.roughness);
       this.materials.push(material);
       this.stickerMaterials.set(s.id, material);
     }
     this.cube = new PhysicalCubeScene(this.scene,
       print.stickers.map((s) => ({ ...s, p: print.cubies.find((c) => c.id === s.cubie)!.position, n: s.normal })),
       this.stickerMaterials, plastic, spacing,
-      { body: new THREE.BoxGeometry(0.99, 0.99, 0.99),
-        sticker: new THREE.PlaneGeometry(0.87, 0.87), stickerOffset: 0.501 });
+      createPresentationGeometry());
     this.sync(state);
     this.updateFaceletImage();
   }
