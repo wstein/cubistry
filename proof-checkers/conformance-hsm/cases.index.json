@@ -1,0 +1,289 @@
+[
+  {
+    "name": "witness",
+    "group": "positive",
+    "description": "new seconds-first print, eight modes (research 4d9ef77)",
+    "path": "proof-checkers/conformance-hsm/cases/witness.json",
+    "sha256": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3"
+  },
+  {
+    "name": "baseline",
+    "group": "positive",
+    "description": "current app print, eight recurrent modes (research 4d9ef77)",
+    "path": "proof-checkers/conformance-hsm/cases/baseline.json",
+    "sha256": "2780c128bdba4c135f8edb2e5e30486e80d59a621db8a5e74f1446ae69da1737"
+  },
+  {
+    "name": "modes",
+    "group": "positive",
+    "description": "same print, all 18 own periods and application modes, edges at most five HTM (research 30b6d02)",
+    "path": "proof-checkers/conformance-hsm/cases/modes.json",
+    "sha256": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae"
+  },
+  {
+    "name": "recovery-unsupported",
+    "group": "negative",
+    "description": "recovery-table schema: no native profile, UNSUPPORTED (research 30b6d02)",
+    "path": "proof-checkers/conformance-hsm/cases/recovery-unsupported.json",
+    "sha256": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda"
+  },
+  {
+    "name": "schema-unsupported",
+    "group": "negative",
+    "description": "unknown schema name",
+    "path": "proof-checkers/conformance-hsm/cases/schema-unsupported.json",
+    "sha256": "b6cb0eb794dbe2c15fc113ce90e43e4284957adbf8cc8b7fe86539b0eb7e16ca"
+  },
+  {
+    "name": "version-two",
+    "group": "negative",
+    "description": "unsupported witness version",
+    "path": "proof-checkers/conformance-hsm/cases/version-two.json",
+    "sha256": "2463c000c1faf24c74caf82c986dd7b010a76a3355100f48b6cd697118d69372"
+  },
+  {
+    "name": "version-float",
+    "group": "negative",
+    "description": "float version token",
+    "path": "proof-checkers/conformance-hsm/cases/version-float.json",
+    "sha256": "5eef184d0bfb3fdbdbd80a1ae055d2b492ca0eea6f573addc8365ec6e18a6042"
+  },
+  {
+    "name": "extra-top-key",
+    "group": "negative",
+    "description": "unknown top-level key",
+    "path": "proof-checkers/conformance-hsm/cases/extra-top-key.json",
+    "sha256": "456da84b5b6e3aec9796c065a5bd70281e8d0941cfbf5277e7cd226d4e5fab6f"
+  },
+  {
+    "name": "extra-sticker-key",
+    "group": "negative",
+    "description": "unknown sticker key",
+    "path": "proof-checkers/conformance-hsm/cases/extra-sticker-key.json",
+    "sha256": "68e4c8bb9b6575cbe780257fb75d41bc0b8afb5badfb5f7b414d88ab343c40c6"
+  },
+  {
+    "name": "extra-mode-key",
+    "group": "negative",
+    "description": "unknown mode key",
+    "path": "proof-checkers/conformance-hsm/cases/extra-mode-key.json",
+    "sha256": "9359d604a8ca1b3dd7197fae4b0d6a0cd10ce9974e7a81ab0059169278c0b3b6"
+  },
+  {
+    "name": "extra-step-key",
+    "group": "negative",
+    "description": "unknown step key",
+    "path": "proof-checkers/conformance-hsm/cases/extra-step-key.json",
+    "sha256": "a920f095ae20f698210f0c74db79f898a4ebcf1d565b25b1853a87387907660f"
+  },
+  {
+    "name": "duplicate-label-key",
+    "group": "negative",
+    "description": "duplicate JSON object key",
+    "path": "proof-checkers/conformance-hsm/cases/duplicate-label-key.json",
+    "sha256": "df6e4934d05ed9fabcd1e60e5f11e3dead9e151a4ab4f6cabb317879e8d2b8db"
+  },
+  {
+    "name": "truncated-json",
+    "group": "negative",
+    "description": "truncated JSON",
+    "path": "proof-checkers/conformance-hsm/cases/truncated-json.json",
+    "sha256": "98ea80df5c77865f3206d8abb942b655517969585249ae927d930669dcc21295"
+  },
+  {
+    "name": "float-slot",
+    "group": "negative",
+    "description": "float integer token",
+    "path": "proof-checkers/conformance-hsm/cases/float-slot.json",
+    "sha256": "b6e6b2c44558e21eaa3080644e07d00f669f2c62ee960ae05cfbb4b3569dd871"
+  },
+  {
+    "name": "tampered-sticker-printcode",
+    "group": "negative",
+    "description": "sticker glyph changed, printCode kept",
+    "path": "proof-checkers/conformance-hsm/cases/tampered-sticker-printcode.json",
+    "sha256": "e042f63a3e88cd366ea6dcbd213866ffb42fdf045be8c4365c284cdb7c4ef64b"
+  },
+  {
+    "name": "tampered-sticker-missing-glyph",
+    "group": "negative",
+    "description": "tens 5 glyph replaced, printCode updated, glyph 5 no longer printed",
+    "path": "proof-checkers/conformance-hsm/cases/tampered-sticker-missing-glyph.json",
+    "sha256": "3dc6d17394b2077925cf460eb299f8ee65e1f88c1de825ce6b53d68db67c514b"
+  },
+  {
+    "name": "tampered-sticker-swapped-glyphs",
+    "group": "negative",
+    "description": "two tens glyphs swapped consistently, so the saved routes show wrong digits",
+    "path": "proof-checkers/conformance-hsm/cases/tampered-sticker-swapped-glyphs.json",
+    "sha256": "f6ce5413542e532fac9b5af8a8f164c05b39555068a08b6085682919d2115b53"
+  },
+  {
+    "name": "printcode-wrong",
+    "group": "negative",
+    "description": "printCode differs from the printed stickers",
+    "path": "proof-checkers/conformance-hsm/cases/printcode-wrong.json",
+    "sha256": "ff6957c48d1a44ac3da1916915ba90d544013790d627f4b69957b87c5da635ff"
+  },
+  {
+    "name": "upside-down-glyph",
+    "group": "negative",
+    "description": "letter sticker printed upside down",
+    "path": "proof-checkers/conformance-hsm/cases/upside-down-glyph.json",
+    "sha256": "e0bfec12a45efbbfe522f45cb21181bca81a0df815a6e90815d2a8f273050437"
+  },
+  {
+    "name": "blank-mislabelled",
+    "group": "negative",
+    "description": "real blank sticker given a nonblank slot class",
+    "path": "proof-checkers/conformance-hsm/cases/blank-mislabelled.json",
+    "sha256": "022a17287d49ec91549aac7a0fd8c4469200a4b71bd1a538dedf3a161ae40dbb"
+  },
+  {
+    "name": "wrong-frame",
+    "group": "negative",
+    "description": "one saved period-start frame is wrong",
+    "path": "proof-checkers/conformance-hsm/cases/wrong-frame.json",
+    "sha256": "85b9ec96d86f46d001b001d5e9eb4fa76e20a25f9cc8388ce2f7c67400ad134f"
+  },
+  {
+    "name": "non-shortest-edge",
+    "group": "negative",
+    "description": "a saved edge is replaced by a longer word with the same effect",
+    "path": "proof-checkers/conformance-hsm/cases/non-shortest-edge.json",
+    "sha256": "6ff732823fa171544b236ad4339a70069ecbae99a02c7ba00d6bf3589b0c92bf"
+  },
+  {
+    "name": "broken-closure",
+    "group": "negative",
+    "description": "M +1 period cut after the first lap does not close the full pose",
+    "path": "proof-checkers/conformance-hsm/cases/broken-closure.json",
+    "sha256": "b4a6e8ee060578c5475f3820bdc803885f13729e2e1dc699707021e54b4330fc"
+  },
+  {
+    "name": "skipped-display",
+    "group": "negative",
+    "description": "a saved edge skips a display",
+    "path": "proof-checkers/conformance-hsm/cases/skipped-display.json",
+    "sha256": "9874790fa522d2e478ae43a5bba12066bfc738e16f62b09a4ad5b5e110caf129"
+  },
+  {
+    "name": "missing-required-mode",
+    "group": "negative",
+    "description": "the M -1 mode is absent",
+    "path": "proof-checkers/conformance-hsm/cases/missing-required-mode.json",
+    "sha256": "b50149d9cef8b72835d7b33010856c04097072828e507f52101f835224a996ae"
+  },
+  {
+    "name": "duplicate-mode",
+    "group": "negative",
+    "description": "the same mode listed twice",
+    "path": "proof-checkers/conformance-hsm/cases/duplicate-mode.json",
+    "sha256": "fa386a992b8503ee7da7247db4a93df0aa3afbe2cdce07d95bad54644d65512f"
+  },
+  {
+    "name": "wrong-lap-claim",
+    "group": "negative",
+    "description": "published period HTM is off by one",
+    "path": "proof-checkers/conformance-hsm/cases/wrong-lap-claim.json",
+    "sha256": "ef24546a51d695faa74948389b005617f1a2a536fceac65138bc35ca5e38d9e6"
+  },
+  {
+    "name": "wrong-max-claim",
+    "group": "negative",
+    "description": "published maximum edge is off by one",
+    "path": "proof-checkers/conformance-hsm/cases/wrong-max-claim.json",
+    "sha256": "9f311ac880c22e09fdd7570ff85d7bb5a4a0e269c1185d971ac15160580249df"
+  },
+  {
+    "name": "wrong-mean-claim",
+    "group": "negative",
+    "description": "published minimum mean differs from the period mean",
+    "path": "proof-checkers/conformance-hsm/cases/wrong-mean-claim.json",
+    "sha256": "0b37aaf5b2d495f4cef0c9d58108a8bb781e04869dd80f05e3cc1a6e04719d1e"
+  },
+  {
+    "name": "wrong-graph-size",
+    "group": "negative",
+    "description": "published graph size differs from the rebuilt graph",
+    "path": "proof-checkers/conformance-hsm/cases/wrong-graph-size.json",
+    "sha256": "12cd90d5f0c1d0d67a0c01670ab94f6e3a151cddd7fb8aa98a2990a4757a6616"
+  },
+  {
+    "name": "non-minimum-mean",
+    "group": "negative",
+    "description": "valid closed shortest-edge H 00-11 +1 period published as the minimum-mean cycle",
+    "path": "proof-checkers/conformance-hsm/cases/non-minimum-mean.json",
+    "sha256": "04b78fb82ef53f3c08954293f9dd135edb59e9a53a82424e04288fbd6f7ecf21"
+  },
+  {
+    "name": "wrong-inverse",
+    "group": "negative",
+    "description": "S -1 given as the inverse traversal of S +1, which is not a shortest-edge schedule",
+    "path": "proof-checkers/conformance-hsm/cases/wrong-inverse.json",
+    "sha256": "d40d8668c6940740dc23ce4ecdd4ada780de78872ae17058cbd914f94c8472ef"
+  },
+  {
+    "name": "universal-claim-five",
+    "group": "negative",
+    "description": "universal bound published as five HTM",
+    "path": "proof-checkers/conformance-hsm/cases/universal-claim-five.json",
+    "sha256": "48314cf12483bdd876cef5707cce7f734e0a60e22b0c4351816f53a795276ec6"
+  },
+  {
+    "name": "m-cap-six",
+    "group": "negative",
+    "description": "M mode published with a six-HTM cap",
+    "path": "proof-checkers/conformance-hsm/cases/m-cap-six.json",
+    "sha256": "ed963393a9bd67a8843bbc862364cc32628cc61c17fae423b38d34fdb65e7fb8"
+  },
+  {
+    "name": "word-double-space",
+    "group": "negative",
+    "description": "non-canonical whitespace in a move word",
+    "path": "proof-checkers/conformance-hsm/cases/word-double-space.json",
+    "sha256": "87d6d6de7ad6e1aea533291554748c0924dc970bebe32c1a9ca0e1d44dd3a42b"
+  },
+  {
+    "name": "modes-selection-rule",
+    "group": "negative",
+    "description": "S 59 -1 claims its own period although the +1 period is not worse",
+    "path": "proof-checkers/conformance-hsm/cases/modes-selection-rule.json",
+    "sha256": "9178c02877baacf7bbe497a8cdec071e83fd7ea718f635a480f6f3f5b8f4d9ae"
+  },
+  {
+    "name": "modes-traversal",
+    "group": "negative",
+    "description": "application mode claims forward traversal of the opposite period",
+    "path": "proof-checkers/conformance-hsm/cases/modes-traversal.json",
+    "sha256": "134aa953bc2535ff2414484ac12986a3697db27a9ba21a6fc0988f6e2e09a015"
+  },
+  {
+    "name": "modes-app-metric",
+    "group": "negative",
+    "description": "application period HTM understated",
+    "path": "proof-checkers/conformance-hsm/cases/modes-app-metric.json",
+    "sha256": "4fbccaf68a7d4575f40d6be22e22e6e918b0479e8506a06e0897661ce0303772"
+  },
+  {
+    "name": "modes-edge-limit",
+    "group": "negative",
+    "description": "edge limit published as six",
+    "path": "proof-checkers/conformance-hsm/cases/modes-edge-limit.json",
+    "sha256": "9b065740438d6fd005240c1fb390ad0c5e8359fc133a54e6807985edde3c8bcf"
+  },
+  {
+    "name": "modes-missing-mode",
+    "group": "negative",
+    "description": "one of the 18 own periods is absent",
+    "path": "proof-checkers/conformance-hsm/cases/modes-missing-mode.json",
+    "sha256": "48c84801ad03895127afe4ab5d994efdabf7e82137b34423c4377eb9b8a168aa"
+  },
+  {
+    "name": "modes-cap-four",
+    "group": "negative",
+    "description": "own period certified under a four HTM cap",
+    "path": "proof-checkers/conformance-hsm/cases/modes-cap-four.json",
+    "sha256": "05b63e08d668fc52410660218b22d685b2a31fd13fef82f6d47f2510cd4c4bc4"
+  }
+]
