@@ -183,6 +183,7 @@ def recIncoming(e: Int32, cost: Int64, heap: MutList[(Int64, Int32), r], dist: A
     }
 def recDistances(graph: RecGraph, goalCodes: List[Int64]): Vector[Int64] \ IO = region rc {
     let n = Vector.length(graph#layers);
+    require(n > 0 and n <= 1000000, "ERROR: graph exceeds exact signed-64-bit packed-cost capacity");
     let edgeCount = Vector.length(graph#ends);
     let heads = Array.repeat(rc, n, -1); let next = Array.repeat(rc, edgeCount, -1); let sources = Array.repeat(rc, edgeCount, -1);
     foreach (i <- List.range(0, n)) {
@@ -444,8 +445,11 @@ def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
             }
             case _ => throw new IllegalArgumentException("UNSUPPORTED: expected [--mode INDEX] RECOVERY.json MODES.json")
         };
-        let recovery = readJson(r); let witness = readJson(w);
-        println(json(recCheck(recovery, witness, shaFile(r), shaFile(w), selected)))
+        // Strict valid UTF-8 decodes and re-encodes byte-for-byte, with no normalization.
+        // Parse and digest the same one-read text, preventing path mutation races.
+        let recoveryText = readText(r); let witnessText = readText(w);
+        let recovery = parseJson(recoveryText); let witness = parseJson(witnessText);
+        println(json(recCheck(recovery, witness, shaText(recoveryText), shaText(witnessText), selected)))
         }
         }
     } catch {
