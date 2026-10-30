@@ -1,0 +1,3 @@
+# Native evidence includes empty final TSV fields and deliberate CRLF controls.
+# Preserve those exact bytes; do not treat field separators as prose whitespace.
+*.tsv whitespace=-blank-at-eol,cr-at-eol
