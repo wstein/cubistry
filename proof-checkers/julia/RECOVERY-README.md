@@ -15,6 +15,16 @@ julia --startup-file=no --compile=min --project=proof-checkers/julia proof-check
 julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/recovery-tests.jl RECOVERY.json MODES.json
 ```
 
+The exact frozen bytes already exist in the unchanged old corpus:
+[recovery input](../conformance-hsm/cases/recovery-unsupported.json) and
+[all-mode input](../conformance-hsm/cases/modes.json). The former filename and its
+old `UNSUPPORTED` expectation belong to `check.jl hsm`, and stay unchanged. The new
+entrypoint can read these same files directly:
+
+```sh
+julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/recovery.jl proof-checkers/conformance-hsm/cases/recovery-unsupported.json proof-checkers/conformance-hsm/cases/modes.json
+```
+
 The checker replays all eighteen own periods and inverses and recomputes the
 application selection rule. For each recovery row it independently enumerates
 all legal settled full poses, rebuilds every endpoint reachable within five HTM
