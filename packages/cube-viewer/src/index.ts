@@ -32,7 +32,7 @@ export {
   createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
 } from "./presentation-preset.ts";
 export { PhysicalCubeScene, stickerFrame, type PhysicalStickerFrame } from "./physical-scene.ts";
-const spacing = 0.52;
+const spacing = 0.5;
 /** Physical-state viewer: no target selection, solver or mechanics ownership. */
 export const BASE_MOVE_DURATION_MS = 75;
 export const MIN_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 2000;

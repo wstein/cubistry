@@ -5,6 +5,7 @@ import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.j
  * One pair of geometries per cube; no shadow maps or extra render passes. */
 export const PRESENTATION_PRESET = Object.freeze({
   version: 1,
+  cubiePitch: 1,
   bodyWidth: 0.99,
   bodyRadius: 0.055,
   bevelSegments: 3,
@@ -45,7 +46,7 @@ export function createPresentationGeometry() {
   for (let i = 0; i < uv.count; i++)
     uv.setXY(i, THREE.MathUtils.clamp(positions.getX(i) / p.stickerWidth + 0.5, 0, 1),
       THREE.MathUtils.clamp(positions.getY(i) / p.stickerWidth + 0.5, 0, 1));
-  return { body, sticker, stickerOffset: p.stickerOffset };
+  return { body, core: new THREE.BoxGeometry(1, 1, 1), sticker, stickerOffset: p.stickerOffset };
 }
 
 export function createPlasticMaterial(color = "#202329", roughness = 0.45) {

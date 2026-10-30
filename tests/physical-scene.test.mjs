@@ -37,7 +37,7 @@ function fixture(printed, spacing) {
 test("size-2 adapter preserves every immutable sticker frame at legal move endpoints", () => {
   const { print } = createDesign("picture");
   let state = initialState(print);
-  const h = fixture(stickerPoses(print, state), .52);
+  const h = fixture(stickerPoses(print, state), .5);
   h.adapter.sync(stickerPoses(print, state));
   h.verify(stickerPoses(print, state));
   for (const token of ["R", "U'", "F2", "L", "D2", "B'", "R2", "U", "F'"]) {
@@ -59,7 +59,7 @@ test("inherited size-3 calendar frames, center orientation and whole-cube turns 
   const pin = JSON.parse(readFileSync("calendar-source.json"));
   const design = validateDesign(JSON.parse(readFileSync("public/calendar/" + Object.keys(pin.runtime)[0])));
   let state = design.printing;
-  const h = fixture(state, 1.04);
+  const h = fixture(state, 1);
   h.adapter.sync(state); h.verify(state);
   for (const token of ["R", "U'", "F2", "L", "D2", "B'", "x", "y'", "z2"]) {
     const { axis, layer, turns } = moveInfo(token);
@@ -74,7 +74,7 @@ test("inherited size-3 calendar frames, center orientation and whole-cube turns 
 test("canceling a render-only turn restores the supplied authoritative frame and disposes shared geometry once", () => {
   const { print } = createDesign("picture");
   const poses = stickerPoses(print, initialState(print));
-  const h = fixture(poses, .52);
+  const h = fixture(poses, .5);
   h.adapter.sync(poses);
   const turn = h.adapter.beginTurn([0, 1], 0, Math.PI / 2);
   turn.update(.37); turn.dispose(); h.adapter.sync(poses); h.verify(poses);
@@ -93,7 +93,7 @@ test("shared clock placements and camera-space transforms stay outside physical 
   const poses = stickerPoses(print, initialState(print));
   const stage = new THREE.Scene();
   const cubes = [-2.8, 0, 2.8].map(x => {
-    const h = fixture(poses, .52);
+    const h = fixture(poses, .5);
     h.parent.position.set(x, 0, 0);
     h.parent.rotation.set(.16, .2, 0);
     stage.add(h.parent);
@@ -111,4 +111,39 @@ test("shared clock placements and camera-space transforms stay outside physical 
   assert.equal(cubes[0].parent.children.length, 8);
   assert.equal(cubes[2].parent.children.length, 8);
   for (const h of cubes) { if (h !== cubes[1]) h.adapter.dispose(); h.material.dispose(); }
+});
+
+test("compact size-2/size-3 seams have opaque plastic coverage at frontal and slight-angle junction rays", () => {
+  const { print } = createDesign("picture");
+  const pin = JSON.parse(readFileSync("calendar-source.json"));
+  const calendar = validateDesign(JSON.parse(readFileSync("public/calendar/" + Object.keys(pin.runtime)[0])));
+  for (const [poses, spacing, joints] of [
+    [stickerPoses(print, initialState(print)), .5, [0]],
+    [calendar.printing, 1, [-.5, .5]],
+  ]) {
+    const h = fixture(poses, spacing);
+    h.adapter.sync(poses); h.parent.updateMatrixWorld(true);
+    for (const x of joints) for (const y of joints)
+      for (const [dx, dy] of [[0, 0], [.02, .01], [-.02, -.01]]) {
+        const direction = new THREE.Vector3(dx, dy, -1).normalize();
+        const ray = new THREE.Raycaster(new THREE.Vector3(x - dx * 10, y - dy * 10, 10), direction);
+        assert(ray.intersectObject(h.parent, true).length > 0, `open junction at ${x},${y}`);
+      }
+    h.parent.traverse(object => {
+      if (!object.userData.plasticCore) return;
+      object.geometry.computeBoundingBox();
+      const bounds = object.geometry.boundingBox.clone().applyMatrix4(object.matrix);
+      for (const bound of [...bounds.min, ...bounds.max]) assert(Math.abs(bound) <= .500001);
+      // The sealing core stays below every exterior printed surface.
+      const body = object.parent;
+      for (const sticker of body.children.filter(child => child.userData.stickerId !== undefined)) {
+        const source = poses.find(pose => pose.id === sticker.userData.stickerId);
+        for (let axis = 0; axis < 3; axis++) {
+          if (source.n[axis] === 1) assert(bounds.max.getComponent(axis) <= .430001);
+          if (source.n[axis] === -1) assert(bounds.min.getComponent(axis) >= -.430001);
+        }
+      }
+    });
+    h.adapter.dispose(); h.material.dispose();
+  }
 });

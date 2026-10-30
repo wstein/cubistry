@@ -43,7 +43,7 @@ test("reconfiguration disposes old shared geometry, materials and images without
       if (object.material.map) textures.add(object.material.map);
     }
   });
-  assert.equal(geometries.size, 2);
+  assert.equal(geometries.size, 3);
   let disposedGeometry = 0, disposedMaterial = 0, disposedTexture = 0;
   for (const geometry of geometries) geometry.addEventListener("dispose", () => disposedGeometry++);
   for (const material of materials) material.addEventListener("dispose", () => disposedMaterial++);
