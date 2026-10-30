@@ -1,9 +1,0 @@
-{
-  "repository": "https://github.com/wstein/puzlwerk.git",
-  "commit": "c0826027e5c4b369edbee0f05d239fc7f35e737a",
-  "package": "@puzlwerk/solver-2x2",
-  "version": "0.1.0",
-  "providerRenamePR": "https://github.com/wstein/puzlwerk/pull/14",
-  "consumerRenamePR": "https://github.com/wstein/cubistry/pull/29",
-  "integrity": "sha512-bn1gp/mZ3KQK0fbXbT0hu3lYu4dQmevOpcGoAIRBlyb75NQIGmBxcEOwSXgBf8BSehXa4iYILvEsRRgJILOAjQ=="
-}
