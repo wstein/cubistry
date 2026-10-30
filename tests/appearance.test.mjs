@@ -69,7 +69,7 @@ test("face colors use explicit metadata and image-backed art is never sampled or
   assert.equal(sourceFaceColor("text", manifest, "#ffffff"), "#fffdf6");
   assert.equal(sourceFaceColor("picture", manifest, "#abcdef"), "#abcdef");
 });
-test("per-application appearance preferences are bounded, fail closed, and reset to the style default", () => {
+test("per-page appearance preferences are bounded, fail closed, and reset to the style default", () => {
   assert.notEqual(appearanceStorageKey("/clock.html"), appearanceStorageKey("/calendar.html"));
   assert(appearanceStorageKey("x".repeat(1000)).length < 240);
   const valid = { version: 1, construction: "stickerless", frameColor: "#1a2b3c" };
