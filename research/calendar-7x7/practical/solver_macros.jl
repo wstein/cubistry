@@ -111,7 +111,23 @@ function macro_solve(source, start, target, action, catalogs)
                     best = (key, inverse, word); bestscore = after; bestcost = cost
                 end
             end
-            isnothing(best) && error("Greedy macro search stalled in orbit $k at $before/$(length(constraints))")
+            # A bounded two-macro escape for corner assignments with shared artwork.
+            if isnothing(best) && k == 1
+                for (_, first_inverse, first_word) in candidates
+                    intermediate = occupants[first_inverse]
+                    score(intermediate) >= before-1 || continue
+                    for (_, second_inverse, second_word) in candidates
+                        cost = macro_htm(vcat(first_word,second_word))
+                        cost < bestcost || continue
+                        after = score(intermediate[second_inverse])
+                        if after > before
+                            best = (nothing,first_inverse[second_inverse],vcat(first_word,second_word))
+                            bestscore = after; bestcost = cost
+                        end
+                    end
+                end
+            end
+            isnothing(best) && error("Bounded macro search stalled in orbit $k at $before/$(length(constraints))")
             key, inverse, word = best
             occupants = occupants[inverse]
             state = compose(state, macro_word_perm(word, [UInt16.(g) for g in action.generators]))
@@ -124,33 +140,53 @@ function macro_solve(source, start, target, action, catalogs)
     (;word=macro_normalize(result), state)
 end
 
-function main_macros(dag_path, outdir)
+function macro_calendar_target(year, month)
+    @assert 2026 <= year <= 2099 && 1 <= month <= 12
+    display = board(year,month,"EN";merge_six_nine=false)
+    start = month <= 9 ? 5 : 1
+    letters = collect(MONTHS["EN"][month])
+    for col in 1:7
+        display[1,col] = start <= col <= start+2 ? (string(letters[col-start+1]),"month") : ("","blank")
+        text,ink = display[3,col]
+        !isempty(text) && parse(Int,text) > 7 && (display[3,col] = (text*"↶",ink))
+    end
+    (;year,month,board=display)
+end
+
+function main_macros(dag_path, outdir; source_id=2, target_year=2026, target_month=3)
     started = time_ns()
     mkpath(outdir)
     replay = replay_dag(dag_path)
     source = read_physical(joinpath(@__DIR__,"..","english","evidence","physical-print.tsv"))
     targets = physical_targets("EN")
-    start = signed_perm(replay.registers, replay.targets[2])
-    validate_front(decode_physical(source,start,replay.action), targets[2])
+    @assert haskey(replay.targets,source_id)
+    target = macro_calendar_target(target_year,target_month)
+    start = signed_perm(replay.registers, replay.targets[source_id])
+    validate_front(decode_physical(source,start,replay.action), targets[source_id])
     loaded = time_ns()
     catalogs = macro_catalogues(replay.action)
     cataloged = time_ns()
-    solution = macro_solve(source,start,targets[3],replay.action,catalogs)
-    open(joinpath(outdir,"feb-mar-2026.moves.tsv"),"w") do io
+    solution = macro_solve(source,start,target,replay.action,catalogs)
+    filename = source_id == 2 && target_year == 2026 && target_month == 3 ? "feb-mar-2026.moves.tsv" : "transition-$source_id-$target_year-$target_month.moves.tsv"
+    open(joinpath(outdir,filename),"w") do io
         println(io,"cubistry.calendar7.practical.v1")
-        println(io,"source\t2")
-        println(io,"destination\t2026\t3")
+        println(io,"source\t",source_id)
+        println(io,"destination\t",target_year,'\t',target_month)
         for (g,q) in macro_moves(solution.word);println(io,"move\t",g,'\t',q);end
     end
     reverse_state = compose(solution.state, macro_word_perm(macro_inverse(solution.word), [UInt16.(g) for g in replay.action.generators]))
     @assert reverse_state == start
     println("Benchmark seconds: load=",(loaded-started)/1e9," catalog=",(cataloged-loaded)/1e9," solve=",(time_ns()-cataloged)/1e9)
-    println("EXPERIMENTAL candidate: February→March2026; quarter-turns=",length(solution.word),"; HTM=",macro_htm(solution.word))
+    println("EXPERIMENTAL candidate: source=",source_id," destination=",target_year,'-',target_month,"; quarter-turns=",length(solution.word),"; HTM=",macro_htm(solution.word))
     println("Candidate endpoint SHA256=",state_digest(decode_physical(source,solution.state,replay.action)))
     println("UNKNOWN until independent Julia and Flix raw-input replay accept this finite word.")
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
-    @assert length(ARGS)==2 "Usage: solver_macros.jl BASELINE_DAG OUTPUT_DIRECTORY"
-    main_macros(ARGS...)
+    @assert length(ARGS) in (2,5) "Usage: solver_macros.jl BASELINE_DAG OUTPUT_DIRECTORY [SOURCE_ID YEAR MONTH]"
+    if length(ARGS) == 2
+        main_macros(ARGS...)
+    else
+        main_macros(ARGS[1],ARGS[2];source_id=parse(Int,ARGS[3]),target_year=parse(Int,ARGS[4]),target_month=parse(Int,ARGS[5]))
+    end
 end
