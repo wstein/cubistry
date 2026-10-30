@@ -78,6 +78,7 @@ export function configurePresentationRenderer(renderer: THREE.WebGLRenderer): vo
 export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadowExtent = 4, softness: number = PRESENTATION_PRESET.shadowSoftness) {
   const p = PRESENTATION_PRESET;
   const lights: THREE.Light[] = [];
+  let key!: THREE.DirectionalLight;
   const ambient = new THREE.AmbientLight(0xffffff, p.ambientIntensity);
   scene.add(ambient); lights.push(ambient);
   const hemisphere = new THREE.HemisphereLight(0xffffff, 0x77808d, p.hemisphereIntensity);
@@ -90,6 +91,7 @@ export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadow
     const light = new THREE.DirectionalLight(0xffffff, intensity);
     light.position.set(position[0], position[1], position[2]);
     if (intensity === p.keyIntensity) {
+      key = light;
       light.castShadow = true;
       light.shadow.mapSize.set(p.shadowMapSize, p.shadowMapSize);
       Object.assign(light.shadow.camera, {
@@ -106,7 +108,7 @@ export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadow
     }
     scene.add(light); lights.push(light);
   }
-  return { dispose() {
+  return { key, dispose() {
     for (const light of lights) {
       light.removeFromParent();
       if (light instanceof THREE.DirectionalLight) light.shadow.map?.dispose();

@@ -33,8 +33,45 @@ export function createPresentationStudio(
     backgrounds.set(element, element.style.background);
     element.style.background = STUDIO_BACKGROUND;
   }
+  // Reused Clock-only fitting scratch. Single-cube callers retain the original rig.
+  const lightCenter = new THREE.Vector3();
+  const direction = lights.key.position.clone().normalize();
   return {
     floor,
+    /** Fit one conservative caster union after its final rigid pose/scale.
+     * Light-space side bounds also contain receiver intersections: shadow rays
+     * are parallel to the directional camera depth axis. No mesh traversal. */
+    fitCasters(centers: readonly THREE.Vector3[], radius: number, clearance: number) {
+      if (!centers.length || !Number.isFinite(radius) || radius <= 0 ||
+          !Number.isFinite(clearance) || clearance < 0) throw Error("Invalid studio caster bounds");
+      const key = lights.key, camera = key.shadow.camera;
+      let floorY = Infinity;
+      for (const center of centers) floorY = Math.min(floorY, center.y - radius - clearance);
+      floor.position.y = floorY;
+      // Preserve the existing illumination direction; only shadow projection changes.
+      key.position.copy(direction).multiplyScalar(20);
+      key.updateMatrixWorld();
+      camera.position.copy(key.position);
+      camera.lookAt(0, 0, 0);
+      camera.updateMatrixWorld();
+      let left = Infinity, right = -Infinity, bottom = Infinity, top = -Infinity;
+      let near = Infinity, far = -Infinity;
+      for (const center of centers) {
+        lightCenter.copy(center).applyMatrix4(camera.matrixWorldInverse);
+        left = Math.min(left, lightCenter.x - radius); right = Math.max(right, lightCenter.x + radius);
+        bottom = Math.min(bottom, lightCenter.y - radius); top = Math.max(top, lightCenter.y + radius);
+        near = Math.min(near, -lightCenter.z - radius);
+        // The furthest ground intersection comes from the upper support point.
+        far = Math.max(far, -lightCenter.z + radius + (center.y + radius - floorY) / direction.y);
+      }
+      const padding = .04 * radius;
+      Object.assign(camera, { left: left - padding, right: right + padding,
+        bottom: bottom - padding, top: top + padding, near: Math.max(.01, near - padding), far: far + padding });
+      camera.updateProjectionMatrix();
+      key.shadow.radius = Math.max(2, Math.min(24,
+        PRESENTATION_PRESET.shadowSoftness * (radius / Math.sqrt(3)) * PRESENTATION_PRESET.shadowMapSize /
+        Math.max(camera.right - camera.left, camera.top - camera.bottom)));
+    },
     dispose() {
       floor.removeFromParent(); floor.geometry.dispose(); floor.material.dispose();
       lights.dispose();
