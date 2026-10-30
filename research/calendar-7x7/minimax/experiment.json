@@ -31,7 +31,7 @@
   "statusScope": "Only the five saved complete raw chains accepted independently by unchanged R2 Julia and Flix verifiers; solver clearance remains open",
   "candidateSourceCommit": "1e6f246810b241f7a3ddb38dc4c1dbf996f64f2f",
   "optimizationWork": "RESUMED_BY_OWNER_PHASE_A",
-  "implementationReview": "PENDING_FINAL_INDEPENDENT_REVIEW",
+  "implementationReview": "CLEARED_SCOPED_PHASE_A",
   "targetStatus": "UNKNOWN",
   "verifiedPrimaryHTM": [
     358,
@@ -112,6 +112,15 @@
         "file": "verification/midge-recovery.moves.tsv",
         "sha256": "37bd95f71801096e87f483582b5bb2b69a2eaff37e2b44fba58888367a21f510"
       }
-    ]
+    ],
+    "finalReviewSourceCommit": "a0a1fe2",
+    "finalUnitAssertions": 318631,
+    "review": "review/REVIEW.md",
+    "finalIndependentReproduction": "PASS_R2_R3_MIDGE_BYTE_REGEN_NATIVE5_NEGATIVE9",
+    "finalRegenerationResources": {
+      "seconds": 274.56,
+      "cumulativeAllocatedGB": 123.59,
+      "peakRSSGB": 1.096
+    }
   }
 }

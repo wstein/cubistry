@@ -53,5 +53,13 @@ Flix verifier, compares both native receipts, and checks nine shared corruptions
 gates. Set `CALENDAR7_MINIMAX_RESULTS_DIR` and
 `CALENDAR7_MINIMAX_FLIX_BUILD_DIR` for isolated temporary outputs.
 
-Independent final executable review is required before clearing Phase A.
+Independent final executable review completed at
+`a0a1fe2`. The complete reproduction passed all R2/R3/midge byte comparisons,
+**318,631** assertions, five fresh native chain agreements and nine shared
+rejection controls. All blocking findings are closed for the documented scope;
+see [review report](../review/REVIEW.md). The final corrected primary regeneration
+reported 274.56 seconds, 123.59 GB cumulative allocation and approximately
+1.096 GB peak RSS. These replace neither the historical timings above nor a
+controlled speedup study. The new search retained incumbents; no target bound
+was established.
 All certified parents remain unchanged. No browser E2E, merge or deployment.
