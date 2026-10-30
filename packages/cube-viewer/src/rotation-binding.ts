@@ -47,7 +47,7 @@ export function bindSmartRotation(element: HTMLElement, root: Object3D, options:
   const refresh = () => {
     select.value = controller.mode;
     note.textContent = controller.reducedMotion ? "Reduced motion: inertia and automatic return are off."
-      : controller.mode === "smart" ? "Smart: keep small changes; return larger views after settling and 5 seconds idle."
+      : controller.mode === "smart" ? "Smart: keep small changes; return larger views after settling and 2 seconds idle."
       : controller.mode === "free" ? "Free Rotation: inertia, without automatic return." : "Classic: direct rotation, without inertia or automatic return.";
   };
   const change = () => {
