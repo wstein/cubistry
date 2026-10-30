@@ -1,0 +1,19 @@
+{
+  "schema": "cubistry.calendar7.row2-endpoint-experiment.v1",
+  "status": "UNKNOWN",
+  "scope": "Seven exact physical row-2 sticker and cubie poses at month endpoints, existing immutable English calendar profile",
+  "printingDependencyCommit": "1bd783245abaa0d10946945be309e9fe8392d392",
+  "printingSHA256": "b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931",
+  "rawDAGSHA256": "ef2071eceb3f7e1934c4b67684613044e38d0446f16e86f4d0ba112ddc9f9f24",
+  "practicalChainDependencyCommit": "545e342b75d883e88159fd31d8acfcdee3b95f59",
+  "practicalChainSourceDirectory": "research/calendar-7x7/minimax/verification",
+  "monthDomain": [2026, 2099],
+  "representativeStates": 91,
+  "calendarMonths": 888,
+  "practicalChains": 5,
+  "authority": ["Julia", "Flix"],
+  "intermediateRowImmobility": "NOT_CHECKED",
+  "completePractical887EdgeCoverage": "UNKNOWN",
+  "globalOptimality": "UNKNOWN",
+  "productionTypography": "NOT_CHECKED"
+}
