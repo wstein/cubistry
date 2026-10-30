@@ -1,3 +1,4 @@
+import { syncDurationControl, changeDurationControl } from "./controls.ts";
 import { CalendarViewer } from "../calendar/viewer.ts";
 import { scramble } from "../playground/model.ts";
 import { FACE_FRAMES, scrambleWord, type Face } from "./model.ts";
@@ -37,6 +38,7 @@ function update() {
   viewer?.renderer.domElement.setAttribute("aria-label", `Physical 3 by 3 ${style === "picture" ? "Super Picture" : "classic color"} cube. Drag to rotate the cube.`);
   const snapshot = controller?.snapshot, blocked = !snapshot || snapshot.busy || snapshot.frozen;
   for (const button of physicalButtons) button.disabled = blocked;
+  syncDurationControl(el<HTMLSelectElement>("speed"), viewer, blocked);
   el<HTMLInputElement>("notation").disabled = blocked; el<HTMLInputElement>("seed").disabled = blocked; el<HTMLInputElement>("count").disabled = blocked;
   el<HTMLButtonElement>("undo").disabled = blocked || !snapshot?.cursor;
   el<HTMLButtonElement>("redo").disabled = blocked || snapshot!.cursor >= snapshot!.history.length;
@@ -85,7 +87,7 @@ el("cancel").onclick = () => controller?.cancel();
 el("restore").onclick = () => { void physical(() => controller?.restore() ?? Promise.resolve()); };
 el("reference").onclick = () => viewer?.resetReferenceView();
 el("retry-render").onclick = () => { initializeRenderer(); update(); };
-el("speed").onchange = () => { if (viewer) viewer.duration = Number(el<HTMLSelectElement>("speed").value); };
+el("speed").onchange = () => changeDurationControl(el<HTMLSelectElement>("speed"), viewer, !controller || controller.snapshot.busy || controller.snapshot.frozen);
 el("style").onchange = () => { if (disposed) return; style = el<HTMLSelectElement>("style").value === "classic" ? "classic" : "picture"; if (viewer && controller) viewer.updateArtwork(editor.artwork(style)); update(); };
 for (const { face } of FACE_FRAMES) {
   const field = document.createElement("fieldset"), legend = document.createElement("legend"); legend.textContent = faceLabels[face]; field.append(legend);
