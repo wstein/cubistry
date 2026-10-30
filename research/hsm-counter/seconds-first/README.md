@@ -244,3 +244,59 @@ per witness. The test suite takes a few minutes.
 - This is a settled-display mathematical result. No artwork, typography,
   browser timing, or application change is included.
 - See [manifest.json](manifest.json) for hashes and the environment.
+
+## Independent review (Opus)
+
+**Verdict: no blocking proof issue.** A separate reviewer rebuilt the model
+from scratch (rotation-group corner poses, a four-corner BFS, a full-pose
+shortest-edge graph, Howard policy iteration, and an integer Bellman-Ford
+certificate) without using any code from this directory. The reviewer
+confirmed independence of the checker, reproduction of the tests, negative
+controls, `verification.json`, both witnesses (byte for byte with plain
+`gcc -O2`), and all manifest hashes. The reviewer also confirmed the 159, 171,
+204, 204.75, 82, and 41.14 figures, the baseline figures, the six-HTM bound
+for every display, and the conditional 168 lower bound. The review covers the
+mathematical result. It does not approve a change to the application.
+
+Findings:
+
+1. **Medium (product, not proof): 159 needs a new planner.** The figure holds
+   only for a planner that follows the saved full-pose periods. The app's
+   current policy 13 (greedy shortest edges) on the new print gives S +1 = 186
+   HTM per lap, not 159. It also gives M −1 a maximum of 6 HTM and lets H
+   reach 6 HTM. That breaks the owner's limit of M ≤ 5 and the existing
+   five-HTM-per-step test for all 18 modes in `tests/hsm-counter.test.mjs`.
+   Adopting this print therefore requires a period-following planner as well
+   as the sticker changes.
+2. **Medium (scope): 8 of the 18 app modes are covered.** Witnesses exist for
+   S, M, and H 00–23 and 00–11 in both directions, which is eight modes. The
+   app exposes 18 (three letters, ranges 11, 23, and 59, both directions). The
+   reviewer checked the other 10: each has a recurrent shortest-edge mode with
+   a maximum of at most 5 (for example S 00–23 has a lap of 68). No witnesses
+   are saved for them, so those figures are the reviewer's, not part of this
+   directory's evidence.
+3. **Low: H and M 00–11, −1.** The saved minimum-mean period has one 6-HTM
+   edge. A recurrent mode with a maximum of 5 exists (the minimum cap is 5).
+   If the app adopts this print, choose the period with a maximum of 5 over
+   the one with a single 6-HTM edge.
+4. **Low: wrap figures are not certified.** The wrap values in the table
+   describe the one optimal cycle that was saved. Other optimal cycles can
+   differ. For S −1 with its own shortest edges the reviewer found an optimal
+   cycle with a wrap of 3, where the table reports 4.
+5. **Info (robustness): every digit, H, and M depends on one sticker.** The new
+   print has three S stickers and three blanks (one corner), and each of the
+   tens digits 0–5, the units digits 0–9, H, and M appears once. The baseline's
+   duplicate units 0 and 9 are gone. Digits 0 and 9 are still reachable in
+   every required display, but a single damaged or misprinted sticker now has
+   no duplicate to fall back on.
+
+Still unknown:
+
+- **Global print optimality.** The only proven floor is 60 HTM per S lap. The
+  168 bound holds only under the stated conditions (single S, single tens
+  stickers, one blank corner), which the new print deliberately breaks. The
+  true optimum lies between 60 and 159.
+- **Schedules that are not shortest per edge.** The certificates cover shortest
+  edges only. The reviewer tried edges up to one HTM longer than shortest
+  (6.19 million edges) and found nothing that beats 159. Longer detours remain
+  unchecked.
