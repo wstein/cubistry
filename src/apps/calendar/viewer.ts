@@ -11,12 +11,16 @@ import {
 import {
   PhysicalCubeScene, createPresentationGeometry, createPlasticMaterial,
   createStickerMaterial, configurePresentationRenderer, createPresentationStudio,
+  DEFAULT_APPEARANCE, validateAppearance, installAppearanceControls, type ViewerAppearance,
 } from "@cubistry/cube-viewer";
 /** Calendar-only 26-body viewer: one permanent texture per printed facelet. */
 export class CalendarViewer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.PerspectiveCamera(24, 1, 0.1, 100);
+  private appearance: ViewerAppearance = DEFAULT_APPEARANCE;
+  private plastic?: THREE.MeshPhysicalMaterial;
+  private appearanceControls: ReturnType<typeof installAppearanceControls>;
   private cube: PhysicalCubeScene | null = null;
   private studio: ReturnType<typeof createPresentationStudio>;
   private resources: { dispose(): void }[] = [];
@@ -41,6 +45,8 @@ export class CalendarViewer {
     configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
     this.studio = createPresentationStudio(this.scene, 1.5, 1.5, host);
+    this.appearanceControls = installAppearanceControls(host, (value) => this.setAppearance(value));
+    this.appearanceControls.setDefaultColor("#243d35");
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;
@@ -90,6 +96,11 @@ export class CalendarViewer {
       this.renderer.render(this.scene, this.camera);
     });
   }
+  setAppearance(value: ViewerAppearance): void {
+    this.appearance = validateAppearance(value);
+    this.plastic?.color.set(this.appearance.frameColor ?? "#243d35");
+    this.cube?.setConstruction(this.appearance.construction);
+  }
   resetReferenceView(): void {
     this.yaw = 0.2;
     this.pitch = 0.18;
@@ -106,6 +117,7 @@ export class CalendarViewer {
     this.current = state;
     const plastic = createPlasticMaterial("#243d35", 0.65);
     this.resources.push(plastic);
+    this.plastic = plastic;
     const maps = new Map<string, THREE.MeshPhysicalMaterial>();
     for (const s of design.printing) {
       const role = s.image.match(/^[0-9]$/)
@@ -142,7 +154,8 @@ export class CalendarViewer {
       materials.set(s.id, maps.get(role + ":" + s.image)!);
     }
     this.cube = new PhysicalCubeScene(this.scene, design.printing, materials, plastic, 1,
-      createPresentationGeometry());
+      createPresentationGeometry(), new Map(design.printing.map(s => [s.id, "#fffdf6"])));
+    this.setAppearance(this.appearance);
     this.sync(state);
   }
   private sync(state: State): void {
@@ -192,6 +205,7 @@ export class CalendarViewer {
     this.renderer.setAnimationLoop(null);
     this.resize.disconnect();
     this.studio.dispose();
+    this.appearanceControls.dispose();
     this.clear();
     this.renderer.dispose();
     this.renderer.domElement.remove();
