@@ -26,8 +26,8 @@ function notify({deployOK,metadata=sha,closed=false,remaining=false}){
   return JSON.parse(readFileSync(join(dir,'comment'),'utf8')).body;
  }finally{rmSync(dir,{recursive:true,force:true});}
 }
-function publication({previewFailure=false,earlyFailure=false,finalFailure=false}={}){
- const dir=mkdtempSync(join(tmpdir(),'pages-order-')),storage=join(dir,'storage'),results=new Map();let published;
+function publication({previewFailure=false,previewCancelled=false,earlyFailure=false,finalFailure=false}={}){
+ const dir=mkdtempSync(join(tmpdir(),'pages-order-')),storage=join(dir,'storage'),results=new Map();let published,cancelled=false;
  mkdirSync(join(storage,'pr-preview/pr-1'),{recursive:true});mkdirSync(join(storage,'pr-preview/pr-2'));
  writeFileSync(join(storage,'index.html'),'verified production');
  writeFileSync(join(storage,'pr-preview/pr-1/preview-info.json'),JSON.stringify({sha:old}));
@@ -35,10 +35,10 @@ function publication({previewFailure=false,earlyFailure=false,finalFailure=false
   if(results.has(id))return;for(const dependency of needs(id))run(dependency);
   const body=jobs.get(id),always=/if: always\(\)/.test(body);
   const conditions=[...body.matchAll(/needs\.([a-z-]+)\.result == '([^']+)'/g)];
-  if((!always&&needs(id).some(n=>results.get(n)!=='success'))||conditions.some(m=>results.get(m[1])!==m[2])){results.set(id,'skipped');return;}
+  if((/!cancelled\(\)/.test(body)&&cancelled)||(!always&&needs(id).some(n=>results.get(n)!=='success'))||conditions.some(m=>results.get(m[1])!==m[2])){results.set(id,'skipped');return;}
   if(id==='previews'){
    writeFileSync(join(storage,'pr-preview/pr-1/preview-info.json'),JSON.stringify({sha}));rmSync(join(storage,'pr-preview/pr-2'),{recursive:true});
-   results.set(id,previewFailure?'failure':'success');return;
+   if(previewCancelled)cancelled=true;results.set(id,previewCancelled?'cancelled':previewFailure?'failure':'success');return;
   }
   if(/run: python3 code\/scripts\/pages\/snapshot.py site combined-site/.test(body)){
    const destination=join(dir,id);execFileSync('python3',['scripts/pages/snapshot.py',storage,destination]);
@@ -87,4 +87,12 @@ test('final snapshot preserves trusted-main boundary, distinct immutable artifac
  assert.match(final,/actions\/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa/);
  assert.match(final,/actions\/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e/);
  assert.match(jobs.get('notify'),/DEPLOY_OK: \$\{\{ needs\.deploy-previews\.result == 'success' \}\}/);
+});
+
+test('operator cancellation after early production prevents final publication and fresh availability or cleanup claims',()=>{
+ const result=publication({previewCancelled:true});assert.equal(result.results.get('deploy'),'success');
+ assert.equal(result.results.get('deploy-previews'),'skipped');assert.equal(result.published,old);
+ assert.doesNotMatch(result.comment,/Open non-production PR preview/);assert.match(result.comment,/pending|failed/);
+ const final=jobs.get('deploy-previews');assert.match(final,/if: always\(\) && !cancelled\(\)/);
+ assert.doesNotMatch(notify({deployOK:false,closed:true}),/^.*Preview removed/m);
 });
