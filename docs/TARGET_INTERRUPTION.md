@@ -26,7 +26,12 @@ HSM's settled blank-and-unit six-HTM bound is not asserted for an interrupted
 pose whose blank or letter has moved away. `planFromPose` reuses the same exact
 four-corner graph to restore all four requested front stickers; it does not
 silently finish the obsolete number first or relabel a moved sticker. Full-state
-continuity, actual counts, and exact target replay remain required.
+continuity, actual counts, and exact target replay remain required. In every
+counting mode of the seconds-first print the replan is a least route from the
+actual pose that prefers a node of the mode's saved period. Counting on then
+recovers onto the period at most five HTM per step; see
+[HSM counter](HSM_COUNTER.md#leaving-and-returning-to-the-period).
+`planFromPose` remains the fallback.
 
 Clock and Timer schedulers retain valid anticipatory deadlines for unchanged
 active targets. A stale wall-clock target is replaced after the current turn;
