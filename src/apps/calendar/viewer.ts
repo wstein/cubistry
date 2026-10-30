@@ -1,24 +1,20 @@
 import * as THREE from "three";
 import { stickerArt } from "./artwork.ts";
 import {
-  cross,
   demand,
   apply,
   sameState,
   moveInfo,
-  type V,
   type State,
   type Design,
 } from "./model.ts";
-const vector = (v: V) => new THREE.Vector3(...v);
-const frame = (n: V, up: V) =>
-  new THREE.Matrix4().makeBasis(vector(cross(up, n)), vector(up), vector(n));
+import { PhysicalCubeScene } from "@cubistry/cube-viewer";
 /** Calendar-only 26-body viewer: one permanent texture per printed facelet. */
 export class CalendarViewer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.PerspectiveCamera(24, 1, 0.1, 100);
-  private meshes = new Map<number, THREE.Group>();
+  private cube: PhysicalCubeScene | null = null;
   private resources: { dispose(): void }[] = [];
   private resize: ResizeObserver;
   private yaw = 0.2;
@@ -26,7 +22,6 @@ export class CalendarViewer {
   private radius = 14.1;
   private drag: { id: number; x: number; y: number } | null = null;
   private current: State | null = null;
-  private print: State | null = null;
   private busy = false;
   duration = 100;
   get presentedState(): State | null {
@@ -100,15 +95,14 @@ export class CalendarViewer {
     this.pitch = 0.18;
   }
   private clear(): void {
-    for (const mesh of this.meshes.values()) this.scene.remove(mesh);
-    this.meshes.clear();
+    this.cube?.dispose();
+    this.cube = null;
     for (const r of this.resources) r.dispose();
     this.resources = [];
   }
   configure(design: Design, state: State): void {
     demand(!this.busy, "Cannot change the calendar print during a turn");
     this.clear();
-    this.print = design.printing;
     this.current = state;
     const plastic = new THREE.MeshStandardMaterial({
       color: "#243d35",
@@ -117,7 +111,6 @@ export class CalendarViewer {
     this.resources.push(plastic);
     const box = new THREE.BoxGeometry(0.99, 0.99, 0.99),
       plane = new THREE.PlaneGeometry(0.86, 0.86);
-    this.resources.push(box, plane);
     const maps = new Map<string, THREE.MeshBasicMaterial>();
     for (const s of design.printing) {
       const role = s.image.match(/^[0-9]$/)
@@ -148,36 +141,19 @@ export class CalendarViewer {
       this.resources.push(texture, mat);
       maps.set(key, mat);
     }
-    for (let id = 0; id < 26; id++) {
-      const body = new THREE.Group();
-      body.add(new THREE.Mesh(box, plastic));
-      for (const s of design.printing.filter((s) => s.cubie === id)) {
-        const role = s.image.match(/^[0-9]$/)
-          ? "day"
-          : s.slot < 3
-            ? "weekday"
-            : "month";
-        const sticker = new THREE.Mesh(plane, maps.get(role + ":" + s.image)!);
-        sticker.position.copy(vector(s.n).multiplyScalar(0.502));
-        sticker.quaternion.setFromRotationMatrix(frame(s.n, s.up));
-        sticker.userData.stickerId = s.id;
-        body.add(sticker);
-      }
-      this.scene.add(body);
-      this.meshes.set(id, body);
+    const materials = new Map<number, THREE.Material>();
+    for (const s of design.printing) {
+      const role = s.image.match(/^[0-9]$/) ? "day" : s.slot < 3 ? "weekday" : "month";
+      materials.set(s.id, maps.get(role + ":" + s.image)!);
     }
+    this.cube = new PhysicalCubeScene(this.scene, design.printing, materials, plastic, 1.04,
+      { body: box, sticker: plane, stickerOffset: 0.502 });
     this.sync(state);
   }
   private sync(state: State): void {
-    for (const [id, mesh] of this.meshes) {
-      const src = this.print!.find((s) => s.cubie === id)!,
-        dst = state.find((s) => s.id === src.id)!;
-      mesh.position.copy(vector(dst.p).multiplyScalar(1.04));
-      mesh.quaternion.setFromRotationMatrix(
-        frame(dst.n, dst.up).multiply(frame(src.n, src.up).transpose()),
-      );
-    }
+    this.cube!.sync(state);
   }
+
   async animate(from: State, token: string, to: State): Promise<void> {
     demand(
       this.current &&
@@ -188,32 +164,31 @@ export class CalendarViewer {
     demand(!this.busy, "Calendar viewer already animating");
     this.busy = true;
     const { axis, layer, turns } = moveInfo(token),
-      selected = [...this.meshes].filter(([id]) => {
-        const s = from.find((s) => s.cubie === id)!;
-        return layer === null || s.p[axis] === layer;
-      }),
-      pivot = new THREE.Group();
+      selected = [...new Set(from.filter((s) => layer === null || s.p[axis] === layer).map((s) => s.cubie))];
+    let turn: ReturnType<PhysicalCubeScene["beginTurn"]> | undefined;
     try {
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        this.scene.add(pivot);
-        for (const [, mesh] of selected) pivot.add(mesh);
+        turn = this.cube!.beginTurn(selected, axis, (turns * Math.PI) / 2);
         const start = performance.now();
         await new Promise<void>((resolve) => {
           const tick = (now: number) => {
             const p = Math.min(1, (now - start) / this.duration);
-            pivot.rotation[(["x", "y", "z"] as const)[axis]] =
-              ((turns * Math.PI) / 2) * p * p * (3 - 2 * p);
+            turn!.update(p * p * (3 - 2 * p));
             if (p < 1) requestAnimationFrame(tick);
             else resolve();
           };
           requestAnimationFrame(tick);
         });
       }
-      for (const [, mesh] of selected) this.scene.add(mesh);
-      this.scene.remove(pivot);
+      turn?.dispose();
+      turn = undefined;
       this.current = to;
       this.sync(to);
     } finally {
+      if (turn) {
+        turn.dispose();
+        this.sync(this.current!);
+      }
       this.busy = false;
     }
   }
