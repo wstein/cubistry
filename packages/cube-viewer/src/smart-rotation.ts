@@ -145,6 +145,11 @@ export class SmartRotation {
     if (measured.length() > ROTATION_TUNING.maximumSpeed) measured.setLength(ROTATION_TUNING.maximumSpeed);
     this.velocity.lerp(measured, 1 - Math.exp(-elapsed / ROTATION_TUNING.velocityFilterSeconds));
     if (this.velocity.length() > ROTATION_TUNING.maximumSpeed) this.velocity.setLength(ROTATION_TUNING.maximumSpeed);
+    // A dragged boundary is already a physical presentation stop. Do not
+    // retain filtered outward momentum that can overpower the next reversal.
+    if (this.modeValue !== "free" &&
+        ((this.pitch >= ROTATION_TUNING.pitchLimit - 1e-12 && this.velocity.x > 0) ||
+         (this.pitch <= -ROTATION_TUNING.pitchLimit + 1e-12 && this.velocity.x < 0))) this.velocity.x = 0;
   }
   up(at: number, cancelled = false): void {
     this.time(at); if (this.phaseValue !== "dragging" || this.disposed || this.suspended) return;
