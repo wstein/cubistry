@@ -1,0 +1,18 @@
+[
+  {
+    "raw": "all-targets-dag.tsv",
+    "rawSHA256": "ef2071eceb3f7e1934c4b67684613044e38d0446f16e86f4d0ba112ddc9f9f24",
+    "rawBytes": 6091419,
+    "archive": "all-targets-dag.tsv.gz",
+    "archiveSHA256": "64d1eb37644abda3fbb7121fd85b85dd3552a4a5525a3ad8042b06988705e932",
+    "archiveBytes": 968226
+  },
+  {
+    "raw": "first-target-dag.tsv",
+    "rawSHA256": "55a765b2a13388c480ddb6062c07fb9c03fbd866f276c2b206254c32d686240e",
+    "rawBytes": 4112466,
+    "archive": "first-target-dag.tsv.gz",
+    "archiveSHA256": "86475a6c64669c5fdf0eea1950d3222adab1cce5944c7c56651f1886c569b629",
+    "archiveBytes": 649305
+  }
+]

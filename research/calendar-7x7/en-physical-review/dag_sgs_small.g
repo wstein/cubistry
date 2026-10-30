@@ -1,0 +1,12 @@
+Read("research/calendar-7x7/en-physical-review/dag_words.g");;
+Read("research/calendar-7x7/en-physical-review/partial_transporter.g");;
+gens := [(1,2,3,4),(1,2)];;G := Group(gens);;
+labels := StartCalendarWords(gens);;H := Group(labels);;
+map := GroupGeneralMappingByImages(G,H,gens,labels);;
+S := StabChainMutable(map,rec(base:=[1,2,3,4]));;
+answer := PartialFrontTransporter(S,[1,2],[3,4]);;
+Print("found\t",answer.found,"\n");
+Print("replay\t",EvalCalendarWord(answer.word,gens)=answer.perm,"\n");
+Print("nodes\t",Length(CalendarNodes),"\n");
+ExportCalendarDAG([answer.word],"research/calendar-7x7/en-physical-review/small-dag.tsv");
+QUIT;

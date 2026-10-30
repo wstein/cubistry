@@ -1,0 +1,8 @@
+#I  default `IsGeneratorsOfMagmaWithInverses' method returns `true' for [ <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object>, <object> ]
+dag_sgs_ms	1861
+rebase_resolve_ms	4173
+resolved_transversals	335
+transport_all_ms	185
+candidate_targets	91
+export_nodes	230384
+candidate_generation	COMPLETE_REQUIRES_INDEPENDENT_NATIVE_REPLAY

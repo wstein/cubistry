@@ -1,0 +1,11 @@
+Read("research/calendar-7x7/en-physical-review/partial_transporter.g");;
+gens := [(1,2,3,4),(1,2)];;
+G := Group(gens);;labels := StraightLineProgGens(gens);;H := Group(labels);;
+map := GroupGeneralMappingByImages(G,H,gens,labels);;
+S := StabChainMutable(map,rec(base:=[1,2,3,4]));;
+answer := PartialFrontTransporter(S,[1,2],[3,4]);;
+Print("found\t",answer.found,"\n");
+Print("maps\t",OnTuples([3,4],answer.perm),"\n");
+Print("replay\t",EvalStraightLineProgElm(answer.word)=answer.perm,"\n");
+ExportLegalSLP(answer.word,"research/calendar-7x7/en-physical-review/small-slp.tsv",gens);
+QUIT;

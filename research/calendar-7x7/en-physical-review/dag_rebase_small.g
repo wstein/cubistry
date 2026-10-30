@@ -1,0 +1,13 @@
+Read("research/calendar-7x7/en-physical-review/dag_words.g");;
+Read("research/calendar-7x7/en-physical-review/partial_transporter.g");;
+gens := [(1,2,3,4),(1,2)];;G := Group(gens);;
+labels := StartCalendarWords(gens);;H := Group(labels);;
+map := GroupGeneralMappingByImages(G,H,gens,labels);;
+S := StabChainMutable(map,rec(base:=[1,2,3,4]));;
+Print("oldbase\t",BaseStabChain(S),"\n");
+Print("changed\t",ChangeStabChain(S,[1,3,2,4],false),"\n");
+Print("newbase\t",BaseStabChain(S),"\n");
+answer := PartialFrontTransporter(S,[1,3],[3,4]);;
+Print("found\t",answer.found,"\n");
+if answer.found then Print("replay\t",EvalCalendarWord(answer.word,gens)=answer.perm,"\n");fi;
+QUIT;
