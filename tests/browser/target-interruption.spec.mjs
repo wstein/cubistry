@@ -150,7 +150,9 @@ for (const style of ["symbols", "words"])
         await original(p, timing);
         window.liveCommits.push(r);
       };
-      window.liveEpoch = Date.parse("2026-10-28T11:34:56.800Z");
+      // The saved period's 56 to 57 edge is three quarter units (150 ms at the
+      // preferred 50 ms), so it launches in the last 150 ms before the boundary.
+      window.liveEpoch = Date.parse("2026-10-28T11:34:56.900Z");
     });
     await expect
       .poll(() => page.evaluate(() => typeof window.releaseLiveTurn))
