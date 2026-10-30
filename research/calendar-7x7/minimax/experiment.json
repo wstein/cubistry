@@ -1,14 +1,83 @@
 {
   "schema": "cubistry.calendar7.minimax-experiment.v1",
-  "status": "UNKNOWN",
+  "status": "SAT",
   "dependencyCommit": "c1619530e554e85622d8383636fbca4a248e1d3e",
   "printingSHA256": "b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931",
-  "baselineHTM": [397, 53, 48, 430, 487, 433, 378, 397],
-  "objectives": ["reduce longest edges", "minimize continuous-chain maximum", "reduce mean and variance without padding", "optimize short edges last"],
-  "targetHTM": [100, 120],
+  "baselineHTM": [
+    397,
+    53,
+    48,
+    430,
+    487,
+    433,
+    378,
+    397
+  ],
+  "objectives": [
+    "reduce longest edges",
+    "minimize continuous-chain maximum",
+    "reduce mean and variance without padding",
+    "optimize short edges last"
+  ],
+  "targetHTM": [
+    100,
+    120
+  ],
   "desiredUpperBoundHTM": 200,
   "globalOptimality": "UNKNOWN",
   "fullChronologicalCoverage": "UNKNOWN",
   "runtimeIntegration": "NOT_CHECKED",
-  "promotion": "Draft research only; owner acceptance required"
+  "promotion": "Draft research only; owner acceptance required",
+  "statusScope": "Only the five saved complete raw chains accepted independently by unchanged R2 Julia and Flix verifiers; solver clearance remains open",
+  "candidateSourceCommit": "1e6f246810b241f7a3ddb38dc4c1dbf996f64f2f",
+  "optimizationWork": "PAUSED_BY_OWNER",
+  "implementationReview": "OPEN_FINDINGS",
+  "targetStatus": "UNKNOWN",
+  "verifiedPrimaryHTM": [
+    358,
+    57,
+    48,
+    409,
+    446,
+    401,
+    363,
+    361
+  ],
+  "verifiedPrimaryStatistics": {
+    "count": 8,
+    "meanHTM": 305.375,
+    "medianHTM": 362,
+    "maxHTM": 446
+  },
+  "supplementalMidgeHTM": [
+    66,
+    432
+  ],
+  "verifiedInputs": [
+    {
+      "file": "evidence/chain-1.moves.tsv",
+      "sha256": "3394e630db10e8b6c9b1d9f166ea9eac9fe729a6aa5a7e98c1ce2b5788d7b653",
+      "nativeReceiptsIdentical": true
+    },
+    {
+      "file": "evidence/chain-2.moves.tsv",
+      "sha256": "7dd5981ca947530d5ac796685180dbce12babcfda2c412a4009b92a4b461537d",
+      "nativeReceiptsIdentical": true
+    },
+    {
+      "file": "evidence/chain-3.moves.tsv",
+      "sha256": "d72793f8df71d48195f02a5eea929206b03414c032a7580d256373c223f72861",
+      "nativeReceiptsIdentical": true
+    },
+    {
+      "file": "evidence/chain-4.moves.tsv",
+      "sha256": "71060b20676211ed2a4619b0af13689c7650c7eae88e2c341739d4311876159c",
+      "nativeReceiptsIdentical": true
+    },
+    {
+      "file": "evidence/midge-recovery.moves.tsv",
+      "sha256": "c727b7dd18ee481103b85283529c409fc685f940a058814844d43785cb9a9a9d",
+      "nativeReceiptsIdentical": true
+    }
+  ]
 }
