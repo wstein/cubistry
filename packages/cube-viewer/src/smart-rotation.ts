@@ -220,7 +220,6 @@ export class SmartRotation {
     if (changed && mode !== "free") {
       this.prepareUpright();
       this.levelingRequested = this.quaternion.angleTo(this.upright) > 1e-7;
-      this.anchorCandidate = false;
     } else if (mode === "free") this.levelingRequested = false;
     this.interact(at);
   }

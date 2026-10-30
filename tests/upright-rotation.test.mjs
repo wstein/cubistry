@@ -71,3 +71,17 @@ test('reduced motion performs only requested 150ms leveling; visibility and Free
  c.setMode('free',201);c.down(201);c.drag(.8,.9,201.1);c.up(201.4);const free=c.quaternion.clone();c.setMode('smart',202);c.step(202.05);const bridge=c.quaternion.clone();c.setMode('free',202.05);same(c.quaternion,bridge);c.step(210);same(c.quaternion,bridge);assert.equal(c.phase,'idle');
  c.reset(211);upright(c.quaternion);same(c.quaternion,new SmartRotation(q).quaternion);assert(free.angleTo(c.quaternion)>.1);
 });
+
+test('genuine Free gestures remain anchor candidates through upright selection and leveling; mode choice alone never creates one',()=>{
+ for(const degrees of [10,26]){
+  const c=new SmartRotation(pose(),'free');c.down(0);c.drag(0,degrees*Math.PI/180,.2);c.up(.4);
+  const chosen=c.quaternion.clone();c.setMode('smart',1);
+  if(degrees===10){same(c.anchor,chosen);assert.equal(c.phase,'idle');c.step(10);same(c.quaternion,chosen);}
+  else {same(c.anchor,pose());assert.equal(c.returnDeadline,3);c.step(4);same(c.quaternion,pose());}
+ }
+ const c=new SmartRotation(pose(),'free');c.down(0);c.drag(.03,.08,.1);c.drag(-.03,.08,.2);c.up(.4);
+ c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(2);same(c.anchor,c.quaternion);assert.equal(c.phase,'idle');
+ const d=new SmartRotation(pose());d.down(0);d.drag(0,Math.PI/3,.2);d.up(.4);d.step(3);
+ const automatic=d.quaternion.clone();assert(automatic.angleTo(d.anchor)<25*Math.PI/180);d.setMode('free',3);d.setMode('smart',3.1);
+ same(d.quaternion,automatic);same(d.anchor,pose());assert.equal(d.returnDeadline,5.1);d.step(6.1);same(d.quaternion,pose());
+});
