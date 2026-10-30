@@ -1,9 +1,9 @@
 # Recovery mean decimal root cause
 
-Status: **UNKNOWN** pending the parser fix and its native validation. This is a
+Status: **UNKNOWN** pending complete native validation of the documented fix. This is a
 Codex Sol author investigation of a static exactness defect, found before Flix
 implementation. No Flix/Julia dissent has occurred. The original full eighteen-mode
-Julia baseline remains running unchanged at source
+Julia baseline ran unchanged at source
 `c997f268f451748086c0aaedd32f804ce0f745c6`.
 
 ## Concrete counterexample
@@ -62,3 +62,32 @@ labels. Preserve exact raw-input binding and rerun native positive validation at
 the new source revision. The coordinator will determine the complete validation
 sequence after the unchanged mathematical baseline finishes. Do not start Flix
 implementation before that sequence clears.
+
+## Implementation and focused validation
+
+Fix revision: `249df9d31b1d2c6daa617e88f898ff0c25906300`. The coordinator approved
+the fix after reading the committed root cause. The graph, Dijkstra and sample
+replay algorithms are unchanged. Mean equality now uses the exact canonical
+decimal guard. A second read for `JSONText` extraction must match the original
+strict reader's SHA-256, so it cannot silently bind tokens from different bytes.
+Progress diagnostics now explicitly flush after phases, each 25,000 graph nodes
+and each completed row; the deterministic verdict excludes timings.
+
+The focused native parser suite passed all 23 assertions, including equivalent
+scientific notation, a nearby decimal that collides as `Float64`, escaped keys,
+label-string decoys, extreme exponents, leading zeros, signed zero and input-byte
+binding. Exact command:
+
+```sh
+JULIA_DEPOT_PATH=/tmp/cubistry-julia-depot /tmp/julia-1.13.3/bin/julia --startup-file=no --compile=min --project=proof-checkers/julia proof-checkers/julia/recovery-parser-tests.jl /tmp/hsm-recovery-source.json /tmp/hsm-modes-source.json
+```
+
+Observed exit 0; elapsed 11.819 seconds; maximum resident size 384,580 KiB.
+These focused assertions do not establish the recovery proof.
+
+The obsolete original baseline was deliberately interrupted with `SIGINT` after
+1,293.360 seconds, before any complete verdict. Its captured child exit was -2,
+stdout was empty and maximum resident size was 744,828 KiB. It is retained as
+`INTERRUPTED_UNKNOWN`, with the exact loaded source and diagnostics, rather than
+reported as a semantic rejection. A fresh complete eighteen-mode run at the fix
+revision is required before Flix implementation and confirmation can proceed.
