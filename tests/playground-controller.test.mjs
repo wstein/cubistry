@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { TABLE_URL } from "@puzlwerk/solver-2x2";
 import { stateEquals, validateState } from "@cubistry/cube-core";
 import { applyMoves, parseAlg, stickerPoses } from "@cubistry/cube-mechanics";
 import { createDesign, fullGoal } from "../src/apps/playground/model.ts";
@@ -271,7 +273,7 @@ test("bounded cached table loader rejects oversized/truncated/http failures and 
   let calls = 0;
   const load = tableLoader(async () => {
     calls++;
-    return new Response(new Uint8Array(expected));
+    return new Response(readFileSync(TABLE_URL));
   });
   assert.equal((await load()).length, expected);
   await load();
