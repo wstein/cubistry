@@ -851,6 +851,7 @@ async function observeEndpoints(page) {
     }).observe(cube, { attributes: true });
     const animate = CubeViewer.prototype.animate;
     CubeViewer.prototype.animate = async function (p, ...options) {
+      window.timerViewer=this;window.timerPresentation=p;
       window.sequenceStartedAt ??= performance.now();
       window.nominalDurations.push(75 / this.animationSpeed);
       const motionWindow=options[0]?.();if(motionWindow)(window.motionWindows??=[]).push(motionWindow);
@@ -956,13 +957,13 @@ test("100x10ms reports infeasible budget honestly and still commits a full legal
   await expect(page.locator("#rotation-speed")).toHaveValue("6");
 });
 
-test("pause reconciles active sequences and a final-turn start through legal moves; Resume keeps fractions", async({page})=>{
+test("pause reconciles active sequences and a active final turn through legal moves; Resume keeps fractions", async({page})=>{
   test.setTimeout(60000);
   await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.install();
   await chooseTimer(page);
   await pauseSoon(page);
-  for(const [stop,advance] of [["0",5500],["3",9750]]) {
+  for(const [stop,advance] of [["0",5500],["3",9800]]) {
     await page.locator("#rotation-speed").fill("6");
     await page.fill("#timer-duration","00:20");
     await page.locator("#timer-duration").press("Enter");
@@ -977,7 +978,7 @@ test("pause reconciles active sequences and a final-turn start through legal mov
     await expect(page.locator("#timer-logical")).toHaveText(advance===5500 ? "00:15" : "00:11");
     await expect(page.locator("#cube")).toHaveAttribute("aria-busy","true");
     await expect(page.locator("#timer-sync")).toHaveAttribute("data-state","moving");
-    if(advance===9750) await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
+    if(advance===9800) await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
     const before=Number(await page.locator("#session-moves").innerText());
     await page.click("#timer-start");
     await expect(page.locator("#timer-sync")).not.toContainText("Late");
@@ -1037,15 +1038,24 @@ test("automatic terminal tick preserves the real final turn endpoint and commits
   await testInfo.attach("terminal-endpoint",{path,contentType:"application/json"});
 });
 
-test("a final turn starting without an interior hold cancels on Reset and a rate extension rebases active motion without reversing or stale completion",async({page})=>{
+test("an active final turn without an interior hold cancels on Reset and a rate extension rebases active motion without reversing or stale completion",async({page})=>{
   test.setTimeout(60000);await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.install();await chooseTimer(page);await page.locator("#rotation-speed").fill("6");
   await duration(page,"00:20");await observeEndpoints(page);await clearEndpointObservation(page);
   await pauseSoon(page);
   await page.locator("#rotation-speed").fill("3");await page.click("#timer-start");
-  await page.clock.fastForward(8000);await page.clock.runFor(1750);
+  await page.clock.fastForward(8000);await page.clock.runFor(1800);
   await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
-  expect(await page.evaluate(()=>window.endpointAngles.at(-1).angle)).toBe(0);
+  const active=await page.evaluate(async()=>{
+    const {stateEquals}=await import("/packages/cube-core/src/index.ts");
+    const viewer=window.timerViewer,event=window.timerPresentation,bodies=new Set(viewer.cube.bodies.values());
+    const pivot=viewer.presentation.children.find(o=>!bodies.has(o));
+    return {busy:viewer.busy,fromMatches:stateEquals(viewer.presented,event.from),
+      angle:pivot?Math.max(Math.abs(pivot.rotation.x),Math.abs(pivot.rotation.y),Math.abs(pivot.rotation.z)):null,
+      fullAngle:Math.abs(event.move.turns)*Math.PI/2};
+  });
+  expect(active.busy).toBe(true);expect(active.fromMatches).toBe(true);
+  expect(active.angle).toBeGreaterThan(0);expect(active.angle).toBeLessThan(active.fullAngle);
   await page.click("#timer-reset");await page.clock.runFor(2200);await settled(page,"00:20");
   await expect(page.locator("#status")).toHaveText("Countdown · Ready");
   // This immutable adjacent edge has exactly one legal move, allowing a visible
@@ -1091,7 +1101,7 @@ test("a reduced-motion preference change cannot run an active presentation twice
       finally{if(args[0])window.finalMediaQueries=window.mediaQueries-before;}
     };
   });
-  await page.click("#timer-start");await page.clock.fastForward(8000);await page.clock.runFor(1750);
+  await page.click("#timer-start");await page.clock.fastForward(8000);await page.clock.runFor(1800);
   await expect(page.locator("#move-progress")).toHaveAttribute("aria-valuenow","4");
   const before=Number(await page.locator("#session-moves").innerText());
   await page.emulateMedia({reducedMotion:"reduce"});await page.clock.runFor(520);
