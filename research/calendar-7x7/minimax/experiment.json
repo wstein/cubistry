@@ -1,0 +1,14 @@
+{
+  "schema": "cubistry.calendar7.minimax-experiment.v1",
+  "status": "UNKNOWN",
+  "dependencyCommit": "c1619530e554e85622d8383636fbca4a248e1d3e",
+  "printingSHA256": "b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931",
+  "baselineHTM": [397, 53, 48, 430, 487, 433, 378, 397],
+  "objectives": ["reduce longest edges", "minimize continuous-chain maximum", "reduce mean and variance without padding", "optimize short edges last"],
+  "targetHTM": [100, 120],
+  "desiredUpperBoundHTM": 200,
+  "globalOptimality": "UNKNOWN",
+  "fullChronologicalCoverage": "UNKNOWN",
+  "runtimeIntegration": "NOT_CHECKED",
+  "promotion": "Draft research only; owner acceptance required"
+}
