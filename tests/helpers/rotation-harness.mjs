@@ -9,12 +9,12 @@ export class Element extends EventTarget {
  pointer(type,x=100,y=100,id=1,pointerType="mouse"){const event=new Event(type);Object.assign(event,{pointerId:id,clientX:x,clientY:y,pointerType});this.dispatchEvent(event);}
 }
 export function rotationHarness({mode="smart",root=new Group(),initial,sensitivity=.008,threshold=4}={}) {
- let at=0;const element=new Element(),panel=new Element("details"),document=new EventTarget(),media=new EventTarget();
+ let at=0;const element=new Element(),panel=new Element("details"),document=new EventTarget(),media=new EventTarget(),window=new EventTarget();
  if(initial)root.quaternion.copy(initial);
  document.hidden=false;document.createElement=tag=>new Element(tag);media.matches=false;
  const data=new Map([[rotationStorageKey("/test"),JSON.stringify({version:1,mode})]]);
- const env={now:()=>at,document,media,pathname:"/test",storage:{getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)}};
+ const env={now:()=>at,document,media,window,pathname:"/test",storage:{getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)}};
  const binding=bindSmartRotation(element,root,{sensitivity,threshold,panel,environment:env});
  const select=panel.children[0].children[0],note=panel.children[1];
- return{element,panel,root,document,media,env,binding,select,note,data,time(value){at=value;},step(value){at=value;binding.step();}};
+ return{element,panel,root,document,media,window,env,binding,select,note,data,time(value){at=value;},step(value){at=value;binding.step();}};
 }
