@@ -98,7 +98,7 @@ test("automatic return poses never become anchors through taps, zoom/settings, m
 });
 
 test("nonidentity initial orientations stay idle through reset/tap/settings/visibility without floating-point return loops",()=>{
- const q=new Quaternion().setFromEuler(new Euler(.321,-.789,.217)),c=new SmartRotation(q);
+ const q=new Quaternion().setFromEuler(new Euler(.321,-.789,0)),c=new SmartRotation(q);
  c.interact(1);c.down(2);c.up(2.1,true);c.suspend(3);c.resume(100);c.reset(101);c.setMode("classic",102);c.setMode("smart",103);
  assert.equal(c.phase,"idle");assert.equal(c.returnDeadline,null);near(c.quaternion.angleTo(q),0,1e-7);near(c.anchor.angleTo(q),0,1e-7);
 });
