@@ -51,3 +51,26 @@ test("serialized decode rejects stale results, survives failures and closes pend
   let count=0; const retry=new PhotoDecoder(async()=>{if(++count===1)throw Error("decode failed");return{width:12,height:8,close(){}};});
   await assert.rejects(retry.load("D",png()),/decode failed/); assert(await retry.load("D",png())); retry.dispose();decoder.dispose();
 });
+
+test("JPEG SOF and all supported WebP headers preserve known dimensions and reject corrupt/truncated inputs", () => {
+  for (const marker of [0xc0,0xc2]) {
+    const jpeg=new Uint8Array([255,216,255,224,0,4,0,0,255,marker,0,17,8,0,123,1,65,3,1,17,0,2,17,0,3,17,0,255,217]);
+    assert.deepEqual(rasterDimensions(jpeg,"image/jpeg"),[321,123]);
+    assert.throws(()=>rasterDimensions(jpeg.subarray(0,16),"image/jpeg"),/Truncated|supported/);
+  }
+  for(const kind of ["VP8 ","VP8L","VP8X"]) {
+    const bytes=new Uint8Array(30),view=new DataView(bytes.buffer);bytes.set(new TextEncoder().encode("RIFF"),0);bytes.set(new TextEncoder().encode("WEBP"),8);bytes.set(new TextEncoder().encode(kind),12);
+    if(kind==="VP8 "){bytes.set([157,1,42],23);view.setUint16(26,321,true);view.setUint16(28,123,true);}
+    if(kind==="VP8L"){bytes[20]=47;bytes[21]=64;bytes[22]=129;bytes[23]=30;}
+    if(kind==="VP8X"){bytes[24]=64;bytes[25]=1;bytes[27]=122;}
+    assert.deepEqual(rasterDimensions(bytes,"image/webp"),[321,123]);
+    assert.throws(()=>rasterDimensions(bytes.subarray(0,20),"image/webp"),/supported/);
+    bytes[0]=0;assert.throws(()=>rasterDimensions(bytes,"image/webp"),/supported/);
+  }
+});
+test("postdecode resize refusal closes its image and obsolete failures do not override newer uploads",async()=>{
+  let closed=0;await assert.rejects(decodePhoto(png(),async()=>({width:1537,height:1,close(){closed++;}})),/safely resize/);assert.equal(closed,1);
+  const pending=deferred(),began=deferred();let count=0;
+  const decoder=new PhotoDecoder(async()=>{if(++count===1){began.resolve();await pending.promise;throw Error("obsolete decode");}return{width:12,height:8,close(){}};});
+  const old=decoder.load("F",png());await began.promise;const current=decoder.load("F",png());pending.resolve();assert.equal(await old,null);assert(await current);decoder.dispose();
+});
