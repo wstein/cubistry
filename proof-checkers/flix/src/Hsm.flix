@@ -921,7 +921,7 @@ def hsmCommand(path: String): Unit \ IO = {
 // ---------------------------------------------------------------- conformance
 // Pinned HSM profile corpus: proof-checkers/conformance-hsm/manifest.json.  The pin is embedded here, as for the
 // frozen issue-74 corpus; changing the corpus means changing the manifest, this constant and the Julia twin together.
-def hsmManifestPin(): String = "MANIFEST_PIN_PLACEHOLDER"
+def hsmManifestPin(): String = "1d6ede1981aba967696272ad695ed8488c0ee76de34828875602f91ffc86ee98"
 
 def hsmStatusOf(reason: String): String \ IO =
     if (reason.contains("ERROR:")) "ERROR" else if (reason.contains("UNSUPPORTED:")) "UNSUPPORTED"

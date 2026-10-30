@@ -792,7 +792,7 @@ end
 # ---------------------------------------------------------------- conformance
 # Pinned HSM profile corpus: proof-checkers/conformance-hsm/manifest.json.  The pin is embedded here, as for the
 # frozen issue-74 corpus; changing the corpus means changing the manifest, this constant and the Flix twin together.
-const HSM_MANIFEST_PIN = "MANIFEST_PIN_PLACEHOLDER"
+const HSM_MANIFEST_PIN = "1d6ede1981aba967696272ad695ed8488c0ee76de34828875602f91ffc86ee98"
 function conformance(root)
     path = joinpath(root, "proof-checkers/conformance-hsm/manifest.json")
     need(bytes2hex(sha256(read(path))) == HSM_MANIFEST_PIN, "HSM conformance manifest pin"; code="CORPUS_ERROR")
