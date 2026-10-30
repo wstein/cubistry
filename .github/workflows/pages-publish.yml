@@ -85,9 +85,11 @@ jobs:
           clean-exclude: pr-preview/
           force: false
           commit-message: Update production snapshot from verified main build
+  # Publish the production snapshot before slow/serial preview cleanup.
+  # Preview reconciliation must never block the public site.
   previews:
     if: vars.PAGES_PREVIEWS_ENABLED == 'true'
-    needs: [plan, production]
+    needs: [plan, production, deploy]
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
@@ -126,7 +128,7 @@ jobs:
           wait-for-pages-deployment: false
   deploy:
     if: always() && needs.plan.result == 'success' && needs.production.result == 'success' && vars.PAGES_PREVIEWS_ENABLED == 'true'
-    needs: [plan, production, previews]
+    needs: [plan, production]
     runs-on: ubuntu-latest
     permissions:
       contents: read
