@@ -24,6 +24,6 @@ export async function timerMotion(route,value,duration=250,startAt=0){
  return {controller,rows,frames,timers,history,runtime,get now(){return at;},setDuration(v){speed=v;},advance,
   async finishRow(){const row=rows.at(-1),plan=row.source?.(),from=row.samples.at(-1).progress;
    const end=plan?.endAt??at+speed*(1-from),start=plan?Math.max(at,end-plan.durationMs*(1-from)):at;
-   row.motionStart=start;await advance(start);await advance((start+end)/2);await advance(end);return row;},
+   await advance(start);await advance((start+end)/2);await advance(end);return row;},
  };
 }
