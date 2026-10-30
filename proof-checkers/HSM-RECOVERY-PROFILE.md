@@ -9,10 +9,13 @@ its expected `UNSUPPORTED` recovery case, and all historical evidence unchanged.
 It adds a separate command instead of changing the meaning of `hsm FILE`:
 
 ```sh
-julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/check.jl hsm-recovery RECOVERY.json MODES.json
+julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/recovery.jl RECOVERY.json MODES.json
 ```
 
-The later Flix command has the same arguments. Each checker reads both files
+The standalone entrypoint preserves the existing pinned `check.jl` dispatch and
+its provenance. This command-only amendment was approved before implementation;
+the mathematical scope is unchanged. The later Flix command has the same two
+file arguments. Each checker reads both files
 itself; neither consumes another checker verdict. The existing native HSM model
 may be reused within each language, but no production mechanics or Python proof
 verifier is a dependency. The original HSM and all-mode proof claims retain
