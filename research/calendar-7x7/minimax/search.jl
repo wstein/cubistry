@@ -10,6 +10,13 @@ struct Node
     occupants::NTuple{24,UInt16}
     cost::Int
     path::Vector{Int}
+    word::Vector{Int}
+end
+Node(occupants,cost,path)=Node(occupants,cost,path,Int[])
+Base.@kwdef mutable struct SearchStats
+    greedy_scans::Int=0
+    beam_attempts::Int=0
+    normalizations::Int=0
 end
 
 function extra_seeds!(raw,action,a;seed_budget=46656)
@@ -72,13 +79,14 @@ function cached_catalogues(action,a;relax_budget=0,seed_budget=0)
         for (key,w) in sort!(collect(raw[k]);by=x->(htm(x[2]),length(P.macro_moves(x[2])),x[2],x[1]))] for k in 1:10]
 end
 
-function greedy(occupants,constraints,actions)
+function greedy(occupants,constraints,actions;stats=SearchStats())
     score(v)=count(v[i] in allowed for (i,allowed) in constraints)
     path=Int[];cost=0;current=occupants
     for _ in 1:24
         before=score(current);before==length(constraints) && return Node(current,cost,path)
         best=0;gain=before;price=typemax(Int)
         for (j,c) in enumerate(actions)
+            stats.greedy_scans+=1
             after=count(current[c.inverse[i]] in allowed for (i,allowed) in constraints)
             if after>gain || (after==gain && after>before && c.cost<price)
                 best=j;gain=after;price=c.cost
@@ -92,35 +100,44 @@ function greedy(occupants,constraints,actions)
 end
 path_word(path,actions)=reduce(vcat,(actions[i].word for i in path);init=Int[])
 
-function orbit_search(occupants,constraints,actions,a; width=8,maxdepth=6,budget=150000,weight=2)
+function orbit_search(occupants,constraints,actions,a; width=8,maxdepth=6,budget=150000,weight=2,stats=SearchStats())
     @assert width>=0 && maxdepth>=0 && budget>=0 && weight>0
     score(v)=count(v[i] in allowed for (i,allowed) in constraints)
-    total=length(constraints);incumbent=greedy(occupants,constraints,actions)
+    total=length(constraints);incumbent=greedy(occupants,constraints,actions;stats)
     best=isnothing(incumbent) ? nothing : simplify(path_word(incumbent.path,actions),a)
     bound=isnothing(best) ? typemax(Int) : htm(best)
     width==0 && return best
     score(occupants)==total && return Int[]
-    beam=[Node(occupants,0,Int[])];seen=Dict(occupants=>0);attempts=0
+    beam=[Node(occupants,0,Int[],Int[])]
+    # Keep exact normalized-prefix labels. Endpoint-only cost deduplication can
+    # discard a different suffix that cancels with a later legal macro.
+    seen=Set{Tuple{NTuple{24,UInt16},Tuple}}([(occupants,())]);attempts=0
     cheapest=minimum(c.cost for c in actions)
     for _ in 1:maxdepth
-        pool=Dict{NTuple{24,UInt16},Node}()
+        pool=Dict{Tuple{NTuple{24,UInt16},Tuple},Node}()
         for n in beam,(j,c) in enumerate(actions)
             attempts>=budget && break
-            attempts+=1;cost=n.cost+c.cost;cost>bound && continue
+            attempts+=1;stats.beam_attempts+=1
+            word=simplify(vcat(n.word,c.word),a);stats.normalizations+=1
+            cost=htm(word)
             next=ntuple(i->n.occupants[c.inverse[i]],24)
-            get(seen,next,typemax(Int))<=cost && continue
-            seen[next]=cost;path=vcat(n.path,j)
+            signature=(next,Tuple(word))
+            signature in seen && continue
+            push!(seen,signature);path=vcat(n.path,j)
             matched=score(next)
             if matched==total
-                word=simplify(path_word(path,actions),a);price=htm(word)
+                price=cost
                 better=isnothing(best) || price<bound ||
                     (price==bound && (length(word)<length(best) ||
                     (length(word)==length(best) && (weight==1 ? word<best : word>best))))
                 if better
                     best=word;bound=price
                 end
-            elseif cost<bound
-                pool[next]=Node(next,cost,path)
+            else
+                # Even a normalized prefix above the incumbent can shrink when
+                # another macro cancels its suffix. The width/depth/node caps,
+                # not an unsound cost lower bound, delimit this heuristic search.
+                pool[signature]=Node(next,cost,path,word)
             end
         end
         isempty(pool) && break

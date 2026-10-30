@@ -75,6 +75,9 @@ function improve_word(word,a)
 end
 
 function export_chain(path,input,edge_words,action;hashes=nothing)
+    # Validate before opening: an invalid export must not truncate an existing file.
+    @assert length(input.edges)==length(edge_words) "edge/word length mismatch"
+    @assert isnothing(hashes) || length(hashes)==length(input.edges) "edge/hash length mismatch"
     open(path,"w") do io
         println(io,"cubistry.calendar7.chain.v1")
         println(io,join(("source",input.root,input.year,input.month,input.hash),'\t'))
