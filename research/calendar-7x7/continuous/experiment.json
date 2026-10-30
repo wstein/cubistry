@@ -143,12 +143,13 @@
     "receipt": "evidence/negative-results.tsv"
   },
   "stateSelectionExperiment": {
-    "status": "UNKNOWN for unverified alternative chains",
+    "status": "UNKNOWN",
     "variants": 3,
     "successfulCandidateAlternatives": 2,
     "localSearchFailures": 1,
     "budget": "Exactly three hidden-state variants; one-edge lookahead",
-    "file": "evidence/state-selection/state-selection.tsv"
+    "file": "evidence/state-selection/state-selection.tsv",
+    "statusScope": "Alternative lookahead chains are exploratory and have not been independently confirmed"
   },
   "toolchains": {
     "Julia": "1.13.3",
