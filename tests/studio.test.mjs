@@ -93,10 +93,10 @@ test("fixed-budget shadow filtering preserves world-space softness for single an
 });
 
 test("rotated rigid clock and active layers stay above the receiver and inside shadow coverage", async () => {
-  const { clockPresentationRadius } = await import("../src/apps/clock/framing.ts");
+  const { clockCubeRadius, clockPresentationScale, clockWorldCenters } = await import("../src/apps/clock/framing.ts");
   const { rotatePresentation } = await import("../packages/cube-viewer/src/presentation-rotation.ts");
   const scene = new THREE.Scene(), root = new THREE.Group(); scene.add(root);
-  const studio = createPresentationStudio(scene, 1, 4.3, undefined, clockPresentationRadius);
+  const studio = createPresentationStudio(scene, 1, 4.3);
   const key = scene.children.find(o => o.isLight && o.castShadow);
   const { print } = createDesign("picture"), poses = stickerPoses(print, initialState(print));
   const material = new THREE.MeshStandardMaterial();
@@ -106,8 +106,13 @@ test("rotated rigid clock and active layers stay above the receiver and inside s
     cube.sync(poses); return cube;
   });
   const turn = cubes[2].beginTurn([...new Set(poses.filter(s => s.p[0] === 1).map(s => s.cubie))], 0, Math.PI / 2);
+  const centers = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
   for (const yaw of [-Math.PI, -1.5, 0, 1.5, Math.PI]) for (const pitch of [-1.5, -.7, 0, .7, 1.5]) for (const progress of [0, .5, 1]) {
-    turn.update(progress); rotatePresentation(root, yaw, pitch); scene.updateMatrixWorld(true);
+    turn.update(progress); rotatePresentation(root, yaw, pitch);
+    root.scale.setScalar(clockPresentationScale(2.3, root.quaternion));
+    clockWorldCenters(root.quaternion, root.scale.x, centers);
+    studio.fitCasters(centers, clockCubeRadius * root.scale.x, .08 * root.scale.x);
+    scene.updateMatrixWorld(true);
     root.traverse(o => {
       if (!o.isMesh) return;
       const p = o.geometry.getAttribute("position");
