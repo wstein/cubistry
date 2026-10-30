@@ -79,3 +79,20 @@ test("tiny slow input stays tiny after orientation integration rather than norma
  assert(c.angularSpeed>0 && c.angularSpeed<.05);near(c.quaternion.angleTo(initial()),.001,1e-8);
  c.up(.02);assert.equal(c.phase,"idle");
 });
+
+test("automatic return poses never become anchors through taps, zoom/settings, mode, reduced motion or repeated visibility changes",()=>{
+ for(const action of ["tap","interact","mode","reduced","visibility"]) {
+  const c=new SmartRotation(initial());settled(c,0,60);const anchor=c.anchor.clone(),deadline=c.returnDeadline;
+  c.step(deadline+.6);const q=c.quaternion.clone();assert(q.angleTo(anchor)<radians(25) && q.angleTo(anchor)>radians(10));
+  let end=deadline+.62;
+  if(action==="tap"){c.down(deadline+.61);c.up(end,true);}
+  if(action==="interact")c.interact(end);
+  if(action==="mode"){c.setMode("classic",deadline+.61);c.setMode("smart",end);}
+  if(action==="reduced"){c.setReducedMotion(true,deadline+.61);c.setReducedMotion(false,end);}
+  if(action==="visibility"){c.suspend(deadline+.61);end=100;c.resume(end);c.suspend(101);end=200;c.resume(end);}
+  near(c.anchor.angleTo(anchor),0);near(c.quaternion.angleTo(q),0);assert.equal(c.phase,"awaiting-return");near(c.returnDeadline,end+5);
+  c.step(end+6);near(c.quaternion.angleTo(anchor),0);near(c.anchor.angleTo(anchor),0);
+ }
+ const c=new SmartRotation(initial());settled(c,0,60);c.step(c.returnDeadline+.6);const before=c.quaternion.clone();
+ c.down(7);c.drag(0,radians(1),7.2);c.up(7.4);assert.equal(c.phase,"idle");near(c.anchor.angleTo(c.quaternion),0);assert(c.anchor.angleTo(before)>radians(.9));
+});

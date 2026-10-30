@@ -30,6 +30,7 @@ export class SmartRotation {
   private lastSample = 0;
   private lastMotion: number | null = null;
   private returnAt: number | null = null;
+  private anchorCandidate = false;
   constructor(initial: Quaternion, mode: RotationMode = "smart", reducedMotion = false) {
     if (![initial.x, initial.y, initial.z, initial.w].every(Number.isFinite) || initial.lengthSq() < 1e-12 || !rotationModes.includes(mode))
       throw Error("Invalid presentation orientation or mode");
@@ -52,8 +53,12 @@ export class SmartRotation {
   private settle(at: number): void {
     this.stop(); this.phaseValue = "idle";
     if (this.modeValue !== "smart" || this.reduced || this.suspended || this.disposed) return;
-    if (this.quaternion.angleTo(this.anchor) <= ROTATION_TUNING.toleranceRadians + 1e-12) this.anchor.copy(this.quaternion);
-    else { this.phaseValue = "awaiting-return"; this.returnAt = at + ROTATION_TUNING.idleSeconds; }
+    const distance = this.quaternion.angleTo(this.anchor);
+    if (this.anchorCandidate && distance <= ROTATION_TUNING.toleranceRadians + 1e-12) this.anchor.copy(this.quaternion);
+    else if (distance > 1e-7) { this.phaseValue = "awaiting-return"; this.returnAt = at + ROTATION_TUNING.idleSeconds; }
+    // Only an actual user rotation can propose a new anchor. Automatic
+    // interpolation, taps, settings and visibility changes cannot walk it.
+    this.anchorCandidate = false;
   }
   /** Freeze the last displayed quaternion immediately, including a below-threshold click. */
   down(at: number): void {
@@ -68,7 +73,7 @@ export class SmartRotation {
     const elapsed = at - this.lastSample; this.lastSample = at; this.lastTime = at;
     const input = this.input.set(pitch, yaw, 0);
     this.rotate(input);
-    if (input.lengthSq() > 0) this.lastMotion = at;
+    if (input.lengthSq() > 0) { this.lastMotion = at; this.anchorCandidate = true; }
     if (elapsed <= 0 || this.modeValue === "classic" || this.reduced) { this.velocity.set(0, 0, 0); return; }
     // No 8 ms floor: a real 144 Hz input stream must estimate the same speed.
     const measured = input.multiplyScalar(1 / elapsed);
@@ -132,7 +137,7 @@ export class SmartRotation {
   reset(at: number): void {
     this.time(at); if (this.disposed) return;
     this.stop(); this.quaternion.copy(this.initial); this.anchor.copy(this.initial);
-    this.phaseValue = "idle"; this.lastTime = at; this.lastMotion = null;
+    this.phaseValue = "idle"; this.lastTime = at; this.lastMotion = null; this.anchorCandidate = false;
   }
   dispose(): void { this.stop(); this.phaseValue = "idle"; this.disposed = true; }
 }
