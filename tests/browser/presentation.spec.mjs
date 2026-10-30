@@ -66,8 +66,8 @@ for (const lettering of ["symbols", "words"])
     await frame(page, "clock");
     const view = await page.evaluate(async () => {
       const { clockStage } = await import("/src/clock.mjs");
-      const p = clockStage.camera.position;
-      return [Math.atan2(p.x, p.z), Math.atan2(p.y, Math.hypot(p.x, p.z))];
+      const r = clockStage.presentation.rotation;
+      return [-r.y, r.x];
     });
     expect(view[0]).toBeCloseTo(0.2, 5);
     expect(view[1]).toBeCloseTo(0.16, 5);
@@ -84,6 +84,7 @@ for (const lettering of ["symbols", "words"])
           const q = clockStage.camera.position
             .clone()
             .set(...p)
+            .applyMatrix4(clockStage.presentation.matrixWorld)
             .project(clockStage.camera);
           return Math.abs(q.x) < 0.96 && Math.abs(q.y) < 0.96;
         });

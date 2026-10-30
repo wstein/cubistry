@@ -235,8 +235,9 @@ test("front-dominant default camera still orbits and zooms without altering cube
     );
     const p = viewer.camera.position;
     const result = {
-      yaw: (Math.atan2(p.x, p.z) * 180) / Math.PI,
-      pitch: (Math.asin(p.y / p.length()) * 180) / Math.PI,
+      yaw: (-viewer.presentation.rotation.y * 180) / Math.PI,
+      pitch: (viewer.presentation.rotation.x * 180) / Math.PI,
+      cameraPosition: p.toArray(),
       radius: p.length(),
       fov: viewer.camera.fov,
     };
@@ -244,6 +245,7 @@ test("front-dominant default camera still orbits and zooms without altering cube
     host.remove();
     return result;
   });
+  expect(camera.cameraPosition.slice(0, 2)).toEqual([0, 0]);
   expect(camera.yaw).toBeCloseTo(10);
   expect(camera.pitch).toBeCloseTo(7);
   expect(camera.radius).toBeGreaterThan(9);

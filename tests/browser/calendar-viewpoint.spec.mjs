@@ -37,13 +37,14 @@ for (const design of ["de-a", "en-3"])
         const corners = [-1.5, 1.5].flatMap((x) =>
           [-1.5, 1.5].flatMap((y) =>
             [-1.5, 1.5].map((z) =>
-              p.clone().set(x, y, z).project(v.camera).toArray(),
+              p.clone().set(x, y, z).applyMatrix4(v.presentation.matrixWorld).project(v.camera).toArray(),
             ),
           ),
         );
         return {
-          yaw: Math.atan2(p.x, p.z),
-          pitch: Math.atan2(p.y, Math.hypot(p.x, p.z)),
+          yaw: -v.presentation.rotation.y,
+          pitch: v.presentation.rotation.x,
+          cameraPosition: p.toArray(),
           contained: corners.every(
             ([x, y]) => Math.abs(x) < 0.96 && Math.abs(y) < 0.96,
           ),
@@ -53,6 +54,7 @@ for (const design of ["de-a", "en-3"])
       });
       expect(camera.yaw).toBeCloseTo(0.2, 5);
       expect(camera.pitch).toBeCloseTo(0.18, 5);
+      expect(camera.cameraPosition.slice(0, 2)).toEqual([0, 0]);
       expect(camera.contained).toBe(true);
       expect(camera.nativeWidth).toBe(camera.cssWidth * 2);
       expect(
