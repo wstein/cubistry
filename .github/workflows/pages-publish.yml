@@ -154,9 +154,43 @@ jobs:
           path: combined-site
       - id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
+  # Ross updates storage only after the production-first deployment above.
+  # Publish a fresh combined snapshot after all matrix entries, including any
+  # successful subset when another preview fails. Production is already live.
+  deploy-previews:
+    if: always() && needs.plan.result == 'success' && needs.production.result == 'success' && needs.deploy.result == 'success' && vars.PAGES_PREVIEWS_ENABLED == 'true'
+    needs: [plan, production, deploy, previews]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: main
+          persist-credentials: false
+          path: code
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: gh-pages
+          persist-credentials: false
+          path: site
+      - run: python3 code/scripts/pages/snapshot.py site combined-site
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
+        with:
+          name: github-pages-previews
+          path: combined-site
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
+        with:
+          artifact_name: github-pages-previews
   notify:
     if: always() && needs.plan.result == 'success' && vars.PAGES_PREVIEWS_ENABLED == 'true'
-    needs: [plan, production, previews, deploy]
+    needs: [plan, production, previews, deploy, deploy-previews]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -173,4 +207,4 @@ jobs:
       - run: node scripts/pages/notify.mjs
         env:
           GH_TOKEN: ${{ github.token }}
-          DEPLOY_OK: ${{ needs.deploy.result == 'success' }}
+          DEPLOY_OK: ${{ needs.deploy-previews.result == 'success' }}
