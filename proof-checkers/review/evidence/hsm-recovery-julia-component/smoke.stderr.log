@@ -1,0 +1,9 @@
+strict raw JSON loaded; parsing recovery and all-mode bindings
+building native HSM physical model and four-sticker distances
+replaying eighteen own periods and inverse closures
+checking recovery ("S", 11, 1)
+enumerated 62208 full display poses; rebuilding endpoint graph
+graph S 0-11 1: 25000/62208 nodes, 539214 edges, 8418 word-cache entries
+graph S 0-11 1: 50000/62208 nodes, 1053659 edges, 22947 word-cache entries
+rebuilt 1308546 endpoint edges; reverse lexicographic Dijkstra
+completed recovery ("S", 11, 1)

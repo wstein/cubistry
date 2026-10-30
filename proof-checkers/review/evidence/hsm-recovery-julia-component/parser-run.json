@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/tmp/julia-1.13.3/bin/julia",
+    "--startup-file=no",
+    "--compile=min",
+    "--project=proof-checkers/julia",
+    "proof-checkers/julia/recovery-parser-tests.jl",
+    "proof-checkers/conformance-hsm/cases/recovery-unsupported.json",
+    "proof-checkers/conformance-hsm/cases/modes.json"
+  ],
+  "cwd": "/workspace/cubistry-hsm-recovery-julia-review",
+  "JULIA_DEPOT_PATH": "/tmp/cubistry-julia-depot",
+  "elapsedSeconds": 12.70815522299381,
+  "exitCode": 0,
+  "maximumResidentKiB": 387296
+}
