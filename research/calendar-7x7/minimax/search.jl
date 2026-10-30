@@ -99,6 +99,12 @@ function greedy(occupants,constraints,actions;stats=SearchStats())
     nothing
 end
 path_word(path,actions)=reduce(vcat,(actions[i].word for i in path);init=Int[])
+function node_rank(n,constraints,cheapest,weight)
+    missing=count(!(n.occupants[i] in allowed) for (i,allowed) in constraints)
+    # Word context is part of a label: distinct suffixes can cancel differently.
+    # Include it in the final tie key rather than depending on Dict iteration.
+    (n.cost+weight*cld(missing,3)*cheapest,n.cost,missing,n.occupants,Tuple(n.word))
+end
 
 function orbit_search(occupants,constraints,actions,a; width=8,maxdepth=6,budget=150000,weight=2,stats=SearchStats())
     @assert width>=0 && maxdepth>=0 && budget>=0 && weight>0
@@ -141,8 +147,7 @@ function orbit_search(occupants,constraints,actions,a; width=8,maxdepth=6,budget
             end
         end
         isempty(pool) && break
-        rank(n)=(n.cost+weight*cld(total-score(n.occupants),3)*cheapest,n.cost,-score(n.occupants),n.occupants)
-        nodes=sort!(collect(values(pool));by=rank)
+        nodes=sort!(collect(values(pool));by=n->node_rank(n,constraints,cheapest,weight))
         beam=nodes[1:min(width,length(nodes))]
         attempts>=budget && break
     end
