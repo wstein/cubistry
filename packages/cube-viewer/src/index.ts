@@ -22,10 +22,12 @@ import {
 import { clampPitch, viewTurn } from "./orbit-input.ts";
 import { animateTimedProgress, type MotionTimingSource } from "./motion-timing.ts";
 export type { MotionTiming, MotionTimingSource } from "./motion-timing.ts";
+import { createPresentationStudio } from "./studio.ts";
+export { createPresentationStudio, STUDIO_BACKGROUND } from "./studio.ts";
 import { PhysicalCubeScene } from "./physical-scene.ts";
 import {
   createPresentationGeometry, createPlasticMaterial, createStickerMaterial,
-  configurePresentationRenderer, addPresentationLighting,
+  configurePresentationRenderer,
 } from "./presentation-preset.ts";
 export {
   PRESENTATION_PRESET, createPresentationGeometry, createPlasticMaterial,
@@ -69,6 +71,7 @@ export class CubeViewer {
   readonly scene: THREE.Scene | THREE.Group;
   readonly camera: THREE.PerspectiveCamera;
   private cube: PhysicalCubeScene | null = null;
+  private studio?: ReturnType<typeof createPresentationStudio>;
   private materials: THREE.Material[] = [];
   private textures: THREE.Texture[] = [];
   private print: PrintDefinition | null = null;
@@ -114,7 +117,7 @@ export class CubeViewer {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
-    addPresentationLighting(this.scene);
+    this.studio = createPresentationStudio(this.scene, 1, 1, host);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;
@@ -368,6 +371,7 @@ export class CubeViewer {
     this.destroyed = true;
     if (!this.shared) this.renderer.setAnimationLoop(null);
     this.resize?.disconnect();
+    this.studio?.dispose();
     this.scene.removeFromParent();
     this.cube?.dispose();
     for (const m of this.materials) m.dispose();

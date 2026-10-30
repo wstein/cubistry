@@ -10,7 +10,7 @@ import {
 } from "./model.ts";
 import {
   PhysicalCubeScene, createPresentationGeometry, createPlasticMaterial,
-  createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
+  createStickerMaterial, configurePresentationRenderer, createPresentationStudio,
 } from "@cubistry/cube-viewer";
 /** Calendar-only 26-body viewer: one permanent texture per printed facelet. */
 export class CalendarViewer {
@@ -18,6 +18,7 @@ export class CalendarViewer {
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.PerspectiveCamera(24, 1, 0.1, 100);
   private cube: PhysicalCubeScene | null = null;
+  private studio: ReturnType<typeof createPresentationStudio>;
   private resources: { dispose(): void }[] = [];
   private resize: ResizeObserver;
   private yaw = 0.2;
@@ -39,7 +40,7 @@ export class CalendarViewer {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
-    addPresentationLighting(this.scene);
+    this.studio = createPresentationStudio(this.scene, 1.5, 1.5, host);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;
@@ -190,6 +191,7 @@ export class CalendarViewer {
     demand(!this.busy, "Cannot destroy an animating calendar");
     this.renderer.setAnimationLoop(null);
     this.resize.disconnect();
+    this.studio.dispose();
     this.clear();
     this.renderer.dispose();
     this.renderer.domElement.remove();

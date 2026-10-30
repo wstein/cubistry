@@ -1,0 +1,40 @@
+import * as THREE from "three";
+import { addPresentationLighting } from "./presentation-preset.ts";
+
+export const STUDIO_BACKGROUND =
+  "radial-gradient(ellipse at 48% 28%, #fffdf7 0%, transparent 65%), " +
+  "linear-gradient(180deg, #e9e0d2 0%, #f6f0e5 48%, #d8cabb 100%)";
+
+/** One receiving surface and one shadow-casting key per viewport, never per cube.
+ * Only the upper floor face renders, so below-floor orbits can inspect bottoms. */
+export function createPresentationStudio(
+  scene: THREE.Scene | THREE.Group,
+  halfCubeExtent = 1,
+  horizontalExtent = halfCubeExtent,
+  host?: HTMLElement,
+) {
+  const lights = addPresentationLighting(scene, Math.max(halfCubeExtent, horizontalExtent) * 1.7 + 1);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),
+    new THREE.MeshStandardMaterial({ color: "#e4d8c7", roughness: 1,
+      transparent: true, opacity: 0.76, depthWrite: false, side: THREE.FrontSide }));
+  floor.name = "studio-shadow-receiver";
+  floor.rotation.x = -Math.PI / 2;
+  // Conservative face-turn sweep. The floor never intersects a moving layer.
+  floor.position.y = -Math.SQRT2 * halfCubeExtent - 0.08;
+  floor.receiveShadow = true;
+  scene.add(floor);
+  const backgrounds = new Map<HTMLElement, string>();
+  for (const element of [host, host?.closest<HTMLElement>(".cube-card, .clock-stage, .calendar-stage, .status-stage, .stage")]) {
+    if (!element || backgrounds.has(element)) continue;
+    backgrounds.set(element, element.style.background);
+    element.style.background = STUDIO_BACKGROUND;
+  }
+  return {
+    floor,
+    dispose() {
+      floor.removeFromParent(); floor.geometry.dispose(); floor.material.dispose();
+      lights.dispose();
+      for (const [element, previous] of backgrounds) element.style.background = previous;
+    },
+  };
+}
