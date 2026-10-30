@@ -1,0 +1,17 @@
+{
+  "schema": "cubistry.calendar7.continuous-experiment.v1",
+  "status": "UNKNOWN",
+  "dependencyCommit": "014c383874170f35542305aeeed0945310a33408",
+  "printing": "../english/evidence/physical-print.tsv",
+  "printingSHA256": "b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931",
+  "initialChains": [["2026-01", "2026-02", "2026-03"], ["2026-02", "2026-03", "2026-04"], ["2026-11", "2026-12", "2027-01"], ["2028-02", "2028-03", "2028-04"]],
+  "minimumEdges": 2,
+  "requiredNativeVerifiers": ["Julia", "Flix"],
+  "physicalContinuity": "All 294 sticker identities, positions, normals and actual up vectors retained",
+  "globalOptimality": "UNKNOWN",
+  "fullChronologicalCoverage": "UNKNOWN",
+  "practicalInitialization": "UNKNOWN",
+  "runtimeIntegration": "NOT_CHECKED",
+  "promotion": "Draft research only; owner acceptance required",
+  "browserE2E": false
+}
