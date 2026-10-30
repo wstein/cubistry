@@ -263,8 +263,11 @@ test("midnight rollover settles hours, minutes and seconds as one counted tick",
     { units, gates } = await clockUnits(stats, [23, 59, 59]);
   const scheduler = new LiveClockScheduler(utc),
     boundary = Date.UTC(2027, 0, 1);
-  // Poll when all three wrap routes are launchable: the seconds cube's three
-  // quarter units at 100 ms start 300 ms ahead, and each fits ten ms per unit.
+  // Poll when all three wrap routes are launchable. The scheduler rule is
+  // unchanged: a route launches inside its nominal budget and only if it fits
+  // ten ms per quarter unit. On this print the period wraps are H 5, M 6 and
+  // S 3 quarter units; 50 ms before the boundary the minutes route (60 ms) no
+  // longer fits, while 300 ms is the seconds budget (3 x 100 ms) and fits all.
   scheduler.tick(boundary - 300, 0, units);
   assert.ok(units.every((u) => u.controller.busy));
   assert.ok(units.every((u) => u.controller.progress.target === 0));
