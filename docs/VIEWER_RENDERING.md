@@ -82,7 +82,7 @@ application-framework migration is authorized here.
 
 ## Owner review and implemented follow-up
 
-The owner **did not accept** the initial preview. Issue #60 Section 7 now governs
+The owner **did not accept** the initial preview. Issue #60 Sections 7 and 8 now govern
 visual acceptance. R01's rounded plastic/reflections are retained. Source/numeric
 review is evidence for correctness, not an owner's visual sign-off. The owner's
 reference screenshots were not available to the author; use the preview handoff
@@ -120,14 +120,16 @@ onto a soft floor, but its API receives only size/pitch/yaw, not active-layer
 geometry. Copying it would miss the requested changing turn silhouette. The
 shared [`studio.ts`](../packages/cube-viewer/src/studio.ts) instead uses actual
 moving shell/core/sticker meshes as shadow casters, one 1024×1024 key-light
-shadow map per viewport, PCF filtering with radius 4, and a receiving ground
-surface. Key/fill/rim lighting and approved nonmetallic clearcoat are retained.
+shadow map per viewport and fixed 17-tap PCF filtering. Its radius represents
+0.1 world units per half-cube extent, converted to texels and bounded to 2–24,
+so single/group scenes share softness without extra samples or passes. Key/fill/rim lighting and approved nonmetallic clearcoat are retained.
 The three-cube clock has one rig and floor for the entire synchronized scene.
 
 A warm radial/vertical gradient replaces flat green on the viewport and its
-stage. The semi-opaque warm ground sits below the conservative turn sweep;
-its upper face alone renders, so camera travel below the floor can inspect
-bottoms without an opaque obstruction. Lights, floor geometry/material and
+stage. The ground now uses Three's shadow-only `ShadowMaterial`: outside actual
+occlusion it is transparent, avoiding the uniform floor tint/horizon against that
+gradient. Shadow opacity is 0.28. The same conservative turn sweep and front-sided
+floor are retained, allowing bottom inspection. Lights, floor geometry/material and
 shadow targets are disposed by the scene owner. The adapter does not own shared
 stage renderers. Numeric projection tests show that a moving layer changes the
 cast silhouette within the light frustum. They do not measure GPU shadow softness,
@@ -153,41 +155,52 @@ correct after legal moves, nontrivial loaded poses and interrupted presentations
 This reuses CubeAssembler's colored-body construction technique without importing
 its palette/physics engine. Interior cut-facing plastic remains opaque.
 
-Full printed glyph/image planes remain attached in both constructions; no image
-pixels are sampled, white is never erased, and transparency is not guessed.
-Color assets provide explicit face colors; text assets provide declared document
-backgrounds; image assets retain their material tint as the neutral plastic color
-when no background metadata exists. Calendar explicitly uses its cream background.
-Photos remain original overlays, so this mode does not promise a seamless
-photo-colored bevel or remove the printed-face contour. That limitation preserves
-picture/glyph meaning instead of silently dropping artwork.
+Under Section 8, Stickerless maps original glyph/photo artwork directly onto
+the rounded body's face groups and hides only the redundant inset planes.
+[`body-artwork.ts`](../packages/cube-viewer/src/body-artwork.ts) retains Three's
+complete 0..1 arc-length bevel UVs and rotates their intrinsic right/up basis
+into each immutable source frame. Naive planar projection would trim tile edges.
+Tests cover all six normals/four up rotations, asymmetric raycast landmarks and
+adjacent Landscape tile endpoints. No pixels are erased, recolored or cropped;
+source assets and print exports are unchanged. Stickered restores its original
+inset planes and selected frame.
+
+Body materials follow the original live artwork map/tint, including the existing
+screen-only leading-zero override through turns, cancellation and resets. A
+map-presence change invalidates the shader. Neutral interior/cut materials are
+independent of selected Frame Color in Stickerless, preventing color leakage.
 
 The optional frame-color picker accepts a six-digit hex color and can reset to
-the loaded style's default. It is disabled in Stickerless; exterior face colors
-continue to derive from source appearance. Preferences are versioned, validated,
+the loaded style's default. It remains visible but disabled in Stickerless and
+retains its selected value for returning to Stickered; body artwork determines
+visible exterior appearance. The translucent panel layout is unchanged. Preferences are versioned, validated,
 bounded and optional when storage is unavailable. **Persistence is per page**:
 Counter, Timer and HSM modes on the same main page share it. Full per-application
 R11 isolation is deferred, not claimed as complete. No application settings
 framework was introduced. The three-cube stage presents one control and applies
 its choice to all three cubes.
 
-Rounded sticker contours mask outer image corner pixels. Affine UV scale/right/up,
-asset bytes, sticker identity and physical orientation remain unchanged. Inspect
-asymmetric photo corners in the preview. Print exports retain complete original
-artwork and are not modified by appearance settings.
+Stickered's rounded inset contours still mask corner pixels; Stickerless now
+carries the complete tile parameterization around its bevels. The owner must
+inspect actual image continuity and lighting on the fresh preview; numeric UV
+checks are not visual acceptance.
 
 ## Resource and performance boundaries
 
-There are three shared geometries per cube: rounded shell (588 triangles),
-interior core (12) and artwork plane (18 per printed face). Current cube totals
-are 5,232 triangles per 2×2, 16,572 per Calendar and 15,696 for the three-cube
-clock, plus two ground triangles per viewport. Geometry/texture construction
-never runs per frame. A face material clone per printed source face supports
-Stickerless and is disposed with the adapter.
+Three base shapes serve each cube: rounded shell (588 triangles), core (12),
+and inset artwork plane (18 per printed face). Source-up UV variants are cached
+only at configuration, at most one per distinct body-frame key (bounded by the
+8/26 configured bodies). Positions/normals are unchanged; variants and face
+material clones are explicitly disposed. No UV/geometry/texture generation runs
+per animation frame, and original textures remain caller-owned.
+
+Stickered totals are 5,232/16,572/15,696 triangles for 2×2/Calendar/three-cube
+clock; Stickerless hides inset planes and renders 4,800/15,600/14,400. Each
+viewport adds two ground triangles.
 
 Upper-bound main-pass mesh/group draws before culling are 41/107/121 for
-Stickered 2×2/Calendar/clock, and 81/237/241 for Stickerless (body face groups
-increase draws). One additional 1024×1024 shadow pass renders the actual casters;
+Stickered 2×2/Calendar/clock, and 57/183/169 for Stickerless (body face groups
+increase draws, while inset artwork planes are hidden). One additional 1024×1024 shadow pass renders the actual casters;
 there are no per-cube shadow maps, static shadow sprites or accumulation buffers.
 DPI remains capped at 2. The production Three chunk exceeds the existing 500 kB
 warning threshold. GPU timing and memory were not measured; bounded allocations
@@ -208,8 +221,10 @@ fast suites include:
 
 - [`physical-scene.test.mjs`](../tests/physical-scene.test.mjs): immutable frames,
   shared placements, all-side and moving-layer seam coverage.
+- [`body-artwork.test.mjs`](../tests/body-artwork.test.mjs): full bevel UV coverage,
+  all source frames, tile edges, bounded variants and live map/shader ownership.
 - [`studio.test.mjs`](../tests/studio.test.mjs): changing geometric cast silhouette,
-  shared frustum, floor visibility and resource ownership.
+  shared frustum/filter budget, shadow-only receiver and resource ownership.
 - [`clock-framing.test.mjs`](../tests/clock-framing.test.mjs): full orbit/polar fit,
   bounded zoom and reset without moving physical cubes.
 - [`appearance.test.mjs`](../tests/appearance.test.mjs): source-face colors in
@@ -228,10 +243,14 @@ For owner acceptance at the reported head, inspect:
    colors, legible text and no offset/protruding faces.
 3. Soft cast-shadow silhouettes during layer turns and camera orbit, all three
    cubes sharing the same ground/light; warm gradient/depth and readable contrast
-   at desktop/mobile sizes and 1×/2× DPI.
+   at desktop/mobile sizes and 1×/2× DPI, with no pronounced ground/horizon line.
 4. Stickered/Stickerless on Counter, both timers, HSM, Live Clock, Calendar and
    Picture Playground, including mid-turn toggles: retained art/IDs, source-face
-   colors, close seams and no white-removal/transparency artifacts.
+   colors, close seams and no white-removal/transparency artifacts. In Landscape
+   pictures, compare the owner's before screenshot: no separate pale perimeter in
+   Stickerless, correct adjacent image continuity/orientation, and no turquoise/
+   green Frame Color leakage after toggling. Returning to Stickered must restore
+   the selected frame; Frame Color stays visible-disabled in Stickerless.
 5. Group Reference view and zoom, presentation-mode layout, resize and app
    switching, reduced motion, deadlines/catch-up/counters, print exports, and
    simulated context loss/restoration during a timed move.
