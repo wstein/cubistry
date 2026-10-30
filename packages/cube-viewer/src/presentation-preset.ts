@@ -75,7 +75,7 @@ export function configurePresentationRenderer(renderer: THREE.WebGLRenderer): vo
   renderer.shadowMap.type = THREE.PCFShadowMap;
 }
 /** Called once by the owner of a scene, including a shared multi-cube viewport. */
-export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadowExtent = 4, softness = PRESENTATION_PRESET.shadowSoftness) {
+export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadowExtent = 4, softness: number = PRESENTATION_PRESET.shadowSoftness) {
   const p = PRESENTATION_PRESET;
   const lights: THREE.Light[] = [];
   const ambient = new THREE.AmbientLight(0xffffff, p.ambientIntensity);
