@@ -62,6 +62,10 @@ end
     @test M.retain_endpoint_label!(labels,path([3,5]))
     @test only(only(values(labels))).costs==[3,5]
     @test !M.retain_endpoint_label!(labels,path([2,8]))
+    review_case=Dict{Tuple,Vector{Any}}()
+    @test M.retain_endpoint_label!(review_case,path([50,100]))
+    @test M.retain_endpoint_label!(review_case,path([60,10]))
+    @test only(only(values(review_case))).costs==[60,10]
 end
 
 @testset "Invalid exports do not create or truncate evidence" begin
@@ -93,6 +97,7 @@ end
             @test all(p[i]==i for i in 1:264 if !(24k-23<=i<=24k))
             @test c.cost==M.P.chain_metrics(c.word,action).htm
             @test c.cost<=costs[c.key]
+            @test all(c.key[c.inverse[j]]==j for j in 1:24)
             improved+=c.cost<costs[c.key]
         end
     end
