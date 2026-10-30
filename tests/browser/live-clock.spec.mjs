@@ -115,6 +115,49 @@ test("live H M S clock initializes from one local instant with real blanks and i
     fullPage: true,
   });
 });
+test("live clock selects the preferred quarter-turn defaults H 500 ms, M 250 ms, S 100 ms on load", async ({
+  page,
+}) => {
+  await ready(page, "2026-10-28T11:34:56Z");
+  for (const [name, speed] of [
+    ["hours", "500"],
+    ["minutes", "250"],
+    ["seconds", "100"],
+  ]) {
+    const select = page.locator("#" + name + "-speed");
+    await expect(select).toHaveValue(speed);
+    // The HTML default and the effective unit setting agree.
+    expect(
+      await select.evaluate((e) => e.querySelector("option[selected]").value),
+    ).toBe(speed);
+  }
+  expect(
+    await page.evaluate(async () => {
+      const { clockUnits } = await import("/src/clock.mjs");
+      return clockUnits.map((u) => u.duration);
+    }),
+  ).toEqual([500, 250, 100]);
+});
+test("the previous preferred speeds stay selectable through query parameters", async ({
+  page,
+}) => {
+  await page.goto(
+    "/clock.html?hours-speed=250&minutes-speed=100&seconds-speed=50",
+  );
+  await expect(page.locator("#seconds-speed")).toBeEnabled();
+  for (const [name, speed] of [
+    ["hours", "250"],
+    ["minutes", "100"],
+    ["seconds", "50"],
+  ])
+    await expect(page.locator("#" + name + "-speed")).toHaveValue(speed);
+  expect(
+    await page.evaluate(async () => {
+      const { clockUnits } = await import("/src/clock.mjs");
+      return clockUnits.map((u) => u.duration);
+    }),
+  ).toEqual([250, 100, 50]);
+});
 test("midnight wrap schedules all three final turns to the same target instant", async ({
   page,
 }) => {
