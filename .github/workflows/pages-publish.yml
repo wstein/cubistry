@@ -158,7 +158,7 @@ jobs:
   # Publish a fresh combined snapshot after all matrix entries, including any
   # successful subset when another preview fails. Production is already live.
   deploy-previews:
-    if: always() && needs.plan.result == 'success' && needs.production.result == 'success' && needs.deploy.result == 'success' && vars.PAGES_PREVIEWS_ENABLED == 'true'
+    if: always() && !cancelled() && needs.plan.result == 'success' && needs.production.result == 'success' && needs.deploy.result == 'success' && vars.PAGES_PREVIEWS_ENABLED == 'true'
     needs: [plan, production, deploy, previews]
     runs-on: ubuntu-latest
     permissions:

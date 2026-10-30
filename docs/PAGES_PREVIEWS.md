@@ -149,14 +149,17 @@ publish the new previews. The observed failure had current `gh-pages` metadata
 and a successful early deployment while the public URL still served the older
 snapshot. The final `deploy-previews` job therefore waits for the entire matrix,
 uses `always()` to permit partial preview failures, and still requires successful
-production staging and the early deployment. Notification consumes only its
+production staging and the early deployment. `!cancelled()` prevents this
+additional privileged publication after an operator cancels reconciliation;
+ordinary preview failures still permit successful updates to publish.
+Notification consumes only its
 result. Failure of this final deployment reports previews/cleanup as pending
 while the already published production site remains available.
 
 `node --test tests/pages-publication.test.mjs tests/pages-workflow.test.mjs tests/pages-policy.test.mjs tests/pages-stage.test.mjs`
 replays the actual workflow dependency graph with the real snapshot helper and
 executes the actual notification script against a mocked API. It covers fresh
-and stale metadata, partial matrix failure, failed early/final deployments,
+and stale metadata, partial matrix failure, failed early/final deployments, cancellation after early publication,
 cleanup, trusted checkouts, and distinct artifact identity. These are Node/static
 pipeline regressions, not browser tests or evidence of a new live deployment.
 This maintenance change preserves activation gates and does not activate,
