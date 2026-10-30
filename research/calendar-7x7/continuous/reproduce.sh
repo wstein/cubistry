@@ -12,7 +12,7 @@ git rev-parse HEAD > "$out/source-revision.txt"
 "$julia_bin" --version > "$out/toolchains.log"
 java -version >> "$out/toolchains.log" 2>&1
 sha256sum "$dag" "$here/../english/evidence/physical-print.tsv" "$here/verify.jl" "$here/flix/src/Main.flix" "$here"/evidence/chain-*.moves.tsv > "$out/inputs.sha256"
-"$julia_bin" --startup-file=no "$here/test.jl" > "$out/parser-tests.log" 2>&1
+"$julia_bin" --startup-file=no "$here/test.jl" "$dag" "$here/evidence/chain-1.moves.tsv" > "$out/parser-tests.log" 2>&1
 "$julia_bin" --startup-file=no "$here/solver_chain_test.jl" > "$out/macro-tests.log" 2>&1
 "$julia_bin" --startup-file=no "$here/solver_chain.jl" "$dag" "$out/generated" > "$out/generator.log" 2>&1
 for chain in 1 2 3 4; do
@@ -30,6 +30,7 @@ cmp "$out/selection-expected.tsv" "$out/selection-generated.tsv"
 bash "$here/flix/build.sh" > "$out/flix-build.log" 2>&1
 jar="${CALENDAR7_CHAIN_FLIX_BUILD_DIR:-/tmp/cubistry-calendar7-continuous-flix}/artifact/flix.jar"
 java -Xmx8g -jar "$jar" selftest "$here/../english/evidence" "$here/../en-physical-review" > "$out/flix-selftest.log"
+java -Xmx8g -jar "$jar" orientation-selftest "$here/../english/evidence" "$here/../en-physical-review" "$dag" "$here/evidence/chain-1.moves.tsv" > "$out/flix-orientation-unit.log"
 for chain in 1 2 3 4; do
     input="$here/evidence/chain-$chain.moves.tsv"
     "$julia_bin" --startup-file=no "$here/verify.jl" "$dag" "$input" > "$out/julia-chain-$chain.tsv"

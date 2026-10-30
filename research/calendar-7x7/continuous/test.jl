@@ -30,3 +30,23 @@ include(joinpath(@__DIR__,"verify.jl"))
         end
     end
 end
+
+if !isempty(ARGS)
+    @assert length(ARGS)==2 "Expected original DAG and January chain for orientation unit"
+    @testset "Synthetic orientation-only corruption at target-validation seam" begin
+        proof=replay_dag(ARGS[1];require_full=false);input=read_chain(ARGS[2])
+        printing=read_physical(joinpath(@__DIR__,"..","english","evidence","physical-print.tsv"))
+        state=decode_physical(printing,signed_perm(proof.registers,proof.targets[input.root]),proof.action)
+        goal=calendar_goal(input.year,input.month)
+        @test isnothing(validate_front(state,goal))
+        # Deliberately synthetic: only one actual up vector changes. This is
+        # a target-validation unit, not a legal reachability certificate.
+        index=only(findall(s->s.pos==(-3,2,3) && s.normal==(0,0,1),state))
+        corrupted=copy(state)
+        corrupted[index]=merge(state[index],(up=turn_vector(state[index].up,3),))
+        @test corrupted[index].up!=state[index].up
+        @test all(merge(corrupted[i],(up=state[i].up,))==state[i] for i in eachindex(state))
+        @test count(i->corrupted[i]!=state[i],eachindex(state))==1
+        @test_throws Exception validate_front(corrupted,goal)
+    end
+end

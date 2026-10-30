@@ -1,0 +1,16 @@
+chain catalog orbit=1 count=1008
+chain catalog orbit=2 count=4048
+chain catalog orbit=3 count=4048
+chain catalog orbit=4 count=1760
+chain catalog orbit=5 count=4048
+chain catalog orbit=6 count=4048
+chain catalog orbit=7 count=4048
+chain catalog orbit=8 count=4048
+chain catalog orbit=9 count=4048
+chain catalog orbit=10 count=4048
+Test Summary:                                         | Pass  Total  Time
+Expanded middle layers are exact legal physical moves |   10     10  2.3s
+Test Summary:                       | Pass  Total  Time
+Move metrics and failure boundaries |    5      5  0.3s
+Test Summary:                                    |   Pass   Total  Time
+All ten isolated macro catalogues replay exactly | 105467  105467  4.5s
