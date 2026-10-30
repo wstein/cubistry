@@ -396,8 +396,15 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
       values: [12, 34, 56],
       motion: ["idle", "idle", "idle"],
     });
-    const unit = clockUnits[2],
-      moves = unit.controller.prepare(57),
+    const unit = clockUnits[2];
+    // The saved period's 56 to 57 edge is three quarter turns, so choose the
+    // first nearby target whose shortest route mixes half and quarter turns.
+    const target = [57, 58, 59, 0, 1, 2, 3, 4].find((value) => {
+      const m = unit.controller.prepare(value);
+      return m.some((m) => m.turns === 2) && m.some((m) => m.turns !== 2);
+    });
+    if (target === undefined) throw Error("Missing mixed turn fixture");
+    const moves = unit.controller.prepare(target),
       work = moves.reduce((n, m) => n + Math.abs(m.turns), 0);
     // Software rendering on CI can miss an entire 120 ms turn. Choose a
     // feasible fixture period from native RAF cadence while preserving the
@@ -452,8 +459,8 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
     };
     unit.setDuration(quarter);
     window.angularEndAt = performance.now() + work * quarter;
-    unit.controller.setDeadline(57, window.angularEndAt, quarter);
-    unit.controller.request(57);
+    unit.controller.setDeadline(target, window.angularEndAt, quarter);
+    unit.controller.request(target);
   });
   await expect
     .poll(() =>
