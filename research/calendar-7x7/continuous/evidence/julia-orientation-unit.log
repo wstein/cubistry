@@ -1,0 +1,4 @@
+Test Summary:                      | Pass  Total  Time
+Chain grammar and declared metrics |   32     32  1.0s
+Test Summary:                                                   | Pass  Total  Time
+Synthetic orientation-only corruption at target-validation seam |    5      5  7.1s

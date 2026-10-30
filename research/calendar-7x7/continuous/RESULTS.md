@@ -114,7 +114,13 @@ The hidden-reset tail is particularly relevant: an independently valid R1 word
 cannot simply be reused from an unrelated physical state with the same front.
 The orientation control's correct physical hash/counts prevent those checks from
 masking the intended artwork rejection. Negative controls test verifier rejection;
-they are not calendar impossibility certificates. Their raw SHA-256 fingerprints
+they are not calendar impossibility certificates. A separate synthetic unit in
+each native checker changes only the SUN header sticker's up vector, preserving
+all IDs, positions, normals, text and ink. The baseline passes and the modified
+front must fail, detecting a checker that ignores orientation even when positions
+match. This synthetic mutation is not a legal-state certificate.
+
+Their raw SHA-256 fingerprints
 and native exit statuses are recorded; exact bytes regenerate deterministically.
 
 The four primary construction attempts have no unsuccessful edge. The bounded
