@@ -35,3 +35,8 @@ input and artifact hashes, tool versions, invocation, exit status, stdout,
 stderr, elapsed time and resource limits. A partial smoke run is explicitly
 partial and cannot confirm the full table. The final feature/documentation PR
 will reference immutable research evidence and receive separate review.
+
+For durable reproduction on the protected research branch, the exact raw
+[recovery input](inputs/recovery.json) and [mode input](inputs/modes.json) are
+archived here too. Their bytes match the manifest's original source hashes;
+they are copies, not new witnesses or regenerated data.

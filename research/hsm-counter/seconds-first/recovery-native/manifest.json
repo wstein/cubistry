@@ -7,11 +7,13 @@
   "inputs": {
     "recovery": {
       "path": "research/hsm-counter/seconds-first/modes/recovery.json",
-      "sha256": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda"
+      "sha256": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda",
+      "archivedCopy": "inputs/recovery.json"
     },
     "modes": {
       "path": "research/hsm-counter/seconds-first/modes/witness.json",
-      "sha256": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae"
+      "sha256": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae",
+      "archivedCopy": "inputs/modes.json"
     }
   },
   "contract": {
