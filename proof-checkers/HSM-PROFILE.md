@@ -40,7 +40,10 @@ are compared; the `reason` text is free-form.
 | `cubistry.hsm-seconds-first-recovery` | 1 | **not verifiable here**: `UNSUPPORTED`. Its recovery tables stay UNKNOWN until a native port exists. |
 
 Both verified schemas are strict: the exact key sets below, JSON integer tokens only (no
-floats, no exponents, no Booleans as numbers), no duplicate keys, no unknown keys.
+floats, no exponents, no Booleans as numbers), no duplicate keys, no unknown keys. A UTF-8
+byte order mark before the JSON text is `INVALID_JSON`. The fraction strings `optimalMeanHTM` and
+`perLapHTM` use ASCII digits `0`–`9` only, with nothing before the first or after the last digit
+(no newline, no other Unicode decimal digits).
 
 Top level: `schema`, `version`, `label` (string, informational), `printCode`,
 `universalArbitrarySourceHTM` (must be 6), `printing`, `modes`; the all-modes schema adds
@@ -191,11 +194,13 @@ byte-identical to `data/hsm/seconds-first/witness.json` of PR 92), `baseline` (t
 app print) and `modes` (all 18 modes, research `30b6d02`). Negative controls: unknown
 schema/version, float token, unknown or duplicate keys, truncated JSON, tampered sticker
 (printCode mismatch, missing glyph, swapped glyphs), wrong `printCode`, upside-down glyph,
-mislabelled blank, wrong frame, non-shortest edge, broken closure, skipped display, missing or
+mislabeled blank, wrong frame, non-shortest edge, broken closure, skipped display, missing or
 duplicate mode, wrong lap/maximum/mean/graph-size claim, a valid but non-minimum-mean cycle,
 S −1 given as the inverse traversal (not shortest), universal claim 5, M with cap 6,
 non-canonical whitespace, wrong selection rule/traversal/metrics in the all-modes schema,
-edge limit 6, a cap-4 own period, and the unsupported recovery schema.
+edge limit 6, a cap-4 own period, the unsupported recovery schema, and the five controls of the
+[review record](#review-record-pr-95): a byte order mark, and a trailing newline or
+Arabic-Indic digits in `optimalMeanHTM` and in `perLapHTM`.
 
 To add a witness (for example a later research branch): add the file to the generator, run
 `generate` into a fresh directory, run `pin` with both checkers, then update both manifest pins
@@ -213,21 +218,49 @@ following records were re-pinned, and nothing else in them:
 - `evidence-manifest.json`: the hashes of those two provenance files.
 
 The older lifecycle/build/conformance captures describe the earlier artifact and the 195-case
-corpus; they were not regenerated.
-
-Re-pinned (minimal): in `flix/evidence/provenance.json` the `Main.flix` hash, a new
-`Hsm.flix` entry and `runtimeArtifactSHA256` of the rebuilt jar; in
-`julia/evidence/provenance.json` the `check.jl` hash and a new `Hsm.jl` entry; in
-`evidence-manifest.json` the hashes of those two provenance files. Nothing else changed.
+corpus; they were not regenerated. The Flix fat jar is not byte-reproducible (rebuilding the same
+sources gives a different `runtimeArtifactSHA256`), so that field records the jar that was
+actually run; the source hashes are the reproducible part of the pin.
 
 Regression after the change (rebuilt jar, changed Julia sources): the 195-case `conformance`
-command in Flix and in Julia, and `tools/audit_corpus.py`, still report the pinned full-state
-aggregate `2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661`; the raw exports
-equal the hashes already recorded in the two provenance files. `hsm-conformance` gives the
-identical result in both checkers (41 cases, 3 accepted, 38 rejected). On a shared 2-core box
-Julia needs about 9 minutes and Flix about 1.2 minutes for it; the 18-mode witness alone takes Flix
-about 3.5 minutes. CI must therefore give `hsm-conformance` a generous timeout (at least 20
-minutes); nothing is weakened to save time.
+command in Flix and in Julia still reports the pinned full-state aggregate
+`2b7474246a94f3ea4788c119b93a292283dd2d40cd2739dcc76978b399fcb661`, the raw exports equal the
+hashes already recorded in the two provenance files, and `tools/audit_corpus.py` reports
+`PASS_DATA_PINS` for the unchanged 195-case corpus (it checks data hashes and counts only).
+`hsm-conformance` gives the byte-identical result in both checkers (46 cases, 3 accepted,
+43 rejected). On a shared 2-core box it took Julia 1.5 to 2 minutes (one process) and Flix 7 to
+9 minutes; the 18-mode witness alone takes Flix about 3.5 minutes. CI must therefore give
+`hsm-conformance` a generous timeout (at least 20 minutes); nothing is weakened to save time.
+
+## Review record (PR 95)
+
+The independent review of PR 95 probed both checkers with extra mutations. Four inputs gave a
+**dissent** (different accept/reject), so their status was `UNKNOWN` until this root cause was
+found. The published witnesses were not affected: both checkers accept all three positive cases
+with byte-identical result lines.
+
+| Input | Flix | Julia | Root cause |
+| --- | --- | --- | --- |
+| `optimalMeanHTM` = `"53/20\n"` | `INVALID` | `VALID` | Julia: PCRE `$` also matches before a final newline. Fix: anchor with `\z`. |
+| `perLapHTM` = `"159/1\n"` (all-modes) | `INVALID` | `VALID` | Same regular expression flaw in Julia's `parse_ratio`. Same fix. |
+| `optimalMeanHTM` in Arabic-Indic digits | `VALID` | `INVALID` | Flix: `Char.isDigit` accepts every Unicode decimal digit and `Int64.fromString` parses them. Fix: ASCII `0`–`9` only. |
+| UTF-8 byte order mark before the witness | `INVALID_JSON` | `VALID` | Julia: the shared JSON reader skips a leading byte order mark. Fix: `hsm` rejects it before parsing (`INVALID_JSON`). |
+
+Both checkers were fixed to the stricter reading, the five controls above were added to
+`conformance-hsm/` through `build_hsm_corpus.jl generate` and `pin`, and both checkers were rerun.
+The byte order mark leniency of the shared Julia reader also applies to the frozen issue-74
+commands (`counter`, `state3`); that code is pinned and was not changed; it is left to the owner.
+
+One class-only difference, not a dissent: a lone surrogate escape in `label` is `INVALID_JSON` in
+Flix and `INVALID` in Julia (both reject, exit 1). It is listed here for the owner; `coverage.json`
+was not edited.
+
+Other probes gave the same accept/reject decision and status in both checkers: a root array,
+minimal recovery schema, `version` `1e0`, `-0` and a `id` key escape (both accepted as `0`
+and `id`), an upside-down digit, `59.0`, `0e0`, a 20-digit integer, direction 0, leading, trailing
+or tab whitespace in a word, `"53/20/"`, edge limit 4, a per-lap claim off by one, a missing
+application mode, a second H sticker replacing an S, and the compact re-serialization of the
+witness (accepted, byte-identical lines).
 
 ## For agents (Codex, Claude Code)
 
