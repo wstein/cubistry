@@ -35,6 +35,9 @@ $("hsm-lettering").value = parseLettering(
 const run = new CounterRun();
 const sequenceNumber = new SequenceNumber();
 const durations = [2000, 1000, 500, 250, 100, 50, 10];
+// Default rotation stop per HSM unit (index into `durations`): H 500 ms,
+// M 250 ms, S 100 ms. Changing the unit or entering the HSM counter applies it.
+const hsmDefaultStops = { H: 2, M: 3, S: 4 };
 const speedLabels = [
   "2 s",
   "1 s",
@@ -613,7 +616,11 @@ $("application").addEventListener("change", async () => {
       requested === "five-second-timer" ? "5-Second Timer" : "60-Minute Timer";
     text("timer-heading", timerName);
     $("timer-controls").setAttribute("aria-label", `${timerName} controls`);
-    $("rotation-speed").value = isTimer() ? "3" : "4";
+    $("rotation-speed").value = isTimer()
+      ? "3"
+      : isHsm()
+        ? String(hsmDefaultStops[$("hsm-letter").value] ?? 4)
+        : "4";
     speedUi();
     formatUi();
     ready = true;
@@ -722,6 +729,12 @@ for (const id of ["hsm-letter", "hsm-lettering"])
       previous.dispose();
       view = candidate;
       value = initial;
+      if (event.currentTarget.id === "hsm-letter") {
+        $("rotation-speed").value = String(
+          hsmDefaultStops[$("hsm-letter").value] ?? 4,
+        );
+        speedUi();
+      }
       ready = true;
       error();
       onPhysicalState(initial, false, undefined, view.progress);
