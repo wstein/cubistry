@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
+import { readFileSync } from "node:fs";
+import { validateCounterDesign } from "../src/apps/counter/design.ts";
+import { validateCertifiedCounter } from "../src/apps/counter/certified.ts";
+import { overriddenSticker } from "../packages/cube-viewer/src/facelet-image.ts";
 import { CubeViewer } from "@cubistry/cube-viewer";
 import { createDesign } from "../src/apps/playground/model.ts";
 import { initialState, presentMove, parseMove } from "@cubistry/cube-mechanics";
@@ -8,8 +12,7 @@ import { stateEquals } from "@cubistry/cube-core";
 
 // Exercise real configure/animate/destroy methods without a browser or WebGL.
 // The shared viewport owns the renderer; these methods need only a Three scene.
-function fixture() {
-  const design = createDesign("picture"), state = initialState(design.print);
+function fixture(design = createDesign("picture"), state = initialState(design.print)) {
   const stage = new THREE.Scene(), scene = new THREE.Group();
   scene.position.set(2.8, 0, 0); stage.add(scene);
   const renderer = { dispose() { throw Error("shared renderer ownership violated"); } };
@@ -81,4 +84,47 @@ test("reduced motion still commits exactly the caller-validated legal endpoint",
     assert(stateEquals(h.viewer.presentedState, event.to));
     h.viewer.destroy();
   });
+});
+
+
+test("Stickerless rounded surfaces follow the existing leading-zero image override through turns, reset and construction toggles", async () => {
+  const design = validateCounterDesign(JSON.parse(readFileSync("public/counter-design.v2.json")));
+  const route = validateCertifiedCounter(JSON.parse(readFileSync("public/counter-certified.v1.json")), design);
+  const h = fixture({ print: route.print, assets: design.assets }, route.states[0]);
+  const before = JSON.stringify({ print: route.print, state: route.states[0] });
+  const rule = { position: [-1, -1, 1], normal: [0, 0, 1], sourceAssetId: "0", replacementAssetId: "blank" };
+  const verify = active => {
+    const selected = overriddenSticker(route.print, h.viewer.presentedState, active);
+    const surfaces = new Map(), overlays = new Map();
+    h.scene.traverse(object => {
+      const ids = object.userData.sourceFaceStickerIds;
+      if (ids) ids.forEach((id, index) => { if (id !== null) surfaces.set(id, object.material[index]); });
+      if (object.userData.stickerId !== undefined) overlays.set(object.userData.stickerId, object);
+    });
+    for (const s of route.print.stickers) {
+      const expected = h.viewer.imageMaps.get(s.id === selected ? "blank" : s.assetId);
+      assert.equal(surfaces.get(s.id).map, expected);
+      assert.equal(overlays.get(s.id).material.map, expected);
+      assert.equal(overlays.get(s.id).visible, false);
+    }
+  };
+  h.viewer.setAppearance({ construction: "stickerless", frameColor: "#00aabb" });
+  verify(null); h.viewer.setFaceletImageOverride(rule); verify(rule);
+  const event = presentMove(h.viewer.presentedState, parseMove("L"));
+  await withMotion(false, async () => {
+    await assert.rejects(h.viewer.animate(event, () => {
+      h.viewer.setFaceletImageOverride(null); verify(null);
+      h.viewer.setFaceletImageOverride(rule); verify(rule);
+      throw Error("interrupted after image refresh");
+    }), /interrupted after image refresh/);
+  });
+  assert(stateEquals(h.viewer.presentedState, route.states[0])); verify(rule);
+  h.viewer.setAppearance({ construction: "stickered", frameColor: "#00aabb" });
+  h.viewer.setFaceletImageOverride(null);
+  h.viewer.setAppearance({ construction: "stickerless", frameColor: "#00aabb" }); verify(null);
+  h.viewer.setFaceletImageOverride(rule);
+  await withMotion(true, async () => { await h.viewer.animate(event); }); verify(rule);
+  h.viewer.setFaceletImageOverride(null); verify(null);
+  assert.equal(JSON.stringify({ print: route.print, state: route.states[0] }), before);
+  h.viewer.destroy();
 });
