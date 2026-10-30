@@ -28,7 +28,7 @@ const $ = (id) => document.getElementById(id),
   names = ["hours", "minutes", "seconds"],
   letters = ["H", "M", "S"];
 const lettering = parseLettering(
-  new URLSearchParams(location.search).get("lettering"),
+  new URLSearchParams(location.search).get("lettering") ?? "words",
 );
 $("clock-lettering").value = lettering;
 for (const name of names) {
