@@ -27,13 +27,9 @@ test('horizontal default fills wide aspect better while every rotated legal-turn
     }
   }
 });
-test('manual zoom is independent of orientation containment and default fit rejects invalid input',()=>{
-  for(const aspect of [1,2.3]){
-    const q=new Quaternion().setFromEuler(new Euler(1.4,0,0));
-    const scale=clockPresentationScale(aspect,q),d=clockCameraRadius(aspect);
-    assert.equal(scale,clockPresentationScale(aspect,q));
-    assert(d*.8<d); // zoom changes camera distance, never the scale input.
-  }
+test('camera envelope rejects invalid projection and non-unit quaternion inputs',()=>{
   for(const args of [[0],[-1],[1,NaN],[1,0,0,180]])assert.throws(()=>clockCameraRadius(...args));
+  for(const q of [new Quaternion(0,0,0,0),new Quaternion(1,1,1,1),new Quaternion(NaN,0,0,1)])
+    assert.throws(()=>clockPresentationScale(2.3,q));
   assert.equal(clockCenters.length,3);
 });
