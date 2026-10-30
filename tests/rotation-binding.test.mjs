@@ -1,24 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Group, Quaternion } from "three";
+import { Quaternion } from "three";
 import { bindSmartRotation, readRotationMode, rotationStorageKey } from "../packages/cube-viewer/src/rotation-binding.ts";
-class Element extends EventTarget {
- constructor(tag="canvas"){super();this.tagName=tag;this.children=[];this.style={touchAction:"pan-y"};this.attributes={};this.captures=new Set();}
- append(...values){for(const v of values){this.children.push(v);v.parent=this;}}
- setAttribute(k,v){this.attributes[k]=v;}
- remove(){if(this.parent)this.parent.children=this.parent.children.filter(x=>x!==this);}
- setPointerCapture(id){this.captures.add(id);}hasPointerCapture(id){return this.captures.has(id);}releasePointerCapture(id){this.captures.delete(id);}
- pointer(type,x=100,y=100,id=1,pointerType="mouse"){const event=new Event(type);Object.assign(event,{pointerId:id,clientX:x,clientY:y,pointerType});this.dispatchEvent(event);}
-}
-function harness(saved="smart") {
- let at=0;const element=new Element(),panel=new Element("details"),root=new Group(),document=new EventTarget(),media=new EventTarget();
- document.hidden=false;document.createElement=tag=>new Element(tag);media.matches=false;
- const data=new Map([[rotationStorageKey("/test"),JSON.stringify({version:1,mode:saved})]]);
- const env={now:()=>at,document,media,pathname:"/test",storage:{getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)}};
- const binding=bindSmartRotation(element,root,{sensitivity:.008,threshold:4,panel,environment:env});
- const select=panel.children[0].children[0],note=panel.children[1];
- return{element,panel,root,document,media,env,binding,select,note,data,time(value){at=value;},step(value){at=value;binding.step();}};
-}
+import { rotationHarness } from "./helpers/rotation-harness.mjs";
+const harness = (mode="smart") => rotationHarness({mode});
 const same=(a,b)=>assert(a.angleTo(b)<1e-7);
 test("production pointerdown interrupts pending/active return before threshold, preserving full displayed quaternion",()=>{
  const h=harness("classic");h.element.pointer("pointerdown");h.time(.2);h.element.pointer("pointermove",170,140);h.time(.4);h.element.pointer("pointerup",170,140);
@@ -63,4 +48,15 @@ test("shared settings pointer/keyboard/input activity freezes return without int
  h.time(5.7);const key=new Event("keydown",{cancelable:true});h.panel.dispatchEvent(key);assert.equal(key.defaultPrevented,false);same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,"awaiting-return");assert.equal(h.binding.controller.returnDeadline,10.7);
  h.time(6);h.panel.dispatchEvent(new Event("input"));assert.equal(h.binding.controller.returnDeadline,11);
  h.binding.dispose();h.time(10);h.panel.dispatchEvent(new Event("pointerdown"));same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,"idle");
+});
+
+test("capture failure aborts the uncaptured contact and leaves later gestures usable",()=>{
+ const h=harness("classic"),capture=h.element.setPointerCapture;
+ h.element.setPointerCapture=()=>{throw Error("capture unavailable");};
+ h.element.pointer("pointerdown",100,100,1);assert.notEqual(h.binding.controller.phase,"dragging");
+ // Its outside pointerup is deliberately never delivered.
+ h.element.setPointerCapture=capture;const before=h.root.quaternion.clone();
+ h.time(1);h.element.pointer("pointerdown",100,100,2);h.time(1.1);h.element.pointer("pointermove",140,120,2);h.element.pointer("pointerup",140,120,2);
+ assert(h.root.quaternion.angleTo(before)>.1);assert.equal(h.element.captures.size,0);assert.notEqual(h.binding.controller.phase,"dragging");
+ h.binding.dispose();
 });
