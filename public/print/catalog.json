@@ -94,12 +94,12 @@
       "files": {
         "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
         "README.txt": "dd5b40e34312ff434b95b21f8bb454c3ec2c74195649282682bd93cd19740563",
-        "artwork-1.svg": "6bba4356f1bb7546c04b538a8040abe8c9e06d3315abb378f451bcd7ffd81787",
-        "assembly.pdf": "9d3399ad8a4cbe87dbf1eec4de319215e0ebc0db49a6f91a9811a37f6c028158",
-        "bundle.zip": "4d19a756c620315b86f8377a4add3e358bd498ee42c277cda5e500ff468420d2",
+        "artwork-1.svg": "731cbe8a544ad0c4577584719fbae3fa1e120f6dba4e509f8c0da3b721a5d285",
+        "assembly.pdf": "f5e66c6ec0e5587842c7e05da571c4fdc966918422935e8898e572f2462657c9",
+        "bundle.zip": "746edffc905ec82aa26c5cd962ae4f4d3a4b7a11c8e77966dec4ef1e6def9443",
         "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
-        "manifest.json": "1b0bc2b068eba74e6073b36c6f918ec56000a621ab0414a7b54ba5e181581a8f",
-        "print.pdf": "f9137c9c4b8791e0956b3fa2062cc283bd4a2c3fc2b06a4f3a1fc626b1809527"
+        "manifest.json": "e6237ec6b79aacc67a4d416ca852b927e4457459311feb2514333a9c26dda566",
+        "print.pdf": "770991b99fe406f37bbdf823c5cc7d12b2d0819466887ac49e0fa66d4585a6db"
       }
     },
     {
@@ -115,12 +115,12 @@
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
         "README.txt": "8f4241fc1233b83c789137f1e97329d860340c24f256cc8125975fb63b76dc6c",
         "WORD-ART-PROVENANCE.json": "91dbd93fce7ee55e06b0d543c9908a0d45d63aab5cb2ce7197624eaa39fc50bf",
-        "artwork-1.svg": "f93a8d5a7f54c59b2c4948a6faf6c78ecf551944d42cb3f42961ab1053d706e6",
-        "assembly.pdf": "113f45df8607c135f7df67c86f39985534a9911414e1165d9a8631be5afd45d1",
-        "bundle.zip": "874ed4f7fb6e19d6bb6b09d73fc6d299e0f7c90444e3c67f6be296b4594dc9ae",
+        "artwork-1.svg": "1ff6f9460107221fee20ce2aeb07500114eb97aab105beb3b948db51fa3ceece",
+        "assembly.pdf": "c380b782d17af65236018b110c98be96b143cd6635cf0376a58832e496674f25",
+        "bundle.zip": "6faaebc7b09a440632e004114a895518c1b7ee35f6d5eb2e177152499d8cb77a",
         "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
-        "manifest.json": "cba47d04ce168305c93975dd5f40cb30895539e005ad2eb3aff90b4c8e714a0e",
-        "print.pdf": "2f7dda6317579c874278bde33ffc95409f0665ab792ded8d82e1a61503acb63a"
+        "manifest.json": "e47d264dcd35e0b9898a7b7a3cdf3806944d3e88eb9243ca4e654a8b03e2c122",
+        "print.pdf": "bbfe1d15b61a87aa1e2eaa2e1c623225e1157852df2219b621314529bd71e2d8"
       }
     }
   ]
