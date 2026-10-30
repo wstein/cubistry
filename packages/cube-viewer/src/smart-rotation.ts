@@ -5,7 +5,7 @@ import { Quaternion, Vector3 } from "three";
 export const ROTATION_TUNING = Object.freeze({
   dampingSeconds: .24, stopSpeed: .03, maximumSpeed: 6, velocityFilterSeconds: .04,
   staleReleaseSeconds: .1, toleranceRadians: 25 * Math.PI / 180,
-  idleSeconds: 5, returnSeconds: 1,
+  idleSeconds: 2, returnSeconds: 1,
 });
 export type RotationMode = "smart" | "free" | "classic";
 export type RotationPhase = "idle" | "dragging" | "coasting" | "awaiting-return" | "returning";

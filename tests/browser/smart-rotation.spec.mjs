@@ -38,7 +38,7 @@ test("settled 24 degrees is retained; 26 degrees waits and returns to the accept
   await page.clock.runFor(6000); expect((await snapshot(page)).orientation).toEqual(accepted.orientation);
   await drag(page, (26 * Math.PI / 180) / .007, 0);
   const outside = await snapshot(page); expect(outside.phase).toBe("awaiting-return"); expect(outside.anchor).toEqual(accepted.anchor);
-  await page.clock.runFor(4950); expect((await snapshot(page)).phase).toBe("awaiting-return");
+  await page.clock.runFor(1950); expect((await snapshot(page)).phase).toBe("awaiting-return");
   await page.clock.runFor(100); expect((await snapshot(page)).phase).toBe("returning");
   await page.clock.runFor(1100); const end = await snapshot(page); expect(end.phase).toBe("idle"); expect(end.distance).toBeLessThan(1e-6);
   expect(end.anchor).toEqual(accepted.anchor); expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);

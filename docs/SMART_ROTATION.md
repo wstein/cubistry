@@ -14,7 +14,7 @@ One shared DOM binding serves standalone `CubeViewer`, `CalendarViewer` (includi
 
 The state machine is `idle` / `dragging` / `coasting` / `awaiting-return` / `returning`. Time and angular velocity use seconds, without an 8 ms input floor. Velocity is measured from actual input intervals, smoothed in time and capped by vector magnitude. A stationary hold expires stale release velocity. Coast integration stops at its analytic threshold crossing; remaining frame time belongs to the subsequent delay. Tests compare 30/60/144 Hz and frames that cross multiple phases.
 
-Smart Rubber Band is the default. The anchor starts at the application's defined initial quaternion. A genuine user rotation proposes an anchor candidate: after inertia settles, accept it only within 25° quaternion geodesic distance of the last accepted anchor. Otherwise retain the anchor, wait five seconds after coast ends, then return along the shortest quaternion path over one second. Quaternion signs are equivalent. Quintic ease-in-out has zero first and second derivatives at both return endpoints and does not overshoot.
+Smart Rubber Band is the default. The anchor starts at the application's defined initial quaternion. A genuine user rotation proposes an anchor candidate: after inertia settles, accept it only within 25° quaternion geodesic distance of the last accepted anchor. Otherwise retain the anchor, wait two seconds after coast ends, then return along the shortest quaternion path over one second. Quaternion signs are equivalent. Quintic ease-in-out has zero first and second derivatives at both return endpoints and does not overshoot.
 
 Automatic interpolation never creates an anchor candidate. Taps, wheel/settings activity, mode changes, reduced-motion changes and visibility transitions can interrupt return but cannot promote its intermediate pose to an anchor, even once that pose is within 25°. A new nonzero user drag can propose a new candidate. Thus repeated interruptions cannot walk the accepted anchor through automatic poses.
 
@@ -26,10 +26,10 @@ Automatic interpolation never creates an anchor candidate. Taps, wheel/settings 
 | Velocity smoothing | 0.04 s | Time-based input filtering |
 | Stationary release expiry | 0.1 s | No stale held-pointer flick |
 | Spatial tolerance | 25° | Settled quaternion distance |
-| Idle delay | 5 s after settling | No delay consumed by coasting |
+| Idle delay | 2 s after settling | No delay consumed by coasting |
 | Return duration | 1 s | Approved 0.8–1.2 s tuning range |
 
-Constants live in `ROTATION_TUNING`. At the maximum released speed, analytic coast lasts at most approximately 1.272 seconds before the five-second delay. Subjective sensitivity, damping and return feel remain for owner visual review.
+Constants live in `ROTATION_TUNING`. At the maximum released speed, analytic coast lasts at most approximately 1.272 seconds before the two-second delay. Subjective sensitivity, damping and return feel remain for owner visual review.
 
 ## Input, settings and lifecycle
 
