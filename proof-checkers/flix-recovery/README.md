@@ -50,8 +50,8 @@ level and forced-six behavior. Raw decimal means use significant ASCII digits
 and base-ten exponents; no finite-precision equality decides acceptance.
 
 Global print optimality remains `UNKNOWN`; runtime reachability of forced poses
-and minimum-mean period certificates remain `NOT_CHECKED`. Confirmation still
-requires independent Julia acceptance and final review under the
+and minimum-mean period certificates remain `NOT_CHECKED`. Confirmation is scoped to the independent matching Julia result and
+[final review](../review/HSM-RECOVERY-FINAL.md), under the
 [authority rules](../AUTHORITY.md).
 
 ## Validation record
@@ -61,7 +61,8 @@ frozen raw inputs across all 18 graphs and replayed 264 samples with 1,061 forwa
 steps and per-edge inverses. Its complete output matched the independently
 computed Julia output byte for byte: SHA-256
 `0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70`.
-Final independent review remains pending; this record does not promote readiness.
+The [final independent review](../review/HSM-RECOVERY-FINAL.md) confirms the scoped
+proof; PR readiness remains a separate integration/CI gate.
 
 The measured complete Flix process took 110.35 seconds and peaked at 1,311,372 KiB
 RSS with Java 21 and `-Xmx1536m` on the shared worker. Build time was recorded

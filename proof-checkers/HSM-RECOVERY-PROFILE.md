@@ -1,8 +1,11 @@
 # HSM recovery raw-input profile
 
-Status: draft contract proposed before Julia implementation. Confirmation remains
-**UNKNOWN** until the independently implemented Julia and Flix checkers accept
-the same two raw files and a separate review clears their implementation.
+Status: **SAT / CONFIRMED within the frozen recovery scope**. Independent native
+Julia and Flix checkers accepted the same two raw files with byte-identical
+outputs, and a separate reviewer cleared the implementation. See the
+[results](HSM-RECOVERY-RESULTS.md) and [final review](review/HSM-RECOVERY-FINAL.md).
+The mathematics was frozen before implementation; the original contract and
+subsequent serialization-only clarification remain in the research provenance.
 
 This additive profile leaves the frozen issue-74 files, the existing HSM corpus,
 its expected `UNSUPPORTED` recovery case, and all historical evidence unchanged.

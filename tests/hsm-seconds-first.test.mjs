@@ -93,14 +93,17 @@ test("the witness copies and runtime file are pinned to the research commit", ()
     );
     assert.match(hash, /^[0-9a-f]{64}$/);
   }
-  // CONFIRMED (proof-checkers/AUTHORITY.md) only for the two pinned witnesses,
-  // by the Flix and Julia checkers of PR 95. Recovery stays UNSUPPORTED and
-  // print optimality UNKNOWN; the pin must keep saying so.
-  assert.match(pin.reviewStatus, /^CONFIRMED only for the two pinned witnesses/);
-  assert.match(pin.reviewStatus, /recovery table[\s\S]*is UNSUPPORTED/);
+  // Original and recovery proof scopes are distinct; neither confirms the
+  // application runtime or global print optimality. Keep metadata bound to
+  // the unchanged raw recovery input and the matching native verdict.
+  assert.match(pin.reviewStatus, /^CONFIRMED for the original witnesses and the recovery table/);
+  assert.match(pin.reviewStatus, /old hsm command remains UNSUPPORTED/);
   assert.match(pin.reviewStatus, /optimality is UNKNOWN/i);
+  assert.match(pin.reviewStatus, /software-tested, not proven/);
   assert.match(pin.reviewStatus, /f71d4237/);
   assert.match(pin.reviewStatus, /5dd24dd7/);
+  assert.match(pin.reviewStatus, /0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70/);
+  assert.equal(sha(readFileSync(pin.recoveryCopy)), "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda");
   assert.equal(sha(runtimeBytes), pin.runtimeSHA256);
   // The previous pin is kept as history and still names the old print.
   assert.equal(
