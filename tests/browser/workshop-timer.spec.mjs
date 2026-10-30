@@ -3,7 +3,7 @@ import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { PNG } from "pngjs";
-import { frontPoint } from "../helpers/front-projection.mjs";
+import { frontStickerPoint } from "../helpers/front-projection.mjs";
 async function chooseTimer(page) {
   await page.goto("/");
   await expect(page.locator("#application")).toBeEnabled();
@@ -54,11 +54,7 @@ const active = [
 ];
 function digit(image, cx, cy) {
   const sample = (px, py) => {
-    const [x, y] = frontPoint(
-      image,
-      cx + (px / 256 - 0.5) * 0.87,
-      cy + (0.5 - py / 256) * 0.87,
-    );
+    const [x, y] = frontStickerPoint(image, cx, cy, px, py);
     for (let dy = -2; dy <= 2; dy++)
       for (let dx = -2; dx <= 2; dx++) {
         const i = ((y + dy) * image.width + x + dx) * 4;
@@ -90,7 +86,7 @@ test("Workshop Timer is a separate upright MMSS print; invalid durations do not 
   await expect(page.locator("#timer-controls")).toBeVisible();
   const image = PNG.sync.read(await page.locator("#cube canvas").screenshot());
   for (const [i, value] of [1, 5, 0, 0].entries()) {
-    const d = digit(image, i % 2 ? 0.52 : -0.52, i < 2 ? 0.52 : -0.52);
+    const d = digit(image, i % 2 ? 0.5 : -0.5, i < 2 ? 0.5 : -0.5);
     expect(d.segments).toBe(active[value]);
     expect(d.up).toBe(true);
   }
@@ -361,10 +357,10 @@ test("Counter's presentation-only blank tens never masks any Timer zero and surv
   await duration(page, "00:00");
   const image = PNG.sync.read(await page.locator("#cube canvas").screenshot());
   for (const [cx, cy] of [
-    [-0.52, 0.52],
-    [0.52, 0.52],
-    [-0.52, -0.52],
-    [0.52, -0.52],
+    [-0.5, 0.5],
+    [0.5, 0.5],
+    [-0.5, -0.5],
+    [0.5, -0.5],
   ]) {
     const d = digit(image, cx, cy);
     expect(d.segments).toBe(active[0]);
@@ -860,7 +856,7 @@ async function observeEndpoints(page) {
       const render = this.renderer.render, viewer = this;
       if (options[0]) this.renderer.render = function (...args) {
         const result = render.apply(this, args);
-        const pivot = viewer.scene.children.find(o => o.type === "Group" && !viewer.meshes.includes(o));
+        const pivot = viewer.presentation.children.find(o => ![...viewer.cube.bodies.values()].includes(o));
         if (pivot) window.endpointAngles.push({ at: performance.now(),
           angle: Math.max(Math.abs(pivot.rotation.x), Math.abs(pivot.rotation.y), Math.abs(pivot.rotation.z)),
           fullAngle: Math.abs(p.move.turns) * Math.PI / 2 });

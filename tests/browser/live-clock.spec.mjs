@@ -488,8 +488,8 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
     };
     clockStage.renderer.render = function (scene, camera) {
       for (const [viewer, record] of active) {
-        const pivot = viewer.scene.children.find(
-          (o) => o.type === "Group" && !viewer.meshes.includes(o),
+        const pivot = viewer.presentation.children.find(
+          (o) => ![...viewer.cube.bodies.values()].includes(o),
         );
         if (pivot && record.firstMotion === null) {
           if (

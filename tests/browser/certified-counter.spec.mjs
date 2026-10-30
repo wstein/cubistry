@@ -1,4 +1,4 @@
-import { frontPoint } from "../helpers/front-projection.mjs";
+import { frontStickerPoint } from "../helpers/front-projection.mjs";
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 import { writeFileSync } from "node:fs";
@@ -18,11 +18,7 @@ const active = [
 function renderedDigit(image, centerX) {
   const blue = ([r, g, b]) => b > r * 1.25 && b > g * 1.05;
   const sample = (px, py) => {
-    const [x, y] = frontPoint(
-        image,
-        centerX + (px / 256 - 0.5) * 0.87,
-        -0.52 + (0.5 - py / 256) * 0.87,
-      ),
+    const [x, y] = frontStickerPoint(image, centerX, -.5, px, py),
       colors = [];
     for (let dy = -2; dy <= 2; dy++)
       for (let dx = -2; dx <= 2; dx++) {
@@ -121,8 +117,8 @@ for (const leadingZero of [true, false])
           await page.locator("#cube canvas").screenshot(),
         );
         for (const [digit, center] of [
-          [Math.floor(value / 10), -0.52],
-          [value % 10, 0.52],
+          [Math.floor(value / 10), -0.5],
+          [value % 10, 0.5],
         ]) {
           const actual = renderedDigit(img, center);
           expect(actual.segments).toBe(active[digit]);

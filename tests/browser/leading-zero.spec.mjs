@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { PNG } from "pngjs";
-import { frontPoint } from "../helpers/front-projection.mjs";
+import { frontStickerPoint } from "../helpers/front-projection.mjs";
 async function ready(page) {
   await page.goto("/");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
@@ -103,12 +103,8 @@ function changedPixels(before, after, value) {
   const a = PNG.sync.read(before),
     b = PNG.sync.read(after);
   expect([b.width, b.height]).toEqual([a.width, a.height]);
-  const corners = [
-    [-0.955, -0.955],
-    [-0.085, -0.955],
-    [-0.955, -0.085],
-    [-0.085, -0.085],
-  ].map(([x, y]) => frontPoint(a, x, y));
+  const corners = [[0, 256], [256, 256], [0, 0], [256, 0]]
+    .map(([x, y]) => frontStickerPoint(a, -.5, -.5, x, y));
   const minX = Math.min(...corners.map((p) => p[0])) - 3,
     maxX = Math.max(...corners.map((p) => p[0])) + 3,
     minY = Math.min(...corners.map((p) => p[1])) - 3,
@@ -132,7 +128,7 @@ function changedPixels(before, after, value) {
   if (value < 10) expect(changed).toBeGreaterThan(100);
   else expect(changed).toBe(0);
   // The units glyph (including zero at value0) remains blue and in place.
-  const [x, y] = frontPoint(b, 0.52, -0.52 + (0.5 - 48 / 256) * 0.87),
+  const [x, y] = frontStickerPoint(b, .5, -.5, 128, 48),
     i = (y * b.width + x) * 4;
   // For digits whose top segment is absent, exact image equality outside the field above
   // still verifies units. Value0 additionally checks the rendered zero survives.

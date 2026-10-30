@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
-import { frontPoint } from "../helpers/front-projection.mjs";
+import { frontPoint, frontStickerPoint } from "../helpers/front-projection.mjs";
 async function ready(page) {
   await page.goto("/");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
@@ -72,7 +72,7 @@ test("physical title pixels and upright optimized-print digits survive Set goals
     }
   expect(changed / total).toBeLessThan(0.01);
   // Read the blue orientation marker from the actual projected front sticker.
-  const [x, y] = frontPoint(second, 0.52, -0.52 + (0.5 - 234 / 256) * 0.87);
+  const [x, y] = frontStickerPoint(second, .5, -.5, 128, 234);
   const samples = [];
   for (let dy = -2; dy <= 2; dy++)
     for (let dx = -2; dx <= 2; dx++) {

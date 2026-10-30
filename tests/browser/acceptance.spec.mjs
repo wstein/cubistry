@@ -1,4 +1,4 @@
-import { frontPoint } from "../helpers/front-projection.mjs";
+import { frontStickerPoint } from "../helpers/front-projection.mjs";
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 import { readFileSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
@@ -22,7 +22,7 @@ const values = [0, 7, 42, 58, 99],
 function renderedDigit(image, centerX) {
   const blue = ([r, g, b]) => b > r * 1.25 && b > g * 1.05;
   const sample = (px, py) => {
-    const [x, y] = frontPoint(image, centerX + (px / 256 - 0.5) * 0.87, -0.52 + (0.5 - py / 256) * 0.87), colors = [];
+    const [x, y] = frontStickerPoint(image, centerX, -.5, px, py), colors = [];
     for (let dy = -2; dy <= 2; dy++)
       for (let dx = -2; dx <= 2; dx++) {
         const at = ((y + dy) * image.width + x + dx) * 4;
@@ -81,8 +81,8 @@ test("live solver selection executes fresh paths and actual rendered digits matc
       await page.locator("#cube canvas").screenshot(),
     );
     for (const [digit, center] of [
-      [Math.floor(value / 10), -0.52],
-      [value % 10, 0.52],
+      [Math.floor(value / 10), -0.5],
+      [value % 10, 0.5],
     ]) {
       const actual = renderedDigit(image, center);
       expect(actual.segments, `visible digit ${digit} at ${value}`).toBe(
