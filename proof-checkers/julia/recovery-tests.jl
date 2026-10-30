@@ -77,7 +77,7 @@ apps,goals = R.bind_periods(E,parsed,modes["appModes"])
 row = recovery["modes"][5]; identity = ("S",11,1)
 app = only(a for a in apps if (a.letter,a.maximum,a.direction) == identity)
 @testset "bounded search versus unpruned full-frame enumeration" begin
-    sample = only(s for s in row["samples"] if length(H.parse_word(s["words"][1])) <= 3)
+    sample = first(s for s in row["samples"] if length(H.parse_word(s["words"][1])) <= 3)
     state = H.turn(H.source_state(pr),H.parse_word(sample["setupFromSolved"]))
     targetvalue = mod(sample["fromValue"]+1,12)
     expected = ["","S",string(targetvalue ÷ 10),string(targetvalue % 10)]
