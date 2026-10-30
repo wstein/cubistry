@@ -6,7 +6,7 @@
     "seconds-first-modes": "30b6d022da60c366d79de5498497df0a07e28caf"
   },
   "scope": "raw-input HSM profile; verdicts produced by the Flix and Julia checkers, identical in both",
-  "caseCount": 41,
+  "caseCount": 46,
   "cases": [
     {
       "name": "witness",
@@ -414,6 +414,56 @@
       "description": "own period certified under a four HTM cap",
       "path": "proof-checkers/conformance-hsm/cases/modes-cap-four.json",
       "sha256": "05b63e08d668fc52410660218b22d685b2a31fd13fef82f6d47f2510cd4c4bc4",
+      "expectedValid": false,
+      "expectedStatus": "INVALID",
+      "resultSHA256": ""
+    },
+    {
+      "name": "mean-trailing-newline",
+      "group": "negative",
+      "description": "minimum mean followed by a newline is not a canonical fraction",
+      "path": "proof-checkers/conformance-hsm/cases/mean-trailing-newline.json",
+      "sha256": "e0bb8b3c2861d0f344781e8160390589f077b34e3c8f03148c0efcf282321342",
+      "expectedValid": false,
+      "expectedStatus": "INVALID",
+      "resultSHA256": ""
+    },
+    {
+      "name": "mean-non-ascii-digits",
+      "group": "negative",
+      "description": "minimum mean written with Arabic-Indic digits is not a canonical fraction",
+      "path": "proof-checkers/conformance-hsm/cases/mean-non-ascii-digits.json",
+      "sha256": "42d63f6288bd77391867eccb6e77ac5d5c5e5e8eaf7a272d792415d2776ac3b8",
+      "expectedValid": false,
+      "expectedStatus": "INVALID",
+      "resultSHA256": ""
+    },
+    {
+      "name": "byte-order-mark",
+      "group": "negative",
+      "description": "UTF-8 byte order mark before the JSON text",
+      "path": "proof-checkers/conformance-hsm/cases/byte-order-mark.json",
+      "sha256": "5c334fc83ad12fadc0d4a1d13159314d42ededc4108bcf7d346f1faa2cec7bab",
+      "expectedValid": false,
+      "expectedStatus": "INVALID_JSON",
+      "resultSHA256": ""
+    },
+    {
+      "name": "modes-lap-trailing-newline",
+      "group": "negative",
+      "description": "application per-lap HTM followed by a newline",
+      "path": "proof-checkers/conformance-hsm/cases/modes-lap-trailing-newline.json",
+      "sha256": "f7be3bd38182eab89e2253f2bf323df5b84f1a117393a2068eecd4d8ec8220e2",
+      "expectedValid": false,
+      "expectedStatus": "INVALID",
+      "resultSHA256": ""
+    },
+    {
+      "name": "modes-lap-non-ascii-digits",
+      "group": "negative",
+      "description": "application per-lap HTM written with Arabic-Indic digits",
+      "path": "proof-checkers/conformance-hsm/cases/modes-lap-non-ascii-digits.json",
+      "sha256": "583dbf910289350297566fe23fcdcfba8cc73dcb285ce43e7f4ed4e15933eb7a",
       "expectedValid": false,
       "expectedStatus": "INVALID",
       "resultSHA256": ""

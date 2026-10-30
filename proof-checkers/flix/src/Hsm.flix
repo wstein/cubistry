@@ -452,8 +452,9 @@ def hsmTryPose(eng: HsmEng, opts: List[(Int32, Int32, Int32, Int32)], corners: L
     }
 
 // ---------------------------------------------------------------- fractions
+// ASCII digits only: Char.isDigit accepts every Unicode decimal digit, and Int64.fromString parses them.
 def hsmDigits(s: String): Bool =
-    String.length(s) >= 1 and String.length(s) <= 9 and List.forAll(Char.isDigit, String.toList(s))
+    String.length(s) >= 1 and String.length(s) <= 9 and List.forAll(c -> c >= '0' and c <= '9', String.toList(s))
     and (String.length(s) == 1 or String.charAt(0, s) != '0')
 def hsmGcd(a: Int64, b: Int64): Int64 = if (b == 0i64) a else hsmGcd(b, Int64.modulo(a, b))
 def hsmI64(s: String): Int64 = Option.getWithDefault(0i64, Int64.fromString(s))
@@ -921,7 +922,7 @@ def hsmCommand(path: String): Unit \ IO = {
 // ---------------------------------------------------------------- conformance
 // Pinned HSM profile corpus: proof-checkers/conformance-hsm/manifest.json.  The pin is embedded here, as for the
 // frozen issue-74 corpus; changing the corpus means changing the manifest, this constant and the Julia twin together.
-def hsmManifestPin(): String = "1d6ede1981aba967696272ad695ed8488c0ee76de34828875602f91ffc86ee98"
+def hsmManifestPin(): String = "0c497d15ca1cf530c7b8be2a6775723bc562e2583c5c2cfc103265b3a4935993"
 
 def hsmStatusOf(reason: String): String \ IO =
     if (reason.contains("ERROR:")) "ERROR" else if (reason.contains("UNSUPPORTED:")) "UNSUPPORTED"

@@ -377,7 +377,8 @@ end
 # ---------------------------------------------------------------- fractions
 function parse_fraction(s, what)
     need(s isa AbstractString, what * " must be a string")
-    m = match(r"^(0|[1-9][0-9]{0,8})(?:/([1-9][0-9]{0,8}))?$", s)
+    # \z, not $: PCRE's $ also matches before a final newline, which would accept "53/20\n".
+    m = match(r"^(0|[1-9][0-9]{0,8})(?:/([1-9][0-9]{0,8}))?\z", s)
     need(m !== nothing, what * " must be a canonical fraction")
     num = parse(Int64, m.captures[1])
     den = m.captures[2] === nothing ? Int64(1) : parse(Int64, m.captures[2])
@@ -671,7 +672,7 @@ end
 
 function parse_ratio(s, what)
     need(s isa AbstractString, what * " must be a string")
-    m = match(r"^(0|[1-9][0-9]{0,8})/([1-9][0-9]{0,8})$", s)
+    m = match(r"^(0|[1-9][0-9]{0,8})/([1-9][0-9]{0,8})\z", s)
     need(m !== nothing, what * " must be num/den")
     parse(Int64, m.captures[1]), parse(Int64, m.captures[2])
 end
@@ -781,6 +782,9 @@ end
 
 function evaluate(path)
     try
+        # A leading UTF-8 byte order mark is not JSON text (the Flix reader rejects it as well);
+        # the shared reader would skip it silently.
+        need(read(path, 3) != UInt8[0xef, 0xbb, 0xbf], "byte order mark before the JSON text"; code="INVALID_JSON")
         data, sha = IP.read_json(path)
         (true, "VALID", check_hsm(data, sha))
     catch error
@@ -792,7 +796,7 @@ end
 # ---------------------------------------------------------------- conformance
 # Pinned HSM profile corpus: proof-checkers/conformance-hsm/manifest.json.  The pin is embedded here, as for the
 # frozen issue-74 corpus; changing the corpus means changing the manifest, this constant and the Flix twin together.
-const HSM_MANIFEST_PIN = "1d6ede1981aba967696272ad695ed8488c0ee76de34828875602f91ffc86ee98"
+const HSM_MANIFEST_PIN = "0c497d15ca1cf530c7b8be2a6775723bc562e2583c5c2cfc103265b3a4935993"
 function conformance(root)
     path = joinpath(root, "proof-checkers/conformance-hsm/manifest.json")
     need(bytes2hex(sha256(read(path))) == HSM_MANIFEST_PIN, "HSM conformance manifest pin"; code="CORPUS_ERROR")
