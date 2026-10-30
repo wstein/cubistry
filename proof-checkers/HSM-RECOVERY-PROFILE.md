@@ -112,3 +112,79 @@ five-HTM priority. Those runtime policies do not change this unrestricted graph.
 Execution order is Julia first, then independently implemented Flix on identical
 raw files. Julia acceptance alone is not CONFIRMED. Any actual dissent invokes
 [the authority stop and root-cause rule](AUTHORITY.md); no voting or Python gate.
+
+## Deterministic valid-result wire format
+
+This documentation-only clarification describes the serialization emitted by
+Julia source `249df9d31b1d2c6daa617e88f898ff0c25906300`. It does not change any
+mathematical requirement, raw input or running checker. No computed golden row
+is specified here. Both independent implementations must produce the same
+complete valid result from their own computations.
+
+The output is compact JSON with no insignificant whitespace, followed by one LF.
+Every listed object preserves the exact key order below. Arrays preserve their
+specified order. All integers are JSON integer tokens; the valid result contains
+no floating-point number tokens. Digests are lowercase 64-character SHA-256
+strings. There are no execution times or source revision identifiers in the line.
+
+Top-level keys, in order:
+
+| Key | Type and value |
+| --- | --- |
+| `valid` | Boolean `true` |
+| `status` | String `VALID` |
+| `profile` | String `cubistry.hsm-seconds-first-recovery` |
+| `profileVersion` | Integer `1` |
+| `recoveryInputSHA256` | Digest of the exact raw recovery bytes |
+| `modesInputSHA256` | Digest of the exact raw all-mode bytes |
+| `printSHA256` | Digest using the existing native HSM canonical print rendering |
+| `edgeLimitHTM` | Integer `5` |
+| `modes` | Array of all 18 computed mode summaries, in raw recovery row order |
+| `claims` | Object with the ordered constant strings specified below |
+
+Each mode summary has these keys, in this exact order:
+
+```text
+letter: string
+maximum: integer
+direction: integer
+sourceDirection: integer
+traversal: string
+graphNodes: integer
+edgesAtMostLimitOrForced: integer
+periodNodes: integer
+unreachable: integer
+poseWithoutEdgeAtMostLimit: integer
+stepsHistogram: object
+edgesAboveLimitHistogram: object
+maximumSteps: integer
+meanStepsExact: string
+meanStepsFourPlaces: string
+maximumRecoveryHTM: integer
+sampleReplay: object
+```
+
+Identity and traversal strings use the validated raw vocabulary. Both histogram
+objects contain canonical ASCII nonnegative decimal keys in ascending **numeric**
+order, with positive integer counts. `meanStepsExact` is the reduced nonnegative
+fraction `numerator/denominator`, omitting `/1` for integers. Zero is `0`.
+`meanStepsFourPlaces` is a string with exactly four fractional decimal digits,
+including trailing zeros; it uses neither exponent notation nor a sign.
+
+`sampleReplay` has exactly four integer fields in this order: `samples`, `steps`,
+`edgeInverses`, `fullInverses`. They report the number of raw sample rows replayed,
+the total forward display steps, the number of per-edge inverse checks, and the
+number of complete sample inverse checks. Duplicate sample rows still each count
+as a replay.
+
+`claims` has exactly these ordered string fields and values:
+
+```json
+{"recoveryReturnOntoPeriod":"VERIFIED","globalPrintOptimality":"UNKNOWN","runtimeReachabilityOfForcedPoses":"NOT_CHECKED","minimumMeanPeriodCertificates":"NOT_CHECKED"}
+```
+
+The internal partial smoke record is outside this complete valid wire format:
+it has `valid:false`, `status:UNKNOWN`, only the selected row, and a `PARTIAL`
+recovery claim. It cannot establish confirmation. Invalid-result reason strings
+need not be byte-identical between implementations; actual accept/reject,
+counts and witness results remain subject to the authority rule.
