@@ -1,15 +1,93 @@
 {
   "schema": "cubistry.calendar7.practical-experiment.v1",
-  "status": "UNKNOWN",
+  "status": "SAT",
   "dependencyCommit": "1bd783245abaa0d10946945be309e9fe8392d392",
   "printing": "../english/evidence/physical-print.tsv",
   "sourceWitness": "../en-physical-review/all-targets-dag.tsv.gz",
-  "domain": {"first": "2026-01", "last": "2099-12", "months": 888, "chronologicalEdges": 887},
-  "initialCandidate": {"from": "2026-02", "to": "2026-03", "sourceRepresentative": 2},
-  "targetsHTM": {"initial": 200, "primary": 100, "ambitiousExclusive": 50},
+  "domain": {
+    "first": "2026-01",
+    "last": "2099-12",
+    "months": 888,
+    "chronologicalEdges": 887
+  },
+  "initialCandidate": {
+    "from": "2026-02",
+    "to": "2026-03",
+    "sourceRepresentative": 2
+  },
+  "targetsHTM": {
+    "initial": 200,
+    "primary": 100,
+    "ambitiousExclusive": 50
+  },
   "metric": "individual noncentral layer HTM; whole rotations separate; wide turns expanded",
   "globalOptimality": "UNKNOWN",
   "runtimeIntegration": "NOT_CHECKED",
   "browserE2E": false,
-  "promotion": "Draft research only; owner acceptance required"
+  "promotion": "Draft research only; owner acceptance required",
+  "statusScope": "Only the three saved independently verified source-to-destination transitions",
+  "fullChronologicalCoverage": "UNKNOWN",
+  "verifiedTransitions": [
+    {
+      "from": "2026-02",
+      "to": "2026-03",
+      "sourceRepresentative": 2,
+      "file": "evidence/feb-mar-2026.tsv",
+      "sha256": "70bd684e144978acaa4231907d4d4943c516caec7dbda3bffda9d19dc1c06a00",
+      "endpointSHA256": "eeaa1c5fca38d4c97cc85ece405ab32b96647803459206a33aa3283c259322f7",
+      "HTM": 48,
+      "QTM": 50,
+      "wholeCubeRotations": 0
+    },
+    {
+      "from": "2029-02",
+      "to": "2029-03",
+      "sourceRepresentative": 38,
+      "file": "evidence/feb-mar-2029.tsv",
+      "sha256": "1689452a588f8caf62f8c39ea42e562a90dd9eda33a8ca2a2405d6be403a17c1",
+      "endpointSHA256": "d5c23c663f3c24d41729d747603986fa75a75c042ae9805a3f089f9f46bd718e",
+      "HTM": 57,
+      "QTM": 60,
+      "wholeCubeRotations": 0
+    },
+    {
+      "from": "2030-02",
+      "to": "2030-03",
+      "sourceRepresentative": 50,
+      "file": "evidence/feb-mar-2030.tsv",
+      "sha256": "c41781eb676c7c45a703567e97e39214ec6f1851fcbe32567f3976a5b794513e",
+      "endpointSHA256": "4fb6b1b59aaace71c4ba02e759a53532d62d696172505588b22048b9a6691224",
+      "HTM": 62,
+      "QTM": 66,
+      "wholeCubeRotations": 0
+    }
+  ],
+  "verifiedStatistics": {
+    "count": 3,
+    "minHTM": 48,
+    "medianHTM": 57,
+    "maxHTM": 62,
+    "meanHTM": 55.666666666666664,
+    "p90HTM": 62,
+    "p95HTM": 62,
+    "p99HTM": 62,
+    "percentileConvention": "nearest rank",
+    "totalHTM": 167,
+    "totalQTM": 176,
+    "frequencyHTM": {
+      "48": 1,
+      "57": 1,
+      "62": 1
+    }
+  },
+  "inputSHA256": {
+    "printing": "b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931",
+    "sourceDAGArchive": "64d1eb37644abda3fbb7121fd85b85dd3552a4a5525a3ad8042b06988705e932"
+  },
+  "toolchains": {
+    "Julia": "1.13.3",
+    "Flix": "0.79.0",
+    "flixw": "0.34.9",
+    "Java": "21.0.12.1"
+  }
 }
