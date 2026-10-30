@@ -1,7 +1,7 @@
 # Native HSM recovery verification
 
-This experiment is registered before native recovery verdicts. Its current result
-is **UNKNOWN**. [Issue 98](https://github.com/wstein/cubistry/issues/98) tracks the
+This experiment is registered before native recovery verdicts. The final scoped result
+is **SAT / CONFIRMED**; see [results](RESULTS.md). [Issue 98](https://github.com/wstein/cubistry/issues/98) tracks the
 implementation and delivery; this directory preserves research provenance and
 later immutable run records rather than mirroring the task list.
 

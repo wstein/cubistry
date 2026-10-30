@@ -2,7 +2,7 @@
   "schema": "cubistry.hsm-recovery-native-experiment",
   "version": 1,
   "issue": "https://github.com/wstein/cubistry/issues/98",
-  "status": "UNKNOWN",
+  "status": "SAT",
   "researchSource": "30b6d022da60c366d79de5498497df0a07e28caf",
   "inputs": {
     "recovery": {
@@ -111,7 +111,7 @@
       "id": "mean-decimal-exactness",
       "path": "findings/mean-decimal-rc.md",
       "sha256": "581f9df875dfea34cfd5e1988682fb3d9a8921d7ecc5684942d9e5af8e1a882b",
-      "status": "UNKNOWN pending documented parser correction and native validation",
+      "status": "Resolved by exact-decimal parser at 249df9d; native positive, negative and independent review passed",
       "investigator": "Codex Sol",
       "scope": "Input decimal exactness; mathematical graph code unaffected",
       "parserResolution": {
@@ -142,5 +142,29 @@
       "positive.jsonl": "0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70",
       "positive-capture.json": "a243f3fec67c65b517d44f2b4a7de3ffe55e1a23e7cf293686d6b39ebd3443c6"
     }
+  },
+  "confirmation": "CONFIRMED for scoped native recovery graph claims only",
+  "flixDelivery": {
+    "sourceCommit": "ac1b6bf893472044103a552a34654ec1a9162b21",
+    "path": "deliveries/flix",
+    "files": {
+      "evidence.tar.gz": "0452aa30d50c0d352f8622a1039a58d8927275d8275e53385e5e542dc8e51b79",
+      "summary.json": "549552cc79f6aed703d36f12f40251dd38ab66a309395d46816c246d1c914f83",
+      "manifest.json": "4ffa370b7b6bb5c85287afe29da7ae4d3baf55610d323d0c137a47091295d559",
+      "AUTHOR-REPORT.md": "d6b196e9c7ddf4a9d2b587878109f805867c1390783b176b950e791f6c80567d",
+      "positive.jsonl": "0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70"
+    }
+  },
+  "comparison": {
+    "path": "comparison.json",
+    "sha256": "88ecba26b7c4ed8dd0eb4af2229a1924e51a5274036b38179396d64bcc06ad51",
+    "result": "Both native full outputs byte-identical, 18 modes, no dissent"
+  },
+  "finalReview": {
+    "sourceCommit": "5829667230751af332afb29447cd61bcdd462587",
+    "sourcePath": "proof-checkers/review/HSM-RECOVERY-FINAL.md",
+    "archivedCopy": "reviews/final-review.txt",
+    "sha256": "694c133a195130adbbacd3330973b2616ea41d7415b573b8b4ceaa70573e8f0c",
+    "result": "CONFIRMED within frozen scope; independent source/artifact audits and runtime component checks passed"
   }
 }

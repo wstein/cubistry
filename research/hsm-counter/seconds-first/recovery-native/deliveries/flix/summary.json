@@ -1,0 +1,33 @@
+{
+  "schema": "cubistry.native-recovery.flix-evidence.v1",
+  "status": "NATIVE_FULL_ACCEPTED_BOTH_OUTPUTS_IDENTICAL_FINAL_REVIEW_PENDING",
+  "branch": "feat/hsm-recovery-flix",
+  "branchHead": "e53c852aff0627ef5efc3180e4f9449c70513dc0",
+  "mathematicalSourceCommit": "ac1b6bf",
+  "artifactSHA256": "dd296c1320e42ae3bd7474b67b23f2d1b14f479d1a1c13a8c62aada16435c691",
+  "fullVerdictSHA256": "0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70",
+  "fullVerdictBytes": 9756,
+  "legacyArtifactSHA256": "561ed696a66c861c4c53cad0063ae90593ad4cbe464bfb0531bcb20c0d1511ab",
+  "checks": {
+    "nativeSelfTests": 10,
+    "rawControls": 39,
+    "rawRejected": 37,
+    "legitimateMutationsAcceptedPartial": 2,
+    "nativeRecoveryModes": 18,
+    "sampleRows": 264,
+    "sampleSteps": 1061,
+    "legacyNativeCases": 195,
+    "legacyRecoveryStatus": "UNSUPPORTED",
+    "legacyHsmDataPins": 46,
+    "legacyHsmMathematicalConformance": "NOT_RUN"
+  },
+  "binaryPolicy": "No compiler, runtime, fatjar or compiled code binary is included; hashes, tool versions and exact source inputs are retained. The final fatjar remains in the author worktree for independent review.",
+  "history": [
+    "build-1: new isolated project needed existing Maven cache; sandbox network download failed. Reused unchanged already-resolved Jackson dependency cache; hash guard passed. No replacement dependency or policy bypass.",
+    "build-2: stock Flix API-name compile errors before any proof verdict; fixed unresolved Set/Int64 names and unused local.",
+    "build-3: source compilation succeeded; packaging expected flix.jar but project basename emits work.jar. Build script corrected.",
+    "self-tests directory: capture harness attempted absent /usr/bin/time before launching Java; no verdict. Changed to child getrusage capture; source mathematics unchanged.",
+    "build-4/controls/smoke-h11/self-tests-2: pre-static-fix history retained. Static review found parse/hash path reopens and origin-vs-copied-source build hashes. Not observed checker dissent.",
+    "ac1b6bf/build-final/final-* and full18: both provenance fixes plus explicit packed-cost capacity guard; source frozen and all controls rerun before full proof."
+  ]
+}

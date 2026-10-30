@@ -1,0 +1,29 @@
+{
+  "status": "BOTH_NATIVE_ACCEPT_SAME_RAW_INPUTS_FINAL_REVIEW_PENDING",
+  "byteIdentical": true,
+  "julia": {
+    "source": "249df9d31b1d2c6daa617e88f898ff0c25906300",
+    "stdout": "/tmp/hsm-recovery-julia-sol-exact-full18/stdout.jsonl",
+    "sha256": "0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70"
+  },
+  "flix": {
+    "source": "ac1b6bf893472044103a552a34654ec1a9162b21",
+    "artifactSHA256": "dd296c1320e42ae3bd7474b67b23f2d1b14f479d1a1c13a8c62aada16435c691",
+    "stdout": "/tmp/hsm-recovery-flix-runs/full18/stdout.txt",
+    "sha256": "0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70"
+  },
+  "bytes": 9756,
+  "modes": 18,
+  "recoveryInputSHA256": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda",
+  "modesInputSHA256": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae",
+  "graphNodesAcrossModeGraphs": 1722384,
+  "edgesAcrossModeGraphs": 28747368,
+  "samples": 264,
+  "steps": 1061,
+  "claims": {
+    "recoveryReturnOntoPeriod": "VERIFIED",
+    "globalPrintOptimality": "UNKNOWN",
+    "runtimeReachabilityOfForcedPoses": "NOT_CHECKED",
+    "minimumMeanPeriodCertificates": "NOT_CHECKED"
+  }
+}
