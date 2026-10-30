@@ -1,0 +1,5 @@
+variant	status	first-htm	next-htm	worst-htm	total-htm	seconds	march-sha256	april-sha256	reason
+baseline	CANDIDATE	48	430	430	478	3.112476136	eeaa1c5fca38d4c97cc85ece405ab32b96647803459206a33aa3283c259322f7	0ccfadab9b736e77481bf7ca2e4f83f933c5c9b46556c740ec9b4078d4e4175e	independent native replay required
+hidden-corner	CANDIDATE	56	427	427	483	3.288575702	999299b092ff563dda8dcb7266a99d40441eefae62673df804e21aeebe430f61	8ce93de16c7134fa8720ee47ef7400917ad8771462cc6a0ecdcdc211abfe01b5	independent native replay required
+hidden-midge	UNKNOWN	66				0.84195464	47f22174df7a5f154bbc15691d173437118b90a688290fb3e8255dc61c7feed6		SEARCH_BUDGET_EXHAUSTED: Bounded macro search stalled in orbit 4 at 3/4
+hidden-axial-center	CANDIDATE	66	430	430	496	3.22300364	1bc9d765b729dfa4ae2b4bf1a27d04620fd34caeb7e6c336664ac79c4b965af2	105944656260a26721fc92967f92b30456b9faa93d1c180ef738a0b73b82bbfa	independent native replay required

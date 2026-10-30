@@ -18,7 +18,7 @@ function read_chain(path)
         f=split(lines[cursor],'\t');cursor+=1
         @assert length(f)==9 && f[1]=="edge"
         y,m,htm,qtm,rot,rotq=canonical_integer.(f[2:7])
-        @assert 2026<=y<=2099 && 1<=m<=12 && all(>=(0),(htm,qtm,rot,rotq))
+        @assert 2026<=y<=2099 && 1<=m<=12 && 0<=htm<=100000 && 0<=qtm<=200000 && 0<=rot<=100000 && 0<=rotq<=200000
         source_hash=chain_hash(f[8]);end_hash=chain_hash(f[9]);moves=Tuple{Int,Int}[]
         while cursor<=length(lines) && lines[cursor]!="end"
             f=split(lines[cursor],'\t');cursor+=1
@@ -57,7 +57,9 @@ function verify_chain(dag_path,path;output=stdout)
     @assert haskey(proof.targets,input.root)
     p=signed_perm(proof.registers,proof.targets[input.root])
     state=decode_physical(printing,p,proof.action)
-    validate_front(state,physical_targets("EN")[input.root])
+    canonical=physical_targets("EN")[input.root]
+    @assert canonical.board==calendar_goal(input.year,input.month).board "Declared source month must match source-root profile"
+    validate_front(state,canonical)
     validate_front(state,calendar_goal(input.year,input.month))
     @assert state_digest(state)==input.hash "Initial actual physical state digest"
     initial_state=copy(state);initial_perm=copy(p)

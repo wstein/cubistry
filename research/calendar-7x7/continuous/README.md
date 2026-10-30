@@ -15,10 +15,12 @@ positions, normals and up vectors. Matching artwork alone is insufficient.
 One legal initial state may be established by the original DAG, without
 expanding it. Practical physical initialization remains a separate limitation.
 
-**Current status: UNKNOWN.** A planner candidate is not proof. Native Julia and
-native Flix must independently accept the same raw chain, including every
-intermediate physical state, chronological date, artwork orientation, claimed
-metrics and exact state hash. Neither may silently substitute a new source.
+**Scoped SAT:** native Julia and native Flix independently accept four saved
+two-edge chronological chains, with byte-identical physical hashes and metrics.
+Every intermediate state is retained. See [results and limitations](RESULTS.md).
+Planner-only alternatives remain exploratory, not proof. Both native checkers
+validate intermediate physical states, dates, artwork orientation, declared
+metrics and exact hashes; neither substitutes a new source.
 Global optimality, full 887-edge coverage and runtime integration are not
 claimed. No printing change or unrestricted optimization is authorized.
 
@@ -65,3 +67,24 @@ an independently checkable impossibility proof would justify the last category.
 
 R2 remains Draft for owner research acceptance. No browser E2E, application
 integration, merge, deployment or release belongs to this experiment.
+
+## Reproduce
+
+With Julia 1.13.3, Java 21 and the inherited pinned Flix 0.79.0 toolchain:
+
+```sh
+JULIA_BIN=julia bash research/calendar-7x7/continuous/reproduce.sh
+```
+
+The command writes receipts into a new temporary directory, regenerates and
+byte-compares all four primary chains, reproduces the bounded state-selection
+experiment, runs generator and parser tests, builds the additive native Flix
+checker, compares both native chain replays and checks nine shared corruptions.
+The alternative lookahead chains are regenerated as exploratory artifacts only;
+the driver does not claim native confirmation for them. It compares the
+selection survey excluding elapsed time. Set `CALENDAR7_CHAIN_RESULTS_DIR` and
+`CALENDAR7_CHAIN_FLIX_BUILD_DIR` to select isolated output/build directories.
+
+The original candidate timing logs are preserved as observations; fresh elapsed
+times vary. Exact source revision, toolchain versions and input hashes are
+recorded by the driver. No canonical proof-profile registration is claimed.

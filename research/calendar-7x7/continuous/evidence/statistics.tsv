@@ -1,0 +1,19 @@
+scope	FOUR_SELECTED_PRIMARY_CHAINS_ONLY
+chains	4
+edges	8
+min-htm	48
+mean-htm	327.875
+median-htm	397.0
+p90-nearest-rank-htm	487
+p95-nearest-rank-htm	487
+max-htm	487
+total-htm	2623
+total-qtm	2690
+total-whole-cube-rotation-records	125
+frequency-htm	48	1
+frequency-htm	53	1
+frequency-htm	378	1
+frequency-htm	397	2
+frequency-htm	430	1
+frequency-htm	433	1
+frequency-htm	487	1
