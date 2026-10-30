@@ -1,0 +1,14 @@
+lower-orbit	-3	-3	20	20
+lower-orbit	-3	-2	15	15
+lower-orbit	-3	-1	21	21
+lower-orbit	-3	0	18	18
+lower-orbit	-3	1	22	22
+lower-orbit	-3	2	19	19
+lower-orbit	-2	-2	16	16
+lower-orbit	-2	-1	21	21
+lower-orbit	-2	0	20	20
+lower-orbit	-2	1	18	18
+lower-orbit	-1	-1	22	22
+lower-orbit	-1	0	22	22
+lower-orbit	0	0	6	6
+invalid	java.lang.IllegalArgumentException: physical printing and independently derived nonblank lower bound must equal240

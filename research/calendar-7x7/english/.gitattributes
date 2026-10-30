@@ -1,0 +1,3 @@
+# Generated corrupt fixture bytes are checked natively and pinned by digest.
+# Keep their repeated copied tables out of textual review diffs.
+flix/negative-controls/** -diff
