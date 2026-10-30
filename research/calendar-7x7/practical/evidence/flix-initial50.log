@@ -1,0 +1,28 @@
+dag-progress	10000
+dag-progress	20000
+dag-progress	30000
+dag-progress	40000
+dag-progress	50000
+dag-progress	60000
+dag-progress	70000
+dag-progress	80000
+dag-progress	90000
+dag-progress	100000
+dag-progress	110000
+dag-progress	120000
+dag-progress	130000
+dag-progress	140000
+dag-progress	150000
+dag-progress	160000
+dag-progress	170000
+dag-progress	180000
+dag-progress	190000
+dag-progress	200000
+dag-progress	210000
+dag-progress	220000
+dag-progress	230000
+dag	21	230363	91	ONLY_ORIGINAL_LEGAL_GENERATORS
+source-sha256	da9aa1c3a45042c8d537fac621ae426c70ba21fb4fb053a97696d0786e815c50
+endpoint-sha256	9ae90b7196a3f572fb862d34a578cdf13dbe12eff517e5b41d341ec053459c41
+metrics	50	50	0	0	50
+status	VALID_EXECUTABLE_TRANSITION	218	294	49
