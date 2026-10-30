@@ -60,3 +60,19 @@ test("capture failure aborts the uncaptured contact and leaves later gestures us
  assert(h.root.quaternion.angleTo(before)>.1);assert.equal(h.element.captures.size,0);assert.notEqual(h.binding.controller.phase,"dragging");
  h.binding.dispose();
 });
+
+test('held settings pointers freeze explicit leveling across outside releases, overlap, lost contact and blur without blocking native controls',()=>{
+ const h=harness('free');h.element.pointer('pointerdown');h.time(.1);h.element.pointer('pointermove',170,140);h.time(.2);h.element.pointer('pointermove',140,190);h.time(.4);h.element.pointer('pointerup');
+ h.time(1);h.select.value='smart';h.select.dispatchEvent(new Event('change'));h.step(1.4);assert.equal(h.binding.controller.phase,'leveling');
+ const event=(type,id)=>{const e=new Event(type,{cancelable:true});Object.assign(e,{pointerId:id});return e;};
+ const q=h.root.quaternion.clone();const down=event('pointerdown',4);h.panel.dispatchEvent(down);assert.equal(down.defaultPrevented,false);
+ h.step(8);same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,'dragging');
+ h.element.pointer('pointerdown',100,100,5);h.time(8.1);h.element.pointer('pointermove',200,200,5);same(h.root.quaternion,q);
+ h.document.dispatchEvent(event('pointerup',4));h.step(9);same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,'dragging');
+ h.element.pointer('pointerup',200,200,5);assert.equal(h.binding.controller.phase,'leveling');h.step(9.2);
+ h.panel.dispatchEvent(event('pointerdown',6));h.panel.dispatchEvent(event('pointerdown',7));const held=h.root.quaternion.clone();
+ h.document.dispatchEvent(event('pointercancel',6));h.step(12);same(h.root.quaternion,held);h.document.dispatchEvent(event('lostpointercapture',7));assert.equal(h.binding.controller.phase,'leveling');
+ h.step(12.2);h.panel.dispatchEvent(event('pointerdown',8));const beforeBlur=h.root.quaternion.clone();h.window.dispatchEvent(new Event('blur'));h.step(100);same(h.root.quaternion,beforeBlur);
+ h.window.dispatchEvent(new Event('focus'));assert.equal(h.binding.controller.phase,'leveling');h.step(101);assert.notEqual(h.binding.controller.phase,'dragging');
+ h.binding.dispose();const final=h.root.quaternion.clone();h.panel.dispatchEvent(event('pointerdown',9));h.window.dispatchEvent(new Event('blur'));h.document.dispatchEvent(event('pointerup',9));h.step(200);same(h.root.quaternion,final);
+});
