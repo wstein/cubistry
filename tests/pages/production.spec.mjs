@@ -1,4 +1,4 @@
-import { frontPoint } from "../helpers/front-projection.mjs";
+import { frontStickerPoint } from "../helpers/front-projection.mjs";
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 import { readFile } from "node:fs/promises";
@@ -17,11 +17,7 @@ const active = [
 function renderedDigit(image, centerX) {
   const blue = ([r, g, b]) => b > r * 1.25 && b > g * 1.05;
   const sample = (px, py) => {
-    const [x, y] = frontPoint(
-        image,
-        centerX + (px / 256 - 0.5) * 0.87,
-        -0.52 + (0.5 - py / 256) * 0.87,
-      ),
+    const [x, y] = frontStickerPoint(image, centerX, -.5, px, py),
       colors = [];
     for (let dy = -2; dy <= 2; dy++)
       for (let dx = -2; dx <= 2; dx++) {
@@ -97,8 +93,8 @@ test("built Pages counter resolves immutable assets under project base and rende
       await page.locator("#cube canvas").screenshot(),
     );
     for (const [digit, center] of [
-      [Math.floor(value / 10), -0.52],
-      [value % 10, 0.52],
+      [Math.floor(value / 10), -0.5],
+      [value % 10, 0.5],
     ]) {
       const actual = renderedDigit(image, center);
       expect(actual.segments).toBe(active[digit]);
@@ -218,7 +214,7 @@ test("built Pages Workshop Timer loads its immutable certificate below the proje
   });
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "00:00");
   const image = PNG.sync.read(await page.locator("#cube canvas").screenshot());
-  for (const center of [-0.52, 0.52]) {
+  for (const center of [-0.5, 0.5]) {
     const digit = renderedDigit(image, center);
     expect(digit.segments).toBe(active[0]);
     expect(digit.uprightBaseline).toBe(true);
