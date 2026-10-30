@@ -1,0 +1,13 @@
+gens := [(1,2,3,4),(1,2)];;
+G := Group(gens);;
+labels := StraightLineProgGens(gens);;
+H := Group(labels);;
+map := GroupGeneralMappingByImages(G,H,gens,labels);;
+S := StabChainMutable(map,rec(base:=[1,2,3,4]));;
+p := (1,3,4);;
+word := ImageSiftedBaseImage(S,OnTuples(BaseStabChain(S),p),S.idimage,OnRight)^-1;;
+Print("is_slp\t",IsStraightLineProgElm(word),"\n");
+Print("correct\t",EvalStraightLineProgElm(word)=p,"\n");
+Print("seeds\t",word![1].seeds,"\n");
+Print("lines\t",LinesOfStraightLineProgram(word![2]),"\n");
+QUIT;
