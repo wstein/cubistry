@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { bodyArtworkKey, orientBodyArtwork, sourceFaceIndex } from "./body-artwork.ts";
 import type { Construction } from "./appearance.ts";
 import { cross, demand, type Vec3 } from "@cubistry/cube-core";
 
@@ -23,6 +24,9 @@ export class PhysicalCubeScene {
   private readonly bodies = new Map<number, THREE.Group>();
   private readonly references = new Map<number, { id: number; inverse: THREE.Matrix4 }>();
   private readonly shells = new Map<number, { mesh: THREE.Mesh; stickerless: THREE.Material[] }>();
+  private readonly artwork: { surface: THREE.MeshStandardMaterial; source: THREE.MeshStandardMaterial; fallback: string }[] = [];
+  private readonly stickers: THREE.Mesh[] = [];
+  private readonly bodyVariants = new Map<string, THREE.BufferGeometry>();
   private readonly cores: THREE.Mesh[] = [];
   private readonly innerPlastic: THREE.MeshStandardMaterial;
   private readonly faceMaterials: THREE.Material[] = [];
@@ -55,21 +59,31 @@ export class PhysicalCubeScene {
       let body = this.bodies.get(s.cubie);
       if (!body) {
         body = new THREE.Group();
-        const shell = new THREE.Mesh(geometry.body, plastic);
+        const sourceFaces = printed.filter(face => face.cubie === s.cubie);
+        const key = bodyArtworkKey(sourceFaces);
+        let bodyGeometry = this.bodyVariants.get(key);
+        if (!bodyGeometry) {
+          bodyGeometry = orientBodyArtwork(geometry.body, sourceFaces);
+          this.bodyVariants.set(key, bodyGeometry);
+          if (bodyGeometry !== geometry.body) this.geometries.push(bodyGeometry);
+        }
+        const shell = new THREE.Mesh(bodyGeometry, plastic);
         shell.castShadow = shell.receiveShadow = true;
         body.add(shell);
         // Box/RoundedBox geometry groups are +X,-X,+Y,-Y,+Z,-Z. These
         // materials belong to immutable LOCAL source faces, never world axes.
         const faceMaterials: THREE.Material[] = Array(6).fill(this.innerPlastic);
         const sourceIds = Array(6).fill(null);
-        for (const face of printed.filter((face) => face.cubie === s.cubie)) {
-          const axis = face.n.findIndex(component => component !== 0);
-          const index = axis * 2 + (face.n[axis] < 0 ? 1 : 0);
+        for (const face of sourceFaces) {
+          const index = sourceFaceIndex(face.n);
           const material = plastic instanceof THREE.MeshStandardMaterial
             ? plastic.clone() : new THREE.MeshPhysicalMaterial();
           const art = materials.get(face.id);
           const fallback = art instanceof THREE.MeshStandardMaterial ? `#${art.color.getHexString()}` : "#fffdf6";
-          material.color.set(faceColors.get(face.id) ?? fallback);
+          const color = faceColors.get(face.id) ?? fallback;
+          material.color.set(color);
+          if (art instanceof THREE.MeshStandardMaterial)
+            this.artwork.push({ surface: material, source: art, fallback: color });
           faceMaterials[index] = material; sourceIds[index] = face.id;
           this.faceMaterials.push(material);
         }
@@ -108,6 +122,17 @@ export class PhysicalCubeScene {
       sticker.userData.stickerId = s.id;
       sticker.castShadow = sticker.receiveShadow = true;
       body.add(sticker);
+      this.stickers.push(sticker);
+    }
+    this.refreshArtwork();
+  }
+  /** Live screen-only formatting follows its existing source material, including
+   * image overrides during turns. Texture ownership remains with the caller. */
+  refreshArtwork(): void {
+    for (const { surface, source, fallback } of this.artwork) {
+      if (surface.map !== source.map) { surface.map = source.map; surface.needsUpdate = true; }
+      if (source.map) surface.color.copy(source.color);
+      else surface.color.set(fallback);
     }
   }
   /** Materials change in place, including during a turn; source frames stay fixed. */
@@ -117,6 +142,8 @@ export class PhysicalCubeScene {
       mesh.material = construction === "stickerless" ? stickerless : this.plastic;
     for (const core of this.cores)
       core.material = construction === "stickerless" ? this.innerPlastic : this.plastic;
+    for (const sticker of this.stickers) sticker.visible = construction === "stickered";
+    this.refreshArtwork();
   }
   sync(poses: readonly PhysicalStickerFrame[]): void {
     const byId = new Map(poses.map((s) => [s.id, s]));
@@ -154,6 +181,9 @@ export class PhysicalCubeScene {
     this.references.clear();
     this.shells.clear();
     this.cores.length = 0;
+    this.stickers.length = 0;
+    this.artwork.length = 0;
+    this.bodyVariants.clear();
     for (const material of this.faceMaterials) material.dispose();
     for (const geometry of this.geometries) geometry.dispose();
   }
