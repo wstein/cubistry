@@ -1,28 +1,28 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { PerspectiveCamera, Vector3 } from "three";
+import { PerspectiveCamera, Vector3, Group } from "three";
+import { rotatePresentation } from "../packages/cube-viewer/src/presentation-rotation.ts";
 import { clockCameraRadius, clockBounds } from "../src/apps/clock/framing.ts";
-test("shared clock camera contains turn bounds at every permitted orbit extreme", () => {
+test("stationary shared clock camera contains the rigid turn envelope at every presentation extreme", () => {
   for (const aspect of [1034 / 450, 332 / 230, 0.25, 0.5, 3])
     for (const yaw of [-Math.PI, -Math.PI / 2, -.5, 0, .5, Math.PI / 2, Math.PI])
       for (const pitch of [-Math.PI / 2 + .05, -1, -.4, .1, .4, 1, Math.PI / 2 - .05]) {
         const radius = clockCameraRadius(aspect, yaw, pitch),
           camera = new PerspectiveCamera(28, aspect, 0.1, 1000);
-        camera.position.set(
-          Math.sin(yaw) * Math.cos(pitch) * radius,
-          Math.sin(pitch) * radius,
-          Math.cos(yaw) * Math.cos(pitch) * radius,
-        );
+        const presentation = new Group();
+        rotatePresentation(presentation, yaw, pitch);
+        camera.position.set(0, 0, radius);
+        assert.equal(radius, clockCameraRadius(aspect, 0, 0));
         camera.lookAt(0, 0, 0);
         camera.updateMatrixWorld();
         for (const p of clockBounds) {
-          const q = new Vector3(...p).project(camera);
+          const q = new Vector3(...p).applyQuaternion(presentation.quaternion).project(camera);
           assert(
             Math.abs(q.x) < 0.96 && Math.abs(q.y) < 0.96 && q.z > -1 && q.z < 1,
             JSON.stringify({ aspect, yaw, pitch, p, q }),
           );
         }
-        const reported = new Vector3(3.815, -1.015, 1.015).project(camera);
+        const reported = new Vector3(3.815, -1.015, 1.015).applyQuaternion(presentation.quaternion).project(camera);
         assert(Math.abs(reported.y) < 1);
       }
 });
@@ -50,9 +50,9 @@ test("whole-group orbit reaches rear and bottom without crossing the poles and r
   assert(Math.abs(full.yaw - start.yaw) < 1e-8);
   const cubes = [{ position: [-2.8, 0, 0] }, { position: [0, 0, 0] }, { position: [2.8, 0, 0] }];
   const snapshot = structuredClone(cubes);
-  const stage = Object.assign(Object.create(ClockStage.prototype), { ...rear, zoom: 1.8, cubes });
+  const stage = Object.assign(Object.create(ClockStage.prototype), { ...rear, zoom: 1.8, cubes, presentation: new Group(), camera: new PerspectiveCamera(28, 1, .1, 1000) });
   stage.resetCamera();
-  assert.deepEqual({ yaw: stage.yaw, pitch: stage.pitch, zoom: stage.zoom }, { ...start, zoom: 1 });
+  assert.deepEqual({ yaw: stage.yaw, pitch: stage.pitch, zoom: stage.zoom }, { ...start, zoom: 1.8 });
   assert.deepEqual(cubes, snapshot);
   assert.equal(groupZoom(1, -10000), .8);
   assert.equal(groupZoom(1, 10000), 2);

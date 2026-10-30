@@ -1,5 +1,5 @@
 import { clampPitch } from "@cubistry/cube-viewer";
-/** Camera-only group orbit: bounded polar travel, unrestricted horizontal orbit.
+/** Rigid presentation rotation: bounded polar travel, unrestricted horizontal travel.
  * Wrapping yaw prevents precision loss after repeated complete revolutions. */
 export function groupOrbit(yaw: number, pitch: number, dx: number, dy: number) {
   if (![yaw, pitch, dx, dy].every(Number.isFinite)) throw Error("Invalid group orbit");

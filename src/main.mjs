@@ -253,7 +253,7 @@ try {
   );
   $("status").textContent = "3D rendering unavailable.";
 }
-// The viewer emits only actual camera movement, with a drag threshold to ignore clicks.
+// The compatibility event reports presentation or zoom changes, ignoring clicks.
 const hideHint = () => {
   $("viewer-hint").hidden = true;
 };

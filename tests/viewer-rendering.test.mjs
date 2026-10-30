@@ -17,7 +17,7 @@ function fixture(design = createDesign("picture"), state = initialState(design.p
   scene.position.set(2.8, 0, 0); stage.add(scene);
   const renderer = { dispose() { throw Error("shared renderer ownership violated"); } };
   const viewer = Object.assign(Object.create(CubeViewer.prototype), {
-    scene, renderer, shared: true, busy: false, destroyed: false,
+    scene, presentation: scene, renderer, shared: true, busy: false, destroyed: false,
     materials: [], textures: [], stickerMaterials: new Map(),
     animationSpeed: 1, durationUnit: "move",
   });

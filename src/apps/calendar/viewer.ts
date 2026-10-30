@@ -9,6 +9,7 @@ import {
   type Design,
 } from "./model.ts";
 import {
+  installPresentationDrag, rotatePresentation, cubePresentationRadius, fitPresentationCamera,
   PhysicalCubeScene, createPresentationGeometry, createPlasticMaterial,
   createStickerMaterial, configurePresentationRenderer, createPresentationStudio,
   DEFAULT_APPEARANCE, validateAppearance, installAppearanceControls, type ViewerAppearance,
@@ -17,6 +18,7 @@ import {
 export class CalendarViewer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
+  readonly presentation = new THREE.Group();
   readonly camera = new THREE.PerspectiveCamera(24, 1, 0.1, 100);
   private appearance: ViewerAppearance = DEFAULT_APPEARANCE;
   private plastic?: THREE.MeshPhysicalMaterial;
@@ -28,7 +30,7 @@ export class CalendarViewer {
   private yaw = 0.2;
   private pitch = 0.18;
   private radius = 14.1;
-  private drag: { id: number; x: number; y: number } | null = null;
+  private cancelDrag?: () => void;
   private current: State | null = null;
   private busy = false;
   duration = 100;
@@ -41,10 +43,12 @@ export class CalendarViewer {
   readonly host: HTMLElement;
   constructor(host: HTMLElement) {
     this.host = host;
+    this.presentation.name = "cube-presentation";
+    this.scene.add(this.presentation);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
-    this.studio = createPresentationStudio(this.scene, 1.5, 1.5, host);
+    this.studio = createPresentationStudio(this.scene, 1.5, 1.5, host, cubePresentationRadius(1.5));
     this.appearanceControls = installAppearanceControls(host, (value) => this.setAppearance(value));
     this.appearanceControls.setDefaultColor("#243d35");
     this.resize = new ResizeObserver(() => {
@@ -53,46 +57,22 @@ export class CalendarViewer {
       if (!w || !h) return;
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
-      this.camera.updateProjectionMatrix();
-      // Fit the entire turn/orbit envelope, including at narrow aspect ratios.
-      const halfVertical = THREE.MathUtils.degToRad(this.camera.fov / 2),
-        halfHorizontal = Math.atan(Math.tan(halfVertical) * this.camera.aspect);
-      this.radius =
-        (2.7 * 1.08) / Math.sin(Math.min(halfVertical, halfHorizontal));
+      this.radius = fitPresentationCamera(this.camera, cubePresentationRadius(1.5));
     });
     this.resize.observe(host);
     const el = this.renderer.domElement;
     el.setAttribute("role", "img");
     el.setAttribute(
       "aria-label",
-      "Physical 3 by 3 calendar cube. Drag to orbit.",
+      "Physical 3 by 3 calendar cube. Drag to rotate the cube.",
     );
-    el.addEventListener("pointerdown", (e) => {
-      this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
-      el.setPointerCapture(e.pointerId);
+    this.cancelDrag = installPresentationDrag(el, (dx, dy) => {
+      this.yaw -= dx * 0.007;
+      this.pitch = Math.max(-1.2, Math.min(1.2, this.pitch + dy * 0.007));
     });
-    el.addEventListener("pointermove", (e) => {
-      if (!this.drag || this.drag.id !== e.pointerId) return;
-      this.yaw -= (e.clientX - this.drag.x) * 0.007;
-      this.pitch = Math.max(
-        -1.2,
-        Math.min(1.2, this.pitch + (e.clientY - this.drag.y) * 0.007),
-      );
-      this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
-    });
-    const release = () => {
-      this.drag = null;
-    };
-    el.addEventListener("pointerup", release);
-    el.addEventListener("pointercancel", release);
-    el.addEventListener("lostpointercapture", release);
+    this.radius = fitPresentationCamera(this.camera, cubePresentationRadius(1.5));
     this.renderer.setAnimationLoop(() => {
-      this.camera.position.set(
-        Math.sin(this.yaw) * Math.cos(this.pitch) * this.radius,
-        Math.sin(this.pitch) * this.radius,
-        Math.cos(this.yaw) * Math.cos(this.pitch) * this.radius,
-      );
-      this.camera.lookAt(0, 0, 0);
+      rotatePresentation(this.presentation, this.yaw, this.pitch);
       this.renderer.render(this.scene, this.camera);
     });
   }
@@ -104,6 +84,8 @@ export class CalendarViewer {
   resetReferenceView(): void {
     this.yaw = 0.2;
     this.pitch = 0.18;
+    this.cancelDrag?.();
+    rotatePresentation(this.presentation, this.yaw, this.pitch);
   }
   private clear(): void {
     this.cube?.dispose();
@@ -153,7 +135,7 @@ export class CalendarViewer {
       const role = s.image.match(/^[0-9]$/) ? "day" : s.slot < 3 ? "weekday" : "month";
       materials.set(s.id, maps.get(role + ":" + s.image)!);
     }
-    this.cube = new PhysicalCubeScene(this.scene, design.printing, materials, plastic, 1,
+    this.cube = new PhysicalCubeScene(this.presentation, design.printing, materials, plastic, 1,
       createPresentationGeometry(), new Map(design.printing.map(s => [s.id, "#fffdf6"])));
     this.setAppearance(this.appearance);
     this.sync(state);

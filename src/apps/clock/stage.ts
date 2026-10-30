@@ -1,12 +1,13 @@
 import * as THREE from "three";
 import { groupOrbit, groupZoom } from "./orbit.ts";
-import { clockCameraRadius } from "./framing.ts";
-import { CubeViewer, configurePresentationRenderer, createPresentationStudio, DEFAULT_APPEARANCE, installAppearanceControls, type ViewerAppearance } from "@cubistry/cube-viewer";
+import { clockPresentationRadius } from "./framing.ts";
+import { installPresentationDrag, rotatePresentation, fitPresentationCamera, CubeViewer, configurePresentationRenderer, createPresentationStudio, DEFAULT_APPEARANCE, installAppearanceControls, type ViewerAppearance } from "@cubistry/cube-viewer";
 import { demand } from "@cubistry/cube-core";
 /** One WebGL context, scene, camera and frame loop for the entire H–M–S row. */
 export class ClockStage {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
+  readonly presentation = new THREE.Group();
   readonly camera = new THREE.PerspectiveCamera(28, 1, 0.1, 1000);
   private readonly resize: ResizeObserver;
   private appearance: ViewerAppearance = DEFAULT_APPEARANCE;
@@ -16,9 +17,11 @@ export class ClockStage {
   private pitch = 0.16;
   private radius = 12;
   private zoom = 1;
-  private drag: { id: number; x: number; y: number } | null = null;
+  private cancelDrag?: () => void;
   private cubes: CubeViewer[] = [];
   constructor(host: HTMLElement) {
+    this.presentation.name = "clock-presentation";
+    this.scene.add(this.presentation);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     configurePresentationRenderer(this.renderer);
     const el = this.renderer.domElement;
@@ -26,9 +29,9 @@ export class ClockStage {
     el.setAttribute("role", "img");
     el.setAttribute(
       "aria-label",
-      "Live H M S clock. Three physical cubes in one scene. Drag to orbit all three.",
+      "Live H M S clock. Three physical cubes in one scene. Drag to rotate the entire arrangement.",
     );
-    this.studio = createPresentationStudio(this.scene, 1, 4.3, host);
+    this.studio = createPresentationStudio(this.scene, 1, 4.3, host, clockPresentationRadius);
     this.appearanceControls = installAppearanceControls(host, (value) => {
       this.appearance = value;
       for (const cube of this.cubes) cube.setAppearance(value);
@@ -39,42 +42,20 @@ export class ClockStage {
       if (!w || !h) return;
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
-      this.camera.updateProjectionMatrix();
+      this.fitCamera();
     });
     this.resize.observe(host);
-    el.addEventListener("pointerdown", (e) => {
-      this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
-      el.setPointerCapture(e.pointerId);
+    this.cancelDrag = installPresentationDrag(el, (dx, dy) => {
+      Object.assign(this, groupOrbit(this.yaw, this.pitch, dx, dy));
     });
-    el.addEventListener("pointermove", (e) => {
-      if (!this.drag || this.drag.id !== e.pointerId) return;
-      Object.assign(this, groupOrbit(this.yaw, this.pitch,
-        e.clientX - this.drag.x, e.clientY - this.drag.y));
-      this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
-    });
-    const release = () => {
-      this.drag = null;
-    };
-    el.addEventListener("pointerup", release);
-    el.addEventListener("pointercancel", release);
-    el.addEventListener("lostpointercapture", release);
     el.addEventListener("wheel", (e) => {
       e.preventDefault();
       this.zoom = groupZoom(this.zoom, e.deltaY);
+      this.fitCamera();
     }, { passive: false });
+    this.fitCamera();
     this.renderer.setAnimationLoop(() => {
-      this.radius = clockCameraRadius(
-        this.camera.aspect,
-        this.yaw,
-        this.pitch,
-        this.camera.fov,
-      ) * this.zoom;
-      this.camera.position.set(
-        Math.sin(this.yaw) * Math.cos(this.pitch) * this.radius,
-        Math.sin(this.pitch) * this.radius,
-        Math.cos(this.yaw) * Math.cos(this.pitch) * this.radius,
-      );
-      this.camera.lookAt(0, 0, 0);
+      rotatePresentation(this.presentation, this.yaw, this.pitch);
       this.renderer.render(this.scene, this.camera);
     });
   }
@@ -88,7 +69,7 @@ export class ClockStage {
     );
     const cube = new CubeViewer(host, {
       renderer: this.renderer,
-      scene: this.scene,
+      scene: this.presentation,
       camera: this.camera,
       position: [(index - 1) * 2.8, 0, 0],
       resetCamera: () => this.resetCamera(),
@@ -101,8 +82,11 @@ export class ClockStage {
   resetCamera(): void {
     this.yaw = 0.2;
     this.pitch = 0.16;
-    this.zoom = 1;
-    this.drag = null;
+    this.cancelDrag?.();
+    rotatePresentation(this.presentation, this.yaw, this.pitch);
+  }
+  private fitCamera(): void {
+    this.radius = fitPresentationCamera(this.camera, clockPresentationRadius, this.zoom);
   }
   destroy(): void {
     demand(
