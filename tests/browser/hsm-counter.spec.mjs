@@ -66,6 +66,10 @@ test("all nine HSM variants wrap both ways within six moves and render fixed gly
     await page.selectOption("#hsm-letter", letter);
     await settled(page, 0);
     await expect(page.locator("#status")).toContainText(`${letter} · 00`);
+    await expect(page.locator("#rotation-speed")).toHaveValue(
+      { H: "2", M: "3", S: "4" }[letter],
+    );
+    await expect(page.locator("#error")).toBeEmpty();
     for (const maximum of [59, 23, 11]) {
       await page.selectOption("#hsm-range", String(maximum));
       await page.fill("#hsm-value", String(maximum));
@@ -97,7 +101,7 @@ test("HSM run stop resume, validation, mobile and existing application state rem
   await page.setViewportSize({ width: 390, height: 844 });
   await choose(page);
   await page.screenshot({ path: "test-results/hsm-mobile.png" });
-  await expect(page.locator("#rotation-speed")).toHaveValue("4");
+  await expect(page.locator("#rotation-speed")).toHaveValue("2");
   expect(
     await page.locator("html").evaluate((e) => e.scrollWidth),
   ).toBeLessThanOrEqual(390);
