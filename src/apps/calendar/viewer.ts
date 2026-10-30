@@ -14,7 +14,7 @@ import {
   createStickerMaterial, configurePresentationRenderer, createPresentationStudio,
   DEFAULT_APPEARANCE, validateAppearance, installAppearanceControls, type ViewerAppearance,
 } from "@cubistry/cube-viewer";
-/** Calendar-only 26-body viewer: one permanent texture per printed facelet. */
+/** Existing 26-body size-3 viewer; Calendar glyphs are the default artwork. */
 export class CalendarViewer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
@@ -24,6 +24,7 @@ export class CalendarViewer {
   private plastic?: THREE.MeshPhysicalMaterial;
   private appearanceControls: ReturnType<typeof installAppearanceControls>;
   private cube: PhysicalCubeScene | null = null;
+  private artworkTextures = new Map<number, THREE.CanvasTexture>();
   private studio: ReturnType<typeof createPresentationStudio>;
   private resources: { dispose(): void }[] = [];
   private resize: ResizeObserver;
@@ -92,14 +93,27 @@ export class CalendarViewer {
     this.cube = null;
     for (const r of this.resources) r.dispose();
     this.resources = [];
+    this.artworkTextures.clear();
   }
-  configure(design: Design, state: State): void {
+  configure(design: Pick<Design, "id" | "printing">, state: State, artwork?: ReadonlyMap<number, HTMLCanvasElement>): void {
     demand(!this.busy, "Cannot change the calendar print during a turn");
+    if (artwork) demand(artwork.size === design.printing.length && design.printing.every(s => artwork.has(s.id)), "Incomplete picture artwork");
     this.clear();
     this.current = state;
     const plastic = createPlasticMaterial("#243d35", 0.65);
     this.resources.push(plastic);
     this.plastic = plastic;
+    let materials = new Map<number, THREE.Material>();
+    if (artwork) {
+      for (const s of design.printing) {
+        const texture = new THREE.CanvasTexture(artwork.get(s.id)!);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const material = createStickerMaterial(texture);
+        this.artworkTextures.set(s.id, texture);
+        this.resources.push(texture, material);
+        materials.set(s.id, material);
+      }
+    } else {
     const maps = new Map<string, THREE.MeshPhysicalMaterial>();
     for (const s of design.printing) {
       const role = s.image.match(/^[0-9]$/)
@@ -130,15 +144,25 @@ export class CalendarViewer {
       this.resources.push(texture, mat);
       maps.set(key, mat);
     }
-    const materials = new Map<number, THREE.Material>();
+    materials = new Map<number, THREE.Material>();
     for (const s of design.printing) {
       const role = s.image.match(/^[0-9]$/) ? "day" : s.slot < 3 ? "weekday" : "month";
       materials.set(s.id, maps.get(role + ":" + s.image)!);
+    }
     }
     this.cube = new PhysicalCubeScene(this.presentation, design.printing, materials, plastic, 1,
       createPresentationGeometry(), new Map(design.printing.map(s => [s.id, "#fffdf6"])));
     this.setAppearance(this.appearance);
     this.sync(state);
+  }
+  /** Refresh pixels only; texture objects, source frames, and active layer pivots survive. */
+  updateArtwork(artwork: ReadonlyMap<number, HTMLCanvasElement>): void {
+    demand(this.artworkTextures.size > 0 && artwork.size === this.artworkTextures.size &&
+      [...this.artworkTextures.keys()].every(id => artwork.has(id)), "Incomplete picture artwork");
+    for (const [id, texture] of this.artworkTextures) {
+      texture.image = artwork.get(id)!;
+      texture.needsUpdate = true;
+    }
   }
   private sync(state: State): void {
     this.cube!.sync(state);
