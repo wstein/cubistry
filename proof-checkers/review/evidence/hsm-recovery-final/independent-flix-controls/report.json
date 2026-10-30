@@ -1,0 +1,171 @@
+{
+  "status": "PASS_INDEPENDENT_NATIVE_CONTROLS",
+  "checks": 8,
+  "nativeSelfTests": 10,
+  "rawRejects": 7,
+  "artifactSHA256": "dd296c1320e42ae3bd7474b67b23f2d1b14f479d1a1c13a8c62aada16435c691",
+  "canonicalRecoverySHA256": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda",
+  "canonicalModesSHA256": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae",
+  "elapsedMilliseconds": 1527.684555,
+  "results": [
+    {
+      "name": "native-self-tests",
+      "command": [
+        "java",
+        "-Xmx768m",
+        "-jar",
+        "/workspace/cubistry-hsm-recovery-flix/proof-checkers/flix-recovery/artifact/flix.jar",
+        "--self-test"
+      ],
+      "exitCode": 0,
+      "expectedExit": 0,
+      "status": "VALID",
+      "expectedStatus": "VALID",
+      "valid": true,
+      "expectedValid": true,
+      "elapsedMilliseconds": 112.064727,
+      "stdoutSHA256": "9a4f59a4c076297d8b4df4b03638d0123e62d471784216d32ca7341651844743",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "unknown-schema",
+      "command": [
+        "java",
+        "-Xmx768m",
+        "-jar",
+        "/workspace/cubistry-hsm-recovery-flix/proof-checkers/flix-recovery/artifact/flix.jar",
+        "/tmp/hsm-recovery-independent-flix-controls/unknown-schema.json",
+        "/tmp/hsm-recovery-independent-flix-controls/modes.json"
+      ],
+      "exitCode": 2,
+      "expectedExit": 2,
+      "status": "UNSUPPORTED",
+      "expectedStatus": "UNSUPPORTED",
+      "valid": false,
+      "expectedValid": false,
+      "elapsedMilliseconds": 199.64592299999998,
+      "stdoutSHA256": "5ae8b6b58e2618569919d477d8de37429c686c816475a219db548243ad1f5166",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "boolean-count",
+      "command": [
+        "java",
+        "-Xmx768m",
+        "-jar",
+        "/workspace/cubistry-hsm-recovery-flix/proof-checkers/flix-recovery/artifact/flix.jar",
+        "/tmp/hsm-recovery-independent-flix-controls/boolean-count.json",
+        "/tmp/hsm-recovery-independent-flix-controls/modes.json"
+      ],
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "INVALID",
+      "expectedStatus": "INVALID",
+      "valid": false,
+      "expectedValid": false,
+      "elapsedMilliseconds": 313.80466600000005,
+      "stdoutSHA256": "0f8561b523230382b6b4696cd0eb36a699a38c93d8685ae9d12fa15af6ed37a4",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "mean-string",
+      "command": [
+        "java",
+        "-Xmx768m",
+        "-jar",
+        "/workspace/cubistry-hsm-recovery-flix/proof-checkers/flix-recovery/artifact/flix.jar",
+        "/tmp/hsm-recovery-independent-flix-controls/mean-string.json",
+        "/tmp/hsm-recovery-independent-flix-controls/modes.json"
+      ],
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "INVALID",
+      "expectedStatus": "INVALID",
+      "valid": false,
+      "expectedValid": false,
+      "elapsedMilliseconds": 318.50830199999996,
+      "stdoutSHA256": "ef309b5f66ab0e40a4eb9577ad2bfa758dd533a91de15d50b3a05d146e223607",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wrong-print-binding",
+      "command": [
+        "java",
+        "-Xmx768m",
+        "-jar",
+        "/workspace/cubistry-hsm-recovery-flix/proof-checkers/flix-recovery/artifact/flix.jar",
+        "/tmp/hsm-recovery-independent-flix-controls/wrong-print-binding.json",
+        "/tmp/hsm-recovery-independent-flix-controls/modes.json"
+      ],
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "INVALID",
+      "expectedStatus": "INVALID",
+      "valid": false,
+      "expectedValid": false,
+      "elapsedMilliseconds": 233.020986,
+      "stdoutSHA256": "b4f55b8434d45d65ecdf238a72048283ebde72a22a58fbc986dfae40d22a9a53",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "duplicate-key",
+      "command": [
+        "java",
+        "-Xmx768m",
+        "-jar",
+        "/workspace/cubistry-hsm-recovery-flix/proof-checkers/flix-recovery/artifact/flix.jar",
+        "/tmp/hsm-recovery-independent-flix-controls/duplicate-key.json",
+        "/tmp/hsm-recovery-independent-flix-controls/modes.json"
+      ],
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "INVALID_JSON",
+      "expectedStatus": "INVALID_JSON",
+      "valid": false,
+      "expectedValid": false,
+      "elapsedMilliseconds": 123.26983700000005,
+      "stdoutSHA256": "892ddc2d2466e13c62741ebe43ee4fc9a3006cb87bb9964800b28887f6a8f86d",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "byte-order-mark",
+      "command": [
+        "java",
+        "-Xmx768m",
+        "-jar",
+        "/workspace/cubistry-hsm-recovery-flix/proof-checkers/flix-recovery/artifact/flix.jar",
+        "/tmp/hsm-recovery-independent-flix-controls/byte-order-mark.json",
+        "/tmp/hsm-recovery-independent-flix-controls/modes.json"
+      ],
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "INVALID_JSON",
+      "expectedStatus": "INVALID_JSON",
+      "valid": false,
+      "expectedValid": false,
+      "elapsedMilliseconds": 131.46091,
+      "stdoutSHA256": "9e9124f822a85ea2cc3663868e64fcd9ba38d33e1e5d54cc5ed07290c0b091fc",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "invalid-utf8",
+      "command": [
+        "java",
+        "-Xmx768m",
+        "-jar",
+        "/workspace/cubistry-hsm-recovery-flix/proof-checkers/flix-recovery/artifact/flix.jar",
+        "/tmp/hsm-recovery-independent-flix-controls/invalid-utf8.json",
+        "/tmp/hsm-recovery-independent-flix-controls/modes.json"
+      ],
+      "exitCode": 1,
+      "expectedExit": 1,
+      "status": "INVALID_JSON",
+      "expectedStatus": "INVALID_JSON",
+      "valid": false,
+      "expectedValid": false,
+      "elapsedMilliseconds": 88.81417699999997,
+      "stdoutSHA256": "5f2ff45dbb29637771d40728b92ee589ef3c5d48602b2e3ea26c5539d4d96e85",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

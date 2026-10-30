@@ -1,0 +1,33 @@
+{
+  "status": "PASS_INDEPENDENT_NATIVE_OUTPUT_AND_SOURCE_DATA_AUDIT",
+  "byteIdentical": true,
+  "bytes": 9756,
+  "resultSHA256": "0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70",
+  "modes": 18,
+  "recoveryInputSHA256": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda",
+  "modesInputSHA256": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae",
+  "juliaReviewedSourcesMatched": 7,
+  "flixCompilerSourcesMatched": 7,
+  "flixArtifactSHA256": "dd296c1320e42ae3bd7474b67b23f2d1b14f479d1a1c13a8c62aada16435c691",
+  "claims": {
+    "recoveryReturnOntoPeriod": "VERIFIED",
+    "globalPrintOptimality": "UNKNOWN",
+    "runtimeReachabilityOfForcedPoses": "NOT_CHECKED",
+    "minimumMeanPeriodCertificates": "NOT_CHECKED"
+  },
+  "actualJuliaRawFilesMatched": true,
+  "flixAuthorControls": {
+    "count": 39,
+    "allPassed": true
+  },
+  "juliaAuthorRawControls": {
+    "count": 8,
+    "allPassed": true
+  },
+  "flixAuthorLegacy195": {
+    "valid": true,
+    "counterCases": 41,
+    "geometryCases": 154,
+    "manifestSHA256": "c0d0fa2fc6d692c7c89e436fe5a2670503d8a8a6c86a2cc0d1397be983832e01"
+  }
+}

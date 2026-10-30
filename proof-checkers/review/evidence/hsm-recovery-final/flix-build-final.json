@@ -1,0 +1,22 @@
+{
+  "command": [
+    "./flixw",
+    "build-fatjar",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 11.039946592994966,
+  "artifactSHA256": "dd296c1320e42ae3bd7474b67b23f2d1b14f479d1a1c13a8c62aada16435c691",
+  "artifactBytes": 1661171,
+  "parserSHA256": "2d30c375cddea9657a1e1ef97547a2694b663b355facb4de53a097782b312d1a",
+  "sourceSHA256": {
+    "proof-checkers/flix/src/Conformance.flix": "89f69390edb1846559a33f90ad41234262349e9eb27bbc665cc224b5906b6336",
+    "proof-checkers/flix/src/Counter.flix": "7406ecb3aee977fbfdffedab2fbfb7b098e359d797ec718143b009b023f3ae81",
+    "proof-checkers/flix/src/Geometry.flix": "3d68686ec1285425e522cf7b959b99830fa82554814403e3a81468fca0824f59",
+    "proof-checkers/flix/src/Hsm.flix": "bb84de108a7eb942c9154f77f1eb15f4ae2ce5ff9aa1e231481ad0a9ddb00816",
+    "proof-checkers/flix/src/JsonRead.flix": "e087082a4cdf6881c7bce2500b8668dce4295415dbdd1ca08880e5f59c0a356d",
+    "proof-checkers/flix/src/Lifecycle.flix": "41208965e193797400bb20d2902d48333c6ac9b8617f83db6fb688e70beeaa01",
+    "proof-checkers/flix-recovery/src/RecoveryMain.flix": "1dd0ea4cfb8347661fefbf84c09916847091d21e78486bdf48517400ebb6d21f"
+  },
+  "sourceHashBoundary": "actual copied compiler inputs, checked before and after compilation against unchanged origins"
+}
