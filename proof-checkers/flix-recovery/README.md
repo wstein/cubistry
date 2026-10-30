@@ -8,6 +8,9 @@ both the parsed input and its digest. Build hashes describe the actual copied
 compiler inputs, checked before and after compilation against unchanged origins. It shares only the existing native Flix HSM model/parser.
 It does not invoke the Julia checker or any Python proof verifier.
 
+Follow the [existing build setup](../flix/README.md#build-and-run), including its
+managed-proxy guidance when dependencies are not already cached.
+
 The standalone build copies the old Flix sources except `Main.flix` into an
 ignored build directory and adds `src/RecoveryMain.flix`. The old sources,
 dispatch and artifact remain unchanged. It uses the existing wstein/flixw
@@ -50,3 +53,39 @@ Global print optimality remains `UNKNOWN`; runtime reachability of forced poses
 and minimum-mean period certificates remain `NOT_CHECKED`. Confirmation still
 requires independent Julia acceptance and final review under the
 [authority rules](../AUTHORITY.md).
+
+## Validation record
+
+At mathematical source commit `ac1b6bf`, the native Flix checker accepted the two
+frozen raw inputs across all 18 graphs and replayed 264 samples with 1,061 forward
+steps and per-edge inverses. Its complete output matched the independently
+computed Julia output byte for byte: SHA-256
+`0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70`.
+Final independent review remains pending; this record does not promote readiness.
+
+The measured complete Flix process took 110.35 seconds and peaked at 1,311,372 KiB
+RSS with Java 21 and `-Xmx1536m` on the shared worker. Build time was recorded
+separately. These are execution observations, not a language benchmark.
+
+Ten native small-graph/decimal controls and 39 raw-input controls passed. The raw
+controls reject 37 concrete structural, graph, histogram, metric and replay
+mutations; they accept an informational-label change and an exactly equivalent
+scientific-notation mean as partial computations. Reproduce them with:
+
+```sh
+python3 proof-checkers/flix-recovery/tests/controls.py --output /tmp/NEW-recovery-controls
+python3 proof-checkers/flix-recovery/tests/audit_hsm_data.py
+```
+
+An isolated build of the unchanged old checker passed native 195-case conformance
+and retained `UNSUPPORTED` for its original recovery command. The 46-case HSM
+corpus received a hash/count audit only, as its code and inputs are unchanged;
+its full mathematical conformance command was not repeated for this additive
+entrypoint. All 301 protected files matched the baseline checkout.
+
+The coordinator retains the complete raw controls, build/source/tool hashes,
+stdout/stderr, exits, timing and process resource captures for later evidence
+publication. Two static provenance findings were corrected before the final
+artifact: parsing and hashing now bind one input read, and build records hash the
+actual copied compiler inputs. Both fixes were independently reviewed; the full
+control suite and proof ran on the corrected artifact.
