@@ -67,6 +67,7 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   reset.addEventListener("click", () => update({ ...value, frameColor: null }));
   refresh(); change(value);
   return {
+    panel,
     setDefaultColor(color: string) { defaultColor = color; refresh(); },
     dispose() { panel.remove(); host.style.position = previousPosition; },
   };
