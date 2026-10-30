@@ -49,7 +49,7 @@ def mark_preview(text,number,sha):
     head=boundaries.get('head')
     if head and head[0]>body_start:raise ValueError('Misordered document boundaries')
     marker='<meta name="robots" content="noindex,nofollow">'
-    banner=f'<aside style="padding:12px;background:#fff0b3;color:#222">PR #{number} — non-production preview · {html.escape(sha[:12])}</aside>'
+    banner=f'<aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #{number} — non-production preview · {html.escape(sha[:12])}</aside>'
     insertions=[(head[1] if head else body_start,marker),(body_end,banner)]
     for offset,value in sorted(insertions,reverse=True):text=text[:offset]+value+text[offset:]
     return text

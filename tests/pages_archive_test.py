@@ -14,7 +14,7 @@ class StaticArchiveTests(unittest.TestCase):
   return p
  def test_noindex_and_preview_banner(self):
   p=self.archive([('index.html','<html><head></head><body>site</body></html>'),('assets/a.js','safe static text')]);E.extract(p,self.root/'out',52,'a'*40)
-  text=(self.root/'out/index.html').read_text();self.assertIn('noindex,nofollow',text);self.assertIn('PR #52',text);self.assertEqual((self.root/'out/assets/a.js').read_text(),'safe static text')
+  text=(self.root/'out/index.html').read_text();self.assertIn('noindex,nofollow',text);self.assertIn('Cubistry PR preview · PR #52 — non-production preview · '+('a'*12),text);self.assertEqual((self.root/'out/assets/a.js').read_text(),'safe static text')
  def test_valid_implicit_head_gets_noindex(self):
   p=self.archive([('index.html','<!doctype html><html><meta charset="utf-8"><body>valid implicit head</body></html>')]);E.extract(p,self.root/'implicit',52,'a'*40)
   self.assertIn('noindex,nofollow',(self.root/'implicit/index.html').read_text())

@@ -26,7 +26,7 @@ for (const number of [52, 53])
       "noindex,nofollow",
     );
     await expect(
-      page.getByText(`PR #${number} — non-production preview`, {
+      page.getByText(`Cubistry PR preview · PR #${number} — non-production preview`, {
         exact: false,
       }),
     ).toBeVisible();
