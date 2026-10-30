@@ -308,7 +308,7 @@ test("destroying a shared cube preserves the caller-owned canvas and other cube"
         second.presentedState,
         applyMove(state, parseMove("R")),
       ),
-      roots: stage.scene.children.filter((o) => o.type === "Group").length,
+      roots: stage.presentation.children.filter((o) => o.type === "Group").length,
     };
     stage.destroy();
     assets.dispose();

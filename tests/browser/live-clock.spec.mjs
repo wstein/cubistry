@@ -58,7 +58,7 @@ test("live H M S clock initializes from one local instant with real blanks and i
   expect(
     await page.evaluate(async () => {
       const { clockUnits, clockStage } = await import("/src/clock.mjs");
-      const cubes = clockStage.scene.children.filter((o) => o.type === "Group");
+      const cubes = clockStage.presentation.children.filter((o) => o.type === "Group");
       return {
         roots: cubes.length,
         positions: cubes.map((c) => c.position.x),
@@ -69,7 +69,7 @@ test("live H M S clock initializes from one local instant with real blanks and i
           (u) => u.controller.view.camera === clockStage.camera,
         ),
         groups: clockUnits.every(
-          (u) => u.controller.view.scene.parent === clockStage.scene,
+          (u) => u.controller.view.scene.parent === clockStage.presentation,
         ),
         bodies: cubes.map((c) => c.children.length),
       };
@@ -87,7 +87,7 @@ test("live H M S clock initializes from one local instant with real blanks and i
     box = await canvas.boundingBox();
   const before = await page.evaluate(async () => {
     const { clockStage } = await import("/src/clock.mjs");
-    return clockStage.camera.position.toArray();
+    return { camera: clockStage.camera.position.toArray(), presentation: clockStage.presentation.quaternion.toArray() };
   });
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
@@ -97,9 +97,13 @@ test("live H M S clock initializes from one local instant with real blanks and i
   expect(
     await page.evaluate(async () => {
       const { clockStage } = await import("/src/clock.mjs");
-      return clockStage.camera.position.toArray();
+      return clockStage.presentation.quaternion.toArray();
     }),
-  ).not.toEqual(before);
+  ).not.toEqual(before.presentation);
+  expect(await page.evaluate(async () => {
+    const { clockStage } = await import("/src/clock.mjs");
+    return clockStage.camera.position.toArray();
+  })).toEqual(before.camera);
   expect((await physical(page)).every((u) => u.valid)).toBe(true);
   await page.screenshot({
     path: "test-results/live-clock-shared-desktop.png",
@@ -357,7 +361,7 @@ test.describe("high-density shared clock viewport", () => {
       const points = await page.evaluate(async () => {
         const { clockStage } = await import("/src/clock.mjs");
         clockStage.camera.updateMatrixWorld();
-        return clockStage.scene.children
+        return clockStage.presentation.children
           .filter((o) => o.type === "Group")
           .flatMap((root) =>
             [-1.1, 1.1].flatMap((x) =>
@@ -366,7 +370,7 @@ test.describe("high-density shared clock viewport", () => {
                   root.position
                     .clone()
                     .set(x, y, z)
-                    .add(root.position)
+                    .applyMatrix4(root.matrixWorld)
                     .project(clockStage.camera)
                     .toArray(),
                 ),
