@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Lossless process capture only; no certificate verification or solver logic."""
-import argparse, hashlib, json, subprocess, time
+import argparse, hashlib, json, resource, subprocess, time
 from pathlib import Path
 
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -10,8 +10,11 @@ def main():
     a.output.mkdir(parents=True,exist_ok=False)
     start=time.perf_counter_ns()
     with (a.output/'stdout.txt').open('wb') as out, (a.output/'stderr.txt').open('wb') as err:
-        result=subprocess.run(['/usr/bin/time','-v','-o',str(a.output/'resources.txt'),'--',*command],stdout=out,stderr=err)
+        result=subprocess.run(command,stdout=out,stderr=err)
     elapsed=time.perf_counter_ns()-start
+    usage=resource.getrusage(resource.RUSAGE_CHILDREN)
+    resources={name:getattr(usage,name) for name in dir(usage) if name.startswith("ru_")}
+    (a.output/"resources.json").write_text(json.dumps(resources,indent=2)+"\n")
     root=Path.cwd(); paths=[root/'proof-checkers/flix-recovery/artifact/flix.jar',*sorted((root/'proof-checkers/flix-recovery/src').glob('*.flix'))]
     paths += [root/'proof-checkers/conformance-hsm/cases'/n for n in ('recovery-unsupported.json','modes.json')]
     record={'command':command,'cwd':str(root),'exitCode':result.returncode,'elapsedNanoseconds':elapsed,'sha256':{str(p.relative_to(root)):sha(p) for p in paths},'stdoutSHA256':sha(a.output/'stdout.txt'),'stderrSHA256':sha(a.output/'stderr.txt')}
