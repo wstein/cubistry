@@ -5,7 +5,7 @@ seconds) seconds-first witnesses. It is **not** part of the frozen issue-74 cont
 [SPEC.md](SPEC.md): `SPEC.md`, [INTERFACE.md](INTERFACE.md), [coverage.json](coverage.json),
 `conformance/manifest.json`, `conformance-pin.json` and the 195 existing cases are unchanged.
 Everything specific to this profile is in this file, in `flix/src/Hsm.flix`,
-`julia/Hsm.jl`, `conformance-hsm/` and `tools/build_hsm_corpus.py`.
+`julia/Hsm.jl`, `conformance-hsm/` and `tools/build_hsm_corpus.jl`.
 
 Authority is the one of [AUTHORITY.md](AUTHORITY.md): a witness counts as CONFIRMED for the
 claims listed under [Verified claims](#verified-claims) only when **both** checkers accept the
@@ -181,8 +181,8 @@ printed line. The manifest itself is pinned in the source of both checkers
 case produces its recorded verdict and digest.
 
 The expected verdicts were **produced by the checkers**, not by Python:
-`tools/build_hsm_corpus.py generate` derives the files by plain JSON edits and
-`tools/build_hsm_corpus.py pin` runs `hsm FILE` in Flix and in Julia for every case and writes
+`tools/build_hsm_corpus.jl generate` derives the files by plain JSON edits and
+`tools/build_hsm_corpus.jl pin` runs `hsm FILE` in Flix and in Julia for every case and writes
 the manifest only if both agree on accept/reject, status word and result digest (otherwise
 it prints the dissent and writes nothing: `UNKNOWN`).
 
