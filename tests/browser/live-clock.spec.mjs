@@ -39,9 +39,9 @@ test("live H M S clock initializes from one local instant with real blanks and i
   await expect(page.locator("#clock-digital")).toHaveText("12:34:56");
   await expect(page.locator("#clock-zone")).toHaveText("Europe/Berlin");
   for (const [name, value, speed] of [
-    ["hours", 12, "250"],
-    ["minutes", 34, "100"],
-    ["seconds", 56, "50"],
+    ["hours", 12, "500"],
+    ["minutes", 34, "250"],
+    ["seconds", 56, "100"],
   ]) {
     await expect(page.locator("#clock-" + name)).toHaveAttribute(
       "data-value",
