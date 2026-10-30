@@ -18,7 +18,7 @@ test("stickerless colors belong to immutable local face IDs through canonical lo
     [calendar.printing, apply(calendar.printing, "R U2 F' x"), 1],
   ]) {
     const parent = new THREE.Group(), plastic = new THREE.MeshPhysicalMaterial({ color: "#202329" });
-    const texture = new THREE.Texture(), art = new THREE.MeshStandardMaterial({ map: texture });
+    const art = new THREE.MeshStandardMaterial();
     const colors = new Map(source.map(s => [s.id, `#${((s.id + 1) * 65537).toString(16).padStart(6, "0")}`]));
     const scene = new PhysicalCubeScene(parent, source, new Map(source.map(s => [s.id, art])), plastic,
       spacing, createPresentationGeometry(), colors);
@@ -30,7 +30,7 @@ test("stickerless colors belong to immutable local face IDs through canonical lo
       let faceCount = 0, stickerCount = 0;
       parent.traverse(object => {
         if (object.userData.stickerId !== undefined) {
-          stickerCount++; assert.equal(object.material.map, texture); assert.equal(object.visible, true);
+          stickerCount++; assert.equal(object.material, art); assert.equal(object.visible, false);
         }
         const ids = object.userData.sourceFaceStickerIds;
         if (!ids) return;
@@ -58,7 +58,7 @@ test("stickerless colors belong to immutable local face IDs through canonical lo
     assert.equal(JSON.stringify({ source, target }), snapshot);
     let disposed = 0; for (const material of clones) material.addEventListener("dispose", () => disposed++);
     scene.dispose(); assert.equal(disposed, clones.size);
-    plastic.dispose(); art.dispose(); texture.dispose();
+    plastic.dispose(); art.dispose();
   }
 });
 test("face colors use explicit metadata and image-backed art is never sampled or erased", () => {

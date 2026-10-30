@@ -254,6 +254,7 @@ export class CubeViewer {
         material.needsUpdate = true;
       }
     }
+    this.cube?.refreshArtwork();
   }
   get presentedState(): CubeState | null {
     return this.presented;
