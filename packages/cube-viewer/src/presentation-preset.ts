@@ -15,6 +15,8 @@ export const PRESENTATION_PRESET = Object.freeze({
   stickerOffset: 0.502,
   maxPixelRatio: 2,
   shadowMapSize: 1024,
+  shadowSoftness: 0.1,
+  shadowOpacity: 0.28,
   plasticClearcoat: 0.18,
   stickerClearcoat: 0.12,
   ambientIntensity: 0.45,
@@ -73,7 +75,7 @@ export function configurePresentationRenderer(renderer: THREE.WebGLRenderer): vo
   renderer.shadowMap.type = THREE.PCFShadowMap;
 }
 /** Called once by the owner of a scene, including a shared multi-cube viewport. */
-export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadowExtent = 4) {
+export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadowExtent = 4, softness = PRESENTATION_PRESET.shadowSoftness) {
   const p = PRESENTATION_PRESET;
   const lights: THREE.Light[] = [];
   const ambient = new THREE.AmbientLight(0xffffff, p.ambientIntensity);
@@ -97,7 +99,10 @@ export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadow
       light.shadow.camera.updateProjectionMatrix();
       light.shadow.bias = -0.0002;
       light.shadow.normalBias = 0.01;
-      light.shadow.radius = 4;
+      // Fixed 17-tap PCF work, broader world-space penumbra. Convert to
+      // texels so the single-cube and three-cube rigs have equal softness.
+      light.shadow.radius = Math.max(2, Math.min(24,
+        softness * p.shadowMapSize / (2 * shadowExtent)));
     }
     scene.add(light); lights.push(light);
   }

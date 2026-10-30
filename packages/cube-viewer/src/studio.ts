@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { addPresentationLighting } from "./presentation-preset.ts";
+import { addPresentationLighting, PRESENTATION_PRESET } from "./presentation-preset.ts";
 
 export const STUDIO_BACKGROUND =
   "radial-gradient(ellipse at 48% 28%, #fffdf7 0%, transparent 65%), " +
@@ -13,10 +13,13 @@ export function createPresentationStudio(
   horizontalExtent = halfCubeExtent,
   host?: HTMLElement,
 ) {
-  const lights = addPresentationLighting(scene, Math.max(halfCubeExtent, horizontalExtent) * 1.7 + 1);
+  const lights = addPresentationLighting(scene, Math.max(halfCubeExtent, horizontalExtent) * 1.7 + 1,
+    PRESENTATION_PRESET.shadowSoftness * halfCubeExtent);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),
-    new THREE.MeshStandardMaterial({ color: "#e4d8c7", roughness: 1,
-      transparent: true, opacity: 0.76, depthWrite: false, side: THREE.FrontSide }));
+    // ShadowMaterial is transparent outside actual geometric occlusion. A
+    // uniformly tinted plane would create a horizon against the CSS gradient.
+    new THREE.ShadowMaterial({ color: "#302b26", opacity: PRESENTATION_PRESET.shadowOpacity,
+      depthWrite: false, side: THREE.FrontSide }));
   floor.name = "studio-shadow-receiver";
   floor.rotation.x = -Math.PI / 2;
   // Conservative face-turn sweep. The floor never intersects a moving layer.
