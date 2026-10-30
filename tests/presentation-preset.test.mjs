@@ -31,7 +31,7 @@ test("presentation geometry fits existing turn envelopes with bounded triangles 
   assert(triangles(body) * 26 + triangles(sticker) * 54 < 18000);
   body.dispose(); sticker.dispose();
 });
-test("rounded stickers retain uncropped square image coordinates and physical print-up", () => {
+test("rounded stickers retain the original affine UV frame and physical print-up", () => {
   const { body, sticker } = createPresentationGeometry();
   const positions = sticker.getAttribute("position"), uv = sticker.getAttribute("uv");
   let minU = 1, maxU = 0, minV = 1, maxV = 0;
