@@ -1,10 +1,10 @@
 Test Summary:                                 | Pass  Total  Time
 Executable protocol rejects malformed records |   14     14  0.4s
 Test Summary:                       | Pass  Total  Time
-Native profile and move conventions |  308    308  3.5s
+Native profile and move conventions |  308    308  3.2s
 source-sha256	da9aa1c3a45042c8d537fac621ae426c70ba21fb4fb053a97696d0786e815c50
 endpoint-sha256	eeaa1c5fca38d4c97cc85ece405ab32b96647803459206a33aa3283c259322f7
 metrics	48	50	0	0	48
 status	VALID_EXECUTABLE_TRANSITION	218	294	49
 Test Summary:                             | Pass  Total  Time
-Finite transition and semantic corruption |    5      5  2.6s
+Finite transition and semantic corruption |    5      5  2.9s

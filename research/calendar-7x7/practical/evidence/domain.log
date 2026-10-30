@@ -1,0 +1,14 @@
+classification	EXPERIMENT_ONLY_NOT_MOVE_COUNTS
+months	888
+unique-artwork-boards	91
+chronological-edges	887
+december-january-edges	73
+leap-february-march-edges	18
+same-date-grid-edges	56
+changed-artwork-cells-min	6
+changed-artwork-cells-median	36.0
+changed-artwork-cells-p90	40.0
+changed-artwork-cells-p95	41.0
+changed-artwork-cells-p99	41.0
+changed-artwork-cells-max	41
+transitions-sha256	efb14f2cc254149a5948b3497bd0bc3cf0be8d0f2cd2968a6698b038a662618e

@@ -1,0 +1,13 @@
+catalog orbit=1 count=1008
+catalog orbit=2 count=4048
+catalog orbit=3 count=4048
+orbit=1 matched=3/4 added_htm=9
+orbit=1 matched=4/4 added_htm=12
+orbit=2 matched=7/8 added_htm=8
+orbit=2 matched=8/8 added_htm=10
+orbit=3 matched=7/8 added_htm=9
+orbit=3 matched=8/8 added_htm=10
+Benchmark seconds: load=0.977801124 catalog=0.771438051 solve=0.615344891
+EXPERIMENTAL candidate: source=38 destination=2029-3; quarter-turns=60; HTM=57
+Candidate endpoint SHA256=d5c23c663f3c24d41729d747603986fa75a75c042ae9805a3f089f9f46bd718e
+UNKNOWN until independent Julia and Flix raw-input replay accept this finite word.

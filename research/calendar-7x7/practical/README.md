@@ -84,6 +84,29 @@ R1 delivers concrete transitions and reproducible evidence. R2 investigates all
 the worst edge and state selection across the sequence. Follow-up PRs should
 depend only on the evidence or code they actually use.
 
-**Current status: UNKNOWN.** No executable transition or move-target attainment
-is claimed until both native replay receipts are saved. No browser E2E, merge,
-deployment or release is part of this work.
+**Scoped SAT:** February → March 2026 has a concrete **48-HTM / 50-QTM** word,
+with zero whole-cube rotations, independently accepted by native Julia and
+native Flix. Both agree on all 294 stickers' complete endpoint hash. This
+achieves even the ambitious target for this one favorable transition. The
+887-edge chronological problem and global optimality remain **UNKNOWN**.
+
+Two further selected transitions are also confirmed at **57** and **62 HTM**.
+See [results and limitations](RESULTS.md) for the three verified cases,
+statistics and the roadmap. The independent review is recorded separately;
+this PR stays Draft for owner research acceptance.
+
+## Reproduce
+
+From the repository root, with Julia 1.13.3, Java 21 and the pinned Flix 0.79.0:
+
+```sh
+JULIA_BIN=julia bash research/calendar-7x7/practical/reproduce.sh
+```
+
+The driver writes to a new temporary directory by default. It regenerates and
+byte-compares the selected candidate words, tests all 9,104 macro actions,
+runs Julia's protocol/profile/semantic tests and Flix's independent tests,
+then compares native source/endpoint digests and all five move metrics. It
+also regenerates the complete artwork-difference survey. Set
+`CALENDAR7_RESULTS_DIR` and `CALENDAR7_FLIX_BUILD_DIR` to choose other temporary
+locations. No browser E2E, merge, deployment or release is part of this work.

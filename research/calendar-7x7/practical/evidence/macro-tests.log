@@ -1,0 +1,7 @@
+catalog orbit=1 count=1008
+catalog orbit=2 count=4048
+catalog orbit=3 count=4048
+Test Summary:                    | Pass  Total  Time
+Candidate sequence normalization |    7      7  1.7s
+Test Summary:                                                 |  Pass  Total  Time
+All generated macros have exactly their recorded legal action | 27314  27314  2.3s
