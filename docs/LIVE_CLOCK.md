@@ -1,7 +1,8 @@
 # Live H–M–S clock
 
 The separate [clock page](../clock.html) implements #62 using three independent
-copies of the corrected HSM print from #61. Hours use 00–23; minutes and seconds
+copies of the seconds-first HSM print (see [HSM counter](HSM_COUNTER.md), which also
+lists the changed stickers and the reprint decision). Hours use 00–23; minutes and seconds
 use 00–59. Each unit keeps its own full physical state, assets, animation speed,
 and immutable H/M/S label. The upper-left stickers are genuinely blank.
 
@@ -35,6 +36,13 @@ fullscreen when supported. **Reference view** restores the camera without
 changing the displayed value, print, date or active motion.
 
 ## Predictive playback
+
+Each cube starts on its saved counting period: at load it installs the period pose
+for the current local value (hours 00–23, minutes and seconds 00–59), so the clock
+counts along the pinned routes (seconds 159 HTM per lap, minutes 204, hours 82 on
+average) rather than along routes planned from scratch. Catch-up after a suspended
+tab or wall-clock jump still replans from the actual pose with the exact planner
+(at most six HTM) and may leave the period until the page reloads.
 
 The scheduler prepares shortest HTM routes only from committed, idle full poses.
 For a route, angular work is `Q = sum(abs(move.turns))`: a quarter turn contributes
@@ -103,6 +111,10 @@ HSM routes consist of outer-face moves only, so that column stays at zero.
   and are not stored in the browser. Presentation mode hides the block, like the
   per-cube status lines.
 - Only exact figures are shown, no estimates; the average is rounded for display.
+- On the seconds-first print the seconds cube averages 2.65 HTM per tick (159 per
+  lap) from a fresh start; the previous print averaged 4.49 over its first three
+  laps (808 HTM per 180 ticks, simulated through the same scheduler and these
+  statistics in `tests/hsm-seconds-first.test.mjs`).
 
 ## Verification
 
@@ -111,7 +123,7 @@ npm run check
 npm run test:e2e -- tests/browser/live-clock.spec.mjs
 ```
 
-Node regressions cover the shared midnight endpoint, DST changes and fractional
+Node regressions cover (with the HSM suite in `tests/hsm-seconds-first.test.mjs`) the shared midnight endpoint, DST changes and fractional
 time-zone offsets, wall-clock jumps, bounded suspended-tab catch-up, exact-pose
 preparation, current-value setup, and contiguous weighted timing on every physical move, slot fitting, and minimum-duration recovery.
 Browser regressions measure real mixed quarter/half turns and check that no turn

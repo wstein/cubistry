@@ -1,7 +1,7 @@
 # H/S/M counter
 
-The separate **H/S/M Counter 00–59** application uses the corrected real-blank
-print from the Research investigation. Choose the unit once per cube, then use
+The separate **H/S/M Counter 00–59** application uses the seconds-first print
+from the Research investigation. Choose the unit once per cube, then use
 Set, single steps, Reset, or Run/Stop. Counting can run up or down over 00–59,
 00–23, or 00–11, with leading zeros and wrap enabled. The default rotation speed
 is 100 ms per HTM move. Run requests one step per second while settled; slow
@@ -12,45 +12,129 @@ the upper-right slot. The upper-left sticker is genuinely unprinted. The print s
 immutable during counting. Changing the unit explicitly sets up a new 00
 display; it is not a counted number transition.
 
+## Physical reprint required
+
+> **Owner decision.** The seconds-first print replaces the print that earlier H/S/M
+> sticker sheets used. **Stickers printed from the earlier sheets no longer match:
+> 14 of the 24 sticker identities changed.** Ten identities (0, 5, 7, 11, 13, 16,
+> 20, 21, 22 and 23) are unchanged; do not mix old and new stickers on one cube.
+> A cube already assembled from the old sheets keeps the old print and needs
+> the old application behavior; the application now installs only the new print.
+> Whether to reprint the physical stickers is the owner's decision.
+
+| Id | Corner | Normal | Previous print | Seconds-first print |
+| ---: | ---: | --- | --- | --- |
+| 1 | 0 | (0, −1, 0) | tens 1 | tens 2 |
+| 2 | 0 | (0, 0, −1) | tens 2 | tens 4 |
+| 3 | 1 | (−1, 0, 0) | tens 3 | tens 1 |
+| 4 | 1 | (0, −1, 0) | tens 4 | tens 3 |
+| 6 | 2 | (−1, 0, 0) | units 0 | units 3 |
+| 8 | 2 | (0, 0, −1) | units 2 | units 9 |
+| 9 | 3 | (−1, 0, 0) | units 3 | units 8 |
+| 10 | 3 | (0, 1, 0) | units 4 | **S** |
+| 12 | 4 | (1, 0, 0) | units 6 | units 2 |
+| 14 | 4 | (0, 0, −1) | units 8 | **S** |
+| 15 | 5 | (1, 0, 0) | units 9 | units 4 |
+| 17 | 5 | (0, 0, 1) | units 9 | units 6 |
+| 18 | 6 | (1, 0, 0) | H | S |
+| 19 | 6 | (0, 1, 0) | S | H |
+
+The print code, one triple per corner (stickers on its x, y and z faces), is
+`T0 T2 T4 | T1 T3 T5 | U3 U1 U9 | U8 S U5 | U2 U7 S | U4 U0 U6 | S H M | _ _ _`.
+It has one fully blank corner, six single tens glyphs, ten single units glyphs
+(the duplicate units 0 and 9 are gone) and **three S stickers** on three corners.
+Because a face turn can bring another S corner into the upper-right cell while
+the units cell changes, twelve of the sixty seconds steps cost a single HTM. The
+ids 10 and 14 change their glyph slot and up vector with the new S. Every
+sticker glyph is existing artwork: only the assignment of glyph to sticker
+identity changed, so no new glyph SVG exists. The word variant (`hour`, `min`,
+`sec`) follows the same identities.
+
 ## Proof and implementation boundary
 
 The exact print and runtime digest are pinned in [hsm-source.json](../hsm-source.json).
-The corrected [physical proof](https://github.com/wstein/cubistry/blob/8e9ad5c05e93efa2b1f841590f725416abf226f4/research/hsm-counter/blank/REVIEW.md)
-and all solver results remain on `research/cube-display-feasibility`.
+The pin names the research branch `research/hsm-seconds-first`, commit
+`24240a3b2dbd691de99d5bf1170b5695fc62a320`, and the SHA-256 of the witness and of its
+README, verification and manifest files. A verbatim copy of the witness lives at
+[data/hsm/seconds-first/witness.json](../data/hsm/seconds-first/witness.json);
+`node scripts/derive-hsm-runtime.mjs` derives the runtime file
+[public/hsm-counter.v2.json](../public/hsm-counter.v2.json) from it (`--check`
+fails when the file or its pin is stale). The file name is kept because the
+calendar print manifests pin the print input adapter by hash; its schema version
+is 3, and the digest pin makes a stale cached copy fail loudly instead of
+loading a mismatched print.
 
-The earlier three-corner print allowed an arbitrary upper-left glyph. That was
-not the user's intended blank, so its universal five-move result does not carry
-over. The corrected print has one corner with three unprinted faces, two tens
-corners, four units corners, and one H/S/M corner. Every target now includes all
-four visible stickers; no screen mask or image override hides an extra digit.
+> **Review status.** The research branch is not merged and the independent review
+> of the seconds-first proof is pending. The application consumes the pinned
+> witness; it does not claim the research result is confirmed. The previous pin
+> (`blank/witness.json`, SHA-256 `13eea2a1…`, review commit `8e9ad5c0…`) is retained
+> in `hsm-source.json` under `supersedes`. Print optimality remains UNKNOWN; the
+> research README states what is proved and what is best-found.
 
-The general guarantee is **at most six HTM** from a settled legal pose whose
-blank and upright unit are already in their required front slots.
-The independent four-corner graph covers 136,080 states with all three blank
-orientations allowed. A real blank/H/00 to blank/H/34 example requires exactly
-six moves. The user explicitly accepted this corrected general bound.
+The general guarantee is unchanged: **at most six HTM** from a settled legal pose
+whose blank and upright unit are already in their required front slots, over the
+independent four-corner graph of 136,080 states. A blank/H/00 to blank/H/34 jump
+still needs exactly six moves on the new print. The user explicitly accepted
+this general bound.
 
-All 18 exact canonical counting runs separately have full-state preperiods and
-periods with at most five HTM over 8,292 independently replayed edges. That
-stronger statement depends on the recorded starting pose and policy. It does
-not automatically cover Run after arbitrary Set, Reset to a different 00 pose,
-or range/direction changes. The runtime retains physical continuity and uses
-the honest six-move general ceiling for those states rather than teleporting
-to a canonical pose. If a changed target interrupts a route after one turn,
-the blank or unit may no longer be in those slots. That intermediate source uses
-the same exact graph through `planFromPose`, without extending the settled
-six-move assertion. See [target interruption](TARGET_INTERRUPTION.md).
+### Counting modes
 
-The runtime reconstructs the four-corner graph from shared physical move
-primitives and plans shortest routes from the authoritative full state. Among
-shortest paths it uses one-step lookahead and policy 13, except M/00–59/down,
-which uses policy 1. It derives the full target state by actual move replay;
-shared playback checks exact physical completion including all hidden cubies.
-The blank is a permanent color asset with no text, not a hidden digit texture.
+The best sustainable way to count on a fixed print is a **period**: a closed
+sequence of poses over the full 24-sticker state, hidden stickers included, in
+which every edge is a shortest word from its actual pose. The witness holds one
+period per mode. The application replays them on the loaded print and keeps
+four, counting up:
 
-The first canonical 00–59–00 passes take H: 267, S: 269, and M: 262 HTM. These
-replace the earlier unconstrained-layout numbers. They are not guaranteed
-averages for later passes; print and whole-route optimality remain unknown.
+| Unit and range | Period edges | Lap HTM | Largest edge | Wrap |
+| --- | ---: | ---: | ---: | ---: |
+| S 00–59 | 60 (one lap) | 159 | 4 | 59→00 in 3 |
+| M 00–59 | 120 (two laps) | 204 average | 5 | 4 |
+| H 00–23 | 48 (two laps) | 82 average | 5 | 4 |
+| H 00–11 | 12 (one lap) | 40 | 4 | 4 |
+
+Counting down walks the same period backward with every word inverted. It
+closes the same poses and costs the same HTM, but is not necessarily the shortest
+word toward the lower display. The research gives 159 for the seconds inverse and
+a certified 171 for shortest-edge counting down; the inverse is also used for M
+and H, where it is never longer than the research's own down periods
+(M 204 against 204.75, H 82 and 40 against 82 and 41.14) and keeps the largest
+edge at five or less. Switching direction therefore never leaves the period.
+
+A unit starts on its period: a fresh setup, a unit change and a lettering change
+install the period's pose for the current value and range instead of setting
+up 00 and jumping. In the live clock the same install happens for the current
+time. After a free jump (Set, Reset, range change), an interrupted route or in a
+mode without a period (S 00–23 and 00–11, M 00–23 and 00–11, H 00–59), no period
+pose is on the cube. The exact planner (shortest routes, one-step lookahead,
+policy 13) then plans from the authoritative pose within the six-move bound;
+that fallback needs no certificate beyond the six. A free jump can leave the
+period for good; a unit change or lettering change reinstalls it. Shared
+playback still checks exact physical completion including all hidden cubies, and
+the blank is a permanent color asset with no text.
+
+### Before and after
+
+HTM per lap while counting up. Before is the previous print through the app's
+planner (policy 13, which settles after several laps); after is the saved period.
+
+| Unit | Before (previous print) | After | Change |
+| --- | ---: | ---: | ---: |
+| S 00–59 | 268.3 (first lap 269) | 159 | −41 % |
+| M 00–59 | 266.0 (first lap 262) | 204 | −23 % |
+| H 00–23 | 106.1 (first lap 107) | 82 | −23 % |
+| H 00–11 | 53.1 (first lap 51) | 40 | −25 % |
+
+Before figures are simulated through the same controller with the previous
+print and the planner alone; they are laps 17–24 of a 24-lap run and vary by a few
+HTM from lap to lap. (The research's 268.4 for S is the same quantity; its
+best possible mode on the previous print was 250.5.)
+
+The seconds cube of the [live clock](LIVE_CLOCK.md#move-statistics) averages
+**2.65 HTM per tick (159 per lap) instead of 4.49** over three simulated laps
+from 00 (808 HTM per 180 ticks before, 477 after). These are settled-display
+results. A manual Set, letter or range change can need up to
+six HTM, and the setup word from the solved print to the period start (8–10 HTM)
+is excluded from the laps.
 
 ## Artwork
 
@@ -92,9 +176,9 @@ both variants.
 The separate [live clock](LIVE_CLOCK.md), PR #64, uses one view for all three cubes.
 Its preferred H/M/S timings are 250/100/50 ms **per quarter turn**. A half turn
 uses two quarter units. Six HTM loosely permit twelve quarter units, with nominal
-H/M/S budgets of 3/1.2/0.6 seconds before fitting. Canonical verified upward routes
-for the selected initial cycles use at most eight quarter units; this narrower
-result does not cover arbitrary poses. The clock shows scheduled quarter/half
+H/M/S budgets of 3/1.2/0.6 seconds before fitting. Saved period routes use at most five quarter units
+for seconds and eight for minutes and hours; this narrower result does not cover
+arbitrary poses. The clock shows scheduled quarter/half
 times when it fits a route into the available live interval. Standalone counter
 rotation settings retain their existing per-move behavior.
 
@@ -106,11 +190,21 @@ npm run test:e2e -- tests/browser/hsm-counter.spec.mjs
 ```
 
 The HSM Node regressions cover repeated traversal of all eighteen letter/range/
-direction modes, arbitrary targets, shortest-path prefix totals, invalid inputs,
-full-state inverses, and bounded stop behavior. From each unit's fresh 00
-setup, every mode is counted until its full physical state repeats, with at
-most five HTM per step; this pins the M/00–59/down policy. A positive control
-turns the blank's up vectors without changing any plan. Browser tests cover all nine
-letter/range variants in both wrap directions, run/stop/resume, mobile layout,
-isolation from the existing counter and timer applications, and the exact
-blank/M/33 regression. A known six-move free jump is pinned as a Node regression.
+direction modes, arbitrary targets, fallback prefix totals, invalid inputs,
+full-state inverses, and bounded stop behavior. From each unit's fresh setup, the
+eight modes with a period close over the full pose within one period at most five
+HTM per step; the ten modes without one stay within the six-move bound. A positive
+control turns the blank's up vectors without changing any plan.
+`tests/hsm-seconds-first.test.mjs` pins the research commit and file hashes, the
+derived runtime file, the print code and the 14 changed identities against a
+fixture of the previous print, replays each period on the app's mechanics (the
+saved start frames, closure, and every edge shortest from its actual pose), and
+counts three laps of every researched mode up and down through the real
+controller: S 159, M 204 and H 82 / 40 per lap with the largest edges 4, 5, 5 and 4
+and the S wrap at 3. It then runs the three-cube live-clock scheduler with the move
+statistics for 180 ticks, before and after, and checks bounded catch-up. Negative
+controls corrupt the witness bytes, the derived runtime, a sticker, a period word and
+its length, and each must fail. Browser tests cover all nine letter/range variants in
+both wrap directions, run/stop/resume, mobile layout, isolation from the existing
+counter and timer applications, and the exact blank/M/33 regression. A known
+six-move free jump is pinned as a Node regression.
