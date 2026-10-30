@@ -1,0 +1,29 @@
+PASS rejected	foreign-seed
+PASS rejected	missing-seed
+PASS rejected	forward-reference
+PASS rejected	node-gap
+PASS rejected	product-after-result
+PASS rejected	unknown-result
+PASS rejected	duplicate-result
+PASS rejected	missing-result
+PASS rejected	noncanonical-integer
+PASS rejected	wrong-degree
+PASS rejected	crlf
+PASS rejected	missing-final-lf
+PASS rejected	core-up
+PASS rejected	nonblank239
+PASS rejected	missing-sticker
+PASS rejected	wrong-targets
+PASS rejected	overflow-unused-blank
+PASS rejected	up-int32-min
+PASS rejected	up-int32-max
+PASS rejected	up-out-of-range
+PASS rejected	up-zero
+PASS rejected	up-diagonal
+PASS rejected	normal-overflow
+PASS rejected	up-not-tangent
+PASS rejected	normal-inward
+PASS: identity-only DAG is legal but does not imply correct target optics.
+PASS rejected	identity-wrong-targets
+PASS accepted	valid-unused-blank-axis
+PASS:26 shared raw corrupt cases rejected; valid alternative blank axis accepted. No cross-checker dissent remains on these controls.

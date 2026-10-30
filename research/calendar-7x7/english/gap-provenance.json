@@ -1,0 +1,30 @@
+{
+  "tool": "GAP4.14.0",
+  "role": "Untrusted candidate word generator; not required for native replay",
+  "downloadedPackages": [
+    {
+      "file": "gap-core_4.14.0-3_amd64.deb",
+      "url": "https://deb.debian.org/debian/pool/main/g/gap/gap-core_4.14.0-3_amd64.deb",
+      "sha256": "a2a1ea30e20c2876e4a102389d60902e00fae4d3cb99dbb760d31b58e7c99bdb",
+      "bytes": 187440
+    },
+    {
+      "file": "gap-gapdoc_1.6.6-1_all.deb",
+      "url": "https://deb.debian.org/debian/pool/main/g/gap-gapdoc/gap-gapdoc_1.6.6-1_all.deb",
+      "sha256": "959501f5928de1c60266ad04e03a2e0fe97aa62d956bb06826606d7620431681",
+      "bytes": 971480
+    },
+    {
+      "file": "gap-libs_4.14.0-3_all.deb",
+      "url": "https://deb.debian.org/debian/pool/main/g/gap/gap-libs_4.14.0-3_all.deb",
+      "sha256": "3d293997454cf5c4fff66ad732746704ebd596c58ea5b88876af731f641647b6",
+      "bytes": 9553152
+    },
+    {
+      "file": "libgap9_4.14.0-3_amd64.deb",
+      "url": "https://deb.debian.org/debian/pool/main/g/gap/libgap9_4.14.0-3_amd64.deb",
+      "sha256": "e36200e91f14ed56803d8bc3d66f99e1a5e886d7052c3f2db9738185d84abf50",
+      "bytes": 736056
+    }
+  ]
+}

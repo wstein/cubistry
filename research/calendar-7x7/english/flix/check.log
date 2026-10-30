@@ -1,0 +1,253 @@
+Found 'flix.toml'. Checking dependencies...
+Resolving Flix dependencies...
+Downloading Flix dependencies...
+Resolving Maven dependencies...
+  Running Maven dependency resolver.
+Downloading external jar dependencies...
+Dependency resolution completed.
+-- Type Error [E7796] -------------------------------------------- src/Core.flix
+
+>> Unexpected type: expected 'Int32', found 'Unit'.
+
+74 | def monthDays(y: Int32,m: Int32): Int32 = if(m==2) {if(leap(y))29 else28}
+75 |     else if(List.memberOf(m,List#{4,6,9,11}))30 else31
+
+unexpected type
+
+-- Type Error [E6794] -------------------------------------------- src/Core.flix
+
+>> Unable to unify the types: 'Int32' and 'Unit'.
+
+74 | def monthDays(y: Int32,m: Int32): Int32 = if(m==2) {if(leap(y))29 else28}
+                                                         ^^^^^^^^^^^^^
+                                                         mismatched types.
+
+Type One: Int32
+Type Two: Unit
+
+-- Parse Error [E9061] ------------------------------------------- src/Core.flix
+
+>> Missing operator between expressions.
+
+74 | def monthDays(y: Int32,m: Int32): Int32 = if(m==2) {if(leap(y))29 else28}
+                                                                      ^
+                                                                      Expected an operator here
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected 'else'.
+
+74 | def monthDays(y: Int32,m: Int32): Int32 = if(m==2) {if(leap(y))29 else28}
+                                                                       ^^^^^^
+                                                                       Here
+Hint: an if expression without an else branch must be enclosed in braces.
+
+-- Type Error [E6794] -------------------------------------------- src/Core.flix
+
+>> Unable to unify the types: 'Int32' and 'Unit'.
+
+75 |     else if(List.memberOf(m,List#{4,6,9,11}))30 else31
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              mismatched types.
+
+Type One: Int32
+Type Two: Unit
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected 'else'.
+
+75 |     else if(List.memberOf(m,List#{4,6,9,11}))30 else31
+                                                     ^^^^^^
+                                                     Here
+Hint: an if expression without an else branch must be enclosed in braces.
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected <declaration> before <name>.
+
+75 |     else if(List.memberOf(m,List#{4,6,9,11}))30 else31
+                                                     ^^^^^^
+                                                     Here
+
+-- Type Error [E6925] -------------------------------------------- src/Core.flix
+
+>> Unable to unify the function type 'Int32 -> (Int32 -> Int32)' with the non-function type 'Int32'.
+
+78 |     Int32.modulo(365*p+p/4-p/100+p/400+List.foldLeft((a,k)->a+monthDays(y,k),0,List.range(1,m))+1,7)
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^
+                                                          mismatched types.
+
+Type One: Int32 -> (Int32 -> Int32)
+Type Two: Int32
+
+Explanation: A function type can never be equal to a non-function type, regardless of effects.
+
+-- Resolution Error [E3574] -------------------------------------- src/Core.flix
+
+>> Undefined struct field 'a'.
+
+78 |     Int32.modulo(365*p+p/4-p/100+p/400+List.foldLeft((a,k)->a+monthDays(y,k),0,List.range(1,m))+1,7)
+                                                                 ^
+                                                                 undefined field
+
+-- Resolution Error [E2136] -------------------------------------- src/Core.flix
+
+>> Undefined name 'k'.
+
+78 |     Int32.modulo(365*p+p/4-p/100+p/400+List.foldLeft((a,k)->a+monthDays(y,k),0,List.range(1,m))+1,7)
+                                                                               ^
+                                                                               name not found
+
+-- Type Error [E6794] -------------------------------------------- src/Core.flix
+
+>> Unable to unify the types: 'Int32' and 'Unit'.
+
+89 |         let start=if(m<=9)5 else1;
+                       ^^^^^^^^^
+                       mismatched types.
+
+Type One: Int32
+Type Two: Unit
+
+-- Parse Error [E9061] ------------------------------------------- src/Core.flix
+
+>> Missing operator between expressions.
+
+89 |         let start=if(m<=9)5 else1;
+                                ^
+                                Expected an operator here
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected 'else'.
+
+89 |         let start=if(m<=9)5 else1;
+                                 ^^^^^
+                                 Here
+Hint: an if expression without an else branch must be enclosed in braces.
+
+-- Type Error [E6925] -------------------------------------------- src/Core.flix
+
+>> Unable to unify the function type 'List[Char] -> Option[String]' with the non-function type 'Option[String]'.
+
+110 | def halfWord(s: String): Option[String] = List.foldLeft((acc,c)->match(acc,halfChar(c)) {
+111 |     case(Some(a),Some(b))=>Some(a+"${b}")
+112 |     case _=>None
+113 | },Some(""),List.reverse(String.toList(s)))
+
+mismatched types.
+
+Type One: List[Char] -> Option[String]
+Type Two: Option[String]
+
+Explanation: A function type can never be equal to a non-function type, regardless of effects.
+
+-- Type Error [E6925] -------------------------------------------- src/Core.flix
+
+>> Unable to unify the function type 'Option[String] -> (t0 -> Option[String])' with the non-function type '(t0, t1)'.
+
+110 | def halfWord(s: String): Option[String] = List.foldLeft((acc,c)->match(acc,halfChar(c)) {
+                                                              ^^^^^^^
+                                                              mismatched types.
+
+Type One: Option[String] -> (t0 -> Option[String])
+Type Two: (t0, t1)
+
+Explanation: A function type can never be equal to a non-function type, regardless of effects.
+
+-- Resolution Error [E2136] -------------------------------------- src/Core.flix
+
+>> Undefined name 'acc'.
+
+110 | def halfWord(s: String): Option[String] = List.foldLeft((acc,c)->match(acc,halfChar(c)) {
+                                                               ^^^
+                                                               name not found
+
+-- Resolution Error [E2136] -------------------------------------- src/Core.flix
+
+>> Undefined name 'c'.
+
+110 | def halfWord(s: String): Option[String] = List.foldLeft((acc,c)->match(acc,halfChar(c)) {
+                                                                   ^
+                                                                   name not found
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected ',' before '->'.
+
+110 | def halfWord(s: String): Option[String] = List.foldLeft((acc,c)->match(acc,halfChar(c)) {
+                                                                     ^^
+                                                                     Here
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected <expression> before '->'.
+
+110 | def halfWord(s: String): Option[String] = List.foldLeft((acc,c)->match(acc,halfChar(c)) {
+                                                                     ^^
+                                                                     Here
+
+-- Resolution Error [E2136] -------------------------------------- src/Core.flix
+
+>> Undefined name 'acc'.
+
+110 | def halfWord(s: String): Option[String] = List.foldLeft((acc,c)->match(acc,halfChar(c)) {
+                                                                             ^^^
+                                                                             name not found
+
+-- Resolution Error [E2136] -------------------------------------- src/Core.flix
+
+>> Undefined name 'c'.
+
+110 | def halfWord(s: String): Option[String] = List.foldLeft((acc,c)->match(acc,halfChar(c)) {
+                                                                                          ^
+                                                                                          name not found
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected <pattern> before <user-defined operator>.
+
+112 |     case _=>None
+               ^^^
+               Here
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected '=>' before <user-defined operator>.
+
+112 |     case _=>None
+               ^^^
+               Here
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected <expression> before <user-defined operator>.
+
+112 |     case _=>None
+               ^^^
+               Here
+
+-- Parse Error [E6629] ------------------------------------------- src/Core.flix
+
+>> Expected <match-rule> before <Name>.
+
+112 |     case _=>None
+                  ^^^^
+                  Here
+
+-- Type Error [E7685] -------------------------------------------- src/Core.flix
+
+>> Unexpected argument: expected 'List[t0]', got 'Option[String]'.
+
+113 | },Some(""),List.reverse(String.toList(s)))
+        ^^^^^^^^
+        unexpected argument type
+
+The function 'List.foldLeft' expects its 3rd argument to be of type 'List[t0]'.
+
+Expected: List[t0]
+  Actual: Option[String]
+
+
+Compilation failed with 28 error(s).

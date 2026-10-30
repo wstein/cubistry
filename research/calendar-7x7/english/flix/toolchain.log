@@ -1,0 +1,14 @@
+sha256	src/Core.flix	01719a6d01f9bb2021d51d621905571d2165c7540767729a66d04c9370935d5a
+sha256	src/Dag.flix	852ecf1c5f5f724e04c2eeb788c9426811d2404a8fd546a2f161f9ed0c816535
+sha256	src/Data.flix	e6dc0d3911deb93dae23c1220181d4a293582ee8183e31f3d0e7c40e208dbb7f
+sha256	src/Main.flix	df513f41acc3964303f103926ff121bf31d138949946d08b2926b4567c7b2430
+sha256	flix.jar	8fad2aa09567a7edabcc43f4101fa6199131df2c22929e001c87659d764f6dcf
+sha256	artifact/flix.jar	b9c91ca22aa474f78f8b07e2225cf9f78583f65435cef90ac507b45631004409
+sha256	/workspace/cubistry-calendar5-research/research/calendar-7x7/english/evidence/physical-print.tsv	b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931
+sha256	/workspace/cubistry-calendar5-research/research/calendar-7x7/english/evidence/targets.tsv	ac58cbf371c60be82e52f73a1fc8c4f3aa8a46903a27d5246150785f0cb60a3d
+sha256	/workspace/cubistry-calendar5-research/research/calendar-7x7/english/evidence/front-matches.tsv	e972d7bdc1d64761bc0913e20e5545025f9dfb8e3a6b8de181605086cfcaf757
+sha256	/workspace/cubistry-calendar5-research/research/calendar-7x7/en-physical-review/all-targets-dag.tsv	ef2071eceb3f7e1934c4b67684613044e38d0446f16e86f4d0ba112ddc9f9f24
+openjdk 21.0.12.1 2026-08-18
+OpenJDK Runtime Environment (build 21.0.12.1+1-1-deb13u1-Debian)
+OpenJDK 64-Bit Server VM (build 21.0.12.1+1-1-deb13u1-Debian, mixed mode, sharing)
+The Flix Programming Language 0.79.0
