@@ -1,0 +1,11 @@
+Native authority: Flix physical-de-check; strict canonical certificate regeneration and direct universal obstruction.
+Scope: DE,2026–2099,fixed555555555111,marked overflow,no printed year,declared font/rotation profile.
+sha256	src/PhysicalDe.flix	28c900b6eedb322a2425b15c029fd78bbcb64258855e3139d4185b84a3f976d5
+sha256	src/Oriented.flix	62461e0993d97a9390637250ddc204d2dd03a7534b5c8372aafd192562a4c924
+sha256	src/Main.flix	559093c96a4f0d7bcc3695e5a353f21af936ae090f0bfd47bba7c17e2d8ea6d2
+sha256	flix.jar	8fad2aa09567a7edabcc43f4101fa6199131df2c22929e001c87659d764f6dcf
+sha256	artifact/flix.jar	fa298dfe72b909561210a0401c7a46b6fe3dedfa7eaafefc2c64c02f2a502a15
+openjdk 21.0.12.1 2026-08-18
+OpenJDK Runtime Environment (build 21.0.12.1+1-1-deb13u1-Debian)
+OpenJDK 64-Bit Server VM (build 21.0.12.1+1-1-deb13u1-Debian, mixed mode, sharing)
+The Flix Programming Language 0.79.0

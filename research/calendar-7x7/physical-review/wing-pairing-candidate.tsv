@@ -1,0 +1,25 @@
+language	piece	A-text	A-angle	A-ink	B-text	B-angle	B-ink
+EN	1	27	3	dark		0	blank
+EN	2		0	blank		0	blank
+EN	3	11	0	red	02	0	red
+EN	4	30	3	dark	1	0	red
+EN	5	5	0	red	12	0	red
+EN	6	4	2	red	15	2	red
+EN	7	7	2	red	16	2	red
+EN	8	6	2	red	17	2	red
+EN	9	29	3	dark	18	2	red
+EN	10	12	0	red	19	2	red
+EN	11	3	2	red	25	3	dark
+EN	12	13	0	red	26	3	dark
+EN	13	28	3	dark	27	3	dark
+EN	14	2	0	red	28	3	dark
+EN	15	14	0	red	29	3	dark
+EN	16	15	0	red	30	3	dark
+EN	17	01	2	red	30↶	0	red
+EN	18	V	1	month	31	3	dark
+EN	19	1	0	red	31↶	0	red
+EN	20		0	blank	A	1	month
+EN	21	T	1	month	F	1	month
+EN	22	C	1	month	J	1	month
+EN	23		0	blank	M	1	month
+EN	24	31	3	dark	S	1	month
