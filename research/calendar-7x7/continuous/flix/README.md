@@ -80,6 +80,14 @@ evidence and geometry arguments it also runs the inherited independent tests
 of all 21 generators, inverse and four-turn identities, physical composition,
 actual center orientation and artwork equivalence.
 
+`orientation-selftest EVIDENCE GEOMETRY DAG CHAIN` derives and validates the
+chain's legal initial state, then changes only the actual up vector of the
+visible `SUN` header by one quarter turn. It asserts that exactly one sticker
+changed and that every ID, cubie, position, normal, text and ink value stayed
+identical. The same front validator must reject this corruption. This is a
+synthetic unit-test state, not a claimed legal cube state or transition
+certificate. The test isolates orientation from artwork-position failures.
+
 `parse FILE` accepts syntax only and makes no physical or continuity claim.
 A valid chain establishes only its recorded consecutive months. Practical
 initialization, arbitrary months, complete period coverage and global move

@@ -167,6 +167,36 @@ def parserSelftest(): Unit \ IO = {
     },bad);
     println("selftest\tCHAIN_PARSER_1_POSITIVE_18_NEGATIVE\tPASS")
 }
+// This synthetic corrupted state is a unit-test input, not a legal cube state.
+def orientationSelftest(root: String,geometry: String,dagPath: String,path: String): Unit \ IO = {
+    let CalendarChain.C(source,year,month,sourceHash,_)=readChain(read(path));
+    let printRaw=read(root+"/physical-print.tsv");
+    require(digest(printRaw)=="b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931","immutable PR99 physical printing hash");
+    let printing=readPrint(printRaw);let poses=derivedPoses();
+    validatePoseFile(read(geometry+"/pose-points.tsv"),poses);validateMoves(read(geometry+"/moves.tsv"));
+    let reps=representatives();validateTargets(read(root+"/targets.tsv"),reps);
+    require(goalBoard(at(reps,source-1))==goalBoard(goal(year,month)),"source calendar profile");
+    let results=readDag(read(dagPath),poses,false);
+    let start=match Map.get(source,results) {
+        case Some(p) => p
+        case None => throw new IllegalArgumentException("source root absent from legal DAG")
+    };
+    let initial=liftState(start,printing,poses);
+    require(fullDigest(initial)==sourceHash,"orientation test source SHA");
+    checkFront(initial,year,month);
+    let selected=s -> {let Sticker.S(_,_,pos,n,_,text,_)=s;pos==(-3,2,3) and n==(0,0,1) and text=="SUN"};
+    require(List.count(selected,Vector.toList(initial))==1,"one visible SUN header selected");
+    let corrupted=Vector.map(s -> {
+        let Sticker.S(id,pid,pos,n,up,text,ink)=s;
+        if(selected(s)) Sticker.S(id,pid,pos,n,quarter(up,3),text,ink) else s
+    },initial);
+    require(List.count(pair -> {let(a,b)=pair;a != b},List.zip(Vector.toList(initial),Vector.toList(corrupted)))==1,"exactly one sticker changed");
+    let withoutUp=s -> {let Sticker.S(id,pid,pos,n,_,text,ink)=s;(id,pid,pos,n,text,ink)};
+    require(Vector.map(withoutUp,initial)==Vector.map(withoutUp,corrupted),"IDs, cubies, positions, normals, text and ink unchanged");
+    let accepted=try {checkFront(corrupted,year,month);true} catch {case _: Exception => false};
+    require(not accepted,"orientation-only SUN up corruption must be rejected");
+    println("selftest\tORIENTATION_ONLY_UP_CORRUPTION_REJECTED\tPASS")
+}
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {
         match Sys.Env.getArgs() {
@@ -174,7 +204,8 @@ def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
             case "parse"::path::Nil => {let _ = readChain(read(path));println("status\tVALID_CHAIN_SYNTAX_ONLY")}
             case "selftest"::Nil => parserSelftest()
             case "selftest"::root::geometry::Nil => {parserSelftest();physicalSelftest(root,geometry)}
-            case _ => throw new IllegalArgumentException("chain EVIDENCE GEOMETRY DAG CHAIN | parse CHAIN | selftest EVIDENCE GEOMETRY")
+            case "orientation-selftest"::root::geometry::dag::path::Nil => orientationSelftest(root,geometry,dag,path)
+            case _ => throw new IllegalArgumentException("chain EVIDENCE GEOMETRY DAG CHAIN | parse CHAIN | selftest EVIDENCE GEOMETRY | orientation-selftest EVIDENCE GEOMETRY DAG CHAIN")
         }
     } catch {case ex: Exception => {println("invalid\t"+ex.toString());System.exit(1)}}
 })
