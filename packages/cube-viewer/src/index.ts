@@ -37,6 +37,10 @@ export {
   createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
 } from "./presentation-preset.ts";
 export { PhysicalCubeScene, stickerFrame, type PhysicalStickerFrame } from "./physical-scene.ts";
+import { installPresentationDrag } from "./presentation-input.ts";
+export { installPresentationDrag } from "./presentation-input.ts";
+import { rotatePresentation, cubePresentationRadius, fitPresentationCamera } from "./presentation-rotation.ts";
+export { rotatePresentation, cubePresentationRadius, presentationCameraRadius, fitPresentationCamera } from "./presentation-rotation.ts";
 const spacing = 0.5;
 /** Physical-state viewer: no target selection, solver or mechanics ownership. */
 export const BASE_MOVE_DURATION_MS = 75;
@@ -45,7 +49,7 @@ export const MAX_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 10;
 /** A caller-owned viewport can render several independent physical cubes. */
 export interface SharedCubeViewport {
   readonly renderer: THREE.WebGLRenderer;
-  readonly scene: THREE.Scene;
+  readonly scene: THREE.Scene | THREE.Group;
   readonly camera: THREE.PerspectiveCamera;
   readonly position: Vec3;
   readonly resetCamera?: () => void;
@@ -73,6 +77,7 @@ export class CubeViewer {
   }
   readonly renderer: THREE.WebGLRenderer;
   readonly scene: THREE.Scene | THREE.Group;
+  readonly presentation: THREE.Group;
   readonly camera: THREE.PerspectiveCamera;
   private appearance: ViewerAppearance = DEFAULT_APPEARANCE;
   private plastic?: THREE.MeshPhysicalMaterial;
@@ -92,14 +97,7 @@ export class CubeViewer {
   private radius = 10.5;
   private busy = false;
   private destroyed = false;
-  private drag: {
-    id: number;
-    x: number;
-    y: number;
-    time: number;
-    startX: number;
-    startY: number;
-  } | null = null;
+  private cancelDrag?: () => void;
   private readonly resize: ResizeObserver | null = null;
   private readonly shared: boolean;
   private readonly resetSharedCamera?: () => void;
@@ -109,6 +107,9 @@ export class CubeViewer {
     this.host = host;
     this.shared = Boolean(viewport);
     this.scene = viewport ? new THREE.Group() : new THREE.Scene();
+    this.presentation = viewport ? this.scene as THREE.Group : new THREE.Group();
+    this.presentation.name = "cube-presentation";
+    if (!viewport) this.scene.add(this.presentation);
     this.camera =
       viewport?.camera ?? new THREE.PerspectiveCamera(18, 1, 0.1, 100);
     this.resetSharedCamera = viewport?.resetCamera;
@@ -127,7 +128,7 @@ export class CubeViewer {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
-    this.studio = createPresentationStudio(this.scene, 1, 1, host);
+    this.studio = createPresentationStudio(this.scene, 1, 1, host, cubePresentationRadius(1));
     this.appearanceControls = installAppearanceControls(host, (value) => this.setAppearance(value));
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
@@ -135,72 +136,38 @@ export class CubeViewer {
       if (!w || !h) return;
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
-      this.camera.updateProjectionMatrix();
+      this.fitCamera();
     });
     this.resize.observe(host);
     const el = this.renderer.domElement;
     el.setAttribute(
       "aria-label",
-      "Physical cube viewer. Drag to orbit the camera.",
+      "Physical cube viewer. Drag to rotate the cube.",
     );
     el.setAttribute("role", "img");
-    el.addEventListener("pointerdown", (e) => {
-      this.drag = {
-        id: e.pointerId,
-        x: e.clientX,
-        y: e.clientY,
-        time: e.timeStamp,
-        startX: e.clientX,
-        startY: e.clientY,
-      };
-      el.setPointerCapture(e.pointerId);
-    });
-    el.addEventListener("pointermove", (e) => {
-      if (!this.drag || this.drag.id !== e.pointerId) return;
-      if (
-        Math.hypot(e.clientX - this.drag.startX, e.clientY - this.drag.startY) <
-        4
-      )
-        return;
+    this.cancelDrag = installPresentationDrag(el, (dx, dy, elapsed) => {
+      // Historical event name retained for app hints and existing consumers.
       this.host.dispatchEvent(new Event("cube-camera-change"));
-      const d = viewTurn(
-        e.clientX - this.drag.x,
-        e.clientY - this.drag.y,
-        e.timeStamp - this.drag.time,
-      );
+      const d = viewTurn(dx, dy, elapsed);
       this.yaw -= d.yaw;
       this.pitch = clampPitch(this.pitch + d.pitch);
-      this.drag = {
-        id: e.pointerId,
-        x: e.clientX,
-        y: e.clientY,
-        time: e.timeStamp,
-        startX: this.drag.startX,
-        startY: this.drag.startY,
-      };
-    });
-    const release = () => (this.drag = null);
-    el.addEventListener("pointerup", release);
-    el.addEventListener("pointercancel", release);
-    el.addEventListener("lostpointercapture", release);
+    }, 4);
     el.addEventListener(
       "wheel",
       (e) => {
         e.preventDefault();
         const previous = this.radius;
         this.radius = Math.max(6, Math.min(18, this.radius + e.deltaY * 0.005));
-        if (this.radius !== previous)
+        if (this.radius !== previous) {
+          this.fitCamera();
           this.host.dispatchEvent(new Event("cube-camera-change"));
+        }
       },
       { passive: false },
     );
+    this.fitCamera();
     this.renderer.setAnimationLoop(() => {
-      this.camera.position.set(
-        Math.sin(this.yaw) * Math.cos(this.pitch) * this.radius,
-        Math.sin(this.pitch) * this.radius,
-        Math.cos(this.yaw) * Math.cos(this.pitch) * this.radius,
-      );
-      this.camera.lookAt(0, 0, 0);
+      rotatePresentation(this.presentation, this.yaw, this.pitch);
       this.renderer.render(this.scene, this.camera);
     });
   }
@@ -216,7 +183,11 @@ export class CubeViewer {
     }
     this.yaw = Math.PI / 18;
     this.pitch = (7 * Math.PI) / 180;
-    this.radius = 10.5;
+    this.cancelDrag?.();
+    rotatePresentation(this.presentation, this.yaw, this.pitch);
+  }
+  private fitCamera(): void {
+    fitPresentationCamera(this.camera, cubePresentationRadius(1), this.radius / 10.5);
   }
   get presentedPrint(): PrintDefinition | null {
     return this.print;
@@ -311,7 +282,7 @@ export class CubeViewer {
       this.materials.push(material);
       this.stickerMaterials.set(s.id, material);
     }
-    this.cube = new PhysicalCubeScene(this.scene,
+    this.cube = new PhysicalCubeScene(this.presentation,
       print.stickers.map((s) => ({ ...s, p: print.cubies.find((c) => c.id === s.cubie)!.position, n: s.normal })),
       this.stickerMaterials, plastic, spacing,
       createPresentationGeometry(),

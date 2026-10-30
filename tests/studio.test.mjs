@@ -91,3 +91,33 @@ test("fixed-budget shadow filtering preserves world-space softness for single an
     studio.dispose(); assert.equal(scene.children.length, 0);
   }
 });
+
+test("rotated rigid clock and active layers stay above the receiver and inside shadow coverage", async () => {
+  const { clockPresentationRadius } = await import("../src/apps/clock/framing.ts");
+  const { rotatePresentation } = await import("../packages/cube-viewer/src/presentation-rotation.ts");
+  const scene = new THREE.Scene(), root = new THREE.Group(); scene.add(root);
+  const studio = createPresentationStudio(scene, 1, 4.3, undefined, clockPresentationRadius);
+  const key = scene.children.find(o => o.isLight && o.castShadow);
+  const { print } = createDesign("picture"), poses = stickerPoses(print, initialState(print));
+  const material = new THREE.MeshStandardMaterial();
+  const cubes = [-2.8, 0, 2.8].map(x => {
+    const group = new THREE.Group(); group.position.x = x; root.add(group);
+    const cube = new PhysicalCubeScene(group, poses, new Map(poses.map(s => [s.id, material])), material, .5, createPresentationGeometry());
+    cube.sync(poses); return cube;
+  });
+  const turn = cubes[2].beginTurn([...new Set(poses.filter(s => s.p[0] === 1).map(s => s.cubie))], 0, Math.PI / 2);
+  for (const yaw of [-Math.PI, -1.5, 0, 1.5, Math.PI]) for (const pitch of [-1.5, -.7, 0, .7, 1.5]) for (const progress of [0, .5, 1]) {
+    turn.update(progress); rotatePresentation(root, yaw, pitch); scene.updateMatrixWorld(true);
+    root.traverse(o => {
+      if (!o.isMesh) return;
+      const p = o.geometry.getAttribute("position");
+      for (let i = 0; i < p.count; i++) {
+        const world = new THREE.Vector3().fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld);
+        assert(world.y > studio.floor.position.y, "the complete rotated assembly must clear the receiving plane");
+      }
+    });
+    projectedShadow(scene, key, studio.floor.position.y);
+  }
+  assert.deepEqual(key.shadow.mapSize.toArray(), [1024, 1024]);
+  turn.dispose(); for (const cube of cubes) cube.dispose(); studio.dispose(); material.dispose();
+});
