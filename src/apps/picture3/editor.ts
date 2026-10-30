@@ -6,7 +6,7 @@ export interface EditorPorts {
   decoder: PhotoDecoder;
   canvas(size: number): HTMLCanvasElement;
   rasterize(svg: string): Promise<Blob>;
-  changed(): void;
+  changed(artworkChanged?: boolean): void;
 }
 /** Trusted bundled SVG only; uploaded SVG never enters this decoder. */
 export async function rasterizePreset(svg: string): Promise<Blob> {
@@ -52,9 +52,13 @@ export class PictureEditor {
     resource.source.close(); for (const canvas of [resource.canvas, ...resource.tiles]) canvas.width = canvas.height = 0;
   }
   async preset(id: Preset): Promise<boolean> {
+    const expected = this.epoch + 1;
     return this.replace(async () => {
       const entries = [];
-      for (const { face } of FACE_FRAMES) entries.push([face, { blob: await this.ports.rasterize(presetSvg(id, face)), crop: DEFAULT_CROP }]);
+      for (const { face } of FACE_FRAMES) {
+        if (this.disposed || this.epoch !== expected) throw Error("Picture preset superseded.");
+        entries.push([face, { blob: await this.ports.rasterize(presetSvg(id, face)), crop: DEFAULT_CROP }]);
+      }
       return Object.fromEntries(entries) as FaceSources;
     });
   }
@@ -77,7 +81,7 @@ export class PictureEditor {
       }
       if (!current()) return false;
       const previous = this.resources; this.resources = staged;
-      try { this.ports.changed(); } finally { for (const r of previous.values()) this.release(r); }
+      try { this.ports.changed(true); } finally { for (const r of previous.values()) this.release(r); }
       return true;
     } catch (error) { if (current()) throw error; return false; }
     finally {
@@ -99,7 +103,7 @@ export class PictureEditor {
       let resource: FaceResource;
       try { resource = this.make(source, blob, DEFAULT_CROP); } catch (error) { source.close(); throw error; }
       const previous = this.resources.get(face)!; this.resources.set(face, resource);
-      try { this.ports.changed(); } finally { this.release(previous); }
+      try { this.ports.changed(true); } finally { this.release(previous); }
       return true;
     } catch (error) { if (current()) throw error; return false; }
     finally { if (current()) { this.reserved.delete(face); this.ports.changed(); } }
@@ -109,7 +113,7 @@ export class PictureEditor {
     if (!resource || this.disposed) throw Error("Choose a picture first.");
     const next = validateCrop(crop);
     paintFace(resource.source as ImageBitmap, next, resource.canvas, resource.tiles);
-    resource.crop = next; this.ports.changed();
+    resource.crop = next; this.ports.changed(true);
   }
   artwork(style: "picture" | "classic"): ReadonlyMap<number, HTMLCanvasElement> {
     if (!this.ready) throw Error("The six picture faces are not ready.");
@@ -124,6 +128,7 @@ export class PictureEditor {
     });
     return result;
   }
+  cancelPending(): void { this.epoch++; this.ports.decoder.invalidate(); this.reserved.clear(); this.replacing = false; }
   dispose(): void {
     this.disposed = true; this.epoch++; this.ports.decoder.dispose(); this.reserved.clear();
     for (const r of this.resources.values()) this.release(r); this.resources.clear();
