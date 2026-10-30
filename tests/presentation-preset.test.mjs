@@ -8,14 +8,14 @@ import {
 } from "../packages/cube-viewer/src/presentation-preset.ts";
 
 test("presentation geometry fits existing turn envelopes with bounded triangles and smooth bevel normals", () => {
-  const { body, sticker, stickerOffset } = createPresentationGeometry();
+  const { body, core, sticker, stickerOffset } = createPresentationGeometry();
   body.computeBoundingBox(); sticker.computeBoundingBox();
   const bodyWidth = body.boundingBox.getSize(new THREE.Vector3());
   for (const value of bodyWidth) assert(Math.abs(value - preset.bodyWidth) < 1e-6);
   assert(stickerOffset > preset.bodyWidth / 2);
   assert(preset.stickerWidth < preset.bodyWidth - preset.bodyRadius * 2);
-  for (const spacing of [1.04, .52 * 2])
-    assert(Math.abs(spacing - preset.bodyWidth - .05) < 1e-8);
+  for (const spacing of [1, .5 * 2])
+    assert(Math.abs(spacing - preset.bodyWidth - .01) < 1e-8);
   const normals = body.getAttribute("normal");
   let beveled = false;
   for (let i = 0; i < normals.count; i++) {
@@ -29,10 +29,10 @@ test("presentation geometry fits existing turn envelopes with bounded triangles 
   assert(triangles(sticker) <= 40);
   // Same two geometries serve 8/26 bodies; the three-cube clock has 24 bodies.
   assert(triangles(body) * 26 + triangles(sticker) * 54 < 18000);
-  body.dispose(); sticker.dispose();
+  body.dispose(); core?.dispose(); sticker.dispose();
 });
 test("rounded stickers retain the original affine UV frame and physical print-up", () => {
-  const { body, sticker } = createPresentationGeometry();
+  const { body, core, sticker } = createPresentationGeometry();
   const positions = sticker.getAttribute("position"), uv = sticker.getAttribute("uv");
   let minU = 1, maxU = 0, minV = 1, maxV = 0;
   for (let i = 0; i < uv.count; i++) {
@@ -44,7 +44,7 @@ test("rounded stickers retain the original affine UV frame and physical print-up
     minV = Math.min(minV, v); maxV = Math.max(maxV, v);
   }
   assert.deepEqual([minU, maxU, minV, maxV], [0, 1, 0, 1]);
-  body.dispose(); sticker.dispose();
+  body.dispose(); core?.dispose(); sticker.dispose();
 });
 test("materials retain supplied artwork/color/roughness with bounded nonmetallic highlights", () => {
   const texture = new THREE.Texture();

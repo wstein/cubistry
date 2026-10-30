@@ -140,7 +140,7 @@ export class CalendarViewer {
       const role = s.image.match(/^[0-9]$/) ? "day" : s.slot < 3 ? "weekday" : "month";
       materials.set(s.id, maps.get(role + ":" + s.image)!);
     }
-    this.cube = new PhysicalCubeScene(this.scene, design.printing, materials, plastic, 1.04,
+    this.cube = new PhysicalCubeScene(this.scene, design.printing, materials, plastic, 1,
       createPresentationGeometry());
     this.sync(state);
   }
