@@ -127,3 +127,34 @@ test("appearance controls apply saved construction, restore style color and rele
     });
   }
 });
+
+test("Stickerless interiors and unprinted shell groups never retain a selected frame material", () => {
+  const { print } = createDesign("picture");
+  const pin = JSON.parse(readFileSync("calendar-source.json"));
+  const calendar = validateDesign(JSON.parse(readFileSync("public/calendar/" + Object.keys(pin.runtime)[0])));
+  for (const [source, spacing] of [[stickerPoses(print, initialState(print)), .5], [calendar.printing, 1]]) {
+    const parent = new THREE.Group(), plastic = new THREE.MeshPhysicalMaterial({ color: "#00aabb" });
+    const art = new THREE.MeshStandardMaterial({ color: "#fffdf6" });
+    const scene = new PhysicalCubeScene(parent, source, new Map(source.map(s => [s.id, art])), plastic,
+      spacing, createPresentationGeometry());
+    scene.sync(source); scene.setConstruction("stickerless");
+    const selected = [...new Set(source.filter(s => s.p[0] === 1).map(s => s.cubie))];
+    const turn = scene.beginTurn(selected, 0, Math.PI / 2); turn.update(.5);
+    for (const color of ["#00aabb", "#55cc99"]) {
+      plastic.color.set(color);
+      parent.traverse(object => {
+        if (!object.isMesh || !object.visible) return;
+        for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+          assert.notEqual(material, plastic);
+          assert.notEqual(`#${material.color.getHexString()}`, color);
+        }
+      });
+    }
+    turn.dispose(); scene.sync(source); scene.setConstruction("stickered");
+    parent.traverse(object => {
+      if (object.userData.plasticCore || object.userData.sourceFaceStickerIds) assert.equal(object.material, plastic);
+    });
+    assert.equal(plastic.color.getHexString(), "55cc99");
+    scene.dispose(); art.dispose(); plastic.dispose();
+  }
+});
