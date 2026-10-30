@@ -1,7 +1,7 @@
 # Native Julia recovery proof. Reuses only this language's existing native HSM
 # physical model; no production mechanics, Python verifier, or Flix output.
 module IndependentRecovery
-using SHA
+using SHA, JSON
 using ..IndependentProof
 using ..IndependentHsm
 const IP = IndependentProof
@@ -14,11 +14,40 @@ const Pose = NTuple{8,UInt8}
 const Triple = NTuple{3,Int}
 need(ok, msg; code="INVALID") = IP.need(ok, msg; code=code)
 integer(x, lo=0, hi=10^9) = IP.integer(x, lo, hi)
+progress(xs...) = (println(stderr,xs...); flush(stderr))
 posecode(t) = sum(Int64(t[c]-1) * Int64(24)^(c-1) for c in 1:8)
 function read_raw(path)
     need(read(path, 3) != UInt8[0xef, 0xbb, 0xbf], "byte order mark before JSON"; code="INVALID_JSON")
     IP.read_json(path)
 end
+
+# Preserve decimal values exactly. A coefficient and arbitrary-size base-ten
+# exponent suffice; never allocate 10^exponent for an attacker-controlled token.
+function decimal_canonical(token::AbstractString)
+    need(ncodeunits(token) <= 128, "meanSteps numeric-token limit")
+    m = match(r"^(-?)(0|[1-9][0-9]*)(?:\.([0-9]+))?(?:[eE]([+-]?[0-9]+))?\z",token)
+    need(m !== nothing, "meanSteps must be a JSON number token")
+    fraction = something(m.captures[3],"")
+    digits = lstrip(m.captures[2] * fraction,'0')
+    isempty(digits) && return (1,"0",big(0))
+    exponent = m.captures[4] === nothing ? big(0) : parse(BigInt,m.captures[4])
+    exponent -= ncodeunits(fraction)
+    coefficient = rstrip(digits,'0')
+    exponent += ncodeunits(digits)-ncodeunits(coefficient)
+    (m.captures[1] == "-" ? -1 : 1,String(coefficient),exponent)
+end
+function mean_lexemes(path, original_sha)
+    # The frozen shared reader owns syntax/UTF-8/duplicates/token bounds. Re-read
+    # only with a matching original digest, then typed JSONText traversal keeps
+    # the exact token and correctly handles escaped keys and label-string decoys.
+    bytes = read(path)
+    need(bytes2hex(sha256(bytes)) == original_sha, "raw recovery input changed during parsing"; code="ERROR")
+    raw = JSON.parse(String(bytes),Dict{String,JSON.JSONText};duplicate_keys=:error,allownan=false,maxdepth=64)
+    rows = JSON.parse(raw["modes"].value,Vector{Dict{String,JSON.JSONText}};duplicate_keys=:error,allownan=false,maxdepth=64)
+    [strip(row["meanSteps"].value) for row in rows]
+end
+check_mean_token(token, rounded) = need(decimal_canonical(token) == decimal_canonical(rounded),
+    "exact four-decimal rounded mean steps")
 function header(data, schema, keys)
     need(data isa AbstractDict && get(data, "schema", nothing) == schema, "unsupported recovery input schema"; code="UNSUPPORTED")
     need(get(data, "version", nothing) isa Integer && !(data["version"] isa Bool) && data["version"] == 1,
@@ -202,7 +231,7 @@ function build_graph(E, nodes, layers, index, letter, maximum, direction)
             push!(source,i); push!(target,j); push!(costs,ends[code])
             need(length(costs) <= 50000000, "graph edge resource limit"; code="ERROR")
         end
-        i % 25000 == 0 && println(stderr,"graph ",letter," 0-",maximum," ",direction,": ",i,"/",length(nodes)," nodes, ",length(costs)," edges, ",length(W.memo)," word-cache entries")
+        i % 25000 == 0 && progress("graph ",letter," 0-",maximum," ",direction,": ",i,"/",length(nodes)," nodes, ",length(costs)," edges, ",length(W.memo)," word-cache entries")
     end
     N = length(nodes)
     starts = ones(Int,length(nodes)+1)
@@ -303,15 +332,15 @@ function replay_samples(E, row, index, goals, dist)
     end
     (samples=length(row["samples"]),steps=totalsteps,edgeInverses=inverses,fullInverses=length(row["samples"]))
 end
-function check_row(E, row, app, goals)
+function check_row(E, row, app, goals, mean_token)
     need((row["sourceDirection"],row["traversal"]) == (app.sourceDirection,app.traversal), "recovery selection and traversal bound to witness")
     nodes,layers,index = enumerate_nodes(E,row["letter"],row["maximum"])
     need(length(nodes) == row["graphNodes"], "exact independently enumerated graph node count")
     need(all(haskey(index,g) for g in goals) && length(goals) == row["periodNodes"], "exact period goal membership and count")
-    println(stderr,"enumerated ",length(nodes)," full display poses; rebuilding endpoint graph")
+    progress("enumerated ",length(nodes)," full display poses; rebuilding endpoint graph")
     starts,sources,costs,forced = build_graph(E,nodes,layers,index,row["letter"],row["maximum"],row["direction"])
     need(length(costs) == row["edgesAtMostLimitOrForced"], "exact independently rebuilt recovery edge count")
-    println(stderr,"rebuilt ",length(costs)," endpoint edges; reverse lexicographic Dijkstra")
+    progress("rebuilt ",length(costs)," endpoint edges; reverse lexicographic Dijkstra")
     dist,INF = distances(starts,sources,costs,[index[g] for g in goals])
     unreachable = count(==(INF),dist)
     need(unreachable == row["unreachable"] == 0, "every legal settled pose recovers")
@@ -326,7 +355,7 @@ function check_row(E, row, app, goals)
     maxsteps = maximum(d[2] for d in dist); maxhtm = maximum(d[3] for d in dist)
     totalsteps = sum(d[2] for d in dist); mean = round_mean(totalsteps,length(nodes))
     need(maxsteps == row["maximumSteps"] && maxhtm == row["maximumRecoveryHTM"], "honest maximum recovery metrics")
-    need(row["meanSteps"] == parse(Float64,mean), "exact four-decimal rounded mean steps")
+    check_mean_token(mean_token,mean)
     samples = replay_samples(E,row,index,goals,dist)
     (letter=row["letter"],maximum=row["maximum"],direction=row["direction"],sourceDirection=app.sourceDirection,traversal=app.traversal,
      graphNodes=length(nodes),edgesAtMostLimitOrForced=length(costs),periodNodes=length(goals),unreachable=unreachable,
@@ -336,19 +365,23 @@ end
 function evaluate(recovery_path,modes_path; smoke_index=nothing)
     try
         recovery,rsha = read_raw(recovery_path); modes,msha = read_raw(modes_path)
-        println(stderr,"strict raw JSON loaded; parsing recovery and all-mode bindings")
+        progress("strict raw JSON loaded; parsing recovery and all-mode bindings")
         pr,parsed = parse_inputs(recovery,modes)
-        println(stderr,"building native HSM physical model and four-sticker distances")
+        mean_tokens = mean_lexemes(recovery_path,rsha)
+        need(length(mean_tokens) == 18, "eighteen exact raw meanSteps tokens")
+        foreach(decimal_canonical,mean_tokens)
+        progress("building native HSM physical model and four-sticker distances")
         E = H.build_engine(pr)
-        println(stderr,"replaying eighteen own periods and inverse closures")
+        progress("replaying eighteen own periods and inverse closures")
         apps,goals = bind_periods(E,parsed,modes["appModes"])
         appindex = Dict((a.letter,a.maximum,a.direction) => a for a in apps)
         summaries = Any[]
         indices = smoke_index === nothing ? eachindex(recovery["modes"]) : [smoke_index]
         for i in indices
             row = recovery["modes"][i]; identity = (row["letter"],row["maximum"],row["direction"])
-            println(stderr,"checking recovery ",identity)
-            push!(summaries,check_row(E,row,appindex[identity],goals[identity]))
+            progress("checking recovery ",identity)
+            push!(summaries,check_row(E,row,appindex[identity],goals[identity],mean_tokens[i]))
+            progress("completed recovery ",identity)
         end
         valid = smoke_index === nothing
         status = valid ? "VALID" : "UNKNOWN"

@@ -121,11 +121,11 @@ app = only(a for a in apps if (a.letter,a.maximum,a.direction) == identity)
 end
 @testset "semantic count and sample controls" begin
     bad = deepcopy(row);bad["sourceDirection"] = -app.sourceDirection
-    reject("wrong-selected-source-period",() -> R.check_row(E,bad,app,goals[identity]))
+    reject("wrong-selected-source-period",() -> R.check_row(E,bad,app,goals[identity],JSON.json(bad["meanSteps"])))
     bad = deepcopy(row);bad["graphNodes"] += 1
-    reject("wrong-node-count",() -> R.check_row(E,bad,app,goals[identity]))
+    reject("wrong-node-count",() -> R.check_row(E,bad,app,goals[identity],JSON.json(bad["meanSteps"])))
     bad = deepcopy(row);bad["edgesAtMostLimitOrForced"] += 1
-    reject("wrong-complete-endpoint-count",() -> R.check_row(E,bad,app,goals[identity]))
+    reject("wrong-complete-endpoint-count",() -> R.check_row(E,bad,app,goals[identity],JSON.json(bad["meanSteps"])))
     for (name,change) in [
         ("wrong-period-goal-count",d -> d["periodNodes"] += 1),
         ("wrong-unreachable-count",d -> d["unreachable"] = 1),
@@ -136,7 +136,7 @@ end
         ("wrong-maximum-HTM",d -> d["maximumRecoveryHTM"] += 1),
         ("wrong-rounded-mean",d -> d["meanSteps"] += 0.0001)]
         bad = deepcopy(row);change(bad)
-        reject(name,() -> R.check_row(E,bad,app,goals[identity]))
+        reject(name,() -> R.check_row(E,bad,app,goals[identity],JSON.json(bad["meanSteps"])))
     end
     # Recompute one complete graph for histogram and sample adversaries. These
     # retained distances are independently computed here, never imported verdicts.
