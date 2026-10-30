@@ -46,9 +46,9 @@ export function bindSmartRotation(element: HTMLElement, root: Object3D, options:
   select.setAttribute("aria-describedby", note.id); label.append(select); options.panel.append(label, note);
   const refresh = () => {
     select.value = controller.mode;
-    note.textContent = controller.reducedMotion ? "Reduced motion: inertia and automatic return are off."
-      : controller.mode === "smart" ? "Smart: keep small changes; return larger views after settling and 2 seconds idle."
-      : controller.mode === "free" ? "Free Rotation: inertia, without automatic return." : "Classic: direct rotation, without inertia or automatic return.";
+    note.textContent = controller.reducedMotion ? "Reduced motion: inertia and automatic return are off; choosing an upright mode levels gently over 150 ms."
+      : controller.mode === "smart" ? "Smart upright: keep small changes; return larger views after settling and 2 seconds idle."
+      : controller.mode === "free" ? "Free Rotation: full rotation with inertia, without automatic return." : "Classic upright: direct rotation, without inertia or automatic return.";
   };
   const change = () => {
     if (disposed) return;
