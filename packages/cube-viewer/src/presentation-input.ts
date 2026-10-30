@@ -22,7 +22,12 @@ export function installPresentationDrag(
     if (pointers.size) blocked = true;
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY,
       time: e.timeStamp, active: threshold === 0 });
-    try { element.setPointerCapture(e.pointerId); } catch { /* Keep cancellation safe if capture is unavailable. */ }
+    try { element.setPointerCapture(e.pointerId); } catch {
+      // Without capture an outside release may never reach this element.
+      // Never retain that contact as a ghost that blocks future gestures.
+      pointers.delete(e.pointerId);
+      if (!pointers.size) { blocked = false; lifecycle.up?.(e, true); }
+    }
   };
   const motion = (e: PointerEvent) => {
     const drag = pointers.get(e.pointerId);
