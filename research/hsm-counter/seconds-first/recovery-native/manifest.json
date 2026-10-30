@@ -15,11 +15,14 @@
     }
   },
   "contract": {
-    "commit": "eb151a9",
+    "commit": "eb151a96928c47588816c931e863fa879ad6cfb9",
     "path": "proof-checkers/HSM-RECOVERY-PROFILE.md",
     "sha256": "758e95d60b04e0dfa4fb756451510e6abe0ea44d67574669f52e0fb5302c05d6"
   },
-  "executionOrder": ["Julia", "Flix"],
+  "executionOrder": [
+    "Julia",
+    "Flix"
+  ],
   "confirmationRequires": "Both independent native checkers accept identical raw inputs, with no dissent, followed by independent review.",
   "claims": [
     "Immutable physical print and bound application-period selection",
@@ -28,6 +31,31 @@
     "All 18 mode metrics, histograms and rounded means",
     "Full sample replay, inverse replay and optimal recovery costs"
   ],
-  "excludedClaims": ["Global print optimality", "Runtime reachability of forced-six poses"],
-  "runs": []
+  "excludedClaims": [
+    "Global print optimality",
+    "Runtime reachability of forced-six poses"
+  ],
+  "runs": [
+    {
+      "id": "julia-smoke-s11-up",
+      "scope": "One complete mode only: S 00–11, incrementing",
+      "result": "UNKNOWN",
+      "confirmation": "NOT_CONFIRMED",
+      "capture": "runs/julia-smoke-s11-up/capture.json",
+      "files": {
+        "capture.json": "9f267b3d74df570ac82dbcb6f0ca5c03951209e5fc95695f161e83b7ae9a0673",
+        "stdout.jsonl": "4b38053fd8869b49e9fcd3ac9cc656881a0c52baea1f7d9141f0855d538f7f12",
+        "stderr.txt": "284187604ac0ed214d4aac56de6b76214581e415884436dcb05db79826db500d",
+        "run.jl": "3eec7bd647a5306897a641a38f569b1123c193b7a16dbf6999dab3d1deac4902",
+        "capture.py": "8089e27be3b17218ab46872f55ed88319e5a463a0e3812f39181e2ae400ad56c",
+        "source/Checker.jl": "4cbd782b2bac4dc8392bbad7d8487a1f98cc76bde97a8a4090cd439a0db52ddb",
+        "source/Conformance.jl": "fa327f80eb92276e20ee1d6783f4af3cc770a5c975225645e6702d96ec133b9c",
+        "source/Hsm.jl": "0326ab44cb742f82fe33ae5c8f1f3ab7c11a0ea55fe6cffc5ec658f053150765",
+        "source/Manifest.toml": "136ee9a307e16429f3f89ba1505e1b0f9c51502156c32b3647d554590315d965",
+        "source/Project.toml": "8e44eb68d33587f674f530e8118dd0d898e8a52017d28fc5b55ae345cf3717bb",
+        "source/Recovery.jl": "1b9a04cdff84ff4283be2c12de499867cca4eed167a2561b2ba9108fb29d16b8",
+        "source/recovery.jl": "cd6e72a893c52d1a8ff1dc3235acd6f01d9856d9e8f499f59032c7ba38edac54"
+      }
+    }
+  ]
 }

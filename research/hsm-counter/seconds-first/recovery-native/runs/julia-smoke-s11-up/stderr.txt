@@ -1,0 +1,3 @@
+checking recovery ("S", 11, 1)
+graph S 0-11 1: 25000/62208 nodes, 539214 edges, 8418 word-cache entries
+graph S 0-11 1: 50000/62208 nodes, 1053659 edges, 22947 word-cache entries

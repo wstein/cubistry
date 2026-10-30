@@ -1,0 +1,6 @@
+include("/workspace/cubistry-hsm-recovery-julia/proof-checkers/julia/Checker.jl")
+include("/workspace/cubistry-hsm-recovery-julia/proof-checkers/julia/Hsm.jl")
+include("/workspace/cubistry-hsm-recovery-julia/proof-checkers/julia/Recovery.jl")
+valid,status,output = IndependentRecovery.evaluate("/tmp/hsm-recovery-source.json","/tmp/hsm-modes-source.json";smoke_index=5)
+println(output)
+exit(status == "UNKNOWN" ? 0 : 1)
