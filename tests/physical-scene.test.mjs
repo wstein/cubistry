@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import * as THREE from "three";
 import { PhysicalCubeScene } from "../packages/cube-viewer/src/physical-scene.ts";
+import { createPresentationGeometry } from "../packages/cube-viewer/src/presentation-preset.ts";
 import { createDesign } from "../src/apps/playground/model.ts";
 import { stickerPoses, initialState, presentMove, parseMove, FACE_LAYERS } from "@cubistry/cube-mechanics";
 import { apply, moveInfo, validateDesign } from "../src/apps/calendar/model.ts";
@@ -12,8 +13,7 @@ const near = (a, b) => {
 };
 function fixture(printed, spacing) {
   const parent = new THREE.Group();
-  const geometry = { body: new THREE.BoxGeometry(.99, .99, .99),
-    sticker: new THREE.PlaneGeometry(.87, .87), stickerOffset: .501 };
+  const geometry = createPresentationGeometry();
   const material = new THREE.MeshStandardMaterial();
   const adapter = new PhysicalCubeScene(parent, printed,
     new Map(printed.map(s => [s.id, material])), material, spacing, geometry);

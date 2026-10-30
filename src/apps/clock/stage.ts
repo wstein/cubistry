@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { clockCameraRadius } from "./framing.ts";
-import { CubeViewer } from "@cubistry/cube-viewer";
+import { CubeViewer, configurePresentationRenderer, addPresentationLighting } from "@cubistry/cube-viewer";
 import { demand } from "@cubistry/cube-core";
 /** One WebGL context, scene, camera and frame loop for the entire H–M–S row. */
 export class ClockStage {
@@ -15,8 +15,7 @@ export class ClockStage {
   private cubes: CubeViewer[] = [];
   constructor(host: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    this.renderer.setPixelRatio(Math.min(2, devicePixelRatio));
-    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    configurePresentationRenderer(this.renderer);
     const el = this.renderer.domElement;
     host.append(el);
     el.setAttribute("role", "img");
@@ -24,10 +23,7 @@ export class ClockStage {
       "aria-label",
       "Live H M S clock. Three physical cubes in one scene. Drag to orbit all three.",
     );
-    this.scene.add(new THREE.AmbientLight(0xffffff, 2));
-    const light = new THREE.DirectionalLight(0xffffff, 3);
-    light.position.set(3, 5, 6);
-    this.scene.add(light);
+    addPresentationLighting(this.scene);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;

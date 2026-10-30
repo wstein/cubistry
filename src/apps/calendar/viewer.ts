@@ -8,7 +8,10 @@ import {
   type State,
   type Design,
 } from "./model.ts";
-import { PhysicalCubeScene } from "@cubistry/cube-viewer";
+import {
+  PhysicalCubeScene, createPresentationGeometry, createPlasticMaterial,
+  createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
+} from "@cubistry/cube-viewer";
 /** Calendar-only 26-body viewer: one permanent texture per printed facelet. */
 export class CalendarViewer {
   readonly renderer: THREE.WebGLRenderer;
@@ -34,13 +37,9 @@ export class CalendarViewer {
   constructor(host: HTMLElement) {
     this.host = host;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    this.renderer.setPixelRatio(Math.min(2, devicePixelRatio));
-    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
-    this.scene.add(new THREE.AmbientLight(0xffffff, 2));
-    const light = new THREE.DirectionalLight(0xffffff, 3);
-    light.position.set(3, 5, 6);
-    this.scene.add(light);
+    addPresentationLighting(this.scene);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;
@@ -104,14 +103,9 @@ export class CalendarViewer {
     demand(!this.busy, "Cannot change the calendar print during a turn");
     this.clear();
     this.current = state;
-    const plastic = new THREE.MeshStandardMaterial({
-      color: "#243d35",
-      roughness: 0.65,
-    });
+    const plastic = createPlasticMaterial("#243d35", 0.65);
     this.resources.push(plastic);
-    const box = new THREE.BoxGeometry(0.99, 0.99, 0.99),
-      plane = new THREE.PlaneGeometry(0.86, 0.86);
-    const maps = new Map<string, THREE.MeshBasicMaterial>();
+    const maps = new Map<string, THREE.MeshPhysicalMaterial>();
     for (const s of design.printing) {
       const role = s.image.match(/^[0-9]$/)
         ? "day"
@@ -137,7 +131,7 @@ export class CalendarViewer {
       ctx.fillText(s.image, 128, 133);
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
-      const mat = new THREE.MeshBasicMaterial({ map: texture });
+      const mat = createStickerMaterial(texture);
       this.resources.push(texture, mat);
       maps.set(key, mat);
     }
@@ -147,7 +141,7 @@ export class CalendarViewer {
       materials.set(s.id, maps.get(role + ":" + s.image)!);
     }
     this.cube = new PhysicalCubeScene(this.scene, design.printing, materials, plastic, 1.04,
-      { body: box, sticker: plane, stickerOffset: 0.502 });
+      createPresentationGeometry());
     this.sync(state);
   }
   private sync(state: State): void {
