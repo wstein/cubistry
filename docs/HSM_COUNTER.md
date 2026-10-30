@@ -101,6 +101,22 @@ four, counting up:
 | H 00–23 | 48 (two laps) | 82 average | 5 | 4 |
 | H 00–11 | 12 (one lap) | 40 | 4 | 4 |
 
+Move-count frequencies below cover the **complete saved period**, including
+all wraps, with setup excluded. M and H 00–23 each span two laps; their integer
+frequencies must not be read as counts for one lap. Each half turn counts as one
+HTM. Mean HTM per transition is the weighted total divided by period edges.
+
+| Unit and range | Transitions | 1 HTM | 2 HTM | 3 HTM | 4 HTM | 5 HTM | Total HTM | Mean HTM/transition |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| S 00–59 | 60 | 12 | 6 | 33 | 9 | 0 | 159 | 2.6500 |
+| M 00–59 | 120 | 0 | 0 | 81 | 30 | 9 | 408 | 3.4000 |
+| H 00–23 | 48 | 2 | 0 | 29 | 10 | 7 | 164 | 3.4167 |
+| H 00–11 | 12 | 0 | 0 | 8 | 4 | 0 | 40 | 3.3333 |
+
+These are descriptive counts of the pinned route words, not an independent
+confirmation of feasibility or optimality. Reversing the saved period preserves
+the histogram and mean.
+
 Counting down walks the same period backward with every word inverted. It
 closes the same poses and costs the same HTM, but is not necessarily the shortest
 word toward the lower display. The research gives 159 for the seconds inverse and
