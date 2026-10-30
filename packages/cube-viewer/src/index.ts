@@ -21,6 +21,7 @@ import {
 } from "./facelet-image.ts";
 import { clampPitch, viewTurn } from "./orbit-input.ts";
 import { animateTimedProgress, type MotionTimingSource } from "./motion-timing.ts";
+export { clampPitch, pitchLimit } from "./orbit-input.ts";
 export type { MotionTiming, MotionTimingSource } from "./motion-timing.ts";
 import { createPresentationStudio } from "./studio.ts";
 export { createPresentationStudio, STUDIO_BACKGROUND } from "./studio.ts";

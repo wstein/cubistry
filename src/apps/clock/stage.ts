@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { groupOrbit, groupZoom } from "./orbit.ts";
 import { clockCameraRadius } from "./framing.ts";
 import { CubeViewer, configurePresentationRenderer, createPresentationStudio } from "@cubistry/cube-viewer";
 import { demand } from "@cubistry/cube-core";
@@ -6,12 +7,13 @@ import { demand } from "@cubistry/cube-core";
 export class ClockStage {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
-  readonly camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+  readonly camera = new THREE.PerspectiveCamera(28, 1, 0.1, 1000);
   private readonly resize: ResizeObserver;
   private readonly studio: ReturnType<typeof createPresentationStudio>;
   private yaw = 0.2;
   private pitch = 0.16;
   private radius = 12;
+  private zoom = 1;
   private drag: { id: number; x: number; y: number } | null = null;
   private cubes: CubeViewer[] = [];
   constructor(host: HTMLElement) {
@@ -40,14 +42,8 @@ export class ClockStage {
     });
     el.addEventListener("pointermove", (e) => {
       if (!this.drag || this.drag.id !== e.pointerId) return;
-      this.yaw = Math.max(
-        -0.5,
-        Math.min(0.5, this.yaw - (e.clientX - this.drag.x) * 0.004),
-      );
-      this.pitch = Math.max(
-        -0.4,
-        Math.min(0.4, this.pitch + (e.clientY - this.drag.y) * 0.004),
-      );
+      Object.assign(this, groupOrbit(this.yaw, this.pitch,
+        e.clientX - this.drag.x, e.clientY - this.drag.y));
       this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
     });
     const release = () => {
@@ -56,13 +52,17 @@ export class ClockStage {
     el.addEventListener("pointerup", release);
     el.addEventListener("pointercancel", release);
     el.addEventListener("lostpointercapture", release);
+    el.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      this.zoom = groupZoom(this.zoom, e.deltaY);
+    }, { passive: false });
     this.renderer.setAnimationLoop(() => {
       this.radius = clockCameraRadius(
         this.camera.aspect,
         this.yaw,
         this.pitch,
         this.camera.fov,
-      );
+      ) * this.zoom;
       this.camera.position.set(
         Math.sin(this.yaw) * Math.cos(this.pitch) * this.radius,
         Math.sin(this.pitch) * this.radius,
@@ -93,6 +93,8 @@ export class ClockStage {
   resetCamera(): void {
     this.yaw = 0.2;
     this.pitch = 0.16;
+    this.zoom = 1;
+    this.drag = null;
   }
   destroy(): void {
     demand(
