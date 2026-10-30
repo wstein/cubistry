@@ -33,9 +33,9 @@ function publication({previewFailure=false,previewCancelled=false,earlyFailure=f
  writeFileSync(join(storage,'pr-preview/pr-1/preview-info.json'),JSON.stringify({sha:old}));
  function run(id){
   if(results.has(id))return;for(const dependency of needs(id))run(dependency);
-  const body=jobs.get(id),always=/if: always\(\)/.test(body);
-  const conditions=[...body.matchAll(/needs\.([a-z-]+)\.result == '([^']+)'/g)];
-  if((/!cancelled\(\)/.test(body)&&cancelled)||(!always&&needs(id).some(n=>results.get(n)!=='success'))||conditions.some(m=>results.get(m[1])!==m[2])){results.set(id,'skipped');return;}
+  const body=jobs.get(id),jobIf=body.match(/^    if: (.*)$/m)?.[1]??'',always=/always\(\)/.test(jobIf);
+  const conditions=[...jobIf.matchAll(/needs\.([a-z-]+)\.result == '([^']+)'/g)];
+  if((/!cancelled\(\)/.test(jobIf)&&cancelled)||(!always&&needs(id).some(n=>results.get(n)!=='success'))||conditions.some(m=>results.get(m[1])!==m[2])){results.set(id,'skipped');return;}
   if(id==='previews'){
    writeFileSync(join(storage,'pr-preview/pr-1/preview-info.json'),JSON.stringify({sha}));rmSync(join(storage,'pr-preview/pr-2'),{recursive:true});
    if(previewCancelled)cancelled=true;results.set(id,previewCancelled?'cancelled':previewFailure?'failure':'success');return;
@@ -48,7 +48,7 @@ function publication({previewFailure=false,previewCancelled=false,earlyFailure=f
   results.set(id,'success');
  }
  try{
-  run('notify');
+  run('notify');assert.equal(results.get('notify'),'success','status notification must still run after a publication failure/cancellation');
   const gate=jobs.get('notify').match(/DEPLOY_OK: \$\{\{ needs\.([a-z-]+)\.result == 'success' \}\}/)?.[1];assert(gate,'notify must name its actual deployment dependency');
   return {published:published&&JSON.parse(readFileSync(join(published,'pr-preview/pr-1/preview-info.json'))).sha,
    removed:published&&!existsSync(join(published,'pr-preview/pr-2')),results,comment:notify({deployOK:results.get(gate)==='success'})};
