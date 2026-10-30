@@ -27,9 +27,9 @@
           <form id="notation-form"><label for="notation">Move notation</label><div class="input-row"><input id="notation" placeholder="R U R' U'" autocomplete="off" maxlength="800" /><button type="submit">Apply</button></div></form>
           <form id="scramble-form"><label for="seed">Scramble seed</label><div class="input-row"><input id="seed" type="number" min="0" max="4294967295" value="44" /><label for="count">Moves</label><input id="count" type="number" min="1" max="100" value="20" /><button type="submit">Scramble</button></div></form>
           <div class="button-row"><button id="undo" type="button">Undo</button><button id="redo" type="button">Redo</button><button id="solve" type="button">Solve exact target</button><button id="cancel" type="button">Cancel</button></div>
-          <div class="button-row"><label for="speed">Turn duration <select id="speed"><option value="75">75 ms</option><option value="150" selected>150 ms</option><option value="300">300 ms</option></select></label><button id="restore" type="button">Restore target</button></div>
+          <div class="button-row"><label for="speed">Turn duration <select id="speed"><option value="75">75 ms</option><option value="150" selected>150 ms</option><option value="300">300 ms</option></select></label><button id="restore" type="button">Restore via history</button></div>
           <p id="stats">0 moves played</p><ol id="history" aria-label="Move history"></ol>
-          <p class="hint">Reset view changes presentation only. Restore target resets the puzzle. Exact solving checks every tile frame and can include a long center correction; it is not a shortest-path solver.</p>
+          <p class="hint">Reset view changes presentation only. Restore via history reverses applied legal moves and retains the redo path. Exact solving checks every tile frame and can include a long center correction; it is not a shortest-path solver.</p>
         </section>
       </div>
       <section class="picture-editor" aria-labelledby="pictures-title">
