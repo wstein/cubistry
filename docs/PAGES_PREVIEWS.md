@@ -28,7 +28,11 @@ or deployment runs. Read-only PR/main builds may produce artifacts.
 After activation, `gh-pages` is a static storage branch, not a second Pages
 publishing source. Ross writes `pr-preview/pr-N/`; the pinned JamesIves action
 updates production root with `force: false` and `clean-exclude: pr-preview/`.
-One Actions Pages deployment publishes the complete validated tree. The old and
+An early Actions Pages deployment publishes the verified production update before
+preview reconciliation. After every preview matrix entry finishes, a second
+deployment publishes a fresh combined snapshot. Preview failures cannot block
+the early production deployment; successful preview updates and cleanup can
+still publish if another matrix entry fails. The old and
 new deployers have mutually exclusive gate conditions and share the same global
 publication concurrency group. There is no competing branch-source deployment,
 Pages settings migration, force push or protected research change.
@@ -83,9 +87,11 @@ cleanup. An initial publish refuses a previews-only tree without a verified
 production artifact/root. Subsequent main failures preserve the existing root.
 
 Each eligible PR has one updated bot comment, including pending/failed/stale
-states and build details. Successful links are posted only after the single
+states and build details. Successful links are posted only after the final post-preview
 Actions Pages deployment succeeds and stored metadata matches the current PR
-head. Closed/merged cleanup verifies directory absence before claiming removal.
+head. Success of the earlier production snapshot alone is insufficient: that
+snapshot necessarily predates this run's preview updates. Closed/merged cleanup likewise requires the final deployment and verifies
+directory absence before claiming removal.
 Failures can retain a previously verified preview; its old SHA/banner and the
 updated comment identify it as stale. Re-running the trusted publisher
 reconciles state; no arbitrary input source paths or PR shell text are executed.
@@ -98,7 +104,11 @@ and `wait-for-pages-deployment: false`. Its nested JamesIves publisher is pinned
 at `4a3abc783e1a24aeb44c16e869ad83caf6b4cc23` (v4.7.4), with `force: false`.
 Its optional sticky-comment action is pinned upstream; we disable Ross comments
 and QR requests so status is written only after our actual Actions deployment,
-using one stable bot marker. No third-party QR service receives preview URLs.
+using one stable bot marker. The final upload uses the distinct artifact name
+`github-pages-previews`, passed to the deployment action through `artifact_name`;
+the early upload retains `github-pages`. Both input contracts were checked in
+the existing pinned action sources, avoiding duplicate immutable artifact names
+within a run. No third-party QR service receives preview URLs.
 All new workflow actions are pinned to reviewed commit SHAs; Ross is used as-is,
 not vendored or modified.
 
@@ -131,3 +141,25 @@ actually deploy it. The following are explicit maintainer operations:
 Local tests cover two previews/two updates/independent merge+close plans,
 production/other-preview retention, unsafe archives, missing baseline and deep
 asset bases. No actual branch publication or deployment is used by those tests.
+
+## Publication-order regression
+
+A production-first deployment followed by Ross storage updates is not enough to
+publish the new previews. The observed failure had current `gh-pages` metadata
+and a successful early deployment while the public URL still served the older
+snapshot. The final `deploy-previews` job therefore waits for the entire matrix,
+uses `always()` to permit partial preview failures, and still requires successful
+production staging and the early deployment. Notification consumes only its
+result. Failure of this final deployment reports previews/cleanup as pending
+while the already published production site remains available.
+
+`node --test tests/pages-publication.test.mjs tests/pages-workflow.test.mjs tests/pages-policy.test.mjs tests/pages-stage.test.mjs`
+replays the actual workflow dependency graph with the real snapshot helper and
+executes the actual notification script against a mocked API. It covers fresh
+and stale metadata, partial matrix failure, failed early/final deployments,
+cleanup, trusted checkouts, and distinct artifact identity. These are Node/static
+pipeline regressions, not browser tests or evidence of a new live deployment.
+This maintenance change preserves activation gates and does not activate,
+dispatch or deploy the workflow; trusted-main behavior changes only after a
+human merges the reviewed fix. The initial activation procedure above remains
+historical setup guidance for inactive installations.
