@@ -1,0 +1,541 @@
+moving-layout	pairs_forward_wrap	DE	2099	false
+moving-orbit	pairs_forward_wrap	DE	2099	-3	-3	10	6	16	3	24
+moving-orbit	pairs_forward_wrap	DE	2099	-3	-2	12	4	16	2	24
+moving-orbit	pairs_forward_wrap	DE	2099	-3	-1	19	8	27	2	24
+moving-orbit	pairs_forward_wrap	DE	2099	-3	0	20	4	24	2	24
+moving-orbit	pairs_forward_wrap	DE	2099	-3	1	17	5	22	3	24
+moving-orbit	pairs_forward_wrap	DE	2099	-3	2	15	4	19	2	24
+moving-orbit	pairs_forward_wrap	DE	2099	-2	-2	16	0	16	0	24
+moving-orbit	pairs_forward_wrap	DE	2099	-2	-1	21	0	21	1	24
+moving-orbit	pairs_forward_wrap	DE	2099	-2	0	22	0	22	0	24
+moving-orbit	pairs_forward_wrap	DE	2099	-2	1	18	0	18	1	24
+moving-orbit	pairs_forward_wrap	DE	2099	-1	-1	22	0	22	2	24
+moving-orbit	pairs_forward_wrap	DE	2099	-1	0	22	0	22	1	24
+moving-orbit	pairs_forward_wrap	DE	2099	0	0	6	0	6	0	6
+moving-layout	pairs_forward_reflect	DE	2099	false
+moving-orbit	pairs_forward_reflect	DE	2099	-3	-3	10	4	14	3	24
+moving-orbit	pairs_forward_reflect	DE	2099	-3	-2	12	3	15	2	24
+moving-orbit	pairs_forward_reflect	DE	2099	-3	-1	19	6	25	2	24
+moving-orbit	pairs_forward_reflect	DE	2099	-3	0	20	6	26	2	24
+moving-orbit	pairs_forward_reflect	DE	2099	-3	1	17	6	23	3	24
+moving-orbit	pairs_forward_reflect	DE	2099	-3	2	15	6	21	2	24
+moving-orbit	pairs_forward_reflect	DE	2099	-2	-2	16	0	16	0	24
+moving-orbit	pairs_forward_reflect	DE	2099	-2	-1	21	0	21	1	24
+moving-orbit	pairs_forward_reflect	DE	2099	-2	0	22	0	22	0	24
+moving-orbit	pairs_forward_reflect	DE	2099	-2	1	18	0	18	1	24
+moving-orbit	pairs_forward_reflect	DE	2099	-1	-1	22	0	22	2	24
+moving-orbit	pairs_forward_reflect	DE	2099	-1	0	22	0	22	1	24
+moving-orbit	pairs_forward_reflect	DE	2099	0	0	6	0	6	0	6
+moving-layout	pairs_left_middle_right	DE	2099	false
+moving-orbit	pairs_left_middle_right	DE	2099	-3	-3	10	7	17	3	24
+moving-orbit	pairs_left_middle_right	DE	2099	-3	-2	12	3	15	2	24
+moving-orbit	pairs_left_middle_right	DE	2099	-3	-1	19	8	27	2	24
+moving-orbit	pairs_left_middle_right	DE	2099	-3	0	20	4	24	2	24
+moving-orbit	pairs_left_middle_right	DE	2099	-3	1	17	7	24	3	24
+moving-orbit	pairs_left_middle_right	DE	2099	-3	2	15	4	19	2	24
+moving-orbit	pairs_left_middle_right	DE	2099	-2	-2	16	0	16	0	24
+moving-orbit	pairs_left_middle_right	DE	2099	-2	-1	21	0	21	1	24
+moving-orbit	pairs_left_middle_right	DE	2099	-2	0	22	0	22	0	24
+moving-orbit	pairs_left_middle_right	DE	2099	-2	1	18	0	18	1	24
+moving-orbit	pairs_left_middle_right	DE	2099	-1	-1	22	0	22	2	24
+moving-orbit	pairs_left_middle_right	DE	2099	-1	0	22	0	22	1	24
+moving-orbit	pairs_left_middle_right	DE	2099	0	0	6	0	6	0	6
+moving-layout	quarters_left_middle_right_left	DE	2099	false
+moving-orbit	quarters_left_middle_right_left	DE	2099	-3	-3	10	9	19	3	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-3	-2	12	5	17	2	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-3	-1	19	9	28	2	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-3	0	20	3	23	2	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-3	1	17	6	23	3	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-3	2	15	2	17	2	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-2	-2	16	0	16	0	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-2	-1	21	0	21	1	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-2	0	22	0	22	0	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-2	1	18	0	18	1	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-1	-1	22	0	22	2	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	-1	0	22	0	22	1	24
+moving-orbit	quarters_left_middle_right_left	DE	2099	0	0	6	0	6	0	6
+moving-layout	halfyear_left_right	DE	2099	false
+moving-orbit	halfyear_left_right	DE	2099	-3	-3	10	10	20	3	24
+moving-orbit	halfyear_left_right	DE	2099	-3	-2	12	5	17	2	24
+moving-orbit	halfyear_left_right	DE	2099	-3	-1	19	4	23	2	24
+moving-orbit	halfyear_left_right	DE	2099	-3	0	20	0	20	2	24
+moving-orbit	halfyear_left_right	DE	2099	-3	1	17	6	23	3	24
+moving-orbit	halfyear_left_right	DE	2099	-3	2	15	4	19	2	24
+moving-orbit	halfyear_left_right	DE	2099	-2	-2	16	0	16	0	24
+moving-orbit	halfyear_left_right	DE	2099	-2	-1	21	0	21	1	24
+moving-orbit	halfyear_left_right	DE	2099	-2	0	22	0	22	0	24
+moving-orbit	halfyear_left_right	DE	2099	-2	1	18	0	18	1	24
+moving-orbit	halfyear_left_right	DE	2099	-1	-1	22	0	22	2	24
+moving-orbit	halfyear_left_right	DE	2099	-1	0	22	0	22	1	24
+moving-orbit	halfyear_left_right	DE	2099	0	0	6	0	6	0	6
+moving-layout	group3_best1	DE	2099	true
+moving-orbit	group3_best1	DE	2099	-3	-3	10	10	20	3	24
+moving-orbit	group3_best1	DE	2099	-3	-2	12	3	15	2	24
+moving-orbit	group3_best1	DE	2099	-3	-1	19	3	22	2	24
+moving-orbit	group3_best1	DE	2099	-3	0	20	0	20	2	24
+moving-orbit	group3_best1	DE	2099	-3	1	17	5	22	2	24
+moving-orbit	group3_best1	DE	2099	-3	2	15	5	20	1	24
+moving-orbit	group3_best1	DE	2099	-2	-2	16	0	16	0	24
+moving-orbit	group3_best1	DE	2099	-2	-1	21	0	21	1	24
+moving-orbit	group3_best1	DE	2099	-2	0	22	0	22	0	24
+moving-orbit	group3_best1	DE	2099	-2	1	18	0	18	1	24
+moving-orbit	group3_best1	DE	2099	-1	-1	22	0	22	2	24
+moving-orbit	group3_best1	DE	2099	-1	0	22	0	22	1	24
+moving-orbit	group3_best1	DE	2099	0	0	6	0	6	0	6
+moving-family	DE	6	25	0
+moving-family	DE	3	625	1
+moving-family-pass	DE	3	555555555111
+moving-family	DE	2	15625	0
+moving-layout	pairs_forward_wrap	EN	2099	false
+moving-orbit	pairs_forward_wrap	EN	2099	-3	-3	10	6	16	3	24
+moving-orbit	pairs_forward_wrap	EN	2099	-3	-2	12	4	16	2	24
+moving-orbit	pairs_forward_wrap	EN	2099	-3	-1	18	8	26	2	24
+moving-orbit	pairs_forward_wrap	EN	2099	-3	0	18	4	22	2	24
+moving-orbit	pairs_forward_wrap	EN	2099	-3	1	17	5	22	3	24
+moving-orbit	pairs_forward_wrap	EN	2099	-3	2	15	4	19	2	24
+moving-orbit	pairs_forward_wrap	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	pairs_forward_wrap	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	pairs_forward_wrap	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	pairs_forward_wrap	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	pairs_forward_wrap	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	pairs_forward_wrap	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	pairs_forward_wrap	EN	2099	0	0	6	0	6	0	6
+moving-layout	pairs_forward_reflect	EN	2099	false
+moving-orbit	pairs_forward_reflect	EN	2099	-3	-3	10	4	14	3	24
+moving-orbit	pairs_forward_reflect	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	pairs_forward_reflect	EN	2099	-3	-1	18	6	24	2	24
+moving-orbit	pairs_forward_reflect	EN	2099	-3	0	18	6	24	2	24
+moving-orbit	pairs_forward_reflect	EN	2099	-3	1	17	6	23	3	24
+moving-orbit	pairs_forward_reflect	EN	2099	-3	2	15	5	20	2	24
+moving-orbit	pairs_forward_reflect	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	pairs_forward_reflect	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	pairs_forward_reflect	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	pairs_forward_reflect	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	pairs_forward_reflect	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	pairs_forward_reflect	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	pairs_forward_reflect	EN	2099	0	0	6	0	6	0	6
+moving-layout	pairs_left_middle_right	EN	2099	false
+moving-orbit	pairs_left_middle_right	EN	2099	-3	-3	10	7	17	3	24
+moving-orbit	pairs_left_middle_right	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	pairs_left_middle_right	EN	2099	-3	-1	18	8	26	2	24
+moving-orbit	pairs_left_middle_right	EN	2099	-3	0	18	4	22	2	24
+moving-orbit	pairs_left_middle_right	EN	2099	-3	1	17	7	24	3	24
+moving-orbit	pairs_left_middle_right	EN	2099	-3	2	15	4	19	2	24
+moving-orbit	pairs_left_middle_right	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	pairs_left_middle_right	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	pairs_left_middle_right	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	pairs_left_middle_right	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	pairs_left_middle_right	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	pairs_left_middle_right	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	pairs_left_middle_right	EN	2099	0	0	6	0	6	0	6
+moving-layout	quarters_left_middle_right_left	EN	2099	false
+moving-orbit	quarters_left_middle_right_left	EN	2099	-3	-3	10	9	19	3	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-3	-2	12	4	16	2	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-3	-1	18	9	27	2	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-3	0	18	3	21	2	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-3	1	17	6	23	3	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-3	2	15	2	17	2	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	quarters_left_middle_right_left	EN	2099	0	0	6	0	6	0	6
+moving-layout	halfyear_left_right	EN	2099	false
+moving-orbit	halfyear_left_right	EN	2099	-3	-3	10	10	20	3	24
+moving-orbit	halfyear_left_right	EN	2099	-3	-2	12	4	16	2	24
+moving-orbit	halfyear_left_right	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	halfyear_left_right	EN	2099	-3	0	18	0	18	2	24
+moving-orbit	halfyear_left_right	EN	2099	-3	1	17	6	23	3	24
+moving-orbit	halfyear_left_right	EN	2099	-3	2	15	4	19	2	24
+moving-orbit	halfyear_left_right	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	halfyear_left_right	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	halfyear_left_right	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	halfyear_left_right	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	halfyear_left_right	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	halfyear_left_right	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	halfyear_left_right	EN	2099	0	0	6	0	6	0	6
+moving-layout	group3_best1	EN	2099	true
+moving-orbit	group3_best1	EN	2099	-3	-3	10	10	20	3	24
+moving-orbit	group3_best1	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group3_best1	EN	2099	-3	-1	18	3	21	2	24
+moving-orbit	group3_best1	EN	2099	-3	0	18	0	18	2	24
+moving-orbit	group3_best1	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group3_best1	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group3_best1	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group3_best1	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group3_best1	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group3_best1	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group3_best1	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group3_best1	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group3_best1	EN	2099	0	0	6	0	6	0	6
+moving-layout	group3_best2	EN	2099	true
+moving-orbit	group3_best2	EN	2099	-3	-3	10	7	17	3	24
+moving-orbit	group3_best2	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group3_best2	EN	2099	-3	-1	18	3	21	2	24
+moving-orbit	group3_best2	EN	2099	-3	0	18	3	21	2	24
+moving-orbit	group3_best2	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group3_best2	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group3_best2	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group3_best2	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group3_best2	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group3_best2	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group3_best2	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group3_best2	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group3_best2	EN	2099	0	0	6	0	6	0	6
+moving-layout	group3_best3	EN	2099	true
+moving-orbit	group3_best3	EN	2099	-3	-3	10	9	19	4	24
+moving-orbit	group3_best3	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group3_best3	EN	2099	-3	-1	18	3	21	2	24
+moving-orbit	group3_best3	EN	2099	-3	0	18	3	21	2	24
+moving-orbit	group3_best3	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group3_best3	EN	2099	-3	2	15	7	22	1	24
+moving-orbit	group3_best3	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group3_best3	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group3_best3	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group3_best3	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group3_best3	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group3_best3	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group3_best3	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best1	EN	2099	true
+moving-orbit	group2_best1	EN	2099	-3	-3	10	10	20	3	24
+moving-orbit	group2_best1	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best1	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best1	EN	2099	-3	0	18	0	18	2	24
+moving-orbit	group2_best1	EN	2099	-3	1	17	4	21	2	24
+moving-orbit	group2_best1	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group2_best1	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best1	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best1	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best1	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best1	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best1	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best1	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best2	EN	2099	true
+moving-orbit	group2_best2	EN	2099	-3	-3	10	8	18	3	24
+moving-orbit	group2_best2	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best2	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best2	EN	2099	-3	0	18	2	20	2	24
+moving-orbit	group2_best2	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best2	EN	2099	-3	2	15	6	21	1	24
+moving-orbit	group2_best2	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best2	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best2	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best2	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best2	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best2	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best2	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best3	EN	2099	true
+moving-orbit	group2_best3	EN	2099	-3	-3	10	9	19	4	24
+moving-orbit	group2_best3	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best3	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best3	EN	2099	-3	0	18	2	20	2	24
+moving-orbit	group2_best3	EN	2099	-3	1	17	4	21	2	24
+moving-orbit	group2_best3	EN	2099	-3	2	15	5	20	1	24
+moving-orbit	group2_best3	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best3	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best3	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best3	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best3	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best3	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best3	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best4	EN	2099	true
+moving-orbit	group2_best4	EN	2099	-3	-3	10	8	18	3	24
+moving-orbit	group2_best4	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best4	EN	2099	-3	-1	18	3	21	2	24
+moving-orbit	group2_best4	EN	2099	-3	0	18	2	20	2	24
+moving-orbit	group2_best4	EN	2099	-3	1	17	4	21	2	24
+moving-orbit	group2_best4	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group2_best4	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best4	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best4	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best4	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best4	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best4	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best4	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best5	EN	2099	true
+moving-orbit	group2_best5	EN	2099	-3	-3	10	8	18	3	24
+moving-orbit	group2_best5	EN	2099	-3	-2	12	4	16	2	24
+moving-orbit	group2_best5	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best5	EN	2099	-3	0	18	2	20	2	24
+moving-orbit	group2_best5	EN	2099	-3	1	17	4	21	2	24
+moving-orbit	group2_best5	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group2_best5	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best5	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best5	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best5	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best5	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best5	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best5	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best6	EN	2099	true
+moving-orbit	group2_best6	EN	2099	-3	-3	10	9	19	3	24
+moving-orbit	group2_best6	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best6	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best6	EN	2099	-3	0	18	2	20	2	24
+moving-orbit	group2_best6	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best6	EN	2099	-3	2	15	6	21	1	24
+moving-orbit	group2_best6	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best6	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best6	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best6	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best6	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best6	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best6	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best7	EN	2099	true
+moving-orbit	group2_best7	EN	2099	-3	-3	10	9	19	3	24
+moving-orbit	group2_best7	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best7	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best7	EN	2099	-3	0	18	2	20	2	24
+moving-orbit	group2_best7	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best7	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group2_best7	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best7	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best7	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best7	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best7	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best7	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best7	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best8	EN	2099	true
+moving-orbit	group2_best8	EN	2099	-3	-3	10	9	19	3	24
+moving-orbit	group2_best8	EN	2099	-3	-2	12	5	17	2	24
+moving-orbit	group2_best8	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best8	EN	2099	-3	0	18	2	20	2	24
+moving-orbit	group2_best8	EN	2099	-3	1	17	4	21	2	24
+moving-orbit	group2_best8	EN	2099	-3	2	15	3	18	1	24
+moving-orbit	group2_best8	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best8	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best8	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best8	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best8	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best8	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best8	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best9	EN	2099	true
+moving-orbit	group2_best9	EN	2099	-3	-3	10	9	19	3	24
+moving-orbit	group2_best9	EN	2099	-3	-2	12	5	17	2	24
+moving-orbit	group2_best9	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best9	EN	2099	-3	0	18	2	20	2	24
+moving-orbit	group2_best9	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best9	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group2_best9	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best9	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best9	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best9	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best9	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best9	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best9	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best10	EN	2099	true
+moving-orbit	group2_best10	EN	2099	-3	-3	10	9	19	3	24
+moving-orbit	group2_best10	EN	2099	-3	-2	12	5	17	2	24
+moving-orbit	group2_best10	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best10	EN	2099	-3	0	18	2	20	2	24
+moving-orbit	group2_best10	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best10	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group2_best10	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best10	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best10	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best10	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best10	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best10	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best10	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best11	EN	2099	true
+moving-orbit	group2_best11	EN	2099	-3	-3	10	6	16	3	24
+moving-orbit	group2_best11	EN	2099	-3	-2	12	4	16	2	24
+moving-orbit	group2_best11	EN	2099	-3	-1	18	3	21	2	24
+moving-orbit	group2_best11	EN	2099	-3	0	18	4	22	2	24
+moving-orbit	group2_best11	EN	2099	-3	1	17	4	21	2	24
+moving-orbit	group2_best11	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group2_best11	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best11	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best11	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best11	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best11	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best11	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best11	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best12	EN	2099	true
+moving-orbit	group2_best12	EN	2099	-3	-3	10	7	17	3	24
+moving-orbit	group2_best12	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best12	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best12	EN	2099	-3	0	18	3	21	2	24
+moving-orbit	group2_best12	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best12	EN	2099	-3	2	15	7	22	1	24
+moving-orbit	group2_best12	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best12	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best12	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best12	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best12	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best12	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best12	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best13	EN	2099	true
+moving-orbit	group2_best13	EN	2099	-3	-3	10	8	18	4	24
+moving-orbit	group2_best13	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best13	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best13	EN	2099	-3	0	18	4	22	2	24
+moving-orbit	group2_best13	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best13	EN	2099	-3	2	15	5	20	1	24
+moving-orbit	group2_best13	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best13	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best13	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best13	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best13	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best13	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best13	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best14	EN	2099	true
+moving-orbit	group2_best14	EN	2099	-3	-3	10	6	16	3	24
+moving-orbit	group2_best14	EN	2099	-3	-2	12	5	17	2	24
+moving-orbit	group2_best14	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best14	EN	2099	-3	0	18	4	22	2	24
+moving-orbit	group2_best14	EN	2099	-3	1	17	4	21	2	24
+moving-orbit	group2_best14	EN	2099	-3	2	15	4	19	1	24
+moving-orbit	group2_best14	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best14	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best14	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best14	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best14	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best14	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best14	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best15	EN	2099	true
+moving-orbit	group2_best15	EN	2099	-3	-3	10	6	16	3	24
+moving-orbit	group2_best15	EN	2099	-3	-2	12	4	16	2	24
+moving-orbit	group2_best15	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best15	EN	2099	-3	0	18	4	22	2	24
+moving-orbit	group2_best15	EN	2099	-3	1	17	4	21	3	24
+moving-orbit	group2_best15	EN	2099	-3	2	15	5	20	2	24
+moving-orbit	group2_best15	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best15	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best15	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best15	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best15	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best15	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best15	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best16	EN	2099	true
+moving-orbit	group2_best16	EN	2099	-3	-3	10	7	17	4	24
+moving-orbit	group2_best16	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best16	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best16	EN	2099	-3	0	18	3	21	2	24
+moving-orbit	group2_best16	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best16	EN	2099	-3	2	15	7	22	1	24
+moving-orbit	group2_best16	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best16	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best16	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best16	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best16	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best16	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best16	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best17	EN	2099	true
+moving-orbit	group2_best17	EN	2099	-3	-3	10	8	18	3	24
+moving-orbit	group2_best17	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best17	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best17	EN	2099	-3	0	18	3	21	2	24
+moving-orbit	group2_best17	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best17	EN	2099	-3	2	15	6	21	1	24
+moving-orbit	group2_best17	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best17	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best17	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best17	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best17	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best17	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best17	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best18	EN	2099	true
+moving-orbit	group2_best18	EN	2099	-3	-3	10	7	17	4	24
+moving-orbit	group2_best18	EN	2099	-3	-2	12	5	17	2	24
+moving-orbit	group2_best18	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best18	EN	2099	-3	0	18	4	22	2	24
+moving-orbit	group2_best18	EN	2099	-3	1	17	3	20	3	24
+moving-orbit	group2_best18	EN	2099	-3	2	15	3	18	2	24
+moving-orbit	group2_best18	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best18	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best18	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best18	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best18	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best18	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best18	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best19	EN	2099	true
+moving-orbit	group2_best19	EN	2099	-3	-3	10	7	17	3	24
+moving-orbit	group2_best19	EN	2099	-3	-2	12	6	18	2	24
+moving-orbit	group2_best19	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best19	EN	2099	-3	0	18	4	22	2	24
+moving-orbit	group2_best19	EN	2099	-3	1	17	4	21	2	24
+moving-orbit	group2_best19	EN	2099	-3	2	15	3	18	1	24
+moving-orbit	group2_best19	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best19	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best19	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best19	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best19	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best19	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best19	EN	2099	0	0	6	0	6	0	6
+moving-layout	group2_best20	EN	2099	true
+moving-orbit	group2_best20	EN	2099	-3	-3	10	7	17	4	24
+moving-orbit	group2_best20	EN	2099	-3	-2	12	3	15	2	24
+moving-orbit	group2_best20	EN	2099	-3	-1	18	4	22	2	24
+moving-orbit	group2_best20	EN	2099	-3	0	18	4	22	2	24
+moving-orbit	group2_best20	EN	2099	-3	1	17	5	22	2	24
+moving-orbit	group2_best20	EN	2099	-3	2	15	7	22	1	24
+moving-orbit	group2_best20	EN	2099	-2	-2	16	0	16	0	24
+moving-orbit	group2_best20	EN	2099	-2	-1	21	0	21	1	24
+moving-orbit	group2_best20	EN	2099	-2	0	20	0	20	0	24
+moving-orbit	group2_best20	EN	2099	-2	1	18	0	18	1	24
+moving-orbit	group2_best20	EN	2099	-1	-1	22	0	22	2	24
+moving-orbit	group2_best20	EN	2099	-1	0	22	0	22	1	24
+moving-orbit	group2_best20	EN	2099	0	0	6	0	6	0	6
+moving-family	EN	6	25	0
+moving-family	EN	3	625	3
+moving-family-pass	EN	3	444555555111
+moving-family-pass	EN	3	555555555111
+moving-family-pass	EN	3	555555555222
+moving-family	EN	2	15625	55
+moving-family-pass	EN	2	111111445544
+moving-family-pass	EN	2	225555552211
+moving-family-pass	EN	2	441111555544
+moving-family-pass	EN	2	441144441155
+moving-family-pass	EN	2	441144445511
+moving-family-pass	EN	2	441155551144
+moving-family-pass	EN	2	441155552211
+moving-family-pass	EN	2	441155554411
+moving-family-pass	EN	2	444444441111
+moving-family-pass	EN	2	444444551111
+moving-family-pass	EN	2	444455551111
+moving-family-pass	EN	2	445511115544
+moving-family-pass	EN	2	445511551144
+moving-family-pass	EN	2	445511554411
+moving-family-pass	EN	2	445544441111
+moving-family-pass	EN	2	445544551111
+moving-family-pass	EN	2	445555111144
+moving-family-pass	EN	2	445555114411
+moving-family-pass	EN	2	445555441111
+moving-family-pass	EN	2	445555551111
+moving-family-pass	EN	2	445555551122
+moving-family-pass	EN	2	445555551144
+moving-family-pass	EN	2	445555552211
+moving-family-pass	EN	2	445555554411
+moving-family-pass	EN	2	551111225544
+moving-family-pass	EN	2	551144552211
+moving-family-pass	EN	2	551155221144
+moving-family-pass	EN	2	551155221155
+moving-family-pass	EN	2	551155222255
+moving-family-pass	EN	2	551155224411
+moving-family-pass	EN	2	551155225511
+moving-family-pass	EN	2	551155225522
+moving-family-pass	EN	2	551155442211
+moving-family-pass	EN	2	551155552211
+moving-family-pass	EN	2	551155552222
+moving-family-pass	EN	2	552222551144
+moving-family-pass	EN	2	552222551155
+moving-family-pass	EN	2	552255221155
+moving-family-pass	EN	2	554444441111
+moving-family-pass	EN	2	554444551111
+moving-family-pass	EN	2	554455551111
+moving-family-pass	EN	2	554455551122
+moving-family-pass	EN	2	554455552211
+moving-family-pass	EN	2	555544441111
+moving-family-pass	EN	2	555544551111
+moving-family-pass	EN	2	555544551122
+moving-family-pass	EN	2	555544552211
+moving-family-pass	EN	2	555555222211
+moving-family-pass	EN	2	555555441111
+moving-family-pass	EN	2	555555441122
+moving-family-pass	EN	2	555555442211
+moving-family-pass	EN	2	555555551111
+moving-family-pass	EN	2	555555551122
+moving-family-pass	EN	2	555555552211
+moving-family-pass	EN	2	555555552222

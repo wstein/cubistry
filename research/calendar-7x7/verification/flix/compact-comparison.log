@@ -1,0 +1,4 @@
+PASS: all 24 compact-header layouts and all 312 orbit triples match Julia output.
+Requested columns 1,2: both languages, both ranges have orbit (-3,-2) demand 25 > capacity 24.
+All six adjacent placements fail for 2026–2099; only DE columns 6,7 pass for 2026 alone.
+Necessary inventory bounds only; physical feasibility UNKNOWN.

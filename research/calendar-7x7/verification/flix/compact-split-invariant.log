@@ -1,0 +1,3 @@
+Native compact: fixed 1+2 for every month.
+Native compact-prefix: fixed 2+1 for every month.
+No adaptive monthly mixing; separate DE and EN print inventories.

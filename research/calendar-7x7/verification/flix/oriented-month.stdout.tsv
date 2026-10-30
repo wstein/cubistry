@@ -1,0 +1,74 @@
+oriented-pass	DE	2030	2,6,7	4,5	month	true
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-3	-3	20	3	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-3	-2	20	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-3	-1	20	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-3	0	22	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-3	1	22	2	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-3	2	22	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-2	-2	16	0	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-2	-1	21	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-2	0	22	0	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-2	1	18	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-1	-1	22	2	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	-1	0	22	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	true	0	0	6	0	6
+oriented-pass	DE	2030	2,6,7	4,5	month	false
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-3	-3	20	3	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-3	-2	20	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-3	-1	19	2	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-3	0	22	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-3	1	22	2	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-3	2	22	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-2	-2	16	0	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-2	-1	21	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-2	0	22	0	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-2	1	18	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-1	-1	22	2	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	-1	0	22	1	24
+oriented-orbit	DE	2030	2,6,7	4,5	month	false	0	0	6	0	6
+oriented-boundary	DE	2030	2
+oriented-pass	EN	2030	2,6,7	3,4	month	false
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-3	-3	20	3	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-3	-2	20	1	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-3	-1	20	1	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-3	0	23	1	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-3	1	17	3	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-3	2	21	1	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-2	-2	16	0	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-2	-1	21	1	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-2	0	20	0	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-2	1	18	1	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-1	-1	22	2	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	-1	0	22	1	24
+oriented-orbit	EN	2030	2,6,7	3,4	month	false	0	0	6	0	6
+oriented-pass	EN	2030	2,6,7	4,5	month	true
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-3	-3	20	3	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-3	-2	20	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-3	-1	19	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-3	0	20	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-3	1	22	2	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-3	2	21	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-2	-2	16	0	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-2	-1	21	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-2	0	20	0	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-2	1	18	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-1	-1	22	2	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	-1	0	22	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	true	0	0	6	0	6
+oriented-pass	EN	2030	2,6,7	4,5	month	false
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-3	-3	20	3	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-3	-2	20	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-3	-1	18	2	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-3	0	20	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-3	1	22	2	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-3	2	21	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-2	-2	16	0	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-2	-1	21	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-2	0	20	0	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-2	1	18	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-1	-1	22	2	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	-1	0	22	1	24
+oriented-orbit	EN	2030	2,6,7	4,5	month	false	0	0	6	0	6
+oriented-boundary	EN	2030	3
+oriented-boundary	DE	2031	0
+oriented-boundary	EN	2031	0

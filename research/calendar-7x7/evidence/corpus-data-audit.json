@@ -1,0 +1,14 @@
+{
+  "status": "PASS_DATA_PINS",
+  "cases": 195,
+  "counter": 41,
+  "geometry": 154,
+  "kernel": 2048,
+  "generators": 36,
+  "chainValues": 801,
+  "manifestSHA256": "c0d0fa2fc6d692c7c89e436fe5a2670503d8a8a6c86a2cc0d1397be983832e01",
+  "conformancePinSHA256": "5b2b8a8ef98a3c4f5e4982c54ce6c2978911add7667a058f6092bf81e88cf845",
+  "auditedWorktreeSHA": "fe288c765197a8c7e1ff2cde736855d6723da31a",
+  "command": "python3 proof-checkers/tools/audit_corpus.py",
+  "scope": "Data pins only; does not register or prove the research-local calendar format."
+}

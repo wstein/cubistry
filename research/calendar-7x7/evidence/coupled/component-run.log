@@ -1,0 +1,10 @@
+DE distinct complete target fronts: 91
+DE corner: unknown 60.012s; classes [21]
+DE midge: sat 0.085s; classes [21]
+DE wing1: unknown 60.02s; classes [23, 23]
+DE wing2: sat 4.034s; classes [16, 21]
+EN distinct complete target fronts: 91
+EN corner: sat 38.472s; classes [21]
+EN midge: sat 0.278s; classes [19]
+EN wing1: unknown 60.022s; classes [22, 23]
+EN wing2: sat 2.294s; classes [16, 20]

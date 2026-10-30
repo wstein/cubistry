@@ -1,0 +1,5 @@
+PASS: all 24 fixed-2+1 compact-header layouts and all 312 orbit triples match Julia output.
+Requested columns 1,2: both languages pass necessary bounds for 2026 alone and 2026–2099.
+All other five adjacent placements fail.
+Invariant: one fixed 2+1 split across every month; no adaptive 1+2/2+1 mixing.
+Necessary inventory bounds only; physical feasibility UNKNOWN.

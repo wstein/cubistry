@@ -1,0 +1,3 @@
+PASS: all 140 yearless layouts and all 1820 orbit triples match Julia output.
+DE/EN 2026–2099: no contiguous placement passes; exactly columns 2,6,7 pass each language.
+Physical feasibility UNKNOWN; specified font profile and top-row family only.
