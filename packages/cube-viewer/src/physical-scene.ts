@@ -71,7 +71,9 @@ export class PhysicalCubeScene {
           // Seal internal seams/junctions without squaring the approved exterior
           // bevels. Exterior sides retreat beneath the rounded shell; internal
           // cut faces meet at half the physical pitch, as in CubeAssembler.
-          const min = [-0.5, -0.5, -0.5], max = [0.5, 0.5, 0.5];
+          // A 0.0005-unit internal overlap avoids floating-point cracks at
+          // exact four-piece junctions during interpolated rotations.
+          const min = [-0.5005, -0.5005, -0.5005], max = [0.5005, 0.5005, 0.5005];
           for (const face of printed.filter((face) => face.cubie === s.cubie))
             for (let axis = 0; axis < 3; axis++) {
               if (face.n[axis] === 1) max[axis] = 0.43;

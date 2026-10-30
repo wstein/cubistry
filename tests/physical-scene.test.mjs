@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { PhysicalCubeScene } from "../packages/cube-viewer/src/physical-scene.ts";
 import { createPresentationGeometry } from "../packages/cube-viewer/src/presentation-preset.ts";
 import { createDesign } from "../src/apps/playground/model.ts";
-import { stickerPoses, initialState, presentMove, parseMove, FACE_LAYERS } from "@cubistry/cube-mechanics";
+import { stickerPoses, initialState, presentMove, parseMove, FACE_LAYERS, applyMoves, parseAlg } from "@cubistry/cube-mechanics";
 import { apply, moveInfo, validateDesign } from "../src/apps/calendar/model.ts";
 const near = (a, b) => {
   assert.equal(a.length, b.length);
@@ -133,7 +133,7 @@ test("compact size-2/size-3 seams have opaque plastic coverage at frontal and sl
       if (!object.userData.plasticCore) return;
       object.geometry.computeBoundingBox();
       const bounds = object.geometry.boundingBox.clone().applyMatrix4(object.matrix);
-      for (const bound of [...bounds.min, ...bounds.max]) assert(Math.abs(bound) <= .500001);
+      for (const bound of [...bounds.min, ...bounds.max]) assert(Math.abs(bound) <= .500501);
       // The sealing core stays below every exterior printed surface.
       const body = object.parent;
       for (const sticker of body.children.filter(child => child.userData.stickerId !== undefined)) {
@@ -144,6 +144,49 @@ test("compact size-2/size-3 seams have opaque plastic coverage at frontal and sl
         }
       }
     });
+    h.adapter.dispose(); h.material.dispose();
+  }
+});
+
+
+test("opaque seams survive scrambled poses on all six sides and intermediate legal layer turns", () => {
+  const { print } = createDesign("picture");
+  const pin = JSON.parse(readFileSync("calendar-source.json"));
+  const calendar = validateDesign(JSON.parse(readFileSync("public/calendar/" + Object.keys(pin.runtime)[0])));
+  for (const [source, poses, spacing, joints] of [
+    [stickerPoses(print, initialState(print)),
+      stickerPoses(print, applyMoves(initialState(print), parseAlg("R U2 F' L B2"))), .5, [0]],
+    [calendar.printing, apply(calendar.printing, "R U2 F' L B2 x y'"), 1, [-.5, .5]],
+  ]) {
+    const h = fixture(source, spacing); h.adapter.sync(poses);
+    for (const axis of [0, 1, 2]) for (const sign of [-1, 1]) {
+      const tangents = [0, 1, 2].filter(i => i !== axis);
+      const probe = (objects, rotation = new THREE.Matrix4()) => {
+        h.parent.updateMatrixWorld(true);
+        for (const u of joints) for (const v of joints) for (const offset of [0, .015, -.015]) {
+          const origin = new THREE.Vector3(), direction = new THREE.Vector3();
+          origin.setComponent(axis, sign * 10); direction.setComponent(axis, -sign);
+          origin.setComponent(tangents[0], u - offset * 10);
+          origin.setComponent(tangents[1], v);
+          direction.setComponent(tangents[0], offset);
+          origin.applyMatrix4(rotation); direction.transformDirection(rotation);
+          const ray = new THREE.Raycaster(origin, direction.normalize());
+          assert(ray.intersectObjects(objects, true).length > 0,
+            `open seam axis=${axis} sign=${sign} u=${u} v=${v}`);
+        }
+      };
+      probe(h.parent.children);
+      const selected = [...new Set(poses.filter(s => s.p[axis] === sign).map(s => s.cubie))];
+      const bodies = h.parent.children.filter(body => Math.abs(body.position.getComponent(axis) - sign * spacing) < 1e-6);
+      assert.equal(bodies.length, selected.length);
+      const turn = h.adapter.beginTurn(selected, axis, sign * Math.PI / 2);
+      const direction = new THREE.Vector3(); direction.setComponent(axis, 1);
+      for (const progress of [.25, .5, .75, 1]) {
+        turn.update(progress);
+        probe(bodies, new THREE.Matrix4().makeRotationAxis(direction, sign * Math.PI / 2 * progress));
+      }
+      turn.dispose(); h.adapter.sync(poses); h.verify(poses);
+    }
     h.adapter.dispose(); h.material.dispose();
   }
 });
