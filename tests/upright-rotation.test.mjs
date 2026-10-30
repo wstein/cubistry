@@ -85,3 +85,14 @@ test('genuine Free gestures remain anchor candidates through upright selection a
  const automatic=d.quaternion.clone();assert(automatic.angleTo(d.anchor)<25*Math.PI/180);d.setMode('free',3);d.setMode('smart',3.1);
  same(d.quaternion,automatic);same(d.anchor,pose());assert.equal(d.returnDeadline,5.1);d.step(6.1);same(d.quaternion,pose());
 });
+
+test('dragging either pitch boundary discards outward filtered momentum before a small reversal while preserving yaw',()=>{
+ for(const sign of [-1,1])for(const yaw of [0,.1]){
+  const c=new SmartRotation(pose());c.down(0);c.drag(sign*2,yaw,.02);upright(c.quaternion);
+  const expected=new SmartRotation(pose(),'classic');expected.down(0);expected.drag(sign*2,yaw,.02);
+  same(c.quaternion,expected.quaternion);
+  if(yaw===0)assert.equal(c.angularSpeed,0);else assert(c.angularSpeed>0,'yaw inertia is retained');
+  c.drag(-sign*.02,yaw,.04);const up=new Vector3(0,1,0).applyQuaternion(c.quaternion),before=Math.abs(Math.atan2(up.z,up.y));c.up(.04);c.step(.1);
+  const after=new Vector3(0,1,0).applyQuaternion(c.quaternion);assert(Math.abs(Math.atan2(after.z,after.y))<before,'reverse release must continue away from the pole');upright(c.quaternion);
+ }
+});
