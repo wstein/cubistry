@@ -1,0 +1,74 @@
+physical-class	0		0	blank	2
+physical-class	0	01	2	dark	1
+physical-class	0	1	0	red	1
+physical-class	0	11	0	dark	1
+physical-class	0	12	0	dark	1
+physical-class	0	13	0	dark	1
+physical-class	0	14	0	dark	1
+physical-class	0	15	0	dark	1
+physical-class	0	2	0	red	1
+physical-class	0	27	3	dark	1
+physical-class	0	28	3	dark	1
+physical-class	0	29	3	dark	1
+physical-class	0	3	2	red	1
+physical-class	0	30	3	dark	1
+physical-class	0	31	3	dark	1
+physical-class	0	4	2	red	1
+physical-class	0	5	0	red	1
+physical-class	0	6	2	dark	1
+physical-class	0	6	2	red	1
+physical-class	0	7	2	red	1
+physical-class	0	T	1	month	1
+physical-class	0	V	1	month	1
+physical-class	0	Z	1	month	1
+physical-quota	0	24
+physical-class	1		0	blank	2
+physical-class	1	02	0	red	1
+physical-class	1	1	0	dark	1
+physical-class	1	12	0	red	1
+physical-class	1	15	2	red	1
+physical-class	1	16	2	red	1
+physical-class	1	17	2	red	1
+physical-class	1	18	2	red	1
+physical-class	1	19	2	red	1
+physical-class	1	25	3	dark	1
+physical-class	1	26	3	dark	1
+physical-class	1	27	3	dark	1
+physical-class	1	28	3	dark	1
+physical-class	1	29	3	dark	1
+physical-class	1	30	3	dark	1
+physical-class	1	30↶	0	dark	1
+physical-class	1	31	3	dark	1
+physical-class	1	31↶	0	dark	1
+physical-class	1	A	1	month	1
+physical-class	1	F	1	month	1
+physical-class	1	J	1	month	1
+physical-class	1	M	1	month	1
+physical-class	1	S	1	month	1
+physical-quota	1	24
+physical-exclusion		0	blank	2	2028	2	2	2
+physical-exclusion	01	2	dark	1	2031	11	1	2
+physical-allowed	1	0	red	1	1
+physical-exclusion	11	0	dark	1	2027	10	1	2
+physical-exclusion	12	0	dark	1	2026	10	1	2
+physical-exclusion	13	0	dark	1	2027	12	1	2
+physical-exclusion	14	0	dark	1	2026	12	1	2
+physical-exclusion	15	0	dark	1	2027	11	1	2
+physical-exclusion	2	0	red	1	2031	11	1	2
+physical-allowed	27	3	dark	1	1
+physical-exclusion	28	3	dark	1	2031	11	1	2
+physical-exclusion	29	3	dark	1	2027	10	1	2
+physical-exclusion	3	2	red	1	2027	10	1	2
+physical-exclusion	30	3	dark	1	2026	10	1	2
+physical-exclusion	31	3	dark	1	2027	12	1	2
+physical-exclusion	4	2	red	1	2026	10	1	2
+physical-exclusion	5	0	red	1	2027	12	1	2
+physical-allowed	6	2	dark	1	1
+physical-exclusion	6	2	red	1	2026	12	1	2
+physical-exclusion	7	2	red	1	2027	11	1	2
+physical-exclusion	T	1	month	1	2026	10	1	2
+physical-exclusion	V	1	month	1	2027	11	1	2
+physical-exclusion	Z	1	month	1	2026	12	1	2
+physical-obstruction	2026	11	1	20	3
+physical-result	DE_FIXED_MARKED_PROFILE_REJECTED_BY_NECESSARY_WING_COUPLING
+physical-certificate	VALID_NATIVE_REGENERATION_AND_NECESSARY_COUPLING_OBSTRUCTION
