@@ -14,12 +14,14 @@ using ..IndependentProof
 const IP = IndependentProof
 
 const PROFILE = "cubistry.hsm-seconds-first"
+const PROFILE_MODES = "cubistry.hsm-seconds-first-modes"
 const V3 = NTuple{3,Int}
 const Z = (0, 0, 1)
 const Y = (0, 1, 0)
 const FRONT = [(-1, 1, 1), (1, 1, 1), (-1, -1, 1), (1, -1, 1)]  # blank/letter/tens/units cells
 const REQUIRED_MODES = [("S", 59, 1), ("S", 59, -1), ("M", 59, 1), ("M", 59, -1),
                         ("H", 23, 1), ("H", 23, -1), ("H", 11, 1), ("H", 11, -1)]
+const ALL_MODES = [(l, n, d) for l in ("S", "M", "H") for n in (59, 23, 11) for d in (1, -1)]
 const MAX_STEPS = 100000
 const MAX_TOKENS = 64
 
@@ -662,12 +664,63 @@ emit(x::AbstractVector) = "[" * join((emit(v) for v in x), ",") * "]"
 emit(x::Vector{<:Pair}) = "{" * join((emit(k) * ":" * emit(v) for (k, v) in x), ",") * "}"
 emit(x::NamedTuple) = emit([string(k) => v for (k, v) in pairs(x)])
 
+function print_digest(pr::Print)
+    rows = ["$(pr.id[i]),$(pr.cubie[i]),$(join(pr.p[i], ',')),$(join(pr.n[i], ',')),$(join(pr.up[i], ',')),$(pr.slot[i]),$(pr.image[i])" for i in 1:24]
+    bytes2hex(sha256(join(rows, ";")))
+end
+
+function parse_ratio(s, what)
+    need(s isa AbstractString, what * " must be a string")
+    m = match(r"^(0|[1-9][0-9]{0,8})/([1-9][0-9]{0,8})$", s)
+    need(m !== nothing, what * " must be num/den")
+    parse(Int64, m.captures[1]), parse(Int64, m.captures[2])
+end
+
+# Application modes of the all-modes schema: the +1 period unless the -1 period is strictly better, run forward
+# or backward with every word inverted.
+function check_app_modes(raw, modes, replays, limit)
+    need(raw isa AbstractVector && length(raw) == 18, "exactly the 18 application modes")
+    own = Dict((m.letter, m.maximum, m.direction) => (m, r) for (m, r) in zip(modes, replays))
+    per_lap(m) = (m.period_htm * (m.maximum + 1)) // m.period_edges
+    rows = Any[]
+    seen = Set{Tuple{String,Int,Int}}()
+    for a in raw
+        exact_keys(a, ("letter", "maximum", "direction", "sourceDirection", "traversal", "periodHTM", "periodEdges",
+                       "perLapHTM", "maximumHTM"), "application mode")
+        letter, maximum, direction = a["letter"], IP.integer(a["maximum"], 0, 1000), IP.integer(a["direction"], -1, 1)
+        need((letter, maximum, direction) in ALL_MODES && !((letter, maximum, direction) in seen), "distinct application modes")
+        push!(seen, (letter, maximum, direction))
+        primary, alternative = own[(letter, maximum, 1)][1], own[(letter, maximum, -1)][1]
+        chosen = (per_lap(alternative), alternative.max_htm) < (per_lap(primary), primary.max_htm) ? -1 : 1
+        need(IP.integer(a["sourceDirection"], -1, 1) == chosen, "selection rule")
+        need(a["traversal"] == (chosen == direction ? "forward" : "inverse"), "honest traversal")
+        src, rep = own[(letter, maximum, chosen)]
+        need(length(Set(code_of_pose(p) for p in rep.poses)) == length(rep.poses), "an application period visits each full pose once")
+        costs = rep.costs
+        need(maximum_all(costs) <= limit, "every application edge is at most the edge limit")
+        num, den = parse_ratio(a["perLapHTM"], "perLapHTM")
+        want = per_lap(src)
+        need(IP.integer(a["periodHTM"], 0, 10^9) == sum(costs) && IP.integer(a["periodEdges"], 0, 10^9) == length(costs) &&
+             IP.integer(a["maximumHTM"], 0, 10^9) == maximum_all(costs) && num // den == want, "honest application period metrics")
+        push!(rows, (letter=letter, maximum=maximum, direction=direction, sourceDirection=chosen, traversal=a["traversal"],
+                     periodEdges=length(costs), laps=length(costs) ÷ (maximum + 1), periodHTM=sum(costs),
+                     perLapHTM=frac_string(numerator(want), denominator(want)), maximumHTM=maximum_all(costs)))
+    end
+    rows
+end
+maximum_all(xs) = maximum(xs)
+code_of_pose(p) = Tuple(p)
+
 function check_hsm(data, input_sha)
-    need(data isa AbstractDict && get(data, "schema", nothing) == PROFILE, "unsupported HSM witness schema"; code="UNSUPPORTED")
-    exact_keys(data, ("schema", "version", "label", "printCode", "universalArbitrarySourceHTM", "printing", "modes"), "witness")
+    schema = data isa AbstractDict ? get(data, "schema", nothing) : nothing
+    need(schema in (PROFILE, PROFILE_MODES), "unsupported HSM witness schema"; code="UNSUPPORTED")
+    all_modes = schema == PROFILE_MODES
+    base_keys = ("schema", "version", "label", "printCode", "universalArbitrarySourceHTM", "printing", "modes")
+    exact_keys(data, all_modes ? (base_keys..., "edgeLimitHTM", "appModes") : base_keys, "witness")
     need(data["version"] isa Integer && !(data["version"] isa Bool) && data["version"] == 1, "unsupported witness version"; code="UNSUPPORTED")
     need(data["label"] isa AbstractString && isvalid(data["label"]), "label must be a string")
     need(IP.integer(data["universalArbitrarySourceHTM"], 0, 100) == 6, "the profile publishes the six-HTM universal bound")
+    all_modes && need(IP.integer(data["edgeLimitHTM"], 0, 100) == 5, "the all-modes schema publishes the five-HTM edge limit")
     pr = parse_print(data["printing"])
     need(data["printCode"] == print_code(pr), "printCode equals the printed stickers")
     E = build_engine(pr)
@@ -686,8 +739,11 @@ function check_hsm(data, input_sha)
     modes = [parse_mode(m) for m in rawmodes]
     triples = [(m.letter, m.maximum, m.direction) for m in modes]
     need(length(Set(triples)) == length(triples), "distinct modes")
-    need(all(t -> t in triples, REQUIRED_MODES), "the eight seconds-first modes are present")
+    need(all(t -> t in triples, all_modes ? ALL_MODES : REQUIRED_MODES), all_modes ? "all 18 modes are present" : "the eight seconds-first modes are present")
+    all_modes && need(all(m -> m.cap in (5, 6), modes), "own periods are certified under a five or six HTM cap")
     replays = [replay_mode(E, m, src) for m in modes]
+    all_modes && need(all(m -> m.max_htm <= 5, modes), "every own period is within the five-HTM edge limit")
+    apps = all_modes ? check_app_modes(data["appModes"], modes, replays, 5) : nothing
     shown = Set{Tuple{String,Int}}()
     for (m, r) in zip(modes, replays), v in r.seen
         push!(shown, (m.letter, v))
@@ -708,23 +764,63 @@ function check_hsm(data, input_sha)
                      minimumMeanCertified=true,
                      inverseTraversal=(periodHTM=r.inverse[1], maximumHTM=r.inverse[2], edgesNotShortest=r.inverse[3])))
     end
-    emit([
-        "valid" => true, "status" => "VALID", "profile" => PROFILE, "profileVersion" => 1,
-        "inputSHA256" => input_sha, "printCode" => data["printCode"],
+    fields = Pair{String,Any}[
+        "valid" => true, "status" => "VALID", "profile" => PROFILE, "profileVersion" => 1, "schema" => schema,
+        "inputSHA256" => input_sha, "printCode" => data["printCode"], "printSHA256" => print_digest(pr),
         "fourStickerPlacements" => E.reach, "fourStickerDiameter" => E.diameter,
         "universalBound" => (claimedHTM=6, holds=true, displays=180, maxFromPrintHTM=max_from_print),
-        "modes" => rows,
+        "modes" => rows]
+    all_modes && push!(fields, "edgeLimitHTM" => 5, "applicationModes" => apps)
+    push!(fields,
         "displaysWitnessed" => (S=count(x -> x[1] == "S", shown), M=count(x -> x[1] == "M", shown), H=count(x -> x[1] == "H", shown)),
         "claims" => (globalPrintOptimality="UNKNOWN", conditionalLowerBound168="NOT_CHECKED",
                      wrapMinimaPerCycle="NOT_CERTIFIED", appPolicy13Figures="NOT_CHECKED",
-                     certificatePasses="INFORMATIONAL"),
-    ])
+                     recoveryReturnOntoPeriod="NOT_CHECKED", certificatePasses="INFORMATIONAL"))
+    emit(fields)
 end
 
 function evaluate(path)
     try
         data, sha = IP.read_json(path)
         (true, "VALID", check_hsm(data, sha))
+    catch error
+        d = IP.invalid_result(error)
+        (false, d["status"], emit(["valid" => false, "status" => d["status"], "reason" => d["reason"]]))
+    end
+end
+
+# ---------------------------------------------------------------- conformance
+# Pinned HSM profile corpus: proof-checkers/conformance-hsm/manifest.json.  The pin is embedded here, as for the
+# frozen issue-74 corpus; changing the corpus means changing the manifest, this constant and the Flix twin together.
+const HSM_MANIFEST_PIN = "MANIFEST_PIN_PLACEHOLDER"
+function conformance(root)
+    path = joinpath(root, "proof-checkers/conformance-hsm/manifest.json")
+    need(bytes2hex(sha256(read(path))) == HSM_MANIFEST_PIN, "HSM conformance manifest pin"; code="CORPUS_ERROR")
+    manifest, manifest_sha = IP.read_json(path)
+    need(manifest["schema"] == "cubistry.hsm-conformance.v1" && manifest["profile"] == PROFILE, "HSM manifest schema"; code="CORPUS_ERROR")
+    cases = manifest["cases"]
+    need(length(cases) == manifest["caseCount"] && length(Set(c["name"] for c in cases)) == length(cases), "named cases"; code="CORPUS_ERROR")
+    dir = joinpath(root, "proof-checkers/conformance-hsm/cases")
+    need(Set(readdir(dir)) == Set(c["name"] * ".json" for c in cases), "exact fixture filenames"; code="CORPUS_ERROR")
+    rows = Any[]
+    accepted = 0
+    for c in cases
+        file = joinpath(dir, c["name"] * ".json")
+        need(c["path"] == "proof-checkers/conformance-hsm/cases/" * c["name"] * ".json", "fixture path"; code="CORPUS_ERROR")
+        need(bytes2hex(sha256(read(file))) == c["sha256"], "fixture hash " * c["name"]; code="CORPUS_ERROR")
+        valid, status, text = evaluate(file)
+        digest = valid ? bytes2hex(sha256(text)) : ""
+        need(valid == c["expectedValid"] && status == c["expectedStatus"], "unexpected verdict " * c["name"] * ": " * status * " " * text; code="CONFORMANCE_ERROR")
+        need(digest == c["resultSHA256"], "result digest " * c["name"]; code="CONFORMANCE_ERROR")
+        accepted += valid
+        push!(rows, (name=c["name"], group=c["group"], valid=valid, status=status, resultSHA256=digest))
+    end
+    emit(["valid" => true, "status" => "VALID", "profile" => PROFILE, "manifestSHA256" => manifest_sha,
+          "cases" => length(cases), "accepted" => accepted, "rejected" => length(cases) - accepted, "results" => rows])
+end
+function conformance_command(root)
+    try
+        (true, "VALID", conformance(root))
     catch error
         d = IP.invalid_result(error)
         (false, d["status"], emit(["valid" => false, "status" => d["status"], "reason" => d["reason"]]))

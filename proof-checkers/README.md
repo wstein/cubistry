@@ -32,3 +32,7 @@ using unchanged independent Python/Research oracles at their recorded hashes.
 It never supplies runtime preprocessing to either language's validator. Runtime interfaces and reproducible commands are documented in the
 [Julia](julia/README.md) and [Flix](flix/README.md) guides. Source, complete-state
 exports, lifecycle captures and independent review evidence accompany this Draft.
+
+The additive HSM seconds-first profile (`hsm FILE`, `hsm-conformance ROOT`) is documented in
+[HSM-PROFILE.md](HSM-PROFILE.md); its separate conformance corpus is `conformance-hsm/`.
+The frozen 195-case corpus above is unchanged.

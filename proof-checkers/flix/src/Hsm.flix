@@ -11,6 +11,9 @@
 // facelet-permutation model that is tied back to those frames.  All names are prefixed
 // `hsm` because every Flix source file shares one namespace.
 import java.lang.IllegalArgumentException
+import java.io.File
+import java.nio.charset.MalformedInputException
+import com.fasterxml.jackson.core.JsonProcessingException
 
 enum HsmState with Eq { case HS(Vector[Vec], Vector[Vec], Vector[Vec]) }
 
@@ -23,7 +26,7 @@ type alias HsmEng = { lat = HsmLat, trip = Vector[Int32], ptr = Vector[Int32], p
 enum HsmPrint { case HP(Vector[Int32], Vector[Vec], Vector[Vec], Vector[Vec], Vector[String], Vector[Int32]) }
 
 type alias HsmMode = { letter = String, maximum = Int32, direction = Int32, cap = Int32, nodes = Int32, edges = Int32,
-                       numer = Int64, denom = Int64, periodHtm = Int32, periodEdges = Int32, maxHtm = Int32,
+                       meanNum = Int64, meanDen = Int64, periodHtm = Int32, periodEdges = Int32, maxHtm = Int32,
                        setup = List[Int32], frames = HsmState, steps = List[(Int32, Int32, List[Int32])] }
 
 type alias HsmReplay = { costs = List[Int32], poses = List[Vector[Int32]], seen = Set[Int32],
@@ -511,10 +514,10 @@ def hsmParseMode(m: J): HsmMode \ IO = {
         require(not List.isEmpty(w), "every edge moves");
         (hsmInt(field(s, "from"), 0, 59), hsmInt(field(s, "to"), 0, 59), w)
     }, rawSteps);
-    let (numer, denom) = hsmFraction(field(m, "optimalMeanHTM"), "optimalMeanHTM");
+    let (meanNum, meanDen) = hsmFraction(field(m, "optimalMeanHTM"), "optimalMeanHTM");
     { letter = letter, maximum = maximum, direction = direction, cap = cap,
       nodes = hsmInt(field(m, "graphNodes"), 1, 1000000000), edges = hsmInt(field(m, "graphEdges"), 1, 1000000000),
-      numer = numer, denom = denom, periodHtm = hsmInt(field(m, "periodHTM"), 1, 1000000000),
+      meanNum = meanNum, meanDen = meanDen, periodHtm = hsmInt(field(m, "periodHTM"), 1, 1000000000),
       periodEdges = hsmInt(field(m, "periodEdges"), 1, 1000000000), maxHtm = hsmInt(field(m, "maximumHTM"), 1, 6),
       setup = hsmParseWord(text(field(m, "setup"))), frames = frames, steps = steps }
 }
@@ -543,7 +546,7 @@ def hsmReplay(eng: HsmEng, pr: HsmPrint, md: HsmMode, start: HsmState): HsmRepla
     let total = List.sum(costs);
     require(maxc <= md#cap, "mode HTM ceiling");
     require(md#maxHtm == maxc and md#periodHtm == total and md#periodEdges == List.length(costs), "honest period metrics");
-    require(md#numer * Int32.toInt64(md#periodEdges) == md#denom * Int32.toInt64(md#periodHtm), "honest exact period mean");
+    require(md#meanNum * Int32.toInt64(md#periodEdges) == md#meanDen * Int32.toInt64(md#periodHtm), "honest exact period mean");
     // The same period run backwards, each edge inverted, must close the full pose and show every display.
     let (stInv, valueInv, invSum, invMax, invNot) = List.foldLeft((acc, step) -> {
         let (st, value, sum, mx, notShort) = acc;
@@ -748,13 +751,13 @@ def hsmCertify(eng: HsmEng, pr: HsmPrint, md: HsmMode, rp: HsmReplay): (Int32, I
     let pot = Array.repeat(rc, total, 0i64);
     let parent = Array.repeat(rc, total, -1);
     let color = Array.repeat(rc, total, 0);
-    hsmBellmanFord(1, order, start, succ, costF, active, pot, parent, color, md#numer, md#denom);
+    hsmBellmanFord(1, order, start, succ, costF, active, pot, parent, color, md#meanNum, md#meanDen);
     foreach (i <- List.range(0, total)) {
         if (hsmAt(active, i) == 1) {
             foreach (e <- List.range(hsmAt(start, i), hsmAt(start, i + 1))) {
                 let j = hsmAt(succ, e);
                 if (hsmAt(active, j) == 1)
-                    require(md#denom * Int32.toInt64(Vector.get(i, costF)) - md#numer + Array.get(j, pot) - Array.get(i, pot) >= 0i64, "exact dual feasibility of every edge")
+                    require(md#meanDen * Int32.toInt64(Vector.get(i, costF)) - md#meanNum + Array.get(j, pot) - Array.get(i, pot) >= 0i64, "exact dual feasibility of every edge")
                 else ()
             }
         } else ()
@@ -767,13 +770,88 @@ def hsmPow3(q: Int32): Int32 = if (q == 0) 1 else if (q == 1) 3 else if (q == 2)
 def hsmTriples(ms: List[HsmMode]): List[(String, Int32, Int32)] = List.map(m -> (m#letter, m#maximum, m#direction), ms)
 def hsmRequiredModes(): List[(String, Int32, Int32)] =
     List#{("S", 59, 1), ("S", 59, -1), ("M", 59, 1), ("M", 59, -1), ("H", 23, 1), ("H", 23, -1), ("H", 11, 1), ("H", 11, -1)}
+def hsmAllModes(): List[(String, Int32, Int32)] =
+    List.flatMap(l -> List.flatMap(n -> List#{(l, n, 1), (l, n, -1)}, List#{59, 23, 11}), List#{"S", "M", "H"})
+
+def hsmPrintDigest(pr: HsmPrint): String \ IO = {
+    let v3 = (v: Vec) -> Int32.toString(coordinate(v, 0)) + "," + Int32.toString(coordinate(v, 1)) + "," + Int32.toString(coordinate(v, 2));
+    let rows = List.map(i -> Int32.toString(i) + "," + Int32.toString(hsmCubie(pr, i)) + "," + v3(hsmP(pr, i)) + "," + v3(hsmN(pr, i)) + ","
+                             + v3(hsmU(pr, i)) + "," + Int32.toString(hsmSlot(pr, i)) + "," + hsmImage(pr, i), List.range(0, 24));
+    shaText(String.intercalate(";", rows))
+}
+
+def hsmParseRatio(j: J, what: String): (Int64, Int64) \ IO = {
+    let parts = String.splitOn({substr = "/"}, text(j));
+    require(List.length(parts) == 2 and List.forAll(hsmDigits, parts), what + " must be num/den");
+    let den = hsmI64(List.get(1, parts));
+    require(den >= 1i64, what + " must be num/den");
+    (hsmI64(List.get(0, parts)), den)
+}
+
+def hsmModeIndex(modes: List[HsmMode], key: (String, Int32, Int32)): Int32 =
+    match List.findLeft(i -> (List.get(i, modes))#letter == fst3(key) and (List.get(i, modes))#maximum == snd3(key)
+                             and (List.get(i, modes))#direction == thd3(key), List.range(0, List.length(modes))) {
+        case Some(i) => i
+        case None => -1
+    }
+def fst3(t: (String, Int32, Int32)): String = match t { case (a, _, _) => a }
+def snd3(t: (String, Int32, Int32)): Int32 = match t { case (_, b, _) => b }
+def thd3(t: (String, Int32, Int32)): Int32 = match t { case (_, _, c) => c }
+
+// Application modes of the all-modes schema: the +1 period unless the -1 period is strictly better, run forward
+// or backward with every word inverted.
+def hsmCheckApps(raw: J, modes: List[HsmMode], replays: List[HsmReplay], limit: Int32): List[J] \ IO = {
+    let apps = array(raw);
+    require(List.length(apps) == 18, "exactly the 18 application modes");
+    let keys = List.map(a -> {
+        hsmExactKeys(a, List#{"letter", "maximum", "direction", "sourceDirection", "traversal", "periodHTM", "periodEdges", "perLapHTM", "maximumHTM"}, "application mode");
+        (text(field(a, "letter")), hsmInt(field(a, "maximum"), 0, 1000), hsmInt(field(a, "direction"), -1, 1))
+    }, apps);
+    require(List.forAll(k -> List.memberOf(k, hsmAllModes()), keys) and List.length(List.distinct(keys)) == 18, "distinct application modes");
+    List.map(ak -> {
+        let (a, key) = ak;
+        let letter = fst3(key);
+        let maximum = snd3(key);
+        let direction = thd3(key);
+        let primary = List.get(hsmModeIndex(modes, (letter, maximum, 1)), modes);
+        let alternative = List.get(hsmModeIndex(modes, (letter, maximum, -1)), modes);
+        let lapNum = (m: HsmMode) -> Int32.toInt64(m#periodHtm) * Int32.toInt64(m#maximum + 1);
+        let lapDen = (m: HsmMode) -> Int32.toInt64(m#periodEdges);
+        let lhs = lapNum(alternative) * lapDen(primary);
+        let rhs = lapNum(primary) * lapDen(alternative);
+        let better = lhs < rhs or (lhs == rhs and alternative#maxHtm < primary#maxHtm);
+        let chosen = if (better) -1 else 1;
+        require(hsmInt(field(a, "sourceDirection"), -1, 1) == chosen, "selection rule");
+        let traversal = if (chosen == direction) "forward" else "inverse";
+        require(text(field(a, "traversal")) == traversal, "honest traversal");
+        let si = hsmModeIndex(modes, (letter, maximum, chosen));
+        let src = List.get(si, modes);
+        let rep = List.get(si, replays);
+        let codes = List.map(hsmCodeVec, rep#poses);
+        require(List.length(List.distinct(codes)) == List.length(codes), "an application period visits each full pose once");
+        let costs = rep#costs;
+        let maxc = List.foldLeft(Int32.max, 0, costs);
+        require(maxc <= limit, "every application edge is at most the edge limit");
+        let (num, den) = hsmParseRatio(field(a, "perLapHTM"), "perLapHTM");
+        require(hsmInt(field(a, "periodHTM"), 0, 1000000000) == List.sum(costs) and hsmInt(field(a, "periodEdges"), 0, 1000000000) == List.length(costs)
+                and hsmInt(field(a, "maximumHTM"), 0, 1000000000) == maxc and num * lapDen(src) == lapNum(src) * den, "honest application period metrics");
+        object(List#{("letter", J.Str(letter)), ("maximum", intJ(maximum)), ("direction", intJ(direction)), ("sourceDirection", intJ(chosen)),
+                     ("traversal", J.Str(traversal)), ("periodEdges", intJ(List.length(costs))),
+                     ("laps", intJ(List.length(costs) / (maximum + 1))), ("periodHTM", intJ(List.sum(costs))),
+                     ("perLapHTM", J.Str(hsmFracString(lapNum(src), lapDen(src)))), ("maximumHTM", intJ(maxc))})
+    }, List.zip(apps, keys))
+}
 
 def hsmCheck(j: J, inputSha: String): J \ IO = {
-    require(match optional(j, "schema") { case Some(J.Str(s)) => s == "cubistry.hsm-seconds-first" case _ => false }, "UNSUPPORTED: unsupported HSM witness schema");
-    hsmExactKeys(j, List#{"schema", "version", "label", "printCode", "universalArbitrarySourceHTM", "printing", "modes"}, "witness");
+    let schema = match optional(j, "schema") { case Some(J.Str(s)) => s case _ => "" };
+    require(schema == "cubistry.hsm-seconds-first" or schema == "cubistry.hsm-seconds-first-modes", "UNSUPPORTED: unsupported HSM witness schema");
+    let allModes = schema == "cubistry.hsm-seconds-first-modes";
+    let baseKeys = List#{"schema", "version", "label", "printCode", "universalArbitrarySourceHTM", "printing", "modes"};
+    hsmExactKeys(j, if (allModes) List.append(baseKeys, List#{"edgeLimitHTM", "appModes"}) else baseKeys, "witness");
     require(match field(j, "version") { case J.Int(s) => s == "1" case _ => false }, "UNSUPPORTED: unsupported witness version");
     require(String.length(text(field(j, "label"))) >= 0, "label must be a string");
     require(hsmInt(field(j, "universalArbitrarySourceHTM"), 0, 100) == 6, "the profile publishes the six-HTM universal bound");
+    require(not allModes or hsmInt(field(j, "edgeLimitHTM"), 0, 100) == 5, "the all-modes schema publishes the five-HTM edge limit");
     let pr = hsmParsePrint(field(j, "printing"));
     require(text(field(j, "printCode")) == hsmPrintCode(pr), "printCode equals the printed stickers");
     let eng = hsmBuildEngine(pr);
@@ -793,8 +871,12 @@ def hsmCheck(j: J, inputSha: String): J \ IO = {
     let modes = List.map(hsmParseMode, rawModes);
     let triples = hsmTriples(modes);
     require(List.length(List.distinct(triples)) == List.length(triples), "distinct modes");
-    require(List.forAll(t -> List.memberOf(t, triples), hsmRequiredModes()), "the eight seconds-first modes are present");
+    require(List.forAll(t -> List.memberOf(t, triples), if (allModes) hsmAllModes() else hsmRequiredModes()),
+            if (allModes) "all 18 modes are present" else "the eight seconds-first modes are present");
+    require(not allModes or List.forAll(m -> m#cap == 5 or m#cap == 6, modes), "own periods are certified under a five or six HTM cap");
     let replays = List.map(m -> hsmReplay(eng, pr, m, src), modes);
+    require(not allModes or List.forAll(m -> m#maxHtm <= 5, modes), "every own period is within the five-HTM edge limit");
+    let apps = if (allModes) hsmCheckApps(field(j, "appModes"), modes, replays, 5) else Nil;
     let shown = List.foldLeft((acc, mr) -> {
         let (m, r) = mr;
         List.foldLeft((a, v) -> Set.insert((m#letter, v), a), acc, Set.toList(r#seen))
@@ -810,25 +892,77 @@ def hsmCheck(j: J, inputSha: String): J \ IO = {
         let laps = List.length(r#costs) / (m#maximum + 1);
         object(List#{("letter", J.Str(m#letter)), ("maximum", intJ(m#maximum)), ("direction", intJ(m#direction)), ("htmCap", intJ(m#cap)),
                      ("periodEdges", intJ(List.length(r#costs))), ("laps", intJ(laps)), ("periodHTM", intJ(m#periodHtm)),
-                     ("maximumHTM", intJ(m#maxHtm)), ("meanHTM", J.Str(hsmFracString(m#numer, m#denom))),
+                     ("maximumHTM", intJ(m#maxHtm)), ("meanHTM", J.Str(hsmFracString(m#meanNum, m#meanDen))),
                      ("perLapHTM", J.Str(hsmFracString(Int32.toInt64(m#periodHtm), Int32.toInt64(laps)))),
                      ("setupHTM", intJ(List.length(m#setup))), ("graphNodes", intJ(gn)), ("graphEdges", intJ(ge)),
                      ("minimumMeanCertified", J.Bool(true)),
                      ("inverseTraversal", object(List#{("periodHTM", intJ(r#invHtm)), ("maximumHTM", intJ(r#invMax)), ("edgesNotShortest", intJ(r#invNot))}))})
     }, List.range(0, List.length(modes)));
     let countOf = l -> Set.size(Set.filter(x -> fst(x) == l, shown));
-    object(List#{("valid", J.Bool(true)), ("status", J.Str("VALID")), ("profile", J.Str("cubistry.hsm-seconds-first")),
-                 ("profileVersion", intJ(1)), ("inputSHA256", J.Str(inputSha)), ("printCode", J.Str(text(field(j, "printCode")))),
-                 ("fourStickerPlacements", intJ(Vector.count(d -> d < 255, eng#dist))), ("fourStickerDiameter", intJ(diameter)),
-                 ("universalBound", object(List#{("claimedHTM", intJ(6)), ("holds", J.Bool(true)), ("displays", intJ(180)), ("maxFromPrintHTM", intJ(maxFromPrint))})),
-                 ("modes", J.Arr(rows)),
-                 ("displaysWitnessed", object(List#{("S", intJ(countOf("S"))), ("M", intJ(countOf("M"))), ("H", intJ(countOf("H")))})),
-                 ("claims", object(List#{("globalPrintOptimality", J.Str("UNKNOWN")), ("conditionalLowerBound168", J.Str("NOT_CHECKED")),
-                                         ("wrapMinimaPerCycle", J.Str("NOT_CERTIFIED")), ("appPolicy13Figures", J.Str("NOT_CHECKED")),
-                                         ("certificatePasses", J.Str("INFORMATIONAL"))}))})
+    let head = List#{("valid", J.Bool(true)), ("status", J.Str("VALID")), ("profile", J.Str("cubistry.hsm-seconds-first")),
+                     ("profileVersion", intJ(1)), ("schema", J.Str(schema)), ("inputSHA256", J.Str(inputSha)),
+                     ("printCode", J.Str(text(field(j, "printCode")))), ("printSHA256", J.Str(hsmPrintDigest(pr))),
+                     ("fourStickerPlacements", intJ(Vector.count(d -> d < 255, eng#dist))), ("fourStickerDiameter", intJ(diameter)),
+                     ("universalBound", object(List#{("claimedHTM", intJ(6)), ("holds", J.Bool(true)), ("displays", intJ(180)), ("maxFromPrintHTM", intJ(maxFromPrint))})),
+                     ("modes", J.Arr(rows))};
+    let appPart = if (allModes) List#{("edgeLimitHTM", intJ(5)), ("applicationModes", J.Arr(apps))} else Nil;
+    let tail = List#{("displaysWitnessed", object(List#{("S", intJ(countOf("S"))), ("M", intJ(countOf("M"))), ("H", intJ(countOf("H")))})),
+                     ("claims", object(List#{("globalPrintOptimality", J.Str("UNKNOWN")), ("conditionalLowerBound168", J.Str("NOT_CHECKED")),
+                                             ("wrapMinimaPerCycle", J.Str("NOT_CERTIFIED")), ("appPolicy13Figures", J.Str("NOT_CHECKED")),
+                                             ("recoveryReturnOntoPeriod", J.Str("NOT_CHECKED")), ("certificatePasses", J.Str("INFORMATIONAL"))}))};
+    object(List.append(head, List.append(appPart, tail)))
 }
 
 def hsmCommand(path: String): Unit \ IO = {
     let raw = readJson(path);
     println(json(hsmCheck(raw, shaFile(path))))
+}
+
+// ---------------------------------------------------------------- conformance
+// Pinned HSM profile corpus: proof-checkers/conformance-hsm/manifest.json.  The pin is embedded here, as for the
+// frozen issue-74 corpus; changing the corpus means changing the manifest, this constant and the Julia twin together.
+def hsmManifestPin(): String = "MANIFEST_PIN_PLACEHOLDER"
+
+def hsmStatusOf(reason: String): String \ IO =
+    if (reason.contains("ERROR:")) "ERROR" else if (reason.contains("UNSUPPORTED:")) "UNSUPPORTED"
+    else if (reason.contains("INVALID_JSON:")) "INVALID_JSON" else "INVALID"
+
+def hsmRunCase(path: String): (Bool, String, String) \ IO =
+    try {
+        let raw = readJson(path);
+        (true, "VALID", json(hsmCheck(raw, shaFile(path))))
+    } catch {
+        case ex: JsonProcessingException => (false, "INVALID_JSON", ex.toString())
+        case ex: MalformedInputException => (false, "INVALID_JSON", ex.toString())
+        case ex: IllegalArgumentException => (false, hsmStatusOf(ex.toString()), ex.toString())
+    }
+
+def hsmConformanceCommand(root: String): Unit \ IO = {
+    let path = root + "/proof-checkers/conformance-hsm/manifest.json";
+    let manifestSha = shaFile(path);
+    require(manifestSha == hsmManifestPin(), "ERROR: HSM conformance manifest pin mismatch");
+    let manifest = readJson(path);
+    require(text(field(manifest, "schema")) == "cubistry.hsm-conformance.v1" and text(field(manifest, "profile")) == "cubistry.hsm-seconds-first", "ERROR: HSM manifest schema");
+    let cases = array(field(manifest, "cases"));
+    let names = List.map(c -> text(field(c, "name")), cases);
+    require(List.length(cases) == integer(field(manifest, "caseCount")) and List.length(List.distinct(names)) == List.length(names), "ERROR: named cases");
+    let dir = root + "/proof-checkers/conformance-hsm/cases";
+    let listed = new File(dir).list();
+    require(List.sort(Array.toList(listed)) == List.sort(List.map(n -> n + ".json", names)), "ERROR: exact fixture filenames");
+    let rows = List.map(c -> {
+        let name = text(field(c, "name"));
+        let file = dir + "/" + name + ".json";
+        require(text(field(c, "path")) == "proof-checkers/conformance-hsm/cases/" + name + ".json", "ERROR: fixture path");
+        require(shaFile(file) == text(field(c, "sha256")), "ERROR: fixture hash " + name);
+        let (valid, status, out) = hsmRunCase(file);
+        let digest = if (valid) shaText(out) else "";
+        require(valid == flag(field(c, "expectedValid")) and status == text(field(c, "expectedStatus")), "ERROR: unexpected verdict " + name + ": " + status + " " + out);
+        require(digest == text(field(c, "resultSHA256")), "ERROR: result digest " + name);
+        (valid, object(List#{("name", J.Str(name)), ("group", J.Str(text(field(c, "group")))), ("valid", J.Bool(valid)),
+                             ("status", J.Str(status)), ("resultSHA256", J.Str(digest))}))
+    }, cases);
+    let accepted = List.count(r -> fst(r), rows);
+    println(json(object(List#{("valid", J.Bool(true)), ("status", J.Str("VALID")), ("profile", J.Str("cubistry.hsm-seconds-first")),
+                              ("manifestSHA256", J.Str(manifestSha)), ("cases", intJ(List.length(rows))), ("accepted", intJ(accepted)),
+                              ("rejected", intJ(List.length(rows) - accepted)), ("results", J.Arr(List.map(snd, rows)))})))
 }
