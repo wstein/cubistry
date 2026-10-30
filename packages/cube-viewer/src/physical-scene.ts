@@ -30,18 +30,34 @@ export class PhysicalCubeScene {
     materials: ReadonlyMap<number, THREE.Material>,
     plastic: THREE.Material,
     spacing: number,
-    geometry: { body: THREE.BufferGeometry; sticker: THREE.BufferGeometry; stickerOffset: number },
+    geometry: { body: THREE.BufferGeometry; core?: THREE.BufferGeometry; sticker: THREE.BufferGeometry; stickerOffset: number },
   ) {
     demand(Number.isFinite(spacing) && spacing > 0, "Invalid viewer spacing");
     this.parent = parent;
     this.spacing = spacing;
-    this.geometries = [geometry.body, geometry.sticker];
+    this.geometries = [geometry.body, geometry.sticker, ...(geometry.core ? [geometry.core] : [])];
     for (const s of printed) {
       demand(materials.has(s.id), "Missing printed sticker material");
       let body = this.bodies.get(s.cubie);
       if (!body) {
         body = new THREE.Group();
         body.add(new THREE.Mesh(geometry.body, plastic));
+        if (geometry.core) {
+          // Seal internal seams/junctions without squaring the approved exterior
+          // bevels. Exterior sides retreat beneath the rounded shell; internal
+          // cut faces meet at half the physical pitch, as in CubeAssembler.
+          const min = [-0.5, -0.5, -0.5], max = [0.5, 0.5, 0.5];
+          for (const face of printed.filter((face) => face.cubie === s.cubie))
+            for (let axis = 0; axis < 3; axis++) {
+              if (face.n[axis] === 1) max[axis] = 0.43;
+              if (face.n[axis] === -1) min[axis] = -0.43;
+            }
+          const core = new THREE.Mesh(geometry.core, plastic);
+          core.userData.plasticCore = true;
+          core.scale.set(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
+          core.position.set((max[0] + min[0]) / 2, (max[1] + min[1]) / 2, (max[2] + min[2]) / 2);
+          body.add(core);
+        }
         this.bodies.set(s.cubie, body);
         this.references.set(s.cubie, {
           id: s.id,
