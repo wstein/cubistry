@@ -93,8 +93,14 @@ test("the witness copies and runtime file are pinned to the research commit", ()
     );
     assert.match(hash, /^[0-9a-f]{64}$/);
   }
-  // Reviewed, but not CONFIRMED in the sense of proof-checkers/AUTHORITY.md.
-  assert.match(pin.reviewStatus, /^reviewed, not CONFIRMED/);
+  // CONFIRMED (proof-checkers/AUTHORITY.md) only for the two pinned witnesses,
+  // by the Flix and Julia checkers of PR 95. Recovery stays UNSUPPORTED and
+  // print optimality UNKNOWN; the pin must keep saying so.
+  assert.match(pin.reviewStatus, /^CONFIRMED only for the two pinned witnesses/);
+  assert.match(pin.reviewStatus, /recovery table[\s\S]*is UNSUPPORTED/);
+  assert.match(pin.reviewStatus, /optimality is UNKNOWN/i);
+  assert.match(pin.reviewStatus, /f71d4237/);
+  assert.match(pin.reviewStatus, /5dd24dd7/);
   assert.equal(sha(runtimeBytes), pin.runtimeSHA256);
   // The previous pin is kept as history and still names the old print.
   assert.equal(
