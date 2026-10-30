@@ -1,0 +1,15 @@
+{
+  "schema": "cubistry.calendar7.practical-experiment.v1",
+  "status": "UNKNOWN",
+  "dependencyCommit": "1bd783245abaa0d10946945be309e9fe8392d392",
+  "printing": "../english/evidence/physical-print.tsv",
+  "sourceWitness": "../en-physical-review/all-targets-dag.tsv.gz",
+  "domain": {"first": "2026-01", "last": "2099-12", "months": 888, "chronologicalEdges": 887},
+  "initialCandidate": {"from": "2026-02", "to": "2026-03", "sourceRepresentative": 2},
+  "targetsHTM": {"initial": 200, "primary": 100, "ambitiousExclusive": 50},
+  "metric": "individual noncentral layer HTM; whole rotations separate; wide turns expanded",
+  "globalOptimality": "UNKNOWN",
+  "runtimeIntegration": "NOT_CHECKED",
+  "browserE2E": false,
+  "promotion": "Draft research only; owner acceptance required"
+}
