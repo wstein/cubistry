@@ -1,0 +1,45 @@
+chain catalog orbit=1 count=1008
+chain catalog orbit=2 count=4048
+chain catalog orbit=3 count=4048
+chain catalog orbit=4 count=1760
+chain catalog orbit=5 count=4048
+chain catalog orbit=6 count=4048
+chain catalog orbit=7 count=4048
+chain catalog orbit=8 count=4048
+chain catalog orbit=9 count=4048
+chain catalog orbit=10 count=4048
+chain catalog orbit=1 count=1008
+chain catalog orbit=2 count=4048
+chain catalog orbit=3 count=4048
+chain catalog orbit=4 count=1760
+chain catalog orbit=5 count=4048
+chain catalog orbit=6 count=4048
+chain catalog orbit=7 count=4048
+chain catalog orbit=8 count=4048
+chain catalog orbit=9 count=4048
+chain catalog orbit=10 count=4048
+chain catalog orbit=1 count=1008
+chain catalog orbit=2 count=4048
+chain catalog orbit=3 count=4048
+chain catalog orbit=4 count=1760
+chain catalog orbit=5 count=4048
+chain catalog orbit=6 count=4048
+chain catalog orbit=7 count=4048
+chain catalog orbit=8 count=4048
+chain catalog orbit=9 count=4048
+chain catalog orbit=10 count=4048
+Test Summary:                  | Pass  Total  Time
+HTM and exact endpoint algebra | 2219   2219  2.8s
+Test Summary:                                       |   Pass   Total   Time
+Cached actions preserve every recorded orbit action | 140611  140611  12.0s
+Test Summary:                                           | Pass  Total  Time
+Incremental cancellation is not an additive lower bound |   12     12  1.5s
+Test Summary:                                               | Pass  Total  Time
+Same physical endpoint keeps nondominated trajectory labels |   10     10  0.3s
+Test Summary:                                      | Pass  Total  Time
+Invalid exports do not create or truncate evidence |    6      6  0.5s
+relax	4	60000	3648
+relax	7	60000	5492
+relax	10	60000	5490
+Test Summary:                                         |   Pass   Total   Time
+Production-budget relaxation preserves cached actions | 175771  175771  18.6s
