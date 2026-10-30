@@ -1,0 +1,32 @@
+{
+  "reviewedRevision": "175c68587fca8d1d2ba4f9dffffd51437fade077",
+  "mathematicalRevision": "249df9d31b1d2c6daa617e88f898ff0c25906300",
+  "runtime": "Julia 1.13.3",
+  "JSONVersion": "1.13.0",
+  "sourceAndInputSHA256": {
+    "proof-checkers/julia/Recovery.jl": "9c044527b808e04f55daa080da366ec237565dfccf0b2df972a41023be4c48dc",
+    "proof-checkers/julia/Checker.jl": "4cbd782b2bac4dc8392bbad7d8487a1f98cc76bde97a8a4090cd439a0db52ddb",
+    "proof-checkers/julia/Hsm.jl": "0326ab44cb742f82fe33ae5c8f1f3ab7c11a0ea55fe6cffc5ec658f053150765",
+    "proof-checkers/julia/Project.toml": "8e44eb68d33587f674f530e8118dd0d898e8a52017d28fc5b55ae345cf3717bb",
+    "proof-checkers/julia/Manifest.toml": "136ee9a307e16429f3f89ba1505e1b0f9c51502156c32b3647d554590315d965",
+    "proof-checkers/HSM-RECOVERY-PROFILE.md": "758e95d60b04e0dfa4fb756451510e6abe0ea44d67574669f52e0fb5302c05d6",
+    "proof-checkers/conformance-hsm/cases/recovery-unsupported.json": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda",
+    "proof-checkers/conformance-hsm/cases/modes.json": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae"
+  },
+  "artifactSHA256": {
+    "parser-run.json": "6a6c0443111439367f31332dd4e5aea4c702b565f49b57b815e5f2bd532d6c4b",
+    "parser.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "parser.stdout.log": "be34c0066cd63f4335297f90e981c75dfc58c4a0bde7ef0e43870fdae4d9ccec",
+    "preflight-missing-time.stderr.log": "3e737f6a9117cec194b02103b357f8668fae9adb86a8a8cd0bf25efab8948548",
+    "smoke-run.json": "f88acf1f535f1e5eb786e9dc6744cf8836c7ea29a982b25677fc4d758263b7c8",
+    "smoke.stderr.log": "bc3e1f5c22d0bc0b9ba6206149c5ff3b3f90d3f243e0072f706f53984e209277",
+    "smoke.stdout.json": "4b38053fd8869b49e9fcd3ac9cc656881a0c52baea1f7d9141f0855d538f7f12"
+  },
+  "preflight": {
+    "exitCode": 127,
+    "checkerEntered": false,
+    "reason": "/usr/bin/time absent; retried with metadata-only subprocess launcher"
+  },
+  "verdict": "UNKNOWN",
+  "scope": "one-mode independent component smoke plus exact-decimal parser controls; not complete recovery confirmation"
+}
