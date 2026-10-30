@@ -21,7 +21,7 @@ export function cubePresentationRadius(halfExtent: number): number {
   return Math.sqrt(3) * (halfExtent + .001);
 }
 
-/** Called on initialization, resize, reset or explicit zoom; never ordinary drag. */
+/** Called on initialization, resize or explicit zoom; never drag or orientation reset. */
 export function fitPresentationCamera(camera: THREE.PerspectiveCamera, sphereRadius: number, zoom = 1): number {
   if (!Number.isFinite(zoom) || zoom <= 0) throw Error("Invalid presentation zoom");
   const distance = presentationCameraRadius(camera.aspect, sphereRadius, camera.fov) * zoom;
