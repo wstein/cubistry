@@ -79,6 +79,14 @@ bounds are conservatively fitted inside the rounded cut, including circular
 corner cases. Large dimensions may require more than one A4 sheet. `--layout
 faces` retains six spatial face blocks instead of compact production imposition.
 
+The H/S/M sheets carry the seconds-first print: 24 stickers per cube with three S
+stickers, one H and one M (see [HSM counter](HSM_COUNTER.md#physical-reprint-required)
+for the 14 changed identities; sheets printed earlier no longer match). Only the two
+HSM presets and their catalog entries were regenerated for it, with
+`scripts/print-sticker-sheets.py` on a Python linked to zlib-ng 1.3.1; the calendar
+presets are untouched. The glyph art is unchanged; only its assignment to sticker
+identities differs.
+
 Reproduce all six committed example presets at a new location:
 
 ```sh
