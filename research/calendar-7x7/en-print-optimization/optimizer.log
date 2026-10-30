@@ -1,0 +1,20 @@
+Required nonblank inventory lower bound: 240
+Dict{String, Any}("minimum_blanks" => 3, "orbit" => [-3, -3], "minimum_nonblank" => 20, "minimum_inventory" => 23, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 4)
+Dict{String, Any}("minimum_blanks" => 2, "orbit" => [-3, -2], "minimum_nonblank" => 15, "minimum_inventory" => 17, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 9)
+Dict{String, Any}("minimum_blanks" => 2, "orbit" => [-3, -1], "minimum_nonblank" => 21, "minimum_inventory" => 23, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 3)
+Dict{String, Any}("minimum_blanks" => 2, "orbit" => [-3, 0], "minimum_nonblank" => 18, "minimum_inventory" => 20, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 6)
+Dict{String, Any}("minimum_blanks" => 2, "orbit" => [-3, 1], "minimum_nonblank" => 22, "minimum_inventory" => 24, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 2)
+Dict{String, Any}("minimum_blanks" => 1, "orbit" => [-3, 2], "minimum_nonblank" => 19, "minimum_inventory" => 20, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 5)
+Dict{String, Any}("minimum_blanks" => 0, "orbit" => [-2, -2], "minimum_nonblank" => 16, "minimum_inventory" => 16, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 8)
+Dict{String, Any}("minimum_blanks" => 1, "orbit" => [-2, -1], "minimum_nonblank" => 21, "minimum_inventory" => 22, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 3)
+Dict{String, Any}("minimum_blanks" => 0, "orbit" => [-2, 0], "minimum_nonblank" => 20, "minimum_inventory" => 20, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 4)
+Dict{String, Any}("minimum_blanks" => 1, "orbit" => [-2, 1], "minimum_nonblank" => 18, "minimum_inventory" => 19, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 6)
+Dict{String, Any}("minimum_blanks" => 2, "orbit" => [-1, -1], "minimum_nonblank" => 22, "minimum_inventory" => 24, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 2)
+Dict{String, Any}("minimum_blanks" => 1, "orbit" => [-1, 0], "minimum_nonblank" => 22, "minimum_inventory" => 23, "capacity" => 24, "max_blank_if_no_extra_nonblank" => 2)
+Dict{String, Any}("minimum_blanks" => 0, "orbit" => [0, 0], "minimum_nonblank" => 6, "minimum_inventory" => 6, "capacity" => 6, "max_blank_if_no_extra_nonblank" => 0)
+corner baseline nonblank=21; lower bound=20
+corner minimum model found=true; seconds=41.239173131
+midge baseline nonblank=21; lower bound=18
+midge minimum model found=true; seconds=1.068386616
+wing2 baseline nonblank=40; lower bound=34
+wing2 minimum model found=true; seconds=31.961884002

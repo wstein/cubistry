@@ -1,0 +1,49 @@
+component	piece	face	text	quarter-turn	ink
+wing2	1	1		0	blank
+wing2	1	2		0	blank
+wing2	2	1		0	blank
+wing2	2	2	27	2	red
+wing2	3	1		0	blank
+wing2	3	2	26	3	dark
+wing2	4	1		0	blank
+wing2	4	2		0	blank
+wing2	5	1		0	blank
+wing2	5	2	27	3	dark
+wing2	6	1		0	blank
+wing2	6	2	24	3	dark
+wing2	7	1		0	blank
+wing2	7	2	SUN	0	red
+wing2	8	1		0	blank
+wing2	8	2		0	blank
+wing2	9	1		0	blank
+wing2	9	2	U	1	month
+wing2	10	1	0	0	month
+wing2	10	2	P	1	month
+wing2	11	1	02	2	red
+wing2	11	2	25	3	dark
+wing2	12	1	12	2	red
+wing2	12	2	23	2	red
+wing2	13	1	16	0	red
+wing2	13	2	29	3	dark
+wing2	14	1	17	0	red
+wing2	14	2		0	blank
+wing2	15	1	18	0	red
+wing2	15	2	22	0	red
+wing2	16	1	19	0	red
+wing2	16	2	30	3	dark
+wing2	17	1	22	0	red
+wing2	17	2	25	2	red
+wing2	18	1	28	3	dark
+wing2	18	2	28	3	dark
+wing2	19	1	29	3	dark
+wing2	19	2	28	2	red
+wing2	20	1	30	3	dark
+wing2	20	2	26	2	red
+wing2	21	1	31	3	dark
+wing2	21	2	24	2	red
+wing2	22	1	C	1	month
+wing2	22	2	A	1	month
+wing2	23	1	E	1	month
+wing2	23	2	E	1	month
+wing2	24	1	SAT	2	red
+wing2	24	2		0	blank
