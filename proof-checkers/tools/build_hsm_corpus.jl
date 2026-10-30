@@ -134,6 +134,16 @@ function cases(text, mtext)
         ("modes-edge-limit", "negative", "edge limit published as six", medited(o -> o["edgeLimitHTM"] = 6)),
         ("modes-missing-mode", "negative", "one of the 18 own periods is absent", medited(o -> deleteat!(o["modes"], 4))),
         ("modes-cap-four", "negative", "own period certified under a four HTM cap", medited(o -> o["modes"][1]["htmCap"] = 4)),
+        # Controls for the dissents found in the review of PR 95 (HSM-PROFILE.md, root-cause record).
+        ("mean-trailing-newline", "negative", "minimum mean followed by a newline is not a canonical fraction",
+         edited(setk(mode0, "optimalMeanHTM", "53/20\n"))),
+        ("mean-non-ascii-digits", "negative", "minimum mean written with Arabic-Indic digits is not a canonical fraction",
+         edited(setk(mode0, "optimalMeanHTM", "٥٣/٢٠"))),
+        ("byte-order-mark", "negative", "UTF-8 byte order mark before the JSON text", vcat(UInt8[0xef, 0xbb, 0xbf], nl(text))),
+        ("modes-lap-trailing-newline", "negative", "application per-lap HTM followed by a newline",
+         medited(o -> o["appModes"][1]["perLapHTM"] = o["appModes"][1]["perLapHTM"] * "\n")),
+        ("modes-lap-non-ascii-digits", "negative", "application per-lap HTM written with Arabic-Indic digits",
+         medited(o -> o["appModes"][1]["perLapHTM"] = "١٥٩/١")),
     ]
 end
 
