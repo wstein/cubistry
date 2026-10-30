@@ -111,6 +111,15 @@ export class HsmPlanner {
     demand(chosen && distance < 255, "No reachable HSM display");
     return { chosen, distance };
   }
+  /** Exact shortest HTM distance from the actual pose to a display, hidden state included. */
+  distance(
+    print: PrintDefinition,
+    state: CubeState,
+    letter: Letter,
+    value: number,
+  ): number {
+    return this.goal(print, state, letter, value).distance;
+  }
   plan(
     print: PrintDefinition,
     state: CubeState,

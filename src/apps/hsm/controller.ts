@@ -19,12 +19,14 @@ import {
 import { loadAssets, type AssetManifest } from "@cubistry/cube-assets";
 import { hsmTarget, type HsmDesign, type Letter } from "./design.ts";
 import { HsmPlanner } from "./planner.ts";
+import { HsmPeriods } from "./periods.ts";
 import { routeTurnTiming } from "../shared/turn-timing.ts";
 export class HsmController extends PhysicalPlayback {
   private readonly design: HsmDesign;
   private readonly manifest: AssetManifest;
   private readonly resolveAssets: typeof loadAssets;
   private readonly planner = new HsmPlanner();
+  private readonly periods: HsmPeriods;
   private planned: readonly LegalMove[] = [];
   readonly letter: Letter;
   private range = 59;
@@ -118,6 +120,7 @@ export class HsmController extends PhysicalPlayback {
     this.manifest = manifest;
     this.letter = letter;
     this.resolveAssets = resolveAssets;
+    this.periods = new HsmPeriods(design.print, design.periods);
   }
   protected get maximumValue(): number {
     return 59;
@@ -138,22 +141,32 @@ export class HsmController extends PhysicalPlayback {
       this.planned = this.prepared.moves;
       return this.prepared.target;
     }
-    const next = (value + this.direction + this.range + 1) % (this.range + 1);
-    const front = hsmTarget(this.letter, value),
-      settledUnit = matchesTarget(this.design.print, this.state, {
-        ...front,
-        facelets: front.facelets.slice(0, 2),
-      });
-    this.planned = this.planner[settledUnit ? "plan" : "planFromPose"](
-      this.design.print,
-      this.state,
+    // On a saved period the route is the pinned one; counting down walks it
+    // backward. Anywhere else (jumps, interrupted routes, modes without a
+    // period) the exact shortest-path planner replans from the actual pose.
+    const onPeriod = this.periods.route(
       this.letter,
+      this.range,
+      this.direction,
+      this.state,
       value,
-      next,
-      this.letter === "M" && this.range === 59 && this.direction === -1
-        ? 1
-        : 13,
     );
+    if (onPeriod) this.planned = onPeriod.moves;
+    else {
+      const next = (value + this.direction + this.range + 1) % (this.range + 1);
+      const front = hsmTarget(this.letter, value),
+        settledUnit = matchesTarget(this.design.print, this.state, {
+          ...front,
+          facelets: front.facelets.slice(0, 2),
+        });
+      this.planned = this.planner[settledUnit ? "plan" : "planFromPose"](
+        this.design.print,
+        this.state,
+        this.letter,
+        value,
+        next,
+      );
+    }
     const target = applyMoves(this.state, this.planned);
     this.prepared = { source: this.state, value, moves: this.planned, target };
     return target;
@@ -168,6 +181,11 @@ export class HsmController extends PhysicalPlayback {
       hsmTarget(this.letter, value),
     );
   }
+  /**
+   * Install the settled pose for `value`. When the current counting mode has a
+   * saved period the pose is that period's node, so counting starts on the
+   * pinned routes; otherwise it is the letter's setup followed by a routed jump.
+   */
   async configure(value = 0): Promise<void> {
     demand(!this.busy && !this.configuring, "Wait for HSM motion");
     demand(
@@ -178,11 +196,15 @@ export class HsmController extends PhysicalPlayback {
     let assets;
     try {
       assets = await this.resolveAssets(this.manifest, [this.design.print]);
-      let state = applyMoves(
-        initialState(this.design.print),
-        parseAlg(this.design.zeroWords[this.letter]),
-      );
-      if (value !== 0)
+      let state =
+        this.periods.poseFor(this.letter, this.range, value) ??
+        applyMoves(
+          initialState(this.design.print),
+          parseAlg(this.design.zeroWords[this.letter]),
+        );
+      if (
+        !matchesTarget(this.design.print, state, hsmTarget(this.letter, value))
+      )
         state = applyMoves(
           state,
           this.planner.plan(this.design.print, state, this.letter, value),
