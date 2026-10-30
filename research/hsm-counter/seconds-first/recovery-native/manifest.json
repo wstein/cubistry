@@ -1,0 +1,33 @@
+{
+  "schema": "cubistry.hsm-recovery-native-experiment",
+  "version": 1,
+  "issue": "https://github.com/wstein/cubistry/issues/98",
+  "status": "UNKNOWN",
+  "researchSource": "30b6d022da60c366d79de5498497df0a07e28caf",
+  "inputs": {
+    "recovery": {
+      "path": "research/hsm-counter/seconds-first/modes/recovery.json",
+      "sha256": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda"
+    },
+    "modes": {
+      "path": "research/hsm-counter/seconds-first/modes/witness.json",
+      "sha256": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae"
+    }
+  },
+  "contract": {
+    "commit": "eb151a9",
+    "path": "proof-checkers/HSM-RECOVERY-PROFILE.md",
+    "sha256": "758e95d60b04e0dfa4fb756451510e6abe0ea44d67574669f52e0fb5302c05d6"
+  },
+  "executionOrder": ["Julia", "Flix"],
+  "confirmationRequires": "Both independent native checkers accept identical raw inputs, with no dissent, followed by independent review.",
+  "claims": [
+    "Immutable physical print and bound application-period selection",
+    "Complete legal settled-state recovery graph and endpoint costs",
+    "Exact lexicographic objective: above-limit edges, display steps, HTM",
+    "All 18 mode metrics, histograms and rounded means",
+    "Full sample replay, inverse replay and optimal recovery costs"
+  ],
+  "excludedClaims": ["Global print optimality", "Runtime reachability of forced-six poses"],
+  "runs": []
+}
