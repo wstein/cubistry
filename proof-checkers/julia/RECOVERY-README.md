@@ -11,6 +11,7 @@ instructions](README.md). Both arguments are raw research files from revision
 
 ```sh
 julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/recovery.jl RECOVERY.json MODES.json
+julia --startup-file=no --compile=min --project=proof-checkers/julia proof-checkers/julia/recovery-parser-tests.jl RECOVERY.json MODES.json
 julia --startup-file=no --project=proof-checkers/julia proof-checkers/julia/recovery-tests.jl RECOVERY.json MODES.json
 ```
 
@@ -21,6 +22,10 @@ all legal settled full poses, rebuilds every endpoint reachable within five HTM
 multi-source Dijkstra with exact lexicographic integer costs. It checks every
 published count, histogram, mean, maximum and sample, including full-frame sample
 inverses. It does not consume a Python verifier or another checker's verdict.
+The sole real field, `meanSteps`, retains its original JSON number token through
+hash-bound `JSONText` traversal and compares exact integer coefficients and
+base-10 exponents. The [decimal investigation](../review/HSM-RECOVERY-MEAN-RC.md)
+records why preserving that token is necessary.
 
 Only algebraically redundant words are omitted: adjacent same-face moves reduce,
 and opposite-face moves commute. A separately executed test compares the pruned
