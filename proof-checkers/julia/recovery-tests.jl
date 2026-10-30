@@ -10,10 +10,11 @@ const IP = IndependentProof
 length(ARGS) == 2 || error("RECOVERY.json MODES.json required")
 recovery,rsha = R.read_raw(ARGS[1]); modes,msha = R.read_raw(ARGS[2])
 results = Pair{String,Any}[]
-function reject(name, action; status="INVALID")
+function reject(name, action; status="INVALID", reason_contains=nothing)
     exception = try action(); nothing catch e; e end
     @test exception isa IP.Invalid
     @test exception.code == status
+    reason_contains !== nothing && (@test occursin(reason_contains,exception.message))
     push!(results,name => (valid=false,status=exception.code,reason=exception.message))
 end
 function mutate(name, change)
@@ -154,8 +155,10 @@ end
     reject("reducible-nonoptimal-sample",() -> R.replay_samples(E,bad,index,goals[identity],dist))
     # A legal closed detour keeps the original source and final goal but changes
     # cost. It must not inherit the saved sample's optimality.
-    bad = deepcopy(row);word = bad["samples"][1]["words"][end]
-    bad["samples"][1]["words"][end] = word * " R R'"
-    reject("legal-detour-honest-final-pose",() -> R.replay_samples(E,bad,index,goals[identity],dist))
+    bad = deepcopy(row)
+    selected = first(s for s in bad["samples"] if length(H.parse_word(s["words"][end])) <= 3)
+    selected["words"][end] *= " R R'"
+    reject("legal-detour-honest-final-pose",() -> R.replay_samples(E,bad,index,goals[identity],dist);
+        reason_contains="exact optimal cost triple")
 end
 println(H.emit(["status"=>"PASS","recoveryInputSHA256"=>rsha,"modesInputSHA256"=>msha,"controls"=>results]))
