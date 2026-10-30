@@ -67,14 +67,16 @@ test("scene owner installs one bounded lighting rig and renderer caps high DPI",
   addPresentationLighting(scene);
   assert.equal(scene.children.length, 5);
   assert.equal(scene.children.filter(o => o.isDirectionalLight).length, 3);
-  assert(scene.children.every(o => o.isLight && !o.castShadow));
+  assert.equal(scene.children.filter(o => o.castShadow).length, 1);
+  const key = scene.children.find(o => o.castShadow);
+  assert.deepEqual(key.shadow.mapSize.toArray(), [1024, 1024]);
   for (const [input, expected] of [[1, 1], [1.5, 1.5], [3, 2], [NaN, 1], [0, 1]])
     assert.equal(presentationPixelRatio(input), expected);
   const previous = Object.getOwnPropertyDescriptor(globalThis, "devicePixelRatio");
   Object.defineProperty(globalThis, "devicePixelRatio", { value: 3, configurable: true });
   try {
     let ratio;
-    const renderer = { setPixelRatio(value) { ratio = value; } };
+    const renderer = { shadowMap: {}, setPixelRatio(value) { ratio = value; } };
     configurePresentationRenderer(renderer);
     assert.equal(ratio, 2);
     assert.equal(renderer.outputColorSpace, THREE.SRGBColorSpace);

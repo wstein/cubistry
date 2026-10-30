@@ -41,7 +41,9 @@ export class PhysicalCubeScene {
       let body = this.bodies.get(s.cubie);
       if (!body) {
         body = new THREE.Group();
-        body.add(new THREE.Mesh(geometry.body, plastic));
+        const shell = new THREE.Mesh(geometry.body, plastic);
+        shell.castShadow = shell.receiveShadow = true;
+        body.add(shell);
         if (geometry.core) {
           // Seal internal seams/junctions without squaring the approved exterior
           // bevels. Exterior sides retreat beneath the rounded shell; internal
@@ -54,6 +56,7 @@ export class PhysicalCubeScene {
             }
           const core = new THREE.Mesh(geometry.core, plastic);
           core.userData.plasticCore = true;
+          core.castShadow = core.receiveShadow = true;
           core.scale.set(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
           core.position.set((max[0] + min[0]) / 2, (max[1] + min[1]) / 2, (max[2] + min[2]) / 2);
           body.add(core);
@@ -69,6 +72,7 @@ export class PhysicalCubeScene {
       sticker.position.set(...s.n).multiplyScalar(geometry.stickerOffset);
       sticker.quaternion.setFromRotationMatrix(stickerFrame(s.n, s.up));
       sticker.userData.stickerId = s.id;
+      sticker.castShadow = sticker.receiveShadow = true;
       body.add(sticker);
     }
   }

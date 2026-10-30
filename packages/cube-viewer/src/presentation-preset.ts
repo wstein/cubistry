@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
 /** Bounded presentation quality, shared by every current 2×2/3×3 consumer.
- * One pair of geometries per cube; no shadow maps or extra render passes. */
+ * Shared cube geometry and one bounded shadow map per scene. */
 export const PRESENTATION_PRESET = Object.freeze({
   version: 1,
   cubiePitch: 1,
@@ -14,6 +14,7 @@ export const PRESENTATION_PRESET = Object.freeze({
   stickerCurveSegments: 4,
   stickerOffset: 0.502,
   maxPixelRatio: 2,
+  shadowMapSize: 1024,
   plasticClearcoat: 0.18,
   stickerClearcoat: 0.12,
   ambientIntensity: 0.45,
@@ -67,12 +68,18 @@ export function configurePresentationRenderer(renderer: THREE.WebGLRenderer): vo
   // Neutral compresses bright highlights while retaining printed image colors.
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1;
+  renderer.shadowMap.enabled = true;
+  // PCF honors the key radius; PCFSoft ignores that setting.
+  renderer.shadowMap.type = THREE.PCFShadowMap;
 }
 /** Called once by the owner of a scene, including a shared multi-cube viewport. */
-export function addPresentationLighting(scene: THREE.Scene | THREE.Group): void {
+export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadowExtent = 4) {
   const p = PRESENTATION_PRESET;
-  scene.add(new THREE.AmbientLight(0xffffff, p.ambientIntensity));
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x77808d, p.hemisphereIntensity));
+  const lights: THREE.Light[] = [];
+  const ambient = new THREE.AmbientLight(0xffffff, p.ambientIntensity);
+  scene.add(ambient); lights.push(ambient);
+  const hemisphere = new THREE.HemisphereLight(0xffffff, 0x77808d, p.hemisphereIntensity);
+  scene.add(hemisphere); lights.push(hemisphere);
   for (const [position, intensity] of [
     [[3, 5, 6], p.keyIntensity],
     [[-4, 1, 2], p.fillIntensity],
@@ -80,6 +87,24 @@ export function addPresentationLighting(scene: THREE.Scene | THREE.Group): void 
   ] as const) {
     const light = new THREE.DirectionalLight(0xffffff, intensity);
     light.position.set(position[0], position[1], position[2]);
-    scene.add(light);
+    if (intensity === p.keyIntensity) {
+      light.castShadow = true;
+      light.shadow.mapSize.set(p.shadowMapSize, p.shadowMapSize);
+      Object.assign(light.shadow.camera, {
+        left: -shadowExtent, right: shadowExtent, top: shadowExtent, bottom: -shadowExtent,
+        near: 0.1, far: 40,
+      });
+      light.shadow.camera.updateProjectionMatrix();
+      light.shadow.bias = -0.0002;
+      light.shadow.normalBias = 0.01;
+      light.shadow.radius = 4;
+    }
+    scene.add(light); lights.push(light);
   }
+  return { dispose() {
+    for (const light of lights) {
+      light.removeFromParent();
+      if (light instanceof THREE.DirectionalLight) light.shadow.map?.dispose();
+    }
+  } };
 }
