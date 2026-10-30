@@ -24,6 +24,7 @@ investigation. Search failure is never an impossibility proof.
 **Checkpoint status: scoped SAT for five saved raw chains**, independently
 accepted by unchanged native Julia and Flix replay. See
 [evidence and open review findings](evidence/README.md). Primary maximum is
-446 HTM; the 100–120 and 200-HTM objectives remain UNKNOWN. Further
-optimization is paused by the owner. Solver review is not cleared.
+446 HTM; the 100–120 and 200-HTM objectives remain UNKNOWN. The owner subsequently authorized Phase A completion before application
+integration. [Corrected verification](verification/README.md) records the fixed
+implementation and fresh native receipts; final independent review is pending.
 This PR remains Draft for owner research acceptance; no parent PR is changed.

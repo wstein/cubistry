@@ -30,8 +30,8 @@
   "promotion": "Draft research only; owner acceptance required",
   "statusScope": "Only the five saved complete raw chains accepted independently by unchanged R2 Julia and Flix verifiers; solver clearance remains open",
   "candidateSourceCommit": "1e6f246810b241f7a3ddb38dc4c1dbf996f64f2f",
-  "optimizationWork": "PAUSED_BY_OWNER",
-  "implementationReview": "OPEN_FINDINGS",
+  "optimizationWork": "RESUMED_BY_OWNER_PHASE_A",
+  "implementationReview": "PENDING_FINAL_INDEPENDENT_REVIEW",
   "targetStatus": "UNKNOWN",
   "verifiedPrimaryHTM": [
     358,
@@ -79,5 +79,39 @@
       "sha256": "c727b7dd18ee481103b85283529c409fc685f940a058814844d43785cb9a9a9d",
       "nativeReceiptsIdentical": true
     }
-  ]
+  ],
+  "correctedSourceCommit": "7f71dde7363714d802f94ad095cf1752c2a23b73",
+  "correctedVerification": {
+    "status": "SAT",
+    "statusScope": "Five saved raw continuous chains accepted by both unchanged native verifiers; fixed search may retain certified incumbents",
+    "path": "verification/README.md",
+    "unitAssertions": 318629,
+    "primaryBeamBudgetPerOrbit": 20000,
+    "midgeBeamBudgetPerOrbit": 40000,
+    "relaxationBudgetPerOrbit": 60000,
+    "beamWidth": 8,
+    "chainWidth": 2,
+    "inputs": [
+      {
+        "file": "verification/chain-1.moves.tsv",
+        "sha256": "3394e630db10e8b6c9b1d9f166ea9eac9fe729a6aa5a7e98c1ce2b5788d7b653"
+      },
+      {
+        "file": "verification/chain-2.moves.tsv",
+        "sha256": "7dd5981ca947530d5ac796685180dbce12babcfda2c412a4009b92a4b461537d"
+      },
+      {
+        "file": "verification/chain-3.moves.tsv",
+        "sha256": "d72793f8df71d48195f02a5eea929206b03414c032a7580d256373c223f72861"
+      },
+      {
+        "file": "verification/chain-4.moves.tsv",
+        "sha256": "71060b20676211ed2a4619b0af13689c7650c7eae88e2c341739d4311876159c"
+      },
+      {
+        "file": "verification/midge-recovery.moves.tsv",
+        "sha256": "37bd95f71801096e87f483582b5bb2b69a2eaff37e2b44fba58888367a21f510"
+      }
+    ]
+  }
 }

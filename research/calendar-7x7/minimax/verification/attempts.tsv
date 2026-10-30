@@ -1,0 +1,21 @@
+chain	edge	variant	status	htm	seconds	reason
+3	1	1/1	UNKNOWN		5.642873564	UNKNOWN SEARCH_BUDGET_EXHAUSTED orbit=1 width=8 budget=20000
+3	1	1/2	UNKNOWN		0.392783237	UNKNOWN SEARCH_BUDGET_EXHAUSTED orbit=1 width=8 budget=20000
+2	1	1/1	CANDIDATE	48	2.289608831	native verification required
+2	1	1/2	CANDIDATE	48	1.083983731	native verification required
+2	2	1/1	CANDIDATE	420	7.568848858	native verification required
+2	2	1/2	DOMINATED	420	3.987982117	same endpoint with a no-worse trajectory label
+2	2	2/1	CANDIDATE	425	3.987031536	native verification required
+2	2	2/2	DOMINATED	425	3.841275293	same endpoint with a no-worse trajectory label
+1	1	1/1	CANDIDATE	366	3.996128336	native verification required
+1	1	1/2	CANDIDATE	366	3.587723812	native verification required
+1	2	1/1	CANDIDATE	57	1.081536226	native verification required
+1	2	1/2	DOMINATED	57	1.013614163	same endpoint with a no-worse trajectory label
+1	2	2/1	CANDIDATE	57	1.128566443	native verification required
+1	2	2/2	DOMINATED	57	0.91246707	same endpoint with a no-worse trajectory label
+4	1	1/1	CANDIDATE	363	3.809448625	native verification required
+4	1	1/2	CANDIDATE	363	3.691480869	native verification required
+4	2	1/1	CANDIDATE	366	3.513924809	native verification required
+4	2	1/2	CANDIDATE	366	3.690112428	native verification required
+4	2	2/1	CANDIDATE	386	3.852386973	native verification required
+4	2	2/2	CANDIDATE	386	3.660719592	native verification required
