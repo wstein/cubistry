@@ -13,7 +13,7 @@ jobs:
     name: US English spelling
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Check spelling
         uses: crate-ci/typos@v1.49.0
         with:
@@ -23,7 +23,7 @@ jobs:
     name: Markdown links (local)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Check local links
         uses: lycheeverse/lychee-action@v2
         with:
@@ -37,7 +37,7 @@ jobs:
     name: Markdown links (external, advisory)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Check remote links
         uses: lycheeverse/lychee-action@v2
         with:
