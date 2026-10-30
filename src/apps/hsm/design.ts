@@ -16,14 +16,20 @@ import {
 import { stateEquals } from "@cubistry/cube-core";
 import { deploymentBasePath, sha256 } from "@cubistry/cube-assets";
 export type Letter = "H" | "S" | "M";
+/** Largest step, in HTM, of every saved counting period (the owner's limit). */
+export const PERIOD_EDGE_LIMIT = 5;
 /**
- * One closed counting period of the pinned print. Node `i` shows value
- * `i mod (maximum + 1)`; `words[i]` is the route from node `i` to `i + 1`, and
- * the last word returns to node 0. Counting down walks the same period backward.
+ * One closed counting period of the pinned print for one counting mode. Node `i`
+ * shows value `direction * i mod (maximum + 1)`; `words[i]` is the route from
+ * node `i` to `i + 1`, and the last word returns to node 0. A period with
+ * traversal "inverse" is the opposite direction's research period run backward
+ * with every word inverted, written out in its own direction.
  */
 export interface HsmPeriod {
   readonly letter: Letter;
   readonly maximum: number;
+  readonly direction: 1 | -1;
+  readonly traversal: "forward" | "inverse";
   /** Route from the solved print to node 0, which displays 00. */
   readonly setup: string;
   readonly periodHTM: number;
@@ -39,6 +45,8 @@ function validatePeriod(print: PrintDefinition, raw: unknown): HsmPeriod {
   demand(
     ["H", "S", "M"].includes(p.letter as string) &&
       [11, 23, 59].includes(p.maximum as number) &&
+      [1, -1].includes(p.direction as number) &&
+      ["forward", "inverse"].includes(p.traversal as string) &&
       typeof p.setup === "string" &&
       Array.isArray(p.words) &&
       p.words.length > 0 &&
@@ -48,17 +56,25 @@ function validatePeriod(print: PrintDefinition, raw: unknown): HsmPeriod {
   );
   const letter = p.letter as Letter,
     modulus = (p.maximum as number) + 1,
+    direction = p.direction as 1 | -1,
     words = p.words as string[];
   const start = applyMoves(initialState(print), parseAlg(p.setup as string));
   let state = start,
     total = 0;
   words.forEach((word, i) => {
     demand(
-      matchesTarget(print, state, hsmTarget(letter, i % modulus)),
+      matchesTarget(
+        print,
+        state,
+        hsmTarget(letter, (((direction * i) % modulus) + modulus) % modulus),
+      ),
       "HSM period node shows the wrong value",
     );
     const moves = parseAlg(word);
-    demand(moves.length >= 1 && moves.length <= 6, "HSM period edge too long");
+    demand(
+      moves.length >= 1 && moves.length <= PERIOD_EDGE_LIMIT,
+      "HSM period edge too long",
+    );
     total += moves.length;
     state = applyMoves(state, moves);
   });
@@ -67,6 +83,8 @@ function validatePeriod(print: PrintDefinition, raw: unknown): HsmPeriod {
   return deepFreeze({
     letter,
     maximum: p.maximum as number,
+    direction,
+    traversal: p.traversal as HsmPeriod["traversal"],
     setup: p.setup as string,
     periodHTM: total,
     words,
@@ -105,7 +123,7 @@ export function validateHsmDesign(raw: unknown): HsmDesign {
   const d = record(raw, "HSM counter");
   demand(
     d.schema === "cubistry.hsm-runtime" &&
-      d.version === 3 &&
+      d.version === 4 &&
       Array.isArray(d.printing) &&
       d.printing.length === 24,
     "Invalid HSM runtime",
@@ -159,8 +177,8 @@ export function validateHsmDesign(raw: unknown): HsmDesign {
   demand(Array.isArray(d.periods), "Missing HSM periods");
   const periods = (d.periods as unknown[]).map((p) => validatePeriod(print, p));
   demand(
-    new Set(periods.map((p) => `${p.letter}/${p.maximum}`)).size ===
-      periods.length,
+    new Set(periods.map((p) => `${p.letter}/${p.maximum}/${p.direction}`))
+      .size === periods.length,
     "Duplicate HSM period",
   );
   for (const letter of ["H", "S", "M"] as const) {
@@ -181,7 +199,7 @@ export async function loadHsmDesign(
   expectedHash: string,
 ): Promise<HsmDesign> {
   const response = await fetch(
-    `${deploymentBasePath(basePath)}hsm-counter.v2.json`,
+    `${deploymentBasePath(basePath)}hsm-counter.v3.json`,
   );
   demand(response.ok, "Unable to load HSM print");
   const bytes = await response.arrayBuffer();

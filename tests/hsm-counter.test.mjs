@@ -12,7 +12,7 @@ import {
   inverseMoves,
 } from "@cubistry/cube-mechanics";
 import { stateEquals } from "@cubistry/cube-core";
-const raw = JSON.parse(readFileSync("public/hsm-counter.v2.json"));
+const raw = JSON.parse(readFileSync("public/hsm-counter.v3.json"));
 const design = validateHsmDesign(raw);
 const planner = new HsmPlanner();
 test("real blank is part of every physical target and the known free jump needs six moves", () => {
@@ -39,8 +39,8 @@ const settled = async (c) => {
   assert.equal(c.busy, false);
   assert.notEqual(c.progress.status, "failed");
 };
-// The exact shortest-path planner with lookahead (policy 13) is the fallback
-// for every pose that is not on a saved period. Its first 00–59–00 pass from each
+// The exact shortest-path planner with lookahead (policy 13) plans free jumps
+// and is the last fallback if no recovery plan exists. Its first 00–59–00 pass from each
 // unit's setup on the seconds-first print is pinned here; the saved periods
 // (tests/hsm-seconds-first.test.mjs) do better.
 test("fallback planner keeps its pinned 00–59 prefix totals including overflow", () => {
@@ -206,23 +206,12 @@ test("blank up vectors are free while printed glyphs stay oriented", () => {
     if (/^[HSM]$/.test(s.image)) s.up = s.up.map((x) => -x + 0);
   assert.throws(() => validateHsmDesign(letter), /Invalid HSM setup/);
 });
-// Counting modes that have a saved period (S and M 00–59, H 00–23 and 00–11,
-// each up and down) close over the full pose within one period and never exceed
-// five HTM per step. The other combinations have no period; they use the exact
-// planner and keep the universal six-move bound.
-const PERIOD_MODES = [
-  ["S", 59],
-  ["M", 59],
-  ["H", 23],
-  ["H", 11],
-];
-test("each fresh 00 setup reaches a full-state counting period within the stated HTM bound", async () => {
+// Every one of the 18 counting modes has a saved period, so each fresh 00 setup
+// closes over the full pose and never exceeds five HTM per step.
+test("each fresh 00 setup reaches a full-state counting period within five HTM per step", async () => {
   for (const letter of ["H", "S", "M"])
     for (const maximum of [59, 23, 11])
       for (const direction of [1, -1]) {
-        const researched = PERIOD_MODES.some(
-          ([l, m]) => l === letter && m === maximum,
-        );
         const c = new HsmController(
           { configure() {}, animate: async () => {}, resetCamera() {} },
           design,
@@ -235,11 +224,7 @@ test("each fresh 00 setup reaches a full-state counting period within the stated
         await c.configure();
         const seen = new Set([JSON.stringify(c.state)]);
         let closed = false;
-        for (
-          let pass = 0;
-          pass < (researched ? 40 : 6) && !(closed && researched);
-          pass++
-        ) {
+        for (let pass = 0; pass < 40 && !closed; pass++) {
           for (let i = 0; i <= maximum; i++) {
             const target =
               (c.currentValue + direction + maximum + 1) % (maximum + 1);
@@ -247,7 +232,7 @@ test("each fresh 00 setup reaches a full-state counting period within the stated
             await settled(c);
             assert.equal(c.currentValue, target);
             assert.ok(
-              c.progress.total <= (researched ? 5 : 6),
+              c.progress.total <= 5,
               `${letter}/${maximum}/${direction} step to ${target} took ${c.progress.total} HTM`,
             );
           }
@@ -255,8 +240,7 @@ test("each fresh 00 setup reaches a full-state counting period within the stated
           closed = seen.has(key);
           seen.add(key);
         }
-        if (researched)
-          assert.ok(closed, `${letter}/${maximum}/${direction} did not close`);
+        assert.ok(closed, `${letter}/${maximum}/${direction} did not close`);
         c.dispose();
       }
 });

@@ -41,6 +41,20 @@ export class HsmPlanner {
   private readonly frames: Map<string, number>[] = [];
   private readonly transitions: number[][][] = [];
   private readonly distances = new Uint8Array(24 ** 4).fill(255);
+  /** Read-only view of the exact tables, shared with the recovery search. */
+  get tables(): {
+    readonly maps: readonly ReadonlyMap<string, number>[];
+    readonly frames: readonly ReadonlyMap<string, number>[];
+    readonly transitions: readonly (readonly (readonly number[])[])[];
+    readonly distances: Uint8Array;
+  } {
+    return {
+      maps: this.maps,
+      frames: this.frames,
+      transitions: this.transitions,
+      distances: this.distances,
+    };
+  }
   constructor() {
     for (const p of positions) {
       const poses: Pose[] = [{ p, n: [0, 0, 1], up: [0, 1, 0] }],

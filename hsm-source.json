@@ -1,27 +1,40 @@
 {
   "repository": "https://github.com/wstein/cubistry",
-  "layoutBranch": "research/cube-display-feasibility",
-  "layoutCommit": "4d9ef771305def5c4f6e9b1f2eec7689a03ed21b",
-  "layoutPath": "research/hsm-counter/seconds-first/witness.json",
-  "layoutSHA256": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3",
+  "layoutBranch": "research/hsm-seconds-first-modes",
+  "layoutCommit": "30b6d022da60c366d79de5498497df0a07e28caf",
+  "layoutPath": "research/hsm-counter/seconds-first/modes/witness.json",
+  "layoutSHA256": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae",
   "researchFiles": {
     "research/hsm-counter/seconds-first/README.md": "165f8c36449fdc1fa0581dffe26c0be5766fb0855953a6505c5f1377a5cd219e",
     "research/hsm-counter/seconds-first/verification.json": "ea9e422aefef94855924a90334f8a8d0383a4da5e0b3f93c3424e4885ecbde3c",
     "research/hsm-counter/seconds-first/manifest.json": "4f4c5630da80f8346e174751d68b9cfd8af2ce7e8420894bb35aef55ea452c98",
     "research/hsm-counter/seconds-first/verify.py": "c5a2cf5f7fa3f6e953c071f482d37e9081fb24a4d1c0e81689489e27c5fe956e",
-    "research/hsm-counter/seconds-first/witness.json": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3"
+    "research/hsm-counter/seconds-first/witness.json": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3",
+    "research/hsm-counter/seconds-first/modes/README.md": "6af8fa3b66ed7406314ea7bcc9d33e04badcbf6e722c5442c518763fef5403d2",
+    "research/hsm-counter/seconds-first/modes/manifest.json": "63f446d991d3f52e4e7b42976592c973422bbedc956665d05f779505ce19dcb2",
+    "research/hsm-counter/seconds-first/modes/verification.json": "5747b9d3e2e12e8f8798c6c1dc789ab309ffbc0f047a5b53ffa1a26d72ec1b3d",
+    "research/hsm-counter/seconds-first/modes/verify_modes.py": "d140f88bedbc920f46fcba9fe5cc0e8bcee3e8263a4feee175942a2ad06e08f6",
+    "research/hsm-counter/seconds-first/modes/witness.json": "5dd24dd70d678cc9e7f24da633ba1a772b7ccaf72aa1d4a1622c197ba318c2ae",
+    "research/hsm-counter/seconds-first/modes/recovery.json": "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda"
+  },
+  "basePublished": {
+    "branch": "research/cube-display-feasibility",
+    "commit": "4d9ef771305def5c4f6e9b1f2eec7689a03ed21b",
+    "note": "The seconds-first print with its independent review; the five research/hsm-counter/seconds-first/*.{md,json,py} files above are byte-identical there. The modes/ directory is new on layoutBranch."
   },
   "firstPublished": {
     "branch": "research/hsm-seconds-first",
     "commit": "24240a3b2dbd691de99d5bf1170b5695fc62a320",
     "note": "Same witness, verification.json and verify.py bytes; README.md (no review section) and manifest.json (its README hash) differ."
   },
-  "appCopy": "data/hsm/seconds-first/witness.json",
-  "runtimePath": "public/hsm-counter.v2.json",
-  "runtimeSHA256": "32f0fdc7eb4aafdcfea64f6cf4f1f5b84e23b3bf41fcf635a96ae631bcd244ae",
-  "proofCommit": "4d9ef771305def5c4f6e9b1f2eec7689a03ed21b",
-  "proofPath": "research/hsm-counter/seconds-first/README.md",
-  "reviewStatus": "reviewed, not CONFIRMED: the independent review recorded in the proof README (section \"Independent review (Opus)\") found no blocking proof issue and recomputed 159/204/82/40 with its own Python model; PR #92 review recomputed the same laps through the application. Under proof-checkers/AUTHORITY.md the result is not CONFIRMED until both the Flix and the Julia checker accept it, which has not been done. Print optimality is UNKNOWN.",
+  "appCopy": "data/hsm/seconds-first/modes/witness.json",
+  "recoveryCopy": "data/hsm/seconds-first/modes/recovery.json",
+  "baseCopy": "data/hsm/seconds-first/witness.json",
+  "runtimePath": "public/hsm-counter.v3.json",
+  "runtimeSHA256": "36372b74d3acacc54ec07ae80cec7be4dad264ea7ff4339fd4d4c179b6b0b3ba",
+  "proofCommit": "30b6d022da60c366d79de5498497df0a07e28caf",
+  "proofPath": "research/hsm-counter/seconds-first/modes/README.md",
+  "reviewStatus": "reviewed, not CONFIRMED: the independent review recorded in the seconds-first proof README (section \"Independent review (Opus)\") found no blocking proof issue for the print and its first four periods; the all-mode periods and recovery table (modes/) are checked only by the research's independent Python verifier (verify_modes.py --certify all --recovery-full all). Under proof-checkers/AUTHORITY.md the result is not CONFIRMED until both the Flix and the Julia checker accept it, which has not been done. Print optimality is UNKNOWN.",
   "supersedes": {
     "layoutCommit": "8e9ad5c05e93efa2b1f841590f725416abf226f4",
     "layoutPath": "research/hsm-counter/blank/witness.json",
@@ -29,5 +42,12 @@
     "runtimeSHA256": "8c6b4426be5d6d317f43fd6b7063877feb36af1a5140cb4f282ae2463e3a7cf2",
     "proofCommit": "8e9ad5c05e93efa2b1f841590f725416abf226f4",
     "proofPath": "research/hsm-counter/blank/REVIEW.md"
+  },
+  "printSource": {
+    "path": "public/hsm-counter.v2.json",
+    "sha256": "32f0fdc7eb4aafdcfea64f6cf4f1f5b84e23b3bf41fcf635a96ae631bcd244ae",
+    "derivedFrom": "data/hsm/seconds-first/witness.json",
+    "derivedFromSHA256": "f71d423734e3357b1f41e1ab43625d46a3e9edbf50d0bf74f0c89006309abbc3",
+    "note": "Frozen print source of the committed HSM print sheets (runtime schema version 3, the four periods published first); same printing and setups as the application runtime. Never rewritten."
   }
 }

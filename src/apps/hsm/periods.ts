@@ -4,12 +4,7 @@ import {
   type LegalMove,
   type PrintDefinition,
 } from "@cubistry/cube-core";
-import {
-  applyMoves,
-  initialState,
-  inverseMoves,
-  parseAlg,
-} from "@cubistry/cube-mechanics";
+import { applyMoves, initialState, parseAlg } from "@cubistry/cube-mechanics";
 import type { HsmPeriod, Letter } from "./design.ts";
 
 /** Full physical identity of a settled pose: every cubie, hidden ones included. */
@@ -29,14 +24,13 @@ export interface PeriodRoute {
 }
 
 /**
- * Closed counting periods of the pinned print, replayed on the caller's print.
+ * Closed counting periods of the pinned print, replayed on the caller's print,
+ * one per counting mode (letter, range and direction).
  *
- * Counting up follows each node's saved word. Counting down walks the same
- * period backward with every word inverted: it closes the same full poses and
- * costs the same HTM, but is not necessarily a shortest word toward the lower
- * display. A pose that is not a period node (after a free jump, an interrupted
- * route or a counting mode without a period) has no period route; the caller
- * then replans with the exact shortest-path planner.
+ * Counting follows each node's saved word. A pose that is not a node of the
+ * mode's period (after a free jump, a catch-up or an interrupted route) has no
+ * period route; the caller then recovers onto the period (recovery.ts) or, for
+ * a jump, replans with the exact shortest-path planner.
  */
 export class HsmPeriods {
   private readonly entries = new Map<string, Entry>();
@@ -51,28 +45,62 @@ export class HsmPeriods {
       }
       const index = new Map(nodes.map((n, i) => [poseKey(n), i]));
       demand(index.size === nodes.length, "HSM period revisits a pose");
-      this.entries.set(`${spec.letter}/${spec.maximum}`, {
-        spec,
-        words,
-        nodes,
-        index,
-      });
+      this.entries.set(
+        HsmPeriods.id(spec.letter, spec.maximum, spec.direction),
+        {
+          spec,
+          words,
+          nodes,
+          index,
+        },
+      );
     }
   }
-  private entry(letter: Letter, maximum: number): Entry | undefined {
-    return this.entries.get(`${letter}/${maximum}`);
+  private static id(letter: Letter, maximum: number, direction: number) {
+    return `${letter}/${maximum}/${direction}`;
   }
-  has(letter: Letter, maximum: number): boolean {
-    return this.entries.has(`${letter}/${maximum}`);
+  private entry(letter: Letter, maximum: number, direction: number) {
+    return this.entries.get(HsmPeriods.id(letter, maximum, direction));
   }
-  /** Settled pose of node `value` (first lap); null without a period or beyond the range. */
-  poseFor(letter: Letter, maximum: number, value: number): CubeState | null {
-    const e = this.entry(letter, maximum);
-    return e && value >= 0 && value <= maximum ? e.nodes[value] : null;
+  has(letter: Letter, maximum: number, direction: number): boolean {
+    return this.entries.has(HsmPeriods.id(letter, maximum, direction));
+  }
+  /** Value shown by node `i` of a period. */
+  private static value(e: Entry, i: number): number {
+    const n = e.spec.maximum + 1;
+    return (((e.spec.direction * i) % n) + n) % n;
+  }
+  /** Settled pose of the first node showing `value`; null without a period or beyond the range. */
+  poseFor(
+    letter: Letter,
+    maximum: number,
+    direction: number,
+    value: number,
+  ): CubeState | null {
+    const e = this.entry(letter, maximum, direction);
+    if (!e || value < 0 || value > maximum) return null;
+    return e.nodes.find((_, i) => HsmPeriods.value(e, i) === value) ?? null;
+  }
+  /** Every node of the period that shows `value` (one per lap). */
+  nodesShowing(
+    letter: Letter,
+    maximum: number,
+    direction: number,
+    value: number,
+  ): readonly CubeState[] {
+    const e = this.entry(letter, maximum, direction);
+    return e ? e.nodes.filter((_, i) => HsmPeriods.value(e, i) === value) : [];
   }
   /** Node of `state`, or -1 when the pose is not on the period. */
-  nodeOf(letter: Letter, maximum: number, state: CubeState): number {
-    return this.entry(letter, maximum)?.index.get(poseKey(state)) ?? -1;
+  nodeOf(
+    letter: Letter,
+    maximum: number,
+    direction: number,
+    state: CubeState,
+  ): number {
+    return (
+      this.entry(letter, maximum, direction)?.index.get(poseKey(state)) ?? -1
+    );
   }
   /** The period route to the next value, or null when `state` is off the period. */
   route(
@@ -82,19 +110,13 @@ export class HsmPeriods {
     state: CubeState,
     value: number,
   ): PeriodRoute | null {
-    const e = this.entry(letter, maximum);
+    const e = this.entry(letter, maximum, direction);
     if (!e) return null;
     const from = e.index.get(poseKey(state));
     if (from === undefined) return null;
-    const n = e.nodes.length,
-      modulus = maximum + 1;
-    if (direction === 1) {
-      const node = (from + 1) % n;
-      return node % modulus === value ? { moves: e.words[from], node } : null;
-    }
-    const node = (from - 1 + n) % n;
-    return node % modulus === value
-      ? { moves: inverseMoves(e.words[node]), node }
+    const node = (from + 1) % e.nodes.length;
+    return HsmPeriods.value(e, node) === value
+      ? { moves: e.words[from], node }
       : null;
   }
 }
