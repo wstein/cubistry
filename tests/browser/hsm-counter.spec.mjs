@@ -101,6 +101,7 @@ test("HSM run stop resume, validation, mobile and existing application state rem
   await page.setViewportSize({ width: 390, height: 844 });
   await choose(page);
   await page.screenshot({ path: "test-results/hsm-mobile.png" });
+  // Default rotation time for the H unit is 500 ms (stop index 2).
   await expect(page.locator("#rotation-speed")).toHaveValue("2");
   expect(
     await page.locator("html").evaluate((e) => e.scrollWidth),
@@ -150,4 +151,47 @@ test("M33 has a physical unprinted upper-left corner", async ({ page }) => {
     ),
   ).toBe(3);
   await page.screenshot({ path: "test-results/hsm-blank-M33.png" });
+});
+test("single HSM counter defaults to H 500 ms, M 250 ms, S 100 ms and stays freely adjustable", async ({
+  page,
+}) => {
+  const defaults = {
+    H: ["2", "500 ms"],
+    M: ["3", "250 ms"],
+    S: ["4", "100 ms"],
+  };
+  const slider = page.locator("#rotation-speed");
+  await choose(page);
+  // Opening the counter applies the default of the initially selected unit.
+  await expect(page.locator("#hsm-letter")).toHaveValue("H");
+  await expect(slider).toHaveValue(defaults.H[0]);
+  await expect(slider).toHaveAttribute("aria-valuetext", /^500 ms/);
+  // Changing the unit resets the slider to that unit's default.
+  for (const letter of ["M", "S", "H", "M"]) {
+    await page.selectOption("#hsm-letter", letter);
+    await settled(page, 0);
+    await expect(slider).toHaveValue(defaults[letter][0]);
+    await expect(slider).toHaveAttribute(
+      "aria-valuetext",
+      new RegExp("^" + defaults[letter][1]),
+    );
+  }
+  // The slider stays freely adjustable on every stop and is not re-forced.
+  for (const stop of ["0", "6", "2"]) {
+    await slider.fill(stop);
+    await expect(slider).toHaveValue(stop);
+    await settled(page, 0);
+    await expect(slider).toHaveValue(stop);
+  }
+  // Re-opening the counter from another application applies the default again.
+  await page.selectOption("#application", "certified");
+  await settled(page, 0);
+  await page.selectOption("#application", "hsm-counter");
+  await expect(page.locator("#cube")).toHaveAttribute(
+    "data-application",
+    "hsm-counter",
+  );
+  await settled(page, 0);
+  const letter = await page.locator("#hsm-letter").inputValue();
+  await expect(slider).toHaveValue(defaults[letter][0]);
 });
