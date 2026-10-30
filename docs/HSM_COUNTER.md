@@ -84,18 +84,29 @@ the same 00 setups as the application runtime. The same script checks that it
 still derives exactly from the base witness, and never rewrites it. The
 application no longer loads it.
 
-> **Review status: reviewed, not CONFIRMED.** The independent review recorded in
-> the research README found no blocking proof issue and recomputed the 159, 204,
-> 82 and 40 figures with its own Python model; the review of this application
-> change recomputed the same laps through the real controller. The all-mode
-> periods and the recovery table are checked by the research's independent
-> Python verifier only. Under
-> [proof-checkers/AUTHORITY.md](../proof-checkers/AUTHORITY.md) the result is not
-> CONFIRMED until both the Flix and the Julia checker accept it, which has not
-> been done. The application consumes the pinned witness. The previous pin
-> (`blank/witness.json`, SHA-256 `13eea2a1…`, review commit `8e9ad5c0…`) is retained
-> in `hsm-source.json` under `supersedes`. Print optimality remains UNKNOWN; the
-> research README states what is proved and what is best-found.
+> **Proof status.**
+>
+> - **CONFIRMED** only for the two pinned witnesses, by both native checkers
+>   (Flix and Julia, merged in PR 95, independent review at `477ac51`, profile in
+>   [proof-checkers/HSM-PROFILE.md](../proof-checkers/HSM-PROFILE.md)):
+>   `data/hsm/seconds-first/witness.json` (SHA-256 `f71d4237…`, profile
+>   `cubistry.hsm-seconds-first`) and `data/hsm/seconds-first/modes/witness.json`
+>   (SHA-256 `5dd24dd7…`, research `30b6d02`, profile
+>   `cubistry.hsm-seconds-first-modes`). Both files are byte-identical to the
+>   PR 95 conformance cases `witness.json` and `modes.json`. This covers the
+>   24-sticker print, the 18 mode periods with every edge at most 5 HTM, the
+>   lap, maximum and mean figures (159, 204, 82, 40) and the 6 HTM universal
+>   bound. Run it with `hsm FILE`.
+> - **UNSUPPORTED**: the recovery table `data/hsm/seconds-first/modes/recovery.json`.
+>   Neither checker accepts that schema. The research's Python verifier
+>   (`verify_modes.py --recovery-full all`) is evidence, not proof.
+> - **UNKNOWN**: global print optimality. The research README states what is
+>   proved and what is best-found.
+> - **Software-tested, not proof**: what the app does at run time
+>   (`periods.ts`, `recovery.ts`, the planner, the live clock).
+>
+> The previous pin (`blank/witness.json`, SHA-256 `13eea2a1…`, review commit
+> `8e9ad5c0…`) is retained in `hsm-source.json` under `supersedes`.
 
 The general guarantee is unchanged: **at most six HTM** from a settled legal pose
 whose blank and upright unit are already in their required front slots, over the
