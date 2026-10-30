@@ -38,3 +38,21 @@ test("saved blobs/crop metadata survive reopening and storage-unavailable errors
   await assert.rejects(openPictureDatabase(undefined),/unavailable/);
   await assert.rejects(openPictureDatabase({open(){throw Error("private mode");}}),/storage/);
 });
+
+test("count and aggregate-byte limits reject new rows but permit bounded overwrites and recovery after deletion",async()=>{
+  const db=database(),store=new PictureStore(db);
+  const save=async value=>{const result=store.save(value);await Promise.resolve();db.tx.complete();await result;};
+  for(let i=0;i<10;i++)await save(record(`set-${i}`));
+  await assert.rejects(store.save(record("eleven")),/library limit/);assert.equal(db.rows.size,10);
+  await save({...record("set-0"),name:"Updated existing"});assert.equal(db.rows.size,10);assert.equal(db.rows.get("set-0").name,"Updated existing");
+  const removal=store.delete("set-1");db.tx.complete();await removal;await save(record("eleven"));assert.equal(db.rows.size,10);
+  const bigDb=database(),bigStore=new PictureStore(bigDb),large=new Blob([new Uint8Array(4*1024*1024)],{type:"image/png"});
+  const largeRecord=id=>({...record(id),faces:Object.fromEntries(FACE_FRAMES.map(f=>[f.face,{blob:large,crop:{zoom:1,x:0,y:0}}]))});
+  for(const id of ["a","b"]){const op=bigStore.save(largeRecord(id));await Promise.resolve();bigDb.tx.complete();await op;}
+  await assert.rejects(bigStore.save(largeRecord("c")),/library limit/);assert.equal(bigDb.rows.size,2);
+});
+test("blocked storage rejects promptly and closes any late successful open",async()=>{
+  const request={},database={closed:0,close(){this.closed++;}};
+  const pending=openPictureDatabase({open(){return request;}});request.onblocked();await assert.rejects(pending,/Close other/);
+  request.result=database;request.onsuccess();assert.equal(database.closed,1);
+});

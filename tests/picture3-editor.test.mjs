@@ -35,3 +35,17 @@ test("late upload/set/preset work cannot replace a newer choice or leak a decode
  const oldPreset=presetEditor.preset("coast");await start.promise;
  assert(await presetEditor.load(sources()));gate.resolve();assert.equal(await oldPreset,false);presetEditor.dispose();
 });
+
+test("trusted preset rasterization revokes temporary object URLs on success and encoding/decode errors",async()=>{
+ const {rasterizePreset}=await import("../src/apps/picture3/editor.ts");
+ const oldImage=globalThis.Image,oldDocument=globalThis.document,oldCreate=URL.createObjectURL,oldRevoke=URL.revokeObjectURL;
+ let revoked=0,mode="ok";
+ URL.createObjectURL=()=>"blob:local-preset";URL.revokeObjectURL=url=>{assert.equal(url,"blob:local-preset");revoked++;};
+ globalThis.Image=class{set src(value){if(value)queueMicrotask(()=>mode==="decode"?this.onerror?.():this.onload?.());}};
+ globalThis.document={createElement(){return{getContext:()=>({drawImage(){}}),toBlob(cb){cb(mode==="encode"?null:blob());}};}};
+ try{
+  assert((await rasterizePreset("<svg/>")).size>0);
+  mode="encode";await assert.rejects(rasterizePreset("<svg/>"),/prepare/);
+  mode="decode";await assert.rejects(rasterizePreset("<svg/>"),/decode/);assert.equal(revoked,3);
+ }finally{URL.createObjectURL=oldCreate;URL.revokeObjectURL=oldRevoke;if(oldImage)globalThis.Image=oldImage;else delete globalThis.Image;if(oldDocument)globalThis.document=oldDocument;else delete globalThis.document;}
+});
