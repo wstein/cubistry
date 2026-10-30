@@ -153,7 +153,7 @@ TimerController and production interpolation across both profiles/directions,
 real profile budgets, mixed HTM moves, every sampled junction, revisions,
 clearing, queued targets, pause/reset and missed windows. Existing browser test
 source now checks every scheduled window and moves its four-commit checkpoints
-to the continuous final-window start. Browser/E2E/Playwright tests are **NOT RUN**;
+into the continuous final window. Browser/E2E/Playwright tests are **NOT RUN**;
 source syntax and numeric evidence are separate from owner native-browser feel
 and the 20 ms foreground timing acceptance. No new screenshots or measurements
 replace the preserved historical artifacts.
