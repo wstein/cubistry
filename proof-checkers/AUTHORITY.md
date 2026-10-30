@@ -84,8 +84,14 @@ witnesses is specified in [HSM-PROFILE.md](HSM-PROFILE.md). It is additive: the 
 The rules above apply unchanged: CONFIRMED only when both accept the same raw file, no voting, no
 Python gate. Claims the witness gives no checkable evidence for (for example global print
 optimality) are reported `UNKNOWN` or `NOT_CHECKED` in the result and must stay so in any report.
-The recovery-table schema `cubistry.hsm-seconds-first-recovery` has no native checker and is
-answered `UNSUPPORTED`; its claims are `UNKNOWN`.
+The original `hsm FILE` commands still answer `UNSUPPORTED` for the recovery-table
+schema `cubistry.hsm-seconds-first-recovery`; their frozen behavior is unchanged.
+Separate additive native recovery entrypoints now read the same recovery and mode
+files independently, as specified in [HSM-RECOVERY-PROFILE.md](HSM-RECOVERY-PROFILE.md).
+Their byte-identical full results and independent review confirm the scoped
+recovery graph claims; see [HSM-RECOVERY-RESULTS.md](HSM-RECOVERY-RESULTS.md).
+The authority rules above remain unchanged. Global print optimality remains
+`UNKNOWN`, and runtime reachability of forced poses remains `NOT_CHECKED`.
 
 ## Status of existing proofs
 
