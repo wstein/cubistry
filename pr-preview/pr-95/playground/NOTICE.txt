@@ -1,0 +1,16 @@
+Picture Puzzle Playground artwork
+Copyright 2026 Cubistry contributors
+
+These six original vector illustrations and their 24 cropped SVG sticker tiles
+are licensed under AGPL-3.0-or-later, matching the Cubistry repository license.
+No third-party images, fonts, platform glyphs, or stock artwork are included.
+
+Editable source and deterministic regeneration:
+  scripts/build-playground-art.mjs
+  node scripts/build-playground-art.mjs
+
+Source repository: https://github.com/wstein/cubistry
+License: https://www.gnu.org/licenses/agpl-3.0.html
+The corresponding full-face files are F.svg, B.svg, R.svg, L.svg, U.svg, D.svg.
+Each face uses a 320 by 320 viewBox. Quadrant files use a 160 by 160 viewBox
+with its original face offset; the physical source sticker supplies its frame.
