@@ -28,7 +28,7 @@
   "fullChronologicalCoverage": "UNKNOWN",
   "runtimeIntegration": "NOT_CHECKED",
   "promotion": "Draft research only; owner acceptance required",
-  "statusScope": "Only the five saved complete raw chains accepted independently by unchanged R2 Julia and Flix verifiers; solver clearance remains open",
+  "statusScope": "Five saved complete raw chains independently accepted by unchanged native Julia and Flix; independent research implementation review cleared scoped Phase A, not general solver completeness or runtime certification",
   "candidateSourceCommit": "1e6f246810b241f7a3ddb38dc4c1dbf996f64f2f",
   "optimizationWork": "RESUMED_BY_OWNER_PHASE_A",
   "implementationReview": "CLEARED_SCOPED_PHASE_A",
