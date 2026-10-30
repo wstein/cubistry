@@ -1,0 +1,1 @@
+{"valid":false,"status":"INVALID_JSON","reason":"com.fasterxml.jackson.core.JsonParseException: Unexpected character ('\ufeff' (code 65279 / 0xfeff)): expected a valid value (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 1]"}
