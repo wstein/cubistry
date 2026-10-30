@@ -1,6 +1,7 @@
 include(joinpath(@__DIR__,"search.jl"))
 @eval Minimax begin
-function midge_probe(dag,out)
+function midge_probe(dag,out;width=8,budget=100000)
+    @assert width>=0 && budget>=0
     mkpath(out);proof=P.replay_dag(dag);action=proof.action;a=Algebra(action)
     source=P.read_physical(joinpath(@__DIR__,"..","english","evidence","physical-print.tsv"))
     cache=cached_catalogues(action,a;relax_budget=60000)
@@ -16,19 +17,35 @@ function midge_probe(dag,out)
     println("midge_greedy\t",isnothing(monotonic) ? "UNKNOWN_LOCAL_PLATEAU" : "CANDIDATE")
     started=time_ns()
     try
-        result=solve_month(source,middle,target,action,cache,a;width=8,budget=100000)
+        result=solve_month(source,middle,target,action,cache,a;width,budget)
         @assert P.compose(middle,P.macro_word_perm(result.word,a.generators))==result.state
         input=V.read_chain(joinpath(@__DIR__,"..","continuous","evidence","chain-2.moves.tsv"))
+        checkpoint=V.read_chain(joinpath(@__DIR__,"evidence","midge-recovery.moves.tsv"))
+        @assert (checkpoint.root,checkpoint.hash)==(input.root,input.hash)
+        baseline=improve_word(expand(checkpoint.edges[2].moves),a)
+        if htm(baseline)<=htm(result.word)
+            result=(word=baseline,state=P.compose(middle,P.macro_word_perm(baseline,a.generators)))
+            P.validate_front(P.decode_physical(source,result.state,action),target)
+            println("selection\tMIDGE_R3_CHECKPOINT_ENDPOINT_PRESERVING")
+        end
         hs=[(input.hash,P.state_digest(P.decode_physical(source,middle,action))),
             (P.state_digest(P.decode_physical(source,middle,action)),P.state_digest(P.decode_physical(source,result.state,action)))]
         export_chain(joinpath(out,"midge-recovery.moves.tsv"),input,[first_word,result.word],action;hashes=hs)
         println("probe\tCANDIDATE\t",htm(first_word),'\t',htm(result.word),'\t',(time_ns()-started)/1e9)
     catch ex
         println("probe\tUNKNOWN\t",replace(sprint(showerror,ex),'\n'=>' '))
+        checkpoint=V.read_chain(joinpath(@__DIR__,"evidence","midge-recovery.moves.tsv"))
+        words=[improve_word(expand(edge.moves),a) for edge in checkpoint.edges]
+        export_chain(joinpath(out,"midge-recovery.moves.tsv"),checkpoint,words,action)
+        println("selection\tMIDGE_R3_CHECKPOINT_FALLBACK_UNKNOWN\t",join(htm.(words),','))
     end
 end
 end
 if abspath(PROGRAM_FILE)==@__FILE__
-    @assert length(ARGS)==2
-    Minimax.midge_probe(ARGS...)
+    @assert length(ARGS) in (2,4) "DAG OUT [WIDTH EXPANSION_BUDGET]"
+    if length(ARGS)==2
+        Minimax.midge_probe(ARGS...)
+    else
+        Minimax.midge_probe(ARGS[1],ARGS[2];width=parse(Int,ARGS[3]),budget=parse(Int,ARGS[4]))
+    end
 end
