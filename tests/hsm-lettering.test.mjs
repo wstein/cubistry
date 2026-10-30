@@ -47,7 +47,7 @@ test("unit lettering is a fixed vector print with only small bottom words", () =
 });
 test("both lettering choices retain the same physical print and valid upright HSM setups", () => {
   const original = validateHsmDesign(
-    JSON.parse(readFileSync("public/hsm-counter.v2.json", "utf8")),
+    JSON.parse(readFileSync("public/hsm-counter.v3.json", "utf8")),
   );
   for (const style of ["symbols", "words"]) {
     const d = hsmDesignFor(original, style);

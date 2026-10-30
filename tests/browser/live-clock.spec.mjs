@@ -20,7 +20,7 @@ async function physical(page) {
       "/packages/cube-mechanics/src/index.ts"
     );
     const d = validateHsmDesign(
-      await (await fetch("/hsm-counter.v2.json")).json(),
+      await (await fetch("/hsm-counter.v3.json")).json(),
     );
     return clockUnits.map((u, i) => ({
       value: u.controller.currentValue,
@@ -247,7 +247,7 @@ test("real animation ends all three midnight sequences at the shared live deadli
       "/packages/cube-mechanics/src/index.ts"
     );
     const design = validateHsmDesign(
-      await (await fetch("/hsm-counter.v2.json")).json(),
+      await (await fetch("/hsm-counter.v3.json")).json(),
     );
     const endpoints = ["H", "M", "S"].map((unit) =>
       window.realClockEndpoints.filter((e) => e.unit === unit).at(-1),

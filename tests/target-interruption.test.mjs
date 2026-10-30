@@ -204,7 +204,7 @@ test("both timer prints solve directly from an interrupted move and returning to
 });
 
 test("all HSM units in both fixed lettering styles replan from the committed partial pose", async () => {
-  const original = validateHsmDesign(json("public/hsm-counter.v2.json"));
+  const original = validateHsmDesign(json("public/hsm-counter.v3.json"));
   for (const style of ["symbols", "words"])
     for (const letter of ["H", "M", "S"]) {
       const design = hsmDesignFor(original, style),
@@ -231,7 +231,7 @@ test("all HSM units in both fixed lettering styles replan from the committed par
 });
 
 test("same-target scheduler polling does not restart a route, but a suspended live clock replaces stale seconds at the next move", async () => {
-  const design = validateHsmDesign(json("public/hsm-counter.v2.json"));
+  const design = validateHsmDesign(json("public/hsm-counter.v3.json"));
   const units = [],
     gates = [],
     observers = [];

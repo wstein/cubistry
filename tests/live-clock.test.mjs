@@ -158,7 +158,7 @@ test("wall-clock jumps cancel anticipated deadlines and replan against the new s
 });
 test("HSM prepares exact full poses and gives every turn contiguous angular timing", async () => {
   const d = validateHsmDesign(
-      JSON.parse(readFileSync("public/hsm-counter.v2.json")),
+      JSON.parse(readFileSync("public/hsm-counter.v3.json")),
     ),
     calls = [];
   const c = new HsmController(

@@ -18,7 +18,7 @@ import { HsmController } from "../src/apps/hsm/controller.ts";
 import { validateHsmDesign, hsmTarget } from "../src/apps/hsm/design.ts";
 
 const design = validateHsmDesign(
-  JSON.parse(readFileSync("public/hsm-counter.v2.json")),
+  JSON.parse(readFileSync("public/hsm-counter.v3.json")),
 );
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 const assets = async (manifest) => ({

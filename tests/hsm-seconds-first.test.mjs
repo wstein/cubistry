@@ -9,12 +9,15 @@ import { validateHsmDesign, hsmTarget } from "../src/apps/hsm/design.ts";
 import { HsmPlanner } from "../src/apps/hsm/planner.ts";
 import { HsmController } from "../src/apps/hsm/controller.ts";
 import { HsmPeriods, poseKey } from "../src/apps/hsm/periods.ts";
+import { HsmRecovery } from "../src/apps/hsm/recovery.ts";
 import { LiveClockScheduler } from "../src/apps/clock/scheduler.ts";
 import { ClockMoveStatistics } from "../src/apps/clock/statistics.ts";
 import {
   deriveRuntime,
+  derivePrintSource,
   serialize,
-  COUNTING_PERIODS,
+  inverseWord,
+  COUNTING_MODES,
 } from "../scripts/derive-hsm-runtime.mjs";
 import {
   applyMoves,
@@ -35,30 +38,59 @@ const witness = JSON.parse(witnessBytes);
 const runtimeBytes = readFileSync(pin.runtimePath);
 const raw = JSON.parse(runtimeBytes);
 const design = validateHsmDesign(raw);
+const recoveryTable = json("data/hsm/seconds-first/modes/recovery.json");
 const blankRaw = json("tests/fixtures/hsm-blank-print.v2.json");
+/** The nine letter/range pairs; each has one period per direction. */
+const PAIRS = [
+  ...new Map(COUNTING_MODES.map(([l, m]) => [`${l}/${m}`, [l, m]])).values(),
+];
 const planner = new HsmPlanner();
 
 // ---------------------------------------------------------------- provenance
 
-test("the witness copy and runtime file are pinned to the research commit", () => {
-  // The research landed on the long-lived research branch together with its
-  // independent review; the first publication stays recorded.
-  assert.equal(pin.layoutBranch, "research/cube-display-feasibility");
+test("the witness copies and runtime file are pinned to the research commit", () => {
+  // The all-mode research is a new branch on top of the long-lived research
+  // branch, where the print landed with its independent review; the base and
+  // the first publication stay recorded.
+  assert.equal(pin.layoutBranch, "research/hsm-seconds-first-modes");
   assert.match(pin.layoutCommit, /^[0-9a-f]{40}$/);
-  assert.equal(pin.layoutCommit, "4d9ef771305def5c4f6e9b1f2eec7689a03ed21b");
+  assert.equal(pin.layoutCommit, "30b6d022da60c366d79de5498497df0a07e28caf");
   assert.equal(pin.proofCommit, pin.layoutCommit);
+  assert.deepEqual(
+    [pin.basePublished.branch, pin.basePublished.commit],
+    [
+      "research/cube-display-feasibility",
+      "4d9ef771305def5c4f6e9b1f2eec7689a03ed21b",
+    ],
+  );
   assert.deepEqual(
     [pin.firstPublished.branch, pin.firstPublished.commit],
     ["research/hsm-seconds-first", "24240a3b2dbd691de99d5bf1170b5695fc62a320"],
   );
   assert.equal(
     pin.layoutPath,
-    "research/hsm-counter/seconds-first/witness.json",
+    "research/hsm-counter/seconds-first/modes/witness.json",
   );
   assert.equal(sha(witnessBytes), pin.layoutSHA256);
   assert.equal(pin.researchFiles[pin.layoutPath], pin.layoutSHA256);
+  // Every copy under data/hsm is byte-identical to its research file.
+  for (const [copy, path] of [
+    [pin.appCopy, pin.layoutPath],
+    [
+      pin.recoveryCopy,
+      "research/hsm-counter/seconds-first/modes/recovery.json",
+    ],
+    [pin.baseCopy, "research/hsm-counter/seconds-first/witness.json"],
+  ])
+    assert.equal(sha(readFileSync(copy)), pin.researchFiles[path], copy);
+  assert.equal(witness.printCode, json(pin.baseCopy).printCode);
+  assert.deepEqual(witness.printing, json(pin.baseCopy).printing);
+  assert.equal(Object.keys(pin.researchFiles).length, 11);
   for (const [path, hash] of Object.entries(pin.researchFiles)) {
-    assert.match(path, /^research\/hsm-counter\/seconds-first\/[A-Za-z.]+$/);
+    assert.match(
+      path,
+      /^research\/hsm-counter\/seconds-first\/(modes\/)?[A-Za-z_.]+$/,
+    );
     assert.match(hash, /^[0-9a-f]{64}$/);
   }
   // Reviewed, but not CONFIRMED in the sense of proof-checkers/AUTHORITY.md.
@@ -78,11 +110,57 @@ test("the witness copy and runtime file are pinned to the research commit", () =
 test("the runtime file is exactly what the pinned witness derives", () => {
   assert.equal(serialize(deriveRuntime(witness)), runtimeBytes.toString());
   assert.deepEqual(raw.printing, witness.printing);
-  assert.equal(raw.version, 3);
+  assert.equal(raw.version, 4);
   assert.deepEqual(
-    raw.periods.map((p) => [p.letter, p.maximum]),
-    COUNTING_PERIODS,
+    raw.periods.map((p) => [p.letter, p.maximum, p.direction]),
+    COUNTING_MODES,
   );
+  assert.equal(COUNTING_MODES.length, 18);
+  // Each letter's 00 setup is unchanged from the first four published periods,
+  // so the print bundles' setup examples stay byte-identical.
+  assert.deepEqual(
+    [raw.zeroWords.S, raw.zeroWords.M, raw.zeroWords.H],
+    [
+      ["S", 59],
+      ["M", 59],
+      ["H", 23],
+    ].map(
+      ([l, m]) =>
+        witness.modes.find(
+          (w) => w.letter === l && w.maximum === m && w.direction === 1,
+        ).setup,
+    ),
+  );
+});
+
+test("the frozen print source of the print sheets is unchanged and matches the runtime print", () => {
+  const source = pin.printSource,
+    bytes = readFileSync(source.path),
+    base = readFileSync(source.derivedFrom);
+  assert.equal(source.path, "public/hsm-counter.v2.json");
+  assert.notEqual(source.path, pin.runtimePath);
+  assert.equal(sha(bytes), source.sha256);
+  // Byte for byte the file the seconds-first print sheets were built from.
+  assert.equal(
+    source.sha256,
+    "32f0fdc7eb4aafdcfea64f6cf4f1f5b84e23b3bf41fcf635a96ae631bcd244ae",
+  );
+  assert.equal(sha(base), source.derivedFromSHA256);
+  assert.equal(
+    sha(base),
+    pin.researchFiles["research/hsm-counter/seconds-first/witness.json"],
+  );
+  assert.equal(
+    serialize(derivePrintSource(JSON.parse(base))),
+    bytes.toString(),
+  );
+  for (const style of ["symbols", "words"]) {
+    const m = json(`public/print/hsm-${style}-20mm-3sets/manifest.json`);
+    assert.deepEqual(m.source, { path: source.path, sha256: source.sha256 });
+  }
+  const frozen = JSON.parse(bytes);
+  assert.deepEqual(frozen.printing, raw.printing);
+  assert.deepEqual(frozen.zeroWords, raw.zeroWords);
 });
 
 test("negative controls: a tampered witness, runtime or period is detected", () => {
@@ -101,7 +179,12 @@ test("negative controls: a tampered witness, runtime or period is detected", () 
     (w) => (w.modes[0].steps[3].from = 7),
     (w) => (w.modes[0].steps[3].word = ""),
     (w) => (w.printing = w.printing.slice(1)),
-    (w) => (w.schema = "cubistry.hsm-blank-counter"),
+    (w) => (w.schema = "cubistry.hsm-seconds-first"),
+    (w) => (w.modes[4].steps[0].word = "R U R' U' R2 U"),
+    (w) => (w.modes[4].maximumHTM = 6),
+    (w) => w.appModes.splice(1, 1),
+    (w) => (w.appModes[1].traversal = "forward"),
+    (w) => (w.edgeLimitHTM = 6),
   ]) {
     const w = structuredClone(witness);
     mutate(w);
@@ -216,9 +299,11 @@ test("negative controls: a corrupted sticker breaks the replayed periods", () =>
     (d) => d.periods[0].words.reverse(),
     (d) => d.periods[0].words.pop(),
     (d) => (d.periods[0].periodHTM += 1),
-    (d) => (d.periods[1].setup = d.periods[0].setup),
+    (d) => (d.periods[2].setup = d.periods[0].setup),
     (d) => (d.periods[2].words[0] = "R R R R R R R"),
-    (d) => (d.zeroWords.S = d.periods[1].setup),
+    (d) => (d.periods[1].direction = 1),
+    (d) => (d.periods[1].traversal = "reverse"),
+    (d) => (d.zeroWords.S = d.periods[2].setup),
     (d) => d.periods.push(structuredClone(d.periods[0])),
     (d) => delete d.periods,
     (d) => (d.version = 2),
@@ -234,8 +319,8 @@ test("negative controls: a corrupted sticker breaks the replayed periods", () =>
       // One lap of the two-lap hours period shows the right values but ends on
       // a different full pose.
       (d) => {
-        d.periods[2].words = d.periods[2].words.slice(0, 24);
-        d.periods[2].periodHTM = length(d.periods[2].words);
+        d.periods[12].words = d.periods[12].words.slice(0, 24);
+        d.periods[12].periodHTM = length(d.periods[12].words);
       },
       /HSM period does not close/,
     ],
@@ -245,10 +330,10 @@ test("negative controls: a corrupted sticker breaks the replayed periods", () =>
       /HSM setup is not the first period's setup/,
     ],
     [
-      // Same pose after the edge, but a seven-move word.
+      // Same pose after the edge, but a six-move word: above the five limit.
       (d) => {
         let w = d.periods[0].words[0];
-        while (parseAlg(w).length < 7) w += " U U'";
+        while (parseAlg(w).length < 6) w += " U U'";
         d.periods[0].words[0] = w;
         d.periods[0].periodHTM = length(d.periods[0].words);
       },
@@ -266,8 +351,11 @@ test("negative controls: a corrupted sticker breaks the replayed periods", () =>
 // ------------------------------------------------------------------ periods
 
 const periods = new HsmPeriods(design.print, design.periods);
-const spec = (letter, maximum) =>
-  design.periods.find((p) => p.letter === letter && p.maximum === maximum);
+const spec = (letter, maximum, direction = 1) =>
+  design.periods.find(
+    (p) =>
+      p.letter === letter && p.maximum === maximum && p.direction === direction,
+  );
 const frames = (print, state) =>
   JSON.stringify(
     stickerPoses(print, state)
@@ -275,13 +363,24 @@ const frames = (print, state) =>
       .sort((a, b) => a.id - b.id),
   );
 
-test("each period starts at the witness's saved full pose, closes, and every edge is a shortest word from its actual pose", () => {
-  for (const [letter, maximum] of COUNTING_PERIODS) {
-    const p = spec(letter, maximum),
+test("each of the 18 periods starts at the witness's saved full pose, closes, and never exceeds five HTM", () => {
+  for (const [letter, maximum, direction] of COUNTING_MODES) {
+    const p = spec(letter, maximum, direction),
+      app = witness.appModes.find(
+        (m) =>
+          m.letter === letter &&
+          m.maximum === maximum &&
+          m.direction === direction,
+      ),
       mode = witness.modes.find(
         (m) =>
-          m.letter === letter && m.maximum === maximum && m.direction === 1,
-      );
+          m.letter === letter &&
+          m.maximum === maximum &&
+          m.direction === app.sourceDirection,
+      ),
+      label = `${letter}/${maximum}/${direction}`,
+      n = maximum + 1;
+    assert.equal(p.traversal, app.traversal, label);
     assert.equal(p.setup, mode.setup);
     assert.equal(p.periodHTM, mode.periodHTM);
     assert.equal(p.words.length, mode.periodEdges);
@@ -296,8 +395,8 @@ test("each period starts at the witness's saved full pose, closes, and every edg
     let total = 0,
       maxEdge = 0;
     p.words.forEach((word, i) => {
-      const value = i % (maximum + 1),
-        next = (i + 1) % (maximum + 1),
+      const value = (((direction * i) % n) + n) % n,
+        next = (((direction * (i + 1)) % n) + n) % n,
         moves = parseAlg(word);
       assert.ok(matchesTarget(design.print, state, hsmTarget(letter, value)));
       assert.equal(
@@ -308,24 +407,38 @@ test("each period starts at the witness's saved full pose, closes, and every edg
       seen.add(poseKey(state));
       // The install pose for a value is this replayed first-lap node.
       if (i <= maximum)
-        assert.ok(stateEquals(periods.poseFor(letter, maximum, i), state));
-      // Shortest from the actual pose: nothing reaches the next display faster.
-      assert.equal(
-        moves.length,
-        planner.distance(design.print, state, letter, next),
-        `${letter}/${maximum} edge ${i}`,
-      );
+        assert.ok(
+          stateEquals(
+            periods.poseFor(letter, maximum, direction, value),
+            state,
+          ),
+        );
+      if (p.traversal === "forward")
+        // Shortest from the actual pose: nothing reaches the next display faster.
+        assert.equal(
+          moves.length,
+          planner.distance(design.print, state, letter, next),
+          `${label} edge ${i}`,
+        );
+      // Run backward, word i undoes the source period's word L-1-i.
+      else
+        assert.equal(
+          word,
+          inverseWord(mode.steps[mode.steps.length - 1 - i].word),
+        );
+      assert.ok(moves.length <= 5, `${label} edge ${i}`);
       total += moves.length;
       maxEdge = Math.max(maxEdge, moves.length);
       state = applyMoves(state, moves);
       assert.equal(
-        periods.nodeOf(letter, maximum, state),
+        periods.nodeOf(letter, maximum, direction, state),
         (i + 1) % p.words.length,
       );
     });
     assert.ok(stateEquals(state, start), "closed over the full pose");
     assert.equal(total, p.periodHTM);
-    assert.equal(maxEdge, mode.maximumHTM);
+    assert.equal(maxEdge, app.maximumHTM);
+    assert.ok(maxEdge <= 5, label);
   }
 });
 
@@ -363,15 +476,40 @@ const lapSums = (a, n) =>
     sum(a.slice(i * n, (i + 1) * n)),
   );
 
-// Research figures: per-lap HTM, largest edge, and wrap edge for each unit.
+// Research figures (research/hsm-counter/seconds-first/modes/verification.json):
+// per-lap HTM, laps per period, largest edge, and the wrap edge, the same up and
+// down because counting down runs the up period backward.
 const RESEARCH = [
   { letter: "S", maximum: 59, lap: 159, periodLaps: 1, max: 4, wrap: 3 },
+  { letter: "S", maximum: 23, lap: 68, periodLaps: 1, max: 5, wrap: 5 },
+  { letter: "S", maximum: 11, lap: 32, periodLaps: 1, max: 4, wrap: 4 },
   { letter: "M", maximum: 59, lap: 204, periodLaps: 2, max: 5 },
+  { letter: "M", maximum: 23, lap: 82, periodLaps: 2, max: 5 },
+  { letter: "M", maximum: 11, lap: 40, periodLaps: 1, max: 4, wrap: 4 },
+  { letter: "H", maximum: 59, lap: 204, periodLaps: 2, max: 5 },
   { letter: "H", maximum: 23, lap: 82, periodLaps: 2, max: 5 },
-  { letter: "H", maximum: 11, lap: 40, periodLaps: 1, max: 4 },
+  { letter: "H", maximum: 11, lap: 40, periodLaps: 1, max: 4, wrap: 4 },
 ];
 
-test("three laps of every researched mode cost the research lap totals through the real controller", async () => {
+test("the pinned lap table is the witness's application-mode table", () => {
+  for (const r of RESEARCH)
+    for (const direction of [1, -1]) {
+      const app = witness.appModes.find(
+        (m) =>
+          m.letter === r.letter &&
+          m.maximum === r.maximum &&
+          m.direction === direction,
+      );
+      assert.deepEqual(
+        [app.perLapHTM, app.periodEdges / (r.maximum + 1), app.maximumHTM],
+        [`${r.lap}/1`, r.periodLaps, r.max],
+      );
+      assert.equal(app.traversal, direction === 1 ? "forward" : "inverse");
+    }
+  assert.equal(RESEARCH.length * 2, COUNTING_MODES.length);
+});
+
+test("three laps of every mode cost the research lap totals through the real controller", async () => {
   for (const r of RESEARCH)
     for (const direction of [1, -1]) {
       const n = r.maximum + 1,
@@ -401,7 +539,7 @@ test("the stated S, M and H laps hold over repeated passes and the largest M edg
 });
 
 test("counting down walks the same period backward at the same lap cost", async () => {
-  for (const [letter, maximum] of COUNTING_PERIODS) {
+  for (const [letter, maximum] of PAIRS) {
     const c = new HsmController(view, design, {}, letter, () => {}, dispose);
     c.setMode(maximum, 1);
     await c.configure();
@@ -430,30 +568,129 @@ test("counting down walks the same period backward at the same lap cost", async 
 
 // ---------------------------------------------------------------- off period
 
-test("a free jump keeps the six-move bound and leaves the period; recounting stays legal", async () => {
-  for (const [letter, maximum] of COUNTING_PERIODS) {
+const recoveryRow = (letter, maximum, direction) =>
+  recoveryTable.modes.find(
+    (m) =>
+      m.letter === letter && m.maximum === maximum && m.direction === direction,
+  );
+
+test("after free jumps counting returns onto the period within the research step bound, at most five HTM per step", async () => {
+  for (const [letter, maximum, direction] of COUNTING_MODES) {
     const c = new HsmController(view, design, {}, letter, () => {}, dispose);
-    c.setMode(maximum, 1);
+    c.setMode(maximum, direction);
     await c.configure();
+    const bound = recoveryRow(letter, maximum, direction).maximumSteps,
+      label = `${letter}/${maximum}/${direction}`;
     for (const target of [maximum, 13 % (maximum + 1), 0, maximum >> 1]) {
       c.request(target);
       await settled(c);
       assert.equal(c.currentValue, target);
-      assert.ok(c.progress.total <= 6, `${letter} jump to ${target}`);
+      // A free jump keeps the universal six-move bound.
+      assert.ok(c.progress.total <= 6, `${label} jump to ${target}`);
+      let steps = 0;
+      while (periods.nodeOf(letter, maximum, direction, c.state) < 0) {
+        c.request((c.currentValue + direction + maximum + 1) % (maximum + 1));
+        await settled(c);
+        steps++;
+        assert.ok(c.progress.total <= 5, `${label} recovery step`);
+        assert.ok(steps <= bound, `${label} back on the period`);
+      }
     }
-    let largest = 0;
+    // Back on the period, a full period of counting stays on it.
     for (let i = 0; i < 2 * (maximum + 1); i++) {
-      c.request((c.currentValue + 1) % (maximum + 1));
+      c.request((c.currentValue + direction + maximum + 1) % (maximum + 1));
       await settled(c);
-      assert.ok(c.progress.total <= 6);
-      largest = Math.max(largest, c.progress.total);
+      assert.ok(c.progress.total <= 5);
+      assert.ok(periods.nodeOf(letter, maximum, direction, c.state) >= 0);
     }
-    // Off the period the five-HTM edge maximum is gone: after these jumps the
-    // minutes cube needs six HTM on a step (owner's M <= 5 limit, see docs).
-    if (letter === "M") assert.equal(largest, 6, "M 00–59 off the period");
-    assert.equal(periods.nodeOf(letter, maximum, c.state), -1);
     c.dispose();
   }
+});
+
+test("recovery from every saved research pose is exact: the fewest steps, then the fewest HTM", () => {
+  const recovery = new HsmRecovery(design.print, planner);
+  let slowest = 0;
+  for (const row of recoveryTable.modes) {
+    const { letter, maximum, direction } = row,
+      n = maximum + 1;
+    for (const sample of row.samples) {
+      let state = applyMoves(
+        initialState(design.print),
+        parseAlg(sample.setupFromSolved),
+      );
+      assert.ok(
+        matchesTarget(design.print, state, hsmTarget(letter, sample.fromValue)),
+      );
+      const t0 = performance.now();
+      const plan = recovery.plan(
+        state,
+        letter,
+        maximum,
+        direction,
+        sample.fromValue,
+        (v) => periods.nodesShowing(letter, maximum, direction, v),
+      );
+      slowest = Math.max(slowest, performance.now() - t0);
+      const label = `${letter}/${maximum}/${direction} from ${sample.fromValue}`;
+      assert.equal(plan.words.length, sample.steps, label);
+      assert.equal(
+        plan.htm,
+        sum(sample.words.map((w) => parseAlg(w).length)),
+        label,
+      );
+      let value = sample.fromValue;
+      for (const word of plan.words) {
+        const target = (value + direction + n) % n,
+          shortest = planner.distance(design.print, state, letter, target);
+        // At most five, or the shortest word from a pose that has none of five.
+        assert.ok(
+          word.length <= 5 || (word.length === shortest && shortest > 5),
+          label,
+        );
+        state = applyMoves(state, word);
+        assert.ok(
+          matchesTarget(design.print, state, hsmTarget(letter, target)),
+        );
+        value = target;
+      }
+      assert.ok(periods.nodeOf(letter, maximum, direction, state) >= 0, label);
+    }
+  }
+  // The worst research poses included: the search stays interactive.
+  assert.ok(slowest < 2000, `slowest recovery search ${slowest.toFixed(0)} ms`);
+});
+
+test("a pose with no route of five takes its six-HTM shortest word once, then counts at most five", () => {
+  const recovery = new HsmRecovery(design.print, planner);
+  let checked = 0;
+  for (const row of recoveryTable.modes) {
+    const { letter, maximum, direction } = row,
+      n = maximum + 1;
+    // S has no such pose; M and H have 252 (00–11, 00–23) or 756 (00–59).
+    assert.equal(row.poseWithoutEdgeAtMostLimit > 0, letter !== "S");
+    if (!row.poseWithoutEdgeAtMostLimit) continue;
+    // The third saved sample is the first such pose of the research graph.
+    const sample = row.samples[2],
+      state = applyMoves(
+        initialState(design.print),
+        parseAlg(sample.setupFromSolved),
+      ),
+      next = (sample.fromValue + direction + n) % n;
+    assert.equal(planner.distance(design.print, state, letter, next), 6);
+    const plan = recovery.plan(
+      state,
+      letter,
+      maximum,
+      direction,
+      sample.fromValue,
+      (v) => periods.nodesShowing(letter, maximum, direction, v),
+    );
+    assert.equal(plan.words[0].length, 6);
+    assert.ok(plan.words.slice(1).every((w) => w.length <= 5));
+    assert.ok(plan.words.length <= row.maximumSteps);
+    checked++;
+  }
+  assert.equal(checked, 12);
 });
 
 test("reinstalling at a value starts on that node of the period", async () => {
@@ -461,7 +698,7 @@ test("reinstalling at a value starts on that node of the period", async () => {
   c.setMode(59, 1);
   for (const value of [0, 1, 37, 59]) {
     await c.configure(value);
-    assert.equal(periods.nodeOf("S", 59, c.state), value);
+    assert.equal(periods.nodeOf("S", 59, 1, c.state), value);
     // Independently replayed: the setup word, then the first `value` words.
     const p = spec("S", 59);
     assert.ok(
@@ -485,35 +722,52 @@ test("reinstalling at a value starts on that node of the period", async () => {
   c.dispose();
 });
 
-// OWNER DECISION, not hidden: on the previous print every one of the 18 modes
-// counted at most five HTM per step from a fresh setup. On this print the modes
-// without a saved period use the exact planner, and M 00–23 (both directions),
-// M 00–11 down and H 00–59 down need six HTM on some steps. That exceeds the
-// owner's M <= 5 limit. The largest step of each mode is pinned exactly so a
-// change in either direction is visible (docs/HSM_COUNTER.md, "Largest step").
-const NO_PERIOD_MAX = {
-  "S/23/1": 5,
-  "S/23/-1": 5,
-  "S/11/1": 5,
-  "S/11/-1": 5,
-  "M/23/1": 6,
-  "M/23/-1": 6,
-  "M/11/1": 5,
-  "M/11/-1": 6,
-  "H/59/1": 5,
-  "H/59/-1": 6,
-};
-test("modes without a saved period keep the six-move bound; M 00–23 and M 00–11 down need six", async () => {
-  for (const [mode, max] of Object.entries(NO_PERIOD_MAX)) {
-    const [letter, maximum, direction] = mode.split("/");
-    assert.equal(
-      Math.max(
-        ...(await costs(design, letter, +maximum, +direction, 3)),
-      ),
-      max,
-      mode,
-    );
+test("an interrupted route lands off the period; counting on returns onto it at most five HTM per step", async () => {
+  let off = 0;
+  for (const [letter, maximum, direction] of COUNTING_MODES) {
+    const g = gate(),
+      c = new HsmController(g, design, {}, letter, () => {}, assets),
+      n = maximum + 1,
+      label = `${letter}/${maximum}/${direction}`;
+    c.setMode(maximum, direction);
+    await c.configure(0);
+    // One committed turn toward 7, then the target changes to 5.
+    c.request(7);
+    await flush();
+    g.pending.shift()();
+    await flush();
+    c.request(5);
+    await g.finish(c);
+    assert.equal(c.currentValue, 5);
+    off += periods.nodeOf(letter, maximum, direction, c.state) < 0;
+    let steps = 0;
+    while (periods.nodeOf(letter, maximum, direction, c.state) < 0) {
+      c.request((c.currentValue + direction + n) % n);
+      await g.finish(c);
+      steps++;
+      assert.ok(c.progress.total <= 5, label);
+      assert.ok(
+        steps <= recoveryRow(letter, maximum, direction).maximumSteps,
+        label,
+      );
+    }
+    c.dispose();
   }
+  assert.ok(off >= 12, `${off} of 18 modes left the period`);
+});
+
+// Mutation-style control for the five-HTM requirement: the same print without
+// the saved M 00-23 periods falls back to the exact planner and needs six HTM
+// on the 19→20 step from a fresh setup, which the 18-mode regression in
+// tests/hsm-counter.test.mjs would catch.
+test("negative control: without its saved period, M 00–23 up needs six HTM again", async () => {
+  const stripped = validateHsmDesign({
+    ...structuredClone(raw),
+    periods: raw.periods.filter((p) => !(p.letter === "M" && p.maximum === 23)),
+  });
+  const out = await costs(stripped, "M", 23, 1, 3);
+  assert.equal(Math.max(...out), 6);
+  assert.equal(Math.max(...(await costs(design, "M", 23, 1, 3))), 5);
 });
 
 test("the retained inverse is exact: an inverted period word undoes its edge", () => {
@@ -633,7 +887,7 @@ async function seconds(d, start, ticks) {
   }
   return { sim, perTick };
 }
-const blankDesign = validateHsmDesign({ ...blankRaw, version: 3, periods: [] });
+const blankDesign = validateHsmDesign({ ...blankRaw, version: 4, periods: [] });
 
 test("the live clock's seconds cube costs 2.65 HTM per tick on the new print and drops from about 4.5", async () => {
   const start = Date.UTC(2026, 0, 1, 12, 34, 0);
@@ -665,7 +919,7 @@ test("the whole clock stays on its periods across a minute and hour boundary", a
     sim.units.map((u) => u.controller.currentValue),
     [13, 0, 7],
   );
-  const p = (letter, max, c) => periods.nodeOf(letter, max, c.state) >= 0;
+  const p = (letter, max, c) => periods.nodeOf(letter, max, 1, c.state) >= 0;
   assert.ok(p("H", 23, sim.units[0].controller));
   assert.ok(p("M", 59, sim.units[1].controller));
   assert.ok(p("S", 59, sim.units[2].controller));
@@ -679,7 +933,7 @@ test("the whole clock stays on its periods across a minute and hour boundary", a
   for (const u of sim.units) u.controller.dispose();
 });
 
-test("bounded catch-up still replans from the period and never exceeds six HTM", async () => {
+test("after a bounded catch-up the live seconds return onto the period within six ticks, at most five HTM each", async () => {
   const start = Date.UTC(2026, 0, 1, 12, 34, 5);
   const sim = await clock(design, start);
   sim.origin = start;
@@ -693,5 +947,25 @@ test("bounded catch-up still replans from the period and never exceeds six HTM",
     [12, 34, 45],
   );
   sim.gates.forEach((g, i) => assert.ok(g.committed.length - before[i] <= 6));
+  // The jump leaves the seconds period; counting on recovers within the
+  // research bound for S 00–59 (six steps) and then stays on the period.
+  const seconds = sim.units[2].controller,
+    onPeriod = () => periods.nodeOf("S", 59, 1, seconds.state) >= 0;
+  assert.equal(onPeriod(), false);
+  const ticks = [];
+  let back = -1;
+  for (let k = 41; k <= 52; k++) {
+    const count = sim.gates[2].committed.length;
+    await second(sim, start + 1000 * k);
+    ticks.push(sim.gates[2].committed.length - count);
+    if (back < 0 && onPeriod()) back = k - 40;
+  }
+  assert.equal(seconds.currentValue, 57);
+  assert.ok(
+    back >= 1 && back <= recoveryRow("S", 59, 1).maximumSteps,
+    `back after ${back}`,
+  );
+  assert.ok(onPeriod());
+  assert.ok(Math.max(...ticks) <= 5, `ticks ${ticks}`);
   for (const u of sim.units) u.controller.dispose();
 });
