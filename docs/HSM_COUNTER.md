@@ -1,6 +1,6 @@
-# H/S/M counter
+# H/M/S counter
 
-The separate **H/S/M Counter 00–59** application uses the seconds-first print
+The separate **H/M/S Counter 00–59** application uses the seconds-first print
 from the Research investigation. Choose the unit once per cube, then use
 Set, single steps, Reset, or Run/Stop. Counting can run up or down over 00–59,
 00–23, or 00–11, with leading zeros and wrap enabled. The default rotation speed
@@ -318,7 +318,7 @@ period start (8–10 HTM) is excluded from the laps.
 
 ## Artwork
 
-The H/S/M SVG assets are original geometric paths, authored for this application
+The H/M/S SVG assets are original geometric paths, authored for this application
 under the repository's AGPL-3.0-or-later license. They contain no fonts, raster
 content, or external references. Their canonical dimensions and viewBox are
 256 × 256, with the same background, ink, and bottom orientation marker as the

@@ -1,7 +1,7 @@
 # Physical sticker sheets
 
 The separate **Print stickers** page provides complete physical prints for German
-A, English 3 and both H/S/M lettering variants. Open it from the selected calendar,
+A, English 3 and both H/M/S lettering variants. Open it from the selected calendar,
 clock or HSM counter; the physical print is selected automatically. English's
 leading-zero and unpadded day options use the same print.
 
@@ -79,7 +79,7 @@ bounds are conservatively fitted inside the rounded cut, including circular
 corner cases. Large dimensions may require more than one A4 sheet. `--layout
 faces` retains six spatial face blocks instead of compact production imposition.
 
-The H/S/M sheets carry the seconds-first print: 24 stickers per cube with three S
+The H/M/S sheets carry the seconds-first print: 24 stickers per cube with three S
 stickers, one H and one M (see [HSM counter](HSM_COUNTER.md#physical-reprint-required)
 for the 14 changed identities; sheets printed earlier no longer match). Only the two
 HSM presets and their catalog entries were regenerated for it, with

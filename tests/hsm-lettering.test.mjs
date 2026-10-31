@@ -6,6 +6,8 @@ import {
   hsmImagesFor,
   parseLettering,
   hsmDesignFor,
+  hsmUnitLabel,
+  HSM_UNITS,
 } from "../src/apps/hsm/lettering.ts";
 import {
   assertWordRules,
@@ -66,4 +68,10 @@ test("both lettering choices retain the same physical print and valid upright HS
         ),
       );
   }
+});
+test("the Unit select lists H, M, S in that order and follows the lettering", () => {
+  assert.deepEqual([...HSM_UNITS], ["H", "M", "S"]);
+  assert.deepEqual(HSM_UNITS.map((u) => hsmUnitLabel(u, "symbols")), ["H", "M", "S"]);
+  assert.deepEqual(HSM_UNITS.map((u) => hsmUnitLabel(u, "words")), ["hour", "min", "sec"]);
+  assert.equal(hsmUnitLabel("H", parseLettering("anything else")), "H");
 });
