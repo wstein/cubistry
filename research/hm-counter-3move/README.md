@@ -7,7 +7,7 @@ counter where every increment and every decrement costs **at most 3 HTM**?
 
 | Profile | Upper-left cell | Status of "max 3 HTM" | Evidence |
 | --- | --- | --- | --- |
-| **blank** (primary, owner's frame) | must show a blank sticker | **UNKNOWN** for max 3. Best found: **max 5** with run-in + repeating period (202 of 228 period edges ≤3, 15 at 4, 11 at 5). Strict one-lap exact closure at max 3 was not found. | [witness](evidence/witness-blank-periodic.tsv), Julia and Flix receipts byte-identical |
+| **blank** (primary, owner's frame) | must show a blank sticker | **Max 4 SAT on every mode; max 3 UNKNOWN.** Final print R1 (H/S/M seconds-first print with S→M and old M→H). One-lap periods: M 60 edges / 159 HTM, H 00..23 24 / 78, H 00..11 12 / 40. It dominates the restricted H/S/M print on every mode. | [witness](evidence/witness-blank-R1.tsv), Julia and Flix receipts byte-identical |
 | **free** (relaxation) | unconstrained | **SAT**: every transition is at most 3 HTM | [witness](evidence/witness-free.tsv), Julia and Flix receipts byte-identical |
 
 ### Free profile (relaxation): SAT, checked by Julia and Flix
@@ -45,7 +45,61 @@ and the H 11→00 reset (1). Each one is **at most 3 HTM**.
   upright in exactly one front cell. With a fixed frame, a glyph's up vector
   fixes the corner's rotation, and therefore its cell.
 
-### Blank profile (primary): max 5 with run-in + period; max 3 UNKNOWN
+### Blank profile, third attempt: warm start from the H/S/M seconds-first print — max 4 on every mode (checked)
+
+The best H/M print can never be worse than an H/S/M print restricted to H and
+M, because a print that works with three letters still works when the S
+stickers are ignored. So the third attempt starts from the seconds-first
+H/S/M print. Its 24 stickers are 3 blanks, 6 tens, 10 units and five letters:
+S ×3 (ids 10, 14, 18), H (id 19) and M (id 20).
+[baseline/hmsconvert.jl](baseline/hmsconvert.jl) converts it from
+origin/main `data/hsm/seconds-first/modes/witness.json`. The JSON is first
+flattened with `jq` into [baseline/hms-print-flat.tsv](baseline/hms-print-flat.tsv),
+and the converter cross-checks every up vector against its slot. The
+converter relabels the five letter stickers in id order. The H/S/M up-direction
+runs ([baseline/hms-up-routes.tsv](baseline/hms-up-routes.tsv)) remain valid
+for every relabeling that keeps the stickers they use. Each mode then takes
+the better of those routes and this folder's lap-graph cycle search. The
+objective is no edge above 4 first (10⁶ per 5-HTM edge), then total HTM.
+
+All rows below are measured by **both** native checkers (byte-identical
+receipts) under this folder's definitions: blank upper-left, run-in plus
+repeating full-state period, and decrement = exact inverse of the up period.
+
+| Print | M 00..59 edges / total / mean / max / laps | H 00..23 | H 00..11 | Run-ins |
+| --- | --- | --- | --- | --- |
+| restricted H/S/M (SSSHM, S inert) | 120 / 408 / 3.40 / 5 / 2 | 48 / 164 / 3.42 / 5 / 2 | 12 / 40 / 3.33 / 4 / 1 | 0 |
+| **R1 = MMMHH (final)** | **60 / 159 / 2.65 / 4 / 1** | **24 / 78 / 3.25 / 4 / 1** | **12 / 40 / 3.33 / 4 / 1** | 0 |
+| relabeling HHHMM (Pareto alternative) | 60 / 192 / 3.20 / 4 / 1 | 24 / 70 / 2.92 / 4 / 1 | 12 / 32 / 2.67 / 4 / 1 | 0 |
+| second attempt (prints/blank-periodic.txt) | 120 / 344 / 2.87 / 4 / 2 | 48 / 157 / 3.27 / 5 / 2 | 60 / 190 / 3.17 / 5 / 5 | 216 edges, max 5 |
+
+- **R1 dominates the restricted H/S/M print on every mode.** Max: 4/4/4 versus
+  5/5/4. Mean per edge: 2.65/3.25/3.33 versus 3.40/3.42/3.33. Total per lap:
+  159/78/40 versus 204/82/40. H 00..11 is equal (one lap, 40 HTM, max 4).
+  R1 also beats the second attempt on every mode.
+- R1's M mode reproduces the H/S/M **S** route exactly: 60 edges, 159 HTM,
+  max 4. Its H 00..11 run is the H/S/M H route (40 HTM). Its H 00..23 run
+  comes from this folder's search (78 HTM, max 4), which beats the H/S/M H
+  route (164 per 48, max 5).
+- **Max 4: SAT** on all modes (checker-accepted). Every period is one lap and
+  starts right at setup (run-in 0), so this also satisfies the strict
+  one-lap exact-closure model at max 4. **Max 3: UNKNOWN.** R1 has 9 + 8 + 4
+  edges at 4 HTM. All 60 M edges and all 12 H 00..11 edges equal the
+  recomputed lower bound for their source state (receipt column `tight`).
+- Screening of all 30 letters-only relabelings with H ≥1 and M ≥1, using the
+  given routes only, is in [baseline/screen-relabelings.tsv](baseline/screen-relabelings.tsv).
+  MMMHM, MMMMH and MMMHH get the S route for M (159/60, max 4). The variants
+  with S stickers turned into H (HHHMM, HHHHM, HHHMH) get the S routes for both
+  H modes (68/24 max 5, 32/12 max 4). Only R1 and HHHMM also got the full
+  search. Setups: R1 M 0 (reference state), H 16 HTM each; not part of the
+  bound.
+
+Not done in this time box: the R2(d) variants (old M sticker turned into
+digit d with a new up vector), the one-H/one-M variants with freed letter
+stickers as digit duplicates, and general annealing over all 24 stickers
+seeded from R1. These are the next steps toward lower totals or max 3.
+
+### Blank profile, second attempt (superseded by the third): max 5 with run-in + period
 
 Every display needs a blank sticker at the upper-left, so all four front
 corners are tracked: 136,080 states. Both checkers rebuild this graph
@@ -180,6 +234,8 @@ and B'.
 J=/tmp/claude-0/julia/bin/julia   # Julia 1.13, --startup-file=no
 $J --startup-file=no research/hm-counter-3move/finalize.jl free research/hm-counter-3move/prints/free.txt /tmp/witness-free.tsv
 HM_B5=1 $J --startup-file=no research/hm-counter-3move/periodic.jl write research/hm-counter-3move/prints/blank-periodic.txt /tmp/witness-blank.tsv
+HM_PEN4=0 HM_B5=1 $J --startup-file=no research/hm-counter-3move/periodic.jl write2 research/hm-counter-3move/prints/hms-R1-MMMHH.txt /tmp/witness-R1.tsv research/hm-counter-3move/baseline/hms-up-routes.tsv
+HM_PEN4=0 HM_B5=1 HM_HSTARTS=0 $J --startup-file=no research/hm-counter-3move/periodic.jl write2 research/hm-counter-3move/prints/hms-restricted.txt /tmp/witness-hms.tsv research/hm-counter-3move/baseline/hms-up-routes.tsv
 research/hm-counter-3move/flix/build.sh            # Flix 0.79.0 / Java 21 jar
 research/hm-counter-3move/checker/run-checks.sh research/hm-counter-3move/evidence/witness-free.tsv /tmp/hm-checks-free
 research/hm-counter-3move/checker/run-checks.sh research/hm-counter-3move/evidence/witness-blank-periodic.tsv /tmp/hm-checks-blank
@@ -220,10 +276,9 @@ rejected with the intended reason ([evidence/checks-free.tsv](evidence/checks-fr
 
 ## Not established
 
-- Blank profile: max 3 and max 4 are **UNKNOWN**, under both strict and
-  periodic closure. The best checked result is max 5 (periodic). The search
-  was bounded annealing plus cycle search, not exhaustive, and no
-  infeasibility argument was found.
+- Blank profile: max 3 is **UNKNOWN** (max 4 is SAT, final print R1). The
+  search was bounded, not exhaustive, and no infeasibility argument was found.
+  R2(d), one-H/one-M variants and annealing seeded from R1 were not run.
 - Blank profile: the words are min-cost for each lap given the lap's start
   state. Global optimality of the cycle, the preperiod length and the setup is
   not claimed.
