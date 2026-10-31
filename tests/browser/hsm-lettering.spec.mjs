@@ -56,6 +56,7 @@ test("word print replaces large unit symbols and keeps the counter value", async
   await capture(page);
   await page.selectOption("#hsm-lettering", "words");
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
+  await expect(page.locator("#hsm-letter option")).toHaveText(["hour", "min", "sec"]);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "33");
   await expect(page.locator("#rotation-speed")).toHaveValue("5");
   await expect(page.locator("#error")).toBeEmpty();
@@ -104,6 +105,7 @@ test("word print replaces large unit symbols and keeps the counter value", async
   }
   await page.selectOption("#hsm-lettering", "symbols");
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
+  await expect(page.locator("#hsm-letter option")).toHaveText(["H", "M", "S"]);
   expect((await bounds(page, "S")).minY).toBeLessThan(100);
 });
 test("the shared live clock offers bottom-only words and retains preferred speeds", async ({

@@ -104,7 +104,7 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
     "CI Quality Cube · Workflow monitor",
     "Calendar · Deutsch / English",
     "Live H–M–S Clock",
-    "H/S/M Counter 00–59",
+    "H/M/S Counter 00–59",
     "Counter 0–99",
     "60-Minute Timer",
     "5-Second Timer",
