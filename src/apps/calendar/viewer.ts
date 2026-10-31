@@ -14,6 +14,8 @@ import {
   createStickerMaterial, configurePresentationRenderer, createPresentationStudio,
   DEFAULT_APPEARANCE, validateAppearance, installAppearanceControls, type ViewerAppearance,
 } from "@cubistry/cube-viewer";
+/** Printed paper color of every Calendar face; also the stickerless body color. */
+const CALENDAR_FACE_COLOR = "#fffdf6";
 /** Existing 26-body size-3 viewer; Calendar glyphs are the default artwork. */
 export class CalendarViewer {
   readonly renderer: THREE.WebGLRenderer;
@@ -123,7 +125,7 @@ export class CalendarViewer {
       const canvas = document.createElement("canvas");
       canvas.width = canvas.height = 256;
       const ctx = canvas.getContext("2d")!;
-      ctx.fillStyle = "#fffdf6";
+      ctx.fillStyle = CALENDAR_FACE_COLOR;
       ctx.fillRect(0, 0, 256, 256);
       const art = stickerArt(s);
       ctx.fillStyle = art.color;
@@ -144,7 +146,9 @@ export class CalendarViewer {
     }
     }
     this.cube = new PhysicalCubeScene(this.presentation, design.printing, materials, plastic, 1,
-      createPresentationGeometry(), new Map(design.printing.map(s => [s.id, "#fffdf6"])));
+      createPresentationGeometry(), new Map(design.printing.map(s => [s.id, CALENDAR_FACE_COLOR])),
+      // Explicit, so stickerless seams stay paper-colored whatever the faces do; the core keeps its default.
+      { bodyColor: CALENDAR_FACE_COLOR });
     this.setAppearance(this.appearance);
     this.sync(state);
   }
