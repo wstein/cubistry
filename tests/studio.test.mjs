@@ -259,6 +259,35 @@ test("contact shadow: on by default; off frees everything, on re-creates it, rep
   assert.equal(scene.children.length, 0);
 });
 
+test("contact shadow size: from the fitted radius, capped by the nearest neighbor so blobs never overlap", () => {
+  const p = PRESENTATION_PRESET;
+  assert.equal(p.contactShadowSpacingLimit, 1.0);
+  const planes = scene => scene.children.filter(o => o.name === "studio-contact-shadow");
+  const fit = (centers, radius) => {
+    const scene = new THREE.Scene(), studio = createPresentationStudio(scene, 1, 1, undefined, 1.5);
+    studio.fitCasters(centers, radius, .08);
+    const found = planes(scene).map(m => ({ x: m.position.x, z: m.position.z, side: m.scale.x }));
+    studio.dispose();
+    return found;
+  };
+  // One cube: no neighbor, so only the fitted radius counts (a different radius gives a different size).
+  assert.equal(fit([new THREE.Vector3(0, .5, 0)], 1.4)[0].side, 1.4 * p.contactShadowScale);
+  assert.equal(fit([new THREE.Vector3(0, .5, 0)], 2.0)[0].side, 2.0 * p.contactShadowScale);
+  // Far apart: the cap does not bite, the fitted radius decides.
+  const far = fit([-10, 0, 10].map(x => new THREE.Vector3(x, .5, 0)), 1.4);
+  far.forEach(b => assert.equal(b.side, 1.4 * p.contactShadowScale));
+  // Clock-like spacing 2.8 with radius 1.4 (uncapped side 3.08): capped to the spacing, no overlap.
+  const clock = fit([-2.8, 0, 2.8].map(x => new THREE.Vector3(x, .5, .25)), 1.4);
+  assert.equal(clock.length, 3);
+  clock.forEach(b => assert(Math.abs(b.side - 2.8 * p.contactShadowSpacingLimit) < 1e-12, `side ${b.side}`));
+  for (let i = 0; i < clock.length - 1; i++)
+    assert(Math.hypot(clock[i + 1].x - clock[i].x, clock[i + 1].z - clock[i].z) >= (clock[i].side + clock[i + 1].side) / 2 - 1e-12,
+      "neighboring blobs must not overlap");
+  // Uneven spacing: every blob uses the SMALLEST neighbor distance.
+  const uneven = fit([new THREE.Vector3(-6, .5, 0), new THREE.Vector3(0, .5, 0), new THREE.Vector3(2, .5, 0)], 1.4);
+  uneven.forEach(b => assert(Math.abs(b.side - 2) < 1e-12, `side ${b.side}`));
+});
+
 test("fine shadow edges: opt-in 2048 maps, smaller world penumbra, old maps disposed, fit uses the current map size", () => {
   const p = PRESENTATION_PRESET;
   assert.deepEqual([p.fineShadowEdgesDefault, p.fineShadowMapSize, p.fineShadowSoftnessScale], [false, 2048, .65]);

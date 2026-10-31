@@ -46,6 +46,9 @@ export const PRESENTATION_PRESET = Object.freeze({
   contactShadowOpacity: 0.5,
   /** Plane side as a multiple of the presentation radius (footprint of the blob). */
   contactShadowScale: 2.2,
+  /** Cap on the blob side as a multiple of the nearest neighbor distance: the blobs fade to zero at
+   * their rim, so at 1.0 neighboring blobs touch but never overlap into one band (clock). */
+  contactShadowSpacingLimit: 1.0,
   /** Height above the receiver, avoiding z-fighting with the shadow floor. */
   contactShadowLift: 0.004,
   contactShadowTextureSize: 64,

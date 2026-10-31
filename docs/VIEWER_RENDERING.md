@@ -173,9 +173,12 @@ to them.
 
 - **Contact shadow** (default on, "Contact shadow"): a soft round procedural
   radial plane (a generated `DataTexture`, no canvas) under each fitted cube, just
-  above the receiver. `contactShadowScale` 2.2 times the presentation radius,
-  opacity 0.5. Turning it off or disposing the studio releases geometry, material
-  and texture; turning it on re-creates them.
+  above the receiver. The blob side is `contactShadowScale` (2.2) times the fitted
+  radius, opacity 0.5, and for several cubes it is capped at
+  `contactShadowSpacingLimit` (1.0) times the nearest neighbor distance. Each blob
+  fades to exactly zero at its rim, so neighboring blobs touch but never overlap
+  into one connected band under the three clock cubes. Turning it off or disposing
+  the studio releases geometry, material and texture; turning it on re-creates them.
 - **Warm studio light** (default off): tints lights only: key `#fff3e3` (warm),
   fill and shadow fill `#eaf1ff` (cool). Off restores exactly white; materials,
   stickers and textures are never touched.
@@ -195,8 +198,8 @@ to them.
 light and shadow-caster counts, the key elevation (at least 55 degrees), the
 25-degree fill azimuth offset, both frusta containing the caster union and its
 receiver intersections, disposal of both maps, exact-white lights with the tint
-off, no material color changes, contact-shadow default, allocation, placement and
-disposal, fine-edge map sizes, penumbra and map disposal, and storage round trips
+off, no material color changes, contact-shadow default, allocation, placement,
+size from the fitted radius and the neighbor-distance cap, and disposal, fine-edge map sizes, penumbra and map disposal, and storage round trips
 with garbage input and with objects stored before `fineShadowEdges` existed. Lights, floor geometry/material and
 shadow targets are disposed by the scene owner. The adapter does not own shared
 stage renderers. Not verified (no GPU, browser or visual run): how the steeper
