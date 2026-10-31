@@ -112,8 +112,9 @@ Established (software level only):
   `minimax/verification/chain-3.moves.tsv`), an earlier experimental script
   found a 119 HTM / 136 OBTM word with `L5`, `lambda=12`, `width=40`, `W1`,
   where the orbit-by-orbit solver (width 8, budget 150000, relax budget 60000)
-  needs 456 HTM / 497 OBTM. That word passed only the planner's
-  `validate_front` and a replay.
+  needs 456 HTM / 497 OBTM. That word first passed only the planner's
+  `validate_front` and a replay; it was later accepted by both native
+  verifiers as part of a 3-edge chain (see the receipts below).
 - This port reproduces that result as a candidate: with the same parameters it
   follows the same per-depth trajectory (wrong positions / cheapest beam HTM
   24/15 at depth 4, 12/68 at depth 10, 1/115 at depth 19) and finishes at
@@ -129,7 +130,8 @@ Established (software level only):
 
 Not established:
 
-- No native verification of any word produced by this module (see below).
+- The words produced by this module itself (as opposed to the experimental script) are
+  not natively verified yet (see below).
 - One experiment edge only; no statement about other edges or whole chains.
   The end state differs from the orbit solver's end state off the front, which
   matters for later edges of a chain.
@@ -162,9 +164,38 @@ Not established:
 
 ## Native verification receipts
 
-Reserved. Receipts are added only after the unchanged native Julia and Flix
-chain verifiers have been run on an exported `candidate.moves.tsv` by the
-session owner, following `../minimax/reproduce.sh` (`--verify-only` style).
-Until then every result of this module is a candidate.
+Two chains were checked with the unchanged native verifiers: the Julia chain
+verifier (`../continuous/verify.jl`) and the independent Flix chain verifier
+(`../continuous/flix`). `evidence/verify.sh CHAIN OUTDIR` runs both on the same raw
+chain, compares the receipts byte for byte and then runs five corruption controls
+(wrong end hash, wrong source hash, wrong declared HTM, dropped move, changed move)
+that both verifiers must reject. Python plays no role.
 
-<!-- RECEIPTS: input file, SHA-256, Julia receipt, Flix receipt, cmp result -->
+| Chain | Edges | Julia | Flix | Receipts | Controls rejected by both |
+| --- | ---: | --- | --- | --- | --- |
+| [`evidence/chain-2026-2028/`](evidence/chain-2026-2028/chain-2026-2028.moves.tsv) (root 1, Jan 2026 to Dec 2028) | 35 | `VALID_CONTINUOUS_CHAIN 35 218 294 49` | same | identical, 73 lines | 5 of 5 |
+| [`evidence/chain-jan-feb-2027/`](evidence/chain-jan-feb-2027/chain-3-feb2027.moves.tsv) (chain-3 root, two saved edges, new edge Feb 2027) | 3 | `VALID_CONTINUOUS_CHAIN 3 218 294 49` | same | identical, 9 lines | 5 of 5 |
+
+The 35-edge chain (candidate producer: the experimental script
+[`producer-run.jl`](evidence/chain-2026-2028/producer-run.jl), kept as provenance) costs
+4,496 HTM in total (mean 128.5, median 132, minimum 19, maximum 164) and 4,881 OBTM
+(maximum 197); per-edge numbers and the method per edge (`global` beam or `hybrid`, where
+the orbit solver finished the edge) are in [`edges.tsv`](evidence/chain-2026-2028/edges.tsv).
+Feb to Mar costs 19 HTM (2026) and 38 HTM (2027), where the day grid is identical, and
+102 HTM in the leap year 2028. The earlier certified edges for comparison (HTM): 2026-02 358,
+2026-03 57/48, 2026-04 409, 2026-12 446, 2027-01 401, 2028-03 363, 2028-04 361; only
+2026-02 starts from the same physical state, so the others compare size only.
+
+Scope and caveats:
+
+- Both chains were produced by the experimental script, not by `search.jl`. The 119 HTM
+  word of this module (candidate chain SHA-256 `5c347bf4...dc7c`) has not been run through
+  the native verifiers yet.
+- Only the 35 transitions 2026-2028, a heuristic search, no optimality, no 200-HTM bound,
+  and no claim for the other years up to 2099.
+- 20 of the 35 edges needed the experiment's hybrid fallback. That fallback re-solves
+  orbits 1 to 10 and never touches orbit 11 (the core/centre orbit). An earlier suspicion
+  that the planner's constraint builder and `validate_front` disagree at the centre cell
+  (4,4) was traced to this fallback and is not a planner bug (issue 135, PR 136).
+- The `swapped-moves` fixture of an earlier trial was dropped: swapping two commuting
+  moves does not change the physical result, so both verifiers rightly accept it.
