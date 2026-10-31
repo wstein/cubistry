@@ -75,8 +75,7 @@ test("return is a damped spring: monotone, no fixed duration, faster when farthe
  for(let i=0;i<=400;i++){c.step(deadline+i/100);const next=c.quaternion.angleTo(target);assert(next<=distance+1e-7);distance=next;if(i===100)assert.equal(c.phase,"returning");}
  near(distance,0);assert.equal(c.phase,"idle");
  for(const t of [.1,.3,.8]){const f=new SmartRotation(initial());settled(f,0,90);f.step(f.returnDeadline+t);near(f.quaternion.angleTo(initial()),radians(90)*spring(t),1e-6);}
- const moved=hz=>{const f=new SmartRotation(initial());settled(f,0,distanceDeg(hz));f.step(f.returnDeadline+.1);return f.quaternion.angleTo(initial());};
- function distanceDeg(v){return v;}
+ const moved=degrees=>{const f=new SmartRotation(initial());settled(f,0,degrees);f.step(f.returnDeadline+.1);return f.quaternion.angleTo(initial());};
  assert(radians(150)-moved(150)>radians(60)-moved(60));
  const d=new SmartRotation(initial());settled(d,30,35);const at=d.returnDeadline;d.step(at+.05);const displayed=d.quaternion.clone();
  d.down(at+.06);assert.equal(d.phase,"dragging");near(d.quaternion.angleTo(displayed),0);d.step(at+100);near(d.quaternion.angleTo(displayed),0);
@@ -110,21 +109,28 @@ test("tiny slow input stays tiny after orientation integration rather than norma
 });
 
 test("interrupting a return by taps, zoom/settings, mode, reduced motion or visibility never turns an automatic pose into the target",()=>{
- for(const action of ["tap","interact","mode","reduced","visibility"]) {
-  const c=new SmartRotation(initial());settled(c,0,60);const anchor=c.anchor.clone(),deadline=c.returnDeadline;
-  c.step(deadline+.05);const q=c.quaternion.clone();assert(q.angleTo(anchor)>radians(35));
-  let end=deadline+.07;
-  if(action==="tap"){c.down(deadline+.06);c.up(end,true);}
+ // Offset .05 s: still beyond the tolerance. Offset .4 s: already inside it but different from the target.
+ for(const offset of [.05,.4]) for(const action of ["tap","interact","mode","reduced","visibility"]) {
+  const c=new SmartRotation(initial());settled(c,0,60);const anchor=c.anchor.clone(),deadline=c.returnDeadline,at=deadline+offset;
+  c.step(at);const q=c.quaternion.clone();
+  if(offset===.05)assert(q.angleTo(c.front)>radians(35));else {assert(q.angleTo(c.front)<radians(35));assert(q.angleTo(anchor)>radians(5));}
+  let end=at+.02;
+  if(action==="tap"){c.down(at+.01);c.up(end,true);}
   if(action==="interact")c.interact(end);
-  if(action==="mode"){c.setMode("classic",deadline+.06);c.setMode("smart",end);}
-  if(action==="reduced"){c.setReducedMotion(true,deadline+.06);c.setReducedMotion(false,end);}
-  if(action==="visibility"){c.suspend(deadline+.06);end=100;c.resume(end);c.suspend(101);end=200;c.resume(end);}
+  if(action==="mode"){c.setMode("classic",at+.01);c.setMode("smart",end);}
+  if(action==="reduced"){c.setReducedMotion(true,at+.01);c.setReducedMotion(false,end);}
+  if(action==="visibility"){c.suspend(at+.01);end=at+100;c.resume(end);c.suspend(end+1);end+=100;c.resume(end);}
   near(c.anchor.angleTo(anchor),0);near(c.quaternion.angleTo(q),0);assert.equal(c.phase,"awaiting-return");near(c.returnDeadline,end+wait(c));
   c.step(end+10);near(c.quaternion.angleTo(anchor),0);near(c.anchor.angleTo(anchor),0);
  }
  const c=new SmartRotation(initial());settled(c,0,60);c.step(c.returnDeadline+.6);const before=c.quaternion.clone();
  assert(before.angleTo(c.anchor)<radians(35));
  c.down(7);c.drag(0,radians(1),7.2);c.up(7.4);assert.equal(c.phase,"idle");near(c.anchor.angleTo(c.quaternion),0);assert(c.quaternion.angleTo(before)>radians(.9));
+});
+test("the return wait uses the owner's fixed numbers: 0.6 s at 35 degrees, 0.1 s from 120 degrees, smoothstep between",()=>{
+ near(returnDelay(radians(35)),.6);near(returnDelay(radians(120)),.1);near(returnDelay(radians(200)),.1);near(returnDelay(radians(10)),.6);
+ near(returnDelay(radians(77.5)),.35,1e-9);near(returnDelay(radians(56.25)),.521875,1e-9);
+ near(P.toleranceRadians,radians(35));near(P.idleNearSeconds,.6);near(P.idleFarSeconds,.1);near(P.idleFarRadians,radians(120));
 });
 test("nonidentity initial orientations stay idle through reset/tap/settings/visibility without floating-point return loops",()=>{
  const q=new Quaternion().setFromEuler(new Euler(.321,-.789,0)),c=new SmartRotation(q);
