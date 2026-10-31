@@ -99,6 +99,8 @@ export function createPresentationStudio(
     floor,
     /** Soft blob under each cube; allocates nothing while off (default). */
     setContactShadow,
+    /** Slightly warm key, cool fill lights; light colors only (default off). */
+    setColorTemperature: lights.setColorTemperature,
 
     /** Fit one conservative caster union after its final rigid pose/scale.
      * Light-space side bounds also contain receiver intersections: shadow rays

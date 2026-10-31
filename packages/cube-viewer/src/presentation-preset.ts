@@ -31,6 +31,10 @@ export const PRESENTATION_PRESET = Object.freeze({
   shadowFillSoftness: 0.18,
   /** PCF radius caps in texels: the fill may blur wider than the key. */
   shadowRadiusMax: 24,
+  /** Optional light-only tint; off keeps every light exactly white. */
+  colorTemperatureDefault: false,
+  warmKeyColor: "#fff3e3",
+  coolFillColor: "#eaf1ff",
   /** Optional soft blob directly under each cube; off unless switched on. */
   contactShadowDefault: false,
   contactShadowColor: "#302b26",
@@ -129,13 +133,20 @@ export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadow
   };
   const key = directional([3, 5, 6], p.keyIntensity);
   configureShadowCaster(key, shadowExtent, softness);
-  directional([-4, 1, 2], p.fillIntensity);
-  directional([1, 3, -4], p.rimIntensity);
+  const fill = directional([-4, 1, 2], p.fillIntensity);
+  const rim = directional([1, 3, -4], p.rimIntensity);
   const shadowFill = directional(p.shadowFillPosition, p.shadowFillIntensity);
   configureShadowCaster(shadowFill, shadowExtent, softness * p.shadowFillSoftness / p.shadowSoftness,
     p.shadowFillRadiusMax);
   shadowFill.shadow.intensity = p.shadowFillShadowIntensity;
-  return { key, shadowFill, dispose() {
+  /** Tints light colors only (key warm, fill and shadow fill cool); never materials. */
+  const setColorTemperature = (on: boolean) => {
+    key.color.set(on ? p.warmKeyColor : 0xffffff);
+    fill.color.set(on ? p.coolFillColor : 0xffffff);
+    shadowFill.color.set(on ? p.coolFillColor : 0xffffff);
+  };
+  if (p.colorTemperatureDefault) setColorTemperature(true);
+  return { key, fill, rim, shadowFill, setColorTemperature, dispose() {
     for (const light of lights) {
       light.removeFromParent();
       if (light instanceof THREE.DirectionalLight) light.shadow.map?.dispose();
