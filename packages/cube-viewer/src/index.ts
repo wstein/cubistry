@@ -37,6 +37,8 @@ export {
 } from "./presentation-preset.ts";
 export { PhysicalCubeScene, stickerFrame, DEFAULT_CORE_COLOR, type PhysicalStickerFrame, type StickerlessBodyOptions } from "./physical-scene.ts";
 import { bindSmartRotation, type SmartRotationBinding } from "./rotation-binding.ts";
+import { bindLightingSwitches, type LightingSwitches } from "./lighting-switches.ts";
+export { bindLightingSwitches, type LightingSwitches } from "./lighting-switches.ts";
 export { bindSmartRotation, type SmartRotationBinding } from "./rotation-binding.ts";
 export { SmartRotation, ROTATION_TUNING, type RotationMode, type RotationPhase } from "./smart-rotation.ts";
 export { installPresentationDrag } from "./presentation-input.ts";
@@ -86,6 +88,7 @@ export class CubeViewer {
   private appearanceControls?: ReturnType<typeof installAppearanceControls>;
   private cube: PhysicalCubeScene | null = null;
   private studio?: ReturnType<typeof createPresentationStudio>;
+  private lightingSwitches?: LightingSwitches;
   private materials: THREE.Material[] = [];
   private textures: THREE.Texture[] = [];
   private print: PrintDefinition | null = null;
@@ -129,6 +132,7 @@ export class CubeViewer {
     host.append(this.renderer.domElement);
     this.studio = createPresentationStudio(this.scene, 1, 1, host, cubePresentationRadius(1));
     this.appearanceControls = installAppearanceControls(host, (value) => this.setAppearance(value));
+    this.lightingSwitches = bindLightingSwitches(this.appearanceControls.panel, this.studio);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;
@@ -365,6 +369,7 @@ export class CubeViewer {
     if (!this.shared) this.renderer.setAnimationLoop(null);
     this.resize?.disconnect();
     this.rotation?.dispose();
+    this.lightingSwitches?.dispose();
     this.studio?.dispose();
     this.appearanceControls?.dispose();
     this.scene.removeFromParent();
