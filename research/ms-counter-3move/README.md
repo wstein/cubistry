@@ -14,8 +14,8 @@ one letter is entirely within 3 HTM:
 
 | Witness | M run | S run | Closure | Checkers |
 | --- | --- | --- | --- | --- |
-| **S3** ([witness-s3.tsv](evidence/witness-s3.tsv)), primary | max 4: 57 edges ≤ 3, 3 at 4; 177 HTM | **max 3: all edges ≤ 3**; 162 HTM per 60 edges | M exact (period 1); S period 2 (120 edges), run-in 0 | Julia = Flix (byte-identical); 11/11 controls rejected by both |
-| **M3** ([witness-m3.tsv](evidence/witness-m3.tsv)) | **max 3: all edges ≤ 3**; 163 HTM | max 4: 57 edges ≤ 3, 3 at 4; 171 HTM | exact (period 1) for both | Julia = Flix (byte-identical); 10/10 controls rejected by both |
+| **S3** ([witness-s3.tsv](evidence/witness-s3.tsv)), primary | max 4: 57 edges ≤ 3, 3 at 4; 177 HTM | **max 3: all edges ≤ 3**; 162 HTM per 60 edges | M exact (period 1); S period 2 (120 edges), run-in 0 | Julia = Flix (byte-identical); 14/14 controls rejected by both |
+| **M3** ([witness-m3.tsv](evidence/witness-m3.tsv)) | **max 3: all edges ≤ 3**; 163 HTM | max 4: 57 edges ≤ 3, 3 at 4; 171 HTM | exact (period 1) for both | Julia = Flix (byte-identical); 13/13 controls rejected by both |
 
 The free profile (upper-left unconstrained) was not run in this time box.
 
@@ -27,25 +27,45 @@ to M and S on every mode, comparing maximum first, then edges at the maximum
 
 Any H/S/M print is also an M/S print once H is ignored, so the H/S/M
 seconds-first print (origin/main `010da4e8`,
-`data/hsm/seconds-first/modes/witness.json`) is the baseline. Its printing was
-converted with the slot/up consistency asserted for all 24 stickers
-([hms-seconds-first-printing.txt](evidence/hms-seconds-first-printing.txt),
-`hmsbase.jl`). The H sticker stays printed and inert. Under this study's
+`data/hsm/seconds-first/modes/witness.json`) is the baseline. Its `printing` field was
+extracted with jq into
+[hms-seconds-first-printing.txt](evidence/hms-seconds-first-printing.txt)
+(`_` marks a blank image) and converted by `hmsbase.jl`, which asserts for
+every sticker that its up vector reads upright in the slot named by main's
+file. In the accepted witness, every one of the 24 stickers reads upright in
+the same cell as in main's print; this was checked by comparing upright
+cells sticker by sticker. The H sticker (id 19) stays printed, still upright
+in the upper-right cell, and is inert: no display asks for H. (Correction: the
+first version of this witness, at d4973120, re-oriented sticker 19 so that it
+would read upright in the lower-right cell. The generator had filed the inert
+glyph under the units cell. The fix keeps main's orientation. Display
+behavior, receipts' run lines and all checker verdicts are unchanged; only
+the witness bytes and its hash changed.) Under this study's
 closure rule (exact inverse decrements, edges up to 4) it was then
 re-optimized, and **both checkers accept it**:
 [witness](evidence/witness-hms-restricted.tsv), receipts byte-identical,
 controls in [checks-hms-restricted.tsv](evidence/checks-hms-restricted.tsv).
 That print was also the seed of the search that found S3.
 
-| Mode | H/S/M as published (separate up/down runs) | Same print, re-optimized here | **S3** | M3 |
-| --- | --- | --- | --- | --- |
-| S 00..59 up | max 4, 159 HTM / 60 | max 4, 3 edges at 4, 159 HTM | **max 3**, 0 edges at 4, 162 HTM / 60 | max 4, 3 edges at 4, 171 HTM |
-| S 00..59 down | max 5, 171 HTM / 60 | inverse of up: max 4, 3 edges at 4, 159 | inverse of up: **max 3**, 162 | inverse of up: max 4, 3 edges at 4, 171 |
-| M 00..59 up | max 5, 408 HTM / 120 (mean 3.40) | max 4, 15 edges at 4, 195 HTM | max 4, **3** edges at 4, **177** HTM | **max 3**, 163 HTM |
-| M 00..59 down | max 5, 819 HTM / 240 | inverse of up: max 4, 15 edges at 4, 195 | inverse of up: max 4, 3 edges at 4, 177 | inverse of up: **max 3**, 163 |
+| Mode | main `modes` (optimized, separate up/down runs) | main `appModes` (down = inverse traversal of up) | Same print, re-optimized here | **S3** | M3 |
+| --- | --- | --- | --- | --- | --- |
+| S 00..59 up | max 4, 159 HTM / 60 | max 4, 159 HTM / 60 | max 4, 3 edges at 4, 159 HTM | **max 3**, 0 edges at 4, 162 HTM / 60 | max 4, 3 edges at 4, 171 HTM |
+| S 00..59 down | max 5, 171 HTM / 60 | max 4, 159 HTM / 60 | inverse of up: max 4, 3 edges at 4, 159 | inverse of up: **max 3**, 162 | inverse of up: max 4, 3 edges at 4, 171 |
+| M 00..59 up | max 5, 408 HTM / 120 (mean 3.40) | max 5, 408 HTM / 120 | max 4, 15 edges at 4, 195 HTM | max 4, **3** edges at 4, **177** HTM | **max 3**, 163 HTM |
+| M 00..59 down | max 5, 819 HTM / 240 | max 5, 408 HTM / 120 | inverse of up: max 4, 15 edges at 4, 195 | inverse of up: max 4, 3 edges at 4, 177 | inverse of up: **max 3**, 163 |
 
-How the definitions differ: the H/S/M witness optimizes up and down as
-separate periodic runs, with their own setups and periods. This study keeps
+Sources and status: the two "main" columns are copied from main's
+`witness.json` (`modes[]` and `appModes[]`, fields `maximumHTM`, `periodHTM`
+and `periodEdges`). They were **not** re-verified by these checkers; the main
+branch has its own evidence for them. Only the "re-optimized here" column
+and the S3 and M3 columns are checker-verified in this PR.
+
+How the definitions differ: main's `modes` optimize up and down as separate
+periodic runs, with their own setups and periods. Main's `appModes` run down
+as the inverse traversal of the up period, which is the rule closest to this
+study's. Main's `appModes` keep main's 4/5-HTM routes; the re-optimized
+column finds the best 60-edge cycle for the same print under a 4-HTM edge
+cap. This study keeps
 the owner's rule that decrements are the exact inverse traversal of the up
 period, so down mirrors up exactly. Both use full-state periods with a
 run-in. With setup excluded, the run-in here is 0.
@@ -230,13 +250,36 @@ the exit code:
 | emptied wrap word (M 59→00) | word shorter than graph distance for M edge 59 (59->0) |
 | wrong period boundary (period 2 claimed, edges repeated) | period boundary: M returns to the start state before the claimed period |
 | wrong period boundary (S period 2 claimed as 1; S3 only) | period boundary: S run does not return to the exact start state after the claimed period |
+| non-numeric lower bound (`x1`, M edge 3) | integer field |
+| overflowing claimed maximum (20 digits) | integer field |
+| unknown glyph `Q` on the lower-right sticker | glyph alphabet |
+
+**Common mode.** The Flix checker is a structural port of the Julia checker:
+the same sticker model, Rodrigues turns, display rule, period rule and
+tracked-sticker graph, written a second time in another language. Agreement
+therefore guards against implementation slips, such as parsing, indexing,
+overflow or replay order. It does not guard against a rule that both
+checkers misread in the same way. These rules were checked by hand against
+the owner's frame:
+
+- the cell coordinates (UL (-1,1,1), UR (1,1,1), LL (-1,-1,1), LR (1,-1,1),
+  viewed from +z);
+- upright means up vector (0,1,0);
+- a blank sticker passes in any orientation, and only `_` counts as blank;
+- the move sign convention (a quarter turn of face F is -side·90° about its
+  axis, matching the H/M checkers);
+- one HTM per token, half turns included;
+- decrements are the reversed word with inverted tokens;
+- the period boundary is checked at 00 with minimality.
+
+The tracked-graph histogram (136,080 states) matches the H/M study.
 
 No Python is used anywhere in the search, the checkers or the evidence.
 
 ## Reproduce
 
 ```sh
-J=/tmp/claude-0/julia/bin/julia   # Julia 1.13, --startup-file=no
+J=${JULIA:-julia}               # Julia 1.13 (set JULIA if julia is not on PATH)
 cd research/ms-counter-3move
 P3S="e bd aMS34801S56297MSf c"    # S3; 24 labels: ' ' blank, a-f tens 0-5, 0-9 units, M, S
 P3M="ef  ac59Sb dM08M14M26S73"    # M3
