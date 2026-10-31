@@ -1,0 +1,15 @@
+receipts	IDENTICAL	7ff3f7afb139a4407c3d232598dcb57c423bd3e5bb0a23d5086b5b54921d0b75
+negative	glyph	julia	REJECTED	wrong glyph at cell 2 for M59 00 after setup
+negative	glyph	flix	REJECTED	wrong glyph at cell 2 for M59 00 after setup
+negative	up	julia	REJECTED	glyph not upright at cell 4 for M59 00 after setup
+negative	up	flix	REJECTED	glyph not upright at cell 4 for M59 00 after setup
+negative	nonblank-ul	julia	REJECTED	upper-left cell must show a blank sticker at M59 00 after setup
+negative	nonblank-ul	flix	REJECTED	upper-left cell must show a blank sticker at M59 00 after setup
+negative	move	julia	REJECTED	wrong glyph at cell 2 for M59 step 5
+negative	move	flix	REJECTED	wrong glyph at cell 2 for M59 step 5
+negative	lowerbound	julia	REJECTED	claimed lower bound differs for H23 step 0
+negative	lowerbound	flix	REJECTED	claimed lower bound differs for H23 step 0
+negative	claim	julia	REJECTED	claimed maximum edge HTM differs from replay
+negative	claim	flix	REJECTED	claimed maximum edge HTM differs from replay
+negative	boundary	julia	REJECTED	period boundary: state after preperiod+period must equal state after preperiod for M59
+negative	boundary	flix	REJECTED	period boundary: state after preperiod+period must equal state after preperiod for M59
