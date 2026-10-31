@@ -327,6 +327,32 @@ resources remain authoritative. No custom recovery state, 2D fallback or changed
 WebGL-creation failure policy is introduced. Restoration during a timed move is
 still a manual browser check.
 
+### Test mode (low effects)
+
+Software GL (SwiftShader) in CI renders the shadow maps slowly. For tests only, an
+opt-in switch makes the scene cheaper. It is **off by default** and nothing in the
+application sets it: `configurePresentationRenderer` reads the `localStorage` key
+`cubistry-lowfx` once, when a renderer is configured (`presentationEffects` in
+`presentation-preset.ts` parses it).
+
+| Value | Effect |
+|---|---|
+| absent, unknown, or storage unreadable (private mode) | Production behavior, unchanged. |
+| `"shadows"` | Only `renderer.shadowMap.enabled` is set to false. The lights keep `castShadow`. |
+| `"1"` | As `"shadows"`, and the drawing-buffer pixel ratio is forced to `lowEffectsPixelRatio` (0.5) instead of the capped device ratio. |
+
+`playwright.config.mjs` sets `"shadows"` for its `baseURL` origin through an inline
+`use.storageState`. The built-site configs (`playwright.pages.config.mjs`,
+`playwright.preview.config.mjs`) opt out. Contexts that a spec creates itself with
+`browser.newContext` do not inherit the config's storage state and stay at full effects.
+
+The mode changes how the scene looks: without shadow maps there are no cast shadows
+(the contact blobs remain), and `"1"` also halves the buffer resolution, so a spec that
+asserts a buffer of twice the CSS size at a device scale factor of 2 would fail. Screenshots
+and pixel assertions from a low-effects run are therefore not comparable with production
+renders. Use the production look for visual review, and set the flag by hand in the browser
+console (`localStorage.setItem("cubistry-lowfx", "shadows")`, then reload) only for debugging.
+
 ## Validation and owner preview handoff
 
 **E2E NOT RUN (per owner instruction).** No screenshot, browser, touch-device or
