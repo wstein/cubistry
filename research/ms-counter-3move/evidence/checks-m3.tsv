@@ -1,0 +1,21 @@
+receipts	IDENTICAL	f78fe64605c2a96e4b0234c37f9ca095248f2257d18cdc01787ebd31c1b97263
+negative	glyph	julia	REJECTED	wrong glyph at cell 2 for M00 after setup
+negative	glyph	flix	REJECTED	wrong glyph at cell 2 for M00 after setup
+negative	up	julia	REJECTED	glyph not upright at cell 4 for M00 after setup
+negative	up	flix	REJECTED	glyph not upright at cell 4 for M00 after setup
+negative	nonblank-ul	julia	REJECTED	upper-left cell must show a blank sticker at M00 after setup
+negative	nonblank-ul	flix	REJECTED	upper-left cell must show a blank sticker at M00 after setup
+negative	hidden-glyph	julia	REJECTED	claimed lower bound differs for M edge 7 (7->8)
+negative	hidden-glyph	flix	REJECTED	claimed lower bound differs for M edge 7 (7->8)
+negative	move	julia	REJECTED	wrong glyph at cell 2 for M edge 5 (5->6)
+negative	move	flix	REJECTED	wrong glyph at cell 2 for M edge 5 (5->6)
+negative	lowerbound-high	julia	REJECTED	claimed lower bound differs for S edge 7 (7->8)
+negative	lowerbound-high	flix	REJECTED	claimed lower bound differs for S edge 7 (7->8)
+negative	lowerbound-low	julia	REJECTED	claimed lower bound differs for S edge 7 (7->8)
+negative	lowerbound-low	flix	REJECTED	claimed lower bound differs for S edge 7 (7->8)
+negative	claim	julia	REJECTED	claimed maximum edge HTM differs from replay
+negative	claim	flix	REJECTED	claimed maximum edge HTM differs from replay
+negative	truncated	julia	REJECTED	word shorter than graph distance for M edge 59 (59->0)
+negative	truncated	flix	REJECTED	word shorter than graph distance for M edge 59 (59->0)
+negative	period-double	julia	REJECTED	period boundary: M returns to the start state before the claimed period
+negative	period-double	flix	REJECTED	period boundary: M returns to the start state before the claimed period
