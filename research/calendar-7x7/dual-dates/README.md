@@ -38,7 +38,7 @@ printing.
 The candidate DAG ([evidence/candidate-dag.tsv.gz](evidence/candidate-dag.tsv.gz)) is
 the original PR #99 DAG plus 496 appended legal primitive products
 ([evidence/repairs.tsv](evidence/repairs.tsv)). Comparing the `result` lines of the
-two DAGs, **26 of the 91 targets** (the first is target 13) get a different
+two DAGs, **26 of the 91 targets** (targets 4, 5, 7, 13, 21, 22, 24, 27, 33, 35, 36, 42, 44, 50, 51, 53, 59, 61, 68, 70, 76, 78, 79, 86, 87, 88) get a different
 result root; the other 65 keep theirs. The repairs are commutator words confined
 to orbits 1 and 10 (they are needed so that the dual-label stickers show the
 right label at the right turn; an unrepaired target fails the front check).
@@ -47,9 +47,12 @@ Consequences:
 - The full physical states, and every state digest, of PR #99 and PR #119 do not
   carry over for those 26 targets. The row-2 serialization hash is still identical
   for all 91 states of the candidate.
-- Chains whose roots or retained states belong to such a target (for example the
-  chains in PR #130) are not covered by this candidate; they would need to be
-  re-derived and re-verified for the new print.
+- No chain verified against the PR #99 print carries over to the new print: the
+  print itself changes in four surfaces, so every saved chain (for example those in
+  PR #130, which are rooted on targets 1 and 11, neither of which is repaired) was
+  verified against the old print and is not covered by this candidate. Chains that
+  pass through one of the 26 repaired targets would in addition have different
+  states. They would need to be re-derived and re-verified for the new print.
 - The print changes only in the four surfaces named above; the physical model, the
   generators and the front displays are otherwise unchanged.
 

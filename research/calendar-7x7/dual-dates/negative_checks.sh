@@ -17,7 +17,7 @@ awk -F'\t' -v OFS='\t' 'NR==FNR{if($1==16)old=$0;next}$1==16{print old;next}1' "
 awk -F'\t' -v OFS='\t' '$1==40{n=split($5,v,",");$5="";for(i=1;i<=n;i++){$5=$5(i>1?",":"")(v[i]==0?0:-v[i])}}1' "$evidence/physical-print.tsv" > "$out/flipped-up.print.tsv"
 a=$(awk -F'\t' '$1=="result"&&$2==1{print $3}' "$dag"); b=$(awk -F'\t' '$1=="result"&&$2==2{print $3}' "$dag")
 awk -F'\t' -v OFS='\t' -v a="$a" -v b="$b" '$1=="result"&&$2==1{$3=b}$1=="result"&&$2==2{$3=a}1' "$dag" > "$out/swapped-roots.dag.tsv"
-# Two controls that reach the front check (the other five are caught earlier by exact-match checks of
+# Two controls that reach the front check (the first four are caught earlier by exact-match checks of
 # the table, labels and frames): a repaired target pointed back at its original, unrepaired root, and the
 # sign of the first appended repair product flipped.
 orig="$out/original-dag.tsv"
