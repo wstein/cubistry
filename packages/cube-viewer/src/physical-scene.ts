@@ -18,6 +18,15 @@ export const stickerFrame = (normal: Vec3, up: Vec3): THREE.Matrix4 =>
     new THREE.Vector3(...normal),
   );
 
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+/** Neutral dark gray; the visible core of a stickerless cube. */
+export const DEFAULT_CORE_COLOR = "#3a3d42";
+export interface StickerlessBodyOptions {
+  /** Explicit color for every inward cut face. Absent: follow the bordering face. */
+  readonly bodyColor?: string | null;
+  /** Stickerless core color. Absent: DEFAULT_CORE_COLOR. */
+  readonly coreColor?: string;
+}
 /** Size-neutral scene adapter. Callers validate prints, state and legal moves.
  * Textures/materials and animation deadlines stay caller-owned. */
 export class PhysicalCubeScene {
@@ -28,7 +37,10 @@ export class PhysicalCubeScene {
   private readonly stickers: THREE.Mesh[] = [];
   private readonly bodyVariants = new Map<string, THREE.BufferGeometry>();
   private readonly cores: THREE.Mesh[] = [];
-  private readonly innerPlastic: THREE.MeshStandardMaterial;
+  /** Stickerless core: visible only in seams; never follows a frame color. */
+  private readonly coreMaterial: THREE.MeshStandardMaterial;
+  private readonly cutMaterials = new Map<string, THREE.Material>();
+  private readonly bodyColor: string | null;
   private readonly faceMaterials: THREE.Material[] = [];
   private readonly geometries: THREE.BufferGeometry[];
   private readonly parent: THREE.Scene | THREE.Group;
@@ -42,16 +54,17 @@ export class PhysicalCubeScene {
     spacing: number,
     geometry: { body: THREE.BufferGeometry; core?: THREE.BufferGeometry; sticker: THREE.BufferGeometry; stickerOffset: number },
     faceColors: ReadonlyMap<number, string> = new Map(),
+    options: StickerlessBodyOptions = {},
   ) {
     demand(Number.isFinite(spacing) && spacing > 0, "Invalid viewer spacing");
     this.parent = parent;
     this.plastic = plastic;
-    // Interior separation belongs to construction, never a selected frame color.
-    this.innerPlastic = plastic instanceof THREE.MeshStandardMaterial
-      ? plastic.clone() : new THREE.MeshPhysicalMaterial();
-    this.innerPlastic.color.set("#202329");
-    this.innerPlastic.map = null;
-    this.faceMaterials.push(this.innerPlastic);
+    const coreColor = options.coreColor ?? DEFAULT_CORE_COLOR;
+    demand(HEX_COLOR.test(coreColor), "Invalid core color");
+    demand(options.bodyColor == null || HEX_COLOR.test(options.bodyColor), "Invalid body color");
+    this.bodyColor = options.bodyColor ?? null;
+    // The core belongs to construction, never a selected frame color.
+    this.coreMaterial = this.neutralPlastic(coreColor) as THREE.MeshStandardMaterial;
     this.spacing = spacing;
     this.geometries = [geometry.body, geometry.sticker, ...(geometry.core ? [geometry.core] : [])];
     for (const s of printed) {
@@ -72,8 +85,9 @@ export class PhysicalCubeScene {
         body.add(shell);
         // Box/RoundedBox geometry groups are +X,-X,+Y,-Y,+Z,-Z. These
         // materials belong to immutable LOCAL source faces, never world axes.
-        const faceMaterials: THREE.Material[] = Array(6).fill(this.innerPlastic);
+        const faceMaterials: THREE.Material[] = Array(6).fill(null);
         const sourceIds = Array(6).fill(null);
+        const exterior: { index: number; color: string }[] = [];
         for (const face of sourceFaces) {
           const index = sourceFaceIndex(face.n);
           const material = plastic instanceof THREE.MeshStandardMaterial
@@ -85,8 +99,13 @@ export class PhysicalCubeScene {
           if (art instanceof THREE.MeshStandardMaterial)
             this.artwork.push({ surface: material, source: art, fallback: color });
           faceMaterials[index] = material; sourceIds[index] = face.id;
+          exterior.push({ index, color });
           this.faceMaterials.push(material);
         }
+        // Inward-facing cut faces take the color of a bordering exterior face
+        // (or the explicit body color), like real stickerless cubes.
+        for (let index = 0; index < 6; index++)
+          if (!faceMaterials[index]) faceMaterials[index] = this.cutMaterial(index, exterior);
         shell.userData.sourceFaceStickerIds = sourceIds;
         this.shells.set(s.cubie, { mesh: shell, stickerless: faceMaterials });
         if (geometry.core) {
@@ -135,13 +154,39 @@ export class PhysicalCubeScene {
       else surface.color.set(fallback);
     }
   }
+  /** Stickerless core color; takes effect immediately, including during a turn. */
+  setCoreColor(color: string): void {
+    demand(HEX_COLOR.test(color), "Invalid core color");
+    this.coreMaterial.color.set(color);
+  }
+  private neutralPlastic(color: string): THREE.Material {
+    const material = this.plastic instanceof THREE.MeshStandardMaterial
+      ? this.plastic.clone() : new THREE.MeshPhysicalMaterial();
+    (material as THREE.MeshStandardMaterial).color.set(color);
+    (material as THREE.MeshStandardMaterial).map = null;
+    this.faceMaterials.push(material);
+    return material;
+  }
+  /** Bounded: one shared material per distinct color, never per cubie face. */
+  private cutMaterial(index: number, exterior: readonly { index: number; color: string }[]): THREE.Material {
+    let color = this.bodyColor;
+    if (!color) {
+      // Prefer an exterior face that borders this cut face (different axis);
+      // fall back to the only remaining exterior face, e.g. a center's back.
+      const border = exterior.find(face => (face.index >> 1) !== (index >> 1)) ?? exterior[0];
+      color = border?.color ?? DEFAULT_CORE_COLOR;
+    }
+    let material = this.cutMaterials.get(color);
+    if (!material) { material = this.neutralPlastic(color); this.cutMaterials.set(color, material); }
+    return material;
+  }
   /** Materials change in place, including during a turn; source frames stay fixed. */
   setConstruction(construction: Construction): void {
     demand(["stickered", "stickerless"].includes(construction), "Invalid cube construction");
     for (const { mesh, stickerless } of this.shells.values())
       mesh.material = construction === "stickerless" ? stickerless : this.plastic;
     for (const core of this.cores)
-      core.material = construction === "stickerless" ? this.innerPlastic : this.plastic;
+      core.material = construction === "stickerless" ? this.coreMaterial : this.plastic;
     for (const sticker of this.stickers) sticker.visible = construction === "stickered";
     this.refreshArtwork();
   }

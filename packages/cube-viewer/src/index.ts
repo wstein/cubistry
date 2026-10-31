@@ -35,7 +35,7 @@ export {
   PRESENTATION_PRESET, createPresentationGeometry, createPlasticMaterial,
   createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
 } from "./presentation-preset.ts";
-export { PhysicalCubeScene, stickerFrame, type PhysicalStickerFrame } from "./physical-scene.ts";
+export { PhysicalCubeScene, stickerFrame, DEFAULT_CORE_COLOR, type PhysicalStickerFrame, type StickerlessBodyOptions } from "./physical-scene.ts";
 import { bindSmartRotation, type SmartRotationBinding } from "./rotation-binding.ts";
 export { bindSmartRotation, type SmartRotationBinding } from "./rotation-binding.ts";
 export { SmartRotation, ROTATION_TUNING, type RotationMode, type RotationPhase } from "./smart-rotation.ts";
@@ -283,7 +283,9 @@ export class CubeViewer {
       this.stickerMaterials, plastic, spacing,
       createPresentationGeometry(),
       new Map(print.stickers.map((s) => [s.id,
-        sourceFaceColor(s.assetId, assets.manifest, assets.materials.get(s.materialId)!.color)])));
+        sourceFaceColor(s.assetId, assets.manifest, assets.materials.get(s.materialId)!.color)])),
+      // Optional manifest materials: "body" overrides cut faces, "core" the stickerless core.
+      { bodyColor: assets.materials.get("body")?.color, coreColor: assets.materials.get("core")?.color });
     this.setAppearance(this.appearance ?? DEFAULT_APPEARANCE);
     this.sync(state);
     this.updateFaceletImage();
