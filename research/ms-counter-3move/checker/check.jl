@@ -95,7 +95,7 @@ function readprint(rows)
         p, n, u = ivec(f[4]), ivec(f[5]), ivec(f[6])
         need(all(c -> c in (-1, 1), p), "corner position")
         need(n in UNITS && u in UNITS && dotv(p, n) == 1 && dotv(n, u) == 0, "outward tangent frame")
-        need(length(f[7]) == 1 && f[7][1] in "MS0123456789_", "glyph alphabet")
+        need(length(f[7]) == 1 && f[7][1] in "MSH0123456789_", "glyph alphabet (H allowed as an inert printed glyph)")
         push!(st, Stk(parse(Int, f[2]), parse(Int, f[3]), p, n, u, f[7][1]))
     end
     need(sort([x.id for x in st]) == collect(0:23), "unique sticker ids 0..23")
