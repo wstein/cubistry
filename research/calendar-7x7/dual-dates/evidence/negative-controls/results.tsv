@@ -1,6 +1,8 @@
-case	julia-exit	flix-exit
-wrong-turn	1	1
-wrong-label	1	1
-restored-surface	1	1
-flipped-up	1	1
-swapped-roots	1	1
+case	julia-exit	flix-exit	reason (julia | flix)
+wrong-turn	1	1	AssertionError: table == Dict(255 => [("8", 0), ("1", 1)], 281 => [("31", 0), ("24", 1)]) | java.lang.IllegalArgumentException: exact declared quarter-turn artwork profile
+wrong-label	1	1	AssertionError: (s.text, s.ink) == expected | java.lang.IllegalArgumentException: only four declared new-candidate surfaces may change artwork
+restored-surface	1	1	AssertionError: (s.text, s.ink) == expected | java.lang.IllegalArgumentException: only four declared new-candidate surfaces may change artwork
+flipped-up	1	1	AssertionError: (s.piece, s.home, s.normal, s.up) == (before.piece, before.home, before.normal, before.up) | java.lang.IllegalArgumentException: all source identities, cubies and source frames immutable
+swapped-roots	1	1	AssertionError: Dual-profile front mismatch at 1,5 | java.lang.IllegalArgumentException: selected date/ordinary artwork must match exact target including orientation
+unrepaired-root	1	1	AssertionError: Dual-profile front mismatch at 3,4 | java.lang.IllegalArgumentException: selected date/ordinary artwork must match exact target including orientation
+flipped-repair	1	1	AssertionError: Dual-profile front mismatch at 3,1 | java.lang.IllegalArgumentException: selected date/ordinary artwork must match exact target including orientation
