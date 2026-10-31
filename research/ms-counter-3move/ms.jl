@@ -126,17 +126,18 @@ end
 function fixpoint(sh, L; maxit = 200, verbose = false)
     tg = targets(L)
     X = allshowing(sh, tg[1])
+    n0 = length(X)
     it = 0
     while true
         it += 1
         layers = run60(X, sh, tg)
         if length(layers) < 61 || isempty(layers[end])
-            return (UInt64[], length(layers) - 1 + 60 * (it - 1), it, length(X))
+            return (UInt64[], length(layers) - 1 + 60 * (it - 1), it, n0)
         end
         Y = layers[end]
         verbose && println("  it $it |X|=$(length(X)) -> $(length(Y)) minlayer=$(minimum(length.(layers)))")
-        Y == X && return (X, 60 * it, it, length(X))
-        it >= maxit && return (Y, 60 * it, it, length(X))
+        Y == X && return (X, 60 * it, it, n0)
+        it >= maxit && return (Y, 60 * it, it, n0)
         X = Y
     end
 end

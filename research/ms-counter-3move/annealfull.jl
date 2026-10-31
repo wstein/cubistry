@@ -3,6 +3,7 @@
 # Generator side only.
 include("fullvi.jl")
 
+const SWEIGHT = Ref(parse(Int, get(ENV, "MS_SWEIGHT", "1")))
 function fullscore(lab; K = 10)
     validlab(lab) || return 10^9
     sh = showtable(mkprint(lab))
@@ -12,7 +13,9 @@ function fullscore(lab; K = 10)
         any(isempty, G.layers) && return 10^9
         f, mins, _ = valueiter(G, K)
         (length(mins) < K || mins[end] >= INF) && return 10^9
-        sc += (mins[K] - mins[K-4]) ÷ 4
+        w = (mins[K] - mins[K-4]) ÷ 4
+        # optional extra weight on the S run total (env MS_SWEIGHT, default 1)
+        sc += L == 'S' ? (w ÷ 1000) * 1000 + SWEIGHT[] * (w % 1000) : w
     end
     sc
 end
@@ -41,5 +44,6 @@ end
 if abspath(PROGRAM_FILE) == @__FILE__
     seed = parse(Int, ARGS[1]); iters = parse(Int, ARGS[2])
     init = length(ARGS[3]) == 18 ? poollab(collect(ARGS[3])) : collect(ARGS[3])
-    annealfull(seed, iters, init)
+    T0 = length(ARGS) >= 4 ? parse(Float64, ARGS[4]) : 1500.0
+    annealfull(seed, iters, init; T0 = T0)
 end

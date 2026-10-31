@@ -62,7 +62,7 @@ function stickerrows(lab, s::State)
         u0 = ROT[rk]' * [0, 1, 0]
         R = ROT[s[c]]
         p = R * collect(POS[c]); n = R * n0; u = R * u0
-        gl = g == ' ' ? '_' : g
+        gl = g == ' ' ? '_' : g == 'X' ? 'H' : g   # X = printed H (never shown)
         push!(rows, "sticker\t$(sid-1)\t$(c-1)\t$(vecs(p))\t$(vecs(n))\t$(vecs(u))\t$gl")
     end
     rows
