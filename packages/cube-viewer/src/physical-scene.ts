@@ -19,7 +19,7 @@ export const stickerFrame = (normal: Vec3, up: Vec3): THREE.Matrix4 =>
   );
 
 /** Core ball diameter as a share of the full cube edge length. */
-export const CORE_DIAMETER_RATIO = 0.4;
+export const CORE_DIAMETER_RATIO = 0.8;
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 /** Neutral dark gray; the visible core of a stickerless cube. */
 export const DEFAULT_CORE_COLOR = "#3a3d42";
