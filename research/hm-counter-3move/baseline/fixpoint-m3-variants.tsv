@@ -1,0 +1,6 @@
+m3-SH.txt	M59	|U|=2592	iter=2	|F|=3	sizes=2592,3,3
+m3-SH.txt	H23	|U|=2592	iter=1	|F|=0	sizes=2592,0
+m3-SH.txt	H11	|U|=2592	iter=3	|F|=0	sizes=2592,20,4,0
+m3-MH.txt	M59	|U|=2592	iter=1	|F|=0	sizes=2592,0
+m3-MH.txt	H23	|U|=2592	iter=2	|F|=0	sizes=2592,15,0
+m3-MH.txt	H11	|U|=2592	iter=5	|F|=0	sizes=2592,65,9,5,3,0

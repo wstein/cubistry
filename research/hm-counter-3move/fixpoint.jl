@@ -90,17 +90,6 @@ function fixpoint3(sh, L, r; maxiter = 200)
     (F = X, sizes = sizes, unresolved = true)
 end
 
-if abspath(PROGRAM_FILE) == (@__FILE__) && !startswith(ARGS[1], "anneal")
-    checktwist()
-    for pf in ARGS
-        pr = readprinttxt(pf); sh = showtable(pr)
-        for (L, r) in MODES
-            fp = fixpoint3(sh, L, r)
-            println(basename(pf), "\t$L$r\t|U|=$(fp.sizes[1])\titer=$(length(fp.sizes)-1)\t|F|=$(length(fp.F))\tsizes=$(join(fp.sizes[1:min(end,8)], ","))")
-            flush(stdout)
-        end
-    end
-end
 
 # edges survived by radius-3 set propagation from U (up to `laps` laps)
 function survive3(sh, L, r; laps = 2)
@@ -144,10 +133,6 @@ function anneal3max(seed, iters, out, init)
         end
         it % 200 == 0 && (println("it=$it cur=$sc"); flush(stdout))
     end
-end
-if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "anneal"
-    checktwist()
-    anneal3max(parse(Int, ARGS[2]), parse(Int, ARGS[3]), ARGS[4], readprinttxt(ARGS[5]))
 end
 
 # ---- hours-only max-3 search with the minutes route frozen ----
@@ -230,6 +215,110 @@ function annealH3(seed, iters, out, init, free)
         it % 100 == 0 && (println("it=$it cur=$sc"); flush(stdout))
     end
 end
+
+# ---- setup words to arbitrary states: meet in the middle over two radius-5 balls ----
+# element g with applyelem(z, g) == y (indexed by start position, as ball elements)
+function relelem(z::State, y::State)::State
+    g = zeros(UInt8, 8)
+    for c in 1:8
+        g[PIDX[c, z[c]]] = COMP[y[c], INV[z[c]]]
+    end
+    Tuple(g)
+end
+const B5DICT = Ref{Dict{UInt64,Int}}()
+function solveword(x::State, y::State)
+    w = solveword10(x, y)
+    w === nothing || return w
+    b5 = BALLS[end]; rng = MersenneTwister(5)
+    for _ in 1:4000                      # random radius-5 prefix, then meet again (<= 15)
+        i = rand(rng, 2:length(b5.elems))
+        w2 = solveword10(applyelem(x, b5.elems[i]), y)
+        w2 === nothing || return reduceword(vcat(b5.words[i], w2))
+    end
+    nothing
+end
+function solveword10(x::State, y::State)
+    b5 = BALLS[end]
+    isassigned(B5DICT) || (B5DICT[] = Dict(key(E) => i for (i, E) in enumerate(b5.elems)))
+    best = nothing
+    for (i, E) in enumerate(b5.elems)
+        g = relelem(applyelem(x, E), y)
+        j = get(B5DICT[], key(g), 0)
+        if j > 0
+            w = reduceword(vcat(b5.words[i], b5.words[j]))
+            (best === nothing || length(w) < length(best)) && (best = w)
+            length(best) <= b5.len[i] && break
+        end
+    end
+    best
+end
+
+# best <= 3 HTM cycle inside the fixpoint limit F: lap graph restricted to F
+# with radius-3 laps; returns (setup word, (P, Q, words, quality)) or nothing
+function f3mode(sh, L, r)
+    fp = fixpoint3(sh, L, r)
+    F = fp.F; isempty(F) && return nothing
+    succ = Dict{UInt64,Dict{UInt64,Int}}()
+    for a in F
+        ls = lap(unkey(a), L, r, sh)            # min-cost layers (B4/B5, PEN4)
+        img = Set(lapset3([a], L, r, sh))
+        succ[a] = Dict(b => c for (b, c) in ls[end] if b in img && insorted(F, b))
+    end
+    best = nothing
+    for a in F
+        frontier = Dict(a => (0, [a]))
+        for depth in 1:length(F)
+            nf = Dict{UInt64,Tuple{Int,Vector{UInt64}}}()
+            for (x, (c, path)) in frontier, (y, w) in succ[x]
+                nc = c + w
+                if y == a
+                    q = nc / depth
+                    (best === nothing || q < best[1]) && (best = (q, path))
+                elseif !(y in path) && get(nf, y, (typemax(Int), UInt64[]))[1] > nc
+                    nf[y] = (nc, vcat(path, y))
+                end
+            end
+            frontier = nf; isempty(frontier) && break
+        end
+    end
+    best === nothing && return nothing
+    cyc = best[2]
+    words = Vector{Vector{Int}}()
+    for i in 1:length(cyc)
+        append!(words, lapwords(lap(unkey(cyc[i]), L, r, sh), cyc[i % length(cyc) + 1]))
+    end
+    setup = solveword(IDSTATE, unkey(cyc[1]))
+    setup === nothing && return nothing
+    (setup, (P = 0, Q = length(cyc) * (r + 1), words = words, quality = (best[1], length(cyc))))
+end
+
+# all three modes: sum of exact fixpoint penalties (0 = max-3 run exists)
+function objAll3(pr::Print)
+    count(==(' '), pr.glyph) == 3 || return (1e9, nothing)
+    tall = vcat([laptargets(L, r) for (L, r) in MODES]...)
+    nbad = count(t -> !realizable(pr, t), unique(tall))
+    nbad > 0 && return (1e6 * nbad, nothing)
+    sh = showtable(pr)
+    p = [fppenalty(sh, L, r) for (L, r) in MODES]
+    (Float64(sum(p)), Tuple(p))
+end
+
+# ---- command-line entry points (kept last so every function is defined) ----
+if abspath(PROGRAM_FILE) == (@__FILE__) && !startswith(ARGS[1], "anneal") && !startswith(ARGS[1], "write")
+    checktwist()
+    for pf in ARGS
+        pr = readprinttxt(pf); sh = showtable(pr)
+        for (L, r) in MODES
+            fp = fixpoint3(sh, L, r)
+            println(basename(pf), "\t$L$r\t|U|=$(fp.sizes[1])\titer=$(length(fp.sizes)-1)\t|F|=$(length(fp.F))\tsizes=$(join(fp.sizes[1:min(end,8)], ","))")
+            flush(stdout)
+        end
+    end
+end
+if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "anneal"
+    checktwist()
+    anneal3max(parse(Int, ARGS[2]), parse(Int, ARGS[3]), ARGS[4], readprinttxt(ARGS[5]))
+end
 if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "annealH3"
     checktwist()
     pr = readprinttxt(ARGS[5]); routes = readroutes(ARGS[6])
@@ -237,5 +326,17 @@ if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "annealH3"
     used = usedstickers(pr, su, words)
     free = [i for i in 1:24 if !(i in used) && pr.glyph[i] != ' ']
     println("frozen by the minutes route: ", sort(collect(used)))
+    annealH3(parse(Int, ARGS[2]), parse(Int, ARGS[3]), ARGS[4], pr, free)
+end
+if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "write3"
+    checktwist(); enable5!()
+    writeperiodic2(ARGS[2], ARGS[3]; routesfile = length(ARGS) >= 4 ? ARGS[4] : "",
+                   hstarts = parse(Int, get(ENV, "HM_HSTARTS", "15")))
+end
+if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "annealAll3"
+    checktwist()
+    pr = readprinttxt(ARGS[5])
+    free = [i for i in 1:24 if pr.glyph[i] != ' ']
+    @eval objH3(pr::Print) = objAll3(pr)
     annealH3(parse(Int, ARGS[2]), parse(Int, ARGS[3]), ARGS[4], pr, free)
 end
