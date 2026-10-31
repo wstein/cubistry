@@ -20,7 +20,8 @@ display; it is not a counted number transition.
 > 20, 21, 22 and 23) are unchanged; do not mix old and new stickers on one cube.
 > A cube already assembled from the old sheets keeps the old print and needs
 > the old application behavior; the application now installs only the new print.
-> Whether to reprint the physical stickers is the owner's decision.
+> The owner reports that the new stickers are printed (14 of 24 sticker
+> identities changed: ids 1, 2, 3, 4, 6, 8, 9, 10, 12, 14, 15, 17, 18 and 19).
 
 | Id | Corner | Normal | Previous print | Seconds-first print |
 | ---: | ---: | --- | --- | --- |
@@ -196,9 +197,11 @@ or an interrupted route. The counter then returns to it as follows.
   never exceeds the universal six. Among the least routes it prefers one that
   lands on a period node. Otherwise it prefers a pose from which the next step
   needs at most five HTM. Only if every least route lands on a pose without such
-  a step would it spend one HTM more, and never beyond six. In 5,400 measured
-  jumps (300 per mode) that never happened, and no jump took longer than the
-  least route.
+  a step does it spend one HTM more, and never beyond six. In a sample of 5,400
+  jumps (300 per mode) no jump took longer than the least route. In the
+  exhaustive set (24,624 jumps, from every period node to every value other than
+  the next one) 28 M/H jumps take one HTM more than the least route; none takes
+  more than six.
 - **Counting on** recovers. Each step shows the next value, as ordinary
   counting does, and may use any legal word of at most five HTM, not only a
   shortest one. An exact bidirectional search over settled full poses
@@ -222,18 +225,26 @@ The mean is 3.3–3.9 steps. Every step is at most five HTM, with one exception.
 On M or H, 756 poses of 116,640 (00–59) or 252 (00–23, 00–11) have no route of
 five to the next display. From such a pose the first step is its unavoidable
 six-HTM shortest word. It happens once and only from such a pose; S has none.
-The jump above avoids landing on these poses.
+The jump above avoids landing on these poses **for the counting direction in
+force when it jumps**. A pose that is fine for one direction can be one of these
+poses for the other.
 
 Measured through the real controller (5,400 random jumps, 300 per mode):
 
 - 0–6 steps back to the period, with 3–4 typical;
-- at most five HTM on every step;
-- no six-HTM step;
+- at most five HTM on every step of these runs, which jump and then keep the
+  same counting direction (see the six-HTM steps below for a direction change);
 - at most 28 HTM per recovery;
 - at most 249 ms for one recovery search.
 
 The live seconds after a 40-second catch-up are back on the period within six
 ticks; a test pins this.
+
+The recovery search runs synchronously on the main thread. It is bounded by
+`RECOVERY_MAX_STEPS = 8`; measured on a 2.1 GHz Xeon the median is 6 ms and the
+worst case 163 ms, so a UI hitch of roughly 0.6 to 1.3 seconds is expected in
+the worst case on a slow phone. Moving it off the main thread is under way in a
+separate change; update this paragraph when that lands.
 
 The exact shortest-path planner (policy 13) remains only as the last fallback,
 if no recovery plan or jump route is found. With the pinned print that does not
@@ -241,8 +252,9 @@ happen.
 
 ### Largest step per mode
 
-**All 18 modes count at most five HTM per step**, from a fresh setup and, after
-recovery, after any jump. The largest step over three laps from a fresh setup is
+**All 18 modes count at most five HTM per step** from a fresh setup and from
+the period, and after a free jump while the counting direction stays the same.
+The largest step over three laps from a fresh setup is
 pinned in `tests/hsm-seconds-first.test.mjs` and `tests/hsm-counter.test.mjs`:
 
 | Unit | 00–59 up / down | 00–23 up / down | 00–11 up / down |
@@ -252,7 +264,16 @@ pinned in `tests/hsm-seconds-first.test.mjs` and `tests/hsm-counter.test.mjs`:
 | H | 5 / 5 | 5 / 5 | 4 / 4 |
 
 A free jump itself can still need six HTM; the user accepted the six-move bound
-for free jumps. Before the all-mode periods, M 00–23 (up and down), M 00–11
+for free jumps.
+
+**Six-HTM counting steps.** The five-HTM statements hold only while the counting
+direction does not change after a free jump (or Set). If the direction is
+changed after a jump or Set, M and H can need six HTM on a counting step. An
+exhaustive run found 78 such steps (M 40, H 38). All are forced: from that pose
+no route of five HTM shows the next display, so the six-HTM shortest word is the
+only choice (for example M 40 to 39). S never takes six. The owner's accepted
+scope is: seconds at most five HTM; minutes may take six, including Set followed
+by a direction change; hours up to ten moves; free jumps at most six. Before the all-mode periods, M 00–23 (up and down), M 00–11
 down and H 00–59 down needed six HTM on ordinary counting steps, and so could M
 00–59 after leaving its period. A negative-control test keeps that regression
 visible: removing the M 00–23 periods brings the six back.
@@ -365,6 +386,16 @@ It checks recovery four ways:
   research's step count and HTM;
 - from the poses without a route of five, exactly one six-HTM step comes
   first.
+
+Three further tests are mutation controls and a coverage gap:
+
+- free jumps from period nodes land on a period node where a least route can
+  (fails if the period preference in the jump is removed);
+- the recovery route search equals a brute-force search over every move
+  sequence, including both orders of two opposite faces (fails if the search
+  prunes both orders);
+- after `configure()`, a switch of mode, range or direction from period nodes
+  costs at most five HTM per step and is back on the period within six steps.
 
 It runs the three-cube live-clock scheduler with the move statistics for 180
 ticks, before and after, and checks that a bounded catch-up returns the seconds
