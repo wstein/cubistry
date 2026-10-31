@@ -243,6 +243,15 @@ input), the 294-surface model of `../english/evidence/physical-print.tsv`, and
 - Legibility of two stacked numbers on corner and wing stickers is UNKNOWN: it
   needs real sizes and a font.
 
+[evidence/context-use.tsv](evidence/context-use.tsv), from
+[context_use.jl](context_use.jl), is a descriptive listing, not a proof. It
+covers layout B, the context reading and `print-B.tsv`. For each of the 12
+displays where a stacked sticker stands for a single date, it gives:
+
+- the full date rows 3 to 7 as read on the front;
+- every such cell, with the surface, its label and the date the month needs there;
+- the months that map to the display (104 in total).
+
 ## Checkers
 
 - [stacked_common.jl](stacked_common.jl), [check_stacked.jl](check_stacked.jl):
