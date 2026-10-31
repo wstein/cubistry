@@ -33,7 +33,7 @@ and the H 11→00 reset (1). Each one is **at most 3 HTM**.
   Switching letters at other values is not optimized. One option is to count
   back to 00 and use the setup word; another is to replan freely, but then the
   device leaves the closed cycle.
-- Each edge also carries an independently recomputed lower bound: the shortest
+- Each edge also carries a lower bound recomputed by both checkers: the shortest
   distance from its source state to *any* state showing the target. This uses
   the 9,072-state graph of the three tracked front stickers (histogram
   `0:1,1:15,2:177,3:1397,4:4981,5:2497,6:4`). For 63 of the 85 transitions the
@@ -99,17 +99,26 @@ byte-identical receipts; the negative controls are in the
   the same 4 edges at 4 and 38 against 40 HTM. If the minutes total of 159
   must not get worse, R1 stays on the Pareto front. m3-SH, s3-MH and hours3
   are Pareto alternatives.
-- Sticker changes are counted position by position against the H/S/M
-  seconds-first print, so S3 and M3 derivatives count as almost entirely
-  reprinted (20–24 stickers). R1 changes only 4.
-- Checker semantics changed in one respect: both checkers now also require
+- Sticker changes in the table are counted position by position against the
+  H/S/M seconds-first print, so S3 and M3 derivatives count as almost entirely
+  repositioned (20–24 stickers; m3-SH 24). R1 changes only 4. Counted by
+  artwork instead (printed glyphs as a multiset, position and orientation
+  ignored), **every print in the table needs only 3 newly printed stickers**:
+  the H/S/M set has S×3, H, M, and every print here uses five H/M letters
+  (R1: M×3, H×2; m3-SH: H×2, M×3), so the three S stickers are reprinted as
+  letters; the 3 blanks and 16 digits are the same multiset.
+- Checker semantics changed in two respects: both checkers now also require
   the **period to be minimal** (no earlier whole-lap repetition), which the
-  new "period too long" control needs. New controls: period too long (period
-  rows repeated, rejected as not minimal) and period too short (last lap of a
-  multi-lap period removed, rejected at the period boundary; exercised on
-  s3-MH). Inert H is not needed here: H is an active letter.
+  new "period too long" control needs, and the **distinct-state rule**: the
+  Q full states inside a period are pairwise distinct (see the periodic
+  definitions). New controls: period too long (period rows repeated, rejected
+  as not minimal), period too short (last lap of a multi-lap period removed,
+  rejected at the period boundary; exercised on s3-MH), exact closure,
+  distinct states, lower bound +1 and claimed maximum +1 (see
+  [the controls table](#reproduce)). Inert H is not needed here: H is an
+  active letter.
 
-### Blank profile, fourth attempt: improving R1 and deciding max 3 exactly (R1 still on the Pareto front)
+### Blank profile, fourth attempt: improving R1 and deciding max 3 exactly (R1 still on the Pareto front; its max-3 status is superseded by the fifth)
 
 **Final print: R1** (unchanged sticker set: 4 stickers differ from the
 H/S/M seconds-first print, ids 10, 14, 18 S→M and id 20 M→H). The final
@@ -173,9 +182,12 @@ for R1 (3,837 / 2,234 / 2,098 states).
   (`prints/annealed-h11max3-candidate.txt`, 18 sticker changes) has no ≤ 3
   cycle for M 00..59 or H 00..23. Its checked witness above still uses a
   4-HTM H 00..11 cycle, because the route search did not reach the one-state
-  limit. **Max 3 is therefore UNKNOWN for M 00..59 and H 00..23 in general,
-  and UNKNOWN on the full H/M print.** No single print with max 3 on even
-  one mode has been checked by both checkers.
+  limit. *(Superseded by the fifth attempt.)* At the time of this attempt,
+  max 3 was UNKNOWN for M 00..59 and H 00..23 in general, and no single print
+  with max 3 on even one mode had been checked by both checkers. The fifth
+  attempt above now has checker-accepted max-3 witnesses for M 00..59 alone
+  (m3-SH, s3-MH) and for both hour modes alone (hours3). Max 3 for all three
+  modes on one print remains **UNKNOWN**.
 
 ### Blank profile, third attempt: warm start from the H/S/M seconds-first print (superseded by the fourth)
 
@@ -295,6 +307,16 @@ and B'.
   edge. The run is a **preperiod** of P edges followed by a **period** of
   Q edges. P and Q are whole laps. The full 24-sticker state after P+Q edges
   equals the state after P edges, so the period repeats forever.
+- The period is **minimal** (the state after P edges does not reappear at an
+  earlier whole-lap boundary) and its Q full states are **pairwise distinct**
+  (distinct-state rule), so every period state has exactly one successor word
+  and the period can be run by a device that knows only the full state. The
+  rule covers period states only. Preperiod states may coincide with period
+  states: P must be a whole number of laps, so a run-in that joins the cycle
+  in the middle of a lap repeats period states until the next lap boundary.
+  This happens in the second-attempt witness (M: the states before steps
+  39–59 equal those before steps 159–179, counted from the setup; H 00..23
+  and H 00..11 similarly), which both checkers accept.
 - **Decrement = exact inverse traversal of the period** (same words inverted,
   same lengths). The baseline uses separate down runs instead. Here the owner's
   requirement fixes decrements as the exact inverse of the increment route, and
@@ -343,8 +365,9 @@ and B'.
   11→00, then backtracking to words. The output is the TSV witness. These are
   candidate producers only.
 - `checker/check.jl` (native Julia) and `flix/src/Main.flix` (native Flix
-  0.79.0) were written independently of the generator and of each other. Each
-  one parses the witness and validates the 24-facelet lattice, the rigid
+  0.79.0) share no code with the generator. They are **not** independent of
+  each other: the Flix checker is a structural port of the Julia checker (see
+  [Checker independence](#checker-independence)). Each one parses the witness and validates the 24-facelet lattice, the rigid
   corners and the tangent up vectors. It turns stickers with integer Rodrigues
   quarter turns and replays the setups, every increment, the exact inverse
   decrement traversal and the reset. It checks the displays (including the
@@ -360,6 +383,40 @@ and B'.
 - Search used Julia only. No Python is part of the deliverable or of the
   evidence.
 
+### Checker independence
+
+The two checkers are two implementations of **one** design, not two designs.
+`flix/src/Main.flix` was written as a structural port of `checker/check.jl`:
+the same decomposition (parse print, replay, display check, tracked-sticker
+graph, lower bound), the same integer Rodrigues turn formula, the same
+breadth-first search over the same tracked slots and pose encoding, the same
+candidate enumeration for the lower bound (blank stickers tried in every
+tangent orientation), the same period, minimality and distinct-state rules,
+and the same reject strings. What the port does buy is independence from
+language-level mistakes: separate parsers, separate integer and list
+handling, separate hashing and receipt formatting, and a byte-for-byte receipt
+comparison, so a slip in one implementation of the shared design shows up as
+a dissent.
+
+Common-mode risks that byte-identical receipts do **not** rule out:
+
+- a modeling error in the shared design: move sign convention (k = −side ×
+  amount), the cell coordinates and the "upright" up vector (0,1,0), the
+  definition of an increment, the reset or the decrement;
+- an error in the lower-bound argument itself: the tracked-sticker graph and
+  the rule that a blank reads in every orientation are taken over unchanged,
+  so a wrong but consistent bound would be confirmed by both;
+- a rule that both omit (the distinct-state rule inside a period was missing
+  from both until an independent PR review pointed it out);
+- shared reading of the witness format, including what counts as a field.
+
+Before the integer grammar below was shared, the two parsers disagreed on
+malformed numbers (Julia accepted `+4`, ` 4`, `4 `, `0x4` and padded
+naturals and crashed on `4e0`, empty or 20-digit fields; Flix rejected them).
+The committed witnesses never used such fields, so no receipt changed; the
+cause was Julia's `parse(Int, …)` accepting more than the regular expression
+in front of it was meant to allow, and no check in front of some fields.
+
 ## Reproduce
 
 ```sh
@@ -374,6 +431,7 @@ HM_PEN4=1000 HM_FSTARTS=1 $J --startup-file=no research/hm-counter-3move/fixpoin
 research/hm-counter-3move/flix/build.sh            # Flix 0.79.0 / Java 21 jar
 research/hm-counter-3move/checker/run-checks.sh research/hm-counter-3move/evidence/witness-free.tsv /tmp/hm-checks-free
 research/hm-counter-3move/checker/run-checks.sh research/hm-counter-3move/evidence/witness-blank-periodic.tsv /tmp/hm-checks-blank
+research/hm-counter-3move/checker/run-malformed.sh research/hm-counter-3move/evidence/witness-blank-m3-SH.tsv research/hm-counter-3move/evidence/witness-free.tsv /tmp/hm-checks-malformed
 $J --startup-file=no research/hm-counter-3move/blank-open-probe.jl   # strict-closure diagnostic
 ```
 
@@ -386,18 +444,45 @@ uses v1. Both checkers accept both formats.
 `run-checks.sh` writes both receipts and requires them to be byte-identical. It
 then runs the negative controls through both checkers. Each control must be
 rejected with the intended reason ([evidence/checks-free.tsv](evidence/checks-free.tsv),
-[evidence/checks-blank-periodic.tsv](evidence/checks-blank-periodic.tsv)):
+[evidence/checks-blank-periodic.tsv](evidence/checks-blank-periodic.tsv) and the other
+`evidence/checks-blank-*.tsv` files):
 
-| Control | Free (v1) rejection | Blank periodic (v2) rejection |
+| Control | Free (v1) rejection | Blank (v2) rejection, every v2 witness |
 | --- | --- | --- |
 | corrupted glyph (M→H at upper-right) | wrong glyph at cell 2 for M00 after setup | wrong glyph at cell 2 for M59 00 after setup |
 | corrupted up vector (units sticker) | glyph not upright at cell 4 for M00 after setup | glyph not upright at cell 4 for M59 00 after setup |
 | non-blank sticker at upper-left | n/a | upper-left cell must show a blank sticker at M59 00 after setup |
-| route move changed (M step 5→6) | wrong glyph at cell 2 for M 5->6 | wrong glyph at cell 2 for M59 step 5 |
-| claimed distance +1 / −1 (too small) | claimed lower bound differs for H 7->8 | claimed lower bound differs for H23 step 0 |
+| route move changed (M step 5→6) | wrong glyph at cell 2 for M 5->6 | wrong glyph at cell 2 (or another display error) for M59 step 5 |
+| claimed lower bound +1 (v1: every H 7→8 edge; v2: first H 00..23 step with bound ≥ 1) | claimed lower bound differs for H 7->8 | claimed lower bound differs for H23 step *k* |
+| claimed lower bound −1 (same v2 step) | n/a | claimed lower bound differs for H23 step *k* |
 | claimed maximum −1 | claimed maximum edge HTM differs from replay | same |
+| claimed maximum +1 | claimed maximum edge HTM differs from replay | same |
 | truncated wrap word | word shorter than graph distance for M 59->0 | n/a |
-| wrong period boundary (one lap moved) | n/a | period boundary: state after preperiod+period must equal state after preperiod for M59 |
+| wrong period boundary: one lap moved (period ≥ 2 laps or preperiod > 0), else one edge moved | n/a | period boundary: … for M59, or preperiod and period must be whole laps (one-lap witnesses) |
+| exact closure: last M period word gets a trailing `B` (displays stay correct, full state does not close) | n/a | period boundary: state after preperiod+period must equal state after preperiod for M59 |
+| period too long: M period rows repeated, Q doubled | n/a | period is not minimal for M59 |
+| period too short: last lap of the first multi-lap period removed (only witnesses with one) | n/a | period boundary: … for that mode |
+| distinct states: M period run twice, first copy ends with `B`, second starts with `B'` (minimal, closes, but repeats a full state) | n/a | full state repeats within the period for M59 |
+
+For one-lap periods the "wrong period boundary" control can only hit the
+whole-lap rule; the "exact closure" control is the one that exercises exact
+full-state closure there.
+
+[checker/run-malformed.sh](checker/run-malformed.sh) adds negative controls for
+the integer grammar and for broken files, run once on a v2 witness (m3-SH) and
+on the v1 witness ([evidence/checks-malformed.tsv](evidence/checks-malformed.tsv)).
+Every numeric field (sticker id, cubie id, vector component, preperiod,
+period, lower bound, reset lower bound, claimed maximum) follows one grammar in
+both checkers: a natural number is `0` or a nonzero ASCII digit followed by at
+most five ASCII digits (no sign, no leading zeros, no spaces, at most 6
+digits); a vector component may also be `-` followed by a nonzero natural.
+Anything else is rejected with `malformed number in <field>`. The controls
+cover `+4`, ` 4`, `4 `, `0x4`, `4e0`, an empty field, `4x`, `04`, 7- and
+20-digit padded values, a 20-digit overflow, `-4`, `-0` and `+1` in vectors,
+padded or signed ids, preperiod and period, lower bounds in v1 and v2, the v1
+reset bound, a truncated file, a truncated print, a missing or doubled `end`
+row, and invalid UTF-8. Each is rejected by both checkers with the same
+reason; none raises an uncaught exception.
 
 ## Alternatives (estimate only, not built)
 
