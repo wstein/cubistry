@@ -123,11 +123,26 @@ def frontFailure(state: Vector[Sticker],board: List[(String,String)],mode: Strin
         let((r,c),want)=q;
         let hits=List.filter(s -> {let Sticker.S(_,_,p,n,_,_,_)=s;p==(c-4,4-r,3) and n==(0,0,1)},Vector.toList(state));
         require(List.length(hits)==1,"one physical front surface per cell");
-        let Sticker.S(_,_,_,_,up,text,ink)=at(hits,0);
-        if(stackedMatch(text,ink,upAngle(up),want,mode)) Nil else List#{"${r},${c}"}
+        let Sticker.S(sid,_,_,_,up,text,ink)=at(hits,0);
+        let angle=upAngle(up);
+        if(stackedMatch(text,ink,angle,want,mode)) Nil else {
+            let why=match stackedParse(text) {
+                case None => "plain-mismatch"
+                case Some(_) => if(angle != 0 and stackedMatch(text,ink,0,want,mode)) "stacked-not-upright" else "stacked-mismatch"
+            };
+            List#{"${r},${c}\t${sid}\t${angle}\t${why}"}
+        }
     },List.zip(cells(),board));
-    match failing {case x::_ => x case Nil => "-"}
+    match failing {case x::_ => x case Nil => "-\t-\t-\t-"}
 }
+def contextUses(state: Vector[Sticker],board: List[(String,String)]): Int32 \ IO =
+    List.count(q -> {
+        let((r,c),(want,_))=q;
+        let hits=List.filter(s -> {let Sticker.S(_,_,p,n,_,_,_)=s;p==(c-4,4-r,3) and n==(0,0,1)},Vector.toList(state));
+        require(List.length(hits)==1,"one physical front surface per cell");
+        let Sticker.S(_,_,_,_,_,text,_)=at(hits,0);
+        match stackedParse(text) {case Some(_) => text != want case None => false}
+    },List.zip(cells(),board))
 def stateText(state: Vector[Sticker]): String = List.foldLeft((acc,s) -> {
     let Sticker.S(id,pid,pos,n,u,text,ink)=s;
     acc+"${id}\t${pid}\t${vecText(pos)}\t${vecText(n)}\t${vecText(u)}\t${text}\t${ink}\n"
@@ -141,7 +156,19 @@ def checkStacked(printPath: String,dagPath: String,variant: String,mode: String,
     let goals=stackedGoals(variant,reps);
     let(source,printed,blanked,stacked)=stackedPrint(read(printPath),read(oldRoot+"/physical-print.tsv"),variant);
     let folded=List.count(g -> List.exists(cell -> {let(t,_)=cell;(match stackedParse(t) {case Some(_) => true case None => false})},goalBoard(g)),goals);
+    let oldBoards=List.map(p -> {let(yy,mm)=p;goalBoard(goal(yy,mm))},calendarMonths());
+    let months=List.map(rep -> List.count(b -> b==goalBoard(rep),oldBoards),reps);
     println("stacked-profile\t${variant}\t${mode}\t888\t91\t${folded}");
+    List.forEach(q -> {
+        let(i,g)=q;let Goal.G(y,m,board)=g;
+        List.forEach(e -> {
+            let((r,c),(t,ink))=e;
+            match stackedParse(t) {
+                case Some(_) => println("stacked-fold\t${i+1}\t${y}\t${m}\t${at(months,i)}\t${r},${c}\t${t}\t${ink}")
+                case None => ()
+            }
+        },List.zip(cells(),board))
+    },List.zipWithIndex(goals));
     println("stacked-print\t${printed}\t${294-printed}\t${blanked}\t${stacked}");
     let lower=inventoryLowerBound(goals);
     println("stacked-lower-bound-strict\t${variant}\t${lower}");
@@ -150,10 +177,11 @@ def checkStacked(printPath: String,dagPath: String,variant: String,mode: String,
         let p=match Map.get(id,results){case Some(value)=>value case None=>throw new IllegalArgumentException("missing complete target")};
         let state=liftState(p,source,poses);let Goal.G(y,m,board)=at(goals,id-1);
         let cell=frontFailure(state,board,mode);
+        let uses=contextUses(state,board);
         let shown=List.flatMap(s -> {let Sticker.S(sid,_,_,n,_,_,_)=s;if(n==(0,0,1)) List#{sid} else Nil},Vector.toList(state));
-        let status=if(cell=="-")"PASS" else "FAIL";
-        println("stacked-target\t${id}\t${y}\t${m}\t${status}\t${cell}\t${stackSha(stateText(state))}");
-        (id,cell=="-",shown)
+        let status=if(cell=="-\t-\t-\t-")"PASS" else "FAIL";
+        println("stacked-target\t${id}\t${y}\t${m}\t${status}\t${cell}\t${at(months,id-1)}\t${uses}\t${stackSha(stateText(state))}");
+        (id,cell=="-\t-\t-\t-",shown)
     },List.range(1,92));
     let shownAll=List.distinct(List.flatMap(o -> {let(_,_,s)=o;s},outcomes));
     let hidden=List.count(s -> {let Sticker.S(sid,_,_,_,_,g,_)=s;g != "" and not List.memberOf(sid,shownAll)},Vector.toList(source));
@@ -164,11 +192,48 @@ def checkStacked(printPath: String,dagPath: String,variant: String,mode: String,
     println("stacked-summary\t${verdict}\t${variant}\t${mode}\t${91-nf}\t${nf}\t${printed}");
     require(nf==0,"${nf} of 91 legal DAG states fail the stacked front")
 }
+// Inventory obstruction for ANY print (necessary condition); see stacked_inventory in Julia.
+def invGroup(g: String,ink: String,r: Int32,c: Int32,variant: String,mode: String): String \ IO = {
+    let t=String.replace(src="I",dst="1",String.replace(src="O",dst="0",g));
+    let hits=if(mode=="context") List.filter(p -> {let(a,b)=p;t=="${a}" or t=="${b}" or t=="${a}/${b}"},pairsOf(variant)) else Nil;
+    match hits {
+        case (a,b)::_ => "pair|${a}|${b}|${ink}"
+        case Nil => {let(x,q,i)=lowerArt(g,ink,r,c);"art|${x}|${q}|${i}"}
+    }
+}
+def stackedInventory(variant: String,mode: String,oldRoot: String): Unit \ IO = {
+    require(mode=="strict" or mode=="context","mode must be strict or context");
+    let _ = pairsOf(variant);
+    let reps=representatives();validateTargets(read(oldRoot+"/targets.tsv"),reps);
+    let goals=stackedGoals(variant,reps);
+    let keys=List.sort(List.distinct(List.map(p -> {let(r,c)=p;orbit(r,c)},cells())));
+    let rows=List.map(key -> {
+        let perGoal=List.map(g -> {
+            let inOrbit=List.filter(q -> {let((r,c),_)=q;orbit(r,c)==key},List.zip(cells(),goalBoard(g)));
+            let blanks=List.count(q -> {let(_,(t,_))=q;t==""},inOrbit);
+            let groups=List.flatMap(q -> {let((r,c),(t,ink))=q;if(t=="") Nil else List#{invGroup(t,ink,r,c,variant,mode)}},inOrbit);
+            (groups,blanks)
+        },goals);
+        let classes=List.distinct(List.flatMap(x -> {let(gs,_)=x;gs},perGoal));
+        let need=List.foldLeft((acc,cls) -> acc+List.foldLeft((m,x) -> {let(gs,_)=x;Int32.max(m,List.count(y -> y==cls,gs))},0,perGoal),0,classes);
+        let blanks=List.foldLeft((m,x) -> {let(_,b)=x;Int32.max(m,b)},0,perGoal);
+        let cap=if(key==(0,0))6 else 24;let slack=cap-need-blanks;let(x,y)=key;
+        println("stacked-orbit\t${variant}\t${mode}\t${x}\t${y}\t${need}\t${blanks}\t${cap}\t${slack}");
+        (need,slack)
+    },keys);
+    let total=List.foldLeft((a,p) -> {let(n,_)=p;a+n},0,rows);
+    let negative=List.count(p -> {let(_,s)=p;s<0},rows);
+    let core=List.sort(List.distinct(List.map(g -> {let(t,_)=at(goalBoard(g),24);t},goals)));
+    println("stacked-core-cell\t${variant}\t${List.foldLeft((a,t) -> if(a=="") t else a+","+t,"",core)}");
+    let verdict=if(negative==0)"NOT_OBSTRUCTED" else "OBSTRUCTED";
+    println("stacked-inventory\t${variant}\t${mode}\t${total}\t${verdict}\t${negative}")
+}
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {
         match Sys.Env.getArgs() {
+            case "inventory"::variant::mode::oldRoot::Nil => stackedInventory(variant,mode,oldRoot)
             case printing::dag::variant::mode::oldRoot::geometry::Nil => checkStacked(printing,dag,variant,mode,oldRoot,geometry)
-            case _ => throw new IllegalArgumentException("PRINT DAG VARIANT MODE ORIGINAL_EVIDENCE GEOMETRY")
+            case _ => throw new IllegalArgumentException("PRINT DAG VARIANT MODE ORIGINAL_EVIDENCE GEOMETRY | inventory VARIANT MODE ORIGINAL_EVIDENCE")
         }
     } catch {case ex: Exception => {println("invalid\t"+ex.toString());System.exit(1)}}
 })

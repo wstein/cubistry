@@ -8,3 +8,9 @@ A-context-pr99-print	A	context	1	1	IDENTICAL	stacked-summary REJECT A context 73
 W-context-pr99-print	W	context	0	0	IDENTICAL	stacked-summary ACCEPT W context 91 0 240
 W-context-pr128-pairs-pr99-dag	W	context	1	1	IDENTICAL	stacked-summary REJECT W context 52 39 238
 W-context-pr128-pairs-pr128-dag	W	context	1	1	IDENTICAL	stacked-summary REJECT W context 52 39 238
+inventory-W-strict	W	strict	0	0	IDENTICAL	stacked-inventory W strict 240 NOT_OBSTRUCTED 0
+inventory-W-context	W	context	0	0	IDENTICAL	stacked-inventory W context 237 NOT_OBSTRUCTED 0
+inventory-A-strict	A	strict	0	0	IDENTICAL	stacked-inventory A strict 267 OBSTRUCTED 6
+inventory-A-context	A	context	0	0	IDENTICAL	stacked-inventory A context 260 OBSTRUCTED 4
+inventory-B-strict	B	strict	0	0	IDENTICAL	stacked-inventory B strict 240 OBSTRUCTED 1
+inventory-B-context	B	context	0	0	IDENTICAL	stacked-inventory B context 234 NOT_OBSTRUCTED 0

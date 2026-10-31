@@ -72,17 +72,18 @@ end
 function stacked_goals(variant)
     old=physical_targets("EN");@assert length(old)==91
     index=Dict(join(string.(t.board),"|")=>i for (i,t) in enumerate(old))
-    boards=Vector{Any}(nothing,91);months=0
+    boards=Vector{Any}(nothing,91);months=0;per=zeros(Int,91)
     for y in 2026:2099,m in 1:12
         months+=1
         id=index[join(string.(wrapped_board(y,m)),"|")]
+        per[id]+=1
         @assert wrapped_board(old[id].year,old[id].month)==old[id].board
         b=stacked_board(y,m,variant)
         isnothing(boards[id]) ? (boards[id]=b) : @assert boards[id]==b "one old target maps to two new boards"
     end
     @assert months==888 && all(!isnothing,boards)
     @assert length(unique(join.(string.(b) for b in boards)))==91 "new boards must be distinct"
-    [(year=old[i].year,month=old[i].month,board=boards[i]) for i in 1:91]
+    [(year=old[i].year,month=old[i].month,board=boards[i],months=per[i]) for i in 1:91]
 end
 
 # Read the candidate print; only these artwork changes against PR #99 are allowed:
@@ -125,13 +126,25 @@ function stacked_match(s,angle,want,mode)
     image_normal(s.text,angle,s.ink)==image_normal(want[1],0,want[2])
 end
 
+# Cells where an upright stacked surface stands for a single date (context use).
+function context_uses(state,board)
+    n=0
+    for r in 1:7,c in 1:7
+        s=only(filter(s->s.pos==(c-4,4-r,3) && s.normal==FRONT_NORMAL,state))
+        !isnothing(parse_stacked(s.text)) && s.text!=board[r,c][1] && (n+=1)
+    end
+    n
+end
 function front_failure(state,board,mode)
     for r in 1:7,c in 1:7
         s=only(filter(s->s.pos==(c-4,4-r,3) && s.normal==FRONT_NORMAL,state))
         angle=findfirst(==(s.up),IMAGE_UPS)-1
-        stacked_match(s,angle,board[r,c],mode) || return "$r,$c"
+        stacked_match(s,angle,board[r,c],mode) && continue
+        p=parse_stacked(s.text)
+        why=isnothing(p) ? "plain-mismatch" : (angle!=0 && stacked_match(s,0,board[r,c],mode)) ? "stacked-not-upright" : "stacked-mismatch"
+        return "$r,$c\t$(s.id)\t$angle\t$why"
     end
-    "-"
+    "-\t-\t-\t-"
 end
 
 function check_stacked(print_path,dag_path,variant,mode)
@@ -139,6 +152,9 @@ function check_stacked(print_path,dag_path,variant,mode)
     goals=stacked_goals(variant);candidate=read_stacked_print(print_path,variant)
     folded=count(g->any(!isnothing(parse_stacked(g.board[r,c][1])) for r in 3:7,c in 1:7),goals)
     println("stacked-profile\t",variant,'\t',mode,"\t888\t91\t",folded)
+    for (id,g) in enumerate(goals),r in 1:7,c in 1:7
+        isnothing(parse_stacked(g.board[r,c][1])) || println("stacked-fold\t",id,'\t',g.year,'\t',g.month,'\t',g.months,'\t',r,',',c,'\t',g.board[r,c][1],'\t',g.board[r,c][2])
+    end
     println("stacked-print\t",candidate.printed,'\t',294-candidate.printed,'\t',candidate.blanked,'\t',candidate.stacked)
     println("stacked-lower-bound-strict\t",variant,'\t',nonblank_lower_bound(goals))
     proof=replay_dag(dag_path);failed=Int[];shown=Set{Int}()
@@ -146,12 +162,52 @@ function check_stacked(print_path,dag_path,variant,mode)
         p=signed_perm(proof.registers,proof.targets[id]);state=decode_physical(candidate.source,p,proof.action)
         for s in state;s.normal==FRONT_NORMAL && s.pos[3]==3 && push!(shown,s.id);end
         cell=front_failure(state,goals[id].board,mode)
-        cell=="-" || push!(failed,id)
-        println("stacked-target\t",id,'\t',goals[id].year,'\t',goals[id].month,'\t',cell=="-" ? "PASS" : "FAIL",'\t',cell,'\t',state_digest(state))
+        cell=="-\t-\t-\t-" || push!(failed,id)
+        println("stacked-target\t",id,'\t',goals[id].year,'\t',goals[id].month,'\t',cell=="-\t-\t-\t-" ? "PASS" : "FAIL",'\t',cell,'\t',goals[id].months,'\t',context_uses(state,goals[id].board),'\t',state_digest(state))
     end
     hidden=count(id->!isempty(candidate.source[id].text) && !(id in shown),1:294)
     println("stacked-printed-never-on-front\t",hidden)
     verdict=isempty(failed) ? "ACCEPT" : "REJECT"
     println("stacked-summary\t",verdict,'\t',variant,'\t',mode,'\t',91-length(failed),'\t',length(failed),'\t',candidate.printed)
     @assert isempty(failed) "$(length(failed)) of 91 legal DAG states fail the stacked front: targets $(join(failed,','))"
+end
+
+# Inventory obstruction for ANY print of the 294-surface model (necessary condition).
+# In one display, the cells of an orbit that need artwork of one group must be shown
+# by distinct surfaces printed in that group, and blank cells by distinct blank
+# surfaces. strict: a group is one artwork class (the PR #99 bound). context: the
+# plain dates a, b and the stacked a/b of a declared pair, in one ink, form one
+# group (a stacked surface may serve any of them), which only weakens the bound.
+function inventory_group(g,ink,r,c,variant,mode)
+    if mode=="context"
+        t=replace(g,'O'=>'0','I'=>'1')
+        for (a,b) in VARIANT_PAIRS[variant]
+            t in (string(a),string(b),stacked_text(a,b)) && return ("pair",string(a),string(b),ink)
+        end
+    end
+    a=artwork(g,ink,r,c);("art",a[1],string(a[2]),a[3])
+end
+function stacked_inventory(variant,mode)
+    @assert haskey(VARIANT_PAIRS,variant) && mode in MODES "VARIANT must be A|B|W, MODE strict|context"
+    goals=stacked_goals(variant);total=0;negative=0
+    for k in sort!(unique(orbit(r,c) for r in 1:7,c in 1:7))
+        peak=Dict{NTuple{4,String},Int}();blanks=0
+        for t in goals
+            counts=Dict{NTuple{4,String},Int}();b=0
+            for r in 1:7,c in 1:7
+                orbit(r,c)==k || continue
+                g,ink=t.board[r,c]
+                if isempty(g);b+=1;continue;end
+                key=inventory_group(g,ink,r,c,variant,mode);counts[key]=get(counts,key,0)+1
+            end
+            for (key,n) in counts;peak[key]=max(get(peak,key,0),n);end
+            blanks=max(blanks,b)
+        end
+        need=sum(values(peak);init=0);slack=capacity(k)-need-blanks
+        slack<0 && (negative+=1);total+=need
+        println("stacked-orbit\t",variant,'\t',mode,'\t',k[1],'\t',k[2],'\t',need,'\t',blanks,'\t',capacity(k),'\t',slack)
+    end
+    core=sort!(unique(goals[id].board[4,4][1] for id in 1:91))
+    println("stacked-core-cell\t",variant,'\t',join(core,','))
+    println("stacked-inventory\t",variant,'\t',mode,'\t',total,'\t',negative==0 ? "NOT_OBSTRUCTED" : "OBSTRUCTED",'\t',negative)
 end

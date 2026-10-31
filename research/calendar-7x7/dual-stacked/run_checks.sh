@@ -33,4 +33,15 @@ run_case A-context-pr99-print  "$p99" "$out/pr99-dag.tsv" A context
 run_case W-context-pr99-print  "$p99" "$out/pr99-dag.tsv" W context
 run_case W-context-pr128-pairs-pr99-dag  "$ev/print-W-pr128-pairs.tsv" "$out/pr99-dag.tsv" W context
 run_case W-context-pr128-pairs-pr128-dag "$ev/print-W-pr128-pairs.tsv" "$out/pr128-dag.tsv" W context
+run_inventory() {
+    variant=$1; mode=$2; name=inventory-$variant-$mode
+    js=0; "$julia_bin" --startup-file=no "$here/check_stacked.jl" inventory "$variant" "$mode" > "$out/$name.julia.stdout" 2> "$out/$name.julia.stderr" || js=$?
+    fs=0; java -Xmx8g -jar "$jar" inventory "$variant" "$mode" "$cal/english/evidence" > "$out/$name.flix.stdout" 2> "$out/$name.flix.stderr" || fs=$?
+    grep "^stacked-" "$out/$name.julia.stdout" > "$out/$name.julia.tsv" || true
+    grep "^stacked-" "$out/$name.flix.stdout" > "$out/$name.flix.tsv" || true
+    same=DIFFERENT; cmp -s "$out/$name.julia.tsv" "$out/$name.flix.tsv" && same=IDENTICAL
+    summary=$(grep "^stacked-inventory" "$out/$name.julia.tsv" | tr "\t" " " || true)
+    printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "$name" "$variant" "$mode" "$js" "$fs" "$same" "$summary" >> "$out/cases.tsv"
+}
+for v in W A B; do for m in strict context; do run_inventory "$v" "$m"; done; done
 cat "$out/cases.tsv"
