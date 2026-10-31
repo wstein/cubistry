@@ -1,0 +1,43 @@
+{
+  "repository": "https://github.com/wstein/cubistry",
+  "researchPullRequest": "https://github.com/wstein/cubistry/pull/134",
+  "branch": "research/counter-99-blank-top",
+  "commit": "22fe5842c4c59e54789c865914e70abb7cfcb24c",
+  "researchRoot": "research/counter-99-blank-top",
+  "researchFiles": {
+    "research/counter-99-blank-top/README.md": "bda7899a2b12cbc743edd7ed90baa37b63e937caf63ea925a06ee23926346904",
+    "research/counter-99-blank-top/evidence/print.tsv": "19682e5192da6f99c5eb6ebf5a0c49e792abf207aeb841f7ccfd46c541805fc3",
+    "research/counter-99-blank-top/evidence/routes-lz.tsv": "47355671febf02e47331f9fe59bf4a5363b1f470c806718cc37a087732182838",
+    "research/counter-99-blank-top/evidence/routes-nz.tsv": "75b41f4d8c0d9df994a436e72e42acf1bcc8520e1aa2f0d6b14327e4d560915c",
+    "research/counter-99-blank-top/evidence/setup-lz.tsv": "8e716f5a6ed0b7672182c561e47ba8d7e22aa5b3364cc415040ffd1251fc1287",
+    "research/counter-99-blank-top/evidence/setup-nz.tsv": "3efaf3b1b7e03ae76da223566cce99a5788287bcb22d6e389712600692097eab",
+    "research/counter-99-blank-top/evidence/receipt-julia-lz.tsv": "7005fa5ee1e8f987655f9911409dd9b4b24a201ffed6036cbb08189614560f0e",
+    "research/counter-99-blank-top/evidence/receipt-julia-nz.tsv": "753e48a2878ebce92ab4ef6d7a32ba58110816b7c4ed356b696b9b1cdb252967",
+    "research/counter-99-blank-top/evidence/receipt-flix-lz.tsv": "7005fa5ee1e8f987655f9911409dd9b4b24a201ffed6036cbb08189614560f0e",
+    "research/counter-99-blank-top/evidence/receipt-flix-nz.tsv": "753e48a2878ebce92ab4ef6d7a32ba58110816b7c4ed356b696b9b1cdb252967",
+    "research/counter-99-blank-top/evidence/negative-controls.tsv": "2683a9c31d6414f05e4d8a0565ba3823222d188073f924b09077e32466444672",
+    "research/counter-99-blank-top/evidence/run.sh": "52cd86a4ad2844cbff6a01c6ab3c111eda2ae5fb8e2008ef7aea1e6a53b23ee8",
+    "research/counter-99-blank-top/julia/check.jl": "4301f531e7994aedbb241114b05efbca3ce8050e05a06f75d1b34e0ecfbfcece",
+    "research/counter-99-blank-top/flix/src/Main.flix": "f1b35b43fa2fa0ee4315eb99f91e827950b4aeeae35f616e45777f697fc86a28",
+    "research/counter-99-blank-top/flix/build.sh": "2ad3ad6b999750bb5dcc0d879b3966d1133ae97e01d45b18520921d4c90a838c"
+  },
+  "appCopies": {
+    "data/counter/blank-top/print.tsv": "research/counter-99-blank-top/evidence/print.tsv",
+    "data/counter/blank-top/routes-lz.tsv": "research/counter-99-blank-top/evidence/routes-lz.tsv",
+    "data/counter/blank-top/routes-nz.tsv": "research/counter-99-blank-top/evidence/routes-nz.tsv",
+    "data/counter/blank-top/setup-lz.tsv": "research/counter-99-blank-top/evidence/setup-lz.tsv",
+    "data/counter/blank-top/setup-nz.tsv": "research/counter-99-blank-top/evidence/setup-nz.tsv",
+    "data/counter/blank-top/receipt-julia-lz.tsv": "research/counter-99-blank-top/evidence/receipt-julia-lz.tsv",
+    "data/counter/blank-top/receipt-julia-nz.tsv": "research/counter-99-blank-top/evidence/receipt-julia-nz.tsv",
+    "data/counter/blank-top/receipt-flix-lz.tsv": "research/counter-99-blank-top/evidence/receipt-flix-lz.tsv",
+    "data/counter/blank-top/receipt-flix-nz.tsv": "research/counter-99-blank-top/evidence/receipt-flix-nz.tsv"
+  },
+  "canonicalSource": {
+    "path": "public/counter-design.v2.json",
+    "print": "prints.padded",
+    "note": "Cubie IDs, cubie positions and sticker IDs (by cubie and outward normal) of the titled counter's source geometry. The blank-top runtime keeps these identities; only the artwork and print-up vectors differ."
+  },
+  "runtimePath": "public/counter-blank-top.v1.json",
+  "runtimeSHA256": "ee74ac606ca6142b962ae7ad68163079194058a89e20a57cdcc3c852f403bb6a",
+  "reviewStatus": "Research candidate accepted by both native checkers (Julia and Flix receipts byte-identical per mode) at the pinned commit, with an independent review comment on PR 134, which stays a research draft. Max 3 HTM is UNKNOWN for this print and for all prints. Global optimality of the print, the routes and the 6-HTM mode-switch word is UNKNOWN. The application runtime and its replay tests are software regression tests, not proofs."
+}
