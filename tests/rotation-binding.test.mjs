@@ -6,11 +6,11 @@ import { rotationHarness } from "./helpers/rotation-harness.mjs";
 const harness = (mode="smart") => rotationHarness({mode});
 const same=(a,b)=>assert(a.angleTo(b)<1e-7);
 test("production pointerdown interrupts pending/active return before threshold, preserving full displayed quaternion",()=>{
- const h=harness("classic");h.element.pointer("pointerdown");h.time(.2);h.element.pointer("pointermove",170,140);h.time(.4);h.element.pointer("pointerup",170,140);
+ const h=harness("classic");h.element.pointer("pointerdown");h.time(.2);h.element.pointer("pointermove",250,200);h.time(.4);h.element.pointer("pointerup",250,200);
  h.select.value="smart";h.select.dispatchEvent(new Event("change"));assert.equal(h.binding.controller.phase,"awaiting-return");assert.match(h.note.textContent,/2 seconds idle/);
- h.step(2.6);assert.equal(h.binding.controller.phase,"returning");const before=h.root.quaternion.clone();
- h.time(2.7);h.element.pointer("pointerdown",170,140);same(h.root.quaternion,before);assert.equal(h.binding.controller.phase,"dragging");
- h.element.pointer("pointermove",171,141);h.step(20);same(h.root.quaternion,before);h.element.pointer("pointercancel",171,141);assert.equal(h.binding.controller.phase,"awaiting-return");
+ h.step(2.45);assert.equal(h.binding.controller.phase,"returning");const before=h.root.quaternion.clone();
+ h.time(2.5);h.element.pointer("pointerdown",250,200);same(h.root.quaternion,before);assert.equal(h.binding.controller.phase,"dragging");
+ h.element.pointer("pointermove",251,201);h.step(20);h.element.pointer("pointercancel",251,201);assert.equal(h.binding.controller.phase,"awaiting-return");
  assert.equal(h.element.captures.size,0);h.binding.dispose();
 });
 test("touch overlap blocks automatic motion until every contact ends; active deadzone reversal remains exact",()=>{
@@ -44,8 +44,8 @@ test("motion preference failures are bounded and safe; zoom/reset never reconstr
 
 test("shared settings pointer/keyboard/input activity freezes return without intercepting native controls and cleans up",()=>{
  const h=harness("classic");h.element.pointer("pointerdown");h.time(.2);h.element.pointer("pointermove",190,160);h.time(.4);h.element.pointer("pointerup");
- h.select.value="smart";h.select.dispatchEvent(new Event("change"));h.step(2.6);assert.equal(h.binding.controller.phase,"returning");const q=h.root.quaternion.clone();
- h.time(2.7);const key=new Event("keydown",{cancelable:true});h.panel.dispatchEvent(key);assert.equal(key.defaultPrevented,false);same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,"awaiting-return");assert.equal(h.binding.controller.returnDeadline,4.7);
+ h.select.value="smart";h.select.dispatchEvent(new Event("change"));h.step(2.45);assert.equal(h.binding.controller.phase,"returning");const q=h.root.quaternion.clone();
+ h.time(2.5);const key=new Event("keydown",{cancelable:true});h.panel.dispatchEvent(key);assert.equal(key.defaultPrevented,false);same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,"awaiting-return");assert.equal(h.binding.controller.returnDeadline,4.5);
  h.time(3);h.panel.dispatchEvent(new Event("input"));assert.equal(h.binding.controller.returnDeadline,5);
  h.binding.dispose();h.time(10);h.panel.dispatchEvent(new Event("pointerdown"));same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,"idle");
 });

@@ -5,7 +5,7 @@ import {SmartRotation,ROTATION_TUNING as P} from '../packages/cube-viewer/src/sm
 const pose=(p=0,y=0)=>new Quaternion().setFromEuler(new Euler(p,y,0));
 const same=(a,b)=>assert(a.angleTo(b)<1e-7);
 function upright(q){const up=new Vector3(0,1,0).applyQuaternion(q);assert(Math.abs(up.x)<1e-12);assert(up.y>=Math.sin(.05)-1e-12);}
-const ease=t=>t*t*t*(10-15*t+6*t*t);
+const spring=t=>(1+P.returnFrequency*t)*Math.exp(-P.returnFrequency*t);
 test('Smart and Classic remain upright through yaw revolutions, pitch poles, coast and angular return',()=>{
  for(const mode of ['smart','classic']){
   const c=new SmartRotation(pose(.16,-.2),mode);c.down(0);
@@ -16,12 +16,12 @@ test('Smart and Classic remain upright through yaw revolutions, pitch poles, coa
   c.up(1.2);for(let t=1.21;t<7;t+=.013){c.step(t);upright(c.quaternion);}
  }
 });
-test('upright return uses shortest unwrapped yaw and pitch easing without intermediate SLERP roll',()=>{
+test('upright return uses shortest unwrapped yaw and a pitch/yaw spring without intermediate SLERP roll',()=>{
  const start=pose(.3,179*Math.PI/180),c=new SmartRotation(start);c.down(0);c.drag(.5,50*Math.PI/180,.2);c.up(.4);
  const at=c.returnDeadline;assert.equal(at,2.4);
  for(let i=0;i<=100;i++){const t=i/100;c.step(at+t);upright(c.quaternion);
-  same(c.quaternion,pose(.8-.5*ease(t),(229-50*ease(t))*Math.PI/180));}
- same(c.quaternion,start);assert.equal(c.phase,'idle');
+  same(c.quaternion,pose(.3+.5*spring(t),(179+50*spring(t))*Math.PI/180));}
+ c.step(at+5);same(c.quaternion,start);assert.equal(c.phase,'idle');
 });
 test('pitch boundary stops outward inertia analytically and leaves the exact two-second settled delay at every frame rate',()=>{
  const rows=[];
@@ -32,7 +32,7 @@ test('pitch boundary stops outward inertia analytically and leaves the exact two
   const hit=.02-P.dampingSeconds*Math.log(1-(P.pitchLimit-1.45)/(vp*P.dampingSeconds));assert(hit<stop);
   for(let t=.02+1/hz;t<deadline+.5;t+=1/hz){c.step(t);upright(c.quaternion);}
   c.step(deadline+.5);assert.equal(c.phase,'returning');assert(Math.abs(c.returnDeadline-deadline)<1e-10);
-  rows.push(c.quaternion.clone());c.step(deadline+1);same(c.quaternion,pose(1.35,0));
+  rows.push(c.quaternion.clone());c.step(deadline+5);same(c.quaternion,pose(1.35,0));
  }
  for(const q of rows)same(q,rows[0]);
  const c=new SmartRotation(pose());c.down(0);c.drag(1.45,0,.02);c.up(.02);
@@ -56,7 +56,7 @@ test('interrupted leveling retains its exact residual through tap and drag, resu
  const c=new SmartRotation(pose(),'free');c.down(0);c.drag(.7,.4,.1);c.drag(-.2,.8,.2);c.up(.4);const anchor=c.anchor.clone();
  const target=new SmartRotation(c.quaternion).quaternion.clone();c.setMode('smart',1);c.step(1.4);const shown=c.quaternion.clone();c.down(1.4);same(c.quaternion,shown);c.step(10);same(c.quaternion,shown);
  c.up(10,true);assert.equal(c.phase,'leveling');c.step(11);upright(c.quaternion);same(c.quaternion,target);same(c.anchor,anchor);assert.equal(c.returnDeadline,13);
- c.step(13.4);const automatic=c.quaternion.clone();c.down(13.4);same(c.quaternion,automatic);c.up(13.6,true);same(c.anchor,anchor);assert.equal(c.returnDeadline,15.6);
+ c.step(13.05);const automatic=c.quaternion.clone();c.down(13.05);same(c.quaternion,automatic);c.up(13.6,true);same(c.anchor,anchor);assert.equal(c.returnDeadline,15.6);
  const d=new SmartRotation(pose(),'free');d.down(0);d.drag(.8,.6,.1);d.drag(.4,.9,.2);d.up(.4);d.setMode('classic',1);d.step(1.4);
  const before=d.quaternion.clone();d.down(1.4);same(d.quaternion,before);d.drag(0,0,1.5);same(d.quaternion,before);
  d.drag(.03,.04,1.6);const moved=d.quaternion.clone();assert(moved.angleTo(before)>.01);d.up(1.8);assert.equal(d.phase,'leveling');same(d.quaternion,moved);
@@ -72,20 +72,20 @@ test('reduced motion performs only requested 150ms leveling; visibility and Free
  c.reset(211);upright(c.quaternion);same(c.quaternion,new SmartRotation(q).quaternion);assert(free.angleTo(c.quaternion)>.1);
 });
 
-test('genuine Free gestures remain anchor candidates through upright selection and leveling; mode choice alone never creates one',()=>{
- for(const degrees of [10,26]){
+test('Free gestures never move the front anchor through upright selection and leveling; only distance decides about return',()=>{
+ for(const degrees of [10,40]){
   const c=new SmartRotation(pose(),'free');c.down(0);c.drag(0,degrees*Math.PI/180,.2);c.up(.4);
   const chosen=c.quaternion.clone();c.setMode('smart',1);
-  if(degrees===10){same(c.anchor,chosen);assert.equal(c.phase,'idle');c.step(10);same(c.quaternion,chosen);}
-  else {same(c.anchor,pose());assert.equal(c.returnDeadline,3);c.step(4);same(c.quaternion,pose());}
+  same(c.anchor,pose());
+  if(degrees===10){assert.equal(c.phase,'idle');c.step(10);same(c.quaternion,chosen);}
+  else {assert.equal(c.returnDeadline,3);c.step(10);same(c.quaternion,pose());}
  }
  const c=new SmartRotation(pose(),'free');c.down(0);c.drag(.03,.08,.1);c.drag(-.03,.08,.2);c.up(.4);
- c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(2);same(c.anchor,c.quaternion);assert.equal(c.phase,'idle');
+ c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(2);same(c.anchor,pose());assert.equal(c.phase,'idle');
  const d=new SmartRotation(pose());d.down(0);d.drag(0,Math.PI/3,.2);d.up(.4);d.step(3);
- const automatic=d.quaternion.clone();assert(automatic.angleTo(d.anchor)<25*Math.PI/180);d.setMode('free',3);d.setMode('smart',3.1);
- same(d.quaternion,automatic);same(d.anchor,pose());assert.equal(d.returnDeadline,5.1);d.step(6.1);same(d.quaternion,pose());
+ const automatic=d.quaternion.clone();assert(automatic.angleTo(d.anchor)<35*Math.PI/180);d.setMode('free',3);d.setMode('smart',3.1);
+ same(d.quaternion,automatic);same(d.anchor,pose());assert.equal(d.phase,'idle');assert.equal(d.returnDeadline,null);
 });
-
 test('dragging either pitch boundary discards outward filtered momentum before a small reversal while preserving yaw',()=>{
  for(const hz of [30,60,144])for(const sign of [-1,1])for(const yaw of [0,.1]){
   const c=new SmartRotation(pose()),expected=new SmartRotation(pose(),'classic');c.down(0);expected.down(0);
@@ -99,14 +99,14 @@ test('dragging either pitch boundary discards outward filtered momentum before a
 });
 
 test('reduced Smart classifies genuine settled gestures and requested leveling while disabling only automatic motion',()=>{
- for(const degrees of [10,26])for(const bridge of [false,true]){
+ for(const degrees of [10,40])for(const bridge of [false,true]){
   const c=new SmartRotation(pose(),bridge?'free':'smart',true);c.down(0);c.drag(0,degrees*Math.PI/180,.2);
   if(bridge){c.drag(.03,0,.3);c.drag(0,.03,.4);c.drag(-.03,0,.5);c.drag(0,-.03,.6);}c.up(.8);
   if(bridge){c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(1.15);}
   const settled=c.quaternion.clone();assert.equal(c.phase,'idle');assert.equal(c.returnDeadline,null);
-  if(degrees===10)same(c.anchor,settled);else same(c.anchor,pose());
+  same(c.anchor,pose());
   c.step(20);same(c.quaternion,settled);c.setReducedMotion(false,21);
-  if(degrees===10){assert.equal(c.phase,'idle');same(c.anchor,settled);c.step(30);same(c.quaternion,settled);}
-  else {assert.equal(c.returnDeadline,23);c.step(24);same(c.quaternion,pose());}
+  if(degrees===10){assert.equal(c.phase,'idle');same(c.anchor,pose());c.step(30);same(c.quaternion,settled);}
+  else {assert.equal(c.returnDeadline,23);c.step(30);same(c.quaternion,pose());}
  }
 });
