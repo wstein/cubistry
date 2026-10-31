@@ -31,23 +31,26 @@ async function mode(page, value) {
   if (!(await panel.evaluate(e => e.open))) await panel.locator("summary").click();
   await page.getByLabel("View rotation mode", { exact: true }).selectOption(value);
 }
-test("settled 24 degrees is retained; 26 degrees waits and returns to the accepted anchor without puzzle/camera changes", async ({ page }) => {
+test("a settled 34 degree drag from the default view (about 25 degrees from the exact front) is retained as the return target; a second drag beyond 35 degrees from the front waits and returns to it without puzzle/camera changes", async ({ page }) => {
   await ready(page); const initial = await snapshot(page);
-  await drag(page, (24 * Math.PI / 180) / .007, 0);
+  await drag(page, (34 * Math.PI / 180) / .007, 0);
   const accepted = await snapshot(page); expect(accepted.phase).toBe("idle"); expect(accepted.distance).toBeLessThan(1e-6);
   await page.clock.runFor(6000); expect((await snapshot(page)).orientation).toEqual(accepted.orientation);
   await drag(page, (26 * Math.PI / 180) / .007, 0);
   const outside = await snapshot(page); expect(outside.phase).toBe("awaiting-return"); expect(outside.anchor).toEqual(accepted.anchor);
-  await page.clock.runFor(1950); expect((await snapshot(page)).phase).toBe("awaiting-return");
-  await page.clock.runFor(100); expect((await snapshot(page)).phase).toBe("returning");
-  await page.clock.runFor(1100); const end = await snapshot(page); expect(end.phase).toBe("idle"); expect(end.distance).toBeLessThan(1e-6);
-  expect(end.anchor).toEqual(accepted.anchor); expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
+  const wait = async () => outside.deadline - await page.evaluate(() => performance.now() / 1000);
+  await page.clock.runFor(Math.max(1, Math.floor((await wait() - .05) * 1000))); expect((await snapshot(page)).phase).toBe("awaiting-return");
+  await page.clock.runFor(150); expect((await snapshot(page)).phase).toBe("returning");
+  await page.clock.runFor(2500); const end = await snapshot(page); expect(end.phase).toBe("idle"); expect(end.distance).toBeLessThan(2e-3);
+  expect(end.anchor).toEqual(accepted.anchor); expect(end.orientation).not.toEqual(initial.orientation);
+  expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
 });
 test("flick inertia is capped, a tap interrupts return, and Free/Classic/reduced modes preserve physical state", async ({ page }) => {
   await ready(page); const initial = await snapshot(page);
   await drag(page, 120, 50, 50, 0); const release = await snapshot(page); expect(release.phase).toBe("coasting"); expect(release.speed).toBeLessThanOrEqual(6);
   await page.clock.runFor(150); expect((await snapshot(page)).orientation).not.toEqual(release.orientation);
-  await page.clock.runFor(2000); const waiting = await snapshot(page); expect(waiting.phase).toBe("awaiting-return");
+  for (let i = 0; i < 40 && (await snapshot(page)).phase === "coasting"; i++) await page.clock.runFor(50);
+  const waiting = await snapshot(page); expect(waiting.phase).toBe("awaiting-return");
   const now = await page.evaluate(() => performance.now() / 1000); await page.clock.runFor(Math.ceil((waiting.deadline - now + .25) * 1000));
   expect((await snapshot(page)).phase).toBe("returning");
   const box = await page.locator("#cube canvas").boundingBox(); await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down();

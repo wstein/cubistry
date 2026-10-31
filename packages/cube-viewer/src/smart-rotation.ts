@@ -4,8 +4,14 @@ import { Quaternion, Vector3 } from "three";
  * See the adjacent CUBE_ASSEMBLER_LICENSE.txt file. All time units here are seconds. */
 export const ROTATION_TUNING = Object.freeze({
   dampingSeconds: .24, stopSpeed: .03, maximumSpeed: 6, velocityFilterSeconds: .04,
-  staleReleaseSeconds: .1, toleranceRadians: 25 * Math.PI / 180,
-  idleSeconds: 2, returnSeconds: 1, pitchLimit: Math.PI / 2 - .05,
+  staleReleaseSeconds: .1, toleranceRadians: 35 * Math.PI / 180,
+  // Return to the remembered target (default view, then the last accepted view): wait returnDelay(distance) after settling (long near the
+  // tolerance, short when stretched far), then a soft-start critically damped
+  // response (rate in 1/s): offset x(t) = x0 e^(-rt) (1 + rt + (rt)^2/2) has zero speed
+  // and acceleration at the start, speed proportional to distance, no fixed duration.
+  // The return ends when the remaining pitch/yaw offset is below returnEpsilon (rad).
+  idleNearSeconds: .6, idleFarSeconds: .1, idleFarRadians: 120 * Math.PI / 180,
+  returnRate: 9, returnEpsilon: 1e-3, pitchLimit: Math.PI / 2 - .05,
   levelingSeconds: 1, reducedLevelingSeconds: .15,
 });
 export type RotationMode = "smart" | "free" | "classic";
@@ -13,11 +19,18 @@ export type RotationPhase = "idle" | "dragging" | "coasting" | "awaiting-return"
 export const rotationModes: readonly RotationMode[] = ["smart", "free", "classic"];
 const wrap = (angle: number) => Math.atan2(Math.sin(angle), Math.cos(angle));
 const smooth = (t: number) => t * t * t * (10 + t * (-15 + 6 * t));
+/** Seconds to wait after settling at `distance` radians from the front view. */
+export function returnDelay(distance: number): number {
+  const { toleranceRadians: near, idleFarRadians: far, idleNearSeconds, idleFarSeconds } = ROTATION_TUNING;
+  const f = Math.max(0, Math.min(1, (distance - near) / (far - near)));
+  return idleNearSeconds + (idleFarSeconds - idleNearSeconds) * f * f * (3 - 2 * f);
+}
 /** Presentation only: no renderer, puzzle state, camera, scheduler or DOM ownership. */
 export class SmartRotation {
   readonly quaternion: Quaternion;
   readonly anchor: Quaternion;
   private readonly initial: Quaternion;
+  private readonly frontView = new Quaternion();
   private readonly velocity = new Vector3();
   private readonly delta = new Quaternion();
   private readonly axis = new Vector3();
@@ -28,10 +41,12 @@ export class SmartRotation {
   private readonly levelTarget = new Quaternion();
   private pitch = 0;
   private yaw = 0;
+  private anchorCandidate = false;
   private anchorPitch = 0;
   private anchorYaw = 0;
   private returnPitch = 0;
   private returnYaw = 0;
+  private returnYawTarget = 0;
   private levelingRequested = false;
   private levelAt = 0;
   private levelDuration = 1;
@@ -44,7 +59,6 @@ export class SmartRotation {
   private lastSample = 0;
   private lastMotion: number | null = null;
   private returnAt: number | null = null;
-  private anchorCandidate = false;
   constructor(initial: Quaternion, mode: RotationMode = "smart", reducedMotion = false) {
     if (![initial.x, initial.y, initial.z, initial.w].every(Number.isFinite) || initial.lengthSq() < 1e-12 || !rotationModes.includes(mode))
       throw Error("Invalid presentation orientation or mode");
@@ -55,6 +69,8 @@ export class SmartRotation {
     if (mode !== "free") this.quaternion.copy(this.initial);
     this.residual.identity(); this.modeValue = mode; this.reduced = reducedMotion;
   }
+  /** The exact frontal view: the observer sits on +Z, so identity shows the front head-on. The tolerance is measured from here, never from the (slightly rotated) default view. */
+  get front(): Quaternion { return this.frontView; }
   get phase(): RotationPhase { return this.phaseValue; }
   get mode(): RotationMode { return this.modeValue; }
   get reducedMotion(): boolean { return this.reduced; }
@@ -113,13 +129,18 @@ export class SmartRotation {
     }
     this.levelingRequested = false;
     if (this.modeValue !== "smart") return;
-    const distance = this.quaternion.angleTo(this.anchor);
+    // The tolerance is always measured from the exact front view (identity), not the
+    // default view. The return target starts as the default view. A genuine user rotation
+    // settled within it becomes the new return target; beyond it the view returns to
+    // the last such target. Automatic poses, taps and settings never become targets,
+    // and a target never lies farther than the tolerance from the front.
+    const distance = this.quaternion.angleTo(this.frontView);
     if (this.anchorCandidate && distance <= ROTATION_TUNING.toleranceRadians + 1e-12) {
       this.anchor.copy(this.quaternion); this.anchorPitch = this.pitch; this.anchorYaw = this.yaw;
+    } else if (!this.reduced && this.quaternion.angleTo(this.anchor) > 1e-7) {
+      // Beyond the tolerance, or an automatic/interrupted pose: back to the last target.
+      this.phaseValue = "awaiting-return"; this.returnAt = at + returnDelay(distance);
     }
-    else if (!this.reduced && distance > 1e-7) { this.phaseValue = "awaiting-return"; this.returnAt = at + ROTATION_TUNING.idleSeconds; }
-    // Only an actual user rotation can propose a new anchor. Automatic
-    // interpolation, taps, settings and visibility changes cannot walk it.
     this.anchorCandidate = false;
   }
   /** Freeze the last displayed quaternion immediately, including a below-threshold click. */
@@ -199,16 +220,23 @@ export class SmartRotation {
       this.settle(this.levelAt + this.levelDuration);
     }
     if (this.phaseValue === "awaiting-return" && this.returnAt !== null && at >= this.returnAt) {
-      this.returnPitch = this.pitch; this.returnYaw = this.yaw;
+      // Offsets from the target view; yaw takes the shortest way round.
+      this.returnYawTarget = this.yaw + wrap(this.anchorYaw - this.yaw);
+      this.returnPitch = this.pitch - this.anchorPitch; this.returnYaw = this.yaw - this.returnYawTarget;
       this.phaseValue = "returning";
     }
     if (this.phaseValue === "returning" && this.returnAt !== null) {
-      const fraction = Math.max(0, Math.min(1, (at - this.returnAt) / ROTATION_TUNING.returnSeconds));
-      const eased = smooth(fraction);
-      this.pitch = this.returnPitch + (this.anchorPitch - this.returnPitch) * eased;
-      this.yaw = this.returnYaw + wrap(this.anchorYaw - this.returnYaw) * eased;
+      // Analytic soft-start critically damped return: x(t) = x0 e^(-rt) (1 + rt + (rt)^2/2).
+      // It is frame-rate independent and never overshoots the target view.
+      const r = ROTATION_TUNING.returnRate, t = Math.max(0, at - this.returnAt);
+      const remaining = Math.exp(-r * t) * (1 + r * t + (r * t) ** 2 / 2);
+      this.pitch = this.anchorPitch + this.returnPitch * remaining;
+      this.yaw = this.returnYawTarget + this.returnYaw * remaining;
       this.composeUpright(); this.quaternion.copy(this.upright);
-      if (fraction === 1) { this.quaternion.copy(this.anchor); this.phaseValue = "idle"; this.returnAt = null; }
+      if (Math.hypot(this.returnPitch, this.returnYaw) * remaining <= ROTATION_TUNING.returnEpsilon) {
+        this.pitch = this.anchorPitch; this.yaw = this.returnYawTarget; this.composeUpright();
+        this.quaternion.copy(this.anchor); this.phaseValue = "idle"; this.returnAt = null;
+      }
     }
   }
   /** Explicit zoom/settings interaction stops automatic motion without changing orientation. */
