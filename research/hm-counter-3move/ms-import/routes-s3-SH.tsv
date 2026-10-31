@@ -1,0 +1,182 @@
+mode	M	59	-	0	60	60
+step	0	1	R' B' R
+step	1	2	R' B' R
+step	2	3	R' B2
+step	3	4	R' B' R
+step	4	5	R B R2
+step	5	6	R' B' R'
+step	6	7	R B' R
+step	7	8	R' B R
+step	8	9	U R' U'
+step	9	10	B2 L2 D
+step	10	11	R' B2 R'
+step	11	12	U2 B2 R2
+step	12	13	R' B2 R
+step	13	14	B R
+step	14	15	R' F2 L F2
+step	15	16	R' B2 R
+step	16	17	R' B' R
+step	17	18	R' B2 R
+step	18	19	U R U'
+step	19	20	D B2 D2
+step	20	21	R' B' R
+step	21	22	R' B' R
+step	22	23	R' B2
+step	23	24	R' B' R
+step	24	25	R B R2
+step	25	26	R' B' R'
+step	26	27	R B' R
+step	27	28	R' B R
+step	28	29	U R' U'
+step	29	30	B2 L2 D
+step	30	31	R' B2 R'
+step	31	32	U2 B2 R2
+step	32	33	R' B2 R
+step	33	34	B R
+step	34	35	R' B2 R
+step	35	36	F2 L' F2 R
+step	36	37	R' B' R
+step	37	38	R' B2 R
+step	38	39	U R U'
+step	39	40	D B2 D2
+step	40	41	R' B' R
+step	41	42	R' B' R
+step	42	43	R' B2
+step	43	44	R' B' R
+step	44	45	R B R2
+step	45	46	R' B' R'
+step	46	47	R B' R
+step	47	48	R' B R
+step	48	49	U R' U'
+step	49	50	B2 L2 D
+step	50	51	R' B2 R'
+step	51	52	U2 B2 R2
+step	52	53	R' B2 R
+step	53	54	B R
+step	54	55	R' B2 R
+step	55	56	F2 L' F2 R
+step	56	57	R' B' R
+step	57	58	R' B2 R
+step	58	59	U R U'
+step	59	0	D B2 D2
+mode	H	59	F2 L U' B2 D R2 U R' B2	0	120	120
+step	0	1	B' R' B2
+step	1	2	R B'
+step	2	3	R2 B' R'
+step	3	4	B R2
+step	4	5	R B' R
+step	5	6	R2 U' R2
+step	6	7	B2 R'
+step	7	8	R' B R
+step	8	9	U R2 U'
+step	9	10	R' B D2
+step	10	11	R' B2 R
+step	11	12	R2 B2
+step	12	13	U' R2 U'
+step	13	14	R' B R'
+step	14	15	R2
+step	15	16	R' B R
+step	16	17	B2 R' U
+step	17	18	U' B R
+step	18	19	U R U'
+step	19	20	B2 D2 B'
+step	20	21	U R U'
+step	21	22	R B2
+step	22	23	R' B' R
+step	23	24	R' B' R
+step	24	25	R B' R
+step	25	26	R2 B' R'
+step	26	27	R' B R
+step	27	28	B2 R
+step	28	29	R' B2 R
+step	29	30	L2 D B2
+step	30	31	R' B2 R'
+step	31	32	R2 B2
+step	32	33	U R2 U'
+step	33	34	R' B R'
+step	34	35	R2
+step	35	36	R' B R
+step	36	37	B2 R' U
+step	37	38	B R
+step	38	39	U R U'
+step	39	40	R' D R'
+step	40	41	B' R'
+step	41	42	B2 R B'
+step	42	43	R2 B' R'
+step	43	44	B R2
+step	44	45	R B' R
+step	45	46	R2 U' R2
+step	46	47	B2 R'
+step	47	48	R' B R
+step	48	49	U R2 U'
+step	49	50	R' B D2
+step	50	51	R' B2 R
+step	51	52	R2 B2
+step	52	53	U' R2 U'
+step	53	54	R' B R'
+step	54	55	R2
+step	55	56	R' B R
+step	56	57	B2 R' U
+step	57	58	U' B R
+step	58	59	U R U'
+step	59	0	B2 D2 B'
+step	0	1	U R U'
+step	1	2	R B2
+step	2	3	R' B' R
+step	3	4	R' B' R
+step	4	5	R B' R
+step	5	6	R2 B' R'
+step	6	7	R' B R
+step	7	8	B2 R
+step	8	9	R' B2 R
+step	9	10	L2 D B2
+step	10	11	R' B2 R'
+step	11	12	R2 B2
+step	12	13	U R2 U'
+step	13	14	R' B R'
+step	14	15	R2
+step	15	16	R' B R
+step	16	17	B2 R' U
+step	17	18	B R
+step	18	19	U R U'
+step	19	20	R' D R'
+step	20	21	B' R'
+step	21	22	B2 R B'
+step	22	23	R2 B' R'
+step	23	24	B R2
+step	24	25	R B' R
+step	25	26	R2 U' R2
+step	26	27	B2 R'
+step	27	28	R' B R
+step	28	29	U R2 U'
+step	29	30	R' B D2
+step	30	31	R' B2 R
+step	31	32	R2 B2
+step	32	33	U' R2 U'
+step	33	34	R' B R'
+step	34	35	R2
+step	35	36	R' B R
+step	36	37	B2 R' U
+step	37	38	U' B R
+step	38	39	U R U'
+step	39	40	B2 D2 B'
+step	40	41	U R U'
+step	41	42	R B2
+step	42	43	R' B' R
+step	43	44	R' B' R
+step	44	45	R B' R
+step	45	46	R2 B' R'
+step	46	47	R' B R
+step	47	48	B2 R
+step	48	49	R' B2 R
+step	49	50	L2 D B2
+step	50	51	R' B2 R'
+step	51	52	R2 B2
+step	52	53	U R2 U'
+step	53	54	R' B R'
+step	54	55	R2
+step	55	56	R' B R
+step	56	57	B2 R' U
+step	57	58	B R
+step	58	59	U R U'
+step	59	0	R' D R'
