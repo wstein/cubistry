@@ -20,6 +20,9 @@ struct Reject <: Exception
     reason::String
 end
 need(ok, why) = ok || throw(Reject(why))
+# numeric fields: at most six decimal digits (same rule and wording as the Flix checker)
+natural(s) = (need(occursin(r"^[0-9]{1,6}$", s), "integer field"); parse(Int, s))
+signedint(s) = startswith(s, "-") ? -natural(s[2:end]) : natural(s)
 
 const V = NTuple{3,Int}
 dotv(a, b) = a[1] * b[1] + a[2] * b[2] + a[3] * b[3]
@@ -87,16 +90,15 @@ function readprint(rows)
     need(length(rows) == 24, "exactly 24 sticker rows")
     st = Stk[]
     ivec(s) = (f = split(s, ','); need(length(f) == 3, "vector arity");
-               Tuple(map(x -> (need(occursin(r"^-?[0-9]+$", x), "integer"); parse(Int, x)), f)))
+               Tuple(map(signedint, f)))
     for r in rows
         f = split(r, '\t')
         need(length(f) == 7 && f[1] == "sticker", "sticker row shape")
-        need(occursin(r"^[0-9]+$", f[2]) && occursin(r"^[0-9]+$", f[3]), "integer ids")
         p, n, u = ivec(f[4]), ivec(f[5]), ivec(f[6])
         need(all(c -> c in (-1, 1), p), "corner position")
         need(n in UNITS && u in UNITS && dotv(p, n) == 1 && dotv(n, u) == 0, "outward tangent frame")
-        need(length(f[7]) == 1 && f[7][1] in "MSH0123456789_", "glyph alphabet (H allowed as an inert printed glyph)")
-        push!(st, Stk(parse(Int, f[2]), parse(Int, f[3]), p, n, u, f[7][1]))
+        need(length(f[7]) == 1 && f[7][1] in "MSH0123456789_", "glyph alphabet")
+        push!(st, Stk(natural(f[2]), natural(f[3]), p, n, u, f[7][1]))
     end
     need(sort([x.id for x in st]) == collect(0:23), "unique sticker ids 0..23")
     lattice = Set((x.p, x.n) for x in st)
@@ -236,9 +238,8 @@ function validate(path)
             need(length(f) == 7 && f[1] == "edge" && f[2] == string(letter) && f[3] == string(i) &&
                  f[4] == string(v) && f[5] == string(nv), "edge row $letter $i")
             w = parseword(f[6])
-            need(occursin(r"^[0-9]+$", f[7]), "integer lower bound")
             lb = lowerbound(g, state, wanted(letter, nv, blank))
-            need(parse(Int, f[7]) == lb, "claimed lower bound differs for $letter edge $i ($v->$nv)")
+            need(natural(f[7]) == lb, "claimed lower bound differs for $letter edge $i ($v->$nv)")
             need(length(w) >= lb, "word shorter than graph distance for $letter edge $i ($v->$nv)")
             nxt = doword(state, w)
             checkshow(nxt, wanted(letter, nv, blank), "$letter edge $i ($v->$nv)")
@@ -265,7 +266,7 @@ function validate(path)
     end
     f = split(rows[r], '\t'); r += 1
     need(length(f) == 3 && f[1] == "claim" && f[2] == "maxEdgeHTM", "claim row")
-    need(parse(Int, f[3]) == maximum(alllens), "claimed maximum edge HTM differs from replay")
+    need(natural(f[3]) == maximum(alllens), "claimed maximum edge HTM differs from replay")
     need(rows[r] == "end" && r == length(rows), "end row")
     push!(out, "transitions\t$(length(alllens))\ttotal\t$(sum(alllens))\tmax\t$(maximum(alllens))\thist\t$(histtext(alllens))")
     push!(out, "verdict\tACCEPT")
