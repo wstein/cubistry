@@ -1,0 +1,37 @@
+year	month	htm	obtm	qtm	rotations	method
+2026	2	123	150	148	1	global l=12.0 w=40 mp=1
+2026	3	19	23	22	0	global l=12.0 w=40 mp=1
+2026	4	149	153	180	2	hybrid l=12.0 w=40 mp=1
+2026	5	121	149	149	2	global l=12.0 w=40 mp=1
+2026	6	132	138	157	1	global l=12.0 w=40 mp=1
+2026	7	127	134	157	1	global l=12.0 w=40 mp=1
+2026	8	120	152	153	2	hybrid l=12.0 w=40 mp=1
+2026	9	128	139	155	1	hybrid l=12.0 w=40 mp=1
+2026	10	118	119	141	1	global l=12.0 w=40 mp=1
+2026	11	151	158	186	2	hybrid l=12.0 w=40 mp=1
+2026	12	124	122	139	2	global l=12.0 w=40 mp=1
+2027	1	110	126	147	1	global l=12.0 w=40 mp=1
+2027	2	153	163	190	2	hybrid l=12.0 w=40 mp=1
+2027	3	38	42	44	0	hybrid l=12.0 w=40 mp=1
+2027	4	147	166	175	1	hybrid l=12.0 w=40 mp=1
+2027	5	164	197	192	2	hybrid l=12.0 w=40 mp=1
+2027	6	158	157	184	1	hybrid l=12.0 w=40 mp=1
+2027	7	126	142	152	1	global l=12.0 w=40 mp=1
+2027	8	144	133	170	1	hybrid l=12.0 w=40 mp=1
+2027	9	138	144	161	2	global l=12.0 w=40 mp=1
+2027	10	155	157	187	2	hybrid l=8.0 w=30 mp=1
+2027	11	160	174	191	2	hybrid l=12.0 w=40 mp=1
+2027	12	128	134	148	1	global l=12.0 w=40 mp=1
+2028	1	115	134	139	2	global l=12.0 w=40 mp=1
+2028	2	125	144	157	1	hybrid l=12.0 w=40 mp=1
+2028	3	102	113	110	2	global l=12.0 w=40 mp=1
+2028	4	123	130	163	2	global l=12.0 w=40 mp=1
+2028	5	150	158	164	2	hybrid l=12.0 w=40 mp=1
+2028	6	141	163	169	2	hybrid l=12.0 w=40 mp=1
+2028	7	139	144	162	1	hybrid l=12.0 w=40 mp=1
+2028	8	135	146	156	2	hybrid l=12.0 w=40 mp=1
+2028	9	163	165	194	1	hybrid l=12.0 w=40 mp=1
+2028	10	133	138	151	1	global l=12.0 w=40 mp=1
+2028	11	98	121	115	2	hybrid l=12.0 w=40 mp=1
+2028	12	139	153	151	2	hybrid l=12.0 w=40 mp=1
+#edges=35 htm mean=128.5 median=132 max=164 total=4496 | obtm mean=139.5 median=144 max=197 total=4881
