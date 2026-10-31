@@ -9,5 +9,7 @@ negative	lowerbound	julia	REJECTED	claimed lower bound differs for H 7->8
 negative	lowerbound	flix	REJECTED	claimed lower bound differs for H 7->8
 negative	claim	julia	REJECTED	claimed maximum edge HTM differs from replay
 negative	claim	flix	REJECTED	claimed maximum edge HTM differs from replay
+negative	claim-up	julia	REJECTED	claimed maximum edge HTM differs from replay
+negative	claim-up	flix	REJECTED	claimed maximum edge HTM differs from replay
 negative	truncated	julia	REJECTED	word shorter than graph distance for M 59->0
 negative	truncated	flix	REJECTED	word shorter than graph distance for M 59->0
