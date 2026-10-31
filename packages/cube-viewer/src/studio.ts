@@ -1,11 +1,12 @@
 import * as THREE from "three";
-import { addPresentationLighting, PRESENTATION_PRESET } from "./presentation-preset.ts";
+import { addPresentationLighting, PRESENTATION_PRESET, shadowRadiusTexels } from "./presentation-preset.ts";
 
 export const STUDIO_BACKGROUND =
   "radial-gradient(ellipse at 48% 28%, #fffdf7 0%, transparent 65%), " +
   "linear-gradient(180deg, #e9e0d2 0%, #f6f0e5 48%, #d8cabb 100%)";
 
-/** One receiving surface and one shadow-casting key per viewport, never per cube.
+/** One receiving surface and exactly two shadow casters (key and softer shadow fill)
+ * per viewport, never per cube.
  * Only the upper floor face renders, so below-floor orbits can inspect bottoms. */
 export function createPresentationStudio(
   scene: THREE.Scene | THREE.Group,
@@ -35,7 +36,12 @@ export function createPresentationStudio(
   }
   // Reused Clock-only fitting scratch. Single-cube callers retain the original rig.
   const lightCenter = new THREE.Vector3();
-  const direction = lights.key.position.clone().normalize();
+  const casters = [
+    { light: lights.key, softness: PRESENTATION_PRESET.shadowSoftness, max: PRESENTATION_PRESET.shadowRadiusMax, direction: lights.key.position.clone().normalize() },
+    { light: lights.shadowFill,
+      softness: PRESENTATION_PRESET.shadowFillSoftness, max: PRESENTATION_PRESET.shadowFillRadiusMax,
+      direction: lights.shadowFill.position.clone().normalize() },
+  ];
   return {
     floor,
     /** Fit one conservative caster union after its final rigid pose/scale.
@@ -44,37 +50,40 @@ export function createPresentationStudio(
     fitCasters(centers: readonly THREE.Vector3[], radius: number, clearance: number) {
       if (!centers.length || !Number.isFinite(radius) || radius <= 0 ||
           !Number.isFinite(clearance) || clearance < 0) throw Error("Invalid studio caster bounds");
-      const key = lights.key, camera = key.shadow.camera;
       let floorY = Infinity;
       for (const center of centers) floorY = Math.min(floorY, center.y - radius - clearance);
       floor.position.y = floorY;
-      // Preserve the existing illumination direction; only shadow projection changes.
-      key.position.copy(direction).multiplyScalar(20);
-      key.updateMatrixWorld();
-      camera.position.copy(key.position);
-      camera.lookAt(0, 0, 0);
-      camera.updateMatrixWorld();
-      let left = Infinity, right = -Infinity, bottom = Infinity, top = -Infinity;
-      let near = Infinity, far = -Infinity;
-      for (const center of centers) {
-        lightCenter.copy(center).applyMatrix4(camera.matrixWorldInverse);
-        left = Math.min(left, lightCenter.x - radius); right = Math.max(right, lightCenter.x + radius);
-        bottom = Math.min(bottom, lightCenter.y - radius); top = Math.max(top, lightCenter.y + radius);
-        near = Math.min(near, -lightCenter.z - radius);
-        // The furthest ground intersection comes from the upper support point.
-        far = Math.max(far, -lightCenter.z + radius + (center.y + radius - floorY) / direction.y);
+      for (const { light, softness, max, direction } of casters) {
+        const camera = light.shadow.camera;
+        // Preserve the existing illumination direction; only shadow projection changes.
+        light.position.copy(direction).multiplyScalar(20);
+        light.updateMatrixWorld();
+        camera.position.copy(light.position);
+        camera.lookAt(0, 0, 0);
+        camera.updateMatrixWorld();
+        let left = Infinity, right = -Infinity, bottom = Infinity, top = -Infinity;
+        let near = Infinity, far = -Infinity;
+        for (const center of centers) {
+          lightCenter.copy(center).applyMatrix4(camera.matrixWorldInverse);
+          left = Math.min(left, lightCenter.x - radius); right = Math.max(right, lightCenter.x + radius);
+          bottom = Math.min(bottom, lightCenter.y - radius); top = Math.max(top, lightCenter.y + radius);
+          near = Math.min(near, -lightCenter.z - radius);
+          // The furthest ground intersection comes from the upper support point.
+          far = Math.max(far, -lightCenter.z + radius + (center.y + radius - floorY) / direction.y);
+        }
+        // Square coverage keeps isotropic PCF softness. Padding exceeds each
+        // light's cube-scaled filter footprint (wider for the softer fill), so
+        // edge casters retain their penumbra.
+        const padding = radius * Math.max(.12, 1.25 * softness / Math.sqrt(3));
+        const half = Math.max(right - left, top - bottom) / 2 + padding;
+        const cx = (left + right) / 2, cy = (bottom + top) / 2;
+        camera.left = cx - half; camera.right = cx + half;
+        camera.bottom = cy - half; camera.top = cy + half;
+        camera.near = Math.max(.01, near - padding); camera.far = far + padding;
+        camera.updateProjectionMatrix();
+        light.shadow.radius = shadowRadiusTexels(softness * (radius / Math.sqrt(3)),
+          Math.max(camera.right - camera.left, camera.top - camera.bottom), max);
       }
-      // Square coverage keeps isotropic PCF softness. Padding exceeds its
-      // cube-scaled filter footprint, so edge casters retain their penumbra.
-      const padding = .12 * radius, half = Math.max(right - left, top - bottom) / 2 + padding;
-      const cx = (left + right) / 2, cy = (bottom + top) / 2;
-      camera.left = cx - half; camera.right = cx + half;
-      camera.bottom = cy - half; camera.top = cy + half;
-      camera.near = Math.max(.01, near - padding); camera.far = far + padding;
-      camera.updateProjectionMatrix();
-      key.shadow.radius = Math.max(2, Math.min(24,
-        PRESENTATION_PRESET.shadowSoftness * (radius / Math.sqrt(3)) * PRESENTATION_PRESET.shadowMapSize /
-        Math.max(camera.right - camera.left, camera.top - camera.bottom)));
     },
     dispose() {
       floor.removeFromParent(); floor.geometry.dispose(); floor.material.dispose();

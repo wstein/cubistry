@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
 /** Bounded presentation quality, shared by every current 2×2/3×3 consumer.
- * Shared cube geometry and one bounded shadow map per scene. */
+ * Shared cube geometry and two bounded shadow maps per scene (key and shadow fill). */
 export const PRESENTATION_PRESET = Object.freeze({
   version: 1,
   cubiePitch: 1,
@@ -24,6 +24,16 @@ export const PRESENTATION_PRESET = Object.freeze({
   keyIntensity: 2.8,
   fillIntensity: 0.85,
   rimIntensity: 1.3,
+  /** Second, weaker, softer shadow caster opposite the key (no per-cube maps). */
+  shadowFillIntensity: 1.0,
+  shadowFillPosition: Object.freeze([-3.5, 6, 4] as const),
+  /** World-space penumbra per half-cube extent; larger than shadowSoftness. */
+  shadowFillSoftness: 0.18,
+  /** PCF radius caps in texels: the fill may blur wider than the key. */
+  shadowRadiusMax: 24,
+  shadowFillRadiusMax: 32,
+  /** Darkness weight of the shadow fill's shadow (LightShadow.intensity). */
+  shadowFillShadowIntensity: 0.55,
 });
 
 export function createPresentationGeometry() {
@@ -74,41 +84,49 @@ export function configurePresentationRenderer(renderer: THREE.WebGLRenderer): vo
   // PCF honors the key radius; PCFSoft ignores that setting.
   renderer.shadowMap.type = THREE.PCFShadowMap;
 }
-/** Called once by the owner of a scene, including a shared multi-cube viewport. */
+/** Radius in shadow-map texels giving a world-space penumbra of `softness`. */
+export function shadowRadiusTexels(softness: number, frustumWidth: number,
+  max: number = PRESENTATION_PRESET.shadowRadiusMax): number {
+  return Math.max(2, Math.min(max, softness * PRESENTATION_PRESET.shadowMapSize / frustumWidth));
+}
+function configureShadowCaster(light: THREE.DirectionalLight, shadowExtent: number, softness: number,
+  maxRadius: number = PRESENTATION_PRESET.shadowRadiusMax) {
+  const p = PRESENTATION_PRESET;
+  light.castShadow = true;
+  light.shadow.mapSize.set(p.shadowMapSize, p.shadowMapSize);
+  Object.assign(light.shadow.camera, {
+    left: -shadowExtent, right: shadowExtent, top: shadowExtent, bottom: -shadowExtent,
+    near: 0.1, far: 40,
+  });
+  light.shadow.camera.updateProjectionMatrix();
+  light.shadow.bias = -0.0002;
+  light.shadow.normalBias = 0.01;
+  // Fixed 17-tap PCF work, broader world-space penumbra. Convert to
+  // texels so the single-cube and three-cube rigs have equal softness.
+  light.shadow.radius = shadowRadiusTexels(softness, 2 * shadowExtent, maxRadius);
+}
+/** Called once by the owner of a scene, including a shared multi-cube viewport.
+ * Exactly two lights cast shadows: the key and the softer shadow fill. */
 export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadowExtent = 4, softness: number = PRESENTATION_PRESET.shadowSoftness) {
   const p = PRESENTATION_PRESET;
   const lights: THREE.Light[] = [];
-  let key!: THREE.DirectionalLight;
-  const ambient = new THREE.AmbientLight(0xffffff, p.ambientIntensity);
-  scene.add(ambient); lights.push(ambient);
-  const hemisphere = new THREE.HemisphereLight(0xffffff, 0x77808d, p.hemisphereIntensity);
-  scene.add(hemisphere); lights.push(hemisphere);
-  for (const [position, intensity] of [
-    [[3, 5, 6], p.keyIntensity],
-    [[-4, 1, 2], p.fillIntensity],
-    [[1, 3, -4], p.rimIntensity],
-  ] as const) {
+  const add = <T extends THREE.Light>(light: T): T => { scene.add(light); lights.push(light); return light; };
+  add(new THREE.AmbientLight(0xffffff, p.ambientIntensity));
+  add(new THREE.HemisphereLight(0xffffff, 0x77808d, p.hemisphereIntensity));
+  const directional = (position: readonly [number, number, number], intensity: number) => {
     const light = new THREE.DirectionalLight(0xffffff, intensity);
     light.position.set(position[0], position[1], position[2]);
-    if (intensity === p.keyIntensity) {
-      key = light;
-      light.castShadow = true;
-      light.shadow.mapSize.set(p.shadowMapSize, p.shadowMapSize);
-      Object.assign(light.shadow.camera, {
-        left: -shadowExtent, right: shadowExtent, top: shadowExtent, bottom: -shadowExtent,
-        near: 0.1, far: 40,
-      });
-      light.shadow.camera.updateProjectionMatrix();
-      light.shadow.bias = -0.0002;
-      light.shadow.normalBias = 0.01;
-      // Fixed 17-tap PCF work, broader world-space penumbra. Convert to
-      // texels so the single-cube and three-cube rigs have equal softness.
-      light.shadow.radius = Math.max(2, Math.min(24,
-        softness * p.shadowMapSize / (2 * shadowExtent)));
-    }
-    scene.add(light); lights.push(light);
-  }
-  return { key, dispose() {
+    return add(light);
+  };
+  const key = directional([3, 5, 6], p.keyIntensity);
+  configureShadowCaster(key, shadowExtent, softness);
+  directional([-4, 1, 2], p.fillIntensity);
+  directional([1, 3, -4], p.rimIntensity);
+  const shadowFill = directional(p.shadowFillPosition, p.shadowFillIntensity);
+  configureShadowCaster(shadowFill, shadowExtent, softness * p.shadowFillSoftness / p.shadowSoftness,
+    p.shadowFillRadiusMax);
+  shadowFill.shadow.intensity = p.shadowFillShadowIntensity;
+  return { key, shadowFill, dispose() {
     for (const light of lights) {
       light.removeFromParent();
       if (light instanceof THREE.DirectionalLight) light.shadow.map?.dispose();

@@ -65,11 +65,11 @@ test("materials retain supplied artwork/color/roughness with bounded nonmetallic
 test("scene owner installs one bounded lighting rig and renderer caps high DPI", () => {
   const scene = new THREE.Scene();
   addPresentationLighting(scene);
-  assert.equal(scene.children.length, 5);
-  assert.equal(scene.children.filter(o => o.isDirectionalLight).length, 3);
-  assert.equal(scene.children.filter(o => o.castShadow).length, 1);
-  const key = scene.children.find(o => o.castShadow);
-  assert.deepEqual(key.shadow.mapSize.toArray(), [1024, 1024]);
+  assert.equal(scene.children.length, 6, "ambient, hemisphere, key, fill, rim, shadow fill");
+  assert.equal(scene.children.filter(o => o.isDirectionalLight).length, 4);
+  assert.equal(scene.children.filter(o => o.castShadow).length, 2);
+  for (const caster of scene.children.filter(o => o.castShadow))
+    assert.deepEqual(caster.shadow.mapSize.toArray(), [1024, 1024]);
   for (const [input, expected] of [[1, 1], [1.5, 1.5], [3, 2], [NaN, 1], [0, 1]])
     assert.equal(presentationPixelRatio(input), expected);
   const previous = Object.getOwnPropertyDescriptor(globalThis, "devicePixelRatio");
@@ -85,4 +85,11 @@ test("scene owner installs one bounded lighting rig and renderer caps high DPI",
     if (previous) Object.defineProperty(globalThis, "devicePixelRatio", previous);
     else delete globalThis.devicePixelRatio;
   }
+});
+
+test("retuned preset values are the named, reviewable constants", () => {
+  const p = preset;
+  assert.deepEqual([p.ambientIntensity, p.hemisphereIntensity, p.keyIntensity, p.fillIntensity, p.rimIntensity],
+    [.3, .65, 2.8, .85, 1.3]);
+  assert.deepEqual([p.shadowOpacity, p.shadowSoftness, p.shadowMapSize], [.38, .14, 1024]);
 });
