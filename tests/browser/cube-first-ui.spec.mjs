@@ -304,7 +304,10 @@ for (const width of [1440, 768, 390, 320])
     await expect(
       page.getByRole("button", { name: "Reset session moves" }),
     ).toBeVisible();
-    await expect(page.locator("details,#application-status")).toHaveCount(0);
+    // No collapsible help or status blocks; the shared Appearance panel is a <details> by design.
+    await expect(
+      page.locator("details:not(.cube-appearance),#application-status"),
+    ).toHaveCount(0);
     await expect(page.locator("#counter-controls #status")).toHaveCount(0);
     await expect(page.locator(".counter-stats")).not.toContainText(
       /certified|permanent print/i,
