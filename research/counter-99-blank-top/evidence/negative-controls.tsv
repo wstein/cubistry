@@ -1,0 +1,7 @@
+wrong-glyph	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	setup: LR shows 8 (sticker 17), display 00 needs 0	same-message
+wrong-up	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	setup: LL sticker 14 glyph 0 not upright (up 0,-1,0)	same-message
+top-nonblank	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	setup: UL shows 5 (sticker 20), display 00 needs blank	same-message
+nz-tens-nonblank	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	setup: LL shows 0 (sticker 23), display _0 needs blank	same-message
+wrong-move	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	increment 40->41: UL shows 4 (sticker 13), display 41 needs blank	same-message
+short-claim	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 50: claimed increment shortest 0 but exact distance is 1	same-message
+bad-inverse	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 60: decrement is not the exact inverse word	same-message
