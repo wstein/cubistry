@@ -42,15 +42,21 @@ if [ "$(head -n 1 "$witness")" = "cubistry.hm-counter.v2" ]; then
   lbstep=$(awk -F'\t' '$1=="step" && $2=="H" && $3=="23" {if ($7>=1) {print k; exit}; k++}' "$witness")
   awk -F'\t' -v OFS='\t' '$1=="claim" {$3=$3-1}1' "$witness" > "$neg/claim.tsv"
   # wrong period boundary in the M mode: move one lap between preperiod and period
-  awk -F'\t' -v OFS='\t' '$1=="mode" && $2=="M" {if ($5>=60) {$5-=60; $6+=60} else {$5+=60; $6-=60}}1' "$witness" > "$neg/boundary.tsv"
+  # move one lap between preperiod and period when the M period has two or more
+  # laps or a preperiod; for a one-lap period every whole-lap boundary is
+  # correct, so the boundary is moved by one edge instead (whole-lap rule)
+  mp=$(awk -F'\t' '$1=="mode" && $2=="M"{print $5" "$6}' "$witness")
+  set -- $mp
+  if [ "$1" -ge 60 ] || [ "$2" -ge 120 ]; then bwant="period boundary: state after preperiod+period must equal state after preperiod"; else bwant="preperiod and period must be whole laps"; fi
+  awk -F'\t' -v OFS='\t' '$1=="mode" && $2=="M" {if ($5>=60) {$5-=60; $6+=60} else if ($6>=120) {$5+=60; $6-=60} else {$5+=1; $6-=1}}1' "$witness" > "$neg/boundary.tsv"
   controls=(
     "glyph|wrong glyph at cell 2 for M59 00 after setup"
     "up|glyph not upright at cell 4 for M59 00 after setup"
     "nonblank-ul|upper-left cell must show a blank sticker at M59 00 after setup"
-    "move|for M59 step 5"
+    "move|M59 step 5"
     "lowerbound|claimed lower bound differs for H23 step $lbstep"
     "claim|claimed maximum edge HTM differs from replay"
-    "boundary|period boundary"
+    "boundary|$bwant"
   )
 else
 awk -F'\t' -v OFS='\t' -v r="$ur" 'NR==r{$7="H"}1' "$witness" > "$neg/glyph.tsv"

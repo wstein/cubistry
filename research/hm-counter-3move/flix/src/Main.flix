@@ -117,7 +117,7 @@ def readSticker(row: String): Stk \ IO = match String.splitOn(substr="\t",row) {
         require(List.forAll(a -> Int32.abs(comp(p,a))==1,List.range(0,3)),"corner position");
         require(unitVec(n) and unitVec(u) and dot(p,n)==1 and dot(n,u)==0,"outward tangent frame");
         let g=match String.toList(gs) {
-            case ch::Nil => {require(List.memberOf(ch,String.toList("HM0123456789_")),"glyph alphabet");ch}
+            case ch::Nil => {require(List.memberOf(ch,String.toList("HMS0123456789_")),"glyph alphabet");ch}
             case _ => {require(false,"glyph alphabet");' '}
         };
         Stk.S(natural(i),natural(c),p,n,u,g)
