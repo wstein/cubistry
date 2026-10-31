@@ -21,6 +21,64 @@ export const STUDIO_BACKGROUND =
   "radial-gradient(ellipse at 48% 28%, #fffdf7 0%, transparent 65%), " +
   "linear-gradient(180deg, #e9e0d2 0%, #f6f0e5 48%, #d8cabb 100%)";
 
+/**
+ * Decides, once per frame and before the shadow pass, whether the shadow maps are stale. A flat
+ * snapshot of everything the depth pass reads is compared exactly (no hashing, so no collisions)
+ * with the previous frame: per visited object its id and visibility (an invisible subtree is
+ * skipped, as in three), per shadow caster its world matrix, geometry and material ids, and per
+ * light its world matrix, target matrix, shadow camera frustum, map size and bias/radius.
+ * The lights use `shadow.autoUpdate = false`; `needsUpdate` is set only on a difference.
+ */
+export function createShadowChangeDetector(root: THREE.Object3D, lights: readonly THREE.DirectionalLight[]) {
+  let previous = new Float64Array(0), current = new Float64Array(1024), previousLength = -1;
+  let forced = true;
+  for (const light of lights) { light.shadow.autoUpdate = false; light.shadow.needsUpdate = true; }
+  const push = (n: number, value: number) => {
+    if (n >= current.length) { const grown = new Float64Array(current.length * 2); grown.set(current); current = grown; }
+    current[n] = value; return n + 1;
+  };
+  const walk = (object: THREE.Object3D, n: number): number => {
+    n = push(n, object.id);
+    if (!object.visible) return push(n, 0);
+    n = push(n, 1);
+    const mesh = object as THREE.Mesh;
+    if (mesh.isMesh && mesh.castShadow) {
+      const material = mesh.material as THREE.Material | THREE.Material[];
+      n = push(n, mesh.geometry.id);
+      n = push(n, Array.isArray(material) ? -material.length : (material as unknown as { id: number }).id);
+      const e = object.matrixWorld.elements;
+      for (let i = 0; i < 16; i++) n = push(n, e[i]);
+    }
+    for (const child of object.children) n = walk(child, n);
+    return push(n, -1);
+  };
+  const update = () => {
+    let n = walk(root, 0);
+    for (const light of lights) {
+      const shadow = light.shadow, camera = shadow.camera;
+      const e = light.matrixWorld.elements, t = light.target.matrixWorld.elements;
+      for (let i = 0; i < 16; i++) { n = push(n, e[i]); n = push(n, t[i]); }
+      for (const v of [camera.left, camera.right, camera.top, camera.bottom, camera.near, camera.far,
+        shadow.mapSize.x, shadow.mapSize.y, shadow.radius, shadow.bias, shadow.normalBias, light.castShadow ? 1 : 0])
+        n = push(n, v);
+      n = push(n, shadow.map ? 1 : 0); // a recreated (disposed) map is empty and must be rendered
+    }
+    let changed = forced || n !== previousLength;
+    for (let i = 0; !changed && i < n; i++) changed = current[i] !== previous[i];
+    if (changed) {
+      for (const light of lights) light.shadow.needsUpdate = true;
+      forced = false; previousLength = n;
+      if (previous.length < n) previous = new Float64Array(current.length);
+      previous.set(current.subarray(0, n));
+    }
+  };
+  return {
+    update,
+    markDirty() { forced = true; for (const light of lights) light.shadow.needsUpdate = true; },
+    release() { for (const light of lights) light.shadow.autoUpdate = true; },
+  };
+}
+
 /** One receiving surface and exactly two shadow casters (key and softer shadow fill)
  * per viewport, never per cube.
  * Only the upper floor face renders, so below-floor orbits can inspect bottoms. */
@@ -58,6 +116,9 @@ export function createPresentationStudio(
       softness: PRESENTATION_PRESET.shadowFillSoftness, max: PRESENTATION_PRESET.shadowFillRadiusMax,
       direction: lights.shadowFill.position.clone().normalize() },
   ];
+  // Shadow maps are re-rendered only when the shadow-relevant inputs changed (R05/R06 in
+  // docs/VIEWER_RENDERING.md). Three honors `shadow.needsUpdate` when `autoUpdate` is false.
+  const shadowState = createShadowChangeDetector(scene, casters.map(c => c.light));
   // World-space penumbra: per half-cube extent until the first fit, then per fitted cube size.
   let fitRadius = 0, fineEdges = false;
   /** PCF radius in texels from the light's CURRENT map size and frustum width. */
@@ -78,6 +139,7 @@ export function createPresentationStudio(
       shadow.dispose(); shadow.map = null; shadow.mapPass = null;
       updateRadius(c);
     }
+    shadowState.markDirty();
   };
   // Contact shadow: allocated only while switched on, one plane per fitted cube.
   const contact = { meshes: [] as THREE.Mesh[], geometry: undefined as THREE.PlaneGeometry | undefined,
@@ -123,8 +185,18 @@ export function createPresentationStudio(
   };
   if (PRESENTATION_PRESET.contactShadowDefault) setContactShadow(true);
   if (PRESENTATION_PRESET.fineShadowEdgesDefault) setFineShadowEdges(true);
+  // WebGLRenderer.render calls Scene.onBeforeRender before WebGLShadowMap.render, so the decision is
+  // made in time without any call in the consumers. A Group has no such hook: call beforeRender().
+  const previousHook = scene.onBeforeRender;
+  const hook: THREE.Object3D["onBeforeRender"] = function (this: THREE.Object3D, ...args) {
+    previousHook.apply(this, args); shadowState.update();
+  };
+  if ((scene as THREE.Scene).isScene) scene.onBeforeRender = hook;
   return {
     floor,
+    /** Marks the shadow maps stale when a caster, light or shadow camera changed since the last
+     * call. Installed automatically on a THREE.Scene; call it right before render for a Group. */
+    beforeRender: shadowState.update,
     /** Soft blob under each cube (default on); allocates nothing while off. */
     setContactShadow,
     /** Slightly warm key, cool fill lights; light colors only (default off). */
@@ -181,6 +253,8 @@ export function createPresentationStudio(
       releaseContact(); contactOn = false;
       floor.removeFromParent(); floor.geometry.dispose(); floor.material.dispose();
       lights.dispose();
+      if (scene.onBeforeRender === hook) scene.onBeforeRender = previousHook;
+      shadowState.release();
       for (const [element, previous] of backgrounds) element.style.background = previous;
     },
   };
