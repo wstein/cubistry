@@ -6,7 +6,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65535)
 export default defineConfig({
   ...base,
   testDir: "./tests/pages-infra",
-  use: { ...base.use, baseURL: `http://127.0.0.1:${port}/cubistry/` },
+  use: { ...base.use, storageState: undefined, baseURL: `http://127.0.0.1:${port}/cubistry/` },
   webServer: {
     command: `node tests/pages-infra/build-fixture.mjs && PLAYWRIGHT_PORT=${port} STATIC_ROOT=test-results/preview-site node tests/pages/serve.mjs`,
     url: `http://127.0.0.1:${port}/cubistry/`,
