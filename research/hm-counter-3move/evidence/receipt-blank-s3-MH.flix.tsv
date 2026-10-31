@@ -1,0 +1,18 @@
+cubistry.hm-counter.receipt.v2
+witness-sha256	567442793c0a21eb7e4b0f55eeb61c2954e6c3d9e3b94756ac0026ceafb4f59a
+profile	blank
+graph	136080	0:1,1:15,2:198,3:2030,4:15396,5:61768,6:53528,7:3144
+mode	M	59	setup	0	preperiod	0	period	120	laps	2
+period	M	59	total	324	max	3	hist	0:0,1:6,2:24,3:90,4:0,5:0,6:0	lbtotal	284	tight	80	closure	exact
+preperiod	M	59	total	0	max	0	hist	0:0,1:0,2:0,3:0,4:0,5:0,6:0
+decrement	M	59	inverse-of-period	exact
+mode	H	23	setup	9	preperiod	0	period	24	laps	1
+period	H	23	total	73	max	4	hist	0:0,1:0,2:2,3:19,4:3,5:0,6:0	lbtotal	66	tight	18	closure	exact
+preperiod	H	23	total	0	max	0	hist	0:0,1:0,2:0,3:0,4:0,5:0,6:0
+decrement	H	23	inverse-of-period	exact
+mode	H	11	setup	10	preperiod	0	period	12	laps	1
+period	H	11	total	40	max	4	hist	0:0,1:0,2:2,3:4,4:6,5:0,6:0	lbtotal	35	tight	7	closure	exact
+preperiod	H	11	total	0	max	0	hist	0:0,1:0,2:0,3:0,4:0,5:0,6:0
+decrement	H	11	inverse-of-period	exact
+edges	period	156	max	4	hist	0:0,1:6,2:28,3:113,4:9,5:0,6:0	preperiod	0	max	0	hist	0:0,1:0,2:0,3:0,4:0,5:0,6:0
+verdict	ACCEPT
