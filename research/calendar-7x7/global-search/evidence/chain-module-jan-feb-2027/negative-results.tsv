@@ -1,0 +1,6 @@
+control	julia-exit	flix-exit	reason (julia | flix)
+wrong-end-hash	1	1	Intermediate/final physical hash mismatch | java.lang.IllegalArgumentException: edge destination full physical SHA mismatch
+wrong-source-hash	1	1	Initial actual physical state digest | java.lang.IllegalArgumentException: initial full physical source SHA mismatch
+wrong-htm	1	1	Declared transition metrics mismatch | java.lang.IllegalArgumentException: declared HTM/QTM/rotation metrics differ from raw moves
+dropped-move	1	1	Declared transition metrics mismatch | java.lang.IllegalArgumentException: declared HTM/QTM/rotation metrics differ from raw moves
+sign-flipped-move	1	1	Front image mismatch at 2,1 | java.lang.IllegalArgumentException: actual front art/orientation mismatch
