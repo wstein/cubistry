@@ -1,0 +1,12 @@
+cubistry.ms-counter.receipt.v1
+witness-sha256	3ff9da9799fba72cfb49482e19906acc87532e9fb834993ae4ed33cd99b31d5f
+profile	blank
+graph	136080	0:1,1:15,2:198,3:2030,4:15396,5:61768,6:53528,7:3144
+run	M	period	1	runin	0	edges	60	total	163	max	3	hist	0:0,1:4,2:9,3:47,4:0,5:0,6:0	lbtotal	142	lbmax	3	tight	42
+decrement	M	edges	60	inverse	exact
+setup	M	htm	0	word	-
+run	S	period	1	runin	0	edges	60	total	171	max	4	hist	0:0,1:1,2:10,3:46,4:3,5:0,6:0	lbtotal	153	lbmax	3	tight	43
+decrement	S	edges	60	inverse	exact
+setup	S	htm	9	word	R F' D' L' D' R2 U' F2 U2
+transitions	120	total	334	max	4	hist	0:0,1:5,2:19,3:93,4:3,5:0,6:0
+verdict	ACCEPT
