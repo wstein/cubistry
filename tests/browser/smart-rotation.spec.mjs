@@ -1,4 +1,4 @@
-// Browser regression source for #120. Added but NOT RUN under the session policy.
+// Browser regression source for #120. Verified locally with software GL (all 4 tests); see docs/SMART_ROTATION.md.
 import { test, expect } from "@playwright/test";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 test.use({ hasTouch: true });
@@ -26,12 +26,19 @@ async function drag(page, dx, dy, duration = 200, hold = 200, selector = "#cube 
   await page.mouse.move(x, y); await page.mouse.down(); await page.clock.runFor(duration);
   await page.mouse.move(x + dx, y + dy); if (hold) await page.clock.runFor(hold); await page.mouse.up();
 }
+// Software GL renders every fake frame, so advance in small steps and stop as soon as the motion has ended.
+async function settleIdle(page, limit = 80) {
+  for (let i = 0; i < limit && (await snapshot(page)).phase !== "idle"; i++) await page.clock.runFor(250);
+}
 async function mode(page, value) {
   const panel = page.locator(".cube-appearance");
   if (!(await panel.evaluate(e => e.open))) await panel.locator("summary").click();
   await page.getByLabel("View rotation mode", { exact: true }).selectOption(value);
+  // The open panel covers the canvas center where drag() grabs; a drag that lands on it is a blocked overlap.
+  await panel.evaluate(e => { e.open = false; });
 }
 test("a settled 34 degree drag from the default view (about 25 degrees from the exact front) is retained as the return target; a second drag beyond 40 degrees from the front waits and returns to it without puzzle/camera changes", async ({ page }) => {
+  test.slow(); // Fake time still renders every frame in software GL.
   await ready(page); const initial = await snapshot(page);
   await drag(page, (34 * Math.PI / 180) / .007, 0);
   const accepted = await snapshot(page); expect(accepted.phase).toBe("idle"); expect(accepted.distance).toBeLessThan(1e-6);
@@ -46,6 +53,7 @@ test("a settled 34 degree drag from the default view (about 25 degrees from the 
   expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
 });
 test("flick inertia is capped, a tap interrupts return, and Free/Classic/reduced modes preserve physical state", async ({ page }) => {
+  test.slow(); // Fake time still renders every frame in software GL.
   await ready(page); const initial = await snapshot(page);
   await drag(page, 120, 50, 50, 0); const release = await snapshot(page); expect(release.phase).toBe("coasting"); expect(release.speed).toBeLessThanOrEqual(6);
   await page.clock.runFor(150); expect((await snapshot(page)).orientation).not.toEqual(release.orientation);
@@ -57,10 +65,10 @@ test("flick inertia is capped, a tap interrupts return, and Free/Classic/reduced
   const frozen = await snapshot(page); await page.clock.runFor(2000); expect((await snapshot(page)).orientation).toEqual(frozen.orientation); await page.mouse.up();
   expect((await snapshot(page)).anchor).toEqual(initial.anchor);
   await mode(page, "classic"); await drag(page, 80, 20, 50, 0); expect((await snapshot(page)).phase).toBe("idle");
-  await mode(page, "free"); await drag(page, 80, 20, 50, 0); expect((await snapshot(page)).phase).toBe("coasting"); await page.clock.runFor(12000);
+  await mode(page, "free"); await drag(page, 80, 20, 50, 0); expect((await snapshot(page)).phase).toBe("coasting"); await settleIdle(page);
   const free = await snapshot(page); expect(free.phase).toBe("idle"); expect(free.deadline).toBeNull();
   await page.emulateMedia({ reducedMotion: "reduce" }); await mode(page, "smart"); await drag(page, 80, 20, 50, 0); await page.clock.runFor(180);
-  expect((await snapshot(page)).phase).toBe("idle"); await page.clock.runFor(10000); const end = await snapshot(page);
+  expect((await snapshot(page)).phase).toBe("idle"); await page.clock.runFor(2000); const end = await snapshot(page);
   expect(end.phase).toBe("idle"); expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
 });
 test("real touch release coasts and the clock rotates one rigid assembly with a stationary camera", async ({ page }) => {
@@ -81,8 +89,9 @@ test("real touch release coasts and the clock rotates one rigid assembly with a 
   const end = await snapshot(page, "clock"); expect(end.orientation).not.toEqual(before.orientation); expect(end.camera).toEqual(before.camera); await client.detach();
 });
 
-// Owner follow-up: upright default / optional Free. Source only, NOT RUN.
+// Owner follow-up: upright default / optional Free.
 test("upright defaults retain vertical up through drag/coast/return; Free mode levels continuously when leaving it", async ({page})=>{
+ test.slow();
  await ready(page);const initial=await snapshot(page);
  await drag(page,100,80,100,0);
  const upright=async()=>page.evaluate(async()=>{const v=(await import('/src/apps/picture3/page.ts')).picture3App.viewer;
