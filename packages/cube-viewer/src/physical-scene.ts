@@ -18,8 +18,8 @@ export const stickerFrame = (normal: Vec3, up: Vec3): THREE.Matrix4 =>
     new THREE.Vector3(...normal),
   );
 
-/** Core ball radius as a share of the half cube edge (a real 3x3 core is about 0.35). */
-export const CORE_RADIUS_RATIO = 0.35;
+/** Core ball diameter as a share of the full cube edge length. */
+export const CORE_DIAMETER_RATIO = 0.4;
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 /** Neutral dark gray; the visible core of a stickerless cube. */
 export const DEFAULT_CORE_COLOR = "#3a3d42";
@@ -136,7 +136,7 @@ export class PhysicalCubeScene {
       const core = new THREE.Mesh(geometry.core, plastic);
       core.userData.plasticCore = true;
       core.castShadow = core.receiveShadow = true;
-      core.scale.setScalar(half * CORE_RADIUS_RATIO);
+      core.scale.setScalar(half * CORE_DIAMETER_RATIO); // radius = ratio * edge / 2 = ratio * half edge
       core.position.set(...hi.map((v, axis) => (v + lo[axis]) / 2) as [number, number, number]);
       parent.add(core);
       this.cores.push(core);
