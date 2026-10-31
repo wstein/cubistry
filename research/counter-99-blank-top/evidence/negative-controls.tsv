@@ -5,3 +5,4 @@ nz-tens-nonblank	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	setup: LL
 wrong-move	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	increment 40->41: UL shows 4 (sticker 13), display 41 needs blank	same-message
 short-claim	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 50: claimed increment shortest 0 but exact distance is 1	same-message
 bad-inverse	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 60: decrement is not the exact inverse word	same-message
+hidden-unreachable	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 4: target display 05 is unreachable from the actual state	same-message
