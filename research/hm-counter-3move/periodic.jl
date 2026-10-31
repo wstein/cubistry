@@ -492,4 +492,3 @@ if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "write2"
     writeperiodic2(ARGS[2], ARGS[3]; routesfile = length(ARGS) >= 4 ? ARGS[4] : "",
                    hstarts = parse(Int, get(ENV, "HM_HSTARTS", "15")))
 end
-

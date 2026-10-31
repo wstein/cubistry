@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Builds the independent Flix checker jar (Flix 0.79.0, Java 21) using the
-# flixw scaffolding of research/calendar-7x7/english/flix.
+# Builds the Flix checker jar (Flix 0.79.0, Java 21; a structural port of
+# checker/check.jl) using the flixw scaffolding of
+# research/calendar-7x7/english/flix.
 set -euo pipefail
 here=$(cd -- "$(dirname -- "$0")" && pwd)
 build_dir=${HM_FLIX_BUILD_DIR:-/tmp/cubistry-hm-counter-flix}
