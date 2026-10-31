@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <link rel="icon" type="image/svg+xml" href="/cubistry/pr-preview/pr-148/favicon.svg" />
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Live 2×2 solver acceptance</title
+  ><link rel="stylesheet" href="/cubistry/pr-preview/pr-148/examples/example.css" />
+  <script type="module" crossorigin src="/cubistry/pr-preview/pr-148/assets/acceptance-UY_g5wVp.js"></script>
+  <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/three-BW9MzyAf.js">
+  <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/presentation-rotation-BmjvdG6T.js">
+  <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-B2IVHwR3.js">
+  <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-BLvcFufp.js">
+  <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-fBBdAZHD.js">
+  <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/design-Dr4cJDiZ.js">
+
+  <meta name="robots" content="noindex,nofollow"><body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #148 — non-production preview · fd047813a006</aside>
+    <main>
+      <h1>Live existing-solver acceptance</h1>
+      <p>
+        This local development check calls the existing cubing 2×2 solver for
+        each selected value. It solves a complete known counter target; it does
+        not search for a shortest partial display.
+      </p>
+      <p>
+        Fixed scrambled start: <code>R U F2 L' D B</code>. Each run starts
+        there.
+      </p>
+      <label
+        >Target
+        <select id="goal">
+          <option value="0">00</option>
+          <option value="7">07</option>
+          <option value="42">42</option>
+          <option value="58">58</option>
+          <option value="99">99</option>
+        </select></label
+      ><button id="solve" disabled>Call solver and execute</button
+      ><button id="camera">Front view</button>
+      <p id="status" role="status">Loading fixed sticker assets…</p>
+      <div id="cube" aria-label="Physical counter cube"></div>
+      <pre id="result"></pre>
+      <p>
+        <a href="/">Counter MVP</a> ·
+        <a href="/library-example.html">Independent library example</a>
+      </p>
+    </main>
+  </body>
+</html>
