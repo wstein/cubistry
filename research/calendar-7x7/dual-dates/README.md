@@ -1,8 +1,9 @@
 # English calendar: combined date labels 1/8 and 24/31
 
-**Status: UNVERIFIED research candidate. Not certified.** Native Julia and
-independent Flix have not yet both been run on these exact inputs in one
-reproducible session; no independent review or corruption controls exist yet.
+**Status: research candidate, not certified.** Native Julia and independent
+Flix accept the committed inputs with byte-identical receipts, and both reject
+five corruption controls. Independent review and a pinned manifest are still
+missing.
 
 ## Question
 
@@ -49,7 +50,8 @@ are claimed.
 - [flix/](flix/): independent Flix checker, sharing only the unchanged native
   English geometry, printing and DAG modules.
 - [evidence/](evidence/): candidate printing, artwork table, appended-repair list,
-  gzip-compressed candidate DAG, the saved Julia receipt and the Flix receipt.
+  gzip-compressed candidate DAG, the saved and fresh Julia receipts, the Flix
+  receipt and the negative controls.
 
 Observed so far:
 
@@ -62,15 +64,22 @@ Observed so far:
   that are byte-identical to the saved Julia receipt (SHA-256
   `9f3d71d52a8309b768a408a350ad9630083ff73cebf49889fb18f4daeaff31a6`). The first
   Flix build had parse errors, fixed in this branch.
-- Julia has **not** been re-run on these inputs in the session that fixed Flix,
-  so the two receipts are not yet a fresh matching pair.
+- Julia 1.13.3, re-run on the committed inputs after the Flix fix, produces the
+  same 99 lines ([evidence/julia-receipt.fresh.tsv](evidence/julia-receipt.fresh.tsv)),
+  byte-identical to the Flix receipt and to the saved Julia receipt.
+- [negative_checks.sh](negative_checks.sh) corrupts one item at a time: the
+  quarter-turn table, the label of surface 255, restoring surface 16, flipping
+  the up vector of surface 40, and swapping the DAG roots of targets 1 and 2.
+  Julia and Flix both exit 1 on all five, for the intended reason
+  ([results](evidence/negative-controls/results.tsv), diagnostics beside it).
+  These are invalid-candidate results, not UNSAT proofs. The corrupted DAG
+  (about 6 MB) is not stored; the script regenerates it.
 
 ## Not done yet
 
-1. Re-run Julia on the exact committed inputs and compare with Flix.
-2. Corrupt-certificate controls for both checkers, as for the row-2 proof.
-3. Independent review. If any verdict disagrees, stop and investigate.
-4. Pinned manifest with input, source and artifact hashes.
+1. Independent review. If any verdict disagrees, stop and investigate.
+2. Pinned manifest with input, source and artifact hashes.
+3. A single reproduction script that runs both checkers and the controls.
 
 ## Reproduce
 

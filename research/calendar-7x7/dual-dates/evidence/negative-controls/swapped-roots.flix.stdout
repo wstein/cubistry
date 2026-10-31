@@ -1,0 +1,32 @@
+dual-weekday	1	66
+dual-weekday	2	200
+dual-weekday	3	237
+dual-weekday	4	213
+dual-weekday	5	202
+dual-weekday	6	199
+dual-weekday	7	290
+dag-progress	10000
+dag-progress	20000
+dag-progress	30000
+dag-progress	40000
+dag-progress	50000
+dag-progress	60000
+dag-progress	70000
+dag-progress	80000
+dag-progress	90000
+dag-progress	100000
+dag-progress	110000
+dag-progress	120000
+dag-progress	130000
+dag-progress	140000
+dag-progress	150000
+dag-progress	160000
+dag-progress	170000
+dag-progress	180000
+dag-progress	190000
+dag-progress	200000
+dag-progress	210000
+dag-progress	220000
+dag-progress	230000
+dag	21	230859	91	ONLY_ORIGINAL_LEGAL_GENERATORS
+invalid	java.lang.IllegalArgumentException: selected date/ordinary artwork must match exact target including orientation
