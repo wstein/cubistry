@@ -206,11 +206,13 @@ def checkEdge(print: List[Sticker],dist: Map[Int32,Int32],mode: String,acc: (Lis
         require(int(at(f,5)) == List.length(inc) and int(at(f,8)) == List.length(dec),"row ${i}: claimed HTM differs from word length");
         require(at(f,7) == invWord(at(f,4)),"row ${i}: decrement is not the exact inverse word");
         let si = shortest(dist,print,state,w,mode);
+        require(si != Int32.maxValue(),"row ${i}: target display " + label(w,mode) + " is unreachable from the actual state");
         require(int(at(f,6)) == si,"row ${i}: claimed increment shortest " + at(f,6) + " but exact distance is ${si}");
         require(List.length(inc) >= si,"row ${i}: impossible");
         let next = play(state,inc);
         checkDisplay(print,next,w,mode,"increment " + label(v,mode) + "->" + label(w,mode));
         let sd = shortest(dist,print,next,v,mode);
+        require(sd != Int32.maxValue(),"row ${i}: target display " + label(v,mode) + " is unreachable from the actual state");
         require(int(at(f,9)) == sd,"row ${i}: claimed decrement shortest " + at(f,9) + " but exact distance is ${sd}");
         let back = play(next,dec);
         require(back == state,"row ${i}: decrement does not restore the exact previous state");
@@ -260,7 +262,7 @@ def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {
         match Sys.Env.getArgs() {
             case p :: m :: r :: s :: Nil => runCheck(p,m,r,s)
-            case _ => throw new IllegalArgumentException("usage: check.jl PRINT MODE ROUTES SETUP")
+            case _ => throw new IllegalArgumentException("usage: PRINT MODE ROUTES SETUP")
         }
     } catch {
         case ex: Exception => { println("invalid\t" + ex.getMessage()); System.exit(1) }
