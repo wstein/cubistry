@@ -128,10 +128,10 @@ test("one static core ball sits at the cube center with a realistic distance to 
     const [core] = cores;
     assert.equal(core.parent, h.parent);
     assert.deepEqual(core.position.toArray(), [0, 0, 0]);
-    assert(Math.abs(2 * core.scale.x - CORE_DIAMETER_RATIO * 2 * half) < 1e-9); // diameter = 40% of the edge
-    assert(Math.abs(2 * core.scale.x - .4 * 2 * half) < 1e-9); assert.equal(core.scale.x, core.scale.y); assert.equal(core.scale.x, core.scale.z);
-    // The ball stays well inside: more than half the half-edge remains to the surface.
-    assert(half - core.scale.x > half / 2);
+    assert(Math.abs(2 * core.scale.x - CORE_DIAMETER_RATIO * 2 * half) < 1e-9); // diameter = 80% of the edge
+    assert(Math.abs(2 * core.scale.x - .8 * 2 * half) < 1e-9); assert.equal(core.scale.x, core.scale.y); assert.equal(core.scale.x, core.scale.z);
+    // The ball stays inside the cube, with a visible margin to the surface.
+    assert(core.scale.x < half && half - core.scale.x > half / 10);
     // A frontal ray through the center hits the ball for these even/odd centers alike.
     const ray = new THREE.Raycaster(new THREE.Vector3(0, 0, 10), new THREE.Vector3(0, 0, -1));
     assert(ray.intersectObject(core).length > 0);
