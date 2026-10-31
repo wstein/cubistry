@@ -31,18 +31,19 @@ async function mode(page, value) {
   if (!(await panel.evaluate(e => e.open))) await panel.locator("summary").click();
   await page.getByLabel("View rotation mode", { exact: true }).selectOption(value);
 }
-test("settled 34 degrees from the front is retained; beyond 35 degrees waits and springs back to the front without puzzle/camera changes", async ({ page }) => {
+test("settled 34 degrees from the front is retained as the return target; beyond 35 degrees waits and returns to it without puzzle/camera changes", async ({ page }) => {
   await ready(page); const initial = await snapshot(page);
   await drag(page, (34 * Math.PI / 180) / .007, 0);
-  const retained = await snapshot(page); expect(retained.phase).toBe("idle"); expect(retained.distance).toBeCloseTo(34 * Math.PI / 180, 3);
-  await page.clock.runFor(6000); expect((await snapshot(page)).orientation).toEqual(retained.orientation);
+  const accepted = await snapshot(page); expect(accepted.phase).toBe("idle"); expect(accepted.distance).toBeLessThan(1e-6);
+  await page.clock.runFor(6000); expect((await snapshot(page)).orientation).toEqual(accepted.orientation);
   await drag(page, (26 * Math.PI / 180) / .007, 0);
-  const outside = await snapshot(page); expect(outside.phase).toBe("awaiting-return"); expect(outside.anchor).toEqual(initial.anchor);
+  const outside = await snapshot(page); expect(outside.phase).toBe("awaiting-return"); expect(outside.anchor).toEqual(accepted.anchor);
   const wait = async () => outside.deadline - await page.evaluate(() => performance.now() / 1000);
   await page.clock.runFor(Math.max(1, Math.floor((await wait() - .05) * 1000))); expect((await snapshot(page)).phase).toBe("awaiting-return");
   await page.clock.runFor(150); expect((await snapshot(page)).phase).toBe("returning");
   await page.clock.runFor(2500); const end = await snapshot(page); expect(end.phase).toBe("idle"); expect(end.distance).toBeLessThan(2e-3);
-  expect(end.anchor).toEqual(initial.anchor); expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
+  expect(end.anchor).toEqual(accepted.anchor); expect(end.orientation).not.toEqual(initial.orientation);
+  expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
 });
 test("flick inertia is capped, a tap interrupts return, and Free/Classic/reduced modes preserve physical state", async ({ page }) => {
   await ready(page); const initial = await snapshot(page);

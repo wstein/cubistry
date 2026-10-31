@@ -4,24 +4,43 @@ import { Quaternion, Vector3, Euler } from "three";
 import { SmartRotation, ROTATION_TUNING as P, returnDelay } from "../packages/cube-viewer/src/smart-rotation.ts";
 const radians = degrees => degrees * Math.PI / 180;
 const initial = () => new Quaternion();
-const wait = c => returnDelay(c.quaternion.angleTo(c.anchor));
+const wait = c => returnDelay(c.quaternion.angleTo(c.front));
 const spring = t => Math.exp(-P.returnRate*t)*(1+P.returnRate*t+(P.returnRate*t)**2/2);
 const near = (a,b,tolerance=1e-9) => assert(Math.abs(a-b)<tolerance,`${a} != ${b}`);
 function settled(controller, pitch, yaw, start=0) { controller.down(start); controller.drag(radians(pitch),radians(yaw),start+.2); controller.up(start+.4); }
-test("settled views within 35 degrees of the front stay; beyond it they spring back to the front, never to an earlier view",()=>{
- const c=new SmartRotation(initial());settled(c,0,34);assert.equal(c.phase,"idle");near(c.anchor.angleTo(initial()),0);near(c.quaternion.angleTo(initial()),radians(34));
- settled(c,0,26,1);assert(c.quaternion.angleTo(initial())>radians(35));assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(initial()),0);
+test("settled views within 35 degrees of the front become the return target; beyond it the view returns to the last such view",()=>{
+ const c=new SmartRotation(initial());settled(c,0,34);assert.equal(c.phase,"idle");
+ near(c.anchor.angleTo(initial()),radians(34));near(c.anchor.angleTo(c.quaternion),0);
+ const accepted=c.anchor.clone();
+ settled(c,0,26,1);assert(c.quaternion.angleTo(initial())>radians(35));assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(accepted),0);
  const due=1.4+wait(c);near(c.returnDeadline,due);c.step(due-.001);assert.equal(c.phase,"awaiting-return");const outside=c.quaternion.clone();
  c.step(due);assert.equal(c.phase,"returning");near(c.quaternion.angleTo(outside),0);
- c.step(10);assert.equal(c.phase,"idle");near(c.quaternion.angleTo(initial()),0);
- const exact=new SmartRotation(initial());settled(exact,0,35);assert.equal(exact.phase,"idle");
- const over=new SmartRotation(initial());settled(over,0,36);assert.equal(over.phase,"awaiting-return");
+ c.step(10);assert.equal(c.phase,"idle");near(c.quaternion.angleTo(accepted),0);near(c.quaternion.angleTo(initial()),radians(34));
+ const exact=new SmartRotation(initial());settled(exact,0,35);assert.equal(exact.phase,"idle");near(exact.anchor.angleTo(initial()),radians(35));
+ const over=new SmartRotation(initial());settled(over,0,36);assert.equal(over.phase,"awaiting-return");near(over.anchor.angleTo(initial()),0);
  const spatial=new SmartRotation(initial());settled(spatial,30,30);assert(spatial.quaternion.angleTo(initial())>radians(35));assert.equal(spatial.phase,"awaiting-return");
  const diagonal=new SmartRotation(initial());settled(diagonal,20,20);assert(diagonal.quaternion.angleTo(initial())<radians(35));assert.equal(diagonal.phase,"idle");
 });
-test("no gesture ever moves the front anchor, and quaternion signs are equivalent",()=>{
- const c=new SmartRotation(initial());settled(c,0,20);settled(c,0,20,1);settled(c,0,5,2);near(c.anchor.angleTo(initial()),0);assert.equal(c.phase,"awaiting-return");
- const negative=new Quaternion(0,0,0,-1),d=new SmartRotation(negative);settled(d,0,24);assert.equal(d.phase,"idle");near(d.anchor.angleTo(initial()),0);near(d.quaternion.angleTo(initial()),radians(24));
+test("the threshold is measured from the front, so the return target never walks beyond it; the last view within it is always the target",()=>{
+ const c=new SmartRotation(initial());
+ settled(c,0,20);near(c.anchor.angleTo(initial()),radians(20));
+ settled(c,0,20,1);assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(initial()),radians(20));c.step(10);near(c.quaternion.angleTo(initial()),radians(20));
+ settled(c,0,10,11);near(c.anchor.angleTo(initial()),radians(30));
+ settled(c,0,10,12);assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(initial()),radians(30));c.step(30);near(c.quaternion.angleTo(initial()),radians(30));
+ for(const degrees of [5,-12,18,-25,33]){settled(c,0,degrees,40+degrees);assert(c.anchor.angleTo(initial())<=radians(35)+1e-9);c.step(100+degrees);}
+});
+test("a far gesture after a retained view returns to that view, not to the front, and an interrupted return resumes to it",()=>{
+ const c=new SmartRotation(initial());settled(c,25,0);const kept=c.anchor.clone();assert(kept.angleTo(initial())>radians(24));
+ settled(c,0,70,1);assert.equal(c.phase,"awaiting-return");const due=c.returnDeadline;c.step(due+.05);
+ c.down(due+.06);c.up(due+.1,true);assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(kept),0);
+ c.step(due+10);near(c.quaternion.angleTo(kept),0);assert.equal(c.phase,"idle");
+ const tapped=new SmartRotation(initial());settled(tapped,25,0);const target=tapped.anchor.clone();settled(tapped,0,50,1);
+ const t0=tapped.returnDeadline;tapped.step(t0+.4);assert(tapped.quaternion.angleTo(initial())<radians(35));
+ tapped.down(t0+.41);tapped.up(t0+.5,true);assert.equal(tapped.phase,"awaiting-return");near(tapped.anchor.angleTo(target),0);
+ tapped.step(t0+10);near(tapped.quaternion.angleTo(target),0);
+});
+test("quaternion signs are equivalent for the accepted view and the front",()=>{
+ const negative=new Quaternion(0,0,0,-1),d=new SmartRotation(negative);settled(d,0,24);assert.equal(d.phase,"idle");near(d.anchor.angleTo(initial()),radians(24));near(d.front.angleTo(initial()),0);
 });
 function trajectory(hz,mode="smart") {
  const c=new SmartRotation(initial(),mode),duration=.5,speed=1.2,frames=Math.round(hz*duration),dt=duration/frames;
@@ -69,8 +88,8 @@ test("fast diagonal flick uses a combined speed cap; stationary holds and cancel
  const held=trajectory(60);held.down(1);held.drag(.1,.1,1.01);held.up(1.51);assert.notEqual(held.phase,"coasting");assert.equal(held.angularSpeed,0);
  const cancelled=new SmartRotation(initial());cancelled.down(0);cancelled.drag(1,1,.01);cancelled.up(.01,true);assert.notEqual(cancelled.phase,"coasting");
 });
-test("small views stay after coast without moving the anchor; free/classic/reduced modes and switching never jump",()=>{
- const c=new SmartRotation(initial());c.down(0);c.drag(0,.2,1);c.up(1);assert.equal(c.phase,"coasting");near(c.anchor.angleTo(initial()),0);c.step(4);assert.equal(c.phase,"idle");near(c.anchor.angleTo(initial()),0);assert(c.quaternion.angleTo(initial())>.2);
+test("small views become the target only after coast; free/classic/reduced modes and switching never jump",()=>{
+ const c=new SmartRotation(initial());c.down(0);c.drag(0,.2,1);c.up(1);assert.equal(c.phase,"coasting");near(c.anchor.angleTo(initial()),0);c.step(4);assert.equal(c.phase,"idle");near(c.anchor.angleTo(c.quaternion),0);assert(c.quaternion.angleTo(initial())>.2);
  for(const mode of ["free","classic"]){const d=trajectory(60,mode);d.step(100);assert.equal(d.phase,"idle");assert.equal(d.returnDeadline,null);}
  const reduced=new SmartRotation(initial(),"smart",true);settled(reduced,40,40);assert.equal(reduced.phase,"idle");assert.equal(reduced.angularSpeed,0);
  const d=trajectory(60);d.step(.6);const q=d.quaternion.clone();d.setMode("classic",.6);near(d.quaternion.angleTo(q),0);d.setMode("smart",.7);near(d.quaternion.angleTo(q),0);assert.equal(d.phase,"awaiting-return");
@@ -90,7 +109,7 @@ test("tiny slow input stays tiny after orientation integration rather than norma
  c.up(.02);assert.equal(c.phase,"idle");
 });
 
-test("interrupting a return by taps, zoom/settings, mode, reduced motion or visibility never moves the anchor",()=>{
+test("interrupting a return by taps, zoom/settings, mode, reduced motion or visibility never turns an automatic pose into the target",()=>{
  for(const action of ["tap","interact","mode","reduced","visibility"]) {
   const c=new SmartRotation(initial());settled(c,0,60);const anchor=c.anchor.clone(),deadline=c.returnDeadline;
   c.step(deadline+.05);const q=c.quaternion.clone();assert(q.angleTo(anchor)>radians(35));
@@ -105,7 +124,7 @@ test("interrupting a return by taps, zoom/settings, mode, reduced motion or visi
  }
  const c=new SmartRotation(initial());settled(c,0,60);c.step(c.returnDeadline+.6);const before=c.quaternion.clone();
  assert(before.angleTo(c.anchor)<radians(35));
- c.down(7);c.drag(0,radians(1),7.2);c.up(7.4);assert.equal(c.phase,"idle");near(c.anchor.angleTo(initial()),0);assert(c.quaternion.angleTo(before)>radians(.9));
+ c.down(7);c.drag(0,radians(1),7.2);c.up(7.4);assert.equal(c.phase,"idle");near(c.anchor.angleTo(c.quaternion),0);assert(c.quaternion.angleTo(before)>radians(.9));
 });
 test("nonidentity initial orientations stay idle through reset/tap/settings/visibility without floating-point return loops",()=>{
  const q=new Quaternion().setFromEuler(new Euler(.321,-.789,0)),c=new SmartRotation(q);

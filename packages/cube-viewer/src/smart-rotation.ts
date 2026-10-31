@@ -40,6 +40,7 @@ export class SmartRotation {
   private readonly levelTarget = new Quaternion();
   private pitch = 0;
   private yaw = 0;
+  private anchorCandidate = false;
   private anchorPitch = 0;
   private anchorYaw = 0;
   private returnPitch = 0;
@@ -67,6 +68,8 @@ export class SmartRotation {
     if (mode !== "free") this.quaternion.copy(this.initial);
     this.residual.identity(); this.modeValue = mode; this.reduced = reducedMotion;
   }
+  /** The defined initial view; the tolerance is always measured from here. */
+  get front(): Quaternion { return this.initial; }
   get phase(): RotationPhase { return this.phaseValue; }
   get mode(): RotationMode { return this.modeValue; }
   get reducedMotion(): boolean { return this.reduced; }
@@ -125,12 +128,21 @@ export class SmartRotation {
     }
     this.levelingRequested = false;
     if (this.modeValue !== "smart") return;
-    // The anchor is always the front view: within the tolerance the view stays,
-    // beyond it the spring returns to the front. Nothing ever moves the anchor.
-    const distance = this.quaternion.angleTo(this.anchor);
-    if (!this.reduced && distance > ROTATION_TUNING.toleranceRadians + 1e-12) {
+    // The tolerance is always measured from the front view. A genuine user rotation
+    // settled within it becomes the new return target; beyond it the view returns to
+    // the last such target. Automatic poses, taps and settings never become targets,
+    // and a target never lies farther than the tolerance from the front.
+    const distance = this.quaternion.angleTo(this.initial);
+    if (distance <= ROTATION_TUNING.toleranceRadians + 1e-12) {
+      if (this.anchorCandidate) {
+        this.anchor.copy(this.quaternion); this.anchorPitch = this.pitch; this.anchorYaw = this.yaw;
+      } else if (!this.reduced && this.quaternion.angleTo(this.anchor) > 1e-7) {
+        this.phaseValue = "awaiting-return"; this.returnAt = at + returnDelay(distance);
+      }
+    } else if (!this.reduced) {
       this.phaseValue = "awaiting-return"; this.returnAt = at + returnDelay(distance);
     }
+    this.anchorCandidate = false;
   }
   /** Freeze the last displayed quaternion immediately, including a below-threshold click. */
   down(at: number): void {
@@ -148,7 +160,7 @@ export class SmartRotation {
     const previousPitch = this.pitch;
     this.rotate(input);
     if (this.modeValue !== "free") input.x = this.pitch - previousPitch;
-    if (input.lengthSq() > 0) this.lastMotion = at;
+    if (input.lengthSq() > 0) { this.lastMotion = at; this.anchorCandidate = true; }
     if (elapsed <= 0 || this.modeValue === "classic" || this.reduced) { this.velocity.set(0, 0, 0); return; }
     // No 8 ms floor: a real 144 Hz input stream must estimate the same speed.
     const measured = input.multiplyScalar(1 / elapsed);
@@ -259,7 +271,7 @@ export class SmartRotation {
     this.stop(); this.quaternion.copy(this.initial); this.anchor.copy(this.initial);
     this.closestUpright(); this.anchorPitch = this.pitch; this.anchorYaw = this.yaw;
     this.residual.identity(); this.levelingRequested = false;
-    this.phaseValue = "idle"; this.lastTime = at; this.lastMotion = null;
+    this.phaseValue = "idle"; this.lastTime = at; this.lastMotion = null; this.anchorCandidate = false;
   }
   dispose(): void { this.stop(); this.phaseValue = "idle"; this.disposed = true; }
 }
