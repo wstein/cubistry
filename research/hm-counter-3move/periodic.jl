@@ -93,7 +93,8 @@ function enable5!()
     push!(BALLS, b5); push!(CLS, c5); push!(WORKS, Work(c5.nwords))
 end
 # edge cost: HTM + 1000 per edge beyond 3 HTM (lexicographic: max first)
-edgecost(len) = len + (len > 3 ? 1000 : 0)
+const PEN4 = parse(Int, get(ENV, "HM_PEN4", "1000"))
+edgecost(len) = len + (len > 3 ? PEN4 : 0) + (len > 4 ? 1_000_000 : 0)
 
 # one lap from state a (showing 00): layers of Dict(state => min cost)
 function lap(a::State, L, r, sh)
@@ -102,7 +103,8 @@ function lap(a::State, L, r, sh)
     for step in 1:n
         need = tg[step % n + 1]
         nxt = Dict{UInt64,Int}()
-        for (bi, b) in enumerate(BALLS)
+        for bi in 2:length(BALLS)
+            b = BALLS[bi]
             for (k, c) in layers[end]
                 st = unkey(k)
                 foreachhit(st, sh, need, CLS[bi], WORKS[bi]) do j
@@ -329,3 +331,156 @@ if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "anneal2"
     @eval periodicscore(pr::Print) = lapobjective(pr)
     annealp(parse(Int, ARGS[2]), parse(Int, ARGS[3]), ARGS[4], readprinttxt(ARGS[5]))
 end
+
+# SA objective v3: per-mode best cycle quality (mean cost per lap, HTM plus
+# 10^6 per edge above 4 HTM and HM_PEN4 per edge above 3) over two sampled
+# starts, summed over modes.
+function cycleobjective(pr::Print)
+    tall = vcat([laptargets(L, r) for (L, r) in MODES]...)
+    nbad = count(t -> !realizable(pr, t), unique(tall))
+    nbad > 0 && return (1e9 * nbad, (:unrealizable, nbad))
+    sh = showtable(pr)
+    sc = 0.0; info = Float64[]
+    for (mi, (L, r)) in enumerate(MODES)
+        best = Inf
+        for t in 1:2
+            s = findstart(MersenneTwister(100 + 10mi + t), sh, target(L, 0, true))
+            s === nothing && continue
+            fc = findcycle(s, L, r, sh; maxnodes = 30)
+            fc === nothing || (best = min(best, fc.quality[1]))
+        end
+        best == Inf && (best = 1e8)
+        sc += best; push!(info, best)
+    end
+    (sc, Tuple(info))
+end
+
+if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "anneal3"
+    get(ENV, "HM_B5", "") == "1" && enable5!()
+    @eval periodicscore(pr::Print) = cycleobjective(pr)
+    annealp(parse(Int, ARGS[2]), parse(Int, ARGS[3]), ARGS[4], readprinttxt(ARGS[5]); T0 = 3.0)
+end
+
+# merge adjacent turns of the same face (quarter arithmetic mod 4)
+function reduceword(w::Vector{Int})
+    out = Int[]
+    q(m) = ((m - 1) % 3 == 0 ? 1 : (m - 1) % 3 == 1 ? 2 : 3)
+    for m in w
+        if !isempty(out) && (out[end] - 1) ÷ 3 == (m - 1) ÷ 3
+            t = mod(q(out[end]) + q(m), 4); f = (m - 1) ÷ 3
+            pop!(out)
+            t != 0 && push!(out, 3f + (t == 1 ? 1 : t == 2 ? 2 : 3))
+        else
+            push!(out, m)
+        end
+    end
+    length(out) == length(w) ? out : reduceword(out)
+end
+
+# ---------------- writer v2b: identity reference, optional fixed routes ----------------
+# Reference print state = the printed home frames (IDSTATE). Each mode takes
+# the better of (a) a given route (setup + period words, e.g. the H/S/M
+# seconds-first up runs, valid for any print that keeps the H/M/digit/blank
+# stickers they use) and (b) the lap-graph cycle search from starts within
+# radius 4 (or 4+4) of the reference state.
+function readroutes(path)
+    routes = Dict{Tuple{Char,Int},Tuple{Vector{Int},Int,Int,Vector{Vector{Int}}}}()
+    cur = nothing
+    mv(w) = w == "" || w == "-" ? Int[] : [findfirst(==(t), MOVENAMES) for t in split(w)]
+    for line in eachline(path)
+        f = split(line, '\t')
+        if f[1] == "mode"
+            cur = (f[2][1], parse(Int, f[3]))
+            routes[cur] = (mv(f[4]), parse(Int, f[5]), parse(Int, f[6]), Vector{Int}[])
+        else
+            push!(routes[cur][4], mv(f[4]))
+        end
+    end
+    routes
+end
+
+function routequality(s, words, P, Q, L, r, sh)
+    st = s
+    for (j, w) in enumerate(words)
+        st = applyword(st, w)
+        shows(st, sh, target(L, j % (r + 1), true)) || return nothing
+        j == P && (global PSTATE = st)
+    end
+    P == 0 && (global PSTATE = s)
+    st == PSTATE || return nothing
+    sum(edgecost(length(w)) for w in words[P+1:end]) / (Q ÷ (r + 1))
+end
+
+function writeperiodic2(printfile, out; routesfile = "", hstarts = 15)
+    pr = readprinttxt(printfile); sh = showtable(pr)
+    routes = routesfile == "" ? Dict() : readroutes(routesfile)
+    modes = Any[]
+    for (L, r) in MODES
+        best = nothing
+        for src in "SHM"
+            haskey(routes, (src, r)) || continue
+            setup, P, Q, words = routes[(src, r)]
+            s = applyword(IDSTATE, setup)
+            if shows(s, sh, target(L, 0, true))
+                q = routequality(s, words, P, Q, L, r, sh)
+                q === nothing || (best === nothing || q < best[1]) && (best = (q, setup, (P = P, Q = Q, words = words), "given-$src"))
+            end
+        end
+        cands = hstarts == 0 ? Tuple{Vector{Int},State}[] : [(B4.words[i], applyelem(IDSTATE, E)) for (i, E) in enumerate(B4.elems)]
+        rngH = MersenneTwister(300)
+        for _ in 1:(hstarts == 0 ? 0 : 40)
+            E1 = rand(rngH, 2:length(B4.elems)); x = applyelem(IDSTATE, B4.elems[E1])
+            for (j, E2) in enumerate(B4.elems)
+                push!(cands, (vcat(B4.words[E1], B4.words[j]), applyelem(x, E2)))
+            end
+        end
+        cnt = 0
+        for (wd, s) in cands
+            shows(s, sh, target(L, 0, true)) || continue
+            cnt += 1; cnt > hstarts && break
+            mc = modecycle(s, L, r, sh)
+            mc === nothing && continue
+            (best === nothing || mc.quality[1] < best[1]) && (best = (mc.quality[1], wd, mc, "search"))
+        end
+        best === nothing && error("no cycle for $L$r")
+        println("$L$r quality $(best[1]) source $(best[4]) P=$(best[3].P) Q=$(best[3].Q)"); flush(stdout)
+        push!(modes, (L, r, best[2], best[3]))
+    end
+    # rebase: the reference state is the M start, so the M setup is empty and
+    # the H setups become inverse(M setup) followed by their own setup
+    msetup = modes[1][3]
+    sRef = applyword(IDSTATE, msetup)
+    invm = reverse([invmove(m) for m in msetup])
+    modes = [(L, r, L == 'M' ? Int[] : reduceword(vcat(invm, su)), mc) for (L, r, su, mc) in modes]
+    io = IOBuffer()
+    println(io, "cubistry.hm-counter.v2"); println(io, "profile\tblank"); println(io, "letters\tHM")
+    for sid in 1:24
+        c = (sid - 1) ÷ 3 + 1; a = (sid - 1) % 3 + 1
+        n = zeros(Int, 3); n[a] = POS[c][a]
+        R = ROT[sRef[c]]
+        uh = pr.glyph[sid] == ' ' ? (a == 1 ? [0, 1, 0] : [1, 0, 0]) : homeup2(sid, pr.cell[sid])
+        println(io, "sticker\t", sid - 1, "\t", c - 1, "\t", join(R * collect(POS[c]), ","), "\t",
+                join(R * n, ","), "\t", join(R * uh, ","), "\t", pr.glyph[sid] == ' ' ? "_" : string(pr.glyph[sid]))
+    end
+    wtxt(w) = isempty(w) ? "-" : join(MOVENAMES[w], " ")
+    mx = 0
+    for (L, r, setup, mc) in modes
+        println(io, "mode\t$L\t$r\t$(wtxt(setup))\t$(mc.P)\t$(mc.Q)")
+        st = applyword(sRef, setup); n = r + 1
+        for (j, w) in enumerate(mc.words)
+            v = (j - 1) % n; nv = (v + 1) % n
+            lb = lowerbound2(st, target(L, nv, true), sh, BALLS[end])
+            println(io, "step\t$L\t$r\t$v\t$nv\t$(wtxt(w))\t$lb")
+            mx = max(mx, length(w)); st = applyword(st, w)
+        end
+    end
+    println(io, "claim\tmaxEdgeHTM\t$mx"); println(io, "end")
+    write(out, take!(io)); println("wrote $out")
+end
+
+if abspath(PROGRAM_FILE) == (@__FILE__) && ARGS[1] == "write2"
+    get(ENV, "HM_B5", "") == "1" && enable5!()
+    writeperiodic2(ARGS[2], ARGS[3]; routesfile = length(ARGS) >= 4 ? ARGS[4] : "",
+                   hstarts = parse(Int, get(ENV, "HM_HSTARTS", "15")))
+end
+
