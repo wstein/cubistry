@@ -7,6 +7,44 @@ const PR99_PRINT_SHA="b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f305
 # A, B: six-week months folded with stacked cells. W: PR #99 wrap layout unchanged,
 # stacked surfaces only as context-read substitutes (the PR #128 pairs).
 const VARIANT_PAIRS=Dict("A"=>[(1,8),(24,31)],"B"=>[(23,30),(24,31)],"W"=>[(1,8),(24,31)])
+# Mixed layouts: each six-week month type chooses its own display, written as
+# "F31=<choice>,S30=<choice>,S31=<choice>" (Friday-start 31 days, Saturday-start
+# 30 and 31 days). keep = PR #99 overflow wrap; bfold = bottom fold; bfold30 =
+# 23/30 folded, 31 kept as 31↶; afold = top fold with 1/8.
+const MIX_TYPES=("F31","S30","S31")
+const MIX_CHOICES=Dict("F31"=>("keep","bfold"),"S30"=>("keep","bfold","afold"),"S31"=>("keep","bfold","bfold30","afold"))
+function parse_mix(variant)
+    parts=split(variant,',')
+    @assert length(parts)==3 "mixed layout needs F31=..,S30=..,S31=.."
+    out=Dict{String,String}()
+    for (i,part) in enumerate(parts)
+        kv=split(part,'=')
+        @assert length(kv)==2 && kv[1]==MIX_TYPES[i] "unknown or misplaced month type '$(kv[1])'"
+        @assert kv[2] in MIX_CHOICES[kv[1]] "unknown choice '$(kv[2])' for $(kv[1])"
+        out[String(kv[1])]=String(kv[2])
+    end
+    out
+end
+all_mixes()=["F31=$a,S30=$b,S31=$c" for a in MIX_CHOICES["F31"] for b in MIX_CHOICES["S30"] for c in MIX_CHOICES["S31"]]
+function variant_pairs(variant)
+    haskey(VARIANT_PAIRS,variant) && return VARIANT_PAIRS[variant]
+    @assert occursin('=',variant) "VARIANT must be A|B|W or F31=..,S30=..,S31=.."
+    mix=parse_mix(variant);pairs=Tuple{Int,Int}[]
+    "afold" in values(mix) && push!(pairs,(1,8))
+    (mix["S30"]=="bfold" || mix["S31"] in ("bfold","bfold30")) && push!(pairs,(23,30))
+    (mix["F31"]=="bfold" || mix["S31"]=="bfold") && push!(pairs,(24,31))
+    pairs
+end
+valid_variant(variant)=(variant_pairs(variant);true)
+# Display style of one month: :plain (five weeks), :wrap, :bottom, :bottom30, :top.
+function month_style(variant,off,n)
+    div(off+n-1,7)+1<=5 && return :plain
+    kind=off==5 && n==31 ? "F31" : off==6 && n==30 ? "S30" : off==6 && n==31 ? "S31" : error("unexpected six-week month")
+    variant=="W" && return :wrap
+    variant=="B" && return :bottom
+    variant=="A" && return off==6 ? :top : :bottom
+    Dict("keep"=>:wrap,"bfold"=>:bottom,"bfold30"=>:bottom30,"afold"=>:top)[parse_mix(variant)[kind]]
+end
 const MODES=("strict","context")
 red_column(c)=c==1 || c==7
 
@@ -40,13 +78,14 @@ end
 # stacked cells. Variant B folds the bottom (d-7/d in row 7). Variant A folds the
 # top (1/8) for Saturday-start months and the bottom (24/31) otherwise.
 function stacked_board(y,m,variant)
-    @assert haskey(VARIANT_PAIRS,variant) "variant must be A or B"
+    pairs=variant_pairs(variant)
     a=wrapped_board(y,m)
-    variant=="W" && return a
-    for r in 3:7,c in 1:7;a[r,c]=("","blank");end
     off=offset(y,m,"EN");n=daysinmonth(Date(y,m,1))
+    style=month_style(variant,off,n)
+    style in (:plain,:wrap) && return a
+    for r in 3:7,c in 1:7;a[r,c]=("","blank");end
     weeks=div(off+n-1,7)+1
-    top=weeks==6 && variant=="A" && off==6
+    top=style==:top
     for d in 1:n
         week,c=divrem(off+d-1,7);c+=1;ink=red_column(c) ? "red" : "dark"
         if weeks<=5
@@ -55,15 +94,19 @@ function stacked_board(y,m,variant)
             week==0 && continue                       # day 1 is printed with 8 below
             r=week+2;text=d==8 ? stacked_text(1,8) : string(d)
         else
-            week==5 && continue                       # sixth week is printed under d-7
-            r=week+3;text=week==4 && d+7<=n ? stacked_text(d,d+7) : string(d)
+            if week==5                                # sixth week is printed under d-7
+                style==:bottom30 && d==31 || continue     # except 31, which keeps its overflow
+                r=3;text="31↶"
+            else
+                r=week+3;text=week==4 && d+7<=n && !(style==:bottom30 && d+7==31) ? stacked_text(d,d+7) : string(d)
+            end
         end
         @assert a[r,c]==("","blank") "fold collision"
         a[r,c]=(text,ink)
     end
     for r in 3:7,c in 1:7
         p=parse_stacked(a[r,c][1])
-        isnothing(p) || @assert p in VARIANT_PAIRS[variant] "fold produced an undeclared pair $(a[r,c][1])"
+        isnothing(p) || @assert p in pairs "fold produced an undeclared pair $(a[r,c][1])"
     end
     a
 end
@@ -100,12 +143,12 @@ function read_stacked_print(path,variant)
         @assert (s.piece,s.home,s.normal,s.up)==(b.piece,b.home,b.normal,b.up) "surface identity or frame changed at $id"
         (s.text,s.ink)==(b.text,b.ink) && continue
         if isempty(s.text)
-            paired=any(b.text in (string(p[1]),string(p[2])) for p in VARIANT_PAIRS[variant])
+            paired=any(b.text in (string(p[1]),string(p[2])) for p in variant_pairs(variant))
             @assert endswith(b.text,"↶") || paired "only overflow or paired-date surfaces may become blank (surface $id)"
             blanked+=1
         else
             p=parse_stacked(s.text)
-            @assert !isnothing(p) && p in VARIANT_PAIRS[variant] "undeclared artwork change at surface $id"
+            @assert !isnothing(p) && p in variant_pairs(variant) "undeclared artwork change at surface $id"
             @assert b.text in (string(p[1]),string(p[2])) && s.ink==b.ink "stacked surface $id must replace one of its own dates in the same ink"
             stacked+=1
         end
@@ -148,7 +191,7 @@ function front_failure(state,board,mode)
 end
 
 function check_stacked(print_path,dag_path,variant,mode)
-    @assert haskey(VARIANT_PAIRS,variant) && mode in MODES "VARIANT must be A|B|W, MODE strict|context"
+    @assert valid_variant(variant) && mode in MODES "VARIANT must be A|B|W or a mixed layout, MODE strict|context"
     goals=stacked_goals(variant);candidate=read_stacked_print(print_path,variant)
     folded=count(g->any(!isnothing(parse_stacked(g.board[r,c][1])) for r in 3:7,c in 1:7),goals)
     println("stacked-profile\t",variant,'\t',mode,"\t888\t91\t",folded)
@@ -181,15 +224,15 @@ end
 function inventory_group(g,ink,r,c,variant,mode)
     if mode=="context"
         t=replace(g,'O'=>'0','I'=>'1')
-        for (a,b) in VARIANT_PAIRS[variant]
+        for (a,b) in variant_pairs(variant)
             t in (string(a),string(b),stacked_text(a,b)) && return ("pair",string(a),string(b),ink)
         end
     end
     a=artwork(g,ink,r,c);("art",a[1],string(a[2]),a[3])
 end
 function stacked_inventory(variant,mode)
-    @assert haskey(VARIANT_PAIRS,variant) && mode in MODES "VARIANT must be A|B|W, MODE strict|context"
-    goals=stacked_goals(variant);total=0;negative=0
+    @assert valid_variant(variant) && mode in MODES "VARIANT must be A|B|W or a mixed layout, MODE strict|context"
+    goals=stacked_goals(variant);total=0;negative=0;over=String[]
     for k in sort!(unique(orbit(r,c) for r in 1:7,c in 1:7))
         peak=Dict{NTuple{4,String},Int}();blanks=0
         for t in goals
@@ -204,10 +247,16 @@ function stacked_inventory(variant,mode)
             blanks=max(blanks,b)
         end
         need=sum(values(peak);init=0);slack=capacity(k)-need-blanks
-        slack<0 && (negative+=1);total+=need
+        slack<0 && (negative+=1;push!(over,"($(k[1]),$(k[2]))"));total+=need
         println("stacked-orbit\t",variant,'\t',mode,'\t',k[1],'\t',k[2],'\t',need,'\t',blanks,'\t',capacity(k),'\t',slack)
     end
     core=sort!(unique(goals[id].board[4,4][1] for id in 1:91))
     println("stacked-core-cell\t",variant,'\t',join(core,','))
-    println("stacked-inventory\t",variant,'\t',mode,'\t',total,'\t',negative==0 ? "NOT_OBSTRUCTED" : "OBSTRUCTED",'\t',negative)
+    println("stacked-inventory\t",variant,'\t',mode,'\t',total,'\t',negative==0 ? "NOT_OBSTRUCTED" : "OBSTRUCTED",'\t',negative,'\t',isempty(over) ? "-" : join(over," "))
+end
+# All 24 mixed layouts in one run, both readings.
+function stacked_inventory_all()
+    for v in all_mixes(),mode in MODES
+        stacked_inventory(v,mode)
+    end
 end

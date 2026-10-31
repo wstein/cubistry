@@ -1,13 +1,22 @@
 #!/usr/bin/env julia
 # UNTRUSTED candidate generator; only check_stacked.jl and flix/ decide acceptance.
-# Keeps every PR #99 legal state: blanks the overflow (↶) surfaces and reprints, as
+# Keeps every PR #99 legal state: blanks each overflow (↶) surface that no new display
+# needs (it is never shown on a cell that wants its overflow label) and reprints, as
 # the stacked pair, whichever surface the old state puts on each folded cell.
 include(joinpath(@__DIR__,"stacked_common.jl"))
 function generate(dag_path,variant,out)
     goals=stacked_goals(variant);proof=replay_dag(dag_path)
     old_path=joinpath(@__DIR__,"..","english","evidence","physical-print.tsv")
     rows=strict_lines(old_path);source=read_physical(old_path);art=Dict{Int,String}()
-    for (id,s) in enumerate(source);endswith(s.text,"↶") && (art[id]="");end
+    needed=Set{Int}()
+    for id in 1:91
+        state=decode_physical(source,signed_perm(proof.registers,proof.targets[id]),proof.action)
+        for s in state
+            (s.normal==FRONT_NORMAL && endswith(s.text,"↶")) || continue
+            goals[id].board[4-s.pos[2],s.pos[1]+4][1]==s.text && push!(needed,s.id)
+        end
+    end
+    for (id,s) in enumerate(source);endswith(s.text,"↶") && !(id in needed) && (art[id]="");end
     for id in 1:91
         state=decode_physical(source,signed_perm(proof.registers,proof.targets[id]),proof.action)
         for r in 3:7,c in 1:7

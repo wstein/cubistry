@@ -8,9 +8,13 @@ A-context-pr99-print	A	context	1	1	IDENTICAL	stacked-summary REJECT A context 73
 W-context-pr99-print	W	context	0	0	IDENTICAL	stacked-summary ACCEPT W context 91 0 240
 W-context-pr128-pairs-pr99-dag	W	context	1	1	IDENTICAL	stacked-summary REJECT W context 52 39 238
 W-context-pr128-pairs-pr128-dag	W	context	1	1	IDENTICAL	stacked-summary REJECT W context 52 39 238
-inventory-W-strict	W	strict	0	0	IDENTICAL	stacked-inventory W strict 240 NOT_OBSTRUCTED 0
-inventory-W-context	W	context	0	0	IDENTICAL	stacked-inventory W context 237 NOT_OBSTRUCTED 0
-inventory-A-strict	A	strict	0	0	IDENTICAL	stacked-inventory A strict 267 OBSTRUCTED 6
-inventory-A-context	A	context	0	0	IDENTICAL	stacked-inventory A context 260 OBSTRUCTED 4
-inventory-B-strict	B	strict	0	0	IDENTICAL	stacked-inventory B strict 240 OBSTRUCTED 1
-inventory-B-context	B	context	0	0	IDENTICAL	stacked-inventory B context 234 NOT_OBSTRUCTED 0
+inventory-W-strict	W	strict	0	0	IDENTICAL	stacked-inventory W strict 240 NOT_OBSTRUCTED 0 -
+inventory-W-context	W	context	0	0	IDENTICAL	stacked-inventory W context 237 NOT_OBSTRUCTED 0 -
+inventory-A-strict	A	strict	0	0	IDENTICAL	stacked-inventory A strict 267 OBSTRUCTED 6 (-3,-3) (-3,-1) (-2,-1) (-1,-1) (-1,0) (0,0)
+inventory-A-context	A	context	0	0	IDENTICAL	stacked-inventory A context 260 OBSTRUCTED 4 (-2,-1) (-1,-1) (-1,0) (0,0)
+inventory-B-strict	B	strict	0	0	IDENTICAL	stacked-inventory B strict 240 OBSTRUCTED 1 (-3,-3)
+inventory-B-context	B	context	0	0	IDENTICAL	stacked-inventory B context 234 NOT_OBSTRUCTED 0 -
+mix-F31bfold-strict	F31=bfold,S30=keep,S31=keep	strict	1	1	IDENTICAL	stacked-summary REJECT F31=bfold,S30=keep,S31=keep strict 85 6 239
+mix-S30bfold-S31bfold-strict	F31=keep,S30=bfold,S31=bfold	strict	1	1	IDENTICAL	stacked-summary REJECT F31=keep,S30=bfold,S31=bfold strict 85 6 238
+mix-S30bfold-S31bfold30-strict	F31=keep,S30=bfold,S31=bfold30	strict	1	1	IDENTICAL	stacked-summary REJECT F31=keep,S30=bfold,S31=bfold30 strict 89 2 239
+inventory-all	24-mixes	both	0	0	IDENTICAL	48 inventory lines

@@ -1,18 +1,47 @@
-# English calendar: stacked dual labels, case 1 (1/8 + 24/31) vs case 2 (23/30 + 24/31 + 24/31)
+# English calendar: stacked dual labels (negative result under the strict reading)
 
-**Status: research candidate, not certified.** Two results are covered by both
-native checkers (Julia and the Flix port) with byte-identical receipts:
+**Status: research result, not certified.** Every result in this section is
+covered by both native checkers (Julia and the Flix port), with byte-identical
+receipts:
 
-- **Case 2** (layout B: `24/31` red, `24/31` black, `23/30` red) is accepted as
-  one candidate under the context reading. It keeps all 91 PR #99 legal states,
-  needs no repairs and frees 3 printed surfaces.
-- **Case 1** (layout A: `1/8` red, `24/31` red) is **obstructed for every print**
-  of the 294-surface model, under both readings.
+**Owner decisions.**
 
-All 13 corruption controls are rejected by both checkers. A first independent
-review (at commit 35277d6, before the case comparison) found no correctness bug.
-There is no pinned manifest yet. Anything not covered by both checkers is marked
-UNKNOWN.
+- Stacked labels count only when upright.
+- Dropping the `30↶`/`31↶` marks is acceptable.
+- The **context reading is rejected**: a stacked sticker is correct only on a
+  cell that really needs that stacked label (strict reading).
+- The earlier choice of case 2 is moot, and the earlier recommendation of case
+  2 is withdrawn.
+
+**Result under the strict reading.** The scope is the declared pairs, the
+294-surface model, the declared glyph profile and inks, and the PR #99 optics
+rule that a blank cell needs a blank sticker.
+
+- **Case 1** (`1/8` red, `24/31` red; layout A) is impossible under both
+  readings, for any print.
+- **Case 2** (`23/30` red, `24/31` red, `24/31` black; layout B) is impossible
+  under the strict reading, for any print. In the corner orbit, 22 printed and
+  3 blank stickers are needed, but the orbit has only 24.
+- **So no full-fold stacked print exists under the strict reading.**
+- **Splitting the six-week months into types does not save anything either.**
+  Of the 24 split-month combinations ("Split-month combinations" below), the 7
+  that are feasible under strict need at least 240 printed surfaces, the
+  PR #99 count.
+  - Three of them need exactly 240: they would replace overflow marks by stacked
+    labels at no extra printed surfaces. For each of them, the existing legal
+    states fail, and whether other legal states exist is UNKNOWN.
+- No move savings are claimed anywhere.
+
+The case 2 candidate below (237 printed, all 91 PR #99 states, context reading)
+remains as a record. It **depends on the rejected reading** and is not a design
+candidate.
+
+All 17 corruption controls are rejected by both checkers. Two independent
+reviews (at 35277d6 and c9abdea) found no correctness bug. There is no pinned
+manifest yet. Anything not covered by both checkers is marked UNKNOWN.
+
+PR #128 (`../dual-dates/`) is kept, unchanged, as the superseded
+orientation-selection study.
 
 This folder replaces the meaning of PR #128 (`../dual-dates/`) without changing
 it. PR #128 is an orientation-selection profile: one surface carries two labels a
@@ -57,12 +86,15 @@ reused unchanged. Front rows 1 and 2 (month letters, weekday names) are unchange
 - **Strict reading:** a stacked sticker is correct only on its own folded cell,
   with the same label and ink.
 - **Context reading:** in addition, an upright stacked `a/b` in the cell's ink
-  may stand where a month needs only `a` or only `b`. This is the owner's "the
-  month decides which one applies".
+  may stand where a month needs only `a` or only `b`. **Rejected by the owner.**
+  It is kept only for reference.
 - **Layout W** keeps the PR #99 wrap layout and treats the PR #128 pairs as
   stacked context stickers. It is a comparison only.
 
 ## Comparison: case 1 vs case 2
+
+This table predates the owner's rejection of the context reading. Its context
+entries are kept for reference only.
 
 | | Case 1 (A: `1/8` red, `24/31` red) | Case 2 (B: `23/30` red, `24/31` red, `24/31` black) |
 |---|---|---|
@@ -77,15 +109,100 @@ reused unchanged. Front rows 1 and 2 (month letters, weekday names) are unchange
 | Transition move counts | not applicable (no states) | Unchanged: same DAG and the same 91 states. Chains not re-run with the new print |
 | Checker results | inventory OBSTRUCTED (both); candidate rejected (both) | ACCEPT (both); inventory NOT_OBSTRUCTED for context |
 
-**Recommendation: case 2 (layout B, bottom fold, three single-color stickers),
-read in context.**
+The earlier recommendation of case 2 is **withdrawn**. Case 2 works only under
+the context reading, which the owner rejected. Under the strict reading case 2
+is impossible (corner orbit), and case 1 is impossible under both readings.
 
-- It is the only case with a checked full solution: every display has a legal
-  physical state (the existing PR #99 states), and it saves 3 printed surfaces.
-- Case 1 is impossible in this model whatever the print, as shown below. It
-  would need a different model or artwork profile.
-- Owner decision: case 2 works only under the context reading. Under strict it
-  is impossible as well.
+## Split-month combinations
+
+The owner asked whether the unfavorable months can be split into subtypes, each
+displayed its own way.
+
+**The three six-week month types.**
+
+| Type | Months (2026 to 2099) | Allowed displays |
+|---|---:|---|
+| F31: Friday-start, 31 days | 73 | `keep` (PR #99 overflow `31↶`), `bfold` (`24/31` red at row 7 Sunday) |
+| S30: Saturday-start, 30 days | 42 | `keep` (`30↶`), `bfold` (`23/30` red), `afold` (`1/8` red at row 3 Saturday, weeks 2 to 6 in rows 3 to 7) |
+| S31: Saturday-start, 31 days | 75 | `keep` (`30↶`, `31↶`), `bfold` (`23/30` red and `24/31` black), `bfold30` (`23/30` red; 31 stays as `31↶` in row 3 Monday), `afold` (`1/8` red) |
+
+These give 2 × 3 × 4 = 24 combinations. Both checkers accept a layout written as
+`F31=<choice>,S30=<choice>,S31=<choice>`. `check_stacked.jl inventory-all` and
+the Flix `inventory-all` command evaluate all 24 combinations in both readings.
+Their receipts are identical:
+[inventory-all](evidence/receipts/inventory-all.julia.tsv).
+
+**No finer split changes the date grid.** The date rows of a month depend only
+on its starting weekday and its length, and both are fixed within each type.
+
+- Leap years affect only February, which never needs six weeks. A Saturday-start
+  February has at most 29 days and fits in five weeks.
+- The month-letter position (January to September right, October to December
+  left) changes row 1 only, and it does so whatever the fold choice.
+
+So no finer subtype is considered.
+
+**Table** (strict bound = printed surfaces any print would need, the PR #99
+optics rule included; obstructed orbits are named by their front-face orbit
+key; context column for reference only, since that reading is rejected):
+
+| # | Combination | Strict feasible | Strict bound | Strict obstructed orbits | Context bound (reference) | Existing PR #99 states, strict |
+|---:|---|---|---:|---|---|---|
+| 1 | `F31=keep,S30=keep,S31=keep` | yes | 240 | - | 240 (not obstructed) | PR #99 baseline (control) |
+| 2 | `F31=keep,S30=keep,S31=bfold` | yes | 241 | - | 236 (not obstructed) | not checked (bound > 240) |
+| 3 | `F31=keep,S30=keep,S31=bfold30` | yes | 241 | - | 238 (not obstructed) | not checked (bound > 240) |
+| 4 | `F31=keep,S30=keep,S31=afold` | no | 268 | (-3,-1) (-3,1) (-2,-1) (-1,-1) (-1,0) (0,0) | 265 (obstructed) | — |
+| 5 | `F31=keep,S30=bfold,S31=keep` | yes | 241 | - | 238 (not obstructed) | not checked (bound > 240) |
+| 6 | `F31=keep,S30=bfold,S31=bfold` | yes | 240 | - | 235 (not obstructed) | candidate 238 printed: 85 / 91 pass (fail 28, 45, 54, 62, 71, 90) |
+| 7 | `F31=keep,S30=bfold,S31=bfold30` | yes | 240 | - | 237 (not obstructed) | candidate 239 printed: 89 / 91 pass (fail 62, 90) |
+| 8 | `F31=keep,S30=bfold,S31=afold` | no | 268 | (-3,-3) (-3,-1) (-3,1) (-2,-1) (-1,-1) (-1,0) (0,0) | 261 (obstructed) | — |
+| 9 | `F31=keep,S30=afold,S31=keep` | no | 268 | (-3,-1) (-3,1) (-2,-1) (-1,-1) (-1,0) (0,0) | 265 (obstructed) | — |
+| 10 | `F31=keep,S30=afold,S31=bfold` | no | 268 | (-3,-3) (-3,-1) (-3,1) (-2,-1) (-1,-1) (-1,0) (0,0) | 258 (obstructed) | — |
+| 11 | `F31=keep,S30=afold,S31=bfold30` | no | 268 | (-3,-3) (-3,-1) (-3,1) (-2,-1) (-1,-1) (-1,0) (0,0) | 261 (obstructed) | — |
+| 12 | `F31=keep,S30=afold,S31=afold` | no | 267 | (-3,-1) (-3,1) (-2,-1) (-1,-1) (-1,0) (0,0) | 264 (obstructed) | — |
+| 13 | `F31=bfold,S30=keep,S31=keep` | yes | 240 | - | 238 (not obstructed) | candidate 239 printed: 85 / 91 pass (fail 33, 42, 50, 59, 76, 87) |
+| 14 | `F31=bfold,S30=keep,S31=bfold` | no | 241 | (-3,-3) | 235 (not obstructed) | — |
+| 15 | `F31=bfold,S30=keep,S31=bfold30` | no | 241 | (-3,-3) | 236 (not obstructed) | — |
+| 16 | `F31=bfold,S30=keep,S31=afold` | no | 268 | (-3,-3) (-3,-1) (-3,1) (-2,-1) (-1,-1) (-1,0) (0,0) | 261 (obstructed) | — |
+| 17 | `F31=bfold,S30=bfold,S31=keep` | no | 241 | (-3,-3) | 236 (not obstructed) | — |
+| 18 | `F31=bfold,S30=bfold,S31=bfold` (case 2) | no | 240 | (-3,-3) | 234 (not obstructed) | — |
+| 19 | `F31=bfold,S30=bfold,S31=bfold30` | no | 240 | (-3,-3) | 235 (not obstructed) | — |
+| 20 | `F31=bfold,S30=bfold,S31=afold` | no | 268 | (-3,-3) (-3,-1) (-2,-1) (-1,-1) (-1,0) (0,0) | 257 (obstructed) | — |
+| 21 | `F31=bfold,S30=afold,S31=keep` | no | 268 | (-3,-3) (-3,-1) (-3,1) (-2,-1) (-1,-1) (-1,0) (0,0) | 262 (obstructed) | — |
+| 22 | `F31=bfold,S30=afold,S31=bfold` | no | 268 | (-3,-3) (-3,-1) (-2,-1) (-1,-1) (-1,0) (0,0) | 257 (obstructed) | — |
+| 23 | `F31=bfold,S30=afold,S31=bfold30` | no | 268 | (-3,-3) (-3,-1) (-2,-1) (-1,-1) (-1,0) (0,0) | 258 (obstructed) | — |
+| 24 | `F31=bfold,S30=afold,S31=afold` (case 1) | no | 267 | (-3,-3) (-3,-1) (-2,-1) (-1,-1) (-1,0) (0,0) | 260 (obstructed) | — |
+
+Controls inside the table:
+
+- Row 1 reproduces the PR #99 bound 240.
+- Row 18 reproduces case 2 (strict: 240, corner obstructed; context: 234).
+- Row 24 reproduces case 1 (267 strict, 260 context).
+
+**Final result: no strict-feasible combination has a bound below 240.** Splitting
+the month types cannot save a printed surface under the strict reading.
+
+- Every combination with a top fold (`afold`) is obstructed.
+- Every combination that needs two stacked labels in the corner orbit is
+  obstructed (`23/30` red and `24/31` red both sit at row 7 Sunday).
+- The feasible combinations swap one overflow artwork for one stacked artwork at
+  best. `30↶` red is shared by S30 and S31, so it disappears only if both fold.
+
+**Rows 6, 7 and 13 (bound 240).** These would show stacked labels instead of
+some overflow marks at the PR #99 printed count. They are a readability
+alternative, not a saving, and they mix two display styles in one calendar.
+
+- For each, the untrusted generator derived a candidate print from the existing
+  states. Both checkers reject it under strict (`mix-*` rows in
+  [cases.tsv](evidence/receipts/cases.tsv)).
+- The failures are structural:
+  - the candidate keeps fewer printed surfaces (238 or 239) than the strict
+    bound 240;
+  - the failing cells are row-7 cells where a reprinted stacked surface
+    stands on a cell that needs a plain date (`stacked-mismatch`).
+- Any strict print for these rows needs at least 240 printed surfaces and new
+  legal states for the failing displays. Whether such states exist is
+  **UNKNOWN**: no synthesis was attempted.
 
 ## Why case 1 is impossible (both checkers, `inventory` command)
 
@@ -173,7 +290,11 @@ Why the two W rows fail (checker output; 13 targets each):
   - cell 7,1 shows surface 281 (`24/31`) at angle 3.
   - All three fail because the label is not upright.
 
-### Accepted candidate (case 2, context reading)
+### Case 2 candidate under the REJECTED context reading (record only)
+
+The owner rejected the context reading, so this candidate is **not a design
+candidate**. It is kept as a record of what that reading would have allowed.
+
 
 [evidence/print-B.tsv](evidence/print-B.tsv) differs from the PR #99 print in six
 surfaces:
@@ -200,7 +321,7 @@ decide.
   not been re-run against the new print. A formal chain receipt for case 2 is
   UNKNOWN.
 
-### Why the existing states cannot free more than 3
+### Why the existing states cannot free more than 3 (context reading, rejected)
 
 This is an argument from checker output, not a computed count. Both checkers
 report `stacked-printed-never-on-front 0` for the PR #99 print: each of the 240
@@ -245,7 +366,8 @@ input), the 294-surface model of `../english/evidence/physical-print.tsv`, and
 
 [evidence/context-use.tsv](evidence/context-use.tsv), from
 [context_use.jl](context_use.jl), is a descriptive listing, not a proof. It
-covers layout B, the context reading and `print-B.tsv`. For each of the 12
+describes the **REJECTED context reading** (layout B, `print-B.tsv`) and was
+made for the owner's decision. For each of the 12
 displays where a stacked sticker stands for a single date, it gives:
 
 - the full date rows 3 to 7 as read on the front;
@@ -257,8 +379,8 @@ displays where a stacked sticker stands for a single date, it gives:
 - [stacked_common.jl](stacked_common.jl), [check_stacked.jl](check_stacked.jl):
   native Julia. They include the unchanged `../english/replay_legal.jl`
   (geometry, print reader, legal DAG replay, PR #99 optics) and add the fold
-  layouts, the print-change rules, the stacked match rule and the inventory
-  obstruction.
+  layouts, the split-month (mixed) layouts, the print-change rules, the stacked
+  match rule and the inventory obstruction (`inventory`, `inventory-all`).
 - [flix/](flix/): Flix 0.79.0 port, built by [flix/build.sh](flix/build.sh) from
   the unchanged English Flix `Core`, `Data` and `Dag` modules plus a new
   `Main.flix`.
@@ -272,7 +394,7 @@ a wrong definition of the semantics would be shared. The geometry, calendar,
 optics (including the inventory artwork classes), print reader and DAG replay
 come from separately written English Julia and Flix modules (the PR #99 pair).
 
-[negative_checks.sh](negative_checks.sh) runs 13 controls. Results are in
+[negative_checks.sh](negative_checks.sh) runs 17 controls. Results are in
 [evidence/negative-controls/results.tsv](evidence/negative-controls/results.tsv);
 Julia and Flix both exit 1 on all of them, for matching reasons and the same
 first failing cell:
@@ -288,8 +410,11 @@ first failing cell:
     `../dual-dates/generate_oriented.jl`) moves the red `24/31` sticker 16 onto
     row 7 Saturday of target 1. That cell needs a red 31, and the sticker
     arrives a quarter turn from upright, so the cause is `stacked-not-upright`.
-- **Argument rejections:** unknown mode, and an unknown variant or mode for
-  `inventory`.
+- **Argument rejections:**
+  - unknown mode;
+  - an unknown variant or mode for `inventory`;
+  - mixed-layout parsing: unknown month type (`S29`), unknown choice
+    (`F31=afold`), misordered types, and a missing type.
 
 These are invalid-candidate results, not UNSAT proofs.
 
@@ -309,30 +434,35 @@ Single runs:
 
 - `julia --startup-file=no research/calendar-7x7/dual-stacked/check_stacked.jl PRINT DAG B context`
 - `julia --startup-file=no research/calendar-7x7/dual-stacked/check_stacked.jl inventory A context`
+- `julia --startup-file=no research/calendar-7x7/dual-stacked/check_stacked.jl inventory-all`
+- `julia --startup-file=no research/calendar-7x7/dual-stacked/check_stacked.jl inventory "F31=keep,S30=bfold,S31=bfold30" strict`
 - `java -jar flix.jar PRINT DAG B context research/calendar-7x7/english/evidence research/calendar-7x7/en-physical-review`
 - `java -jar flix.jar inventory A context research/calendar-7x7/english/evidence`
+- `java -jar flix.jar inventory-all research/calendar-7x7/english/evidence`
 
 Compare only lines starting with `stacked-`.
 
-## Open decisions for the owner
+## Owner decisions and open points
 
-1. **Case:** case 2 is recommended. Case 1 is obstructed for any print in this
-   model.
-2. **Reading:** is the context reading acceptable? Under it, a stacked sticker stands
-   for a single date in 104 of 888 months (12 displays). For example, `24/31`
-   black appears on an ordinary Monday the 24th. Without it,
-   case 2 is impossible too.
-3. **Overflow marks:** under case 2, `30↶` and `31↶` disappear completely. Is
-   that intended?
-4. **Orientation:** may a stacked label ever be read rotated? Assumed no. This
-   is the rule that rejects the PR #128 states.
-5. **Typography and size:** a font, the rule line and real sticker measurements
-   are needed to judge two stacked numbers on corner and outer-wing stickers
-   (UNKNOWN here).
-6. **Scope:** stop at the 3-surface candidate, or look for up to 3 more frees
-   with new states (bound 234)? That needs new DAG synthesis and is UNKNOWN.
-7. **PR #128:** keep it as the superseded orientation-selection study (it is
-   untouched here).
-8. **Core pair (design alternative):** should an extra core sticker such as
-   `5/12` be considered? It would remove the core part of the case 1 obstruction;
-   the remaining case 1 orbits would then be UNKNOWN.
+Decided:
+
+- The context reading is **rejected**; only the strict reading counts.
+- Stacked labels count only when upright.
+- Dropping the `30↶`/`31↶` marks is acceptable.
+- Case 2 was chosen earlier, but that choice is moot under the strict reading.
+- PR #128 stays as the superseded orientation-selection study (untouched here).
+
+Open points:
+
+1. **Readability alternative at equal cost:** split-month rows 6, 7 and 13 have
+   strict bound 240. Is it worth looking for new legal states (UNKNOWN; none
+   synthesized) to show stacked labels instead of some overflow marks?
+   - There is no printed-surface saving.
+   - Two display styles would appear in one calendar.
+2. **Other artwork:** any saving under the strict reading would need artwork
+   outside the declared profile, for example:
+   - an extra core pair such as `5/12`, which removes only the core part of the
+     case 1 obstruction (its other orbits would then be UNKNOWN);
+   - a different layout or model.
+3. **Typography and size:** a font, the rule line and real sticker measurements
+   (UNKNOWN here) would be needed for any stacked design.

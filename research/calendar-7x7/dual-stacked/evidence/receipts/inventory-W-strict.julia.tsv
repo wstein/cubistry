@@ -12,4 +12,4 @@ stacked-orbit	W	strict	-1	-1	22	2	24	0
 stacked-orbit	W	strict	-1	0	22	1	24	1
 stacked-orbit	W	strict	0	0	6	0	6	0
 stacked-core-cell	W	10,11,5,6,7,8,9
-stacked-inventory	W	strict	240	NOT_OBSTRUCTED	0
+stacked-inventory	W	strict	240	NOT_OBSTRUCTED	0	-
