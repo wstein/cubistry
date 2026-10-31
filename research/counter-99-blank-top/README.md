@@ -3,8 +3,10 @@
 **Status:** one permanent 24-sticker print (20 upright digit stickers, 4 blank stickers)
 supports two counting modes. Both native checkers (Julia and Flix) accept it and their receipts
 match byte for byte. **The target "at most 3 HTM on every edge" is NOT reached:** the best
-certified print has a maximum of **4 HTM**. For this print, max 3 is **proven infeasible**
-in both modes by exact search (see below). Whether **any** print reaches max 3 is **UNKNOWN**.
+checker-accepted print has a maximum of **4 HTM**. Max 3 is **UNKNOWN**, both for this print
+and over all prints. A search-side Julia computation, which no checker has confirmed, finds no max-3
+cycle for this print (see below). The only checker-backed fact here is that this route's
+4-move edges are at least as long as the exact distance both checkers recompute; for example, LZ 99->00 has exact distance 4.
 
 | Mode | Edges | Max HTM | Edges at 1 / 2 / 3 / 4 | Total HTM | Mean | Setup from printed state |
 | --- | ---: | ---: | --- | ---: | ---: | --- |
@@ -37,8 +39,9 @@ takes 6 HTM, and the way back is the inverse word. That word is not claimed to b
 - Each mode is one closed 100-edge cycle of **full** cube states: the hidden stickers are tracked, and after
   100 increments the cube is back in exactly the starting state, so counting can go on forever.
 - **Profile A (optional relaxation, top cells unconstrained):** not searched separately. Every Profile B
-  route is also a Profile A route, so the Profile A maximum is at most 4. Tracked-tuple ball sizes for A are
-  1, 13, 114, 396, 504 for radius 0..4. Whether A can reach max 3 or max 2 is UNKNOWN; this is not claimed.
+  route is also a Profile A route, so the Profile A maximum is at most 4. Search-side cumulative ball sizes
+  of the 2-sticker tracked graph (LL and LR only, 504 states) are 1, 13, 114, 396, 504 for radius 0..4; no
+  checker computes them. Whether A can reach max 3 or max 2 is UNKNOWN; this is not claimed.
 
 ## Files
 
@@ -50,7 +53,7 @@ takes 6 HTM, and the way back is the inverse word. That word is not claimed to b
 - `evidence/setup-lz.tsv`, `evidence/setup-nz.tsv`: setup words from the printed state.
 - `evidence/receipt-{julia,flix}-{lz,nz}.tsv`: checker receipts (identical per mode).
 - `evidence/negative-controls.tsv`, `evidence/controls/`: mutated inputs and how they were rejected.
-- `evidence/exact-k3.tsv`: the exact max-3 statement for this print (search side).
+- `evidence/exact-k3.tsv`: search-side max-3 computation for this print (no checker confirms it).
 - `julia/check.jl`: native Julia checker. `flix/src/Main.flix` and `flix/build.sh`: native Flix checker
   (Flix 0.79.0 via the repository's flixw scaffolding, Java 21).
 - `search/`: Julia generator (word index, layered DP, annealing, exact reach, export). It is not proof
@@ -69,6 +72,20 @@ The two checkers share no code; each replays the moves on its own sticker vector
    every edge and both directions, the exact distance from the actual state to the nearest state
    showing the target. The claimed `*_shortest` column must equal it.
 
+**Independence limitation (common mode):** the Flix checker is a port of the Julia checker. It has the same
+check order, the same data model (sticker position, normal and up vectors), the same tracked-graph BFS and the same
+messages, written by the same author. The two languages and implementations guard against coding slips, but not against
+a rule that was misread in the shared design: such a misreading would most likely show up in both. The following
+rules were checked by hand against the repository's existing counter work rather than by a second design:
+- clockwise turn convention, v -> (v.n)n - n x v about the outward normal (R carries front to up);
+- cell layout: front = +z viewed with +y up, so UL = (-1,1,1), UR = (1,1,1), LL = (-1,-1,1), LR = (1,-1,1);
+- upright rule: up vector = +y, blank carries no orientation;
+- HTM counting: one move per face turn, half turns included.
+
+The old print's sticker up vectors, read with these conventions, are upright exactly in their declared
+slots after its published setup `U2 F' L U' R'`, which shows 00 with title stickers on top. This is a
+consistency check of the conventions only. No rule check was made structurally different in Flix.
+
 LZ: 63 of 100 increments and 72 of 100 decrements are shortest to any matching display. NZ: 69 and 70.
 The rest are longer on purpose: they keep the hidden state on a repeatable cycle. Words of length up to 5
 were allowed, and every used word is at most 4.
@@ -76,7 +93,7 @@ were allowed, and every used word is at most 4.
 Negative controls (both checkers reject each one with the same intended message, see
 `evidence/negative-controls.tsv`): wrong glyph, wrong up vector, non-blank sticker in a top cell,
 non-blank sticker in the NZ tens cell, wrong route move, claimed distance too small, and a decrement that is not
-the inverse word.
+the inverse word, plus a hidden glyph reprint (units 5 printed as 6) that makes display 05 unreachable.
 
 Reproduce (no Python anywhere):
 
@@ -86,13 +103,18 @@ JULIA=/path/to/julia research/counter-99-blank-top/evidence/run.sh   # builds th
 
 ## Max 3: what is known
 
-- **This print (exact, search side):** `search/exact_report.jl` enumerates every legal full state
+Max 3 is **UNKNOWN** for this print and for all prints. The checkers confirm only per-edge exact
+distances along the stored route: for example, the LZ 99->00 edge starts from the actual state, and the
+nearest state showing 00 is exactly 4 HTM away. A different hidden state at 99 is not covered by that check.
+
+- **This print (search side, not checker-confirmed):** `search/exact_report.jl` enumerates every legal full state
   showing value 0 (LZ 3,888, NZ 15,552). It then propagates the complete set of reachable states with
   words of at most 3 HTM, without a beam. LZ dies at the 99->00 edge: every edge 00->...->99 can
-  be done in 3 or fewer, but no route can also wrap in 3 or fewer. NZ survives one full lap but dies 40 edges into the
-  second, so no closed (repeatable) max-3 cycle exists. These statements are produced by the Julia generator
-  code only and are not re-checked by Flix.
-- **Over all prints:** UNKNOWN. Tracked-tuple balls (radius 0..4: 1, 16, 214, 2,244, 17,640 of
+  be done in 3 or fewer, but the computation finds no route that also wraps in 3 or fewer. NZ survives one full lap but dies 40
+  edges into the second, so the computation finds no closed (repeatable) max-3 cycle. This rests only on the
+  generator code (`search/exact.jl`, `search/c99_reach.jl`); neither native checker covers it, so it
+  is not a proof of infeasibility.
+- **Over all prints:** UNKNOWN. Search-side cumulative ball sizes of the 4-sticker tracked graph (radius 0..4: 1, 16, 214, 2,244, 17,640 of
   136,080) show that max 3 is a tight target, but no counting bound rules it out. Simulated annealing over
   sticker labels, scored by exact max-3 reach, warm-started from the old print and
   reheated, plateaued at "all edges except 99->00" for LZ. Random restarts did much worse (about 33 layers).
