@@ -105,13 +105,16 @@ seam-specific bevel coverage and interior cut-face caps. Both consumers now use
 unit pitch (0.5 times the size-2 ±1 lattice), retaining the approved 0.99-unit
 rounded outer shell and 0.055-unit bevels. The visible shell seam is 0.01 units.
 
-Concealed plastic cores extend to internal half-pitch seams while retreating to
-0.43 on immutable source exterior faces, below the shell. A 0.0005-unit overlap
-on internal sides prevents floating-point cracks at interpolated four-piece
-junctions. Exterior geometry never grows. Cores follow the same canonical body
-frames and legal turn pivots as artwork. Numeric rays cover 2×2/3×3 scrambled
-poses on all six sides and 25/50/75/100% layer turns, rather than only a front
-reference pose.
+**Core ball (supersedes per-cubie box cores).** The former per-cubie plastic box
+cores are removed. Each cube has one static core ball at its center, radius
+`CORE_RADIUS_RATIO` (0.35) of the half cube edge, so a 3×3 keeps about one unit
+of distance to the surface. It follows the view group but never a layer turn or
+body frame. Consequence, owner-requested and measured with rays: the shell seams
+are no longer sealed behind the bevels, so frontal and slightly oblique rays
+through four-cubie junction lines can pass between bodies. The former tests for
+opaque seams are replaced by tests of the ball's placement and its independence
+from poses and turns. The owner should judge the see-through lines in the
+preview.
 
 ### R05/R06: dynamic cast shadows and warm studio
 
@@ -159,9 +162,9 @@ Inward-facing cut faces of a stickerless body take the color of a bordering
 exterior face of the same cubie (the first one by local face order whose axis
 differs; a lone exterior face is the fallback), as on real stickerless cubes.
 An optional manifest material with id `body` overrides every cut face of the
-cube. The stickerless core is dark gray (`DEFAULT_CORE_COLOR`) unless an optional
-manifest material `core` or `PhysicalCubeScene.setCoreColor` sets it. Stickered
-keeps the core in the selected frame color. Neither color is exposed in the UI.
+cube. The stickerless core ball is dark gray (`DEFAULT_CORE_COLOR`) unless an
+optional manifest material `core` or `PhysicalCubeScene.setCoreColor` sets it.
+Stickered keeps the core ball in the selected frame color. Neither color is exposed in the UI.
 
 Under Section 8, Stickerless maps original glyph/photo artwork directly onto
 the rounded body's face groups and hides only the redundant inset planes.
