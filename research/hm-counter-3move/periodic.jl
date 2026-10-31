@@ -93,8 +93,8 @@ function enable5!()
     push!(BALLS, b5); push!(CLS, c5); push!(WORKS, Work(c5.nwords))
 end
 # edge cost: HTM + 1000 per edge beyond 3 HTM (lexicographic: max first)
-const PEN4 = parse(Int, get(ENV, "HM_PEN4", "1000"))
-edgecost(len) = len + (len > 3 ? PEN4 : 0) + (len > 4 ? 1_000_000 : 0)
+const PEN4 = Ref(parse(Int, get(ENV, "HM_PEN4", "1000")))
+edgecost(len) = len + (len > 3 ? PEN4[] : 0) + (len > 4 ? 1_000_000 : 0)
 
 # one lap from state a (showing 00): layers of Dict(state => min cost)
 function lap(a::State, L, r, sh)
@@ -416,6 +416,8 @@ function writeperiodic2(printfile, out; routesfile = "", hstarts = 15)
     routes = routesfile == "" ? Dict() : readroutes(routesfile)
     modes = Any[]
     for (L, r) in MODES
+        # optional per-letter objective: HM_PEN4_M / HM_PEN4_H override HM_PEN4
+        PEN4[] = parse(Int, get(ENV, "HM_PEN4_" * L, get(ENV, "HM_PEN4", "1000")))
         best = nothing
         for src in "SHM"
             haskey(routes, (src, r)) || continue
