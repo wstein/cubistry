@@ -1,18 +1,31 @@
 import { demand, deepFreeze, record, validatePrint, stateEquals, type PrintDefinition, type CubeState, type LegalMove } from "@cubistry/cube-core";
 import { initialState, applyMoves, parseAlg, matchesTarget } from "@cubistry/cube-mechanics";
 import { deploymentBasePath, sha256 } from "@cubistry/cube-assets";
-import { targetFor, type CounterDesign } from "./design.ts";
+import { targetFor, type CounterDesign, type CounterVariant } from "./design.ts";
+/**
+ * One stored counting route on one permanent print. The titled route has 99
+ * edges (00..99, no wrap); a cyclic route has 100 edges including 99->00, and
+ * its states close on the exact start state.
+ */
 export interface CertifiedCounter {
   readonly print: PrintDefinition;
   readonly states: readonly CubeState[];
   readonly increments: readonly (readonly LegalMove[])[];
+  readonly variant: CounterVariant;
+  /** Display format of this route's targets: false is the blank-top NZ mode. */
+  readonly padded: boolean;
+  readonly cyclic: boolean;
 }
 export const inverseMoves = (moves: readonly LegalMove[]): readonly LegalMove[] =>
   [...moves].reverse().map(m => ({face:m.face, turns: m.turns === 2 ? 2 : m.turns === 1 ? -1 : 1}));
 /** Eligibility uses every cubie position and body frame, never the visible digits. */
 export function certifiedStep(route: CertifiedCounter, from: CubeState, value: number, target: number): readonly LegalMove[] | null {
-  if (Math.abs(target-value)!==1 || !stateEquals(from,route.states[value])) return null;
-  return target>value ? route.increments[value] : inverseMoves(route.increments[target]);
+  if (!stateEquals(from,route.states[value])) return null;
+  if (Math.abs(target-value)===1) return target>value ? route.increments[value] : inverseMoves(route.increments[target]);
+  // A cyclic route also stores the 99->00 edge; its decrement is the exact inverse.
+  if (route.cyclic && value===99 && target===0) return route.increments[99];
+  if (route.cyclic && value===0 && target===99) return inverseMoves(route.increments[99]);
+  return null;
 }
 export function validateCertifiedCounter(raw: unknown, design: CounterDesign): CertifiedCounter {
   const d=record(raw,"certified counter");
@@ -40,7 +53,7 @@ export function validateCertifiedCounter(raw: unknown, design: CounterDesign): C
     demand(stateEquals(applyMoves(next,inverseMoves(increments[i])),states[i]),"Certified inverse mismatch");
     states.push(next);
   }
-  return deepFreeze({print,states,increments});
+  return deepFreeze({print,states,increments,variant:"titled" as const,padded:true,cyclic:false});
 }
 const CERTIFIED_SHA256="022da9eea3cf4b0f046251e89983700b41efdd9ce7c60a4d280be016e995ae2f";
 export async function loadCertifiedCounter(design: CounterDesign, basePath="/"): Promise<CertifiedCounter> {
