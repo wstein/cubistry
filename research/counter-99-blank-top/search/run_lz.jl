@@ -1,6 +1,0 @@
-include(joinpath(@__DIR__, "anneal.jl"))
-include(joinpath(@__DIR__, "oldprint.jl"))
-W = buildwords(5)
-lab, st = oldprint()
-b = anneal(W, lab, st, parse(Int, ARGS[1]), parse(Int, ARGS[2]); mode=Symbol(ARGS[3]))
-println("final ", b[1], " ", join(b[2], ','), " seed ", st)
