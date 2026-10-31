@@ -122,21 +122,62 @@ CubeAssembler's `cubeShadow.ts`/`CubeShadow.res` projects a rotated cube outline
 onto a soft floor, but its API receives only size/pitch/yaw, not active-layer
 geometry. Copying it would miss the requested changing turn silhouette. The
 shared [`studio.ts`](../packages/cube-viewer/src/studio.ts) instead uses actual
-moving shell/core/sticker meshes as shadow casters, one 1024×1024 key-light
-shadow map per viewport and fixed 17-tap PCF filtering. Its radius represents
-0.1 world units per half-cube extent, converted to texels and bounded to 2–24,
-so single/group scenes share softness without extra samples or passes. Key/fill/rim lighting and approved nonmetallic clearcoat are retained.
-The three-cube clock has one rig and floor for the entire synchronized scene.
+moving shell/core/sticker meshes as shadow casters, with fixed 17-tap PCF
+filtering. Radii represent a world-space penumbra per half-cube extent, converted
+to texels and bounded, so single/group scenes share softness without extra
+samples or passes. The three-cube clock has one rig and floor for the entire
+synchronized scene. Approved nonmetallic clearcoat is retained.
 
-A warm radial/vertical gradient replaces flat green on the viewport and its
-stage. The ground now uses Three's shadow-only `ShadowMaterial`: outside actual
-occlusion it is transparent, avoiding the uniform floor tint/horizon against that
-gradient. Shadow opacity is 0.38. The same conservative turn sweep and front-sided
-floor are retained, allowing bottom inspection. Lights, floor geometry/material and
+**Studio rig (all values are named constants in `PRESENTATION_PRESET`).**
+Ambient 0.30 and hemisphere 0.65 (previously 0.45 and 1.1: together they were
+more than half the key and reached every surface equally, flattening the shading).
+Key 2.8 at [3, 5, 6], fill 0.85 at [-4, 1, 2] and rim 1.3 at [1, 3, -4] keep their
+directions and intensities. A fourth directional light, the *shadow fill*
+(`shadowFillIntensity` 1.0, about 36 percent of the key, at [-3.5, 6, 4] on the
+side opposite the key), also casts a shadow. Its penumbra is wider
+(`shadowFillSoftness` 0.18 against the key's `shadowSoftness` 0.14, radius cap
+32 against 24 texels) and its shadow is weighted by
+`shadowFillShadowIntensity` 0.55. The intended effect: a denser core where the
+two shadows overlap and softer edges, neither hard nor gone.
+
+**Cost.** Exactly two 1024x1024 shadow maps per viewport, never per cube. The
+clock keeps one rig for three cubes. `fitCasters` fits both shadow cameras to the
+same conservative caster union (side bounds include receiver intersections;
+padding is scaled with each light's filter footprint, wider for the fill), and
+`dispose()` releases both maps.
+
+**Floor.** `ShadowMaterial` multiplies the shadow factors of all casting lights
+before applying its opacity (now 0.38). The key's shadow darkens the floor with the
+full opacity; the shadow fill's per-light shadow intensity scales its contribution
+down, so regions shaded only by the fill read about 55 percent as dark. Overlap
+does not darken beyond the opacity: the result is a union with graded edges, not an
+additive double shadow. A warm radial/vertical gradient replaces flat green on the
+viewport and its stage; the floor stays transparent outside shadows, so light
+pools on it are invisible.
+
+**Switches (both default off).** `setContactShadow(on)` adds a soft procedural
+radial plane (a generated `DataTexture`, no canvas) under each fitted cube, just
+above the receiver (`contactShadow*` constants). While off nothing is allocated;
+turning it off or disposing the studio releases geometry, material and texture.
+`setColorTemperature(on)` tints lights only: key `#fff3e3` (warm), fill and
+shadow fill `#eaf1ff` (cool). Off restores exactly white; materials, stickers and
+textures are never touched. The shared **Appearance** panel offers them as
+"Contact shadow" and "Warm studio light" checkboxes in CubeViewer,
+CalendarViewer and ClockStage ([`lighting-switches.ts`](../packages/cube-viewer/src/lighting-switches.ts)).
+They persist per page in their own versioned, bounded key
+`cubistry-viewer-lighting-v1:<path>`; the appearance storage format is unchanged.
+Garbage or unavailable storage falls back to the defaults.
+
+**Verified and not verified.** Numeric tests cover preset values and defaults,
+light and shadow-caster counts, both frusta containing the caster union and its
+receiver intersections, disposal of both maps, exact-white lights with the tint
+off, no material color changes, contact-shadow allocation, placement and disposal,
+and storage round trips with garbage input. Lights, floor geometry/material and
 shadow targets are disposed by the scene owner. The adapter does not own shared
-stage renderers. Numeric projection tests show that a moving layer changes the
-cast silhouette within the light frustum. They do not measure GPU shadow softness,
-artifacts, frame rate or perceived depth; these remain owner preview checks.
+stage renderers. Not verified (no GPU, browser or visual run): how the retuned
+values and the two-shadow combination actually look, shadow softness and banding
+at the larger fill radius, frame rate, the perceived strength of the contact shadow
+and the color tint, and the panel layout in a browser. These need an owner preview.
 
 ### R07: whole-group camera travel
 
