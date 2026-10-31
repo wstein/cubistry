@@ -1,0 +1,105 @@
+graph	tracked-front-corners	136080	diameter	7
+setup	nz	L' U B' U L2 U	6
+edge	nz	_0	_1	B R'	2	2	1
+edge	nz	_1	_2	D B' D	3	3	3
+edge	nz	_2	_3	R' B' R	3	3	3
+edge	nz	_3	_4	D2 R2 D	3	1	1
+edge	nz	_4	_5	R2 F D	3	3	3
+edge	nz	_5	_6	R2 F R2 D2	4	3	3
+edge	nz	_6	_7	D' B	2	1	2
+edge	nz	_7	_8	R' B' R	3	3	2
+edge	nz	_8	_9	D2 F' R2	3	3	3
+edge	nz	_9	10	D L' D	3	3	1
+edge	nz	10	11	B2 R' U2	3	3	1
+edge	nz	11	12	U R2 U'	3	3	3
+edge	nz	12	13	U R U'	3	3	3
+edge	nz	13	14	R' B2 R	3	3	3
+edge	nz	14	15	R' B' R'	3	3	3
+edge	nz	15	16	R' B2 R	3	3	3
+edge	nz	16	17	U R U'	3	3	3
+edge	nz	17	18	B2 R'	2	2	1
+edge	nz	18	19	B2 R B	3	2	2
+edge	nz	19	20	D2	1	1	1
+edge	nz	20	21	U R' U'	3	3	1
+edge	nz	21	22	F D F'	3	2	1
+edge	nz	22	23	U R U'	3	3	3
+edge	nz	23	24	R' B R	3	3	3
+edge	nz	24	25	R2	1	1	1
+edge	nz	25	26	R' B' R	3	3	3
+edge	nz	26	27	U R' U'	3	3	3
+edge	nz	27	28	R' B2	2	1	2
+edge	nz	28	29	U R' U'	3	3	3
+edge	nz	29	30	B2 D2 B'	3	2	2
+edge	nz	30	31	R' B' R	3	3	2
+edge	nz	31	32	R' B' R	3	3	3
+edge	nz	32	33	R B R2	3	3	3
+edge	nz	33	34	B2 R2 U	3	3	2
+edge	nz	34	35	R2	1	1	1
+edge	nz	35	36	U' R2	2	2	2
+edge	nz	36	37	R' B2 R	3	3	3
+edge	nz	37	38	B2 R' U	3	2	1
+edge	nz	38	39	R' B R	3	2	3
+edge	nz	39	40	D2 B2 D'	3	3	2
+edge	nz	40	41	B2 R' B	3	2	2
+edge	nz	41	42	R B'	2	1	2
+edge	nz	42	43	U R U'	3	3	3
+edge	nz	43	44	R' B R	3	3	3
+edge	nz	44	45	R2	1	1	1
+edge	nz	45	46	R' B' R	3	3	3
+edge	nz	46	47	U R' U'	3	3	3
+edge	nz	47	48	B R' B	3	2	2
+edge	nz	48	49	R' B2 R	3	2	3
+edge	nz	49	50	L' B2 D2	3	3	3
+edge	nz	50	51	R' B	2	1	2
+edge	nz	51	52	R B'	2	1	2
+edge	nz	52	53	U R U'	3	3	3
+edge	nz	53	54	R' B R	3	3	3
+edge	nz	54	55	R2	1	1	1
+edge	nz	55	56	R' B' R	3	3	3
+edge	nz	56	57	U R' U'	3	3	3
+edge	nz	57	58	F D' F'	3	2	2
+edge	nz	58	59	R B2	2	1	2
+edge	nz	59	60	D B2 D2	3	2	3
+edge	nz	60	61	R' B' R	3	3	2
+edge	nz	61	62	U' R B2	3	1	2
+edge	nz	62	63	R' B2 R	3	3	3
+edge	nz	63	64	R2 U	2	2	2
+edge	nz	64	65	R2	1	1	1
+edge	nz	65	66	U' R2 B2	3	2	3
+edge	nz	66	67	R2 B' R'	3	3	3
+edge	nz	67	68	R' B R	3	3	3
+edge	nz	68	69	R' B R	3	2	3
+edge	nz	69	70	B D2 B2	3	2	2
+edge	nz	70	71	U R U'	3	3	3
+edge	nz	71	72	B2 R	2	2	1
+edge	nz	72	73	U R U'	3	3	3
+edge	nz	73	74	R' B R	3	3	3
+edge	nz	74	75	R2	1	1	1
+edge	nz	75	76	R' B' R	3	3	3
+edge	nz	76	77	U R' U'	3	3	3
+edge	nz	77	78	F D' F'	3	1	2
+edge	nz	78	79	U R U'	3	1	3
+edge	nz	79	80	D2 B'	2	1	2
+edge	nz	80	81	R'	1	1	1
+edge	nz	81	82	B2 R B'	3	2	2
+edge	nz	82	83	R2 U R2	3	3	3
+edge	nz	83	84	R' B R'	3	3	3
+edge	nz	84	85	U R2 U'	3	3	3
+edge	nz	85	86	R' B2 R'	3	3	3
+edge	nz	86	87	R U R	3	1	3
+edge	nz	87	88	B' R'	2	2	1
+edge	nz	88	89	B U' R	3	2	2
+edge	nz	89	90	D L2 D	3	3	1
+edge	nz	90	91	U R' U'	3	3	1
+edge	nz	91	92	F D F'	3	2	2
+edge	nz	92	93	U R U'	3	3	3
+edge	nz	93	94	R' B R	3	3	3
+edge	nz	94	95	R2	1	1	1
+edge	nz	95	96	R' B' R	3	3	3
+edge	nz	96	97	U R' U'	3	3	3
+edge	nz	97	98	F D' F'	3	2	2
+edge	nz	98	99	U R U'	3	1	3
+edge	nz	99	_0	D B2 D	3	3	3
+histogram	nz	1:9,2:13,3:77,4:1
+summary	nz	edges	100	max	4	total	270	inc_shortest	69	dec_shortest	70
+status	VALID	nz	MAX_HTM_4

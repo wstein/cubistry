@@ -1,0 +1,101 @@
+mode	step	from	to	increment	inc_htm	inc_shortest	decrement	dec_htm	dec_shortest
+nz	0	_0	_1	B R'	2	2	R B'	2	1
+nz	1	_1	_2	D B' D	3	3	D' B D'	3	3
+nz	2	_2	_3	R' B' R	3	3	R' B R	3	3
+nz	3	_3	_4	D2 R2 D	3	1	D' R2 D2	3	1
+nz	4	_4	_5	R2 F D	3	3	D' F' R2	3	3
+nz	5	_5	_6	R2 F R2 D2	4	3	D2 R2 F' R2	4	3
+nz	6	_6	_7	D' B	2	1	B' D	2	2
+nz	7	_7	_8	R' B' R	3	3	R' B R	3	2
+nz	8	_8	_9	D2 F' R2	3	3	R2 F D2	3	3
+nz	9	_9	10	D L' D	3	3	D' L D'	3	1
+nz	10	10	11	B2 R' U2	3	3	U2 R B2	3	1
+nz	11	11	12	U R2 U'	3	3	U R2 U'	3	3
+nz	12	12	13	U R U'	3	3	U R' U'	3	3
+nz	13	13	14	R' B2 R	3	3	R' B2 R	3	3
+nz	14	14	15	R' B' R'	3	3	R B R	3	3
+nz	15	15	16	R' B2 R	3	3	R' B2 R	3	3
+nz	16	16	17	U R U'	3	3	U R' U'	3	3
+nz	17	17	18	B2 R'	2	2	R B2	2	1
+nz	18	18	19	B2 R B	3	2	B' R' B2	3	2
+nz	19	19	20	D2	1	1	D2	1	1
+nz	20	20	21	U R' U'	3	3	U R U'	3	1
+nz	21	21	22	F D F'	3	2	F D' F'	3	1
+nz	22	22	23	U R U'	3	3	U R' U'	3	3
+nz	23	23	24	R' B R	3	3	R' B' R	3	3
+nz	24	24	25	R2	1	1	R2	1	1
+nz	25	25	26	R' B' R	3	3	R' B R	3	3
+nz	26	26	27	U R' U'	3	3	U R U'	3	3
+nz	27	27	28	R' B2	2	1	B2 R	2	2
+nz	28	28	29	U R' U'	3	3	U R U'	3	3
+nz	29	29	30	B2 D2 B'	3	2	B D2 B2	3	2
+nz	30	30	31	R' B' R	3	3	R' B R	3	2
+nz	31	31	32	R' B' R	3	3	R' B R	3	3
+nz	32	32	33	R B R2	3	3	R2 B' R'	3	3
+nz	33	33	34	B2 R2 U	3	3	U' R2 B2	3	2
+nz	34	34	35	R2	1	1	R2	1	1
+nz	35	35	36	U' R2	2	2	R2 U	2	2
+nz	36	36	37	R' B2 R	3	3	R' B2 R	3	3
+nz	37	37	38	B2 R' U	3	2	U' R B2	3	1
+nz	38	38	39	R' B R	3	2	R' B' R	3	3
+nz	39	39	40	D2 B2 D'	3	3	D B2 D2	3	2
+nz	40	40	41	B2 R' B	3	2	B' R B2	3	2
+nz	41	41	42	R B'	2	1	B R'	2	2
+nz	42	42	43	U R U'	3	3	U R' U'	3	3
+nz	43	43	44	R' B R	3	3	R' B' R	3	3
+nz	44	44	45	R2	1	1	R2	1	1
+nz	45	45	46	R' B' R	3	3	R' B R	3	3
+nz	46	46	47	U R' U'	3	3	U R U'	3	3
+nz	47	47	48	B R' B	3	2	B' R B'	3	2
+nz	48	48	49	R' B2 R	3	2	R' B2 R	3	3
+nz	49	49	50	L' B2 D2	3	3	D2 B2 L	3	3
+nz	50	50	51	R' B	2	1	B' R	2	2
+nz	51	51	52	R B'	2	1	B R'	2	2
+nz	52	52	53	U R U'	3	3	U R' U'	3	3
+nz	53	53	54	R' B R	3	3	R' B' R	3	3
+nz	54	54	55	R2	1	1	R2	1	1
+nz	55	55	56	R' B' R	3	3	R' B R	3	3
+nz	56	56	57	U R' U'	3	3	U R U'	3	3
+nz	57	57	58	F D' F'	3	2	F D F'	3	2
+nz	58	58	59	R B2	2	1	B2 R'	2	2
+nz	59	59	60	D B2 D2	3	2	D2 B2 D'	3	3
+nz	60	60	61	R' B' R	3	3	R' B R	3	2
+nz	61	61	62	U' R B2	3	1	B2 R' U	3	2
+nz	62	62	63	R' B2 R	3	3	R' B2 R	3	3
+nz	63	63	64	R2 U	2	2	U' R2	2	2
+nz	64	64	65	R2	1	1	R2	1	1
+nz	65	65	66	U' R2 B2	3	2	B2 R2 U	3	3
+nz	66	66	67	R2 B' R'	3	3	R B R2	3	3
+nz	67	67	68	R' B R	3	3	R' B' R	3	3
+nz	68	68	69	R' B R	3	2	R' B' R	3	3
+nz	69	69	70	B D2 B2	3	2	B2 D2 B'	3	2
+nz	70	70	71	U R U'	3	3	U R' U'	3	3
+nz	71	71	72	B2 R	2	2	R' B2	2	1
+nz	72	72	73	U R U'	3	3	U R' U'	3	3
+nz	73	73	74	R' B R	3	3	R' B' R	3	3
+nz	74	74	75	R2	1	1	R2	1	1
+nz	75	75	76	R' B' R	3	3	R' B R	3	3
+nz	76	76	77	U R' U'	3	3	U R U'	3	3
+nz	77	77	78	F D' F'	3	1	F D F'	3	2
+nz	78	78	79	U R U'	3	1	U R' U'	3	3
+nz	79	79	80	D2 B'	2	1	B D2	2	2
+nz	80	80	81	R'	1	1	R	1	1
+nz	81	81	82	B2 R B'	3	2	B R' B2	3	2
+nz	82	82	83	R2 U R2	3	3	R2 U' R2	3	3
+nz	83	83	84	R' B R'	3	3	R B' R	3	3
+nz	84	84	85	U R2 U'	3	3	U R2 U'	3	3
+nz	85	85	86	R' B2 R'	3	3	R B2 R	3	3
+nz	86	86	87	R U R	3	1	R' U' R'	3	3
+nz	87	87	88	B' R'	2	2	R B	2	1
+nz	88	88	89	B U' R	3	2	R' U B'	3	2
+nz	89	89	90	D L2 D	3	3	D' L2 D'	3	1
+nz	90	90	91	U R' U'	3	3	U R U'	3	1
+nz	91	91	92	F D F'	3	2	F D' F'	3	2
+nz	92	92	93	U R U'	3	3	U R' U'	3	3
+nz	93	93	94	R' B R	3	3	R' B' R	3	3
+nz	94	94	95	R2	1	1	R2	1	1
+nz	95	95	96	R' B' R	3	3	R' B R	3	3
+nz	96	96	97	U R' U'	3	3	U R U'	3	3
+nz	97	97	98	F D' F'	3	2	F D F'	3	2
+nz	98	98	99	U R U'	3	1	U R' U'	3	3
+nz	99	99	_0	D B2 D	3	3	D' B2 D'	3	3
