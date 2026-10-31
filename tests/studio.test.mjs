@@ -200,3 +200,49 @@ test("shadow fill: opposite side, weaker, softer; both shadow cameras contain th
   assert.deepEqual(disposed, [key, fill]);
   assert.equal(scene.children.length, 0);
 });
+
+test("contact shadow: off by default allocates nothing; on places planes under the cube; toggles do not leak", () => {
+  const p = PRESENTATION_PRESET;
+  assert.equal(p.contactShadowDefault, false);
+  const scene = new THREE.Scene(), studio = createPresentationStudio(scene, 1, 1, undefined, 1.5);
+  const baseline = scene.children.length;
+  assert(!scene.children.some(o => o.name === "studio-contact-shadow"));
+  studio.setContactShadow(false);
+  assert.equal(scene.children.length, baseline, "switching off while off is a no-op");
+  const disposed = { geometry: 0, material: 0, texture: 0 };
+  for (let round = 0; round < 3; round++) {
+    studio.setContactShadow(true);
+    const planes = scene.children.filter(o => o.name === "studio-contact-shadow");
+    assert.equal(planes.length, 1);
+    const [plane] = planes;
+    assert.equal(plane.castShadow, false); assert.equal(plane.receiveShadow, false);
+    assert(Math.abs(plane.position.y - (studio.floor.position.y + p.contactShadowLift)) < 1e-12);
+    assert.equal(plane.material.transparent, true); assert.equal(plane.material.depthWrite, false);
+    assert.equal(plane.scale.x, 1.5 * p.contactShadowScale);
+    assert.equal(plane.material.color.getHexString(), "302b26");
+    plane.geometry.addEventListener("dispose", () => disposed.geometry++);
+    plane.material.addEventListener("dispose", () => disposed.material++);
+    plane.material.map.addEventListener("dispose", () => disposed.texture++);
+    const alpha = plane.material.map.image.data, n = plane.material.map.image.width;
+    assert.equal(alpha[3], 0, "rim is transparent"); assert(alpha[((n / 2) * n + n / 2) * 4 + 3] > 240, "center is dense");
+    studio.setContactShadow(true);
+    assert.equal(scene.children.length, baseline + 1);
+    studio.setContactShadow(false);
+    assert.equal(scene.children.length, baseline);
+  }
+  assert.deepEqual(disposed, { geometry: 3, material: 3, texture: 3 });
+  studio.setContactShadow(true);
+  const centers = [-2.8, 0, 2.8].map(x => new THREE.Vector3(x, .5, .25));
+  studio.fitCasters(centers, 1.4, .08);
+  const planes = scene.children.filter(o => o.name === "studio-contact-shadow");
+  assert.equal(planes.length, 3);
+  planes.forEach((plane, i) => {
+    assert.equal(plane.position.x, centers[i].x); assert.equal(plane.position.z, .25);
+    assert(Math.abs(plane.position.y - (studio.floor.position.y + p.contactShadowLift)) < 1e-12);
+    assert(plane.position.y < centers[i].y - 1.4, "plane sits below the cube");
+  });
+  studio.fitCasters(centers.slice(0, 1), 1.4, .08);
+  assert.equal(scene.children.filter(o => o.name === "studio-contact-shadow").length, 1);
+  studio.dispose();
+  assert.equal(scene.children.length, 0);
+});
