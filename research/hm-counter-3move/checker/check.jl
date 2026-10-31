@@ -1,6 +1,8 @@
-# Native Julia checker for the H/M counter witness (cubistry.hm-counter.v1).
+# Native Julia checker for the H/M counter witness (cubistry.hm-counter.v1/v2).
 #
-# Shares no code with the generator (engine.jl, solve.jl, ...). It rebuilds the
+# Shares no code with the generator (engine.jl, solve.jl, ...). The Flix
+# checker (flix/src/Main.flix) is a structural port of this file, not an
+# independent design; see the README section "Checker independence". It rebuilds the
 # physical print from the witness, turns every sticker with integer Rodrigues
 # quarter turns, replays setups, increments, the exact inverse decrements and
 # the 11->00 reset, checks exact full-state closure, and rebuilds the tracked
@@ -12,6 +14,20 @@ struct Reject <: Exception
     reason::String
 end
 need(ok, why) = ok || throw(Reject(why))
+
+# One integer grammar for every numeric field, the same in the Flix checker:
+# a natural number is "0" or a nonzero ASCII digit followed by at most five
+# ASCII digits (no sign, no leading zeros, no spaces, at most 6 digits); a
+# signed integer is a natural number or "-" followed by a nonzero natural.
+# Anything else is rejected with "malformed number in <field>".
+function natural(s, what)
+    need(occursin(r"\A(?:0|[1-9][0-9]{0,5})\z", s), "malformed number in $what")
+    parse(Int, s)
+end
+function signedint(s, what)
+    need(occursin(r"\A(?:0|-?[1-9][0-9]{0,5})\z", s), "malformed number in $what")
+    parse(Int, s)
+end
 
 const V = NTuple{3,Int}
 dotv(a, b) = a[1] * b[1] + a[2] * b[2] + a[3] * b[3]
@@ -79,16 +95,16 @@ function readprint(rows)
     need(length(rows) == 24, "exactly 24 sticker rows")
     st = Stk[]
     ivec(s) = (f = split(s, ','); need(length(f) == 3, "vector arity");
-               Tuple(map(x -> (need(occursin(r"^-?[0-9]+$", x), "integer"); parse(Int, x)), f)))
+               Tuple(map(x -> signedint(x, "vector component"), f)))
     for r in rows
         f = split(r, '\t')
         need(length(f) == 7 && f[1] == "sticker", "sticker row shape")
-        need(occursin(r"^[0-9]+$", f[2]) && occursin(r"^[0-9]+$", f[3]), "integer ids")
+        id = natural(f[2], "sticker id"); cubie = natural(f[3], "cubie id")
         p, n, u = ivec(f[4]), ivec(f[5]), ivec(f[6])
         need(all(c -> c in (-1, 1), p), "corner position")
         need(n in UNITS && u in UNITS && dotv(p, n) == 1 && dotv(n, u) == 0, "outward tangent frame")
         need(length(f[7]) == 1 && f[7][1] in "HMS0123456789_", "glyph alphabet")
-        push!(st, Stk(parse(Int, f[2]), parse(Int, f[3]), p, n, u, f[7][1]))
+        push!(st, Stk(id, cubie, p, n, u, f[7][1]))
     end
     need(sort([x.id for x in st]) == collect(0:23), "unique sticker ids 0..23")
     lattice = Set((x.p, x.n) for x in st)
@@ -187,19 +203,25 @@ function histtext(lens)
     join(["$d:$(count(==(d), lens))" for d in 0:6], ",")
 end
 
+# A missing row reads as "" (real rows are never empty), so a truncated
+# witness fails the shape check of the first missing row instead of crashing.
+rowat(rows, i) = i <= length(rows) ? rows[i] : ""
+
 function validate(path)
     raw = read(path)
     text = String(copy(raw))
+    need(isvalid(text), "invalid UTF-8")
     need(!occursin('\r', text), "CR forbidden")
     need(endswith(text, "\n"), "final LF required")
     rows = split(chop(text), '\n')
     need(all(!isempty, rows), "empty line")
-    rows[1] == "cubistry.hm-counter.v2" && return validate2(rows, raw)
-    need(rows[1] == "cubistry.hm-counter.v1", "schema header")
-    f = split(rows[2], '\t'); need(length(f) == 2 && f[1] == "profile" && f[2] in ("free", "blank"), "profile row")
+    row(i) = rowat(rows, i)
+    row(1) == "cubistry.hm-counter.v2" && return validate2(rows, raw)
+    need(row(1) == "cubistry.hm-counter.v1", "schema header")
+    f = split(row(2), '\t'); need(length(f) == 2 && f[1] == "profile" && f[2] in ("free", "blank"), "profile row")
     blank = f[2] == "blank"
-    need(rows[3] == "letters\tHM", "letters row must be exactly HM")
-    st0 = readprint(rows[4:27])
+    need(row(3) == "letters\tHM", "letters row must be exactly HM")
+    st0 = readprint(rows[4:min(27, end)])
     blank && need(any(x -> x.glyph == '_', st0), "blank profile needs a blank sticker")
     g = buildgraph(blank ? 4 : 3)
     out = String[]
@@ -212,7 +234,7 @@ function validate(path)
     alllens = Int[]
     claimmax = -1
     for (letter, n) in (('M', 60), ('H', 24))
-        f = split(rows[r], '\t'); r += 1
+        f = split(row(r), '\t'); r += 1
         need(length(f) == 3 && f[1] == "setup" && f[2] == string(letter), "setup row for $letter")
         setup = parseword(f[3]); setuptext = f[3]
         state = doword(st0, setup)
@@ -221,14 +243,14 @@ function validate(path)
         states = [state]; words = Vector{Vector{Tuple{Int,Int,Int}}}()
         lens = Int[]; lbs = Int[]
         for v in 0:n-1
-            f = split(rows[r], '\t'); r += 1
+            f = split(row(r), '\t'); r += 1
             nv = (v + 1) % n
             need(length(f) == 6 && f[1] == "edge" && f[2] == string(letter) &&
                  f[3] == string(v) && f[4] == string(nv), "edge row $letter $v")
             w = parseword(f[5])
-            need(occursin(r"^[0-9]+$", f[6]), "integer lower bound")
+            claimed = natural(f[6], "lower bound")
             lb = lowerbound(g, state, wanted(letter, nv, blank))
-            need(parse(Int, f[6]) == lb, "claimed lower bound differs for $letter $v->$nv")
+            need(claimed == lb, "claimed lower bound differs for $letter $v->$nv")
             need(length(w) >= lb, "word shorter than graph distance for $letter $v->$nv")
             nxt = doword(state, w)
             checkshow(nxt, wanted(letter, nv, blank), "$letter $v->$nv")
@@ -250,11 +272,12 @@ function validate(path)
         push!(out, "decrement\t$letter\tedges\t$n\tinverse\texact")
         push!(out, "setup\t$letter\thtm\t$(length(setup))\tword\t$(setuptext)")
         if letter == 'H'
-            f = split(rows[r], '\t'); r += 1
+            f = split(row(r), '\t'); r += 1
             need(length(f) == 6 && f[1] == "reset" && f[2] == "H" && f[3] == "11" && f[4] == "0", "reset row")
             w = parseword(f[5])
+            claimed = natural(f[6], "lower bound")
             lb = lowerbound(g, states[12], wanted('H', 0, blank))
-            need(parse(Int, f[6]) == lb, "claimed reset lower bound differs")
+            need(claimed == lb, "claimed reset lower bound differs")
             after = doword(states[12], w)
             checkshow(after, wanted('H', 0, blank), "reset 11->00")
             need(after == start, "reset 11->00 must reach the exact H00 start state")
@@ -263,10 +286,10 @@ function validate(path)
             push!(out, "reset\tH\t11\t0\thtm\t$(length(w))\tlb\t$lb\texact")
         end
     end
-    f = split(rows[r], '\t'); r += 1
+    f = split(row(r), '\t'); r += 1
     need(length(f) == 3 && f[1] == "claim" && f[2] == "maxEdgeHTM", "claim row")
-    need(parse(Int, f[3]) == maximum(alllens), "claimed maximum edge HTM differs from replay")
-    need(rows[r] == "end" && r == length(rows), "end row")
+    need(natural(f[3], "claim") == maximum(alllens), "claimed maximum edge HTM differs from replay")
+    need(row(r) == "end" && r == length(rows), "end row")
     push!(out, "transitions\t$(length(alllens))\ttotal\t$(sum(alllens))\tmax\t$(maximum(alllens))\thist\t$(histtext(alllens))")
     push!(out, "verdict\tACCEPT")
     join(out, "\n") * "\n"
@@ -278,9 +301,10 @@ end
 # exactly after P+Q steps; P and Q are whole laps. Decrement is the exact
 # inverse traversal of the period.
 function validate2(rows, raw)
-    need(rows[2] == "profile\tblank", "v2 requires the blank profile")
-    need(rows[3] == "letters\tHM", "letters row must be exactly HM")
-    st0 = readprint(rows[4:27])
+    row(i) = rowat(rows, i)
+    need(row(2) == "profile\tblank", "v2 requires the blank profile")
+    need(row(3) == "letters\tHM", "letters row must be exactly HM")
+    st0 = readprint(rows[4:min(27, end)])
     need(any(x -> x.glyph == '_', st0), "blank profile needs a blank sticker")
     g = buildgraph(4)
     out = String["cubistry.hm-counter.receipt.v2", "witness-sha256\t" * bytes2hex(sha256(raw)), "profile\tblank"]
@@ -289,11 +313,10 @@ function validate2(rows, raw)
     r = 28
     allper = Int[]; allpre = Int[]
     for (letter, range) in (('M', 59), ('H', 23), ('H', 11))
-        f = split(rows[r], '\t'); r += 1
+        f = split(row(r), '\t'); r += 1
         need(length(f) == 6 && f[1] == "mode" && f[2] == string(letter) && f[3] == string(range), "mode row $letter $range")
         n = range + 1
-        need(occursin(r"^[0-9]+$", f[5]) && occursin(r"^[0-9]+$", f[6]), "integer preperiod/period")
-        P = parse(Int, f[5]); Q = parse(Int, f[6])
+        P = natural(f[5], "preperiod"); Q = natural(f[6], "period")
         need(P % n == 0 && Q % n == 0 && Q > 0 && P + Q <= 100000, "preperiod and period must be whole laps")
         state = doword(st0, parseword(f[4]))
         setuplen = length(parseword(f[4]))
@@ -301,13 +324,13 @@ function validate2(rows, raw)
         states = [state]; words = Vector{Vector{Tuple{Int,Int,Int}}}(); lens = Int[]; lbs = Int[]
         for j in 0:P+Q-1
             v = j % n; nv = (v + 1) % n
-            f = split(rows[r], '\t'); r += 1
+            f = split(row(r), '\t'); r += 1
             need(length(f) == 7 && f[1] == "step" && f[2] == string(letter) && f[3] == string(range) &&
                  f[4] == string(v) && f[5] == string(nv), "step row $letter$range $j")
             w = parseword(f[6])
-            need(occursin(r"^[0-9]+$", f[7]), "integer lower bound")
+            claimed = natural(f[7], "lower bound")
             lb = lowerbound(g, state, wanted(letter, nv, true))
-            need(parse(Int, f[7]) == lb, "claimed lower bound differs for $letter$range step $j")
+            need(claimed == lb, "claimed lower bound differs for $letter$range step $j")
             need(length(w) >= lb, "word shorter than graph distance for $letter$range step $j")
             nxt = doword(state, w)
             checkshow(nxt, wanted(letter, nv, true), "$letter$range step $j")
@@ -319,6 +342,12 @@ function validate2(rows, raw)
         for j in n:n:Q-n
             need(states[P+j+1] != states[P+1], "period is not minimal for $letter$range")
         end
+        # distinct-state rule: the Q full states before the period steps are
+        # pairwise distinct, so every period state has exactly one successor
+        # word (no full state reused inside a multi-lap period). Preperiod
+        # states are not included: P is a whole number of laps, so a run-in
+        # that joins the cycle mid-lap legitimately repeats period states.
+        need(length(Set(states[P+1:P+Q])) == Q, "full state repeats within the period for $letter$range")
         # decrement: exact inverse traversal of the period, from the period start
         d = states[P+1]
         for j in P+Q-1:-1:P
@@ -333,11 +362,11 @@ function validate2(rows, raw)
         push!(out, "preperiod\t$letter\t$range\ttotal\t$(sum(pre; init = 0))\tmax\t$(maximum(pre; init = 0))\thist\t$(histtext(pre))")
         push!(out, "decrement\t$letter\t$range\tinverse-of-period\texact")
     end
-    f = split(rows[r], '\t'); r += 1
+    f = split(row(r), '\t'); r += 1
     need(length(f) == 3 && f[1] == "claim" && f[2] == "maxEdgeHTM", "claim row")
     m = maximum(vcat(allper, allpre))
-    need(parse(Int, f[3]) == m, "claimed maximum edge HTM differs from replay")
-    need(rows[r] == "end" && r == length(rows), "end row")
+    need(natural(f[3], "claim") == m, "claimed maximum edge HTM differs from replay")
+    need(row(r) == "end" && r == length(rows), "end row")
     push!(out, "edges\tperiod\t$(length(allper))\tmax\t$(maximum(allper))\thist\t$(histtext(allper))\tpreperiod\t$(length(allpre))\tmax\t$(maximum(allpre; init = 0))\thist\t$(histtext(allpre))")
     push!(out, "verdict\tACCEPT")
     join(out, "\n") * "\n"
