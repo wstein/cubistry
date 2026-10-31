@@ -1,0 +1,568 @@
+# descriptive listing, not a proof; Julia only; class lines: orbit, printed glyph@angle (angle without half-turn merging) of every cell in the class, ink, class angle, merged or single, peak, displays at peak, examples
+orbit	row1	(-3, -3)	printed=20	blank=3	capacity=24	slack=1
+class	row1	(-3, -3)	O@0	month	angle=0	single	peak=1	displays=7	e.g.=2026-10,2027-10,2028-10,+4
+class	row1	(-3, -3)	23@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, -3)	24@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, -3)	25@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, -3)	26@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, -3)	27@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-3, -3)	28@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-3, -3)	29@0	red	angle=0	single	peak=1	displays=12	e.g.=2026-03,2026-11,2027-08,+9
+class	row1	(-3, -3)	29@3	red	angle=3	single	peak=1	displays=12	e.g.=2026-08,2027-05,2028-01,+9
+class	row1	(-3, -3)	30@3	red	angle=3	single	peak=1	displays=11	e.g.=2026-05,2027-01,2027-10,+8
+class	row1	(-3, -3)	31@3	red	angle=3	single	peak=1	displays=7	e.g.=2026-01,2026-10,2027-07,+4
+class	row1	(-3, -3)	B@2	month	angle=2	single	peak=1	displays=14	e.g.=2026-02,2027-02,2028-02,+11
+class	row1	(-3, -3)	D@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-12,2027-12,2028-12,+4
+class	row1	(-3, -3)	G@2	month	angle=2	single	peak=1	displays=7	e.g.=2026-08,2027-08,2028-08,+4
+class	row1	(-3, -3)	L@2	month	angle=2	single	peak=1	displays=7	e.g.=2026-07,2027-07,2028-07,+4
+class	row1	(-3, -3)	N@2	month	angle=0	single	peak=1	displays=14	e.g.=2026-01,2026-06,2027-01,+11
+class	row1	(-3, -3)	N@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-11,2027-11,2028-11,+4
+class	row1	(-3, -3)	P@2	month	angle=2	single	peak=1	displays=7	e.g.=2026-09,2027-09,2028-09,+4
+class	row1	(-3, -3)	R@2	month	angle=2	single	peak=1	displays=14	e.g.=2026-03,2026-04,2027-03,+11
+class	row1	(-3, -3)	Y@2	month	angle=2	single	peak=1	displays=7	e.g.=2026-05,2027-05,2028-05,+4
+blank	row1	(-3, -3)	peak=3	displays=1	e.g.=2026-02
+orbit	row1	(-3, -2)	printed=15	blank=2	capacity=24	slack=7
+class	row1	(-3, -2)	O@0	month	angle=0	single	peak=1	displays=7	e.g.=2026-11,2027-11,2028-11,+4
+class	row1	(-3, -2)	20@0	red	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-3, -2)	21@0	red	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-3, -2)	16@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, -2)	17@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, -2)	18@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, -2)	19@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, -2)	22@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-3, -2)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, -2)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-05,2027-01,2027-10,+9
+class	row1	(-3, -2)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-01,2026-10,2027-04,+8
+class	row1	(-3, -2)	31@3	dark	angle=3	single	peak=1	displays=7	e.g.=2026-07,2027-12,2028-03,+4
+class	row1	(-3, -2)	C@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-10,2027-10,2028-10,+4
+class	row1	(-3, -2)	E@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-12,2027-12,2028-12,+4
+class	row1	(-3, -2)	SAT@2	red	angle=2	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row1	(-3, -2)	peak=2	displays=38	e.g.=2026-02,2026-03,2026-04,+35
+orbit	row1	(-3, -1)	printed=21	blank=2	capacity=24	slack=1
+class	row1	(-3, -1)	10@0	red	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, -1)	1@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, -1)	11@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, -1)	12@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, -1)	13@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-3, -1)	14@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-3, -1)	15@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-3, -1)	2@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, -1)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, -1)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, -1)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-01,2026-10,2027-04,+9
+class	row1	(-3, -1)	3@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, -1)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-04,2026-07,2027-09,+8
+class	row1	(-3, -1)	31@3	dark	angle=3	single	peak=1	displays=7	e.g.=2026-12,2028-08,2029-05,+4
+class	row1	(-3, -1)	4@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, -1)	5@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-3, -1)	6@2|9@0	red	angle=2	merged	peak=1	displays=26	e.g.=2026-06,2026-08,2027-02,+23
+class	row1	(-3, -1)	7@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-3, -1)	C@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-12,2027-12,2028-12,+4
+class	row1	(-3, -1)	T@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-10,2027-10,2028-10,+4
+class	row1	(-3, -1)	V@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-11,2027-11,2028-11,+4
+blank	row1	(-3, -1)	peak=2	displays=28	e.g.=2026-02,2026-03,2026-06,+25
+orbit	row1	(-3, 0)	printed=18	blank=2	capacity=24	slack=4
+class	row1	(-3, 0)	10@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, 0)	11@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, 0)	12@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-3, 0)	13@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-3, 0)	14@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-3, 0)	2@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, 0)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, 0)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, 0)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, 0)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-04,2026-07,2027-09,+9
+class	row1	(-3, 0)	3@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, 0)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-09,2026-12,2027-06,+8
+class	row1	(-3, 0)	31@3	dark	angle=3	single	peak=1	displays=7	e.g.=2027-03,2028-05,2029-01,+4
+class	row1	(-3, 0)	4@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, 0)	5@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, 0)	6@0|9@2	red	angle=0	merged	peak=1	displays=26	e.g.=2026-05,2026-09,2026-12,+23
+class	row1	(-3, 0)	7@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-3, 0)	8@0|8@2	red	angle=0	merged	peak=1	displays=26	e.g.=2026-02,2026-03,2026-08,+23
+blank	row1	(-3, 0)	peak=2	displays=22	e.g.=2026-02,2026-03,2026-06,+19
+orbit	row1	(-3, 1)	printed=22	blank=2	capacity=24	slack=0
+class	row1	(-3, 1)	20@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-3, 1)	1@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-3, 1)	21@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-3, 1)	15@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, 1)	16@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, 1)	17@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, 1)	18@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, 1)	19@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-3, 1)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, 1)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, 1)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, 1)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, 1)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-09,2026-12,2027-06,+9
+class	row1	(-3, 1)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-06,2027-03,2027-11,+8
+class	row1	(-3, 1)	30↶@0	red	angle=0	single	peak=1	displays=11	e.g.=2026-08,2027-05,2028-01,+8
+class	row1	(-3, 1)	31@3	dark	angle=3	single	peak=1	displays=7	e.g.=2026-03,2027-08,2028-10,+4
+class	row1	(-3, 1)	31↶@0	red	angle=0	single	peak=1	displays=7	e.g.=2026-05,2027-01,2027-10,+4
+class	row1	(-3, 1)	A@1	month	angle=1	single	peak=1	displays=14	e.g.=2026-04,2026-08,2027-04,+11
+class	row1	(-3, 1)	F@1	month	angle=1	single	peak=1	displays=14	e.g.=2026-02,2027-02,2028-02,+11
+class	row1	(-3, 1)	J@1	month	angle=1	single	peak=1	displays=21	e.g.=2026-01,2026-06,2026-07,+18
+class	row1	(-3, 1)	M@1	month	angle=1	single	peak=1	displays=14	e.g.=2026-03,2026-05,2027-03,+11
+class	row1	(-3, 1)	S@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-09,2027-09,2028-09,+4
+blank	row1	(-3, 1)	peak=2	displays=17	e.g.=2026-10,2026-11,2026-12,+14
+orbit	row1	(-3, 2)	printed=19	blank=1	capacity=24	slack=4
+class	row1	(-3, 2)	22@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, 2)	23@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, 2)	24@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, 2)	24@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-3, 2)	25@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, 2)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-3, 2)	26@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-3, 2)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-3, 2)	27@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-3, 2)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-3, 2)	28@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-3, 2)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-3, 2)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-06,2027-03,2027-11,+9
+class	row1	(-3, 2)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-03,2026-11,2027-08,+8
+class	row1	(-3, 2)	A@1	month	angle=1	single	peak=1	displays=21	e.g.=2026-01,2026-03,2026-05,+18
+class	row1	(-3, 2)	E@1	month	angle=1	single	peak=1	displays=21	e.g.=2026-02,2026-09,2027-02,+18
+class	row1	(-3, 2)	P@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-04,2027-04,2028-04,+4
+class	row1	(-3, 2)	SUN@0	red	angle=0	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+class	row1	(-3, 2)	U@1	month	angle=1	single	peak=1	displays=21	e.g.=2026-06,2026-07,2026-08,+18
+blank	row1	(-3, 2)	peak=1	displays=24	e.g.=2026-02,2026-10,2026-11,+21
+orbit	row1	(-2, -2)	printed=16	blank=0	capacity=24	slack=8
+class	row1	(-2, -2)	20@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-2, -2)	21@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-2, -2)	21@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, -2)	17@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-2, -2)	18@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-2, -2)	19@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-2, -2)	22@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, -2)	22@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-2, -2)	23@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, -2)	23@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-2, -2)	24@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-2, -2)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, -2)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, -2)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, -2)	FRI@2	weekday	angle=2	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+class	row1	(-2, -2)	MON@1	weekday	angle=1	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row1	(-2, -2)	peak=0	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+orbit	row1	(-2, -1)	printed=21	blank=1	capacity=24	slack=2
+class	row1	(-2, -1)	10@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-2, -1)	20@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-2, -1)	1@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-2, -1)	11@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-2, -1)	12@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-2, -1)	21@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-2, -1)	13@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-2, -1)	14@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, -1)	15@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, -1)	16@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, -1)	2@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-2, -1)	22@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-2, -1)	23@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-2, -1)	24@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, -1)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, -1)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, -1)	3@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-2, -1)	4@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, -1)	5@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, -1)	6@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, -1)	TUE@1	weekday	angle=1	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row1	(-2, -1)	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+orbit	row1	(-2, 0)	printed=20	blank=0	capacity=24	slack=4
+class	row1	(-2, 0)	10@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-2, 0)	20@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-2, 0)	11@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, 0)	21@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-2, 0)	12@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, 0)	13@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, 0)	19@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-2, 0)	22@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-2, 0)	23@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, 0)	24@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, 0)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, 0)	3@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-2, 0)	4@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-2, 0)	5@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-2, 0)	6@0|9@2	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-01,2026-04,2026-07,+23
+class	row1	(-2, 0)	9@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, 0)	7@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, 0)	7@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-2, 0)	8@0|8@2	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-05,2026-06,2027-01,+23
+class	row1	(-2, 0)	WED@1	weekday	angle=1	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row1	(-2, 0)	peak=0	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+orbit	row1	(-2, 1)	printed=18	blank=1	capacity=24	slack=5
+class	row1	(-2, 1)	20@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, 1)	20@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-2, 1)	1@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, 1)	21@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-2, 1)	14@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-2, 1)	15@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-2, 1)	16@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-2, 1)	17@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-2, 1)	18@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, 1)	18@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-2, 1)	19@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, 1)	19@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-2, 1)	2@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, 1)	22@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-2, 1)	23@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-2, 1)	24@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-2, 1)	31↶@0	dark	angle=0	single	peak=1	displays=7	e.g.=2026-08,2027-05,2028-01,+4
+class	row1	(-2, 1)	THU@1	weekday	angle=1	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row1	(-2, 1)	peak=1	displays=58	e.g.=2026-01,2026-04,2026-05,+55
+orbit	row1	(-1, -1)	printed=22	blank=2	capacity=24	slack=0
+class	row1	(-1, -1)	1@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-1, -1)	1@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-1, -1)	11@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-1, -1)	12@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-1, -1)	13@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-1, -1)	13@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-1, -1)	14@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-1, -1)	14@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-1, -1)	15@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-1, -1)	15@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-1, -1)	16@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-1, -1)	16@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-1, -1)	17@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-1, -1)	17@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-1, -1)	18@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-1, -1)	19@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-1, -1)	2@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-1, -1)	2@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-1, -1)	3@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-1, -1)	3@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-1, -1)	4@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-1, -1)	5@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+blank	row1	(-1, -1)	peak=2	displays=26	e.g.=2026-05,2026-08,2027-01,+23
+orbit	row1	(-1, 0)	printed=22	blank=1	capacity=24	slack=1
+class	row1	(-1, 0)	10@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-1, 0)	10@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-1, 0)	1@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-1, 0)	11@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-1, 0)	12@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-1, 0)	12@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-1, 0)	13@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-1, 0)	14@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(-1, 0)	15@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-1, 0)	16@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-1, 0)	17@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-1, 0)	18@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-1, 0)	2@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row1	(-1, 0)	3@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(-1, 0)	4@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(-1, 0)	4@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(-1, 0)	5@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-1, 0)	6@0|9@2	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-01,2026-04,2026-07,+23
+class	row1	(-1, 0)	6@2|9@0	dark	angle=2	merged	peak=1	displays=26	e.g.=2026-06,2026-08,2027-02,+23
+class	row1	(-1, 0)	7@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row1	(-1, 0)	7@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row1	(-1, 0)	8@0|8@2	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-01,2026-09,2026-10,+23
+blank	row1	(-1, 0)	peak=1	displays=39	e.g.=2026-01,2026-05,2026-08,+36
+orbit	row1	(0, 0)	printed=6	blank=0	capacity=6	slack=0
+class	row1	(0, 0)	10@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row1	(0, 0)	11@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row1	(0, 0)	5@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row1	(0, 0)	6@0|9@0	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-05,2026-09,2026-12,+23
+class	row1	(0, 0)	7@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row1	(0, 0)	8@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+blank	row1	(0, 0)	peak=0	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+orbit	row18	(-3, -3)	printed=22	blank=3	capacity=24	slack=-1
+class	row18	(-3, -3)	O@0	month	angle=0	single	peak=1	displays=7	e.g.=2026-10,2027-10,2028-10,+4
+class	row18	(-3, -3)	23@0	red	angle=0	single	peak=1	displays=2	e.g.=2031-02,2048-02
+class	row18	(-3, -3)	23/30@0	red	angle=0	single	peak=1	displays=11	e.g.=2026-08,2027-05,2028-01,+8
+class	row18	(-3, -3)	24@0	red	angle=0	single	peak=1	displays=6	e.g.=2028-09,2029-06,2030-02,+3
+class	row18	(-3, -3)	24/31@0	red	angle=0	single	peak=1	displays=7	e.g.=2026-05,2027-01,2027-10,+4
+class	row18	(-3, -3)	25@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, -3)	26@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, -3)	27@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-3, -3)	28@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-3, -3)	29@0	red	angle=0	single	peak=1	displays=12	e.g.=2026-03,2026-11,2027-08,+9
+class	row18	(-3, -3)	29@3	red	angle=3	single	peak=1	displays=12	e.g.=2026-08,2027-05,2028-01,+9
+class	row18	(-3, -3)	30@3	red	angle=3	single	peak=1	displays=11	e.g.=2026-05,2027-01,2027-10,+8
+class	row18	(-3, -3)	31@3	red	angle=3	single	peak=1	displays=7	e.g.=2026-01,2026-10,2027-07,+4
+class	row18	(-3, -3)	B@2	month	angle=2	single	peak=1	displays=14	e.g.=2026-02,2027-02,2028-02,+11
+class	row18	(-3, -3)	D@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-12,2027-12,2028-12,+4
+class	row18	(-3, -3)	G@2	month	angle=2	single	peak=1	displays=7	e.g.=2026-08,2027-08,2028-08,+4
+class	row18	(-3, -3)	L@2	month	angle=2	single	peak=1	displays=7	e.g.=2026-07,2027-07,2028-07,+4
+class	row18	(-3, -3)	N@2	month	angle=0	single	peak=1	displays=14	e.g.=2026-01,2026-06,2027-01,+11
+class	row18	(-3, -3)	N@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-11,2027-11,2028-11,+4
+class	row18	(-3, -3)	P@2	month	angle=2	single	peak=1	displays=7	e.g.=2026-09,2027-09,2028-09,+4
+class	row18	(-3, -3)	R@2	month	angle=2	single	peak=1	displays=14	e.g.=2026-03,2026-04,2027-03,+11
+class	row18	(-3, -3)	Y@2	month	angle=2	single	peak=1	displays=7	e.g.=2026-05,2027-05,2028-05,+4
+blank	row18	(-3, -3)	peak=3	displays=1	e.g.=2026-02
+orbit	row18	(-3, -2)	printed=15	blank=2	capacity=24	slack=7
+class	row18	(-3, -2)	O@0	month	angle=0	single	peak=1	displays=7	e.g.=2026-11,2027-11,2028-11,+4
+class	row18	(-3, -2)	20@0	red	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-3, -2)	21@0	red	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-3, -2)	16@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-3, -2)	17@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, -2)	18@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, -2)	19@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, -2)	22@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-3, -2)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-3, -2)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-05,2027-01,2027-10,+9
+class	row18	(-3, -2)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-01,2026-10,2027-04,+8
+class	row18	(-3, -2)	31@3	dark	angle=3	single	peak=1	displays=7	e.g.=2026-07,2027-12,2028-03,+4
+class	row18	(-3, -2)	C@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-10,2027-10,2028-10,+4
+class	row18	(-3, -2)	E@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-12,2027-12,2028-12,+4
+class	row18	(-3, -2)	SAT@2	red	angle=2	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row18	(-3, -2)	peak=2	displays=38	e.g.=2026-02,2026-03,2026-04,+35
+orbit	row18	(-3, -1)	printed=21	blank=2	capacity=24	slack=1
+class	row18	(-3, -1)	10@0	red	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, -1)	1@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-3, -1)	11@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, -1)	12@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, -1)	13@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-3, -1)	14@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-3, -1)	15@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-3, -1)	2@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, -1)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-3, -1)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, -1)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-01,2026-10,2027-04,+9
+class	row18	(-3, -1)	3@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, -1)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-04,2026-07,2027-09,+8
+class	row18	(-3, -1)	31@3	dark	angle=3	single	peak=1	displays=7	e.g.=2026-12,2028-08,2029-05,+4
+class	row18	(-3, -1)	4@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, -1)	5@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-3, -1)	6@2|9@0	red	angle=2	merged	peak=1	displays=26	e.g.=2026-06,2026-08,2027-02,+23
+class	row18	(-3, -1)	7@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-3, -1)	C@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-12,2027-12,2028-12,+4
+class	row18	(-3, -1)	T@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-10,2027-10,2028-10,+4
+class	row18	(-3, -1)	V@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-11,2027-11,2028-11,+4
+blank	row18	(-3, -1)	peak=2	displays=28	e.g.=2026-02,2026-03,2026-06,+25
+orbit	row18	(-3, 0)	printed=18	blank=2	capacity=24	slack=4
+class	row18	(-3, 0)	10@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, 0)	11@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, 0)	12@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-3, 0)	13@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-3, 0)	14@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-3, 0)	2@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-3, 0)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-3, 0)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, 0)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, 0)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-04,2026-07,2027-09,+9
+class	row18	(-3, 0)	3@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, 0)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-09,2026-12,2027-06,+8
+class	row18	(-3, 0)	31@3	dark	angle=3	single	peak=1	displays=7	e.g.=2027-03,2028-05,2029-01,+4
+class	row18	(-3, 0)	4@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, 0)	5@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, 0)	6@0|9@2	red	angle=0	merged	peak=1	displays=26	e.g.=2026-05,2026-09,2026-12,+23
+class	row18	(-3, 0)	7@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-3, 0)	8@0|8@2	red	angle=0	merged	peak=1	displays=26	e.g.=2026-02,2026-03,2026-08,+23
+blank	row18	(-3, 0)	peak=2	displays=22	e.g.=2026-02,2026-03,2026-06,+19
+orbit	row18	(-3, 1)	printed=20	blank=2	capacity=24	slack=2
+class	row18	(-3, 1)	20@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-3, 1)	1@0	red	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-3, 1)	21@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-3, 1)	15@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-3, 1)	16@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, 1)	17@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, 1)	18@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, 1)	19@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-3, 1)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-3, 1)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, 1)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, 1)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, 1)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-09,2026-12,2027-06,+9
+class	row18	(-3, 1)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-06,2027-03,2027-11,+8
+class	row18	(-3, 1)	31@3	dark	angle=3	single	peak=1	displays=7	e.g.=2026-03,2027-08,2028-10,+4
+class	row18	(-3, 1)	A@1	month	angle=1	single	peak=1	displays=14	e.g.=2026-04,2026-08,2027-04,+11
+class	row18	(-3, 1)	F@1	month	angle=1	single	peak=1	displays=14	e.g.=2026-02,2027-02,2028-02,+11
+class	row18	(-3, 1)	J@1	month	angle=1	single	peak=1	displays=21	e.g.=2026-01,2026-06,2026-07,+18
+class	row18	(-3, 1)	M@1	month	angle=1	single	peak=1	displays=14	e.g.=2026-03,2026-05,2027-03,+11
+class	row18	(-3, 1)	S@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-09,2027-09,2028-09,+4
+blank	row18	(-3, 1)	peak=2	displays=22	e.g.=2026-10,2026-11,2026-12,+19
+orbit	row18	(-3, 2)	printed=20	blank=1	capacity=24	slack=3
+class	row18	(-3, 2)	22@2	red	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-3, 2)	23@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, 2)	24@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, 2)	24@3	dark	angle=3	single	peak=1	displays=6	e.g.=2028-04,2029-09,2030-06,+3
+class	row18	(-3, 2)	24/31@3	dark	angle=3	single	peak=1	displays=7	e.g.=2026-08,2027-05,2028-01,+4
+class	row18	(-3, 2)	25@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, 2)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-3, 2)	26@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-3, 2)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-3, 2)	27@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-3, 2)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-3, 2)	28@2	red	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-3, 2)	28@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-3, 2)	29@3	dark	angle=3	single	peak=1	displays=12	e.g.=2026-06,2027-03,2027-11,+9
+class	row18	(-3, 2)	30@3	dark	angle=3	single	peak=1	displays=11	e.g.=2026-03,2026-11,2027-08,+8
+class	row18	(-3, 2)	A@1	month	angle=1	single	peak=1	displays=21	e.g.=2026-01,2026-03,2026-05,+18
+class	row18	(-3, 2)	E@1	month	angle=1	single	peak=1	displays=21	e.g.=2026-02,2026-09,2027-02,+18
+class	row18	(-3, 2)	P@1	month	angle=1	single	peak=1	displays=7	e.g.=2026-04,2027-04,2028-04,+4
+class	row18	(-3, 2)	SUN@0	red	angle=0	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+class	row18	(-3, 2)	U@1	month	angle=1	single	peak=1	displays=21	e.g.=2026-06,2026-07,2026-08,+18
+blank	row18	(-3, 2)	peak=1	displays=24	e.g.=2026-02,2026-10,2026-11,+21
+orbit	row18	(-2, -2)	printed=16	blank=0	capacity=24	slack=8
+class	row18	(-2, -2)	20@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-2, -2)	21@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-2, -2)	21@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, -2)	17@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-2, -2)	18@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-2, -2)	19@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-2, -2)	22@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, -2)	22@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-2, -2)	23@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, -2)	23@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-2, -2)	24@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-2, -2)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, -2)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, -2)	27@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, -2)	FRI@2	weekday	angle=2	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+class	row18	(-2, -2)	MON@1	weekday	angle=1	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row18	(-2, -2)	peak=0	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+orbit	row18	(-2, -1)	printed=21	blank=1	capacity=24	slack=2
+class	row18	(-2, -1)	10@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-2, -1)	20@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-2, -1)	1@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-2, -1)	11@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-2, -1)	12@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-2, -1)	21@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-2, -1)	13@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-2, -1)	14@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, -1)	15@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, -1)	16@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, -1)	2@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-2, -1)	22@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-2, -1)	23@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-2, -1)	24@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, -1)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, -1)	26@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, -1)	3@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-2, -1)	4@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, -1)	5@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, -1)	6@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, -1)	TUE@1	weekday	angle=1	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row18	(-2, -1)	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+orbit	row18	(-2, 0)	printed=20	blank=0	capacity=24	slack=4
+class	row18	(-2, 0)	10@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-2, 0)	20@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-2, 0)	11@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, 0)	21@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-2, 0)	12@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, 0)	13@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, 0)	19@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-2, 0)	22@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-2, 0)	23@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, 0)	24@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, 0)	25@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, 0)	3@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-2, 0)	4@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-2, 0)	5@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-2, 0)	6@0|9@2	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-01,2026-04,2026-07,+23
+class	row18	(-2, 0)	9@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, 0)	7@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, 0)	7@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-2, 0)	8@0|8@2	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-05,2026-06,2027-01,+23
+class	row18	(-2, 0)	WED@1	weekday	angle=1	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row18	(-2, 0)	peak=0	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+orbit	row18	(-2, 1)	printed=17	blank=1	capacity=24	slack=6
+class	row18	(-2, 1)	20@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, 1)	20@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-2, 1)	1@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, 1)	21@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-2, 1)	14@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-2, 1)	15@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-2, 1)	16@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-2, 1)	17@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-2, 1)	18@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, 1)	18@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-2, 1)	19@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, 1)	19@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-2, 1)	2@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, 1)	22@3	dark	angle=1	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-2, 1)	23@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-2, 1)	24@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-2, 1)	THU@1	weekday	angle=1	single	peak=1	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+blank	row18	(-2, 1)	peak=1	displays=65	e.g.=2026-01,2026-04,2026-05,+62
+orbit	row18	(-1, -1)	printed=22	blank=2	capacity=24	slack=0
+class	row18	(-1, -1)	1@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-1, -1)	1@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-1, -1)	11@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-1, -1)	12@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-1, -1)	13@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-1, -1)	13@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-1, -1)	14@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-1, -1)	14@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-1, -1)	15@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-1, -1)	15@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-1, -1)	16@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-1, -1)	16@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-1, -1)	17@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-1, -1)	17@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-1, -1)	18@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-1, -1)	19@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-1, -1)	2@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-1, -1)	2@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-1, -1)	3@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-1, -1)	3@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-1, -1)	4@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-1, -1)	5@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+blank	row18	(-1, -1)	peak=2	displays=26	e.g.=2026-05,2026-08,2027-01,+23
+orbit	row18	(-1, 0)	printed=22	blank=1	capacity=24	slack=1
+class	row18	(-1, 0)	10@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-1, 0)	10@0	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-1, 0)	1@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-1, 0)	11@2	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-1, 0)	12@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-1, 0)	12@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-1, 0)	13@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-1, 0)	14@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(-1, 0)	15@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-1, 0)	16@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-1, 0)	17@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-1, 0)	18@3	dark	angle=3	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-1, 0)	2@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-09,2026-12,2027-06,+10
+class	row18	(-1, 0)	3@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(-1, 0)	4@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(-1, 0)	4@1	dark	angle=1	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(-1, 0)	5@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-1, 0)	6@0|9@2	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-01,2026-04,2026-07,+23
+class	row18	(-1, 0)	6@2|9@0	dark	angle=2	merged	peak=1	displays=26	e.g.=2026-06,2026-08,2027-02,+23
+class	row18	(-1, 0)	7@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+class	row18	(-1, 0)	7@2	dark	angle=2	single	peak=1	displays=13	e.g.=2026-05,2027-01,2027-10,+10
+class	row18	(-1, 0)	8@0|8@2	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-01,2026-09,2026-10,+23
+blank	row18	(-1, 0)	peak=1	displays=39	e.g.=2026-01,2026-05,2026-08,+36
+orbit	row18	(0, 0)	printed=6	blank=0	capacity=6	slack=0
+class	row18	(0, 0)	10@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-06,2027-02,2027-03,+10
+class	row18	(0, 0)	11@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-02,2026-03,2026-11,+10
+class	row18	(0, 0)	5@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-08,2027-05,2028-01,+10
+class	row18	(0, 0)	6@0|9@0	dark	angle=0	merged	peak=1	displays=26	e.g.=2026-05,2026-09,2026-12,+23
+class	row18	(0, 0)	7@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-01,2026-10,2027-04,+10
+class	row18	(0, 0)	8@0	dark	angle=0	single	peak=1	displays=13	e.g.=2026-04,2026-07,2027-09,+10
+blank	row18	(0, 0)	peak=0	displays=91	e.g.=2026-01,2026-02,2026-03,+88
+profile	pr99	row1	bound=240	obstructed=-	(-3, -3):20+3 (-3, -2):15+2 (-3, -1):21+2 (-3, 0):18+2 (-3, 1):22+2 (-3, 2):19+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):20+0 (-2, 1):18+1 (-1, -1):22+2 (-1, 0):22+1 (0, 0):6+0
+profile	pr99	row6	bound=240	obstructed=-	(-3, -3):21+3 (-3, -2):15+2 (-3, -1):21+2 (-3, 0):18+2 (-3, 1):21+2 (-3, 2):20+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):20+0 (-2, 1):17+1 (-1, -1):22+2 (-1, 0):22+1 (0, 0):6+0
+profile	pr99	row7	bound=240	obstructed=-	(-3, -3):21+3 (-3, -2):15+2 (-3, -1):21+2 (-3, 0):18+2 (-3, 1):21+2 (-3, 2):19+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):20+0 (-2, 1):18+1 (-1, -1):22+2 (-1, 0):22+1 (0, 0):6+0
+profile	pr99	row13	bound=240	obstructed=-	(-3, -3):21+3 (-3, -2):15+2 (-3, -1):21+2 (-3, 0):18+2 (-3, 1):21+2 (-3, 2):19+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):20+0 (-2, 1):18+1 (-1, -1):22+2 (-1, 0):22+1 (0, 0):6+0
+profile	pr99	row18	bound=240	obstructed=(-3, -3)	(-3, -3):22+3 (-3, -2):15+2 (-3, -1):21+2 (-3, 0):18+2 (-3, 1):20+2 (-3, 2):20+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):20+0 (-2, 1):17+1 (-1, -1):22+2 (-1, 0):22+1 (0, 0):6+0
+profile	no-6/9	row1	bound=246	obstructed=(-1, 0) (0, 0)	(-3, -3):20+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):19+2 (-3, 1):22+2 (-3, 2):19+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):21+0 (-2, 1):18+1 (-1, -1):22+2 (-1, 0):24+1 (0, 0):7+0
+profile	no-6/9	row6	bound=246	obstructed=(-1, 0) (0, 0)	(-3, -3):21+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):19+2 (-3, 1):21+2 (-3, 2):20+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):21+0 (-2, 1):17+1 (-1, -1):22+2 (-1, 0):24+1 (0, 0):7+0
+profile	no-6/9	row7	bound=246	obstructed=(-1, 0) (0, 0)	(-3, -3):21+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):19+2 (-3, 1):21+2 (-3, 2):19+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):21+0 (-2, 1):18+1 (-1, -1):22+2 (-1, 0):24+1 (0, 0):7+0
+profile	no-6/9	row13	bound=246	obstructed=(-1, 0) (0, 0)	(-3, -3):21+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):19+2 (-3, 1):21+2 (-3, 2):19+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):21+0 (-2, 1):18+1 (-1, -1):22+2 (-1, 0):24+1 (0, 0):7+0
+profile	no-6/9	row18	bound=246	obstructed=(-3, -3) (-1, 0) (0, 0)	(-3, -3):22+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):19+2 (-3, 1):20+2 (-3, 2):20+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):21+0 (-2, 1):17+1 (-1, -1):22+2 (-1, 0):24+1 (0, 0):7+0
+profile	no-half-turn	row1	bound=249	obstructed=(-1, 0) (0, 0)	(-3, -3):20+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):20+2 (-3, 1):22+2 (-3, 2):19+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):22+0 (-2, 1):18+1 (-1, -1):22+2 (-1, 0):25+1 (0, 0):7+0
+profile	no-half-turn	row6	bound=249	obstructed=(-1, 0) (0, 0)	(-3, -3):21+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):20+2 (-3, 1):21+2 (-3, 2):20+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):22+0 (-2, 1):17+1 (-1, -1):22+2 (-1, 0):25+1 (0, 0):7+0
+profile	no-half-turn	row7	bound=249	obstructed=(-1, 0) (0, 0)	(-3, -3):21+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):20+2 (-3, 1):21+2 (-3, 2):19+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):22+0 (-2, 1):18+1 (-1, -1):22+2 (-1, 0):25+1 (0, 0):7+0
+profile	no-half-turn	row13	bound=249	obstructed=(-1, 0) (0, 0)	(-3, -3):21+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):20+2 (-3, 1):21+2 (-3, 2):19+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):22+0 (-2, 1):18+1 (-1, -1):22+2 (-1, 0):25+1 (0, 0):7+0
+profile	no-half-turn	row18	bound=249	obstructed=(-3, -3) (-1, 0) (0, 0)	(-3, -3):22+3 (-3, -2):15+2 (-3, -1):22+2 (-3, 0):20+2 (-3, 1):20+2 (-3, 2):20+1 (-2, -2):16+0 (-2, -1):21+1 (-2, 0):22+0 (-2, 1):17+1 (-1, -1):22+2 (-1, 0):25+1 (0, 0):7+0
+whatif	N-quarter-turn-equal	row1	bound=239	obstructed=-	corner=19+3
+whatif	N-quarter-turn-equal	row6	bound=239	obstructed=-	corner=20+3
+whatif	N-quarter-turn-equal	row7	bound=239	obstructed=-	corner=20+3
+whatif	N-quarter-turn-equal	row13	bound=239	obstructed=-	corner=20+3
+whatif	N-quarter-turn-equal	row18	bound=239	obstructed=-	corner=21+3
+whatif	29-quarter-turn-equal	row1	bound=239	obstructed=-	corner=19+3
+whatif	29-quarter-turn-equal	row6	bound=239	obstructed=-	corner=20+3
+whatif	29-quarter-turn-equal	row7	bound=239	obstructed=-	corner=20+3
+whatif	29-quarter-turn-equal	row13	bound=239	obstructed=-	corner=20+3
+whatif	29-quarter-turn-equal	row18	bound=239	obstructed=-	corner=21+3
+whatif	black-24/31-as-red	row1	bound=240	obstructed=-	corner=20+3
+whatif	black-24/31-as-red	row6	bound=240	obstructed=-	corner=21+3
+whatif	black-24/31-as-red	row7	bound=240	obstructed=-	corner=21+3
+whatif	black-24/31-as-red	row13	bound=240	obstructed=-	corner=21+3
+whatif	black-24/31-as-red	row18	bound=240	obstructed=(-3, -3)	corner=22+3
+whatif	stacked-also-top-date(rejected-context)	row1	bound=240	obstructed=-	corner=20+3
+whatif	stacked-also-top-date(rejected-context)	row6	bound=238	obstructed=-	corner=20+3
+whatif	stacked-also-top-date(rejected-context)	row7	bound=239	obstructed=-	corner=20+3
+whatif	stacked-also-top-date(rejected-context)	row13	bound=239	obstructed=-	corner=20+3
+whatif	stacked-also-top-date(rejected-context)	row18	bound=237	obstructed=-	corner=20+3
