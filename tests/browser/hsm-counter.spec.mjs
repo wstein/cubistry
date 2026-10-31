@@ -66,9 +66,7 @@ test("all nine HSM variants wrap both ways within six moves and render fixed gly
     await page.selectOption("#hsm-letter", letter);
     await settled(page, 0);
     await expect(page.locator("#status")).toContainText(`${letter} · 00`);
-    await expect(page.locator("#rotation-speed")).toHaveValue(
-      { H: "2", M: "3", S: "4" }[letter],
-    );
+    await expect(page.locator("#rotation-speed")).toHaveValue("4");
     await expect(page.locator("#error")).toBeEmpty();
     for (const maximum of [59, 23, 11]) {
       await page.selectOption("#hsm-range", String(maximum));
@@ -101,8 +99,8 @@ test("HSM run stop resume, validation, mobile and existing application state rem
   await page.setViewportSize({ width: 390, height: 844 });
   await choose(page);
   await page.screenshot({ path: "test-results/hsm-mobile.png" });
-  // Default rotation time for the H unit is 500 ms (stop index 2).
-  await expect(page.locator("#rotation-speed")).toHaveValue("2");
+  // Default rotation time for every unit is 100 ms (stop index 4).
+  await expect(page.locator("#rotation-speed")).toHaveValue("4");
   expect(
     await page.locator("html").evaluate((e) => e.scrollWidth),
   ).toBeLessThanOrEqual(390);
@@ -152,12 +150,12 @@ test("M33 has a physical unprinted upper-left corner", async ({ page }) => {
   ).toBe(3);
   await page.screenshot({ path: "test-results/hsm-blank-M33.png" });
 });
-test("single HSM counter defaults to H 500 ms, M 250 ms, S 100 ms and stays freely adjustable", async ({
+test("single HSM counter defaults to 100 ms for H, M and S and stays freely adjustable", async ({
   page,
 }) => {
   const defaults = {
-    H: ["2", "500 ms"],
-    M: ["3", "250 ms"],
+    H: ["4", "100 ms"],
+    M: ["4", "100 ms"],
     S: ["4", "100 ms"],
   };
   const slider = page.locator("#rotation-speed");
@@ -165,7 +163,7 @@ test("single HSM counter defaults to H 500 ms, M 250 ms, S 100 ms and stays free
   // Opening the counter applies the default of the initially selected unit.
   await expect(page.locator("#hsm-letter")).toHaveValue("H");
   await expect(slider).toHaveValue(defaults.H[0]);
-  await expect(slider).toHaveAttribute("aria-valuetext", /^500 ms/);
+  await expect(slider).toHaveAttribute("aria-valuetext", /^100 ms/);
   // Changing the unit resets the slider to that unit's default.
   for (const letter of ["M", "S", "H", "M"]) {
     await page.selectOption("#hsm-letter", letter);
