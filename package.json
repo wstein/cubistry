@@ -12,7 +12,7 @@
     "test:proof": "python3 -m unittest discover -s tests -p \"*_test.py\"",
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run verify:counter-blank-top && npm test && npm run test:proof && python3 research/counter/verify.py && python3 research/architecture/verify_design.py && python3 research/certified-counter/verify.py && npm run build && npm run test:timer-proof && npm run test:five-second-proof",
-    "verify:counter-blank-top": "node scripts/counter-blank-top.mjs --check",
+    "verify:counter-blank-top": "node scripts/counter-blank-top.mjs --check && node scripts/export-counter-blank-top-net.mjs --check",
     "typecheck": "npm run build:core && tsc --noEmit",
     "build:design": "npm run build:core && node research/architecture/build_counter_design.mjs",
     "build:core": "rescript build",
