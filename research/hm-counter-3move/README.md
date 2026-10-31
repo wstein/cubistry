@@ -7,7 +7,7 @@ counter where every increment and every decrement costs **at most 3 HTM**?
 
 | Profile | Upper-left cell | Status of "max 3 HTM" | Evidence |
 | --- | --- | --- | --- |
-| **blank** (primary, owner's frame) | must show a blank sticker | **Max 4 SAT on every mode.** Final print R1 (H/S/M seconds-first print, 4 stickers relabeled). One-lap periods: M 60 / 159 HTM (9 edges at 4), H 00..23 24 / 78 (7), H 00..11 12 / 40 (4). It dominates the restricted H/S/M print on every mode. **Max 3 is impossible for print R1 on every mode** (exact generator-side fixpoint) and UNKNOWN for other prints. | [witness](evidence/witness-blank-R1-final.tsv), Julia and Flix receipts byte-identical |
+| **blank** (primary, owner's frame) | must show a blank sticker | **Max 3 SAT for the minutes alone** (m3-SH, s3-MH) **or for both hour modes alone** (hours3). The other field stays at max 4. All three modes at max 3 on one print: **UNKNOWN**. Every mode at max 4 is SAT (R1, s3-SH and others). | [witnesses](evidence/), Julia and Flix receipts byte-identical |
 | **free** (relaxation) | unconstrained | **SAT**: every transition is at most 3 HTM | [witness](evidence/witness-free.tsv), Julia and Flix receipts byte-identical |
 
 ### Free profile (relaxation): SAT, checked by Julia and Flix
@@ -45,7 +45,71 @@ and the H 11→00 reset (1). Each one is **at most 3 HTM**.
   upright in exactly one front cell. With a fixed frame, a glyph's up vector
   fixes the corner's rotation, and therefore its cell.
 
-### Blank profile, fourth attempt: improving R1 and deciding max 3 exactly
+### Blank profile, fifth attempt: M/S S3 and M3 structures imported — max 3 reached for minutes or for both hour modes (checked)
+
+Inputs: the M/S study's prints S3 and M3 (PR #138, commit `d497312`, copied
+with provenance into [ms-import/](ms-import/PROVENANCE.md)). In both, each of
+the three blanks sits on a corner that also carries two tens digits, and the
+letters are spread over four corners. In S3 the S counter stays within 3 HTM
+throughout, using a two-lap period. [ms-import/msconvert.jl](ms-import/msconvert.jl)
+relabels their letters and converts their up runs into route seeds:
+s3-MH (S3 with S→M, M→H), s3-SH (S→H), m3-SH (M3 with S→H) and m3-MH.
+
+**Exact max-3 screen** ([fixpoint.jl](fixpoint.jl), generator-side; the tool
+finds limits of any length, so multi-lap periods are covered):
+
+| Print | M 00..59 | H 00..23 | H 00..11 |
+| --- | --- | --- | --- |
+| s3-MH | feasible (limit 39) | infeasible | infeasible |
+| s3-SH | infeasible | **feasible** (limit 19) | infeasible |
+| m3-SH | feasible (limit 3) | infeasible | infeasible |
+| m3-MH | infeasible | infeasible | infeasible |
+| hours3 (annealed from s3-SH, 10 stickers changed) | infeasible | **feasible** | **feasible** |
+
+Hours3 came from annealing over all 21 non-blank stickers of s3-SH, with the
+sum of the three exact fixpoint penalties as the objective. It reached max 3
+for both hour modes within 8 iterations. The minutes penalty did not reach 0
+in 889+ iterations; a second run seeded from m3-SH made no progress on the
+hours.
+
+**Checked witnesses.** Per mode: edges (laps) / total HTM / edges at 4 / max.
+Run-in 0 everywhere. Every row is accepted by both checkers with
+byte-identical receipts; the negative controls are in the
+`evidence/checks-blank-*.tsv` files.
+
+| Print (sticker changes vs H/S/M; H setups) | M 00..59 | H 00..23 | H 00..11 |
+| --- | --- | --- | --- |
+| R1 final (4; 16 / 16) | 60 (1) / 159 / 9 / 4 | 24 (1) / 78 / 7 / 4 | 12 (1) / 40 / 4 / 4 |
+| **m3-SH** (24; 4 / 4) | 60 (1) / 163 / 0 / **3** | 24 (1) / 73 / 5 / 4 | 12 (1) / 40 / 5 / 4 |
+| **s3-MH** (20; 9 / 10) | 120 (2) / 324 / 0 / **3** | 24 (1) / 73 / 3 / 4 | 12 (1) / 40 / 6 / 4 |
+| **s3-SH** (22; 8 / 4) | 60 (1) / 177 / 3 / 4 | 24 (1) / 65 / 0 / **3** | 12 (1) / 38 / 4 / 4 |
+| **hours3** (23; 16 / 15) | 60 (1) / 190 / 13 / 4 | 24 (1) / 61 / 0 / **3** | 12 (1) / 32 / 0 / **3** |
+| M/S S3, for reference (M/S checkers) | S: 120 (2) / 324 / 0 / 3 | — | — |
+
+- **Minutes at max 3: SAT** (m3-SH, one lap, 163 HTM; s3-MH, two laps,
+  162 HTM per lap). The hours stay at max 4.
+- **Both hour modes at max 3: SAT** (hours3: H 00..23 61 HTM, H 00..11
+  32 HTM, one lap each). The minutes stay at max 4 with 13 edges at 4.
+- **All three modes at max 3 on one print: UNKNOWN.** None of the prints
+  above admits it (exact fixpoint), and the bounded annealing did not find
+  one.
+- Compared with R1 using the lexicographic order (max, edges at max, total),
+  **s3-SH is better on every mode**: M has 3 instead of 9 edges at 4,
+  although its total is 177 against 159; H 00..23 reaches max 3; H 00..11 has
+  the same 4 edges at 4 and 38 against 40 HTM. If the minutes total of 159
+  must not get worse, R1 stays on the Pareto front. m3-SH, s3-MH and hours3
+  are Pareto alternatives.
+- Sticker changes are counted position by position against the H/S/M
+  seconds-first print, so S3 and M3 derivatives count as almost entirely
+  reprinted (20–24 stickers). R1 changes only 4.
+- Checker semantics changed in one respect: both checkers now also require
+  the **period to be minimal** (no earlier whole-lap repetition), which the
+  new "period too long" control needs. New controls: period too long (period
+  rows repeated, rejected as not minimal) and period too short (last lap of a
+  multi-lap period removed, rejected at the period boundary; exercised on
+  s3-MH). Inert H is not needed here: H is an active letter.
+
+### Blank profile, fourth attempt: improving R1 and deciding max 3 exactly (R1 still on the Pareto front)
 
 **Final print: R1** (unchanged sticker set: 4 stickers differ from the
 H/S/M seconds-first print, ids 10, 14, 18 S→M and id 20 M→H). The final
@@ -306,6 +370,7 @@ HM_PEN4=0 HM_B5=1 $J --startup-file=no research/hm-counter-3move/periodic.jl wri
 HM_PEN4=0 HM_B5=1 HM_HSTARTS=0 $J --startup-file=no research/hm-counter-3move/periodic.jl write2 research/hm-counter-3move/prints/hms-restricted.txt /tmp/witness-hms.tsv research/hm-counter-3move/baseline/hms-up-routes.tsv
 HM_PEN4_M=0 HM_PEN4_H=1000 HM_B5=1 $J --startup-file=no research/hm-counter-3move/periodic.jl write2 research/hm-counter-3move/prints/hms-R1-MMMHH.txt /tmp/witness-R1-final.tsv research/hm-counter-3move/baseline/hms-up-routes.tsv
 $J --startup-file=no research/hm-counter-3move/fixpoint.jl research/hm-counter-3move/prints/hms-R1-MMMHH.txt   # exact max-3 decision per mode
+HM_PEN4=1000 HM_FSTARTS=1 $J --startup-file=no research/hm-counter-3move/fixpoint.jl write3 research/hm-counter-3move/prints/hours3.txt /tmp/witness-hours3.tsv research/hm-counter-3move/ms-import/routes-s3-SH.tsv
 research/hm-counter-3move/flix/build.sh            # Flix 0.79.0 / Java 21 jar
 research/hm-counter-3move/checker/run-checks.sh research/hm-counter-3move/evidence/witness-free.tsv /tmp/hm-checks-free
 research/hm-counter-3move/checker/run-checks.sh research/hm-counter-3move/evidence/witness-blank-periodic.tsv /tmp/hm-checks-blank
@@ -346,8 +411,9 @@ rejected with the intended reason ([evidence/checks-free.tsv](evidence/checks-fr
 
 ## Not established
 
-- Blank profile: max 4 is SAT (R1 final, checked). Max 3 is impossible for
-  print R1 and for the 35 two-sticker variants that keep its minutes period
+- Blank profile: max 3 for all three modes on one print is UNKNOWN. Max 3
+  for the minutes alone or for both hour modes alone is SAT (checked). Max 3
+  is impossible for print R1 and for the 35 two-sticker variants that keep its minutes period
   (exact generator-side fixpoint, not a checker claim). It is UNKNOWN for
   prints in general: the annealing over all 24 stickers was bounded, and its
   one H 00..11 max-3 print was not turned into a checked witness. The
