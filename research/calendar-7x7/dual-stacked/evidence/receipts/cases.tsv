@@ -1,0 +1,10 @@
+case	variant	mode	julia-exit	flix-exit	receipts	summary
+B-context-candidate	B	context	0	0	IDENTICAL	stacked-summary ACCEPT B context 91 0 237
+B-strict-candidate	B	strict	1	1	IDENTICAL	stacked-summary REJECT B strict 79 12 237
+A-context-candidate	A	context	1	1	IDENTICAL	stacked-summary REJECT A context 78 13 237
+A-strict-candidate	A	strict	1	1	IDENTICAL	stacked-summary REJECT A strict 72 19 237
+B-context-pr99-print	B	context	1	1	IDENTICAL	stacked-summary REJECT B context 73 18 240
+A-context-pr99-print	A	context	1	1	IDENTICAL	stacked-summary REJECT A context 73 18 240
+W-context-pr99-print	W	context	0	0	IDENTICAL	stacked-summary ACCEPT W context 91 0 240
+W-context-pr128-pairs-pr99-dag	W	context	1	1	IDENTICAL	stacked-summary REJECT W context 52 39 238
+W-context-pr128-pairs-pr128-dag	W	context	1	1	IDENTICAL	stacked-summary REJECT W context 52 39 238

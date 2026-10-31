@@ -1,0 +1,41 @@
+front-grid	row	1	2	3	4	5	6	7
+front-grid	1	corner	outer-wing	inner-wing	midge	inner-wing	outer-wing	corner
+front-grid	2	outer-wing	centre(-2,-2)	centre(-2,-1)	centre(-2,0)	centre(-2,1)	centre(-2,-2)	outer-wing
+front-grid	3	inner-wing	centre(-2,1)	centre(-1,-1)	centre(-1,0)	centre(-1,-1)	centre(-2,-1)	inner-wing
+front-grid	4	midge	centre(-2,0)	centre(-1,0)	core-centre	centre(-1,0)	centre(-2,0)	midge
+front-grid	5	inner-wing	centre(-2,-1)	centre(-1,-1)	centre(-1,0)	centre(-1,-1)	centre(-2,1)	inner-wing
+front-grid	6	outer-wing	centre(-2,-2)	centre(-2,1)	centre(-2,0)	centre(-2,-1)	centre(-2,-2)	outer-wing
+front-grid	7	corner	outer-wing	inner-wing	midge	inner-wing	outer-wing	corner
+week-pair	r3c1/r4c1	inner-wing	midge
+week-pair	r3c2/r4c2	centre(-2,1)	centre(-2,0)
+week-pair	r3c3/r4c3	centre(-1,-1)	centre(-1,0)
+week-pair	r3c4/r4c4	centre(-1,0)	core-centre
+week-pair	r3c5/r4c5	centre(-1,-1)	centre(-1,0)
+week-pair	r3c6/r4c6	centre(-2,-1)	centre(-2,0)
+week-pair	r3c7/r4c7	inner-wing	midge
+week-pair	r4c1/r5c1	midge	inner-wing
+week-pair	r4c2/r5c2	centre(-2,0)	centre(-2,-1)
+week-pair	r4c3/r5c3	centre(-1,0)	centre(-1,-1)
+week-pair	r4c4/r5c4	core-centre	centre(-1,0)
+week-pair	r4c5/r5c5	centre(-1,0)	centre(-1,-1)
+week-pair	r4c6/r5c6	centre(-2,0)	centre(-2,1)
+week-pair	r4c7/r5c7	midge	inner-wing
+week-pair	r5c1/r6c1	inner-wing	outer-wing
+week-pair	r5c2/r6c2	centre(-2,-1)	centre(-2,-2)
+week-pair	r5c3/r6c3	centre(-1,-1)	centre(-2,1)
+week-pair	r5c4/r6c4	centre(-1,0)	centre(-2,0)
+week-pair	r5c5/r6c5	centre(-1,-1)	centre(-2,-1)
+week-pair	r5c6/r6c6	centre(-2,1)	centre(-2,-2)
+week-pair	r5c7/r6c7	inner-wing	outer-wing
+week-pair	r6c1/r7c1	outer-wing	corner
+week-pair	r6c2/r7c2	centre(-2,-2)	outer-wing
+week-pair	r6c3/r7c3	centre(-2,1)	inner-wing
+week-pair	r6c4/r7c4	centre(-2,0)	midge
+week-pair	r6c5/r7c5	centre(-2,-1)	inner-wing
+week-pair	r6c6/r7c6	centre(-2,-2)	outer-wing
+week-pair	r6c7/r7c7	outer-wing	corner
+stacked-surface	B	15	23/30	red	corner	-3,-3,3
+stacked-surface	B	16	24/31	red	corner	-3,-3,3
+stacked-surface	B	61	24/31	dark	outer-wing	-3,2,3
+stacked-surface	A	16	24/31	red	corner	-3,-3,3
+stacked-surface	A	244	1/8	red	inner-wing	3,-1,-3
