@@ -4,7 +4,7 @@ import { Quaternion, Vector3 } from "three";
  * See the adjacent CUBE_ASSEMBLER_LICENSE.txt file. All time units here are seconds. */
 export const ROTATION_TUNING = Object.freeze({
   dampingSeconds: .24, stopSpeed: .03, maximumSpeed: 6, velocityFilterSeconds: .04,
-  staleReleaseSeconds: .1, toleranceRadians: 35 * Math.PI / 180,
+  staleReleaseSeconds: .1, toleranceRadians: 40 * Math.PI / 180,
   // Return to the remembered target (default view, then the last accepted view): wait returnDelay(distance) after settling (long near the
   // tolerance, short when stretched far), then a soft-start critically damped
   // response (rate in 1/s): offset x(t) = x0 e^(-rt) (1 + rt + (rt)^2/2) has zero speed

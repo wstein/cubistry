@@ -8,26 +8,26 @@ const wait = c => returnDelay(c.quaternion.angleTo(c.front));
 const spring = t => Math.exp(-P.returnRate*t)*(1+P.returnRate*t+(P.returnRate*t)**2/2);
 const near = (a,b,tolerance=1e-9) => assert(Math.abs(a-b)<tolerance,`${a} != ${b}`);
 function settled(controller, pitch, yaw, start=0) { controller.down(start); controller.drag(radians(pitch),radians(yaw),start+.2); controller.up(start+.4); }
-test("settled views within 35 degrees of the front become the return target; beyond it the view returns to the last such view",()=>{
- const c=new SmartRotation(initial());settled(c,0,34);assert.equal(c.phase,"idle");
- near(c.anchor.angleTo(initial()),radians(34));near(c.anchor.angleTo(c.quaternion),0);
+test("settled views within 40 degrees of the front become the return target; beyond it the view returns to the last such view",()=>{
+ const c=new SmartRotation(initial());settled(c,0,39);assert.equal(c.phase,"idle");
+ near(c.anchor.angleTo(initial()),radians(39));near(c.anchor.angleTo(c.quaternion),0);
  const accepted=c.anchor.clone();
- settled(c,0,26,1);assert(c.quaternion.angleTo(initial())>radians(35));assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(accepted),0);
+ settled(c,0,26,1);assert(c.quaternion.angleTo(initial())>radians(40));assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(accepted),0);
  const due=1.4+wait(c);near(c.returnDeadline,due);c.step(due-.001);assert.equal(c.phase,"awaiting-return");const outside=c.quaternion.clone();
  c.step(due);assert.equal(c.phase,"returning");near(c.quaternion.angleTo(outside),0);
- c.step(10);assert.equal(c.phase,"idle");near(c.quaternion.angleTo(accepted),0);near(c.quaternion.angleTo(initial()),radians(34));
- const exact=new SmartRotation(initial());settled(exact,0,35);assert.equal(exact.phase,"idle");near(exact.anchor.angleTo(initial()),radians(35));
- const over=new SmartRotation(initial());settled(over,0,36);assert.equal(over.phase,"awaiting-return");near(over.anchor.angleTo(initial()),0);
- const spatial=new SmartRotation(initial());settled(spatial,30,30);assert(spatial.quaternion.angleTo(initial())>radians(35));assert.equal(spatial.phase,"awaiting-return");
- const diagonal=new SmartRotation(initial());settled(diagonal,20,20);assert(diagonal.quaternion.angleTo(initial())<radians(35));assert.equal(diagonal.phase,"idle");
+ c.step(10);assert.equal(c.phase,"idle");near(c.quaternion.angleTo(accepted),0);near(c.quaternion.angleTo(initial()),radians(39));
+ const exact=new SmartRotation(initial());settled(exact,0,40);assert.equal(exact.phase,"idle");near(exact.anchor.angleTo(initial()),radians(40));
+ const over=new SmartRotation(initial());settled(over,0,41);assert.equal(over.phase,"awaiting-return");near(over.anchor.angleTo(initial()),0);
+ const spatial=new SmartRotation(initial());settled(spatial,35,35);assert(spatial.quaternion.angleTo(initial())>radians(40));assert.equal(spatial.phase,"awaiting-return");
+ const diagonal=new SmartRotation(initial());settled(diagonal,25,25);assert(diagonal.quaternion.angleTo(initial())<radians(40));assert.equal(diagonal.phase,"idle");
 });
 test("the threshold is measured from the front, so the return target never walks beyond it; the last view within it is always the target",()=>{
  const c=new SmartRotation(initial());
  settled(c,0,20);near(c.anchor.angleTo(initial()),radians(20));
- settled(c,0,20,1);assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(initial()),radians(20));c.step(10);near(c.quaternion.angleTo(initial()),radians(20));
+ settled(c,0,25,1);assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(initial()),radians(20));c.step(10);near(c.quaternion.angleTo(initial()),radians(20));
  settled(c,0,10,11);near(c.anchor.angleTo(initial()),radians(30));
- settled(c,0,10,12);assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(initial()),radians(30));c.step(30);near(c.quaternion.angleTo(initial()),radians(30));
- for(const degrees of [5,-12,18,-25,33]){settled(c,0,degrees,40+degrees);assert(c.anchor.angleTo(initial())<=radians(35)+1e-9);c.step(100+degrees);}
+ settled(c,0,15,12);assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(initial()),radians(30));c.step(30);near(c.quaternion.angleTo(initial()),radians(30));
+ for(const degrees of [5,-12,18,-25,38]){settled(c,0,degrees,40+degrees);assert(c.anchor.angleTo(initial())<=radians(40)+1e-9);c.step(100+degrees);}
 });
 test("a far gesture after a retained view returns to that view, not to the front, and an interrupted return resumes to it",()=>{
  const c=new SmartRotation(initial());settled(c,25,0);const kept=c.anchor.clone();assert(kept.angleTo(initial())>radians(24));
@@ -35,7 +35,7 @@ test("a far gesture after a retained view returns to that view, not to the front
  c.down(due+.06);c.up(due+.1,true);assert.equal(c.phase,"awaiting-return");near(c.anchor.angleTo(kept),0);
  c.step(due+10);near(c.quaternion.angleTo(kept),0);assert.equal(c.phase,"idle");
  const tapped=new SmartRotation(initial());settled(tapped,25,0);const target=tapped.anchor.clone();settled(tapped,0,50,1);
- const t0=tapped.returnDeadline;tapped.step(t0+.4);assert(tapped.quaternion.angleTo(initial())<radians(35));
+ const t0=tapped.returnDeadline;tapped.step(t0+.4);assert(tapped.quaternion.angleTo(initial())<radians(40));
  tapped.down(t0+.41);tapped.up(t0+.5,true);assert.equal(tapped.phase,"awaiting-return");near(tapped.anchor.angleTo(target),0);
  tapped.step(t0+10);near(tapped.quaternion.angleTo(target),0);
 });
@@ -80,7 +80,7 @@ test("return is a damped spring: monotone, no fixed duration, faster when farthe
  const d=new SmartRotation(initial());settled(d,30,35);const at=d.returnDeadline;d.step(at+.05);const displayed=d.quaternion.clone();
  d.down(at+.06);assert.equal(d.phase,"dragging");near(d.quaternion.angleTo(displayed),0);d.step(at+100);near(d.quaternion.angleTo(displayed),0);
  d.up(at+100.1,true);assert.equal(d.phase,"awaiting-return");near(d.returnDeadline,at+100.1+wait(d));
- const e=new SmartRotation(initial());settled(e,0,40);e.down(1);assert.equal(e.returnDeadline,null);e.up(1.2,true);near(e.returnDeadline,1.2+wait(e));
+ const e=new SmartRotation(initial());settled(e,0,50);e.down(1);assert.equal(e.returnDeadline,null);e.up(1.2,true);near(e.returnDeadline,1.2+wait(e));
 });
 test("fast diagonal flick uses a combined speed cap; stationary holds and cancellation never coast",()=>{
  const c=new SmartRotation(initial());c.down(0);c.drag(10,10,.001);c.up(.001);assert(c.angularSpeed<=P.maximumSpeed);assert.equal(c.phase,"coasting");
@@ -91,8 +91,8 @@ test("small views become the target only after coast; free/classic/reduced modes
  const c=new SmartRotation(initial());c.down(0);c.drag(0,.2,1);c.up(1);assert.equal(c.phase,"coasting");near(c.anchor.angleTo(initial()),0);c.step(4);assert.equal(c.phase,"idle");near(c.anchor.angleTo(c.quaternion),0);assert(c.quaternion.angleTo(initial())>.2);
  for(const mode of ["free","classic"]){const d=trajectory(60,mode);d.step(100);assert.equal(d.phase,"idle");assert.equal(d.returnDeadline,null);}
  const reduced=new SmartRotation(initial(),"smart",true);settled(reduced,40,40);assert.equal(reduced.phase,"idle");assert.equal(reduced.angularSpeed,0);
- const d=trajectory(60);d.step(.6);const q=d.quaternion.clone();d.setMode("classic",.6);near(d.quaternion.angleTo(q),0);d.setMode("smart",.7);near(d.quaternion.angleTo(q),0);assert.equal(d.phase,"awaiting-return");
- d.setReducedMotion(true,.8);assert.equal(d.phase,"idle");near(d.quaternion.angleTo(q),0);d.setReducedMotion(false,.9);near(d.returnDeadline,.9+wait(d));
+ const d=trajectory(60);d.step(1);assert(d.quaternion.angleTo(d.front)>radians(40));const q=d.quaternion.clone();d.setMode("classic",1);near(d.quaternion.angleTo(q),0);d.setMode("smart",1.1);near(d.quaternion.angleTo(q),0);assert.equal(d.phase,"awaiting-return");
+ d.setReducedMotion(true,1.2);assert.equal(d.phase,"idle");near(d.quaternion.angleTo(q),0);d.setReducedMotion(false,1.3);near(d.returnDeadline,1.3+wait(d));
 });
 test("zoom interaction, hidden/resume, reset and disposal preserve displayed orientation without hidden time catch-up",()=>{
  const q=new Quaternion().setFromEuler(new Euler(.12,-.18,0)),c=new SmartRotation(q);
@@ -113,7 +113,7 @@ test("interrupting a return by taps, zoom/settings, mode, reduced motion or visi
  for(const offset of [.05,.4]) for(const action of ["tap","interact","mode","reduced","visibility"]) {
   const c=new SmartRotation(initial());settled(c,0,60);const anchor=c.anchor.clone(),deadline=c.returnDeadline,at=deadline+offset;
   c.step(at);const q=c.quaternion.clone();
-  if(offset===.05)assert(q.angleTo(c.front)>radians(35));else {assert(q.angleTo(c.front)<radians(35));assert(q.angleTo(anchor)>radians(5));}
+  if(offset===.05)assert(q.angleTo(c.front)>radians(40));else {assert(q.angleTo(c.front)<radians(40));assert(q.angleTo(anchor)>radians(5));}
   let end=at+.02;
   if(action==="tap"){c.down(at+.01);c.up(end,true);}
   if(action==="interact")c.interact(end);
@@ -124,13 +124,13 @@ test("interrupting a return by taps, zoom/settings, mode, reduced motion or visi
   c.step(end+10);near(c.quaternion.angleTo(anchor),0);near(c.anchor.angleTo(anchor),0);
  }
  const c=new SmartRotation(initial());settled(c,0,60);c.step(c.returnDeadline+.6);const before=c.quaternion.clone();
- assert(before.angleTo(c.anchor)<radians(35));
+ assert(before.angleTo(c.anchor)<radians(40));
  c.down(7);c.drag(0,radians(1),7.2);c.up(7.4);assert.equal(c.phase,"idle");near(c.anchor.angleTo(c.quaternion),0);assert(c.quaternion.angleTo(before)>radians(.9));
 });
-test("the return wait uses the owner's fixed numbers: 0.6 s at 35 degrees, 0.1 s from 120 degrees, smoothstep between",()=>{
- near(returnDelay(radians(35)),.6);near(returnDelay(radians(120)),.1);near(returnDelay(radians(200)),.1);near(returnDelay(radians(10)),.6);
- near(returnDelay(radians(77.5)),.35,1e-9);near(returnDelay(radians(56.25)),.521875,1e-9);
- near(P.toleranceRadians,radians(35));near(P.idleNearSeconds,.6);near(P.idleFarSeconds,.1);near(P.idleFarRadians,radians(120));
+test("the return wait uses the owner's fixed numbers: 0.6 s at 40 degrees, 0.1 s from 120 degrees, smoothstep between",()=>{
+ near(returnDelay(radians(40)),.6);near(returnDelay(radians(120)),.1);near(returnDelay(radians(200)),.1);near(returnDelay(radians(10)),.6);
+ near(returnDelay(radians(80)),.35,1e-9);near(returnDelay(radians(60)),.521875,1e-9);
+ near(P.toleranceRadians,radians(40));near(P.idleNearSeconds,.6);near(P.idleFarSeconds,.1);near(P.idleFarRadians,radians(120));
 });
 test("nonidentity initial orientations stay idle through reset/tap/settings/visibility without floating-point return loops",()=>{
  const q=new Quaternion().setFromEuler(new Euler(.321,-.789,0)),c=new SmartRotation(q);
@@ -156,9 +156,9 @@ test("the tolerance is measured from the exact frontal view, not from a rotated 
  const start=new Quaternion().setFromEuler(new Euler(0,radians(20),0));
  const away=new SmartRotation(start);assert.equal(away.phase,"idle");near(away.front.angleTo(new Quaternion()),0);
  near(away.anchor.angleTo(away.front),radians(20));
- settled(away,0,20);assert(Math.abs(away.quaternion.angleTo(away.front)-radians(40))<1e-6);assert.equal(away.phase,"awaiting-return");
+ settled(away,0,25);assert(Math.abs(away.quaternion.angleTo(away.front)-radians(45))<1e-6);assert.equal(away.phase,"awaiting-return");
  near(away.anchor.angleTo(start),0);away.step(20);near(away.quaternion.angleTo(start),0);
  const toward=new SmartRotation(start);settled(toward,0,-30);near(toward.quaternion.angleTo(toward.front),radians(10),1e-6);
  assert.equal(toward.phase,"idle");near(toward.anchor.angleTo(toward.quaternion),0);
- const edge=new SmartRotation(start);settled(edge,0,15);near(edge.quaternion.angleTo(edge.front),radians(35),1e-6);assert.equal(edge.phase,"idle");
+ const edge=new SmartRotation(start);settled(edge,0,20);near(edge.quaternion.angleTo(edge.front),radians(40),1e-6);assert.equal(edge.phase,"idle");
 });
