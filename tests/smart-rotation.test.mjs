@@ -145,3 +145,14 @@ test("a held view, such as the rear side, never returns until release; Free keep
  const free=new SmartRotation(initial(),"free");free.down(0);free.drag(0,radians(170),.2);free.up(.4,true);free.step(500);
  assert.equal(free.phase,"idle");assert.equal(free.returnDeadline,null);near(free.quaternion.angleTo(initial()),radians(170),1e-6);
 });
+
+test("the tolerance is measured from the exact frontal view, not from a rotated default view",()=>{
+ const start=new Quaternion().setFromEuler(new Euler(0,radians(20),0));
+ const away=new SmartRotation(start);assert.equal(away.phase,"idle");near(away.front.angleTo(new Quaternion()),0);
+ near(away.anchor.angleTo(away.front),radians(20));
+ settled(away,0,20);assert(Math.abs(away.quaternion.angleTo(away.front)-radians(40))<1e-6);assert.equal(away.phase,"awaiting-return");
+ near(away.anchor.angleTo(start),0);away.step(20);near(away.quaternion.angleTo(start),0);
+ const toward=new SmartRotation(start);settled(toward,0,-30);near(toward.quaternion.angleTo(toward.front),radians(10),1e-6);
+ assert.equal(toward.phase,"idle");near(toward.anchor.angleTo(toward.quaternion),0);
+ const edge=new SmartRotation(start);settled(edge,0,15);near(edge.quaternion.angleTo(edge.front),radians(35),1e-6);assert.equal(edge.phase,"idle");
+});

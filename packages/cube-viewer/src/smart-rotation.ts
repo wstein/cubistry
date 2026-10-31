@@ -30,6 +30,7 @@ export class SmartRotation {
   readonly quaternion: Quaternion;
   readonly anchor: Quaternion;
   private readonly initial: Quaternion;
+  private readonly frontView = new Quaternion();
   private readonly velocity = new Vector3();
   private readonly delta = new Quaternion();
   private readonly axis = new Vector3();
@@ -68,8 +69,8 @@ export class SmartRotation {
     if (mode !== "free") this.quaternion.copy(this.initial);
     this.residual.identity(); this.modeValue = mode; this.reduced = reducedMotion;
   }
-  /** The defined initial view; the tolerance is always measured from here. */
-  get front(): Quaternion { return this.initial; }
+  /** The exact frontal view: the observer sits on +Z, so identity shows the front head-on. The tolerance is measured from here, never from the (slightly rotated) default view. */
+  get front(): Quaternion { return this.frontView; }
   get phase(): RotationPhase { return this.phaseValue; }
   get mode(): RotationMode { return this.modeValue; }
   get reducedMotion(): boolean { return this.reduced; }
@@ -128,18 +129,16 @@ export class SmartRotation {
     }
     this.levelingRequested = false;
     if (this.modeValue !== "smart") return;
-    // The tolerance is always measured from the front view. A genuine user rotation
+    // The tolerance is always measured from the exact front view (identity), not the
+    // default view. The return target starts as the default view. A genuine user rotation
     // settled within it becomes the new return target; beyond it the view returns to
     // the last such target. Automatic poses, taps and settings never become targets,
     // and a target never lies farther than the tolerance from the front.
-    const distance = this.quaternion.angleTo(this.initial);
-    if (distance <= ROTATION_TUNING.toleranceRadians + 1e-12) {
-      if (this.anchorCandidate) {
-        this.anchor.copy(this.quaternion); this.anchorPitch = this.pitch; this.anchorYaw = this.yaw;
-      } else if (!this.reduced && this.quaternion.angleTo(this.anchor) > 1e-7) {
-        this.phaseValue = "awaiting-return"; this.returnAt = at + returnDelay(distance);
-      }
-    } else if (!this.reduced) {
+    const distance = this.quaternion.angleTo(this.frontView);
+    if (this.anchorCandidate && distance <= ROTATION_TUNING.toleranceRadians + 1e-12) {
+      this.anchor.copy(this.quaternion); this.anchorPitch = this.pitch; this.anchorYaw = this.yaw;
+    } else if (!this.reduced && this.quaternion.angleTo(this.anchor) > 1e-7) {
+      // Beyond the tolerance, or an automatic/interrupted pose: back to the last target.
       this.phaseValue = "awaiting-return"; this.returnAt = at + returnDelay(distance);
     }
     this.anchorCandidate = false;
