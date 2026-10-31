@@ -93,9 +93,15 @@ export function createPresentationStudio(
       scene.add(mesh); contact.meshes.push(mesh);
     }
     while (contact.meshes.length > fitted.centers.length) contact.meshes.pop()!.removeFromParent();
+    // Every blob fades to zero at its rim. Capping the side by the nearest neighbor distance keeps
+    // the three clock blobs from overlapping into one connected band.
+    let side = fitted.radius * p.contactShadowScale, nearest = Infinity;
+    for (let i = 0; i < fitted.centers.length; i++) for (let j = i + 1; j < fitted.centers.length; j++)
+      nearest = Math.min(nearest, Math.hypot(fitted.centers[i].x - fitted.centers[j].x, fitted.centers[i].z - fitted.centers[j].z));
+    if (nearest > 1e-6 && Number.isFinite(nearest)) side = Math.min(side, nearest * p.contactShadowSpacingLimit);
     contact.meshes.forEach((mesh, i) => {
       mesh.position.set(fitted.centers[i].x, floor.position.y + p.contactShadowLift, fitted.centers[i].z);
-      mesh.scale.setScalar(fitted.radius * p.contactShadowScale);
+      mesh.scale.setScalar(side);
     });
   };
   const releaseContact = () => {
