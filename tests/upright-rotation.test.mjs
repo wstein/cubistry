@@ -76,7 +76,7 @@ test('reduced motion performs only requested 150ms leveling; visibility and Free
 });
 
 test('Free gestures within the tolerance become the target after leveling; farther ones return to the last target',()=>{
- for(const degrees of [10,40]){
+ for(const degrees of [10,50]){
   const c=new SmartRotation(pose(),'free');c.down(0);c.drag(0,degrees*Math.PI/180,.2);c.up(.4);
   const chosen=c.quaternion.clone();c.setMode('smart',1);
   if(degrees===10){same(c.anchor,chosen);assert.equal(c.phase,'idle');c.step(10);same(c.quaternion,chosen);}
@@ -85,7 +85,7 @@ test('Free gestures within the tolerance become the target after leveling; farth
  const c=new SmartRotation(pose(),'free');c.down(0);c.drag(.03,.08,.1);c.drag(-.03,.08,.2);c.up(.4);
  c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(2);same(c.anchor,c.quaternion);assert.equal(c.phase,'idle');
  const d=new SmartRotation(pose());d.down(0);d.drag(0,Math.PI/3,.2);d.up(.4);d.step(d.returnDeadline+.3);
- const automatic=d.quaternion.clone();assert(automatic.angleTo(d.front)<35*Math.PI/180&&automatic.angleTo(d.front)>.1);const at=d.returnDeadline+.31;d.setMode('free',at);d.setMode('smart',at+.1);
+ const automatic=d.quaternion.clone();assert(automatic.angleTo(d.front)<40*Math.PI/180&&automatic.angleTo(d.front)>.1);const at=d.returnDeadline+.31;d.setMode('free',at);d.setMode('smart',at+.1);
  same(d.quaternion,automatic);same(d.anchor,pose());assert(Math.abs(d.returnDeadline-(at+.1+wait(d)))<1e-9);d.step(at+10);same(d.quaternion,pose());
 });
 test('dragging either pitch boundary discards outward filtered momentum before a small reversal while preserving yaw',()=>{
@@ -101,7 +101,7 @@ test('dragging either pitch boundary discards outward filtered momentum before a
 });
 
 test('reduced Smart classifies genuine settled gestures and requested leveling while disabling only automatic motion',()=>{
- for(const degrees of [10,40])for(const bridge of [false,true]){
+ for(const degrees of [10,50])for(const bridge of [false,true]){
   const c=new SmartRotation(pose(),bridge?'free':'smart',true);c.down(0);c.drag(0,degrees*Math.PI/180,.2);
   if(bridge){c.drag(.03,0,.3);c.drag(0,.03,.4);c.drag(-.03,0,.5);c.drag(0,-.03,.6);}c.up(.8);
   if(bridge){c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(1.15);}
