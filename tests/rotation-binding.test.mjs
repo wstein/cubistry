@@ -2,14 +2,17 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { Quaternion } from "three";
 import { bindSmartRotation, readRotationMode, rotationStorageKey } from "../packages/cube-viewer/src/rotation-binding.ts";
+import { returnDelay } from "../packages/cube-viewer/src/smart-rotation.ts";
 import { rotationHarness } from "./helpers/rotation-harness.mjs";
 const harness = (mode="smart") => rotationHarness({mode});
 const same=(a,b)=>assert(a.angleTo(b)<1e-7);
+const wait=h=>returnDelay(h.binding.controller.quaternion.angleTo(h.binding.controller.anchor));
+const close=(a,b)=>assert(Math.abs(a-b)<1e-9,`${a} != ${b}`);
 test("production pointerdown interrupts pending/active return before threshold, preserving full displayed quaternion",()=>{
  const h=harness("classic");h.element.pointer("pointerdown");h.time(.2);h.element.pointer("pointermove",250,200);h.time(.4);h.element.pointer("pointerup",250,200);
- h.select.value="smart";h.select.dispatchEvent(new Event("change"));assert.equal(h.binding.controller.phase,"awaiting-return");assert.match(h.note.textContent,/2 seconds idle/);
- h.step(2.45);assert.equal(h.binding.controller.phase,"returning");const before=h.root.quaternion.clone();
- h.time(2.5);h.element.pointer("pointerdown",250,200);same(h.root.quaternion,before);assert.equal(h.binding.controller.phase,"dragging");
+ h.select.value="smart";h.select.dispatchEvent(new Event("change"));assert.equal(h.binding.controller.phase,"awaiting-return");assert.match(h.note.textContent,/short wait/);
+ const dl=h.binding.controller.returnDeadline;h.step(dl+.05);assert.equal(h.binding.controller.phase,"returning");const before=h.root.quaternion.clone();
+ h.time(dl+.1);h.element.pointer("pointerdown",250,200);same(h.root.quaternion,before);assert.equal(h.binding.controller.phase,"dragging");
  h.element.pointer("pointermove",251,201);h.step(20);h.element.pointer("pointercancel",251,201);assert.equal(h.binding.controller.phase,"awaiting-return");
  assert.equal(h.element.captures.size,0);h.binding.dispose();
 });
@@ -21,7 +24,7 @@ test("touch overlap blocks automatic motion until every contact ends; active dea
  h.time(1);h.element.pointer("pointerdown",100,100,1,"touch");h.time(1.2);h.element.pointer("pointermove",180,150,1,"touch");
  h.time(1.3);h.element.pointer("pointerdown",10,10,2,"touch");const held=h.root.quaternion.clone();h.element.pointer("pointermove",230,230,1,"touch");same(h.root.quaternion,held);
  h.element.pointer("pointerup",180,150,1,"touch");h.step(20);assert.equal(h.binding.controller.phase,"dragging");same(h.root.quaternion,held);
- h.element.pointer("pointerup",10,10,2,"touch");assert.equal(h.binding.controller.phase,"awaiting-return");assert.equal(h.binding.controller.returnDeadline,22);h.binding.dispose();
+ h.element.pointer("pointerup",10,10,2,"touch");assert.equal(h.binding.controller.phase,"awaiting-return");close(h.binding.controller.returnDeadline,20+wait(h));h.binding.dispose();
 });
 test("binding settings persist modes, honor reduced motion, freeze hidden time and release capture/listeners/controls",()=>{
  const h=harness("free");assert.equal(h.select.value,"free");assert.equal(h.select.attributes["aria-label"],"View rotation mode");assert(h.select.attributes["aria-describedby"]);
@@ -29,7 +32,7 @@ test("binding settings persist modes, honor reduced motion, freeze hidden time a
  h.element.pointer("pointerdown");h.time(.2);h.element.pointer("pointermove",180,150);h.time(.4);h.element.pointer("pointerup");
  h.select.value="smart";h.select.dispatchEvent(new Event("change"));const q=h.root.quaternion.clone();
  h.time(1);h.document.hidden=true;h.document.dispatchEvent(new Event("visibilitychange"));h.step(100);same(h.root.quaternion,q);
- h.document.hidden=false;h.document.dispatchEvent(new Event("visibilitychange"));assert.equal(h.binding.controller.returnDeadline,102);
+ h.document.hidden=false;h.document.dispatchEvent(new Event("visibilitychange"));close(h.binding.controller.returnDeadline,100+wait(h));
  h.media.matches=true;h.media.dispatchEvent(new Event("change"));assert.equal(h.binding.controller.phase,"idle");assert.match(h.note.textContent,/Reduced motion/);h.step(200);same(h.root.quaternion,q);
  h.time(201);h.element.pointer("pointerdown");assert.equal(h.element.captures.size,1);h.binding.dispose();assert.equal(h.element.captures.size,0);assert.equal(h.panel.children.length,0);assert.equal(h.element.style.touchAction,"pan-y");
  h.element.pointer("pointermove",300,300);h.media.matches=false;h.media.dispatchEvent(new Event("change"));h.document.dispatchEvent(new Event("visibilitychange"));h.step(300);same(h.root.quaternion,q);
@@ -44,9 +47,9 @@ test("motion preference failures are bounded and safe; zoom/reset never reconstr
 
 test("shared settings pointer/keyboard/input activity freezes return without intercepting native controls and cleans up",()=>{
  const h=harness("classic");h.element.pointer("pointerdown");h.time(.2);h.element.pointer("pointermove",190,160);h.time(.4);h.element.pointer("pointerup");
- h.select.value="smart";h.select.dispatchEvent(new Event("change"));h.step(2.45);assert.equal(h.binding.controller.phase,"returning");const q=h.root.quaternion.clone();
- h.time(2.5);const key=new Event("keydown",{cancelable:true});h.panel.dispatchEvent(key);assert.equal(key.defaultPrevented,false);same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,"awaiting-return");assert.equal(h.binding.controller.returnDeadline,4.5);
- h.time(3);h.panel.dispatchEvent(new Event("input"));assert.equal(h.binding.controller.returnDeadline,5);
+ h.select.value="smart";h.select.dispatchEvent(new Event("change"));const dl=h.binding.controller.returnDeadline;h.step(dl+.05);assert.equal(h.binding.controller.phase,"returning");const q=h.root.quaternion.clone();
+ h.time(dl+.1);const key=new Event("keydown",{cancelable:true});h.panel.dispatchEvent(key);assert.equal(key.defaultPrevented,false);same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,"awaiting-return");close(h.binding.controller.returnDeadline,dl+.1+wait(h));
+ h.time(dl+.5);h.panel.dispatchEvent(new Event("input"));close(h.binding.controller.returnDeadline,dl+.5+wait(h));
  h.binding.dispose();h.time(10);h.panel.dispatchEvent(new Event("pointerdown"));same(h.root.quaternion,q);assert.equal(h.binding.controller.phase,"idle");
 });
 
