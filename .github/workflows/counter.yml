@@ -38,17 +38,27 @@ jobs:
           "$RUNNER_TEMP/print-venv/bin/pip" install -r scripts/print-requirements.txt
           PATH="$RUNNER_TEMP/print-venv/bin:$PATH" npm run test:print-exports
 
-  # The browser end-to-end suite is split into parallel shards. It runs on every
-  # push to main and on pull requests that carry the `e2e` label; each shard
-  # needs its own runner because the specs run in software-rendered Chromium.
+  # The browser end-to-end suite is split into two groups of parallel shards. It
+  # runs on every push to main and on pull requests that carry the `e2e` label;
+  # each shard needs its own runner because the specs run in software-rendered
+  # Chromium. The `timing` group holds the specs that wait on real animation time
+  # or assert millisecond precision (see `timingSpecs` in playwright.config.mjs);
+  # it has a longer per-test limit, so a slow frame cannot fail the fast group.
   e2e:
+    name: e2e ${{ matrix.group }} (${{ matrix.shard }})
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        include:
+          - { group: fast, shard: 1, of: 3 }
+          - { group: fast, shard: 2, of: 3 }
+          - { group: fast, shard: 3, of: 3 }
+          - { group: timing, shard: 1, of: 3 }
+          - { group: timing, shard: 2, of: 3 }
+          - { group: timing, shard: 3, of: 3 }
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
@@ -61,13 +71,14 @@ jobs:
       - run: npm run prepare:solver
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e -- --shard=${{ matrix.shard }}/4
+      - run: npm run test:e2e -- --shard=${{ matrix.shard }}/${{ matrix.of }}
         env:
           CI: '1'
+          CUBISTRY_E2E_GROUP: ${{ matrix.group }}
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
-          name: counter-browser-failure-shard-${{ matrix.shard }}
+          name: counter-browser-failure-${{ matrix.group }}-${{ matrix.shard }}
           path: test-results/
           retention-days: 7
 
