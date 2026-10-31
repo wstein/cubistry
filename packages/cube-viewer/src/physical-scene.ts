@@ -18,6 +18,8 @@ export const stickerFrame = (normal: Vec3, up: Vec3): THREE.Matrix4 =>
     new THREE.Vector3(...normal),
   );
 
+/** Core ball radius as a share of the half cube edge (a real 3x3 core is about 0.35). */
+export const CORE_RADIUS_RATIO = 0.35;
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 /** Neutral dark gray; the visible core of a stickerless cube. */
 export const DEFAULT_CORE_COLOR = "#3a3d42";
@@ -108,26 +110,6 @@ export class PhysicalCubeScene {
           if (!faceMaterials[index]) faceMaterials[index] = this.cutMaterial(index, exterior);
         shell.userData.sourceFaceStickerIds = sourceIds;
         this.shells.set(s.cubie, { mesh: shell, stickerless: faceMaterials });
-        if (geometry.core) {
-          // Seal internal seams/junctions without squaring the approved exterior
-          // bevels. Exterior sides retreat beneath the rounded shell; internal
-          // cut faces meet at half the physical pitch, as in CubeAssembler.
-          // A 0.0005-unit internal overlap avoids floating-point cracks at
-          // exact four-piece junctions during interpolated rotations.
-          const min = [-0.5005, -0.5005, -0.5005], max = [0.5005, 0.5005, 0.5005];
-          for (const face of printed.filter((face) => face.cubie === s.cubie))
-            for (let axis = 0; axis < 3; axis++) {
-              if (face.n[axis] === 1) max[axis] = 0.43;
-              if (face.n[axis] === -1) min[axis] = -0.43;
-            }
-          const core = new THREE.Mesh(geometry.core, plastic);
-          core.userData.plasticCore = true;
-          core.castShadow = core.receiveShadow = true;
-          core.scale.set(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
-          core.position.set((max[0] + min[0]) / 2, (max[1] + min[1]) / 2, (max[2] + min[2]) / 2);
-          body.add(core);
-          this.cores.push(core);
-        }
         this.bodies.set(s.cubie, body);
         this.references.set(s.cubie, {
           id: s.id,
@@ -142,6 +124,22 @@ export class PhysicalCubeScene {
       sticker.castShadow = sticker.receiveShadow = true;
       body.add(sticker);
       this.stickers.push(sticker);
+    }
+    if (geometry.core && printed.length) {
+      // One static core ball at the cube center, as in real cubes: it never
+      // follows layer turns. Unit-pitch cubies span +-0.5 around their centers.
+      const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+      for (const s of printed) for (let axis = 0; axis < 3; axis++) {
+        lo[axis] = Math.min(lo[axis], s.p[axis] * spacing); hi[axis] = Math.max(hi[axis], s.p[axis] * spacing);
+      }
+      const half = Math.max(...hi.map((v, axis) => (v - lo[axis]) / 2)) + 0.5;
+      const core = new THREE.Mesh(geometry.core, plastic);
+      core.userData.plasticCore = true;
+      core.castShadow = core.receiveShadow = true;
+      core.scale.setScalar(half * CORE_RADIUS_RATIO);
+      core.position.set(...hi.map((v, axis) => (v + lo[axis]) / 2) as [number, number, number]);
+      parent.add(core);
+      this.cores.push(core);
     }
     this.refreshArtwork();
   }
@@ -221,6 +219,7 @@ export class PhysicalCubeScene {
     };
   }
   dispose(): void {
+    for (const core of this.cores) core.removeFromParent();
     for (const body of this.bodies.values()) body.removeFromParent();
     this.bodies.clear();
     this.references.clear();
