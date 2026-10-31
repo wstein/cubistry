@@ -1,0 +1,1 @@
+INVALID	AssertionError: (s.piece, s.home, s.normal, s.up) == (before.piece, before.home, before.normal, before.up)
