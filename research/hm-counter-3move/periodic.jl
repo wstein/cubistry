@@ -159,7 +159,7 @@ function findcycle(s0::State, L, r, sh; maxnodes = parse(Int, get(ENV, "HM_NODES
     for a in nodes
         # Dijkstra-free: BFS over laps up to depth 6 tracking cost
         frontier = Dict(a => (0, [a]))
-        for depth in 1:6
+        for depth in 1:parse(Int, get(ENV, "HM_DEPTH", "6"))
             nf = Dict{UInt64,Tuple{Int,Vector{UInt64}}}()
             for (x, (c, path)) in frontier
                 haskey(succ, x) || continue
@@ -434,6 +434,13 @@ function writeperiodic2(printfile, out; routesfile = "", hstarts = 15)
             E1 = rand(rngH, 2:length(B4.elems)); x = applyelem(IDSTATE, B4.elems[E1])
             for (j, E2) in enumerate(B4.elems)
                 push!(cands, (vcat(B4.words[E1], B4.words[j]), applyelem(x, E2)))
+            end
+        end
+        if get(ENV, "HM_FSTARTS", "") == "1" && isdefined(Main, :f3mode)
+            f3 = Main.f3mode(sh, L, r)
+            if f3 !== nothing
+                println("$L$r max-3 cycle in fixpoint limit: quality $(f3[2].quality)"); flush(stdout)
+                (best === nothing || f3[2].quality[1] < best[1]) && (best = (f3[2].quality[1], f3[1], f3[2], "fixpoint"))
             end
         end
         cnt = 0
