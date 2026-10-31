@@ -1,0 +1,116 @@
+cubistry.hm-counter.v1
+profile	free
+letters	HM
+sticker	0	0	-1,1,-1	0,0,-1	1,0,0	3
+sticker	1	0	-1,1,-1	0,1,0	0,0,1	5
+sticker	2	0	-1,1,-1	-1,0,0	0,-1,0	6
+sticker	3	1	1,-1,-1	0,0,-1	0,1,0	2
+sticker	4	1	1,-1,-1	1,0,0	0,1,0	6
+sticker	5	1	1,-1,-1	0,-1,0	1,0,0	H
+sticker	6	2	1,1,-1	0,1,0	0,0,-1	H
+sticker	7	2	1,1,-1	1,0,0	0,1,0	H
+sticker	8	2	1,1,-1	0,0,-1	0,-1,0	4
+sticker	9	3	1,1,1	1,0,0	0,-1,0	7
+sticker	10	3	1,1,1	0,0,1	0,1,0	M
+sticker	11	3	1,1,1	0,1,0	0,0,-1	1
+sticker	12	4	-1,1,1	0,1,0	1,0,0	8
+sticker	13	4	-1,1,1	-1,0,0	0,1,0	M
+sticker	14	4	-1,1,1	0,0,1	-1,0,0	M
+sticker	15	5	1,-1,1	0,-1,0	-1,0,0	9
+sticker	16	5	1,-1,1	0,0,1	0,1,0	0
+sticker	17	5	1,-1,1	1,0,0	0,0,-1	2
+sticker	18	6	-1,-1,-1	0,0,-1	1,0,0	4
+sticker	19	6	-1,-1,-1	-1,0,0	0,1,0	5
+sticker	20	6	-1,-1,-1	0,-1,0	0,0,1	3
+sticker	21	7	-1,-1,1	0,-1,0	1,0,0	1
+sticker	22	7	-1,-1,1	0,0,1	0,1,0	0
+sticker	23	7	-1,-1,1	-1,0,0	0,1,0	4
+setup	M	-
+edge	M	0	1	R' B U'	2
+edge	M	1	2	B2 R	2
+edge	M	2	3	R B2 U2	3
+edge	M	3	4	U' B2 R'	3
+edge	M	4	5	R' B' R	3
+edge	M	5	6	R2 U2	2
+edge	M	6	7	R2 U' R2	3
+edge	M	7	8	U' R2 U	3
+edge	M	8	9	R' B R'	2
+edge	M	9	10	R' F' D'	3
+edge	M	10	11	R2 B2 U2	3
+edge	M	11	12	B U2 R	2
+edge	M	12	13	R U2	2
+edge	M	13	14	R2 B R'	2
+edge	M	14	15	U2 R' B2	2
+edge	M	15	16	U2 R2	2
+edge	M	16	17	U R2 U'	3
+edge	M	17	18	U' R2 U	3
+edge	M	18	19	R	1
+edge	M	19	20	R' D' L2	3
+edge	M	20	21	R' U2	2
+edge	M	21	22	R' B' R	3
+edge	M	22	23	R2 U R2	3
+edge	M	23	24	B U' R'	2
+edge	M	24	25	R' B' R	3
+edge	M	25	26	R U' R2	3
+edge	M	26	27	U' R2 U'	3
+edge	M	27	28	U' R2 U	3
+edge	M	28	29	R B2	1
+edge	M	29	30	D' R F'	3
+edge	M	30	31	R'	1
+edge	M	31	32	R2 U' R2	3
+edge	M	32	33	R2 B R'	2
+edge	M	33	34	U' R'	2
+edge	M	34	35	R' B' R	3
+edge	M	35	36	R' B' R	3
+edge	M	36	37	R U	2
+edge	M	37	38	U' R2 U	3
+edge	M	38	39	B2 R B'	2
+edge	M	39	40	D' F' L'	3
+edge	M	40	41	R' U2 B	2
+edge	M	41	42	U' B2 R	3
+edge	M	42	43	R2 B2 U2	3
+edge	M	43	44	U R U'	2
+edge	M	44	45	R2 U'	2
+edge	M	45	46	R2	1
+edge	M	46	47	R B' R	2
+edge	M	47	48	U' R2 U	3
+edge	M	48	49	B2 R B'	2
+edge	M	49	50	D' F' L'	3
+edge	M	50	51	R' U2	2
+edge	M	51	52	R' B' R	3
+edge	M	52	53	B U' R'	2
+edge	M	53	54	R' B2 R	3
+edge	M	54	55	R2 U R2	3
+edge	M	55	56	R U' R2	3
+edge	M	56	57	U' R2 U'	3
+edge	M	57	58	U' R2 U	3
+edge	M	58	59	U' B R	2
+edge	M	59	0	U R' D'	3
+setup	H	B' U2 F' R' U2 R F
+edge	H	0	1	R2 B2 U2	3
+edge	H	1	2	R' B R	3
+edge	H	2	3	R2 B U'	2
+edge	H	3	4	R' B2 R	3
+edge	H	4	5	U R2 U'	3
+edge	H	5	6	R' B' U	2
+edge	H	6	7	R2 U' R2	3
+edge	H	7	8	R2 U' R2	3
+edge	H	8	9	R U B	2
+edge	H	9	10	R' F' D'	3
+edge	H	10	11	U R2 B'	2
+edge	H	11	12	R U' B	2
+edge	H	12	13	U R U'	2
+edge	H	13	14	R' B2 U	3
+edge	H	14	15	R2 U	2
+edge	H	15	16	U2 R U2	3
+edge	H	16	17	B R	2
+edge	H	17	18	U2 R' U2	3
+edge	H	18	19	R' B2 R	3
+edge	H	19	20	R' D'	2
+edge	H	20	21	U2 R U2	3
+edge	H	21	22	U R2 U'	3
+edge	H	22	23	R' B' R	3
+edge	H	23	0	D2 L2 B'	2
+reset	H	11	0	R2 D F	3
+claim	maxEdgeHTM	3
+end
