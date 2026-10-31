@@ -18,7 +18,7 @@ This plan only records assumptions, acceptance criteria and the decisions still 
 - The H/M/S Counter (`index.html?application=hsm-counter`, `src/main.mjs`) has the controls Unit, Count range, Direction, Set value, Run/Stop, Reset, ±1 and a Rotation Speed slider with per-unit defaults: hour 500 ms, minute 250 ms, second 100 ms per HTM move.
 - `ClockStage` is fixed to three cubes: `createCube` rejects an index of three or more, `clockCenters` is `[-2.8, 0, 2.8]`, the caster centers array has three entries and the framing helpers (`src/apps/clock/framing.ts`) assume that row.
 
-## Proposed behavior (to be confirmed)
+## Proposed behavior (carry, hour range and entry point confirmed)
 1. **Two cubes, H left and M right**, one stage, same lettering choice as the clock (large H / M or small hour / min).
 2. **One time value from 00:00 to 23:59**, counted in minutes: the M cube shows 00–59, the H cube shows 00–23.
 3. **Step, Run and Set**: ±1 minute, Run up or down with a direction control, Set value HH:MM. When the minutes wrap 59→00 (up) or 00→59 (down), the hour changes in the same step, so both cubes may turn at once.
@@ -37,10 +37,13 @@ This plan only records assumptions, acceptance criteria and the decisions still 
 - No physical state is invented: only prints and periods that the H/M/S Counter already verifies are used, and any new claim must carry the SAT/UNSAT/UNKNOWN wording required by `AGENTS.md`.
 - Documentation and UI text in US English; spelling and link checks pass.
 
-## Open decisions for the owner
-- **Carry semantics:** one combined minute counter with carry (proposed) versus two independent counters.
-- **Hour range:** 00–23 only (proposed) or an optional 12-hour range 00–11.
-- **Entry point:** a new choice in the application list of every page (proposed) or a separate page.
+## Decisions
+Owner decisions, 2026-10-31:
+- **Carry semantics:** one combined minute counter with carry (not two independent counters).
+- **Hour range:** 00–23 only; no 12-hour range in this application.
+- **Entry point:** a new choice in the application list of every page (no separate page).
+
+Still open:
 - **Verification boundary:** the browser end-to-end suite has not passed on `main` since 2026-10-30 (see the Counter checks investigation), so browser tests for this application cannot be treated as gating until that is fixed.
 
 ## Out of scope
