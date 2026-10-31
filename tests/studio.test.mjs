@@ -165,10 +165,18 @@ test("shadow fill: opposite side, weaker, softer; both shadow cameras contain th
   assert.equal(lights.length, 4);
   assert.deepEqual(lights.filter(l => l.castShadow).map(l => l.intensity), [p.keyIntensity, p.shadowFillIntensity]);
   const [key, fill, rim] = [lights[0], lights[3], lights[2]];
-  assert.deepEqual(key.position.toArray(), [3, 5, 6]);
+  assert.deepEqual(key.position.toArray(), [1.5, 7, 3], "steeper key (was [3, 5, 6])");
+  const elevation = light => THREE.MathUtils.radToDeg(Math.asin(light.position.y / light.position.length()));
+  assert(elevation(key) >= 55, `key elevation ${elevation(key)} must be at least 55 degrees (was 40.2)`);
   assert.deepEqual(lights[1].position.toArray(), [-4, 1, 2]);
   assert.deepEqual(rim.position.toArray(), [1, 3, -4]);
-  assert(fill.position.x * key.position.x < 0, "shadow fill sits on the opposite side of the key");
+  const azimuth = light => Math.atan2(light.position.x, light.position.z);
+  const offset = THREE.MathUtils.radToDeg(azimuth(key) - azimuth(fill));
+  assert(Math.abs(offset - p.shadowFillAzimuthDegrees) < 1e-6, `fill azimuth offset ${offset}`);
+  assert.equal(p.shadowFillAzimuthDegrees, 25);
+  assert(fill.position.x < key.position.x, "shadow fill moves toward smaller x");
+  assert(Math.abs(fill.position.length() - key.position.length()) < 1e-9, "key distance is kept");
+  assert(Math.abs(elevation(fill) - elevation(key)) < 1e-9, "elevation delta is 0");
   assert.equal(fill.shadow.intensity, p.shadowFillShadowIntensity);
   assert.equal(key.shadow.intensity, 1);
   assert.deepEqual(fill.shadow.mapSize.toArray(), [p.shadowMapSize, p.shadowMapSize]);
@@ -201,18 +209,22 @@ test("shadow fill: opposite side, weaker, softer; both shadow cameras contain th
   assert.equal(scene.children.length, 0);
 });
 
-test("contact shadow: off by default allocates nothing; on places planes under the cube; toggles do not leak", () => {
+test("contact shadow: on by default; off frees everything, on re-creates it, repeatedly without leaks", () => {
   const p = PRESENTATION_PRESET;
-  assert.equal(p.contactShadowDefault, false);
+  assert.equal(p.contactShadowDefault, true);
+  assert.equal(p.contactShadowScale, 2.2);
+  const contactPlanes = scene => scene.children.filter(o => o.name === "studio-contact-shadow");
   const scene = new THREE.Scene(), studio = createPresentationStudio(scene, 1, 1, undefined, 1.5);
+  assert.equal(contactPlanes(scene).length, 1, "default on");
+  studio.setContactShadow(false);
   const baseline = scene.children.length;
-  assert(!scene.children.some(o => o.name === "studio-contact-shadow"));
+  assert.equal(contactPlanes(scene).length, 0);
   studio.setContactShadow(false);
   assert.equal(scene.children.length, baseline, "switching off while off is a no-op");
   const disposed = { geometry: 0, material: 0, texture: 0 };
   for (let round = 0; round < 3; round++) {
     studio.setContactShadow(true);
-    const planes = scene.children.filter(o => o.name === "studio-contact-shadow");
+    const planes = contactPlanes(scene);
     assert.equal(planes.length, 1);
     const [plane] = planes;
     assert.equal(plane.castShadow, false); assert.equal(plane.receiveShadow, false);
@@ -234,7 +246,7 @@ test("contact shadow: off by default allocates nothing; on places planes under t
   studio.setContactShadow(true);
   const centers = [-2.8, 0, 2.8].map(x => new THREE.Vector3(x, .5, .25));
   studio.fitCasters(centers, 1.4, .08);
-  const planes = scene.children.filter(o => o.name === "studio-contact-shadow");
+  const planes = contactPlanes(scene);
   assert.equal(planes.length, 3);
   planes.forEach((plane, i) => {
     assert.equal(plane.position.x, centers[i].x); assert.equal(plane.position.z, .25);
@@ -242,8 +254,53 @@ test("contact shadow: off by default allocates nothing; on places planes under t
     assert(plane.position.y < centers[i].y - 1.4, "plane sits below the cube");
   });
   studio.fitCasters(centers.slice(0, 1), 1.4, .08);
-  assert.equal(scene.children.filter(o => o.name === "studio-contact-shadow").length, 1);
+  assert.equal(contactPlanes(scene).length, 1);
   studio.dispose();
+  assert.equal(scene.children.length, 0);
+});
+
+test("fine shadow edges: opt-in 2048 maps, smaller world penumbra, old maps disposed, fit uses the current map size", () => {
+  const p = PRESENTATION_PRESET;
+  assert.deepEqual([p.fineShadowEdgesDefault, p.fineShadowMapSize, p.fineShadowSoftnessScale], [false, 2048, .65]);
+  const scene = new THREE.Scene(), studio = createPresentationStudio(scene, 1, 1);
+  const [key, fill] = scene.children.filter(o => o.isDirectionalLight && o.castShadow);
+  const world = light => light.shadow.radius * (light.shadow.camera.right - light.shadow.camera.left) / light.shadow.mapSize.x;
+  const sizes = () => [key, fill].map(l => l.shadow.mapSize.toArray());
+  assert.deepEqual(sizes(), [[1024, 1024], [1024, 1024]], "default off");
+  const base = [key, fill].map(world);
+  // A wide clock-like union keeps every radius clear of the texel caps.
+  const centers = [-2.8, 0, 2.8].map(x => new THREE.Vector3(x, 0, 0));
+  studio.fitCasters(centers, 1.4, .08);
+  const fittedBase = [key, fill].map(world);
+  const disposedMaps = [];
+  const fakeMaps = () => [key, fill].map(light => { light.shadow.map = { dispose() { disposedMaps.push(light); } }; });
+  for (let round = 0; round < 3; round++) {
+    fakeMaps();
+    studio.setFineShadowEdges(true);
+    assert.deepEqual(sizes(), [[2048, 2048], [2048, 2048]]);
+    assert.deepEqual(disposedMaps.splice(0), [key, fill], "old shadow maps are disposed");
+    assert.equal(key.shadow.map, null); assert.equal(fill.shadow.map, null);
+    const fine = [key, fill].map(world);
+    fine.forEach((w, i) => assert(Math.abs(w - fittedBase[i] * p.fineShadowSoftnessScale) < 1e-9, `world penumbra scaled ${w}`));
+    // fitCasters (clock: every frame) keeps using the current map size.
+    studio.fitCasters(centers, 1.4, .08);
+    assert.deepEqual(sizes(), [[2048, 2048], [2048, 2048]]);
+    [key, fill].map(world).forEach((w, i) => assert(Math.abs(w - fine[i]) < 1e-9, "fit radius uses the 2048 map"));
+    studio.setFineShadowEdges(true);
+    assert.equal(disposedMaps.length, 0, "no-op while already on");
+    fakeMaps();
+    studio.setFineShadowEdges(false);
+    assert.deepEqual(sizes(), [[1024, 1024], [1024, 1024]]);
+    assert.deepEqual(disposedMaps.splice(0), [key, fill]);
+    [key, fill].map(world).forEach((w, i) => assert(Math.abs(w - fittedBase[i]) < 1e-9, "off restores the penumbra"));
+  }
+  // Before any fit (single-cube viewers never call fitCasters) the switch itself rescales the radius.
+  const scene2 = new THREE.Scene(), studio2 = createPresentationStudio(scene2, 1, 1);
+  const [k2] = scene2.children.filter(o => o.isDirectionalLight && o.castShadow);
+  studio2.setFineShadowEdges(true);
+  assert(Math.abs(world(k2) - base[0] * p.fineShadowSoftnessScale) < 1e-9);
+  assert(world(k2) < base[0]);
+    studio2.dispose(); studio.dispose();
   assert.equal(scene.children.length, 0);
 });
 

@@ -1,9 +1,10 @@
 import { PRESENTATION_PRESET } from "./presentation-preset.ts";
 
-export interface LightingOptions { contactShadow: boolean; colorTemperature: boolean }
+export interface LightingOptions { contactShadow: boolean; colorTemperature: boolean; fineShadowEdges: boolean }
 export const defaultLightingOptions = (): LightingOptions => ({
   contactShadow: PRESENTATION_PRESET.contactShadowDefault,
   colorTemperature: PRESENTATION_PRESET.colorTemperatureDefault,
+  fineShadowEdges: PRESENTATION_PRESET.fineShadowEdgesDefault,
 });
 /** Own small versioned key; the appearance storage format stays unchanged. */
 export const lightingStorageKey = (pathname: string) => `cubistry-viewer-lighting-v1:${pathname.slice(0, 200)}`;
@@ -13,15 +14,15 @@ export function readLightingOptions(storage: Pick<Storage, "getItem"> | undefine
     const raw = storage?.getItem(key); if (!raw || raw.length > 256) return fallback;
     const value = JSON.parse(raw);
     if (value?.version !== 1) return fallback;
-    return {
-      contactShadow: typeof value.contactShadow === "boolean" ? value.contactShadow : fallback.contactShadow,
-      colorTemperature: typeof value.colorTemperature === "boolean" ? value.colorTemperature : fallback.colorTemperature,
-    };
+    // fineShadowEdges is optional so objects stored before it existed still load.
+    const flag = (name: keyof LightingOptions) => typeof value[name] === "boolean" ? value[name] as boolean : fallback[name];
+    return { contactShadow: flag("contactShadow"), colorTemperature: flag("colorTemperature"), fineShadowEdges: flag("fineShadowEdges") };
   } catch { return fallback; }
 }
 export interface LightingSwitchTarget {
   setContactShadow(on: boolean): void;
   setColorTemperature(on: boolean): void;
+  setFineShadowEdges(on: boolean): void;
 }
 export interface LightingEnvironment {
   document: Pick<Document, "createElement">;
@@ -50,6 +51,7 @@ export function bindLightingSwitches(panel: HTMLElement, studio: LightingSwitchT
   };
   add("Contact shadow", "contactShadow", on => studio.setContactShadow(on));
   add("Warm studio light", "colorTemperature", on => studio.setColorTemperature(on));
+  add("Fine shadow edges", "fineShadowEdges", on => studio.setFineShadowEdges(on));
   panel.append(...rows);
   return {
     dispose() {
