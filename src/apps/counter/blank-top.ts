@@ -39,6 +39,20 @@ export const modeSwitchMoves = (
   to: BlankTopMode,
 ): readonly LegalMove[] =>
   to === "nz" ? counter.modeSwitch : inverseMoves(counter.modeSwitch);
+/** Values where LZ and NZ store the identical complete state. */
+export const sharedValues = (counter: BlankTopCounter): readonly number[] =>
+  Array.from({ length: 100 }, (_, v) => v).filter((v) =>
+    stateEquals(counter.routes.lz.states[v], counter.routes.nz.states[v]),
+  );
+/** "31–99" style label of the shared values (they form one run here). */
+export function sharedRangeLabel(counter: BlankTopCounter): string {
+  const values = sharedValues(counter);
+  demand(
+    values.length > 0 && values.at(-1)! - values[0] + 1 === values.length,
+    "Shared LZ/NZ states are not one contiguous range",
+  );
+  return `${values[0]}–${values.at(-1)}`;
+}
 /**
  * The word that switches to mode `to` at `value`, or null where no switch is
  * offered: the 6-HTM switch word (or its inverse) at 00, and an empty word at

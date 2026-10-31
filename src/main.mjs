@@ -25,6 +25,7 @@ import { loadCertifiedCounter } from "./apps/counter/certified.ts";
 import {
   loadBlankTopCounter,
   modeSwitchAt,
+  sharedRangeLabel,
 } from "./apps/counter/blank-top.ts";
 import blankTopPin from "../counter-blank-top-source.json";
 import "./style.css";
@@ -185,7 +186,7 @@ function controlsUi() {
   text(
     "format-note",
     isBlankTop()
-      ? "On the blank-top print, Leading Zero selects the physical mode: on shows 00–09, off shows a blank tens sticker for 0–9. Switch at 0 (6 setup moves) or at 31–99 (no moves: both modes share the cube state there)."
+      ? `On the blank-top print, Leading Zero selects the physical mode: on shows 00–09, off shows a blank tens sticker for 0–9. Switch at 0 (${blankTop.modeSwitch.length} setup moves) or at ${sharedRangeLabel(blankTop)} (no moves: both modes share the cube state there).`
       : "Leading Zero shows or hides only the leading 0. The layout, value, and moves stay the same.",
   );
 
@@ -371,7 +372,9 @@ async function switchMode(leadingZero) {
   const active = view?.config?.padded ?? !leadingZero;
   if (moves === null || leadingZero === active) {
     $("format").checked = active;
-    error("Switch modes at 0, or at 31–99 where both modes share the cube state.");
+    error(
+      `Switch modes at 0, or at ${sharedRangeLabel(blankTop)} where both modes share the cube state.`,
+    );
     controlsUi();
     return;
   }
