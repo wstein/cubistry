@@ -15,6 +15,7 @@ import {
   inverseWord,
   PINNED_COMMIT,
 } from "../scripts/counter-blank-top.mjs";
+import { exportNet } from "../scripts/export-counter-blank-top-net.mjs";
 
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const pin = JSON.parse(readFileSync("counter-blank-top-source.json", "utf8"));
@@ -116,4 +117,18 @@ test("derivation rejects damaged research rows", () => {
 test("inverse words undo every turn in reverse order", () => {
   assert.equal(inverseWord("L' U B' U L2 U"), "U' L2 U' B U' L");
   assert.equal(inverseWord(inverseWord("B' U R' U'")), "B' U R' U'");
+});
+
+test("the committed sticker net is the current export of the runtime print", () => {
+  const svg = exportNet();
+  assert.equal(readFileSync("public/print/counter-blank-top/net.svg", "utf8"), svg);
+  const stickers = [...svg.matchAll(/data-face="([UDLRFB])" data-image="([^"]+)"/g)];
+  assert.equal(stickers.length, 24);
+  assert.equal(stickers.filter((m) => m[2] === "blank").length, 4);
+  // The printed state shows 00 with blank upper cells on the front face.
+  assert.deepEqual(
+    stickers.filter((m) => m[1] === "F").map((m) => m[2]).sort(),
+    ["0", "0", "blank", "blank"],
+  );
+  assert.doesNotMatch(svg, /<(script|image|foreignObject)/);
 });
