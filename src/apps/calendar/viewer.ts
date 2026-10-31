@@ -11,7 +11,7 @@ import {
 import {
   bindSmartRotation, type SmartRotationBinding, rotatePresentation, cubePresentationRadius, fitPresentationCamera,
   PhysicalCubeScene, createPresentationGeometry, createPlasticMaterial,
-  createStickerMaterial, configurePresentationRenderer, createPresentationStudio,
+  createStickerMaterial, configurePresentationRenderer, createPresentationStudio, bindLightingSwitches, type LightingSwitches,
   DEFAULT_APPEARANCE, validateAppearance, installAppearanceControls, type ViewerAppearance,
 } from "@cubistry/cube-viewer";
 /** Printed paper color of every Calendar face; also the stickerless body color. */
@@ -28,6 +28,7 @@ export class CalendarViewer {
   private cube: PhysicalCubeScene | null = null;
   private artworkTextures = new Map<number, THREE.CanvasTexture>();
   private studio: ReturnType<typeof createPresentationStudio>;
+  private lightingSwitches: LightingSwitches;
   private resources: { dispose(): void }[] = [];
   private resize: ResizeObserver;
   private radius = 14.1;
@@ -52,6 +53,7 @@ export class CalendarViewer {
     this.studio = createPresentationStudio(this.scene, 1.5, 1.5, host, cubePresentationRadius(1.5));
     this.appearanceControls = installAppearanceControls(host, (value) => this.setAppearance(value));
     this.appearanceControls.setDefaultColor("#243d35");
+    this.lightingSwitches = bindLightingSwitches(this.appearanceControls.panel, this.studio);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;
@@ -208,6 +210,7 @@ export class CalendarViewer {
     this.renderer.setAnimationLoop(null);
     this.resize.disconnect();
     this.rotation?.dispose();
+    this.lightingSwitches.dispose();
     this.studio.dispose();
     this.appearanceControls.dispose();
     this.clear();

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { groupZoom } from "./orbit.ts";
 import { clockCameraRadius, clockCubeRadius, clockPresentationScale, clockWorldCenters } from "./framing.ts";
-import { bindSmartRotation, type SmartRotationBinding, rotatePresentation, CubeViewer, configurePresentationRenderer, createPresentationStudio, DEFAULT_APPEARANCE, installAppearanceControls, type ViewerAppearance } from "@cubistry/cube-viewer";
+import { bindSmartRotation, type SmartRotationBinding, rotatePresentation, CubeViewer, configurePresentationRenderer, createPresentationStudio, bindLightingSwitches, type LightingSwitches, DEFAULT_APPEARANCE, installAppearanceControls, type ViewerAppearance } from "@cubistry/cube-viewer";
 import { demand } from "@cubistry/cube-core";
 /** One WebGL context, scene, camera and frame loop for the entire H–M–S row. */
 export class ClockStage {
@@ -13,6 +13,7 @@ export class ClockStage {
   private appearance: ViewerAppearance = DEFAULT_APPEARANCE;
   private readonly appearanceControls: ReturnType<typeof installAppearanceControls>;
   private readonly studio: ReturnType<typeof createPresentationStudio>;
+  private readonly lightingSwitches: LightingSwitches;
   private radius = 12;
   private readonly casterCenters = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
   private zoom = 1;
@@ -35,6 +36,7 @@ export class ClockStage {
       this.appearance = value;
       for (const cube of this.cubes) cube.setAppearance(value);
     });
+    this.lightingSwitches = bindLightingSwitches(this.appearanceControls.panel, this.studio);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
         h = host.clientHeight;
@@ -105,6 +107,7 @@ export class ClockStage {
     this.renderer.setAnimationLoop(null);
     this.resize.disconnect();
     this.rotation?.dispose();
+    this.lightingSwitches.dispose();
     this.studio.dispose();
     this.appearanceControls.dispose();
     for (const cube of this.cubes) cube.destroy();
