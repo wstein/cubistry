@@ -28,3 +28,11 @@ animated move sequence, camera drag/reset, and mobile layout. The local desktop
 and mobile screenshots are test outputs, not a substitute for the physical
 proof. Changing the title or numeric format uses an explicit new-print operation;
 counting never redraws or changes an image.
+
+The [blank-top print variant](COUNTER_BLANK_TOP.md) uses the same digit SVGs and
+the blank image (four blank stickers, no title document or font). Its blanks
+match a target in any quarter turn; its 20 digits must be upright. Its sticker
+net, [net.svg](../public/print/counter-blank-top/net.svg), is derived from the
+pinned print by `scripts/export-counter-blank-top-net.mjs` and embeds these
+hash-checked digit images rotated by each sticker's print-up vector; it is an
+assembly reference, not production cut artwork.

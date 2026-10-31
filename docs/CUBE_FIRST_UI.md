@@ -21,7 +21,11 @@ A reload restores the last completed value and physical format, never a running
 operation. Former minute-timer/Auto persistence does not resume hidden work.
 The old timer and Auto modules and their unit regressions remain in the repository.
 
-Leading Zero is presentation-only. Both checkbox states configure the same
+On the **COUNTER title** print (the default), Leading Zero is presentation-only,
+as described here. On the [blank-top print variant](COUNTER_BLANK_TOP.md) it
+selects the physical LZ or NZ mode instead, with an explicit switch at 0 (6 setup
+moves, outside the session count) or a zero-move switch at 31–99; see that page.
+On the titled print, both checkbox states configure the same
 optimized permanent print and canonical states with the existing certified
 route. OFF replaces only the leading field's rendered zero image with the
 preloaded blank image; units zero and every other glyph/field/position remain

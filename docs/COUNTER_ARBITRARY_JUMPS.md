@@ -28,5 +28,9 @@ Selected counts for the reported rows are **9, 9, 9, 10, 9, 8, 9 and 9 HTM**.
 An independent Python engine verifies both raw and selected words, inverses,
 all sticker identities and orientation frames. These bounded fixture results
 are not a universal exactPhysical optimality or eleven-turn guarantee.
+
+The [blank-top print variant](COUNTER_BLANK_TOP.md) uses the same planner and
+solver adapter with its own canonical states and blank-top display targets. The
+fixture counts above were measured on the titled print only.
 The original print retains its existing provider route; certified adjacent
 moves retain the unchanged 339-HTM traversal, 99 edges and maximum five per edge.
