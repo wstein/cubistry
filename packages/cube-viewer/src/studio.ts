@@ -1,6 +1,22 @@
 import * as THREE from "three";
 import { addPresentationLighting, PRESENTATION_PRESET, shadowRadiusTexels } from "./presentation-preset.ts";
 
+/** Procedural radial falloff (alpha only), no DOM or canvas needed. */
+export function createContactShadowTexture(size: number = PRESENTATION_PRESET.contactShadowTextureSize) {
+  const data = new Uint8Array(size * size * 4);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const r = Math.hypot((x + .5) / size * 2 - 1, (y + .5) / size * 2 - 1);
+    const t = Math.max(0, 1 - r), i = (y * size + x) * 4;
+    data.fill(255, i, i + 3);
+    data[i + 3] = Math.round(255 * t * t * (3 - 2 * t)); // smoothstep, exactly 0 at the rim
+  }
+  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+  texture.magFilter = texture.minFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 export const STUDIO_BACKGROUND =
   "radial-gradient(ellipse at 48% 28%, #fffdf7 0%, transparent 65%), " +
   "linear-gradient(180deg, #e9e0d2 0%, #f6f0e5 48%, #d8cabb 100%)";
@@ -42,8 +58,48 @@ export function createPresentationStudio(
       softness: PRESENTATION_PRESET.shadowFillSoftness, max: PRESENTATION_PRESET.shadowFillRadiusMax,
       direction: lights.shadowFill.position.clone().normalize() },
   ];
+  // Contact shadow: allocated only while switched on, one plane per fitted cube.
+  const contact = { meshes: [] as THREE.Mesh[], geometry: undefined as THREE.PlaneGeometry | undefined,
+    material: undefined as THREE.MeshBasicMaterial | undefined, texture: undefined as THREE.Texture | undefined };
+  let contactOn = false;
+  let fitted: { centers: THREE.Vector3[]; radius: number } = { centers: [new THREE.Vector3()], radius: presentationRadius };
+  const placeContact = () => {
+    const p = PRESENTATION_PRESET;
+    while (contact.meshes.length < fitted.centers.length) {
+      const mesh = new THREE.Mesh(contact.geometry, contact.material);
+      mesh.name = "studio-contact-shadow"; mesh.rotation.x = -Math.PI / 2; mesh.renderOrder = 1;
+      mesh.castShadow = mesh.receiveShadow = false;
+      scene.add(mesh); contact.meshes.push(mesh);
+    }
+    while (contact.meshes.length > fitted.centers.length) contact.meshes.pop()!.removeFromParent();
+    contact.meshes.forEach((mesh, i) => {
+      mesh.position.set(fitted.centers[i].x, floor.position.y + p.contactShadowLift, fitted.centers[i].z);
+      mesh.scale.setScalar(fitted.radius * p.contactShadowScale);
+    });
+  };
+  const releaseContact = () => {
+    for (const mesh of contact.meshes) mesh.removeFromParent();
+    contact.meshes.length = 0;
+    contact.geometry?.dispose(); contact.material?.dispose(); contact.texture?.dispose();
+    contact.geometry = contact.material = contact.texture = undefined;
+  };
+  const setContactShadow = (on: boolean) => {
+    if (on === contactOn) return;
+    contactOn = on;
+    if (!on) { releaseContact(); return; }
+    const p = PRESENTATION_PRESET;
+    contact.geometry = new THREE.PlaneGeometry(1, 1);
+    contact.texture = createContactShadowTexture();
+    contact.material = new THREE.MeshBasicMaterial({ map: contact.texture, color: p.contactShadowColor,
+      opacity: p.contactShadowOpacity, transparent: true, depthWrite: false, toneMapped: false, side: THREE.FrontSide });
+    placeContact();
+  };
+  if (PRESENTATION_PRESET.contactShadowDefault) setContactShadow(true);
   return {
     floor,
+    /** Soft blob under each cube; allocates nothing while off (default). */
+    setContactShadow,
+
     /** Fit one conservative caster union after its final rigid pose/scale.
      * Light-space side bounds also contain receiver intersections: shadow rays
      * are parallel to the directional camera depth axis. No mesh traversal. */
@@ -53,6 +109,9 @@ export function createPresentationStudio(
       let floorY = Infinity;
       for (const center of centers) floorY = Math.min(floorY, center.y - radius - clearance);
       floor.position.y = floorY;
+      while (fitted.centers.length < centers.length) fitted.centers.push(new THREE.Vector3());
+      fitted.centers.length = centers.length; fitted.radius = radius;
+      centers.forEach((c, i) => fitted.centers[i].copy(c));
       for (const { light, softness, max, direction } of casters) {
         const camera = light.shadow.camera;
         // Preserve the existing illumination direction; only shadow projection changes.
@@ -84,8 +143,10 @@ export function createPresentationStudio(
         light.shadow.radius = shadowRadiusTexels(softness * (radius / Math.sqrt(3)),
           Math.max(camera.right - camera.left, camera.top - camera.bottom), max);
       }
+      if (contactOn) placeContact();
     },
     dispose() {
+      releaseContact(); contactOn = false;
       floor.removeFromParent(); floor.geometry.dispose(); floor.material.dispose();
       lights.dispose();
       for (const [element, previous] of backgrounds) element.style.background = previous;

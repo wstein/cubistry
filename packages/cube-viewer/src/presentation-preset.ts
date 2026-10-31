@@ -31,6 +31,15 @@ export const PRESENTATION_PRESET = Object.freeze({
   shadowFillSoftness: 0.18,
   /** PCF radius caps in texels: the fill may blur wider than the key. */
   shadowRadiusMax: 24,
+  /** Optional soft blob directly under each cube; off unless switched on. */
+  contactShadowDefault: false,
+  contactShadowColor: "#302b26",
+  contactShadowOpacity: 0.5,
+  /** Plane side as a multiple of the presentation radius (footprint of the blob). */
+  contactShadowScale: 2.6,
+  /** Height above the receiver, avoiding z-fighting with the shadow floor. */
+  contactShadowLift: 0.004,
+  contactShadowTextureSize: 64,
   shadowFillRadiusMax: 32,
   /** Darkness weight of the shadow fill's shadow (LightShadow.intensity). */
   shadowFillShadowIntensity: 0.55,
