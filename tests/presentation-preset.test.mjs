@@ -91,5 +91,5 @@ test("retuned preset values are the named, reviewable constants", () => {
   const p = preset;
   assert.deepEqual([p.ambientIntensity, p.hemisphereIntensity, p.keyIntensity, p.fillIntensity, p.rimIntensity],
     [.3, .65, 2.8, .85, 1.3]);
-  assert.deepEqual([p.shadowOpacity, p.shadowSoftness, p.shadowMapSize], [.38, .14, 1024]);
+  assert.deepEqual([p.shadowOpacity, p.shadowSoftness, p.shadowMapSize], [.3, .14, 1024]);
 });

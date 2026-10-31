@@ -58,6 +58,27 @@ export function createPresentationStudio(
       softness: PRESENTATION_PRESET.shadowFillSoftness, max: PRESENTATION_PRESET.shadowFillRadiusMax,
       direction: lights.shadowFill.position.clone().normalize() },
   ];
+  // World-space penumbra: per half-cube extent until the first fit, then per fitted cube size.
+  let fitRadius = 0, fineEdges = false;
+  /** PCF radius in texels from the light's CURRENT map size and frustum width. */
+  const updateRadius = (c: typeof casters[number]) => {
+    const camera = c.light.shadow.camera, p = PRESENTATION_PRESET;
+    const world = c.softness * (fitRadius ? fitRadius / Math.sqrt(3) : halfCubeExtent) * (fineEdges ? p.fineShadowSoftnessScale : 1);
+    c.light.shadow.radius = shadowRadiusTexels(world,
+      Math.max(camera.right - camera.left, camera.top - camera.bottom), c.max, c.light.shadow.mapSize.x);
+  };
+  const setFineShadowEdges = (on: boolean) => {
+    if (on === fineEdges) return;
+    fineEdges = on;
+    const size = on ? PRESENTATION_PRESET.fineShadowMapSize : PRESENTATION_PRESET.shadowMapSize;
+    for (const c of casters) {
+      const shadow = c.light.shadow;
+      shadow.mapSize.set(size, size);
+      // Drop the old render targets; three recreates them at the new size on the next render.
+      shadow.dispose(); shadow.map = null; shadow.mapPass = null;
+      updateRadius(c);
+    }
+  };
   // Contact shadow: allocated only while switched on, one plane per fitted cube.
   const contact = { meshes: [] as THREE.Mesh[], geometry: undefined as THREE.PlaneGeometry | undefined,
     material: undefined as THREE.MeshBasicMaterial | undefined, texture: undefined as THREE.Texture | undefined };
@@ -95,12 +116,15 @@ export function createPresentationStudio(
     placeContact();
   };
   if (PRESENTATION_PRESET.contactShadowDefault) setContactShadow(true);
+  if (PRESENTATION_PRESET.fineShadowEdgesDefault) setFineShadowEdges(true);
   return {
     floor,
     /** Soft blob under each cube; allocates nothing while off (default). */
     setContactShadow,
     /** Slightly warm key, cool fill lights; light colors only (default off). */
     setColorTemperature: lights.setColorTemperature,
+    /** Opt-in 2048 maps with a slightly harder penumbra (default off). */
+    setFineShadowEdges,
 
     /** Fit one conservative caster union after its final rigid pose/scale.
      * Light-space side bounds also contain receiver intersections: shadow rays
@@ -114,7 +138,7 @@ export function createPresentationStudio(
       while (fitted.centers.length < centers.length) fitted.centers.push(new THREE.Vector3());
       fitted.centers.length = centers.length; fitted.radius = radius;
       centers.forEach((c, i) => fitted.centers[i].copy(c));
-      for (const { light, softness, max, direction } of casters) {
+      for (const { light, softness, direction } of casters) {
         const camera = light.shadow.camera;
         // Preserve the existing illumination direction; only shadow projection changes.
         light.position.copy(direction).multiplyScalar(20);
@@ -142,9 +166,9 @@ export function createPresentationStudio(
         camera.bottom = cy - half; camera.top = cy + half;
         camera.near = Math.max(.01, near - padding); camera.far = far + padding;
         camera.updateProjectionMatrix();
-        light.shadow.radius = shadowRadiusTexels(softness * (radius / Math.sqrt(3)),
-          Math.max(camera.right - camera.left, camera.top - camera.bottom), max);
       }
+      fitRadius = radius;
+      for (const c of casters) updateRadius(c);
       if (contactOn) placeContact();
     },
     dispose() {
