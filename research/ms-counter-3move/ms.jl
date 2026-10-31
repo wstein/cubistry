@@ -86,7 +86,7 @@ function mkprint(lab::Vector{Char})
     for x in lab
         if x == ' '
             push!(g, ' '); push!(c, 0)
-        elseif x in "MS"
+        elseif x in "MSX"   # X = printed H (inert, printed for the UR cell)
             push!(g, x); push!(c, 2)
         elseif x in 'a':'f'
             push!(g, Char('0' + (x - 'a'))); push!(c, 3)

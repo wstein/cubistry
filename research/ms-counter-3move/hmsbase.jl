@@ -1,6 +1,6 @@
 # Converts the H/S/M seconds-first print (origin/main
 # data/hsm/seconds-first/modes/witness.json, field "printing", extracted to a
-# whitespace table "id p n up slot image") into a 24-label M/S print and
+# whitespace table "id p n up slot image", image "_" = blank) into a 24-label M/S print and
 # scores it with the same layered-graph value iteration (generator side only).
 # H stickers become 'X' (printed, never matches a display) unless a
 # replacement label is given.
@@ -10,9 +10,7 @@ function hmslabels(path; hrepl = 'X')
     for ln in eachline(path)
         f = split(ln, ' ')
         id = parse(Int, f[1]); p = parse.(Int, split(f[2], ',')); n = parse.(Int, split(f[3], ','))
-        u = parse.(Int, split(f[4], ',')); slot = parse(Int, f[5]); img = length(f) >= 6 ? f[6] : ""
-        # cell where this sticker reads upright in this engine's frame
-        R = hcat(cross(u, [0, 0, 1]) * 0 + cross([0,1,0],[0,0,1]), [0,1,0], [0,0,1])  # placeholder
+        u = parse.(Int, split(f[4], ',')); slot = parse(Int, f[5]); img = length(f) >= 6 && f[6] != "_" ? f[6] : ""   # "_" = blank
         c = id ÷ 3; a = id % 3 + 1
         @assert POS[c+1] == Tuple(p) "cubie order differs"
         @assert n[a] != 0 "axis order differs"

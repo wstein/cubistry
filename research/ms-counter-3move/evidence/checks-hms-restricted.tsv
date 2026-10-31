@@ -1,4 +1,4 @@
-receipts	IDENTICAL	f0dc3736980af9c1c87aba5fcdabbf100d10fbd6b8eb4d1eb38461a5d0e26fb3
+receipts	IDENTICAL	4716a36d846265a00410798c0c0aaa210469b12bc6155202323ad65db3c8a448
 negative	glyph	julia	REJECTED	wrong glyph at cell 2 for M00 after setup
 negative	glyph	flix	REJECTED	wrong glyph at cell 2 for M00 after setup
 negative	up	julia	REJECTED	glyph not upright at cell 4 for M00 after setup
@@ -19,3 +19,9 @@ negative	truncated	julia	REJECTED	word shorter than graph distance for M edge 59
 negative	truncated	flix	REJECTED	word shorter than graph distance for M edge 59 (59->0)
 negative	period-double	julia	REJECTED	period boundary: M returns to the start state before the claimed period
 negative	period-double	flix	REJECTED	period boundary: M returns to the start state before the claimed period
+negative	integer-nonnumeric	julia	REJECTED	integer field
+negative	integer-nonnumeric	flix	REJECTED	integer field
+negative	integer-overflow	julia	REJECTED	integer field
+negative	integer-overflow	flix	REJECTED	integer field
+negative	glyph-alphabet	julia	REJECTED	glyph alphabet
+negative	glyph-alphabet	flix	REJECTED	glyph alphabet

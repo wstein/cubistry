@@ -19,5 +19,11 @@ negative	truncated	julia	REJECTED	word shorter than graph distance for M edge 59
 negative	truncated	flix	REJECTED	word shorter than graph distance for M edge 59 (59->0)
 negative	period-double	julia	REJECTED	period boundary: M returns to the start state before the claimed period
 negative	period-double	flix	REJECTED	period boundary: M returns to the start state before the claimed period
+negative	integer-nonnumeric	julia	REJECTED	integer field
+negative	integer-nonnumeric	flix	REJECTED	integer field
+negative	integer-overflow	julia	REJECTED	integer field
+negative	integer-overflow	flix	REJECTED	integer field
+negative	glyph-alphabet	julia	REJECTED	glyph alphabet
+negative	glyph-alphabet	flix	REJECTED	glyph alphabet
 negative	period-short	julia	REJECTED	period boundary: S run does not return to the exact start state after the claimed period
 negative	period-short	flix	REJECTED	period boundary: S run does not return to the exact start state after the claimed period
