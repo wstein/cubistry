@@ -26,7 +26,7 @@ export const PRESENTATION_PRESET = Object.freeze({
   keyIntensity: 2.8,
   fillIntensity: 0.85,
   rimIntensity: 1.3,
-  /** Second, weaker, softer shadow caster opposite the key (no per-cube maps). */
+  /** Second, weaker, softer shadow caster a few degrees of azimuth beside the key (no per-cube maps). */
   shadowFillIntensity: 1.0,
   /** Shadow fill = key rotated about Y by this azimuth (negative x side), nearly coincident. */
   shadowFillAzimuthDegrees: 25,
@@ -40,7 +40,7 @@ export const PRESENTATION_PRESET = Object.freeze({
   colorTemperatureDefault: false,
   warmKeyColor: "#fff3e3",
   coolFillColor: "#eaf1ff",
-  /** Optional soft blob directly under each cube; off unless switched on. */
+  /** Soft blob directly under each cube; on by default, switchable (nothing is allocated while off). */
   contactShadowDefault: true,
   contactShadowColor: "#302b26",
   contactShadowOpacity: 0.5,

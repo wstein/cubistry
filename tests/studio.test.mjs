@@ -154,7 +154,7 @@ test("rotated rigid clock and active layers stay above the receiver and inside s
   turn.dispose(); for (const cube of cubes) cube.dispose(); studio.dispose(); material.dispose();
 });
 
-test("shadow fill: opposite side, weaker, softer; both shadow cameras contain the same caster union", () => {
+test("shadow fill: 25 degrees beside the key, weaker, softer; both shadow cameras contain the same caster union", () => {
   const p = PRESENTATION_PRESET;
   assert.equal(p.shadowFillIntensity, 1.0);
   assert(p.shadowFillIntensity / p.keyIntensity > .3 && p.shadowFillIntensity / p.keyIntensity < .4);
