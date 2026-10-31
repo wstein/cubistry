@@ -7,7 +7,7 @@ counter where every increment and every decrement costs **at most 3 HTM**?
 
 | Profile | Upper-left cell | Status of "max 3 HTM" | Evidence |
 | --- | --- | --- | --- |
-| **blank** (primary, owner's frame) | must show a blank sticker | **UNKNOWN**. No closed witness was found. No infeasibility proof exists. | Generator-side diagnostics only (below) |
+| **blank** (primary, owner's frame) | must show a blank sticker | **UNKNOWN** for max 3. Best found: **max 5** with run-in + repeating period (202 of 228 period edges ≤3, 15 at 4, 11 at 5). Strict one-lap exact closure at max 3 was not found. | [witness](evidence/witness-blank-periodic.tsv), Julia and Flix receipts byte-identical |
 | **free** (relaxation) | unconstrained | **SAT**: every transition is at most 3 HTM | [witness](evidence/witness-free.tsv), Julia and Flix receipts byte-identical |
 
 ### Free profile (relaxation): SAT, checked by Julia and Flix
@@ -45,34 +45,81 @@ and the H 11→00 reset (1). Each one is **at most 3 HTM**.
   upright in exactly one front cell. With a fixed frame, a glyph's up vector
   fixes the corner's rotation, and therefore its cell.
 
-### Blank profile (primary): UNKNOWN
+### Blank profile (primary): max 5 with run-in + period; max 3 UNKNOWN
 
-Every display needs a blank sticker at the upper-left. That tracks all four
-front corners: 136,080 states. The checker rebuilds this graph (histogram
-`0:1,1:15,2:198,3:2030,4:15396,5:61768,6:53528,7:3144`; 2,244 states within
-3 HTM, versus 17–22% in the free profile).
+Every display needs a blank sticker at the upper-left, so all four front
+corners are tracked: 136,080 states. Both checkers rebuild this graph
+(histogram `0:1,1:15,2:198,3:2030,4:15396,5:61768,6:53528,7:3144`). Only
+2,244 states lie within 3 HTM, versus 17–22% in the free profile. The blank
+corner's orientation is free: a blank sticker counts in any orientation.
 
-What the time box did and did not establish:
+**Periodic result (accepted by Julia and Flix, byte-identical receipts):** the
+witness is [evidence/witness-blank-periodic.tsv](evidence/witness-blank-periodic.tsv)
+and the print is [prints/blank-periodic.txt](prints/blank-periodic.txt). The
+print has three blank stickers on three different corners, H×2, M×3, tens 0–5
+and units 0–9 once each, which uses all 24 stickers.
 
-- **Not established**: no closed blank-profile walk was found at any maximum.
-  Neither checker has accepted a blank-profile witness. No claim is made about
-  the achievable maximum.
-- Generator-side diagnostic only (not a proof; [blank-open-probe.jl](blank-open-probe.jl)).
-  It uses the annealed print [prints/blank.txt](prints/blank.txt): three blank
-  stickers on three different corners, H×2, M×3. From one sampled M00 state,
-  exact set propagation reaches all 60 M edges as an **open** walk: 58 edges at
-  ≤3 HTM and 2 at 4 HTM (46→47 and 51→52). The 59→00 step cannot return to
-  the exact start state, though: only 11 states remain, and none of them is the
-  start. The reachable sets shrink to 1–20 states. This suggests that exact
-  closure, not the per-edge distance, is the binding constraint here.
-- Structural fact, computed and not a proof of anything: among the 3,136 group
-  elements within 3 HTM, exactly 6 keep the UL, UR and LL corners in place and
-  move LR. They are `R' B R`, `R' B2 R`, `R' B' R`, `U' R U`, `U' R2 U` and
-  `U' R' U`. With the free cell there are 13 at length 3, plus B, B2 and B'.
-- Baseline for comparison (research/hsm-counter/blank, H/S/M, Python-checked,
-  not re-verified here): canonical runs at most 5 HTM, using preperiod plus
-  period. A closure in that weaker, eventually periodic sense was **not tried**
-  here and is the natural next step for the blank profile.
+| Mode | Setup | Preperiod edges | Period edges (laps) | Period HTM 1/2/3/4/5 | Period total | Period max |
+| --- | ---: | ---: | ---: | --- | ---: | ---: |
+| M 00..59 | 0 (reference) | 60 | 120 (2) | 2/18/94/6/0 | 344 | 4 |
+| H 00..23 | 3 (`U B U`) | 120 | 48 (2) | 0/2/36/5/5 | 157 | 5 |
+| H 00..11 (11→00 reset) | 3 (`U B U`) | 36 | 60 (5) | 1/4/45/4/6 | 190 | 5 |
+| all periods | | | 228 | 3/24/175/15/11 | 691 | **5** |
+
+Preperiod edges: 216 in total, max 5, HTM 1/2/3/4/5 = 2/14/146/36/18.
+
+- **Max 3 is not reached.** 202 of 228 period edges are ≤3 HTM, 15 need 4 and
+  11 need 5. The maximum equals the H/S/M blank baseline's 5 (Python-checked
+  there, not re-verified here). The minutes mode alone reaches max 4.
+- Many long edges are forced by the graph. The claimed lower bound (shortest
+  distance from the actual source state to *any* matching display, recomputed
+  by both checkers) equals the word length on 176 of 228 period edges. All
+  11 five-HTM period edges have lower bound 5: from those source states no
+  matching display is closer. Shortening them would need different earlier
+  choices or a different print.
+- What was searched (bounded, not exhaustive): simulated annealing over prints
+  (glyph and cell per sticker, any number of blanks) with exact set-propagation
+  scores. Lap-graph cycle search used radius-3/4/5 balls (3,136 / 31,136 /
+  ~280k elements). 2 annealed prints were turned into witnesses, and the better
+  one was kept. The other one (prints/blank.txt) also reaches max 5, with
+  36 of 204 period edges above 3. **No infeasibility argument for max 3 or
+  max 4 was found; both are UNKNOWN.**
+
+**Side result, strict exact closure** (one lap, back to the exact start state,
+max 3): not found. With prints/blank.txt, the open minutes walk from one
+sampled start had 58 edges ≤3 and 2 at 4 HTM, but it could not return to its
+exact start ([blank-open-probe.jl](blank-open-probe.jl), generator-side
+diagnostic only). The reachable state sets shrink to 1–20 states. Under
+periodic closure, the same print's minutes mode has a one-lap period with
+max 4.
+
+Structural fact (computed, not a proof of anything): among the 3,136 group
+elements within 3 HTM, exactly 6 keep the UL, UR and LL corners in place and
+move LR: `R' B R`, `R' B2 R`, `R' B' R`, `U R U'`, `U R2 U'` and `U R' U'`.
+With the upper-left free there are 13 such elements at length 3, plus B, B2
+and B'.
+
+#### Periodic definitions (blank profile)
+
+- A **mode** is (letter, range): M 00..59, H 00..23, and H 00..11. The last one
+  is the 12-hour cycle, whose 11→00 step is the requested reset. This mirrors
+  the H/S/M baseline modes (letter × range), restricted to H and M.
+- **Up run**: from the reference print state apply the mode's setup word
+  (excluded from the bound), then count 00→01→…→range→00→… with one word per
+  edge. The run is a **preperiod** of P edges followed by a **period** of
+  Q edges. P and Q are whole laps. The full 24-sticker state after P+Q edges
+  equals the state after P edges, so the period repeats forever.
+- **Decrement = exact inverse traversal of the period** (same words inverted,
+  same lengths). The baseline uses separate down runs instead. Here the owner's
+  requirement fixes decrements as the exact inverse of the increment route, and
+  the inverse of a closed period is again a closed period, so separate down
+  runs are not needed. Decrements are defined on period states. A device in
+  the preperiod counts up into the period, or uses setup+preperiod as an
+  extended setup.
+- The words come from a min-cost search over all matching full states,
+  lexicographic on (edges >3 HTM, total HTM). This replaces the baseline's
+  fixed tie-break policies. The checkers do not depend on how the words were
+  found.
 
 ## Model (stated interpretations)
 
@@ -118,6 +165,12 @@ What the time box did and did not establish:
   blank upper-left in the blank profile) and exact full-state closure. It
   rebuilds the tracked-sticker graph (3 or 4 stickers), verifies every claimed
   lower bound and the claimed maximum, and prints a canonical receipt.
+- `periodic.jl` (blank profile): annealing with an exact one-lap min-cost
+  objective per mode, lap-graph exploration (nodes = full states at 00, edges
+  = one lap) to find a reachable cycle, and the v2 witness writer. For v2 the
+  checkers also replay every preperiod and period edge, check the period
+  boundary (exact full-state repetition) and the inverse-of-period decrement,
+  and check the blank upper-left at every display.
 - Search used Julia only. No Python is part of the deliverable or of the
   evidence.
 
@@ -126,24 +179,34 @@ What the time box did and did not establish:
 ```sh
 J=/tmp/claude-0/julia/bin/julia   # Julia 1.13, --startup-file=no
 $J --startup-file=no research/hm-counter-3move/finalize.jl free research/hm-counter-3move/prints/free.txt /tmp/witness-free.tsv
+HM_B5=1 $J --startup-file=no research/hm-counter-3move/periodic.jl write research/hm-counter-3move/prints/blank-periodic.txt /tmp/witness-blank.tsv
 research/hm-counter-3move/flix/build.sh            # Flix 0.79.0 / Java 21 jar
-research/hm-counter-3move/checker/run-checks.sh research/hm-counter-3move/evidence/witness-free.tsv /tmp/hm-checks
-$J --startup-file=no research/hm-counter-3move/blank-open-probe.jl   # blank diagnostic
+research/hm-counter-3move/checker/run-checks.sh research/hm-counter-3move/evidence/witness-free.tsv /tmp/hm-checks-free
+research/hm-counter-3move/checker/run-checks.sh research/hm-counter-3move/evidence/witness-blank-periodic.tsv /tmp/hm-checks-blank
+$J --startup-file=no research/hm-counter-3move/blank-open-probe.jl   # strict-closure diagnostic
 ```
+
+The free witness regenerates byte-identically. The blank witness was produced
+by the second command (about 15 minutes, deterministic seeds). Print search:
+`periodic.jl anneal2 SEED ITERS OUT INIT`. The blank witness uses format v2
+(`mode` rows with preperiod P and period Q, then `step` rows). The free witness
+uses v1. Both checkers accept both formats.
 
 `run-checks.sh` writes both receipts and requires them to be byte-identical. It
 then runs the negative controls through both checkers. Each control must be
-rejected with the intended reason ([evidence/checks-free.tsv](evidence/checks-free.tsv)):
+rejected with the intended reason ([evidence/checks-free.tsv](evidence/checks-free.tsv),
+[evidence/checks-blank-periodic.tsv](evidence/checks-blank-periodic.tsv)):
 
-| Control | Rejection (both checkers) |
-| --- | --- |
-| corrupted glyph (M→H at upper-right) | wrong glyph at cell 2 for M00 after setup |
-| corrupted up vector (units sticker) | glyph not upright at cell 4 for M00 after setup |
-| corrupted route move (M 5→6) | wrong glyph at cell 2 for M 5->6 |
-| corrupted claimed distance (H 7→8 lower bound +1) | claimed lower bound differs for H 7->8 |
-| corrupted claimed maximum | claimed maximum edge HTM differs from replay |
-| truncated wrap word (M 59→00 emptied) | word shorter than graph distance for M 59->0 |
-| non-blank sticker at upper-left (blank profile only) | implemented in `run-checks.sh`; not exercised, because no blank witness exists |
+| Control | Free (v1) rejection | Blank periodic (v2) rejection |
+| --- | --- | --- |
+| corrupted glyph (M→H at upper-right) | wrong glyph at cell 2 for M00 after setup | wrong glyph at cell 2 for M59 00 after setup |
+| corrupted up vector (units sticker) | glyph not upright at cell 4 for M00 after setup | glyph not upright at cell 4 for M59 00 after setup |
+| non-blank sticker at upper-left | n/a | upper-left cell must show a blank sticker at M59 00 after setup |
+| route move changed (M step 5→6) | wrong glyph at cell 2 for M 5->6 | wrong glyph at cell 2 for M59 step 5 |
+| claimed distance +1 / −1 (too small) | claimed lower bound differs for H 7->8 | claimed lower bound differs for H23 step 0 |
+| claimed maximum −1 | claimed maximum edge HTM differs from replay | same |
+| truncated wrap word | word shorter than graph distance for M 59->0 | n/a |
+| wrong period boundary (one lap moved) | n/a | period boundary: state after preperiod+period must equal state after preperiod for M59 |
 
 ## Alternatives (estimate only, not built)
 
@@ -157,11 +220,12 @@ rejected with the intended reason ([evidence/checks-free.tsv](evidence/checks-fr
 
 ## Not established
 
-- Blank profile: whether max 3 (or max 4) is feasible with exact closure, or
-  with eventually periodic closure, is **UNKNOWN**.
+- Blank profile: max 3 and max 4 are **UNKNOWN**, under both strict and
+  periodic closure. The best checked result is max 5 (periodic). The search
+  was bounded annealing plus cycle search, not exhaustive, and no
+  infeasibility argument was found.
+- Blank profile: the words are min-cost for each lap given the lap's start
+  state. Global optimality of the cycle, the preperiod length and the setup is
+  not claimed.
 - Free profile: optimality of the total HTM (236) is not claimed. Neither is
   minimality of the setup word or of the duplicate allocation.
-- The Flix and Julia checkers have only accepted the free-profile witness.
-  The blank code path (4 tracked stickers, blank at upper-left) is
-  implemented and its graph size (136,080) was checked in Julia, but it has
-  not yet accepted an actual blank witness.
