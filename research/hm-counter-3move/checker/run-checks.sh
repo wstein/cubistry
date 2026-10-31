@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the native Julia checker and the independent Flix checker on a witness,
+# Runs the native Julia checker and the Flix checker (a structural port of it) on a witness,
 # compares their receipts byte for byte, then runs negative controls on both.
 # usage: checker/run-checks.sh WITNESS.tsv OUTDIR
 set -euo pipefail
@@ -74,6 +74,45 @@ if [ "$(head -n 1 "$witness")" = "cubistry.hm-counter.v2" ]; then
     controls+=("tooshort|period boundary: state after preperiod+period must equal state after preperiod for $sl$sr")
   fi
   controls+=("toolong|period is not minimal for M59")
+  # claimed bound too large (same step as "lowerbound"), claimed maximum too large
+  awk -F'\t' -v OFS='\t' '$1=="step" && $2=="H" && $3=="23" && $7>=1 && !done {$7=$7+1; done=1}1' "$witness" > "$neg/lowerbound-up.tsv"
+  awk -F'\t' -v OFS='\t' '$1=="claim" {$3=$3+1}1' "$witness" > "$neg/claim-up.tsv"
+  controls+=("lowerbound-up|claimed lower bound differs for H23 step $lbstep"
+             "claim-up|claimed maximum edge HTM differs from replay")
+  # exact closure: the last M period word gets a trailing B. B turns only the
+  # back layer, so every display stays correct, but the full state after the
+  # period is B applied to the period start state, not the start state itself.
+  # This exercises the exact-closure check also for one-lap periods, where the
+  # "boundary" control only hits the whole-lap rule.
+  awk -F'\t' -v OFS='\t' '
+    $1=="mode" {inM=($2=="M"); if (inM) {last=$5+$6; j=0}; print; next}
+    $1=="step" && inM {j++; if (j==last) $6=$6" B"; print; next}
+    {print}' "$witness" > "$neg/closure.tsv"
+  controls+=("closure|period boundary: state after preperiod+period must equal state after preperiod for M59")
+  # distinct-state rule inside a multi-lap period: the M period is run twice,
+  # the first copy ends with an extra B (lap boundary state B*S differs from S,
+  # so the period stays minimal) and the second copy starts with B', which
+  # brings the cube back to S. The states after the first step of each copy
+  # are then equal. The claimed bound of the first step of the second copy is
+  # the bound from B*S, computed with the Julia checker's own functions.
+  lbB=$("$julia" --startup-file=no -e '
+    include(ARGS[1]); rows = readlines(ARGS[2]); st = readprint(rows[4:27])
+    i = findfirst(r -> startswith(r, "mode\tM\t"), rows); f = split(rows[i], "\t")
+    s = let s = doword(st, parseword(f[4]))
+        for j in 1:parse(Int, f[5]); s = doword(s, parseword(split(rows[i+j], "\t")[6])); end
+        s
+    end
+    print(lowerbound(buildgraph(4), doword(s, parseword("B")), wanted(Char(77), 1, true)))' "$here/check.jl" "$witness")
+  awk -F'\t' -v OFS='\t' -v lb="$lbB" '
+    $1=="mode" {inM=($2=="M"); if (inM) {P=$5; Q=$6; $6=2*Q; j=0; n=0}; print; next}
+    $1=="step" && inM {j++; if (j<=P) {print; next}
+      n++; row[n]=$0; if (n==Q) {
+        for (k=1;k<=Q;k++) {split(row[k],a,"\t"); if (k==Q) a[6]=a[6]" B"; print a[1],a[2],a[3],a[4],a[5],a[6],a[7]}
+        for (k=1;k<=Q;k++) {split(row[k],a,"\t"); if (k==1) {a[6]="B'"'"' "a[6]; a[7]=lb}; print a[1],a[2],a[3],a[4],a[5],a[6],a[7]}
+        inM=0}
+      next}
+    {print}' "$witness" > "$neg/midrepeat.tsv"
+  controls+=("midrepeat|full state repeats within the period for M59")
 else
 awk -F'\t' -v OFS='\t' -v r="$ur" 'NR==r{$7="H"}1' "$witness" > "$neg/glyph.tsv"
 awk -F'\t' -v OFS='\t' -v r="$lr" 'NR==r{$6=($6=="0,1,0")?"1,0,0":"0,1,0"}1' "$witness" > "$neg/up.tsv"
@@ -81,6 +120,7 @@ awk -F'\t' -v OFS='\t' '$1=="edge" && $2=="M" && $3=="5" && !done {n=split($5,a,
 awk -F'\t' -v OFS='\t' '$1=="edge" && $2=="H" && $3=="7" {$6=$6+1}1' "$witness" > "$neg/lowerbound.tsv"
 awk -F'\t' -v OFS='\t' '$1=="claim" {$3=$3-1}1' "$witness" > "$neg/claim.tsv"
 awk -F'\t' -v OFS='\t' '$1=="edge" && $2=="M" && $3=="59" {$5="-"}1' "$witness" > "$neg/truncated.tsv"
+awk -F'\t' -v OFS='\t' '$1=="claim" {$3=$3+1}1' "$witness" > "$neg/claim-up.tsv"
 
 controls=(
   "glyph|wrong glyph at cell 2 for M00 after setup"
@@ -88,6 +128,7 @@ controls=(
   "move|for M 5->6"
   "lowerbound|claimed lower bound differs for H 7->8"
   "claim|claimed maximum edge HTM differs from replay"
+  "claim-up|claimed maximum edge HTM differs from replay"
   "truncated|word shorter than graph distance for M 59->0"
 )
 if [ "$profile" = blank ]; then

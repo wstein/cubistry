@@ -15,3 +15,11 @@ negative	boundary	julia	REJECTED	preperiod and period must be whole laps
 negative	boundary	flix	REJECTED	preperiod and period must be whole laps
 negative	toolong	julia	REJECTED	period is not minimal for M59
 negative	toolong	flix	REJECTED	period is not minimal for M59
+negative	lowerbound-up	julia	REJECTED	claimed lower bound differs for H23 step 0
+negative	lowerbound-up	flix	REJECTED	claimed lower bound differs for H23 step 0
+negative	claim-up	julia	REJECTED	claimed maximum edge HTM differs from replay
+negative	claim-up	flix	REJECTED	claimed maximum edge HTM differs from replay
+negative	closure	julia	REJECTED	period boundary: state after preperiod+period must equal state after preperiod for M59
+negative	closure	flix	REJECTED	period boundary: state after preperiod+period must equal state after preperiod for M59
+negative	midrepeat	julia	REJECTED	full state repeats within the period for M59
+negative	midrepeat	flix	REJECTED	full state repeats within the period for M59
