@@ -204,6 +204,55 @@ alternative, not a saving, and they mix two display styles in one calendar.
   legal states for the failing displays. Whether such states exist is
   **UNKNOWN**: no synthesis was attempted.
 
+### Glyph equalities and the corner orbit (descriptive listing, not a proof)
+
+[evidence/art-breakdown.tsv](evidence/art-breakdown.tsv), from
+[art_breakdown.jl](art_breakdown.jl), is Julia only and not a checker. For every
+orbit, it lists the demand by artwork class for the PR #99 baseline (row 1) and
+for the full bottom fold (row 18). Its per-orbit totals match the checkers'
+`inventory-all` receipts.
+
+**The strict bound already uses all PR #99 glyph equalities.** These are 6/9,
+the half-turn-symmetric glyphs `0 1 2 5 8 H N S X Z`, round O/0, bar I/1, and
+any rotation on the core.
+
+- An artwork class always has one ink. A red 6 merges with a red 9; a red 6 and
+  a black 9 never merge.
+- 6/9 saves 6 stickers in total:
+  - one each in orbits (-3,-1), (-3,0), (-2,0) and the core;
+  - two in orbit (-1,0).
+- The other half-turn merges (8 at angles 0 and 2) save 3 more, in orbits
+  (-3,0), (-2,0) and (-1,0).
+- In the corner orbit (-3,-3), they save **nothing**: no 6, 9 or other
+  half-turn-symmetric date occurs there.
+
+**Corner orbit, row 18: 22 printed + 3 blank = 25 > 24.** Each class needs at
+most one sticker at a time (peak 1):
+
+| Classes | Ink | Count |
+|---|---|---:|
+| month letters `O`, `B`, `D`, `G`, `L`, `P`, `R`, `Y`, and `N` twice (`N` in JAN/JUN at row 1 column 7 and `N` in NOV at row 1 column 1 are a quarter turn apart) | month | 10 |
+| `23`, `23/30`, `24`, `24/31`, `25`, `26`, `27`, `28`, `30`, `31`, and `29` twice (Sunday and Saturday corners are a quarter turn apart) | red | 12 |
+| blank (only in the display of February 2026: Sunday-start, 28 days, row 7 empty; 9 months) | — | 3 |
+
+Plain `23` and `24` are still needed because the strict reading forbids a
+stacked sticker on a plain date. The PR #99 baseline needs 20 + 3: the same
+classes, without `23/30` and `24/31`.
+
+**What-if equalities (Julia only):**
+
+| Equality | Corner orbit, row 18 | Row 18 | Rows 6, 7, 13 | Physically plausible? |
+|---|---|---|---|---|
+| `N` equal under a quarter turn | 21 + 3 = 24 | feasible, bound 239 | bound 239 | **No**: an N turned a quarter reads as Z. |
+| `29` equal under a quarter turn | 21 + 3 = 24 | feasible, bound 239 | bound 239 | **No**: digits are not quarter-turn symmetric. |
+| black `24/31` treated as red | 22 + 3 (unchanged) | obstructed | 240 | That sticker sits on an outer wing, not a corner, and red would break the column ink rule. |
+| `23/30` and `24/31` also stand for `23` and `24` | 20 + 3 | feasible, bound 237 | 238 / 239 / 239 | This is the context reading, which the owner rejected. |
+
+**No realistic glyph equality brings the corner orbit to 24.** The two
+equalities that would work (quarter-turn `N` or `29`) are not plausible in any
+font. The owner has already limited even `0` to half-turn symmetry where the
+font allows it.
+
 ## Why case 1 is impossible (both checkers, `inventory` command)
 
 `check_stacked.jl inventory VARIANT MODE` and the Flix `inventory` command
