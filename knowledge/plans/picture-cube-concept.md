@@ -133,16 +133,18 @@ Cubacle `develop` at `5d94f24` (five commits later, 2026-10-31) adds a V2 state
 token codec on orbit coordinates in `src/notation/orbit64/v2/`, including the
 picture models in both pose variants (`registry.rs:66-67` [V]), with tests in
 `tests/orbit64_v2_test.rs`. Its module doc says it has no facelet bridge
-(`v2/mod.rs:10` [V]), and it has no print I/O. The rest of this plan cites the
+(`v2/mod.rs:10` [V]), and it has no print I/O [V] (none in `v2/` at `5d94f24`). The rest of this plan cites the
 pinned snapshot. Until a facelet and print path exists, a picture state in
 Cubacle needs a separate field next to the V1 token, or it is given as
 `{"moves": ...}` over a print, as the fixed-frame 2×2 does, because a camera does
 not read identity. Without a print file, everything stays color-based.
 
-**V1 output stays byte-identical.** Cubacle's design lists any change to Orbit64
-as a non-goal ("byte-identical, as the don't-care design requires",
-`docs/design/fixed-frame-proofs.md:110-111` [V]). Under V2 adoption this remains
-a requirement for V1: existing V1 token output must not change.
+**V1 output and V2 adoption.** The existing Cubacle design requires V1 output to
+stay byte-identical: it lists any change to Orbit64 as a non-goal
+("byte-identical, as the don't-care design requires",
+`docs/design/fixed-frame-proofs.md:110-111` at `9a03c0f` [V]). That this stays a
+requirement for V1 under V2 adoption is our inference [A], for the owner to
+confirm (open question 7).
 
 A V2 token must be labeled wherever a V1 decoder might see it, for example by
 a field name or an `orbit64v2:` prefix, because a V1 decoder can misread it as a
@@ -290,9 +292,12 @@ exist yet. They are UNKNOWN until implemented and checked.
 7×7 front projection (49 cells) [A, arithmetic]: corners, 4 cells,
 8·7·6·5·3⁴ = 136,080; midges, 4 cells, 12·11·10·9·2⁴ = 190,080; each wing orbit,
 8 cells, two halves of 24·23·22·21 = 255,024; each movable center orbit (6), 4
-cells, 255,024 each (fewer with duplicates); core Z4. Together about 2.9 million
-entries (136,080 + 190,080 + 4 × 255,024 + 6 × 255,024 = 2,876,400, plus Z4 for
-the core) [A, arithmetic]; memory UNKNOWN until built. Alphabet 18 layers × 3 =
+cells, 255,024 each (fewer with duplicates); core Z4. The 7×7 has two wing
+orbits (`w = floor((n - 2) / 2) = 2`, FORMAT-V2.md, "Pieces and orbits" [V]),
+each split into two 4-cell halves, so 2 × 2 = 4 wing tables; the 6 center
+orbits match `floor((n - 2)^2 / 4) = 6` from the same table [V]. Together about
+2.9 million entries (136,080 + 190,080 + 4 × 255,024 + 6 × 255,024 = 2,876,400,
+plus Z4 for the core) [A, arithmetic]; memory UNKNOWN until built. Alphabet 18 layers × 3 =
 54 moves: exact IDA* beyond depth about 10 is expected to be impractical [A].
 
 In practice: **staged target-set search with side effects**. Stage i only
@@ -371,7 +376,7 @@ the minimax edge lengths (maximum 446 HTM) by a clear margin is **UNKNOWN**.
    `develop` at `5d94f24` already has a V2 coordinate codec including the
    picture models, but no facelet or print I/O (section 2). The timing and scope
    of the rest of the port still follow V2's own open items, since V2 is a
-   draft. V1 output stays byte-identical. Until facelet and print I/O land,
+   draft. Until facelet and print I/O land,
    picture state in Cubacle needs a side field or a print + moves form.
 2. **`0` is half-turn-equal, but only where the chosen font's `0` is actually
    half-turn symmetric** (no slash, dot or serif asymmetry). This is checked per
@@ -393,6 +398,8 @@ the minimax edge lengths (maximum 446 HTM) by a clear margin is **UNKNOWN**.
 5. Priority: 3×3 twist (small, exact) before the 7×7 projection?
 6. Should Cubacle read Cubistry's `physical-print.tsv` directly (format binding)
    or use its own format with a converter?
+7. Confirm: V1 output stays byte-identical under V2 adoption? (The existing
+   Cubacle design requires it today; section 2.)
 
 ## Connections
 
