@@ -31,7 +31,7 @@ async function mode(page, value) {
   if (!(await panel.evaluate(e => e.open))) await panel.locator("summary").click();
   await page.getByLabel("View rotation mode", { exact: true }).selectOption(value);
 }
-test("settled 34 degrees from the front is retained as the return target; beyond 35 degrees waits and returns to it without puzzle/camera changes", async ({ page }) => {
+test("a settled 34 degree drag from the default view (about 25 degrees from the exact front) is retained as the return target; a second drag beyond 35 degrees from the front waits and returns to it without puzzle/camera changes", async ({ page }) => {
   await ready(page); const initial = await snapshot(page);
   await drag(page, (34 * Math.PI / 180) / .007, 0);
   const accepted = await snapshot(page); expect(accepted.phase).toBe("idle"); expect(accepted.distance).toBeLessThan(1e-6);

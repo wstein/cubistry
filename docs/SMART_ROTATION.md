@@ -32,7 +32,7 @@ Taps, wheel/settings activity, mode changes, reduced-motion changes and visibili
 | Spatial tolerance | 35° | Settled quaternion distance from the front view |
 | Return wait | 0.6 s at 35° to 0.1 s at 120°+ | After settling; no delay consumed by coasting |
 | Return rate | 9 /s | Soft-start critically damped; no fixed duration |
-| Return end offset | 0.001 rad | Snap to the front view |
+| Return end offset | 0.001 rad | Snap to the return target |
 
 Constants live in `ROTATION_TUNING`. At the maximum released speed, analytic coast lasts at most approximately 1.272 seconds before the return wait. Subjective sensitivity, damping and return feel remain for owner visual review.
 
@@ -44,7 +44,7 @@ The existing Appearance panel now contains an accessible native rotation selecto
 
 Pointerdown freezes the exact displayed bridge quaternion. While interrupted, upright drag changes the target yaw/pitch while retaining the frozen residual orientation, without adding roll. Release resumes the already requested leveling; a tap retains the original target. After leveling settles, only a genuine user drag can propose an anchor, and any owed Smart return wait starts then. Switching to Free cancels leveling and preserves the displayed pose. Per-page versioned/bounded localStorage preferences use the same mechanism as existing viewer appearance; failures fall back safely. Held panel pointers freeze return/leveling until all panel and canvas contacts end, including outside releases. Document release/cancel/lost-capture listeners and window blur/focus/visibility handling prevent ghost holds and overlap takeover. Keyboard/input activity interrupts motion without intercepting native control behavior. No new canvas arrow-key handler conflicts with Counter's puzzle shortcuts.
 
-Reduced Smart still classifies settled views against the 35° tolerance; views beyond it stay without autonomous motion. This also applies after the requested 150 ms leveling finishes. Re-enabling motion returns an outside view to the front view.
+Reduced Smart still classifies settled views against the 35° tolerance; views beyond it stay without autonomous motion. This also applies after the requested 150 ms leveling finishes. Re-enabling motion returns a view that differs from the return target (for example one beyond the tolerance) to that target.
 
 `prefers-reduced-motion` disables inertia and automatic return, including live preference changes, with an explanatory control note. An explicitly requested upright mode change still levels gently over 150 ms under reduced motion; it does not leave a rolled view permanently stranded. Pointer interruption freezes/resumes only this already requested transition. Visibility suspension freezes the displayed orientation and discards motion/countdowns; resume starts a fresh settled delay when return is owed, without consuming hidden wall time or accepting an automatic pose. Reset restores the defined initial view and anchor while retaining explicit zoom and puzzle state. Disposal releases pointer capture, pointer/panel/media/visibility listeners and added settings controls.
 
@@ -72,7 +72,7 @@ Owner checks must include low/fast mouse and touch drags, a held release, small/
 
 ## Owner-approved supersession
 
-The initial handoff used unrestricted quaternion rotation in Smart mode and a five-second wait. The owner's 2026-10-30 follow-up explicitly supersedes those choices with upright Smart/Classic rotation for every cube and a two-second settled wait. Free remains optional. The physical-state boundary and fixed observer remain. Earlier exact-head reviews are historical evidence and do not clear this follow-up; new final-head review is required.
+The initial handoff used unrestricted quaternion rotation in Smart mode and a five-second wait. The owner's 2026-10-30 follow-up explicitly supersedes those choices with upright Smart/Classic rotation for every cube and a two-second settled wait. Free remains optional. The 25° spatial anchor, one-second return, physical-state boundary and fixed observer remain. Earlier exact-head reviews are historical evidence and do not clear this follow-up; new final-head review is required.
 
 ## Owner-approved supersession (front-based tolerance, 35°, spring, distance-dependent wait)
 

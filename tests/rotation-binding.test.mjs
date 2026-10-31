@@ -13,7 +13,7 @@ test("production pointerdown interrupts pending/active return before threshold, 
  h.select.value="smart";h.select.dispatchEvent(new Event("change"));assert.equal(h.binding.controller.phase,"awaiting-return");assert.match(h.note.textContent,/short wait/);
  const dl=h.binding.controller.returnDeadline;h.step(dl+.05);assert.equal(h.binding.controller.phase,"returning");const before=h.root.quaternion.clone();
  h.time(dl+.1);h.element.pointer("pointerdown",250,200);same(h.root.quaternion,before);assert.equal(h.binding.controller.phase,"dragging");
- h.element.pointer("pointermove",251,201);h.step(20);h.element.pointer("pointercancel",251,201);assert.equal(h.binding.controller.phase,"awaiting-return");
+ h.element.pointer("pointermove",251,201);h.step(20);same(h.root.quaternion,before);h.element.pointer("pointercancel",251,201);assert.equal(h.binding.controller.phase,"awaiting-return");
  assert.equal(h.element.captures.size,0);h.binding.dispose();
 });
 test("touch overlap blocks automatic motion until every contact ends; active deadzone reversal remains exact",()=>{
