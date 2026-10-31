@@ -11,6 +11,10 @@ its active value.
 
 ## Metric and state contract
 
+On the [blank-top print](COUNTER_BLANK_TOP.md), the turns of a Leading Zero
+mode switch are shown as separate setup moves; they never change session moves,
+the move meter or the sequence number.
+
 The display shows **completed / planned moves**. The metric is HTM: `R`, `R2`
 and `R'` each count as one legal outer-face token; `R R2 R'` counts as three.
 Frames, animation duration, camera motion and internal quarter-turn calculations

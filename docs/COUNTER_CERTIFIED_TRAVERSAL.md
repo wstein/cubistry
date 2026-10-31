@@ -1,5 +1,11 @@
 # Certified fixed-print counter traversal
 
+> This page describes the default **COUNTER title** print. The Counter also
+> offers the [blank-top print variant](COUNTER_BLANK_TOP.md) (blank top cells,
+> LZ and NZ physical modes, cyclic 278/270-HTM routes, max 4 HTM), selected with
+> the Sticker print control. Everything below, including the 339-HTM route and
+> the screen-only Leading Zero, applies to the titled print only.
+
 The shared header selector offers Counter 0–99, starting at canonical 00.
 Both Leading Zero checkbox states retain this same optimized immutable print
 and certified traversal. The checkbox only masks the leading zero on screen;
