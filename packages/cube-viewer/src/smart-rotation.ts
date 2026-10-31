@@ -5,10 +5,13 @@ import { Quaternion, Vector3 } from "three";
 export const ROTATION_TUNING = Object.freeze({
   dampingSeconds: .24, stopSpeed: .03, maximumSpeed: 6, velocityFilterSeconds: .04,
   staleReleaseSeconds: .1, toleranceRadians: 35 * Math.PI / 180,
-  // Critically damped spring back to the front view: speed grows with distance,
-  // there is no fixed duration. returnFrequency is its natural frequency (rad/s);
-  // the return ends when the remaining pitch/yaw offset is below returnEpsilon (rad).
-  idleSeconds: 2, returnFrequency: 7, returnEpsilon: 1e-3, pitchLimit: Math.PI / 2 - .05,
+  // Return to the front view: wait returnDelay(distance) after settling (long near the
+  // tolerance, short when stretched far), then a soft-start critically damped
+  // response (rate in 1/s): offset x(t) = x0 e^(-rt) (1 + rt + (rt)^2/2) has zero speed
+  // and acceleration at the start, speed proportional to distance, no fixed duration.
+  // The return ends when the remaining pitch/yaw offset is below returnEpsilon (rad).
+  idleNearSeconds: .6, idleFarSeconds: .1, idleFarRadians: 120 * Math.PI / 180,
+  returnRate: 9, returnEpsilon: 1e-3, pitchLimit: Math.PI / 2 - .05,
   levelingSeconds: 1, reducedLevelingSeconds: .15,
 });
 export type RotationMode = "smart" | "free" | "classic";
@@ -16,6 +19,12 @@ export type RotationPhase = "idle" | "dragging" | "coasting" | "awaiting-return"
 export const rotationModes: readonly RotationMode[] = ["smart", "free", "classic"];
 const wrap = (angle: number) => Math.atan2(Math.sin(angle), Math.cos(angle));
 const smooth = (t: number) => t * t * t * (10 + t * (-15 + 6 * t));
+/** Seconds to wait after settling at `distance` radians from the front view. */
+export function returnDelay(distance: number): number {
+  const { toleranceRadians: near, idleFarRadians: far, idleNearSeconds, idleFarSeconds } = ROTATION_TUNING;
+  const f = Math.max(0, Math.min(1, (distance - near) / (far - near)));
+  return idleNearSeconds + (idleFarSeconds - idleNearSeconds) * f * f * (3 - 2 * f);
+}
 /** Presentation only: no renderer, puzzle state, camera, scheduler or DOM ownership. */
 export class SmartRotation {
   readonly quaternion: Quaternion;
@@ -120,7 +129,7 @@ export class SmartRotation {
     // beyond it the spring returns to the front. Nothing ever moves the anchor.
     const distance = this.quaternion.angleTo(this.anchor);
     if (!this.reduced && distance > ROTATION_TUNING.toleranceRadians + 1e-12) {
-      this.phaseValue = "awaiting-return"; this.returnAt = at + ROTATION_TUNING.idleSeconds;
+      this.phaseValue = "awaiting-return"; this.returnAt = at + returnDelay(distance);
     }
   }
   /** Freeze the last displayed quaternion immediately, including a below-threshold click. */
@@ -206,10 +215,10 @@ export class SmartRotation {
       this.phaseValue = "returning";
     }
     if (this.phaseValue === "returning" && this.returnAt !== null) {
-      // Analytic critically damped spring from rest: x(t) = x0 (1 + wt) e^(-wt).
+      // Analytic soft-start critically damped return: x(t) = x0 e^(-rt) (1 + rt + (rt)^2/2).
       // It is frame-rate independent and never overshoots the front view.
-      const w = ROTATION_TUNING.returnFrequency, t = Math.max(0, at - this.returnAt);
-      const remaining = (1 + w * t) * Math.exp(-w * t);
+      const r = ROTATION_TUNING.returnRate, t = Math.max(0, at - this.returnAt);
+      const remaining = Math.exp(-r * t) * (1 + r * t + (r * t) ** 2 / 2);
       this.pitch = this.anchorPitch + this.returnPitch * remaining;
       this.yaw = this.returnYawTarget + this.returnYaw * remaining;
       this.composeUpright(); this.quaternion.copy(this.upright);

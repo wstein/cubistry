@@ -38,8 +38,9 @@ test("settled 34 degrees from the front is retained; beyond 35 degrees waits and
   await page.clock.runFor(6000); expect((await snapshot(page)).orientation).toEqual(retained.orientation);
   await drag(page, (26 * Math.PI / 180) / .007, 0);
   const outside = await snapshot(page); expect(outside.phase).toBe("awaiting-return"); expect(outside.anchor).toEqual(initial.anchor);
-  await page.clock.runFor(1950); expect((await snapshot(page)).phase).toBe("awaiting-return");
-  await page.clock.runFor(100); expect((await snapshot(page)).phase).toBe("returning");
+  const wait = async () => outside.deadline - await page.evaluate(() => performance.now() / 1000);
+  await page.clock.runFor(Math.max(1, Math.floor((await wait() - .05) * 1000))); expect((await snapshot(page)).phase).toBe("awaiting-return");
+  await page.clock.runFor(150); expect((await snapshot(page)).phase).toBe("returning");
   await page.clock.runFor(2500); const end = await snapshot(page); expect(end.phase).toBe("idle"); expect(end.distance).toBeLessThan(2e-3);
   expect(end.anchor).toEqual(initial.anchor); expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
 });
@@ -47,7 +48,8 @@ test("flick inertia is capped, a tap interrupts return, and Free/Classic/reduced
   await ready(page); const initial = await snapshot(page);
   await drag(page, 120, 50, 50, 0); const release = await snapshot(page); expect(release.phase).toBe("coasting"); expect(release.speed).toBeLessThanOrEqual(6);
   await page.clock.runFor(150); expect((await snapshot(page)).orientation).not.toEqual(release.orientation);
-  await page.clock.runFor(2000); const waiting = await snapshot(page); expect(waiting.phase).toBe("awaiting-return");
+  for (let i = 0; i < 40 && (await snapshot(page)).phase === "coasting"; i++) await page.clock.runFor(50);
+  const waiting = await snapshot(page); expect(waiting.phase).toBe("awaiting-return");
   const now = await page.evaluate(() => performance.now() / 1000); await page.clock.runFor(Math.ceil((waiting.deadline - now + .25) * 1000));
   expect((await snapshot(page)).phase).toBe("returning");
   const box = await page.locator("#cube canvas").boundingBox(); await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down();
