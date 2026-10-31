@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import * as THREE from "three";
-import { PhysicalCubeScene } from "../packages/cube-viewer/src/physical-scene.ts";
+import { PhysicalCubeScene, CORE_RADIUS_RATIO } from "../packages/cube-viewer/src/physical-scene.ts";
 import { createPresentationGeometry } from "../packages/cube-viewer/src/presentation-preset.ts";
 import { createDesign } from "../src/apps/playground/model.ts";
 import { stickerPoses, initialState, presentMove, parseMove, FACE_LAYERS, applyMoves, parseAlg } from "@cubistry/cube-mechanics";
@@ -78,7 +78,7 @@ test("canceling a render-only turn restores the supplied authoritative frame and
   h.adapter.sync(poses);
   const turn = h.adapter.beginTurn([0, 1], 0, Math.PI / 2);
   turn.update(.37); turn.dispose(); h.adapter.sync(poses); h.verify(poses);
-  assert.equal(h.parent.children.length, print.cubies.length);
+  assert.equal(h.parent.children.filter(o => !o.userData.plasticCore).length, print.cubies.length);
   let bodies = 0, stickers = 0, materials = 0;
   h.geometry.body.addEventListener("dispose", () => bodies++);
   h.geometry.sticker.addEventListener("dispose", () => stickers++);
@@ -108,48 +108,37 @@ test("shared clock placements and camera-space transforms stay outside physical 
   turn.dispose(); cubes[1].adapter.sync(poses);
   for (const h of cubes) h.verify(poses);
   cubes[1].adapter.dispose();
-  assert.equal(cubes[0].parent.children.length, 8);
-  assert.equal(cubes[2].parent.children.length, 8);
+  assert.equal(cubes[0].parent.children.filter(o => !o.userData.plasticCore).length, 8);
+  assert.equal(cubes[2].parent.children.filter(o => !o.userData.plasticCore).length, 8);
   for (const h of cubes) { if (h !== cubes[1]) h.adapter.dispose(); h.material.dispose(); }
 });
 
-test("compact size-2/size-3 seams have opaque plastic coverage at frontal and slight-angle junction rays", () => {
+test("one static core ball sits at the cube center with a realistic distance to the surface", () => {
   const { print } = createDesign("picture");
   const pin = JSON.parse(readFileSync("calendar-source.json"));
   const calendar = validateDesign(JSON.parse(readFileSync("public/calendar/" + Object.keys(pin.runtime)[0])));
-  for (const [poses, spacing, joints] of [
-    [stickerPoses(print, initialState(print)), .5, [0]],
-    [calendar.printing, 1, [-.5, .5]],
+  for (const [poses, spacing, half] of [
+    [stickerPoses(print, initialState(print)), .5, 1],
+    [calendar.printing, 1, 1.5],
   ]) {
     const h = fixture(poses, spacing);
     h.adapter.sync(poses); h.parent.updateMatrixWorld(true);
-    for (const x of joints) for (const y of joints)
-      for (const [dx, dy] of [[0, 0], [.02, .01], [-.02, -.01]]) {
-        const direction = new THREE.Vector3(dx, dy, -1).normalize();
-        const ray = new THREE.Raycaster(new THREE.Vector3(x - dx * 10, y - dy * 10, 10), direction);
-        assert(ray.intersectObject(h.parent, true).length > 0, `open junction at ${x},${y}`);
-      }
-    h.parent.traverse(object => {
-      if (!object.userData.plasticCore) return;
-      object.geometry.computeBoundingBox();
-      const bounds = object.geometry.boundingBox.clone().applyMatrix4(object.matrix);
-      for (const bound of [...bounds.min, ...bounds.max]) assert(Math.abs(bound) <= .500501);
-      // The sealing core stays below every exterior printed surface.
-      const body = object.parent;
-      for (const sticker of body.children.filter(child => child.userData.stickerId !== undefined)) {
-        const source = poses.find(pose => pose.id === sticker.userData.stickerId);
-        for (let axis = 0; axis < 3; axis++) {
-          if (source.n[axis] === 1) assert(bounds.max.getComponent(axis) <= .430001);
-          if (source.n[axis] === -1) assert(bounds.min.getComponent(axis) >= -.430001);
-        }
-      }
-    });
+    const cores = []; h.parent.traverse(object => { if (object.userData.plasticCore) cores.push(object); });
+    assert.equal(cores.length, 1);
+    const [core] = cores;
+    assert.equal(core.parent, h.parent);
+    assert.deepEqual(core.position.toArray(), [0, 0, 0]);
+    assert(Math.abs(core.scale.x - half * CORE_RADIUS_RATIO) < 1e-9); assert.equal(core.scale.x, core.scale.y); assert.equal(core.scale.x, core.scale.z);
+    // The ball stays well inside: more than half the half-edge remains to the surface.
+    assert(half - core.scale.x > half / 2);
+    // A frontal ray through the center hits the ball for these even/odd centers alike.
+    const ray = new THREE.Raycaster(new THREE.Vector3(0, 0, 10), new THREE.Vector3(0, 0, -1));
+    assert(ray.intersectObject(core).length > 0);
     h.adapter.dispose(); h.material.dispose();
   }
 });
 
-
-test("opaque seams survive scrambled poses on all six sides and intermediate legal layer turns", () => {
+test("the static core ball ignores scrambled poses on all six sides and intermediate legal layer turns", () => {
   const { print } = createDesign("picture");
   const pin = JSON.parse(readFileSync("calendar-source.json"));
   const calendar = validateDesign(JSON.parse(readFileSync("public/calendar/" + Object.keys(pin.runtime)[0])));
@@ -161,29 +150,17 @@ test("opaque seams survive scrambled poses on all six sides and intermediate leg
     const h = fixture(source, spacing); h.adapter.sync(poses);
     for (const axis of [0, 1, 2]) for (const sign of [-1, 1]) {
       const tangents = [0, 1, 2].filter(i => i !== axis);
-      const probe = (objects, rotation = new THREE.Matrix4()) => {
-        h.parent.updateMatrixWorld(true);
-        for (const u of joints) for (const v of joints) for (const offset of [0, .015, -.015]) {
-          const origin = new THREE.Vector3(), direction = new THREE.Vector3();
-          origin.setComponent(axis, sign * 10); direction.setComponent(axis, -sign);
-          origin.setComponent(tangents[0], u - offset * 10);
-          origin.setComponent(tangents[1], v);
-          direction.setComponent(tangents[0], offset);
-          origin.applyMatrix4(rotation); direction.transformDirection(rotation);
-          const ray = new THREE.Raycaster(origin, direction.normalize());
-          assert(ray.intersectObjects(objects, true).length > 0,
-            `open seam axis=${axis} sign=${sign} u=${u} v=${v}`);
-        }
-      };
-      probe(h.parent.children);
+      const core = h.parent.children.find(object => object.userData.plasticCore);
+      const corePosition = core.position.toArray();
       const selected = [...new Set(poses.filter(s => s.p[axis] === sign).map(s => s.cubie))];
-      const bodies = h.parent.children.filter(body => Math.abs(body.position.getComponent(axis) - sign * spacing) < 1e-6);
+      const bodies = h.parent.children.filter(body => !body.userData.plasticCore && Math.abs(body.position.getComponent(axis) - sign * spacing) < 1e-6);
       assert.equal(bodies.length, selected.length);
       const turn = h.adapter.beginTurn(selected, axis, sign * Math.PI / 2);
       const direction = new THREE.Vector3(); direction.setComponent(axis, 1);
       for (const progress of [.25, .5, .75, 1]) {
         turn.update(progress);
-        probe(bodies, new THREE.Matrix4().makeRotationAxis(direction, sign * Math.PI / 2 * progress));
+        assert.equal(core.parent, h.parent); assert.deepEqual(core.position.toArray(), corePosition);
+        assert(!bodies.includes(core));
       }
       turn.dispose(); h.adapter.sync(poses); h.verify(poses);
     }

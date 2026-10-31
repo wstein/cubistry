@@ -49,7 +49,7 @@ export function createPresentationGeometry() {
   for (let i = 0; i < uv.count; i++)
     uv.setXY(i, THREE.MathUtils.clamp(positions.getX(i) / p.stickerWidth + 0.5, 0, 1),
       THREE.MathUtils.clamp(positions.getY(i) / p.stickerWidth + 0.5, 0, 1));
-  return { body, core: new THREE.BoxGeometry(1, 1, 1), sticker, stickerOffset: p.stickerOffset };
+  return { body, core: new THREE.SphereGeometry(1, 48, 24), sticker, stickerOffset: p.stickerOffset };
 }
 
 export function createPlasticMaterial(color = "#202329", roughness = 0.45) {

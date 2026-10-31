@@ -57,7 +57,7 @@ test("reconfiguration disposes old shared geometry, materials and images without
   assert.equal(disposedMaterial, materials.size);
   assert.equal(disposedTexture, textures.size);
   assert.deepEqual(h.scene.position.toArray(), [2.8, 0, 0]);
-  assert.equal(h.scene.children.length, 8);
+  assert.equal(h.scene.children.filter(o => !o.userData.plasticCore).length, 8);
   h.viewer.destroy(); h.viewer.destroy();
   assert.equal(h.stage.children.length, 0);
 });
@@ -67,7 +67,7 @@ test("timing rejection restores authoritative presentation and allows the next l
     await assert.rejects(h.viewer.animate(event, () => { throw Error("timing failure"); }), /timing failure/);
     assert.equal(h.viewer.animating, false);
     assert(stateEquals(h.viewer.presentedState, h.state));
-    assert.equal(h.scene.children.length, 8);
+    assert.equal(h.scene.children.filter(o => !o.userData.plasticCore).length, 8);
     // No pending RAF is scheduled when the timing source rejects on entry.
     await withMotion(true, async () => { await h.viewer.animate(event); });
     assert(stateEquals(h.viewer.presentedState, event.to));
@@ -80,7 +80,7 @@ test("reduced motion still commits exactly the caller-validated legal endpoint",
     const h = fixture(), event = presentMove(h.state, parseMove("U2"));
     await h.viewer.animate(event);
     assert(stateEquals(h.viewer.presentedState, event.to));
-    assert.equal(h.scene.children.length, 8);
+    assert.equal(h.scene.children.filter(o => !o.userData.plasticCore).length, 8);
     await assert.rejects(h.viewer.animate(event), /out of sync/);
     assert(stateEquals(h.viewer.presentedState, event.to));
     h.viewer.destroy();
@@ -152,7 +152,7 @@ test("presentation reset preserves zoom, scramble, artwork and a live legal laye
       const animation = h.viewer.animate(event);
       assert(h.viewer.animating);
       const bodies = new Set(h.viewer.cube.bodies.values());
-      const pivot = h.scene.children.find(o => !bodies.has(o));
+      const pivot = h.scene.children.find(o => !bodies.has(o) && !o.userData.plasticCore);
       // A turn pivot and all its printed surfaces live inside the presentation parent.
       assert(pivot);
       assert.equal(pivot.parent, h.viewer.presentation);
@@ -315,7 +315,7 @@ test("production shared gestures inspect rear/bottom and preserve rigid placemen
  const event=presentMove(state,parseMove("R")),frames=[],oldRAF=globalThis.requestAnimationFrame;
  globalThis.requestAnimationFrame=cb=>(frames.push(cb),frames.length);
  try{await withMotion(false,async()=>{
-   const animation=cubes[2].animate(event);const bodies=new Set(cubes[2].cube.bodies.values());const pivot=cubes[2].scene.children.find(o=>!bodies.has(o));assert(pivot);assert.equal(pivot.parent,cubes[2].scene);
+   const animation=cubes[2].animate(event);const bodies=new Set(cubes[2].cube.bodies.values());const pivot=cubes[2].scene.children.find(o=>!bodies.has(o)&&!o.userData.plasticCore);assert(pivot);assert.equal(pivot.parent,cubes[2].scene);
    h.time(deadline+.31);h.element.pointer("pointerdown");h.time(deadline+.4);h.element.pointer("pointermove",150,130);
    frames.shift()(performance.now()+40);assert(pivot.rotation.x!==0);
    stage.updatePresentationBounds();const scaleDuring=root.scale.x,floorDuring=studio.floor.position.y;stage.updatePresentationBounds();
