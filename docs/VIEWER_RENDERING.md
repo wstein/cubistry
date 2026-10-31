@@ -153,6 +153,34 @@ clock calls `fitCasters` from its animation loop; CubeViewer and CalendarViewer
 never call it and keep the frustum set at creation. The floor is unchanged: it
 stays at the bounding-sphere clearance below the cubes.
 
+**On-change shadow update.** Re-rendering both shadow maps in every frame was about
+half of the per-frame cost on software GL (counter 83 to 33 ms, clock 133 to 83 ms,
+calendar 117 to 50 ms with the shadow map disabled). The studio therefore sets
+`shadow.autoUpdate = false` on both casting lights and sets `shadow.needsUpdate = true`
+only when a shadow-relevant input changed since the last frame (the first frame
+always renders). `renderer.render` calls `Scene.onBeforeRender` before
+`WebGLShadowMap.render`, and the shadow pass honors `needsUpdate` when `autoUpdate` is
+false (verified in the installed three 0.180 sources), so the studio installs that
+hook on its `THREE.Scene` and the consumers (CubeViewer, CalendarViewer, ClockStage)
+needed no change. A studio built on a plain `Group` has no such hook and must call
+`studio.beforeRender()` right before each render; `dispose()` restores the previous
+hook and `autoUpdate = true`. Scene matrices are already current at that point.
+Detection compares an exact (not hashed) flat snapshot with the previous frame:
+for every visited object its id and `visible` flag (invisible subtrees are skipped,
+as in three), for every shadow-casting mesh its `matrixWorld`, geometry id and
+material id, and for each light its world and target matrix, shadow camera frustum,
+map size, radius, biases and whether a map exists. Hence bodies, turn pivots, stickers,
+the presentation group's rotation, scale and position, the construction toggle
+(hidden inset stickers), geometry or material swaps, and every `fitCasters` call that
+actually changes a light or frustum all trigger a render, while a `fitCasters` call
+with unchanged inputs does not. `setFineShadowEdges` additionally marks dirty
+explicitly because it recreates the maps. The full `renderer.render` still runs every
+frame; only the two shadow passes are skipped. Not detected: in-place edits of
+vertex data or morph targets, `shadowMap.type` changes, and layer masks (none occur
+in the app). Covered by `tests/studio-shadow-update.test.mjs` (fake frames, no
+browser). **Visual quality was not verified in a browser**; the speed-up and the
+absence of stale shadows still have to be checked there.
+
 **Floor.** `ShadowMaterial` multiplies the shadow factors of all casting lights
 before applying its opacity (now 0.30; it was 0.28 before the studio retune). The key's
 shadow darkens the floor with the full opacity; the shadow fill's per-light shadow
