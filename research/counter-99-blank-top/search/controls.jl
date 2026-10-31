@@ -26,4 +26,7 @@ f[5] = join(w, " "); f[8] = join(reverse(inv1.(w)), " "); put("routes-lz-wrong-m
 f = fieldsof(R[52]); f[7] = string(parse(Int, f[7]) - 1); put("routes-lz-short-claim.tsv", setrow(R, 52, f))
 # 7 decrement not the inverse word: step 60 decrement reversed without inverting moves
 f = fieldsof(R[62]); f[8] = join(reverse(split(f[5])), " "); f[8] == join(reverse(inv1.(split(f[5]))), " ") && (f[8] = f[5] * " " * f[5]); put("routes-lz-bad-inverse.tsv", setrow(R, 62, f))
+# 8 unreachable target: the units-5 sticker (upright at LR) is reprinted as 6, so no sticker can show units 5
+u5 = only(i for i in 0:23 if fieldsof(P[i+2])[4] == "5" && fieldsof(P[i+2])[5] == join(M.upfor(i, (1,-1,1)), ","))
+f = fieldsof(P[u5+2]); f[4] = "6"; put("print-hidden-unreachable.tsv", setrow(P, u5+2, f))
 println("controls written; nz LL sticker ", nzll)

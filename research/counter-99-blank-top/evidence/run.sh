@@ -32,5 +32,6 @@ neg nz-tens-nonblank nz $c/print-nz-tens-nonblank.tsv routes-nz.tsv setup-nz.tsv
 neg wrong-move lz print.tsv $c/routes-lz-wrong-move.tsv setup-lz.tsv "increment 40->41"
 neg short-claim lz print.tsv $c/routes-lz-short-claim.tsv setup-lz.tsv "claimed increment shortest"
 neg bad-inverse lz print.tsv $c/routes-lz-bad-inverse.tsv setup-lz.tsv "not the exact inverse word"
+neg hidden-unreachable lz $c/print-hidden-unreachable.tsv routes-lz.tsv setup-lz.tsv "row 4: target display 05 is unreachable"
 } | tee negative-controls.tsv
 exit $status
