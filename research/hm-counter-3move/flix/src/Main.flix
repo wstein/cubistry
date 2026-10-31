@@ -398,6 +398,7 @@ def runMode(rows: List[String],letter: Char,range: Int32,st0: List[Stk],
     let fstates=List.toVector(List.reverse(states));
     let fwords=List.toVector(List.reverse(words));
     require(Vector.get(p+q,fstates)==Vector.get(p,fstates),"period boundary: state after preperiod+period must equal state after preperiod for ${letter}${range}");
+    List.forEach(j -> require(Vector.get(p+j,fstates) != Vector.get(p,fstates),"period is not minimal for ${letter}${range}"),List.map(k -> k*n,List.range(1,q/n)));
     let _ = List.foldLeft((s,j) -> {
         let d=doWord(s,invWord(Vector.get(j,fwords)));
         require(d==Vector.get(j,fstates),"exact full-state decrement replay ${letter}${range}");
