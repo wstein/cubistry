@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head><meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/svg+xml" href="/cubistry/pr-preview/pr-155/favicon.svg" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Picture Puzzle Playground · Cubistry</title>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-155/assets/playground-CBbuwXX4.js"></script>
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-155/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-155/assets/three-BW9MzyAf.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-155/assets/presentation-rotation-C_rrih-n.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-155/assets/index-BxEYNP1i.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-155/assets/model-Ie5T8aZg.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-155/assets/index-BnEfDMIT.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-155/assets/index-BNQifYwP.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-155/assets/puzlwerk-2x2-b2l7NZPC.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-155/assets/model-CTOgjrkI.css">
+  </head>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #155 — non-production preview · 5e9045669622</aside>
+    <main>
+      <header>
+        <a class="brand" href="./">CUBISTRY <span>/ PLAYGROUND</span></a
+        ><a href="./picture3.html">3×3 Super Picture Cube ↗</a>
+      </header>
+      <div class="intro">
+        <p class="eyebrow">A PHYSICAL PUZZLE, ONE TURN AT A TIME</p>
+        <h1>Picture Puzzle Playground</h1>
+        <p>Turn, explore, and put every piece back in its exact place.</p>
+      </div>
+      <div class="layout">
+        <section class="stage" aria-label="Interactive puzzle">
+          <div class="stage-top">
+            <span class="badge">2 × 2</span
+            ><label
+              >Design
+              <select id="design">
+                <option value="picture">Landscape pictures</option>
+                <option value="classic">Classic colors</option>
+              </select></label
+            >
+          </div>
+          <div
+            id="cube"
+            aria-label="Physical picture puzzle"
+            aria-busy="true"
+          ></div>
+          <div class="stage-bottom">
+            <span>Drag to rotate · scroll to zoom</span
+            ><button id="camera" type="button">Reset view</button>
+          </div>
+          <div class="goals">
+            <div>
+              <span>EXACT PHYSICAL TARGET</span
+              ><strong id="exact">Loading</strong>
+            </div>
+            <div>
+              <span>UP TO WHOLE-CUBE ROTATION</span
+              ><strong id="equivalent">Loading</strong>
+            </div>
+          </div>
+        </section>
+        <section class="controls" aria-label="Puzzle controls">
+          <div class="control-heading">
+            <h2>Make a move</h2>
+            <span>18 legal turns</span>
+          </div>
+          <div
+            id="face-buttons"
+            class="face-buttons"
+            role="group"
+            aria-label="Legal face turns"
+          ></div>
+          <form id="notation-form">
+            <label for="notation">Move notation</label>
+            <div class="input-row">
+              <input
+                id="notation"
+                placeholder="R U R' U'"
+                autocomplete="off"
+                spellcheck="false"
+                maxlength="4096"
+              /><button id="apply" type="submit">Apply</button>
+            </div>
+            <small>R L U D F B · add ' for inverse, 2 for half turn.</small>
+          </form>
+          <div class="history-actions">
+            <button id="undo">↶ Undo</button><button id="redo">Redo ↷</button>
+          </div>
+          <div class="divider"></div>
+          <form id="scramble-form">
+            <div class="control-heading"><h2>Explore & restore</h2></div>
+            <div class="seed-row">
+              <label
+                >Seed<input
+                  id="seed"
+                  type="number"
+                  min="0"
+                  max="4294967295"
+                  step="1"
+                  value="42"
+                  required /></label
+              ><label
+                >Moves<input
+                  id="count"
+                  type="number"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value="20"
+                  required /></label
+              ><button id="scramble" type="submit">Scramble</button>
+            </div>
+          </form>
+          <div class="solve-row">
+            <button id="solve" class="primary">Solve exact target</button
+            ><button id="cancel">Cancel</button>
+          </div>
+          <label class="speed-label" for="speed"
+            >Quarter turn <output id="speed-value">100 ms</output></label
+          ><input
+            id="speed"
+            type="range"
+            min="10"
+            max="1000"
+            step="10"
+            value="100"
+          /><small>Half turns take twice as long.</small>
+          <p id="status" role="status" aria-live="polite">
+            Preparing the physical puzzle…
+          </p>
+          <p class="session-help">
+            Changing design starts a
+            <strong>new physical puzzle session</strong> after the active turn.
+            It clears history.
+          </p>
+          <button id="new-session" class="quiet">Start new session</button>
+        </section>
+      </div>
+      <section class="history-section" aria-label="Move history">
+        <div class="control-heading">
+          <h2>Move history</h2>
+          <p id="stats">0 / 0 HTM · 0 turns played</p>
+        </div>
+        <p class="history-help">
+          Completed moves only. Undo moves the cursor; a new move replaces the
+          redo branch.
+        </p>
+        <ol id="history" aria-label="Committed moves"></ol>
+        <p id="empty">Your first move starts the story.</p>
+      </section>
+      <details class="notes">
+        <summary>Goals, keyboard controls & supported puzzles</summary>
+        <p>
+          Exact means all eight physical pieces and 24 sticker frames match the
+          original target, even in classic colors. Rotational equivalence allows
+          any of the 24 whole-cube orientations. Rotating the presentation changes
+          neither goal.
+        </p>
+        <p>
+          Keyboard: focus a face button and press Enter or Space, or type a
+          legal word and press Enter. Away from inputs, R L U D F B turns a
+          face; Shift adds inverse. Escape cancels after the active legal turn.
+        </p>
+        <p>
+          Scrambles are repeatable recorded legal words, not uniform random
+          states. Solve uses the pinned PuzlWerk 2×2 capability and verifies the
+          full route before playback and the endpoint afterward. Exact routes
+          are not guaranteed optimal.
+        </p>
+        <p>
+          3×3: Unsupported in this playground. Its shared interactive mechanics
+          and viewer profile are 2×2 only. Cubistry’s Calendar uses a separate
+          3×3 picture provider; this is not a claim about that provider’s
+          capabilities. No uploads, larger puzzles, or saved sessions.
+        </p>
+        <p>
+          <a href="./playground/F.svg">Original landscape artwork</a> ·
+          <a href="./playground/NOTICE.txt">Artwork source & license</a>
+        </p>
+      </details>
+      <footer>
+        Bundled original vector artwork · AGPL-3.0-or-later · Powered by
+        PuzlWerk
+      </footer>
+    </main>
+  </body>
+</html>
