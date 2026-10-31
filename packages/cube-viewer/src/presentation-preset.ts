@@ -99,13 +99,39 @@ export function presentationPixelRatio(ratio: number): number {
   return Number.isFinite(ratio) && ratio > 0
     ? Math.min(PRESENTATION_PRESET.maxPixelRatio, ratio) : 1;
 }
-export function configurePresentationRenderer(renderer: THREE.WebGLRenderer): void {
-  renderer.setPixelRatio(presentationPixelRatio(devicePixelRatio));
+/** localStorage key of the opt-in low-effects test mode (never set by the application itself). */
+export const LOW_EFFECTS_STORAGE_KEY = "cubistry-lowfx";
+/** Drawing-buffer pixel ratio forced by the low-effects mode `"1"` (test only). */
+export const lowEffectsPixelRatio = 0.5;
+export interface PresentationEffects {
+  /** False only in the low-effects test modes; the renderer shadow map is then disabled. */
+  shadows: boolean;
+  /** Forced pixel ratio, or null to keep the production (device) ratio. */
+  pixelRatio: number | null;
+}
+/** Parses the opt-in test flag: `"shadows"` disables only the shadow map, `"1"` also forces
+ * `lowEffectsPixelRatio`. Absent storage, a throwing storage (private mode) and any other value
+ * give the unchanged production behavior. */
+export function presentationEffects(storage?: Pick<Storage, "getItem"> | null): PresentationEffects {
+  let flag: string | null = null;
+  try { flag = storage?.getItem(LOW_EFFECTS_STORAGE_KEY) ?? null; } catch { flag = null; }
+  if (flag === "shadows") return { shadows: false, pixelRatio: null };
+  if (flag === "1") return { shadows: false, pixelRatio: lowEffectsPixelRatio };
+  return { shadows: true, pixelRatio: null };
+}
+function browserStorage(): Storage | null {
+  try { return typeof localStorage === "undefined" ? null : localStorage; } catch { return null; }
+}
+export function configurePresentationRenderer(renderer: THREE.WebGLRenderer,
+  storage: Pick<Storage, "getItem"> | null = browserStorage()): void {
+  const effects = presentationEffects(storage);
+  renderer.setPixelRatio(effects.pixelRatio ?? presentationPixelRatio(devicePixelRatio));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   // Neutral compresses bright highlights while retaining printed image colors.
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1;
-  renderer.shadowMap.enabled = true;
+  // Low-effects test mode only disables the renderer shadow map; the lights keep castShadow.
+  renderer.shadowMap.enabled = effects.shadows;
   // PCF honors the key radius; PCFSoft ignores that setting.
   renderer.shadowMap.type = THREE.PCFShadowMap;
 }
