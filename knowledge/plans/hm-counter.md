@@ -15,14 +15,14 @@ This plan only records assumptions, acceptance criteria and the decisions still 
 ## What exists (verified in the repository at the time of writing)
 - The Live H–M–S Clock (`clock.html`, `src/clock.mjs`) creates one `HsmController` per cube on one shared WebGL scene (`ClockStage`, `src/apps/clock/stage.ts`) and drives them from `LiveClockScheduler` (`src/apps/clock/scheduler.ts`).
 - Each HSM cube uses the seconds-first print with the unit letters H, M and S, and supports the count ranges 00–59, 00–23 and 00–11 (`src/apps/hsm/design.ts`, `docs/HSM_COUNTER.md`).
-- The H/M/S Counter (`index.html?application=hsm-counter`, `src/main.mjs`) has the controls Unit, Count range, Direction, Set value, Run/Stop, Reset, ±1 and a Rotation Speed slider with per-unit defaults: hour 500 ms, minute 250 ms, second 100 ms per HTM move.
+- The H/M/S Counter (`index.html?application=hsm-counter`, `src/main.mjs`) has the controls Unit, Count range, Direction, Set value, Run/Stop, Reset, ±1 and a Rotation Speed slider whose default is 100 ms per HTM move for every unit.
 - `ClockStage` is fixed to three cubes: `createCube` rejects an index of three or more, `clockCenters` is `[-2.8, 0, 2.8]`, the caster centers array has three entries and the framing helpers (`src/apps/clock/framing.ts`) assume that row.
 
 ## Proposed behavior (carry, hour range and entry point confirmed)
 1. **Two cubes, H left and M right**, one stage, same lettering choice as the clock (large H / M or small hour / min).
 2. **One time value from 00:00 to 23:59**, counted in minutes: the M cube shows 00–59, the H cube shows 00–23.
 3. **Step, Run and Set**: ±1 minute, Run up or down with a direction control, Set value HH:MM. When the minutes wrap 59→00 (up) or 00→59 (down), the hour changes in the same step, so both cubes may turn at once.
-4. **Speed**: the Rotation Speed slider keeps its 100 ms default; the minute cube defaults to 250 ms and the hour cube to 500 ms per HTM move, as in the H/M/S Counter.
+4. **Speed**: the Rotation Speed slider defaults to 100 ms per HTM move for both cubes (owner decision, 2026-10-31: the slower 500 ms for hours and 250 ms for minutes apply only to the Live Clock).
 5. A step ends only when both cubes have settled; no time-of-day clock and no wall-clock deadlines are involved.
 
 ## Work packages

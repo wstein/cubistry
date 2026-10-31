@@ -362,8 +362,9 @@ arbitrary poses. A recovery step after a catch-up has at most five HTM, so at
 most ten quarter units. The clock shows scheduled quarter/half
 times when it fits a route into the available live interval. Standalone counter
 rotation settings keep their per-move behavior; choosing the unit (or opening the
-HSM counter) sets the slider to that unit's default of H 500 ms, M 250 ms, S 100 ms,
-which can then be changed freely.
+HSM counter) sets the slider to the default of 100 ms for every unit (the slower
+500/250 ms preferences for hours and minutes belong only to the live clock), which
+can then be changed freely.
 
 ## Validation
 
