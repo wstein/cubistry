@@ -1,0 +1,107 @@
+stacked-profile	F31=keep,S30=bfold,S31=bfold30	strict	888	91	11
+stacked-fold	8	2026	8	11	7,1	23/30	red
+stacked-fold	17	2027	5	11	7,1	23/30	red
+stacked-fold	25	2028	1	11	7,1	23/30	red
+stacked-fold	28	2028	4	10	7,1	23/30	red
+stacked-fold	31	2028	7	10	7,1	23/30	red
+stacked-fold	45	2029	9	11	7,1	23/30	red
+stacked-fold	48	2029	12	11	7,1	23/30	red
+stacked-fold	54	2030	6	10	7,1	23/30	red
+stacked-fold	63	2031	3	11	7,1	23/30	red
+stacked-fold	71	2031	11	11	7,1	23/30	red
+stacked-fold	82	2033	10	10	7,1	23/30	red
+stacked-print	239	55	1	1
+stacked-lower-bound-strict	F31=keep,S30=bfold,S31=bfold30	240
+stacked-target	1	2026	1	PASS	-	-	-	-	12	0	499a46db0a22a00a3cb2ff6249b5892bfc7b3b99649bc769a692f76a95293e58
+stacked-target	2	2026	2	PASS	-	-	-	-	9	0	b1fbb61088078dfe697c127a0029863b3a4ac3db79727aa422a64107c7265468
+stacked-target	3	2026	3	PASS	-	-	-	-	11	0	fc0e69776fc6ddd45a4aa2854baff0c69557e2a96b39a146cc177fa98190af37
+stacked-target	4	2026	4	PASS	-	-	-	-	11	0	f97220b680dd7b226a8d1420045c752a0dfd7ce00e13d37089116f1ba34e044e
+stacked-target	5	2026	5	PASS	-	-	-	-	11	0	6e98c135aafee4732d1b280fd13f1dddea4200e235851803ae67b13a8b8d3c4e
+stacked-target	6	2026	6	PASS	-	-	-	-	11	0	d4389ff7b443fd7eb6daa817a69e3cc1a806c35e3f56ab09ecd474e5195838f0
+stacked-target	7	2026	7	PASS	-	-	-	-	11	0	895b7e43036cb02b660d4429903bc3225d2dfd6eb03e8e71642e1ff4741e7643
+stacked-target	8	2026	8	PASS	-	-	-	-	11	0	34463be8008eecb5a8d9ae17312df2b7d0c6c540133f66a4e77981ce80d33c41
+stacked-target	9	2026	9	PASS	-	-	-	-	11	0	a3622573e3b2cdfaec9cdd4940237e71a066c77ba5233121f7695c9f461fb296
+stacked-target	10	2026	10	PASS	-	-	-	-	11	0	ce17bb0eb6bf3eccfc160f2d7b12ca5480ccf422c847730ae65a793fdac44f26
+stacked-target	11	2026	11	PASS	-	-	-	-	11	0	2a854ba93d42c7cd60262b0a4fccbf646eae17b3a26d6da691ef6b600d918524
+stacked-target	12	2026	12	PASS	-	-	-	-	11	0	188a95666b5aa9313d3823d9d228c474e57096b1530d18e6d743bb9eea4d363e
+stacked-target	13	2027	1	PASS	-	-	-	-	10	0	2cc1c48200c5932ce844fada52a9d8409729029aa39e07df171976c0ed5e4a7f
+stacked-target	14	2027	2	PASS	-	-	-	-	8	0	f3d99d136a68cfb9ed093deb2002cb530ecb0daae2ab02443e36da0d339b2c1e
+stacked-target	15	2027	3	PASS	-	-	-	-	11	0	f8c9b0794cef89bf00820308ccd0b917c997f31d99d6cb038b21cb1a19fec2e5
+stacked-target	16	2027	4	PASS	-	-	-	-	11	0	e75ab1fdf39f00322aa080139b12bd9487cc8ad251d52666aded97a70cee2d04
+stacked-target	17	2027	5	PASS	-	-	-	-	11	0	3ae2fe208bcc213db57d7b48224786590701d99685fc22ed8d76deee2900a4e3
+stacked-target	18	2027	6	PASS	-	-	-	-	11	0	c72aa657a0fa12832803e306fc77b80bd1f413ac8753ee23378c6899b8f776f4
+stacked-target	19	2027	7	PASS	-	-	-	-	11	0	6a7bf3a186d84f85d158aa3a6a2a1fb5241a15ee6802e7f73e812e86f0055bc6
+stacked-target	20	2027	8	PASS	-	-	-	-	11	0	fbe4ac2c9826f05b02b1c53177665d894439fb8cf8759369d5864ffb6a3c4396
+stacked-target	21	2027	9	PASS	-	-	-	-	11	0	7719cf246daf99151e63a52b99afaa9b91064f0a2ec661302b7d29360af2baf9
+stacked-target	22	2027	10	PASS	-	-	-	-	11	0	3536162e966290111b0911e4516518d818ef8729f4b1265dac20ce53c5c3b5c3
+stacked-target	23	2027	11	PASS	-	-	-	-	11	0	d35f421c589f7accd9e18cb99d495dc06c7b2c0ad44bb50a7e11d51b9303d6e0
+stacked-target	24	2027	12	PASS	-	-	-	-	11	0	fe079b258ee808d3e657e5b140590f2fc58057798c7f3b2f639cfa4c002d1e5c
+stacked-target	25	2028	1	PASS	-	-	-	-	11	0	4f56103854c10a077ed5765eeb1b1c8ca34f4f2eabb1e0b9ffcc75e31fbd63bc
+stacked-target	26	2028	2	PASS	-	-	-	-	3	0	518151b08360d8ef9c1db92b77def1113f6319873e37a0c6ce70e809158fc7a2
+stacked-target	27	2028	3	PASS	-	-	-	-	10	0	0ee7d93ae36d839ba4b50629b9cc73171c053f35bb62cb17feca2bb9a1748b13
+stacked-target	28	2028	4	PASS	-	-	-	-	10	0	df51235bd8845a20d8c46d0f90e5c504368a94cec4a15059bcbd74c1662978be
+stacked-target	29	2028	5	PASS	-	-	-	-	10	0	dc48d2dd61395758ae1507deae616b15363a7c6d04776d3ba032914e9b4d0f0f
+stacked-target	30	2028	6	PASS	-	-	-	-	10	0	2b8d59c514c9c9336327f172664f870f8c6a253cab3ce1b6ca8f7abcc4f4e91a
+stacked-target	31	2028	7	PASS	-	-	-	-	10	0	c141af15cba83d39939d2c66ba21138123349e49a117a824ed9bb1fc8d4be56e
+stacked-target	32	2028	8	PASS	-	-	-	-	10	0	43e448d959d667cc02acc9054bb526025d9a02926dcceb88c02b8c7d0abdfdfc
+stacked-target	33	2028	9	PASS	-	-	-	-	10	0	20d1f726e7d582bfda0fee8c61f054941701a44fa830177f0904bc07c6f6ef2d
+stacked-target	34	2028	10	PASS	-	-	-	-	10	0	d28c4f0457821fb36adaa3077d6b54cb093380d139a2337da5e7236022afc764
+stacked-target	35	2028	11	PASS	-	-	-	-	10	0	ce3f6832765069286200380e1e328bfa91732dd4e21d4db338ddc96f9358fa5d
+stacked-target	36	2028	12	PASS	-	-	-	-	10	0	461c1425a6a63f2f084dafd45b54910bb141d4e968063c64693501516a018fcb
+stacked-target	37	2029	1	PASS	-	-	-	-	10	0	dc0e502319e3c7b5b273706b8127849c3358843e7d2b9019a5c43bc6208e1f22
+stacked-target	38	2029	2	PASS	-	-	-	-	8	0	b77acf949aee92e4e0b2a19c33db2f5cc764d847fcc821d87ae1437d9a62bcfa
+stacked-target	39	2029	3	PASS	-	-	-	-	11	0	6f8b644e4addfb8fb9ec269961fdd635c9be26a552e29dc041b764feaa280c71
+stacked-target	40	2029	4	PASS	-	-	-	-	11	0	21db63b3c04d9412c763163f7f334f034e99cf3039582dafd129d780a2ac1a81
+stacked-target	41	2029	5	PASS	-	-	-	-	11	0	bbf5b11d67a0f045f60742e4f42279c6de26d5e51e29b717c1526696f5d06b17
+stacked-target	42	2029	6	PASS	-	-	-	-	11	0	c6fe88b7d71d4e83bd98a0966bf277edeb1f02a63e4dd3c31dbb2bd05fb845c1
+stacked-target	43	2029	7	PASS	-	-	-	-	11	0	d84c405ff785d6eb26bf1ea3ebba7c5b86d877653b871b64bc935f787dded1a3
+stacked-target	44	2029	8	PASS	-	-	-	-	11	0	506d8ca285cfdea16806c745b69ab61ad4235b35a248b4d93455e19238c47726
+stacked-target	45	2029	9	PASS	-	-	-	-	11	0	39b8a0dc3ea27cffe27b2e0ff1691d0bc9a1e50675a66bc943326a50b85e668c
+stacked-target	46	2029	10	PASS	-	-	-	-	11	0	b9e9a6067099ddb182bf42f6bcf5b4bd1645d623cad86a0f3ed24eb00cf02020
+stacked-target	47	2029	11	PASS	-	-	-	-	11	0	01b1b69d6746ff0f45cdc95f4aca35ac73338f3b1fa9b1396aabc413e3b51a15
+stacked-target	48	2029	12	PASS	-	-	-	-	11	0	9a882a4383ccad79a7795fe65a8a190704725df2022fd6f92f77463d06afb27f
+stacked-target	49	2030	1	PASS	-	-	-	-	11	0	e162f85cd68e50dd074e0c779f01fd379e164f704ba6876646433017ad18aa22
+stacked-target	50	2030	2	PASS	-	-	-	-	8	0	779e4cd3afd33b06a0ac6408535b62098ec9f193cd8995ab40b859e0c3b65761
+stacked-target	51	2030	3	PASS	-	-	-	-	10	0	d3984f979a1d10f7bbbdcfa5c27d6ae8cc4a1651d38cb91cf6697b0cc47bde32
+stacked-target	52	2030	4	PASS	-	-	-	-	10	0	4f4e2e35fce086c31e26f6f950062e3b5a7ad1ab96c1bff3d07580c41f004a9a
+stacked-target	53	2030	5	PASS	-	-	-	-	10	0	f51a91719f6f75856162f92b954b5771706af9aeb20a44080343a728a5483514
+stacked-target	54	2030	6	PASS	-	-	-	-	10	0	e4e61c2cde173188817894e6d9a17e6373a296ad004d972080026ecd25e37de8
+stacked-target	55	2030	7	PASS	-	-	-	-	10	0	7fd8e25e41222907c37eceb399f1b0da621add72214cc2b8fcbf5a1f41a5368a
+stacked-target	56	2030	8	PASS	-	-	-	-	10	0	3c46ad6856b7449bc19166c989faa30a6b497cf4a8b66b45f75ea6b5f9ddd0d8
+stacked-target	57	2030	9	PASS	-	-	-	-	10	0	27397680d4e745703fb3e2803b1304da94d1b2289ccbf569f8f92b31f25bcb6c
+stacked-target	58	2030	10	PASS	-	-	-	-	10	0	628ead3ff2e076b9593ca05b56a558a9c0ea43a66abf0da773114a34ca56d3b8
+stacked-target	59	2030	11	PASS	-	-	-	-	10	0	721695d117d2a354d4a2c401e8b72ebbdce81180f85beeaa9f98b24d866784ee
+stacked-target	60	2030	12	PASS	-	-	-	-	10	0	25a3dd42970a9de90dacf3c76973b0da70a152fda4d46a68ff3e56b0fac28c30
+stacked-target	61	2031	1	PASS	-	-	-	-	10	0	f02b00752603ebba650960b9b6e9835e19a1505b6d9ca59d5b71336b956d378e
+stacked-target	62	2031	2	FAIL	7,1	15	0	stacked-mismatch	8	1	6e7556690d1c21c30da620226e41d166316c4ca052c3aab019ee6f1d4cf8aae8
+stacked-target	63	2031	3	PASS	-	-	-	-	11	0	2f83e5acf955c6bd1b4c50e7525159e88bb9ccfba18e9736e8da32f3874e9919
+stacked-target	64	2031	4	PASS	-	-	-	-	11	0	a7e35cf220a6dee53729cc33e4a8bf804382473a8ab5098dce9d8458859b8705
+stacked-target	65	2031	5	PASS	-	-	-	-	11	0	1a93a65ff0d60007fddaf234fdcbd65d8ce3fe0bc34be3962c6b5118e8515721
+stacked-target	66	2031	6	PASS	-	-	-	-	11	0	0beadb2c7ba3c7590f12ac66b3355746b0afc236156ba1d1a5f5b8894273328e
+stacked-target	67	2031	7	PASS	-	-	-	-	11	0	63e88d1c7b4e8e953fc133df906e332a279f9eb879160a6c3ab159ce14a11f64
+stacked-target	68	2031	8	PASS	-	-	-	-	11	0	3135d661ce926f225f200f51a3d528dc13b48b77ce2d5a5f4d96ecae907584aa
+stacked-target	69	2031	9	PASS	-	-	-	-	11	0	96b41dab04d41e963c8f58e43de0d7a3ea3da9f7d1be4ec05bbd975dbefe72c2
+stacked-target	70	2031	10	PASS	-	-	-	-	11	0	1ce1945578f0b849205d7ae03ea80cb45b1fd2986e7f48ebb2b94f3332df2e3c
+stacked-target	71	2031	11	PASS	-	-	-	-	11	0	78cb4a8e8ebf1842f7f9db983448cb33637a7e26a7a2f8ea24438e76c4d40852
+stacked-target	72	2031	12	PASS	-	-	-	-	11	0	2bb0164905597a563176ac5edb8650734ef65cc0eac7b82fc91190f7b11f8c03
+stacked-target	73	2032	2	PASS	-	-	-	-	3	0	e260b261167f998bf3602209a4ba0ab7552531e83db10be3c7bb82f4950bcf7e
+stacked-target	74	2033	2	PASS	-	-	-	-	8	0	c9899c1c3e6b74a78c4c436f66e89919943418f9b0e6871b295fa3de25d4843e
+stacked-target	75	2033	3	PASS	-	-	-	-	10	0	4988a36f4296ff2395559f8ec09d926594e71930626c3dea795023615508c05a
+stacked-target	76	2033	4	PASS	-	-	-	-	10	0	88a2f2de25c6760da74403fc06a3378aa03a0e9b6a276feb4d421391ae67a771
+stacked-target	77	2033	5	PASS	-	-	-	-	10	0	e4f5176c94108d252dc7ee4853b1023a178c35b9cd6bcb76f31486ba854731db
+stacked-target	78	2033	6	PASS	-	-	-	-	10	0	82ea0368ee3fbac6425a77a7152c7980d7c38447e82f722dcd746c1f3a9b5793
+stacked-target	79	2033	7	PASS	-	-	-	-	10	0	9c75c6696d4cc6513b86fa3ff9860aac09c32915b083f05ad17f40a2654b557f
+stacked-target	80	2033	8	PASS	-	-	-	-	10	0	0c89a558ebad5844a24fe00e196221852417c4fee7c16f80b778161e97d65581
+stacked-target	81	2033	9	PASS	-	-	-	-	10	0	51fc2cde9568b676b94b36907477fd84a4558b81498f538ca7ac750358e62859
+stacked-target	82	2033	10	PASS	-	-	-	-	10	0	f4c6077b67db7bc4bfc4c8e11c04a24a7b6a1e6f55e5d4719c7a785c09a3a460
+stacked-target	83	2033	11	PASS	-	-	-	-	10	0	c947d36dc45884bb79e50b2403da273158427c48cb63780f474fc5b845b37704
+stacked-target	84	2033	12	PASS	-	-	-	-	10	0	f96ed2acd5f93dc7914674c164a043ded844665c6f06745fe98ba5f94a769953
+stacked-target	85	2034	1	PASS	-	-	-	-	10	0	b97525733ee3df70f5a5ad1f0f9ee6fd7a5e0267cd7dc1f14bf6033dd2b70ac4
+stacked-target	86	2034	2	PASS	-	-	-	-	7	0	f577477805ceba196f93f980b94c545b4e32fac96e874f5f34e15036552ef32e
+stacked-target	87	2036	2	PASS	-	-	-	-	3	0	336cb7d9d7324316e84c71a8875a6032ebf1a69bee3d7e8ced25994a65feb196
+stacked-target	88	2040	2	PASS	-	-	-	-	3	0	7fce9bfcebc5e3abedee4722a79554927100ac8fa3152c2cb5230a226144d733
+stacked-target	89	2044	2	PASS	-	-	-	-	2	0	cb516ae0e24d7b5b5468aeff95f23b882cb27c840a0f7459f15fa9909643c27a
+stacked-target	90	2048	2	FAIL	7,1	15	0	stacked-mismatch	2	1	99a637f0f23df697a3b5af1b4cf2b6566e3c13d5d74f8716abb923257feb4a8d
+stacked-target	91	2052	2	PASS	-	-	-	-	2	0	6dc2e85afbeb7f089429e3af29b92c824f98a13feefebb928045f526ab2ca7c7
+stacked-printed-never-on-front	0
+stacked-summary	REJECT	F31=keep,S30=bfold,S31=bfold30	strict	89	2	239

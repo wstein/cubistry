@@ -44,4 +44,14 @@ run_inventory() {
     printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "$name" "$variant" "$mode" "$js" "$fs" "$same" "$summary" >> "$out/cases.tsv"
 }
 for v in W A B; do for m in strict context; do run_inventory "$v" "$m"; done; done
+run_case mix-F31bfold-strict           "$ev/print-mix-F31bfold.tsv"            "$out/pr99-dag.tsv" "F31=bfold,S30=keep,S31=keep"   strict
+run_case mix-S30bfold-S31bfold-strict   "$ev/print-mix-S30bfold-S31bfold.tsv"   "$out/pr99-dag.tsv" "F31=keep,S30=bfold,S31=bfold"   strict
+run_case mix-S30bfold-S31bfold30-strict "$ev/print-mix-S30bfold-S31bfold30.tsv" "$out/pr99-dag.tsv" "F31=keep,S30=bfold,S31=bfold30" strict
+# All 24 split-month combinations, both readings, in one run per checker.
+js=0; "$julia_bin" --startup-file=no "$here/check_stacked.jl" inventory-all > "$out/inventory-all.julia.stdout" 2> "$out/inventory-all.julia.stderr" || js=$?
+fs=0; java -Xmx8g -jar "$jar" inventory-all "$cal/english/evidence" > "$out/inventory-all.flix.stdout" 2> "$out/inventory-all.flix.stderr" || fs=$?
+grep "^stacked-" "$out/inventory-all.julia.stdout" > "$out/inventory-all.julia.tsv" || true
+grep "^stacked-" "$out/inventory-all.flix.stdout" > "$out/inventory-all.flix.tsv" || true
+same=DIFFERENT; cmp -s "$out/inventory-all.julia.tsv" "$out/inventory-all.flix.tsv" && same=IDENTICAL
+printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" inventory-all 24-mixes both "$js" "$fs" "$same" "$(grep -c "^stacked-inventory" "$out/inventory-all.julia.tsv") inventory lines" >> "$out/cases.tsv"
 cat "$out/cases.tsv"

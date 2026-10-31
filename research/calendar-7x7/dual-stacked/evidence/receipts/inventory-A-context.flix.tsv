@@ -12,4 +12,4 @@ stacked-orbit	A	context	-1	-1	25	2	24	-3
 stacked-orbit	A	context	-1	0	24	1	24	-1
 stacked-orbit	A	context	0	0	7	0	6	-1
 stacked-core-cell	A	10,11,12,5,6,7,8,9
-stacked-inventory	A	context	260	OBSTRUCTED	4
+stacked-inventory	A	context	260	OBSTRUCTED	4	(-2,-1) (-1,-1) (-1,0) (0,0)

@@ -68,5 +68,9 @@ run_inv_case() {
 }
 run_inv_case inventory-unknown-variant C context
 run_inv_case inventory-unknown-mode B loose
+run_inv_case mix-unknown-type     "F31=keep,S29=keep,S31=keep"  strict
+run_inv_case mix-unknown-choice   "F31=afold,S30=keep,S31=keep" strict
+run_inv_case mix-misordered-types "S30=keep,F31=keep,S31=keep"  strict
+run_inv_case mix-missing-type     "F31=keep,S30=keep"           strict
 cat "$out/results.tsv"
 exit $status

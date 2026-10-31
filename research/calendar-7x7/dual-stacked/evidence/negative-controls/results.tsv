@@ -9,6 +9,10 @@ swapped-roots	1	1	AssertionError: 2 of 91 legal DAG states fail the stacked fron
 inverted-folded-root	1	1	AssertionError: 1 of 91 legal DAG states fail the stacked front: targets 5 | java.lang.IllegalArgumentException: 1 of 91 legal DAG states fail the stacked front	5 1,1 294 1 plain-mismatch | 5 1,1 294 1 plain-mismatch
 rotated-stacked	1	1	AssertionError: 1 of 91 legal DAG states fail the stacked front: targets 1 | java.lang.IllegalArgumentException: 1 of 91 legal DAG states fail the stacked front	1 7,7 16 1 stacked-not-upright | 1 7,7 16 1 stacked-not-upright
 wrong-variant	1	1	AssertionError: undeclared artwork change at surface 15 | java.lang.IllegalArgumentException: undeclared artwork change	 | 
-unknown-mode	1	1	AssertionError: VARIANT must be A|B|W, MODE strict|context | java.lang.IllegalArgumentException: mode must be strict or context	 | 
-inventory-unknown-variant	1	1	AssertionError: VARIANT must be A|B|W, MODE strict|context | java.lang.IllegalArgumentException: variant must be A, B or W
-inventory-unknown-mode	1	1	AssertionError: VARIANT must be A|B|W, MODE strict|context | java.lang.IllegalArgumentException: mode must be strict or context
+unknown-mode	1	1	AssertionError: VARIANT must be A|B|W or a mixed layout, MODE strict|context | java.lang.IllegalArgumentException: mode must be strict or context	 | 
+inventory-unknown-variant	1	1	AssertionError: VARIANT must be A|B|W or F31=..,S30=..,S31=.. | java.lang.IllegalArgumentException: variant must be A, B, W or a mixed layout
+inventory-unknown-mode	1	1	AssertionError: VARIANT must be A|B|W or a mixed layout, MODE strict|context | java.lang.IllegalArgumentException: mode must be strict or context
+mix-unknown-type	1	1	AssertionError: unknown or misplaced month type 'S29' | java.lang.IllegalArgumentException: unknown or misplaced month type
+mix-unknown-choice	1	1	AssertionError: unknown choice 'afold' for F31 | java.lang.IllegalArgumentException: unknown choice for month type
+mix-misordered-types	1	1	AssertionError: unknown or misplaced month type 'S30' | java.lang.IllegalArgumentException: unknown or misplaced month type
+mix-missing-type	1	1	AssertionError: mixed layout needs F31=..,S30=..,S31=.. | java.lang.IllegalArgumentException: mixed layout needs F31=..,S30=..,S31=..
