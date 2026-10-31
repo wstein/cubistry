@@ -122,8 +122,23 @@ case 1 with any print, and synthesis (commutator words) is unnecessary.
 
 The obstruction is scoped to this model: 294 surfaces, the five-date-row
 layout, the declared glyph profile and inks, and stacked labels only for the
-declared pairs. It is not a statement about other artwork, such as orientation
-selection on the core.
+declared pairs.
+
+- It uses the PR #99 optics rule that a blank cell needs a blank sticker. Some
+  obstructions depend on that rule:
+  - case 2 strict, corner orbit: 22 printed + 3 blank > 24. So "case 2 is
+    impossible under strict" depends on it;
+  - case 1 context, orbits (-2,-1) and (-1,0): 24 printed + 1 blank each.
+- The case 1 verdict does **not** depend on it: the core argument above uses no
+  blanks (7 groups for 6 core stickers).
+- It is not a statement about other artwork, such as orientation selection on
+  the core.
+
+One escape from the core argument remains, as an **open design alternative,
+not a result**: a third, undeclared core pair sticker such as `5/12` (a legal
+same-column pair). Under the context reading it would cut the core demand from
+7 groups to 6. The other three case 1 context obstructions would then be open
+again, not proven either way, because a new pair also changes their groups.
 
 ## Results of the legal-state checks (both checkers, identical receipts)
 
@@ -294,8 +309,9 @@ Compare only lines starting with `stacked-`.
 
 1. **Case:** case 2 is recommended. Case 1 is obstructed for any print in this
    model.
-2. **Reading:** is the context reading acceptable? Under it, a stacked `24/31`
-   appears on an ordinary Monday the 24th, in 104 of the 888 months. Without it,
+2. **Reading:** is the context reading acceptable? Under it, a stacked sticker stands
+   for a single date in 104 of 888 months (12 displays). For example, `24/31`
+   black appears on an ordinary Monday the 24th. Without it,
    case 2 is impossible too.
 3. **Overflow marks:** under case 2, `30↶` and `31↶` disappear completely. Is
    that intended?
@@ -306,5 +322,6 @@ Compare only lines starting with `stacked-`.
    (UNKNOWN here).
 6. **Scope:** stop at the 3-surface candidate, or look for up to 3 more frees
    with new states (bound 234)? That needs new DAG synthesis and is UNKNOWN.
-7. **PR #128:** keep it as the superseded orientation-selection study (it is
-   untouched here).
+. **Core pair (design alternative):** should an extra core sticker such as
+   `5/12` be considered? It would remove the core part of the case 1 obstruction;
+   the remaining case 1 orbits would then be UNKNOWN.
