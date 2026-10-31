@@ -155,6 +155,14 @@ correct after legal moves, nontrivial loaded poses and interrupted presentations
 This reuses CubeAssembler's colored-body construction technique without importing
 its palette/physics engine. Interior cut-facing plastic remains opaque.
 
+Inward-facing cut faces of a stickerless body take the color of a bordering
+exterior face of the same cubie (the first one by local face order whose axis
+differs; a lone exterior face is the fallback), as on real stickerless cubes.
+An optional manifest material with id `body` overrides every cut face of the
+cube. The stickerless core is dark gray (`DEFAULT_CORE_COLOR`) unless an optional
+manifest material `core` or `PhysicalCubeScene.setCoreColor` sets it. Stickered
+keeps the core in the selected frame color. Neither color is exposed in the UI.
+
 Under Section 8, Stickerless maps original glyph/photo artwork directly onto
 the rounded body's face groups and hides only the redundant inset planes.
 [`body-artwork.ts`](../packages/cube-viewer/src/body-artwork.ts) retains Three's
@@ -167,7 +175,7 @@ inset planes and selected frame.
 
 Body materials follow the original live artwork map/tint, including the existing
 screen-only leading-zero override through turns, cancellation and resets. A
-map-presence change invalidates the shader. Neutral interior/cut materials are
+map-presence change invalidates the shader. The core and cut materials are
 independent of selected Frame Color in Stickerless, preventing color leakage.
 
 The optional frame-color picker accepts a six-digit hex color and can reset to
