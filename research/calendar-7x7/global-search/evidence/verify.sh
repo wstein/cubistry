@@ -31,7 +31,8 @@ else
 fi
 
 # Corruption controls, built with awk/sed only. Each changes exactly one item of the last edge
-# (or the source line) and must be rejected by both verifiers for the intended reason.
+# (or the source line) and must be rejected by both verifiers for the intended reason; the reasons are
+# checked below and recorded. dropped-move and wrong-htm are caught by the declared-metrics check.
 neg="$out/negative"; mkdir -p "$neg"
 last=$(grep -n '^edge' "$chain" | tail -1 | cut -d: -f1)
 flip() { awk -F'\t' -v OFS='\t' -v L="$1" -v F="$2" 'NR==L{$F=(substr($F,1,1)=="0"?"1":"0") substr($F,2)}1' "$chain"; }
@@ -40,11 +41,21 @@ flip 2 5 > "$neg/wrong-source-hash.tsv"
 awk -F'\t' -v OFS='\t' -v L="$last" 'NR==L{$4=$4+1}1' "$chain" > "$neg/wrong-htm.tsv"
 mv10=$(awk -v L="$last" 'NR>L && /^move\t/{c++; if(c==10){print NR; exit}}' "$chain")
 awk -v M="$mv10" 'NR!=M' "$chain" > "$neg/dropped-move.tsv"
-awk -F'\t' -v OFS='\t' -v M="$mv10" 'NR==M{$3=($3=="-1"?"1":"-1")}1' "$chain" > "$neg/changed-move.tsv"
+# Sign flip of a +-1 layer quarter turn: declared HTM, QTM and rotation counts stay consistent, so only
+# the state replay can catch it (sign-flipped-move is therefore NOT caught by the metrics check).
+mvq=$(awk -F'\t' -v L="$last" 'NR>L && $1=="move" && $2%7!=0 && ($3==1||$3==-1){print NR; exit}' "$chain")
+awk -F'\t' -v OFS='\t' -v M="$mvq" 'NR==M{$3=($3=="-1"?"1":"-1")}1' "$chain" > "$neg/sign-flipped-move.tsv"
 
 printf 'control\tjulia-exit\tflix-exit\treason (julia | flix)\n' > "$out/negative-results.tsv"
 status=0
-for f in wrong-end-hash wrong-source-hash wrong-htm dropped-move changed-move; do
+# Expected rejection reasons (extended regular expressions matched against each verifier's message).
+declare -A want_j want_f
+want_j[wrong-end-hash]='physical hash mismatch';          want_f[wrong-end-hash]='destination full physical SHA mismatch'
+want_j[wrong-source-hash]='Initial actual physical state'; want_f[wrong-source-hash]='initial full physical source SHA mismatch'
+want_j[wrong-htm]='Declared transition metrics mismatch';  want_f[wrong-htm]='declared HTM/QTM/rotation metrics differ'
+want_j[dropped-move]='Declared transition metrics mismatch'; want_f[dropped-move]='declared HTM/QTM/rotation metrics differ'
+want_j[sign-flipped-move]='Front image mismatch|physical hash mismatch'; want_f[sign-flipped-move]='actual front art/orientation mismatch|destination full physical SHA mismatch'
+for f in wrong-end-hash wrong-source-hash wrong-htm dropped-move sign-flipped-move; do
     jc=0; fc=0
     jv "$neg/$f.tsv" > "$neg/$f.julia.out" 2> "$neg/$f.julia.err" || jc=$?
     fv "$neg/$f.tsv" > "$neg/$f.flix.out" 2> "$neg/$f.flix.err" || fc=$?
@@ -52,5 +63,7 @@ for f in wrong-end-hash wrong-source-hash wrong-htm dropped-move changed-move; d
     fr=$(grep -hm1 '^invalid' "$neg/$f.flix.out" | sed 's/^invalid\t//' || true)
     printf '%s\t%s\t%s\t%s | %s\n' "$f" "$jc" "$fc" "$jr" "$fr" | tee -a "$out/negative-results.tsv"
     { [ "$jc" -eq 1 ] && [ "$fc" -eq 1 ]; } || { echo "UNEXPECTED native decision for $f" >&2; status=1; }
+    printf '%s' "$jr" | grep -Eq "${want_j[$f]}" || { echo "UNEXPECTED Julia reason for $f: $jr" >&2; status=1; }
+    printf '%s' "$fr" | grep -Eq "${want_f[$f]}" || { echo "UNEXPECTED Flix reason for $f: $fr" >&2; status=1; }
 done
 exit $status
