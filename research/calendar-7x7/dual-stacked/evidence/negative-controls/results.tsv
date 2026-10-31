@@ -1,0 +1,11 @@
+case	julia-exit	flix-exit	reason (julia | flix)
+wrong-ink	1	1	AssertionError: stacked surface 15 must replace one of its own dates in the same ink | java.lang.IllegalArgumentException: stacked surface must replace one of its own dates in the same ink
+undeclared-pair	1	1	AssertionError: undeclared artwork change at surface 15 | java.lang.IllegalArgumentException: undeclared artwork change
+reversed-pair	1	1	AssertionError: undeclared artwork change at surface 61 | java.lang.IllegalArgumentException: undeclared artwork change
+restored-overflow	1	1	AssertionError: 11 of 91 legal DAG states fail the stacked front: targets 8,17,25,28,31,45,48,54,63,71,82 | java.lang.IllegalArgumentException: 11 of 91 legal DAG states fail the stacked front
+blank-month-letter	1	1	AssertionError: only overflow or paired-date surfaces may become blank (surface 2) | java.lang.IllegalArgumentException: only overflow or paired-date surfaces may become blank
+flipped-up	1	1	AssertionError: surface identity or frame changed at 16 | java.lang.IllegalArgumentException: surface identity or frame changed
+swapped-roots	1	1	AssertionError: 2 of 91 legal DAG states fail the stacked front: targets 1,2 | java.lang.IllegalArgumentException: 2 of 91 legal DAG states fail the stacked front
+inverted-folded-root	1	1	AssertionError: 1 of 91 legal DAG states fail the stacked front: targets 5 | java.lang.IllegalArgumentException: 1 of 91 legal DAG states fail the stacked front
+wrong-variant	1	1	AssertionError: undeclared artwork change at surface 15 | java.lang.IllegalArgumentException: undeclared artwork change
+unknown-mode	1	1	AssertionError: VARIANT must be A|B|W, MODE strict|context | java.lang.IllegalArgumentException: mode must be strict or context
