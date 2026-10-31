@@ -96,14 +96,23 @@ test("the witness copies and runtime file are pinned to the research commit", ()
   // Original and recovery proof scopes are distinct; neither confirms the
   // application runtime or global print optimality. Keep metadata bound to
   // the unchanged raw recovery input and the matching native verdict.
-  assert.match(pin.reviewStatus, /^CONFIRMED for the original witnesses and the recovery table/);
+  assert.match(
+    pin.reviewStatus,
+    /^CONFIRMED for the original witnesses and the recovery table/,
+  );
   assert.match(pin.reviewStatus, /old hsm command remains UNSUPPORTED/);
   assert.match(pin.reviewStatus, /optimality is UNKNOWN/i);
   assert.match(pin.reviewStatus, /software-tested, not proven/);
   assert.match(pin.reviewStatus, /f71d4237/);
   assert.match(pin.reviewStatus, /5dd24dd7/);
-  assert.match(pin.reviewStatus, /0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70/);
-  assert.equal(sha(readFileSync(pin.recoveryCopy)), "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda");
+  assert.match(
+    pin.reviewStatus,
+    /0d0d139589dfe9a39524967ebe543c4316c9343e0e0d4c05966b5a5ef3283c70/,
+  );
+  assert.equal(
+    sha(readFileSync(pin.recoveryCopy)),
+    "0679d41c0f7241787a6680e8cea66f0b82c6c57eb02a11225f4e1a7efe162bda",
+  );
   assert.equal(sha(runtimeBytes), pin.runtimeSHA256);
   // The previous pin is kept as history and still names the old print.
   assert.equal(
@@ -977,4 +986,146 @@ test("after a bounded catch-up the live seconds return onto the period within si
   assert.ok(onPeriod());
   assert.ok(Math.max(...ticks) <= 5, `ticks ${ticks}`);
   for (const u of sim.units) u.controller.dispose();
+});
+
+// Mutation controls. Each test below fails on a named mutant of
+// src/apps/hsm/recovery.ts (see the PR description).
+const poseText = (recovery, state) => recovery.encode(state).join(",");
+
+test("a free jump from a period node lands on a period node when a least route can (jump keeps its period preference)", () => {
+  const recovery = new HsmRecovery(design.print, planner);
+  // [letter, range, direction, start node display, jumped-to value]. Measured
+  // against the unpreferenced search: each of these lands off the period
+  // without the preference, on it with it, at the same HTM.
+  const cases = [
+    ["S", 59, 1, 0, 57],
+    ["S", 59, 1, 20, 17],
+    ["S", 23, 1, 0, 1],
+    ["S", 11, 1, 10, 1],
+    ["M", 59, 1, 10, 11],
+    ["M", 23, 1, 15, 0],
+    ["M", 11, 1, 0, 11],
+    ["H", 59, 1, 5, 6],
+    ["H", 23, 1, 20, 17],
+    ["H", 11, 1, 10, 9],
+  ];
+  for (const [letter, maximum, direction, from, value] of cases) {
+    const state = periods.poseFor(letter, maximum, direction, from),
+      label = `${letter}/${maximum}/${direction} ${from} -> ${value}`,
+      word = recovery.jump(state, letter, maximum, direction, value, (v) =>
+        periods.nodesShowing(letter, maximum, direction, v),
+      ),
+      after = applyMoves(state, word);
+    assert.ok(matchesTarget(design.print, after, hsmTarget(letter, value)));
+    assert.equal(
+      word.length,
+      planner.distance(design.print, state, letter, value),
+      label,
+    );
+    assert.ok(periods.nodeOf(letter, maximum, direction, after) >= 0, label);
+  }
+});
+
+test("recovery reach equals a brute-force search over every move sequence", () => {
+  const recovery = new HsmRecovery(design.print, planner);
+  // Brute force on the search's own pose tables (recovery.trans), but without
+  // its canonical-word pruning: every pose within `limit` HTM, layer by layer.
+  const step = (pose, m) => {
+    const out = new Uint8Array(8);
+    for (let c = 0; c < 8; c++) out[c] = recovery.trans[c][m][pose[c]];
+    return out;
+  };
+  // [letter, range, start display, jumped-to value, limit]. The last two fail
+  // if the search also drops the second order of two opposite faces (R L vs L R).
+  const cases = [
+    ["S", 59, 0, 5, 3],
+    ["S", 59, 7, 9, 4],
+    ["M", 59, 7, 8, 5],
+    ["S", 59, 49, 51, 5],
+    ["S", 59, 49, 54, 5],
+  ];
+  let compared = 0;
+  for (const [letter, maximum, from, value, limit] of cases) {
+    const origin = recovery.encode(periods.poseFor(letter, maximum, 1, from));
+    let layer = new Map([[origin.join(","), origin]]);
+    const expected = new Set();
+    for (let depth = 1; depth <= limit; depth++) {
+      const next = new Map();
+      for (const pose of layer.values())
+        for (let m = 0; m < 18; m++) {
+          const q = step(pose, m),
+            key = q.join(",");
+          if (next.has(key)) continue;
+          next.set(key, q);
+          if (recovery.shortest(q, letter, value) === 0) expected.add(key);
+        }
+      layer = next;
+    }
+    const found = recovery.reach(origin, letter, value, limit),
+      got = new Set([...found.values()].map((e) => e.pose.join(",")));
+    assert.ok(expected.size > 0);
+    assert.deepEqual(
+      [...got].sort(),
+      [...expected].sort(),
+      `${letter}/${maximum} ${from} -> ${value} within ${limit}`,
+    );
+    // Each reported word is a real route of at most `limit` moves to its pose.
+    for (const e of found.values()) {
+      let q = origin;
+      for (const m of e.word) q = step(q, m);
+      assert.equal(q.join(","), e.pose.join(","));
+      assert.ok(e.word.length <= limit);
+    }
+    compared += expected.size;
+  }
+  assert.ok(compared > 0);
+});
+
+test("configure() followed by a mode, range or direction switch counts at most five HTM per step and is back on the period within six steps", async () => {
+  let worst = 0,
+    checked = 0;
+  for (const letter of ["H", "S", "M"]) {
+    const modes = COUNTING_MODES.filter(([l]) => l === letter);
+    for (const [, fromMax, fromDir] of modes)
+      for (const [, toMax, toDir] of modes) {
+        if (fromMax === toMax && fromDir === toDir) continue;
+        for (const advance of [0, 3]) {
+          const c = new HsmController(
+            view,
+            design,
+            {},
+            letter,
+            () => {},
+            dispose,
+          );
+          c.setMode(fromMax, fromDir);
+          await c.configure();
+          for (let i = 0; i < advance; i++) {
+            c.request((c.currentValue + fromDir + fromMax + 1) % (fromMax + 1));
+            await settled(c);
+          }
+          assert.ok(periods.nodeOf(letter, fromMax, fromDir, c.state) >= 0);
+          // The display must exist in the new range (the app resets otherwise).
+          if (c.currentValue > toMax) {
+            c.dispose();
+            continue;
+          }
+          c.setMode(toMax, toDir);
+          const label = `${letter} ${fromMax}/${fromDir} -> ${toMax}/${toDir} after ${advance}`;
+          let steps = 0;
+          while (periods.nodeOf(letter, toMax, toDir, c.state) < 0) {
+            c.request((c.currentValue + toDir + toMax + 1) % (toMax + 1));
+            await settled(c);
+            steps++;
+            worst = Math.max(worst, steps);
+            assert.ok(c.progress.total <= 5, `${label} step ${steps}`);
+            assert.ok(steps <= 6, `${label} back on the period`);
+          }
+          checked++;
+          c.dispose();
+        }
+      }
+  }
+  assert.ok(checked >= 150, `${checked} switches`);
+  assert.ok(worst <= 6);
 });
