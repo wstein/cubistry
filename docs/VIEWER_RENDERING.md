@@ -154,7 +154,7 @@ never call it and keep the frustum set at creation. The floor is unchanged: it
 stays at the bounding-sphere clearance below the cubes.
 
 **Floor.** `ShadowMaterial` multiplies the shadow factors of all casting lights
-before applying its opacity (now 0.30, lighter than the earlier 0.38). The key's
+before applying its opacity (now 0.30; it was 0.28 before the studio retune). The key's
 shadow darkens the floor with the full opacity; the shadow fill's per-light shadow
 intensity scales its contribution down. Overlap does not darken beyond the
 opacity: the result is a union with graded edges, not an additive double shadow.
@@ -270,20 +270,24 @@ checks are not visual acceptance.
 
 ## Resource and performance boundaries
 
-Three base shapes serve each cube: rounded shell (588 triangles), core (12),
-and inset artwork plane (18 per printed face). Source-up UV variants are cached
+Three base shapes are shared: the rounded shell (588 triangles) and the inset
+artwork plane (18 per printed face) per body, and one static core ball per cube
+(2,208 triangles; the per-body box cores no longer exist). Source-up UV variants are cached
 only at configuration, at most one per distinct body-frame key (bounded by the
 8/26 configured bodies). Positions/normals are unchanged; variants and face
 material clones are explicitly disposed. No UV/geometry/texture generation runs
 per animation frame, and original textures remain caller-owned.
 
-Stickered totals are 5,232/16,572/15,696 triangles for 2×2/Calendar/three-cube
-clock; Stickerless hides inset planes and renders 4,800/15,600/14,400. Each
-viewport adds two ground triangles.
+Stickered totals are 7,344/18,468/22,032 triangles for 2×2/Calendar/three-cube
+clock; Stickerless hides inset planes and renders 6,912/17,496/20,736. Each
+viewport adds two ground triangles, and each cube two triangles for its contact
+shadow plane while that switch is on (the default).
 
-Upper-bound main-pass mesh/group draws before culling are 41/107/121 for
-Stickered 2×2/Calendar/clock, and 57/183/169 for Stickerless (body face groups
-increase draws, while inset artwork planes are hidden). One additional 1024×1024 shadow pass renders the actual casters;
+Upper-bound main-pass mesh/group draws before culling, counting the core ball,
+the ground and the contact planes (on by default), are 35/83/103 for Stickered
+2×2/Calendar/clock, and 51/159/151 for Stickerless (body face groups increase
+draws, while inset artwork planes are hidden). Two additional shadow passes (key
+and shadow fill, each 1024×1024, or 2048×2048 with fine shadow edges) render the actual casters;
 there are no per-cube shadow maps, static shadow sprites or accumulation buffers.
 DPI remains capped at 2. The production Three chunk exceeds the existing 500 kB
 warning threshold. GPU timing and memory were not measured; bounded allocations

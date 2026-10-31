@@ -125,7 +125,7 @@ export function createPresentationStudio(
   if (PRESENTATION_PRESET.fineShadowEdgesDefault) setFineShadowEdges(true);
   return {
     floor,
-    /** Soft blob under each cube; allocates nothing while off (default). */
+    /** Soft blob under each cube (default on); allocates nothing while off. */
     setContactShadow,
     /** Slightly warm key, cool fill lights; light colors only (default off). */
     setColorTemperature: lights.setColorTemperature,
