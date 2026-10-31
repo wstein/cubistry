@@ -159,13 +159,17 @@ Keeping symmetry out of the state means one state can be scored against
 different prints and fonts without re-encoding it, and the state count stays
 exact.
 
-**Open owner decision: is `0` quarter-turn-equal or half-turn-equal?** The code
+**Owner decision: `0` is half-turn-equal, under a font condition.** `0` counts
+as half-turn-equal (period 2) only where the chosen font's `0` is actually
+half-turn symmetric: no slash, dot, serif or other asymmetry. This is checked
+per font and per artwork. Where the condition fails, `0` gets a different period
+(4, asymmetric, unless the glyph shows another symmetry). The code currently
 treats `0` as equal under every quarter turn: `image_normal` returns the same key
 for `"0"` regardless of angle (`english/prepare_physical.jl:15` [V]; same rule in
-`orientation_screen.jl`). The owner described half-turn symmetry. V2's example
-also calls `0` half-turn symmetric. This is **undecided**. A quarter-turn-equal
-`0` enlarges every target set that contains a `0`, so any result that relies on
-it would need to be rechecked once this is decided.
+`orientation_screen.jl`). That treatment is therefore to be changed, and guarded
+by a font check. **This change is not implemented here.** Any existing result
+that relies on a quarter-turn-equal `0` is UNKNOWN until it is rechecked with the
+corrected rule.
 
 ## 4. Data model (opt-in picture mode)
 
@@ -232,8 +236,9 @@ equal  = [ ["6@2", "9@0"] ]         # per ink
 281 = ["31@0", "24@1"]
 ```
 
-The `period = { "0" = 1 }` entry encodes today's code behavior and is subject to
-the open decision in section 3.
+The `period = { "0" = 1 }` entry encodes today's code behavior. Under the owner
+decision in section 3 it becomes `"0" = 2` when the font check passes, and a
+different period otherwise.
 
 ## 5. Target model
 
@@ -342,23 +347,33 @@ overdetermined but an immediate baseline. Whether side-effect search beats
 | P7 | 4×4/5×5 center target-set stage | Partial targets with identity: replay correct; color targets byte-identical to today |
 | P8 | Print/move optimization (research) | Candidates only, each accepted independently |
 
-## Open owner decisions
+## Owner decisions
 
-1. **Should Cubacle adopt Orbit64 V2?** Cubacle supports V1 only today. V2 is a
-   draft and itself defers ports until its open items are done (section 2).
-   Until then, picture state in Cubacle needs a side field or a print + moves
-   form.
-2. **Is `0` quarter-turn-equal or half-turn-equal?** The code says quarter, the
-   owner described half (section 3). Undecided.
-3. Lift "no strict mode" only inside the opt-in picture mode?
-4. Which glyphs are quarter-turn-equal in general (today only `0`; `H`, `X`, `8`
-   only half)? Per sticker or per artwork?
-5. A shared metric for the calendar (single-layer HTM, rotations counted
+### Decided
+
+1. **Cubacle will adopt Orbit64 V2.** Cubacle supports V1 only today. The timing
+   and scope of the port still follow V2's own open items, since V2 is a draft
+   and defers ports until those are done (section 2). Until the port lands,
+   picture state in Cubacle needs a side field or a print + moves form.
+2. **`0` is half-turn-equal, but only where the chosen font's `0` is actually
+   half-turn symmetric** (no slash, dot or serif asymmetry). This is checked per
+   font and per artwork; otherwise `0` gets a different period. The code's
+   quarter-turn treatment of `0` (`english/prepare_physical.jl:15`,
+   `orientation_screen.jl`) is to be changed and guarded by a font check. That
+   change is not implemented here; results that rely on it are UNKNOWN until
+   rechecked (section 3).
+
+### Open
+
+1. Lift "no strict mode" only inside the opt-in picture mode?
+2. Which glyphs are quarter-turn-equal in general (`H`, `X`, `8` are only
+   half)? Per sticker or per artwork?
+3. A shared metric for the calendar (single-layer HTM, rotations counted
    separately?). Required before any comparison with 189.
-6. May the 7×7 solver use partial paths with a middle layer (= rotation + 6
+4. May the 7×7 solver use partial paths with a middle layer (= rotation + 6
    layers)?
-7. Priority: 3×3 twist (small, exact) before the 7×7 projection?
-8. Should Cubacle read Cubistry's `physical-print.tsv` directly (format binding)
+5. Priority: 3×3 twist (small, exact) before the 7×7 projection?
+6. Should Cubacle read Cubistry's `physical-print.tsv` directly (format binding)
    or use its own format with a converter?
 
 ## Connections
