@@ -1,0 +1,15 @@
+{
+  "name": "@puzlwerk/solver-3x3-picture",
+  "sources": [
+    {
+      "dir": "res/upstream",
+      "subdirs": true
+    }
+  ],
+  "package-specs": {
+    "module": "esmodule",
+    "in-source": true
+  },
+  "suffix": ".res.mjs",
+  "dependencies": []
+}
