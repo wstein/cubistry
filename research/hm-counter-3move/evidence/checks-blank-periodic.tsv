@@ -13,3 +13,7 @@ negative	claim	julia	REJECTED	claimed maximum edge HTM differs from replay
 negative	claim	flix	REJECTED	claimed maximum edge HTM differs from replay
 negative	boundary	julia	REJECTED	period boundary: state after preperiod+period must equal state after preperiod for M59
 negative	boundary	flix	REJECTED	period boundary: state after preperiod+period must equal state after preperiod for M59
+negative	tooshort	julia	REJECTED	period boundary: state after preperiod+period must equal state after preperiod for M59
+negative	tooshort	flix	REJECTED	period boundary: state after preperiod+period must equal state after preperiod for M59
+negative	toolong	julia	REJECTED	period is not minimal for M59
+negative	toolong	flix	REJECTED	period is not minimal for M59

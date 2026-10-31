@@ -13,3 +13,5 @@ negative	claim	julia	REJECTED	claimed maximum edge HTM differs from replay
 negative	claim	flix	REJECTED	claimed maximum edge HTM differs from replay
 negative	boundary	julia	REJECTED	preperiod and period must be whole laps
 negative	boundary	flix	REJECTED	preperiod and period must be whole laps
+negative	toolong	julia	REJECTED	period is not minimal for M59
+negative	toolong	flix	REJECTED	period is not minimal for M59
