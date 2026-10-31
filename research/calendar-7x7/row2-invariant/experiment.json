@@ -1,0 +1,193 @@
+{
+  "schema": "cubistry.calendar7.row2-endpoint-experiment.v1",
+  "status": "SAT",
+  "scope": "Seven exact physical row-2 sticker and cubie poses at month endpoints, existing immutable English calendar profile",
+  "printingDependencyCommit": "1bd783245abaa0d10946945be309e9fe8392d392",
+  "printingSHA256": "b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931",
+  "rawDAGSHA256": "ef2071eceb3f7e1934c4b67684613044e38d0446f16e86f4d0ba112ddc9f9f24",
+  "practicalChainDependencyCommit": "545e342b75d883e88159fd31d8acfcdee3b95f59",
+  "practicalChainSourceDirectory": "research/calendar-7x7/minimax/verification",
+  "monthDomain": [
+    2026,
+    2099
+  ],
+  "representativeStates": 91,
+  "calendarMonths": 888,
+  "practicalChains": 5,
+  "authority": [
+    "Julia",
+    "Flix"
+  ],
+  "intermediateRowImmobility": "NOT_CHECKED",
+  "completePractical887EdgeCoverage": "UNKNOWN",
+  "globalOptimality": "UNKNOWN",
+  "productionTypography": "NOT_CHECKED",
+  "statusScope": "Research-local: exact row-2 endpoint identities and poses in 91 legal states/888 target months and five explicit continuous chains (ten edges); conditional uniqueness of oriented weekday artwork",
+  "independentReview": "PENDING",
+  "canonicalProofRegistration": "NOT_CLAIMED",
+  "checkerSourceCommit": "81f30884df2240eb12d82b65f19d047ab38ab43a",
+  "rowSHA256": "2592f05dad652f99ad8f6bfed0cf77b86061747856edb6bf75bb63f7cbacb95a",
+  "practicalInputs": [
+    {
+      "name": "chain-1",
+      "sha256": "3394e630db10e8b6c9b1d9f166ea9eac9fe729a6aa5a7e98c1ce2b5788d7b653"
+    },
+    {
+      "name": "chain-2",
+      "sha256": "7dd5981ca947530d5ac796685180dbce12babcfda2c412a4009b92a4b461537d"
+    },
+    {
+      "name": "chain-3",
+      "sha256": "d72793f8df71d48195f02a5eea929206b03414c032a7580d256373c223f72861"
+    },
+    {
+      "name": "chain-4",
+      "sha256": "71060b20676211ed2a4619b0af13689c7650c7eae88e2c341739d4311876159c"
+    },
+    {
+      "name": "midge-recovery",
+      "sha256": "37bd95f71801096e87f483582b5bb2b69a2eaff37e2b44fba58888367a21f510"
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "evidence/flix-build.log",
+      "sha256": "97d6805bfd73310279281b681b8db50db2f345b2fccb179e1de41423cf41c7bc"
+    },
+    {
+      "path": "evidence/flix-full.tsv",
+      "sha256": "b8bebf7ffe6cdd690c5bcda6a3e534cafeb0e4928332fe564d107a3f3e03e051"
+    },
+    {
+      "path": "evidence/flix.tsv",
+      "sha256": "b91c6e485647fa5732c891dfb454365333f622d53fbec0d24e6f5c5c4f2a9a79"
+    },
+    {
+      "path": "evidence/julia.tsv",
+      "sha256": "b91c6e485647fa5732c891dfb454365333f622d53fbec0d24e6f5c5c4f2a9a79"
+    },
+    {
+      "path": "evidence/negative-controls/duplicate-column.flix.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/negative-controls/duplicate-column.flix.stdout",
+      "sha256": "668eae6e73ddeaeeea7b9c440e49b95a3b2ae23fdca0a227d21250cdcf174712"
+    },
+    {
+      "path": "evidence/negative-controls/duplicate-column.julia.stderr",
+      "sha256": "4332d74f1cb9c41adb8c32baedb19b50ac428bc3d1507b02e1a0126f64f22ca1"
+    },
+    {
+      "path": "evidence/negative-controls/duplicate-column.julia.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/negative-controls/duplicate-column.tsv",
+      "sha256": "4cf58da96adf1109a61516743aab6143b14d41cf1ddb8b37197f7287000e4d28"
+    },
+    {
+      "path": "evidence/negative-controls/results.tsv",
+      "sha256": "02ca95ea565414b2539e1c8162254665fb6c1f3c4955c54bcee9ce9b66a0f5ea"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-id.flix.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-id.flix.stdout",
+      "sha256": "df07c4eb91d20fc872285cdc8ebd04d060ddbecc59b02f28d8e53912e4a5ac48"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-id.julia.stderr",
+      "sha256": "455823b691c5b2868c9e84219824e62debf420cf8a053412e12db7608f649c6d"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-id.julia.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-id.tsv",
+      "sha256": "30a38c5030b2c0f444ac6e1f613f59c75d6cb68e583ac19869612f91011ff44d"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-row.flix.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-row.flix.stdout",
+      "sha256": "43ecd2e703d8fc1d471766e372700f9e5a4be186ed038f88606a0f555f52e26f"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-row.julia.stderr",
+      "sha256": "b1ed8d74298deacbdca0c9a86b44c29daf0a1a0315e3dc0c470713ea842bf8b3"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-row.julia.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-row.tsv",
+      "sha256": "db28e086a98c240c155b92f2645c287ea2c448e72058d0c4889c2fe5928de326"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-up.flix.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-up.flix.stdout",
+      "sha256": "43ecd2e703d8fc1d471766e372700f9e5a4be186ed038f88606a0f555f52e26f"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-up.julia.stderr",
+      "sha256": "b1ed8d74298deacbdca0c9a86b44c29daf0a1a0315e3dc0c470713ea842bf8b3"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-up.julia.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/negative-controls/wrong-up.tsv",
+      "sha256": "776b63c30dd96e955adc4f3a4ff597c6e7d76b48f4e30494f7c1bf1fae9bc0f4"
+    },
+    {
+      "path": "evidence/negative-results.tsv",
+      "sha256": "02ca95ea565414b2539e1c8162254665fb6c1f3c4955c54bcee9ce9b66a0f5ea"
+    }
+  ],
+  "checkerInputs": [
+    {
+      "path": "certificate.tsv",
+      "sha256": "0e90d0778bc59def9b3c6b724d779f55754bc988a99a437f19a0744b7073954e"
+    },
+    {
+      "path": "check.jl",
+      "sha256": "84a73bf3e0b1aa3a7e256f7a712f4312b680d5004c5af7759edaefaa34871c0e"
+    },
+    {
+      "path": "flix/src/Main.flix",
+      "sha256": "0e306038e1fc71a90c917b23a00a3091b28fc4b5c950d0a862d55363b08ceb17"
+    }
+  ],
+  "toolchain": {
+    "julia": "1.13.3",
+    "flix": "0.79.0",
+    "flixw": "0.34.9",
+    "java": "OpenJDK 21.0.12.1+1-1-deb13u1-Debian",
+    "verifiedFlixArtifactSHA256": "968e8cb2a47cf18837b01b9f31c66b138b2c0d91b4626e6d565484be77123ddb"
+  },
+  "borrowedNativeFlixSources": [
+    {
+      "path": "research/calendar-7x7/english/flix/src/Core.flix",
+      "sha256": "01719a6d01f9bb2021d51d621905571d2165c7540767729a66d04c9370935d5a"
+    },
+    {
+      "path": "research/calendar-7x7/english/flix/src/Data.flix",
+      "sha256": "e6dc0d3911deb93dae23c1220181d4a293582ee8183e31f3d0e7c40e208dbb7f"
+    },
+    {
+      "path": "research/calendar-7x7/english/flix/src/Dag.flix",
+      "sha256": "852ecf1c5f5f724e04c2eeb788c9426811d2404a8fd546a2f161f9ed0c816535"
+    }
+  ]
+}
