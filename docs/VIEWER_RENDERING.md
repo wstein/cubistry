@@ -106,9 +106,9 @@ unit pitch (0.5 times the size-2 ±1 lattice), retaining the approved 0.99-unit
 rounded outer shell and 0.055-unit bevels. The visible shell seam is 0.01 units.
 
 **Core ball (supersedes per-cubie box cores).** The former per-cubie plastic box
-cores are removed. Each cube has one static core ball at its center, radius
-`CORE_RADIUS_RATIO` (0.35) of the half cube edge, so a 3×3 keeps about one unit
-of distance to the surface. It follows the view group but never a layer turn or
+cores are removed. Each cube has one static core ball at its center, diameter
+`CORE_DIAMETER_RATIO` (0.4) of the full cube edge length, so a 3×3 has a 1.2-unit
+ball and keeps 0.9 units of distance to the surface. It follows the view group but never a layer turn or
 body frame. Consequence, owner-requested and measured with rays: the shell seams
 are no longer sealed behind the bevels, so frontal and slightly oblique rays
 through four-cubie junction lines can pass between bodies. The former tests for

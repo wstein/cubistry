@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import * as THREE from "three";
-import { PhysicalCubeScene, CORE_RADIUS_RATIO } from "../packages/cube-viewer/src/physical-scene.ts";
+import { PhysicalCubeScene, CORE_DIAMETER_RATIO } from "../packages/cube-viewer/src/physical-scene.ts";
 import { createPresentationGeometry } from "../packages/cube-viewer/src/presentation-preset.ts";
 import { createDesign } from "../src/apps/playground/model.ts";
 import { stickerPoses, initialState, presentMove, parseMove, FACE_LAYERS, applyMoves, parseAlg } from "@cubistry/cube-mechanics";
@@ -128,7 +128,8 @@ test("one static core ball sits at the cube center with a realistic distance to 
     const [core] = cores;
     assert.equal(core.parent, h.parent);
     assert.deepEqual(core.position.toArray(), [0, 0, 0]);
-    assert(Math.abs(core.scale.x - half * CORE_RADIUS_RATIO) < 1e-9); assert.equal(core.scale.x, core.scale.y); assert.equal(core.scale.x, core.scale.z);
+    assert(Math.abs(2 * core.scale.x - CORE_DIAMETER_RATIO * 2 * half) < 1e-9); // diameter = 40% of the edge
+    assert(Math.abs(2 * core.scale.x - .4 * 2 * half) < 1e-9); assert.equal(core.scale.x, core.scale.y); assert.equal(core.scale.x, core.scale.z);
     // The ball stays well inside: more than half the half-edge remains to the surface.
     assert(half - core.scale.x > half / 2);
     // A frontal ray through the center hits the ball for these even/odd centers alike.
