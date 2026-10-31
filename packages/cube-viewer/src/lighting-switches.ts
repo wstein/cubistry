@@ -33,7 +33,7 @@ function browserEnvironment(): LightingEnvironment {
   let storage: LightingEnvironment["storage"]; try { storage = localStorage; } catch { /* Private mode can deny access. */ }
   return { document, storage, pathname: location.pathname };
 }
-/** Adds "Contact shadow" and "Warm studio light" checkboxes to the shared
+/** Adds the "Contact shadow", "Warm studio light" and "Fine shadow edges" checkboxes to the shared
  * Appearance panel, applies the persisted (or default) state to the studio. */
 export function bindLightingSwitches(panel: HTMLElement, studio: LightingSwitchTarget, environment?: LightingEnvironment) {
   const env = environment ?? browserEnvironment(), key = lightingStorageKey(env.pathname);
