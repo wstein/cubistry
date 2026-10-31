@@ -16,17 +16,22 @@ export const PRESENTATION_PRESET = Object.freeze({
   maxPixelRatio: 2,
   shadowMapSize: 1024,
   shadowSoftness: 0.14,
-  shadowOpacity: 0.38,
+  shadowOpacity: 0.3,
   plasticClearcoat: 0.18,
   stickerClearcoat: 0.12,
   ambientIntensity: 0.3,
   hemisphereIntensity: 0.65,
+  /** Steep key (about 64 degrees above the horizon): shorter, rounder shadows. */
+  keyPosition: Object.freeze([1.5, 7, 3] as const),
   keyIntensity: 2.8,
   fillIntensity: 0.85,
   rimIntensity: 1.3,
   /** Second, weaker, softer shadow caster opposite the key (no per-cube maps). */
   shadowFillIntensity: 1.0,
-  shadowFillPosition: Object.freeze([-3.5, 6, 4] as const),
+  /** Shadow fill = key rotated about Y by this azimuth (negative x side), nearly coincident. */
+  shadowFillAzimuthDegrees: 25,
+  /** Elevation offset of the shadow fill relative to the key, in degrees. */
+  shadowFillElevationDelta: 0,
   /** World-space penumbra per half-cube extent; larger than shadowSoftness. */
   shadowFillSoftness: 0.18,
   /** PCF radius caps in texels: the fill may blur wider than the key. */
@@ -36,14 +41,18 @@ export const PRESENTATION_PRESET = Object.freeze({
   warmKeyColor: "#fff3e3",
   coolFillColor: "#eaf1ff",
   /** Optional soft blob directly under each cube; off unless switched on. */
-  contactShadowDefault: false,
+  contactShadowDefault: true,
   contactShadowColor: "#302b26",
   contactShadowOpacity: 0.5,
   /** Plane side as a multiple of the presentation radius (footprint of the blob). */
-  contactShadowScale: 2.6,
+  contactShadowScale: 2.2,
   /** Height above the receiver, avoiding z-fighting with the shadow floor. */
   contactShadowLift: 0.004,
   contactShadowTextureSize: 64,
+  /** Opt-in: larger shadow maps and a slightly harder, cleaner edge. */
+  fineShadowEdgesDefault: false,
+  fineShadowMapSize: 2048,
+  fineShadowSoftnessScale: 0.65,
   shadowFillRadiusMax: 32,
   /** Darkness weight of the shadow fill's shadow (LightShadow.intensity). */
   shadowFillShadowIntensity: 0.55,
@@ -99,8 +108,21 @@ export function configurePresentationRenderer(renderer: THREE.WebGLRenderer): vo
 }
 /** Radius in shadow-map texels giving a world-space penumbra of `softness`. */
 export function shadowRadiusTexels(softness: number, frustumWidth: number,
-  max: number = PRESENTATION_PRESET.shadowRadiusMax): number {
-  return Math.max(2, Math.min(max, softness * PRESENTATION_PRESET.shadowMapSize / frustumWidth));
+  max: number = PRESENTATION_PRESET.shadowRadiusMax, mapSize: number = PRESENTATION_PRESET.shadowMapSize): number {
+  // The texel caps are defined at the base map size; scale them so the
+  // world-space limit stays the same for other map sizes.
+  return Math.max(2, Math.min(max * mapSize / PRESENTATION_PRESET.shadowMapSize, softness * mapSize / frustumWidth));
+}
+/** Position of the shadow fill: the key rotated about Y by the (negative) azimuth,
+ * keeping its distance, with an optional elevation offset. */
+export function shadowFillPositionFromKey(key: readonly [number, number, number],
+  azimuthDegrees: number = PRESENTATION_PRESET.shadowFillAzimuthDegrees,
+  elevationDelta: number = PRESENTATION_PRESET.shadowFillElevationDelta): [number, number, number] {
+  const horizontal = Math.hypot(key[0], key[2]), length = Math.hypot(key[0], key[1], key[2]);
+  const azimuth = Math.atan2(key[0], key[2]) - THREE.MathUtils.degToRad(azimuthDegrees);
+  const elevation = Math.atan2(key[1], horizontal) + THREE.MathUtils.degToRad(elevationDelta);
+  return [length * Math.cos(elevation) * Math.sin(azimuth), length * Math.sin(elevation),
+    length * Math.cos(elevation) * Math.cos(azimuth)];
 }
 function configureShadowCaster(light: THREE.DirectionalLight, shadowExtent: number, softness: number,
   maxRadius: number = PRESENTATION_PRESET.shadowRadiusMax) {
@@ -131,11 +153,11 @@ export function addPresentationLighting(scene: THREE.Scene | THREE.Group, shadow
     light.position.set(position[0], position[1], position[2]);
     return add(light);
   };
-  const key = directional([3, 5, 6], p.keyIntensity);
+  const key = directional(p.keyPosition, p.keyIntensity);
   configureShadowCaster(key, shadowExtent, softness);
   const fill = directional([-4, 1, 2], p.fillIntensity);
   const rim = directional([1, 3, -4], p.rimIntensity);
-  const shadowFill = directional(p.shadowFillPosition, p.shadowFillIntensity);
+  const shadowFill = directional(shadowFillPositionFromKey(p.keyPosition), p.shadowFillIntensity);
   configureShadowCaster(shadowFill, shadowExtent, softness * p.shadowFillSoftness / p.shadowSoftness,
     p.shadowFillRadiusMax);
   shadowFill.shadow.intensity = p.shadowFillShadowIntensity;
