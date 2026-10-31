@@ -45,11 +45,14 @@ suspended tab or wall-clock jump is a free jump: a least route to the current
 time (at most six HTM) that prefers a period node. Otherwise it prefers a pose
 whose next step needs at most five HTM. The following ticks then recover onto
 the period. Each tick shows the next value and costs at most five HTM. The
-only exception is a pose with no such step, which M and H can reach after a
-direction change following a jump or Set (forced six-HTM steps; see
-[the HSM counter](HSM_COUNTER.md#largest-step-per-mode)). The jump avoids such
-poses for its own direction, and S never has one. The research bounds the
-return at six steps for seconds and hours (00–23) and seven for minutes:
+only exception is a pose with no such step. The jump avoids such poses for its
+own counting direction, and the live clock always counts up; the exhaustive
+runs of jumps from period nodes found no six-HTM step without a direction
+change. In the HSM app, M and H can reach them after a direction
+change following a jump or Set (forced six-HTM steps; see
+[the HSM counter](HSM_COUNTER.md#largest-step-per-mode)); S never has one. The
+research bounds the return at six steps for seconds and hours (00–23) and
+seven for minutes:
 seconds are back within six ticks, minutes within seven minutes, and hours
 within six hours. Measured returns usually take three or four steps.
 A test pins the seconds' return after a 40-second catch-up. See
