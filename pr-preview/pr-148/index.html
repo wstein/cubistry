@@ -6,21 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Counter</title>
-    <script type="module" crossorigin src="/cubistry/pr-preview/pr-148/assets/counter-BfCTvFgN.js"></script>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-148/assets/counter-DZl_lBqS.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/link-DR-RiidG.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/three-BW9MzyAf.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/presentation-rotation-BmjvdG6T.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-B2IVHwR3.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/playback-C4vR7QeL.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-fBBdAZHD.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/lettering-BHxKj03g.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/puzlwerk-2x2-Obxr_4dL.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/design-Dr4cJDiZ.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-BLvcFufp.js">
-    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-148/assets/style-CgYglJr5.css">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/presentation-rotation-d7NBVBNt.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-tWYEeQQG.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/playback-Dhx6CrAP.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-iS2N_EGN.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/lettering-iV0Xkqfo.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/puzlwerk-2x2-Dknq1ATY.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/design-DDo84Dml.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-CGSHO2d7.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-148/assets/style-Dr7klpq2.css">
   </head>
-  <body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #148 — non-production preview · fd047813a006</aside>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #148 — non-production preview · 426313c97904</aside>
     <main>
       <header>
         <a class="brand" href="./" aria-label="Cubistry counter home"
@@ -146,6 +146,15 @@
           aria-label="Counter controls"
         >
           <h1>Counter</h1>
+          <label for="counter-print">Sticker print</label>
+          <select id="counter-print" aria-describedby="print-note">
+            <option value="titled" selected>COUNTER title (default)</option>
+            <option value="blank-top">Blank top 00–99</option>
+          </select>
+          <p id="print-note" class="small">
+            Choose the print that matches your stickers. Changing it installs
+            the other cube at the current value and restarts session moves.
+          </p>
           <form id="jump-form">
             <label for="value">Target 0–99</label>
             <input
@@ -183,9 +192,13 @@
               ><input id="format" type="checkbox" checked /> Leading Zero</label
             >
           </div>
-          <p class="small">
+          <p id="format-note" class="small">
             Leading Zero shows or hides only the leading 0. The layout, value,
             and moves stay the same.
+          </p>
+          <p id="mode-switch" class="small" hidden>
+            Setup moves (mode switches, not counted in session moves):
+            <output id="setup-moves" aria-label="Setup moves (HTM)">0</output>
           </p>
         </aside>
         <aside
