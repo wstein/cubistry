@@ -1,0 +1,13 @@
+receipts	IDENTICAL	3ba4ecfaaa3c499b4fe0b22433484b613d4aa4c09e5311e8e15030e2fa697c93
+negative	glyph	julia	REJECTED	wrong glyph at cell 2 for M00 after setup
+negative	glyph	flix	REJECTED	wrong glyph at cell 2 for M00 after setup
+negative	up	julia	REJECTED	glyph not upright at cell 4 for M00 after setup
+negative	up	flix	REJECTED	glyph not upright at cell 4 for M00 after setup
+negative	move	julia	REJECTED	wrong glyph at cell 2 for M 5->6
+negative	move	flix	REJECTED	wrong glyph at cell 2 for M 5->6
+negative	lowerbound	julia	REJECTED	claimed lower bound differs for H 7->8
+negative	lowerbound	flix	REJECTED	claimed lower bound differs for H 7->8
+negative	claim	julia	REJECTED	claimed maximum edge HTM differs from replay
+negative	claim	flix	REJECTED	claimed maximum edge HTM differs from replay
+negative	truncated	julia	REJECTED	word shorter than graph distance for M 59->0
+negative	truncated	flix	REJECTED	word shorter than graph distance for M 59->0
