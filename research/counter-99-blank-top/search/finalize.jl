@@ -2,16 +2,16 @@
 # Finds exact closed cycles for LZ and NZ on one print, rebases the print so that the LZ
 # start state is the printed solved state, and writes checker inputs.
 include(joinpath(@__DIR__, "export.jl"))
-lab = parse.(Int, split(ARGS[1], ",")); seed = parse(UInt64, ARGS[2]); out = ARGS[3]
+include(joinpath(@__DIR__, "exact.jl"))
+lab = parse.(Int, split(ARGS[1], ",")); out = ARGS[3]
+seed = ARGS[2] == "auto" ? minimum(allstates(lab, 0, :lz)) : parse(UInt64, ARGS[2])
 ntry = length(ARGS) >= 4 ? parse(Int, ARGS[4]) : 30
 W = buildwords(5)
 res = Dict{Symbol,Any}()
 for mode in (:lz, :nz)
     if mode == :nz
-        # seed for NZ: nearest state showing "_0" from the LZ seed
-        out_ = Tuple{UInt64,Int32}[]; succ!(out_, W, lab, seed, 0, :B, 5, :nz)
-        isempty(out_) && (println("nz: no seed within 5"); continue)
-        s = first(out_[argmin([W.len[x[2]] for x in out_])])
+        # seed for NZ: any legal state showing "_0" (the DP widens it anyway)
+        s = minimum(allstates(lab, 0, :nz))
     else
         s = seed
     end
