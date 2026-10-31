@@ -5,7 +5,7 @@ import { Quaternion, Vector3 } from "three";
 export const ROTATION_TUNING = Object.freeze({
   dampingSeconds: .24, stopSpeed: .03, maximumSpeed: 6, velocityFilterSeconds: .04,
   staleReleaseSeconds: .1, toleranceRadians: 35 * Math.PI / 180,
-  // Return to the front view: wait returnDelay(distance) after settling (long near the
+  // Return to the remembered target (default view, then the last accepted view): wait returnDelay(distance) after settling (long near the
   // tolerance, short when stretched far), then a soft-start critically damped
   // response (rate in 1/s): offset x(t) = x0 e^(-rt) (1 + rt + (rt)^2/2) has zero speed
   // and acceleration at the start, speed proportional to distance, no fixed duration.
@@ -220,14 +220,14 @@ export class SmartRotation {
       this.settle(this.levelAt + this.levelDuration);
     }
     if (this.phaseValue === "awaiting-return" && this.returnAt !== null && at >= this.returnAt) {
-      // Offsets from the front view; yaw takes the shortest way round.
+      // Offsets from the target view; yaw takes the shortest way round.
       this.returnYawTarget = this.yaw + wrap(this.anchorYaw - this.yaw);
       this.returnPitch = this.pitch - this.anchorPitch; this.returnYaw = this.yaw - this.returnYawTarget;
       this.phaseValue = "returning";
     }
     if (this.phaseValue === "returning" && this.returnAt !== null) {
       // Analytic soft-start critically damped return: x(t) = x0 e^(-rt) (1 + rt + (rt)^2/2).
-      // It is frame-rate independent and never overshoots the front view.
+      // It is frame-rate independent and never overshoots the target view.
       const r = ROTATION_TUNING.returnRate, t = Math.max(0, at - this.returnAt);
       const remaining = Math.exp(-r * t) * (1 + r * t + (r * t) ** 2 / 2);
       this.pitch = this.anchorPitch + this.returnPitch * remaining;
