@@ -58,7 +58,7 @@ controls=(
   "up|glyph not upright at cell 4 for M00 after setup"
   "nonblank-ul|upper-left cell must show a blank sticker at M00 after setup"
   "hidden-glyph|claimed lower bound differs for M edge 7 (7->8)"
-  "move|for M edge 5 (5->6)"
+  "move|M edge 5 (5->6)"
   "lowerbound-high|claimed lower bound differs for S edge 7 (7->8)"
   "lowerbound-low|claimed lower bound differs for S edge 7 (7->8)"
   "claim|claimed maximum edge HTM differs from replay"
