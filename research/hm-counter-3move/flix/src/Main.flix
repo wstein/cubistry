@@ -1,5 +1,10 @@
-// Native Flix checker for the H/M counter witness (cubistry.hm-counter.v1).
-// Written independently of the Julia checker and of the generator. It turns
+// Native Flix checker for the H/M counter witness (cubistry.hm-counter.v1/v2).
+// Shares no code with the generator. It is a structural port of the Julia
+// checker (checker/check.jl): same decomposition, turn formula, graph search,
+// lower-bound enumeration and reject strings, re-implemented in Flix. It is
+// therefore an independent implementation of the same design, not an
+// independent design; see the README section "Checker independence" for the
+// common-mode risks this leaves. It turns
 // every sticker frame with integer Rodrigues quarter turns, replays setups,
 // increments, exact inverse decrements and the 11->00 reset, checks exact
 // full-state closure, and rebuilds the tracked front-sticker graph (3 tracked
@@ -7,13 +12,14 @@
 import java.lang.{Exception,System,IllegalArgumentException}
 import java.io.File
 import java.nio.file.Files
+import java.nio.charset.CharacterCodingException
 import java.security.MessageDigest
 import java.util.HexFormat
 
 type alias Vec = (Int32,Int32,Int32)
 type alias Pose = (Vec,Vec,Vec)
 type alias Mv = (Int32,Int32,Int32)
-enum Stk with Eq { case S(Int32,Int32,Vec,Vec,Vec,Char) }
+enum Stk with Eq, Order { case S(Int32,Int32,Vec,Vec,Vec,Char) }
 
 def require(ok: Bool,reason: String): Unit \ IO = if(ok) () else throw new IllegalArgumentException(reason)
 def readBytes(path: String): Array[Int8,Static] \ IO = Files.readAllBytes(new File(path).toPath())
@@ -22,21 +28,41 @@ def at(xs: List[a],i: Int32): a \ IO = match xs {
     case x::rest => if(i==0) x else at(rest,i-1)
     case Nil => throw new IllegalArgumentException("list index")
 }
-def digits(s: String): Bool = String.length(s)>0 and List.forAll(c -> c>='0' and c<='9',String.toList(s))
-def natural(s: String): Int32 \ IO = {
-    require(digits(s) and String.length(s)<=6,"integer field");
-    match Int32.fromString(s) {
-        case Some(n) => n
-        case None => throw new IllegalArgumentException("integer field")
-    }
+// One integer grammar for every numeric field, the same in the Julia checker:
+// a natural number is "0" or a nonzero ASCII digit followed by at most five
+// ASCII digits (no sign, no leading zeros, no spaces, at most 6 digits); a
+// signed integer is a natural number or "-" followed by a nonzero natural.
+// Anything else is rejected with "malformed number in <field>".
+def isDigit(c: Char): Bool = c>='0' and c<='9'
+def naturalSyntax(cs: List[Char]): Bool = match cs {
+    case '0'::Nil => true
+    case c::rest => c>='1' and c<='9' and List.length(rest)<=5 and List.forAll(isDigit,rest)
+    case Nil => false
 }
-def signed(s: String): Int32 \ IO = match String.toList(s) {
-    case '-'::rest => 0-natural(List.foldLeft((a,c) -> a+"${c}","",rest))
-    case _ => natural(s)
+def toInt(s: String,what: String): Int32 \ IO = match Int32.fromString(s) {
+    case Some(n) => n
+    case None => throw new IllegalArgumentException("malformed number in "+what)
+}
+def natural(s: String,what: String): Int32 \ IO = {
+    require(naturalSyntax(String.toList(s)),"malformed number in "+what);
+    toInt(s,what)
+}
+def signed(s: String,what: String): Int32 \ IO = {
+    let ok=match String.toList(s) {
+        case '-'::rest => rest != '0'::Nil and naturalSyntax(rest)
+        case cs => naturalSyntax(cs)
+    };
+    require(ok,"malformed number in "+what);
+    toInt(s,what)
 }
 def vec(s: String): Vec \ IO = match String.splitOn(substr=",",s) {
-    case x::y::z::Nil => (signed(x),signed(y),signed(z))
+    case x::y::z::Nil => (signed(x,"vector component"),signed(y,"vector component"),signed(z,"vector component"))
     case _ => throw new IllegalArgumentException("vector arity")
+}
+// a missing row reads as "" (real rows are never empty), as in the Julia checker
+def rowAt(rows: List[String],i: Int32): String = match List.drop(i,rows) {
+    case r::_ => r
+    case Nil => ""
 }
 def dot(a: Vec,b: Vec): Int32 = match (a,b) { case ((x,y,z),(u,v,w)) => x*u+y*v+z*w }
 def cross(a: Vec,b: Vec): Vec = match (a,b) { case ((x,y,z),(u,v,w)) => (y*w-z*v,z*u-x*w,x*v-y*u) }
@@ -113,6 +139,7 @@ def checkShow(st: List[Stk],want: List[Char],what: String): Unit \ IO =
 
 def readSticker(row: String): Stk \ IO = match String.splitOn(substr="\t",row) {
     case "sticker"::i::c::ps::ns::us::gs::Nil => {
+        let id=natural(i,"sticker id");let cubie=natural(c,"cubie id");
         let p=vec(ps);let n=vec(ns);let u=vec(us);
         require(List.forAll(a -> Int32.abs(comp(p,a))==1,List.range(0,3)),"corner position");
         require(unitVec(n) and unitVec(u) and dot(p,n)==1 and dot(n,u)==0,"outward tangent frame");
@@ -120,7 +147,7 @@ def readSticker(row: String): Stk \ IO = match String.splitOn(substr="\t",row) {
             case ch::Nil => {require(List.memberOf(ch,String.toList("HMS0123456789_")),"glyph alphabet");ch}
             case _ => {require(false,"glyph alphabet");' '}
         };
-        Stk.S(natural(i),natural(c),p,n,u,g)
+        Stk.S(id,cubie,p,n,u,g)
     }
     case _ => throw new IllegalArgumentException("sticker row shape")
 }
@@ -246,8 +273,9 @@ def runChain(rows: List[String],letter: Char,n: Int32,blank: Bool,st0: List[Stk]
                     case "edge"::l::a::b::wt::lbt::Nil => {
                         require(l=="${letter}" and a=="${v}" and b=="${nv}","edge row ${letter} ${v}");
                         let w=parseWord(wt);
+                        let claimed=natural(lbt,"lower bound");
                         let lb=lowerBound(k,maps,dist,s,wanted(letter,nv,blank));
-                        require(natural(lbt)==lb,"claimed lower bound differs for ${letter} ${v}->${nv}");
+                        require(claimed==lb,"claimed lower bound differs for ${letter} ${v}->${nv}");
                         require(List.length(w)>=lb,"word shorter than graph distance for ${letter} ${v}->${nv}");
                         let nxt=doWord(s,w);
                         checkShow(nxt,wanted(letter,nv,blank),"${letter} ${v}->${nv}");
@@ -285,9 +313,10 @@ def runChain(rows: List[String],letter: Char,n: Int32,blank: Bool,st0: List[Stk]
         case r::more => match fieldsOf(r) {
             case "reset"::"H"::"11"::"0"::wt::lbt::Nil => {
                 let w=parseWord(wt);
+                let claimed=natural(lbt,"lower bound");
                 let h11=at(fstates,11);
                 let lb=lowerBound(k,maps,dist,h11,wanted('H',0,blank));
-                require(natural(lbt)==lb,"claimed reset lower bound differs");
+                require(claimed==lb,"claimed reset lower bound differs");
                 let after=doWord(h11,w);
                 checkShow(after,wanted('H',0,blank),"reset 11->00");
                 require(after==start,"reset 11->00 must reach the exact H00 start state");
@@ -300,21 +329,32 @@ def runChain(rows: List[String],letter: Char,n: Int32,blank: Bool,st0: List[Stk]
     } else (out,ls,rest)
 }
 
+// claim row, then exactly one final "end" row (same order as the Julia checker)
+def checkClaimEnd(rest: List[String],mx: Int32): Unit \ IO = {
+    match fieldsOf(rowAt(rest,0)) {
+        case "claim"::"maxEdgeHTM"::v::Nil => require(natural(v,"claim")==mx,"claimed maximum edge HTM differs from replay")
+        case _ => throw new IllegalArgumentException("claim row")
+    };
+    require(List.drop(1,rest)=="end"::Nil,"end row")
+}
+
 def validate(path: String): String \ IO = {
     let bytes=readBytes(path);
-    let text=Files.readString(new File(path).toPath());
+    let text=try Files.readString(new File(path).toPath()) catch {
+        case _: CharacterCodingException => throw new IllegalArgumentException("invalid UTF-8")
+    };
     require(not String.contains(substr="\r",text),"CR forbidden");
     require(String.endsWith(suffix="\n",text),"final LF required");
     let rows=String.splitOn(substr="\n",String.dropRight(1,text));
     require(List.forAll(r -> r != "",rows),"empty line");
-    if(at(rows,0)=="cubistry.hm-counter.v2") validate2(rows,bytes) else {
-    require(at(rows,0)=="cubistry.hm-counter.v1","schema header");
-    let blank=match fieldsOf(at(rows,1)) {
+    if(rowAt(rows,0)=="cubistry.hm-counter.v2") validate2(rows,bytes) else {
+    require(rowAt(rows,0)=="cubistry.hm-counter.v1","schema header");
+    let blank=match fieldsOf(rowAt(rows,1)) {
         case "profile"::"free"::Nil => false
         case "profile"::"blank"::Nil => true
         case _ => throw new IllegalArgumentException("profile row")
     };
-    require(at(rows,2)=="letters\tHM","letters row must be exactly HM");
+    require(rowAt(rows,2)=="letters\tHM","letters row must be exactly HM");
     let st0=readPrint(List.slice(start=3,end=27,rows));
     if(blank) require(List.exists(x -> match x { case Stk.S(_,_,_,_,_,g) => g=='_' },st0),"blank profile needs a blank sticker") else ();
     let k=if(blank) 4 else 3;
@@ -327,13 +367,7 @@ def validate(path: String): String \ IO = {
     let all=List.append(mLens,hLens);
     let mx=List.foldLeft((a,b) -> Int32.max(a,b),0,all);
     let total=List.foldLeft((a,b) -> a+b,0,all);
-    match rest2 {
-        case c::"end"::Nil => match fieldsOf(c) {
-            case "claim"::"maxEdgeHTM"::v::Nil => require(natural(v)==mx,"claimed maximum edge HTM differs from replay")
-            case _ => throw new IllegalArgumentException("claim row")
-        }
-        case _ => throw new IllegalArgumentException("claim row")
-    };
+    checkClaimEnd(rest2,mx);
     let header=List#{"cubistry.hm-counter.receipt.v1","witness-sha256\t"+sha256(bytes),"profile\t"+(if(blank) "blank" else "free"),graphLine};
     let tail=List#{"transitions\t${List.length(all)}\ttotal\t${total}\tmax\t${mx}\thist\t${histText(all)}","verdict\tACCEPT"};
     String.intercalate("\n",List.append(List.append(List.append(header,mOut),hOut),tail))
@@ -362,7 +396,9 @@ def runMode(rows: List[String],letter: Char,range: Int32,st0: List[Stk],
         case r::more => match fieldsOf(r) {
             case "mode"::l::rg::w::ps::qs::Nil => {
                 require(l=="${letter}" and rg=="${range}","mode row ${letter} ${range}");
-                (w,natural(ps),natural(qs),more)
+                let pp=natural(ps,"preperiod");
+                let qq=natural(qs,"period");
+                (w,pp,qq,more)
             }
             case _ => throw new IllegalArgumentException("mode row ${letter} ${range}")
         }
@@ -381,8 +417,9 @@ def runMode(rows: List[String],letter: Char,range: Int32,st0: List[Stk],
                     case "step"::l::rg::a::b::wt::lbt::Nil => {
                         require(l=="${letter}" and rg=="${range}" and a=="${v}" and b=="${nv}","step row ${letter}${range} ${j}");
                         let w=parseWord(wt);
+                        let claimed=natural(lbt,"lower bound");
                         let lb=lowerBound(4,maps,dist,s,wanted(letter,nv,true));
-                        require(natural(lbt)==lb,"claimed lower bound differs for ${letter}${range} step ${j}");
+                        require(claimed==lb,"claimed lower bound differs for ${letter}${range} step ${j}");
                         require(List.length(w)>=lb,"word shorter than graph distance for ${letter}${range} step ${j}");
                         let nxt=doWord(s,w);
                         checkShow(nxt,wanted(letter,nv,true),"${letter}${range} step ${j}");
@@ -399,6 +436,10 @@ def runMode(rows: List[String],letter: Char,range: Int32,st0: List[Stk],
     let fwords=List.toVector(List.reverse(words));
     require(Vector.get(p+q,fstates)==Vector.get(p,fstates),"period boundary: state after preperiod+period must equal state after preperiod for ${letter}${range}");
     List.forEach(j -> require(Vector.get(p+j,fstates) != Vector.get(p,fstates),"period is not minimal for ${letter}${range}"),List.map(k -> k*n,List.range(1,q/n)));
+    // distinct-state rule: the Q full states before the period steps are
+    // pairwise distinct (one successor word per period state); preperiod
+    // states are excluded because P is a whole number of laps
+    require(Set.size(Vector.toSet(Vector.slice(start=p,end=p+q,fstates)))==q,"full state repeats within the period for ${letter}${range}");
     let _ = List.foldLeft((s,j) -> {
         let d=doWord(s,invWord(Vector.get(j,fwords)));
         require(d==Vector.get(j,fstates),"exact full-state decrement replay ${letter}${range}");
@@ -423,8 +464,8 @@ def runMode(rows: List[String],letter: Char,range: Int32,st0: List[Stk],
 }
 
 def validate2(rows: List[String],bytes: Array[Int8,Static]): String \ IO = {
-    require(at(rows,1)=="profile\tblank","v2 requires the blank profile");
-    require(at(rows,2)=="letters\tHM","letters row must be exactly HM");
+    require(rowAt(rows,1)=="profile\tblank","v2 requires the blank profile");
+    require(rowAt(rows,2)=="letters\tHM","letters row must be exactly HM");
     let st0=readPrint(List.slice(start=3,end=27,rows));
     require(List.exists(x -> match x { case Stk.S(_,_,_,_,_,g) => g=='_' },st0),"blank profile needs a blank sticker");
     let (maps,dist)=buildGraph(4);
@@ -438,13 +479,7 @@ def validate2(rows: List[String],bytes: Array[Int8,Static]): String \ IO = {
     let pre=List.append(List.append(pre1,pre2),pre3);
     let mxOf=xs -> List.foldLeft((a,b) -> Int32.max(a,b),0,xs);
     let m=Int32.max(mxOf(per),mxOf(pre));
-    match r3 {
-        case c::"end"::Nil => match fieldsOf(c) {
-            case "claim"::"maxEdgeHTM"::v::Nil => require(natural(v)==m,"claimed maximum edge HTM differs from replay")
-            case _ => throw new IllegalArgumentException("claim row")
-        }
-        case _ => throw new IllegalArgumentException("claim row")
-    };
+    checkClaimEnd(r3,m);
     let header=List#{"cubistry.hm-counter.receipt.v2","witness-sha256\t"+sha256(bytes),"profile\tblank",graphLine};
     let tail=List#{"edges\tperiod\t${List.length(per)}\tmax\t${mxOf(per)}\thist\t${histText(per)}\tpreperiod\t${List.length(pre)}\tmax\t${mxOf(pre)}\thist\t${histText(pre)}","verdict\tACCEPT"};
     String.intercalate("\n",List.append(List.append(List.append(List.append(header,o1),o2),o3),tail))

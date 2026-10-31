@@ -1,0 +1,58 @@
+malformed	claim-plus	julia	REJECTED	malformed number in claim
+malformed	claim-plus	flix	REJECTED	malformed number in claim
+malformed	claim-space	julia	REJECTED	malformed number in claim
+malformed	claim-space	flix	REJECTED	malformed number in claim
+malformed	claim-trail	julia	REJECTED	malformed number in claim
+malformed	claim-trail	flix	REJECTED	malformed number in claim
+malformed	claim-hex	julia	REJECTED	malformed number in claim
+malformed	claim-hex	flix	REJECTED	malformed number in claim
+malformed	claim-exp	julia	REJECTED	malformed number in claim
+malformed	claim-exp	flix	REJECTED	malformed number in claim
+malformed	claim-empty	julia	REJECTED	malformed number in claim
+malformed	claim-empty	flix	REJECTED	malformed number in claim
+malformed	claim-suffix	julia	REJECTED	malformed number in claim
+malformed	claim-suffix	flix	REJECTED	malformed number in claim
+malformed	claim-lead0	julia	REJECTED	malformed number in claim
+malformed	claim-lead0	flix	REJECTED	malformed number in claim
+malformed	claim-pad7	julia	REJECTED	malformed number in claim
+malformed	claim-pad7	flix	REJECTED	malformed number in claim
+malformed	claim-pad20	julia	REJECTED	malformed number in claim
+malformed	claim-pad20	flix	REJECTED	malformed number in claim
+malformed	claim-overflow	julia	REJECTED	malformed number in claim
+malformed	claim-overflow	flix	REJECTED	malformed number in claim
+malformed	claim-negative	julia	REJECTED	malformed number in claim
+malformed	claim-negative	flix	REJECTED	malformed number in claim
+malformed	lb-pad7	julia	REJECTED	malformed number in lower bound
+malformed	lb-pad7	flix	REJECTED	malformed number in lower bound
+malformed	lb-plus	julia	REJECTED	malformed number in lower bound
+malformed	lb-plus	flix	REJECTED	malformed number in lower bound
+malformed	preperiod-pad7	julia	REJECTED	malformed number in preperiod
+malformed	preperiod-pad7	flix	REJECTED	malformed number in preperiod
+malformed	period-lead0	julia	REJECTED	malformed number in period
+malformed	period-lead0	flix	REJECTED	malformed number in period
+malformed	id-pad7	julia	REJECTED	malformed number in sticker id
+malformed	id-pad7	flix	REJECTED	malformed number in sticker id
+malformed	cubie-plus	julia	REJECTED	malformed number in cubie id
+malformed	cubie-plus	flix	REJECTED	malformed number in cubie id
+malformed	vec-negzero	julia	REJECTED	malformed number in vector component
+malformed	vec-negzero	flix	REJECTED	malformed number in vector component
+malformed	vec-plus	julia	REJECTED	malformed number in vector component
+malformed	vec-plus	flix	REJECTED	malformed number in vector component
+malformed	truncated-file	julia	REJECTED	step row M59 32
+malformed	truncated-file	flix	REJECTED	step row M59 32
+malformed	truncated-print	julia	REJECTED	exactly 24 sticker rows
+malformed	truncated-print	flix	REJECTED	exactly 24 sticker rows
+malformed	no-end	julia	REJECTED	end row
+malformed	no-end	flix	REJECTED	end row
+malformed	extra-end	julia	REJECTED	end row
+malformed	extra-end	flix	REJECTED	end row
+malformed	invalid-utf8	julia	REJECTED	invalid UTF-8
+malformed	invalid-utf8	flix	REJECTED	invalid UTF-8
+malformed	v1-lb-lead0	julia	REJECTED	malformed number in lower bound
+malformed	v1-lb-lead0	flix	REJECTED	malformed number in lower bound
+malformed	v1-reset-space	julia	REJECTED	malformed number in lower bound
+malformed	v1-reset-space	flix	REJECTED	malformed number in lower bound
+malformed	v1-claim-plus	julia	REJECTED	malformed number in claim
+malformed	v1-claim-plus	flix	REJECTED	malformed number in claim
+malformed	v1-truncated-file	julia	REJECTED	edge row M 32
+malformed	v1-truncated-file	flix	REJECTED	edge row M 32
