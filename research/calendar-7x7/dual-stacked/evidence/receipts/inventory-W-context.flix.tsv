@@ -1,0 +1,15 @@
+stacked-orbit	W	context	-3	-3	19	3	24	2
+stacked-orbit	W	context	-3	-2	15	2	24	7
+stacked-orbit	W	context	-3	-1	21	2	24	1
+stacked-orbit	W	context	-3	0	18	2	24	4
+stacked-orbit	W	context	-3	1	22	2	24	0
+stacked-orbit	W	context	-3	2	19	1	24	4
+stacked-orbit	W	context	-2	-2	16	0	24	8
+stacked-orbit	W	context	-2	-1	21	1	24	2
+stacked-orbit	W	context	-2	0	20	0	24	4
+stacked-orbit	W	context	-2	1	18	1	24	5
+stacked-orbit	W	context	-1	-1	21	2	24	1
+stacked-orbit	W	context	-1	0	21	1	24	2
+stacked-orbit	W	context	0	0	6	0	6	0
+stacked-core-cell	W	10,11,5,6,7,8,9
+stacked-inventory	W	context	237	NOT_OBSTRUCTED	0

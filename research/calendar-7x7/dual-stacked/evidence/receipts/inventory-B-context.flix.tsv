@@ -1,0 +1,15 @@
+stacked-orbit	B	context	-3	-3	18	3	24	3
+stacked-orbit	B	context	-3	-2	15	2	24	7
+stacked-orbit	B	context	-3	-1	21	2	24	1
+stacked-orbit	B	context	-3	0	18	2	24	4
+stacked-orbit	B	context	-3	1	20	2	24	2
+stacked-orbit	B	context	-3	2	19	1	24	4
+stacked-orbit	B	context	-2	-2	15	0	24	9
+stacked-orbit	B	context	-2	-1	21	1	24	2
+stacked-orbit	B	context	-2	0	20	0	24	4
+stacked-orbit	B	context	-2	1	17	1	24	6
+stacked-orbit	B	context	-1	-1	22	2	24	0
+stacked-orbit	B	context	-1	0	22	1	24	1
+stacked-orbit	B	context	0	0	6	0	6	0
+stacked-core-cell	B	10,11,5,6,7,8,9
+stacked-inventory	B	context	234	NOT_OBSTRUCTED	0

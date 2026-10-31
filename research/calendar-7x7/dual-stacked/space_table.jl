@@ -1,7 +1,7 @@
 #!/usr/bin/env julia
 # Descriptive listing (not a proof): piece type behind every front cell of the
 # repository's lattice model, and the same-column cell pairs seven days apart.
-# Centres are named by their rotation orbit key (x,y) on the front face; (-2,-1)
+# Centers are named by their rotation orbit key (x,y) on the front face; (-2,-1)
 # and (-2,1) are the two mirror-image oblique orbits.
 include(joinpath(@__DIR__,"..","english","replay_legal.jl"))
 function piece_type(p)
@@ -10,10 +10,10 @@ function piece_type(p)
     if outer==2
         return a[1]==0 ? "midge" : a[1]==1 ? "inner-wing" : "outer-wing"
     end
-    a[1]==0 && a[2]==0 && return "core-centre"
-    "centre($(a[1]),$(a[2]))"
+    a[1]==0 && a[2]==0 && return "core-center"
+    "center($(a[1]),$(a[2]))"
 end
-cell_type(r,c)=(t=piece_type((c-4,4-r,3));startswith(t,"centre(") ? "centre"*replace(string(orbit(r,c))," "=>"") : t)
+cell_type(r,c)=(t=piece_type((c-4,4-r,3));startswith(t,"center(") ? "center"*replace(string(orbit(r,c))," "=>"") : t)
 println("front-grid\trow\t",join(1:7,'\t'))
 for r in 1:7;println("front-grid\t",r,'\t',join([cell_type(r,c) for c in 1:7],'\t'));end
 for r in 3:6,c in 1:7

@@ -1,0 +1,15 @@
+stacked-orbit	A	strict	-3	-3	22	3	24	-1
+stacked-orbit	A	strict	-3	-2	16	2	24	6
+stacked-orbit	A	strict	-3	-1	23	2	24	-1
+stacked-orbit	A	strict	-3	0	20	2	24	2
+stacked-orbit	A	strict	-3	1	22	2	24	0
+stacked-orbit	A	strict	-3	2	21	2	24	1
+stacked-orbit	A	strict	-2	-2	18	0	24	6
+stacked-orbit	A	strict	-2	-1	24	1	24	-1
+stacked-orbit	A	strict	-2	0	23	0	24	1
+stacked-orbit	A	strict	-2	1	20	1	24	3
+stacked-orbit	A	strict	-1	-1	26	2	24	-4
+stacked-orbit	A	strict	-1	0	25	1	24	-2
+stacked-orbit	A	strict	0	0	7	0	6	-1
+stacked-core-cell	A	10,11,12,5,6,7,8,9
+stacked-inventory	A	strict	267	OBSTRUCTED	6
