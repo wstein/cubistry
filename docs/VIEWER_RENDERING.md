@@ -107,8 +107,8 @@ rounded outer shell and 0.055-unit bevels. The visible shell seam is 0.01 units.
 
 **Core ball (supersedes per-cubie box cores).** The former per-cubie plastic box
 cores are removed. Each cube has one static core ball at its center, diameter
-`CORE_DIAMETER_RATIO` (0.4) of the full cube edge length, so a 3×3 has a 1.2-unit
-ball and keeps 0.9 units of distance to the surface. It follows the view group but never a layer turn or
+`CORE_DIAMETER_RATIO` (0.8) of the full cube edge length, so a 3×3 has a 2.4-unit
+ball and keeps 0.3 units of distance to the surface. It follows the view group but never a layer turn or
 body frame. Consequence, owner-requested and measured with rays: the shell seams
 are no longer sealed behind the bevels, so frontal and slightly oblique rays
 through four-cubie junction lines can pass between bodies. The former tests for
