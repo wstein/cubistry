@@ -1,3 +1,11 @@
+# NOTE (added for the PR; the rest of this file is verbatim provenance, not runnable as is):
+#  - It hard-codes this machine's paths: R="/home/user/cubistry/research/calendar-7x7" and
+#    DAG="/tmp/claude-0/dualrun/legal-dag.tsv" (the decompressed research/calendar-7x7/en-physical-review/all-targets-dag.tsv.gz).
+#  - The comment about the core/centre orbit in `edge_search` (the `k==11` branch) is SUPERSEDED: the
+#    "Front image mismatch at 4,4" failures came from this script's hybrid fallback, which never
+#    re-solves orbit 11, not from a planner or validator disagreement (issue #135, PR #136).
+#  - The module research/calendar-7x7/global-search/search.jl is the clean port; this script produced the
+#    35-edge chain and the 3-edge chain recorded next to it.
 # Experiment (scratch): global beam search for a 35-edge chain Jan 2026 -> Dec 2028, root 1.
 # Physical state is carried from edge to edge. Progress is appended to progress-<TAG>.tsv after every edge;
 # a restart replays the saved words and continues.
