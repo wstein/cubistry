@@ -11,7 +11,7 @@ here=$(cd -- "$(dirname -- "$0")" && pwd)
 witness=$1
 out=$2
 mkdir -p "$out"
-julia=${JULIA:-/tmp/claude-0/julia/bin/julia}
+julia=${JULIA:-${JULIA_BIN:-julia}}   # julia from PATH unless JULIA or JULIA_BIN is set
 jar=${MS_FLIX_BUILD_DIR:-/tmp/cubistry-ms-counter-flix}/artifact/flix.jar
 
 jl() { "$julia" --startup-file=no "$here/check.jl" "$1"; }
@@ -51,6 +51,10 @@ awk -F'\t' -v OFS='\t' '
   {print}' "$witness" > "$neg/period-double.tsv"
 # wrong period boundary: claim a shorter period (the last cycle cut off)
 awk -F'\t' -v OFS='\t' '$1=="run" && $2=="S" {p=$6; if (p>1) {$6=p-1}} {print}' "$witness" > "$neg/period-short.tsv"
+# malformed numeric fields and an unknown glyph (parser robustness)
+awk -F'\t' -v OFS='\t' '$1=="edge" && $2=="M" && $3=="3" {$7="x1"}1' "$witness" > "$neg/integer-nonnumeric.tsv"
+awk -F'\t' -v OFS='\t' '$1=="claim" {$3="99999999999999999999"}1' "$witness" > "$neg/integer-overflow.tsv"
+awk -F'\t' -v OFS='\t' -v r="$lr" 'NR==r{$7="Q"}1' "$witness" > "$neg/glyph-alphabet.tsv"
 speriod=$(awk -F'\t' '$1=="run" && $2=="S" {print $6}' "$witness")
 
 controls=(
@@ -64,6 +68,9 @@ controls=(
   "claim|claimed maximum edge HTM differs from replay"
   "truncated|word shorter than graph distance for M edge 59 (59->0)"
   "period-double|period boundary: M returns to the start state before the claimed period"
+  "integer-nonnumeric|integer field"
+  "integer-overflow|integer field"
+  "glyph-alphabet|glyph alphabet"
 )
 if [ "$speriod" -gt 1 ]; then
   controls+=("period-short|period boundary: S run does not return to the exact start state after the claimed period")
