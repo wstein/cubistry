@@ -30,6 +30,29 @@ front_row() { awk -F'\t' -v p="$1" '$1=="sticker" && $4==p && $5=="0,0,1" {print
 ur=$(front_row "1,1,1"); lr=$(front_row "1,-1,1"); ul=$(front_row "-1,1,1")
 profile=$(awk -F'\t' '$1=="profile"{print $2}' "$witness")
 
+if [ "$(head -n 1 "$witness")" = "cubistry.hm-counter.v2" ]; then
+  # v2 (blank profile, preperiod + period) controls
+  awk -F'\t' -v OFS='\t' -v r="$ur" 'NR==r{$7="H"}1' "$witness" > "$neg/glyph.tsv"
+  awk -F'\t' -v OFS='\t' -v r="$lr" 'NR==r{$6=($6=="0,1,0")?"1,0,0":"0,1,0"}1' "$witness" > "$neg/up.tsv"
+  awk -F'\t' -v OFS='\t' -v r="$ul" 'NR==r{$7="7"}1' "$witness" > "$neg/nonblank-ul.tsv"
+  # route move: last token of the M step from 5 to 6 (first lap) changed
+  awk -F'\t' -v OFS='\t' '$1=="step" && $2=="M" && $4=="5" && !done {n=split($6,a," "); t=a[n]; if (t ~ /2$/) a[n]=substr(t,1,1); else if (t ~ /'"'"'$/) a[n]=substr(t,1,1)"2"; else a[n]=t"2"; s=a[1]; for(i=2;i<=n;i++) s=s" "a[i]; $6=s; done=1}1' "$witness" > "$neg/move.tsv"
+  # claimed bound too small: first H23 step with lb >= 1, lb - 1
+  awk -F'\t' -v OFS='\t' '$1=="step" && $2=="H" && $3=="23" && $7>=1 && !done {$7=$7-1; done=1}1' "$witness" > "$neg/lowerbound.tsv"
+  lbstep=$(awk -F'\t' '$1=="step" && $2=="H" && $3=="23" {if ($7>=1) {print k; exit}; k++}' "$witness")
+  awk -F'\t' -v OFS='\t' '$1=="claim" {$3=$3-1}1' "$witness" > "$neg/claim.tsv"
+  # wrong period boundary in the M mode: move one lap between preperiod and period
+  awk -F'\t' -v OFS='\t' '$1=="mode" && $2=="M" {if ($5>=60) {$5-=60; $6+=60} else {$5+=60; $6-=60}}1' "$witness" > "$neg/boundary.tsv"
+  controls=(
+    "glyph|wrong glyph at cell 2 for M59 00 after setup"
+    "up|glyph not upright at cell 4 for M59 00 after setup"
+    "nonblank-ul|upper-left cell must show a blank sticker at M59 00 after setup"
+    "move|for M59 step 5"
+    "lowerbound|claimed lower bound differs for H23 step $lbstep"
+    "claim|claimed maximum edge HTM differs from replay"
+    "boundary|period boundary"
+  )
+else
 awk -F'\t' -v OFS='\t' -v r="$ur" 'NR==r{$7="H"}1' "$witness" > "$neg/glyph.tsv"
 awk -F'\t' -v OFS='\t' -v r="$lr" 'NR==r{$6=($6=="0,1,0")?"1,0,0":"0,1,0"}1' "$witness" > "$neg/up.tsv"
 awk -F'\t' -v OFS='\t' '$1=="edge" && $2=="M" && $3=="5" && !done {n=split($5,a," "); t=a[n]; if (t ~ /2$/) a[n]=substr(t,1,1); else if (t ~ /'"'"'$/) a[n]=substr(t,1,1)"2"; else a[n]=t"2"; s=a[1]; for(i=2;i<=n;i++) s=s" "a[i]; $5=s; done=1}1' "$witness" > "$neg/move.tsv"
@@ -48,6 +71,7 @@ controls=(
 if [ "$profile" = blank ]; then
   awk -F'\t' -v OFS='\t' -v r="$ul" 'NR==r{$7="7"}1' "$witness" > "$neg/nonblank-ul.tsv"
   controls+=("nonblank-ul|upper-left cell must show a blank sticker at M00 after setup")
+fi
 fi
 status=0
 for c in "${controls[@]}"; do
