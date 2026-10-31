@@ -5,6 +5,7 @@ import hsmPin from "../hsm-source.json";
 import {
   hsmImagesFor,
   hsmDesignFor,
+  hsmUnitLabel,
   parseLettering,
 } from "./apps/hsm/lettering.ts";
 import {
@@ -38,6 +39,14 @@ const $ = (id) => document.getElementById(id);
 $("hsm-lettering").value = parseLettering(
   new URLSearchParams(location.search).get("lettering"),
 );
+// The Unit select follows the sticker lettering: H / M / S or hour / min / sec.
+const syncHsmUnitLabels = () => {
+  const lettering = parseLettering($("hsm-lettering").value);
+  for (const option of $("hsm-letter").options)
+    option.textContent = hsmUnitLabel(option.value, lettering);
+};
+syncHsmUnitLabels();
+$("hsm-lettering").addEventListener("change", syncHsmUnitLabels);
 const run = new CounterRun();
 const sequenceNumber = new SequenceNumber();
 const durations = [2000, 1000, 500, 250, 100, 50, 10];
@@ -864,6 +873,7 @@ for (const id of ["hsm-letter", "hsm-lettering"])
       ready = true;
       $("hsm-letter").value = previous.letter;
       $("hsm-lettering").value = previousLettering;
+      syncHsmUnitLabels();
       error(e.message);
     }
     controlsUi();
