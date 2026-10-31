@@ -132,6 +132,15 @@
           aria-label="Counter controls"
         >
           <h1>Counter</h1>
+          <label for="counter-print">Sticker print</label>
+          <select id="counter-print" aria-describedby="print-note">
+            <option value="titled" selected>COUNTER title (default)</option>
+            <option value="blank-top">Blank top 00–99</option>
+          </select>
+          <p id="print-note" class="small">
+            Choose the print that matches your stickers. Changing it installs
+            the other cube at the current value and restarts session moves.
+          </p>
           <form id="jump-form">
             <label for="value">Target 0–99</label>
             <input
@@ -169,9 +178,13 @@
               ><input id="format" type="checkbox" checked /> Leading Zero</label
             >
           </div>
-          <p class="small">
+          <p id="format-note" class="small">
             Leading Zero shows or hides only the leading 0. The layout, value,
             and moves stay the same.
+          </p>
+          <p id="mode-switch" class="small" hidden>
+            Setup moves (mode switches, not counted in session moves):
+            <output id="setup-moves" aria-label="Setup moves (HTM)">0</output>
           </p>
         </aside>
         <aside

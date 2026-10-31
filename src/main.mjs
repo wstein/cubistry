@@ -22,6 +22,11 @@ import { loadTimerRoute, loadFiveSecondRoute } from "./apps/timer/design.ts";
 import { CounterRun } from "./apps/counter/run.mjs";
 import { SequenceNumber } from "./apps/shared/sequence-number.ts";
 import { loadCertifiedCounter } from "./apps/counter/certified.ts";
+import {
+  loadBlankTopCounter,
+  modeSwitchAt,
+} from "./apps/counter/blank-top.ts";
+import blankTopPin from "../counter-blank-top-source.json";
 import "./style.css";
 import { loadAssets } from "@cubistry/cube-assets";
 import { CubeViewer, BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
@@ -54,6 +59,29 @@ let ready = false,
   proof,
   certified;
 let padded = true;
+// The permanent Counter print: "titled" (default) or "blank-top". On the
+// blank-top print, Leading Zero selects the physical mode (LZ or NZ).
+let counterPrint = "titled",
+  blankTop;
+const isBlankTop = () => counterPrint === "blank-top";
+const modeName = (leadingZero) =>
+  leadingZero ? "leading zero (LZ)" : "no leading zero (NZ)";
+/** The stored route that a print and Leading Zero state select. */
+const routeFor = (print, leadingZero) =>
+  print === "blank-top"
+    ? blankTop.routes[leadingZero ? "lz" : "nz"]
+    : certified;
+/** The switch word to the other mode at the current value, or null. */
+function pendingSwitch() {
+  if (!ready || !isBlankTop() || application !== "certified") return null;
+  if (!view || view.busy || run.running || view.progress.status === "failed")
+    return null;
+  return modeSwitchAt(
+    blankTop,
+    view.config?.padded ? "nz" : "lz",
+    view.currentValue,
+  );
+}
 let hsmDesign,
   hsmRunning = false,
   hsmNextAt = 0,
@@ -89,6 +117,7 @@ function save() {
         value: view?.currentValue ?? value,
         label: "COUNTER",
         padded,
+        print: counterPrint,
         application: "certified",
         moveDuration: durations[Number($("rotation-speed").value)],
       }),
@@ -148,7 +177,17 @@ function controlsUi() {
     run.running ||
     hsmRunning ||
     (isTimer() && clock.running && !clock.elapsed);
-  $("format").disabled = !ready || isHsm();
+  $("format").disabled =
+    !ready || isHsm() || (isBlankTop() && pendingSwitch() === null);
+  $("counter-print").disabled = !ready || !!view?.busy || run.running;
+  $("mode-switch").hidden = !isBlankTop();
+  text("setup-moves", String(view?.modeSwitch?.committed ?? 0));
+  text(
+    "format-note",
+    isBlankTop()
+      ? "On the blank-top print, Leading Zero selects the physical mode: on shows 00–09, off shows a blank tens sticker for 0–9. Switch at 0 (6 setup moves) or at 31–99 (no moves: both modes share the cube state there)."
+      : "Leading Zero shows or hides only the leading 0. The layout, value, and moves stay the same.",
+  );
 
   const active = run.running || !!view?.busy;
   $("run").textContent = active ? "Stop" : "Run";
@@ -236,9 +275,12 @@ const onPhysicalState = (physical, busy, failure, progress) => {
     if (physical === run.target) run.stop();
     save();
   }
+  const switching = view?.modeSwitch?.active ? view.modeSwitch : null;
   $("status").textContent = failure
     ? "Turn sequence stopped."
-    : run.running
+    : switching
+      ? `Switching to ${modeName(!view.config?.padded)} · ${switching.completed} / ${switching.total} setup moves`
+      : run.running
       ? `Running to ${run.target} · Current ${physical}`
       : busy
         ? `Finishing ${progress?.target ?? value}…`
@@ -292,7 +334,8 @@ $("reset-session-moves").addEventListener("click", () =>
 );
 // This screen-only field rule never selects a different permanent print or solver.
 function formatUi() {
-  if (isTimer() || isHsm()) {
+  // The blank-top print shows its own physical blank; nothing is masked.
+  if (isTimer() || isHsm() || isBlankTop()) {
     viewer.setFaceletImageOverride(null);
     return;
   }
@@ -307,13 +350,86 @@ function formatUi() {
         },
   );
 }
-$("format").addEventListener("change", () =>
+$("format").addEventListener("change", () => {
+  if (isBlankTop()) {
+    void switchMode($("format").checked);
+    return;
+  }
   action(() => {
     formatUi();
     padded = $("format").checked;
     save();
-  }),
-);
+  });
+});
+/**
+ * Blank-top only: switch the physical mode with an explicit, animated word
+ * (at 0) or no turn (where both modes share the complete state). Refused
+ * anywhere else; the checkbox then returns to the active mode.
+ */
+async function switchMode(leadingZero) {
+  const moves = pendingSwitch();
+  const active = view?.config?.padded ?? !leadingZero;
+  if (moves === null || leadingZero === active) {
+    $("format").checked = active;
+    error("Switch modes at 0, or at 31–99 where both modes share the cube state.");
+    controlsUi();
+    return;
+  }
+  error();
+  try {
+    await view.switchRoute(routeFor("blank-top", leadingZero), moves);
+    padded = leadingZero;
+    save();
+  } catch (e) {
+    // A failed turn already reported "Reload to recover"; keep that message.
+    if (ready) error(e.message);
+  }
+  $("format").checked = view.config?.padded ?? active;
+  if (ready)
+    $("status").textContent = `Current ${view.currentValue} · ${modeName(view.config?.padded)}`;
+  controlsUi();
+}
+$("counter-print").addEventListener("change", async () => {
+  const requested = $("counter-print").value;
+  if (
+    !ready ||
+    view.busy ||
+    run.running ||
+    application !== "certified" ||
+    requested === counterPrint
+  ) {
+    $("counter-print").value = counterPrint;
+    return;
+  }
+  ready = false;
+  controlsUi();
+  try {
+    if (requested === "blank-top")
+      blankTop ??= await loadBlankTopCounter(
+        proof,
+        blankTopPin.runtimeSHA256,
+        import.meta.env.BASE_URL,
+      );
+    const route = routeFor(requested, $("format").checked);
+    const installed = view.currentValue;
+    // An explicit new-print operation: the other permanent print is
+    // installed in its canonical state for the current value.
+    await view.configure("COUNTER", route.padded, installed, route);
+    counterPrint = requested;
+    padded = $("format").checked;
+    value = installed;
+    formatUi();
+    ready = true;
+    error();
+    onPhysicalState(view.currentValue, view.busy, undefined, view.progress);
+    $("status").textContent = `${requested === "blank-top" ? `Blank-top print, ${modeName(route.padded)}` : "COUNTER title print"} installed at ${installed}. Session moves restart at 0.`;
+  } catch (e) {
+    ready = true;
+    $("counter-print").value = counterPrint;
+    error(e.message);
+  }
+  controlsUi();
+});
 function speedUi() {
   const stop = Number($("rotation-speed").value);
   if (!isTimer() || !ready)
@@ -600,11 +716,12 @@ $("application").addEventListener("change", async () => {
       );
     } else {
       candidate = new CounterController(viewer, proof, callback, resolveAssets);
+      const route = routeFor(counterPrint, $("format").checked);
       await candidate.configure(
         "COUNTER",
-        true,
+        route.padded,
         rememberedCounterValue,
-        certified,
+        route,
       );
     }
     timerScheduler.invalidate();
@@ -790,7 +907,22 @@ async function initialize() {
     }
     speedUi();
     certified = await loadCertifiedCounter(proof, import.meta.env.BASE_URL);
-    await view.configure("COUNTER", true, value, certified);
+    const requestedPrint =
+      new URLSearchParams(location.search).get("print") ?? saved?.print;
+    if (requestedPrint === "blank-top")
+      try {
+        blankTop = await loadBlankTopCounter(
+          proof,
+          blankTopPin.runtimeSHA256,
+          import.meta.env.BASE_URL,
+        );
+        counterPrint = "blank-top";
+      } catch (e) {
+        error(`Blank-top print unavailable (${e.message}); showing the COUNTER title print.`);
+      }
+    $("counter-print").value = counterPrint;
+    const route = routeFor(counterPrint, $("format").checked);
+    await view.configure("COUNTER", route.padded, value, route);
     formatUi();
     padded = $("format").checked;
     ready = true;
