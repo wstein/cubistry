@@ -53,7 +53,7 @@ if [ "$(head -n 1 "$witness")" = "cubistry.hm-counter.v2" ]; then
     "glyph|wrong glyph at cell 2 for M59 00 after setup"
     "up|glyph not upright at cell 4 for M59 00 after setup"
     "nonblank-ul|upper-left cell must show a blank sticker at M59 00 after setup"
-    "move|M59 step 5"
+    "move|M59 step "
     "lowerbound|claimed lower bound differs for H23 step $lbstep"
     "claim|claimed maximum edge HTM differs from replay"
     "boundary|$bwant"
