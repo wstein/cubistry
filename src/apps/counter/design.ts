@@ -24,6 +24,23 @@ export const FRONT: readonly Vec3[] = [
   [-1, -1, 1],
   [1, -1, 1],
 ];
+/**
+ * The permanent Counter prints. "titled" is the default COUNTER print (title
+ * fragments in both top cells); "blank-top" is the 00-99 print with blank
+ * stickers in both top cells (research/counter-99-blank-top). Both share the
+ * controller, renderer, solver and traversal code; only targets differ.
+ */
+export type CounterVariant = "titled" | "blank-top";
+export const COUNTER_VARIANTS: readonly CounterVariant[] = Object.freeze([
+  "titled",
+  "blank-top",
+]);
+/** Top-cell artwork of each print, upper left then upper right. */
+const TOP_CELLS: Readonly<Record<CounterVariant, readonly [string, string]>> =
+  Object.freeze({
+    titled: Object.freeze(["title-left", "title-right"] as const),
+    "blank-top": Object.freeze(["blank", "blank"] as const),
+  });
 export interface CounterConfig {
   readonly label: string;
   readonly padded: boolean;
@@ -75,11 +92,29 @@ export interface CounterDesign {
     readonly word: string;
   }[];
 }
-export function targetFor(value: number, padded: boolean): DisplayTarget {
+/**
+ * The front display of one value. On the titled print, padded=false only
+ * describes the legacy unpadded target. On the blank-top print, padded=false
+ * is the physical NZ mode: the tens cell shows a blank sticker for 0..9.
+ * Blank cells match in any quarter turn; digits must be upright.
+ */
+export function targetFor(
+  value: number,
+  padded: boolean,
+  variant: CounterVariant = "titled",
+): DisplayTarget {
   demand(
     Number.isInteger(value) && value >= 0 && value <= 99,
     "Invalid counter target",
   );
+  demand(COUNTER_VARIANTS.includes(variant), "Unknown counter print variant");
+  const top = TOP_CELLS[variant];
+  const assets = [
+    top[0],
+    top[1],
+    value < 10 && !padded ? "blank" : String(Math.floor(value / 10)),
+    String(value % 10),
+  ];
   return deepFreeze({
     schema: "cubistry.target",
     version: 1,
@@ -88,15 +123,10 @@ export function targetFor(value: number, padded: boolean): DisplayTarget {
       normal: [0, 0, 1] as Vec3,
       up: [0, 1, 0] as Vec3,
       matching:
-        i === 2 && value < 10 && !padded
+        assets[i] === "blank"
           ? ("equivalent" as const)
           : ("exact" as const),
-      assetId: [
-        "title-left",
-        "title-right",
-        value < 10 && !padded ? "blank" : String(Math.floor(value / 10)),
-        String(value % 10),
-      ][i],
+      assetId: assets[i],
     })),
   });
 }
@@ -184,13 +214,25 @@ export async function configurePrint(
   selectedPrint?: PrintDefinition,
 ): Promise<{ print: PrintDefinition; assets: AssetManifest }> {
   const base = selectedPrint ?? design.prints[config.padded ? "padded" : "unpadded"];
+  // A print without title stickers (blank-top) loads no title document or
+  // font; it keeps the same licensed digit and blank images.
+  const titled = base.stickers.some((s) => s.assetId.startsWith("title-"));
   const assets = validateAssets(
-    {
-      ...design.assets,
-      documents: design.assets.documents.map((d) =>
-        d.id === "counter-title" ? { ...d, text: config.label } : d,
-      ),
-    },
+    titled
+      ? {
+          ...design.assets,
+          documents: design.assets.documents.map((d) =>
+            d.id === "counter-title" ? { ...d, text: config.label } : d,
+          ),
+        }
+      : {
+          ...design.assets,
+          fonts: [],
+          documents: [],
+          images: design.assets.images.filter(
+            (i) => i.id === "blank" || /^[0-9]$/.test(i.id),
+          ),
+        },
     [base],
   );
   const bytes = new TextEncoder().encode(
