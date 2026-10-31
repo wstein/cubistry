@@ -322,6 +322,8 @@ Compare only lines starting with `stacked-`.
    (UNKNOWN here).
 6. **Scope:** stop at the 3-surface candidate, or look for up to 3 more frees
    with new states (bound 234)? That needs new DAG synthesis and is UNKNOWN.
-. **Core pair (design alternative):** should an extra core sticker such as
+7. **PR #128:** keep it as the superseded orientation-selection study (it is
+   untouched here).
+8. **Core pair (design alternative):** should an extra core sticker such as
    `5/12` be considered? It would remove the core part of the case 1 obstruction;
    the remaining case 1 orbits would then be UNKNOWN.
