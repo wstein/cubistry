@@ -41,9 +41,10 @@ $("hsm-lettering").value = parseLettering(
 const run = new CounterRun();
 const sequenceNumber = new SequenceNumber();
 const durations = [2000, 1000, 500, 250, 100, 50, 10];
-// Default rotation stop per HSM unit (index into `durations`): H 500 ms,
-// M 250 ms, S 100 ms. Changing the unit or entering the HSM counter applies it.
-const hsmDefaultStops = { H: 2, M: 3, S: 4 };
+// Default rotation stop per HSM unit (index into `durations`): 100 ms for every
+// unit. Only the live clock keeps its slower H 500 ms / M 250 ms preferences.
+// Changing the unit or entering the HSM counter applies it.
+const hsmDefaultStops = { H: 4, M: 4, S: 4 };
 const speedLabels = [
   "2 s",
   "1 s",
