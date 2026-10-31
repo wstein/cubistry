@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {Quaternion,Euler,Vector3} from 'three';
 import {SmartRotation,ROTATION_TUNING as P,returnDelay} from '../packages/cube-viewer/src/smart-rotation.ts';
 const pose=(p=0,y=0)=>new Quaternion().setFromEuler(new Euler(p,y,0));
-const wait=c=>returnDelay(c.quaternion.angleTo(c.anchor));
+const wait=c=>returnDelay(c.quaternion.angleTo(c.front));
 const same=(a,b)=>assert(a.angleTo(b)<1e-7);
 function upright(q){const up=new Vector3(0,1,0).applyQuaternion(q);assert(Math.abs(up.x)<1e-12);assert(up.y>=Math.sin(.05)-1e-12);}
 const spring=t=>Math.exp(-P.returnRate*t)*(1+P.returnRate*t+(P.returnRate*t)**2/2);
@@ -75,19 +75,18 @@ test('reduced motion performs only requested 150ms leveling; visibility and Free
  c.reset(211);upright(c.quaternion);same(c.quaternion,new SmartRotation(q).quaternion);assert(free.angleTo(c.quaternion)>.1);
 });
 
-test('Free gestures never move the front anchor through upright selection and leveling; only distance decides about return',()=>{
+test('Free gestures within the tolerance become the target after leveling; farther ones return to the last target',()=>{
  for(const degrees of [10,40]){
   const c=new SmartRotation(pose(),'free');c.down(0);c.drag(0,degrees*Math.PI/180,.2);c.up(.4);
   const chosen=c.quaternion.clone();c.setMode('smart',1);
-  same(c.anchor,pose());
-  if(degrees===10){assert.equal(c.phase,'idle');c.step(10);same(c.quaternion,chosen);}
-  else {assert(Math.abs(c.returnDeadline-(1+wait(c)))<1e-9);c.step(10);same(c.quaternion,pose());}
+  if(degrees===10){same(c.anchor,chosen);assert.equal(c.phase,'idle');c.step(10);same(c.quaternion,chosen);}
+  else {same(c.anchor,pose());assert(Math.abs(c.returnDeadline-(1+wait(c)))<1e-9);c.step(10);same(c.quaternion,pose());}
  }
  const c=new SmartRotation(pose(),'free');c.down(0);c.drag(.03,.08,.1);c.drag(-.03,.08,.2);c.up(.4);
- c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(2);same(c.anchor,pose());assert.equal(c.phase,'idle');
- const d=new SmartRotation(pose());d.down(0);d.drag(0,Math.PI/3,.2);d.up(.4);d.step(3);
- const automatic=d.quaternion.clone();assert(automatic.angleTo(d.anchor)<35*Math.PI/180);d.setMode('free',3);d.setMode('smart',3.1);
- same(d.quaternion,automatic);same(d.anchor,pose());assert.equal(d.phase,'idle');assert.equal(d.returnDeadline,null);
+ c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(2);same(c.anchor,c.quaternion);assert.equal(c.phase,'idle');
+ const d=new SmartRotation(pose());d.down(0);d.drag(0,Math.PI/3,.2);d.up(.4);d.step(d.returnDeadline+.3);
+ const automatic=d.quaternion.clone();assert(automatic.angleTo(d.front)<35*Math.PI/180&&automatic.angleTo(d.front)>.1);const at=d.returnDeadline+.31;d.setMode('free',at);d.setMode('smart',at+.1);
+ same(d.quaternion,automatic);same(d.anchor,pose());assert(Math.abs(d.returnDeadline-(at+.1+wait(d)))<1e-9);d.step(at+10);same(d.quaternion,pose());
 });
 test('dragging either pitch boundary discards outward filtered momentum before a small reversal while preserving yaw',()=>{
  for(const hz of [30,60,144])for(const sign of [-1,1])for(const yaw of [0,.1]){
@@ -107,9 +106,9 @@ test('reduced Smart classifies genuine settled gestures and requested leveling w
   if(bridge){c.drag(.03,0,.3);c.drag(0,.03,.4);c.drag(-.03,0,.5);c.drag(0,-.03,.6);}c.up(.8);
   if(bridge){c.setMode('smart',1);assert.equal(c.phase,'leveling');same(c.anchor,pose());c.step(1.15);}
   const settled=c.quaternion.clone();assert.equal(c.phase,'idle');assert.equal(c.returnDeadline,null);
-  same(c.anchor,pose());
+  if(degrees===10)same(c.anchor,settled);else same(c.anchor,pose());
   c.step(20);same(c.quaternion,settled);c.setReducedMotion(false,21);
-  if(degrees===10){assert.equal(c.phase,'idle');same(c.anchor,pose());c.step(30);same(c.quaternion,settled);}
+  if(degrees===10){assert.equal(c.phase,'idle');same(c.anchor,settled);c.step(30);same(c.quaternion,settled);}
   else {assert(Math.abs(c.returnDeadline-(21+wait(c)))<1e-9);c.step(30);same(c.quaternion,pose());}
  }
 });

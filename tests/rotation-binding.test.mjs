@@ -6,7 +6,7 @@ import { returnDelay } from "../packages/cube-viewer/src/smart-rotation.ts";
 import { rotationHarness } from "./helpers/rotation-harness.mjs";
 const harness = (mode="smart") => rotationHarness({mode});
 const same=(a,b)=>assert(a.angleTo(b)<1e-7);
-const wait=h=>returnDelay(h.binding.controller.quaternion.angleTo(h.binding.controller.anchor));
+const wait=h=>returnDelay(h.binding.controller.quaternion.angleTo(h.binding.controller.front));
 const close=(a,b)=>assert(Math.abs(a-b)<1e-9,`${a} != ${b}`);
 test("production pointerdown interrupts pending/active return before threshold, preserving full displayed quaternion",()=>{
  const h=harness("classic");h.element.pointer("pointerdown");h.time(.2);h.element.pointer("pointermove",250,200);h.time(.4);h.element.pointer("pointerup",250,200);
