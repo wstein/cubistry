@@ -194,6 +194,7 @@ function validate(path)
     need(endswith(text, "\n"), "final LF required")
     rows = split(chop(text), '\n')
     need(all(!isempty, rows), "empty line")
+    rows[1] == "cubistry.hm-counter.v2" && return validate2(rows, raw)
     need(rows[1] == "cubistry.hm-counter.v1", "schema header")
     f = split(rows[2], '\t'); need(length(f) == 2 && f[1] == "profile" && f[2] in ("free", "blank"), "profile row")
     blank = f[2] == "blank"
@@ -267,6 +268,74 @@ function validate(path)
     need(parse(Int, f[3]) == maximum(alllens), "claimed maximum edge HTM differs from replay")
     need(rows[r] == "end" && r == length(rows), "end row")
     push!(out, "transitions\t$(length(alllens))\ttotal\t$(sum(alllens))\tmax\t$(maximum(alllens))\thist\t$(histtext(alllens))")
+    push!(out, "verdict\tACCEPT")
+    join(out, "\n") * "\n"
+end
+
+# ---- v2: blank profile, run-in (preperiod) + repeating full-state period ----
+# mode rows: "mode L range setup P Q" followed by P+Q step rows
+# "step L range from to word lb". The state after P steps must reappear
+# exactly after P+Q steps; P and Q are whole laps. Decrement is the exact
+# inverse traversal of the period.
+function validate2(rows, raw)
+    need(rows[2] == "profile\tblank", "v2 requires the blank profile")
+    need(rows[3] == "letters\tHM", "letters row must be exactly HM")
+    st0 = readprint(rows[4:27])
+    need(any(x -> x.glyph == '_', st0), "blank profile needs a blank sticker")
+    g = buildgraph(4)
+    out = String["cubistry.hm-counter.receipt.v2", "witness-sha256\t" * bytes2hex(sha256(raw)), "profile\tblank"]
+    reach = [Int(d) for d in g.dist if d >= 0]
+    push!(out, "graph\t$(length(reach))\t" * join(["$d:$(count(==(d), reach))" for d in 0:maximum(reach)], ","))
+    r = 28
+    allper = Int[]; allpre = Int[]
+    for (letter, range) in (('M', 59), ('H', 23), ('H', 11))
+        f = split(rows[r], '\t'); r += 1
+        need(length(f) == 6 && f[1] == "mode" && f[2] == string(letter) && f[3] == string(range), "mode row $letter $range")
+        n = range + 1
+        need(occursin(r"^[0-9]+$", f[5]) && occursin(r"^[0-9]+$", f[6]), "integer preperiod/period")
+        P = parse(Int, f[5]); Q = parse(Int, f[6])
+        need(P % n == 0 && Q % n == 0 && Q > 0 && P + Q <= 100000, "preperiod and period must be whole laps")
+        state = doword(st0, parseword(f[4]))
+        setuplen = length(parseword(f[4]))
+        checkshow(state, wanted(letter, 0, true), "$letter$range 00 after setup")
+        states = [state]; words = Vector{Vector{Tuple{Int,Int,Int}}}(); lens = Int[]; lbs = Int[]
+        for j in 0:P+Q-1
+            v = j % n; nv = (v + 1) % n
+            f = split(rows[r], '\t'); r += 1
+            need(length(f) == 7 && f[1] == "step" && f[2] == string(letter) && f[3] == string(range) &&
+                 f[4] == string(v) && f[5] == string(nv), "step row $letter$range $j")
+            w = parseword(f[6])
+            need(occursin(r"^[0-9]+$", f[7]), "integer lower bound")
+            lb = lowerbound(g, state, wanted(letter, nv, true))
+            need(parse(Int, f[7]) == lb, "claimed lower bound differs for $letter$range step $j")
+            need(length(w) >= lb, "word shorter than graph distance for $letter$range step $j")
+            nxt = doword(state, w)
+            checkshow(nxt, wanted(letter, nv, true), "$letter$range step $j")
+            need(doword(nxt, invword(w)) == state, "full-state edge inverse")
+            push!(words, w); push!(lens, length(w)); push!(lbs, lb); push!(states, nxt)
+            state = nxt
+        end
+        need(states[P+Q+1] == states[P+1], "period boundary: state after preperiod+period must equal state after preperiod for $letter$range")
+        # decrement: exact inverse traversal of the period, from the period start
+        d = states[P+1]
+        for j in P+Q-1:-1:P
+            d = doword(d, invword(words[j+1]))
+            need(d == states[j+1], "exact full-state decrement replay $letter$range")
+            checkshow(d, wanted(letter, j % n, true), "decrement $letter$range")
+        end
+        pre = lens[1:P]; per = lens[P+1:end]
+        append!(allper, per); append!(allpre, pre)
+        push!(out, "mode\t$letter\t$range\tsetup\t$setuplen\tpreperiod\t$P\tperiod\t$Q\tlaps\t$(Q ÷ n)")
+        push!(out, "period\t$letter\t$range\ttotal\t$(sum(per))\tmax\t$(maximum(per))\thist\t$(histtext(per))\tlbtotal\t$(sum(lbs[P+1:end]))\ttight\t$(count(per .== lbs[P+1:end]))\tclosure\texact")
+        push!(out, "preperiod\t$letter\t$range\ttotal\t$(sum(pre; init = 0))\tmax\t$(maximum(pre; init = 0))\thist\t$(histtext(pre))")
+        push!(out, "decrement\t$letter\t$range\tinverse-of-period\texact")
+    end
+    f = split(rows[r], '\t'); r += 1
+    need(length(f) == 3 && f[1] == "claim" && f[2] == "maxEdgeHTM", "claim row")
+    m = maximum(vcat(allper, allpre))
+    need(parse(Int, f[3]) == m, "claimed maximum edge HTM differs from replay")
+    need(rows[r] == "end" && r == length(rows), "end row")
+    push!(out, "edges\tperiod\t$(length(allper))\tmax\t$(maximum(allper))\thist\t$(histtext(allper))\tpreperiod\t$(length(allpre))\tmax\t$(maximum(allpre; init = 0))\thist\t$(histtext(allpre))")
     push!(out, "verdict\tACCEPT")
     join(out, "\n") * "\n"
 end
