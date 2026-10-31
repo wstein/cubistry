@@ -1,2 +1,2 @@
-exact_k3	lz	start_states	3888	survives_layers	99	NO_ROUTE_ALL_EDGES_LE_3
-exact_k3	nz	start_states	15552	survives_layers	139	NO_CLOSED_CYCLE_ALL_EDGES_LE_3
+exact_k3	lz	start_states	3888	survives_layers	99	SEARCH_FOUND_NO_ROUTE_ALL_EDGES_LE_3_UNCHECKED
+exact_k3	nz	start_states	15552	survives_layers	139	SEARCH_FOUND_NO_CLOSED_CYCLE_ALL_EDGES_LE_3_UNCHECKED

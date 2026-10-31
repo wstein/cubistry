@@ -1,7 +1,7 @@
-# Exact per-print statements over ALL reachable full states (no beam):
+# Search-side per-print computation over ALL reachable full states (no beam):
 # enumerate every legal full state showing value 0, then propagate with words of length
-# <= K through the 100 displays. An empty layer proves that THIS print admits no route
-# (not even an open one) with every edge <= K HTM.
+# <= K through the 100 displays. An empty layer means the computation finds no route for
+# THIS print (not even an open one) with every edge <= K HTM. No native checker confirms it.
 include(joinpath(@__DIR__, "engine.jl"))
 cwaxes(P) = P[1]*P[2]*P[3] > 0 ? (1, 2, 3) : (1, 3, 2)   # cyclic axis order at a corner
 function twist(st)
