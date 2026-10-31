@@ -131,53 +131,81 @@ synchronized scene. Approved nonmetallic clearcoat is retained.
 **Studio rig (all values are named constants in `PRESENTATION_PRESET`).**
 Ambient 0.30 and hemisphere 0.65 (previously 0.45 and 1.1: together they were
 more than half the key and reached every surface equally, flattening the shading).
-Key 2.8 at [3, 5, 6], fill 0.85 at [-4, 1, 2] and rim 1.3 at [1, 3, -4] keep their
-directions and intensities. A fourth directional light, the *shadow fill*
-(`shadowFillIntensity` 1.0, about 36 percent of the key, at [-3.5, 6, 4] on the
-side opposite the key), also casts a shadow. Its penumbra is wider
-(`shadowFillSoftness` 0.18 against the key's `shadowSoftness` 0.14, radius cap
-32 against 24 texels) and its shadow is weighted by
-`shadowFillShadowIntensity` 0.55. The intended effect: a denser core where the
-two shadows overlap and softer edges, neither hard nor gone.
+The key (2.8) moved from [3, 5, 6] (about 40 degrees above the horizon, which cast
+long, flat, hexagonal-looking shadows) to `keyPosition` [1.5, 7, 3] (about 64
+degrees), giving shorter, rounder shadows. Fill 0.85 at [-4, 1, 2] and rim 1.3 at
+[1, 3, -4] keep their directions and intensities. A fourth directional light, the
+*shadow fill* (`shadowFillIntensity` 1.0, about 36 percent of the key), also casts
+a shadow. Its position is derived from the key: rotated about the Y axis by
+`shadowFillAzimuthDegrees` 25 toward smaller x, at the key's distance and elevation
+(`shadowFillElevationDelta` 0). The two shadows therefore nearly coincide; the fill's
+penumbra is wider (`shadowFillSoftness` 0.18 against the key's `shadowSoftness`
+0.14, radius cap 32 against 24 texels) and its shadow is weighted by
+`shadowFillShadowIntensity` 0.55. The intended effect is one soft shadow with a
+wider penumbra, not two separate shadows.
 
-**Cost.** Exactly two 1024x1024 shadow maps per viewport, never per cube. The
-clock keeps one rig for three cubes. `fitCasters` fits both shadow cameras to the
-same conservative caster union (side bounds include receiver intersections;
-padding is scaled with each light's filter footprint, wider for the fill), and
-`dispose()` releases both maps.
+**Cost.** Exactly two shadow maps per viewport (1024x1024 by default), never per
+cube. The clock keeps one rig for three cubes. `fitCasters` fits both shadow
+cameras to the same conservative caster union from each light's own direction
+(side bounds include receiver intersections; padding is scaled with each light's
+filter footprint, wider for the fill), and `dispose()` releases both maps. The
+clock calls `fitCasters` from its animation loop; CubeViewer and CalendarViewer
+never call it and keep the frustum set at creation. The floor is unchanged: it
+stays at the bounding-sphere clearance below the cubes.
 
 **Floor.** `ShadowMaterial` multiplies the shadow factors of all casting lights
-before applying its opacity (now 0.38). The key's shadow darkens the floor with the
-full opacity; the shadow fill's per-light shadow intensity scales its contribution
-down, so regions shaded only by the fill read about 55 percent as dark. Overlap
-does not darken beyond the opacity: the result is a union with graded edges, not an
-additive double shadow. A warm radial/vertical gradient replaces flat green on the
-viewport and its stage; the floor stays transparent outside shadows, so light
-pools on it are invisible.
+before applying its opacity (now 0.30, lighter than the earlier 0.38). The key's
+shadow darkens the floor with the full opacity; the shadow fill's per-light shadow
+intensity scales its contribution down. Overlap does not darken beyond the
+opacity: the result is a union with graded edges, not an additive double shadow.
+A warm radial/vertical gradient replaces flat green on the viewport and its stage;
+the floor stays transparent outside shadows, so light pools on it are invisible.
 
-**Switches (both default off).** `setContactShadow(on)` adds a soft procedural
-radial plane (a generated `DataTexture`, no canvas) under each fitted cube, just
-above the receiver (`contactShadow*` constants). While off nothing is allocated;
-turning it off or disposing the studio releases geometry, material and texture.
-`setColorTemperature(on)` tints lights only: key `#fff3e3` (warm), fill and
-shadow fill `#eaf1ff` (cool). Off restores exactly white; materials, stickers and
-textures are never touched. The shared **Appearance** panel offers them as
-"Contact shadow" and "Warm studio light" checkboxes in CubeViewer,
-CalendarViewer and ClockStage ([`lighting-switches.ts`](../packages/cube-viewer/src/lighting-switches.ts)).
-They persist per page in their own versioned, bounded key
-`cubistry-viewer-lighting-v1:<path>`; the appearance storage format is unchanged.
-Garbage or unavailable storage falls back to the defaults.
+**Switches in the Appearance panel.** `setContactShadow(on)`,
+`setColorTemperature(on)` and `setFineShadowEdges(on)` on the studio object back
+three checkboxes in CubeViewer, CalendarViewer and ClockStage
+([`lighting-switches.ts`](../packages/cube-viewer/src/lighting-switches.ts)). They
+persist per page in their own versioned, bounded key
+`cubistry-viewer-lighting-v1:<path>` (the appearance storage format is unchanged;
+`fineShadowEdges` is an optional field, so older stored objects still load). A
+stored choice overrides the defaults; garbage or unavailable storage falls back
+to them.
+
+- **Contact shadow** (default on, "Contact shadow"): a soft round procedural
+  radial plane (a generated `DataTexture`, no canvas) under each fitted cube, just
+  above the receiver. `contactShadowScale` 2.2 times the presentation radius,
+  opacity 0.5. Turning it off or disposing the studio releases geometry, material
+  and texture; turning it on re-creates them.
+- **Warm studio light** (default off): tints lights only: key `#fff3e3` (warm),
+  fill and shadow fill `#eaf1ff` (cool). Off restores exactly white; materials,
+  stickers and textures are never touched.
+- **Fine shadow edges** (default off): both shadow maps use 2048x2048
+  (`fineShadowMapSize`) and the world-space penumbra is multiplied by
+  `fineShadowSoftnessScale` 0.65. This is a trade-off, not a free improvement: the
+  stair-stepped edges come from the world-space spacing of the fixed 17-tap PCF
+  samples (spacing is penumbra divided by the sample count), so a larger map alone
+  would not remove them. Narrowing the penumbra shrinks that spacing, giving a
+  cleaner but slightly harder edge, at four times the shadow-map memory and fill
+  cost. Switching disposes the old shadow maps and clears them so three recreates
+  them at the new size on the next render; the PCF radius is recomputed from each
+  light's current map size (texel caps scale with the map size), both when
+  switching and in every `fitCasters` call.
 
 **Verified and not verified.** Numeric tests cover preset values and defaults,
-light and shadow-caster counts, both frusta containing the caster union and its
+light and shadow-caster counts, the key elevation (at least 55 degrees), the
+25-degree fill azimuth offset, both frusta containing the caster union and its
 receiver intersections, disposal of both maps, exact-white lights with the tint
-off, no material color changes, contact-shadow allocation, placement and disposal,
-and storage round trips with garbage input. Lights, floor geometry/material and
+off, no material color changes, contact-shadow default, allocation, placement and
+disposal, fine-edge map sizes, penumbra and map disposal, and storage round trips
+with garbage input and with objects stored before `fineShadowEdges` existed. Lights, floor geometry/material and
 shadow targets are disposed by the scene owner. The adapter does not own shared
-stage renderers. Not verified (no GPU, browser or visual run): how the retuned
-values and the two-shadow combination actually look, shadow softness and banding
-at the larger fill radius, frame rate, the perceived strength of the contact shadow
-and the color tint, and the panel layout in a browser. These need an owner preview.
+stage renderers. Not verified (no GPU, browser or visual run): how the steeper
+key, the 25-degree shadow pair and the lighter 0.30 opacity actually look, whether
+the cast shadow still reads as hexagonal or stair-stepped (default and fine edges),
+whether the three clock shadows still merge, the perceived size and strength of the
+contact shadow and whether the cubes still look as if they float, banding at the
+larger fill radius, frame rate and memory with 2048 maps, the color tint, and the
+panel layout in a browser. These need an owner preview.
 
 ### R07: whole-group camera travel
 
