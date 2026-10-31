@@ -246,3 +246,30 @@ test("contact shadow: off by default allocates nothing; on places planes under t
   studio.dispose();
   assert.equal(scene.children.length, 0);
 });
+
+test("color temperature: default off keeps every light white; on tints lights only", () => {
+  const p = PRESENTATION_PRESET;
+  assert.equal(p.colorTemperatureDefault, false);
+  const scene = new THREE.Scene(), studio = createPresentationStudio(scene, 1, 1);
+  const lights = scene.children.filter(o => o.isLight);
+  const material = new THREE.MeshStandardMaterial({ color: "#12ab34" });
+  const sticker = new THREE.Mesh(new THREE.BufferGeometry(), material); scene.add(sticker);
+  const hex = () => lights.map(l => l.color.getHexString());
+  const hemisphereGround = lights.find(o => o.isHemisphereLight).groundColor.getHexString();
+  assert.deepEqual(hex(), lights.map(() => "ffffff"), "off: exactly white");
+  const [key, fill, rim, shadowFill] = scene.children.filter(o => o.isDirectionalLight);
+  for (let round = 0; round < 3; round++) {
+    studio.setColorTemperature(true);
+    assert.equal(key.color.getHexString(), "fff3e3");
+    assert.equal(fill.color.getHexString(), "eaf1ff");
+    assert.equal(shadowFill.color.getHexString(), "eaf1ff");
+    assert.equal(rim.color.getHexString(), "ffffff");
+    assert.equal(lights.filter(l => l.color.getHexString() !== "ffffff").length, 3);
+    assert.equal(material.color.getHexString(), "12ab34", "material colors are never touched");
+    assert.equal(studio.floor.material.color.getHexString(), "302b26");
+    assert.equal(lights.find(o => o.isHemisphereLight).groundColor.getHexString(), hemisphereGround);
+    studio.setColorTemperature(false);
+    assert.deepEqual(hex(), lights.map(() => "ffffff"), "off again: exactly white");
+  }
+  studio.dispose(); material.dispose();
+});
