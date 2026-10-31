@@ -33,7 +33,9 @@ function dual_match(s,angle,wanted,table)
 end
 function read_candidate_print(path,table)
     source=read_physical(path)
-    old=read_physical(joinpath(@__DIR__,"..","english","evidence","physical-print.tsv"))
+    old_path=joinpath(@__DIR__,"..","english","evidence","physical-print.tsv")
+    @assert bytes2hex(sha256(read(old_path)))=="b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931" "unchanged PR99 printing provenance"
+    old=read_physical(old_path)
     for id in 1:294
         s=source[id];before=old[id]
         @assert (s.piece,s.home,s.normal,s.up)==(before.piece,before.home,before.normal,before.up)
