@@ -1,0 +1,100 @@
+# descriptive listing, not a proof; cells show the label as read on the front (printed text turned by the actual angle; half-turn symmetric labels read reversed through the PR #99 glyph table) and ink; '.' is blank; @q marks any other quarter turn
+target	28	2028	4	Sat	30	10	1
+row	28	3	.	.	.	.	.	.	1 red
+row	28	4	2 red	3 dark	4 dark	5 dark	6 dark	7 dark	8 red
+row	28	5	9 red	10 dark	11 dark	12 dark	13 dark	14 dark	15 red
+row	28	6	16 red	17 dark	18 dark	19 dark	20 dark	21 dark	22 red
+row	28	7	23/30 red	24/31 dark	25 dark	26 dark	27 dark	28 dark	29 red
+use	28	7,2	61	24/31 dark	0	24 dark
+months	28	2028-04,2034-04,2045-04,2051-04,2056-04,2062-04,2073-04,2079-04,2084-04,2090-04
+target	33	2028	9	Fri	30	10	1
+row	33	3	.	.	.	.	.	1 dark	2 red
+row	33	4	3 red	4 dark	5 dark	6 dark	7 dark	8 dark	9 red
+row	33	5	10 red	11 dark	12 dark	13 dark	14 dark	15 dark	16 red
+row	33	6	17 red	18 dark	19 dark	20 dark	21 dark	22 dark	23 red
+row	33	7	24/31 red	25 dark	26 dark	27 dark	28 dark	29 dark	30 red
+use	33	7,1	16	24/31 red	0	24 red
+months	33	2028-09,2034-09,2045-09,2051-09,2056-09,2062-09,2073-09,2079-09,2084-09,2090-09
+target	42	2029	6	Fri	30	11	1
+row	42	3	.	.	.	.	.	1 dark	2 red
+row	42	4	3 red	4 dark	5 dark	6 dark	7 dark	8 dark	9 red
+row	42	5	10 red	11 dark	12 dark	13 dark	14 dark	15 dark	16 red
+row	42	6	17 red	18 dark	19 dark	20 dark	21 dark	22 dark	23 red
+row	42	7	24/31 red	25 dark	26 dark	27 dark	28 dark	29 dark	30 red
+use	42	7,1	16	24/31 red	0	24 red
+months	42	2029-06,2035-06,2040-06,2046-06,2057-06,2063-06,2068-06,2074-06,2085-06,2091-06,2096-06
+target	45	2029	9	Sat	30	11	1
+row	45	3	.	.	.	.	.	.	1 red
+row	45	4	2 red	3 dark	4 dark	5 dark	6 dark	7 dark	8 red
+row	45	5	9 red	10 dark	11 dark	12 dark	13 dark	14 dark	15 red
+row	45	6	16 red	17 dark	18 dark	19 dark	20 dark	21 dark	22 red
+row	45	7	23/30 red	24/31 dark	25 dark	26 dark	27 dark	28 dark	29 red
+use	45	7,2	61	24/31 dark	0	24 dark
+months	45	2029-09,2035-09,2040-09,2046-09,2057-09,2063-09,2068-09,2074-09,2085-09,2091-09,2096-09
+target	50	2030	2	Fri	28	8	1
+row	50	3	.	.	.	.	.	1 dark	2 red
+row	50	4	3 red	4 dark	5 dark	6 dark	7 dark	8 dark	9 red
+row	50	5	10 red	11 dark	12 dark	13 dark	14 dark	15 dark	16 red
+row	50	6	17 red	18 dark	19 dark	20 dark	21 dark	22 dark	23 red
+row	50	7	24/31 red	25 dark	26 dark	27 dark	28 dark	.	.
+use	50	7,1	16	24/31 red	0	24 red
+months	50	2030-02,2041-02,2047-02,2058-02,2069-02,2075-02,2086-02,2097-02
+target	54	2030	6	Sat	30	10	1
+row	54	3	.	.	.	.	.	.	1 red
+row	54	4	2 red	3 dark	4 dark	5 dark	6 dark	7 dark	8 red
+row	54	5	9 red	10 dark	11 dark	12 dark	13 dark	14 dark	15 red
+row	54	6	16 red	17 dark	18 dark	19 dark	20 dark	21 dark	22 red
+row	54	7	23/30 red	24/31 dark	25 dark	26 dark	27 dark	28 dark	29 red
+use	54	7,2	61	24/31 dark	0	24 dark
+months	54	2030-06,2041-06,2047-06,2052-06,2058-06,2069-06,2075-06,2080-06,2086-06,2097-06
+target	59	2030	11	Fri	30	10	1
+row	59	3	.	.	.	.	.	1 dark	2 red
+row	59	4	3 red	4 dark	5 dark	6 dark	7 dark	8 dark	9 red
+row	59	5	10 red	11 dark	12 dark	13 dark	14 dark	15 dark	16 red
+row	59	6	17 red	18 dark	19 dark	20 dark	21 dark	22 dark	23 red
+row	59	7	24/31 red	25 dark	26 dark	27 dark	28 dark	29 dark	30 red
+use	59	7,1	16	24/31 red	0	24 red
+months	59	2030-11,2041-11,2047-11,2052-11,2058-11,2069-11,2075-11,2080-11,2086-11,2097-11
+target	62	2031	2	Sat	28	8	2
+row	62	3	.	.	.	.	.	.	1 red
+row	62	4	2 red	3 dark	4 dark	5 dark	6 dark	7 dark	8 red
+row	62	5	9 red	10 dark	11 dark	12 dark	13 dark	14 dark	15 red
+row	62	6	16 red	17 dark	18 dark	19 dark	20 dark	21 dark	22 red
+row	62	7	23/30 red	24/31 dark	25 dark	26 dark	27 dark	28 dark	.
+use	62	7,1	15	23/30 red	0	23 red
+use	62	7,2	61	24/31 dark	0	24 dark
+months	62	2031-02,2042-02,2053-02,2059-02,2070-02,2081-02,2087-02,2098-02
+target	71	2031	11	Sat	30	11	1
+row	71	3	.	.	.	.	.	.	1 red
+row	71	4	2 red	3 dark	4 dark	5 dark	6 dark	7 dark	8 red
+row	71	5	9 red	10 dark	11 dark	12 dark	13 dark	14 dark	15 red
+row	71	6	16 red	17 dark	18 dark	19 dark	20 dark	21 dark	22 red
+row	71	7	23/30 red	24/31 dark	25 dark	26 dark	27 dark	28 dark	29 red
+use	71	7,2	61	24/31 dark	0	24 dark
+months	71	2031-11,2036-11,2042-11,2053-11,2059-11,2064-11,2070-11,2081-11,2087-11,2092-11,2098-11
+target	76	2033	4	Fri	30	10	1
+row	76	3	.	.	.	.	.	1 dark	2 red
+row	76	4	3 red	4 dark	5 dark	6 dark	7 dark	8 dark	9 red
+row	76	5	10 red	11 dark	12 dark	13 dark	14 dark	15 dark	16 red
+row	76	6	17 red	18 dark	19 dark	20 dark	21 dark	22 dark	23 red
+row	76	7	24/31 red	25 dark	26 dark	27 dark	28 dark	29 dark	30 red
+use	76	7,1	16	24/31 red	0	24 red
+months	76	2033-04,2039-04,2044-04,2050-04,2061-04,2067-04,2072-04,2078-04,2089-04,2095-04
+target	87	2036	2	Fri	29	3	1
+row	87	3	.	.	.	.	.	1 dark	2 red
+row	87	4	3 red	4 dark	5 dark	6 dark	7 dark	8 dark	9 red
+row	87	5	10 red	11 dark	12 dark	13 dark	14 dark	15 dark	16 red
+row	87	6	17 red	18 dark	19 dark	20 dark	21 dark	22 dark	23 red
+row	87	7	24/31 red	25 dark	26 dark	27 dark	28 dark	29 dark	.
+use	87	7,1	16	24/31 red	0	24 red
+months	87	2036-02,2064-02,2092-02
+target	90	2048	2	Sat	29	2	2
+row	90	3	.	.	.	.	.	.	1 red
+row	90	4	2 red	3 dark	4 dark	5 dark	6 dark	7 dark	8 red
+row	90	5	9 red	10 dark	11 dark	12 dark	13 dark	14 dark	15 red
+row	90	6	16 red	17 dark	18 dark	19 dark	20 dark	21 dark	22 red
+row	90	7	23/30 red	24/31 dark	25 dark	26 dark	27 dark	28 dark	29 red
+use	90	7,1	15	23/30 red	0	23 red
+use	90	7,2	61	24/31 dark	0	24 dark
+months	90	2048-02,2076-02
+total-months	104
