@@ -58,6 +58,22 @@ if [ "$(head -n 1 "$witness")" = "cubistry.hm-counter.v2" ]; then
     "claim|claimed maximum edge HTM differs from replay"
     "boundary|$bwant"
   )
+  # period too long: the M period rows repeated once more, Q doubled
+  awk -F'\t' -v OFS='\t' '
+    $1=="mode" {inM=($2=="M"); if (inM) {P=$5; Q=$6; $6=2*$6; j=0}; print; next}
+    $1=="step" && inM {print; if (j>=P) buf=buf $0 "\n"; j++; if (j==P+Q) {printf "%s", buf; inM=0}; next}
+    {print}' "$witness" > "$neg/toolong.tsv"
+  # period too short: first mode whose period has two or more laps loses its last lap
+  short=$(awk -F'\t' '$1=="mode" && $6>=2*($3+1) {print $2"\t"$3; exit}' "$witness")
+  if [ -n "$short" ]; then
+    sl=${short%%$'\t'*}; sr=${short#*$'\t'}
+    awk -F'\t' -v OFS='\t' -v L="$sl" -v R="$sr" '
+      $1=="mode" {inS=($2==L && $3==R); if (inS) {P=$5; Q=$6; n=R+1; $6=Q-n; j=0}; print; next}
+      $1=="step" && inS {if (j < P+Q-n) print; j++; next}
+      {print}' "$witness" > "$neg/tooshort.tsv"
+    controls+=("tooshort|period boundary: state after preperiod+period must equal state after preperiod for $sl$sr")
+  fi
+  controls+=("toolong|period is not minimal for M59")
 else
 awk -F'\t' -v OFS='\t' -v r="$ur" 'NR==r{$7="H"}1' "$witness" > "$neg/glyph.tsv"
 awk -F'\t' -v OFS='\t' -v r="$lr" 'NR==r{$6=($6=="0,1,0")?"1,0,0":"0,1,0"}1' "$witness" > "$neg/up.tsv"

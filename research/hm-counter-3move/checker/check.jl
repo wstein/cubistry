@@ -316,6 +316,9 @@ function validate2(rows, raw)
             state = nxt
         end
         need(states[P+Q+1] == states[P+1], "period boundary: state after preperiod+period must equal state after preperiod for $letter$range")
+        for j in n:n:Q-n
+            need(states[P+j+1] != states[P+1], "period is not minimal for $letter$range")
+        end
         # decrement: exact inverse traversal of the period, from the period start
         d = states[P+1]
         for j in P+Q-1:-1:P
