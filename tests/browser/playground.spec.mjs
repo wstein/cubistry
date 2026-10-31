@@ -126,7 +126,7 @@ test("corrupt solver table fails explicitly without moving or changing history",
   await word(page, "R U");
   await page.locator("#solve").click();
   await idle(page);
-  await expect(page.locator("#cube")).toHaveAttribute("data-solver", "Invalid");
+  await expect(page.locator("#cube")).toHaveAttribute("data-solver", "Unavailable"); // hash failures are recoverable (docs/PLAYGROUND_SOLVER_TABLE.md)
   await expect(page.locator("#cube")).toHaveAttribute("data-cursor", "2");
   await expect(page.locator("#history li")).toHaveCount(2);
   await expect(page.locator("#cube")).toHaveAttribute("data-exact", "false");
