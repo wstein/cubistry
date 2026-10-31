@@ -1,0 +1,13 @@
+cubistry.hm-counter.receipt.v1
+witness-sha256	4e8939dd3c6987430b17eb49c4533a5f7a5e25692928daeac35a170d885b0dab
+profile	free
+graph	9072	0:1,1:15,2:177,3:1397,4:4981,5:2497,6:4
+chain	M	edges	60	total	164	max	3	hist	0:0,1:3,2:10,3:47,4:0,5:0,6:0	lbtotal	149	lbmax	3	tight	45	closure	exact
+decrement	M	edges	60	inverse	exact
+setup	M	htm	0	word	-
+chain	H	edges	24	total	69	max	3	hist	0:0,1:0,2:3,3:21,4:0,5:0,6:0	lbtotal	62	lbmax	3	tight	17	closure	exact
+decrement	H	edges	24	inverse	exact
+setup	H	htm	7	word	B' U2 F' R' U2 R F
+reset	H	11	0	htm	3	lb	3	exact
+transitions	85	total	236	max	3	hist	0:0,1:3,2:13,3:69,4:0,5:0,6:0
+verdict	ACCEPT
