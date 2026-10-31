@@ -60,24 +60,26 @@ the target model (sections "Data model" and "Target model").
 
 | Size | Cubacle: modeled | Cubacle: missing | Cubistry |
 |---|---|---|---|
-| 2×2 | `PocketSolver`, rotation quotient (`docs/design/fixed-frame-proofs.md:67-72` [V]). A **fixed-frame 2×2** with a print (id, cubie, p, n, up, image) and `FrameGoal` (rules `ids`/`image`, optional `up`) is in code on `develop` (`src/engines/two/fixed/goal.rs:1-30`, `src/puzzle/frame/mod.rs` [V]); the design still calls it "planned until merged" (`fixed-frame-proofs.md:12-14` [V]). | `image` is exact string equality only (`fixed-frame-proofs.md:157` [V]): no symmetry, no 6/9 or O/0 equality. | H/S/M counter on the 2×2 with independent checkers (`research/hsm-counter/README.md` [V]). |
-| 3×3 | Two-phase on colors; target-set IDA* with internal **identity views** (54-bit mask per position), 24 views for free orientation (`docs/design/dont-care-targets.md:393-405`, `src/engines/three/partial/goal.rs:1-8` [V]). | Center twist: a view is discarded when a center is not "itself", and twist is never checked (`goal.rs:80-87` [V]); explicitly "slice 2" (`dont-care-targets.md:415` [V]). Cubacle's Orbit64 support is V1 only: it carries the frame digit (24) and no center twist (`src/notation/orbit64/coords.rs:4-9` [V]). | `date-3x3`: pure center-correction macros of 18/20/18 HTM (`research/date-3x3/README.md:103-107` [V]); 2048 residual twists, diameter of the full picture cube UNKNOWN (`date-3x3/center-bound-investigation/README.md:5-24` [L]). On `main`, the 3×3 Super Picture Cube solves all six center rotations with a pinned reference provider ([SUPER_PICTURE_CUBE.md](../../docs/SUPER_PICTURE_CUBE.md) [V]); that route makes no optimality claim. |
-| 4×4, 5×5 | Reduction (TPR, cube555); wing identity from colors; centers by color only, freely paired (`relative.rs:131-137` [V]); decision "no strict mode" (`notes/Same-colored inner pieces are equal and there is no strict mode.md` [V]); centers-only and mixed-center routes (`dont-care-targets.md:383-389` [V]). | Center identity; 5×5 core twist (follows from facelets = colors, `src/puzzle/facelets.rs:79-93` [A]). | [–] no 4×4/5×5 picture research. |
-| 6×6, 7×7 | dwalton reduction, 7×7 mean **189.05 moves** (`docs/design/dwalton-port.md:80` [V]), counted as `moves N`: `Rw` and `2R` count 1 each (`docs/metrics.md:113` [V]); centers-only target. | As 4×4/5×5; no partial targets except `centers`. | 7×7 fully physical: 294 stickers, 218 cubies, home/normal/up/text/ink (`english/replay_legal.jl:24-46` [V]); front comparison by `image_normal` (`replay_legal.jl:66-77` [V]); existence DAG of about 10^111 leaves (`english/README.md` [V]); practical solvers use pure commutators on **one** orbit, and untargeted orbits must stay fixed (`practical/RESULTS.md:34-39` [V]); minimax 358 to 446 HTM per month edge, mean 305.4 (`minimax/verification/README.md:13-14` [V]). |
+| 2×2 | `PocketSolver`, rotation quotient (`docs/design/fixed-frame-proofs.md:67-72` [V]). A **fixed-frame 2×2** with a print (id, cubie, p, n, up, image) and `FrameGoal` (rules `ids`/`image`, optional `up`) is in code on `develop` (`FrameGoal` at `src/engines/two/fixed/goal.rs:34`, `src/puzzle/frame/mod.rs` [V]); the design still calls it "planned until merged" (`fixed-frame-proofs.md:12-14` [V]). | `image` is exact string equality only (`fixed-frame-proofs.md:157` [V]): no symmetry, no 6/9 or O/0 equality. | H/S/M counter on the 2×2 with independent checkers (`research/hsm-counter/README.md` [V]). |
+| 3×3 | Two-phase on colors; target-set IDA* with internal **identity views** (54-bit mask per position), 24 views for free orientation (`docs/design/dont-care-targets.md:393-405`, `src/engines/three/partial/goal.rs:1-8` [V]). | Center twist: a view is discarded when a center is not "itself", and twist is never checked (`goal.rs:80-87` [V]); explicitly "slice 2" (`dont-care-targets.md:415` [V]). At the pinned snapshot `9a03c0f`, Cubacle's Orbit64 support is V1 only: it carries the frame digit (24) and no center twist (`src/notation/orbit64/coords.rs:4-9` [V]). Later `develop` adds a V2 coordinate codec (section 2). | `date-3x3`: pure center-correction macros of 18/20/18 HTM (`research/date-3x3/README.md:103-107` [V]); 2048 residual twists, diameter of the full picture cube UNKNOWN (`date-3x3/center-bound-investigation/README.md:5-24` [L]). On `main`, the 3×3 Super Picture Cube solves all six center rotations with a pinned reference provider ([SUPER_PICTURE_CUBE.md](../../docs/SUPER_PICTURE_CUBE.md) [V]); that route makes no optimality claim. |
+| 4×4, 5×5 | Reduction (TPR, cube555); wing identity from colors; centers by color only, freely paired (`relative.rs:131-137` [V]); decision "no strict mode" (`notes/Same-colored inner pieces are equal and there is no strict mode.md` [V]); centers-only route (`dont-care-targets.md:383-389` [V]) and mixed-center route (`dont-care-targets.md:29,123` [V]). | Center identity; 5×5 core twist (follows from facelets = colors, `src/puzzle/facelets.rs:79-93` [A]). | [–] no 4×4/5×5 picture research. |
+| 6×6, 7×7 | dwalton reduction, 7×7 mean **189.05 moves** (`docs/design/dwalton-port.md:80` [V]), counted as `moves N`: `Rw` and `2R` count 1 each (`docs/metrics.md:113` [V]); centers-only target. | As 4×4/5×5; no partial targets except `centers`. | 7×7 fully physical: 294 stickers, 218 cubies, home/normal/up/text/ink (`english/replay_legal.jl:24-46` [V]); front comparison by `image_normal` (`replay_legal.jl:66-77` [V]); existence DAG of about 10^111 leaves (`english/README.md` [V]); practical solvers use pure commutators on **one** orbit, and untargeted orbits must stay fixed (`practical/RESULTS.md:34-39` [V]); minimax: five saved two-edge chains with 8 primary edge words of 358, 57, 48, 409, 446, 401, 363 and 361 HTM, so 48 to 446 HTM, maximum 446, mean 305.4 (`minimax/verification/README.md:3-4,13-14` [V]). |
 
 Weaknesses of the Cubistry solver [V/A]: single-orbit macros only (above); cost
 is roughly the sum of orbit costs (ranking by actual HTM, but no admissible
 bound, `minimax/SEARCH-POLICY.md:9-18` [V]); no optimality claim. The figure
-"about 9 HTM per differing piece" does **not** appear in the files [–]. Order of
-magnitude [A]: 6 to 41, median 36 changed front cells per edge
-(`practical/RESULTS.md:74-75` [V]) against 358 to 446 HTM, about 10 to 12 HTM per
-cell.
+"about 9 HTM per differing piece" does **not** appear in the files [–].
+Changed front cells per edge range from 6 to 41, median 36
+(`practical/RESULTS.md:74-75` [V]), and the same file says these "are not move
+counts or move-count lower bounds". No per-cell move cost is derived here.
 
 **Metric caveat [A].** Cubacle's 189 counts block moves as 1 and applies to
-random scrambles. Cubistry counts every non-central single layer as 1 HTM in a
-21-generator alphabet (`english/README.md`, section "Legal reachability" [V]).
-Comparing 189 with 358 to 446 is meaningless until both are converted to one
-metric.
+random scrambles. Cubistry counts every noncentral single layer as 1 HTM, with
+whole-cube rotations counted separately (`minimax/README.md:13-14` [V]), in a
+21-generator alphabet of 18 noncentral layer quarter turns and three whole-cube
+rotations (`english/README.md`, section "Legal reachability" [V]).
+Comparing 189 with the minimax edge lengths (48 to 446 HTM) is meaningless
+until both are converted to one metric.
 
 ## 2. State tokens: Orbit64 V1 and V2
 
@@ -87,8 +89,9 @@ with explicit picture models:
 
 - **V1 stays color-based.** A V1 state token is a color state with a whole-cube
   frame ([FORMAT.md](https://github.com/wstein/flix-orbit64/blob/main/FORMAT.md),
-  "State" [V]). Nothing in V2 changes what V1 tokens mean (FORMAT-V2.md,
-  introduction [V]).
+  "State" [V]), and it reads colors: a center orbit is a multiset of colors
+  (FORMAT.md, "Canonical form", lines 315-318 [V]). Nothing in V2 changes what
+  V1 tokens mean (FORMAT-V2.md, introduction [V]).
 - **V2 is an append-only registry** without V1's class bits. Entries are only
   appended, never removed, reordered or changed (FORMAT-V2.md, "Growth rules"
   [V]). The initial registry holds the `n x n x n` cube for `n = 2..15` in a
@@ -98,8 +101,9 @@ with explicit picture models:
 - **Picture model** (FORMAT-V2.md, "Sticker models" and "Conventions" [V]): every
   sticker is distinguishable, center pieces are numbered by their home slot, and
   each fixed center records its rotation `r_f` in `0..3` against a per-face
-  reference direction. The six rotations take radix `2^11`, since the parity of
-  `r_B` is forced (FORMAT-V2.md, "Digit layout", digit 7 [V]).
+  reference direction. The six rotations take radix `2^11` (FORMAT-V2.md,
+  "Digit layout", digit 7 [V]), since the parity of `r_B` follows from the
+  relation `R = C` (FORMAT-V2.md, "Parity relations" [V]).
 - **Partial distinguishability**, for example a logo on one center only, is a
   future registry entry, not part of the initial registry (FORMAT-V2.md,
   "Extensions" [V]).
@@ -123,11 +127,22 @@ open items put porting other implementations, Cubacle among them, after the
 facelet bridge and CI checks (FORMAT-V2.md, "Open items before V2 leaves draft",
 item 4 [V]).
 
-**Cubacle today supports V1 only** (`src/notation/orbit64/*.rs`; the module doc
-in `mod.rs` cites `FORMAT.md` [V]). Without a picture model in Cubacle, a picture
-state there needs a separate field next to the V1 token, or it is given as
+**Cubacle and V2.** At the pinned snapshot `9a03c0f`, Cubacle supports V1 only
+(`src/notation/orbit64/*.rs`; the module doc in `mod.rs` cites `FORMAT.md` [V]).
+Cubacle `develop` at `5d94f24` (five commits later, 2026-10-31) adds a V2 state
+token codec on orbit coordinates in `src/notation/orbit64/v2/`, including the
+picture models in both pose variants (`registry.rs:66-67` [V]), with tests in
+`tests/orbit64_v2_test.rs`. Its module doc says it has no facelet bridge
+(`v2/mod.rs:10` [V]), and it has no print I/O. The rest of this plan cites the
+pinned snapshot. Until a facelet and print path exists, a picture state in
+Cubacle needs a separate field next to the V1 token, or it is given as
 `{"moves": ...}` over a print, as the fixed-frame 2×2 does, because a camera does
 not read identity. Without a print file, everything stays color-based.
+
+**V1 output stays byte-identical.** Cubacle's design lists any change to Orbit64
+as a non-goal ("byte-identical, as the don't-care design requires",
+`docs/design/fixed-frame-proofs.md:110-111` [V]). Under V2 adoption this remains
+a requirement for V1: existing V1 token output must not change.
 
 A V2 token must be labeled wherever a V1 decoder might see it, for example by
 a field name or an `orbit64v2:` prefix, because a V1 decoder can misread it as a
@@ -149,8 +164,8 @@ layer**, not to the state token:
   (`english/prepare_physical.jl:12-21` [V]), using the `HALF` table of
   half-turn-equal glyphs `0 1 2 5 8 H N S X Z` and the swap `6`↔`9`
   (`orientation_screen.jl:6-7` [V]). A multi-character label whose characters
-  are all in the table is reversed and mapped character by character. `O` and `I` are aliased to `0` and `1`. Ink is
-  part of the key.
+  are all in the table is reversed and mapped character by character. `O` and
+  `I` are aliased to `0` and `1`. Ink is part of the key.
 - A per-sticker **symmetry period** (see the artwork table below) is the
   general form of the same idea. It lives in the print profile, next to text,
   ink and reference `up`.
@@ -208,7 +223,7 @@ fixed-center rotations number 2048 [L], consistent with V2's `2^11` radix for
 digit 7 [V].
 
 **Formats.** Print: Cubistry's `physical-print.tsv` unchanged (header
-`sticker piece home normal up text ink`, `replay_legal.jl:29` [V]), with an
+`sticker piece home normal up text ink`, `replay_legal.jl:28` [V]), with an
 optional `period` column. Artwork profile as TOML (illustrative only; the format
 name is a placeholder):
 
@@ -275,8 +290,9 @@ exist yet. They are UNKNOWN until implemented and checked.
 7×7 front projection (49 cells) [A, arithmetic]: corners, 4 cells,
 8·7·6·5·3⁴ = 136,080; midges, 4 cells, 12·11·10·9·2⁴ = 190,080; each wing orbit,
 8 cells, two halves of 24·23·22·21 = 255,024; each movable center orbit (6), 4
-cells, 255,024 each (fewer with duplicates); core Z4. Total table size is
-estimated as small (tens of MB), UNKNOWN until built. Alphabet 18 layers × 3 =
+cells, 255,024 each (fewer with duplicates); core Z4. Together about 2.9 million
+entries (136,080 + 190,080 + 4 × 255,024 + 6 × 255,024 = 2,876,400, plus Z4 for
+the core) [A, arithmetic]; memory UNKNOWN until built. Alphabet 18 layers × 3 =
 54 moves: exact IDA* beyond depth about 10 is expected to be impractical [A].
 
 In practice: **staged target-set search with side effects**. Stage i only
@@ -286,14 +302,14 @@ orbits may be disturbed freely (instead of "untargeted orbits must be fixed",
 corners/midges/core, each stage beam search or IDA* with the projection tables.
 Fallback: pick one completion and run dwalton (189) plus an identity fix-up,
 overdetermined but an immediate baseline. Whether side-effect search beats
-358 to 446 HTM by a clear margin is **UNKNOWN**.
+the minimax edge lengths (maximum 446 HTM) by a clear margin is **UNKNOWN**.
 
 ## 7. Applications
 
 - **7×7 calendar**: 49 cells, 24 views, profile from section 4. The dual-label
   profile 1/8, 24/31 is directly a read table: cell "1" accepts
   (255, q ∈ {1, 3}) plus every other dark "1" at its angles. The README claims no
-  move savings (`dual-dates/README.md:40-42` [V]). Chains: the end state of one
+  move savings (`dual-dates/README.md:68-69` [V]). Chains: the end state of one
   edge is the start of the next; keep non-dominated end states
   (`minimax/SEARCH-POLICY.md:20-23` [V]); the solver returns several endpoints.
 - **3×3 H/S/M counter**: a letter plus two digits on the front; center twist is
@@ -340,10 +356,10 @@ overdetermined but an immediate baseline. Whether side-effect search beats
 |---|---|---|
 | P1 | Artwork profile `cubacle.picture.v1` and compilation to a read table (Rust), with the same parser in Julia | The Cubistry profile reproduces `image_normal` byte for byte on all 294 × 4 (sticker, angle) pairs |
 | P2 | 2×2: profile → `FrameGoal` rules | H/S/M goldens unchanged; a 6/9 target = union of two rules |
-| P3 | 3×3: `ct[6]` and twist table in target-set IDA* | `date-3x3`'s 18/20/18 HTM corrections are shown shorter or equal; spike cases 7–11 unchanged without twist |
+| P3 | 3×3: `ct[6]` and twist table in target-set IDA* | `date-3x3`'s 18/20/18 HTM corrections are shown shorter or equal (by the twist IDA*, not a proof until both native checkers accept); spike cases 7–11 unchanged without twist |
 | P4 | Picture state (colors + center permutation + twist), input as print + moves | Round trip moves → state → hash equals Julia `state_digest` |
-| P5 | 7×7 front projection tables, bounds only | h ≤ known edge length on all 5 minimax chains; tables deterministic |
-| P6 | 7×7 staged side-effect search | 5 minimax edges: result accepted by both Julia and Flix; length reported, no success threshold set in advance |
+| P5 | 7×7 front projection tables, bounds only | h ≤ known edge length on all 8 primary edges of the 5 minimax chains; tables deterministic |
+| P6 | 7×7 staged side-effect search | 5 minimax chains with 8 primary edges: result accepted by both Julia and Flix; length reported, no success threshold set in advance |
 | P7 | 4×4/5×5 center target-set stage | Partial targets with identity: replay correct; color targets byte-identical to today |
 | P8 | Print/move optimization (research) | Candidates only, each accepted independently |
 
@@ -351,9 +367,11 @@ overdetermined but an immediate baseline. Whether side-effect search beats
 
 ### Decided
 
-1. **Cubacle will adopt Orbit64 V2.** Cubacle supports V1 only today. The timing
-   and scope of the port still follow V2's own open items, since V2 is a draft
-   and defers ports until those are done (section 2). Until the port lands,
+1. **Cubacle will adopt Orbit64 V2.** The pinned snapshot `9a03c0f` is V1 only;
+   `develop` at `5d94f24` already has a V2 coordinate codec including the
+   picture models, but no facelet or print I/O (section 2). The timing and scope
+   of the rest of the port still follow V2's own open items, since V2 is a
+   draft. V1 output stays byte-identical. Until facelet and print I/O land,
    picture state in Cubacle needs a side field or a print + moves form.
 2. **`0` is half-turn-equal, but only where the chosen font's `0` is actually
    half-turn symmetric** (no slash, dot or serif asymmetry). This is checked per
