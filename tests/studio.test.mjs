@@ -41,17 +41,20 @@ test("one studio rig casts actual moving three-cube geometry onto a bounded soft
     adapter.sync(poses); return { adapter, group };
   });
   const shadowLights = scene.children.filter(object => object.isLight && object.castShadow);
-  assert.equal(shadowLights.length, 1);
+  assert.equal(shadowLights.length, 2, "key plus shadow fill, never per cube");
   assert.equal(studio.floor.receiveShadow, true);
   assert(studio.floor.position.y < -Math.SQRT2);
   for (const construction of ["stickered", "stickerless"]) {
     for (const cube of cubes) cube.adapter.setConstruction(construction);
     const before = projectedShadow(scene, shadowLights[0], studio.floor.position.y);
+    const fillBefore = projectedShadow(scene, shadowLights[1], studio.floor.position.y);
     const ids = poses.filter(s => s.p[1] === 1).map(s => s.cubie);
     const turn = cubes[2].adapter.beginTurn([...new Set(ids)], 1, Math.PI / 2);
     turn.update(.5);
     const during = projectedShadow(scene, shadowLights[0], studio.floor.position.y);
     assert(!before.equals(during), `${construction}: a layer must change the geometric shadow silhouette`);
+    assert(!fillBefore.equals(projectedShadow(scene, shadowLights[1], studio.floor.position.y)),
+      `${construction}: the shadow fill silhouette changes too`);
     turn.dispose(); cubes[2].adapter.sync(poses);
     assert(projectedShadow(scene, shadowLights[0], studio.floor.position.y).equals(before));
   }
@@ -84,13 +87,17 @@ test("studio ground does not occlude below-floor orbit and backdrop remains warm
 test("fixed-budget shadow filtering preserves world-space softness for single and grouped cubes", () => {
   for (const [halfExtent, horizontalExtent] of [[1, 1], [1, 4.3], [1.5, 1.5]]) {
     const scene = new THREE.Scene(), studio = createPresentationStudio(scene, halfExtent, horizontalExtent);
-    const keys = scene.children.filter(object => object.isLight && object.castShadow);
-    assert.equal(keys.length, 1);
-    const key = keys[0], camera = key.shadow.camera;
-    assert.deepEqual(key.shadow.mapSize.toArray(), [1024, 1024]);
-    assert(key.shadow.radius >= 2 && key.shadow.radius <= 24);
-    const worldRadius = key.shadow.radius * (camera.right - camera.left) / key.shadow.mapSize.x;
-    assert(Math.abs(worldRadius - PRESENTATION_PRESET.shadowSoftness * halfExtent) < 1e-8);
+    const casters = scene.children.filter(object => object.isLight && object.castShadow);
+    assert.equal(casters.length, 2);
+    for (const [light, softness] of [[casters[0], PRESENTATION_PRESET.shadowSoftness],
+                                     [casters[1], PRESENTATION_PRESET.shadowFillSoftness]]) {
+      const camera = light.shadow.camera;
+      assert.deepEqual(light.shadow.mapSize.toArray(), [1024, 1024]);
+      assert(light.shadow.radius >= 2 && light.shadow.radius <= PRESENTATION_PRESET.shadowFillRadiusMax);
+      const worldRadius = light.shadow.radius * (camera.right - camera.left) / light.shadow.mapSize.x;
+      assert(Math.abs(worldRadius - softness * halfExtent) < 1e-8);
+    }
+    assert(casters[1].shadow.radius > casters[0].shadow.radius, "shadow fill is softer than the key");
     studio.dispose(); assert.equal(scene.children.length, 0);
   }
 });
@@ -145,4 +152,51 @@ test("rotated rigid clock and active layers stay above the receiver and inside s
   for(const progress of [0,.2,.5,.8,1]){turn.update(progress);studio.fitCasters(centers,clockCubeRadius,.08);
     assert.equal(studio.floor.position.y,floorAtDefault);assert.equal(key.shadow.camera.right-key.shadow.camera.left,widthAtDefault);}
   turn.dispose(); for (const cube of cubes) cube.dispose(); studio.dispose(); material.dispose();
+});
+
+test("shadow fill: opposite side, weaker, softer; both shadow cameras contain the same caster union", () => {
+  const p = PRESENTATION_PRESET;
+  assert.equal(p.shadowFillIntensity, 1.0);
+  assert(p.shadowFillIntensity / p.keyIntensity > .3 && p.shadowFillIntensity / p.keyIntensity < .4);
+  assert(p.shadowFillSoftness > p.shadowSoftness);
+  assert(p.shadowFillShadowIntensity > 0 && p.shadowFillShadowIntensity < 1);
+  const scene = new THREE.Scene(), studio = createPresentationStudio(scene, 1, 4.3);
+  const lights = scene.children.filter(o => o.isDirectionalLight);
+  assert.equal(lights.length, 4);
+  assert.deepEqual(lights.filter(l => l.castShadow).map(l => l.intensity), [p.keyIntensity, p.shadowFillIntensity]);
+  const [key, fill, rim] = [lights[0], lights[3], lights[2]];
+  assert.deepEqual(key.position.toArray(), [3, 5, 6]);
+  assert.deepEqual(lights[1].position.toArray(), [-4, 1, 2]);
+  assert.deepEqual(rim.position.toArray(), [1, 3, -4]);
+  assert(fill.position.x * key.position.x < 0, "shadow fill sits on the opposite side of the key");
+  assert.equal(fill.shadow.intensity, p.shadowFillShadowIntensity);
+  assert.equal(key.shadow.intensity, 1);
+  assert.deepEqual(fill.shadow.mapSize.toArray(), [p.shadowMapSize, p.shadowMapSize]);
+  for (const radius of [1, 1.7]) {
+    const centers = [-2.8, 0, 2.8].map(x => new THREE.Vector3(x * radius, .3, -.4));
+    const clearance = .08 * radius;
+    studio.fitCasters(centers, radius * 1.1, clearance);
+    scene.updateMatrixWorld(true);
+    for (const light of [key, fill]) {
+      light.shadow.updateMatrices(light);
+      const camera = light.shadow.camera, direction = light.position.clone().normalize();
+      for (const center of centers) for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) {
+        const corner = center.clone().add(new THREE.Vector3(sx, sy, sz).multiplyScalar(radius * 1.1 / Math.sqrt(3)));
+        for (const point of [corner, corner.clone().addScaledVector(direction.clone().negate(),
+            (corner.y - studio.floor.position.y) / direction.y)]) {
+          const ndc = point.clone().project(camera);
+          assert(Math.abs(ndc.x) < 1 && Math.abs(ndc.y) < 1 && ndc.z > -1 && ndc.z < 1,
+            "caster and its receiver intersection lie inside this light's frustum");
+        }
+      }
+      assert(Math.abs((camera.right - camera.left) - (camera.top - camera.bottom)) < 1e-12);
+      assert.deepEqual(light.shadow.mapSize.toArray(), [1024, 1024]);
+    }
+    assert(fill.shadow.radius > key.shadow.radius);
+  }
+  const disposed = [];
+  for (const light of [key, fill]) { light.shadow.map = { dispose() { disposed.push(light); } }; }
+  studio.dispose();
+  assert.deepEqual(disposed, [key, fill]);
+  assert.equal(scene.children.length, 0);
 });
