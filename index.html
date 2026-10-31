@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Counter</title>
-    <script type="module" crossorigin src="/cubistry/assets/counter-C5DqW8oE.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/counter-gXS17Jrw.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/link-DR-RiidG.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/three-BW9MzyAf.js">
@@ -16,9 +16,9 @@
     <link rel="modulepreload" crossorigin href="/cubistry/assets/index-CmjMcBak.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/lettering-B68hIPUm.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/puzlwerk-2x2-DWFACdC1.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/design-BN0anJCV.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/design-9zAZ1n7O.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/index-C_NaBeHz.js">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/style-B63ckwHP.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/style-CmJoyAh0.css">
   </head>
   <body>
     <main>
@@ -145,6 +145,15 @@
           aria-label="Counter controls"
         >
           <h1>Counter</h1>
+          <label for="counter-print">Sticker print</label>
+          <select id="counter-print" aria-describedby="print-note">
+            <option value="titled" selected>COUNTER title (default)</option>
+            <option value="blank-top">Blank top 00–99</option>
+          </select>
+          <p id="print-note" class="small">
+            Choose the print that matches your stickers. Changing it installs
+            the other cube at the current value and restarts session moves.
+          </p>
           <form id="jump-form">
             <label for="value">Target 0–99</label>
             <input
@@ -182,9 +191,13 @@
               ><input id="format" type="checkbox" checked /> Leading Zero</label
             >
           </div>
-          <p class="small">
+          <p id="format-note" class="small">
             Leading Zero shows or hides only the leading 0. The layout, value,
             and moves stay the same.
+          </p>
+          <p id="mode-switch" class="small" hidden>
+            Setup moves (mode switches, not counted in session moves):
+            <output id="setup-moves" aria-label="Setup moves (HTM)">0</output>
           </p>
         </aside>
         <aside
