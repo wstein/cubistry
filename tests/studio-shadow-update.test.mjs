@@ -149,3 +149,22 @@ test("an earlier Scene.onBeforeRender hook keeps running", () => {
   scene.onBeforeRender(); assert.equal(calls, 1);
   studio.dispose(); scene.onBeforeRender(); assert.equal(calls, 2);
 });
+
+test("a changed shadow map size or a recreated (disposed) map marks dirty without an explicit call", () => {
+  const { lights, frame, studio } = rig();
+  assert.deepEqual(frame(), both);
+  assert.deepEqual(frame(), none);
+  // A map appearing (first render of a light) and later disappearing (dispose) both change the snapshot.
+  lights[0].shadow.map = new THREE.WebGLRenderTarget(1, 1);
+  assert.deepEqual(frame(), both, "an existing map is a change");
+  assert.deepEqual(frame(), none);
+  lights[0].shadow.map = null;
+  assert.deepEqual(frame(), both, "a disposed map must be rendered again");
+  assert.deepEqual(frame(), none);
+  // The map size is part of what the depth pass reads.
+  lights[1].shadow.mapSize.set(2048, 2048);
+  assert.deepEqual(frame(), both);
+  assert.deepEqual(frame(), none);
+  studio.dispose();
+});
+
