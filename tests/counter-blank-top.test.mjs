@@ -12,6 +12,8 @@ import {
   validateBlankTopCounter,
   modeSwitchMoves,
   modeSwitchAt,
+  sharedValues,
+  sharedRangeLabel,
   BLANK_TOP_STATISTICS,
 } from "../src/apps/counter/blank-top.ts";
 import { parseTsv } from "../scripts/counter-blank-top.mjs";
@@ -109,6 +111,8 @@ test("LZ and NZ store identical complete states from 31 to 99, so a switch there
   for (let v = 0; v < 100; v++)
     if (stateEquals(blankTop.routes.lz.states[v], blankTop.routes.nz.states[v])) shared.push(v);
   assert.deepEqual(shared, Array.from({ length: 69 }, (_, i) => 31 + i));
+  assert.deepEqual(sharedValues(blankTop), shared);
+  assert.equal(sharedRangeLabel(blankTop), "31–99");
   assert.deepEqual(modeSwitchAt(blankTop, "nz", 57), []);
   assert.deepEqual(modeSwitchAt(blankTop, "lz", 31), []);
   assert.equal(modeSwitchAt(blankTop, "nz", 30), null);
