@@ -307,6 +307,7 @@ def validate(path: String): String \ IO = {
     require(String.endsWith(suffix="\n",text),"final LF required");
     let rows=String.splitOn(substr="\n",String.dropRight(1,text));
     require(List.forAll(r -> r != "",rows),"empty line");
+    if(at(rows,0)=="cubistry.hm-counter.v2") validate2(rows,bytes) else {
     require(at(rows,0)=="cubistry.hm-counter.v1","schema header");
     let blank=match fieldsOf(at(rows,1)) {
         case "profile"::"free"::Nil => false
@@ -337,6 +338,7 @@ def validate(path: String): String \ IO = {
     let tail=List#{"transitions\t${List.length(all)}\ttotal\t${total}\tmax\t${mx}\thist\t${histText(all)}","verdict\tACCEPT"};
     String.intercalate("\n",List.append(List.append(List.append(header,mOut),hOut),tail))
 }
+}
 
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {
@@ -348,3 +350,101 @@ def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
         case ex: IllegalArgumentException => {println("REJECT\t"+ex.getMessage());System.exit(1)}
     }
 })
+
+// ---- v2: blank profile, run-in (preperiod) + repeating full-state period ----
+// "mode L range setup P Q" then P+Q rows "step L range from to word lb".
+// The state after P steps must reappear exactly after P+Q steps; P and Q are
+// whole laps. Decrement = exact inverse traversal of the period.
+def runMode(rows: List[String],letter: Char,range: Int32,st0: List[Stk],
+            maps: List[Map[Pose,Int32]],dist: Vector[Int32]): (List[String],List[Int32],List[Int32],List[String]) \ IO = {
+    let n=range+1;
+    let (setupText,p,q,rest0)=match rows {
+        case r::more => match fieldsOf(r) {
+            case "mode"::l::rg::w::ps::qs::Nil => {
+                require(l=="${letter}" and rg=="${range}","mode row ${letter} ${range}");
+                (w,natural(ps),natural(qs),more)
+            }
+            case _ => throw new IllegalArgumentException("mode row ${letter} ${range}")
+        }
+        case Nil => throw new IllegalArgumentException("mode row ${letter} ${range}")
+    };
+    require(Int32.modulo(p,n)==0 and Int32.modulo(q,n)==0 and q>0 and p+q<=100000,"preperiod and period must be whole laps");
+    let setup=parseWord(setupText);
+    let start=doWord(st0,setup);
+    checkShow(start,wanted(letter,0,true),"${letter}${range} 00 after setup");
+    let (_,states,words,lens,lbs,rest)=List.foldLeft((acc,j) -> match acc {
+        case (s,ss,ws,ls,bs,rr) => {
+            let v=Int32.modulo(j,n);
+            let nv=Int32.modulo(v+1,n);
+            match rr {
+                case r::more => match fieldsOf(r) {
+                    case "step"::l::rg::a::b::wt::lbt::Nil => {
+                        require(l=="${letter}" and rg=="${range}" and a=="${v}" and b=="${nv}","step row ${letter}${range} ${j}");
+                        let w=parseWord(wt);
+                        let lb=lowerBound(4,maps,dist,s,wanted(letter,nv,true));
+                        require(natural(lbt)==lb,"claimed lower bound differs for ${letter}${range} step ${j}");
+                        require(List.length(w)>=lb,"word shorter than graph distance for ${letter}${range} step ${j}");
+                        let nxt=doWord(s,w);
+                        checkShow(nxt,wanted(letter,nv,true),"${letter}${range} step ${j}");
+                        require(doWord(nxt,invWord(w))==s,"full-state edge inverse");
+                        (nxt,nxt::ss,w::ws,List.length(w)::ls,lb::bs,more)
+                    }
+                    case _ => throw new IllegalArgumentException("step row ${letter}${range} ${j}")
+                }
+                case Nil => throw new IllegalArgumentException("step row ${letter}${range} ${j}")
+            }
+        }
+    },(start,start::Nil,Nil,Nil,Nil,rest0),List.range(0,p+q));
+    let fstates=List.toVector(List.reverse(states));
+    let fwords=List.toVector(List.reverse(words));
+    require(Vector.get(p+q,fstates)==Vector.get(p,fstates),"period boundary: state after preperiod+period must equal state after preperiod for ${letter}${range}");
+    let _ = List.foldLeft((s,j) -> {
+        let d=doWord(s,invWord(Vector.get(j,fwords)));
+        require(d==Vector.get(j,fstates),"exact full-state decrement replay ${letter}${range}");
+        checkShow(d,wanted(letter,Int32.modulo(j,n),true),"decrement ${letter}${range}");
+        d
+    },Vector.get(p,fstates),List.reverse(List.range(p,p+q)));
+    let ls=List.reverse(lens);
+    let bs=List.reverse(lbs);
+    let pre=List.take(p,ls);
+    let per=List.drop(p,ls);
+    let perLb=List.drop(p,bs);
+    let sum=xs -> List.foldLeft((a,b) -> a+b,0,xs);
+    let mxOf=xs -> List.foldLeft((a,b) -> Int32.max(a,b),0,xs);
+    let tight=List.count(pr -> match pr { case (a,b) => a==b },List.zip(per,perLb));
+    let out=List#{
+        "mode\t${letter}\t${range}\tsetup\t${List.length(setup)}\tpreperiod\t${p}\tperiod\t${q}\tlaps\t${q/n}",
+        "period\t${letter}\t${range}\ttotal\t${sum(per)}\tmax\t${mxOf(per)}\thist\t${histText(per)}\tlbtotal\t${sum(perLb)}\ttight\t${tight}\tclosure\texact",
+        "preperiod\t${letter}\t${range}\ttotal\t${sum(pre)}\tmax\t${mxOf(pre)}\thist\t${histText(pre)}",
+        "decrement\t${letter}\t${range}\tinverse-of-period\texact"
+    };
+    (out,per,pre,rest)
+}
+
+def validate2(rows: List[String],bytes: Array[Int8,Static]): String \ IO = {
+    require(at(rows,1)=="profile\tblank","v2 requires the blank profile");
+    require(at(rows,2)=="letters\tHM","letters row must be exactly HM");
+    let st0=readPrint(List.slice(start=3,end=27,rows));
+    require(List.exists(x -> match x { case Stk.S(_,_,_,_,_,g) => g=='_' },st0),"blank profile needs a blank sticker");
+    let (maps,dist)=buildGraph(4);
+    let reach=List.filter(d -> d>=0,Vector.toList(dist));
+    let maxd=List.foldLeft((a,b) -> Int32.max(a,b),0,reach);
+    let graphLine="graph\t${List.length(reach)}\t"+String.intercalate(",",List.map(d -> "${d}:${List.count(x -> x==d,reach)}",List.range(0,maxd+1)));
+    let (o1,per1,pre1,r1)=runMode(List.drop(27,rows),'M',59,st0,maps,dist);
+    let (o2,per2,pre2,r2)=runMode(r1,'H',23,st0,maps,dist);
+    let (o3,per3,pre3,r3)=runMode(r2,'H',11,st0,maps,dist);
+    let per=List.append(List.append(per1,per2),per3);
+    let pre=List.append(List.append(pre1,pre2),pre3);
+    let mxOf=xs -> List.foldLeft((a,b) -> Int32.max(a,b),0,xs);
+    let m=Int32.max(mxOf(per),mxOf(pre));
+    match r3 {
+        case c::"end"::Nil => match fieldsOf(c) {
+            case "claim"::"maxEdgeHTM"::v::Nil => require(natural(v)==m,"claimed maximum edge HTM differs from replay")
+            case _ => throw new IllegalArgumentException("claim row")
+        }
+        case _ => throw new IllegalArgumentException("claim row")
+    };
+    let header=List#{"cubistry.hm-counter.receipt.v2","witness-sha256\t"+sha256(bytes),"profile\tblank",graphLine};
+    let tail=List#{"edges\tperiod\t${List.length(per)}\tmax\t${mxOf(per)}\thist\t${histText(per)}\tpreperiod\t${List.length(pre)}\tmax\t${mxOf(pre)}\thist\t${histText(pre)}","verdict\tACCEPT"};
+    String.intercalate("\n",List.append(List.append(List.append(List.append(header,o1),o2),o3),tail))
+}
