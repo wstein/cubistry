@@ -1,5 +1,5 @@
 cubistry.ms-counter.receipt.v1
-witness-sha256	e0aa5e5ca6c9cf93e14f5b9480924aad745741e7ded9789d588430e3b1d17d3f
+witness-sha256	0ec9f38a6b4abf689a4f26379961f97520e0ff76629d4a2dcd2edb397cfff16b
 profile	blank
 graph	136080	0:1,1:15,2:198,3:2030,4:15396,5:61768,6:53528,7:3144
 run	M	period	1	runin	0	edges	60	total	195	max	4	hist	0:0,1:0,2:0,3:45,4:15,5:0,6:0	lbtotal	185	lbmax	4	tight	50

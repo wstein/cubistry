@@ -20,6 +20,8 @@ S setup R F' D' L' D' R2 U' F2 U2 (9 HTM)
 max 4 hist [5, 19, 93, 3] total 334
 
 ## hmsbase.jl evidence/hms-seconds-first-printing.txt
+# extracted with: git show 010da4e8:data/hsm/seconds-first/modes/witness.json |
+#   jq -r '.printing[] | "\(.id) \(.p|join(",")) \(.n|join(",")) \(.up|join(",")) \(.slot) \(if .image=="" then "_" else .image end)"'
 # (origin/main 010da4e8, data/hsm/seconds-first/modes/witness.json "printing";
 #  slot/up consistency with this engine's frame asserted for all 24 stickers)
 labels "acebdf3198S527S406SXM   "     (X = printed H, never displayed)
