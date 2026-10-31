@@ -131,7 +131,7 @@ The three-cube clock has one rig and floor for the entire synchronized scene.
 A warm radial/vertical gradient replaces flat green on the viewport and its
 stage. The ground now uses Three's shadow-only `ShadowMaterial`: outside actual
 occlusion it is transparent, avoiding the uniform floor tint/horizon against that
-gradient. Shadow opacity is 0.28. The same conservative turn sweep and front-sided
+gradient. Shadow opacity is 0.38. The same conservative turn sweep and front-sided
 floor are retained, allowing bottom inspection. Lights, floor geometry/material and
 shadow targets are disposed by the scene owner. The adapter does not own shared
 stage renderers. Numeric projection tests show that a moving layer changes the

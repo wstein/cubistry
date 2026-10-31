@@ -68,7 +68,7 @@ test("studio ground does not occlude below-floor orbit and backdrop remains warm
   assert.equal(studio.floor.material.transparent, true);
   assert.equal(studio.floor.material.depthWrite, false);
   assert.equal(studio.floor.material.opacity, PRESENTATION_PRESET.shadowOpacity);
-  assert(studio.floor.material.opacity > 0 && studio.floor.material.opacity < .35);
+  assert(studio.floor.material.opacity > 0 && studio.floor.material.opacity < .5);
   assert.equal(studio.floor.position.y, -Math.SQRT2 * 1.5 - .08);
   scene.updateMatrixWorld(true);
   const below = new THREE.Raycaster(new THREE.Vector3(0, -10, 0), new THREE.Vector3(0, 1, 0));
