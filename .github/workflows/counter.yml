@@ -16,7 +16,7 @@ concurrency:
 jobs:
   counter:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
@@ -37,23 +37,67 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/print-venv"
           "$RUNNER_TEMP/print-venv/bin/pip" install -r scripts/print-requirements.txt
           PATH="$RUNNER_TEMP/print-venv/bin:$PATH" npm run test:print-exports
-      - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
-        run: npx playwright install --with-deps chromium
-      - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
-        run: npm run test:e2e
-        env:
-          CI: '1'
-      - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
-        run: npm run test:pages
-        env:
-          CI: '1'
-      - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
-        run: npm run test:pr-preview
+
+  # The browser end-to-end suite is split into parallel shards. It runs on every
+  # push to main and on pull requests that carry the `e2e` label; each shard
+  # needs its own runner because the specs run in software-rendered Chromium.
+  e2e:
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm run prepare:solver
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e -- --shard=${{ matrix.shard }}/4
         env:
           CI: '1'
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
-          name: counter-browser-failure
+          name: counter-browser-failure-shard-${{ matrix.shard }}
+          path: test-results/
+          retention-days: 7
+
+  # The deployed-pages and preview-infrastructure browser tests build their own
+  # site and server, so they do not depend on the shards above.
+  e2e-pages:
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm run prepare:solver
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:pages
+        env:
+          CI: '1'
+      - run: npm run test:pr-preview
+        env:
+          CI: '1'
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: failure()
+        with:
+          name: counter-pages-browser-failure
           path: test-results/
           retention-days: 7
