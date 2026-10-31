@@ -127,6 +127,14 @@ test("interrupting a return by taps, zoom/settings, mode, reduced motion or visi
  assert(before.angleTo(c.anchor)<radians(40));
  c.down(7);c.drag(0,radians(1),7.2);c.up(7.4);assert.equal(c.phase,"idle");near(c.anchor.angleTo(c.quaternion),0);assert(c.quaternion.angleTo(before)>radians(.9));
 });
+test("the boundary is inclusive: a pose just above exactly 40 degrees (within the numeric slack) stays, a clearly larger one returns",()=>{
+ const slack=new SmartRotation(initial());slack.down(0);slack.drag(0,P.toleranceRadians+5e-13,.2);slack.up(.4);
+ assert(slack.quaternion.angleTo(slack.front)>P.toleranceRadians);
+ assert.equal(slack.phase,"idle");assert(slack.anchor.equals(slack.quaternion),"the pose became the return target");
+ const beyond=new SmartRotation(initial());beyond.down(0);beyond.drag(0,P.toleranceRadians+1e-9,.2);beyond.up(.4);
+ assert.equal(beyond.phase,"awaiting-return");near(beyond.anchor.angleTo(beyond.front),0);
+ const below=new SmartRotation(initial());below.down(0);below.drag(0,P.toleranceRadians-5e-13,.2);below.up(.4);assert.equal(below.phase,"idle");
+});
 test("the return wait uses the owner's fixed numbers: 0.6 s at 40 degrees, 0.1 s from 120 degrees, smoothstep between",()=>{
  near(returnDelay(radians(40)),.6);near(returnDelay(radians(120)),.1);near(returnDelay(radians(200)),.1);near(returnDelay(radians(10)),.6);
  near(returnDelay(radians(80)),.35,1e-9);near(returnDelay(radians(60)),.521875,1e-9);
