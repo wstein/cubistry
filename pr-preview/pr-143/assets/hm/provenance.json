@@ -4,7 +4,7 @@
   "label": "m3-SH",
   "source": {
     "path": "data/hm/m3-sh/modes/witness.json",
-    "sha256": "a4ca6ccd5bac254894b64df8d675f3a9555dd1c3eef37fe9aa1214c1a8b70126"
+    "sha256": "635e9325dea8e5da5c495d94918c82bf85e3fabfa53817cd4ad584e859210939"
   },
   "generator": "scripts/hm/render-net.mjs",
   "license": "AGPL-3.0-or-later (project artwork; no fonts, no raster data)",
