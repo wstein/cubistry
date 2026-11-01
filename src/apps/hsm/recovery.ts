@@ -53,6 +53,21 @@ export interface RecoveryPlan {
   readonly words: readonly (readonly LegalMove[])[];
   readonly htm: number;
 }
+/**
+ * A search written as a generator: every `yield` is a safe point where a caller
+ * may suspend it (time slicing, cancellation); the return value is the result.
+ * Running it to completion without ever suspending is the synchronous search.
+ */
+export type SearchTask<T> = Generator<void, T, void>;
+export const runSync = <T>(task: SearchTask<T>): T => {
+  for (;;) {
+    const step = task.next();
+    if (step.done) return step.value;
+  }
+};
+/** Depth below which the walk is a generator; deeper subtrees run uninterrupted. */
+const SLICE_DEPTH = 2;
+type Targets = (value: number) => readonly CubeState[];
 
 /**
  * Exact return onto a closed counting period after a free jump, a catch-up or an
@@ -185,13 +200,13 @@ export class HsmRecovery {
    * one least word each (canonical words: no face twice in a row, opposite faces
    * in one order). `exact` keeps only words of exactly `limit` moves.
    */
-  private reach(
+  private *reachTask(
     pose: Uint8Array,
     letter: Letter,
     value: number,
     limit: number,
     exact = false,
-  ): Map<number, { pose: Uint8Array; word: number[] }> {
+  ): SearchTask<Map<number, { pose: Uint8Array; word: number[] }>> {
     const found = new Map<number, { pose: Uint8Array; word: number[] }>();
     const start: number[] = [];
     for (const o of this.optionsFor(letter, value)) {
@@ -200,6 +215,45 @@ export class HsmRecovery {
         start.push(...q);
     }
     const word: number[] = [];
+    const visit = (r: Uint8Array, q: number[], depth: number) => {
+      if (depth && (!exact || depth === limit))
+        for (let i = 0; i < q.length; i += 4)
+          if (this.dist(q, i) === 0) {
+            const k = HsmRecovery.key(r),
+              seen = found.get(k);
+            if (!seen || seen.word.length > depth)
+              found.set(k, { pose: r, word: word.slice() });
+            break;
+          }
+    };
+    /** The pruned successor of (r, q) by move m, or null; null also for a skipped move. Same rules as `dfs`. */
+    const child = (
+      r: Uint8Array,
+      q: number[],
+      depth: number,
+      last: number,
+      m: number,
+    ): [Uint8Array, number[]] | null => {
+      const budget = limit - depth - 1,
+        lf = last < 0 ? -1 : Math.floor(last / 3),
+        f = Math.floor(m / 3);
+      if (f === lf || (lf >= 0 && f === (lf ^ 1) && f < lf)) return null;
+      const nq: number[] = [];
+      const t = this.table.transitions;
+      for (let i = 0; i < q.length; i += 4) {
+        const a = t[0][m][q[i]],
+          b = t[1][m][q[i + 1]],
+          c = t[2][m][q[i + 2]],
+          d = t[3][m][q[i + 3]];
+        if (this.table.distances[a * 13824 + b * 576 + c * 24 + d] <= budget)
+          nq.push(a, b, c, d);
+      }
+      if (!nq.length) return null;
+      const r2 = new Uint8Array(8);
+      for (let c = 0; c < 8; c++) r2[c] = this.trans[c][m][r[c]];
+      return [r2, nq];
+    };
+    // The uninterrupted walk (hot path, kept as a plain recursion).
     const dfs = (r: Uint8Array, q: number[], depth: number, last: number) => {
       if (depth && (!exact || depth === limit))
         for (let i = 0; i < q.length; i += 4)
@@ -234,7 +288,28 @@ export class HsmRecovery {
         word.pop();
       }
     };
-    if (start.length) dfs(pose, start, 0, -1);
+    // The same walk in the same order; the top levels are a generator so that
+    // a caller can suspend between subtrees, each of which runs uninterrupted.
+    const sliced = function* (
+      r: Uint8Array,
+      q: number[],
+      depth: number,
+      last: number,
+    ): Generator<void> {
+      visit(r, q, depth);
+      if (depth === limit) return;
+      for (let m = 0; m < 18; m++) {
+        const c = child(r, q, depth, last, m);
+        if (!c) continue;
+        word.push(m);
+        if (depth + 1 >= SLICE_DEPTH) {
+          dfs(c[0], c[1], depth + 1, m);
+          yield;
+        } else yield* sliced(c[0], c[1], depth + 1, m);
+        word.pop();
+      }
+    };
+    if (start.length) yield* sliced(pose, start, 0, -1);
     return found;
   }
   /**
@@ -250,8 +325,21 @@ export class HsmRecovery {
     maximum: number,
     direction: number,
     value: number,
-    targets: (value: number) => readonly CubeState[],
+    targets: Targets,
   ): readonly LegalMove[] | null {
+    return runSync(
+      this.jumpTask(state, letter, maximum, direction, value, targets),
+    );
+  }
+  /** `jump` as a suspendable task: identical result, safe points at each `yield`. */
+  *jumpTask(
+    state: CubeState,
+    letter: Letter,
+    maximum: number,
+    direction: number,
+    value: number,
+    targets: Targets,
+  ): SearchTask<readonly LegalMove[] | null> {
     const origin = this.encode(state),
       least = this.shortest(origin, letter, value);
     if (least > 6) return null;
@@ -263,11 +351,19 @@ export class HsmRecovery {
     let fallback: number[] | null = null;
     for (let length = least; length <= Math.max(least, 6); length++) {
       let free: number[] | null = null;
-      for (const [k, e] of this.reach(origin, letter, value, length, true)) {
+      const reached = yield* this.reachTask(
+        origin,
+        letter,
+        value,
+        length,
+        true,
+      );
+      for (const [k, e] of reached) {
         if (period.has(k)) return e.word.map((m) => moves[m]);
         if (!free && this.shortest(e.pose, letter, next) <= RECOVERY_EDGE_LIMIT)
           free = e.word;
         fallback ??= e.word;
+        yield;
       }
       if (free) return free.map((m) => moves[m]);
     }
@@ -284,8 +380,21 @@ export class HsmRecovery {
     maximum: number,
     direction: number,
     from: number,
-    targets: (value: number) => readonly CubeState[],
+    targets: Targets,
   ): RecoveryPlan | null {
+    return runSync(
+      this.planTask(state, letter, maximum, direction, from, targets),
+    );
+  }
+  /** `plan` as a suspendable task: identical result, safe points at each `yield`. */
+  *planTask(
+    state: CubeState,
+    letter: Letter,
+    maximum: number,
+    direction: number,
+    from: number,
+    targets: Targets,
+  ): SearchTask<RecoveryPlan | null> {
     const n = maximum + 1,
       at = (k: number) => (((from + k * direction) % n) + n) % n;
     const origin = this.encode(state);
@@ -297,29 +406,32 @@ export class HsmRecovery {
         ],
       ]),
     ];
-    const grow = (
+    const grow = function* (
+      this: HsmRecovery,
       layers: Map<number, Node>[],
       depth: number,
       value: (j: number) => number,
       first: boolean,
-    ) => {
+    ): Generator<void> {
       while (layers.length <= depth) {
         const j = layers.length,
           next = new Map<number, Node>();
         for (const node of layers[j - 1].values()) {
+          yield;
           let limit = RECOVERY_EDGE_LIMIT,
             exact = false;
           if (first && j === 1) {
             const d = this.shortest(node.pose, letter, value(j));
             if (d > RECOVERY_EDGE_LIMIT) [limit, exact] = [d, true];
           }
-          for (const [k, e] of this.reach(
+          const reached = yield* this.reachTask(
             node.pose,
             letter,
             value(j),
             limit,
             exact,
-          )) {
+          );
+          for (const [k, e] of reached) {
             const htm = node.htm + e.word.length,
               old = next.get(k);
             if (!old || old.htm > htm)
@@ -334,7 +446,8 @@ export class HsmRecovery {
       if (!goals.length) continue;
       const a = Math.ceil(k / 2),
         b = k - a;
-      grow(forward, a, at, true);
+      yield* grow.call(this, forward, a, at, true);
+      yield;
       const backward: Map<number, Node>[] = [
         new Map(
           goals.map((g) => {
@@ -347,9 +460,11 @@ export class HsmRecovery {
         ),
       ];
       // Backward layer j shows at(k - j): the predecessors of layer j - 1.
-      grow(backward, b, (j) => at(k - j), false);
+      yield* grow.call(this, backward, b, (j) => at(k - j), false);
       let best: [Node, Node] | null = null;
+      let scanned = 0;
       for (const [key, f] of forward[a]) {
+        if ((++scanned & 4095) === 0) yield;
         const g = backward[b].get(key);
         if (g && (!best || f.htm + g.htm < best[0].htm + best[1].htm))
           best = [f, g];

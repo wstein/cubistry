@@ -9,6 +9,7 @@ import { loadAssets } from "@cubistry/cube-assets";
 import { loadCounterDesign } from "./apps/counter/design.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";
 import { HsmController } from "./apps/hsm/controller.ts";
+import { SlicedExecutor } from "./apps/hsm/recovery-executor.ts";
 import {
   LiveClockScheduler,
   localValues,
@@ -43,7 +44,9 @@ $("clock-lettering").addEventListener("change", () => {
     url.searchParams.set(name + "-speed", $(name + "-speed").value);
   location.assign(url);
 });
-const scheduler = new LiveClockScheduler(),
+// Recovery searches run in slices that yield to the event loop (docs/HSM_COUNTER.md).
+const recoveryExecutor = new SlicedExecutor(),
+  scheduler = new LiveClockScheduler(),
   units = [],
   // Session statistics live as long as this page's controllers: reloading or
   // changing the print restarts them; re-rendering and presentation do not.
@@ -170,6 +173,7 @@ async function initialize() {
           if (error) fail(error);
         },
         async () => assets[i],
+        recoveryExecutor,
       );
       controller.setMode(i === 0 ? 23 : 59, 1);
       unclaimed.splice(unclaimed.indexOf(assets[i]), 1);

@@ -33,6 +33,14 @@ recovers onto the period at most five HTM per step; see
 [HSM counter](HSM_COUNTER.md#leaving-and-returning-to-the-period).
 `planFromPose` remains the fallback.
 
+In the browser the recovery search behind that replan is time-sliced: the
+controller does not plan, and no cube moves, until the search has finished, and
+a retarget during the search cancels it and plans only the latest value. A late
+result is used only for the exact pose and value it was computed for, so a
+superseded plan is never applied. The live clock waits for the search with the
+unit shown as synchronizing. Without an executor (Node tests) the search runs
+inline. See [HSM counter](HSM_COUNTER.md#leaving-and-returning-to-the-period).
+
 Clock and Timer schedulers retain valid anticipatory deadlines for unchanged
 active targets. A stale wall-clock target is replaced after the current turn;
 its obsolete deadline is cleared. This is bounded recovery, not a hard real-time

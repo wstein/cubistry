@@ -20,8 +20,40 @@ import { loadAssets, type AssetManifest } from "@cubistry/cube-assets";
 import { hsmTarget, type HsmDesign, type Letter } from "./design.ts";
 import { HsmPlanner } from "./planner.ts";
 import { HsmPeriods } from "./periods.ts";
-import { HsmRecovery } from "./recovery.ts";
+import { HsmRecovery, type RecoveryPlan, type SearchTask } from "./recovery.ts";
+import type { RecoveryExecutor, SearchJob } from "./recovery-executor.ts";
 import { routeTurnTiming } from "../shared/turn-timing.ts";
+/** A recovery search the controller needs: the inputs fully determine its result. */
+type Need =
+  | {
+      readonly kind: "plan";
+      readonly range: number;
+      readonly direction: number;
+      readonly state: CubeState;
+      /** The value the cube shows now; the plan counts on from it. */
+      readonly value: number;
+    }
+  | {
+      readonly kind: "jump";
+      readonly range: number;
+      readonly direction: number;
+      readonly state: CubeState;
+      /** The value to jump to. */
+      readonly value: number;
+    };
+const sameNeed = (a: Need, b: Need): boolean =>
+  a.kind === b.kind &&
+  a.range === b.range &&
+  a.direction === b.direction &&
+  a.value === b.value &&
+  stateEquals(a.state, b.state);
+/** Thrown only in probe mode, where a route would have to run a search inline. */
+class NeedsSearch {
+  readonly need: Need;
+  constructor(need: Need) {
+    this.need = need;
+  }
+}
 export class HsmController extends PhysicalPlayback {
   private readonly design: HsmDesign;
   private readonly manifest: AssetManifest;
@@ -38,6 +70,23 @@ export class HsmController extends PhysicalPlayback {
     words: readonly (readonly LegalMove[])[];
   } | null = null;
   private planned: readonly LegalMove[] = [];
+  /** Where recovery searches run; without one they run inline (Node, tests). */
+  private readonly executor: RecoveryExecutor | null;
+  /** The search in flight (at most one) and the finished result not yet used. */
+  private pending: {
+    readonly need: Need;
+    readonly target: number;
+    readonly job: SearchJob<unknown>;
+    /** Settles when the search finishes or is dropped, whatever the executor does. */
+    readonly settled: Promise<void>;
+    readonly release: () => void;
+  } | null = null;
+  private found: {
+    readonly need: Need;
+    readonly result: RecoveryPlan | readonly LegalMove[] | null;
+  } | null = null;
+  private searchError: Error | null = null;
+  private probing = false;
   readonly letter: Letter;
   private range = 59;
   private direction = 1;
@@ -107,8 +156,10 @@ export class HsmController extends PhysicalPlayback {
       [11, 23, 59].includes(range) && [1, -1].includes(direction),
       "Invalid HSM counting mode",
     );
-    if (this.range !== range || this.direction !== direction)
+    if (this.range !== range || this.direction !== direction) {
       this.prepared = null;
+      this.cancelSearch();
+    }
     this.range = range;
     this.direction = direction;
   }
@@ -124,8 +175,10 @@ export class HsmController extends PhysicalPlayback {
       progress?: MoveProgress,
     ) => void,
     resolveAssets: typeof loadAssets = loadAssets,
+    executor: RecoveryExecutor | null = null,
   ) {
     super(view, onState);
+    this.executor = executor;
     this.design = design;
     this.manifest = manifest;
     this.letter = letter;
@@ -193,16 +246,25 @@ export class HsmController extends PhysicalPlayback {
       !this.periods.has(this.letter, this.range, this.direction)
     )
       return null;
-    this.recovery ??= new HsmRecovery(this.design.print, this.planner);
-    const word = this.recovery.jump(
-      this.state!,
-      this.letter,
-      this.range,
-      this.direction,
-      value,
-      (v) =>
-        this.periods.nodesShowing(this.letter, this.range, this.direction, v),
-    );
+    const state = this.state!,
+      word = this.resolve(
+        {
+          kind: "jump",
+          range: this.range,
+          direction: this.direction,
+          state,
+          value,
+        },
+        () =>
+          this.recoverer().jump(
+            state,
+            this.letter,
+            this.range,
+            this.direction,
+            value,
+            this.targetsOf(this.range, this.direction),
+          ),
+      ) as readonly LegalMove[] | null;
     return word?.length ? word : null;
   }
   /**
@@ -227,16 +289,24 @@ export class HsmController extends PhysicalPlayback {
       r.value !== value ||
       !stateEquals(r.source, state)
     ) {
-      this.recovery ??= new HsmRecovery(this.design.print, this.planner);
-      const plan = this.recovery.plan(
-        state,
-        this.letter,
-        this.range,
-        this.direction,
-        previous,
-        (v) =>
-          this.periods.nodesShowing(this.letter, this.range, this.direction, v),
-      );
+      const plan = this.resolve(
+        {
+          kind: "plan",
+          range: this.range,
+          direction: this.direction,
+          state,
+          value: previous,
+        },
+        () =>
+          this.recoverer().plan(
+            state,
+            this.letter,
+            this.range,
+            this.direction,
+            previous,
+            this.targetsOf(this.range, this.direction),
+          ),
+      ) as RecoveryPlan | null;
       this.recovering = plan && {
         range: this.range,
         direction: this.direction,
@@ -257,6 +327,148 @@ export class HsmController extends PhysicalPlayback {
         }
       : null;
     return word;
+  }
+  private recoverer(): HsmRecovery {
+    return (this.recovery ??= new HsmRecovery(this.design.print, this.planner));
+  }
+  private targetsOf(range: number, direction: number) {
+    return (v: number) =>
+      this.periods.nodesShowing(this.letter, range, direction, v);
+  }
+  /**
+   * The result of a recovery search: a finished off-thread result for exactly
+   * these inputs, else computed inline. In probe mode the inline case throws
+   * instead, so the caller can start the search off the critical path.
+   */
+  private resolve(
+    need: Need,
+    compute: () => RecoveryPlan | readonly LegalMove[] | null,
+  ): RecoveryPlan | readonly LegalMove[] | null {
+    const hit = this.found;
+    if (hit && sameNeed(hit.need, need)) {
+      this.found = null;
+      return hit.result;
+    }
+    if (this.probing) throw new NeedsSearch(need);
+    return compute();
+  }
+  private cancelSearch(): void {
+    const p = this.pending;
+    this.pending = null;
+    p?.job.cancel();
+    p?.release();
+  }
+  /** Start (or keep) the search for `need`, replacing any other one. */
+  private search(need: Need, target: number): Promise<void> {
+    const old = this.pending;
+    if (old && sameNeed(old.need, need)) return old.settled;
+    this.cancelSearch();
+    const { range, direction, state, value } = need,
+      recovery = this.recoverer(),
+      targets = this.targetsOf(range, direction),
+      task: SearchTask<unknown> =
+        need.kind === "plan"
+          ? recovery.planTask(
+              state,
+              this.letter,
+              range,
+              direction,
+              value,
+              targets,
+            )
+          : recovery.jumpTask(
+              state,
+              this.letter,
+              range,
+              direction,
+              value,
+              targets,
+            ),
+      job = this.executor!.start(task);
+    let release!: () => void;
+    const aborted = new Promise<void>((resolve) => (release = resolve));
+    const handled = job.done.then(
+        (outcome) => {
+          if (this.pending === entry) this.pending = null;
+          // Applied only to the very inputs it was computed for; a superseded,
+          // cancelled or out-of-date search leaves nothing behind.
+          if (
+            !outcome.cancelled &&
+            this.range === range &&
+            this.direction === direction &&
+            this.state &&
+            stateEquals(this.state, state)
+          )
+            this.found = {
+              need,
+              result: outcome.value as
+                RecoveryPlan | readonly LegalMove[] | null,
+            };
+        },
+        (e) => {
+          if (this.pending === entry) this.pending = null;
+          this.searchError = e instanceof Error ? e : Error(String(e));
+        },
+      ),
+      entry = {
+        need,
+        target,
+        job,
+        settled: Promise.race([handled, aborted]),
+        release,
+      };
+    this.pending = entry;
+    return entry.settled;
+  }
+  /**
+   * Make the route to `value` computable without blocking: null when it is (it
+   * is then also planned and cached), else the promise of the started search.
+   */
+  private ensureRoute(value: number): Promise<void> | null {
+    if (!this.executor) return null;
+    if (this.searchError) {
+      const e = this.searchError;
+      this.searchError = null;
+      throw e;
+    }
+    this.probing = true;
+    try {
+      this.prepareTarget(value);
+      return null;
+    } catch (e) {
+      if (!(e instanceof NeedsSearch)) throw e;
+      return this.search(e.need, value).then(() => {
+        if (this.searchError) {
+          const err = this.searchError;
+          this.searchError = null;
+          throw err;
+        }
+      });
+    } finally {
+      this.probing = false;
+    }
+  }
+  /**
+   * Non-blocking `prepare`: the route when it needs no search or the search has
+   * finished, else null while a sliced search for it runs (polling again
+   * continues it). Without an executor this is `prepare`.
+   */
+  tryPrepare(value: number): readonly LegalMove[] | null {
+    demand(!this.busy, "HSM must be settled before preparation");
+    if (!this.executor) return this.prepare(value);
+    return this.ensureRoute(value) ? null : this.planned;
+  }
+  protected override beforeTarget(value: number): Promise<void> | null {
+    return this.ensureRoute(value);
+  }
+  override request(value: number): void {
+    // A retarget drops the search for the old value at once.
+    if (this.pending && this.pending.target !== value) this.cancelSearch();
+    super.request(value);
+  }
+  override dispose(): void {
+    this.cancelSearch();
+    super.dispose();
   }
   protected targetMoves(): readonly LegalMove[] {
     return this.planned;
@@ -299,6 +511,8 @@ export class HsmController extends PhysicalPlayback {
         );
       this.prepared = null;
       this.recovering = null;
+      this.found = null;
+      this.cancelSearch();
       this.clearDeadline();
       this.install(this.design.print, state, assets, value);
       assets = undefined;

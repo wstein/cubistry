@@ -237,19 +237,57 @@ Measured through the real controller (5,400 random jumps, 300 per mode):
 - at most five HTM on every step of these runs, which jump and then keep the
   same counting direction (see the six-HTM steps below for a direction change);
 - at most 28 HTM per recovery;
-- at most 249 ms for one recovery search.
+- at most 249 ms for one recovery search (in total; the page is blocked for
+  one slice of it at a time, see below).
 
 The live seconds after a 40-second catch-up are back on the period within six
 ticks; a test pins this.
 
-The recovery search runs synchronously on the main thread. It is bounded by
-`RECOVERY_MAX_STEPS = 8`. Measured on a 2.1 GHz Xeon the median is 6 ms and the
-worst case 163 ms; timings vary by run (the 5,400-jump run above saw 249 ms, a
-warm run over the 47,628 recoveries after the exhaustive jumps above had a
-median of 4 ms and a worst of 67 ms). On a slow phone, several times slower, the
-worst case is estimated (not measured) as a UI hitch of roughly 0.6 to 1.3
-seconds. Moving the search off the main thread is under way in a separate
-change; update this paragraph when that lands.
+The recovery search never blocks the page for more than one short slice. It is
+bounded by `RECOVERY_MAX_STEPS = 8`; on a 2.1 GHz Xeon the median is 6 ms and
+the worst case 163 ms (timings vary by run: the 5,400-jump run above saw 249 ms,
+a warm run over the 47,628 recoveries after the exhaustive jumps above had a
+median of 4 ms and a worst of 67 ms; on a slow phone, several times slower, an
+unsliced worst case would be a hitch of roughly 0.6 to 1.3 seconds, estimated,
+not measured). In the browser it is time-sliced on the main thread
+(`src/apps/hsm/recovery-executor.ts`): the same search, written as a
+suspendable generator, runs for about 8 ms and then yields to the event loop
+(a `MessageChannel` hop, else a timer; `scheduler.yield` is not used because it
+resumes ahead of other pending tasks and would starve the live clock's own
+polling), so rendering and input keep running and a slow phone sees slices, not a second-long freeze. The
+result is exactly the synchronous one; the pure search (`HsmRecovery.plan` and
+`jump`) is unchanged for callers and for the Node tests, which run it to
+completion. Details:
+
+- **Where it runs.** Only a recovery plan or an off-period jump needs a search.
+  Counting on the period, and any step with a saved route, plans inline as
+  before. The controller learns of a needed search by a probe: it plans as
+  usual, and where it would search inline it throws instead, starts the sliced
+  search, and answers again when the result is in.
+- **Who waits.** Playback waits before the first move of a request
+  (`beforeTarget`), so a jump or recovery step starts a few slices later and
+  the cube does not move meanwhile. The live clock asks `tryPrepare`, which
+  returns no route (and the unit reports "synchronizing") until the search has
+  finished, and asks again on the next tick; the successor of the current value
+  starts searching as soon as the unit is idle, ahead of its boundary. A
+  catch-up is therefore as late as the search takes, as before, but the page
+  stays responsive.
+- **Cancellation.** At most one search is in flight. A request for another
+  value, a changed counting mode, a new setup or disposal cancels it at once; a
+  slice already running finishes first (at most one slice) and the search is
+  closed at its next safe point. A result is kept only for the exact pose,
+  value, range and direction it was computed for and is used once, so a
+  superseded plan is never applied.
+- **Without a Worker or executor.** The sliced search needs no Worker, so there
+  is nothing to fall back from in the browser. A controller built without an
+  executor (Node, unit tests) plans inline and synchronously, exactly the
+  previous behavior. A Web Worker was considered and not chosen: the search
+  needs the planner tables (about 210 ms to rebuild), a stale search
+  cannot be interrupted inside a Worker without terminating it, and the
+  slicing needs no second copy of the code.
+- **What still blocks.** The first search builds the recovery tables once
+  (about 30 ms on the Xeon); the existing planner tables (about 200 ms) are
+  built when a controller is created, as before.
 
 The exact shortest-path planner (policy 13) remains only as the last fallback,
 if no recovery plan or jump route is found. With the pinned print that does not
