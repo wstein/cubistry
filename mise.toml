@@ -5,6 +5,12 @@ julia = "1.13"        # research/ci-quality-cube/Project.toml: julia = "1.13"
 node = "22"           # package.json engines: node >= 22
 python = "3.12"       # requirements-verifier.txt (sympy)
 
+# Search and structured data (gh:wstein/bundledock)
+fd = "10.5"
+jq = "1.8"
+ripgrep = "15.2"
+yq = "4.54"
+
 [env]
 JULIA_NUM_THREADS = "auto"
 _.python.venv = { path = ".venv", create = true }
