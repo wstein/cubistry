@@ -146,18 +146,18 @@ shows that LZ and NZ store the identical complete cube state for every value fro
    off (see Controls and behavior for the exact default and persistence rules).
 4. The checkbox is labeled *Leading zero mode (physical)* on the blank-top print;
    the titled print keeps *Leading Zero*.
-
-5. (a) Shared links should carry the sticker print, so a shared link restores
-   the blank-top print. **Open, not implemented:** the Counter generates no
-   share link today (the only generated link, *Print stickers*, is hidden for the
-   Counter, and value and mode are not encoded in any URL); `?print=blank-top`
-   already selects the variant on load. How to carry the print (for example in
-   the page address) is still to be decided.
-   (b) **Deferred:** the blank-top net does not join the Print stickers page.
-   Printing fixes the sticker identities, max 3 HTM for this print is UNKNOWN so
-   a better print may follow, the independent review of PR
-   [#144](https://github.com/wstein/cubistry/pull/144) is still open, and a
-   reprint is the owner's call.
+5. Sticker print and shared links:
+   - (a) Shared links should carry the sticker print, so a shared link restores
+     the blank-top print. **Open, not implemented:** the Counter generates no
+     share link today (the only generated link, *Print stickers*, is hidden for
+     the Counter, and value and mode are not encoded in any URL);
+     `?print=blank-top` already selects the variant on load. How to carry the
+     print (for example in the page address) is still to be decided.
+   - (b) **Deferred:** the blank-top net does not join the Print stickers page.
+     Printing fixes the sticker identities, max 3 HTM for this print is UNKNOWN
+     so a better print may follow, the independent review of PR
+     [#144](https://github.com/wstein/cubistry/pull/144) is still open, and a
+     reprint is the owner's call.
 
 ## Data, pins and verification
 
