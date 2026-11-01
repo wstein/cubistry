@@ -13,8 +13,12 @@ yq = "4.54"
 
 # Navigation, filtering, and viewing (gh:wstein/bundledock)
 bat = "0.26"
+bottom = "0.14"
+dust = "1.2"
 fzf = "0.74"
 lazygit = "0.66"
+lsd = "1.2"
+xh = "0.26"
 zoxide = "0.10"
 
 # Developer utilities, linting, and benchmarking (gh:wstein/bundledock)
