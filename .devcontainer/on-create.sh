@@ -12,6 +12,8 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 grep -q 'mise activate' ~/.bashrc || echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
 grep -q 'mise activate' ~/.zshrc 2>/dev/null || echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc
+mkdir -p ~/.config/fish
+grep -q 'mise activate' ~/.config/fish/config.fish 2>/dev/null || echo '~/.local/bin/mise activate fish | source' >> ~/.config/fish/config.fish
 
 # flixw (github.com/wstein/flixw), pinned tag
 if [ ! -d "$HOME/.local/src/flixw" ]; then
