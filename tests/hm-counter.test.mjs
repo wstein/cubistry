@@ -1,0 +1,438 @@
+// H/M counter (print m3-SH, research PR #133) application regressions.
+//
+// These tests replay the pinned data in the app's own mechanics model
+// (@cubistry/cube-mechanics) and through the real controller. They are app
+// regression tests, NOT proofs: the research claims rest on the Julia and
+// Flix checkers of research/hm-counter-3move, whose receipts are pinned here.
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import {
+  validateHsmDesign,
+  hsmTarget,
+  HSM_VARIANT,
+} from "../src/apps/hsm/design.ts";
+import { HsmController } from "../src/apps/hsm/controller.ts";
+import { HsmPlanner } from "../src/apps/hsm/planner.ts";
+import { HsmRecovery } from "../src/apps/hsm/recovery.ts";
+import { HsmPeriods } from "../src/apps/hsm/periods.ts";
+import { HM_VARIANT, hmImages } from "../src/apps/hm/variant.ts";
+import {
+  initialState,
+  applyMoves,
+  parseAlg,
+  matchesTarget,
+  inverseMoves,
+  stickerPoses,
+} from "@cubistry/cube-mechanics";
+import { stateEquals } from "@cubistry/cube-core";
+import {
+  check,
+  build,
+  HM_COUNTING_MODES,
+} from "../scripts/prepare-hm.mjs";
+import {
+  convertWitness,
+  sha256,
+  inverseWord,
+} from "../scripts/hm/convert-witness.mjs";
+
+const json = (p) => JSON.parse(readFileSync(p, "utf8"));
+const pin = json("hm-source.json");
+const raw = json(pin.runtimePath);
+const witness = json(pin.convertedPath);
+const design = validateHsmDesign(raw, HM_VARIANT);
+
+/** Research figures for m3-SH (README and receipts of PR #133 at the pin). */
+const RESEARCH = [
+  { letter: "M", maximum: 59, edges: 60, total: 163, max: 3, at4: 0, hist: { 1: 4, 2: 9, 3: 47 } },
+  { letter: "H", maximum: 23, edges: 24, total: 73, max: 4, at4: 5, hist: { 1: 0, 2: 4, 3: 15, 4: 5 } },
+  { letter: "H", maximum: 11, edges: 12, total: 40, max: 4, at4: 5, hist: { 1: 0, 2: 1, 3: 6, 4: 5 } },
+];
+const H_SETUP = "U' B2 U B";
+
+const FRONT = [
+  [-1, 1, 1],
+  [1, 1, 1],
+  [-1, -1, 1],
+  [1, -1, 1],
+];
+/** Explicit front-face read-out: blank upper-left, upright letter and digits. */
+function assertShows(state, letter, value, label) {
+  const poses = stickerPoses(design.print, state);
+  const want = ["blank", letter, ...String(value).padStart(2, "0")];
+  FRONT.forEach((p, cell) => {
+    const seen = poses.filter(
+      (s) =>
+        JSON.stringify(s.p) === JSON.stringify(p) &&
+        JSON.stringify(s.n) === "[0,0,1]",
+    );
+    assert.equal(seen.length, 1, label);
+    assert.equal(seen[0].assetId, want[cell], `${label} cell ${cell}`);
+    if (want[cell] !== "blank")
+      assert.deepEqual(seen[0].up, [0, 1, 0], `${label} upright ${cell}`);
+  });
+  assert.ok(matchesTarget(design.print, state, hsmTarget(letter, value)));
+}
+const period = (letter, maximum, direction) =>
+  design.periods.find(
+    (p) =>
+      p.letter === letter && p.maximum === maximum && p.direction === direction,
+  );
+const value = (direction, i, n) => (((direction * i) % n) + n) % n;
+const sum = (a) => a.reduce((x, y) => x + y, 0);
+
+// ------------------------------------------------------------ data and pins
+
+test("pins, research copies, converted witness and runtime are current", () => {
+  assert.equal(pin.commit, "0df2f3a012749bb550bc34dd1bc4fa07dcde6817");
+  assert.equal(pin.branch, "research/hm-counter-3move");
+  assert.equal(pin.print, "m3-SH");
+  check(pin);
+  const { converted, runtime } = build(pin);
+  assert.equal(sha256(converted), pin.convertedSHA256);
+  assert.equal(sha256(runtime), pin.runtimeSHA256);
+  // Both native receipts are byte-identical and name the pinned witness.
+  const files = pin.researchFiles;
+  const R = "research/hm-counter-3move/evidence/";
+  assert.equal(
+    files[`${R}receipt-blank-m3-SH.julia.tsv`],
+    files[`${R}receipt-blank-m3-SH.flix.tsv`],
+  );
+  assert.equal(witness.source.sha256, files[`${R}witness-blank-m3-SH.tsv`]);
+  assert.equal(witness.source.commit, pin.commit);
+});
+
+test("the print is m3-SH: three blanks, H twice, M three times, tens 0-5, units 0-9", () => {
+  assert.equal(
+    witness.printCode,
+    "H U3 U7 | T2 _ T0 | T3 _ T1 | T4 T5 _ | U9 H U5 | M U8 U0 | U6 M U2 | U4 U1 M",
+  );
+  const glyphs = (slot) =>
+    witness.printing
+      .filter((s) => s.slot === slot && s.image !== "")
+      .map((s) => s.image)
+      .sort();
+  assert.deepEqual(glyphs(1), ["H", "H", "M", "M", "M"]);
+  assert.deepEqual(glyphs(2), [..."012345"]);
+  assert.deepEqual(glyphs(3), [..."0123456789"]);
+  const blanks = witness.printing.filter((s) => s.image === "");
+  assert.equal(blanks.length, 3);
+  // Three blanks on three corners, each next to two tens digits.
+  assert.equal(new Set(blanks.map((s) => s.cubie)).size, 3);
+  for (const b of blanks)
+    assert.deepEqual(
+      witness.printing
+        .filter((s) => s.cubie === b.cubie && s !== b)
+        .map((s) => s.slot),
+      [2, 2],
+    );
+  assert.equal(
+    design.print.stickers.filter((s) => s.assetId === "blank").length,
+    3,
+  );
+  assert.equal(design.print.id, "hm_counter_m3_sh");
+  assert.deepEqual(
+    hmImages.map((i) => i.id),
+    ["H", "M"],
+  );
+});
+
+test("research numbers: totals, maxima, histograms and edge limit", () => {
+  assert.equal(witness.edgeLimitHTM, 4);
+  assert.equal(raw.edgeLimitHTM, HM_VARIANT.edgeLimit);
+  for (const r of RESEARCH) {
+    const m = witness.modes.find(
+      (x) => x.letter === r.letter && x.maximum === r.maximum,
+    );
+    assert.equal(m.periodEdges, r.edges);
+    assert.equal(m.laps, 1);
+    assert.equal(m.preperiodEdges, 0);
+    assert.equal(m.periodHTM, r.total);
+    assert.equal(m.maximumHTM, r.max);
+    assert.deepEqual(m.histogram, r.hist);
+    assert.equal(m.steps.filter((s) => s.htm === 4).length, r.at4);
+    for (const s of m.steps) assert.ok(s.htm >= s.lowerBound);
+  }
+});
+
+// -------------------------------------------- every edge in the app mechanics
+
+test("every period edge of every mode replays in the app mechanics, up and down", () => {
+  assert.equal(design.periods.length, HM_COUNTING_MODES.length);
+  for (const r of RESEARCH) {
+    const up = period(r.letter, r.maximum, 1),
+      down = period(r.letter, r.maximum, -1),
+      n = r.maximum + 1,
+      label = `${r.letter}/${r.maximum}`;
+    assert.ok(up && down, label);
+    assert.equal(up.traversal, "forward");
+    assert.equal(down.traversal, "inverse");
+    assert.equal(up.maximumHTM, r.max);
+    assert.equal(down.maximumHTM, r.max);
+    assert.ok(r.max <= HM_VARIANT.edgeLimit);
+    // Up: node i shows i, every word within the mode's own maximum.
+    const start = applyMoves(initialState(design.print), parseAlg(up.setup));
+    let state = start;
+    const nodes = [];
+    const lengths = up.words.map((word, i) => {
+      nodes.push(state);
+      assertShows(state, r.letter, value(1, i, n), `${label} node ${i}`);
+      const moves = parseAlg(word);
+      assert.ok(moves.length >= 1 && moves.length <= r.max, `${label} edge ${i}`);
+      const next = applyMoves(state, moves);
+      // Exact inverse: undoing the word returns the full previous pose.
+      assert.ok(stateEquals(applyMoves(next, inverseMoves(moves)), state));
+      state = next;
+      return moves.length;
+    });
+    // Closure at the period boundary: the exact full 24-sticker state.
+    assert.ok(stateEquals(state, start), `${label} closes`);
+    assertShows(state, r.letter, 0, `${label} wrap`);
+    assert.equal(sum(lengths), r.total, label);
+    assert.equal(up.periodHTM, r.total);
+    assert.equal(Math.max(...lengths), r.max);
+    // The period is minimal: no full pose repeats inside it.
+    assert.equal(
+      new Set(nodes.map((s) => JSON.stringify(s.cubies))).size,
+      nodes.length,
+    );
+    // Down: the same poses in reverse order, every word the inverse.
+    assert.equal(down.setup, up.setup);
+    assert.deepEqual(
+      down.words,
+      up.words.slice().reverse().map(inverseWord),
+    );
+    state = start;
+    down.words.forEach((word, i) => {
+      assertShows(state, r.letter, value(-1, i, n), `${label} down ${i}`);
+      assert.ok(stateEquals(state, nodes[(n - i) % n]), `${label} down pose ${i}`);
+      const moves = parseAlg(word);
+      assert.ok(moves.length <= r.max);
+      state = applyMoves(state, moves);
+    });
+    assert.ok(stateEquals(state, start), `${label} down closes`);
+  }
+});
+
+test("setups: M00 is the reference print state, H00 is four HTM away and not a counted step", () => {
+  const home = initialState(design.print);
+  assertShows(home, "M", 0, "reference");
+  assert.equal(design.zeroWords.M, "");
+  assert.equal(design.zeroWords.H, H_SETUP);
+  assert.equal(parseAlg(H_SETUP).length, 4);
+  assertShows(applyMoves(home, parseAlg(H_SETUP)), "H", 0, "H setup");
+  for (const p of design.periods)
+    assert.equal(p.setup, p.letter === "M" ? "" : H_SETUP);
+  // Both hour periods start on the same H00 pose.
+  const periods = new HsmPeriods(design.print, design.periods);
+  assert.ok(
+    stateEquals(periods.poseFor("H", 23, 1, 0), periods.poseFor("H", 11, 1, 0)),
+  );
+});
+
+// ----------------------------------------------------- the real controller
+
+const view = { configure() {}, animate: async () => {}, resetCamera() {} };
+const dispose = async () => ({ dispose() {} });
+const settled = async (c) => {
+  for (let n = 0; c.busy && n < 100; n++)
+    await new Promise((r) => setImmediate(r));
+  assert.equal(c.busy, false);
+  assert.notEqual(c.progress.status, "failed");
+};
+async function costs(letter, maximum, direction, laps) {
+  const c = new HsmController(view, design, {}, letter, () => {}, dispose);
+  c.setMode(maximum, direction);
+  await c.configure();
+  const out = [];
+  for (let i = 0; i < laps * (maximum + 1); i++) {
+    const target = (c.currentValue + direction + maximum + 1) % (maximum + 1),
+      before = c.progress.sessionTotal;
+    c.request(target);
+    await settled(c);
+    assert.equal(c.currentValue, target);
+    assertShows(c.state, letter, target, `${letter}/${maximum} -> ${target}`);
+    out.push(c.progress.sessionTotal - before);
+  }
+  c.dispose();
+  return out;
+}
+
+test("three laps up and down per mode through the controller cost the research laps", async () => {
+  for (const r of RESEARCH)
+    for (const direction of [1, -1]) {
+      const n = r.maximum + 1,
+        out = await costs(r.letter, r.maximum, direction, 3),
+        label = `${r.letter}/${r.maximum}/${direction}`;
+      for (let lap = 0; lap < 3; lap++)
+        assert.equal(sum(out.slice(lap * n, (lap + 1) * n)), r.total, label);
+      assert.equal(Math.max(...out), r.max, label);
+    }
+});
+
+test("unit change sets up 00; Set and Reset are free jumps that return to the period", async () => {
+  const c = new HsmController(view, design, {}, "M", () => {}, dispose);
+  c.setMode(59, 1);
+  await c.configure();
+  assert.equal(c.progress.sessionTotal, 0);
+  assertShows(c.state, "M", 0, "M fresh");
+  for (const target of [33, 58, 0, 17]) {
+    const before = c.progress.sessionTotal;
+    c.request(target);
+    await settled(c);
+    assertShows(c.state, "M", target, `jump ${target}`);
+    assert.ok(c.progress.sessionTotal - before <= HM_VARIANT.jumpBound);
+    // Counting on after the jump reaches the period within a few steps.
+    const periods = new HsmPeriods(design.print, design.periods);
+    let steps = 0;
+    while (periods.nodeOf("M", 59, 1, c.state) < 0 && steps < 10) {
+      c.request((c.currentValue + 1) % 60);
+      await settled(c);
+      steps++;
+    }
+    assert.ok(periods.nodeOf("M", 59, 1, c.state) >= 0, `recovered after ${target}`);
+  }
+  c.dispose();
+  // The H controller of a unit change installs the H00 period pose directly.
+  const h = new HsmController(view, design, {}, "H", () => {}, dispose);
+  h.setMode(11, 1);
+  await h.configure();
+  assert.equal(h.progress.sessionTotal, 0);
+  assertShows(h.state, "H", 0, "H fresh");
+  assert.ok(
+    stateEquals(
+      h.state,
+      applyMoves(initialState(design.print), parseAlg(H_SETUP)),
+    ),
+  );
+  // Ranges are per letter: M only 00-59, H 00-23 or 00-11; no S on this print.
+  assert.throws(() => h.setMode(59, 1));
+  const m = new HsmController(view, design, {}, "M", () => {}, dispose);
+  assert.throws(() => m.setMode(23, 1));
+  assert.throws(() => new HsmController(view, design, {}, "S", () => {}, dispose));
+});
+
+test("free jumps from settled poses stay within the graph-radius cap", () => {
+  const planner = new HsmPlanner(HM_VARIANT.jumpBound);
+  const recovery = new HsmRecovery(
+    design.print,
+    planner,
+    HM_VARIANT.edgeLimit,
+    HM_VARIANT.jumpBound,
+  );
+  const periods = new HsmPeriods(design.print, design.periods);
+  let worst = 0;
+  for (const [letter, maximum] of [
+    ["M", 59],
+    ["H", 23],
+    ["H", 11],
+  ]) {
+    let state = periods.poseFor(letter, maximum, 1, 0);
+    for (let k = 0; k < 40; k++) {
+      const target = (k * 37 + 11) % (maximum + 1);
+      const word =
+        recovery.jump(state, letter, maximum, 1, target, (v) =>
+          periods.nodesShowing(letter, maximum, 1, v),
+        ) ?? planner.plan(design.print, state, letter, target);
+      worst = Math.max(worst, word.length);
+      state = applyMoves(state, word);
+      assertShows(state, letter, target, `jump ${letter}${target}`);
+    }
+  }
+  assert.ok(worst <= HM_VARIANT.jumpBound);
+});
+
+// ------------------------------------------------------- negative controls
+
+test("negative controls: wrong variant, corrupted runtime and tampered witness are rejected", () => {
+  // The H/M runtime is not an H/S/M runtime and vice versa.
+  assert.throws(() => validateHsmDesign(structuredClone(raw)), /another counter variant|Missing HSM setup|Invalid/);
+  assert.throws(
+    () => validateHsmDesign(json("public/hsm-counter.v3.json"), HM_VARIANT),
+    /another counter variant/,
+  );
+  assert.equal(HSM_VARIANT.edgeLimit, 5);
+  const length = (words) => words.reduce((n, w) => n + parseAlg(w).length, 0);
+  for (const [mutate, reason] of [
+    [(d) => (d.periods[0].maximumHTM = 4), /HSM period maximum mismatch/],
+    [(d) => (d.edgeLimitHTM = 5), /another counter variant/],
+    [(d) => (d.letters = ["H", "S", "M"]), /another counter variant/],
+    [(d) => (d.printing[0].image = "S"), /Invalid immutable HSM glyph/],
+    [(d) => (d.periods[0].words[5] = "R"), /HSM period node shows the wrong value/],
+    [(d) => d.periods[2].words.pop(), /Invalid HSM period/],
+    [(d) => (d.zeroWords.H = ""), /Invalid HSM setup/],
+    [
+      // Same poses, but one H 00-23 word padded to five HTM: above the limit 4.
+      (d) => {
+        d.periods[2].words[0] += " U U'";
+        d.periods[2].periodHTM = length(d.periods[2].words);
+        d.periods[2].maximumHTM = 5;
+      },
+      /HSM period edge too long/,
+    ],
+    [
+      (d) => {
+        d.periods[0].words[0] += " U U'";
+        d.periods[0].periodHTM = length(d.periods[0].words);
+      },
+      /HSM period maximum mismatch/,
+    ],
+  ]) {
+    const d = structuredClone(raw);
+    mutate(d);
+    assert.throws(() => validateHsmDesign(d, HM_VARIANT), reason);
+  }
+  assert.doesNotThrow(() => validateHsmDesign(structuredClone(raw), HM_VARIANT));
+
+  // The converter refuses tampered research bytes.
+  const read = (r) => readFileSync(pin.copies[r], "utf8");
+  const R = "research/hm-counter-3move/evidence/";
+  const tsv = read(`${R}witness-blank-m3-SH.tsv`);
+  const meta = {
+    label: "m3-SH",
+    source: {},
+    receipts: {
+      julia: read(`${R}receipt-blank-m3-SH.julia.tsv`),
+      flix: read(`${R}receipt-blank-m3-SH.flix.tsv`),
+    },
+    checks: read(`${R}checks-blank-m3-SH.tsv`),
+  };
+  assert.doesNotThrow(() => convertWitness(tsv, meta));
+  for (const [bad, reason] of [
+    [tsv.replace("step\tM\t59\t5\t6\tR' B' R", "step\tM\t59\t5\t6\tR' B R"), /shows 6/],
+    [tsv.replace("sticker\t4\t1\t-1,-1,1\t0,-1,0\t1,0,0\t_", "sticker\t4\t1\t-1,-1,1\t0,-1,0\t1,0,0\t7"), /shows|receipt/],
+    [tsv.replace("mode\tH\t23\tU' B2 U B\t0\t24", "mode\tH\t23\t-\t0\t24"), /setup shows 00/],
+    [tsv.replace("claim\tmaxEdgeHTM\t4", "claim\tmaxEdgeHTM\t3"), /claimed maximum/],
+  ]) {
+    assert.notEqual(bad, tsv);
+    assert.throws(() => convertWitness(bad, meta), reason);
+  }
+  assert.throws(
+    () => convertWitness(tsv, { ...meta, receipts: { ...meta.receipts, flix: meta.receipts.flix + "x" } }),
+    /byte-identical/,
+  );
+});
+
+// ------------------------------------------------- physical reprint table
+
+test("all 24 sticker identities differ from both earlier H/S/M prints", () => {
+  const seconds = json("data/hsm/seconds-first/modes/witness.json").printing;
+  const previous = json("tests/fixtures/hsm-blank-print.v2.json").printing;
+  const same = (a, b) =>
+    a.image === b.image &&
+    (a.image === "" || JSON.stringify(a.up) === JSON.stringify(b.up));
+  for (const old of [seconds, previous]) {
+    let differ = 0;
+    witness.printing.forEach((s, i) => {
+      // The same 24 identities: corner and facelet.
+      assert.deepEqual([s.cubie, s.p, s.n], [old[i].cubie, old[i].p, old[i].n]);
+      if (!same(s, old[i])) differ++;
+    });
+    assert.equal(differ, 24);
+  }
+  // Glyph multisets: the seconds-first print has S x3, H, M where m3-SH has
+  // H x2 and M x3; digits and blanks are the same multiset.
+  const bag = (p) => p.map((s) => s.image || "_").sort().join("");
+  assert.equal(bag(seconds).replace(/[HMS]/g, ""), bag(witness.printing).replace(/[HM]/g, ""));
+});
