@@ -9,7 +9,7 @@ import { validateHsmDesign, hsmTarget } from "../src/apps/hsm/design.ts";
 import { HsmPlanner } from "../src/apps/hsm/planner.ts";
 import { HsmController } from "../src/apps/hsm/controller.ts";
 import { HsmPeriods, poseKey } from "../src/apps/hsm/periods.ts";
-import { HsmRecovery } from "../src/apps/hsm/recovery.ts";
+import { HsmRecovery, runSync } from "../src/apps/hsm/recovery.ts";
 import { LiveClockScheduler } from "../src/apps/clock/scheduler.ts";
 import { ClockMoveStatistics } from "../src/apps/clock/statistics.ts";
 import {
@@ -1061,7 +1061,7 @@ test("recovery reach equals a brute-force search over every move sequence", () =
         }
       layer = next;
     }
-    const found = recovery.reach(origin, letter, value, limit),
+    const found = runSync(recovery.reachTask(origin, letter, value, limit)),
       got = new Set([...found.values()].map((e) => e.pose.join(",")));
     assert.ok(expected.size > 0);
     assert.deepEqual(
