@@ -1,0 +1,74 @@
+{
+  "repository": "https://github.com/wstein/cubelab",
+  "revision": "08e079f3bc211777d8980f75ec6a7f61979dd2ac",
+  "license": "AGPL-3.0-or-later",
+  "files": [
+    {
+      "source": "src/Move/MoveExecutor.res",
+      "path": "res/upstream/Move/MoveExecutor.res",
+      "sha256": "5cdf024059fac11fddff6fb65d21bd86a18e3718039252b3749c4dfd95d6d262"
+    },
+    {
+      "source": "src/Move/MoveNormalizer.res",
+      "path": "res/upstream/Move/MoveNormalizer.res",
+      "sha256": "db1509ece5e404cba166cf635daa367756be665d23f47093949f80174e6390eb"
+    },
+    {
+      "source": "src/Move/MoveParser.res",
+      "path": "res/upstream/Move/MoveParser.res",
+      "sha256": "afdf83899123c21ca688c6a2405b70b57ef828e7a442508c6cdee1d62c860337"
+    },
+    {
+      "source": "src/Move/MoveTransform.res",
+      "path": "res/upstream/Move/MoveTransform.res",
+      "sha256": "4385cca25de1826247e5d9d37c09ef14f0449481f0c5f1c7ed0db04e6a52b7cc"
+    },
+    {
+      "source": "src/Move/MoveTypes.res",
+      "path": "res/upstream/Move/MoveTypes.res",
+      "sha256": "205ae6e11990965c606d92b41232ecf045a1378bd1339bba145bc9a565d2689f"
+    },
+    {
+      "source": "src/Solver/PictureCenters.res",
+      "path": "res/upstream/Solver/PictureCenters.res",
+      "sha256": "b163df3aafb3193a048a627b7f4d45e1057bf8890344fd07605e5b5030475ec5"
+    },
+    {
+      "source": "src/Solver/TwoPhaseSolver.res",
+      "path": "res/upstream/Solver/TwoPhaseSolver.res",
+      "sha256": "04ba92dcf6d3cd39d9d58a1f676bd22a5376edc3ca337a654c5ea0554aa0625b"
+    },
+    {
+      "source": "src/State/FaceletCodec.res",
+      "path": "res/upstream/State/FaceletCodec.res",
+      "sha256": "1bd2f8b08e7bc3beab496bb13b67270001d3e220825d857eb2e4bbdec8089ea5"
+    },
+    {
+      "source": "src/State/PatternState.res",
+      "path": "res/upstream/State/PatternState.res",
+      "sha256": "22bce5ba4e5c71e345bf7b755e379eaa37906711b08f5a790c5f949024d3ebef"
+    },
+    {
+      "source": "src/State/PieceReducer.res",
+      "path": "res/upstream/State/PieceReducer.res",
+      "sha256": "5b450e6245dcbe73bd713ae4008c6b9b7815f2e87b8d3c6ecd1fc58a631edc31"
+    },
+    {
+      "source": "src/State/StateParity.res",
+      "path": "res/upstream/State/StateParity.res",
+      "sha256": "89229de6a6fd4fba7516484cb2a8a167fc2917c9b42cc70e722ea82a423b1792"
+    },
+    {
+      "source": "src/State/StateTypes.res",
+      "path": "res/upstream/State/StateTypes.res",
+      "sha256": "4eabd092fdd4405a686b25b9e982eec06853f022728d5061a2c3f713c065dd7e"
+    }
+  ],
+  "referenceMacros": {
+    "repository": "https://github.com/wstein/cubistry",
+    "revision": "2455cef82040822bb601191c801e4052602c0db9",
+    "path": "research/date-3x3/center-corrections.json",
+    "adjacentPairConstruction": "(R U)^105 and proper cube symmetries; independently verified ordinary identity and center deltas",
+    "constructedReferenceMaximumHTM": 286
+  }
+}

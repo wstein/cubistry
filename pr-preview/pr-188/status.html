@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head><meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/svg+xml" href="/cubistry/pr-preview/pr-188/favicon.svg" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f3eb" />
+    <title>Cubistry · CI Quality Cube</title>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-188/assets/status-DPRIzenU.js"></script>
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-188/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-188/assets/three-BW9MzyAf.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-188/assets/presentation-rotation-Bp0l0InI.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-188/assets/index-DsEYcoX5.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-188/assets/index-PiRgrWxW.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-188/assets/index-Il41stwk.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-188/assets/playback-DZ84n_LJ.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-188/assets/status-C5fHyEHq.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-188/assets/style-rP8WIpvS.css">
+  </head>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #188 — non-production preview · 10a7cb443dd3</aside>
+    <main>
+      <header>
+        <a class="brand" href="./"
+          ><span class="brand-mark">▦</span> CUBISTRY</a
+        >
+        <nav aria-label="Reference applications">
+          <a href="index.html">Counter</a> · <a href="clock.html">Clock</a> ·
+          <a href="calendar.html">Calendar</a>
+        </nav>
+      </header>
+      <h1>CI Quality Cube</h1>
+      <p class="small">
+        Four categories. Five states each. One immutable physical print. Local
+        simulated events only.
+      </p>
+      <div class="status-workspace">
+        <section class="status-stage" aria-label="Physical workflow cube">
+          <div id="status-viewer" aria-busy="true"></div>
+          <p
+            id="status-front"
+            class="sr-only"
+            aria-label="Committed category and state words"
+          ></p>
+          <p id="status-sync" role="status" aria-live="polite">
+            Loading the fixed workflow print…
+          </p>
+          <p class="small">
+            Drag to look around. Each category, icon and state word belongs
+            permanently to its physical sticker.
+          </p>
+        </section>
+        <aside class="status-controls" aria-label="Workflow controls">
+          <dl class="status-values">
+            <div>
+              <dt>Last completed snapshot</dt>
+              <dd id="status-current">—</dd>
+            </div>
+            <div>
+              <dt>Requested snapshot</dt>
+              <dd id="status-requested">—</dd>
+            </div>
+          </dl>
+          <label for="status-build">BUILD</label>
+          <select id="status-build" data-quality-control disabled></select>
+          <label for="status-test">TEST</label>
+          <select id="status-test" data-quality-control disabled></select>
+          <label for="status-analyze">ANALYZE</label>
+          <select id="status-analyze" data-quality-control disabled></select>
+          <label for="status-review">REVIEW</label>
+          <select id="status-review" data-quality-control disabled></select>
+          <label for="status-event-category">Event category</label>
+          <select
+            id="status-event-category"
+            data-quality-control
+            disabled
+          ></select>
+          <label for="status-event">Simulated agent event</label>
+          <select id="status-event" data-quality-control disabled></select>
+          <button id="status-send" data-quality-control disabled>
+            Send event
+          </button>
+          <div class="status-buttons">
+            <button id="status-demo" data-quality-control disabled>
+              Run demo
+            </button>
+            <button id="status-burst" data-quality-control disabled>
+              Send rapid sequence
+            </button>
+          </div>
+          <button id="status-finish" disabled>Finish active snapshot</button>
+          <label for="status-speed">Quarter-turn time</label>
+          <select id="status-speed" data-quality-control>
+            <option value="500">500 ms</option>
+            <option value="250" selected>250 ms</option>
+            <option value="100">100 ms</option>
+            <option value="50">50 ms</option>
+          </select>
+          <p id="status-moves" aria-label="Committed status move progress">
+            0 / 0 HTM · Session 0
+          </p>
+          <p id="status-fault" role="status" aria-live="polite"></p>
+          <h2>Recent local events</h2>
+          <ol
+            id="status-history"
+            aria-label="Recent simulated workflow events"
+          ></ol>
+          <p class="small">
+            New requests finish the active legal turn, discard obsolete moves,
+            then replan. A half turn takes twice the selected quarter-turn time.
+          </p>
+        </aside>
+      </div>
+      <p id="status-error" class="error" role="alert"></p>
+      <button id="status-reload" hidden>Reload application</button>
+    </main>
+  </body>
+</html>
