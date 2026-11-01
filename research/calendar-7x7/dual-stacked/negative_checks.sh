@@ -34,7 +34,7 @@ printf 'case\tjulia-exit\tflix-exit\treason (julia | flix)\tfirst failing cell, 
 run_case() {
     name=$1; print=$2; case_dag=$3; variant=$4; mode=$5
     js=0; "$julia_bin" --startup-file=no "$here/check_stacked.jl" "$print" "$case_dag" "$variant" "$mode" > "$out/$name.julia.stdout" 2> "$out/$name.julia.stderr" || js=$?
-    fs=0; java -Xmx8g -jar "$jar" "$print" "$case_dag" "$variant" "$mode" "$cal/english/evidence" "$cal/en-physical-review" > "$out/$name.flix.stdout" 2> "$out/$name.flix.stderr" || fs=$?
+    fs=0; java -Dstdout.encoding=UTF-8 -Xmx8g -jar "$jar" "$print" "$case_dag" "$variant" "$mode" "$cal/english/evidence" "$cal/en-physical-review" > "$out/$name.flix.stdout" 2> "$out/$name.flix.stderr" || fs=$?
     jr=$(grep -m1 'INVALID' "$out/$name.julia.stderr" | sed 's/^INVALID\t//' | cut -c1-160 || true)
     fr=$(grep -hm1 '^invalid' "$out/$name.flix.stdout" | sed 's/^invalid\t//' | cut -c1-160 || true)
     jf=$(grep -m1 '^stacked-target.*	FAIL	' "$out/$name.julia.stdout" | cut -f2,6-9 | tr '\t' ' ' || true)
@@ -60,7 +60,7 @@ run_case unknown-mode         "$P" "$dag" B loose
 run_inv_case() {
     name=$1; variant=$2; mode=$3
     js=0; "$julia_bin" --startup-file=no "$here/check_stacked.jl" inventory "$variant" "$mode" > "$out/$name.julia.stdout" 2> "$out/$name.julia.stderr" || js=$?
-    fs=0; java -Xmx8g -jar "$jar" inventory "$variant" "$mode" "$cal/english/evidence" > "$out/$name.flix.stdout" 2> "$out/$name.flix.stderr" || fs=$?
+    fs=0; java -Dstdout.encoding=UTF-8 -Xmx8g -jar "$jar" inventory "$variant" "$mode" "$cal/english/evidence" > "$out/$name.flix.stdout" 2> "$out/$name.flix.stderr" || fs=$?
     jr=$(grep -m1 "INVALID" "$out/$name.julia.stderr" | sed "s/^INVALID\t//" | cut -c1-160 || true)
     fr=$(grep -hm1 "^invalid" "$out/$name.flix.stdout" | sed "s/^invalid\t//" | cut -c1-160 || true)
     printf "%s\t%s\t%s\t%s | %s\n" "$name" "$js" "$fs" "$jr" "$fr" >> "$out/results.tsv"
@@ -72,5 +72,10 @@ run_inv_case mix-unknown-type     "F31=keep,S29=keep,S31=keep"  strict
 run_inv_case mix-unknown-choice   "F31=afold,S30=keep,S31=keep" strict
 run_inv_case mix-misordered-types "S30=keep,F31=keep,S31=keep"  strict
 run_inv_case mix-missing-type     "F31=keep,S30=keep"           strict
+run_inv_case bfold31-for-S30       "F31=keep,S30=bfold31,S31=keep" strict
+run_inv_case header-bad-digit     "F31=bfold,S30=bfold,S31=bfold;H=555555555226" strict
+run_inv_case header-short         "F31=bfold,S30=bfold,S31=bfold;H=55555" strict
+run_inv_case header-fixed-variant "B;H=555555555222" strict
+run_inv_case header-double        "F31=bfold,S30=bfold,S31=bfold;H=555555555222;H=555555555222" strict
 cat "$out/results.tsv"
 exit $status

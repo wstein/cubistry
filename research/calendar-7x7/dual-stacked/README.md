@@ -1,4 +1,235 @@
-# English calendar: stacked dual labels (negative result under the strict reading)
+# English calendar: stacked dual labels, the pure split with moved month letters
+
+**Status: research candidate, not certified.** Every number in this section
+comes from both native checkers (Julia and the Flix port), with byte-identical
+receipts. The month-letter search itself is a Julia-only search, marked as such
+below. Legal states for the new layouts are **UNKNOWN**.
+
+**Owner decisions.**
+
+- Strict reading only; the context reading is rejected.
+- Stacked labels count only when upright.
+- **No mixing**: either every six-week month is split into the last date row or
+  every one uses the PR #99 overflow in the first date row. Mixed layouts (for
+  example C*) are reference material only.
+- The target is the **pure split** with no overflow marks anywhere (row 18):
+  - F31 (Friday-start, 31 days): `24/31` red at row 7 Sunday;
+  - S30 (Saturday-start, 30 days): `23/30` red at row 7 Sunday;
+  - S31 (Saturday-start, 31 days): `23/30` red at row 7 Sunday and `24/31` black
+    at row 7 Monday.
+- PR #128 (`../dual-dates/`) is kept, unchanged, as the superseded study.
+
+## Result: the pure split fits if the month letters move off the corners
+
+With the PR #99 month-letter placement, the pure split is obstructed in one
+orbit only: the corner orbit (-3,-3) needs 22 printed + 3 blank = 25 > 24. Ten
+of those 22 printed classes are month letters, at row 1 columns 1 and 7.
+
+**Constraints on the letters** (from `../README.md`, as previously approved by
+the owner):
+
+- the three letters of a month sit in three adjacent cells of row 1 (start
+  column 1 to 5);
+- split headers such as `J   AN` are rejected;
+- the placement may depend on the month, by a deterministic annual rule, within
+  one immutable print.
+
+The placement is written as a suffix `;H=<12 start columns, January to
+December>`. Both checkers accept it. PR #99 is `H=555555555111`.
+
+| Placement | Rule in words | Strict lower bound | Obstructed orbits | Corner orbit (printed + blank, spare) |
+|---|---|---:|---|---|
+| `H=555555555111` (PR #99, control) | Jan–Sep columns 5–7, Oct–Dec 1–3 | 240 | (-3,-3) | 22 + 3, −1 |
+| **`H=555555555222`** | Jan–Sep 5–7, **Oct–Dec 2–4** (one cell right) | **240** | none | 19 + 3, 2 spare |
+| **`H=555555555544`** | Jan–Oct 5–7, **Nov–Dec 4–6** | **238** | none | 20 + 3, 1 spare |
+| `H=545555554544` | Feb, Sep, Nov, Dec at 4–6, the rest at 5–7 | 236 | none | 18 + 4, 2 spare |
+| `H=434444443433` | mostly 4–6, Feb/Sep at 3–5, Nov/Dec at 3–5 | 236 | none | 12 + 4, 8 spare |
+
+All five rows come from both checkers (`inventory-F31-bfold_S30-bfold_S31-bfold_H-*` receipts).
+
+**So the pure split becomes strictly feasible at the inventory level** in two
+simple ways:
+
+- the smallest change to PR #99: October to December one cell to the right
+  (bound 240, no saving);
+- November and December at columns 4–6: bound 238, two printed surfaces fewer
+  than PR #99.
+
+The 236 schedules are irregular. They are local-search results, not proven
+optima.
+
+**How the placements were found (descriptive search, not a proof; Julia only;
+[header_search.jl](header_search.jl)):**
+
+| Scheme family | Schemes | Feasible for the pure split | Best bound |
+|---|---:|---:|---:|
+| one block for all months | 5 | 0 | — |
+| two blocks, Jan–Sep / Oct–Dec | 25 | 1 (`555555555222`) | 240 |
+| half-years | 25 | 1 | 243 |
+| quarters | 625 | 10 | 240 |
+| month pairs | 15,625 | 387 | 238 |
+| per-month local search from 626 starts | — | 191 local optima | 236 |
+
+**The four-week February display** (Sunday-start, 28 days; 9 months, 2026-02
+first):
+
+- Row 7 is empty, so it is the source of the corner orbit's blank peak.
+- With October to December at columns 2–4, February keeps its letters at 5–7.
+  That display is unchanged: 3 corner blanks.
+- In the 236 schedules, February moves off the corner columns. Its row-1
+  corners then become blank too, so 4 corner blanks.
+- In every case the blank peak comes from this one display.
+
+**Other levers read from the class tables**
+([art-breakdown.tsv](evidence/art-breakdown.tsv)):
+
+- The red date classes in the corner orbit (23, 24, 25–28, 29 twice, 30, 31,
+  and the stacked `23/30`, `24/31`) are fixed by the calendar and the
+  Sunday-first week. No legal layout choice removes them.
+- The only legal lever found is the month letters. No forbidden glyph equality
+  is used: only the PR #99 profile (6/9, half-turn glyphs).
+
+## Remaining capacity (pure split)
+
+Printed + blank, and spare (capacity − printed − blank). A spare slot can take
+one more artwork class of any ink.
+
+| orbit (cap) | PR #99 layout (row 1) | pure split, PR #99 letters | pure split, Oct–Dec 2–4 | pure split, Nov–Dec 4–6 |
+|---|---|---|---|---|
+| (-3,-3) corner (24) | 20+3, spare 1 | 22+3, **−1** | 19+3, spare 2 | 20+3, spare 1 |
+| (-3,-2) (24) | 15+2, spare 7 | 15+2, spare 7 | 15+2, spare 7 | 12+2, spare 10 |
+| (-3,-1) (24) | 21+2, spare 1 | 21+2, spare 1 | 21+2, spare 1 | 18+2, spare 4 |
+| (-3,0) midge (24) | 18+2, spare 4 | 18+2, spare 4 | 21+2, spare 1 | 20+2, spare 2 |
+| (-3,1) (24) | 22+2, spare 0 | 20+2, spare 2 | 20+2, spare 2 | 22+2, spare 0 |
+| (-3,2) (24) | 19+1, spare 4 | 20+1, spare 3 | 20+1, spare 3 | 22+1, spare 1 |
+| (-2,-2) (24) | 16+0, spare 8 | 16+0, spare 8 | 16+0, spare 8 | 16+0, spare 8 |
+| (-2,-1) (24) | 21+1, spare 2 | 21+1, spare 2 | 21+1, spare 2 | 21+1, spare 2 |
+| (-2,0) (24) | 20+0, spare 4 | 20+0, spare 4 | 20+0, spare 4 | 20+0, spare 4 |
+| (-2,1) (24) | 18+1, spare 5 | 17+1, spare 6 | 17+1, spare 6 | 17+1, spare 6 |
+| (-1,-1) (24) | 22+2, spare 0 | 22+2, spare 0 | 22+2, spare 0 | 22+2, spare 0 |
+| (-1,0) (24) | 22+1, spare 1 | 22+1, spare 1 | 22+1, spare 1 | 22+1, spare 1 |
+| core (6) | 6+0, spare 0 | 6+0, spare 0 | 6+0, spare 0 | 6+0, spare 0 |
+
+**Distribution for the pure split with October to December at columns 2–4**
+(sticker kinds per orbit, from the per-class receipt lines):
+
+| orbit | printed stickers by kind | blank | spare |
+|---|---|---:|---:|
+| (-3,-3) corner | 10 red dates, 7 month letters, `23/30` red, `24/31` red | 3 | 2 |
+| (-3,-2) outer wing | 4 dark dates, 7 red dates, 3 month letters, 1 weekday name | 2 | 7 |
+| (-3,-1) inner wing | 5 dark dates, 13 red dates, 3 month letters | 2 | 1 |
+| (-3,0) midge | 6 dark dates, 12 red dates, 3 month letters | 2 | 1 |
+| (-3,1) | 7 dark dates, 8 red dates, 5 month letters | 2 | 2 |
+| (-3,2) outer wing | 7 dark dates, 7 red dates, 4 month letters, `24/31` black, 1 weekday name | 1 | 3 |
+| (-2,-2) | 14 dark dates, 2 weekday names | 0 | 8 |
+| (-2,-1) | 20 dark dates, 1 weekday name | 1 | 2 |
+| (-2,0) | 19 dark dates, 1 weekday name | 0 | 4 |
+| (-2,1) | 16 dark dates, 1 weekday name | 1 | 6 |
+| (-1,-1) | 22 dark dates | 2 | 0 |
+| (-1,0) | 22 dark dates | 1 | 1 |
+| core | 6 dark dates | 0 | 0 |
+
+Plain 23 and 24 (red and black) remain separate classes, because the strict
+reading needs them in the months without a fold.
+
+## Existing legal states for the pure split: not enough (new states UNKNOWN)
+
+The untrusted generator derived a candidate print from the 91 PR #99 states for
+the two simple placements:
+
+- the three overflow stickers become blank;
+- the surfaces on the folded cells (15, 16, 61) are reprinted as `23/30` red,
+  `24/31` red and `24/31` black;
+- 237 printed in total.
+
+Both checkers reject both candidates under strict
+(`pure-H555555555222-strict`, `pure-H555555555544-strict` in
+[cases.tsv](evidence/receipts/cases.tsv)): 60 of 91 states pass, 31 fail.
+
+- **21 fail at row 1.** The month letters moved, so every display of a moved
+  month needs a new state.
+- **10 fail at row 7** (`stacked-mismatch`). The only copy of a stacked label is
+  a reprinted plain 23 or 24, which other months still need as a plain date.
+- **Structurally,** the candidate has 237 printed surfaces, fewer than the strict
+  bound (240 or 238). A valid print needs extra copies on spare surfaces, plus
+  new legal states for at least these 31 displays.
+- Spare capacity exists in the right orbits (corner: 2 or 1; orbit (-3,2): 3 or
+  1). Which physical surfaces to use, and whether legal states exist, are
+  **UNKNOWN**.
+
+What synthesis would take:
+
+- The PR #130 global-search module is on `research/cube-display-feasibility`.
+  It searches transitions between fronts of the PR #99 print, using
+  `macro_front_constraints` from `../continuous/` and the continuous chain
+  verifiers.
+- Reusing it needs a new print (at least the bound), new month goals (moved
+  letters, folded cells), and the chain verifiers parametrized for the new
+  print and targets. That is not a small step and has not been done.
+
+## Appendix: mixed layouts and C* (reference only, not candidates)
+
+These were computed for the owner's earlier request, before the "no mixing"
+decision. `bfold31` is a new S31 choice: fold only the 31st (`24/31` black at
+row 7 Monday), keeping `30↶` red. Both checkers parse it, and
+`inventory-all` now covers 30 combinations. The original 24 keep their
+numbering; rows 25–30 are the `bfold31` ones.
+
+**C\* = `F31=bfold,S30=keep,S31=bfold31`:** strictly feasible, bound 240, no
+saving.
+
+- It removes `31↶` red (orbit (-3,1)) and `31↶` black (orbit (-2,1)).
+- It adds `24/31` red (corner) and `24/31` black (outer wing (-3,2)).
+- `30↶` red stays.
+
+| orbit (cap) | PR #99 (row 1) | row 2 (S31 bfold) | row 3 (S31 bfold30) | row 13 (F31 bfold) | C* |
+|---|---|---|---|---|---|
+| (-3,-3) (24) | 20+3, spare 1 | 21+3, spare 0 | 21+3, spare 0 | 21+3, spare 0 | 21+3, spare 0 |
+| (-3,-2) (24) | 15+2, spare 7 | 15+2, spare 7 | 15+2, spare 7 | 15+2, spare 7 | 15+2, spare 7 |
+| (-3,-1) (24) | 21+2, spare 1 | 21+2, spare 1 | 21+2, spare 1 | 21+2, spare 1 | 21+2, spare 1 |
+| (-3,0) (24) | 18+2, spare 4 | 18+2, spare 4 | 18+2, spare 4 | 18+2, spare 4 | 18+2, spare 4 |
+| (-3,1) (24) | 22+2, spare 0 | 22+2, spare 0 | 22+2, spare 0 | 21+2, spare 1 | 21+2, spare 1 |
+| (-3,2) (24) | 19+1, spare 4 | 20+1, spare 3 | 19+1, spare 4 | 19+1, spare 4 | 20+1, spare 3 |
+| (-2,-2) (24) | 16+0, spare 8 | 16+0, spare 8 | 16+0, spare 8 | 16+0, spare 8 | 16+0, spare 8 |
+| (-2,-1) (24) | 21+1, spare 2 | 21+1, spare 2 | 21+1, spare 2 | 21+1, spare 2 | 21+1, spare 2 |
+| (-2,0) (24) | 20+0, spare 4 | 20+0, spare 4 | 20+0, spare 4 | 20+0, spare 4 | 20+0, spare 4 |
+| (-2,1) (24) | 18+1, spare 5 | 17+1, spare 6 | 18+1, spare 5 | 18+1, spare 5 | 17+1, spare 6 |
+| (-1,-1) (24) | 22+2, spare 0 | 22+2, spare 0 | 22+2, spare 0 | 22+2, spare 0 | 22+2, spare 0 |
+| (-1,0) (24) | 22+1, spare 1 | 22+1, spare 1 | 22+1, spare 1 | 22+1, spare 1 | 22+1, spare 1 |
+| core (6) | 6+0, spare 0 | 6+0, spare 0 | 6+0, spare 0 | 6+0, spare 0 | 6+0, spare 0 |
+
+**Which overflow marks the strictly feasible mixed combinations remove** (PR #99
+letters):
+
+| Combination | Bound | Removed | Still needed |
+|---|---:|---|---|
+| 1 keep/keep/keep | 240 | — | all three |
+| 2 keep/keep/bfold | 241 | `31↶` black | `30↶` red, `31↶` red |
+| 3 keep/keep/bfold30 | 241 | — | all three |
+| 5 keep/bfold/keep | 241 | — | all three |
+| 6 keep/bfold/bfold | 240 | `30↶` red, `31↶` black | `31↶` red |
+| 7 keep/bfold/bfold30 | 240 | `30↶` red | `31↶` red, `31↶` black |
+| 13 bfold/keep/keep | 240 | `31↶` red | `30↶` red, `31↶` black |
+| 25 keep/keep/bfold31 | 240 | `31↶` black | `30↶` red, `31↶` red |
+| 26 keep/bfold/bfold31 | 241 | `31↶` black | `30↶` red, `31↶` red |
+| 28 bfold/keep/bfold31 (C*) | 240 | `31↶` red, `31↶` black | `30↶` red |
+
+- With the PR #99 letters, no mixed combination removes all three marks.
+- The freed overflow stickers sit in orbits (-3,1) and (-2,1), not in the corner
+  or (-3,2) orbits that the stacked labels need, so they are not spares for the
+  new classes.
+- A fold of only the 30th for S30 is `bfold` itself: it needs `23/30`, the third
+  stacked sticker.
+- For the existing states and C*: the 6/7 F31 and S31 displays would need the
+  stacked copies on their fold cells. As shown above, the surfaces there are
+  sole plain copies, so new states would be needed (UNKNOWN).
+
+## Earlier result (before the month-letter lever)
+
+This section assumed the PR #99 month-letter placement throughout. Its
+statement that no full-fold stacked print exists under strict holds only for
+that placement; see the result at the top.
+
 
 **Status: research result, not certified.** Every result in this section is
 covered by both native checkers (Julia and the Flix port), with byte-identical
@@ -443,7 +674,7 @@ a wrong definition of the semantics would be shared. The geometry, calendar,
 optics (including the inventory artwork classes), print reader and DAG replay
 come from separately written English Julia and Flix modules (the PR #99 pair).
 
-[negative_checks.sh](negative_checks.sh) runs 17 controls. Results are in
+[negative_checks.sh](negative_checks.sh) runs 22 controls. Results are in
 [evidence/negative-controls/results.tsv](evidence/negative-controls/results.tsv);
 Julia and Flix both exit 1 on all of them, for matching reasons and the same
 first failing cell:
@@ -463,7 +694,10 @@ first failing cell:
   - unknown mode;
   - an unknown variant or mode for `inventory`;
   - mixed-layout parsing: unknown month type (`S29`), unknown choice
-    (`F31=afold`), misordered types, and a missing type.
+    (`F31=afold`), misordered types, a missing type, and `bfold31` given for
+    S30;
+  - month-letter placement: a bad digit, a short header, a header on a fixed
+    layout (`B;H=...`), and two `;H=` suffixes.
 
 These are invalid-candidate results, not UNSAT proofs.
 

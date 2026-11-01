@@ -14,9 +14,24 @@ def stackSha(text: String): String \ IO = HexFormat.of().formatHex(MessageDigest
 // Mixed layouts "F31=<choice>,S30=<choice>,S31=<choice>"; see stacked_common.jl.
 def mixTypes(): List[String] = List#{"F31","S30","S31"}
 def mixChoices(t: String): List[String] =
-    if(t=="F31") List#{"keep","bfold"} else if(t=="S30") List#{"keep","bfold","afold"} else List#{"keep","bfold","bfold30","afold"}
+    if(t=="F31") List#{"keep","bfold"} else if(t=="S30") List#{"keep","bfold","afold"} else List#{"keep","bfold","bfold30","afold","bfold31"}
+// Optional month-letter placement "<mix>;H=<12 start columns 1..5>"; see stacked_common.jl.
+def startDigit(c: Char): Int32 = if(c=='1') 1 else if(c=='2') 2 else if(c=='3') 3 else if(c=='4') 4 else 5
+def headerStarts(variant: String): List[Int32] \ IO = match String.splitOn(substr=";",variant) {
+    case _::Nil => List.map(m -> if(m<=9) 5 else 1,List.range(1,13))
+    case _::h::Nil => match String.toList(h) {
+        case 'H'::'='::rest => {
+            require(List.length(rest)==12 and List.forAll(c -> List.memberOf(c,String.toList("12345")),rest),"month-letter placement must be H= and 12 start columns 1..5");
+            List.map(startDigit,rest)
+        }
+        case _ => throw new IllegalArgumentException("month-letter placement must be H= and 12 start columns 1..5")
+    }
+    case _ => throw new IllegalArgumentException("at most one ';H=' suffix")
+}
+def baseVariant(variant: String): String = match String.splitOn(substr=";",variant) {case v::_ => v case Nil => variant}
 def parseMix(variant: String): List[String] \ IO = {
-    let parts=String.splitOn(substr=",",variant);
+    let _ = headerStarts(variant);
+    let parts=String.splitOn(substr=",",baseVariant(variant));
     require(List.length(parts)==3,"mixed layout needs F31=..,S30=..,S31=..");
     List.map(q -> {
         let(i,part)=q;
@@ -31,7 +46,9 @@ def parseMix(variant: String): List[String] \ IO = {
     },List.zipWithIndex(parts))
 }
 def allMixes(): List[String] =
-    List.flatMap(a -> List.flatMap(b -> List.map(c -> "F31=${a},S30=${b},S31=${c}",mixChoices("S31")),mixChoices("S30")),mixChoices("F31"))
+    List.append(
+        List.flatMap(a -> List.flatMap(b -> List.map(c -> "F31=${a},S30=${b},S31=${c}",List.filter(c -> c != "bfold31",mixChoices("S31"))),mixChoices("S30")),mixChoices("F31")),
+        List.flatMap(a -> List.map(b -> "F31=${a},S30=${b},S31=bfold31",mixChoices("S30")),mixChoices("F31")))
 def pairsOf(variant: String): List[(Int32,Int32)] \ IO =
     if(variant=="A" or variant=="W") List#{(1,8),(24,31)}
     else if(variant=="B") List#{(23,30),(24,31)}
@@ -39,7 +56,7 @@ def pairsOf(variant: String): List[(Int32,Int32)] \ IO =
         let ch=parseMix(variant);let f=at(ch,0);let s30=at(ch,1);let s31=at(ch,2);
         let a=if(List.memberOf("afold",ch)) List#{(1,8)} else Nil;
         let b=if(s30=="bfold" or s31=="bfold" or s31=="bfold30") List#{(23,30)} else Nil;
-        let c=if(f=="bfold" or s31=="bfold") List#{(24,31)} else Nil;
+        let c=if(f=="bfold" or s31=="bfold" or s31=="bfold31") List#{(24,31)} else Nil;
         List.append(List.append(a,b),c)
     }
     else throw new IllegalArgumentException("variant must be A, B, W or a mixed layout")
@@ -52,7 +69,7 @@ def monthStyle(variant: String,off: Int32,n: Int32): String \ IO =
         if(variant=="W") "wrap" else if(variant=="B") "bottom" else if(variant=="A") {if(off==6) "top" else "bottom"}
         else {
             let c=at(parseMix(variant),kind);
-            if(c=="keep") "wrap" else if(c=="bfold") "bottom" else if(c=="bfold30") "bottom30" else "top"
+            if(c=="keep") "wrap" else if(c=="bfold") "bottom" else if(c=="bfold30") "bottom30" else if(c=="bfold31") "bottom31" else "top"
         }
     }
 
@@ -81,13 +98,17 @@ def placement(style: String,n: Int32,off: Int32,d: Int32): Option[(Int32,String)
     else if(style=="top") {
         if(w==0) None else Some((w+2,if(d==8)"1/8" else "${d}"))
     } else if(w==5) {
-        if(style=="bottom30" and d==31) Some((3,"31↶")) else None
-    } else Some((w+3,if(w==4 and d+7<=n and not (style=="bottom30" and d+7==31))"${d}/${d+7}" else "${d}"))
+        if((style=="bottom30" and d==31) or (style=="bottom31" and d==30)) Some((3,"${d}↶")) else None
+    } else Some((w+3,if(w==4 and d+7<=n and not (style=="bottom30" and d+7==31) and not (style=="bottom31" and d+7==30))"${d}/${d+7}" else "${d}"))
 }
 def stackedCell(variant: String,y: Int32,m: Int32,row: Int32,col: Int32): (String,String) \ IO = {
     let off=offset(y,m);let n=monthDays(y,m);
     let style=monthStyle(variant,off,n);
-    if(row<=2 or style=="wrap") goalCell(y,m,row,col)
+    if(row==1 and String.contains(substr=";",variant)) {
+        let st=at(headerStarts(variant),m-1);
+        if(col>=st and col<=st+2) ("${at(String.toList(monthWord(m)),col-st)}","month") else ("","blank")
+    }
+    else if(row<=2 or style=="wrap") goalCell(y,m,row,col)
     else {
         let hits=List.flatMap(d -> match placement(style,n,off,d) {
             case Some((r,text)) => if(r==row and Int32.modulo(off+d-1,7)+1==col) List#{text} else Nil
@@ -238,11 +259,11 @@ def invGroup(g: String,ink: String,r: Int32,c: Int32,variant: String,mode: Strin
     let t=String.replace(src="I",dst="1",String.replace(src="O",dst="0",g));
     let hits=if(mode=="context") List.filter(p -> {let(a,b)=p;t=="${a}" or t=="${b}" or t=="${a}/${b}"},pairsOf(variant)) else Nil;
     match hits {
-        case (a,b)::_ => "pair|${a}|${b}|${ink}"
-        case Nil => {let(x,q,i)=lowerArt(g,ink,r,c);"art|${x}|${q}|${i}"}
+        case (a,b)::_ => "pair\t${a}\t${b}\t${ink}"
+        case Nil => {let(x,q,i)=lowerArt(g,ink,r,c);"art\t${x}\t${q}\t${i}"}
     }
 }
-def stackedInventory(variant: String,mode: String,oldRoot: String): Unit \ IO = {
+def stackedInventory(variant: String,mode: String,oldRoot: String,showClasses: Bool): Unit \ IO = {
     require(mode=="strict" or mode=="context","mode must be strict or context");
     let _ = pairsOf(variant);
     let reps=representatives();validateTargets(read(oldRoot+"/targets.tsv"),reps);
@@ -255,11 +276,15 @@ def stackedInventory(variant: String,mode: String,oldRoot: String): Unit \ IO = 
             let groups=List.flatMap(q -> {let((r,c),(t,ink))=q;if(t=="") Nil else List#{invGroup(t,ink,r,c,variant,mode)}},inOrbit);
             (groups,blanks)
         },goals);
-        let classes=List.distinct(List.flatMap(x -> {let(gs,_)=x;gs},perGoal));
+        let classes=List.sort(List.distinct(List.flatMap(x -> {let(gs,_)=x;gs},perGoal)));
         let need=List.foldLeft((acc,cls) -> acc+List.foldLeft((m,x) -> {let(gs,_)=x;Int32.max(m,List.count(y -> y==cls,gs))},0,perGoal),0,classes);
         let blanks=List.foldLeft((m,x) -> {let(_,b)=x;Int32.max(m,b)},0,perGoal);
         let cap=if(key==(0,0))6 else 24;let slack=cap-need-blanks;let(x,y)=key;
         println("stacked-orbit\t${variant}\t${mode}\t${x}\t${y}\t${need}\t${blanks}\t${cap}\t${slack}");
+        if(showClasses) List.forEach(cls -> {
+            let peak=List.foldLeft((m,z) -> {let(gs,_)=z;Int32.max(m,List.count(w -> w==cls,gs))},0,perGoal);
+            println("stacked-class\t${variant}\t${mode}\t${x}\t${y}\t${cls}\t${peak}")
+        },classes) else ();
         (need,slack,"(${x},${y})")
     },keys);
     let total=List.foldLeft((a,p) -> {let(n,_,_)=p;a+n},0,rows);
@@ -274,8 +299,8 @@ def stackedInventory(variant: String,mode: String,oldRoot: String): Unit \ IO = 
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {
         match Sys.Env.getArgs() {
-            case "inventory"::variant::mode::oldRoot::Nil => stackedInventory(variant,mode,oldRoot)
-            case "inventory-all"::oldRoot::Nil => List.forEach(v -> List.forEach(m -> stackedInventory(v,m,oldRoot),List#{"strict","context"}),allMixes())
+            case "inventory"::variant::mode::oldRoot::Nil => stackedInventory(variant,mode,oldRoot,true)
+            case "inventory-all"::oldRoot::Nil => List.forEach(v -> List.forEach(m -> stackedInventory(v,m,oldRoot,false),List#{"strict","context"}),allMixes())
             case printing::dag::variant::mode::oldRoot::geometry::Nil => checkStacked(printing,dag,variant,mode,oldRoot,geometry)
             case _ => throw new IllegalArgumentException("PRINT DAG VARIANT MODE ORIGINAL_EVIDENCE GEOMETRY | inventory VARIANT MODE ORIGINAL_EVIDENCE")
         }

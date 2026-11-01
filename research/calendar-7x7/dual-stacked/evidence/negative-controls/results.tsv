@@ -16,3 +16,8 @@ mix-unknown-type	1	1	AssertionError: unknown or misplaced month type 'S29' | jav
 mix-unknown-choice	1	1	AssertionError: unknown choice 'afold' for F31 | java.lang.IllegalArgumentException: unknown choice for month type
 mix-misordered-types	1	1	AssertionError: unknown or misplaced month type 'S30' | java.lang.IllegalArgumentException: unknown or misplaced month type
 mix-missing-type	1	1	AssertionError: mixed layout needs F31=..,S30=..,S31=.. | java.lang.IllegalArgumentException: mixed layout needs F31=..,S30=..,S31=..
+bfold31-for-S30	1	1	AssertionError: unknown choice 'bfold31' for S30 | java.lang.IllegalArgumentException: unknown choice for month type
+header-bad-digit	1	1	AssertionError: month-letter placement must be H= and 12 start columns 1..5 | java.lang.IllegalArgumentException: month-letter placement must be H= and 12 start columns 1..5
+header-short	1	1	AssertionError: month-letter placement must be H= and 12 start columns 1..5 | java.lang.IllegalArgumentException: month-letter placement must be H= and 12 start columns 1..5
+header-fixed-variant	1	1	AssertionError: month-letter placement is only defined for mixed layouts | java.lang.IllegalArgumentException: mixed layout needs F31=..,S30=..,S31=..
+header-double	1	1	AssertionError: at most one ';H=' suffix | java.lang.IllegalArgumentException: at most one ';H=' suffix
