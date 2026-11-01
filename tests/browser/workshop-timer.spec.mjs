@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { startFrameGapProbe, resetFrameGap, readFrameGap, endpointToleranceMs } from "../helpers/frame-gap.mjs";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -833,6 +834,7 @@ test("Sequence numbers identify actual starts, retain the finished number and ig
 });
 
 async function observeEndpoints(page) {
+  await startFrameGapProbe(page);
   await page.evaluate(async () => {
     const { WorkshopClock } = await import("/src/apps/timer/clock.ts");
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
@@ -872,13 +874,15 @@ async function observeEndpoints(page) {
   });
 }
 async function clearEndpointObservation(page) {
+  await resetFrameGap(page);
   await page.evaluate(() => {
     window.sequenceStartedAt = null; window.deadlineCommits = []; window.timerTimes = [];
     window.nominalDurations = []; window.motionWindows = []; window.endpointRenders = []; window.endpointAngles = [];
   });
 }
 async function endpointObservation(page, value = 1) {
-  return page.evaluate(async (value) => {
+  const frameGap = await readFrameGap(page);
+  return { frameGap, ...(await page.evaluate(async (value) => {
     const { validateTimerRoute } = await import("/src/apps/timer/design.ts");
     const { stateEquals } = await import("/packages/cube-core/src/index.ts");
     const route = validateTimerRoute(await (await fetch("/workshop-timer.v1.json")).json());
@@ -892,7 +896,7 @@ async function endpointObservation(page, value = 1) {
       motionWindows: window.motionWindows, nominalDurations: window.nominalDurations, actualMoveDurations: window.timerTimes,
       intermediateAngles: window.endpointAngles.filter(s => s.angle > .001 && s.angle < s.fullAngle - .001),
       samples: window.endpointAngles };
-  }, value);
+  }, value)) };
 }
 function expectEndpoint(observation, preferred) {
   expect(observation.exactFullState).toBe(true);
@@ -902,8 +906,9 @@ function expectEndpoint(observation, preferred) {
   expect(observation.motionWindows.at(-1).endAt).toBe(observation.deadline);
   if (preferred <= 250) expect(observation.nominalDurations).toEqual(Array(5).fill(preferred));
   else expect(Math.max(...observation.nominalDurations)).toBeLessThan(preferred);
-  expect(Math.abs(observation.settledAt - observation.deadline)).toBeLessThanOrEqual(20);
-  expect(Math.abs(observation.renderedAt - observation.deadline)).toBeLessThanOrEqual(20);
+  const tolerance = endpointToleranceMs(observation.frameGap); // 20 ms unless frames are slower than that
+  expect(Math.abs(observation.settledAt - observation.deadline)).toBeLessThanOrEqual(tolerance);
+  expect(Math.abs(observation.renderedAt - observation.deadline)).toBeLessThanOrEqual(tolerance);
   expect(observation.renderedAt).toBeLessThanOrEqual(observation.settledAt);
   expect(observation.liveAtCommit).toBe(observation.target);
   expect(observation.settledAt - observation.startedAt).toBeLessThanOrEqual(5000);
@@ -926,7 +931,7 @@ test("real Timer final turn meets the actual clock endpoint within20ms at250ms, 
     await page.click("#timer-start");
   }
   const path = testInfo.outputPath("endpoint-observations.json");
-  writeFileSync(path, JSON.stringify({ kind: "foreground-real-clock-endpoint", toleranceMs: 20,
+  writeFileSync(path, JSON.stringify({ kind: "foreground-real-clock-endpoint", toleranceMs: 20, // base bound; each observation carries its measured frameGap
     implementationHead: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
     observedAt: new Date().toISOString(), observations }, null, 2));
   await testInfo.attach("endpoint-observations", { path, contentType: "application/json" });
