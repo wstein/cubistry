@@ -2,7 +2,7 @@
 
 How Cubistry relates to PuzlWerk, ChronoCube and the shared solver packages. Back to the [README](../README.md).
 
-## Architecture and ecosystem
+## Ecosystem
 
 Cubistry is the reusable cube-display framework between the
 [PuzlWerk](https://github.com/wstein/puzlwerk) puzzle/solver foundation and
