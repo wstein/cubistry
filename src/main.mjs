@@ -2,6 +2,10 @@ import { installPrintLink } from "./apps/print/link.ts";
 import { HsmController } from "./apps/hsm/controller.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";
 import hsmPin from "../hsm-source.json";
+import { MsController } from "./apps/ms/controller.ts";
+import { loadMsDesign } from "./apps/ms/design.ts";
+import msPin from "../ms-source.json";
+import hsmSymbols from "./apps/hsm/images.json";
 import {
   hsmImagesFor,
   hsmDesignFor,
@@ -106,6 +110,12 @@ let hsmDesign,
   hsmNextAt = 0,
   rememberedCounterValue = 0;
 const isHsm = () => application === "hsm-counter";
+// The M/S counter (research PR #138) walks the saved period of one print.
+let msDesign,
+  msRunning = false,
+  msNextAt = 0;
+const isMs = () => application === "ms-counter";
+const msShift = (delta) => (value + delta + 60) % 60;
 const hsmMaximum = () => Number($("hsm-range").value);
 const hsmShift = (delta) =>
   (value + delta + hsmMaximum() + 1) % (hsmMaximum() + 1);
@@ -128,7 +138,7 @@ const error = (message = "") => {
   $("error").textContent = message;
 };
 function save() {
-  if (isTimer() || isHsm()) return;
+  if (isTimer() || isHsm() || isMs()) return;
   try {
     localStorage.setItem(
       "cubistry-counter-v2",
@@ -155,8 +165,9 @@ function controlsUi() {
     !!view?.busy ||
     run.running ||
     hsmRunning ||
+    msRunning ||
     (isTimer() && clock.running && !clock.elapsed);
-  $("counter-controls").hidden = isTimer() || isHsm();
+  $("counter-controls").hidden = isTimer() || isHsm() || isMs();
   $("hsm-controls").hidden = !isHsm();
   for (const el of $("hsm-controls").querySelectorAll("button,input,select"))
     el.disabled = !ready;
@@ -170,6 +181,14 @@ function controlsUi() {
   $("hsm-run").textContent =
     hsmRunning || (isHsm() && view?.busy) ? "Stop" : "Run";
   $("hsm-run").setAttribute("aria-pressed", String(hsmRunning));
+  $("ms-controls").hidden = !isMs();
+  for (const el of $("ms-controls").querySelectorAll("button,input,select"))
+    el.disabled = !ready;
+  for (const id of ["ms-letter", "ms-direction"])
+    $(id).disabled = !ready || !!view?.busy || msRunning;
+  $("ms-run").textContent =
+    msRunning || (isMs() && view?.busy) ? "Stop" : "Run";
+  $("ms-run").setAttribute("aria-pressed", String(msRunning));
   $("timer-controls").hidden = !isTimer();
   $("timer-start").disabled = !ready || (clock.elapsed && !durationDirty);
   $("timer-start").textContent = clock.running
@@ -195,9 +214,10 @@ function controlsUi() {
     !!view?.busy ||
     run.running ||
     hsmRunning ||
+    msRunning ||
     (isTimer() && clock.running && !clock.elapsed);
   $("format").disabled =
-    !ready || isHsm() || (isBlankTop() && pendingSwitch() === null);
+    !ready || isHsm() || isMs() || (isBlankTop() && pendingSwitch() === null);
   $("counter-print").disabled = !ready || !!view?.busy || run.running;
   $("mode-switch").hidden = !isBlankTop();
   text("setup-moves", String(view?.modeSwitch?.committed ?? 0));
@@ -266,6 +286,7 @@ const onPhysicalState = (physical, busy, failure, progress) => {
     ready = false;
     run.stop();
     hsmRunning = false;
+    msRunning = false;
     if (isTimer()) {
       clock.pause();
       timerScheduler.invalidate();
@@ -286,6 +307,24 @@ const onPhysicalState = (physical, busy, failure, progress) => {
       failure
         ? "Turn sequence stopped."
         : `${view.letter} · ${String(physical).padStart(2, "0")} · ${hsmRunning ? "Running" : busy ? "Moving" : "Ready"}`,
+    );
+    controlsUi();
+    return;
+  }
+  if (isMs()) {
+    if (!busy) value = physical;
+    const { lap, laps } = view.lap;
+    text(
+      "status",
+      failure
+        ? "Turn sequence stopped."
+        : `${view.letter} · ${String(physical).padStart(2, "0")} · ${msRunning ? "Running" : busy ? "Moving" : "Ready"}`,
+    );
+    const msRun = view.period.run;
+    text(
+      "ms-period",
+      `${view.msPrint.label} · ${view.letter} period: ${msRun.laps} lap${msRun.laps > 1 ? "s" : ""}, ${msRun.periodHTM} moves, at most ${msRun.maximumHTM} per step` +
+        (laps > 1 && lap ? ` · lap ${lap} of ${laps}` : ""),
     );
     controlsUi();
     return;
@@ -355,7 +394,7 @@ $("reset-session-moves").addEventListener("click", () =>
 // This screen-only field rule never selects a different permanent print or solver.
 function formatUi() {
   // The blank-top print shows its own physical blank; nothing is masked.
-  if (isTimer() || isHsm() || isBlankTop()) {
+  if (isTimer() || isHsm() || isMs() || isBlankTop()) {
     viewer.setFaceletImageOverride(null);
     return;
   }
@@ -482,6 +521,13 @@ function tick() {
     }
     return;
   }
+  if (isMs()) {
+    if (msRunning && !view.busy && performance.now() >= msNextAt) {
+      msNextAt = performance.now() + 1000;
+      request(msShift(Number($("ms-direction").value)));
+    }
+    return;
+  }
   if (isTimer()) {
     timerScheduler.tick(
       clock.snapshot(),
@@ -510,7 +556,8 @@ window.addEventListener("keydown", (event) => {
     ) ||
     !ready ||
     isTimer() ||
-    isHsm()
+    isHsm() ||
+    isMs()
   )
     return;
   const steps = { ArrowUp: 1, ArrowDown: -1, PageUp: 10, PageDown: -10 };
@@ -656,6 +703,7 @@ $("application").addEventListener("change", async () => {
     view.busy ||
     run.running ||
     hsmRunning ||
+    msRunning ||
     (isTimer() && clock.running && !clock.elapsed)
   ) {
     $("application").value = application;
@@ -707,6 +755,9 @@ $("application").addEventListener("change", async () => {
       );
       // The selected range decides which saved counting period is installed.
       candidate.setMode(hsmMaximum(), Number($("hsm-direction").value));
+      await candidate.configure();
+    } else if (requested === "ms-counter") {
+      candidate = await msController(callback);
       await candidate.configure();
     } else if (requested === "timer" || requested === "five-second-timer") {
       const profile =
@@ -763,7 +814,9 @@ $("application").addEventListener("change", async () => {
       ? "3"
       : isHsm()
         ? String(hsmDefaultStops[$("hsm-letter").value] ?? 4)
-        : "4";
+        : isMs()
+          ? String(hsmDefaultStops[$("ms-letter").value] ?? 4)
+          : "4";
     speedUi();
     formatUi();
     ready = true;
@@ -891,6 +944,107 @@ for (const id of ["hsm-letter", "hsm-lettering"])
     }
     controlsUi();
   });
+/** A new M/S controller for the selected unit on print S3 (not yet configured). */
+async function msController(callback) {
+  msDesign ??= await loadMsDesign(
+    import.meta.env.BASE_URL,
+    msPin.runtimeSHA256,
+  );
+  return new MsController(
+    viewer,
+    msDesign.print,
+    {
+      ...proof.assets,
+      fonts: [],
+      documents: [],
+      images: [
+        ...proof.assets.images.filter(
+          (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
+        ),
+        ...hsmSymbols.filter((i) => i.id === "M" || i.id === "S"),
+      ],
+    },
+    $("ms-letter").value,
+    callback,
+    (manifest, prints, signal) =>
+      loadAssets(manifest, prints, signal, import.meta.env.BASE_URL),
+  );
+}
+function stopMs() {
+  msRunning = false;
+  const active = view.stopAfterCurrent();
+  value = active ?? view.currentValue;
+  controlsUi();
+}
+$("ms-run").addEventListener("click", () =>
+  action(() => {
+    if (!ready || !isMs()) return;
+    if (msRunning || view.busy) stopMs();
+    else {
+      msRunning = true;
+      msNextAt = performance.now();
+      tick();
+      controlsUi();
+    }
+  }),
+);
+for (const button of document.querySelectorAll("[data-ms-delta]"))
+  button.addEventListener("click", () =>
+    action(() => {
+      if (!ready || !isMs()) return;
+      stopMs();
+      request(msShift(Number(button.dataset.msDelta)));
+    }),
+  );
+$("ms-reset").addEventListener("click", () =>
+  action(() => {
+    if (ready && isMs()) {
+      stopMs();
+      request(0);
+    }
+  }),
+);
+$("ms-set-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  action(() => {
+    if (!ready || !isMs()) return;
+    const raw = $("ms-value").value.trim(),
+      n = Number(raw);
+    if (!/^\d{1,2}$/.test(raw) || n > 59)
+      throw Error("Enter an integer from 00 to 59.");
+    stopMs();
+    request(n);
+  });
+});
+$("ms-letter").addEventListener("change", async () => {
+  if (!ready || !isMs() || msRunning || view.busy) return;
+  const previous = view;
+  ready = false;
+  controlsUi();
+  let candidate;
+  try {
+    candidate = await msController((...args) => {
+      if (view === candidate) onPhysicalState(...args);
+    });
+    await candidate.configure(0);
+    previous.dispose();
+    view = candidate;
+    value = 0;
+    $("rotation-speed").value = String(
+      hsmDefaultStops[$("ms-letter").value] ?? 4,
+    );
+    speedUi();
+    ready = true;
+    error();
+    onPhysicalState(0, false, undefined, view.progress);
+  } catch (e) {
+    candidate?.dispose();
+    ready = true;
+    $("ms-letter").value = previous.letter;
+    error(e.message);
+  }
+  controlsUi();
+});
 async function initialize() {
   if (!viewer) return;
   try {
@@ -958,7 +1112,11 @@ async function initialize() {
     controlsUi();
     save();
     const requested = new URLSearchParams(location.search).get("application");
-    if (["hsm-counter", "timer", "five-second-timer"].includes(requested)) {
+    if (
+      ["hsm-counter", "ms-counter", "timer", "five-second-timer"].includes(
+        requested,
+      )
+    ) {
       $("application").value = requested;
       $("application").dispatchEvent(new Event("change"));
     }

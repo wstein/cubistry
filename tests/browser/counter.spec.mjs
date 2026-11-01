@@ -105,6 +105,7 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
     "Calendar · Deutsch / English",
     "Live H–M–S Clock",
     "H/M/S Counter 00–59",
+    "M/S Counter 00–59",
     "Counter 0–99",
     "60-Minute Timer",
     "5-Second Timer",
