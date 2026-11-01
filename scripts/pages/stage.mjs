@@ -61,7 +61,8 @@ if (action === "deploy") {
       String(entry.number),
       entry.sha,
       // Untrusted free text: an argv element, never shell-interpreted.
-      String(pr?.title ?? ""),
+      // Control characters (NUL makes execFileSync throw) become spaces.
+      String(pr?.title ?? "").replace(/[\u0000-\u001f\u007f-\u009f]/g, " "),
     ],
     { stdio: "inherit" },
   );
