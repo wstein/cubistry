@@ -560,3 +560,165 @@ test("the pair is generic in the moduli and the cube units (fake units)", async 
   await Promise.all([a, b]);
   assert.equal(pair.value, 3);
 });
+
+// ------------------------------------------- failure, dispose and issue contracts
+
+/** Fake unit with scriptable behavior; reports through the pair's handler. */
+function fakeUnits({ failRequest = {} } = {}) {
+  const units = [];
+  const make = (name) => (onState) => {
+    const unit = {
+      name,
+      busy: false,
+      currentValue: 0,
+      configured: false,
+      disposed: 0,
+      requests: [],
+      async configure(v) {
+        unit.configured = true;
+        unit.currentValue = v;
+      },
+      request(v) {
+        if (!unit.configured) throw new Error(`${name}: not configured`);
+        unit.requests.push(v);
+        if (failRequest[name]) throw new Error(`${name}: request failed`);
+        unit.busy = true;
+        onState(unit.currentValue, true);
+        setImmediate(() => {
+          unit.currentValue = v;
+          unit.busy = false;
+          onState(v, false);
+        });
+      },
+      dispose() {
+        unit.disposed++;
+      },
+    };
+    units.push(unit);
+    return unit;
+  };
+  return { units, make };
+}
+
+test("a failing cube is reported through error and onState; the promise settles", async () => {
+  // Real controllers: the view throws on the first turn of the major cube.
+  const views = { minor: makeView(), major: makeView() };
+  views.major.animate = async () => {
+    throw new Error("turn failed");
+  };
+  const states = [];
+  const pair = new PairController({
+    minorModulus: 60,
+    majorModulus: 60,
+    createMinor: (s) => new MsController(views.minor, ms, {}, "S", s, assets),
+    createMajor: (s) => new MsController(views.major, ms, {}, "M", s, assets),
+    onState: (s) => states.push(s),
+  });
+  await pair.configure(59);
+  states.length = 0;
+  await pair.step(1); // resolves; never rejects
+  assert.equal(pair.error?.message, "turn failed");
+  assert.equal(states.at(-1).error?.message, "turn failed");
+  assert.equal(pair.busy, false);
+  assert.equal(pair.value, 0, "the minor cube wrapped, the major did not move");
+  // A step publishes its target and busy state at the start.
+  assert.equal(states[0].busy, true);
+  assert.equal(states[0].target, 60);
+  assert.equal(states[0].error, undefined);
+  // The next call still settles instead of hanging.
+  await pair.step(1);
+  // A new configure clears the failure.
+  views.major.animate = async () => {};
+  await pair.configure(0);
+  assert.equal(pair.error, undefined);
+});
+
+test("a step publishes busy then idle states with the target", async () => {
+  const views = { minor: makeView(), major: makeView() };
+  const seen = [];
+  const pair = new PairController({
+    minorModulus: 60,
+    majorModulus: 60,
+    createMinor: (s) => new MsController(views.minor, ms, {}, "S", s, assets),
+    createMajor: (s) => new MsController(views.major, ms, {}, "M", s, assets),
+    onState: (s) => seen.push(s),
+  });
+  await pair.configure(5);
+  seen.length = 0;
+  const moving = pair.step(1);
+  // Published synchronously, before any turn finished.
+  assert.equal(seen.length, 1);
+  await moving;
+  assert.equal(seen[0].busy, true);
+  assert.equal(seen[0].target, 6);
+  assert.equal(seen[0].value, 5);
+  assert.equal(seen.at(-1).busy, false);
+  assert.equal(seen.at(-1).value, 6);
+});
+
+test("a unit whose request throws sets error, rolls the target back and settles", async () => {
+  const { units, make } = fakeUnits({ failRequest: { major: true } });
+  const states = [];
+  const pair = new PairController({
+    minorModulus: 60,
+    majorModulus: 24,
+    createMinor: make("minor"),
+    createMajor: make("major"),
+    onState: (s) => states.push(s),
+  });
+  const [minor, major] = units;
+  await pair.configure(59); // 00:59
+  states.length = 0;
+  // The carry is half issued: the minor cube was asked first, then the major
+  // request threw. The pair restores the old target for both cubes.
+  await pair.step(1);
+  assert.equal(pair.error?.message, "major: request failed");
+  assert.equal(states.at(-1).error?.message, "major: request failed");
+  assert.equal(pair.target, 59, "target rolled back");
+  assert.deepEqual(
+    minor.requests,
+    [0, 59],
+    "minor asked back to the old value",
+  );
+  assert.equal(pair.busy, false);
+  assert.equal(major.currentValue, 0);
+});
+
+test("step, set and reset before configure throw before any state change", async () => {
+  const { units, make } = fakeUnits();
+  const pair = new PairController({
+    minorModulus: 60,
+    majorModulus: 24,
+    createMinor: make("minor"),
+    createMajor: make("major"),
+  });
+  assert.throws(() => pair.step(1), /configure/i);
+  assert.throws(() => pair.set(5), /configure/i);
+  assert.throws(() => pair.reset(), /configure/i);
+  assert.equal(pair.target, 0);
+  assert.deepEqual(units[0].requests, []);
+  assert.deepEqual(units[1].requests, []);
+  await pair.configure(30);
+  await pair.step(1); // works, and no stale waiter from the failed calls
+  assert.equal(pair.value, 31);
+});
+
+test("dispose is atomic: refused while any cube moves, then releases both", async () => {
+  const views = { minor: makeView(), major: makeView() };
+  const pair = SETS["M/S"].build(views);
+  await pair.configure(59);
+  views.major.hold = true; // only the major cube is slow
+  const p = pair.step(1);
+  await flush();
+  assert.equal(pair.minor.busy, false);
+  assert.equal(pair.major.busy, true);
+  assert.throws(() => pair.dispose(), /settle/i);
+  assert.ok(pair.minor.state, "the idle minor cube was not released");
+  assert.ok(pair.major.state);
+  views.major.release();
+  await p;
+  pair.dispose();
+  assert.equal(pair.minor.state, null);
+  assert.equal(pair.major.state, null);
+  assert.throws(() => pair.step(1), /configure/i);
+});
