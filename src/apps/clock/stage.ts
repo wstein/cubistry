@@ -1,9 +1,22 @@
 import * as THREE from "three";
 import { groupZoom } from "./orbit.ts";
-import { clockCameraRadius, clockCubeRadius, clockPresentationScale, clockWorldCenters } from "./framing.ts";
+import { clockCameraRadius, clockCenters, clockCentersFor, clockCubeCount, clockCubeRadius, clockPresentationScale, clockRowExtent, clockWorldCenters } from "./framing.ts";
 import { bindSmartRotation, type SmartRotationBinding, rotatePresentation, CubeViewer, configurePresentationRenderer, createPresentationStudio, bindLightingSwitches, type LightingSwitches, DEFAULT_APPEARANCE, installAppearanceControls, type ViewerAppearance } from "@cubistry/cube-viewer";
 import { demand } from "@cubistry/cube-core";
-/** One WebGL context, scene, camera and frame loop for the entire H–M–S row. */
+const THREE_CUBE_LABEL =
+  "Live H M S clock. Three physical cubes in one scene. Drag to rotate the entire arrangement.";
+const TWO_CUBE_LABEL =
+  "Two physical cubes in one scene. Drag to rotate the entire arrangement.";
+export interface ClockStageOptions {
+  /** Cubes in the row: 2 or 3 (default 3, the H–M–S clock). Other values are rejected. */
+  readonly cubes?: number;
+  /** Accessible name of the canvas; defaults to a description of the row. */
+  readonly label?: string;
+}
+/**
+ * One WebGL context, scene, camera and frame loop for an entire row of two or
+ * three cubes (the H–M–S clock uses three).
+ */
 export class ClockStage {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
@@ -15,11 +28,17 @@ export class ClockStage {
   private readonly studio: ReturnType<typeof createPresentationStudio>;
   private readonly lightingSwitches: LightingSwitches;
   private radius = 12;
-  private readonly casterCenters = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+  /** Row centers; unset only on bare prototype instances, which use the three-cube row. */
+  private readonly layout?: readonly number[];
+  private readonly casterCenters: THREE.Vector3[];
   private zoom = 1;
   private rotation?: SmartRotationBinding;
   private cubes: CubeViewer[] = [];
-  constructor(host: HTMLElement) {
+  constructor(host: HTMLElement, options: ClockStageOptions = {}) {
+    // Validate before any renderer or DOM work.
+    const count = clockCubeCount(options.cubes ?? 3);
+    this.layout = clockCentersFor(count);
+    this.casterCenters = this.layout.map(() => new THREE.Vector3());
     this.presentation.name = "clock-presentation";
     this.scene.add(this.presentation);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -29,7 +48,7 @@ export class ClockStage {
     el.setAttribute("role", "img");
     el.setAttribute(
       "aria-label",
-      "Live H M S clock. Three physical cubes in one scene. Drag to rotate the entire arrangement.",
+      options.label ?? (count === 3 ? THREE_CUBE_LABEL : TWO_CUBE_LABEL),
     );
     this.studio = createPresentationStudio(this.scene, 1, 4.3, host);
     this.appearanceControls = installAppearanceControls(host, (value) => {
@@ -61,19 +80,26 @@ export class ClockStage {
       this.renderer.render(this.scene, this.camera);
     });
   }
+  /** Cube centers of this stage's row, left to right. */
+  get centers(): readonly number[] {
+    return this.layout ?? clockCenters;
+  }
   createCube(host: HTMLElement, index: number): CubeViewer {
+    const centers = this.centers;
     demand(
       Number.isInteger(index) &&
         index >= 0 &&
-        index < 3 &&
+        index < centers.length &&
         this.cubes.length === index,
-      "Clock cubes must be H M S in order",
+      centers.length === 3
+        ? "Clock cubes must be H M S in order"
+        : "Stage cubes must be created left to right",
     );
     const cube = new CubeViewer(host, {
       renderer: this.renderer,
       scene: this.presentation,
       camera: this.camera,
-      position: [(index - 1) * 2.8, 0, 0],
+      position: [centers[index], 0, 0],
       resetCamera: () => this.resetCamera(),
       onDefaultPlasticColor: (color) => { if (index === 0) this.appearanceControls.setDefaultColor(color); },
     });
@@ -85,18 +111,20 @@ export class ClockStage {
     this.rotation?.reset();
   }
   private fitCamera(): void {
-    this.radius = clockCameraRadius(this.camera.aspect, 0, 0, this.camera.fov) * this.zoom;
+    const centers = this.centers;
+    this.radius = clockCameraRadius(this.camera.aspect, 0, 0, this.camera.fov, centers) * this.zoom;
     this.camera.position.set(0, 0, this.radius);
     this.camera.lookAt(0, 0, 0);
     // Very narrow viewports can require a distance beyond the initial far plane.
-    this.camera.far = Math.max(100, this.radius + 2.8 + clockCubeRadius + 1);
+    this.camera.far = Math.max(100, this.radius + clockRowExtent(centers) + clockCubeRadius + 1);
     this.camera.updateProjectionMatrix();
     this.updatePresentationBounds();
   }
   private updatePresentationBounds(): void {
-    const scale = clockPresentationScale(this.camera.aspect, this.presentation.quaternion, this.camera.fov);
+    const centers = this.centers;
+    const scale = clockPresentationScale(this.camera.aspect, this.presentation.quaternion, this.camera.fov, centers);
     this.presentation.scale.setScalar(scale);
-    clockWorldCenters(this.presentation.quaternion, scale, this.casterCenters);
+    clockWorldCenters(this.presentation.quaternion, scale, this.casterCenters, centers);
     this.studio.fitCasters(this.casterCenters, clockCubeRadius * scale, .08 * scale);
   }
   destroy(): void {

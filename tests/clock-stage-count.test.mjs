@@ -3,7 +3,7 @@
 // historical H–M–S row; two cubes are a symmetric row with the same spacing.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Quaternion, Euler, Vector3, PerspectiveCamera } from "three";
+import { Quaternion, Euler, Vector3, PerspectiveCamera, Group, Scene } from "three";
 import {
   clockBounds,
   clockBoundsFor,
@@ -107,4 +107,58 @@ test("framing helpers reject invalid center rows and short outputs", () => {
   }
   assert.throws(() => clockWorldCenters(clockDefaultQuaternion, 1, [new Vector3()], clockCentersFor(2)));
   assert.throws(() => clockWorldCenters(clockDefaultQuaternion, 1, [new Vector3(), new Vector3()]));
+});
+
+test("the stage rejects a cube count other than 2 or 3 before creating a renderer", async () => {
+  const { ClockStage } = await import("../src/apps/clock/stage.ts");
+  for (const cubes of rejected.filter((c) => c !== undefined && c !== null))
+    assert.throws(() => new ClockStage({}, { cubes }), /two or three cubes/, String(cubes));
+});
+
+/** A bare stage as the existing stage tests build it, with an explicit row. */
+async function bareStage(count) {
+  const { ClockStage } = await import("../src/apps/clock/stage.ts");
+  const scene = new Scene(), presentation = new Group();
+  scene.add(presentation);
+  const fields = {
+    scene, presentation, camera: new PerspectiveCamera(28, 1, 0.1, 1000), renderer: {}, cubes: [], zoom: 1,
+    appearanceControls: { setDefaultColor() {} },
+    appearance: { construction: "stickered", frameColor: null },
+  };
+  if (count !== undefined) fields.layout = clockCentersFor(count);
+  return Object.assign(Object.create(ClockStage.prototype), fields);
+}
+
+test("stage cubes take the row positions of their count; extra cubes are rejected", async () => {
+  for (const [count, expected] of [[undefined, [-2.8, 0, 2.8]], [3, [-2.8, 0, 2.8]], [2, [-1.4, 1.4]]]) {
+    const stage = await bareStage(count);
+    assert.deepEqual([...stage.centers], expected);
+    const cubes = expected.map((_, i) => stage.createCube({}, i));
+    cubes.forEach((cube, i) => assert.deepEqual(cube.scene.position.toArray(), [expected[i], 0, 0]));
+    assert.throws(() => stage.createCube({}, expected.length));
+    cubes.forEach((c) => c.destroy());
+  }
+  const stage = await bareStage(2);
+  assert.throws(() => stage.createCube({}, 1), /left to right/, "in order only");
+});
+
+test("stage camera fitting uses the row of its count, far plane included", async () => {
+  for (const count of [2, 3])
+    for (const aspect of [0.001, 0.03, 0.25, 2.3])
+      for (const zoom of [0.8, 1, 2]) {
+        const stage = await bareStage(count);
+        const centers = clockCentersFor(count);
+        Object.assign(stage, { zoom, presentation: { quaternion: clockDefaultQuaternion }, updatePresentationBounds() {} });
+        stage.camera.aspect = aspect;
+        stage.fitCamera();
+        const camera = stage.camera;
+        camera.updateMatrixWorld();
+        assert.equal(camera.position.z, clockCameraRadius(aspect, 0, 0, 28, centers) * zoom);
+        assert.equal(camera.far, Math.max(100, camera.position.z + clockRowExtent(centers) + clockCubeRadius + 1));
+        for (const center of centers)
+          for (const offset of [-clockCubeRadius, clockCubeRadius]) {
+            const point = new Vector3(center, 0, offset).applyQuaternion(clockDefaultQuaternion).project(camera);
+            assert(point.z > -1 && point.z < 1, JSON.stringify({ count, aspect, zoom, point }));
+          }
+      }
 });
