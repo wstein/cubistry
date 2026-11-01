@@ -619,7 +619,11 @@ test("a slice is bounded by its budget and the search has dense safe points: eve
     slices >= safePoints / budget,
     `${slices} slices for ${safePoints} safe points`,
   );
-  assert.ok(safePoints > 300, `${safePoints} safe points`);
+  // The count is deterministic: 1,125,296 safe points over the research
+  // samples. A margin of about 11% allows small search changes; dropping the
+  // yield after each depth-2 subtree leaves only 23,256 and the worst gap grows
+  // several times over, so a coarser search fails here.
+  assert.ok(safePoints >= 1_000_000, `${safePoints} safe points`);
 });
 
 test("an endless task is cut into slices of at most the budget", async () => {
