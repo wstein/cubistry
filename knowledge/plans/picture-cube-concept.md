@@ -142,9 +142,14 @@ not read identity. Without a print file, everything stays color-based.
 **V1 output and V2 adoption.** The existing Cubacle design requires V1 output to
 stay byte-identical: it lists any change to Orbit64 as a non-goal
 ("byte-identical, as the don't-care design requires",
-`docs/design/fixed-frame-proofs.md:110-111` at `9a03c0f` [V]). That this stays a
-requirement for V1 under V2 adoption is our inference [A], for the owner to
-confirm (open question 7).
+`docs/design/fixed-frame-proofs.md:110-111` at `9a03c0f` [V]). Owner decision
+(open question 7, answered): V2 is **not** required to be byte-identical to V1.
+Instead V1 stays reproducible as a pinned mode (`v1`) with golden tests on the
+existing outputs, V2 is the new default and may differ, and every difference is
+documented with its reason in a difference list that a diff test reports instead
+of forbidding. Byte-identity remains mandatory only for what already exists
+physically (printed items and anything an instruction depends on, for example the
+PR 99 states), through the `v1` mode.
 
 A V2 token must be labeled wherever a V1 decoder might see it, for example by
 a field name or an `orbit64v2:` prefix, because a V1 decoder can misread it as a
@@ -398,8 +403,9 @@ the minimax edge lengths (maximum 446 HTM) by a clear margin is **UNKNOWN**.
 5. Priority: 3×3 twist (small, exact) before the 7×7 projection?
 6. Should Cubacle read Cubistry's `physical-print.tsv` directly (format binding)
    or use its own format with a converter?
-7. Confirm: V1 output stays byte-identical under V2 adoption? (The existing
-   Cubacle design requires it today; section 2.)
+7. ~~Confirm: V1 output stays byte-identical under V2 adoption?~~ Decided by the
+   owner: no. V1 stays reproducible as a pinned `v1` mode with golden tests; V2
+   may differ and every difference is documented (section 2).
 
 ## Connections
 
