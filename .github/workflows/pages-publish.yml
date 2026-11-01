@@ -1,6 +1,10 @@
 name: Reconcile Pages previews
 
 on:
+  # A superseded (cancelled) or skipped build has nothing to publish, so it does
+  # not reach the publisher's concurrency group or its plan job. Pull request
+  # builds exist only for PRs with the `preview` label (pages.yml); closed PRs
+  # are handled by the pull_request_target signal below.
   workflow_run:
     workflows: [Pages build]
     types: [completed]
@@ -16,7 +20,7 @@ permissions:
 
 concurrency:
   # An inactive workflow must not evict a pending legacy production deployment.
-  group: ${{ vars.PAGES_PREVIEWS_ENABLED == 'true' && github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main' && 'counter-pages-publish' || format('inactive-or-signal-pages-{0}', github.run_id) }}
+  group: ${{ vars.PAGES_PREVIEWS_ENABLED == 'true' && github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || contains(fromJSON('["success","failure"]'), github.event.workflow_run.conclusion)) && 'counter-pages-publish' || format('inactive-or-signal-pages-{0}', github.run_id) }}
   cancel-in-progress: false
 
 jobs:
@@ -39,7 +43,7 @@ jobs:
       actions: read
       pull-requests: read
       pages: read
-    if: vars.PAGES_PREVIEWS_ENABLED == 'true' && github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
+    if: vars.PAGES_PREVIEWS_ENABLED == 'true' && github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || contains(fromJSON('["success","failure"]'), github.event.workflow_run.conclusion))
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}

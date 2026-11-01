@@ -12,7 +12,7 @@ test("inactive publisher cannot coalesce away a pending legacy production deploy
   );
   assert.match(
     publisher,
-    /group: \$\{\{ vars\.PAGES_PREVIEWS_ENABLED == 'true' && github\.event_name != 'pull_request_target' && github\.ref == 'refs\/heads\/main' && 'counter-pages-publish' \|\| format\('inactive-or-signal-pages-\{0\}', github\.run_id\) \}\}/,
+    /group: \$\{\{ vars\.PAGES_PREVIEWS_ENABLED == 'true' && github\.event_name != 'pull_request_target' && github\.ref == 'refs\/heads\/main' && \(github\.event_name != 'workflow_run' \|\| contains\(fromJSON\('\["success","failure"\]'\), github\.event\.workflow_run\.conclusion\)\) && 'counter-pages-publish' \|\| format\('inactive-or-signal-pages-\{0\}', github\.run_id\) \}\}/,
   );
   assert.match(builder, /concurrency:\n  group: pages-build-/);
   assert.match(
@@ -155,4 +155,21 @@ test("pull request builds start only for the preview label and other labels cann
   assert.match(condition, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'preview'\)/);
   assert.match(condition, /github\.event\.action != 'labeled' \|\| github\.event\.label\.name == 'preview'/);
   assert.match(condition, /^github\.ref == 'refs\/heads\/main' \|\|/);
+});
+test("only completed successful or failed builds reach the publisher's group and plan job", () => {
+  const publisher = readFileSync(
+    new URL("../.github/workflows/pages-publish.yml", import.meta.url),
+    "utf8",
+  );
+  const guard =
+    "(github.event_name != 'workflow_run' || contains(fromJSON('[\"success\",\"failure\"]'), github.event.workflow_run.conclusion))";
+  const group = publisher.match(/^  group: (.*)$/m)[1];
+  const plan = publisher.split("  plan:\n")[1].match(/^    if: (.*)$/m)[1];
+  assert.ok(group.includes(guard));
+  assert.ok(plan.includes(guard));
+  // The guard must come before the shared publication group name.
+  assert.ok(group.indexOf(guard) < group.indexOf("'counter-pages-publish'"));
+  // The signal job keeps its own condition and gains no workflow_run handling.
+  const signal = publisher.split("  closed-signal:\n")[1].split("  plan:\n")[0];
+  assert.doesNotMatch(signal, /workflow_run/);
 });
