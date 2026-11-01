@@ -76,6 +76,14 @@ export abstract class PhysicalPlayback {
     this.onState = onState;
   }
   protected abstract get maximumValue(): number;
+  /**
+   * Optional asynchronous preparation before a route is planned. Return a
+   * promise to wait for it (the planning then runs without blocking); return
+   * null, the default, to plan at once with no added turn of the event loop.
+   */
+  protected beforeTarget(_value: number): Promise<void> | null {
+    return null;
+  }
   protected abstract targetState(value: number): CubeState;
   protected abstract targetMoves(
     from: CubeState,
@@ -193,6 +201,12 @@ export abstract class PhysicalPlayback {
       // latest requested number equals the last completed display.
       while (this.current !== this.desired || this.betweenTargets) {
         const target = this.desired;
+        const preparing = this.beforeTarget(target);
+        if (preparing) {
+          await preparing;
+          // Retargeted while preparing: nothing moved, plan the latest value.
+          if (this.desired !== target) continue;
+        }
         const targetState = this.targetState(target);
         const moves = this.targetMoves(this.authoritative, targetState, target);
         this.activeTarget = target;
