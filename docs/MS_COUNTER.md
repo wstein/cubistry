@@ -46,10 +46,14 @@ The application follows the period node by node and shows the lap
 
 Set and Reset walk the saved period, step by step, in the direction with fewer
 HTM, to a node that shows the target (on S3's seconds, either lap). A route
-that a newer target interrupts stops between two turns of a saved word; the
-next route first finishes or undoes that word, whichever is cheaper. The
-application never plays a turn that is not part of a saved period edge, so
-every settled display is a period node.
+that a newer target interrupts stops between two turns of a saved word. The
+research words often cancel across step boundaries, so that pose can also lie
+inside other steps, or be a period node itself. The planner records every such
+place and continues from the one with the least HTM: it finishes or undoes the
+partial word of that place, then walks whole steps either way round. The tests
+compare every interrupted step of both units with an independent replay of all
+shared poses. The application never plays a turn that is not a turn of a saved
+word or of its inverse, so every settled display is a period node.
 
 ## Data and provenance
 
