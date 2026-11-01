@@ -88,7 +88,8 @@ The [certified route](docs/COUNTER_CERTIFIED_TRAVERSAL.md) retains 339 committed
 HTM over 99 adjacent increments, maximum five per edge, excluding setup.
 The Counter's **Sticker print** control also offers the
 [blank-top 00–99 print](docs/COUNTER_BLANK_TOP.md): blank top cells, a physical
-LZ/NZ mode on Leading Zero, cyclic routes of 278 (LZ) and 270 (NZ) HTM with at
+LZ/NZ mode on the checkbox labeled *Leading zero mode (physical)* there, Wrap
+on by default, cyclic routes of 278 (LZ) and 270 (NZ) HTM with at
 most 4 HTM per edge, pinned from research PR #134. It needs its own stickers;
 the titled print stays the default.
 [Exact-frame arbitrary-jump planning](docs/COUNTER_ARBITRARY_JUMPS.md) reuses the
