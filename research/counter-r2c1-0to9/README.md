@@ -1,14 +1,17 @@
 # Single-digit `0–9` counter at `r2c1` with 1 touching move + preparing moves (2×2×2, fixed frame, HTM)
 
-**Status:** **SAT and tight in every operating mode.** Two permanent 24-sticker prints (`closed` and `wrap1`, each with 10 upright digit stickers `0–9` and 14 blank stickers) establish the exact minimum preparing-move and total-HTM bounds for counting `0..9` in the lower-left front cell `r2c1` (`LL = (-1, -1, 1)`) while the other three front cells (`UL`, `UR`, `LR`) show empty space (blank). Both native checkers ([Julia](julia/check.jl) and [Flix](flix/src/Main.flix)) accept both witnesses with **byte-identical receipts** ([`receipt-julia-closed.tsv`](evidence/receipt-julia-closed.tsv), [`receipt-flix-closed.tsv`](evidence/receipt-flix-closed.tsv), [`receipt-julia-wrap1.tsv`](evidence/receipt-julia-wrap1.tsv), [`receipt-flix-wrap1.tsv`](evidence/receipt-flix-wrap1.tsv)) and reject all 11 negative controls with identical messages ([`negative-controls.tsv`](evidence/negative-controls.tsv)).
+**Status:** **SAT and tight in every operating mode.** Four permanent 24-sticker prints (`closed`, `wrap1`, `constL-closed`, and `constL-wrap1`, each with 10 upright digit stickers `0–9` and 14 blank stickers) establish the exact minimum preparing-move and total-HTM bounds for counting `0..9` in the lower-left front cell `r2c1` (`LL = (-1, -1, 1)`) while the other three front cells (`UL`, `UR`, `LR`) show empty space (blank) — both for unrestricted touching moves (`{L, D}`) and for **constant final touching move (`Always L`)**, while proving **`Always L'` (and `Always D`) mathematically impossible (`UNSAT`)**. Both native checkers ([Julia](julia/check.jl) and [Flix](flix/src/Main.flix)) accept all four witnesses with **byte-identical receipts** ([`receipt-julia-closed.tsv`](evidence/receipt-julia-closed.tsv), [`receipt-flix-closed.tsv`](evidence/receipt-flix-closed.tsv), [`receipt-julia-wrap1.tsv`](evidence/receipt-julia-wrap1.tsv), [`receipt-flix-wrap1.tsv`](evidence/receipt-flix-wrap1.tsv), [`receipt-julia-constL-closed.tsv`](evidence/receipt-julia-constL-closed.tsv), [`receipt-flix-constL-closed.tsv`](evidence/receipt-flix-constL-closed.tsv), [`receipt-julia-constL-wrap1.tsv`](evidence/receipt-julia-constL-wrap1.tsv), [`receipt-flix-constL-wrap1.tsv`](evidence/receipt-flix-constL-wrap1.tsv)) and reject all 12 negative controls with identical messages ([`negative-controls.tsv`](evidence/negative-controls.tsv)).
 
-| Mode / Witness | Edges | Max HTM / edge | Max Prep / edge | Edges at 1 / 2 / 3 HTM | Total Prep Moves | Total HTM | Mean HTM | Closure | Setup |
-| --- | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- | --- |
-| **0-Prep baseline** (`1 HTM` only, no prep) | 8 (max 9 displays `0..8`) | 1 | 0 | 8 / 0 / 0 | 0 | 8 | 1.000 | **UNSAT for 10 displays (`0..9`)** | — |
-| **`wrap1` (open `0..9` prefix, 9 edges)** | 9 | **2** | **1** | 8 / 1 / 0 | **1** (tight min) | **10** | **1.111** | Open (`0 -> 9`) | none (`0` printed) |
-| **`wrap1` (1-lap display wrap `0..9->0`)** | 10 | **2** | **1** | 9 / 1 / 0 | **1** (tight min) | **11** | **1.100** | Display-wrapped (`0` restored at `r2c1`) | none (`0` printed) |
-| **`closed` (open `0..9` prefix, 9 edges)** | 9 | **2** | **1** | 7 / 2 / 0 | 2 | 11 | 1.222 | Prefix of exact cycle | none (`0` printed) |
-| **`closed` (primary, exact full-state cycle `0..9->0`)** | 10 | **2** | **1** | 7 / 3 / 0 | **3** (tight min) | **13** | **1.300** | **Exact full 24-sticker closure (Period 1)** | none (`0` printed) |
+| Mode / Witness | Final Touch Move(s) | Edges | Max HTM / edge | Max Prep / edge | Edges at 1 / 2 / 3 HTM | Total Prep Moves | Total HTM | Mean HTM | Closure | Setup |
+| --- | :---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- | --- |
+| **0-Prep baseline** (`1 HTM` only, no prep) | `L, D` | 8 (max 9 displays `0..8`) | 1 | 0 | 8 / 0 / 0 | 0 | 8 | 1.000 | **UNSAT for 10 displays (`0..9`)** | — |
+| **`wrap1` (open `0..9` prefix, 9 edges)** | `L, D` | 9 | **2** | **1** | 8 / 1 / 0 | **1** (tight min) | **10** | **1.111** | Open (`0 -> 9`) | none (`0` printed) |
+| **`wrap1` (1-lap display wrap `0..9->0`)** | `L, D` | 10 | **2** | **1** | 9 / 1 / 0 | **1** (tight min) | **11** | **1.100** | Display-wrapped (`0` restored at `r2c1`) | none (`0` printed) |
+| **`closed` (primary, exact full-state cycle `0..9->0`)** | `L, D` | 10 | **2** | **1** | 7 / 3 / 0 | **3** (tight min) | **13** | **1.300** | **Exact full 24-sticker closure (Period 1)** | none (`0` printed) |
+| **`Always L'` / `Always D` (`P* L'` or `P* D`)** | `L'` (or `D`) | 8 (max 9 displays `0..8`) | any | any | — | any | — | — | **UNSAT for 10 displays (`0..9`)** | — |
+| **`constL-wrap1` (open `0..9` prefix, 9 edges)** | **Always `L`** | 9 | 3 | 2 | 6 / 1 / 2 | **5** (tight min) | **14** | 1.556 | Open (`0 -> 9`, every step ends in `L`) | none (`0` printed) |
+| **`constL-wrap1` (1-lap display wrap `0..9->0`)** | **Always `L`** | 10 | 3 | 2 | 7 / 0 / 3 | **6** (tight min) | **16** | 1.600 | Display-wrapped (7/10 steps pure `L`) | none (`0` printed) |
+| **`constL-closed` (exact full-state cycle `0..9->0`)** | **Always `L`** | 10 | 3 | 2 | 4 / 1 / 5 | **11** (tight min) | **21** | 2.100 | **Exact full 24-sticker closure (Period 1)** | none (`0` printed) |
 
 Even though up to **2 preparing moves** per transition were allowed by the specification (`1–2 preparing moves`), **2 preparing moves on a single step are never needed**: every transition in both witnesses uses **1 touching move (`L` or `D`)** preceded by **0 or 1 back-face preparing move (`B` or `B2`)**.
 
@@ -79,6 +82,24 @@ Exhaustive search and meet-in-the-middle verification ([`evidence/bounds-summary
 
 Remarkably, the 20 `B`-only exact-closed 13-HTM cycles consist of the 10 cyclic shifts of a single canonical rhythm (`L | D | L | B L | D | L | B2 D | L | D | B D`) and the 10 cyclic shifts of its mirror dual under $L \leftrightarrow D', B \leftrightarrow B'$.
 
+### Theorem 4: Constant Final Touching Move Asymmetry (`Always L'` is UNSAT, whereas `Always L` is SAT)
+What if we require **every single increment** $d \to d+1$ to end with the **exact same touching move** $T$? There is a striking geometric asymmetry between clockwise **`L`** (and its mirror dual **`D'`**) and counter-clockwise **`L'`** (and its mirror dual **`D`**), verified in [`search/const_touch.jl`](search/const_touch.jl):
+
+1. **Why `Always L'` (and `Always D`) is Mathematically IMPOSSIBLE (`UNSAT` — even for open `0..9` and for ANY number of preparing moves in `{R, U, B}`):**
+   - In any step $p_1 \dots p_k \, L'$ ($p_i \in \{R, U, B\}$), the preparing moves never touch `LL = (-1, -1, 1)`. Thus right before `L'` executes, the corner cubie $C_d$ displaying digit $d$ on `+z` is still at `LL` in its settled orientation.
+   - When `L'` executes, it rotates `LL = (-1, -1, 1)` into **`UL = (-1, 1, 1)` (`r1c1`) on the front face**, mapping the bottom normal `(0, -1, 0)` of `LL` directly to the front normal `(0, 0, +1)` of `UL`!
+   - By 3D corner chirality, whenever sticker $f$ of corner cubie $C$ sits at `LL` facing `+z`, its unique chiral successor sticker $\sigma(f)$ on the same corner cubie sits at `LL` facing `(0, -1, 0)`. Thus `L'` sends $\sigma(f)$ directly onto the front `+z` face of `UL` in settled state $d+1$, forcing $\sigma(f)$ to be **`blank`**.
+   - On each 3-sticker corner cubie $(f_1 \to f_2 \to f_3 \to f_1)$, at most **1** sticker $f$ can be a digit whose chiral successor $\sigma(f)$ is `blank`.
+   - Since a 2×2×2 cube has only **8 corner cubies**, at most **8 digits (`0..7` exited in `0..8`)** can ever be exited by `P* L'`. Counting `0..9` requires 9 transitions (exiting 9 digits `0..8`) in an open path or 10 transitions in a wrapped/closed path — **impossible by the Pigeonhole Principle ($9 > 8$)**!
+   - By exact mirror symmetry ($L' \leftrightarrow D$), **`Always D` is equally impossible (`UNSAT`)** because `D` rotates `LL = (-1, -1, 1)` into `LR = (1, -1, 1)` (`r2c2`) on the front face.
+2. **Why `Always L` (and `Always D'`) IS POSSIBLE (`SAT` in all modes — open, wrapped, and exact full-state closed):**
+   - Clockwise **`L`** rotates `LL = (-1, -1, 1)` to **`DBL = (-1, -1, -1)` on the hidden back face** (`-z`), NOT to a front blank cell! (Symmetrically, **`D'`** also rotates `LL` to `DBL` on the back face).
+   - Meanwhile, the incoming digit cubie arrives at `LL` from `UL = (-1, 1, 1)`, which CAN be staged by `U` and `B` preparing moves during the intermediate (unsettled) frames before `L` snaps it into `r2c1`.
+   - Exact tight minimum bounds for `Always L` (with $\le 2$ preps/step):
+     - **Open `0..9` (9 edges):** **5 preparing moves (14 HTM)**: `L | L | B L | B L | L | L | B' U2 L | U L | L` (or with $\le 1$ prep/step: `L | L | U L | B' L | U L | U' L | B' L | L | L`).
+     - **1-Lap Display-Wrapped `0..9->0` (10 edges, `constL-wrap1`):** **6 preparing moves (16 HTM, 7/10 steps pure `L`)**: `L | L | B' U L | L | L | U B2 L | L | L | B' U' L | L`.
+     - **Exact Full-State Closed 10-Cycle (`0..9->0`, `constL-closed`):** **11 preparing moves (21 HTM, Period 1)**: `L | L | U B' L | B' U2 L | B' U L | U' L | L | U B' L | L | B' U L`.
+
 ---
 
 ## 3. Certified witnesses
@@ -130,9 +151,20 @@ Remarkably, the 20 `B`-only exact-closed 13-HTM cycles consist of the 10 cyclic 
 
 ---
 
+### Constant-`L` witnesses: `constL-wrap1` (16 HTM wrapped) and `constL-closed` (21 HTM exact full-state cycle)
+- **Files:**
+  - `constL-wrap1`: [`evidence/print-constL-wrap1.tsv`](evidence/print-constL-wrap1.tsv), [`evidence/routes-constL-wrap1.tsv`](evidence/routes-constL-wrap1.tsv), [`evidence/setup-constL-wrap1.tsv`](evidence/setup-constL-wrap1.tsv)
+  - `constL-closed`: [`evidence/print-constL-closed.tsv`](evidence/print-constL-closed.tsv), [`evidence/routes-constL-closed.tsv`](evidence/routes-constL-closed.tsv), [`evidence/setup-constL-closed.tsv`](evidence/setup-constL-closed.tsv)
+- **Receipts:** [`evidence/receipt-julia-constL-wrap1.tsv`](evidence/receipt-julia-constL-wrap1.tsv), [`evidence/receipt-flix-constL-wrap1.tsv`](evidence/receipt-flix-constL-wrap1.tsv), [`evidence/receipt-julia-constL-closed.tsv`](evidence/receipt-julia-constL-closed.tsv), [`evidence/receipt-flix-constL-closed.tsv`](evidence/receipt-flix-constL-closed.tsv) (all byte-identical)
+- **Routes:**
+  - `constL-wrap1`: `L | L | B' U L | L | L | U B2 L | L | L | B' U' L | L` (**16 HTM**, **6 preps**, **7 out of 10 steps are a single bare `L`**)
+  - `constL-closed`: `L | L | U B' L | B' U2 L | B' U L | U' L | L | U B' L | L | B' U L` (**21 HTM**, **11 preps**, **exact Period-1 full-state closure where every increment ends with `L`**)
+
+---
+
 ## 4. Reproduce verification
 
-Both native checkers rebuild the 136,080-state tracked 4-front-corner BFS graph (diameter 7), verify all 24 sticker frames, check the `1-touch + (0..2)-prep` structure and intermediate `r2c1` invariance on every edge, compare receipts byte for byte, and verify all 11 negative controls:
+Both native checkers rebuild the 136,080-state tracked 4-front-corner BFS graph (diameter 7), verify all 24 sticker frames, check the `1-touch + (0..2)-prep` structure, constant-`L` final move constraint, and intermediate `r2c1` invariance on every edge, compare receipts byte for byte across all 4 witnesses, and verify all 12 negative controls:
 
 ```sh
 research/counter-r2c1-0to9/evidence/run.sh
