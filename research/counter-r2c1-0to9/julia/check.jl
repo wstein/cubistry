@@ -149,7 +149,7 @@ end
 
 function main(args)
     length(args) == 4 || fail("usage: PRINT MODE ROUTES SETUP")
-    print = readprint(args[1]); mode = args[2]; req(mode in ("closed", "wrap1"), "mode")
+    print = readprint(args[1]); mode = args[2]; req(mode in ("closed", "wrap1", "constL-closed", "constL-wrap1"), "mode")
     home = [(s.pos, s.nrm, s.up) for s in print]
     dist = trackedbfs(); req(length(dist) == 136080, "tracked graph size $(length(dist))")
     println("graph\ttracked-front-corners\t", length(dist), "\tdiameter\t", maximum(values(dist)))
@@ -188,6 +188,9 @@ function main(args)
 
         # Check that all preparing moves in `inc` precede the single touching move
         req(touches_r2c1(inc[end]) && all(m -> !touches_r2c1(m), inc[1:end-1]), "row $i: preparing moves must precede the r2c1 touching move")
+        if startswith(mode, "constL-")
+            req(inc[end][3] == "L", "row $i: constant-L mode requires final touching move L (got $(inc[end][3]))")
+        end
 
         # Verify r2c1 stays untouched during preparing moves
         cur = state
@@ -220,7 +223,7 @@ function main(args)
     end
 
     req(length(seen_states) == 10, "period states are not pairwise distinct")
-    if mode == "closed"
+    if mode in ("closed", "constL-closed")
         req(state == start, "cycle does not return to the exact full start state")
     end
     closure_tag = state == start ? "exact-closed" : "display-wrapped"
