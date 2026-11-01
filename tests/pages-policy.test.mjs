@@ -5,6 +5,8 @@ import {
   validRun,
   selectBuild,
   previewPath,
+  previewInventory,
+  hasPreviewContent,
   REPOSITORY,
 } from "../scripts/pages/policy.mjs";
 const sha = (n) => String(n).padStart(40, "a");
@@ -183,4 +185,47 @@ test("coalesced close followed by a fork completion still reconciles every inter
       [1, "remove"],
     ],
   );
+});
+const blob = (path) => ({ path, type: "blob" });
+test("previewInventory ignores the .nojekyll leftover that rsync keeps after removal", () => {
+  assert.deepEqual(
+    previewInventory({ tree: [blob("pr-preview/pr-5/.nojekyll")] }),
+    [],
+  );
+  assert.deepEqual(
+    previewInventory({
+      tree: [
+        blob("pr-preview/pr-5/.nojekyll"),
+        blob("pr-preview/pr-5/index.html"),
+      ],
+    }),
+    [5],
+  );
+  assert.deepEqual(
+    previewInventory({
+      tree: [
+        blob("index.html"),
+        blob("pr-preview/pr-1/.nojekyll"),
+        blob("pr-preview/pr-2/preview-info.json"),
+        blob("pr-preview/pr-3/assets/a.js"),
+        blob("pr-preview/pr-3/index.html"),
+        blob("pr-preview/pr-04/index.html"),
+      ],
+    }).sort(),
+    [2, 3],
+  );
+  assert.deepEqual(previewInventory(null), []);
+});
+test("previewInventory still fails closed on incomplete trees", () => {
+  assert.throws(() => previewInventory({ truncated: true, tree: [] }));
+  assert.throws(() => previewInventory({}));
+});
+test("hasPreviewContent treats a .nojekyll-only listing as removed", () => {
+  assert.equal(hasPreviewContent(null), false);
+  assert.equal(hasPreviewContent([{ name: ".nojekyll" }]), false);
+  assert.equal(
+    hasPreviewContent([{ name: ".nojekyll" }, { name: "index.html" }]),
+    true,
+  );
+  assert.equal(hasPreviewContent({ type: "file" }), true);
 });

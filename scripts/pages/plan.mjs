@@ -1,6 +1,6 @@
 import { writeFile, appendFile } from "node:fs/promises";
 import { GitHub } from "./api.mjs";
-import { plan, BUILD_WORKFLOW } from "./policy.mjs";
+import { plan, previewInventory, BUILD_WORKFLOW } from "./policy.mjs";
 const api = new GitHub();
 const pages = await api.request("pages");
 if (
@@ -14,16 +14,7 @@ if (
 const pulls = await api.pages("pulls?state=open"),
   main = await api.request("commits/main");
 const tree = await api.request("git/trees/gh-pages?recursive=1");
-if (tree && (tree.truncated || !Array.isArray(tree.tree)))
-  throw Error("Incomplete storage-tree inventory");
-const inventory = [
-  ...new Set(
-    (tree?.tree || []).flatMap((x) => {
-      const m = /^pr-preview\/pr-([1-9][0-9]*)\//.exec(x.path);
-      return m ? [Number(m[1])] : [];
-    }),
-  ),
-];
+const inventory = previewInventory(tree);
 const builds = {};
 for (const pr of pulls)
   if (pr.head?.repo?.full_name === "wstein/cubistry")
