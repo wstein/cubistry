@@ -6,21 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Counter</title>
-    <script type="module" crossorigin src="/cubistry/pr-preview/pr-143/assets/counter-DhhZVRyB.js"></script>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-143/assets/counter-_PAwklDp.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/link-DR-RiidG.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/three-BW9MzyAf.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/presentation-rotation-CDXCmGvo.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/index-BGKCFT5j.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/playback-DIGfmDhQ.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/index-CmjMcBak.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/lettering-Cg763SEg.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/puzlwerk-2x2--rJPoM5y.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/design-BN0anJCV.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/index-C_NaBeHz.js">
-    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-143/assets/style-8P70jhsR.css">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/presentation-rotation-BCWs-Ft7.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/index-CoVX5M-l.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/playback-BfXO0CFm.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/index-DSVg7RaF.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/lettering-Nji33YDC.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/puzlwerk-2x2-CajN2B5s.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/design-Dr6M1L9g.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-143/assets/index-C8nvKQ4v.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-143/assets/style-6CN-LqR2.css">
   </head>
-  <body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #143 — non-production preview · 22af418bf4a7</aside>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #143 — non-production preview · b84b451806fe</aside>
     <main>
       <header>
         <a class="brand" href="./" aria-label="Cubistry counter home"
@@ -33,8 +33,9 @@
             <option value="status-cube">CI Quality Cube · Workflow monitor</option>
             <option value="calendar">Calendar · Deutsch / English</option>
             <option value="live-clock">Live H–M–S Clock</option>
-            <option value="hsm-counter">H/S/M Counter 00–59</option>
-            <option value="hm-counter">H/M Counter</option>
+            <option value="hsm-counter">H/M/S Counter 00–59</option>
+            <option value="ms-counter">M/S Counter 00–59</option>
+            <option value="hm-one-cube">H/M One-Cube Counter</option>
             <option value="certified" selected>Counter 0–99</option>
             <option value="timer">60-Minute Timer</option>
             <option value="five-second-timer">5-Second Timer</option>
@@ -146,6 +147,15 @@
           aria-label="Counter controls"
         >
           <h1>Counter</h1>
+          <label for="counter-print">Sticker print</label>
+          <select id="counter-print" aria-describedby="print-note">
+            <option value="titled" selected>COUNTER title (default)</option>
+            <option value="blank-top">Blank top 00–99</option>
+          </select>
+          <p id="print-note" class="small">
+            Choose the print that matches your stickers. Changing it installs
+            the other cube at the current value and restarts session moves.
+          </p>
           <form id="jump-form">
             <label for="value">Target 0–99</label>
             <input
@@ -180,12 +190,17 @@
             <label class="check"
               ><input id="wrap" type="checkbox" /> Wrap 99 ↔ 0</label
             ><label class="check"
-              ><input id="format" type="checkbox" checked /> Leading Zero</label
+              ><input id="format" type="checkbox" checked />
+              <span id="format-label">Leading Zero</span></label
             >
           </div>
-          <p class="small">
+          <p id="format-note" class="small">
             Leading Zero shows or hides only the leading 0. The layout, value,
             and moves stay the same.
+          </p>
+          <p id="mode-switch" class="small" hidden>
+            Setup moves (mode switches, not counted in session moves):
+            <output id="setup-moves" aria-label="Setup moves (HTM)">0</output>
           </p>
         </aside>
         <aside
@@ -194,14 +209,14 @@
           aria-label="HSM counter controls"
           hidden
         >
-          <h1 id="hsm-heading">H/S/M Counter</h1>
+          <h1 id="hsm-heading">H/M/S Counter</h1>
           <label id="hsm-lettering-label" for="hsm-lettering">Sticker lettering</label>
           <select id="hsm-lettering"><option value="symbols">Large H / M / S</option><option value="words">Small hour / min / sec</option></select>
           <label for="hsm-letter">Unit</label>
           <select id="hsm-letter">
-            <option>H</option>
-            <option>S</option>
-            <option>M</option>
+            <option value="H">H</option>
+            <option value="M">M</option>
+            <option value="S">S</option>
           </select>
           <label for="hsm-range">Count range</label>
           <select id="hsm-range">
@@ -238,6 +253,52 @@
             blank. Settled number changes take at most six moves. A new target
             replaces old work after the current turn. Changing the unit sets up
             a fresh 00 display.
+          </p>
+        </aside>
+        <aside
+          id="ms-controls"
+          class="controls"
+          aria-label="M/S counter controls"
+          hidden
+        >
+          <h1>M/S Counter</h1>
+          <label for="ms-letter">Unit</label>
+          <select id="ms-letter">
+            <option>M</option>
+            <option>S</option>
+          </select>
+          <label for="ms-direction">Direction</label>
+          <select id="ms-direction">
+            <option value="1">Up</option>
+            <option value="-1">Down</option>
+          </select>
+          <form id="ms-set-form">
+            <label for="ms-value">Set value</label>
+            <input id="ms-value" type="text" inputmode="numeric" value="00" />
+            <button type="submit">Set</button>
+          </form>
+          <div class="target-actions">
+            <button
+              id="ms-run"
+              type="button"
+              class="primary"
+              aria-pressed="false"
+            >
+              Run</button
+            ><button id="ms-reset" type="button">Reset</button>
+          </div>
+          <div class="increments">
+            <button data-ms-delta="-1">−1</button
+            ><button data-ms-delta="1">+1</button>
+          </div>
+          <p id="ms-period" class="small" aria-live="polite"></p>
+          <p class="small">
+            Counts one step per second, wrapping through 00. Upper-left stays
+            blank. Every +1 plays a saved step of at most four moves and every
+            −1 plays the previous step backward. On this print (S3) seconds stay
+            within three moves; a print with both units within three is
+            unknown. Set and Reset walk the saved steps the shorter way round.
+            Changing the unit sets up a fresh 00 display.
           </p>
         </aside>
         <aside
