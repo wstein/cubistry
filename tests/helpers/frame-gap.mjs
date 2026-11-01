@@ -25,5 +25,6 @@ export function readFrameGap(page) {
 /** Deadline bound of the endpoint specs. Deliberately not widened with the frame gap: measured in software GL at up to
  * 300 ms per frame, the 250 ms and 2000 ms cases settle within 0.6 to 3.7 ms of the deadline. */
 export const ENDPOINT_TOLERANCE_MS = 20;
-/** At the 10 ms preference the final turn settles 96 to 177 ms late in software GL (see the known-issue tests). */
-export const FRAME_LIMITED_PREFERENCE_MS = 10;
+/** Preference at which the final turn is known to settle late (96 to 177 ms after the deadline in software GL, whatever
+ * the frame time). The cause is not verified; see the known-issue tests. */
+export const LATE_FINAL_TURN_PREFERENCE_MS = 10;
