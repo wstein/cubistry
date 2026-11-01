@@ -125,7 +125,9 @@ the H/M/S counter. Only the variant parameters differ (see
   to need at most 6 HTM. **No such bound is established for m3-SH.** The
   application caps a jump at 7 HTM, the radius of the four-corner graph, which no
   route can exceed. Sampled jumps in the tests needed at most 6, but sampling is
-  not a bound.
+  not a bound, and the cap is not slack: poses exist whose least route to a
+  display is 7 HTM (for example `U2 B' U'` from the print, then H 15), which a
+  cap of 6 would refuse.
 - The H/M print has a single lettering (the large H and M symbols). The H/M/S
   word lettering is not offered.
 
