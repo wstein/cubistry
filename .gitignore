@@ -21,3 +21,4 @@ work/
 .print-venv/
 .venv/
 bun.lock
+flix.jar
