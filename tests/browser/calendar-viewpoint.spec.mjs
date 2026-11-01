@@ -1,10 +1,12 @@
 import { test, expect } from "@playwright/test";
+import { until } from "../helpers/settle.mjs";
 
 test.use({ deviceScaleFactor: 2 });
 for (const design of ["de-a", "en-3"])
   test(`the ${design} reference viewpoint stays readable and contained on desktop and mobile`, async ({
     page,
   }) => {
+    test.setTimeout(120000);
     await page.addInitScript(() => {
       Date.now = () => Date.parse("2026-10-29T12:00:00Z");
     });
@@ -18,18 +20,20 @@ for (const design of ["de-a", "en-3"])
     await expect(page.locator("#calendar-front")).toHaveText(front);
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 1000 });
-      const before = await page.evaluate(async () => {
-        const { calendarApp } = await import("/src/calendar.mjs");
-        return calendarApp.viewer.renderer.info.render.frame;
+      const frame = () =>
+        page.evaluate(async () => {
+          const { calendarApp } = await import("/src/calendar.mjs");
+          return calendarApp.viewer.renderer.info.render.frame;
+        });
+      const before = await frame();
+      // Software GL at a 2x device scale renders slowly; one CI run saw a single
+      // frame in the default 5 s. The requirement (more than one new frame) is
+      // unchanged; only the real-time budget is explicit and the failure reports
+      // the frame counts. The 30 s budget is six times the default.
+      await until(page, `more than one new frame after ${before} at ${width}px`, frame, {
+        accept: (value) => value > before + 1,
+        timeout: 30000,
       });
-      await expect
-        .poll(async () =>
-          page.evaluate(async () => {
-            const { calendarApp } = await import("/src/calendar.mjs");
-            return calendarApp.viewer.renderer.info.render.frame;
-          }),
-        )
-        .toBeGreaterThan(before + 1);
       const camera = await page.evaluate(async () => {
         const { calendarApp } = await import("/src/calendar.mjs");
         const v = calendarApp.viewer,
