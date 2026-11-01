@@ -238,7 +238,10 @@ def checkEdge(print: List[Sticker],dist: Map[Int32,Int32],mode: String,acc: (Lis
         let lastTok = at(incToks,List.length(incToks) - 1);
         if (mode == "constL-closed" or mode == "constL-wrap1")
             require(lastTok == "L","row ${i}: constant-L mode requires final touching move L (got " + lastTok + ")")
-        else ();
+        else if (mode == "9L1D-closed" or mode == "9L1D-wrap1") {
+            let wantT = if (i < 9) "L" else "D";
+            require(lastTok == wantT,"row ${i}: 9L1D mode requires final touching move " + wantT + " (got " + lastTok + ")")
+        } else ();
         checkPrepFrames(print,state,preps,v,i,1);
 
         let si = shortest(dist,print,state,w);
@@ -272,7 +275,7 @@ def fmtMean10(tot: Int32): String = {
 
 def runCheck(printPath: String,mode: String,routesPath: String,setupPath: String): Unit \ IO = {
     let print = readPrint(printPath);
-    require(mode == "closed" or mode == "wrap1" or mode == "constL-closed" or mode == "constL-wrap1","mode");
+    require(mode == "closed" or mode == "wrap1" or mode == "constL-closed" or mode == "constL-wrap1" or mode == "9L1D-closed" or mode == "9L1D-wrap1","mode");
     let home = List.map(s -> match s { case (p,n,_,u) => (p,n,u) },print);
     let dist = trackedBfs();
     require(Map.size(dist) == 136080,"tracked graph size ${Map.size(dist)}");
@@ -296,7 +299,7 @@ def runCheck(printPath: String,mode: String,routesPath: String,setupPath: String
     match List.foldLeft((acc,row) -> checkEdge(print,dist,mode,acc,row),(state0,Nil,Nil),body) {
         case (lastState,seen,stats) => {
             require(List.length(seen) == 10,"period states are not pairwise distinct");
-            if (mode == "closed" or mode == "constL-closed") require(lastState == state0,"cycle does not return to the exact full start state") else ();
+            if (mode == "closed" or mode == "constL-closed" or mode == "9L1D-closed") require(lastState == state0,"cycle does not return to the exact full start state") else ();
             let closureTag = if (lastState == state0) "exact-closed" else "display-wrapped";
             let lens = List.map(x -> match x { case (h,_,_,_) => h },stats);
             let totalHtm = List.foldLeft((a,b) -> a + b,0,lens);
