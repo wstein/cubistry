@@ -21,6 +21,7 @@
             <option value="calendar">Calendar · Deutsch / English</option>
             <option value="live-clock">Live H–M–S Clock</option>
             <option value="hsm-counter">H/M/S Counter 00–59</option>
+            <option value="ms-counter">M/S Counter 00–59</option>
             <option value="certified" selected>Counter 0–99</option>
             <option value="timer">60-Minute Timer</option>
             <option value="five-second-timer">5-Second Timer</option>
@@ -238,6 +239,52 @@
             blank. Settled number changes take at most six moves. A new target
             replaces old work after the current turn. Changing the unit sets up
             a fresh 00 display.
+          </p>
+        </aside>
+        <aside
+          id="ms-controls"
+          class="controls"
+          aria-label="M/S counter controls"
+          hidden
+        >
+          <h1>M/S Counter</h1>
+          <label for="ms-letter">Unit</label>
+          <select id="ms-letter">
+            <option>M</option>
+            <option>S</option>
+          </select>
+          <label for="ms-direction">Direction</label>
+          <select id="ms-direction">
+            <option value="1">Up</option>
+            <option value="-1">Down</option>
+          </select>
+          <form id="ms-set-form">
+            <label for="ms-value">Set value</label>
+            <input id="ms-value" type="text" inputmode="numeric" value="00" />
+            <button type="submit">Set</button>
+          </form>
+          <div class="target-actions">
+            <button
+              id="ms-run"
+              type="button"
+              class="primary"
+              aria-pressed="false"
+            >
+              Run</button
+            ><button id="ms-reset" type="button">Reset</button>
+          </div>
+          <div class="increments">
+            <button data-ms-delta="-1">−1</button
+            ><button data-ms-delta="1">+1</button>
+          </div>
+          <p id="ms-period" class="small" aria-live="polite"></p>
+          <p class="small">
+            Counts one step per second, wrapping through 00. Upper-left stays
+            blank. Every +1 plays a saved step of at most four moves and every
+            −1 plays the previous step backward. On this print (S3) seconds stay
+            within three moves; a print with both units within three is
+            unknown. Set and Reset walk the saved steps the shorter way round.
+            Changing the unit sets up a fresh 00 display.
           </p>
         </aside>
         <aside
