@@ -408,6 +408,124 @@ test("a plan search without a route does not loop: the async path reaches the sy
   }
 });
 
+/** A controller (with and without an executor) that left the period by a free jump to 40. */
+async function offPeriod(executor, via = []) {
+  const c = newController("S", 59, 1, executor),
+    plain = newController("S", 59, 1, null);
+  await c.configure(0);
+  await plain.configure(0);
+  for (const v of [...via, 40]) {
+    c.request(v);
+    await flush();
+    for (const job of executor.jobs) job.finish();
+    await settleN(c);
+    plain.request(v);
+    await settleN(plain);
+  }
+  assert.ok(stateEquals(c.state, plain.state));
+  return { c, plain };
+}
+
+test("a finished search is used only for the exact pose it was computed for", async () => {
+  const executor = manualExecutor(),
+    { c, plain } = await offPeriod(executor);
+  assert.equal(c.tryPrepare(41), null);
+  executor.jobs.at(-1).finish();
+  await flush();
+  assert.equal(word(c.tryPrepare(41)), word(plain.prepare(41)));
+  const first = c.state;
+  // The same value reached from another pose: the earlier plan must not apply.
+  for (const v of [5, 40]) {
+    c.request(v);
+    plain.request(v);
+    await flush();
+    for (const job of executor.jobs) job.finish();
+    await settleN(c);
+    await settleN(plain);
+  }
+  assert.ok(stateEquals(c.state, plain.state));
+  assert.ok(!stateEquals(first, c.state), "a different pose for value 40");
+  const jobs = executor.jobs.length;
+  assert.equal(c.tryPrepare(41), null, "a new search, not the old result");
+  assert.ok(executor.jobs.length > jobs);
+  executor.jobs.at(-1).finish();
+  await flush();
+  assert.equal(word(c.tryPrepare(41)), word(plain.prepare(41)));
+  c.dispose();
+  plain.dispose();
+});
+
+test("a finished search is used only for the exact value it was computed for", async () => {
+  const executor = manualExecutor(),
+    { c, plain } = await offPeriod(executor);
+  assert.equal(c.tryPrepare(10), null);
+  executor.jobs.at(-1).finish();
+  await flush();
+  assert.equal(word(c.tryPrepare(10)), word(plain.prepare(10)));
+  const jobs = executor.jobs.length;
+  assert.equal(c.tryPrepare(20), null, "another value starts its own search");
+  assert.equal(executor.jobs.length, jobs + 1);
+  executor.jobs.at(-1).finish();
+  await flush();
+  assert.equal(word(c.tryPrepare(20)), word(plain.prepare(20)));
+  c.dispose();
+  plain.dispose();
+});
+
+test("a mode switch cancels the pending search, and a changed mode drops a late result", async () => {
+  const executor = manualExecutor(),
+    { c, plain } = await offPeriod(executor);
+  assert.equal(c.tryPrepare(10), null);
+  const job = executor.jobs.at(-1);
+  c.setMode(59, 1);
+  assert.equal(job.cancelled, false, "the same mode keeps the search");
+  c.setMode(23, 1);
+  assert.equal(job.cancelled, true, "a new mode drops the search at once");
+  c.setMode(59, 1);
+  // A search that ignores cancellation finishes late, in another mode.
+  const stubborn = manualExecutor({ honorCancel: false }),
+    s = await offPeriod(stubborn);
+  assert.equal(s.c.tryPrepare(10), null);
+  const late = stubborn.jobs.at(-1);
+  s.c.setMode(23, 1);
+  late.finish();
+  await flush();
+  s.c.setMode(59, 1);
+  const jobs = stubborn.jobs.length;
+  assert.equal(s.c.tryPrepare(10), null, "the late result left nothing behind");
+  assert.equal(stubborn.jobs.length, jobs + 1);
+  stubborn.jobs.at(-1).finish();
+  await flush();
+  assert.equal(word(s.c.tryPrepare(10)), word(s.plain.prepare(10)));
+  for (const x of [c, plain, s.c, s.plain]) x.dispose();
+});
+
+test("a request retargeted while its search runs never plays the old target", async () => {
+  const executor = manualExecutor(),
+    played = [],
+    c = new HsmController(
+      view,
+      design,
+      {},
+      "S",
+      (_v, _busy, _error, progress) => {
+        if (progress?.status === "playing") played.push(progress.target);
+      },
+      assets,
+      executor,
+    );
+  await c.configure(0);
+  c.request(40);
+  await flush();
+  c.request(17);
+  await flush();
+  executor.jobs.at(-1).finish();
+  await settleN(c);
+  assert.equal(c.currentValue, 17);
+  assert.ok(!played.includes(40), `played targets ${played}`);
+  c.dispose();
+});
+
 // ------------------------------------------------- through the controller
 
 test("every mode counts, jumps and recovers identically with and without the sliced executor", async () => {
