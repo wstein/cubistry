@@ -1084,12 +1084,12 @@ test("recovery reach equals a brute-force search over every move sequence", () =
 test("configure() followed by a mode, range or direction switch counts at most five HTM per step and is back on the period within six steps", async () => {
   let worst = 0,
     checked = 0;
-  for (const letter of ["S"]) {
+  for (const letter of ["H", "S", "M"]) {
     const modes = COUNTING_MODES.filter(([l]) => l === letter);
     for (const [, fromMax, fromDir] of modes)
       for (const [, toMax, toDir] of modes) {
         if (fromMax === toMax && fromDir === toDir) continue;
-        for (const advance of [3]) {
+        for (const advance of [0, 3]) {
           const c = new HsmController(
             view,
             design,
@@ -1126,7 +1126,7 @@ test("configure() followed by a mode, range or direction switch counts at most f
         }
       }
   }
-  assert.ok(checked >= 20, `${checked} switches`);
+  assert.ok(checked >= 150, `${checked} switches`);
   assert.ok(worst <= 6);
 });
 
