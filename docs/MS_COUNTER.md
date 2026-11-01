@@ -88,8 +88,9 @@ every period with the application's own cube mechanics before use.
   `checker/run-checks.sh` (Julia 1.13.3, Flix 0.79.0 on Java 21). Both
   accepted S3 (and M3, which the app does not use), and the S3 receipts and
   checks file they produced were byte-identical to the pinned copies.
-- The research README lists each corner's faces in the generator's order. The
-  converted print code follows the witness's x, y, z faces; the per-corner
-  sticker sets agree, which a test checks.
+- The converted print code lists each corner's stickers in x, y, z face order.
+  The research README's per-corner table lists them in witness sticker-row
+  order, although its heading says x, y, z (a wording slip in PR #138, not in
+  this application). The per-corner sticker sets agree, which a test checks.
 - No sticker sheets are generated for S3 yet.
 - Letter switching at values other than 00 is not optimized (as in the research).
