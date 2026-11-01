@@ -99,6 +99,14 @@ What if we require **every single increment** $d \to d+1$ to end with the **exac
      - **Open `0..9` (9 edges):** **5 preparing moves (14 HTM)**: `L | L | B L | B L | L | L | B' U2 L | U L | L` (or with $\le 1$ prep/step: `L | L | U L | B' L | U L | U' L | B' L | L | L`).
      - **1-Lap Display-Wrapped `0..9->0` (10 edges, `constL-wrap1`):** **6 preparing moves (16 HTM, 7/10 steps pure `L`)**: `L | L | B' U L | L | L | U B2 L | L | L | B' U' L | L`.
      - **Exact Full-State Closed 10-Cycle (`0..9->0`, `constL-closed`):** **11 preparing moves (21 HTM, Period 1)**: `L | L | U B' L | B' U2 L | B' U L | U' L | L | U B' L | L | B' U L`.
+3. **What about `L'` for `0..9` and `D` for `9=>0`? (`9×L' + 1×D` is UNSAT, but `8×L' + 2×D` is SAT via Chiral Predecessor Reuse!):**
+   - **Why `9×(P* L') + 1×(P* D)` (`L'` on all 9 steps `0->1` .. `8->9`, `D` on `9->0`) is still `UNSAT`:**
+     Counting `0 -> 9` already comprises **9 transitions** (`0->1, 1->2, ..., 8->9`), exiting the **9** digits `0..8`. Because a 2×2×2 cube has only **8 corner cubies**, `P* L'` can exit at most **8 digits** in total — so the 9th transition (`8->9`) already fails before `9->0` is reached!
+   - **Why switching one step earlier (`8×(P* L')` on `0->8` + `D` on `8->9` and `9->0`) IS `SAT`:**
+     When `0..7` (8 digits, one per cubie at $f_1$) are exited by `P* L'`, their chiral **successors** $f_2 = \sigma(f_1)$ on all 8 cubies must be `blank`. The remaining 2 digits (`8` and `9`) sit at the third sticker $f_3 = \sigma^{-1}(f_1)$ of two cubies. When **`D`** exits a digit at $f_3$ from `LL`, it rotates the **left** normal `(-1, 0, 0)` of `LL` — which is the chiral **predecessor** $\sigma^{-1}(f_3) = f_2$ — onto the front face of `LR = (1, -1, 1)`. Since $f_2$ is **already `blank`**, `D` reuses the exact same `blank` sticker on the opposite chiral side!
+     - **Open `0..9` (`8×(P* L') + 1×D`):** **4 preparing moves (13 HTM)**: `L' | L' | L' | B2 L' | R U' L' | U' L' | L' | L' | D`
+     - **1-Lap Wrapped `0..9->0` (`8×(P* L') + 2×D`):** **4 preparing moves (14 HTM, 7/10 steps have 0 preps)**: `L' | L' | L' | B2 L' | R U' L' | U' L' | L' | L' | D | D`
+     - **Exact Full-State Closed 10-Cycle (`8×(P* L') + 2×D`):** **12 preparing moves (22 HTM, Period 1)**: `R2 U' L' | B' L' | U' L' | B' L' | B' L' | U' R2 L' | B2 L' | U' L' | B' U2 D | D`
 
 ---
 
