@@ -435,4 +435,12 @@ test("all 24 sticker identities differ from both earlier H/S/M prints", () => {
   // H x2 and M x3; digits and blanks are the same multiset.
   const bag = (p) => p.map((s) => s.image || "_").sort().join("");
   assert.equal(bag(seconds).replace(/[HMS]/g, ""), bag(witness.printing).replace(/[HM]/g, ""));
+  // By artwork, m3-SH needs exactly 3 glyphs that the seconds-first sheet lacks.
+  const need = {};
+  for (const s of witness.printing) need[s.image || "_"] = (need[s.image || "_"] ?? 0) + 1;
+  for (const s of seconds) need[s.image || "_"] = (need[s.image || "_"] ?? 0) - 1;
+  assert.equal(
+    Object.values(need).filter((n) => n > 0).reduce((a, b) => a + b, 0),
+    3,
+  );
 });
