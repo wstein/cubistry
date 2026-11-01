@@ -17,6 +17,8 @@ import type { HsmPlanner } from "./planner.ts";
 
 /** Recovery steps may use any word up to this length; the counting limit. */
 export const RECOVERY_EDGE_LIMIT = 5;
+/** Longest free jump on the H/S/M print: its universal six-HTM bound. */
+export const RECOVERY_JUMP_BOUND = 6;
 /** Longest search; the research recovery table needs at most seven steps. */
 export const RECOVERY_MAX_STEPS = 8;
 
@@ -92,8 +94,19 @@ export class HsmRecovery {
   private readonly options = new Map<string, number[][]>();
   private readonly table: HsmPlanner["tables"];
   private readonly print: PrintDefinition;
-  constructor(print: PrintDefinition, planner: HsmPlanner) {
+  /** Step limit while recovering (the variant's counting limit). */
+  private readonly edgeLimit: number;
+  /** Cap for one free jump. */
+  private readonly jumpBound: number;
+  constructor(
+    print: PrintDefinition,
+    planner: HsmPlanner,
+    edgeLimit = RECOVERY_EDGE_LIMIT,
+    jumpBound = RECOVERY_JUMP_BOUND,
+  ) {
     this.print = print;
+    this.edgeLimit = edgeLimit;
+    this.jumpBound = jumpBound;
     this.table = planner.tables;
     const home = stickerPoses(print, initialState(print));
     const cubies = [...new Set(home.map((s) => s.cubie))].sort((a, b) => a - b);
@@ -342,14 +355,18 @@ export class HsmRecovery {
   ): SearchTask<readonly LegalMove[] | null> {
     const origin = this.encode(state),
       least = this.shortest(origin, letter, value);
-    if (least > 6) return null;
+    if (least > this.jumpBound) return null;
     const n = maximum + 1,
       next = (value + direction + n) % n,
       period = new Set(
         targets(value).map((g) => HsmRecovery.key(this.encode(g))),
       );
     let fallback: number[] | null = null;
-    for (let length = least; length <= Math.max(least, 6); length++) {
+    for (
+      let length = least;
+      length <= Math.max(least, this.jumpBound);
+      length++
+    ) {
       let free: number[] | null = null;
       const reached = yield* this.reachTask(
         origin,
@@ -360,7 +377,7 @@ export class HsmRecovery {
       );
       for (const [k, e] of reached) {
         if (period.has(k)) return e.word.map((m) => moves[m]);
-        if (!free && this.shortest(e.pose, letter, next) <= RECOVERY_EDGE_LIMIT)
+        if (!free && this.shortest(e.pose, letter, next) <= this.edgeLimit)
           free = e.word;
         fallback ??= e.word;
         yield;
@@ -418,11 +435,11 @@ export class HsmRecovery {
           next = new Map<number, Node>();
         for (const node of layers[j - 1].values()) {
           yield;
-          let limit = RECOVERY_EDGE_LIMIT,
+          let limit = this.edgeLimit,
             exact = false;
           if (first && j === 1) {
             const d = this.shortest(node.pose, letter, value(j));
-            if (d > RECOVERY_EDGE_LIMIT) [limit, exact] = [d, true];
+            if (d > this.edgeLimit) [limit, exact] = [d, true];
           }
           const reached = yield* this.reachTask(
             node.pose,

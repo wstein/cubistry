@@ -55,7 +55,14 @@ export class HsmPlanner {
       distances: this.distances,
     };
   }
-  constructor() {
+  /** Cap for a route from a settled blank/unit pose (`plan`). */
+  readonly bound: number;
+  /**
+   * `bound` is the variant's free-jump cap: six for the H/S/M print (its
+   * universal bound), the graph radius seven where no tighter bound is known.
+   */
+  constructor(bound = 6) {
+    this.bound = bound;
     for (const p of positions) {
       const poses: Pose[] = [{ p, n: [0, 0, 1], up: [0, 1, 0] }],
         map = new Map([[key(poses[0]), 0]]);
@@ -158,7 +165,7 @@ export class HsmPlanner {
       nextValue,
       policy,
     );
-    demand(result.length <= 6, "No certified HSM route");
+    demand(result.length <= this.bound, "No certified HSM route");
     return result;
   }
   /** Reuse the exact graph after a partially completed route has moved the unit.
