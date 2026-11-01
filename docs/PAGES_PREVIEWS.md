@@ -39,6 +39,10 @@ Pages settings migration, force push or protected research change.
 
 ## Security boundary and event handling
 
+- A PR gets a build and a preview only while it carries the `preview` label.
+  Other labels start no build and do not cancel a running one. Removing the
+  label removes the stored preview at the next reconciliation (a `main` push,
+  a labeled PR build, a closed PR or a manual dispatch), not immediately.
 - `pull_request` opened/reopened/synchronize builds check out the exact head,
   use contents-read only, do not persist credentials and have no publishing
   secrets or write permissions. Fork builds are excluded from this preview path.
