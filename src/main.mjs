@@ -743,7 +743,8 @@ $("application").addEventListener("change", async () => {
   }
   if (application === "certified") rememberedCounterValue = view.currentValue;
   const requested = $("application").value,
-    previous = view;
+    previous = view,
+    savedUi = hsmUiSnapshot();
   ready = false;
   controlsUi();
   let candidate;
@@ -838,7 +839,8 @@ $("application").addEventListener("change", async () => {
     candidate?.dispose();
     ready = true;
     $("application").value = application;
-    if (isHsm()) hsmVariantUi(isHm());
+    // The previous controller keeps running: restore its controls exactly.
+    restoreHsmUi(savedUi);
     error(e.message);
   }
   controlsUi();
@@ -848,6 +850,32 @@ const hsmMarkup = {
   range: $("hsm-range").innerHTML,
   help: $("hsm-help").textContent,
 };
+/** Exact state of the shared H/S/M controls, to restore after a failed switch. */
+function hsmUiSnapshot() {
+  return {
+    heading: $("hsm-heading").textContent,
+    label: $("hsm-controls").getAttribute("aria-label"),
+    hidden: $("hsm-lettering").hidden,
+    letterOptions: $("hsm-letter").innerHTML,
+    letter: $("hsm-letter").value,
+    rangeOptions: $("hsm-range").innerHTML,
+    range: $("hsm-range").value,
+    lettering: $("hsm-lettering").value,
+    help: $("hsm-help").textContent,
+  };
+}
+function restoreHsmUi(s) {
+  $("hsm-heading").textContent = s.heading;
+  $("hsm-controls").setAttribute("aria-label", s.label);
+  $("hsm-lettering").hidden = $("hsm-lettering-label").hidden = s.hidden;
+  $("hsm-letter").innerHTML = s.letterOptions;
+  $("hsm-letter").value = s.letter;
+  $("hsm-range").innerHTML = s.rangeOptions;
+  $("hsm-range").value = s.range;
+  $("hsm-lettering").value = s.lettering;
+  $("hsm-help").textContent = s.help;
+  syncHsmUnitLabels();
+}
 const rangeLabels = { 59: "00–59", 23: "00–23", 11: "00–11" };
 /** The H/M print offers M 00–59 and H 00–23 / 00–11 only. */
 function hmRangeUi() {
@@ -972,7 +1000,9 @@ for (const id of ["hsm-letter", "hsm-lettering"])
       previousLettering =
         viewer.presentedPrint?.id === "hsm_counter_seconds_first_words"
           ? "words"
-          : "symbols";
+          : "symbols",
+      // Taken after the user's choice, before the H/M range list follows it.
+      savedUi = hsmUiSnapshot();
     ready = false;
     controlsUi();
     let candidate;
@@ -1007,10 +1037,12 @@ for (const id of ["hsm-letter", "hsm-lettering"])
     } catch (e) {
       candidate?.dispose();
       ready = true;
-      $("hsm-letter").value = previous.letter;
-      $("hsm-lettering").value = previousLettering;
-      if (isHm()) hmRangeUi();
-      syncHsmUnitLabels();
+      restoreHsmUi({
+        ...savedUi,
+        letter: previous.letter,
+        lettering:
+          id === "hsm-lettering" ? previousLettering : savedUi.lettering,
+      });
       error(e.message);
     }
     controlsUi();

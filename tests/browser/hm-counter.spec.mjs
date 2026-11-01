@@ -216,3 +216,65 @@ test("the H/S/M counter keeps its own controls after the H/M counter", async ({
   await expect(page.locator("#hsm-letter")).toHaveValue("H");
   await physical(page, "H", 0);
 });
+
+// A failed H/M load must leave the running H/S/M counter and its controls
+// exactly as they were: unit, range, lettering, heading and option lists.
+for (const [name, fulfil] of [
+  ["fetch failure", (route) => route.fulfill({ status: 404, body: "" })],
+  [
+    "hash mismatch",
+    async (route) => {
+      const response = await route.fetch();
+      await route.fulfill({ response, body: (await response.text()) + " " });
+    },
+  ],
+])
+  test(`a failed H/M load (${name}) keeps the H/S/M selection`, async ({
+    page,
+  }) => {
+    await page.goto("/?lettering=words");
+    await expect(page.locator("#application")).toBeEnabled();
+    await page.selectOption("#application", "hsm-counter");
+    await expect(page.locator("#cube")).toHaveAttribute(
+      "data-application",
+      "hsm-counter",
+    );
+    await settled(page, 0);
+    await page.selectOption("#hsm-letter", "S");
+    await expect(page.locator("#status")).toContainText("S · 00");
+    await page.selectOption("#hsm-range", "11");
+    await page.route("**/hm-counter.v1.json", fulfil);
+    await page.selectOption("#application", "hm-counter");
+    await expect(page.locator("#error")).not.toBeEmpty();
+    await expect(page.locator("#application")).toHaveValue("hsm-counter");
+    await expect(page.locator("#cube")).toHaveAttribute(
+      "data-application",
+      "hsm-counter",
+    );
+    await expect(page.locator("#hsm-heading")).toHaveText("H/S/M Counter");
+    await expect(page.locator("#hsm-lettering")).toBeVisible();
+    await expect(page.locator("#hsm-lettering")).toHaveValue("words");
+    expect(await options(page, "hsm-letter")).toEqual(["H", "S", "M"]);
+    expect(await options(page, "hsm-range")).toEqual(["59", "23", "11"]);
+    await expect(page.locator("#hsm-letter")).toHaveValue("S");
+    await expect(page.locator("#hsm-range")).toHaveValue("11");
+    // The old controller still counts the S unit on 00-11.
+    await page.fill("#hsm-value", "11");
+    await page.locator("#hsm-set-form").evaluate((f) => f.requestSubmit());
+    await settled(page, 11);
+    await expect(page.locator("#status")).toContainText("S · 11");
+  });
+
+test("a failed H/M unit change keeps the previous unit and range", async ({
+  page,
+}) => {
+  await choose(page);
+  await page.selectOption("#hsm-range", "11");
+  await page.route("**/assets/**", (route) => route.abort());
+  await page.selectOption("#hsm-letter", "M");
+  await expect(page.locator("#error")).not.toBeEmpty();
+  await expect(page.locator("#hsm-letter")).toHaveValue("H");
+  expect(await options(page, "hsm-range")).toEqual(["23", "11"]);
+  await expect(page.locator("#hsm-range")).toHaveValue("11");
+  await expect(page.locator("#status")).toContainText("H · 00");
+});
