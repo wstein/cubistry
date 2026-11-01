@@ -8,7 +8,7 @@ const workflow=readFileSync('.github/workflows/pages-publish.yml','utf8');
 const jobs=new Map([...workflow.matchAll(/^  ([a-z][a-z0-9-]*):\n([\s\S]*?)(?=^  [a-z][a-z0-9-]*:\n|$(?![\s\S]))/gm)].map(m=>[m[1],m[2]]));
 function needs(id){const value=jobs.get(id).match(/^    needs: (.*)$/m)?.[1];return value?value.replace(/[\[\]]/g,'').split(',').map(s=>s.trim()):[];}
 const sha='b'.repeat(40),old='a'.repeat(40),repo={id:100,full_name:'wstein/cubistry'};
-function notify({deployOK,metadata=sha,closed=false,remaining=false}){
+function notify({deployOK,metadata=sha,closed=false,remaining=false,leftover=false}){
  const dir=mkdtempSync(join(tmpdir(),'pages-notify-'));
  try{
   const pr={number:1,state:closed?'closed':'open',head:{sha,repo},base:{repo}};
@@ -19,7 +19,7 @@ function notify({deployOK,metadata=sha,closed=false,remaining=false}){
    'issues/1/comments?per_page=100&page=1':closed?[{id:7,user:{login:'github-actions[bot]'},body:'<!-- cubistry-pr-preview --> old'}]:[],
    [`actions/workflows/pages.yml/runs?event=pull_request&head_sha=${sha}&per_page=100&page=1`]:{workflow_runs:[run]},
    'contents/pr-preview/pr-1/preview-info.json?ref=gh-pages':{content:Buffer.from(JSON.stringify({sha:metadata})).toString('base64')},
-   'contents/pr-preview/pr-1?ref=gh-pages':remaining?[]:null,
+   'contents/pr-preview/pr-1?ref=gh-pages':remaining?[{name:'.nojekyll'},{name:'index.html'}]:leftover?[{name:'.nojekyll'}]:null,
   };
   writeFileSync(join(dir,'mock.mjs'),`import{writeFileSync}from'node:fs';const responses=${JSON.stringify(responses)};globalThis.fetch=async(url,options)=>{const path=String(url).split('/repos/wstein/cubistry/')[1];if(options.method==='POST'||options.method==='PATCH'){writeFileSync(${JSON.stringify(join(dir,'comment'))},options.body);return new Response('{}');}if(!(path in responses))throw Error('Unexpected API request '+path);return new Response(JSON.stringify(responses[path]),{status:responses[path]===null?404:200});};`);
   execFileSync(process.execPath,['--import',join(dir,'mock.mjs'),resolve('scripts/pages/notify.mjs')],{env:{...process.env,GH_TOKEN:'unit-test-only',DEPLOY_OK:String(deployOK)},stdio:'pipe'});
@@ -28,7 +28,7 @@ function notify({deployOK,metadata=sha,closed=false,remaining=false}){
 }
 function publication({previewFailure=false,previewCancelled=false,earlyFailure=false,finalFailure=false}={}){
  const dir=mkdtempSync(join(tmpdir(),'pages-order-')),storage=join(dir,'storage'),results=new Map();let published,cancelled=false;
- mkdirSync(join(storage,'pr-preview/pr-1'),{recursive:true});mkdirSync(join(storage,'pr-preview/pr-2'));
+ mkdirSync(join(storage,'pr-preview/pr-1'),{recursive:true});mkdirSync(join(storage,'pr-preview/pr-2'));writeFileSync(join(storage,'pr-preview/pr-2/.nojekyll'),'');writeFileSync(join(storage,'pr-preview/pr-2/index.html'),'old preview');
  writeFileSync(join(storage,'index.html'),'verified production');
  writeFileSync(join(storage,'pr-preview/pr-1/preview-info.json'),JSON.stringify({sha:old}));
  function run(id){
@@ -37,7 +37,7 @@ function publication({previewFailure=false,previewCancelled=false,earlyFailure=f
   const conditions=[...jobIf.matchAll(/needs\.([a-z-]+)\.result == '([^']+)'/g)];
   if((/!cancelled\(\)/.test(jobIf)&&cancelled)||(!always&&needs(id).some(n=>results.get(n)!=='success'))||conditions.some(m=>results.get(m[1])!==m[2])){results.set(id,'skipped');return;}
   if(id==='previews'){
-   writeFileSync(join(storage,'pr-preview/pr-1/preview-info.json'),JSON.stringify({sha}));rmSync(join(storage,'pr-preview/pr-2'),{recursive:true});
+   writeFileSync(join(storage,'pr-preview/pr-1/preview-info.json'),JSON.stringify({sha}));for(const f of ['index.html','preview-info.json'])rmSync(join(storage,'pr-preview/pr-2',f),{force:true});/* rsync keeps the protected .nojekyll */
    if(previewCancelled)cancelled=true;results.set(id,previewCancelled?'cancelled':previewFailure?'failure':'success');return;
   }
   if(/run: python3 code\/scripts\/pages\/snapshot.py site combined-site/.test(body)){
@@ -51,11 +51,11 @@ function publication({previewFailure=false,previewCancelled=false,earlyFailure=f
   run('notify');assert.equal(results.get('notify'),'success','status notification must still run after a publication failure/cancellation');
   const gate=jobs.get('notify').match(/DEPLOY_OK: \$\{\{ needs\.([a-z-]+)\.result == 'success' \}\}/)?.[1];assert(gate,'notify must name its actual deployment dependency');
   return {published:published&&JSON.parse(readFileSync(join(published,'pr-preview/pr-1/preview-info.json'))).sha,
-   removed:published&&!existsSync(join(published,'pr-preview/pr-2')),results,comment:notify({deployOK:results.get(gate)==='success'})};
+   removed:published&&!existsSync(join(published,'pr-preview/pr-2/index.html')),leftover:published&&existsSync(join(published,'pr-preview/pr-2/.nojekyll')),results,comment:notify({deployOK:results.get(gate)==='success'})};
  }finally{rmSync(dir,{recursive:true,force:true});}
 }
 test('production publishes first, then the completed preview snapshot is actually deployed before availability is announced',()=>{
- const result=publication();assert.equal(result.published,sha,'the early production snapshot still contained the old preview');assert.equal(result.removed,true);
+ const result=publication();assert.equal(result.published,sha,'the early production snapshot still contained the old preview');assert.equal(result.removed,true);assert.equal(result.leftover,true,'simulation must leave .nojekyll like rsync');
  assert.match(result.comment,/Open non-production PR preview/);
 });
 test('partial preview failures cannot delay production and successful changes still reach the final deployment',()=>{
@@ -69,6 +69,8 @@ test('notification separately requires the final deployment and matching metadat
  assert.doesNotMatch(notify({deployOK:true,metadata:old}),/Open non-production PR preview/);
  assert.doesNotMatch(notify({deployOK:false,closed:true}),/^.*Preview removed/m);
  assert.match(notify({deployOK:true,closed:true}),/Preview removed/);
+ assert.match(notify({deployOK:true,closed:true,leftover:true}),/Preview removed/,'a .nojekyll-only directory is a removed preview');
+ assert.doesNotMatch(notify({deployOK:false,closed:true,leftover:true}),/^.*Preview removed/m);
  assert.doesNotMatch(notify({deployOK:true,closed:true,remaining:true}),/^.*Preview removed/m);
 });
 

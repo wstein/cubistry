@@ -1,5 +1,10 @@
 import { GitHub } from "./api.mjs";
-import { REPOSITORY, previewPath, selectBuild } from "./policy.mjs";
+import {
+  REPOSITORY,
+  previewPath,
+  selectBuild,
+  hasPreviewContent,
+} from "./policy.mjs";
 const api = new GitHub(),
   marker = "<!-- cubistry-pr-preview -->",
   deployOK = process.env.DEPLOY_OK === "true";
@@ -17,7 +22,7 @@ for (const pr of pulls) {
       `contents/${previewPath(pr.number)}?ref=gh-pages`,
     );
     text =
-      deployOK && !remaining
+      deployOK && !hasPreviewContent(remaining)
         ? "Preview removed after this PR closed or merged."
         : "Preview cleanup/deployment is pending or failed; the last deployment may still contain the old preview.";
   } else {
