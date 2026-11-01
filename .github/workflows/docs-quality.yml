@@ -8,6 +8,12 @@ on:
 permissions:
   contents: read
 
+# A newer push to a pull request supersedes its running checks. Runs on main
+# are never cancelled, so every main commit keeps its own result.
+concurrency:
+  group: docs-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   spelling:
     name: US English spelling
