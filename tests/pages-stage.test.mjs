@@ -6,7 +6,11 @@ import { join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 const sha = "a".repeat(40),
   repository = { id: 100, full_name: "wstein/cubistry" };
-const pr = { state: "open", head: { sha, repo: repository } };
+const pr = {
+  state: "open",
+  labels: [{ name: "preview" }],
+  head: { sha, repo: repository },
+};
 const run = (number) => ({
   id: 99,
   head_sha: sha,
@@ -60,4 +64,10 @@ test("closed cleanup rechecks reopened PRs rather than deleting their preview", 
     stage({ ...pr, state: "closed" }, null, "remove"),
     "action=remove\n",
   );
+});
+test("stage removes a preview whose PR lost the label and never deploys an unlabeled PR", () => {
+  const unlabeled = { ...pr, labels: [{ name: "e2e" }] };
+  assert.equal(stage(unlabeled, null, "remove"), "action=remove\n");
+  assert.equal(stage(unlabeled, run(1)), "action=none\n");
+  assert.equal(stage(pr, null, "remove"), "action=none\n");
 });

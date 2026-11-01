@@ -2,6 +2,10 @@
 export const REPOSITORY = "wstein/cubistry";
 export const BUILD_WORKFLOW = ".github/workflows/pages.yml";
 export const ARTIFACT_NAME = "pages-site";
+// A PR gets a preview only while it carries this label.
+export const PREVIEW_LABEL = "preview";
+export const hasPreviewLabel = (pr) =>
+  Array.isArray(pr?.labels) && pr.labels.some((l) => l?.name === PREVIEW_LABEL);
 export const previewPath = (number) => {
   if (!Number.isSafeInteger(number) || number < 1)
     throw Error("Invalid PR number");
@@ -44,7 +48,8 @@ export function plan({ pulls, inventory, builds, main }) {
     if (
       pr.state !== "open" ||
       pr.head?.repo?.full_name !== REPOSITORY ||
-      pr.base?.repo?.full_name !== REPOSITORY
+      pr.base?.repo?.full_name !== REPOSITORY ||
+      !hasPreviewLabel(pr)
     )
       continue;
     previewPath(pr.number);

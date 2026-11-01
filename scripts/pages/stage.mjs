@@ -1,7 +1,7 @@
 import { writeFile, mkdir, appendFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { GitHub } from "./api.mjs";
-import { REPOSITORY, validRun, previewPath } from "./policy.mjs";
+import { REPOSITORY, validRun, previewPath, hasPreviewLabel } from "./policy.mjs";
 const entry = JSON.parse(process.env.ENTRY),
   api = new GitHub();
 let action = "none";
@@ -29,11 +29,17 @@ if (entry.number === 0) {
   previewPath(entry.number);
   const pr = await api.request(`pulls/${entry.number}`);
   if (entry.action === "remove") {
-    if (!pr || pr.state !== "open" || pr.head?.repo?.full_name !== REPOSITORY)
+    if (
+      !pr ||
+      pr.state !== "open" ||
+      pr.head?.repo?.full_name !== REPOSITORY ||
+      !hasPreviewLabel(pr)
+    )
       action = "remove";
   } else if (
     entry.action === "deploy" &&
     pr?.state === "open" &&
+    hasPreviewLabel(pr) &&
     pr.head?.repo?.full_name === REPOSITORY &&
     pr.head.sha === entry.sha
   ) {
