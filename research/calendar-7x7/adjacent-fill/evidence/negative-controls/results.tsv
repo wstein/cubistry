@@ -1,0 +1,6 @@
+case	julia-exit	flix-exit	reason (julia | flix)
+unknown-key	1	1	AssertionError: unknown or misplaced display-set key 'tail' | java.lang.IllegalArgumentException: unknown or misplaced display-set key
+unknown-choice	1	1	AssertionError: unknown choice 'next' for lead | java.lang.IllegalArgumentException: unknown choice for display-set key
+misordered-keys	1	1	AssertionError: unknown or misplaced display-set key 'trail' | java.lang.IllegalArgumentException: unknown or misplaced display-set key
+missing-key	1	1	AssertionError: display set needs lead=..,trail=..,six=.. | java.lang.IllegalArgumentException: display set needs lead=..,trail=..,six=..
+incoherent-overflow	1	1	AssertionError: incoherent: overflow marks need empty row-3 cells, so they cannot be combined with lead=prev | java.lang.IllegalArgumentException: incoherent: overflow marks need empty row-3 cells, so they cannot be combined with lead=prev
