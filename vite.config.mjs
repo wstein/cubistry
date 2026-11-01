@@ -35,6 +35,7 @@ export default defineConfig({
         print: fileURLToPath(new URL("./print.html", import.meta.url)),
         calendar: fileURLToPath(new URL("./calendar.html", import.meta.url)),
         clock: fileURLToPath(new URL("./clock.html", import.meta.url)),
+        msTimer: fileURLToPath(new URL("./ms-timer.html", import.meta.url)),
         counter: fileURLToPath(new URL("./index.html", import.meta.url)),
         acceptance: fileURLToPath(
           new URL("./solver-acceptance.html", import.meta.url),
