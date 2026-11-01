@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import { writeFileSync } from "node:fs";
-import { startFrameGapProbe, readFrameGap, frameToleranceMs } from "../helpers/frame-gap.mjs";
 test.use({ timezoneId: "Europe/Berlin" });
 async function ready(page, time) {
   // Install the fake clock slightly in the past: pauseAt() rejects a target
@@ -568,9 +567,11 @@ test("untimed recovery honors quarter-based clock speed while the default viewer
   });
   await page.goto("/clock.html");
   await expect(page.locator("#seconds-speed")).toBeEnabled();
-  await startFrameGapProbe(page);
+  // A long move period keeps frame quantization (up to 300 ms in software GL) small against the signal: if the
+  // legacy "move" metric were ignored, half turns would take twice the period.
+  const period = 720;
   const run = async (metric) =>
-    page.evaluate(async (metric) => {
+    page.evaluate(async ({ metric, period }) => {
       const { clockUnits, clockStage } = await import("/src/clock.mjs"),
         { LiveClockScheduler } = await import("/src/apps/clock/scheduler.ts");
       LiveClockScheduler.prototype.tick = () => ({
@@ -579,8 +580,7 @@ test("untimed recovery honors quarter-based clock speed while the default viewer
       });
       const unit = clockUnits[2],
         viewer = unit.controller.view,
-        base = 75,
-        period = 180;
+        base = 75;
       viewer.setAnimationSpeed(base / period, metric);
       unit.controller.clearDeadline();
       const candidate = [57, 58, 59, 0, 1, 2, 3, 4].find((value) => {
@@ -605,7 +605,7 @@ test("untimed recovery honors quarter-based clock speed while the default viewer
       while (unit.controller.busy) await new Promise((r) => setTimeout(r, 10));
       viewer.animate = animate;
       return samples;
-    }, metric);
+    }, { metric, period });
   const weighted = await run("quarter-turn"),
     legacy = await run("move");
   const mean = (samples, weight) => {
@@ -615,9 +615,8 @@ test("untimed recovery honors quarter-based clock speed while the default viewer
   expect(weighted.every((t) => !t.timed)).toBe(true);
   expect(legacy.every((t) => !t.timed)).toBe(true);
   expect(mean(weighted, 2) / mean(weighted, 1)).toBeGreaterThan(1.4);
-  const frameGap = await readFrameGap(page);
-  // Equal legacy moves differ only by frame quantization, which software GL makes larger than 90 ms.
-  expect(Math.abs(mean(legacy, 2) - mean(legacy, 1))).toBeLessThanOrEqual(frameToleranceMs(90, frameGap));
+  // Legacy moves take equal time whatever their turns; a broken metric would separate the means by `period`.
+  expect(Math.abs(mean(legacy, 2) - mean(legacy, 1))).toBeLessThanOrEqual(period / 2);
 });
 test("move statistics block is present, stable in layout and updates after clock ticks", async ({
   page,
