@@ -19,6 +19,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { convertWitness, serialize, sha256 } from "./hm/convert-witness.mjs";
 import { deriveRuntime, HSM_RUNTIME } from "./derive-hsm-runtime.mjs";
+import { renderNet } from "./hm/render-net.mjs";
 
 const root = new URL("../", import.meta.url);
 const path = (p) => fileURLToPath(new URL(p, root));
@@ -71,7 +72,10 @@ const hasCommit = (commit) => {
   }
 };
 
-/** Convert the pinned copies and derive the runtime; returns both texts. */
+const NET = "public/assets/hm/m3-sh-net.svg",
+  NET_PROVENANCE = "public/assets/hm/provenance.json";
+
+/** Convert the pinned copies, derive the runtime and the sticker net. */
 export function build(pin) {
   const read = (research) => readFileSync(path(pin.copies[research]), "utf8");
   const witness = convertWitness(read(WITNESS), {
@@ -90,13 +94,26 @@ export function build(pin) {
   });
   const converted = serialize(witness);
   const runtime = serialize(deriveRuntime(witness, HM_RUNTIME));
-  return { converted, runtime };
+  const net = renderNet(
+    witness.printing,
+    (p) => readFileSync(path(p), "utf8"),
+    { label: pin.print, source: { path: pin.convertedPath, sha256: sha256(converted) } },
+  );
+  return {
+    converted,
+    runtime,
+    net: net.svg,
+    netProvenance: serialize(net.provenance),
+  };
 }
 
 function writeOutputs(pin) {
-  const { converted, runtime } = build(pin);
+  const { converted, runtime, net, netProvenance } = build(pin);
   writeFileSync(path(pin.convertedPath), converted);
   writeFileSync(path(pin.runtimePath), runtime);
+  mkdirSync(dirname(path(NET)), { recursive: true });
+  writeFileSync(path(NET), net);
+  writeFileSync(path(NET_PROVENANCE), netProvenance);
   pin.convertedSHA256 = sha256(converted);
   pin.runtimeSHA256 = sha256(runtime);
   writeFileSync(path(PIN), JSON.stringify(pin, null, 2) + "\n");
@@ -120,7 +137,12 @@ export function check(pin, { requireCommit = false } = {}) {
     console.log(
       `Commit ${pin.commit} not available locally; checked the copies only`,
     );
-  const { converted, runtime } = build(pin);
+  const { converted, runtime, net, netProvenance } = build(pin);
+  if (
+    readFileSync(path(NET), "utf8") !== net ||
+    readFileSync(path(NET_PROVENANCE), "utf8") !== netProvenance
+  )
+    throw Error("Sticker net or its provenance is stale; run without --check");
   if (
     readFileSync(path(pin.convertedPath), "utf8") !== converted ||
     sha256(converted) !== pin.convertedSHA256
