@@ -81,3 +81,35 @@ function check_pure(new_path,dag_path,targets)
     @assert short==0 "print misses $short required class copies"
     @assert isempty(failed) "$(length(failed)) of $(length(ids)) states fail the pure-split front: targets $(join(failed,","))"
 end
+# Cubie-level front matchability (design check): for each display and body orbit, the
+# number of front cells a maximum matching of cells to cubies leaves unmatched (two
+# stickers on one cubie cannot serve two cells at once). Kuhn's augmenting paths.
+function unmatched_count(source,board)
+    total=0
+    for key in unique(bodykey(h) for h in all_homes())
+        hs=[h for h in all_homes() if bodykey(h)==key]
+        cs=[(r,c) for r in 1:7 for c in 1:7 if bodykey((c-4,4-r,3))==key]
+        stick=Dict(h=>filter(s->s.home==h,source) for h in hs)
+        adj=[[j for j in eachindex(hs) if !isempty(piece_options(stick[hs[j]],hs[j],(c-4,4-r,3),board[r,c]))] for (r,c) in cs]
+        owner=Dict{Int,Int}()
+        function aug(i,seen)
+            for j in adj[i]
+                j in seen && continue
+                push!(seen,j)
+                if !haskey(owner,j) || aug(owner[j],seen);owner[j]=i;return true;end
+            end
+            false
+        end
+        total+=count(i->!aug(i,Set{Int}()),eachindex(cs))
+    end
+    total
+end
+function matchability_report(print_path)
+    source=read_physical(print_path);goals=stacked_goals(PURE_VARIANT);bad=0
+    for (id,g) in enumerate(goals)
+        u=unmatched_count(source,g.board)
+        u>0 && (bad+=1;println("pure-unmatched\t",id,'\t',g.year,'\t',g.month,'\t',u))
+    end
+    println("pure-matchability\t",bad)
+    @assert bad==0 "$bad displays have no cubie-level front matching"
+end

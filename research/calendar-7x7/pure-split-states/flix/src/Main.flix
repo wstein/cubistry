@@ -86,8 +86,63 @@ def checkPure(printPath: String,dagPath: String,targets: String,oldRoot: String,
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {
         match Sys.Env.getArgs() {
+            case "matchability"::printing::oldRoot::Nil => matchability(printing,oldRoot)
             case printing::dag::targets::oldRoot::geometry::Nil => checkPure(printing,dag,targets,oldRoot,geometry)
-            case _ => throw new IllegalArgumentException("PRINT DAG TARGETS ORIGINAL_EVIDENCE GEOMETRY")
+            case _ => throw new IllegalArgumentException("PRINT DAG TARGETS ORIGINAL_EVIDENCE GEOMETRY | matchability PRINT ORIGINAL_EVIDENCE")
         }
     } catch {case ex: Exception => {println("invalid\t"+ex.toString());System.exit(1)}}
 })
+
+// Cubie-level front matchability (design check): for each display and body orbit, the
+// number of front cells left unmatched by a maximum matching of cells to cubies.
+def cellOptions(source: Vector[Sticker],home: (Int32,Int32,Int32),r: Int32,c: Int32,want: (String,String)): Bool \ IO = {
+    let pos=(c-4,4-r,3);let(g,wi)=want;
+    let stickers=List.filter(s -> {let Sticker.S(_,_,h,_,_,_,_)=s;h==home},Vector.toList(source));
+    List.exists(rot -> rotate(home,rot)==pos and List.exists(s -> {
+        let Sticker.S(_,_,_,n,u,text,ink)=s;
+        rotate(n,rot)==(0,0,1) and optic(text,upAngle(rotate(u,rot)),ink)==optic(g,0,wi)
+    },stickers),rotations())
+}
+def augment(c: Int32,adj: Map[Int32,List[Int32]],owner: Map[Int32,Int32],seen: Set[Int32]): (Bool,Map[Int32,Int32],Set[Int32]) =
+    tryHomes(c,Map.getWithDefault(c,Nil,adj),adj,owner,seen)
+def tryHomes(c: Int32,hs: List[Int32],adj: Map[Int32,List[Int32]],owner: Map[Int32,Int32],seen: Set[Int32]): (Bool,Map[Int32,Int32],Set[Int32]) = match hs {
+    case Nil => (false,owner,seen)
+    case h::rest =>
+        if(Set.memberOf(h,seen)) tryHomes(c,rest,adj,owner,seen)
+        else {
+            let seen2=Set.insert(h,seen);
+            match Map.get(h,owner) {
+                case None => (true,Map.insert(h,c,owner),seen2)
+                case Some(c2) => {
+                    let(ok,owner2,seen3)=augment(c2,adj,owner,seen2);
+                    if(ok) (true,Map.insert(h,c,owner2),seen3) else tryHomes(c,rest,adj,owner2,seen3)
+                }
+            }
+        }
+}
+def unmatchedCount(source: Vector[Sticker],board: List[(String,String)]): Int32 \ IO = {
+    let keys=List.distinct(List.map(bodyKey,homes()));
+    List.foldLeft((total,key) -> {
+        let hs=List.toVector(List.filter(h -> bodyKey(h)==key,homes()));
+        let cs=List.filter(q -> {let((r,c),_)=q;bodyKey((c-4,4-r,3))==key},List.zip(cells(),board));
+        let adj=List.foldLeft((m,q) -> {
+            let(i,((r,c),want))=q;
+            Map.insert(i,List.filter(j -> cellOptions(source,Vector.get(j,hs),r,c,want),List.range(0,Vector.length(hs))),m)
+        },Map.empty(),List.zipWithIndex(cs));
+        let(_,missing)=List.foldLeft((acc,i) -> {
+            let(owner,miss)=acc;let(ok,owner2,_)=augment(i,adj,owner,Set.empty());
+            if(ok) (owner2,miss) else (owner,miss+1)
+        },(Map.empty(),0),List.range(0,List.length(cs)));
+        total+missing
+    },0,keys)
+}
+def matchability(printPath: String,oldRoot: String): Unit \ IO = {
+    let reps=representatives();validateTargets(read(oldRoot+"/targets.tsv"),reps);
+    let goals=stackedGoals(pureVariant(),reps);let source=readPrint(read(printPath));
+    let bad=List.foldLeft((n,q) -> {
+        let(i,g)=q;let Goal.G(y,m,board)=g;let u=unmatchedCount(source,board);
+        if(u>0) {println("pure-unmatched\t${i+1}\t${y}\t${m}\t${u}");n+1} else n
+    },0,List.zipWithIndex(goals));
+    println("pure-matchability\t${bad}");
+    require(bad==0,"${bad} displays have no cubie-level front matching")
+}

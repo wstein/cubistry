@@ -14,3 +14,5 @@
 243	31↶/red	/blank	(-3, 1)	unmatchable-cells=0
 4	/blank	24/31/dark	(-3, 2)	unmatchable-cells=0
 193	31↶/dark	/blank	(-2, 1)	unmatchable-cells=0
+35	C/month	26/dark	(-3, 0)	midge-redesign
+70	26/dark	C/month	(-3, 0)	midge-redesign
