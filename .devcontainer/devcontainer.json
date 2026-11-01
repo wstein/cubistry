@@ -1,0 +1,36 @@
+{
+  "name": "cubistry-research",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "containerEnv": {
+    "FLIXW_VERSION": "v0.34.9",
+    "MISE_YES": "1",
+    "MISE_TRUSTED_CONFIG_PATHS": "/workspaces",
+    "JULIA_PKG_PRECOMPILE_AUTO": "0",
+    "FLIXW_HOME": "/home/vscode/.local/share/flixw"
+  },
+  "mounts": [
+    "source=cubistry-mise-data,target=/home/vscode/.local/share/mise,type=volume",
+    "source=cubistry-julia-depot,target=/home/vscode/.julia,type=volume",
+    "source=cubistry-flixw-cache,target=/home/vscode/.local/share/flixw,type=volume"
+  ],
+  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local/share /home/vscode/.julia && bash .devcontainer/on-create.sh",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "hostRequirements": { "cpus": 4, "memory": "8gb" },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "jdx.mise-vscode",
+        "julialang.language-julia",
+        "ms-python.python",
+        "rescript-lang.rescript-vscode",
+        "flix.flix",
+        "ms-vscode.cpptools",
+        "redhat.java"
+      ]
+    }
+  }
+}
