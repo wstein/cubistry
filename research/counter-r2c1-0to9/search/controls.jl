@@ -81,6 +81,11 @@ function main(args)
     let rows = [replace(r, r"^wrap1\t" => "closed\t") for r in r_wrap1]
         write(joinpath(out, "routes-open-as-closed.tsv"), join(rows, "\n") * "\n")
     end
+
+    # 11. non-const-touch: closed routes run in 'constL-closed' mode (step 1->2 uses D instead of L)
+    let rows = [replace(r, r"^closed\t" => "constL-closed\t") for r in r_closed]
+        write(joinpath(out, "routes-non-const-touch.tsv"), join(rows, "\n") * "\n")
+    end
 end
 
 main(ARGS)

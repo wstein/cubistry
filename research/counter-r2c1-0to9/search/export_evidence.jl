@@ -154,7 +154,15 @@ function main()
     words_wrap1 = ["D", "D", "D", "L", "L", "D", "B D", "L", "L", "D"]
     write_witness(ev_dir, "wrap1", words_wrap1, dist)
 
-    # 3. Write exact bound summary table `bounds-summary.tsv`
+    # 3. Constant-L exact-closed witness: `constL-closed` (21 HTM exact-closed 10-cycle, 11 U/B preps, every step ends in L)
+    words_constL_closed = ["L", "L", "U B' L", "B' U2 L", "B' U L", "U' L", "L", "U B' L", "L", "B' U L"]
+    write_witness(ev_dir, "constL-closed", words_constL_closed, dist)
+
+    # 4. Constant-L 1-lap wrapped witness: `constL-wrap1` (16 HTM display-wrapped 10-edge / 14 HTM open 9-edge, 6 U/B preps, 7/10 steps pure L)
+    words_constL_wrap1 = ["L", "L", "B' U L", "L", "L", "U B2 L", "L", "L", "B' U' L", "L"]
+    write_witness(ev_dir, "constL-wrap1", words_constL_wrap1, dist)
+
+    # 5. Write exact bound summary table `bounds-summary.tsv`
     open(joinpath(ev_dir, "bounds-summary.tsv"), "w") do io
         println(io, "prep_budget\tstep_model\tmax_displays_reached\topen_9edge_paths\tdisplay_wrap_10edge_paths\texact_closed_10cycles")
         println(io, "0\tP* T (L/D/F only)\t9\t0\t0\t0")
@@ -164,6 +172,10 @@ function main()
         println(io, "2\tP* T (R/U/B prep)\t10\t1577116\t213962\t0")
         println(io, "3\tP* T (B-only prep)\t10\t-\t-\t20")
         println(io, "3\tP* T (R/U/B prep)\t10\t-\t-\t127")
+        println(io, "any\tP* L' (Always L' / Always D)\t9\t0\t0\t0")
+        println(io, "5\tP* L (Always L, <=2 preps/step)\t10\t>=1\t0\t0")
+        println(io, "6\tP* L (Always L, <=2 preps/step)\t10\t>=1\t>=1\t0")
+        println(io, "11\tP* L (Always L, <=2 preps/step)\t10\t>=1\t>=1\t>=1")
     end
     println("Wrote bounds-summary.tsv.")
 end
