@@ -35,6 +35,10 @@ import { CubeViewer, BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
 import { CounterController } from "./apps/counter/controller.ts";
 import { loadCounterDesign } from "./apps/counter/design.ts";
 import { parseValue, shifted } from "./counter.mjs";
+import {
+  leadingZeroLabel,
+  wrapFor,
+} from "./apps/counter/print-options.ts";
 const $ = (id) => document.getElementById(id);
 $("hsm-lettering").value = parseLettering(
   new URLSearchParams(location.search).get("lettering"),
@@ -71,9 +75,13 @@ let ready = false,
   certified;
 let padded = true;
 // The permanent Counter print: "titled" (default) or "blank-top". On the
-// blank-top print, Leading Zero selects the physical mode (LZ or NZ).
+// blank-top print, the Leading Zero checkbox (labeled "Leading zero mode
+// (physical)" there) selects the physical mode (LZ or NZ).
 let counterPrint = "titled",
   blankTop;
+// Wrap as the user set it in this page session, or null until they toggle it;
+// while null, Wrap follows the active print's default (on for blank-top).
+let wrapChoice = null;
 const isBlankTop = () => counterPrint === "blank-top";
 const modeName = (leadingZero) =>
   leadingZero ? "leading zero (LZ)" : "no leading zero (NZ)";
@@ -193,10 +201,11 @@ function controlsUi() {
   $("counter-print").disabled = !ready || !!view?.busy || run.running;
   $("mode-switch").hidden = !isBlankTop();
   text("setup-moves", String(view?.modeSwitch?.committed ?? 0));
+  text("format-label", leadingZeroLabel(counterPrint));
   text(
     "format-note",
     isBlankTop()
-      ? `On the blank-top print, Leading Zero selects the physical mode: on shows 00–09, off shows a blank tens sticker for 0–9. Switch at 0 (${blankTop.modeSwitch.length} setup moves) or at ${sharedRangeLabel(blankTop)} (no moves: both modes share the cube state there).`
+      ? `On the blank-top print, this checkbox selects the physical mode: on is LZ (shows 00–09), off is NZ (a blank tens sticker for 0–9). It is enabled only while the cube is idle: at 0 the switch plays ${blankTop.modeSwitch.length} setup moves, at ${sharedRangeLabel(blankTop)} it plays none (both modes share the cube state there), and elsewhere it is disabled.`
       : "Leading Zero shows or hides only the leading 0. The layout, value, and moves stay the same.",
   );
 
@@ -361,6 +370,9 @@ function formatUi() {
         },
   );
 }
+$("wrap").addEventListener("change", () => {
+  wrapChoice = $("wrap").checked;
+});
 $("format").addEventListener("change", () => {
   if (isBlankTop()) {
     void switchMode($("format").checked);
@@ -429,6 +441,7 @@ $("counter-print").addEventListener("change", async () => {
     // installed in its canonical state for the current value.
     await view.configure("COUNTER", route.padded, installed, route);
     counterPrint = requested;
+    $("wrap").checked = wrapFor(counterPrint, wrapChoice);
     padded = $("format").checked;
     value = installed;
     formatUi();
@@ -935,6 +948,7 @@ async function initialize() {
         error(`Blank-top print unavailable (${e.message}); showing the COUNTER title print.`);
       }
     $("counter-print").value = counterPrint;
+    $("wrap").checked = wrapFor(counterPrint, wrapChoice);
     const route = routeFor(counterPrint, $("format").checked);
     await view.configure("COUNTER", route.padded, value, route);
     formatUi();
