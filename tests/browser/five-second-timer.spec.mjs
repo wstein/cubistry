@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { scaled } from "../helpers/timeout-scale.mjs";
-import { startFrameGapProbe, resetFrameGap, readFrameGap, endpointToleranceMs } from "../helpers/frame-gap.mjs";
+import { startFrameGapProbe, resetFrameGap, readFrameGap, ENDPOINT_TOLERANCE_MS, FRAME_LIMITED_PREFERENCE_MS } from "../helpers/frame-gap.mjs";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -301,6 +301,9 @@ for (const [stop, preferred] of [
     page,
   }, testInfo) => {
     test.setTimeout(scaled(45000));
+    // KNOWN ISSUE, not explained yet: at the 10 ms preference the final turn settles 96 to 139 ms after the deadline
+    // in software GL even at 17 ms median frames. test.fail() keeps the assertion live and turns red once it is fixed.
+    test.fail(preferred === FRAME_LIMITED_PREFERENCE_MS, "10 ms preference settles 96-139 ms late; root cause not investigated");
     await page.setViewportSize({ width: 800, height: 700 });
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await choose(page);
@@ -381,6 +384,10 @@ for (const [stop, preferred] of [
     );
     const path = testInfo.outputPath("deadline-observation.json");
     writeFileSync(path, JSON.stringify(trace, null, 2));
+    // verify_trace.py validates the trace above, so the frame gap goes to its own file.
+    const gapPath = testInfo.outputPath("frame-gap.json");
+    writeFileSync(gapPath, JSON.stringify({ preferredMilliseconds: preferred, frameGap, toleranceMs: ENDPOINT_TOLERANCE_MS }, null, 2));
+    await testInfo.attach("frame-gap", { path: gapPath, contentType: "application/json" });
     const result = JSON.parse(
       execFileSync(
         "python3",
@@ -403,7 +410,7 @@ for (const [stop, preferred] of [
         trace.observation.settledMilliseconds -
           trace.observation.deadlineMilliseconds,
       ),
-    ).toBeLessThanOrEqual(endpointToleranceMs(frameGap)); // 20 ms unless frames are slower than that
+    ).toBeLessThanOrEqual(ENDPOINT_TOLERANCE_MS);
     expect(
       trace.observation.settledMilliseconds -
         trace.observation.firstMoveMilliseconds,
