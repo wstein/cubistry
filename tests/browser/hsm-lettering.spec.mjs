@@ -57,6 +57,8 @@ test("word print replaces large unit symbols and keeps the counter value", async
   await page.selectOption("#hsm-lettering", "words");
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
   await expect(page.locator("#hsm-letter option")).toHaveText(["hour", "min", "sec"]);
+  // The order and the saved values come from the markup, not from HSM_UNITS, so assert them on the real select.
+  expect(await page.locator("#hsm-letter option").evaluateAll((o) => o.map((e) => e.value))).toEqual(["H", "M", "S"]);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "33");
   await expect(page.locator("#rotation-speed")).toHaveValue("5");
   await expect(page.locator("#error")).toBeEmpty();
@@ -164,5 +166,7 @@ test("an invalid word asset leaves the existing fixed print and value usable", a
   await expect(page.locator("#error")).not.toHaveText("");
   await expect(page.locator("#hsm-lettering")).toHaveValue("symbols");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "33");
+  // A failed switch restores the symbol labels of the Unit select as well.
+  await expect(page.locator("#hsm-letter option")).toHaveText(["H", "M", "S"]);
   await expect(page.locator("#hsm-run")).toBeEnabled();
 });

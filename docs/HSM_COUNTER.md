@@ -331,7 +331,8 @@ print-sheet export is outside this change.
 Choose either a large H/M/S symbol or only the small word `hour`, `min`, or `sec`
 at the bottom of R1C2. They are separate fixed physical prints, never both on one
 sticker. The word variant replaces each entire unit image before setup; it is
-not a position-dependent overlay. Changing lettering in the single-cube counter
+not a position-dependent overlay. The Unit select follows the lettering (`hour`, `min`, `sec` for words; `H`, `M`, `S`
+for symbols) and keeps the order H, M, S with the values `H`, `M`, `S`. Changing lettering in the single-cube counter
 installs the selected print at the current value. Choosing a new unit retains
 the existing reset-to-zero behavior.
 
