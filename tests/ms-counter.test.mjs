@@ -8,6 +8,7 @@ import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import {
   validateMsDesign,
+  loadMsDesign,
   msTarget,
   MS_EDGE_LIMIT,
 } from "../src/apps/ms/design.ts";
@@ -626,5 +627,60 @@ test("every interrupted S3 step continues with the least HTM over all shared pos
               );
           }
         }
+  }
+});
+
+// ------------------------------------------------------ lap and integrity
+
+test("the lap readout follows S3's two seconds laps node by node", async () => {
+  const c = new MsController(view, s3, {}, "S", () => {}, assets);
+  await c.configure(0);
+  const seen = [];
+  // 120 steps up visit lap 1 (nodes 0..59), lap 2 (60..119), then lap 1.
+  for (let i = 0; i <= 120; i++) {
+    const expected = i % 120 < 60 ? 1 : 2;
+    assert.equal(c.node, i % 120);
+    assert.deepEqual(c.lap, { lap: expected, laps: 2 }, `node ${c.node}`);
+    seen.push(c.lap.lap);
+    if (i < 120) {
+      c.request((c.currentValue + 1) % 60);
+      await settled(c);
+    }
+  }
+  assert.deepEqual([seen[59], seen[60], seen[119], seen[120]], [1, 2, 2, 1]);
+  // Minutes have one lap: always lap 1 of 1.
+  const m = new MsController(view, s3, {}, "M", () => {}, assets);
+  await m.configure(59);
+  m.request(0);
+  await settled(m);
+  assert.deepEqual(m.lap, { lap: 1, laps: 1 });
+});
+
+test("loadMsDesign accepts the pinned bytes only", async () => {
+  const original = globalThis.fetch;
+  const serve = (bytes) => async () => new Response(bytes);
+  try {
+    globalThis.fetch = serve(runtimeBytes);
+    const loaded = await loadMsDesign("/", pin.runtimeSHA256);
+    assert.equal(loaded.print.label, "S3");
+    // A wrong pin, or one changed byte, is refused before parsing.
+    await assert.rejects(
+      loadMsDesign("/", "0".repeat(64)),
+      /M\/S print integrity mismatch/,
+    );
+    const changed = Buffer.from(runtimeBytes);
+    changed[changed.indexOf("R' B' R")] = "L".charCodeAt(0);
+    globalThis.fetch = serve(changed);
+    await assert.rejects(
+      loadMsDesign("/", pin.runtimeSHA256),
+      /M\/S print integrity mismatch/,
+    );
+    globalThis.fetch = async () => new Response("", { status: 404 });
+    await assert.rejects(
+      loadMsDesign("/", pin.runtimeSHA256),
+      /Unable to load M\/S print/,
+    );
+  } finally {
+    globalThis.fetch = original;
   }
 });
