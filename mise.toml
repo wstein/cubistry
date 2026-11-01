@@ -22,13 +22,19 @@ xh = "0.26"
 zoxide = "0.10"
 
 # Developer utilities, linting, and benchmarking (gh:wstein/bundledock)
+actionlint = "1.7"
+git-cliff = "2.14"
+gitleaks = "8.30"
+hadolint = "2.15"
 hyperfine = "2.0"
 just = "1.59"
+lychee = "0.24"
 ruff = "0.17"
 shellcheck = "0.11"
 shfmt = "3.14"
 typos = "1.51"
 uv = "0.13"
+watchexec = "2.8"
 
 [env]
 JULIA_NUM_THREADS = "auto"
