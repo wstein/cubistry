@@ -8,6 +8,18 @@ test.use({ timezoneId: "Europe/Berlin" });
 // The default 5 s expect timeout is therefore below the work being waited on. 15 s matches the other
 // planning waits in this file.
 const PLANNING_TIMEOUT = 15000;
+// Idle is not enough: an idle viewer can also be the state before the action started. Wait for idle
+// together with the front the action should have produced, so a lost action fails at the gate.
+const idleShowing = (page, what, accept) =>
+  until(
+    page,
+    `calendar idle (aria-busy false) and front ${what}`,
+    async () => ({
+      busy: await page.locator("#calendar-viewer").getAttribute("aria-busy", { timeout: 1000 }),
+      front: await page.locator("#calendar-front").textContent({ timeout: 1000 }),
+    }),
+    { accept: (v) => v.busy === "false" && accept(v.front), timeout: PLANNING_TIMEOUT },
+  );
 async function ready(page, time = "2026-01-03T11:00:00Z") {
   // Install the fake clock slightly in the past: pauseAt() rejects a target
   // that real time has already overtaken, which happens under CPU load.
@@ -81,6 +93,7 @@ test("German A shows a physical weekday/day/month and renders responsively", asy
 test("English 3 keeps the day adjacent and removes the zero with legal moves", async ({
   page,
 }) => {
+  test.setTimeout(60000); // two planning gates of up to 15 s plus setup
   await ready(page);
   await page.selectOption("#calendar-design", "en-3");
   await expect(page.locator("#calendar-design")).toBeEnabled();
@@ -115,9 +128,11 @@ test("English 3 keeps the day adjacent and removes the zero with legal moves", a
   // While the target is still loading, the previous physical pose stays idle.
   expect((await physical(page)).cells[7]).toBe("0");
   releaseTarget();
-  await ariaBusy(page, "#calendar-viewer", false, {
-    timeout: PLANNING_TIMEOUT,
-  });
+  await idleShowing(
+    page,
+    "SAT JAN 3",
+    (front) => front === "SAT · blank · blank · J · A · N · blank · blank · 3",
+  );
   // An idle viewer can precede the controller request for the loaded target,
   // so wait for the unpadded physical endpoint itself.
   await until(
@@ -146,11 +161,14 @@ test("English 3 keeps the day adjacent and removes the zero with legal moves", a
 test("live date crosses leap-day midnight and inspection validates Gregorian dates", async ({
   page,
 }) => {
+  test.setTimeout(45000); // one planning gate of up to 15 s plus setup
   await ready(page, "2024-02-28T22:59:59Z");
   await page.clock.runFor(1100);
-  await ariaBusy(page, "#calendar-viewer", false, {
-    timeout: PLANNING_TIMEOUT,
-  });
+  await idleShowing(
+    page,
+    "DO 29 FEB",
+    (front) => front === "D · O · blank · blank · 2 · 9 · F · E · B",
+  );
   expect((await physical(page)).cells).toEqual([
     "D",
     "O",
@@ -397,6 +415,7 @@ test.describe("high-density calendar framing", () => {
 test("English Saturday and both Sunday source stickers stay permanently red and extra-bold", async ({
   page,
 }) => {
+  test.setTimeout(90000); // four planning gates of up to 15 s plus setup
   await ready(page, "2026-11-07T11:00:00Z");
   await page.selectOption("#calendar-design", "en-3");
   await expect(page.locator("#calendar-design")).toBeEnabled();
@@ -409,9 +428,7 @@ test("English Saturday and both Sunday source stickers stay permanently red and 
   ]) {
     await page.fill("#calendar-date", iso);
     await page.locator("#calendar-date").dispatchEvent("change");
-    await ariaBusy(page, "#calendar-viewer", false, {
-      timeout: PLANNING_TIMEOUT,
-    });
+    await idleShowing(page, image, (front) => front.split(" · ")[0] === image);
     const actual = await page.evaluate(async () => {
       const { calendarApp } = await import("/src/calendar.mjs");
       const { front } = await import("/src/apps/calendar/model.ts");
@@ -459,6 +476,7 @@ test("English Saturday and both Sunday source stickers stay permanently red and 
 test("date picking starts legal motion immediately and day buttons preserve latest intent and counts", async ({
   page,
 }) => {
+  test.setTimeout(120000); // five planning gates of up to 15 s plus setup
   await ready(page, "2024-02-28T11:00:00Z");
   await page.evaluate(async () => {
     const { CalendarViewer } = await import("/src/apps/calendar/viewer.ts");
