@@ -1,0 +1,9 @@
+matrix	julia-exit=0	flix-exit=0	IDENTICAL
+adjacent-inventory	lead=blank,trail=blank,six=overflow	240	NOT_OBSTRUCTED	0	-
+adjacent-inventory	lead=blank,trail=blank,six=earlylate	294	OBSTRUCTED	8	(-3,-3) (-3,-1) (-3,1) (-2,-1) (-2,0) (-1,-1) (-1,0) (0,0)
+adjacent-inventory	lead=blank,trail=next,six=overflow	268	OBSTRUCTED	3	(-3,-3) (-3,-1) (-3,1)
+adjacent-inventory	lead=blank,trail=next,six=earlylate	322	OBSTRUCTED	10	(-3,-3) (-3,-1) (-3,0) (-3,1) (-3,2) (-2,-1) (-2,0) (-1,-1) (-1,0) (0,0)
+adjacent-incoherent	lead=prev,trail=blank,six=overflow	overflow marks need empty row-3 cells
+adjacent-inventory	lead=prev,trail=blank,six=earlylate	333	OBSTRUCTED	9	(-3,-3) (-3,-1) (-3,1) (-2,-1) (-2,0) (-2,1) (-1,-1) (-1,0) (0,0)
+adjacent-incoherent	lead=prev,trail=next,six=overflow	overflow marks need empty row-3 cells
+adjacent-inventory	lead=prev,trail=next,six=earlylate	361	OBSTRUCTED	11	(-3,-3) (-3,-1) (-3,0) (-3,1) (-3,2) (-2,-1) (-2,0) (-2,1) (-1,-1) (-1,0) (0,0)
