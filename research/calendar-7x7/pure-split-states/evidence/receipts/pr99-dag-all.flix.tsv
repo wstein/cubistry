@@ -1,0 +1,122 @@
+pure-print-change	4		blank	24/31	dark	new-up
+pure-print-change	25		blank	D	month	new-up
+pure-print-change	35		blank	26	dark	new-up
+pure-print-change	70	26	dark	C	month	new-up
+pure-print-change	74		blank	N	month	new-up
+pure-print-change	134		blank	T	month	new-up
+pure-print-change	135		blank	V	month	new-up
+pure-print-change	193	31↶	dark		blank	same-up
+pure-print-change	218	0	month	23/30	red	same-up
+pure-print-change	219	D	month	24/31	red	new-up
+pure-print-change	220	N	month		blank	same-up
+pure-print-change	224	30↶	red		blank	same-up
+pure-print-change	228	V	month	O	month	new-up
+pure-print-change	243	31↶	red		blank	same-up
+pure-print-change	261	T	month	E	month	same-up
+pure-print-change	278	C	month		blank	same-up
+pure-print-change	283	E	month		blank	same-up
+pure-print-orbit	-3	-3	19	3	19	5	0
+pure-print-orbit	-3	-2	15	2	15	9	0
+pure-print-orbit	-3	-1	21	2	21	3	0
+pure-print-orbit	-3	0	21	2	21	3	0
+pure-print-orbit	-3	1	20	2	20	4	0
+pure-print-orbit	-3	2	20	1	20	4	0
+pure-print-orbit	-2	-2	16	0	16	8	0
+pure-print-orbit	-2	-1	21	1	21	3	0
+pure-print-orbit	-2	0	20	0	20	4	0
+pure-print-orbit	-2	1	17	1	17	7	0
+pure-print-orbit	-1	-1	22	2	22	2	0
+pure-print-orbit	-1	0	22	1	22	2	0
+pure-print-orbit	0	0	6	0	6	0	0
+pure-target	1	2026	1	PASS	-	-	-	-	d212c31117e4ea5c6c77b70520578f14d97b55626048b28e8fc6e8e515084b7d
+pure-target	2	2026	2	FAIL	1,4	35	2	plain-mismatch	0fd6248d39eacc6ddbd3e834d7e458633bf802f6ec9c452fdfd4e523a76f5bde
+pure-target	3	2026	3	FAIL	1,4	35	2	plain-mismatch	dfb006fa45946286c6be88ef682dcccb9e5df169916b6a428fc46e6a783a132c
+pure-target	4	2026	4	PASS	-	-	-	-	2c542f40747ed679527bc457b1dbe64e1166fb227bce15bc396d4d3fffcd640e
+pure-target	5	2026	5	FAIL	7,1	16	0	plain-mismatch	014ac363f57aec04de7048191eab6de3cd30c2c54761012ef29e73ee5c51a585
+pure-target	6	2026	6	PASS	-	-	-	-	d54f1f67ad92ada9a234c9d620e3ee7e1380162c65abeca3848de516ce5c45c5
+pure-target	7	2026	7	PASS	-	-	-	-	5d8e1feec988fe1591f71a114894a959cdbf05629ba0f1b47d537b66d1d7ce31
+pure-target	8	2026	8	FAIL	7,1	15	0	plain-mismatch	862c7593591eb174d03b18c577280bad803047470499e219b496cd3937610675
+pure-target	9	2026	9	PASS	-	-	-	-	8d0c85dd6ab6f45288ca6ca243a89c3432e31359330e42509972bdc2680b2165
+pure-target	10	2026	10	FAIL	1,1	218	3	stacked-mismatch	1cf2af632eb9c5a92e47c2b64bd6b682c6f35aa09141cd10280fb318c45cdc16
+pure-target	11	2026	11	FAIL	1,2	85	3	plain-mismatch	ad030e302f94eceb6fc4987de0dd373ca4a1f3e6a758af190c6381cf12a05c59
+pure-target	12	2026	12	FAIL	1,1	219	3	stacked-mismatch	e1e5daae4e8bfa5e98c7566917d8c2023063dfd6c7fb9f1be9e8f0d20512edf3
+pure-target	13	2027	1	FAIL	7,1	16	0	plain-mismatch	5d5110eb3bb88ad548d6c83e0ab80af7885b4b8474f6c2905fdc146766416ab3
+pure-target	14	2027	2	PASS	-	-	-	-	373edd52341887a97e3586bfe527371edb32fcaebd1ad0523216c726219de27f
+pure-target	15	2027	3	PASS	-	-	-	-	02a4c0af992992f98efa590bf89e1cf536ca57774cf1ab034f7435f00fb18ff4
+pure-target	16	2027	4	PASS	-	-	-	-	8f3cdccffed7466b7414232f278b1fc8e771da4ee22d9bd26883ed4a02a0fc2d
+pure-target	17	2027	5	FAIL	7,1	15	0	plain-mismatch	05f9406af7791ba25a79db18d4345160b37975f9161130ef279c21bb7bc48073
+pure-target	18	2027	6	PASS	-	-	-	-	496507952b9657b82ccef37e9a63fec68eebda526013051fd83a326496865ed4
+pure-target	19	2027	7	PASS	-	-	-	-	b96c98dbc9a8a58f4cc9eabfc4a111ec97976fd7eb14c5086bd000fa19668190
+pure-target	20	2027	8	FAIL	1,4	35	2	plain-mismatch	707e6afae6caad3332a5c34e2c990dfd54e5135590ef154df418b8a310757948
+pure-target	21	2027	9	PASS	-	-	-	-	464491da48bdfc096a8a32700e95629dc496138441e0f077b1baa100039badd5
+pure-target	22	2027	10	FAIL	1,1	218	3	stacked-mismatch	a46420173d8fbc898e7110363bd8ba61456e4d6cd06d2289c0e2d87faa6a9306
+pure-target	23	2027	11	FAIL	1,2	85	3	plain-mismatch	b84f9374d5466c92700aa217a376ab66a24ba26c2ee7e30cedd0d7634c9be451
+pure-target	24	2027	12	FAIL	1,1	219	3	stacked-mismatch	f30b0011f483d3ae4fe83087fef1c693f5450b1437310ca7e8df37ecab554745
+pure-target	25	2028	1	FAIL	7,1	15	0	plain-mismatch	14e2dcdc0dc9f79678eb9887b292f3f449d6d81a55830c9045d3cae8c286673a
+pure-target	26	2028	2	FAIL	1,4	35	2	plain-mismatch	f1f362a013fa1bc525405cf8fb78e4556015679339f9715eb5c4ded850b42353
+pure-target	27	2028	3	PASS	-	-	-	-	9db4f6b333a36db4b90e535c917146fb5e42d4c7f57ec898773278085c4c6bd0
+pure-target	28	2028	4	FAIL	7,1	15	0	plain-mismatch	76fa19b6624d43ca51130dab1982c16e846b6cc5800d2b1011a730b36025620e
+pure-target	29	2028	5	PASS	-	-	-	-	70fb271cc438f475d604de80ea54335b2ef57732556b444bd0b54519e6dac857
+pure-target	30	2028	6	PASS	-	-	-	-	1cd4491bbe7100fa7c56ec84537b3b5ce795d1a5deda4c4758c93110b17612b8
+pure-target	31	2028	7	FAIL	7,1	15	0	plain-mismatch	8057cf9e4ad5096ba5a6e74b232f62a25a76a2131002c452536e5c587150e4eb
+pure-target	32	2028	8	PASS	-	-	-	-	2b6a76b52a0d990f2eac5993c1a976d626f41908084151a14748377218fc787b
+pure-target	33	2028	9	PASS	-	-	-	-	d076e8a106d12127fbe6725d716267e1d30949e93c5bbb63031017f5376d4d97
+pure-target	34	2028	10	FAIL	1,1	218	3	stacked-mismatch	c6d50bec6721e09a40997e29640ff236dbcfc8bc013d1690883ba3a7810de4ce
+pure-target	35	2028	11	FAIL	1,2	85	3	plain-mismatch	82f7f9c6c775159a8ed8fff2fb9efc664706655e5ced246836f9976954ac630c
+pure-target	36	2028	12	FAIL	1,1	219	3	stacked-mismatch	cee60cdf72fa0a74bba946c5e1064146e49149f24589d8876df3d63adc082053
+pure-target	37	2029	1	PASS	-	-	-	-	3f477e959a900ee820dd873ffed1aca6b85a44d9faf67823bedf976bd1fcb208
+pure-target	38	2029	2	PASS	-	-	-	-	49a2119629c958bcd0dcf92f4c2b38103a31016ae5d818ed543d8f3b94ce00a0
+pure-target	39	2029	3	PASS	-	-	-	-	ad5ca3552e2cb01dca0eddc1b8a31f1af7b03016633d6faf901dee3e1bfb0eda
+pure-target	40	2029	4	FAIL	1,4	35	2	plain-mismatch	1d5e4522755ff757cd0edaa9a7186df13d7baad6ad0275d7cb713cfb232c78f0
+pure-target	41	2029	5	PASS	-	-	-	-	5c895dd83f83118449574616d5bc25c2b4a16bc031a962d60e8e7aa8f1676457
+pure-target	42	2029	6	PASS	-	-	-	-	bf73c9590a9fb1b54ed92b11a52f45c695044e5efa8ebf600c2e99383779c7bb
+pure-target	43	2029	7	FAIL	1,4	35	2	plain-mismatch	ec531d60cf88f015ca124960249452be5fdfff7060b0f94650416a75406d8151
+pure-target	44	2029	8	PASS	-	-	-	-	07510e8c560c8f72c13868f49b6c9378c09f2e0e5bdd00209efe5fbc88cd8599
+pure-target	45	2029	9	FAIL	7,1	15	0	plain-mismatch	e0b02c5e4e00468f2af0ad62d89307fe00576ac7e35af193986382f444bb56e0
+pure-target	46	2029	10	FAIL	1,1	218	3	stacked-mismatch	db95fda11e33850db20923889dbd396bf838652163180ce7e3580d09dd58560f
+pure-target	47	2029	11	FAIL	1,2	85	3	plain-mismatch	20e94367513b75d18b9ecbbd118aa71158a9f05d62b9ebe4cce9bcb50db186c1
+pure-target	48	2029	12	FAIL	1,1	219	3	stacked-mismatch	3e427576bd7f87f895059fc3b14543a5612c3918478891722af615779311f889
+pure-target	49	2030	1	PASS	-	-	-	-	ff7fd592fa89c7771fb8d0c855c374be111e4ac2af696d7d27da86a761448e87
+pure-target	50	2030	2	PASS	-	-	-	-	2fa2551437635cad5d337c352a2be0b865729416d1b38703aa75cf5a58c24193
+pure-target	51	2030	3	FAIL	7,1	16	0	plain-mismatch	0d406234a37c7c094c134de4a5dc7c491f1a450be48b88bdb6b71fb51210a146
+pure-target	52	2030	4	PASS	-	-	-	-	f1e36e8f3a7940f61c10e5c5832964b0526d489648ccbcca026c44a4f758177a
+pure-target	53	2030	5	PASS	-	-	-	-	bbb96b17f666d352f7acb99352fe6b3a76acb28753d9fe5a8bd13c494cc3210a
+pure-target	54	2030	6	FAIL	7,1	15	0	plain-mismatch	7fbccefb83abdc3d9b33d47a9151f1ea948f1f22f313d08af60ceb593ff76ddb
+pure-target	55	2030	7	PASS	-	-	-	-	745ab387e373a0b24423f51cec6d9aed13aed06cb7c960cf101a6edeb67c5e7d
+pure-target	56	2030	8	PASS	-	-	-	-	a01f9a3b0483b2b74d60b9bbb9c96f96e4c9ded471a34dcd824c8c9fd88dc190
+pure-target	57	2030	9	FAIL	1,4	35	2	plain-mismatch	b60a3bb743e35f7ed6db435df7e29b23032f6eeafc09bbce3166604ce2990754
+pure-target	58	2030	10	FAIL	1,1	218	3	stacked-mismatch	65dd544fd34775ccc7f1f19f4ca35bbf73e8a64d02a7db0aef8a37bdd3d2050f
+pure-target	59	2030	11	FAIL	1,2	85	3	plain-mismatch	c9d4090796e502a2f9f573c37f64c05e07e298f06e061b68a67f497b8f74f542
+pure-target	60	2030	12	FAIL	1,1	219	3	stacked-mismatch	d67f5e32959cfd6e3ef592afd4072aa2e01499ad1d2fc4647038e0c6a9cf0039
+pure-target	61	2031	1	PASS	-	-	-	-	7567e688faa88cf5b36a3acc474815164bb8d307528e89980f04a1bcb6271b40
+pure-target	62	2031	2	FAIL	7,4	70	2	plain-mismatch	1cfbcf299164c04855cbf117506b42e0f171d95c7d5e2eda5b80067de41569b6
+pure-target	63	2031	3	FAIL	7,1	15	0	plain-mismatch	d1a884b6c24e3320129d86406e008d4faed47d3c3cee0bdf629d889a52c3b81e
+pure-target	64	2031	4	PASS	-	-	-	-	7c7b132abb1c31fcb192ce9287417875e929d28345346ca37173a85ea0609acf
+pure-target	65	2031	5	PASS	-	-	-	-	bd75f065d6ffaa5b9bce66ca4120d29a2fa26e9b743c48be2efd7b2786c7fdb4
+pure-target	66	2031	6	FAIL	1,4	35	2	plain-mismatch	46531e1bfddff13ef50e5c6e513bab2d6aae5a237e296f852b59ec13cd900916
+pure-target	67	2031	7	PASS	-	-	-	-	5d285a5fdf4217a8bebddb071821a6feb1dcecff60b7102e8a3f34db24c080c3
+pure-target	68	2031	8	FAIL	7,1	16	0	plain-mismatch	4389a0f04b1196e426b0516e93f8c9826354d81894a91ba8c3d49bbdb41110be
+pure-target	69	2031	9	PASS	-	-	-	-	254bd3e32e1c2d3c89c44769a44d870c946cb5852343d7c1b3a783b801f39eec
+pure-target	70	2031	10	FAIL	1,1	218	3	stacked-mismatch	3236d732ec95aa668a50fb24d3e32ef671a844dd8765c747229fd82a64293e03
+pure-target	71	2031	11	FAIL	1,2	85	3	plain-mismatch	329dfaf925689147c4a8b147cf4cdfa2273cff273a7eb71ead0b10e73e90fee4
+pure-target	72	2031	12	FAIL	1,1	219	3	stacked-mismatch	7b66b6b8717eb96db997ac41a3562877c2b439f648677a8aa0629545d7f2b968
+pure-target	73	2032	2	FAIL	1,4	35	2	plain-mismatch	8cbc2d04d2a4106599606c0b385bbfd28072c6825f58917a3db1fa7bbf2194d5
+pure-target	74	2033	2	FAIL	1,4	35	2	plain-mismatch	5fe8f965b627cbf1855a682eb726d5b370a697468369742d33b1f379d731e8b3
+pure-target	75	2033	3	PASS	-	-	-	-	71fd2ed2f3aad5025e29ddb1b8404c0ff514bd007f466e3cea7b298d3bc7aa2a
+pure-target	76	2033	4	PASS	-	-	-	-	e601348e7a6214749ec3718c184185ac1bf463aed97bc77233236bb6c27cb995
+pure-target	77	2033	5	FAIL	1,4	35	2	plain-mismatch	4ded9afc390238f7ae2442c90cad764f9dbaf21160289930917d384a626e5fa1
+pure-target	78	2033	6	PASS	-	-	-	-	7449d1b8d17fdc5b97df260453876c5925fe6ae98475684ce785c2de70736ca1
+pure-target	79	2033	7	FAIL	7,1	16	0	plain-mismatch	8c02b1cfcde624e43ba0b4bb3317bf07e61f6953be94648857554c391799b249
+pure-target	80	2033	8	PASS	-	-	-	-	ae811c765cdfdb9c9ee816e4e1a352f443f66e7b36fff1b4fbf90211a8efd61e
+pure-target	81	2033	9	PASS	-	-	-	-	f8e53dd2e72270f4d6b3e50e24653bab58c021be539bb0f34e36c471893c1bdb
+pure-target	82	2033	10	FAIL	1,1	218	3	stacked-mismatch	e91572de194518ea263f6cc29718494887f950d3b420772a1f27997190eb379e
+pure-target	83	2033	11	FAIL	1,2	85	3	plain-mismatch	acbbba0246b82432c62f55a16ba04ec61e1cd6e5682558e75b57c85ae11ffa0c
+pure-target	84	2033	12	FAIL	1,1	219	3	stacked-mismatch	51b1f5e2ee5482fd020ee118172d11930175b51d12f83f9c9d09d4e93829c0fe
+pure-target	85	2034	1	FAIL	1,4	35	2	plain-mismatch	3fc4cdce66bc6d1bad7d81362e973349c5b9b3e92c3ad6958a96ee3798e50a90
+pure-target	86	2034	2	FAIL	1,4	35	2	plain-mismatch	511381fa71147ee00cf0f66772bd4a161913e8dbd4ea37d471bb2e05671e6070
+pure-target	87	2036	2	PASS	-	-	-	-	688208a4c4b0e3dae86384e3b41bed313bc9c4ddbaec5a419ae202d5abdcb73b
+pure-target	88	2040	2	PASS	-	-	-	-	963d36620671c905036d3331cba73f97e93b1015aa7a51f658b7f565b8fa1f0d
+pure-target	89	2044	2	PASS	-	-	-	-	3db63cef8e5f94851bbaebb71a2ddcc550d0838d2ccaa567d0201a7263d2f735
+pure-target	90	2048	2	FAIL	7,4	70	2	plain-mismatch	71bda548c33026b86c1fb785afdbfa0870e58b8d3e12c268f394e29d899b9fd5
+pure-target	91	2052	2	PASS	-	-	-	-	19e67813c352129dbf593d2c0d29a426a7863113338a6a8e60d3c1d2e5da8630
+pure-summary	REJECT	42	49	0	240
