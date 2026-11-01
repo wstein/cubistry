@@ -39,11 +39,24 @@ export const inverseWord = (word) =>
     .reverse()
     .map((m) => (m.endsWith("'") ? m[0] : m.endsWith("2") ? m : m + "'"))
     .join(" ");
-const EDGE_LIMIT = 5;
+/**
+ * What one counter variant derives from its modes witness. The H/S/M default
+ * reproduces public/hsm-counter.v3.json byte for byte; `extended` adds the
+ * variant's letters, edge limit, label and per-period maximum (H/M counter).
+ */
+export const HSM_RUNTIME = {
+  witnessSchema: "cubistry.hsm-seconds-first-modes",
+  edgeLimit: 5,
+  modes: COUNTING_MODES,
+  letters: ["H", "S", "M"],
+  source: "data/hsm/seconds-first/modes/witness.json",
+  extended: false,
+};
 
-export function deriveRuntime(witness) {
+export function deriveRuntime(witness, profile = HSM_RUNTIME) {
+  const EDGE_LIMIT = profile.edgeLimit;
   if (
-    witness.schema !== "cubistry.hsm-seconds-first-modes" ||
+    witness.schema !== profile.witnessSchema ||
     witness.version !== 1 ||
     witness.edgeLimitHTM !== EDGE_LIMIT ||
     witness.printing?.length !== 24
@@ -78,7 +91,7 @@ export function deriveRuntime(witness) {
       throw Error(`Malformed witness period ${letter}/${maximum}/${direction}`);
     return mode;
   };
-  const periods = COUNTING_MODES.map(([letter, maximum, direction]) => {
+  const periods = profile.modes.map(([letter, maximum, direction]) => {
     const app = witness.appModes.find(
       (m) =>
         m.letter === letter &&
@@ -106,6 +119,7 @@ export function deriveRuntime(witness) {
       traversal: app.traversal,
       setup: source.setup,
       periodHTM: source.periodHTM,
+      ...(profile.extended ? { maximumHTM: source.maximumHTM } : {}),
       words,
     };
   });
@@ -115,8 +129,17 @@ export function deriveRuntime(witness) {
   return {
     schema: "cubistry.hsm-runtime",
     version: 4,
-    source: "data/hsm/seconds-first/modes/witness.json",
-    zeroWords: { H: zeroWords.H, S: zeroWords.S, M: zeroWords.M },
+    source: profile.source,
+    ...(profile.extended
+      ? {
+          label: witness.label,
+          letters: profile.letters,
+          edgeLimitHTM: EDGE_LIMIT,
+        }
+      : {}),
+    zeroWords: Object.fromEntries(
+      profile.letters.map((letter) => [letter, zeroWords[letter]]),
+    ),
     printing: witness.printing,
     periods,
   };

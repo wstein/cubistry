@@ -1,0 +1,1319 @@
+{
+  "schema": "cubistry.hm-counter-modes",
+  "version": 1,
+  "label": "m3-SH",
+  "source": {
+    "repository": "https://github.com/wstein/cubistry",
+    "branch": "research/hm-counter-3move",
+    "commit": "0df2f3a012749bb550bc34dd1bc4fa07dcde6817",
+    "path": "research/hm-counter-3move/evidence/witness-blank-m3-SH.tsv",
+    "sha256": "2f5412bab13821909fc76c981a17e58aaf65c99271bea706f0b5ef4cdb52e210"
+  },
+  "printCode": "H U3 U7 | T2 _ T0 | T3 _ T1 | T4 T5 _ | U9 H U5 | M U8 U0 | U6 M U2 | U4 U1 M",
+  "edgeLimitHTM": 4,
+  "receiptSHA256": "8279bafe76a5490351a8004742af8659f2013cb1937de8cef65c87659158de25",
+  "printing": [
+    {
+      "id": 0,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 1,
+      "image": "H",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 1,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 3,
+      "image": "3",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "cubie": 0,
+      "p": [
+        -1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 3,
+      "image": "7",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 2,
+      "image": "2",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 4,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 2,
+      "image": "",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 5,
+      "cubie": 1,
+      "p": [
+        -1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 2,
+      "image": "0",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 6,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 2,
+      "image": "3",
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 7,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 2,
+      "image": "",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 8,
+      "cubie": 2,
+      "p": [
+        -1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 2,
+      "image": "1",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 9,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        -1,
+        0,
+        0
+      ],
+      "slot": 2,
+      "image": "4",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 10,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 2,
+      "image": "5",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 11,
+      "cubie": 3,
+      "p": [
+        -1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 2,
+      "image": "",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 12,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 3,
+      "image": "9",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 13,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 1,
+      "image": "H",
+      "up": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 14,
+      "cubie": 4,
+      "p": [
+        1,
+        -1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 3,
+      "image": "5",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 15,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 1,
+      "image": "M",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 16,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        -1,
+        0
+      ],
+      "slot": 3,
+      "image": "8",
+      "up": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 17,
+      "cubie": 5,
+      "p": [
+        1,
+        -1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 3,
+      "image": "0",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "id": 18,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 3,
+      "image": "6",
+      "up": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 19,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 1,
+      "image": "M",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 20,
+      "cubie": 6,
+      "p": [
+        1,
+        1,
+        -1
+      ],
+      "n": [
+        0,
+        0,
+        -1
+      ],
+      "slot": 3,
+      "image": "2",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 21,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        1,
+        0,
+        0
+      ],
+      "slot": 3,
+      "image": "4",
+      "up": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 22,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        1,
+        0
+      ],
+      "slot": 3,
+      "image": "1",
+      "up": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 23,
+      "cubie": 7,
+      "p": [
+        1,
+        1,
+        1
+      ],
+      "n": [
+        0,
+        0,
+        1
+      ],
+      "slot": 1,
+      "image": "M",
+      "up": [
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "modes": [
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "setup": "",
+      "setupHTM": 0,
+      "preperiodEdges": 0,
+      "periodStart": 0,
+      "periodEdges": 60,
+      "laps": 1,
+      "periodHTM": 163,
+      "maximumHTM": 3,
+      "histogram": {
+        "1": 4,
+        "2": 9,
+        "3": 47
+      },
+      "steps": [
+        {
+          "from": 0,
+          "to": 1,
+          "word": "R' B",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 1,
+          "to": 2,
+          "word": "R'",
+          "htm": 1,
+          "lowerBound": 1
+        },
+        {
+          "from": 2,
+          "to": 3,
+          "word": "B' R B2",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "word": "U R' U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 4,
+          "to": 5,
+          "word": "R' B2 R'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 6,
+          "to": 7,
+          "word": "R' B2 R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 7,
+          "to": 8,
+          "word": "B' R' B'",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 8,
+          "to": 9,
+          "word": "R2 B2 R",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 9,
+          "to": 10,
+          "word": "L' B2 D",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 10,
+          "to": 11,
+          "word": "R' B",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 11,
+          "to": 12,
+          "word": "R2 U R",
+          "htm": 3,
+          "lowerBound": 1
+        },
+        {
+          "from": 12,
+          "to": 13,
+          "word": "B R",
+          "htm": 2,
+          "lowerBound": 2
+        },
+        {
+          "from": 13,
+          "to": 14,
+          "word": "U R2 U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 14,
+          "to": 15,
+          "word": "R' B R'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 15,
+          "to": 16,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 16,
+          "to": 17,
+          "word": "R' B' R2",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 17,
+          "to": 18,
+          "word": "R2 U R",
+          "htm": 3,
+          "lowerBound": 1
+        },
+        {
+          "from": 18,
+          "to": 19,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 19,
+          "to": 20,
+          "word": "B' L2 D",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 20,
+          "to": 21,
+          "word": "R' B",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 21,
+          "to": 22,
+          "word": "R'",
+          "htm": 1,
+          "lowerBound": 1
+        },
+        {
+          "from": 22,
+          "to": 23,
+          "word": "R2",
+          "htm": 1,
+          "lowerBound": 1
+        },
+        {
+          "from": 23,
+          "to": 24,
+          "word": "R B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 24,
+          "to": 25,
+          "word": "B R2",
+          "htm": 2,
+          "lowerBound": 2
+        },
+        {
+          "from": 25,
+          "to": 26,
+          "word": "R B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 26,
+          "to": 27,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 27,
+          "to": 28,
+          "word": "B' R' B'",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 28,
+          "to": 29,
+          "word": "R",
+          "htm": 1,
+          "lowerBound": 1
+        },
+        {
+          "from": 29,
+          "to": 30,
+          "word": "R2 D' L2",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 30,
+          "to": 31,
+          "word": "U R2 U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 31,
+          "to": 32,
+          "word": "R' B2 U2",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 32,
+          "to": 33,
+          "word": "B2 R B'",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 33,
+          "to": 34,
+          "word": "U R U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 34,
+          "to": 35,
+          "word": "R2 B2 R2",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 35,
+          "to": 36,
+          "word": "R2 U R2",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 36,
+          "to": 37,
+          "word": "R' B R'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 37,
+          "to": 38,
+          "word": "U R U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 38,
+          "to": 39,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 39,
+          "to": 40,
+          "word": "D' R L2",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 40,
+          "to": 41,
+          "word": "R' B",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 41,
+          "to": 42,
+          "word": "R' B2",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 42,
+          "to": 43,
+          "word": "R B'",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 43,
+          "to": 44,
+          "word": "U R' U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 44,
+          "to": 45,
+          "word": "R' B R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 45,
+          "to": 46,
+          "word": "R B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 46,
+          "to": 47,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 47,
+          "to": 48,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 48,
+          "to": 49,
+          "word": "U R' U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 49,
+          "to": 50,
+          "word": "D R' D2",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 50,
+          "to": 51,
+          "word": "B2 R2 U",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 51,
+          "to": 52,
+          "word": "U' R B2",
+          "htm": 3,
+          "lowerBound": 1
+        },
+        {
+          "from": 52,
+          "to": 53,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 53,
+          "to": 54,
+          "word": "R B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 54,
+          "to": 55,
+          "word": "B2 R2",
+          "htm": 2,
+          "lowerBound": 2
+        },
+        {
+          "from": 55,
+          "to": 56,
+          "word": "R B' R",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 56,
+          "to": 57,
+          "word": "R' B2 R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 57,
+          "to": 58,
+          "word": "F' U' F",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 58,
+          "to": 59,
+          "word": "R B2 R",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 59,
+          "to": 0,
+          "word": "B2 L' D",
+          "htm": 3,
+          "lowerBound": 3
+        }
+      ]
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "setup": "U' B2 U B",
+      "setupHTM": 4,
+      "preperiodEdges": 0,
+      "periodStart": 0,
+      "periodEdges": 24,
+      "laps": 1,
+      "periodHTM": 73,
+      "maximumHTM": 4,
+      "histogram": {
+        "1": 0,
+        "2": 4,
+        "3": 15,
+        "4": 5
+      },
+      "steps": [
+        {
+          "from": 0,
+          "to": 1,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 1,
+          "to": 2,
+          "word": "U R' U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 2,
+          "to": 3,
+          "word": "R' B' U",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "word": "R B'",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 4,
+          "to": 5,
+          "word": "U R U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "word": "R U' B' U",
+          "htm": 4,
+          "lowerBound": 3
+        },
+        {
+          "from": 6,
+          "to": 7,
+          "word": "U' R2 B'",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 7,
+          "to": 8,
+          "word": "U R' U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 8,
+          "to": 9,
+          "word": "B R'",
+          "htm": 2,
+          "lowerBound": 2
+        },
+        {
+          "from": 9,
+          "to": 10,
+          "word": "D' L B L2",
+          "htm": 4,
+          "lowerBound": 4
+        },
+        {
+          "from": 10,
+          "to": 11,
+          "word": "R' B R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 11,
+          "to": 12,
+          "word": "U R' U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 12,
+          "to": 13,
+          "word": "R' B'",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 13,
+          "to": 14,
+          "word": "R B",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 14,
+          "to": 15,
+          "word": "R' B2 R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 15,
+          "to": 16,
+          "word": "R' B R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 16,
+          "to": 17,
+          "word": "R B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 17,
+          "to": 18,
+          "word": "R' B R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 18,
+          "to": 19,
+          "word": "R2 U2 R U2",
+          "htm": 4,
+          "lowerBound": 3
+        },
+        {
+          "from": 19,
+          "to": 20,
+          "word": "R D' B",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 20,
+          "to": 21,
+          "word": "U B2 R' U'",
+          "htm": 4,
+          "lowerBound": 3
+        },
+        {
+          "from": 21,
+          "to": 22,
+          "word": "R B R2",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 22,
+          "to": 23,
+          "word": "F' U' F",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 23,
+          "to": 0,
+          "word": "R L2 B D",
+          "htm": 4,
+          "lowerBound": 3
+        }
+      ]
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "setup": "U' B2 U B",
+      "setupHTM": 4,
+      "preperiodEdges": 0,
+      "periodStart": 0,
+      "periodEdges": 12,
+      "laps": 1,
+      "periodHTM": 40,
+      "maximumHTM": 4,
+      "histogram": {
+        "1": 0,
+        "2": 1,
+        "3": 6,
+        "4": 5
+      },
+      "steps": [
+        {
+          "from": 0,
+          "to": 1,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 1,
+          "to": 2,
+          "word": "U R' U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 2,
+          "to": 3,
+          "word": "R' B' U",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "word": "U' R",
+          "htm": 2,
+          "lowerBound": 1
+        },
+        {
+          "from": 4,
+          "to": 5,
+          "word": "R U' B' U",
+          "htm": 4,
+          "lowerBound": 3
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "word": "R' B R' B2",
+          "htm": 4,
+          "lowerBound": 3
+        },
+        {
+          "from": 6,
+          "to": 7,
+          "word": "U R2 U'",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 7,
+          "to": 8,
+          "word": "R' B' R",
+          "htm": 3,
+          "lowerBound": 3
+        },
+        {
+          "from": 8,
+          "to": 9,
+          "word": "F2 L' F2",
+          "htm": 3,
+          "lowerBound": 2
+        },
+        {
+          "from": 9,
+          "to": 10,
+          "word": "L2 D L B",
+          "htm": 4,
+          "lowerBound": 3
+        },
+        {
+          "from": 10,
+          "to": 11,
+          "word": "R2 B2 R U2",
+          "htm": 4,
+          "lowerBound": 3
+        },
+        {
+          "from": 11,
+          "to": 0,
+          "word": "R D R' D",
+          "htm": 4,
+          "lowerBound": 4
+        }
+      ]
+    }
+  ],
+  "appModes": [
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodHTM": 163,
+      "periodEdges": 60,
+      "maximumHTM": 3
+    },
+    {
+      "letter": "M",
+      "maximum": 59,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodHTM": 163,
+      "periodEdges": 60,
+      "maximumHTM": 3
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodHTM": 73,
+      "periodEdges": 24,
+      "maximumHTM": 4
+    },
+    {
+      "letter": "H",
+      "maximum": 23,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodHTM": 73,
+      "periodEdges": 24,
+      "maximumHTM": 4
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": 1,
+      "sourceDirection": 1,
+      "traversal": "forward",
+      "periodHTM": 40,
+      "periodEdges": 12,
+      "maximumHTM": 4
+    },
+    {
+      "letter": "H",
+      "maximum": 11,
+      "direction": -1,
+      "sourceDirection": 1,
+      "traversal": "inverse",
+      "periodHTM": 40,
+      "periodEdges": 12,
+      "maximumHTM": 4
+    }
+  ]
+}
