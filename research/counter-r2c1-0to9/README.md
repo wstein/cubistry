@@ -110,6 +110,19 @@ What if we require **every single increment** $d \to d+1$ to end with the **exac
      - **Open `0..9` (`8×(P* L') + 1×D`):** **4 preparing moves (13 HTM)**: `L' | L' | L' | B2 L' | R U' L' | U' L' | L' | L' | D`
      - **1-Lap Wrapped `0..9->0` (`8×(P* L') + 2×D`):** **4 preparing moves (14 HTM, 7/10 steps have 0 preps)**: `L' | L' | L' | B2 L' | R U' L' | U' L' | L' | L' | D | D`
      - **Exact Full-State Closed 10-Cycle (`8×(P* L') + 2×D`):** **12 preparing moves (22 HTM, Period 1)**: `R2 U' L' | B' L' | U' L' | B' L' | B' L' | U' R2 L' | B2 L' | U' L' | B' U2 D | D`
+4. **What about `8×L + 2×D` (`D` on `5=>6` and `9=>0`, or `4=>5` and `9=>0`) and the `B`-Only (`No U, No R`) 3-`D` Threshold:**
+   - **If `U` is allowed (max 2 moves/inc, $\le 1$ prep/step, no `R`):**
+     - **`D` on `5=>6` and `9=>0` (`[LLLLLDLLLD]`):**
+       - 1-Lap Wrapped (`5 preps = 15 HTM`, max 2 moves/inc): `L | L | B2 L | L | B' L | U D | B L | B L | L | D`
+       - Exact Closed 10-Cycle (`8 preps = 18 HTM`, max 2 moves/inc, 100% quarter-turns): `B L | B L | U' L | B L | U L | U' D | B L | B L | L | D`
+     - **`D` on `4=>5` and `9=>0` (`[LLLLDLLLLD]`, symmetric `0..4` / `5..9`):**
+       - 1-Lap Wrapped (`3 preps = 13 HTM`, max 2 moves/inc, only **1 `U` move**): `L | L | B2 L | L | D | U L | L | B2 L | L | D`
+       - Exact Closed 10-Cycle (`4 preps = 14 HTM`, max 2 moves/inc): `U L | L | B2 L | L | U D | L | L | B2 L | L | D`
+   - **If `U` and `R` are NEVER rotated (`B`-only preps `B, B', B2`, max 2 moves/inc):**
+     - Because neither `L` nor `B` can replenish `UL = (-1, 1, 1)` from the top, **at most 3 consecutive `B* L` steps** can ever execute without a `D`-step! Consequently, in $\langle L, D, B \rangle$ (`no U, no R`), **`0, 1, or 2` `D`-steps (`10×L`, `9×L+1×D`, `8×L+2×D`) have 0 solutions (`UNSAT`)**, whereas **`3` `D`-steps (`7×L + 3×D`) is the exact tight minimum for wrapped `0..9->0`** and **`4` `D`-steps (`6×L + 4×D`) is the exact tight minimum for full-state closure**:
+       - **`7×L + 3×D` (`D` on `3=>4, 6=>7, 9=>0`, only 2 `B`-preps = 12 HTM, no `U`, no `R`):** `L | L | B2 L | D | L | L | B2 D | L | L | D`
+       - **`7×L + 3×D` (`D` on `2=>3, 5=>6, 9=>0`, 3 `B`-preps = 13 HTM, 100% clockwise `L, D, B` quarter-turns, no `U`, no `R`):** `L | B L | D | L | B L | D | L | B L | L | D`
+       - **`6×L + 4×D` Exact Closed 10-Cycle (`4 B-preps = 14 HTM`, 100% clockwise `L, D, B` quarter-turns, no `U`, no `R`):** `B D | B L | D | L | D | L | L | B L | B L | D`
 
 ---
 
