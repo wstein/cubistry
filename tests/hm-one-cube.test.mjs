@@ -343,6 +343,72 @@ test("free jumps from settled poses stay within the graph-radius cap", () => {
   assert.ok(worst <= HM_VARIANT.jumpBound);
 });
 
+// ------------------------------------------- step length after a free jump
+
+/**
+ * Replay: from the settled 00 pose, Set every value, then count on for one lap
+ * in `direction`. Returns the HTM of every counting step (not the Set).
+ */
+async function stepsAfterEverySet(letter, maximum, direction) {
+  const n = maximum + 1,
+    out = [];
+  for (let set = 0; set < n; set++) {
+    const c = new HsmController(view, design, {}, letter, () => {}, dispose);
+    c.setMode(maximum, direction);
+    await c.configure();
+    c.request(set);
+    await settled(c);
+    for (let i = 0; i < n; i++) {
+      const before = c.progress.sessionTotal;
+      c.request((c.currentValue + direction + n) % n);
+      await settled(c);
+      out.push({ set, cost: c.progress.sessionTotal - before });
+    }
+    c.dispose();
+  }
+  return out;
+}
+
+test("step length: period steps stay within 3 (M) or 4 (H); steps after a free jump can take 5", async () => {
+  const docText = readFileSync("docs/HM_ONE_CUBE_COUNTER.md", "utf8"),
+    help = /hsm-help"\)\.textContent = hm\s*\? "([^"]+)"/.exec(
+      readFileSync("src/main.mjs", "utf8"),
+    )?.[1];
+  assert.ok(help, "H/M help text found in src/main.mjs");
+  // Measured by replaying the controller (see the doc): [letter, maximum,
+  // direction, steps above 3, steps at 5, a Set value, its first three steps].
+  for (const [letter, maximum, direction, above3, at5, set, afterSet] of [
+    ["M", 59, 1, 252, 2, 20, [5, 4, 2]],
+    ["M", 59, -1, 254, 1, 12, [5, 4, 4]],
+    ["H", 23, -1, 195, 3, 2, [4, 5, 4]],
+  ]) {
+    const label = `${letter}/${maximum}/${direction}`,
+      steps = await stepsAfterEverySet(letter, maximum, direction),
+      costs = steps.map((s) => s.cost);
+    // Worst case after a jump is 5 HTM, never more (a replay, not a proof).
+    assert.equal(Math.max(...costs), 5, label);
+    assert.equal(costs.filter((c) => c > 3).length, above3, label);
+    assert.deepEqual(
+      steps.filter((s) => s.set === set).slice(0, 3).map((s) => s.cost),
+      afterSet,
+      label,
+    );
+    // "At most four" is false after a jump: a few steps cost exactly 5.
+    assert.equal(costs.filter((c) => c === 5).length, at5, label);
+  }
+  // The period itself keeps its limits: M at most 3, H at most 4.
+  assert.equal(period("M", 59, 1).maximumHTM, 3);
+  assert.equal(period("H", 23, 1).maximumHTM, 4);
+  assert.equal(period("H", 11, 1).maximumHTM, 4);
+  // Help text and doc tell the measured truth, not the period-only claim.
+  assert.match(help, /rarely five/);
+  assert.match(help, /first steps may cost more/);
+  assert.doesNotMatch(help, /Counting steps take at most four moves/);
+  assert.match(docText, /up to\s+\*\*5 HTM\*\*/);
+  assert.match(docText, /252/);
+  assert.match(docText, /254/);
+});
+
 // ------------------------------------------------------- negative controls
 
 test("negative controls: wrong variant, corrupted runtime and tampered witness are rejected", () => {
