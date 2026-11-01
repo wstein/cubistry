@@ -95,7 +95,8 @@ for (const [mode, lap] of [
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await chooseBlankTop(page);
-    await page.locator("#wrap").check();
+    // Wrap is on by default on this print, so 99 -> 00 uses the stored edge.
+    await expect(page.locator("#wrap")).toBeChecked();
     if (mode === "nz") {
       await page.locator("#format").uncheck();
       await settle(page, 0);
@@ -118,6 +119,59 @@ for (const [mode, lap] of [
     await settle(page, 99);
     expect(await words(page, offset)).toBe(routes[mode][99].decrement);
     expect(errors).toEqual([]);
+  });
+
+test("Wrap defaults on and the checkbox names the physical mode on the blank-top print only", async ({ page }) => {
+  const label = page.locator("#format-label");
+  await page.goto("/");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#wrap")).not.toBeChecked();
+  await expect(label).toHaveText("Leading Zero");
+  await page.locator("#counter-print").selectOption("blank-top");
+  await expect(page.locator("#status")).toContainText("Blank-top print");
+  await expect(page.locator("#wrap")).toBeChecked();
+  await expect(label).toHaveText("Leading zero mode (physical)");
+  await expect(page.locator("#format")).toHaveAccessibleName("Leading zero mode (physical)");
+  await expect(page.locator("#format-note")).toContainText("selects the physical mode");
+  await expect(page.locator("#format-note")).toContainText("only while the cube is idle");
+  await expect(page.locator("#format-note")).toContainText("at 0 the switch plays 6 setup moves");
+  await expect(page.locator("#format-note")).toContainText("at 31–99 it plays none");
+  // Wrap is session-only: a reload starts from the print default again.
+  await page.reload();
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#counter-print")).toHaveValue("blank-top");
+  await expect(page.locator("#wrap")).toBeChecked();
+  await expect(label).toHaveText("Leading zero mode (physical)");
+  await page.locator("#counter-print").selectOption("titled");
+  await expect(page.locator("#status")).toContainText("COUNTER title print installed");
+  await expect(page.locator("#wrap")).not.toBeChecked();
+  await expect(label).toHaveText("Leading Zero");
+  // An explicit Wrap choice survives later print changes in this session.
+  await page.locator("#wrap").check();
+  await page.locator("#counter-print").selectOption("blank-top");
+  await expect(page.locator("#status")).toContainText("Blank-top print");
+  await page.locator("#wrap").uncheck();
+  await page.locator("#counter-print").selectOption("titled");
+  await expect(page.locator("#status")).toContainText("COUNTER title print installed");
+  await expect(page.locator("#wrap")).not.toBeChecked();
+  await page.locator("#counter-print").selectOption("blank-top");
+  await expect(page.locator("#status")).toContainText("Blank-top print");
+  await expect(page.locator("#wrap")).not.toBeChecked();
+});
+
+// The longer label does not fit beside Wrap in the controls column, so the
+// options row wraps (flex-wrap) and the label sits on its own line below Wrap.
+for (const width of [1280, 390, 320])
+  test(`the relabeled checkbox fits without horizontal overflow at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await chooseBlankTop(page);
+    const wrap = await page.locator("#wrap").boundingBox();
+    const format = await page.locator("#format").boundingBox();
+    expect(format.y).toBeGreaterThan(wrap.y);
+    const options = await page.locator(".options").boundingBox();
+    const label = await page.locator("#format-label").boundingBox();
+    expect(label.x + label.width).toBeLessThanOrEqual(options.x + options.width + 0.5);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
   });
 
 test("Leading Zero switches the physical mode at 0 with 6 setup moves outside the session count", async ({ page }) => {
