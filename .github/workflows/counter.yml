@@ -5,6 +5,10 @@ on:
     types: [opened, reopened, synchronize, labeled]
   push:
     branches: [main]
+  # Nightly full run of the default branch: 01:00 UTC = 02:00 CET / 03:00 CEST.
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -15,6 +19,8 @@ concurrency:
 
 jobs:
   counter:
+    # The nightly run only repeats the browser suite; main pushes cover this job.
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -46,12 +52,14 @@ jobs:
           "$RUNNER_TEMP/print-venv/bin/pip" install -r scripts/print-requirements.txt
           PATH="$RUNNER_TEMP/print-venv/bin:$PATH" npm run test:print-exports
 
-  # The browser end-to-end suite is split into two groups of parallel shards. It
-  # runs on every push to main and on pull requests that carry the `e2e` label;
-  # each shard needs its own runner because the specs run in software-rendered
-  # Chromium. The `timing` group holds the specs that wait on real animation time
-  # or assert millisecond precision (see `timingSpecs` in playwright.config.mjs);
-  # it has a longer per-test limit, so a slow frame cannot fail the fast group.
+  # The browser end-to-end suite is split into two groups of parallel shards. The
+  # full six shards run on every push to main, nightly and on manual dispatch. A
+  # pull request that carries the `e2e` label runs only the `fast` group (the main
+  # scenario); the `timing` group waits on real animation time or asserts
+  # millisecond precision (see `timingSpecs` in playwright.config.mjs) and runs
+  # from main. Each shard needs its own runner because the specs run in
+  # software-rendered Chromium. The `timing` group has a longer per-test limit, so
+  # a slow frame cannot fail the fast group.
   e2e:
     name: e2e ${{ matrix.group }} (${{ matrix.shard }})
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
@@ -59,14 +67,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - { group: fast, shard: 1, of: 3 }
-          - { group: fast, shard: 2, of: 3 }
-          - { group: fast, shard: 3, of: 3 }
-          - { group: timing, shard: 1, of: 3 }
-          - { group: timing, shard: 2, of: 3 }
-          - { group: timing, shard: 3, of: 3 }
+      matrix: ${{ fromJSON(github.event_name == 'pull_request' && '{"include":[{"group":"fast","shard":1,"of":3},{"group":"fast","shard":2,"of":3},{"group":"fast","shard":3,"of":3}]}' || '{"include":[{"group":"fast","shard":1,"of":3},{"group":"fast","shard":2,"of":3},{"group":"fast","shard":3,"of":3},{"group":"timing","shard":1,"of":3},{"group":"timing","shard":2,"of":3},{"group":"timing","shard":3,"of":3}]}') }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
