@@ -301,9 +301,12 @@ for (const [stop, preferred] of [
     page,
   }, testInfo) => {
     test.setTimeout(scaled(45000));
-    // KNOWN ISSUE, not explained yet: at the 10 ms preference the final turn settles 96 to 139 ms after the deadline
-    // in software GL even at 17 ms median frames. test.fail() keeps the assertion live and turns red once it is fixed.
-    test.fail(preferred === LATE_FINAL_TURN_PREFERENCE_MS, "10 ms preference settles 96-139 ms late; root cause not investigated");
+    // KNOWN ISSUE at the 10 ms preference (cause not verified): the final turn settles 96 to 139 ms after the deadline in
+    // software GL, even at 17 ms median frames. Only that lateness is pinned below (`knownLate`); every other check stays
+    // strict. Unverified hypothesis: motion-timing.ts creates a deadline window only if endAt - at >= min(10, remaining),
+    // so a late final 10 ms move may fall back to frame-stepped motion. Once the lateness is gone, the pin fails: then
+    // delete `knownLate`.
+    const knownLate = preferred === LATE_FINAL_TURN_PREFERENCE_MS;
     await page.setViewportSize({ width: 800, height: 700 });
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await choose(page);
@@ -405,16 +408,23 @@ for (const [stop, preferred] of [
       epoch + 2500 - 50,
     );
     expect(trace.observation.deadlineMilliseconds).not.toBeNull();
-    expect(
-      Math.abs(
-        trace.observation.settledMilliseconds -
-          trace.observation.deadlineMilliseconds,
-      ),
-    ).toBeLessThanOrEqual(ENDPOINT_TOLERANCE_MS);
-    expect(
+    const lateness =
       trace.observation.settledMilliseconds -
-        trace.observation.firstMoveMilliseconds,
-    ).toBeLessThanOrEqual(2500);
+      trace.observation.deadlineMilliseconds;
+    if (knownLate) {
+      // Pins the known lateness only; the deadline itself must still leave the 2.5 s window.
+      expect(lateness).toBeGreaterThan(ENDPOINT_TOLERANCE_MS);
+      expect(
+        trace.observation.deadlineMilliseconds -
+          trace.observation.firstMoveMilliseconds,
+      ).toBeLessThanOrEqual(2500);
+    } else {
+      expect(Math.abs(lateness)).toBeLessThanOrEqual(ENDPOINT_TOLERANCE_MS);
+      expect(
+        trace.observation.settledMilliseconds -
+          trace.observation.firstMoveMilliseconds,
+      ).toBeLessThanOrEqual(2500);
+    }
     await expect(page.locator("#rotation-speed")).toHaveValue(stop);
     await expect(page.locator("#speed-label")).toHaveText(
       `${preferred === 2000 ? "2 s" : preferred + " ms"} preferred`,
