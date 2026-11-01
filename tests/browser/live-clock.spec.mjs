@@ -19,8 +19,11 @@ async function physical(page) {
     const { matchesTarget } = await import(
       "/packages/cube-mechanics/src/index.ts"
     );
-    const d = validateHsmDesign(
-      await (await fetch("/hsm-counter.v3.json")).json(),
+    // The live clock defaults to word lettering, which has its own print id.
+    const { hsmDesignFor } = await import("/src/apps/hsm/lettering.ts");
+    const d = hsmDesignFor(
+      validateHsmDesign(await (await fetch("/hsm-counter.v3.json")).json()),
+      "words",
     );
     return clockUnits.map((u, i) => ({
       value: u.controller.currentValue,
@@ -80,7 +83,7 @@ test("live H M S clock initializes from one local instant with real blanks and i
     renderers: true,
     cameras: true,
     groups: true,
-    bodies: [8, 8, 8],
+    bodies: [9, 9, 9], // eight cubies plus the static core ball
   });
   await page.clock.runFor(100);
   const canvas = page.locator("#clock-scene canvas"),
@@ -293,8 +296,10 @@ test("real animation ends all three midnight sequences at the shared live deadli
     const { matchesTarget } = await import(
       "/packages/cube-mechanics/src/index.ts"
     );
-    const design = validateHsmDesign(
-      await (await fetch("/hsm-counter.v3.json")).json(),
+    const { hsmDesignFor } = await import("/src/apps/hsm/lettering.ts");
+    const design = hsmDesignFor(
+      validateHsmDesign(await (await fetch("/hsm-counter.v3.json")).json()),
+      "words",
     );
     const endpoints = ["H", "M", "S"].map((unit) =>
       window.realClockEndpoints.filter((e) => e.unit === unit).at(-1),
@@ -489,7 +494,8 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
     clockStage.renderer.render = function (scene, camera) {
       for (const [viewer, record] of active) {
         const pivot = viewer.presentation.children.find(
-          (o) => ![...viewer.cube.bodies.values()].includes(o),
+          // The static core ball is also a scene child; it is never the turning pivot.
+          (o) => !o.userData.plasticCore && ![...viewer.cube.bodies.values()].includes(o),
         );
         if (pivot && record.firstMotion === null) {
           if (
