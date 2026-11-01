@@ -858,7 +858,7 @@ async function observeEndpoints(page) {
       const render = this.renderer.render, viewer = this;
       if (options[0]) this.renderer.render = function (...args) {
         const result = render.apply(this, args);
-        const pivot = viewer.presentation.children.find(o => ![...viewer.cube.bodies.values()].includes(o));
+        const pivot = viewer.presentation.children.find(o => !o.userData.plasticCore && ![...viewer.cube.bodies.values()].includes(o)); // the static core ball is not the pivot
         if (pivot) window.endpointAngles.push({ at: performance.now(),
           angle: Math.max(Math.abs(pivot.rotation.x), Math.abs(pivot.rotation.y), Math.abs(pivot.rotation.z)),
           fullAngle: Math.abs(p.move.turns) * Math.PI / 2 });
@@ -1049,7 +1049,7 @@ test("an active final turn without an interior hold cancels on Reset and a rate 
   const active=await page.evaluate(async()=>{
     const {stateEquals}=await import("/packages/cube-core/src/index.ts");
     const viewer=window.timerViewer,event=window.timerPresentation,bodies=new Set(viewer.cube.bodies.values());
-    const pivot=viewer.presentation.children.find(o=>!bodies.has(o));
+    const pivot=viewer.presentation.children.find(o=>!o.userData.plasticCore&&!bodies.has(o));
     return {busy:viewer.busy,fromMatches:stateEquals(viewer.presented,event.from),
       angle:pivot?Math.max(Math.abs(pivot.rotation.x),Math.abs(pivot.rotation.y),Math.abs(pivot.rotation.z)):null,
       fullAngle:Math.abs(event.move.turns)*Math.PI/2};

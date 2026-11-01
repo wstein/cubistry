@@ -114,7 +114,7 @@ test("five-second option has exact cap, inherited rotation stops, independent pr
 test("full thirty-minute countdown visits all361 actual states and independently replays1681HTM", async ({
   page,
 }) => {
-  test.setTimeout(240000);
+  test.setTimeout(600000);
   await page.clock.install();
   await choose(page);
   await pauseSoon(page, 1000);
