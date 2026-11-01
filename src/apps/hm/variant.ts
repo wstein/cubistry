@@ -8,7 +8,7 @@ import symbols from "../hsm/images.json" with { type: "json" };
 
 /**
  * The H/M counter: print m3-SH from research PR #133, hours and minutes only,
- * with a genuinely blank upper-left sticker. It runs on the H/S/M controller,
+ * with a genuinely blank upper-left sticker. It runs on the H/M/S controller,
  * planner, periods and recovery, parameterized by this variant.
  *
  * - Ranges: M 00–59; H 00–23 and 00–11 (the 12-hour cycle with its 11→00 step).
@@ -27,7 +27,7 @@ export const HM_VARIANT: HsmVariant = deepFreeze({
   runtimeFile: "hm-counter.v1.json",
   extended: true,
 });
-/** The large H and M symbols; the same artwork as the H/S/M counter. */
+/** The large H and M symbols; the same artwork as the H/M/S counter. */
 export const hmImages = symbols.filter((i) =>
   (HM_VARIANT.letters as readonly string[]).includes(i.id),
 );

@@ -17,7 +17,7 @@ import type { HsmPlanner } from "./planner.ts";
 
 /** Recovery steps may use any word up to this length; the counting limit. */
 export const RECOVERY_EDGE_LIMIT = 5;
-/** Longest free jump on the H/S/M print: its universal six-HTM bound. */
+/** Longest free jump on the H/M/S print: its universal six-HTM bound. */
 export const RECOVERY_JUMP_BOUND = 6;
 /** Longest search; the research recovery table needs at most seven steps. */
 export const RECOVERY_MAX_STEPS = 8;
