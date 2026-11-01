@@ -110,6 +110,17 @@ the H/M/S counter. Only the variant parameters differ (see
   arbitrary state the first steps may cost more. As in the H/M/S counter,
   these jumps use the application's exact four-corner planner, not the shared
   PuzlWerk solver.
+- **Step length after a free jump (measured).** On the period the limits 3
+  (minutes) and 4 (hours) hold. Off the period a counting step can take up to
+  **5 HTM**, as stated above. Replay of the controller: Set every value from the
+  settled 00 pose, then count one lap on. Minutes up: 252 of 3,600 steps cost
+  more than 3 HTM and 2 cost 5 (Set 20, then +1 costs 5). Minutes down: 254 and
+  1 (Set 12, then −1 costs 5). Hours 00–23 down: 195 of 576 steps cost more than
+  3 and 3 cost 5 (Set 2, then −1 costs 4 and the next −1 costs 5, so not only the
+  first step exceeds 4). From 00, hours 00–23 up and 00–11 stayed within 4; Sets
+  made after counting on, and random Set-and-count chains, reached 5 in every
+  mode. 5 is the largest value observed, not a proved bound. One step per second
+  is unaffected: the Run interval is 1000 ms.
 - **Free-jump bound.** For the H/M/S print, a jump from a settled pose is proved
   to need at most 6 HTM. **No such bound is established for m3-SH.** The
   application caps a jump at 7 HTM, the radius of the four-corner graph, which no
