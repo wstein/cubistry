@@ -1,0 +1,25 @@
+/* M/S Timer: the Live Clock stage row with two cards instead of three. */
+.ms-timer-page .clock-cubes {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.ms-timer-page .clock-workspace {
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+.ms-timer-page .timer-controls label {
+  display: block;
+  margin-top: 16px;
+}
+.ms-timer-page .timer-controls label:first-of-type {
+  margin-top: 0;
+}
+.ms-timer-page .timer-controls #status {
+  margin-top: 16px;
+}
+.ms-timer-page #timer-sync[data-state="synchronizing"] {
+  color: #855122;
+}
+@media (max-width: 900px) {
+  .ms-timer-page .clock-workspace {
+    grid-template-columns: 1fr;
+  }
+}
