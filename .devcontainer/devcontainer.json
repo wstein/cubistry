@@ -10,7 +10,8 @@
     "MISE_YES": "1",
     "MISE_TRUSTED_CONFIG_PATHS": "/workspaces",
     "JULIA_PKG_PRECOMPILE_AUTO": "0",
-    "FLIXW_HOME": "/home/vscode/.local/share/flixw"
+    "FLIXW_HOME": "/home/vscode/.local/share/flixw",
+    "FLIX_CACHE_HOME": "/home/vscode/.local/share/flixw"
   },
   "mounts": [
     "source=cubistry-mise-data,target=/home/vscode/.local/share/mise,type=volume",
