@@ -1,0 +1,29 @@
+receipts	IDENTICAL	c0f3a0a37d99659ee34aa93bebfca87301d065a19ab4fcaca67ff63d0f8073c0
+negative	glyph	julia	REJECTED	wrong glyph at cell 2 for M00 after setup
+negative	glyph	flix	REJECTED	wrong glyph at cell 2 for M00 after setup
+negative	up	julia	REJECTED	glyph not upright at cell 4 for M00 after setup
+negative	up	flix	REJECTED	glyph not upright at cell 4 for M00 after setup
+negative	nonblank-ul	julia	REJECTED	upper-left cell must show a blank sticker at M00 after setup
+negative	nonblank-ul	flix	REJECTED	upper-left cell must show a blank sticker at M00 after setup
+negative	hidden-glyph	julia	REJECTED	wrong glyph at cell 4 for M edge 7 (7->8)
+negative	hidden-glyph	flix	REJECTED	wrong glyph at cell 4 for M edge 7 (7->8)
+negative	move	julia	REJECTED	wrong glyph at cell 2 for M edge 5 (5->6)
+negative	move	flix	REJECTED	wrong glyph at cell 2 for M edge 5 (5->6)
+negative	lowerbound-high	julia	REJECTED	claimed lower bound differs for S edge 7 (7->8)
+negative	lowerbound-high	flix	REJECTED	claimed lower bound differs for S edge 7 (7->8)
+negative	lowerbound-low	julia	REJECTED	claimed lower bound differs for S edge 7 (7->8)
+negative	lowerbound-low	flix	REJECTED	claimed lower bound differs for S edge 7 (7->8)
+negative	claim	julia	REJECTED	claimed maximum edge HTM differs from replay
+negative	claim	flix	REJECTED	claimed maximum edge HTM differs from replay
+negative	truncated	julia	REJECTED	word shorter than graph distance for M edge 59 (59->0)
+negative	truncated	flix	REJECTED	word shorter than graph distance for M edge 59 (59->0)
+negative	period-double	julia	REJECTED	period boundary: M returns to the start state before the claimed period
+negative	period-double	flix	REJECTED	period boundary: M returns to the start state before the claimed period
+negative	integer-nonnumeric	julia	REJECTED	integer field
+negative	integer-nonnumeric	flix	REJECTED	integer field
+negative	integer-overflow	julia	REJECTED	integer field
+negative	integer-overflow	flix	REJECTED	integer field
+negative	glyph-alphabet	julia	REJECTED	glyph alphabet
+negative	glyph-alphabet	flix	REJECTED	glyph alphabet
+negative	period-short	julia	REJECTED	period boundary: S run does not return to the exact start state after the claimed period
+negative	period-short	flix	REJECTED	period boundary: S run does not return to the exact start state after the claimed period

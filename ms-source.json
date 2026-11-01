@@ -1,0 +1,24 @@
+{
+  "repository": "https://github.com/wstein/cubistry",
+  "pullRequest": 138,
+  "branch": "research/ms-counter-3move",
+  "runtimePath": "public/ms-counter.v1.json",
+  "commit": "ee88e5725be8e5e1acf554d924ae9a6d5da43de3",
+  "researchFiles": {
+    "research/ms-counter-3move/README.md": "b3ae80d2839af20fa67398a2d7e4c6ee1501bca5ac3d06987eebc95f0291f760",
+    "research/ms-counter-3move/evidence/witness-s3.tsv": "48a0e5d3dd8bc59f931fbe0e3c71ac019486ccf42b81d685658713f410821e42",
+    "research/ms-counter-3move/evidence/receipt-s3.julia.tsv": "c0f3a0a37d99659ee34aa93bebfca87301d065a19ab4fcaca67ff63d0f8073c0",
+    "research/ms-counter-3move/evidence/receipt-s3.flix.tsv": "c0f3a0a37d99659ee34aa93bebfca87301d065a19ab4fcaca67ff63d0f8073c0",
+    "research/ms-counter-3move/evidence/checks-s3.tsv": "450563594f8d0776cac4f3dc426b2c1e50024fda16d2a4aa0b3b5726f3730110",
+    "research/ms-counter-3move/checker/check.jl": "ceeb8bbdb451048e73f581e28ab759e0b465c21d507b751e1457e5e7c199a80a",
+    "research/ms-counter-3move/checker/run-checks.sh": "15537d29fbbc48ca8d7f47fd5569ff38b8f7ad49f8db062a2bf2bb72bf6d16cc",
+    "research/ms-counter-3move/flix/src/Main.flix": "de16268a8a40cd7255c2df7b8d77de2c4194c21fb454786e23e8ec06711c8198"
+  },
+  "copies": {
+    "research/ms-counter-3move/evidence/witness-s3.tsv": "data/ms/research/witness-s3.tsv",
+    "research/ms-counter-3move/evidence/receipt-s3.julia.tsv": "data/ms/research/receipt-s3.julia.tsv",
+    "research/ms-counter-3move/evidence/receipt-s3.flix.tsv": "data/ms/research/receipt-s3.flix.tsv",
+    "research/ms-counter-3move/evidence/checks-s3.tsv": "data/ms/research/checks-s3.tsv"
+  },
+  "runtimeSHA256": "aa4e30f6038de8c0c03b3fc10b84625a50ed386618a915d0a5960711bba71fbd"
+}
