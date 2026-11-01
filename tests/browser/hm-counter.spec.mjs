@@ -219,7 +219,7 @@ test("the H/S/M counter keeps its own controls after the H/M counter", async ({
 
 // A failed H/M load must leave the running H/S/M counter and its controls
 // exactly as they were: unit, range, lettering, heading and option lists.
-for (const [name, fulfil] of [
+for (const [name, respond] of [
   ["fetch failure", (route) => route.fulfill({ status: 404, body: "" })],
   [
     "hash mismatch",
@@ -243,7 +243,7 @@ for (const [name, fulfil] of [
     await page.selectOption("#hsm-letter", "S");
     await expect(page.locator("#status")).toContainText("S · 00");
     await page.selectOption("#hsm-range", "11");
-    await page.route("**/hm-counter.v1.json", fulfil);
+    await page.route("**/hm-counter.v1.json", respond);
     await page.selectOption("#application", "hm-counter");
     await expect(page.locator("#error")).not.toBeEmpty();
     await expect(page.locator("#application")).toHaveValue("hsm-counter");
