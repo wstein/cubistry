@@ -847,6 +847,119 @@ function search_B_only_L_D_patterns()
     end
 end
 
+function search_qtm_y_and_D_patterns()
+    pull_y  = apply_pull(MOVE_BY_NAME["U"].pull, MOVE_BY_NAME["D'"].pull)
+    pull_yp = apply_pull(MOVE_BY_NAME["U'"].pull, MOVE_BY_NAME["D"].pull)
+    pull_D  = MOVE_BY_NAME["D"].pull
+    pull_L  = MOVE_BY_NAME["L"].pull
+    pull_L2 = MOVE_BY_NAME["L2"].pull
+    pull_D2 = MOVE_BY_NAME["D2"].pull
+    pull_y2 = apply_pull(pull_y, pull_y)
+
+    qtm_B   = [MOVE_BY_NAME[m] for m in ["B", "B'"]]
+    qtm_noR = [MOVE_BY_NAME[m] for m in ["B", "B'", "U", "U'"]]
+    qtm_noU = [MOVE_BY_NAME[m] for m in ["B", "B'", "R", "R'"]]
+    qtm_all = [MOVE_BY_NAME[m] for m in ["B", "B'", "U", "U'", "R", "R'"]]
+
+    function make_qtm_cands(final_name::String, final_pull::NTuple{24,Int}, preps)
+        cands = Tuple{String, Int, NTuple{24,Int}}[]
+        push!(cands, (final_name, 0, final_pull))
+        for p in preps
+            push!(cands, (p.name * " " * final_name, 1, apply_pull(p.pull, final_pull)))
+        end
+        return cands
+    end
+
+    println("\n=======================================================")
+    println("Pure QTM (<= 1 QTM prep/step, NO half-turns allowed):")
+    println("  1) L | L | L | L | y'/y | L | L | L | L | y'/y")
+    println("  2) L | L | L | L | D    | L | L | L | L | y'/y")
+    println("  3) L | L | L | L | y'/y | L | L | L | L | D")
+    println("  4) L | L | L | L | D    | L | L | L | L | D")
+    println("=======================================================")
+
+    b0 = bit(HOME_STATE[IDX_UL]) | bit(HOME_STATE[IDX_UR]) | bit(HOME_STATE[IDX_LR])
+    l0 = bit(HOME_STATE[IDX_LL])
+    states = Vector{NTuple{24,Int}}(undef, 11)
+    states[1] = HOME_STATE
+    path10 = zeros(Int, 10)
+
+    for (prep_label, preps) in [
+        ("B-only QTM {B, B'} (no U, no R)", qtm_B),
+        ("No-U QTM {B, B', R, R'}", qtm_noU),
+        ("No-R QTM {B, B', U, U'}", qtm_noR),
+        ("All QTM {B, B', U, U', R, R'}", qtm_all)
+    ]
+        println("\n--- Prep set: $prep_label ---")
+        cands_L  = make_qtm_cands("L", pull_L, preps)
+        cands_D  = make_qtm_cands("D", pull_D, preps)
+        cands_y  = make_qtm_cands("y", pull_y, preps)
+        cands_yp = make_qtm_cands("y'", pull_yp, preps)
+        cands_yy = vcat(cands_yp, cands_y)
+        cands_bare_D  = [("D", 0, pull_D)]
+        cands_bare_yy = [("y'", 0, pull_yp), ("y", 0, pull_y)]
+
+        for (pat_label, c5, c10) in [
+            ("L|L|L|L|y'|L|L|L|L|y'",     cands_yp,      cands_yp),
+            ("L|L|L|L|y |L|L|L|L|y",      cands_y,       cands_y),
+            ("L|L|L|L|y'/y|L|L|L|L|y'/y", cands_yy,      cands_yy),
+            ("Bare y'/y on 5 & 10",       cands_bare_yy, cands_bare_yy),
+            ("L|L|L|L|D |L|L|L|L|y'",     cands_D,       cands_yp),
+            ("L|L|L|L|D |L|L|L|L|y",      cands_D,       cands_y),
+            ("Bare D on 5, bare y'/y on 10", cands_bare_D, cands_bare_yy),
+            ("L|L|L|L|y'/y|L|L|L|L|D",    cands_yy,      cands_D),
+            ("L|L|L|L|D |L|L|L|L|D",      cands_D,       cands_D)
+        ]
+            open_res = Tuple{Int,String}[]
+            wrap_res = Tuple{Int,String}[]
+            closed_res = Tuple{Int,String}[]
+
+            function dfs(d::Int, ll_m::UInt32, bl_m::UInt32, pr::Int)
+                if d == 10
+                    w9 = join([(k == 5 ? c5[path10[k]][1] : cands_L[path10[k]][1]) for k in 1:9], " | ")
+                    push!(open_res, (pr, w9))
+                    st = states[10]
+                    for (si, s) in enumerate(c10)
+                        nxt = apply_pull(st, s[3])
+                        if nxt[IDX_LL] == HOME_STATE[IDX_LL]
+                            b_new = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                            if (b_new & ll_m) == 0
+                                path10[10] = si
+                                w10 = join([(k == 5 ? c5[path10[k]][1] : k == 10 ? c10[path10[k]][1] : cands_L[path10[k]][1]) for k in 1:10], " | ")
+                                push!(wrap_res, (pr + s[2], w10))
+                                nxt == HOME_STATE && push!(closed_res, (pr + s[2], w10))
+                            end
+                        end
+                    end
+                    return
+                end
+                st = states[d]
+                cur = (d == 5) ? c5 : cands_L
+                for (si, s) in enumerate(cur)
+                    nxt = apply_pull(st, s[3])
+                    b_ll = bit(nxt[IDX_LL])
+                    (b_ll & (ll_m | bl_m)) != 0 && continue
+                    b_bl = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                    ll_m2 = ll_m | b_ll
+                    (b_bl & ll_m2) != 0 && continue
+                    states[d + 1] = nxt
+                    path10[d] = si
+                    dfs(d + 1, ll_m2, bl_m | b_bl, pr + s[2])
+                end
+            end
+            dfs(1, l0, b0, 0)
+            sort!(open_res, by = x -> (x[1], x[2]))
+            sort!(wrap_res, by = x -> (x[1], x[2]))
+            sort!(closed_res, by = x -> (x[1], x[2]))
+            println("  [$pat_label]: open=$(length(open_res))",
+                    isempty(open_res) ? "" : " (min=$(open_res[1][1]): $(open_res[1][2]))",
+                    " | wrap=$(length(wrap_res))",
+                    isempty(wrap_res) ? "" : " (min=$(wrap_res[1][1]): $(wrap_res[1][2]))",
+                    " | closed=$(length(closed_res))")
+        end
+    end
+end
+
 if abspath(PROGRAM_FILE) == @__FILE__
     verify_always_L_prime_impossibility()
     search_always_L()
@@ -854,4 +967,5 @@ if abspath(PROGRAM_FILE) == @__FILE__
     search_9L_1D()
     search_8L_2D_patterns()
     search_B_only_L_D_patterns()
+    search_qtm_y_and_D_patterns()
 end
