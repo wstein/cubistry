@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Counter</title>
-    <script type="module" crossorigin src="/cubistry/pr-preview/pr-148/assets/counter-C7lt2BgX.js"></script>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-148/assets/counter-DdJr84oB.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/link-DR-RiidG.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/three-BW9MzyAf.js">
@@ -14,13 +14,13 @@
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-CoVX5M-l.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/playback-DLkwvYj4.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-DSVg7RaF.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/lettering-CmfUKGU3.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/lettering-BUtD6Kp2.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/puzlwerk-2x2-CQ8zkYDZ.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/design-Dr6M1L9g.js">
     <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-148/assets/index-C8nvKQ4v.js">
     <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-148/assets/style-Dr7klpq2.css">
   </head>
-  <body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #148 — non-production preview · ccef8046f68e</aside>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #148 — non-production preview · 8ac1b90d4c61</aside>
     <main>
       <header>
         <a class="brand" href="./" aria-label="Cubistry counter home"
@@ -33,7 +33,7 @@
             <option value="status-cube">CI Quality Cube · Workflow monitor</option>
             <option value="calendar">Calendar · Deutsch / English</option>
             <option value="live-clock">Live H–M–S Clock</option>
-            <option value="hsm-counter">H/S/M Counter 00–59</option>
+            <option value="hsm-counter">H/M/S Counter 00–59</option>
             <option value="ms-counter">M/S Counter 00–59</option>
             <option value="certified" selected>Counter 0–99</option>
             <option value="timer">60-Minute Timer</option>
@@ -189,7 +189,8 @@
             <label class="check"
               ><input id="wrap" type="checkbox" /> Wrap 99 ↔ 0</label
             ><label class="check"
-              ><input id="format" type="checkbox" checked /> Leading Zero</label
+              ><input id="format" type="checkbox" checked />
+              <span id="format-label">Leading Zero</span></label
             >
           </div>
           <p id="format-note" class="small">
@@ -207,14 +208,14 @@
           aria-label="HSM counter controls"
           hidden
         >
-          <h1>H/S/M Counter</h1>
+          <h1>H/M/S Counter</h1>
           <label for="hsm-lettering">Sticker lettering</label>
           <select id="hsm-lettering"><option value="symbols">Large H / M / S</option><option value="words">Small hour / min / sec</option></select>
           <label for="hsm-letter">Unit</label>
           <select id="hsm-letter">
-            <option>H</option>
-            <option>S</option>
-            <option>M</option>
+            <option value="H">H</option>
+            <option value="M">M</option>
+            <option value="S">S</option>
           </select>
           <label for="hsm-range">Count range</label>
           <select id="hsm-range">
