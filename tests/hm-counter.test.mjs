@@ -85,7 +85,7 @@ const sum = (a) => a.reduce((x, y) => x + y, 0);
 // ------------------------------------------------------------ data and pins
 
 test("pins, research copies, converted witness and runtime are current", () => {
-  assert.equal(pin.commit, "0df2f3a012749bb550bc34dd1bc4fa07dcde6817");
+  assert.equal(pin.commit, "44ca982d9e15dc28c62ba105f47f62a26cf8d261");
   assert.equal(pin.branch, "research/hm-counter-3move");
   assert.equal(pin.print, "m3-SH");
   check(pin);
