@@ -22,7 +22,7 @@ test("inactive publisher cannot coalesce away a pending legacy production deploy
   assert.match(builder, /    concurrency:\n      group: counter-pages-publish/);
   assert.match(
     builder,
-    /cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' \}\}/,
+    /cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' && \(github\.event\.action != 'labeled' \|\| github\.event\.label\.name == 'preview'\) \}\}/,
   );
   const groups = new Map();
   const submit = (id, group) => {
@@ -141,4 +141,18 @@ test("stacked-PR closure signals fixed main context without PR execution or a di
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+test("pull request builds start only for the preview label and other labels cannot cancel them", () => {
+  const builder = readFileSync(
+    new URL("../.github/workflows/pages.yml", import.meta.url),
+    "utf8",
+  );
+  const condition = builder
+    .split("  build:\n")[1]
+    .match(/    if: >-\n((?:      .*\n)+)/)[1]
+    .replace(/\s+/g, " ")
+    .trim();
+  assert.match(condition, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'preview'\)/);
+  assert.match(condition, /github\.event\.action != 'labeled' \|\| github\.event\.label\.name == 'preview'/);
+  assert.match(condition, /^github\.ref == 'refs\/heads\/main' \|\|/);
 });
