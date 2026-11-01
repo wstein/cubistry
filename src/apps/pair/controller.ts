@@ -1,4 +1,6 @@
 import { demand } from "@cubistry/cube-core";
+import { ENDPOINT_TOLERANCE_MS } from "../timer/scheduler.ts";
+import { carryStep, planCarryBudget, type CarryBudget } from "./carry.ts";
 
 /**
  * One cube of a pair, as far as the pair needs it. `MsController` satisfies
@@ -24,7 +26,46 @@ export interface PairUnit {
    * units that walk one period both ways (M/S) omit it.
    */
   setDirection?(direction: 1 | -1): void;
+  /**
+   * Optional: the moves the unit would play to reach `value` from its settled
+   * pose, without playing them. Needed only for timed steps (`PairTiming`),
+   * which plan each cube's budget from its word. `MsController` and
+   * `HsmController` (through `hsmPairUnit`) provide it.
+   */
+  prepare?(value: number): readonly unknown[];
 }
+
+/** Deadline of one step, for a caller with wall-clock boundaries (a timer). */
+export interface PairTiming {
+  /** Time (on the pair's `now` clock) by which both cubes must show the target. */
+  readonly deadline: number;
+  /** Step interval for the scheduler budget (1000 ms for one-second steps at 1x). */
+  readonly interval: number;
+  /** Preferred duration per HTM move. */
+  readonly preferred: number;
+}
+/** A timed step as planned: the owner applies each cube's `budget` duration. */
+export interface PairTimedStep {
+  readonly from: number;
+  readonly to: number;
+  readonly carry: boolean;
+  readonly timing: PairTiming;
+  /** Planned HTM per cube (major null without a carry); null when the step was issued while the pair still moved. */
+  readonly moves: { readonly minor: number; readonly major: number | null } | null;
+  readonly budget: CarryBudget | null;
+}
+/**
+ * A timed step the display could not do in time. Never silent: each is
+ * reported, and the cubes still finish their routes.
+ * - `budget-infeasible`: the planned words do not fit the step budget.
+ * - `late`: both cubes settled after the deadline plus the 20 ms endpoint tolerance.
+ * - `missed`: the next timed step arrived while the pair still moved (the
+ *   in-flight timed step, if any, is named); the new target replaces it.
+ */
+export type PairReport =
+  | { readonly kind: "budget-infeasible"; readonly step: PairTimedStep }
+  | { readonly kind: "late"; readonly step: PairTimedStep; readonly settledAt: number }
+  | { readonly kind: "missed"; readonly step: PairTimedStep | null; readonly at: number };
 
 /** The state callback every single-cube controller takes as its constructor argument. */
 export type UnitStateHandler = (
@@ -56,6 +97,10 @@ export interface PairOptions<Minor extends PairUnit, Major extends PairUnit> {
   readonly createMajor: UnitFactory<Major>;
   /** Called on every change of the pair state. */
   readonly onState?: (state: PairState) => void;
+  /** Clock for timed steps (default `performance.now`). */
+  readonly now?: () => number;
+  /** Called for every report of a timed step. */
+  readonly onReport?: (report: PairReport) => void;
 }
 
 /**
@@ -85,6 +130,11 @@ export class PairController<
   private configuring = false;
   private configured = false;
   private waiters: (() => void)[] = [];
+  private readonly now: () => number;
+  private readonly onReport: ((report: PairReport) => void) | undefined;
+  /** The timed step in flight, checked against its deadline when both cubes settle. */
+  private clocked: PairTimedStep | null = null;
+  private latest: PairTimedStep | null = null;
 
   constructor(options: PairOptions<Minor, Major>) {
     const { minorModulus, majorModulus } = options;
@@ -99,6 +149,8 @@ export class PairController<
     this.majorModulus = majorModulus;
     this.size = minorModulus * majorModulus;
     this.onState = options.onState;
+    this.now = options.now ?? (() => performance.now());
+    this.onReport = options.onReport;
     this.minor = options.createMinor(this.handler);
     this.major = options.createMajor(this.handler);
   }
@@ -120,6 +172,13 @@ export class PairController<
   /** First failure of a unit since the last `configure`, if any. */
   get error(): Error | undefined {
     return this.failure;
+  }
+  /**
+   * The latest timed step as planned (kept after it settles), so the owner can
+   * apply each cube's budget; null before the first timed step.
+   */
+  get lastTimedStep(): PairTimedStep | null {
+    return this.latest;
   }
   /** Counting direction of the latest step (+1 until a step goes down). */
   get direction(): 1 | -1 {
@@ -159,12 +218,63 @@ export class PairController<
    * Move the pending target by one and carry. Relative to the pending target,
    * so two calls in a row count twice. Resolves when the pair is idle, that is
    * when both cubes have settled on the latest target.
+   *
+   * With `timing` (a timer boundary) the step is planned first: each cube's
+   * word comes from its `prepare` and gets its own budget (`planCarryBudget`).
+   * An infeasible budget, a late settle and a step issued while the pair still
+   * moves are reported through `onReport`. Invalid timing, or units without
+   * `prepare`, throw before any state change; a `prepare` that throws is a unit
+   * failure (recorded in `error`, nothing requested, the target unchanged).
    */
-  step(direction: 1 | -1): Promise<void> {
+  step(direction: 1 | -1, timing: PairTiming | null = null): Promise<void> {
     demand(direction === 1 || direction === -1, "Invalid pair direction");
     this.ready();
+    if (timing) {
+      demand(
+        Number.isFinite(timing.deadline) &&
+          Number.isFinite(timing.interval) &&
+          timing.interval > 0 &&
+          Number.isFinite(timing.preferred) &&
+          timing.preferred > 0,
+        "Invalid pair timing",
+      );
+      demand(
+        typeof this.minor.prepare === "function" &&
+          typeof this.major.prepare === "function",
+        "Timed steps need units that can prepare",
+      );
+    }
+    const s = carryStep(this, this.pending, direction);
+    if (!timing) {
+      this.direct(direction);
+      return this.go(s.to);
+    }
+    const from = this.pending,
+      moving = this.busy;
+    if (moving) this.report({ kind: "missed", step: this.clocked, at: this.now() });
     this.direct(direction);
-    return this.go((this.pending + direction + this.size) % this.size);
+    let moves: PairTimedStep["moves"] = null,
+      budget: CarryBudget | null = null;
+    if (!moving) {
+      try {
+        moves = {
+          minor: this.minor.prepare!(s.minor).length,
+          major: s.carry ? this.major.prepare!(s.major).length : null,
+        };
+        budget = planCarryBudget(moves, timing.preferred, timing.interval, timing.deadline - this.now());
+      } catch (e) {
+        // A unit cannot plan: report it like a refused request, request nothing.
+        this.failure ??= e instanceof Error ? e : Error(String(e));
+        this.publish();
+        return Promise.resolve();
+      }
+    }
+    const step: PairTimedStep = Object.freeze({ from, to: s.to, carry: s.carry, timing, moves, budget });
+    this.clocked = this.latest = step;
+    if (budget && !budget.feasible) this.report({ kind: "budget-infeasible", step });
+    // A rolled-back step has no deadline left to miss: `release` reports late
+    // only while the target is still this step's.
+    return this.go(s.to);
   }
 
   /** Walk both cubes to `value`; the same settle and retarget rules as `step`. */
@@ -268,9 +378,20 @@ export class PairController<
     });
   }
 
+  private report(report: PairReport): void {
+    this.onReport?.(report);
+  }
+
   /** Resolve the waiting calls once both cubes are idle (or one has failed). */
   private release(): void {
     if (this.configuring || this.minor.busy || this.major.busy) return;
+    const clocked = this.clocked;
+    this.clocked = null;
+    if (clocked && clocked.to === this.pending && !this.failure) {
+      const at = this.now();
+      if (at > clocked.timing.deadline + ENDPOINT_TOLERANCE_MS)
+        this.report({ kind: "late", step: clocked, settledAt: at });
+    }
     const waiting = this.waiters;
     this.waiters = [];
     for (const resolve of waiting) resolve();
