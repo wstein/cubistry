@@ -8,9 +8,10 @@ export interface HsmPairUnit extends PairUnit {
 
 /**
  * Adapter: an `HsmController` counting 0..`range` (23 for hours, 59 for
- * minutes). The only thing it adds is `setDirection`, which selects the saved
- * period of the counting direction through the controller's own `setMode`; it
- * changes no behavior of the controller.
+ * minutes). It adds `setDirection`, which selects the saved
+ * period of the counting direction through the controller's own `setMode`,
+ * and passes `prepare` through for timed steps; it changes no behavior of the
+ * controller.
  */
 export const hsmPairUnit = (
   controller: HsmController,
@@ -27,6 +28,7 @@ export const hsmPairUnit = (
     },
     configure: (value) => controller.configure(value),
     request: (value) => controller.request(value),
+    prepare: (value) => controller.prepare(value),
     dispose: () => controller.dispose(),
     setDirection: (direction) => controller.setMode(range, direction),
   };
