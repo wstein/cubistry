@@ -7,6 +7,8 @@ import { MsController } from "./apps/ms/controller.ts";
 import { loadMsDesign } from "./apps/ms/design.ts";
 import msPin from "../ms-source.json";
 import hsmSymbols from "./apps/hsm/images.json";
+import { HM_VARIANT, hmImages, loadHmDesign } from "./apps/hm/variant.ts";
+import hmPin from "../hm-source.json";
 import {
   hsmImagesFor,
   hsmDesignFor,
@@ -50,7 +52,10 @@ $("hsm-lettering").value = parseLettering(
 );
 // The Unit select follows the sticker lettering: H / M / S or hour / min / sec.
 const syncHsmUnitLabels = () => {
-  const lettering = parseLettering($("hsm-lettering").value);
+  // The H/M counter (lettering choice hidden) has the large symbols only.
+  const lettering = $("hsm-lettering").hidden
+    ? "symbols"
+    : parseLettering($("hsm-lettering").value);
   for (const option of $("hsm-letter").options)
     option.textContent = hsmUnitLabel(option.value, lettering);
 };
@@ -109,10 +114,15 @@ function pendingSwitch() {
   );
 }
 let hsmDesign,
+  hmDesign,
   hsmRunning = false,
   hsmNextAt = 0,
   rememberedCounterValue = 0;
-const isHsm = () => application === "hsm-counter";
+// The H/M counter is a second variant of the H/M/S counter: same controls,
+// controller, planner and periods, with its own print and letters.
+const isHsm = () =>
+  application === "hsm-counter" || application === "hm-counter";
+const isHm = () => application === "hm-counter";
 // The M/S counter (research PR #138) walks the saved period of one print.
 let msDesign,
   msRunning = false,
@@ -743,15 +753,13 @@ $("application").addEventListener("change", async () => {
     };
     const resolveAssets = (manifest, prints, signal) =>
       loadAssets(manifest, prints, signal, import.meta.env.BASE_URL);
-    if (requested === "hsm-counter") {
-      hsmDesign ??= await loadHsmDesign(
-        import.meta.env.BASE_URL,
-        hsmPin.runtimeSHA256,
-      );
+    if (requested === "hsm-counter" || requested === "hm-counter") {
+      const hm = requested === "hm-counter";
+      hsmVariantUi(hm);
       candidate = new HsmController(
         viewer,
-        hsmDesignFor(hsmDesign, parseLettering($("hsm-lettering").value)),
-        hsmAssets(),
+        await hsmVariantDesign(hm),
+        hsmAssets(hm),
         $("hsm-letter").value,
         callback,
         resolveAssets,
@@ -830,11 +838,65 @@ $("application").addEventListener("change", async () => {
     candidate?.dispose();
     ready = true;
     $("application").value = application;
+    if (isHsm()) hsmVariantUi(isHm());
     error(e.message);
   }
   controlsUi();
 });
-function hsmAssets() {
+const hsmMarkup = {
+  letter: $("hsm-letter").innerHTML,
+  range: $("hsm-range").innerHTML,
+  help: $("hsm-help").textContent,
+};
+const rangeLabels = { 59: "00–59", 23: "00–23", 11: "00–11" };
+/** The H/M print offers M 00–59 and H 00–23 / 00–11 only. */
+function hmRangeUi() {
+  const ranges = HM_VARIANT.ranges[$("hsm-letter").value],
+    keep = Number($("hsm-range").value);
+  $("hsm-range").innerHTML = ranges
+    .map((r) => `<option value="${r}">${rangeLabels[r]}</option>`)
+    .join("");
+  $("hsm-range").value = String(ranges.includes(keep) ? keep : ranges[0]);
+}
+/** Adapt the shared controls to the H/M/S (default) or the H/M variant. */
+function hsmVariantUi(hm) {
+  const letter = $("hsm-letter").value,
+    range = $("hsm-range").value;
+  $("hsm-heading").textContent = hm ? "H/M Counter" : "H/M/S Counter";
+  $("hsm-controls").setAttribute(
+    "aria-label",
+    hm ? "H/M counter controls" : "HSM counter controls",
+  );
+  $("hsm-lettering").hidden = $("hsm-lettering-label").hidden = hm;
+  $("hsm-letter").innerHTML = hm
+    ? HM_VARIANT.letters
+        .map((l) => `<option value="${l}">${l}</option>`)
+        .join("")
+    : hsmMarkup.letter;
+  $("hsm-letter").value = hm && !HM_VARIANT.letters.includes(letter) ? "H" : letter;
+  if (hm) hmRangeUi();
+  else {
+    $("hsm-range").innerHTML = hsmMarkup.range;
+    $("hsm-range").value = range;
+  }
+  $("hsm-help").textContent = hm
+    ? "Counts one step per second, wrapping through 00. Upper-left stays blank. Counting steps take at most four moves (minutes at most three); a free jump (Set, Reset) takes at most seven. A new target replaces old work after the current turn. Changing the unit sets up a fresh 00 display."
+    : hsmMarkup.help;
+  syncHsmUnitLabels();
+}
+async function hsmVariantDesign(hm) {
+  if (hm)
+    return (hmDesign ??= await loadHmDesign(
+      import.meta.env.BASE_URL,
+      hmPin.runtimeSHA256,
+    ));
+  hsmDesign ??= await loadHsmDesign(
+    import.meta.env.BASE_URL,
+    hsmPin.runtimeSHA256,
+  );
+  return hsmDesignFor(hsmDesign, parseLettering($("hsm-lettering").value));
+}
+function hsmAssets(hm = isHm()) {
   return {
     ...proof.assets,
     fonts: [],
@@ -843,7 +905,9 @@ function hsmAssets() {
       ...proof.assets.images.filter(
         (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
       ),
-      ...hsmImagesFor(parseLettering($("hsm-lettering").value)),
+      ...(hm
+        ? hmImages
+        : hsmImagesFor(parseLettering($("hsm-lettering").value))),
     ],
   };
 }
@@ -913,9 +977,10 @@ for (const id of ["hsm-letter", "hsm-lettering"])
     controlsUi();
     let candidate;
     try {
+      if (isHm()) hmRangeUi();
       candidate = new HsmController(
         viewer,
-        hsmDesignFor(hsmDesign, parseLettering($("hsm-lettering").value)),
+        await hsmVariantDesign(isHm()),
         hsmAssets(),
         $("hsm-letter").value,
         (...args) => {
@@ -944,6 +1009,7 @@ for (const id of ["hsm-letter", "hsm-lettering"])
       ready = true;
       $("hsm-letter").value = previous.letter;
       $("hsm-lettering").value = previousLettering;
+      if (isHm()) hmRangeUi();
       syncHsmUnitLabels();
       error(e.message);
     }
@@ -1118,7 +1184,7 @@ async function initialize() {
     save();
     const requested = new URLSearchParams(location.search).get("application");
     if (
-      ["hsm-counter", "ms-counter", "timer", "five-second-timer"].includes(
+      ["hsm-counter", "hm-counter", "ms-counter", "timer", "five-second-timer"].includes(
         requested,
       )
     ) {
