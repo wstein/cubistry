@@ -109,6 +109,8 @@ test("H/M counter offers H and M with their own ranges and a blank upper-left", 
 test("every H/M mode counts up and down on its period and wraps through 00", async ({
   page,
 }) => {
+  // Nine round trips of animated moves; allow for slow shared runners.
+  test.setTimeout(90000);
   await choose(page);
   const step = async (letter, delta, value, largest) => {
     await page.locator(`[data-hsm-delta="${delta}"]`).click();
