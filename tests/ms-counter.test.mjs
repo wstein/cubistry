@@ -537,8 +537,9 @@ function interruptOracle(run) {
   };
 }
 /** Count one step from `from` in `direction`, interrupted after `k` turns by `target`. */
-async function interrupted(letter, from, direction, k, target) {
+async function interrupted(letter, from, direction, k, target, lap2 = false) {
   let turns = 0,
+    armed = false,
     c,
     mid = null;
   const played = [];
@@ -546,6 +547,7 @@ async function interrupted(letter, from, direction, k, target) {
     configure() {},
     resetCamera() {},
     animate: async (pr) => {
+      if (!armed) return;
       played.push(serializeMove(pr.move));
       if (++turns === k) {
         mid = pr.to;
@@ -555,9 +557,17 @@ async function interrupted(letter, from, direction, k, target) {
   };
   c = new MsController(view, s3, {}, letter, () => {}, assets);
   await c.configure(from);
+  // Lap 2 of the 120-second steps: count up through all of lap 1 first.
+  for (let i = 0; lap2 && i < 60; i++) {
+    c.request((c.currentValue + 1) % 60);
+    await settled(c);
+  }
+  if (lap2) assert.equal(c.node, from + 60);
+  const base = c.progress.sessionTotal;
+  armed = true;
   c.request((from + direction + 60) % 60);
   await settled(c);
-  return { c, mid, played, after: c.progress.sessionTotal - k };
+  return { c, mid, played, after: c.progress.sessionTotal - base - k };
 }
 
 test("S3 research words share interior poses across steps", () => {
@@ -602,10 +612,14 @@ test("every interrupted S3 step continues with the least HTM over all shared pos
       oracle = interruptOracle(run),
       words = run.words.map((w) => parseAlg(w));
     const turnsOf = new Set(words.flat().map((m) => serializeMove(m)));
-    for (let from = 0; from < 60; from++)
+    // Seconds have two laps: also interrupt every step of lap 2 (nodes 60..119).
+    const laps = run.words.length / 60;
+    for (let at = 0; at < 60 * laps; at++)
       for (const direction of [1, -1])
         for (let k = 1; k < 4; k++) {
-          const node = from,
+          const from = at % 60,
+            lap2 = at >= 60,
+            node = at,
             step =
               direction === 1
                 ? words[node]
@@ -613,8 +627,15 @@ test("every interrupted S3 step continues with the least HTM over all shared pos
           if (k >= step.length) continue;
           for (const second of [0, 2, -1, 5]) {
             const target = (from + direction * second + 120) % 60;
-            const r = await interrupted(letter, from, direction, k, target);
-            const label = `${letter} ${from} ${direction > 0 ? "+" : "-"} k${k} -> ${target}`;
+            const r = await interrupted(
+              letter,
+              from,
+              direction,
+              k,
+              target,
+              lap2,
+            );
+            const label = `${letter} ${at} ${direction > 0 ? "+" : "-"} k${k} -> ${target}`;
             assert.ok(r.mid, label);
             assert.equal(r.after, oracle.best(r.mid, target), label);
             assert.equal(r.c.currentValue, target, label);
@@ -679,6 +700,101 @@ test("loadMsDesign accepts the pinned bytes only", async () => {
     await assert.rejects(
       loadMsDesign("/", pin.runtimeSHA256),
       /Unable to load M\/S print/,
+    );
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+// ------------------------------------------------- guards and tie-breaks
+
+test("a route with equal HTM takes the fewest edges (oracle over every place)", () => {
+  let ties = 0;
+  for (const letter of ["M", "S"]) {
+    const run = s3.runs[letter],
+      period = new MsPeriod(s3.print, run),
+      places = interruptOracle(run).places,
+      words = run.words.map((w) => parseAlg(w)),
+      n = words.length,
+      cost = (from, count, dir) => {
+        let htm = 0;
+        for (let k = 0; k < count; k++)
+          htm +=
+            words[dir > 0 ? (from + k) % n : (from - k - 1 + 2 * n) % n].length;
+        return htm;
+      };
+    // Candidates (htm, edges) from every place of a pose to a node showing value.
+    const candidates = (state, value) => {
+      const all = [];
+      for (const [e, o] of places(state)) {
+        const starts =
+          o === 0
+            ? [[e, 0, 0]]
+            : [
+                [e, o, 1],
+                [(e + 1) % n, words[e].length - o, 1],
+              ];
+        for (const [node, lead, edges] of starts)
+          for (let t = value; t < n; t += 60) {
+            const ahead = (t - node + n) % n;
+            all.push(
+              [lead + cost(node, ahead, 1), edges + ahead],
+              [lead + cost(node, n - ahead, -1), edges + ((n - ahead) % n)],
+            );
+          }
+      }
+      return all;
+    };
+    const seen = new Set();
+    let state = applyMoves(initialState(s3.print), parseAlg(run.setup));
+    for (const word of words)
+      for (const move of [null, ...word]) {
+        if (move) state = applyMoves(state, [move]);
+        const key = poseKey(state);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        for (let value = 0; value < 60; value++) {
+          const all = candidates(state, value),
+            [htm, edges] = all.reduce((x, y) =>
+              y[0] < x[0] || (y[0] === x[0] && y[1] < x[1]) ? y : x,
+            );
+          ties += all.filter(([h, e]) => h === htm && e !== edges).length;
+          const route = period.route(state, value);
+          assert.equal(route.moves.length, htm, `${letter} ${key} ${value}`);
+          assert.equal(route.edges, edges, `${letter} ${key} ${value}`);
+        }
+      }
+  }
+  assert.ok(ties > 0, "the data has equal-HTM routes of different edge count");
+});
+
+test("a tie in HTM between two directions takes the fewer edges", () => {
+  // Poses I, U, U2 (nodes 0..2). From node 0 to node 2: ahead U, U is 2 edges
+  // and 2 HTM; behind is the one edge "U U" inverted, also 2 HTM.
+  const run = { ...s3.runs.M, setup: "", words: ["U", "U", "U U"] };
+  const period = new MsPeriod(s3.print, run);
+  const route = period.route(period.nodes[0], 2);
+  assert.equal(route.moves.length, 2);
+  assert.equal(route.edges, 1);
+  assert.equal(text(route.moves), "U' U'");
+});
+
+test("a period that revisits a node pose is refused", () => {
+  const run = { ...s3.runs.M, setup: "", words: ["R", "R'", "R", "R'"] };
+  assert.throws(
+    () => new MsPeriod(s3.print, run),
+    /M\/S period revisits a pose/,
+  );
+});
+
+test("loadMsDesign refuses a 65,536-byte payload even with a matching hash", async () => {
+  const original = globalThis.fetch;
+  try {
+    const big = Buffer.alloc(65536, 32);
+    globalThis.fetch = async () => new Response(big);
+    await assert.rejects(
+      loadMsDesign("/", createHash("sha256").update(big).digest("hex")),
+      /M\/S print integrity mismatch/,
     );
   } finally {
     globalThis.fetch = original;
