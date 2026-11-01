@@ -11,6 +11,12 @@ jq = "1.8"
 ripgrep = "15.2"
 yq = "4.54"
 
+# Navigation, filtering, and viewing (gh:wstein/bundledock)
+bat = "0.26"
+fzf = "0.74"
+lazygit = "0.66"
+zoxide = "0.10"
+
 [env]
 JULIA_NUM_THREADS = "auto"
 _.python.venv = { path = ".venv", create = true }
