@@ -58,7 +58,7 @@ export class HsmPlanner {
   /** Cap for a route from a settled blank/unit pose (`plan`). */
   readonly bound: number;
   /**
-   * `bound` is the variant's free-jump cap: six for the H/S/M print (its
+   * `bound` is the variant's free-jump cap: six for the H/M/S print (its
    * universal bound), the graph radius seven where no tighter bound is known.
    */
   constructor(bound = 6) {

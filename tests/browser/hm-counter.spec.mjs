@@ -134,12 +134,13 @@ test("every H/M mode counts up and down on its period and wraps through 00", asy
   }
 });
 
-test("Set, Reset, unit change and validation behave like the H/S/M counter", async ({
+test("Set, Reset, unit change and validation behave like the H/M/S counter", async ({
   page,
 }) => {
   await choose(page);
   await unit(page, "M");
-  await expect(page.locator("#rotation-speed")).toHaveValue("3");
+  // 100 ms per HTM move for every unit, as in the H/M/S counter.
+  await expect(page.locator("#rotation-speed")).toHaveValue("4");
   await page.fill("#hsm-value", "60");
   await page.locator("#hsm-set-form").evaluate((f) => f.requestSubmit());
   await expect(page.locator("#error")).toContainText("00 to 59");
@@ -163,9 +164,12 @@ test("Set, Reset, unit change and validation behave like the H/S/M counter", asy
   await page.fill("#hsm-value", "05");
   await page.locator("#hsm-set-form").evaluate((f) => f.requestSubmit());
   await settled(page, 5);
+  // A non-default speed stop first, so the unit change visibly re-applies 100 ms.
+  await page.locator("#rotation-speed").fill("2");
+  await expect(page.locator("#rotation-speed")).toHaveValue("2");
   await unit(page, "H");
   await expect(page.locator("#status")).toContainText("H · 00");
-  await expect(page.locator("#rotation-speed")).toHaveValue("2");
+  await expect(page.locator("#rotation-speed")).toHaveValue("4");
   await physical(page, "H", 0);
   expect(await options(page, "hsm-range")).toEqual(["23", "11"]);
   // H 00–23 rejects 24; H 00–11 wraps 11 -> 00.
@@ -187,7 +191,7 @@ test("Set, Reset, unit change and validation behave like the H/S/M counter", asy
   await expect(page.locator("#error")).toBeEmpty();
 });
 
-test("the H/S/M counter keeps its own controls after the H/M counter", async ({
+test("the H/M/S counter keeps its own controls after the H/M counter", async ({
   page,
 }) => {
   await choose(page);
@@ -197,9 +201,9 @@ test("the H/S/M counter keeps its own controls after the H/M counter", async ({
     "hsm-counter",
   );
   await settled(page, 0);
-  await expect(page.locator("#hsm-heading")).toHaveText("H/S/M Counter");
+  await expect(page.locator("#hsm-heading")).toHaveText("H/M/S Counter");
   await expect(page.locator("#hsm-lettering")).toBeVisible();
-  expect(await options(page, "hsm-letter")).toEqual(["H", "S", "M"]);
+  expect(await options(page, "hsm-letter")).toEqual(["H", "M", "S"]);
   expect(await options(page, "hsm-range")).toEqual(["59", "23", "11"]);
   expect(await page.evaluate(() => window.hsmPrint.id)).toBe(
     "hsm_counter_seconds_first",
@@ -217,7 +221,7 @@ test("the H/S/M counter keeps its own controls after the H/M counter", async ({
   await physical(page, "H", 0);
 });
 
-// A failed H/M load must leave the running H/S/M counter and its controls
+// A failed H/M load must leave the running H/M/S counter and its controls
 // exactly as they were: unit, range, lettering, heading and option lists.
 for (const [name, respond] of [
   ["fetch failure", (route) => route.fulfill({ status: 404, body: "" })],
@@ -229,7 +233,7 @@ for (const [name, respond] of [
     },
   ],
 ])
-  test(`a failed H/M load (${name}) keeps the H/S/M selection`, async ({
+  test(`a failed H/M load (${name}) keeps the H/M/S selection`, async ({
     page,
   }) => {
     await page.goto("/?lettering=words");
@@ -251,10 +255,10 @@ for (const [name, respond] of [
       "data-application",
       "hsm-counter",
     );
-    await expect(page.locator("#hsm-heading")).toHaveText("H/S/M Counter");
+    await expect(page.locator("#hsm-heading")).toHaveText("H/M/S Counter");
     await expect(page.locator("#hsm-lettering")).toBeVisible();
     await expect(page.locator("#hsm-lettering")).toHaveValue("words");
-    expect(await options(page, "hsm-letter")).toEqual(["H", "S", "M"]);
+    expect(await options(page, "hsm-letter")).toEqual(["H", "M", "S"]);
     expect(await options(page, "hsm-range")).toEqual(["59", "23", "11"]);
     await expect(page.locator("#hsm-letter")).toHaveValue("S");
     await expect(page.locator("#hsm-range")).toHaveValue("11");
@@ -277,4 +281,34 @@ test("a failed H/M unit change keeps the previous unit and range", async ({
   expect(await options(page, "hsm-range")).toEqual(["23", "11"]);
   await expect(page.locator("#hsm-range")).toHaveValue("11");
   await expect(page.locator("#status")).toContainText("H · 00");
+});
+
+test("Unit labels read H and M in the H/M counter even with word lettering selected", async ({
+  page,
+}) => {
+  const labels = () =>
+    page.locator("#hsm-letter option").evaluateAll((o) =>
+      o.map((e) => e.textContent),
+    );
+  await page.goto("/?lettering=words");
+  await expect(page.locator("#application")).toBeEnabled();
+  await page.selectOption("#application", "hsm-counter");
+  await expect(page.locator("#cube")).toHaveAttribute(
+    "data-application",
+    "hsm-counter",
+  );
+  expect(await labels()).toEqual(["hour", "min", "sec"]);
+  await page.selectOption("#application", "hm-counter");
+  await expect(page.locator("#cube")).toHaveAttribute(
+    "data-application",
+    "hm-counter",
+  );
+  expect(await labels()).toEqual(["H", "M"]);
+  await page.selectOption("#application", "hsm-counter");
+  await expect(page.locator("#cube")).toHaveAttribute(
+    "data-application",
+    "hsm-counter",
+  );
+  await expect(page.locator("#hsm-lettering")).toHaveValue("words");
+  expect(await labels()).toEqual(["hour", "min", "sec"]);
 });
