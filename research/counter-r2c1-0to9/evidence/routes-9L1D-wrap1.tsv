@@ -1,0 +1,11 @@
+mode	step	from	to	increment	inc_htm	inc_prep	inc_touch	inc_shortest	decrement	dec_htm	dec_prep	dec_touch	dec_shortest
+9L1D-wrap1	0	0	1	U L	2	1	1	2	L' U'	2	1	1	2
+9L1D-wrap1	1	1	2	B2 L	2	1	1	1	L' B2	2	1	1	1
+9L1D-wrap1	2	2	3	U L	2	1	1	2	L' U'	2	1	1	2
+9L1D-wrap1	3	3	4	U' L	2	1	1	2	L' U	2	1	1	1
+9L1D-wrap1	4	4	5	B' L	2	1	1	1	L' B	2	1	1	1
+9L1D-wrap1	5	5	6	L	1	0	1	1	L'	1	0	1	1
+9L1D-wrap1	6	6	7	B2 L	2	1	1	1	L' B2	2	1	1	1
+9L1D-wrap1	7	7	8	B L	2	1	1	2	L' B'	2	1	1	1
+9L1D-wrap1	8	8	9	U L	2	1	1	2	L' U'	2	1	1	1
+9L1D-wrap1	9	9	0	D	1	0	1	1	D'	1	0	1	1
