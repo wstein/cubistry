@@ -1,6 +1,8 @@
-# H/M counter
+# H/M One-Cube Counter
 
-The separate **H/M Counter** application counts hours and minutes on one fixed
+Not to be confused with the planned two-cube H/M Counter ([hm-counter plan](../knowledge/plans/hm-counter.md)).
+
+The separate **H/M One-Cube Counter** application counts hours and minutes on one fixed
 2×2×2 print, **m3-SH**, from research PR #133
 (`research/hm-counter-3move`). The upper-left sticker is genuinely unprinted.
 The upright H or M occupies the upper-right cell, and the tens and units digits
@@ -17,7 +19,7 @@ steps, Reset, or Run/Stop, exactly as in the H/M/S counter. The ranges are:
   jump to 00 from any value.
 
 Leading zeros are shown, and counting wraps in both directions. The default
-rotation speed is 100 ms per HTM move for both units, as in the H/M/S counter. Open it from the application chooser or with `?application=hm-counter`.
+rotation speed is 100 ms per HTM move for both units, as in the H/M/S counter. Open it from the application chooser or with `?application=hm-one-cube`.
 
 ## Status and provenance
 
@@ -84,7 +86,7 @@ total above.
 
 ## Behavior
 
-The H/M counter uses the same controller, planner, periods and recovery code as
+The H/M one-cube counter uses the same controller, planner, periods and recovery code as
 the H/M/S counter. Only the variant parameters differ (see
 [Implementation](#implementation)). It behaves as follows.
 
@@ -123,7 +125,7 @@ and its numbers are unchanged. `src/apps/hm/variant.ts` defines `HM_VARIANT`:
 letters H and M, M 00–59, H 00–23 and 00–11, limit 4 and jump cap 7. An
 extended runtime names its letters and limit, and each period carries its
 `maximumHTM`. Loading validates every period node, the closure, the per-step
-limit and that maximum against the replayed words. The H/M counter shares the
+limit and that maximum against the replayed words. The H/M one-cube counter shares the
 H/M/S controls in `index.html`. The heading, letters, ranges and help text
 adapt to the variant, and switching back restores the H/M/S controls.
 
@@ -196,7 +198,7 @@ m3-SH. See below.
 > identities differ from the current H/M/S seconds-first print, and all 24 differ
 > from the previous H/M/S print.** Each one differs in artwork, in orientation
 > on its corner, or both. A cube stickered from either H/M/S sheet cannot run
-> the H/M counter. **Whether and when to reprint the physical stickers is the
+> the H/M one-cube counter. **Whether and when to reprint the physical stickers is the
 > owner's decision.** This change makes no print sheets and does not alter the
 > H/M/S sheets.
 
@@ -209,7 +211,7 @@ solved pose; the test asserts this. For every identity, the comparison takes the
 H/M/S sheets) and of the converted m3-SH witness. An identity is unchanged only
 if its glyph is the same and, for a printed glyph, its print-up vector is the
 same (a blank reads the same in every orientation). "Tens" and "units" name the
-front cell in which a digit is upright. `tests/hm-counter.test.mjs` recomputes
+front cell in which a digit is upright. `tests/hm-one-cube.test.mjs` recomputes
 the count.
 
 | Id | Corner | Normal | Previous H/M/S print | Seconds-first print (current) | m3-SH print |
@@ -274,12 +276,12 @@ recomputed by the test:
 
 ```sh
 node scripts/prepare-hm.mjs --check
-node --test tests/hm-counter.test.mjs
+node --test tests/hm-one-cube.test.mjs
 npm run typecheck
-npm run test:e2e -- tests/browser/hm-counter.spec.mjs
+npm run test:e2e -- tests/browser/hm-one-cube.spec.mjs
 ```
 
-`tests/hm-counter.test.mjs` checks:
+`tests/hm-one-cube.test.mjs` checks:
 
 - the pins, the copies, the converted witness, the runtime and the net;
 - the print code, glyph counts and blanks;
@@ -303,7 +305,7 @@ and the 24-of-24 reprint comparison. Negative controls must be rejected: the
 wrong variant, a corrupted runtime (maximum, limit, letters, glyph, word,
 setup), a tampered witness and mismatched receipts.
 
-`tests/browser/hm-counter.spec.mjs` opens the application and checks:
+`tests/browser/hm-one-cube.spec.mjs` opens the application and checks:
 
 - its controls and the blank upper-left;
 - counting up and down in every mode with each wrap (59→00, 23→00, 11→00 and
