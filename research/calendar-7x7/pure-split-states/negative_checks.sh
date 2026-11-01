@@ -69,6 +69,10 @@ run_chain() {
 run_chain chain-move-changed "$P" "$out/move-changed.chain.tsv"
 run_chain chain-htm-changed  "$P" "$out/htm-changed.chain.tsv"
 run_chain chain-stage1-print "$here/evidence/print-stage1.tsv" "$C"
+# Front-rule control: the final-print chain re-hashed under the stage-1 print, so the
+# digest checks pass and only the front rule can notice the old midge artwork.
+"$julia_bin" --startup-file=no "$here/rehash_chain.jl" "$here/evidence/print-stage1.tsv" "$dag" "$C" "$out/rehashed-stage1.chain.tsv"
+run_chain chain-stage1-print-rehashed "$here/evidence/print-stage1.tsv" "$out/rehashed-stage1.chain.tsv"
 js=0; "$julia_bin" --startup-file=no "$cal/continuous/verify.jl" "$dag" "$C" > "$out/chain-pr99-verifier.julia.stdout" 2> "$out/chain-pr99-verifier.julia.stderr" || js=$?
 [ "$js" -ne 0 ] && js=1
 printf '%s\t%s\t%s\t%s\t%s\n' chain-pr99-julia-verifier "$js" - "$(grep -m1 -E 'AssertionError|ERROR' "$out/chain-pr99-verifier.julia.stderr" | cut -c1-160)" "unchanged PR #99 Julia chain verifier, expected to reject" >> "$out/results.tsv"

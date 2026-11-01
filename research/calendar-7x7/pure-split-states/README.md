@@ -58,8 +58,14 @@ artwork scheme A no longer needs (moved letters, overflow marks) and spare
 blanks. It prefers surfaces that no still-valid PR #99 state shows on the front.
 
 - **It does not keep every shown surface.** In the midge orbit, the three new
-  letters needed three PR #99 blanks, and every one of them is shown by some
-  still-valid PR #99 state. The designer gave those states up.
+  letters went onto the PR #99 blanks 35, 134 and 135.
+  - No unchanged-layout PR #99 state shows surface 134 or 135.
+  - Surface 35 is shown by 13 of them.
+  - Among the assignments with a full matching, the designer found none that
+    breaks fewer states, so the cost fell on surface 35 and the designer gave
+    those 13 states up.
+  - In the final print, surface 70 (not a blank: PR #99 dark `26`, now `C`) is
+    also changed. It is shown by the states of displays 62 and 90.
   - In the stage-1 print, surface 35 (a PR #99 blank, then `C`) sits on the
     front of the PR #99 states of 13 unchanged displays (2, 3, 20, 26, 40, 43,
     57, 66, 73, 74, 77, 85, 86). That is why those states broke.
@@ -205,24 +211,39 @@ Both verifiers accept the chain with identical receipts
 | Oct → Nov | orbit solve | 439 |
 | Nov → Dec | global search | 68 |
 
-These are search results from one deterministic heuristic run. They are not
+In total the chain has **2458 HTM**. These are search results from one
+deterministic heuristic run. They are not
 optimal and are not compared with the PR #99 chains. The orbit-solve edges
 (over 400 HTM) are much longer than the global-search edges, which shows how
 weak the fallback is, not a property of the layout. No move savings are
-claimed.
+claimed. The total must not be compared with the PR #130 35-edge chain average
+(128.5 HTM per edge): the search effort and the fallback differ.
 
 Chain controls (in [results.tsv](evidence/negative-controls/results.tsv)):
 
 - Both parametrized verifiers reject:
   - one layer move changed with the same metrics (the edge front fails);
   - a changed declared HTM (metrics mismatch);
-  - the stage-1 print (the source digest differs).
+  - the stage-1 print (the source digest differs);
+  - the same chain re-hashed under the stage-1 print by the control generator
+    [rehash_chain.jl](rehash_chain.jl), so that every digest check passes. The
+    **front rule** then rejects it at edge 4 (April → May), because the old
+    midge artwork is visible.
 - The **unchanged** PR #99 Julia chain verifier also rejects the chain, because
   its print and displays differ. That is why the parametrization is needed.
 
+## UNKNOWN
+
+- Chains for years other than 2027.
+- A continuous chain over 2026 to 2099.
+- Other cube sizes.
+- Real sticker sizes and legibility.
+- There is no pinned manifest; anything not covered by both checkers is
+  UNKNOWN.
+
 ## Negative controls
 
-[negative_checks.sh](negative_checks.sh) runs nine checker controls and four
+[negative_checks.sh](negative_checks.sh) runs nine checker controls and five
 chain controls (see stage 3); results are in
 [results.tsv](evidence/negative-controls/results.tsv). Julia and Flix both exit
 1 on all nine checker controls:
