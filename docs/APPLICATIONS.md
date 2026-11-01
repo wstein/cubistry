@@ -13,6 +13,7 @@ relative to the site root, for example `http://localhost:5173/` locally.
 | Live H-M-S Clock | Current local time on three 2x2 cubes (hours, minutes, seconds) | `clock.html` | [Live clock](LIVE_CLOCK.md) |
 | Counter 0-99 | A fixed-print 2x2 counter, 00 to 99 | `index.html` (default) | [Counter usage](COUNTER_USAGE.md), [cube-first controls](CUBE_FIRST_UI.md) |
 | H/M/S Counter 00-59 | One cube counting seconds, minutes or hours | `index.html`, chooser | [H/M/S counter](HSM_COUNTER.md) |
+| H/M Counter | One cube counting hours or minutes on print m3-SH (candidate, needs a physical reprint) | `index.html`, chooser | [H/M counter](HM_COUNTER.md) |
 | 60-Minute Timer | Countdown or stopwatch, 00:00-59:50 | `index.html`, chooser | [Workshop timer](WORKSHOP_TIMER.md) |
 | 5-Second Timer | Countdown or stopwatch, 00:00-39:55 | `index.html`, chooser | [Five-second timer](FIVE_SECOND_TIMER.md) |
 | Calendar | German and English calendar cubes (3x3) | `calendar.html` | [Calendar cubes](CALENDAR_CUBES.md) |
