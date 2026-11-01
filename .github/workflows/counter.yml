@@ -28,6 +28,14 @@ jobs:
           python-version: '3.12'
       - run: npm run prepare:solver
       - run: npm ci
+      # Fetches the exact pinned research commit (by full SHA, so nothing
+      # unpinned is trusted) and requires the committed H/M copies to be
+      # byte-identical to it. `npm run check` alone verifies the copies only.
+      - name: Verify H/M data against its pinned research commit
+        run: |
+          commit="$(node -p "require('./hm-source.json').commit")"
+          git fetch --no-tags --depth=1 origin "$commit"
+          node scripts/prepare-hm.mjs --check --require-commit
       - run: npm run check
       # Verifies the committed print presets only (no regeneration, so the zlib
       # build does not matter). Needs the pinned Python packages, so it is not
