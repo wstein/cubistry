@@ -1,4 +1,4 @@
-// H/M counter (print m3-SH, research PR #133) application regressions.
+// H/M one-cube counter (print m3-SH, research PR #133) application regressions.
 //
 // These tests replay the pinned data in the app's own mechanics model
 // (@cubistry/cube-mechanics) and through the real controller. They are app

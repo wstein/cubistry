@@ -1,4 +1,4 @@
-// Pin, convert and verify the H/M counter data (print m3-SH) from the research
+// Pin, convert and verify the H/M one-cube counter data (print m3-SH) from the research
 // branch. No hand-edited data: every file under data/hm and the runtime
 // public/hm-counter.v1.json come from this script.
 //
@@ -34,7 +34,7 @@ export const HM_COUNTING_MODES = [
   [letter, maximum, 1],
   [letter, maximum, -1],
 ]);
-/** Owner's per-edge limit for the H/M counter. */
+/** Owner's per-edge limit for the H/M one-cube counter. */
 export const HM_EDGE_LIMIT = 4;
 export const HM_RUNTIME = {
   ...HSM_RUNTIME,

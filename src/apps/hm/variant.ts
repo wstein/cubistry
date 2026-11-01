@@ -7,7 +7,7 @@ import {
 import symbols from "../hsm/images.json" with { type: "json" };
 
 /**
- * The H/M counter: print m3-SH from research PR #133, hours and minutes only,
+ * The H/M one-cube counter: print m3-SH from research PR #133, hours and minutes only,
  * with a genuinely blank upper-left sticker. It runs on the H/M/S controller,
  * planner, periods and recovery, parameterized by this variant.
  *
