@@ -558,9 +558,300 @@ function search_9L_1D()
     end
 end
 
+function search_8L_2D_patterns()
+    b0 = bit(HOME_STATE[IDX_UL]) | bit(HOME_STATE[IDX_UR]) | bit(HOME_STATE[IDX_LR])
+    l0 = bit(HOME_STATE[IDX_LL])
+
+    for (label, d_steps) in [
+        ("D on 5=>6 and 9=>0 (steps 6 and 10, 1-indexed)", Set([6, 10])),
+        ("D on 4=>5 and 9=>0 (steps 5 and 10, symmetric 0..4 / 5..9)", Set([5, 10]))
+    ]
+        println("\n=======================================================")
+        println("Pattern: $label")
+        println("=======================================================")
+        for max_p in (1, 2)
+            cands_L = build_const_touch_steps("L"; max_preps = max_p)
+            cands_D = build_const_touch_steps("D"; max_preps = max_p)
+            println("\n--- Open / Wrapped with <=$max_p prep(s)/step (max $(max_p+1) moves/inc) ---")
+            states = Vector{NTuple{24,Int}}(undef, 11)
+            states[1] = HOME_STATE
+            path10 = zeros(Int, 10)
+            found_open = false
+            for budget in 0:10
+                open_w = ""
+                wrap_w = ""
+                bare_D_w = ""
+                q_only_w = ""
+                function dfs_ow(d::Int, ll_m::UInt32, bl_m::UInt32, pr::Int)
+                    if d == 10
+                        if isempty(open_w)
+                            open_w = join([(k in d_steps ? cands_D[path10[k]].word : cands_L[path10[k]].word) for k in 1:9], " | ")
+                        end
+                        st = states[10]
+                        c10 = (10 in d_steps) ? cands_D : cands_L
+                        for (si, s) in enumerate(c10)
+                            pr + s.prep_count > budget && break
+                            nxt = apply_pull(st, s.pull)
+                            if nxt[IDX_LL] == HOME_STATE[IDX_LL]
+                                b_new = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                                if (b_new & ll_m) == 0
+                                    path10[10] = si
+                                    words = [(k in d_steps ? cands_D[path10[k]].word : cands_L[path10[k]].word) for k in 1:10]
+                                    w_str = join(words, " | ")
+                                    isempty(wrap_w) && (wrap_w = w_str)
+                                    all(words[k] == "D" for k in d_steps) && isempty(bare_D_w) && (bare_D_w = w_str)
+                                    !occursin('2', w_str) && isempty(q_only_w) && (q_only_w = w_str)
+                                end
+                            end
+                        end
+                        return
+                    end
+                    st = states[d]
+                    cands_cur = (d in d_steps) ? cands_D : cands_L
+                    for (si, s) in enumerate(cands_cur)
+                        pr + s.prep_count > budget && break
+                        nxt = apply_pull(st, s.pull)
+                        b_ll = bit(nxt[IDX_LL])
+                        (b_ll & (ll_m | bl_m)) != 0 && continue
+                        b_bl = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                        ll_m2 = ll_m | b_ll
+                        (b_bl & ll_m2) != 0 && continue
+                        states[d + 1] = nxt
+                        path10[d] = si
+                        dfs_ow(d + 1, ll_m2, bl_m | b_bl, pr + s.prep_count)
+                    end
+                end
+                dfs_ow(1, l0, b0, 0)
+                if !isempty(open_w) && !found_open
+                    println("  Tight min Open 0..9: $budget preps ($(9 + budget) HTM) -> $open_w")
+                    found_open = true
+                end
+                if !isempty(wrap_w)
+                    println("  Tight min Wrapped 0..9->0: $budget preps ($(10 + budget) HTM) -> $wrap_w")
+                    !isempty(bare_D_w) && println("    With bare 1-move 'D' on both D-steps: $bare_D_w")
+                    !isempty(q_only_w) && println("    Quarter-turn only (no half-turns):   $q_only_w")
+                    break
+                end
+            end
+
+            # Also check Exact Full-State Closed 10-Cycle
+            max_half = max_p == 1 ? 5 : 6
+            fwd = Dict{NTuple{24,Int}, Vector{Tuple{UInt32,UInt32,Int,NTuple{5,Int}}}}()
+            path_f = zeros(Int, 5)
+            function dfs_f(d::Int, st::NTuple{24,Int}, ll_m::UInt32, bl_m::UInt32, pr::Int)
+                if d == 6
+                    vec = get!(fwd, st) do
+                        Tuple{UInt32,UInt32,Int,NTuple{5,Int}}[]
+                    end
+                    push!(vec, (ll_m, bl_m, pr, (path_f[1], path_f[2], path_f[3], path_f[4], path_f[5])))
+                    return
+                end
+                cands_cur = (d in d_steps) ? cands_D : cands_L
+                for (si, s) in enumerate(cands_cur)
+                    pr + s.prep_count > max_half && break
+                    nxt = apply_pull(st, s.pull)
+                    b_ll = bit(nxt[IDX_LL])
+                    (b_ll & (ll_m | bl_m)) != 0 && continue
+                    b_bl = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                    ll_m2 = ll_m | b_ll
+                    (b_bl & ll_m2) != 0 && continue
+                    path_f[d] = si
+                    dfs_f(d + 1, nxt, ll_m2, bl_m | b_bl, pr + s.prep_count)
+                end
+            end
+            dfs_f(1, HOME_STATE, l0, b0, 0)
+
+            inv_L = [invert_pull(s.pull) for s in cands_L]
+            inv_D = [invert_pull(s.pull) for s in cands_D]
+            best_preps = 999
+            best_w = ""
+            path_b = zeros(Int, 5)
+            # Backward d=1..5 corresponds to forward step_idx = 11 - d (i.e. 10, 9, 8, 7, 6)
+            function dfs_b(d::Int, st::NTuple{24,Int}, ll_m::UInt32, bl_m::UInt32, pr::Int)
+                if d == 6
+                    if haskey(fwd, st)
+                        for (f_ll, f_bl, f_pr, f_path) in fwd[st]
+                            tot = f_pr + pr
+                            tot >= best_preps && continue
+                            (f_ll & ll_m) != l0 && continue
+                            all_ll = f_ll | ll_m
+                            all_bl = f_bl | bl_m
+                            if (all_ll & all_bl) == 0
+                                words = [(k in d_steps ? cands_D[f_path[k]].word : cands_L[f_path[k]].word) for k in 1:5]
+                                for k in 5:-1:1
+                                    step_idx = 11 - k
+                                    push!(words, (step_idx in d_steps ? cands_D[path_b[k]].word : cands_L[path_b[k]].word))
+                                end
+                                best_preps = tot
+                                best_w = join(words, " | ")
+                            end
+                        end
+                    end
+                    return
+                end
+                step_idx = 11 - d
+                cands_cur = (step_idx in d_steps) ? cands_D : cands_L
+                invs_cur  = (step_idx in d_steps) ? inv_D   : inv_L
+                for (si, s) in enumerate(cands_cur)
+                    pr + s.prep_count > max_half && break
+                    pr + s.prep_count >= best_preps && break
+                    prv = apply_pull(st, invs_cur[si])
+                    b_ll = bit(prv[IDX_LL])
+                    b_bl = bit(prv[IDX_UL]) | bit(prv[IDX_UR]) | bit(prv[IDX_LR])
+                    path_b[d] = si
+                    if d < 5
+                        (b_ll & (ll_m | bl_m)) != 0 && continue
+                        ll_m2 = ll_m | b_ll
+                        (b_bl & ll_m2) != 0 && continue
+                        dfs_b(d + 1, prv, ll_m2, bl_m | b_bl, pr + s.prep_count)
+                    else
+                        (b_bl & ll_m) != 0 && continue
+                        dfs_b(d + 1, prv, ll_m, bl_m | b_bl, pr + s.prep_count)
+                    end
+                end
+            end
+            dfs_b(1, HOME_STATE, l0, b0, 0)
+            println("  Exact-closed 10-cycle (<=$max_p prep/step): ",
+                    isempty(best_w) ? "none" : "$best_preps preps ($(10 + best_preps) HTM) -> $best_w")
+        end
+    end
+end
+
+function search_B_only_L_D_patterns()
+    b0 = bit(HOME_STATE[IDX_UL]) | bit(HOME_STATE[IDX_UR]) | bit(HOME_STATE[IDX_LR])
+    l0 = bit(HOME_STATE[IDX_LL])
+    cands_L = [s for s in build_const_touch_steps("L"; max_preps = 1) if s.only_B_prep]
+    cands_D = [s for s in build_const_touch_steps("D"; max_preps = 1) if s.only_B_prep]
+    @assert length(cands_L) == 4 && length(cands_D) == 4
+    cands_LD = vcat(cands_L, cands_D) # 8 candidates total (all <=2 HTM, no U or R!)
+
+    println("\n=======================================================")
+    println("B-Only Preps (NO U or R rotations, max 2 moves/inc):")
+    println("Checking 8xL + 2xD (5=>6 & 9=>0, 4=>5 & 9=>0, or any 2 D-steps)")
+    println("=======================================================")
+
+    for (label, d_steps) in [
+        ("D on 5=>6 and 9=>0 (steps 6 and 10)", Set([6, 10])),
+        ("D on 4=>5 and 9=>0 (steps 5 and 10)", Set([5, 10]))
+    ]
+        states = Vector{NTuple{24,Int}}(undef, 11)
+        states[1] = HOME_STATE
+        path10 = zeros(Int, 10)
+        open_found = String[]
+        wrap_found = String[]
+        closed_found = String[]
+        function dfs_fixed(d::Int, ll_m::UInt32, bl_m::UInt32)
+            if d == 10
+                w9 = join([(k in d_steps ? cands_D[path10[k]].word : cands_L[path10[k]].word) for k in 1:9], " | ")
+                push!(open_found, w9)
+                st = states[10]
+                c10 = (10 in d_steps) ? cands_D : cands_L
+                for (si, s) in enumerate(c10)
+                    nxt = apply_pull(st, s.pull)
+                    if nxt[IDX_LL] == HOME_STATE[IDX_LL]
+                        b_new = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                        if (b_new & ll_m) == 0
+                            path10[10] = si
+                            w10 = join([(k in d_steps ? cands_D[path10[k]].word : cands_L[path10[k]].word) for k in 1:10], " | ")
+                            push!(wrap_found, w10)
+                            nxt == HOME_STATE && push!(closed_found, w10)
+                        end
+                    end
+                end
+                return
+            end
+            st = states[d]
+            cands_cur = (d in d_steps) ? cands_D : cands_L
+            for (si, s) in enumerate(cands_cur)
+                nxt = apply_pull(st, s.pull)
+                b_ll = bit(nxt[IDX_LL])
+                (b_ll & (ll_m | bl_m)) != 0 && continue
+                b_bl = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                ll_m2 = ll_m | b_ll
+                (b_bl & ll_m2) != 0 && continue
+                states[d + 1] = nxt
+                path10[d] = si
+                dfs_fixed(d + 1, ll_m2, bl_m | b_bl)
+            end
+        end
+        dfs_fixed(1, l0, b0)
+        println("  $label:")
+        println("    Open 0..9 paths: $(length(open_found))", isempty(open_found) ? "" : " (e.g. $(open_found[1]))")
+        println("    Wrapped 0..9->0: $(length(wrap_found))", isempty(wrap_found) ? "" : " (e.g. $(wrap_found[1]))")
+        println("    Exact-closed:    $(length(closed_found))", isempty(closed_found) ? "" : " (e.g. $(closed_found[1]))")
+    end
+
+    # Now find ALL valid (L, D) touch patterns over 10 steps when ONLY B preps (no U or R) are allowed,
+    # grouped by how many D steps they use (0, 1, 2, 3, 4, ...)!
+    println("\n--- Exhaustive classification of ALL B-only (no U, no R) 10-step routes by number of D-steps ---")
+    states = Vector{NTuple{24,Int}}(undef, 11)
+    states[1] = HOME_STATE
+    path10 = zeros(Int, 10)
+    wrap_by_dcount = Dict{Int, Vector{Tuple{Int, String, String}}}()
+    closed_by_dcount = Dict{Int, Vector{Tuple{Int, String, String}}}()
+
+    function dfs_all_B(d::Int, ll_m::UInt32, bl_m::UInt32, preps::Int, d_count::Int)
+        if d == 10
+            st = states[10]
+            for (si, s) in enumerate(cands_LD)
+                nxt = apply_pull(st, s.pull)
+                if nxt[IDX_LL] == HOME_STATE[IDX_LL]
+                    b_new = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                    if (b_new & ll_m) == 0
+                        path10[10] = si
+                        dc = d_count + (s.touch_face == 'D' ? 1 : 0)
+                        pr = preps + s.prep_count
+                        w10 = join([cands_LD[path10[k]].word for k in 1:10], " | ")
+                        pat = join([cands_LD[path10[k]].touch_face for k in 1:10], "")
+                        push!(get!(wrap_by_dcount, dc, Tuple{Int,String,String}[]), (pr, pat, w10))
+                        if nxt == HOME_STATE
+                            push!(get!(closed_by_dcount, dc, Tuple{Int,String,String}[]), (pr, pat, w10))
+                        end
+                    end
+                end
+            end
+            return
+        end
+        st = states[d]
+        for (si, s) in enumerate(cands_LD)
+            nxt = apply_pull(st, s.pull)
+            b_ll = bit(nxt[IDX_LL])
+            (b_ll & (ll_m | bl_m)) != 0 && continue
+            b_bl = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+            ll_m2 = ll_m | b_ll
+            (b_bl & ll_m2) != 0 && continue
+            states[d + 1] = nxt
+            path10[d] = si
+            dfs_all_B(d + 1, ll_m2, bl_m | b_bl, preps + s.prep_count, d_count + (s.touch_face == 'D' ? 1 : 0))
+        end
+    end
+    dfs_all_B(1, l0, b0, 0, 0)
+
+    for dc in sort(collect(keys(wrap_by_dcount)))
+        v = sort(wrap_by_dcount[dc], by = x -> (x[1], count(c -> c == '2', x[3]), x[2], x[3]))
+        c = get(closed_by_dcount, dc, Tuple{Int,String,String}[])
+        sort!(c, by = x -> (x[1], count(c -> c == '2', x[3]), x[2], x[3]))
+        println("  D-steps = $dc (L-steps = $(10-dc)): wrapped=$(length(v)) (min preps=$(v[1][1]), e.g. [$(v[1][2])] $(v[1][3])) | exact-closed=$(length(c))",
+                isempty(c) ? "" : " (min preps=$(c[1][1]), e.g. [$(c[1][2])] $(c[1][3]))")
+        # Also print best example where step 10 (9=>0) is D
+        v_endD = [x for x in v if endswith(x[2], "D")]
+        if !isempty(v_endD)
+            println("    Best wrapped ending with D on 9=>0: $(v_endD[1][1]) preps [$(v_endD[1][2])] -> $(v_endD[1][3])")
+            v_q = [x for x in v_endD if !occursin('2', x[3])]
+            !isempty(v_q) && println("    Best quarter-only wrapped ending with D on 9=>0: $(v_q[1][1]) preps [$(v_q[1][2])] -> $(v_q[1][3])")
+        end
+        c_endD = [x for x in c if endswith(x[2], "D")]
+        if !isempty(c_endD)
+            println("    Best closed  ending with D on 9=>0: $(c_endD[1][1]) preps [$(c_endD[1][2])] -> $(c_endD[1][3])")
+        end
+    end
+end
+
 if abspath(PROGRAM_FILE) == @__FILE__
     verify_always_L_prime_impossibility()
     search_always_L()
     search_Lprime_plus_D()
     search_9L_1D()
+    search_8L_2D_patterns()
+    search_B_only_L_D_patterns()
 end

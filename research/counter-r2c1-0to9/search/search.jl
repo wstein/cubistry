@@ -226,8 +226,6 @@ function find_all_13htm_B_cycles()
     return cycles
 end
 
-find_all_13htm_B_cycles()
-
 function inspect_cycle_print(words::Vector{String}, name::String)
     println("\n=== Inspecting cycle: $name ===")
     println("  Words: ", join(words, " | "))
@@ -276,22 +274,11 @@ function inspect_cycle_print(words::Vector{String}, name::String)
     end
 end
 
-inspect_cycle_print(["L", "D", "L", "B L", "D", "L", "B2 D", "L", "D", "B D"], "B-Prep Cycle #15 (L | D | L | B L | D | L | B2 D | L | D | B D)")
-
-# Check if any of the 20 B-only 13-HTM cycle prints (or 127 RUB 13-HTM cycle prints)
-# also admits a 1-prep or 2-prep open 9-edge path (0..9) from some setup state!
 function check_open_on_same_print()
-    # In fact, in any 13-HTM cycle with 3 preps (at steps i1, i2, i3),
-    # if one of the 3 preps is on the 10th step (9->0), then steps 1..9 (0->1->...->9)
-    # ALREADY have only 2 preps (11 HTM across the 9 edges 0..9) with 0 setup!
-    # Look at Cycle #15:
-    # Steps 1..9 (0->1..->9): L | D | L | B L | D | L | B2 D | L | D  (only TWO preps: B and B2! 11 HTM!)
-    # Step 10 (9->0): B D (the 3rd prep is on the wrap edge 9->0!)
     println("\nNotice on Cycle #15 (L | D | L | B L | D | L | B2 D | L | D | B D):")
     println("  - Edges 0->1..->9 (open 0..9 from printed state, setup=0): 9 edges, 7 at 1 HTM, 2 at 2 HTM = 11 HTM (only 2 preps)!")
     println("  - Edge 9->0 (wrap back to exact printed state): B D (2 HTM, 1 prep), completing the 13-HTM closed cycle!")
 end
-check_open_on_same_print()
 
 # Can a SINGLE print support BOTH:
 #   Mode 1 (closed): 10-edge exact-closed cycle (0..9->0) in 13 HTM (7x 1-HTM, 3x 2-HTM B-prep)
@@ -373,4 +360,9 @@ function search_dual_mode_print()
     end
 end
 
-search_dual_mode_print()
+if abspath(PROGRAM_FILE) == @__FILE__
+    find_all_13htm_B_cycles()
+    inspect_cycle_print(["L", "D", "L", "B L", "D", "L", "B2 D", "L", "D", "B D"], "B-Prep Cycle #15 (L | D | L | B L | D | L | B2 D | L | D | B D)")
+    check_open_on_same_print()
+    search_dual_mode_print()
+end
