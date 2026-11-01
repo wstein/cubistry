@@ -29,6 +29,7 @@
     "pretypecheck": "npm run prepare:five-second",
     "test:five-second-proof": "npm run prepare:five-second && python3 .five-second-research/research/five-second-timer/verify.py .five-second-research/research/five-second-timer/optimized-certificate.json && python3 .five-second-research/research/five-second-timer/physical_replay.py .five-second-research/research/five-second-timer/optimized-certificate.json && python3 -m unittest discover -s .five-second-research/research/five-second-timer -p test_verify.py && python3 .five-second-research/research/five-second-timer/verify_trace.py test-results/five-second-commits.json",
     "verify:ms": "node scripts/prepare-ms.mjs --check",
+    "precheck": "npm run verify:hm",
     "verify:hm": "node scripts/prepare-hm.mjs --check"
   },
   "dependencies": {
