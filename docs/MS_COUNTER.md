@@ -13,20 +13,22 @@ seconds max 4 with 3 edges at 4). M3 exists in research PR #138 but is not in
 the application: its files are neither copied nor pinned here, and the panel
 has no print chooser.
 
-## What is established
+## What the research reports
 
 From the research README at the pinned commit, for S3 (the research's primary
-witness):
+witness). These are research candidates, not settled results; see
+[Boundaries](#boundaries):
 
 - **Max 4 HTM per increment and per decrement, with only 3 edges at 4 HTM.**
-  The seconds stay entirely within 3 HTM.
+  The seconds stay entirely within 3 HTM. The maximum of 4 is witnessed by
+  replay; it is not a proof of optimality.
 - **Max 3 HTM for both units is `UNKNOWN`.** It was not found and is not
   proven infeasible.
 
-| Unit | Period |
-| --- | --- |
+| Unit        | Period                                                    |
+| ----------- | --------------------------------------------------------- |
 | M (minutes) | 1 lap, 177 HTM, max 4 (3 edges at 4: 14→15, 35→36, 55→56) |
-| S (seconds) | **2 laps** (120 edges), 324 HTM, max 3 |
+| S (seconds) | **2 laps** (120 edges), 324 HTM, max 3                    |
 
 The application's tests read these numbers from the converted runtime and
 compare them with the README values.
@@ -34,7 +36,7 @@ compare them with the README values.
 ## How the application counts
 
 Each unit has one closed period of full poses (hidden stickers
-included). Node *i* shows *i* mod 60. +1 plays the node's saved research word;
+included). Node _i_ shows _i_ mod 60. +1 plays the node's saved research word;
 −1 plays the previous word inverted (reversed, every turn undone), which is the
 exact inverse traversal that the research checkers replay. Down therefore
 mirrors up, the 00 → 59 wrap included.
@@ -82,9 +84,15 @@ every period with the application's own cube mechanics before use.
 
 ## Boundaries
 
-- The conversion is a data-integrity gate, not a proof. The research Julia and
-  Flix checkers are the authority. The application's tests do not run them;
-  they were re-run once at the pinned commit with
+- The conversion is a data-integrity gate, not a proof. S3 is a research
+  candidate: both research checkers (Julia and Flix) accept it, and an
+  independent review on research PR #138 covers the pinned head `ee88e57`. The
+  limit of that evidence is that the Flix checker is a structural port of the
+  Julia checker, so the two share a common mode. The authority for proof status
+  is [proof-checkers/AUTHORITY.md](../proof-checkers/AUTHORITY.md), which has
+  no M/S profile, so nothing here is confirmed under it. Max 4 HTM is
+  witnessed by replay; max 3 HTM stays `UNKNOWN`. The application's tests do
+  not run the checkers; they were re-run once at the pinned commit with
   `checker/run-checks.sh` (Julia 1.13.3, Flix 0.79.0 on Java 21). Both
   accepted S3 (and M3, which the app does not use), and the S3 receipts and
   checks file they produced were byte-identical to the pinned copies.
