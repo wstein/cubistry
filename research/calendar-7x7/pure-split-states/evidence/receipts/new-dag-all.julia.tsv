@@ -1,0 +1,122 @@
+pure-print-change	4		blank	24/31	dark	new-up
+pure-print-change	25		blank	D	month	new-up
+pure-print-change	35		blank	26	dark	new-up
+pure-print-change	70	26	dark	C	month	new-up
+pure-print-change	74		blank	N	month	new-up
+pure-print-change	134		blank	T	month	new-up
+pure-print-change	135		blank	V	month	new-up
+pure-print-change	193	31↶	dark		blank	same-up
+pure-print-change	218	0	month	23/30	red	same-up
+pure-print-change	219	D	month	24/31	red	new-up
+pure-print-change	220	N	month		blank	same-up
+pure-print-change	224	30↶	red		blank	same-up
+pure-print-change	228	V	month	O	month	new-up
+pure-print-change	243	31↶	red		blank	same-up
+pure-print-change	261	T	month	E	month	same-up
+pure-print-change	278	C	month		blank	same-up
+pure-print-change	283	E	month		blank	same-up
+pure-print-orbit	-3	-3	19	3	19	5	0
+pure-print-orbit	-3	-2	15	2	15	9	0
+pure-print-orbit	-3	-1	21	2	21	3	0
+pure-print-orbit	-3	0	21	2	21	3	0
+pure-print-orbit	-3	1	20	2	20	4	0
+pure-print-orbit	-3	2	20	1	20	4	0
+pure-print-orbit	-2	-2	16	0	16	8	0
+pure-print-orbit	-2	-1	21	1	21	3	0
+pure-print-orbit	-2	0	20	0	20	4	0
+pure-print-orbit	-2	1	17	1	17	7	0
+pure-print-orbit	-1	-1	22	2	22	2	0
+pure-print-orbit	-1	0	22	1	22	2	0
+pure-print-orbit	0	0	6	0	6	0	0
+pure-target	1	2026	1	PASS	-	-	-	-	d212c31117e4ea5c6c77b70520578f14d97b55626048b28e8fc6e8e515084b7d
+pure-target	2	2026	2	PASS	-	-	-	-	583a55d8a3e7d7542b042245f910480b382ee7b582a7a2f5a08a164f68bf115b
+pure-target	3	2026	3	PASS	-	-	-	-	0b523d1652a236120e804d18a4029c7df847205381b4dd6f007fb451460eb815
+pure-target	4	2026	4	PASS	-	-	-	-	2c542f40747ed679527bc457b1dbe64e1166fb227bce15bc396d4d3fffcd640e
+pure-target	5	2026	5	PASS	-	-	-	-	1fd186d41bc52400b61a5433c4fcb7dd66415a529097bd4e1bb65c2eeb46d53d
+pure-target	6	2026	6	PASS	-	-	-	-	d54f1f67ad92ada9a234c9d620e3ee7e1380162c65abeca3848de516ce5c45c5
+pure-target	7	2026	7	PASS	-	-	-	-	5d8e1feec988fe1591f71a114894a959cdbf05629ba0f1b47d537b66d1d7ce31
+pure-target	8	2026	8	PASS	-	-	-	-	24fde4ccf23eb7bcb895d42a59b1e63ad4428cd557f0fd91fa8718cf3ce2847c
+pure-target	9	2026	9	PASS	-	-	-	-	8d0c85dd6ab6f45288ca6ca243a89c3432e31359330e42509972bdc2680b2165
+pure-target	10	2026	10	PASS	-	-	-	-	f6f32ae9b9db9c12a04db6ef6c596f5d9d27005add6e3177797fabe27775860e
+pure-target	11	2026	11	PASS	-	-	-	-	291ba8af62f56fc370b7dcfbc51ede9c29b6b80258941603d3955b08507fa20b
+pure-target	12	2026	12	PASS	-	-	-	-	7e96dd34170abe3fccab9de68dfb6251e62ba996d5a63a9720894029ba5e06ef
+pure-target	13	2027	1	PASS	-	-	-	-	43c0cc6311606f1eb2cee1e40aaeaafdf2fa7ad80b8aa393586d65721d3bdb46
+pure-target	14	2027	2	PASS	-	-	-	-	373edd52341887a97e3586bfe527371edb32fcaebd1ad0523216c726219de27f
+pure-target	15	2027	3	PASS	-	-	-	-	02a4c0af992992f98efa590bf89e1cf536ca57774cf1ab034f7435f00fb18ff4
+pure-target	16	2027	4	PASS	-	-	-	-	8f3cdccffed7466b7414232f278b1fc8e771da4ee22d9bd26883ed4a02a0fc2d
+pure-target	17	2027	5	PASS	-	-	-	-	53e58a09cb2d2ba16bb0d8b349843df070f5c4dba9eda83c8e30e8090ef0818a
+pure-target	18	2027	6	PASS	-	-	-	-	496507952b9657b82ccef37e9a63fec68eebda526013051fd83a326496865ed4
+pure-target	19	2027	7	PASS	-	-	-	-	b96c98dbc9a8a58f4cc9eabfc4a111ec97976fd7eb14c5086bd000fa19668190
+pure-target	20	2027	8	PASS	-	-	-	-	3331daf9ccea5f83b47624bb0dcf42f5921bbf8b712be9dab8401eeb2821de95
+pure-target	21	2027	9	PASS	-	-	-	-	464491da48bdfc096a8a32700e95629dc496138441e0f077b1baa100039badd5
+pure-target	22	2027	10	PASS	-	-	-	-	6b87b6097fede89730c6033b61bd8b225b77aa28bd1797ef4ae3f66bd6e1399c
+pure-target	23	2027	11	PASS	-	-	-	-	55c9fb6e13049607f95959c2107b3d54884b2a20f654347d0d51bf0ee014d26a
+pure-target	24	2027	12	PASS	-	-	-	-	751da66903025a4584a9aefcfdf80bdfc7b2aff29788e5df9859703b27d259b3
+pure-target	25	2028	1	PASS	-	-	-	-	fbf48c2095bdb6a8f3f6ce767244c013d903f27946bde0f1756c4c9c367a8f14
+pure-target	26	2028	2	PASS	-	-	-	-	03cef80d7b3385dc7cc26dc8e4d035b64348cac6bd628984cd627041c6ada2b2
+pure-target	27	2028	3	PASS	-	-	-	-	9db4f6b333a36db4b90e535c917146fb5e42d4c7f57ec898773278085c4c6bd0
+pure-target	28	2028	4	PASS	-	-	-	-	8e8e60a72ec2c4f0459e00eba21f0abc207727cd64f5f2df9a485c2922b2fe9a
+pure-target	29	2028	5	PASS	-	-	-	-	70fb271cc438f475d604de80ea54335b2ef57732556b444bd0b54519e6dac857
+pure-target	30	2028	6	PASS	-	-	-	-	1cd4491bbe7100fa7c56ec84537b3b5ce795d1a5deda4c4758c93110b17612b8
+pure-target	31	2028	7	PASS	-	-	-	-	3ee8712a40824d33294ad76b088f5689a065eb4761db599498f38840769fb4ef
+pure-target	32	2028	8	PASS	-	-	-	-	2b6a76b52a0d990f2eac5993c1a976d626f41908084151a14748377218fc787b
+pure-target	33	2028	9	PASS	-	-	-	-	d076e8a106d12127fbe6725d716267e1d30949e93c5bbb63031017f5376d4d97
+pure-target	34	2028	10	PASS	-	-	-	-	0ee722799f0b02ce2c3c1196674a510a2a8fadb5f1df554471304b1fad9d4b93
+pure-target	35	2028	11	PASS	-	-	-	-	5c0ade09fb3cb7df81a27f1cd4ffb141931ae853e0924ae8e11af73b370e895f
+pure-target	36	2028	12	PASS	-	-	-	-	c71d100c347b00526788619fbe30866fbaabe52c8cc74161b64f9c41b6606e97
+pure-target	37	2029	1	PASS	-	-	-	-	3f477e959a900ee820dd873ffed1aca6b85a44d9faf67823bedf976bd1fcb208
+pure-target	38	2029	2	PASS	-	-	-	-	49a2119629c958bcd0dcf92f4c2b38103a31016ae5d818ed543d8f3b94ce00a0
+pure-target	39	2029	3	PASS	-	-	-	-	ad5ca3552e2cb01dca0eddc1b8a31f1af7b03016633d6faf901dee3e1bfb0eda
+pure-target	40	2029	4	PASS	-	-	-	-	a5197b9d6728d1c01941c8b28ec8eead094aa9b609e0b1369b38f86454e5cb57
+pure-target	41	2029	5	PASS	-	-	-	-	5c895dd83f83118449574616d5bc25c2b4a16bc031a962d60e8e7aa8f1676457
+pure-target	42	2029	6	PASS	-	-	-	-	bf73c9590a9fb1b54ed92b11a52f45c695044e5efa8ebf600c2e99383779c7bb
+pure-target	43	2029	7	PASS	-	-	-	-	566859473e3c1ae5dacec955012ff88e072ecf8877888d7b60f32fc6b8a62158
+pure-target	44	2029	8	PASS	-	-	-	-	07510e8c560c8f72c13868f49b6c9378c09f2e0e5bdd00209efe5fbc88cd8599
+pure-target	45	2029	9	PASS	-	-	-	-	9886341def592b9211b2dee5566bc47c5b7354b9f8c29125ba2b6d3bf966455d
+pure-target	46	2029	10	PASS	-	-	-	-	3858730c55d5e3220cb925e345ab954be3ba7e85e50f82b6cfdc70cd393311fb
+pure-target	47	2029	11	PASS	-	-	-	-	d286f23c499949fdc2594f1ae6c6b68950cbb2b03cea0dede3a5c88f98d6a9f8
+pure-target	48	2029	12	PASS	-	-	-	-	b9c6430790af5f6c210cfb9554b1f7a4e65a1adf5e88f95a7c5d6fc9fdbe16e8
+pure-target	49	2030	1	PASS	-	-	-	-	ff7fd592fa89c7771fb8d0c855c374be111e4ac2af696d7d27da86a761448e87
+pure-target	50	2030	2	PASS	-	-	-	-	2fa2551437635cad5d337c352a2be0b865729416d1b38703aa75cf5a58c24193
+pure-target	51	2030	3	PASS	-	-	-	-	ade58264c470bc23d179e50f56893eb622dfb19ca92ea19a9df0558d4bf36452
+pure-target	52	2030	4	PASS	-	-	-	-	f1e36e8f3a7940f61c10e5c5832964b0526d489648ccbcca026c44a4f758177a
+pure-target	53	2030	5	PASS	-	-	-	-	bbb96b17f666d352f7acb99352fe6b3a76acb28753d9fe5a8bd13c494cc3210a
+pure-target	54	2030	6	PASS	-	-	-	-	a27c916e4cd455eea050136b38d84535cfc74c05977b05f10e3bdc60410a7052
+pure-target	55	2030	7	PASS	-	-	-	-	745ab387e373a0b24423f51cec6d9aed13aed06cb7c960cf101a6edeb67c5e7d
+pure-target	56	2030	8	PASS	-	-	-	-	a01f9a3b0483b2b74d60b9bbb9c96f96e4c9ded471a34dcd824c8c9fd88dc190
+pure-target	57	2030	9	PASS	-	-	-	-	a3ce2ac76cd0e0458445a988cbd04feacf3ea9b3f59a65920cf69950b9484253
+pure-target	58	2030	10	PASS	-	-	-	-	6d64ca1d57f89c25ef3139b81d604c9f3dfd64a046f7d8afd2f1764a7a1df5e2
+pure-target	59	2030	11	PASS	-	-	-	-	cf3edd4c7fe3819a3eca8a18edd237b066d8f0130e987a4aab56b0079491ec98
+pure-target	60	2030	12	PASS	-	-	-	-	b4678c42b4695a8b4185fc12738dad78b81d84c28fd197ca5477d31cf3ac209c
+pure-target	61	2031	1	PASS	-	-	-	-	7567e688faa88cf5b36a3acc474815164bb8d307528e89980f04a1bcb6271b40
+pure-target	62	2031	2	PASS	-	-	-	-	a61a905540c5ccf7adf62b31921ac8edb0fb5b8ffd48750762c4515a0e76c84b
+pure-target	63	2031	3	PASS	-	-	-	-	d2eee37151ccc103c24c0541070c604ce95901d6dc8cb4de64697ec183e09532
+pure-target	64	2031	4	PASS	-	-	-	-	7c7b132abb1c31fcb192ce9287417875e929d28345346ca37173a85ea0609acf
+pure-target	65	2031	5	PASS	-	-	-	-	bd75f065d6ffaa5b9bce66ca4120d29a2fa26e9b743c48be2efd7b2786c7fdb4
+pure-target	66	2031	6	PASS	-	-	-	-	02d1d4411ac5909c6f3ef94b9adef8f9093b5ffe6fdc86e49b93558c1f3eb7d1
+pure-target	67	2031	7	PASS	-	-	-	-	5d285a5fdf4217a8bebddb071821a6feb1dcecff60b7102e8a3f34db24c080c3
+pure-target	68	2031	8	PASS	-	-	-	-	5d70c219e25df900b2c2d6e4fedf26f3c527d3f776e02d58233525cbfcd4b42a
+pure-target	69	2031	9	PASS	-	-	-	-	254bd3e32e1c2d3c89c44769a44d870c946cb5852343d7c1b3a783b801f39eec
+pure-target	70	2031	10	PASS	-	-	-	-	36833d6cce0e8b530ed9731cbd4fab168f54fa0f76f25d43b04df26932e4e35d
+pure-target	71	2031	11	PASS	-	-	-	-	dbdb2f60ece59a19aa6639e62ea46c39b25658a7e817641d14c5943d9dff1291
+pure-target	72	2031	12	PASS	-	-	-	-	7496ce0d1a3f8e114da3b8c34c4e6990abef89d2938789f45aef32a7b17f1861
+pure-target	73	2032	2	PASS	-	-	-	-	ba36cf8d86510fc72b3514eb13889bb85c5eda2c5eaedfd2f4b6464aeb50bfbd
+pure-target	74	2033	2	PASS	-	-	-	-	4005e5896901c21a6a55701bab44f07651803f5f97ab460d3a385100aef83a2a
+pure-target	75	2033	3	PASS	-	-	-	-	71fd2ed2f3aad5025e29ddb1b8404c0ff514bd007f466e3cea7b298d3bc7aa2a
+pure-target	76	2033	4	PASS	-	-	-	-	e601348e7a6214749ec3718c184185ac1bf463aed97bc77233236bb6c27cb995
+pure-target	77	2033	5	PASS	-	-	-	-	eec2496e5be117e20e55e1cabcf8ee662f0fc66ceee2a42c97f3652952657335
+pure-target	78	2033	6	PASS	-	-	-	-	7449d1b8d17fdc5b97df260453876c5925fe6ae98475684ce785c2de70736ca1
+pure-target	79	2033	7	PASS	-	-	-	-	84df84a1eed54a7a430fc0bafcf84d00cdfcf1dedd29af9b569ecf1f2b2a2ddf
+pure-target	80	2033	8	PASS	-	-	-	-	ae811c765cdfdb9c9ee816e4e1a352f443f66e7b36fff1b4fbf90211a8efd61e
+pure-target	81	2033	9	PASS	-	-	-	-	f8e53dd2e72270f4d6b3e50e24653bab58c021be539bb0f34e36c471893c1bdb
+pure-target	82	2033	10	PASS	-	-	-	-	129287f9db63af354e717911af52a921a8ecc165c2b98fd3f7bb3d7a9262ac3c
+pure-target	83	2033	11	PASS	-	-	-	-	056d319e82d3f310ac16a46d562edbf49ae1b053b2a061d5fd74518fb5242e1b
+pure-target	84	2033	12	PASS	-	-	-	-	b6fa349102c534fc21a38fde7fdc152e87b465abaa3e1ea499df1a05aabf5a6e
+pure-target	85	2034	1	PASS	-	-	-	-	ac9faefbf1d1f42f01379b0bae3aa61922b0a816d80712a0c29572bf9b9d1d0b
+pure-target	86	2034	2	PASS	-	-	-	-	5f0ab9517734800187e4c396ee45f811d9d4eac47ae889807f3289845a366686
+pure-target	87	2036	2	PASS	-	-	-	-	688208a4c4b0e3dae86384e3b41bed313bc9c4ddbaec5a419ae202d5abdcb73b
+pure-target	88	2040	2	PASS	-	-	-	-	963d36620671c905036d3331cba73f97e93b1015aa7a51f658b7f565b8fa1f0d
+pure-target	89	2044	2	PASS	-	-	-	-	3db63cef8e5f94851bbaebb71a2ddcc550d0838d2ccaa567d0201a7263d2f735
+pure-target	90	2048	2	PASS	-	-	-	-	903bac3eed7ea8da9aaa36ee5949eebba7262b8d5fbac13997f03ca2aade80a5
+pure-target	91	2052	2	PASS	-	-	-	-	19e67813c352129dbf593d2c0d29a426a7863113338a6a8e60d3c1d2e5da8630
+pure-summary	ACCEPT	91	0	0	240
