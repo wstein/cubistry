@@ -9,6 +9,7 @@ flipped-product	1	1	AssertionError: 1 of 91 states fail the pure-split front: ta
 chain-move-changed	1	1	AssertionError: Edge 1 front | java.lang.IllegalArgumentException: edge front	 | 
 chain-htm-changed	1	1	AssertionError: Declared transition metrics mismatch | java.lang.IllegalArgumentException: declared HTM/QTM/rotation metrics differ from raw moves	 | 
 chain-stage1-print	1	1	AssertionError: Initial actual physical state digest | java.lang.IllegalArgumentException: initial full physical source SHA mismatch	 | 
+chain-stage1-print-rehashed	1	1	AssertionError: Edge 4 front | java.lang.IllegalArgumentException: edge front	 | 
 chain-pr99-julia-verifier	1	-	ERROR: LoadError: AssertionError: Front image mismatch at 7,1	unchanged PR #99 Julia chain verifier, expected to reject
 bad-target-id	1	1	AssertionError: TARGETS must be distinct ids 1..91 or all | java.lang.IllegalArgumentException: TARGETS must be distinct ids 1..91 or all	 | 
 duplicate-targets	1	1	AssertionError: TARGETS must be distinct ids 1..91 or all | java.lang.IllegalArgumentException: TARGETS must be distinct ids 1..91 or all	 | 
