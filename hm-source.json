@@ -5,17 +5,17 @@
   "print": "m3-SH",
   "convertedPath": "data/hm/m3-sh/modes/witness.json",
   "runtimePath": "public/hm-counter.v1.json",
-  "commit": "0df2f3a012749bb550bc34dd1bc4fa07dcde6817",
+  "commit": "44ca982d9e15dc28c62ba105f47f62a26cf8d261",
   "researchFiles": {
-    "research/hm-counter-3move/README.md": "1c91192ec5eeff91b0d3e396b6140d8999f1c6c82c7a6a000ca32e2b63154ff9",
+    "research/hm-counter-3move/README.md": "b74328ef5f9939309e2004d7ed0c60fe55eb485fb773d811f8e6476c0bd41fde",
     "research/hm-counter-3move/evidence/witness-blank-m3-SH.tsv": "2f5412bab13821909fc76c981a17e58aaf65c99271bea706f0b5ef4cdb52e210",
     "research/hm-counter-3move/evidence/receipt-blank-m3-SH.julia.tsv": "8279bafe76a5490351a8004742af8659f2013cb1937de8cef65c87659158de25",
     "research/hm-counter-3move/evidence/receipt-blank-m3-SH.flix.tsv": "8279bafe76a5490351a8004742af8659f2013cb1937de8cef65c87659158de25",
-    "research/hm-counter-3move/evidence/checks-blank-m3-SH.tsv": "153000dc1dbfc460a6e9ca40e864650841cd7bdf44b3822e608d7153755490ee",
-    "research/hm-counter-3move/checker/check.jl": "7009ead07b1b4ad8b22dc497578d0ce1859a88a2268a9b09ba739675ebb23a47",
-    "research/hm-counter-3move/checker/run-checks.sh": "f4878d027659f5bf54374c6877694b5366122e98ad010ddbe729ac9c1c2201cf",
-    "research/hm-counter-3move/flix/src/Main.flix": "79655895ab10f51c43c1b1a1ced2a6a1e8dced087c486f119d5578c9c171ee2b",
-    "research/hm-counter-3move/ms-import/PROVENANCE.md": "e7a3c595f29ef32399c19005988d8486805b38f3240bf18e34c58178c077d4fa"
+    "research/hm-counter-3move/evidence/checks-blank-m3-SH.tsv": "01072fa54f27fd15568abcf5af9701079971d2cfa9480880ac572c73f9a249ab",
+    "research/hm-counter-3move/checker/check.jl": "08af405b7bf83a467d3db0a5e8f3424d606e4f6a765bf5e594112db2a6dd4364",
+    "research/hm-counter-3move/checker/run-checks.sh": "41534db2f85fd68b296532db597b963f4bb580f0656093a471abdb89a152f7cf",
+    "research/hm-counter-3move/flix/src/Main.flix": "1014b19743b52929be820a77d0427dcfef843d5a082516724517f3c205221b3f",
+    "research/hm-counter-3move/ms-import/PROVENANCE.md": "2aea0585cdba376a9d5da7bc05eb22b12f7c28d36b92a8c67ab4e9b1f70b1295"
   },
   "copies": {
     "research/hm-counter-3move/evidence/witness-blank-m3-SH.tsv": "data/hm/m3-sh/research/witness-blank-m3-SH.tsv",
@@ -23,6 +23,6 @@
     "research/hm-counter-3move/evidence/receipt-blank-m3-SH.flix.tsv": "data/hm/m3-sh/research/receipt-blank-m3-SH.flix.tsv",
     "research/hm-counter-3move/evidence/checks-blank-m3-SH.tsv": "data/hm/m3-sh/research/checks-blank-m3-SH.tsv"
   },
-  "convertedSHA256": "a4ca6ccd5bac254894b64df8d675f3a9555dd1c3eef37fe9aa1214c1a8b70126",
+  "convertedSHA256": "635e9325dea8e5da5c495d94918c82bf85e3fabfa53817cd4ad584e859210939",
   "runtimeSHA256": "120f02832f090fbb29d9238d0d88dddfd54d9ff9542975174c37d94e1dcdd524"
 }
