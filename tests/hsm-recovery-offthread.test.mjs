@@ -370,6 +370,44 @@ test("tryPrepare keeps one search per route, returns null until it finishes, the
   for (const x of [c, plain]) x.dispose();
 });
 
+test("a plan search without a route does not loop: the async path reaches the synchronous route", async () => {
+  const original = HsmRecovery.prototype.planTask;
+  const executor = sliced(0.5);
+  let started = 0;
+  const c = newController("S", 59, 1, executor),
+    plain = newController("S", 59, 1, null);
+  try {
+    await c.configure(0);
+    await plain.configure(0);
+    c.request(40);
+    await settleN(c);
+    plain.request(40);
+    await settleN(plain);
+    // The recovery plan finds no route here, so the jump search must take over.
+    HsmRecovery.prototype.planTask = function () {
+      started++;
+      return (function* () {
+        return null;
+      })();
+    };
+    const expected = plain.prepare(41),
+      before = executor.stats.jobs;
+    let route = null;
+    for (let n = 0; n < 30 && !route; n++) {
+      route = c.tryPrepare(41);
+      await flush();
+    }
+    assert.ok(route, `no route after polling (${executor.stats.jobs - before} searches)`);
+    assert.equal(word(route), word(expected));
+    assert.equal(executor.stats.jobs - before, 2, "one plan and one jump search");
+    assert.ok(started >= 1);
+  } finally {
+    HsmRecovery.prototype.planTask = original;
+    c.dispose();
+    plain.dispose();
+  }
+});
+
 // ------------------------------------------------- through the controller
 
 test("every mode counts, jumps and recovers identically with and without the sliced executor", async () => {
