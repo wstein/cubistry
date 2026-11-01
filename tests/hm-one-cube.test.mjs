@@ -409,6 +409,103 @@ test("step length: period steps stay within 3 (M) or 4 (H); steps after a free j
   assert.match(docText, /254/);
 });
 
+test("recovery after a free jump honors the variant's edge limit 4 where a 4-HTM route exists", async () => {
+  // Replayed from every Set value: these three cases never need a step above 4
+  // (H 00-23 up with the default recovery limit 5 takes 39 steps at 5 HTM).
+  for (const [letter, maximum, direction] of [
+    ["H", 23, 1],
+    ["H", 11, 1],
+    ["H", 11, -1],
+  ]) {
+    const steps = await stepsAfterEverySet(letter, maximum, direction);
+    assert.equal(steps.length, (maximum + 1) ** 2);
+    assert.ok(
+      Math.max(...steps.map((s) => s.cost)) <= HM_VARIANT.edgeLimit,
+      `${letter}/${maximum}/${direction}`,
+    );
+  }
+});
+
+test("recovery: a pose with no 4-HTM route to the next value takes its shortest word (5) as the first step", () => {
+  const recovery = new HsmRecovery(
+      design.print,
+      new HsmPlanner(HM_VARIANT.jumpBound),
+      HM_VARIANT.edgeLimit,
+      HM_VARIANT.jumpBound,
+    ),
+    periods = new HsmPeriods(design.print, design.periods);
+  // Poses off the period that show the value but need exactly 5 HTM to show
+  // the next one (found by search over short scrambles of the print).
+  for (const [scramble, value, direction] of [
+    ["L B", 50, -1],
+    ["U2 R D2 U2", 57, 1],
+  ]) {
+    const state = applyMoves(initialState(design.print), parseAlg(scramble));
+    assert.ok(matchesTarget(design.print, state, hsmTarget("M", value)));
+    assert.equal(periods.nodeOf("M", 59, direction, state), -1);
+    const plan = recovery.plan(state, "M", 59, direction, value, (v) =>
+      periods.nodesShowing("M", 59, direction, v),
+    );
+    assert.ok(plan, `${scramble}: a plan exists`);
+    assert.equal(plan.words[0].length, 5, `${scramble}: first step`);
+    const next = applyMoves(state, plan.words[0]);
+    assert.ok(
+      matchesTarget(
+        design.print,
+        next,
+        hsmTarget("M", (value + direction + 60) % 60),
+      ),
+    );
+  }
+});
+
+test("free-jump cap 7 is not slack: a least route of 7 HTM exists, and cap 6 refuses or shortchanges it", () => {
+  assert.equal(HM_VARIANT.jumpBound, 7);
+  const make = (bound) =>
+      new HsmRecovery(
+        design.print,
+        new HsmPlanner(bound),
+        HM_VARIANT.edgeLimit,
+        bound,
+      ),
+    periods = new HsmPeriods(design.print, design.periods),
+    capped = make(HM_VARIANT.jumpBound),
+    lower = make(6);
+  // Poses found by search over short scrambles of the print; each has a display
+  // that no route shorter than 7 HTM reaches. Sampled jumps from settled poses
+  // need at most 6, but that is a sample, not a bound.
+  for (const [scramble, letter, maximum, target] of [
+    ["U2 B' U'", "H", 23, 15],
+    ["L2 B R F'", "H", 23, 17],
+    ["U' D D2 R U'", "H", 11, 5],
+  ]) {
+    const state = applyMoves(initialState(design.print), parseAlg(scramble)),
+      nodes = (v) => periods.nodesShowing(letter, maximum, 1, v),
+      word = capped.jump(state, letter, maximum, 1, target, nodes);
+    assert.equal(word?.length, 7, scramble);
+    assert.ok(
+      matchesTarget(
+        design.print,
+        applyMoves(state, word),
+        hsmTarget(letter, target),
+      ),
+      scramble,
+    );
+    assert.equal(lower.jump(state, letter, maximum, 1, target, nodes), null);
+  }
+  // The search also looks one step beyond the least length for a route that
+  // lets counting continue within the edge limit: here the least route is 6 HTM,
+  // the chosen route 7 HTM, and the next step from it needs at most 4 HTM.
+  const state = applyMoves(initialState(design.print), parseAlg("L2 U2 U U' B")),
+    nodes = (v) => periods.nodesShowing("H", 23, 1, v),
+    word = capped.jump(state, "H", 23, 1, 23, nodes);
+  assert.equal(word?.length, 7);
+  const landed = applyMoves(state, word);
+  assert.ok(matchesTarget(design.print, landed, hsmTarget("H", 23)));
+  assert.ok(capped.shortest(capped.encode(landed), "H", 0) <= HM_VARIANT.edgeLimit);
+  assert.equal(lower.jump(state, "H", 23, 1, 23, nodes)?.length, 6);
+});
+
 // ------------------------------------------------------- negative controls
 
 test("negative controls: wrong variant, corrupted runtime and tampered witness are rejected", () => {
@@ -449,6 +546,22 @@ test("negative controls: wrong variant, corrupted runtime and tampered witness a
     mutate(d);
     assert.throws(() => validateHsmDesign(d, HM_VARIANT), reason);
   }
+  // The range is checked per letter: M only 59, H only 23 or 11, even when the
+  // modulus fits the word count and the letter is allowed.
+  for (const [index, letter, maximum] of [
+    [2, "M", 23], // an hours period relabeled as minutes
+    [0, "H", 59], // the minutes period relabeled as hours
+    [3, "M", 11],
+  ]) {
+    const d = structuredClone(raw);
+    d.periods[index].letter = letter;
+    d.periods[index].maximum = maximum;
+    assert.throws(
+      () => validateHsmDesign(d, HM_VARIANT),
+      /Invalid HSM period/,
+      `${letter}${maximum}`,
+    );
+  }
   assert.doesNotThrow(() => validateHsmDesign(structuredClone(raw), HM_VARIANT));
 
   // The converter refuses tampered research bytes.
@@ -473,6 +586,24 @@ test("negative controls: wrong variant, corrupted runtime and tampered witness a
   ]) {
     assert.notEqual(bad, tsv);
     assert.throws(() => convertWitness(bad, meta), reason);
+  }
+  // A consistent but wrong receipt (both identical, digest re-recorded) must
+  // still be refused when it disagrees on a single field of one mode.
+  for (const [from, to, reason] of [
+    [/(period\tH\t23\ttotal\t73\tmax\t)4/, "$13", /receipt agrees on H23/],
+    [/(period\tM\t59\ttotal\t163\tmax\t)3/, "$14", /receipt agrees on M59/],
+    [/(period\tH\t11\ttotal\t)40/, "$141", /receipt agrees on H11/],
+  ]) {
+    const receipt = meta.receipts.julia.replace(from, to);
+    assert.notEqual(receipt, meta.receipts.julia);
+    const checks = meta.checks.replace(
+      /^receipts\tIDENTICAL\t[0-9a-f]+/,
+      `receipts\tIDENTICAL\t${sha256(receipt)}`,
+    );
+    assert.throws(
+      () => convertWitness(tsv, { ...meta, receipts: { julia: receipt, flix: receipt }, checks }),
+      reason,
+    );
   }
   assert.throws(
     () => convertWitness(tsv, { ...meta, receipts: { ...meta.receipts, flix: meta.receipts.flix + "x" } }),
