@@ -6,3 +6,4 @@ src/*.res.mjs
 __pycache__/
 *.pyc
 .venv/
+bun.lock
