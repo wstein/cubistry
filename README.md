@@ -49,6 +49,7 @@ application chooser in the page header switches between these:
 | Counter 0-99 | A two-digit counter (default page) | `index.html` ([docs](docs/COUNTER_USAGE.md)) |
 | H/M/S Counter 00-59 | Seconds, minutes or hours | `index.html` ([docs](docs/HSM_COUNTER.md)) |
 | 60-Minute and 5-Second Timers | Countdown and stopwatch | `index.html` ([docs](docs/WORKSHOP_TIMER.md), [docs](docs/FIVE_SECOND_TIMER.md)) |
+| M/S Timer | Countdown and stopwatch on two cubes, 00:00-59:59 | `ms-timer.html` ([docs](docs/MS_TIMER.md)) |
 | Calendar | German and English calendar cubes | `calendar.html` ([docs](docs/CALENDAR_CUBES.md)) |
 | CI Quality Cube | Workflow status on six faces | `status.html` ([docs](docs/STATUS_CUBE.md)) |
 | Picture Puzzle Playground | Free-play 2x2 with picture stickers | `playground.html` ([docs](docs/PICTURE_PLAYGROUND.md)) |

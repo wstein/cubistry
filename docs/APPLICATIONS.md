@@ -4,9 +4,10 @@ Preview status, the Status Cube, acceptance examples, sticker sheets and the pla
 
 ## Application overview
 
-The application chooser in the page header lists the first eight applications
-below. The remaining pages are opened directly or by link. Entry points are
-relative to the site root, for example `http://localhost:5173/` locally.
+The application chooser in the page header lists the applications up to the
+Picture Puzzle Playground below. The remaining pages are opened directly or by
+link. Entry points are relative to the site root, for example
+`http://localhost:5173/` locally.
 
 | Application | What it shows | Entry point | Documentation |
 | --- | --- | --- | --- |
@@ -16,6 +17,7 @@ relative to the site root, for example `http://localhost:5173/` locally.
 | H/M One-Cube Counter | One cube counting hours or minutes on print m3-SH (candidate, needs a physical reprint) | `index.html`, chooser | [H/M One-Cube Counter](HM_ONE_CUBE_COUNTER.md) |
 | 60-Minute Timer | Countdown or stopwatch, 00:00-59:50 | `index.html`, chooser | [Workshop timer](WORKSHOP_TIMER.md) |
 | 5-Second Timer | Countdown or stopwatch, 00:00-39:55 | `index.html`, chooser | [Five-second timer](FIVE_SECOND_TIMER.md) |
+| M/S Timer | Countdown or stopwatch on two cubes (minutes, seconds), 00:00-59:59 | `ms-timer.html`, chooser | [M/S Timer](MS_TIMER.md) |
 | Calendar | German and English calendar cubes (3x3) | `calendar.html` | [Calendar cubes](CALENDAR_CUBES.md) |
 | CI Quality Cube | Six-face workflow status prototype | `status.html` | [Status Cube](STATUS_CUBE.md) |
 | Picture Puzzle Playground | Free-play 2x2 with picture stickers | `playground.html` | [Playground](PICTURE_PLAYGROUND.md) |
