@@ -42,7 +42,7 @@ export const inverseWord = (word) =>
 /**
  * What one counter variant derives from its modes witness. The H/S/M default
  * reproduces public/hsm-counter.v3.json byte for byte; `extended` adds the
- * variant's letters, edge limit, label and per-period maximum (H/M counter).
+ * variant's letters, edge limit, label and per-period maximum (H/M one-cube counter).
  */
 export const HSM_RUNTIME = {
   witnessSchema: "cubistry.hsm-seconds-first-modes",

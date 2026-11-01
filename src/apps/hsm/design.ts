@@ -22,7 +22,7 @@ export const PERIOD_EDGE_LIMIT = 5;
  * One counter application built on this code: which letters its print
  * carries, its counting ranges per letter, the owner's per-edge limit for the
  * saved periods, the cap for a free jump and the runtime file it loads.
- * The H/M/S counter is the default everywhere; the H/M counter (src/apps/hm)
+ * The H/M/S counter is the default everywhere; the H/M one-cube counter (src/apps/hm)
  * is a second variant of the same controller, planner and periods.
  */
 export interface HsmVariant {
