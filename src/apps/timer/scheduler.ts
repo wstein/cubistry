@@ -1,6 +1,21 @@
 import { stateEquals, type CubeState } from "@cubistry/cube-core";
 import type { ClockSnapshot } from "./clock.ts";
-import type { TimerController } from "./controller.ts";
+import type { MoveProgress } from "../shared/playback.ts";
+
+/**
+ * What the scheduler needs from one cube: `TimerController` and the M/S Timer
+ * cubes both provide it, so each cube of a pair gets its own scheduler.
+ */
+export interface TimerCube {
+  readonly currentValue: number;
+  readonly busy: boolean;
+  readonly progress: MoveProgress;
+  readonly state: CubeState | null;
+  prepare(value: number): readonly unknown[];
+  request(value: number): void;
+  setDeadline(target: number, endAt: number, durationMs: number): void;
+  clearDeadline(): void;
+}
 
 /** Foreground calibration allowances, not browser/OS scheduling guarantees. */
 export const FRAME_ALLOWANCE_MS = 75;
@@ -30,7 +45,7 @@ interface Plan {
 /** Predictive Timer presentation; playback retains sole ownership of physical state. */
 export class TimerScheduler {
   private plan: Plan | null = null;
-  private controller: TimerController | null = null;
+  private controller: TimerCube | null = null;
   private wake: ReturnType<typeof setTimeout> | null = null;
   private lastBucket: number | null = null;
   private missedBoundary = false;
@@ -52,7 +67,7 @@ export class TimerScheduler {
     const p = this.plan;
     return p && p.target === snapshot.next?.target ? p.target : null;
   }
-  tick(snapshot: ClockSnapshot, controller: TimerController, preferred: number,
+  tick(snapshot: ClockSnapshot, controller: TimerCube, preferred: number,
     setDuration: (duration: number) => void): void {
     this.controller = controller;
     const { bucket, next } = snapshot;
@@ -157,7 +172,7 @@ export class TimerScheduler {
       controller.request(p.target);
     }
   }
-  private request(controller: TimerController, target: number): void {
+  private request(controller: TimerCube, target: number): void {
     if (controller.busy && controller.progress.target === target && controller.progress.queuedTarget === null) return;
     if (controller.progress.queuedTarget !== target) controller.request(target);
   }
