@@ -123,6 +123,27 @@ What if we require **every single increment** $d \to d+1$ to end with the **exac
        - **`7×L + 3×D` (`D` on `3=>4, 6=>7, 9=>0`, only 2 `B`-preps = 12 HTM, no `U`, no `R`):** `L | L | B2 L | D | L | L | B2 D | L | L | D`
        - **`7×L + 3×D` (`D` on `2=>3, 5=>6, 9=>0`, 3 `B`-preps = 13 HTM, 100% clockwise `L, D, B` quarter-turns, no `U`, no `R`):** `L | B L | D | L | B L | D | L | B L | L | D`
        - **`6×L + 4×D` Exact Closed 10-Cycle (`4 B-preps = 14 HTM`, 100% clockwise `L, D, B` quarter-turns, no `U`, no `R`):** `B D | B L | D | L | D | L | L | B L | B L | D`
+5. **Pure-QTM (`\le 1` QTM prep/step, no half-turn preps) on `L | L | L | L | (y'/y or D) | L | L | L | L | (y'/y or D)`:**
+   What if every step has a strict **$\le 2$ QTM budget** — at most **1 QTM preparing move (`B, B', U, U', R, R'`)** before a 90° final move (`L, D, y, y'`), and **no prepare move allowed if a half-turn (`L2, D2, y2`) is used** (so `B2, U2, R2` are forbidden as single preps)?
+   - **If `U` and `R` are forbidden (`B`-only QTM preps `{B, B'}`):**
+     - **Pure QTM (`L, D, y, y'` with `{B, B'}` preps):** **0 solutions (`UNSAT`)** for all `4×L + X + 4×L + Y` patterns (`X, Y in {y, y', D}`), even for Open `0..9`! All surviving paths die at step 9 (`8=>9`), because during `0..4` the front-right corners `UR, LR` sit untouched showing `blank`, and a single 90° `B` or `B'` quarter-turn cannot swap the diagonally opposite back corner `DBR` into `UBL` in 1 QTM (unlike `B2`). In pure `B`-only QTM, at least **3** `y/y'` or `D` steps (`7×L + 3×y` or `7×L + 3×D`) are required (`L | B L | D | L | B L | D | L | B L | L | D`, 3 QTM preps = 13 QTM).
+     - **With bare HTM half-turns allowed with 0 preps (`L2, D2, y2` with 0 preps):** Open `0..9` becomes **`SAT`** using a single bare `L2` (`L2 | B L | B' L | L | B' y | L | B' L | L | L`, 59 open routes, or `L | B L | L | B L | D | B L | B L | B L | L2`, 5 open routes), while 10-step wrapped `0..9->0` remains **`UNSAT` (0 solutions)**.
+   - **If `U`/`U'` (or `R`/`R'`) QTM preps are allowed (`\le 1` QTM prep/step, 0 half-turns):**
+     - **`L | L | L | L | y | L | L | L | L | y` (`No-R` QTM `{B, B', U, U'}`):**
+       - **Open `0..9`:** **336** `No-R` routes (705 with `R`), min **4 QTM preps (13 QTM)**: `U L | L | B' L | L | B' y | L | B' L | L | L`
+       - **1-Lap Wrapped `0..9->0`:** **12** `No-R` routes (185 with `R`), min **5 QTM preps (15 QTM)**: `U L | L | B' L | L | B' y | L | B' L | L | L | U' y`
+     - **`L | L | L | L | y' | L | L | L | L | y'` (including bare `y'` on both `4=>5` and `9=>0`):**
+       - **Open `0..9`:** **293** `No-R` routes (1,073 with `R`), min **5 QTM preps (14 QTM)**: `L | U' L | B' L | U L | y' | B' L | B L | L | L`
+       - **1-Lap Wrapped `0..9->0`:** **24** `No-R` routes (416 with `R`), min **6 QTM preps (16 QTM, bare `y'` at steps 5 & 10, zero `R` moves)**: `L | U' L | B L | U L | y' | B L | L | B L | U L | y'`
+     - **`L | L | L | L | D | L | L | L | L | y'` (`D` on `4=>5`, `y'` on `9=>0`):**
+       - **Open `0..9`:** **684** `No-R` routes (2,121 with `R`), min **5 QTM preps (14 QTM, bare `D` on `4=>5`)**: `L | B L | B L | L | D | B L | B L | L | U L`
+       - **1-Lap Wrapped `0..9->0`:** **44** `No-R` routes (345 with `R`), min **7 QTM preps (17 QTM, bare `y'` on `9=>0`)**: `L | U' L | B L | U L | U' D | B L | L | B L | U L | y'` (or with **bare `D` on `4=>5` AND bare `y'` on `9=>0`**: `L | B L | R L | B L | D | B L | U' L | B L | U L | y'`, 7 QTM preps = 17 QTM).
+     - **`L | L | L | L | D | L | L | L | L | y` (`D` on `4=>5`, `y` on `9=>0`):**
+       - **1-Lap Wrapped `0..9->0`:** `UNSAT` without `R` (0 routes), **6** routes with `R` (min **8 QTM preps = 18 QTM**: `U L | B' L | L | U L | B' D | B' L | R L | U' L | L | R y`).
+     - **`L | L | L | L | y' | L | L | L | L | D` (swapped: `y'` on `4=>5`, `D` on `9=>0`):**
+       - **1-Lap Wrapped `0..9->0`:** **62** `No-R` routes (638 with `R`), min **6 QTM preps (16 QTM, bare `y'` on `4=>5` and bare `D` on `9=>0`, zero `R` moves)**: `L | U' L | B L | U L | y' | B L | L | B L | B L | D`
+     - **`L | L | L | L | D | L | L | L | L | D` (pure-QTM `8×L + 2×D` on `4=>5` & `9=>0`, no `B2`):**
+       - **1-Lap Wrapped `0..9->0`:** **109** `No-R` routes (624 with `R`, 16 `No-U`), min **6 QTM preps (16 QTM, zero `R` moves)**: `L | B L | L | B' L | U D | B' L | L | U L | L | B' D` (or **No-U** with `R`: `L | B L | B L | R L | R D | B' L | R' L | B L | B L | D`, 8 QTM preps = 18 QTM).
 
 ---
 
