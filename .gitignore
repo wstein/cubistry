@@ -19,3 +19,5 @@ work/
 
 # Optional pinned Python tools for reproducible vector print exports.
 .print-venv/
+.venv/
+bun.lock
