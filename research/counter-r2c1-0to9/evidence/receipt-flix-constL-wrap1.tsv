@@ -1,0 +1,13 @@
+graph	tracked-front-corners	136080	diameter	7
+setup	constL-wrap1	(none)	0
+edge	constL-wrap1	0	1	L	1	0	1	1	1
+edge	constL-wrap1	1	2	L	1	0	1	1	1
+edge	constL-wrap1	2	3	B' U L	3	2	1	2	2
+edge	constL-wrap1	3	4	L	1	0	1	1	1
+edge	constL-wrap1	4	5	L	1	0	1	1	1
+edge	constL-wrap1	5	6	U B2 L	3	2	1	3	2
+edge	constL-wrap1	6	7	L	1	0	1	1	1
+edge	constL-wrap1	7	8	L	1	0	1	1	1
+edge	constL-wrap1	8	9	B' U' L	3	2	1	2	2
+edge	constL-wrap1	9	0	L	1	0	1	1	1
+summary	constL-wrap1	edges=10	max_htm=3	total_htm=16	total_prep=6	mean_htm=1.6	hist=1:7,3:3	inc_shortest=8/10	dec_shortest=7/10	closure=display-wrapped

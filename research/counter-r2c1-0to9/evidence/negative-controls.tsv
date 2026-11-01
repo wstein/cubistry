@@ -9,3 +9,4 @@ bad-inverse	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 0: decreme
 short-claim	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 6: claimed increment shortest 1 but exact distance is 2	same-message
 hidden-unreachable	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 4: target display 5 is unreachable from the actual state	same-message
 open-closure	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	cycle does not return to the exact full start state	same-message
+non-const-touch	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 1: constant-L mode requires final touching move L (got D)	same-message

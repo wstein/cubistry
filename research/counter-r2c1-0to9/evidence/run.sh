@@ -10,7 +10,7 @@ jl() { "$julia" --startup-file=no "$here/../julia/check.jl" "$@"; }
 fx() { java -jar "$jar" "$@" 2>/dev/null | grep -v '^Picked up'; }
 cd "$here"
 status=0
-for m in closed wrap1; do
+for m in closed wrap1 constL-closed constL-wrap1; do
     jl print-$m.tsv $m routes-$m.tsv setup-$m.tsv > receipt-julia-$m.tsv
     fx print-$m.tsv $m routes-$m.tsv setup-$m.tsv > receipt-flix-$m.tsv
     if cmp -s receipt-julia-$m.tsv receipt-flix-$m.tsv; then
@@ -42,5 +42,6 @@ neg bad-inverse closed print-closed.tsv $c/routes-bad-inverse.tsv setup-closed.t
 neg short-claim closed print-closed.tsv $c/routes-short-claim.tsv setup-closed.tsv "claimed increment shortest"
 neg hidden-unreachable closed $c/print-hidden-unreachable.tsv routes-closed.tsv setup-closed.tsv "row 4: target display 5 is unreachable"
 neg open-closure closed print-wrap1.tsv $c/routes-open-as-closed.tsv setup-closed.tsv "cycle does not return to the exact full start state"
+neg non-const-touch constL-closed print-closed.tsv $c/routes-non-const-touch.tsv setup-constL-closed.tsv "constant-L mode requires final touching move L (got D)"
 } | tee negative-controls.tsv
 exit $status

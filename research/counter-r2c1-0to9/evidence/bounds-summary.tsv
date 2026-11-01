@@ -6,3 +6,7 @@ prep_budget	step_model	max_displays_reached	open_9edge_paths	display_wrap_10edge
 2	P* T (R/U/B prep)	10	1577116	213962	0
 3	P* T (B-only prep)	10	-	-	20
 3	P* T (R/U/B prep)	10	-	-	127
+any	P* L' (Always L' / Always D)	9	0	0	0
+5	P* L (Always L, <=2 preps/step)	10	>=1	0	0
+6	P* L (Always L, <=2 preps/step)	10	>=1	>=1	0
+11	P* L (Always L, <=2 preps/step)	10	>=1	>=1	>=1
