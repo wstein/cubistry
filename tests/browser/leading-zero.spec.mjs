@@ -160,8 +160,15 @@ test("formatting remains available during actual Set animation and Run without r
   await pauseSoon(page);
   await page.locator("#value").fill("7");
   await page.locator("#set").click();
-  await page.clock.runFor(100);
+  // One default-speed move lasts about 100 fake ms, so runFor(100) parks the clock on the boundary
+  // between two moves. Whether the first move has finished then depends on the rAF phase (no move
+  // done in most runs, one in others) and the controller's continuation straddles the two snapshots
+  // below. Stop inside the first move, where the state is the same on every run.
+  await page.clock.runFor(40);
   expect(await page.evaluate(() => window.counterViewer.animating)).toBe(true);
+  expect(
+    await page.evaluate(() => document.querySelector("#move-progress").textContent),
+  ).toMatch(/^0 \/ \d+ moves$/);
   const before = await snapshot(page);
   await expect(page.locator("#format")).toBeEnabled();
   await page.locator("#format").uncheck();
