@@ -7,7 +7,7 @@
 // of the app's cube-mechanics) and refuses data that does not show the
 // required displays, does not close at the claimed (minimal) period, uses a
 // run-in, or disagrees with the native receipts. It is a data-integrity gate,
-// not a proof: the research Julia and Flix checkers are the authority.
+// not a proof; proof status is governed by proof-checkers/AUTHORITY.md.
 import { createHash } from "node:crypto";
 
 export const sha256 = (bytes) =>
