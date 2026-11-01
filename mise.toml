@@ -1,0 +1,10 @@
+# Single source of truth for research toolchains (host and .devcontainer).
+[tools]
+java = "temurin-21"   # Flix needs Java 21+
+julia = "1.13"        # research/ci-quality-cube/Project.toml: julia = "1.13"
+node = "22"           # package.json engines: node >= 22
+python = "3.12"       # requirements-verifier.txt (sympy)
+
+[env]
+JULIA_NUM_THREADS = "auto"
+_.python.venv = { path = ".venv", create = true }
