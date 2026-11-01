@@ -23,6 +23,7 @@ export default defineConfig({
   testDir: "./tests/browser",
   ...(group === "fast" ? { testIgnore: timingSpecs } : group === "timing" ? { testMatch: timingSpecs } : {}),
   timeout: group === "timing" ? 90000 : 30000,
+  expect: { timeout: group === "timing" ? 20000 : 5000 }, // polls and auto-waits in the slow group
   fullyParallel: false,
   workers: 1,
   use: {

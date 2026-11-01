@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { scaled } from "../helpers/timeout-scale.mjs";
 import { startFrameGapProbe, resetFrameGap, readFrameGap, endpointToleranceMs } from "../helpers/frame-gap.mjs";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
@@ -106,7 +107,7 @@ test("Workshop Timer is a separate upright MMSS print; invalid durations do not 
 test("absolute fifteen-minute deadline visits all91 actual displays and independently replays331 committed HTM", async ({
   page,
 }) => {
-  test.setTimeout(120000);
+  test.setTimeout(scaled(120000));
   await page.clock.install();
   await chooseTimer(page);
   await pauseSoon(page);
@@ -171,7 +172,7 @@ test("absolute fifteen-minute deadline visits all91 actual displays and independ
 test("pause freezes a lagged clock and settles one frozen bucket; reset never teleports an active legal sequence", async ({
   page,
 }) => {
-  test.setTimeout(60000);
+  test.setTimeout(scaled(60000));
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.clock.install();
   await chooseTimer(page);
@@ -232,7 +233,7 @@ test("timer panel fits mobile and preserves six inherited speed stops plus 10ms"
 test("real animation budgets measure committed five-move edges at default250ms, optional100ms and slow2s", async ({
   page,
 }) => {
-  test.setTimeout(90000);
+  test.setTimeout(scaled(90000));
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await chooseTimer(page);
   await expect(page.locator("#rotation-speed")).toHaveValue("3");
@@ -526,7 +527,7 @@ test("switching modes during slow accelerated playback stops and resets through 
 test("interactive100x full-range countdown visibly lags slow-enough rotations and eventually verifies physical zero", async ({
   page,
 }) => {
-  test.setTimeout(120000);
+  test.setTimeout(scaled(120000));
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await chooseTimer(page);
   await duration(page, "59:50");
@@ -670,7 +671,7 @@ test("Set replaces a pending duration safely during an active legal animation wi
 
 for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844 }, { width: 320, height: 740 }]) {
   test(`Timer status distinguishes movement from backlog and keeps the active slider stable at ${viewport.width}px`, async ({ page }, testInfo) => {
-    test.setTimeout(60000);
+    test.setTimeout(scaled(60000));
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.clock.install();
@@ -915,7 +916,7 @@ function expectEndpoint(observation, preferred) {
   if (preferred > 10) expect(observation.intermediateAngles.length).toBeGreaterThan(1);
 }
 test("real Timer final turn meets the actual clock endpoint within20ms at250ms, adaptive2s and10ms", async ({ page }, testInfo) => {
-  test.setTimeout(60000);
+  test.setTimeout(scaled(60000));
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await chooseTimer(page);
   await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
@@ -963,7 +964,7 @@ test("100x10ms reports infeasible budget honestly and still commits a full legal
 });
 
 test("pause reconciles active sequences and a active final turn through legal moves; Resume keeps fractions", async({page})=>{
-  test.setTimeout(60000);
+  test.setTimeout(scaled(60000));
   await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.install();
   await chooseTimer(page);
@@ -1044,7 +1045,7 @@ test("automatic terminal tick preserves the real final turn endpoint and commits
 });
 
 test("an active final turn without an interior hold cancels on Reset and a rate extension rebases active motion without reversing or stale completion",async({page})=>{
-  test.setTimeout(60000);await page.emulateMedia({reducedMotion:"no-preference"});
+  test.setTimeout(scaled(60000));await page.emulateMedia({reducedMotion:"no-preference"});
   await page.clock.install();await chooseTimer(page);await page.locator("#rotation-speed").fill("6");
   await duration(page,"00:20");await observeEndpoints(page);await clearEndpointObservation(page);
   await pauseSoon(page);
