@@ -36,6 +36,11 @@ typos = "1.51"
 uv = "0.13"
 watchexec = "2.8"
 
+# VCS, shell prompt, and typesetting (gh:wstein/bundledock)
+jj = "0.46"
+starship = "1.27"
+typst = "0.15"
+
 [env]
 JULIA_NUM_THREADS = "auto"
 _.python.venv = { path = ".venv", create = true }
