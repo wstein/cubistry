@@ -1,0 +1,86 @@
+# descriptive listing, not a proof; layout F31=bfold,S30=bfold,S31=bfold;H=555555555222; cell = text ink, '.' = blank
+year	month	row	c1	c2	c3	c4	c5	c6	c7
+2027	1	1	.	.	.	.	J month	A month	N month
+2027	1	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	1	3	.	.	.	.	.	1 dark	2 red
+2027	1	4	3 red	4 dark	5 dark	6 dark	7 dark	8 dark	9 red
+2027	1	5	10 red	11 dark	12 dark	13 dark	14 dark	15 dark	16 red
+2027	1	6	17 red	18 dark	19 dark	20 dark	21 dark	22 dark	23 red
+2027	1	7	24/31 red	25 dark	26 dark	27 dark	28 dark	29 dark	30 red
+2027	2	1	.	.	.	.	F month	E month	B month
+2027	2	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	2	3	.	1 dark	2 dark	3 dark	4 dark	5 dark	6 red
+2027	2	4	7 red	8 dark	9 dark	10 dark	11 dark	12 dark	13 red
+2027	2	5	14 red	15 dark	16 dark	17 dark	18 dark	19 dark	20 red
+2027	2	6	21 red	22 dark	23 dark	24 dark	25 dark	26 dark	27 red
+2027	2	7	28 red	.	.	.	.	.	.
+2027	3	1	.	.	.	.	M month	A month	R month
+2027	3	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	3	3	.	1 dark	2 dark	3 dark	4 dark	5 dark	6 red
+2027	3	4	7 red	8 dark	9 dark	10 dark	11 dark	12 dark	13 red
+2027	3	5	14 red	15 dark	16 dark	17 dark	18 dark	19 dark	20 red
+2027	3	6	21 red	22 dark	23 dark	24 dark	25 dark	26 dark	27 red
+2027	3	7	28 red	29 dark	30 dark	31 dark	.	.	.
+2027	4	1	.	.	.	.	A month	P month	R month
+2027	4	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	4	3	.	.	.	.	1 dark	2 dark	3 red
+2027	4	4	4 red	5 dark	6 dark	7 dark	8 dark	9 dark	10 red
+2027	4	5	11 red	12 dark	13 dark	14 dark	15 dark	16 dark	17 red
+2027	4	6	18 red	19 dark	20 dark	21 dark	22 dark	23 dark	24 red
+2027	4	7	25 red	26 dark	27 dark	28 dark	29 dark	30 dark	.
+2027	5	1	.	.	.	.	M month	A month	Y month
+2027	5	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	5	3	.	.	.	.	.	.	1 red
+2027	5	4	2 red	3 dark	4 dark	5 dark	6 dark	7 dark	8 red
+2027	5	5	9 red	10 dark	11 dark	12 dark	13 dark	14 dark	15 red
+2027	5	6	16 red	17 dark	18 dark	19 dark	20 dark	21 dark	22 red
+2027	5	7	23/30 red	24/31 dark	25 dark	26 dark	27 dark	28 dark	29 red
+2027	6	1	.	.	.	.	J month	U month	N month
+2027	6	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	6	3	.	.	1 dark	2 dark	3 dark	4 dark	5 red
+2027	6	4	6 red	7 dark	8 dark	9 dark	10 dark	11 dark	12 red
+2027	6	5	13 red	14 dark	15 dark	16 dark	17 dark	18 dark	19 red
+2027	6	6	20 red	21 dark	22 dark	23 dark	24 dark	25 dark	26 red
+2027	6	7	27 red	28 dark	29 dark	30 dark	.	.	.
+2027	7	1	.	.	.	.	J month	U month	L month
+2027	7	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	7	3	.	.	.	.	1 dark	2 dark	3 red
+2027	7	4	4 red	5 dark	6 dark	7 dark	8 dark	9 dark	10 red
+2027	7	5	11 red	12 dark	13 dark	14 dark	15 dark	16 dark	17 red
+2027	7	6	18 red	19 dark	20 dark	21 dark	22 dark	23 dark	24 red
+2027	7	7	25 red	26 dark	27 dark	28 dark	29 dark	30 dark	31 red
+2027	8	1	.	.	.	.	A month	U month	G month
+2027	8	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	8	3	1 red	2 dark	3 dark	4 dark	5 dark	6 dark	7 red
+2027	8	4	8 red	9 dark	10 dark	11 dark	12 dark	13 dark	14 red
+2027	8	5	15 red	16 dark	17 dark	18 dark	19 dark	20 dark	21 red
+2027	8	6	22 red	23 dark	24 dark	25 dark	26 dark	27 dark	28 red
+2027	8	7	29 red	30 dark	31 dark	.	.	.	.
+2027	9	1	.	.	.	.	S month	E month	P month
+2027	9	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	9	3	.	.	.	1 dark	2 dark	3 dark	4 red
+2027	9	4	5 red	6 dark	7 dark	8 dark	9 dark	10 dark	11 red
+2027	9	5	12 red	13 dark	14 dark	15 dark	16 dark	17 dark	18 red
+2027	9	6	19 red	20 dark	21 dark	22 dark	23 dark	24 dark	25 red
+2027	9	7	26 red	27 dark	28 dark	29 dark	30 dark	.	.
+2027	10	1	.	O month	C month	T month	.	.	.
+2027	10	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	10	3	.	.	.	.	.	1 dark	2 red
+2027	10	4	3 red	4 dark	5 dark	6 dark	7 dark	8 dark	9 red
+2027	10	5	10 red	11 dark	12 dark	13 dark	14 dark	15 dark	16 red
+2027	10	6	17 red	18 dark	19 dark	20 dark	21 dark	22 dark	23 red
+2027	10	7	24/31 red	25 dark	26 dark	27 dark	28 dark	29 dark	30 red
+2027	11	1	.	N month	O month	V month	.	.	.
+2027	11	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	11	3	.	1 dark	2 dark	3 dark	4 dark	5 dark	6 red
+2027	11	4	7 red	8 dark	9 dark	10 dark	11 dark	12 dark	13 red
+2027	11	5	14 red	15 dark	16 dark	17 dark	18 dark	19 dark	20 red
+2027	11	6	21 red	22 dark	23 dark	24 dark	25 dark	26 dark	27 red
+2027	11	7	28 red	29 dark	30 dark	.	.	.	.
+2027	12	1	.	D month	E month	C month	.	.	.
+2027	12	2	SUN red	MON weekday	TUE weekday	WED weekday	THU weekday	FRI weekday	SAT red
+2027	12	3	.	.	.	1 dark	2 dark	3 dark	4 red
+2027	12	4	5 red	6 dark	7 dark	8 dark	9 dark	10 dark	11 red
+2027	12	5	12 red	13 dark	14 dark	15 dark	16 dark	17 dark	18 red
+2027	12	6	19 red	20 dark	21 dark	22 dark	23 dark	24 dark	25 red
+2027	12	7	26 red	27 dark	28 dark	29 dark	30 dark	31 dark	.

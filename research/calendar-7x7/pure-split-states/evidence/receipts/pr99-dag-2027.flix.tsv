@@ -1,0 +1,42 @@
+pure-print-change	4		blank	24/31	dark	new-up
+pure-print-change	25		blank	D	month	new-up
+pure-print-change	35		blank	C	month	new-up
+pure-print-change	74		blank	N	month	new-up
+pure-print-change	134		blank	T	month	new-up
+pure-print-change	135		blank	V	month	new-up
+pure-print-change	193	31↶	dark		blank	same-up
+pure-print-change	218	0	month	23/30	red	same-up
+pure-print-change	219	D	month	24/31	red	new-up
+pure-print-change	220	N	month		blank	same-up
+pure-print-change	224	30↶	red		blank	same-up
+pure-print-change	228	V	month	O	month	new-up
+pure-print-change	243	31↶	red		blank	same-up
+pure-print-change	261	T	month	E	month	same-up
+pure-print-change	278	C	month		blank	same-up
+pure-print-change	283	E	month		blank	same-up
+pure-print-orbit	-3	-3	19	3	19	5	0
+pure-print-orbit	-3	-2	15	2	15	9	0
+pure-print-orbit	-3	-1	21	2	21	3	0
+pure-print-orbit	-3	0	21	2	21	3	0
+pure-print-orbit	-3	1	20	2	20	4	0
+pure-print-orbit	-3	2	20	1	20	4	0
+pure-print-orbit	-2	-2	16	0	16	8	0
+pure-print-orbit	-2	-1	21	1	21	3	0
+pure-print-orbit	-2	0	20	0	20	4	0
+pure-print-orbit	-2	1	17	1	17	7	0
+pure-print-orbit	-1	-1	22	2	22	2	0
+pure-print-orbit	-1	0	22	1	22	2	0
+pure-print-orbit	0	0	6	0	6	0	0
+pure-target	13	2027	1	FAIL	7,1	16	0	plain-mismatch	2493c312a1a66656e1660ade4a6979b846366a556bbf34214d9f49955ece0027
+pure-target	14	2027	2	PASS	-	-	-	-	5d4948c787221174c17eac9ca21cc027b9cb27840633800a81484e13cf3763d6
+pure-target	15	2027	3	PASS	-	-	-	-	4d4c86a580d96ee78759a3001c75d3793e72f05c9c518751d4d2f1b650af3d3a
+pure-target	16	2027	4	PASS	-	-	-	-	76235c988e83db91109a3a1d2972018aadebfd2d180e9ef3582b1a02e5a65081
+pure-target	17	2027	5	FAIL	7,1	15	0	plain-mismatch	db79da358e907dec24682805e076752d2bebd8b64b09d077529e2a233a15fdd5
+pure-target	18	2027	6	PASS	-	-	-	-	3f2093f9495399ecc16f50548b2763bef016e7cad7aea99c9334fa00633a737b
+pure-target	19	2027	7	PASS	-	-	-	-	d82025d6fc462cdfa022cca03b5096fd26bb1975fa0acdd87f363a8529cc54e3
+pure-target	20	2027	8	FAIL	1,4	35	0	plain-mismatch	ad4d2042b86269518a651ee14c49cdaf6c9ff7707c9fb059511288e48b5fe68b
+pure-target	21	2027	9	PASS	-	-	-	-	1d9446a99884008307d85845072ee5c6daf881cddd82e7caaca8ddf369c0df9f
+pure-target	22	2027	10	FAIL	1,1	218	3	stacked-mismatch	9ee98ae73b370566231496c726ef313e04dd4b119487e64fc96e5aa8c104e3d1
+pure-target	23	2027	11	FAIL	1,2	85	3	plain-mismatch	c24230b9d467e699b13bea7c82c5f8e78454cda7f25641fcddaf0daf5513e09a
+pure-target	24	2027	12	FAIL	1,1	219	3	stacked-mismatch	1ac898bb85e2e33bf495a69875b2ed585ed10fbf4da2ecad24fc6e2695eb5daa
+pure-summary	REJECT	6	6	0	240

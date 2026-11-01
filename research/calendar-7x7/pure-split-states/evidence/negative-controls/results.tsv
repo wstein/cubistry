@@ -1,0 +1,8 @@
+case	julia-exit	flix-exit	reason (julia | flix)	first failing target (julia | flix)
+blank-stacked-dark	1	1	AssertionError: print misses 1 required class copies | java.lang.IllegalArgumentException: print misses required class copies	17 7,2 4 0 plain-mismatch | 17 7,2 4 0 plain-mismatch
+rotated-stacked-red	1	1	AssertionError: print misses 1 required class copies | java.lang.IllegalArgumentException: print misses required class copies	13 7,1 219 1 stacked-not-upright | 13 7,1 219 1 stacked-not-upright
+identity-changed	1	1	AssertionError: id == i && (1 <= piece <= 218 && homes[piece] == p) | java.lang.IllegalArgumentException: piece ID/home mismatch	 | 
+unrepaired-root	1	1	AssertionError: 1 of 12 states fail the pure-split front: targets 13 | java.lang.IllegalArgumentException: 1 of 12 states fail the pure-split front	13 7,1 16 0 plain-mismatch | 13 7,1 16 0 plain-mismatch
+flipped-product	1	1	AssertionError: 1 of 12 states fail the pure-split front: targets 13 | java.lang.IllegalArgumentException: 1 of 12 states fail the pure-split front	13 7,2 24 1 plain-mismatch | 13 7,2 24 1 plain-mismatch
+bad-target-id	1	1	AssertionError: TARGETS must be distinct ids 1..91 or all | java.lang.IllegalArgumentException: TARGETS must be distinct ids 1..91 or all	 | 
+duplicate-targets	1	1	AssertionError: TARGETS must be distinct ids 1..91 or all | java.lang.IllegalArgumentException: TARGETS must be distinct ids 1..91 or all	 | 
