@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { scaled } from "../helpers/timeout-scale.mjs";
 import { startFrameGapProbe, resetFrameGap, readFrameGap, endpointToleranceMs } from "../helpers/frame-gap.mjs";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
@@ -158,7 +159,7 @@ test("full thirty-minute countdown visits all361 actual states and independently
 test("slow accelerated playback retains one latest target, pauses fractions, resumes and resets with legal commits", async ({
   page,
 }) => {
-  test.setTimeout(90000);
+  test.setTimeout(scaled(90000));
   // Register application intervals on an already paused clock. Setup moves still
   // commit legally; real animation is enabled before the intentional stall.
   await page.clock.install();
@@ -299,7 +300,7 @@ for (const [stop, preferred] of [
   test(`five-second six-move sequence settles at its deadline at ${preferred}ms preference`, async ({
     page,
   }, testInfo) => {
-    test.setTimeout(45000);
+    test.setTimeout(scaled(45000));
     await page.setViewportSize({ width: 800, height: 700 });
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await choose(page);
