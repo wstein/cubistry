@@ -8,6 +8,14 @@ display is blocked under this print (see "Stage 2").
 This work depends on PR #145 (`research/calendar7-stacked-dual-labels`), which
 holds the inventory result for the pure split with moved month letters.
 
+> **Update in progress (midge redesign).** The print below is being replaced by a
+> coupled midge redesign (surfaces 35 and 70 swap artwork, `evidence/print-pure-A.tsv`),
+> under which all 91 displays have a cubie-level front matching in both checkers
+> (`check_pure.jl matchability`, Flix `matchability`). The stage-1 receipts and the 2027
+> DAG were made for the previous print and have been removed; the stage-2 DAG and
+> receipts for all 91 displays follow in the next commit, together with a full README
+> update.
+
 ## Layout
 
 - The **pure split** under the strict reading, with no overflow marks:
