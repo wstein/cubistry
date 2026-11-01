@@ -58,7 +58,7 @@ export class HsmController extends PhysicalPlayback {
   private readonly design: HsmDesign;
   private readonly manifest: AssetManifest;
   private readonly resolveAssets: typeof loadAssets;
-  private readonly planner = new HsmPlanner();
+  private readonly planner: HsmPlanner;
   private readonly periods: HsmPeriods;
   private recovery: HsmRecovery | null = null;
   /** Remaining recovery steps: valid while the cube is at `source` in this mode. */
@@ -158,7 +158,8 @@ export class HsmController extends PhysicalPlayback {
   }
   setMode(range: number, direction: number): void {
     demand(
-      [11, 23, 59].includes(range) && [1, -1].includes(direction),
+      (this.design.variant.ranges[this.letter] ?? []).includes(range) &&
+        [1, -1].includes(direction),
       "Invalid HSM counting mode",
     );
     if (this.range !== range || this.direction !== direction) {
@@ -188,6 +189,11 @@ export class HsmController extends PhysicalPlayback {
     this.manifest = manifest;
     this.letter = letter;
     this.resolveAssets = resolveAssets;
+    demand(
+      design.variant.letters.includes(letter),
+      "Letter is not on this print",
+    );
+    this.planner = new HsmPlanner(design.variant.jumpBound);
     this.periods = new HsmPeriods(design.print, design.periods);
   }
   protected get maximumValue(): number {
@@ -334,7 +340,12 @@ export class HsmController extends PhysicalPlayback {
     return word;
   }
   private recoverer(): HsmRecovery {
-    return (this.recovery ??= new HsmRecovery(this.design.print, this.planner));
+    return (this.recovery ??= new HsmRecovery(
+      this.design.print,
+      this.planner,
+      this.design.variant.edgeLimit,
+      this.design.variant.jumpBound,
+    ));
   }
   private targetsOf(range: number, direction: number) {
     return (v: number) =>
@@ -505,7 +516,7 @@ export class HsmController extends PhysicalPlayback {
         this.periods.poseFor(this.letter, this.range, this.direction, value) ??
         applyMoves(
           initialState(this.design.print),
-          parseAlg(this.design.zeroWords[this.letter]),
+          parseAlg(this.design.zeroWords[this.letter] ?? ""),
         );
       if (
         !matchesTarget(this.design.print, state, hsmTarget(this.letter, value))
