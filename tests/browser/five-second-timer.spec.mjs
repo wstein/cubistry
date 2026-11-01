@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { startFrameGapProbe, resetFrameGap, readFrameGap, endpointToleranceMs } from "../helpers/frame-gap.mjs";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -305,6 +306,8 @@ for (const [stop, preferred] of [
     await page.locator("#rotation-speed").fill("6");
     await duration(page, "00:05");
     await page.locator("#rotation-speed").fill(stop);
+    await startFrameGapProbe(page);
+    await resetFrameGap(page);
     const offset = await page.evaluate(() => window.fiveMoves.length);
     const epoch = await page.evaluate(() => {
       window.fiveMovingSample = null;
@@ -330,6 +333,7 @@ for (const [stop, preferred] of [
       return at;
     });
     await settled(page, "00:00");
+    const frameGap = await readFrameGap(page);
     const moving = await page.evaluate(() => window.fiveMovingSample);
     expect(moving).not.toBeNull();
     expect(moving.physical).toBe("00:05");
@@ -398,7 +402,7 @@ for (const [stop, preferred] of [
         trace.observation.settledMilliseconds -
           trace.observation.deadlineMilliseconds,
       ),
-    ).toBeLessThanOrEqual(20);
+    ).toBeLessThanOrEqual(endpointToleranceMs(frameGap)); // 20 ms unless frames are slower than that
     expect(
       trace.observation.settledMilliseconds -
         trace.observation.firstMoveMilliseconds,
