@@ -4,7 +4,8 @@ import { GitHub } from "./api.mjs";
 import { REPOSITORY, validRun, previewPath } from "./policy.mjs";
 const entry = JSON.parse(process.env.ENTRY),
   api = new GitHub();
-let action = "none";
+let action = "none",
+  pr = null;
 if (entry.number === 0) {
   if (entry.status === "success") {
     const main = await api.request("commits/main"),
@@ -27,7 +28,7 @@ if (entry.number === 0) {
   }
 } else {
   previewPath(entry.number);
-  const pr = await api.request(`pulls/${entry.number}`);
+  pr = await api.request(`pulls/${entry.number}`);
   if (entry.action === "remove") {
     if (!pr || pr.state !== "open" || pr.head?.repo?.full_name !== REPOSITORY)
       action = "remove";
@@ -59,6 +60,9 @@ if (action === "deploy") {
       "artifact-site",
       String(entry.number),
       entry.sha,
+      // Untrusted free text: an argv element, never shell-interpreted.
+      // Control characters (NUL makes execFileSync throw) become spaces.
+      String(pr?.title ?? "").replace(/[\u0000-\u001f\u007f-\u009f]/g, " "),
     ],
     { stdio: "inherit" },
   );

@@ -79,3 +79,22 @@ export function plan({ pulls, inventory, builds, main }) {
     },
   };
 }
+/**
+ * PR numbers whose preview directory holds real content. The Pages deploy
+ * action's rsync protects `.nojekyll`, so a removed preview leaves exactly that
+ * empty blob behind; it must not count as an existing preview.
+ */
+export function previewInventory(tree) {
+  if (tree && (tree.truncated || !Array.isArray(tree.tree)))
+    throw Error("Incomplete storage-tree inventory");
+  const found = new Set();
+  for (const x of tree?.tree || []) {
+    const m = /^pr-preview\/pr-([1-9][0-9]*)\/(.+)$/.exec(x.path);
+    if (m && m[2] !== ".nojekyll") found.add(Number(m[1]));
+  }
+  return [...found];
+}
+/** True when a contents-API directory listing holds anything but `.nojekyll`. */
+export const hasPreviewContent = (listing) =>
+  Boolean(listing) &&
+  (!Array.isArray(listing) || listing.some((x) => x?.name !== ".nojekyll"));
