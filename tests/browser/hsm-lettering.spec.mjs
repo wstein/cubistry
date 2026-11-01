@@ -170,3 +170,11 @@ test("an invalid word asset leaves the existing fixed print and value usable", a
   await expect(page.locator("#hsm-letter option")).toHaveText(["H", "M", "S"]);
   await expect(page.locator("#hsm-run")).toBeEnabled();
 });
+test("the Unit select reads hour, min, sec on load when the URL asks for words", async ({
+  page,
+}) => {
+  await page.goto("/?application=hsm-counter&lettering=words");
+  await expect(page.locator("#hsm-lettering")).toHaveValue("words");
+  await expect(page.locator("#hsm-lettering")).toBeEnabled();
+  await expect(page.locator("#hsm-letter option")).toHaveText(["hour", "min", "sec"]);
+});
