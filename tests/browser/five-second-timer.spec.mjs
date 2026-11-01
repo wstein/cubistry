@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { scaled } from "../helpers/timeout-scale.mjs";
-import { startFrameGapProbe, resetFrameGap, readFrameGap, ENDPOINT_TOLERANCE_MS, FRAME_LIMITED_PREFERENCE_MS } from "../helpers/frame-gap.mjs";
+import { startFrameGapProbe, resetFrameGap, readFrameGap, ENDPOINT_TOLERANCE_MS, LATE_FINAL_TURN_PREFERENCE_MS } from "../helpers/frame-gap.mjs";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -303,7 +303,7 @@ for (const [stop, preferred] of [
     test.setTimeout(scaled(45000));
     // KNOWN ISSUE, not explained yet: at the 10 ms preference the final turn settles 96 to 139 ms after the deadline
     // in software GL even at 17 ms median frames. test.fail() keeps the assertion live and turns red once it is fixed.
-    test.fail(preferred === FRAME_LIMITED_PREFERENCE_MS, "10 ms preference settles 96-139 ms late; root cause not investigated");
+    test.fail(preferred === LATE_FINAL_TURN_PREFERENCE_MS, "10 ms preference settles 96-139 ms late; root cause not investigated");
     await page.setViewportSize({ width: 800, height: 700 });
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await choose(page);

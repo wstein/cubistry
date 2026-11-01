@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { scaled } from "../helpers/timeout-scale.mjs";
-import { startFrameGapProbe, resetFrameGap, readFrameGap, ENDPOINT_TOLERANCE_MS, FRAME_LIMITED_PREFERENCE_MS } from "../helpers/frame-gap.mjs";
+import { startFrameGapProbe, resetFrameGap, readFrameGap, ENDPOINT_TOLERANCE_MS, LATE_FINAL_TURN_PREFERENCE_MS } from "../helpers/frame-gap.mjs";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -921,21 +921,25 @@ async function timerEndpointCases(page, testInfo, cases) {
   await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
   await observeEndpoints(page);
   const observations = [];
-  for (const [stop, preferred] of cases) {
-    await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
-    await page.locator("#rotation-speed").fill(stop); await clearEndpointObservation(page);
-    await page.click("#timer-start"); await settled(page, "00:10");
-    const observation = await endpointObservation(page);
-    observations.push({ preferredMilliseconds: preferred, ...observation });
-    // Write the evidence first: a failing known-issue case must still leave its measurements.
-    const path = testInfo.outputPath("endpoint-observations.json");
-    writeFileSync(path, JSON.stringify({ kind: "foreground-real-clock-endpoint", toleranceMs: ENDPOINT_TOLERANCE_MS,
-      implementationHead: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
-      observedAt: new Date().toISOString(), observations }, null, 2));
-    await testInfo.attach("endpoint-observations", { path, contentType: "application/json" });
-    expectEndpoint(observation, preferred);
-    await expect(page.locator("#rotation-speed")).toHaveValue(stop);
-    await page.click("#timer-start");
+  const path = testInfo.outputPath("endpoint-observations.json");
+  try {
+    for (const [stop, preferred] of cases) {
+      await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
+      await page.locator("#rotation-speed").fill(stop); await clearEndpointObservation(page);
+      await page.click("#timer-start"); await settled(page, "00:10");
+      const observation = await endpointObservation(page);
+      observations.push({ preferredMilliseconds: preferred, ...observation });
+      // Write the evidence before asserting: a failing case must still leave its measurements.
+      writeFileSync(path, JSON.stringify({ kind: "foreground-real-clock-endpoint", toleranceMs: ENDPOINT_TOLERANCE_MS,
+        implementationHead: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+        observedAt: new Date().toISOString(), observations }, null, 2));
+      expectEndpoint(observation, preferred);
+      await expect(page.locator("#rotation-speed")).toHaveValue(stop);
+      await page.click("#timer-start");
+    }
+  } finally {
+    // Attach once for all cases, also when an assertion above failed.
+    if (observations.length) await testInfo.attach("endpoint-observations", { path, contentType: "application/json" });
   }
 }
 test("real Timer final turn meets the actual clock endpoint within20ms at250ms and adaptive2s", async ({ page }, testInfo) => {
@@ -948,7 +952,7 @@ test("real Timer final turn meets the actual clock endpoint within20ms at250ms a
 test("real Timer final turn meets the actual clock endpoint within20ms at 10ms (known issue: settles late)", async ({ page }, testInfo) => {
   test.fail(true, "10 ms preference settles 96-177 ms after the deadline; root cause not investigated");
   test.setTimeout(scaled(60000));
-  await timerEndpointCases(page, testInfo, [["6", FRAME_LIMITED_PREFERENCE_MS]]);
+  await timerEndpointCases(page, testInfo, [["6", LATE_FINAL_TURN_PREFERENCE_MS]]);
 });
 test("real Stopwatch final physical state and live clock share the target endpoint within20ms", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "no-preference" }); await chooseTimer(page);
