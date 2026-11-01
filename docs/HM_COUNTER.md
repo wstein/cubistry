@@ -12,7 +12,9 @@ steps, Reset, or Run/Stop, exactly as in the H/S/M counter. The ranges are:
 
 - **M 00–59**, one lap of 60 steps;
 - **H 00–23**, one lap of 24 steps;
-- **H 00–11**, the 12-hour cycle, whose 11→00 step is the reset to 00.
+- **H 00–11**, the 12-hour cycle: counting up from 11 wraps to 00 in one
+  ordinary period step (11→00). This is not the Reset button, which is a free
+  jump to 00 from any value.
 
 Leading zeros are shown, and counting wraps in both directions. The default
 rotation speed is 500 ms per HTM move for H and 250 ms for M, as in the H/S/M
@@ -21,9 +23,13 @@ counter. Open it from the application chooser or with `?application=hm-counter`.
 ## Status and provenance
 
 > **Candidate, not yet independently reviewed.** The numbers below come from
-> research PR #133 at commit `0df2f3a012749bb550bc34dd1bc4fa07dcde6817`.
-> An independent review of that research runs in parallel. If the review finds
-> issues, the data can be re-pinned with one command (see
+> research PR #133. The pinned commit is
+> `44ca982d9e15dc28c62ba105f47f62a26cf8d261`, the PR head when this was pinned.
+> The m3-SH witness and receipts are byte-identical to the earlier pin
+> `0df2f3a0`; only the checkers, the README and the checks file (more negative
+> controls) changed. An independent re-review of that research at this commit
+> is still running. If the review finds issues or the research head moves, the
+> data must be re-pinned; that takes one command (see
 > [Data pinning and verification](#data-pinning-and-verification)).
 >
 > - Both native research checkers (Julia `checker/check.jl` and Flix
@@ -240,8 +246,17 @@ triple per corner (stickers on its x, y and z faces), is
 It has three blanks on three different corners, each next to two tens digits.
 It has H twice, M three times, tens 0–5 once each and units 0–9 once each. As a
 multiset, the seconds-first print has the same digits and blanks. Its letters
-are S ×3, H and M instead of H ×2 and M ×3. Every identity still changes, so an
-existing cube cannot be converted by relabeling a few stickers.
+are S ×3, H and M instead of H ×2 and M ×3. So two counts apply, and both are
+recomputed by the test:
+
+- **By position:** all 24 identities change. A cube stickered from an H/S/M sheet
+  must be fully re-stickered; no sticker can stay where it is.
+- **By artwork:** printed glyphs counted as a multiset, ignoring position and
+  orientation. A new m3-SH sheet needs only **3 glyphs not on the seconds-first
+  sheet**: one more H and two more M, which take the place of the three S. The
+  3 blanks and 16 digits are the same artwork. The research README of PR #133
+  reports the same count. Stickers already on a cube are not reusable in
+  practice, so this is about artwork, not about peeling and moving stickers.
 
 ## Limitations
 
