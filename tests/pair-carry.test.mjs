@@ -64,6 +64,10 @@ test("the named carries of both plans, up and down", () => {
     [HM_MODULI, 1440, 1],
     [HM_MODULI, 1.5, 1],
     [{ minorModulus: 1, majorModulus: 24 }, 0, 1],
+    [{ minorModulus: 60, majorModulus: 1 }, 0, 1],
+    [{ minorModulus: 60.5, majorModulus: 24 }, 0, 1],
+    [{ minorModulus: 60, majorModulus: 23.5 }, 0, 1],
+    [{ minorModulus: "60", majorModulus: 24 }, 0, 1],
   ])
     assert.throws(() => carryStep(...bad));
 });
@@ -78,6 +82,11 @@ test("carry budget: one whole budget per cube, the step planned for the larger w
   // The words are not chained: a serial 3 + 4 = 7 moves does not fit.
   assert.equal(planSequence(7, 100, 1000).feasible, false);
   assert.equal(four.duration, Math.max(four.minor.duration, four.major.duration));
+  // Unequal words: the step lasts as long as the longer cube plan.
+  const unequal = planCarryBudget({ minor: 1, major: 4 }, 100, 1000);
+  assert.notEqual(unequal.minor.duration, unequal.major.duration);
+  assert.equal(unequal.duration, unequal.major.duration);
+  assert.equal(planCarryBudget({ minor: 4, major: 1 }, 100, 1000).duration, unequal.major.duration);
   const plain = planCarryBudget({ minor: 3, major: null }, 100, 1000);
   assert.deepEqual([plain.major, plain.larger, plain.feasible], [null, 3, true]);
   // Feasible exactly when the larger word fits on its own.
@@ -97,6 +106,8 @@ test("carry budget: one whole budget per cube, the step planned for the larger w
     [{ minor: 1.5, major: null }, 100, 1000],
     [{ minor: 1, major: null }, 0, 1000],
     [{ minor: 1, major: null }, 100, NaN],
+    [{ minor: 1, major: null }, 100, 0],
+    [{ minor: 1, major: null }, 100, -1000],
     [{ minor: 1, major: null }, 100, 1000, NaN],
   ])
     assert.throws(() => planCarryBudget(...bad), /budget/);
