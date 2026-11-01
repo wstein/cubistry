@@ -91,7 +91,7 @@ export function renderNet(printing, read, { label, source }) {
   });
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">` +
-    `<title>H/M counter print ${label}: sticker net, solved source pose</title>` +
+    `<title>H/M one-cube counter print ${label}: sticker net, solved source pose</title>` +
     `<rect width="${width}" height="${height}" fill="#ffffff"/>` +
     body.join("") +
     outlines.join("") +
