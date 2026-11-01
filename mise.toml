@@ -38,6 +38,7 @@ uv = "0.13"
 watchexec = "2.8"
 
 # VCS, shell prompt, and typesetting (gh:wstein/bundledock)
+"aqua:fish-shell/fish-shell" = "4.9.3"
 jj = "0.46"
 starship = "1.27"
 typst = "0.15"
