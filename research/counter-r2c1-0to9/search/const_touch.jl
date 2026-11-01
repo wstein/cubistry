@@ -372,8 +372,195 @@ function search_Lprime_plus_D()
             isempty(best_w) ? "none" : "$best_preps preps ($(10 + best_preps) HTM) -> $best_w")
 end
 
+function search_9L_1D()
+    b0 = bit(HOME_STATE[IDX_UL]) | bit(HOME_STATE[IDX_UR]) | bit(HOME_STATE[IDX_LR])
+    l0 = bit(HOME_STATE[IDX_LL])
+
+    for max_p in (1, 2)
+        cands_L = build_const_touch_steps("L"; max_preps = max_p)
+        cands_D = build_const_touch_steps("D"; max_preps = max_p)
+        println("\n=== 6.$(max_p) 9x(P* L) (0->9) + 1x(P* D) (9=>0) with <=$max_p prep(s)/step ===")
+        states = Vector{NTuple{24,Int}}(undef, 11)
+        states[1] = HOME_STATE
+        path10 = zeros(Int, 10)
+        found_open = false
+        for budget in 0:10
+            open_w = ""
+            wrap_w = ""
+            function dfs_ow(d::Int, ll_m::UInt32, bl_m::UInt32, pr::Int)
+                if d == 10
+                    isempty(open_w) && (open_w = join([cands_L[path10[k]].word for k in 1:9], " | "))
+                    st = states[10]
+                    for (si, s) in enumerate(cands_D)
+                        pr + s.prep_count > budget && break
+                        nxt = apply_pull(st, s.pull)
+                        if nxt[IDX_LL] == HOME_STATE[IDX_LL]
+                            b_new = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                            if (b_new & ll_m) == 0 && isempty(wrap_w)
+                                path10[10] = si
+                                wrap_w = join([k <= 9 ? cands_L[path10[k]].word : cands_D[path10[k]].word for k in 1:10], " | ")
+                                return true
+                            end
+                        end
+                    end
+                    return false
+                end
+                st = states[d]
+                for (si, s) in enumerate(cands_L)
+                    pr + s.prep_count > budget && break
+                    nxt = apply_pull(st, s.pull)
+                    b_ll = bit(nxt[IDX_LL])
+                    (b_ll & (ll_m | bl_m)) != 0 && continue
+                    b_bl = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                    ll_m2 = ll_m | b_ll
+                    (b_bl & ll_m2) != 0 && continue
+                    states[d + 1] = nxt
+                    path10[d] = si
+                    dfs_ow(d + 1, ll_m2, bl_m | b_bl, pr + s.prep_count) && return true
+                end
+                return false
+            end
+            dfs_ow(1, l0, b0, 0)
+            if !isempty(open_w) && !found_open
+                println("  Tight min Open 0..9 (9x P* L): $budget preps ($(9 + budget) HTM) -> $open_w")
+                found_open = true
+            end
+            if !isempty(wrap_w)
+                println("  Tight min Wrapped 0..9->0 (9x P* L + 1x P* D): $budget preps ($(10 + budget) HTM) -> $wrap_w")
+                if max_p == 1
+                    # Enumerate all 8-prep max-2-move-per-inc solutions and find quarter-turn-only / bare-D ones
+                    all_w = String[]
+                    function dfs_all(d::Int, ll_m::UInt32, bl_m::UInt32, pr::Int)
+                        if d == 10
+                            st = states[10]
+                            for (si, s) in enumerate(cands_D)
+                                pr + s.prep_count > budget && break
+                                nxt = apply_pull(st, s.pull)
+                                if nxt[IDX_LL] == HOME_STATE[IDX_LL]
+                                    b_new = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                                    if (b_new & ll_m) == 0
+                                        path10[10] = si
+                                        push!(all_w, join([k <= 9 ? cands_L[path10[k]].word : cands_D[path10[k]].word for k in 1:10], " | "))
+                                    end
+                                end
+                            end
+                            return
+                        end
+                        st = states[d]
+                        for (si, s) in enumerate(cands_L)
+                            pr + s.prep_count > budget && break
+                            nxt = apply_pull(st, s.pull)
+                            b_ll = bit(nxt[IDX_LL])
+                            (b_ll & (ll_m | bl_m)) != 0 && continue
+                            b_bl = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                            ll_m2 = ll_m | b_ll
+                            (b_bl & ll_m2) != 0 && continue
+                            states[d + 1] = nxt
+                            path10[d] = si
+                            dfs_all(d + 1, ll_m2, bl_m | b_bl, pr + s.prep_count)
+                        end
+                    end
+                    dfs_all(1, l0, b0, 0)
+                    q_only = [w for w in all_w if !occursin('2', w)]
+                    bare_D = [w for w in all_w if endswith(w, "| D")]
+                    q_bare_D = [w for w in q_only if endswith(w, "| D")]
+                    println("    Total 8-prep (max 2 moves/inc) wrapped solutions: $(length(all_w))")
+                    println("    Quarter-turn only (no half-turns): $(length(q_only))", isempty(q_only) ? "" : " -> $(q_only[1])")
+                    println("    Ending in bare 1-move 'D' on 9=>0: $(length(bare_D))", isempty(bare_D) ? "" : " -> $(bare_D[1])")
+                    println("    Both quarter-turn-only AND ending in bare 'D': $(length(q_bare_D))", isempty(q_bare_D) ? "" : " -> $(q_bare_D[1])")
+                end
+                break
+            end
+        end
+    end
+
+    # Exact full-state closed 10-cycle MITM for 9x(P* L) (0->9) + 1x(P* D) (9=>0)
+    for max_p in (1, 2)
+        cands_L = build_const_touch_steps("L"; max_preps = max_p)
+        cands_D = build_const_touch_steps("D"; max_preps = max_p)
+        println("\n=== 7.$(max_p) Exact Full-State Closed 10-Cycle for 9x(P* L) + 1x(P* D) (<=$max_p prep(s)/step) ===")
+        max_half = max_p == 1 ? 5 : 6
+        fwd = Dict{NTuple{24,Int}, Vector{Tuple{UInt32,UInt32,Int,NTuple{5,Int}}}}()
+        path_f = zeros(Int, 5)
+        function dfs_f(d::Int, st::NTuple{24,Int}, ll_m::UInt32, bl_m::UInt32, pr::Int)
+            if d == 6
+                vec = get!(fwd, st) do
+                    Tuple{UInt32,UInt32,Int,NTuple{5,Int}}[]
+                end
+                push!(vec, (ll_m, bl_m, pr, (path_f[1], path_f[2], path_f[3], path_f[4], path_f[5])))
+                return
+            end
+            for (si, s) in enumerate(cands_L)
+                pr + s.prep_count > max_half && break
+                nxt = apply_pull(st, s.pull)
+                b_ll = bit(nxt[IDX_LL])
+                (b_ll & (ll_m | bl_m)) != 0 && continue
+                b_bl = bit(nxt[IDX_UL]) | bit(nxt[IDX_UR]) | bit(nxt[IDX_LR])
+                ll_m2 = ll_m | b_ll
+                (b_bl & ll_m2) != 0 && continue
+                path_f[d] = si
+                dfs_f(d + 1, nxt, ll_m2, bl_m | b_bl, pr + s.prep_count)
+            end
+        end
+        dfs_f(1, HOME_STATE, l0, b0, 0)
+        println("  Indexed $(length(fwd)) forward 5-step (all P* L) states")
+
+        inv_L = [invert_pull(s.pull) for s in cands_L]
+        inv_D = [invert_pull(s.pull) for s in cands_D]
+        best_preps = 999
+        best_w = ""
+        path_b = zeros(Int, 5)
+        # Backward: d=1 is edge 9->0 (uses D), d=2..5 are edges 8->9..5->6 (uses L)
+        function dfs_b(d::Int, st::NTuple{24,Int}, ll_m::UInt32, bl_m::UInt32, pr::Int)
+            if d == 6
+                if haskey(fwd, st)
+                    for (f_ll, f_bl, f_pr, f_path) in fwd[st]
+                        tot = f_pr + pr
+                        tot >= best_preps && continue
+                        (f_ll & ll_m) != l0 && continue
+                        all_ll = f_ll | ll_m
+                        all_bl = f_bl | bl_m
+                        if (all_ll & all_bl) == 0
+                            words = [cands_L[f_path[k]].word for k in 1:5]
+                            append!(words, [cands_L[path_b[k]].word for k in 5:-1:2])
+                            push!(words, cands_D[path_b[1]].word)
+                            best_preps = tot
+                            best_w = join(words, " | ")
+                            println("  Found 9x(P* L) + 1x(P* D) exact-closed 10-cycle with $best_preps preps ($(10 + best_preps) HTM): $best_w")
+                        end
+                    end
+                end
+                return
+            end
+            cands_cur = d == 1 ? cands_D : cands_L
+            invs_cur  = d == 1 ? inv_D   : inv_L
+            for (si, s) in enumerate(cands_cur)
+                pr + s.prep_count > max_half && break
+                pr + s.prep_count >= best_preps && break
+                prv = apply_pull(st, invs_cur[si])
+                b_ll = bit(prv[IDX_LL])
+                b_bl = bit(prv[IDX_UL]) | bit(prv[IDX_UR]) | bit(prv[IDX_LR])
+                path_b[d] = si
+                if d < 5
+                    (b_ll & (ll_m | bl_m)) != 0 && continue
+                    ll_m2 = ll_m | b_ll
+                    (b_bl & ll_m2) != 0 && continue
+                    dfs_b(d + 1, prv, ll_m2, bl_m | b_bl, pr + s.prep_count)
+                else
+                    (b_bl & ll_m) != 0 && continue
+                    dfs_b(d + 1, prv, ll_m, bl_m | b_bl, pr + s.prep_count)
+                end
+            end
+        end
+        dfs_b(1, HOME_STATE, l0, b0, 0)
+        println("  Best exact-closed 10-cycle for 9x(P* L) + 1x(P* D) (<=$max_p prep/step): ",
+                isempty(best_w) ? "none" : "$best_preps preps ($(10 + best_preps) HTM) -> $best_w")
+    end
+end
+
 if abspath(PROGRAM_FILE) == @__FILE__
     verify_always_L_prime_impossibility()
     search_always_L()
     search_Lprime_plus_D()
+    search_9L_1D()
 end
