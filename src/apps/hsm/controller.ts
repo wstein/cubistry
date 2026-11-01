@@ -81,10 +81,15 @@ export class HsmController extends PhysicalPlayback {
     readonly settled: Promise<void>;
     readonly release: () => void;
   } | null = null;
+  /**
+   * Finished off-thread results, at most one per kind and kept (a null result
+   * included) until replaced: one route may ask for a plan and then a jump for
+   * the same pose, and neither may be searched twice.
+   */
   private found: {
     readonly need: Need;
     readonly result: RecoveryPlan | readonly LegalMove[] | null;
-  } | null = null;
+  }[] = [];
   private searchError: Error | null = null;
   private probing = false;
   readonly letter: Letter;
@@ -344,11 +349,8 @@ export class HsmController extends PhysicalPlayback {
     need: Need,
     compute: () => RecoveryPlan | readonly LegalMove[] | null,
   ): RecoveryPlan | readonly LegalMove[] | null {
-    const hit = this.found;
-    if (hit && sameNeed(hit.need, need)) {
-      this.found = null;
-      return hit.result;
-    }
+    const hit = this.found.find((f) => sameNeed(f.need, need));
+    if (hit) return hit.result;
     if (this.probing) throw new NeedsSearch(need);
     return compute();
   }
@@ -399,11 +401,14 @@ export class HsmController extends PhysicalPlayback {
             this.state &&
             stateEquals(this.state, state)
           )
-            this.found = {
-              need,
-              result: outcome.value as
-                RecoveryPlan | readonly LegalMove[] | null,
-            };
+            this.found = [
+              ...this.found.filter((f) => f.need.kind !== need.kind),
+              {
+                need,
+                result: outcome.value as
+                  RecoveryPlan | readonly LegalMove[] | null,
+              },
+            ];
         },
         (e) => {
           if (this.pending === entry) this.pending = null;
@@ -511,7 +516,7 @@ export class HsmController extends PhysicalPlayback {
         );
       this.prepared = null;
       this.recovering = null;
-      this.found = null;
+      this.found = [];
       this.cancelSearch();
       this.clearDeadline();
       this.install(this.design.print, state, assets, value);
