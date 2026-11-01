@@ -447,39 +447,81 @@ test("a controller without an executor never defers: planning stays synchronous"
 
 // ------------------------------------------------------------- blocking
 
-test("no slice of the search blocks for long: worst slice over every research sample", async () => {
-  const executor = realSliced(8);
-  let worstSearch = 0;
+test("a slice is bounded by its budget and the search has dense safe points: every research sample", async () => {
+  // A fake clock makes the bound deterministic: every step of the task between
+  // two safe points costs one tick, so a slice may take at most `budget` ticks.
+  const budget = 4;
+  let ticks = 0;
+  const executor = new SlicedExecutor({
+    budgetMs: budget,
+    now: () => ticks,
+    yieldNow: () => Promise.resolve(),
+  });
+  const counted = function* (task) {
+    for (;;) {
+      ticks++;
+      const step = task.next();
+      if (step.done) return step.value;
+      yield;
+    }
+  };
+  let safePoints = 0;
   for (const row of table.modes) {
     const { letter, maximum, direction } = row,
       targets = targetsOf(letter, maximum, direction);
     for (const sample of row.samples) {
       const state = applyMoves(
-        initialState(design.print),
-        parseAlg(sample.setupFromSolved),
-      );
-      const t0 = performance.now();
-      await outcome(
+          initialState(design.print),
+          parseAlg(sample.setupFromSolved),
+        ),
+        before = ticks;
+      const value = await outcome(
         executor,
-        recovery.planTask(
-          state,
-          letter,
-          maximum,
-          direction,
-          sample.fromValue,
-          targets,
+        counted(
+          recovery.planTask(
+            state,
+            letter,
+            maximum,
+            direction,
+            sample.fromValue,
+            targets,
+          ),
         ),
       );
-      worstSearch = Math.max(worstSearch, performance.now() - t0);
+      assert.ok(value === null || value.words.length > 0);
+      safePoints += ticks - before;
     }
   }
   const { worstSliceMs, slices } = executor.stats;
-  console.log(
-    `recovery search: worst slice ${worstSliceMs.toFixed(1)} ms over ${slices} slices (budget 8 ms); slowest whole search ${worstSearch.toFixed(0)} ms`,
+  assert.ok(
+    worstSliceMs <= budget,
+    `worst slice ${worstSliceMs} ticks exceeds the ${budget}-tick budget`,
   );
-  // A generous bound for a loaded CI host: the search alone takes up to ~160 ms.
-  assert.ok(worstSliceMs < 100, `worst slice ${worstSliceMs.toFixed(1)} ms`);
-  assert.ok(slices > 300, `${slices} slices`);
+  assert.ok(
+    slices >= safePoints / budget,
+    `${slices} slices for ${safePoints} safe points`,
+  );
+  assert.ok(safePoints > 300, `${safePoints} safe points`);
+});
+
+test("an endless task is cut into slices of at most the budget", async () => {
+  let ticks = 0,
+    steps = 0;
+  const executor = new SlicedExecutor({
+    budgetMs: 3,
+    now: () => ticks,
+    yieldNow: () => Promise.resolve(),
+  });
+  const task = (function* () {
+    for (;;) {
+      ticks++;
+      if (++steps === 100) return steps;
+      yield;
+    }
+  })();
+  assert.equal(await outcome(executor, task), 100);
+  assert.equal(executor.stats.worstSliceMs, 3);
+  assert.equal(executor.stats.slices, 34);
 });
 
 // -------------------------------------------------------------- live clock
