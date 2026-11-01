@@ -2,3 +2,4 @@ case	targets	julia-exit	flix-exit	receipts	summary
 matchability	-	0	0	IDENTICAL	pure-matchability 0
 new-dag-all	all	0	0	IDENTICAL	pure-summary ACCEPT 91 0 0 240
 pr99-dag-all	all	1	1	IDENTICAL	pure-summary REJECT 42 49 0 240
+chain-2027	2027	0	0	IDENTICAL	status VALID_CONTINUOUS_CHAIN 11 218 294 49

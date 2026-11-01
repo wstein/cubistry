@@ -55,6 +55,24 @@ run_case  midge-undone        "$out/midge-undone.print.tsv"        "$dag" all
 run_match midge-undone-matchability "$out/midge-undone.print.tsv"
 run_case  unrepaired-root     "$P" "$out/unrepaired-root.dag.tsv"  all
 run_case  flipped-product     "$P" "$out/flipped-product.dag.tsv"  all
+# Chain controls: one layer move changed (same metrics); a declared HTM changed; the stage-1 print; the
+# unchanged PR #99 Julia chain verifier (its print and displays differ from this layout).
+C="$here/evidence/chain-2027.moves.tsv"
+awk -F'\t' -v OFS='\t' '$1=="move"&&$2%7!=0&&!d{$2=($2%7==6?$2-1:$2+1);d=1}1' "$C" > "$out/move-changed.chain.tsv"
+awk -F'\t' -v OFS='\t' '$1=="edge"&&!d{$4=$4+1;d=1}1' "$C" > "$out/htm-changed.chain.tsv"
+run_chain() {
+    name=$1; print=$2; chain=$3
+    js=0; "$julia_bin" --startup-file=no "$here/pure_chain.jl" "$print" "$dag" "$chain" > "$out/$name.julia.stdout" 2> "$out/$name.julia.stderr" || js=$?
+    fs=0; java -Dstdout.encoding=UTF-8 -Xmx8g -jar "$jar" chain "$print" "$dag" "$chain" "$cal/english/evidence" "$cal/en-physical-review" > "$out/$name.flix.stdout" 2> "$out/$name.flix.stderr" || fs=$?
+    note "$name" "$js" "$fs"
+}
+run_chain chain-move-changed "$P" "$out/move-changed.chain.tsv"
+run_chain chain-htm-changed  "$P" "$out/htm-changed.chain.tsv"
+run_chain chain-stage1-print "$here/evidence/print-stage1.tsv" "$C"
+js=0; "$julia_bin" --startup-file=no "$cal/continuous/verify.jl" "$dag" "$C" > "$out/chain-pr99-verifier.julia.stdout" 2> "$out/chain-pr99-verifier.julia.stderr" || js=$?
+[ "$js" -ne 0 ] && js=1
+printf '%s\t%s\t%s\t%s\t%s\n' chain-pr99-julia-verifier "$js" - "$(grep -m1 -E 'AssertionError|ERROR' "$out/chain-pr99-verifier.julia.stderr" | cut -c1-160)" "unchanged PR #99 Julia chain verifier, expected to reject" >> "$out/results.tsv"
+[ "$js" -eq 1 ] || { printf 'UNKNOWN: PR #99 verifier accepted\n' >&2; status=1; }
 run_case  bad-target-id       "$P" "$dag" "0,$jan"
 run_case  duplicate-targets   "$P" "$dag" "$jan,$jan"
 cat "$out/results.tsv"

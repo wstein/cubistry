@@ -6,7 +6,7 @@ mkdir -p "$build_dir/src"
 cp -R "$here/../../english/flix/.flixw" "$build_dir/"
 cp "$here/../../english/flix/flixw" "$here/../../english/flix/flix.toml" "$build_dir/"
 cp "$here/../../english/flix/src/Core.flix" "$here/../../english/flix/src/Data.flix" "$here/../../english/flix/src/Dag.flix" "$build_dir/src/"
-cp "$here/src/Main.flix" "$here/src/Stacked.flix" "$build_dir/src/"
+cp "$here/src/Main.flix" "$here/src/Stacked.flix" "$here/src/Chain.flix" "$build_dir/src/"
 cd "$build_dir"
 export FLIX_CACHE_HOME=${FLIX_CACHE_HOME:-/tmp/cubistry-flix-cache}
 export COURSIER_CACHE=${COURSIER_CACHE:-/tmp/cubistry-flix-coursier}

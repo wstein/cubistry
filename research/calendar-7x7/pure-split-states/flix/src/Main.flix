@@ -87,8 +87,9 @@ def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {
         match Sys.Env.getArgs() {
             case "matchability"::printing::oldRoot::Nil => matchability(printing,oldRoot)
+            case "chain"::printing::dag::path::oldRoot::geometry::Nil => runPureChain(printing,dag,path,oldRoot,geometry)
             case printing::dag::targets::oldRoot::geometry::Nil => checkPure(printing,dag,targets,oldRoot,geometry)
-            case _ => throw new IllegalArgumentException("PRINT DAG TARGETS ORIGINAL_EVIDENCE GEOMETRY | matchability PRINT ORIGINAL_EVIDENCE")
+            case _ => throw new IllegalArgumentException("PRINT DAG TARGETS ORIGINAL_EVIDENCE GEOMETRY | matchability PRINT ORIGINAL_EVIDENCE | chain PRINT DAG CHAIN ORIGINAL_EVIDENCE GEOMETRY")
         }
     } catch {case ex: Exception => {println("invalid\t"+ex.toString());System.exit(1)}}
 })
@@ -145,4 +146,63 @@ def matchability(printPath: String,oldRoot: String): Unit \ IO = {
     },0,List.zipWithIndex(goals));
     println("pure-matchability\t${bad}");
     require(bad==0,"${bad} displays have no cubie-level front matching")
+}
+
+// Chain verifier for the pure split (same replay as ../../continuous/flix, parametrized
+// for the new print and the pure-split displays under the strict stacked rule).
+def pureFront(state: Vector[Sticker],y: Int32,m: Int32,what: String): Unit \ IO =
+    require(frontFailure(state,stackedBoard(pureVariant(),y,m),"strict")=="-\t-\t-\t-",what)
+def runPureChain(printPath: String,dagPath: String,path: String,oldRoot: String,geometry: String): Unit \ IO = {
+    let CalendarChain.C(source,sy,sm,sourceHash,edges)=readChain(read(path));
+    let oldRaw=read(oldRoot+"/physical-print.tsv");
+    require(digest(oldRaw)=="b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931","unchanged PR99 printing provenance");
+    let old=readPrint(oldRaw);let printing=readPrint(read(printPath));
+    List.forEach(i -> {
+        let Sticker.S(_,a,b,c,_,_,_)=Vector.get(i,old);let Sticker.S(_,a2,b2,c2,_,_,_)=Vector.get(i,printing);
+        require((a,b,c)==(a2,b2,c2),"surface identity changed")
+    },List.range(0,294));
+    let poses=derivedPoses();
+    validatePoseFile(read(geometry+"/pose-points.tsv"),poses);validateMoves(read(geometry+"/moves.tsv"));
+    let reps=representatives();validateTargets(read(oldRoot+"/targets.tsv"),reps);
+    let goals=stackedGoals(pureVariant(),reps);
+    require(goalBoard(at(goals,source-1))==stackedBoard(pureVariant(),sy,sm),"source root display must match declared source month");
+    let results=readDag(read(dagPath),poses,false);
+    let start=match Map.get(source,results) {
+        case Some(p) => p
+        case None => throw new IllegalArgumentException("source root absent from legal DAG")
+    };
+    let initial=liftState(start,printing,poses);pureFront(initial,sy,sm,"source front");
+    require(fullDigest(initial)==sourceHash,"initial full physical source SHA mismatch");
+    println("source-sha256\t${sourceHash}");
+    let(end,final,_,_)=List.foldLeft((current,pair) -> {
+        let(index,edge)=pair;let Edge.E(year,month,h,q,r,rq,ss,ds,steps)=edge;
+        let(before,state,previousYear,previousMonth)=current;
+        let(ny,nm)=if(previousMonth==12)(previousYear+1,1)else(previousYear,previousMonth+1);
+        require((year,month)==(ny,nm),"edges must be consecutive chronological months");
+        require(fullDigest(state)==ss,"edge source hash must equal retained complete physical state");
+        require(metrics(steps)==(h,q,r,rq),"declared HTM/QTM/rotation metrics differ from raw moves");
+        let(after,direct)=List.foldLeft((poseState,step) -> {
+            let(p,s)=poseState;(compose(p,stepPerm(step,poses)),directStep(step,s))
+        },(before,state),steps);
+        let lifted=liftState(after,printing,poses);
+        require(lifted==direct,"pose replay agrees with direct294-sticker physical replay");
+        pureFront(lifted,year,month,"edge front");
+        require(fullDigest(lifted)==ds,"edge destination full physical SHA mismatch");
+        let(inversePose,inverseDirect)=List.foldLeft((poseState,step) -> {
+            let(p,s)=poseState;let inv=inverseStep(step);
+            (compose(p,stepPerm(inv,poses)),directStep(inv,s))
+        },(after,direct),List.reverse(steps));
+        require(inversePose==before and inverseDirect==state,"edge inverse must restore exact physical source");
+        println("edge\t${index+1}\t${year}\t${month}\t${ss}\t${ds}");
+        println("metrics\t${index+1}\t${h}\t${q}\t${r}\t${rq}\t${List.length(steps)}");
+        (after,direct,year,month)
+    },(start,initial,sy,sm),List.zipWithIndex(edges));
+    let allSteps=List.flatMap(edge -> {let Edge.E(_,_,_,_,_,_,_,_,steps)=edge;steps},edges);
+    let(backPose,backDirect)=List.foldLeft((poseState,step) -> {
+        let(p,s)=poseState;let inv=inverseStep(step);
+        (compose(p,stepPerm(inv,poses)),directStep(inv,s))
+    },(end,final),List.reverse(allSteps));
+    require(backPose==start and backDirect==initial,"full chain inverse restores exact initial physical state");
+    println("endpoint-sha256\t${fullDigest(final)}");
+    println("status\tVALID_CONTINUOUS_CHAIN\t${List.length(edges)}\t218\t294\t49")
 }

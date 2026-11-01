@@ -163,13 +163,69 @@ cell = text and ink; descriptive listing from [displays.jl](displays.jl)).
 
 ## Stage 3: the 2027 chain January to December
 
-In progress: the chain search and the parametrized chain verifiers follow in the next commit.
+[chain.jl](chain.jl) (untrusted) keeps one physical state from the stage-2
+January 2027 root through December 2027. For each month edge it runs the
+unchanged PR #130 global search under the final print and the pure-split
+displays; if that stalls, it uses the planner's orbit solve. The chain is
+[chain-2027.moves.tsv](evidence/chain-2027.moves.tsv), in the existing chain
+format; the search log is [chain-2027-edges.tsv](evidence/chain-2027-edges.tsv).
+
+**The chain verifiers were parametrized for this print and these displays,
+in both languages:**
+
+- [pure_chain.jl](pure_chain.jl) (Julia) and the Flix `chain` command run the
+  same replay as `../continuous/verify.jl` and `../continuous/flix`:
+  - one retained physical state;
+  - chronological edges;
+  - pose and direct 294-sticker replay must agree;
+  - every front must match;
+  - exact inverse restoration of each edge and of the whole chain.
+- Only three things change:
+  - the print is read from the file, with the PR #99 print SHA-pinned as the
+    provenance base and identities unchanged;
+  - the source-root check uses the pure-split displays;
+  - every front is checked against the pure-split display under the strict
+    stacked rule.
+
+Both verifiers accept the chain with identical receipts
+(`VALID_CONTINUOUS_CHAIN 11 218 294 49`; `chain-2027` in
+[cases.tsv](evidence/receipts/cases.tsv)).
+
+| Edge | Method | HTM |
+|---|---|---:|
+| Jan → Feb | orbit solve (global search stalled) | 443 |
+| Feb → Mar | orbit solve | 62 |
+| Mar → Apr | orbit solve | 422 |
+| Apr → May | global search | 117 |
+| May → Jun | global search | 120 |
+| Jun → Jul | global search | 113 |
+| Jul → Aug | global search | 98 |
+| Aug → Sep | global search | 114 |
+| Sep → Oct | orbit solve | 462 |
+| Oct → Nov | orbit solve | 439 |
+| Nov → Dec | global search | 68 |
+
+These are search results from one deterministic heuristic run. They are not
+optimal and are not compared with the PR #99 chains. The orbit-solve edges
+(over 400 HTM) are much longer than the global-search edges, which shows how
+weak the fallback is, not a property of the layout. No move savings are
+claimed.
+
+Chain controls (in [results.tsv](evidence/negative-controls/results.tsv)):
+
+- Both parametrized verifiers reject:
+  - one layer move changed with the same metrics (the edge front fails);
+  - a changed declared HTM (metrics mismatch);
+  - the stage-1 print (the source digest differs).
+- The **unchanged** PR #99 Julia chain verifier also rejects the chain, because
+  its print and displays differ. That is why the parametrization is needed.
 
 ## Negative controls
 
-[negative_checks.sh](negative_checks.sh) runs nine controls; results are in
+[negative_checks.sh](negative_checks.sh) runs nine checker controls and four
+chain controls (see stage 3); results are in
 [results.tsv](evidence/negative-controls/results.tsv). Julia and Flix both exit
-1 on all nine:
+1 on all nine checker controls:
 
 - the dark `24/31` surface blanked: supply fails, and the first S31 display
   fails at (7,2);
@@ -196,7 +252,7 @@ In progress: the chain search and the parametrized chain verifiers follow in the
   - `dual-stacked/flix/src/Main.flix`:
     `4187ee5683c1049232813219ebc5d6aa8c1b7fda5acda532722e5cc11dea31b2`
     (`main` removed, provenance header added).
-- (Next commit) [flix/src/Chain.flix](flix/src/Chain.flix) copies the chain parser and step
+- [flix/src/Chain.flix](flix/src/Chain.flix) copies the chain parser and step
   replay of `../continuous/flix/src/Main.flix` (base `7eaebaf`).
 - [pure_chain.jl](pure_chain.jl) copies `turn_vector` and `direct_move` from
   `../practical/verify.jl`, and `read_chain` and `chain_metrics` from

@@ -6,5 +6,9 @@ midge-undone	1	1	AssertionError: 19 of 91 states fail the pure-split front: targ
 midge-undone-matchability	1	1	AssertionError: 1 displays have no cubie-level front matching | java.lang.IllegalArgumentException: 1 displays have no cubie-level front matching	72 2031 12 1 | 72 2031 12 1
 unrepaired-root	1	1	AssertionError: 1 of 91 states fail the pure-split front: targets 13 | java.lang.IllegalArgumentException: 1 of 91 states fail the pure-split front	13 2027 1 FAIL 7,1 16 0 plain-mismatch 5d5110eb3bb88ad548d6c83e0ab80af7885b4b8474f6c2905fdc146766416ab3 | 13 2027 1 FAIL 7,1 16 0 plain-mismatch 5d5110eb3bb88ad548d6c83e0ab80af7885b4b8474f6c2905fdc146766416ab3
 flipped-product	1	1	AssertionError: 1 of 91 states fail the pure-split front: targets 2 | java.lang.IllegalArgumentException: 1 of 91 states fail the pure-split front	2 2026 2 FAIL 1,5 6 3 plain-mismatch 3613273818d57f5b5d1ce35967550f01250c77501eaa3e08a9cb7b970dcb7910 | 2 2026 2 FAIL 1,5 6 3 plain-mismatch 3613273818d57f5b5d1ce35967550f01250c77501eaa3e08a9cb7b970dcb7910
+chain-move-changed	1	1	AssertionError: Edge 1 front | java.lang.IllegalArgumentException: edge front	 | 
+chain-htm-changed	1	1	AssertionError: Declared transition metrics mismatch | java.lang.IllegalArgumentException: declared HTM/QTM/rotation metrics differ from raw moves	 | 
+chain-stage1-print	1	1	AssertionError: Initial actual physical state digest | java.lang.IllegalArgumentException: initial full physical source SHA mismatch	 | 
+chain-pr99-julia-verifier	1	-	ERROR: LoadError: AssertionError: Front image mismatch at 7,1	unchanged PR #99 Julia chain verifier, expected to reject
 bad-target-id	1	1	AssertionError: TARGETS must be distinct ids 1..91 or all | java.lang.IllegalArgumentException: TARGETS must be distinct ids 1..91 or all	 | 
 duplicate-targets	1	1	AssertionError: TARGETS must be distinct ids 1..91 or all | java.lang.IllegalArgumentException: TARGETS must be distinct ids 1..91 or all	 | 
