@@ -11,6 +11,11 @@ export interface ClockPort {
   readonly currentValue: number;
   readonly busy: boolean;
   prepare(value: number): readonly LegalMove[];
+  /**
+   * Like `prepare`, but never blocks: null while the route is still being
+   * computed off the critical path (the call keeps that computation going).
+   */
+  tryPrepare?(value: number): readonly LegalMove[] | null;
   request(value: number): void;
   setDeadline(target: number, endAt: number, durationMs: number): void;
   clearDeadline(): void;
@@ -109,7 +114,13 @@ export class LiveClockScheduler {
       unit.setDuration(unit.duration);
       if (c.currentValue !== logical) {
         c.clearDeadline();
-        const work = quarterTurnUnits(c.prepare(logical));
+        const route = c.tryPrepare ? c.tryPrepare(logical) : c.prepare(logical);
+        if (!route) {
+          // The recovery search is still running in slices; ask again next tick.
+          motion[i] = "synchronizing";
+          return;
+        }
+        const work = quarterTurnUnits(route);
         // Recover the current value using at most half the remaining slot, so
         // there is time to prepare its successor. Never use an instant turn.
         const available =
@@ -124,7 +135,15 @@ export class LiveClockScheduler {
         return;
       }
       const boundary = nextChange(epoch, i as 0 | 1 | 2, this.read),
-        moves = c.prepare(boundary.value);
+        moves = c.tryPrepare
+          ? c.tryPrepare(boundary.value)
+          : c.prepare(boundary.value);
+      if (!moves) {
+        // The successor needs a recovery search that has not finished yet; it
+        // started as soon as the unit went idle. Poll again next tick.
+        motion[i] = "idle";
+        return;
+      }
       const work = quarterTurnUnits(moves),
         remaining = boundary.epoch - epoch,
         budget = work * unit.duration;
