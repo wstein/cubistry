@@ -26,9 +26,10 @@ every display must be physically realizable, not merely look plausible on a
 screen.
 
 Cubistry provides the 3D viewer and animator, the sticker print rendering and
-validation, and several reference applications. The mathematics (solvers and
-feasibility proofs) lives in the neighboring [PuzlWerk](https://github.com/wstein/puzlwerk)
-project and in research branches. This repository keeps verified facts apart
+validation, and several reference applications. The solver foundation lives in the neighboring
+[PuzlWerk](https://github.com/wstein/puzlwerk) project; feasibility research and
+proof checkers live here under `research/` and `proof-checkers/`, with long-running
+research on a dedicated branch. This repository keeps verified facts apart
 from proposals: feasibility results are stated as `SAT` (a validated witness),
 `UNSAT` (an independently checkable proof under explicit assumptions) or
 `UNKNOWN` (anything else). See [Evidence and checks](docs/EVIDENCE_AND_CHECKS.md).
