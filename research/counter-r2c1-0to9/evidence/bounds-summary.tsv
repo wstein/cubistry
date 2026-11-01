@@ -1,0 +1,8 @@
+prep_budget	step_model	max_displays_reached	open_9edge_paths	display_wrap_10edge_paths	exact_closed_10cycles
+0	P* T (L/D/F only)	9	0	0	0
+1	P* T (B-only prep)	10	22368	1928	0
+1	P* T (R/U/B prep)	10	23088	2302	0
+1	P* T P* (any order)	10	46176	4604	0
+2	P* T (R/U/B prep)	10	1577116	213962	0
+3	P* T (B-only prep)	10	-	-	20
+3	P* T (R/U/B prep)	10	-	-	127

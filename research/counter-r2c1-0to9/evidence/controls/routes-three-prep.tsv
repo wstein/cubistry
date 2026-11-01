@@ -1,0 +1,11 @@
+mode	step	from	to	increment	inc_htm	inc_prep	inc_touch	inc_shortest	decrement	dec_htm	dec_prep	dec_touch	dec_shortest
+closed	0	0	1	L	1	0	1	1	L'	1	0	1	1
+closed	1	1	2	D	1	0	1	1	D'	1	0	1	1
+closed	2	2	3	L	1	0	1	1	L'	1	0	1	1
+closed	3	3	4	R U B L	4	3	1	1	L' B' U' R'	4	3	1	1
+closed	4	4	5	D	1	0	1	1	D'	1	0	1	1
+closed	5	5	6	L	1	0	1	1	L'	1	0	1	1
+closed	6	6	7	B2 D	2	1	1	2	D' B2	2	1	1	1
+closed	7	7	8	L	1	0	1	1	L'	1	0	1	1
+closed	8	8	9	D	1	0	1	1	D'	1	0	1	1
+closed	9	9	0	B D	2	1	1	2	D' B'	2	1	1	1

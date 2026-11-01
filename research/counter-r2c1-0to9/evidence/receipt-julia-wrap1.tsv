@@ -1,0 +1,13 @@
+graph	tracked-front-corners	136080	diameter	7
+setup	wrap1	(none)	0
+edge	wrap1	0	1	D	1	0	1	1	1
+edge	wrap1	1	2	D	1	0	1	1	1
+edge	wrap1	2	3	D	1	0	1	1	1
+edge	wrap1	3	4	L	1	0	1	1	1
+edge	wrap1	4	5	L	1	0	1	1	1
+edge	wrap1	5	6	D	1	0	1	1	1
+edge	wrap1	6	7	B D	2	1	1	2	1
+edge	wrap1	7	8	L	1	0	1	1	1
+edge	wrap1	8	9	L	1	0	1	1	1
+edge	wrap1	9	0	D	1	0	1	1	1
+summary	wrap1	edges=10	max_htm=2	total_htm=11	total_prep=1	mean_htm=1.1	hist=1:9,2:1	inc_shortest=10/10	dec_shortest=9/10	closure=display-wrapped

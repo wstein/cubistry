@@ -1,0 +1,11 @@
+wrong-glyph	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	setup: LL shows 9 (sticker 8), display 0 needs 0	same-message
+wrong-move	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	increment 0->1: LL shows blank (sticker 18), display 1 needs 1	same-message
+wrong-up	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	setup: LL sticker 8 glyph 0 not upright (up -1,0,0)	same-message
+front-nonblank	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	setup: UL shows 5 (sticker 2), display 0 needs blank	same-message
+two-touch-moves	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 0: increment must use exactly 1 move touching r2c1 (got 2)	same-message
+three-prep-moves	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 3: increment allows at most 2 preparing moves (got 3)	same-message
+prep-after-touch	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 3: preparing moves must precede the r2c1 touching move	same-message
+bad-inverse	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 0: decrement is not the exact inverse word	same-message
+short-claim	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 6: claimed increment shortest 1 but exact distance is 2	same-message
+hidden-unreachable	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	row 4: target display 5 is unreachable from the actual state	same-message
+open-closure	REJECTED_AS_INTENDED	julia_exit=1	flix_exit=1	invalid	cycle does not return to the exact full start state	same-message
