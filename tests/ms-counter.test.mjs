@@ -46,6 +46,9 @@ test("the research copies and the runtime are pinned to PR #138", () => {
   assert.equal(pin.pullRequest, 138);
   assert.equal(pin.branch, "research/ms-counter-3move");
   assert.equal(pin.commit, "ee88e5725be8e5e1acf554d924ae9a6d5da43de3");
+  // The open question stays explicit in the pin.
+  assert.match(pin.reviewStatus, /Max 3 HTM for both units: UNKNOWN\./);
+  assert.match(pin.reviewStatus, /not proofs\./);
   assert.deepEqual(Object.keys(pin.researchFiles), Object.keys(RESEARCH_FILES));
   for (const [research, copy] of Object.entries(pin.copies)) {
     assert.equal(RESEARCH_FILES[research], copy);
