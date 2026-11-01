@@ -285,6 +285,12 @@ completion. Details:
   needs the planner tables (about 210 ms to rebuild), a stale search
   cannot be interrupted inside a Worker without terminating it, and the
   slicing needs no second copy of the code.
+- **Measured.** In Chromium on a shared 2-vCPU host, over all 264 research
+  samples: the previous search blocked the event loop for up to 294 ms (903 ms
+  with the CPU throttled 4x, a phone class); the sliced search's longest slice
+  was 28 ms (68 ms at 4x), with 1 and 4 long tasks over 50 ms instead of 28 and
+  113. The whole search takes slightly longer than before (median 13 ms against
+  9 ms) because it yields between slices.
 - **What still blocks.** The first search builds the recovery tables once
   (about 30 ms on the Xeon); the existing planner tables (about 200 ms) are
   built when a controller is created, as before.
