@@ -9,6 +9,9 @@
 | **`wrap1` (1-lap display wrap `0..9->0`)** | `L, D` | 10 | **2** | **1** | 9 / 1 / 0 | **1** (tight min) | **11** | **1.100** | Display-wrapped (`0` restored at `r2c1`) | none (`0` printed) |
 | **`closed` (primary, exact full-state cycle `0..9->0`)** | `L, D` | 10 | **2** | **1** | 7 / 3 / 0 | **3** (tight min) | **13** | **1.300** | **Exact full 24-sticker closure (Period 1)** | none (`0` printed) |
 | **`Always L'` / `Always D` (`P* L'` or `P* D`)** | `L'` (or `D`) | 8 (max 9 displays `0..8`) | any | any | — | any | — | — | **UNSAT for 10 displays (`0..9`)** | — |
+| **`9L1D-wrap1` (open `0..9` prefix, max 2 moves/inc)** | **`L` (`0..9`)** | 9 | **2** | **1** | 4 / 5 / 0 | **5** (tight min) | **14** | 1.556 | Open (`0 -> 9`, max 2 HTM/edge) | none (`0` printed) |
+| **`9L1D-wrap1` (1-lap wrap `0..9->0`, max 2 moves/inc)** | **`L` (`0..9`), `D` (`9=>0`)** | 10 | **2** | **1** | 2 / 8 / 0 | **8** (tight min) | **18** | 1.800 | Display-wrapped (`9=>0` is bare `D`) | none (`0` printed) |
+| **`9L1D-closed` (exact full-state cycle `0..9->0`)** | **`L` (`0..9`), `D` (`9=>0`)** | 10 | 3 | 2 | 3 / 4 / 3 | **10** (tight min) | **20** | 2.000 | **Exact full 24-sticker closure (Period 1)** | none (`0` printed) |
 | **`constL-wrap1` (open `0..9` prefix, 9 edges)** | **Always `L`** | 9 | 3 | 2 | 6 / 1 / 2 | **5** (tight min) | **14** | 1.556 | Open (`0 -> 9`, every step ends in `L`) | none (`0` printed) |
 | **`constL-wrap1` (1-lap display wrap `0..9->0`)** | **Always `L`** | 10 | 3 | 2 | 7 / 0 / 3 | **6** (tight min) | **16** | 1.600 | Display-wrapped (7/10 steps pure `L`) | none (`0` printed) |
 | **`constL-closed` (exact full-state cycle `0..9->0`)** | **Always `L`** | 10 | 3 | 2 | 4 / 1 / 5 | **11** (tight min) | **21** | 2.100 | **Exact full 24-sticker closure (Period 1)** | none (`0` printed) |
@@ -167,6 +170,19 @@ What if we require **every single increment** $d \to d+1$ to end with the **exac
 - **Routes:**
   - `constL-wrap1`: `L | L | B' U L | L | L | U B2 L | L | L | B' U' L | L` (**16 HTM**, **6 preps**, **7 out of 10 steps are a single bare `L`**)
   - `constL-closed`: `L | L | U B' L | B' U2 L | B' U L | U' L | L | U B' L | L | B' U L` (**21 HTM**, **11 preps**, **exact Period-1 full-state closure where every increment ends with `L`**)
+
+### `9×L + 1×D` witnesses (`L` for `0..9`, `D` for `9=>0`): `9L1D-wrap1` (max 2 moves/inc, 18 HTM) and `9L1D-closed` (20 HTM exact cycle)
+- **Files:**
+  - `9L1D-wrap1` (**max 2 moves per inc**, $\le 1$ prep/step): [`evidence/print-9L1D-wrap1.tsv`](evidence/print-9L1D-wrap1.tsv), [`evidence/routes-9L1D-wrap1.tsv`](evidence/routes-9L1D-wrap1.tsv), [`evidence/setup-9L1D-wrap1.tsv`](evidence/setup-9L1D-wrap1.tsv)
+  - `9L1D-closed` (exact Period-1 full-state cycle): [`evidence/print-9L1D-closed.tsv`](evidence/print-9L1D-closed.tsv), [`evidence/routes-9L1D-closed.tsv`](evidence/routes-9L1D-closed.tsv), [`evidence/setup-9L1D-closed.tsv`](evidence/setup-9L1D-closed.tsv)
+- **Receipts:** [`evidence/receipt-julia-9L1D-wrap1.tsv`](evidence/receipt-julia-9L1D-wrap1.tsv), [`evidence/receipt-flix-9L1D-wrap1.tsv`](evidence/receipt-flix-9L1D-wrap1.tsv), [`evidence/receipt-julia-9L1D-closed.tsv`](evidence/receipt-julia-9L1D-closed.tsv), [`evidence/receipt-flix-9L1D-closed.tsv`](evidence/receipt-flix-9L1D-closed.tsv) (all byte-identical)
+- **Routes:**
+  - **`9L1D-wrap1` (max 2 moves/inc, $\le 1$ prep/step, 18 HTM, 8 preps):**
+    `U L | B2 L | U L | U' L | B' L | L | B2 L | B L | U L | D`
+    *(Every increment `0->1` .. `8->9` uses at most 1 `{U, B}` prep move followed by `L`, and `9=>0` is a single bare `D`! Or if only open `0..9` is needed with max 2 moves/inc: `L | L | U L | B' L | U L | U' L | B' L | L | L` costs only **5 preps = 14 HTM**).*
+  - **`9L1D-closed` (exact Period-1 full-state closure, 20 HTM, 10 preps):**
+    `L | B U L | U2 B L | U L | R2 L | U' B' L | L | B L | B L | D`
+    *(Also has a 15-HTM / 5-prep 1-lap wrapped variant when 2 preps are allowed on 2 steps: `L | U' B2 L | L | L | B' U' L | L | B2 L | L | L | D`, where 7/10 steps have 0 preps).*
 
 ---
 
