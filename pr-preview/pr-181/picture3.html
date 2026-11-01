@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head><meta name="robots" content="noindex,nofollow">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/cubistry/pr-preview/pr-181/favicon.svg" />
+    <title>3×3 Super Picture Cube · Cubistry</title>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-181/assets/picture3-ztwjNtf3.js"></script>
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-181/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-181/assets/three-BW9MzyAf.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-181/assets/presentation-rotation-BCWs-Ft7.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-181/assets/index-CoVX5M-l.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-181/assets/model-Bt_YWJw7.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-181/assets/viewer-BXq836S3.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-181/assets/model-CTOgjrkI.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-181/assets/picture3-Dhl04JN_.css">
+  </head>
+  <body><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #181 — non-production preview · 9e6c931ed14e</aside>
+    <main>
+      <header><a class="brand" href="./">CUBISTRY <span>/ SUPER PICTURE</span></a><a href="./playground.html">2×2 Playground ↗</a></header>
+      <div class="intro"><p class="eyebrow">SIX PICTURES. EVERY TILE IN ITS PLACE.</p><h1>3×3 Super Picture Cube</h1><p>Your pictures stay on this device. Turn, scramble, and restore every tile — including the centers.</p></div>
+      <div class="layout">
+        <section class="stage" aria-label="3 by 3 puzzle">
+          <div class="stage-top"><span class="badge">3 × 3</span><label>Appearance <select id="style"><option value="picture">Super Picture</option><option value="classic">Classic colors</option></select></label></div>
+          <div id="cube" aria-label="Physical 3 by 3 cube" aria-busy="true"></div>
+          <p id="render-error" role="alert" hidden></p><button id="retry-render" type="button" hidden>Retry 3D view</button>
+          <div class="stage-bottom"><span>Drag to rotate the cube</span><button id="reference" type="button">Reset view</button></div>
+          <div class="goals"><div><span>EXACT TARGET · ALL SIX CENTERS</span><strong id="exact">Loading</strong></div></div>
+          <p id="physical-status" role="status" aria-live="polite">Preparing the picture cube…</p>
+        </section>
+        <section class="controls" aria-label="Physical puzzle controls">
+          <h2>Turn and explore</h2><div id="face-buttons" class="face-buttons" role="group" aria-label="Legal face turns"></div>
+          <div id="rotations" class="button-row" role="group" aria-label="Logical whole-cube turns"></div>
+          <form id="notation-form"><label for="notation">Move notation</label><div class="input-row"><input id="notation" placeholder="R U R' U'" autocomplete="off" maxlength="800" /><button type="submit">Apply</button></div></form>
+          <form id="scramble-form"><label for="seed">Scramble seed</label><div class="input-row"><input id="seed" type="number" min="0" max="4294967295" value="44" /><label for="count">Moves</label><input id="count" type="number" min="1" max="100" value="20" /><button type="submit">Scramble</button></div></form>
+          <div class="button-row"><button id="undo" type="button">Undo</button><button id="redo" type="button">Redo</button><button id="solve" type="button">Solve exact target</button><button id="cancel" type="button">Cancel</button></div>
+          <div class="button-row"><label for="speed">Turn duration <select id="speed"><option value="75">75 ms</option><option value="150" selected>150 ms</option><option value="300">300 ms</option></select></label><button id="restore" type="button">Restore via history</button></div>
+          <p id="stats">0 moves played</p><ol id="history" aria-label="Move history"></ol>
+          <p class="hint">Reset view changes presentation only. Restore via history reverses applied legal moves and retains the redo path. Exact solving checks every tile frame and can include a long center correction; it is not a shortest-path solver.</p>
+        </section>
+      </div>
+      <section class="picture-editor" aria-labelledby="pictures-title">
+        <div class="editor-heading"><div><h2 id="pictures-title">Make it yours</h2><p>Choose six images, then zoom and position each crop. Arrow keys adjust the sliders. Editing pictures preserves your scramble.</p></div><label for="preset">Example set <select id="preset"><option value="coast">Coastal landscapes</option><option value="orbit">Orbital patterns</option><option value="blocks">Color studies</option><option value="">Custom pictures</option></select></label></div>
+        <p class="hint">PNG, JPEG or WebP only. Up to 8 MiB and 16 megapixels per image; 32 MiB total. Decoded sources are bounded to 1536 pixels per side. Previews are 768×768; tiles are 256×256.</p>
+        <div id="face-editors" class="face-editors"></div>
+        <p id="image-status" role="status" aria-live="polite">Loading bundled examples…</p>
+      </section>
+      <section class="local-library" aria-labelledby="library-title">
+        <h2 id="library-title">Saved on this device</h2><p>Pictures are saved only when you choose Save. Nothing is uploaded. Clearing browser data removes your saved sets.</p>
+        <form id="save-form"><label for="set-name">Set name</label><div class="input-row"><input id="set-name" maxlength="64" required placeholder="My picture set" /><button id="save-set" type="submit">Save local set</button></div></form>
+        <div class="button-row"><label for="saved-sets">Local sets <select id="saved-sets"><option value="">Choose a saved set</option></select></label><button id="load-set" type="button">Load</button><button id="delete-set" type="button">Delete saved set</button><button id="retry-storage" type="button">Retry local storage</button></div>
+        <p id="storage-status" role="status" aria-live="polite">Opening local storage…</p><p class="hint">Up to 10 sets / 64 MiB. Save with an existing name replaces that saved set. A failed save leaves your current pictures and previously saved data intact.</p>
+      </section>
+    </main>
+  </body>
+</html>
