@@ -17,5 +17,7 @@ export function startFrameGapProbe(page) {
 }
 export const resetFrameGap = (page) => page.evaluate(() => { if (window.frameGapProbe) window.frameGapProbe.max = 0; });
 export const readFrameGap = (page) => page.evaluate(() => window.frameGapProbe?.max ?? 0);
+/** A timing bound of `baseMs` that widens with a measured largest frame gap. */
+export const frameToleranceMs = (baseMs, frameGapMs) => Math.max(baseMs, FRAME_GAP_FACTOR * frameGapMs);
 /** Allowed |settled - deadline| in milliseconds for a measured largest frame gap. */
-export const endpointToleranceMs = (frameGapMs) => Math.max(ENDPOINT_TOLERANCE_MS, FRAME_GAP_FACTOR * frameGapMs);
+export const endpointToleranceMs = (frameGapMs) => frameToleranceMs(ENDPOINT_TOLERANCE_MS, frameGapMs);

@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { writeFileSync } from "node:fs";
+import { startFrameGapProbe, readFrameGap, frameToleranceMs } from "../helpers/frame-gap.mjs";
 test.use({ timezoneId: "Europe/Berlin" });
 async function ready(page, time) {
   // Install the fake clock slightly in the past: pauseAt() rejects a target
@@ -567,6 +568,7 @@ test("untimed recovery honors quarter-based clock speed while the default viewer
   });
   await page.goto("/clock.html");
   await expect(page.locator("#seconds-speed")).toBeEnabled();
+  await startFrameGapProbe(page);
   const run = async (metric) =>
     page.evaluate(async (metric) => {
       const { clockUnits, clockStage } = await import("/src/clock.mjs"),
@@ -613,7 +615,9 @@ test("untimed recovery honors quarter-based clock speed while the default viewer
   expect(weighted.every((t) => !t.timed)).toBe(true);
   expect(legacy.every((t) => !t.timed)).toBe(true);
   expect(mean(weighted, 2) / mean(weighted, 1)).toBeGreaterThan(1.4);
-  expect(Math.abs(mean(legacy, 2) - mean(legacy, 1))).toBeLessThanOrEqual(90);
+  const frameGap = await readFrameGap(page);
+  // Equal legacy moves differ only by frame quantization, which software GL makes larger than 90 ms.
+  expect(Math.abs(mean(legacy, 2) - mean(legacy, 1))).toBeLessThanOrEqual(frameToleranceMs(90, frameGap));
 });
 test("move statistics block is present, stable in layout and updates after clock ticks", async ({
   page,
