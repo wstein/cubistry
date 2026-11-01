@@ -61,9 +61,23 @@ blanks. It prefers surfaces that no still-valid PR #99 state shows on the front.
   letters went onto the PR #99 blanks 35, 134 and 135.
   - No unchanged-layout PR #99 state shows surface 134 or 135.
   - Surface 35 is shown by 13 of them.
-  - Among the assignments with a full matching, the designer found none that
-    breaks fewer states, so the cost fell on surface 35 and the designer gave
-    those 13 states up.
+  - `design_print.jl` ran with the 2027 displays protected (ids 13 to 24). It
+    keeps the fewest unmatchable cells first, then the fewest broken protected
+    states, then the fewest broken states in total. It put `C` on 35, which
+    gave up those 13 states.
+  - `redesign_midge.jl` then started from that print. It searched single
+    artwork swaps inside the midge orbit with no protected list, minimizing
+    unmatchable displays and then broken states.
+  - Independent review (not checked by these checkers):
+    - none of the 120 placements of `C`, `T`, `V` onto the six PR #99 midge
+      blanks gives a full matching;
+    - over placements plus one swap, with the 2027 displays protected first,
+      the final print is optimal (1 broken 2027 display, 15 in total);
+    - **without that protection, a fully matchable print that breaks only 10
+      unchanged-layout states exists**: displays 6, 14, 15, 29, 37, 52, 55, 69,
+      80, 89. It puts `C` on surface 36 and red 13 on surface 42. It breaks
+      February and March 2027.
+  - Prints with two or more swaps: UNKNOWN.
   - In the final print, surface 70 (not a blank: PR #99 dark `26`, now `C`) is
     also changed. It is shown by the states of displays 62 and 90.
   - In the stage-1 print, surface 35 (a PR #99 blank, then `C`) sits on the
@@ -231,6 +245,159 @@ Chain controls (in [results.tsv](evidence/negative-controls/results.tsv)):
     midge artwork is visible.
 - The **unchanged** PR #99 Julia chain verifier also rejects the chain, because
   its print and displays differ. That is why the parametrization is needed.
+
+## Cost comparison with the PR #99 layout (owner request)
+
+### A. Layout-level metric (no search; not a cost)
+
+[compare/layout-metric.tsv](compare/layout-metric.tsv), from
+[compare/layout_metric.jl](compare/layout_metric.jl), is a descriptive listing
+and Julia only. For each of the 875 month transitions from 2027-01 to 2099-12,
+it counts:
+
+- **diff:** the front cells (rows 1 to 7, 49 cells) whose label or ink differs
+  between consecutive displays;
+- **moved:** the labels present on both displays but at different cells.
+
+| Layout | diff mean | diff median | diff max | moved mean | moved median | moved max |
+|---|---:|---:|---:|---:|---:|---:|
+| PR #99 (wrap marks) | 34.97 | 36 | 41 | 12.42 | 13 | 21 |
+| pure split, scheme A | 34.40 | 36 | 41 | 12.31 | 13 | 21 |
+
+- **Per transition**, the pure split never has more differing cells than
+  PR #99. It is equal on 516 transitions and lower by 1 or 2 on 359.
+- **By month type (diff mean, PR #99 / pure):**
+
+  | Month type | as source | as target |
+  |---|---|---|
+  | plain | 34.09 / 33.74 | 35.26 / 34.88 |
+  | F31 | 38.14 / 37.14 | 33.28 / 32.39 |
+  | S30 | 38.31 / 37.31 | 35.76 / 34.76 |
+  | S31 | 38.16 / 36.16 | 33.45 / 31.66 |
+
+- The biggest differences in favor of the pure split are 2 cells, at S31
+  transitions such as 2027-04 → 2027-05. The fold removes the row-3 overflow
+  cells.
+- **What this cannot show:** the number of changed cells is not a move count.
+  The cost depends on which pieces must move, on cubie coupling, on the print
+  and on the search.
+
+### B. Same-search comparison on the 12 transitions December 2026 → December 2027
+
+[compare/compare_chain.jl](compare/compare_chain.jl) (untrusted) runs the
+**unchanged PR #130 global search** with identical settings on both prints:
+
+- **PR #99:** the PR #99 print, the PR #99 displays, and the PR #99 DAG.
+- **Pure split:** the final print, the pure-split displays, and the stage-2
+  DAG.
+- **Same policy on both:**
+  - start from the December 2026 root of each DAG;
+  - each print carries its own physical state through the months;
+  - the planner's orbit solve runs **only when the beam stalls** ("fb" below).
+- **Default budget:** library L5, lambda 12, width 40, fanout 4, depth 60,
+  patience 8, strict, W1 orbit weights, deterministic, no random seed.
+- **Generous budget:** width 80 and patience 16, everything else the same.
+
+All four chains are verified:
+
+- the PR #99 chains by the **unchanged** continuous chain verifiers (Julia and
+  Flix);
+- the pure-split chains by the parametrized verifiers;
+- in every case both languages give identical receipts
+  (`VALID_CONTINUOUS_CHAIN 12`; [compare/evidence](compare/evidence)).
+
+The HTM values are search results: not optimal.
+
+| Edge | PR #99, default | pure, default | PR #99, generous | pure, generous | seconds default (PR #99 / pure) | seconds generous |
+|---|---:|---:|---:|---:|---:|---:|
+| 2026-12 → 2027-1 | 88 | 439 (fb) | 88 | 439 (fb) | 1521/1539 | 2767/2713 |
+| 2027-1 → 2027-2 | 137 | 469 (fb) | 119 | 469 (fb) | 1244/1185 | 944/863 |
+| 2027-2 → 2027-3 | 73 (fb) | 64 (fb) | 78 (fb) | 64 (fb) | 141/140 | 226/307 |
+| 2027-3 → 2027-4 | 139 | 422 (fb) | 461 (fb) | 422 (fb) | 536/436 | 1492/1398 |
+| 2027-4 → 2027-5 | 477 (fb) | 426 (fb) | 454 (fb) | 426 (fb) | 566/504 | 1302/1100 |
+| 2027-5 → 2027-6 | 487 (fb) | 479 (fb) | 116 | 479 (fb) | 676/680 | 994/1084 |
+| 2027-6 → 2027-7 | 340 (fb) | 95 | 448 (fb) | 98 | 650/611 | 1068/972 |
+| 2027-7 → 2027-8 | 411 (fb) | 440 (fb) | 416 (fb) | 439 (fb) | 567/617 | 858/948 |
+| 2027-8 → 2027-9 | 112 | 411 (fb) | 397 (fb) | 125 | 650/517 | 866/826 |
+| 2027-9 → 2027-10 | 443 (fb) | 452 (fb) | 455 (fb) | 435 (fb) | 481/675 | 1145/1129 |
+| 2027-10 → 2027-11 | 122 | 355 (fb) | 121 | 127 | 700/340 | 816/755 |
+| 2027-11 → 2027-12 | 409 (fb) | 54 | 385 (fb) | 126 | 640/354 | 836/808 |
+
+| Run | Total HTM | Mean | Median | Max | Fallbacks (of 12) | Mean of edges without fallback | Mean seconds per edge |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| PR #99, default | 3238 | 269.8 | 239.5 | 487 | 7 | 119.6 | 698 |
+| pure, default | 4106 | 342.2 | 424 | 479 | 10 | 74.5 | 633 |
+| PR #99, generous | 3538 | 294.8 | 391 | 461 | 8 | 111.0 | 1109 |
+| pure, generous | 3649 | 304.1 | 424 | 479 | 8 | 119.0 | 1075 |
+
+The wall times were measured with four runs sharing four cores. In earlier
+single runs, the same search took about 400 seconds per edge.
+
+**Reading:**
+
+- Every total is dominated by the orbit-solve fallback (roughly 350 to 490 HTM
+  per fallback edge). Edges the beam completes cost about 55 to 140 HTM on
+  either print.
+- At the default budget, the beam stalls on 10 of 12 pure-split edges against
+  7 of 12 PR #99 edges, so the pure-split total is 27% higher.
+- At the generous budget, both stall on 8 of 12 edges and the totals differ by
+  3% (3649 vs 3538).
+- The generous budget did not help the PR #99 print here: two edges that the
+  default beam had solved now stalled.
+
+**Verdict:** under equal search effort the pure split is **comparable, not
+clearly worse**.
+
+- The difference at the default budget is one search's stall count (three more
+  fallbacks), not a measured layout cost.
+- With the generous budget the two prints are within 3%.
+
+**What this comparison cannot show:**
+
+- The optimal or near-optimal cost of either layout.
+- How each layout does with a refined producer. The PR #130 35-edge chain
+  average of 128.5 HTM came from the hand-refined `producer-run.jl` on the
+  PR #99 print, and it was not rerun here.
+- The behavior on transitions outside 2027.
+- No layout is claimed to be cheaper.
+
+### C. Effort to extend the pure-split chain to 2027–2099 (estimate, not started)
+
+- **Size:** 875 edges (January 2027 to December 2099), plus the December 2026
+  → January 2027 edge if wanted.
+- **Time:**
+  - About 400 to 700 seconds per edge with this search: about 400 alone, about
+    650 with four runs sharing four cores.
+  - Sequentially that is **roughly 100 to 170 hours (4 to 7 days)** at the
+    default budget, and about twice that at the generous budget.
+- **Memory:** about 1.6 GB per search process (measured). Four parallel
+  processes fit in 15 GB.
+- **Parallelism is limited.** A continuous chain carries one physical state, so
+  edge k+1 cannot start before edge k ends.
+  - **Parallel per-year segments** would each start from the DAG root of their
+    January. Joining them needs a *full-state* edge from one segment's
+    December state to the next January root. These tools solve front goals,
+    not full states, so that option is UNKNOWN.
+  - **What does parallelize:** several search configurations for the same
+    edge, keeping the best verified word. That improves quality, not elapsed
+    time.
+- **Batching plan (resumable):**
+  - one-year segments, run in sequence;
+  - after each segment, export the cumulative chain from the January 2027 root
+    and verify it with both parametrized chain verifiers (about 15 to 25
+    seconds per 12 edges, so a full 875-edge verification takes minutes);
+  - resume from the verified chain prefix by replay, as PR #130's `search.jl`
+    already does with `PREFIX_EDGES`;
+  - pin each verified segment's receipts.
+- **Risks:**
+  - On this sample, the orbit-solve fallback ran on 8 to 10 of 12 edges, at
+    350 to 490 HTM each. Extrapolated that is roughly 260,000 to 300,000 HTM
+    for 875 edges.
+  - A better fallback, or a refined producer like PR #130's, is the main lever
+    for move counts. Whether it helps the pure split is UNKNOWN.
+  - A stall that the orbit solve also fails on would stop the chain. This did
+    not happen in 2027; it is UNKNOWN for other years.
+  - Long runs on a shared machine.
 
 ## UNKNOWN
 
