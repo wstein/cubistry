@@ -1,6 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { writeFileSync } from "node:fs";
+import { ariaBusy, until } from "../helpers/settle.mjs";
 test.use({ timezoneId: "Europe/Berlin" });
+// A date change is planned in a real Web Worker whose search is CPU-bound (about 5 to 7 s here:
+// transition optimizer, then the center-aware picture solver) and is unaffected by page.clock. The
+// planner's own 8 s deadline is a fake-clock timer, so under a paused clock only this wait bounds it.
+// The default 5 s expect timeout is therefore below the work being waited on. 15 s matches the other
+// planning waits in this file.
+const PLANNING_TIMEOUT = 15000;
 async function ready(page, time = "2026-01-03T11:00:00Z") {
   // Install the fake clock slightly in the past: pauseAt() rejects a target
   // that real time has already overtaken, which happens under CPU load.
@@ -108,15 +115,22 @@ test("English 3 keeps the day adjacent and removes the zero with legal moves", a
   // While the target is still loading, the previous physical pose stays idle.
   expect((await physical(page)).cells[7]).toBe("0");
   releaseTarget();
-  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
-    "aria-busy",
-    "false",
-  );
+  await ariaBusy(page, "#calendar-viewer", false, {
+    timeout: PLANNING_TIMEOUT,
+  });
   // An idle viewer can precede the controller request for the loaded target,
   // so wait for the unpadded physical endpoint itself.
-  await expect
-    .poll(async () => (await physical(page)).cells)
-    .toEqual(["SAT", "", "", "J", "A", "N", "", "", "3"]);
+  await until(
+    page,
+    "unpadded physical endpoint SAT JAN 3",
+    async () => (await physical(page)).cells,
+    {
+      accept: (cells) =>
+        JSON.stringify(cells) ===
+        JSON.stringify(["SAT", "", "", "J", "A", "N", "", "", "3"]),
+      timeout: PLANNING_TIMEOUT,
+    },
+  );
   expect(
     await page.evaluate(async () => {
       const { calendarApp } = await import("/src/calendar.mjs");
@@ -134,10 +148,9 @@ test("live date crosses leap-day midnight and inspection validates Gregorian dat
 }) => {
   await ready(page, "2024-02-28T22:59:59Z");
   await page.clock.runFor(1100);
-  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
-    "aria-busy",
-    "false",
-  );
+  await ariaBusy(page, "#calendar-viewer", false, {
+    timeout: PLANNING_TIMEOUT,
+  });
   expect((await physical(page)).cells).toEqual([
     "D",
     "O",
@@ -396,10 +409,9 @@ test("English Saturday and both Sunday source stickers stay permanently red and 
   ]) {
     await page.fill("#calendar-date", iso);
     await page.locator("#calendar-date").dispatchEvent("change");
-    await expect(page.locator("#calendar-viewer")).toHaveAttribute(
-      "aria-busy",
-      "false",
-    );
+    await ariaBusy(page, "#calendar-viewer", false, {
+      timeout: PLANNING_TIMEOUT,
+    });
     const actual = await page.evaluate(async () => {
       const { calendarApp } = await import("/src/calendar.mjs");
       const { front } = await import("/src/apps/calendar/model.ts");
@@ -471,22 +483,26 @@ test("date picking starts legal motion immediately and day buttons preserve late
   await expect(page.locator("#calendar-estimates")).toContainText(
     "after motion",
   );
+  // The move total and the first animate() call both follow the worker plan.
   await expect(page.locator("#calendar-moves")).not.toHaveText(
     "0 / 0 HTM · 0 / 0 cube rotations",
+    { timeout: PLANNING_TIMEOUT },
   );
-  await expect
-    .poll(() => page.evaluate(() => typeof window.releaseCalendarMove))
-    .toBe("function");
+  await until(
+    page,
+    "first physical move requested (window.releaseCalendarMove installed)",
+    () => page.evaluate(() => typeof window.releaseCalendarMove),
+    { accept: (type) => type === "function", timeout: PLANNING_TIMEOUT },
+  );
   await page.click("#calendar-increment");
   await page.click("#calendar-increment");
   await page.click("#calendar-decrement");
   await expect(page.locator("#calendar-date")).toHaveValue("2024-03-01");
   await expect(page.locator("#calendar-queue")).toContainText("queued");
   await page.evaluate(() => window.releaseCalendarMove());
-  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
-    "aria-busy",
-    "false",
-  );
+  await ariaBusy(page, "#calendar-viewer", false, {
+    timeout: PLANNING_TIMEOUT,
+  });
   expect((await physical(page)).cells).toEqual([
     "F",
     "R",
@@ -513,16 +529,14 @@ test("date picking starts legal motion immediately and day buttons preserve late
   expect(await physical(page)).toEqual(before);
   await page.fill("#calendar-date", "0001-01-01");
   await page.locator("#calendar-date").dispatchEvent("change");
-  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
-    "aria-busy",
-    "false",
-  );
+  await ariaBusy(page, "#calendar-viewer", false, {
+    timeout: PLANNING_TIMEOUT,
+  });
   await expect(page.locator("#calendar-decrement")).toBeDisabled();
   await page.fill("#calendar-date", "9999-12-31");
   await page.locator("#calendar-date").dispatchEvent("change");
-  await expect(page.locator("#calendar-viewer")).toHaveAttribute(
-    "aria-busy",
-    "false",
-  );
+  await ariaBusy(page, "#calendar-viewer", false, {
+    timeout: PLANNING_TIMEOUT,
+  });
   await expect(page.locator("#calendar-increment")).toBeDisabled();
 });
