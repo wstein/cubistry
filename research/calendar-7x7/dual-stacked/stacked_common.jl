@@ -10,11 +10,25 @@ const VARIANT_PAIRS=Dict("A"=>[(1,8),(24,31)],"B"=>[(23,30),(24,31)],"W"=>[(1,8)
 # Mixed layouts: each six-week month type chooses its own display, written as
 # "F31=<choice>,S30=<choice>,S31=<choice>" (Friday-start 31 days, Saturday-start
 # 30 and 31 days). keep = PR #99 overflow wrap; bfold = bottom fold; bfold30 =
-# 23/30 folded, 31 kept as 31↶; afold = top fold with 1/8.
+# 23/30 folded, 31 kept as 31↶; bfold31 = 24/31 folded, 30 kept as 30↶;
+# afold = top fold with 1/8.
 const MIX_TYPES=("F31","S30","S31")
-const MIX_CHOICES=Dict("F31"=>("keep","bfold"),"S30"=>("keep","bfold","afold"),"S31"=>("keep","bfold","bfold30","afold"))
+const MIX_CHOICES=Dict("F31"=>("keep","bfold"),"S30"=>("keep","bfold","afold"),"S31"=>("keep","bfold","bfold30","afold","bfold31"))
+# Optional month-letter placement: "<mix>;H=<12 digits>", the start column (1..5)
+# of the three adjacent month letters for January..December. Without it the PR #99
+# placement is used (January-September columns 5-7, October-December 1-3).
+function header_starts(variant)
+    parts=split(variant,';')
+    @assert length(parts)<=2 "at most one ';H=' suffix"
+    length(parts)==1 && return [m<=9 ? 5 : 1 for m in 1:12]
+    h=parts[2]
+    @assert startswith(h,"H=") && length(h)==14 && all(ch->ch in '1':'5',h[3:end]) "month-letter placement must be H= and 12 start columns 1..5"
+    [parse(Int,ch) for ch in h[3:end]]
+end
+base_variant(variant)=String(first(split(variant,';')))
 function parse_mix(variant)
-    parts=split(variant,',')
+    header_starts(variant)
+    parts=split(base_variant(variant),',')
     @assert length(parts)==3 "mixed layout needs F31=..,S30=..,S31=.."
     out=Dict{String,String}()
     for (i,part) in enumerate(parts)
@@ -25,14 +39,17 @@ function parse_mix(variant)
     end
     out
 end
-all_mixes()=["F31=$a,S30=$b,S31=$c" for a in MIX_CHOICES["F31"] for b in MIX_CHOICES["S30"] for c in MIX_CHOICES["S31"]]
+# The original 24 combinations first (numbering kept), then the 6 with bfold31.
+all_mixes()=vcat(["F31=$a,S30=$b,S31=$c" for a in MIX_CHOICES["F31"] for b in MIX_CHOICES["S30"] for c in MIX_CHOICES["S31"] if c!="bfold31"],
+    ["F31=$a,S30=$b,S31=bfold31" for a in MIX_CHOICES["F31"] for b in MIX_CHOICES["S30"]])
 function variant_pairs(variant)
     haskey(VARIANT_PAIRS,variant) && return VARIANT_PAIRS[variant]
+    @assert !haskey(VARIANT_PAIRS,base_variant(variant)) "month-letter placement is only defined for mixed layouts"
     @assert occursin('=',variant) "VARIANT must be A|B|W or F31=..,S30=..,S31=.."
     mix=parse_mix(variant);pairs=Tuple{Int,Int}[]
     "afold" in values(mix) && push!(pairs,(1,8))
     (mix["S30"]=="bfold" || mix["S31"] in ("bfold","bfold30")) && push!(pairs,(23,30))
-    (mix["F31"]=="bfold" || mix["S31"]=="bfold") && push!(pairs,(24,31))
+    (mix["F31"]=="bfold" || mix["S31"] in ("bfold","bfold31")) && push!(pairs,(24,31))
     pairs
 end
 valid_variant(variant)=(variant_pairs(variant);true)
@@ -43,7 +60,7 @@ function month_style(variant,off,n)
     variant=="W" && return :wrap
     variant=="B" && return :bottom
     variant=="A" && return off==6 ? :top : :bottom
-    Dict("keep"=>:wrap,"bfold"=>:bottom,"bfold30"=>:bottom30,"afold"=>:top)[parse_mix(variant)[kind]]
+    Dict("keep"=>:wrap,"bfold"=>:bottom,"bfold30"=>:bottom30,"bfold31"=>:bottom31,"afold"=>:top)[parse_mix(variant)[kind]]
 end
 const MODES=("strict","context")
 red_column(c)=c==1 || c==7
@@ -80,6 +97,10 @@ end
 function stacked_board(y,m,variant)
     pairs=variant_pairs(variant)
     a=wrapped_board(y,m)
+    if occursin(';',variant)
+        start=header_starts(variant)[m]
+        for c in 1:7;a[1,c]=start<=c<=start+2 ? (string(MONTHS["EN"][m][c-start+1]),"month") : ("","blank");end
+    end
     off=offset(y,m,"EN");n=daysinmonth(Date(y,m,1))
     style=month_style(variant,off,n)
     style in (:plain,:wrap) && return a
@@ -95,10 +116,10 @@ function stacked_board(y,m,variant)
             r=week+2;text=d==8 ? stacked_text(1,8) : string(d)
         else
             if week==5                                # sixth week is printed under d-7
-                style==:bottom30 && d==31 || continue     # except 31, which keeps its overflow
-                r=3;text="31↶"
+                (style==:bottom30 && d==31) || (style==:bottom31 && d==30) || continue  # the unfolded one keeps its overflow
+                r=3;text="$(d)↶"
             else
-                r=week+3;text=week==4 && d+7<=n && !(style==:bottom30 && d+7==31) ? stacked_text(d,d+7) : string(d)
+                r=week+3;text=week==4 && d+7<=n && !(style==:bottom30 && d+7==31) && !(style==:bottom31 && d+7==30) ? stacked_text(d,d+7) : string(d)
             end
         end
         @assert a[r,c]==("","blank") "fold collision"
@@ -230,7 +251,7 @@ function inventory_group(g,ink,r,c,variant,mode)
     end
     a=artwork(g,ink,r,c);("art",a[1],string(a[2]),a[3])
 end
-function stacked_inventory(variant,mode)
+function stacked_inventory(variant,mode;classes=false)
     @assert valid_variant(variant) && mode in MODES "VARIANT must be A|B|W or a mixed layout, MODE strict|context"
     goals=stacked_goals(variant);total=0;negative=0;over=String[]
     for k in sort!(unique(orbit(r,c) for r in 1:7,c in 1:7))
@@ -249,6 +270,9 @@ function stacked_inventory(variant,mode)
         need=sum(values(peak);init=0);slack=capacity(k)-need-blanks
         slack<0 && (negative+=1;push!(over,"($(k[1]),$(k[2]))"));total+=need
         println("stacked-orbit\t",variant,'\t',mode,'\t',k[1],'\t',k[2],'\t',need,'\t',blanks,'\t',capacity(k),'\t',slack)
+        classes && for key in sort!(collect(keys(peak)))
+            println("stacked-class\t",variant,'\t',mode,'\t',k[1],'\t',k[2],'\t',join(key,'\t'),'\t',peak[key])
+        end
     end
     core=sort!(unique(goals[id].board[4,4][1] for id in 1:91))
     println("stacked-core-cell\t",variant,'\t',join(core,','))

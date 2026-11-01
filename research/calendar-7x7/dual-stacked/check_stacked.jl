@@ -4,12 +4,12 @@
 #   check_stacked.jl inventory VARIANT MODE   inventory obstruction for any print
 #   check_stacked.jl inventory-all            all 24 mixed layouts, both readings
 #   VARIANT is A, B, W or a mixed layout F31=keep|bfold,S30=keep|bfold|afold,
-#   S31=keep|bfold|bfold30|afold
+#   S31=keep|bfold|bfold30|afold|bfold31
 include(joinpath(@__DIR__,"stacked_common.jl"))
 if abspath(PROGRAM_FILE)==@__FILE__
     try
         if length(ARGS)==3 && ARGS[1]=="inventory"
-            stacked_inventory(ARGS[2],ARGS[3])
+            stacked_inventory(ARGS[2],ARGS[3];classes=true)
         elseif ARGS==["inventory-all"]
             stacked_inventory_all()
         else
