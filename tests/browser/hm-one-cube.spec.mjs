@@ -1,4 +1,4 @@
-// Browser regression tests for the H/M counter (print m3-SH). These exercise
+// Browser regression tests for the H/M one-cube counter (print m3-SH). These exercise
 // the application; they are not proofs of the research claims.
 import { test, expect } from "@playwright/test";
 
@@ -32,10 +32,10 @@ async function choose(page) {
       window.hsmState = presentation.to;
     };
   });
-  await page.selectOption("#application", "hm-counter");
+  await page.selectOption("#application", "hm-one-cube");
   await expect(page.locator("#cube")).toHaveAttribute(
     "data-application",
-    "hm-counter",
+    "hm-one-cube",
   );
   await expect(page.locator("#application")).toBeEnabled();
   await settled(page, 0);
@@ -83,11 +83,11 @@ async function unit(page, letter) {
 const options = (page, id) =>
   page.locator(`#${id} option`).evaluateAll((o) => o.map((e) => e.value));
 
-test("H/M counter offers H and M with their own ranges and a blank upper-left", async ({
+test("H/M one-cube counter offers H and M with their own ranges and a blank upper-left", async ({
   page,
 }) => {
   await choose(page);
-  await expect(page.locator("#hsm-heading")).toHaveText("H/M Counter");
+  await expect(page.locator("#hsm-heading")).toHaveText("H/M One-Cube Counter");
   await expect(page.locator("#hsm-lettering")).toBeHidden();
   expect(await options(page, "hsm-letter")).toEqual(["H", "M"]);
   await expect(page.locator("#hsm-letter")).toHaveValue("H");
@@ -191,7 +191,7 @@ test("Set, Reset, unit change and validation behave like the H/M/S counter", asy
   await expect(page.locator("#error")).toBeEmpty();
 });
 
-test("the H/M/S counter keeps its own controls after the H/M counter", async ({
+test("the H/M/S counter keeps its own controls after the H/M one-cube counter", async ({
   page,
 }) => {
   await choose(page);
@@ -210,10 +210,10 @@ test("the H/M/S counter keeps its own controls after the H/M counter", async ({
   );
   await unit(page, "S");
   await physical(page, "S", 0);
-  await page.selectOption("#application", "hm-counter");
+  await page.selectOption("#application", "hm-one-cube");
   await expect(page.locator("#cube")).toHaveAttribute(
     "data-application",
-    "hm-counter",
+    "hm-one-cube",
   );
   await expect(page.locator("#status")).toContainText("H · 00");
   await settled(page, 0);
@@ -248,7 +248,7 @@ for (const [name, respond] of [
     await expect(page.locator("#status")).toContainText("S · 00");
     await page.selectOption("#hsm-range", "11");
     await page.route("**/hm-counter.v1.json", respond);
-    await page.selectOption("#application", "hm-counter");
+    await page.selectOption("#application", "hm-one-cube");
     await expect(page.locator("#error")).not.toBeEmpty();
     await expect(page.locator("#application")).toHaveValue("hsm-counter");
     await expect(page.locator("#cube")).toHaveAttribute(
@@ -283,7 +283,7 @@ test("a failed H/M unit change keeps the previous unit and range", async ({
   await expect(page.locator("#status")).toContainText("H · 00");
 });
 
-test("Unit labels read H and M in the H/M counter even with word lettering selected", async ({
+test("Unit labels read H and M in the H/M one-cube counter even with word lettering selected", async ({
   page,
 }) => {
   const labels = () =>
@@ -298,10 +298,10 @@ test("Unit labels read H and M in the H/M counter even with word lettering selec
     "hsm-counter",
   );
   expect(await labels()).toEqual(["hour", "min", "sec"]);
-  await page.selectOption("#application", "hm-counter");
+  await page.selectOption("#application", "hm-one-cube");
   await expect(page.locator("#cube")).toHaveAttribute(
     "data-application",
-    "hm-counter",
+    "hm-one-cube",
   );
   expect(await labels()).toEqual(["H", "M"]);
   await page.selectOption("#application", "hsm-counter");

@@ -52,7 +52,8 @@ $("hsm-lettering").value = parseLettering(
 );
 // The Unit select follows the sticker lettering: H / M / S or hour / min / sec.
 const syncHsmUnitLabels = () => {
-  // The H/M counter (lettering choice hidden) has the large symbols only.
+  // The H/M One-Cube Counter (lettering choice hidden) has the large symbols
+  // only.
   const lettering = $("hsm-lettering").hidden
     ? "symbols"
     : parseLettering($("hsm-lettering").value);
@@ -118,11 +119,11 @@ let hsmDesign,
   hsmRunning = false,
   hsmNextAt = 0,
   rememberedCounterValue = 0;
-// The H/M counter is a second variant of the H/M/S counter: same controls,
-// controller, planner and periods, with its own print and letters.
+// The H/M One-Cube Counter is a second variant of the H/M/S counter: same
+// controls, controller, planner and periods, with its own print and letters.
 const isHsm = () =>
-  application === "hsm-counter" || application === "hm-counter";
-const isHm = () => application === "hm-counter";
+  application === "hsm-counter" || application === "hm-one-cube";
+const isHm = () => application === "hm-one-cube";
 // The M/S counter (research PR #138) walks the saved period of one print.
 let msDesign,
   msRunning = false,
@@ -754,8 +755,8 @@ $("application").addEventListener("change", async () => {
     };
     const resolveAssets = (manifest, prints, signal) =>
       loadAssets(manifest, prints, signal, import.meta.env.BASE_URL);
-    if (requested === "hsm-counter" || requested === "hm-counter") {
-      const hm = requested === "hm-counter";
+    if (requested === "hsm-counter" || requested === "hm-one-cube") {
+      const hm = requested === "hm-one-cube";
       hsmVariantUi(hm);
       candidate = new HsmController(
         viewer,
@@ -890,10 +891,12 @@ function hmRangeUi() {
 function hsmVariantUi(hm) {
   const letter = $("hsm-letter").value,
     range = $("hsm-range").value;
-  $("hsm-heading").textContent = hm ? "H/M Counter" : "H/M/S Counter";
+  $("hsm-heading").textContent = hm
+    ? "H/M One-Cube Counter"
+    : "H/M/S Counter";
   $("hsm-controls").setAttribute(
     "aria-label",
-    hm ? "H/M counter controls" : "HSM counter controls",
+    hm ? "H/M one-cube counter controls" : "HSM counter controls",
   );
   $("hsm-lettering").hidden = $("hsm-lettering-label").hidden = hm;
   $("hsm-letter").innerHTML = hm
@@ -1216,9 +1219,13 @@ async function initialize() {
     save();
     const requested = new URLSearchParams(location.search).get("application");
     if (
-      ["hsm-counter", "hm-counter", "ms-counter", "timer", "five-second-timer"].includes(
-        requested,
-      )
+      [
+        "hsm-counter",
+        "hm-one-cube",
+        "ms-counter",
+        "timer",
+        "five-second-timer",
+      ].includes(requested)
     ) {
       $("application").value = requested;
       $("application").dispatchEvent(new Event("change"));
