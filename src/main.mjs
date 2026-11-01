@@ -724,7 +724,7 @@ $("application").addEventListener("change", async () => {
     return;
   }
   if (
-    ["live-clock", "calendar", "status-cube", "playground"].includes(
+    ["live-clock", "calendar", "status-cube", "playground", "ms-timer"].includes(
       $("application").value,
     )
   ) {
@@ -736,7 +736,9 @@ $("application").addEventListener("change", async () => {
             ? "calendar.html"
             : $("application").value === "status-cube"
               ? "status.html"
-              : "clock.html",
+              : $("application").value === "ms-timer"
+                ? "ms-timer.html"
+                : "clock.html",
         location.href,
       ),
     );
@@ -1225,6 +1227,7 @@ async function initialize() {
         "ms-counter",
         "timer",
         "five-second-timer",
+        "ms-timer",
       ].includes(requested)
     ) {
       $("application").value = requested;
