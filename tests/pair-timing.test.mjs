@@ -26,7 +26,8 @@ const at = (text) => {
 function rig({ minorModulus = 60, majorModulus = 60, words = {}, throwOn = {} } = {}) {
   const log = [];
   let clock = 0;
-  const reports = [];
+  const reports = [],
+    states = [];
   const make = (name) => (onState) => {
     const unit = {
       name,
@@ -55,6 +56,11 @@ function rig({ minorModulus = 60, majorModulus = 60, words = {}, throwOn = {} } 
         unit.busy = false;
         onState(unit.currentValue, false);
       },
+      /** The unit stops where it is and reports an error, as a failed playback does. */
+      fail(error) {
+        unit.busy = false;
+        onState(unit.currentValue, false, error);
+      },
       setDirection(d) {
         log.push(`${name}:direction:${d}`);
       },
@@ -69,8 +75,9 @@ function rig({ minorModulus = 60, majorModulus = 60, words = {}, throwOn = {} } 
     createMajor: make("major"),
     now: () => clock,
     onReport: (r) => reports.push(r),
+    onState: (st) => states.push(st),
   });
-  return { pair, log, reports, set: (t) => (clock = t) };
+  return { pair, log, reports, states, throwOn, set: (t) => (clock = t) };
 }
 
 test("a timed carry plans each cube's own word and one budget per cube for the larger word", async () => {
@@ -316,4 +323,83 @@ test("a timed carry through two real S3 controllers plans exactly the words it p
   assert.deepEqual(reports.map((r) => r.kind), ["budget-infeasible", "late"]);
   assert.equal(reports[0].step, reports[1].step);
   assert.deepEqual(reports[0].step.moves, { minor: played.minor.length, major: null });
+});
+
+test("an older failure does not hide a late carry; a failure during the step is its own report", async () => {
+  // An untimed request failure first: error is recorded and stays until configure.
+  const r = rig({ minorModulus: 60, majorModulus: 24 });
+  await r.pair.configure(at("00:59"));
+  r.throwOn["major:request"] = true;
+  const failed = r.pair.step(1);
+  r.pair.minor.finish();
+  await failed;
+  assert.equal(r.pair.error?.message, "major: request failed");
+  assert.equal(r.pair.value, at("00:59"));
+  // Then a timed carry that settles late must still be reported late.
+  delete r.throwOn["major:request"];
+  r.set(0);
+  const late = r.pair.step(1, T(1000));
+  r.set(1100);
+  r.pair.minor.finish();
+  r.pair.major.finish();
+  await late;
+  assert.equal(r.pair.value, at("01:00"));
+  assert.deepEqual(r.reports.map((x) => x.kind), ["late"]);
+  assert.equal(r.reports[0].settledAt, 1100);
+  // A unit that fails during a timed step that then settles late: the failure
+  // is the report (error and onState), not a second "late".
+  const f = rig();
+  await f.pair.configure(at("00:59"));
+  f.set(0);
+  const step = f.pair.step(1, T(1000));
+  f.set(2000);
+  f.pair.minor.finish();
+  f.pair.major.fail(Error("major broke"));
+  await step;
+  assert.equal(f.pair.error?.message, "major broke");
+  assert.equal(f.states.at(-1).error?.message, "major broke");
+  assert.equal(f.pair.busy, false);
+  assert.deepEqual(f.reports, []);
+});
+
+test("a late carry is reported once", async () => {
+  const r = rig();
+  await r.pair.configure(at("09:59"));
+  const step = r.pair.step(1, T(1000));
+  r.set(1500);
+  r.pair.minor.finish();
+  r.pair.major.finish();
+  await step;
+  // Later settles (a Set to the shown value, an untimed step) do not repeat it.
+  await r.pair.set(r.pair.value);
+  const next = r.pair.step(1);
+  r.pair.minor.finish();
+  await next;
+  assert.deepEqual(r.reports.map((x) => x.kind), ["late"]);
+});
+
+test("a prepare failure is published through onState", async () => {
+  const r = rig({ throwOn: { "minor:prepare": true } });
+  await r.pair.configure(3);
+  r.states.length = 0;
+  await r.pair.step(1, T(1000));
+  assert.equal(r.states.length, 1);
+  assert.deepEqual(
+    { value: r.states[0].value, target: r.states[0].target, busy: r.states[0].busy, error: r.states[0].error?.message },
+    { value: 3, target: 3, busy: false, error: "minor: cannot plan" },
+  );
+});
+
+test("a minor unit without prepare, or invalid timing with a direction change, throws before any state change", async () => {
+  const r = rig();
+  await r.pair.configure(at("13:00"));
+  r.log.length = 0;
+  for (const bad of [T(NaN), T(1000, -1)]) assert.throws(() => r.pair.step(-1, bad), /timing/);
+  assert.equal(r.pair.direction, 1, "the direction did not change");
+  delete r.pair.minor.prepare;
+  assert.throws(() => r.pair.step(-1, T(1000)), /prepare/);
+  assert.deepEqual(r.log, [], "no direction change, plan or request");
+  assert.equal(r.pair.direction, 1);
+  assert.equal(r.pair.target, at("13:00"));
+  assert.equal(r.pair.busy, false);
 });

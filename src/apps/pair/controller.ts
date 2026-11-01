@@ -58,7 +58,9 @@ export interface PairTimedStep {
  * A timed step the display could not do in time. Never silent: each is
  * reported, and the cubes still finish their routes.
  * - `budget-infeasible`: the planned words do not fit the step budget.
- * - `late`: both cubes settled after the deadline plus the 20 ms endpoint tolerance.
+ * - `late`: both cubes settled after the deadline plus the 20 ms endpoint
+ *   tolerance. Not reported when a unit failed during that step: the failure
+ *   (`error`, `onState`) is the report then.
  * - `missed`: the next timed step arrived while the pair still moved (the
  *   in-flight timed step, if any, is named); the new target replaces it.
  */
@@ -109,8 +111,9 @@ export interface PairOptions<Minor extends PairUnit, Major extends PairUnit> {
  * `value % minorModulus` and the major unit `floor(value / minorModulus)`, so a
  * wrap of the minor unit changes the major unit in the same step (59:59 to
  * 00:00 for M/S, 23:59 to 00:00 for H/M). Both cubes turn in parallel and a
- * move ends only when both have settled. The class has no timers and no wall
- * clock: the caller decides when to step; the units do their own async playback.
+ * move ends only when both have settled. The class has no timers: the caller
+ * decides when to step and the units do their own async playback. It reads its
+ * clock (`now`) only to plan timed steps and check them against their deadlines.
  */
 export class PairController<
   Minor extends PairUnit = PairUnit,
@@ -134,6 +137,8 @@ export class PairController<
   private readonly onReport: ((report: PairReport) => void) | undefined;
   /** The timed step in flight, checked against its deadline when both cubes settle. */
   private clocked: PairTimedStep | null = null;
+  /** `failure` when the timed step in flight was issued, to tell a failure of that step from an older one. */
+  private clockedFailure: Error | undefined;
   private latest: PairTimedStep | null = null;
 
   constructor(options: PairOptions<Minor, Major>) {
@@ -271,6 +276,7 @@ export class PairController<
     }
     const step: PairTimedStep = Object.freeze({ from, to: s.to, carry: s.carry, timing, moves, budget });
     this.clocked = this.latest = step;
+    this.clockedFailure = this.failure;
     if (budget && !budget.feasible) this.report({ kind: "budget-infeasible", step });
     // A rolled-back step has no deadline left to miss: `release` reports late
     // only while the target is still this step's.
@@ -387,7 +393,9 @@ export class PairController<
     if (this.configuring || this.minor.busy || this.major.busy) return;
     const clocked = this.clocked;
     this.clocked = null;
-    if (clocked && clocked.to === this.pending && !this.failure) {
+    // A unit failure during this step is its report (`error`, `onState`); an
+    // older failure, recorded before the step was issued, does not hide a late settle.
+    if (clocked && clocked.to === this.pending && this.failure === this.clockedFailure) {
       const at = this.now();
       if (at > clocked.timing.deadline + ENDPOINT_TOLERANCE_MS)
         this.report({ kind: "late", step: clocked, settledAt: at });
