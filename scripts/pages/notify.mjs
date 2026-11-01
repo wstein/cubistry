@@ -1,5 +1,10 @@
 import { GitHub } from "./api.mjs";
-import { REPOSITORY, previewPath, selectBuild } from "./policy.mjs";
+import {
+  REPOSITORY,
+  previewPath,
+  selectBuild,
+  hasPreviewLabel,
+} from "./policy.mjs";
 const api = new GitHub(),
   marker = "<!-- cubistry-pr-preview -->",
   deployOK = process.env.DEPLOY_OK === "true";
@@ -10,15 +15,18 @@ for (const pr of pulls) {
   const existing = comments.find(
     (c) => c.user?.login === "github-actions[bot]" && c.body?.includes(marker),
   );
-  if (pr.state !== "open" && !existing) continue;
+  const active = pr.state === "open" && hasPreviewLabel(pr);
+  if (!active && !existing) continue;
   let text;
-  if (pr.state !== "open") {
+  if (!active) {
     const remaining = await api.request(
       `contents/${previewPath(pr.number)}?ref=gh-pages`,
     );
     text =
       deployOK && !remaining
-        ? "Preview removed after this PR closed or merged."
+        ? pr.state === "open"
+          ? "Preview removed because the `preview` label is gone."
+          : "Preview removed after this PR closed or merged."
         : "Preview cleanup/deployment is pending or failed; the last deployment may still contain the old preview.";
   } else {
     const runs = await api.pages(

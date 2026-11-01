@@ -1,6 +1,6 @@
 import { writeFile, appendFile } from "node:fs/promises";
 import { GitHub } from "./api.mjs";
-import { plan, BUILD_WORKFLOW } from "./policy.mjs";
+import { plan, BUILD_WORKFLOW, hasPreviewLabel } from "./policy.mjs";
 const api = new GitHub();
 const pages = await api.request("pages");
 if (
@@ -26,7 +26,7 @@ const inventory = [
 ];
 const builds = {};
 for (const pr of pulls)
-  if (pr.head?.repo?.full_name === "wstein/cubistry")
+  if (pr.head?.repo?.full_name === "wstein/cubistry" && hasPreviewLabel(pr))
     builds[pr.number] = await api.pages(
       `actions/workflows/pages.yml/runs?event=pull_request&head_sha=${pr.head.sha}`,
       "workflow_runs",

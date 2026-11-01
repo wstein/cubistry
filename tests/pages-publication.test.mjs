@@ -8,15 +8,15 @@ const workflow=readFileSync('.github/workflows/pages-publish.yml','utf8');
 const jobs=new Map([...workflow.matchAll(/^  ([a-z][a-z0-9-]*):\n([\s\S]*?)(?=^  [a-z][a-z0-9-]*:\n|$(?![\s\S]))/gm)].map(m=>[m[1],m[2]]));
 function needs(id){const value=jobs.get(id).match(/^    needs: (.*)$/m)?.[1];return value?value.replace(/[\[\]]/g,'').split(',').map(s=>s.trim()):[];}
 const sha='b'.repeat(40),old='a'.repeat(40),repo={id:100,full_name:'wstein/cubistry'};
-function notify({deployOK,metadata=sha,closed=false,remaining=false}){
+function notify({deployOK,metadata=sha,closed=false,remaining=false,unlabeled=false,comment=closed}){
  const dir=mkdtempSync(join(tmpdir(),'pages-notify-'));
  try{
-  const pr={number:1,state:closed?'closed':'open',head:{sha,repo},base:{repo}};
+  const pr={number:1,state:closed?'closed':'open',labels:unlabeled?[{name:'e2e'}]:[{name:'preview'}],head:{sha,repo},base:{repo}};
   const run={id:99,head_sha:sha,event:'pull_request',path:'.github/workflows/pages.yml',repository:repo,head_repository:repo,
    pull_requests:[{number:1,head:{sha,repo},base:{repo}}],status:'completed',conclusion:'success'};
   const responses={
    'pulls?state=all&per_page=100&page=1':[pr],
-   'issues/1/comments?per_page=100&page=1':closed?[{id:7,user:{login:'github-actions[bot]'},body:'<!-- cubistry-pr-preview --> old'}]:[],
+   'issues/1/comments?per_page=100&page=1':comment?[{id:7,user:{login:'github-actions[bot]'},body:'<!-- cubistry-pr-preview --> old'}]:[],
    [`actions/workflows/pages.yml/runs?event=pull_request&head_sha=${sha}&per_page=100&page=1`]:{workflow_runs:[run]},
    'contents/pr-preview/pr-1/preview-info.json?ref=gh-pages':{content:Buffer.from(JSON.stringify({sha:metadata})).toString('base64')},
    'contents/pr-preview/pr-1?ref=gh-pages':remaining?[]:null,
@@ -68,6 +68,8 @@ test('failed final deployment never claims fresh availability from newer storage
 test('notification separately requires the final deployment and matching metadata, including closed cleanup',()=>{
  assert.doesNotMatch(notify({deployOK:true,metadata:old}),/Open non-production PR preview/);
  assert.doesNotMatch(notify({deployOK:false,closed:true}),/^.*Preview removed/m);
+ assert.match(notify({deployOK:true,unlabeled:true,comment:true}),/Preview removed because the `preview` label is gone/);
+ assert.doesNotMatch(notify({deployOK:true,unlabeled:true,comment:true,remaining:true}),/^.*Preview removed/m);
  assert.match(notify({deployOK:true,closed:true}),/Preview removed/);
  assert.doesNotMatch(notify({deployOK:true,closed:true,remaining:true}),/^.*Preview removed/m);
 });

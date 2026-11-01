@@ -6,11 +6,13 @@ import {
   selectBuild,
   previewPath,
   REPOSITORY,
+  PREVIEW_LABEL,
 } from "../scripts/pages/policy.mjs";
 const sha = (n) => String(n).padStart(40, "a");
 const pr = (n, s) => ({
   number: n,
   state: "open",
+  labels: [{ name: PREVIEW_LABEL }],
   head: { sha: s, repo: { full_name: REPOSITORY } },
   base: { repo: { full_name: REPOSITORY } },
 });
@@ -183,4 +185,24 @@ test("coalesced close followed by a fork completion still reconciles every inter
       [1, "remove"],
     ],
   );
+});
+test("only open internal PRs that carry the preview label get a preview; unlabeled ones are removed", () => {
+  const unlabeled = { ...pr(1, sha(1)), labels: [{ name: "e2e" }] };
+  const noLabels = { ...pr(3, sha(3)) };
+  delete noLabels.labels;
+  const output = plan({
+    pulls: [unlabeled, pr(2, sha(2)), noLabels],
+    inventory: [1, 2, 3],
+    builds: { 1: [run(1, sha(1))], 2: [run(2, sha(2))], 3: [run(3, sha(3))] },
+    main: { sha: sha(9), runs: [] },
+  });
+  assert.deepEqual(
+    output.entries.map((x) => [x.number, x.action]),
+    [
+      [2, "deploy"],
+      [1, "remove"],
+      [3, "remove"],
+    ],
+  );
+  assert.equal(PREVIEW_LABEL, "preview");
 });
