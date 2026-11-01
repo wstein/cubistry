@@ -489,3 +489,139 @@ test("the converter rejects tampered research data", () => {
     ),
   );
 });
+
+// ------------------------------------- interrupted routes and pose collisions
+
+/**
+ * Independent oracle: every (edge, offset) whose pose equals `state`, found by
+ * replaying the words, and the least HTM to a node showing `value` from any of
+ * them (undo the offset, or finish the edge, then walk either way round).
+ */
+function interruptOracle(run) {
+  const W = run.words.map((w) => parseAlg(w)),
+    L = W.map((w) => w.length),
+    n = W.length,
+    at = new Map();
+  let s = applyMoves(initialState(s3.print), parseAlg(run.setup));
+  W.forEach((w, i) => {
+    for (let o = 0; o < w.length; o++) {
+      const k = poseKey(s);
+      at.set(k, [...(at.get(k) ?? []), [i, o]]);
+      s = applyMoves(s, [w[o]]);
+    }
+  });
+  const walk = (a, t) => {
+    let f = 0,
+      b = 0;
+    for (let k = a; k !== t; k = (k + 1) % n) f += L[k];
+    for (let k = a; k !== t; k = (k - 1 + n) % n) b += L[(k - 1 + n) % n];
+    return Math.min(f, b);
+  };
+  return {
+    places: (state) => at.get(poseKey(state)) ?? [],
+    best(state, value) {
+      let best = Infinity;
+      for (const [e, o] of at.get(poseKey(state)) ?? [])
+        for (let t = value; t < n; t += 60)
+          best = Math.min(
+            best,
+            o + walk(e, t),
+            o === 0 ? Infinity : L[e] - o + walk((e + 1) % n, t),
+          );
+      return best;
+    },
+  };
+}
+/** Count one step from `from` in `direction`, interrupted after `k` turns by `target`. */
+async function interrupted(letter, from, direction, k, target) {
+  let turns = 0,
+    c,
+    mid = null;
+  const played = [];
+  const view = {
+    configure() {},
+    resetCamera() {},
+    animate: async (pr) => {
+      played.push(serializeMove(pr.move));
+      if (++turns === k) {
+        mid = pr.to;
+        c.request(target);
+      }
+    },
+  };
+  c = new MsController(view, s3, {}, letter, () => {}, assets);
+  await c.configure(from);
+  c.request((from + direction + 60) % 60);
+  await settled(c);
+  return { c, mid, played, after: c.progress.sessionTotal - k };
+}
+
+test("S3 research words share interior poses across steps", () => {
+  // Words often cancel across step boundaries, so one pose lies inside
+  // several steps; the planner must consider all of them.
+  for (const letter of ["M", "S"]) {
+    const o = interruptOracle(s3.runs[letter]);
+    const period = new MsPeriod(s3.print, s3.runs[letter]);
+    let shared = 0;
+    period.words.forEach((w, i) => {
+      let s = period.nodes[i];
+      for (let j = 1; j < w.length; j++) {
+        s = applyMoves(s, [w[j - 1]]);
+        if (o.places(s).length > 1) shared++;
+      }
+    });
+    assert.ok(shared > 0, `${letter} has shared interior poses`);
+  }
+});
+
+test("an interrupted S3 step undoes one turn instead of walking a detour", async () => {
+  // M 00 -> 01 is "R' B' R"; after its first turn the target becomes 00 again:
+  // the least continuation is the inverse of that one turn.
+  const w = s3.runs.M.words[0];
+  assert.equal(w, "R' B' R");
+  let r = await interrupted("M", 0, 1, 1, 0);
+  assert.deepEqual(r.played, ["R'", "R"]);
+  assert.equal(r.c.currentValue, 0);
+  assert.equal(r.c.node, 0);
+  // Target 59 instead: undo the turn, then the 59 -> 00 word inverted.
+  r = await interrupted("M", 0, 1, 1, 59);
+  assert.deepEqual(
+    r.played.join(" "),
+    `R' R ${inverseWord(s3.runs.M.words[59])}`,
+  );
+  assert.equal(r.after, 1 + parseAlg(s3.runs.M.words[59]).length);
+});
+
+test("every interrupted S3 step continues with the least HTM over all shared poses", async () => {
+  for (const letter of ["M", "S"]) {
+    const run = s3.runs[letter],
+      oracle = interruptOracle(run),
+      words = run.words.map((w) => parseAlg(w));
+    const turnsOf = new Set(words.flat().map((m) => serializeMove(m)));
+    for (let from = 0; from < 60; from++)
+      for (const direction of [1, -1])
+        for (let k = 1; k < 4; k++) {
+          const node = from,
+            step =
+              direction === 1
+                ? words[node]
+                : words[(node - 1 + words.length) % words.length];
+          if (k >= step.length) continue;
+          for (const second of [0, 2, -1, 5]) {
+            const target = (from + direction * second + 120) % 60;
+            const r = await interrupted(letter, from, direction, k, target);
+            const label = `${letter} ${from} ${direction > 0 ? "+" : "-"} k${k} -> ${target}`;
+            assert.ok(r.mid, label);
+            assert.equal(r.after, oracle.best(r.mid, target), label);
+            assert.equal(r.c.currentValue, target, label);
+            assert.ok(r.c.node >= 0 && r.c.node % 60 === target, label);
+            // Every played turn is a turn of a saved step (or its inverse).
+            for (const t of r.played)
+              assert.ok(
+                turnsOf.has(t) || turnsOf.has(inverseWord(t)),
+                `${label}: ${t}`,
+              );
+          }
+        }
+  }
+});

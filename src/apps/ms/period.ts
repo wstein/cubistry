@@ -36,6 +36,10 @@ interface Place {
  * newer target interrupts stops between two turns of such a word. A route to
  * any value therefore walks the period, edge by edge, in the direction with the
  * fewest HTM; it never plays a move that is not part of a period edge.
+ *
+ * Research words often cancel across edge boundaries, so one pose can lie
+ * inside several edges, or be a node and lie inside an edge. Every such place
+ * is recorded, and a route starts from whichever place gives the least HTM.
  */
 export class MsPeriod {
   readonly run: MsRun;
@@ -44,7 +48,8 @@ export class MsPeriod {
   private readonly inverses: readonly (readonly LegalMove[])[];
   /** prefix[i]: HTM of words 0..i-1. */
   private readonly prefix: readonly number[];
-  private readonly places = new Map<string, Place>();
+  /** Every place of each reachable pose: nodes (offset 0) and edge interiors. */
+  private readonly places = new Map<string, Place[]>();
   constructor(print: PrintDefinition, run: MsRun) {
     this.run = run;
     this.words = run.words.map((w) => parseAlg(w));
@@ -55,15 +60,15 @@ export class MsPeriod {
     this.words.forEach((word, i) => {
       nodes.push(state);
       demand(
-        !this.places.has(poseKey(state)) ||
-          this.places.get(poseKey(state))!.offset !== 0,
+        !(this.places.get(poseKey(state)) ?? []).some((p) => p.offset === 0),
         "M/S period revisits a pose",
       );
       for (let offset = 0; offset < word.length; offset++) {
         const key = poseKey(state);
-        // A node always wins over an interior pose with the same identity.
-        if (offset === 0 || !this.places.has(key))
-          this.places.set(key, { edge: i, offset });
+        this.places.set(key, [
+          ...(this.places.get(key) ?? []),
+          { edge: i, offset },
+        ]);
         state = applyMoves(state, [word[offset]]);
       }
       prefix.push(prefix[i] + word.length);
@@ -81,8 +86,8 @@ export class MsPeriod {
   }
   /** Node of `state`, or -1 when the pose is not a period node. */
   nodeOf(state: CubeState): number {
-    const place = this.places.get(poseKey(state));
-    return place?.offset === 0 ? place.edge : -1;
+    const node = this.places.get(poseKey(state))?.find((p) => p.offset === 0);
+    return node ? node.edge : -1;
   }
   /** First node (lap 1) that shows `value`. */
   poseFor(value: number): CubeState {
@@ -123,38 +128,37 @@ export class MsPeriod {
     };
   }
   /**
-   * The least-HTM walk along the period from `state` to a node showing
-   * `value`; null when `state` is not on the period. A pose inside an edge
-   * first completes or undoes that edge.
+   * The least-HTM route from `state` to a node showing `value` among all
+   * routes of this form: from any place of `state` (a node, or an offset inside
+   * an edge, which is first undone or completed), walk whole edges either way
+   * round. Null when `state` is not on the period. Every turn is a turn of a
+   * saved word or of its inverse.
    */
   route(state: CubeState, value: number): MsRoute | null {
-    const place = this.places.get(poseKey(state));
-    if (!place) return null;
+    const places = this.places.get(poseKey(state));
+    if (!places) return null;
     demand(
       Number.isInteger(value) && value >= 0 && value < MS_MODULUS,
       "Invalid M/S value",
     );
-    const n = this.length,
-      word = this.words[place.edge];
+    const n = this.length;
     const starts: {
       node: number;
       moves: readonly LegalMove[];
       edges: number;
-    }[] =
-      place.offset === 0
-        ? [{ node: place.edge, moves: [], edges: 0 }]
+    }[] = places.flatMap(({ edge, offset }) => {
+      const word = this.words[edge];
+      return offset === 0
+        ? [{ node: edge, moves: [], edges: 0 }]
         : [
             {
-              node: place.edge,
-              moves: inverseMoves(word.slice(0, place.offset)),
+              node: edge,
+              moves: inverseMoves(word.slice(0, offset)),
               edges: 1,
             },
-            {
-              node: (place.edge + 1) % n,
-              moves: word.slice(place.offset),
-              edges: 1,
-            },
+            { node: (edge + 1) % n, moves: word.slice(offset), edges: 1 },
           ];
+    });
     let best: { htm: number; edges: number; build: () => MsRoute } | null =
       null;
     for (const start of starts)
