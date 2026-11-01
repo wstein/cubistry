@@ -67,7 +67,14 @@ Pages settings migration, force push or protected research change.
   current Vite document structure (explicit HTML/body and optional implicit
   head); iframe/xmp/noembed/noframes/plaintext containers and malformed document
   nesting fail closed instead of attempting an HTML5 rewrite. Every preview HTML gets noindex
-  and a visible non-production PR/SHA banner before Ross receives it.
+  and a visible non-production banner before Ross receives it. The banner shows
+  `PR #N` as a link to that pull request (built only from the validated integer
+  and the fixed repository constant, `rel="noopener noreferrer"`), the PR title
+  and the short SHA. The title is untrusted free text: it is passed to
+  `extract.py` as one argv element (never through a shell), reduced to a single
+  line without control characters, capped at 80 characters with an ellipsis and
+  HTML-escaped; an empty title is omitted. A title edit only appears after the
+  next build, because `pages.yml` does not trigger on `edited`.
 - Same-repository previews share the site's origin and can execute client-side
   JS in visitors' browsers. This is not a hostile-code sandbox; only authorized
   same-repository contributors are automatically published. No fork publishing,
@@ -91,7 +98,11 @@ states and build details. Successful links are posted only after the final post-
 Actions Pages deployment succeeds and stored metadata matches the current PR
 head. Success of the earlier production snapshot alone is insufficient: that
 snapshot necessarily predates this run's preview updates. Closed/merged cleanup likewise requires the final deployment and verifies
-directory absence before claiming removal.
+directory absence before claiming removal. The Pages deploy action's rsync
+protects `.nojekyll`, so a removed preview directory keeps that single empty
+file. Inventory and cleanup comments therefore count a `pr-preview/pr-N/`
+directory only when it holds something other than `.nojekyll`; otherwise every
+reconcile run would plan a useless remove job for each closed PR.
 Failures can retain a previously verified preview; its old SHA/banner and the
 updated comment identify it as stale. Re-running the trusted publisher
 reconciles state; no arbitrary input source paths or PR shell text are executed.
