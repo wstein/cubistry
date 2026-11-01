@@ -911,7 +911,7 @@ function hsmVariantUi(hm) {
     $("hsm-range").value = range;
   }
   $("hsm-help").textContent = hm
-    ? "Counts one step per second, wrapping through 00. Upper-left stays blank. Counting steps take at most four moves (minutes at most three); a free jump (Set, Reset) takes at most seven. A new target replaces old work after the current turn. Changing the unit sets up a fresh 00 display."
+    ? "Counts one step per second, wrapping through 00. Upper-left stays blank. Counting steps usually take at most four moves (minutes at most three), rarely five; after a jump to an arbitrary state the first steps may cost more. A free jump (Set, Reset) takes at most seven. A new target replaces old work after the current turn. Changing the unit sets up a fresh 00 display."
     : hsmMarkup.help;
   syncHsmUnitLabels();
 }
