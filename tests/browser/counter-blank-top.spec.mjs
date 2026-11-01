@@ -150,6 +150,11 @@ test("Wrap defaults on and the checkbox names the physical mode on the blank-top
   await page.locator("#wrap").check();
   await page.locator("#counter-print").selectOption("blank-top");
   await expect(page.locator("#status")).toContainText("Blank-top print");
+  await page.locator("#counter-print").selectOption("titled");
+  await expect(page.locator("#status")).toContainText("COUNTER title print installed");
+  await expect(page.locator("#wrap")).toBeChecked();
+  await page.locator("#counter-print").selectOption("blank-top");
+  await expect(page.locator("#status")).toContainText("Blank-top print");
   await page.locator("#wrap").uncheck();
   await page.locator("#counter-print").selectOption("titled");
   await expect(page.locator("#status")).toContainText("COUNTER title print installed");
