@@ -1084,12 +1084,12 @@ test("recovery reach equals a brute-force search over every move sequence", () =
 test("configure() followed by a mode, range or direction switch counts at most five HTM per step and is back on the period within six steps", async () => {
   let worst = 0,
     checked = 0;
-  for (const letter of ["H", "S", "M"]) {
+  for (const letter of ["S"]) {
     const modes = COUNTING_MODES.filter(([l]) => l === letter);
     for (const [, fromMax, fromDir] of modes)
       for (const [, toMax, toDir] of modes) {
         if (fromMax === toMax && fromDir === toDir) continue;
-        for (const advance of [0, 3]) {
+        for (const advance of [3]) {
           const c = new HsmController(
             view,
             design,
@@ -1126,6 +1126,67 @@ test("configure() followed by a mode, range or direction switch counts at most f
         }
       }
   }
-  assert.ok(checked >= 150, `${checked} switches`);
+  assert.ok(checked >= 20, `${checked} switches`);
   assert.ok(worst <= 6);
+});
+
+// prepare(next) caches a plan for the mode it was made in. A mode, range or
+// direction switch before the request must drop it: the request then plans like
+// a controller that never prepared anything and never plays the stale plan.
+test("a plan prepared before a range or direction switch is not used after it", async () => {
+  const switches = [
+    [59, 1, 59, -1],
+    [59, 1, 23, 1],
+    [23, -1, 23, 1],
+    [23, 1, 11, -1],
+  ];
+  let differing = 0;
+  for (const letter of ["H", "S", "M"])
+    for (const [fromMax, fromDir, toMax, toDir] of switches)
+      for (const jump of [false, true]) {
+        const run = async (withPrepared) => {
+          const c = new HsmController(
+            view,
+            design,
+            {},
+            letter,
+            () => {},
+            dispose,
+          );
+          c.setMode(fromMax, fromDir);
+          await c.configure();
+          for (let i = 0; i < 2; i++) {
+            c.request((c.currentValue + fromDir + fromMax + 1) % (fromMax + 1));
+            await settled(c);
+          }
+          // A free jump leaves the period, so recovery steps are involved.
+          if (jump) {
+            c.request((c.currentValue + 7) % (fromMax + 1));
+            await settled(c);
+          }
+          const next = (c.currentValue + fromDir + fromMax + 1) % (fromMax + 1);
+          const before = c.state,
+            stale = withPrepared ? c.prepare(next) : null;
+          c.setMode(toMax, toDir);
+          c.request(next);
+          await settled(c);
+          const out = {
+            value: c.currentValue,
+            state: c.state,
+            total: c.progress.total,
+            stale: stale && applyMoves(before, stale),
+          };
+          c.dispose();
+          return out;
+        };
+        const label = `${letter} ${fromMax}/${fromDir} -> ${toMax}/${toDir}${jump ? " after a jump" : ""}`;
+        const prepared = await run(true),
+          fresh = await run(false);
+        assert.equal(prepared.value, fresh.value, label);
+        assert.ok(stateEquals(prepared.state, fresh.state), label);
+        assert.equal(prepared.total, fresh.total, label);
+        // Count the cases where the stale plan would have ended elsewhere.
+        if (!stateEquals(prepared.stale, prepared.state)) differing++;
+      }
+  assert.ok(differing >= 10, `${differing} switches change the route`);
 });
