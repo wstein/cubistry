@@ -4,11 +4,11 @@ The separate **H/M Counter** application counts hours and minutes on one fixed
 2×2×2 print, **m3-SH**, from research PR #133
 (`research/hm-counter-3move`). The upper-left sticker is genuinely unprinted.
 The upright H or M occupies the upper-right cell, and the tens and units digits
-fill the lower row. The existing [H/S/M Counter 00–59](HSM_COUNTER.md) is a
+fill the lower row. The existing [H/M/S Counter 00–59](HSM_COUNTER.md) is a
 separate application and is unchanged.
 
 Choose the unit (H or M), the range and the direction, then use Set, single
-steps, Reset, or Run/Stop, exactly as in the H/S/M counter. The ranges are:
+steps, Reset, or Run/Stop, exactly as in the H/M/S counter. The ranges are:
 
 - **M 00–59**, one lap of 60 steps;
 - **H 00–23**, one lap of 24 steps;
@@ -17,8 +17,7 @@ steps, Reset, or Run/Stop, exactly as in the H/S/M counter. The ranges are:
   jump to 00 from any value.
 
 Leading zeros are shown, and counting wraps in both directions. The default
-rotation speed is 500 ms per HTM move for H and 250 ms for M, as in the H/S/M
-counter. Open it from the application chooser or with `?application=hm-counter`.
+rotation speed is 100 ms per HTM move for both units, as in the H/M/S counter. Open it from the application chooser or with `?application=hm-counter`.
 
 ## Status and provenance
 
@@ -86,7 +85,7 @@ total above.
 ## Behavior
 
 The H/M counter uses the same controller, planner, periods and recovery code as
-the H/S/M counter. Only the variant parameters differ (see
+the H/M/S counter. Only the variant parameters differ (see
 [Implementation](#implementation)). It behaves as follows.
 
 - **Changing the unit** installs the selected range's period pose for 00 directly:
@@ -98,35 +97,35 @@ the H/S/M counter. Only the variant parameters differ (see
   the same poses, so switching direction never leaves the period.
 - **Set, Reset and other free jumps** (including −1 while Direction is Up) take
   a least route to the requested display. Among least routes they prefer one
-  that lands on a period node, as in the H/S/M counter. Counting on from a pose
+  that lands on a period node, as in the H/M/S counter. Counting on from a pose
   off the period follows an exact recovery plan back onto it. Each recovery
   step shows the next value and uses at most 4 HTM, unless the pose has no
   route of 4 HTM; then the first step takes its shortest word. The
-  exact four-corner planner remains the last fallback. As in the H/S/M counter,
+  exact four-corner planner remains the last fallback. As in the H/M/S counter,
   these jumps use the application's exact four-corner planner, not the shared
   PuzlWerk solver.
-- **Free-jump bound.** For the H/S/M print, a jump from a settled pose is proved
+- **Free-jump bound.** For the H/M/S print, a jump from a settled pose is proved
   to need at most 6 HTM. **No such bound is established for m3-SH.** The
   application caps a jump at 7 HTM, the radius of the four-corner graph, which no
   route can exceed. Sampled jumps in the tests needed at most 6, but sampling is
   not a bound.
-- The H/M print has a single lettering (the large H and M symbols). The H/S/M
+- The H/M print has a single lettering (the large H and M symbols). The H/M/S
   word lettering is not offered.
 
-The live clock and the H/S/M counter do not use this print.
+The live clock and the H/M/S counter do not use this print.
 
 ## Implementation
 
 `src/apps/hsm` is parameterized by an `HsmVariant`: its letters, its ranges per
 letter, its print id, its per-step limit, its free-jump cap and its runtime
-file. `HSM_VARIANT` is the default everywhere, so the H/S/M counter, its data
+file. `HSM_VARIANT` is the default everywhere, so the H/M/S counter, its data
 and its numbers are unchanged. `src/apps/hm/variant.ts` defines `HM_VARIANT`:
 letters H and M, M 00–59, H 00–23 and 00–11, limit 4 and jump cap 7. An
 extended runtime names its letters and limit, and each period carries its
 `maximumHTM`. Loading validates every period node, the closure, the per-step
 limit and that maximum against the replayed words. The H/M counter shares the
-H/S/M controls in `index.html`. The heading, letters, ranges and help text
-adapt to the variant, and switching back restores the H/S/M controls.
+H/M/S controls in `index.html`. The heading, letters, ranges and help text
+adapt to the variant, and switching back restores the H/M/S controls.
 
 ## Data pinning and verification
 
@@ -152,7 +151,7 @@ exact closure. It refuses a run-in. It cross-checks the totals, maxima and
 setups against the receipt, requires the two receipts to be byte-identical and
 requires the checks file to record that digest. The runtime
 [public/hm-counter.v1.json](../public/hm-counter.v1.json) is derived from it with
-the H/S/M runtime derivation, parameterized by an H/M profile. The application
+the H/M/S runtime derivation, parameterized by an H/M profile. The application
 loads the runtime only when its SHA-256 matches the pin.
 
 ```sh
@@ -168,7 +167,7 @@ the branch when the commit is missing. `npm run verify:hm` runs `--check`.
 
 ## Artwork
 
-The glyphs are the existing artwork, unchanged: the H/S/M large symbols
+The glyphs are the existing artwork, unchanged: the H/M/S large symbols
 [H.svg](../public/assets/hsm/H.svg) and [M.svg](../public/assets/hsm/M.svg),
 and the counter digits in `public/assets/digits/`. They follow the same rules
 (see [counter artwork](COUNTER_ARTWORK.md)): original geometric vector paths in
@@ -194,26 +193,26 @@ m3-SH. See below.
 ## Physical reprint required
 
 > **Owner decision.** m3-SH is a new print. **All 24 of the 24 sticker
-> identities differ from the current H/S/M seconds-first print, and all 24 differ
-> from the previous H/S/M print.** Each one differs in artwork, in orientation
-> on its corner, or both. A cube stickered from either H/S/M sheet cannot run
+> identities differ from the current H/M/S seconds-first print, and all 24 differ
+> from the previous H/M/S print.** Each one differs in artwork, in orientation
+> on its corner, or both. A cube stickered from either H/M/S sheet cannot run
 > the H/M counter. **Whether and when to reprint the physical stickers is the
 > owner's decision.** This change makes no print sheets and does not alter the
-> H/S/M sheets.
+> H/M/S sheets.
 
 Method: both earlier prints and m3-SH use the same 24 sticker identities. Each
 identity is a fixed corner (cubie) and facelet (position and normal) in the
 solved pose; the test asserts this. For every identity, the comparison takes the
 `printing` record of
 [data/hsm/seconds-first/modes/witness.json](../data/hsm/seconds-first/modes/witness.json)
-(current H/S/M sheets), of `tests/fixtures/hsm-blank-print.v2.json` (previous
-H/S/M sheets) and of the converted m3-SH witness. An identity is unchanged only
+(current H/M/S sheets), of `tests/fixtures/hsm-blank-print.v2.json` (previous
+H/M/S sheets) and of the converted m3-SH witness. An identity is unchanged only
 if its glyph is the same and, for a printed glyph, its print-up vector is the
 same (a blank reads the same in every orientation). "Tens" and "units" name the
 front cell in which a digit is upright. `tests/hm-counter.test.mjs` recomputes
 the count.
 
-| Id | Corner | Normal | Previous H/S/M print | Seconds-first print (current) | m3-SH print |
+| Id | Corner | Normal | Previous H/M/S print | Seconds-first print (current) | m3-SH print |
 | ---: | ---: | --- | --- | --- | --- |
 | 0 | 0 | (−1, 0, 0) | tens 0 (0, 1, 0) | tens 0 (0, 1, 0) | H (0, −1, 0) |
 | 1 | 0 | (0, −1, 0) | tens 1 (0, 0, 1) | tens 2 (0, 0, 1) | units 3 (1, 0, 0) |
@@ -249,7 +248,7 @@ multiset, the seconds-first print has the same digits and blanks. Its letters
 are S ×3, H and M instead of H ×2 and M ×3. So two counts apply, and both are
 recomputed by the test:
 
-- **By position:** all 24 identities change. A cube stickered from an H/S/M sheet
+- **By position:** all 24 identities change. A cube stickered from an H/M/S sheet
   must be fully re-stickered; no sticker can stay where it is.
 - **By artwork:** printed glyphs counted as a multiset, ignoring position and
   orientation. A new m3-SH sheet needs only **3 glyphs not on the seconds-first
@@ -266,7 +265,7 @@ recomputed by the test:
   mode). All three modes at max 3 on one print is UNKNOWN.
 - Free jumps have no established universal bound on this print; the cap of 7 is
   the graph radius. The recovery step count after a jump is software-tested,
-  not bounded by a research table (the H/S/M counter has one).
+  not bounded by a research table (the H/M/S counter has one).
 - No print or cut sheets exist for m3-SH; the sticker net is a reference.
 - Only M 00–59, H 00–23 and H 00–11 are offered: the research covers exactly
   these modes (no H 00–59 and no M 00–23 or M 00–11).
@@ -310,6 +309,6 @@ setup), a tampered witness and mismatched receipts.
 - counting up and down in every mode with each wrap (59→00, 23→00, 11→00 and
   back), within each mode's maximum;
 - Set, Reset, unit change, validation and Run/Stop;
-- that the H/S/M counter keeps its own controls afterward.
+- that the H/M/S counter keeps its own controls afterward.
 
 These are application regression tests, not proofs.
