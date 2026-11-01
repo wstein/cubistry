@@ -17,7 +17,7 @@
     "source=cubistry-julia-depot,target=/home/vscode/.julia,type=volume",
     "source=cubistry-flixw-cache,target=/home/vscode/.local/share/flixw,type=volume"
   ],
-  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local/share /home/vscode/.julia && bash .devcontainer/on-create.sh",
+  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local /home/vscode/.julia && bash .devcontainer/on-create.sh",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "hostRequirements": { "cpus": 4, "memory": "8gb" },
   "customizations": {
