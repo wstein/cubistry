@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { groupZoom } from "./orbit.ts";
-import { clockCameraRadius, clockCubeRadius, clockPresentationScale, clockWorldCenters } from "./framing.ts";
+import { assertClockCubeCount, clockCameraRadius, clockCentersFor, clockCubeRadius, clockPresentationScale, clockWorldCenters, type ClockCubeCount } from "./framing.ts";
 import { bindSmartRotation, type SmartRotationBinding, rotatePresentation, CubeViewer, configurePresentationRenderer, createPresentationStudio, bindLightingSwitches, type LightingSwitches, DEFAULT_APPEARANCE, installAppearanceControls, type ViewerAppearance } from "@cubistry/cube-viewer";
 import { demand } from "@cubistry/cube-core";
-/** One WebGL context, scene, camera and frame loop for the entire H–M–S row. */
+/** One WebGL context, scene, camera and frame loop for a row of two or three cubes (the H–M–S clock uses three). */
 export class ClockStage {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
@@ -15,11 +15,15 @@ export class ClockStage {
   private readonly studio: ReturnType<typeof createPresentationStudio>;
   private readonly lightingSwitches: LightingSwitches;
   private radius = 12;
-  private readonly casterCenters = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+  private readonly cubeCount: ClockCubeCount;
+  private readonly casterCenters: THREE.Vector3[];
   private zoom = 1;
   private rotation?: SmartRotationBinding;
   private cubes: CubeViewer[] = [];
-  constructor(host: HTMLElement) {
+  constructor(host: HTMLElement, cubeCount: number = 3) {
+    assertClockCubeCount(cubeCount);
+    this.cubeCount = cubeCount;
+    this.casterCenters = Array.from({ length: cubeCount }, () => new THREE.Vector3());
     this.presentation.name = "clock-presentation";
     this.scene.add(this.presentation);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -29,7 +33,9 @@ export class ClockStage {
     el.setAttribute("role", "img");
     el.setAttribute(
       "aria-label",
-      "Live H M S clock. Three physical cubes in one scene. Drag to rotate the entire arrangement.",
+      cubeCount === 3
+        ? "Live H M S clock. Three physical cubes in one scene. Drag to rotate the entire arrangement."
+        : "Two physical cubes in one scene. Drag to rotate the entire arrangement.",
     );
     this.studio = createPresentationStudio(this.scene, 1, 4.3, host);
     this.appearanceControls = installAppearanceControls(host, (value) => {
@@ -65,15 +71,15 @@ export class ClockStage {
     demand(
       Number.isInteger(index) &&
         index >= 0 &&
-        index < 3 &&
+        index < this.cubeCount &&
         this.cubes.length === index,
-      "Clock cubes must be H M S in order",
+      "Clock cubes must be created in order, below the cube count",
     );
     const cube = new CubeViewer(host, {
       renderer: this.renderer,
       scene: this.presentation,
       camera: this.camera,
-      position: [(index - 1) * 2.8, 0, 0],
+      position: [clockCentersFor(this.cubeCount)[index], 0, 0],
       resetCamera: () => this.resetCamera(),
       onDefaultPlasticColor: (color) => { if (index === 0) this.appearanceControls.setDefaultColor(color); },
     });
@@ -85,18 +91,18 @@ export class ClockStage {
     this.rotation?.reset();
   }
   private fitCamera(): void {
-    this.radius = clockCameraRadius(this.camera.aspect, 0, 0, this.camera.fov) * this.zoom;
+    this.radius = clockCameraRadius(this.camera.aspect, 0, 0, this.camera.fov, this.cubeCount) * this.zoom;
     this.camera.position.set(0, 0, this.radius);
     this.camera.lookAt(0, 0, 0);
     // Very narrow viewports can require a distance beyond the initial far plane.
-    this.camera.far = Math.max(100, this.radius + 2.8 + clockCubeRadius + 1);
+    this.camera.far = Math.max(100, this.radius + Math.max(...clockCentersFor(this.cubeCount)) + clockCubeRadius + 1);
     this.camera.updateProjectionMatrix();
     this.updatePresentationBounds();
   }
   private updatePresentationBounds(): void {
-    const scale = clockPresentationScale(this.camera.aspect, this.presentation.quaternion, this.camera.fov);
+    const scale = clockPresentationScale(this.camera.aspect, this.presentation.quaternion, this.camera.fov, this.cubeCount);
     this.presentation.scale.setScalar(scale);
-    clockWorldCenters(this.presentation.quaternion, scale, this.casterCenters);
+    clockWorldCenters(this.presentation.quaternion, scale, this.casterCenters, this.cubeCount);
     this.studio.fitCasters(this.casterCenters, clockCubeRadius * scale, .08 * scale);
   }
   destroy(): void {
