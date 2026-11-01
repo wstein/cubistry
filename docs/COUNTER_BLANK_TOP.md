@@ -95,8 +95,10 @@ shows that LZ and NZ store the identical complete cube state for every value fro
   on screen and never changes the print, state or moves
   ([cube-first UI](CUBE_FIRST_UI.md)).
 - **Leading Zero on the blank-top print selects the physical mode** (checked: LZ,
-  unchecked: NZ). It is enabled only while the cube is idle and Run is off, and
-  only at:
+  unchecked: NZ). On this print the checkbox is labeled **Leading zero mode
+  (physical)**; the titled print keeps the label *Leading Zero*. The longer label
+  sits on its own line below Wrap. It is enabled only while the cube is idle and
+  Run is off, and only at:
   - **0**: the switch plays the 6-HTM word (LZ 00 → NZ _0) or its inverse. Every
     turn is animated and committed to the cube state.
   - **31–99**: both modes hold the same complete state, so the switch plays no
@@ -113,7 +115,13 @@ shows that LZ and NZ store the identical complete cube state for every value fro
   steps on the canonical route use the stored research word or its exact inverse.
   On this print the stored route also includes the 99→00 edge, so 99→0 and 0→99
   (with Wrap, or Set from an adjacent value) use the stored 4-HTM (LZ) or 3-HTM
-  (NZ) wrap word instead of the solver. Wrap stays off by default as before.
+  (NZ) wrap word instead of the solver.
+- **Wrap defaults to on for the blank-top print** (its stored routes are cyclic),
+  so +1 at 99 and −1 at 0 use the stored wrap word by default. The titled print
+  keeps Wrap off by default. Wrap is not saved: on load it starts at the active
+  print's default. When the print changes, Wrap follows the new print's default
+  unless the user has toggled Wrap since the page loaded; then that explicit
+  choice is kept for the rest of the page session.
 - **Arbitrary jumps and noncanonical states** use the existing shared PuzlWerk
   `exactPhysical` solver (24 virtual coordinate frames, both directions) from the
   authoritative state to the complete canonical state of the active mode. The
@@ -130,17 +138,26 @@ shows that LZ and NZ store the identical complete cube state for every value fro
   blank-top runtime cannot be loaded, the page says so and shows the titled print.
   The URL parameter `?print=blank-top` selects the variant on load.
 
-### Open UI questions for the owner
+### Owner decisions on the UI questions
 
-1. Should a print change keep the current value (current behavior) or start the
-   blank-top cube at its printed state 00 (LZ)?
-2. Should the zero-move switch at 31–99 stay, or should switching be limited to 0
-   as the research describes?
-3. Should Wrap default to on for the blank-top print, since its routes are cyclic?
-4. Should the checkbox be relabeled on the blank-top print (for example
-   "Leading zero mode (physical)"), or is the explanatory note enough?
-5. Should a print change also be offered as a URL parameter in the share/print
-   links, and should the blank-top net join the Print stickers page?
+1. A print change keeps the current value (unchanged behavior).
+2. The zero-move switch at 31–99 stays (unchanged behavior).
+3. Wrap defaults to on for the blank-top print only; the titled print keeps Wrap
+   off (see Controls and behavior for the exact default and persistence rules).
+4. The checkbox is labeled *Leading zero mode (physical)* on the blank-top print;
+   the titled print keeps *Leading Zero*.
+
+5. (a) Shared links should carry the sticker print, so a shared link restores
+   the blank-top print. **Open, not implemented:** the Counter generates no
+   share link today (the only generated link, *Print stickers*, is hidden for the
+   Counter, and value and mode are not encoded in any URL); `?print=blank-top`
+   already selects the variant on load. How to carry the print (for example in
+   the page address) is still to be decided.
+   (b) **Deferred:** the blank-top net does not join the Print stickers page.
+   Printing fixes the sticker identities, max 3 HTM for this print is UNKNOWN so
+   a better print may follow, the independent review of PR
+   [#144](https://github.com/wstein/cubistry/pull/144) is still open, and a
+   reprint is the owner's call.
 
 ## Data, pins and verification
 
@@ -196,12 +213,15 @@ for this print.
   the 31–99 shared states, per-print/per-mode eligibility and ingress negative
   controls; drives the real controller through full laps up and down, mode
   switches and solver jumps.
+- [tests/counter-print-options.test.mjs](../tests/counter-print-options.test.mjs):
+  per-print Wrap default, explicit-choice precedence and checkbox labels.
 - [tests/counter-blank-top-source.test.mjs](../tests/counter-blank-top-source.test.mjs):
   pins, runtime freshness, canonical identities, derivation negative controls, net.
 - [tests/browser/counter-blank-top.spec.mjs](../tests/browser/counter-blank-top.spec.mjs):
   selects the variant, counts full LZ and NZ laps through the wrap edge in the
-  real page against the research words, checks rendered top blanks and upright
-  digits, switches modes (6 setup moves outside the session count, zero-move
+  real page against the research words with the default Wrap, checks rendered
+  top blanks and upright digits, the per-print Wrap default and label, switches
+  modes (6 setup moves outside the session count, zero-move
   switch at 45), reloads, returns to the titled print and jumps.
 
 ## Limitations
