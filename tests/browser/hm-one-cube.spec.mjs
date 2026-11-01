@@ -312,3 +312,35 @@ test("Unit labels read H and M in the H/M one-cube counter even with word letter
   await expect(page.locator("#hsm-lettering")).toHaveValue("words");
   expect(await labels()).toEqual(["hour", "min", "sec"]);
 });
+
+test("Unit labels follow a lettering change made after load, across H/M and back", async ({
+  page,
+}) => {
+  const labels = () =>
+    page.locator("#hsm-letter option").evaluateAll((o) =>
+      o.map((e) => e.textContent),
+    );
+  await page.goto("/");
+  await expect(page.locator("#application")).toBeEnabled();
+  await page.selectOption("#application", "hsm-counter");
+  await expect(page.locator("#cube")).toHaveAttribute(
+    "data-application",
+    "hsm-counter",
+  );
+  await expect(page.locator("#hsm-lettering")).toHaveValue("symbols");
+  await page.selectOption("#hsm-lettering", "words");
+  expect(await labels()).toEqual(["hour", "min", "sec"]);
+  await page.selectOption("#application", "hm-one-cube");
+  await expect(page.locator("#cube")).toHaveAttribute(
+    "data-application",
+    "hm-one-cube",
+  );
+  expect(await labels()).toEqual(["H", "M"]);
+  await page.selectOption("#application", "hsm-counter");
+  await expect(page.locator("#cube")).toHaveAttribute(
+    "data-application",
+    "hsm-counter",
+  );
+  await expect(page.locator("#hsm-lettering")).toHaveValue("words");
+  expect(await labels()).toEqual(["hour", "min", "sec"]);
+});

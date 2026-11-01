@@ -103,7 +103,11 @@ the H/M/S counter. Only the variant parameters differ (see
   off the period follows an exact recovery plan back onto it. Each recovery
   step shows the next value and uses at most 4 HTM, unless the pose has no
   route of 4 HTM; then the first step takes its shortest word. The
-  exact four-corner planner remains the last fallback. As in the H/M/S counter,
+  exact four-corner planner remains the last fallback. The recovery search can
+  fail: from some off-period poses it finds no plan, and the next count then
+  falls back to a free jump, which can cost up to 5 HTM. A recovery step can
+  also reach 4 HTM. So the 4 HTM limit holds on the period; after a jump to an
+  arbitrary state the first steps may cost more. As in the H/M/S counter,
   these jumps use the application's exact four-corner planner, not the shared
   PuzlWerk solver.
 - **Free-jump bound.** For the H/M/S print, a jump from a settled pose is proved
