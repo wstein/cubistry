@@ -233,3 +233,68 @@ test("M/S run stops after the current step and the other apps stay intact", asyn
   );
   await settled(page, 0);
 });
+
+/** Selects and panel geometry of a visible counter panel. */
+async function panelSelects(page, panel, ids) {
+  return page.evaluate(
+    ({ panel, ids }) => {
+      const box = (el) => el.getBoundingClientRect();
+      const p = document.getElementById(panel),
+        style = getComputedStyle(p),
+        inner =
+          box(p).width -
+          parseFloat(style.paddingLeft) -
+          parseFloat(style.paddingRight) -
+          parseFloat(style.borderLeftWidth) -
+          parseFloat(style.borderRightWidth);
+      return {
+        inner,
+        selects: ids.map((id) => {
+          const el = document.getElementById(id),
+            label = document.querySelector(`label[for="${id}"]`);
+          return {
+            id,
+            width: box(el).width,
+            gap: box(el).top - box(label).bottom,
+            marginBottom: parseFloat(getComputedStyle(el).marginBottom),
+          };
+        }),
+      };
+    },
+    { panel, ids },
+  );
+}
+for (const width of [1280, 400, 390, 320])
+  test(`M/S panel selects span the panel like the H/M/S panel at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await choose(page);
+    const ms = await panelSelects(page, "ms-controls", [
+      "ms-letter",
+      "ms-direction",
+    ]);
+    expect(
+      await page.locator("html").evaluate((e) => e.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+    await page.selectOption("#application", "hsm-counter");
+    await expect(page.locator("#cube")).toHaveAttribute(
+      "data-application",
+      "hsm-counter",
+    );
+    await settled(page, 0);
+    const hsm = await panelSelects(page, "hsm-controls", [
+      "hsm-letter",
+      "hsm-direction",
+    ]);
+    // Same full-width selects and the same label spacing in both panels.
+    for (const [i, s] of ms.selects.entries()) {
+      expect(Math.abs(s.width - ms.inner), s.id).toBeLessThanOrEqual(1);
+      expect(
+        Math.abs(s.width - hsm.selects[i].width),
+        s.id,
+      ).toBeLessThanOrEqual(1);
+      expect(Math.abs(s.gap - hsm.selects[i].gap), s.id).toBeLessThanOrEqual(1);
+      expect(s.marginBottom, s.id).toBe(hsm.selects[i].marginBottom);
+    }
+  });
