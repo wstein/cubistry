@@ -33,18 +33,19 @@ Verified means: read in the named file on `origin/main` (commit `34dc177`) or, w
 - A2. A one-second profile such as `stepSeconds: 1`, `maxSeconds: 3599` fits `TimerProfile` without changing `WorkshopClock`'s clock arithmetic. The clock was read for 5 s and 10 s steps only.
 - A3. The scheduler constants and formula above apply unchanged per cube at a one-second interval.
 - A4. Derived arithmetic, from the formula above at 1× (`I = 1000`, `B = 500`), shown only to frame open decision 2: for `N = 4` moves, `overhead = 308`, `(500 - 308 - 20) / 4 = 43` ms per move; for `N = 3`, `(500 - 233 - 20) / 3 = 82.3` ms; for a serial 3 + 4 = 7 moves, `overhead + 20 = 553 > 500`, so no feasible plan under that formula. Not a measurement.
+- A5. Derived arithmetic for other Timer speeds, from `planSequence` (`src/apps/timer/scheduler.ts:10-16`): `I = 1000 / speed` ms, `B = I / 2`, and a plan is feasible when `8 + 75*N + 10*N + 20 <= B` (wake allowance 8, frame allowance 75, minimum move 10, endpoint tolerance 20; lines 6-9). At 10x, `B = 50 < 113` (the value for `N = 1`), so no step with a move is feasible from 10x up. The largest speed with a feasible plan is about 4.4x for `N = 1`, 1.77x for `N = 3`, 1.36x for `N = 4` (`B >= 368`) and 0.80x for a serial `N = 7` (`B >= 623`). The 1x to 100x set of the existing timers (`docs/WORKSHOP_TIMER.md`) therefore does not carry over to one-second steps unchanged. Not a measurement.
 
 ## Proposed behavior
 1. **Two cubes, M left and S right**, one stage, the layout of the M/S Counter print S3 on each cube.
 2. **One time value 00:00–59:59** counted in seconds. The S cube shows 00–59, the M cube shows 00–59. Whole seconds only: no sub-second state on the cubes.
-3. **Stopwatch and Countdown** with the controls of the existing timers (Start/Pause/Resume, Reset, Set, Timer speed, Rotation Speed). Pause retains fractions; the live readout and cube target come from one monotonic sample.
+3. **Stopwatch and Countdown** with the controls of the existing timers (Start/Pause/Resume, Reset, Set, Timer speed, Rotation Speed; the speed set is open decision 8). Pause retains fractions; the live readout and cube target come from one monotonic sample.
 4. **Carry:** the S cube changes every second; on 59→00 (Stopwatch) or 00→59 (Countdown) the M cube changes in the same step, so both cubes may turn at once.
 5. The next target is prepared ahead and the last turn of each cube ends at the one-second boundary, as in the existing timers.
 
 ## Approach (recommended): a 3-PR stack
 Dependency: **PR #148 must be merged first** (S3 data, `MsController`, period handling). Until then the stack cannot start; PR #148 may still be restacked.
 1. **Stage generalization (shared with the H/M Counter plan).** `ClockStage` and the framing helpers take a cube count of two or three. The three-cube Live Clock stays unchanged and its tests stay green. If the H/M Counter lands this work first, this PR is dropped.
-2. **Pair controller with carry (shared).** One combined counter over a minor and a major unit (60-modulus for M/S; 60 and 24 for H/M) with a carry rule, owning two single-cube controllers. Generic in the unit moduli and cube controllers so that the H/M Counter and the M/S Timer use the same code. Unit tests with independent replay helpers.
+2. **Pair controller with carry (shared).** One combined counter over a minor and a major unit (60-modulus for M/S; 60 and 24 for H/M) with a carry rule, owning two single-cube controllers. [hm-counter.md](hm-counter.md) describes this controller as owning two `HsmController`s and must be aligned with the generic design in this work package (not changed by this plan). Generic in the unit moduli and cube controllers so that the H/M Counter and the M/S Timer use the same code. Unit tests with independent replay helpers.
 3. **M/S Timer application.** One-second profile on `WorkshopClock`, Stopwatch and Countdown, scheduler wiring per cube, controls like the existing timers, application choice, documentation, tests.
 
 ## Work packages
@@ -61,9 +62,9 @@ Dependency: **PR #148 must be merged first** (S3 data, `MsController`, period ha
 ## Acceptance criteria
 - The three-cube Live Clock, the M/S Counter, the 60-Minute Timer and the 5-Second Timer behave exactly as before.
 - Every displayed value 00:00 to 59:59 is reached by legal moves only, replayed by helpers independent of the controller (the converted S3 data and a separate cube model, not the controller's own state).
-- Carries are covered up and down: 00:59→01:00, 01:59→02:00, 58:59→59:00 and 59:00→58:59.
+- Carries are covered up and down: 00:59→01:00, 01:59→02:00, 58:59→59:00 and 59:00→58:59; and the 4-HTM minutes edges 14:59→15:00, 35:59→36:00 and 55:59→56:00 with their reverse steps, the worst case for open decision 2 (edges per `docs/MS_COUNTER.md` on PR #148).
 - The 59:59 boundary: Stopwatch stops at its end behavior chosen under open decision 3 and Countdown stops at 00:00; neither continues past it; the end state is a displayed value of the print.
-- Deadlines: the last turn of each cube ends at the one-second boundary within the documented 20 ms tolerance in deterministic scheduler tests; an infeasible budget or missed deadline is reported, not hidden.
+- Deadlines, for the Timer speeds that decision 8 admits (A5): the last turn of each cube ends at the one-second boundary within the documented 20 ms tolerance in deterministic scheduler tests; speeds with an infeasible budget are reported as such by the existing mechanism. An infeasible budget or missed deadline is reported, not hidden.
 - Pause and resume keep fractions (for example pausing at 12.5 s shows 00:12 and keeps the 0.5 s); Reset returns to the configured duration or zero.
 - Seconds cube lap: after 60 steps the display repeats while the full pose differs; the test replays two laps and checks the lap-aware pose.
 - No physical state is invented: only S3 period nodes and their saved words (or inverses) are played, and interrupted routes follow the PR #148 rules. Any new claim carries the SAT/UNSAT/UNKNOWN wording of `AGENTS.md`.
@@ -80,6 +81,7 @@ Still open:
 5. **Set and Reset targets.** Whether Set walks the period (as in PR #148) or jumps; Reset target when the cubes show a mid-period pose.
 6. **E2E gating.** Browser E2E on `main` was repaired by PR #162; the heavy lane runs only on the stack tip. Whether PR 1 and PR 2 need browser tests, or only PR 3, is undecided.
 7. **Naming.** Timer versus Counter, and the product name, are pending the owner.
+8. **Timer speed set.** Which speeds exist for a one-second timer. See A5: with one-second steps only low multipliers admit a feasible plan, so the 1x to 100x set of the existing timers cannot be kept as is for the deadline criterion; the set, or accepting infeasible reports at high speeds, is undecided.
 
 ## Out of scope
 - New puzzle prints, solvers or proofs, including M and S on one cube; the M3 print of PR #138; sticker sheets for S3; sub-second display; a wall-clock mode (the Live Clock covers it); changes to the 60-Minute and 5-Second Timers.
