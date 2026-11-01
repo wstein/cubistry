@@ -1,0 +1,128 @@
+cubistry.hm-counter.v2
+profile	blank
+letters	HM
+sticker	0	0	-1,-1,-1	-1,0,0	0,-1,0	H
+sticker	1	0	-1,-1,-1	0,-1,0	1,0,0	3
+sticker	2	0	-1,-1,-1	0,0,-1	0,1,0	7
+sticker	3	1	-1,-1,1	-1,0,0	0,0,-1	2
+sticker	4	1	-1,-1,1	0,-1,0	1,0,0	_
+sticker	5	1	-1,-1,1	0,0,1	0,1,0	0
+sticker	6	2	-1,1,-1	-1,0,0	0,0,1	3
+sticker	7	2	-1,1,-1	0,1,0	1,0,0	_
+sticker	8	2	-1,1,-1	0,0,-1	0,-1,0	1
+sticker	9	3	-1,1,1	-1,0,0	0,-1,0	4
+sticker	10	3	-1,1,1	0,1,0	0,0,-1	5
+sticker	11	3	-1,1,1	0,0,1	1,0,0	_
+sticker	12	4	1,-1,-1	1,0,0	0,1,0	9
+sticker	13	4	1,-1,-1	0,-1,0	1,0,0	H
+sticker	14	4	1,-1,-1	0,0,-1	-1,0,0	5
+sticker	15	5	1,-1,1	1,0,0	0,-1,0	M
+sticker	16	5	1,-1,1	0,-1,0	-1,0,0	8
+sticker	17	5	1,-1,1	0,0,1	0,1,0	0
+sticker	18	6	1,1,-1	1,0,0	0,0,1	6
+sticker	19	6	1,1,-1	0,1,0	0,0,-1	M
+sticker	20	6	1,1,-1	0,0,-1	0,-1,0	2
+sticker	21	7	1,1,1	1,0,0	0,-1,0	4
+sticker	22	7	1,1,1	0,1,0	0,0,-1	1
+sticker	23	7	1,1,1	0,0,1	0,1,0	M
+mode	M	59	-	0	60
+step	M	59	0	1	R' B	1
+step	M	59	1	2	R'	1
+step	M	59	2	3	B' R B2	2
+step	M	59	3	4	U R' U'	3
+step	M	59	4	5	R' B2 R'	3
+step	M	59	5	6	R' B' R	3
+step	M	59	6	7	R' B2 R	3
+step	M	59	7	8	B' R' B'	2
+step	M	59	8	9	R2 B2 R	2
+step	M	59	9	10	L' B2 D	3
+step	M	59	10	11	R' B	1
+step	M	59	11	12	R2 U R	1
+step	M	59	12	13	B R	2
+step	M	59	13	14	U R2 U'	3
+step	M	59	14	15	R' B R'	3
+step	M	59	15	16	R' B' R	3
+step	M	59	16	17	R' B' R2	3
+step	M	59	17	18	R2 U R	1
+step	M	59	18	19	R' B' R	3
+step	M	59	19	20	B' L2 D	3
+step	M	59	20	21	R' B	1
+step	M	59	21	22	R'	1
+step	M	59	22	23	R2	1
+step	M	59	23	24	R B' R	3
+step	M	59	24	25	B R2	2
+step	M	59	25	26	R B' R	3
+step	M	59	26	27	R' B' R	3
+step	M	59	27	28	B' R' B'	2
+step	M	59	28	29	R	1
+step	M	59	29	30	R2 D' L2	3
+step	M	59	30	31	U R2 U'	3
+step	M	59	31	32	R' B2 U2	3
+step	M	59	32	33	B2 R B'	2
+step	M	59	33	34	U R U'	3
+step	M	59	34	35	R2 B2 R2	2
+step	M	59	35	36	R2 U R2	3
+step	M	59	36	37	R' B R'	3
+step	M	59	37	38	U R U'	3
+step	M	59	38	39	R' B' R	3
+step	M	59	39	40	D' R L2	3
+step	M	59	40	41	R' B	1
+step	M	59	41	42	R' B2	1
+step	M	59	42	43	R B'	1
+step	M	59	43	44	U R' U'	3
+step	M	59	44	45	R' B R	3
+step	M	59	45	46	R B' R	3
+step	M	59	46	47	R' B' R	3
+step	M	59	47	48	R' B' R	3
+step	M	59	48	49	U R' U'	3
+step	M	59	49	50	D R' D2	3
+step	M	59	50	51	B2 R2 U	3
+step	M	59	51	52	U' R B2	1
+step	M	59	52	53	R' B' R	3
+step	M	59	53	54	R B' R	3
+step	M	59	54	55	B2 R2	2
+step	M	59	55	56	R B' R	2
+step	M	59	56	57	R' B2 R	3
+step	M	59	57	58	F' U' F	2
+step	M	59	58	59	R B2 R	2
+step	M	59	59	0	B2 L' D	3
+mode	H	23	U' B2 U B	0	24
+step	H	23	0	1	R' B' R	3
+step	H	23	1	2	U R' U'	3
+step	H	23	2	3	R' B' U	3
+step	H	23	3	4	R B'	1
+step	H	23	4	5	U R U'	3
+step	H	23	5	6	R U' B' U	3
+step	H	23	6	7	U' R2 B'	2
+step	H	23	7	8	U R' U'	3
+step	H	23	8	9	B R'	2
+step	H	23	9	10	D' L B L2	4
+step	H	23	10	11	R' B R	3
+step	H	23	11	12	U R' U'	3
+step	H	23	12	13	R' B'	1
+step	H	23	13	14	R B	1
+step	H	23	14	15	R' B2 R	3
+step	H	23	15	16	R' B R	3
+step	H	23	16	17	R B' R	3
+step	H	23	17	18	R' B R	3
+step	H	23	18	19	R2 U2 R U2	3
+step	H	23	19	20	R D' B	2
+step	H	23	20	21	U B2 R' U'	3
+step	H	23	21	22	R B R2	3
+step	H	23	22	23	F' U' F	2
+step	H	23	23	0	R L2 B D	3
+mode	H	11	U' B2 U B	0	12
+step	H	11	0	1	R' B' R	3
+step	H	11	1	2	U R' U'	3
+step	H	11	2	3	R' B' U	3
+step	H	11	3	4	U' R	1
+step	H	11	4	5	R U' B' U	3
+step	H	11	5	6	R' B R' B2	3
+step	H	11	6	7	U R2 U'	3
+step	H	11	7	8	R' B' R	3
+step	H	11	8	9	F2 L' F2	2
+step	H	11	9	10	L2 D L B	3
+step	H	11	10	11	R2 B2 R U2	3
+step	H	11	11	0	R D R' D	4
+claim	maxEdgeHTM	4
+end
