@@ -17,6 +17,10 @@ if [ -d "$HOME/.local/src/flixw" ] && command -v java >/dev/null; then
   [ -f "$bin_dir/flixw" ] && ln -sf "$bin_dir/flixw" "$HOME/.local/bin/flixw"
 fi
 
+if command -v fish >/dev/null; then
+  ln -sf "$(command -v fish)" "$HOME/.local/bin/fish"
+fi
+
 # Smoke checks
 mise ls --current
 java -version; julia --version; node --version; python3 --version; gcc --version | head -1
