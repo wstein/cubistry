@@ -21,14 +21,14 @@ Run, move counters, or camera. Both checkbox states use the same certified
 339-HTM traversal. The unchecked option is screen formatting; the permanent
 print/sticker identities remain unchanged.
 
-Drag to orbit and scroll to zoom. **Rotation Speed** has six stops: 2 s, 1 s,
-500 ms, 250 ms, 100 ms (default), and 50 ms per HTM move. It changes animation
+Drag to orbit and scroll to zoom. **Rotation Speed** has seven stops: 2 s, 1 s,
+500 ms, 250 ms, 100 ms (default), 50 ms, and 10 ms per HTM move. It changes animation
 only. The same **Run** button changes to **Stop** in place while work is active.
 Current state, session moves, the current move sequence, and **Reset session
 moves** are always visible together below the cube, above Rotation Speed.
-The 60-minute
-timer remains a future independent application under
-[issue #30](https://github.com/wstein/cubistry/issues/30). See
+The 60-minute timer is a separate application
+([Workshop timer](WORKSHOP_TIMER.md); background in
+[issue #30](https://github.com/wstein/cubistry/issues/30)). See
 [cube-first controls and verification](CUBE_FIRST_UI.md).
 
 The [certified route](COUNTER_CERTIFIED_TRAVERSAL.md) retains 339 committed

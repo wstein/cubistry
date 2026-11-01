@@ -28,11 +28,15 @@ The [Status Cube reference](STATUS_CUBE.md) is a small declarative workflow
 prototype with six fixed physical faces and local simulated events. Open
 `status.html` directly or select it from the counter's application chooser.
 
-Pages URL: https://wstein.github.io/cubistry/. As of 2026-11-01 the site
-answers with HTTP 200 and serves the counter (`index.html`) and the live clock
-(`clock.html`), published by the main-only Pages workflow. (Earlier revisions of
-this text said publication still awaited the first human-approved merge and
-the first successful run; that is no longer accurate.) The static counter needs no
+Pages URL: https://wstein.github.io/cubistry/. On 2026-11-01 the site
+answered HTTP 200 for `/cubistry/`, `/clock.html` and `/calendar.html` and served
+the counter and live clock. Publication path as read from the workflows: when the
+repository variable `PAGES_PREVIEWS_ENABLED` is not `true`, the `deploy` job of
+`.github/workflows/pages.yml` publishes from main; otherwise that job is skipped
+and `.github/workflows/pages-publish.yml` ("Reconcile Pages previews") publishes
+production through the `gh-pages` branch (see [PR previews](PAGES_PREVIEWS.md)).
+The variable's value cannot be read from here; recent main runs skipped the
+`deploy` job, which is consistent with the second path. The static counter needs no
 dev server. The existing solver acceptance page remains development-only.
 
 This MVP preview is separate from the selective Hugo/documentation roadmap in
