@@ -1,0 +1,16 @@
+218	0/month	23/30/red	(-3, -3)	unmatchable-cells=0
+219	D/month	24/31/red	(-3, -3)	unmatchable-cells=0
+220	N/month	/blank	(-3, -3)	unmatchable-cells=0
+25	/blank	D/month	(-3, -2)	unmatchable-cells=7
+74	/blank	N/month	(-3, -2)	unmatchable-cells=7
+278	C/month	/blank	(-3, -2)	unmatchable-cells=7
+283	E/month	/blank	(-3, -2)	unmatchable-cells=7
+228	V/month	O/month	(-3, -1)	unmatchable-cells=3
+261	T/month	E/month	(-3, -1)	unmatchable-cells=3
+35	/blank	C/month	(-3, 0)	unmatchable-cells=1
+134	/blank	T/month	(-3, 0)	unmatchable-cells=1
+135	/blank	V/month	(-3, 0)	unmatchable-cells=1
+224	30↶/red	/blank	(-3, 1)	unmatchable-cells=0
+243	31↶/red	/blank	(-3, 1)	unmatchable-cells=0
+4	/blank	24/31/dark	(-3, 2)	unmatchable-cells=0
+193	31↶/dark	/blank	(-2, 1)	unmatchable-cells=0
