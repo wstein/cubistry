@@ -227,7 +227,9 @@ Both verifiers accept the chain with identical receipts
 
 In total the chain has **2458 HTM**. These are search results from one
 deterministic heuristic run. They are not
-optimal and are not compared with the PR #99 chains. The orbit-solve edges
+optimal. This chain is not compared with the PR #99 chains here; section B
+below compares different 12-edge chains (December 2026 to December 2027)
+under the same search. The orbit-solve edges
 (over 400 HTM) are much longer than the global-search edges, which shows how
 weak the fallback is, not a property of the layout. No move savings are
 claimed. The total must not be compared with the PR #130 35-edge chain average
@@ -330,13 +332,15 @@ The HTM values are search results: not optimal.
 | PR #99, generous | 3538 | 294.8 | 391 | 461 | 8 | 111.0 | 1109 |
 | pure, generous | 3649 | 304.1 | 424 | 479 | 8 | 119.0 | 1075 |
 
-The wall times were measured with four runs sharing four cores. In earlier
-single runs, the same search took about 400 seconds per edge.
+The wall times were measured with four runs sharing four cores. (An earlier,
+unlogged observation of single runs was about 400 seconds per edge; no evidence
+file backs it.)
 
 **Reading:**
 
-- Every total is dominated by the orbit-solve fallback (roughly 350 to 490 HTM
-  per fallback edge). Edges the beam completes cost about 55 to 140 HTM on
+- Every total is dominated by the orbit-solve fallback, mostly 340 to 490 HTM
+  per fallback edge (range 64 to 490; the 2027-2 → 2027-3 fallback costs only
+  64 to 78 HTM in all four chains). Edges the beam completes cost about 55 to 140 HTM on
   either print.
 - At the default budget, the beam stalls on 10 of 12 pure-split edges against
   7 of 12 PR #99 edges, so the pure-split total is 27% higher.
@@ -366,12 +370,16 @@ clearly worse**.
 - **Size:** 875 edges (January 2027 to December 2099), plus the December 2026
   → January 2027 edge if wanted.
 - **Time:**
-  - About 400 to 700 seconds per edge with this search: about 400 alone, about
-    650 with four runs sharing four cores.
+  - About 633 to 698 seconds per edge at the default budget, measured with
+    four runs sharing four cores. Single runs may be faster (an unlogged
+    earlier observation was about 400 seconds).
   - Sequentially that is **roughly 100 to 170 hours (4 to 7 days)** at the
-    default budget, and about twice that at the generous budget.
+    default budget. The generous budget took 1075 to 1109 seconds per edge,
+    about 1.6 to 1.7 times as long.
 - **Memory:** about 1.6 GB per search process (measured). Four parallel
-  processes fit in 15 GB.
+  search processes fit in 15 GB. Four parallel Flix chain verifiers with
+  `-Xmx6g` were OOM-killed on a 15 GB machine: run them one at a time or with a
+  smaller heap.
 - **Parallelism is limited.** A continuous chain carries one physical state, so
   edge k+1 cannot start before edge k ends.
   - **Parallel per-year segments** would each start from the DAG root of their
@@ -390,9 +398,9 @@ clearly worse**.
     already does with `PREFIX_EDGES`;
   - pin each verified segment's receipts.
 - **Risks:**
-  - On this sample, the orbit-solve fallback ran on 8 to 10 of 12 edges, at
-    350 to 490 HTM each. Extrapolated that is roughly 260,000 to 300,000 HTM
-    for 875 edges.
+  - On this sample, the orbit-solve fallback ran on 8 to 10 of 12 edges,
+    mostly at 340 to 490 HTM each (range 64 to 490). The run means per edge
+    (270 to 342 HTM) times 875 edges give roughly 236,000 to 300,000 HTM.
   - A better fallback, or a refined producer like PR #130's, is the main lever
     for move counts. Whether it helps the pure split is UNKNOWN.
   - A stall that the orbit solve also fails on would stop the chain. This did
