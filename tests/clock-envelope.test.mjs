@@ -38,7 +38,7 @@ test('actual stage fitting retains depth coverage at narrow aspects and explicit
   const { ClockStage }=await import('../src/apps/clock/stage.ts');
   for(const aspect of [.001,.01,.03,.25,2.3])for(const zoom of [.8,1,2]){
     const camera=new PerspectiveCamera(28,aspect,.1,1000), presentation={quaternion:clockDefaultQuaternion};
-    const stage=Object.assign(Object.create(ClockStage.prototype),{camera,presentation,zoom,updatePresentationBounds(){}});
+    const stage=Object.assign(Object.create(ClockStage.prototype),{camera,presentation,zoom,cubeCount:3,updatePresentationBounds(){}});
     stage.fitCamera();camera.updateMatrixWorld();
     assert.equal(camera.position.z,clockCameraRadius(aspect)*zoom);
     for(const center of clockCenters)for(const offset of [-clockCubeRadius,clockCubeRadius]){

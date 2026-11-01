@@ -252,7 +252,7 @@ test("real shared viewport construction rotates all three placements rigidly abo
   const scene = new THREE.Scene(), presentation = new THREE.Group(); scene.add(presentation);
   const camera = new THREE.PerspectiveCamera(), renderer = {};
   const stage = Object.assign(Object.create(ClockStage.prototype), {
-    scene, presentation, camera, renderer, cubes: [], appearanceControls: { setDefaultColor() {} },
+    scene, presentation, camera, renderer, cubes: [], cubeCount: 3, appearanceControls: { setDefaultColor() {} },
     appearance: { construction: "stickered", frameColor: null },
   });
   const cubes = [0, 1, 2].map(i => stage.createCube({}, i));
@@ -285,7 +285,7 @@ test("production shared gestures inspect rear/bottom and preserve rigid placemen
  const initial=new THREE.Quaternion().setFromEuler(new THREE.Euler(.16,-.2,0)),h=rotationHarness({root,initial,sensitivity:.004,threshold:0});
  const camera=new THREE.PerspectiveCamera(28,1,.1,1000);camera.position.set(0,0,30);camera.lookAt(0,0,0);
  const studio=createPresentationStudio(scene,1,4.3);
- const stage=Object.assign(Object.create(ClockStage.prototype),{scene,presentation:root,camera,renderer:{},cubes:[],zoom:1.8,rotation:h.binding,studio,casterCenters:[new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3()],
+ const stage=Object.assign(Object.create(ClockStage.prototype),{scene,presentation:root,camera,renderer:{},cubes:[],cubeCount:3,zoom:1.8,rotation:h.binding,studio,casterCenters:[new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3()],
  appearance:DEFAULT_APPEARANCE,appearanceControls:{setDefaultColor(){}}});
  const assets={textureOrigin:"bottom-left",images:new Map(design.assets.images.map(image=>[image.id,{width:64,height:64}])),materials:new Map(design.assets.materials.map(material=>[material.id,material]))};
  const cubes=[0,1,2].map(i=>stage.createCube({},i));cubes.forEach(c=>c.configure(design.print,state,assets));
