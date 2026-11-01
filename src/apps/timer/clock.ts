@@ -18,6 +18,13 @@ export const FIVE_SECOND_TIMER: TimerProfile = Object.freeze({
   defaultSeconds: 1800,
   stepName: "five-second",
 });
+/** M/S Timer: whole seconds, 00:00–59:59, Countdown default 15:00. */
+export const ONE_SECOND_TIMER: TimerProfile = Object.freeze({
+  stepSeconds: 1,
+  maxSeconds: 3599,
+  defaultSeconds: 900,
+  stepName: "one-second",
+});
 const durationError = (p: TimerProfile) =>
   `Duration must be 00:00–${formatTimer(p.maxSeconds / p.stepSeconds, p)} in ${p.stepName} steps`;
 
@@ -167,11 +174,11 @@ export function formatTimer(
     bucket > profile.maxSeconds / profile.stepSeconds
   )
     throw Error("Invalid timer bucket");
-  return formatLiveTimer(bucket * profile.stepSeconds);
+  return formatLiveTimer(bucket * profile.stepSeconds, profile.maxSeconds);
 }
 /** One-second control-panel readout; physical targets use application-specific buckets. */
-export function formatLiveTimer(seconds: number): string {
-  if (!Number.isInteger(seconds) || seconds < 0 || seconds > 3590)
+export function formatLiveTimer(seconds: number, maxSeconds = 3590): string {
+  if (!Number.isInteger(seconds) || seconds < 0 || seconds > maxSeconds)
     throw Error("Invalid live timer seconds");
   return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 }
