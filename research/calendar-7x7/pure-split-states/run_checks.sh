@@ -30,3 +30,11 @@ record matchability - "$js" "$fs"
 run_case new-dag-all "$out/dag-all.tsv" all
 run_case pr99-dag-all "$out/pr99-dag.tsv" all
 cat "$out/cases.tsv"
+# The 2027 chain (January to December, one retained state) under both chain verifiers.
+js=0; "$julia_bin" --startup-file=no "$here/pure_chain.jl" "$here/evidence/print-pure-A.tsv" "$out/dag-all.tsv" "$here/evidence/chain-2027.moves.tsv" > "$out/chain-2027.julia.stdout" 2> "$out/chain-2027.julia.stderr" || js=$?
+fs=0; java -Dstdout.encoding=UTF-8 -Xmx8g -jar "$jar" chain "$here/evidence/print-pure-A.tsv" "$out/dag-all.tsv" "$here/evidence/chain-2027.moves.tsv" "$cal/english/evidence" "$cal/en-physical-review" > "$out/chain-2027.flix.stdout" 2> "$out/chain-2027.flix.stderr" || fs=$?
+grep -E '^(source|edge|metrics|endpoint|status)' "$out/chain-2027.julia.stdout" > "$out/chain-2027.julia.tsv" || true
+grep -E '^(source|edge|metrics|endpoint|status)' "$out/chain-2027.flix.stdout" > "$out/chain-2027.flix.tsv" || true
+same=DIFFERENT; cmp -s "$out/chain-2027.julia.tsv" "$out/chain-2027.flix.tsv" && same=IDENTICAL
+printf '%s\t%s\t%s\t%s\t%s\t%s\n' chain-2027 2027 "$js" "$fs" "$same" "$(grep '^status' "$out/chain-2027.julia.tsv" | tr '\t' ' ')" >> "$out/cases.tsv"
+tail -n 1 "$out/cases.tsv"
