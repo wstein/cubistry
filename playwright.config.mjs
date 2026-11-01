@@ -14,7 +14,7 @@ const lowEffects = {
 // millisecond precision are slow in software GL, so they run in their own job with a longer per-test limit.
 // CUBISTRY_E2E_GROUP=fast runs everything else, =timing only these files; unset (the default) runs all of them.
 export const timingSpecs = [
-  "cube-first-ui", "five-second-timer", "leading-zero", "live-clock", "workshop-timer",
+  "cube-first-ui", "five-second-timer", "leading-zero", "live-clock", "status-cube", "workshop-timer",
 ].map(name => `**/${name}.spec.mjs`);
 const group = process.env.CUBISTRY_E2E_GROUP;
 if (group !== undefined && group !== "" && group !== "fast" && group !== "timing")
