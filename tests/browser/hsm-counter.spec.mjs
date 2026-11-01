@@ -167,6 +167,9 @@ test("single HSM counter defaults to 100 ms for H, M and S and stays freely adju
   // Changing the unit resets the slider to that unit's default.
   for (const letter of ["M", "S", "H", "M"]) {
     await page.selectOption("#hsm-letter", letter);
+    // The default is applied after the asynchronous reconfiguration; every default is "4", so the slider value
+    // alone cannot show that it ran. The status line is updated right after it.
+    await expect(page.locator("#status")).toContainText(letter + " · 00");
     await settled(page, 0);
     await expect(slider).toHaveValue(defaults[letter][0]);
     await expect(slider).toHaveAttribute(
