@@ -953,28 +953,39 @@ $("timer-speed").addEventListener("change", () =>
     tick();
   }),
 );
+const normalizeAppKey = (req) => {
+  if (!req) return "certified";
+  const stripped = req.replace(/\.html$/, "");
+  if (stripped === "index" || stripped === "counter") return "certified";
+  if (stripped === "clock") return "live-clock";
+  if (stripped === "status") return "status-cube";
+  return stripped;
+};
+
+const syncApplicationSelect = (appKey) => {
+  const select = $("application");
+  if (!select) return;
+  const targetVal = appKey === "certified" ? "index.html" : `${appKey}.html`;
+  if ([...select.options].some((o) => o.value === targetVal)) {
+    select.value = targetVal;
+  } else if ([...select.options].some((o) => o.value === appKey)) {
+    select.value = appKey;
+  }
+};
+
 async function switchApplication(requested) {
-  if (
-    ["live-clock", "calendar", "status-cube", "playground", "ms-timer", "chronocube"].includes(
-      requested,
-    )
-  ) {
-    location.assign(
-      new URL(
-        requested === "chronocube"
-          ? "chronocube.html"
-          : requested === "playground"
-            ? "playground.html"
-            : requested === "calendar"
-              ? "calendar.html"
-              : requested === "status-cube"
-                ? "status.html"
-                : requested === "ms-timer"
-                  ? "ms-timer.html"
-                  : "clock.html",
-        location.href,
-      ),
-    );
+  const targetKey = normalizeAppKey(requested);
+  const externalMap = {
+    "chronocube": "chronocube.html",
+    "playground": "playground.html",
+    "calendar": "calendar.html",
+    "status-cube": "status.html",
+    "ms-timer": "ms-timer.html",
+    "live-clock": "clock.html",
+    "picture3": "picture3.html",
+  };
+  if (externalMap[targetKey]) {
+    location.assign(new URL(externalMap[targetKey], location.href));
     return;
   }
   if (application === "certified" && view) rememberedCounterValue = view.currentValue;
@@ -989,8 +1000,8 @@ async function switchApplication(requested) {
     };
     const resolveAssets = (manifest, prints, signal) =>
       loadAssets(manifest, prints, signal, import.meta.env.BASE_URL);
-    if (requested === "hsm-counter" || requested === "hm-one-cube") {
-      const hm = requested === "hm-one-cube";
+    if (targetKey === "hsm-counter" || targetKey === "hm-one-cube") {
+      const hm = targetKey === "hm-one-cube";
       hsmVariantUi(hm);
       candidate = new HsmController(
         viewer,
@@ -1004,24 +1015,24 @@ async function switchApplication(requested) {
       // The selected range decides which saved counting period is installed.
       candidate.setMode(hsmMaximum(), Number($("hsm-direction").value));
       await candidate.configure();
-    } else if (requested === "ms-counter") {
+    } else if (targetKey === "ms-counter") {
       candidate = await msController(callback);
       await candidate.configure();
-    } else if (requested === "tenth-counter") {
+    } else if (targetKey === "tenth-counter") {
       candidate = new MsTimerTenthCube(
         viewer,
-        tenthManifest(undefined, undefined, undefined, requested),
+        tenthManifest(undefined, undefined, undefined, targetKey),
         callback,
         resolveAssets,
       );
       await candidate.configure();
-    } else if (requested === "timer" || requested === "five-second-timer") {
+    } else if (targetKey === "timer" || targetKey === "five-second-timer") {
       const profile =
-        requested === "five-second-timer"
+        targetKey === "five-second-timer"
           ? FIVE_SECOND_TIMER
           : TEN_SECOND_TIMER;
       const route =
-        requested === "five-second-timer"
+        targetKey === "five-second-timer"
           ? (fiveSecondRoute ??= await loadFiveSecondRoute(
               import.meta.env.BASE_URL,
             ))
@@ -1029,7 +1040,7 @@ async function switchApplication(requested) {
       candidate = new TimerController(
         viewer,
         route,
-        getActiveManifest(undefined, undefined, undefined, requested),
+        getActiveManifest(undefined, undefined, undefined, targetKey),
         callback,
         resolveAssets,
       );
@@ -1061,17 +1072,24 @@ async function switchApplication(requested) {
     timerScheduler.invalidate();
     previous?.dispose();
     view = candidate;
-    application = requested;
+    application = targetKey;
     try {
-      const nextUrl = new URL(location.href);
-      if (requested === "certified") nextUrl.searchParams.delete("application");
-      else nextUrl.searchParams.set("application", requested);
+      const targetFile = targetKey === "certified" ? "index.html" : `${targetKey}.html`;
+      const nextUrl = new URL(targetFile, location.href);
+      if (location.search) {
+        const sp = new URLSearchParams(location.search);
+        if (sp.has("application")) {
+          sp.set("application", targetKey);
+          nextUrl.search = sp.toString();
+        }
+      }
       history.replaceState(null, "", nextUrl);
-      localStorage.setItem("cubistry_app", requested);
+      localStorage.setItem("cubistry_app", targetKey);
     } catch {}
+    syncApplicationSelect(application);
     if (!isTimer()) value = view.currentValue;
     const timerName =
-      requested === "five-second-timer" ? "5-Second Timer" : "60-Minute Timer";
+      targetKey === "five-second-timer" ? "5-Second Timer" : "60-Minute Timer";
     text("timer-heading", timerName);
     $("timer-controls").setAttribute("aria-label", `${timerName} controls`);
     $("rotation-speed").value = isTimer()
@@ -1089,7 +1107,7 @@ async function switchApplication(requested) {
   } catch (e) {
     candidate?.dispose();
     ready = true;
-    $("application").value = application;
+    syncApplicationSelect(application);
     // The previous controller keeps running: restore its controls exactly.
     restoreHsmUi(savedUi);
     error(e.message);
@@ -1107,7 +1125,7 @@ $("application").addEventListener("change", async () => {
     tenthRunning ||
     (isTimer() && clock?.running && !clock?.elapsed)
   ) {
-    $("application").value = application;
+    syncApplicationSelect(application);
     return;
   }
   await switchApplication($("application").value);
@@ -1485,10 +1503,27 @@ async function initialize() {
       );
     }
     speedUi();
-    const requested =
+    const pathAppMap = {
+      timer: "timer",
+      "five-second-timer": "five-second-timer",
+      "tenth-counter": "tenth-counter",
+      "hsm-counter": "hsm-counter",
+      "ms-counter": "ms-counter",
+      "hm-one-cube": "hm-one-cube",
+      counter: "certified",
+    };
+    const pathMatch = location.pathname.match(/\/([^/]+)\.html$/);
+    const pathApp = pathMatch ? pathAppMap[pathMatch[1]] : undefined;
+    const defaultApp = document.body.dataset.defaultApplication;
+    const requested = normalizeAppKey(
       new URLSearchParams(location.search).get("application") ||
-      localStorage.getItem("cubistry_app") ||
-      "certified";
+        defaultApp ||
+        pathApp ||
+        (location.pathname.endsWith(".html") && !location.pathname.endsWith("/index.html")
+          ? undefined
+          : localStorage.getItem("cubistry_app")) ||
+        "certified",
+    );
     if (
       requested !== "certified" &&
       [
@@ -1501,7 +1536,7 @@ async function initialize() {
         "tenth-counter",
       ].includes(requested)
     ) {
-      $("application").value = requested;
+      syncApplicationSelect(requested);
       await switchApplication(requested);
       return;
     }
