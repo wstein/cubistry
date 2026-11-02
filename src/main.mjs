@@ -139,7 +139,7 @@ const msShift = (delta) => (value + delta + 60) % 60;
 let tenthRunning = false,
   tenthNextAt = 0;
 const isTenth = () => application === "tenth-counter";
-const tenthShift = (delta) => (value + delta + 10) % 10;
+const tenthShift = (delta) => ((value + delta) % 10 + 10) % 10;
 const hsmMaximum = () => Number($("hsm-range").value);
 const hsmShift = (delta) =>
   (value + delta + hsmMaximum() + 1) % (hsmMaximum() + 1);
@@ -217,11 +217,16 @@ function controlsUi() {
   $("tenth-controls").hidden = !isTenth();
   for (const el of $("tenth-controls").querySelectorAll("button,input,select"))
     el.disabled = !ready;
-  for (const id of ["tenth-direction", "tenth-speed"])
-    $(id).disabled = !ready || !!view?.busy || tenthRunning;
   $("tenth-run").textContent =
     tenthRunning || (isTenth() && view?.busy) ? "Stop" : "Run";
   $("tenth-run").setAttribute("aria-pressed", String(tenthRunning));
+  if (isTenth()) {
+    for (const btn of document.querySelectorAll("[data-tenth-target]")) {
+      const active = Number(btn.dataset.tenthTarget) === value;
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", String(active));
+    }
+  }
   $("timer-controls").hidden = !isTimer();
   $("timer-start").disabled = !ready || (clock.elapsed && !durationDirty);
   $("timer-start").textContent = clock.running
@@ -574,6 +579,16 @@ $("rotation-speed").addEventListener("input", () => {
 });
 $("tenth-speed").addEventListener("change", () => {
   speedUi();
+  if (tenthRunning) {
+    const interval = Number($("tenth-speed").value) || DEFAULT_TENTH_STEP_INTERVAL;
+    tenthNextAt = Math.min(tenthNextAt, performance.now() + interval);
+    if (!view?.busy) tick();
+  }
+});
+$("tenth-direction").addEventListener("change", () => {
+  if (tenthRunning && !view?.busy && performance.now() >= tenthNextAt) {
+    tick();
+  }
 });
 function tick() {
   if (!ready) return;
@@ -1230,26 +1245,14 @@ for (const button of document.querySelectorAll("[data-tenth-delta]"))
       request(tenthShift(Number(button.dataset.tenthDelta)));
     }),
   );
-$("tenth-reset").addEventListener("click", () =>
-  action(() => {
-    if (ready && isTenth()) {
+for (const button of document.querySelectorAll("[data-tenth-target]"))
+  button.addEventListener("click", () =>
+    action(() => {
+      if (!ready || !isTenth()) return;
       stopTenth();
-      request(0);
-    }
-  }),
-);
-$("tenth-set-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  action(() => {
-    if (!ready || !isTenth()) return;
-    const raw = $("tenth-value").value.trim(),
-      n = Number(raw);
-    if (!/^\d$/.test(raw) || n < 0 || n > 9)
-      throw Error("Enter an integer from 0 to 9.");
-    stopTenth();
-    request(n);
-  });
-});
+      request(Number(button.dataset.tenthTarget));
+    }),
+  );
 $("ms-letter").addEventListener("change", async () => {
   if (!ready || !isMs() || msRunning || view.busy) return;
   const previous = view;
