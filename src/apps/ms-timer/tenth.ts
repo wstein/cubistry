@@ -260,6 +260,79 @@ export const TENTH_RUN: MsRun = (() => {
   });
 })();
 
+const TENTH_BFS_GENERATORS = [
+  "L",
+  "L'",
+  "L2",
+  "D",
+  "D'",
+  "D2",
+  "B",
+  "B'",
+  "B2",
+] as const;
+
+const TENTH_PARSED_GENERATORS = TENTH_BFS_GENERATORS.map((m) => parseAlg(m));
+
+function serializeCubeState(state: CubeState): string {
+  return JSON.stringify(state);
+}
+
+/**
+ * Finds the shortest path in {L, D, B} from any state to tenthTarget(value),
+ * preferring period nodes when multiple shortest paths exist.
+ */
+export function findTenthRoute(
+  fromState: CubeState,
+  toValue: number,
+  periodNodes?: readonly CubeState[],
+): readonly LegalMove[] {
+  demand(
+    Number.isInteger(toValue) && toValue >= 0 && toValue < TENTH_MODULUS,
+    "Invalid tenth target value",
+  );
+  if (matchesTarget(TENTH_PRINT, fromState, tenthTarget(toValue))) return [];
+
+  const q: Array<{ st: CubeState; path: LegalMove[] }> = [
+    { st: fromState, path: [] },
+  ];
+  const visited = new Set<string>([serializeCubeState(fromState)]);
+  let bestCandidate: LegalMove[] | null = null;
+  let minDepth = Infinity;
+
+  while (q.length > 0) {
+    const { st, path } = q.shift()!;
+    if (path.length > minDepth) break;
+
+    if (matchesTarget(TENTH_PRINT, st, tenthTarget(toValue))) {
+      minDepth = path.length;
+      if (!bestCandidate) {
+        bestCandidate = path;
+      }
+      if (periodNodes && stateEquals(st, periodNodes[toValue])) {
+        return path;
+      }
+      continue;
+    }
+
+    if (path.length >= 4) continue;
+    for (let i = 0; i < TENTH_PARSED_GENERATORS.length; i++) {
+      const parsed = TENTH_PARSED_GENERATORS[i];
+      if (path.length > 0) {
+        const last = path[path.length - 1];
+        if (last.face === parsed[0].face) continue;
+      }
+      const nextSt = applyMoves(st, parsed);
+      const k = serializeCubeState(nextSt);
+      if (!visited.has(k)) {
+        visited.add(k);
+        q.push({ st: nextSt, path: [...path, parsed[0]] });
+      }
+    }
+  }
+  return bestCandidate ?? [];
+}
+
 /**
  * The 1/10-second cube of the M/S Timer: replays the Period-1 closed {L, D, B}
  * sequence `L | L | B L | B L | D | B D | B L | D | L | D` on `TENTH_PRINT`
@@ -353,26 +426,14 @@ export class MsTimerTenthCube extends PhysicalPlayback implements TimerCube {
       this.planned = this.prepared.moves;
       return this.prepared.target;
     }
-    const fromNode = this.node;
-    if (fromNode >= 0 && fromNode < TENTH_MODULUS) {
-      const canonicalAlg = TENTH_CANONICAL_SHORTEST_PATHS[fromNode][value];
-      if (canonicalAlg !== undefined) {
-        const moves = parseAlg(canonicalAlg);
-        const target = this.period.nodes[value];
-        this.planned = moves;
-        this.prepared = { source: this.state, value, moves, target };
-        return target;
-      }
-    }
-    const route = this.period.route(this.state, value);
-    demand(route, "Tenth-second pose is not on the saved period");
-    this.planned = route.moves;
-    const target = applyMoves(this.state, route.moves);
+    const moves = findTenthRoute(this.state, value, this.period.nodes);
+    const target = applyMoves(this.state, moves);
     demand(
-      stateEquals(target, this.period.nodes[route.node]),
-      "Tenth-second route missed its period node",
+      matchesTarget(TENTH_PRINT, target, tenthTarget(value)),
+      "Tenth-second route failed to match target display",
     );
-    this.prepared = { source: this.state, value, moves: route.moves, target };
+    this.planned = moves;
+    this.prepared = { source: this.state, value, moves, target };
     return target;
   }
 

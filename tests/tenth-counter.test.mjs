@@ -153,3 +153,36 @@ test("all 90 tenth transitions loaded from file are verified against tenthTarget
   assert.equal(counts[4], 3);
   assert.equal(counts[1] + counts[2] + counts[3], 87); // 96.7% <= 3 moves
 });
+
+test("findTenthRoute transitions 3 <-> 6 in a single L2 move", async () => {
+  const {
+    TENTH_PRINT,
+    TENTH_WORDS,
+    findTenthRoute,
+    tenthTarget,
+  } = await import("../src/apps/ms-timer/tenth.ts");
+
+  let st3 = initialState(TENTH_PRINT);
+  for (let i = 0; i < 3; i++) {
+    st3 = applyMoves(st3, parseAlg(TENTH_WORDS[i]));
+  }
+  assert(matchesTarget(TENTH_PRINT, st3, tenthTarget(3)));
+
+  // From state 3 to 6
+  const to6 = findTenthRoute(st3, 6);
+  assert.equal(to6.length, 1, "3 to 6 must be 1 move");
+  assert.equal(to6[0].face, "L");
+  assert.equal(to6[0].turns, 2, "3 to 6 must be L2");
+
+  const st6 = applyMoves(st3, to6);
+  assert(matchesTarget(TENTH_PRINT, st6, tenthTarget(6)));
+
+  // From state 6 back to 3
+  const backTo3 = findTenthRoute(st6, 3);
+  assert.equal(backTo3.length, 1, "6 back to 3 must be 1 move");
+  assert.equal(backTo3[0].face, "L");
+  assert.equal(backTo3[0].turns, 2, "6 back to 3 must be L2");
+
+  const backSt3 = applyMoves(st6, backTo3);
+  assert(matchesTarget(TENTH_PRINT, backSt3, tenthTarget(3)));
+});
