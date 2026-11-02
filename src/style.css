@@ -373,3 +373,219 @@ h1 {
   width: 100%;
   min-width: 0;
 }
+
+/* ==========================================================================
+   Segmented Appearance Popover (Glassmorphism Flyout)
+   ========================================================================== */
+.cube-appearance {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 30;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.cube-appearance summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-navy, #153b61);
+  background: rgba(255, 253, 246, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(21, 59, 97, 0.22);
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(21, 59, 97, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cube-appearance summary::-webkit-details-marker {
+  display: none;
+}
+
+.cube-appearance summary::before {
+  content: "⚙";
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-plastic-berry, #9e0b5c);
+  transition: transform 0.2s ease;
+}
+
+.cube-appearance summary::after {
+  content: "▾";
+  font-size: 12px;
+  margin-left: 2px;
+  opacity: 0.65;
+  transition: transform 0.2s ease;
+}
+
+.cube-appearance summary:hover {
+  background: #ffffff;
+  border-color: var(--color-plastic-berry, #9e0b5c);
+  color: var(--color-plastic-berry, #9e0b5c);
+  box-shadow: 0 6px 20px rgba(158, 11, 92, 0.16);
+  transform: translateY(-1px);
+}
+
+.cube-appearance[open] summary {
+  background: var(--color-plastic-berry, #9e0b5c);
+  color: #ffffff;
+  border-color: var(--color-plastic-berry, #9e0b5c);
+  box-shadow: 0 6px 20px rgba(158, 11, 92, 0.25);
+}
+
+.cube-appearance[open] summary::before {
+  color: #ffffff;
+  transform: rotate(45deg);
+}
+
+.cube-appearance[open] summary::after {
+  transform: rotate(180deg);
+  opacity: 0.9;
+}
+
+/* Glassmorphism Flyout Card */
+.cube-appearance-popover {
+  margin-top: 10px;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgba(255, 253, 246, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(21, 59, 97, 0.18);
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(21, 59, 97, 0.16), 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  animation: appearancePopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes appearancePopIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Segmented Tabs Bar */
+.cube-appearance-tabs {
+  display: flex;
+  background: rgba(21, 59, 97, 0.08);
+  padding: 3px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  gap: 2px;
+}
+
+.cube-appearance-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  color: rgba(21, 59, 97, 0.75);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.cube-appearance-tab:hover {
+  color: var(--color-ink-navy, #153b61);
+}
+
+.cube-appearance-tab.active {
+  background: #ffffff;
+  color: var(--color-plastic-berry, #9e0b5c);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Content Sections */
+.cube-appearance-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cube-appearance label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-navy, #153b61);
+  margin-top: 4px;
+}
+
+.cube-appearance select {
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(21, 59, 97, 0.2);
+  background: #ffffff;
+  color: var(--color-ink-navy, #153b61);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.cube-appearance select:focus {
+  outline: none;
+  border-color: var(--color-plastic-berry, #9e0b5c);
+  box-shadow: 0 0 0 2px rgba(158, 11, 92, 0.2);
+}
+
+.cube-appearance input[type="color"] {
+  width: 36px;
+  height: 26px;
+  padding: 1px;
+  border-radius: 6px;
+  vertical-align: middle;
+  border: 1px solid rgba(21, 59, 97, 0.2);
+  cursor: pointer;
+}
+
+.cube-appearance button {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid rgba(21, 59, 97, 0.2);
+  background: #ffffff;
+  color: var(--color-ink-navy, #153b61);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cube-appearance button:hover:not(:disabled) {
+  border-color: var(--color-plastic-berry, #9e0b5c);
+  color: var(--color-plastic-berry, #9e0b5c);
+}
+
+.cube-appearance button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cube-appearance p {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #556677;
+  margin: 4px 0 0;
+}
+

@@ -154,9 +154,9 @@ async function initialize() {
         ],
       };
     }
-    let currentDisplay = "dseg7";
-    let currentMarker = "off";
-    let currentLetterFont = "same";
+    let currentDisplay = localStorage.getItem("cubistry_clock_digit_font") || "noto-sans";
+    let currentMarker = localStorage.getItem("cubistry_clock_marker") || "off";
+    let currentLetterFont = localStorage.getItem("cubistry_clock_letter_font") || "same";
     let manifest = createClockManifest(currentDisplay, currentMarker, currentLetterFont);
     const results = await Promise.allSettled(
       names.map(() =>
@@ -190,12 +190,12 @@ async function initialize() {
       displaySelect.id = "clock-display";
       displaySelect.setAttribute("aria-label", "Digit font display");
       displaySelect.innerHTML = `
-        <option value="dseg7" selected>7-Segment (DSEG7)</option>
-        <option value="dseg14">14-Segment (DSEG14)</option>
-        <option value="noto-sans">Noto Sans (Calendar Standard)</option>
-        <option value="quicksand">Quicksand (Rounded Geometric)</option>
-        <option value="outfit">Outfit (Clean Geometric)</option>
-        <option value="classic">Classic (Geometric)</option>
+        <option value="noto-sans"${currentDisplay === "noto-sans" ? " selected" : ""}>Noto Sans (Calendar Standard)</option>
+        <option value="dseg7"${currentDisplay === "dseg7" ? " selected" : ""}>7-Segment (DSEG7)</option>
+        <option value="dseg14"${currentDisplay === "dseg14" ? " selected" : ""}>14-Segment (DSEG14)</option>
+        <option value="quicksand"${currentDisplay === "quicksand" ? " selected" : ""}>Quicksand (Rounded Geometric)</option>
+        <option value="outfit"${currentDisplay === "outfit" ? " selected" : ""}>Outfit (Clean Geometric)</option>
+        <option value="classic"${currentDisplay === "classic" ? " selected" : ""}>Classic (Geometric)</option>
       `;
       displayLabel.append(displaySelect);
 
@@ -207,12 +207,12 @@ async function initialize() {
       letterSelect.id = "clock-letter-font";
       letterSelect.setAttribute("aria-label", "Letter and word font");
       letterSelect.innerHTML = `
-        <option value="same" selected>Same as digit font</option>
-        <option value="dseg14">14-Segment (DSEG14)</option>
-        <option value="noto-sans">Noto Sans (Calendar Standard)</option>
-        <option value="quicksand">Quicksand (Rounded Geometric)</option>
-        <option value="outfit">Outfit (Clean Geometric)</option>
-        <option value="classic">Classic (Geometric)</option>
+        <option value="same"${currentLetterFont === "same" ? " selected" : ""}>Same as digit font</option>
+        <option value="dseg14"${currentLetterFont === "dseg14" ? " selected" : ""}>14-Segment (DSEG14)</option>
+        <option value="noto-sans"${currentLetterFont === "noto-sans" ? " selected" : ""}>Noto Sans (Calendar Standard)</option>
+        <option value="quicksand"${currentLetterFont === "quicksand" ? " selected" : ""}>Quicksand (Rounded Geometric)</option>
+        <option value="outfit"${currentLetterFont === "outfit" ? " selected" : ""}>Outfit (Clean Geometric)</option>
+        <option value="classic"${currentLetterFont === "classic" ? " selected" : ""}>Classic (Geometric)</option>
       `;
       letterLabel.append(letterSelect);
 
@@ -224,11 +224,11 @@ async function initialize() {
       markerSelect.id = "clock-marker";
       markerSelect.setAttribute("aria-label", "Orientation marker indicator");
       markerSelect.innerHTML = `
-        <option value="off" selected>Off</option>
-        <option value="auto">Dot: Auto (0, 2, 5, 6, 8, 9)</option>
-        <option value="all">Dot: All digits (0–9)</option>
-        <option value="line-auto">Underline: Auto (0, 2, 5, 6, 8, 9)</option>
-        <option value="line-all">Underline: All digits (0–9)</option>
+        <option value="off"${currentMarker === "off" ? " selected" : ""}>Off</option>
+        <option value="auto"${currentMarker === "auto" ? " selected" : ""}>Dot: Auto (0, 2, 5, 6, 8, 9)</option>
+        <option value="all"${currentMarker === "all" ? " selected" : ""}>Dot: All digits (0–9)</option>
+        <option value="line-auto"${currentMarker === "line-auto" ? " selected" : ""}>Underline: Auto (0, 2, 5, 6, 8, 9)</option>
+        <option value="line-all"${currentMarker === "line-all" ? " selected" : ""}>Underline: All digits (0–9)</option>
       `;
       markerLabel.append(markerSelect);
 
@@ -242,6 +242,11 @@ async function initialize() {
           currentDisplay = displaySelect.value;
           currentMarker = markerSelect.value;
           currentLetterFont = letterSelect.value;
+          try {
+            localStorage.setItem("cubistry_clock_digit_font", currentDisplay);
+            localStorage.setItem("cubistry_clock_marker", currentMarker);
+            localStorage.setItem("cubistry_clock_letter_font", currentLetterFont);
+          } catch {}
           const nextManifest = createClockManifest(currentDisplay, currentMarker, currentLetterFont);
           await Promise.all(owned.map((c) => c.updateManifest(nextManifest)));
         } catch (e) {

@@ -114,7 +114,7 @@ const MODES = {
 };
 
 // Global Appearance state (persisted across mode switches)
-let currentDisplay = localStorage.getItem("cubistry_digit_font") || "dseg7";
+let currentDisplay = localStorage.getItem("cubistry_digit_font") || "noto-sans";
 let currentMarker = localStorage.getItem("cubistry_marker_mode") || "line-auto";
 let currentLetterFont = localStorage.getItem("cubistry_letter_font") || "same";
 let currentLettering = localStorage.getItem("cubistry_lettering") || "words-pascal";
