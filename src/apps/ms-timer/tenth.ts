@@ -15,7 +15,7 @@ import {
   parseAlg,
   type MovePresentation,
 } from "@cubistry/cube-mechanics";
-import { loadAssets, type AssetManifest } from "@cubistry/cube-assets";
+import { deploymentBasePath, loadAssets, type AssetManifest } from "@cubistry/cube-assets";
 import {
   PhysicalPlayback,
   type MoveProgress,
@@ -27,6 +27,7 @@ import type { MsRun } from "../ms/design.ts";
 import { MsPeriod } from "../ms/period.ts";
 import type { ClockSnapshot } from "../timer/clock.ts";
 import { ENDPOINT_TOLERANCE_MS, type TimerCube } from "../timer/scheduler.ts";
+import tenthTransitionsData from "./tenth-transitions.json" with { type: "json" };
 
 /** Values 0..9 for the tenth-of-a-second cube. */
 export const TENTH_MODULUS = 10;
@@ -78,6 +79,102 @@ export function tenthTarget(value: number): DisplayTarget {
       matching: assetId === "blank" ? "equivalent" : "exact",
     })),
   });
+}
+
+/** One optimal transition between digits 0..9 on the 1/10 cube. */
+export interface TenthTransition {
+  readonly from: number;
+  readonly to: number;
+  readonly alg: string;
+  readonly htm: number;
+  readonly qtm: number;
+}
+
+export interface TenthTransitionsFile {
+  readonly schema: "cubistry.tenth-transitions";
+  readonly version: number;
+  readonly generator: string;
+  readonly frontCells: Readonly<Record<string, string>>;
+  readonly totalTransitions: number;
+  readonly transitions: readonly TenthTransition[];
+}
+
+/**
+ * All 90 optimal shortest transitions between any digit (0..9) on the 1/10 cube,
+ * keeping the stationary "1/10" (T) sticker at r1c2 and the blank front cells intact.
+ * 87 of 90 transitions are <= 3 HTM (average: 1.91 moves).
+ */
+export const TENTH_OPTIMAL_TRANSITIONS: readonly TenthTransition[] = deepFreeze(
+  (tenthTransitionsData as TenthTransitionsFile).transitions,
+);
+
+const TENTH_OPTIMAL_MAP: readonly (readonly LegalMove[])[] = (() => {
+  const map: LegalMove[][] = Array.from({ length: 100 }, () => []);
+  for (const t of TENTH_OPTIMAL_TRANSITIONS) {
+    map[t.from * 10 + t.to] = parseAlg(t.alg) as LegalMove[];
+  }
+  return deepFreeze(map);
+})();
+
+/**
+ * Returns the optimal shortest move sequence from digit `from` to digit `to` (0..9)
+ * loaded from `tenth-transitions.json`.
+ * 87 of 90 transitions are <= 3 moves (average 1.91 moves).
+ */
+export function tenthOptimalMoves(
+  from: number,
+  to: number,
+): readonly LegalMove[] {
+  demand(
+    Number.isInteger(from) &&
+      from >= 0 &&
+      from < TENTH_MODULUS &&
+      Number.isInteger(to) &&
+      to >= 0 &&
+      to < TENTH_MODULUS,
+    "Invalid tenth transition index",
+  );
+  if (from === to) return [];
+  return TENTH_OPTIMAL_MAP[from * 10 + to];
+}
+
+/**
+ * Exact shortest paths between canonical period nodes S_i -> S_j on TENTH_PRINT.
+ * Every transition lands exactly on this.period.nodes[j], preserving Period-1
+ * state closure and never leaving the closed counting period.
+ */
+export const TENTH_CANONICAL_SHORTEST_PATHS: readonly (readonly string[])[] =
+  Object.freeze([
+    Object.freeze(["", "L", "L2", "L2 B L", "L2 B L B L", "L2 B L B L D", "D' L' D' L' B'", "D' L' D'", "D' L'", "D'"]),
+    Object.freeze(["L'", "", "L", "L B L", "L B L B L", "L B L B L D", "L' D' L' D' L' B'", "L' D' L' D'", "L' D' L'", "L' D'"]),
+    Object.freeze(["L2", "L'", "", "B L", "B L B L", "B L B L D", "L2 D' L' D' L' B'", "L2 D' L' D'", "L2 D' L'", "L2 D'"]),
+    Object.freeze(["L' B' L2", "L' B' L'", "L' B'", "", "B L", "B L D", "L D B D L", "D' L' D2 B' D2", "L' B' L2 D' L'", "L' B' L2 D'"]),
+    Object.freeze(["L' B' L' B' L2", "L' B' L' B' L'", "L' B' L' B'", "L' B'", "", "D", "D B D", "D B D B L", "L B2 D B2 L B'", "L' B' L' B' L2 D'"]),
+    Object.freeze(["L B D B L2 D", "L B2 D L2 B D", "D' L' B' L' B'", "D' L' B'", "D'", "", "B D", "B D B L", "L B D B L", "L B D B L2"]),
+    Object.freeze(["B L D L D", "L D2 B L2 D B'", "L' D' B' D' L2 B'", "L' D' B' D' L'", "D' B' D'", "D' B'", "", "B L", "B L D", "B L D L"]),
+    Object.freeze(["D L D", "D L D L", "D L D L2", "D2 B D2 L D", "L' B' D' B' D'", "L' B' D' B'", "L' B'", "", "D", "D L"]),
+    Object.freeze(["L D", "L D L", "L D L2", "L D L2 B L", "L' B' D' B' L' D'", "L' B' D' B' L'", "D' L' B'", "D'", "", "L"]),
+    Object.freeze(["D", "D L", "D L2", "D L2 B L", "L2 B' D' B' L' D'", "L2 B' D' B' L'", "L' D' L' B'", "L' D'", "L'", ""]),
+  ]);
+
+export const TENTH_TRANSITIONS_RUNTIME_FILE = "tenth-transitions.v1.json";
+
+/** Load the 90 tenth transitions from public runtime file via fetch. */
+export async function loadTenthTransitions(
+  basePath = "",
+): Promise<TenthTransitionsFile> {
+  const url = `${deploymentBasePath(basePath)}${TENTH_TRANSITIONS_RUNTIME_FILE}`;
+  const response = await fetch(url);
+  demand(response.ok, "Unable to load tenth transitions file");
+  const data = (await response.json()) as TenthTransitionsFile;
+  demand(
+    data.schema === "cubistry.tenth-transitions" &&
+      data.version === 1 &&
+      Array.isArray(data.transitions) &&
+      data.transitions.length === 90,
+    "Invalid tenth transitions file",
+  );
+  return deepFreeze(data);
 }
 
 const RAW_TENTH_STICKERS = [
@@ -255,6 +352,17 @@ export class MsTimerTenthCube extends PhysicalPlayback implements TimerCube {
     ) {
       this.planned = this.prepared.moves;
       return this.prepared.target;
+    }
+    const fromNode = this.node;
+    if (fromNode >= 0 && fromNode < TENTH_MODULUS) {
+      const canonicalAlg = TENTH_CANONICAL_SHORTEST_PATHS[fromNode][value];
+      if (canonicalAlg !== undefined) {
+        const moves = parseAlg(canonicalAlg);
+        const target = this.period.nodes[value];
+        this.planned = moves;
+        this.prepared = { source: this.state, value, moves, target };
+        return target;
+      }
     }
     const route = this.period.route(this.state, value);
     demand(route, "Tenth-second pose is not on the saved period");

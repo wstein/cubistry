@@ -111,3 +111,45 @@ test("MsTimerTenthCube step, reset, set and request update state and advance thr
   }
   assert.equal(cube.currentValue, 9);
 });
+
+test("all 90 tenth transitions loaded from file are verified against tenthTarget", async () => {
+  const {
+    TENTH_OPTIMAL_TRANSITIONS,
+    tenthOptimalMoves,
+    tenthTarget,
+    TENTH_WORDS,
+  } = await import("../src/apps/ms-timer/tenth.ts");
+  assert.equal(TENTH_OPTIMAL_TRANSITIONS.length, 90);
+
+  // Compute the 10 canonical period states
+  const canonicalStates = [initialState(TENTH_PRINT)];
+  for (let i = 0; i < 9; i++) {
+    canonicalStates.push(applyMoves(canonicalStates[i], parseAlg(TENTH_WORDS[i])));
+  }
+
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+  for (const t of TENTH_OPTIMAL_TRANSITIONS) {
+    assert(t.from >= 0 && t.from < 10);
+    assert(t.to >= 0 && t.to < 10);
+    assert.notEqual(t.from, t.to);
+
+    const moves = parseAlg(t.alg);
+    assert.equal(moves.length, t.htm);
+    assert.deepEqual(moves, tenthOptimalMoves(t.from, t.to));
+    counts[t.htm] = (counts[t.htm] || 0) + 1;
+
+    // Apply moves to canonical starting state
+    const endState = applyMoves(canonicalStates[t.from], moves);
+    assert(
+      matchesTarget(TENTH_PRINT, endState, tenthTarget(t.to)),
+      `Transition ${t.from} -> ${t.to} with ${t.alg} must match tenthTarget(${t.to})`,
+    );
+  }
+
+  // Distribution matches exact BFS: 33 1-move, 35 2-move, 19 3-move, 3 4-move
+  assert.equal(counts[1], 33);
+  assert.equal(counts[2], 35);
+  assert.equal(counts[3], 19);
+  assert.equal(counts[4], 3);
+  assert.equal(counts[1] + counts[2] + counts[3], 87); // 96.7% <= 3 moves
+});
