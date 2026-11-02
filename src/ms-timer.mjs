@@ -64,17 +64,20 @@ const action = (fn) => {
   }
   ui();
 };
-const preferred = () => durations[Number($("rotation-speed").value)];
+const preferred = () => 100;
 
 function speedUi() {
   text(
     "speed-label",
-    `${speedLabels[Number($("rotation-speed").value)]} preferred per HTM move`,
+    `Fixed rotation times: Min 100 ms · Sec 100 ms · 1/10s 50 ms`,
   );
-  $("rotation-speed").setAttribute(
-    "aria-valuetext",
-    $("speed-label").textContent,
-  );
+  if ($("rotation-speed")) {
+    $("rotation-speed").value = "4";
+    $("rotation-speed").setAttribute(
+      "aria-valuetext",
+      $("speed-label").textContent,
+    );
+  }
 }
 
 function ui() {
@@ -276,6 +279,9 @@ async function initialize() {
       displaySelect.innerHTML = `
         <option value="dseg7" selected>7-Segment (DSEG7)</option>
         <option value="dseg14">14-Segment (DSEG14)</option>
+        <option value="noto-sans">Noto Sans (Calendar Standard)</option>
+        <option value="quicksand">Quicksand (Rounded Geometric)</option>
+        <option value="outfit">Outfit (Clean Geometric)</option>
         <option value="classic">Classic (Geometric)</option>
       `;
       displayLabel.append(displaySelect);

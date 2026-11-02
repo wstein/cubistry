@@ -84,7 +84,13 @@ export const TENTH_WORD_IMAGE = Object.freeze({
   sha256: "0a1f78e209ae05bece7da56700a14e0c256b1e758bc3f5bb64b08fee766de070",
 });
 
-export type TenthDisplayVariant = "dseg7" | "dseg14" | "classic";
+export type TenthDisplayVariant =
+  | "dseg7"
+  | "dseg14"
+  | "noto-sans"
+  | "quicksand"
+  | "outfit"
+  | "classic";
 export type TenthMarkerMode = "auto" | "all" | "off";
 
 /** Ambiguous digits under 180° rotation on 7-segment display (0, 2, 5, 6, 8, 9). */

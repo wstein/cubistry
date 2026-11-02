@@ -538,4 +538,13 @@ export class HsmController extends PhysicalPlayback {
     }
     this.notify();
   }
+
+  /**
+   * Update the active asset manifest (for live font / orientation switching) in place.
+   */
+  async updateManifest(manifest: AssetManifest): Promise<void> {
+    if (!this.state) return;
+    const assets = await this.resolveAssets(manifest, [this.design.print]);
+    this.install(this.design.print, this.state, assets, this.currentValue);
+  }
 }
