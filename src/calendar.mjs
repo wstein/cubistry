@@ -299,6 +299,12 @@ async function initialize() {
     presBtn?.addEventListener("click", () => {
       $("presentation-toggle")?.click();
     });
+    new MutationObserver(() => {
+      document.body.classList.toggle(
+        "presentation-mode",
+        document.body.dataset.presentation === "true",
+      );
+    }).observe(document.body, { attributes: true, attributeFilter: ["data-presentation"] });
     const toggleBtn = document.querySelector(".hud-toggle-btn");
     toggleBtn?.addEventListener("click", () => {
       document.querySelector(".calendar-controls")?.classList.toggle("minimized");
