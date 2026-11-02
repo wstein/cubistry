@@ -7,6 +7,7 @@ import letterManifests from "./letter-manifests.json" with { type: "json" };
 
 export type LetterFont =
   | "same"
+  | "dseg7"
   | "dseg14"
   | "noto-sans"
   | "quicksand"
@@ -18,8 +19,9 @@ export function resolveLetterFamily(
   digitDisplay: string = "dseg7",
 ): "dseg14" | "noto-sans" | "quicksand" | "outfit" | "classic" {
   if (letterFont && letterFont !== "same") {
-    if (["dseg14", "noto-sans", "quicksand", "outfit", "classic"].includes(letterFont)) {
-      return letterFont as "dseg14" | "noto-sans" | "quicksand" | "outfit" | "classic";
+    if (letterFont === "dseg7" || letterFont === "dseg14") return "dseg14";
+    if (["noto-sans", "quicksand", "outfit", "classic"].includes(letterFont)) {
+      return letterFont as "noto-sans" | "quicksand" | "outfit" | "classic";
     }
   }
   if (digitDisplay === "dseg7" || digitDisplay === "dseg14") return "dseg14";

@@ -163,7 +163,7 @@ function setupAppearancePanel(container, onUpdate) {
 
   // 1. Digit Font
   const displayLabel = document.createElement("label");
-  displayLabel.textContent = "Digit font";
+  displayLabel.textContent = "Display font";
   const displaySelect = document.createElement("select");
   displaySelect.id = "studio-display-font";
   displaySelect.innerHTML = `
@@ -183,7 +183,8 @@ function setupAppearancePanel(container, onUpdate) {
   const letterSelect = document.createElement("select");
   letterSelect.id = "studio-letter-font";
   letterSelect.innerHTML = `
-    <option value="same">Same as digit font</option>
+    <option value="same">Same as display font</option>
+    <option value="dseg7">7-Segment (DSEG7)</option>
     <option value="dseg14">14-Segment (DSEG14)</option>
     <option value="noto-sans">Noto Sans (Calendar Standard)</option>
     <option value="quicksand">Quicksand (Rounded Geometric)</option>

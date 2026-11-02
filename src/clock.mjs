@@ -185,7 +185,7 @@ async function initialize() {
       const displayLabel = document.createElement("label");
       displayLabel.style.display = "block";
       displayLabel.style.marginTop = "6px";
-      displayLabel.textContent = "Display ";
+      displayLabel.textContent = "Display font";
       const displaySelect = document.createElement("select");
       displaySelect.id = "clock-display";
       displaySelect.setAttribute("aria-label", "Digit font display");
@@ -207,7 +207,8 @@ async function initialize() {
       letterSelect.id = "clock-letter-font";
       letterSelect.setAttribute("aria-label", "Letter and word font");
       letterSelect.innerHTML = `
-        <option value="same"${currentLetterFont === "same" ? " selected" : ""}>Same as digit font</option>
+        <option value="same"${currentLetterFont === "same" ? " selected" : ""}>Same as display font</option>
+        <option value="dseg7"${currentLetterFont === "dseg7" ? " selected" : ""}>7-Segment (DSEG7)</option>
         <option value="dseg14"${currentLetterFont === "dseg14" ? " selected" : ""}>14-Segment (DSEG14)</option>
         <option value="noto-sans"${currentLetterFont === "noto-sans" ? " selected" : ""}>Noto Sans (Calendar Standard)</option>
         <option value="quicksand"${currentLetterFont === "quicksand" ? " selected" : ""}>Quicksand (Rounded Geometric)</option>

@@ -23,7 +23,7 @@ export function buildStudioManifest(
   const family = resolveLetterFamily(letterFont, display);
   const letterImages = hsmImagesForFamily(lettering, family) as readonly ImageAsset[];
   const digitImages = tenthAssetImages(display, marker, baseImages);
-  const fontTenthWord = letterImages.find((i) => i.id === "T");
+  const fontTenthWord = (hsmImagesForFamily("words-pascal", family) as readonly ImageAsset[]).find((i) => i.id === "T");
   const images = fontTenthWord
     ? digitImages.map((img) => (img.id === "T" ? fontTenthWord : img))
     : digitImages;
