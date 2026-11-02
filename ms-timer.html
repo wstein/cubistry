@@ -68,7 +68,7 @@
           data-application="ms-timer"
         >
           <div id="ms-timer-scene" class="clock-viewer"></div>
-          <div class="clock-cubes" aria-label="Individual cube state">
+          <div class="clock-cubes sr-only" aria-hidden="true">
             <article class="clock-card">
               <h2>Minutes (min)</h2>
               <div id="ms-minutes" data-unit="M" aria-busy="true"></div>
@@ -167,7 +167,7 @@
         ✕ Exit Presentation
       </button>
       <p id="error" role="alert"></p>
-      <p class="small">
+      <p class="small sr-only">
         Drag the shared view to look around all three cubes. The minutes and
         seconds cubes use print S3 of the M/S Counter with min and sec word
         stickers; the 1/10-second cube uses the Period-1 {L, D, B} r2c1 0–9

@@ -50,7 +50,7 @@
       <div class="clock-workspace">
         <section class="clock-stage" aria-label="Live hour minute second cubes">
           <div id="clock-scene" class="clock-viewer"></div>
-          <div class="clock-cubes" aria-label="Individual cube controls">
+          <div class="clock-cubes sr-only" aria-hidden="true">
             <article class="clock-card">
               <h2>Hours</h2>
               <div id="clock-hours" data-unit="H" aria-busy="true"></div>
@@ -181,7 +181,7 @@
       </button>
 
       <p id="clock-error" class="error" role="alert"></p>
-      <p class="small">
+      <p class="small sr-only">
         Drag the shared view to look around all three cubes. The unit labels
         stay fixed and the upper-left stickers stay blank. A half turn takes
         twice the scheduled quarter-turn time. Preferred timings may be

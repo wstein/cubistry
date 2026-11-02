@@ -23,11 +23,11 @@
   padding: 0;
 }
 .clock-cubes {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  max-width: 720px;
-  margin: 16px auto 0;
+  display: none !important;
+}
+.live-clock-page > p.small,
+.clock-workspace ~ p.small {
+  display: none !important;
 }
 .clock-card {
   min-width: 0;
