@@ -11,7 +11,9 @@ import {
   FIVE_SECOND_TIMER,
   formatTimer,
   formatLiveTimer,
+  formatMsTimer,
   parseDuration,
+  parseMsDuration,
 } from "../src/apps/timer/clock.ts";
 
 const clockAt = (now) => new WorkshopClock(() => now.value, ONE_SECOND_TIMER);
@@ -179,4 +181,40 @@ test("the readout formats every second up to 59:59 and nothing beyond", () => {
   // The existing timers keep their bound of 59:50.
   assert.throws(() => formatLiveTimer(3591));
   assert.equal(formatLiveTimer(3590), "59:50");
+});
+
+test("tenth-second readout and Set duration parser accept MM:SS and MM:SS.d", () => {
+  assert.equal(formatMsTimer(0), "00:00.0");
+  assert.equal(formatMsTimer(9000), "15:00.0");
+  assert.equal(formatMsTimer(125), "00:12.5");
+  assert.equal(formatMsTimer(35990), "59:59.0");
+  assert.equal(formatMsTimer(35999), "59:59.9");
+  assert.equal(parseMsDuration("00:00"), 0);
+  assert.equal(parseMsDuration("00:00.0"), 0);
+  assert.equal(parseMsDuration("15:00"), 9000);
+  assert.equal(parseMsDuration("15:00.0"), 9000);
+  assert.equal(parseMsDuration("15:00.5"), 9005);
+  assert.equal(parseMsDuration("5:07.3"), 3073);
+  assert.equal(parseMsDuration("59:59.0", 35990), 35990);
+  for (const bad of [
+    "60:00",
+    "60:00.0",
+    "15:60",
+    "15:6",
+    "15:00.",
+    "15:00.12",
+    "1500",
+    "",
+    "-1:00",
+  ])
+    assert.throws(() => parseMsDuration(bad, 35990), Error, bad);
+
+  const now = { value: 0 };
+  const c = clockAt(now);
+  c.setMode("stopwatch");
+  c.start();
+  now.value = 250;
+  const ts = c.tenthSnapshot();
+  assert.equal(ts.bucket, 2);
+  assert.deepEqual(ts.next, { target: 3, deadline: 300, interval: 100 });
 });
