@@ -1,0 +1,13 @@
+graph	tracked-front-corners	136080	diameter	7
+setup	2qtm-closed	(none)	0
+edge	2qtm-closed	0	1	B D	2	1	1	2	1
+edge	2qtm-closed	1	2	B L	2	1	1	1	1
+edge	2qtm-closed	2	3	D	1	0	1	1	1
+edge	2qtm-closed	3	4	L	1	0	1	1	1
+edge	2qtm-closed	4	5	D	1	0	1	1	1
+edge	2qtm-closed	5	6	L	1	0	1	1	1
+edge	2qtm-closed	6	7	L	1	0	1	1	1
+edge	2qtm-closed	7	8	B L	2	1	1	2	1
+edge	2qtm-closed	8	9	B L	2	1	1	2	1
+edge	2qtm-closed	9	0	D	1	0	1	1	1
+summary	2qtm-closed	edges=10	max_htm=2	total_htm=14	total_prep=4	mean_htm=1.4	hist=1:6,2:4	inc_shortest=9/10	dec_shortest=6/10	closure=exact-closed

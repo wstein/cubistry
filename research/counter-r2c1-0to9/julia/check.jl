@@ -149,7 +149,7 @@ end
 
 function main(args)
     length(args) == 4 || fail("usage: PRINT MODE ROUTES SETUP")
-    print = readprint(args[1]); mode = args[2]; req(mode in ("closed", "wrap1", "constL-closed", "constL-wrap1", "9L1D-closed", "9L1D-wrap1"), "mode")
+    print = readprint(args[1]); mode = args[2]; req(mode in ("closed", "wrap1", "constL-closed", "constL-wrap1", "9L1D-closed", "9L1D-wrap1", "2qtm-closed"), "mode")
     home = [(s.pos, s.nrm, s.up) for s in print]
     dist = trackedbfs(); req(length(dist) == 136080, "tracked graph size $(length(dist))")
     println("graph\ttracked-front-corners\t", length(dist), "\tdiameter\t", maximum(values(dist)))
@@ -226,7 +226,7 @@ function main(args)
     end
 
     req(length(seen_states) == 10, "period states are not pairwise distinct")
-    if mode in ("closed", "constL-closed", "9L1D-closed")
+    if mode in ("closed", "constL-closed", "9L1D-closed", "2qtm-closed")
         req(state == start, "cycle does not return to the exact full start state")
     end
     closure_tag = state == start ? "exact-closed" : "display-wrapped"

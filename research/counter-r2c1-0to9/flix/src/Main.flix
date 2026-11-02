@@ -275,7 +275,7 @@ def fmtMean10(tot: Int32): String = {
 
 def runCheck(printPath: String,mode: String,routesPath: String,setupPath: String): Unit \ IO = {
     let print = readPrint(printPath);
-    require(mode == "closed" or mode == "wrap1" or mode == "constL-closed" or mode == "constL-wrap1" or mode == "9L1D-closed" or mode == "9L1D-wrap1","mode");
+    require(mode == "closed" or mode == "wrap1" or mode == "constL-closed" or mode == "constL-wrap1" or mode == "9L1D-closed" or mode == "9L1D-wrap1" or mode == "2qtm-closed","mode");
     let home = List.map(s -> match s { case (p,n,_,u) => (p,n,u) },print);
     let dist = trackedBfs();
     require(Map.size(dist) == 136080,"tracked graph size ${Map.size(dist)}");
@@ -299,7 +299,7 @@ def runCheck(printPath: String,mode: String,routesPath: String,setupPath: String
     match List.foldLeft((acc,row) -> checkEdge(print,dist,mode,acc,row),(state0,Nil,Nil),body) {
         case (lastState,seen,stats) => {
             require(List.length(seen) == 10,"period states are not pairwise distinct");
-            if (mode == "closed" or mode == "constL-closed" or mode == "9L1D-closed") require(lastState == state0,"cycle does not return to the exact full start state") else ();
+            if (mode == "closed" or mode == "constL-closed" or mode == "9L1D-closed" or mode == "2qtm-closed") require(lastState == state0,"cycle does not return to the exact full start state") else ();
             let closureTag = if (lastState == state0) "exact-closed" else "display-wrapped";
             let lens = List.map(x -> match x { case (h,_,_,_) => h },stats);
             let totalHtm = List.foldLeft((a,b) -> a + b,0,lens);

@@ -15,6 +15,7 @@
 | **`constL-wrap1` (open `0..9` prefix, 9 edges)** | **Always `L`** | 9 | 3 | 2 | 6 / 1 / 2 | **5** (tight min) | **14** | 1.556 | Open (`0 -> 9`, every step ends in `L`) | none (`0` printed) |
 | **`constL-wrap1` (1-lap display wrap `0..9->0`)** | **Always `L`** | 10 | 3 | 2 | 7 / 0 / 3 | **6** (tight min) | **16** | 1.600 | Display-wrapped (7/10 steps pure `L`) | none (`0` printed) |
 | **`constL-closed` (exact full-state cycle `0..9->0`)** | **Always `L`** | 10 | 3 | 2 | 4 / 1 / 5 | **11** (tight min) | **21** | 2.100 | **Exact full 24-sticker closure (Period 1)** | none (`0` printed) |
+| **`2qtm-closed` (100% quarter turns, stationary `r1c2`)** | `L, D` | 10 | **2** | **1** | 6 / 4 / 0 | **4** | **14** (14 QTM) | **1.400** | **Exact full 24-sticker closure (Period 1)** | none (`0` printed) |
 
 Even though up to **2 preparing moves** per transition were allowed by the specification (`1–2 preparing moves`), **2 preparing moves on a single step are never needed**: every transition in both witnesses uses **1 touching move (`L` or `D`)** preceded by **0 or 1 back-face preparing move (`B` or `B2`)**.
 
@@ -217,6 +218,16 @@ What if we require **every single increment** $d \to d+1$ to end with the **exac
   - **`9L1D-closed` (exact Period-1 full-state closure, 20 HTM, 10 preps):**
     `L | B U L | U2 B L | U L | R2 L | U' B' L | L | B L | B L | D`
     *(Also has a 15-HTM / 5-prep 1-lap wrapped variant when 2 preps are allowed on 2 steps: `L | U' B2 L | L | L | B' U' L | L | B2 L | L | L | D`, where 7/10 steps have 0 preps).*
+
+### `2qtm-closed` witness: 100% quarter turns, stationary `r1c2`, exact Period-1 closure
+- **Files:** [`evidence/print-2qtm-closed.tsv`](evidence/print-2qtm-closed.tsv), [`evidence/routes-2qtm-closed.tsv`](evidence/routes-2qtm-closed.tsv), [`evidence/setup-2qtm-closed.tsv`](evidence/setup-2qtm-closed.tsv)
+- **Receipts:** [`evidence/receipt-julia-2qtm-closed.tsv`](evidence/receipt-julia-2qtm-closed.tsv) and [`evidence/receipt-flix-2qtm-closed.tsv`](evidence/receipt-flix-2qtm-closed.tsv) (byte-identical)
+- **Route:** `B D | B L | D | L | D | L | L | B L | B L | D`
+- **Properties:**
+  - **$\le 2$ QTM on every increment ($v \to v+1$) and decrement ($v \to v-1$):** Every move is a pure 90° clockwise quarter turn (`L`, `D`, or `B`). No half turns are used anywhere.
+  - **Corner `r1c2` (`(1, 1, 1)`) is 100% stationary:** Generated strictly within $\langle L, D, B \rangle$, so `(1, 1, 1)` never moves.
+  - **Exact full-state closure:** Exactly returns to initial state after 10 steps (1 lap, Period 1).
+  - **Total cost:** 14 QTM / 14 HTM across 10 transitions (mean 1.40 QTM/edge, max 2 QTM/edge).
 
 ---
 

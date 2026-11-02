@@ -10,7 +10,7 @@ jl() { "$julia" --startup-file=no "$here/../julia/check.jl" "$@"; }
 fx() { java -jar "$jar" "$@" 2>/dev/null | grep -v '^Picked up'; }
 cd "$here"
 status=0
-for m in closed wrap1 constL-closed constL-wrap1 9L1D-closed 9L1D-wrap1; do
+for m in closed wrap1 constL-closed constL-wrap1 9L1D-closed 9L1D-wrap1 2qtm-closed; do
     jl print-$m.tsv $m routes-$m.tsv setup-$m.tsv > receipt-julia-$m.tsv
     fx print-$m.tsv $m routes-$m.tsv setup-$m.tsv > receipt-flix-$m.tsv
     if cmp -s receipt-julia-$m.tsv receipt-flix-$m.tsv; then

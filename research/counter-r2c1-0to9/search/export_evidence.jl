@@ -171,7 +171,11 @@ function main()
     words_9L1D_wrap1 = ["U L", "B2 L", "U L", "U' L", "B' L", "L", "B2 L", "B L", "U L", "D"]
     write_witness(ev_dir, "9L1D-wrap1", words_9L1D_wrap1, dist)
 
-    # 7. Write exact bound summary table `bounds-summary.tsv`
+    # 7. 2 QTM exact-closed witness: `2qtm-closed` (14 QTM exact-closed 10-cycle, max 2 QTM per increment/decrement, 4 B preps, 6xL + 4xD, stationary r1c2)
+    words_2qtm_closed = ["B D", "B L", "D", "L", "D", "L", "L", "B L", "B L", "D"]
+    write_witness(ev_dir, "2qtm-closed", words_2qtm_closed, dist)
+
+    # 8. Write exact bound summary table `bounds-summary.tsv`
     open(joinpath(ev_dir, "bounds-summary.tsv"), "w") do io
         println(io, "prep_budget\tstep_model\tmax_displays_reached\topen_9edge_paths\tdisplay_wrap_10edge_paths\texact_closed_10cycles")
         println(io, "0\tP* T (L/D/F only)\t9\t0\t0\t0")
