@@ -485,6 +485,7 @@ for (const hud of document.querySelectorAll(".floating-hud")) {
   const presBtn = hud.querySelector(".hud-presentation-btn");
   presBtn?.addEventListener("click", () => togglePresentation(true));
 }
+document.querySelector("#presentation-btn, .island-presentation-btn")?.addEventListener("click", () => togglePresentation(true));
 $("exit-presentation-btn")?.addEventListener("click", () => togglePresentation(false));
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {

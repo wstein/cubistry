@@ -11,11 +11,10 @@
     <main class="live-clock-page">
       <header class="floating-island">
         <a class="brand" href="./" aria-label="Cubistry home"
-          ><span class="brand-mark">▦</span> CUBISTRY</a
+          ><span class="brand-mark">▦</span><span class="brand-text"> CUBISTRY</span></a
         >
         <div class="application-choice">
-          <label for="clock-application">Cube / application</label
-          ><select id="clock-application">
+          <select id="clock-application" aria-label="Cube application">
             <optgroup label="Integrated Studio (2×2)">
               <option value="chronocube.html">Chronocube Studio (Integrated 2×2)</option>
             </optgroup>
@@ -41,6 +40,7 @@
           </select>
         </div>
         <a class="print-stickers-link" id="print-stickers" href="print.html?design=words-pascal" target="_blank" rel="noopener">Print stickers</a>
+        <button type="button" class="island-presentation-btn" id="presentation-btn" title="Presentation Mode" aria-label="Enter presentation mode"><span class="btn-icon">⛶</span><span class="btn-text"> Presentation</span></button>
       </header>
       <div class="clock-heading sr-only">
         <div>
@@ -78,7 +78,6 @@
             <div class="hud-header">
               <h2 class="hud-title">Live time</h2>
               <div class="hud-actions">
-                <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
                 <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
               </div>
             </div>

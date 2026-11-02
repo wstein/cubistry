@@ -247,7 +247,6 @@ function renderStudioHud(title, bodyHtml) {
     <div class="hud-header">
       <h2 class="hud-title">${title}</h2>
       <div class="hud-actions">
-        <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
         <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">${wasMinimized ? "⚙" : "─"}</button>
       </div>
     </div>
@@ -260,9 +259,9 @@ function renderStudioHud(title, bodyHtml) {
     container.classList.toggle("is-minimized");
     toggleBtn.textContent = container.classList.contains("is-minimized") ? "⚙" : "─";
   });
-  const presBtn = container.querySelector(".hud-presentation-btn");
-  presBtn?.addEventListener("click", () => togglePresentation(true));
 }
+
+document.querySelector("#presentation-btn, .island-presentation-btn")?.addEventListener("click", () => togglePresentation(true));
 
 let exitTimer = null;
 function togglePresentation(enable) {

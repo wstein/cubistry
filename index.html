@@ -11,11 +11,10 @@
     <main>
       <header class="floating-island">
         <a class="brand" href="./" aria-label="Cubistry counter home"
-          ><span class="brand-mark">▦</span> CUBISTRY</a
+          ><span class="brand-mark">▦</span><span class="brand-text"> CUBISTRY</span></a
         >
         <div class="application-choice">
-          <label for="application">Cube / application</label>
-          <select id="application">
+          <select id="application" aria-label="Cube application">
             <optgroup label="Integrated Studio (2×2)">
               <option value="chronocube">Chronocube Studio (Integrated 2×2)</option>
             </optgroup>
@@ -40,6 +39,7 @@
           </select>
         </div>
         <a class="print-stickers-link" id="print-stickers" href="print.html?design=words-pascal" target="_blank" rel="noopener">Print stickers</a>
+        <button type="button" class="island-presentation-btn" id="presentation-btn" title="Presentation Mode" aria-label="Enter presentation mode"><span class="btn-icon">⛶</span><span class="btn-text"> Presentation</span></button>
       </header>
       <section class="workspace" aria-label="Cube counter">
         <div class="cube-card">
@@ -87,7 +87,6 @@
               <div class="hud-header">
                 <h1 class="hud-title">Counter</h1>
                 <div class="hud-actions">
-                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
                   <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
                 </div>
               </div>
@@ -159,7 +158,6 @@
               <div class="hud-header">
                 <h1 id="hsm-heading" class="hud-title">H/M/S Counter</h1>
                 <div class="hud-actions">
-                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
                   <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
                 </div>
               </div>
@@ -220,7 +218,6 @@
               <div class="hud-header">
                 <h1 class="hud-title">M/S Counter</h1>
                 <div class="hud-actions">
-                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
                   <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
                 </div>
               </div>
@@ -275,7 +272,6 @@
               <div class="hud-header">
                 <h1 class="hud-title">1/10-Second Counter</h1>
                 <div class="hud-actions">
-                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
                   <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
                 </div>
               </div>
@@ -340,7 +336,6 @@
               <div class="hud-header">
                 <h1 id="timer-heading" class="hud-title">60-Minute Timer</h1>
                 <div class="hud-actions">
-                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
                   <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
                 </div>
               </div>
