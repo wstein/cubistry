@@ -144,6 +144,7 @@ const msShift = (delta) => (value + delta + 60) % 60;
 let tenthRunning = false,
   tenthTargetDeadline = 0,
   tenthNextAt = 0;
+let pendingManifest = null;
 const isTenth = () => application === "tenth-counter";
 const tenthShift = (delta) => ((value + delta) % 10 + 10) % 10;
 const hsmMaximum = () => Number($("hsm-range").value);
@@ -310,7 +311,8 @@ function manual(next, updateInput = true) {
   request(next);
 }
 const onPhysicalState = (physical, busy, failure, progress) => {
-  if (progress) {
+  try {
+    if (progress) {
     text("sequence-number", String(sequenceNumber.observe(progress) || "—"));
     const meter = $("move-progress");
     meter.textContent = `${progress.completed} / ${progress.total} moves`;
@@ -382,9 +384,9 @@ const onPhysicalState = (physical, busy, failure, progress) => {
   if (isTenth()) {
     if (!busy) {
       value = physical;
-      if (pendingTenthManifest) {
-        const m = pendingTenthManifest;
-        pendingTenthManifest = null;
+      if (pendingManifest) {
+        const m = pendingManifest;
+        pendingManifest = null;
         view.updateManifest?.(m).catch((e) => error(e.message));
       }
     }
@@ -416,7 +418,10 @@ const onPhysicalState = (physical, busy, failure, progress) => {
       : busy
         ? `Finishing ${progress?.target ?? value}…`
         : `Current ${physical}`;
-  controlsUi();
+    controlsUi();
+  } catch (err) {
+    console.error("onPhysicalState error:", err);
+  }
 };
 try {
   viewer = new CubeViewer($("cube"));
@@ -661,7 +666,6 @@ $("tenth-direction").addEventListener("change", () => {
     tick();
   }
 });
-let pendingManifest = null;
 function getActiveManifest(
   display = $("tenth-display")?.value || "dseg7",
   marker = $("tenth-marker")?.value || "off",
