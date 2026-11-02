@@ -46,6 +46,9 @@ export default defineConfig({
         library: fileURLToPath(
           new URL("./library-example.html", import.meta.url),
         ),
+        licenses: fileURLToPath(
+          new URL("./licenses.html", import.meta.url),
+        ),
       },
       output: { manualChunks: { three: ["three"] } },
     },
