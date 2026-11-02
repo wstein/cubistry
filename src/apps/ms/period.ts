@@ -43,6 +43,7 @@ interface Place {
  */
 export class MsPeriod {
   readonly run: MsRun;
+  readonly modulus: number;
   readonly nodes: readonly CubeState[];
   readonly words: readonly (readonly LegalMove[])[];
   private readonly inverses: readonly (readonly LegalMove[])[];
@@ -50,8 +51,13 @@ export class MsPeriod {
   private readonly prefix: readonly number[];
   /** Every place of each reachable pose: nodes (offset 0) and edge interiors. */
   private readonly places = new Map<string, Place[]>();
-  constructor(print: PrintDefinition, run: MsRun) {
+  constructor(
+    print: PrintDefinition,
+    run: MsRun,
+    modulus: number = MS_MODULUS,
+  ) {
     this.run = run;
+    this.modulus = modulus;
     this.words = run.words.map((w) => parseAlg(w));
     this.inverses = this.words.map((w) => inverseMoves(w));
     let state = applyMoves(initialState(print), parseAlg(run.setup));
@@ -92,7 +98,7 @@ export class MsPeriod {
   /** First node (lap 1) that shows `value`. */
   poseFor(value: number): CubeState {
     demand(
-      Number.isInteger(value) && value >= 0 && value < MS_MODULUS,
+      Number.isInteger(value) && value >= 0 && value < this.modulus,
       "Invalid M/S value",
     );
     return this.nodes[value];
@@ -138,7 +144,7 @@ export class MsPeriod {
     const places = this.places.get(poseKey(state));
     if (!places) return null;
     demand(
-      Number.isInteger(value) && value >= 0 && value < MS_MODULUS,
+      Number.isInteger(value) && value >= 0 && value < this.modulus,
       "Invalid M/S value",
     );
     const n = this.length;
@@ -162,7 +168,7 @@ export class MsPeriod {
     let best: { htm: number; edges: number; build: () => MsRoute } | null =
       null;
     for (const start of starts)
-      for (let target = value; target < n; target += MS_MODULUS) {
+      for (let target = value; target < n; target += this.modulus) {
         const ahead = (target - start.node + n) % n,
           behind = (n - ahead) % n;
         for (const [count, direction] of [
