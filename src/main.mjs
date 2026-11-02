@@ -126,6 +126,7 @@ function pendingSwitch() {
 let hsmDesign,
   hmDesign,
   hsmRunning = false,
+  hsmTargetDeadline = 0,
   hsmNextAt = 0,
   rememberedCounterValue = 0;
 // The H/M One-Cube Counter is a second variant of the H/M/S counter: same
@@ -136,10 +137,12 @@ const isHm = () => application === "hm-one-cube";
 // The M/S counter (research PR #138) walks the saved period of one print.
 let msDesign,
   msRunning = false,
+  msTargetDeadline = 0,
   msNextAt = 0;
 const isMs = () => application === "ms-counter";
 const msShift = (delta) => (value + delta + 60) % 60;
 let tenthRunning = false,
+  tenthTargetDeadline = 0,
   tenthNextAt = 0;
 const isTenth = () => application === "tenth-counter";
 const tenthShift = (delta) => ((value + delta) % 10 + 10) % 10;
@@ -616,12 +619,12 @@ $("tenth-speed").addEventListener("change", () => {
   speedUi();
   if (tenthRunning) {
     const interval = Number($("tenth-speed").value) || DEFAULT_TENTH_STEP_INTERVAL;
-    tenthNextAt = Math.min(tenthNextAt, performance.now() + interval);
+    tenthTargetDeadline = Math.min(tenthTargetDeadline, performance.now() + interval);
     if (!view?.busy) tick();
   }
 });
 $("tenth-direction").addEventListener("change", () => {
-  if (tenthRunning && !view?.busy && performance.now() >= tenthNextAt) {
+  if (tenthRunning && !view?.busy) {
     tick();
   }
 });
@@ -638,7 +641,7 @@ function getActiveManifest(
   const letterImages = hsmImagesForFamily(lettering, family);
 
   if (currentApp === "hsm-counter" || currentApp === "ms-counter" || currentApp === "hm-one-cube" || currentApp === "tenth-counter") {
-    const fontTenthWord = letterImages.find((i) => i.id === "T");
+    const fontTenthWord = hsmImagesForFamily("words-pascal", family).find((i) => i.id === "T");
     const resolvedDigitImages = fontTenthWord
       ? digitImages.map((img) => (img.id === "T" ? fontTenthWord : img))
       : digitImages;
@@ -692,26 +695,52 @@ $("tenth-marker")?.addEventListener("change", updateStyle);
 function tick() {
   if (!ready) return;
   if (isHsm()) {
-    if (hsmRunning && !view.busy && performance.now() >= hsmNextAt) {
-      hsmNextAt = performance.now() + 1000;
-      request(hsmShift(Number($("hsm-direction").value)));
+    if (hsmRunning && !view.busy) {
+      const now = performance.now();
+      const turnDuration = durations[Number($("rotation-speed").value)] || 100;
+      if (now >= hsmTargetDeadline - turnDuration) {
+        if (now > hsmTargetDeadline) {
+          hsmTargetDeadline = now + 1000;
+        }
+        const target = hsmShift(Number($("hsm-direction").value));
+        view.setDeadline?.(target, hsmTargetDeadline, turnDuration);
+        hsmTargetDeadline += 1000;
+        request(target);
+      }
     }
     return;
   }
   if (isMs()) {
-    if (msRunning && !view.busy && performance.now() >= msNextAt) {
-      msNextAt = performance.now() + 1000;
-      request(msShift(Number($("ms-direction").value)));
+    if (msRunning && !view.busy) {
+      const now = performance.now();
+      const turnDuration = durations[Number($("rotation-speed").value)] || 100;
+      if (now >= msTargetDeadline - turnDuration) {
+        if (now > msTargetDeadline) {
+          msTargetDeadline = now + 1000;
+        }
+        const target = msShift(Number($("ms-direction").value));
+        view.setDeadline?.(target, msTargetDeadline, turnDuration);
+        msTargetDeadline += 1000;
+        request(target);
+      }
     }
     return;
   }
   if (isTenth()) {
-    if (tenthRunning && !view.busy && performance.now() >= tenthNextAt) {
+    if (tenthRunning && !view.busy) {
+      const now = performance.now();
       const interval = Number($("tenth-speed").value) || DEFAULT_TENTH_STEP_INTERVAL;
       const turnSpeed = tenthTurnSpeedForInterval(interval);
       viewer?.setAnimationSpeed(BASE_MOVE_DURATION_MS / turnSpeed);
-      tenthNextAt = performance.now() + interval;
-      request(tenthShift(Number($("tenth-direction").value) || 1));
+      if (now >= tenthTargetDeadline - turnSpeed) {
+        if (now > tenthTargetDeadline) {
+          tenthTargetDeadline = now + interval;
+        }
+        const target = tenthShift(Number($("tenth-direction").value) || 1);
+        view.setDeadline?.(target, tenthTargetDeadline, turnSpeed);
+        tenthTargetDeadline += interval;
+        request(target);
+      }
     }
     return;
   }
@@ -884,35 +913,23 @@ $("timer-speed").addEventListener("change", () =>
     tick();
   }),
 );
-$("application").addEventListener("change", async () => {
-  if (
-    !ready ||
-    view.busy ||
-    run.running ||
-    hsmRunning ||
-    msRunning ||
-    tenthRunning ||
-    (isTimer() && clock.running && !clock.elapsed)
-  ) {
-    $("application").value = application;
-    return;
-  }
+async function switchApplication(requested) {
   if (
     ["live-clock", "calendar", "status-cube", "playground", "ms-timer", "chronocube"].includes(
-      $("application").value,
+      requested,
     )
   ) {
     location.assign(
       new URL(
-        $("application").value === "chronocube"
+        requested === "chronocube"
           ? "chronocube.html"
-          : $("application").value === "playground"
+          : requested === "playground"
             ? "playground.html"
-            : $("application").value === "calendar"
+            : requested === "calendar"
               ? "calendar.html"
-              : $("application").value === "status-cube"
+              : requested === "status-cube"
                 ? "status.html"
-                : $("application").value === "ms-timer"
+                : requested === "ms-timer"
                   ? "ms-timer.html"
                   : "clock.html",
         location.href,
@@ -920,9 +937,8 @@ $("application").addEventListener("change", async () => {
     );
     return;
   }
-  if (application === "certified") rememberedCounterValue = view.currentValue;
-  const requested = $("application").value,
-    previous = view,
+  if (application === "certified" && view) rememberedCounterValue = view.currentValue;
+  const previous = view,
     savedUi = hsmUiSnapshot();
   ready = false;
   controlsUi();
@@ -1003,7 +1019,7 @@ $("application").addEventListener("change", async () => {
       await candidate.updateManifest(getActiveManifest(undefined, undefined, undefined, "certified"));
     }
     timerScheduler.invalidate();
-    previous.dispose();
+    previous?.dispose();
     view = candidate;
     application = requested;
     try {
@@ -1039,6 +1055,22 @@ $("application").addEventListener("change", async () => {
     error(e.message);
   }
   controlsUi();
+}
+
+$("application").addEventListener("change", async () => {
+  if (
+    !ready ||
+    view?.busy ||
+    run.running ||
+    hsmRunning ||
+    msRunning ||
+    tenthRunning ||
+    (isTimer() && clock?.running && !clock?.elapsed)
+  ) {
+    $("application").value = application;
+    return;
+  }
+  await switchApplication($("application").value);
 });
 const hsmMarkup = {
   letter: $("hsm-letter").innerHTML,
@@ -1131,6 +1163,7 @@ function hsmAssets(hm = isHm()) {
 }
 function stopHsm() {
   hsmRunning = false;
+  view?.clearDeadline?.();
   const active = view.stopAfterCurrent();
   value = active ?? view.currentValue;
   controlsUi();
@@ -1141,7 +1174,7 @@ $("hsm-run").addEventListener("click", () =>
     if (hsmRunning || view.busy) stopHsm();
     else {
       hsmRunning = true;
-      hsmNextAt = performance.now();
+      hsmTargetDeadline = performance.now() + 1000;
       tick();
       controlsUi();
     }
@@ -1267,6 +1300,7 @@ async function msController(callback) {
 }
 function stopMs() {
   msRunning = false;
+  view?.clearDeadline?.();
   const active = view.stopAfterCurrent();
   value = active ?? view.currentValue;
   controlsUi();
@@ -1277,7 +1311,7 @@ $("ms-run").addEventListener("click", () =>
     if (msRunning || view.busy) stopMs();
     else {
       msRunning = true;
-      msNextAt = performance.now();
+      msTargetDeadline = performance.now() + 1000;
       tick();
       controlsUi();
     }
@@ -1313,6 +1347,7 @@ $("ms-set-form").addEventListener("submit", (event) => {
 });
 function stopTenth() {
   tenthRunning = false;
+  view?.clearDeadline?.();
   const active = view.stopAfterCurrent();
   value = active ?? view.currentValue;
   controlsUi();
@@ -1323,7 +1358,8 @@ $("tenth-run").addEventListener("click", () =>
     if (tenthRunning || view.busy) stopTenth();
     else {
       tenthRunning = true;
-      tenthNextAt = performance.now();
+      const interval = Number($("tenth-speed").value) || DEFAULT_TENTH_STEP_INTERVAL;
+      tenthTargetDeadline = performance.now() + interval;
       tick();
       controlsUi();
     }
@@ -1378,13 +1414,6 @@ async function initialize() {
   if (!viewer) return;
   try {
     proof = await loadCounterDesign(undefined, import.meta.env.BASE_URL);
-    view = new CounterController(
-      viewer,
-      proof,
-      onPhysicalState,
-      (manifest, prints, signal) =>
-        loadAssets(manifest, prints, signal, import.meta.env.BASE_URL),
-    );
     let saved;
     try {
       saved = JSON.parse(localStorage.getItem("cubistry-counter-v2"));
@@ -1416,6 +1445,33 @@ async function initialize() {
       );
     }
     speedUi();
+    const requested =
+      new URLSearchParams(location.search).get("application") ||
+      localStorage.getItem("cubistry_app") ||
+      "certified";
+    if (
+      requested !== "certified" &&
+      [
+        "hsm-counter",
+        "hm-one-cube",
+        "ms-counter",
+        "timer",
+        "five-second-timer",
+        "ms-timer",
+        "tenth-counter",
+      ].includes(requested)
+    ) {
+      $("application").value = requested;
+      await switchApplication(requested);
+      return;
+    }
+    view = new CounterController(
+      viewer,
+      proof,
+      onPhysicalState,
+      (manifest, prints, signal) =>
+        loadAssets(manifest, prints, signal, import.meta.env.BASE_URL),
+    );
     certified = await loadCertifiedCounter(proof, import.meta.env.BASE_URL);
     const requestedPrint =
       new URLSearchParams(location.search).get("print") ?? saved?.print;
@@ -1441,21 +1497,6 @@ async function initialize() {
     $("value").value = String(value);
     controlsUi();
     save();
-    const requested = new URLSearchParams(location.search).get("application");
-    if (
-      [
-        "hsm-counter",
-        "hm-one-cube",
-        "ms-counter",
-        "timer",
-        "five-second-timer",
-        "ms-timer",
-        "tenth-counter",
-      ].includes(requested)
-    ) {
-      $("application").value = requested;
-      $("application").dispatchEvent(new Event("change"));
-    }
   } catch (e) {
     error("Counter setup failed: " + e.message);
     $("status").textContent = "Unable to load the verified fixed print.";

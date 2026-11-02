@@ -255,7 +255,7 @@ async function initialize() {
       const displayLabel = document.createElement("label");
       displayLabel.style.display = "block";
       displayLabel.style.marginTop = "6px";
-      displayLabel.textContent = "Display ";
+      displayLabel.textContent = "Display font ";
       const displaySelect = document.createElement("select");
       displaySelect.id = "timer-display";
       displaySelect.setAttribute("aria-label", "Digit font display");
@@ -277,7 +277,8 @@ async function initialize() {
       letterSelect.id = "timer-letter-font";
       letterSelect.setAttribute("aria-label", "Letter and word font");
       letterSelect.innerHTML = `
-        <option value="same" selected>Same as digit font</option>
+        <option value="same" selected>Same as display font</option>
+        <option value="dseg7">7-Segment (DSEG7)</option>
         <option value="dseg14">14-Segment (DSEG14)</option>
         <option value="noto-sans">Noto Sans (Calendar Standard)</option>
         <option value="quicksand">Quicksand (Rounded Geometric)</option>
