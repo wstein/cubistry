@@ -909,7 +909,7 @@ header.floating-island {
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-/* Hover or Focused state (0.95 focus opacity) */
+/* Hover or Focused state (0.9 focus opacity) */
 .floating-hud:hover,
 .floating-hud:focus-within,
 .floating-hud-appearance:hover,
@@ -930,7 +930,7 @@ aside.status-controls:hover,
 aside.status-controls:focus-within,
 header.floating-island:hover,
 header.floating-island:focus-within {
-  opacity: 0.95;
+  opacity: 0.9;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   box-shadow: 0 20px 48px rgba(21, 59, 97, 0.18), 0 2px 10px rgba(21, 59, 97, 0.08);

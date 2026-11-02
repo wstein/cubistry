@@ -2,7 +2,7 @@
  * Three-tier HUD idle controller for immersive 3D canvas:
  * - Idle (> 10s of inactivity): panels become invisible (opacity: 0, pointer-events: none)
  * - Ambient (mouse move / activity on canvas): panels become translucent (opacity: 0.38)
- * - Hover / Focus: panels become crisp & readable (opacity: 0.95)
+ * - Hover / Focus: panels become crisp & readable (opacity: 0.9)
  */
 
 export interface HudIdleOptions {
