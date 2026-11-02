@@ -24,6 +24,7 @@ test("dedicated MPA pages exist and contain valid markup", () => {
     assert.match(content, new RegExp(`data-default-application="${app}"`), `${file} has default application`);
     assert.match(content, /<script type="module" src="\/src\/main\.mjs"><\/script>/, `${file} loads main.mjs`);
     assert.match(content, /<footer class="floating-glass-pill"/, `${file} includes floating glass pill`);
+    assert.match(content, /href="https:\/\/github\.com\/wstein\/cubistry\/"/, `${file} links to cubistry repo`);
   }
 });
 
@@ -48,5 +49,6 @@ test("all navigation selects use clean HTML URLs for single-cube applications", 
     assert.match(content, /<option value="hsm-counter\.html">H\/M\/S Counter 00–59<\/option>/, `${file} links to hsm-counter.html`);
     assert.match(content, /<option value="ms-counter\.html">M\/S Counter 00–59<\/option>/, `${file} links to ms-counter.html`);
     assert.match(content, /<option value="hm-one-cube\.html">H\/M One-Cube Counter<\/option>/, `${file} links to hm-one-cube.html`);
+    assert.match(content, /href="https:\/\/github\.com\/wstein\/cubistry\/"/, `${file} links to cubistry repo`);
   }
 });
