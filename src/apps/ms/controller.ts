@@ -25,7 +25,7 @@ export class MsController extends PhysicalPlayback {
   readonly letter: MsLetter;
   readonly period: MsPeriod;
   private readonly manifest: AssetManifest;
-  private readonly resolveAssets: typeof loadAssets;
+  protected readonly resolveAssets: typeof loadAssets;
   private planned: readonly LegalMove[] = [];
   private prepared: {
     source: CubeState;

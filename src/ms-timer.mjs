@@ -11,6 +11,7 @@ import {
   MsTimerTenthCube,
   TENTH_MOVE_MS,
   TENTH_WORD_IMAGE,
+  tenthAssetImages,
 } from "./apps/ms-timer/tenth.ts";
 import { MsTimer } from "./apps/ms-timer/timer.ts";
 import { PairController } from "./apps/pair/controller.ts";
@@ -243,27 +244,79 @@ async function initialize() {
       loadCounterDesign(undefined, base),
       loadMsDesign(base, msPin.runtimeSHA256),
     ]);
-    const manifest = {
-      ...proof.assets,
-      fonts: [],
-      documents: [],
-      images: [
-        ...proof.assets.images.filter(
-          (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
-        ),
-        ...hsmWords.filter((i) => i.id === "M" || i.id === "S"),
-        TENTH_WORD_IMAGE,
-      ],
-    };
+    function createTimerManifest(display = "dseg7", marker = "off") {
+      return {
+        ...proof.assets,
+        fonts: [],
+        documents: [],
+        images: [
+          ...tenthAssetImages(display, marker, proof.assets.images),
+          ...hsmWords.filter((i) => i.id === "M" || i.id === "S"),
+        ],
+      };
+    }
+    let currentDisplay = "dseg7";
+    let currentMarker = "off";
+    let manifest = createTimerManifest(currentDisplay, currentMarker);
     const resolveAssets = (m, prints, signal) =>
       loadAssets(m, prints, signal, base);
     stage = new ClockStage($("ms-timer-scene"), 3);
+
+    // Appearance panel font and orientation marker selectors
+    const appearancePanel = stage.appearancePanel;
+    let majorUnit = null, minorUnit = null;
+    if (appearancePanel) {
+      const displayLabel = document.createElement("label");
+      displayLabel.style.display = "block";
+      displayLabel.style.marginTop = "6px";
+      displayLabel.textContent = "Display ";
+      const displaySelect = document.createElement("select");
+      displaySelect.id = "timer-display";
+      displaySelect.setAttribute("aria-label", "Digit font display");
+      displaySelect.innerHTML = `
+        <option value="dseg7" selected>7-Segment (DSEG7)</option>
+        <option value="dseg14">14-Segment (DSEG14)</option>
+        <option value="classic">Classic (Geometric)</option>
+      `;
+      displayLabel.append(displaySelect);
+
+      const markerLabel = document.createElement("label");
+      markerLabel.style.display = "block";
+      markerLabel.style.marginTop = "6px";
+      markerLabel.textContent = "Orientation dot ";
+      const markerSelect = document.createElement("select");
+      markerSelect.id = "timer-marker";
+      markerSelect.setAttribute("aria-label", "Orientation dot indicator");
+      markerSelect.innerHTML = `
+        <option value="off" selected>Off</option>
+        <option value="auto">Auto (0, 2, 5, 6, 8, 9)</option>
+        <option value="all">All digits (0–9)</option>
+      `;
+      markerLabel.append(markerSelect);
+
+      appearancePanel.append(displayLabel, markerLabel);
+
+      const onAppearanceChange = async () => {
+        currentDisplay = displaySelect.value;
+        currentMarker = markerSelect.value;
+        const nextManifest = createTimerManifest(currentDisplay, currentMarker);
+        await Promise.all([
+          majorUnit?.updateManifest(nextManifest),
+          minorUnit?.updateManifest(nextManifest),
+          tenth?.updateManifest(nextManifest),
+        ]);
+      };
+
+      displaySelect.addEventListener("change", onAppearanceChange);
+      markerSelect.addEventListener("change", onAppearanceChange);
+    }
+
     // Minutes on the left (index 0), seconds in the middle (index 1), 1/10s on the right (index 2).
     viewers.major = stage.createCube($("ms-minutes"), 0);
     viewers.minor = stage.createCube($("ms-seconds"), 1);
     viewers.tenth = stage.createCube($("ms-tenths"), 2);
-    const unit = (letter, viewer) => (onState) =>
-      new MsTimerCube(
+    const unit = (letter, viewer) => (onState) => {
+      const cube = new MsTimerCube(
         viewer,
         design.print,
         manifest,
@@ -274,6 +327,10 @@ async function initialize() {
         },
         resolveAssets,
       );
+      if (letter === "M") majorUnit = cube;
+      if (letter === "S") minorUnit = cube;
+      return cube;
+    };
     const pair = new PairController({
       minorModulus: 60,
       majorModulus: 60,

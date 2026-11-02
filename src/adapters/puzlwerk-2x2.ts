@@ -13,6 +13,19 @@ export interface CounterSolver {
 }
 let sharedTable: Promise<Uint8Array> | undefined;
 async function loadTable(): Promise<Uint8Array> {
+  if (
+    typeof process !== "undefined" &&
+    process.versions?.node &&
+    TABLE_URL instanceof URL &&
+    TABLE_URL.protocol === "file:"
+  ) {
+    try {
+      const { readFileSync } = await import("node:fs");
+      return (sharedTable ??= Promise.resolve(new Uint8Array(readFileSync(TABLE_URL))));
+    } catch {
+      // Fall through to fetch
+    }
+  }
   sharedTable ??= fetch(TABLE_URL, {
     signal: AbortSignal.timeout(10000),
     redirect: "error",
