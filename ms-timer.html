@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · M/S Timer</title>
-    <script type="module" crossorigin src="/cubistry/assets/msTimer-4Jm16Ak8.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/msTimer-xSRFs8K8.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/three-BW9MzyAf.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-rotation-Bp0l0InI.js">
@@ -16,10 +16,10 @@
     <link rel="modulepreload" crossorigin href="/cubistry/assets/index-Il41stwk.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/design-DHA_FxE4.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/playback-DZ84n_LJ.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/images-MCvI0zwR.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/status-CP-uiTGZ.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/images-words-DIvmE0g9.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/status-C57--T_h.js">
     <link rel="stylesheet" crossorigin href="/cubistry/assets/stage-DqGfkQSZ.css">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/msTimer-P3Rqc3Bu.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/msTimer-DKUSD-oY.css">
     <link rel="stylesheet" crossorigin href="/cubistry/assets/style-BUPFihsN.css">
   </head>
   <body>
@@ -61,8 +61,9 @@
         <div>
           <h1 id="timer-heading">M/S Timer</h1>
           <p class="small">
-            One time, 00:00–59:59, in whole seconds. Two physical cubes: minutes
-            on the left, seconds on the right.
+            One time, 00:00.0–59:59.0, in tenth-second steps. Three physical
+            cubes: minutes on the left, seconds in the middle, 1/10 second on
+            the right.
           </p>
         </div>
       </div>
@@ -70,22 +71,29 @@
         <section
           class="clock-stage"
           id="ms-timer-display"
-          aria-label="Minutes and seconds cubes"
+          aria-label="Minutes, seconds, and tenth-second cubes"
           data-application="ms-timer"
         >
           <div id="ms-timer-scene" class="clock-viewer"></div>
           <div class="clock-cubes" aria-label="Individual cube state">
             <article class="clock-card">
-              <h2>Minutes (M)</h2>
+              <h2>Minutes (min)</h2>
               <div id="ms-minutes" data-unit="M" aria-busy="true"></div>
               <p id="ms-minutes-state" class="clock-state" role="status">
                 Preparing…
               </p>
             </article>
             <article class="clock-card">
-              <h2>Seconds (S)</h2>
+              <h2>Seconds (sec)</h2>
               <div id="ms-seconds" data-unit="S" aria-busy="true"></div>
               <p id="ms-seconds-state" class="clock-state" role="status">
+                Preparing…
+              </p>
+            </article>
+            <article class="clock-card">
+              <h2>1/10 Second (1/10)</h2>
+              <div id="ms-tenths" data-unit="T" aria-busy="true"></div>
+              <p id="ms-tenths-state" class="clock-state" role="status">
                 Preparing…
               </p>
             </article>
@@ -117,9 +125,9 @@
             <option value="6" label="10 ms"></option>
           </datalist>
           <p class="small">
-            The scheduler shortens the preferred time per move so that the last
-            turn of each cube ends at the one-second boundary. Both cubes turn
-            in parallel at a carry.
+            The scheduler shortens the preferred time per move on the minutes
+            and seconds cubes so their last turn ends at each one-second
+            boundary; the 1/10-second cube turns at 50 ms per QTM move.
           </p>
         </section>
         <aside
@@ -134,12 +142,12 @@
           </select>
           <form id="timer-duration-form">
             <div id="timer-duration-setting">
-              <label for="timer-duration">Duration MM:SS</label>
+              <label for="timer-duration">Duration MM:SS.d</label>
               <div class="duration-actions">
                 <input
                   id="timer-duration"
                   type="text"
-                  value="15:00"
+                  value="15:00.0"
                   autocomplete="off"
                   aria-describedby="timer-bounds"
                   disabled
@@ -148,13 +156,15 @@
               </div>
             </div>
           </form>
-          <p id="timer-bounds" class="small">00:00–59:59 · one-second steps</p>
+          <p id="timer-bounds" class="small">
+            00:00.0–59:59.0 · tenth-second steps
+          </p>
           <output
             id="timer-logical"
             class="timer-time"
-            aria-label="Timer time (one-second resolution)"
+            aria-label="Timer time (tenth-second resolution)"
             aria-describedby="timer-bounds"
-            >15:00</output
+            >15:00.0</output
           >
           <p class="small" id="timer-speed-note">Timer speed: 1× (fixed)</p>
           <div class="timer-actions">
@@ -179,9 +189,11 @@
       </div>
       <p id="error" role="alert"></p>
       <p class="small">
-        Drag the shared view to look around both cubes. The cubes use print S3
-        of the M/S Counter, one set to M and one to S; it is a research
-        candidate. See the M/S Timer documentation for its limits.
+        Drag the shared view to look around all three cubes. The minutes and
+        seconds cubes use print S3 of the M/S Counter with min and sec word
+        stickers; the 1/10-second cube uses the Period-1 {L, D, B} r2c1 0–9
+        sequence (L | L | B L | B L | D | B D | B L | D | L | D) with 1/10 at
+        r1c2.
       </p>
     </main>
   </body>
