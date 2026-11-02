@@ -212,10 +212,32 @@ async function configure() {
     fail(e);
   }
 }
+function syncUrl() {
+  try {
+    const nextUrl = new URL(location.href);
+    const design = $("calendar-design").value;
+    if (design === "en-3") {
+      nextUrl.searchParams.set("lang", "en");
+    } else {
+      nextUrl.searchParams.delete("lang");
+      nextUrl.searchParams.delete("design");
+    }
+    if (!live && date?.iso) {
+      nextUrl.searchParams.set("date", date.iso);
+    } else {
+      nextUrl.searchParams.delete("date");
+    }
+    history.replaceState(null, "", nextUrl);
+  } catch {}
+}
+
 $("calendar-application").addEventListener("change", () =>
   location.assign(new URL($("calendar-application").value, location.href)),
 );
-$("calendar-design").addEventListener("change", () => void configure());
+$("calendar-design").addEventListener("change", () => {
+  syncUrl();
+  void configure();
+});
 $("calendar-padding").addEventListener("change", () => void update());
 function inspectDate() {
   if (!ready || failed) return;
@@ -224,6 +246,7 @@ function inspectDate() {
     $("calendar-error").textContent = "";
     date = chosen;
     live = false;
+    syncUrl();
     void update();
     controls();
   } catch (e) {
@@ -245,6 +268,7 @@ function stepDate(direction) {
     live = false;
     $("calendar-date").value = date.iso;
     $("calendar-error").textContent = "";
+    syncUrl();
     void update();
     controls();
   } catch (e) {
@@ -258,6 +282,7 @@ $("calendar-live").addEventListener("click", () => {
   live = true;
   date = localDate(Date.now());
   $("calendar-date").value = date.iso;
+  syncUrl();
   void update();
   controls();
 });
@@ -291,6 +316,29 @@ async function initialize() {
       ),
       "Calendar font unavailable",
     );
+    const params = new URLSearchParams(location.search);
+    const langParam = params.get("lang") || params.get("language") || params.get("design");
+    if (langParam) {
+      const val = langParam.toLowerCase();
+      if (val === "en" || val === "en-3" || val === "english") {
+        $("calendar-design").value = "en-3";
+      } else if (val === "de" || val === "de-a" || val === "deutsch" || val === "german") {
+        $("calendar-design").value = "de-a";
+      }
+    }
+    const padParam = params.get("padding") ?? params.get("pad");
+    if (padParam !== null) {
+      $("calendar-padding").checked = !["0", "false", "off", "no"].includes(padParam.toLowerCase());
+    }
+    const dateParam = params.get("date");
+    if (dateParam && dateParam !== "today") {
+      try {
+        date = civilDate(dateParam);
+        live = false;
+      } catch {
+        // Fall back to today's local date if invalid
+      }
+    }
     viewer = new CalendarViewer($("calendar-viewer"));
     $("calendar-date").value = date.iso;
     await configure();
