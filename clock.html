@@ -73,73 +73,6 @@
               </p>
             </article>
           </div>
-          <section
-            id="clock-stats"
-            class="clock-stats"
-            role="status"
-            aria-live="off"
-            aria-label="Clock moves"
-          >
-            <table class="clock-move-table">
-              <caption>
-                Committed moves this session
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col">Cube</th>
-                  <th scope="col" abbr="Total HTM">Total HTM</th>
-                  <th scope="col" abbr="Cube rotations">Cube rotations</th>
-                  <th scope="col" abbr="Last tick HTM">Last tick</th>
-                  <th scope="col" abbr="Max HTM per tick">Max / tick</th>
-                  <th scope="col" abbr="Average HTM per tick">Average / tick</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr data-unit="H">
-                  <th scope="row">Hours</th>
-                  <td id="hours-session-moves">0</td>
-                  <td id="hours-session-rotations">0</td>
-                  <td id="hours-last-moves">—</td>
-                  <td id="hours-max-moves">—</td>
-                  <td id="hours-mean-moves">—</td>
-                </tr>
-                <tr data-unit="M">
-                  <th scope="row">Minutes</th>
-                  <td id="minutes-session-moves">0</td>
-                  <td id="minutes-session-rotations">0</td>
-                  <td id="minutes-last-moves">—</td>
-                  <td id="minutes-max-moves">—</td>
-                  <td id="minutes-mean-moves">—</td>
-                </tr>
-                <tr data-unit="S">
-                  <th scope="row">Seconds</th>
-                  <td id="seconds-session-moves">0</td>
-                  <td id="seconds-session-rotations">0</td>
-                  <td id="seconds-last-moves">—</td>
-                  <td id="seconds-max-moves">—</td>
-                  <td id="seconds-mean-moves">—</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr data-unit="total">
-                  <th scope="row">Total</th>
-                  <td id="total-session-moves">0</td>
-                  <td id="total-session-rotations">0</td>
-                  <td id="total-last-moves">—</td>
-                  <td id="total-max-moves">—</td>
-                  <td aria-label="No average for the total"></td>
-                </tr>
-              </tfoot>
-            </table>
-          </section>
-          <button
-            id="reset-clock-moves"
-            class="quiet clock-stats-reset"
-            type="button"
-            disabled
-          >
-            Reset session moves
-          </button>
           <aside class="clock-control floating-hud" aria-label="Live clock control display">
             <div class="hud-header">
               <h2 class="hud-title">Live time</h2>
@@ -166,6 +99,73 @@
                 <option value="words-pascal" selected>Small Hour / Min / Sec</option>
                 <option value="words">Small hour / min / sec</option>
               </select>
+              <section
+                id="clock-stats"
+                class="clock-stats"
+                role="status"
+                aria-live="off"
+                aria-label="Clock moves"
+              >
+                <table class="clock-move-table">
+                  <caption>
+                    Committed moves this session
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Cube</th>
+                      <th scope="col" abbr="Total HTM">Total HTM</th>
+                      <th scope="col" abbr="Cube rotations">Cube rotations</th>
+                      <th scope="col" abbr="Last tick HTM">Last tick</th>
+                      <th scope="col" abbr="Max HTM per tick">Max / tick</th>
+                      <th scope="col" abbr="Average HTM per tick">Average / tick</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr data-unit="H">
+                      <th scope="row">Hours</th>
+                      <td id="hours-session-moves">0</td>
+                      <td id="hours-session-rotations">0</td>
+                      <td id="hours-last-moves">—</td>
+                      <td id="hours-max-moves">—</td>
+                      <td id="hours-mean-moves">—</td>
+                    </tr>
+                    <tr data-unit="M">
+                      <th scope="row">Minutes</th>
+                      <td id="minutes-session-moves">0</td>
+                      <td id="minutes-session-rotations">0</td>
+                      <td id="minutes-last-moves">—</td>
+                      <td id="minutes-max-moves">—</td>
+                      <td id="minutes-mean-moves">—</td>
+                    </tr>
+                    <tr data-unit="S">
+                      <th scope="row">Seconds</th>
+                      <td id="seconds-session-moves">0</td>
+                      <td id="seconds-session-rotations">0</td>
+                      <td id="seconds-last-moves">—</td>
+                      <td id="seconds-max-moves">—</td>
+                      <td id="seconds-mean-moves">—</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr data-unit="total">
+                      <th scope="row">Total</th>
+                      <td id="total-session-moves">0</td>
+                      <td id="total-session-rotations">0</td>
+                      <td id="total-last-moves">—</td>
+                      <td id="total-max-moves">—</td>
+                      <td aria-label="No average for the total"></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </section>
+              <button
+                id="reset-clock-moves"
+                class="quiet clock-stats-reset"
+                type="button"
+                disabled
+              >
+                Reset session moves
+              </button>
             </div>
           </aside>
         </section>

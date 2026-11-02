@@ -9,17 +9,39 @@
   </head>
   <body>
     <main>
-      <header>
+      <header class="floating-island">
         <a class="brand" href="./"
           ><span class="brand-mark">▦</span> CUBISTRY</a
         >
-        <nav aria-label="Reference applications">
-          <a href="index.html">Counter</a> · <a href="clock.html">Clock</a> ·
-          <a href="calendar.html">Calendar</a>
-        </nav>
+        <div class="application-choice">
+          <label for="status-application">Cube / application</label>
+          <select id="status-application" onchange="if(this.value) location.href=this.value">
+            <optgroup label="Integrated Studio (2×2)">
+              <option value="chronocube.html">Chronocube Studio (Integrated 2×2)</option>
+            </optgroup>
+            <optgroup label="Calendar & Puzzles (3×3)">
+              <option value="calendar.html">Calendar · Deutsch / English</option>
+              <option value="playground.html">Picture Puzzle Playground</option>
+              <option value="status.html" selected>CI Quality Cube</option>
+            </optgroup>
+            <optgroup label="Multi-Cube Clocks & Timers (2×2)">
+              <option value="clock.html">Live H–M–S Clock</option>
+              <option value="ms-timer.html">M/S Timer</option>
+            </optgroup>
+            <optgroup label="Single-Cube Applications (2×2)">
+              <option value="index.html">Counter 0–99</option>
+              <option value="index.html?application=timer">60-Minute Timer</option>
+              <option value="index.html?application=five-second-timer">5-Second Timer</option>
+              <option value="index.html?application=tenth-counter">1/10-Second Counter 0–9</option>
+              <option value="index.html?application=hsm-counter">H/M/S Counter 00–59</option>
+              <option value="index.html?application=ms-counter">M/S Counter 00–59</option>
+              <option value="index.html?application=hm-one-cube">H/M One-Cube Counter</option>
+            </optgroup>
+          </select>
+        </div>
       </header>
-      <h1>CI Quality Cube</h1>
-      <p class="small">
+      <h1 class="sr-only">CI Quality Cube</h1>
+      <p class="small sr-only">
         Four categories. Five states each. One immutable physical print. Local
         simulated events only.
       </p>
@@ -31,15 +53,22 @@
             class="sr-only"
             aria-label="Committed category and state words"
           ></p>
-          <p id="status-sync" role="status" aria-live="polite">
+          <p id="status-sync" class="sr-only" role="status" aria-live="polite">
             Loading the fixed workflow print…
           </p>
-          <p class="small">
+          <p class="small sr-only">
             Drag to look around. Each category, icon and state word belongs
             permanently to its physical sticker.
           </p>
         </section>
-        <aside class="status-controls" aria-label="Workflow controls">
+        <aside class="status-controls floating-hud" aria-label="Workflow controls">
+          <div class="hud-header">
+            <h2 class="hud-title">CI Quality Cube</h2>
+            <div class="hud-actions">
+              <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+            </div>
+          </div>
+          <div class="hud-body">
           <dl class="status-values">
             <div>
               <dt>Last completed snapshot</dt>
@@ -94,10 +123,11 @@
             id="status-history"
             aria-label="Recent simulated workflow events"
           ></ol>
-          <p class="small">
-            New requests finish the active legal turn, discard obsolete moves,
-            then replan. A half turn takes twice the selected quarter-turn time.
-          </p>
+            <p class="small sr-only">
+              New requests finish the active legal turn, discard obsolete moves,
+              then replan. A half turn takes twice the selected quarter-turn time.
+            </p>
+          </div>
         </aside>
       </div>
       <p id="status-error" class="error" role="alert"></p>

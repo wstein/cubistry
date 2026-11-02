@@ -65,70 +65,86 @@
             class="sr-only"
             aria-label="Committed calendar face"
           ></div>
-          <p id="calendar-state" role="status">Preparing the fixed print…</p>
+          <p id="calendar-state" class="sr-only" role="status">Preparing the fixed print…</p>
         </section>
-        <aside class="calendar-controls">
-          <h2>Date</h2>
-          <output id="calendar-digital" aria-label="Requested calendar date"
-            >—</output
-          >
-          <p id="calendar-zone" class="small"></p>
-          <label for="calendar-design">Physical print</label
-          ><select id="calendar-design" disabled>
-            <option value="de-a">Deutsch · A</option>
-            <option value="en-3">English · 3</option>
-          </select>
-          <p id="calendar-layout" class="small"></p>
-          <label id="calendar-padding-label" hidden
-            ><input id="calendar-padding" type="checkbox" checked /> Leading
-            zero</label
-          >
-          <label for="calendar-date">Inspect a date</label
-          ><input
-            type="date"
-            id="calendar-date"
-            min="0001-01-01"
-            max="9999-12-31"
-            disabled
-          />
-          <div class="calendar-day-buttons">
-            <button id="calendar-decrement" aria-label="Previous day" disabled>
-              −1 day
-            </button>
-            <button id="calendar-increment" aria-label="Next day" disabled>
-              +1 day
-            </button>
+        <aside class="calendar-controls floating-hud" aria-label="Calendar controls">
+          <div class="hud-header">
+            <h2 class="hud-title">Date</h2>
+            <div class="hud-actions">
+              <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
+              <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+            </div>
           </div>
-          <p
-            id="calendar-estimates"
-            class="small"
-            aria-label="Day transition move estimates"
-          ></p>
-          <button id="calendar-live" class="primary" disabled>Today</button>
-          <div class="calendar-move-counts">
-            <span>Transition moves</span>
-            <output
-              id="calendar-moves"
-              aria-label="Physical transition move progress"
-              >0 / 0 HTM · 0 / 0 cube rotations</output
+          <div class="hud-body">
+            <output id="calendar-digital" aria-label="Requested calendar date"
+              >—</output
             >
-            <p id="calendar-route" class="small">Initial display</p>
-            <p id="calendar-queue" class="small"></p>
+            <p id="calendar-zone" class="small"></p>
+            <label for="calendar-design">Physical print</label
+            ><select id="calendar-design" disabled>
+              <option value="de-a">Deutsch · A</option>
+              <option value="en-3">English · 3</option>
+            </select>
+            <p id="calendar-layout" class="small"></p>
+            <label id="calendar-padding-label" hidden
+              ><input id="calendar-padding" type="checkbox" checked /> Leading
+              zero</label
+            >
+            <label for="calendar-date">Inspect a date</label
+            ><input
+              type="date"
+              id="calendar-date"
+              min="0001-01-01"
+              max="9999-12-31"
+              disabled
+            />
+            <div class="calendar-day-buttons">
+              <button id="calendar-decrement" aria-label="Previous day" disabled>
+                −1 day
+              </button>
+              <button id="calendar-increment" aria-label="Next day" disabled>
+                +1 day
+              </button>
+            </div>
+            <p
+              id="calendar-estimates"
+              class="small"
+              aria-label="Day transition move estimates"
+            ></p>
+            <button id="calendar-live" class="primary" disabled>Today</button>
+            <div class="calendar-move-counts">
+              <span>Transition moves</span>
+              <output
+                id="calendar-moves"
+                aria-label="Physical transition move progress"
+                >0 / 0 HTM · 0 / 0 cube rotations</output
+              >
+              <p id="calendar-route" class="small">Initial display</p>
+              <p id="calendar-queue" class="small"></p>
+            </div>
+            <label for="calendar-speed">Rotation Speed</label
+            ><select id="calendar-speed">
+              <option value="500">500 ms</option>
+              <option value="250">250 ms</option>
+              <option value="100" selected>100 ms</option>
+              <option value="50">50 ms</option>
+              <option value="10">10 ms</option>
+            </select>
+            <p class="small sr-only">
+              Drag to look around. Date changes follow legal turns, including
+              whole-cube rotations. The fixed stickers never change.
+            </p>
           </div>
-          <label for="calendar-speed">Rotation Speed</label
-          ><select id="calendar-speed">
-            <option value="500">500 ms</option>
-            <option value="250">250 ms</option>
-            <option value="100" selected>100 ms</option>
-            <option value="50">50 ms</option>
-            <option value="10">10 ms</option>
-          </select>
-          <p class="small">
-            Drag to look around. Date changes follow legal turns, including
-            whole-cube rotations. The fixed stickers never change.
-          </p>
         </aside>
       </div>
+      <button
+        type="button"
+        id="exit-presentation-btn"
+        class="presentation-exit-btn"
+        aria-label="Exit presentation mode"
+      >
+        ✕ Exit Presentation
+      </button>
       <p id="calendar-error" class="error" role="alert"></p>
     </main>
     <script type="module" src="/src/calendar.mjs"></script>
