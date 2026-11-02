@@ -19,9 +19,9 @@
 }
 .calendar-stage {
   min-width: 0;
-  background: #e9eee7;
-  border-radius: 24px;
-  padding: 24px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
   text-align: center;
 }
 #calendar-viewer {
@@ -37,10 +37,13 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 24px;
-  background: #fffdf6;
-  border: 1px solid #d9ded7;
-  border-radius: 24px;
+  padding: 20px 22px;
+  background: rgba(255, 253, 246, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(21, 59, 97, 0.16);
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(21, 59, 97, 0.14), 0 2px 8px rgba(21, 59, 97, 0.06);
 }
 .calendar-controls h2,
 .calendar-controls p {

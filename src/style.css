@@ -489,18 +489,18 @@ h1 {
 .cube-appearance-tabs {
   display: flex;
   background: rgba(21, 59, 97, 0.08);
-  padding: 3px;
-  border-radius: 10px;
+  padding: 4px;
+  border-radius: 12px;
   margin-bottom: 14px;
-  gap: 2px;
+  gap: 4px;
 }
 
 .cube-appearance-tab {
   flex: 1;
   border: none;
   background: transparent;
-  padding: 7px 10px;
-  font-size: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
   font-weight: 600;
   border-radius: 8px;
   color: rgba(21, 59, 97, 0.75);
@@ -614,6 +614,34 @@ main {
   position: relative;
   overflow: hidden;
   max-width: none;
+}
+
+/* Enable scrolling on multi-element pages like clock, timer, calendar, studio */
+html:has(.live-clock-page, .calendar-page, .chronocube-page, .ms-timer-page),
+body:has(.live-clock-page, .calendar-page, .chronocube-page, .ms-timer-page),
+body.live-clock-page,
+body.calendar-page,
+body.chronocube-page,
+body.ms-timer-page {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100vh;
+}
+
+main.live-clock-page,
+main.calendar-page,
+main.ms-timer-page,
+.chronocube-page main {
+  width: 100%;
+  max-width: 1440px;
+  height: auto !important;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 80px 24px 48px;
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
 }
 
 .workspace {
@@ -763,7 +791,7 @@ aside.cube-appearance.floating-hud {
   left: 16px;
   right: auto;
   z-index: 25;
-  width: clamp(320px, 28vw, 390px);
+  width: clamp(350px, 30vw, 420px);
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   box-sizing: border-box;
