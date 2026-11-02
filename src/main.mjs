@@ -417,12 +417,37 @@ const onPhysicalState = (physical, busy, failure, progress) => {
 };
 try {
   viewer = new CubeViewer($("cube"));
+  const tenthOptions = $("tenth-appearance-options");
+  if (tenthOptions && viewer.appearanceControls?.panel) {
+    for (const label of Array.from(tenthOptions.children)) {
+      viewer.appearanceControls.panel.append(label);
+    }
+  }
 } catch {
   error(
     "WebGL is unavailable. Enable hardware acceleration or try another browser.",
   );
   $("status").textContent = "3D rendering unavailable.";
 }
+function togglePresentation(enable) {
+  document.body.classList.toggle("presentation-mode", enable);
+  viewer?.resetCamera?.();
+}
+for (const hud of document.querySelectorAll(".floating-hud")) {
+  const toggleBtn = hud.querySelector(".hud-toggle-btn");
+  toggleBtn?.addEventListener("click", () => {
+    hud.classList.toggle("is-minimized");
+    toggleBtn.textContent = hud.classList.contains("is-minimized") ? "⚙" : "─";
+  });
+  const presBtn = hud.querySelector(".hud-presentation-btn");
+  presBtn?.addEventListener("click", () => togglePresentation(true));
+}
+$("exit-presentation-btn")?.addEventListener("click", () => togglePresentation(false));
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {
+    togglePresentation(false);
+  }
+});
 // The compatibility event reports presentation or zoom changes, ignoring clicks.
 const hideHint = () => {
   $("viewer-hint").hidden = true;
@@ -463,7 +488,7 @@ $("reset-session-moves").addEventListener("click", () =>
 // This screen-only field rule never selects a different permanent print or solver.
 function formatUi() {
   // The blank-top print shows its own physical blank; nothing is masked.
-  if (isTimer() || isHsm() || isMs() || isBlankTop()) {
+  if (isTimer() || isHsm() || isMs() || isBlankTop() || isTenth()) {
     viewer.setFaceletImageOverride(null);
     return;
   }
@@ -612,14 +637,18 @@ function getActiveManifest(
   const lettering = parseLettering($("hsm-lettering")?.value ?? "symbols");
   const letterImages = hsmImagesForFamily(lettering, family);
 
-  if (currentApp === "hsm-counter" || currentApp === "ms-counter" || currentApp === "hm-one-cube") {
+  if (currentApp === "hsm-counter" || currentApp === "ms-counter" || currentApp === "hm-one-cube" || currentApp === "tenth-counter") {
+    const fontTenthWord = letterImages.find((i) => i.id === "T");
+    const resolvedDigitImages = fontTenthWord
+      ? digitImages.map((img) => (img.id === "T" ? fontTenthWord : img))
+      : digitImages;
     return {
       ...proof.assets,
       fonts: [],
       documents: [],
       images: [
-        ...digitImages.filter((i) => /^[0-9]$/.test(i.id) || i.id === "blank"),
-        ...(currentApp === "hm-one-cube" ? hmImages : letterImages),
+        ...resolvedDigitImages.filter((i) => /^[0-9]$/.test(i.id) || i.id === "blank" || i.id === "T"),
+        ...(currentApp === "hm-one-cube" ? hmImages : currentApp === "tenth-counter" ? [] : letterImages),
       ],
     };
   }
@@ -639,8 +668,8 @@ function getActiveManifest(
   };
 }
 
-function tenthManifest(display, marker) {
-  return getActiveManifest(display, marker);
+function tenthManifest(display, marker, letterFont, currentApp = "tenth-counter") {
+  return getActiveManifest(display, marker, letterFont, currentApp);
 }
 
 async function updateStyle() {
@@ -925,7 +954,7 @@ $("application").addEventListener("change", async () => {
     } else if (requested === "tenth-counter") {
       candidate = new MsTimerTenthCube(
         viewer,
-        tenthManifest(),
+        tenthManifest(undefined, undefined, undefined, requested),
         callback,
         resolveAssets,
       );

@@ -59,12 +59,20 @@
         <section class="clock-stage" id="studio-stage" aria-label="Chronocube Studio Stage">
           <div id="studio-scene" class="clock-viewer"></div>
           <div id="studio-cards" class="clock-cubes" data-count="3"></div>
+          <aside id="studio-controls" class="clock-control floating-hud" aria-label="Studio controls">
+            <!-- Dynamically populated per active mode -->
+          </aside>
         </section>
-
-        <aside id="studio-controls" class="clock-control" aria-label="Studio controls">
-          <!-- Dynamically populated per active mode -->
-        </aside>
       </div>
+
+      <button
+        type="button"
+        id="exit-presentation-btn"
+        class="presentation-exit-btn"
+        aria-label="Exit presentation mode"
+      >
+        ✕ Exit Presentation
+      </button>
 
       <p id="studio-error" class="error" role="alert"></p>
 

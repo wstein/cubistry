@@ -43,8 +43,7 @@
       <section class="workspace" aria-label="Cube counter">
         <div class="cube-card">
           <div class="viewer-stage" style="position: relative;">
-            <details class="cube-appearance" style="position: absolute; top: 12px; left: 12px; z-index: 2; background: #fffdf5ed; color: #342e28; border: 1px solid #c9bbab; border-radius: 8px; padding: 7px 10px; font-size: 12px; text-align: left; max-width: calc(100% - 24px);">
-              <summary>Appearance</summary>
+            <div id="tenth-appearance-options" hidden>
               <label style="display: block; margin-top: 6px;">Display
                 <select id="tenth-display">
                   <option value="dseg7" selected>7-Segment (DSEG7)</option>
@@ -74,9 +73,317 @@
                   <option value="line-all">Underline: All digits (0–9)</option>
                 </select>
               </label>
-            </details>
+            </div>
             <div id="cube" aria-busy="true"></div>
             <span id="viewer-hint">Drag to rotate · Scroll to zoom</span>
+
+            <aside
+              id="counter-controls"
+              class="controls floating-hud"
+              aria-label="Counter controls"
+            >
+              <div class="hud-header">
+                <h1 class="hud-title">Counter</h1>
+                <div class="hud-actions">
+                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
+                  <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+                </div>
+              </div>
+              <div class="hud-body">
+                <label for="counter-print">Sticker print</label>
+                <select id="counter-print" aria-describedby="print-note">
+                  <option value="titled" selected>COUNTER title (default)</option>
+                  <option value="blank-top">Blank top 00–99</option>
+                </select>
+                <p id="print-note" class="small">
+                  Choose the print that matches your stickers. Changing it installs
+                  the other cube at the current value and restarts session moves.
+                </p>
+                <form id="jump-form">
+                  <label for="value">Target 0–99</label>
+                  <input
+                    id="value"
+                    type="text"
+                    inputmode="numeric"
+                    value="0"
+                    aria-describedby="bounds"
+                  />
+                  <div class="target-actions">
+                    <button id="set" type="submit">Set</button
+                    ><button
+                      id="run"
+                      type="button"
+                      class="primary"
+                      aria-pressed="false"
+                    >
+                      Run
+                    </button>
+                  </div>
+                </form>
+                <p id="bounds" class="small">
+                  Set a value directly, or Run toward it by 1 per second.
+                </p>
+                <div class="increments" aria-label="Manual steps">
+                  <button data-delta="-10">−10</button
+                  ><button data-delta="-1">−1</button
+                  ><button data-delta="1">+1</button
+                  ><button data-delta="10">+10</button>
+                </div>
+                <div class="options">
+                  <label class="check"
+                    ><input id="wrap" type="checkbox" /> Wrap 99 ↔ 0</label
+                  ><label class="check"
+                    ><input id="format" type="checkbox" checked />
+                    <span id="format-label">Leading Zero</span></label
+                  >
+                </div>
+                <p id="format-note" class="small">
+                  Leading Zero shows or hides only the leading 0. The layout, value,
+                  and moves stay the same.
+                </p>
+                <p id="mode-switch" class="small" hidden>
+                  Setup moves (mode switches, not counted in session moves):
+                  <output id="setup-moves" aria-label="Setup moves (HTM)">0</output>
+                </p>
+              </div>
+            </aside>
+
+            <aside
+              id="hsm-controls"
+              class="controls floating-hud"
+              aria-label="HSM counter controls"
+              hidden
+            >
+              <div class="hud-header">
+                <h1 id="hsm-heading" class="hud-title">H/M/S Counter</h1>
+                <div class="hud-actions">
+                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
+                  <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+                </div>
+              </div>
+              <div class="hud-body">
+                <label id="hsm-lettering-label" for="hsm-lettering">Sticker lettering</label>
+                <select id="hsm-lettering"><option value="symbols">Large H / M / S</option><option value="words-pascal" selected>Small Hour / Min / Sec</option><option value="words">Small hour / min / sec</option></select>
+                <label for="hsm-letter">Unit</label>
+                <select id="hsm-letter">
+                  <option value="H">H</option>
+                  <option value="M">M</option>
+                  <option value="S">S</option>
+                </select>
+                <label for="hsm-range">Count range</label>
+                <select id="hsm-range">
+                  <option value="59">00–59</option>
+                  <option value="23">00–23</option>
+                  <option value="11">00–11</option>
+                </select>
+                <label for="hsm-direction">Direction</label>
+                <select id="hsm-direction">
+                  <option value="1">Up</option>
+                  <option value="-1">Down</option>
+                </select>
+                <form id="hsm-set-form">
+                  <label for="hsm-value">Set value</label>
+                  <input id="hsm-value" type="text" inputmode="numeric" value="00" />
+                  <button type="submit">Set</button>
+                </form>
+                <div class="target-actions">
+                  <button
+                    id="hsm-run"
+                    type="button"
+                    class="primary"
+                    aria-pressed="false"
+                  >
+                    Run</button
+                  ><button id="hsm-reset" type="button">Reset</button>
+                </div>
+                <div class="increments">
+                  <button data-hsm-delta="-1">−1</button
+                  ><button data-hsm-delta="1">+1</button>
+                </div>
+                <p id="hsm-help" class="small">
+                  Counts one step per second, wrapping through 00. Upper-left stays
+                  blank. Settled number changes take at most six moves. A new target
+                  replaces old work after the current turn. Changing the unit sets up
+                  a fresh 00 display.
+                </p>
+              </div>
+            </aside>
+
+            <aside
+              id="ms-controls"
+              class="controls floating-hud"
+              aria-label="M/S counter controls"
+              hidden
+            >
+              <div class="hud-header">
+                <h1 class="hud-title">M/S Counter</h1>
+                <div class="hud-actions">
+                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
+                  <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+                </div>
+              </div>
+              <div class="hud-body">
+                <label for="ms-letter">Unit</label>
+                <select id="ms-letter">
+                  <option>M</option>
+                  <option>S</option>
+                </select>
+                <label for="ms-direction">Direction</label>
+                <select id="ms-direction">
+                  <option value="1">Up</option>
+                  <option value="-1">Down</option>
+                </select>
+                <form id="ms-set-form">
+                  <label for="ms-value">Set value</label>
+                  <input id="ms-value" type="text" inputmode="numeric" value="00" />
+                  <button type="submit">Set</button>
+                </form>
+                <div class="target-actions">
+                  <button
+                    id="ms-run"
+                    type="button"
+                    class="primary"
+                    aria-pressed="false"
+                  >
+                    Run</button
+                  ><button id="ms-reset" type="button">Reset</button>
+                </div>
+                <div class="increments">
+                  <button data-ms-delta="-1">−1</button
+                  ><button data-ms-delta="1">+1</button>
+                </div>
+                <p id="ms-period" class="small" aria-live="polite"></p>
+                <p class="small">
+                  Counts one step per second, wrapping through 00. Upper-left stays
+                  blank. Every +1 plays a saved step of at most four moves and every
+                  −1 plays the previous step backward. On this print (S3) seconds stay
+                  within three moves; a print with both units within three is
+                  unknown. Set and Reset walk the saved steps the shorter way round.
+                  Changing the unit sets up a fresh 00 display.
+                </p>
+              </div>
+            </aside>
+
+            <aside
+              id="tenth-controls"
+              class="controls floating-hud"
+              aria-label="1/10-second counter controls"
+              hidden
+            >
+              <div class="hud-header">
+                <h1 class="hud-title">1/10-Second Counter</h1>
+                <div class="hud-actions">
+                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
+                  <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+                </div>
+              </div>
+              <div class="hud-body">
+                <label for="tenth-direction">Direction</label>
+                <select id="tenth-direction">
+                  <option value="1">Up</option>
+                  <option value="-1">Down</option>
+                </select>
+                <label for="tenth-speed">Speed</label>
+                <select id="tenth-speed">
+                  <option value="2000">2s</option>
+                  <option value="1000" selected>1s</option>
+                  <option value="500">500ms</option>
+                  <option value="100">100ms</option>
+                </select>
+                <label>Set value (0–9)</label>
+                <div class="tenth-digits" role="group" aria-label="Set value 0 to 9">
+                  <button type="button" data-tenth-target="0">0</button>
+                  <button type="button" data-tenth-target="1">1</button>
+                  <button type="button" data-tenth-target="2">2</button>
+                  <button type="button" data-tenth-target="3">3</button>
+                  <button type="button" data-tenth-target="4">4</button>
+                  <button type="button" data-tenth-target="5">5</button>
+                  <button type="button" data-tenth-target="6">6</button>
+                  <button type="button" data-tenth-target="7">7</button>
+                  <button type="button" data-tenth-target="8">8</button>
+                  <button type="button" data-tenth-target="9">9</button>
+                </div>
+                <div class="target-actions">
+                  <button
+                    id="tenth-run"
+                    type="button"
+                    class="primary"
+                    aria-pressed="false"
+                  >
+                    Run
+                  </button>
+                </div>
+                <div class="increments">
+                  <button type="button" data-tenth-delta="-5">−5</button>
+                  <button type="button" data-tenth-delta="-1">−1</button>
+                  <button type="button" data-tenth-delta="1">+1</button>
+                  <button type="button" data-tenth-delta="5">+5</button>
+                </div>
+                <p id="tenth-period" class="small" aria-live="polite"></p>
+                <p class="small">
+                  Counts one tenth of a second per step, wrapping through 0..9.
+                  The 1/10 unit sticker at upper-right stays stationary while the
+                  single Period-1 closed sequence plays on the lower-left digit at
+                  50 ms per QTM. Digit buttons and step increments walk the saved period edges turn by turn.
+                </p>
+              </div>
+            </aside>
+
+            <aside
+              id="timer-controls"
+              class="timer-controls floating-hud"
+              aria-label="60-Minute Timer controls"
+              hidden
+            >
+              <div class="hud-header">
+                <h1 id="timer-heading" class="hud-title">60-Minute Timer</h1>
+                <div class="hud-actions">
+                  <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
+                  <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+                </div>
+              </div>
+              <div class="hud-body">
+                <label for="timer-mode">Mode</label>
+                <select id="timer-mode">
+                  <option value="countdown">Countdown</option>
+                  <option value="stopwatch">Stopwatch</option>
+                </select>
+                <form id="timer-duration-form">
+                  <div id="timer-duration-setting">
+                    <label for="timer-duration">Duration MM:SS</label>
+                    <div class="duration-actions">
+                      <input
+                        id="timer-duration"
+                        type="text"
+                        value="15:00"
+                        aria-describedby="timer-bounds"
+                      />
+                      <button id="timer-set" type="submit">Set</button>
+                    </div>
+                  </div>
+                </form>
+                <p id="timer-bounds" class="small">00:00–59:50 · 10-second steps</p>
+                <output
+                  id="timer-logical"
+                  class="timer-time"
+                  aria-label="Live timer time (one-second resolution)"
+                  aria-describedby="timer-bounds"
+                  >15:00</output
+                >
+                <label for="timer-speed">Timer speed</label>
+                <select id="timer-speed">
+                  <option value="1">1×</option>
+                  <option value="10">10×</option>
+                  <option value="20">20×</option>
+                  <option value="50">50×</option>
+                  <option value="100">100×</option>
+                </select>
+                <div class="timer-actions">
+                  <button id="timer-start" class="primary" type="button">Start</button
+                  ><button id="timer-reset" type="button">Reset</button>
+                </div>
+              </div>
+            </aside>
           </div>
           <div class="cube-footer">
             <section
@@ -171,270 +478,15 @@
             </datalist>
           </div>
         </div>
-        <aside
-          id="counter-controls"
-          class="controls"
-          aria-label="Counter controls"
-        >
-          <h1>Counter</h1>
-          <label for="counter-print">Sticker print</label>
-          <select id="counter-print" aria-describedby="print-note">
-            <option value="titled" selected>COUNTER title (default)</option>
-            <option value="blank-top">Blank top 00–99</option>
-          </select>
-          <p id="print-note" class="small">
-            Choose the print that matches your stickers. Changing it installs
-            the other cube at the current value and restarts session moves.
-          </p>
-          <form id="jump-form">
-            <label for="value">Target 0–99</label>
-            <input
-              id="value"
-              type="text"
-              inputmode="numeric"
-              value="0"
-              aria-describedby="bounds"
-            />
-            <div class="target-actions">
-              <button id="set" type="submit">Set</button
-              ><button
-                id="run"
-                type="button"
-                class="primary"
-                aria-pressed="false"
-              >
-                Run
-              </button>
-            </div>
-          </form>
-          <p id="bounds" class="small">
-            Set a value directly, or Run toward it by 1 per second.
-          </p>
-          <div class="increments" aria-label="Manual steps">
-            <button data-delta="-10">−10</button
-            ><button data-delta="-1">−1</button
-            ><button data-delta="1">+1</button
-            ><button data-delta="10">+10</button>
-          </div>
-          <div class="options">
-            <label class="check"
-              ><input id="wrap" type="checkbox" /> Wrap 99 ↔ 0</label
-            ><label class="check"
-              ><input id="format" type="checkbox" checked />
-              <span id="format-label">Leading Zero</span></label
-            >
-          </div>
-          <p id="format-note" class="small">
-            Leading Zero shows or hides only the leading 0. The layout, value,
-            and moves stay the same.
-          </p>
-          <p id="mode-switch" class="small" hidden>
-            Setup moves (mode switches, not counted in session moves):
-            <output id="setup-moves" aria-label="Setup moves (HTM)">0</output>
-          </p>
-        </aside>
-        <aside
-          id="hsm-controls"
-          class="controls"
-          aria-label="HSM counter controls"
-          hidden
-        >
-          <h1 id="hsm-heading">H/M/S Counter</h1>
-          <label id="hsm-lettering-label" for="hsm-lettering">Sticker lettering</label>
-          <select id="hsm-lettering"><option value="symbols">Large H / M / S</option><option value="words-pascal" selected>Small Hour / Min / Sec</option><option value="words">Small hour / min / sec</option></select>
-          <label for="hsm-letter">Unit</label>
-          <select id="hsm-letter">
-            <option value="H">H</option>
-            <option value="M">M</option>
-            <option value="S">S</option>
-          </select>
-          <label for="hsm-range">Count range</label>
-          <select id="hsm-range">
-            <option value="59">00–59</option>
-            <option value="23">00–23</option>
-            <option value="11">00–11</option>
-          </select>
-          <label for="hsm-direction">Direction</label>
-          <select id="hsm-direction">
-            <option value="1">Up</option>
-            <option value="-1">Down</option>
-          </select>
-          <form id="hsm-set-form">
-            <label for="hsm-value">Set value</label>
-            <input id="hsm-value" type="text" inputmode="numeric" value="00" />
-            <button type="submit">Set</button>
-          </form>
-          <div class="target-actions">
-            <button
-              id="hsm-run"
-              type="button"
-              class="primary"
-              aria-pressed="false"
-            >
-              Run</button
-            ><button id="hsm-reset" type="button">Reset</button>
-          </div>
-          <div class="increments">
-            <button data-hsm-delta="-1">−1</button
-            ><button data-hsm-delta="1">+1</button>
-          </div>
-          <p id="hsm-help" class="small">
-            Counts one step per second, wrapping through 00. Upper-left stays
-            blank. Settled number changes take at most six moves. A new target
-            replaces old work after the current turn. Changing the unit sets up
-            a fresh 00 display.
-          </p>
-        </aside>
-        <aside
-          id="ms-controls"
-          class="controls"
-          aria-label="M/S counter controls"
-          hidden
-        >
-          <h1>M/S Counter</h1>
-          <label for="ms-letter">Unit</label>
-          <select id="ms-letter">
-            <option>M</option>
-            <option>S</option>
-          </select>
-          <label for="ms-direction">Direction</label>
-          <select id="ms-direction">
-            <option value="1">Up</option>
-            <option value="-1">Down</option>
-          </select>
-          <form id="ms-set-form">
-            <label for="ms-value">Set value</label>
-            <input id="ms-value" type="text" inputmode="numeric" value="00" />
-            <button type="submit">Set</button>
-          </form>
-          <div class="target-actions">
-            <button
-              id="ms-run"
-              type="button"
-              class="primary"
-              aria-pressed="false"
-            >
-              Run</button
-            ><button id="ms-reset" type="button">Reset</button>
-          </div>
-          <div class="increments">
-            <button data-ms-delta="-1">−1</button
-            ><button data-ms-delta="1">+1</button>
-          </div>
-          <p id="ms-period" class="small" aria-live="polite"></p>
-          <p class="small">
-            Counts one step per second, wrapping through 00. Upper-left stays
-            blank. Every +1 plays a saved step of at most four moves and every
-            −1 plays the previous step backward. On this print (S3) seconds stay
-            within three moves; a print with both units within three is
-            unknown. Set and Reset walk the saved steps the shorter way round.
-            Changing the unit sets up a fresh 00 display.
-          </p>
-        </aside>
-        <aside
-          id="tenth-controls"
-          class="controls"
-          aria-label="1/10-second counter controls"
-          hidden
-        >
-          <h1>1/10-Second Counter</h1>
-          <label for="tenth-direction">Direction</label>
-          <select id="tenth-direction">
-            <option value="1">Up</option>
-            <option value="-1">Down</option>
-          </select>
-          <label for="tenth-speed">Speed</label>
-          <select id="tenth-speed">
-            <option value="2000">2s</option>
-            <option value="1000" selected>1s</option>
-            <option value="500">500ms</option>
-            <option value="100">100ms</option>
-          </select>
-          <label>Set value (0–9)</label>
-          <div class="tenth-digits" role="group" aria-label="Set value 0 to 9">
-            <button type="button" data-tenth-target="0">0</button>
-            <button type="button" data-tenth-target="1">1</button>
-            <button type="button" data-tenth-target="2">2</button>
-            <button type="button" data-tenth-target="3">3</button>
-            <button type="button" data-tenth-target="4">4</button>
-            <button type="button" data-tenth-target="5">5</button>
-            <button type="button" data-tenth-target="6">6</button>
-            <button type="button" data-tenth-target="7">7</button>
-            <button type="button" data-tenth-target="8">8</button>
-            <button type="button" data-tenth-target="9">9</button>
-          </div>
-          <div class="target-actions">
-            <button
-              id="tenth-run"
-              type="button"
-              class="primary"
-              aria-pressed="false"
-            >
-              Run
-            </button>
-          </div>
-          <div class="increments">
-            <button type="button" data-tenth-delta="-5">−5</button>
-            <button type="button" data-tenth-delta="-1">−1</button>
-            <button type="button" data-tenth-delta="1">+1</button>
-            <button type="button" data-tenth-delta="5">+5</button>
-          </div>
-          <p id="tenth-period" class="small" aria-live="polite"></p>
-          <p class="small">
-            Counts one tenth of a second per step, wrapping through 0..9.
-            The 1/10 unit sticker at upper-right stays stationary while the
-            single Period-1 closed sequence plays on the lower-left digit at
-            50 ms per QTM. Digit buttons and step increments walk the saved period edges turn by turn.
-          </p>
-        </aside>
-        <aside
-          id="timer-controls"
-          class="timer-controls"
-          aria-label="60-Minute Timer controls"
-          hidden
-        >
-          <h1 id="timer-heading">60-Minute Timer</h1>
-          <label for="timer-mode">Mode</label>
-          <select id="timer-mode">
-            <option value="countdown">Countdown</option>
-            <option value="stopwatch">Stopwatch</option>
-          </select>
-          <form id="timer-duration-form">
-            <div id="timer-duration-setting">
-              <label for="timer-duration">Duration MM:SS</label>
-              <div class="duration-actions">
-                <input
-                  id="timer-duration"
-                  type="text"
-                  value="15:00"
-                  aria-describedby="timer-bounds"
-                />
-                <button id="timer-set" type="submit">Set</button>
-              </div>
-            </div>
-          </form>
-          <p id="timer-bounds" class="small">00:00–59:50 · 10-second steps</p>
-          <output
-            id="timer-logical"
-            class="timer-time"
-            aria-label="Live timer time (one-second resolution)"
-            aria-describedby="timer-bounds"
-            >15:00</output
-          >
-          <label for="timer-speed">Timer speed</label>
-          <select id="timer-speed">
-            <option value="1">1×</option>
-            <option value="10">10×</option>
-            <option value="20">20×</option>
-            <option value="50">50×</option>
-            <option value="100">100×</option>
-          </select>
-          <div class="timer-actions">
-            <button id="timer-start" class="primary" type="button">Start</button
-            ><button id="timer-reset" type="button">Reset</button>
-          </div>
-        </aside>
       </section>
+      <button
+        type="button"
+        id="exit-presentation-btn"
+        class="presentation-exit-btn"
+        aria-label="Exit presentation mode"
+      >
+        ✕ Exit Presentation
+      </button>
       <p id="error" role="alert"></p>
     </main>
     <script type="module" src="/src/main.mjs"></script>
