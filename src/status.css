@@ -1,9 +1,23 @@
+body {
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+main {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
 .status-workspace {
-  display: grid;
-  align-items: start;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 24px;
-  margin-top: 24px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
 .status-stage .sr-only {
   position: absolute;
@@ -17,14 +31,17 @@
   border: 0;
 }
 .status-stage {
-  min-width: 0;
-  border-radius: 24px;
-  background: #e8ede5;
-  padding: 20px;
+  position: static;
+  background: transparent;
+  padding: 0;
 }
 #status-viewer {
-  height: 510px;
-  width: 100%;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;
+  z-index: 1;
 }
 #status-viewer > canvas {
   display: block;
@@ -36,10 +53,21 @@
   font-weight: 700;
 }
 .status-controls {
-  background: #fffdf6;
-  border: 1px solid #d5ddd2;
-  border-radius: 24px;
-  padding: 24px;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 25;
+  width: clamp(280px, 28vw, 360px);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: rgba(255, 253, 246, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(21, 59, 97, 0.16);
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(21, 59, 97, 0.14), 0 2px 8px rgba(21, 59, 97, 0.06);
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 12px;

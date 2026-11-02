@@ -293,6 +293,19 @@ async function initialize() {
     $("calendar-date").value = date.iso;
     await configure();
     presentation.setReady(!failed);
+    const presBtn = document.querySelector(".hud-presentation-btn");
+    presBtn?.addEventListener("click", () => {
+      $("presentation-toggle")?.click();
+    });
+    const toggleBtn = document.querySelector(".hud-toggle-btn");
+    toggleBtn?.addEventListener("click", () => {
+      document.querySelector(".calendar-controls")?.classList.toggle("minimized");
+    });
+    $("exit-presentation-btn")?.addEventListener("click", () => {
+      if (document.body.dataset.presentation === "true") {
+        $("presentation-toggle")?.click();
+      }
+    });
     setInterval(tick, 1000);
     document.addEventListener("visibilitychange", tick);
     window.addEventListener("pageshow", tick);

@@ -144,6 +144,9 @@ try {
     sessions.set(style, { design, assets });
   }
   viewer = new CubeViewer($("cube"));
+  document.querySelector(".hud-toggle-btn")?.addEventListener("click", () => {
+    document.querySelector(".controls")?.classList.toggle("minimized");
+  });
   speed();
   controller = new PlaygroundController(
     viewer,

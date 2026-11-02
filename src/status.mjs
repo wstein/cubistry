@@ -202,6 +202,10 @@ async function initialize() {
       () => QualityPolicy.load(statusDefinition, import.meta.env.BASE_URL),
     );
     await statusController.configure();
+    const toggleBtn = document.querySelector(".hud-toggle-btn");
+    toggleBtn?.addEventListener("click", () => {
+      document.querySelector(".status-controls")?.classList.toggle("minimized");
+    });
     ready = true;
     show();
   } catch (error) {
