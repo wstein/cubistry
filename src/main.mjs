@@ -27,7 +27,12 @@ import { TimerController } from "./apps/timer/controller.ts";
 import { TimerScheduler } from "./apps/timer/scheduler.ts";
 import { timerMotion } from "./apps/timer/status.ts";
 import { loadTimerRoute, loadFiveSecondRoute } from "./apps/timer/design.ts";
-import { MsTimerTenthCube, TENTH_WORD_IMAGE } from "./apps/ms-timer/tenth.ts";
+import {
+  MsTimerTenthCube,
+  TENTH_WORD_IMAGE,
+  DEFAULT_TENTH_STEP_INTERVAL,
+  tenthTurnSpeedForInterval,
+} from "./apps/ms-timer/tenth.ts";
 import { CounterRun } from "./apps/counter/run.mjs";
 import { SequenceNumber } from "./apps/shared/sequence-number.ts";
 import { loadCertifiedCounter } from "./apps/counter/certified.ts";
@@ -545,6 +550,12 @@ $("counter-print").addEventListener("change", async () => {
   controlsUi();
 });
 function speedUi() {
+  if (isTenth()) {
+    const interval = Number($("tenth-speed").value) || DEFAULT_TENTH_STEP_INTERVAL;
+    const turnSpeed = tenthTurnSpeedForInterval(interval);
+    viewer?.setAnimationSpeed(BASE_MOVE_DURATION_MS / turnSpeed);
+    return;
+  }
   const stop = Number($("rotation-speed").value);
   if (!isTimer() || !ready)
     viewer?.setAnimationSpeed(BASE_MOVE_DURATION_MS / durations[stop]);
@@ -560,6 +571,9 @@ $("rotation-speed").addEventListener("input", () => {
   speedUi();
   if (isTimer()) tick();
   save();
+});
+$("tenth-speed").addEventListener("change", () => {
+  speedUi();
 });
 function tick() {
   if (!ready) return;
@@ -579,7 +593,9 @@ function tick() {
   }
   if (isTenth()) {
     if (tenthRunning && !view.busy && performance.now() >= tenthNextAt) {
-      const interval = Number($("tenth-speed").value) || 500;
+      const interval = Number($("tenth-speed").value) || DEFAULT_TENTH_STEP_INTERVAL;
+      const turnSpeed = tenthTurnSpeedForInterval(interval);
+      viewer?.setAnimationSpeed(BASE_MOVE_DURATION_MS / turnSpeed);
       tenthNextAt = performance.now() + interval;
       request(tenthShift(Number($("tenth-direction").value) || 1));
     }
