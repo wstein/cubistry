@@ -222,3 +222,35 @@ test("setting any state keeps valid full cycle cubie state where all 8 cubies ma
     );
   }
 });
+
+test("tenth-speed options and hardwired turn speeds match specification", async () => {
+  const {
+    TENTH_STEP_INTERVALS,
+    DEFAULT_TENTH_STEP_INTERVAL,
+    TENTH_HARDWIRED_TURN_SPEEDS,
+    tenthTurnSpeedForInterval,
+  } = await import("../src/apps/ms-timer/tenth.ts");
+
+  assert.deepEqual([...TENTH_STEP_INTERVALS], [2000, 1000, 500, 100]);
+  assert.equal(DEFAULT_TENTH_STEP_INTERVAL, 1000);
+
+  // Hardwired turn speed verification:
+  // 100ms -> 50ms, 500ms -> 100ms, 1s (1000ms) -> 250ms, 2s (2000ms) -> 500ms
+  assert.equal(TENTH_HARDWIRED_TURN_SPEEDS[100], 50);
+  assert.equal(TENTH_HARDWIRED_TURN_SPEEDS[500], 100);
+  assert.equal(TENTH_HARDWIRED_TURN_SPEEDS[1000], 250);
+  assert.equal(TENTH_HARDWIRED_TURN_SPEEDS[2000], 500);
+
+  assert.equal(tenthTurnSpeedForInterval(100), 50);
+  assert.equal(tenthTurnSpeedForInterval(500), 100);
+  assert.equal(tenthTurnSpeedForInterval(1000), 250);
+  assert.equal(tenthTurnSpeedForInterval(2000), 500);
+
+  // Check index.html UI elements
+  const html = readFileSync("index.html", "utf8");
+  assert(html.includes('<select id="tenth-speed">'));
+  assert(html.includes('<option value="2000">2s</option>'));
+  assert(html.includes('<option value="1000" selected>1s</option>'));
+  assert(html.includes('<option value="500">500ms</option>'));
+  assert(html.includes('<option value="100">100ms</option>'));
+});

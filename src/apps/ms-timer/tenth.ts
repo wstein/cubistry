@@ -36,6 +36,27 @@ export const TENTH_MODULUS = 10;
 export const TENTH_MOVE_MS = 50;
 
 /**
+ * Hardwired step intervals and corresponding turn speeds for the 1/10-second counter:
+ *   100ms step -> 50ms turn
+ *   500ms step -> 100ms turn
+ *   1s step (1000ms) -> 250ms turn
+ *   2s step (2000ms) -> 500ms turn
+ */
+export const TENTH_STEP_INTERVALS = Object.freeze([2000, 1000, 500, 100] as const);
+export const DEFAULT_TENTH_STEP_INTERVAL = 1000;
+
+export const TENTH_HARDWIRED_TURN_SPEEDS: Readonly<Record<number, number>> = Object.freeze({
+  100: 50,
+  500: 100,
+  1000: 250,
+  2000: 500,
+});
+
+export function tenthTurnSpeedForInterval(intervalMs: number): number {
+  return TENTH_HARDWIRED_TURN_SPEEDS[intervalMs] ?? 250;
+}
+
+/**
  * Period-1 closed {L, D, B} cycle for the 0..9 digit at r2c1 ((-1,-1,1)),
  * keeping r1c2 ((1,1,1)) stationary with the "1/10" ("T") unit sticker:
  *   L | L | B L | B L | D | B D | B L | D | L | D  (6×L + 4×D, 14 QTM).
