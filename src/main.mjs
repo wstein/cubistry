@@ -31,6 +31,7 @@ import {
   MsTimerTenthCube,
   TENTH_WORD_IMAGE,
   DEFAULT_TENTH_STEP_INTERVAL,
+  tenthAssetImages,
   tenthTurnSpeedForInterval,
 } from "./apps/ms-timer/tenth.ts";
 import { CounterRun } from "./apps/counter/run.mjs";
@@ -374,7 +375,14 @@ const onPhysicalState = (physical, busy, failure, progress) => {
     return;
   }
   if (isTenth()) {
-    if (!busy) value = physical;
+    if (!busy) {
+      value = physical;
+      if (pendingTenthManifest) {
+        const m = pendingTenthManifest;
+        pendingTenthManifest = null;
+        view.updateManifest?.(m).catch((e) => error(e.message));
+      }
+    }
     text(
       "status",
       failure
@@ -590,6 +598,34 @@ $("tenth-direction").addEventListener("change", () => {
     tick();
   }
 });
+let pendingTenthManifest = null;
+function tenthManifest(
+  display = $("tenth-display")?.value || "dseg7",
+  marker = $("tenth-marker")?.value || "auto",
+) {
+  return {
+    ...proof.assets,
+    fonts: [],
+    documents: [],
+    images: tenthAssetImages(display, marker, proof.assets.images),
+  };
+}
+async function updateTenthStyle() {
+  if (!ready || !isTenth()) return;
+  const manifest = tenthManifest();
+  if (view?.busy) {
+    pendingTenthManifest = manifest;
+    return;
+  }
+  try {
+    pendingTenthManifest = null;
+    await view.updateManifest?.(manifest);
+  } catch (e) {
+    error(e.message);
+  }
+}
+$("tenth-display").addEventListener("change", updateTenthStyle);
+$("tenth-marker").addEventListener("change", updateTenthStyle);
 function tick() {
   if (!ready) return;
   if (isHsm()) {
@@ -853,17 +889,7 @@ $("application").addEventListener("change", async () => {
     } else if (requested === "tenth-counter") {
       candidate = new MsTimerTenthCube(
         viewer,
-        {
-          ...proof.assets,
-          fonts: [],
-          documents: [],
-          images: [
-            ...proof.assets.images.filter(
-              (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
-            ),
-            TENTH_WORD_IMAGE,
-          ],
-        },
+        tenthManifest(),
         callback,
         resolveAssets,
       );

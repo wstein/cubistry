@@ -15,7 +15,7 @@ import {
   parseAlg,
   type MovePresentation,
 } from "@cubistry/cube-mechanics";
-import { deploymentBasePath, loadAssets, type AssetManifest } from "@cubistry/cube-assets";
+import { deploymentBasePath, loadAssets, type AssetManifest, type ImageAsset } from "@cubistry/cube-assets";
 import {
   PhysicalPlayback,
   type MoveProgress,
@@ -28,6 +28,7 @@ import { MsPeriod } from "../ms/period.ts";
 import type { ClockSnapshot } from "../timer/clock.ts";
 import { ENDPOINT_TOLERANCE_MS, type TimerCube } from "../timer/scheduler.ts";
 import tenthTransitionsData from "./tenth-transitions.json" with { type: "json" };
+import dsegManifestData from "./dseg-manifests.json" with { type: "json" };
 
 /** Values 0..9 for the tenth-of-a-second cube. */
 export const TENTH_MODULUS = 10;
@@ -82,6 +83,57 @@ export const TENTH_WORD_IMAGE = Object.freeze({
   url: "/assets/hsm/words/T.svg",
   sha256: "0a1f78e209ae05bece7da56700a14e0c256b1e758bc3f5bb64b08fee766de070",
 });
+
+export type TenthDisplayVariant = "dseg7" | "dseg14" | "classic";
+export type TenthMarkerMode = "auto" | "all" | "off";
+
+/** Ambiguous digits under 180° rotation on 7-segment display (0, 2, 5, 6, 8, 9). */
+export const AMBIGUOUS_TENTH_DIGITS = Object.freeze(new Set([0, 2, 5, 6, 8, 9]));
+
+export function tenthAssetImages(
+  display: TenthDisplayVariant = "dseg7",
+  marker: TenthMarkerMode = "auto",
+  fallbackImages: readonly ImageAsset[] = [],
+): ImageAsset[] {
+  if (display === "classic") {
+    return [
+      ...fallbackImages.filter(
+        (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
+      ),
+      TENTH_WORD_IMAGE,
+    ];
+  }
+
+  const fontManifest = (
+    dsegManifestData as Record<
+      string,
+      Record<string, { url: string; sha256: string }>
+    >
+  )[display];
+  demand(Boolean(fontManifest), `Unknown display variant: ${display}`);
+
+  const images: ImageAsset[] = [
+    { id: "blank", kind: "color", color: "#fffdf6" },
+    TENTH_WORD_IMAGE,
+  ];
+
+  for (let d = 0; d < 10; d++) {
+    const showDot =
+      marker === "all" || (marker === "auto" && AMBIGUOUS_TENTH_DIGITS.has(d));
+    const key = showDot ? `${d}-dot` : `${d}`;
+    const entry = fontManifest[key];
+    demand(Boolean(entry), `Missing manifest entry for ${key}`);
+    images.push({
+      id: String(d),
+      kind: "image",
+      format: "svg",
+      url: entry.url,
+      sha256: entry.sha256,
+    });
+  }
+
+  return images;
+}
 
 /** Display target for the 1/10-second cube: blank at r1c1 & r2c2, "T" (1/10) at r1c2, digit at r2c1. */
 export function tenthTarget(value: number): DisplayTarget {
@@ -359,7 +411,7 @@ export function findTenthRoute(
  */
 export class MsTimerTenthCube extends PhysicalPlayback implements TimerCube {
   readonly period: MsPeriod;
-  private readonly manifest: AssetManifest;
+  private manifest: AssetManifest;
   private readonly resolveAssets: typeof loadAssets;
   private planned: readonly LegalMove[] = [];
   private prepared: {
@@ -537,6 +589,24 @@ export class MsTimerTenthCube extends PhysicalPlayback implements TimerCube {
       assets = await this.resolveAssets(this.manifest, [TENTH_PRINT]);
       this.prepared = null;
       this.install(TENTH_PRINT, state, assets, value);
+      assets = undefined;
+    } finally {
+      assets?.dispose();
+      this.configuring = false;
+    }
+    this.notify();
+  }
+
+  /** Update the active asset manifest and reconfigure cube textures in-place. */
+  async updateManifest(manifest: AssetManifest): Promise<void> {
+    demand(!this.busy && !this.configuring, "Wait for tenth-second motion");
+    this.configuring = true;
+    let assets;
+    try {
+      this.manifest = manifest;
+      const state = this.authoritative ?? this.period.poseFor(this.current);
+      assets = await this.resolveAssets(manifest, [TENTH_PRINT]);
+      this.install(TENTH_PRINT, state, assets, this.current);
       assets = undefined;
     } finally {
       assets?.dispose();

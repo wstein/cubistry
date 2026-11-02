@@ -294,4 +294,104 @@ test("tenth-speed options and hardwired turn speeds match specification", async 
   assert(!html.includes('id="tenth-value"'), "Must have no tenth-value text input");
   assert(!html.includes('id="tenth-set-form"'), "Must have no tenth-set-form");
   assert(!html.includes('id="tenth-reset"'), "Must have no tenth-reset button");
+
+  // DSEG display & orientation marker UI elements
+  assert(html.includes('<select id="tenth-display">'));
+  assert(html.includes('<option value="dseg7" selected>7-Segment (DSEG7)</option>'));
+  assert(html.includes('<option value="dseg14">14-Segment (DSEG14)</option>'));
+  assert(html.includes('<option value="classic">Classic (Geometric)</option>'));
+
+  assert(html.includes('<select id="tenth-marker">'));
+  assert(html.includes('<option value="auto" selected>Auto (0, 2, 5, 6, 8, 9)</option>'));
+  assert(html.includes('<option value="all">All digits (0–9)</option>'));
+  assert(html.includes('<option value="off">Off</option>'));
+});
+
+test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9) verify cleanly", async () => {
+  const {
+    tenthAssetImages,
+    AMBIGUOUS_TENTH_DIGITS,
+    TENTH_PRINT,
+    MsTimerTenthCube,
+  } = await import("../src/apps/ms-timer/tenth.ts");
+  const dsegManifest = JSON.parse(readFileSync("src/apps/ms-timer/dseg-manifests.json", "utf8"));
+
+  // Check all ambiguous digits are exactly {0, 2, 5, 6, 8, 9}
+  assert.deepEqual([...AMBIGUOUS_TENTH_DIGITS].sort(), [0, 2, 5, 6, 8, 9]);
+
+  // Check file hashes for every SVG in public/assets/digits/dseg7 and dseg14
+  for (const variant of ["dseg7", "dseg14"]) {
+    const entries = dsegManifest[variant];
+    assert.equal(Object.keys(entries).length, 20); // 10 clean + 10 dot
+    for (const [key, info] of Object.entries(entries)) {
+      const filePath = "public" + info.url;
+      const fileBytes = readFileSync(filePath);
+      const computedSha = sha256(fileBytes);
+      assert.equal(computedSha, info.sha256, `${filePath} sha256 mismatch`);
+      const svgContent = fileBytes.toString("utf8");
+      assert(svgContent.includes('<svg xmlns="http://www.w3.org/2000/svg"'));
+      assert(svgContent.includes('fill="#fffdf6"'));
+      assert(svgContent.includes('fill="#1d4771"'));
+    }
+  }
+
+  // Verify 'auto' marker mode: dots ONLY on 0, 2, 5, 6, 8, 9
+  for (const variant of ["dseg7", "dseg14"]) {
+    const autoImages = tenthAssetImages(variant, "auto");
+    assert.equal(autoImages.length, 12); // blank, T, 0..9
+    for (let d = 0; d < 10; d++) {
+      const img = autoImages.find((i) => i.id === String(d));
+      assert(img, `Digit ${d} image must be present`);
+      if (AMBIGUOUS_TENTH_DIGITS.has(d)) {
+        assert(img.url.endsWith(`${d}-dot.svg`), `Digit ${d} must have dot in auto mode`);
+      } else {
+        assert(img.url.endsWith(`${d}.svg`), `Digit ${d} must NOT have dot in auto mode`);
+      }
+    }
+
+    // Verify 'all' marker mode: dots on all 0..9
+    const allImages = tenthAssetImages(variant, "all");
+    for (let d = 0; d < 10; d++) {
+      const img = allImages.find((i) => i.id === String(d));
+      assert(img.url.endsWith(`${d}-dot.svg`), `Digit ${d} must have dot in all mode`);
+    }
+
+    // Verify 'off' marker mode: no dots on any digit
+    const offImages = tenthAssetImages(variant, "off");
+    for (let d = 0; d < 10; d++) {
+      const img = offImages.find((i) => i.id === String(d));
+      assert(img.url.endsWith(`${d}.svg`), `Digit ${d} must NOT have dot in off mode`);
+    }
+  }
+
+  // Verify MsTimerTenthCube.updateManifest preserves puzzle state and value
+  const mockView = {
+    configure() {},
+    animate() { return Promise.resolve(); },
+    resetCamera() {},
+  };
+  const mockAssets = { dispose() {} };
+
+  const cube = new MsTimerTenthCube(
+    mockView,
+    { schema: "cubistry.assets", version: 1, fonts: [], documents: [], images: tenthAssetImages("dseg7", "auto") },
+    () => {},
+    () => Promise.resolve(mockAssets),
+  );
+
+  await cube.configure(6);
+  assert.equal(cube.currentValue, 6);
+  const stateBefore = cube.state;
+
+  // Switch to DSEG14 in-place
+  await cube.updateManifest({
+    schema: "cubistry.assets",
+    version: 1,
+    fonts: [],
+    documents: [],
+    images: tenthAssetImages("dseg14", "all"),
+  });
+
+  assert.equal(cube.currentValue, 6);
+  assert.deepEqual(cube.state, stateBefore, "Cube permutation state must be preserved across manifest updates");
 });
