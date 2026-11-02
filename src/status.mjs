@@ -208,6 +208,47 @@ async function initialize() {
     toggleBtn?.addEventListener("click", () => {
       document.querySelector(".status-controls")?.classList.toggle("minimized");
     });
+    let exitTimer = null;
+    const togglePresentation = (enable) => {
+      const active = typeof enable === "boolean" ? enable : !document.body.classList.contains("presentation-mode");
+      document.body.classList.toggle("presentation-mode", active);
+      if (active) {
+        document.body.classList.add("show-exit-btn");
+        clearTimeout(exitTimer);
+        exitTimer = setTimeout(() => {
+          document.body.classList.remove("show-exit-btn");
+        }, 2500);
+        if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+      } else {
+        document.body.classList.remove("show-exit-btn");
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    };
+    document.querySelector("#presentation-btn, .island-presentation-btn")?.addEventListener("click", () => togglePresentation(true));
+    $("exit-presentation-btn")?.addEventListener("click", () => togglePresentation(false));
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {
+        togglePresentation(false);
+      }
+    });
+    window.addEventListener("mousemove", () => {
+      if (document.body.classList.contains("presentation-mode")) {
+        document.body.classList.add("show-exit-btn");
+        clearTimeout(exitTimer);
+        exitTimer = setTimeout(() => {
+          document.body.classList.remove("show-exit-btn");
+        }, 2500);
+      }
+    });
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement && document.body.classList.contains("presentation-mode")) {
+        togglePresentation(false);
+      }
+    });
     ready = true;
     show();
   } catch (error) {

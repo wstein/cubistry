@@ -99,9 +99,6 @@
   .calendar-controls {
     grid-row: 1;
   }
-  #calendar-viewer {
-    height: 390px;
-  }
 }
 
 .calendar-day-buttons {
