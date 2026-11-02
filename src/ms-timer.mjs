@@ -22,21 +22,11 @@ import hsmWords from "./apps/hsm/images-words-pascal.json";
 import msPin from "../ms-source.json";
 
 const $ = (id) => document.getElementById(id);
-const durations = [2000, 1000, 500, 250, 100, 50, 10];
-const speedLabels = [
-  "2 s",
-  "1 s",
-  "500 ms",
-  "250 ms",
-  "100 ms",
-  "50 ms",
-  "10 ms",
-];
 const MAX_TENTHS = ONE_SECOND_TIMER.maxSeconds * 10;
 const format = (seconds) =>
   formatMsTimer(Math.round(seconds * 10), MAX_TENTHS);
 const text = (id, value) => {
-  if ($(id).textContent !== value) $(id).textContent = value;
+  if ($(id)?.textContent !== value && $(id)) $(id).textContent = value;
 };
 
 let stage = null,
@@ -65,20 +55,6 @@ const action = (fn) => {
   ui();
 };
 const preferred = () => 100;
-
-function speedUi() {
-  text(
-    "speed-label",
-    `Fixed rotation times: Min 100 ms · Sec 100 ms · 1/10s 50 ms`,
-  );
-  if ($("rotation-speed")) {
-    $("rotation-speed").value = "4";
-    $("rotation-speed").setAttribute(
-      "aria-valuetext",
-      $("speed-label").textContent,
-    );
-  }
-}
 
 function ui() {
   if (!timer) return;
@@ -164,7 +140,6 @@ function ui() {
   $("timer-mode").disabled = !idle;
   $("timer-duration").disabled = !idle || running;
   $("timer-set").disabled = !idle || running;
-  $("rotation-speed").disabled = !idle;
   $("timer-duration-setting").hidden = timer.mode === "stopwatch";
   $("timer-bounds").textContent =
     timer.mode === "stopwatch"
@@ -187,10 +162,6 @@ function setDurationOf(unit) {
   return (ms) => viewers[unit]?.setAnimationSpeed(BASE_MOVE_DURATION_MS / ms);
 }
 
-$("rotation-speed").addEventListener("input", () => {
-  speedUi();
-  tick();
-});
 $("timer-duration").addEventListener("input", () => {
   durationDirty = true;
   ui();
@@ -370,7 +341,6 @@ async function initialize() {
       tenth.configure(0),
     ]);
     disposables.length = 0;
-    speedUi();
     setDurationOf("minor")(preferred());
     setDurationOf("major")(preferred());
     setDurationOf("tenth")(TENTH_MOVE_MS);

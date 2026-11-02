@@ -86,37 +86,6 @@
               </p>
             </article>
           </div>
-          <label class="speed-control" for="rotation-speed"
-            >Rotation Speed
-            <output id="speed-label"
-              >100 ms preferred per HTM move</output
-            ></label
-          >
-          <input
-            id="rotation-speed"
-            type="range"
-            min="0"
-            max="6"
-            step="1"
-            value="4"
-            list="speed-marks"
-            aria-describedby="speed-label"
-            disabled
-          />
-          <datalist id="speed-marks">
-            <option value="0" label="2 s"></option>
-            <option value="1" label="1 s"></option>
-            <option value="2" label="500 ms"></option>
-            <option value="3" label="250 ms"></option>
-            <option value="4" label="100 ms"></option>
-            <option value="5" label="50 ms"></option>
-            <option value="6" label="10 ms"></option>
-          </datalist>
-          <p class="small">
-            The scheduler shortens the preferred time per move on the minutes
-            and seconds cubes so their last turn ends at each one-second
-            boundary; the 1/10-second cube turns at 50 ms per QTM move.
-          </p>
         </section>
         <aside
           id="timer-controls"
