@@ -112,13 +112,14 @@ test("MsTimerTenthCube step, reset, set and request update state and advance thr
   assert.equal(cube.currentValue, 9);
 });
 
-test("all 90 tenth transitions loaded from file are verified against tenthTarget", async () => {
+test("all 90 tenth transitions loaded from file are verified against canonical states (all 8 cubies matter)", async () => {
   const {
     TENTH_OPTIMAL_TRANSITIONS,
     tenthOptimalMoves,
     tenthTarget,
     TENTH_WORDS,
   } = await import("../src/apps/ms-timer/tenth.ts");
+  const { stateEquals } = await import("@cubistry/cube-core");
   assert.equal(TENTH_OPTIMAL_TRANSITIONS.length, 90);
 
   // Compute the 10 canonical period states
@@ -127,7 +128,7 @@ test("all 90 tenth transitions loaded from file are verified against tenthTarget
     canonicalStates.push(applyMoves(canonicalStates[i], parseAlg(TENTH_WORDS[i])));
   }
 
-  const counts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
   for (const t of TENTH_OPTIMAL_TRANSITIONS) {
     assert(t.from >= 0 && t.from < 10);
     assert(t.to >= 0 && t.to < 10);
@@ -141,48 +142,83 @@ test("all 90 tenth transitions loaded from file are verified against tenthTarget
     // Apply moves to canonical starting state
     const endState = applyMoves(canonicalStates[t.from], moves);
     assert(
+      stateEquals(endState, canonicalStates[t.to]),
+      `Transition ${t.from} -> ${t.to} with ${t.alg} must match canonical state ${t.to} on all 8 cubies`,
+    );
+    assert(
       matchesTarget(TENTH_PRINT, endState, tenthTarget(t.to)),
       `Transition ${t.from} -> ${t.to} with ${t.alg} must match tenthTarget(${t.to})`,
     );
   }
 
-  // Distribution matches exact BFS: 33 1-move, 35 2-move, 19 3-move, 3 4-move
-  assert.equal(counts[1], 33);
-  assert.equal(counts[2], 35);
-  assert.equal(counts[3], 19);
-  assert.equal(counts[4], 3);
-  assert.equal(counts[1] + counts[2] + counts[3], 87); // 96.7% <= 3 moves
+  // Exact distribution of shortest paths between canonical period nodes preserving all 8 cubies:
+  assert.equal(counts[1], 14);
+  assert.equal(counts[2], 16);
+  assert.equal(counts[3], 16);
+  assert.equal(counts[4], 12);
+  assert.equal(counts[5], 20);
+  assert.equal(counts[6], 12);
 });
 
-test("findTenthRoute transitions 3 <-> 6 in a single L2 move", async () => {
+test("setting any state keeps valid full cycle cubie state where all 8 cubies matter", async () => {
   const {
     TENTH_PRINT,
     TENTH_WORDS,
-    findTenthRoute,
-    tenthTarget,
+    MsTimerTenthCube,
   } = await import("../src/apps/ms-timer/tenth.ts");
+  const { stateEquals } = await import("@cubistry/cube-core");
 
-  let st3 = initialState(TENTH_PRINT);
-  for (let i = 0; i < 3; i++) {
-    st3 = applyMoves(st3, parseAlg(TENTH_WORDS[i]));
+  const canonicalStates = [initialState(TENTH_PRINT)];
+  for (let i = 0; i < 9; i++) {
+    canonicalStates.push(applyMoves(canonicalStates[i], parseAlg(TENTH_WORDS[i])));
   }
-  assert(matchesTarget(TENTH_PRINT, st3, tenthTarget(3)));
 
-  // From state 3 to 6
-  const to6 = findTenthRoute(st3, 6);
-  assert.equal(to6.length, 1, "3 to 6 must be 1 move");
-  assert.equal(to6[0].face, "L");
-  assert.equal(to6[0].turns, 2, "3 to 6 must be L2");
+  const mockView = {
+    configure() {},
+    animate() {
+      return Promise.resolve();
+    },
+    resetCamera() {},
+  };
+  const mockAssets = { dispose() {} };
 
-  const st6 = applyMoves(st3, to6);
-  assert(matchesTarget(TENTH_PRINT, st6, tenthTarget(6)));
+  const cube = new MsTimerTenthCube(
+    mockView,
+    { schema: "cubistry.assets", version: 1, fonts: [], documents: [], images: [] },
+    () => {},
+    () => Promise.resolve(mockAssets),
+  );
 
-  // From state 6 back to 3
-  const backTo3 = findTenthRoute(st6, 3);
-  assert.equal(backTo3.length, 1, "6 back to 3 must be 1 move");
-  assert.equal(backTo3[0].face, "L");
-  assert.equal(backTo3[0].turns, 2, "6 back to 3 must be L2");
+  await cube.configure(0);
+  assert(stateEquals(cube.state, canonicalStates[0]), "Configured at 0 must match canonical state 0");
 
-  const backSt3 = applyMoves(st6, backTo3);
-  assert(matchesTarget(TENTH_PRINT, backSt3, tenthTarget(3)));
+  // Setting every digit must result in exact canonical cycle node on all 8 cubies
+  for (let target = 0; target < 10; target++) {
+    await cube.set(target);
+    assert(
+      stateEquals(cube.state, canonicalStates[target]),
+      `Setting ${target} must land on canonical state ${target} (all 8 cubies matter)`,
+    );
+  }
+
+  // Stepping +1 and -1 must also preserve all 8 cubies
+  await cube.set(0);
+  for (let i = 0; i < 10; i++) {
+    await cube.step(1);
+    const expected = (i + 1) % 10;
+    assert(
+      stateEquals(cube.state, canonicalStates[expected]),
+      `Step +1 to ${expected} must land on canonical state ${expected} (all 8 cubies matter)`,
+    );
+  }
+
+  await cube.set(0);
+  for (let i = 0; i < 10; i++) {
+    await cube.step(-1);
+    const expected = ((10 - i - 1) % 10 + 10) % 10;
+    assert(
+      stateEquals(cube.state, canonicalStates[expected]),
+      `Step -1 to ${expected} must land on canonical state ${expected} (all 8 cubies matter)`,
+    );
+  }
 });

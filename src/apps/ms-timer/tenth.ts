@@ -279,8 +279,8 @@ function serializeCubeState(state: CubeState): string {
 }
 
 /**
- * Finds the shortest path in {L, D, B} from any state to tenthTarget(value),
- * preferring period nodes when multiple shortest paths exist.
+ * Finds the shortest path in {L, D, B} from any state to the canonical period node
+ * (or tenthTarget(value) if periodNodes not provided), ensuring all 8 cubies match.
  */
 export function findTenthRoute(
   fromState: CubeState,
@@ -291,31 +291,29 @@ export function findTenthRoute(
     Number.isInteger(toValue) && toValue >= 0 && toValue < TENTH_MODULUS,
     "Invalid tenth target value",
   );
-  if (matchesTarget(TENTH_PRINT, fromState, tenthTarget(toValue))) return [];
+  const targetNode = periodNodes ? periodNodes[toValue] : null;
+  if (targetNode) {
+    if (stateEquals(fromState, targetNode)) return [];
+  } else if (matchesTarget(TENTH_PRINT, fromState, tenthTarget(toValue))) {
+    return [];
+  }
 
   const q: Array<{ st: CubeState; path: LegalMove[] }> = [
     { st: fromState, path: [] },
   ];
   const visited = new Set<string>([serializeCubeState(fromState)]);
-  let bestCandidate: LegalMove[] | null = null;
-  let minDepth = Infinity;
 
   while (q.length > 0) {
     const { st, path } = q.shift()!;
-    if (path.length > minDepth) break;
-
-    if (matchesTarget(TENTH_PRINT, st, tenthTarget(toValue))) {
-      minDepth = path.length;
-      if (!bestCandidate) {
-        bestCandidate = path;
-      }
-      if (periodNodes && stateEquals(st, periodNodes[toValue])) {
-        return path;
-      }
-      continue;
+    if (
+      targetNode
+        ? stateEquals(st, targetNode)
+        : matchesTarget(TENTH_PRINT, st, tenthTarget(toValue))
+    ) {
+      return path;
     }
 
-    if (path.length >= 4) continue;
+    if (path.length >= 6) continue;
     for (let i = 0; i < TENTH_PARSED_GENERATORS.length; i++) {
       const parsed = TENTH_PARSED_GENERATORS[i];
       if (path.length > 0) {
@@ -330,7 +328,7 @@ export function findTenthRoute(
       }
     }
   }
-  return bestCandidate ?? [];
+  return [];
 }
 
 /**
@@ -426,18 +424,38 @@ export class MsTimerTenthCube extends PhysicalPlayback implements TimerCube {
       this.planned = this.prepared.moves;
       return this.prepared.target;
     }
-    const moves = findTenthRoute(this.state, value, this.period.nodes);
-    const target = applyMoves(this.state, moves);
+    const target = this.period.nodes[value];
+    let moves: readonly LegalMove[];
+    const node = this.period.nodeOf(this.state);
+    if (node !== -1) {
+      if (node === value) {
+        moves = [];
+      } else {
+        moves = parseAlg(TENTH_CANONICAL_SHORTEST_PATHS[node][value]) as LegalMove[];
+      }
+    } else {
+      const route = this.period.route(this.state, value);
+      moves = (route ? route.moves : findTenthRoute(this.state, value, this.period.nodes)) as LegalMove[];
+    }
+    const endState = applyMoves(this.state, moves);
     demand(
-      matchesTarget(TENTH_PRINT, target, tenthTarget(value)),
-      "Tenth-second route failed to match target display",
+      stateEquals(endState, target),
+      "Tenth-second route failed to reach canonical target state (all 8 cubies matter)",
     );
     this.planned = moves;
     this.prepared = { source: this.state, value, moves, target };
     return target;
   }
 
-  protected targetMoves(): readonly LegalMove[] {
+  protected targetMoves(
+    from: CubeState,
+    _target: CubeState,
+    value: number,
+  ): readonly LegalMove[] {
+    if (this.prepared?.value === value && stateEquals(this.prepared.source, from)) {
+      return (this.route = this.planned = this.prepared.moves);
+    }
+    this.prepareTarget(value);
     return (this.route = this.planned);
   }
 
