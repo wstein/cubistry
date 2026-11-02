@@ -1,9 +1,18 @@
-// M/S Timer (stack PR 3): the predictive scheduler wired per cube on the pair
-// controller, in virtual time. Every turn is replayed on a separate cube model
-// built from the saved research words (tests/helpers/ms-timer-rig.mjs).
+// M/S Timer: the predictive scheduler wired per cube on the minutes/seconds pair
+// and the 1/10-second cube, in virtual time. Every turn is replayed on a
+// separate cube model built from the saved research words
+// (tests/helpers/ms-timer-rig.mjs).
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { MsTimerScheduler } from "../src/apps/ms-timer/scheduler.ts";
+import {
+  TENTH_MOVE_MS,
+  TENTH_PRINT,
+  TENTH_WORD_IMAGE,
+  TENTH_WORDS,
+} from "../src/apps/ms-timer/tenth.ts";
 import { planSequence } from "../src/apps/timer/scheduler.ts";
 import { stateEquals } from "../packages/cube-core/src/index.ts";
 import { inverseWord } from "../scripts/ms/convert-witness.mjs";
@@ -20,8 +29,14 @@ async function runChecked(r, firstBoundaryOffset, seconds, expect) {
     await r.runTo(boundary + 40);
     const played = r.take();
     r.check(expect(k));
-    const row = { k, boundary, minor: played.minor, major: played.major };
-    for (const unit of ["minor", "major"]) {
+    const row = {
+      k,
+      boundary,
+      minor: played.minor,
+      major: played.major,
+      tenth: played.tenth,
+    };
+    for (const unit of ["minor", "major", "tenth"]) {
       if (!played[unit].length) continue;
       const last = played[unit].at(-1);
       assert.ok(
@@ -33,6 +48,28 @@ async function runChecked(r, firstBoundaryOffset, seconds, expect) {
   }
   return report;
 }
+
+test("the 1/10-second word sticker and Period-1 {L, D, B} print satisfy asset and closure invariants", () => {
+  const bytes = readFileSync("public" + TENTH_WORD_IMAGE.url);
+  const sha = createHash("sha256").update(bytes).digest("hex");
+  assert.equal(sha, TENTH_WORD_IMAGE.sha256);
+  const svg = bytes.toString("utf8");
+  assert.match(svg, /viewBox="0 0 256 256"/);
+  assert.equal((svg.match(/<path\b/g) || []).length, 1);
+  assert.equal(TENTH_PRINT.stickers.length, 24);
+  assert.deepEqual([...TENTH_WORDS], [
+    "L",
+    "L",
+    "B L",
+    "B L",
+    "D",
+    "B D",
+    "B L",
+    "D",
+    "L",
+    "D",
+  ]);
+});
 
 test("derived budget arithmetic at 1x: about 82 ms for 3 moves, 43 ms for 4, no feasible serial 3 + 4", () => {
   const three = planSequence(3, 100, 1000),
@@ -47,7 +84,7 @@ test("derived budget arithmetic at 1x: about 82 ms for 3 moves, 43 ms for 4, no 
   assert.equal(planSequence(4, 100, 100).feasible, false);
 });
 
-test("Countdown 00:03 to 00:00: both cubes land on every second within 20 ms and the end holds", async () => {
+test("Countdown 00:03.0 to 00:00.0: all three cubes land on every second within 20 ms and the end holds", async () => {
   const r = await rig({ from: 3, duration: 3 });
   r.timer.start();
   const report = await runChecked(r, 1000, 3, (k) => 3 - k);
@@ -55,24 +92,65 @@ test("Countdown 00:03 to 00:00: both cubes land on every second within 20 ms and
     report.every((x) => x.major.length === 0),
     "no carry, the minutes cube rests",
   );
+  assert.ok(
+    report.every((x) => x.tenth.length === 14),
+    "the 1/10s cube plays all 14 QTM of its reverse period each second",
+  );
   assert.equal(r.timer.running, false);
   assert.equal(r.timer.clock.elapsed, true);
   assert.equal(r.pair.value, 0);
+  assert.equal(r.tenth.currentValue, 0);
   await r.runTo(r.now + 3000);
-  assert.deepEqual(r.take(), { minor: [], major: [] }, "no turn after 00:00");
-  assert.equal(r.timer.text, "00:00");
+  assert.deepEqual(
+    r.take(),
+    { minor: [], major: [], tenth: [] },
+    "no turn after 00:00.0",
+  );
+  assert.equal(r.timer.text, "00:00.0");
+  assert.equal(r.timer.shown, "00:00.0");
   assert.equal(r.timer.warning, "");
+});
+
+test("each tenth of a second the 1/10-second cube turns at 50 ms per QTM and closes its 14-QTM Period-1 cycle every second", async () => {
+  const r = await rig({ from: 0, mode: "stopwatch" });
+  const initialTenthPose = startPose("tenth", 0);
+  r.timer.start();
+  for (let d = 1; d <= 10; d++) {
+    const boundary = d * 100;
+    await r.runTo(boundary);
+    const played = r.take();
+    const expectedWord = TENTH_WORDS[d - 1];
+    assert.equal(
+      played.tenth.map((x) => x.move).join(" "),
+      expectedWord,
+      `step ${d - 1} -> ${d % 10} plays ${expectedWord}`,
+    );
+    for (const turn of played.tenth) {
+      assert.equal(
+        turn.completeAt - turn.calledAt,
+        TENTH_MOVE_MS,
+        "50 ms per QTM move",
+      );
+    }
+    assert.equal(played.tenth.at(-1).completeAt, boundary);
+    assert.equal(r.tenth.currentValue, d % 10);
+  }
+  assert.ok(
+    stateEquals(r.model.tenth, initialTenthPose),
+    "Period-1 cycle closes back to the exact initial 24-sticker state after 10 tenths",
+  );
 });
 
 test("each second the seconds cube turns about 82 ms per HTM and finishes at the boundary", async () => {
   const r = await rig({ from: 0, mode: "stopwatch" });
   r.timer.start();
   const report = await runChecked(r, 1000, 6, (k) => k);
-  for (const { k, minor } of report) {
+  for (const { k, minor, tenth } of report) {
     assert.ok(
       minor.length >= 1 && minor.length <= 3,
       `second ${k}: ${minor.length} HTM`,
     );
+    assert.equal(tenth.length, 14, `second ${k}: 14 QTM on the 1/10s cube`);
     const effective = planSequence(minor.length, 100, 1000).effective;
     assert.ok(effective > 80 && effective <= 100);
     // Contiguous: every turn starts where the previous one ended.
@@ -94,7 +172,7 @@ const CARRY_EDGES = [
 ];
 
 for (const [low, high, four] of CARRY_EDGES) {
-  test(`Stopwatch ${low} to ${high}: both cubes turn in parallel and end at the boundary${four ? " (4 HTM minutes edge)" : ""}`, async () => {
+  test(`Stopwatch ${low} to ${high}: all cubes turn in parallel and end at the boundary${four ? " (4 HTM minutes edge)" : ""}`, async () => {
     const start = at(low) - 2;
     const r = await rig({ from: start, mode: "stopwatch" });
     r.joinRunning(start); // join the run two seconds before the carry
@@ -110,6 +188,7 @@ for (const [low, high, four] of CARRY_EDGES) {
       true,
       "the seconds cube turns at the carry",
     );
+    assert.equal(carry.tenth.length, 14, "the 1/10s cube turns through the second");
     if (four) assert.equal(carry.major.length, 4, "4 HTM edge");
     // Parallel, not serial: the two windows overlap in time.
     const span = (rows) => [rows[0].calledAt, rows.at(-1).completeAt];
@@ -145,15 +224,15 @@ for (const [low, high, four] of CARRY_EDGES) {
   });
 }
 
-test("Stopwatch stops at 59:59 without wrapping; Reset walks back to 00:00 through the wrap", async () => {
+test("Stopwatch stops at 59:59.0 without wrapping; Reset walks back to 00:00.0 through the wrap", async () => {
   const start = at("59:57");
   const r = await rig({ from: start, mode: "stopwatch" });
   r.joinRunning(start);
   await runChecked(r, 1000, 2, (k) => start + k);
   assert.equal(r.timer.running, false);
-  assert.equal(r.timer.text, "59:59");
+  assert.equal(r.timer.text, "59:59.0");
   await r.runTo(r.now + 4000);
-  assert.deepEqual(r.take(), { minor: [], major: [] });
+  assert.deepEqual(r.take(), { minor: [], major: [], tenth: [] });
   assert.equal(r.pair.value, at("59:59"));
   const done = r.timer.reset();
   await r.runTo(r.now + 3000, { ticking: false });
@@ -166,12 +245,17 @@ test("two laps of the seconds cube: the display repeats after 60 steps while the
   const r = await rig({ from: 0, mode: "stopwatch", tick: 25 });
   r.timer.start();
   const start = startPose("minor", 0);
+  const startTenth = startPose("tenth", 0);
   let lastMinor = 0;
   for (let k = 1; k <= 121; k++) {
     await r.runTo(k * 1000 + 50);
     const played = r.take();
     lastMinor += played.minor.length;
     r.check(k);
+    assert.ok(
+      stateEquals(r.model.tenth, startTenth),
+      "1/10s cube closes every single second",
+    );
     if (k === 60) {
       assert.equal(r.pair.minor.currentValue, 0);
       assert.equal(
@@ -209,12 +293,11 @@ test("a missed carry is reported as Late and the cubes still end on the right va
   await r.settle();
   assert.equal(r.timer.warning, "Late");
   await r.runTo(r.now + 1500, { ticking: true });
-  r.timer.pause(); // reconciles both cubes with the paused clock
+  r.timer.pause(); // reconciles all cubes with the paused clock
   await r.runTo(r.now + 3000, { ticking: false });
-  assert.equal(r.pair.busy, false);
+  assert.equal(r.timer.busy, false);
   r.take();
-  r.check(r.timer.clock.bucket); // the late carry still ends on the right value
-  assert.equal(r.pair.value, r.timer.clock.bucket);
+  r.check(r.timer.clock.tenthBucket / 10); // the late carry still ends on the right value
 });
 
 test("an infeasible budget at a carry (00:59 to 01:00, both cubes) is reported", async () => {
@@ -250,22 +333,22 @@ test("the warning reports either cube alone, and Late wins over Budget infeasibl
 
 // ------------------------------------------------------ Set, Reset and pause
 
-test("Set walks the saved periods across carries, including the 4-HTM minutes edges, turn by turn", async () => {
+test("Set walks the saved periods across carries and tenths, including the 4-HTM minutes edges, turn by turn", async () => {
   const r = await rig({ from: 900 });
   const sequence = [
-    "14:59",
-    "15:00",
+    "14:59.5",
+    "15:00.0",
     "36:00",
-    "35:59",
+    "35:59.7",
     "55:59",
-    "56:00",
-    "00:00",
-    "59:59",
+    "56:00.2",
+    "00:00.0",
+    "59:59.0",
     "15:00",
   ];
   for (const target of sequence) {
     const before = r.take();
-    assert.deepEqual(before, { minor: [], major: [] });
+    assert.deepEqual(before, { minor: [], major: [], tenth: [] });
     const walking = r.timer.set(target);
     let done = false;
     walking.then(() => (done = true));
@@ -273,10 +356,11 @@ test("Set walks the saved periods across carries, including the 4-HTM minutes ed
     while (!done) await r.runTo(r.now + 10, { ticking: false });
     const played = r.take();
     r.check(at(target));
-    assert.equal(r.pair.value, at(target));
     assert.equal(r.timer.configuredSeconds, at(target));
     // No free jump: every change of value takes real turns.
-    assert.ok(played.minor.length + played.major.length > 0);
+    assert.ok(
+      played.minor.length + played.major.length + played.tenth.length > 0,
+    );
     assert.ok(r.now > started);
   }
 });
@@ -304,7 +388,7 @@ test("Reset returns by the shortest route to the configured duration (Countdown)
   await c.walk(c.timer.reset());
   c.take();
   c.check(5);
-  assert.equal(c.timer.text, "00:05");
+  assert.equal(c.timer.text, "00:05.0");
   assert.equal(c.timer.started, false);
 
   const s = await rig({ from: 0, mode: "stopwatch" });
@@ -313,7 +397,7 @@ test("Reset returns by the shortest route to the configured duration (Countdown)
   s.timer.pause();
   await s.walk(s.timer.reset());
   s.check(0);
-  assert.equal(s.timer.text, "00:00");
+  assert.equal(s.timer.text, "00:00.0");
 
   // Reset from far away is a walk by the fewer-HTM direction, ending exactly on the target.
   const far = await rig({ from: at("59:59"), duration: 900 });
@@ -321,7 +405,7 @@ test("Reset returns by the shortest route to the configured duration (Countdown)
   far.check(900);
 });
 
-test("changing the mode walks both cubes to the new start value", async () => {
+test("changing the mode walks all three cubes to the new start value", async () => {
   const r = await rig({ from: 900 });
   await r.walk(r.timer.setMode("stopwatch"));
   r.check(0);
@@ -329,20 +413,21 @@ test("changing the mode walks both cubes to the new start value", async () => {
   r.check(900);
 });
 
-test("pause keeps the fraction: 12.5 s shows 00:12 (Stopwatch) and resumes with 0.5 s to the next second", async () => {
+test("pause keeps the tenth-second fraction: 12.5 s shows 00:12.5 (Stopwatch) and resumes with 0.5 s to the next second", async () => {
   const r = await rig({ from: 0, mode: "stopwatch" });
   r.timer.start();
   await r.runTo(12500);
-  r.take();
   r.timer.pause();
-  await r.runTo(r.now + 20, { ticking: false });
-  assert.equal(r.timer.text, "00:12");
+  await r.runTo(r.now + 150, { ticking: false });
+  r.take();
+  assert.equal(r.timer.text, "00:12.5");
+  assert.equal(r.timer.shown, "00:12.5");
   assert.equal(r.timer.clock.valueMs, 12500);
-  r.check(12);
+  r.check(12.5);
   const paused = r.now;
   await r.runTo(paused + 5000, { ticking: false });
-  assert.equal(r.timer.text, "00:12");
-  assert.deepEqual(r.take(), { minor: [], major: [] });
+  assert.equal(r.timer.text, "00:12.5");
+  assert.deepEqual(r.take(), { minor: [], major: [], tenth: [] });
   r.timer.start();
   const boundary = r.now + 500;
   await r.runTo(boundary + 40);
@@ -351,16 +436,18 @@ test("pause keeps the fraction: 12.5 s shows 00:12 (Stopwatch) and resumes with 
   assert.ok(Math.abs(played.minor.at(-1).completeAt - boundary) <= TOLERANCE);
 });
 
-test("Countdown pause at 12.5 s left shows 00:13 and keeps the 0.5 s", async () => {
+test("Countdown pause at 12.5 s left walks to 00:12.5 and keeps the 0.5 s", async () => {
   const r = await rig({ from: 20, duration: 20 });
   r.timer.start();
   await r.runTo(7500);
   r.take();
   r.timer.pause();
-  await r.runTo(r.now + 20, { ticking: false });
-  assert.equal(r.timer.text, "00:13");
+  await r.runTo(r.now + 500, { ticking: false });
+  r.take();
+  assert.equal(r.timer.text, "00:12.5");
+  assert.equal(r.timer.shown, "00:12.5");
   assert.equal(r.timer.clock.valueMs, 12500);
-  r.check(13);
+  r.check(12.5);
 });
 
 test("invalid Set input is rejected, never rounded, and changes nothing", async () => {
@@ -372,13 +459,14 @@ test("invalid Set input is rejected, never rounded, and changes nothing", async 
     "1500",
     "",
     "-1:00",
-    "15:00.5",
+    "15:00.55",
+    "15:00.",
     "99:99",
   ]) {
     assert.throws(() => r.timer.set(bad), Error, bad);
     assert.equal(r.timer.configuredSeconds, 900);
   }
   await r.runTo(500, { ticking: false });
-  assert.deepEqual(r.take(), { minor: [], major: [] });
+  assert.deepEqual(r.take(), { minor: [], major: [], tenth: [] });
   assert.equal(r.timer.clock.valueMs, 900000);
 });
