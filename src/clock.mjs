@@ -325,10 +325,41 @@ async function initialize() {
       toggleBtn.textContent = hud.classList.contains("is-minimized") ? "⚙" : "─";
     });
     const presBtn = hud?.querySelector(".hud-presentation-btn");
+    let exitTimer = null;
     const togglePresentation = (enable) => {
-      document.body.classList.toggle("presentation-mode", enable);
+      const active = typeof enable === "boolean" ? enable : !document.body.classList.contains("presentation-mode");
+      document.body.classList.toggle("presentation-mode", active);
+      if (active) {
+        document.body.classList.add("show-exit-btn");
+        clearTimeout(exitTimer);
+        exitTimer = setTimeout(() => {
+          document.body.classList.remove("show-exit-btn");
+        }, 2500);
+        if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+      } else {
+        document.body.classList.remove("show-exit-btn");
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
       stage?.resetCamera?.();
     };
+    window.addEventListener("mousemove", () => {
+      if (document.body.classList.contains("presentation-mode")) {
+        document.body.classList.add("show-exit-btn");
+        clearTimeout(exitTimer);
+        exitTimer = setTimeout(() => {
+          document.body.classList.remove("show-exit-btn");
+        }, 2500);
+      }
+    });
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement && document.body.classList.contains("presentation-mode")) {
+        togglePresentation(false);
+      }
+    });
     presBtn?.addEventListener("click", () => togglePresentation(true));
     $("exit-presentation-btn")?.addEventListener("click", () => togglePresentation(false));
     window.addEventListener("keydown", (e) => {

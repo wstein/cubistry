@@ -261,11 +261,44 @@ function renderStudioHud(title, bodyHtml) {
   presBtn?.addEventListener("click", () => togglePresentation(true));
 }
 
+let exitTimer = null;
 function togglePresentation(enable) {
-  document.body.classList.toggle("presentation-mode", enable);
+  const active = typeof enable === "boolean" ? enable : !document.body.classList.contains("presentation-mode");
+  document.body.classList.toggle("presentation-mode", active);
+  if (active) {
+    document.body.classList.add("show-exit-btn");
+    clearTimeout(exitTimer);
+    exitTimer = setTimeout(() => {
+      document.body.classList.remove("show-exit-btn");
+    }, 2500);
+    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  } else {
+    document.body.classList.remove("show-exit-btn");
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
   activeStage?.resetCamera?.();
   activeViewer?.resetCamera?.();
 }
+
+window.addEventListener("mousemove", () => {
+  if (document.body.classList.contains("presentation-mode")) {
+    document.body.classList.add("show-exit-btn");
+    clearTimeout(exitTimer);
+    exitTimer = setTimeout(() => {
+      document.body.classList.remove("show-exit-btn");
+    }, 2500);
+  }
+});
+
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement && document.body.classList.contains("presentation-mode")) {
+    togglePresentation(false);
+  }
+});
 $("exit-presentation-btn")?.addEventListener("click", () => togglePresentation(false));
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {
