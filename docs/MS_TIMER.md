@@ -1,38 +1,46 @@
 # M/S Timer
 
 The **M/S Timer** (application id `ms-timer`) is a Countdown and a Stopwatch on
-**two** physical 2×2 cubes at one-second resolution: the left cube shows the
-minutes (M), the right cube the seconds (S). One combined time, **00:00–59:59**,
-is counted in whole seconds. The [60-Minute Timer](WORKSHOP_TIMER.md) works in
-10-second steps and the [5-Second Timer](FIVE_SECOND_TIMER.md) in 5-second
-steps, both on one cube; neither can show single seconds. Open it from the
-application chooser, at `ms-timer.html`, or with `index.html?application=ms-timer`.
+**three** physical 2×2 cubes at tenth-second resolution: the left cube shows the
+minutes (`min`), the middle cube the seconds (`sec`), and the right cube the
+tenth of a second (`1/10`). One combined time, **00:00.0–59:59.0**, is counted
+in tenth-second (`100 ms`) steps. The [60-Minute Timer](WORKSHOP_TIMER.md) works
+in 10-second steps and the [5-Second Timer](FIVE_SECOND_TIMER.md) in 5-second
+steps, both on one cube; neither can show single seconds or tenths. Open it from
+the application chooser, at `ms-timer.html`, or with
+`index.html?application=ms-timer`.
 
 The plan and the owner decisions of 2026-11-01 are in
 [the M/S Timer plan](../knowledge/plans/ms-timer.md).
 
 ## Behavior
 
-- **Two cubes, one stage.** Both cubes carry print S3 of the
-  [M/S Counter](MS_COUNTER.md): the left one is set to M, the right one to S.
-  They share one scene and one camera (the Live Clock stage with two cubes).
-- **Countdown** starts at 15:00 by default, counts down and stops at 00:00.
-  **Stopwatch** starts at 00:00, counts up and stops at 59:59 without wrapping.
-  Neither continues past its end; the end state is a displayed value of the print.
-- **Whole seconds.** The clock is the monotonic clock of the existing timers
-  with a one-second profile. Countdown rounds a partial second up, Stopwatch
-  down. Pause keeps the fraction: pausing a Stopwatch at 12.5 s shows 00:12
-  and keeps the 0.5 s, so Resume reaches 00:13 half a second later. The live
-  readout and the target of the cubes come from one monotonic sample.
+- **Three cubes, one stage.** The left and middle cubes carry print S3 of the
+  [M/S Counter](MS_COUNTER.md) with small bottom-aligned `min` and `sec` word
+  stickers at `r1c2` (matching the Live H–M–S Clock word lettering). The right
+  cube carries the 2×2×2 `0–9` counter at `r2c1` with a stationary `1/10`
+  sticker at `r1c2` (`blank` at `r1c1` and `r2c2`), replaying the Period-1
+  closed `{L, D, B}` sequence `L | L | B L | B L | D | B D | B L | D | L | D`
+  (14 QTM, 6×L + 4×D, max 2 QTM per step). All three cubes share one scene and
+  one camera (`ClockStage(host, 3)`).
+- **Countdown** starts at 15:00.0 by default, counts down and stops at 00:00.0.
+  **Stopwatch** starts at 00:00.0, counts up and stops at 59:59.0 without wrapping.
+  Neither continues past its end; the end state is a displayed value of the prints.
+- **Tenth-second resolution.** The clock is the monotonic clock of the existing
+  timers. Countdown rounds a partial tenth up, Stopwatch down. Pause keeps the
+  fraction: pausing a Stopwatch at 12.5 s shows 00:12.5 and keeps the 0.5 s, so
+  Resume reaches 00:13.0 half a second later. The live readout and the targets
+  of the cubes come from one monotonic sample.
 - **Controls** are those of the other timers: one Start / Pause / Resume
   button, Reset, Set, and the Countdown / Stopwatch mode switch. Set takes
-  `MM:SS` from 00:00 to 59:59; anything else (for example 60:00 or 15:6) is
-  rejected with a message and never rounded. Reset returns to the configured
-  duration (Countdown) or to 00:00 (Stopwatch).
+  `MM:SS` or `MM:SS.d` from 00:00.0 to 59:59.0; anything else (for example
+  60:00, 15:60, 15:6, or 15:00.12) is rejected with a message and never rounded.
+  Reset returns to the configured duration (Countdown) or to 00:00.0 (Stopwatch).
 - **Timer speed is 1× only** in this version; the page shows it as fixed. The
   tests use a virtual clock and need no acceleration.
-- **Rotation Speed** defaults to 100 ms per HTM move. It is a preference: the
-  scheduler shortens it per step so that the turns fit the budget (below).
+- **Rotation Speed** defaults to 100 ms per HTM move on the minutes and seconds
+  cubes (shortened per step by the scheduler so turns fit the one-second
+  budget), while the 1/10-second cube turns at a fixed **50 ms per QTM move**.
 - **Set and Reset walk the saved periods** of both cubes turn by turn, the way
   the M/S Counter does (the direction with fewer HTM, no free jumps). A newer
   target interrupts a walk between two turns of a saved word.
