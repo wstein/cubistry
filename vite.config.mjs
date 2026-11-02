@@ -40,6 +40,21 @@ export default defineConfig({
         clock: fileURLToPath(new URL("./clock.html", import.meta.url)),
         msTimer: fileURLToPath(new URL("./ms-timer.html", import.meta.url)),
         counter: fileURLToPath(new URL("./index.html", import.meta.url)),
+        counterAlias: fileURLToPath(new URL("./counter.html", import.meta.url)),
+        timer: fileURLToPath(new URL("./timer.html", import.meta.url)),
+        fiveSecondTimer: fileURLToPath(
+          new URL("./five-second-timer.html", import.meta.url),
+        ),
+        tenthCounter: fileURLToPath(
+          new URL("./tenth-counter.html", import.meta.url),
+        ),
+        hsmCounter: fileURLToPath(
+          new URL("./hsm-counter.html", import.meta.url),
+        ),
+        msCounter: fileURLToPath(new URL("./ms-counter.html", import.meta.url)),
+        hmOneCube: fileURLToPath(
+          new URL("./hm-one-cube.html", import.meta.url),
+        ),
         acceptance: fileURLToPath(
           new URL("./solver-acceptance.html", import.meta.url),
         ),
