@@ -33,20 +33,24 @@ const lettering = parseLettering(
   new URLSearchParams(location.search).get("lettering") ?? "words-pascal",
 );
 $("clock-lettering").value = lettering;
-const defaultSpeeds = { hours: "250", minutes: "100", seconds: "100" };
+const defaultSpeeds = { hours: 500, minutes: 250, seconds: 100 };
 for (const name of names) {
   const preferred = new URLSearchParams(location.search).get(name + "-speed");
-  if (["2000", "1000", "500", "250", "100", "50", "10"].includes(preferred)) {
-    $(name + "-speed").value = preferred;
-  } else {
-    $(name + "-speed").value = defaultSpeeds[name];
+  if ($(name + "-speed")) {
+    if (["2000", "1000", "500", "250", "100", "50", "10"].includes(preferred)) {
+      $(name + "-speed").value = preferred;
+    } else {
+      $(name + "-speed").value = String(defaultSpeeds[name]);
+    }
   }
 }
 $("clock-lettering").addEventListener("change", () => {
   const url = new URL(location.href);
   url.searchParams.set("lettering", $("clock-lettering").value);
-  for (const name of names)
-    url.searchParams.set(name + "-speed", $(name + "-speed").value);
+  for (const name of names) {
+    if ($(name + "-speed"))
+      url.searchParams.set(name + "-speed", $(name + "-speed").value);
+  }
   location.assign(url);
 });
 // Recovery searches run in slices that yield to the event loop (docs/HSM_COUNTER.md).
@@ -98,8 +102,10 @@ function draw() {
       node.dataset.state = state;
       node.textContent = `${String(u.controller.currentValue).padStart(2, "0")}${state === "idle" ? "" : state === "moving" ? " · Moving" : " · Synchronizing"}`;
       const quarter = u.scheduledQuarterDuration ?? u.duration;
-      $(names[i] + "-timing").textContent =
-        `Scheduled: quarter ${quarter.toFixed(1)} ms · half ${(quarter * 2).toFixed(1)} ms${quarter < u.duration - 0.05 ? " · fitted to live time" : ""}`;
+      if ($(names[i] + "-timing")) {
+        $(names[i] + "-timing").textContent =
+          `Scheduled: quarter ${quarter.toFixed(1)} ms · half ${(quarter * 2).toFixed(1)} ms${quarter < u.duration - 0.05 ? " · fitted to live time" : ""}`;
+      }
     });
   } catch (e) {
     fail(e);
@@ -236,16 +242,27 @@ async function initialize() {
       unclaimed.splice(unclaimed.indexOf(assets[i]), 1);
       await controller.configure(initial[i]);
       owned.push(controller);
-      const duration = Number($(names[i] + "-speed").value),
-        setDuration = (ms) =>
-          viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / ms, "quarter-turn");
+      const paramSpeed = Number(
+        new URLSearchParams(location.search).get(names[i] + "-speed"),
+      );
+      const duration =
+        paramSpeed &&
+        [2000, 1000, 500, 250, 100, 50, 10].includes(paramSpeed)
+          ? paramSpeed
+          : $(names[i] + "-speed")
+            ? Number($(names[i] + "-speed").value)
+            : defaultSpeeds[names[i]];
+      const setDuration = (ms) =>
+        viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / ms, "quarter-turn");
       setDuration(duration);
       units.push({ controller, duration, setDuration });
-      $(names[i] + "-speed").disabled = false;
-      $(names[i] + "-speed").addEventListener("change", () => {
-        units[i].duration = Number($(names[i] + "-speed").value);
-        draw();
-      });
+      if ($(names[i] + "-speed")) {
+        $(names[i] + "-speed").disabled = false;
+        $(names[i] + "-speed").addEventListener("change", () => {
+          units[i].duration = Number($(names[i] + "-speed").value);
+          draw();
+        });
+      }
     }
     ready = true;
     presentation.setReady(true);
