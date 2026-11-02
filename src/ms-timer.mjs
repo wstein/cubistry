@@ -7,11 +7,16 @@ import { ClockStage } from "./apps/clock/stage.ts";
 import { loadCounterDesign } from "./apps/counter/design.ts";
 import { loadMsDesign } from "./apps/ms/design.ts";
 import { MsTimerCube } from "./apps/ms-timer/cube.ts";
+import {
+  MsTimerTenthCube,
+  TENTH_MOVE_MS,
+  TENTH_WORD_IMAGE,
+} from "./apps/ms-timer/tenth.ts";
 import { MsTimer } from "./apps/ms-timer/timer.ts";
 import { PairController } from "./apps/pair/controller.ts";
-import { ONE_SECOND_TIMER, formatTimer } from "./apps/timer/clock.ts";
+import { ONE_SECOND_TIMER, formatMsTimer } from "./apps/timer/clock.ts";
 import { timerMotion } from "./apps/timer/status.ts";
-import hsmSymbols from "./apps/hsm/images.json";
+import hsmWords from "./apps/hsm/images-words.json";
 import msPin from "../ms-source.json";
 
 const $ = (id) => document.getElementById(id);
@@ -25,7 +30,9 @@ const speedLabels = [
   "50 ms",
   "10 ms",
 ];
-const format = (seconds) => formatTimer(seconds, ONE_SECOND_TIMER);
+const MAX_TENTHS = ONE_SECOND_TIMER.maxSeconds * 10;
+const format = (seconds) =>
+  formatMsTimer(Math.round(seconds * 10), MAX_TENTHS);
 const text = (id, value) => {
   if ($(id).textContent !== value) $(id).textContent = value;
 };
@@ -35,7 +42,7 @@ let stage = null,
   ready = false,
   failed = false,
   durationDirty = false;
-const viewers = { minor: null, major: null };
+const viewers = { minor: null, major: null, tenth: null };
 
 function fail(e) {
   failed = true;
@@ -74,9 +81,9 @@ function ui() {
   const idle = !failed && ready;
   const running = timer.running;
   const physical = timer.pair.value;
-  text("timer-logical", format(snapshot.liveSeconds));
-  $("ms-timer-display").dataset.value = format(physical);
-  $("ms-timer-display").setAttribute("aria-busy", String(timer.pair.busy));
+  text("timer-logical", timer.text);
+  $("ms-timer-display").dataset.value = timer.shown;
+  $("ms-timer-display").setAttribute("aria-busy", String(timer.busy));
   for (const [unit, id] of [
     ["major", "ms-minutes"],
     ["minor", "ms-seconds"],
@@ -89,12 +96,20 @@ function ui() {
       `${String(cube.currentValue).padStart(2, "0")}${cube.busy ? " · Moving" : ""}`,
     );
   }
+  if (timer.tenth) {
+    $("ms-tenths").dataset.value = String(timer.tenth.currentValue);
+    $("ms-tenths").setAttribute("aria-busy", String(timer.tenth.busy));
+    text(
+      "ms-tenths-state",
+      `.${timer.tenth.currentValue}${timer.tenth.busy ? " · Moving" : ""}`,
+    );
+  }
   const cubeTarget = (cube) =>
     cube.busy ? (cube.progress.target ?? cube.currentValue) : cube.currentValue;
   const motion = timerMotion({
     physical,
     logical: snapshot.bucket,
-    busy: timer.pair.busy,
+    busy: timer.busy,
     activeTarget:
       cubeTarget(timer.pair.major) * timer.pair.minorModulus +
       cubeTarget(timer.pair.minor),
@@ -113,7 +128,7 @@ function ui() {
     "timer-effective",
     motion === "idle" && !timer.warning
       ? ""
-      : `${Math.round(timer.effective.major)} ms minutes · ${Math.round(timer.effective.minor)} ms seconds effective`,
+      : `${Math.round(timer.effective.major)} ms minutes · ${Math.round(timer.effective.minor)} ms seconds · ${Math.round(timer.effective.tenth)} ms 1/10s effective`,
   );
   const elapsed = timer.clock.elapsed;
   const phase = elapsed
@@ -148,8 +163,8 @@ function ui() {
   $("timer-duration-setting").hidden = timer.mode === "stopwatch";
   $("timer-bounds").textContent =
     timer.mode === "stopwatch"
-      ? `Stopwatch · 00:00–${format(ONE_SECOND_TIMER.maxSeconds)} · stops at the limit`
-      : `00:00–${format(ONE_SECOND_TIMER.maxSeconds)} · one-second steps`;
+      ? `Stopwatch · 00:00.0–${format(ONE_SECOND_TIMER.maxSeconds)} · stops at the limit`
+      : `00:00.0–${format(ONE_SECOND_TIMER.maxSeconds)} · tenth-second steps`;
 }
 
 function tick() {
@@ -235,15 +250,17 @@ async function initialize() {
         ...proof.assets.images.filter(
           (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
         ),
-        ...hsmSymbols.filter((i) => i.id === "M" || i.id === "S"),
+        ...hsmWords.filter((i) => i.id === "M" || i.id === "S"),
+        TENTH_WORD_IMAGE,
       ],
     };
     const resolveAssets = (m, prints, signal) =>
       loadAssets(m, prints, signal, base);
-    stage = new ClockStage($("ms-timer-scene"), 2);
-    // Minutes on the left (index 0), seconds on the right (index 1).
+    stage = new ClockStage($("ms-timer-scene"), 3);
+    // Minutes on the left (index 0), seconds in the middle (index 1), 1/10s on the right (index 2).
     viewers.major = stage.createCube($("ms-minutes"), 0);
     viewers.minor = stage.createCube($("ms-seconds"), 1);
+    viewers.tenth = stage.createCube($("ms-tenths"), 2);
     const unit = (letter, viewer) => (onState) =>
       new MsTimerCube(
         viewer,
@@ -263,21 +280,36 @@ async function initialize() {
       createMajor: unit("M", viewers.major),
       onState: () => ui(),
     });
-    disposables.push(pair);
+    const tenth = new MsTimerTenthCube(
+      viewers.tenth,
+      manifest,
+      (...args) => {
+        ui();
+        if (args[2]) fail(args[2]);
+      },
+      resolveAssets,
+    );
+    disposables.push(pair, tenth);
     timer = new MsTimer({
       pair,
+      tenth,
       preferred,
       setDuration: {
         minor: setDurationOf("minor"),
         major: setDurationOf("major"),
+        tenth: setDurationOf("tenth"),
       },
       refresh: tick,
     });
-    await pair.configure(ONE_SECOND_TIMER.defaultSeconds);
+    await Promise.all([
+      pair.configure(ONE_SECOND_TIMER.defaultSeconds),
+      tenth.configure(0),
+    ]);
     disposables.length = 0;
     speedUi();
     setDurationOf("minor")(preferred());
     setDurationOf("major")(preferred());
+    setDurationOf("tenth")(TENTH_MOVE_MS);
     $("timer-duration").value = format(timer.configuredSeconds);
     ready = true;
     ui();
