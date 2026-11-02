@@ -91,7 +91,12 @@ export type TenthDisplayVariant =
   | "quicksand"
   | "outfit"
   | "classic";
-export type TenthMarkerMode = "auto" | "all" | "off";
+export type TenthMarkerMode =
+  | "auto"
+  | "all"
+  | "off"
+  | "line-auto"
+  | "line-all";
 
 /** Ambiguous digits under 180° rotation on 7-segment display (0, 2, 5, 6, 8, 9). */
 export const AMBIGUOUS_TENTH_DIGITS = Object.freeze(new Set([0, 2, 5, 6, 8, 9]));
@@ -124,9 +129,13 @@ export function tenthAssetImages(
   ];
 
   for (let d = 0; d < 10; d++) {
-    const showDot =
-      marker === "all" || (marker === "auto" && AMBIGUOUS_TENTH_DIGITS.has(d));
-    const key = showDot ? `${d}-dot` : `${d}`;
+    const isAmbiguous = AMBIGUOUS_TENTH_DIGITS.has(d);
+    let key = `${d}`;
+    if (marker === "all" || (marker === "auto" && isAmbiguous)) {
+      key = `${d}-dot`;
+    } else if (marker === "line-all" || (marker === "line-auto" && isAmbiguous)) {
+      key = `${d}-line`;
+    }
     const entry = fontManifest[key];
     demand(Boolean(entry), `Missing manifest entry for ${key}`);
     images.push({

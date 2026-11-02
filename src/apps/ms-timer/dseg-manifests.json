@@ -79,6 +79,46 @@
     "9-dot": {
       "url": "/assets/digits/dseg7/9-dot.svg",
       "sha256": "d3b14304b043bf48105196f47d2c115c822f8ded956e72d607ac37638a6c0196"
+    },
+    "0-line": {
+      "url": "/assets/digits/dseg7/0-line.svg",
+      "sha256": "b9d5fb70ebd35deac36a1be91f5406aede9b744c4806971cbb1039c05d474fc0"
+    },
+    "1-line": {
+      "url": "/assets/digits/dseg7/1-line.svg",
+      "sha256": "65b5b9ebe762a2da04292c1b7496161a367f08c686023cfb64db504e20941571"
+    },
+    "2-line": {
+      "url": "/assets/digits/dseg7/2-line.svg",
+      "sha256": "70abd75398cdfcdfd6dfbb71de44e238d0fe11f7676f423435a6d905767a061c"
+    },
+    "3-line": {
+      "url": "/assets/digits/dseg7/3-line.svg",
+      "sha256": "ef3840a500eec41630c5ba34e0274a31021aa40bdb21644b0be9a05a8c0f4b8a"
+    },
+    "4-line": {
+      "url": "/assets/digits/dseg7/4-line.svg",
+      "sha256": "56fd65dc248e510c9d1da323702b37393f0194efbecbbb286e620d161116b1b8"
+    },
+    "5-line": {
+      "url": "/assets/digits/dseg7/5-line.svg",
+      "sha256": "cd23323871f5bd1a8cfddd2f71dabefba48c9844aa5ba2e4f415726d5eb6a8b2"
+    },
+    "6-line": {
+      "url": "/assets/digits/dseg7/6-line.svg",
+      "sha256": "c849532f97a3078f8b703a5b90774ec2e309ed3e68a3a20494ab92553d15f2b5"
+    },
+    "7-line": {
+      "url": "/assets/digits/dseg7/7-line.svg",
+      "sha256": "7e12b27c727d84661fb9408970976a200c86e55ac98b3049a2caa7a99e0fee52"
+    },
+    "8-line": {
+      "url": "/assets/digits/dseg7/8-line.svg",
+      "sha256": "e0d582698f508ead96933bc333199742202b205fc78d95636b59ce636dc9ec7c"
+    },
+    "9-line": {
+      "url": "/assets/digits/dseg7/9-line.svg",
+      "sha256": "94f725cae8ef60b1a2bc6a6f469705aa07d45385916bd36caad5a9b86e5d44a8"
     }
   },
   "dseg14": {
@@ -161,6 +201,46 @@
     "9-dot": {
       "url": "/assets/digits/dseg14/9-dot.svg",
       "sha256": "96870f3df2471e8831aee7fad1e1a1f51e18b1a7dcd80253024f3dc6a4a9e380"
+    },
+    "0-line": {
+      "url": "/assets/digits/dseg14/0-line.svg",
+      "sha256": "ba1d438a0a876e41135efd1bba6d5fab0ca3e354274a974dc6696c26fff2e90a"
+    },
+    "1-line": {
+      "url": "/assets/digits/dseg14/1-line.svg",
+      "sha256": "8a3fae41f2040ac288eaa14fe76f72249246fc958c65063a59a071b2fbcfb893"
+    },
+    "2-line": {
+      "url": "/assets/digits/dseg14/2-line.svg",
+      "sha256": "08f0130e754e9af3cdaa04fcc4830eb98faf6636bee5159355f6bed14de4febf"
+    },
+    "3-line": {
+      "url": "/assets/digits/dseg14/3-line.svg",
+      "sha256": "2e00dc20c7de1f7c1ac2ec36557a36062a28ffb3ae2c322fb04bfffac627ba8f"
+    },
+    "4-line": {
+      "url": "/assets/digits/dseg14/4-line.svg",
+      "sha256": "aaf741acb5987919aeac4e2ab9d01eec8240f33f1fb45f74c86fe835a6d823f4"
+    },
+    "5-line": {
+      "url": "/assets/digits/dseg14/5-line.svg",
+      "sha256": "1c514443078733b9d9ae485720752571659d11da1c9ffbd10b9f4edb39dde829"
+    },
+    "6-line": {
+      "url": "/assets/digits/dseg14/6-line.svg",
+      "sha256": "adb3707bab77a402a974e556d7a81630edf3732565744724f68860aff0893853"
+    },
+    "7-line": {
+      "url": "/assets/digits/dseg14/7-line.svg",
+      "sha256": "d44f2a087f87fb3b8cdb1d45b6aa8c1c5a697fa1a13f42d91ee22dfe89aea8a3"
+    },
+    "8-line": {
+      "url": "/assets/digits/dseg14/8-line.svg",
+      "sha256": "0a3b45be75964accc29ee0ac34e0f06f64ae4b4c890435c0c853317b5fce8c24"
+    },
+    "9-line": {
+      "url": "/assets/digits/dseg14/9-line.svg",
+      "sha256": "8574d0483de5841953f678cf9f4dfe3d6328bf75ccee6bc6c05ada9f0dded3e0"
     }
   },
   "noto-sans": {
@@ -243,6 +323,46 @@
     "9-dot": {
       "url": "/assets/digits/noto-sans/9-dot.svg",
       "sha256": "55a43e3cedb9a0b33770626e7c18fd72bf61a87b41bc3b01070a5a4987db4f18"
+    },
+    "0-line": {
+      "url": "/assets/digits/noto-sans/0-line.svg",
+      "sha256": "b3d883e47782b15f64ba57aab97a16025b9058df970874ffd7e00aec9dec62da"
+    },
+    "1-line": {
+      "url": "/assets/digits/noto-sans/1-line.svg",
+      "sha256": "14a3e033512a34cc16d1797e70352f8ffaf9527ad90c7fc1409778c5c6890bae"
+    },
+    "2-line": {
+      "url": "/assets/digits/noto-sans/2-line.svg",
+      "sha256": "d92d99aba1c9da38dc06bc019e23fd0a970703551cdfe12eebda0b95bcba2af6"
+    },
+    "3-line": {
+      "url": "/assets/digits/noto-sans/3-line.svg",
+      "sha256": "fc178ffc30df3ee06dca584af45d455cc4de54932c111f8b35f0d3d7350dd354"
+    },
+    "4-line": {
+      "url": "/assets/digits/noto-sans/4-line.svg",
+      "sha256": "40e374a4285b95d178ca96ca7ddb50361415b7573a211effef7157e4cdd07f19"
+    },
+    "5-line": {
+      "url": "/assets/digits/noto-sans/5-line.svg",
+      "sha256": "4ae6955cfec999565c628c359b6b84eeb1402e450700e154f20c8ecde4aa9aa4"
+    },
+    "6-line": {
+      "url": "/assets/digits/noto-sans/6-line.svg",
+      "sha256": "ca7ad95eb2638f60a6d54e480ea09a9876fd9bf273ef1af536b752d022bd4801"
+    },
+    "7-line": {
+      "url": "/assets/digits/noto-sans/7-line.svg",
+      "sha256": "2a37a6a1917b5e8d9d2a7e5483f420fc62ef49499f9cb9206953241c69e3b6ff"
+    },
+    "8-line": {
+      "url": "/assets/digits/noto-sans/8-line.svg",
+      "sha256": "90b7fab35829de81572a713e42e39d6e04d88133ef391cde2883c7a02fc66c6d"
+    },
+    "9-line": {
+      "url": "/assets/digits/noto-sans/9-line.svg",
+      "sha256": "573689ec2ac6f83ae6a67662011a4696a4fba70d4acf7abce7cfd5d2377179f2"
     }
   },
   "quicksand": {
@@ -325,6 +445,46 @@
     "9-dot": {
       "url": "/assets/digits/quicksand/9-dot.svg",
       "sha256": "14cbd6d8959d7e86672be279ba17c9cfa0368e8e25efeddbf43e95c5a0164810"
+    },
+    "0-line": {
+      "url": "/assets/digits/quicksand/0-line.svg",
+      "sha256": "4315ab326dd9478d92aadb3cf1aa8076d3092b7b07f6b69d4bf84a3516627d78"
+    },
+    "1-line": {
+      "url": "/assets/digits/quicksand/1-line.svg",
+      "sha256": "70a2b1727a9e3ad06b07ae1ca499bcb73f3b1a66bcabe52dae8370eb829f3b75"
+    },
+    "2-line": {
+      "url": "/assets/digits/quicksand/2-line.svg",
+      "sha256": "c8a93e3b390c6b182caffaf2cd236b06e98fe95d28c4d1d5d84273bf0c075689"
+    },
+    "3-line": {
+      "url": "/assets/digits/quicksand/3-line.svg",
+      "sha256": "4c1d4ee6c05d16b5cfe0b784cc825d034539fa9f9045de5079565a2190fc31cc"
+    },
+    "4-line": {
+      "url": "/assets/digits/quicksand/4-line.svg",
+      "sha256": "794ad1adba9a7572b7a3c3b8f3e03239793b5775a7d63cdf8d4c89d1820315d2"
+    },
+    "5-line": {
+      "url": "/assets/digits/quicksand/5-line.svg",
+      "sha256": "1ddba44e8df5b6a60f5cf48d70df9c8d311bef0db472387619eafddbac8a45bd"
+    },
+    "6-line": {
+      "url": "/assets/digits/quicksand/6-line.svg",
+      "sha256": "5051086f325ab0416d87bb12a25557817c6a81a9fd2037d193c296468e8174c9"
+    },
+    "7-line": {
+      "url": "/assets/digits/quicksand/7-line.svg",
+      "sha256": "562f5ebcd247e7c7a9d67de0c85b0e321a1c06f5a184495b947d0cd5486cbc42"
+    },
+    "8-line": {
+      "url": "/assets/digits/quicksand/8-line.svg",
+      "sha256": "7985f39bbe900c8b6908b80578957078b100487714517c33c8df742e50118858"
+    },
+    "9-line": {
+      "url": "/assets/digits/quicksand/9-line.svg",
+      "sha256": "787c4066f11283f27040b1a2f5a5ff4ae3c9389b416c668e3fa1ba052318a76c"
     }
   },
   "outfit": {
@@ -407,6 +567,46 @@
     "9-dot": {
       "url": "/assets/digits/outfit/9-dot.svg",
       "sha256": "f77e253f6139ff71f339ffc8b400fbdc1410baabaf3cba73fe280225133495bc"
+    },
+    "0-line": {
+      "url": "/assets/digits/outfit/0-line.svg",
+      "sha256": "30250d3e6678d901210428e0483b9f36c7048d5919ac2ccc6e2bba88a3fdf3fd"
+    },
+    "1-line": {
+      "url": "/assets/digits/outfit/1-line.svg",
+      "sha256": "c2408b38680d7dd2110b3739aaf67d76194e8e6b61fe4fe7842ce7abcae7e33c"
+    },
+    "2-line": {
+      "url": "/assets/digits/outfit/2-line.svg",
+      "sha256": "f614bd7b9139e696f16890acfd21a47ff1f407f0bede5785d9d948a17bc045e0"
+    },
+    "3-line": {
+      "url": "/assets/digits/outfit/3-line.svg",
+      "sha256": "25debf736308850c682c49adbf15379bf7ae5024607526acae6b1bbcbea160ef"
+    },
+    "4-line": {
+      "url": "/assets/digits/outfit/4-line.svg",
+      "sha256": "31ab0e8cabb1d5b19591e141a4aed88da856b946bc009e2d870ac014f889fc22"
+    },
+    "5-line": {
+      "url": "/assets/digits/outfit/5-line.svg",
+      "sha256": "5133d33019c70f869f7f7b3cc34e7be75cd1d395f49b58bb535cab7230627a8d"
+    },
+    "6-line": {
+      "url": "/assets/digits/outfit/6-line.svg",
+      "sha256": "7cc5f211cd1b5288b27ba129f06e79af0e9de1f4f79bf252df4d5d55aadaf4c9"
+    },
+    "7-line": {
+      "url": "/assets/digits/outfit/7-line.svg",
+      "sha256": "1502212bd49cceae0c273be29c3a79795e23b82a4d991130d43121568d15d960"
+    },
+    "8-line": {
+      "url": "/assets/digits/outfit/8-line.svg",
+      "sha256": "c50864b6a0d83b53c84e957ac2659b434ab714d1099c8807d1c899d86fadd897"
+    },
+    "9-line": {
+      "url": "/assets/digits/outfit/9-line.svg",
+      "sha256": "810e019411b14e1b7057d472a6a49dc3ecf7f32e5fa4945a42ee7001fe19c44b"
     }
   }
 }
