@@ -134,6 +134,7 @@ const msShift = (delta) => (value + delta + 60) % 60;
 let tenthRunning = false,
   tenthNextAt = 0;
 const isTenth = () => application === "tenth-counter";
+const tenthShift = (delta) => (value + delta + 10) % 10;
 const hsmMaximum = () => Number($("hsm-range").value);
 const hsmShift = (delta) =>
   (value + delta + hsmMaximum() + 1) % (hsmMaximum() + 1);
@@ -580,8 +581,7 @@ function tick() {
     if (tenthRunning && !view.busy && performance.now() >= tenthNextAt) {
       const interval = Number($("tenth-speed").value) || 500;
       tenthNextAt = performance.now() + interval;
-      const delta = Number($("tenth-direction").value) || 1;
-      view.step(delta);
+      request(tenthShift(Number($("tenth-direction").value) || 1));
     }
     return;
   }
