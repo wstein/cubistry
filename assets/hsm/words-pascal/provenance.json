@@ -1,0 +1,51 @@
+{
+  "schema": "cubistry.hsm-unit-lettering",
+  "version": 1,
+  "variant": "words-pascal",
+  "description": "Small Hour/Min/Sec PascalCase at the bottom; no large H/M/S in this variant.",
+  "canvas": [
+    256,
+    256
+  ],
+  "fontSize": 79.36,
+  "baseline": 232,
+  "font": {
+    "family": "Noto Sans",
+    "weight": 600,
+    "package": "@fontsource/noto-sans@5.2.10",
+    "path": "public/fonts/noto-sans-latin-600.woff2",
+    "sha256": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed",
+    "license": "SIL-OFL-1.1",
+    "licensePath": "public/fonts/OFL.txt"
+  },
+  "generator": "scripts/export-hsm-word-art-pascal.mjs",
+  "stickers": {
+    "H": {
+      "text": "Hour",
+      "inkBounds": [
+        38.36288,
+        175.33696,
+        223.98592,
+        232.7936
+      ]
+    },
+    "M": {
+      "text": "Min",
+      "inkBounds": [
+        61.97248,
+        172.32128,
+        195.456,
+        232
+      ]
+    },
+    "S": {
+      "text": "Sec",
+      "inkBounds": [
+        66.85312,
+        174.54336,
+        190.57536,
+        232.7936
+      ]
+    }
+  }
+}
