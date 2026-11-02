@@ -40,6 +40,18 @@
 /* Stage & Cube Grids */
 .clock-stage {
   position: relative;
+  width: 100%;
+}
+
+.chronocube-page .clock-workspace {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.chronocube-page .clock-viewer {
+  height: clamp(380px, 55vh, 680px);
+  width: 100%;
 }
 
 .clock-stage .cube-appearance {

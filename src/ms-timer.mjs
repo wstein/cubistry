@@ -388,6 +388,27 @@ async function initialize() {
     setDurationOf("tenth")(TENTH_MOVE_MS);
     $("timer-duration").value = format(timer.configuredSeconds);
     ready = true;
+
+    // Spatial Floating HUD & Presentation Mode controls
+    const hud = document.querySelector(".timer-controls.floating-hud");
+    const toggleBtn = hud?.querySelector(".hud-toggle-btn");
+    toggleBtn?.addEventListener("click", () => {
+      hud.classList.toggle("is-minimized");
+      toggleBtn.textContent = hud.classList.contains("is-minimized") ? "⚙" : "─";
+    });
+    const presBtn = hud?.querySelector(".hud-presentation-btn");
+    const togglePresentation = (enable) => {
+      document.body.classList.toggle("presentation-mode", enable);
+      stage?.resetCamera?.();
+    };
+    presBtn?.addEventListener("click", () => togglePresentation(true));
+    $("exit-presentation-btn")?.addEventListener("click", () => togglePresentation(false));
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {
+        togglePresentation(false);
+      }
+    });
+
     ui();
     setInterval(tick, 50);
     document.addEventListener("visibilitychange", tick);

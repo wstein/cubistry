@@ -138,28 +138,45 @@
           >
             Reset session moves
           </button>
+          <aside class="clock-control floating-hud" aria-label="Live clock control display">
+            <div class="hud-header">
+              <h2 class="hud-title">Live time</h2>
+              <div class="hud-actions">
+                <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
+                <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+              </div>
+            </div>
+            <div class="hud-body">
+              <div class="clock-digital">
+                <output
+                  id="clock-digital"
+                  aria-label="Current local time"
+                  aria-live="off"
+                  >--:--:--</output
+                ><span id="clock-zone" class="small"></span>
+              </div>
+              <p id="clock-status" class="small" role="status">
+                Preparing the verified fixed prints…
+              </p>
+              <label for="clock-lettering">Sticker lettering</label>
+              <select id="clock-lettering" disabled>
+                <option value="symbols">Large H / M / S</option>
+                <option value="words-pascal" selected>Small Hour / Min / Sec</option>
+                <option value="words">Small hour / min / sec</option>
+              </select>
+            </div>
+          </aside>
         </section>
-        <aside class="clock-control" aria-label="Live clock control display">
-          <h2>Live time</h2>
-          <div class="clock-digital">
-            <output
-              id="clock-digital"
-              aria-label="Current local time"
-              aria-live="off"
-              >--:--:--</output
-            ><span id="clock-zone" class="small"></span>
-          </div>
-          <p id="clock-status" class="small" role="status">
-            Preparing the verified fixed prints…
-          </p>
-          <label for="clock-lettering">Sticker lettering</label>
-          <select id="clock-lettering" disabled>
-            <option value="symbols">Large H / M / S</option>
-            <option value="words-pascal" selected>Small Hour / Min / Sec</option>
-            <option value="words">Small hour / min / sec</option>
-          </select>
-        </aside>
       </div>
+
+      <button
+        type="button"
+        id="exit-presentation-btn"
+        class="presentation-exit-btn"
+        aria-label="Exit presentation mode"
+      >
+        ✕ Exit Presentation
+      </button>
 
       <p id="clock-error" class="error" role="alert"></p>
       <p class="small">

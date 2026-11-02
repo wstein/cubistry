@@ -236,6 +236,42 @@ function setupAppearancePanel(container, onUpdate) {
   markerSelect.addEventListener("change", handleChange);
 }
 
+function renderStudioHud(title, bodyHtml) {
+  const container = $("studio-controls");
+  const wasMinimized = container.classList.contains("is-minimized");
+  container.innerHTML = `
+    <div class="hud-header">
+      <h2 class="hud-title">${title}</h2>
+      <div class="hud-actions">
+        <button type="button" class="hud-btn hud-presentation-btn" title="Toggle presentation mode">⛶ Presentation</button>
+        <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">${wasMinimized ? "⚙" : "─"}</button>
+      </div>
+    </div>
+    <div class="hud-body">
+      ${bodyHtml}
+    </div>
+  `;
+  const toggleBtn = container.querySelector(".hud-toggle-btn");
+  toggleBtn?.addEventListener("click", () => {
+    container.classList.toggle("is-minimized");
+    toggleBtn.textContent = container.classList.contains("is-minimized") ? "⚙" : "─";
+  });
+  const presBtn = container.querySelector(".hud-presentation-btn");
+  presBtn?.addEventListener("click", () => togglePresentation(true));
+}
+
+function togglePresentation(enable) {
+  document.body.classList.toggle("presentation-mode", enable);
+  activeStage?.resetCamera?.();
+  activeViewer?.resetCamera?.();
+}
+$("exit-presentation-btn")?.addEventListener("click", () => togglePresentation(false));
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {
+    togglePresentation(false);
+  }
+});
+
 // -------------------------------------------------------------
 // Mode 1: Live H-M-S Clock (3 cubes)
 // -------------------------------------------------------------
@@ -260,9 +296,7 @@ async function initClockMode() {
     </article>
   `;
 
-  const controlsContainer = $("studio-controls");
-  controlsContainer.innerHTML = `
-    <h2>Live time</h2>
+  renderStudioHud("Live Time", `
     <div class="clock-digital">
       <output id="clock-digital" aria-label="Current local time">--:--:--</output>
       <span id="clock-status" class="small" role="status">Preparing…</span>
@@ -317,7 +351,7 @@ async function initClockMode() {
         Reset session moves
       </button>
     </section>
-  `;
+  `);
 
   $("clock-lettering").value = currentLettering;
 
@@ -449,8 +483,7 @@ async function initMsTimerMode() {
     </article>
   `;
 
-  const controlsContainer = $("studio-controls");
-  controlsContainer.innerHTML = `
+  renderStudioHud("M/S Timer", `
     <div class="timer-controls">
       <label for="timer-mode">Mode</label>
       <select id="timer-mode">
@@ -477,7 +510,7 @@ async function initMsTimerMode() {
         <span id="timer-effective" class="small"></span>
       </p>
     </div>
-  `;
+  `);
 
   const stage = new ClockStage($("studio-scene"), 3);
   activeStage = stage;
@@ -613,9 +646,7 @@ async function initHmClockMode() {
     </article>
   `;
 
-  const controlsContainer = $("studio-controls");
-  controlsContainer.innerHTML = `
-    <h2>Live Wall Time</h2>
+  renderStudioHud("Live Wall Time", `
     <div class="clock-digital">
       <output id="clock-digital" class="studio-digital-huge" aria-label="Current local time">--:--</output>
       <span id="clock-status" class="small" role="status">Synchronizing…</span>
@@ -626,7 +657,7 @@ async function initHmClockMode() {
       <option value="words-pascal" selected>Small Hour / Min</option>
       <option value="words">Small hour / min</option>
     </select>
-  `;
+  `);
 
   $("clock-lettering").value = currentLettering;
 
@@ -716,9 +747,7 @@ async function initTenthMode() {
     </article>
   `;
 
-  const controlsContainer = $("studio-controls");
-  controlsContainer.innerHTML = `
-    <h2>1/10-Second Counter</h2>
+  renderStudioHud("1/10-Second Counter", `
     <p class="small">Period-1 {L, D, B} sequence with fast responsive stepping.</p>
     <div class="tenth-quick-grid">
       ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -745,7 +774,7 @@ async function initTenthMode() {
         <option value="-1">Reverse (-1)</option>
       </select>
     </div>
-  `;
+  `);
 
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
@@ -818,9 +847,7 @@ async function initCounterMode() {
     </article>
   `;
 
-  const controlsContainer = $("studio-controls");
-  controlsContainer.innerHTML = `
-    <h2>Counter Controls</h2>
+  renderStudioHud("Counter Controls", `
     <div style="display: flex; gap: 8px; margin: 12px 0;">
       <button id="counter-minus-10" style="flex: 1;">-10</button>
       <button id="counter-minus-1" style="flex: 1;">-1</button>
@@ -836,7 +863,7 @@ async function initCounterMode() {
         Auto step (+1 every second)
       </label>
     </div>
-  `;
+  `);
 
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
@@ -908,15 +935,13 @@ async function initTimerMode(fiveSecond = false) {
     </article>
   `;
 
-  const controlsContainer = $("studio-controls");
-  controlsContainer.innerHTML = `
-    <h2>${fiveSecond ? "5-Second Timer" : "Workshop Timer"}</h2>
+  renderStudioHud(fiveSecond ? "5-Second Timer" : "Workshop Timer", `
     <div style="display: flex; gap: 8px; margin: 12px 0;">
       <button id="timer-toggle-btn" class="primary" style="flex: 1;">Start</button>
       <button id="timer-reset-btn" style="flex: 1;">Reset</button>
     </div>
     <p id="timer-status-info" class="small">Idle · Tap Start to countdown</p>
-  `;
+  `);
 
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
@@ -983,9 +1008,7 @@ async function initHsmSingleMode(variant = "hsm") {
     </article>
   `;
 
-  const controlsContainer = $("studio-controls");
-  controlsContainer.innerHTML = `
-    <h2>Counter Controls</h2>
+  renderStudioHud("Counter Controls", `
     <div style="margin-bottom: 12px;">
       <label for="single-unit-select">Unit sticker</label>
       <select id="single-unit-select">
@@ -1011,7 +1034,7 @@ async function initHsmSingleMode(variant = "hsm") {
     <div style="display: flex; gap: 8px;">
       <button id="hsm-reset" style="flex: 1;">Reset (00)</button>
     </div>
-  `;
+  `);
 
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
