@@ -234,12 +234,21 @@ async function initialize() {
 
       appearancePanel.append(displayLabel, letterLabel, markerLabel);
 
+      let updating = false;
       const onAppearanceChange = async () => {
-        currentDisplay = displaySelect.value;
-        currentMarker = markerSelect.value;
-        currentLetterFont = letterSelect.value;
-        const nextManifest = createClockManifest(currentDisplay, currentMarker, currentLetterFont);
-        await Promise.all(owned.map((c) => c.updateManifest(nextManifest)));
+        if (updating) return;
+        updating = true;
+        try {
+          currentDisplay = displaySelect.value;
+          currentMarker = markerSelect.value;
+          currentLetterFont = letterSelect.value;
+          const nextManifest = createClockManifest(currentDisplay, currentMarker, currentLetterFont);
+          await Promise.all(owned.map((c) => c.updateManifest(nextManifest)));
+        } catch (e) {
+          console.warn("Appearance update queued or deferred:", e);
+        } finally {
+          updating = false;
+        }
       };
 
       displaySelect.addEventListener("change", onAppearanceChange);
@@ -249,6 +258,7 @@ async function initialize() {
     for (let i = 0; i < 3; i++) {
       const host = $("clock-" + names[i]),
         viewer = stage.createCube(host, i);
+      let initialAssets = assets[i];
       const controller = new HsmController(
         viewer,
         design,
@@ -260,7 +270,14 @@ async function initialize() {
           host.setAttribute("aria-busy", String(busy));
           if (error) fail(error);
         },
-        async () => assets[i],
+        (m, prints, signal) => {
+          if (initialAssets && m === manifest) {
+            const a = initialAssets;
+            initialAssets = null;
+            return Promise.resolve(a);
+          }
+          return loadAssets(m, prints, signal, import.meta.env.BASE_URL);
+        },
         recoveryExecutor,
       );
       controller.setMode(i === 0 ? 23 : 59, 1);

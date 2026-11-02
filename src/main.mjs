@@ -624,11 +624,18 @@ function getActiveManifest(
     };
   }
 
+  // Preserve non-digit images (such as title-left and title-right for COUNTER print)
+  // as well as proof.assets.fonts and proof.assets.documents.
+  const nonDigitImages = proof.assets.images.filter(
+    (img) => !/^[0-9]$/.test(img.id) && img.id !== "blank" && img.id !== "T",
+  );
+
   return {
     ...proof.assets,
-    fonts: [],
-    documents: [],
-    images: digitImages,
+    images: [
+      ...digitImages,
+      ...nonDigitImages,
+    ],
   };
 }
 

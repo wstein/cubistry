@@ -177,6 +177,13 @@ export class TimerController extends PhysicalPlayback {
   async updateManifest(manifest: AssetManifest): Promise<void> {
     if (!this.authoritative || !this.route.print) return;
     const assets = await this.resolveAssets(manifest, [this.route.print]);
+    while (this.busy || this.view.animating) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    if (!this.authoritative || !this.route.print) {
+      assets.dispose();
+      return;
+    }
     this.install(this.route.print, this.authoritative, assets, this.current);
   }
 }
