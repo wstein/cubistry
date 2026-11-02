@@ -37,7 +37,7 @@
 .clock-card h2 {
   font-size: 1rem;
   margin: 0;
-  color: #315d4e;
+  color: var(--color-ink-navy, #153b61);
 }
 .clock-viewer {
   height: clamp(230px, 32vw, 450px);

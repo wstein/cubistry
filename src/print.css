@@ -43,16 +43,19 @@
   margin: 0;
 }
 .print-controls a {
-  color: #315d4e;
+  color: var(--color-ink-navy, #153b61);
 }
 .print-controls .print-download {
   display: block;
   padding: 14px;
   border-radius: 12px;
-  background: #315d4e;
+  background: var(--color-plastic-berry, #9e0b5c);
   color: white;
   text-align: center;
   text-decoration: none;
+}
+.print-controls .print-download:hover {
+  background: var(--color-plastic-berry-dark, #7a0645);
 }
 .print-controls details {
   border-top: 1px solid #d9ded7;
