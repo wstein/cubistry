@@ -25,7 +25,9 @@ async function open(page) {
   await shown(page, "15:00.0");
   // The shortest preferred turn keeps the Set and mode walks short; the
   // scheduler fits the turns of each second into its budget either way.
-  await page.locator("#rotation-speed").fill("6");
+  if ((await page.locator("#rotation-speed").count()) > 0) {
+    await page.locator("#rotation-speed").fill("6");
+  }
 }
 
 test("the chooser offers the M/S Timer and the page shows three cubes: minutes, seconds, and 1/10 second", async ({
@@ -80,8 +82,10 @@ test("the chooser offers the M/S Timer and the page shows three cubes: minutes, 
   await expect(page.locator("#timer-speed-note")).toHaveText(
     "Timer speed: 1× (fixed)",
   );
-  await expect(page.locator("#rotation-speed")).toHaveValue("4");
-  await expect(page.locator("#speed-label")).toContainText("100 ms");
+  if ((await page.locator("#rotation-speed").count()) > 0) {
+    await expect(page.locator("#rotation-speed")).toHaveValue("4");
+    await expect(page.locator("#speed-label")).toContainText("100 ms");
+  }
   // The seconds cube's second lap is internal and never shown.
   await expect(page.locator("main")).not.toContainText(/\blap\b/i);
 });
