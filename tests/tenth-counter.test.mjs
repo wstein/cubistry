@@ -56,3 +56,58 @@ test("tenth-second print preset ms-timer-tenth-20mm-3sets is verified and in cat
     assert(netSvg.includes(`id="sticker-${i}"`), `Net must include sticker-${i}`);
   }
 });
+
+test("MsTimerTenthCube step, reset, set and request update state and advance through 0-9", async () => {
+  const mockView = {
+    configure() {},
+    animate() {
+      return Promise.resolve();
+    },
+    resetCamera() {},
+  };
+  const mockAssets = { dispose() {} };
+  let reportedValue = -1;
+  let reportedBusy = false;
+
+  const cube = new MsTimerTenthCube(
+    mockView,
+    { schema: "cubistry.assets", version: 1, fonts: [], documents: [], images: [] },
+    (v, busy) => {
+      reportedValue = v;
+      reportedBusy = busy;
+    },
+    () => Promise.resolve(mockAssets),
+  );
+
+  await cube.configure(0);
+  assert.equal(cube.currentValue, 0);
+  assert.equal(reportedValue, 0);
+  assert.equal(reportedBusy, false);
+
+  // Step +1 -> 1
+  await cube.step(1);
+  assert.equal(cube.currentValue, 1);
+
+  // Step +1 -> 2
+  await cube.step(1);
+  assert.equal(cube.currentValue, 2);
+
+  // Step -1 -> 1
+  await cube.step(-1);
+  assert.equal(cube.currentValue, 1);
+
+  // Set 7
+  await cube.set(7);
+  assert.equal(cube.currentValue, 7);
+
+  // Reset -> 0
+  await cube.reset();
+  assert.equal(cube.currentValue, 0);
+
+  // Request 9
+  cube.request(9);
+  while (cube.busy) {
+    await new Promise((r) => setTimeout(r, 5));
+  }
+  assert.equal(cube.currentValue, 9);
+});

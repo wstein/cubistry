@@ -218,6 +218,17 @@ export class MsTimerTenthCube extends PhysicalPlayback implements TimerCube {
     return new Promise((resolve) => this.waiters.push(resolve));
   }
 
+  /** Reset back to 0 along the period and resolve once settled. */
+  reset(): Promise<void> {
+    return this.set(0);
+  }
+
+  /** Step by `delta` (+1 or -1) along the period and resolve once settled. */
+  step(delta = 1): Promise<void> {
+    const next = (this.currentValue + delta + TENTH_MODULUS) % TENTH_MODULUS;
+    return this.set(next);
+  }
+
   protected get maximumValue(): number {
     return TENTH_MODULUS - 1;
   }

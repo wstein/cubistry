@@ -1211,38 +1211,27 @@ for (const button of document.querySelectorAll("[data-tenth-delta]"))
     action(() => {
       if (!ready || !isTenth()) return;
       stopTenth();
-      const delta = Number(button.dataset.tenthDelta);
-      error();
-      view.step(delta);
+      request(tenthShift(Number(button.dataset.tenthDelta)));
     }),
   );
 $("tenth-reset").addEventListener("click", () =>
-  action(async () => {
-    if (!ready || !isTenth()) return;
-    stopTenth();
-    error();
-    try {
-      await view.reset();
-    } catch (e) {
-      error(e.message);
+  action(() => {
+    if (ready && isTenth()) {
+      stopTenth();
+      request(0);
     }
   }),
 );
 $("tenth-set-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  action(async () => {
+  action(() => {
     if (!ready || !isTenth()) return;
     const raw = $("tenth-value").value.trim(),
       n = Number(raw);
     if (!/^\d$/.test(raw) || n < 0 || n > 9)
       throw Error("Enter an integer from 0 to 9.");
     stopTenth();
-    error();
-    try {
-      await view.set(n);
-    } catch (e) {
-      error(e.message);
-    }
+    request(n);
   });
 });
 $("ms-letter").addEventListener("change", async () => {
