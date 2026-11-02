@@ -137,3 +137,4 @@ In compliance with the AGPL-3.0 and corresponding third-party licenses:
    ```
 3. **Inspect Output Directory**:
    All bundled runtime licenses, provenance hashes, and source manifests are copied into `dist/licenses/` during the build step.
+
