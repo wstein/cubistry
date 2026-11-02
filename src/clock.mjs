@@ -29,7 +29,7 @@ const $ = (id) => document.getElementById(id),
   names = ["hours", "minutes", "seconds"],
   letters = ["H", "M", "S"];
 const lettering = parseLettering(
-  new URLSearchParams(location.search).get("lettering") ?? "words",
+  new URLSearchParams(location.search).get("lettering") ?? "words-pascal",
 );
 $("clock-lettering").value = lettering;
 for (const name of names) {
@@ -212,4 +212,11 @@ export {
   statistics as clockStatistics,
 };
 
-installPrintLink(() => $("clock-lettering").value === "words" ? "hsm-words" : "hsm-symbols");
+installPrintLink(() => {
+  const v = $("clock-lettering").value;
+  return v === "words-pascal"
+    ? "hsm-words-pascal"
+    : v === "words"
+      ? "hsm-words"
+      : "hsm-symbols";
+});

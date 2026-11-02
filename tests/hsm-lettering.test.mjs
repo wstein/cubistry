@@ -22,42 +22,46 @@ import {
 } from "../packages/cube-mechanics/src/index.ts";
 const hash = (b) => createHash("sha256").update(b).digest("hex");
 test("unit lettering is a fixed vector print with only small bottom words", () => {
-  const p = JSON.parse(
-    readFileSync("public/assets/hsm/words/provenance.json", "utf8"),
-  );
-  assert.equal(hash(readFileSync(p.font.path)), p.font.sha256);
-  assert.equal(p.font.license, "SIL-OFL-1.1");
-  assert.equal(p.fontSize, MAX_WORD_FONT_SIZE);
-  for (const a of hsmImagesFor("words")) {
-    const bytes = readFileSync("public" + a.url),
-      svg = bytes.toString();
-    assert.equal(hash(bytes), a.sha256);
-    assert.match(svg, /viewBox="0 0 256 256"/);
-    assert.equal((svg.match(/<path\b/g) || []).length, 1);
-    assert.doesNotMatch(svg, /<text|href=|url\(|stroke=/);
-    // Lower third of the canvas, at least 2.5 mm (32 units) from the side edges
-    // (beyond the 1 mm print safe inset) and 1.5 mm from the bottom, checked
-    // against the exporter-recorded bounds with a documented tolerance.
-    assertWordRules(p, a.id);
-    assert.equal(
-      p.stickers[a.id].text,
-      { H: "hour", M: "min", S: "sec" }[a.id],
+  for (const [variant, dir, map] of [
+    ["words", "public/assets/hsm/words", { H: "hour", M: "min", S: "sec" }],
+    ["words-pascal", "public/assets/hsm/words-pascal", { H: "Hour", M: "Min", S: "Sec" }],
+  ]) {
+    const p = JSON.parse(
+      readFileSync(`${dir}/provenance.json`, "utf8"),
     );
+    assert.equal(hash(readFileSync(p.font.path)), p.font.sha256);
+    assert.equal(p.font.license, "SIL-OFL-1.1");
+    assert(p.fontSize <= MAX_WORD_FONT_SIZE);
+    for (const a of hsmImagesFor(variant)) {
+      const bytes = readFileSync("public" + a.url),
+        svg = bytes.toString();
+      assert.equal(hash(bytes), a.sha256);
+      assert.match(svg, /viewBox="0 0 256 256"/);
+      assert.equal((svg.match(/<path\b/g) || []).length, 1);
+      assert.doesNotMatch(svg, /<text|href=|url\(|stroke=/);
+      assertWordRules(p, a.id);
+      assert.equal(p.stickers[a.id].text, map[a.id]);
+    }
   }
   assert.equal(parseLettering("words"), "words");
+  assert.equal(parseLettering("words-pascal"), "words-pascal");
   assert.equal(parseLettering("unsupported"), "symbols");
 });
-test("both lettering choices retain the same physical print and valid upright HSM setups", () => {
+test("all lettering choices retain the same physical print and valid upright HSM setups", () => {
   const original = validateHsmDesign(
     JSON.parse(readFileSync("public/hsm-counter.v3.json", "utf8")),
   );
-  for (const style of ["symbols", "words"]) {
+  for (const style of ["symbols", "words", "words-pascal"]) {
     const d = hsmDesignFor(original, style);
     assert.deepEqual(d.print.cubies, original.print.cubies);
     assert.deepEqual(d.print.stickers, original.print.stickers);
     assert.equal(
       d.print.id,
-      style === "words" ? "hsm_counter_seconds_first_words" : original.print.id,
+      style === "words-pascal"
+        ? "hsm_counter_seconds_first_words_pascal"
+        : style === "words"
+          ? "hsm_counter_seconds_first_words"
+          : original.print.id,
     );
     for (const letter of ["H", "M", "S"])
       assert(
@@ -73,5 +77,6 @@ test("the Unit select lists H, M, S in that order and follows the lettering", ()
   assert.deepEqual([...HSM_UNITS], ["H", "M", "S"]);
   assert.deepEqual(HSM_UNITS.map((u) => hsmUnitLabel(u, "symbols")), ["H", "M", "S"]);
   assert.deepEqual(HSM_UNITS.map((u) => hsmUnitLabel(u, "words")), ["hour", "min", "sec"]);
+  assert.deepEqual(HSM_UNITS.map((u) => hsmUnitLabel(u, "words-pascal")), ["Hour", "Min", "Sec"]);
   assert.equal(hsmUnitLabel("H", parseLettering("anything else")), "H");
 });

@@ -1003,9 +1003,11 @@ for (const id of ["hsm-letter", "hsm-lettering"])
       initial =
         id === "hsm-lettering" ? view.currentValue : 0,
       previousLettering =
-        viewer.presentedPrint?.id === "hsm_counter_seconds_first_words"
-          ? "words"
-          : "symbols",
+        viewer.presentedPrint?.id === "hsm_counter_seconds_first_words_pascal"
+          ? "words-pascal"
+          : viewer.presentedPrint?.id === "hsm_counter_seconds_first_words"
+            ? "words"
+            : "symbols",
       // Taken after the user's choice, before the H/M range list follows it.
       savedUi = hsmUiSnapshot();
     ready = false;
@@ -1241,4 +1243,12 @@ async function initialize() {
 controlsUi();
 void initialize();
 
-installPrintLink(() => $("application").value === "hsm-counter" ? $("hsm-lettering").value === "words" ? "hsm-words" : "hsm-symbols" : null);
+installPrintLink(() => {
+  if ($("application").value !== "hsm-counter") return null;
+  const v = $("hsm-lettering").value;
+  return v === "words-pascal"
+    ? "hsm-words-pascal"
+    : v === "words"
+      ? "hsm-words"
+      : "hsm-symbols";
+});
