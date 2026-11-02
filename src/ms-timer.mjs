@@ -399,7 +399,7 @@ async function initialize() {
       hud.classList.toggle("is-minimized");
       toggleBtn.textContent = hud.classList.contains("is-minimized") ? "⚙" : "─";
     });
-    const presBtn = hud?.querySelector(".hud-presentation-btn");
+    const presBtn = document.querySelector("#presentation-btn, .island-presentation-btn, .hud-presentation-btn");
     let exitTimer = null;
     const togglePresentation = (enable) => {
       const active = typeof enable === "boolean" ? enable : !document.body.classList.contains("presentation-mode");

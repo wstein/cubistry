@@ -11,11 +11,10 @@
     <main>
       <header class="floating-island">
         <a class="brand" href="./"
-          ><span class="brand-mark">▦</span> CUBISTRY</a
+          ><span class="brand-mark">▦</span><span class="brand-text"> CUBISTRY</span></a
         >
         <div class="application-choice">
-          <label for="playground-application">Cube / application</label>
-          <select id="playground-application" onchange="if(this.value) location.href=this.value">
+          <select id="playground-application" aria-label="Cube application" onchange="if(this.value) location.href=this.value">
             <optgroup label="Integrated Studio (2×2)">
               <option value="chronocube.html">Chronocube Studio (Integrated 2×2)</option>
             </optgroup>
@@ -41,6 +40,7 @@
           </select>
         </div>
         <a class="print-stickers-link" href="picture3.html">3×3 Super Picture ↗</a>
+        <button type="button" class="island-presentation-btn" id="presentation-btn" title="Presentation Mode" aria-label="Enter presentation mode"><span class="btn-icon">⛶</span><span class="btn-text"> Presentation</span></button>
       </header>
       <div class="intro sr-only">
         <p class="eyebrow">A PHYSICAL PUZZLE, ONE TURN AT A TIME</p>

@@ -295,7 +295,7 @@ async function initialize() {
     $("calendar-date").value = date.iso;
     await configure();
     presentation.setReady(!failed);
-    const presBtn = document.querySelector(".hud-presentation-btn");
+    const presBtn = document.querySelector("#presentation-btn, .island-presentation-btn, .hud-presentation-btn");
     presBtn?.addEventListener("click", () => {
       $("presentation-toggle")?.click();
     });
