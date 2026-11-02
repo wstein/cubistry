@@ -322,7 +322,7 @@ test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9
   // Check file hashes for every SVG in public/assets/digits
   for (const variant of ["dseg7", "dseg14", "noto-sans", "quicksand", "outfit"]) {
     const entries = dsegManifest[variant];
-    assert.equal(Object.keys(entries).length, 20); // 10 clean + 10 dot
+    assert.equal(Object.keys(entries).length, 30); // 10 clean + 10 dot + 10 line
     for (const [key, info] of Object.entries(entries)) {
       const filePath = "public" + info.url;
       const fileBytes = readFileSync(filePath);
@@ -356,11 +356,29 @@ test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9
       assert(img.url.endsWith(`${d}-dot.svg`), `Digit ${d} must have dot in all mode`);
     }
 
-    // Verify 'off' marker mode: no dots on any digit
+    // Verify 'off' marker mode: no dots or lines on any digit
     const offImages = tenthAssetImages(variant, "off");
     for (let d = 0; d < 10; d++) {
       const img = offImages.find((i) => i.id === String(d));
-      assert(img.url.endsWith(`${d}.svg`), `Digit ${d} must NOT have dot in off mode`);
+      assert(img.url.endsWith(`${d}.svg`), `Digit ${d} must NOT have dot or line in off mode`);
+    }
+
+    // Verify 'line-auto' marker mode: thin underline ONLY on 0, 2, 5, 6, 8, 9
+    const lineAutoImages = tenthAssetImages(variant, "line-auto");
+    for (let d = 0; d < 10; d++) {
+      const img = lineAutoImages.find((i) => i.id === String(d));
+      if (AMBIGUOUS_TENTH_DIGITS.has(d)) {
+        assert(img.url.endsWith(`${d}-line.svg`), `Digit ${d} must have line in line-auto mode`);
+      } else {
+        assert(img.url.endsWith(`${d}.svg`), `Digit ${d} must NOT have line in line-auto mode`);
+      }
+    }
+
+    // Verify 'line-all' marker mode: thin underline on all 0..9
+    const lineAllImages = tenthAssetImages(variant, "line-all");
+    for (let d = 0; d < 10; d++) {
+      const img = lineAllImages.find((i) => i.id === String(d));
+      assert(img.url.endsWith(`${d}-line.svg`), `Digit ${d} must have line in line-all mode`);
     }
   }
 
