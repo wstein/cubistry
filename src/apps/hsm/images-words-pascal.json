@@ -1,0 +1,23 @@
+[
+  {
+    "id": "H",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/hsm/words-pascal/H.svg",
+    "sha256": "11fb01632c2457d4b7866f0c0d0f1c019b26ac626227404fa6e5796ad8e0de5c"
+  },
+  {
+    "id": "M",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/hsm/words-pascal/M.svg",
+    "sha256": "cb62444da97cff0e690c2387320b5e240611f567f8c8d2949937ee5d9e6d5f5f"
+  },
+  {
+    "id": "S",
+    "kind": "image",
+    "format": "svg",
+    "url": "/assets/hsm/words-pascal/S.svg",
+    "sha256": "96afad515578a8d85654c15584078f71bb8a033d242829685460ca03cbe32b8b"
+  }
+]
