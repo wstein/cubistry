@@ -25,14 +25,14 @@ export function installHudIdleController(options: HudIdleOptions = {}): {
     if (active && active !== document.body && active !== document.documentElement) {
       if (
         active.closest(
-          ".floating-hud, .floating-hud-appearance, aside.cube-appearance, .floating-island, .controls, .clock-control, .calendar-controls, .status-controls",
+          ".floating-hud, .floating-hud-appearance, aside.cube-appearance, .floating-island, .controls, .clock-control, .calendar-controls, .status-controls, .floating-glass-pill",
         )
       ) {
         return true;
       }
     }
     const hovered = document.querySelector(
-      ".floating-hud:hover, .floating-hud-appearance:hover, aside.cube-appearance:hover, aside.controls:hover, aside.clock-control:hover, aside.calendar-controls:hover, aside.status-controls:hover",
+      ".floating-hud:hover, .floating-hud-appearance:hover, aside.cube-appearance:hover, aside.controls:hover, aside.clock-control:hover, aside.calendar-controls:hover, aside.status-controls:hover, .floating-glass-pill:hover",
     );
     return Boolean(hovered);
   }
