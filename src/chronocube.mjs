@@ -1199,6 +1199,10 @@ async function initStudio() {
   });
 
   await switchMode(initialMode, false);
+  const presParam = urlParams.get("presentation") ?? urlParams.get("kiosk");
+  if (presParam === "1" || presParam === "true") {
+    setTimeout(() => togglePresentation(true), 200);
+  }
 }
 
 initStudio();

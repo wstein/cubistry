@@ -347,6 +347,10 @@ async function initialize() {
     presBtn?.addEventListener("click", () => {
       $("presentation-toggle")?.click();
     });
+    const presParam = params.get("presentation") ?? params.get("kiosk");
+    if (presParam === "1" || presParam === "true") {
+      setTimeout(() => $("presentation-toggle")?.click(), 200);
+    }
     new MutationObserver(() => {
       document.body.classList.toggle(
         "presentation-mode",
