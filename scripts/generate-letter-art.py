@@ -128,3 +128,4 @@ for family, font_path in FONTS.items():
 
 (ROOT / 'src/apps/hsm/letter-manifests.json').write_text(json.dumps(manifest, indent=2) + '\n')
 print('Letter assets and manifests updated successfully.')
+

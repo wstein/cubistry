@@ -1,0 +1,142 @@
+@import "./style.css";
+@import "./clock.css";
+@import "./ms-timer.css";
+
+/* Chronocube Studio Layout */
+.chronocube-page main {
+  max-width: 1440px;
+  margin: auto;
+  padding: 24px 32px 40px;
+}
+
+.studio-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.studio-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #e3e8e1;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  color: var(--color-ink-navy, #153b61);
+  font-weight: 500;
+}
+
+.studio-mode-pill .badge {
+  background: var(--color-plastic-berry, #9e0b5c);
+  color: #fff;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Stage & Cube Grids */
+.clock-stage {
+  position: relative;
+}
+
+.clock-stage .cube-appearance {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  z-index: 10;
+}
+
+.clock-cubes[data-count="1"] {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 320px;
+  margin: 16px auto 0;
+}
+
+.clock-cubes[data-count="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 640px;
+  margin: 16px auto 0;
+}
+
+.clock-cubes[data-count="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+/* Tenth Counter Controls in Aside */
+.tenth-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tenth-quick-btn {
+  padding: 8px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid #c2c9bf;
+  background: #fff;
+  color: var(--color-ink-navy, #153b61);
+  cursor: pointer;
+}
+
+.tenth-quick-btn:hover {
+  background: #e9eee7;
+  border-color: #9e0b5c;
+}
+
+.tenth-step-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tenth-step-actions button {
+  flex: 1;
+}
+
+.tenth-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Digital Displays */
+.studio-digital-huge {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--color-ink-navy, #153b61);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  margin: 8px 0 16px;
+}
+
+.studio-badge-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.mode-badge {
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #d8ded5;
+  color: #202c36;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.mode-badge.active {
+  background: var(--color-plastic-berry, #9e0b5c);
+  color: #fff;
+}
