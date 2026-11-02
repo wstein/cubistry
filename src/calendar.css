@@ -5,6 +5,12 @@
   src: url("/fonts/noto-sans-latin-800.woff2") format("woff2");
   font-display: swap;
 }
+.calendar-page {
+  padding-top: 64px;
+}
+.calendar-heading {
+  display: none;
+}
 .calendar-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;

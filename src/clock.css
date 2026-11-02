@@ -1,12 +1,8 @@
-.clock-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 24px;
+.live-clock-page {
+  padding-top: 64px;
 }
-.clock-heading h1 {
-  margin: 0;
+.clock-heading {
+  display: none;
 }
 .clock-digital {
   display: flex;
@@ -21,23 +17,38 @@
 }
 .clock-stage {
   min-width: 0;
-  background: #e9eee7;
-  border: 1px solid #d9ded7;
+  background: rgba(255, 253, 246, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(21, 59, 97, 0.12);
   border-radius: 24px;
-  padding: 20px;
+  padding: 16px 20px 24px;
+  box-shadow: 0 8px 32px rgba(21, 59, 97, 0.08);
 }
 .clock-cubes {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
+  max-width: 720px;
+  margin: 16px auto 0;
 }
 .clock-card {
   min-width: 0;
+  background: rgba(255, 253, 246, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(21, 59, 97, 0.14);
+  border-radius: 16px;
+  padding: 10px 16px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(21, 59, 97, 0.05);
 }
 .clock-card h2 {
-  font-size: 1rem;
-  margin: 0;
-  color: var(--color-ink-navy, #153b61);
+  font-size: 0.82rem;
+  margin: 0 0 4px;
+  color: #556677;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 .clock-viewer {
   height: clamp(380px, 55vh, 680px);
@@ -112,9 +123,15 @@
 
 /* Session move statistics: the counter's compact tabular-number summary style. */
 .clock-stats {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid #c8d0c5;
+  margin: 16px auto 0;
+  max-width: 720px;
+  padding: 14px 20px;
+  background: rgba(255, 253, 246, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(21, 59, 97, 0.14);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(21, 59, 97, 0.05);
 }
 .clock-move-table {
   width: 100%;

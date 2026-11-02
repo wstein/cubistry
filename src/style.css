@@ -508,6 +508,7 @@ h1 {
   user-select: none;
   transition: all 0.15s ease;
   text-align: center;
+  white-space: nowrap;
 }
 
 .cube-appearance-tab:hover {
@@ -744,7 +745,9 @@ header.floating-island .application-choice select,
 }
 
 header.floating-island a.print-stickers-link,
-.floating-island a.print-stickers-link {
+header.floating-island #print-stickers,
+.floating-island a.print-stickers-link,
+.floating-island #print-stickers {
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--color-ink-navy, #153b61);
@@ -760,7 +763,7 @@ aside.cube-appearance.floating-hud {
   left: 16px;
   right: auto;
   z-index: 25;
-  width: clamp(260px, 22vw, 300px);
+  width: clamp(320px, 28vw, 390px);
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   box-sizing: border-box;

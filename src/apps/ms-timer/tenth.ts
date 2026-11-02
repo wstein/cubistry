@@ -130,21 +130,21 @@ export function tenthAssetImages(
 
   for (let d = 0; d < 10; d++) {
     const isAmbiguous = AMBIGUOUS_TENTH_DIGITS.has(d);
-    let key = `${d}`;
-    if (marker === "all" || (marker === "auto" && isAmbiguous)) {
-      key = `${d}-dot`;
-    } else if (marker === "line-all" || (marker === "line-auto" && isAmbiguous)) {
-      key = `${d}-line`;
-    }
-    const entry = fontManifest[key];
-    demand(Boolean(entry), `Missing manifest entry for ${key}`);
-    images.push({
+    const entry = fontManifest[String(d)];
+    demand(Boolean(entry), `Missing manifest entry for ${d}`);
+    const img: ImageAsset = {
       id: String(d),
       kind: "image",
       format: "svg",
       url: entry.url,
       sha256: entry.sha256,
-    });
+      ...(marker === "line-all" || (marker === "line-auto" && isAmbiguous)
+        ? { marker: "underline" as const }
+        : marker === "all" || (marker === "auto" && isAmbiguous)
+          ? { marker: "dot" as const }
+          : {}),
+    };
+    images.push(img);
   }
 
   return images;
