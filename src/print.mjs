@@ -2,7 +2,14 @@ import "./style.css";
 import "./print.css";
 const $ = (id) => document.getElementById(id);
 const base = new URL(import.meta.env.BASE_URL, location.origin);
-const allowed = ["de-a", "en-3", "hsm-symbols", "hsm-words", "hsm-words-pascal"];
+const allowed = [
+  "de-a",
+  "en-3",
+  "hsm-symbols",
+  "hsm-words",
+  "hsm-words-pascal",
+  "ms-timer-tenth",
+];
 let entries = [];
 const url = (entry, file) =>
   new URL(`print/${entry.directory}${file}`, base).href;
@@ -58,7 +65,8 @@ try {
         Number.isInteger(e.copies) &&
         e.copies > 0 &&
         e.copies <= 100 &&
-        e.stickerCount === e.copies * (e.design.startsWith("hsm-") ? 24 : 54) &&
+        e.stickerCount ===
+          e.copies * (e.design.startsWith("hsm-") || e.design.startsWith("ms-") ? 24 : 54) &&
         e.files?.["print.pdf"] &&
         e.files?.["manifest.json"],
     )

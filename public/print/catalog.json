@@ -143,6 +143,27 @@
         "bundle.zip": "c11e51a24be0dbaea4ceb5706bdb62c0cd171b64f39710862ad965e9a9c06a16",
         "manifest.json": "8d0e62f42a8dd26b95797f82ec51907fe036f3ea19d78c12fc08af33f9298a68"
       }
+    },
+    {
+      "id": "ms-timer-tenth-20mm-3sets",
+      "design": "ms-timer-tenth",
+      "sizeMm": 20,
+      "copies": 3,
+      "stickerCount": 72,
+      "pages": 1,
+      "directory": "ms-timer-tenth-20mm-3sets/",
+      "files": {
+        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
+        "README.txt": "00a960af708f55f1b6050b2ea8cdd06cdd01e79473421734b490ee548ffedad9",
+        "WORD-ART-PROVENANCE.json": "ad105b44c33bf1c13b90b0f1ad2cd89ff014485722a3da79ed04d82642bcc547",
+        "artwork-1.svg": "43d39e827edb7375780f76675a522728ff20c84543bc98a4631439d8249e5d8d",
+        "assembly.pdf": "c380b782d17af65236018b110c98be96b143cd6635cf0376a58832e496674f25",
+        "bundle.zip": "8693f5875dd0fb589e1c4269aae75e1d68ebeb1655dfc0959cb71b83270747db",
+        "cuts-1.svg": "b6533900ddb47802485944b25cc2b726a59a8e8d26d51e9c4836c88f0074bf5a",
+        "print.pdf": "bbfe1d15b61a87aa1e2eaa2e1c623225e1157852df2219b621314529bd71e2d8",
+        "manifest.json": "ab1882e8cce65a07e3d98c66d037717ae76b64d0bff69df1dba2edf6ec362f04"
+      }
     }
   ]
 }
