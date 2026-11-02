@@ -879,7 +879,9 @@ footer.floating-glass-pill a:hover,
 
 /* Micro-Badge Brand Anchor (Adaptive Presentation Watermark) */
 footer.floating-glass-pill .pill-brand,
-.floating-glass-pill .pill-brand {
+.floating-glass-pill .pill-brand,
+footer.floating-glass-pill .bottom-brand,
+.floating-glass-pill .bottom-brand {
   display: none;
   align-items: center;
   gap: 6px;
@@ -890,7 +892,9 @@ footer.floating-glass-pill .pill-brand,
 }
 
 footer.floating-glass-pill .pill-brand .brand-mark,
-.floating-glass-pill .pill-brand .brand-mark {
+.floating-glass-pill .pill-brand .brand-mark,
+footer.floating-glass-pill .bottom-brand .brand-mark,
+.floating-glass-pill .bottom-brand .brand-mark {
   background: var(--color-plastic-berry, #9e0b5c);
   border-radius: 4px;
   color: white;
@@ -904,30 +908,44 @@ footer.floating-glass-pill .pill-brand .brand-mark,
 }
 
 footer.floating-glass-pill .pill-brand-sep,
-.floating-glass-pill .pill-brand-sep {
+.floating-glass-pill .pill-brand-sep,
+footer.floating-glass-pill .bottom-brand-sep,
+.floating-glass-pill .bottom-brand-sep {
   display: none;
 }
 
 /* In presentation mode: top bar hides, bottom bar reveals Micro-Badge Brand Anchor watermark */
 body.presentation-mode footer.floating-glass-pill,
-body.presentation-mode .floating-glass-pill {
+body.presentation-mode .floating-glass-pill,
+body[data-presentation="true"] footer.floating-glass-pill,
+body[data-presentation="true"] .floating-glass-pill {
   opacity: 0.65;
   z-index: 50;
 }
 
 body.presentation-mode footer.floating-glass-pill:hover,
-body.presentation-mode .floating-glass-pill:hover {
+body.presentation-mode .floating-glass-pill:hover,
+body[data-presentation="true"] footer.floating-glass-pill:hover,
+body[data-presentation="true"] .floating-glass-pill:hover {
   opacity: 0.95;
 }
 
 body.presentation-mode footer.floating-glass-pill .pill-brand,
-body.presentation-mode .floating-glass-pill .pill-brand {
-  display: inline-flex;
+body.presentation-mode .floating-glass-pill .pill-brand,
+body.presentation-mode .bottom-brand,
+body[data-presentation="true"] footer.floating-glass-pill .pill-brand,
+body[data-presentation="true"] .floating-glass-pill .pill-brand,
+body[data-presentation="true"] .bottom-brand {
+  display: inline-flex !important;
 }
 
 body.presentation-mode footer.floating-glass-pill .pill-brand-sep,
-body.presentation-mode .floating-glass-pill .pill-brand-sep {
-  display: inline;
+body.presentation-mode .floating-glass-pill .pill-brand-sep,
+body.presentation-mode .bottom-brand-sep,
+body[data-presentation="true"] footer.floating-glass-pill .pill-brand-sep,
+body[data-presentation="true"] .floating-glass-pill .pill-brand-sep,
+body[data-presentation="true"] .bottom-brand-sep {
+  display: inline !important;
 }
 
 /* Floating Glass Appearance Card (Top-Left) */
