@@ -18,6 +18,10 @@ import { PairController } from "./apps/pair/controller.ts";
 import { ONE_SECOND_TIMER, formatMsTimer } from "./apps/timer/clock.ts";
 import { timerMotion } from "./apps/timer/status.ts";
 import { installPrintLink } from "./apps/print/link.ts";
+import {
+  resolveLetterFamily,
+  hsmImagesForFamily,
+} from "./apps/hsm/lettering.ts";
 import hsmWords from "./apps/hsm/images-words-pascal.json";
 import msPin from "../ms-source.json";
 
@@ -218,20 +222,28 @@ async function initialize() {
       loadCounterDesign(undefined, base),
       loadMsDesign(base, msPin.runtimeSHA256),
     ]);
-    function createTimerManifest(display = "dseg7", marker = "off") {
+    function createTimerManifest(display = "dseg7", marker = "off", letterFont = "same") {
+      const family = resolveLetterFamily(letterFont, display);
+      const letterImages = hsmImagesForFamily("words-pascal", family);
+      const digitImages = tenthAssetImages(display, marker, proof.assets.images);
+      const fontTenthWord = letterImages.find((i) => i.id === "T");
+      const images = fontTenthWord
+        ? digitImages.map((img) => (img.id === "T" ? fontTenthWord : img))
+        : digitImages;
       return {
         ...proof.assets,
         fonts: [],
         documents: [],
         images: [
-          ...tenthAssetImages(display, marker, proof.assets.images),
-          ...hsmWords.filter((i) => i.id === "M" || i.id === "S"),
+          ...images,
+          ...letterImages.filter((i) => i.id === "M" || i.id === "S"),
         ],
       };
     }
     let currentDisplay = "dseg7";
     let currentMarker = "off";
-    let manifest = createTimerManifest(currentDisplay, currentMarker);
+    let currentLetterFont = "same";
+    let manifest = createTimerManifest(currentDisplay, currentMarker, currentLetterFont);
     const resolveAssets = (m, prints, signal) =>
       loadAssets(m, prints, signal, base);
     stage = new ClockStage($("ms-timer-scene"), 3);
@@ -257,26 +269,46 @@ async function initialize() {
       `;
       displayLabel.append(displaySelect);
 
+      const letterLabel = document.createElement("label");
+      letterLabel.style.display = "block";
+      letterLabel.style.marginTop = "6px";
+      letterLabel.textContent = "Letter font ";
+      const letterSelect = document.createElement("select");
+      letterSelect.id = "timer-letter-font";
+      letterSelect.setAttribute("aria-label", "Letter and word font");
+      letterSelect.innerHTML = `
+        <option value="same" selected>Same as digit font</option>
+        <option value="dseg14">14-Segment (DSEG14)</option>
+        <option value="noto-sans">Noto Sans (Calendar Standard)</option>
+        <option value="quicksand">Quicksand (Rounded Geometric)</option>
+        <option value="outfit">Outfit (Clean Geometric)</option>
+        <option value="classic">Classic (Geometric)</option>
+      `;
+      letterLabel.append(letterSelect);
+
       const markerLabel = document.createElement("label");
       markerLabel.style.display = "block";
       markerLabel.style.marginTop = "6px";
-      markerLabel.textContent = "Orientation dot ";
+      markerLabel.textContent = "Orientation marker ";
       const markerSelect = document.createElement("select");
       markerSelect.id = "timer-marker";
-      markerSelect.setAttribute("aria-label", "Orientation dot indicator");
+      markerSelect.setAttribute("aria-label", "Orientation marker indicator");
       markerSelect.innerHTML = `
         <option value="off" selected>Off</option>
-        <option value="auto">Auto (0, 2, 5, 6, 8, 9)</option>
-        <option value="all">All digits (0–9)</option>
+        <option value="auto">Dot: Auto (0, 2, 5, 6, 8, 9)</option>
+        <option value="all">Dot: All digits (0–9)</option>
+        <option value="line-auto">Underline: Auto (0, 2, 5, 6, 8, 9)</option>
+        <option value="line-all">Underline: All digits (0–9)</option>
       `;
       markerLabel.append(markerSelect);
 
-      appearancePanel.append(displayLabel, markerLabel);
+      appearancePanel.append(displayLabel, letterLabel, markerLabel);
 
       const onAppearanceChange = async () => {
         currentDisplay = displaySelect.value;
         currentMarker = markerSelect.value;
-        const nextManifest = createTimerManifest(currentDisplay, currentMarker);
+        currentLetterFont = letterSelect.value;
+        const nextManifest = createTimerManifest(currentDisplay, currentMarker, currentLetterFont);
         await Promise.all([
           majorUnit?.updateManifest(nextManifest),
           minorUnit?.updateManifest(nextManifest),
@@ -285,6 +317,7 @@ async function initialize() {
       };
 
       displaySelect.addEventListener("change", onAppearanceChange);
+      letterSelect.addEventListener("change", onAppearanceChange);
       markerSelect.addEventListener("change", onAppearanceChange);
     }
 

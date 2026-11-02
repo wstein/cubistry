@@ -25,6 +25,8 @@ import {
   hsmImagesFor,
   hsmDesignFor,
   parseLettering,
+  resolveLetterFamily,
+  hsmImagesForFamily,
 } from "./apps/hsm/lettering.ts";
 const $ = (id) => document.getElementById(id),
   names = ["hours", "minutes", "seconds"],
@@ -138,7 +140,8 @@ async function initialize() {
       loadHsmDesign(import.meta.env.BASE_URL, pin.runtimeSHA256),
     ]);
     const design = hsmDesignFor(sourceDesign, lettering);
-    function createClockManifest(display = "dseg7", marker = "off") {
+    function createClockManifest(display = "dseg7", marker = "off", letterFont = "same") {
+      const family = resolveLetterFamily(letterFont, display);
       return {
         ...proof.assets,
         fonts: [],
@@ -147,13 +150,14 @@ async function initialize() {
           ...tenthAssetImages(display, marker, proof.assets.images).filter(
             (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
           ),
-          ...hsmImagesFor(lettering),
+          ...hsmImagesForFamily(lettering, family),
         ],
       };
     }
     let currentDisplay = "dseg7";
     let currentMarker = "off";
-    let manifest = createClockManifest(currentDisplay, currentMarker);
+    let currentLetterFont = "same";
+    let manifest = createClockManifest(currentDisplay, currentMarker, currentLetterFont);
     const results = await Promise.allSettled(
       names.map(() =>
         loadAssets(
@@ -195,30 +199,51 @@ async function initialize() {
       `;
       displayLabel.append(displaySelect);
 
+      const letterLabel = document.createElement("label");
+      letterLabel.style.display = "block";
+      letterLabel.style.marginTop = "6px";
+      letterLabel.textContent = "Letter font ";
+      const letterSelect = document.createElement("select");
+      letterSelect.id = "clock-letter-font";
+      letterSelect.setAttribute("aria-label", "Letter and word font");
+      letterSelect.innerHTML = `
+        <option value="same" selected>Same as digit font</option>
+        <option value="dseg14">14-Segment (DSEG14)</option>
+        <option value="noto-sans">Noto Sans (Calendar Standard)</option>
+        <option value="quicksand">Quicksand (Rounded Geometric)</option>
+        <option value="outfit">Outfit (Clean Geometric)</option>
+        <option value="classic">Classic (Geometric)</option>
+      `;
+      letterLabel.append(letterSelect);
+
       const markerLabel = document.createElement("label");
       markerLabel.style.display = "block";
       markerLabel.style.marginTop = "6px";
-      markerLabel.textContent = "Orientation dot ";
+      markerLabel.textContent = "Orientation marker ";
       const markerSelect = document.createElement("select");
       markerSelect.id = "clock-marker";
-      markerSelect.setAttribute("aria-label", "Orientation dot indicator");
+      markerSelect.setAttribute("aria-label", "Orientation marker indicator");
       markerSelect.innerHTML = `
         <option value="off" selected>Off</option>
-        <option value="auto">Auto (0, 2, 5, 6, 8, 9)</option>
-        <option value="all">All digits (0–9)</option>
+        <option value="auto">Dot: Auto (0, 2, 5, 6, 8, 9)</option>
+        <option value="all">Dot: All digits (0–9)</option>
+        <option value="line-auto">Underline: Auto (0, 2, 5, 6, 8, 9)</option>
+        <option value="line-all">Underline: All digits (0–9)</option>
       `;
       markerLabel.append(markerSelect);
 
-      appearancePanel.append(displayLabel, markerLabel);
+      appearancePanel.append(displayLabel, letterLabel, markerLabel);
 
       const onAppearanceChange = async () => {
         currentDisplay = displaySelect.value;
         currentMarker = markerSelect.value;
-        const nextManifest = createClockManifest(currentDisplay, currentMarker);
+        currentLetterFont = letterSelect.value;
+        const nextManifest = createClockManifest(currentDisplay, currentMarker, currentLetterFont);
         await Promise.all(owned.map((c) => c.updateManifest(nextManifest)));
       };
 
       displaySelect.addEventListener("change", onAppearanceChange);
+      letterSelect.addEventListener("change", onAppearanceChange);
       markerSelect.addEventListener("change", onAppearanceChange);
     }
     for (let i = 0; i < 3; i++) {

@@ -1,0 +1,342 @@
+{
+  "noto-sans": {
+    "symbols": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/symbols/H.svg",
+        "sha256": "43c6e34806c7b171700d921dd06c41fee8a70313a68fd1a6bafefcb53081f2e7"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/symbols/M.svg",
+        "sha256": "06fc6f1fa35ff30dd009d6c04e25a00c3602a7d9004c18030da26ff1847c5ab2"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/symbols/S.svg",
+        "sha256": "15545dd129c38be0d3675bbec6f82e3b0283877b1826205d886f936e9913ae6d"
+      }
+    },
+    "words-pascal": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/words-pascal/H.svg",
+        "sha256": "17551a252406d542beb33d9f9794108485db6ef913fb5db4b4aaf1468abad8af"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/words-pascal/M.svg",
+        "sha256": "e8fd5b2e169e631d070cd179a07f2df08ae51e6f00d9250b7eb91c68cae1338d"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/words-pascal/S.svg",
+        "sha256": "068dbb0da457e73874b2432970d4ec41fe9fb1de44997abfc9e5c611330ca0f5"
+      },
+      "T": {
+        "id": "T",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/words-pascal/T.svg",
+        "sha256": "605f2abcd42bd28cf16998a3358971506332970f9c502399bf57c67da43bf25d"
+      }
+    },
+    "words": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/words/H.svg",
+        "sha256": "ec0e1b014833d22f040ff537a318b5143f53112e203ce336e7fce3902e4a47da"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/words/M.svg",
+        "sha256": "ca401591ae617e39e8e8655b3d9fdf88e8ab7d0824effa4ca4ee587239e25ce7"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/words/S.svg",
+        "sha256": "58a8450ae8f1d32c732c930d839a1ad9d53c75f3593bc6e24e403b91a0df0115"
+      },
+      "T": {
+        "id": "T",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/noto-sans/words/T.svg",
+        "sha256": "605f2abcd42bd28cf16998a3358971506332970f9c502399bf57c67da43bf25d"
+      }
+    }
+  },
+  "quicksand": {
+    "symbols": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/symbols/H.svg",
+        "sha256": "445b3e3e78cdbb26a2463c8f9a0cbe65a2959f1d2b2eb70375c6e681605d2342"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/symbols/M.svg",
+        "sha256": "6f1c909103f46d37727328659b7a1df635d39a022a87fcad9b42320dee4156e9"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/symbols/S.svg",
+        "sha256": "304b3c91576348fe56abfe0b7d7d06e2456903118aea4658235a6b54c748be8a"
+      }
+    },
+    "words-pascal": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/words-pascal/H.svg",
+        "sha256": "57a7b58341b697e94eb8feb2082a8d468dbd9063d2893c1ce1050e59e4a4b020"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/words-pascal/M.svg",
+        "sha256": "98e204b6321e40e5f682346e4b32926bb0cdf1198201b587429d9aa1d1e3cd64"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/words-pascal/S.svg",
+        "sha256": "d26fec8f9f4fa7bd10c0952d7a27c8a5b0f6d04fbac2d27784ffe63ef2a69cc2"
+      },
+      "T": {
+        "id": "T",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/words-pascal/T.svg",
+        "sha256": "338738c4b3dead4f5d8885478da7a882a8e649ae9931f5e585981b626a12f418"
+      }
+    },
+    "words": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/words/H.svg",
+        "sha256": "6e3171e1a69e7bcbff1882d1ba70dc39ce3f7f59a6b41ce31d8b467de0061276"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/words/M.svg",
+        "sha256": "874a7297f70b05cd986108ab07bf5a704d542d807093e5ecc8bd9653a4eed186"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/words/S.svg",
+        "sha256": "ede15e94ce10f5da81746abf3df3d56a0fc691c3781ad4e14c5aaa581887dc15"
+      },
+      "T": {
+        "id": "T",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/quicksand/words/T.svg",
+        "sha256": "338738c4b3dead4f5d8885478da7a882a8e649ae9931f5e585981b626a12f418"
+      }
+    }
+  },
+  "outfit": {
+    "symbols": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/symbols/H.svg",
+        "sha256": "20a6d339799026993caf6adff2afb5af954566e67452049ddf0a08423799289d"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/symbols/M.svg",
+        "sha256": "8a9d92aa41bd3779c0047c99472e6962f8092a99d9480cc613ef8e1d4fe9bbe0"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/symbols/S.svg",
+        "sha256": "3987b946ab41a0e55d79c17b3a6c55b170086ebc2bc7c0d77701010d7d34c756"
+      }
+    },
+    "words-pascal": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/words-pascal/H.svg",
+        "sha256": "d7cf371ec604a3b40bea6e9f1debe7afeaf8e9704196340f80a9d70fb3f99dd0"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/words-pascal/M.svg",
+        "sha256": "c772ba4d569a0b63a707550ecd2f91724195f0c135bf549a54f363da215e03a2"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/words-pascal/S.svg",
+        "sha256": "5bcb4283aede18f860a0cc7d90df662b5f5c44934907bc1cfd4a823f3389b733"
+      },
+      "T": {
+        "id": "T",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/words-pascal/T.svg",
+        "sha256": "81101826d2ed4f9af3b59d0647adb463a3b253d9b4b94451f573a09bcee554b2"
+      }
+    },
+    "words": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/words/H.svg",
+        "sha256": "4335d8a53c477bdefc6e9ea9576950fab239dc66a5d1bf28e5ff6ebf8a3b8b51"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/words/M.svg",
+        "sha256": "24306afa86b678eba535f549a08e241482e05e3b274668d96f5077c2a56afa04"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/words/S.svg",
+        "sha256": "b18ca0ecdf5e0f5fb5424b98c340b366e81ab4b812e37fb18cb0b48b036f88be"
+      },
+      "T": {
+        "id": "T",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/outfit/words/T.svg",
+        "sha256": "81101826d2ed4f9af3b59d0647adb463a3b253d9b4b94451f573a09bcee554b2"
+      }
+    }
+  },
+  "dseg14": {
+    "symbols": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/symbols/H.svg",
+        "sha256": "de764a93d3bbeca82c1eae1f647f5362764c71eeef3d56f0cfb9454f0591438c"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/symbols/M.svg",
+        "sha256": "e9716bc1df0e2a4387424af4315ebc80856a5ee19de100d5da5225d5f68d4dc9"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/symbols/S.svg",
+        "sha256": "a14cae4e25e1666756c9d428b59bd95d1b0d4d4d7ab6dbc1c5724c61c183e24d"
+      }
+    },
+    "words-pascal": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/words-pascal/H.svg",
+        "sha256": "88739feb1a4ce9c4aea705c5c9ec120f9e744185b466268da0adce1abf82f437"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/words-pascal/M.svg",
+        "sha256": "f32525685e0583c994e87e5e1e0be475035ec9d98937f9809fccbbd0b2801bc1"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/words-pascal/S.svg",
+        "sha256": "c62af397a732693d7d38b241ff3746af9dade61753a265d1568528c50ad506b8"
+      },
+      "T": {
+        "id": "T",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/words-pascal/T.svg",
+        "sha256": "93e02dc47a4669617d0b87d4913eca76f4ae28c2c738b7ecee4e45850669c8ba"
+      }
+    },
+    "words": {
+      "H": {
+        "id": "H",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/words/H.svg",
+        "sha256": "88739feb1a4ce9c4aea705c5c9ec120f9e744185b466268da0adce1abf82f437"
+      },
+      "M": {
+        "id": "M",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/words/M.svg",
+        "sha256": "f32525685e0583c994e87e5e1e0be475035ec9d98937f9809fccbbd0b2801bc1"
+      },
+      "S": {
+        "id": "S",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/words/S.svg",
+        "sha256": "c62af397a732693d7d38b241ff3746af9dade61753a265d1568528c50ad506b8"
+      },
+      "T": {
+        "id": "T",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/letters/dseg14/words/T.svg",
+        "sha256": "93e02dc47a4669617d0b87d4913eca76f4ae28c2c738b7ecee4e45850669c8ba"
+      }
+    }
+  }
+}

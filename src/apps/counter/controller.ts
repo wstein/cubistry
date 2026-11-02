@@ -24,7 +24,7 @@ import {
   matchesTarget,
   presentMove,
 } from "@cubistry/cube-mechanics";
-import { loadAssets, type LoadedAssets } from "@cubistry/cube-assets";
+import { loadAssets, type LoadedAssets, type AssetManifest } from "@cubistry/cube-assets";
 import {
   configurePrint,
   targetFor,
@@ -284,5 +284,11 @@ export class CounterController extends PhysicalPlayback {
       this.configuring = false;
     }
     this.notify();
+  }
+
+  async updateManifest(manifest: AssetManifest): Promise<void> {
+    if (!this.authoritative || !this.print) return;
+    const assets = await this.resolveAssets(manifest, [this.print]);
+    this.install(this.print, this.authoritative, assets, this.current);
   }
 }

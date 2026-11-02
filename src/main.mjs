@@ -14,6 +14,8 @@ import {
   hsmDesignFor,
   hsmUnitLabel,
   parseLettering,
+  resolveLetterFamily,
+  hsmImagesForFamily,
 } from "./apps/hsm/lettering.ts";
 import {
   WorkshopClock,
@@ -598,34 +600,59 @@ $("tenth-direction").addEventListener("change", () => {
     tick();
   }
 });
-let pendingTenthManifest = null;
-function tenthManifest(
+let pendingManifest = null;
+function getActiveManifest(
   display = $("tenth-display")?.value || "dseg7",
   marker = $("tenth-marker")?.value || "off",
+  letterFont = $("tenth-letter-font")?.value || "same",
+  currentApp = application,
 ) {
+  const digitImages = tenthAssetImages(display, marker, proof.assets.images);
+  const family = resolveLetterFamily(letterFont, display);
+  const lettering = parseLettering($("hsm-lettering")?.value ?? "symbols");
+  const letterImages = hsmImagesForFamily(lettering, family);
+
+  if (currentApp === "hsm-counter" || currentApp === "ms-counter" || currentApp === "hm-one-cube") {
+    return {
+      ...proof.assets,
+      fonts: [],
+      documents: [],
+      images: [
+        ...digitImages.filter((i) => /^[0-9]$/.test(i.id) || i.id === "blank"),
+        ...(currentApp === "hm-one-cube" ? hmImages : letterImages),
+      ],
+    };
+  }
+
   return {
     ...proof.assets,
     fonts: [],
     documents: [],
-    images: tenthAssetImages(display, marker, proof.assets.images),
+    images: digitImages,
   };
 }
-async function updateTenthStyle() {
-  if (!ready || !isTenth()) return;
-  const manifest = tenthManifest();
+
+function tenthManifest(display, marker) {
+  return getActiveManifest(display, marker);
+}
+
+async function updateStyle() {
+  if (!ready) return;
+  const manifest = getActiveManifest();
   if (view?.busy) {
-    pendingTenthManifest = manifest;
+    pendingManifest = manifest;
     return;
   }
   try {
-    pendingTenthManifest = null;
+    pendingManifest = null;
     await view.updateManifest?.(manifest);
   } catch (e) {
     error(e.message);
   }
 }
-$("tenth-display").addEventListener("change", updateTenthStyle);
-$("tenth-marker").addEventListener("change", updateTenthStyle);
+$("tenth-display")?.addEventListener("change", updateStyle);
+$("tenth-letter-font")?.addEventListener("change", updateStyle);
+$("tenth-marker")?.addEventListener("change", updateStyle);
 function tick() {
   if (!ready) return;
   if (isHsm()) {
@@ -908,7 +935,7 @@ $("application").addEventListener("change", async () => {
       candidate = new TimerController(
         viewer,
         route,
-        proof.assets,
+        getActiveManifest(undefined, undefined, undefined, requested),
         callback,
         resolveAssets,
       );
@@ -935,6 +962,7 @@ $("application").addEventListener("change", async () => {
         rememberedCounterValue,
         route,
       );
+      await candidate.updateManifest(getActiveManifest(undefined, undefined, undefined, "certified"));
     }
     timerScheduler.invalidate();
     previous.dispose();
@@ -1049,19 +1077,12 @@ async function hsmVariantDesign(hm) {
   return hsmDesignFor(hsmDesign, parseLettering($("hsm-lettering").value));
 }
 function hsmAssets(hm = isHm()) {
-  return {
-    ...proof.assets,
-    fonts: [],
-    documents: [],
-    images: [
-      ...proof.assets.images.filter(
-        (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
-      ),
-      ...(hm
-        ? hmImages
-        : hsmImagesFor(parseLettering($("hsm-lettering").value))),
-    ],
-  };
+  return getActiveManifest(
+    undefined,
+    undefined,
+    undefined,
+    hm ? "hm-one-cube" : "hsm-counter",
+  );
 }
 function stopHsm() {
   hsmRunning = false;
@@ -1368,6 +1389,7 @@ async function initialize() {
     $("wrap").checked = wrapFor(counterPrint, wrapChoice);
     const route = routeFor(counterPrint, $("format").checked);
     await view.configure("COUNTER", route.padded, value, route);
+    await view.updateManifest(getActiveManifest(undefined, undefined, undefined, "certified"));
     formatUi();
     padded = $("format").checked;
     ready = true;
