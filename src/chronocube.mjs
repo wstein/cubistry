@@ -145,6 +145,7 @@ export function buildManifest(display, marker, letterFont, lettering = "words-pa
     proofData?.assets?.images ?? [],
     proofData?.assets?.fonts ?? [],
     proofData?.assets?.documents ?? [],
+    proofData?.assets?.materials ?? [],
   );
 }
 
