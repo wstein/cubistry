@@ -45,7 +45,7 @@ test("chronocube manifest builder correctly includes fonts and orientation marke
   );
   assert(
     manifest.images.some(
-      (img) => img.id === "6" && img.url && img.url.includes("-line.svg"),
+      (img) => img.id === "6" && img.marker === "underline",
     ),
   );
   assert(

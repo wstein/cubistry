@@ -342,10 +342,11 @@ test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9
     for (let d = 0; d < 10; d++) {
       const img = autoImages.find((i) => i.id === String(d));
       assert(img, `Digit ${d} image must be present`);
+      assert(img.url.endsWith(`${d}.svg`), `Digit ${d} url must be clean svg`);
       if (AMBIGUOUS_TENTH_DIGITS.has(d)) {
-        assert(img.url.endsWith(`${d}-dot.svg`), `Digit ${d} must have dot in auto mode`);
+        assert.equal(img.marker, "dot", `Digit ${d} must have dot marker in auto mode`);
       } else {
-        assert(img.url.endsWith(`${d}.svg`), `Digit ${d} must NOT have dot in auto mode`);
+        assert.equal(img.marker, undefined, `Digit ${d} must NOT have dot marker in auto mode`);
       }
     }
 
@@ -353,7 +354,8 @@ test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9
     const allImages = tenthAssetImages(variant, "all");
     for (let d = 0; d < 10; d++) {
       const img = allImages.find((i) => i.id === String(d));
-      assert(img.url.endsWith(`${d}-dot.svg`), `Digit ${d} must have dot in all mode`);
+      assert(img.url.endsWith(`${d}.svg`), `Digit ${d} url must be clean svg`);
+      assert.equal(img.marker, "dot", `Digit ${d} must have dot marker in all mode`);
     }
 
     // Verify 'off' marker mode: no dots or lines on any digit
@@ -361,16 +363,18 @@ test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9
     for (let d = 0; d < 10; d++) {
       const img = offImages.find((i) => i.id === String(d));
       assert(img.url.endsWith(`${d}.svg`), `Digit ${d} must NOT have dot or line in off mode`);
+      assert.equal(img.marker, undefined, `Digit ${d} must have no marker attribute in off mode`);
     }
 
     // Verify 'line-auto' marker mode: thin underline ONLY on 0, 2, 5, 6, 8, 9
     const lineAutoImages = tenthAssetImages(variant, "line-auto");
     for (let d = 0; d < 10; d++) {
       const img = lineAutoImages.find((i) => i.id === String(d));
+      assert(img.url.endsWith(`${d}.svg`), `Digit ${d} url must be clean svg`);
       if (AMBIGUOUS_TENTH_DIGITS.has(d)) {
-        assert(img.url.endsWith(`${d}-line.svg`), `Digit ${d} must have line in line-auto mode`);
+        assert.equal(img.marker, "underline", `Digit ${d} must have line in line-auto mode`);
       } else {
-        assert(img.url.endsWith(`${d}.svg`), `Digit ${d} must NOT have line in line-auto mode`);
+        assert.equal(img.marker, undefined, `Digit ${d} must NOT have line in line-auto mode`);
       }
     }
 
@@ -378,7 +382,8 @@ test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9
     const lineAllImages = tenthAssetImages(variant, "line-all");
     for (let d = 0; d < 10; d++) {
       const img = lineAllImages.find((i) => i.id === String(d));
-      assert(img.url.endsWith(`${d}-line.svg`), `Digit ${d} must have line in line-all mode`);
+      assert(img.url.endsWith(`${d}.svg`), `Digit ${d} url must be clean svg`);
+      assert.equal(img.marker, "underline", `Digit ${d} must have line in line-all mode`);
     }
   }
 

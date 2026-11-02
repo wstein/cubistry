@@ -39,6 +39,7 @@ export type ImageAsset =
       readonly format: "svg" | "png" | "webp";
       readonly url: string;
       readonly sha256: string;
+      readonly marker?: "underline" | "dot" | "none";
     }
   | {
       readonly id: string;
@@ -435,7 +436,24 @@ export async function loadAssets(
           );
           reserve(image.width, image.height);
           c = canvas(image.width, image.height);
-          context(c).drawImage(image, 0, 0);
+          const ctx = context(c);
+          ctx.drawImage(image, 0, 0);
+          if ("marker" in asset && asset.marker && asset.marker !== "none") {
+            ctx.fillStyle = "#1d4771";
+            if (asset.marker === "underline") {
+              if (typeof ctx.roundRect === "function") {
+                ctx.beginPath();
+                ctx.roundRect(112, 242, 32, 4, 2);
+                ctx.fill();
+              } else {
+                ctx.fillRect(112, 242, 32, 4);
+              }
+            } else if (asset.marker === "dot") {
+              ctx.beginPath();
+              ctx.arc(208, 214, 8, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
         } finally {
           URL.revokeObjectURL(url);
         }

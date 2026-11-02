@@ -7,9 +7,9 @@
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Calendar cubes</title>
   </head>
-  <body>
+  <body class="calendar-page">
     <main>
-      <header>
+      <header class="floating-island">
         <a class="brand" href="./"
           ><span class="brand-mark">▦</span> CUBISTRY</a
         >
@@ -23,6 +23,8 @@
               <option value="calendar.html" selected>
                 Calendar · Deutsch / English
               </option>
+              <option value="playground.html">Picture Puzzle Playground</option>
+              <option value="status.html">CI Quality Cube</option>
             </optgroup>
             <optgroup label="Multi-Cube Clocks & Timers (2×2)">
               <option value="clock.html">Live H–M–S Clock</option>
@@ -30,20 +32,31 @@
             </optgroup>
             <optgroup label="Single-Cube Applications (2×2)">
               <option value="index.html">Counter 0–99</option>
+              <option value="index.html?application=timer">60-Minute Timer</option>
+              <option value="index.html?application=five-second-timer">5-Second Timer</option>
+              <option value="index.html?application=tenth-counter">
+                1/10-Second Counter 0–9
+              </option>
               <option value="index.html?application=hsm-counter">
                 H/M/S Counter 00–59
               </option>
-              <option value="index.html?application=tenth-counter">
-                1/10-Second Counter 0–9
+              <option value="index.html?application=ms-counter">
+                M/S Counter 00–59
+              </option>
+              <option value="index.html?application=hm-one-cube">
+                H/M One-Cube Counter
               </option>
             </optgroup>
           </select>
         </div>
+        <a class="print-stickers-link" id="print-stickers" href="print.html?design=de-a" target="_blank" rel="noopener">Print stickers</a>
       </header>
-      <h1>Calendar cubes</h1>
-      <p class="small">
-        Two independently verified prints. One date at a time.
-      </p>
+      <div class="calendar-heading sr-only">
+        <h1>Calendar cubes</h1>
+        <p class="small">
+          Two independently verified prints. One date at a time.
+        </p>
+      </div>
       <div class="calendar-workspace">
         <section class="calendar-stage" aria-label="Physical calendar cube">
           <div id="calendar-viewer" aria-busy="true"></div>
