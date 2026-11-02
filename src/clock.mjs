@@ -9,6 +9,7 @@ import { loadAssets } from "@cubistry/cube-assets";
 import { loadCounterDesign } from "./apps/counter/design.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";
 import { HsmController } from "./apps/hsm/controller.ts";
+import { tenthAssetImages } from "./apps/ms-timer/tenth.ts";
 import { SlicedExecutor } from "./apps/hsm/recovery-executor.ts";
 import {
   LiveClockScheduler,
@@ -32,10 +33,14 @@ const lettering = parseLettering(
   new URLSearchParams(location.search).get("lettering") ?? "words-pascal",
 );
 $("clock-lettering").value = lettering;
+const defaultSpeeds = { hours: "250", minutes: "100", seconds: "100" };
 for (const name of names) {
   const preferred = new URLSearchParams(location.search).get(name + "-speed");
-  if (["2000", "1000", "500", "250", "100", "50", "10"].includes(preferred))
+  if (["2000", "1000", "500", "250", "100", "50", "10"].includes(preferred)) {
     $(name + "-speed").value = preferred;
+  } else {
+    $(name + "-speed").value = defaultSpeeds[name];
+  }
 }
 $("clock-lettering").addEventListener("change", () => {
   const url = new URL(location.href);
@@ -127,17 +132,22 @@ async function initialize() {
       loadHsmDesign(import.meta.env.BASE_URL, pin.runtimeSHA256),
     ]);
     const design = hsmDesignFor(sourceDesign, lettering);
-    const manifest = {
-      ...proof.assets,
-      fonts: [],
-      documents: [],
-      images: [
-        ...proof.assets.images.filter(
-          (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
-        ),
-        ...hsmImagesFor(lettering),
-      ],
-    };
+    function createClockManifest(display = "dseg7", marker = "off") {
+      return {
+        ...proof.assets,
+        fonts: [],
+        documents: [],
+        images: [
+          ...tenthAssetImages(display, marker, proof.assets.images).filter(
+            (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
+          ),
+          ...hsmImagesFor(lettering),
+        ],
+      };
+    }
+    let currentDisplay = "dseg7";
+    let currentMarker = "off";
+    let manifest = createClockManifest(currentDisplay, currentMarker);
     const results = await Promise.allSettled(
       names.map(() =>
         loadAssets(
@@ -158,6 +168,53 @@ async function initialize() {
     $("clock-zone").textContent =
       Intl.DateTimeFormat().resolvedOptions().timeZone;
     stage = new ClockStage($("clock-scene"));
+
+    // Appearance panel font and orientation marker selectors
+    const appearancePanel = stage.appearancePanel;
+    if (appearancePanel) {
+      const displayLabel = document.createElement("label");
+      displayLabel.style.display = "block";
+      displayLabel.style.marginTop = "6px";
+      displayLabel.textContent = "Display ";
+      const displaySelect = document.createElement("select");
+      displaySelect.id = "clock-display";
+      displaySelect.setAttribute("aria-label", "Digit font display");
+      displaySelect.innerHTML = `
+        <option value="dseg7" selected>7-Segment (DSEG7)</option>
+        <option value="dseg14">14-Segment (DSEG14)</option>
+        <option value="noto-sans">Noto Sans (Calendar Standard)</option>
+        <option value="quicksand">Quicksand (Rounded Geometric)</option>
+        <option value="outfit">Outfit (Clean Geometric)</option>
+        <option value="classic">Classic (Geometric)</option>
+      `;
+      displayLabel.append(displaySelect);
+
+      const markerLabel = document.createElement("label");
+      markerLabel.style.display = "block";
+      markerLabel.style.marginTop = "6px";
+      markerLabel.textContent = "Orientation dot ";
+      const markerSelect = document.createElement("select");
+      markerSelect.id = "clock-marker";
+      markerSelect.setAttribute("aria-label", "Orientation dot indicator");
+      markerSelect.innerHTML = `
+        <option value="off" selected>Off</option>
+        <option value="auto">Auto (0, 2, 5, 6, 8, 9)</option>
+        <option value="all">All digits (0–9)</option>
+      `;
+      markerLabel.append(markerSelect);
+
+      appearancePanel.append(displayLabel, markerLabel);
+
+      const onAppearanceChange = async () => {
+        currentDisplay = displaySelect.value;
+        currentMarker = markerSelect.value;
+        const nextManifest = createClockManifest(currentDisplay, currentMarker);
+        await Promise.all(owned.map((c) => c.updateManifest(nextManifest)));
+      };
+
+      displaySelect.addEventListener("change", onAppearanceChange);
+      markerSelect.addEventListener("change", onAppearanceChange);
+    }
     for (let i = 0; i < 3; i++) {
       const host = $("clock-" + names[i]),
         viewer = stage.createCube(host, i);

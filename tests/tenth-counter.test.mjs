@@ -319,8 +319,8 @@ test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9
   // Check all ambiguous digits are exactly {0, 2, 5, 6, 8, 9}
   assert.deepEqual([...AMBIGUOUS_TENTH_DIGITS].sort(), [0, 2, 5, 6, 8, 9]);
 
-  // Check file hashes for every SVG in public/assets/digits/dseg7 and dseg14
-  for (const variant of ["dseg7", "dseg14"]) {
+  // Check file hashes for every SVG in public/assets/digits
+  for (const variant of ["dseg7", "dseg14", "noto-sans", "quicksand", "outfit"]) {
     const entries = dsegManifest[variant];
     assert.equal(Object.keys(entries).length, 20); // 10 clean + 10 dot
     for (const [key, info] of Object.entries(entries)) {
@@ -336,7 +336,7 @@ test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9
   }
 
   // Verify 'auto' marker mode: dots ONLY on 0, 2, 5, 6, 8, 9
-  for (const variant of ["dseg7", "dseg14"]) {
+  for (const variant of ["dseg7", "dseg14", "noto-sans", "quicksand", "outfit"]) {
     const autoImages = tenthAssetImages(variant, "auto");
     assert.equal(autoImages.length, 12); // blank, T, 0..9
     for (let d = 0; d < 10; d++) {
