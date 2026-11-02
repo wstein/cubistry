@@ -500,7 +500,11 @@ $("cube").addEventListener("cube-camera-change", hideHint, { once: true });
 setTimeout(hideHint, 10000);
 $("jump-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  action(() => manual(parseValue($("value").value), false));
+  action(() => {
+    const target = parseValue($("value").value);
+    manual(target, false);
+    syncSetupUrl({ val: String(target) });
+  });
 });
 $("run").addEventListener("click", () =>
   action(() => {
@@ -551,6 +555,7 @@ $("wrap").addEventListener("change", () => {
   wrapChoice = $("wrap").checked;
 });
 $("format").addEventListener("change", () => {
+  syncSetupUrl({ pad: $("format").checked ? "1" : "0" });
   if (isBlankTop()) {
     void switchMode($("format").checked);
     return;
@@ -618,6 +623,7 @@ $("counter-print").addEventListener("change", async () => {
     // installed in its canonical state for the current value.
     await view.configure("COUNTER", route.padded, installed, route);
     counterPrint = requested;
+    syncSetupUrl({ print: requested });
     $("wrap").checked = wrapFor(counterPrint, wrapChoice);
     padded = $("format").checked;
     value = installed;
@@ -655,6 +661,7 @@ $("rotation-speed").addEventListener("input", () => {
   speedUi();
   if (isTimer()) tick();
   save();
+  syncSetupUrl({ speed: String(durations[Number($("rotation-speed").value)]) });
 });
 $("tenth-speed").addEventListener("change", () => {
   speedUi();
@@ -665,6 +672,7 @@ $("tenth-speed").addEventListener("change", () => {
   }
 });
 $("tenth-direction").addEventListener("change", () => {
+  syncSetupUrl({ dir: $("tenth-direction").value === "-1" ? "down" : "up" });
   if (tenthRunning && !view?.busy) {
     tick();
   }
@@ -725,6 +733,10 @@ async function updateStyle() {
   try {
     pendingManifest = null;
     await view.updateManifest?.(manifest);
+    syncSetupUrl({
+      font: $("tenth-display")?.value,
+      marker: $("tenth-marker")?.value,
+    });
   } catch (e) {
     error(e.message);
   }
@@ -928,6 +940,7 @@ $("timer-duration-form").addEventListener("submit", (event) => {
   action(() => {
     if (!ready || !isTimer() || clock.running) return;
     applyDuration();
+    syncSetupUrl({ duration: $("timer-duration").value });
     timerUi();
     controlsUi();
   });
@@ -941,6 +954,7 @@ $("timer-mode").addEventListener("change", () =>
     $("timer-duration").value = formatTime(
       configuredSeconds / clock.profile.stepSeconds,
     );
+    syncSetupUrl({ mode: $("timer-mode").value });
     reconcileTimer();
     timerUi();
     controlsUi();
@@ -950,6 +964,7 @@ $("timer-speed").addEventListener("change", () =>
   action(() => {
     if (!ready || !isTimer()) return;
     clock.setSpeed(Number($("timer-speed").value));
+    syncSetupUrl({ rate: $("timer-speed").value });
     tick();
   }),
 );
@@ -972,6 +987,127 @@ const syncApplicationSelect = (appKey) => {
     select.value = appKey;
   }
 };
+
+function syncSetupUrl(changes = {}) {
+  if (msRunning || hsmRunning || tenthRunning || run.running || (isTimer() && clock?.running)) return;
+  try {
+    const nextUrl = new URL(location.href);
+    for (const [k, v] of Object.entries(changes)) {
+      if (v === null || v === undefined) {
+        nextUrl.searchParams.delete(k);
+      } else {
+        nextUrl.searchParams.set(k, v);
+      }
+    }
+    history.replaceState(null, "", nextUrl);
+  } catch {}
+}
+
+function applyInitialUrlParams(app) {
+  const params = new URLSearchParams(location.search);
+
+  const unitParam = params.get("unit") || params.get("letter");
+  if (unitParam) {
+    const u = unitParam.toUpperCase();
+    if (app === "ms-counter" && (u === "M" || u === "S")) {
+      $("ms-letter").value = u;
+    } else if ((app === "hsm-counter" || app === "hm-one-cube") && ["H", "M", "S"].includes(u)) {
+      if (app !== "hm-one-cube" || u !== "S") {
+        $("hsm-letter").value = u;
+      }
+    }
+  }
+
+  const dirParam = params.get("dir") || params.get("direction");
+  if (dirParam) {
+    const d = ["down", "-1"].includes(dirParam.toLowerCase()) ? "-1" : "1";
+    if ($("ms-direction")) $("ms-direction").value = d;
+    if ($("hsm-direction")) $("hsm-direction").value = d;
+    if ($("tenth-direction")) $("tenth-direction").value = d;
+  }
+
+  const rangeParam = params.get("range");
+  if (rangeParam && $("hsm-range")) {
+    if (["59", "23", "11"].includes(rangeParam)) {
+      $("hsm-range").value = rangeParam;
+    }
+  }
+
+  const speedParam = params.get("speed");
+  if (speedParam) {
+    const num = Number(speedParam);
+    const speedIndex = durations.indexOf(num);
+    if (speedIndex !== -1 && $("rotation-speed")) {
+      $("rotation-speed").value = String(speedIndex);
+      speedUi();
+    }
+  }
+
+  const letteringParam = params.get("lettering");
+  if (letteringParam && $("hsm-lettering")) {
+    const l = parseLettering(letteringParam);
+    $("hsm-lettering").value = l;
+    syncHsmUnitLabels();
+  }
+
+  const fontParam = params.get("font") || params.get("display");
+  if (fontParam && $("tenth-display")) {
+    const f = fontParam.toLowerCase();
+    if (["dseg7", "dseg14", "noto-sans", "quicksand", "outfit", "classic"].includes(f)) {
+      $("tenth-display").value = f;
+    }
+  }
+
+  const markerParam = params.get("marker");
+  if (markerParam && $("tenth-marker")) {
+    const m = markerParam.toLowerCase();
+    if (["off", "auto", "all", "line-auto", "line-all"].includes(m)) {
+      $("tenth-marker").value = m;
+    }
+  }
+
+  const padParam = params.get("pad") ?? params.get("padding");
+  if (padParam !== null && $("format")) {
+    $("format").checked = !["0", "false", "off", "no"].includes(padParam.toLowerCase());
+  }
+
+  const timerMode = params.get("mode");
+  if (timerMode && $("timer-mode")) {
+    const m = timerMode.toLowerCase();
+    if (["countdown", "stopwatch"].includes(m)) {
+      $("timer-mode").value = m;
+    }
+  }
+
+  const timerSpeed = params.get("rate") || params.get("timer-speed");
+  if (timerSpeed && $("timer-speed")) {
+    if (["1", "10", "20", "50", "100"].includes(timerSpeed)) {
+      $("timer-speed").value = timerSpeed;
+    }
+  }
+}
+
+function checkAutoPresentation() {
+  const sp = new URLSearchParams(location.search);
+  const p = sp.get("presentation") ?? sp.get("kiosk");
+  if (p === "1" || p === "true") {
+    setTimeout(() => togglePresentation(true), 200);
+  }
+}
+
+function checkAutoRun(app) {
+  const sp = new URLSearchParams(location.search);
+  const shouldRun = sp.get("run") === "1" || sp.get("run") === "true" || sp.get("autoplay") === "1";
+  if (!shouldRun) return;
+  setTimeout(() => {
+    if (!ready) return;
+    if (app === "ms-counter" && !msRunning) $("ms-run")?.click();
+    else if ((app === "hsm-counter" || app === "hm-one-cube") && !hsmRunning) $("hsm-run")?.click();
+    else if (app === "tenth-counter" && !tenthRunning) $("tenth-run")?.click();
+    else if ((app === "timer" || app === "five-second-timer") && !clock?.running) $("timer-run")?.click();
+    else if (app === "certified" && !run.running) $("run")?.click();
+  }, 400);
+}
 
 async function switchApplication(requested) {
   const targetKey = normalizeAppKey(requested);
@@ -1000,6 +1136,7 @@ async function switchApplication(requested) {
     };
     const resolveAssets = (manifest, prints, signal) =>
       loadAssets(manifest, prints, signal, import.meta.env.BASE_URL);
+    applyInitialUrlParams(targetKey);
     if (targetKey === "hsm-counter" || targetKey === "hm-one-cube") {
       const hm = targetKey === "hm-one-cube";
       hsmVariantUi(hm);
@@ -1014,10 +1151,19 @@ async function switchApplication(requested) {
       );
       // The selected range decides which saved counting period is installed.
       candidate.setMode(hsmMaximum(), Number($("hsm-direction").value));
-      await candidate.configure();
+      const valParam = new URLSearchParams(location.search).get("val") ?? new URLSearchParams(location.search).get("value");
+      const maxVal = hsmMaximum();
+      const initial = (valParam !== null && /^\d{1,2}$/.test(valParam) && Number(valParam) <= maxVal) ? Number(valParam) : 0;
+      await candidate.configure(initial);
+      value = initial;
+      $("hsm-value").value = String(initial).padStart(2, "0");
     } else if (targetKey === "ms-counter") {
       candidate = await msController(callback);
-      await candidate.configure();
+      const valParam = new URLSearchParams(location.search).get("val") ?? new URLSearchParams(location.search).get("value");
+      const initial = (valParam !== null && /^\d{1,2}$/.test(valParam) && Number(valParam) <= 59) ? Number(valParam) : 0;
+      await candidate.configure(initial);
+      value = initial;
+      $("ms-value").value = String(initial).padStart(2, "0");
     } else if (targetKey === "tenth-counter") {
       candidate = new MsTimerTenthCube(
         viewer,
@@ -1025,7 +1171,10 @@ async function switchApplication(requested) {
         callback,
         resolveAssets,
       );
-      await candidate.configure();
+      const valParam = new URLSearchParams(location.search).get("val") ?? new URLSearchParams(location.search).get("value");
+      const initial = (valParam !== null && /^\d$/.test(valParam)) ? Number(valParam) : 0;
+      await candidate.configure(initial);
+      value = initial;
     } else if (targetKey === "timer" || targetKey === "five-second-timer") {
       const profile =
         targetKey === "five-second-timer"
@@ -1044,19 +1193,29 @@ async function switchApplication(requested) {
         callback,
         resolveAssets,
       );
-      await candidate.configure(profile.defaultSeconds / profile.stepSeconds);
+      const durParam = new URLSearchParams(location.search).get("duration");
+      let initSeconds = profile.defaultSeconds;
+      if (durParam) {
+        if (/^\d+:\d{2}$/.test(durParam)) {
+          const [m, s] = durParam.split(":").map(Number);
+          initSeconds = m * 60 + s;
+        } else if (/^\d+$/.test(durParam)) {
+          initSeconds = Number(durParam);
+        }
+      }
+      await candidate.configure(initSeconds / profile.stepSeconds);
       clock = new WorkshopClock(undefined, profile);
       timerScheduler.invalidate();
-      clock.setMode("countdown");
-      clock.configure(profile.defaultSeconds);
-      clock.setSpeed(1);
-      $("timer-mode").value = "countdown";
-      $("timer-speed").value = "1";
-      configuredSeconds = profile.defaultSeconds;
+      const initialMode = $("timer-mode").value || "countdown";
+      clock.setMode(initialMode);
+      clock.configure(initSeconds);
+      const initialSpeed = Number($("timer-speed").value) || 1;
+      clock.setSpeed(initialSpeed);
+      configuredSeconds = initSeconds;
       durationDirty = false;
       timerStarted = false;
       $("timer-duration").value = formatTime(
-        profile.defaultSeconds / profile.stepSeconds,
+        initSeconds / profile.stepSeconds,
       );
     } else {
       candidate = new CounterController(viewer, proof, callback, resolveAssets);
@@ -1104,6 +1263,8 @@ async function switchApplication(requested) {
     ready = true;
     error();
     onPhysicalState(view.currentValue, view.busy, undefined, view.progress);
+    checkAutoPresentation();
+    checkAutoRun(targetKey);
   } catch (e) {
     candidate?.dispose();
     ready = true;
@@ -1251,6 +1412,7 @@ $("hsm-reset").addEventListener("click", () =>
     if (ready && isHsm()) {
       stopHsm();
       request(0);
+      syncSetupUrl({ val: "00" });
     }
   }),
 );
@@ -1264,17 +1426,23 @@ $("hsm-set-form").addEventListener("submit", (event) => {
       throw Error(`Enter an integer from 00 to ${hsmMaximum()}.`);
     stopHsm();
     request(n);
+    syncSetupUrl({ val: String(n).padStart(2, "0") });
   });
 });
 $("hsm-range").addEventListener("change", () =>
   action(() => {
     if (!ready || !isHsm() || hsmRunning || view.busy) return;
+    syncSetupUrl({ range: $("hsm-range").value });
     if (value > hsmMaximum()) request(0);
   }),
 );
+$("hsm-direction")?.addEventListener("change", () => {
+  syncSetupUrl({ dir: $("hsm-direction").value === "-1" ? "down" : "up" });
+});
 for (const id of ["hsm-letter", "hsm-lettering"])
   $(id).addEventListener("change", async () => {
     if (!ready || !isHsm() || hsmRunning || view.busy) return;
+    syncSetupUrl({ [id === "hsm-letter" ? "unit" : "lettering"]: $(id).value });
     const previous = view,
       initial =
         id === "hsm-lettering" ? view.currentValue : 0,
@@ -1388,6 +1556,7 @@ $("ms-reset").addEventListener("click", () =>
     if (ready && isMs()) {
       stopMs();
       request(0);
+      syncSetupUrl({ val: "00" });
     }
   }),
 );
@@ -1401,7 +1570,11 @@ $("ms-set-form").addEventListener("submit", (event) => {
       throw Error("Enter an integer from 00 to 59.");
     stopMs();
     request(n);
+    syncSetupUrl({ val: String(n).padStart(2, "0") });
   });
+});
+$("ms-direction")?.addEventListener("change", () => {
+  syncSetupUrl({ dir: $("ms-direction").value === "-1" ? "down" : "up" });
 });
 function stopTenth() {
   tenthRunning = false;
@@ -1437,10 +1610,12 @@ for (const button of document.querySelectorAll("[data-tenth-target]"))
       if (!ready || !isTenth()) return;
       stopTenth();
       request(Number(button.dataset.tenthTarget));
+      syncSetupUrl({ val: String(button.dataset.tenthTarget) });
     }),
   );
 $("ms-letter").addEventListener("change", async () => {
   if (!ready || !isMs() || msRunning || view.busy) return;
+  syncSetupUrl({ unit: $("ms-letter").value });
   const previous = view;
   ready = false;
   controlsUi();
@@ -1548,6 +1723,11 @@ async function initialize() {
         loadAssets(manifest, prints, signal, import.meta.env.BASE_URL),
     );
     certified = await loadCertifiedCounter(proof, import.meta.env.BASE_URL);
+    applyInitialUrlParams("certified");
+    const valParam = new URLSearchParams(location.search).get("val") ?? new URLSearchParams(location.search).get("value");
+    if (valParam !== null && /^\d{1,2}$/.test(valParam) && Number(valParam) <= 99) {
+      value = Number(valParam);
+    }
     const requestedPrint =
       new URLSearchParams(location.search).get("print") ?? saved?.print;
     if (requestedPrint === "blank-top")
@@ -1572,6 +1752,8 @@ async function initialize() {
     $("value").value = String(value);
     controlsUi();
     save();
+    checkAutoPresentation();
+    checkAutoRun("certified");
   } catch (e) {
     error("Counter setup failed: " + e.message);
     $("status").textContent = "Unable to load the verified fixed print.";

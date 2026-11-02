@@ -364,6 +364,10 @@ async function initialize() {
     });
     presBtn?.addEventListener("click", () => togglePresentation(true));
     $("exit-presentation-btn")?.addEventListener("click", () => togglePresentation(false));
+    const urlPres = new URLSearchParams(location.search).get("presentation") ?? new URLSearchParams(location.search).get("kiosk");
+    if (urlPres === "1" || urlPres === "true") {
+      setTimeout(() => togglePresentation(true), 200);
+    }
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {
         togglePresentation(false);
