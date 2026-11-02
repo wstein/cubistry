@@ -44,9 +44,9 @@
 
 .clock-stage .cube-appearance {
   position: absolute;
-  top: 32px;
-  left: 32px;
-  z-index: 10;
+  top: 14px;
+  left: 14px;
+  z-index: 30;
 }
 
 .clock-cubes[data-count="1"] {
