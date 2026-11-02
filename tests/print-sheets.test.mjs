@@ -30,7 +30,7 @@ const catalog = read(root + "catalog.json");
 
 test("committed print presets retain every physical sticker and full source-face orientation", () => {
   assert.equal(catalog.schema, "cubistry.print-catalog");
-  assert.equal(catalog.entries.length, 6);
+  assert.equal(catalog.entries.length, 7);
   for (const entry of catalog.entries) {
     const dir = root + entry.directory,
       m = read(dir + "manifest.json");
@@ -164,26 +164,31 @@ test("A4 imposition keeps real cuts, bleed and conservative ink safety inside ea
 });
 
 test("HSM unit words print at full size on their unchanged baseline", () => {
-  const entry = catalog.entries.find((e) => e.design === "hsm-words"),
-    dir = root + entry.directory,
-    m = read(dir + "manifest.json"),
-    words = read("public/assets/hsm/words/provenance.json");
-  assert.deepEqual(read(dir + "WORD-ART-PROVENANCE.json"), words);
-  assert.equal(words.fontSize, MAX_WORD_FONT_SIZE);
-  assert.equal(words.baseline, WORD_BASELINE);
-  // The seconds-first print has one H, one M and three S stickers per cube.
-  for (const [id, perCube] of [
-    ["H", 1],
-    ["M", 1],
-    ["S", 3],
-  ]) {
-    const printed = m.stickers.filter((s) => s.image === id);
-    assert.equal(printed.length, m.copies * perCube);
-    for (const s of printed) {
-      // Safe fitting must not shrink the word art (that would move the baseline).
-      assert.equal(s.artScale, 1);
-      assert.deepEqual(s.sourceInkBounds, words.stickers[id].inkBounds);
-      assertWordRules(words, id, s.sourceInkBounds);
+  for (const design of ["hsm-words", "hsm-words-pascal"]) {
+    const entry = catalog.entries.find((e) => e.design === design),
+      dir = root + entry.directory,
+      m = read(dir + "manifest.json"),
+      provPath = design === "hsm-words-pascal"
+        ? "public/assets/hsm/words-pascal/provenance.json"
+        : "public/assets/hsm/words/provenance.json",
+      words = read(provPath);
+    assert.deepEqual(read(dir + "WORD-ART-PROVENANCE.json"), words);
+    assert(words.fontSize <= MAX_WORD_FONT_SIZE);
+    assert.equal(words.baseline, WORD_BASELINE);
+    // The seconds-first print has one H, one M and three S stickers per cube.
+    for (const [id, perCube] of [
+      ["H", 1],
+      ["M", 1],
+      ["S", 3],
+    ]) {
+      const printed = m.stickers.filter((s) => s.image === id);
+      assert.equal(printed.length, m.copies * perCube);
+      for (const s of printed) {
+        // Safe fitting must not shrink the word art (that would move the baseline).
+        assert.equal(s.artScale, 1);
+        assert.deepEqual(s.sourceInkBounds, words.stickers[id].inkBounds);
+        assertWordRules(words, id, s.sourceInkBounds);
+      }
     }
   }
 });

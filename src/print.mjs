@@ -2,7 +2,7 @@ import "./style.css";
 import "./print.css";
 const $ = (id) => document.getElementById(id);
 const base = new URL(import.meta.env.BASE_URL, location.origin);
-const allowed = ["de-a", "en-3", "hsm-symbols", "hsm-words"];
+const allowed = ["de-a", "en-3", "hsm-symbols", "hsm-words", "hsm-words-pascal"];
 let entries = [];
 const url = (entry, file) =>
   new URL(`print/${entry.directory}${file}`, base).href;

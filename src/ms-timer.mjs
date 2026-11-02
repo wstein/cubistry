@@ -16,7 +16,8 @@ import { MsTimer } from "./apps/ms-timer/timer.ts";
 import { PairController } from "./apps/pair/controller.ts";
 import { ONE_SECOND_TIMER, formatMsTimer } from "./apps/timer/clock.ts";
 import { timerMotion } from "./apps/timer/status.ts";
-import hsmWords from "./apps/hsm/images-words.json";
+import { installPrintLink } from "./apps/print/link.ts";
+import hsmWords from "./apps/hsm/images-words-pascal.json";
 import msPin from "../ms-source.json";
 
 const $ = (id) => document.getElementById(id);
@@ -331,4 +332,5 @@ async function initialize() {
   }
 }
 void initialize();
+installPrintLink(() => "hsm-words-pascal");
 export { timer as msTimer, stage as msTimerStage };
