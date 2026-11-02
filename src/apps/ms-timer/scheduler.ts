@@ -1,13 +1,15 @@
 import type { ClockSnapshot } from "../timer/clock.ts";
 import { TimerScheduler, type TimerCube } from "../timer/scheduler.ts";
+import { TenthScheduler } from "./tenth.ts";
 
 export type TimerWarning = "" | "Budget infeasible" | "Late";
 
-/** The two cubes of the timer: the minor one shows seconds, the major one minutes. */
+/** The cubes of the timer: minor shows seconds, major minutes, and optional tenth shows 1/10s. */
 export interface TimerPair {
   readonly minor: TimerCube;
   readonly major: TimerCube;
   readonly minorModulus: number;
+  readonly tenth?: TimerCube;
 }
 
 /**
@@ -43,6 +45,7 @@ export function cubeSnapshot(
 export class MsTimerScheduler {
   readonly minor: TimerScheduler;
   readonly major: TimerScheduler;
+  readonly tenth: TenthScheduler;
 
   private readonly modulus: number;
 
@@ -56,6 +59,7 @@ export class MsTimerScheduler {
       readClock && (() => cubeSnapshot(readClock(), unit, modulus));
     this.minor = new TimerScheduler(refresh, fresh("minor"));
     this.major = new TimerScheduler(refresh, fresh("major"));
+    this.tenth = new TenthScheduler(refresh);
   }
 
   /** "Late" wins over "Budget infeasible"; empty when both cubes are on time. */
@@ -71,6 +75,7 @@ export class MsTimerScheduler {
   invalidate(): void {
     this.minor.invalidate();
     this.major.invalidate();
+    this.tenth.invalidate();
   }
 
   /** The combined target a cube is deliberately heading for, or null. */
@@ -92,7 +97,9 @@ export class MsTimerScheduler {
     setDuration: {
       minor(ms: number): void;
       major(ms: number): void;
+      tenth?(ms: number): void;
     },
+    tenthSnapshot?: ClockSnapshot,
   ): void {
     for (const unit of ["minor", "major"] as const)
       this[unit].tick(
@@ -101,5 +108,12 @@ export class MsTimerScheduler {
         preferred,
         setDuration[unit],
       );
+    if (pair.tenth && tenthSnapshot) {
+      this.tenth.tick(
+        tenthSnapshot,
+        pair.tenth,
+        setDuration.tenth ?? (() => {}),
+      );
+    }
   }
 }

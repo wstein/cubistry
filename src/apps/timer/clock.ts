@@ -25,6 +25,8 @@ export const ONE_SECOND_TIMER: TimerProfile = Object.freeze({
   defaultSeconds: 900,
   stepName: "one-second",
 });
+/** Maximum M/S Timer value in tenths of a second (59:59.9 = 35999 tenths). */
+export const MS_MAX_TENTHS = 35999;
 const durationError = (p: TimerProfile) =>
   `Duration must be 00:00–${formatTimer(p.maxSeconds / p.stepSeconds, p)} in ${p.stepName} steps`;
 
@@ -119,6 +121,47 @@ export class WorkshopClock {
       ? Math.ceil(this.valueMs / (this.profile.stepSeconds * 1000))
       : Math.floor(this.valueMs / (this.profile.stepSeconds * 1000));
   }
+  /** Combined time in tenths of a second (Countdown rounds up, Stopwatch down). */
+  get tenthBucket(): number {
+    return this.direction === "countdown"
+      ? Math.ceil(this.valueMs / 100)
+      : Math.floor(this.valueMs / 100);
+  }
+  /** Snapshot for the 1/10-second cube (bucket 0..9, 100 ms step interval at 1x). */
+  tenthSnapshot(at: number = this.now()): ClockSnapshot {
+    const value = this.valueAt(at);
+    const tenthBucket =
+      this.direction === "countdown"
+        ? Math.ceil(value / 100)
+        : Math.floor(value / 100);
+    const running =
+      this.active &&
+      (this.direction === "countdown"
+        ? value > 0
+        : value < this.profile.maxSeconds * 1000);
+    const targetTenths =
+      tenthBucket + (this.direction === "countdown" ? -1 : 1);
+    const distance =
+      this.direction === "countdown"
+        ? value - targetTenths * 100
+        : targetTenths * 100 - value;
+    return {
+      at,
+      bucket: ((tenthBucket % 10) + 10) % 10,
+      liveSeconds:
+        this.direction === "countdown"
+          ? Math.ceil(value / 1000)
+          : Math.floor(value / 1000),
+      running,
+      next: running
+        ? {
+            target: ((targetTenths % 10) + 10) % 10,
+            deadline: at + distance / this.multiplier,
+            interval: 100 / this.multiplier,
+          }
+        : null,
+    };
+  }
   get elapsed(): boolean {
     return this.direction === "countdown"
       ? this.valueMs === 0
@@ -133,6 +176,14 @@ export class WorkshopClock {
     )
       throw Error(durationError(this.profile));
     this.duration = seconds;
+    this.reset();
+  }
+  configureTenths(tenths: number, maxTenths = this.profile.maxSeconds * 10): void {
+    if (!Number.isInteger(tenths) || tenths < 0 || tenths > maxTenths)
+      throw Error(
+        `Duration must be 00:00.0–${formatMsTimer(maxTenths)} in tenth-second steps`,
+      );
+    this.duration = tenths / 10;
     this.reset();
   }
   setMode(mode: TimerMode): void {
@@ -161,8 +212,35 @@ export class WorkshopClock {
   }
   reset(): void {
     this.active = false;
-    this.frozen = this.direction === "countdown" ? this.duration * 1000 : 0;
+    this.frozen =
+      this.direction === "countdown" ? Math.round(this.duration * 1000) : 0;
   }
+}
+export function formatMsTimer(
+  tenths: number,
+  maxTenths = MS_MAX_TENTHS,
+): string {
+  if (!Number.isInteger(tenths) || tenths < 0 || tenths > maxTenths)
+    throw Error("Invalid M/S timer tenths");
+  const totalSeconds = Math.floor(tenths / 10);
+  const tenth = tenths % 10;
+  return `${String(Math.floor(totalSeconds / 60)).padStart(2, "0")}:${String(totalSeconds % 60).padStart(2, "0")}.${tenth}`;
+}
+export function parseMsDuration(
+  text: string,
+  maxTenths = MS_MAX_TENTHS,
+): number {
+  const match = /^(\d{1,2}):([0-5]\d)(?:\.(\d))?$/.exec(text);
+  if (!match) throw Error("Enter MM:SS or MM:SS.d in tenth-second steps");
+  const m = Number(match[1]);
+  const s = Number(match[2]);
+  const d = match[3] !== undefined ? Number(match[3]) : 0;
+  const tenths = (m * 60 + s) * 10 + d;
+  if (tenths > maxTenths)
+    throw Error(
+      `Duration must be 00:00.0–${formatMsTimer(maxTenths, maxTenths)} in tenth-second steps`,
+    );
+  return tenths;
 }
 export function formatTimer(
   bucket: number,
