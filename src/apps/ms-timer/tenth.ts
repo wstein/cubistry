@@ -187,6 +187,7 @@ export class MsTimerTenthCube extends PhysicalPlayback implements TimerCube {
   } | null = null;
   private timingRevision = 0;
   private route: readonly LegalMove[] = [];
+  private waiters: (() => void)[] = [];
 
   constructor(
     view: PhysicalView,
@@ -199,10 +200,22 @@ export class MsTimerTenthCube extends PhysicalPlayback implements TimerCube {
     ) => void,
     resolveAssets: typeof loadAssets = loadAssets,
   ) {
-    super(view, onState);
+    super(view, (v, busy, error, progress) => {
+      onState(v, busy, error, progress);
+      if (!busy && this.waiters.length) {
+        for (const resolve of this.waiters.splice(0)) resolve();
+      }
+    });
     this.manifest = manifest;
     this.resolveAssets = resolveAssets;
     this.period = new MsPeriod(TENTH_PRINT, TENTH_RUN, TENTH_MODULUS);
+  }
+
+  /** Walk to `value` along the saved period and resolve once settled. */
+  set(value: number): Promise<void> {
+    this.request(value);
+    if (!this.busy) return Promise.resolve();
+    return new Promise((resolve) => this.waiters.push(resolve));
   }
 
   protected get maximumValue(): number {
