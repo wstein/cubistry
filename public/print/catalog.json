@@ -122,6 +122,27 @@
         "manifest.json": "e47d264dcd35e0b9898a7b7a3cdf3806944d3e88eb9243ca4e654a8b03e2c122",
         "print.pdf": "bbfe1d15b61a87aa1e2eaa2e1c623225e1157852df2219b621314529bd71e2d8"
       }
+    },
+    {
+      "id": "hsm-words-pascal-20mm-3sets",
+      "design": "hsm-words-pascal",
+      "sizeMm": 20,
+      "copies": 3,
+      "stickerCount": 72,
+      "pages": 1,
+      "directory": "hsm-words-pascal-20mm-3sets/",
+      "files": {
+        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
+        "README.txt": "8f4241fc1233b83c789137f1e97329d860340c24f256cc8125975fb63b76dc6c",
+        "WORD-ART-PROVENANCE.json": "eb12906f2487638ecfeb1d342b9513062d281e5062c4fefb95584e0f9a7832f3",
+        "artwork-1.svg": "feb10fef0741e5404decacf2e52b3fe4cd147c0bef2dbc6eab54f9b43720b04f",
+        "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
+        "assembly.pdf": "c380b782d17af65236018b110c98be96b143cd6635cf0376a58832e496674f25",
+        "print.pdf": "bbfe1d15b61a87aa1e2eaa2e1c623225e1157852df2219b621314529bd71e2d8",
+        "bundle.zip": "c11e51a24be0dbaea4ceb5706bdb62c0cd171b64f39710862ad965e9a9c06a16",
+        "manifest.json": "8d0e62f42a8dd26b95797f82ec51907fe036f3ea19d78c12fc08af33f9298a68"
+      }
     }
   ]
 }
