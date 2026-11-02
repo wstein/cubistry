@@ -201,7 +201,7 @@ test("setting any state keeps valid full cycle cubie state where all 8 cubies ma
     );
   }
 
-  // Stepping +1 and -1 must also preserve all 8 cubies
+  // Stepping +1, -1, +5, and -5 must also preserve all 8 cubies
   await cube.set(0);
   for (let i = 0; i < 10; i++) {
     await cube.step(1);
@@ -219,6 +219,28 @@ test("setting any state keeps valid full cycle cubie state where all 8 cubies ma
     assert(
       stateEquals(cube.state, canonicalStates[expected]),
       `Step -1 to ${expected} must land on canonical state ${expected} (all 8 cubies matter)`,
+    );
+  }
+
+  await cube.set(0);
+  for (let i = 0; i < 10; i++) {
+    const current = cube.currentValue;
+    await cube.step(5);
+    const expected = (current + 5) % 10;
+    assert(
+      stateEquals(cube.state, canonicalStates[expected]),
+      `Step +5 from ${current} to ${expected} must land on canonical state ${expected} (all 8 cubies matter)`,
+    );
+  }
+
+  await cube.set(0);
+  for (let i = 0; i < 10; i++) {
+    const current = cube.currentValue;
+    await cube.step(-5);
+    const expected = ((current - 5) % 10 + 10) % 10;
+    assert(
+      stateEquals(cube.state, canonicalStates[expected]),
+      `Step -5 from ${current} to ${expected} must land on canonical state ${expected} (all 8 cubies matter)`,
     );
   }
 });
@@ -253,4 +275,23 @@ test("tenth-speed options and hardwired turn speeds match specification", async 
   assert(html.includes('<option value="1000" selected>1s</option>'));
   assert(html.includes('<option value="500">500ms</option>'));
   assert(html.includes('<option value="100">100ms</option>'));
+
+  // Dedicated digit buttons 0-9
+  for (let d = 0; d < 10; d++) {
+    assert(
+      html.includes(`data-tenth-target="${d}"`),
+      `UI must include digit button ${d}`,
+    );
+  }
+
+  // Increments: -5, -1, +1, +5
+  assert(html.includes('data-tenth-delta="-5"'));
+  assert(html.includes('data-tenth-delta="-1"'));
+  assert(html.includes('data-tenth-delta="1"'));
+  assert(html.includes('data-tenth-delta="5"'));
+
+  // No text input, set-form, or reset button
+  assert(!html.includes('id="tenth-value"'), "Must have no tenth-value text input");
+  assert(!html.includes('id="tenth-set-form"'), "Must have no tenth-set-form");
+  assert(!html.includes('id="tenth-reset"'), "Must have no tenth-reset button");
 });

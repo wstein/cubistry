@@ -249,6 +249,22 @@ h1 {
   line-height: 1.65;
   color: #526255;
 }
+.tenth-digits {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+.tenth-digits button {
+  padding: 10px 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.tenth-digits button.active {
+  background: var(--color-ink-navy);
+  color: #fffdf6;
+  border-color: var(--color-ink-navy);
+}
 .increments {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
