@@ -1,4 +1,6 @@
 import { installPrintLink } from "./apps/print/link.ts";
+import { initHudIdle } from "./apps/shared/hud-idle.ts";
+initHudIdle();
 import { HsmController } from "./apps/hsm/controller.ts";
 import { SlicedExecutor } from "./apps/hsm/recovery-executor.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";

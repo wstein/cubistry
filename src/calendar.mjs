@@ -1,4 +1,6 @@
 import { installPrintLink } from "./apps/print/link.ts";
+import { initHudIdle } from "./apps/shared/hud-idle.ts";
+initHudIdle();
 import "./style.css";
 import "./calendar.css";
 import "./presentation.css";

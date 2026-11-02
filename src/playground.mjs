@@ -1,4 +1,6 @@
 import { loadAssets } from "@cubistry/cube-assets";
+import { initHudIdle } from "./apps/shared/hud-idle.ts";
+initHudIdle();
 import { CubeViewer, BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
 import { serializeMove } from "@cubistry/cube-mechanics";
 import { createDesign, ALLOWED_MOVES } from "./apps/playground/model.ts";

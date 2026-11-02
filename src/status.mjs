@@ -1,5 +1,7 @@
 import "./style.css";
 import "./status.css";
+import { initHudIdle } from "./apps/shared/hud-idle.ts";
+initHudIdle();
 import raw from "./apps/status/definition.json";
 import { CubeViewer, BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
 import { loadAssets } from "@cubistry/cube-assets";

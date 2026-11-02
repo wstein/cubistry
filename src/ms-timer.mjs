@@ -1,6 +1,8 @@
 import "./style.css";
 import "./clock.css";
 import "./ms-timer.css";
+import { initHudIdle } from "./apps/shared/hud-idle.ts";
+initHudIdle();
 import { loadAssets } from "@cubistry/cube-assets";
 import { BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
 import { ClockStage } from "./apps/clock/stage.ts";
