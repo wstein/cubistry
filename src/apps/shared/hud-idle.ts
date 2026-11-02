@@ -17,7 +17,7 @@ export function installHudIdleController(options: HudIdleOptions = {}): {
     return { wake() {}, destroy() {} };
   }
 
-  const timeoutMs = options.timeoutMs ?? 10000;
+  const timeoutMs = options.timeoutMs ?? 2000;
   let timer: ReturnType<typeof setTimeout> | null = null;
 
   function isProtected(): boolean {
@@ -87,7 +87,7 @@ export function installHudIdleController(options: HudIdleOptions = {}): {
   };
 }
 
-export function initHudIdle(timeoutMs = 10000): {
+export function initHudIdle(timeoutMs = 2000): {
   wake(): void;
   destroy(): void;
 } {
