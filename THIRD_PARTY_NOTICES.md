@@ -6,7 +6,7 @@ Copyright © 2026 Werner Stein and Cubistry contributors.
 
 In accordance with AGPL-3.0 (§6 and §13), any user interacting with Cubistry over a computer network has the right to receive the Complete Corresponding Source code of the software under the terms of this license.
 
-* **Primary Repository**: [https://github.com/wstein/puzlwerk](https://github.com/wstein/puzlwerk)
+* **Primary Repository**: [https://github.com/wstein/cubistry](https://github.com/wstein/cubistry)
 * **License Full Text**: [https://www.gnu.org/licenses/agpl-3.0.html](https://www.gnu.org/licenses/agpl-3.0.html) (also distributed locally in `LICENSE`)
 
 ---
@@ -126,8 +126,8 @@ The following third-party libraries and modules are bundled, linked, or distribu
 In compliance with the AGPL-3.0 and corresponding third-party licenses:
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/wstein/puzlwerk.git
-   cd puzlwerk
+   git clone https://github.com/wstein/cubistry.git
+   cd cubistry
    ```
 2. **Build and Verify All Notices**:
    ```bash
