@@ -1,0 +1,166 @@
+{
+  "dseg7": {
+    "0": {
+      "url": "/assets/digits/dseg7/0.svg",
+      "sha256": "a4ac63760c9879e555af94c53be37f70b64624826726b41eb7caf51f06851f1c"
+    },
+    "0-dot": {
+      "url": "/assets/digits/dseg7/0-dot.svg",
+      "sha256": "8dcce523044c7d4d69f6512348f8c3c22a06d92fde1ceb816cdaeeb6137eee08"
+    },
+    "1": {
+      "url": "/assets/digits/dseg7/1.svg",
+      "sha256": "b5611399f555474e3d79db517196589d7d5a9f88c4a3487b72ca21f28dca12e6"
+    },
+    "1-dot": {
+      "url": "/assets/digits/dseg7/1-dot.svg",
+      "sha256": "f1015c299ed693acf87cef612d2c66cbd0c59ddbcfa95a1898337091112d2c20"
+    },
+    "2": {
+      "url": "/assets/digits/dseg7/2.svg",
+      "sha256": "b4d5518f4b4f607725f03f985665eeb722ef8cbbcfd9124500da199117e44079"
+    },
+    "2-dot": {
+      "url": "/assets/digits/dseg7/2-dot.svg",
+      "sha256": "47a55e1af138d9997d0a84e97c8324f882c9173ee74e6d06d9b02040fd60e817"
+    },
+    "3": {
+      "url": "/assets/digits/dseg7/3.svg",
+      "sha256": "a38c43f3a769971af94adf2fe81d547d5e12abb0958484b65880652c044e1d1a"
+    },
+    "3-dot": {
+      "url": "/assets/digits/dseg7/3-dot.svg",
+      "sha256": "0101ffbb88a1cbdd6c240093092a26b369e4703a5e01a1ab3af0c5495c8f8bae"
+    },
+    "4": {
+      "url": "/assets/digits/dseg7/4.svg",
+      "sha256": "28d43402a177cbad7bd50a85d21cb1d673a193b053e264639e3a7e3373d54128"
+    },
+    "4-dot": {
+      "url": "/assets/digits/dseg7/4-dot.svg",
+      "sha256": "0e2fc839eb26350c783e71af0aee42b34a06a4658d16619e1ab0e9acc150abc5"
+    },
+    "5": {
+      "url": "/assets/digits/dseg7/5.svg",
+      "sha256": "811d2a677f36637a5a9d66340b877478a6f7b4529981f8528b64a3d2b7114433"
+    },
+    "5-dot": {
+      "url": "/assets/digits/dseg7/5-dot.svg",
+      "sha256": "68294cc8cffe7b354ff05c2e8aeea6b9767b0fd56b2803586dda022fb86932c0"
+    },
+    "6": {
+      "url": "/assets/digits/dseg7/6.svg",
+      "sha256": "3b651e01888930f8361b1b25432ffda853072573917aa1c7ed62bb28f9db062f"
+    },
+    "6-dot": {
+      "url": "/assets/digits/dseg7/6-dot.svg",
+      "sha256": "7a17efb3224488599ce7de1fb35a57800a75355552ba083e813a15043fb086e2"
+    },
+    "7": {
+      "url": "/assets/digits/dseg7/7.svg",
+      "sha256": "f84946f05aa6167d0ec12462ac8ecc101723de8744e17ddd68080a3f5417ded5"
+    },
+    "7-dot": {
+      "url": "/assets/digits/dseg7/7-dot.svg",
+      "sha256": "999bb6c38d4401fe8a29f7f04990a5a0063eaff76bf3b939890ab9f0c576b49e"
+    },
+    "8": {
+      "url": "/assets/digits/dseg7/8.svg",
+      "sha256": "6e7881d19a485213603859e4db5c06cda563b809fd8fca03d78a151721cc4b5f"
+    },
+    "8-dot": {
+      "url": "/assets/digits/dseg7/8-dot.svg",
+      "sha256": "947bd59bdc68d755450a399113be2a00d93304f660db39603d2922b46569a415"
+    },
+    "9": {
+      "url": "/assets/digits/dseg7/9.svg",
+      "sha256": "ce31cddb9ff9568f5b509c7e8141de7c11c8ba43fd5a7329a531c5749945c6c3"
+    },
+    "9-dot": {
+      "url": "/assets/digits/dseg7/9-dot.svg",
+      "sha256": "d3b14304b043bf48105196f47d2c115c822f8ded956e72d607ac37638a6c0196"
+    }
+  },
+  "dseg14": {
+    "0": {
+      "url": "/assets/digits/dseg14/0.svg",
+      "sha256": "0d1991e405c94c7394a3146105e8d309dc150345f47e884ee1594ee785d7f367"
+    },
+    "0-dot": {
+      "url": "/assets/digits/dseg14/0-dot.svg",
+      "sha256": "bffb3d4ed232d4c7b8ab5dd2dab3999a4e6b6075aaf0e082493efffcd82a0c3b"
+    },
+    "1": {
+      "url": "/assets/digits/dseg14/1.svg",
+      "sha256": "90a3a67077e670925fd141d9443a82fac0a11a622ab3f55beb93fca152f07600"
+    },
+    "1-dot": {
+      "url": "/assets/digits/dseg14/1-dot.svg",
+      "sha256": "11c0aaa67d959afa0dec2c20ff6931833983859830830b497f86d7bd6c448f89"
+    },
+    "2": {
+      "url": "/assets/digits/dseg14/2.svg",
+      "sha256": "834b9e865704e977eb0f717ed4ce6eca33a2fe6230395d8199a434caea69772d"
+    },
+    "2-dot": {
+      "url": "/assets/digits/dseg14/2-dot.svg",
+      "sha256": "e32408c1a7bb45d9ef0aa2d23387590f57120dfbe8bb04509ee1064764ccc5b4"
+    },
+    "3": {
+      "url": "/assets/digits/dseg14/3.svg",
+      "sha256": "1e5f4bd83c9e3a1c52f7b89d0fb3a0cfca9284f43a67b292ed27da5d626baa57"
+    },
+    "3-dot": {
+      "url": "/assets/digits/dseg14/3-dot.svg",
+      "sha256": "137bfcf063bee6c7fdb4ed0be4ff82ff77cb758e1355322b543965315ac1d618"
+    },
+    "4": {
+      "url": "/assets/digits/dseg14/4.svg",
+      "sha256": "5454b05eae97c7d569dad5ee88b975b85d6aedb5d8e88ceffa3b3fe1fb85dc27"
+    },
+    "4-dot": {
+      "url": "/assets/digits/dseg14/4-dot.svg",
+      "sha256": "843da546472f3a8a324f018918825dcf392281f84e74ca60af6f13528a45a3ac"
+    },
+    "5": {
+      "url": "/assets/digits/dseg14/5.svg",
+      "sha256": "d00d87b7f6884a2c05789ed9f1705c3e54e7bd104cdf495a49338868794d2b40"
+    },
+    "5-dot": {
+      "url": "/assets/digits/dseg14/5-dot.svg",
+      "sha256": "68634bf9574e8dfe85f518d8e5c3bb715f4866bbe340a54fd87b76430b523efd"
+    },
+    "6": {
+      "url": "/assets/digits/dseg14/6.svg",
+      "sha256": "37e818e5fa4b7afda597315a8dc56bbb0f2bae8ce7742e3d26a1f458a6493322"
+    },
+    "6-dot": {
+      "url": "/assets/digits/dseg14/6-dot.svg",
+      "sha256": "d1cd876434eaab969f9b6a039298083d563d91f2fb80f217c6f701a4177178ed"
+    },
+    "7": {
+      "url": "/assets/digits/dseg14/7.svg",
+      "sha256": "8a5b87b1265003fb85fee6a09f31e9d4b0d0d84a0c49fff5a00f4a39505c1a0f"
+    },
+    "7-dot": {
+      "url": "/assets/digits/dseg14/7-dot.svg",
+      "sha256": "ab9cea7eaa67452ec5e57958b9b4130d2981a585c981334672ac5bbd5dfd5b35"
+    },
+    "8": {
+      "url": "/assets/digits/dseg14/8.svg",
+      "sha256": "5f34ce7bd2192a4a7bbcad8f550f9a787b02bcaaf4163571077936e1e568120f"
+    },
+    "8-dot": {
+      "url": "/assets/digits/dseg14/8-dot.svg",
+      "sha256": "7e2bd9d873d61d7b8ed1792be91e853726344f6e7329ef5babfe116264f0e895"
+    },
+    "9": {
+      "url": "/assets/digits/dseg14/9.svg",
+      "sha256": "383d0e7073a1523bbd3fcbdbe5186240d7bbc12afce7776d62bbbfe90d19a056"
+    },
+    "9-dot": {
+      "url": "/assets/digits/dseg14/9-dot.svg",
+      "sha256": "96870f3df2471e8831aee7fad1e1a1f51e18b1a7dcd80253024f3dc6a4a9e380"
+    }
+  }
+}

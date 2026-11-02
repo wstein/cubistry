@@ -309,6 +309,18 @@
             <option value="500">500ms</option>
             <option value="100">100ms</option>
           </select>
+          <label for="tenth-display">Display</label>
+          <select id="tenth-display">
+            <option value="dseg7" selected>7-Segment (DSEG7)</option>
+            <option value="dseg14">14-Segment (DSEG14)</option>
+            <option value="classic">Classic (Geometric)</option>
+          </select>
+          <label for="tenth-marker">Orientation dot</label>
+          <select id="tenth-marker">
+            <option value="auto" selected>Auto (0, 2, 5, 6, 8, 9)</option>
+            <option value="all">All digits (0–9)</option>
+            <option value="off">Off</option>
+          </select>
           <label>Set value (0–9)</label>
           <div class="tenth-digits" role="group" aria-label="Set value 0 to 9">
             <button type="button" data-tenth-target="0">0</button>
