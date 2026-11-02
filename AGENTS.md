@@ -61,3 +61,12 @@ Skill instructions are task-specific and do not override accepted project ADRs o
 - Apply exact-case, context-aware edits to active references; never use global case-insensitive replacements.
 - Preserve historical ADR wording, immutable snapshots, source URLs/revisions/hashes, quotations and license/copyright notices. Classify old-name occurrences as historical, active or uncertain; report uncertain cases for review instead of silently changing them.
 - Naming-only work does not authorize a solver/application change, package publication or migration. Preserve existing `@cubistry/*` packages.
+
+## Visual branding and theme consistency
+- **Icon and Palette Provenance**: The brand visual identity is grounded in `public/favicon.svg` (2×2 Chronocube face in berry plastic and deep navy ink).
+  - Body / Plastic Primary: `#9e0b5c` (Dark: `#7a0645`, Highlight: `#c8257e`).
+  - Face / Sticker Surface: `#fffdf6`.
+  - Lettering / Segments Ink: `#153b61`.
+  - App Canvas Background: `#f5f3eb`.
+- **UI Elements**: Use the berry plastic tone for `.brand-mark` and primary call-to-action buttons (`button.primary`). Keep text and control readouts in navy/ink tones (`--color-ink-navy`).
+- Do not introduce unrelated neon or high-saturation greens/blues into the core Chronocube shell without ADR approval.

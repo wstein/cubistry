@@ -1,3 +1,12 @@
+:root {
+  --color-plastic-berry: #9e0b5c;
+  --color-plastic-berry-dark: #7a0645;
+  --color-plastic-berry-light: #c8257e;
+  --color-sticker-bg: #fffdf6;
+  --color-ink-navy: #153b61;
+  --color-canvas-bg: #f5f3eb;
+  --color-focus: #c8257e;
+}
 @font-face {
   font-family: "Counter Sans";
   font-style: normal;
@@ -13,7 +22,7 @@
 }
 body {
   margin: 0;
-  background: #f5f3eb;
+  background: var(--color-canvas-bg);
   color: #202c36;
   font:
     14px "Counter Sans",
@@ -44,7 +53,7 @@ header {
   letter-spacing: 2.5px;
 }
 .brand-mark {
-  background: #315d4e;
+  background: var(--color-plastic-berry);
   border-radius: 8px;
   color: white;
   font-size: 23px;
@@ -52,6 +61,7 @@ header {
   width: 32px;
   text-align: center;
   letter-spacing: 0;
+  box-shadow: 0 1px 3px rgba(122, 6, 69, 0.35);
 }
 button,
 input,
@@ -63,7 +73,7 @@ button,
 input,
 select {
   border: 1px solid #c8d0c5;
-  background: #fffdf8;
+  background: var(--color-sticker-bg);
   border-radius: 9px;
   padding: 12px 14px;
 }
@@ -81,16 +91,16 @@ select:disabled {
   cursor: not-allowed;
 }
 :focus-visible {
-  outline: 3px solid #397f60;
+  outline: 3px solid var(--color-focus);
   outline-offset: 3px;
 }
 .primary {
-  background: #315d4e;
-  border-color: #315d4e;
+  background: var(--color-plastic-berry);
+  border-color: var(--color-plastic-berry-dark);
   color: white;
 }
 .primary:hover {
-  background: #264a3e;
+  background: var(--color-plastic-berry-dark);
 }
 label {
   display: block;
@@ -169,7 +179,7 @@ label {
   max-width: 400px;
   padding: 0;
   margin: 10px auto 16px;
-  accent-color: #315d4e;
+  accent-color: var(--color-plastic-berry);
 }
 .counter-stats {
   max-width: 400px;
@@ -262,12 +272,12 @@ h1 {
 .check input {
   width: 18px;
   height: 18px;
-  accent-color: #315d4e;
+  accent-color: var(--color-plastic-berry);
 }
 #status {
   margin: 0 0 16px;
   font-size: 14px;
-  color: #315d4e;
+  color: var(--color-ink-navy);
   min-height: 22px;
 }
 .timer-motion {
