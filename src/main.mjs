@@ -27,6 +27,7 @@ import { TimerController } from "./apps/timer/controller.ts";
 import { TimerScheduler } from "./apps/timer/scheduler.ts";
 import { timerMotion } from "./apps/timer/status.ts";
 import { loadTimerRoute, loadFiveSecondRoute } from "./apps/timer/design.ts";
+import { MsTimerTenthCube, TENTH_WORD_IMAGE } from "./apps/ms-timer/tenth.ts";
 import { CounterRun } from "./apps/counter/run.mjs";
 import { SequenceNumber } from "./apps/shared/sequence-number.ts";
 import { loadCertifiedCounter } from "./apps/counter/certified.ts";
@@ -130,6 +131,9 @@ let msDesign,
   msNextAt = 0;
 const isMs = () => application === "ms-counter";
 const msShift = (delta) => (value + delta + 60) % 60;
+let tenthRunning = false,
+  tenthNextAt = 0;
+const isTenth = () => application === "tenth-counter";
 const hsmMaximum = () => Number($("hsm-range").value);
 const hsmShift = (delta) =>
   (value + delta + hsmMaximum() + 1) % (hsmMaximum() + 1);
@@ -152,7 +156,7 @@ const error = (message = "") => {
   $("error").textContent = message;
 };
 function save() {
-  if (isTimer() || isHsm() || isMs()) return;
+  if (isTimer() || isHsm() || isMs() || isTenth()) return;
   try {
     localStorage.setItem(
       "cubistry-counter-v2",
@@ -180,8 +184,9 @@ function controlsUi() {
     run.running ||
     hsmRunning ||
     msRunning ||
+    tenthRunning ||
     (isTimer() && clock.running && !clock.elapsed);
-  $("counter-controls").hidden = isTimer() || isHsm() || isMs();
+  $("counter-controls").hidden = isTimer() || isHsm() || isMs() || isTenth();
   $("hsm-controls").hidden = !isHsm();
   for (const el of $("hsm-controls").querySelectorAll("button,input,select"))
     el.disabled = !ready;
@@ -203,6 +208,14 @@ function controlsUi() {
   $("ms-run").textContent =
     msRunning || (isMs() && view?.busy) ? "Stop" : "Run";
   $("ms-run").setAttribute("aria-pressed", String(msRunning));
+  $("tenth-controls").hidden = !isTenth();
+  for (const el of $("tenth-controls").querySelectorAll("button,input,select"))
+    el.disabled = !ready;
+  for (const id of ["tenth-direction", "tenth-speed"])
+    $(id).disabled = !ready || !!view?.busy || tenthRunning;
+  $("tenth-run").textContent =
+    tenthRunning || (isTenth() && view?.busy) ? "Stop" : "Run";
+  $("tenth-run").setAttribute("aria-pressed", String(tenthRunning));
   $("timer-controls").hidden = !isTimer();
   $("timer-start").disabled = !ready || (clock.elapsed && !durationDirty);
   $("timer-start").textContent = clock.running
@@ -229,9 +242,14 @@ function controlsUi() {
     run.running ||
     hsmRunning ||
     msRunning ||
+    tenthRunning ||
     (isTimer() && clock.running && !clock.elapsed);
   $("format").disabled =
-    !ready || isHsm() || isMs() || (isBlankTop() && pendingSwitch() === null);
+    !ready ||
+    isHsm() ||
+    isMs() ||
+    isTenth() ||
+    (isBlankTop() && pendingSwitch() === null);
   $("counter-print").disabled = !ready || !!view?.busy || run.running;
   $("mode-switch").hidden = !isBlankTop();
   text("setup-moves", String(view?.modeSwitch?.committed ?? 0));
@@ -301,6 +319,7 @@ const onPhysicalState = (physical, busy, failure, progress) => {
     run.stop();
     hsmRunning = false;
     msRunning = false;
+    tenthRunning = false;
     if (isTimer()) {
       clock.pause();
       timerScheduler.invalidate();
@@ -339,6 +358,21 @@ const onPhysicalState = (physical, busy, failure, progress) => {
       "ms-period",
       `${view.msPrint.label} · ${view.letter} period: ${msRun.laps} lap${msRun.laps > 1 ? "s" : ""}, ${msRun.periodHTM} moves, at most ${msRun.maximumHTM} per step` +
         (laps > 1 && lap ? ` · lap ${lap} of ${laps}` : ""),
+    );
+    controlsUi();
+    return;
+  }
+  if (isTenth()) {
+    if (!busy) value = physical;
+    text(
+      "status",
+      failure
+        ? "Turn sequence stopped."
+        : `1/10s · .${physical} · ${tenthRunning ? "Running" : busy ? "Moving" : "Ready"}`,
+    );
+    text(
+      "tenth-period",
+      "Period-1 {L, D, B} closed cycle: 1 lap, 14 QTM moves, 50 ms/QTM, stationary 1/10 at r1c2",
     );
     controlsUi();
     return;
@@ -542,6 +576,15 @@ function tick() {
     }
     return;
   }
+  if (isTenth()) {
+    if (tenthRunning && !view.busy && performance.now() >= tenthNextAt) {
+      const interval = Number($("tenth-speed").value) || 500;
+      tenthNextAt = performance.now() + interval;
+      const delta = Number($("tenth-direction").value) || 1;
+      view.step(delta);
+    }
+    return;
+  }
   if (isTimer()) {
     timerScheduler.tick(
       clock.snapshot(),
@@ -718,6 +761,7 @@ $("application").addEventListener("change", async () => {
     run.running ||
     hsmRunning ||
     msRunning ||
+    tenthRunning ||
     (isTimer() && clock.running && !clock.elapsed)
   ) {
     $("application").value = application;
@@ -774,6 +818,24 @@ $("application").addEventListener("change", async () => {
       await candidate.configure();
     } else if (requested === "ms-counter") {
       candidate = await msController(callback);
+      await candidate.configure();
+    } else if (requested === "tenth-counter") {
+      candidate = new MsTimerTenthCube(
+        viewer,
+        {
+          ...proof.assets,
+          fonts: [],
+          documents: [],
+          images: [
+            ...proof.assets.images.filter(
+              (i) => /^[0-9]$/.test(i.id) || i.id === "blank",
+            ),
+            TENTH_WORD_IMAGE,
+          ],
+        },
+        callback,
+        resolveAssets,
+      );
       await candidate.configure();
     } else if (requested === "timer" || requested === "five-second-timer") {
       const profile =
@@ -1126,6 +1188,63 @@ $("ms-set-form").addEventListener("submit", (event) => {
     request(n);
   });
 });
+function stopTenth() {
+  tenthRunning = false;
+  const active = view.stopAfterCurrent();
+  value = active ?? view.currentValue;
+  controlsUi();
+}
+$("tenth-run").addEventListener("click", () =>
+  action(() => {
+    if (!ready || !isTenth()) return;
+    if (tenthRunning || view.busy) stopTenth();
+    else {
+      tenthRunning = true;
+      tenthNextAt = performance.now();
+      tick();
+      controlsUi();
+    }
+  }),
+);
+for (const button of document.querySelectorAll("[data-tenth-delta]"))
+  button.addEventListener("click", () =>
+    action(() => {
+      if (!ready || !isTenth()) return;
+      stopTenth();
+      const delta = Number(button.dataset.tenthDelta);
+      error();
+      view.step(delta);
+    }),
+  );
+$("tenth-reset").addEventListener("click", () =>
+  action(async () => {
+    if (!ready || !isTenth()) return;
+    stopTenth();
+    error();
+    try {
+      await view.reset();
+    } catch (e) {
+      error(e.message);
+    }
+  }),
+);
+$("tenth-set-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  action(async () => {
+    if (!ready || !isTenth()) return;
+    const raw = $("tenth-value").value.trim(),
+      n = Number(raw);
+    if (!/^\d$/.test(raw) || n < 0 || n > 9)
+      throw Error("Enter an integer from 0 to 9.");
+    stopTenth();
+    error();
+    try {
+      await view.set(n);
+    } catch (e) {
+      error(e.message);
+    }
+  });
+});
 $("ms-letter").addEventListener("change", async () => {
   if (!ready || !isMs() || msRunning || view.busy) return;
   const previous = view;
@@ -1230,6 +1349,7 @@ async function initialize() {
         "timer",
         "five-second-timer",
         "ms-timer",
+        "tenth-counter",
       ].includes(requested)
     ) {
       $("application").value = requested;
@@ -1244,6 +1364,7 @@ controlsUi();
 void initialize();
 
 installPrintLink(() => {
+  if ($("application").value === "tenth-counter") return "ms-timer-tenth";
   if ($("application").value !== "hsm-counter") return null;
   const v = $("hsm-lettering").value;
   return v === "words-pascal"
