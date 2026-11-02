@@ -48,6 +48,18 @@ The plan and the owner decisions of 2026-11-01 are in
   after 60 steps while the full pose differs; the timer plans this internally
   (lap-aware, fewest HTM, as in the M/S Counter) and does not show the lap.
 
+## Dedicated 1/10-Second Counter & Print Sheet
+
+In addition to the 3-cube timer, a **dedicated 1/10-Second Counter** (`tenth-counter`)
+is provided for standalone interactive study and simulation:
+- Replays the 10-step Period-1 sequence `L | L | B L | B L | D | B D | B L | D | L | D`
+  holding the `1/10` mark stationary at `r1c2` and displaying `0–9` at `r2c1`.
+- Provides Step (+1/−1), Set (0–9), Reset, Run/Pause, and Speed controls (100 ms real-time,
+  250 ms, 500 ms visual demo) in the main viewer (`index.html?application=tenth-counter`).
+- **Physical print sheet**: `ms-timer-tenth-20mm-3sets` in `public/print/` delivers 72
+  20 mm stickers (3 complete cube sets) with cut and bleed lines, alongside an outside-view
+  sticker net (`net.svg`).
+
 ## Carry and deadlines
 
 A carry (59→00 up, 00→59 down on the seconds cube) changes the minutes cube in
