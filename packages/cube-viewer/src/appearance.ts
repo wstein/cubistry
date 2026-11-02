@@ -35,37 +35,65 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   let defaultColor = "#202329";
   const previousPosition = host.style.position;
   host.style.position = "relative";
-  const panel = document.createElement("details");
-  panel.className = "cube-appearance";
+  const panel = document.createElement("aside");
+  panel.className = "cube-appearance floating-hud floating-hud-appearance";
   Object.assign(panel.style, {
     position: "absolute",
-    top: "14px",
-    left: "14px",
+    top: "16px",
+    left: "16px",
     zIndex: "30",
     textAlign: "left",
   });
+
+  const header = document.createElement("div");
+  header.className = "hud-header";
+
+  const title = document.createElement("h2");
+  title.className = "hud-title";
+  title.textContent = "Appearance";
+
+  const actions = document.createElement("div");
+  actions.className = "hud-actions";
+
+  const toggleBtn = document.createElement("span");
+  toggleBtn.setAttribute("role", "button");
+  toggleBtn.setAttribute("tabindex", "0");
+  toggleBtn.className = "hud-btn icon-only hud-toggle-btn";
+  toggleBtn.title = "Minimize or expand appearance";
+  toggleBtn.textContent = "─";
+  actions.append(toggleBtn);
+
+  toggleBtn.addEventListener("click", () => {
+    if (panel.classList?.toggle) {
+      panel.classList.toggle("is-minimized");
+      toggleBtn.textContent = panel.classList.contains("is-minimized") ? "⚙" : "─";
+    }
+  });
+
+  header.append(title, actions);
 
   const summary = document.createElement("summary");
   summary.className = "cube-appearance-summary";
   summary.setAttribute("aria-label", "Appearance settings");
   summary.textContent = "Appearance";
+  summary.style.display = "none";
 
   const popover = document.createElement("div");
-  popover.className = "cube-appearance-popover";
+  popover.className = "cube-appearance-popover hud-content";
 
   const tabNav = document.createElement("div");
   tabNav.className = "cube-appearance-tabs";
   tabNav.setAttribute("role", "tablist");
   tabNav.style.display = "none";
 
-  const tabStickersBtn = document.createElement("div");
+  const tabStickersBtn = document.createElement("span");
   tabStickersBtn.className = "cube-appearance-tab active";
   tabStickersBtn.setAttribute("role", "tab");
   tabStickersBtn.setAttribute("tabindex", "0");
   tabStickersBtn.setAttribute("aria-selected", "true");
   tabStickersBtn.textContent = "Stickers & Type";
 
-  const tabViewportBtn = document.createElement("div");
+  const tabViewportBtn = document.createElement("span");
   tabViewportBtn.className = "cube-appearance-tab";
   tabViewportBtn.setAttribute("role", "tab");
   tabViewportBtn.setAttribute("tabindex", "0");
@@ -91,8 +119,17 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     viewportSection.style.display = tab === "viewport" ? "block" : "none";
   };
 
-  tabStickersBtn.addEventListener("click", () => switchTab("stickers"));
-  tabViewportBtn.addEventListener("click", () => switchTab("viewport"));
+  const bindTabEvents = (el: HTMLElement, tab: "stickers" | "viewport") => {
+    el.addEventListener("click", () => switchTab(tab));
+    el.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        switchTab(tab);
+      }
+    });
+  };
+  bindTabEvents(tabStickersBtn, "stickers");
+  bindTabEvents(tabViewportBtn, "viewport");
 
   popover.append(tabNav, stickersSection, viewportSection);
 
@@ -110,13 +147,13 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   note.style.margin = "6px 0 0";
   viewportSection.append(label, colorLabel, reset, note);
 
-  panel.append(summary, popover);
+  panel.append(header, summary, popover);
   host.append(panel);
 
   const originalAppend = panel.append.bind(panel);
   panel.append = (...nodes: any[]) => {
     for (const node of nodes) {
-      if (node === summary || node === popover) {
+      if (node === header || node === summary || node === popover) {
         originalAppend(node);
       } else {
         const text = String(node.textContent ?? "").toLowerCase();
@@ -139,15 +176,6 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     }
   };
 
-  const onDocClick = (e: Event) => {
-    if (panel.open && typeof (panel as any).contains === "function" && !(panel as any).contains(e.target as Node)) {
-      panel.open = false;
-    }
-  };
-  if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
-    document.addEventListener("pointerdown", onDocClick);
-  }
-
   const refresh = () => {
     mode.value = value.construction; color.value = value.frameColor ?? defaultColor;
     color.disabled = reset.disabled = value.construction === "stickerless";
@@ -164,9 +192,6 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     panel,
     setDefaultColor(color: string) { defaultColor = color; refresh(); },
     dispose() {
-      if (typeof document !== "undefined" && typeof document.removeEventListener === "function") {
-        document.removeEventListener("pointerdown", onDocClick);
-      }
       panel.remove();
       host.style.position = previousPosition;
     },

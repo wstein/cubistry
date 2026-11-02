@@ -432,10 +432,43 @@ try {
   );
   $("status").textContent = "3D rendering unavailable.";
 }
+let exitTimer = null;
 function togglePresentation(enable) {
-  document.body.classList.toggle("presentation-mode", enable);
+  const active = typeof enable === "boolean" ? enable : !document.body.classList.contains("presentation-mode");
+  document.body.classList.toggle("presentation-mode", active);
+  if (active) {
+    document.body.classList.add("show-exit-btn");
+    clearTimeout(exitTimer);
+    exitTimer = setTimeout(() => {
+      document.body.classList.remove("show-exit-btn");
+    }, 2500);
+    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  } else {
+    document.body.classList.remove("show-exit-btn");
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
   viewer?.resetCamera?.();
 }
+
+window.addEventListener("mousemove", () => {
+  if (document.body.classList.contains("presentation-mode")) {
+    document.body.classList.add("show-exit-btn");
+    clearTimeout(exitTimer);
+    exitTimer = setTimeout(() => {
+      document.body.classList.remove("show-exit-btn");
+    }, 2500);
+  }
+});
+
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement && document.body.classList.contains("presentation-mode")) {
+    togglePresentation(false);
+  }
+});
 for (const hud of document.querySelectorAll(".floating-hud")) {
   const toggleBtn = hud.querySelector(".hud-toggle-btn");
   toggleBtn?.addEventListener("click", () => {
