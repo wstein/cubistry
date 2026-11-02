@@ -87,6 +87,9 @@ export class ClockStage {
     this.cubes.push(cube);
     return cube;
   }
+  get appearancePanel(): HTMLElement {
+    return this.appearanceControls.panel;
+  }
   resetCamera(): void {
     this.rotation?.reset();
   }

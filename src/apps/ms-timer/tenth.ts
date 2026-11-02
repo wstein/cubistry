@@ -92,7 +92,7 @@ export const AMBIGUOUS_TENTH_DIGITS = Object.freeze(new Set([0, 2, 5, 6, 8, 9]))
 
 export function tenthAssetImages(
   display: TenthDisplayVariant = "dseg7",
-  marker: TenthMarkerMode = "auto",
+  marker: TenthMarkerMode = "off",
   fallbackImages: readonly ImageAsset[] = [],
 ): ImageAsset[] {
   if (display === "classic") {

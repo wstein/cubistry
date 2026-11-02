@@ -601,7 +601,7 @@ $("tenth-direction").addEventListener("change", () => {
 let pendingTenthManifest = null;
 function tenthManifest(
   display = $("tenth-display")?.value || "dseg7",
-  marker = $("tenth-marker")?.value || "auto",
+  marker = $("tenth-marker")?.value || "off",
 ) {
   return {
     ...proof.assets,

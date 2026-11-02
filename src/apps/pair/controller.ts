@@ -18,6 +18,13 @@ export interface PairUnit {
   configure(value: number): Promise<void>;
   /** Walk to `value`; a newer request replaces the pending one. */
   request(value: number): void;
+  /**
+   * Optional: jump directly to `value` (for Set, Reset or arbitrary repositioning).
+   * Units providing dual-routing (e.g. `MsTimerCube`) use an optimal solver jump for
+   * `set` and reserve single-edge period words for step-by-step counting.
+   * If omitted, falls back to `request(value)`.
+   */
+  set?(value: number): void;
   /** Release the display; only valid once the unit has settled. */
   dispose(): void;
   /**
@@ -252,7 +259,7 @@ export class PairController<
     const s = carryStep(this, this.pending, direction);
     if (!timing) {
       this.direct(direction);
-      return this.go(s.to);
+      return this.go(s.to, false);
     }
     const from = this.pending,
       moving = this.busy;
@@ -280,14 +287,14 @@ export class PairController<
     if (budget && !budget.feasible) this.report({ kind: "budget-infeasible", step });
     // A rolled-back step has no deadline left to miss: `release` reports late
     // only while the target is still this step's.
-    return this.go(s.to);
+    return this.go(s.to, false);
   }
 
   /** Walk both cubes to `value`; the same settle and retarget rules as `step`. */
   set(value: number): Promise<void> {
     this.check(value);
     this.ready();
-    return this.go(value);
+    return this.go(value, true);
   }
 
   /**
@@ -331,7 +338,7 @@ export class PairController<
     this.major.setDirection?.(direction);
   }
 
-  private go(value: number): Promise<void> {
+  private go(value: number, isSet = false): Promise<void> {
     this.ready();
     const previous = this.pending;
     this.pending = value;
@@ -339,8 +346,8 @@ export class PairController<
     // Both requests go out before anything can count as settled.
     this.issuing = true;
     try {
-      this.ask(this.minor, value % this.minorModulus);
-      this.ask(this.major, Math.floor(value / this.minorModulus));
+      this.ask(this.minor, value % this.minorModulus, isSet);
+      this.ask(this.major, Math.floor(value / this.minorModulus), isSet);
     } catch (e) {
       // A unit refused its request: record it, undo the half-issued carry.
       this.failure ??= e instanceof Error ? e : Error(String(e));
@@ -350,7 +357,7 @@ export class PairController<
         [this.major, Math.floor(previous / this.minorModulus)],
       ] as const)
         try {
-          this.ask(unit, v);
+          this.ask(unit, v, isSet);
         } catch {
           // The unit is already failed; the error above is the report.
         }
@@ -363,9 +370,13 @@ export class PairController<
   }
 
   /** Request `value` unless the unit already rests on it (a cube that does not carry stays still). */
-  private ask(unit: PairUnit, value: number): void {
+  private ask(unit: PairUnit, value: number, isSet = false): void {
     if (!unit.busy && unit.currentValue === value) return;
-    unit.request(value);
+    if (isSet && typeof unit.set === "function") {
+      unit.set(value);
+    } else {
+      unit.request(value);
+    }
   }
 
   private readonly handler: UnitStateHandler = (_value, _busy, error) => {

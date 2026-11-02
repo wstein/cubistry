@@ -302,9 +302,9 @@ test("tenth-speed options and hardwired turn speeds match specification", async 
   assert(html.includes('<option value="classic">Classic (Geometric)</option>'));
 
   assert(html.includes('<select id="tenth-marker">'));
-  assert(html.includes('<option value="auto" selected>Auto (0, 2, 5, 6, 8, 9)</option>'));
+  assert(html.includes('<option value="auto">Auto (0, 2, 5, 6, 8, 9)</option>'));
   assert(html.includes('<option value="all">All digits (0–9)</option>'));
-  assert(html.includes('<option value="off">Off</option>'));
+  assert(html.includes('<option value="off" selected>Off</option>'));
 });
 
 test("DSEG7 and DSEG14 vector assets and orientation dot modes (0, 2, 5, 6, 8, 9) verify cleanly", async () => {
