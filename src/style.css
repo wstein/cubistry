@@ -5,6 +5,8 @@
   --color-sticker-bg: #fffdf6;
   --color-ink-navy: #153b61;
   --color-canvas-bg: #f5f3eb;
+  --studio-bg: radial-gradient(ellipse at 48% 28%, #fffdf7 0%, transparent 65%),
+    linear-gradient(180deg, #e9e0d2 0%, #f6f0e5 48%, #d8cabb 100%);
   --color-focus: #c8257e;
 }
 @font-face {
@@ -20,9 +22,12 @@
 [hidden] {
   display: none !important;
 }
+html,
 body {
   margin: 0;
-  background: var(--color-canvas-bg);
+  padding: 0;
+  background: var(--studio-bg);
+  background-attachment: fixed;
   color: #202c36;
   font:
     14px "Counter Sans",
@@ -340,9 +345,6 @@ h1 {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  #cube {
-    height: clamp(300px, 90vw, 500px);
-  }
   .options {
     gap: 8px;
   }
@@ -626,32 +628,38 @@ main {
   max-width: none;
 }
 
-/* Enable scrolling on multi-element pages like clock, timer, calendar, studio */
-html:has(.live-clock-page, .calendar-page, .chronocube-page, .ms-timer-page),
-body:has(.live-clock-page, .calendar-page, .chronocube-page, .ms-timer-page),
+/* Full-viewport canvas page containers across all RC endpoints */
+html:has(.live-clock-page, .calendar-page, .chronocube-page, .ms-timer-page, #cube, #calendar-viewer, .clock-viewer, #status-viewer),
+body:has(.live-clock-page, .calendar-page, .chronocube-page, .ms-timer-page, #cube, #calendar-viewer, .clock-viewer, #status-viewer),
 body.live-clock-page,
 body.calendar-page,
 body.chronocube-page,
 body.ms-timer-page {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  height: auto !important;
-  min-height: 100vh;
+  overflow: hidden !important;
+  height: 100vh !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--studio-bg) !important;
+  background-attachment: fixed !important;
 }
 
 main.live-clock-page,
 main.calendar-page,
 main.ms-timer-page,
-.chronocube-page main {
-  width: 100%;
-  max-width: 1440px;
-  height: auto !important;
-  min-height: 100vh;
-  margin: 0 auto;
-  padding: 80px 24px 48px;
-  overflow-y: visible !important;
-  overflow-x: hidden !important;
-  box-sizing: border-box;
+.chronocube-page main,
+body:has(#cube) main,
+body:has(#calendar-viewer) main,
+body:has(.clock-viewer) main,
+body:has(#status-viewer) main {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
 }
 
 .workspace {
@@ -1305,19 +1313,23 @@ aside.clock-control.is-minimized .hud-header {
    Presentation Mode: 100% full screen w/o controls
    ========================================================================== */
 
-body.presentation-mode {
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  background: var(--color-canvas-bg, #f5f3eb);
+body.presentation-mode,
+body[data-presentation="true"] {
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: var(--studio-bg) !important;
+  background-attachment: fixed !important;
 }
 
 body.presentation-mode header,
 body.presentation-mode .floating-island,
-body.presentation-mode .floating-hud,
+body.presentation-mode .floating-hud:not(.calendar-controls):not(.clock-control),
 body.presentation-mode aside.controls,
 body.presentation-mode aside.timer-controls,
-body.presentation-mode aside.clock-control,
+body.presentation-mode aside.status-controls,
 body.presentation-mode aside.cube-appearance,
 body.presentation-mode .cube-footer,
 body.presentation-mode .floating-dock,
@@ -1342,14 +1354,37 @@ body.presentation-mode .workspace,
 body.presentation-mode .cube-card,
 body.presentation-mode .viewer-stage,
 body.presentation-mode #cube,
-body.presentation-mode .clock-viewer {
+body.presentation-mode .clock-viewer,
+body.presentation-mode #calendar-viewer,
+body.presentation-mode .calendar-workspace,
+body.presentation-mode .calendar-stage,
+body.presentation-mode .clock-workspace,
+body.presentation-mode .clock-stage,
+body.presentation-mode #studio-scene,
+body.presentation-mode #status-viewer,
+body.presentation-mode .status-workspace,
+body.presentation-mode .status-stage {
+  position: fixed !important;
+  inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
   max-height: 100vh !important;
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
+  background: transparent !important;
+}
+
+body.presentation-mode canvas,
+body[data-presentation="true"] canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
 .presentation-exit-btn {

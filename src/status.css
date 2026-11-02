@@ -121,9 +121,6 @@ main {
   .status-workspace {
     grid-template-columns: 1fr;
   }
-  #status-viewer {
-    height: 360px;
-  }
 }
 .status-values dd {
   font-size: 1rem;
