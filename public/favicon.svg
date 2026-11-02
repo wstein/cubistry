@@ -1,1 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" rx="3" fill="#254f43"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 2x2 cube body (four rounded cubies in berry/magenta plastic) -->
+  <g fill="#9e0b5c" stroke="#7a0645" stroke-width="4">
+    <rect x="4" y="4" width="244" height="244" rx="36" />
+    <rect x="264" y="4" width="244" height="244" rx="36" />
+    <rect x="4" y="264" width="244" height="244" rx="36" />
+    <rect x="264" y="264" width="244" height="244" rx="36" />
+  </g>
+  <!-- Subtle plastic rim highlight -->
+  <g fill="none" stroke="#c8257e" stroke-width="4" opacity="0.65">
+    <rect x="8" y="8" width="236" height="236" rx="32" />
+    <rect x="268" y="8" width="236" height="236" rx="32" />
+    <rect x="8" y="268" width="236" height="236" rx="32" />
+    <rect x="268" y="268" width="236" height="236" rx="32" />
+  </g>
+  <!-- Four warm-ivory sticker faces -->
+  <g fill="#fffdf6">
+    <rect x="24" y="24" width="204" height="204" rx="22" />
+    <rect x="284" y="24" width="204" height="204" rx="22" />
+    <rect x="24" y="284" width="204" height="204" rx="22" />
+    <rect x="284" y="284" width="204" height="204" rx="22" />
+  </g>
+  <!-- Top-right (r1c2): bold M -->
+  <path
+    d="M328 188V66L386 138L444 66V188"
+    fill="none"
+    stroke="#153b61"
+    stroke-width="24"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- Bottom-left (r2c1): bold 7-segment 4 -->
+  <g fill="#153b61">
+    <!-- upper-left vertical -->
+    <path d="M68 320V384L92 372V334Z" />
+    <!-- upper-right vertical -->
+    <path d="M184 320V384L160 372V334Z" />
+    <!-- middle horizontal -->
+    <path d="M76 386H176L164 408H88Z" />
+    <!-- lower-right vertical -->
+    <path d="M184 400V466L160 450V412Z" />
+  </g>
+  <!-- Bottom-right (r2c2): bold 7-segment 2 -->
+  <g fill="#153b61">
+    <!-- top horizontal -->
+    <path d="M332 314H440L424 336H348Z" />
+    <!-- upper-right vertical -->
+    <path d="M446 322V382L422 372V338Z" />
+    <!-- middle horizontal -->
+    <path d="M336 380H436L424 402H348Z" />
+    <!-- lower-left vertical -->
+    <path d="M326 396V458L350 444V410Z" />
+    <!-- bottom horizontal -->
+    <path d="M332 466H440L424 444H348Z" />
+  </g>
+</svg>
