@@ -141,6 +141,8 @@ export function buildManifest(display, marker, letterFont, lettering = "words-pa
     letterFont,
     lettering,
     proofData?.assets?.images ?? [],
+    proofData?.assets?.fonts ?? [],
+    proofData?.assets?.documents ?? [],
   );
 }
 
@@ -209,15 +211,24 @@ function setupAppearancePanel(container, onUpdate) {
   fieldset.append(displayLabel, letterLabel, markerLabel);
   panel.append(fieldset);
 
+  let updating = false;
   const handleChange = async () => {
-    currentDisplay = displaySelect.value;
-    currentLetterFont = letterSelect.value;
-    currentMarker = markerSelect.value;
-    localStorage.setItem("cubistry_digit_font", currentDisplay);
-    localStorage.setItem("cubistry_letter_font", currentLetterFont);
-    localStorage.setItem("cubistry_marker_mode", currentMarker);
-    const nextManifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, currentLettering);
-    await onUpdate(nextManifest);
+    if (updating) return;
+    updating = true;
+    try {
+      currentDisplay = displaySelect.value;
+      currentLetterFont = letterSelect.value;
+      currentMarker = markerSelect.value;
+      localStorage.setItem("cubistry_digit_font", currentDisplay);
+      localStorage.setItem("cubistry_letter_font", currentLetterFont);
+      localStorage.setItem("cubistry_marker_mode", currentMarker);
+      const nextManifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, currentLettering);
+      await onUpdate(nextManifest);
+    } catch (e) {
+      console.warn("Appearance update queued or deferred:", e);
+    } finally {
+      updating = false;
+    }
   };
 
   displaySelect.addEventListener("change", handleChange);

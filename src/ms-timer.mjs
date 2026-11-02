@@ -304,16 +304,25 @@ async function initialize() {
 
       appearancePanel.append(displayLabel, letterLabel, markerLabel);
 
+      let updating = false;
       const onAppearanceChange = async () => {
-        currentDisplay = displaySelect.value;
-        currentMarker = markerSelect.value;
-        currentLetterFont = letterSelect.value;
-        const nextManifest = createTimerManifest(currentDisplay, currentMarker, currentLetterFont);
-        await Promise.all([
-          majorUnit?.updateManifest(nextManifest),
-          minorUnit?.updateManifest(nextManifest),
-          tenth?.updateManifest(nextManifest),
-        ]);
+        if (updating) return;
+        updating = true;
+        try {
+          currentDisplay = displaySelect.value;
+          currentMarker = markerSelect.value;
+          currentLetterFont = letterSelect.value;
+          const nextManifest = createTimerManifest(currentDisplay, currentMarker, currentLetterFont);
+          await Promise.all([
+            majorUnit?.updateManifest(nextManifest),
+            minorUnit?.updateManifest(nextManifest),
+            tenth?.updateManifest(nextManifest),
+          ]);
+        } catch (e) {
+          console.warn("Appearance update queued or deferred:", e);
+        } finally {
+          updating = false;
+        }
       };
 
       displaySelect.addEventListener("change", onAppearanceChange);

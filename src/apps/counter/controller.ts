@@ -289,6 +289,13 @@ export class CounterController extends PhysicalPlayback {
   async updateManifest(manifest: AssetManifest): Promise<void> {
     if (!this.authoritative || !this.print) return;
     const assets = await this.resolveAssets(manifest, [this.print]);
+    while (this.busy || this.view.animating) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    if (!this.authoritative || !this.print) {
+      assets.dispose();
+      return;
+    }
     this.install(this.print, this.authoritative, assets, this.current);
   }
 }

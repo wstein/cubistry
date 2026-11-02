@@ -75,6 +75,13 @@ export class MsTimerCube extends MsController {
   async updateManifest(manifest: AssetManifest): Promise<void> {
     if (!this.state) return;
     const assets = await this.resolveAssets(manifest, [this.msPrint.print]);
+    while (this.busy || this.view.animating) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    if (!this.state) {
+      assets.dispose();
+      return;
+    }
     this.install(this.msPrint.print, this.state, assets, this.currentValue);
   }
 

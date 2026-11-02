@@ -614,7 +614,9 @@ export class MsTimerTenthCube extends PhysicalPlayback implements TimerCube {
 
   /** Update the active asset manifest and reconfigure cube textures in-place. */
   async updateManifest(manifest: AssetManifest): Promise<void> {
-    demand(!this.busy && !this.configuring, "Wait for tenth-second motion");
+    while (this.busy || this.configuring || this.view.animating) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
     this.configuring = true;
     let assets;
     try {

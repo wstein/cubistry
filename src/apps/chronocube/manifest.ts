@@ -17,6 +17,8 @@ export function buildStudioManifest(
   letterFont: LetterFont = "same",
   lettering: Lettering = "words-pascal",
   baseImages: readonly ImageAsset[] = [],
+  fonts: readonly any[] = [],
+  documents: readonly any[] = [],
 ): AssetManifest {
   const family = resolveLetterFamily(letterFont, display);
   const letterImages = hsmImagesForFamily(lettering, family) as readonly ImageAsset[];
@@ -25,14 +27,18 @@ export function buildStudioManifest(
   const images = fontTenthWord
     ? digitImages.map((img) => (img.id === "T" ? fontTenthWord : img))
     : digitImages;
+  const nonDigitImages = baseImages.filter(
+    (img) => !/^[0-9]$/.test(img.id) && img.id !== "blank" && img.id !== "T",
+  );
   return {
     schema: "cubistry.assets",
     version: 1,
-    fonts: [],
+    fonts: fonts as any,
     materials: [],
-    documents: [],
+    documents: documents as any,
     images: [
       ...images,
+      ...nonDigitImages,
       ...letterImages.filter((i) => ["H", "M", "S", "T"].includes(i.id)),
     ],
   };

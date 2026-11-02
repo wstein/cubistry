@@ -16,6 +16,7 @@ export interface PhysicalView {
   ): void;
   animate(presentation: MovePresentation, timing?: MotionTimingSource): Promise<void>;
   resetCamera(): void;
+  readonly animating?: boolean;
 }
 /** HTM counts each already-validated outer-face token once, including half turns. */
 export const countHtmMoves = (moves: readonly LegalMove[]): number =>
@@ -139,7 +140,9 @@ export abstract class PhysicalPlayback {
     this.view.configure(print, state, assets);
     const previous = this.assets;
     this.assets = assets;
-    previous?.dispose();
+    if (previous && previous !== assets) {
+      previous.dispose();
+    }
     this.print = print;
     this.authoritative = state;
     this.current = this.desired = value;
