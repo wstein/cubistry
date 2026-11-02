@@ -1505,3 +1505,203 @@ body.presentation-mode .presentation-exit-btn:hover {
   }
 }
 
+/* ==========================================================================
+   Licenses & Open Source Compliance Document Page
+   ========================================================================== */
+
+body.licenses-page {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100vh;
+  background: var(--studio-bg);
+  background-attachment: fixed;
+  color: var(--color-ink-navy, #153b61);
+  padding-bottom: 90px;
+}
+
+body.licenses-page main.licenses-container {
+  width: 100%;
+  max-width: 980px;
+  margin: 84px auto 0;
+  padding: 24px 20px;
+  box-sizing: border-box;
+}
+
+.licenses-header {
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+.licenses-header h1 {
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+  font-weight: 800;
+  color: var(--color-ink-navy, #153b61);
+  margin: 0 0 8px;
+}
+
+.licenses-header p {
+  font-size: 1.05rem;
+  color: rgba(21, 59, 97, 0.78);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.compliance-notice-card {
+  background: rgba(255, 253, 246, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(158, 11, 92, 0.25);
+  border-left: 5px solid var(--color-plastic-berry, #9e0b5c);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 30px rgba(21, 59, 97, 0.08);
+}
+
+.compliance-notice-card h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-plastic-berry, #9e0b5c);
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.compliance-notice-card p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-ink-navy, #153b61);
+  margin: 0 0 12px;
+}
+
+.compliance-notice-card p:last-child {
+  margin-bottom: 0;
+}
+
+.licenses-section {
+  margin-bottom: 36px;
+}
+
+.licenses-section h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-ink-navy, #153b61);
+  margin: 0 0 16px;
+  border-bottom: 1px solid rgba(21, 59, 97, 0.12);
+  padding-bottom: 8px;
+}
+
+.license-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+}
+
+.license-card {
+  background: rgba(255, 253, 246, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(21, 59, 97, 0.14);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 18px rgba(21, 59, 97, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.license-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(21, 59, 97, 0.1);
+}
+
+.license-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.license-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-ink-navy, #153b61);
+  margin: 0;
+}
+
+.license-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.license-badge.agpl {
+  background: #fdf0f5;
+  color: var(--color-plastic-berry, #9e0b5c);
+  border: 1px solid rgba(158, 11, 92, 0.3);
+}
+
+.license-badge.mit {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid rgba(30, 64, 175, 0.25);
+}
+
+.license-badge.mpl {
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid rgba(154, 52, 18, 0.25);
+}
+
+.license-badge.ofl {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid rgba(22, 101, 52, 0.25);
+}
+
+.license-card-desc {
+  font-size: 0.88rem;
+  color: rgba(21, 59, 97, 0.75);
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+.license-card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-top: 1px solid rgba(21, 59, 97, 0.08);
+  padding-top: 10px;
+}
+
+.license-card-links a {
+  color: var(--color-plastic-berry, #9e0b5c);
+  text-decoration: none;
+}
+
+.license-card-links a:hover {
+  text-decoration: underline;
+}
+
+.license-source-box {
+  background: rgba(21, 59, 97, 0.04);
+  border: 1px solid rgba(21, 59, 97, 0.12);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: monospace;
+  font-size: 0.88rem;
+  color: var(--color-ink-navy, #153b61);
+  overflow-x: auto;
+}
+
