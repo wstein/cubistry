@@ -814,7 +814,7 @@ header.floating-island a.github-link:hover,
   color: var(--color-plastic-berry, #9e0b5c);
 }
 
-/* Minimal Bottom-Center Glass Micro-Pill */
+/* Minimal Bottom-Center Glass Micro-Pill (Always visible, presentation watermark) */
 footer.floating-glass-pill,
 .floating-glass-pill {
   position: fixed;
@@ -836,7 +836,7 @@ footer.floating-glass-pill,
   font-size: 0.76rem;
   font-weight: 500;
   color: var(--color-ink-navy, #153b61);
-  opacity: 0.45;
+  opacity: 0.55;
   transition: opacity 0.35s ease, transform 0.35s ease, background 0.25s ease;
   white-space: nowrap;
   pointer-events: auto;
@@ -864,17 +864,57 @@ footer.floating-glass-pill a:hover,
   color: var(--color-plastic-berry, #9e0b5c);
 }
 
-/* Three-tier idle state integration for bottom glass micro-pill */
-body[data-hud-state="idle"] footer.floating-glass-pill:not(:hover):not(:focus-within),
-body[data-hud-state="idle"] .floating-glass-pill:not(:hover):not(:focus-within) {
-  opacity: 0;
-  pointer-events: none;
+/* Micro-Badge Brand Anchor (Adaptive Presentation Watermark) */
+footer.floating-glass-pill .pill-brand,
+.floating-glass-pill .pill-brand {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-size: 0.72rem;
+  color: var(--color-ink-navy, #153b61);
 }
 
-/* Presentation mode hides the footer */
+footer.floating-glass-pill .pill-brand .brand-mark,
+.floating-glass-pill .pill-brand .brand-mark {
+  background: var(--color-plastic-berry, #9e0b5c);
+  border-radius: 4px;
+  color: white;
+  font-size: 10px;
+  line-height: 16px;
+  width: 16px;
+  height: 16px;
+  text-align: center;
+  letter-spacing: 0;
+  box-shadow: 0 1px 2px rgba(122, 6, 69, 0.3);
+}
+
+footer.floating-glass-pill .pill-brand-sep,
+.floating-glass-pill .pill-brand-sep {
+  display: none;
+}
+
+/* In presentation mode: top bar hides, bottom bar reveals Micro-Badge Brand Anchor watermark */
 body.presentation-mode footer.floating-glass-pill,
 body.presentation-mode .floating-glass-pill {
-  display: none !important;
+  opacity: 0.65;
+  z-index: 50;
+}
+
+body.presentation-mode footer.floating-glass-pill:hover,
+body.presentation-mode .floating-glass-pill:hover {
+  opacity: 0.95;
+}
+
+body.presentation-mode footer.floating-glass-pill .pill-brand,
+body.presentation-mode .floating-glass-pill .pill-brand {
+  display: inline-flex;
+}
+
+body.presentation-mode footer.floating-glass-pill .pill-brand-sep,
+body.presentation-mode .floating-glass-pill .pill-brand-sep {
+  display: inline;
 }
 
 /* Floating Glass Appearance Card (Top-Left) */
@@ -989,7 +1029,7 @@ aside.status-controls {
 }
 
 header.floating-island {
-  opacity: 0.7;
+  opacity: 0.85;
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
@@ -1035,11 +1075,6 @@ body[data-hud-state="idle"] aside.status-controls:not(:hover):not(:focus-within)
   transform: translateY(4px);
 }
 
-body[data-hud-state="idle"] header.floating-island:not(:hover):not(:focus-within) {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(-50%) translateY(-4px);
-}
 
 .hud-header {
   display: flex;
