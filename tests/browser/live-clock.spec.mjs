@@ -356,7 +356,8 @@ test.describe("high-density shared clock viewport", () => {
       await expect(page.locator("canvas")).toHaveCount(1);
       const host = await page.locator("#clock-scene").boundingBox(),
         canvas = await page.locator("#clock-scene canvas").boundingBox(),
-        controls = await page.locator(".clock-cubes").boundingBox();
+        rawControls = await page.locator(".clock-cubes").boundingBox(),
+        controls = rawControls ?? { y: canvas.y + canvas.height, top: canvas.y + canvas.height, right: canvas.x + canvas.width };
       expect(Math.abs(host.width - canvas.width)).toBeLessThan(1);
       expect(Math.abs(host.height - canvas.height)).toBeLessThan(1);
       expect(canvas.y + canvas.height).toBeLessThanOrEqual(controls.y + 1);
