@@ -10,7 +10,40 @@
   </head>
   <body>
     <main>
-      <header><a class="brand" href="./">CUBISTRY <span>/ SUPER PICTURE</span></a><a href="./playground.html">2×2 Playground ↗</a></header>
+      <header class="floating-island">
+        <a class="brand" href="./" aria-label="Cubistry home"
+          ><span class="brand-mark">▦</span> CUBISTRY</a
+        >
+        <div class="application-choice">
+          <label for="picture3-application">Cube / application</label>
+          <select id="picture3-application" onchange="if(this.value) location.href=this.value">
+            <optgroup label="Integrated Studio (2×2)">
+              <option value="chronocube.html">Chronocube Studio (Integrated 2×2)</option>
+            </optgroup>
+            <optgroup label="Multi-Cube Clocks & Timers (2×2)">
+              <option value="clock.html">Live H–M–S Clock</option>
+              <option value="ms-timer.html">M/S Timer</option>
+            </optgroup>
+            <optgroup label="Single-Cube Applications (2×2)">
+              <option value="index.html">Counter 0–99</option>
+              <option value="index.html?application=timer">60-Minute Timer</option>
+              <option value="index.html?application=five-second-timer">5-Second Timer</option>
+              <option value="index.html?application=tenth-counter">1/10-Second Counter 0–9</option>
+              <option value="index.html?application=hsm-counter">H/M/S Counter 00–59</option>
+              <option value="index.html?application=ms-counter">M/S Counter 00–59</option>
+              <option value="index.html?application=hm-one-cube">H/M One-Cube Counter</option>
+            </optgroup>
+            <optgroup label="Calendar & Puzzles (3×3)">
+              <option value="calendar.html">Calendar · Deutsch / English</option>
+              <option value="playground.html">Picture Puzzle Playground</option>
+              <option value="picture3.html" selected>3×3 Super Picture Cube</option>
+              <option value="status.html">CI Quality Cube · Workflow monitor</option>
+            </optgroup>
+          </select>
+        </div>
+        <a class="print-stickers-link" href="./playground.html">2×2 Playground ↗</a>
+        <a class="github-link" href="https://github.com/wstein/puzlwerk" target="_blank" rel="noopener">GitHub ↗</a>
+      </header>
       <div class="intro"><p class="eyebrow">SIX PICTURES. EVERY TILE IN ITS PLACE.</p><h1>3×3 Super Picture Cube</h1><p>Your pictures stay on this device. Turn, scramble, and restore every tile — including the centers.</p></div>
       <div class="layout">
         <section class="stage" aria-label="3 by 3 puzzle">
@@ -44,6 +77,13 @@
         <div class="button-row"><label for="saved-sets">Local sets <select id="saved-sets"><option value="">Choose a saved set</option></select></label><button id="load-set" type="button">Load</button><button id="delete-set" type="button">Delete saved set</button><button id="retry-storage" type="button">Retry local storage</button></div>
         <p id="storage-status" role="status" aria-live="polite">Opening local storage…</p><p class="hint">Up to 10 sets / 64 MiB. Save with an existing name replaces that saved set. A failed save leaves your current pictures and previously saved data intact.</p>
       </section>
+      <footer class="floating-glass-pill" role="contentinfo">
+        <span>&copy; 2026 Werner Stein</span>
+        <span>&middot;</span>
+        <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL-3.0</a>
+        <span>&middot;</span>
+        <a href="https://github.com/wstein/puzlwerk" target="_blank" rel="noopener">GitHub ↗</a>
+      </footer>
     </main>
     <script type="module" src="/src/apps/picture3/page.ts"></script>
   </body>

@@ -793,6 +793,90 @@ header.floating-island #print-stickers,
   white-space: nowrap;
 }
 
+header.floating-island a.print-stickers-link:hover,
+header.floating-island #print-stickers:hover,
+.floating-island a.print-stickers-link:hover,
+.floating-island #print-stickers:hover {
+  color: var(--color-plastic-berry, #9e0b5c);
+}
+
+header.floating-island a.github-link,
+.floating-island a.github-link {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-ink-navy, #153b61);
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+header.floating-island a.github-link:hover,
+.floating-island a.github-link:hover {
+  color: var(--color-plastic-berry, #9e0b5c);
+}
+
+/* Minimal Bottom-Center Glass Micro-Pill */
+footer.floating-glass-pill,
+.floating-glass-pill {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 5px 16px;
+  background: rgba(255, 253, 246, 0.78);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(21, 59, 97, 0.14);
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px rgba(21, 59, 97, 0.08), 0 2px 6px rgba(21, 59, 97, 0.04);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--color-ink-navy, #153b61);
+  opacity: 0.45;
+  transition: opacity 0.35s ease, transform 0.35s ease, background 0.25s ease;
+  white-space: nowrap;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+footer.floating-glass-pill:hover,
+footer.floating-glass-pill:focus-within,
+.floating-glass-pill:hover,
+.floating-glass-pill:focus-within {
+  opacity: 0.9;
+  background: rgba(255, 253, 246, 0.92);
+  box-shadow: 0 12px 32px rgba(21, 59, 97, 0.14), 0 2px 8px rgba(21, 59, 97, 0.06);
+}
+
+footer.floating-glass-pill a,
+.floating-glass-pill a {
+  color: var(--color-ink-navy, #153b61);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+footer.floating-glass-pill a:hover,
+.floating-glass-pill a:hover {
+  color: var(--color-plastic-berry, #9e0b5c);
+}
+
+/* Three-tier idle state integration for bottom glass micro-pill */
+body[data-hud-state="idle"] footer.floating-glass-pill:not(:hover):not(:focus-within),
+body[data-hud-state="idle"] .floating-glass-pill:not(:hover):not(:focus-within) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Presentation mode hides the footer */
+body.presentation-mode footer.floating-glass-pill,
+body.presentation-mode .floating-glass-pill {
+  display: none !important;
+}
+
 /* Floating Glass Appearance Card (Top-Left) */
 .floating-hud-appearance,
 aside.cube-appearance.floating-hud {
