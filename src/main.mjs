@@ -862,21 +862,23 @@ $("application").addEventListener("change", async () => {
     return;
   }
   if (
-    ["live-clock", "calendar", "status-cube", "playground", "ms-timer"].includes(
+    ["live-clock", "calendar", "status-cube", "playground", "ms-timer", "chronocube"].includes(
       $("application").value,
     )
   ) {
     location.assign(
       new URL(
-        $("application").value === "playground"
-          ? "playground.html"
-          : $("application").value === "calendar"
-            ? "calendar.html"
-            : $("application").value === "status-cube"
-              ? "status.html"
-              : $("application").value === "ms-timer"
-                ? "ms-timer.html"
-                : "clock.html",
+        $("application").value === "chronocube"
+          ? "chronocube.html"
+          : $("application").value === "playground"
+            ? "playground.html"
+            : $("application").value === "calendar"
+              ? "calendar.html"
+              : $("application").value === "status-cube"
+                ? "status.html"
+                : $("application").value === "ms-timer"
+                  ? "ms-timer.html"
+                  : "clock.html",
         location.href,
       ),
     );
@@ -968,6 +970,13 @@ $("application").addEventListener("change", async () => {
     previous.dispose();
     view = candidate;
     application = requested;
+    try {
+      const nextUrl = new URL(location.href);
+      if (requested === "certified") nextUrl.searchParams.delete("application");
+      else nextUrl.searchParams.set("application", requested);
+      history.replaceState(null, "", nextUrl);
+      localStorage.setItem("cubistry_app", requested);
+    } catch {}
     if (!isTimer()) value = view.currentValue;
     const timerName =
       requested === "five-second-timer" ? "5-Second Timer" : "60-Minute Timer";
