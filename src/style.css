@@ -956,10 +956,6 @@ body[data-hud-state="idle"] header.floating-island:not(:hover):not(:focus-within
   pointer-events: none;
   transform: translateX(-50%) translateY(-4px);
 }
-              opacity 0.25s ease,
-              width 0.25s ease,
-              padding 0.25s ease;
-}
 
 .hud-header {
   display: flex;
