@@ -1,0 +1,34 @@
+{
+  "schema": "cubistry.hsm-unit-lettering",
+  "version": 1,
+  "variant": "tenth",
+  "description": "Small 1/10 unit mark at bottom; digits are original geometric artwork.",
+  "canvas": [
+    256,
+    256
+  ],
+  "fontSize": 80.64,
+  "baseline": 232,
+  "font": {
+    "family": "Noto Sans",
+    "weight": 600,
+    "package": "@fontsource/noto-sans@5.2.10",
+    "path": "public/fonts/noto-sans-latin-600.woff2",
+    "sha256": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed",
+    "license": "SIL-OFL-1.1",
+    "licensePath": "public/fonts/OFL.txt"
+  },
+  "generator": "scripts/export-hsm-word-art.py",
+  "fontToolsVersion": "4.61.1",
+  "stickers": {
+    "T": {
+      "text": "1/10",
+      "inkBounds": [
+        49.69876,
+        173.536,
+        208.55916,
+        232.8064
+      ]
+    }
+  }
+}

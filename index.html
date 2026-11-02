@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Counter</title>
-    <script type="module" crossorigin src="/cubistry/assets/counter-DGwVstdZ.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/counter-BrjdQ7sK.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/link-DR-RiidG.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/three-BW9MzyAf.js">
@@ -16,7 +16,7 @@
     <link rel="modulepreload" crossorigin href="/cubistry/assets/index-Il41stwk.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/images-words-pascal-CXentWEj.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/lettering-BeJq2IZS.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/status-Dn6DwBi1.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/tenth-B08mssk6.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/puzlwerk-2x2-DWOC6B8p.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/design-DHA_FxE4.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/index-PiRgrWxW.js">
@@ -42,6 +42,7 @@
             <option value="timer">60-Minute Timer</option>
             <option value="five-second-timer">5-Second Timer</option>
             <option value="ms-timer">M/S Timer</option>
+            <option value="tenth-counter">1/10-Second Counter 0–9</option>
           </select>
         </div>
       </header>
@@ -302,6 +303,51 @@
             within three moves; a print with both units within three is
             unknown. Set and Reset walk the saved steps the shorter way round.
             Changing the unit sets up a fresh 00 display.
+          </p>
+        </aside>
+        <aside
+          id="tenth-controls"
+          class="controls"
+          aria-label="1/10-second counter controls"
+          hidden
+        >
+          <h1>1/10-Second Counter</h1>
+          <label for="tenth-direction">Direction</label>
+          <select id="tenth-direction">
+            <option value="1">Up</option>
+            <option value="-1">Down</option>
+          </select>
+          <label for="tenth-speed">Speed</label>
+          <select id="tenth-speed">
+            <option value="500">500 ms (visual demo)</option>
+            <option value="250">250 ms</option>
+            <option value="100">100 ms (real-time 1/10 s)</option>
+          </select>
+          <form id="tenth-set-form">
+            <label for="tenth-value">Set value (0–9)</label>
+            <input id="tenth-value" type="text" inputmode="numeric" value="0" />
+            <button type="submit">Set</button>
+          </form>
+          <div class="target-actions">
+            <button
+              id="tenth-run"
+              type="button"
+              class="primary"
+              aria-pressed="false"
+            >
+              Run</button
+            ><button id="tenth-reset" type="button">Reset</button>
+          </div>
+          <div class="increments">
+            <button data-tenth-delta="-1">−1</button
+            ><button data-tenth-delta="1">+1</button>
+          </div>
+          <p id="tenth-period" class="small" aria-live="polite"></p>
+          <p class="small">
+            Counts one tenth of a second per step, wrapping through 0..9.
+            The 1/10 unit sticker at upper-right stays stationary while the
+            single Period-1 closed sequence plays on the lower-left digit at
+            50 ms per QTM. Set and Reset walk the saved period edges turn by turn.
           </p>
         </aside>
         <aside
