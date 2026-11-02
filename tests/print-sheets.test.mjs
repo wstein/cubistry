@@ -30,7 +30,7 @@ const catalog = read(root + "catalog.json");
 
 test("committed print presets retain every physical sticker and full source-face orientation", () => {
   assert.equal(catalog.schema, "cubistry.print-catalog");
-  assert.equal(catalog.entries.length, 7);
+  assert.equal(catalog.entries.length, 8);
   for (const entry of catalog.entries) {
     const dir = root + entry.directory,
       m = read(dir + "manifest.json");
