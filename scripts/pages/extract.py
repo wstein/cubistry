@@ -83,6 +83,7 @@ def extract(archive,destination,number=0,sha='',title=''):
                 stat.S_ISLNK(mode) or (stat.S_IFMT(mode) not in (0,stat.S_IFREG,stat.S_IFDIR))):raise ValueError('Unsafe artifact path or mode')
             if str(PurePosixPath(name))!=name or name in seen:raise ValueError('Ambiguous artifact path')
             if parts[0]=='pr-preview':raise ValueError('Reserved preview namespace')
+            if number and parts[-1]=='CNAME':raise ValueError('Preview artifacts must not carry a CNAME')
             seen.add(name);total+=info.file_size
             if total>MAX_TOTAL or info.file_size>16*1024*1024:raise ValueError('Artifact expands beyond budget')
             records.append(info)
