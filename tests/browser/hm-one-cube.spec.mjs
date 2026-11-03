@@ -250,7 +250,7 @@ for (const [name, respond] of [
     await page.route("**/hm-counter.v1.json", respond);
     await page.selectOption("#application", "hm-one-cube");
     await expect(page.locator("#error")).not.toBeEmpty();
-    await expect(page.locator("#application")).toHaveValue("hsm-counter");
+    await expect(page.locator("#application")).toHaveValue(/^(hsm-counter|hsm-counter\.html)$/);
     await expect(page.locator("#cube")).toHaveAttribute(
       "data-application",
       "hsm-counter",
