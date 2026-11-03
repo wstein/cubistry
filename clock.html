@@ -6,26 +6,26 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Live clock</title>
-    <script type="module" crossorigin src="/cubistry/assets/clock-1hnVPzW2.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/clock-BxwH0C_2.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/link-DR-RiidG.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/link-pqopq5Ic.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/hud-idle-DOw3sxRr.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-poBCzuf2.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-Bid_WFyU.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/three-BW9MzyAf.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-rotation-p-13F4z1.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-C1wZ9l11.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-me5JM1fm.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/stage-DvgqEptG.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-wNaGm7IV.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/design-Be1HVdsh.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/playback-c5TypXwO.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/tenth-BfCxUuxA.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/hsm-source-ChCaHlc1.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-rotation-Dme9kJ4p.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-D1YqWdER.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-C6YKoHNJ.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/stage-D1een_PT.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-DPIKAtMX.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/design-5LdJRQco.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/playback-B_qQRIEe.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/tenth-B7NANfyi.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/hsm-source-vDuAXjk3.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/recovery-executor-B19cojzQ.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/statistics-pIZlGFip.js">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/presentation-DNp6jLQL.css">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/style-B_F9DT4B.css">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/clock-D79AuSwn.css">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/statistics-Bliiy4SG.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/presentation-DOksXpjB.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/style-B5u_CSs6.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/clock-Db-IePmj.css">
   </head>
   <body class="live-clock-page">
     <main class="live-clock-page">
@@ -73,13 +73,24 @@
       <div class="clock-workspace">
         <section class="clock-stage" aria-label="Live hour minute second cubes">
           <div id="clock-scene" class="clock-viewer"></div>
-          <div class="clock-cubes sr-only" aria-hidden="true">
+          <div class="clock-cubes" aria-label="Individual cube controls">
             <article class="clock-card">
               <h2>Hours</h2>
               <div id="clock-hours" data-unit="H" aria-busy="true"></div>
               <p id="hours-state" class="clock-state" role="status">
                 Preparing…
               </p>
+              <label for="hours-speed">Preferred quarter-turn time</label
+              ><select id="hours-speed" disabled>
+                <option value="2000">2 s</option>
+                <option value="1000">1 s</option>
+                <option value="500" selected>500 ms</option>
+                <option value="250">250 ms</option>
+                <option value="100">100 ms</option>
+                <option value="50">50 ms</option>
+                <option value="10">10 ms</option>
+              </select>
+              <p id="hours-timing" class="small clock-timing"></p>
             </article>
             <article class="clock-card">
               <h2>Minutes</h2>
@@ -87,6 +98,17 @@
               <p id="minutes-state" class="clock-state" role="status">
                 Preparing…
               </p>
+              <label for="minutes-speed">Preferred quarter-turn time</label
+              ><select id="minutes-speed" disabled>
+                <option value="2000">2 s</option>
+                <option value="1000">1 s</option>
+                <option value="500">500 ms</option>
+                <option value="250" selected>250 ms</option>
+                <option value="100">100 ms</option>
+                <option value="50">50 ms</option>
+                <option value="10">10 ms</option>
+              </select>
+              <p id="minutes-timing" class="small clock-timing"></p>
             </article>
             <article class="clock-card">
               <h2>Seconds</h2>
@@ -94,6 +116,17 @@
               <p id="seconds-state" class="clock-state" role="status">
                 Preparing…
               </p>
+              <label for="seconds-speed">Preferred quarter-turn time</label
+              ><select id="seconds-speed" disabled>
+                <option value="2000">2 s</option>
+                <option value="1000">1 s</option>
+                <option value="500">500 ms</option>
+                <option value="250">250 ms</option>
+                <option value="100" selected>100 ms</option>
+                <option value="50">50 ms</option>
+                <option value="10">10 ms</option>
+              </select>
+              <p id="seconds-timing" class="small clock-timing"></p>
             </article>
           </div>
           <aside class="clock-control floating-hud" aria-label="Live clock control display">
