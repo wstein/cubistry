@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry · Live clock</title>
-    <script type="module" crossorigin src="/cubistry/assets/clock-BxwH0C_2.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/clock-CSr55L19.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/link-pqopq5Ic.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/hud-idle-DOw3sxRr.js">
@@ -25,7 +25,7 @@
     <link rel="modulepreload" crossorigin href="/cubistry/assets/statistics-Bliiy4SG.js">
     <link rel="stylesheet" crossorigin href="/cubistry/assets/presentation-DOksXpjB.css">
     <link rel="stylesheet" crossorigin href="/cubistry/assets/style-B5u_CSs6.css">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/clock-Db-IePmj.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/clock-BaeP_XeI.css">
   </head>
   <body class="live-clock-page">
     <main class="live-clock-page">
@@ -73,66 +73,16 @@
       <div class="clock-workspace">
         <section class="clock-stage" aria-label="Live hour minute second cubes">
           <div id="clock-scene" class="clock-viewer"></div>
-          <div class="clock-cubes" aria-label="Individual cube controls">
-            <article class="clock-card">
-              <h2>Hours</h2>
-              <div id="clock-hours" data-unit="H" aria-busy="true"></div>
-              <p id="hours-state" class="clock-state" role="status">
-                Preparing…
-              </p>
-              <label for="hours-speed">Preferred quarter-turn time</label
-              ><select id="hours-speed" disabled>
-                <option value="2000">2 s</option>
-                <option value="1000">1 s</option>
-                <option value="500" selected>500 ms</option>
-                <option value="250">250 ms</option>
-                <option value="100">100 ms</option>
-                <option value="50">50 ms</option>
-                <option value="10">10 ms</option>
-              </select>
-              <p id="hours-timing" class="small clock-timing"></p>
-            </article>
-            <article class="clock-card">
-              <h2>Minutes</h2>
-              <div id="clock-minutes" data-unit="M" aria-busy="true"></div>
-              <p id="minutes-state" class="clock-state" role="status">
-                Preparing…
-              </p>
-              <label for="minutes-speed">Preferred quarter-turn time</label
-              ><select id="minutes-speed" disabled>
-                <option value="2000">2 s</option>
-                <option value="1000">1 s</option>
-                <option value="500">500 ms</option>
-                <option value="250" selected>250 ms</option>
-                <option value="100">100 ms</option>
-                <option value="50">50 ms</option>
-                <option value="10">10 ms</option>
-              </select>
-              <p id="minutes-timing" class="small clock-timing"></p>
-            </article>
-            <article class="clock-card">
-              <h2>Seconds</h2>
-              <div id="clock-seconds" data-unit="S" aria-busy="true"></div>
-              <p id="seconds-state" class="clock-state" role="status">
-                Preparing…
-              </p>
-              <label for="seconds-speed">Preferred quarter-turn time</label
-              ><select id="seconds-speed" disabled>
-                <option value="2000">2 s</option>
-                <option value="1000">1 s</option>
-                <option value="500">500 ms</option>
-                <option value="250">250 ms</option>
-                <option value="100" selected>100 ms</option>
-                <option value="50">50 ms</option>
-                <option value="10">10 ms</option>
-              </select>
-              <p id="seconds-timing" class="small clock-timing"></p>
-            </article>
+          <div class="clock-cubes sr-only" aria-hidden="true">
+            <div id="clock-hours" data-unit="H" aria-busy="true"></div>
+            <div id="clock-minutes" data-unit="M" aria-busy="true"></div>
+            <div id="clock-seconds" data-unit="S" aria-busy="true"></div>
           </div>
           <aside class="clock-control floating-hud" aria-label="Live clock control display">
             <div class="hud-header">
               <h2 class="hud-title">Live time</h2>
               <div class="hud-actions">
+                <button type="button" id="clock-nerd-toggle-btn" class="hud-btn hud-nerd-btn" title="Toggle Nerd mode (timing & speeds)" aria-label="Toggle Nerd mode">⚡</button>
                 <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
               </div>
             </div>
@@ -221,6 +171,64 @@
               >
                 Reset session moves
               </button>
+              <details id="clock-nerd-details" class="clock-nerd-details" aria-label="Nerd timing and speed controls">
+                <summary class="clock-nerd-summary">
+                  <span>⚡ Nerd Mode · Timing & Speeds</span>
+                </summary>
+                <div class="clock-nerd-body">
+                  <div class="nerd-unit-card">
+                    <div class="nerd-unit-header">
+                      <span class="nerd-unit-title">Hours</span>
+                      <span id="hours-state" class="clock-state" role="status">Preparing…</span>
+                    </div>
+                    <label for="hours-speed">Preferred quarter-turn time</label>
+                    <select id="hours-speed" disabled>
+                      <option value="2000">2 s</option>
+                      <option value="1000">1 s</option>
+                      <option value="500" selected>500 ms</option>
+                      <option value="250">250 ms</option>
+                      <option value="100">100 ms</option>
+                      <option value="50">50 ms</option>
+                      <option value="10">10 ms</option>
+                    </select>
+                    <p id="hours-timing" class="small clock-timing"></p>
+                  </div>
+                  <div class="nerd-unit-card">
+                    <div class="nerd-unit-header">
+                      <span class="nerd-unit-title">Minutes</span>
+                      <span id="minutes-state" class="clock-state" role="status">Preparing…</span>
+                    </div>
+                    <label for="minutes-speed">Preferred quarter-turn time</label>
+                    <select id="minutes-speed" disabled>
+                      <option value="2000">2 s</option>
+                      <option value="1000">1 s</option>
+                      <option value="500">500 ms</option>
+                      <option value="250" selected>250 ms</option>
+                      <option value="100">100 ms</option>
+                      <option value="50">50 ms</option>
+                      <option value="10">10 ms</option>
+                    </select>
+                    <p id="minutes-timing" class="small clock-timing"></p>
+                  </div>
+                  <div class="nerd-unit-card">
+                    <div class="nerd-unit-header">
+                      <span class="nerd-unit-title">Seconds</span>
+                      <span id="seconds-state" class="clock-state" role="status">Preparing…</span>
+                    </div>
+                    <label for="seconds-speed">Preferred quarter-turn time</label>
+                    <select id="seconds-speed" disabled>
+                      <option value="2000">2 s</option>
+                      <option value="1000">1 s</option>
+                      <option value="500">500 ms</option>
+                      <option value="250">250 ms</option>
+                      <option value="100" selected>100 ms</option>
+                      <option value="50">50 ms</option>
+                      <option value="10">10 ms</option>
+                    </select>
+                    <p id="seconds-timing" class="small clock-timing"></p>
+                  </div>
+                </div>
+              </details>
             </div>
           </aside>
         </section>
