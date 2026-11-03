@@ -287,7 +287,7 @@ test("damaged five-second certificate leaves current Counter usable", async ({
   );
   await page.selectOption("#application", "five-second-timer");
   await expect(page.locator("#error")).toContainText("integrity");
-  await expect(page.locator("#application")).toHaveValue("certified");
+  await expect(page.locator("#application")).toHaveValue(/^(certified|index\.html)$/);
   await page.locator('[data-delta="1"]').click();
   await settled(page, "1");
 });

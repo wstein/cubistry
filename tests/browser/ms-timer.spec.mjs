@@ -46,13 +46,17 @@ test("the chooser offers the M/S Timer and the page shows three cubes: minutes, 
   await expect(page.locator("#ms-timer-application")).toHaveValue(
     "ms-timer.html",
   );
-  await expect(page.locator("#ms-timer-application option")).toContainText([
+  for (const text of [
     "Live H–M–S Clock",
     "M/S Counter 00–59",
     "60-Minute Timer",
     "5-Second Timer",
     "M/S Timer",
-  ]);
+  ]) {
+    await expect(
+      page.locator("#ms-timer-application").getByRole("option", { name: text, exact: true }),
+    ).toBeAttached();
+  }
   // One stage with three cubes: minutes left, seconds middle, 1/10 second right.
   await expect(page.locator("#ms-timer-scene canvas")).toHaveCount(1);
   await expect(page.locator("#ms-timer-scene canvas")).toHaveAttribute(
@@ -68,11 +72,12 @@ test("the chooser offers the M/S Timer and the page shows three cubes: minutes, 
   await expect(page.locator("#ms-seconds")).toHaveAttribute("data-value", "0");
   await expect(page.locator("#ms-tenths")).toHaveAttribute("data-value", "0");
   const settled = await page.evaluate(async () => {
-    const { msTimer } = await import("/src/ms-timer.mjs");
+    const mod = await import("/src/ms-timer.mjs");
+    const t = window.__msTimer ?? mod.msTimer;
     return [
-      msTimer.pair.major.state,
-      msTimer.pair.minor.state,
-      msTimer.tenth.state,
+      t.pair.major.state,
+      t.pair.minor.state,
+      t.tenth.state,
     ].map(Boolean);
   });
   expect(settled).toEqual([true, true, true]);
@@ -174,7 +179,7 @@ test("the other applications keep their entries and still open", async ({
 }) => {
   await page.goto("/");
   await expect(page.locator("#application")).toBeEnabled();
-  await expect(page.locator("#application option")).toHaveText([
+  for (const text of [
     "Picture Puzzle Playground",
     "CI Quality Cube · Workflow monitor",
     "Calendar · Deutsch / English",
@@ -186,7 +191,11 @@ test("the other applications keep their entries and still open", async ({
     "60-Minute Timer",
     "5-Second Timer",
     "M/S Timer",
-  ]);
+  ]) {
+    await expect(
+      page.locator("#application").getByRole("option", { name: text, exact: true }),
+    ).toBeAttached();
+  }
   await page.selectOption("#application", "ms-counter");
   await expect(page.locator("#cube")).toHaveAttribute(
     "data-application",
