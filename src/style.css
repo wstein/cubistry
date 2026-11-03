@@ -345,6 +345,13 @@ h1 {
     grid-template-columns: 1fr;
     gap: 20px;
   }
+  .cube-card {
+    margin-top: 80px !important;
+  }
+  .floating-hud,
+  aside.controls {
+    top: 80px !important;
+  }
   .options {
     gap: 8px;
   }
@@ -1349,7 +1356,6 @@ body.presentation-mode main > p.small {
   display: none !important;
 }
 
-body.presentation-mode main,
 body.presentation-mode .workspace,
 body.presentation-mode .cube-card,
 body.presentation-mode .viewer-stage,
@@ -1364,11 +1370,11 @@ body.presentation-mode #studio-scene,
 body.presentation-mode #status-viewer,
 body.presentation-mode .status-workspace,
 body.presentation-mode .status-stage {
-  position: fixed !important;
+  position: absolute !important;
   inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  max-height: 100vh !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
@@ -1427,51 +1433,8 @@ body.presentation-mode .presentation-exit-btn:hover {
   transform: scale(1.02);
 }
 
-/* Responsive Layout & Auto-Compact Rules */
+/* Responsive Layout & Compact Rules */
 @media (max-width: 1180px) {
-  /* Side panels auto-collapse to compact icon/pill buttons when not focused/hovered */
-  .floating-hud-appearance:not(:hover):not(:focus-within),
-  aside.cube-appearance.floating-hud:not(:hover):not(:focus-within),
-  .floating-hud:not(:hover):not(:focus-within),
-  aside.controls:not(:hover):not(:focus-within),
-  aside.timer-controls:not(:hover):not(:focus-within),
-  aside.clock-control:not(:hover):not(:focus-within),
-  aside.calendar-controls:not(:hover):not(:focus-within),
-  aside.status-controls:not(:hover):not(:focus-within) {
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: fit-content !important;
-    padding: 8px 14px !important;
-    border-radius: 9999px !important;
-    overflow: hidden !important;
-  }
-
-  .floating-hud-appearance:not(:hover):not(:focus-within) .hud-content,
-  aside.cube-appearance.floating-hud:not(:hover):not(:focus-within) .hud-content,
-  .floating-hud:not(:hover):not(:focus-within) .hud-body,
-  aside.controls:not(:hover):not(:focus-within) .hud-body,
-  aside.timer-controls:not(:hover):not(:focus-within) .hud-body,
-  aside.clock-control:not(:hover):not(:focus-within) .hud-body,
-  aside.calendar-controls:not(:hover):not(:focus-within) .hud-body,
-  aside.status-controls:not(:hover):not(:focus-within) .hud-body,
-  aside.calendar-controls:not(:hover):not(:focus-within) > :not(.hud-header),
-  aside.status-controls:not(:hover):not(:focus-within) > :not(.hud-header) {
-    display: none !important;
-  }
-
-  .floating-hud-appearance:not(:hover):not(:focus-within) .hud-header,
-  aside.cube-appearance.floating-hud:not(:hover):not(:focus-within) .hud-header,
-  .floating-hud:not(:hover):not(:focus-within) .hud-header,
-  aside.controls:not(:hover):not(:focus-within) .hud-header,
-  aside.timer-controls:not(:hover):not(:focus-within) .hud-header,
-  aside.clock-control:not(:hover):not(:focus-within) .hud-header,
-  aside.calendar-controls:not(:hover):not(:focus-within) .hud-header,
-  aside.status-controls:not(:hover):not(:focus-within) .hud-header {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-    border-bottom: none !important;
-  }
-
   /* Island presentation button shows icon ⛶ only */
   header.floating-island .island-presentation-btn .btn-text,
   .floating-island .island-presentation-btn .btn-text {
