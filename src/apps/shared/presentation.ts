@@ -9,6 +9,7 @@ export function installPresentation(options: PresentationOptions): {
 } {
   const main = document.querySelector("main");
   if (!main) throw Error("Presentation requires the application container");
+  document.querySelector?.("#presentation-tools")?.remove?.();
   const tools = document.createElement("nav");
   tools.id = "presentation-tools";
   tools.className = "presentation-tools";
