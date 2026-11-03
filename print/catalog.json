@@ -19,7 +19,7 @@
         "assembly.pdf": "50502c9fb7f92fc6b549bd288d2cfa95a4c4609e40444c6e3cbd893aa3617775",
         "bundle.zip": "0c82a3901dc4a1b8a55feb452984d558dfaba3bd7755d0f5c46c6bfd640bd1ea",
         "cuts-1.svg": "78b4606a42612b92ef22ccd1713b7c132784f8b08ec25d359072c8840f970149",
-        "manifest.json": "4eb45f94b2022405dc7bb27ebf54a6b5bad52d32c54505257d4c85d69c7a9e7a",
+        "manifest.json": "d53aeba41ff95cd1d82429b12abfea476f8ddf5fd334817702cc21d3b2a21ba9",
         "print.pdf": "be2dade91c55d0e4704719da8684a1bde35e8812598b6106d0296bd55e8cb3f2"
       }
     },
@@ -39,7 +39,7 @@
         "assembly.pdf": "ef4bb35d2dced4b5e1f0c156b12db8c912b913273fb453be3bc88c79e80e9d6a",
         "bundle.zip": "bb3a8542c67351fda2a71431c18fe8de7d5d5a5949e0aff6b00825f0bd755398",
         "cuts-1.svg": "bd6e5ad784bf465212b3257dac4ada28e632a0e348e344bf88c0c8e86b838e2e",
-        "manifest.json": "87acdac6add39f4a027cdd0e25868951a18fb7b3e7d5a93a13db8fdd0fc74b25",
+        "manifest.json": "999513e9ee46e3b282b3ee8e40e7872a7cb958c273248ebce7b212b698859336",
         "print.pdf": "fab84a9733b90f0e02d60af5365873d91cdb27436142ed50d66861f9b0430824"
       }
     },
@@ -59,7 +59,7 @@
         "assembly.pdf": "6c62afa8877d91c734fe57c61aa5c1931a10977a515b6465f5b9ee77b5f086a7",
         "bundle.zip": "bcec638e649bae2d5b29c1037d92ff59791505293c12699e035e504848b817ed",
         "cuts-1.svg": "78b4606a42612b92ef22ccd1713b7c132784f8b08ec25d359072c8840f970149",
-        "manifest.json": "f44a890de499d7361f82fd5dfe1a6f986c8ab792daa645f967ecbd9a3ca69ddf",
+        "manifest.json": "1f98a3e35ae786c9d8438dde61e7c93dc5740a66c563676afa31f454b8d6a296",
         "print.pdf": "e6b847667a3a306fa290eb3018e7a51a61f8fc969cd7ae93e20eaaf2d45ff4f1"
       }
     },
@@ -79,7 +79,7 @@
         "assembly.pdf": "c2804fcabceaf5a14fcd66ebe3a7c6dd135e6303fef15af52d83ba79c0b55abc",
         "bundle.zip": "57ba134b0ce0e4214cb2954232a5d1685bb1b9146dbf8debc4cc0a4943d44403",
         "cuts-1.svg": "bd6e5ad784bf465212b3257dac4ada28e632a0e348e344bf88c0c8e86b838e2e",
-        "manifest.json": "f6324b67be0086ce692a9bce36e92c3333c889eb31e484eed85fc0663d97f2e5",
+        "manifest.json": "a516df30d07fb2f517970a0fb4f66b98c30f9dec196cc73295c8528aa00da78d",
         "print.pdf": "0d71f38cd69c6302384a9279191fdabaf5ba99252059c81a0635ec35e743c73c"
       }
     },
@@ -98,7 +98,7 @@
         "assembly.pdf": "f5e66c6ec0e5587842c7e05da571c4fdc966918422935e8898e572f2462657c9",
         "bundle.zip": "746edffc905ec82aa26c5cd962ae4f4d3a4b7a11c8e77966dec4ef1e6def9443",
         "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
-        "manifest.json": "e6237ec6b79aacc67a4d416ca852b927e4457459311feb2514333a9c26dda566",
+        "manifest.json": "1586831c62983a8b363323d982346fa0b514f6f7c52858e5f61323157d45883c",
         "print.pdf": "770991b99fe406f37bbdf823c5cc7d12b2d0819466887ac49e0fa66d4585a6db"
       }
     },
@@ -119,7 +119,7 @@
         "assembly.pdf": "c380b782d17af65236018b110c98be96b143cd6635cf0376a58832e496674f25",
         "bundle.zip": "6faaebc7b09a440632e004114a895518c1b7ee35f6d5eb2e177152499d8cb77a",
         "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
-        "manifest.json": "e47d264dcd35e0b9898a7b7a3cdf3806944d3e88eb9243ca4e654a8b03e2c122",
+        "manifest.json": "3dbba1bd76df188a11fc0fbf0526fe387ae8ddcb86777a5bc1753b63ad85f32f",
         "print.pdf": "bbfe1d15b61a87aa1e2eaa2e1c623225e1157852df2219b621314529bd71e2d8"
       }
     },
@@ -134,14 +134,14 @@
       "files": {
         "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
-        "README.txt": "8f4241fc1233b83c789137f1e97329d860340c24f256cc8125975fb63b76dc6c",
+        "README.txt": "439ce2e831bda6342f13c350efad773221cec72872f3c749a4dd29e0d5e56161",
         "WORD-ART-PROVENANCE.json": "eb12906f2487638ecfeb1d342b9513062d281e5062c4fefb95584e0f9a7832f3",
         "artwork-1.svg": "feb10fef0741e5404decacf2e52b3fe4cd147c0bef2dbc6eab54f9b43720b04f",
+        "assembly.pdf": "71e01e7052262bfea0bcb71ac39b4bc3ad1c602471b9b0cfd6e063c3a785e3da",
+        "bundle.zip": "6b0a3a69d18b9e493a97daa25228c492c7426adca290eee86c8d18f4c13b0bef",
         "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
-        "assembly.pdf": "c380b782d17af65236018b110c98be96b143cd6635cf0376a58832e496674f25",
-        "print.pdf": "bbfe1d15b61a87aa1e2eaa2e1c623225e1157852df2219b621314529bd71e2d8",
-        "bundle.zip": "c11e51a24be0dbaea4ceb5706bdb62c0cd171b64f39710862ad965e9a9c06a16",
-        "manifest.json": "8d0e62f42a8dd26b95797f82ec51907fe036f3ea19d78c12fc08af33f9298a68"
+        "manifest.json": "2a22dcf1fa11b57eb2cdc7b069bac8a807ee48f373dabc40703109cd59d0e551",
+        "print.pdf": "c2422d37ee66ff887013e3b83499e275d7d34d612bd77f7a8c6218667ca4b916"
       }
     },
     {
@@ -156,13 +156,13 @@
         "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
         "README.txt": "00a960af708f55f1b6050b2ea8cdd06cdd01e79473421734b490ee548ffedad9",
-        "WORD-ART-PROVENANCE.json": "ad105b44c33bf1c13b90b0f1ad2cd89ff014485722a3da79ed04d82642bcc547",
-        "artwork-1.svg": "43d39e827edb7375780f76675a522728ff20c84543bc98a4631439d8249e5d8d",
-        "assembly.pdf": "c380b782d17af65236018b110c98be96b143cd6635cf0376a58832e496674f25",
-        "bundle.zip": "8693f5875dd0fb589e1c4269aae75e1d68ebeb1655dfc0959cb71b83270747db",
+        "WORD-ART-PROVENANCE.json": "91dbd93fce7ee55e06b0d543c9908a0d45d63aab5cb2ce7197624eaa39fc50bf",
+        "artwork-1.svg": "8855ac042af464df85a853d31fd33594e8b6d6767b66c3960303b586502bf496",
+        "assembly.pdf": "3f84e6b4e6ca0dd781dbe5d56403d53d043e0c3f8032ec0141dc44e8e2732497",
+        "bundle.zip": "64038d858e6f2d9b4cfd290dd7e45e83e0873538ba17a6682046bcd562815024",
         "cuts-1.svg": "b6533900ddb47802485944b25cc2b726a59a8e8d26d51e9c4836c88f0074bf5a",
-        "print.pdf": "bbfe1d15b61a87aa1e2eaa2e1c623225e1157852df2219b621314529bd71e2d8",
-        "manifest.json": "ab1882e8cce65a07e3d98c66d037717ae76b64d0bff69df1dba2edf6ec362f04"
+        "manifest.json": "4c9c4f2bef12953bc20c92116764b8b32cc9956c2bccd614fa2f489edc138c41",
+        "print.pdf": "f960746592c8b7dae7212695ef4befb527d06b0f00aade0fe3f589f71c32d914"
       }
     }
   ]
