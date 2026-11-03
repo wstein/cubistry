@@ -21,6 +21,9 @@ export function installHudIdleController(options: HudIdleOptions = {}): {
   let timer: ReturnType<typeof setTimeout> | null = null;
 
   function isProtected(): boolean {
+    if (typeof navigator !== "undefined" && navigator.webdriver) {
+      return true;
+    }
     const active = document.activeElement;
     if (active && active !== document.body && active !== document.documentElement) {
       if (
