@@ -36,7 +36,7 @@ class StaticArchiveTests(unittest.TestCase):
   self.assertEqual(title(self.banner('a'*78+'&&&')),'a'*78+'&amp;\u2026')
   self.assertEqual(title(self.banner('a'*80+'<')),'a'*79+'\u2026')
  def test_cname_is_rejected_in_previews_but_not_production(self):
-  for name in ('CNAME','sub/CNAME','a/b/CNAME'):
+  for name in ('CNAME','sub/CNAME','a/b/CNAME','CNAME/index.html','sub/CNAME/index.html','CNAME/a/b.js'):
    with self.subTest(name=name),self.assertRaises(ValueError):E.extract(self.archive([('index.html','<html><body>site</body></html>'),(name,'x.example')]),self.root/('p'+name.replace('/','_')),52,'a'*40)
   E.extract(self.archive([('index.html','<html><body>site</body></html>'),('CNAME','x.example')]),self.root/'prod')
   self.assertEqual((self.root/'prod/CNAME').read_text(),'x.example')
