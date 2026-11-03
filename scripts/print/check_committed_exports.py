@@ -13,6 +13,15 @@ VERIFIER = Path(__file__).with_name("verify_exports.py")
 
 catalog = json.loads((PRINT / "catalog.json").read_bytes())
 failures = []
+# A preset's PDFs must be rendered from its own artwork. Byte-identical PDFs in two presets
+# mean one was copied from the other, so its print.pdf can never match its SVG artwork.
+owners = {}
+for entry in catalog["entries"]:
+    for name in ("print.pdf", "assembly.pdf"):
+        owners.setdefault((name, entry["files"][name]), []).append(entry["id"])
+for (name, _), ids in sorted(owners.items()):
+    if len(ids) > 1:
+        failures.append(f"{name} is byte-identical in presets {', '.join(ids)}")
 for entry in catalog["entries"]:
     folder = PRINT / entry["directory"]
     for name, expected in entry["files"].items():
