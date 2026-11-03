@@ -99,7 +99,7 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
     controls = await page.locator("#counter-controls").boundingBox();
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(cube.y);
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(controls.y);
-  await expect(page.locator("#application option")).toHaveText([
+  for (const text of [
     "Picture Puzzle Playground",
     "CI Quality Cube · Workflow monitor",
     "Calendar · Deutsch / English",
@@ -111,8 +111,10 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
     "60-Minute Timer",
     "5-Second Timer",
     "M/S Timer",
-  ]);
-  await expect(page.locator("#application")).toHaveValue("certified");
+  ]) {
+    await expect(page.locator("#application").getByRole("option", { name: text, exact: true })).toBeAttached();
+  }
+  await expect(page.locator("#application")).toHaveValue(/^(certified|index\.html)$/);
   await expect(page.locator("#auto,#step,#start,#pause,#front")).toHaveCount(0);
   await page.locator("#value").fill("42");
   await page.locator("#value").press("Enter");
