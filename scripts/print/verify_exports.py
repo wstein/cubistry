@@ -213,6 +213,7 @@ for key,word in M.get('setupExamples',{}).items():
   date=datetime.date.fromisoformat(key);digits=list(f'{date.day:02d}')
   if M['design']=='de-a':expected=[*('MO','DI','MI','DO','FR','SA','SO')[date.weekday()],'','',*digits,*('JAN','FEB','MÄR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DEZ')[date.month-1]]
   else:expected=[('MON','TUE','WED','THU','FRI','SAT','SUN')[date.weekday()],'','',*('JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC')[date.month-1],'',*digits]
+ elif M['design']=='ms-timer-tenth':expected=['','T',key,'']  # front face: blank, 1/10 mark, digit, blank
  else:expected=['',key,'0','0']
  need([s[5] for s in observed]==expected,'actual physical setup labels')
  need(all(not s[5] or s[4]==(0,1,0) for s in observed),'setup printed glyphs upright')
