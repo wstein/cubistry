@@ -268,8 +268,8 @@ test("tenth-speed options and hardwired turn speeds match specification", async 
   assert.equal(tenthTurnSpeedForInterval(1000), 250);
   assert.equal(tenthTurnSpeedForInterval(2000), 500);
 
-  // Check index.html UI elements
-  const html = readFileSync("index.html", "utf8");
+  // Check counter.html UI elements
+  const html = readFileSync("counter.html", "utf8");
   assert(html.includes('<select id="tenth-speed">'));
   assert(html.includes('<option value="2000">2s</option>'));
   assert(html.includes('<option value="1000" selected>1s</option>'));
