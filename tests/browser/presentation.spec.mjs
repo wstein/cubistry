@@ -50,7 +50,7 @@ for (const lettering of ["symbols", "words"])
       .toBe(true);
     await expect(page.locator("#clock-digital")).toBeVisible();
     await expect(page.locator("#clock-status")).toBeVisible();
-    await expect(page.locator("#seconds-speed")).not.toBeVisible();
+    await expect(page.locator("#clock-lettering")).not.toBeVisible();
     await expect(page.locator("header")).not.toBeVisible();
     await expect(page.locator("canvas")).toHaveCount(1);
     const canvas = page.locator("#clock-scene canvas");
@@ -105,7 +105,7 @@ for (const lettering of ["symbols", "words"])
     await expect
       .poll(() => page.evaluate(() => document.fullscreenElement === null))
       .toBe(true);
-    await expect(page.locator("#seconds-speed")).toBeVisible();
+    await expect(page.locator("#clock-lettering")).toBeVisible();
     expect(await clockState(page)).toEqual(before);
   });
 
@@ -275,7 +275,7 @@ test("leaving presentation while a fullscreen request is pending cannot reenter 
     "data-presentation",
     "false",
   );
-  await expect(page.locator("#seconds-speed")).toBeVisible();
+  await expect(page.locator("#clock-lettering")).toBeVisible();
 });
 
 for (const latest of ["resolved", "rejected"])
