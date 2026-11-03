@@ -63,7 +63,7 @@ def mark_preview(text,number,sha,title=''):
     if number<1:raise ValueError('Invalid PR number')
     link=f'<a href="https://github.com/{REPOSITORY}/pull/{number}" target="_blank" rel="noopener noreferrer">PR #{number}</a>'
     label=clean_title(title)
-    banner=f'<aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · {link}{" · "+label if label else ""} — non-production preview · {html.escape(sha[:12])}</aside>'
+    banner=f'<aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · {link}{" · <bdi>"+label+"</bdi>" if label else ""} — non-production preview · {html.escape(sha[:12])}</aside>'
     insertions=[(head[1] if head else body_start,marker),(body_end,banner)]
     for offset,value in sorted(insertions,reverse=True):text=text[:offset]+value+text[offset:]
     return text
