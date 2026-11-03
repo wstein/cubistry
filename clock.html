@@ -53,13 +53,24 @@
       <div class="clock-workspace">
         <section class="clock-stage" aria-label="Live hour minute second cubes">
           <div id="clock-scene" class="clock-viewer"></div>
-          <div class="clock-cubes sr-only" aria-hidden="true">
+          <div class="clock-cubes" aria-label="Individual cube controls">
             <article class="clock-card">
               <h2>Hours</h2>
               <div id="clock-hours" data-unit="H" aria-busy="true"></div>
               <p id="hours-state" class="clock-state" role="status">
                 Preparing…
               </p>
+              <label for="hours-speed">Preferred quarter-turn time</label
+              ><select id="hours-speed" disabled>
+                <option value="2000">2 s</option>
+                <option value="1000">1 s</option>
+                <option value="500" selected>500 ms</option>
+                <option value="250">250 ms</option>
+                <option value="100">100 ms</option>
+                <option value="50">50 ms</option>
+                <option value="10">10 ms</option>
+              </select>
+              <p id="hours-timing" class="small clock-timing"></p>
             </article>
             <article class="clock-card">
               <h2>Minutes</h2>
@@ -67,6 +78,17 @@
               <p id="minutes-state" class="clock-state" role="status">
                 Preparing…
               </p>
+              <label for="minutes-speed">Preferred quarter-turn time</label
+              ><select id="minutes-speed" disabled>
+                <option value="2000">2 s</option>
+                <option value="1000">1 s</option>
+                <option value="500">500 ms</option>
+                <option value="250" selected>250 ms</option>
+                <option value="100">100 ms</option>
+                <option value="50">50 ms</option>
+                <option value="10">10 ms</option>
+              </select>
+              <p id="minutes-timing" class="small clock-timing"></p>
             </article>
             <article class="clock-card">
               <h2>Seconds</h2>
@@ -74,6 +96,17 @@
               <p id="seconds-state" class="clock-state" role="status">
                 Preparing…
               </p>
+              <label for="seconds-speed">Preferred quarter-turn time</label
+              ><select id="seconds-speed" disabled>
+                <option value="2000">2 s</option>
+                <option value="1000">1 s</option>
+                <option value="500">500 ms</option>
+                <option value="250">250 ms</option>
+                <option value="100" selected>100 ms</option>
+                <option value="50">50 ms</option>
+                <option value="10">10 ms</option>
+              </select>
+              <p id="seconds-timing" class="small clock-timing"></p>
             </article>
           </div>
           <aside class="clock-control floating-hud" aria-label="Live clock control display">

@@ -60,10 +60,11 @@ $("clock-lettering").addEventListener("change", () => {
 // Recovery searches run in slices that yield to the event loop (docs/HSM_COUNTER.md).
 const recoveryExecutor = new SlicedExecutor(),
   scheduler = new LiveClockScheduler(),
-  units = [],
+  units = window.__clockUnits ?? [],
   // Session statistics live as long as this page's controllers: reloading or
   // changing the print restarts them; re-rendering and presentation do not.
   statistics = new ClockMoveStatistics(names.length);
+window.__clockUnits = units;
 let shownStatistics = -1;
 function statisticsUi() {
   const snapshot = statistics.snapshot();
@@ -84,7 +85,7 @@ function statisticsUi() {
     if (i < names.length) show(name + "-mean-moves", unit.mean, formatMean);
   });
 }
-let stage = null;
+let stage = window.__clockStage ?? null;
 let ready = false,
   failed = false;
 function draw() {
@@ -127,13 +128,28 @@ $("reset-clock-moves").addEventListener("click", () => {
 $("clock-application").addEventListener("change", () =>
   location.assign(new URL($("clock-application").value, location.href)),
 );
-const presentation = installPresentation({
-  app: "clock",
-  // Statistics follow the per-cube status lines and the calendar's move counts.
-  hide: ["main > header", ".clock-heading", ".clock-cubes", ".clock-stats", ".clock-stats-reset", ".clock-control > h2", ".clock-control > label", ".clock-control > select", "main > p.small"],
-  resetView: () => stage?.resetCamera(),
-});
+const presentation =
+  window.__clockPresentation ??
+  (window.__clockPresentation = installPresentation({
+    app: "clock",
+    // Statistics follow the per-cube status lines and the calendar's move counts.
+    hide: [
+      "main > header",
+      ".clock-heading",
+      ".clock-cubes",
+      ".clock-stats",
+      ".clock-stats-reset",
+      ".clock-control .hud-header",
+      ".clock-control > h2",
+      ".clock-control > label",
+      ".clock-control > select",
+      "main > p.small",
+    ],
+    resetView: () => stage?.resetCamera(),
+  }));
 async function initialize() {
+  if (window.__clockInitialized) return;
+  window.__clockInitialized = true;
   const owned = [],
     unclaimed = [];
   try {
@@ -180,6 +196,7 @@ async function initialize() {
     $("clock-zone").textContent =
       Intl.DateTimeFormat().resolvedOptions().timeZone;
     stage = new ClockStage($("clock-scene"));
+    window.__clockStage = stage;
 
     // Appearance panel font and orientation marker selectors
     const appearancePanel = stage.appearancePanel;
