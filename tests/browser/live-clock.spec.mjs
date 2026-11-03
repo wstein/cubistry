@@ -19,11 +19,13 @@ async function physical(page) {
     const { matchesTarget } = await import(
       "/packages/cube-mechanics/src/index.ts"
     );
-    // The live clock defaults to word lettering, which has its own print id.
+    // The live clock defaults to words-pascal lettering, which has its own print id.
     const { hsmDesignFor } = await import("/src/apps/hsm/lettering.ts");
+    const lettering =
+      new URLSearchParams(location.search).get("lettering") ?? "words-pascal";
     const d = hsmDesignFor(
       validateHsmDesign(await (await fetch("/hsm-counter.v3.json")).json()),
-      "words",
+      lettering,
     );
     return clockUnits.map((u, i) => ({
       value: u.controller.currentValue,
@@ -297,9 +299,11 @@ test("real animation ends all three midnight sequences at the shared live deadli
       "/packages/cube-mechanics/src/index.ts"
     );
     const { hsmDesignFor } = await import("/src/apps/hsm/lettering.ts");
+    const lettering =
+      new URLSearchParams(location.search).get("lettering") ?? "words-pascal";
     const design = hsmDesignFor(
       validateHsmDesign(await (await fetch("/hsm-counter.v3.json")).json()),
-      "words",
+      lettering,
     );
     const endpoints = ["H", "M", "S"].map((unit) =>
       window.realClockEndpoints.filter((e) => e.unit === unit).at(-1),
@@ -404,6 +408,7 @@ test("slow preferences show fitted quarter and half durations without relabeling
   page,
 }) => {
   await ready(page, "2026-10-28T11:34:56Z");
+  await page.locator("#clock-nerd-details summary").click();
   await page.selectOption("#seconds-speed", "2000");
   await expect(page.locator('label[for="seconds-speed"]')).toHaveText(
     "Preferred quarter-turn time",

@@ -116,7 +116,7 @@ test("the shared live clock offers bottom-only words and retains preferred speed
   await page.addInitScript(() => {
     Date.now = () => Date.parse("2026-10-28T11:34:56Z");
   });
-  await page.goto("/clock.html?lettering=words");
+  await page.goto("/clock.html?lettering=words&nerd=1");
   await expect(page.locator("#clock-lettering")).toBeEnabled();
   await expect(page.locator("canvas")).toHaveCount(1);
   expect(
