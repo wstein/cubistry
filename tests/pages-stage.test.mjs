@@ -146,14 +146,14 @@ test("deploy hands a hostile PR title to extract.py as one inert argv element in
   assert.deepEqual(r.files, [], "title must never be shell-interpreted");
   assert.match(
     r.banner,
-    / · x \$\(touch PWNED\) `touch PWNED2` ; &quot;q&quot; &lt;\/aside&gt;&lt;script&gt; next — non-production preview · a{12}$/,
+    / · <bdi>x \$\(touch PWNED\) `touch PWNED2` ; &quot;q&quot; &lt;\/aside&gt;&lt;script&gt; next<\/bdi> — non-production preview · a{12}$/,
   );
   assert.doesNotMatch(r.banner, /<script/);
 });
 test("deploy survives control characters such as NUL in the PR title", () => {
   const r = deploy("fix\u0000the\u0007thing\u001b[0m");
   assert.equal(r.output, "action=deploy\n");
-  assert.match(r.banner, / · fix the thing \[0m — non-production/);
+  assert.match(r.banner, / · <bdi>fix the thing \[0m<\/bdi> — non-production/);
   assert.equal(deploy(null).output, "action=deploy\n");
   assert.match(deploy(null).banner, /<\/a> — non-production preview/);
 });

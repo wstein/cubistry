@@ -25,11 +25,11 @@ class StaticArchiveTests(unittest.TestCase):
  def test_banner_title_is_escaped_single_line_and_bounded(self):
   b=self.banner('<script>alert(1)</script> "q" \'s\' & more')
   self.assertNotIn('<script>',b);self.assertIn('&lt;script&gt;alert(1)&lt;/script&gt; &quot;q&quot; &#x27;s&#x27; &amp; more',b)
-  b=self.banner('a\nb\r\n\tc\x00d\u2028e\u202ef  g');self.assertIn(' · a b c d ef g — non-production',b)
-  b=self.banner('x'*500);m=re.search(r'</a> · (x+)\u2026 —',b);self.assertTrue(m);self.assertEqual(len(m.group(1))+1,80)
+  b=self.banner('a\nb\r\n\tc\x00d\u2028e\u202ef  g');self.assertIn(' · <bdi>a b c d ef g</bdi> — non-production',b)
+  b=self.banner('x'*500);m=re.search(r'</a> · <bdi>(x+)\u2026</bdi> —',b);self.assertTrue(m);self.assertEqual(len(m.group(1))+1,80)
   self.assertIn('Zürich 日本語 🚀 fix',self.banner('Zürich 日本語 🚀 fix'))
  def test_banner_title_cap_boundaries_and_escape_after_truncation(self):
-  def title(b):return re.search(r'</a> · (.*) — non-production',b).group(1)
+  def title(b):return re.search(r'</a> · <bdi>(.*)</bdi> — non-production',b).group(1)
   self.assertEqual(title(self.banner('a'*80)),'a'*80)
   self.assertEqual(title(self.banner('a'*81)),'a'*79+'\u2026')
   self.assertEqual(title(self.banner('a'*79+'&')),'a'*79+'&amp;')
