@@ -27,6 +27,12 @@ main {
   border: none;
   border-radius: 0;
 }
+.stage-bottom {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 20;
+}
 #cube {
   position: fixed;
   inset: 0;

@@ -35,8 +35,8 @@ const text = (id, value) => {
   if ($(id)?.textContent !== value && $(id)) $(id).textContent = value;
 };
 
-let stage = null,
-  timer = null,
+let stage = typeof window !== "undefined" ? window.__msTimerStage ?? null : null,
+  timer = typeof window !== "undefined" ? window.__msTimer ?? null : null,
   ready = false,
   failed = false,
   durationDirty = false;
@@ -217,6 +217,12 @@ $("ms-timer-application").addEventListener("change", () =>
 );
 
 async function initialize() {
+  if (typeof window !== "undefined" && window.__msTimerInitialized) {
+    timer = window.__msTimer;
+    stage = window.__msTimerStage;
+    return;
+  }
+  if (typeof window !== "undefined") window.__msTimerInitialized = true;
   const disposables = [];
   try {
     const base = import.meta.env.BASE_URL;
@@ -381,6 +387,10 @@ async function initialize() {
       },
       refresh: tick,
     });
+    if (typeof window !== "undefined") {
+      window.__msTimer = timer;
+      window.__msTimerStage = stage;
+    }
     await Promise.all([
       pair.configure(ONE_SECOND_TIMER.defaultSeconds),
       tenth.configure(0),

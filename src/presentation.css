@@ -1,12 +1,39 @@
-.presentation-tools,
-#presentation-tools {
-  display: none !important;
+.presentation-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 35;
+}
+.presentation-tools button {
+  width: auto;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 12px;
+  background: rgba(255, 253, 246, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(21, 59, 97, 0.16);
+  color: var(--color-ink-navy, #153b61);
+  box-shadow: 0 2px 6px rgba(21, 59, 97, 0.05);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.presentation-tools button:hover {
+  background: #ffffff;
+  border-color: rgba(21, 59, 97, 0.3);
 }
 .presentation-feedback {
   margin: 0;
 }
 body[data-presentation="true"] {
-  display: block !important;
+  display: flex !important;
+  flex-direction: column !important;
   width: 100vw !important;
   height: 100vh !important;
   height: 100dvh !important;
@@ -16,14 +43,20 @@ body[data-presentation="true"] {
   background: radial-gradient(ellipse at 48% 28%, #fffdf7 0%, transparent 65%),
     linear-gradient(180deg, #e9e0d2 0%, #f6f0e5 48%, #d8cabb 100%) !important;
 }
-body[data-presentation="true"] > :not(main):not(.floating-glass-pill):not(.presentation-exit-btn) {
+body[data-presentation="true"] > aside {
+  flex: none !important;
+  position: relative !important;
+  z-index: 50 !important;
+}
+body[data-presentation="true"] > :not(main):not(aside):not(.floating-glass-pill):not(.presentation-exit-btn) {
   display: none !important;
 }
 body[data-presentation="true"] main {
-  position: fixed !important;
-  inset: 0 !important;
+  flex: 1 1 auto !important;
+  position: relative !important;
   width: 100vw !important;
-  height: 100vh !important;
+  height: auto !important;
+  min-height: 0 !important;
   max-width: none !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -35,14 +68,19 @@ body[data-presentation="true"] [data-presentation-hide] {
   display: none !important;
 }
 body[data-presentation="true"] .presentation-tools {
-  display: none !important;
+  position: fixed !important;
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 100 !important;
+  display: flex !important;
+  margin: 0 !important;
 }
 body[data-presentation="true"] .clock-workspace,
 body[data-presentation="true"] .calendar-workspace {
-  position: fixed !important;
+  position: absolute !important;
   inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 100% !important;
+  height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
   display: block !important;
@@ -78,10 +116,10 @@ body[data-presentation="true"] .clock-digital {
 }
 body[data-presentation="true"] .clock-stage,
 body[data-presentation="true"] .calendar-stage {
-  position: fixed !important;
+  position: absolute !important;
   inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 100% !important;
+  height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
@@ -91,10 +129,10 @@ body[data-presentation="true"] .calendar-stage {
 }
 body[data-presentation="true"] .clock-viewer,
 body[data-presentation="true"] #calendar-viewer {
-  position: fixed !important;
+  position: absolute !important;
   inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 100% !important;
+  height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
@@ -112,7 +150,14 @@ body[data-presentation="true"] #calendar-viewer canvas {
   border: none !important;
 }
 body[data-presentation="true"] #calendar-state {
-  display: none !important;
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  z-index: 10;
+  font-size: 0.85rem;
+  color: var(--color-ink-navy, #153b61);
 }
 body[data-presentation="true"] .error {
   display: none !important;

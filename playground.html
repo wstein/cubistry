@@ -44,7 +44,7 @@
       </header>
       <div class="intro sr-only">
         <p class="eyebrow">A PHYSICAL PUZZLE, ONE TURN AT A TIME</p>
-        <h1>Picture Puzzle Playground</h1>
+        <div>Picture Puzzle Playground</div>
         <p>Turn, explore, and put every piece back in its exact place.</p>
       </div>
       <div class="layout">
@@ -54,10 +54,13 @@
             aria-label="Physical picture puzzle"
             aria-busy="true"
           ></div>
+          <div class="stage-bottom">
+            <button id="camera" type="button" class="hud-btn" title="Reset view">Reset view</button>
+          </div>
         </section>
         <section class="controls floating-hud" aria-label="Puzzle controls">
           <div class="hud-header">
-            <h2 class="hud-title">Picture Playground</h2>
+            <h1 class="hud-title">Picture Puzzle Playground</h1>
             <div class="hud-actions">
               <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
             </div>
