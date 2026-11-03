@@ -22,7 +22,7 @@ for (const [id, file] of [
   };
 }
 const hsm = read("public/hsm-counter.v2.json");
-for (const style of ["symbols", "words"])
+for (const style of ["symbols", "words", "words-pascal"])
   designs[`hsm-${style}`] = {
     id: `hsm-${style}`,
     size: 2,
@@ -31,4 +31,19 @@ for (const style of ["symbols", "words"])
     setupExamples: hsm.zeroWords,
     lettering: style,
   };
+// The dedicated 1/10-second cube: digits plus the 1/10 mark (image "T") from the words lettering.
+const tenth = read("public/ms-timer-tenth.v1.json");
+const fromZero = (to) =>
+  read("public/tenth-transitions.v1.json").transitions.find(
+    (t) => t.from === 0 && t.to === to,
+  ).alg;
+designs["ms-timer-tenth"] = {
+  id: "ms-timer-tenth",
+  size: 2,
+  source: "public/ms-timer-tenth.v1.json",
+  printing: tenth.printing,
+  setupExamples: { 0: "", 5: fromZero(5) },
+  lettering: "words",
+  fontRole: "Only 1/10 unit mark outline; digits are original geometric artwork",
+};
 console.log(JSON.stringify(designs));

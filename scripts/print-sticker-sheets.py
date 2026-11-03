@@ -183,7 +183,7 @@ class Artwork:
                 value = []
             else:
                 path = ROOT / (f'public/assets/digits/{image}.svg' if image.isdigit() else
-                               f'public/assets/hsm/{"words/" if design["lettering"] == "words" else ""}{image}.svg')
+                               f'public/assets/hsm/{"" if design["lettering"] == "symbols" else design["lettering"] + "/"}{image}.svg')
                 self.inputs[str(path.relative_to(ROOT))] = sha(path)
                 value = read_svg(path)
             self.cache[key] = value
@@ -422,21 +422,21 @@ def write_design(design, output, size, gap, bleed, radius, safe, artwork, copies
     shutil.copyfile(ROOT/'LICENSE', output/'ARTWORK-LICENSE.txt')
     font = None
     extra_files = ['ARTWORK-LICENSE.txt']
-    if design['size'] == 3 or design.get('lettering') == 'words':
+    if design['size'] == 3 or design.get('lettering') in ('words', 'words-pascal'):
         shutil.copyfile(ROOT/'public/fonts/OFL.txt', output/'OFL.txt')
         extra_files.append('OFL.txt')
         if design['size'] == 3:
             font = {'family': 'Noto Sans', 'weights': sorted(artwork.fonts), 'role': 'Calendar glyph outlines',
                     'package': '@fontsource/noto-sans@5.2.10', 'license': 'SIL-OFL-1.1', 'licenseFile': 'OFL.txt'}
         else:
-            words = ROOT/'public/assets/hsm/words/provenance.json'
+            words = ROOT/f'public/assets/hsm/{design["lettering"]}/provenance.json'
             source_font = json.loads(words.read_text())['font']
             need(sha(ROOT/source_font['path']) == source_font['sha256'], 'Pinned word-art source font changed')
             artwork.inputs[str(words.relative_to(ROOT))] = sha(words)
             artwork.inputs[source_font['path']] = source_font['sha256']
             shutil.copyfile(words, output/'WORD-ART-PROVENANCE.json')
             extra_files.append('WORD-ART-PROVENANCE.json')
-            font = {'family': 'Noto Sans', 'weights': [600], 'role': 'Only hour/min/sec unit-word outlines; digits are original geometric artwork',
+            font = {'family': 'Noto Sans', 'weights': [600], 'role': design.get('fontRole', 'Only hour/min/sec unit-word outlines; digits are original geometric artwork'),
                     'package': source_font['package'], 'license': 'SIL-OFL-1.1', 'licenseFile': 'OFL.txt', 'sourceProvenance': 'WORD-ART-PROVENANCE.json'}
     notes = f'''Cubistry {design["id"]} print and cut export
 
@@ -491,8 +491,8 @@ No external font service or raster sticker image is required by these exports.
 
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--design', choices=['de-a', 'en-3', 'hsm-symbols', 'hsm-words'])
-    p.add_argument('--catalog', action='store_true', help='Build the six measured-size example presets')
+    p.add_argument('--design', choices=['de-a', 'en-3', 'hsm-symbols', 'hsm-words', 'hsm-words-pascal', 'ms-timer-tenth'])
+    p.add_argument('--catalog', action='store_true', help='Build the measured-size example presets')
     p.add_argument('--output', type=Path, required=True, help='A NEW directory; saved exports are never overwritten')
     p.add_argument('--size-mm', type=float, default=16)
     p.add_argument('--copies', type=int, default=2)
@@ -523,7 +523,7 @@ def main():
         return
     args.output.mkdir(parents=True, exist_ok=False)
     entries = []
-    presets = [(d, s, 2) for d in ('de-a', 'en-3') for s in (15, 16)] + [(d, 20, 3) for d in ('hsm-symbols', 'hsm-words')]
+    presets = [(d, s, 2) for d in ('de-a', 'en-3') for s in (15, 16)] + [(d, 20, 3) for d in ('hsm-symbols', 'hsm-words', 'hsm-words-pascal', 'ms-timer-tenth')]
     for design, size, copies in presets:
         identity = f'{design}-{size}mm-{copies}sets'
         directory = args.output/identity

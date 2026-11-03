@@ -1,4 +1,4 @@
-Cubistry hsm-words print and cut export
+Cubistry hsm-words-pascal print and cut export
 
 This example contains 3 complete cube sets, 72 stickers in total.
 Cut size: 20 x 20 mm; corner radius: 1 mm.
