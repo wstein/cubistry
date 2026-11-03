@@ -23,8 +23,8 @@ const optimizer = new CalendarOptimizer();
 const $ = (id) => document.getElementById(id),
   base = deploymentBasePath(import.meta.env.BASE_URL),
   cache = new Map();
-let viewer = null,
-  controller = null,
+let viewer = window.__calendarViewer ?? null,
+  controller = window.__calendarController ?? null,
   live = true,
   ready = false,
   failed = false,
@@ -203,6 +203,7 @@ async function configure() {
       changed,
       optimizer.plan,
     );
+    window.__calendarController = controller;
     ready = true;
     showControl();
     requested = id + "/" + date.iso;
@@ -235,7 +236,7 @@ $("calendar-application").addEventListener("change", () =>
   location.assign(new URL($("calendar-application").value, location.href)),
 );
 $("calendar-design").addEventListener("change", () => {
-  syncUrl();
+  $("calendar-design").disabled = true;
   void configure();
 });
 $("calendar-padding").addEventListener("change", () => void update());
@@ -246,7 +247,6 @@ function inspectDate() {
     $("calendar-error").textContent = "";
     date = chosen;
     live = false;
-    syncUrl();
     void update();
     controls();
   } catch (e) {
@@ -268,7 +268,6 @@ function stepDate(direction) {
     live = false;
     $("calendar-date").value = date.iso;
     $("calendar-error").textContent = "";
-    syncUrl();
     void update();
     controls();
   } catch (e) {
@@ -282,7 +281,6 @@ $("calendar-live").addEventListener("click", () => {
   live = true;
   date = localDate(Date.now());
   $("calendar-date").value = date.iso;
-  syncUrl();
   void update();
   controls();
 });
@@ -298,12 +296,24 @@ function tick() {
     void update();
   }
 }
-const presentation = installPresentation({
-  app: "calendar",
-  hide: ["main > header", "main > h1", "main > p.small", ".calendar-controls > :not(#calendar-digital):not(#calendar-zone)"],
-  resetView: () => viewer?.resetReferenceView(),
-});
+const presentation =
+  window.__calendarPresentation ??
+  (window.__calendarPresentation = installPresentation({
+    app: "calendar",
+    hide: [
+      "main > header",
+      "main > h1",
+      ".calendar-heading",
+      "main > p.small",
+      ".calendar-controls .hud-header",
+      ".calendar-controls .hud-body > :not(#calendar-digital):not(#calendar-zone)",
+      ".calendar-controls > :not(#calendar-digital):not(#calendar-zone):not(.hud-body):not(.hud-header)",
+    ],
+    resetView: () => viewer?.resetReferenceView(),
+  }));
 async function initialize() {
+  if (window.__calendarInitialized) return;
+  window.__calendarInitialized = true;
   try {
     await Promise.all(
       [600, 800].map((weight) =>
@@ -340,8 +350,10 @@ async function initialize() {
       }
     }
     viewer = new CalendarViewer($("calendar-viewer"));
+    window.__calendarViewer = viewer;
     $("calendar-date").value = date.iso;
     await configure();
+    window.__calendarController = controller;
     presentation.setReady(!failed);
     const presBtn = document.querySelector("#presentation-btn, .island-presentation-btn, .hud-presentation-btn");
     presBtn?.addEventListener("click", () => {
@@ -377,10 +389,10 @@ async function initialize() {
 void initialize();
 export const calendarApp = {
   get controller() {
-    return controller;
+    return window.__calendarController ?? controller;
   },
   get viewer() {
-    return viewer;
+    return window.__calendarViewer ?? viewer;
   },
 };
 

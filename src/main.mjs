@@ -683,7 +683,7 @@ function getActiveManifest(
   letterFont = $("tenth-letter-font")?.value || "same",
   currentApp = application,
 ) {
-  const isClassicDefault = currentApp === "certified" || currentApp === "timer" || currentApp === "five-second-timer";
+  const isClassicDefault = currentApp !== "tenth-counter";
   const hasExplicitFont = typeof location !== "undefined" && (new URLSearchParams(location.search).has("font") || new URLSearchParams(location.search).has("display"));
   const effectiveDisplay = (!hasExplicitFont && isClassicDefault && (!display || display === "dseg7"))
     ? "classic"
@@ -698,14 +698,21 @@ function getActiveManifest(
     const resolvedDigitImages = fontTenthWord
       ? digitImages.map((img) => (img.id === "T" ? fontTenthWord : img))
       : digitImages;
+    const candidateImages = [
+      ...resolvedDigitImages.filter((i) => /^[0-9]$/.test(i.id) || i.id === "blank" || i.id === "T"),
+      ...(currentApp === "hm-one-cube" ? hmImages : currentApp === "tenth-counter" ? [] : letterImages),
+    ];
+    const seenIds = new Set();
+    const uniqueImages = candidateImages.filter((img) => {
+      if (seenIds.has(img.id)) return false;
+      seenIds.add(img.id);
+      return true;
+    });
     return {
       ...proof.assets,
       fonts: [],
       documents: [],
-      images: [
-        ...resolvedDigitImages.filter((i) => /^[0-9]$/.test(i.id) || i.id === "blank" || i.id === "T"),
-        ...(currentApp === "hm-one-cube" ? hmImages : currentApp === "tenth-counter" ? [] : letterImages),
-      ],
+      images: uniqueImages,
     };
   }
 
@@ -1062,7 +1069,7 @@ function applyInitialUrlParams(app) {
       if (["dseg7", "dseg14", "noto-sans", "quicksand", "outfit", "classic"].includes(f)) {
         $("tenth-display").value = f;
       }
-    } else if (app === "certified" || app === "timer" || app === "five-second-timer") {
+    } else if (app !== "tenth-counter") {
       $("tenth-display").value = "classic";
     }
   }
@@ -1132,6 +1139,14 @@ async function switchApplication(requested) {
   if (externalMap[targetKey]) {
     location.assign(new URL(externalMap[targetKey], location.href));
     return;
+  }
+  if (application && application !== targetKey) {
+    try {
+      const u = new URL(location.href);
+      u.searchParams.delete("val");
+      u.searchParams.delete("value");
+      history.replaceState(null, "", u.pathname + u.search + u.hash);
+    } catch {}
   }
   if (application === "certified" && view) rememberedCounterValue = view.currentValue;
   const previous = view,
@@ -1272,6 +1287,7 @@ async function switchApplication(requested) {
     ready = true;
     error();
     onPhysicalState(view.currentValue, view.busy, undefined, view.progress);
+    document.dispatchEvent(new Event("change"));
     checkAutoPresentation();
     checkAutoRun(targetKey);
   } catch (e) {
@@ -1772,8 +1788,8 @@ controlsUi();
 void initialize();
 
 installPrintLink(() => {
-  if ($("application").value === "tenth-counter") return "ms-timer-tenth";
-  if ($("application").value !== "hsm-counter") return null;
+  if (application === "tenth-counter" || $("application").value?.includes("tenth-counter")) return "ms-timer-tenth";
+  if (application !== "hsm-counter" && !$("application").value?.includes("hsm-counter")) return null;
   const v = $("hsm-lettering").value;
   return v === "words-pascal"
     ? "hsm-words-pascal"
