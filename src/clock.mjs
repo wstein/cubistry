@@ -139,10 +139,11 @@ const presentation =
       ".clock-cubes",
       ".clock-stats",
       ".clock-stats-reset",
+      "#clock-nerd-details",
       ".clock-control .hud-header",
-      ".clock-control > h2",
-      ".clock-control > label",
-      ".clock-control > select",
+      ".clock-control h2",
+      ".clock-control label",
+      ".clock-control select",
       "main > p.small",
     ],
     resetView: () => stage?.resetCamera(),
@@ -335,6 +336,39 @@ async function initialize() {
     presentation.setReady(true);
     $("reset-clock-moves").disabled = false;
     $("clock-lettering").disabled = false;
+
+    // Nerd / Dev Mode timing controls inside the floating HUD
+    const nerdDetails = $("clock-nerd-details");
+    const nerdToggleBtn = $("clock-nerd-toggle-btn");
+    const urlParams = new URLSearchParams(location.search);
+    const hasNerdParam =
+      urlParams.has("nerd") ||
+      urlParams.has("dev") ||
+      urlParams.has("expert");
+    const hasSpeedParams = names.some((n) => urlParams.has(n + "-speed"));
+    const nerdStored = localStorage.getItem("cubistry_clock_nerd_mode");
+    const initialNerd = hasNerdParam || hasSpeedParams || nerdStored === "true";
+
+    const updateNerdState = (open) => {
+      if (nerdDetails) nerdDetails.open = open;
+      nerdToggleBtn?.classList.toggle("is-active", open);
+      try {
+        localStorage.setItem("cubistry_clock_nerd_mode", open ? "true" : "false");
+      } catch {}
+    };
+
+    updateNerdState(initialNerd);
+
+    nerdToggleBtn?.addEventListener("click", () => {
+      updateNerdState(!nerdDetails?.open);
+    });
+
+    nerdDetails?.addEventListener("toggle", () => {
+      nerdToggleBtn?.classList.toggle("is-active", nerdDetails.open);
+      try {
+        localStorage.setItem("cubistry_clock_nerd_mode", nerdDetails.open ? "true" : "false");
+      } catch {}
+    });
 
     // Spatial Floating HUD & Presentation Mode controls
     const hud = document.querySelector(".clock-control.floating-hud");
