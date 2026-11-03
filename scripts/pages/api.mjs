@@ -1,23 +1,52 @@
 import { REPOSITORY } from "./policy.mjs";
+// Transient failures of idempotent reads (GET) are retried: up to
+// RETRY_ATTEMPTS tries in total, waiting RETRY_DELAYS_MS[i] before retry i+1.
+// The added delay is 2 s + 6 s = 8 s, well below one minute. Only HTTP 502,
+// 503, 504 and network errors or timeouts (fetch throws) are transient; other
+// statuses fail at once. Writes (POST, PUT, PATCH, DELETE) are never retried
+// because a repeated request may apply twice after a lost response.
+const RETRY_ATTEMPTS = 3;
+const RETRY_DELAYS_MS = [2000, 6000];
+const TRANSIENT_STATUS = new Set([502, 503, 504]);
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export class GitHub {
-  constructor(token = process.env.GH_TOKEN) {
+  constructor(token = process.env.GH_TOKEN, { sleep = wait } = {}) {
     if (!token) throw Error("Missing GitHub token");
     this.token = token;
+    this.sleep = sleep;
   }
   async request(path, options = {}) {
-    const response = await fetch(
-      `https://api.github.com/repos/${REPOSITORY}/${path}`,
-      {
-        ...options,
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-          Accept: "application/vnd.github+json",
-          "X-GitHub-Api-Version": "2022-11-28",
-          ...options.headers,
-        },
-        signal: AbortSignal.timeout(30000),
+    const method = String(options.method ?? "GET").toUpperCase();
+    const attempts = method === "GET" ? RETRY_ATTEMPTS : 1;
+    for (let attempt = 1; ; attempt++) {
+      let response;
+      try {
+        response = await this.send(path, options);
+      } catch (error) {
+        if (attempt >= attempts) throw error;
+        await this.sleep(RETRY_DELAYS_MS[attempt - 1]);
+        continue;
+      }
+      if (TRANSIENT_STATUS.has(response.status) && attempt < attempts) {
+        await this.sleep(RETRY_DELAYS_MS[attempt - 1]);
+        continue;
+      }
+      return this.result(response, path);
+    }
+  }
+  send(path, options) {
+    return fetch(`https://api.github.com/repos/${REPOSITORY}/${path}`, {
+      ...options,
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        ...options.headers,
       },
-    );
+      signal: AbortSignal.timeout(30000),
+    });
+  }
+  async result(response, path) {
     if (response.status === 404) return null;
     if (!response.ok)
       throw Error(`GitHub API ${response.status}: ${path.split("?")[0]}`);
