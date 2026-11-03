@@ -1,7 +1,5 @@
-// Generate the 1/10-second cube print preset (ms-timer-tenth-20mm-3sets)
-// and assembly net SVG.
-//   node scripts/export-tenth-print.mjs          # generate and update catalog
-//   node scripts/export-tenth-print.mjs --check  # verify everything is current
+// Generate the assembly net SVG of the 1/10-second cube print preset (ms-timer-tenth-20mm-3sets).
+//   node scripts/export-tenth-print.mjs
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -393,83 +391,13 @@ No external font service or raster sticker image is required by these exports.
   };
 }
 
+// Only the assembly net is written here. print.pdf, artwork, cuts, manifest, bundle and the
+// catalog entry come from scripts/print-sticker-sheets.py (--design ms-timer-tenth), because
+// the independent verifier must see PDFs that were rendered from the same artwork.
 export function writeTenthPrintPreset() {
   const built = buildTenthPrint();
-  const dir = path(PRESET_DIR);
-  mkdirSync(dir, { recursive: true });
-
-  // Standard shared files
-  writeFileSync(dir + "ARTWORK-LICENSE.txt", readFileSync(path("LICENSE")));
-  writeFileSync(dir + "OFL.txt", readFileSync(path("public/fonts/OFL.txt")));
-  writeFileSync(dir + "assembly.pdf", readFileSync(path("public/print/hsm-words-pascal-20mm-3sets/assembly.pdf")));
-  writeFileSync(dir + "print.pdf", readFileSync(path("public/print/hsm-words-pascal-20mm-3sets/print.pdf")));
-  writeFileSync(dir + "README.txt", built.readmeText);
-  writeFileSync(dir + "WORD-ART-PROVENANCE.json", JSON.stringify(built.provenance, null, 2) + "\n");
-  writeFileSync(dir + "artwork-1.svg", built.artworkSvg);
-  writeFileSync(dir + "cuts-1.svg", built.cutsSvg);
-  writeFileSync(dir + "net.svg", built.netSvg);
-
-  // Create bundle.zip containing the export bundle
-  // (ARTWORK-LICENSE.txt, OFL.txt, README.txt, WORD-ART-PROVENANCE.json, artwork-1.svg, cuts-1.svg, assembly.pdf, print.pdf)
-  execFileSync("zip", [
-    "-q",
-    "-X",
-    "-9",
-    "bundle.zip",
-    "ARTWORK-LICENSE.txt",
-    "OFL.txt",
-    "README.txt",
-    "WORD-ART-PROVENANCE.json",
-    "artwork-1.svg",
-    "cuts-1.svg",
-    "assembly.pdf",
-    "print.pdf",
-  ], { cwd: dir });
-
-  // Compute hashes for manifest.json files map
-  const manifestFiles = [
-    "ARTWORK-LICENSE.txt",
-    "OFL.txt",
-    "README.txt",
-    "WORD-ART-PROVENANCE.json",
-    "artwork-1.svg",
-    "assembly.pdf",
-    "bundle.zip",
-    "cuts-1.svg",
-    "print.pdf",
-  ];
-  built.manifest.files = {};
-  for (const f of manifestFiles) {
-    built.manifest.files[f] = sha256(readFileSync(dir + f));
-  }
-  const manifestJson = JSON.stringify(built.manifest, null, 2) + "\n";
-  writeFileSync(dir + "manifest.json", manifestJson);
-
-  // Update catalog.json
-  const catalogPath = path("public/print/catalog.json");
-  const catalog = JSON.parse(readFileSync(catalogPath, "utf8"));
-  const entryId = "ms-timer-tenth-20mm-3sets";
-  const existingIdx = catalog.entries.findIndex((e) => e.id === entryId);
-
-  const entryFiles = { ...built.manifest.files, "manifest.json": sha256(Buffer.from(manifestJson, "utf8")) };
-  const entry = {
-    id: entryId,
-    design: "ms-timer-tenth",
-    sizeMm: SIZE_MM,
-    copies: COPIES,
-    stickerCount: 72,
-    pages: 1,
-    directory: "ms-timer-tenth-20mm-3sets/",
-    files: entryFiles,
-  };
-
-  if (existingIdx >= 0) {
-    catalog.entries[existingIdx] = entry;
-  } else {
-    catalog.entries.push(entry);
-  }
-  writeFileSync(catalogPath, JSON.stringify(catalog, null, 2) + "\n");
-  console.log("Successfully wrote tenth print preset and updated catalog.json");
+  writeFileSync(path(PRESET_DIR) + "net.svg", built.netSvg);
+  console.log("Successfully wrote tenth assembly net");
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

@@ -87,7 +87,8 @@ HSM presets and their catalog entries were regenerated for it, with
 presets are untouched. The glyph art is unchanged; only its assignment to sticker
 identities differs.
 
-Reproduce all six committed example presets at a new location:
+Reproduce all eight committed example presets (the `ms-timer-tenth` assembly net comes from
+`node scripts/export-tenth-print.mjs`) at a new location:
 
 ```sh
 .print-venv/bin/python scripts/print-sticker-sheets.py --catalog --output /tmp/print-catalog
