@@ -190,3 +190,6 @@ update();
 void initializeStorage();
 void editor.preset("coast").then(ok => { if (ok) report("image-status", "Coastal landscapes ready. Choose your own six images or another example set."); }).catch(error => report("image-status", error));
 export const picture3App = { editor, get controller() { return controller; }, get viewer() { return viewer; } };
+if (typeof window !== "undefined") {
+  (window as unknown as { __picture3App: typeof picture3App }).__picture3App = picture3App;
+}

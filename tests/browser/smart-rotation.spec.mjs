@@ -13,8 +13,8 @@ async function ready(page, path = "/picture3.html") {
 }
 async function snapshot(page, kind = "picture") {
   return page.evaluate(async kind => {
-    const view = kind === "picture" ? (await import("/src/apps/picture3/page.ts")).picture3App.viewer
-      : (await import("/src/clock.mjs")).clockStage;
+    const view = kind === "picture" ? (window.__picture3App?.viewer ?? (await import("/src/apps/picture3/page.ts")).picture3App.viewer)
+      : (window.__clockStage ?? (await import("/src/clock.mjs")).clockStage);
     const c = view.rotation.controller;
     return { phase: c.phase, speed: c.angularSpeed, deadline: c.returnDeadline, orientation: view.presentation.quaternion.toArray(),
       anchor: c.anchor.toArray(), distance: view.presentation.quaternion.angleTo(c.anchor), state: JSON.stringify(view.presentedState),
@@ -32,10 +32,16 @@ async function settleIdle(page, limit = 80) {
 }
 async function mode(page, value) {
   const panel = page.locator(".cube-appearance");
-  if (!(await panel.evaluate(e => e.open))) await panel.locator("summary").click();
+  await panel.evaluate(e => {
+    e.classList.remove("is-minimized");
+    if ("open" in e) e.open = true;
+  });
   await page.getByLabel("View rotation mode", { exact: true }).selectOption(value);
   // The open panel covers the canvas center where drag() grabs; a drag that lands on it is a blocked overlap.
-  await panel.evaluate(e => { e.open = false; });
+  await panel.evaluate(e => {
+    e.classList.add("is-minimized");
+    if ("open" in e) e.open = false;
+  });
 }
 test("a settled 34 degree drag from the default view (about 25 degrees from the exact front) is retained as the return target; a second drag beyond 40 degrees from the front waits and returns to it without puzzle/camera changes", async ({ page }) => {
   test.slow(); // Fake time still renders every frame in software GL.
@@ -75,8 +81,10 @@ test("real touch release coasts and the clock rotates one rigid assembly with a 
   await ready(page, "/clock.html"); const before = await snapshot(page, "clock"), box = await page.locator("#clock-scene canvas").boundingBox();
   const client = await page.context().newCDPSession(page), x = box.x + box.width / 2, y = box.y + box.height / 2;
   await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y, id: 0 }] }); await page.clock.runFor(100);
-  await client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: x + 100, y: y + 40, id: 0 }] });
-  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await Promise.all([
+    client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: x + 100, y: y + 40, id: 0 }] }),
+    client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }),
+  ]);
   expect((await snapshot(page, "clock")).phase).toBe("coasting"); await page.clock.runFor(100);
   const geometry = await page.evaluate(async () => {
     const { clockStage, clockUnits } = await import("/src/clock.mjs"); clockStage.scene.updateMatrixWorld(true);
@@ -94,7 +102,7 @@ test("upright defaults retain vertical up through drag/coast/return; Free mode l
  test.slow();
  await ready(page);const initial=await snapshot(page);
  await drag(page,100,80,100,0);
- const upright=async()=>page.evaluate(async()=>{const v=(await import('/src/apps/picture3/page.ts')).picture3App.viewer;
+ const upright=async()=>page.evaluate(async()=>{const v=(window.__picture3App?.viewer ?? (await import('/src/apps/picture3/page.ts')).picture3App.viewer);
   const q=v.presentation.quaternion,up=v.camera.up.clone().set(0,1,0).applyQuaternion(q);return [up.x,up.y];});
  for(let i=0;i<40;i++){const up=await upright();expect(Math.abs(up[0])).toBeLessThan(1e-7);expect(up[1]).toBeGreaterThan(.049);await page.clock.runFor(100);}
  await mode(page,'free');await drag(page,80,40);await drag(page,-30,70);const rolled=await snapshot(page);
@@ -104,6 +112,7 @@ test("upright defaults retain vertical up through drag/coast/return; Free mode l
  expect((await snapshot(page)).orientation).toEqual(beforeTap.orientation);await page.mouse.up();await page.clock.runFor(1050);
  const up=await upright();expect(Math.abs(up[0])).toBeLessThan(1e-7);expect(up[1]).toBeGreaterThan(.049);
  expect((await snapshot(page)).state).toBe(initial.state);expect((await snapshot(page)).camera).toEqual(initial.camera);
- await mode(page,'free');await drag(page,80,40);await drag(page,-30,70);await page.emulateMedia({reducedMotion:'reduce'});await mode(page,'classic');
+ await mode(page,'free');await drag(page,80,40);await drag(page,-30,70);await page.emulateMedia({reducedMotion:'reduce'});
+ await mode(page,'classic');
  expect((await snapshot(page)).phase).toBe('leveling');await page.clock.runFor(180);expect((await snapshot(page)).phase).toBe('idle');
 });
