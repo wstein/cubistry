@@ -11,12 +11,12 @@ link. Entry points are relative to the site root, for example
 
 | Application | What it shows | Entry point | Documentation |
 | --- | --- | --- | --- |
-| Live H-M-S Clock | Current local time on three 2x2 cubes (hours, minutes, seconds) | `clock.html` | [Live clock](LIVE_CLOCK.md) |
-| Counter 0-99 | A fixed-print 2x2 counter, 00 to 99 | `index.html` (default) | [Counter usage](COUNTER_USAGE.md), [cube-first controls](CUBE_FIRST_UI.md) |
-| H/M/S Counter 00-59 | One cube counting seconds, minutes or hours | `index.html`, chooser | [H/M/S counter](HSM_COUNTER.md) |
-| H/M One-Cube Counter | One cube counting hours or minutes on print m3-SH (candidate, needs a physical reprint) | `index.html`, chooser | [H/M One-Cube Counter](HM_ONE_CUBE_COUNTER.md) |
-| 60-Minute Timer | Countdown or stopwatch, 00:00-59:50 | `index.html`, chooser | [Workshop timer](WORKSHOP_TIMER.md) |
-| 5-Second Timer | Countdown or stopwatch, 00:00-39:55 | `index.html`, chooser | [Five-second timer](FIVE_SECOND_TIMER.md) |
+| Live H-M-S Clock | Current local time on three 2x2 cubes (hours, minutes, seconds) | `clock.html` (default) | [Live clock](LIVE_CLOCK.md) |
+| Counter 0-99 | A fixed-print 2x2 counter, 00 to 99 | `counter.html` | [Counter usage](COUNTER_USAGE.md), [cube-first controls](CUBE_FIRST_UI.md) |
+| H/M/S Counter 00-59 | One cube counting seconds, minutes or hours | `hsm-counter.html`, chooser | [H/M/S counter](HSM_COUNTER.md) |
+| H/M One-Cube Counter | One cube counting hours or minutes on print m3-SH (candidate, needs a physical reprint) | `hm-one-cube.html`, chooser | [H/M One-Cube Counter](HM_ONE_CUBE_COUNTER.md) |
+| 60-Minute Timer | Countdown or stopwatch, 00:00-59:50 | `timer.html`, chooser | [Workshop timer](WORKSHOP_TIMER.md) |
+| 5-Second Timer | Countdown or stopwatch, 00:00-39:55 | `five-second-timer.html`, chooser | [Five-second timer](FIVE_SECOND_TIMER.md) |
 | M/S Timer | Countdown or stopwatch on two cubes (minutes, seconds), 00:00-59:59 | `ms-timer.html`, chooser | [M/S Timer](MS_TIMER.md) |
 | Calendar | German and English calendar cubes (3x3) | `calendar.html` | [Calendar cubes](CALENDAR_CUBES.md) |
 | CI Quality Cube | Six-face workflow status prototype | `status.html` | [Status Cube](STATUS_CUBE.md) |
