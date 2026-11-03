@@ -48,6 +48,8 @@ typst = "0.15"
 "github:wstein/sheetmill" = "0.1"
 "github:wstein/sourcesteward" = "0.1"
 zk = "0.15"
+claude = "latest"
+codex = "latest"
 
 
 [env]
