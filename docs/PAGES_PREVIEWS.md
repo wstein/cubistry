@@ -77,7 +77,8 @@ Pages settings migration, force push or protected research change.
   and the short SHA. The title is untrusted free text: it is passed to
   `extract.py` as one argv element (never through a shell), reduced to a single
   line without control characters, capped at 80 characters with an ellipsis and
-  HTML-escaped; an empty title is omitted. A title edit only appears after the
+  HTML-escaped and wrapped in `<bdi>` so right-to-left text cannot reorder
+  the rest of the banner; an empty title is omitted. A title edit only appears after the
   next build, because `pages.yml` does not trigger on `edited`.
 - Same-repository previews share the site's origin and can execute client-side
   JS in visitors' browsers. This is not a hostile-code sandbox; only authorized
