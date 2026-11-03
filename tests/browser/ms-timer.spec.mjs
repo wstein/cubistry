@@ -17,7 +17,7 @@ const idle = (page) =>
   });
 
 async function open(page) {
-  await page.goto("/?application=ms-timer");
+  await page.goto("/counter.html?application=ms-timer");
   await expect(page).toHaveURL(/ms-timer\.html$/, { timeout: scaled(30000) });
   await expect(page.locator("#timer-start")).toBeEnabled({
     timeout: scaled(60000),
@@ -33,7 +33,7 @@ async function open(page) {
 test("the chooser offers the M/S Timer and the page shows three cubes: minutes, seconds, and 1/10 second", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   await expect(
     page.locator("#application option", { hasText: "M/S Timer" }),
@@ -177,7 +177,7 @@ test("invalid Set input is rejected and the timer keeps its duration", async ({
 test("the other applications keep their entries and still open", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   for (const text of [
     "Picture Puzzle Playground",

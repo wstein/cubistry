@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { expectedCertifiedHtm as total } from "../helpers/certified-counts.mjs";
 async function ready(page) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.locator("#format").uncheck();
   await expect(page.locator("#application")).toBeEnabled();

@@ -55,7 +55,7 @@ test("HSM word lettering opens the corresponding whole-cube sheet, including all
     "href",
     /hsm-words-20mm-3sets\/print\.pdf$/,
   );
-  await page.goto("/?application=hsm-counter&lettering=words");
+  await page.goto("/counter.html?application=hsm-counter&lettering=words");
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
   await page.locator("#print-stickers").click();
   await expect(page.locator("#print-design")).toHaveValue("hsm-words");

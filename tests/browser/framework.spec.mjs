@@ -5,7 +5,7 @@ const design = JSON.parse(
   readFileSync(new URL("../../public/counter-design.v2.json", import.meta.url)),
 );
 async function ready(page) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 }
@@ -20,7 +20,7 @@ for (const [field, value] of [
     await page.route("**/counter-design.v2.json", (r) =>
       r.fulfill({ json: bad }),
     );
-    await page.goto("/");
+    await page.goto("/counter.html");
     await expect(page.locator("#error")).toContainText(
       "Unsupported counter design",
     );
@@ -256,9 +256,15 @@ test("SVG paint escapes cannot hide external references", async ({ page }) => {
 test("missing secure Web Crypto gives an actionable startup and asset diagnostic", async ({page}) => {
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.addInitScript(()=>Object.defineProperty(globalThis.crypto,'subtle',{value:undefined,configurable:true}));
-  await page.goto('/');await expect(page.locator('#error')).toContainText('Secure Web Crypto is unavailable');await expect(page.locator('#error')).toContainText('http://localhost:');await expect(page.locator('#error')).toContainText('HTTPS');await expect(page.locator('#cube')).not.toHaveAttribute('data-value','15');
+  await page.goto('/counter.html');await expect(page.locator('#error')).toContainText('Secure Web Crypto is unavailable');await expect(page.locator('#error')).toContainText('http://localhost:');await expect(page.locator('#error')).toContainText('HTTPS');await expect(page.locator('#cube')).not.toHaveAttribute('data-value','15');
   const diagnostic=await page.evaluate(async()=>{const {loadAssets}=await import('/packages/cube-assets/src/index.ts');const wire=await(await fetch('/counter-design.v2.json')).json();try{await loadAssets(wire.assets,[]);return 'accepted without integrity';}catch(error){return error.message;}});
   expect(diagnostic).toContain('Secure Web Crypto is unavailable');expect(diagnostic).toContain('localhost');expect(diagnostic).toContain('HTTPS');expect(errors).toEqual([]);
+});
+
+test("root URL redirects to clock.html", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/clock\.html$/);
+  await expect(page.locator("#clock-scene canvas")).toBeVisible();
 });
 
 test("destroying a shared cube preserves the caller-owned canvas and other cube", async ({

@@ -3,7 +3,7 @@ import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { PNG } from "pngjs";
 import { frontStickerPoint } from "../helpers/front-projection.mjs";
 async function ready(page) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
@@ -256,7 +256,7 @@ test("unchecked saved formatting cannot select a legacy fallback when the optimi
   await page.route("**/counter-certified.v1.json", (route) =>
     route.fulfill({ status: 404, body: "missing optimized route" }),
   );
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#error")).toContainText(
     "Certified route could not be loaded",
   );
