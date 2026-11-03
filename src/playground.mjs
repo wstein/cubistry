@@ -98,7 +98,7 @@ $("design").addEventListener("change", () =>
 $("new-session").addEventListener("click", () =>
   controller?.newSession(sessions.get(controller.snapshot.style)),
 );
-$("camera").addEventListener("click", () => viewer?.resetCamera());
+$("camera")?.addEventListener("click", () => viewer?.resetCamera());
 $("speed").addEventListener("input", speed);
 window.addEventListener("keydown", (e) => {
   if (!controller) return;
