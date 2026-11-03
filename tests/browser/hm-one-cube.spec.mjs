@@ -16,7 +16,7 @@ async function settled(page, value) {
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 }
 async function choose(page) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
@@ -236,7 +236,7 @@ for (const [name, respond] of [
   test(`a failed H/M load (${name}) keeps the H/M/S selection`, async ({
     page,
   }) => {
-    await page.goto("/?lettering=words");
+    await page.goto("/counter.html?lettering=words");
     await expect(page.locator("#application")).toBeEnabled();
     await page.selectOption("#application", "hsm-counter");
     await expect(page.locator("#cube")).toHaveAttribute(
@@ -290,7 +290,7 @@ test("Unit labels read H and M in the H/M one-cube counter even with word letter
     page.locator("#hsm-letter option").evaluateAll((o) =>
       o.map((e) => e.textContent),
     );
-  await page.goto("/?lettering=words");
+  await page.goto("/counter.html?lettering=words");
   await expect(page.locator("#application")).toBeEnabled();
   await page.selectOption("#application", "hsm-counter");
   await expect(page.locator("#cube")).toHaveAttribute(
@@ -320,7 +320,7 @@ test("Unit labels follow a lettering change made after load, across H/M and back
     page.locator("#hsm-letter option").evaluateAll((o) =>
       o.map((e) => e.textContent),
     );
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   await page.selectOption("#application", "hsm-counter");
   await expect(page.locator("#cube")).toHaveAttribute(

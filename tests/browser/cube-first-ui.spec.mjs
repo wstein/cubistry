@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 async function ready(page) {
   await page.clock.install();
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await pauseSoon(page);
 }
@@ -181,7 +181,7 @@ test("real seven-stop speed can change during playback without changing legal mo
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await target(page, 4);
   await page.locator("#set").click();
@@ -204,7 +204,7 @@ test("real seven-stop speed can change during playback without changing legal mo
 test("front-dominant default camera still orbits and zooms without altering cube state", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   const canvas = page.locator("#cube canvas");
   const before = await canvas.screenshot();
@@ -355,7 +355,7 @@ for (const saved of [
         localStorage.setItem("cubistry-counter-v2", JSON.stringify(saved)),
       saved,
     );
-    await page.goto("/");
+    await page.goto("/counter.html");
     await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
     await expect(page.locator("#rotation-speed")).toHaveValue(
       saved.moveDuration === 250 || saved.speed === 0.3 ? "3" : "4",

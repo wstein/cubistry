@@ -7,7 +7,7 @@ import { execFileSync } from "node:child_process";
 import { PNG } from "pngjs";
 import { frontStickerPoint } from "../helpers/front-projection.mjs";
 async function chooseTimer(page) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
@@ -276,7 +276,7 @@ test("real animation budgets measure committed five-move edges at default250ms, 
 test("application switches apply Timer250 and Counter100 defaults while preserving Counter state", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   await page.locator("#rotation-speed").fill("5");
   await page.fill("#value", "42");
@@ -332,7 +332,7 @@ test("tab-resume catch-up reads the monotonic deadline, ignores wall-clock jumps
 test("a rejected Timer certificate leaves the existing Counter and its physical state usable", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   await page.fill("#value", "42");
   await page.click("#set");
@@ -351,7 +351,7 @@ test("a rejected Timer certificate leaves the existing Counter and its physical 
 test("Counter's presentation-only blank tens never masks any Timer zero and survives application return", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   await page.locator("#format").uncheck();
   await page.selectOption("#application", "timer");

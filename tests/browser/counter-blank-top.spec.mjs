@@ -39,7 +39,7 @@ function rendered(image, centerX, centerY = -0.5) {
 }
 const token = (p) => p.move.face + (p.move.turns === 2 ? "2" : p.move.turns === -1 ? "'" : "");
 async function chooseBlankTop(page) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await expect(page.locator("#counter-print")).toHaveValue("titled");
   await page.evaluate(async () => {
@@ -123,7 +123,7 @@ for (const [mode, lap] of [
 
 test("Wrap defaults on and the checkbox names the physical mode on the blank-top print only", async ({ page }) => {
   const label = page.locator("#format-label");
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await expect(page.locator("#wrap")).not.toBeChecked();
   await expect(label).toHaveText("Leading Zero");

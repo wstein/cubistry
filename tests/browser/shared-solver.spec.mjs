@@ -6,7 +6,7 @@ import { execFileSync } from "node:child_process";
 test("isolated legacy consumer commits the shared 42→43 direct path and independent replay retains every physical frame", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   // The legacy library contract remains testable through an isolated consumer;
   // the normal Counter checkbox no longer selects this physical print.
@@ -87,7 +87,7 @@ test("a missing shared table fails setup without enabling moves or a witness fal
       ? route.fulfill({ status: 404, body: "missing table" })
       : route.continue(),
   );
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#error")).toContainText(
     "Shared solver table could not be loaded",
   );

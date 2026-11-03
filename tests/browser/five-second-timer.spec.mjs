@@ -5,7 +5,7 @@ import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 async function choose(page, leadingZero = true) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   if (!leadingZero) await page.locator("#format").uncheck();
   await page.evaluate(async () => {
@@ -280,7 +280,7 @@ test("Stopwatch floors five-second fractions and terminates exactly39:55 at100x;
 test("damaged five-second certificate leaves current Counter usable", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   await page.route("**/five-second-timer.v1.json", (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: "{}" }),

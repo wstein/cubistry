@@ -68,12 +68,12 @@ test("built Pages counter resolves immutable assets under project base and rende
   page.on("response", (r) => {
     if (r.status() >= 400) failures.push(r.url());
   });
-  await page.goto("./");
+  await page.goto("./counter.html");
   await expect(
     page.getByRole("heading", { name: "Counter", exact: true }),
   ).toBeVisible();
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  await expect(page.locator("#application")).toHaveValue(/^(certified|index\.html)$/);
+  await expect(page.locator("#application")).toHaveValue(/^(certified|counter\.html)$/);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
   for (const value of [42, 43, 7, 99]) {
     await page.locator("#value").fill(String(value));
@@ -168,9 +168,9 @@ test("built project-path optimized print loads its pinned certificate and execut
   page.on("response", (r) => {
     if (r.status() >= 400) failures.push(r.url());
   });
-  await page.goto("./");
+  await page.goto("./counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  await expect(page.locator("#application")).toHaveValue(/^(certified|index\.html)$/);
+  await expect(page.locator("#application")).toHaveValue(/^(certified|counter\.html)$/);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
   await page.locator('[data-delta="1"]').click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
@@ -199,7 +199,7 @@ test("built Pages Workshop Timer loads its immutable certificate below the proje
   page.on("response", (r) => {
     if (r.status() >= 400) failures.push(r.url());
   });
-  await page.goto("./");
+  await page.goto("./counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   await page.selectOption("#application", "timer.html");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "15:00");
@@ -223,4 +223,10 @@ test("built Pages Workshop Timer loads its immutable certificate below the proje
   expect(requests.filter((p) => !p.startsWith("/cubistry/"))).toEqual([]);
   expect(failures).toEqual([]);
   expect(errors).toEqual([]);
+});
+
+test("built Pages root redirects to live clock", async ({ page }) => {
+  await page.goto("./");
+  await expect(page).toHaveURL(/clock\.html$/);
+  await expect(page.locator("#clock-scene canvas")).toBeVisible();
 });

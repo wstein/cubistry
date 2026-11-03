@@ -45,7 +45,7 @@ function renderedDigit(image, centerX) {
 }
 
 async function chooseCertified(page) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");

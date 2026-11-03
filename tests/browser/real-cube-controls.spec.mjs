@@ -5,7 +5,7 @@ const cases = JSON.parse(
   readFileSync(new URL("../fixtures/arbitrary-jumps.json", import.meta.url)),
 );
 async function ready(page) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 }

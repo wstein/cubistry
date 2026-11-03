@@ -39,7 +39,7 @@ async function bounds(page, letter) {
 test("word print replaces large unit symbols and keeps the counter value", async ({
   page,
 }) => {
-  await page.goto("/?application=hsm-counter");
+  await page.goto("/counter.html?application=hsm-counter");
   await expect(page.locator("#cube")).toHaveAttribute(
     "data-application",
     "hsm-counter",
@@ -153,7 +153,7 @@ test("the shared live clock offers bottom-only words and retains preferred speed
 test("an invalid word asset leaves the existing fixed print and value usable", async ({
   page,
 }) => {
-  await page.goto("/?application=hsm-counter");
+  await page.goto("/counter.html?application=hsm-counter");
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
   await page.fill("#hsm-value", "33");
   await page.locator("#hsm-set-form button").click();
@@ -173,7 +173,7 @@ test("an invalid word asset leaves the existing fixed print and value usable", a
 test("the Unit select reads hour, min, sec on load when the URL asks for words", async ({
   page,
 }) => {
-  await page.goto("/?application=hsm-counter&lettering=words");
+  await page.goto("/counter.html?application=hsm-counter&lettering=words");
   await expect(page.locator("#hsm-lettering")).toHaveValue("words");
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
   await expect(page.locator("#hsm-letter option")).toHaveText(["hour", "min", "sec"]);
