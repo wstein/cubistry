@@ -110,8 +110,8 @@ preview therefore leaves `pr-preview/pr-N/.nojekyll` behind. Inventory and
 cleanup comments count a `pr-preview/pr-N/` directory only when it holds
 something other than `.nojekyll`; otherwise every reconcile run would plan a
 useless remove job for each closed PR. `extract.py` extracts dot-prefixed paths
-never, and rejects a `CNAME` at any depth in preview artifacts (production is
-unchanged), so no other protected name can pin a preview. The stage step turns
+never, and rejects any path component named `CNAME` (file or directory, rsync
+protects both) in preview artifacts (production is unchanged), so no other protected name can pin a preview. The stage step turns
 control characters in the PR title (including NUL) into spaces before calling
 `extract.py`, so such a title cannot block a deployment.
 Failures can retain a previously verified preview; its old SHA/banner and the
