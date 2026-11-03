@@ -59,8 +59,8 @@
   },
   "generator": {
     "path": "scripts/print-sticker-sheets.py",
-    "sha256": "c318c0a5b51ab5d013e827ef92e3949492aa508e19f9a3120acc381f88708efd",
-    "artInputAdapter": "5e43a14f9648ff45896196b388257954b3f134fedb631e3ff564657ba2f2912a",
+    "sha256": "bc209cbb3515e82d53c246498f1dd5a32cbc3d7ec699c81144e75861f55493f7",
+    "artInputAdapter": "0d104d066b81b45c33374b268c3624f951f477eefa6122ad5e49705c1f876172",
     "tools": {
       "reportlab": "4.4.9",
       "fonttools": "4.61.1",
