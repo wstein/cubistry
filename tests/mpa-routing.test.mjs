@@ -30,7 +30,7 @@ test("dedicated MPA pages exist and contain valid markup", () => {
 
 test("all navigation selects use clean HTML URLs for single-cube applications", () => {
   const htmlFiles = [
-    "index.html",
+    "counter.html",
     "clock.html",
     "ms-timer.html",
     "chronocube.html",
@@ -43,6 +43,7 @@ test("all navigation selects use clean HTML URLs for single-cube applications", 
 
   for (const file of htmlFiles) {
     const content = fs.readFileSync(path.join(root, file), "utf-8");
+    assert.match(content, /<option value="counter\.html"(?: selected)?>Counter 0–99<\/option>/, `${file} links to counter.html`);
     assert.match(content, /<option value="timer\.html">60-Minute Timer<\/option>/, `${file} links to timer.html`);
     assert.match(content, /<option value="five-second-timer\.html">5-Second Timer<\/option>/, `${file} links to five-second-timer.html`);
     assert.match(content, /<option value="tenth-counter\.html">1\/10-Second Counter 0–9<\/option>/, `${file} links to tenth-counter.html`);
@@ -51,4 +52,11 @@ test("all navigation selects use clean HTML URLs for single-cube applications", 
     assert.match(content, /<option value="hm-one-cube\.html">H\/M One-Cube Counter<\/option>/, `${file} links to hm-one-cube.html`);
     assert.match(content, /href="https:\/\/github\.com\/wstein\/cubistry\/"/, `${file} links to cubistry repo`);
   }
+});
+
+test("root index.html redirects to clock.html", () => {
+  const content = fs.readFileSync(path.join(root, "index.html"), "utf-8");
+  assert.match(content, /http-equiv="refresh" content="0; url=clock\.html"/);
+  assert.match(content, /location\.replace/);
+  assert.match(content, /clock\.html/);
 });

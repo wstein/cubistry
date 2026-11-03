@@ -31,7 +31,7 @@ test("the Leading Zero label names the physical mode on the blank-top print", ()
 });
 
 test("the static page starts with the titled label and Wrap unchecked", () => {
-  const html = readFileSync("index.html", "utf8");
+  const html = readFileSync("counter.html", "utf8");
   assert.match(html, /<input id="wrap" type="checkbox" \/>/);
   assert.match(html, /<span id="format-label">Leading Zero<\/span>/);
 });
