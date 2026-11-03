@@ -37,7 +37,26 @@
   padding: 0;
 }
 .clock-cubes {
-  display: none !important;
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+}
+.clock-cubes select,
+.clock-cubes button {
+  pointer-events: auto;
+}
+.clock-card div[data-unit] {
+  height: 0;
+  min-height: 0;
+  visibility: hidden;
 }
 .live-clock-page > p.small,
 .clock-workspace ~ p.small {
