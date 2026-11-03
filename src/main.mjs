@@ -678,13 +678,18 @@ $("tenth-direction").addEventListener("change", () => {
   }
 });
 function getActiveManifest(
-  display = $("tenth-display")?.value || "dseg7",
+  display = $("tenth-display")?.value,
   marker = $("tenth-marker")?.value || "off",
   letterFont = $("tenth-letter-font")?.value || "same",
   currentApp = application,
 ) {
-  const digitImages = tenthAssetImages(display, marker, proof.assets.images);
-  const family = resolveLetterFamily(letterFont, display);
+  const isClassicDefault = currentApp === "certified" || currentApp === "timer" || currentApp === "five-second-timer";
+  const hasExplicitFont = typeof location !== "undefined" && (new URLSearchParams(location.search).has("font") || new URLSearchParams(location.search).has("display"));
+  const effectiveDisplay = (!hasExplicitFont && isClassicDefault && (!display || display === "dseg7"))
+    ? "classic"
+    : (display || (isClassicDefault ? "classic" : "dseg7"));
+  const digitImages = tenthAssetImages(effectiveDisplay, marker, proof.assets.images);
+  const family = resolveLetterFamily(letterFont, effectiveDisplay);
   const lettering = parseLettering($("hsm-lettering")?.value ?? "symbols");
   const letterImages = hsmImagesForFamily(lettering, family);
 
@@ -1051,10 +1056,14 @@ function applyInitialUrlParams(app) {
   }
 
   const fontParam = params.get("font") || params.get("display");
-  if (fontParam && $("tenth-display")) {
-    const f = fontParam.toLowerCase();
-    if (["dseg7", "dseg14", "noto-sans", "quicksand", "outfit", "classic"].includes(f)) {
-      $("tenth-display").value = f;
+  if ($("tenth-display")) {
+    if (fontParam) {
+      const f = fontParam.toLowerCase();
+      if (["dseg7", "dseg14", "noto-sans", "quicksand", "outfit", "classic"].includes(f)) {
+        $("tenth-display").value = f;
+      }
+    } else if (app === "certified" || app === "timer" || app === "five-second-timer") {
+      $("tenth-display").value = "classic";
     }
   }
 
