@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="icon" type="image/svg+xml" href="/cubistry/favicon.svg" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f3eb" />
+    <title>Cubistry · Licenses & Open Source Compliance</title>
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/style-BZ8bjh1g.css">
+  </head>
+  <body class="licenses-page">
+    <header class="floating-island">
+      <a class="brand" href="./" aria-label="Cubistry home">
+        <span class="brand-mark">▦</span><span class="brand-text"> CUBISTRY</span>
+      </a>
+      <div class="application-choice">
+        <select id="licenses-navigation" aria-label="Go to application" onchange="if(this.value) location.assign(this.value)">
+          <option value="" disabled selected>Navigation · Switch application…</option>
+          <optgroup label="Integrated Studio (2×2)">
+            <option value="chronocube.html">Chronocube Studio (Integrated 2×2)</option>
+          </optgroup>
+          <optgroup label="Multi-Cube Clocks & Timers (2×2)">
+            <option value="clock.html">Live H–M–S Clock</option>
+            <option value="ms-timer.html">M/S Timer</option>
+          </optgroup>
+          <optgroup label="Single-Cube Applications (2×2)">
+            <option value="index.html">Counter 0–99</option>
+            <option value="timer.html">60-Minute Timer</option>
+            <option value="five-second-timer.html">5-Second Timer</option>
+            <option value="tenth-counter.html">1/10-Second Counter 0–9</option>
+            <option value="hsm-counter.html">H/M/S Counter 00–59</option>
+            <option value="ms-counter.html">M/S Counter 00–59</option>
+            <option value="hm-one-cube.html">H/M One-Cube Counter</option>
+          </optgroup>
+          <optgroup label="Calendar & Puzzles (3×3)">
+            <option value="calendar.html">Calendar · Deutsch / English</option>
+            <option value="playground.html">Picture Puzzle Playground</option>
+            <option value="picture3.html">3×3 Super Picture Cube</option>
+            <option value="status.html">CI Quality Cube · Workflow monitor</option>
+          </optgroup>
+        </select>
+      </div>
+      <a class="print-stickers-link" href="https://github.com/wstein/cubistry/" target="_blank" rel="noopener">GitHub ↗</a>
+    </header>
+
+    <main class="licenses-container">
+      <div class="licenses-header">
+        <h1>Licenses & Compliance Notices</h1>
+        <p>Complete third-party attribution, software inventory (SBOM), and open-source statutory obligations for Cubistry.</p>
+      </div>
+
+      <div class="compliance-notice-card" role="region" aria-label="Open source compliance overview">
+        <h2>⚖️ Open Source & Third-Party Compliance Obligations</h2>
+        <p>
+          Cubistry is committed to transparent, legally compliant open-source distribution. In web applications running in modern browsers, bundled JavaScript, WebAssembly, fonts, and graphics are delivered directly to the client device, triggering statutory compliance obligations under German, European, and international copyright laws (<em>Lizenz- und Compliance-Pflichten</em>).
+        </p>
+        <p>
+          These legal duties include the retention of author attribution notices, direct delivery of complete license terms, and honoring copyleft obligations (including AGPL-3.0 §13 network user source code availability). Specialized compliance advisory firms (such as <strong>Nucleus Partners</strong> and corporate FOSS compliance specialists) guide enterprises in verifying that open-source usage strictly meets all statutory and contractual requirements, establishing auditable Software Bills of Materials (SBOM), and avoiding license incompatibilities.
+        </p>
+        <p>
+          Every build of Cubistry deterministically extracts and packages all bundled license notices and provenance hashes into the distribution archive under <code>/licenses/</code>.
+        </p>
+      </div>
+
+      <section class="licenses-section">
+        <h2>Primary Project License</h2>
+        <div class="license-grid">
+          <article class="license-card">
+            <div>
+              <div class="license-card-header">
+                <h3 class="license-card-title">Cubistry</h3>
+                <span class="license-badge agpl">AGPL-3.0</span>
+              </div>
+              <p class="license-card-desc">
+                Browser-first twisty-puzzle platform and Chronocube reference application.
+                Copyright &copy; 2026 Werner Stein and Cubistry contributors.
+              </p>
+            </div>
+            <div class="license-card-links">
+              <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">License text ↗</a>
+              <a href="https://github.com/wstein/cubistry/" target="_blank" rel="noopener">Source code ↗</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="licenses-section">
+        <h2>Runtime Third-Party Components</h2>
+        <div class="license-grid">
+          <article class="license-card">
+            <div>
+              <div class="license-card-header">
+                <h3 class="license-card-title">Three.js</h3>
+                <span class="license-badge mit">MIT</span>
+              </div>
+              <p class="license-card-desc">
+                3D WebGL renderer and scene graph.
+                Copyright &copy; 2010&ndash;2026 Three.js authors (Ricardo Cabello).
+              </p>
+            </div>
+            <div class="license-card-links">
+              <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener">MIT License ↗</a>
+              <a href="https://github.com/mrdoob/three.js" target="_blank" rel="noopener">Upstream repo ↗</a>
+            </div>
+          </article>
+
+          <article class="license-card">
+            <div>
+              <div class="license-card-header">
+                <h3 class="license-card-title">Cubing.js & Twips (WASM)</h3>
+                <span class="license-badge mpl">MPL-2.0 / GPL</span>
+              </div>
+              <p class="license-card-desc">
+                Puzzle solver mechanics and WebAssembly solver engine (101 bundled Rust crates, csTimer solver, Comlink).
+                Copyright &copy; Lucas Garron and Cubing.js contributors.
+              </p>
+            </div>
+            <div class="license-card-links">
+              <a href="licenses/cubing/LICENSE-MPL.md" target="_blank">MPL-2.0 notice</a>
+              <a href="licenses/cubing/csTimer-LICENSE" target="_blank">csTimer GPL</a>
+              <a href="licenses/cubing/twips-crate-notices.json" target="_blank">WASM Crates (JSON)</a>
+            </div>
+          </article>
+
+          <article class="license-card">
+            <div>
+              <div class="license-card-header">
+                <h3 class="license-card-title">PuzlWerk Solvers</h3>
+                <span class="license-badge agpl">AGPL-3.0 / MIT</span>
+              </div>
+              <p class="license-card-desc">
+                2&times;2 counter/timer and 3&times;3 calendar/picture puzzle route planning solvers.
+                Copyright &copy; 2026 Werner Stein and PuzlWerk contributors.
+              </p>
+            </div>
+            <div class="license-card-links">
+              <a href="licenses/puzlwerk/LICENSE" target="_blank">Solver license</a>
+              <a href="licenses/puzlwerk/NOTICE" target="_blank">Attribution notice</a>
+            </div>
+          </article>
+
+          <article class="license-card">
+            <div>
+              <div class="license-card-header">
+                <h3 class="license-card-title">ReScript Runtime</h3>
+                <span class="license-badge mit">MIT</span>
+              </div>
+              <p class="license-card-desc">
+                High-performance functional programming runtime for state and solver logic.
+                Copyright &copy; 2020 ReScript Association &middot; Bloomberg Finance L.P.
+              </p>
+            </div>
+            <div class="license-card-links">
+              <a href="https://rescript-lang.org/" target="_blank" rel="noopener">ReScript project ↗</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="licenses-section">
+        <h2>Typography & Fonts</h2>
+        <div class="license-grid">
+          <article class="license-card">
+            <div>
+              <div class="license-card-header">
+                <h3 class="license-card-title">Noto Sans</h3>
+                <span class="license-badge ofl">SIL OFL 1.1</span>
+              </div>
+              <p class="license-card-desc">
+                Primary UI typography across cube face lettering and readouts.
+                Copyright &copy; 2012 Google Inc.
+              </p>
+            </div>
+            <div class="license-card-links">
+              <a href="https://openfontlicense.org/" target="_blank" rel="noopener">SIL OFL 1.1 ↗</a>
+            </div>
+          </article>
+
+          <article class="license-card">
+            <div>
+              <div class="license-card-header">
+                <h3 class="license-card-title">DSEG 7-Segment Font</h3>
+                <span class="license-badge ofl">SIL OFL 1.1</span>
+              </div>
+              <p class="license-card-desc">
+                Classic 7-segment digital LCD clock face display typography.
+                Copyright &copy; 2017&ndash;2020 Keshikan.
+              </p>
+            </div>
+            <div class="license-card-links">
+              <a href="https://www.keshikan.net/fonts-e.html" target="_blank" rel="noopener">Keshikan fonts ↗</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="licenses-section">
+        <h2>Complete Corresponding Source & Verification</h2>
+        <p style="margin-bottom: 12px; font-size: 0.95rem; line-height: 1.6;">
+          To verify provenance hashes or reproduce the build and notice archives independently:
+        </p>
+        <pre class="license-source-box">git clone https://github.com/wstein/cubistry.git
+cd cubistry
+npm ci
+npm run build
+node --test tests/runtime-notices.test.mjs</pre>
+      </section>
+    </main>
+
+    <footer class="floating-glass-pill" role="contentinfo">
+      <span class="pill-brand bottom-brand"><span class="brand-mark">▦</span> CUBISTRY</span>
+      <span class="pill-brand-sep bottom-brand-sep">&middot;</span>
+      <span>&copy; 2026 Werner Stein</span>
+      <span>&middot;</span>
+      <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL-3.0</a>
+      <span>&middot;</span>
+      <a href="licenses.html" aria-current="page">Licenses</a>
+      <span>&middot;</span>
+      <a href="https://github.com/wstein/cubistry/" target="_blank" rel="noopener">GitHub ↗</a>
+    </footer>
+  </body>
+</html>
+

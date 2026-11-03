@@ -5,19 +5,51 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/cubistry/favicon.svg" />
     <title>3×3 Super Picture Cube · Cubistry</title>
-    <script type="module" crossorigin src="/cubistry/assets/picture3-CmJLJtc1.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/picture3-d-MQYp3A.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/three-BW9MzyAf.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-rotation-Bp0l0InI.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-DsEYcoX5.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/model-vOJkb31m.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/viewer-bO9pRa0l.js">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/model-CTOgjrkI.css">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-rotation-p-13F4z1.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-C1wZ9l11.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/model-Cvpbv_ge.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/viewer-Bx4hO8nI.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/model-DILZ7_UK.css">
     <link rel="stylesheet" crossorigin href="/cubistry/assets/picture3-Dhl04JN_.css">
   </head>
   <body>
     <main>
-      <header><a class="brand" href="./">CUBISTRY <span>/ SUPER PICTURE</span></a><a href="./playground.html">2×2 Playground ↗</a></header>
+      <header class="floating-island">
+        <a class="brand" href="./" aria-label="Cubistry home"
+          ><span class="brand-mark">▦</span><span class="brand-text"> CUBISTRY</span></a
+        >
+        <div class="application-choice">
+          <select id="picture3-application" aria-label="Cube application" onchange="if(this.value) location.href=this.value">
+            <optgroup label="Integrated Studio (2×2)">
+              <option value="chronocube.html">Chronocube Studio (Integrated 2×2)</option>
+            </optgroup>
+            <optgroup label="Multi-Cube Clocks & Timers (2×2)">
+              <option value="clock.html">Live H–M–S Clock</option>
+              <option value="ms-timer.html">M/S Timer</option>
+            </optgroup>
+            <optgroup label="Single-Cube Applications (2×2)">
+              <option value="index.html">Counter 0–99</option>
+              <option value="timer.html">60-Minute Timer</option>
+              <option value="five-second-timer.html">5-Second Timer</option>
+              <option value="tenth-counter.html">1/10-Second Counter 0–9</option>
+              <option value="hsm-counter.html">H/M/S Counter 00–59</option>
+              <option value="ms-counter.html">M/S Counter 00–59</option>
+              <option value="hm-one-cube.html">H/M One-Cube Counter</option>
+            </optgroup>
+            <optgroup label="Calendar & Puzzles (3×3)">
+              <option value="calendar.html">Calendar · Deutsch / English</option>
+              <option value="playground.html">Picture Puzzle Playground</option>
+              <option value="picture3.html" selected>3×3 Super Picture Cube</option>
+              <option value="status.html">CI Quality Cube · Workflow monitor</option>
+            </optgroup>
+          </select>
+        </div>
+        <a class="print-stickers-link" href="./playground.html">2×2 Playground ↗</a>
+        <button type="button" class="island-presentation-btn" id="presentation-btn" title="Presentation Mode" aria-label="Enter presentation mode"><span class="btn-icon">⛶</span><span class="btn-text"> Presentation</span></button>
+      </header>
       <div class="intro"><p class="eyebrow">SIX PICTURES. EVERY TILE IN ITS PLACE.</p><h1>3×3 Super Picture Cube</h1><p>Your pictures stay on this device. Turn, scramble, and restore every tile — including the centers.</p></div>
       <div class="layout">
         <section class="stage" aria-label="3 by 3 puzzle">
@@ -51,6 +83,26 @@
         <div class="button-row"><label for="saved-sets">Local sets <select id="saved-sets"><option value="">Choose a saved set</option></select></label><button id="load-set" type="button">Load</button><button id="delete-set" type="button">Delete saved set</button><button id="retry-storage" type="button">Retry local storage</button></div>
         <p id="storage-status" role="status" aria-live="polite">Opening local storage…</p><p class="hint">Up to 10 sets / 64 MiB. Save with an existing name replaces that saved set. A failed save leaves your current pictures and previously saved data intact.</p>
       </section>
+      <footer class="floating-glass-pill" role="contentinfo">
+        <span class="pill-brand bottom-brand"><span class="brand-mark">▦</span> CUBISTRY</span>
+        <span class="pill-brand-sep bottom-brand-sep">&middot;</span>
+        <span>&copy; 2026 Werner Stein</span>
+        <span>&middot;</span>
+        <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL-3.0</a>
+        <span>&middot;</span>
+        <a href="licenses.html">Licenses</a>
+        <span>&middot;</span>
+        <a href="https://github.com/wstein/cubistry/" target="_blank" rel="noopener">GitHub ↗</a>
+      </footer>
+      <button
+        type="button"
+        class="presentation-exit-btn"
+        id="exit-presentation-btn"
+        title="Exit Presentation Mode"
+        aria-label="Exit presentation mode"
+      >
+        ✕ Exit
+      </button>
     </main>
   </body>
 </html>

@@ -5,65 +5,98 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Picture Puzzle Playground · Cubistry</title>
-    <script type="module" crossorigin src="/cubistry/assets/playground-D6rq2kxB.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/playground-BQZzHD9T.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/three-BW9MzyAf.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-rotation-Bp0l0InI.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-DsEYcoX5.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/model-vOJkb31m.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-Il41stwk.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-PiRgrWxW.js">
-    <link rel="modulepreload" crossorigin href="/cubistry/assets/puzlwerk-2x2-DWOC6B8p.js">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/model-CTOgjrkI.css">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/presentation-rotation-p-13F4z1.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-C1wZ9l11.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/model-Cvpbv_ge.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-wNaGm7IV.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/hud-idle-DOw3sxRr.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/index-me5JM1fm.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/puzlwerk-2x2-CtNdqoX_.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/model-DILZ7_UK.css">
   </head>
   <body>
     <main>
-      <header>
-        <a class="brand" href="./">CUBISTRY <span>/ PLAYGROUND</span></a
-        ><a href="./picture3.html">3×3 Super Picture Cube ↗</a>
+      <header class="floating-island">
+        <a class="brand" href="./"
+          ><span class="brand-mark">▦</span><span class="brand-text"> CUBISTRY</span></a
+        >
+        <div class="application-choice">
+          <select id="playground-application" aria-label="Cube application" onchange="if(this.value) location.href=this.value">
+            <optgroup label="Integrated Studio (2×2)">
+              <option value="chronocube.html">Chronocube Studio (Integrated 2×2)</option>
+            </optgroup>
+            <optgroup label="Multi-Cube Clocks & Timers (2×2)">
+              <option value="clock.html">Live H–M–S Clock</option>
+              <option value="ms-timer.html">M/S Timer</option>
+            </optgroup>
+            <optgroup label="Single-Cube Applications (2×2)">
+              <option value="index.html">Counter 0–99</option>
+              <option value="timer.html">60-Minute Timer</option>
+              <option value="five-second-timer.html">5-Second Timer</option>
+              <option value="tenth-counter.html">1/10-Second Counter 0–9</option>
+              <option value="hsm-counter.html">H/M/S Counter 00–59</option>
+              <option value="ms-counter.html">M/S Counter 00–59</option>
+              <option value="hm-one-cube.html">H/M One-Cube Counter</option>
+            </optgroup>
+            <optgroup label="Calendar & Puzzles (3×3)">
+              <option value="calendar.html">Calendar · Deutsch / English</option>
+              <option value="playground.html" selected>Picture Puzzle Playground</option>
+              <option value="picture3.html">3×3 Super Picture Cube</option>
+              <option value="status.html">CI Quality Cube · Workflow monitor</option>
+            </optgroup>
+          </select>
+        </div>
+        <a class="print-stickers-link" href="picture3.html">3×3 Super Picture ↗</a>
+        <button type="button" class="island-presentation-btn" id="presentation-btn" title="Presentation Mode" aria-label="Enter presentation mode"><span class="btn-icon">⛶</span><span class="btn-text"> Presentation</span></button>
       </header>
-      <div class="intro">
+      <div class="intro sr-only">
         <p class="eyebrow">A PHYSICAL PUZZLE, ONE TURN AT A TIME</p>
         <h1>Picture Puzzle Playground</h1>
         <p>Turn, explore, and put every piece back in its exact place.</p>
       </div>
       <div class="layout">
         <section class="stage" aria-label="Interactive puzzle">
-          <div class="stage-top">
-            <span class="badge">2 × 2</span
-            ><label
-              >Design
-              <select id="design">
-                <option value="picture">Landscape pictures</option>
-                <option value="classic">Classic colors</option>
-              </select></label
-            >
-          </div>
           <div
             id="cube"
             aria-label="Physical picture puzzle"
             aria-busy="true"
           ></div>
-          <div class="stage-bottom">
-            <span>Drag to rotate · scroll to zoom</span
-            ><button id="camera" type="button">Reset view</button>
-          </div>
-          <div class="goals">
-            <div>
-              <span>EXACT PHYSICAL TARGET</span
-              ><strong id="exact">Loading</strong>
-            </div>
-            <div>
-              <span>UP TO WHOLE-CUBE ROTATION</span
-              ><strong id="equivalent">Loading</strong>
-            </div>
-          </div>
         </section>
-        <section class="controls" aria-label="Puzzle controls">
-          <div class="control-heading">
-            <h2>Make a move</h2>
-            <span>18 legal turns</span>
+        <section class="controls floating-hud" aria-label="Puzzle controls">
+          <div class="hud-header">
+            <h2 class="hud-title">Picture Playground</h2>
+            <div class="hud-actions">
+              <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+            </div>
           </div>
+          <div class="hud-body">
+            <div class="stage-top" style="padding: 0 0 12px 0;">
+              <span class="badge">2 × 2</span
+              ><label
+                >Design
+                <select id="design">
+                  <option value="picture">Landscape pictures</option>
+                  <option value="classic">Classic colors</option>
+                </select></label
+              >
+            </div>
+            <div class="goals" style="margin-bottom: 14px; border: 1px solid #dce1dd; border-radius: 12px; overflow: hidden;">
+              <div>
+                <span>EXACT PHYSICAL TARGET</span
+                ><strong id="exact">Loading</strong>
+              </div>
+              <div>
+                <span>UP TO WHOLE-CUBE ROTATION</span
+                ><strong id="equivalent">Loading</strong>
+              </div>
+            </div>
+            <div class="control-heading">
+              <h2>Make a move</h2>
+              <span>18 legal turns</span>
+            </div>
           <div
             id="face-buttons"
             class="face-buttons"
@@ -134,54 +167,75 @@
             It clears history.
           </p>
           <button id="new-session" class="quiet">Start new session</button>
-        </section>
-      </div>
-      <section class="history-section" aria-label="Move history">
-        <div class="control-heading">
-          <h2>Move history</h2>
-          <p id="stats">0 / 0 HTM · 0 turns played</p>
+          <div class="history-section" aria-label="Move history" style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #dce1dd;">
+            <div class="control-heading">
+              <h2>Move history</h2>
+              <p id="stats">0 / 0 HTM · 0 turns played</p>
+            </div>
+            <p class="history-help">
+              Completed moves only. Undo moves the cursor; a new move replaces the
+              redo branch.
+            </p>
+            <ol id="history" aria-label="Committed moves"></ol>
+            <p id="empty">Your first move starts the story.</p>
+          </div>
         </div>
-        <p class="history-help">
-          Completed moves only. Undo moves the cursor; a new move replaces the
-          redo branch.
-        </p>
-        <ol id="history" aria-label="Committed moves"></ol>
-        <p id="empty">Your first move starts the story.</p>
       </section>
-      <details class="notes">
-        <summary>Goals, keyboard controls & supported puzzles</summary>
-        <p>
-          Exact means all eight physical pieces and 24 sticker frames match the
-          original target, even in classic colors. Rotational equivalence allows
-          any of the 24 whole-cube orientations. Rotating the presentation changes
-          neither goal.
-        </p>
-        <p>
-          Keyboard: focus a face button and press Enter or Space, or type a
-          legal word and press Enter. Away from inputs, R L U D F B turns a
-          face; Shift adds inverse. Escape cancels after the active legal turn.
-        </p>
-        <p>
-          Scrambles are repeatable recorded legal words, not uniform random
-          states. Solve uses the pinned PuzlWerk 2×2 capability and verifies the
-          full route before playback and the endpoint afterward. Exact routes
-          are not guaranteed optimal.
-        </p>
-        <p>
-          3×3: Unsupported in this playground. Its shared interactive mechanics
-          and viewer profile are 2×2 only. Cubistry’s Calendar uses a separate
-          3×3 picture provider; this is not a claim about that provider’s
-          capabilities. No uploads, larger puzzles, or saved sessions.
-        </p>
-        <p>
-          <a href="./playground/F.svg">Original landscape artwork</a> ·
-          <a href="./playground/NOTICE.txt">Artwork source & license</a>
-        </p>
-      </details>
-      <footer>
-        Bundled original vector artwork · AGPL-3.0-or-later · Powered by
-        PuzlWerk
-      </footer>
+    </div>
+    <details class="notes sr-only">
+      <summary>Goals, keyboard controls & supported puzzles</summary>
+      <p>
+        Exact means all eight physical pieces and 24 sticker frames match the
+        original target, even in classic colors. Rotational equivalence allows
+        any of the 24 whole-cube orientations. Rotating the presentation changes
+        neither goal.
+      </p>
+      <p>
+        Keyboard: focus a face button and press Enter or Space, or type a
+        legal word and press Enter. Away from inputs, R L U D F B turns a
+        face; Shift adds inverse. Escape cancels after the active legal turn.
+      </p>
+      <p>
+        Scrambles are repeatable recorded legal words, not uniform random
+        states. Solve uses the pinned PuzlWerk 2×2 capability and verifies the
+        full route before playback and the endpoint afterward. Exact routes
+        are not guaranteed optimal.
+      </p>
+      <p>
+        3×3: Unsupported in this playground. Its shared interactive mechanics
+        and viewer profile are 2×2 only. Cubistry’s Calendar uses a separate
+        3×3 picture provider; this is not a claim about that provider’s
+        capabilities. No uploads, larger puzzles, or saved sessions.
+      </p>
+      <p>
+        <a href="./playground/F.svg">Original landscape artwork</a> ·
+        <a href="./playground/NOTICE.txt">Artwork source & license</a>
+      </p>
+    </details>
+    <footer class="sr-only">
+      Bundled original vector artwork · AGPL-3.0-or-later · Powered by
+      PuzlWerk
+    </footer>
+    <footer class="floating-glass-pill" role="contentinfo">
+      <span class="pill-brand bottom-brand"><span class="brand-mark">▦</span> CUBISTRY</span>
+      <span class="pill-brand-sep bottom-brand-sep">&middot;</span>
+      <span>&copy; 2026 Werner Stein</span>
+      <span>&middot;</span>
+      <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL-3.0</a>
+      <span>&middot;</span>
+      <a href="licenses.html">Licenses</a>
+      <span>&middot;</span>
+      <a href="https://github.com/wstein/cubistry/" target="_blank" rel="noopener">GitHub ↗</a>
+    </footer>
+    <button
+      type="button"
+      class="presentation-exit-btn"
+      id="exit-presentation-btn"
+      title="Exit Presentation Mode"
+      aria-label="Exit presentation mode"
+    >
+      ✕ Exit
+    </button>
     </main>
   </body>
 </html>
