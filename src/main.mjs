@@ -992,7 +992,7 @@ const normalizeAppKey = (req) => {
 const syncApplicationSelect = (appKey) => {
   const select = $("application");
   if (!select) return;
-  const targetVal = appKey === "certified" ? "index.html" : `${appKey}.html`;
+  const targetVal = appKey === "certified" ? "counter.html" : `${appKey}.html`;
   if ([...select.options].some((o) => o.value === targetVal)) {
     select.value = targetVal;
   } else if ([...select.options].some((o) => o.value === appKey)) {
@@ -1257,7 +1257,7 @@ async function switchApplication(requested) {
     view = candidate;
     application = targetKey;
     try {
-      const targetFile = targetKey === "certified" ? "index.html" : `${targetKey}.html`;
+      const targetFile = targetKey === "certified" ? "counter.html" : `${targetKey}.html`;
       const nextUrl = new URL(targetFile, location.href);
       if (location.search) {
         const sp = new URLSearchParams(location.search);
@@ -1719,7 +1719,9 @@ async function initialize() {
       new URLSearchParams(location.search).get("application") ||
         defaultApp ||
         pathApp ||
-        (location.pathname.endsWith(".html") && !location.pathname.endsWith("/index.html")
+        (location.pathname.endsWith(".html") &&
+        !location.pathname.endsWith("/counter.html") &&
+        !location.pathname.endsWith("/index.html")
           ? undefined
           : localStorage.getItem("cubistry_app")) ||
         "certified",

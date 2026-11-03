@@ -39,8 +39,8 @@ export default defineConfig({
         calendar: fileURLToPath(new URL("./calendar.html", import.meta.url)),
         clock: fileURLToPath(new URL("./clock.html", import.meta.url)),
         msTimer: fileURLToPath(new URL("./ms-timer.html", import.meta.url)),
-        counter: fileURLToPath(new URL("./index.html", import.meta.url)),
-        counterAlias: fileURLToPath(new URL("./counter.html", import.meta.url)),
+        index: fileURLToPath(new URL("./index.html", import.meta.url)),
+        counter: fileURLToPath(new URL("./counter.html", import.meta.url)),
         timer: fileURLToPath(new URL("./timer.html", import.meta.url)),
         fiveSecondTimer: fileURLToPath(
           new URL("./five-second-timer.html", import.meta.url),
