@@ -1,8 +1,10 @@
 """Bounded static extraction; never execute artifact code or preserve modes/links."""
-import html,os,re,stat,sys,zipfile
+import html,os,re,stat,sys,unicodedata,zipfile
 from pathlib import Path,PurePosixPath
 from html.parser import HTMLParser
 MAX_TOTAL=64*1024*1024
+REPOSITORY='wstein/cubistry'
+MAX_TITLE=80
 
 class DocumentBoundaries(HTMLParser):
     """Strict Vite HTML document boundaries; never rewrite or execute markup."""
@@ -42,19 +44,31 @@ class DocumentBoundaries(HTMLParser):
             if not self.document or self.document[-1]!=tag:raise ValueError('Misnested document boundary')
             self.document.pop()
 
-def mark_preview(text,number,sha):
+def clean_title(title):
+    """Single-line, bounded, escaped PR title; untrusted free text from PR authors."""
+    text=''.join(' ' if unicodedata.category(c) in ('Cc','Zl','Zp') else c for c in str(title or ''))
+    text=''.join(c for c in text if unicodedata.category(c)!='Cf')
+    text=' '.join(text.split())
+    if len(text)>MAX_TITLE:text=text[:MAX_TITLE-1].rstrip()+'\u2026'
+    return html.escape(text,quote=True)
+
+def mark_preview(text,number,sha,title=''):
     boundaries=DocumentBoundaries(text).positions
     if 'html' not in boundaries or 'body' not in boundaries:raise ValueError('Preview HTML lacks explicit document boundaries')
     body_start,body_end=boundaries['body']
     head=boundaries.get('head')
     if head and head[0]>body_start:raise ValueError('Misordered document boundaries')
     marker='<meta name="robots" content="noindex,nofollow">'
-    banner=f'<aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · PR #{number} — non-production preview · {html.escape(sha[:12])}</aside>'
+    number=int(number)
+    if number<1:raise ValueError('Invalid PR number')
+    link=f'<a href="https://github.com/{REPOSITORY}/pull/{number}" target="_blank" rel="noopener noreferrer">PR #{number}</a>'
+    label=clean_title(title)
+    banner=f'<aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · {link}{" · "+label if label else ""} — non-production preview · {html.escape(sha[:12])}</aside>'
     insertions=[(head[1] if head else body_start,marker),(body_end,banner)]
     for offset,value in sorted(insertions,reverse=True):text=text[:offset]+value+text[offset:]
     return text
 
-def extract(archive,destination,number=0,sha=''):
+def extract(archive,destination,number=0,sha='',title=''):
     root=Path(destination)
     if root.exists() and any(root.iterdir()):raise ValueError('Extraction directory must be empty')
     records=[];seen=set();total=0
@@ -84,8 +98,8 @@ def extract(archive,destination,number=0,sha=''):
             path.parent.mkdir(parents=True,exist_ok=True)
             data=z.read(info)
             if number and path.suffix=='.html':
-                text=mark_preview(data.decode('utf-8'),number,sha)
+                text=mark_preview(data.decode('utf-8'),number,sha,title)
                 data=text.encode()
             path.write_bytes(data);path.chmod(0o644)
     (root/'.nojekyll').write_text('')
-if __name__=='__main__':extract(sys.argv[1],sys.argv[2],int(sys.argv[3]) if len(sys.argv)>3 else 0,sys.argv[4] if len(sys.argv)>4 else '')
+if __name__=='__main__':extract(sys.argv[1],sys.argv[2],int(sys.argv[3]) if len(sys.argv)>3 else 0,sys.argv[4] if len(sys.argv)>4 else '',sys.argv[5] if len(sys.argv)>5 else '')
