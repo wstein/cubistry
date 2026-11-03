@@ -28,6 +28,18 @@ class StaticArchiveTests(unittest.TestCase):
   b=self.banner('a\nb\r\n\tc\x00d\u2028e\u202ef  g');self.assertIn(' · a b c d ef g — non-production',b)
   b=self.banner('x'*500);m=re.search(r'</a> · (x+)\u2026 —',b);self.assertTrue(m);self.assertEqual(len(m.group(1))+1,80)
   self.assertIn('Zürich 日本語 🚀 fix',self.banner('Zürich 日本語 🚀 fix'))
+ def test_banner_title_cap_boundaries_and_escape_after_truncation(self):
+  def title(b):return re.search(r'</a> · (.*) — non-production',b).group(1)
+  self.assertEqual(title(self.banner('a'*80)),'a'*80)
+  self.assertEqual(title(self.banner('a'*81)),'a'*79+'\u2026')
+  self.assertEqual(title(self.banner('a'*79+'&')),'a'*79+'&amp;')
+  self.assertEqual(title(self.banner('a'*78+'&&&')),'a'*78+'&amp;\u2026')
+  self.assertEqual(title(self.banner('a'*80+'<')),'a'*79+'\u2026')
+ def test_cname_is_rejected_in_previews_but_not_production(self):
+  for name in ('CNAME','sub/CNAME','a/b/CNAME'):
+   with self.subTest(name=name),self.assertRaises(ValueError):E.extract(self.archive([('index.html','<html><body>site</body></html>'),(name,'x.example')]),self.root/('p'+name.replace('/','_')),52,'a'*40)
+  E.extract(self.archive([('index.html','<html><body>site</body></html>'),('CNAME','x.example')]),self.root/'prod')
+  self.assertEqual((self.root/'prod/CNAME').read_text(),'x.example')
  def test_banner_omits_missing_or_blank_titles(self):
   for title in ('',None,'  \n\t ','\u200b'):
    with self.subTest(title=title):self.assertIn('</a> — non-production preview',self.banner(title))
