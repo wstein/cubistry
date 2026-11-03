@@ -4,6 +4,7 @@ import {
   previewPath,
   selectBuild,
   hasPreviewLabel,
+  hasPreviewContent,
 } from "./policy.mjs";
 const api = new GitHub(),
   marker = "<!-- cubistry-pr-preview -->",
@@ -23,7 +24,7 @@ for (const pr of pulls) {
       `contents/${previewPath(pr.number)}?ref=gh-pages`,
     );
     text =
-      deployOK && !remaining
+      deployOK && !hasPreviewContent(remaining)
         ? pr.state === "open"
           ? "Preview removed because the `preview` label is gone."
           : "Preview removed after this PR closed or merged."
