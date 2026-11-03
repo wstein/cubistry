@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 import { frontPoint, frontStickerPoint } from "../helpers/front-projection.mjs";
 async function ready(page) {
-  await page.goto("/");
+  await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 }
 async function go(page, value) {

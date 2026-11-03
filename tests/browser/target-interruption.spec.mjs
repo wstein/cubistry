@@ -69,7 +69,7 @@ for (const style of ["symbols", "words"])
   test(`HSM ${style} target changes discard the old route after one legal turn`, async ({
     page,
   }) => {
-    await page.goto(`/?application=hsm-counter&lettering=${style}`);
+    await page.goto(`/counter.html?application=hsm-counter&lettering=${style}`);
     await expect(page.locator("#hsm-value")).toBeEnabled();
     await expect(page.locator("#application")).toBeEnabled();
     await installGate(page);
@@ -93,7 +93,7 @@ for (const application of ["timer", "five-second-timer"])
   test(`${application} retargeting restores the last complete display directly from the interrupted pose`, async ({
     page,
   }) => {
-    await page.goto(`/?application=${application}`);
+    await page.goto(`/counter.html?application=${application}`);
     await expect(page.locator("#application")).toBeEnabled();
     await expect(page.locator("#cube")).toHaveAttribute(
       "data-application",

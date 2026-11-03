@@ -11,7 +11,7 @@ test("built playground resolves picture tiles and authenticated solver under pro
   page.on("request", (r) => {
     if (r.url().startsWith("http")) requests.push(new URL(r.url()).pathname);
   });
-  await page.goto("./");
+  await page.goto("./counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.locator("#application").selectOption("playground");
   await expect(page).toHaveURL(/\/cubistry\/playground.html$/);
