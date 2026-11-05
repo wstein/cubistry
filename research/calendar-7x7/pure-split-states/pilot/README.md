@@ -135,3 +135,59 @@ julia --startup-file=no pure_chain.jl evidence/print-pure-A.tsv PURE_DAG OUT/pur
 The Flix verifiers run as `java -jar <continuous flix.jar> chain ../english/evidence ../en-physical-review DAG CHAIN`
 and `java -jar <pure flix.jar> chain PRINT DAG CHAIN ../english/evidence ../en-physical-review`.
 Run Flix verifiers one at a time, or with `-Xmx4g`, on a 15 GB machine.
+
+## Resumable producer: [producer-resume.jl](producer-resume.jl)
+
+A new file; the merged `producer.jl` is **not** modified. It derives from `producer.jl`
+with SHA-256 `c9e2249fba62b5904525c20558f9d9789a8d79a2857b14368d9079e43dde2adc`
+(`sha256sum pilot/producer.jl`), also recorded in the header of `producer-resume.jl`.
+The block from `function obtm` through `solve_edge` (macro library, beam edge search,
+hybrid finish, acceptance check, setting schedule 12/40/1, 8/30/1, 12/60/1, 12/40/0 and
+the `orbitfb` fallback) is a verbatim copy of `producer.jl` lines 33-233. Only the
+argument handling and the driver differ. The layout is fixed to the pure split and the
+variant to `orbitfb`.
+
+```sh
+julia --startup-file=no pilot/producer-resume.jl DAG PRINT OUT_PREFIX EDGES START PRIOR_MOVES
+```
+
+- `EDGES`: number of new month edges; production stops after 2099-12.
+- `START`: `YYYY-MM` root month of a fresh chain (`PRIOR_MOVES` is `-`), or `resume` to
+  continue from the last edge of `PRIOR_MOVES`. A resume replays the whole prior chain
+  from its root and checks every source and end digest and every strict front before
+  producing anything.
+- Writes `OUT_PREFIX.moves.tsv` (cumulative: prior edge blocks copied byte for byte,
+  then the new blocks) and `OUT_PREFIX-edges.tsv` (exactly one header line, then the new
+  edges only, so `tail -n +2` concatenates cleanly). Exits non-zero, without writing a
+  moves file, when the prior chain does not replay or an edge fails.
+- One process builds the 654,752-macro library (about 40 s) and needs about 3 GB. Run
+  one producer process at a time.
+
+### Tests (Julia 1.13.3)
+
+Receipts are in `evidence/resume-*`.
+
+1. **Determinism.** Resuming from the first 2 edges of `evidence/pure-orbitfb.moves.tsv`
+   and producing 2 edges (2027-03 hybrid 40 HTM, 2027-04 global 130 HTM) gave a
+   `.moves.tsv` byte-identical (SHA-256
+   `e321cbc59ba34a8c7e18ac88afbf814382bc9ec063d5cd375413fc8a2cf9f064`) to the first 4
+   edges of the shipped chain. The method and HTM columns of the edge rows match; the
+   seconds column differs.
+2. **Past 2027.** Resuming from the full 12-edge shipped chain and producing 2 edges gave
+   2028-01 (hybrid, 149 HTM) and 2028-02 (hybrid, 147 HTM). The first 12 edge blocks are
+   byte-identical to the shipped chain. **Both** chain verifiers (`pure_chain.jl` and the
+   Flix `chain` command) accept this 14-edge chain, the receipts are identical, and the
+   status is `VALID_CONTINUOUS_CHAIN 14 218 294 49`
+   (endpoint `e0bd491ec3eb8c6e35d5bcc8d8fa2b4c07d945229f5c0083483946dd810c7c40`).
+   This shows acceptance of one chain crossing the year boundary 2027 to 2028 with a
+   leap-year February; acceptance of the rest of 2028-2099 is UNKNOWN until shown.
+3. **Failure paths.** A prior chain with a changed move and a prior chain with a
+   truncated edge block each exit 1 before producing any edge. A fresh START with a
+   non-`-` PRIOR_MOVES exits 1.
+4. **Fresh start.** `START=2028-01` with `PRIOR_MOVES=-` and `EDGES=2` (the workflow's smoke
+   path) gave 2028-02 (global, 137 HTM) and 2028-03 (global, 149 HTM) from the DAG root
+   with source month 2028-01. Both verifiers accept it with identical receipts
+   (`VALID_CONTINUOUS_CHAIN 2 218 294 49`).
+
+Files: `evidence/resume-determinism*`, `evidence/resume-2028*` (edge table, chain, Julia
+and Flix receipts) and `evidence/resume-fresh-2028-01*`.
