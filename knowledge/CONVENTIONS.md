@@ -6,7 +6,7 @@
 - `plans/` describe approaches; `milestones/` capture durable outcomes. Track actionable work and status exclusively in GitHub Issues; use PRs for implementation, review and delivery. Do not create task lists or task mirrors in the vault.
 - Treat the repository Markdown as authoritative. Obsidian may be used without proprietary plugins, configuration, or external services.
 - Prefer relative Markdown links, which work in GitHub and Obsidian. Optional `[[wikilinks]]` may help local navigation but should not be the only route to an important document.
-- Use short, descriptive filenames.
+- Use short, descriptive filenames. Never reuse an ID (ADR, spec).
 - Frontmatter is YAML with `id`, `title`, `type`, `status`, and `created`; use ISO date strings for dates. Keep link relationships as ordinary Markdown links.
 - Statuses: ADR `proposed | accepted | superseded | rejected`; spec `draft | approved | deprecated`. Status is informative, not an automated certificate.
 - A decision never silently changes: record context, options, consequences, and a link to the replacing ADR if superseded.
