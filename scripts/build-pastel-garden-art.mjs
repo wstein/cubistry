@@ -57,41 +57,6 @@ const cheeks = (x, y, gap, c = H.pink.dark) =>
 const happy = (x, y) => eye(x - 17, y) + eye(x + 17, y) + cheeks(x, y + 10, 27) + smile(x, y + 8);
 const sleepy = (x, y) => sleepyEye(x - 17, y) + sleepyEye(x + 17, y) + cheeks(x, y + 10, 27) + smile(x, y + 10, 6);
 
-// ---- Original characters -------------------------------------------------
-// Pip: round peach sprout-sprite with two leaf ears.
-const pip = (() => {
-  const body = `<ellipse cx="190" cy="222" rx="68" ry="58"/><ellipse cx="156" cy="276" rx="20" ry="12"/><ellipse cx="224" cy="276" rx="20" ry="12"/><ellipse cx="124" cy="214" rx="14" ry="22" transform="rotate(25 124 214)"/>`;
-  return `${leafShape(168, 176, -125, 0.55)}${leafShape(212, 176, -55, 0.55)}${shaded("pip", body, H.peach.light, H.peach.mid, shine(160, 190, 16, 9))}${happy(190, 212)}`;
-})();
-// Nimbo: lilac cloud-puff with a star antenna.
-const nimbo = (() => {
-  const body = `<circle cx="130" cy="215" r="38"/><circle cx="178" cy="196" r="50"/><circle cx="224" cy="218" r="36"/><ellipse cx="177" cy="236" rx="76" ry="30"/>`;
-  return `<path d="M178 150V122" ${stroke}/><path d="M178 100l6 13 14 2-10 10 3 14-13-7-13 7 3-14-10-10 14-2Z" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.outline}"/>${shaded("nimbo", body, H.lilac.light, H.lilac.mid, shine(150, 170, 18, 9))}${sleepy(178, 205)}`;
-})();
-// Tulia: mint round creature wearing a tulip bud.
-const tulia = (() => {
-  const body = `<circle cx="160" cy="222" r="62"/><ellipse cx="124" cy="282" rx="18" ry="11"/><ellipse cx="196" cy="282" rx="18" ry="11"/>`;
-  return `${shaded("tulia", body, H.green.light, H.green.mid, shine(130, 185, 16, 9))}<path d="M138 156C136 132 150 120 160 112C170 120 184 132 182 156Q160 170 138 156Z" fill="${H.pink.dark}" stroke="${ink}" stroke-width="${W.outline}"/>${happy(160, 218)}`;
-})();
-// Moss: butter bean with twig antlers and soft ears.
-const moss = (() => {
-  const body = `<ellipse cx="172" cy="214" rx="54" ry="76"/><ellipse cx="136" cy="296" rx="18" ry="10"/><ellipse cx="208" cy="296" rx="18" ry="10"/><ellipse cx="124" cy="176" rx="12" ry="22" transform="rotate(-35 124 176)"/><ellipse cx="220" cy="176" rx="12" ry="22" transform="rotate(35 220 176)"/>`;
-  return `<path d="M152 140Q146 112 128 98M148 118L168 100M192 140Q198 112 216 98M196 118L176 100" ${strokeW(4, twig)}/>${shaded("moss", body, H.butter.mid, H.butter.dark, shine(150, 170, 14, 9))}${happy(172, 196)}`;
-})();
-// Sunny: sunshine puff with petal rays.
-const sunny = (() => {
-  const rays = Array.from({ length: 10 }, (_, i) => {
-    const a = (Math.PI * 2 * i) / 10;
-    return `<circle cx="${160 + Math.cos(a) * 62}" cy="${170 + Math.sin(a) * 62}" r="15"/>`;
-  }).join("");
-  return `${shaded("sunny", rays + `<circle cx="160" cy="170" r="52"/>`, H.butter.mid, H.butter.dark, shine(135, 142, 18, 9))}${happy(160, 166)}`;
-})();
-// Plop: pink pond-sprite peeking out of the water with a lily-pad hat.
-const plop = (() => {
-  const body = `<circle cx="160" cy="205" r="56"/><ellipse cx="92" cy="226" rx="12" ry="18" transform="rotate(-30 92 226)"/><ellipse cx="228" cy="226" rx="12" ry="18" transform="rotate(30 228 226)"/>`;
-  return `${shaded("plop", body, H.pink.mid, H.pink.dark, shine(135, 170, 14, 8))}<ellipse cx="160" cy="152" rx="36" ry="12" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M160 152l14-6" ${strokeW(W.fine)}/>${eye(143, 196)}${eye(177, 196)}${cheeks(160, 206, 27, H.pink.dark)}${smile(160, 204)}<path d="M0 238Q40 220 80 238T160 238T240 238T320 238V320H0Z" fill="${H.sky.water}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M0 280Q50 262 100 280T200 280T320 276V320H0Z" fill="${H.sky.waterDk}"/>`;
-})();
-
 // ---- Scenery and small critters (original, flat vector) -------------------
 const g = (x, y, s, inner) => `<g transform="translate(${x} ${y}) scale(${s})">${inner}</g>`;
 const o = `stroke="${ink}" stroke-width="${W.fine}"`;
@@ -137,6 +102,57 @@ const cloud = (x, y, s = 1, fill = white) =>
 const hill = (d, fill, line = false) =>
   `<path d="${d}" fill="${fill}"${line ? ` stroke="${ink}" stroke-width="${W.outline}"` : ""}/>`;
 const glow = (x, y, r = 4) => `<circle cx="${x}" cy="${y}" r="${r * 2.4}" fill="${H.butter.mid}" opacity=".35"/><circle cx="${x}" cy="${y}" r="${r}" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.fine}"/>`;
+
+// More expressions for personality.
+const arcEye = (x, y) => `<path d="M${x - 6} ${y + 3}Q${x} ${y - 6} ${x + 6} ${y + 3}" ${strokeW(2.5)}/>`;
+const laugh = (x, y) =>
+  `<path d="M${x - 10} ${y}Q${x} ${y + 2} ${x + 10} ${y}Q${x} ${y + 18} ${x - 10} ${y}Z" fill="${H.pink.dark}" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>`;
+const oMouth = (x, y) => `<ellipse cx="${x}" cy="${y + 4}" rx="4.5" ry="6" fill="${H.pink.dark}" stroke="${ink}" stroke-width="2.5"/>`;
+const sparkleEye = (x, y) =>
+  `<circle cx="${x}" cy="${y}" r="6.5" fill="${ink}"/><circle cx="${x + 2}" cy="${y - 2.5}" r="2.4" fill="#fff"/><circle cx="${x - 2}" cy="${y + 2}" r="1.2" fill="#fff"/>`;
+const bubble = (x, y, r) =>
+  `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity=".6" stroke="${ink}" stroke-width="${W.fine}"/><path d="M${x - r * 0.55} ${y - r * 0.1}a${r * 0.55} ${r * 0.55} 0 0 1 ${r * 0.45} -${r * 0.45}" ${strokeW(1.5, "#fff")}/>`;
+const arm = (x, y, rot, rx = 11, ry = 18) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" transform="rotate(${rot} ${x} ${y})"/>`;
+
+// ---- Original characters -------------------------------------------------
+// Pip: round peach sprout-sprite with leaf ears. Waters the flower and waves hello.
+const pip = (() => {
+  const body = `<ellipse cx="190" cy="222" rx="68" ry="58"/><ellipse cx="156" cy="276" rx="20" ry="12"/><ellipse cx="224" cy="276" rx="20" ry="12"/>${arm(128, 216, 50)}${arm(257, 190, 30)}`;
+  const can = g(110, 196, 1, `<g transform="rotate(-15)"><path d="M-12 2L-28 12" ${strokeW(4)}/><ellipse cx="-29" cy="13" rx="3" ry="5" fill="${H.sky.dark}" ${o}/><path d="M12 -5Q24 -2 12 9" ${strokeW(W.outline)}/><rect x="-12" y="-10" width="24" height="20" rx="5" fill="${H.sky.mid}" ${o}/><path d="M-8 -4H8" ${strokeW(W.fine, "#fff")}/></g>`);
+  const drops = [[78, 218, 3], [74, 232, 2.6], [84, 242, 2.2]].map(([x, y, r]) => `<path d="M${x} ${y - r * 1.8}Q${x + r} ${y} ${x} ${y + r}Q${x - r} ${y} ${x} ${y - r * 1.8}Z" fill="${H.sky.mid}" ${o}/>`).join("");
+  return `${leafShape(168, 176, -125, 0.55)}${leafShape(212, 176, -55, 0.55)}${shaded("pip", body, H.peach.light, H.peach.mid, shine(160, 190, 16, 9))}${arcEye(173, 210)}${arcEye(207, 210)}${cheeks(190, 224, 27)}${laugh(190, 222)}${can}${drops}`;
+})();
+// Nimbo: lilac cloud-puff with a star antenna, hugging a star plush while dreaming.
+const nimbo = (() => {
+  const body = `<circle cx="130" cy="215" r="38"/><circle cx="178" cy="196" r="50"/><circle cx="224" cy="218" r="36"/><ellipse cx="177" cy="236" rx="76" ry="30"/>`;
+  const plush = star(178, 250, 27, H.butter.mid) + `<circle cx="170" cy="252" r="2" fill="${ink}"/><circle cx="186" cy="252" r="2" fill="${ink}"/><path d="M173 258Q178 262 183 258" ${strokeW(1.6)}/>`;
+  return `<path d="M178 150V122" ${stroke}/>${star(178, 106, 14)}${shaded("nimbo", body, H.lilac.light, H.lilac.mid, shine(150, 170, 18, 9))}${sleepy(178, 205)}${plush}${merged(arm(142, 252, 80, 9, 15) + arm(214, 252, -80, 9, 15), H.lilac.light)}${bubble(236, 162, 5)}${bubble(250, 142, 7)}${bubble(268, 116, 10)}`;
+})();
+// Tulia: mint round creature wearing a tulip bud; delighted, with a bouquet and a butterfly friend.
+const tulia = (() => {
+  const body = `<circle cx="160" cy="222" r="62"/><ellipse cx="124" cy="282" rx="18" ry="11"/><ellipse cx="196" cy="282" rx="18" ry="11"/>${arm(104, 236, 25)}${arm(216, 238, -30)}`;
+  const bouquet = `${tulip(230, 240, 0.5, H.butter.mid)}${tulip(244, 244, 0.45, H.lilac.mid)}`;
+  return `${shaded("tulia", body, H.green.light, H.green.mid, shine(130, 185, 16, 9))}<path d="M138 156C136 132 150 120 160 112C170 120 184 132 182 156Q160 170 138 156Z" fill="${H.pink.dark}" stroke="${ink}" stroke-width="${W.outline}"/>${butterfly(184, 108, H.sky.mid, H.lilac.light, 0.7)}${sparkleEye(143, 218)}${sparkleEye(177, 218)}${cheeks(160, 230, 29)}${oMouth(160, 226)}${bouquet}`;
+})();
+// Moss: butter bean with twig antlers and soft ears; carries a glowing lantern and laughs.
+const moss = (() => {
+  const body = `<ellipse cx="172" cy="214" rx="54" ry="76"/><ellipse cx="136" cy="296" rx="18" ry="10"/><ellipse cx="208" cy="296" rx="18" ry="10"/><ellipse cx="124" cy="176" rx="12" ry="22" transform="rotate(-35 124 176)"/><ellipse cx="220" cy="176" rx="12" ry="22" transform="rotate(35 220 176)"/>${arm(126, 242, 20, 10, 18)}${arm(220, 244, -20, 10, 18)}`;
+  const lantern = `<circle cx="112" cy="262" r="26" fill="${H.butter.mid}" opacity=".35"/>` + g(112, 262, 1, `<path d="M-8 -12Q0 -26 8 -12" ${strokeW(W.fine)}/><rect x="-9" y="-13" width="18" height="5" rx="2" fill="${twig}" ${o}/><rect x="-9" y="-8" width="18" height="20" rx="4" fill="${H.butter.light}" ${o}/><rect x="-9" y="10" width="18" height="5" rx="2" fill="${twig}" ${o}/><circle cy="2" r="3.5" fill="${H.butter.mid}"/>`);
+  return `<path d="M152 140Q146 112 128 98M148 118L168 100M192 140Q198 112 216 98M196 118L176 100" ${strokeW(4, twig)}/>${shaded("moss", body, H.butter.mid, H.butter.dark, shine(150, 170, 14, 9))}${arcEye(155, 192)}${arcEye(189, 192)}${cheeks(172, 204, 27)}${laugh(172, 200)}${lantern}${glow(236, 206, 3)}`;
+})();
+// Sunny: sunshine puff with petal rays; winks, with a small bird perched on top.
+const sunny = (() => {
+  const rays = Array.from({ length: 10 }, (_, i) => {
+    const a = (Math.PI * 2 * i) / 10;
+    return `<circle cx="${160 + Math.cos(a) * 62}" cy="${170 + Math.sin(a) * 62}" r="15"/>`;
+  }).join("");
+  return `${shaded("sunny", rays + `<circle cx="160" cy="170" r="52"/>`, H.butter.mid, H.butter.dark, shine(135, 142, 18, 9))}${eye(143, 164)}${arcEye(177, 164)}${cheeks(160, 176, 27)}${laugh(160, 172)}${bird(160, 104, H.lilac.mid, 0.8)}`;
+})();
+// Plop: pink pond-sprite peeking out of the water with a lily-pad hat; astonished, blowing bubbles.
+const plop = (() => {
+  const body = `<circle cx="160" cy="205" r="56"/><ellipse cx="92" cy="226" rx="12" ry="18" transform="rotate(-30 92 226)"/><ellipse cx="228" cy="226" rx="12" ry="18" transform="rotate(30 228 226)"/>`;
+  return `${shaded("plop", body, H.pink.mid, H.pink.dark, shine(135, 170, 14, 8))}<ellipse cx="160" cy="152" rx="36" ry="12" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M160 152l14-6" ${strokeW(W.fine)}/>${petals(176, 146, 6, 5, H.pink.light, 0)}${sparkleEye(143, 196)}${sparkleEye(177, 196)}${cheeks(160, 208, 29, H.pink.dark)}${oMouth(160, 204)}${bubble(206, 190, 7)}${bubble(224, 166, 10)}${bubble(238, 134, 13)}<path d="M0 238Q40 220 80 238T160 238T240 238T320 238V320H0Z" fill="${H.sky.water}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M0 280Q50 262 100 280T200 280T320 276V320H0Z" fill="${H.sky.waterDk}"/>`;
+})();
 
 const drawings = {
   // FRONT: sunny garden. TL bee+flower, TR butterfly+cloud, BL mushroom, BR snail.
