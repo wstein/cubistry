@@ -92,13 +92,65 @@ const plop = (() => {
   return `${shaded("plop", body, H.pink.mid, H.pink.dark, shine(135, 170, 14, 8))}<ellipse cx="160" cy="152" rx="36" ry="12" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M160 152l14-6" ${strokeW(W.fine)}/>${eye(143, 196)}${eye(177, 196)}${cheeks(160, 206, 27, H.pink.dark)}${smile(160, 204)}<path d="M0 238Q40 220 80 238T160 238T240 238T320 238V320H0Z" fill="${H.sky.water}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M0 280Q50 262 100 280T200 280T320 276V320H0Z" fill="${H.sky.waterDk}"/>`;
 })();
 
+// ---- Scenery and small critters (original, flat vector) -------------------
+const g = (x, y, s, inner) => `<g transform="translate(${x} ${y}) scale(${s})">${inner}</g>`;
+const o = `stroke="${ink}" stroke-width="${W.fine}"`;
+const butterfly = (x, y, c1, c2, s = 1) =>
+  g(x, y, s, `<ellipse cx="-9" cy="-6" rx="10" ry="8" fill="${c1}" ${o} transform="rotate(-25 -9 -6)"/><ellipse cx="9" cy="-6" rx="10" ry="8" fill="${c1}" ${o} transform="rotate(25 9 -6)"/><ellipse cx="-7" cy="7" rx="7" ry="6" fill="${c2}" ${o}/><ellipse cx="7" cy="7" rx="7" ry="6" fill="${c2}" ${o}/><path d="M0 -9V10" ${strokeW(3)}/><path d="M0 -9Q-4 -17 -8 -17M0 -9Q4 -17 8 -17" ${strokeW(W.fine)}/>`);
+const bee = (x, y, s = 1) =>
+  g(x, y, s, `<ellipse cx="-4" cy="-9" rx="6" ry="4" fill="#fff" ${o} transform="rotate(-25 -4 -9)"/><ellipse cx="5" cy="-9" rx="6" ry="4" fill="#fff" ${o} transform="rotate(25 5 -9)"/><ellipse rx="12" ry="8" fill="${H.butter.mid}" ${o}/><path d="M-3 -7V7M4 -7V7" ${strokeW(2.5)}/><circle cx="-8" cy="-1" r="1.7" fill="${ink}"/>`);
+const ladybug = (x, y, s = 1) =>
+  g(x, y, s, `<circle r="9" fill="${H.pink.dark}" ${o}/><path d="M-6 -7a8 8 0 0 1 12 0Z" fill="${ink}"/><path d="M0 -7V9" ${strokeW(W.fine)}/><circle cx="-4" cy="1" r="1.8" fill="${ink}"/><circle cx="4" cy="2" r="1.8" fill="${ink}"/>`);
+const mushroom = (x, y, s = 1, cap = H.pink.dark) =>
+  g(x, y, s, `<path d="M-7 0V-14H7V0Q0 4 -7 0Z" fill="${white}" ${o}/><path d="M-20 -14A20 16 0 0 1 20 -14Z" fill="${cap}" ${o}/><circle cx="-8" cy="-22" r="3" fill="#fff"/><circle cx="6" cy="-26" r="2.5" fill="#fff"/><circle cx="12" cy="-19" r="2" fill="#fff"/>`);
+const snail = (x, y, s = 1, shell = H.lilac.mid) =>
+  g(x, y, s, `<ellipse cx="2" cy="-5" rx="24" ry="6" fill="${H.peach.light}" ${o}/><path d="M24 -8V-20M29 -8L34 -18" ${strokeW(W.fine)}/><circle cx="-4" cy="-16" r="13" fill="${shell}" ${o}/><path d="M-4 -16a4 4 0 1 1 4 4a8 8 0 1 1-8-8" ${strokeW(W.fine)}/>`);
+const bird = (x, y, c, s = 1, flip = 1) =>
+  g(x, y, s, `<g transform="scale(${flip} 1)"><path d="M-10 0L-20 -5L-18 4Z" fill="${c}" ${o}/><ellipse rx="12" ry="8.5" fill="${c}" ${o}/><circle cx="9" cy="-6" r="6.5" fill="${c}" ${o}/><path d="M14 -7L21 -4L14 -2Z" fill="${H.peach.dark}" ${o}/><ellipse cx="-2" cy="2" rx="6" ry="4" fill="${H.pink.light}" ${o} opacity=".8"/><circle cx="10" cy="-7" r="1.6" fill="${ink}"/></g>`);
+const fish = (x, y, s = 1, c = H.peach.mid) =>
+  g(x, y, s, `<path d="M-13 0L-25 -8V8Z" fill="${c}" ${o}/><ellipse rx="15" ry="9" fill="${c}" ${o}/><path d="M-2 -8Q4 -15 8 -8" fill="${H.peach.dark}" ${o}/><circle cx="8" cy="-2" r="2" fill="${ink}"/><path d="M13 3Q10 5 8 4" ${strokeW(W.fine)}/>`);
+const dragonfly = (x, y, s = 1) =>
+  g(x, y, s, `<ellipse cx="-4" cy="-8" rx="13" ry="4.5" fill="#fff" opacity=".8" ${o} transform="rotate(-18 -4 -8)"/><ellipse cx="-4" cy="6" rx="13" ry="4.5" fill="#fff" opacity=".8" ${o} transform="rotate(18 -4 6)"/><path d="M-14 0H20" ${strokeW(4, H.lilac.dark)}/><circle cx="22" cy="0" r="4" fill="${H.lilac.dark}" ${o}/>`);
+const balloon = (x, y, s = 1) =>
+  g(x, y, s, `<path d="M-12 24L-8 42M12 24L8 42" ${strokeW(W.fine)}/><rect x="-10" y="42" width="20" height="13" rx="3" fill="${H.peach.mid}" ${o}/><circle r="26" fill="${H.pink.mid}" ${o}/><path d="M0 -26C-14 -10 -14 10 0 26C14 10 14 -10 0 -26Z" fill="${H.butter.mid}" ${o}/>`);
+const pine = (x, y, s = 1, c = H.green.mid) =>
+  g(x, y, s, `<rect x="-4" y="22" width="8" height="12" fill="${twig}" ${o}/><path d="M0 -52L-16 -24H-8L-22 -2H-10L-26 22H26L10 -2H22L8 -24H16Z" fill="${c}" ${o} stroke-linejoin="round"/>`);
+const reeds = (x, y, s = 1) =>
+  g(x, y, s, `<path d="M-10 0Q-12 -30 -9 -58M2 0Q4 -34 1 -72M13 0Q16 -26 13 -50" ${strokeW(W.outline, H.green.dark)}/><ellipse cx="-9" cy="-60" rx="4.5" ry="11" fill="${twig}" ${o}/><ellipse cx="1" cy="-74" rx="4.5" ry="11" fill="${twig}" ${o}/><ellipse cx="13" cy="-52" rx="4.5" ry="10" fill="${twig}" ${o}/>`);
+const house = (x, y, s = 1) =>
+  g(x, y, s, `<path d="M-14 0V-26H14V0Z" fill="${white}" ${o}/><path d="M-30 -26A30 24 0 0 1 30 -26Z" fill="${H.pink.mid}" ${o}/><circle cx="-12" cy="-38" r="3.5" fill="#fff"/><circle cx="10" cy="-42" r="3" fill="#fff"/><rect x="-6" y="-20" width="12" height="12" rx="6" fill="${H.butter.mid}" ${o}/>`);
+const plane = (x, y, s = 1) =>
+  g(x, y, s, `<path d="M0 0L46 -14L20 12Z" fill="${white}" ${o} stroke-linejoin="round"/><path d="M0 0L20 12L16 2Z" fill="${H.sky.mid}" ${o} stroke-linejoin="round"/>`);
+const tulip = (x, y, s = 1, c = H.pink.mid) =>
+  g(x, y, s, `<path d="M0 0V-34" ${strokeW(W.outline)}/><path d="M-9 -34C-10 -48 -4 -54 0 -58C4 -54 10 -48 9 -34Q0 -28 -9 -34Z" fill="${c}" ${o}/>`);
+const tuft = (x, y, c = H.green.dark) =>
+  `<path d="M${x} ${y}q-4-14-10-18M${x} ${y}q0-18 2-24M${x} ${y}q4-14 12-16" ${strokeW(W.outline, c)}/>`;
+const star = (x, y, r, c = H.butter.light) => {
+  const pts = Array.from({ length: 10 }, (_, i) => {
+    const a = -Math.PI / 2 + (Math.PI * i) / 5, d = i % 2 ? r * 0.45 : r;
+    return `${(x + Math.cos(a) * d).toFixed(1)} ${(y + Math.sin(a) * d).toFixed(1)}`;
+  });
+  return `<path d="M${pts.join("L")}Z" fill="${c}" stroke="${ink}" stroke-width="${W.fine}" stroke-linejoin="round"/>`;
+};
+const cloud = (x, y, s = 1, fill = white) =>
+  g(x, y, s, `<path transform="translate(-30 -80)" d="M30 80Q14 50 48 48Q58 18 88 36Q118 30 124 58Q148 74 122 82H46Q32 86 30 80Z" fill="${fill}" stroke="${ink}" stroke-width="${W.outline}"/>`);
+const hill = (d, fill, line = false) =>
+  `<path d="${d}" fill="${fill}"${line ? ` stroke="${ink}" stroke-width="${W.outline}"` : ""}/>`;
+const glow = (x, y, r = 4) => `<circle cx="${x}" cy="${y}" r="${r * 2.4}" fill="${H.butter.mid}" opacity=".35"/><circle cx="${x}" cy="${y}" r="${r}" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.fine}"/>`;
+
 const drawings = {
-  F: `<rect width="320" height="320" fill="${H.butter.bg}"/><path d="M90 150V320" ${stroke}/>${leafShape(90, 295, -140, 1)}${petals(90, 105, 36, 6, H.peach.mid, 15)}<circle cx="90" cy="105" r="14" fill="${H.butter.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${dot(40, 40, 7, H.pink.mid)}${dot(270, 60, 9, H.butter.mid)}${pip}`,
-  B: `<rect width="320" height="320" fill="${H.sky.light}"/><path transform="translate(40 -20)" d="M215 45a50 50 0 1 0 48 70a40 40 0 1 1-48-70Z" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M70 60l6 14 15 2-11 10 4 15-14-8-14 8 4-15-11-10 15-2Z" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.outline}"/>${dot(40, 150, 5, H.butter.light)}${dot(280, 190, 5, H.butter.light)}<path d="M0 285Q80 255 160 282T320 272V320H0Z" fill="${H.sky.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${nimbo}`,
-  R: `<rect width="320" height="320" fill="${H.pink.bg}"/><path d="M40 320V210M285 320V190" ${stroke}/>${leafShape(40, 295, -60, 0.9)}${leafShape(285, 290, -120, 0.9)}<path d="M20 210C18 175 32 160 40 152C50 160 62 175 60 210Q40 224 20 210Z" fill="${H.peach.light}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M265 190C263 155 277 140 285 132C295 140 307 155 305 190Q285 204 265 190Z" fill="${H.pink.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${dot(60, 70, 7, "#fff")}${dot(255, 70, 5, H.butter.mid)}${tulia}`,
-  L: `<rect width="320" height="320" fill="${H.green.bg}"/><path d="M-10 90Q90 70 200 20" ${stroke}/>${leafShape(30, 82, -75, 0.8)}${leafShape(90, 70, 60, 0.8)}${leafShape(150, 50, -70, 0.8)}${dot(40, 190, 8, H.peach.mid)}${dot(285, 120, 7, H.butter.mid)}${dot(270, 220, 6, H.pink.mid)}<path d="M0 300Q90 270 190 298T320 290V320H0Z" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${moss}`,
-  U: `<rect width="320" height="320" fill="${H.sky.bg}"/><path d="M30 80Q14 50 48 48Q58 18 88 36Q118 30 124 58Q148 74 122 82H46Q32 86 30 80Z" fill="${white}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M200 300Q190 270 220 266Q232 238 258 258Q288 254 290 280Q312 290 292 300Z" fill="${white}" stroke="${ink}" stroke-width="${W.outline}"/>${sunny}<path d="M40 290Q140 255 230 292" fill="none" stroke="${white}" stroke-width="10" stroke-linecap="round"/>`,
-  D: `<rect width="320" height="320" fill="${H.sky.aqua}"/><path d="M0 60Q80 30 160 60T320 60" fill="none" stroke="${H.sky.water}" stroke-width="8" stroke-linecap="round"/>${dot(50, 120, 5, "#fff")}${dot(270, 100, 6, "#fff")}<path d="M240 120a36 28 0 1 0 64 -22L272 116Z" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${petals(270, 100, 16, 5, H.pink.mid, 0)}<circle cx="270" cy="100" r="6" fill="${H.butter.mid}" stroke="${ink}" stroke-width="${W.fine}"/>${plop}`,
+  // FRONT: sunny garden. TL bee+flower, TR butterfly+cloud, BL mushroom, BR snail.
+  F: `<rect width="320" height="320" fill="${H.butter.bg}"/>${cloud(225, 52, 0.6)}${hill("M0 232Q80 196 170 224T320 210V320H0Z", H.green.light)}${hill("M0 266Q90 236 190 262T320 256V320H0Z", H.green.mid, true)}<path d="M90 150V290" ${stroke}/>${leafShape(90, 285, -140, 1)}${petals(90, 105, 36, 6, H.peach.mid, 15)}<circle cx="90" cy="105" r="14" fill="${H.butter.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${bee(34, 52, 1.1)}${butterfly(268, 112, H.pink.mid, H.peach.mid, 1.1)}${mushroom(36, 300, 1.1)}${tuft(60, 312)}${tuft(300, 308)}${pip}${snail(284, 304, 0.9)}`,
+  // BACK: starry night. TL shooting star, TR moon, BL pine+fireflies, BR mushroom house.
+  B: `<rect width="320" height="320" fill="${H.sky.light}"/>${star(60, 66, 15)}<path d="M120 40Q96 56 70 92" ${strokeW(W.outline, H.butter.mid)}/>${star(40, 130, 6)}${cloud(78, 124, 0.7, H.lilac.bg)}${star(118, 98, 9)}${star(26, 92, 5)}<path transform="translate(40 -20)" d="M215 45a50 50 0 1 0 48 70a40 40 0 1 1-48-70Z" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.outline}"/>${star(210, 60, 7)}${star(290, 150, 5)}${hill("M0 232L70 168L130 224L200 152L270 224L320 190V320H0Z", H.sky.mid)}${hill("M0 270Q80 246 160 268T320 256V320H0Z", H.sky.dark, true)}${pine(40, 258, 0.9, H.sky.dark)}${pine(78, 272, 0.6, H.sky.dark)}${glow(30, 188)}${glow(96, 214, 3)}${house(288, 296, 0.75)}${nimbo}`,
+  // RIGHT: tulip meadow. TL blue butterfly, TR bluebird, BL bee+tulip row, BR ladybug.
+  R: `<rect width="320" height="320" fill="${H.pink.bg}"/>${hill("M0 220Q80 190 170 214T320 200V320H0Z", H.lilac.light)}${hill("M0 266Q90 238 190 262T320 254V320H0Z", H.green.mid, true)}<path d="M40 320V210M285 320V190" ${stroke}/>${leafShape(40, 295, -60, 0.9)}${leafShape(285, 290, -120, 0.9)}<path d="M20 210C18 175 32 160 40 152C50 160 62 175 60 210Q40 224 20 210Z" fill="${H.peach.light}" stroke="${ink}" stroke-width="${W.outline}"/><path d="M265 190C263 155 277 140 285 132C295 140 307 155 305 190Q285 204 265 190Z" fill="${H.pink.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${butterfly(70, 74, H.sky.mid, H.lilac.light, 1.2)}${bird(262, 76, H.sky.mid, 1.1, -1)}${dot(255, 126, 5, H.butter.mid)}${tulip(92, 304, 0.7, H.butter.mid)}${tulip(236, 308, 0.7, H.lilac.mid)}${bee(80, 196, 1)}${tulia}${ladybug(282, 296, 1.1)}`,
+  // LEFT: forest edge. TL ladybug leaf, TR bird on branch, BL mushrooms, BR stones+clover.
+  L: `<rect width="320" height="320" fill="${H.green.bg}"/>${pine(250, 238, 1.5, H.green.light)}${pine(30, 250, 1.2, H.green.light)}${hill("M0 240Q80 214 170 236T320 224V320H0Z", H.green.light)}<path d="M-10 90Q90 70 200 20" ${stroke}/>${leafShape(30, 82, -75, 0.8)}${leafShape(90, 70, 60, 0.8)}${leafShape(150, 50, -70, 0.8)}${ladybug(44, 56, 1.1)}${bird(214, 22, H.peach.mid, 1.1, -1)}${dot(285, 120, 7, H.butter.mid)}${dot(60, 160, 6, H.pink.mid)}${hill("M0 300Q90 270 190 298T320 290V320H0Z", H.green.mid, true)}${mushroom(30, 296, 1.2)}${mushroom(64, 304, 0.8, H.peach.dark)}${tuft(120, 312)}${moss}${dot(276, 298, 5, H.pink.mid)}${dot(292, 306, 4, H.butter.mid)}<ellipse cx="258" cy="306" rx="12" ry="6" fill="${H.lilac.light}" ${o}/><ellipse cx="300" cy="238" rx="8" ry="5" fill="${H.lilac.light}" ${o}/>`,
+  // UP: sky. TL rainbow+cloud, TR bird, BL balloon, BR paper plane+cloud.
+  U: `<rect width="320" height="320" fill="${H.sky.bg}"/>${["pink", "butter", "green", "sky"].map((k, i) => `<path d="M${14 + i * 7} 150A${50 - i * 7} ${50 - i * 7} 0 0 1 ${114 - i * 7 - 0} 150" fill="none" stroke="${H[k].mid}" stroke-width="7"/>`).join("")}${cloud(60, 66, 0.9)}${bird(258, 66, H.pink.mid, 1.2, -1)}${cloud(280, 120, 0.5, H.sky.light)}${balloon(52, 232, 0.8)}${plane(250, 262, 1.1)}${cloud(300, 308, 0.7)}${sunny}<path d="M40 292Q120 268 200 296" fill="none" stroke="${white}" stroke-width="10" stroke-linecap="round"/>`,
+  // DOWN: pond. TL dragonfly, TR lily pad, BL fish, BR reeds + bubbles.
+  D: `<rect width="320" height="320" fill="${H.sky.aqua}"/><path d="M0 60Q80 30 160 60T320 60" fill="none" stroke="${H.sky.water}" stroke-width="8" stroke-linecap="round"/>${dragonfly(58, 74, 1.1)}<ellipse cx="60" cy="128" rx="20" ry="5" fill="none" stroke="${H.sky.water}" stroke-width="3"/><path d="M240 120a36 28 0 1 0 64 -22L272 116Z" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${petals(270, 100, 16, 5, H.pink.mid, 0)}<circle cx="270" cy="100" r="6" fill="${H.butter.mid}" stroke="${ink}" stroke-width="${W.fine}"/>${plop}${fish(52, 288, 1.1)}${reeds(292, 296, 1)}${dot(240, 262, 5, "#fff")}${dot(256, 248, 3.5, "#fff")}`,
 };
 
 const images = [];
