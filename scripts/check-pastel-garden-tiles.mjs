@@ -75,7 +75,7 @@ for (const id of tiles) {
 // Alternative Up/Down proposals (full 320x320 faces): check each of their four stickers.
 for (const id of ["U1", "U2", "U3", "U4", "U5", "U5b", "D1", "D2", "D3", "D4", "D5"]) {
   let face;
-  try { face = readFileSync(new URL(`proposals/${id}.svg`, dir), "utf8"); } catch { continue; }
+  try { face = readFileSync(new URL(`../assets/playground-pastel-proposals/${id}.svg`, import.meta.url), "utf8"); } catch { continue; }
   for (const [r, c] of [[0, 0], [0, 1], [1, 0], [1, 1]])
     report(`${id}_${r}_${c}`, await measure(face.replace('width="320" height="320" viewBox="0 0 320 320"', `width="160" height="160" viewBox="${c * 160} ${r * 160} 160 160"`)));
 }

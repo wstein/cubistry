@@ -4,9 +4,9 @@ Copyright 2026 Cubistry contributors
 These six original vector illustrations and their 24 cropped SVG sticker tiles
 are licensed under AGPL-3.0-or-later, matching the Cubistry repository license.
 The six characters (Pip, Nimbo, Tulia, Moss, Sunny, Plop) are original inventions
-and are not modeled on any licensed character. No third-party images, fonts,
-platform glyphs, or stock artwork are
-included.
+and are not modeled on any licensed character. The SVG files in this directory
+contain no text and no fonts; no third-party images, platform glyphs, or stock
+artwork are included.
 
 Editable source and deterministic regeneration:
   scripts/build-pastel-garden-art.mjs

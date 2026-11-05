@@ -116,8 +116,8 @@ neighboring faces' colors (clouds tinted by the neighbor), and the bottom a
 picnic meadow with Tulia and Plop, where the front face's garden path continues
 as stepping stones to the blanket. The other reviewed top and bottom proposals, the
 single-blue sky variant and the retired tulip meadow and pond are kept as
-drafts in [`public/playground-pastel/proposals/`](../public/playground-pastel/proposals/up.svg)
-(see also its [down sheet](../public/playground-pastel/proposals/down.svg)) and are
+drafts in [`assets/playground-pastel-proposals/`](../assets/playground-pastel-proposals/up.svg)
+(see also its [down sheet](../assets/playground-pastel-proposals/down.svg)) and are
 not wired in. The six characters are original inventions, not modeled on
 any licensed character. The art follows the same constraints as above and the
 asset validator's SVG subset (no clipping paths, `url()` references or dash

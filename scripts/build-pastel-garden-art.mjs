@@ -434,7 +434,7 @@ const net = Object.entries(pos)
   .join("");
 writeFileSync(new URL("net.svg", dir), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330 1000" width="1330" height="1000"><rect width="1330" height="1000" fill="#f5f3eb"/>${net}</svg>\n`);
 
-const pdir = new URL("proposals/", dir);
+const pdir = new URL("../assets/playground-pastel-proposals/", import.meta.url);
 mkdirSync(pdir, { recursive: true });
 for (const [id, p] of Object.entries(proposals))
   writeFileSync(new URL(`${id}.svg`, pdir), `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">${p.art}</svg>\n`);
