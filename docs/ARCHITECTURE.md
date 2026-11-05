@@ -15,7 +15,7 @@ PuzlWerk core (ReScript) owns model, states and moves without DOM;
 `@puzlwerk/viewer` owns the scene (camera, light) and rendering without
 application knowledge, with the CubeScene model as its intended contract
 (proposed in [#111](https://github.com/wstein/cubistry/issues/111), still
-open); Cubistry owns presentation, animation timing, themes, printing,
+open); Cubistry owns presentation (animation timing: open, see below), themes, printing,
 validation, counters and calendars, generic physical-display composition,
 rendering of permanent sticker prints, and a planned declarative application
 runtime. CubeAssembler keeps scan, camera and validation; CubeLab keeps its
@@ -28,8 +28,8 @@ this repository (`packages/cube-viewer`); a future print/design studio will
 
 Decided (owner, 2026-11-05): puzzle orientation (whole-cube rotations x/y/z,
 fixed frame, centers) belongs to the application and core and reaches the
-viewer as plain transformation data in the CubeScene contract (for example a
-quaternion per group); display orientation (camera, orbit, POV) and
+viewer as plain transformation data in the proposed CubeScene contract (#111), for example a
+quaternion per group; display orientation (camera, orbit, POV) and
 interpolation between supplied states belong to the viewer, which knows no move
 notation. Who owns the timing and easing of an animation is still open
 (proposal: the application supplies start and target, the viewer interpolates).

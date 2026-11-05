@@ -25,7 +25,7 @@ to the cube; the display changes only by turning faces. Cubistry's rule is that
 every display must be physically realizable, not merely look plausible on a
 screen.
 
-Cubistry provides presentation, animation timing, themes, the sticker print rendering and
+Cubistry provides presentation, themes, the sticker print rendering and
 validation, and several reference applications. The shared 3D viewer is the target package
 `@puzlwerk/viewer` in the PuzlWerk monorepo; the viewer code still lives in this repository
 (`packages/cube-viewer`) until a separately approved migration. The solver foundation lives in the neighboring
@@ -76,7 +76,7 @@ notes and the full list are in [Development](docs/DEVELOPMENT.md) and
 ## How the repository fits together
 
 ```text
-applications (Cubistry: presentation, animation timing, themes, printing,
+applications (Cubistry: presentation, themes, printing,
 validation, counters, calendars; ChronoCube, clock, ...)
         |  depend on
    @puzlwerk/viewer   scene (camera, light) and rendering
