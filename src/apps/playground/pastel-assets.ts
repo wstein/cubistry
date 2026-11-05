@@ -118,55 +118,55 @@ export const pastelImages: readonly ImageAsset[] = [
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/U_0_0.svg",
-    "sha256": "7c93d2abebcce3395b43e10b2fc84a0f0a84cb1c1cb07fcbbb89812e36f8987e"
+    "sha256": "75aba8b03e3016294cf0f7ae49a8ba3746c8cf592c978f22b2df6bd9d7767e7c"
   },
   {
     "id": "U_0_1",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/U_0_1.svg",
-    "sha256": "1c13e02b4d156015904b23d90a5d3892a298c379020970c66a024011e2c79221"
+    "sha256": "8f04d8d6509d08346813bcde53a3bf7052f857bb09aff308ec749d6cea6a80aa"
   },
   {
     "id": "U_1_0",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/U_1_0.svg",
-    "sha256": "975cd14a7f3381c790e8f88b8cc0bf13445994672135ab33711680fdfe0dd623"
+    "sha256": "d126ce9de3889e1757d97718d3f710f548bcfb7fa7aaded06b59cb274dea421c"
   },
   {
     "id": "U_1_1",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/U_1_1.svg",
-    "sha256": "ad0304d1a7777901339e2dbb31285d2caee1b1799e2f7c6b492d946079f397ed"
+    "sha256": "c9f77049f0a775997088b7ecba8c902b6c5a335e8274aa0081d4a7cc68b0fb67"
   },
   {
     "id": "D_0_0",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/D_0_0.svg",
-    "sha256": "8564c5f99f201ebd288f1e4c53fd66793a39d82d768e375defe4060241af20bf"
+    "sha256": "a61476d15f24d1ebad3b4b14acae9b74e23c3b58ad14a6984c83ed6a9e13f53a"
   },
   {
     "id": "D_0_1",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/D_0_1.svg",
-    "sha256": "1788a1ea7483b99f5f0f3d99594e2b06665cd6b03de2e33d5f47b4fa2766a719"
+    "sha256": "f1085f2e059157dc28232846a9c15d19f7137a552264975bca86a58617db6f15"
   },
   {
     "id": "D_1_0",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/D_1_0.svg",
-    "sha256": "3b63dea08898ffff4caa6ef9e91344bc79f9bd83e6266dec6c04cc5abac3416d"
+    "sha256": "1d511694ba1e31be20c711353e2dc45277849a52c923b5fb16b0f04a699a9b6c"
   },
   {
     "id": "D_1_1",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/D_1_1.svg",
-    "sha256": "63306eafbb881888301d49b4120c39b3272b62ef037cfa074111ec42aebf40d9"
+    "sha256": "925badeeab1155e2330dc550a9f8e29b041173ff25c3e96937f0b6c662f59927"
   }
 ];
