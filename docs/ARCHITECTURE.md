@@ -4,27 +4,31 @@ How Cubistry relates to PuzlWerk, ChronoCube and the shared solver packages. Bac
 
 ## Ecosystem
 
-Cubistry is the reusable cube-display framework above the
-[PuzlWerk](https://github.com/wstein/puzlwerk) puzzle/solver foundation and
-below application-level products. Dependencies flow from applications to the
-shared viewer to PuzlWerk core, never in reverse.
+Cubistry is an application-level framework above the shared viewer, which in
+turn sits above the [PuzlWerk](https://github.com/wstein/puzlwerk)
+puzzle/solver foundation. The viewer depends on the core; applications depend
+on the viewer. Dependencies never point in reverse.
 
 The shared viewer is `@puzlwerk/viewer`, a separate package in the PuzlWerk
 monorepo (not in the core package and not in an application). Target split:
 PuzlWerk core (ReScript) owns model, states and moves without DOM;
-`@puzlwerk/viewer` owns the scene (camera, light, rotation of the cube about
-its center) and rendering without application knowledge, with the CubeScene
-model ([#111](https://github.com/wstein/cubistry/issues/111)) as its contract;
-Cubistry owns presentation, animation timing, themes, printing, counters and
-calendars, generic physical-display composition, rendering of permanent
-sticker prints, validation, and a planned declarative application runtime.
-CubeAssembler keeps scan, camera and validation; CubeLab keeps its native
-WebGL viewport until a separate migration (M3) is approved; Cubacle (Rust/WASM
-solver) never depends on the viewer. This is the target architecture, not a
-migration approval: each migration (CubeAssembler, Cubistry, CubeLab) needs
-the owner's separate approval. Until then the viewer code remains in this
-repository (`packages/cube-viewer`); a future print/design studio will *use*
-the viewer, not be required by it.
+`@puzlwerk/viewer` owns the scene (camera, light) and rendering without
+application knowledge, with the CubeScene model as its intended contract
+(proposed in [#111](https://github.com/wstein/cubistry/issues/111), still
+open); Cubistry owns presentation, animation timing, themes, printing,
+validation, counters and calendars, generic physical-display composition,
+rendering of permanent sticker prints, and a planned declarative application
+runtime. CubeAssembler keeps scan, camera and validation; CubeLab keeps its
+native WebGL viewport until a separate migration (M3) is approved; Cubacle
+(Rust solver) never depends on the viewer. This is the target architecture,
+not a migration approval: each migration (CubeAssembler, Cubistry, CubeLab)
+needs the owner's separate approval. Until then the viewer code remains in
+this repository (`packages/cube-viewer`); a future print/design studio will
+*use* the viewer, not be required by it.
+
+Open: whether the orientation (rotation) of the cube belongs to the viewer or
+to the Cubistry presentation is not decided. #111 and
+[Smart rotation](SMART_ROTATION.md) assign it to the presentation.
 
 The neutral 00–99 counter belongs in Cubistry as a reference example. The
 planned **ChronoCube** application belongs above the framework and focuses
