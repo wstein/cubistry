@@ -111,8 +111,10 @@ sticker tiles, and no quarter-turn equivalence. The left, front, right and back
 faces form one continuous landscape: a shared ground profile and a winding garden
 path meet exactly at every shared edge, with a dawn, day and night story around
 the belt. Its front face is Sunny, the right face a garden with Pip, the top a
-sun and moon sky whose edges blend smoothly into the neighboring faces' colors,
-and the bottom a picnic meadow. The other reviewed top and bottom proposals, the
+layered sun and moon sky with cloud kids whose edges blend smoothly into the
+neighboring faces' colors (clouds tinted by the neighbor), and the bottom a
+picnic meadow with Tulia and Plop, where the front face's garden path continues
+as stepping stones to the blanket. The other reviewed top and bottom proposals, the
 single-blue sky variant and the retired tulip meadow and pond are kept as
 drafts in [`public/playground-pastel/proposals/`](../public/playground-pastel/proposals/up.svg)
 (see also its [down sheet](../public/playground-pastel/proposals/down.svg)) and are

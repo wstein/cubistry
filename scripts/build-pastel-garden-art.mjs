@@ -300,6 +300,10 @@ const bush = (x, y, sc) =>
   shaded(g(x, y, sc, `<circle cx="-24" cy="8" r="22"/><circle cx="4" cy="-10" r="30"/><circle cx="32" cy="8" r="22"/><ellipse cx="4" cy="22" rx="46" ry="14"/>`), H.green.mid, H.green.dark, shine(x - 14 * sc, y - 24 * sc, 14 * sc, 7 * sc), [x, y]);
 const roundShaded = (x, y, r, c) =>
   shaded(`<circle cx="${x}" cy="${y}" r="${r}"/>`, c, mix(c, ink, 0.22), shine(x - r * 0.35, y - r * 0.35, r * 0.3, r * 0.18), [x, y]);
+const stonePts = Array.from({ length: 5 }, (_, i) => {
+  const t = i / 4, u = 1 - t;
+  return [u * u * 240 + 2 * u * t * 252 + t * t * 210, u * u * 8 + 2 * u * t * 56 + t * t * 98];
+});
 const picnicArt = () => {
   const cells = Array.from({ length: 20 }, (_, k) => {
     const i = k % 5, j = Math.floor(k / 5);
@@ -311,21 +315,26 @@ const picnicArt = () => {
   const corners = [[4, 6, 1.0], [318, 4, 1.0], [8, 306, 0.95], [314, 308, 1.0]];
   const skip = (x, y) =>
     (Math.abs(x - 160) < 96 && Math.abs(y - 172) < 80) || corners.some(([cx, cy, k]) => Math.hypot(x - cx, y - cy) < 58 * k) ||
-    Math.hypot(x - 246, y - 190) < 52 || Math.hypot(x - 66, y - 260) < 58;
+    Math.hypot(x - 246, y - 190) < 52 || Math.hypot(x - 66, y - 260) < 58 || stonePts.some(([sx, sy]) => Math.hypot(x - sx, y - sy) < 24) || x > 262 && y < 70;
+  // Story: the garden path touches the Front face's bottom edge near x=240 and continues here as
+  // stepping stones to the picnic; a snail's slime trail crosses the same edge at x=284.
+  const stones = stonePts.map(([x, y], i) => `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="13" ry="8.5" fill="${H.peach.light}" ${o} transform="rotate(${(i * 31) % 50 - 25} ${x.toFixed(1)} ${y.toFixed(1)})"/>`).join("");
+  const slime = `<path d="M284 0C294 70 264 140 268 210Q270 250 252 270" fill="none" stroke="${H.peach.light}" stroke-width="4" stroke-linecap="round" opacity=".75"/>`;
+  const fairyRing = mushroom(82, 26, 0.75) + mushroom(104, 34, 0.55, H.peach.dark);
   // Personality: Tulia sits at the blanket's edge with her bouquet; Plop splashes in a puddle.
   const puddle = g(-66, 126, 0.8, `<ellipse cx="160" cy="196" rx="66" ry="28" fill="${H.sky.water}" stroke="${ink}" stroke-width="${W.outline}"/><ellipse cx="160" cy="200" rx="48" ry="16" fill="${H.sky.aqua}" opacity=".6"/>${plopSmall}${bubble(198, 138, 5)}${bubble(210, 120, 7)}`);
   return (
     smoothField(downEdgesGreen, "#bfdcab") + corners.map(([x, y, k]) => bush(x, y, k)).join("") +
-    scatterBlooms(3, 6, 6, skip) + blanketShadow + blanket +
+    scatterBlooms(3, 6, 6, skip) + slime + stones + fairyRing + blanketShadow + blanket +
     puddle + g(150, 56.8, 0.6, tulia) +
-    snail(252, 276, 1.1) + ladybug(64, 66, 1.2) + butterfly(252, 70, H.lilac.mid, H.pink.light, 1.3) + mushroom(186, 294, 1.1) +
+    snail(252, 276, 1.1) + ladybug(64, 66, 1.2) + butterfly(150, 58, H.lilac.mid, H.pink.light, 1.3) + mushroom(186, 294, 1.1) +
     tuft(110, 314) + tuft(214, 312) + tuft(30, 150) + tuft(296, 166)
   );
 };
 // Layered, shaded sky: far pale clouds, mid outlined clouds, near shaded clouds, shaded sun and moon.
 const cloudPath = "M30 80Q14 50 48 48Q58 18 88 36Q118 30 124 58Q148 74 122 82H46Q32 86 30 80Z";
-const cloudFar = (x, y, s) =>
-  `<path transform="translate(${x} ${y}) scale(${s}) translate(-30 -80)" d="${cloudPath}" fill="#ffffff" opacity=".55"/>`;
+const cloudFar = (x, y, s, fill = "#ffffff") =>
+  `<path transform="translate(${x} ${y}) scale(${s}) translate(-30 -80)" d="${cloudPath}" fill="${fill}" opacity=".55"/>`;
 const cloudShaded = (x, y, s, base = white, shade = H.lilac.bg) =>
   shaded(`<path transform="translate(${x} ${y}) scale(${s}) translate(-30 -80)" d="${cloudPath}"/>`, base, shade, shine(x + 28 * s, y - 46 * s, 14 * s, 7 * s), [x + 51 * s, y - 28 * s]);
 const moonShaded = (x, y, s) =>
@@ -339,10 +348,15 @@ const sunShaded = (x, y, r) =>
 const miniFace = (x, y, mood = "happy", gap = 11) =>
   (mood === "sleepy" ? sleepyEye(x - gap, y) + sleepyEye(x + gap, y) : mood === "wink" ? eye(x - gap, y, 3.4) + arcEye(x + gap, y) : eye(x - gap, y, 3.4) + eye(x + gap, y, 3.4)) +
   cheeks(x, y + 7, gap + 7, H.pink.dark) + smile(x, y + 5, 5);
+// Story: the sky is tinted by the face beside it: dawn peach toward the Left face, warm butter toward the
+// Right face, white toward Front (day), and lilac toward the Back face (night, where the moon is).
+// The moon sits at the top-left because the Back face's moon is at its top-right edge, mirrored across the shared edge.
+const dawnTint = mix(white, H.peach.mid, 0.3), dayTint = mix(white, H.butter.mid, 0.28);
 const u5Content =
-  cloudFar(26, 52, 0.5) + cloudFar(196, 36, 0.45) + cloudFar(240, 150, 0.5) + cloudFar(8, 206, 0.45) + cloudFar(120, 232, 0.4) +
-  cloud(206, 108, 0.7) + cloud(22, 158, 0.7) +
-  cloudShaded(10, 270, 0.82) + cloudShaded(222, 272, 0.78) + cloudShaded(112, 168, 0.55) +
+  `<circle cx="0" cy="312" r="96" fill="${H.peach.light}" opacity=".4"/>` +
+  cloudFar(26, 52, 0.5, H.lilac.light) + cloudFar(196, 36, 0.45, H.lilac.light) + cloudFar(240, 150, 0.5) + cloudFar(8, 206, 0.45, dawnTint) + cloudFar(120, 232, 0.4) +
+  cloud(206, 108, 0.7, dayTint) + cloud(22, 158, 0.7, dawnTint) +
+  cloudShaded(10, 270, 0.82, dawnTint, H.peach.light) + cloudShaded(222, 272, 0.78, dayTint, H.butter.light) + cloudShaded(112, 168, 0.55) +
   moonShaded(100, 4, 0.85) +
   sparkles([[40, 40, 7], [270, 40, 6], [60, 110, 5], [250, 100, 6], [160, 30, 5], [20, 80, 4], [300, 90, 4]]) +
   sunShaded(160, 276, 26) +
