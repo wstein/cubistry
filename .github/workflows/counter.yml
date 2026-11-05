@@ -112,6 +112,8 @@ jobs:
       - run: npm run test:pages
         env:
           CI: '1'
+      - name: Check Pastel Garden tiles
+        run: node scripts/check-pastel-garden-tiles.mjs
       - run: npm run test:pr-preview
         env:
           CI: '1'
