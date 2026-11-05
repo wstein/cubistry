@@ -1,0 +1,12 @@
+EDGE 2027-1
+EDGE 2027-2
+EDGE 2027-3
+  no global solution with l=12.0 w=40 mp=1; trying hybrid finish
+  EDGE 2027-3 FAILED with l=12.0 w=40 mp=1
+  no global solution with l=8.0 w=30 mp=1; trying hybrid finish
+  EDGE 2027-3 FAILED with l=8.0 w=30 mp=1
+  no global solution with l=12.0 w=60 mp=1; trying hybrid finish
+  EDGE 2027-3 FAILED with l=12.0 w=60 mp=1
+ERROR: LoadError: edge 2027-3 failed with all settings
+  no global solution with l=12.0 w=40 mp=0; trying hybrid finish
+  EDGE 2027-3 FAILED with l=12.0 w=40 mp=0
