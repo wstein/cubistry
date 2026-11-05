@@ -4,16 +4,27 @@ How Cubistry relates to PuzlWerk, ChronoCube and the shared solver packages. Bac
 
 ## Ecosystem
 
-Cubistry is the reusable cube-display framework between the
+Cubistry is the reusable cube-display framework above the
 [PuzlWerk](https://github.com/wstein/puzlwerk) puzzle/solver foundation and
-application-level products. Dependencies flow from applications to Cubistry to
-PuzlWerk, never in reverse.
+below application-level products. Dependencies flow from applications to the
+shared viewer to PuzlWerk core, never in reverse.
 
-Cubistry owns generic physical-display composition, the 3D viewer and animator,
-rendering of permanent sticker prints, validation, and a planned declarative
-application runtime. Its viewer is a reusable module within this monorepo, not
-a separate repository; a future print/design studio will *use* the viewer,
-not be required by it.
+The shared viewer is `@puzlwerk/viewer`, a separate package in the PuzlWerk
+monorepo (not in the core package and not in an application). Target split:
+PuzlWerk core (ReScript) owns model, states and moves without DOM;
+`@puzlwerk/viewer` owns the scene (camera, light, rotation of the cube about
+its center) and rendering without application knowledge, with the CubeScene
+model ([#111](https://github.com/wstein/cubistry/issues/111)) as its contract;
+Cubistry owns presentation, animation timing, themes, printing, counters and
+calendars, generic physical-display composition, rendering of permanent
+sticker prints, validation, and a planned declarative application runtime.
+CubeAssembler keeps scan, camera and validation; CubeLab keeps its native
+WebGL viewport until a separate migration (M3) is approved; Cubacle (Rust/WASM
+solver) never depends on the viewer. This is the target architecture, not a
+migration approval: each migration (CubeAssembler, Cubistry, CubeLab) needs
+the owner's separate approval. Until then the viewer code remains in this
+repository (`packages/cube-viewer`); a future print/design studio will *use*
+the viewer, not be required by it.
 
 The neutral 00–99 counter belongs in Cubistry as a reference example. The
 planned **ChronoCube** application belongs above the framework and focuses
