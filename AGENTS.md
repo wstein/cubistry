@@ -12,7 +12,7 @@ Cubistry is a browser-first twisty-puzzle platform. Chronocube is a reference ap
 ## Work discipline
 - Clarify assumptions and acceptance criteria in the relevant spec or task.
 - Agent collaboration (roles, review, Ready, merge, rewrite, stacks, labels, identity, reports) follows the global agent rules, not this file.
-- Labels: `e2e` starts the heavy lane (`counter.yml:65,97`, `pages.yml:42,49`); `preview` publishes a same-repo PR preview (`pages.yml:21-28`, `pages-publish.yml:8`).
+- Labels: `e2e` starts the heavy lane (`counter.yml:65,97`; on PRs only the `fast` group); `preview` publishes a same-repo PR preview (`pages.yml:21-28`, `pages-publish.yml:8`).
 - Never overwrite proof artifacts without retaining reproducibility.
 - Keep proof research on its dedicated research branch; keep foundational design changes on feature branches.
 - Do not claim SAT or UNSAT from sticker capacity, a screenshot, solver log alone, or a candidate layout.
