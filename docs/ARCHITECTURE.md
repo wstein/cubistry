@@ -26,9 +26,13 @@ needs the owner's separate approval. Until then the viewer code remains in
 this repository (`packages/cube-viewer`); a future print/design studio will
 *use* the viewer, not be required by it.
 
-Open: whether the orientation (rotation) of the cube belongs to the viewer or
-to the Cubistry presentation is not decided. #111 and
-[Smart rotation](SMART_ROTATION.md) assign it to the presentation.
+Decided (owner, 2026-11-05): puzzle orientation (whole-cube rotations x/y/z,
+fixed frame, centers) belongs to the application and core and reaches the
+viewer as plain transformation data in the CubeScene contract (for example a
+quaternion per group); display orientation (camera, orbit, POV) and
+interpolation between supplied states belong to the viewer, which knows no move
+notation. Who owns the timing and easing of an animation is still open
+(proposal: the application supplies start and target, the viewer interpolates).
 
 The neutral 00–99 counter belongs in Cubistry as a reference example. The
 planned **ChronoCube** application belongs above the framework and focuses
