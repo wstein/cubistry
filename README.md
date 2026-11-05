@@ -25,8 +25,10 @@ to the cube; the display changes only by turning faces. Cubistry's rule is that
 every display must be physically realizable, not merely look plausible on a
 screen.
 
-Cubistry provides the 3D viewer and animator, the sticker print rendering and
-validation, and several reference applications. The solver foundation lives in the neighboring
+Cubistry provides presentation, animation timing, themes, the sticker print rendering and
+validation, and several reference applications. The shared 3D viewer is the target package
+`@puzlwerk/viewer` in the PuzlWerk monorepo; the viewer code still lives in this repository
+(`packages/cube-viewer`) until a separately approved migration. The solver foundation lives in the neighboring
 [PuzlWerk](https://github.com/wstein/puzlwerk) project; feasibility research and
 proof checkers live here under `research/` and `proof-checkers/`, with long-running
 research on a dedicated branch. This repository keeps verified facts apart
@@ -74,14 +76,15 @@ notes and the full list are in [Development](docs/DEVELOPMENT.md) and
 ## How the repository fits together
 
 ```text
-applications (ChronoCube, clock, counters, ...)
+applications (Cubistry, ChronoCube, clock, counters, ...)
         |  depend on
-   Cubistry   viewer, animator, sticker prints, validation
+   @puzlwerk/viewer   scene (camera, light, cube rotation) and rendering
         |  depends on
-   PuzlWerk   puzzle and solver foundation (separate repository)
+   PuzlWerk core      model, states, moves (separate repository)
 ```
 
-Dependencies flow downward only; Cubistry remains usable without ChronoCube.
+Target architecture; the viewer code still lives in this repository until a
+separately approved migration. Dependencies flow downward only; Cubistry remains usable without ChronoCube.
 Proof work lives on the protected branch `research/cube-display-feasibility`;
 foundational design changes go on feature branches. The `knowledge/` directory is
 a Markdown vault (decisions, specifications, findings): start at
