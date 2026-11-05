@@ -17,7 +17,8 @@ comparison. The question is whether the pure split's move counts for December
 
 [producer.jl](producer.jl) (untrusted, candidate generator only) adapts PR #130's
 hand-refined producer
-(`../../global-search/evidence/chain-2026-2028/producer-run.jl`).
+(`../../global-search/evidence/chain-2026-2028/producer-run.jl`, SHA-256
+`112ad364bcd27a6724182d5928bc55a5d047ae580ac3fab1cdcf025eccf89e9d`).
 
 - **Copied unchanged:** the macro library, the beam edge search, the hybrid
   finish (minimax orbit search from the best four partial beam snapshots), the
@@ -37,7 +38,9 @@ hand-refined producer
 - **Provenance:** the `base` runs used an earlier version of this file. It had
   two further variant hooks that `base` never activates. The `base` logic is
   identical, and the deterministic `orbitfb` run of the pure split reproduces
-  the `base` chain byte for byte.
+  the `base` chain byte for byte: `evidence/pure-orbitfb.moves.tsv` and
+  `evidence/pure-base.moves.tsv` both have SHA-256
+  `4e4df8d7b5d0666d2f34105032b227ae1166f92dd98c2d7e24d7fa4b524898e1`.
 
 ## Results (Dec 2026 → Dec 2027, 12 edges)
 
@@ -68,9 +71,23 @@ reference only: 1621 HTM in total, 135.1 per edge.
 
 ## Answer
 
-- **The pure split reaches the PR #130 level with the refined producer:**
-  128.5 HTM per edge on these 12 edges, against 129.8 for the PR #99 print
-  under the same producer, settings and start policy.
+- **With the refined producer, the pure split is at the same level as the
+  PR #99 print:** 128.5 HTM per edge on these 12 edges, against 129.8 under the
+  same producer, settings and start policy.
+- **Comparison with PR #130:**
+  - 128.5 happens to equal PR #130's 35-edge mean (4496 / 35). That mean
+    covers other years and states.
+  - The like-for-like 2027 figure of PR #130's chain is 135.1 (1621 / 12), from
+    other start states.
+- **Fairness:**
+  - The `orbitfb` fallback was added **after** seeing the PR #99 `base`
+    failure. The pure split never activates it, so pure `orbitfb` equals pure
+    `base`.
+  - On the PR #99 print, the orbit-solve edge (Feb → Mar: 77 HTM, against 40
+    for the pure split's hybrid) changes the PR #99 trajectory for every later
+    edge.
+  - This is one 12-edge trajectory per print. A gap of about 15 HTM (about 1%)
+    is within noise: **on par, not "pure is lower"**.
 - The heavy fallback edges of the earlier comparison (350 to 490 HTM) are gone
   on both prints. The refined producer's hybrid finish replaced them.
 - What this cannot show:
@@ -81,12 +98,16 @@ reference only: 1621 HTM in total, 135.1 per edge.
 
 ## Effort estimate for 2027–2099 (measured pilot numbers, not started)
 
-- **Time:** 875 edges at about 256 to 263 seconds per edge is about **62 to 64
-  hours** in one sequential process. Measured with a single producer process at
-  a time. Two concurrent producer processes stopped without output, and the
-  cause was not recorded.
-- **Memory:** about 3.2 GB per producer process (measured); the library holds
-  about 655,000 macros.
+- **Time:** the full chain is 875 edges. At about 256 to 263 seconds per edge
+  that is about **62 to 64 hours** in one sequential process.
+  - The pilot already covers 12 of those edges, so about 864 remain.
+  - The seconds per edge exclude the one-time library build of each process:
+    39 to 64 seconds, logged in `evidence/library-build.log` (654,752 macros).
+  - The edge times were measured with a single producer process at a time.
+  - Unlogged observation: two concurrent producer processes stopped without
+    output; no log survives and the cause was not recorded.
+- **Memory:** unlogged observation from `ps` of about 2.3 to 3.2 GB per producer
+  process. No `/usr/bin/time` output was recorded.
 - **Parallelism:** only one chain at a time can carry the physical state, as in
   the earlier estimate. Running years in parallel needs full-state join edges,
   which is UNKNOWN.
