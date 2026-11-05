@@ -262,6 +262,27 @@ const edgeField = (e, center) => {
       .join("")
   );
 };
+// Smooth variant of edgeField: a fine grid of flat cells whose color is an inverse-distance blend of
+// the four edge colors and the center, so no visible color boundaries remain. Cells overlap by 1px so
+// no hairline seams appear when the texture is scaled. Flat rects only (no gradients or url()).
+const smoothField = (e, center, cell = 16) => {
+  const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const sides = [["top", (x, y) => y], ["bottom", (x, y) => 320 - y], ["left", (x) => x], ["right", (x) => 320 - x]];
+  let out = `<rect width="320" height="320" fill="${center}"/>`;
+  for (let y = 0; y < 320; y += cell)
+    for (let x = 0; x < 320; x += cell) {
+      const cx = x + cell / 2, cy = y + cell / 2;
+      let wsum = 30, acc = hex(center).map((v) => v * 30);
+      for (const [k, d] of sides) {
+        const w = 1 / (d(cx, cy) / 320 + 0.06) ** 2, c = hex(e[k]);
+        wsum += w;
+        acc = acc.map((v, i) => v + w * c[i]);
+      }
+      const col = "#" + acc.map((v) => Math.round(v / wsum).toString(16).padStart(2, "0")).join("");
+      out += `<rect x="${x}" y="${y}" width="${cell + 1}" height="${cell + 1}" fill="${col}"/>`;
+    }
+  return out;
+};
 const rng = (seed) => () => {
   seed = (seed + 0x6d2b79f5) >>> 0;
   let t = seed;
@@ -307,13 +328,15 @@ const plopSmall = (() => {
   return `${shaded(body, H.pink.mid, H.pink.dark, shine(145, 150, 11, 6), [160, 170])}<ellipse cx="160" cy="134" rx="26" ry="9" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${sparkleEye(148, 166)}${sparkleEye(172, 166)}${cheeks(160, 177, 22, H.pink.dark)}${oMouth(160, 172)}`;
 })();
 
+const u5Content = g(100, 4, 0.85, moonShape + "") + sparkles([[40, 40, 7], [270, 40, 6], [60, 110, 5], [250, 100, 6], [160, 30, 5], [20, 80, 4], [300, 90, 4]]) + cloud(40, 170, 0.8) + cloud(206, 156, 0.9) + sunBurst(160, 270, 26) + bird(262, 230, H.pink.mid, 0.9, -1) + bird(56, 250, H.lilac.mid, 0.9);
 const proposals = {
   U0: { title: "U0 · current: dusk meadow (Tulia)", art: drawings.U },
   U1: { title: "U1 · Cloud meadow", art: upField + cloud(30, 90, 1.1) + cloud(180, 70, 0.8) + cloud(40, 250, 0.9) + cloud(190, 275, 1.0) + cloud(112, 172, 0.7) + cloud(240, 165, 0.6) + bird(262, 36, H.pink.mid, 1, -1) + bird(70, 40, H.peach.mid, 0.9) + plane(40, 190, 1) + balloon(284, 214, 0.45) + sparkles([[150, 36, 6], [20, 150, 5], [300, 120, 6], [160, 232, 5]]) },
   U2: { title: "U2 · Sun at the zenith", art: upField + sunBurst(160, 160, 44) + cloud(20, 70, 0.8) + cloud(226, 70, 0.7) + cloud(24, 276, 0.85) + cloud(226, 284, 0.8) + bird(268, 150, H.lilac.mid, 1, -1) + bird(46, 168, H.pink.mid, 1) + sparkles([[100, 120, 5], [220, 200, 5], [150, 44, 6], [160, 282, 6]]) },
   U3: { title: "U3 · Rainbow arch", art: upField + rainbowArcs(160, 205, 112) + cloud(24, 218, 0.95) + cloud(214, 222, 0.95) + cloud(110, 70, 0.8) + cloud(236, 60, 0.6) + bird(60, 110, H.pink.mid, 1) + bird(250, 130, H.sky.mid, 1, -1) + sparkles([[160, 104, 6], [30, 40, 5], [296, 190, 5], [150, 290, 5]]) },
   U4: { title: "U4 · Up and away", art: upField + cloud(130, 74, 0.6) + cloud(130, 280, 0.8) + cloud(240, 175, 0.5) + balloon(66, 110, 0.9) + balloon(234, 96, 0.7) + kite(250, 228, 1, H.lilac.mid) + plane(50, 250, 1.2) + plane(150, 160, 0.8) + bird(180, 30, H.pink.mid, 0.9, -1) + bird(280, 150, H.peach.mid, 0.9, -1) },
-  U5: { title: "U5 · Sun and moon sky", art: upField + g(100, 4, 0.85, moonShape + "") + sparkles([[40, 40, 7], [270, 40, 6], [60, 110, 5], [250, 100, 6], [160, 30, 5], [20, 80, 4], [300, 90, 4]]) + cloud(40, 170, 0.8) + cloud(206, 156, 0.9) + sunBurst(160, 270, 26) + bird(262, 230, H.pink.mid, 0.9, -1) + bird(56, 250, H.lilac.mid, 0.9) },
+  U5: { title: "U5 · Sun and moon sky (smooth blend)", art: smoothField(upEdges, "#eef7fb") + u5Content },
+  U5b: { title: "U5b · Sun and moon sky (single blue)", art: `<rect width="320" height="320" fill="${H.sky.bg}"/>` + u5Content },
   D0: { title: "D0 · current: pond (Plop)", art: drawings.D },
   D1: { title: "D1 · Wildflower meadow", art: downField + scatterBlooms(7, 6, 6) + tuft(40, 120) + tuft(280, 60) + tuft(160, 310) + tuft(290, 250) + ladybug(60, 70, 1.2) + butterfly(252, 84, H.pink.mid, H.peach.mid, 1.3) + bee(72, 252, 1.3) + snail(246, 268, 1.1) },
   D2: { title: "D2 · Tulip field with Tulia", art: (() => {
@@ -356,7 +379,8 @@ const sheet = (kind, ids) => {
     const beltY = kind === "U" ? oy + 34 + cell : oy + 34, faceY = kind === "U" ? oy + 34 : oy + 34 + cell;
     return `<text x="${ox}" y="${oy + 20}" font-family="system-ui, sans-serif" font-size="18" fill="${ink}">${proposals[id].title}</text>` + ["L", "F", "R", "B"].map((f, i) => nest(drawings[f], ox + i * cell, beltY, s)).join("") + nest(proposals[id].art, ox + cell, faceY, s);
   }).join("");
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 1070" width="1260" height="1070"><rect width="1260" height="1070" fill="#f5f3eb"/>${body}</svg>\n`;
+  const height = 20 + Math.ceil(ids.length / 2) * 350;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 ${height}" width="1260" height="${height}"><rect width="1260" height="${height}" fill="#f5f3eb"/>${body}</svg>\n`;
 };
-writeFileSync(new URL("up.svg", pdir), sheet("U", ["U0", "U1", "U2", "U3", "U4", "U5"]));
+writeFileSync(new URL("up.svg", pdir), sheet("U", ["U0", "U1", "U2", "U3", "U4", "U5", "U5b"]));
 writeFileSync(new URL("down.svg", pdir), sheet("D", ["D0", "D1", "D2", "D3", "D4", "D5"]));
