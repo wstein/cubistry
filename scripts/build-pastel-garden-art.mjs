@@ -278,6 +278,8 @@ const upEdges = { top: H.sky.light, right: H.butter.bg, bottom: H.sky.bg, left: 
 const upField = edgeField(upEdges, "#eef7fb");
 const downEdges = { top: H.green.mid, right: H.green.mid, bottom: H.sky.dark, left: H.green.mid };
 const downField = edgeField(downEdges, "#bfdcab");
+// All-green edges (no night-blue nuance toward the Back face) for the chosen picnic meadow.
+const downEdgesGreen = { top: H.green.mid, right: H.green.mid, bottom: H.green.mid, left: H.green.mid };
 
 const moonShape = `<path transform="translate(-215 -45)" d="M215 45a50 50 0 1 0 48 70a40 40 0 1 1-48-70Z" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.outline}"/>`;
 const rainbowArcs = (cx, cy, r) =>
@@ -313,13 +315,13 @@ const proposals = {
     return downField + rows.map((t) => tulip(t.x, t.y, 0.55, t.c)).join("") + g(24, -23.7, 0.85, tulia) + butterfly(52, 44, H.sky.mid, H.lilac.light, 1.1) + bee(268, 292, 1.1);
   })() },
   D3: { title: "D3 · Pond meadow with Plop", art: downField + scatterBlooms(5, 6, 6, (x, y) => ((x - 160) / 104) ** 2 + ((y - 168) / 70) ** 2 < 1) + `<ellipse cx="160" cy="168" rx="98" ry="64" fill="${H.sky.water}" stroke="${ink}" stroke-width="${W.outline}"/><ellipse cx="160" cy="176" rx="76" ry="44" fill="${H.sky.aqua}" opacity=".6"/><ellipse cx="228" cy="198" rx="20" ry="9" fill="${H.green.mid}" ${o}/><ellipse cx="96" cy="150" rx="18" ry="8" fill="${H.green.mid}" ${o}/>` + bloom(228, 194, 7, H.pink.mid) + plopSmall + bubble(204, 140, 6) + bubble(216, 122, 9) + reeds(268, 120, 0.8) + reeds(54, 264, 0.8) + dragonfly(246, 262, 1) + dragonfly(68, 80, 1) },
-  D4: { title: "D4 · CHOSEN: picnic (smooth blend)", art: (() => {
+  D4: { title: "D4 · CHOSEN: picnic (smooth green blend)", art: (() => {
     const cells = Array.from({ length: 20 }, (_, k) => {
       const i = k % 5, j = Math.floor(k / 5);
       return `<rect x="${-70 + i * 28}" y="${-56 + j * 28}" width="28" height="28" fill="${(i + j) % 2 ? H.pink.light : "#fffaf1"}"/>`;
     }).join("");
     const blanket = g(160, 172, 1, `<g transform="rotate(-10)">${cells}<rect x="-70" y="-56" width="140" height="112" fill="none" stroke="${ink}" stroke-width="${W.outline}"/><path d="M-26 -18l8-26h32l8 26Z" fill="${H.peach.mid}" ${o} stroke-linejoin="round"/><path d="M-18 -44Q0 -66 18 -44" ${strokeW(W.outline)}/><circle cx="38" cy="14" r="8" fill="${H.pink.dark}" ${o}/><circle cx="-30" cy="26" r="8" fill="${H.butter.mid}" ${o}/></g>`);
-    return smoothField(downEdges, "#bfdcab") + scatterBlooms(3, 6, 6, (x, y) => Math.abs(x - 160) < 96 && Math.abs(y - 172) < 80) + blanket + snail(252, 270, 1.1) + ladybug(64, 66, 1.2) + butterfly(252, 70, H.lilac.mid, H.pink.light, 1.3) + mushroom(60, 262, 1.1);
+    return smoothField(downEdgesGreen, "#bfdcab") + scatterBlooms(3, 6, 6, (x, y) => Math.abs(x - 160) < 96 && Math.abs(y - 172) < 80) + blanket + snail(252, 270, 1.1) + ladybug(64, 66, 1.2) + butterfly(252, 70, H.lilac.mid, H.pink.light, 1.3) + mushroom(60, 262, 1.1);
   })() },
   D5: { title: "D5 · Stepping stones and flower beds", art: (() => {
     const stones = Array.from({ length: 9 }, (_, i) => {
