@@ -4,7 +4,13 @@
 
 Agent collaboration (roles, review, Ready, merge, rewrite, stacks, labels, identity, reports) follows the global agent rules, not this file.
 
-Merge: Rebase and merge only.
+Start focused feature branches from current `main`. Use small, atomic [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+A PR describes its scope, a short summary, the verification commands you ran, and known risks or limitations.
+
+Merge: Rebase and merge only. A linear-history ruleset on `main` enforces this.
+
+Agent rules are in [AGENTS.md](AGENTS.md).
 
 ## Dedicated research branch
 
