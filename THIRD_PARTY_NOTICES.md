@@ -119,6 +119,10 @@ The following third-party libraries and modules are bundled, linked, or distribu
 * **Copyright**: © 2026 Cubistry contributors.
 * **License**: AGPL-3.0-or-later.
 * **Regeneration**: Deterministically built using `node scripts/build-playground-art.mjs`.
+* **Pastel Garden Artwork**: Six original vector illustrations and their 24 cropped SVG sticker tiles; the characters (Pip, Nimbo, Tulia, Moss, Sunny, Plop) are original inventions, not modeled on any licensed character (`public/playground-pastel/NOTICE.txt`).
+* **Copyright**: © 2026 Cubistry contributors.
+* **License**: AGPL-3.0-or-later.
+* **Regeneration**: Deterministically built using `node scripts/build-pastel-garden-art.mjs`.
 
 ---
 
