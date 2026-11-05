@@ -1,0 +1,14 @@
+# producer adapted from PR #130 producer-run.jl; layout=pure variant=base
+from	to	method	htm	seconds
+2026-12	2027-1	hybrid l=12.0 w=40 mp=1	116	320.6
+2027-1	2027-2	hybrid l=8.0 w=30 mp=1	126	413.4
+2027-2	2027-3	hybrid l=12.0 w=40 mp=1	40	188.4
+2027-3	2027-4	global l=12.0 w=40 mp=1	130	170.0
+2027-4	2027-5	global l=12.0 w=40 mp=1	129	171.5
+2027-5	2027-6	hybrid l=12.0 w=40 mp=1	143	281.2
+2027-6	2027-7	hybrid l=12.0 w=40 mp=1	139	241.2
+2027-7	2027-8	hybrid l=12.0 w=40 mp=1	153	398.4
+2027-8	2027-9	global l=12.0 w=40 mp=1	146	169.5
+2027-9	2027-10	hybrid l=12.0 w=40 mp=1	144	279.7
+2027-10	2027-11	hybrid l=12.0 w=40 mp=1	134	261.0
+2027-11	2027-12	global l=12.0 w=40 mp=1	142	173.2
