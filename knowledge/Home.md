@@ -8,7 +8,6 @@ This directory is a portable, Markdown-first knowledge base and an optional Obsi
 
 ## Navigate
 
-- [Zettelkasten](zettel/index.md) — atomic insights and open questions
 - [Maps of content](maps/index.md) — topic navigation
 - [Architecture decisions](adr/index.md) — accepted/superseded decisions
 - [Specifications](specs/index.md) — testable product and technical requirements

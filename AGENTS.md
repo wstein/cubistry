@@ -5,7 +5,7 @@ Cubistry is a browser-first twisty-puzzle platform. Chronocube is a reference ap
 
 ## Sources of truth
 - Read `knowledge/Home.md` and `knowledge/CONVENTIONS.md` before modifying architecture, specs or research.
-- Accepted ADRs govern decisions; specs govern requirements; Zettel capture hypotheses and findings. Do not silently rewrite accepted decisions.
+- Accepted ADRs govern decisions; specs govern requirements. Do not silently rewrite accepted decisions.
 - Keep experimentally verified facts distinct from proposals and assumptions.
 - Existing results, scripts, and certificates in research branches are evidence; preserve their provenance.
 
