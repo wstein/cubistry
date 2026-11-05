@@ -50,7 +50,8 @@ consumes the full original sticker frames instead of a lossy solver projection.
 ## Decision
 
 Keep the existing `@cubistry/cube-viewer` as the single reusable presentation
-package. Add a narrow, size-neutral presentation adapter for printed frames,
+package. This describes the current state; the target shared viewer package is
+`@puzlwerk/viewer` per [Architecture](ARCHITECTURE.md). Add a narrow, size-neutral presentation adapter for printed frames,
 canonical body poses and already validated turn events. The 2×2 caller keeps its
 existing canonical print/state validation; the 3×3 Calendar caller keeps its
 existing legal replay validation. This boundary does not advertise additional
