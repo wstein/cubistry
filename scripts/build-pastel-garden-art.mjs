@@ -309,11 +309,16 @@ const picnicArt = () => {
   const blanketShadow = g(8, 10, 1, `<g transform="translate(160 172) rotate(-10)"><rect x="-70" y="-56" width="140" height="112" fill="${H.green.dark}" opacity=".3"/></g>`);
   const blanket = g(160, 172, 1, `<g transform="rotate(-10)">${cells}<rect x="-70" y="-56" width="140" height="112" fill="none" stroke="${ink}" stroke-width="${W.outline}"/>${basket}${roundShaded(38, 14, 8, H.pink.dark)}${roundShaded(-30, 26, 8, H.butter.mid)}</g>`);
   const corners = [[4, 6, 1.0], [318, 4, 1.0], [8, 306, 0.95], [314, 308, 1.0]];
-  const skip = (x, y) => (Math.abs(x - 160) < 96 && Math.abs(y - 172) < 80) || corners.some(([cx, cy, k]) => Math.hypot(x - cx, y - cy) < 58 * k);
+  const skip = (x, y) =>
+    (Math.abs(x - 160) < 96 && Math.abs(y - 172) < 80) || corners.some(([cx, cy, k]) => Math.hypot(x - cx, y - cy) < 58 * k) ||
+    Math.hypot(x - 246, y - 190) < 52 || Math.hypot(x - 66, y - 260) < 58;
+  // Personality: Tulia sits at the blanket's edge with her bouquet; Plop splashes in a puddle.
+  const puddle = g(-66, 126, 0.8, `<ellipse cx="160" cy="196" rx="66" ry="28" fill="${H.sky.water}" stroke="${ink}" stroke-width="${W.outline}"/><ellipse cx="160" cy="200" rx="48" ry="16" fill="${H.sky.aqua}" opacity=".6"/>${plopSmall}${bubble(198, 138, 5)}${bubble(210, 120, 7)}`);
   return (
     smoothField(downEdgesGreen, "#bfdcab") + corners.map(([x, y, k]) => bush(x, y, k)).join("") +
     scatterBlooms(3, 6, 6, skip) + blanketShadow + blanket +
-    snail(252, 270, 1.1) + ladybug(64, 66, 1.2) + butterfly(252, 70, H.lilac.mid, H.pink.light, 1.3) + mushroom(60, 262, 1.1) +
+    puddle + g(150, 56.8, 0.6, tulia) +
+    snail(252, 276, 1.1) + ladybug(64, 66, 1.2) + butterfly(252, 70, H.lilac.mid, H.pink.light, 1.3) + mushroom(186, 294, 1.1) +
     tuft(110, 314) + tuft(214, 312) + tuft(30, 150) + tuft(296, 166)
   );
 };
@@ -330,6 +335,10 @@ const sunShaded = (x, y, r) =>
     const a = (Math.PI * 2 * i) / 12;
     return `<path d="M${(x + Math.cos(a) * (r + 12)).toFixed(1)} ${(y + Math.sin(a) * (r + 12)).toFixed(1)}L${(x + Math.cos(a) * (r + 30)).toFixed(1)} ${(y + Math.sin(a) * (r + 30)).toFixed(1)}" ${strokeW(5, H.butter.mid)}/>`;
   }).join("") + `<circle cx="${x}" cy="${y}" r="${r + 10}" fill="${H.butter.light}" opacity=".6"/>` + shaded(`<circle cx="${x}" cy="${y}" r="${r}"/>`, H.butter.mid, H.butter.dark, shine(x - r * 0.4, y - r * 0.4, r * 0.35, r * 0.2), [x, y]);
+// Small faces for sky characters: moods are "happy", "sleepy" and "wink".
+const miniFace = (x, y, mood = "happy", gap = 11) =>
+  (mood === "sleepy" ? sleepyEye(x - gap, y) + sleepyEye(x + gap, y) : mood === "wink" ? eye(x - gap, y, 3.4) + arcEye(x + gap, y) : eye(x - gap, y, 3.4) + eye(x + gap, y, 3.4)) +
+  cheeks(x, y + 7, gap + 7, H.pink.dark) + smile(x, y + 5, 5);
 const u5Content =
   cloudFar(26, 52, 0.5) + cloudFar(196, 36, 0.45) + cloudFar(240, 150, 0.5) + cloudFar(8, 206, 0.45) + cloudFar(120, 232, 0.4) +
   cloud(206, 108, 0.7) + cloud(22, 158, 0.7) +
@@ -337,7 +346,11 @@ const u5Content =
   moonShaded(100, 4, 0.85) +
   sparkles([[40, 40, 7], [270, 40, 6], [60, 110, 5], [250, 100, 6], [160, 30, 5], [20, 80, 4], [300, 90, 4]]) +
   sunShaded(160, 276, 26) +
-  bird(252, 196, H.pink.mid, 0.9, -1) + bird(62, 206, H.lilac.mid, 0.9);
+  bird(252, 196, H.pink.mid, 0.9, -1) + bird(62, 206, H.lilac.mid, 0.9) +
+  // Personality: a calm sun, a sleepy moon, and three cloud kids with moods.
+  miniFace(160, 276, "happy", 9) + sleepyEye(76, 46) + cheeks(72, 58, 6, H.pink.dark) +
+  miniFace(54, 250, "sleepy", 13) + bubble(100, 232, 4) + bubble(110, 218, 6) +
+  miniFace(262, 252, "wink", 13) + miniFace(142, 156, "happy", 8);
 const proposals = {
   U0: { title: "U0 · previous: dusk meadow (Tulia)", art: drawings.U },
   U1: { title: "U1 · Cloud meadow", art: upField + cloud(30, 90, 1.1) + cloud(180, 70, 0.8) + cloud(40, 250, 0.9) + cloud(190, 275, 1.0) + cloud(112, 172, 0.7) + cloud(240, 165, 0.6) + bird(262, 36, H.pink.mid, 1, -1) + bird(70, 40, H.peach.mid, 0.9) + plane(40, 190, 1) + balloon(284, 214, 0.45) + sparkles([[150, 36, 6], [20, 150, 5], [300, 120, 6], [160, 232, 5]]) },
