@@ -10,7 +10,7 @@ const word = async (page, text) => {
   await page.locator("#notation").press("Enter");
   await idle(page);
 };
-test("keyboard manual turns, invalid words, seeded scramble history roundtrip and exact solve in both designs", async ({
+test("keyboard manual turns, invalid words, seeded scramble history roundtrip and exact solve in every design", async ({
   page,
 }) => {
   const errors = [];
@@ -30,7 +30,7 @@ test("keyboard manual turns, invalid words, seeded scramble history roundtrip an
     "Verified",
   );
   await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
-  for (const style of ["picture", "classic"]) {
+  for (const style of ["picture", "pastel", "classic"]) {
     await page.locator("#design").selectOption(style);
     await idle(page);
     await expect(page.locator("#history li")).toHaveCount(0);

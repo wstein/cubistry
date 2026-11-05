@@ -17,7 +17,8 @@ import {
 } from "@cubistry/cube-mechanics";
 import type { AssetManifest } from "@cubistry/cube-assets";
 import { pictureImages } from "./picture-assets.ts";
-export type Style = "classic" | "picture";
+import { pastelImages } from "./pastel-assets.ts";
+export type Style = "classic" | "picture" | "pastel";
 const faces = [
   { face: "R", normal: [1, 0, 0], up: [0, 1, 0], color: "#e94538" },
   { face: "L", normal: [-1, 0, 0], up: [0, 1, 0], color: "#ff922e" },
@@ -40,7 +41,7 @@ export const CAPABILITY = deepFreeze({
     "Unsupported: this playground uses the shared size-2 mechanics and viewer profile.",
 });
 export function createDesign(style: Style) {
-  if (!["classic", "picture"].includes(style))
+  if (!["classic", "picture", "pastel"].includes(style))
     throw Error("Unsupported playground design");
   const print = validatePrint({
     schema: "cubistry.print",
@@ -83,7 +84,9 @@ export function createDesign(style: Style) {
             kind: "color" as const,
             color,
           }))
-        : pictureImages,
+        : style === "pastel"
+          ? pastelImages
+          : pictureImages,
   });
   const target = initialState(print);
   // Whole-cube frames are constructed using legal opposite face turns. They

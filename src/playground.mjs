@@ -135,7 +135,7 @@ for (const el of [
 ])
   el.disabled = true;
 try {
-  for (const style of ["picture", "classic"]) {
+  for (const style of ["picture", "pastel", "classic"]) {
     const design = createDesign(style),
       assets = await loadAssets(
         design.assets,
