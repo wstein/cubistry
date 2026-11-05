@@ -8,7 +8,7 @@ Start focused feature branches from current `main`. Use small, atomic [Conventio
 
 A PR describes its scope, a short summary, the verification commands you ran, and known risks or limitations.
 
-Merge: Rebase and merge only. A linear-history ruleset on `main` enforces this.
+Merge: Rebase and merge only. Repository merge settings and a linear-history ruleset on `main` enforce this.
 
 Agent rules are in [AGENTS.md](AGENTS.md).
 
