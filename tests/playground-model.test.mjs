@@ -17,7 +17,7 @@ import {
   scramble,
 } from "../src/apps/playground/model.ts";
 import { prepareTestSolver } from "./helpers/shared-solver.mjs";
-for (const style of ["classic", "picture"]) {
+for (const style of ["classic", "picture", "pastel"]) {
   test(`${style}: permanent IDs, local frames, rotation classification and real provider exact solve`, async () => {
     const d = createDesign(style);
     assert.equal(d.print.stickers.length, 24);
@@ -57,24 +57,28 @@ for (const style of ["classic", "picture"]) {
 }
 test("distinct print sessions and original image tile provenance", () => {
   const classic = createDesign("classic"),
-    picture = createDesign("picture");
-  assert.notEqual(classic.print.id, picture.print.id);
+    picture = createDesign("picture"),
+    pastel = createDesign("pastel");
+  assert.equal(new Set([classic, picture, pastel].map((d) => d.print.id)).size, 3);
   assert.ok(!stateEquals(classic.target, picture.target));
-  for (const image of picture.assets.images) {
-    const source = readFileSync(
-      new URL(`../public${image.url}`, import.meta.url),
-      "utf8",
-    );
-    assert.equal(
-      createHash("sha256").update(source).digest("hex"),
-      image.sha256,
-    );
-    assert.ok(!/<(?:text|clipPath|image|script)\b|href=/.test(source));
-    assert.match(
-      source,
-      /width="160" height="160" viewBox="(?:0|160) (?:0|160) 160 160"/,
-    );
-  }
+  assert.ok(!stateEquals(picture.target, pastel.target));
+  for (const design of [picture, pastel])
+    for (const image of design.assets.images) {
+      const source = readFileSync(
+        new URL(`../public${image.url}`, import.meta.url),
+        "utf8",
+      );
+      assert.equal(
+        createHash("sha256").update(source).digest("hex"),
+        image.sha256,
+      );
+      assert.ok(!/<(?:text|clipPath|image|script)\b|href=/.test(source));
+      assert.match(
+        source,
+        /width="160" height="160" viewBox="(?:0|160) (?:0|160) 160 160"/,
+      );
+    }
+  assert.equal(pastel.assets.images.length, 24);
   assert.throws(() => scramble(-1, 20));
   assert.throws(() => scramble(0, 101));
   assert.throws(() => scramble(1.5, 20));

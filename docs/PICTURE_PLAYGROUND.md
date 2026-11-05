@@ -7,7 +7,7 @@ not a new renderer or general application framework.
 
 ## Behavior and physical contract
 
-Choose Landscape pictures or Classic colors. Each is a separate immutable print
+Choose Landscape pictures, Pastel Garden or Classic colors. Each is a separate immutable print
 with eight body IDs, 24 sticker IDs, fixed local normals and up vectors, and a
 complete initial physical target. Changing design or choosing Start new session
 explicitly creates a new physical puzzle and clears history after the active
@@ -102,6 +102,30 @@ and their integrity manifest. Formatting of the generated TypeScript is cosmetic
 Copyright 2026 Cubistry contributors, AGPL-3.0-or-later, matching the repository
 [license](../LICENSE). This provenance travels with the generator,
 [bundled artwork notice](../public/playground/NOTICE.txt), and app footer.
+
+### Pastel Garden design
+
+Pastel Garden is a third picture design with the same physical contract as
+Landscape pictures: its own print (`playground_pastel_v1`), 24 uniquely oriented
+sticker tiles, and no quarter-turn equivalence. The left, front, right and back
+faces form one continuous landscape: a shared ground profile and a winding garden
+path meet exactly at every shared edge, with a dawn, day and night story around
+the belt. Its front face is Sunny, the right face a garden with Pip, the top a
+tulip meadow and the bottom a pond. Alternative top and bottom faces, with edge
+colors blended into their neighbors, are drafted in
+[`public/playground-pastel/proposals/`](../public/playground-pastel/proposals/up.svg)
+(see also its [down sheet](../public/playground-pastel/proposals/down.svg)) and are
+not wired in. The six characters are original inventions, not modeled on
+any licensed character. The art follows the same constraints as above and the
+asset validator's SVG subset (no clipping paths, `url()` references or dash
+patterns). The authoritative generator is
+[`build-pastel-garden-art.mjs`](../scripts/build-pastel-garden-art.mjs); regenerate
+with `node scripts/build-pastel-garden-art.mjs`. It writes the faces, tiles,
+net preview, integrity manifest and typed asset list. Run
+`node scripts/check-pastel-garden-tiles.mjs` to verify that every tile has enough
+detail to place and differs from its own 90, 180 and 270 degree rotations. See the
+[artwork notice](../public/playground-pastel/NOTICE.txt). Legibility at physical
+sticker size has not been reviewed.
 
 Actual DPR2 Chromium captures were inspected: the front mountain/lake continues
 across the four correctly oriented stickers, a side illustration remains
