@@ -76,15 +76,16 @@ notes and the full list are in [Development](docs/DEVELOPMENT.md) and
 ## How the repository fits together
 
 ```text
-applications (Cubistry, ChronoCube, clock, counters, ...)
+applications (Cubistry: presentation, animation timing, themes, printing,
+validation, counters, calendars; ChronoCube, clock, ...)
         |  depend on
-   @puzlwerk/viewer   scene (camera, light, cube rotation) and rendering
+   @puzlwerk/viewer   scene (camera, light) and rendering
         |  depends on
    PuzlWerk core      model, states, moves (separate repository)
 ```
 
 Target architecture; the viewer code still lives in this repository until a
-separately approved migration. Dependencies flow downward only; Cubistry remains usable without ChronoCube.
+separately approved migration. The viewer depends on the core; applications depend on the viewer. Dependencies flow downward only; Cubistry remains usable without ChronoCube.
 Proof work lives on the protected branch `research/cube-display-feasibility`;
 foundational design changes go on feature branches. The `knowledge/` directory is
 a Markdown vault (decisions, specifications, findings): start at
