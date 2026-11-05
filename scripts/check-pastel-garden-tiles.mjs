@@ -73,7 +73,7 @@ for (const id of tiles) {
   report(id, await measure(svg));
 }
 // Alternative Up/Down proposals (full 320x320 faces): check each of their four stickers.
-for (const id of ["U1", "U2", "U3", "U4", "U5", "D1", "D2", "D3", "D4", "D5"]) {
+for (const id of ["U1", "U2", "U3", "U4", "U5", "U5b", "D1", "D2", "D3", "D4", "D5"]) {
   let face;
   try { face = readFileSync(new URL(`proposals/${id}.svg`, dir), "utf8"); } catch { continue; }
   for (const [r, c] of [[0, 0], [0, 1], [1, 0], [1, 1]])
