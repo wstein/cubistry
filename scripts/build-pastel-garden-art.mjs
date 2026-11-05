@@ -295,7 +295,49 @@ const plopSmall = (() => {
   return `${shaded(body, H.pink.mid, H.pink.dark, shine(145, 150, 11, 6), [160, 170])}<ellipse cx="160" cy="134" rx="26" ry="9" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${sparkleEye(148, 166)}${sparkleEye(172, 166)}${cheeks(160, 177, 22, H.pink.dark)}${oMouth(160, 172)}`;
 })();
 
-const u5Content = g(100, 4, 0.85, moonShape + "") + sparkles([[40, 40, 7], [270, 40, 6], [60, 110, 5], [250, 100, 6], [160, 30, 5], [20, 80, 4], [300, 90, 4]]) + cloud(40, 170, 0.8) + cloud(206, 156, 0.9) + sunBurst(160, 270, 26) + bird(262, 230, H.pink.mid, 0.9, -1) + bird(56, 250, H.lilac.mid, 0.9);
+// Layered, shaded picnic meadow: bush corners (far), blanket and flower beds (mid), grass tufts (near).
+const bush = (x, y, sc) =>
+  shaded(g(x, y, sc, `<circle cx="-24" cy="8" r="22"/><circle cx="4" cy="-10" r="30"/><circle cx="32" cy="8" r="22"/><ellipse cx="4" cy="22" rx="46" ry="14"/>`), H.green.mid, H.green.dark, shine(x - 14 * sc, y - 24 * sc, 14 * sc, 7 * sc), [x, y]);
+const roundShaded = (x, y, r, c) =>
+  shaded(`<circle cx="${x}" cy="${y}" r="${r}"/>`, c, mix(c, ink, 0.22), shine(x - r * 0.35, y - r * 0.35, r * 0.3, r * 0.18), [x, y]);
+const picnicArt = () => {
+  const cells = Array.from({ length: 20 }, (_, k) => {
+    const i = k % 5, j = Math.floor(k / 5);
+    return `<rect x="${-70 + i * 28}" y="${-56 + j * 28}" width="28" height="28" fill="${(i + j) % 2 ? H.pink.light : "#fffaf1"}"/>`;
+  }).join("");
+  const basket = shaded(`<path d="M-26 -18l8-26h32l8 26Z"/>`, H.peach.mid, H.peach.dark, shine(-9, -38, 8, 4), [0, -31]) + `<path d="M-18 -44Q0 -66 18 -44" ${strokeW(W.outline)}/><path d="M-20 -32H20M-23 -24H23" ${strokeW(W.fine, H.peach.dark)}/>`;
+  const blanketShadow = g(8, 10, 1, `<g transform="translate(160 172) rotate(-10)"><rect x="-70" y="-56" width="140" height="112" fill="${H.green.dark}" opacity=".3"/></g>`);
+  const blanket = g(160, 172, 1, `<g transform="rotate(-10)">${cells}<rect x="-70" y="-56" width="140" height="112" fill="none" stroke="${ink}" stroke-width="${W.outline}"/>${basket}${roundShaded(38, 14, 8, H.pink.dark)}${roundShaded(-30, 26, 8, H.butter.mid)}</g>`);
+  const corners = [[4, 6, 1.0], [318, 4, 1.0], [8, 306, 0.95], [314, 308, 1.0]];
+  const skip = (x, y) => (Math.abs(x - 160) < 96 && Math.abs(y - 172) < 80) || corners.some(([cx, cy, k]) => Math.hypot(x - cx, y - cy) < 58 * k);
+  return (
+    smoothField(downEdgesGreen, "#bfdcab") + corners.map(([x, y, k]) => bush(x, y, k)).join("") +
+    scatterBlooms(3, 6, 6, skip) + blanketShadow + blanket +
+    snail(252, 270, 1.1) + ladybug(64, 66, 1.2) + butterfly(252, 70, H.lilac.mid, H.pink.light, 1.3) + mushroom(60, 262, 1.1) +
+    tuft(110, 314) + tuft(214, 312) + tuft(30, 150) + tuft(296, 166)
+  );
+};
+// Layered, shaded sky: far pale clouds, mid outlined clouds, near shaded clouds, shaded sun and moon.
+const cloudPath = "M30 80Q14 50 48 48Q58 18 88 36Q118 30 124 58Q148 74 122 82H46Q32 86 30 80Z";
+const cloudFar = (x, y, s) =>
+  `<path transform="translate(${x} ${y}) scale(${s}) translate(-30 -80)" d="${cloudPath}" fill="#ffffff" opacity=".55"/>`;
+const cloudShaded = (x, y, s, base = white, shade = H.lilac.bg) =>
+  shaded(`<path transform="translate(${x} ${y}) scale(${s}) translate(-30 -80)" d="${cloudPath}"/>`, base, shade, shine(x + 28 * s, y - 46 * s, 14 * s, 7 * s), [x + 51 * s, y - 28 * s]);
+const moonShaded = (x, y, s) =>
+  shaded(`<path transform="translate(${x} ${y}) scale(${s}) translate(-215 -45)" d="M215 45a50 50 0 1 0 48 70a40 40 0 1 1-48-70Z"/>`, H.butter.light, H.butter.mid, shine(x - 22 * s, y + 20 * s, 9 * s, 5 * s), [x + 2 * s, y + 38 * s]);
+const sunShaded = (x, y, r) =>
+  Array.from({ length: 12 }, (_, i) => {
+    const a = (Math.PI * 2 * i) / 12;
+    return `<path d="M${(x + Math.cos(a) * (r + 12)).toFixed(1)} ${(y + Math.sin(a) * (r + 12)).toFixed(1)}L${(x + Math.cos(a) * (r + 30)).toFixed(1)} ${(y + Math.sin(a) * (r + 30)).toFixed(1)}" ${strokeW(5, H.butter.mid)}/>`;
+  }).join("") + `<circle cx="${x}" cy="${y}" r="${r + 10}" fill="${H.butter.light}" opacity=".6"/>` + shaded(`<circle cx="${x}" cy="${y}" r="${r}"/>`, H.butter.mid, H.butter.dark, shine(x - r * 0.4, y - r * 0.4, r * 0.35, r * 0.2), [x, y]);
+const u5Content =
+  cloudFar(26, 52, 0.5) + cloudFar(196, 36, 0.45) + cloudFar(240, 150, 0.5) + cloudFar(8, 206, 0.45) + cloudFar(120, 232, 0.4) +
+  cloud(206, 108, 0.7) + cloud(22, 158, 0.7) +
+  cloudShaded(10, 270, 0.82) + cloudShaded(222, 272, 0.78) + cloudShaded(112, 168, 0.55) +
+  moonShaded(100, 4, 0.85) +
+  sparkles([[40, 40, 7], [270, 40, 6], [60, 110, 5], [250, 100, 6], [160, 30, 5], [20, 80, 4], [300, 90, 4]]) +
+  sunShaded(160, 276, 26) +
+  bird(252, 196, H.pink.mid, 0.9, -1) + bird(62, 206, H.lilac.mid, 0.9);
 const proposals = {
   U0: { title: "U0 · previous: dusk meadow (Tulia)", art: drawings.U },
   U1: { title: "U1 · Cloud meadow", art: upField + cloud(30, 90, 1.1) + cloud(180, 70, 0.8) + cloud(40, 250, 0.9) + cloud(190, 275, 1.0) + cloud(112, 172, 0.7) + cloud(240, 165, 0.6) + bird(262, 36, H.pink.mid, 1, -1) + bird(70, 40, H.peach.mid, 0.9) + plane(40, 190, 1) + balloon(284, 214, 0.45) + sparkles([[150, 36, 6], [20, 150, 5], [300, 120, 6], [160, 232, 5]]) },
@@ -315,14 +357,7 @@ const proposals = {
     return downField + rows.map((t) => tulip(t.x, t.y, 0.55, t.c)).join("") + g(24, -23.7, 0.85, tulia) + butterfly(52, 44, H.sky.mid, H.lilac.light, 1.1) + bee(268, 292, 1.1);
   })() },
   D3: { title: "D3 · Pond meadow with Plop", art: downField + scatterBlooms(5, 6, 6, (x, y) => ((x - 160) / 104) ** 2 + ((y - 168) / 70) ** 2 < 1) + `<ellipse cx="160" cy="168" rx="98" ry="64" fill="${H.sky.water}" stroke="${ink}" stroke-width="${W.outline}"/><ellipse cx="160" cy="176" rx="76" ry="44" fill="${H.sky.aqua}" opacity=".6"/><ellipse cx="228" cy="198" rx="20" ry="9" fill="${H.green.mid}" ${o}/><ellipse cx="96" cy="150" rx="18" ry="8" fill="${H.green.mid}" ${o}/>` + bloom(228, 194, 7, H.pink.mid) + plopSmall + bubble(204, 140, 6) + bubble(216, 122, 9) + reeds(268, 120, 0.8) + reeds(54, 264, 0.8) + dragonfly(246, 262, 1) + dragonfly(68, 80, 1) },
-  D4: { title: "D4 · CHOSEN: picnic (smooth green blend)", art: (() => {
-    const cells = Array.from({ length: 20 }, (_, k) => {
-      const i = k % 5, j = Math.floor(k / 5);
-      return `<rect x="${-70 + i * 28}" y="${-56 + j * 28}" width="28" height="28" fill="${(i + j) % 2 ? H.pink.light : "#fffaf1"}"/>`;
-    }).join("");
-    const blanket = g(160, 172, 1, `<g transform="rotate(-10)">${cells}<rect x="-70" y="-56" width="140" height="112" fill="none" stroke="${ink}" stroke-width="${W.outline}"/><path d="M-26 -18l8-26h32l8 26Z" fill="${H.peach.mid}" ${o} stroke-linejoin="round"/><path d="M-18 -44Q0 -66 18 -44" ${strokeW(W.outline)}/><circle cx="38" cy="14" r="8" fill="${H.pink.dark}" ${o}/><circle cx="-30" cy="26" r="8" fill="${H.butter.mid}" ${o}/></g>`);
-    return smoothField(downEdgesGreen, "#bfdcab") + scatterBlooms(3, 6, 6, (x, y) => Math.abs(x - 160) < 96 && Math.abs(y - 172) < 80) + blanket + snail(252, 270, 1.1) + ladybug(64, 66, 1.2) + butterfly(252, 70, H.lilac.mid, H.pink.light, 1.3) + mushroom(60, 262, 1.1);
-  })() },
+  D4: { title: "D4 · CHOSEN: picnic (smooth green blend)", art: picnicArt() },
   D5: { title: "D5 · Stepping stones and flower beds", art: (() => {
     const stones = Array.from({ length: 9 }, (_, i) => {
       const t = i / 8, x = 14 + t * 292, y = 168 + 56 * Math.sin(t * Math.PI * 2 - 0.4);
