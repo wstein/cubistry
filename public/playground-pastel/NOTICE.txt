@@ -1,0 +1,16 @@
+Pastel Garden picture-cube artwork (draft)
+Copyright 2026 Cubistry contributors
+
+These six original vector illustrations and their 24 cropped SVG sticker tiles
+are licensed under AGPL-3.0-or-later, matching the Cubistry repository license.
+No third-party images, fonts, characters, platform glyphs, or stock artwork are
+included.
+
+Editable source and deterministic regeneration:
+  scripts/build-pastel-garden-art.mjs
+  node scripts/build-pastel-garden-art.mjs
+
+Source repository: https://github.com/wstein/cubistry
+License: https://www.gnu.org/licenses/agpl-3.0.html
+Each full face uses a 320 by 320 viewBox; quadrant files use a 160 by 160
+viewBox with the original face offset. net.svg is an assembly preview only.
