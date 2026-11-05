@@ -232,3 +232,131 @@ const net = Object.entries(pos)
   .join("");
 writeFileSync(new URL("net.svg", dir), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330 1000" width="1330" height="1000"><rect width="1330" height="1000" fill="#f5f3eb"/>${net}</svg>\n`);
 
+// ---- Proposals: alternative Up (sky) and Down (meadow) faces ----------------
+// The four side faces form one continuous landscape. Up and Down are designed around it:
+// every edge of a proposal starts in the exact color of the neighboring face at that edge and
+// steps (flat bands, no gradients) toward a lighter center. Adjacent edges in the net:
+//   Up:   bottom = F top, top = B top, left = L top, right = R top.
+//   Down: top = F bottom, bottom = B bottom, left = L bottom, right = R bottom.
+const mix = (a, b, t) => {
+  const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const [x, y] = [p(a), p(b)];
+  return "#" + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, "0")).join("");
+};
+const edgeField = (e, center) => {
+  const poly = {
+    bottom: (d) => [[0, 320], [320, 320], [320 - d, 320 - d], [d, 320 - d]],
+    top: (d) => [[0, 0], [320, 0], [320 - d, d], [d, d]],
+    left: (d) => [[0, 0], [0, 320], [d, 320 - d], [d, d]],
+    right: (d) => [[320, 0], [320, 320], [320 - d, 320 - d], [320 - d, d]],
+  };
+  const steps = [[1, 0.8], [0.74, 0.55], [0.5, 0.3], [0.28, 0]];
+  return (
+    `<rect width="320" height="320" fill="${center}"/>` +
+    steps
+      .map(([f, t]) =>
+        Object.keys(poly)
+          .map((side) => `<polygon points="${poly[side](160 * f).map((q) => q.join(",")).join(" ")}" fill="${mix(e[side], center, t)}"/>`)
+          .join(""),
+      )
+      .join("")
+  );
+};
+const rng = (seed) => () => {
+  seed = (seed + 0x6d2b79f5) >>> 0;
+  let t = seed;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+const bloom = (x, y, r, c, cc = H.butter.mid, n = 5) =>
+  g(x, y, 1, Array.from({ length: n }, (_, i) => {
+    const a = (Math.PI * 2 * i) / n - Math.PI / 2;
+    return `<circle cx="${(Math.cos(a) * r * 0.8).toFixed(1)}" cy="${(Math.sin(a) * r * 0.8).toFixed(1)}" r="${(r * 0.55).toFixed(1)}" fill="${c}" ${o}/>`;
+  }).join("") + `<circle r="${(r * 0.45).toFixed(1)}" fill="${cc}" ${o}/>`);
+const bloomPalette = [H.pink.mid, H.peach.mid, H.butter.mid, H.lilac.mid, "#ffffff", H.sky.mid];
+const scatterBlooms = (seed, cols, rows, skip = () => false, r0 = 7, r1 = 11) => {
+  const r = rng(seed), out = [];
+  for (let j = 0; j < rows; j++)
+    for (let i = 0; i < cols; i++) {
+      const x = (i + 0.2 + 0.6 * r()) * (320 / cols), y = (j + 0.2 + 0.6 * r()) * (320 / rows);
+      const rad = r0 + r() * (r1 - r0), c = bloomPalette[Math.floor(r() * bloomPalette.length)];
+      if (!skip(x, y)) out.push({ x, y, rad, c });
+    }
+  return out.sort((a, b) => a.y - b.y).map((b) => bloom(b.x, b.y, b.rad, b.c, b.c === H.butter.mid ? H.peach.mid : H.butter.mid)).join("");
+};
+const kite = (x, y, s = 1, c = H.pink.mid) =>
+  g(x, y, s, `<path d="M0 26Q-10 40 0 52T0 80" ${strokeW(W.fine)}/><circle cy="44" r="3" fill="${H.butter.mid}" ${o}/><circle cy="62" r="3" fill="${H.sky.mid}" ${o}/><polygon points="0,-26 17,0 0,28 -17,0" fill="${c}" ${o} stroke-linejoin="round"/><path d="M0 -26V28M-17 0H17" ${strokeW(W.fine)}/>`);
+const sparkles = (pts, c = H.butter.light) => pts.map(([x, y, r]) => star(x, y, r, c)).join("");
+const UE = { top: H.sky.light, right: H.butter.bg, bottom: H.sky.bg, left: H.green.bg };
+const upField = edgeField(UE, "#eef7fb");
+const DE = { top: H.green.mid, right: H.green.mid, bottom: H.sky.dark, left: H.green.mid };
+const downField = edgeField(DE, "#bfdcab");
+
+const moonShape = `<path transform="translate(-215 -45)" d="M215 45a50 50 0 1 0 48 70a40 40 0 1 1-48-70Z" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.outline}"/>`;
+const rainbowArcs = (cx, cy, r) =>
+  ["pink", "butter", "green", "sky"].map((k, i) => `<path d="M${cx - r + i * 10} ${cy}A${r - i * 10} ${r - i * 10} 0 0 1 ${cx + r - i * 10} ${cy}" fill="none" stroke="${H[k].mid}" stroke-width="10"/>`).join("");
+const sunBurst = (x, y, r) =>
+  Array.from({ length: 12 }, (_, i) => {
+    const a = (Math.PI * 2 * i) / 12;
+    return `<path d="M${(x + Math.cos(a) * (r + 12)).toFixed(1)} ${(y + Math.sin(a) * (r + 12)).toFixed(1)}L${(x + Math.cos(a) * (r + 30)).toFixed(1)} ${(y + Math.sin(a) * (r + 30)).toFixed(1)}" ${strokeW(5, H.butter.mid)}/>`;
+  }).join("") + `<circle cx="${x}" cy="${y}" r="${r + 10}" fill="${H.butter.light}" opacity=".6"/><circle cx="${x}" cy="${y}" r="${r}" fill="${H.butter.mid}" stroke="${ink}" stroke-width="${W.outline}"/>`;
+
+const plopSmall = (() => {
+  const body = `<circle cx="160" cy="170" r="38"/><ellipse cx="116" cy="186" rx="9" ry="13" transform="rotate(-30 116 186)"/><ellipse cx="204" cy="186" rx="9" ry="13" transform="rotate(30 204 186)"/>`;
+  return `${shaded(body, H.pink.mid, H.pink.dark, shine(145, 150, 11, 6), [160, 170])}<ellipse cx="160" cy="134" rx="26" ry="9" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/>${sparkleEye(148, 166)}${sparkleEye(172, 166)}${cheeks(160, 177, 22, H.pink.dark)}${oMouth(160, 172)}`;
+})();
+
+const proposals = {
+  U0: { title: "U0 · current: dusk meadow (Tulia)", art: drawings.U },
+  U1: { title: "U1 · Cloud meadow", art: upField + cloud(30, 90, 1.1) + cloud(180, 70, 0.8) + cloud(40, 250, 0.9) + cloud(190, 275, 1.0) + cloud(112, 172, 0.7) + cloud(240, 165, 0.6) + bird(262, 36, H.pink.mid, 1, -1) + bird(70, 40, H.peach.mid, 0.9) + plane(40, 190, 1) + balloon(284, 214, 0.45) + sparkles([[150, 36, 6], [20, 150, 5], [300, 120, 6], [160, 232, 5]]) },
+  U2: { title: "U2 · Sun at the zenith", art: upField + sunBurst(160, 160, 44) + cloud(20, 70, 0.8) + cloud(226, 70, 0.7) + cloud(24, 276, 0.85) + cloud(226, 284, 0.8) + bird(268, 150, H.lilac.mid, 1, -1) + bird(46, 168, H.pink.mid, 1) + sparkles([[100, 120, 5], [220, 200, 5], [150, 44, 6], [160, 282, 6]]) },
+  U3: { title: "U3 · Rainbow arch", art: upField + rainbowArcs(160, 205, 112) + cloud(24, 218, 0.95) + cloud(214, 222, 0.95) + cloud(110, 70, 0.8) + cloud(236, 60, 0.6) + bird(60, 110, H.pink.mid, 1) + bird(250, 130, H.sky.mid, 1, -1) + sparkles([[160, 104, 6], [30, 40, 5], [296, 190, 5], [150, 290, 5]]) },
+  U4: { title: "U4 · Up and away", art: upField + cloud(130, 74, 0.6) + cloud(130, 280, 0.8) + cloud(240, 175, 0.5) + balloon(66, 110, 0.9) + balloon(234, 96, 0.7) + kite(250, 228, 1, H.lilac.mid) + plane(50, 250, 1.2) + plane(150, 160, 0.8) + bird(180, 30, H.pink.mid, 0.9, -1) + bird(280, 150, H.peach.mid, 0.9, -1) },
+  U5: { title: "U5 · Sun and moon sky", art: upField + g(100, 4, 0.85, moonShape + "") + sparkles([[40, 40, 7], [270, 40, 6], [60, 110, 5], [250, 100, 6], [160, 30, 5], [20, 80, 4], [300, 90, 4]]) + cloud(40, 170, 0.8) + cloud(206, 156, 0.9) + sunBurst(160, 270, 26) + bird(262, 230, H.pink.mid, 0.9, -1) + bird(56, 250, H.lilac.mid, 0.9) },
+  D0: { title: "D0 · current: pond (Plop)", art: drawings.D },
+  D1: { title: "D1 · Wildflower meadow", art: downField + scatterBlooms(7, 6, 6) + tuft(40, 120) + tuft(280, 60) + tuft(160, 310) + tuft(290, 250) + ladybug(60, 70, 1.2) + butterfly(252, 84, H.pink.mid, H.peach.mid, 1.3) + bee(72, 252, 1.3) + snail(246, 268, 1.1) },
+  D2: { title: "D2 · Tulip field with Tulia", art: (() => {
+    const r = rng(11), rows = [];
+    for (let j = 0; j < 5; j++) for (let i = 0; i < 7; i++) {
+      const x = 22 + i * 46 + (j % 2 ? 23 : 0) + (r() - 0.5) * 8, y = 76 + j * 52;
+      if (Math.hypot(x - 160, y - 150) > 84) rows.push({ x, y, c: [H.pink.mid, H.butter.mid, H.lilac.mid, H.peach.mid][Math.floor(r() * 4)] });
+    }
+    return downField + rows.map((t) => tulip(t.x, t.y, 0.55, t.c)).join("") + g(24, -23.7, 0.85, tulia) + butterfly(52, 44, H.sky.mid, H.lilac.light, 1.1) + bee(268, 292, 1.1);
+  })() },
+  D3: { title: "D3 · Pond meadow with Plop", art: downField + scatterBlooms(5, 6, 6, (x, y) => ((x - 160) / 104) ** 2 + ((y - 168) / 70) ** 2 < 1) + `<ellipse cx="160" cy="168" rx="98" ry="64" fill="${H.sky.water}" stroke="${ink}" stroke-width="${W.outline}"/><ellipse cx="160" cy="176" rx="76" ry="44" fill="${H.sky.aqua}" opacity=".6"/><ellipse cx="228" cy="198" rx="20" ry="9" fill="${H.green.mid}" ${o}/><ellipse cx="96" cy="150" rx="18" ry="8" fill="${H.green.mid}" ${o}/>` + bloom(228, 194, 7, H.pink.mid) + plopSmall + bubble(204, 140, 6) + bubble(216, 122, 9) + reeds(268, 120, 0.8) + reeds(54, 264, 0.8) + dragonfly(246, 262, 1) + dragonfly(68, 80, 1) },
+  D4: { title: "D4 · Picnic", art: (() => {
+    const cells = Array.from({ length: 20 }, (_, k) => {
+      const i = k % 5, j = Math.floor(k / 5);
+      return `<rect x="${-70 + i * 28}" y="${-56 + j * 28}" width="28" height="28" fill="${(i + j) % 2 ? H.pink.light : "#fffaf1"}"/>`;
+    }).join("");
+    const blanket = g(160, 172, 1, `<g transform="rotate(-10)">${cells}<rect x="-70" y="-56" width="140" height="112" fill="none" stroke="${ink}" stroke-width="${W.outline}"/><path d="M-26 -18l8-26h32l8 26Z" fill="${H.peach.mid}" ${o} stroke-linejoin="round"/><path d="M-18 -44Q0 -66 18 -44" ${strokeW(W.outline)}/><circle cx="38" cy="14" r="8" fill="${H.pink.dark}" ${o}/><circle cx="-30" cy="26" r="8" fill="${H.butter.mid}" ${o}/></g>`);
+    return downField + scatterBlooms(3, 6, 6, (x, y) => Math.abs(x - 160) < 96 && Math.abs(y - 172) < 80) + blanket + snail(252, 270, 1.1) + ladybug(64, 66, 1.2) + butterfly(252, 70, H.lilac.mid, H.pink.light, 1.3) + mushroom(60, 262, 1.1);
+  })() },
+  D5: { title: "D5 · Stepping stones and flower beds", art: (() => {
+    const stones = Array.from({ length: 9 }, (_, i) => {
+      const t = i / 8, x = 14 + t * 292, y = 168 + 56 * Math.sin(t * Math.PI * 2 - 0.4);
+      return `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="15" ry="10" fill="${H.peach.light}" ${o} transform="rotate(${(i * 23) % 40 - 20} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+    }).join("");
+    const bed = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${H.green.mid}" stroke="${ink}" stroke-width="${W.outline}"/>` + [[0, 0, 11], [-r * 0.55, -r * 0.2, 8], [r * 0.5, -r * 0.3, 8], [-r * 0.2, r * 0.5, 8], [r * 0.45, r * 0.4, 8]].map(([dx, dy, rad], k) => bloom(x + dx, y + dy, rad, bloomPalette[(k + 2) % bloomPalette.length])).join("");
+    return downField + scatterBlooms(9, 5, 5, (x, y) => Math.abs(y - (168 + 56 * Math.sin(((x - 14) / 292) * Math.PI * 2 - 0.4))) < 26 || Math.hypot(x - 78, y - 84) < 52 || Math.hypot(x - 244, y - 262) < 52, 6, 9) + stones + bed(78, 84, 40) + bed(244, 262, 40) + bee(180, 120, 1.2) + bee(130, 270, 1.1) + mushroom(280, 90, 1) + snail(50, 292, 0.9);
+  })() },
+};
+const pdir = new URL("proposals/", dir);
+mkdirSync(pdir, { recursive: true });
+for (const [id, p] of Object.entries(proposals))
+  writeFileSync(new URL(`${id}.svg`, pdir), `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">${p.art}</svg>\n`);
+// Review sheets (preview only, not print or app assets): each proposal attached to the continuous belt.
+const nest = (markup, x, y, size) =>
+  `<svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="0 0 320 320" overflow="hidden">${markup}<rect width="320" height="320" fill="none" stroke="${ink}" stroke-width="3"/></svg>`;
+const sheet = (kind, ids) => {
+  const s = 140, cell = s + 4;
+  const body = ids.map((id, k) => {
+    const ox = 20 + (k % 2) * 620, oy = 20 + Math.floor(k / 2) * 350;
+    const beltY = kind === "U" ? oy + 34 + cell : oy + 34, faceY = kind === "U" ? oy + 34 : oy + 34 + cell;
+    return `<text x="${ox}" y="${oy + 20}" font-family="system-ui, sans-serif" font-size="18" fill="${ink}">${proposals[id].title}</text>` + ["L", "F", "R", "B"].map((f, i) => nest(drawings[f], ox + i * cell, beltY, s)).join("") + nest(proposals[id].art, ox + cell, faceY, s);
+  }).join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 1070" width="1260" height="1070"><rect width="1260" height="1070" fill="#f5f3eb"/>${body}</svg>\n`;
+};
+writeFileSync(new URL("up.svg", pdir), sheet("U", ["U0", "U1", "U2", "U3", "U4", "U5"]));
+writeFileSync(new URL("down.svg", pdir), sheet("D", ["D0", "D1", "D2", "D3", "D4", "D5"]));
