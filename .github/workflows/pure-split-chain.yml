@@ -1,0 +1,659 @@
+name: Pure-split chain
+
+# Manually dispatched producer for the 2027-2099 pure-split calendar chain
+# (research/calendar-7x7/pure-split-states). It cannot be dispatched until this
+# file is on the default branch (main).
+#
+# Contract with the research branch (pilot/producer-resume.jl), called as
+#   julia --startup-file=no pilot/producer-resume.jl \
+#       DAG PRINT OUT_PREFIX EDGES START PRIOR_MOVES
+#   START        YYYY-MM root month for a fresh chain, or "resume" to continue
+#                from the end of PRIOR_MOVES
+#   PRIOR_MOVES  cumulative moves.tsv of the verified prefix, or "-" when fresh
+# It must write OUT_PREFIX.moves.tsv (cumulative: prior prefix plus new edges)
+# and OUT_PREFIX-edges.tsv (header plus the new edges only), stop at 2099-12,
+# and exit non-zero on any edge it cannot produce.
+
+on:
+  workflow_dispatch:
+    inputs:
+      research_ref:
+        description: Branch or tag of this repository that holds the research code
+        type: string
+        default: research/cube-display-feasibility
+      start_year:
+        description: Root year of a fresh chain (ignored with prior_run_id)
+        type: string
+        default: "2027"
+      start_month:
+        description: Root month of a fresh chain, 1-12 (ignored with prior_run_id)
+        type: string
+        default: "1"
+      edges_per_job:
+        description: Month edges per job (48 = 4 years)
+        type: string
+        default: "48"
+      jobs:
+        description: Number of chained jobs in this run, 1-4
+        type: string
+        default: "1"
+      prior_run_id:
+        description: Run id of an earlier run of this workflow whose last artifact is continued
+        type: string
+        default: ""
+      smoke_mode:
+        description: 2 edges from 2028-01 in one job, about 10 minutes; ignores the other numeric inputs
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  # Needed only to read the prior run and download its artifact.
+  actions: read
+
+concurrency:
+  group: pure-split-chain
+  cancel-in-progress: false
+
+env:
+  WORKFLOW_PATH: .github/workflows/pure-split-chain.yml
+  PURE_DIR: research/calendar-7x7/pure-split-states
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+      edges: ${{ steps.validate.outputs.edges }}
+      jobs: ${{ steps.validate.outputs.jobs }}
+      start: ${{ steps.validate.outputs.start }}
+      prior_run_id: ${{ steps.validate.outputs.prior_run_id }}
+      smoke: ${{ steps.validate.outputs.smoke }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: true # prepare only fetches this repository; no untrusted code runs here
+      - name: Validate inputs
+        id: validate
+        env:
+          IN_YEAR: ${{ inputs.start_year }}
+          IN_MONTH: ${{ inputs.start_month }}
+          IN_EDGES: ${{ inputs.edges_per_job }}
+          IN_JOBS: ${{ inputs.jobs }}
+          IN_PRIOR: ${{ inputs.prior_run_id }}
+          IN_SMOKE: ${{ inputs.smoke_mode }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          if [ "$IN_SMOKE" = "true" ]; then
+            edges=2; jobs=1; start=2028-01; prior=""; smoke=true
+          else
+            smoke=false
+            [[ "$IN_YEAR" =~ ^20[0-9]{2}$ ]] || fail "start_year must be 4 digits"
+            [[ "$IN_MONTH" =~ ^([1-9]|1[0-2])$ ]] || fail "start_month must be 1-12"
+            [ "$IN_YEAR" -ge 2027 ] && [ "$IN_YEAR" -le 2099 ] || fail "start_year must be 2027-2099"
+            [[ "$IN_EDGES" =~ ^[1-9][0-9]{0,2}$ ]] || fail "edges_per_job must be a positive integer"
+            [ "$IN_EDGES" -le 60 ] || fail "edges_per_job above 60 does not fit the 6 h job limit"
+            [[ "$IN_JOBS" =~ ^[1-4]$ ]] || fail "jobs must be 1-4"
+            [ -z "$IN_PRIOR" ] || [[ "$IN_PRIOR" =~ ^[0-9]{1,20}$ ]] || fail "prior_run_id must be digits"
+            edges=$IN_EDGES; jobs=$IN_JOBS; prior=$IN_PRIOR
+            start=$(printf '%04d-%02d' "$IN_YEAR" "$IN_MONTH")
+          fi
+          {
+            echo "edges=$edges"; echo "jobs=$jobs"; echo "start=$start"
+            echo "prior_run_id=$prior"; echo "smoke=$smoke"
+          } >> "$GITHUB_OUTPUT"
+      - name: Check prior run
+        if: steps.validate.outputs.prior_run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRIOR: ${{ steps.validate.outputs.prior_run_id }}
+        run: |
+          set -euo pipefail
+          # The API path is scoped to this repository, so a foreign run id is a 404.
+          read -r path conclusion < <(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$PRIOR" --jq '[.path, .conclusion] | @tsv')
+          # .path may carry an @ref suffix.
+          [ "${path%%@*}" = "$WORKFLOW_PATH" ] || { echo "::error::run $PRIOR is not a run of $WORKFLOW_PATH ($path)"; exit 1; }
+          [ "$conclusion" = "success" ] || { echo "::error::run $PRIOR did not succeed ($conclusion)"; exit 1; }
+      - name: Resolve research ref
+        id: resolve
+        env:
+          REF: ${{ inputs.research_ref }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          [[ "$REF" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$ ]] || fail "research_ref has unsupported characters"
+          case "$REF" in *..*|*//*|*.lock) fail "research_ref is not a plain ref name";; esac
+          # Only a branch or tag that exists in this repository is accepted; no raw SHAs, URLs or fork refs.
+          git fetch --no-tags --depth=1 origin "+refs/heads/$REF:refs/remotes/research/ref" 2>/dev/null \
+            || git fetch --no-tags --depth=1 origin "+refs/tags/$REF:refs/remotes/research/ref" 2>/dev/null \
+            || fail "research_ref '$REF' is not a branch or tag of $GITHUB_REPOSITORY"
+          sha=$(git rev-parse --verify "refs/remotes/research/ref^{commit}")
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "research_ref $REF resolved to $sha"
+          missing=0
+          for f in pilot/producer-resume.jl pure_chain.jl flix/build.sh evidence/print-pure-A.tsv evidence/dag-all.tsv.gz; do
+            git cat-file -e "$sha:$PURE_DIR/$f" 2>/dev/null || { echo "::error::$PURE_DIR/$f is missing at $sha"; missing=1; }
+          done
+          [ "$missing" = 0 ] || fail "research ref lacks required files (pilot/producer-resume.jl is added by a separate PR against research/cube-display-feasibility)"
+          {
+            echo "### Pure-split chain"
+            echo "- research_ref: \`$REF\`"
+            echo "- resolved SHA: \`$sha\`"
+            echo "- smoke: \`${{ steps.validate.outputs.smoke }}\`, jobs: ${{ steps.validate.outputs.jobs }}, edges per job: ${{ steps.validate.outputs.edges }}, start: ${{ steps.validate.outputs.start }}, prior run: \`${{ steps.validate.outputs.prior_run_id }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  seg1:
+    needs: [prepare]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    env:
+      SHA: ${{ needs.prepare.outputs.sha }}
+      EDGES: ${{ needs.prepare.outputs.edges }}
+      START: ${{ needs.prepare.outputs.start }}
+      SMOKE: ${{ needs.prepare.outputs.smoke }}
+      SEG: "1"
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          path: src
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - name: Download prior run artifact
+        if: needs.prepare.outputs.prior_run_id != ''
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: psc-chain-*
+          path: prev
+          run-id: ${{ needs.prepare.outputs.prior_run_id }}
+          github-token: ${{ github.token }}
+      - name: Prepare work directory
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          if [ -d "$GITHUB_WORKSPACE/prev" ]; then
+            # A prior artifact is untrusted input until its checksums and marker verify.
+            d=$(find "$GITHUB_WORKSPACE/prev" -name VERIFIED.txt -printf '%h\n' | sort -V | tail -n 1)
+            [ -n "$d" ] || { echo "::error::no verified chain artifact found in the previous step"; exit 1; }
+            (cd "$d" && sha256sum --check --strict SHA256SUMS)
+            cp "$d/moves.tsv" "$GITHUB_WORKSPACE/out/prior.moves.tsv"
+            cp "$d/edges.tsv" "$GITHUB_WORKSPACE/out/prior.edges.tsv"
+            echo "continuing from $d"
+          fi
+          gzip -dc "src/$PURE_DIR/evidence/dag-all.tsv.gz" > "$GITHUB_WORKSPACE/out/dag-all.tsv"
+      - name: Build Flix verifier jar
+        run: |
+          set -euo pipefail
+          jar=$(bash "src/$PURE_DIR/flix/build.sh" | tail -n 1)
+          test -f "$jar"
+          echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
+          sha256sum "$jar" | tee "$GITHUB_WORKSPACE/out/flix-jar.sha256"
+      - name: Produce edges
+        run: |
+          set -euo pipefail
+          cd "src/$PURE_DIR"
+          script=pilot/producer-resume.jl
+          [ -f "$script" ] || { echo "::error::$PURE_DIR/$script is missing in the checked-out research ref"; exit 1; }
+          out=$GITHUB_WORKSPACE/out
+          if [ -f "$out/prior.moves.tsv" ]; then start=resume; prior=$out/prior.moves.tsv; else start=$START; prior=-; fi
+          limit=300m; [ "$SMOKE" = true ] && limit=25m
+          julia --version
+          set +e
+          timeout "$limit" julia --startup-file=no "$script" "$out/dag-all.tsv" evidence/print-pure-A.tsv "$out/chain" "$EDGES" "$start" "$prior" 2>&1 | tee "$out/run.log"
+          rc=${PIPESTATUS[0]}
+          set -e
+          [ "$rc" = 0 ] || { echo "::error::producer exited with $rc (124 = timeout)"; exit "$rc"; }
+          test -s "$out/chain.moves.tsv" && test -s "$out/chain-edges.tsv"
+          mv "$out/chain.moves.tsv" "$out/moves.tsv"
+          if [ -f "$out/prior.edges.tsv" ]; then
+            { cat "$out/prior.edges.tsv"; tail -n +2 "$out/chain-edges.tsv"; } > "$out/edges.tsv"
+          else
+            cp "$out/chain-edges.tsv" "$out/edges.tsv"
+          fi
+      - name: Verify cumulative chain with Julia
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$PURE_DIR"
+          julia --startup-file=no pure_chain.jl evidence/print-pure-A.tsv "$out/dag-all.tsv" "$out/moves.tsv" > "$out/verify.julia.stdout" 2> "$out/verify.julia.stderr" || { cat "$out/verify.julia.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.julia.stdout" > "$out/receipt.julia.tsv"
+          tail -n 2 "$out/receipt.julia.tsv"
+      - name: Verify cumulative chain with Flix
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$PURE_DIR"
+          cal=$(cd .. && pwd)
+          java -Dstdout.encoding=UTF-8 -Xmx6g -jar "$FLIX_JAR" chain evidence/print-pure-A.tsv "$out/dag-all.tsv" "$out/moves.tsv" "$cal/english/evidence" "$cal/en-physical-review" > "$out/verify.flix.stdout" 2> "$out/verify.flix.stderr" || { cat "$out/verify.flix.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.flix.stdout" > "$out/receipt.flix.tsv"
+          tail -n 2 "$out/receipt.flix.tsv"
+          cmp "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" || { echo "::error::Julia and Flix receipts differ"; exit 1; }
+          grep -q '^status.VALID_CONTINUOUS_CHAIN' "$out/receipt.flix.tsv"
+      - name: Package artifact
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out
+          mkdir "$GITHUB_WORKSPACE/pack"
+          cp "$out/moves.tsv" "$out/edges.tsv" "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" "$out/run.log" "$out/flix-jar.sha256" "$GITHUB_WORKSPACE/pack/"
+          {
+            echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "segment=$SEG"
+            echo "edges_total=$(($(wc -l < "$out/edges.tsv") - 1))"
+          } > "$GITHUB_WORKSPACE/pack/VERIFIED.txt"
+          (cd "$GITHUB_WORKSPACE/pack" && sha256sum moves.tsv edges.tsv receipt.julia.tsv receipt.flix.tsv run.log flix-jar.sha256 VERIFIED.txt > SHA256SUMS)
+          {
+            echo "### Segment $SEG verified"
+            echo "- research SHA: \`$SHA\`"
+            echo "- cumulative edges: $(($(wc -l < "$out/edges.tsv") - 1))"
+            echo '```'; cat "$GITHUB_WORKSPACE/pack/SHA256SUMS"; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: psc-chain-${{ github.run_id }}-s1
+          path: pack/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Collect failure logs
+        if: failure() || cancelled()
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/fail"
+          cp -f "$GITHUB_WORKSPACE"/out/*.log "$GITHUB_WORKSPACE"/out/verify.* "$GITHUB_WORKSPACE"/out/receipt.* "$GITHUB_WORKSPACE/fail/" 2>/dev/null || true
+          # Not a chain artifact: no VERIFIED.txt, never used as a prior.
+          echo "segment $SEG failed or was cancelled; partial logs only" > "$GITHUB_WORKSPACE/fail/FAILED.txt"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: failure() || cancelled()
+        with:
+          name: psc-failure-${{ github.run_id }}-s1
+          path: fail/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  seg2:
+    needs: [prepare, seg1]
+    if: ${{ fromJSON(needs.prepare.outputs.jobs) >= 2 }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    env:
+      SHA: ${{ needs.prepare.outputs.sha }}
+      EDGES: ${{ needs.prepare.outputs.edges }}
+      START: ${{ needs.prepare.outputs.start }}
+      SMOKE: ${{ needs.prepare.outputs.smoke }}
+      SEG: "2"
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          path: src
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - name: Download previous segment artifact
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: psc-chain-${{ github.run_id }}-s1
+          path: prev
+      - name: Prepare work directory
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          if [ -d "$GITHUB_WORKSPACE/prev" ]; then
+            # A prior artifact is untrusted input until its checksums and marker verify.
+            d=$(find "$GITHUB_WORKSPACE/prev" -name VERIFIED.txt -printf '%h\n' | sort -V | tail -n 1)
+            [ -n "$d" ] || { echo "::error::no verified chain artifact found in the previous step"; exit 1; }
+            (cd "$d" && sha256sum --check --strict SHA256SUMS)
+            cp "$d/moves.tsv" "$GITHUB_WORKSPACE/out/prior.moves.tsv"
+            cp "$d/edges.tsv" "$GITHUB_WORKSPACE/out/prior.edges.tsv"
+            echo "continuing from $d"
+          fi
+          gzip -dc "src/$PURE_DIR/evidence/dag-all.tsv.gz" > "$GITHUB_WORKSPACE/out/dag-all.tsv"
+      - name: Build Flix verifier jar
+        run: |
+          set -euo pipefail
+          jar=$(bash "src/$PURE_DIR/flix/build.sh" | tail -n 1)
+          test -f "$jar"
+          echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
+          sha256sum "$jar" | tee "$GITHUB_WORKSPACE/out/flix-jar.sha256"
+      - name: Produce edges
+        run: |
+          set -euo pipefail
+          cd "src/$PURE_DIR"
+          script=pilot/producer-resume.jl
+          [ -f "$script" ] || { echo "::error::$PURE_DIR/$script is missing in the checked-out research ref"; exit 1; }
+          out=$GITHUB_WORKSPACE/out
+          if [ -f "$out/prior.moves.tsv" ]; then start=resume; prior=$out/prior.moves.tsv; else start=$START; prior=-; fi
+          limit=300m; [ "$SMOKE" = true ] && limit=25m
+          julia --version
+          set +e
+          timeout "$limit" julia --startup-file=no "$script" "$out/dag-all.tsv" evidence/print-pure-A.tsv "$out/chain" "$EDGES" "$start" "$prior" 2>&1 | tee "$out/run.log"
+          rc=${PIPESTATUS[0]}
+          set -e
+          [ "$rc" = 0 ] || { echo "::error::producer exited with $rc (124 = timeout)"; exit "$rc"; }
+          test -s "$out/chain.moves.tsv" && test -s "$out/chain-edges.tsv"
+          mv "$out/chain.moves.tsv" "$out/moves.tsv"
+          if [ -f "$out/prior.edges.tsv" ]; then
+            { cat "$out/prior.edges.tsv"; tail -n +2 "$out/chain-edges.tsv"; } > "$out/edges.tsv"
+          else
+            cp "$out/chain-edges.tsv" "$out/edges.tsv"
+          fi
+      - name: Verify cumulative chain with Julia
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$PURE_DIR"
+          julia --startup-file=no pure_chain.jl evidence/print-pure-A.tsv "$out/dag-all.tsv" "$out/moves.tsv" > "$out/verify.julia.stdout" 2> "$out/verify.julia.stderr" || { cat "$out/verify.julia.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.julia.stdout" > "$out/receipt.julia.tsv"
+          tail -n 2 "$out/receipt.julia.tsv"
+      - name: Verify cumulative chain with Flix
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$PURE_DIR"
+          cal=$(cd .. && pwd)
+          java -Dstdout.encoding=UTF-8 -Xmx6g -jar "$FLIX_JAR" chain evidence/print-pure-A.tsv "$out/dag-all.tsv" "$out/moves.tsv" "$cal/english/evidence" "$cal/en-physical-review" > "$out/verify.flix.stdout" 2> "$out/verify.flix.stderr" || { cat "$out/verify.flix.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.flix.stdout" > "$out/receipt.flix.tsv"
+          tail -n 2 "$out/receipt.flix.tsv"
+          cmp "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" || { echo "::error::Julia and Flix receipts differ"; exit 1; }
+          grep -q '^status.VALID_CONTINUOUS_CHAIN' "$out/receipt.flix.tsv"
+      - name: Package artifact
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out
+          mkdir "$GITHUB_WORKSPACE/pack"
+          cp "$out/moves.tsv" "$out/edges.tsv" "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" "$out/run.log" "$out/flix-jar.sha256" "$GITHUB_WORKSPACE/pack/"
+          {
+            echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "segment=$SEG"
+            echo "edges_total=$(($(wc -l < "$out/edges.tsv") - 1))"
+          } > "$GITHUB_WORKSPACE/pack/VERIFIED.txt"
+          (cd "$GITHUB_WORKSPACE/pack" && sha256sum moves.tsv edges.tsv receipt.julia.tsv receipt.flix.tsv run.log flix-jar.sha256 VERIFIED.txt > SHA256SUMS)
+          {
+            echo "### Segment $SEG verified"
+            echo "- research SHA: \`$SHA\`"
+            echo "- cumulative edges: $(($(wc -l < "$out/edges.tsv") - 1))"
+            echo '```'; cat "$GITHUB_WORKSPACE/pack/SHA256SUMS"; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: psc-chain-${{ github.run_id }}-s2
+          path: pack/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Collect failure logs
+        if: failure() || cancelled()
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/fail"
+          cp -f "$GITHUB_WORKSPACE"/out/*.log "$GITHUB_WORKSPACE"/out/verify.* "$GITHUB_WORKSPACE"/out/receipt.* "$GITHUB_WORKSPACE/fail/" 2>/dev/null || true
+          # Not a chain artifact: no VERIFIED.txt, never used as a prior.
+          echo "segment $SEG failed or was cancelled; partial logs only" > "$GITHUB_WORKSPACE/fail/FAILED.txt"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: failure() || cancelled()
+        with:
+          name: psc-failure-${{ github.run_id }}-s2
+          path: fail/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  seg3:
+    needs: [prepare, seg2]
+    if: ${{ fromJSON(needs.prepare.outputs.jobs) >= 3 }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    env:
+      SHA: ${{ needs.prepare.outputs.sha }}
+      EDGES: ${{ needs.prepare.outputs.edges }}
+      START: ${{ needs.prepare.outputs.start }}
+      SMOKE: ${{ needs.prepare.outputs.smoke }}
+      SEG: "3"
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          path: src
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - name: Download previous segment artifact
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: psc-chain-${{ github.run_id }}-s2
+          path: prev
+      - name: Prepare work directory
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          if [ -d "$GITHUB_WORKSPACE/prev" ]; then
+            # A prior artifact is untrusted input until its checksums and marker verify.
+            d=$(find "$GITHUB_WORKSPACE/prev" -name VERIFIED.txt -printf '%h\n' | sort -V | tail -n 1)
+            [ -n "$d" ] || { echo "::error::no verified chain artifact found in the previous step"; exit 1; }
+            (cd "$d" && sha256sum --check --strict SHA256SUMS)
+            cp "$d/moves.tsv" "$GITHUB_WORKSPACE/out/prior.moves.tsv"
+            cp "$d/edges.tsv" "$GITHUB_WORKSPACE/out/prior.edges.tsv"
+            echo "continuing from $d"
+          fi
+          gzip -dc "src/$PURE_DIR/evidence/dag-all.tsv.gz" > "$GITHUB_WORKSPACE/out/dag-all.tsv"
+      - name: Build Flix verifier jar
+        run: |
+          set -euo pipefail
+          jar=$(bash "src/$PURE_DIR/flix/build.sh" | tail -n 1)
+          test -f "$jar"
+          echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
+          sha256sum "$jar" | tee "$GITHUB_WORKSPACE/out/flix-jar.sha256"
+      - name: Produce edges
+        run: |
+          set -euo pipefail
+          cd "src/$PURE_DIR"
+          script=pilot/producer-resume.jl
+          [ -f "$script" ] || { echo "::error::$PURE_DIR/$script is missing in the checked-out research ref"; exit 1; }
+          out=$GITHUB_WORKSPACE/out
+          if [ -f "$out/prior.moves.tsv" ]; then start=resume; prior=$out/prior.moves.tsv; else start=$START; prior=-; fi
+          limit=300m; [ "$SMOKE" = true ] && limit=25m
+          julia --version
+          set +e
+          timeout "$limit" julia --startup-file=no "$script" "$out/dag-all.tsv" evidence/print-pure-A.tsv "$out/chain" "$EDGES" "$start" "$prior" 2>&1 | tee "$out/run.log"
+          rc=${PIPESTATUS[0]}
+          set -e
+          [ "$rc" = 0 ] || { echo "::error::producer exited with $rc (124 = timeout)"; exit "$rc"; }
+          test -s "$out/chain.moves.tsv" && test -s "$out/chain-edges.tsv"
+          mv "$out/chain.moves.tsv" "$out/moves.tsv"
+          if [ -f "$out/prior.edges.tsv" ]; then
+            { cat "$out/prior.edges.tsv"; tail -n +2 "$out/chain-edges.tsv"; } > "$out/edges.tsv"
+          else
+            cp "$out/chain-edges.tsv" "$out/edges.tsv"
+          fi
+      - name: Verify cumulative chain with Julia
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$PURE_DIR"
+          julia --startup-file=no pure_chain.jl evidence/print-pure-A.tsv "$out/dag-all.tsv" "$out/moves.tsv" > "$out/verify.julia.stdout" 2> "$out/verify.julia.stderr" || { cat "$out/verify.julia.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.julia.stdout" > "$out/receipt.julia.tsv"
+          tail -n 2 "$out/receipt.julia.tsv"
+      - name: Verify cumulative chain with Flix
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$PURE_DIR"
+          cal=$(cd .. && pwd)
+          java -Dstdout.encoding=UTF-8 -Xmx6g -jar "$FLIX_JAR" chain evidence/print-pure-A.tsv "$out/dag-all.tsv" "$out/moves.tsv" "$cal/english/evidence" "$cal/en-physical-review" > "$out/verify.flix.stdout" 2> "$out/verify.flix.stderr" || { cat "$out/verify.flix.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.flix.stdout" > "$out/receipt.flix.tsv"
+          tail -n 2 "$out/receipt.flix.tsv"
+          cmp "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" || { echo "::error::Julia and Flix receipts differ"; exit 1; }
+          grep -q '^status.VALID_CONTINUOUS_CHAIN' "$out/receipt.flix.tsv"
+      - name: Package artifact
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out
+          mkdir "$GITHUB_WORKSPACE/pack"
+          cp "$out/moves.tsv" "$out/edges.tsv" "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" "$out/run.log" "$out/flix-jar.sha256" "$GITHUB_WORKSPACE/pack/"
+          {
+            echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "segment=$SEG"
+            echo "edges_total=$(($(wc -l < "$out/edges.tsv") - 1))"
+          } > "$GITHUB_WORKSPACE/pack/VERIFIED.txt"
+          (cd "$GITHUB_WORKSPACE/pack" && sha256sum moves.tsv edges.tsv receipt.julia.tsv receipt.flix.tsv run.log flix-jar.sha256 VERIFIED.txt > SHA256SUMS)
+          {
+            echo "### Segment $SEG verified"
+            echo "- research SHA: \`$SHA\`"
+            echo "- cumulative edges: $(($(wc -l < "$out/edges.tsv") - 1))"
+            echo '```'; cat "$GITHUB_WORKSPACE/pack/SHA256SUMS"; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: psc-chain-${{ github.run_id }}-s3
+          path: pack/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Collect failure logs
+        if: failure() || cancelled()
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/fail"
+          cp -f "$GITHUB_WORKSPACE"/out/*.log "$GITHUB_WORKSPACE"/out/verify.* "$GITHUB_WORKSPACE"/out/receipt.* "$GITHUB_WORKSPACE/fail/" 2>/dev/null || true
+          # Not a chain artifact: no VERIFIED.txt, never used as a prior.
+          echo "segment $SEG failed or was cancelled; partial logs only" > "$GITHUB_WORKSPACE/fail/FAILED.txt"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: failure() || cancelled()
+        with:
+          name: psc-failure-${{ github.run_id }}-s3
+          path: fail/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  seg4:
+    needs: [prepare, seg3]
+    if: ${{ fromJSON(needs.prepare.outputs.jobs) >= 4 }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    env:
+      SHA: ${{ needs.prepare.outputs.sha }}
+      EDGES: ${{ needs.prepare.outputs.edges }}
+      START: ${{ needs.prepare.outputs.start }}
+      SMOKE: ${{ needs.prepare.outputs.smoke }}
+      SEG: "4"
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          path: src
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - name: Download previous segment artifact
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: psc-chain-${{ github.run_id }}-s3
+          path: prev
+      - name: Prepare work directory
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          if [ -d "$GITHUB_WORKSPACE/prev" ]; then
+            # A prior artifact is untrusted input until its checksums and marker verify.
+            d=$(find "$GITHUB_WORKSPACE/prev" -name VERIFIED.txt -printf '%h\n' | sort -V | tail -n 1)
+            [ -n "$d" ] || { echo "::error::no verified chain artifact found in the previous step"; exit 1; }
+            (cd "$d" && sha256sum --check --strict SHA256SUMS)
+            cp "$d/moves.tsv" "$GITHUB_WORKSPACE/out/prior.moves.tsv"
+            cp "$d/edges.tsv" "$GITHUB_WORKSPACE/out/prior.edges.tsv"
+            echo "continuing from $d"
+          fi
+          gzip -dc "src/$PURE_DIR/evidence/dag-all.tsv.gz" > "$GITHUB_WORKSPACE/out/dag-all.tsv"
+      - name: Build Flix verifier jar
+        run: |
+          set -euo pipefail
+          jar=$(bash "src/$PURE_DIR/flix/build.sh" | tail -n 1)
+          test -f "$jar"
+          echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
+          sha256sum "$jar" | tee "$GITHUB_WORKSPACE/out/flix-jar.sha256"
+      - name: Produce edges
+        run: |
+          set -euo pipefail
+          cd "src/$PURE_DIR"
+          script=pilot/producer-resume.jl
+          [ -f "$script" ] || { echo "::error::$PURE_DIR/$script is missing in the checked-out research ref"; exit 1; }
+          out=$GITHUB_WORKSPACE/out
+          if [ -f "$out/prior.moves.tsv" ]; then start=resume; prior=$out/prior.moves.tsv; else start=$START; prior=-; fi
+          limit=300m; [ "$SMOKE" = true ] && limit=25m
+          julia --version
+          set +e
+          timeout "$limit" julia --startup-file=no "$script" "$out/dag-all.tsv" evidence/print-pure-A.tsv "$out/chain" "$EDGES" "$start" "$prior" 2>&1 | tee "$out/run.log"
+          rc=${PIPESTATUS[0]}
+          set -e
+          [ "$rc" = 0 ] || { echo "::error::producer exited with $rc (124 = timeout)"; exit "$rc"; }
+          test -s "$out/chain.moves.tsv" && test -s "$out/chain-edges.tsv"
+          mv "$out/chain.moves.tsv" "$out/moves.tsv"
+          if [ -f "$out/prior.edges.tsv" ]; then
+            { cat "$out/prior.edges.tsv"; tail -n +2 "$out/chain-edges.tsv"; } > "$out/edges.tsv"
+          else
+            cp "$out/chain-edges.tsv" "$out/edges.tsv"
+          fi
+      - name: Verify cumulative chain with Julia
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$PURE_DIR"
+          julia --startup-file=no pure_chain.jl evidence/print-pure-A.tsv "$out/dag-all.tsv" "$out/moves.tsv" > "$out/verify.julia.stdout" 2> "$out/verify.julia.stderr" || { cat "$out/verify.julia.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.julia.stdout" > "$out/receipt.julia.tsv"
+          tail -n 2 "$out/receipt.julia.tsv"
+      - name: Verify cumulative chain with Flix
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$PURE_DIR"
+          cal=$(cd .. && pwd)
+          java -Dstdout.encoding=UTF-8 -Xmx6g -jar "$FLIX_JAR" chain evidence/print-pure-A.tsv "$out/dag-all.tsv" "$out/moves.tsv" "$cal/english/evidence" "$cal/en-physical-review" > "$out/verify.flix.stdout" 2> "$out/verify.flix.stderr" || { cat "$out/verify.flix.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.flix.stdout" > "$out/receipt.flix.tsv"
+          tail -n 2 "$out/receipt.flix.tsv"
+          cmp "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" || { echo "::error::Julia and Flix receipts differ"; exit 1; }
+          grep -q '^status.VALID_CONTINUOUS_CHAIN' "$out/receipt.flix.tsv"
+      - name: Package artifact
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out
+          mkdir "$GITHUB_WORKSPACE/pack"
+          cp "$out/moves.tsv" "$out/edges.tsv" "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" "$out/run.log" "$out/flix-jar.sha256" "$GITHUB_WORKSPACE/pack/"
+          {
+            echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "segment=$SEG"
+            echo "edges_total=$(($(wc -l < "$out/edges.tsv") - 1))"
+          } > "$GITHUB_WORKSPACE/pack/VERIFIED.txt"
+          (cd "$GITHUB_WORKSPACE/pack" && sha256sum moves.tsv edges.tsv receipt.julia.tsv receipt.flix.tsv run.log flix-jar.sha256 VERIFIED.txt > SHA256SUMS)
+          {
+            echo "### Segment $SEG verified"
+            echo "- research SHA: \`$SHA\`"
+            echo "- cumulative edges: $(($(wc -l < "$out/edges.tsv") - 1))"
+            echo '```'; cat "$GITHUB_WORKSPACE/pack/SHA256SUMS"; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: psc-chain-${{ github.run_id }}-s4
+          path: pack/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Collect failure logs
+        if: failure() || cancelled()
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/fail"
+          cp -f "$GITHUB_WORKSPACE"/out/*.log "$GITHUB_WORKSPACE"/out/verify.* "$GITHUB_WORKSPACE"/out/receipt.* "$GITHUB_WORKSPACE/fail/" 2>/dev/null || true
+          # Not a chain artifact: no VERIFIED.txt, never used as a prior.
+          echo "segment $SEG failed or was cancelled; partial logs only" > "$GITHUB_WORKSPACE/fail/FAILED.txt"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: failure() || cancelled()
+        with:
+          name: psc-failure-${{ github.run_id }}-s4
+          path: fail/
+          retention-days: 14
+          if-no-files-found: ignore
