@@ -18,16 +18,17 @@ const MIN_ROT_DIFF = 0.03; // share of pixels that change under the least-differ
 const faces = ["F", "B", "R", "L", "U", "D"];
 const tiles = faces.flatMap((f) => [0, 1].flatMap((r) => [0, 1].map((c) => `${f}_${r}_${c}`)));
 
-const browser = await chromium.launch();
+// CHROMIUM_PATH optionally selects a specific browser binary (e.g. a preinstalled Chromium).
+// CHROMIUM_PATH optionally selects a specific browser binary (e.g. a preinstalled Chromium).
+const browser = await chromium.launch(
+  process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH, args: ["--no-sandbox"] } : {},
+);
 const page = await browser.newPage();
 let failed = 0;
 const seen = new Map();
-for (const id of tiles) {
-  const svg = readFileSync(new URL(`${id}.svg`, dir), "utf8");
-  const hash = createHash("sha256").update(svg).digest("hex");
-  if (seen.has(hash)) { console.log(`FAIL ${id}: identical to ${seen.get(hash)}`); failed++; }
-  seen.set(hash, id);
-  const r = await page.evaluate(async ({ svg }) => {
+
+async function measure(svg) {
+  return page.evaluate(async ({ svg }) => {
     const img = new Image();
     img.src = "data:image/svg+xml;base64," + btoa(svg);
     await img.decode();
@@ -57,10 +58,27 @@ for (const id of tiles) {
     });
     return { detail, minRot: Math.min(...rots) };
   }, { svg });
+}
+function report(label, r) {
   const ok = r.detail >= MIN_DETAIL && r.minRot >= MIN_ROT_DIFF;
   if (!ok) failed++;
-  console.log(`${ok ? "ok  " : "FAIL"} ${id} detail=${(r.detail * 100).toFixed(1)}% rotation-diff=${(r.minRot * 100).toFixed(1)}%`);
+  console.log(`${ok ? "ok  " : "FAIL"} ${label} detail=${(r.detail * 100).toFixed(1)}% rotation-diff=${(r.minRot * 100).toFixed(1)}%`);
+}
+
+for (const id of tiles) {
+  const svg = readFileSync(new URL(`${id}.svg`, dir), "utf8");
+  const hash = createHash("sha256").update(svg).digest("hex");
+  if (seen.has(hash)) { console.log(`FAIL ${id}: identical to ${seen.get(hash)}`); failed++; }
+  seen.set(hash, id);
+  report(id, await measure(svg));
+}
+// Alternative Up/Down proposals (full 320x320 faces): check each of their four stickers.
+for (const id of ["U1", "U2", "U3", "U4", "U5", "D1", "D2", "D3", "D4", "D5"]) {
+  let face;
+  try { face = readFileSync(new URL(`proposals/${id}.svg`, dir), "utf8"); } catch { continue; }
+  for (const [r, c] of [[0, 0], [0, 1], [1, 0], [1, 1]])
+    report(`${id}_${r}_${c}`, await measure(face.replace('width="320" height="320" viewBox="0 0 320 320"', `width="160" height="160" viewBox="${c * 160} ${r * 160} 160 160"`)));
 }
 await browser.close();
-console.log(failed ? `${failed} tile check(s) failed` : "all 24 tiles pass");
+console.log(failed ? `${failed} tile check(s) failed` : "all tiles pass");
 process.exit(failed ? 1 : 0);
