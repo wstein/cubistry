@@ -288,10 +288,10 @@ const scatterBlooms = (seed, cols, rows, skip = () => false, r0 = 7, r1 = 11) =>
 const kite = (x, y, s = 1, c = H.pink.mid) =>
   g(x, y, s, `<path d="M0 26Q-10 40 0 52T0 80" ${strokeW(W.fine)}/><circle cy="44" r="3" fill="${H.butter.mid}" ${o}/><circle cy="62" r="3" fill="${H.sky.mid}" ${o}/><polygon points="0,-26 17,0 0,28 -17,0" fill="${c}" ${o} stroke-linejoin="round"/><path d="M0 -26V28M-17 0H17" ${strokeW(W.fine)}/>`);
 const sparkles = (pts, c = H.butter.light) => pts.map(([x, y, r]) => star(x, y, r, c)).join("");
-const UE = { top: H.sky.light, right: H.butter.bg, bottom: H.sky.bg, left: H.green.bg };
-const upField = edgeField(UE, "#eef7fb");
-const DE = { top: H.green.mid, right: H.green.mid, bottom: H.sky.dark, left: H.green.mid };
-const downField = edgeField(DE, "#bfdcab");
+const upEdges = { top: H.sky.light, right: H.butter.bg, bottom: H.sky.bg, left: H.green.bg };
+const upField = edgeField(upEdges, "#eef7fb");
+const downEdges = { top: H.green.mid, right: H.green.mid, bottom: H.sky.dark, left: H.green.mid };
+const downField = edgeField(downEdges, "#bfdcab");
 
 const moonShape = `<path transform="translate(-215 -45)" d="M215 45a50 50 0 1 0 48 70a40 40 0 1 1-48-70Z" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.outline}"/>`;
 const rainbowArcs = (cx, cy, r) =>
