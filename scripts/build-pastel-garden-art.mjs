@@ -352,7 +352,7 @@ const miniFace = (x, y, mood = "happy", gap = 11) =>
 // Right face, white toward Front (day), and lilac toward the Back face (night, where the moon is).
 // The moon sits at the top-left because the Back face's moon is at its top-right edge, mirrored across the shared edge.
 const dawnTint = mix(white, H.peach.mid, 0.3), dayTint = mix(white, H.butter.mid, 0.28);
-// Sun in the upper right, away from the Front face's top edge where Sunny now sits (the 2x2 seams cross at the centre).
+// Sun in the upper right, away from the Front face's top edge where Sunny now sits (the 2x2 seams cross at the center).
 const u5Content =
   `<circle cx="0" cy="312" r="96" fill="${H.peach.light}" opacity=".4"/>` +
   cloudFar(26, 52, 0.5, H.lilac.light) + cloudFar(240, 150, 0.5) + cloudFar(8, 206, 0.45, dawnTint) + cloudFar(120, 232, 0.4) +
