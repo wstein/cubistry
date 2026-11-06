@@ -159,35 +159,45 @@ test("Countdown paused at 15:00.5 into the 4-HTM minutes edge resumes and keeps 
 // period word (src/apps/ms-timer/cube.ts). The plan's "step by step" wording of
 // decision 5 therefore holds only for adjacent targets.
 
-const htm = (word) => (word ? word.split(" ").length : 0);
+const words = (alg) => (alg ? alg.split(" ") : []);
+/** Inverse of a move word: reversed order, each turn undone. */
+const invert = (alg) =>
+  words(alg)
+    .reverse()
+    .map((m) =>
+      m.endsWith("2") ? m : m.endsWith("'") ? m.slice(0, -1) : `${m}'`,
+    );
+const moves = (rows) => rows.map((x) => x.move);
 
 test("Set to an adjacent second plays exactly the saved period word, forward and inverse", async () => {
   const r = await rig({ from: 30 });
-  let walking = r.timer.set("00:31");
-  await r.walk(walking);
+  const word = ms.runs.S.words[30]; // edge 30 -> 31 of the seconds cube
+  const forward = await r.walk(r.timer.set("00:31"));
   r.check(31);
-  walking = r.timer.set("00:30");
-  await r.walk(walking);
+  assert.deepEqual(
+    moves(forward.minor),
+    words(word),
+    "forward: the saved word",
+  );
+  assert.equal(forward.major.length, 0);
+  const back = await r.walk(r.timer.set("00:30"));
   r.check(30);
-  // Both steps are single period edges: their lengths equal the saved words.
-  const r2 = await rig({ from: 30 });
-  const w = r2.timer.set("00:31");
-  let done = false;
-  w.then(() => (done = true));
-  while (!done) await r2.runTo(r2.now + 10, { ticking: false });
-  const played = r2.take();
-  assert.equal(played.minor.length, htm(ms.runs.S.words[30]));
-  assert.equal(played.major.length, 0);
+  assert.deepEqual(
+    moves(back.minor),
+    invert(word),
+    "inverse: the saved word undone",
+  );
+  assert.equal(back.major.length, 0);
+  assert.equal(back.minor.length, forward.minor.length);
 });
 
-test("Set and Reset across far distances finish on a period node within 11 HTM per cube", async () => {
+// Observed for the tested targets only. docs/COUNTER_REUSE.md:75 limits the 11 HTM
+// bound to solving modulo whole rotations; the adapter solves exactPhysical, so
+// this is no proven bound.
+test("Set and Reset to the tested far targets finish on a period node, observed at most 11 HTM per cube", async () => {
   const r = await rig({ from: 900 });
   for (const target of ["00:00", "59:59", "29:30", "15:00"]) {
-    const walking = r.timer.set(target);
-    let done = false;
-    walking.then(() => (done = true));
-    while (!done) await r.runTo(r.now + 10, { ticking: false });
-    const played = r.take();
+    const played = await r.walk(r.timer.set(target));
     r.check(at(target));
     for (const unit of ["minor", "major"]) {
       assert.ok(
@@ -195,7 +205,8 @@ test("Set and Reset across far distances finish on a period node within 11 HTM p
         `${target} ${unit}: ${played[unit].length} HTM`,
       );
     }
-    assert.ok(played.tenth.length <= 14 * 10);
+    // The 1/10 cube is not moved by a Set to a whole second from a whole second.
+    assert.equal(played.tenth.length, 0, `${target}: 1/10 cube turns`);
     // The cube rests on a node of its period that shows the target: for the
     // seconds cube either lap, for the minutes cube its single lap.
     const sec = at(target);
@@ -212,9 +223,17 @@ test("Set and Reset across far distances finish on a period node within 11 HTM p
       `${target}: minutes cube on a period node`,
     );
   }
+});
+
+test("Reset from the far end finishes on the configured duration within the same observed 11 HTM per cube", async () => {
   const far = await rig({ from: at("59:59"), duration: 900 });
-  await far.walk(far.timer.reset());
+  const played = await far.walk(far.timer.reset());
   far.check(900);
+  for (const unit of ["minor", "major"])
+    assert.ok(
+      played[unit].length <= 11,
+      `reset ${unit}: ${played[unit].length} HTM`,
+    );
   assert.equal(far.timer.warning, "");
 });
 
@@ -222,11 +241,9 @@ test("a newer Set interrupts a running Set walk and the cubes end on the newer t
   const r = await rig({ from: 900 });
   const first = r.timer.set("45:10");
   await r.runTo(r.now + 120, { ticking: false }); // mid-route, turns still queued
+  assert.equal(r.timer.busy, true, "the first walk is still running");
   const second = r.timer.set("05:20");
-  let done = false;
-  Promise.all([first, second]).then(() => (done = true));
-  while (!done) await r.runTo(r.now + 10, { ticking: false });
-  r.take();
+  await r.walk(Promise.all([first, second]));
   r.check(at("05:20"));
   assert.equal(r.timer.configuredSeconds, at("05:20"));
   assert.equal(r.timer.busy, false);
