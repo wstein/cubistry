@@ -104,8 +104,10 @@ a search of at most six solver attempts (all three solver frames, both
 directions). The attempt count decides the route; a 5-second wall-clock guard,
 checked only before each attempt, stops the search on a very slow machine. The
 hard 8-second worker deadline covers cold startup, the direct search and the
-center portfolio, so cold startup plus attempts above 5 seconds can still
-shorten the route. Timeout, worker errors, invalid
+center portfolio, so on a very slow machine, where cold startup plus attempts
+exceed 5 seconds, the guard can still cut the search short. The route is then
+less optimized than after a full search, never longer than the direct route.
+Timeout, worker errors, invalid
 results, or a candidate that is not strictly shorter preserve the checked
 fallback. A single worker handles one solve and one replaceable pending request;
 no unbounded queue of solver jobs is retained. Browser restoration from the
