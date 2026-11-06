@@ -88,8 +88,14 @@ test('final snapshot preserves trusted-main boundary, distinct immutable artifac
  assert.doesNotMatch(final,/head_ref|pull_request\.head|npm |matrix\./);
  const upload=final.match(/name: (github-pages[^\n]+)/)?.[1],deployment=final.match(/artifact_name: ([^\n]+)/)?.[1];
  assert(upload&&upload!=='github-pages');assert.equal(upload,deployment);
- assert.match(final,/actions\/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa/);
- assert.match(final,/actions\/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e/);
+ // Expected pins come from pages.yml, so a Dependabot bump needs no test edit. Both must be full commit SHAs and equal.
+ const pagesYml=readFileSync('.github/workflows/pages.yml','utf8');
+ for(const action of ['actions/upload-pages-artifact','actions/deploy-pages']){
+  const re=new RegExp(`${action}@([^\\s#]+)`);
+  const expected=pagesYml.match(re)?.[1];
+  assert.match(expected??'',/^[0-9a-f]{40}$/,`${action} in pages.yml must be pinned to a commit SHA`);
+  assert.equal(final.match(re)?.[1],expected,`${action} in pages-publish.yml must use the same commit SHA as pages.yml`);
+ }
  assert.match(jobs.get('notify'),/DEPLOY_OK: \$\{\{ needs\.deploy-previews\.result == 'success' \}\}/);
 });
 
