@@ -1,1 +1,0 @@
-function z({physical:n,logical:r,busy:i,activeTarget:o,anticipatedTarget:u=null,catchingUp:f=!1}){return f&&(i||n!==r)?"synchronizing":i?o!==null&&o!==r&&o!==u?"synchronizing":"moving":n===r||n===u?"idle":"synchronizing"}export{z as t};

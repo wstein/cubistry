@@ -1,0 +1,1 @@
+import{d as e}from"./calendar-solver-vendor-CNbo6oql.js";e.expose&&import(`./inside-UWSZBO4Y-DA4_xDYO.js`).then(()=>{globalThis.postMessage?globalThis.postMessage(`comlink-exposed`):globalThis.process.getBuiltinModule(`node:worker_threads`).parentPort?.postMessage(`comlink-exposed`)});var t=import.meta.url;export{t as WORKER_ENTRY_FILE_URL};
