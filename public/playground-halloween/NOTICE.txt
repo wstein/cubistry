@@ -1,0 +1,24 @@
+Halloween picture-cube artwork
+Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+These six whole-face vector illustrations (a cat in a witch hat, a smiling pumpkin, a ghost and a hanging bat on a moonlit night, with bats and a crescent moon above and a spider, candy and pumpkins below) are a work separate from the
+Cubistry program code, which stays under AGPL-3.0-or-later. The images are
+licensed under CC BY-SA 4.0; the AGPL copyleft does not cover them. The SVG files in
+this directory contain no text and no fonts; no third-party images, platform
+glyphs, or stock artwork are included.
+
+Editable source and regeneration:
+  scripts/build-halloween-art.mjs
+  node scripts/build-halloween-art.mjs      (rewrites the six faces)
+  node scripts/build-playground-theme.mjs halloween   (re-pins them)
+
+The art generator is the editable source of the artwork, so it is art data under
+the same CC BY-SA 4.0 license, not AGPL program code.
+
+Source repository: https://github.com/wstein/cubistry
+License: https://creativecommons.org/licenses/by-sa/4.0/
+Each whole face uses a 320 by 320 viewBox. The playground cuts the faces into the
+N by N stickers a cube of size N needs when it loads them, so no pre-cut tiles are
+stored.
