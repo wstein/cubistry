@@ -47,6 +47,7 @@ import {
   sharedRangeLabel,
 } from "./apps/counter/blank-top.ts";
 import blankTopPin from "../counter-blank-top-source.json";
+import { urlAfterAppSwitch } from "./app-switch-url.mjs";
 import "./style.css";
 import { loadAssets } from "@cubistry/cube-assets";
 import { CubeViewer, BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
@@ -1142,10 +1143,7 @@ async function switchApplication(requested) {
   }
   if (application && application !== targetKey) {
     try {
-      const u = new URL(location.href);
-      u.searchParams.delete("val");
-      u.searchParams.delete("value");
-      history.replaceState(null, "", u.pathname + u.search + u.hash);
+      history.replaceState(null, "", urlAfterAppSwitch(location.href, application, targetKey));
     } catch {}
   }
   if (application === "certified" && view) rememberedCounterValue = view.currentValue;
