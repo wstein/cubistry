@@ -83,6 +83,7 @@ function showMoves() {
     ? "Planning legal route…"
     : `${p.completed.htm} / ${p.total.htm} HTM · ${p.completed.rotations} / ${p.total.rotations} cube rotations`;
   $("calendar-moves").dataset.route = p.route;
+  $("calendar-moves").dataset.solverStatus = optimizer.solverStatus;
   $("calendar-route").textContent = p.planning
     ? "Finding a shorter legal route…"
     : p.route === "optimized"
