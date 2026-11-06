@@ -22,6 +22,7 @@ else if (root && opt("variants")) {
   cols = names.map((n) => ({ name: n, dir: resolve(root, n) }));
 } else { console.error("usage: make-variant-sheet.mjs <themeDir> --variants a-a,a-b | --before <dir> --after <dir> [--out sheet.png]"); process.exit(2); }
 
+const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 const cell = Math.floor(1640 / cols.length / 4) - 8;
 const colHtml = cols.map((c) => {
   const imgs = FACE_NAMES.map((f) => {
@@ -31,9 +32,9 @@ const colHtml = cols.map((c) => {
     return `<img src="${dataUrl(readFileSync(p, "utf8"))}" width="${cell}" height="${cell}" style="grid-column:${x + 1};grid-row:${y + 1};border:1px solid #4a3a38">`;
   }).join("");
   let verdict = "";
-  if (existsSync(`${c.dir}/tiles.json`)) { const j = JSON.parse(readFileSync(`${c.dir}/tiles.json`, "utf8")); verdict = ` <span style="font-weight:400">checker: ${j.verdict}</span>`; }
-  const table = `<table style="border-collapse:collapse;margin-top:10px;font-size:14px"><tr>${RATING_AXES.map((a) => `<th style="border:1px solid #4a3a38;padding:3px 10px">${a}</th>`).join("")}</tr><tr>${RATING_AXES.map(() => `<td style="border:1px solid #4a3a38;padding:3px 10px;height:22px;text-align:center">1-5</td>`).join("")}</tr></table>`;
-  return `<div style="flex:1"><div style="font:700 22px sans-serif;margin:6px 0">${c.name}${verdict}</div><div style="display:grid;grid-template-columns:repeat(4,${cell}px);gap:4px;line-height:0">${imgs}</div>${table}</div>`;
+  if (existsSync(`${c.dir}/tiles.json`)) { const j = JSON.parse(readFileSync(`${c.dir}/tiles.json`, "utf8")); verdict = ` <span style="font-weight:400">checker: ${esc(j.verdict)}</span>`; }
+  const table = `<table style="border-collapse:collapse;margin-top:10px;font-size:14px"><tr>${RATING_AXES.map((a) => `<th style="border:1px solid #4a3a38;padding:3px 10px">${esc(a)}</th>`).join("")}</tr><tr>${RATING_AXES.map(() => `<td style="border:1px solid #4a3a38;padding:3px 10px;height:22px;text-align:center">1-5</td>`).join("")}</tr></table>`;
+  return `<div style="flex:1"><div style="font:700 22px sans-serif;margin:6px 0">${esc(c.name)}${verdict}</div><div style="display:grid;grid-template-columns:repeat(4,${cell}px);gap:4px;line-height:0">${imgs}</div>${table}</div>`;
 }).join("");
 const out = resolve(opt("out") ?? `${root ?? "."}/variant-sheet.png`);
 const b = await openBrowser();

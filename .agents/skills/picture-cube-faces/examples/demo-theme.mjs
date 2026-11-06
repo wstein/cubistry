@@ -1,6 +1,7 @@
 /** Synthetic "demo" theme: a tooling test, NOT art. It shows the scene API; the six faces are independent of the cube size N.
  *  - Belt story: dawn (L) -> day (F) -> evening (R) -> night (B) -> dawn again, one continuous panorama.
- *  - One dominating hero per face (about a third of the face), friendly face, flat vector, one ink color.
+ *  - One hero per face, friendly face, flat vector, one ink color. The hero is about 28 % of the face plus rays, BELOW the
+ *    skill rule of 35-50 %: this is a tooling test, not art; real themes follow the rule.
  *  - Texture anchors: a seeded scatter of small asymmetric marks (stars in the sky, grass tufts on the ground) so that
  *    even the 1/49 tiles of a 7x7 cube contain something to place and to orient. Real themes should use story-bearing
  *    anchors (clouds, birds, flowers) instead of a uniform scatter.

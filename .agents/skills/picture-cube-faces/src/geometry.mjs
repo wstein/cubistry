@@ -12,7 +12,7 @@ export const MAX_N = 7;
 export const DEFAULT_FACE_SIZE = 420;
 export const tileSize = (S, n) => S / n;
 
-/** Throws unless n is an integer in 2..5. */
+/** Throws unless n is an integer in 2..7. */
 export function assertSupportedN(n) {
   if (!Number.isInteger(n) || n < MIN_N || n > MAX_N) {
     throw new RangeError(`N must be an integer from ${MIN_N} to ${MAX_N}, got ${n}`);

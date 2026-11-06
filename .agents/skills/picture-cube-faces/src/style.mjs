@@ -1,6 +1,7 @@
 /** Pastel style kit: one ink color, three line weights, soft hues, friendly faces.
  * Flat vector only: no gradients, filters, clip paths, url() references, <text> or <image>.
- * Line weights are given for a 160 px sticker and scaled with k = tile / 160.
+ * Line weights are given for a 160 px tile of the 320 px reference face (a 2 x 2 sticker) and scaled with
+ * k = S / 320, where S is the face size in px (theme ctx.k); k = 1 at 320 px and 1.3125 at 420 px.
  */
 export const INK = "#4a3a38";
 export const LINE = { outline: 3, fine: 2, body: 6 }; // body = merged outline, half is covered so 3 shows

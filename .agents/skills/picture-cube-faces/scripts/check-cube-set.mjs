@@ -3,56 +3,90 @@
  *
  *   node check-cube-set.mjs <dir> [--n N | --n-range A-B] [options]
  *
- * <dir> holds the six faces U L F R B D (.svg, square, S x S px). The cube size N is NOT part of a theme: every face is
- * sliced into N x N tiles exactly as the app does at runtime, for each N examined (default 2..7).
+ * <dir> holds the six faces U L F R B D (.svg, square, S x S px) and optionally net.svg. The cube size N is NOT part of a
+ * theme: every face is sliced into N x N tiles exactly as the app does at runtime, for each N examined (default 2..7).
  *
- * Checks: forbidden constructs, style audit (advisory), file-size budget, face format, edge seams of all 12 shared
- * edges, and per N: tiles lacking detail, rotation-ambiguous tiles, identical tiles (and rotation twins).
- * Strictness: N listed in --strict-n (default 2) must be clean or the run FAILs; other N are reported as warnings
- * (strictness for N >= 3 is an open owner decision). Tile files, if present (legacy F_r_c.svg or tiles/nN/), are
- * format- and size-checked but are never required.
+ * HARD failures (exit 1): any file the app's SVG validator would reject (same allowlist, see src/svgcheck.mjs; faces,
+ * net.svg and tile files), wrong face format or size, edge seams of the 12 shared edges (3 px band, mean, big-pixel
+ * share and worst sticker segment), tile preview files that differ from the face crop, and flat stickers (lack of detail)
+ * at a strict N. Everything else is a WARNING or INFORMATION.
+ * INFORMATION (never a failure; the owner accepts equal-looking stickers and orientations, the cube then counts as
+ * visually solved): per N the symmetry class of every sticker (none, 2-fold, 4-fold), groups of identical stickers,
+ * groups of rotation twins, and for odd N which center stickers need no orientation. The classification is
+ * src/symmetry.mjs and is written to the json (key perN.<N>.classification).
  *
- * Options: --strict-n 2,3  --min-detail 0.08  --min-rot 0.03  --seam-mean 3  --max-face-kb 200  --max-tile-kb 30
+ * Options: --strict-n 2,3  --min-detail 0.08  --sym-tol 0.03  --dup-tol 0.02  --seam-mean 3  --seam-segment 9
+ *          --max-face-kb 200  --max-tile-kb 30  --tile-tol 0.005
  *          --size-fail (budget overruns FAIL instead of warn)  --json <path> (default <dir>/tiles.json)
- * Exit code: 0 PASS, 1 FAIL, 2 usage or environment error.
+ * Exit code: 0 PASS, 1 FAIL, 2 usage or environment error (bad flag or number, unknown option, no browser).
  */
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { resolve, basename } from "node:path";
 import { FACE_NAMES, EDGES, parseNSpec, parseTileId, stickerCount } from "../src/geometry.mjs";
 import { findForbidden, styleAudit, checkSizes, checkTileFormat, faceRoot, DEFAULT_BUDGET } from "../src/rules.mjs";
-import { MIN_DETAIL, MIN_ROT_DIFF, detailShare, rotationDiffs, rotatedSignatures, evaluateTiles } from "../src/metrics.mjs";
-import { stripDiffs, edgeStats, seamVerdict, SEAM_MEAN_LIMIT } from "../src/seams.mjs";
+import { MIN_DETAIL, MIN_ROT_DIFF } from "../src/metrics.mjs";
+import { classifyTiles, summarize, DUPLICATE_TOL } from "../src/symmetry.mjs";
+import { bandDiffs, edgeStats, seamVerdict, SEAM_MEAN_LIMIT, SEAM_SEGMENT_LIMIT, SEAM_BAND } from "../src/seams.mjs";
 
 const PROBE = 80;
-const flags = new Set(["size-fail"]);
+const TILE_TOL = 0.005; // share of pixels (channel difference > 64) allowed between a tile file and the face crop
 
+/** Option table: type "num" (finite, > 0 unless min given), "int", "list" (comma separated integers), "str", "flag". */
+const OPTIONS = {
+  n: { type: "int" }, "n-range": { type: "str" }, "strict-n": { type: "list" }, json: { type: "str" },
+  "min-detail": { type: "num", min: 0, max: 1 }, "sym-tol": { type: "num", min: 0, max: 1 }, "dup-tol": { type: "num", min: 0, max: 1 },
+  "tile-tol": { type: "num", min: 0, max: 1 }, "seam-mean": { type: "num", min: 0, max: 255 }, "seam-segment": { type: "num", min: 0, max: 255 },
+  "max-face-kb": { type: "num", min: 1 }, "max-tile-kb": { type: "num", min: 1 }, "size-fail": { type: "flag" },
+};
+
+/** Strict argv parser; throws Error(message) for unknown options, missing values and non-numeric numbers. */
 function parseArgs(argv) {
   const o = { _: [] };
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i].startsWith("--")) {
-      const k = argv[i].slice(2);
-      o[k] = flags.has(k) ? true : argv[++i];
-    } else o._.push(argv[i]);
+    const a = argv[i];
+    if (!a.startsWith("--")) { o._.push(a); continue; }
+    const k = a.slice(2), spec = OPTIONS[k];
+    if (!spec) throw new Error(`unknown option --${k}`);
+    if (spec.type === "flag") { o[k] = true; continue; }
+    const v = argv[++i];
+    if (v === undefined || v.startsWith("--")) throw new Error(`option --${k} needs a value`);
+    const num = (t) => { if (!/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(t.trim())) throw new Error(`option --${k}: "${t}" is not a number`); return Number(t); };
+    if (spec.type === "num") {
+      const x = num(v);
+      if (!Number.isFinite(x) || x < (spec.min ?? 0) || x > (spec.max ?? Infinity)) throw new Error(`option --${k}: ${v} is outside ${spec.min ?? 0}..${spec.max ?? "inf"}`);
+      o[k] = x;
+    } else if (spec.type === "int") {
+      const x = num(v);
+      if (!Number.isInteger(x)) throw new Error(`option --${k}: "${v}" is not an integer`);
+      o[k] = String(x);
+    } else if (spec.type === "list") {
+      const xs = v.split(",").filter(Boolean).map(num);
+      if (!xs.length || !xs.every((x) => Number.isInteger(x) && x >= 2 && x <= 7)) throw new Error(`option --${k}: "${v}" must be a comma separated list of integers from 2 to 7`);
+      o[k] = xs;
+    } else o[k] = v;
   }
   return o;
 }
 
-const opts = parseArgs(process.argv.slice(2));
-if (!opts._[0]) {
+let opts;
+try { opts = parseArgs(process.argv.slice(2)); } catch (e) { console.error(e.message); console.error("usage: check-cube-set.mjs <dir> [--n N | --n-range A-B] [--strict-n 2] [--json path] (see file header)"); process.exit(2); }
+if (opts._.length !== 1) {
   console.error("usage: check-cube-set.mjs <dir> [--n N | --n-range A-B] [--strict-n 2] [--json path] (see file header)");
   process.exit(2);
 }
 const dir = resolve(opts._[0]);
-let ns, strictN;
-try {
-  ns = parseNSpec(opts.n, opts["n-range"]);
-  strictN = (opts["strict-n"] ?? "2").split(",").filter(Boolean).map(Number);
-} catch (e) { console.error(e.message); process.exit(2); }
+if (!existsSync(dir) || !statSync(dir).isDirectory()) { console.error(`not a directory: ${dir}`); process.exit(2); }
+let ns;
+const strictN = opts["strict-n"] ?? [2];
+try { ns = parseNSpec(opts.n, opts["n-range"]); } catch (e) { console.error(e.message); process.exit(2); }
 const th = {
-  minDetail: Number(opts["min-detail"] ?? MIN_DETAIL),
-  minRot: Number(opts["min-rot"] ?? MIN_ROT_DIFF),
-  seamMean: Number(opts["seam-mean"] ?? SEAM_MEAN_LIMIT),
-  budget: { faceKB: Number(opts["max-face-kb"] ?? DEFAULT_BUDGET.faceKB), tileKB: Number(opts["max-tile-kb"] ?? DEFAULT_BUDGET.tileKB) },
+  minDetail: opts["min-detail"] ?? MIN_DETAIL,
+  symmetryTol: opts["sym-tol"] ?? MIN_ROT_DIFF,
+  duplicateTol: opts["dup-tol"] ?? DUPLICATE_TOL,
+  tileTol: opts["tile-tol"] ?? TILE_TOL,
+  seamMean: opts["seam-mean"] ?? SEAM_MEAN_LIMIT,
+  seamSegment: opts["seam-segment"] ?? SEAM_SEGMENT_LIMIT,
+  budget: { faceKB: opts["max-face-kb"] ?? DEFAULT_BUDGET.faceKB, tileKB: opts["max-tile-kb"] ?? DEFAULT_BUDGET.tileKB },
 };
 const sizeFail = Boolean(opts["size-fail"]);
 
@@ -99,12 +133,14 @@ if (existsSync(`${dir}/tiles`)) for (const x of readdirSync(`${dir}/tiles`)) { c
 
 let forbiddenTotal = 0;
 const forbiddenRows = [];
-const scan = (label, text) => {
-  for (const h of findForbidden(text)) { forbiddenTotal++; forbiddenRows.push({ file: label, ...h }); fail(`${label}: forbidden <${h.id}> x${h.count} (${h.why})`); }
+const scan = (label, text, opt) => {
+  for (const h of findForbidden(text, opt)) { forbiddenTotal++; forbiddenRows.push({ file: label, ...h }); fail(`${label}: ${h.id} x${h.count} (${h.why})`); }
 };
 for (const f of FACE_NAMES) scan(`${f}.svg`, faces[f]);
 for (const t of tileFiles) scan(t.file, readFileSync(t.path, "utf8"));
-if (!forbiddenTotal) ok("no forbidden constructs (gradient, filter, clipPath, url(), text, image, script, ...)");
+const netPath = `${dir}/net.svg`;
+if (existsSync(netPath)) scan("net.svg", readFileSync(netPath, "utf8"), { dimensions: false, size: false });
+if (!forbiddenTotal) ok("every face, tile and the net pass the app's SVG allowlist (tags, attributes, decoded values, integer width/height <= 1024)");
 result.forbidden = forbiddenRows;
 
 const audit = styleAudit(FACE_NAMES.map((f) => faces[f]).join(""));
@@ -123,72 +159,78 @@ if (sizes.over.length > 8) (sizeFail ? fail : warn)(`size: ... and ${sizes.over.
 if (!sizes.over.length) ok("file sizes within budget");
 
 if (tileFiles.length) {
-  warn(`${tileFiles.length} tile file(s) found; tile files are not part of a theme (generated on demand), format-checked only`);
+  console.log(`     ${tileFiles.length} tile file(s) found (on-demand previews, or the shipped tiles of a 2x2 playground set): format-checked, compared with the face crop, never required`);
   for (const t of tileFiles) {
     const id = parseTileId(basename(t.file, ".svg"));
     for (const p of checkTileFormat(readFileSync(t.path, "utf8"), { r: id.r, c: id.c, tile: S / t.n })) fail(`${t.file}: ${p}`);
   }
 }
+if (!ns.some((n) => strictN.includes(n))) warn(`no strict N among the examined sizes (N = ${ns.join(",")}; strict = ${strictN.join(",")}): flat stickers are only warnings in this run. Add --strict-n ${ns[0]} to make them fail`);
 
-// ---- 3. rendering: seams and per-N tile metrics -------------------------------------------------------------------
+// ---- 3. rendering: seams, tile previews and per-N classification ----------------------------------------------------
 let browser;
 try {
-  const { openBrowser, probeFace } = await import("../src/browser.mjs");
+  const { openBrowser } = await import("../src/browser.mjs");
   browser = await openBrowser();
+} catch (e) {
+  console.error(`ERROR cannot start the browser: ${e.message}`);
+  process.exit(2);
+}
+try {
+  const { probeFace, compareTiles } = await import("../src/browser.mjs");
   const strips = {}, tilesByN = Object.fromEntries(ns.map((n) => [n, []]));
   for (const f of FACE_NAMES) {
-    const probe = await probeFace(browser.page, faces[f], S, ns, PROBE);
+    const probe = await probeFace(browser.page, faces[f], S, ns, PROBE, SEAM_BAND);
     strips[f] = probe.strips;
     for (const n of ns) for (const t of probe.tiles[n]) tilesByN[n].push({ id: `${f}_${t.r}_${t.c}`, px: new Uint8ClampedArray(Buffer.from(t.b64, "base64")) });
   }
-  await browser.close();
-  browser = null;
 
-  // seams
+  // tile files against the face crop (a bbox that culls visible art makes a tile differ from the face)
+  result.tileCompare = { checked: 0, differing: [] };
+  for (const f of FACE_NAMES) {
+    const mine = tileFiles.filter((t) => basename(t.file).startsWith(`${f}_`) && Number.isInteger(S / t.n));
+    if (!mine.length) continue;
+    const items = mine.map((t) => { const id = parseTileId(basename(t.file, ".svg")); return { svg: readFileSync(t.path, "utf8"), r: id.r, c: id.c, n: t.n, file: t.file }; });
+    const shares = await compareTiles(browser.page, faces[f], S, items);
+    shares.forEach((x, k) => {
+      result.tileCompare.checked++;
+      if (x.share > th.tileTol) { result.tileCompare.differing.push({ file: items[k].file, share: +x.share.toFixed(4) }); fail(`${items[k].file}: differs from the ${f} face crop (${(x.share * 100).toFixed(2)}% of pixels, limit ${(th.tileTol * 100).toFixed(2)}%); check the {svg, bbox} of the art`); }
+    });
+  }
+  if (result.tileCompare.checked && !result.tileCompare.differing.length) ok(`${result.tileCompare.checked} tile file(s) match the face crops`);
+
+  // seams: 3 px band, mean, big-pixel share, worst sticker segment at the largest N examined
+  const segN = Math.max(...ns);
   result.seams = [];
   let worst = 0;
   for (const e of EDGES) {
-    const a = strips[e.a[0]][e.a[1]], b = strips[e.b[0]][e.b[1]];
-    const stats = edgeStats(stripDiffs(a, b, e.rev));
-    const good = seamVerdict(stats, { meanLimit: th.seamMean });
+    const stats = edgeStats(bandDiffs(strips[e.a[0]][e.a[1]], strips[e.b[0]][e.b[1]], e.rev), segN);
+    const good = seamVerdict(stats, { meanLimit: th.seamMean, segmentLimit: th.seamSegment });
     worst = Math.max(worst, stats.mean);
-    result.seams.push({ edge: e.name, mean: +stats.mean.toFixed(2), max: stats.max, bigShare: +stats.bigShare.toFixed(4), worstSegment: +stats.worstSegment.toFixed(2), pass: good });
-    if (!good) fail(`seam ${e.name}: mean diff ${stats.mean.toFixed(2)}/255 (limit ${th.seamMean}), ${(stats.bigShare * 100).toFixed(1)}% of pixels > 16`);
+    result.seams.push({ edge: e.name, mean: +stats.mean.toFixed(2), max: +stats.max.toFixed(2), bigShare: +stats.bigShare.toFixed(4), worstSegment: +stats.worstSegment.toFixed(2), segmentMeans: stats.segmentMeans.map((v) => +v.toFixed(2)), segments: segN, band: SEAM_BAND, pass: good });
+    if (!good) fail(`seam ${e.name}: mean diff ${stats.mean.toFixed(2)}/255 (limit ${th.seamMean}), worst sticker segment ${stats.worstSegment.toFixed(2)} (limit ${th.seamSegment}, ${segN} segments), ${(stats.bigShare * 100).toFixed(1)}% of pixels > 16`);
   }
-  if (result.seams.every((s) => s.pass)) ok(`all 12 shared edges match (worst mean difference ${worst.toFixed(2)}/255, limit ${th.seamMean})`);
-  console.log("     " + result.seams.map((s) => `${s.edge} ${s.mean}`).join("  "));
+  if (result.seams.every((x) => x.pass)) ok(`all 12 shared edges match over a ${SEAM_BAND} px band (worst mean difference ${worst.toFixed(2)}/255, limit ${th.seamMean}; worst segment limit ${th.seamSegment})`);
+  console.log("     " + result.seams.map((x) => `${x.edge} ${x.mean}`).join("  "));
 
-  // tiles per N
+  // per N: classification (information) and flatness (hard at strict N)
   result.perN = {};
   for (const n of ns) {
-    const measured = tilesByN[n].map((t) => ({
-      id: t.id,
-      detail: detailShare(t.px, PROBE),
-      minRot: Math.min(...rotationDiffs(t.px, PROBE)),
-      sigs: rotatedSignatures(t.px, PROBE),
-    }));
-    const ev = evaluateTiles(measured, th);
+    const c = classifyTiles(tilesByN[n], { n, probe: PROBE, minDetail: th.minDetail, symmetryTol: th.symmetryTol, duplicateTol: th.duplicateTol });
     const strict = strictN.includes(n);
-    const problems = ev.lackDetail.length + ev.rotAmbiguous.length + ev.identical.length;
-    result.perN[n] = {
-      stickers: stickerCount(n), strict,
-      counts: { lackDetail: ev.lackDetail.length, rotationAmbiguous: ev.rotAmbiguous.length, identicalGroups: ev.identical.length, rotationTwinGroups: ev.rotationTwins.length },
-      lackDetail: ev.lackDetail, rotationAmbiguous: ev.rotAmbiguous, identical: ev.identical, rotationTwins: ev.rotationTwins,
-      tiles: measured.map((t) => ({ id: t.id, detail: +t.detail.toFixed(3), rotDiff: +t.minRot.toFixed(3) })),
-      pass: problems === 0,
-    };
-    const line = `N=${n} (${stickerCount(n)} stickers): ${ev.lackDetail.length} lack detail, ${ev.rotAmbiguous.length} rotation-ambiguous, ${ev.identical.length} identical group(s), ${ev.rotationTwins.length} rotation-twin group(s)`;
-    if (!problems) ok(line);
-    else (strict ? fail : warn)(`${line}${strict ? "" : "  [warning: strictness for N >= 3 is an owner decision]"}`);
-    if (problems) {
-      const show = (label, list) => list.length && console.log(`       ${label}: ${list.slice(0, 12).map((x) => (Array.isArray(x) ? `{${x.join(",")}}` : x)).join(" ")}${list.length > 12 ? ` ... (+${list.length - 12})` : ""}`);
-      show("lack detail", ev.lackDetail); show("rotation-ambiguous", ev.rotAmbiguous); show("identical", ev.identical);
-    }
+    result.perN[n] = { stickers: stickerCount(n), strict, classification: c, pass: c.counts.lackDetail === 0 };
+    const line = `N=${n} (${stickerCount(n)} stickers): ${summarize(c)}`;
+    if (!c.counts.lackDetail) ok(line);
+    else (strict ? fail : warn)(`${line}${strict ? "" : "  [warning: flat stickers at N >= 3: strictness is an owner decision]"}`);
+    const show = (label, list) => list.length && console.log(`       ${label}: ${list.slice(0, 8).map((x) => (Array.isArray(x) ? `{${x.slice(0, 6).join(",")}${x.length > 6 ? ",..." : ""}}` : x)).join(" ")}${list.length > 8 ? ` ... (+${list.length - 8})` : ""}`);
+    show("lack detail", c.lackDetail); show("identical (info)", c.identicalGroups); show("rotation twins (info)", c.rotationTwinGroups);
+    if (c.centers.length) console.log(`       centers: ${c.centers.map((x) => `${x.face} ${x.symmetry}${x.orientationNeeded ? "" : " (no orientation needed)"}`).join(", ")}`);
   }
+  await browser.close();
+  browser = null;
 } catch (e) {
   if (browser) await browser.close().catch(() => {});
-  console.error(`ERROR rendering failed: ${e.message}`);
-  process.exit(2);
+  fail(`rendering failed: ${e.message}`);
 }
 finish();
 

@@ -13,3 +13,5 @@ export * from "./versions.mjs";
 export * from "./metrics.mjs";
 export * from "./seams.mjs";
 export * from "./rules.mjs";
+export * from "./symmetry.mjs";
+export * from "./svgcheck.mjs";

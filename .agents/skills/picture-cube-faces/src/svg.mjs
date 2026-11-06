@@ -26,12 +26,12 @@ const faceInner = (face, crop, compact) => {
   return (rects.length ? rectsToSvg(rects) : "") + (compact ? compactSvg(art) : art);
 };
 
-/** Standard cross net: U above F; L F R B in a row; D below F. `inners` maps face name to its inner svg. */
+/** Standard cross net (nested svg elements clip to their box by default, so no `overflow` attribute is needed): U above F; L F R B in a row; D below F. `inners` maps face name to its inner svg. */
 export function netSvg(inners, S, { gap = 10, bg = "#f5f3eb", ink = "#4a3a38" } = {}) {
   const cell = S + gap;
   const body = FACE_NAMES.map((f) => {
     const [c, r] = NET_POS[f];
-    return `<svg x="${c * cell + gap}" y="${r * cell + gap}" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" overflow="hidden">${inners[f]}<rect width="${S}" height="${S}" fill="none" stroke="${ink}" stroke-width="2"/></svg>`;
+    return `<svg x="${c * cell + gap}" y="${r * cell + gap}" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">${inners[f]}<rect width="${S}" height="${S}" fill="none" stroke="${ink}" stroke-width="2"/></svg>`;
   }).join("");
   const W = 4 * cell + gap, H = 3 * cell + gap;
   return `<svg xmlns="${NS}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="${bg}"/>${body}</svg>\n`;
@@ -40,6 +40,7 @@ export function netSvg(inners, S, { gap = 10, bg = "#f5f3eb", ink = "#4a3a38" } 
 /** Writes tile previews of one face set for cube size n into dir (F_r_c.svg, viewBox crops of the face). */
 export function writeTiles(dir, S, n, faceInners) {
   assertSupportedN(n);
+  if (!Number.isInteger(S / n)) throw new RangeError(`face size ${S} px is not divisible by N = ${n}: tile files need integer width/height (the app's SVG validator rejects fractions)`);
   mkdirSync(dir, { recursive: true });
   const tile = S / n, sizes = [];
   for (const f of FACE_NAMES) {
@@ -61,6 +62,7 @@ export function writeTiles(dir, S, n, faceInners) {
  */
 export function writeFaceSet(dir, spec, { compact = true, net = true, previewN = [] } = {}) {
   const { size: S, faces } = spec;
+  if (!Number.isInteger(S) || S < 1 || S > 1024) throw new RangeError(`face size must be an integer from 1 to 1024 (the app's SVG validator), got ${S}`);
   mkdirSync(dir, { recursive: true });
   const files = {};
   const write = (name, text) => { writeFileSync(`${dir}/${name}`, text); files[name] = Buffer.byteLength(text); };

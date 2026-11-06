@@ -16,10 +16,17 @@ const wrap = (u) => ((u % 4) + 4) % 4;
  * @param {object} cfg
  * @param {Array} cfg.sky      four stop lists (L, F, R, B): [[v, "#hex"], ...] with v 0 (top) .. 1 (horizon)
  * @param {Array} cfg.ground   four stop lists (L, F, R, B): v 0 (horizon) .. 1 (bottom edge)
- * @param {number|((u:number)=>number)} [cfg.horizon=0.72]  horizon height as a fraction of the face
+ * @param {number|((u:number)=>number)} [cfg.horizon=0.72]  horizon height as a fraction of the face. A function of u in
+ *        [0, 4) MUST be periodic (horizon(0) equals horizon(4 - epsilon)): B wraps into L, and a step there is a visible
+ *        seam one cell inside B that the edge check cannot see. `belt.warnings` reports a violation.
  */
 export function createBelt({ sky, ground, horizon = 0.72 }) {
   if (sky?.length !== 4 || ground?.length !== 4) throw new Error("belt needs 4 sky and 4 ground keyframes (L, F, R, B)");
+  const warnings = [];
+  if (typeof horizon === "function") {
+    const a = horizon(0), b = horizon(4 - 1e-9);
+    if (!(Math.abs(a - b) < 1e-4)) warnings.push(`belt horizon is not periodic: horizon(0) = ${a} but horizon(4-) = ${b}; the B|L seam jumps. Make the horizon a function that repeats every 4 (for example based on sin(u * PI / 2)).`);
+  }
   const horizonAt = (u) => (typeof horizon === "function" ? horizon(wrap(u)) : horizon);
 
   // Cyclic keyframe blend: keyframe k sits at u = k + 0.5, neighbors blend with smoothstep.
@@ -37,6 +44,7 @@ export function createBelt({ sky, ground, horizon = 0.72 }) {
   }
 
   return {
+    warnings,
     rgbAt,
     colorAt: (u, v, step = 2) => toHex(quantize(rgbAt(u, v), step)),
     horizonAt,

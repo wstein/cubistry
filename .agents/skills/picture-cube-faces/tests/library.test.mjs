@@ -6,7 +6,10 @@ import { createBelt } from "../src/belt.mjs";
 import { upBorders, downBorders, borderGrid } from "../src/updown.mjs";
 import { buildGrid, cellsPerFace } from "../src/grid.mjs";
 import { gridToRects, compactSvg, cropRects } from "../src/compact.mjs";
-import { evaluateTiles, detailShare, rotationDiffs, rotatedSignatures } from "../src/metrics.mjs";
+import { detailShare, rotationDiffs } from "../src/metrics.mjs";
+import { classifyTiles } from "../src/symmetry.mjs";
+import { auditSvg } from "../src/svgcheck.mjs";
+import { demoTheme } from "../examples/demo-theme.mjs";
 import { archiveCurrent, nextVersion } from "../src/versions.mjs";
 import { glyphPath, GLYPHS } from "../src/glyphs.mjs";
 import { defineTheme } from "../src/theme.mjs";
@@ -75,19 +78,54 @@ test("compactSvg merges touching equal rects and never merges shapes that differ
   assert.equal(compactSvg(gap), gap);
 });
 
-test("tile metrics: flat tile lacks detail, symmetric tile is rotation-ambiguous, twins and identical are grouped", () => {
+test("compactSvg is lossless: skips merging when an attribute is not double-quoted, keeps precision", () => {
+  const single = '<rect x="0" y="0" width="5" height="5" fill=\'red\'/><rect x="5" y="0" width="5" height="5" fill=\'blue\'/>';
+  assert.equal(compactSvg(single), single);
+  const stroke = '<rect x="0" y="0" width="5" height="5" fill="#fff" stroke=\'#000\'/><rect x="5" y="0" width="5" height="5" fill="#fff" stroke=\'#000\'/>';
+  assert.equal(compactSvg(stroke), stroke);
+  assert.equal(compactSvg('<rect x="0.12345" y="0" width="1" height="1" fill="#fff"/>'), '<rect x="0.12345" y="0" width="1" height="1" fill="#fff"/>');
+  const prec = compactSvg('<rect x="0.12345" y="0" width="0.25" height="1" fill="#fff"/><rect x="0.37345" y="0" width="0.25" height="1" fill="#fff"/>');
+  assert.equal(prec, '<rect x="0.12345" y="0" width="0.5" height="1" fill="#fff"/>');
+});
+
+test("belt: a non-periodic horizon function is reported, a periodic one is not", () => {
+  const keys = Array(4).fill([[0, "#aaccee"], [1, "#eeeeff"]]);
+  const mk = (horizon) => createBelt({ sky: keys, ground: keys, horizon });
+  assert.deepEqual(mk((u) => 0.5 + 0.1 * u).warnings.length, 1);
+  assert.match(mk((u) => 0.5 + 0.1 * u).warnings[0], /not periodic/);
+  assert.deepEqual(mk((u) => 0.74 + 0.02 * Math.sin(u * Math.PI)).warnings, []);
+  assert.deepEqual(mk(0.7).warnings, []);
+});
+
+test("library output passes the app's SVG allowlist (faces, tiles, net) and has no shape-rendering", () => {
+  const dir = mkdtempSync(`${tmpdir()}/cube-a-`);
+  demoTheme({ size: 420 }).build(dir, { previewN: [3] });
+  for (const f of readdirSync(dir).filter((x) => x.endsWith(".svg"))) {
+    const text = readFileSync(`${dir}/${f}`, "utf8");
+    assert.deepEqual(auditSvg(text, f === "net.svg" ? { dimensions: false, size: false } : {}), [], f);
+    assert.ok(!text.includes("shape-rendering"), f);
+  }
+  for (const f of readdirSync(`${dir}/tiles/n3`)) assert.deepEqual(auditSvg(readFileSync(`${dir}/tiles/n3/${f}`, "utf8")), [], f);
+  const draw = () => "";
+  const small = defineTheme({ name: "s", size: 320, belt, faces: { L: draw, F: draw, R: draw, B: draw, U: draw, D: draw } });
+  assert.throws(() => small.build(mkdtempSync(`${tmpdir()}/cube-a-`), { previewN: [3] }), /not divisible/);
+  const big = defineTheme({ name: "b", size: 1100, belt, faces: { L: draw, F: draw, R: draw, B: draw, U: draw, D: draw } });
+  assert.throws(() => big.build(mkdtempSync(`${tmpdir()}/cube-a-`)), /1 to 1024/);
+});
+
+test("tile metrics: flat tile lacks detail, symmetric tile has a symmetry class, twins and identical are grouped", () => {
   const n = 8, make = (fn) => { const d = new Uint8ClampedArray(n * n * 4); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const v = fn(x, y); d.set([v, v, v, 255], (y * n + x) * 4); } return d; };
   const flat = make(() => 200), corner = make((x, y) => (x < 3 && y < 3 ? 0 : 200)), disc = make((x, y) => (Math.hypot(x - 3.5, y - 3.5) < 2.5 ? 0 : 200)), turned = make((x, y) => (x > 4 && y < 3 ? 0 : 200));
   assert.equal(detailShare(flat, n), 0);
   assert.ok(detailShare(corner, n) > 0.1);
   assert.equal(Math.min(...rotationDiffs(disc, n)) < 0.03, true);
   assert.ok(Math.min(...rotationDiffs(corner, n)) > 0.1);
-  const t = (id, d) => ({ id, detail: detailShare(d, n), minRot: Math.min(...rotationDiffs(d, n)), sigs: rotatedSignatures(d, n) });
-  const ev = evaluateTiles([t("a", flat), t("b", corner), t("c", corner), t("d", turned), t("e", disc)]);
-  assert.deepEqual(ev.lackDetail, ["a"]);
-  assert.ok(ev.rotAmbiguous.includes("e"));
-  assert.deepEqual(ev.identical, [["b", "c"]]);
-  assert.ok(ev.rotationTwins.flat().includes("d"));
+  const c = classifyTiles([{ id: "F_0_0", px: flat }, { id: "F_0_1", px: corner }, { id: "F_1_0", px: corner }, { id: "F_1_1", px: turned }, { id: "U_0_0", px: disc }], { probe: n });
+  assert.deepEqual(c.lackDetail, ["F_0_0"]);
+  assert.equal(c.tiles.find((t) => t.id === "U_0_0").symmetry, "4-fold");
+  assert.equal(c.tiles.find((t) => t.id === "F_0_1").symmetry, "none");
+  assert.deepEqual(c.identicalGroups, [["F_0_1", "F_1_0"]]);
+  assert.ok(c.rotationTwinGroups.flat().includes("F_1_1"));
 });
 
 test("version archive: rebuild in place keeps v1, v2", () => {

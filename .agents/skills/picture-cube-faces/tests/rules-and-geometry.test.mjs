@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { EDGES, FACE_NAMES, SIDES_CHECK, assertSupportedN, edgePixelPair, edgeSegments, parseNSpec, parseTileId, stickerCount, tileIds } from "./helpers.mjs";
 import { findForbidden, styleAudit, checkSizes, checkTileFormat, faceRoot } from "../src/rules.mjs";
-import { stripDiffs, edgeStats, seamVerdict } from "../src/seams.mjs";
+import { stripDiffs, bandDiffs, edgeStats, seamVerdict } from "../src/seams.mjs";
 
 test("supported sizes are 2..7 and sticker counts follow 6*N*N", () => {
   for (const n of [2, 3, 4, 5, 6, 7]) assert.equal(assertSupportedN(n), n);
@@ -45,11 +45,12 @@ test("edge segments split S into N sticker segments", () => {
 });
 
 test("forbidden constructs are found", () => {
-  const bad = '<svg><defs><linearGradient id="g"/><clipPath id="c"/><filter id="f"/></defs><text>x</text><image href="a.png"/><rect fill="url(#g)"/><script>1</script></svg>';
+  const X = 'xmlns="http://www.w3.org/2000/svg"';
+  const bad = `<svg ${X} width="10" height="10"><defs><linearGradient id="g"/><clipPath id="c"/><filter id="f"/></defs><text>x</text><image href="a.png"/><rect fill="url(#g)"/></svg>`;
   const ids = findForbidden(bad).map((h) => h.id);
-  for (const id of ["gradient", "clipPath", "filter", "text", "image", "href", "url()", "script"]) assert.ok(ids.includes(id), id);
-  assert.deepEqual(findForbidden('<svg><rect fill="#fff" stroke="#000" stroke-width="3"/><path d="M0 0L1 1"/></svg>'), []);
-  assert.deepEqual(findForbidden("<svg><g transform=\"rotate(3)\"/><textual/></svg>").map((h) => h.id), []);
+  for (const id of ["gradient", "clipPath", "filter", "text", "image", "href", "url()", "element:defs", "attribute:id"]) assert.ok(ids.includes(id), id);
+  assert.deepEqual(findForbidden(`<svg ${X} width="10" height="10"><rect fill="#fff" stroke="#000" stroke-width="3"/><path d="M0 0L1 1"/></svg>`), []);
+  assert.deepEqual(findForbidden(`<svg ${X} width="10" height="10"><g transform="rotate(3)"/><textual/></svg>`).map((h) => h.id), ["element:textual"]);
 });
 
 test("style audit counts non-white stroke colors and weights", () => {
@@ -75,7 +76,9 @@ test("tile format: width/height and viewBox crop", () => {
   assert.deepEqual(checkTileFormat(ok, { r: 1, c: 2, tile: 60 }), []);
   assert.equal(checkTileFormat(ok, { r: 2, c: 1, tile: 60 }).length, 1);
   assert.equal(checkTileFormat(ok.replace('width="60"', 'width="61"'), { r: 1, c: 2, tile: 60 }).length, 1);
-  assert.deepEqual(faceRoot('<svg width="420" height="420" viewBox="0 0 420 420">'), { width: 420, height: 420, viewBox: "0 0 420 420" });
+  assert.deepEqual(faceRoot('<svg width="420" height="420" viewBox="0 0 420 420"></svg>'), { width: 420, height: 420, viewBox: "0 0 420 420" });
+  assert.equal(faceRoot("<svg"), null);
+  assert.equal(checkTileFormat(ok, { r: 1, c: 2, tile: 60.5 }).some((p) => /integer/.test(p)), true);
 });
 
 test("seam math: strips, reversal, verdict", () => {
@@ -90,4 +93,12 @@ test("seam math: strips, reversal, verdict", () => {
   assert.equal(seamVerdict(st), true);
   assert.equal(seamVerdict(edgeStats([5, 5, 5, 5], 2)), false);
   assert.equal(seamVerdict(edgeStats([0, 0, 0, 40], 2), { meanLimit: 20, bigShare: 0.1 }), false);
+  // one bad sticker segment fails even when the mean and the big-pixel share are fine
+  const spread = Array(100).fill(0).map((_, i) => (i < 8 ? 15 : 0));
+  assert.equal(seamVerdict(edgeStats(spread, 10), { segmentLimit: 9 }), false);
+  assert.equal(seamVerdict(edgeStats(spread, 10), { segmentLimit: 20 }), true);
+  // a band: line 0 matches, lines 1 and 2 do not (art stopping short of the edge)
+  const line = (v) => Array(6).fill(v), band = (...vs) => vs.map(line);
+  assert.deepEqual(bandDiffs(band(10, 10, 10), band(10, 10, 10)), [0, 0]);
+  assert.deepEqual(bandDiffs(band(10, 10, 10), band(10, 70, 70)), [40, 40]);
 });

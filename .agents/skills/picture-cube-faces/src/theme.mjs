@@ -8,7 +8,7 @@
  *
  * Each callback draws ON TOP of an automatic background (belt panorama for L F R B, derived borders for U and D)
  * and returns an svg fragment string, a list of strings / {svg, bbox} items, or {art, bg} (bg: rects, or false for none).
- * Coordinates are face pixels (0..S). Keep the outer ~2 % rim of every face free of art so the seams stay clean.
+ * Coordinates are face pixels (0..S). Keep the outer ~3 % rim of every face free of art so the seams stay clean.
  */
 import { writeFileSync } from "node:fs";
 import { FACE_NAMES, BELT, DEFAULT_FACE_SIZE } from "./geometry.mjs";
@@ -70,7 +70,9 @@ export function defineTheme({ name, size = DEFAULT_FACE_SIZE, belt = null, up = 
     build(dir, { archive = false, compact = true, previewN = [] } = {}) {
       const archived = archive ? archiveCurrent(dir) : null;
       const manifest = writeFaceSet(dir, { size: S, faces: compose() }, { compact, previewN });
-      const report = { theme: name, archived, ...manifest, builtWith: "picture-cube-faces" };
+      const warnings = belt?.warnings ?? [];
+      for (const w of warnings) console.warn(`WARN theme ${name}: ${w}`);
+      const report = { theme: name, archived, ...manifest, warnings, builtWith: "picture-cube-faces" };
       writeFileSync(`${dir}/build-report.json`, JSON.stringify(report, null, 2) + "\n");
       return report;
     },
