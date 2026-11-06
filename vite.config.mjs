@@ -65,7 +65,12 @@ export default defineConfig({
           new URL("./licenses.html", import.meta.url),
         ),
       },
-      output: { manualChunks: { three: ["three"] } },
+      output: {
+        // Rolldown (Vite 8) accepts only the function form of manualChunks.
+        manualChunks(id) {
+          if (id.includes("/node_modules/three/")) return "three";
+        },
+      },
     },
   },
 });
