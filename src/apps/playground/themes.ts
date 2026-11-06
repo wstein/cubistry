@@ -35,6 +35,12 @@ export interface FaceSet {
    * image changes, so a saved or running puzzle never meets different art under the same print id.
    */
   readonly version?: number;
+  /**
+   * Content id (lowercase hex, at most 32 characters) for sets whose art is not fixed in the
+   * repository, such as an upload: it becomes part of the print id, so different pictures never
+   * share one.
+   */
+  readonly contentId?: string;
 }
 export const MIN_CUBE_SIZE = 2;
 export const MAX_CUBE_SIZE = 7;

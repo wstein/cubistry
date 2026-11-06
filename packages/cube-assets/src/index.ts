@@ -68,6 +68,67 @@ export interface LoadedAssets {
 import * as Assets from "../res/PwAssets.res.mjs";
 export const ASSET_LIMITS = Assets.limits;
 export const safeAssetPath = Assets.safeAssetPath;
+export { sanitizeSvg, isSanitizedSvg, SvgRejected, SVG_LIMITS } from "./svg-sanitize.ts";
+export type { SanitizedSvg, SanitizeOptions } from "./svg-sanitize.ts";
+import { sanitizeSvg, isSanitizedSvg } from "./svg-sanitize.ts";
+/**
+ * In-memory sources: bytes the user supplied in this browser (an upload), already validated by the
+ * caller. They are addressed by URLs under LOCAL_ASSET_PREFIX, which are never fetched: the loader
+ * takes the bytes from the map, recomputes their SHA-256 and compares it with the manifest, applies
+ * its own size, signature and sanitizer checks and decodes them through a short-lived blob URL.
+ * Built-in assets keep the same-origin, hash-pinned fetch path and its limits; a manifest URL under
+ * the prefix without a local source fails closed and is never requested from the network.
+ */
+export const LOCAL_ASSET_PREFIX = "/uploaded/";
+export const LOCAL_ASSET_LIMITS = Object.freeze({
+  bytesPerFile: 5 * 1024 * 1024,
+  totalBytes: 24 * 1024 * 1024,
+  /** Uploaded faces are kept at no more than this edge; the decoded-pixel budget is the shared one. */
+  pixelsPerSide: 1024,
+});
+export interface LocalSource {
+  readonly format: "svg" | "png";
+  readonly bytes: Uint8Array;
+}
+export type LocalSources = ReadonlyMap<string, LocalSource>;
+export function isLocalAssetUrl(url: string): boolean {
+  return url.startsWith(LOCAL_ASSET_PREFIX);
+}
+/** Width and height from a PNG header; throws on anything that is not a PNG. */
+export function pngDimensions(bytes: Uint8Array): readonly [number, number] {
+  return rasterDimensions(bytes, "png");
+}
+/** Checks one in-memory source against its manifest entry and returns its bytes. @internal */
+export async function verifyLocalSource(
+  local: LocalSources | undefined,
+  asset: { readonly url: string; readonly format: string; readonly sha256: string },
+  budget: { bytes: number },
+): Promise<Uint8Array> {
+  demand(isLocalAssetUrl(asset.url), "Not an in-memory asset URL");
+  const source = local?.get(asset.url);
+  demand(source !== undefined, "In-memory picture source is missing");
+  demand(source.format === asset.format, "In-memory picture format mismatch");
+  const { bytes } = source;
+  budget.bytes += bytes.length;
+  demand(
+    bytes.length > 0 &&
+      bytes.length <= LOCAL_ASSET_LIMITS.bytesPerFile &&
+      budget.bytes <= LOCAL_ASSET_LIMITS.totalBytes,
+    "Picture byte limit exceeded",
+  );
+  demand((await sha256(bytes)) === asset.sha256, "In-memory picture integrity check failed");
+  if (asset.format === "png") {
+    const [w, h] = rasterDimensions(bytes, "png");
+    demand(
+      w > 0 && h > 0 && w <= LOCAL_ASSET_LIMITS.pixelsPerSide && h <= LOCAL_ASSET_LIMITS.pixelsPerSide,
+      "Raster dimensions exceed limit",
+    );
+  } else {
+    demand(asset.format === "svg", "Unsupported in-memory picture format");
+    demand(isSanitizedSvg(new TextDecoder("utf-8", { fatal: true }).decode(bytes)), "SVG is not in sanitized form");
+  }
+  return bytes;
+}
 export function validateAssets(raw: unknown, prints: readonly PrintDefinition[] = []): AssetManifest {
   return Assets.validateAssets(raw, prints);
 }
@@ -302,6 +363,7 @@ export async function loadAssets(
   prints: readonly PrintDefinition[],
   signal?: AbortSignal,
   basePath = "/",
+  local?: LocalSources,
 ): Promise<LoadedAssets> {
   basePath = deploymentBasePath(basePath);
   signal = signal
@@ -310,7 +372,8 @@ export async function loadAssets(
   const manifest = validateAssets(raw, prints),
     images = new Map<string, ImageBitmap>(),
     materials = new Map(manifest.materials.map((m) => [m.id, m])),
-    budget = { bytes: 0 };
+    budget = { bytes: 0 },
+    localBudget = { bytes: 0 };
   let pixels = 0;
   const reserve = (w: number, h: number) => {
     pixels += w * h;
@@ -427,25 +490,31 @@ export async function loadAssets(
       } else if (asset.crop && decodedSources.has(asset.url + "#" + asset.sha256)) {
         c = takeCrop(asset.url + "#" + asset.sha256, asset.crop);
       } else {
-        const bytes = await fetchBounded(
-          asset.url,
-          asset.sha256,
-          asset.format,
-          budget,
-          signal,
-          basePath,
-        );
-        if (asset.format === "svg")
-          validateSvg(new TextDecoder().decode(bytes));
+        const inMemory = isLocalAssetUrl(asset.url),
+          maxSide = inMemory ? LOCAL_ASSET_LIMITS.pixelsPerSide : ASSET_LIMITS.pixelsPerSide;
+        let bytes: Uint8Array;
+        if (inMemory) bytes = await verifyLocalSource(local, asset, localBudget);
         else {
-          const [w, h] = rasterDimensions(bytes, asset.format);
-          demand(
-            w > 0 &&
-              h > 0 &&
-              w <= ASSET_LIMITS.pixelsPerSide &&
-              h <= ASSET_LIMITS.pixelsPerSide,
-            "Raster dimensions exceed limit",
+          bytes = await fetchBounded(
+            asset.url,
+            asset.sha256,
+            asset.format,
+            budget,
+            signal,
+            basePath,
           );
+          if (asset.format === "svg")
+            validateSvg(new TextDecoder().decode(bytes));
+          else {
+            const [w, h] = rasterDimensions(bytes, asset.format);
+            demand(
+              w > 0 &&
+                h > 0 &&
+                w <= ASSET_LIMITS.pixelsPerSide &&
+                h <= ASSET_LIMITS.pixelsPerSide,
+              "Raster dimensions exceed limit",
+            );
+          }
         }
         const url = URL.createObjectURL(
           new Blob([new Uint8Array(bytes).buffer], {
@@ -463,8 +532,8 @@ export async function loadAssets(
           demand(
             image.width > 0 &&
               image.height > 0 &&
-              image.width <= 1024 &&
-              image.height <= 1024,
+              image.width <= maxSide &&
+              image.height <= maxSide,
             "Decoded image exceeds bounds",
           );
           reserve(image.width, image.height);
