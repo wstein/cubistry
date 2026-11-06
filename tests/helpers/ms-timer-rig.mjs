@@ -209,7 +209,7 @@ export async function rig({
       now = origin;
       timer.tick();
     },
-    /** Run virtual time (no scheduler ticks) until `promise` settles, e.g. a Set or Reset walk. */
+    /** Run virtual time (no scheduler ticks) until `promise` settles, e.g. a Set or Reset walk. Returns the turns it played (per cube). */
     async walk(promise, limit = 30000) {
       let done = false;
       const tracked = promise.then(() => (done = true));
@@ -217,7 +217,7 @@ export async function rig({
       while (!done && now < end) await r.runTo(now + 50, { ticking: false });
       assert.ok(done, "the walk settled");
       await tracked;
-      r.take();
+      return r.take();
     },
     /** Let queued microtasks run without advancing time. */
     settle,
