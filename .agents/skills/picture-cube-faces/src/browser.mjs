@@ -47,12 +47,12 @@ export async function rasterize(page, svg, n) {
 }
 
 /**
- * Renders one face at S x S and returns (a) its four outermost pixel lines as flat RGB arrays and (b) for every cube
+ * Renders one face at S x S and returns (a) its four sides as bands of `band` outermost pixel lines (flat RGB arrays, outermost first) and (b) for every cube
  * size in `ns` the N x N tiles sliced from that rendering, each downsampled to probe x probe RGBA and base64 encoded.
  * Slicing the face render is exactly what the app does at runtime, so no tile files are needed.
  */
-export async function probeFace(page, faceSvg, S, ns, probe = 80) {
-  return page.evaluate(async ({ url, S, ns, probe }) => {
+export async function probeFace(page, faceSvg, S, ns, probe = 80, band = 3) {
+  return page.evaluate(async ({ url, S, ns, probe, band }) => {
     const img = new Image();
     img.src = url;
     await img.decode();
@@ -62,9 +62,10 @@ export async function probeFace(page, faceSvg, S, ns, probe = 80) {
     const all = cx.getImageData(0, 0, S, S).data;
     const rgb = (x, y) => { const k = (y * S + x) * 4; return [all[k], all[k + 1], all[k + 2]]; };
     const strips = { top: [], bottom: [], left: [], right: [] };
-    for (let i = 0; i < S; i++) {
-      strips.top.push(...rgb(i, 0)); strips.bottom.push(...rgb(i, S - 1));
-      strips.left.push(...rgb(0, i)); strips.right.push(...rgb(S - 1, i));
+    for (let d = 0; d < band; d++) {
+      const t = [], bo = [], l = [], r = [];
+      for (let i = 0; i < S; i++) { t.push(...rgb(i, d)); bo.push(...rgb(i, S - 1 - d)); l.push(...rgb(d, i)); r.push(...rgb(S - 1 - d, i)); }
+      strips.top.push(t); strips.bottom.push(bo); strips.left.push(l); strips.right.push(r);
     }
     const pc = new OffscreenCanvas(probe, probe);
     const px = pc.getContext("2d", { willReadFrequently: true });
@@ -80,7 +81,7 @@ export async function probeFace(page, faceSvg, S, ns, probe = 80) {
       }
     }
     return { strips, tiles };
-  }, { url: dataUrl(faceSvg), S, ns, probe });
+  }, { url: dataUrl(faceSvg), S, ns, probe, band });
 }
 
 /** Renders an html string and saves a full-page PNG. */
@@ -89,4 +90,29 @@ export async function screenshotHtml(page, html, path, width = 1700) {
   await page.setContent(html);
   await page.waitForTimeout(200);
   await page.screenshot({ path, fullPage: true });
+}
+
+/**
+ * Compares tile files with the same crop of the rendered face. items: [{svg, r, c, n}] (tile svg text, tile position,
+ * cube size). Returns [{r, c, n, share}] where share is the fraction of pixels over `limit` (0 = identical rendering).
+ */
+export async function compareTiles(page, faceSvg, S, items, limit = 64) {
+  return page.evaluate(async ({ face, S, items, limit, urls }) => {
+    const load = async (url) => { const img = new Image(); img.src = url; await img.decode(); return img; };
+    const fi = await load(face);
+    const fc = new OffscreenCanvas(S, S), fx = fc.getContext("2d", { willReadFrequently: true });
+    fx.drawImage(fi, 0, 0, S, S);
+    const out = [];
+    for (let k = 0; k < items.length; k++) {
+      const { r, c, n } = items[k], t = Math.round(S / n);
+      const ti = await load(urls[k]);
+      const tc = new OffscreenCanvas(t, t), tx = tc.getContext("2d", { willReadFrequently: true });
+      tx.drawImage(ti, 0, 0, t, t);
+      const a = tx.getImageData(0, 0, t, t).data, b = fx.getImageData(Math.round(c * (S / n)), Math.round(r * (S / n)), t, t).data;
+      let bad = 0;
+      for (let i = 0; i < a.length; i += 4) if (Math.abs(a[i] - b[i]) > limit || Math.abs(a[i + 1] - b[i + 1]) > limit || Math.abs(a[i + 2] - b[i + 2]) > limit) bad++;
+      out.push({ r, c, n, share: bad / (t * t) });
+    }
+    return out;
+  }, { face: dataUrl(faceSvg), S, items: items.map(({ r, c, n }) => ({ r, c, n })), limit, urls: items.map((it) => dataUrl(it.svg)) });
 }

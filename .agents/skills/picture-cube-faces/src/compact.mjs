@@ -1,8 +1,9 @@
-/** Lossless SVG compaction. Merging never changes a single pixel of the rendering:
+/** Lossless SVG compaction. Merging never changes a single pixel of the rendering (numbers keep 12 significant digits;
+ *  a rect is only merged when ALL of its attributes were parsed, i.e. written as name="value" with double quotes):
  *  - gridToRects: runs of equal-colored cells become one rect (rows first, then identical stacked rows);
  *  - compactSvg: touching consecutive <rect> elements with equal style are merged, inter-tag whitespace dropped.
  */
-const trim = (v) => String(+v.toFixed(3));
+const trim = (v) => String(+v.toPrecision(12));
 
 /** Merges a color grid (see grid.mjs) into rects {x, y, w, h, fill} in face pixels (cell = S / M). */
 export function gridToRects(grid, S) {
@@ -41,15 +42,23 @@ export const rectSvg = (r) => `<rect x="${trim(r.x)}" y="${trim(r.y)}" width="${
 export const cropRects = (rects, [x, y, w, h]) =>
   rects.filter((r) => r.x < x + w && r.x + r.w > x && r.y < y + h && r.y + r.h > y);
 
-/** Background group; crispEdges avoids hairlines between neighboring rects at any zoom. */
-export const rectsToSvg = (rects) => `<g shape-rendering="crispEdges">${rects.map(rectSvg).join("")}</g>`;
+/**
+ * Background rects, plain: no wrapper and no `shape-rendering` (the app's SVG allowlist rejects that attribute).
+ * Cells sit on whole pixels at the face size (420 / 60 = 7 px), so no hairlines show at native size; at fractional zoom
+ * a faint seam between equal-colored neighbors is possible, which is why rects are merged into as few as possible.
+ */
+export const rectsToSvg = (rects) => rects.map(rectSvg).join("");
 
 const RECT = /<rect\b([^>]*?)\/>/g;
 const ATTR = /([\w:-]+)="([^"]*)"/g;
 const parseAttrs = (s) => Object.fromEntries([...s.matchAll(ATTR)].map((m) => [m[1], m[2]]));
 const GEOM = ["x", "y", "width", "height"];
 
+/** True when every attribute of the attribute string was parsed (double-quoted name="value" pairs only). */
+const fullyParsed = (s) => s.replace(ATTR, "").trim() === "";
+
 function mergeable(a, b) {
+  if (!fullyParsed(a) || !fullyParsed(b)) return null;
   const A = parseAttrs(a), B = parseAttrs(b);
   if (!GEOM.every((k) => k in A && k in B && Number.isFinite(+A[k]) && Number.isFinite(+B[k]))) return null;
   // Only plain filled rects may merge: rx/ry/stroke/transform would change the shape.
