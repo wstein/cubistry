@@ -342,7 +342,7 @@ test("a rejected Timer certificate leaves the existing Counter and its physical 
   );
   await page.selectOption("#application", "timer");
   await expect(page.locator("#error")).toContainText("integrity");
-  await expect(page.locator("#application")).toHaveValue(/^(certified|index\.html)$/);
+  await expect(page.locator("#application")).toHaveValue(/^(certified|counter\.html)$/);
   await settled(page, "42");
   await page.locator('[data-delta="1"]').click();
   await settled(page, "43");
