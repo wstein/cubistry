@@ -76,11 +76,15 @@ Numbers from [cubacle `docs/wasm.md`](https://github.com/wstein/cubacle/blob/134
   for Cubing.js; 2×2 mean 8.83 for both.
 - **Time, Node.** First 3×3 solve: cubacle 32.6 to 33.1 ms, Cubing.js 119.8 to
   121.9 ms. First 2×2 solve: cubacle 92.7 to 94.2 ms (tables built on the first
-  solve), Cubing.js 16.6 to 20.3 ms, so the cubacle cold start is about 5 times
-  slower. Later calls: 3×3 median 0.2 ms against 4.4 to 4.6 ms; 2×2 median
-  0.004 to 0.005 ms against 2.4 to 2.5 ms.
+  solve), Cubing.js 16.6 to 20.3 ms. The ratio is derived here from the two ranges
+  (92.7 to 94.2 ms against 16.6 to 20.3 ms), not stated in the source: the cubacle
+  cold start is 4.6 to 5.7 times slower. Later calls: 3×3 median 0.2 ms against
+  4.4 to 4.6 ms; 2×2 median 0.004 to 0.005 ms against 2.4 to 2.5 ms. Measurement
+  limit: the Cubing.js times include the library's call overhead and, for the first
+  call, its lazy loading (the 2×2 call runs after the 3×3 calls, so the worker
+  already runs); the cubacle times are the `cubacle_solve` call only.
 - **Memory.** cubacle: 21,364,736 bytes of linear memory after the first 2×2
-  solve (peak of the module). Cubing.js: **UNKNOWN**. No resident set was measured
+  solve (peak of the module for these calls, as linear memory never shrinks). Cubing.js: **UNKNOWN**. No resident set was measured
   for either side.
 - **Not measured.** Firefox and Safari, warm code cache, the other Calendar page
   files. The comparison is a hint for G2, not a parity result.
