@@ -1,6 +1,4 @@
 import "./chronocube.css";
-import { initHudIdle } from "./apps/shared/hud-idle.ts";
-initHudIdle();
 import { ClockStage } from "./apps/clock/stage.ts";
 import { LiveClockScheduler, clockText } from "./apps/clock/scheduler.ts";
 import { ClockMoveStatistics, formatMean } from "./apps/clock/statistics.ts";
