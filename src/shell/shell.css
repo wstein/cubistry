@@ -138,8 +138,8 @@ body.chronocube-page:has(#shell) {
   padding: 0 var(--sp-4) var(--sp-3);
 }
 .shell .shell-main {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto auto;
+  display: flex;
+  flex-direction: column;
   gap: var(--sp-3);
   min-height: 0;
   min-width: 0;
@@ -148,6 +148,7 @@ body.chronocube-page:has(#shell) {
 /* The stage is the containing block for the (legacy) fixed-position viewer and panels. */
 .shell .shell-stage {
   position: relative;
+  flex: 1 1 0;
   min-height: 0;
   min-width: 0;
   overflow: hidden;
@@ -377,27 +378,57 @@ body.chronocube-page:has(#shell) {
   }
 }
 
-/* ---------- presentation mode: the stage takes the window ---------- */
+/* ---------- presentation mode: the stage takes the window ----------
+   As on the single pages, the live readout panel (the dock) and the footer watermark stay visible over the stage. */
 body.presentation-mode .shell {
   grid-template-rows: minmax(0, 1fr);
 }
 body.presentation-mode .shell .shell-header,
-body.presentation-mode .shell .shell-dock,
 body.presentation-mode .shell .shell-readout,
 body.presentation-mode .shell .shell-nerd,
-body.presentation-mode .shell .error,
-body.presentation-mode .shell .shell-footer {
+body.presentation-mode .shell .error {
   display: none;
 }
 body.presentation-mode .shell .shell-body {
-  grid-template-columns: minmax(0, 1fr);
+  display: block;
   padding: 0;
+  height: 100%;
+}
+body.presentation-mode .shell .shell-main,
+body.presentation-mode .shell .shell-stage {
+  height: 100%;
 }
 body.presentation-mode .shell .shell-stage {
   border-radius: 0;
 }
 body.presentation-mode .shell .shell-presentation {
   display: block;
+}
+body.presentation-mode .shell .shell-dock {
+  position: fixed;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  z-index: 25;
+  width: clamp(260px, 28vw, 340px);
+  max-height: calc(100dvh - 2 * var(--sp-4));
+  opacity: 0.9;
+}
+body.presentation-mode .shell .shell-footer {
+  position: fixed;
+  bottom: var(--sp-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  margin: 0;
+  padding: 5px var(--sp-4);
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  opacity: 0.65;
+}
+body.presentation-mode .shell .shell-footer:hover,
+body.presentation-mode .shell .shell-footer:focus-within {
+  opacity: 0.95;
 }
 
 @media (prefers-reduced-motion: reduce) {
