@@ -29,6 +29,15 @@ const netFile = (cell = 100, name = "net.png") => ({
   }),
 });
 
+// Every upload is decoded, sanitized and measured in the page. On the CI runners (software GL, shared CPU)
+// a step takes 4 to 9 times its local time (run 42297733991: 3.7 s against 0.8 s, 31 s against 4.6 s), so
+// the waits for a finished upload use the page's own bounds: 30 s per measurement (pictures.ts) and 8 s per
+// SVG check (upload-browser.ts), and a test gets the slow limit (3 x 30 s) like the timing group.
+const UPLOAD_MS = 30000;
+test.beforeEach(() => {
+  test.slow();
+});
+
 const open = async (page) => {
   await page.goto("/playground.html");
   await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
@@ -59,7 +68,7 @@ test("six PNG files named by face load as a new design and can be played", async
   const before = requests.length;
   await page.locator("#upload-input").setInputFiles(six());
   await loaded(page);
-  await expect(page.locator("#upload-status")).toContainText("All six faces are ready");
+  await expect(page.locator("#upload-status")).toContainText("All six faces are ready", { timeout: UPLOAD_MS });
   await expect(page.locator("#design")).toHaveValue("upload");
   await expect(page.locator('#design option[value="upload"]')).toHaveJSProperty("disabled", false);
   for (const f of FACES) await expect(page.locator(`#upload-net [data-face="${f}"]`)).toHaveAttribute("data-filled", "true");
@@ -82,7 +91,7 @@ test("one net image in the cross layout is cut into the six faces", async ({ pag
   await open(page);
   await page.locator("#upload-input").setInputFiles(netFile());
   await loaded(page);
-  await expect(page.locator("#upload-status")).toContainText("All six faces are ready");
+  await expect(page.locator("#upload-status")).toContainText("All six faces are ready", { timeout: UPLOAD_MS });
   // Each slot holds its own cell of the net (checked through the preview colors).
   for (const f of FACES) {
     const [r, g, b] = await slotColor(page, f), [er, eg, eb] = HUES[f];
@@ -97,7 +106,7 @@ test("a net that is not 4:3 falls back to the six slots without changing the des
   await open(page);
   const odd = { name: "odd.png", mimeType: "image/png", buffer: pngOf(300, 300, () => [10, 20, 30]) };
   await page.locator("#upload-input").setInputFiles(odd);
-  await expect(page.locator("#upload-status")).toContainText("not a 4:3 cross");
+  await expect(page.locator("#upload-status")).toContainText("not a 4:3 cross", { timeout: UPLOAD_MS });
   await expect(page.locator("#cube")).toHaveAttribute("data-style", "picture");
   await expect(page.locator('#upload-net [data-face="U"]')).toBeFocused();
 });
@@ -109,7 +118,7 @@ test("faces can be filled one at a time by drag and drop and by the keyboard", a
   const chooser = page.waitForEvent("filechooser");
   await page.keyboard.press("Enter");
   await (await chooser).setFiles(faceFile("F"));
-  await expect(page.locator("#upload-status")).toContainText("1 of 6 faces ready");
+  await expect(page.locator("#upload-status")).toContainText("1 of 6 faces ready", { timeout: UPLOAD_MS });
   // drop on slots
   for (const f of FACES.filter((x) => x !== "F")) {
     const file = faceFile(f);
@@ -140,12 +149,12 @@ test("untrusted files are refused with a reason and never change the design", as
     [{ name: "F.png", mimeType: "image/png", buffer: pngOf(30, 20, () => [0, 0, 0]) }, /must be square/],
   ]) {
     await input.setInputFiles(file);
-    await expect(page.locator("#upload-status")).toContainText(reason);
+    await expect(page.locator("#upload-status")).toContainText(reason, { timeout: UPLOAD_MS });
     await expect(page.locator("#upload-status")).toHaveAttribute("data-tone", "error");
     await expect(page.locator('#upload-net [data-face="F"]')).toHaveAttribute("data-filled", "false");
   }
   await input.setInputFiles(Array.from({ length: 7 }, (_, i) => faceFile("F", 8)).map((f, i) => ({ ...f, name: `${i}.png` })));
-  await expect(page.locator("#upload-status")).toContainText("not 7 files");
+  await expect(page.locator("#upload-status")).toContainText("not 7 files", { timeout: UPLOAD_MS });
   await expect(page.locator("#cube")).toHaveAttribute("data-style", "picture");
   await expect(page.locator("#upload-status")).toHaveAttribute("data-tone", "error");
 });
@@ -191,18 +200,18 @@ test("suitability display: built-in set at N=2 and N=5, and an uploaded set", as
   await expect(page.locator("#cube")).toHaveAttribute("data-style", "seasons", { timeout: 60000 });
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false", { timeout: 60000 });
   await expect(page.locator("#fit")).toHaveAttribute("aria-busy", "false", { timeout: 60000 });
-  await expect(page.locator("#fit-summary")).toContainText(/Good fit\. 0 stickers flat, 0 identical groups, 0 rotation-ambiguous/);
+  await expect(page.locator("#fit-summary")).toContainText(/Good fit\. 0 stickers flat, 0 identical groups, 0 rotation-ambiguous/, { timeout: UPLOAD_MS });
   await expect(page.locator("#fit")).toHaveAttribute("data-light", "green");
   await expect(page.locator("#fit-note")).not.toContainText("not playable");
   await page.locator("#picture-size").selectOption("5");
-  await expect(page.locator("#fit-summary")).toContainText(/\d+ stickers? flat, \d+ identical groups?, \d+ rotation-ambiguous/);
+  await expect(page.locator("#fit-summary")).toContainText(/\d+ stickers? flat, \d+ identical groups?, \d+ rotation-ambiguous/, { timeout: UPLOAD_MS });
   await expect(page.locator("#fit-note")).toContainText("not playable yet");
   await expect(page.locator("#fit-note")).toContainText("2×2 only");
   expect(await page.locator("#fit-thumbs li canvas").count()).toBeGreaterThan(0);
   // The kinds are visible text and a full sentence for screen readers, not a tooltip.
   await expect(page.locator("#fit-thumbs li .marks").first()).not.toBeEmpty();
   await expect(page.locator("#fit-thumbs li .sr-only").first()).toContainText(/Face \w, row \d, column \d: /);
-  await expect(page.locator("#fit-symmetry")).toContainText(/Rotation symmetry of the detailed stickers: \d+ none, \d+ 2-fold, \d+ 4-fold/);
+  await expect(page.locator("#fit-symmetry")).toContainText(/Rotation symmetry of the detailed stickers: \d+ none, \d+ 2-fold, \d+ 4-fold/, { timeout: UPLOAD_MS });
   // one live region for the whole panel
   await expect(page.locator("#pictures [role=status]")).toHaveCount(1);
   // advice never blocks: the puzzle can still be played at N=5 in the display
@@ -213,7 +222,7 @@ test("suitability display: built-in set at N=2 and N=5, and an uploaded set", as
   await page.locator("#upload-input").setInputFiles(flat);
   await loaded(page);
   await expect(page.locator("#fit")).toHaveAttribute("data-light", "red", { timeout: 30000 });
-  await expect(page.locator("#fit-summary")).toContainText("24 stickers flat, 6 identical groups");
+  await expect(page.locator("#fit-summary")).toContainText("24 stickers flat, 6 identical groups", { timeout: UPLOAD_MS });
   await expect(page.locator("#fit-thumbs li canvas")).toHaveCount(24);
 });
 
@@ -245,7 +254,7 @@ test("faces of 1024 px load at size 2 and are measured at size 5 within the shar
   const big = FACES.map((f) => faceFile(f, 1024));
   await page.locator("#upload-input").setInputFiles(big);
   await loaded(page);
-  await expect(page.locator("#upload-status")).toContainText("All six faces are ready");
+  await expect(page.locator("#upload-status")).toContainText("All six faces are ready", { timeout: UPLOAD_MS });
   await expect(page.locator("#upload-resolution")).toContainText("large enough");
   await page.locator("#picture-size").selectOption("5");
   await expect(page.locator("#fit-summary")).toContainText(/stickers? flat, \d+ identical groups?, \d+ rotation-ambiguous/, { timeout: 60000 });
@@ -275,7 +284,7 @@ test("replacing pictures is atomic, and removing them is queued behind a running
   const before = await page.locator('#upload-net [data-face="F"] img').getAttribute("src");
   // One good new face and one bad file: nothing is replaced.
   await page.locator("#upload-input").setInputFiles([faceFile("F", 150), { name: "B.png", mimeType: "image/png", buffer: Buffer.from("not an image") }]);
-  await expect(page.locator("#upload-status")).toHaveAttribute("data-tone", "error");
+  await expect(page.locator("#upload-status")).toHaveAttribute("data-tone", "error", { timeout: UPLOAD_MS });
   expect(await page.locator('#upload-net [data-face="F"] img').getAttribute("src")).toBe(before);
   // Remove right behind a new upload: the removal runs last and wins.
   await page.locator("#upload-input").setInputFiles(six(160));
@@ -290,11 +299,11 @@ test("hostile SVG is refused quickly (worker), with the file name in the message
   const slow = { name: "F.svg", mimeType: "image/svg+xml", buffer: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><g transform="scale(1)${" ".repeat(80)}!"/></svg>`) };
   const start = Date.now();
   await page.locator("#upload-input").setInputFiles(slow);
-  await expect(page.locator("#upload-status")).toContainText("F.svg was rejected");
+  await expect(page.locator("#upload-status")).toContainText("F.svg was rejected", { timeout: UPLOAD_MS });
   expect(Date.now() - start).toBeLessThan(6000);
   const flat = { name: "F.svg", mimeType: "image/svg+xml", buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 10"/>') };
   await page.locator("#upload-input").setInputFiles(flat);
-  await expect(page.locator("#upload-status")).toContainText("F.svg was rejected: Invalid viewBox");
+  await expect(page.locator("#upload-status")).toContainText("F.svg was rejected: Invalid viewBox", { timeout: UPLOAD_MS });
   // a net with fractional user units is cut exactly: every face gets its own cell
   const cell = (c, r, color) => `<rect x="${c * 1.2}" y="${r * 1.2}" width="1.2" height="1.2" fill="${color}"/>`;
   const net = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4.8 3.6">${cell(1, 0, "#e00")}${cell(0, 1, "#0a0")}${cell(1, 1, "#00e")}${cell(2, 1, "#ee0")}${cell(3, 1, "#0ee")}${cell(1, 2, "#e0e")}</svg>`;

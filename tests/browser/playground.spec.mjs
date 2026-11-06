@@ -211,6 +211,7 @@ for (const mobile of [false, true])
   test(`DPR2 ${mobile ? "mobile" : "desktop"} canvas fits viewport, camera changes only view, resources load`, async ({
     browser,
   }, testInfo) => {
+    test.slow(); // the DPR2 screenshot took 17 s on a healthy CI runner and 30 s on a slow one (4 s locally)
     const context = await browser.newContext({
         viewport: mobile
           ? { width: 390, height: 844 }
