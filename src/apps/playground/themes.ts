@@ -8,6 +8,7 @@
 // To add a built-in theme: copy the six faces to public/playground-<id>/, run
 // `node scripts/build-playground-theme.mjs <id>` and add one entry to THEMES below.
 import type { ImageAsset } from "@cubistry/cube-assets";
+import { bremenFaces } from "./theme-assets/bremen.ts";
 import { seasonsFaces } from "./theme-assets/seasons.ts";
 export const FACE_IDS = ["F", "B", "R", "L", "U", "D"] as const;
 export type FaceId = (typeof FACE_IDS)[number];
@@ -34,6 +35,7 @@ export const MIN_CUBE_SIZE = 2;
 export const MAX_CUBE_SIZE = 7;
 const REGISTRY = [
   { id: "seasons", name: "Four Seasons", faces: seasonsFaces },
+  { id: "bremen", name: "Town Musicians", faces: bremenFaces },
 ] as const satisfies readonly FaceSet[];
 /** Literal union of the registered ids; it is what makes `Style` and `createDesign` type-checked. */
 export type ThemeId = (typeof REGISTRY)[number]["id"];

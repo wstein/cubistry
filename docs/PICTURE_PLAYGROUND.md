@@ -178,6 +178,7 @@ current puzzle and reports the error.
 Registered themes:
 
 - `seasons`, Four Seasons: a lamb in spring, a duckling in summer, a fox in autumn leaves and a penguin in winter around the belt, with a rainbow sun above and a picnic blanket below.
+- `bremen`, Town Musicians: a donkey with a guitar, a dog with a drum, a cat with a tambourine and a rooster with a horn making music along a forest path, with a starry sky and a ribbon of notes above and a woodland path below.
 
 To add a theme: copy the six faces (`F`, `B`, `R`, `L`, `U`, `D` `.svg`) and a `NOTICE.txt`
 into `public/playground-<id>/`; run `node scripts/build-playground-theme.mjs <id>` to
