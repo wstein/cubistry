@@ -332,7 +332,7 @@ export async function createPlanner({ design, options = {} }) {
       context.from,
       context.target,
       context.fallbackWord,
-      { maxAttempts: 6, timeBudgetMs: 500 },
+      { maxAttempts: 6, timeBudgetMs: 5000 },
     );
     if (activeGeneration !== generation)
       throw Error("Calendar planning superseded");

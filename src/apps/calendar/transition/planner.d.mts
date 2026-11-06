@@ -17,6 +17,7 @@ export function createTransitionOptimizer(options: {
     options?: {
       maxAttempts?: number;
       timeBudgetMs?: number;
+      now?: () => number;
     },
   ): Promise<{ word: string }>;
 };
