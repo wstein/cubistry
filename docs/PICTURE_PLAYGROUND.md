@@ -99,7 +99,8 @@ resources are used. The authoritative generator is
 [`build-playground-art.mjs`](../scripts/build-playground-art.mjs); regenerate with
 `node scripts/build-playground-art.mjs`. It writes complete faces, cropped tiles
 and their integrity manifest. Formatting of the generated TypeScript is cosmetic.
-Copyright 2026 Cubistry contributors, AGPL-3.0-or-later, matching the repository
+The artwork is licensed under CC BY-SA 4.0 (see "Picture theme license" below);
+the program code is AGPL-3.0-or-later, matching the repository
 [license](../LICENSE). This provenance travels with the generator,
 [bundled artwork notice](../public/playground/NOTICE.txt), and app footer.
 
@@ -132,7 +133,7 @@ sticker size has not been reviewed.
 
 ### Picture theme license
 
-The theme images are licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), not under the AGPL
+The theme images, including the original Landscape pictures and Pastel Garden, are licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), not under the AGPL
 that covers the program code: "Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry."
 Each theme directory carries a `NOTICE.txt` with this text, the committed
 art generators are art data under the same license, and
