@@ -352,17 +352,18 @@ const miniFace = (x, y, mood = "happy", gap = 11) =>
 // Right face, white toward Front (day), and lilac toward the Back face (night, where the moon is).
 // The moon sits at the top-left because the Back face's moon is at its top-right edge, mirrored across the shared edge.
 const dawnTint = mix(white, H.peach.mid, 0.3), dayTint = mix(white, H.butter.mid, 0.28);
+// Sun in the upper right, away from the Front face's top edge where Sunny now sits (the 2x2 seams cross at the centre).
 const u5Content =
   `<circle cx="0" cy="312" r="96" fill="${H.peach.light}" opacity=".4"/>` +
-  cloudFar(26, 52, 0.5, H.lilac.light) + cloudFar(196, 36, 0.45, H.lilac.light) + cloudFar(240, 150, 0.5) + cloudFar(8, 206, 0.45, dawnTint) + cloudFar(120, 232, 0.4) +
-  cloud(206, 108, 0.7, dayTint) + cloud(22, 158, 0.7, dawnTint) +
+  cloudFar(26, 52, 0.5, H.lilac.light) + cloudFar(240, 150, 0.5) + cloudFar(8, 206, 0.45, dawnTint) + cloudFar(120, 232, 0.4) +
+  sunShaded(244, 78, 22) + miniFace(244, 78, "happy", 7.7) +
+  cloud(176, 220, 0.6, dayTint) + cloud(22, 158, 0.7, dawnTint) +
   cloudShaded(10, 270, 0.82, dawnTint, H.peach.light) + cloudShaded(222, 272, 0.78, dayTint, H.butter.light) + cloudShaded(112, 168, 0.55) +
   moonShaded(100, 4, 0.85) +
-  sparkles([[40, 40, 7], [270, 40, 6], [60, 110, 5], [250, 100, 6], [160, 30, 5], [20, 80, 4], [300, 90, 4]]) +
-  sunShaded(160, 276, 26) +
+  sparkles([[40, 40, 7], [60, 110, 5], [160, 30, 5], [20, 80, 4], [300, 190, 4], [150, 290, 5]]) +
   bird(252, 196, H.pink.mid, 0.9, -1) + bird(62, 206, H.lilac.mid, 0.9) +
-  // Personality: a calm sun, a sleepy moon, and three cloud kids with moods.
-  miniFace(160, 276, "happy", 9) + sleepyEye(76, 46) + cheeks(72, 58, 6, H.pink.dark) +
+  // Personality: a sleepy moon and three cloud kids with moods; the calm sun now smiles from the corner.
+  sleepyEye(76, 46) + cheeks(72, 58, 6, H.pink.dark) +
   miniFace(54, 250, "sleepy", 13) + bubble(100, 232, 4) + bubble(110, 218, 6) +
   miniFace(262, 252, "wink", 13) + miniFace(142, 156, "happy", 8);
 const proposals = {
