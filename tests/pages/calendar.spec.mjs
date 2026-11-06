@@ -51,8 +51,14 @@ for (const [design, moves, front, sourceIso, targetIso] of [
     const completed = Number(
       (await moveStats.textContent()).match(/^(\d+) \/ /)[1],
     );
+    const solverStatus = await moveStats.getAttribute("data-solver-status");
+    console.log(
+      `calendar ${design} ${targetIso}: solverStatus=${solverStatus} moves=${completed}`,
+    );
     expect(completed).toBeGreaterThan(0);
-    expect(completed).toBeLessThanOrEqual(moves);
+    expect(completed, `solverStatus=${solverStatus}`).toBeLessThanOrEqual(
+      moves,
+    );
     expect(errors).toEqual([]);
     await page.screenshot({
       path: `test-results/calendar-built-optimized-${design}-${targetIso}.png`,
