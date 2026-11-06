@@ -18,8 +18,10 @@ import {
 import type { AssetManifest } from "@cubistry/cube-assets";
 import { pictureImages } from "./picture-assets.ts";
 import { pastelImages } from "./pastel-assets.ts";
-import { THEMES, sliceFaceSet, type ThemeId } from "./themes.ts";
-export type Style = "classic" | "picture" | "pastel" | ThemeId;
+import { THEMES, sliceFaceSet, type FaceSet, type ThemeId } from "./themes.ts";
+/** "upload" is the user's own face set; it is created with `createDesign("upload", set)`. */
+export const UPLOAD_STYLE = "upload";
+export type Style = "classic" | "picture" | "pastel" | ThemeId | typeof UPLOAD_STYLE;
 const faces = [
   { face: "R", normal: [1, 0, 0], up: [0, 1, 0], color: "#e94538" },
   { face: "L", normal: [-1, 0, 0], up: [0, 1, 0], color: "#ff922e" },
@@ -41,16 +43,31 @@ export const CAPABILITY = deepFreeze({
   size3:
     "Unsupported: this playground uses the shared size-2 mechanics and viewer profile.",
 });
-export function createDesign(style: Style) {
-  const theme = THEMES.find((t) => t.id === style);
+/** The face set behind a design style: a registered theme, or the `custom` set of an upload. */
+function faceSetOf(style: Style, custom?: FaceSet): FaceSet | undefined {
+  if (style === UPLOAD_STYLE) {
+    if (!custom) throw Error("The upload design needs a face set");
+    return custom;
+  }
+  return THEMES.find((t) => t.id === style);
+}
+export function createDesign(style: Style, custom?: FaceSet) {
+  const theme = faceSetOf(style, custom);
   if (
-    !["classic", "picture", "pastel", ...THEMES.map((t) => t.id)].includes(style)
+    ![
+      "classic",
+      "picture",
+      "pastel",
+      UPLOAD_STYLE,
+      ...THEMES.map((t) => t.id),
+    ].includes(style)
   )
     throw Error("Unsupported playground design");
   const print = validatePrint({
     schema: "cubistry.print",
     version: 1,
-    id: `playground_${style}_v${theme?.version ?? 1}`,
+    // A face set whose art is not fixed in the repository (an upload) names its content in the print id.
+    id: `playground_${style}${theme?.contentId ? `_${theme.contentId}` : ""}_v${theme?.version ?? 1}`,
     topology: { kind: "cube", size: 2 },
     cubies: POSITIONS.map((position, id) => ({ id, position })),
     stickers: faces.flatMap(({ face, normal, up }, f) => {
