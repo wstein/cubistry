@@ -177,7 +177,7 @@ current puzzle and reports the error.
 
 Registered themes:
 
-- _none yet_
+- `seasons`, Four Seasons: a lamb in spring, a duckling in summer, a fox in autumn leaves and a penguin in winter around the belt, with a rainbow sun above and a picnic blanket below.
 
 To add a theme: copy the six faces (`F`, `B`, `R`, `L`, `U`, `D` `.svg`) and a `NOTICE.txt`
 into `public/playground-<id>/`; run `node scripts/build-playground-theme.mjs <id>` to

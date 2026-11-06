@@ -1,0 +1,23 @@
+{
+  "design": "seasons",
+  "faces": {
+    "F": {
+      "sha256": "343efffae04da957ee6858c83144e56b6fe9b3f826c282e541871ef7171810a2"
+    },
+    "B": {
+      "sha256": "44c02dabe55c0945b117576c3a07c995c982b1b521f27121c76211aae14e5a8c"
+    },
+    "R": {
+      "sha256": "e392cfcb2f8d61964614a63f8b38a9f123c03c988c63e289fd70ef832457c404"
+    },
+    "L": {
+      "sha256": "385769c2602363a2e86c08ecf214593d06810fc0a45556f86349213d0d3c6bb1"
+    },
+    "U": {
+      "sha256": "9dd37f3a7c01c7e6c1b1e674861e0f05ba30c1c2f417f8ffd54b0b1793a0bb35"
+    },
+    "D": {
+      "sha256": "369f39acbc85bcd4b070f2643c127ddf228f0703af6e2fb151558b383c037508"
+    }
+  }
+}
