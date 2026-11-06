@@ -9,6 +9,6 @@
     "@cubistry/cube-core": "*",
     "@cubistry/cube-mechanics": "*",
     "@cubistry/cube-assets": "*",
-    "three": "0.180.0"
+    "three": "0.186.1"
   }
 }
