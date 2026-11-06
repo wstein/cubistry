@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wstein/cubistry/schemas/cubistry.appearance-2.schema.json",
+  "title": "cubistry.appearance@2",
+  "description": "Frozen sticker appearance map: identical classes, rotation-twin classes with quarter-turn offsets, and symmetry orders. Solvers and checkers read it instead of pixels. Hash: SHA-256 of the canonical JSON (sorted keys, no whitespace).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "printId", "classifier", "classes", "assets"],
+  "properties": {
+    "schema": { "const": "cubistry.appearance" },
+    "version": { "const": 2 },
+    "printId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,96}$" },
+    "classifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "version", "level", "thresholds", "sample", "renderer", "inputSha256"],
+      "properties": {
+        "module": { "type": "string", "minLength": 1, "maxLength": 96 },
+        "version": { "type": "integer", "minimum": 1 },
+        "level": { "enum": ["strict", "loose"] },
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pixelTolerance", "share"],
+          "properties": {
+            "pixelTolerance": { "type": "integer", "minimum": 0, "maximum": 255 },
+            "share": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "sample": { "type": "integer", "minimum": 1 },
+        "renderer": { "type": "string", "minLength": 1, "maxLength": 96 },
+        "inputSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "classes": {
+      "type": "object",
+      "description": "Class id (i# identical, t# rotation twin) -> rotational symmetry order. Turns are compared modulo 4 / order.",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[it][0-9]+$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["order"],
+          "properties": { "order": { "enum": [1, 2, 4] } }
+        }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "description": "Asset id -> identical class, twin class and the quarter-turn offset of the upright asset against the twin class representative (counterclockwise, 0 <= turn < 4 / order of the twin class; the schema bounds it by 3, validators check the order).",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[A-Za-z0-9_-]{1,96}$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["identical", "twin", "turn"],
+          "properties": {
+            "identical": { "type": "string", "pattern": "^i[0-9]+$" },
+            "twin": { "type": "string", "pattern": "^t[0-9]+$" },
+            "turn": { "enum": [0, 1, 2, 3] }
+          }
+        }
+      }
+    }
+  }
+}

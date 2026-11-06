@@ -6,3 +6,6 @@
  */
 export * from "./sha256.ts";
 export * from "./canonical.ts";
+export * from "./tiles.ts";
+export * from "./classify.ts";
+export * from "./map.ts";
