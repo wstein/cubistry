@@ -1,0 +1,26 @@
+Cubistry mark and favicon set (draft)
+Copyright 2026 Cubistry contributors
+
+Origin: original marks created with Claude Design for the owner. The SVG files
+are copied unchanged from the Claude Design delivery and contain only simple
+shapes (svg, g, rect), no text and no fonts. The PNG files come from the same
+delivery. No third-party images, platform glyphs, or stock artwork are included.
+
+License: license to be decided by the owner.
+
+SVG sources (authoritative; sha256):
+  8cdb96035bbb6595d16378be46ffb3e4e1e8c18677252df3829fa6d428236137  public/favicon.svg
+  9efaedd7e90b5b8f88a8ca42ba2dddf7a3a2d1b83c27a522269187a560a10543  public/brand/cubistry-mark.svg
+  f3ead56ca7cc15ec63ae7f8a2945e8f8e2a830ae002d69ef56c3e6f803dbe342  public/brand/cubistry-mark-dark.svg
+
+PNG files (pixel size, source SVG, no DPI; rendered by the design delivery):
+  public/favicon-16.png                       16 x 16    favicon.svg
+  public/favicon-32.png                       32 x 32    favicon.svg
+  public/favicon-48.png                       48 x 48    favicon.svg
+  public/apple-touch-icon.png                 180 x 180  cubistry-mark.svg (opaque background)
+  docs/design/brand/cubistry-mark-512.png     512 x 512  cubistry-mark.svg
+  docs/design/brand/cubistry-mark-dark-512.png 512 x 512 cubistry-mark-dark.svg
+favicon-48.png is not linked from the pages; it is kept for platforms that
+request a 48 px icon (for example site-icon crawlers) and for later use.
+
+Source repository: https://github.com/wstein/cubistry
