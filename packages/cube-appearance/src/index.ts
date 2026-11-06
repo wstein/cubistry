@@ -9,3 +9,7 @@ export * from "./canonical.ts";
 export * from "./tiles.ts";
 export * from "./classify.ts";
 export * from "./map.ts";
+export * from "./geometry.ts";
+export * from "./policy.ts";
+export * from "./stones.ts";
+export * from "./goal.ts";
