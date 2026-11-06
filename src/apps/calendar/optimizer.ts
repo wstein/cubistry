@@ -39,6 +39,11 @@ export class CalendarOptimizer {
     }
   >();
   diagnostics: Readonly<Record<string, unknown>> | null = null;
+  /** Status of the latest solve ("none" before the first), for display only. */
+  get solverStatus(): string {
+    const status = this.diagnostics?.solverStatus;
+    return typeof status === "string" ? status : "none";
+  }
   constructor(
     createWorker: () => PlanningWorker = () =>
       new Worker(new URL("./optimizer-worker.ts", import.meta.url), {
