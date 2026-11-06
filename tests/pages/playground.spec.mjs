@@ -14,7 +14,13 @@ test("built playground resolves picture tiles and authenticated solver under pro
   await page.goto("./counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.locator("#application").selectOption("playground");
-  await expect(page).toHaveURL(/\/cubistry\/playground.html$/);
+  // Selecting the application starts a full page navigation. In three Pages runs this URL check
+  // failed at the 5 s default with `Received string: ""` while the log showed "waiting for navigation
+  // to finish". Those runs took 12.9-13.3 s for the whole test; five passing runs took 10.3-14.8 s.
+  // The cause is unknown (no trace was uploaded), so 15 s is a bounded allowance, not a diagnosis.
+  await expect(page).toHaveURL(/\/cubistry\/playground.html$/, {
+    timeout: 15000,
+  });
   await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
   await page.locator("#notation").fill("R L'");
   await page.locator("#notation").press("Enter");
