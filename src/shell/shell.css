@@ -1,0 +1,407 @@
+/* Unified shell layout for the Chronocube Studio page: header above the stage, controls always visible.
+   Regions are addressed by [data-region] and [data-slot] (chronocube.html). Tokens: ./tokens.css.
+   The legacy stylesheets are imported before this file, so rules here use the extra class `.shell` to win. */
+
+/* The legacy full-viewport rule uses :has(#cube, ...), so its specificity includes an id; match it here. */
+html:has(#shell),
+body.chronocube-page:has(#shell) {
+  background: var(--bg) !important;
+  color: var(--ink);
+  font-family: var(--f-ui);
+  font-size: var(--t-md);
+}
+
+.shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.shell :focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- header ---------- */
+.shell .shell-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-3);
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 0;
+  min-width: 0;
+}
+.shell .shell-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+  flex: none;
+}
+.shell .shell-mark {
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+.shell .shell-wordmark {
+  font: 600 14px/1 var(--f-ui);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.shell .shell-switcher {
+  display: flex;
+  flex: 0 1 340px;
+  min-width: 0;
+  margin: 0;
+}
+.shell .shell-switcher select {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 var(--t-sm) var(--f-ui);
+}
+.shell .shell-title {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.shell .shell-title h1 {
+  margin: 0;
+  font: 600 var(--t-md) / 1.2 var(--f-ui);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shell .shell-title p {
+  margin: 2px 0 0;
+  color: var(--ink-2);
+  font: var(--t-sm) / 1.3 var(--f-ui);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shell .studio-mode-pill {
+  background: var(--surface-2);
+  color: var(--ink);
+  font: 500 var(--t-sm) var(--f-ui);
+  white-space: nowrap;
+}
+.shell .studio-mode-pill .badge {
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 600 var(--t-cap) var(--f-num);
+}
+.shell .shell-link,
+.shell .shell-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 var(--t-sm) var(--f-ui);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+  position: static;
+  transition: background var(--dur-chrome) var(--ease-chrome);
+}
+.shell .shell-link:hover,
+.shell .shell-btn:hover {
+  background: var(--surface-2);
+}
+
+/* ---------- body: stage column and dock ---------- */
+.shell .shell-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(260px, 28vw, 340px);
+  gap: var(--sp-4);
+  min-height: 0;
+  padding: 0 var(--sp-4) var(--sp-3);
+}
+.shell .shell-main {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  gap: var(--sp-3);
+  min-height: 0;
+  min-width: 0;
+}
+
+/* The stage is the containing block for the (legacy) fixed-position viewer and panels. */
+.shell .shell-stage {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  contain: layout;
+  border-radius: var(--r-3);
+  background: radial-gradient(120% 90% at 50% 30%, var(--stage-1), var(--stage-2));
+}
+.chronocube-page .shell .shell-stage .clock-viewer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.shell .shell-stage .clock-cubes {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0 auto;
+  z-index: 2;
+  pointer-events: none;
+}
+.shell .shell-stage .clock-cubes {
+  display: grid;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-3) var(--sp-3);
+  /* The viewer paints its own light studio backdrop in both themes, so the cards keep the legacy dark ink. */
+  color: #202c36;
+}
+.shell .shell-stage .clock-cubes > * {
+  pointer-events: auto;
+}
+.shell .shell-hints {
+  position: absolute;
+  top: var(--sp-3);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+.shell .shell-reference {
+  position: absolute;
+  left: var(--sp-3);
+  bottom: var(--sp-3);
+  z-index: 3;
+}
+.shell .shell-presentation {
+  display: none;
+}
+.shell .shell-readout,
+.shell .shell-nerd {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--sp-3) var(--sp-4);
+  font: var(--t-sm) / 1.4 var(--f-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.shell .shell-dock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--sp-4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+}
+.shell .shell-slots {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.shell .shell-slot:not([hidden]) {
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+}
+.shell .shell-controls {
+  position: static;
+  width: auto;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+  color: var(--ink);
+}
+.shell .shell-controls .hud-title {
+  color: var(--ink);
+  font: 600 var(--t-md) var(--f-ui);
+}
+.shell .shell-controls .small,
+.shell .shell-controls label {
+  color: var(--ink-2);
+}
+.shell .shell-controls select,
+.shell .shell-controls input {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  min-height: 40px;
+}
+.shell .shell-controls button.primary,
+.shell .shell-controls button[type="button"].primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Legacy session-move table and reset button carry light-theme colors; the dock follows the tokens. */
+.shell .shell-controls .clock-move-table,
+.shell .shell-controls .clock-move-table caption {
+  color: var(--ink-2);
+}
+.shell .shell-controls .clock-move-table tfoot :is(th, td) {
+  border-top-color: var(--line);
+}
+.shell .shell-controls .clock-stats {
+  border-top-color: var(--line);
+}
+.shell .shell-controls .clock-stats-reset {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+/* ---------- error line and footer ---------- */
+.shell .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.shell .error {
+  margin: 0;
+  padding: 0 var(--sp-4) var(--sp-2);
+  color: var(--s-error);
+  font: var(--t-sm) / 1.4 var(--f-ui);
+}
+.shell .error:empty {
+  display: none;
+}
+.shell .shell-footer {
+  position: static;
+  transform: none;
+  justify-self: center;
+  margin: 0 var(--sp-4) var(--sp-2);
+  max-width: calc(100% - 2 * var(--sp-4));
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 1;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  color: var(--ink-2);
+  font: var(--t-sm) / 1.4 var(--f-ui);
+}
+.shell .shell-footer a {
+  color: var(--ink);
+}
+.shell .shell-footer .brand-mark {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ---------- narrow and short viewports ---------- */
+@media (max-width: 699px) {
+  .shell .shell-header {
+    padding: var(--sp-2) var(--sp-3);
+  }
+  .shell .shell-title,
+  .shell .studio-mode-pill {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .shell .shell-switcher {
+    flex: 1 1 140px;
+  }
+  .shell .shell-btn .btn-text {
+    display: none;
+  }
+  .shell .shell-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 40%);
+    gap: var(--sp-3);
+    padding: 0 var(--sp-3) var(--sp-2);
+  }
+}
+@media (max-height: 500px) {
+  .shell .shell-header {
+    flex-wrap: nowrap;
+    padding: var(--sp-1) var(--sp-3);
+  }
+  .shell .shell-wordmark,
+  .shell .shell-title p,
+  .shell .studio-mode-pill,
+  .shell .shell-link {
+    display: none;
+  }
+  .shell .shell-body {
+    padding-bottom: var(--sp-1);
+  }
+  .shell .shell-footer {
+    margin-bottom: var(--sp-1);
+    font-size: var(--t-cap);
+  }
+}
+
+/* ---------- presentation mode: the stage takes the window ---------- */
+body.presentation-mode .shell {
+  grid-template-rows: minmax(0, 1fr);
+}
+body.presentation-mode .shell .shell-header,
+body.presentation-mode .shell .shell-dock,
+body.presentation-mode .shell .shell-readout,
+body.presentation-mode .shell .shell-nerd,
+body.presentation-mode .shell .error,
+body.presentation-mode .shell .shell-footer {
+  display: none;
+}
+body.presentation-mode .shell .shell-body {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0;
+}
+body.presentation-mode .shell .shell-stage {
+  border-radius: 0;
+}
+body.presentation-mode .shell .shell-presentation {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell * {
+    transition: none !important;
+  }
+}

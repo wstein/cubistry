@@ -1,6 +1,8 @@
 @import "./style.css";
 @import "./clock.css";
 @import "./ms-timer.css";
+@import "./shell/tokens.css";
+@import "./shell/shell.css";
 
 /* Chronocube Studio Layout */
 .chronocube-page {
