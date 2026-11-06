@@ -1,0 +1,72 @@
+{
+  "theme": "demo",
+  "faces": {
+    "L": {
+      "hero": "Sun",
+      "heroColor": "#fbe08a",
+      "heroShare": 0.4,
+      "sky": [
+        "#f7c5d6",
+        "#fde7c6"
+      ],
+      "ground": "#bfe0b0",
+      "edges": {
+        "left": "#c8a8c8",
+        "right": "#d4d8e0"
+      }
+    },
+    "F": {
+      "hero": "Flower",
+      "heroColor": "#f9c6d3",
+      "heroShare": 0.4,
+      "sky": [
+        "#a9d4f2",
+        "#e2f2fb"
+      ],
+      "ground": "#b4dca4",
+      "edges": {
+        "left": "#d4d8e0",
+        "right": "#e0c8d0"
+      }
+    },
+    "R": {
+      "hero": "Cloud",
+      "heroColor": "#fffaf1",
+      "heroShare": 0.4,
+      "heroShape": "rect",
+      "sky": [
+        "#e9a9c5",
+        "#fbd1a8"
+      ],
+      "ground": "#c6cf9c",
+      "edges": {
+        "left": "#e0c8d0",
+        "right": "#a890b8"
+      }
+    },
+    "B": {
+      "hero": "Moon",
+      "heroColor": "#d8ccf2",
+      "heroShare": 0.4,
+      "sky": [
+        "#5a5fa8",
+        "#a9a3d6"
+      ],
+      "ground": "#7f9fa6",
+      "edges": {
+        "left": "#a890b8",
+        "right": "#c8a8c8"
+      }
+    },
+    "U": {
+      "hero": "Star",
+      "heroColor": "#fff4c2",
+      "heroShare": 0.4
+    },
+    "D": {
+      "hero": "Flower",
+      "heroColor": "#f8d5b8",
+      "heroShare": 0.4
+    }
+  }
+}
