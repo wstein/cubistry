@@ -4,4 +4,4 @@ Decisions live here after review. See the [ADR template](../templates/adr.md). T
 
 Back to [Home](../Home.md).
 
-- [ADR-0001: Shell design tokens and the dark accent on surfaces](ADR-0001-shell-tokens.md) (proposed)
+- [ADR-0001: Shell design tokens and the dark accent on surfaces](ADR-0001-shell-tokens.md) (accepted)
