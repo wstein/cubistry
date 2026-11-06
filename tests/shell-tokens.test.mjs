@@ -109,8 +109,10 @@ test("IBM Plex files are woff2, carry the OFL texts and are listed in the notice
   for (const file of ["OFL-Sans.txt", "OFL-Mono.txt"]) {
     const text = read(`public/fonts/ibm-plex/${file}`);
     assert(text.includes("SIL OPEN FONT LICENSE Version 1.1"), file);
+    assert(notice.includes(createHash("sha256").update(readFileSync(resolve(`public/fonts/ibm-plex/${file}`))).digest("hex")), `${file} checksum is not in NOTICE.txt`);
     assert(text.startsWith('Copyright © 2017 IBM Corp. with Reserved Font Name "Plex"'), file);
   }
+  assert(read(".gitattributes").includes("public/fonts/ibm-plex/OFL-*.txt -text"), "OFL texts keep their line endings");
   const notices = read("THIRD_PARTY_NOTICES.md");
   assert(notices.includes("IBM Plex Sans") && notices.includes("IBM Plex Mono") && notices.includes("public/fonts/ibm-plex/OFL-Sans.txt"));
   assert(notices.includes('Copyright © 2017 IBM Corp. with Reserved Font Name "Plex"') && notices.includes("@ibm/plex-sans@1.1.0") && notices.includes("@ibm/plex-mono@2.5.0"));

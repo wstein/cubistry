@@ -16,3 +16,6 @@ of https://github.com/IBM/plex (fonts/complete/woff2/):
     zip sha256 6d23f01257663d8cc49a0d64c22ced630b79e0e2a0ac08a0da86e9a38bbc481c
     IBMPlexMono-Regular.woff2   sha256 ba204497f16b6d334cee9d1e963a831b73e3a56e1d6300a8489d18df7214b350
     IBMPlexMono-Medium.woff2    sha256 33faf307fa6031fb4062276d7320a6d632de890cbb347576fd80cfa01077bc25
+
+The license texts are the upstream LICENSE.txt files of both packages (identical), byte for byte, CRLF line endings:
+  OFL-Sans.txt, OFL-Mono.txt   sha256 7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da

@@ -1,0 +1,2 @@
+# Upstream OFL texts use CRLF line endings and are kept byte-identical (checksums in NOTICE.txt).
+public/fonts/ibm-plex/OFL-*.txt -text
