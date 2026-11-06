@@ -38,8 +38,8 @@ Exactly ONE dominating object per face (35-50 % of the face area), calm composit
 
 ## 4. Hard rules
 
-- Style: flat vector, ONE ink color, three line weights, Pastel look (soft pastel fills, thin outlines, rosy cheeks, friendly faces). No gradients, filters, clipPath, mask, `url()`, `<text>`, `<image>`, `<script>`, `href`.
-- The deliverable is **six whole faces** (U L F R B D, square svg, viewBox `0 0 S S`) plus `net.svg`. Do not ship tile files: the app slices the faces into NxN tiles at runtime for any N from 2 to 7.
+- Style: flat vector, ONE ink color, three line weights, Pastel look (soft pastel fills, thin outlines, rosy cheeks, friendly faces). Nothing outside the app SVG allowlist (see SKILL.md): no gradients, filters, clipPath, mask, `url()`, `<text>`, `<image>`, `<script>`, `href`, `style`, `shape-rendering`.
+- The core deliverable is **six whole faces** (U L F R B D, square svg, viewBox `0 0 S S`, integer S up to 1024) plus `net.svg`; the app slices them into NxN tiles at runtime for any N from 2 to 7. Consumer: {{CONSUMER}} (2x2 playground: also 24 tile files and the sha256 manifest; theme stack: faces only, 320 px, manifest from `build-playground-theme.mjs`; see "Consumers" in SKILL.md).
 - Granularity: every 1/49 tile (7x7) of every face needs something to place and to orient. Anchors per tile; no large empty skies without texture (stars, clouds, flat-band gradients, grass tufts); hero objects span several tiles.
 - No scattered equal small items, no pale empty rings, no fussy borders, no corner icons, no letters or numbers unless the theme is a letter theme (then every glyph needs an unambiguous orientation hint).
 - Seams: all 12 shared edges match; target mean difference below 3/255 (Up and Down borders about 0).
@@ -50,9 +50,9 @@ Exactly ONE dominating object per face (35-50 % of the face area), calm composit
 
 `node .agents/skills/picture-cube-faces/scripts/check-cube-set.mjs <dir>` prints `RESULT: PASS`, and:
 
-- N = 2 is strictly clean (every tile: detail >= 8 %, rotation difference >= 3 %, no identical tiles).
-- N = 3..7: the per-N counts are reported; the owner has not decided strictness yet, so list the counts in the hand-back (goal: zero).
-- Seams, forbidden constructs and size budget (face <= 200 KB warn; report measured sizes) clean.
+- N = 2 is strictly clean for flatness (every sticker has detail >= 8 %). Symmetric stickers, duplicates and rotation twins are acceptable (owner rule: the cube then counts as visually solved) and are only reported.
+- N = 3..7: the per-N classification is reported; the owner has not decided strictness for flat stickers yet, so list the counts in the hand-back (goal: zero flat stickers).
+- Seams, the app SVG allowlist and size budget (face <= 200 KB warn; report measured sizes) clean.
 - You viewed the final sheet yourself after the LAST change.
 - An independent review (`templates/review-prompt.md`) ran and its findings are addressed or listed.
 

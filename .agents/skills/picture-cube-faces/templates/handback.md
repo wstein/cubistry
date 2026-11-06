@@ -4,7 +4,7 @@ Write in English. Keep it concise. Facts first, then self-assessment.
 
 ## Result
 
-- Output folder: {{OUT_DIR}} (faces U L F R B D + net.svg; no tile files shipped)
+- Output folder: {{OUT_DIR}} (faces U L F R B D + net.svg; tile files only if the consumer needs them: {{CONSUMER}})
 - Branch / commit / PR: {{REF}}
 - Face size: {{FACE_PX}} px; theme source: {{SOURCE_FILE}}
 
@@ -14,14 +14,16 @@ Write in English. Keep it concise. Facts first, then self-assessment.
 RESULT: ...
 ```
 
-| N | stickers | lack detail | rotation-ambiguous | identical groups | status |
-|---|---|---|---|---|---|
-| 2 | 24 | | | | strict |
-| 3 | 54 | | | | report only |
-| 4 | 96 | | | | report only |
-| 5 | 150 | | | | report only |
-| 6 | 216 | | | | report only |
-| 7 | 294 | | | | report only |
+| N | stickers | lack detail | symmetry none / 2-fold / 4-fold | identical groups | rotation-twin groups | centers needing no orientation | status |
+|---|---|---|---|---|---|---|---|
+| 2 | 24 | | | | | n/a | strict |
+| 3 | 54 | | | | | | report only |
+| 4 | 96 | | | | | n/a | report only |
+| 5 | 150 | | | | | | report only |
+| 6 | 216 | | | | | n/a | report only |
+| 7 | 294 | | | | | | report only |
+
+Symmetry, identical groups and rotation twins are information (the owner accepts them; the cube counts as visually solved), only flat stickers can fail.
 
 Seams: worst mean difference {{SEAM_WORST}}/255 (target < 3). Sizes: faces max {{FACE_MAX_KB}} KB, mean {{FACE_MEAN_KB}} KB; compaction {{COMPACTION}}.
 
