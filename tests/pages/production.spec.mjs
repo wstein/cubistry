@@ -52,6 +52,10 @@ function renderedDigit(image, centerX) {
 test("built Pages counter resolves immutable assets under project base and renders legal goal animations", async ({
   page,
 }) => {
+  // Four set-and-animate rounds with a canvas screenshot each, in software GL. Under Playwright
+  // 1.64.1 each element screenshot took 4.6-6.7 s in three failing runs, which exhausts the 30 s
+  // limit; passing runs under 1.56.1 took 15.1-27.6 s.
+  test.slow();
   const errors = [],
     requests = [],
     failures = [];
