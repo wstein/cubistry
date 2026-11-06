@@ -27,4 +27,4 @@ FINDINGS:
 NOT REPRODUCED: <hand-back claims you could not confirm>
 ```
 
-Severity: blocker = checker FAIL, forbidden construct, seam mismatch, visible discontinuity; major = hero/composition/legibility problems, N = 2 tile problems; minor = taste, N >= 3 warnings.
+Severity: blocker = checker FAIL, a construct outside the app SVG allowlist, seam mismatch, visible discontinuity; major = hero/composition/legibility problems, flat stickers at N = 2; minor = taste, N >= 3 warnings, symmetric/duplicate stickers that are cheap to avoid (these are information, not defects).
