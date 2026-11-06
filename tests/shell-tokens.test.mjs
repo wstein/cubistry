@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 
 // Unit checks for the shell design tokens (src/shell/tokens.css). Source only: no browser, no build.
@@ -98,18 +99,21 @@ test("tokens define the type, spacing and radius scales and the self-hosted font
 });
 
 test("IBM Plex files are woff2, carry the OFL texts and are listed in the notices", () => {
-  for (const file of ["ibm-plex-sans-latin-400-normal", "ibm-plex-sans-latin-500-normal", "ibm-plex-sans-latin-600-normal",
-    "ibm-plex-mono-latin-400-normal", "ibm-plex-mono-latin-500-normal"]) {
+  const notice = read("public/fonts/ibm-plex/NOTICE.txt");
+  for (const file of ["IBMPlexSans-Regular", "IBMPlexSans-Medium", "IBMPlexSans-SemiBold", "IBMPlexMono-Regular", "IBMPlexMono-Medium"]) {
     const bytes = readFileSync(resolve(`public/fonts/ibm-plex/${file}.woff2`));
     assert.equal(bytes.subarray(0, 4).toString("latin1"), "wOF2", file);
+    // Unmodified upstream file: the checksum is recorded in NOTICE.txt.
+    assert(notice.includes(createHash("sha256").update(bytes).digest("hex")), `${file} checksum is not in NOTICE.txt`);
   }
   for (const file of ["OFL-Sans.txt", "OFL-Mono.txt"]) {
     const text = read(`public/fonts/ibm-plex/${file}`);
     assert(text.includes("SIL OPEN FONT LICENSE Version 1.1"), file);
-    assert(text.includes("IBM Corp."), file);
+    assert(text.startsWith('Copyright © 2017 IBM Corp. with Reserved Font Name "Plex"'), file);
   }
   const notices = read("THIRD_PARTY_NOTICES.md");
   assert(notices.includes("IBM Plex Sans") && notices.includes("IBM Plex Mono") && notices.includes("public/fonts/ibm-plex/OFL-Sans.txt"));
+  assert(notices.includes('Copyright © 2017 IBM Corp. with Reserved Font Name "Plex"') && notices.includes("@ibm/plex-sans@1.1.0") && notices.includes("@ibm/plex-mono@2.5.0"));
   const licenses = read("licenses.html");
   assert(licenses.includes("IBM Plex Sans") && licenses.includes("IBM Plex Mono") && licenses.includes("fonts/ibm-plex/OFL-Sans.txt"));
 });
