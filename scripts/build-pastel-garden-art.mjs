@@ -353,10 +353,12 @@ const miniFace = (x, y, mood = "happy", gap = 11) =>
 // The moon sits at the top-left because the Back face's moon is at its top-right edge, mirrored across the shared edge.
 const dawnTint = mix(white, H.peach.mid, 0.3), dayTint = mix(white, H.butter.mid, 0.28);
 // Sun in the upper right, away from the Front face's top edge where Sunny now sits (the 2x2 seams cross at the center).
+// It peeks out from behind a cloud and is 15% larger than the sun of the earlier draft (radius 26 -> 30).
 const u5Content =
   `<circle cx="0" cy="312" r="96" fill="${H.peach.light}" opacity=".4"/>` +
   cloudFar(26, 52, 0.5, H.lilac.light) + cloudFar(240, 150, 0.5) + cloudFar(8, 206, 0.45, dawnTint) + cloudFar(120, 232, 0.4) +
-  sunShaded(244, 78, 22) + miniFace(244, 78, "happy", 7.7) +
+  sunShaded(250, 68, 30) + miniFace(250, 68, "happy", 10.5) +
+  cloud(250 - 40 * (30 / 26), 68 + 50 * (30 / 26), 0.7 * (30 / 26), dayTint) +
   cloud(176, 220, 0.6, dayTint) + cloud(22, 158, 0.7, dawnTint) +
   cloudShaded(10, 270, 0.82, dawnTint, H.peach.light) + cloudShaded(222, 272, 0.78, dayTint, H.butter.light) + cloudShaded(112, 168, 0.55) +
   moonShaded(100, 4, 0.85) +
