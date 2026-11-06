@@ -8,8 +8,9 @@ on:
 permissions:
   contents: read
 
-# A newer push to a pull request supersedes its running checks. Runs on main
-# are never cancelled, so every main commit keeps its own result.
+# A newer push to a pull request supersedes its running checks. A running
+# main run is not cancelled, but a newer main run displaces a main run that
+# is still pending in the same group.
 concurrency:
   group: docs-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
