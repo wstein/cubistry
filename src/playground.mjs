@@ -9,7 +9,7 @@ import { PlaygroundController } from "./apps/playground/controller.ts";
 const $ = (id) => document.getElementById(id);
 let controller, viewer;
 const sessions = new Map();
-// Picture themes are fetched when first selected (a set is up to about 800 KB of SVG), once even if
+// Picture themes are fetched when first selected (a set is at most about 820 KB of SVG, no single file over 210 KB), once even if
 // they are selected again while loading. While a load is pending the selector shows the chosen design
 // and every control that would act on the current puzzle is disabled, so no move is made that the
 // finished switch would then discard.

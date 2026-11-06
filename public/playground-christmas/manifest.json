@@ -1,0 +1,23 @@
+{
+  "design": "christmas",
+  "faces": {
+    "F": {
+      "sha256": "3cdecd573d409e8f219186621594d99fedaf507628340452a8505cadfdf41e3c"
+    },
+    "B": {
+      "sha256": "3e27ba7c545d5fcf6110636d9a603a476ff176760bcd15f83cd49cb2e2a156ca"
+    },
+    "R": {
+      "sha256": "20b0c5837d67d38c02cea3780e1f47db1a44b3d150bd87f02439aea3be0d6278"
+    },
+    "L": {
+      "sha256": "459cf75f68bec5e1114c000b5ea5895f49d6a3149c0fa8130b3f518b01347600"
+    },
+    "U": {
+      "sha256": "6f790c692ab81b46b7360d01672a2e0f7f4145eb034bd3f7b1f3f34170b0aabb"
+    },
+    "D": {
+      "sha256": "b1cf6d1147017fa1fa5000c29cb7f960ba0eb0ab4e98928fcddfa10d19b1d909"
+    }
+  }
+}
