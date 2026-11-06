@@ -111,6 +111,44 @@ test("direct relative routes shorten German and English dates while preserving a
   }
 });
 
+test("planner route is set by the attempt count, not by a slow clock", async () => {
+  const kpuzzle = await puzzles["3x3x3"].kpuzzle();
+  const design = load("en-3-zero"),
+    from = findTarget(design, civilDate("2026-10-28")),
+    target = findTarget(design, civilDate("2026-10-29")),
+    fallbackWord = simplify(inverse(from.word) + " " + target.word);
+  const optimizer = createTransitionOptimizer({
+    printing: design.printing,
+    kpuzzle,
+    KPattern,
+    solve,
+    corrections,
+  });
+  const run = (now) =>
+    optimizer.plan(apply(design.printing, from.word), target, fallbackWord, {
+      now,
+    });
+  const fast = await run(() => 0);
+  assert.equal(fast.error, null);
+  assert(fast.optimized);
+  assert(fast.attempts >= 2);
+  assert.equal(fast.budgetExceeded, false);
+  // A clock that stays far below the 5 s guard must not change the route.
+  let t = 0;
+  const slow = await run(() => (t += 300));
+  assert.equal(slow.error, null);
+  assert.equal(slow.budgetExceeded, false);
+  assert.equal(slow.attempts, fast.attempts);
+  assert.equal(slow.word, fast.word);
+  // The guard reads the injected clock: past the budget at the first check,
+  // no attempt runs and the checked fallback is kept.
+  let u = 0;
+  const stopped = await run(() => (u += 10000));
+  assert.equal(stopped.error, null);
+  assert.equal(stopped.attempts, 0);
+  assert.equal(stopped.word, fallbackWord);
+  assert.equal(stopped.budgetExceeded, true);
+});
 function worker() {
   return {
     onmessage: null,
