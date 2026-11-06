@@ -139,7 +139,7 @@ const tulia = (() => {
 })();
 // Moss: butter bean with twig antlers and soft ears; carries a glowing lantern and laughs.
 const moss = (() => {
-  const body = `<ellipse cx="172" cy="214" rx="54" ry="76"/><ellipse cx="136" cy="296" rx="18" ry="10"/><ellipse cx="208" cy="296" rx="18" ry="10"/><ellipse cx="124" cy="176" rx="12" ry="22" transform="rotate(-35 124 176)"/><ellipse cx="220" cy="176" rx="12" ry="22" transform="rotate(35 220 176)"/>${arm(126, 242, 20, 10, 18)}${arm(220, 244, -20, 10, 18)}`;
+  const body = `<ellipse cx="172" cy="214" rx="54" ry="76"/><ellipse cx="136" cy="297" rx="18" ry="10"/><ellipse cx="208" cy="297" rx="18" ry="10"/><ellipse cx="124" cy="176" rx="12" ry="22" transform="rotate(-35 124 176)"/><ellipse cx="220" cy="176" rx="12" ry="22" transform="rotate(35 220 176)"/>${arm(126, 242, 20, 10, 18)}${arm(220, 244, -20, 10, 18)}`;
   const lantern = `<circle cx="112" cy="262" r="26" fill="${H.butter.mid}" opacity=".35"/>` + g(112, 262, 1, `<path d="M-8 -12Q0 -26 8 -12" ${strokeW(W.fine)}/><rect x="-9" y="-13" width="18" height="5" rx="2" fill="${twig}" ${o}/><rect x="-9" y="-8" width="18" height="20" rx="4" fill="${H.butter.light}" ${o}/><rect x="-9" y="10" width="18" height="5" rx="2" fill="${twig}" ${o}/><circle cy="2" r="3.5" fill="${H.butter.mid}"/>`);
   return `<path d="M152 140Q146 112 128 98M148 118L168 100M192 140Q198 112 216 98M196 118L176 100" ${strokeW(4, twig)}/>${shaded(body, H.butter.mid, H.butter.dark, shine(150, 170, 14, 9), [172, 214])}${arcEye(155, 192)}${arcEye(189, 192)}${cheeks(172, 204, 27)}${laugh(172, 200)}${lantern}${glow(236, 206, 3)}`;
 })();
@@ -149,7 +149,7 @@ const sunny = (() => {
     const a = (Math.PI * 2 * i) / 10;
     return `<circle cx="${160 + Math.cos(a) * 62}" cy="${170 + Math.sin(a) * 62}" r="15"/>`;
   }).join("");
-  return `${shaded(rays + `<circle cx="160" cy="170" r="52"/>` + arm(238, 158, -40, 10, 17), H.butter.mid, H.butter.dark, shine(135, 142, 18, 9), [160, 170])}${eye(143, 164)}${arcEye(177, 164)}${cheeks(160, 176, 27)}${laugh(160, 172)}${bird(160, 104, H.lilac.mid, 0.8)}`;
+  return `${shaded(rays + `<circle cx="160" cy="170" r="52"/>`, H.butter.mid, H.butter.dark, shine(135, 142, 18, 9), [160, 170])}${eye(143, 164)}${arcEye(177, 164)}${cheeks(160, 176, 27)}${laugh(160, 172)}${bird(160, 104, H.lilac.mid, 0.8)}`;
 })();
 // Plop: pink pond-sprite peeking out of the water with a lily-pad hat; astonished, blowing bubbles.
 const plop = (() => {
@@ -182,7 +182,7 @@ const dotted = (p0, c, p1, n) =>
 
 const drawings = {
   // FRONT (day, Sunny): TL rainbow+cloud+bird, TR Sunny (clear of the 2x2 seams at x=160 and y=160), BL balloon+small cloud+mushroom, BR paper plane+snail.
-  // Sunny waves at Pip (right); the sun rose on the left face, and a butterfly trail leads to Pip's flower.
+  // The sun rose on the left face, and a butterfly trail leads to Pip's flower.
   F: `<rect width="320" height="320" fill="${H.sky.bg}"/>${["pink", "butter", "green", "sky"].map((k, i) => `<path d="M${14 + i * 7} 150A${50 - i * 7} ${50 - i * 7} 0 0 1 ${114 - i * 7} 150" fill="none" stroke="${H[k].mid}" stroke-width="7"/>`).join("")}${cloud(60, 66, 0.9)}${bird(124, 104, H.pink.mid, 1.2, -1)}${cloud(112, 188, 0.5, H.sky.light)}${dotted([170, 204], [270, 190], [320, 104], 14)}${belt(H.green.light, H.green.mid, 4, 0)}${gardenPath}${balloon(56, 192, 0.7)}${plane(240, 214, 1.1)}${mushroom(36, 296, 1.1)}${tuft(60, 312)}${tuft(300, 308)}${snail(284, 300, 0.9)}${g(100.8, -49.4, 0.82, sunny)}`,
   // BACK (night): TL shooting star+cloud, TR moon, BL pine+fireflies, BR mushroom house. Nimbo sleeps near Moss's lantern light.
   B: `<rect width="320" height="320" fill="${H.sky.light}"/>${star(60, 66, 15)}<path d="M120 40Q96 56 70 92" ${strokeW(W.outline, H.butter.mid)}/>${star(40, 130, 6)}${cloud(78, 124, 0.7, H.lilac.bg)}${star(118, 98, 9)}${star(26, 92, 5)}<path transform="translate(40 -20)" d="M215 45a50 50 0 1 0 48 70a40 40 0 1 1-48-70Z" fill="${H.butter.light}" stroke="${ink}" stroke-width="${W.outline}"/>${star(210, 60, 7)}${star(290, 150, 5)}${hill("M0 226L70 168L130 222L200 150L270 222L320 226V320H0Z", H.sky.mid)}${hill("M0 262Q90 244 190 260T320 262V320H0Z", H.sky.dark, true)}${gardenPath}${pine(40, 258, 0.9, H.sky.dark)}${pine(78, 272, 0.6, H.sky.dark)}${glow(30, 188)}${glow(96, 214, 3)}${glow(314, 198, 3)}${house(280, 296, 0.75)}${g(20, 0, 1, nimbo)}`,
