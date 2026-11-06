@@ -133,6 +133,22 @@ for (const theme of themes) {
   });
 }
 
+test("presentation mode: the stage fills the window, the dock readout and the footer stay visible, the header hides", async () => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.locator("#presentation-btn").click();
+  await expect(page.locator("body")).toHaveClass(/presentation-mode/);
+  const [stage, dock, footer] = await Promise.all([boxOf(page, "stage"), boxOf(page, "dock"), page.locator(".shell-footer").boundingBox()]);
+  await expect(page.locator('[data-region="header"]')).toBeHidden();
+  expect(stage.height).toBeCloseTo(900, 0);
+  expect(stage.width).toBeCloseTo(1440, 0);
+  expect(dock, "dock stays visible").not.toBeNull();
+  expect(footer, "footer watermark stays visible").not.toBeNull();
+  expect(dock.x + dock.width).toBeLessThanOrEqual(1440.5);
+  expect(footer.y + footer.height).toBeLessThanOrEqual(900.5);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("body")).not.toHaveClass(/presentation-mode/);
+});
+
 test("no page errors while measuring", () => {
   expect(errors).toEqual([]);
 });
