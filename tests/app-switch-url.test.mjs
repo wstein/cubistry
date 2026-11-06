@@ -16,8 +16,13 @@ test("duration does not survive an application switch", () => {
   );
 });
 
-test("deep links are kept on first load and on a switch to the same application", () => {
+test("startup call keeps deep links although the default application is certified", () => {
+  // The real startup call has previous "certified" (src/main.mjs `let application`) and initial true.
+  const deep = `${base}/timer.html?duration=05:00&val=12#top`.replace("/index.html", "");
+  assert.equal(urlAfterAppSwitch(deep, "certified", "timer", true), "/timer.html?duration=05:00&val=12#top");
+});
+
+test("a switch to the same application keeps the URL", () => {
   const deep = `${base}?duration=05:00&val=12#top`;
-  assert.equal(urlAfterAppSwitch(deep, "", "timer"), "/index.html?duration=05:00&val=12#top");
   assert.equal(urlAfterAppSwitch(deep, "timer", "timer"), "/index.html?duration=05:00&val=12#top");
 });
