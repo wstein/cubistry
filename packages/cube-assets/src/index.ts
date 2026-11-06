@@ -40,6 +40,8 @@ export type ImageAsset =
       readonly url: string;
       readonly sha256: string;
       readonly marker?: "underline" | "dot" | "none";
+      /** Optional pixel rectangle [x, y, width, height] of the decoded image to use instead of all of it. */
+      readonly crop?: readonly [number, number, number, number];
     }
   | {
       readonly id: string;
@@ -378,6 +380,35 @@ export async function loadAssets(
   } finally {
     for (const f of fontFaces) document.fonts.delete(f);
   }
+  // A cropped image is a rectangle of a larger file (for example one square of a whole face). The
+  // file is fetched, validated and decoded once and shared by all of its crops. Its pixels count
+  // against the budget only while crops are still to be cut from it; each crop counts for its own
+  // pixels, so a set of crops that tiles its source costs about twice the source at the peak.
+  const decodedSources = new Map<string, HTMLCanvasElement>();
+  const cropsLeft = new Map<string, number>();
+  for (const asset of manifest.images)
+    if (asset.kind === "image" && asset.crop) {
+      const key = asset.url + "#" + asset.sha256;
+      cropsLeft.set(key, (cropsLeft.get(key) ?? 0) + 1);
+    }
+  const takeCrop = (key: string, crop: readonly number[]) => {
+    const source = decodedSources.get(key)!;
+    const [x, y, w, h] = crop;
+    demand(
+      x + w <= source.width && y + h <= source.height,
+      "Image crop exceeds the decoded image",
+    );
+    reserve(w, h);
+    const part = canvas(w, h);
+    context(part).drawImage(source, x, y, w, h, 0, 0, w, h);
+    const left = cropsLeft.get(key)! - 1;
+    cropsLeft.set(key, left);
+    if (left === 0) {
+      decodedSources.delete(key);
+      pixels -= source.width * source.height;
+    }
+    return part;
+  };
   try {
     for (const asset of manifest.images) {
       let c: HTMLCanvasElement;
@@ -393,6 +424,8 @@ export async function loadAssets(
         reserve(w, h);
         c = canvas(w, h);
         context(c).drawImage(doc, x, y, w, h, 0, 0, w, h);
+      } else if (asset.crop && decodedSources.has(asset.url + "#" + asset.sha256)) {
+        c = takeCrop(asset.url + "#" + asset.sha256, asset.crop);
       } else {
         const bytes = await fetchBounded(
           asset.url,
@@ -457,8 +490,12 @@ export async function loadAssets(
         } finally {
           URL.revokeObjectURL(url);
         }
+        if (asset.crop) {
+          decodedSources.set(asset.url + "#" + asset.sha256, c);
+          c = takeCrop(asset.url + "#" + asset.sha256, asset.crop);
+        }
       }
-      reserve(c.width, c.height);
+      if (!(asset.kind === "image" && asset.crop)) reserve(c.width, c.height);
       images.set(
         asset.id,
         await createImageBitmap(c, { imageOrientation: "flipY" }),
