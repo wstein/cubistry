@@ -118,6 +118,7 @@ test("deadline preserves an interim center-aware candidate and its backend truth
       }),
     15,
   );
+  assert.equal(optimizer.solverStatus, "none");
   assert.equal(await optimizer.plan(ctx), first.word);
   const end = apply(ctx.from, first.word),
     compact = optimizer.plan.compactReference({
@@ -132,6 +133,7 @@ test("deadline preserves an interim center-aware candidate and its backend truth
   assert.equal(optimizer.diagnostics.retainedCandidateStatus, "solved");
   assert.equal(optimizer.diagnostics.solverStatus, "deadline");
   assert.equal(worker.dead, true);
+  assert.equal(optimizer.solverStatus, "deadline");
   optimizer.dispose();
 });
 
