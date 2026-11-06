@@ -112,6 +112,12 @@ The following third-party libraries and modules are bundled, linked, or distribu
 * **Copyright**: Copyright © 2017–2020 Keshikan (keshikan.net)
 * **Website**: [https://www.keshikan.net/fonts-e.html](https://www.keshikan.net/fonts-e.html)
 
+### 4.3. IBM Plex Sans and IBM Plex Mono
+* **Component**: IBM Plex Sans (400, 500, 600) and IBM Plex Mono (400, 500), Latin subset, WOFF2, from the Fontsource packages `@fontsource/ibm-plex-sans` and `@fontsource/ibm-plex-mono` 5.3.0 (`public/fonts/ibm-plex/`)
+* **License**: [SIL Open Font License 1.1 (OFL-1.1)](https://openfontlicense.org/); texts in `public/fonts/ibm-plex/OFL-Sans.txt` and `public/fonts/ibm-plex/OFL-Mono.txt`
+* **Copyright**: Copyright © 2017 IBM Corp. (Plex Mono), Copyright © 2019 IBM Corp. (Plex Sans). All rights reserved.
+* **Website / Upstream**: [https://github.com/IBM/plex](https://github.com/IBM/plex)
+
 ---
 
 ## 5. Original Vector Artwork & Illustration Notices
