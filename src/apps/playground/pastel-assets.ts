@@ -118,28 +118,28 @@ export const pastelImages: readonly ImageAsset[] = [
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/U_0_0.svg",
-    "sha256": "57ced96c6b538fdd853360689067b11924c98ca0f35d1a0f1ef585321fb2f9e4"
+    "sha256": "b447f113053ca73ac32c45212fc67742709684a609e815fb4ade3256a577fba4"
   },
   {
     "id": "U_0_1",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/U_0_1.svg",
-    "sha256": "d1a3c2630a51476e5eadbee16492ba94719dc84b4583bfbf67f64c5e06cdf404"
+    "sha256": "0f18ec01a9c15edfb4e5703f44c15068f499f65d9c0af9fa4c3bfe7c5998596d"
   },
   {
     "id": "U_1_0",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/U_1_0.svg",
-    "sha256": "17c75d82e5464a132b6b4ad961d6e3c49843aa028f1197771776a2da204b01ca"
+    "sha256": "a89dc4305b25aaed518b1d81985d1fcf3aaa3292dbd83d384524176941b7e5b6"
   },
   {
     "id": "U_1_1",
     "kind": "image",
     "format": "svg",
     "url": "/playground-pastel/U_1_1.svg",
-    "sha256": "349f34839c56244f218943743bafd811e696d2dc87a8e56453d9ec522576e82b"
+    "sha256": "5eb1f3efbe341126ad4f82117f601a3d3682d9ca4ecf432289acf7e867b4c117"
   },
   {
     "id": "D_0_0",
