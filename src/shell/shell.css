@@ -325,6 +325,10 @@ body.chronocube-page:has(#shell) {
 .shell .shell-footer a {
   color: var(--ink);
 }
+.shell .shell-footer .pill-brand,
+.shell .shell-footer .bottom-brand {
+  color: var(--ink);
+}
 .shell .shell-footer .brand-mark {
   background: var(--accent);
   color: var(--on-accent);
@@ -400,6 +404,9 @@ body.presentation-mode .shell .shell-stage {
 }
 body.presentation-mode .shell .shell-stage {
   border-radius: 0;
+  /* Layout containment makes the stage a stacking context, which would put the exit button (z-index 100) below the
+     fixed dock (z-index 25). The stage fills the window here, so fixed children keep the same box without it. */
+  contain: none;
 }
 body.presentation-mode .shell .shell-presentation {
   display: block;
