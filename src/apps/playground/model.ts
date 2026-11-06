@@ -18,7 +18,8 @@ import {
 import type { AssetManifest } from "@cubistry/cube-assets";
 import { pictureImages } from "./picture-assets.ts";
 import { pastelImages } from "./pastel-assets.ts";
-export type Style = "classic" | "picture" | "pastel";
+import { THEMES, sliceFaceSet, type ThemeId } from "./themes.ts";
+export type Style = "classic" | "picture" | "pastel" | ThemeId;
 const faces = [
   { face: "R", normal: [1, 0, 0], up: [0, 1, 0], color: "#e94538" },
   { face: "L", normal: [-1, 0, 0], up: [0, 1, 0], color: "#ff922e" },
@@ -41,12 +42,15 @@ export const CAPABILITY = deepFreeze({
     "Unsupported: this playground uses the shared size-2 mechanics and viewer profile.",
 });
 export function createDesign(style: Style) {
-  if (!["classic", "picture", "pastel"].includes(style))
+  const theme = THEMES.find((t) => t.id === style);
+  if (
+    !["classic", "picture", "pastel", ...THEMES.map((t) => t.id)].includes(style)
+  )
     throw Error("Unsupported playground design");
   const print = validatePrint({
     schema: "cubistry.print",
     version: 1,
-    id: `playground_${style}_v1`,
+    id: `playground_${style}_v${theme?.version ?? 1}`,
     topology: { kind: "cube", size: 2 },
     cubies: POSITIONS.map((position, id) => ({ id, position })),
     stickers: faces.flatMap(({ face, normal, up }, f) => {
@@ -86,7 +90,9 @@ export function createDesign(style: Style) {
           }))
         : style === "pastel"
           ? pastelImages
-          : pictureImages,
+          : style === "picture"
+            ? pictureImages
+            : sliceFaceSet(theme!, CAPABILITY.size),
   });
   const target = initialState(print);
   // Whole-cube frames are constructed using legal opposite face turns. They

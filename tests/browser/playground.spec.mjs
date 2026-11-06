@@ -114,6 +114,79 @@ test("cancel and Solve replace a moving word after its active legal turn; design
   await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
   await expect(page.locator("canvas")).toHaveCount(1);
 });
+test("every picture theme loads on demand and starts a fresh session", async ({
+  page,
+}) => {
+  test.slow();
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("response", (r) => {
+    if (r.status() >= 400) errors.push(r.url());
+  });
+  await ready(page);
+  const themes = (
+    await page.locator("#design option").evaluateAll((os) => os.map((o) => o.value))
+  ).filter((v) => !["classic", "picture", "pastel"].includes(v));
+  for (const theme of themes) {
+    await page.locator("#design").selectOption(theme);
+    await expect(page.locator("#cube")).toHaveAttribute("data-style", theme, {
+      timeout: 30000,
+    });
+    await idle(page);
+    await expect(page.locator("#history li")).toHaveCount(0);
+    await word(page, "R U");
+    await expect(page.locator("#cube")).toHaveAttribute("data-exact", "false");
+    await page.locator("#solve").click();
+    await idle(page);
+    await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
+    await expect(page.locator("canvas")).toHaveCount(1);
+  }
+  expect(errors).toEqual([]);
+});
+test("a pending theme load is fetched once and blocks moves on the old puzzle until it settles", async ({
+  page,
+}) => {
+  test.slow();
+  await ready(page);
+  const themes = (
+    await page.locator("#design option").evaluateAll((os) => os.map((o) => o.value))
+  ).filter((v) => !["classic", "picture", "pastel"].includes(v));
+  if (!themes.length) return; // no registered theme: nothing to load
+  const theme = themes[0];
+  let release;
+  const gate = new Promise((resolve) => (release = resolve)),
+    counts = {};
+  await page.route(`**/playground-${theme}/*.svg`, async (route) => {
+    const path = new URL(route.request().url()).pathname;
+    counts[path] = (counts[path] ?? 0) + 1;
+    await gate;
+    await route.continue();
+  });
+  await word(page, "R U");
+  await page.locator("#design").selectOption(theme);
+  await expect(page.locator("#status")).toContainText("Loading");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
+  await expect(page.locator("#design")).toHaveValue(theme);
+  for (const id of ["#apply", "#notation", "#undo", "#redo", "#solve", "#scramble", "#new-session"])
+    await expect(page.locator(id)).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Turn R", exact: true })).toBeDisabled();
+  await page.locator("h1").click();
+  await page.keyboard.press("r");
+  await expect(page.locator("#history li")).toHaveCount(2);
+  // Choosing another design cancels the pending one; choosing the theme again must not fetch it twice.
+  await page.locator("#design").selectOption("picture");
+  await idle(page);
+  await expect(page.locator("#cube")).toHaveAttribute("data-style", "picture");
+  await page.locator("#design").selectOption(theme);
+  await expect(page.locator("#status")).toContainText("Loading");
+  release();
+  await expect(page.locator("#cube")).toHaveAttribute("data-style", theme, { timeout: 30000 });
+  await idle(page);
+  await expect(page.locator("#history li")).toHaveCount(0);
+  await expect(page.locator("#apply")).toBeEnabled();
+  expect(Object.keys(counts)).toHaveLength(6);
+  expect(Object.values(counts)).toEqual([1, 1, 1, 1, 1, 1]);
+});
 test("corrupt solver table fails explicitly without moving or changing history", async ({
   page,
 }) => {

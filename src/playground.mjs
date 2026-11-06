@@ -4,10 +4,65 @@ initHudIdle();
 import { CubeViewer, BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
 import { serializeMove } from "@cubistry/cube-mechanics";
 import { createDesign, ALLOWED_MOVES } from "./apps/playground/model.ts";
+import { THEMES } from "./apps/playground/themes.ts";
 import { PlaygroundController } from "./apps/playground/controller.ts";
 const $ = (id) => document.getElementById(id);
 let controller, viewer;
 const sessions = new Map();
+// Picture themes are fetched when first selected (a set is up to about 800 KB of SVG), once even if
+// they are selected again while loading. While a load is pending the selector shows the chosen design
+// and every control that would act on the current puzzle is disabled, so no move is made that the
+// finished switch would then discard.
+const loading = new Map();
+let designRequest = 0,
+  pendingDesign = null,
+  released = false;
+for (const theme of THEMES) {
+  const option = document.createElement("option");
+  option.value = theme.id;
+  option.textContent = theme.name;
+  $("design").insertBefore(option, $("design").querySelector('[value="classic"]'));
+}
+function loadSession(style) {
+  if (sessions.has(style)) return Promise.resolve(sessions.get(style));
+  if (!loading.has(style)) {
+    const design = createDesign(style);
+    loading.set(
+      style,
+      loadAssets(design.assets, [design.print], undefined, import.meta.env.BASE_URL)
+        .then((assets) => {
+          if (released) assets.dispose();
+          else sessions.set(style, { design, assets });
+          return sessions.get(style);
+        })
+        .finally(() => loading.delete(style)),
+    );
+  }
+  return loading.get(style);
+}
+async function chooseDesign(style) {
+  const request = ++designRequest;
+  if (sessions.has(style)) {
+    pendingDesign = null;
+    controller?.newSession(sessions.get(style));
+    update();
+    return;
+  }
+  pendingDesign = style;
+  update();
+  try {
+    const session = await loadSession(style);
+    if (request !== designRequest || !session) return;
+    pendingDesign = null;
+    controller?.newSession(session);
+    update();
+  } catch (error) {
+    if (request !== designRequest) return;
+    pendingDesign = null;
+    update();
+    $("status").textContent = `Unable to load this design: ${error.message}`;
+  }
+}
 for (const move of ALLOWED_MOVES) {
   const token = serializeMove(move),
     b = document.createElement("button");
@@ -25,8 +80,9 @@ const manual = [
 function update() {
   if (!controller) return;
   const s = controller.snapshot;
-  $("status").textContent = s.message;
-  $("cube").setAttribute("aria-busy", String(s.busy));
+  const hold = s.busy || s.frozen || pendingDesign !== null;
+  $("status").textContent = pendingDesign ? "Loading the picture set…" : s.message;
+  $("cube").setAttribute("aria-busy", String(s.busy || pendingDesign !== null));
   Object.assign($("cube").dataset, {
     ready: "true",
     exact: s.frozen ? "unknown" : String(s.exact),
@@ -49,13 +105,14 @@ function update() {
       ? "Solved"
       : "Unsolved";
   $("equivalent").dataset.solved = String(!s.frozen && s.rotationEquivalent);
-  for (const el of manual) el.disabled = s.busy || s.frozen;
-  $("undo").disabled = s.busy || s.frozen || s.cursor === 0;
-  $("redo").disabled = s.busy || s.frozen || s.cursor === s.history.length;
-  for (const id of ["solve", "scramble", "design", "new-session"])
-    $(id).disabled = s.frozen;
+  for (const el of manual) el.disabled = hold;
+  $("undo").disabled = hold || s.cursor === 0;
+  $("redo").disabled = hold || s.cursor === s.history.length;
+  for (const id of ["solve", "scramble", "new-session"])
+    $(id).disabled = s.frozen || pendingDesign !== null;
+  $("design").disabled = s.frozen;
   $("cancel").disabled = !s.busy || s.frozen;
-  $("design").value = s.style;
+  $("design").value = pendingDesign ?? s.style;
   $("stats").textContent =
     `${s.cursor} / ${s.history.length} HTM · ${s.turns} turns played`;
   $("empty").hidden = s.history.length > 0;
@@ -92,9 +149,7 @@ $("undo").addEventListener("click", () => controller?.undo());
 $("redo").addEventListener("click", () => controller?.redo());
 $("solve").addEventListener("click", () => controller?.solve());
 $("cancel").addEventListener("click", () => controller?.cancel());
-$("design").addEventListener("change", () =>
-  controller?.newSession(sessions.get($("design").value)),
-);
+$("design").addEventListener("change", () => void chooseDesign($("design").value));
 $("new-session").addEventListener("click", () =>
   controller?.newSession(sessions.get(controller.snapshot.style)),
 );
@@ -118,6 +173,7 @@ window.addEventListener("keydown", (e) => {
     return;
   if (/^[rludfb]$/i.test(e.key)) {
     e.preventDefault();
+    if (pendingDesign) return;
     controller.manual(e.key.toUpperCase() + (e.shiftKey ? "'" : ""));
   }
 });
@@ -135,16 +191,7 @@ for (const el of [
 ])
   el.disabled = true;
 try {
-  for (const style of ["picture", "pastel", "classic"]) {
-    const design = createDesign(style),
-      assets = await loadAssets(
-        design.assets,
-        [design.print],
-        undefined,
-        import.meta.env.BASE_URL,
-      );
-    sessions.set(style, { design, assets });
-  }
+  for (const style of ["picture", "pastel", "classic"]) await loadSession(style);
   viewer = new CubeViewer($("cube"));
   document.querySelector(".hud-toggle-btn")?.addEventListener("click", () => {
     document.querySelector(".controls")?.classList.toggle("minimized");
@@ -211,6 +258,7 @@ try {
 addEventListener(
   "pagehide",
   () => {
+    released = true;
     controller?.cancel();
     const release = () => {
       if (viewer?.animating) {

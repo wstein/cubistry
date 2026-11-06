@@ -7,7 +7,7 @@ not a new renderer or general application framework.
 
 ## Behavior and physical contract
 
-Choose Landscape pictures, Pastel Garden or Classic colors. Each is a separate immutable print
+Choose Landscape pictures, Pastel Garden, a picture theme (see below) or Classic colors. Each is a separate immutable print
 with eight body IDs, 24 sticker IDs, fixed local normals and up vectors, and a
 complete initial physical target. Changing design or choosing Start new session
 explicitly creates a new physical puzzle and clears history after the active
@@ -129,6 +129,66 @@ net preview, integrity manifest and typed asset list. Run
 detail to place and differs from its own 90, 180 and 270 degree rotations. See the
 [artwork notice](../public/playground-pastel/NOTICE.txt). Legibility at physical
 sticker size has not been reviewed.
+
+### Picture theme license
+
+The theme images are licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), not under the AGPL
+that covers the program code: "Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry."
+Each theme directory carries a `NOTICE.txt` with this text, the committed
+art generators are art data under the same license, and
+[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) lists every theme.
+Pictures a user adds in the browser never leave it and stay the uploader's
+responsibility.
+
+### Picture themes
+
+Further picture sets are registered as themes in
+[`themes.ts`](../src/apps/playground/themes.ts). A theme is stored independently of
+the cube size: the six whole 320×320 faces in `public/playground-<id>/` plus a
+manifest and a notice, and one registry entry. The registry holds generic
+`FaceSet` values (`id`, display name, optional print version, and six face sources with
+URL, format, SHA-256 and pixel size), and `sliceFaceSet(set, n)` depends only on that
+type, never on which set it is, so a future user upload (six images, or one net image
+cut into six) only has to produce a `FaceSet`. No pre-cut tiles are stored.
+`sliceFaceSet` cuts the faces into the n×n stickers of a size-n cube (ids
+`F_<row>_<col>`): one image asset per sticker with a pixel `crop` of its face. The asset
+loader fetches, validates and decodes each face once, shares it between its crops, and
+counts crops apart from the 64 whole assets (up to 512, enough for 6·7·7 = 294 stickers).
+The decoded face counts against the 8 Mpixel budget only until its last crop is cut, and
+every crop counts for its own pixels. The cut is therefore loader-valid for sizes 2 to 7
+(tested), but the playground can only play size 2: larger sizes need size-n mechanics,
+viewer and solver, which do not exist yet. For sizes that do not divide 320 the tile edges
+are rounded to whole pixels, so neighboring tiles differ by at most one pixel in width.
+
+At size 2 each theme is its own design with the same physical contract as Pastel Garden:
+print `playground_<id>_v<version>`, 24 uniquely oriented stickers, no quarter-turn
+equivalence. **When a face image changes, bump the theme's `version` in `themes.ts`** so the
+print id changes with the art; the model test compares each theme's face digest with
+`tests/fixtures/playground-theme-pins.json` and fails if the art changed under an old
+version. Each face must stay within the asset loader's 256 KiB per-file and 4 MiB per-set
+limits.
+
+The Design selector lists every registered theme. A theme's faces are fetched when it is
+first selected, not at page load, and only once even if it is selected again while loading.
+While a theme loads, the selector shows it, the status says so, and every control that acts
+on the current puzzle is disabled, so no move is made that the finished switch would
+discard. Choosing another design meanwhile cancels the pending one. A failed load keeps the
+current puzzle and reports the error.
+
+Registered themes:
+
+- _none yet_
+
+To add a theme: copy the six faces (`F`, `B`, `R`, `L`, `U`, `D` `.svg`) and a `NOTICE.txt`
+into `public/playground-<id>/`; run `node scripts/build-playground-theme.mjs <id>` to
+write `manifest.json` and `src/apps/playground/theme-assets/<id>.ts` and to print the face
+digest; add the entry to `themes.ts` and the digest to the pins file.
+`node scripts/build-playground-theme.mjs --check <id>` verifies the generated files are
+current. `node scripts/check-pastel-garden-tiles.mjs` cuts the size-2 stickers of every theme
+(or of the sets named as arguments) and checks them for detail and distinct rotations;
+`--sizes` also reports the same measures for sizes 3 to 7 as information. The unit tests
+pin each face by SHA-256 and reject text, images, scripts, styles, gradients, filters,
+clipping paths, `url()`, `data:` and `@import` content.
 
 Actual DPR2 Chromium captures were inspected: the front mountain/lake continues
 across the four correctly oriented stickers, a side illustration remains

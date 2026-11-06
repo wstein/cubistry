@@ -1663,6 +1663,12 @@ body.licenses-page main.licenses-container {
   border: 1px solid rgba(154, 52, 18, 0.25);
 }
 
+.license-badge.cc {
+  background: #f5f3ff;
+  color: #5b21b6;
+  border: 1px solid rgba(91, 33, 182, 0.25);
+}
+
 .license-badge.ofl {
   background: #f0fdf4;
   color: #166534;
