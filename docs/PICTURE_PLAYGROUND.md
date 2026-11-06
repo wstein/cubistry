@@ -206,7 +206,7 @@ move) holds three tools. All of them run in the browser; nothing is uploaded to 
 **Face set model.** An upload produces the same `FaceSet` as a built-in theme (`id` `upload`, six face
 sources with URL, format, SHA-256 and pixel size). `sliceFaceSet`, the suitability measures and rendering
 never look at where a set came from. `createDesign("upload", set)` builds the design (print
-`playground_upload_v1`).
+`playground_upload_<hash>_v1`).
 
 **Upload.** PNG or SVG. Either choose six files named `F`, `B`, `L`, `R`, `U`, `D` (case-insensitive,
 `F.png`, `u.svg`), or one net image in the standard cross (U above F; L F R B in one row; D below F). A
