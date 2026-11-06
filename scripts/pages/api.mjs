@@ -28,6 +28,7 @@ export class GitHub {
         continue;
       }
       if (TRANSIENT_STATUS.has(response.status) && attempt < attempts) {
+        await response.body?.cancel();
         await this.sleep(RETRY_DELAYS_MS[attempt - 1]);
         continue;
       }
