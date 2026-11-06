@@ -53,6 +53,41 @@ code). Verification is local.
   Calendar, Picture and Counter browser specs pass locally before Cubing.js is
   removed.
 
+## G1 result
+
+**Conditionally passed, decided by the owner on 2026-11-06.** Steps 2 and 3 go
+ahead (shadow-mode parity, 2×2 adapter and research generator). The 2×2 cold start
+and memory stay open. This is not a decision on steps 4 to 6 and changes no ADR.
+Numbers from [cubacle `docs/wasm.md`](https://github.com/wstein/cubacle/blob/134b6a3749e8a251b5419df02b0037ee0fd938ec/docs/wasm.md)
+(PR [wstein/cubacle#34](https://github.com/wstein/cubacle/pull/34), merge commit
+`134b6a3749e8a251b5419df02b0037ee0fd938ec`; gate issue
+[wstein/cubacle#21](https://github.com/wstein/cubacle/issues/21), epic
+[#190](https://github.com/wstein/cubistry/issues/190)). Cubistry revision compared:
+`fb19f8f17b6d28c359280ddfa285c9585d8c8ac2`, Cubing.js 0.66.1. Commands and setup
+(Node v22.23.4, one aarch64 Linux VM, three runs) are in that document.
+
+- **Size.** `cubacle-wasm`: 162,079 bytes raw, 61,134 gzip, 50,241 brotli. Against
+  one Calendar vendor bundle (upper bound, the bundle holds more than the solvers):
+  13 percent raw, 18 percent gzip and brotli. Against the embedded twips module,
+  which serves the 2×2 only: 32 percent raw, 40 percent gzip and brotli. The 3×3 in
+  Cubing.js is a JavaScript solver (min2phase) inside the bundles; its size there is
+  **UNKNOWN**.
+- **Moves** (12 fixed scrambles per size). 3×3 mean 20.83 for cubacle against 20.5
+  for Cubing.js; 2×2 mean 8.83 for both.
+- **Time, Node.** First 3×3 solve: cubacle 32.6 to 33.1 ms, Cubing.js 119.8 to
+  121.9 ms. First 2×2 solve: cubacle 92.7 to 94.2 ms (tables built on the first
+  solve), Cubing.js 16.6 to 20.3 ms, so the cubacle cold start is about 5 times
+  slower. Later calls: 3×3 median 0.2 ms against 4.4 to 4.6 ms; 2×2 median
+  0.004 to 0.005 ms against 2.4 to 2.5 ms.
+- **Memory.** cubacle: 21,364,736 bytes of linear memory after the first 2×2
+  solve (peak of the module). Cubing.js: **UNKNOWN**. No resident set was measured
+  for either side.
+- **Not measured.** Firefox and Safari, warm code cache, the other Calendar page
+  files. The comparison is a hint for G2, not a parity result.
+
+Open: whether the 2×2 cold start (about 93 ms in Node, 109 ms in Chromium) and the
+21.4 MB of memory are acceptable.
+
 ## Constraints
 
 - Pin cubacle by commit hash and integrity, as `puzlwerk-source.json` does; never
