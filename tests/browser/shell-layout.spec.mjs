@@ -85,11 +85,8 @@ test("390x844: header controls are at least 44 px", async () => {
   }
 });
 
-for (const theme of themes) {
-  test(`${theme}: visible text in the header, dock and footer meets 4.5:1 against its background`, async () => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.emulateMedia({ colorScheme: theme });
-    const failures = await page.evaluate(() => {
+const textContrastFailures = (selectors) =>
+  page.evaluate(selector => {
       const parse = value => {
         const m = value.match(/rgba?\(([^)]+)\)/);
         if (!m) return null;
@@ -112,7 +109,7 @@ for (const theme of themes) {
         return layers.reverse().reduce((acc, c) => over(c, acc), { r: 255, g: 255, b: 255, a: 1 });
       };
       const out = [];
-      const roots = document.querySelectorAll('[data-region="header"], [data-region="dock"], .shell-footer');
+      const roots = document.querySelectorAll(selector);
       for (const root of roots) {
         for (const el of root.querySelectorAll("*")) {
           const direct = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
@@ -128,15 +125,50 @@ for (const theme of themes) {
         }
       }
       return out;
+    }, selectors);
+
+for (const theme of themes) {
+  test(`${theme}: visible text in the header, dock and footer meets 4.5:1 against its background`, async () => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ colorScheme: theme });
+    expect(await textContrastFailures('[data-region="header"], [data-region="dock"], .shell-footer')).toEqual([]);
+  });
+}
+
+// Entering presentation mode requests fullscreen and leaving exits it, both asynchronously. Wait for each to settle:
+// a viewport resize is refused while the window is fullscreen, and a late fullscreenchange would end a new session.
+const enterPresentation = async () => {
+  await page.locator("#presentation-btn").click();
+  await expect(page.locator("body")).toHaveClass(/presentation-mode/);
+  await page.waitForFunction(() => document.fullscreenElement !== null, null, { timeout: 2000 }).catch(() => {});
+};
+const leavePresentation = async () => {
+  await expect(page.locator("body")).not.toHaveClass(/presentation-mode/);
+  await page.waitForFunction(() => document.fullscreenElement === null);
+};
+
+for (const frame of frames.filter(f => f.name !== "1024x768")) {
+  test(`presentation mode ${frame.name}: the exit button ends the mode and is not covered by the dock`, async () => {
+    await page.setViewportSize({ width: frame.width, height: frame.height });
+    await enterPresentation();
+    await expect(page.locator("body")).toHaveClass(/show-exit-btn/);
+    const hit = await page.evaluate(() => {
+      const r = document.querySelector("#exit-presentation-btn").getBoundingClientRect();
+      const el = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return el?.closest("#exit-presentation-btn") ? "button" : el?.className || el?.tagName;
     });
-    expect(failures).toEqual([]);
+    expect(hit, "element at the center of the exit button").toBe("button");
+    await page.locator("#exit-presentation-btn").click({ timeout: 3000 });
+    await leavePresentation();
+    await enterPresentation();
+    await page.keyboard.press("Escape");
+    await leavePresentation();
   });
 }
 
 test("presentation mode: the stage fills the window, the dock readout and the footer stay visible, the header hides", async () => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.locator("#presentation-btn").click();
-  await expect(page.locator("body")).toHaveClass(/presentation-mode/);
+  await enterPresentation();
   const [stage, dock, footer] = await Promise.all([boxOf(page, "stage"), boxOf(page, "dock"), page.locator(".shell-footer").boundingBox()]);
   await expect(page.locator('[data-region="header"]')).toBeHidden();
   expect(stage.height).toBeCloseTo(900, 0);
@@ -145,8 +177,12 @@ test("presentation mode: the stage fills the window, the dock readout and the fo
   expect(footer, "footer watermark stays visible").not.toBeNull();
   expect(dock.x + dock.width).toBeLessThanOrEqual(1440.5);
   expect(footer.y + footer.height).toBeLessThanOrEqual(900.5);
+  for (const theme of themes) {
+    await page.emulateMedia({ colorScheme: theme });
+    expect(await textContrastFailures(".shell-footer"), `${theme} footer in presentation mode`).toEqual([]);
+  }
   await page.keyboard.press("Escape");
-  await expect(page.locator("body")).not.toHaveClass(/presentation-mode/);
+  await leavePresentation();
 });
 
 test("no page errors while measuring", () => {
