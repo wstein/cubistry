@@ -12,7 +12,8 @@ with eight body IDs, 24 sticker IDs, fixed local normals and up vectors, and a
 complete initial physical target. Changing design or choosing Start new session
 explicitly creates a new physical puzzle and clears history after the active
 legal turn finishes. It never changes an old puzzle's print during motion.
-There is no session persistence or upload feature.
+Your own pictures (see "Your own pictures" below) are a further design, created in this
+browser only. There is no session persistence.
 
 The 18 buttons and notation field accept only R/L/U/D/F/B with an optional prime
 or 2. Unsupported or mixed invalid words are rejected before motion. Keyboard
@@ -196,6 +197,71 @@ current. `node scripts/check-pastel-garden-tiles.mjs` cuts the size-2 stickers o
 `--sizes` also reports the same measures for sizes 3 to 7 as information. The unit tests
 pin each face by SHA-256 and reject text, images, scripts, styles, gradients, filters,
 clipping paths, `url()`, `data:` and `@import` content.
+
+### Your own pictures, suitability and template
+
+The Pictures panel of [playground.html](../playground.html) (closed by default, so the controls do not
+move) holds three tools. All of them run in the browser; nothing is uploaded to a server.
+
+**Face set model.** An upload produces the same `FaceSet` as a built-in theme (`id` `upload`, six face
+sources with URL, format, SHA-256 and pixel size). `sliceFaceSet`, the suitability measures and rendering
+never look at where a set came from. `createDesign("upload", set)` builds the design (print
+`playground_upload_v1`).
+
+**Upload.** PNG or SVG. Either choose six files named `F`, `B`, `L`, `R`, `U`, `D` (case-insensitive,
+`F.png`, `u.svg`), or one net image in the standard cross (U above F; L F R B in one row; D below F). A
+net is recognized by its 4:3 aspect (within 2 percent) and cut into six faces at the boundaries
+k·width/4 and k·height/3 (PNG: rounded to whole pixels; SVG: exact user units, never rounded); cells are
+stretched to square faces in both formats. Any other aspect leaves the slots as they are and asks for a manual
+assignment. The six slots of a small net also accept a file each by
+click, keyboard (Enter on a focused slot) or drag and drop. A face must be square. The format is decided by
+content, not by file name. When all six faces are present the pictures load as the design "Your pictures";
+changing or removing them starts a new session like any design change. Replacing is atomic: all files of a
+selection are read first and the slots change only after the new set has loaded; a failure (an unreadable
+file, a face that is too large once cleaned, a failed load) is shown in the panel and leaves the slots and the
+active design as they were. Changes and "Remove my pictures" run one after another in the order made. The
+print id contains a hash of the six face hashes (`playground_upload_<hash>_v1`), so different pictures never
+share one.
+
+**Limits.** 5 MB per file, 20 MB per selection, at most six files, PNG at most 4096 pixels per side
+(validated from the header and again by decoding). Faces are kept at no more than 1024 pixels per side; a
+PNG is always decoded and drawn again, so metadata chunks are dropped. The asset loader has a separate
+in-memory path for these bytes: URLs under `/uploaded/` are never fetched; the loader recomputes the
+SHA-256 against the manifest, re-applies size and signature checks and decodes through a blob URL that it
+revokes right after decoding. Built-in assets keep the same-origin, hash-pinned fetch path unchanged, and an
+`/uploaded/` URL without a local source fails closed.
+
+**SVG safety.** The checks run in a Worker (`svg-worker.ts`), which is terminated after 8 seconds; all
+patterns are linear-time and numeric attributes are capped at 64 characters before any pattern runs, with
+regression tests that bound the time of the known pathological inputs. Uploaded SVG is untrusted. [`svg-sanitize.ts`](../packages/cube-assets/src/svg-sanitize.ts)
+tokenizes it without the DOM, checks every element and attribute against an allowlist and serializes the
+result again; only that output is kept, loaded through `<img>` or a blob URL, never inlined into the page,
+and the loader re-checks that its bytes are in canonical sanitized form. Rejected (whole file):
+DOCTYPE/ENTITY and unknown entities, processing instructions, `script`, `foreignObject`, `iframe`,
+`object`, `embed`, `image` (including data: sources), `use`, `a`, animation elements, `url()` that is not
+a same-document fragment, `javascript:`/`data:`/`@import`, CSS escapes, malformed or oversized input.
+Stripped (reported, the rest is kept): event-handler attributes, `href` that is not a same-document
+fragment on a gradient, unknown and namespaced attributes and elements, `style` elements, filters and
+patterns.
+
+**Suitability display.** For the selected design and a cube size 2 to 7 it shows a traffic light and counts,
+for example "12 stickers flat, 4 identical groups, 9 rotation-ambiguous", with thumbnails of the problem
+stickers. It advises only and never blocks. Each sticker is classified as flat, identical to another,
+rotation symmetric (none, 2-fold or 4-fold) or a turned copy (90, 180 or 270 degrees) of another. The pure
+measures live in [`suitability.ts`](../src/apps/playground/suitability.ts) and are shared with the
+`--sizes` mode of `scripts/check-pastel-garden-tiles.mjs`, whose output is unchanged. Only flat stickers and flat faces set the light
+(green: none; yellow: up to a quarter of the stickers; red: more, or a whole face flat). Identical, symmetric
+and turned stickers are information, not errors: they are counted, with the none, 2-fold and 4-fold symmetry
+numbers, and marked on the thumbnails (visible marks plus full sentences for screen readers). The playground
+mechanics support size 2 only, so for larger sizes the display says that the size is not playable yet and
+describes the pictures only.
+
+**Resolution.** Advice is 100 pixels per sticker, so a face needs 200 pixels for 2×2 up to 700 pixels for
+7×7. Smaller PNG faces get a warning; SVG has no such limit.
+
+**Template.** "Download PNG" and "Download SVG" give a blank net for the chosen size with the tile grid and
+the labels U, L, F, R, B, D (PNG: n·400 × n·300 pixels). The SVG passes the sanitizer unchanged and the
+template can be uploaded as a net.
 
 Actual DPR2 Chromium captures were inspected: the front mountain/lake continues
 across the four correctly oriented stickers, a side illustration remains

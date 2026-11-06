@@ -87,6 +87,10 @@ export class PlaygroundController {
     this.states = [this.state];
     viewer.configure(session.design.print, this.state, session.assets);
   }
+  /** The assets of the session currently shown (lets the app release replaced uploads). */
+  get sessionAssets() {
+    return this.session.assets;
+  }
   get snapshot() {
     return deepFreeze({
       state: this.state,

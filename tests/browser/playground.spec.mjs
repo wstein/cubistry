@@ -125,8 +125,8 @@ test("every picture theme loads on demand and starts a fresh session", async ({
   });
   await ready(page);
   const themes = (
-    await page.locator("#design option").evaluateAll((os) => os.map((o) => o.value))
-  ).filter((v) => !["classic", "picture", "pastel"].includes(v));
+    await page.locator("#design option").evaluateAll((os) => os.filter((o) => !o.disabled).map((o) => o.value))
+  ).filter((v) => !["classic", "picture", "pastel"].includes(v)); // "upload" stays disabled until pictures are added
   for (const theme of themes) {
     await page.locator("#design").selectOption(theme);
     await expect(page.locator("#cube")).toHaveAttribute("data-style", theme, {

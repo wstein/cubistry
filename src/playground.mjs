@@ -3,7 +3,8 @@ import { initHudIdle } from "./apps/shared/hud-idle.ts";
 initHudIdle();
 import { CubeViewer, BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
 import { serializeMove } from "@cubistry/cube-mechanics";
-import { createDesign, ALLOWED_MOVES } from "./apps/playground/model.ts";
+import { createDesign, ALLOWED_MOVES, UPLOAD_STYLE } from "./apps/playground/model.ts";
+import { initPictures } from "./apps/playground/pictures.ts";
 import { THEMES } from "./apps/playground/themes.ts";
 import { PlaygroundController } from "./apps/playground/controller.ts";
 const $ = (id) => document.getElementById(id);
@@ -23,8 +24,11 @@ for (const theme of THEMES) {
   option.textContent = theme.name;
   $("design").insertBefore(option, $("design").querySelector('[value="classic"]'));
 }
+// Theme loads are shared by style. Uploads never go through this map: a load is keyed by nothing but
+// its own bytes (see useUpload), so a new upload can never receive an earlier upload's pending promise.
 function loadSession(style) {
   if (sessions.has(style)) return Promise.resolve(sessions.get(style));
+  if (style === UPLOAD_STYLE) return Promise.reject(Error("no pictures have been uploaded"));
   if (!loading.has(style)) {
     const design = createDesign(style);
     loading.set(
@@ -40,6 +44,57 @@ function loadSession(style) {
   }
   return loading.get(style);
 }
+// The user's own pictures: a FaceSet like any theme plus their bytes, which only the loader's in-memory
+// path reads. A replaced upload's assets are released once the controller has left them.
+let upload = null,
+  uploadSeq = 0,
+  retired = [];
+/**
+ * Makes an upload the "Your pictures" design, or removes it (null). The pictures are loaded first and
+ * committed only when that succeeds, so a failed upload is never selectable and the previous one stays.
+ * Resolves to { ok: true } or { ok: false, error }.
+ */
+async function useUpload(next) {
+  const seq = ++uploadSeq;
+  const option = $("design").querySelector('[value="upload"]');
+  if (!next) {
+    const old = sessions.get(UPLOAD_STYLE);
+    sessions.delete(UPLOAD_STYLE);
+    if (old) retired.push(old.assets);
+    upload = null;
+    option.disabled = true;
+    if ($("design").value === UPLOAD_STYLE || controller?.snapshot.style === UPLOAD_STYLE) {
+      $("design").value = "picture";
+      designRequest++;
+      pendingDesign = null;
+      controller?.newSession(sessions.get("picture"));
+    }
+    pictures.styleChanged($("design").value);
+    return { ok: true };
+  }
+  let session;
+  try {
+    const design = createDesign(UPLOAD_STYLE, next.set),
+      assets = await loadAssets(design.assets, [design.print], undefined, import.meta.env.BASE_URL, next.local);
+    session = { design, assets };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "the pictures could not be loaded" };
+  }
+  if (seq !== uploadSeq || released) {
+    session.assets.dispose();
+    return { ok: false, error: "these pictures were replaced before they finished loading" };
+  }
+  const old = sessions.get(UPLOAD_STYLE);
+  if (old) retired.push(old.assets);
+  upload = next;
+  sessions.set(UPLOAD_STYLE, session);
+  option.disabled = false;
+  $("design").value = UPLOAD_STYLE;
+  await chooseDesign(UPLOAD_STYLE);
+  pictures.styleChanged(UPLOAD_STYLE);
+  return { ok: true };
+}
+const pictures = initPictures({ baseUrl: import.meta.env.BASE_URL, useUpload });
 async function chooseDesign(style) {
   const request = ++designRequest;
   if (sessions.has(style)) {
@@ -79,6 +134,11 @@ const manual = [
 ];
 function update() {
   if (!controller) return;
+  retired = retired.filter((assets) => {
+    if (assets === controller.sessionAssets) return true;
+    assets.dispose();
+    return false;
+  });
   const s = controller.snapshot;
   const hold = s.busy || s.frozen || pendingDesign !== null;
   $("status").textContent = pendingDesign ? "Loading the picture set…" : s.message;
@@ -149,7 +209,10 @@ $("undo").addEventListener("click", () => controller?.undo());
 $("redo").addEventListener("click", () => controller?.redo());
 $("solve").addEventListener("click", () => controller?.solve());
 $("cancel").addEventListener("click", () => controller?.cancel());
-$("design").addEventListener("change", () => void chooseDesign($("design").value));
+$("design").addEventListener("change", () => {
+  pictures.styleChanged($("design").value);
+  void chooseDesign($("design").value);
+});
 $("new-session").addEventListener("click", () =>
   controller?.newSession(sessions.get(controller.snapshot.style)),
 );
@@ -190,6 +253,7 @@ for (const el of [
   ].map($),
 ])
   el.disabled = true;
+$("pictures").inert = true; // the picture panel waits for the puzzle, like the other controls
 try {
   for (const style of ["picture", "pastel", "classic"]) await loadSession(style);
   viewer = new CubeViewer($("cube"));
@@ -238,6 +302,7 @@ try {
     }
   });
   speed();
+  $("pictures").inert = false;
   controller = new PlaygroundController(
     viewer,
     sessions.get("picture"),
@@ -267,6 +332,8 @@ addEventListener(
       }
       viewer?.destroy();
       for (const s of sessions.values()) s.assets.dispose();
+      for (const assets of retired) assets.dispose();
+      pictures.dispose();
     };
     release();
   },
