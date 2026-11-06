@@ -24,15 +24,15 @@ What still holds in the built app:
 |---|---|
 | 0 Carry with one combined counter | holds (`PairController`) |
 | 1 Rotation speed default 100 ms per HTM | holds for the minutes and seconds cubes; the tenth cube is fixed at 50 ms per QTM |
-| 2 Carry turns both cubes in parallel, one budget per cube | holds; the tenth cube is an additional third plan every second |
+| 2 Carry turns both cubes in parallel, one budget per cube | holds; the tenth cube is an additional third plan (its cube turns every 100 ms, not every second) |
 | 3 Range 00:00-59:59, ends, Countdown default 15:00 | holds (ends at 59:59.0 and 00:00.0) |
 | 4 Seconds cube has two laps, internal | holds |
-| 5 Set and Reset walk the saved period step by step | **changed**: only adjacent steps (a +1/-1 tick, or a Set to a neighbor) play the saved period word. Set, Reset and mode change are jumps solved by the 2x2 solver to a period node (`MsTimerCube.set`, `00ecde5`; at most 11 HTM per cube). `docs/MS_TIMER.md` still says "walk the saved periods turn by turn"; that sentence no longer matches the code. |
+| 5 Set and Reset walk the saved period step by step | **changed**: only adjacent steps (a +1/-1 tick, or a Set to a neighbor) play the saved period word. Set, Reset and mode change are jumps solved by the 2x2 solver to a period node (`MsTimerCube.set`, `00ecde5`; at most 11 HTM per cube was observed for the targets tested in `tests/ms-timer-gaps.test.mjs`, no source proves it: `docs/COUNTER_REUSE.md:75` limits the 11 HTM bound to solving modulo whole rotations and the adapter solves exactPhysical). Stale wording that no longer matches the code: `docs/MS_TIMER.md:44` ("walk the saved periods turn by turn") and the comments in `src/apps/ms-timer/timer.ts:36-37` and `:175` ("walk the saved periods turn by turn and never jump", "walk all cubes ... turn by turn"). Known stale comments, listed here and not edited (no app code changes in this change set). |
 | 6 E2E gating | holds as written for PRs 1-3 |
 | 7 Name and id | holds |
 | 8 Timer speed 1x only | holds |
 
-Changed in the built app against the plan text: "two cubes" and "no sub-second state" (Purpose, Proposed behavior 1-2 and 5), the title, and decision 5 as above. The "Out of scope" entry "sub-second display" is no longer true. The 2x2 solver is no longer reachable only through period walking, so the "No physical state is invented" criterion holds for ticks but is replaced by the solver's legal moves for jumps. Not covered by the research caveats in `docs/MS_COUNTER.md`: the tenth cube's Period-1 print is a separate print (sticker sheet `ms-timer-tenth-20mm-3sets`), not S3.
+Changed in the built app against the plan text: "two cubes" and "no sub-second state" (Purpose, Proposed behavior 1-2 and 5), the title, and decision 5 as above. The "Out of scope" entry "sub-second display" is no longer true. Before the three-cube change, only saved period words moved the cubes (period walking); now a Set, Reset or mode change also moves a cube through the 2x2 solver, so the "No physical state is invented" criterion holds for ticks but is replaced by the solver's legal moves for jumps. Not covered by the research caveats in `docs/MS_COUNTER.md`: the tenth cube's Period-1 print is a separate print (sticker sheet `ms-timer-tenth-20mm-3sets`), not S3.
 
 Known defect in the built app (not fixed by the reconciliation, reported): while a Countdown runs between two whole seconds, the cubes show a value one second higher than the readout (readout 00:19.5, cubes 00:20.5). Pausing, a Set, or the next boundary corrects it. A `todo` test in `tests/ms-timer-gaps.test.mjs` records it.
 
