@@ -114,7 +114,7 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
   ]) {
     await expect(page.locator("#application").getByRole("option", { name: text, exact: true })).toBeAttached();
   }
-  await expect(page.locator("#application")).toHaveValue(/^(certified|index\.html)$/);
+  await expect(page.locator("#application")).toHaveValue(/^(certified|counter\.html)$/);
   await expect(page.locator("#auto,#step,#start,#pause,#front")).toHaveCount(0);
   await page.locator("#value").fill("42");
   await page.locator("#value").press("Enter");
