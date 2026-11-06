@@ -19,7 +19,6 @@ const faces = ["F", "B", "R", "L", "U", "D"];
 const tiles = faces.flatMap((f) => [0, 1].flatMap((r) => [0, 1].map((c) => `${f}_${r}_${c}`)));
 
 // CHROMIUM_PATH optionally selects a specific browser binary (e.g. a preinstalled Chromium).
-// CHROMIUM_PATH optionally selects a specific browser binary (e.g. a preinstalled Chromium).
 const browser = await chromium.launch(
   process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH, args: ["--no-sandbox"] } : {},
 );
@@ -73,9 +72,17 @@ for (const id of tiles) {
   report(id, await measure(svg));
 }
 // Alternative Up/Down proposals (full 320x320 faces): check each of their four stickers.
+// These are the proposals written by scripts/build-pastel-garden-art.mjs (U0 and D0 are the
+// previous faces and are not checked). A missing file is an error, not a skip: an entry
+// that is intentionally absent must be removed from this list.
 for (const id of ["U1", "U2", "U3", "U4", "U5", "U5b", "D1", "D2", "D3", "D4", "D5"]) {
+  const file = new URL(`../assets/playground-pastel-proposals/${id}.svg`, import.meta.url);
   let face;
-  try { face = readFileSync(new URL(`../assets/playground-pastel-proposals/${id}.svg`, import.meta.url), "utf8"); } catch { continue; }
+  try { face = readFileSync(file, "utf8"); } catch (error) {
+    console.error(`FAIL ${id}: expected proposal file is missing or unreadable: assets/playground-pastel-proposals/${id}.svg (${error.code ?? error.message})`);
+    await browser.close();
+    process.exit(1);
+  }
   for (const [r, c] of [[0, 0], [0, 1], [1, 0], [1, 1]])
     report(`${id}_${r}_${c}`, await measure(face.replace('width="320" height="320" viewBox="0 0 320 320"', `width="160" height="160" viewBox="${c * 160} ${r * 160} 160 160"`)));
 }

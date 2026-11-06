@@ -123,6 +123,9 @@ The following third-party libraries and modules are bundled, linked, or distribu
 * **Copyright**: © 2026 Cubistry contributors.
 * **License**: AGPL-3.0-or-later.
 * **Regeneration**: Deterministically built using `node scripts/build-pastel-garden-art.mjs`.
+* **Cubistry mark and favicon**: Original marks created with Claude Design for the owner; no third-party images or fonts (`public/brand/NOTICE.txt`).
+* **Copyright**: © 2026 Cubistry contributors.
+* **License**: license to be decided by the owner.
 
 ---
 

@@ -65,13 +65,29 @@ test("404 returns null and is not retried", async () => {
   assert.equal(calls.length, 1);
 });
 test("other 4xx fail at once without retry", async () => {
-  for (const status of [400, 401, 403, 422, 429]) {
+  for (const status of [400, 401, 403, 422, 429, 500]) {
     const calls = mock([status]);
     await assert.rejects(client().api.request("pages"), {
       message: `GitHub API ${status}: pages`,
     });
     assert.equal(calls.length, 1);
   }
+});
+test("the body of a discarded 5xx response is cancelled before the retry", async () => {
+  let cancelled = 0;
+  const bodies = [
+    new ReadableStream({ cancel: () => void cancelled++ }),
+    JSON.stringify({ ok: true }),
+  ];
+  const statuses = [503, 200];
+  let call = 0;
+  globalThis.fetch = async () => {
+    const i = call++;
+    return new Response(bodies[i], { status: statuses[i] });
+  };
+  assert.deepEqual(await client().api.request("pages"), { ok: true });
+  assert.equal(call, 2);
+  assert.equal(cancelled, 1);
 });
 test("writes are not retried", async () => {
   for (const method of ["POST", "PUT", "DELETE", "PATCH"]) {
