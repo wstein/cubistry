@@ -14,7 +14,12 @@ test("built playground resolves picture tiles and authenticated solver under pro
   await page.goto("./counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.locator("#application").selectOption("playground");
-  await expect(page).toHaveURL(/\/cubistry\/playground.html$/);
+  // #238, cause UNKNOWN: after selecting the application Playwright could not read the URL within the
+  // 5 s default (`Received string: ""`, "waiting for navigation to finish"). Whole-test durations: failing
+  // runs 12.9-13.3 s, passing runs 9.2-14.8 s. This waits longer; it does not remove a cause.
+  await expect(page).toHaveURL(/\/cubistry\/playground.html$/, {
+    timeout: 15000,
+  });
   await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
   await page.locator("#notation").fill("R L'");
   await page.locator("#notation").press("Enter");
