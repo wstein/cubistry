@@ -13,6 +13,8 @@ const word = async (page, text) => {
 test("keyboard manual turns, invalid words, seeded scramble history roundtrip and exact solve in every design", async ({
   page,
 }) => {
+  // The loop below runs one full session per design; "pastel" made it three (912e48ac).
+  test.slow();
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await ready(page);
