@@ -50,7 +50,7 @@ Skill instructions are task-specific and do not override accepted project ADRs o
 - Naming-only work does not authorize a solver/application change, package publication or migration. Preserve existing `@cubistry/*` packages.
 
 ## Visual branding and theme consistency
-- **Icon and Palette Provenance**: The brand visual identity is grounded in `public/favicon.svg` (2×2 Chronocube face in berry plastic and deep navy ink).
+- **Icon and Palette Provenance**: The brand visual identity is grounded in `public/brand/cubistry-mark.svg` (logo, quarter-turn mark; dark variant `public/brand/cubistry-mark-dark.svg`) and `public/favicon.svg` (favicon, 2×2 sticker grid in berry plastic and deep navy ink; PNG set `public/favicon-16.png`, `-32.png`, `-48.png`, `public/apple-touch-icon.png` shows the mark). Minimum sizes: mark 24 px, favicon 16 px. The 512 px mark PNG files are in `docs/design/brand/`.
   - Body / Plastic Primary: `#9e0b5c` (Dark: `#7a0645`, Highlight: `#c8257e`).
   - Face / Sticker Surface: `#fffdf6`.
   - Lettering / Segments Ink: `#153b61`.
