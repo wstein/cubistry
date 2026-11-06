@@ -2,7 +2,7 @@
 id: ADR-0001
 title: Shell design tokens and the dark accent on surfaces
 type: adr
-status: proposed
+status: accepted
 created: 2026-11-06
 ---
 # ADR-0001: Shell design tokens and the dark accent on surfaces
@@ -24,8 +24,10 @@ saturated green or blue in the core shell without an ADR; the status colors `--s
 such colors.
 
 ## Decision
+Accepted by the owner on 2026-11-06, including the status colors (teal, blue) and the dark theme.
+
 - Keep the palette values unchanged and add `--mark-ink` (`#153b61` light, `#8fb4dd` dark) for the logo.
-- `--accent` marks only the primary action and the logo. In the dark theme it is used on `--surface` and `--surface-2`
+- `--accent` marks the primary action, the logo and small fills (cube-count badge, footer mark). In the dark theme it is used on `--surface` and `--surface-2`
   only for large text (20 px and up), fills and non-text parts (3:1). Small accent text sits on `--bg` (5.07:1).
   `--on-accent` on `--accent` is 7.91:1 light and 5.57:1 dark.
 - The status colors `--s-ready`, `--s-moving`, `--s-sync`, `--s-paused`, `--s-done`, `--s-warn`, `--s-error` appear only in
@@ -39,7 +41,7 @@ such colors.
 
 ## Consequences
 - Small accent text on dark panels is not allowed; the test does not detect misuse in component CSS.
-- IBM Plex Sans and Mono are self-hosted (OFL 1.1, `public/fonts/ibm-plex/`); sticker print keeps Noto Sans.
+- IBM Plex Sans and Mono are self-hosted as the complete, unmodified upstream WOFF2 files (OFL 1.1, `public/fonts/ibm-plex/`, source and checksums in `NOTICE.txt`); sticker print keeps Noto Sans.
 
 ## References
 - [Architecture decisions](index.md)
