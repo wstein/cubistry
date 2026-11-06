@@ -65,6 +65,7 @@ queue, clock, or solver. Calling the generic viewer never invents a next state.
 | --- | --- |
 | [cube-core](../packages/cube-core/res/PwCore.res) | Topology, permanent cubie/sticker/image IDs, local frames, immutable print, complete body poses, target predicates, strict schema validation |
 | [cube-mechanics](../packages/cube-mechanics/res/PwMechanics.res) | One right-handed integer rotation engine, legal move parser/AST, state transitions, source poses, exact/optical target matching, legal presentation verification |
+| [cube-appearance](../packages/cube-appearance/src/index.ts) ([docs](CUBE_APPEARANCE.md)) | Pure sticker classifier (symmetry, identical stickers, rotation twins), frozen `cubistry.appearance@2` maps, and the visual "looks solved" predicate; depends only on cube-core |
 | [cube-assets schema/codec](../packages/cube-assets/res/PwAssets.res) and [browser resolver](../packages/cube-assets/src/index.ts) | Versioned asset/document metadata, safe bounded image/font loading, integrity hashes, immutable bitmaps, lossless design/state JSON references |
 | [cube-viewer](../packages/cube-viewer/src/index.ts) | Camera, rigid cubie meshes, image materials, animation of an externally provided legal transition |
 | [CounterController](../src/apps/counter/controller.ts) | Counter goal selection, queued desired values, witnessed paths through the common state, authoritative current physical state |
