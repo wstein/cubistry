@@ -71,9 +71,9 @@ export function createTransitionOptimizer({printing,kpuzzle,KPattern,solve,corre
  const cache=new Map();
  const cachedSolve=async(pattern)=>{const k=key([pattern.patternData.CORNERS,pattern.patternData.EDGES]);if(cache.has(k))return cache.get(k);const alg=await solve(pattern);cache.set(k,alg);if(cache.size>512)cache.delete(cache.keys().next().value);return alg;};
  return {
-  async plan(from,target,fallbackWord,{maxAttempts=6,timeBudgetMs=500}={}){
-   need(Number.isInteger(maxAttempts)&&maxAttempts>=1&&maxAttempts<=6&&Number.isFinite(timeBudgetMs)&&timeBudgetMs>0,'Bounded optimizer parameters required');
-   const started=performance.now(),fallback=simplify(fallbackWord),baselineCounts=count(fallback);
+  async plan(from,target,fallbackWord,{maxAttempts=6,timeBudgetMs=5000,now=()=>performance.now()}={}){
+   need(Number.isInteger(maxAttempts)&&maxAttempts>=1&&maxAttempts<=6&&Number.isFinite(timeBudgetMs)&&timeBudgetMs>0&&typeof now==='function','Bounded optimizer parameters required');
+   const started=now(),fallback=simplify(fallbackWord),baselineCounts=count(fallback);
    need(shows(G.apply(from,fallback),target.cells),'Fallback does not reach the visible date');
    let word=fallback,method='verified-fallback',attempts=0,error=null;const candidates=[];
    try{
@@ -88,7 +88,7 @@ export function createTransitionOptimizer({printing,kpuzzle,KPattern,solve,corre
      if(solverFrame.word&&count(word).total<=20)break;
      const conjugated=solverFrame.transformation.invert().applyTransformation(relative).applyTransformation(solverFrame.transformation);
      for(const reverse of [false,true]){
-      if(attempts>=maxAttempts||performance.now()-started>=timeBudgetMs)break frames;
+      if(attempts>=maxAttempts||now()-started>=timeBudgetMs)break frames;
       attempts++;
       const solution=await cachedSolve((reverse?conjugated.invert():conjugated).toKPattern()),outer=mapWord(normalize(reverse?solution:solution.invert()),solverFrame.map);
      need(tokens(outer).every(t=>faces.includes(t[0])),'Solver returned a non-outer move');
@@ -105,7 +105,7 @@ export function createTransitionOptimizer({printing,kpuzzle,KPattern,solve,corre
      }
     }
    }catch(e){error=e.message;}
-   return {word,optimized:word!==fallback,method,counts:count(word),baselineCounts,attempts,elapsedMs:performance.now()-started,budgetExceeded:performance.now()-started>timeBudgetMs,error,candidates};
+   return {word,optimized:word!==fallback,method,counts:count(word),baselineCounts,attempts,elapsedMs:now()-started,budgetExceeded:now()-started>timeBudgetMs,error,candidates};
   },
   toPattern,
  };

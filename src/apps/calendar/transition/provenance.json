@@ -8,8 +8,8 @@
       "researchPath": "research/date-3x3/transition-optimization/planner.mjs",
       "researchSHA256": "518c38a0f3ab32dea39fed79b73b2d161c1d2a4bbe7a71536b1539272ce78776",
       "localPath": "planner.mjs",
-      "localSHA256": "9bdddf0954fe2c4dafa98e8a1490500e2e094a606db367218e8ff1179542ec57",
-      "changes": "Geometry import path changed to ./geometry.mjs; matching repairs now minimize simplified prefix joins over verified cyclic shifts and the explicitly supplied inverse-half family, with variant/offset/saving diagnostics. Original research SHA remains historical.",
+      "localSHA256": "d39892e5637074ff4444267ec08199c59c1332232a6dcb189291381640e825fe",
+      "changes": "Geometry import path changed to ./geometry.mjs; matching repairs now minimize simplified prefix joins over verified cyclic shifts and the explicitly supplied inverse-half family, with variant/offset/saving diagnostics; the candidate loop is bounded by attempts, with a 5 s wall-clock safety stop and an injectable clock. Original research SHA remains historical.",
       "verification": {
         "researchCommit": "f0f6ebb41413c6f79ddea78793e045c8ebd028f6",
         "path": "research/date-3x3/center-bound-investigation/cyclic-verification.json",

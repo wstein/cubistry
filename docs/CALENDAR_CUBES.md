@@ -100,8 +100,12 @@ optimized routes stayed at 11–41 turns. The fallback remains legal and checked
 but after a long session it can be hundreds of turns; bounding it is open work.
 The default application connects this provider to the pinned Research
 [transition optimizer](../src/apps/calendar/transition/provenance.json). It has
-a soft 500 ms search budget between at most six solver attempts and a hard
-8-second worker deadline including cold startup. Timeout, worker errors, invalid
+a search of at most six solver attempts (all three solver frames, both
+directions). The attempt count decides the route; a 5-second wall-clock guard,
+checked only before each attempt, stops the search on a very slow machine. The
+hard 8-second worker deadline covers cold startup, the direct search and the
+center portfolio, so cold startup plus attempts above 5 seconds can still
+shorten the route. Timeout, worker errors, invalid
 results, or a candidate that is not strictly shorter preserve the checked
 fallback. A single worker handles one solve and one replaceable pending request;
 no unbounded queue of solver jobs is retained. Browser restoration from the

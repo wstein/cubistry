@@ -43,7 +43,7 @@ self.onmessage = async (
       context.fallbackWord,
       {
         maxAttempts: 6,
-        timeBudgetMs: 500,
+        timeBudgetMs: 5000,
       },
     );
     let references;
