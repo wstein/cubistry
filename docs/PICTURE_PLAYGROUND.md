@@ -181,6 +181,7 @@ Registered themes:
 - `bremen`, Town Musicians: a donkey with a guitar, a dog with a drum, a cat with a tambourine and a rooster with a horn making music along a forest path, with a starry sky and a ribbon of notes above and a woodland path below.
 - `martin`, Lantern Parade: a child, a fox, a pony and an owl with a hedgehog carry lanterns through an autumn evening, with a crescent moon and flying swallows above and fallen leaves and a pond below.
 - `space`, Starry Sky: a smiling star, a rocket, a satellite and a crescent moon on a starry night, with constellations above and a rocket on a moon launch pad below.
+- `christmas`, Christmas: a gingerbread cookie, a snowman by a cottage, a reindeer under a lamp post and a teddy bear on a snowy night, with an aurora and a smiling star above and a lantern with gifts on a sled below.
 
 To add a theme: copy the six faces (`F`, `B`, `R`, `L`, `U`, `D` `.svg`) and a `NOTICE.txt`
 into `public/playground-<id>/`; run `node scripts/build-playground-theme.mjs <id>` to

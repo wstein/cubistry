@@ -147,6 +147,10 @@ The following third-party libraries and modules are bundled, linked, or distribu
 * **Copyright**: © 2026 Werner Stein; created with AI assistance (Claude, Anthropic). Attribution: Werner Stein, Cubistry.
 * **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); the SVG files are the source and are licensed under the same license.
 * **Regeneration**: The SVG files are the source; no generator is shipped. After an edit, run `node scripts/build-playground-theme.mjs space` to re-pin them.
+* **Christmas Artwork**: Six whole-face vector illustrations for the `christmas` playground theme (`public/playground-christmas/NOTICE.txt`).
+* **Copyright**: © 2026 Werner Stein; created with AI assistance (Claude, Anthropic). Attribution: Werner Stein, Cubistry.
+* **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); the committed art generator is art data under the same license.
+* **Regeneration**: Deterministically built using `node scripts/build-christmas-art.mjs`, then pinned with `node scripts/build-playground-theme.mjs christmas`.
 * **Cubistry mark and favicon**: Original marks created with Claude Design for the owner; no third-party images or fonts (`public/brand/NOTICE.txt`).
 * **Copyright**: © 2026 Cubistry contributors.
 * **License**: license to be decided by the owner.
