@@ -7,6 +7,7 @@ import * as Primitive_object from "@rescript/runtime/lib/es6/Primitive_object.js
 
 let limits = PwCore.deepFreeze({
   count: 64,
+  cropCount: 512,
   bytesPerFile: 262144,
   totalBytes: 4194304,
   pixelsPerSide: 1024,
@@ -43,7 +44,9 @@ function validateAssets(value, prints) {
   PwCore.demand(Primitive_object.equal(PwCore.field(a, "schema"), "cubistry.assets") && Primitive_object.equal(PwCore.field(a, "version"), 1.0), "Unsupported asset schema/version");
   let list = name => {
     let items = PwCore.array(PwCore.field(a, name));
-    PwCore.demand(items.length <= 64, "Invalid " + name + " list");
+    PwCore.demand(items.length <= (64 + (
+      name === "images" ? 512 : 0
+    ) | 0), "Invalid " + name + " list");
     return items.map(item => PwCore.record(item, name));
   };
   let fonts = list("fonts");
@@ -121,30 +124,50 @@ function validateAssets(value, prints) {
       case "image" :
         let format = PwCore.field(i, "format");
         PwCore.demand((Primitive_object.equal(format, "svg") || Primitive_object.equal(format, "png") || Primitive_object.equal(format, "webp")) && hash(PwCore.field(i, "sha256")), "Unsupported image format or missing integrity hash");
-        return PwCore.demand(safeAssetPath(PwCore.field(i, "url")).endsWith("." + PwCore.string(format)), "Image URL/format mismatch");
+        PwCore.demand(safeAssetPath(PwCore.field(i, "url")).endsWith("." + PwCore.string(format)), "Image URL/format mismatch");
+        let crop = PwCore.field(i, "crop");
+        if (crop === null) {
+          return;
+        }
+        let parts = PwCore.array(crop);
+        return PwCore.demand(parts.length === 4 && parts.every(v => {
+          if (typeof v === "number") {
+            return Number.isInteger(v);
+          } else {
+            return false;
+          }
+        }) && PwCore.number(parts[0]) >= 0.0 && PwCore.number(parts[1]) >= 0.0 && PwCore.number(parts[2]) > 0.0 && PwCore.number(parts[3]) > 0.0 && PwCore.number(parts[2]) <= 1024.0 && PwCore.number(parts[3]) <= 1024.0, "Invalid image crop");
       case "text" :
         let docId = PwCore.field(i, "documentId");
         PwCore.demand(PwCore.identifier(docId), "Invalid text-document reference type");
         let doc = documents.find(d => Primitive_object.equal(PwCore.field(d, "id"), docId));
         PwCore.demand(Stdlib_Option.isSome(doc), "Invalid text image reference/crop");
-        let crop = PwCore.array(PwCore.field(i, "crop"));
-        PwCore.demand(crop.length === 4 && crop.every(v => {
+        let crop$1 = PwCore.array(PwCore.field(i, "crop"));
+        PwCore.demand(crop$1.length === 4 && crop$1.every(v => {
           if (typeof v === "number") {
             return Number.isInteger(v);
           } else {
             return false;
           }
         }), "Invalid text image reference/crop");
-        let x = PwCore.number(crop[0]);
-        let y = PwCore.number(crop[1]);
-        let w = PwCore.number(crop[2]);
-        let h = PwCore.number(crop[3]);
+        let x = PwCore.number(crop$1[0]);
+        let y = PwCore.number(crop$1[1]);
+        let w = PwCore.number(crop$1[2]);
+        let h = PwCore.number(crop$1[3]);
         let d = Stdlib_Option.getOrThrow(doc, undefined);
         return PwCore.demand(x >= 0.0 && y >= 0.0 && w > 0.0 && h > 0.0 && x + w <= PwCore.number(PwCore.field(d, "width")) && y + h <= PwCore.number(PwCore.field(d, "height")), "Text crop exceeds document");
       default:
         return Stdlib_JsError.throwWithMessage("Unsupported asset kind");
     }
   });
+  let cropped = images.filter(i => {
+    if (Primitive_object.equal(PwCore.field(i, "kind"), "image")) {
+      return PwCore.field(i, "crop") !== null;
+    } else {
+      return false;
+    }
+  }).length;
+  PwCore.demand(cropped <= 512 && (images.length - cropped | 0) <= 64, "Invalid images list");
   [
     [
       "font",

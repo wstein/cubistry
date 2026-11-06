@@ -3,6 +3,9 @@
 open PwCore
 let limits = deepFreeze({
   "count": 64,
+  // Crops of shared source images (one sticker each) are counted apart from the 64 whole assets: a
+  // size-7 cube needs 6 * 7 * 7 = 294. Their pixels still count against decodedPixels one by one.
+  "cropCount": 512,
   "bytesPerFile": 262144,
   "totalBytes": 4194304,
   "pixelsPerSide": 1024,
@@ -40,7 +43,10 @@ let validateAssets = (value, prints: array<print>) => {
   )
   let list = name => {
     let items = array(field(a, name))
-    demand(items->Array.length <= 64, "Invalid " ++ name ++ " list")
+    demand(
+      items->Array.length <= 64 + (name == "images" ? 512 : 0),
+      "Invalid " ++ name ++ " list",
+    )
     items->Array.map(item => record(item, name))
   }
   let fonts = list("fonts")
@@ -127,6 +133,27 @@ let validateAssets = (value, prints: array<print>) => {
         safeAssetPath(field(i, "url"))->String.endsWith("." ++ string(format)),
         "Image URL/format mismatch",
       )
+      switch field(i, "crop") {
+      | JSON.Null => ()
+      | crop =>
+        let parts = array(crop)
+        demand(
+          parts->Array.length == 4 &&
+            parts->Array.every(v =>
+              switch v {
+              | JSON.Number(n) => integer(n)
+              | _ => false
+              }
+            ) &&
+            number(Array.getUnsafe(parts, 0)) >= 0.0 &&
+            number(Array.getUnsafe(parts, 1)) >= 0.0 &&
+            number(Array.getUnsafe(parts, 2)) > 0.0 &&
+            number(Array.getUnsafe(parts, 3)) > 0.0 &&
+            number(Array.getUnsafe(parts, 2)) <= 1024.0 &&
+            number(Array.getUnsafe(parts, 3)) <= 1024.0,
+          "Invalid image crop",
+        )
+      }
     | JSON.String("text") =>
       let docId = field(i, "documentId")
       demand(identifier(docId), "Invalid text-document reference type")
@@ -160,6 +187,13 @@ let validateAssets = (value, prints: array<print>) => {
     | _ => JsError.throwWithMessage("Unsupported asset kind")
     }
   })
+  let cropped = images
+    ->Array.filter(i => field(i, "kind") == JSON.String("image") && field(i, "crop") != JSON.Null)
+    ->Array.length
+  demand(
+    cropped <= 512 && images->Array.length - cropped <= 64,
+    "Invalid images list",
+  )
   [
     ("font", fonts),
     ("material", materials),
