@@ -1,4 +1,5 @@
 import { frontStickerPoint } from "../helpers/front-projection.mjs";
+import { canvasShot } from "../helpers/canvas-shot.mjs";
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 import { readFileSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
@@ -77,9 +78,7 @@ test("live solver selection executes fresh paths and actual rendered digits matc
       "data-value",
       String(value),
     );
-    const image = PNG.sync.read(
-      await page.locator("#cube canvas").screenshot(),
-    );
+    const image = PNG.sync.read(await canvasShot(page));
     for (const [digit, center] of [
       [Math.floor(value / 10), -0.5],
       [value % 10, 0.5],
