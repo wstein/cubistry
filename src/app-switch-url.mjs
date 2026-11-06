@@ -4,12 +4,12 @@ export const APP_SCOPED_PARAMS = ["val", "value", "duration"];
 
 /**
  * Returns the path, query and hash to show after switching from `previous` to
- * `target`. On first load (`previous` empty) or when the application does not
+ * `target`. On the startup call (`initial`) or when the application does not
  * change, the URL is returned unchanged so deep links keep working.
  */
-export function urlAfterAppSwitch(href, previous, target) {
+export function urlAfterAppSwitch(href, previous, target, initial = false) {
   const u = new URL(href);
-  if (previous && previous !== target) {
+  if (!initial && previous && previous !== target) {
     for (const key of APP_SCOPED_PARAMS) u.searchParams.delete(key);
   }
   return u.pathname + u.search + u.hash;

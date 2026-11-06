@@ -1126,7 +1126,7 @@ function checkAutoRun(app) {
   }, 400);
 }
 
-async function switchApplication(requested) {
+async function switchApplication(requested, { initial = false } = {}) {
   const targetKey = normalizeAppKey(requested);
   const externalMap = {
     "chronocube": "chronocube.html",
@@ -1143,7 +1143,7 @@ async function switchApplication(requested) {
   }
   if (application && application !== targetKey) {
     try {
-      history.replaceState(null, "", urlAfterAppSwitch(location.href, application, targetKey));
+      history.replaceState(null, "", urlAfterAppSwitch(location.href, application, targetKey, initial));
     } catch {}
   }
   if (application === "certified" && view) rememberedCounterValue = view.currentValue;
@@ -1737,7 +1737,7 @@ async function initialize() {
       ].includes(requested)
     ) {
       syncApplicationSelect(requested);
-      await switchApplication(requested);
+      await switchApplication(requested, { initial: true });
       return;
     }
     view = new CounterController(
