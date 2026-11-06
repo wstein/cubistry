@@ -8,6 +8,7 @@
 // To add a built-in theme: copy the six faces to public/playground-<id>/, run
 // `node scripts/build-playground-theme.mjs <id>` and add one entry to THEMES below.
 import type { ImageAsset } from "@cubistry/cube-assets";
+import { halloweenFaces } from "./theme-assets/halloween.ts";
 import { easterFaces } from "./theme-assets/easter.ts";
 import { christmasFaces } from "./theme-assets/christmas.ts";
 import { spaceFaces } from "./theme-assets/space.ts";
@@ -44,6 +45,7 @@ const REGISTRY = [
   { id: "space", name: "Starry Sky", faces: spaceFaces },
   { id: "christmas", name: "Christmas", faces: christmasFaces },
   { id: "easter", name: "Easter", faces: easterFaces },
+  { id: "halloween", name: "Halloween", faces: halloweenFaces },
 ] as const satisfies readonly FaceSet[];
 /** Literal union of the registered ids; it is what makes `Style` and `createDesign` type-checked. */
 export type ThemeId = (typeof REGISTRY)[number]["id"];

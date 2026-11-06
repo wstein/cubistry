@@ -183,6 +183,7 @@ Registered themes:
 - `space`, Starry Sky: a smiling star, a rocket, a satellite and a crescent moon on a starry night, with constellations above and a rocket on a moon launch pad below.
 - `christmas`, Christmas: a gingerbread cookie, a snowman by a cottage, a reindeer under a lamp post and a teddy bear on a snowy night, with an aurora and a smiling star above and a lantern with gifts on a sled below.
 - `easter`, Easter: a snail with a watering can, a bunny with an egg basket, a chick hatching from its egg and a sleepy lamb holding an egg, with an egg balloon and a kite above and a nest of eggs below.
+- `halloween`, Halloween: a cat in a witch hat, a smiling pumpkin, a ghost and a hanging bat on a moonlit night, with bats and a crescent moon above and a spider, candy and pumpkins below.
 
 To add a theme: copy the six faces (`F`, `B`, `R`, `L`, `U`, `D` `.svg`) and a `NOTICE.txt`
 into `public/playground-<id>/`; run `node scripts/build-playground-theme.mjs <id>` to
