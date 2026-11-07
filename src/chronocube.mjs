@@ -28,6 +28,7 @@ import { MODE_CATALOG } from "./apps/mode-catalog.ts";
 import { createRegistry } from "./apps/registry.ts";
 import { createRouter } from "./apps/router.ts";
 import { createShellHost, findShellRegions } from "./apps/shell/slot-api.ts";
+import { mountTenthControls } from "./apps/chronocube/tenth-controls.ts";
 import { PairController } from "./apps/pair/controller.ts";
 import { MsTimerCube } from "./apps/ms-timer/cube.ts";
 import { MsTimer } from "./apps/ms-timer/timer.ts";
@@ -680,7 +681,7 @@ async function initHmClockMode(isCurrent) {
 // -------------------------------------------------------------
 // Mode 4: 1/10-Second Precision Counter (1 cube)
 // -------------------------------------------------------------
-async function initTenthMode(isCurrent) {
+async function initTenthMode(isCurrent, shell) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = `
@@ -689,48 +690,17 @@ async function initTenthMode(isCurrent) {
     </article>
   `;
 
-  renderStudioHud("1/10-Second Counter", `
-    <p class="small">Period-1 {L, D, B} sequence with fast responsive stepping.</p>
-    <div class="tenth-quick-grid">
-      ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        .map((n) => `<button class="tenth-quick-btn" data-val="${n}">${n}</button>`)
-        .join("")}
-    </div>
-    <div class="tenth-step-actions">
-      <button id="tenth-step-minus5">-5 Steps</button>
-      <button id="tenth-step-plus5">+5 Steps</button>
-    </div>
-    <div class="tenth-toggle-row">
-      <label for="tenth-speed-select">Step speed</label>
-      <select id="tenth-speed-select">
-        <option value="50">50 ms (Fast)</option>
-        <option value="100" selected>100 ms (Default)</option>
-        <option value="250">250 ms</option>
-        <option value="500">500 ms</option>
-      </select>
-    </div>
-    <div class="tenth-toggle-row" style="margin-top: 8px;">
-      <label for="tenth-direction-toggle">Direction</label>
-      <select id="tenth-direction-toggle">
-        <option value="1" selected>Forward (+1)</option>
-        <option value="-1">Reverse (-1)</option>
-      </select>
-    </div>
-  `);
-
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
   const abandon = () => (viewer.destroy(), null);
 
   let manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, "words-pascal");
-  let stepInterval = 100;
-  let direction = 1;
 
   function updateViewerSpeed(intervalMs) {
     const turnDuration = tenthTurnSpeedForInterval(intervalMs);
     viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / turnDuration);
   }
-  updateViewerSpeed(stepInterval);
+  updateViewerSpeed(100);
 
   const tenth = new MsTimerTenthCube(
     viewer,
@@ -750,26 +720,11 @@ async function initTenthMode(isCurrent) {
   await tenth.configure(0);
   if (!isCurrent()) return abandon();
 
-  $("studio-controls").querySelectorAll(".tenth-quick-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      tenth.set(Number(btn.dataset.val));
-    });
-  });
-
-  $("tenth-step-plus5").addEventListener("click", () => {
-    tenth.step(5 * direction);
-  });
-  $("tenth-step-minus5").addEventListener("click", () => {
-    tenth.step(-5 * direction);
-  });
-
-  $("tenth-speed-select").addEventListener("change", (e) => {
-    stepInterval = Number(e.target.value);
-    updateViewerSpeed(stepInterval);
-  });
-
-  $("tenth-direction-toggle").addEventListener("change", (e) => {
-    direction = Number(e.target.value);
+  // Controls live in the dock slots (ModeShell): the shell removes them and their listeners when the mode ends.
+  mountTenthControls(shell, document, {
+    set: (value) => tenth.set(value),
+    step: (count) => tenth.step(count),
+    setStepInterval: updateViewerSpeed,
   });
 
   return () => {
@@ -1055,7 +1010,7 @@ const MODE_INITS = {
   clock: (isCurrent) => initClockMode(isCurrent),
   "ms-timer": (isCurrent) => initMsTimerMode(isCurrent),
   "hm-clock": (isCurrent) => initHmClockMode(isCurrent),
-  tenth: (isCurrent) => initTenthMode(isCurrent),
+  tenth: (isCurrent, _params, shell) => initTenthMode(isCurrent, shell),
   counter: (isCurrent) => initCounterMode(isCurrent),
   timer: (isCurrent) => initTimerMode(false, isCurrent),
   "five-second-timer": (isCurrent) => initTimerMode(true, isCurrent),
