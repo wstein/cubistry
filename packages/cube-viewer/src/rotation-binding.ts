@@ -59,7 +59,7 @@ export function bindSmartRotation(element: HTMLElement, root: Object3D, options:
   const toggleInfo = () => { note.hidden = !note.hidden; info.setAttribute("aria-expanded", String(!note.hidden)); };
   info.addEventListener("click", toggleInfo);
   const row = env.document.createElement("div"); row.className = "cube-appearance-hint-row"; row.append(hint, info);
-  options.panel.append(label, note, row);
+  options.panel.append(label, row, note); // DOM order = reading order: control, hint with button, details
   const refresh = () => {
     select.value = controller.mode;
     hint.textContent = controller.reducedMotion ? "Reduced motion: no inertia."
