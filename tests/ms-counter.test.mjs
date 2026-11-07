@@ -800,3 +800,19 @@ test("loadMsDesign refuses a 65,536-byte payload even with a matching hash", asy
     globalThis.fetch = original;
   }
 });
+
+test("updateManifest reinstalls the cube with the new manifest and keeps pose and value", async () => {
+  const seen = [];
+  const resolveAssets = async (manifest) => (seen.push(manifest), { dispose() {} });
+  const c = new MsController(view, s3, { id: "first" }, "S", () => {}, resolveAssets);
+  await c.configure(7);
+  const pose = c.state;
+  await c.updateManifest({ id: "second" });
+  assert.deepEqual(seen.map((m) => m.id), ["first", "second"]);
+  assert.equal(c.currentValue, 7);
+  assert.deepEqual(c.state, pose);
+  // Before configure() there is nothing to update.
+  const idle = new MsController(view, s3, {}, "M", () => {}, resolveAssets);
+  await idle.updateManifest({ id: "third" });
+  assert.equal(seen.length, 2);
+});
