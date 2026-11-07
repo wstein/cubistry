@@ -57,9 +57,9 @@ test("slotsOf lists the filled slot numbers of a mode and rejects an unknown id"
   for (const row of SLOT_MAP) assert.ok(slotsOf(row.modes[0]).every((n) => SLOT_NUMBERS.includes(n)));
 });
 
-test("migration status: every registered mode is listed; the rest of the modes are pending", () => {
+test("migration status: every registered mode is listed; only the 1/10-Second Counter has been migrated", () => {
   assert.deepEqual(Object.keys(MIGRATION).sort(), MODE_CATALOG.map((m) => m.id).sort());
   for (const status of Object.values(MIGRATION)) assert.ok(["pending", "migrated"].includes(status));
   const migrated = Object.entries(MIGRATION).filter(([, s]) => s === "migrated").map(([id]) => id);
-  assert.deepEqual(migrated, []);
+  assert.deepEqual(migrated, ["tenth"]);
 });

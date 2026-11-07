@@ -86,8 +86,11 @@ export class FakeElement {
   listenerCount(type) {
     return this._listeners.get(type)?.size ?? 0;
   }
+  fire(type) {
+    for (const fn of [...(this._listeners.get(type) ?? [])]) fn({ type, target: this });
+  }
   click() {
-    for (const fn of [...(this._listeners.get("click") ?? [])]) fn({ type: "click", target: this });
+    this.fire("click");
   }
   /** All descendant elements, depth first. */
   descendants() {
