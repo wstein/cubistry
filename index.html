@@ -1,24 +1,138 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="refresh" content="0; url=clock.html" />
-    <link rel="canonical" href="/cubistry/assets/clock-DPS9OWGx.html" />
     <link rel="icon" type="image/svg+xml" href="/cubistry/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/cubistry/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/cubistry/favicon-16.png" />
     <link rel="apple-touch-icon" href="/cubistry/apple-touch-icon.png" />
-    <title>Cubistry · Live clock</title>
-    <script>
-      const target = new URLSearchParams(location.search).get("application");
-      const dest = target
-        ? (target === "counter" ? "counter.html" : `${target}.html`)
-        : "clock.html";
-      location.replace(dest + location.search + location.hash);
-    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f3eb" />
+    <title>Cubistry</title>
+    <script type="module" crossorigin src="/cubistry/assets/index-DOck_QQc.js"></script>
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-P2Xu9kJm.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/mode-catalog-C18jqk4v.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/assets/preload-helper-D9dmXOBl.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/index-CdEIHXKU.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/chronocube-BwXdJCAG.css">
   </head>
-  <body>
-    <p>Redirecting to <a href="clock.html">Live H–M–S Clock</a>…</p>
+  <body class="chronocube-page">
+    <div class="shell" id="shell" data-view="landing">
+      <header class="shell-header" data-region="header">
+        <a class="shell-brand" href="index.html" aria-label="Cubistry home">
+          <svg class="shell-mark" viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+            <rect x="6" y="37" width="25" height="25" rx="5.5" fill="var(--mark-ink)" />
+            <rect x="34" y="38" width="23" height="23" rx="4.5" fill="#fffdf6" stroke="var(--mark-ink)" stroke-width="2" />
+            <g transform="rotate(-8 32 17.5)">
+              <rect x="6" y="5" width="25" height="25" rx="5.5" fill="var(--accent)" />
+              <rect x="33" y="5" width="25" height="25" rx="5.5" fill="var(--accent)" />
+            </g>
+          </svg>
+          <b class="shell-wordmark">Cubistry</b>
+        </a>
+        <div class="application-choice shell-switcher" data-region="app-switcher" data-app-only>
+          <label class="sr-only" for="studio-application">Application</label>
+          <select id="studio-application">
+            <option value="clock">Live H–M–S Clock (3 cubes)</option>
+            <option value="ms-timer">M/S Timer & Stopwatch (3 cubes)</option>
+            <option value="hm-clock">H–M Wall Clock (2 cubes)</option>
+            <option value="tenth">1/10-Second Counter (1 cube)</option>
+            <option value="counter">Counter 0–99 (1 cube)</option>
+            <option value="timer">60-Minute Workshop Timer (1 cube)</option>
+            <option value="five-second-timer">5-Second Precision Timer (1 cube)</option>
+            <option value="hsm-counter">H/M/S Counter 00–59 (1 cube)</option>
+            <option value="ms-counter">M/S Counter 00–59 (1 cube)</option>
+            <option value="hm-one-cube">H/M One-Cube Counter (1 cube)</option>
+            <option value="calendar7">7x7 Calendar (1 cube)</option>
+          </select>
+        </div>
+        <div class="shell-title" data-app-only>
+          <h1 id="studio-heading">Live H–M–S Clock</h1>
+          <p class="small" id="studio-subtitle">One current time. Three physical cubes.</p>
+        </div>
+        <span class="studio-mode-pill" id="studio-cube-pill" data-app-only>
+          <span class="badge" id="studio-cube-count-badge">3 CUBES</span>
+          <span id="studio-mode-label">H · M · S</span>
+        </span>
+        <a class="print-stickers-link shell-link" data-app-only id="print-stickers" href="print.html?design=words-pascal" target="_blank" rel="noopener">Print stickers</a>
+        <button type="button" class="shell-btn" id="presentation-btn" data-region="present-action" data-app-only title="Presentation Mode" aria-label="Enter presentation mode"><span class="btn-icon" aria-hidden="true">⛶</span><span class="btn-text"> Presentation</span></button>
+      </header>
+
+      <main id="landing" class="landing" aria-label="Cubistry home">
+        <section class="landing-hero" aria-label="Cubistry">
+          <div class="landing-copy">
+            <h1>Cubistry</h1>
+            <p class="landing-lede">Every digit is a puzzle cube state, reached only by legal face turns.</p>
+            <a class="landing-open" id="landing-open-clock" href="index.html?app=clock">Open Live Clock</a>
+          </div>
+        </section>
+        <section class="landing-section" aria-labelledby="landing-apps-heading">
+          <h2 id="landing-apps-heading">Apps</h2>
+          <div class="landing-tiles" id="landing-apps"></div>
+        </section>
+        <section class="landing-section" aria-labelledby="landing-cubes-heading">
+          <h2 id="landing-cubes-heading">Cubes</h2>
+          <p class="landing-note">Single cubes and designs. Each one opens large in the same view.</p>
+          <div class="landing-tiles" id="landing-cubes"></div>
+        </section>
+      </main>
+
+      <div class="shell-body">
+        <div class="shell-main" role="main">
+          <section class="shell-stage" id="studio-stage" data-region="stage" aria-label="Chronocube Studio Stage">
+            <div id="studio-scene" class="clock-viewer"></div>
+            <div id="studio-cards" class="clock-cubes" data-count="3"></div>
+            <div class="shell-hints" data-region="hints" hidden></div>
+            <button type="button" class="shell-btn shell-reference" data-region="reference-view" hidden>Reference view</button>
+            <div class="shell-presentation" data-region="presentation">
+              <button
+                type="button"
+                id="exit-presentation-btn"
+                class="presentation-exit-btn"
+                aria-label="Exit presentation mode"
+              >
+                ✕ Exit Presentation
+              </button>
+            </div>
+          </section>
+          <div class="shell-readout" data-region="readout" hidden></div>
+          <div class="shell-nerd" data-region="nerd-drawer" hidden></div>
+        </div>
+
+        <div class="shell-dock" data-region="dock" aria-label="Controls">
+          <div class="shell-status" data-region="status-zone" role="status" aria-live="polite"></div>
+          <div class="shell-primary" data-region="primary-action" hidden></div>
+          <div class="shell-slots">
+            <section class="shell-slot" data-slot="1" hidden></section>
+            <section class="shell-slot" data-slot="2" hidden></section>
+            <section class="shell-slot" data-slot="3" hidden></section>
+            <section class="shell-slot" data-slot="4" hidden></section>
+            <section class="shell-slot" data-slot="5" hidden></section>
+          </div>
+          <aside id="studio-controls" class="shell-controls" aria-label="Studio controls">
+            <!-- Dynamically populated per active mode -->
+          </aside>
+          <div class="shell-view-controls" data-region="view-controls" hidden></div>
+        </div>
+      </div>
+
+      <p id="studio-error" class="error" role="alert"></p>
+
+      <p class="small sr-only" id="studio-footer-note">
+        Chronocube Studio integrates physically realizable 2×2 twisty puzzle counters, timers, and clocks.
+        Drag the shared 3D view to inspect all cubes simultaneously.
+      </p>
+      <footer class="floating-glass-pill shell-footer" role="contentinfo">
+        <span class="pill-brand bottom-brand"><span class="brand-mark">▦</span> CUBISTRY</span>
+        <span class="pill-brand-sep bottom-brand-sep">&middot;</span>
+        <span>&copy; 2026 Werner Stein</span>
+        <span>&middot;</span>
+        <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL-3.0</a>
+        <span>&middot;</span>
+        <a href="licenses.html">Licenses</a>
+        <span>&middot;</span>
+        <a href="https://github.com/wstein/cubistry/" target="_blank" rel="noopener">GitHub ↗</a>
+      </footer>
+    </div>
   </body>
 </html>
