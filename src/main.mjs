@@ -493,12 +493,6 @@ window.addEventListener("keydown", (e) => {
     togglePresentation(false);
   }
 });
-// The compatibility event reports presentation or zoom changes, ignoring clicks.
-const hideHint = () => {
-  $("viewer-hint").hidden = true;
-};
-$("cube").addEventListener("cube-camera-change", hideHint, { once: true });
-setTimeout(hideHint, 10000);
 $("jump-form").addEventListener("submit", (event) => {
   event.preventDefault();
   action(() => {

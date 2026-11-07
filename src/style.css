@@ -176,9 +176,6 @@ body:has(#cube) main {
 #cube canvas:active {
   cursor: grabbing;
 }
-#viewer-hint {
-  display: none !important;
-}
 .cube-footer {
   padding: 8px 28px 22px;
   text-align: center;
@@ -361,11 +358,6 @@ h1 {
   }
   .cube-footer {
     padding: 10px 20px 20px;
-  }
-  #viewer-hint {
-    right: 10px;
-    bottom: 8px;
-    font-size: 11px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1308,7 +1300,6 @@ body.presentation-mode .counter-stats,
 body.presentation-mode .clock-heading,
 body.presentation-mode .clock-cubes,
 body.presentation-mode .clock-stats,
-body.presentation-mode #viewer-hint,
 body.presentation-mode #reset-clock-moves,
 body.presentation-mode .stats-summary,
 body.presentation-mode .speed-control,
