@@ -28,12 +28,11 @@ import { MsTimer } from "./apps/ms-timer/timer.ts";
 import {
   WorkshopClock,
   ONE_SECOND_TIMER,
-  FIVE_SECOND_TIMER,
   formatTimer,
   formatMsTimer,
   parseMsDuration,
 } from "./apps/timer/clock.ts";
-import { TimerController } from "./apps/timer/controller.ts";
+import { createStudioTimerController, studioTimerProfile } from "./apps/chronocube/timer-mode.ts";
 import { loadTimerRoute, loadFiveSecondRoute } from "./apps/timer/design.ts";
 import { timerMotion } from "./apps/timer/status.ts";
 import { CounterController } from "./apps/counter/controller.ts";
@@ -982,27 +981,31 @@ async function initTimerMode(fiveSecond = false) {
   viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 100);
 
   const route = fiveSecond ? await loadFiveSecondRoute(base) : await loadTimerRoute(base);
-  const spec = fiveSecond ? FIVE_SECOND_TIMER : ONE_SECOND_TIMER;
+  const spec = studioTimerProfile(fiveSecond);
   const clock = new WorkshopClock(undefined, spec);
 
   let manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont);
-  const controller = new TimerController(viewer, route, {
-    assets: manifest,
-    onState: (v, busy) => {
+  const controller = createStudioTimerController(
+    viewer,
+    route,
+    manifest,
+    (v, busy) => {
       $("timer-state").textContent = busy ? "Moving…" : "Ready";
     },
-  });
+    resolveAssets,
+  );
 
   setupAppearancePanel($("studio-scene"), async (nextManifest) => {
     await controller.updateManifest(nextManifest);
   });
 
-  const defaultSec = fiveSecond ? 5 : 900;
+  // Controller values are step buckets, not seconds.
+  const defaultSec = spec.defaultSeconds / spec.stepSeconds;
   await controller.configure(defaultSec);
 
   function update() {
     const snap = clock.snapshot();
-    $("timer-display").textContent = formatTimer(snap.bucket, spec.maxSeconds);
+    $("timer-display").textContent = formatTimer(snap.bucket, spec);
     $("timer-toggle-btn").textContent = clock.running ? "Pause" : "Start";
     $("timer-status-info").textContent = clock.running ? "Counting down…" : "Paused";
   }
