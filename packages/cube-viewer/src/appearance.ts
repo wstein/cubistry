@@ -119,7 +119,7 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     let opener: HTMLElement | null = null;
     setOpen = (open: boolean) => {
       popover.hidden = !open; disclosure.setAttribute("aria-expanded", String(open));
-      document.dispatchEvent?.(new CustomEvent("cube-appearance:state", { detail: { open } }));
+      document.dispatchEvent?.(new CustomEvent("cube-appearance:state", { detail: { open, present: true } }));
     };
     disclosure.addEventListener("click", () => { opener = null; setOpen(popover.hidden); });
     panel.addEventListener("cube-appearance:open", (event) => {
@@ -176,7 +176,7 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     setDefaultColor(color: string) { defaultColor = color; refresh(); },
     dispose() {
       panel.remove();
-      if (dock) { if (!dock.children.length) dock.hidden = true; document.dispatchEvent?.(new CustomEvent("cube-appearance:state", { detail: { open: false } })); } else host.style.position = previousPosition;
+      if (dock) { if (!dock.children.length) dock.hidden = true; document.dispatchEvent?.(new CustomEvent("cube-appearance:state", { detail: { open: false, present: false } })); } else host.style.position = previousPosition;
     },
   };
 }
