@@ -34,6 +34,29 @@ async function frame(page, app) {
     .toBeGreaterThan(before + 1);
 }
 
+async function expectClockFitsPresentation(page, lettering, width) {
+  await frame(page, "clock");
+  expect(await page.locator("html").evaluate((e) => e.scrollWidth)).toBeLessThanOrEqual(
+    width,
+  );
+  const fit = await page.evaluate(async () => {
+    const { clockStage } = await import("/src/clock.mjs");
+    const { clockBounds } = await import("/src/apps/clock/framing.ts");
+    return clockBounds.every((p) => {
+      const q = clockStage.camera.position
+        .clone()
+        .set(...p)
+        .applyMatrix4(clockStage.presentation.matrixWorld)
+        .project(clockStage.camera);
+      return Math.abs(q.x) < 0.96 && Math.abs(q.y) < 0.96;
+    });
+  });
+  expect(fit).toBe(true);
+  await page.screenshot({
+    path: `test-results/presentation-clock-${lettering}-${width}.png`,
+  });
+}
+
 for (const lettering of ["symbols", "words"])
   test(`native fullscreen presents the ${lettering} clock and restores controls without changing physical poses`, async ({
     page,
@@ -71,29 +94,12 @@ for (const lettering of ["symbols", "words"])
     });
     expect(view[0]).toBeCloseTo(0.2, 5);
     expect(view[1]).toBeCloseTo(0.16, 5);
-    for (const width of [1440, 390]) {
-      await page.setViewportSize({ width, height: 900 });
-      await frame(page, "clock");
-      expect(
-        await page.locator("html").evaluate((e) => e.scrollWidth),
-      ).toBeLessThanOrEqual(width);
-      const fit = await page.evaluate(async () => {
-        const { clockStage } = await import("/src/clock.mjs");
-        const { clockBounds } = await import("/src/apps/clock/framing.ts");
-        return clockBounds.every((p) => {
-          const q = clockStage.camera.position
-            .clone()
-            .set(...p)
-            .applyMatrix4(clockStage.presentation.matrixWorld)
-            .project(clockStage.camera);
-          return Math.abs(q.x) < 0.96 && Math.abs(q.y) < 0.96;
-        });
-      });
-      expect(fit).toBe(true);
-      await page.screenshot({
-        path: `test-results/presentation-clock-${lettering}-${width}.png`,
-      });
-    }
+    // The window cannot be resized while it is natively fullscreen (Chromium
+    // rejects Browser.setWindowBounds), so this test checks the fit at the
+    // fullscreen size; the 1440 px and 390 px widths run in the next test
+    // without native fullscreen.
+    const width = await page.evaluate(() => window.innerWidth);
+    await expectClockFitsPresentation(page, lettering, width);
     expect(await clockState(page)).toEqual(before);
     await page
       .getByRole("button", { name: "Show controls", exact: true })
@@ -106,6 +112,32 @@ for (const lettering of ["symbols", "words"])
       .poll(() => page.evaluate(() => document.fullscreenElement === null))
       .toBe(true);
     await expect(page.locator("#clock-lettering")).toBeVisible();
+    expect(await clockState(page)).toEqual(before);
+  });
+
+for (const lettering of ["symbols", "words"])
+  test(`presented ${lettering} clock fits the viewport at desktop and mobile widths`, async ({
+    page,
+  }) => {
+    // Without native fullscreen the window can be resized (see above).
+    await page.addInitScript(() => {
+      Object.defineProperty(HTMLElement.prototype, "requestFullscreen", {
+        configurable: true,
+        value: undefined,
+      });
+    });
+    await ready(page, `/clock.html?lettering=${lettering}`);
+    const before = await clockState(page);
+    await page.getByRole("button", { name: "Present", exact: true }).click();
+    await expect(page.locator("body")).toHaveAttribute(
+      "data-presentation",
+      "true",
+    );
+    await page.getByRole("button", { name: "Reference view" }).click();
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expectClockFitsPresentation(page, lettering, width);
+    }
     expect(await clockState(page)).toEqual(before);
   });
 
