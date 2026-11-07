@@ -1,0 +1,59 @@
+{
+  "status": "research candidate, not certified",
+  "repository": "wstein/cubistry",
+  "branch": "research/commit-pure-split-chain-2028",
+  "commit": "0690b1c5034b1c11427adffa84f2b331a052813e",
+  "commitNote": "This is the head of the S0 branch research/commit-pure-split-chain-2028 (pull request #292). The research branch is merged by rebase, which rewrites commit ids: update branch and commit with `node scripts/prepare-calendar7.mjs --pin <merged commit> --branch research/cube-display-feasibility` once the pull request is merged. The SHA-256 values below do not change.",
+  "chain": {
+    "format": "cubistry.calendar7.chain.v1",
+    "root": "2028-01 (display 25)",
+    "last": "2076-01",
+    "edges": 576,
+    "notCovered": "2099-12 is not reached; 2026-11..2027-12 are not in this chain",
+    "receiptStatus": "VALID_CONTINUOUS_CHAIN 576 218 294 49 (Julia and Flix, byte-identical receipts)"
+  },
+  "provenance": {
+    "workflow": ".github/workflows/pure-split-chain.yml",
+    "run": 42338197349,
+    "artifact": "psc-chain-42338197349-s4",
+    "lineage": [
+      42177775429,
+      42229311160,
+      42297036432,
+      42338197349
+    ],
+    "inputs": {
+      "start_year": 2028,
+      "start_month": 1,
+      "edges_per_job": 36,
+      "jobs": 4
+    },
+    "researchRef": "743e17d035dae11787acc3cf02c88c3b22942f4d"
+  },
+  "sources": {
+    "research/calendar-7x7/pure-split-states/evidence/print-pure-A.tsv": "425e647b29ec28fec29ea719b9074ad3b6977e2b95aea8f7e458f85270042784",
+    "research/calendar-7x7/pure-split-states/evidence/chain-2028-2076.moves.tsv": "34925dacbc356c243bf5fddd9fa999e4581d0b5eab42bd84a1726157144a88e0",
+    "research/calendar-7x7/pure-split-states/evidence/receipts/chain-2028-2076.julia.tsv": "696d78087767e3a66892d845f375c67d93d241272330328611aba0b81a8bc655",
+    "research/calendar-7x7/pure-split-states/evidence/receipts/chain-2028-2076.flix.tsv": "696d78087767e3a66892d845f375c67d93d241272330328611aba0b81a8bc655",
+    "research/calendar-7x7/pure-split-states/evidence/chain-2028-2076-edges.tsv": "51d9565b4738c00cf558768c58cd3a9183cfb1cd041cbeb906f9a4885b680700",
+    "research/calendar-7x7/pure-split-states/evidence/dag-all.tsv.gz": "ec74769c335722f45165e9061c56375af62fd187fcd5a17042d9683d732c1d88",
+    "research/calendar-7x7/pure-split-states/pure_chain.jl": "4c2ddf0f9ce7771794a005baf69b0bd3971f76659e5fdb4bec86f348b81c406a",
+    "research/calendar-7x7/pure-split-states/pure_common.jl": "8e3aecd60cc888de28ae8e7c18cddfcf390b9f123a0e59f3322c42e6d1b8d0a4",
+    "research/calendar-7x7/pure-split-states/stacked_common.jl": "1acefbd32b1e56221f3b84c1a17e0e7820228bab84fb53edee0e9e9051785312"
+  },
+  "copies": {
+    "research/calendar-7x7/pure-split-states/evidence/print-pure-A.tsv": "data/calendar7/research/print-pure-A.tsv",
+    "research/calendar-7x7/pure-split-states/evidence/chain-2028-2076.moves.tsv": "data/calendar7/research/chain-2028-2076.moves.tsv",
+    "research/calendar-7x7/pure-split-states/evidence/receipts/chain-2028-2076.julia.tsv": "data/calendar7/research/chain-2028-2076.receipt.julia.tsv"
+  },
+  "julia": {
+    "data/calendar7/julia/root-state.tsv": "fbf48c2095bdb6a8f3f6ce767244c013d903f27946bde0f1756c4c9c367a8f14",
+    "data/calendar7/julia/displays.tsv": "40e964a096184b9080252e399efc1a66d39e98f6a4853db6301c1d6bebed7c50",
+    "scripts/calendar7/export-julia.jl": "e66a061b8bc8e93bc75c2a53858879d45c047ea242046157de27ec9424049244"
+  },
+  "runtime": {
+    "public/calendar7/state.v1.json": "82093d844d159bef7a40dd61a35439450ebb304047902f3ee42445d24da019db",
+    "public/calendar7/graph.v1.json": "5445b48646d95fd07de105a534ec3b9dbc9f232d700dd3080e4e7eacd9c9bd70",
+    "public/calendar7/displays.v1.json": "3de8812d6de80cf947ea7844b2af816d3a8cebee80bea77e202329c1aa5caf0c"
+  }
+}
