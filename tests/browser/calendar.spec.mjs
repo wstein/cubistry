@@ -308,9 +308,11 @@ test.describe("high-density calendar framing", () => {
   }) => {
     // Four fullPage screenshots at deviceScaleFactor 2 under SwiftShader took
     // 13.3, 10.9, 8.9 and 8.5+ s in CI run 42359946184 (trace of the failed
-    // test), plus about 29 s for load, design change and the en-3 solve. The
+    // test), plus about 18.5 s for load, design change and the en-3 solve
+    // (5.3 + 2.1 + 9.1 + 2.0 s). The
     // old 60 s budget expired inside the last screenshot (60.0 s); no
-    // assertion had failed. Budget: 4 x 15 s of screenshots + 30 s + margin.
+    // assertion had failed. Budget: 4 x 15 s of screenshots + 30 s + margin
+    // for a slower runner.
     test.setTimeout(150000);
     await page.addInitScript(() => {
       const epoch = Date.parse("2026-11-07T11:00:00Z");
