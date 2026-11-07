@@ -55,7 +55,7 @@ node .agents/skills/picture-cube-faces/examples/build-demo.mjs /tmp/demo --previ
 node .agents/skills/picture-cube-faces/scripts/check-cube-set.mjs /tmp/demo
 ```
 
-Generated demo output stays out of git (build into a temp dir). Tile previews at N = 2 are a quarter of a full-background face (30-47 KB) and exceed the 30 KB tile budget with a warning; that is expected. Tests: `node --test ".agents/skills/picture-cube-faces/tests/*.test.mjs"`; they also run in `npm test` (and so in `npm run check`). The checker end-to-end tests need Playwright's Chromium and report themselves as skipped when no browser can start (CI jobs without a browser skip them; run them locally before a hand-back).
+Generated demo output stays out of git (build into a temp dir). Tile previews at N = 2 are a quarter of a full-background face (30-47 KB) and exceed the 30 KB tile budget with a warning; that is expected. Tests: `node --test ".agents/skills/picture-cube-faces/tests/*.test.mjs"`; they also run in `npm test` (and so in `npm run check`). The checker end-to-end tests need Playwright's Chromium and report themselves as skipped when no browser can start. The `counter` CI job installs Chromium (`npx playwright install --with-deps chromium`) so they run there; elsewhere run them locally before a hand-back.
 
 ## Consumers: what the deliverable must contain
 
