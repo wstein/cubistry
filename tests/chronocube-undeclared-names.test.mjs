@@ -10,6 +10,7 @@ import ts from "typescript";
 const NAME_CODES = new Set([2304, 2552]); // Cannot find name / Did you mean (name)
 const MEMBER_CODES = new Set([2339, 2551]); // Property does not exist / Did you mean (property)
 // The file reads form controls through $(id), typed as HTMLElement; those properties exist at runtime.
+// Only 2339 is excused: 2551 means a close spelling exists on the type, which points at a typo.
 const DOM_TYPE = /on type '(?:HTML\w*Element|Element|EventTarget|Event|Node|ImportMeta)'/;
 
 test("src/chronocube.mjs uses no undeclared name and no missing method or property", () => {
@@ -32,7 +33,7 @@ test("src/chronocube.mjs uses no undeclared name and no missing method or proper
     .getSemanticDiagnostics(source)
     .filter((d) => {
       const message = ts.flattenDiagnosticMessageText(d.messageText, "\n");
-      return NAME_CODES.has(d.code) || (MEMBER_CODES.has(d.code) && !DOM_TYPE.test(message));
+      return NAME_CODES.has(d.code) || (MEMBER_CODES.has(d.code) && !(d.code === 2339 && DOM_TYPE.test(message)));
     })
     .map((d) => {
       const { line } = source.getLineAndCharacterOfPosition(d.start);
