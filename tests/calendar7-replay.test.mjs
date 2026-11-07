@@ -231,18 +231,30 @@ test("negative controls: every corruption is rejected", () => {
   // A flipped move (first move that is not a half turn).
   const k = edge0.moves.findIndex((m) => m[1] !== 2);
   const flipped = edge0.moves.map((m, i) => (i === k ? [m[0], -m[1]] : m));
-  rejects(() => run(withEdge(0, { moves: flipped })), /front differs|end hash differs/);
+  rejects(() => run(withEdge(0, { moves: flipped })), /edge 0: front differs from display 26/);
   // A changed edge: another generator in one move, metrics kept consistent.
   const changed = edge0.moves.map((m, i) => (i === k ? [(m[0] % 21) + 1, m[1]] : m));
-  rejects(() => run(withEdge(0, { moves: changed, ...metrics(changed) })), /front differs|end hash differs/);
+  rejects(() => run(withEdge(0, { moves: changed, ...metrics(changed) })), /edge 0: front differs from display 26/);
   // A whole-cube rotation substituted for a layer move, metrics kept consistent.
   const rotated = edge0.moves.map((m, i) => (i === k ? [7 * (Math.floor((m[0] - 1) / 7) + 1), m[1]] : m));
-  rejects(() => run(withEdge(0, { moves: rotated, ...metrics(rotated) })), /front differs|end hash differs/);
+  rejects(() => run(withEdge(0, { moves: rotated, ...metrics(rotated) })), /edge 0: front differs from display 26/);
   // Declared metrics that do not match the word; a truncated word.
   rejects(() => run(withEdge(0, { htm: edge0.htm + 1 })), /declared metrics differ/);
   const cut = edge0.moves.slice(0, -1);
-  rejects(() => run(withEdge(0, { moves: cut, ...metrics(cut) })), /front differs|end hash differs/);
+  rejects(() => run(withEdge(0, { moves: cut, ...metrics(cut) })), /edge 0: front differs from display 26/);
   rejects(() => run(withEdge(0, { moves: cut })), /declared metrics differ/);
+  // The end-hash guard fires only when the front is right and the hash is wrong: a correct word
+  // against a wrong target hash.
+  const wrongHash = { edges: graph.edges, nodes: graph.nodes.map((n, i) => (i === 1 ? { ...n, hash: "0".repeat(64) } : n)) };
+  rejects(() => run(wrongHash), /edge 0: end hash differs from node 1/);
+  // Month adjacency and the root display id.
+  const wrongMonth = { edges: graph.edges, nodes: graph.nodes.map((n, i) => (i === 1 ? { ...n, month: n.month % 12 + 1 } : n)) };
+  rejects(() => verifyChain(printing, pose, table, wrongMonth), /edge 0: chronological adjacency required/);
+  const wrongRootDisplay = { edges: graph.edges, nodes: graph.nodes.map((n, i) => (i === 0 ? { ...n, display: n.display % 91 + 1 } : n)) };
+  rejects(() => verifyChain(printing, pose, table, wrongRootDisplay), /node 0 names the wrong display/);
+  // Not falsifiable here: the two inverse-restoration checks (per edge and for the whole chain).
+  // They hold for any word because a move and its inverse always cancel in this engine, so
+  // only a corrupted engine could trip them; the unit test of the generators covers that.
   // A changed print: one sticker text differs, so the complete-state hash differs.
   const other = { ...printing, text: printing.text.map((t, i) => (i === 4 ? "Z" : t)) };
   rejects(() => run(graph, other), /retained source differs/);
