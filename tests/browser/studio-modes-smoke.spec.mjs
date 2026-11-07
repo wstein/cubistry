@@ -2,8 +2,11 @@ import { test, expect } from "@playwright/test";
 
 // Smoke test for the ten Chronocube Studio modes (src/chronocube.mjs, MODES and switchMode). Per mode it asserts the
 // observable load signals only: no text in #studio-error (switchMode writes "Failed to load mode <id>: ..." there),
-// no uncaught page error, no console.error, and one rendered canvas with a non-zero box in #studio-scene (a
-// ClockStage or a CubeViewer mounts it there).
+// no uncaught page error, no console.error, and a canvas with a non-zero box in #studio-scene. The canvas is
+// mounted when an init function starts, before its designs and controllers load, so it is no ready signal. Ready
+// is the test hook #shell[data-mode-ready=<id>], which switchMode sets after the init function resolved and
+// removes at every switch. A switch is only triggered after the previous mode is ready: switchMode has no
+// generation guard (#267), so a switch during init lets the old init write into the new mode.
 
 // Same order and ids as the <option> values of #studio-application that are not page links (chronocube.html);
 // the first test compares this list with the page.
@@ -17,10 +20,10 @@ const KNOWN_ERRORS = {
   "hm-clock": ["Invalid live clock snapshot"],
 };
 
-// On the CI runners (software GL, shared CPU) a step takes 4 to 9 times its local time, so the load wait is the
-// 25 s that shell-layout.spec.mjs uses for the same page, and a test gets the slow limit (3 x 30 s). The
+// On the CI runners (software GL, shared CPU) a step takes 4 to 9 times its local time, so the ready wait is 30 s
+// (it includes ensureProof and the design fetches), and a test gets the slow limit (3 x 30 s). The
 // all-modes test loads ten modes in one session and gets an explicit limit of 10 x 30 s.
-const LOAD_MS = 25000;
+const LOAD_MS = 30000;
 const SETTLE_MS = 1500;
 
 const watch = (page) => {
@@ -33,9 +36,10 @@ const watch = (page) => {
 };
 
 const assertLoaded = async (page, seen, id) => {
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", id, { timeout: LOAD_MS });
   await expect(page.locator("#studio-application")).toHaveValue(id);
   const canvas = page.locator("#studio-scene canvas").first();
-  await expect(canvas).toBeVisible({ timeout: LOAD_MS });
+  await expect(canvas).toBeVisible();
   await page.waitForTimeout(SETTLE_MS);
   const box = await canvas.boundingBox();
   expect(box, `${id}: canvas box`).not.toBeNull();
