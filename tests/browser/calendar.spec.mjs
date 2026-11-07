@@ -266,8 +266,8 @@ test("calendar rejects altered runtime and retains navigation", async ({
     "Calendar integrity mismatch",
   );
   await expect(page.locator("#calendar-design")).toBeDisabled();
-  await page.selectOption("#calendar-application", "clock.html");
-  await expect(page).toHaveURL(/clock.html$/);
+  await page.selectOption("#calendar-application", "ms-timer.html");
+  await expect(page).toHaveURL(/ms-timer.html$/);
 });
 test("selecting today refreshes Live and Inspecting status without moving stickers", async ({
   page,

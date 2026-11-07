@@ -5,11 +5,15 @@ async function ready(page, path) {
     Date.now = () => Date.parse("2026-10-29T04:35:42Z");
   });
   await page.goto(path);
-  await expect(page.locator("#presentation-toggle")).toBeEnabled();
+  // The clock mode of the unified view has one Present button (#presentation-btn); the calendar page has its own.
+  if (path.includes("app=clock")) {
+    await expect(page.locator("#seconds-speed")).toBeEnabled({ timeout: 30000 });
+    await expect(page.locator("#presentation-btn")).toBeEnabled();
+  } else await expect(page.locator("#presentation-toggle")).toBeEnabled();
 }
 async function clockState(page) {
   return page.evaluate(async () => {
-    const { clockUnits } = await import("/src/clock.mjs");
+    const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
     return clockUnits.map((u) => u.controller.state);
   });
 }
@@ -17,7 +21,7 @@ async function frame(page, app) {
   const before = await page.evaluate(async (app) => {
     const renderer =
       app === "clock"
-        ? (await import("/src/clock.mjs")).clockStage.renderer
+        ? (await import("/src/apps/clock/live-mode.mjs")).clockStage.renderer
         : (await import("/src/calendar.mjs")).calendarApp.viewer.renderer;
     return renderer.info.render.frame;
   }, app);
@@ -26,7 +30,7 @@ async function frame(page, app) {
       page.evaluate(async (app) => {
         const renderer =
           app === "clock"
-            ? (await import("/src/clock.mjs")).clockStage.renderer
+            ? (await import("/src/apps/clock/live-mode.mjs")).clockStage.renderer
             : (await import("/src/calendar.mjs")).calendarApp.viewer.renderer;
         return renderer.info.render.frame;
       }, app),
@@ -40,7 +44,7 @@ async function expectClockFitsPresentation(page, lettering, width) {
     width,
   );
   const fit = await page.evaluate(async () => {
-    const { clockStage } = await import("/src/clock.mjs");
+    const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
     const { clockBounds } = await import("/src/apps/clock/framing.ts");
     return clockBounds.every((p) => {
       const q = clockStage.camera.position
@@ -61,13 +65,10 @@ for (const lettering of ["symbols", "words"])
   test(`native fullscreen presents the ${lettering} clock and restores controls without changing physical poses`, async ({
     page,
   }) => {
-    await ready(page, `/clock.html?lettering=${lettering}`);
+    await ready(page, `/index.html?app=clock&lettering=${lettering}`);
     const before = await clockState(page);
-    await page.getByRole("button", { name: "Present", exact: true }).click();
-    await expect(page.locator("body")).toHaveAttribute(
-      "data-presentation",
-      "true",
-    );
+    await page.locator("#presentation-btn").click();
+    await expect(page.locator("body")).toHaveClass(/presentation-mode/);
     await expect
       .poll(() => page.evaluate(() => Boolean(document.fullscreenElement)))
       .toBe(true);
@@ -76,7 +77,7 @@ for (const lettering of ["symbols", "words"])
     await expect(page.locator("#clock-lettering")).not.toBeVisible();
     await expect(page.locator("header")).not.toBeVisible();
     await expect(page.locator("canvas")).toHaveCount(1);
-    const canvas = page.locator("#clock-scene canvas");
+    const canvas = page.locator("#studio-scene canvas");
     const box = await canvas.boundingBox();
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
@@ -88,7 +89,7 @@ for (const lettering of ["symbols", "words"])
     await page.getByRole("button", { name: "Reference view" }).click();
     await frame(page, "clock");
     const view = await page.evaluate(async () => {
-      const { clockStage } = await import("/src/clock.mjs");
+      const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
       const r = clockStage.presentation.rotation;
       return [-r.y, r.x];
     });
@@ -101,13 +102,8 @@ for (const lettering of ["symbols", "words"])
     const width = await page.evaluate(() => window.innerWidth);
     await expectClockFitsPresentation(page, lettering, width);
     expect(await clockState(page)).toEqual(before);
-    await page
-      .getByRole("button", { name: "Show controls", exact: true })
-      .click();
-    await expect(page.locator("body")).toHaveAttribute(
-      "data-presentation",
-      "false",
-    );
+    await page.keyboard.press("Escape");
+    await expect(page.locator("body")).not.toHaveClass(/presentation-mode/);
     await expect
       .poll(() => page.evaluate(() => document.fullscreenElement === null))
       .toBe(true);
@@ -126,13 +122,10 @@ for (const lettering of ["symbols", "words"])
         value: undefined,
       });
     });
-    await ready(page, `/clock.html?lettering=${lettering}`);
+    await ready(page, `/index.html?app=clock&lettering=${lettering}`);
     const before = await clockState(page);
-    await page.getByRole("button", { name: "Present", exact: true }).click();
-    await expect(page.locator("body")).toHaveAttribute(
-      "data-presentation",
-      "true",
-    );
+    await page.locator("#presentation-btn").click();
+    await expect(page.locator("body")).toHaveClass(/presentation-mode/);
     await page.getByRole("button", { name: "Reference view" }).click();
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 900 });
@@ -303,16 +296,11 @@ test("leaving presentation while a fullscreen request is pending cannot reenter 
     HTMLElement.prototype.requestFullscreen = () =>
       new Promise((resolve) => (window.completeFullscreenRequest = resolve));
   });
-  await ready(page, "/clock.html");
-  await page.getByRole("button", { name: "Present", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Show controls", exact: true })
-    .click();
+  await ready(page, "/index.html?app=clock");
+  await page.locator("#presentation-btn").click();
+  await page.keyboard.press("Escape");
   await page.evaluate(() => window.completeFullscreenRequest());
-  await expect(page.locator("body")).toHaveAttribute(
-    "data-presentation",
-    "false",
-  );
+  await expect(page.locator("body")).not.toHaveClass(/presentation-mode/);
   await expect(page.locator("#clock-lettering")).toBeVisible();
 });
 
@@ -338,12 +326,10 @@ for (const latest of ["resolved", "rejected"])
         document.dispatchEvent(new Event("fullscreenchange"));
       };
     });
-    await ready(page, "/clock.html");
-    await page.getByRole("button", { name: "Present", exact: true }).click();
-    await page
-      .getByRole("button", { name: "Show controls", exact: true })
-      .click();
-    await page.getByRole("button", { name: "Present", exact: true }).click();
+    await ready(page, "/index.html?app=clock");
+    await page.locator("#presentation-btn").click();
+    await page.keyboard.press("Escape");
+    await page.locator("#presentation-btn").click();
     await page.evaluate((latest) => {
       if (latest === "resolved") {
         window.testFullscreen = document.documentElement;
@@ -357,17 +343,9 @@ for (const latest of ["resolved", "rejected"])
       window.testFullscreen = document.documentElement;
       window.fullscreenRequests[0].resolve();
     });
-    await expect(page.locator("body")).toHaveAttribute(
-      "data-presentation",
-      "true",
-    );
+    await expect(page.locator("body")).toHaveClass(/presentation-mode/);
     expect(await page.evaluate(() => window.fullscreenExits)).toBe(0);
-    await page
-      .getByRole("button", { name: "Show controls", exact: true })
-      .click();
-    await expect(page.locator("body")).toHaveAttribute(
-      "data-presentation",
-      "false",
-    );
+    await page.keyboard.press("Escape");
+    await expect(page.locator("body")).not.toHaveClass(/presentation-mode/);
     expect(await page.evaluate(() => window.fullscreenExits)).toBe(1);
   });
