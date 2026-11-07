@@ -95,48 +95,6 @@
   margin-top: 16px;
 }
 
-/* Tenth Counter Controls in Aside */
-.tenth-quick-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin: 12px 0;
-}
-
-.tenth-quick-btn {
-  padding: 8px 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 8px;
-  border: 1px solid #c2c9bf;
-  background: #fff;
-  color: var(--color-ink-navy, #153b61);
-  cursor: pointer;
-}
-
-.tenth-quick-btn:hover {
-  background: #e9eee7;
-  border-color: #9e0b5c;
-}
-
-.tenth-step-actions {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.tenth-step-actions button {
-  flex: 1;
-}
-
-.tenth-toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 12px;
-}
-
 /* Digital Displays */
 .studio-digital-huge {
   font-size: 2.8rem;

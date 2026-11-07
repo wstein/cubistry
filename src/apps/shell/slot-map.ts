@@ -97,7 +97,7 @@ export const MIGRATION: Readonly<Record<string, MigrationStatus>> = {
   clock: "pending",
   "ms-timer": "pending",
   "hm-clock": "pending",
-  tenth: "pending",
+  tenth: "migrated",
   counter: "pending",
   timer: "pending",
   "five-second-timer": "pending",
