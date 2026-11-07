@@ -25,6 +25,6 @@ C1, C2, ... mark complete copies. Sticker IDs and face positions map every
 physical image back to the immutable application source. Setup words in the
 guide/manifest bring the completed source-pose print to readable examples.
 
-The original geometric/arranged artwork is distributed with ARTWORK-LICENSE.txt.
+The original geometric/arranged artwork is licensed under CC BY-SA 4.0, see ARTWORK-LICENSE.txt.
 Font-derived outlines, where used, additionally retain the included OFL.txt.
 No external font service or raster sticker image is required by these exports.
