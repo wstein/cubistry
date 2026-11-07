@@ -26,11 +26,30 @@ const KNOWN_ERRORS = {
 const LOAD_MS = 30000;
 const SETTLE_MS = 1500;
 
+// A switch is triggered inside the page, and the marker is logged right after the change event was dispatched.
+// The change handler runs the old mode's cleanup (clearInterval) synchronously inside the dispatch, and console and
+// pageerror events keep their order, so everything before the marker belongs to the old mode (the hm-clock error
+// can still arrive between its last assertion and the cleanup) and everything after it to the new mode. The old
+// mode's messages are not suppressed for the new one; they are cut at the cleanup. Messages logged synchronously
+// during the dispatch by the new mode's init are cut too, but a synchronous throw there lands in #studio-error,
+// which is still asserted.
+const SWITCH_MARK = "smoke-switch-marker";
+const switchTo = (page, id) =>
+  page.evaluate(([mode, mark]) => {
+    const select = document.getElementById("studio-application");
+    select.value = mode;
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    console.log(mark);
+  }, [id, SWITCH_MARK]);
+
 const watch = (page) => {
   const seen = { pageErrors: [], consoleErrors: [] };
   page.on("pageerror", (e) => seen.pageErrors.push(e.message));
   page.on("console", (m) => {
-    if (m.type() === "error") seen.consoleErrors.push(m.text());
+    if (m.text() === SWITCH_MARK) {
+      seen.pageErrors.length = 0;
+      seen.consoleErrors.length = 0;
+    } else if (m.type() === "error") seen.consoleErrors.push(m.text());
   });
   return seen;
 };
@@ -76,9 +95,7 @@ test("switching through all modes in one session loads each without errors", asy
   await page.goto(`/chronocube.html?mode=${MODES[0]}`);
   await assertLoaded(page, seen, MODES[0]);
   for (const id of MODES.slice(1)) {
-    seen.pageErrors.length = 0;
-    seen.consoleErrors.length = 0;
-    await page.selectOption("#studio-application", id);
+    await switchTo(page, id);
     await expect(page).toHaveURL(new RegExp(`[?&]mode=${id}(&|$)`));
     await assertLoaded(page, seen, id);
   }
