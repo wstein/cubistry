@@ -1,7 +1,7 @@
 /** Sticker classification for the skill: a thin adapter over `packages/cube-appearance` (owner decision D8: ONE
  * classifier, in the package; this module only prepares tiles and keeps the version-1 JSON shape the checker writes).
  * This is INFORMATION, not a verdict: the owner accepts equal-looking stickers and orientations (the cube then counts
- * as visually solved), and symmetric centers of an odd-N cube need not be turned.
+ * as visually solved), and symmetric centers of an odd-N cube need not be turned within their period (D10).
  *
  * What the package does (see docs/CUBE_APPEARANCE.md): loose level (pixel tolerance 24, share 3 percent by default),
  * order from the half and quarter turn, identical groups and rotation-twin groups by complete linkage (two stickers
@@ -25,8 +25,9 @@
  *   centers: [{ id, face, symmetry, orientationNeeded, period }]   // odd N only: the fixed center sticker of each face
  * }
  * equivalentTurns = how many of the four quarter turns look alike (1 none, 2 two-fold, 4 four-fold).
- * orientationNeeded is false for a 2-fold or 4-fold symmetric center (owner rule: such a center need not be turned);
- * it is the package's `orientationExact` (v1 meaning kept). `period` (new, additive) is the package's: a center is
+ * orientationNeeded is the version-1 flag, false for a 2-fold or 4-fold symmetric center (legacy meaning, unchanged);
+ * owner decision D10: a center need not be turned only within its period (4-fold any turn, 2-fold modulo a half turn),
+ * so read `period`. The flag is the package's `orientationExact` (v1 meaning kept). `period` (additive) is the package's: a center is
  * solved when its quarter-turn offset is right modulo `period` (4 for none, 2 for 2-fold, 1 for 4-fold). The package
  * flag `orientationNeeded` (order below 4) is stricter than the v1 flag for 2-fold centers; see docs/CUBE_APPEARANCE.md.
  * `appearanceOf` returns the package's own Classification (both levels, offsets) for callers that want cubistry.appearance@2.
@@ -108,7 +109,7 @@ export function summarize(c) {
   let line = `symmetry none ${s.none} / 2-fold ${s.twoFold} / 4-fold ${s.fourFold}; ${c.counts.identicalGroups} identical group(s) (${c.counts.identicalTiles} stickers); ${c.counts.rotationTwinGroups} rotation-twin group(s) (${c.counts.rotationTwinTiles} stickers); ${c.counts.lackDetail} lack detail`;
   if (c.centers.length) {
     const free = c.centers.filter((x) => !x.orientationNeeded).length;
-    line += `; centers: ${free} of ${c.centers.length} need no orientation`;
+    line += `; centers: ${free} of ${c.centers.length} need no orientation within their period`;
   }
   return line;
 }
