@@ -11,7 +11,7 @@ link. Entry points are relative to the site root, for example
 
 | Application | What it shows | Entry point | Documentation |
 | --- | --- | --- | --- |
-| Live H-M-S Clock | Current local time on three 2x2 cubes (hours, minutes, seconds) | `clock.html` (default) | [Live clock](LIVE_CLOCK.md) |
+| Live H-M-S Clock | Current local time on three 2x2 cubes (hours, minutes, seconds) | `index.html?app=clock` | [Live clock](LIVE_CLOCK.md) |
 | Counter 0-99 | A fixed-print 2x2 counter, 00 to 99 | `counter.html` | [Counter usage](COUNTER_USAGE.md), [cube-first controls](CUBE_FIRST_UI.md) |
 | H/M/S Counter 00-59 | One cube counting seconds, minutes or hours | `hsm-counter.html`, chooser | [H/M/S counter](HSM_COUNTER.md) |
 | H/M One-Cube Counter | One cube counting hours or minutes on print m3-SH (candidate, needs a physical reprint) | `hm-one-cube.html`, chooser | [H/M One-Cube Counter](HM_ONE_CUBE_COUNTER.md) |
@@ -33,7 +33,7 @@ prototype with six fixed physical faces and local simulated events. Open
 `status.html` directly or select it from the counter's application chooser.
 
 Pages URL: https://wstein.github.io/cubistry/. On 2026-11-01 the site
-answered HTTP 200 for `/cubistry/`, `/clock.html` and `/calendar.html` and served
+answered HTTP 200 for `/cubistry/`, `/calendar.html` and the former `clock.html` page and served
 the counter and live clock. Publication path as read from the workflows: when the
 repository variable `PAGES_PREVIEWS_ENABLED` is not `true`, the `deploy` job of
 `.github/workflows/pages.yml` publishes from main; otherwise that job is skipped
