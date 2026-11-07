@@ -64,7 +64,7 @@ test("a step plays move by move; pause, play, speed and skip to the end reach th
   await expect(progress).toHaveText(/^Turning to February 2028: move \d+ of 138$/);
   // The heading, sheet and live region already name the new month; the digest is that of the pose being turned only at the end.
   await expect(page.locator(".c7-month")).toHaveText("February 2028");
-  await page.locator('[data-c7="speed"]').selectOption("16");
+  await page.locator('[data-c7="speed"]').selectOption("8");
   await page.locator('[data-c7="play"]').click(); // Pause
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "paused");
   await expect(page.locator('[data-c7="play"]')).toHaveText("Play");
@@ -77,6 +77,9 @@ test("a step plays move by move; pause, play, speed and skip to the end reach th
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "playing");
   await page.locator('[data-c7="skip"]').click();
   await idle(page, "2028-02");
+  // The button is inactive now but keeps the keyboard focus.
+  await expect(page.locator('[data-c7="skip"]')).toBeFocused();
+  await expect(page.locator('[data-c7="skip"]')).toHaveAttribute("aria-disabled", "true");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[1].hash);
   await expect(page.locator(".c7-live")).toContainText("The cube has turned to February 2028");
   // Backward: the inverse of the previous edge; and Next during the step ends it at once.
@@ -148,4 +151,25 @@ test("at 375 px the page scrolls instead of clipping and the controls are reacha
   }
   await page.locator('[data-c7="reset"]').press("Enter");
   expect(seen).toEqual([]);
+});
+
+test("a focused control is never hidden behind the pinned cube (WCAG 2.4.11)", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  for (const [width, height] of [[1280, 1000], [1280, 800], [900, 700]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto("/index.html?app=calendar7&year=2028&month=1");
+    await idle(page, "2028-01");
+    for (const name of ["speed", "reset"]) {
+      await page.evaluate(() => {
+        const s = document.getElementById("studio-stage");
+        s.scrollTop = s.scrollHeight;
+      });
+      await page.locator(`[data-c7="${name}"]`).focus();
+      const gap = await page.evaluate((n) => {
+        const scene = document.getElementById("studio-scene").getBoundingClientRect();
+        return document.querySelector(`[data-c7="${n}"]`).getBoundingClientRect().top - scene.bottom;
+      }, name);
+      expect(gap, `${name} at ${width}x${height}`).toBeGreaterThanOrEqual(-0.5);
+    }
+  }
 });

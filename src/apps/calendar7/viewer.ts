@@ -45,8 +45,8 @@ import { BLANK_PAPER, drawSticker, PAPER, PLASTIC, TEXTURE } from "./sticker-art
 import { MoveTween } from "./tween.ts";
 
 /**
- * The presentation geometry with a lighter body: 218 bodies at the preset's three bevel segments are 570 triangles each
- * (124k in all); one segment keeps the rounded edge profile of the preset at a fifth of the cost.
+ * The presentation geometry with a lighter body: 218 bodies at the preset's three bevel segments are 588 triangles each
+ * (128,184 in all); one segment keeps the rounded edge profile of the preset at a fifth of the cost.
  */
 function lightGeometry() {
   const geometry = createPresentationGeometry();
@@ -241,6 +241,7 @@ export class Calendar7Viewer implements StageView {
         turn.dispose();
         if (completed) this.sync(after);
       },
+      performance.now(),
     );
   }
 

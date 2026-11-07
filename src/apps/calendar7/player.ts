@@ -53,7 +53,8 @@ export class StateMismatchError extends Error {
 }
 
 export const BASE_MOVE_MS = 90;
-export const SPEEDS = [0.5, 1, 2, 4, 8, 16] as const;
+/** Nominal speeds: 90 ms per move at 1x; a frame is about 17 ms, so 8x is one frame per move. */
+export const SPEEDS = [0.5, 1, 2, 4, 8] as const;
 export const DEFAULT_SPEED = 2;
 
 export interface PlayerOptions {
