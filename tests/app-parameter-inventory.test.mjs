@@ -22,6 +22,13 @@ const PAGES = ["print.html", "index.html"];
 const MAIN = "src/main.mjs";
 const row = (params, file, modes, pattern) => ({ params, file, modes, pattern });
 
+// Limits of this gate, stated plainly:
+// - `modes` is only checked for existence (registered mode, pending mode or page). It mixes the unified id of a mode
+//   with the legacy page that reads the parameter today (`index.html`, `print.html`); it does not prove that the mode
+//   reads the parameter at run time. The check is on source text, not behavior.
+// - The completeness scan below sees only lines that contain URLSearchParams, a name ending in "params", or `sp`, and
+//   a literal key. A key built at run time (hours-speed and its siblings) or read from a differently named variable
+//   is covered only by its explicit row.
 // Aliases share a row. `modes` are the ids of the modes that read the parameter today; `pattern` replaces the
 // default literal read for a key that the code builds at run time.
 const INVENTORY = [
