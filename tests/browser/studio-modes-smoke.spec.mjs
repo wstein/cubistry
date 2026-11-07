@@ -80,7 +80,7 @@ test("the mode list matches the studio select", async ({ page }) => {
 for (const id of MODES) {
   test(`mode ${id} loads without errors`, async ({ page }) => {
     const seen = watch(page);
-    await page.goto(`/chronocube.html?mode=${id}`);
+    await page.goto(`/chronocube.html?app=${id}`);
     await assertLoaded(page, seen, id);
   });
 }
@@ -88,11 +88,11 @@ for (const id of MODES) {
 test("switching through all modes in one session loads each without errors", async ({ page }) => {
   test.setTimeout(10 * 30000);
   const seen = watch(page);
-  await page.goto(`/chronocube.html?mode=${MODES[0]}`);
+  await page.goto(`/chronocube.html?app=${MODES[0]}`);
   await assertLoaded(page, seen, MODES[0]);
   for (const id of MODES.slice(1)) {
     await switchTo(page, id);
-    await expect(page).toHaveURL(new RegExp(`[?&]mode=${id}(&|$)`));
+    await expect(page).toHaveURL(new RegExp(`[?&]app=${id}(&|$)`));
     await assertLoaded(page, seen, id);
   }
 });
