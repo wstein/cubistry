@@ -81,57 +81,10 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   const popover = document.createElement("div");
   popover.className = "cube-appearance-popover hud-content";
 
-  const tabNav = document.createElement("div");
-  tabNav.className = "cube-appearance-tabs";
-  tabNav.setAttribute("role", "tablist");
-  tabNav.style.display = "none";
-
-  const tabStickersBtn = document.createElement("span");
-  tabStickersBtn.className = "cube-appearance-tab active";
-  tabStickersBtn.setAttribute("role", "tab");
-  tabStickersBtn.setAttribute("tabindex", "0");
-  tabStickersBtn.setAttribute("aria-selected", "true");
-  tabStickersBtn.textContent = "Stickers & Type";
-
-  const tabViewportBtn = document.createElement("span");
-  tabViewportBtn.className = "cube-appearance-tab";
-  tabViewportBtn.setAttribute("role", "tab");
-  tabViewportBtn.setAttribute("tabindex", "0");
-  tabViewportBtn.setAttribute("aria-selected", "false");
-  tabViewportBtn.textContent = "3D & Viewport";
-
-  tabNav.append(tabStickersBtn, tabViewportBtn);
-
-  const stickersSection = document.createElement("div");
-  stickersSection.className = "cube-appearance-section cube-appearance-stickers";
-  stickersSection.style.display = "none";
-
   const viewportSection = document.createElement("div");
   viewportSection.className = "cube-appearance-section cube-appearance-viewport";
   viewportSection.style.display = "flex";
-
-  const switchTab = (tab: "stickers" | "viewport") => {
-    tabStickersBtn.className = `cube-appearance-tab${tab === "stickers" ? " active" : ""}`;
-    tabStickersBtn.setAttribute("aria-selected", String(tab === "stickers"));
-    tabViewportBtn.className = `cube-appearance-tab${tab === "viewport" ? " active" : ""}`;
-    tabViewportBtn.setAttribute("aria-selected", String(tab === "viewport"));
-    stickersSection.style.display = tab === "stickers" ? "block" : "none";
-    viewportSection.style.display = tab === "viewport" ? "flex" : "none";
-  };
-
-  const bindTabEvents = (el: HTMLElement, tab: "stickers" | "viewport") => {
-    el.addEventListener("click", () => switchTab(tab));
-    el.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        switchTab(tab);
-      }
-    });
-  };
-  bindTabEvents(tabStickersBtn, "stickers");
-  bindTabEvents(tabViewportBtn, "viewport");
-
-  popover.append(tabNav, stickersSection, viewportSection);
+  popover.append(viewportSection);
 
   const label = document.createElement("label"); label.textContent = "Construction ";
   const mode = document.createElement("select"); mode.setAttribute("aria-label", "Cube construction");
@@ -170,12 +123,8 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
           text.includes("display") ||
           text.includes("letter") ||
           text.includes("marker");
-        if (isSticker) {
-          stickersSection.append(node);
-          tabNav.style.display = "flex";
-          switchTab("stickers");
-        } else if (node.className === "cube-appearance-more-item") {
-          moreBody.append(node);
+        if (isSticker || node.className === "cube-appearance-more-item") {
+          moreBody.append(node); // Sticker fonts and lighting rows are rarely changed: under "More", no tabs.
         } else if (viewportSection.insertBefore) {
           viewportSection.insertBefore(node, more); // Primary controls stay ahead of "More" in DOM order.
         } else {
