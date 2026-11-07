@@ -1,4 +1,5 @@
 import { TimerController } from "../timer/controller.ts";
+import type { WorkshopClock } from "../timer/clock.ts";
 import { FIVE_SECOND_TIMER, TEN_SECOND_TIMER, formatTimer, type TimerProfile } from "../timer/clock.ts";
 import type { TimerRoute } from "../timer/design.ts";
 import type { AssetManifest, loadAssets } from "@cubistry/cube-assets";
@@ -27,4 +28,33 @@ export function studioTimerDefaultBucket(profile: TimerProfile): number {
 /** mm:ss readout of a clock bucket for the mode's profile. */
 export function studioTimerReadout(bucket: number, profile: TimerProfile): string {
   return formatTimer(bucket, profile);
+}
+
+/** What the Studio timer drives: a clock and one cube controller. */
+export interface StudioTimerParts {
+  clock: WorkshopClock;
+  controller: TimerController;
+  /** Move duration in ms for the next turns. */
+  setDuration: (durationMs: number) => void;
+}
+
+/** Start, Pause, Reset and the periodic tick of the Studio timer modes. */
+export class StudioTimerDriver {
+  private readonly parts: StudioTimerParts;
+  constructor(parts: StudioTimerParts) {
+    this.parts = parts;
+  }
+  start(): void {
+    this.parts.clock.start();
+  }
+  pause(): void {
+    this.parts.clock.pause();
+  }
+  reset(): void {
+    this.parts.clock.reset();
+    this.parts.controller.request(this.parts.clock.snapshot().bucket);
+  }
+  /** Called every 50 ms while the mode is shown. */
+  tick(): void {}
+  dispose(): void {}
 }
