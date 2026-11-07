@@ -46,10 +46,8 @@ blank-glyph certificate. All canonical 339-HTM/max-five guarantees still apply
 to the unchanged underlying optimized print in both screen formats.
 
 The default camera uses 10° yaw, 7° elevation, radius 10.5, and 18° vertical
-field of view. Orbit and zoom affect the camera only. The transient hint is
-hidden on a drag of at least four pixels, an actual zoom change, or ten seconds;
-a click does not dismiss it. It remains hidden until the viewer is recreated.
-Reduced motion retains immediate physical commits and requires no hint fade.
+field of view. Orbit and zoom affect the camera only. The viewer shows no
+drag-and-zoom hint. Reduced motion retains immediate physical commits.
 
 ## Related issue disposition
 
