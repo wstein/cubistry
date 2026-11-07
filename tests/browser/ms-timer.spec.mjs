@@ -63,11 +63,28 @@ test("the chooser offers the M/S Timer and the page shows three cubes: minutes, 
     "aria-label",
     /Three physical cubes/,
   );
-  const minutes = await page.locator("#ms-minutes").boundingBox(),
-    seconds = await page.locator("#ms-seconds").boundingBox(),
-    tenths = await page.locator("#ms-tenths").boundingBox();
-  expect(minutes.x).toBeLessThan(seconds.x);
-  expect(seconds.x).toBeLessThan(tenths.x);
+  // The #ms-minutes, #ms-seconds and #ms-tenths elements are screen-reader-only
+  // anchors (ms-timer.html:66, `.sr-only` clips them to 1 px at one position),
+  // so their boxes say nothing about the layout. The cubes sit in one WebGL
+  // scene; order them by the screen x of their real scene centers.
+  const screenX = await page.evaluate(async () => {
+    const { clockCentersFor } = await import("/src/apps/clock/framing.ts");
+    const mod = await import("/src/ms-timer.mjs");
+    const stage = window.__msTimerStage ?? mod.msTimerStage;
+    stage.presentation.updateMatrixWorld(true);
+    stage.camera.updateMatrixWorld(true);
+    return clockCentersFor(3).map((cx) =>
+      stage.camera.position
+        .clone()
+        .set(cx, 0, 0)
+        .applyMatrix4(stage.presentation.matrixWorld)
+        .project(stage.camera).x,
+    );
+  });
+  expect(screenX).toHaveLength(3);
+  expect(screenX[0]).toBeLessThan(screenX[1]);
+  expect(screenX[1]).toBeLessThan(screenX[2]);
+  for (const x of screenX) expect(Math.abs(x)).toBeLessThan(1);
   await expect(page.locator("#ms-minutes")).toHaveAttribute("data-value", "15");
   await expect(page.locator("#ms-seconds")).toHaveAttribute("data-value", "0");
   await expect(page.locator("#ms-tenths")).toHaveAttribute("data-value", "0");
