@@ -3,13 +3,17 @@
 // (its --sizes mode), so both use one definition of "flat", "rotation symmetric" and "identical".
 // That definition is the shared classifier in packages/cube-appearance at its LOOSE level (owner
 // decisions D3 and D8): this module keeps the traffic light and the display wording but owns no pixel
-// comparison of its own. A sticker is an SAMPLE x SAMPLE RGBA buffer (the caller renders it; this module
+// comparison of its own. Resolution: flatness and rotational symmetry are measured on the full SAMPLE x
+// SAMPLE sticker (same as the check script); only the identical and rotation-twin GROUPS, which compare
+// every pair, run on a COARSE block-average copy to keep N = 7 (294 stickers) tolerable. A sticker is an SAMPLE x SAMPLE RGBA buffer (the caller renders it; this module
 // never touches the DOM). The result ADVISES only: nothing here blocks a design, and it must not feed
 // solver decisions (solvers use the strict level or exact thresholds).
 import {
   LOOSE_THRESHOLDS,
   classifyTiles,
   detailOf,
+  differingShare,
+  rotateRgb,
   symmetryOrder,
   tileHash,
   toRgb,
@@ -34,12 +38,14 @@ export interface TileMeasure {
   readonly hash: string;
 }
 
-/** Measures one n x n RGBA sticker (n = SAMPLE unless stated) with the shared classifier. */
+/** Measures one n x n RGBA sticker (n = SAMPLE unless stated) with the shared classifier's primitives. */
 export function measureRgba(d: ArrayLike<number>, n = SAMPLE): TileMeasure {
-  const tile = { id: "sticker", side: n, data: d };
-  const rgb = toRgb(tile);
-  const [report] = classifyTiles([tile]).tiles;
-  const rotations = report.rotDiff.loose;
+  const rgb = toRgb({ id: "sticker", side: n, data: d });
+  const rotations = [1, 2, 3].map((k) => differingShare(rgb, rotateRgb(rgb, k), LOOSE_THRESHOLDS.pixelTolerance)) as [
+    number,
+    number,
+    number,
+  ];
   return { detail: detailOf(rgb), rotations, minRot: Math.min(...rotations), hash: tileHash(rgb) };
 }
 
@@ -116,11 +122,11 @@ export function analyzeStickers(stickers: readonly StickerInput[], n: number): S
   const c: Classification | null = stickers.length
     ? classifyTiles(stickers.map((s) => ({ id: s.id, side: COARSE, data: coarse(s.data, SAMPLE) })))
     : null;
-  const report = new Map((c?.tiles ?? []).map((t) => [t.id, t] as const));
   stickers.forEach((s) => {
-    // Flatness is measured on the full-size sticker, orientation and groups on the coarse copy.
-    if (detailOf(toRgb({ id: s.id, side: SAMPLE, data: s.data })) < MIN_DETAIL) flatSet.add(s.id);
-    const order = report.get(s.id)!.order.loose;
+    // Flatness and symmetry come from the full-size sticker; only the groups use the coarse copy.
+    const m = measureRgba(s.data);
+    if (isFlat(m)) flatSet.add(s.id);
+    const order = symmetryOf(m);
     if (order === 4) symmetric4.push(s.id);
     else if (order === 2) symmetric2.push(s.id);
   });
