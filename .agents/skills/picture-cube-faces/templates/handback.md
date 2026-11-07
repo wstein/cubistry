@@ -14,7 +14,7 @@ Write in English. Keep it concise. Facts first, then self-assessment.
 RESULT: ...
 ```
 
-| N | stickers | lack detail | symmetry none / 2-fold / 4-fold | identical groups | rotation-twin groups | centers needing no orientation | status |
+| N | stickers | lack detail | symmetry none / 2-fold / 4-fold | identical groups | rotation-twin groups | centers needing no orientation within their period (D10) | status |
 |---|---|---|---|---|---|---|---|
 | 2 | 24 | | | | | n/a | strict |
 | 3 | 54 | | | | | | report only |
