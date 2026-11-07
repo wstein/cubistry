@@ -29,7 +29,7 @@ states exists yet. This is why the status stays "research candidate, not certifi
 | A chain of 576 month-to-month edges from **January 2028** to **January 2076**, one physical state kept throughout | Anything before 2028-01, in particular **2026-11 to 2027-12** (today's date is outside the chain) |
 | All 91 display types (7 start weekdays × 13 month types) occur on the chain | **2076-02 to 2099-12**: the chain does not reach 2099-12 yet; 287 more edges are still to be produced |
 | The display sheets of all 888 months 2026 to 2099 | A route from a solved cube to the chain root: no practical setup route exists |
-| Replay, hash equality with the research receipts, inverse restoration, front check | Shortcut or star routes: every jump would be a walk along the chain (median about 3,000 moves) |
+| Replay, hash equality with the research receipts, inverse restoration, front check | Shortcut or star routes: every jump would be a walk along the chain |
 | | Any user interface, optimizer, solver, sticker sheet or physical build instruction |
 
 ### Start state
@@ -80,12 +80,16 @@ The test replays every edge on the 294-sticker model, requires the complete-stat
 of every node to equal the Research receipt (the receipt it produces is byte-identical
 to the Julia receipt), restores every edge and the whole chain by its inverse, checks
 every front against the display sheet, and requires an independent month-sheet
-generator to equal the Julia display table for all 888 months. Negative controls (a
-flipped move, a changed generator, a rotation in place of a layer move, a wrong print,
-a wrong root, swapped or truncated edges, a wrong pin) must all be rejected.
+generator to equal the Julia display table for all 888 months. Negative controls must be
+rejected, each with its own error message: a flipped move, a changed generator, a rotation
+in place of a layer move, wrong declared metrics, a truncated move word, a changed print,
+the neighboring month as root, edges out of chain order, a node count that does not match
+the edge count, a wrong display id, a tampered display cell (at the root and at an edge
+target), a wrong ink and a quarter-turned plain sticker on the front, and a wrong pin.
 
-Regenerate the Julia exports (Julia 1.10, a checkout of the pinned research commit at
-`$RESEARCH`):
+Regenerate the Julia exports with Julia 1.13 as in `mise.toml` (the committed exports were
+produced with Julia 1.10.5; they are plain text) and a checkout of the pinned research
+commit at `$RESEARCH`:
 
 ```sh
 PURE=$RESEARCH/research/calendar-7x7/pure-split-states
