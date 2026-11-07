@@ -124,7 +124,7 @@ Facts read from the repository at `eb1dcce3`; the run-time behavior is `UNKNOWN`
 - Issues #219 and #218: M/S Timer plan reconciliation and countdown offset; see [M/S Timer plan](ms-timer.md).
 - Issue #190: Cubacle WASM replacement; see [plan](cubacle-wasm-replacement.md).
 
-## Appendix: URL parameters read by the code (origin/main `7dae282`)
+## Appendix: URL parameters read by the code (origin/main `7dae282`; the `mode` row and the `chronocube.html` line numbers re-read at the head of the stage 2 stack)
 Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `src/` and the HTML entry points. Parameters read through helpers not matched by pattern may be missing; the inventory test of stage 4 closes that gap.
 
 | Parameter | Read at | Page or script |
