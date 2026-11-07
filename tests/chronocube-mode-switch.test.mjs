@@ -18,6 +18,31 @@ test("a switch runs the previous mode's cleanup once and reports the new mode as
   assert.deepEqual(log, ["a", "b"]);
 });
 
+test("an init that resolves after a newer switch runs its own cleanup and does not replace the active cleanup", async () => {
+  const sw = createModeSwitcher();
+  const slow = deferred();
+  const log = [];
+  const first = sw.switchTo(() => slow.promise);
+  const second = await sw.switchTo(async () => () => log.push("new"));
+  assert.equal(second, true);
+  slow.resolve(() => log.push("stale"));
+  assert.equal(await first, false);
+  assert.deepEqual(log, ["stale"]);
+  await sw.switchTo(async () => () => {});
+  assert.deepEqual(log, ["stale", "new"]);
+});
+
+test("an init that fails after a newer switch does not report its error", async () => {
+  const errors = [];
+  const sw = createModeSwitcher((err) => errors.push(err.message));
+  const slow = deferred();
+  const first = sw.switchTo(() => slow.promise);
+  await sw.switchTo(async () => () => {});
+  slow.reject(new Error("old mode failed"));
+  assert.equal(await first, false);
+  assert.deepEqual(errors, []);
+});
+
 test("an init that fails while current reports its error", async () => {
   const errors = [];
   const sw = createModeSwitcher((err) => errors.push(err.message));
