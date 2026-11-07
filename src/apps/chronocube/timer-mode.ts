@@ -1,12 +1,6 @@
 import { TimerController } from "../timer/controller.ts";
 import { TimerScheduler } from "../timer/scheduler.ts";
-import type { WorkshopClock } from "../timer/clock.ts";
-import {
-  FIVE_SECOND_TIMER,
-  TEN_SECOND_TIMER,
-  formatTimer,
-  type TimerProfile,
-} from "../timer/clock.ts";
+import { FIVE_SECOND_TIMER, TEN_SECOND_TIMER, formatTimer, type TimerProfile, type WorkshopClock } from "../timer/clock.ts";
 import type { TimerRoute } from "../timer/design.ts";
 import type { AssetManifest, loadAssets } from "@cubistry/cube-assets";
 
@@ -32,10 +26,7 @@ export function studioTimerDefaultBucket(profile: TimerProfile): number {
 }
 
 /** mm:ss readout of a clock bucket for the mode's profile. */
-export function studioTimerReadout(
-  bucket: number,
-  profile: TimerProfile,
-): string {
+export function studioTimerReadout(bucket: number, profile: TimerProfile): string {
   return formatTimer(bucket, profile);
 }
 
@@ -45,6 +36,8 @@ export interface StudioTimerParts {
   controller: TimerController;
   /** Move duration in ms for the next turns. */
   setDuration: (durationMs: number) => void;
+  /** Receives errors thrown by the periodic tick; defaults to console.error. */
+  onError?: (err: Error) => void;
 }
 
 /** Preferred move duration (ms) of the Studio timer cube; the scheduler shortens it when a deadline needs it. */
@@ -68,6 +61,7 @@ export class StudioTimerDriver {
   pause(): void {
     this.parts.clock.pause();
     this.reconcile();
+    this.tick();
   }
   reset(): void {
     this.parts.clock.reset();
@@ -75,17 +69,17 @@ export class StudioTimerDriver {
   }
   /** Called every 50 ms while the mode is shown: moves the cube toward the clock's bucket and next boundary. */
   tick(): void {
-    const { clock, controller, setDuration } = this.parts;
-    this.scheduler.tick(
-      clock.snapshot(),
-      controller,
-      STUDIO_TIMER_MOVE_MS,
-      setDuration,
-    );
+    try {
+      const { clock, controller, setDuration } = this.parts;
+      this.scheduler.tick(clock.snapshot(), controller, STUDIO_TIMER_MOVE_MS, setDuration);
+    } catch (e) {
+      (this.parts.onError ?? console.error)(e as Error);
+    }
   }
-  /** Drops any planned boundary move and requests the clock's current bucket. */
+  /** Drops any planned boundary move, restores the preferred duration and requests the clock's current bucket. */
   private reconcile(): void {
     this.scheduler.invalidate();
+    this.parts.setDuration(STUDIO_TIMER_MOVE_MS);
     this.parts.controller.request(this.parts.clock.snapshot().bucket);
   }
   dispose(): void {

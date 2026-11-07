@@ -1048,6 +1048,9 @@ async function initTimerMode(fiveSecond, isCurrent) {
     clock,
     controller,
     setDuration: (ms) => viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / ms),
+    onError: (err) => {
+      if (isCurrent()) $("studio-error").textContent = err.message;
+    },
   });
 
   $("timer-toggle-btn").addEventListener("click", () => {
