@@ -28,11 +28,15 @@ import { MsTimer } from "./apps/ms-timer/timer.ts";
 import {
   WorkshopClock,
   ONE_SECOND_TIMER,
-  formatTimer,
   formatMsTimer,
   parseMsDuration,
 } from "./apps/timer/clock.ts";
-import { createStudioTimerController, studioTimerProfile } from "./apps/chronocube/timer-mode.ts";
+import {
+  createStudioTimerController,
+  studioTimerDefaultBucket,
+  studioTimerProfile,
+  studioTimerReadout,
+} from "./apps/chronocube/timer-mode.ts";
 import { loadTimerRoute, loadFiveSecondRoute } from "./apps/timer/design.ts";
 import { timerMotion } from "./apps/timer/status.ts";
 import { CounterController } from "./apps/counter/controller.ts";
@@ -1000,12 +1004,12 @@ async function initTimerMode(fiveSecond = false) {
   });
 
   // Controller values are step buckets, not seconds.
-  const defaultSec = spec.defaultSeconds / spec.stepSeconds;
+  const defaultSec = studioTimerDefaultBucket(spec);
   await controller.configure(defaultSec);
 
   function update() {
     const snap = clock.snapshot();
-    $("timer-display").textContent = formatTimer(snap.bucket, spec);
+    $("timer-display").textContent = studioTimerReadout(snap.bucket, spec);
     $("timer-toggle-btn").textContent = clock.running ? "Pause" : "Start";
     $("timer-status-info").textContent = clock.running ? "Counting down…" : "Paused";
   }
