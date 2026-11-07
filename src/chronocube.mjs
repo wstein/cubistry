@@ -1151,6 +1151,7 @@ async function switchMode(newMode, pushHistory = true) {
 
   activeMode = newMode;
   const meta = MODES[newMode];
+  delete $("shell").dataset.modeReady; // test hook, set again below once the init function has resolved
 
   // Update header text
   $("studio-heading").textContent = meta.title;
@@ -1179,6 +1180,8 @@ async function switchMode(newMode, pushHistory = true) {
     else if (newMode === "hsm-counter") activeCleanup = await initHsmSingleMode("hsm");
     else if (newMode === "ms-counter") activeCleanup = await initHsmSingleMode("ms");
     else if (newMode === "hm-one-cube") activeCleanup = await initHsmSingleMode("hm");
+    // Test hook (tests/browser/studio-modes-smoke.spec.mjs): the mode finished initializing without an exception.
+    if (activeMode === newMode) $("shell").dataset.modeReady = newMode;
   } catch (err) {
     console.error("Failed to initialize mode:", err);
     $("studio-error").textContent = `Failed to load mode ${newMode}: ${err.message}`;
