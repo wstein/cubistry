@@ -1712,3 +1712,64 @@ body.licenses-page main.licenses-container {
   overflow-x: auto;
 }
 
+
+/* Appearance panel grouping: primary controls, short hints with an "i" button, and the "More" disclosure. */
+.cube-appearance-viewport {
+  flex-direction: column;
+}
+.cube-appearance .cube-appearance-hint {
+  margin: 0;
+}
+.cube-appearance .cube-appearance-hint-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  order: 1;
+}
+.cube-appearance .cube-appearance-viewport > p[id^="cube-rotation-note-"] {
+  order: 2;
+}
+.cube-appearance .cube-appearance-more {
+  order: 3;
+  border-top: 1px solid rgba(21, 59, 97, 0.14);
+  padding-top: 8px;
+}
+.cube-appearance .cube-appearance-more > summary {
+  display: block;
+  padding: 4px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-navy, #153b61);
+  cursor: pointer;
+  list-style: revert;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  backdrop-filter: none;
+  transform: none;
+}
+.cube-appearance .cube-appearance-more > summary::before,
+.cube-appearance .cube-appearance-more > summary::after {
+  content: none;
+}
+.cube-appearance .cube-appearance-more-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+.cube-appearance .cube-appearance-info {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1;
+}
+.cube-appearance :focus-visible {
+  outline: 2px solid var(--focus, #c8257e);
+  outline-offset: 2px;
+}

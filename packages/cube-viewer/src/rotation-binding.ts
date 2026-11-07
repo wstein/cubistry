@@ -50,9 +50,20 @@ export function bindSmartRotation(element: HTMLElement, root: Object3D, options:
     const option = env.document.createElement("option"); option.value = value; option.textContent = text; select.append(option);
   }
   const note = env.document.createElement("p"); note.id = `cube-rotation-note-${++noteSerial}`; note.style.margin = "6px 0 0";
-  select.setAttribute("aria-describedby", note.id); label.append(select); options.panel.append(label, note);
+  note.hidden = true; // The full text sits behind the visible "i" button; aria-describedby still reads it.
+  select.setAttribute("aria-describedby", note.id); label.append(select);
+  const hint = env.document.createElement("p"); hint.className = "cube-appearance-hint";
+  const info = env.document.createElement("button") as HTMLButtonElement; info.type = "button"; info.className = "cube-appearance-info";
+  info.textContent = "i"; info.title = "About view rotation"; info.setAttribute("aria-label", "About view rotation");
+  info.setAttribute("aria-controls", note.id); info.setAttribute("aria-expanded", "false");
+  const toggleInfo = () => { note.hidden = !note.hidden; info.setAttribute("aria-expanded", String(!note.hidden)); };
+  info.addEventListener("click", toggleInfo);
+  const row = env.document.createElement("div"); row.className = "cube-appearance-hint-row"; row.append(hint, info);
+  options.panel.append(label, note, row);
   const refresh = () => {
     select.value = controller.mode;
+    hint.textContent = controller.reducedMotion ? "Reduced motion: no inertia."
+      : controller.mode === "smart" ? "Returns to your last view." : controller.mode === "free" ? "No automatic return." : "No inertia, no return.";
     note.textContent = controller.reducedMotion ? "Reduced motion: inertia and automatic return are off; choosing an upright mode levels gently over 150 ms."
       : controller.mode === "smart" ? "Smart upright: views within 40° of the front stay; larger ones return to your last view after settling and a short wait that shrinks with distance."
       : controller.mode === "free" ? "Free Rotation: full rotation with inertia, without automatic return." : "Classic upright: direct rotation, without inertia or automatic return.";
@@ -106,7 +117,7 @@ export function bindSmartRotation(element: HTMLElement, root: Object3D, options:
       for (const type of ["keydown", "input", "change"]) options.panel.removeEventListener(type, panelActivity);
       for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) env.document.removeEventListener(type, panelRelease, true);
       env.window?.removeEventListener("blur", blur); env.window?.removeEventListener("focus", focus); panelPointers.clear();
-      label.remove(); note.remove(); element.style.touchAction = previousTouchAction;
+      info.removeEventListener("click", toggleInfo); label.remove(); note.remove(); row.remove(); element.style.touchAction = previousTouchAction;
     },
   };
 }

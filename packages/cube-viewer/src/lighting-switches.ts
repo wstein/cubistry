@@ -40,7 +40,7 @@ export function bindLightingSwitches(panel: HTMLElement, studio: LightingSwitchT
   const state = readLightingOptions(env.storage, key);
   const rows: HTMLElement[] = [], listeners: [HTMLInputElement, () => void][] = [];
   const add = (text: string, name: keyof LightingOptions, apply: (on: boolean) => void) => {
-    const label = env.document.createElement("label") as HTMLLabelElement; label.style.display = "block";
+    const label = env.document.createElement("label") as HTMLLabelElement; label.style.display = "block"; label.className = "cube-appearance-more-item";
     const box = env.document.createElement("input") as HTMLInputElement; box.type = "checkbox"; box.checked = state[name];
     label.append(box, ` ${text}`); rows.push(label); apply(state[name]);
     const change = () => {

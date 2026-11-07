@@ -108,7 +108,7 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
 
   const viewportSection = document.createElement("div");
   viewportSection.className = "cube-appearance-section cube-appearance-viewport";
-  viewportSection.style.display = "block";
+  viewportSection.style.display = "flex";
 
   const switchTab = (tab: "stickers" | "viewport") => {
     tabStickersBtn.className = `cube-appearance-tab${tab === "stickers" ? " active" : ""}`;
@@ -116,7 +116,7 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     tabViewportBtn.className = `cube-appearance-tab${tab === "viewport" ? " active" : ""}`;
     tabViewportBtn.setAttribute("aria-selected", String(tab === "viewport"));
     stickersSection.style.display = tab === "stickers" ? "block" : "none";
-    viewportSection.style.display = tab === "viewport" ? "block" : "none";
+    viewportSection.style.display = tab === "viewport" ? "flex" : "none";
   };
 
   const bindTabEvents = (el: HTMLElement, tab: "stickers" | "viewport") => {
@@ -139,13 +139,18 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     const option = document.createElement("option"); option.value = id; option.textContent = title; mode.append(option);
   }
   label.append(mode);
+  const note = document.createElement("p"); note.className = "cube-appearance-hint"; note.textContent = "Artwork is kept in both.";
+  // Rarely changed settings sit under a native disclosure (keyboard and screen reader support without script).
+  const more = document.createElement("details"); more.className = "cube-appearance-more";
+  const moreSummary = document.createElement("summary"); moreSummary.textContent = "More";
+  const moreBody = document.createElement("div"); moreBody.className = "cube-appearance-more-body";
   const colorLabel = document.createElement("label"); colorLabel.textContent = " Frame color ";
   const color = document.createElement("input"); color.type = "color"; color.setAttribute("aria-label", "Plastic frame color");
   colorLabel.append(color);
   const reset = document.createElement("button"); reset.type = "button"; reset.textContent = "Style default";
-  const note = document.createElement("p"); note.textContent = "Printed artwork is retained in both constructions.";
-  note.style.margin = "6px 0 0";
-  viewportSection.append(label, colorLabel, reset, note);
+  moreBody.append(colorLabel, reset);
+  more.append(moreSummary, moreBody);
+  viewportSection.append(label, note, more);
 
   panel.append(header, summary, popover);
   host.append(panel);
@@ -169,6 +174,10 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
           stickersSection.append(node);
           tabNav.style.display = "flex";
           switchTab("stickers");
+        } else if (node.className === "cube-appearance-more-item") {
+          moreBody.append(node);
+        } else if (viewportSection.insertBefore) {
+          viewportSection.insertBefore(node, more); // Primary controls stay ahead of "More" in DOM order.
         } else {
           viewportSection.append(node);
         }
