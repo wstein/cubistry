@@ -2,10 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { installAppearanceControls } from "../packages/cube-viewer/src/appearance.ts";
-import { installViewMenu } from "../src/shell/view-menu.ts";
+import { installAppearanceButton } from "../src/shell/appearance-button.ts";
+import { findAppearancePanel } from "../src/apps/chronocube/appearance-panel.ts";
 
 // The Appearance section of the studio's right-hand pane (the dock): collapsed by default, opened from the header
-// View menu, closed by Escape with focus returned. Fake DOM; the layout itself is in tests/browser/shell-layout.spec.mjs.
+// header Appearance button, closed by Escape with focus returned. Fake DOM; the layout itself is in tests/browser/shell-layout.spec.mjs.
 
 class Node extends EventTarget {
   constructor(tagName, id = "") {
@@ -92,32 +93,47 @@ test("floating mode is unchanged for pages without a dock", () => withDocument((
   assert.equal(controls.panel.style.position, "absolute");
 }));
 
-test("View menu: toggles with aria-expanded, Escape closes and returns focus, the entry opens Appearance and closes the menu", () => {
-  const doc = Object.assign(new EventTarget(), { activeElement: null, nodes: {}, getElementById(id) { return this.nodes[id] ?? null; },
-    querySelector: selector => selector === ".cube-appearance.is-docked" ? panel : null });
-  globalThis.document = doc;
-  const button = new Node("button", "view-menu-btn"), menu = new Node("div", "view-menu"), item = new Node("button", "view-menu-appearance");
-  menu.hidden = true; button.attributes["aria-expanded"] = "false"; menu.append(item);
-  Object.assign(doc.nodes, { "view-menu-btn": button, "view-menu": menu, "view-menu-appearance": item });
-  const panel = new Node("aside"), opened = []; panel.addEventListener("cube-appearance:open", e => opened.push(e.detail.opener));
-  try {
-    installViewMenu(doc);
-    button.dispatchEvent(new Event("click"));
-    assert.equal(menu.hidden, false); assert.equal(button.attributes["aria-expanded"], "true"); assert.equal(item.focused, 1);
-    button.dispatchEvent(new Event("click")); assert.equal(menu.hidden, true);
-    button.dispatchEvent(new Event("click"));
-    menu.dispatchEvent(key("Escape"));
-    assert.equal(menu.hidden, true); assert.equal(button.attributes["aria-expanded"], "false"); assert.equal(button.focused, 1);
-    button.dispatchEvent(new Event("click")); item.dispatchEvent(new Event("click"));
-    assert.equal(menu.hidden, true); assert.deepEqual(opened, [button]);
-  } finally { delete globalThis.document; }
+test("header Appearance button: a plain disclosure that opens the section, mirrors its state and gets the focus back", () => withDocument(({ scene, doc }) => {
+  const button = new Node("button", "appearance-btn"); button.attributes["aria-expanded"] = "false";
+  doc.getElementById = id => id === "appearance-btn" ? button : null;
+  doc.querySelector = selector => selector === ".cube-appearance.is-docked" ? panel : null;
+  const controls = installAppearanceControls(scene, () => {}), panel = controls.panel;
+  const toggle = walk(panel).find(n => n.className === "cube-appearance-disclosure");
+  installAppearanceButton(doc);
+  assert.equal(button.attributes["aria-controls"], "cube-appearance-body");
+  assert.equal(button.attributes.role, undefined, "no menu role");
+  button.dispatchEvent(new Event("click"));
+  assert.equal(toggle.attributes["aria-expanded"], "true"); assert.equal(toggle.focused, 1, "focus moves into the section");
+  assert.equal(button.attributes["aria-expanded"], "true", "the button mirrors the section");
+  button.dispatchEvent(new Event("click"));
+  assert.equal(toggle.attributes["aria-expanded"], "false"); assert.equal(button.attributes["aria-expanded"], "false");
+  button.dispatchEvent(new Event("click")); panel.dispatchEvent(key("Escape"));
+  assert.equal(button.focused, 1, "Escape returns focus to the header button");
+  assert.equal(button.attributes["aria-expanded"], "false");
+  toggle.dispatchEvent(new Event("click"));
+  assert.equal(button.attributes["aria-expanded"], "true", "opening with the section toggle updates the button too");
+  const next = installAppearanceControls(scene, () => {});
+  assert.equal(button.attributes["aria-expanded"], "false", "a new panel (mode switch) starts closed and the button follows");
+  next.dispose();
+}));
+
+test("setupAppearancePanel finds the docked panel for hosts that name a dock, and the panel inside the host otherwise", () => {
+  const docked = {}, inside = {};
+  const doc = { querySelector: selector => selector === '[data-region="view-controls"] .cube-appearance' ? docked : null };
+  const dockHost = { dataset: { appearanceDock: "view-controls" }, querySelector: () => null };
+  assert.equal(findAppearancePanel(dockHost, doc), docked);
+  assert.equal(findAppearancePanel({ dataset: {}, querySelector: () => inside }, doc), inside);
+  assert.equal(findAppearancePanel({ dataset: {}, querySelector: () => null }, doc), null, "a panel element passed as container finds nothing, as before");
+  const source = readFileSync("src/chronocube.mjs", "utf8");
+  assert.match(source, /findAppearancePanel\(container, document\)/);
+  assert(!source.includes('container.querySelector(".cube-appearance")'));
 });
 
 test("markup and styles: scene declares the dock, header has the View menu, docked styles use tokens and no translucency", () => {
   const html = readFileSync("index.html", "utf8"), css = readFileSync("src/shell/shell.css", "utf8");
   assert.match(html, /id="studio-scene"[^>]*data-appearance-dock="view-controls"/);
-  assert.match(html, /id="view-menu-btn"[^>]*aria-haspopup="menu"[^>]*aria-expanded="false"/);
-  assert.match(html, /id="view-menu-appearance"/);
+  assert.match(html, /id="appearance-btn"[^>]*aria-expanded="false"/);
+  assert(!/role="menu"|aria-haspopup/.test(html), "no menu role: a plain disclosure until the full View menu exists");
   const block = css.slice(css.indexOf(".is-docked"), css.indexOf(".is-docked") + 2500);
   assert(css.includes(".is-docked") && /position:\s*static/.test(block));
   assert(/var\(--surface\)/.test(css.slice(css.indexOf("/* ---------- appearance section"))));
