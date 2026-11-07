@@ -192,6 +192,12 @@ for (const mode of ["unsupported", "rejected"])
 test("calendar physical motion continues through presentation and reference-view reset", async ({
   page,
 }) => {
+  // In CI run 42363500526 (trace of the failed test) no assertion failed: the
+  // 30 s default expired inside the second screenshot, 5.1 s after it began.
+  // The planning gate took 5.2 s, the first-turn wait 6.4 s and the first
+  // screenshot 5.4 s under SwiftShader; passing runs take 15 to 23 s.
+  // Budget: 3x the slowest passing run.
+  test.setTimeout(90000);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.addInitScript(() => {
     HTMLElement.prototype.requestFullscreen = () =>
