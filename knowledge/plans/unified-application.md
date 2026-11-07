@@ -130,7 +130,7 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | Parameter | Read at | Page or script |
 |---|---|---|
 | `application` | `index.html:14`, `src/main.mjs:1262`, `:1717` | redirect, single-cube pages |
-| `mode` | `src/main.mjs:1091`, `src/chronocube.mjs:1180`, `:1195` | single-cube pages (`mode`), studio |
+| `mode` | `src/main.mjs:1091` | single-cube pages (the studio reads `app` since the router, `src/apps/router.ts`) |
 | `val`, `value` | `src/main.mjs:1176`, `:1184`, `:1196`, `:1752` | single-cube pages |
 | `duration` | `src/main.mjs:1218` | single-cube pages |
 | `unit`, `letter` | `src/main.mjs:1022` | single-cube pages |
@@ -144,7 +144,7 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | `marker` | `src/main.mjs:1078` | single-cube pages |
 | `print` | `src/main.mjs:1757` | single-cube pages |
 | `autoplay`, `run` | `src/main.mjs:1117`, `src/ms-timer.mjs:455` | single-cube pages, M/S Timer |
-| `kiosk`, `presentation` | `src/main.mjs:1109`, `src/clock.mjs:418`, `src/calendar.mjs:363`, `src/ms-timer.mjs:451`, `src/chronocube.mjs:1200` | all of these |
+| `kiosk`, `presentation` | `src/main.mjs:1109`, `src/clock.mjs:418`, `src/calendar.mjs:363`, `src/ms-timer.mjs:451`, `src/chronocube.mjs:1182` | all of these |
 | `nerd`, `dev`, `expert` | `src/clock.mjs:345-347` | clock |
 | `hours-speed`, `minutes-speed`, `seconds-speed` | `src/clock.mjs:42`, `:314` | clock |
 | `date`, `lang`, `language`, `design` | `src/calendar.mjs:344`, `:331` | calendar |
