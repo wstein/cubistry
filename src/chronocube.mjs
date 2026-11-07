@@ -25,6 +25,7 @@ import {
 import { PairController } from "./apps/pair/controller.ts";
 import { MsTimerCube } from "./apps/ms-timer/cube.ts";
 import { MsTimer } from "./apps/ms-timer/timer.ts";
+import { applyDuration } from "./apps/chronocube/duration-form.ts";
 import {
   WorkshopClock,
   ONE_SECOND_TIMER,
@@ -645,9 +646,15 @@ async function initMsTimerMode() {
 
   $("timer-duration-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    timer.set($("timer-duration").value).then(ui, (err) => {
-      $("studio-error").textContent = err.message;
-    });
+    $("studio-error").textContent = "";
+    applyDuration(
+      timer,
+      $("timer-duration").value,
+      ui,
+      (message) => {
+        $("studio-error").textContent = message;
+      },
+    );
   });
 
   await Promise.all([pair.configure(ONE_SECOND_TIMER.defaultSeconds), tenth.configure(0)]);
