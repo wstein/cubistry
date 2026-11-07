@@ -34,15 +34,15 @@ the next month.
   before it. A move turns the layer of its axis, or the whole cube for `rot`, by the exponent
   of the move; the engine's right-handed quarter turn is the right-handed rotation of the
   scene. The controls are **Play/Pause** (pauses after the move in flight), **Skip to end**,
-  **Speed** (0.5× to 16×, default 2×; 90 ms per move at 1×) and **Reset view**. Previous or
+  **Speed** (0.5× to 8×, default 2×; nominal 90 ms per move at 1×, so 8× is about one frame per move) and **Reset view**. Previous or
   Next during a step first brings the cube to the end of that step, then plays the new step.
   Under `prefers-reduced-motion: reduce` nothing animates: a step jumps to its end state and
   the page says so.
 - **The shown state is the engine state.** The cube always shows a pose of the engine, never an
   approximation. At the end of every step (played, skipped, interrupted or jumped) the
   SHA-256 digest of the pose is compared with the stored hash of the month's node
-  (`graph.v1.json`); a difference stops the view with a message and leaves the month sheet
-  alone. The page publishes the digest it computed as `data-c7-digest` on `#calendar7-root`
+  (`graph.v1.json`); a difference stops the view with a message, hides the cube and disables the controls until the
+  page is reloaded, and leaves the month sheet alone. The page publishes the digest it computed as `data-c7-digest` on `#calendar7-root`
   (with `data-c7-month` and `data-c7-state`); the browser test compares it with the graph.
 - **Not in this stage:** no solver, no jump to a non-adjacent month (a jump would
   walk the chain, up to tens of thousands of moves; a month given in the URL is shown at once

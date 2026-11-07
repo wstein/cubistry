@@ -265,10 +265,10 @@ test("MoveTween: eased progress over the given time, one end, cancel resolves at
   const tween = new MoveTween();
   const seen = [];
   const ends = [];
-  const done = tween.begin(100, (p) => seen.push(p), (c) => ends.push(c));
+  const done = tween.begin(100, (p) => seen.push(p), (c) => ends.push(c), 1000);
   assert.equal(tween.running, true);
   assert.equal(tween.tick(1000), true);
-  assert.equal(seen[0], 0, "the clock starts at the first frame, no jump");
+  assert.equal(seen[0], 0);
   tween.tick(1050);
   assert.equal(seen[1], smoothstep(0.5));
   tween.tick(1200);
@@ -277,16 +277,22 @@ test("MoveTween: eased progress over the given time, one end, cancel resolves at
   await done;
   assert.equal(tween.running, false);
   assert.equal(tween.tick(1300), false, "an idle tween asks for no frame");
+  // A move shorter than a frame ends on the first frame after it began.
+  const e0 = [];
+  const quick = tween.begin(11, () => {}, (c) => e0.push(c), 5000);
+  tween.tick(5017);
+  await quick;
+  assert.deepEqual(e0, [true]);
   // Cancel: the end callback runs with false and the promise resolves without a frame.
   const e2 = [];
-  const p2 = tween.begin(100, () => {}, (c) => e2.push(c));
+  const p2 = tween.begin(100, () => {}, (c) => e2.push(c), 0);
   tween.cancel();
   await p2;
   assert.deepEqual(e2, [false]);
   // A new tween replaces a running one.
   const e3 = [];
-  const first = tween.begin(100, () => {}, (c) => e3.push(["first", c]));
-  const second = tween.begin(100, () => {}, (c) => e3.push(["second", c]));
+  const first = tween.begin(100, () => {}, (c) => e3.push(["first", c]), 0);
+  const second = tween.begin(100, () => {}, (c) => e3.push(["second", c]), 0);
   await first;
   assert.deepEqual(e3, [["first", false]]);
   tween.cancel();
@@ -497,11 +503,11 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   const { env } = mountEnv({ stage });
   const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
   await idle(root);
-  assert.equal(root.el("play").disabled, true, "nothing to play yet");
+  assert.equal(root.el("play").getAttribute("aria-disabled") === "true", true, "nothing to play yet");
   root.clickLink(href({ year: 2028, month: 2 }));
   await flush();
   assert.equal(root.el("play").textContent, "Pause");
-  assert.equal(root.el("skip").disabled, false);
+  assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", false);
   assert.match(root.el("progress").textContent, /^Turning to February 2028: move 0 of 138$/);
   root.press("play"); // pause
   assert.equal(root.el("play").textContent, "Play");
@@ -534,8 +540,8 @@ test("mount under reduced motion: no animation, the controls say so, the state i
   assert.equal(stage.log.turns.length, 0);
   assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[1].hash);
   assert.equal(root.el("note").hidden, false);
-  assert.equal(root.el("play").disabled, true);
-  assert.equal(root.el("skip").disabled, true);
+  assert.equal(root.el("play").getAttribute("aria-disabled") === "true", true);
+  assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", true);
   assert.equal(root.el("speed").disabled, true);
   inst.dispose();
 });
@@ -598,6 +604,43 @@ test("mount respects isCurrent after every await: a stale mount builds nothing a
   assert.equal(late.stage.log.shows.length, 0);
   inst.dispose();
   assert.equal(late.stage.destroyed, 1, "and not twice");
+});
+
+test("mount: a digest mismatch stops the 3D view for good: scene hidden, controls off, state failed, later steps do not restart it", async () => {
+  const root = fakeRoot();
+  const tampered = json("public/calendar7/graph.v1.json");
+  tampered.nodes[1].hash = "0".repeat(64);
+  const stage = fakeStage();
+  const { env, host } = mountEnv({
+    stage,
+    fetchJson: async (url) => (url.endsWith("graph.v1.json") ? tampered : url.endsWith("state.v1.json") ? json("public/calendar7/state.v1.json") : json("public/calendar7/displays.v1.json")),
+  });
+  const orig = console.error;
+  console.error = () => {};
+  try {
+    const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+    await idle(root);
+    root.clickLink(href({ year: 2028, month: 2 }));
+    for (let i = 0; i < 100000 && root.getAttribute("data-c7-state") !== "failed"; i++) await Promise.resolve();
+    assert.equal(root.getAttribute("data-c7-state"), "failed");
+    assert.match(root.el("error").textContent, /differs from the stored hash of node 1/);
+    assert.match(root.el("error").textContent, /sheet below/);
+    assert.equal(root.el("error").hidden, false);
+    assert.equal(host.hidden, true);
+    assert.equal(stage.destroyed, 1);
+    const turns = stage.log.turns.length;
+    root.clickLink(href({ year: 2028, month: 1 }));
+    root.press("play");
+    await flush();
+    assert.match(root.view.innerHTML, /data-month="2028-01"/, "the sheet still follows the month");
+    assert.equal(stage.log.turns.length, turns, "no new turn");
+    assert.equal(host.hidden, true);
+    assert.equal(root.getAttribute("data-c7-state"), "failed");
+    inst.dispose();
+    assert.equal(stage.destroyed, 1);
+  } finally {
+    console.error = orig;
+  }
 });
 
 test("a failing stage (no WebGL) leaves the month sheet and reports the error", async () => {
