@@ -220,5 +220,5 @@
 .c7-word { overflow-wrap: anywhere; font-family: var(--f-num); font-size: 0.8rem; max-height: 10rem; overflow: auto; }
 .c7-unavailable { background: var(--surface); color: var(--ink); border: 1px solid var(--s-warn); border-radius: 8px; padding: 8px 12px; margin: 0; }
 .c7-status, .c7-range { font-size: 0.85rem; margin: 0; color: var(--ink); }
-.c7-nav { font-weight: 700; color: var(--accent); }
+.c7-nav { font-weight: 700; color: var(--mark-ink); text-decoration: underline; }
 .c7-nav:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
