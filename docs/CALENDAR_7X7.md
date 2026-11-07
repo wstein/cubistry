@@ -80,15 +80,18 @@ The test replays every edge on the 294-sticker model, requires the complete-stat
 of every node to equal the Research receipt (the receipt it produces is byte-identical
 to the Julia receipt), restores every edge and the whole chain by its inverse, checks
 every front against the display sheet, and requires an independent month-sheet
-generator to equal the Julia display table for all 888 months. Negative controls must be
-rejected, each with its own error message: a flipped move, a changed generator, a rotation
-in place of a layer move, wrong declared metrics, a truncated move word, a changed print,
-the neighboring month as root, edges out of chain order, a node count that does not match
-the edge count, a wrong display id, a tampered display cell (at the root and at an edge
-target), a wrong ink and a quarter-turned plain sticker on the front, and a wrong pin.
+generator to equal the Julia display table for all 888 months. Negative controls must be rejected: a flipped move, a changed generator, a rotation in
+place of a layer move and a truncated move word (these four share one expected message,
+"front differs", because the front is checked before the end hash), wrong declared
+metrics, a wrong target hash with a correct word ("end hash differs"), a changed print,
+the neighboring month as root, edges out of chain order, a node count that does not
+match the edge count, a wrong display id, a month that breaks adjacency, a wrong root
+display id, and a tampered display cell at the root and at an edge target. A wrong ink
+and a quarter-turned plain sticker are checked through the reason of `frontFailure`, and
+the pin controls only through the word "pin". The two inverse-restoration checks cannot be
+falsified without corrupting the engine itself.
 
-Regenerate the Julia exports with Julia 1.13 as in `mise.toml` (the committed exports were
-produced with Julia 1.10.5; they are plain text) and a checkout of the pinned research
+Regenerate the Julia exports with Julia 1.13 as in `mise.toml` and a checkout of the pinned research
 commit at `$RESEARCH`:
 
 ```sh
