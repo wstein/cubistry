@@ -77,7 +77,7 @@ for (const theme of themes) {
 
 test("390x844: header controls are at least 44 px", async () => {
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const selector of ['[data-region="app-switcher"] select', '[data-region="present-action"]', "#view-menu-btn", ".shell-brand", "#print-stickers"]) {
+  for (const selector of ['[data-region="app-switcher"] select', '[data-region="present-action"]', "#appearance-btn", ".shell-brand", "#print-stickers"]) {
     const box = await page.locator(selector).first().boundingBox();
     expect(box, selector).not.toBeNull();
     expect(box.width, `${selector} width`).toBeGreaterThanOrEqual(44);
@@ -197,9 +197,8 @@ for (const frame of frames) {
     await expect(page.locator(".cube-appearance-popover")).toBeHidden();
     expect(await page.locator("#studio-scene .cube-appearance").count(), "no overlay on the stage").toBe(0);
     await expect(page.locator('[data-region="dock"] .cube-appearance')).toHaveCount(1);
-    await page.locator("#view-menu-btn").click();
-    await expect(page.locator("#view-menu-btn")).toHaveAttribute("aria-expanded", "true");
-    await page.locator("#view-menu-appearance").click();
+    await page.locator("#appearance-btn").click();
+    await expect(page.locator("#appearance-btn")).toHaveAttribute("aria-expanded", "true");
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
     await expect(toggle).toBeFocused();
     await expect(page.getByLabel("Cube construction")).toBeVisible();
@@ -209,15 +208,24 @@ for (const frame of frames) {
     expect(overlap(stage, panel), "the section does not cover the stage").toBe(0);
     await page.keyboard.press("Escape");
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
-    await expect(page.locator("#view-menu-btn")).toBeFocused();
+    await expect(page.locator("#appearance-btn")).toBeFocused();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 }
 
+test("single-cube modes keep Display font, Letter font and Orientation marker, now in the docked section under More", async () => {
+  const counter = await context.newPage();
+  await counter.goto("/index.html?app=counter");
+  await counter.locator(".cube-appearance.is-docked").waitFor({ timeout: 25000 });
+  for (const id of ["studio-display-font", "studio-letter-font", "studio-marker-mode"])
+    await expect(counter.locator(`[data-region="dock"] .cube-appearance-more #${id}`), id).toHaveCount(1);
+  await expect(counter.locator("#studio-scene .cube-appearance")).toHaveCount(0);
+  await counter.close();
+});
+
 test("the Appearance section starts closed again after a reload (open state is not remembered)", async () => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.locator("#view-menu-btn").click();
-  await page.locator("#view-menu-appearance").click();
+  await page.locator("#appearance-btn").click();
   await page.reload();
   await page.locator("#studio-controls .hud-body").waitFor({ timeout: 25000 });
   await expect(page.locator(".cube-appearance-disclosure")).toHaveAttribute("aria-expanded", "false");
