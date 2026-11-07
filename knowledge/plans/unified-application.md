@@ -140,7 +140,7 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 
 | Parameter | Read at | Page or script |
 |---|---|---|
-| `application` | `index.html:14`, `src/main.mjs:1262`, `:1717` | redirect, single-cube pages |
+| `application` | `src/main.mjs:1262`, `:1717` | single-cube pages (the redirect in `index.html:14` is gone since stage 3) |
 | `mode` | `src/main.mjs:1091` | single-cube pages (the studio reads `app` since the router, `src/apps/router.ts`) |
 | `val`, `value` | `src/main.mjs:1176`, `:1184`, `:1196`, `:1752` | single-cube pages |
 | `duration` | `src/main.mjs:1218` | single-cube pages |

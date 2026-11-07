@@ -222,11 +222,12 @@ test("returning from suspension synchronizes to live seconds without a missed-ti
   expect(values[2].value).toBe(26);
   await page.selectOption(
     "#clock-application",
-    "index.html?application=hsm-counter",
+    "index.html?app=hsm-counter",
   );
-  await expect(page.locator("#cube")).toHaveAttribute(
-    "data-application",
+  await expect(page.locator("#shell")).toHaveAttribute(
+    "data-mode-ready",
     "hsm-counter",
+    { timeout: 30000 },
   );
 });
 test("real animation ends all three midnight sequences at the shared live deadline", async ({

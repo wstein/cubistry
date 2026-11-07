@@ -1,0 +1,104 @@
+/* Landing page of index.html (design proposal: docs/design/README.md). Tokens: ./shell/tokens.css.
+   The shell shows either the landing page or the app view: #shell[data-view]. */
+.shell[data-view="landing"] [data-app-only],
+.shell[data-view="landing"] .shell-body,
+.shell[data-view="landing"] #studio-error,
+.shell[data-view="app"] .landing {
+  display: none !important;
+}
+
+/* The legacy rule `.chronocube-page main` fixes a full-viewport box; the landing page scrolls inside its grid row. */
+.shell .landing {
+  width: auto;
+  height: auto;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--sp-4);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  box-sizing: border-box;
+  min-height: 0;
+}
+.shell .landing h1,
+.shell .landing h2 {
+  margin: 0;
+  color: var(--ink);
+}
+.shell .landing h1 {
+  font: 600 var(--t-xl) / 1.15 var(--f-ui);
+}
+.shell .landing h2 {
+  font: 600 var(--t-lg) / 1.2 var(--f-ui);
+}
+.shell .landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-5);
+  padding: var(--sp-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  background: linear-gradient(180deg, var(--stage-1), var(--stage-2));
+}
+.shell .landing-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: flex-start;
+}
+.shell .landing-lede,
+.shell .landing-note {
+  margin: 0;
+  color: var(--ink-2);
+  font: 400 var(--t-md) / 1.45 var(--f-ui);
+}
+.shell .landing-open {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 600 var(--t-md) / 1 var(--f-ui);
+  text-decoration: none;
+}
+.shell .landing-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.shell .landing-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--sp-3);
+}
+.shell .landing-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  min-height: 44px;
+  padding: var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+}
+.shell .landing-tile:hover {
+  border-color: var(--accent);
+}
+.shell .landing-tile-name {
+  font: 600 var(--t-md) / 1.25 var(--f-ui);
+}
+.shell .landing-tile-desc {
+  font: 400 var(--t-sm) / 1.4 var(--f-ui);
+  color: var(--ink-2);
+}
+.shell .landing-tile-meta {
+  font: 600 var(--t-cap) / 1 var(--f-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
