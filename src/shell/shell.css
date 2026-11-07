@@ -511,7 +511,7 @@ body.presentation-mode .shell .shell-nerd-toggle {
   background: transparent;
   border: 0;
   box-shadow: none;
-  /* The legacy ambient HUD rule (style.css: opacity .38, blur) targets aside.cube-appearance (lower specificity); the docked section is solid. */
+  /* The legacy ambient HUD rule (style.css: opacity .38, blur) targets aside.cube-appearance; the docked section is solid. The specificity here beats it; the idle variant (style.css, body[data-hud-state]) would not, and the shell does not load hud-idle. */
   opacity: 1;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;

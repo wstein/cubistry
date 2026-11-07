@@ -228,7 +228,9 @@ test("single-cube modes keep Display font, Letter font and Orientation marker, n
 test("modes without a docked panel hide the Appearance button", async () => {
   const calendar = await context.newPage();
   await calendar.goto("/index.html?app=calendar7");
-  await calendar.locator('[data-region="header"]').waitFor();
+  // The button ships hidden: wait until the mode has mounted (the mount renders .c7-live), or this would pass vacuously.
+  await calendar.locator("#calendar7-root .c7-live").waitFor({ timeout: 25000 });
+  await expect(calendar.locator(".cube-appearance.is-docked")).toHaveCount(0);
   await expect(calendar.locator("#appearance-btn")).toBeHidden();
   await calendar.close();
 });
