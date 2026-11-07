@@ -9,7 +9,7 @@ created: 2026-11-06
 
 ## Context
 The unified view needs one set of design tokens for light and dark themes (`src/shell/tokens.css`). The owner-approved
-design proposal gives a palette. Checking it with the WCAG 2.x formula shows:
+design proposal ([README](../../docs/design/README.md), mock: `docs/design/cubistry-mock.html`) gives a palette. Checking it with the WCAG 2.x formula shows:
 
 | Pair | Light | Dark |
 |---|---|---|
