@@ -225,6 +225,14 @@ test("single-cube modes keep Display font, Letter font and Orientation marker, n
   await counter.close();
 });
 
+test("modes without a docked panel hide the Appearance button", async () => {
+  const calendar = await context.newPage();
+  await calendar.goto("/index.html?app=calendar7");
+  await calendar.locator('[data-region="header"]').waitFor();
+  await expect(calendar.locator("#appearance-btn")).toBeHidden();
+  await calendar.close();
+});
+
 test("the Appearance section starts closed again after a reload (open state is not remembered)", async () => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.locator("#appearance-btn").click();

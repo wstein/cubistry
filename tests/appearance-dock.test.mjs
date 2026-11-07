@@ -18,7 +18,7 @@ class Node extends EventTarget {
   setAttribute(name, value) { this.attributes[name] = String(value); }
   getAttribute(name) { return this.attributes[name] ?? null; }
   removeAttribute(name) { delete this.attributes[name]; }
-  remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); }
+  remove() { if (this.parent) { this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; } }
   focus() { this.focused++; globalThis.document.activeElement = this; }
   scrollIntoView() {}
   contains(node) { for (let n = node; n; n = n.parent) if (n === this) return true; return false; }
@@ -124,6 +124,20 @@ test("header Appearance button: a plain disclosure that opens the section, mirro
   again.dispose();
 }));
 
+test("a superseded mode that disposes late does not hide the button of the active mode", () => withDocument(({ scene, doc, dock }) => {
+  const button = new Node("button", "appearance-btn"); button.hidden = true;
+  doc.getElementById = id => id === "appearance-btn" ? button : null;
+  doc.querySelector = selector => selector === ".cube-appearance.is-docked" ? (dock.children[0] ?? null) : selector === '[data-region="view-controls"]' ? dock : null;
+  installAppearanceButton(doc);
+  const older = installAppearanceControls(scene, () => {}), newer = installAppearanceControls(scene, () => {});
+  assert.deepEqual(dock.children, [newer.panel], "the stale panel was replaced");
+  older.dispose();
+  assert.equal(button.hidden, false, "the newer mode still has a docked panel");
+  assert.equal(button.attributes["aria-controls"], "cube-appearance-body"); assert.equal(dock.hidden, false);
+  newer.dispose();
+  assert.equal(button.hidden, true); assert.equal(dock.hidden, true);
+}));
+
 test("setupAppearancePanel finds the docked panel for hosts that name a dock, and the panel inside the host otherwise", () => {
   const docked = {}, inside = {};
   const doc = { querySelector: selector => selector === '[data-region="view-controls"] .cube-appearance' ? docked : null };
@@ -147,7 +161,7 @@ test("markup and styles: scene declares the dock, header has the Appearance butt
   assert(css.includes(".is-docked") && /position:\s*static/.test(block));
   assert(/var\(--surface\)/.test(css.slice(css.indexOf("/* ---------- appearance section"))));
   const docked = block.slice(0, block.indexOf("}"));
-  assert(/opacity:\s*1\s*!important/.test(docked) && /(?<!-webkit-)backdrop-filter:\s*none\s*!important/.test(docked) && /-webkit-backdrop-filter:\s*none\s*!important/.test(docked),
+  assert(/opacity:\s*1;/.test(docked) && /(?<!-webkit-)backdrop-filter:\s*none;/.test(docked) && /-webkit-backdrop-filter:\s*none;/.test(docked) && !docked.includes("!important"),
     "the legacy ambient rule (opacity .38, blur) does not apply to the docked panel");
   assert(!/backdrop-filter:\s*blur/.test(css.slice(css.indexOf("/* ---------- appearance section"), css.indexOf("/* ---------- error line"))));
 });
