@@ -1,6 +1,6 @@
 // Setup parameters that belong to the application that wrote them.
 // They must not survive a switch to another application.
-export const APP_SCOPED_PARAMS = ["val", "value", "duration"];
+export const APP_SCOPED_PARAMS = ["val", "value", "duration", "year", "month"];
 
 /**
  * Returns the path, query and hash to show after switching from `previous` to

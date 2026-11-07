@@ -96,4 +96,13 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     group: "cubes",
     help: "docs/HM_ONE_CUBE_COUNTER.md",
   },
+  {
+    id: "calendar7",
+    title: "7x7 Calendar",
+    subtitle: "English monthly calendar on one 7x7 cube (research candidate).",
+    cubes: 1,
+    badge: "7x7 Calendar",
+    group: "cubes",
+    help: "docs/CALENDAR_7X7.md",
+  },
 ];
