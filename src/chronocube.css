@@ -173,10 +173,14 @@
   display: none !important;
 }
 .c7-root {
-  --c7-dark: var(--ink);
-  --c7-red: var(--s-error);
-  --c7-month: var(--s-moving);
-  --c7-weekday: var(--ink-2);
+  /* Sheet palette (HTML sheet only; the 3D stickers use the print inks in sticker-art.ts). */
+  --c7-dark: #193f63;
+  --c7-month: #193f63;
+  --c7-weekday: #52657a;
+  --c7-red: #a83d32;
+  --c7-cell: #eae7dd;
+  --c7-weekend-cell: #f1e5df;
+  --c7-empty: #f3f1e9;
   color: var(--ink);
 }
 .c7-player { display: grid; gap: 8px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
@@ -211,12 +215,33 @@
 .c7-month { margin: 0; font-size: 1.4rem; color: var(--ink); }
 .c7-month:focus, .c7-unavailable:focus { outline: 2px solid var(--focus); outline-offset: 2px; }
 .c7-sheet { border-collapse: separate; border-spacing: 4px; width: 100%; table-layout: fixed; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
-.c7-sheet td { aspect-ratio: 1; text-align: center; vertical-align: middle; font-weight: 700; font-size: clamp(0.7rem, 2.6vw, 1.2rem); background: var(--surface-2); border-radius: 4px; padding: 0; }
+.c7-sheet td { aspect-ratio: 1; text-align: center; vertical-align: middle; font-weight: 700; font-size: clamp(0.7rem, 2.6vw, 1.2rem); background: var(--c7-cell); border-radius: 4px; padding: 0; }
+.c7-sheet tr:nth-child(n+3) td.c7-ink-red { background: var(--c7-weekend-cell); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .c7-root {
+    --c7-dark: #a9cbf2;
+    --c7-month: #a9cbf2;
+    --c7-weekday: #b4bcc9;
+    --c7-red: #ff9a90;
+    --c7-cell: #2c3547;
+    --c7-weekend-cell: #3a2f3a;
+    --c7-empty: #232a38;
+  }
+}
+:root[data-theme="dark"] .c7-root {
+  --c7-dark: #a9cbf2;
+  --c7-month: #a9cbf2;
+  --c7-weekday: #b4bcc9;
+  --c7-red: #ff9a90;
+  --c7-cell: #2c3547;
+  --c7-weekend-cell: #3a2f3a;
+  --c7-empty: #232a38;
+}
 .c7-ink-dark { color: var(--c7-dark); }
 .c7-ink-red { color: var(--c7-red); }
 .c7-ink-month { color: var(--c7-month); }
 .c7-ink-weekday { color: var(--c7-weekday); }
-.c7-ink-blank { background: var(--line) !important; }
+.c7-ink-blank { background: var(--c7-empty) !important; }
 .c7-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 .c7-step { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
 .c7-step h3 { margin: 0 0 4px; font-size: 1rem; }

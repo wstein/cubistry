@@ -173,3 +173,46 @@ test("a focused control is never hidden behind the pinned cube (WCAG 2.4.11)", a
     }
   }
 });
+
+// The HTML month sheet: every text/background pair that is drawn (measured from the computed styles) reads at 4.5:1 in
+// both themes, and the weekend date cells are tinted while the labels and the empty cells are not.
+for (const scheme of ["light", "dark"]) {
+  test(`month sheet colors read at 4.5:1 (${scheme})`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto("/index.html?app=calendar7&year=2028&month=6");
+    await idle(page, "2028-06");
+    const cells = await page.evaluate(() => {
+      const lum = (c) => {
+        const [r, g, b] = c.match(/[\d.]+/g).slice(0, 3).map((v) => { v = Number(v) / 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const out = [];
+      document.querySelectorAll(".c7-sheet tr").forEach((tr, r) => tr.querySelectorAll("td").forEach((td, c) => {
+        const s = getComputedStyle(td);
+        const [x, y] = [lum(s.color), lum(s.backgroundColor)].sort((p, q) => q - p);
+        out.push({ r, c, cls: td.className, text: td.textContent, bg: s.backgroundColor, color: s.color, ratio: (x + 0.05) / (y + 0.05) });
+      }));
+      return out;
+    });
+    expect(cells).toHaveLength(49);
+    for (const t of cells) if (t.text) expect(t.ratio, `${t.cls} ${t.text} ${t.color} on ${t.bg}`).toBeGreaterThanOrEqual(4.5);
+    const bgOf = (pred) => new Set(cells.filter(pred).map((t) => t.bg));
+    const weekendDates = bgOf((t) => t.r >= 2 && t.cls.includes("c7-ink-red"));
+    const weekdayDates = bgOf((t) => t.r >= 2 && t.cls.includes("c7-ink-dark"));
+    const labels = bgOf((t) => t.r === 1);
+    const empty = bgOf((t) => t.cls.includes("c7-ink-blank"));
+    expect(weekendDates.size).toBe(1);
+    expect(weekdayDates.size).toBe(1);
+    expect([...weekendDates][0]).not.toBe([...weekdayDates][0]);
+    expect(labels).toEqual(weekdayDates);
+    expect([...empty][0]).not.toBe([...weekdayDates][0]);
+    if (scheme === "light") {
+      expect([...weekendDates][0]).toBe("rgb(241, 229, 223)");
+      expect([...weekdayDates][0]).toBe("rgb(234, 231, 221)");
+      expect([...empty][0]).toBe("rgb(243, 241, 233)");
+      expect(cells.find((t) => t.text === "SUN").color).toBe("rgb(168, 61, 50)");
+      expect(cells.find((t) => t.text === "MON").color).toBe("rgb(82, 101, 122)");
+      expect(cells.find((t) => t.cls.includes("c7-ink-dark")).color).toBe("rgb(25, 63, 99)");
+    }
+  });
+}
