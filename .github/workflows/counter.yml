@@ -50,6 +50,9 @@ jobs:
           commit="$(node -p "require('./calendar7-source.json').commit")"
           git fetch --no-tags --depth=1 origin "$commit"
           node scripts/prepare-calendar7.mjs --check --require-commit
+      # The picture-cube-faces checker tests render with Chromium. Without it they
+      # report themselves as skipped (16 tests), so install it here (about 20 s).
+      - run: npx playwright install --with-deps chromium
       - run: npm run check
       # Verifies the committed print presets only (no regeneration, so the zlib
       # build does not matter). Needs the pinned Python packages, so it is not
