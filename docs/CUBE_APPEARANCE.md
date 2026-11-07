@@ -166,6 +166,8 @@ Both former copies of the classification logic now call this package, so there i
   flat face, never for identical, symmetric or turned stickers. Identical now means "same loose class", a superset of
   exact pixel copies (the old raw-pixel hash); `measureRgba` returns the package's rotation shares, `tileHash` and
   `detailOf`. The display never feeds solver decisions.
+  Edge case: the package calls a sticker 4-fold only when both the quarter and the half turn are within the share,
+  while the former display looked at the quarter turn alone; a sticker passing only the quarter turn is now 2-fold or none.
 
 ## Tests
 

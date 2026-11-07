@@ -188,3 +188,26 @@ test("the pixel tolerance is the loose 24, not the strict 16", () => {
   assert.equal(symmetryOf(measureRgba(shaded)), 4);
   assert.deepEqual(analyzeStickers([{ id: "F_0_0", data: shaded }], 2).symmetric4, ["F_0_0"]);
 });
+
+test("symmetry is measured at full resolution: a thin line on a rosette keeps order 4 (not the 20 px copy)", () => {
+  // A 40 px long line, 1 or 2 px thick, breaks the symmetry in 1.25 or 2.5 percent of the 80 px pixels (limit 3 percent).
+  // On the 20 px block average the same line darkens a whole coarse pixel and would exceed the share (5 percent).
+  for (const thick of [1, 2]) {
+    const lined = Uint8ClampedArray.from(sym4);
+    for (let y = 5; y < 5 + thick; y++) for (let x = 0; x < 40; x++) lined.set([0, 0, 0, 255], (y * N + x) * 4);
+    assert.equal(symmetryOf(measureRgba(lined)), 4, `measureRgba, ${thick} px`);
+    assert.deepEqual(analyzeStickers([{ id: "F_0_0", data: lined }], 2).symmetric4, ["F_0_0"], `analyzeStickers, ${thick} px`);
+  }
+});
+
+test("flat stickers never form rotation-twin groups", () => {
+  // Two nearly flat stickers (a 5 percent patch, detail under 8 percent), the second the first turned by a quarter: twins by
+  // the classifier, but flat stickers are reported as flat only.
+  const patchAt = (x0, y0) => tile((x, y) => (x >= x0 && x < x0 + 18 && y >= y0 && y < y0 + 18 ? [0, 0, 0] : [200, 200, 200]));
+  const a = patchAt(0, 0);
+  const stickers = [{ id: "F_0_0", data: a }, { id: "F_0_1", data: rot(a, 1) }];
+  const r = analyzeStickers(stickers, 2);
+  assert.deepEqual(r.flat, ["F_0_0", "F_0_1"]);
+  assert.deepEqual(r.twinGroups, []);
+  assert.ok(r.problems.every((p) => !p.kinds.includes("twin")), JSON.stringify(r.problems));
+});
