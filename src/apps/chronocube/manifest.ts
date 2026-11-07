@@ -16,9 +16,19 @@ export const DEFAULT_STUDIO_MATERIALS = [
   { id: "sticker", color: "#ffffff", roughness: 0.7 },
 ];
 
+/**
+ * The studio panel stores the dot markers as "dot-auto" and "dot-all"; the digit images know them as "auto" and "all".
+ * Any other unknown name means no marker.
+ */
+export function normalizeMarkerMode(marker: string | null | undefined): TenthMarkerMode {
+  if (marker === "dot-auto") return "auto";
+  if (marker === "dot-all") return "all";
+  return marker === "auto" || marker === "all" || marker === "line-auto" || marker === "line-all" ? marker : "off";
+}
+
 export function buildStudioManifest(
   display: TenthDisplayVariant = "dseg7",
-  marker: TenthMarkerMode = "off",
+  markerName: string = "off",
   letterFont: LetterFont = "same",
   lettering: Lettering = "words-pascal",
   baseImages: readonly ImageAsset[] = [],
@@ -26,6 +36,7 @@ export function buildStudioManifest(
   documents: readonly any[] = [],
   materials: readonly any[] = [],
 ): AssetManifest {
+  const marker = normalizeMarkerMode(markerName);
   const family = resolveLetterFamily(letterFont, display);
   const letterImages = hsmImagesForFamily(lettering, family) as readonly ImageAsset[];
   const digitImages = tenthAssetImages(display, marker, baseImages);
