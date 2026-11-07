@@ -29,7 +29,6 @@ import {
   WorkshopClock,
   ONE_SECOND_TIMER,
   formatMsTimer,
-  parseMsDuration,
 } from "./apps/timer/clock.ts";
 import {
   createStudioTimerController,
@@ -646,11 +645,9 @@ async function initMsTimerMode() {
 
   $("timer-duration-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    const parsed = parseMsDuration($("timer-duration").value);
-    if (parsed !== null) {
-      timer.configure(parsed);
-      ui();
-    }
+    timer.set($("timer-duration").value).then(ui, (err) => {
+      $("studio-error").textContent = err.message;
+    });
   });
 
   await Promise.all([pair.configure(ONE_SECOND_TIMER.defaultSeconds), tenth.configure(0)]);
@@ -854,15 +851,15 @@ async function initTenthMode() {
 
   $("studio-controls").querySelectorAll(".tenth-quick-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      tenth.stepTo(Number(btn.dataset.val), direction);
+      tenth.set(Number(btn.dataset.val));
     });
   });
 
   $("tenth-step-plus5").addEventListener("click", () => {
-    tenth.stepBy(5 * direction);
+    tenth.step(5 * direction);
   });
   $("tenth-step-minus5").addEventListener("click", () => {
-    tenth.stepBy(-5 * direction);
+    tenth.step(-5 * direction);
   });
 
   $("tenth-speed-select").addEventListener("change", (e) => {
