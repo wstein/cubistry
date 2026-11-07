@@ -1,4 +1,5 @@
 import "./chronocube.css";
+import { installViewMenu } from "./shell/view-menu.ts";
 import { ClockStage } from "./apps/clock/stage.ts";
 import { LiveClockScheduler, clockText } from "./apps/clock/scheduler.ts";
 import { ClockMoveStatistics, formatMean } from "./apps/clock/statistics.ts";
@@ -203,6 +204,7 @@ function renderStudioHud(title, bodyHtml) {
 }
 
 document.querySelector("#presentation-btn, .island-presentation-btn")?.addEventListener("click", () => togglePresentation(true));
+installViewMenu();
 
 let exitTimer = null;
 function togglePresentation(enable) {

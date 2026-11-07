@@ -77,7 +77,7 @@ for (const theme of themes) {
 
 test("390x844: header controls are at least 44 px", async () => {
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const selector of ['[data-region="app-switcher"] select', '[data-region="present-action"]', ".shell-brand", "#print-stickers"]) {
+  for (const selector of ['[data-region="app-switcher"] select', '[data-region="present-action"]', "#view-menu-btn", ".shell-brand", "#print-stickers"]) {
     const box = await page.locator(selector).first().boundingBox();
     expect(box, selector).not.toBeNull();
     expect(box.width, `${selector} width`).toBeGreaterThanOrEqual(44);
@@ -183,6 +183,44 @@ test("presentation mode: the stage fills the window, the dock readout and the fo
   }
   await page.keyboard.press("Escape");
   await leavePresentation();
+});
+
+// Appearance is a section of the right-hand pane (the dock): collapsed on load, opened from the header View menu,
+// closed by Escape with focus returned to the View button, and never over the stage. The open state is not remembered.
+for (const frame of frames) {
+  test(`${frame.name}: Appearance is a collapsed section of the dock, opened from the View menu, outside the stage`, async () => {
+    await page.setViewportSize({ width: frame.width, height: frame.height });
+    await page.reload();
+    await page.locator("#studio-controls .hud-body").waitFor({ timeout: 25000 });
+    const toggle = page.locator(".cube-appearance-disclosure");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator(".cube-appearance-popover")).toBeHidden();
+    expect(await page.locator("#studio-scene .cube-appearance").count(), "no overlay on the stage").toBe(0);
+    await expect(page.locator('[data-region="dock"] .cube-appearance')).toHaveCount(1);
+    await page.locator("#view-menu-btn").click();
+    await expect(page.locator("#view-menu-btn")).toHaveAttribute("aria-expanded", "true");
+    await page.locator("#view-menu-appearance").click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(toggle).toBeFocused();
+    await expect(page.getByLabel("Cube construction")).toBeVisible();
+    await expect(page.getByLabel("View rotation mode")).toBeVisible();
+    await expect(page.getByLabel("Plastic frame color")).toBeHidden(); // under "More"
+    const [stage, panel] = await Promise.all([boxOf(page, "stage"), page.locator(".cube-appearance").boundingBox()]);
+    expect(overlap(stage, panel), "the section does not cover the stage").toBe(0);
+    await page.keyboard.press("Escape");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("#view-menu-btn")).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+}
+
+test("the Appearance section starts closed again after a reload (open state is not remembered)", async () => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.locator("#view-menu-btn").click();
+  await page.locator("#view-menu-appearance").click();
+  await page.reload();
+  await page.locator("#studio-controls .hud-body").waitFor({ timeout: 25000 });
+  await expect(page.locator(".cube-appearance-disclosure")).toHaveAttribute("aria-expanded", "false");
 });
 
 test("no page errors while measuring", () => {

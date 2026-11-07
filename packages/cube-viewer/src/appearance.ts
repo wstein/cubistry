@@ -33,17 +33,20 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   let value = DEFAULT_APPEARANCE;
   try { value = readAppearance(localStorage, key); } catch { /* Storage may be unavailable. */ }
   let defaultColor = "#202329";
+  // A host that names a dock region (`data-appearance-dock`) gets the panel as a collapsed section of that region
+  // instead of an overlay on the stage. Pages without it keep the floating panel.
+  const dockName = (host as { dataset?: DOMStringMap }).dataset?.appearanceDock;
+  const dock = dockName ? document.querySelector?.(`[data-region="${dockName}"]`) as HTMLElement | null : null;
   const previousPosition = host.style.position;
-  host.style.position = "relative";
+  if (!dock) host.style.position = "relative";
   const panel = document.createElement("aside");
-  panel.className = "cube-appearance floating-hud floating-hud-appearance";
-  Object.assign(panel.style, {
-    position: "absolute",
-    top: "16px",
-    left: "16px",
-    zIndex: "30",
-    textAlign: "left",
-  });
+  if (dock) {
+    for (const stale of Array.from(dock.querySelectorAll(".cube-appearance"))) stale.remove();
+    panel.className = "cube-appearance is-docked";
+  } else {
+    panel.className = "cube-appearance floating-hud floating-hud-appearance";
+    Object.assign(panel.style, { position: "absolute", top: "16px", left: "16px", zIndex: "30", textAlign: "left" });
+  }
 
   const header = document.createElement("div");
   header.className = "hud-header";
@@ -70,7 +73,7 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     }
   });
 
-  header.append(title, actions);
+  if (dock) header.append(title); else header.append(title, actions);
 
   const summary = document.createElement("summary");
   summary.className = "cube-appearance-summary";
@@ -106,7 +109,25 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   viewportSection.append(label, note, more);
 
   panel.append(header, summary, popover);
-  host.append(panel);
+  let setOpen = (_open: boolean) => {};
+  if (dock) {
+    // Disclosure: collapsed on every install (the open state is deliberately not remembered).
+    popover.id = "cube-appearance-body"; popover.hidden = true;
+    const disclosure = document.createElement("button"); disclosure.type = "button"; disclosure.className = "cube-appearance-disclosure";
+    disclosure.textContent = "Appearance"; disclosure.setAttribute("aria-expanded", "false"); disclosure.setAttribute("aria-controls", popover.id);
+    title.textContent = ""; title.append(disclosure);
+    let opener: HTMLElement | null = null;
+    setOpen = (open: boolean) => { popover.hidden = !open; disclosure.setAttribute("aria-expanded", String(open)); };
+    disclosure.addEventListener("click", () => { opener = null; setOpen(popover.hidden); });
+    panel.addEventListener("cube-appearance:open", (event) => {
+      opener = (event as CustomEvent).detail?.opener ?? null; setOpen(true); disclosure.focus(); panel.scrollIntoView?.({ block: "nearest" });
+    });
+    panel.addEventListener("keydown", (event) => {
+      if ((event as KeyboardEvent).key !== "Escape" || popover.hidden) return;
+      event.preventDefault(); setOpen(false); (opener ?? disclosure).focus();
+    });
+    dock.hidden = false; dock.append(panel);
+  } else host.append(panel);
 
   const originalAppend = panel.append.bind(panel);
   panel.append = (...nodes: any[]) => {
@@ -151,7 +172,7 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     setDefaultColor(color: string) { defaultColor = color; refresh(); },
     dispose() {
       panel.remove();
-      host.style.position = previousPosition;
+      if (dock) { if (!dock.children.length) dock.hidden = true; } else host.style.position = previousPosition;
     },
   };
 }

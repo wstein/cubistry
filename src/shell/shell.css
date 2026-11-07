@@ -150,6 +150,43 @@ body.chronocube-page:has(#shell) {
   background: var(--surface-2);
 }
 
+/* View menu in the header (design: view-controls; it opens the Appearance section of the right-hand pane). */
+.shell .shell-view {
+  position: relative;
+  flex: none;
+}
+.shell .shell-menu {
+  position: absolute;
+  top: calc(100% + var(--sp-1));
+  right: 0;
+  z-index: 40;
+  min-width: 180px;
+  padding: var(--sp-1);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.shell .shell-menu[hidden] {
+  display: none;
+}
+.shell .shell-menu button {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--sp-3);
+  border: 0;
+  border-radius: var(--r-1);
+  background: transparent;
+  color: var(--ink);
+  font: 500 var(--t-sm) var(--f-ui);
+  text-align: left;
+  cursor: pointer;
+}
+.shell .shell-menu button:hover {
+  background: var(--surface-2);
+}
+
 /* ---------- body: stage column and dock ---------- */
 .shell .shell-body {
   display: grid;
@@ -487,6 +524,94 @@ body.presentation-mode .shell .shell-nerd-toggle {
 .shell .shell-controls .clock-stats-reset {
   background: var(--surface-2);
   border-color: var(--line);
+  color: var(--ink);
+}
+
+/* ---------- appearance section of the right-hand pane ----------
+   The shared Appearance panel is docked at the end of the dock (the end of the sheet on phones): collapsed by default,
+   solid tokens, no translucency. The legacy floating rules in style.css do not apply (no floating-hud classes). */
+.shell .shell-view-controls:not([hidden]) {
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+}
+.shell .cube-appearance.is-docked {
+  position: static;
+  width: auto;
+  max-height: none;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--ink);
+  font: var(--t-sm) / 1.4 var(--f-ui);
+}
+.shell .cube-appearance.is-docked .hud-header {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.shell .cube-appearance.is-docked .hud-title {
+  margin: 0;
+}
+.shell .cube-appearance.is-docked .cube-appearance-disclosure {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--sp-3);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  font: 600 var(--t-md) var(--f-ui);
+  cursor: pointer;
+}
+.shell .cube-appearance.is-docked .cube-appearance-disclosure::after {
+  content: "▾";
+  transition: transform var(--dur-chrome) var(--ease-chrome);
+}
+.shell .cube-appearance.is-docked .cube-appearance-disclosure[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+.shell .cube-appearance.is-docked .cube-appearance-popover {
+  margin-top: var(--sp-3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--sp-3);
+}
+.shell .cube-appearance.is-docked label,
+.shell .cube-appearance.is-docked .cube-appearance-more > summary {
+  color: var(--ink);
+  font: 500 var(--t-sm) var(--f-ui);
+}
+.shell .cube-appearance.is-docked p {
+  color: var(--ink-2);
+  font: var(--t-cap) / 1.4 var(--f-ui);
+}
+.shell .cube-appearance.is-docked select,
+.shell .cube-appearance.is-docked button:not(.cube-appearance-disclosure) {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  font: 500 var(--t-sm) var(--f-ui);
+  min-height: 40px;
+}
+.shell .cube-appearance.is-docked .cube-appearance-info {
+  min-height: 0;
+  width: 28px;
+  height: 28px;
+}
+.shell .cube-appearance.is-docked .cube-appearance-tabs {
+  background: var(--surface-2);
+}
+.shell .cube-appearance.is-docked .cube-appearance-tab {
+  color: var(--ink-2);
+}
+.shell .cube-appearance.is-docked .cube-appearance-tab.active {
+  background: var(--surface);
   color: var(--ink);
 }
 
