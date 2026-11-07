@@ -1,9 +1,31 @@
-# English 7×7 calendar cube (data stage)
+# English 7×7 calendar cube (data stage and first mode)
 
 **Status: research candidate, not certified.** This page describes the data, the
-pin and the replay test of the English 7×7 monthly calendar cube. There is no user
-interface yet: no page, no chooser entry, and the 3×3 [calendar page](../calendar.html)
-and its [documentation](CALENDAR_CUBES.md) are unchanged.
+pin, the replay test and the first user interface of the English 7×7 monthly
+calendar cube. The 3×3 [calendar page](../calendar.html) and its
+[documentation](CALENDAR_CUBES.md) are unchanged.
+
+## The mode (stage 1)
+
+The chooser of `index.html` lists **7x7 Calendar** (mode id `calendar7`, group
+cubes, one cube); it opens at `index.html?app=calendar7`. The mode shows the 7×7
+month sheet of one month and the move word to the previous and to the next month.
+
+- URL parameters: `year` and `month` (1 to 12), only together. Without them the
+  current month is used.
+- Range: only the months of the proven chain, **January 2028 to January 2076**, can
+  be shown. Any other month, including today (November 2026), gets a "Not available
+  yet" message with links to the first and the last chain month.
+- Steps: previous and next month along the chain. The move word of a forward step is
+  the stored edge; a backward step is the inverse of the edge before it. A token is
+  the axis (`x`, `y`, `z`), the layer (`-3` to `-1`, `+1` to `+3`, or `rot` for the
+  whole cube), then `'` for a counter-clockwise quarter turn or `²` for a half turn.
+- **Not in this stage:** no solver, no jump to a non-adjacent month (a jump would
+  walk the chain, up to tens of thousands of moves), no 3D view of the cube, no
+  route from a solved cube, no sticker sheet. The page says so.
+- Code: `src/apps/calendar7/month-view.ts` (pure) and `mount.ts` (DOM); tests in
+  `tests/calendar7-mode.test.mjs`. The mode uses the existing display, graph and
+  engine modules and adds no new mathematics.
 
 ## What this is
 
@@ -30,7 +52,7 @@ states exists yet. This is why the status stays "research candidate, not certifi
 | All 91 display types (7 start weekdays × 13 month types) occur on the chain | **2076-02 to 2099-12**: the chain does not reach 2099-12 yet; 287 more edges are still to be produced |
 | The display sheets of all 888 months 2026 to 2099 | A route from a solved cube to the chain root: no practical setup route exists |
 | Replay, hash equality with the research receipts, inverse restoration, front check | Shortcut or star routes: every jump would be a walk along the chain |
-| | Any user interface, optimizer, solver, sticker sheet or physical build instruction |
+| | A 3D view, optimizer, solver, sticker sheet or physical build instruction |
 
 ### Start state
 
@@ -51,8 +73,9 @@ of the chain.
 | `public/calendar7/graph.v1.json` | Route graph: 577 nodes (state hash, display, month) and 576 edges (move words) |
 | `public/calendar7/displays.v1.json` | 91 display sheets and the display id of each month 2026 to 2099 |
 | [scripts/prepare-calendar7.mjs](../scripts/prepare-calendar7.mjs) | Pin, convert and check (Node, no Python) |
-| `src/apps/calendar7/` | Pure engine, display and graph modules for the later engine stage: no DOM, no timers |
+| `src/apps/calendar7/` | Pure engine, display, graph and month-view modules (no DOM, no timers) and the DOM mount of the mode |
 | [tests/calendar7-replay.test.mjs](../tests/calendar7-replay.test.mjs) | Full replay and negative controls, part of `npm test` |
+| [tests/calendar7-mode.test.mjs](../tests/calendar7-mode.test.mjs) | Registry entry, month choice, navigation bounds, move words and mount |
 
 ### Conventions
 

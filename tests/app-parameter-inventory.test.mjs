@@ -65,6 +65,7 @@ const INVENTORY = [
   ),
   row(["date", "lang", "language", "design"], "src/calendar.mjs", ["calendar"]),
   row(["design"], "src/print.mjs", ["print.html"]),
+  row(["year", "month"], "src/apps/calendar7/month-view.ts", ["calendar7"]),
 ];
 
 const read = (file) => readFileSync(file, "utf8");

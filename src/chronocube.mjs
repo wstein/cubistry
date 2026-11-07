@@ -23,6 +23,7 @@ import {
   tenthTurnSpeedForInterval,
 } from "./apps/ms-timer/tenth.ts";
 import { whenCurrent } from "./apps/chronocube/mode-switch.ts";
+import { browserMountEnv, mountCalendar7 } from "./apps/calendar7/mount.ts";
 import { MODE_CATALOG } from "./apps/mode-catalog.ts";
 import { createRegistry } from "./apps/registry.ts";
 import { createRouter } from "./apps/router.ts";
@@ -1088,6 +1089,17 @@ async function initHsmSingleMode(variant, isCurrent) {
   };
 }
 
+// -------------------------------------------------------------
+// Mode: English 7x7 calendar (research candidate, not certified). Plain HTML, no canvas.
+// -------------------------------------------------------------
+async function initCalendar7Mode(isCurrent, params) {
+  const cardsContainer = $("studio-cards");
+  cardsContainer.setAttribute("data-count", "1");
+  cardsContainer.innerHTML = '<div class="c7-root" id="calendar7-root"></div>';
+  const instance = await mountCalendar7($("calendar7-root"), params, browserMountEnv(base, isCurrent));
+  return instance ? () => instance.dispose() : undefined;
+}
+
 const MODE_INITS = {
   clock: (isCurrent) => initClockMode(isCurrent),
   "ms-timer": (isCurrent) => initMsTimerMode(isCurrent),
@@ -1099,13 +1111,14 @@ const MODE_INITS = {
   "hsm-counter": (isCurrent) => initHsmSingleMode("hsm", isCurrent),
   "ms-counter": (isCurrent) => initHsmSingleMode("ms", isCurrent),
   "hm-one-cube": (isCurrent) => initHsmSingleMode("hm", isCurrent),
+  calendar7: (isCurrent, params) => initCalendar7Mode(isCurrent, params),
 };
 
 const registry = createRegistry(
   MODE_CATALOG.map((meta) => ({
     ...meta,
-    async mount(_root, _params, { isCurrent }) {
-      const cleanup = await MODE_INITS[meta.id](isCurrent);
+    async mount(_root, params, { isCurrent }) {
+      const cleanup = await MODE_INITS[meta.id](isCurrent, params);
       return typeof cleanup === "function" ? { dispose: cleanup } : undefined;
     },
   })),
