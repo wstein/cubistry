@@ -244,9 +244,9 @@ test("negative controls: every corruption is rejected", () => {
   const other = { ...printing, text: printing.text.map((t, i) => (i === 4 ? "Z" : t)) };
   rejects(() => run(graph, other), "changed print");
   rejects(() => verifyChain(other, pose, table, graph), "changed print, chain");
-  // Wrong root: the state of the neighbouring month is not the root of this chain.
+  // Wrong root: the state of the neighboring month is not the root of this chain.
   const next = applyMoves(pose, edge0.moves);
-  rejects(() => verifyChain(printing, next, table, graph), "neighbour root");
+  rejects(() => verifyChain(printing, next, table, graph), "neighbor root");
   rejects(() => run(graph, printing, next, 0), "wrong source state");
   // Swapped edge order and truncated chain.
   rejects(() => verifyChain(printing, pose, table, { nodes: graph.nodes, edges: [graph.edges[1], graph.edges[0], ...graph.edges.slice(2)] }), "swapped edges");
