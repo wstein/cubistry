@@ -84,12 +84,59 @@ test("the skill classifier is the package: same groups, orders and offsets, no s
 });
 
 test("no transitive merge: A~B and B~C do not pull in C when A and C differ (complete linkage)", () => {
-  // Three bars whose widths step by 5 px (1.9 percent of the area per step, limit 3 percent): neighbors match, the ends do not.
+  // Bars 16, 20 and 24 px wide: after the 2x downsample neighbors differ in 2.0 percent of the pixels (limit 3 percent),
+  // the two ends in 4.0 percent. Single linkage would give one group of three.
   const step = (w) => make((x, y) => (inside(x, y, 4, 17, 4 + w, 23) ? 40 : 220));
-  const a = step(16), b = step(21), cc = step(26);
-  const tiles = [{ id: "F_0_0", px: a }, { id: "F_0_1", px: b }, { id: "F_1_0", px: cc }];
-  const loose = { share: 0.03 };
-  const direct = appearanceOf(tiles, { probe: n, tol: loose.share });
-  const groups = direct.loose.identical.map((g) => g.members.length);
-  assert.ok(Math.max(...groups) < 3, JSON.stringify(direct.loose.identical));
+  const tiles = [{ id: "F_0_0", px: step(16) }, { id: "F_0_1", px: step(20) }, { id: "F_1_0", px: step(24) }];
+  const sizes = appearanceOf(tiles, { probe: n }).loose.identical.map((g) => g.members.length).sort();
+  assert.deepEqual(sizes, [1, 2]);
+  const c = classifyTiles(tiles, { n: 2, probe: n });
+  assert.deepEqual(c.identicalGroups, [["F_0_0", "F_0_1"]]);
+});
+
+// A copy of a picture with a 4 x 4 pixel patch: 1 percent of the 2x downsampled pixels differ, which is within the loose
+// share (3 percent) and over the strict one (0.5 percent), so only the loose level groups it.
+const patched = (d) => { const e = Uint8ClampedArray.from(d); for (let y = 30; y < 34; y++) for (let x = 30; x < 34; x++) e.set([0, 0, 0, 255], (y * n + x) * 4); return e; };
+
+test("groups and orders come from the loose level, not the strict one", () => {
+  const c = classifyTiles([{ id: "F_0_0", px: corner }, { id: "F_0_1", px: patched(corner) }], { n: 2, probe: n });
+  assert.deepEqual(c.identicalGroups, [["F_0_0", "F_0_1"]]);
+  // A quarter-turned copy with the patch is a rotation twin only at the loose level.
+  const tw = classifyTiles([{ id: "F_0_0", px: corner }, { id: "L_0_0", px: patched(turn(corner, 1)) }], { n: 2, probe: n });
+  assert.deepEqual(tw.rotationTwinGroups, [["F_0_0", "L_0_0"]]);
+  assert.deepEqual(packageClassify([{ id: "a", side: n, data: corner }, { id: "b", side: n, data: patched(turn(corner, 1)) }]).strict.twins.filter((g) => g.identical.length > 1), []);
+  // A disc with the patch is still 4-fold at the loose level (about 2 percent change under a turn); strict would say none.
+  const tiles = ["U", "L", "F", "R", "B", "D"].map((f) => ({ id: `${f}_1_1`, px: f === "F" ? patched(disc) : disc }));
+  const centers = classifyTiles(tiles, { n: 3, probe: n }).centers;
+  assert.equal(centers.find((x) => x.face === "F").symmetry, "4-fold");
+  const row = classifyTiles([{ id: "F_0_0", px: patched(disc) }], { n: 2, probe: n }).tiles[0];
+  assert.deepEqual([row.symmetry, row.equivalentTurns], ["4-fold", 4]);
+  assert.equal(packageClassify([{ id: "F", side: n, data: patched(disc) }]).strict.identical[0].order, 1);
+});
+
+test("--tol plumbing: the share reaches the package and the thresholds", () => {
+  const tiles = [{ id: "F_0_0", px: corner }, { id: "F_0_1", px: patched(corner) }];
+  assert.deepEqual(classifyTiles(tiles, { n: 2, probe: n, tol: 0.03 }).identicalGroups, [["F_0_0", "F_0_1"]]);
+  const tight = classifyTiles(tiles, { n: 2, probe: n, tol: 0.001 });
+  assert.deepEqual(tight.identicalGroups, []);
+  assert.equal(tight.thresholds.symmetry, 0.001);
+  assert.equal(tight.thresholds.duplicate, 0.001);
+  assert.equal(appearanceOf(tiles, { probe: n, tol: 0.001 }).loose.thresholds.share, 0.001);
+  assert.equal(appearanceOf(tiles, { probe: n }).loose.thresholds.share, LOOSE_THRESHOLDS.share);
+  assert.throws(() => classifyTiles(tiles, { probe: n, symmetryTol: 0.03, duplicateTol: 0.02 }), /one threshold/);
+});
+
+test("rotation shares and center periods follow the quarter, half and three-quarter turn", () => {
+  const c = classifyTiles(["U", "L", "F"].map((f, i) => ({ id: `${f}_1_1`, px: [disc, bar, corner][i] })), { n: 3, probe: n });
+  const bars = c.tiles.find((t) => t.id === "L_1_1").rotDiff;
+  assert.ok(bars.r90 > 0.1 && bars.r270 > 0.1 && bars.r180 < 0.03, JSON.stringify(bars));
+  const corners = c.tiles.find((t) => t.id === "F_1_1").rotDiff;
+  assert.ok(corners.r90 > 0.1 && corners.r180 > 0.1);
+  assert.deepEqual(c.centers.map((x) => [x.face, x.period]), [["U", 1], ["L", 2], ["F", 4]]);
+});
+
+test("the pixel tolerance is the loose 24, not the strict 16", () => {
+  const shaded = make((x, y) => (Math.hypot(x - 20, y - 20) < 12 ? 40 - (x < 20 ? 20 : 0) : 220)); // left half 20 levels darker
+  const c = classifyTiles([{ id: "F_0_0", px: shaded }], { n: 2, probe: n });
+  assert.equal(c.tiles[0].symmetry, "4-fold");
 });

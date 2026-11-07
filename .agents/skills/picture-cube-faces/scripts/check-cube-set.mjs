@@ -25,7 +25,6 @@ import { resolve, basename } from "node:path";
 import { FACE_NAMES, EDGES, parseNSpec, parseTileId, stickerCount } from "../src/geometry.mjs";
 import { findForbidden, styleAudit, checkSizes, checkTileFormat, faceRoot, DEFAULT_BUDGET } from "../src/rules.mjs";
 import { MIN_DETAIL } from "../src/metrics.mjs";
-import { classifyTiles, summarize, LOOSE_SHARE } from "../src/symmetry.mjs";
 import { bandDiffs, edgeStats, seamVerdict, SEAM_MEAN_LIMIT, SEAM_SEGMENT_LIMIT, SEAM_BAND } from "../src/seams.mjs";
 
 const PROBE = 80;
@@ -79,9 +78,25 @@ if (!existsSync(dir) || !statSync(dir).isDirectory()) { console.error(`not a dir
 let ns;
 const strictN = opts["strict-n"] ?? [2];
 try { ns = parseNSpec(opts.n, opts["n-range"]); } catch (e) { console.error(e.message); process.exit(2); }
+// The classifier is packages/cube-appearance (reached through src/symmetry.mjs). It needs the repo's node_modules
+// (@cubistry/cube-core) and a Node that runs TypeScript sources directly (22.18 or newer): an environment error, exit 2.
+let classifyTiles, summarize, LOOSE_SHARE;
+try { ({ classifyTiles, summarize, LOOSE_SHARE } = await import("../src/symmetry.mjs")); } catch (e) {
+  console.error(`ERROR cannot load the classifier (packages/cube-appearance): ${e.message.split("\n")[0]}`);
+  console.error("Run the checker from a repository checkout with `npm ci` done (the package imports @cubistry/cube-core; CUBE_NODE_MODULES only locates Playwright) and Node 22.18 or newer.");
+  process.exit(2);
+}
+// --tol is the one threshold; --sym-tol and --dup-tol are aliases for it and must not contradict each other.
+const given = ["tol", "sym-tol", "dup-tol"].filter((k) => opts[k] !== undefined);
+if (new Set(given.map((k) => opts[k])).size > 1) {
+  console.error(`conflicting thresholds: ${given.map((k) => `--${k} ${opts[k]}`).join(", ")}; they are aliases of one value (--tol)`);
+  process.exit(2);
+}
+const tol = opts.tol ?? opts["sym-tol"] ?? opts["dup-tol"] ?? LOOSE_SHARE;
 const th = {
   minDetail: opts["min-detail"] ?? MIN_DETAIL,
-  tol: opts.tol ?? opts["sym-tol"] ?? opts["dup-tol"] ?? LOOSE_SHARE,
+  tol,
+  symmetryTol: tol, duplicateTol: tol, // kept in tiles.json for readers of the former fields
   tileTol: opts["tile-tol"] ?? TILE_TOL,
   seamMean: opts["seam-mean"] ?? SEAM_MEAN_LIMIT,
   seamSegment: opts["seam-segment"] ?? SEAM_SEGMENT_LIMIT,

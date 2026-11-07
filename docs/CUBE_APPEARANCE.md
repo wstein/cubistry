@@ -21,6 +21,7 @@ symmetric odd-N centers are accepted. The binding decisions:
 | D6 | Identical stones are interchangeable with the induced rotation, also at N of 4 or more. | `deriveStones` (geometry only; see limits) |
 | D7 | Optimality is claimed only where proven. | This package makes no optimality claim |
 | D8 | The classifier lives in a pure package. | `packages/cube-appearance` |
+| D9 | The suitability traffic light is red only for flat stickers or a flat face; identical, symmetric and turned stickers are information. | `analyzeStickers` in `suitability.ts` (consumer, not the package) |
 
 ## Terminology: order and period
 
@@ -145,17 +146,25 @@ Both former copies of the classification logic now call this package, so there i
     A theme that only chained through intermediate stickers now reports fewer merged groups.
   - `centers[].orientationNeeded` keeps its version-1 meaning (false for a 2-fold or 4-fold sticker) and is the
     package's `orientationExact`. The package's own `orientationNeeded` (order below 4) is stricter: a 2-fold
-    center is solved only modulo a half turn. The additive key `centers[].period` carries the exact rule. The
-    owner should decide whether the skill wording "need not be turned" means "any turn" (4-fold only) or "modulo
-    the period" (as the goal predicate here treats it).
-  - No JSON field was removed or renamed, so the version stays 1. An `appearance@2` map is not written by the checker:
+    center is solved only modulo a half turn. The additive key `centers[].period` carries the exact rule.
+    **OPEN (owner decision pending):** does "need not be turned" mean any turn (4-fold only) or modulo the
+    period (as the goal predicate here treats it)? The same question is marked open in `SUPER_PICTURE_CUBE.md`
+    and in the skill's `reference/cube-sizes-2-to-7.md`; no rule was changed.
+  - No JSON field was removed or renamed, so the version stays 1: `thresholds.symmetry` and `thresholds.duplicate`
+    now carry the same value, and the checker's `thresholds` object keeps `symmetryTol` and `duplicateTol` next
+    to the new `tol`. The checker needs the repository's `node_modules` (the package imports
+    `@cubistry/cube-core`) and Node 22.18 or newer; otherwise it exits 2 with a message. An `appearance@2` map is not written by the checker:
     a map needs a renderer and a print id, and raster maps must not be recomputed on another device.
 - **Suitability display (`src/apps/playground/suitability.ts`).** It keeps its traffic light and wording and
-  calls the loose level on a 20 px block-average copy of each 80 px sticker (a 294-sticker 7x7 classification
-  takes about 1.3 s; 40 px would take about 5 s because the package has no early exit). Flatness is measured on the
-  full 80 px sticker with the package's `detailOf`. The light is unchanged (D9): red only for flat stickers or a
+  calls the loose level for the identical and twin groups on a 20 px block-average copy of each 80 px sticker.
+  Flatness (`detailOf`) and rotational symmetry (the package's `rotateRgb`, `differingShare`, `symmetryOrder`)
+  are measured on the full 80 px sticker, as before, and so are the check script's. Cost: a 294-sticker 7x7 set
+  takes about 2 to 2.5 s on the main thread (about 0.5 s before). The package always computes the strict level and
+  the nearest-neighbor diagnostics too and has no early exit; a follow-up could add a loose-only option and an
+  early exit in `completeLinkage` and `differingShare`. The checker at N = 7 takes about 7.6 s (0.23 s before)
+  and a demo set over N = 2 to 7 about 18 s (2.8 s before), for the same reason. The light is unchanged (D9): red only for flat stickers or a
   flat face, never for identical, symmetric or turned stickers. Identical now means "same loose class", a superset of
-  exact pixel copies (the old raw-pixel hash); `measureRgba` returns the package tile report, `tileHash` and
+  exact pixel copies (the old raw-pixel hash); `measureRgba` returns the package's rotation shares, `tileHash` and
   `detailOf`. The display never feeds solver decisions.
 
 ## Tests

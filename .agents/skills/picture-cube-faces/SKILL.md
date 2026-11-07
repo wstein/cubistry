@@ -4,7 +4,7 @@ description: Generate or refine picture-cube face sets (six whole square SVG fac
 ---
 # Picture-cube faces
 
-Build, check and review picture-cube themes: a belt L - F - R - B that reads as ONE panorama, plus Up and Down faces whose borders come from the belt. All code is Node ESM (no Python). Read the repo rules in `AGENTS.md` first; this skill does not override ADRs or specs. For SVG print rules also follow `.agents/skills/validate-artwork/SKILL.md`.
+Build, check and review picture-cube themes: a belt L - F - R - B that reads as ONE panorama, plus Up and Down faces whose borders come from the belt. All code is Node ESM (no Python). **Prerequisites:** run from a repository checkout after `npm ci` (the classifier is `packages/cube-appearance`, which imports `@cubistry/cube-core` from the repo's `node_modules`; `CUBE_NODE_MODULES` only locates Playwright) and use Node 22.18 or newer, which runs the package's TypeScript sources directly (type stripping). Without them `src/symmetry.mjs` fails to import and the checker exits 2 with a message. Read the repo rules in `AGENTS.md` first; this skill does not override ADRs or specs. For SVG print rules also follow `.agents/skills/validate-artwork/SKILL.md`.
 
 ## What a theme is (read this first)
 
