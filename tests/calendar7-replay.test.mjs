@@ -327,7 +327,7 @@ test("checkPose requires all stickers of one piece to share one position", () =>
       mixed[field][3 * b + j] = t;
     }
   }
-  assert.throws(() => checkPose(printing, mixed), /same position/);
+  assert.throws(() => checkPose(printing, mixed), /at the same position/);
 });
 
 test("the strict TSV reader refuses CRLF text", () => {

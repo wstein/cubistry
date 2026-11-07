@@ -157,12 +157,13 @@ export function stateText(printing: Printing, state: Pose): string {
 export const stateDigest = (printing: Printing, state: Pose): string =>
   sha256Text(stateText(printing, state));
 
-/** Number of distinct bodies and (body position, normal) slots; a cheap sanity check. */
+/** Sanity check: distinct (body position, normal) slots, 218 bodies, and one position per piece. */
 export function checkPose(printing: Printing, state: Pose): void {
   if (printing.piece.length !== STICKERS || state.pos.length !== 3 * STICKERS)
     throw new Error("a pose needs exactly 294 stickers");
   const slots = new Set<string>();
   const bodies = new Set<number>();
+  const bodyOfPiece = new Map<number, number>();
   for (let i = 0; i < STICKERS; i++) {
     const o = 3 * i;
     const pos = [state.pos[o], state.pos[o + 1], state.pos[o + 2]];
@@ -176,7 +177,12 @@ export function checkPose(printing: Printing, state: Pose): void {
     if (u.reduce((s, x) => s + Math.abs(x), 0) !== 1 || n.reduce((s, x, j) => s + x * u[j], 0) !== 0)
       throw new Error(`sticker ${i + 1} has an invalid up vector`);
     slots.add(`${pos}|${n}`);
-    bodies.add(pos[0] * 49 + pos[1] * 7 + pos[2]);
+    const body = pos[0] * 49 + pos[1] * 7 + pos[2];
+    const seen = bodyOfPiece.get(printing.piece[i]);
+    if (seen !== undefined && seen !== body)
+      throw new Error(`sticker ${i + 1}: stickers of piece ${printing.piece[i]} are not at the same position`);
+    bodyOfPiece.set(printing.piece[i], body);
+    bodies.add(body);
   }
   if (slots.size !== STICKERS || bodies.size !== CUBIES)
     throw new Error("poses do not cover 218 bodies and 294 distinct surfaces");
