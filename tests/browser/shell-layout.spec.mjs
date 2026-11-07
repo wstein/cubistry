@@ -185,10 +185,10 @@ test("presentation mode: the stage fills the window, the dock readout and the fo
   await leavePresentation();
 });
 
-// Appearance is a section of the right-hand pane (the dock): collapsed on load, opened from the header View menu,
-// closed by Escape with focus returned to the View button, and never over the stage. The open state is not remembered.
+// Appearance is a section of the right-hand pane (the dock): collapsed on load, opened from the header Appearance button,
+// closed by Escape with focus returned to the Appearance button, and never over the stage. The open state is not remembered.
 for (const frame of frames) {
-  test(`${frame.name}: Appearance is a collapsed section of the dock, opened from the View menu, outside the stage`, async () => {
+  test(`${frame.name}: Appearance is a collapsed section of the dock, opened from the Appearance button, outside the stage`, async () => {
     await page.setViewportSize({ width: frame.width, height: frame.height });
     await page.reload();
     await page.locator("#studio-controls .hud-body").waitFor({ timeout: 25000 });
@@ -201,6 +201,8 @@ for (const frame of frames) {
     await expect(page.locator("#appearance-btn")).toHaveAttribute("aria-expanded", "true");
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
     await expect(toggle).toBeFocused();
+    const look = await page.locator(".cube-appearance").evaluate(e => { const c = getComputedStyle(e); return [c.opacity, c.backdropFilter]; });
+    expect(look, "solid panel: no ambient opacity, no blur").toEqual(["1", "none"]);
     await expect(page.getByLabel("Cube construction")).toBeVisible();
     await expect(page.getByLabel("View rotation mode")).toBeVisible();
     await expect(page.getByLabel("Plastic frame color")).toBeHidden(); // under "More"
