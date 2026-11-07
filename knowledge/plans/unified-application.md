@@ -25,6 +25,10 @@ Evidence level: the current-state facts below were re-read on `origin/main` at `
 9. **Tool pages.** `licenses.html` stays. The fate of `solver-acceptance.html` and `library-example.html` is still open (`print.html`: decision 10).
 10. **`print.html` (owner, 2026-11-07: "Ja, bitte so in den Plan übernehmen"; place, design source and set of applications chosen by the owner the same day: "Slot 5, Design der laufenden App").** `print.html` stays a separate page. It has no entry in the catalog of the landing page or of the Cubes page. It is called from the slot "Print & appearance" (slot 5) of every application that has a print design: a button "Print stickers for this app" opens `print.html?design=<design of the running application>` in a new tab. This deviates from the mock, which puts the button in the View menu (`viewControls()`, `docs/design/cubistry-mock.html:941-954`, section "Tools", lines 951-953; README:75) with a fixed `design=words-pascal`; the deviation is an owner decision. The slot-5 placement in the earlier proposal to the owner was not backed by the design proposal (the README slot map, `docs/design/README.md:17-28`, has no print button); the owner has now chosen it explicitly.
 
+11. **Unified mode ids (owner, 2026-11-07, "So bestätigen").** One list with one key, `app`: `clock`, `ms-timer`, `hm-clock`, `counter`, `tenth`, `timer`, `five-second-timer`, `hsm-counter`, `ms-counter`, `hm-one-cube` (the ids of the mock); later `calendar`, `playground`, `ci`. The legacy application key `certified` becomes `counter` and `tenth-counter` becomes `tenth`. The specs that use `application=` (hsm-lettering, print-sheets, target-interruption, ms-counter, ms-timer) change with the port of their application.
+12. **Host in stage 2 (owner, 2026-11-07, "chronocube.html bis Stufe 3").** Until stage 3 the modes are hosted by `chronocube.html?app=<id>`; `index.html` stays the redirect. Stage 3 makes `index.html` the landing page and the host, and deletes `chronocube.html` (this moves the deletion of `chronocube.html` from stage 5 to stage 3).
+13. **Last mode (owner, 2026-11-07, "Nicht merken").** No auto-redirect to the last used mode: the keys `cubistry_chronocube_mode` and `cubistry_app` stop driving the host and the landing page. Returning users do not resume automatically.
+
 Recommendations in this plan that go beyond these statements (`chronocube.html` is not the final shell, mounting existing engines instead of rewriting them) are recommendations, not decisions; see "Open decisions".
 
 ## Current state (verified on `origin/main` at `7dae282`)
@@ -95,14 +99,11 @@ Row d: the ten deviations that README:56-67 lists under "Deviations that need an
 | 10 | 67 | Deep links: `#app-clock` in the mock; production keeps `?application=` | DECIDED, adjusted: `index.html?app=<id>`, no redirects (row c; decisions 2 and 7) |
 
 ## Open decisions
-Not decided. Each recommendation comes from the code reading behind this plan; the price is what it costs. Decided items (name, `hm-clock`, `licenses.html`, `print.html`, transitional links) are in the section "Decisions".
+Not decided. Each recommendation comes from the code reading behind this plan; the price is what it costs. Decided items (name, `hm-clock`, `licenses.html`, `print.html`, transitional links, mode ids, host in stage 2, start behavior) are in the section "Decisions".
 
 | Topic | Recommendation | Price |
 |---|---|---|
 | Dev pages `solver-acceptance.html`, `library-example.html` | Open. Options: keep as dev pages, or drop from the Pages build. (`print.html` is decided, decision 10; facts: "What `print.html` is" below.) | Both dev pages have E2E (`acceptance.spec`, `production.spec`); dropping them removes that coverage or moves it. |
-| Unified mode ids | One list with one key, `app` (decision 7); today `mode` and `application` differ (`counter` vs `certified`, `tenth` vs `tenth-counter`). The ids of the list are not decided. | Tests using `application=` (hsm-lettering, print-sheets, target-interruption, ms-counter, ms-timer) change. |
-| `chronocube.html` as shell | Treated as not final (an inference from the rejected rename and from `index.html` hosting the modes, not an owner statement); the owner confirms or corrects. | If it were kept as the shell, stage 5 changes. |
-| Start behavior | No auto-redirect to the last used mode (the keys `cubistry_chronocube_mode` and `cubistry_app` stop driving the landing page). | Returning users do not resume automatically. |
 
 ### What `print.html` is
 Facts read from the repository at `eb1dcce3`; the run-time behavior is `UNKNOWN` here.
