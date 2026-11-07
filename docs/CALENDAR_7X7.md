@@ -97,9 +97,10 @@ node scripts/prepare-calendar7.mjs
 
 ## Pin
 
-The pin names the research commit of the pull request that stores the chain on the
-research branch. That branch is merged by rebase, which rewrites commit ids. After the
-merge, re-pin with `node scripts/prepare-calendar7.mjs --pin <merged commit> --branch
+The pin names the research commit `bcee891dd0d247383d5b7604f106cb76180c98d7` on
+`research/cube-display-feasibility`, the merge of the pull request that stores the chain
+there. Research is merged by rebase, which rewrites commit ids, so a new research commit
+needs a new pin: `node scripts/prepare-calendar7.mjs --pin <commit> --branch
 research/cube-display-feasibility`. The SHA-256 values of the data do not change.
 
 ## Licensing
