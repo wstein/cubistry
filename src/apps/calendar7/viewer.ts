@@ -1,0 +1,259 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+/**
+ * English 7x7 calendar cube, 3D view (research candidate, not certified).
+ *
+ * Not a new renderer: it is the same composition as the 3x3 calendar viewer (src/apps/calendar/viewer.ts), built from
+ * the exported, size-neutral parts of @cubistry/cube-viewer (PhysicalCubeScene, the presentation geometry, plastic and
+ * sticker materials, studio lighting, camera fitting, smart rotation). Only `CubeViewer` itself is limited to the
+ * 2x2 print/state contract (@cubistry/cube-core validates size 2 only), so it is not used here.
+ *
+ * The scene holds the 218 surface bodies with 294 stickers of `engine.ts` and draws the sticker texts from the
+ * printing (text and ink). A pose of the engine maps one to one to a sticker frame: position, normal, up.
+ * One engine move turns the bodies of one layer (or all bodies, for a whole-cube rotation) about its axis; the right
+ * handed quarter turn of the engine is the right handed rotation of the scene (x to y to z, front = +z).
+ */
+import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import {
+  bindSmartRotation,
+  configurePresentationRenderer,
+  createPlasticMaterial,
+  createPresentationGeometry,
+  createPresentationStudio,
+  createStickerMaterial,
+  cubePresentationRadius,
+  fitPresentationCamera,
+  PhysicalCubeScene,
+  PRESENTATION_PRESET,
+  type PhysicalStickerFrame,
+  rotatePresentation,
+  type SmartRotationBinding,
+} from "@cubistry/cube-viewer";
+import {
+  applyMoves,
+  CUBIES,
+  generatorAxis,
+  generatorLayer,
+  isRotation,
+  type Move,
+  type Pose,
+  type Printing,
+  STICKERS,
+} from "./engine.ts";
+import type { StageView } from "./player.ts";
+import { BLANK_PAPER, drawSticker, PAPER, PLASTIC, TEXTURE } from "./sticker-art.ts";
+import { MoveTween } from "./tween.ts";
+
+/**
+ * The presentation geometry with a lighter body: 218 bodies at the preset's three bevel segments are 570 triangles each
+ * (124k in all); one segment keeps the rounded edge profile of the preset at a fifth of the cost.
+ */
+function lightGeometry() {
+  const geometry = createPresentationGeometry();
+  const p = PRESENTATION_PRESET;
+  geometry.body.dispose();
+  return { ...geometry, body: new RoundedBoxGeometry(p.bodyWidth, p.bodyWidth, p.bodyWidth, 1, p.bodyRadius) };
+}
+
+/** Camera distance relative to the fit of the bounding sphere: the cube fills the picture, the sphere keeps some air. */
+const ZOOM = 0.9;
+
+export class Calendar7Viewer implements StageView {
+  readonly renderer: THREE.WebGLRenderer;
+  readonly scene = new THREE.Scene();
+  readonly presentation = new THREE.Group();
+  readonly camera = new THREE.PerspectiveCamera(24, 1, 0.1, 200);
+  private readonly studio: ReturnType<typeof createPresentationStudio>;
+  private readonly resize: ResizeObserver;
+  private readonly rotation: SmartRotationBinding;
+  private cube: PhysicalCubeScene | null = null;
+  private resources: { dispose(): void }[] = [];
+  private printing: Printing | null = null;
+  /** Reused every sync: frames are rewritten in place, so a move allocates no frame objects. */
+  private frames: { id: number; cubie: number; p: number[]; n: number[]; up: number[] }[] = [];
+  private readonly tween = new MoveTween();
+  private dirty = true;
+  private destroyed = false;
+  private readonly lastQuaternion = new THREE.Quaternion();
+  /** Marks of the pieces on the turning layer (indexed by piece id), reused for every move. */
+  private readonly onLayer = new Uint8Array(CUBIES + 1);
+
+  /** `panel` receives the rotation mode selector of the smart rotation. */
+  constructor(host: HTMLElement, panel: HTMLElement) {
+    this.presentation.name = "cube-presentation";
+    this.scene.add(this.presentation);
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    configurePresentationRenderer(this.renderer);
+    host.append(this.renderer.domElement);
+    const extent = 3.5;
+    this.studio = createPresentationStudio(this.scene, extent, extent, host, cubePresentationRadius(extent));
+    this.resize = new ResizeObserver(() => {
+      const w = host.clientWidth;
+      const h = host.clientHeight;
+      if (!w || !h) return;
+      this.renderer.setSize(w, h, false);
+      this.camera.aspect = w / h;
+      fitPresentationCamera(this.camera, cubePresentationRadius(extent), ZOOM);
+      this.dirty = true;
+    });
+    this.resize.observe(host);
+    const el = this.renderer.domElement;
+    el.setAttribute("role", "img");
+    el.setAttribute("aria-label", "7x7 calendar cube. Drag to rotate the cube.");
+    rotatePresentation(this.presentation, 0.3, 0.22);
+    this.rotation = bindSmartRotation(el, this.presentation, { sensitivity: 0.006, panel });
+    fitPresentationCamera(this.camera, cubePresentationRadius(extent), ZOOM);
+    this.lastQuaternion.copy(this.presentation.quaternion);
+    // On-demand rendering: an idle cube costs only the rotation step, never a 500-mesh draw.
+    this.renderer.setAnimationLoop((now: number) => this.frame(now));
+  }
+
+  private frame(now: number): void {
+    if (this.destroyed) return;
+    this.rotation.step();
+    if (!this.presentation.quaternion.equals(this.lastQuaternion)) {
+      this.lastQuaternion.copy(this.presentation.quaternion);
+      this.dirty = true;
+    }
+    if (this.tween.tick(now)) this.dirty = true;
+    if (this.dirty) {
+      this.dirty = false;
+      this.renderer.render(this.scene, this.camera);
+    }
+  }
+
+  setLabel(text: string): void {
+    this.renderer.domElement.setAttribute("aria-label", `${text}. Drag to rotate the cube.`);
+  }
+  resetView(): void {
+    this.rotation.reset();
+  }
+
+  private clear(): void {
+    this.cube?.dispose();
+    this.cube = null;
+    for (const r of this.resources) r.dispose();
+    this.resources = [];
+  }
+
+  /** Builds the cube from the printing and shows `pose`. */
+  configure(printing: Printing, pose: Pose): void {
+    this.clear();
+    this.printing = printing;
+    const plastic = createPlasticMaterial(PLASTIC, 0.55);
+    this.resources.push(plastic);
+    const anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
+    const materials = new Map<number, THREE.Material>();
+    const byKey = new Map<string, THREE.Material>();
+    for (let i = 0; i < STICKERS; i++) {
+      const key = `${printing.ink[i]}|${printing.text[i]}`;
+      let material = byKey.get(key);
+      if (!material) {
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = TEXTURE;
+        drawSticker(canvas.getContext("2d") as CanvasRenderingContext2D, printing.text[i], printing.ink[i]);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = anisotropy;
+        material = createStickerMaterial(texture);
+        this.resources.push(texture, material);
+        byKey.set(key, material);
+      }
+      materials.set(i + 1, material);
+    }
+    this.frames = Array.from({ length: STICKERS }, (_, i) => ({
+      id: i + 1,
+      cubie: printing.piece[i],
+      p: [0, 0, 0],
+      n: [0, 0, 0],
+      up: [0, 0, 0],
+    }));
+    this.writeFrames(pose);
+    const faceColors = new Map<number, string>();
+    for (let i = 0; i < STICKERS; i++) faceColors.set(i + 1, printing.text[i] === "" ? BLANK_PAPER : PAPER);
+    this.cube = new PhysicalCubeScene(
+      this.presentation,
+      this.frames as unknown as readonly PhysicalStickerFrame[],
+      materials,
+      plastic,
+      1,
+      lightGeometry(),
+      faceColors,
+      { bodyColor: PLASTIC },
+    );
+    // A sticker is a flat sheet on its body: it needs no shadow of its own (halves the shadow pass).
+    this.presentation.traverse((o) => {
+      if (o.userData.stickerId !== undefined) (o as THREE.Mesh).castShadow = false;
+    });
+    this.cube.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
+    this.dirty = true;
+  }
+
+  private writeFrames(pose: Pose): void {
+    for (let i = 0; i < STICKERS; i++) {
+      const f = this.frames[i];
+      const o = 3 * i;
+      for (let k = 0; k < 3; k++) {
+        f.p[k] = pose.pos[o + k];
+        f.n[k] = pose.normal[o + k];
+        f.up[k] = pose.up[o + k];
+      }
+    }
+  }
+
+  show(pose: Pose): void {
+    if (this.destroyed || !this.cube) return;
+    this.tween.cancel();
+    this.sync(pose);
+  }
+
+  private sync(pose: Pose): void {
+    this.writeFrames(pose);
+    this.cube?.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
+    this.dirty = true;
+  }
+
+  turn(move: Move, before: Pose, ms: number): Promise<void> {
+    if (this.destroyed || !this.cube) return Promise.resolve();
+    this.tween.cancel();
+    const [g, q] = move;
+    const axis = generatorAxis(g);
+    const layer = generatorLayer(g);
+    const whole = isRotation(g);
+    const pieces: number[] = [];
+    this.onLayer.fill(0);
+    for (let i = 0; i < STICKERS; i++) {
+      if (!whole && before.pos[3 * i + axis] !== layer) continue;
+      const piece = (this.printing as Printing).piece[i];
+      if (!this.onLayer[piece]) {
+        this.onLayer[piece] = 1;
+        pieces.push(piece);
+      }
+    }
+    const turn = this.cube.beginTurn(pieces, axis, (q * Math.PI) / 2);
+    const after = applyMoves(before, [move]);
+    this.dirty = true;
+    return this.tween.begin(
+      ms,
+      (progress) => turn.update(progress),
+      (completed) => {
+        // Release the pivot and put every body at its final frame in the same tick: no frame shows the gap.
+        turn.dispose();
+        if (completed) this.sync(after);
+      },
+    );
+  }
+
+  destroy(): void {
+    if (this.destroyed) return;
+    this.tween.cancel();
+    this.destroyed = true;
+    this.renderer.setAnimationLoop(null);
+    this.resize.disconnect();
+    this.rotation.dispose();
+    this.studio.dispose();
+    this.clear();
+    this.renderer.dispose();
+    this.renderer.domElement.remove();
+  }
+}
