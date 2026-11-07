@@ -1,12 +1,27 @@
 // How well a picture set works as a puzzle, measured on its stickers. The pure functions here are
 // shared by the playground's live suitability display and by scripts/check-pastel-garden-tiles.mjs
 // (its --sizes mode), so both use one definition of "flat", "rotation symmetric" and "identical".
-// A sticker is an SAMPLE x SAMPLE RGBA buffer (the caller renders it; this module never touches the
-// DOM). The result ADVISES only: nothing here blocks a design.
+// That definition is the shared classifier in packages/cube-appearance at its LOOSE level (owner
+// decisions D3 and D8): this module keeps the traffic light and the display wording but owns no pixel
+// comparison of its own. A sticker is an SAMPLE x SAMPLE RGBA buffer (the caller renders it; this module
+// never touches the DOM). The result ADVISES only: nothing here blocks a design, and it must not feed
+// solver decisions (solvers use the strict level or exact thresholds).
+import {
+  LOOSE_THRESHOLDS,
+  classifyTiles,
+  detailOf,
+  symmetryOrder,
+  tileHash,
+  toRgb,
+  type Classification,
+  type SymmetryOrder,
+} from "@cubistry/cube-appearance";
+
 export const SAMPLE = 80; // edge of the sampled sticker in pixels
 export const MIN_DETAIL = 0.08; // share of pixels that are not the sticker's dominant color
-export const MIN_ROT_DIFF = 0.03; // share of pixels that change under the least-different rotation
-const PIXEL_TOLERANCE = 24; // per-channel difference that counts as "different"
+export const MIN_ROT_DIFF = LOOSE_THRESHOLDS.share; // share of pixels that may change under a rotation (loose level)
+/** Edge of the copy the groups are compared on (block averages); keeps N = 7 (294 stickers) interactive. */
+export const COARSE = 20;
 
 export interface TileMeasure {
   /** Share of pixels that are not the dominant (quantized) color; low means mostly flat. */
@@ -15,54 +30,27 @@ export interface TileMeasure {
   readonly rotations: readonly [number, number, number];
   /** Smallest of `rotations`; low means the sticker looks like one of its own rotations. */
   readonly minRot: number;
-  /** Hash of the raw pixels: equal hashes mean identical stickers. */
+  /** Hash of the composited pixels: equal hashes mean identical stickers. */
   readonly hash: string;
 }
 
-const rotate90 = (n: number) => (x: number, y: number): [number, number] => [n - 1 - y, x];
-const rotate180 = (n: number) => (x: number, y: number): [number, number] => [n - 1 - x, n - 1 - y];
-const rotate270 = (n: number) => (x: number, y: number): [number, number] => [y, n - 1 - x];
-
-/** Measures one n x n RGBA sticker (n = SAMPLE unless stated). */
+/** Measures one n x n RGBA sticker (n = SAMPLE unless stated) with the shared classifier. */
 export function measureRgba(d: ArrayLike<number>, n = SAMPLE): TileMeasure {
-  const q = (i: number) => `${d[i] >> 4},${d[i + 1] >> 4},${d[i + 2] >> 4}`;
-  const hist = new Map<string, number>();
-  for (let i = 0; i < d.length; i += 4) hist.set(q(i), (hist.get(q(i)) ?? 0) + 1);
-  const detail = 1 - Math.max(...hist.values()) / (n * n);
-  const px = (x: number, y: number) => (y * n + x) * 4;
-  const diff = (a: number, b: number) => {
-    for (let c = 0; c < 3; c++) if (Math.abs(d[a + c] - d[b + c]) > PIXEL_TOLERANCE) return 1;
-    return 0;
-  };
-  const rotations = [rotate90(n), rotate180(n), rotate270(n)].map((m) => {
-    let k = 0;
-    for (let y = 0; y < n; y++)
-      for (let x = 0; x < n; x++) {
-        const [u, v] = m(x, y);
-        k += diff(px(x, y), px(u, v));
-      }
-    return k / (n * n);
-  }) as [number, number, number];
-  let h1 = 0x811c9dc5,
-    h2 = 0x01000193;
-  for (let i = 0; i < d.length; i++) {
-    h1 = Math.imul(h1 ^ d[i], 0x01000193);
-    h2 = Math.imul(h2 + d[i], 0x85ebca6b) ^ (h2 >>> 13);
-  }
-  return { detail, rotations, minRot: Math.min(...rotations), hash: h1 + ":" + h2 };
+  const tile = { id: "sticker", side: n, data: d };
+  const rgb = toRgb(tile);
+  const [report] = classifyTiles([tile]).tiles;
+  const rotations = report.rotDiff.loose;
+  return { detail: detailOf(rgb), rotations, minRot: Math.min(...rotations), hash: tileHash(rgb) };
 }
 
-export type Symmetry = 1 | 2 | 4;
+export type Symmetry = SymmetryOrder;
 /** Rotational symmetry order: 4 = looks the same turned by 90 degrees, 2 = by 180 degrees only, 1 = none. */
 export function symmetryOf(m: TileMeasure): Symmetry {
-  const [r90, r180, r270] = m.rotations;
-  if (Math.min(r90, r270) < MIN_ROT_DIFF) return 4;
-  return r180 < MIN_ROT_DIFF ? 2 : 1;
+  return symmetryOrder(m.rotations, LOOSE_THRESHOLDS);
 }
 export const isFlat = (m: TileMeasure) => m.detail < MIN_DETAIL;
 
-/** Coarse copy of a sticker (block averages), enough to compare rotations of different stickers. */
-const COARSE = 20;
+/** Coarse copy of a sticker (block averages), enough to compare different stickers and their rotations. */
 function coarse(d: ArrayLike<number>, n: number): Uint8ClampedArray {
   const k = n / COARSE,
     out = new Uint8ClampedArray(COARSE * COARSE * 4);
@@ -74,30 +62,6 @@ function coarse(d: ArrayLike<number>, n: number): Uint8ClampedArray {
         out[(y * COARSE + x) * 4 + c] = sum / (k * k);
       }
   return out;
-}
-const rotCoarse = [
-  (x: number, y: number): [number, number] => [x, y],
-  (x: number, y: number): [number, number] => [COARSE - 1 - y, x],
-  (x: number, y: number): [number, number] => [COARSE - 1 - x, COARSE - 1 - y],
-  (x: number, y: number): [number, number] => [y, COARSE - 1 - x],
-];
-/** Share of coarse pixels that differ between a and b turned by `quarter` quarter turns. */
-function twinDiff(a: Uint8ClampedArray, b: Uint8ClampedArray, quarter: number, limit: number): number {
-  let k = 0;
-  const max = limit * COARSE * COARSE;
-  for (let y = 0; y < COARSE; y++)
-    for (let x = 0; x < COARSE; x++) {
-      const [u, v] = rotCoarse[quarter](x, y),
-        pa = (y * COARSE + x) * 4,
-        pb = (v * COARSE + u) * 4;
-      for (let c = 0; c < 3; c++)
-        if (Math.abs(a[pa + c] - b[pb + c]) > PIXEL_TOLERANCE) {
-          k++;
-          break;
-        }
-      if (k > max) return 1;
-    }
-  return k / (COARSE * COARSE);
 }
 
 export interface StickerInput {
@@ -146,48 +110,34 @@ export interface Suitability {
 export const YELLOW_LIMIT = 0.25;
 
 export function analyzeStickers(stickers: readonly StickerInput[], n: number): Suitability {
-  const measures = stickers.map((s) => measureRgba(s.data));
   const flatSet = new Set<string>(),
     symmetric2: string[] = [],
-    symmetric4: string[] = [],
-    byHash = new Map<string, string[]>();
-  stickers.forEach((s, i) => {
-    const m = measures[i];
-    if (isFlat(m)) flatSet.add(s.id);
-    const sym = symmetryOf(m);
-    if (sym === 4) symmetric4.push(s.id);
-    else if (sym === 2) symmetric2.push(s.id);
-    byHash.set(m.hash, [...(byHash.get(m.hash) ?? []), s.id]);
+    symmetric4: string[] = [];
+  const c: Classification | null = stickers.length
+    ? classifyTiles(stickers.map((s) => ({ id: s.id, side: COARSE, data: coarse(s.data, SAMPLE) })))
+    : null;
+  const report = new Map((c?.tiles ?? []).map((t) => [t.id, t] as const));
+  stickers.forEach((s) => {
+    // Flatness is measured on the full-size sticker, orientation and groups on the coarse copy.
+    if (detailOf(toRgb({ id: s.id, side: SAMPLE, data: s.data })) < MIN_DETAIL) flatSet.add(s.id);
+    const order = report.get(s.id)!.order.loose;
+    if (order === 4) symmetric4.push(s.id);
+    else if (order === 2) symmetric2.push(s.id);
   });
-  const identicalGroups = [...byHash.values()].filter((g) => g.length > 1);
-  const identicalOf = new Map<string, string>();
-  identicalGroups.forEach((g) => g.forEach((id) => identicalOf.set(id, g[0])));
-  // Rotation twins: one sticker is another turned by a quarter, half or three-quarter turn. Flat
-  // stickers and exact copies are reported elsewhere, so only distinct, detailed stickers are paired.
-  const candidates = stickers
-    .map((s, i) => ({ id: s.id, hash: measures[i].hash, c: coarse(s.data, SAMPLE), flat: isFlat(measures[i]) }))
-    .filter((t) => !t.flat);
-  const parent = new Map<string, string>();
-  const find = (a: string): string => (parent.get(a) === a || !parent.has(a) ? a : find(parent.get(a)!));
-  const inTwin = new Set<string>();
-  for (let i = 0; i < candidates.length; i++)
-    for (let j = i + 1; j < candidates.length; j++) {
-      const a = candidates[i],
-        b = candidates[j];
-      if (a.hash === b.hash) continue;
-      for (let q = 1; q < 4; q++)
-        if (twinDiff(a.c, b.c, q, MIN_ROT_DIFF) < MIN_ROT_DIFF) {
-          inTwin.add(a.id).add(b.id);
-          for (const id of [a.id, b.id]) if (!parent.has(id)) parent.set(id, id);
-          parent.set(find(a.id), find(b.id));
-          break;
-        }
-    }
-  const groups = new Map<string, string[]>();
-  for (const id of inTwin) groups.set(find(id), [...(groups.get(find(id)) ?? []), id]);
+  // Identical: stickers of one loose identical class (a superset of exact pixel copies).
+  // Rotation twins: one sticker is another turned by a quarter, half or three-quarter turn. Flat stickers and
+  // identical copies are reported elsewhere, so only classes of two or more distinct, detailed pictures count.
   const order = new Map(stickers.map((s, i) => [s.id, i] as const));
   const bySticker = (a: string, b: string) => order.get(a)! - order.get(b)!;
-  const twinGroups = [...groups.values()].map((g) => g.sort(bySticker));
+  const inSticker = (groups: string[][]) => groups.map((g) => g.sort(bySticker)).sort((a, b) => bySticker(a[0], b[0]));
+  const identicalGroups = inSticker((c?.loose.identical ?? []).filter((g) => g.members.length > 1).map((g) => [...g.members]));
+  const identicalOf = new Set(identicalGroups.flat());
+  const twinMembers = (c?.loose.twins ?? [])
+    .filter((g) => g.identical.length > 1)
+    .map((g) => g.members.map((m) => m.id).filter((id) => !flatSet.has(id)))
+    .filter((ids) => new Set(ids.map((id) => c!.loose.identical.findIndex((i) => i.members.includes(id)))).size > 1);
+  const inTwin = new Set(twinMembers.flat());
+  const twinGroups = inSticker(twinMembers.map((g) => [...g]));
   const ambiguousSet = new Set<string>();
   for (const id of [...symmetric2, ...symmetric4, ...inTwin]) if (!flatSet.has(id)) ambiguousSet.add(id);
   const problems: Problem[] = [];

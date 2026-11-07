@@ -22,13 +22,13 @@ At 7x7 every tile is 1/49 of a face (60 px of 420). Each tile must still carry s
 
 Default `--n-range 2-7`. Hard failures are only: constructs outside the app's SVG allowlist (faces, tile files and `net.svg`), face format and size, edge seams, tile files that differ from the face crop, and flat stickers (detail below 8 %) at a strict N. N = 2 is strict by default (`--strict-n 2,3,...` makes more sizes strict); flat stickers at other N are warnings, and the run warns when no examined N is strict.
 
-For every N the checker only CLASSIFIES (`perN.<N>.classification`, module `src/symmetry.mjs`, JSON `version: 1`):
+For every N the checker only CLASSIFIES (`perN.<N>.classification`, module `src/symmetry.mjs`, an adapter over `packages/cube-appearance`, JSON `version: 1`):
 
 - per sticker symmetry order `none`, `2-fold`, `4-fold` (a 90 or 180 degree turn changes fewer than 3 % of the pixels);
-- identical groups (duplicate stones) and rotation-twin groups, found by distance (share of pixels over the pixel threshold on a downsampled probe, below 2 %), so a sub-pixel shift or antialiasing does not hide a duplicate;
-- for odd N the fixed center sticker of each face; a 2-fold or 4-fold symmetric center is reported as "no orientation needed".
+- identical groups (duplicate stones) and rotation-twin groups, found by distance (share of pixels over the pixel threshold on a downsampled probe, at most 3 %, complete linkage), so a sub-pixel shift or antialiasing does not hide a duplicate;
+- for odd N the fixed center sticker of each face; a 2-fold or 4-fold symmetric center is reported as "no orientation needed" (`orientationNeeded: false`); `period` gives the exact rule (solved modulo 4, 2 or 1 quarter turns).
 
-None of this fails a run: the owner accepts equal-looking stickers and orientations (the cube then counts as visually solved). The numbers are for the hand-back and for the app's suitability display, which reuses the module.
+None of this fails a run: the owner accepts equal-looking stickers and orientations (the cube then counts as visually solved). The numbers are for the hand-back and for the app's suitability display, which calls the same package.
 
 ## Synthetic test (unverified for real cubes)
 
@@ -39,7 +39,7 @@ None of this fails a run: the owner accepts equal-looking stickers and orientati
 Decided:
 
 1. **Ambiguity is acceptable.** Equal-looking orientations and duplicate stones are accepted: the cube counts as visually solved. The checker classifies them and does not fail on them.
-2. **Symmetric centers need not be turned.** On odd N (3, 5, 7) a 2-fold or 4-fold symmetric center sticker is reported as "no orientation needed". This is a new rule. [`docs/SUPER_PICTURE_CUBE.md`](../../../../docs/SUPER_PICTURE_CUBE.md) describes the existing 3x3 picture cube, whose exact-solved test counts all six center orientations, and so predates it; the app side (solved test, solver, suitability display) must adopt the rule using `src/symmetry.mjs`. Even N >= 4 has movable center blocks and no single center; the 2x2 has no centers.
+2. **Symmetric centers need not be turned.** On odd N (3, 5, 7) a 2-fold or 4-fold symmetric center sticker is reported as "no orientation needed". This is a new rule. [`docs/SUPER_PICTURE_CUBE.md`](../../../../docs/SUPER_PICTURE_CUBE.md) describes the existing 3x3 picture cube, whose exact-solved test counts all six center orientations, and so predates it (the doc now states the current rule); the suitability display already reports it through the package; the solved test and solver must still adopt it (`packages/cube-appearance`). Even N >= 4 has movable center blocks and no single center; the 2x2 has no centers.
 
 Open:
 

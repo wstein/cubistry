@@ -34,6 +34,7 @@
     "verify:calendar7": "node scripts/prepare-calendar7.mjs --check"
   },
   "dependencies": {
+    "@cubistry/cube-appearance": "*",
     "@cubistry/cube-assets": "*",
     "@cubistry/cube-core": "*",
     "@cubistry/cube-mechanics": "*",

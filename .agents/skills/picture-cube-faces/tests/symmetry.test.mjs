@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { classifyTiles, summarize, symmetryOf } from "../src/symmetry.mjs";
+import { readFileSync } from "node:fs";
+import { classifyTiles, summarize, appearanceOf } from "../src/symmetry.mjs";
+import { classifyTiles as packageClassify, LOOSE_THRESHOLDS } from "../../../../packages/cube-appearance/src/index.ts";
 
 const n = 40;
 const make = (fn) => { const d = new Uint8ClampedArray(n * n * 4); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const v = fn(x + 0.5, y + 0.5); d.set([v, v, v, 255], (y * n + x) * 4); } return d; };
@@ -20,7 +22,6 @@ test("symmetry order: 4-fold, 2-fold, none", () => {
   const c = classifyTiles([{ id: "U_0_0", px: disc }, { id: "U_0_1", px: bar }, { id: "U_1_0", px: corner }], { probe: n });
   assert.deepEqual(c.tiles.map((t) => [t.id, t.symmetry, t.equivalentTurns]), [["U_0_0", "4-fold", 4], ["U_0_1", "2-fold", 2], ["U_1_0", "none", 1]]);
   assert.deepEqual(c.counts.symmetry, { none: 1, twoFold: 1, fourFold: 1 });
-  assert.equal(symmetryOf([0.5, 0.01]), "2-fold");
 });
 
 test("identical and rotation-twin groups are found by distance, not by exact pixels", () => {
@@ -58,4 +59,37 @@ test("flat stickers are listed and the JSON shape is stable", () => {
   assert.deepEqual(Object.keys(c.tiles[0].rotDiff), ["r90", "r180", "r270"]);
   assert.equal(c.version, 1);
   assert.deepEqual(JSON.parse(JSON.stringify(c)), c);
+});
+
+test("the skill classifier is the package: same groups, orders and offsets, no second implementation", () => {
+  const tiles = [
+    { id: "F_0_0", px: corner }, { id: "F_0_1", px: Uint8ClampedArray.from(corner) }, { id: "L_0_0", px: turn(corner, 1) },
+    { id: "B_0_0", px: bar }, { id: "U_0_0", px: disc },
+  ];
+  // The adapter hands the tiles to the package (downsampled by 2 for speed and antialiasing) ...
+  const half = (d) => { const m = n / 2, e = new Uint8ClampedArray(m * m * 4); for (let y = 0; y < m; y++) for (let x = 0; x < m; x++) for (let ch = 0; ch < 4; ch++) { let s = 0; for (let j = 0; j < 2; j++) for (let i = 0; i < 2; i++) s += d[((2 * y + j) * n + 2 * x + i) * 4 + ch]; e[(y * m + x) * 4 + ch] = Math.round(s / 4); } return e; };
+  const direct = packageClassify(tiles.map((t) => ({ id: t.id, side: n / 2, data: half(t.px) })));
+  const viaSkill = appearanceOf(tiles, { probe: n });
+  assert.deepEqual(JSON.parse(JSON.stringify(viaSkill)), JSON.parse(JSON.stringify(direct)));
+  // ... and the version-1 JSON is derived from the package result at the loose level.
+  const c = classifyTiles(tiles, { n: 2, probe: n });
+  assert.deepEqual(c.identicalGroups, direct.loose.identical.filter((g) => g.members.length > 1).map((g) => [...g.members].sort()));
+  assert.deepEqual(c.rotationTwinGroups, direct.loose.twins.filter((g) => g.identical.length > 1).map((g) => g.members.map((m) => m.id).sort()));
+  assert.deepEqual(c.tiles.map((t) => t.equivalentTurns), tiles.map((t) => direct.tiles.find((x) => x.id === t.id).order.loose));
+  assert.equal(c.thresholds.symmetry, LOOSE_THRESHOLDS.share);
+  // The module carries no pixel comparison of its own.
+  const src = readFileSync(new URL("../src/symmetry.mjs", import.meta.url), "utf8");
+  assert.match(src, /packages\/cube-appearance\/src\/index\.ts/);
+  assert.ok(!/Sets|union\(|pixelDistance|rotationDiffs/.test(src));
+});
+
+test("no transitive merge: A~B and B~C do not pull in C when A and C differ (complete linkage)", () => {
+  // Three bars whose widths step by 5 px (1.9 percent of the area per step, limit 3 percent): neighbors match, the ends do not.
+  const step = (w) => make((x, y) => (inside(x, y, 4, 17, 4 + w, 23) ? 40 : 220));
+  const a = step(16), b = step(21), cc = step(26);
+  const tiles = [{ id: "F_0_0", px: a }, { id: "F_0_1", px: b }, { id: "F_1_0", px: cc }];
+  const loose = { share: 0.03 };
+  const direct = appearanceOf(tiles, { probe: n, tol: loose.share });
+  const groups = direct.loose.identical.map((g) => g.members.length);
+  assert.ok(Math.max(...groups) < 3, JSON.stringify(direct.loose.identical));
 });

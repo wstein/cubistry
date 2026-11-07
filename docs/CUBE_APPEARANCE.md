@@ -2,9 +2,9 @@
 
 `@cubistry/cube-appearance` ([source](../packages/cube-appearance/src/index.ts)) is a pure,
 DOM-free package. It decides which stickers look alike and whether a state looks like a goal.
-It adds no solver and changes no application: `PwCore`, `PwMechanics`, the skill and the
-playground suitability display are untouched. Status: stage S1 of the visual-goal solver plan;
-nothing consumes the package yet.
+It adds no solver and changes no solver or mechanics code: `PwCore` and `PwMechanics` are untouched.
+Status: stage S1 of the visual-goal solver plan. Two advisory consumers use the classifier: the
+picture-cube-faces skill and the playground suitability display (see "Consumers"). No solver uses it yet.
 
 ## Rule and owner decisions
 
@@ -131,19 +131,32 @@ prints. Whether pieces of N of 4 or more actually move between slots with an ind
 unverified. The package makes no claim about optimal move counts, parity or reachability beyond the
 2x2 checks above.
 
-## Migration (not part of this change)
+## Consumers (migrated)
 
-Both consumers are unmerged, so this change does not touch them:
+Both former copies of the classification logic now call this package, so there is one implementation.
 
-- **Skill (PR #248).** `symmetry.mjs` should re-export `classifyTiles` and keep a v1 JSON adapter:
-  `symmetry` maps from `order` (table above), groups from `identical` and `twins` (the offset is new),
-  and `orientationNeeded` from `analyzeCenters`. The skill's single-linkage union becomes
-  complete linkage, and its 2 percent rule becomes the loose level for the report and the strict level
-  for any map. The skill is plain Node: Node 24 runs the TypeScript sources directly; if the skill must
-  stay self-contained, vendor a generated copy and check it by hash.
-- **Suitability display (PR #258).** `suitability.ts` keeps its traffic light but should call the shared
-  loose level instead of its own `measureRgba`/`twinDiff`, and must not feed solver decisions.
-  Its exact raw-pixel hash corresponds to `exactGroups`.
+- **Skill (`.agents/skills/picture-cube-faces`).** `src/symmetry.mjs` is an adapter: it downsamples the
+  rendered tiles by 2, calls `classifyTiles` with the loose level (pixel tolerance 24, share 3 percent) and
+  writes the unchanged version-1 JSON (`perN.<N>.classification`, `version: 1`). `appearanceOf` returns the
+  package result for callers that want `cubistry.appearance@2`. The skill imports the TypeScript source
+  directly (Node 22.18 or newer strips types). Differences from the former skill code:
+  - Identical and twin groups use complete linkage instead of single linkage, and one share (default 3 percent,
+    option `--tol`; `--sym-tol` and `--dup-tol` remain as aliases and must agree) replaces the 3 and 2 percent pair.
+    A theme that only chained through intermediate stickers now reports fewer merged groups.
+  - `centers[].orientationNeeded` keeps its version-1 meaning (false for a 2-fold or 4-fold sticker) and is the
+    package's `orientationExact`. The package's own `orientationNeeded` (order below 4) is stricter: a 2-fold
+    center is solved only modulo a half turn. The additive key `centers[].period` carries the exact rule. The
+    owner should decide whether the skill wording "need not be turned" means "any turn" (4-fold only) or "modulo
+    the period" (as the goal predicate here treats it).
+  - No JSON field was removed or renamed, so the version stays 1. An `appearance@2` map is not written by the checker:
+    a map needs a renderer and a print id, and raster maps must not be recomputed on another device.
+- **Suitability display (`src/apps/playground/suitability.ts`).** It keeps its traffic light and wording and
+  calls the loose level on a 20 px block-average copy of each 80 px sticker (a 294-sticker 7x7 classification
+  takes about 1.3 s; 40 px would take about 5 s because the package has no early exit). Flatness is measured on the
+  full 80 px sticker with the package's `detailOf`. The light is unchanged (D9): red only for flat stickers or a
+  flat face, never for identical, symmetric or turned stickers. Identical now means "same loose class", a superset of
+  exact pixel copies (the old raw-pixel hash); `measureRgba` returns the package tile report, `tileHash` and
+  `detailOf`. The display never feeds solver decisions.
 
 ## Tests
 
@@ -152,3 +165,7 @@ SHA-256 against `node:crypto`, known symmetry and twin offsets (including near-t
 no transitive merge, input-order independence, schema and golden hashes, the identity cross-check
 against `matchesTarget` and `stateEquals`, whole-cube rotation, rotation-twin policy, invariance of the
 predicate under every stone automorphism, and the exhaustive 2x2 goal-set oracle.
+
+The skill tests (`symmetry.test.mjs`) and `tests/playground-suitability.test.mjs` prove that both consumers call the
+package: they compare the consumers' groups, orders and offsets with a direct package call and check that the
+consumer sources carry no pixel comparison of their own.

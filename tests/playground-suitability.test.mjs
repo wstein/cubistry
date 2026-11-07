@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SAMPLE, analyzeStickers, describeSuitability, measureRgba, symmetryOf } from "../src/apps/playground/suitability.ts";
+import { readFileSync } from "node:fs";
+import { SAMPLE, COARSE, analyzeStickers, describeSuitability, measureRgba, symmetryOf } from "../src/apps/playground/suitability.ts";
+import { LOOSE_THRESHOLDS, classifyTiles, detailOf, tileHash, toRgb } from "../packages/cube-appearance/src/index.ts";
 
 const N = SAMPLE;
 // A sticker from a function (x, y) -> [r, g, b].
@@ -24,7 +26,7 @@ const flat = (c = [200, 200, 200]) => tile(() => c);
 // Asymmetric picture: a distinct color per quadrant plus a stripe, seeded so tiles differ.
 const asym = (seed = 0) => tile((x, y) => {
   const base = [[250, 30, 30], [30, 250, 30], [30, 30, 250], [240, 240, 30]][(x < N / 2 ? 0 : 1) + (y < N / 2 ? 0 : 2)];
-  return x < 14 + seed * 3 && y < 40 ? [0, 0, 0] : base.map((c, i) => (i === seed % 3 ? 255 - c : c));
+  return x < 14 + seed * 6 && y < 40 ? [0, 0, 0] : base.map((c, i) => (i === seed % 3 ? 255 - c : c));
 });
 // 180-degree symmetric: checker of two halves; 90-degree symmetric: four-fold rosette.
 const sym2 = tile((x, y) => ((x < N / 2) === (y < N / 2) ? [20, 20, 220] : [230, 230, 20]));
@@ -117,4 +119,47 @@ test("the check script and the display share one definition", async () => {
   const script = readFileSync(new URL("../scripts/check-pastel-garden-tiles.mjs", import.meta.url), "utf8");
   assert.match(script, /from "\.\.\/src\/apps\/playground\/suitability\.ts"/);
   assert.ok(!/const MIN_DETAIL =/.test(script));
+});
+
+test("the display calls the shared classifier at its loose level (one implementation, D3 and D8)", () => {
+  const src = readFileSync(new URL("../src/apps/playground/suitability.ts", import.meta.url), "utf8");
+  assert.match(src, /from "@cubistry\/cube-appearance"/);
+  assert.ok(!/PIXEL_TOLERANCE|twinDiff|rotCoarse|imul/.test(src), "no pixel comparison of its own");
+  // measureRgba is the package's tile report plus its hash and detail.
+  const d = asym(2);
+  const m = measureRgba(d);
+  const tile = { id: "sticker", side: N, data: d };
+  const report = classifyTiles([tile]).tiles[0];
+  assert.deepEqual([...m.rotations], [...report.rotDiff.loose]);
+  assert.equal(m.detail, detailOf(toRgb(tile)));
+  assert.equal(m.hash, tileHash(toRgb(tile)));
+  // The groups of analyzeStickers are the package's loose groups of the coarse copies.
+  const stickers = [
+    { id: "F_0_0", data: asym(1) }, { id: "F_0_1", data: asym(1) }, { id: "F_1_0", data: asym(2) }, { id: "F_1_1", data: rot(asym(2), 2) },
+    { id: "B_0_0", data: sym2 }, { id: "B_0_1", data: sym4 },
+  ];
+  const coarse = (d) => {
+    const k = N / COARSE, out = new Uint8ClampedArray(COARSE * COARSE * 4);
+    for (let y = 0; y < COARSE; y++) for (let x = 0; x < COARSE; x++) for (let c = 0; c < 4; c++) {
+      let sum = 0;
+      for (let j = 0; j < k; j++) for (let i = 0; i < k; i++) sum += d[((y * k + j) * N + x * k + i) * 4 + c];
+      out[(y * COARSE + x) * 4 + c] = sum / (k * k);
+    }
+    return out;
+  };
+  const c = classifyTiles(stickers.map((s) => ({ id: s.id, side: COARSE, data: coarse(s.data) })));
+  const r = analyzeStickers(stickers, 2);
+  assert.deepEqual(r.identicalGroups.map((g) => [...g]), c.loose.identical.filter((g) => g.members.length > 1).map((g) => [...g.members]));
+  assert.deepEqual(r.twinGroups.map((g) => [...g]), c.loose.twins.filter((g) => g.identical.length > 1).map((g) => g.members.map((x) => x.id)));
+  assert.deepEqual(r.symmetric4, c.tiles.filter((t) => t.order.loose === 4).map((t) => t.id));
+  assert.deepEqual(r.symmetric2, c.tiles.filter((t) => t.order.loose === 2).map((t) => t.id));
+  assert.equal(LOOSE_THRESHOLDS.share, 0.03);
+});
+
+test("near copies within the loose tolerance count as identical, and the light stays green (D9)", () => {
+  const tweak = Uint8ClampedArray.from(asym(1));
+  for (let i = 0; i < 20; i++) tweak[(i * 331 % (N * N)) * 4] = 0; // a few stray pixels, far below the 3 percent share
+  const r = analyzeStickers([{ id: "F_0_0", data: asym(1) }, { id: "F_0_1", data: tweak }, { id: "F_1_0", data: asym(2) }], 2);
+  assert.deepEqual(r.identicalGroups.map((g) => [...g]), [["F_0_0", "F_0_1"]]);
+  assert.equal(r.light, "green"); // identical, symmetric and turned stickers are information, never red
 });
