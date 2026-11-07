@@ -96,16 +96,31 @@ test("go to the current app keeps its parameters", async () => {
   assert.equal(log.at(-1), "mount timer val=45");
 });
 
-test("back and forward mount the app of the URL without pushing history", async () => {
+test("back and forward mount the app of the URL with its parameters and without pushing history", async () => {
+  const log = [];
+  const { env, state } = fakeEnv(`${BASE}?app=timer&val=45`);
+  const router = createRouter({ registry: makeRegistry(log), root: {}, fallback: "clock", env });
+  await router.start();
+  await router.go("counter");
+  assert.equal(state.href, `${BASE}?app=counter`);
+  state.href = `${BASE}?app=timer&val=45`; // the browser restores the earlier URL on Back
+  await state.pop();
+  assert.equal(router.current(), "timer");
+  assert.deepEqual(state.pushed, ["/index.html?app=counter"]);
+  assert.deepEqual(state.replaced, []);
+  assert.deepEqual(log, ["mount timer val=45", "dispose timer", "mount counter ", "dispose counter", "mount timer val=45"]);
+});
+
+test("back to an unknown id mounts the fallback and corrects the URL in place", async () => {
   const log = [];
   const { env, state } = fakeEnv(`${BASE}?app=timer`);
   const router = createRouter({ registry: makeRegistry(log), root: {}, fallback: "clock", env });
   await router.start();
-  state.href = `${BASE}?app=counter`;
+  state.href = `${BASE}?app=nope&kiosk=1`;
   await state.pop();
-  assert.equal(router.current(), "counter");
+  assert.equal(router.current(), "clock");
+  assert.deepEqual(state.replaced, ["/index.html?app=clock&kiosk=1"]);
   assert.deepEqual(state.pushed, []);
-  assert.deepEqual(log, ["mount timer ", "dispose timer", "mount counter "]);
 });
 
 test("a switch that is superseded while it mounts disposes its mode and reports nothing", async () => {
