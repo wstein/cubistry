@@ -1,0 +1,23 @@
+{
+  "design": "easter",
+  "faces": {
+    "F": {
+      "sha256": "17747ba3057946d8a0da024e96ef4894c2cab1d933b781ac45dddbafd4deca77"
+    },
+    "B": {
+      "sha256": "8827ff46472b6f0c54a5482210746bb94e30317c3119afcfda9f29c6195f511e"
+    },
+    "R": {
+      "sha256": "f6e463e311410c55d341968ce6d593c604ab5d117416c3781fd56f469f8da97d"
+    },
+    "L": {
+      "sha256": "a504f89a172c7e1dcf7144193d7ed6cbf1332de557e0e76517c64f2c9c94937d"
+    },
+    "U": {
+      "sha256": "f035e748f4efa9b81bab7229daf9ec602365230852851928871bcb6fbca11612"
+    },
+    "D": {
+      "sha256": "3cd371ae6f6e851db6faad95103bdf74518d449b91348f7de59d47b33943084f"
+    }
+  }
+}
