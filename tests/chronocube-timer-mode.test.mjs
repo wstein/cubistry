@@ -78,3 +78,28 @@ for (const five of [false, true]) {
     assert.equal(clock.snapshot().bucket, start);
   });
 }
+
+for (const five of [false, true]) {
+  test(`studio ${five ? "five-second-timer" : "timer"}: the cube follows the countdown bucket while running`, async () => {
+    const { clock, controller, driver, advance, profile } = await drive(five);
+    const start = studioTimerDefaultBucket(profile);
+    driver.start();
+    await advance(profile.stepSeconds * 1000 * 3 + 200);
+    const bucket = clock.snapshot().bucket;
+    assert.equal(bucket, start - 3);
+    assert.equal(controller.currentValue, bucket);
+  });
+
+  test(`studio ${five ? "five-second-timer" : "timer"}: Pause settles the cube on the paused bucket`, async () => {
+    const { clock, controller, driver, advance, settle, profile } = await drive(five);
+    const start = studioTimerDefaultBucket(profile);
+    driver.start();
+    await advance(profile.stepSeconds * 1000 * 2 + 200);
+    driver.pause();
+    await settle();
+    await advance(500);
+    assert.equal(clock.running, false);
+    assert.equal(controller.currentValue, clock.snapshot().bucket);
+    assert.equal(controller.currentValue, start - 2);
+  });
+}
