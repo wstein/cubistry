@@ -47,10 +47,12 @@ test("M/S Timer and H-M Wall Clock host bare cubes like the Live Clock: no wrapp
   }
 });
 
-test("the four single-cube modes have no card heading; the HUD title stays", () => {
+test("the four single-cube modes have no card heading; the HUD title stays except in the migrated Tenth mode", () => {
   for (const name of ["Tenth", "Counter", "Timer", "HSM"]) {
     assert(!/<h2/.test(modes[name].split("renderStudioHud(")[0]), `${name}: no card h2`);
-    assert(modes[name].includes("renderStudioHud("), `${name}: HUD kept`);
+    // Tenth fills the dock slots through ModeShell instead of the HUD (slot API); the others still render the HUD.
+    if (name === "Tenth") assert(modes[name].includes("mountTenthControls(") && !modes[name].includes("renderStudioHud("), "Tenth: dock slots");
+    else assert(modes[name].includes("renderStudioHud("), `${name}: HUD kept`);
   }
 });
 
