@@ -6,7 +6,7 @@ import { createBelt } from "../src/belt.mjs";
 import { upBorders, downBorders, borderGrid } from "../src/updown.mjs";
 import { buildGrid, cellsPerFace } from "../src/grid.mjs";
 import { gridToRects, compactSvg, cropRects } from "../src/compact.mjs";
-import { detailShare, rotationDiffs } from "../src/metrics.mjs";
+import { detailOf, toRgb } from "../../../../packages/cube-appearance/src/index.ts";
 import { classifyTiles } from "../src/symmetry.mjs";
 import { auditSvg } from "../src/svgcheck.mjs";
 import { demoTheme } from "../examples/demo-theme.mjs";
@@ -116,10 +116,9 @@ test("library output passes the app's SVG allowlist (faces, tiles, net) and has 
 test("tile metrics: flat tile lacks detail, symmetric tile has a symmetry class, twins and identical are grouped", () => {
   const n = 8, make = (fn) => { const d = new Uint8ClampedArray(n * n * 4); for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const v = fn(x, y); d.set([v, v, v, 255], (y * n + x) * 4); } return d; };
   const flat = make(() => 200), corner = make((x, y) => (x < 3 && y < 3 ? 0 : 200)), disc = make((x, y) => (Math.hypot(x - 3.5, y - 3.5) < 2.5 ? 0 : 200)), turned = make((x, y) => (x > 4 && y < 3 ? 0 : 200));
-  assert.equal(detailShare(flat, n), 0);
-  assert.ok(detailShare(corner, n) > 0.1);
-  assert.equal(Math.min(...rotationDiffs(disc, n)) < 0.03, true);
-  assert.ok(Math.min(...rotationDiffs(corner, n)) > 0.1);
+  const detail = (d) => detailOf(toRgb({ id: "x", side: n, data: d }));
+  assert.equal(detail(flat), 0);
+  assert.ok(detail(corner) > 0.1);
   const c = classifyTiles([{ id: "F_0_0", px: flat }, { id: "F_0_1", px: corner }, { id: "F_1_0", px: corner }, { id: "F_1_1", px: turned }, { id: "U_0_0", px: disc }], { probe: n });
   assert.deepEqual(c.lackDetail, ["F_0_0"]);
   assert.equal(c.tiles.find((t) => t.id === "U_0_0").symmetry, "4-fold");

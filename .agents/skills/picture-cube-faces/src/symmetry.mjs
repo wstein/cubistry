@@ -1,15 +1,20 @@
-/** Sticker classification (pure, no I/O): how symmetric is each sticker, which stickers look the same, which look the
- * same when turned. This is INFORMATION, not a verdict: the owner accepts equal-looking stickers and orientations (the
- * cube then counts as visually solved), and symmetric centers of an odd-N cube need not be turned. The app solver and the
- * suitability display reuse this module; the JSON shape below is stable (bump `version` when it changes).
+/** Sticker classification for the skill: a thin adapter over `packages/cube-appearance` (owner decision D8: ONE
+ * classifier, in the package; this module only prepares tiles and keeps the version-1 JSON shape the checker writes).
+ * This is INFORMATION, not a verdict: the owner accepts equal-looking stickers and orientations (the cube then counts
+ * as visually solved), and symmetric centers of an odd-N cube need not be turned.
+ *
+ * What the package does (see docs/CUBE_APPEARANCE.md): loose level (pixel tolerance 24, share 3 percent by default),
+ * order from the half and quarter turn, identical groups and rotation-twin groups by complete linkage (two stickers
+ * merge only when every cross pair is within tolerance; the old single-linkage union could chain A~B~C).
  *
  * Input: tiles [{id: "F_r_c", px}] where px is an RGBA array of probe x probe pixels (the sticker as the app shows it).
- * Distances are the share of pixels over PIXEL_DIFF on a copy downsampled by DOWNSAMPLE, which absorbs antialiasing.
+ * The comparison runs on a copy downsampled by DOWNSAMPLE, which absorbs antialiasing and keeps N = 7 fast; flatness
+ * ("detail") is measured on the full probe.
  *
- * classifyTiles(tiles, { n, probe }) returns
+ * classifyTiles(tiles, { n, probe }) returns the version-1 shape (unchanged by the migration)
  * {
  *   version: 1, n, stickers, probe,               // probe = side of the compared (downsampled) picture
- *   thresholds: { minDetail, symmetry, duplicate },
+ *   thresholds: { minDetail, symmetry, duplicate },   // symmetry and duplicate are both the package's loose share
  *   tiles: [{ id, symmetry: "none" | "2-fold" | "4-fold", equivalentTurns: 1 | 2 | 4,
  *             detail, rotDiff: { r90, r180, r270 } }],
  *   counts: { stickers, symmetry: { none, twoFold, fourFold }, lackDetail,
@@ -17,84 +22,83 @@
  *   lackDetail: [id],                              // flat stickers (hard failure at strict N)
  *   identicalGroups: [[id]],                       // upright duplicates (the same picture twice)
  *   rotationTwinGroups: [[id]],                    // look alike only after a quarter turn
- *   centers: [{ id, face, symmetry, orientationNeeded }]   // odd N only: the fixed center sticker of each face
+ *   centers: [{ id, face, symmetry, orientationNeeded, period }]   // odd N only: the fixed center sticker of each face
  * }
  * equivalentTurns = how many of the four quarter turns look alike (1 none, 2 two-fold, 4 four-fold).
- * orientationNeeded is false for a 2-fold or 4-fold symmetric center (owner rule: such a center need not be turned).
+ * orientationNeeded is false for a 2-fold or 4-fold symmetric center (owner rule: such a center need not be turned);
+ * it is the package's `orientationExact` (v1 meaning kept). `period` (new, additive) is the package's: a center is
+ * solved when its quarter-turn offset is right modulo `period` (4 for none, 2 for 2-fold, 1 for 4-fold). The package
+ * flag `orientationNeeded` (order below 4) is stricter than the v1 flag for 2-fold centers; see docs/CUBE_APPEARANCE.md.
+ * `appearanceOf` returns the package's own Classification (both levels, offsets) for callers that want cubistry.appearance@2.
  */
-import { MIN_DETAIL, MIN_ROT_DIFF, detailShare, rotationDiffs, rotateRgba, downsample, pixelDistance } from "./metrics.mjs";
+import {
+  LOOSE_THRESHOLDS,
+  analyzeCenters,
+  classifyTiles as classifyAppearance,
+  detailOf,
+  toRgb,
+} from "../../../../packages/cube-appearance/src/index.ts";
+import { MIN_DETAIL, PIXEL_DIFF, downsample } from "./metrics.mjs";
 import { FACE_NAMES, tileId } from "./geometry.mjs";
 
 export const SYMMETRY_VERSION = 1;
-export const DUPLICATE_TOL = 0.02; // share of pixels over PIXEL_DIFF below which two stickers count as the same picture
+/** Share of pixels over the pixel tolerance up to which two stickers count as the same picture (and as symmetric). */
+export const LOOSE_SHARE = LOOSE_THRESHOLDS.share;
 export const DOWNSAMPLE = 2;
 
-/** "none" | "2-fold" | "4-fold" from the 90, 180 and 270 degree differences (shares of changed pixels). */
-export function symmetryOf([d90, d180], tol = MIN_ROT_DIFF) {
-  if (d90 < tol && d180 < tol) return "4-fold";
-  if (d180 < tol) return "2-fold";
-  return "none";
-}
-const TURNS = { none: 1, "2-fold": 2, "4-fold": 4 };
+const NAMES = { 1: "none", 2: "2-fold", 4: "4-fold" };
 
-class Sets {
-  constructor(n) { this.p = Array.from({ length: n }, (_, i) => i); }
-  find(i) { while (this.p[i] !== i) i = this.p[i] = this.p[this.p[i]]; return i; }
-  union(a, b) { this.p[this.find(a)] = this.find(b); }
-  groups() {
-    const m = new Map();
-    this.p.forEach((_, i) => { const r = this.find(i); m.set(r, [...(m.get(r) ?? []), i]); });
-    return [...m.values()];
-  }
-}
-
-export function classifyTiles(tiles, { n = null, probe = null, minDetail = MIN_DETAIL, symmetryTol = MIN_ROT_DIFF, duplicateTol = DUPLICATE_TOL } = {}) {
+/** Package classification (cubistry.appearance classifier) of skill tiles, at the skill's probe and tolerance. */
+export function appearanceOf(tiles, { probe = null, tol = LOOSE_SHARE } = {}) {
   const side = probe ?? Math.round(Math.sqrt((tiles[0]?.px.length ?? 0) / 4));
-  const f = side % DOWNSAMPLE === 0 ? DOWNSAMPLE : 1, cmp = side / f;
-  const rec = tiles.map((t) => {
-    const small = downsample(t.px, side, f);
-    const diffs = rotationDiffs(f === 1 ? t.px : small, cmp);
-    const symmetry = symmetryOf(diffs, symmetryTol);
+  const f = side % DOWNSAMPLE === 0 ? DOWNSAMPLE : 1;
+  const loose = { pixelTolerance: PIXEL_DIFF, share: tol };
+  const small = tiles.map((t) => ({ id: t.id, side: side / f, data: f === 1 ? t.px : downsample(t.px, side, f) }));
+  return classifyAppearance(small, { loose });
+}
+
+export function classifyTiles(tiles, { n = null, probe = null, minDetail = MIN_DETAIL, tol = LOOSE_SHARE, symmetryTol, duplicateTol } = {}) {
+  if (symmetryTol !== undefined && duplicateTol !== undefined && symmetryTol !== duplicateTol) throw new Error("symmetryTol and duplicateTol are one threshold now (the package's loose share): pass `tol` or equal values");
+  const share = symmetryTol ?? duplicateTol ?? tol;
+  const side = probe ?? Math.round(Math.sqrt((tiles[0]?.px.length ?? 0) / 4));
+  const cmp = side % DOWNSAMPLE === 0 ? side / DOWNSAMPLE : side;
+  const empty = tiles.length === 0;
+  const c = empty ? null : appearanceOf(tiles, { probe: side, tol: share });
+  const input = new Map(tiles.map((t) => [t.id, t]));
+  const rec = new Map((c?.tiles ?? []).map((t) => [t.id, t]));
+  const rows = tiles.map((t) => {
+    const r = rec.get(t.id), order = r.order.loose;
+    const detail = detailOf(toRgb({ id: t.id, side, data: t.px }));
     return {
-      id: t.id, symmetry, equivalentTurns: TURNS[symmetry], detail: +detailShare(t.px, side).toFixed(4),
-      rotDiff: { r90: +diffs[0].toFixed(4), r180: +diffs[1].toFixed(4), r270: +diffs[2].toFixed(4) },
-      rots: [0, 1, 2, 3].map((k) => rotateRgba(small, cmp, k)),
+      id: t.id, symmetry: NAMES[order], equivalentTurns: order, detail: +detail.toFixed(4),
+      rotDiff: { r90: +r.rotDiff.loose[0].toFixed(4), r180: +r.rotDiff.loose[1].toFixed(4), r270: +r.rotDiff.loose[2].toFixed(4) },
     };
   });
-  const upright = new Sets(rec.length), anyTurn = new Sets(rec.length);
-  for (let i = 0; i < rec.length; i++) for (let j = i + 1; j < rec.length; j++) {
-    if (pixelDistance(rec[i].rots[0], rec[j].rots[0], cmp, { cutoff: duplicateTol }) <= duplicateTol) { upright.union(i, j); anyTurn.union(i, j); continue; }
-    for (let k = 1; k < 4; k++) if (pixelDistance(rec[i].rots[0], rec[j].rots[k], cmp, { cutoff: duplicateTol }) <= duplicateTol) { anyTurn.union(i, j); break; }
-  }
-  const ids = (g) => g.map((i) => rec[i].id).sort();
-  const identicalGroups = upright.groups().filter((g) => g.length > 1);
-  const uprightRoot = (i) => upright.find(i);
-  const rotationTwinGroups = anyTurn.groups().filter((g) => g.length > 1 && new Set(g.map(uprightRoot)).size > 1);
-  const lackDetail = rec.filter((t) => t.detail < minDetail).map((t) => t.id);
-  const count = (s) => rec.filter((t) => t.symmetry === s).length;
+  const byGroup = (g) => g.sort((a, b) => a[0].localeCompare(b[0]));
+  const identicalGroups = byGroup((c?.loose.identical ?? []).filter((g) => g.members.length > 1).map((g) => [...g.members].sort()));
+  const rotationTwinGroups = byGroup((c?.loose.twins ?? []).filter((g) => g.identical.length > 1).map((g) => g.members.map((m) => m.id).sort()));
+  const lackDetail = rows.filter((t) => t.detail < minDetail).map((t) => t.id);
+  const count = (s) => rows.filter((t) => t.symmetry === s).length;
   const centers = [];
-  if (n && n % 2 === 1) {
+  if (c && n && n % 2 === 1) {
     const mid = (n - 1) / 2;
-    for (const face of FACE_NAMES) {
-      const t = rec.find((x) => x.id === tileId(face, mid, mid));
-      if (t) centers.push({ id: t.id, face, symmetry: t.symmetry, orientationNeeded: t.symmetry === "none" });
+    const ids = FACE_NAMES.map((f) => tileId(f, mid, mid)).filter((id) => input.has(id));
+    for (const r of analyzeCenters(c, ids, "loose")) {
+      centers.push({ id: r.id, face: r.id.split("_")[0], symmetry: NAMES[r.order], orientationNeeded: r.orientationExact, period: r.period });
     }
   }
   return {
-    version: SYMMETRY_VERSION, n, stickers: rec.length, probe: cmp,
-    thresholds: { minDetail, symmetry: symmetryTol, duplicate: duplicateTol },
-    tiles: rec.map(({ rots, ...t }) => t),
+    version: SYMMETRY_VERSION, n, stickers: rows.length, probe: cmp,
+    thresholds: { minDetail, symmetry: share, duplicate: share },
+    tiles: rows,
     counts: {
-      stickers: rec.length,
+      stickers: rows.length,
       symmetry: { none: count("none"), twoFold: count("2-fold"), fourFold: count("4-fold") },
       lackDetail: lackDetail.length,
       identicalGroups: identicalGroups.length, identicalTiles: identicalGroups.flat().length,
       rotationTwinGroups: rotationTwinGroups.length, rotationTwinTiles: rotationTwinGroups.flat().length,
     },
-    lackDetail,
-    identicalGroups: identicalGroups.map(ids).sort((a, b) => a[0].localeCompare(b[0])),
-    rotationTwinGroups: rotationTwinGroups.map(ids).sort((a, b) => a[0].localeCompare(b[0])),
-    centers,
+    lackDetail, identicalGroups, rotationTwinGroups, centers,
   };
 }
 

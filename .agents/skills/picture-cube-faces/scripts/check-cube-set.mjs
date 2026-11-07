@@ -13,9 +13,9 @@
  * INFORMATION (never a failure; the owner accepts equal-looking stickers and orientations, the cube then counts as
  * visually solved): per N the symmetry class of every sticker (none, 2-fold, 4-fold), groups of identical stickers,
  * groups of rotation twins, and for odd N which center stickers need no orientation. The classification is
- * src/symmetry.mjs and is written to the json (key perN.<N>.classification).
+ * packages/cube-appearance (loose level), reached through src/symmetry.mjs and is written to the json (key perN.<N>.classification).
  *
- * Options: --strict-n 2,3  --min-detail 0.08  --sym-tol 0.03  --dup-tol 0.02  --seam-mean 3  --seam-segment 9
+ * Options: --strict-n 2,3  --min-detail 0.08  --tol 0.03 (--sym-tol and --dup-tol are aliases)  --seam-mean 3  --seam-segment 9
  *          --max-face-kb 200  --max-tile-kb 30  --tile-tol 0.005
  *          --size-fail (budget overruns FAIL instead of warn)  --json <path> (default <dir>/tiles.json)
  * Exit code: 0 PASS, 1 FAIL, 2 usage or environment error (bad flag or number, unknown option, no browser).
@@ -24,8 +24,8 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "
 import { resolve, basename } from "node:path";
 import { FACE_NAMES, EDGES, parseNSpec, parseTileId, stickerCount } from "../src/geometry.mjs";
 import { findForbidden, styleAudit, checkSizes, checkTileFormat, faceRoot, DEFAULT_BUDGET } from "../src/rules.mjs";
-import { MIN_DETAIL, MIN_ROT_DIFF } from "../src/metrics.mjs";
-import { classifyTiles, summarize, DUPLICATE_TOL } from "../src/symmetry.mjs";
+import { MIN_DETAIL } from "../src/metrics.mjs";
+import { classifyTiles, summarize, LOOSE_SHARE } from "../src/symmetry.mjs";
 import { bandDiffs, edgeStats, seamVerdict, SEAM_MEAN_LIMIT, SEAM_SEGMENT_LIMIT, SEAM_BAND } from "../src/seams.mjs";
 
 const PROBE = 80;
@@ -34,7 +34,7 @@ const TILE_TOL = 0.005; // share of pixels (channel difference > 64) allowed bet
 /** Option table: type "num" (finite, > 0 unless min given), "int", "list" (comma separated integers), "str", "flag". */
 const OPTIONS = {
   n: { type: "int" }, "n-range": { type: "str" }, "strict-n": { type: "list" }, json: { type: "str" },
-  "min-detail": { type: "num", min: 0, max: 1 }, "sym-tol": { type: "num", min: 0, max: 1 }, "dup-tol": { type: "num", min: 0, max: 1 },
+  "min-detail": { type: "num", min: 0, max: 1 }, "tol": { type: "num", min: 0, max: 1 }, "sym-tol": { type: "num", min: 0, max: 1 }, "dup-tol": { type: "num", min: 0, max: 1 },
   "tile-tol": { type: "num", min: 0, max: 1 }, "seam-mean": { type: "num", min: 0, max: 255 }, "seam-segment": { type: "num", min: 0, max: 255 },
   "max-face-kb": { type: "num", min: 1 }, "max-tile-kb": { type: "num", min: 1 }, "size-fail": { type: "flag" },
 };
@@ -81,8 +81,7 @@ const strictN = opts["strict-n"] ?? [2];
 try { ns = parseNSpec(opts.n, opts["n-range"]); } catch (e) { console.error(e.message); process.exit(2); }
 const th = {
   minDetail: opts["min-detail"] ?? MIN_DETAIL,
-  symmetryTol: opts["sym-tol"] ?? MIN_ROT_DIFF,
-  duplicateTol: opts["dup-tol"] ?? DUPLICATE_TOL,
+  tol: opts.tol ?? opts["sym-tol"] ?? opts["dup-tol"] ?? LOOSE_SHARE,
   tileTol: opts["tile-tol"] ?? TILE_TOL,
   seamMean: opts["seam-mean"] ?? SEAM_MEAN_LIMIT,
   seamSegment: opts["seam-segment"] ?? SEAM_SEGMENT_LIMIT,
@@ -216,7 +215,7 @@ try {
   // per N: classification (information) and flatness (hard at strict N)
   result.perN = {};
   for (const n of ns) {
-    const c = classifyTiles(tilesByN[n], { n, probe: PROBE, minDetail: th.minDetail, symmetryTol: th.symmetryTol, duplicateTol: th.duplicateTol });
+    const c = classifyTiles(tilesByN[n], { n, probe: PROBE, minDetail: th.minDetail, tol: th.tol });
     const strict = strictN.includes(n);
     result.perN[n] = { stickers: stickerCount(n), strict, classification: c, pass: c.counts.lackDetail === 0 };
     const line = `N=${n} (${stickerCount(n)} stickers): ${summarize(c)}`;

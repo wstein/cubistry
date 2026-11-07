@@ -26,7 +26,10 @@ Cubistry is a browser-first twisty-puzzle platform. Chronocube is a reference ap
 For repeated workflows follow:
 - `.agents/skills/feasibility-spike/SKILL.md` for mathematical investigations;
 - `.agents/skills/proof-review/SKILL.md` for independent validation;
-- `.agents/skills/validate-artwork/SKILL.md` for SVG, typography and printable output.
+- `.agents/skills/validate-artwork/SKILL.md` for SVG, typography and printable output;
+- `.agents/skills/picture-cube-faces/SKILL.md` for picture-cube face sets (six whole SVG faces, belt panorama, seam and tile checks, classification of symmetric, identical and twin stickers).
+
+Shared packages: `packages/cube-appearance` (`@cubistry/cube-appearance`, [docs/CUBE_APPEARANCE.md](docs/CUBE_APPEARANCE.md)) is the one classifier for "looks solved": sticker symmetry, identical stones, rotation twins and the appearance goal. The picture-cube-faces skill and the playground suitability display import it; do not add a second classification implementation (owner decision D8).
 
 Skill instructions are task-specific and do not override accepted project ADRs or specs.
 
