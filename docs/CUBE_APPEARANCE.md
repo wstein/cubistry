@@ -22,6 +22,7 @@ symmetric odd-N centers are accepted. The binding decisions:
 | D7 | Optimality is claimed only where proven. | This package makes no optimality claim |
 | D8 | The classifier lives in a pure package. | `packages/cube-appearance` |
 | D9 | The suitability traffic light is red only for flat stickers or a flat face; identical, symmetric and turned stickers are information. | `analyzeStickers` in `suitability.ts` (consumer, not the package) |
+| D10 | Centers: "need not be turned" holds only within the sticker's period. A 4-fold center is solved in any turn, a 2-fold center modulo a half turn, an asymmetric center only exactly (decided 2026-11-07). | `analyzeCenters` (`period`, `orientationNeeded` is order below 4), goal predicate |
 
 ## Terminology: order and period
 
@@ -147,9 +148,10 @@ Both former copies of the classification logic now call this package, so there i
   - `centers[].orientationNeeded` keeps its version-1 meaning (false for a 2-fold or 4-fold sticker) and is the
     package's `orientationExact`. The package's own `orientationNeeded` (order below 4) is stricter: a 2-fold
     center is solved only modulo a half turn. The additive key `centers[].period` carries the exact rule.
-    **OPEN (owner decision pending):** does "need not be turned" mean any turn (4-fold only) or modulo the
-    period (as the goal predicate here treats it)? The same question is marked open in `SUPER_PICTURE_CUBE.md`
-    and in the skill's `reference/cube-sizes-2-to-7.md`; no rule was changed.
+    Decided (D10, 2026-11-07): the package reading is the rule. Only order 4 needs no orientation; a 2-fold
+    center is solved modulo a half turn. The version-1 flag stays as it was (its name predates D10) and
+    must not be read as "2-fold needs no turn": read `period`. Aligning the flag and the checker wording
+    with D10 is a code change for a later PR.
   - No JSON field was removed or renamed, so the version stays 1: `thresholds.symmetry` and `thresholds.duplicate`
     now carry the same value, and the checker's `thresholds` object keeps `symmetryTol` and `duplicateTol` next
     to the new `tol`. The checker needs the repository's `node_modules` (the package imports
