@@ -27,6 +27,7 @@ import { browserMountEnv, mountCalendar7 } from "./apps/calendar7/mount.ts";
 import { MODE_CATALOG } from "./apps/mode-catalog.ts";
 import { createRegistry } from "./apps/registry.ts";
 import { createRouter } from "./apps/router.ts";
+import { createShellHost, findShellRegions } from "./apps/shell/slot-api.ts";
 import { PairController } from "./apps/pair/controller.ts";
 import { MsTimerCube } from "./apps/ms-timer/cube.ts";
 import { MsTimer } from "./apps/ms-timer/timer.ts";
@@ -1067,15 +1068,19 @@ const MODE_INITS = {
 const registry = createRegistry(
   MODE_CATALOG.map((meta) => ({
     ...meta,
-    async mount(_root, params, { isCurrent }) {
-      const cleanup = await MODE_INITS[meta.id](isCurrent, params);
+    async mount(_root, params, { isCurrent, shell }) {
+      const cleanup = await MODE_INITS[meta.id](isCurrent, params, shell);
       return typeof cleanup === "function" ? { dispose: cleanup } : undefined;
     },
   })),
 );
 
+// Dock slots, status chip, primary action, readout and Nerd drawer of index.html; each mode gets its own ModeShell.
+const shellHost = createShellHost(findShellRegions(document), document);
+
 const router = createRouter({
   registry,
+  shellHost,
   root: $("studio-scene"),
   fallback: "clock",
   onBefore(mode) {
