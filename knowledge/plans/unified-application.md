@@ -15,13 +15,13 @@ Evidence level: the current-state facts below were re-read on `origin/main` at `
 ## Decisions (owner, 2026-11-07)
 1. **Approach A, "contract first, thin".** Define a mode contract, build the landing page and the Others page, port each application from its legacy page into a mode, switch specs and links, then delete the legacy pages (the order per application is set by decision 8).
 2. **The old pages go completely, without crutches.** No redirect shims, no compatibility pages, no half-maintained doubles. At no step may an application or a cube become unusable.
-3. **Landing page.** The Live Clock is on top. Below it are the main applications: Clock, M/S Timer, Calendar, Playground, Counter. A second page "Others" holds everything else.
+3. **Landing page.** The Live Clock is on top. Below it are the main applications: Clock, M/S Timer, Calendar, Playground, Counter. A second page "Others" holds everything else. *(Superseded by: proposal is master. Four apps, second page "Cubes"; see the section "Design proposal is master".)*
 4. **Studio page.** The rename to "Chronocube 2×2 Studio" was rejected. The current studio page is unacceptable because of its name and its error state.
 
 5. **Name.** The application name stays "Cubistry". The rename was rejected before and is now final.
 6. **`hm-clock`.** It stays and must exist as a mode in the new structure.
-7. **URL scheme.** `index.html?app=<id>`. The landing page is `index.html` without a parameter.
-8. **No transitional links.** The landing page never links to the old pages. Applications are shown only in the unified view and are migrated quickly instead.
+7. **URL scheme.** `index.html?app=<id>`. The landing page is `index.html` without a parameter. *(Superseded by: proposal is master where it differs; routing is OPEN.)*
+8. **No transitional links.** The landing page never links to the old pages. Applications are shown only in the unified view and are migrated quickly instead. *(Superseded by: proposal is master where it differs; routing is OPEN.)*
 9. **Tool pages.** `licenses.html` stays. The fate of `print.html`, `solver-acceptance.html` and `library-example.html` is still open.
 
 Recommendations in this plan that go beyond these statements (`chronocube.html` is not the final shell, mounting existing engines instead of rewriting them) are recommendations, not decisions; see "Open decisions".
@@ -35,7 +35,7 @@ Recommendations in this plan that go beyond these statements (`chronocube.html` 
 - Seven pages (`counter`, `timer`, `five-second-timer`, `tenth-counter`, `hsm-counter`, `ms-counter`, `hm-one-cube`) are near-identical HTML files that load `src/main.mjs` and differ by `data-default-application`. `clock`, `ms-timer`, `calendar`, `playground`, `picture3`, `status`, `print` have their own scripts.
 - The studio switcher lists 23 options (from a code reading, not a browser run): the 10 modes `clock`, `ms-timer`, `hm-clock`, `tenth`, `counter`, `timer`, `five-second-timer`, `hsm-counter`, `ms-counter`, `hm-one-cube`, and 13 links to legacy pages. `hm-clock` exists only in the studio (owner decision 6: it becomes a mode in the new structure). `calendar`, `playground`, `picture3` and `status` have no mode and are reached only as links. `print.html` is linked from the studio header; `licenses.html` from every footer. See "What `print.html` is" below.
 - Test coverage gaps. The single-cube pages are covered by E2E almost only through `/counter.html` plus the `?application=` selector (`workshop-timer`, `five-second-timer`, `hsm-counter`, `ms-counter`, `hm-one-cube` specs). `five-second-timer.html`, `tenth-counter.html`, `hsm-counter.html`, `ms-counter.html` and `hm-one-cube.html` have no direct E2E, only the markup test in `tests/mpa-routing.test.mjs`; `timer.html` is reached only through the chooser of `counter.html` (`tests/pages/production.spec.mjs:208`). The live-clock spec `tests/browser/live-clock.spec.mjs:223-230` switches to `index.html?application=hsm-counter` through a hidden option (`clock.html:38`). `tenth-counter` has a unit test and no E2E. The studio modes have the load smoke spec of PR #266 and no functional test beyond it (readouts and buttons are not checked); `tests/browser/shell-layout.spec.mjs` checks layout only. Pages specs `tests/pages/production.spec.mjs` use `counter.html`, `timer.html` and `./`.
-- Not specified anywhere in the repository: landing layout, Live Clock as flagship, the main/others split (before this plan), and steps b to g of the unified view. The owner-approved design proposal is [docs/design/README.md](../../docs/design/README.md); see "Differences between the design proposal and the owner decisions". No issue or PR exists for the landing page. PR #262 refers to the landing page work ("handled by the landing page work"); issue #219 says to answer its questions "before step b of the unified view".
+- Not specified anywhere in the repository: landing layout, Live Clock as flagship, the main/others split (before this plan), and steps b to g of the unified view. The owner-approved design proposal is [docs/design/README.md](../../docs/design/README.md); see "Design proposal is master: where the plan must follow it". No issue or PR exists for the landing page. PR #262 refers to the landing page work ("handled by the landing page work"); issue #219 says to answer its questions "before step b of the unified view".
 
 ## Stages
 PR counts are estimates (total about 16 to 22 with `print` as a mode, 15 to 21 without it; one more with PR #269). Limits: issue #198 records an owner decision of 2026-11-06 that raises the limits for the unified view work until it is complete, to 8 open units and 12 open ledger nits (afterwards 3 and 6); `e2e` label on the stack top only, drafts start with a named blocker. Every stage is a stack of small PRs that each keep `main` releasable.
@@ -65,19 +65,18 @@ Kept: new `index.html`, the Others page, `licenses.html`, all `public/*.json` an
 - Test limits: local test runs are capped at 5 minutes each; E2E uses software GL at 30 s per test, so the smoke spec is split.
 - M/S Timer port: issues #219 (plan vs built app) and #218 (countdown shows 1 s more on the cubes) are open and touch the port PR.
 
-## Differences between the design proposal and the owner decisions
-Source: the owner-approved design proposal in [docs/design/README.md](../../docs/design/README.md) and `docs/design/cubistry-mock.html` (added verbatim, cited by [ADR-0001](../adr/ADR-0001-shell-tokens.md)). The owner decisions are the numbered list in "Decisions" above. This section records differences; it decides nothing. Line numbers refer to the committed files.
+## Design proposal is master: where the plan must follow it
+Owner statement (2026-11-07, quoted from the coordinator's relay): the design proposal is well worked out and is master; the earlier decisions of the same day were cited from memory and were probably phrased misleadingly. Source: [docs/design/README.md](../../docs/design/README.md) and `docs/design/cubistry-mock.html` (added verbatim; cited by [ADR-0001](../adr/ADR-0001-shell-tokens.md)). The stages and estimates in this plan are not changed here; a later PR adjusts them after the owner answers the OPEN items. Decisions 3, 7 and 8 above carry the note "superseded by: proposal is master" where they contradict the proposal.
 
-| # | Topic | Design proposal | Owner decisions (2026-11-07) |
-|---|---|---|---|
-| a | Apps on the landing page | Four: Live Clock, Stopwatch (M/S Timer & Stopwatch), Calendar, Playground (README:7, :58; mock `featured:true` at lines 657, 686, 749, 789). The Counter is under Cubes (mock line 732, no `featured`). | Five: Clock, M/S Timer, Calendar, Playground, Counter (decision 3). |
-| b | Second page | "Cubes": the Cube collection, a flat gallery of the nine other cubes (README:8; mock line 1041). | "Others" (decision 3). |
-| c | Routing | The mock uses `#home`, `#cubes` (old `#more` redirects) and `#app-<id>` (README:7-9, :67). README:67 says production keeps `?application=` plus kiosk and autostart flags; the implementing brief supplied with the proposal (not in the repository) says to redirect the existing per-app URLs into the unified view. | `index.html?app=<id>` (decision 7); no redirects, shims or compatibility pages (decision 2); no transitional links (decision 8). |
-| d | Switcher | 13 entries in two sections, Apps and Cubes (README:61; mock defines 13 apps). | Not decided. |
-| e | Fonts | The mock loads IBM Plex and Noto Sans from `fonts.googleapis.com` (mock lines 8-10). | The repository self-hosts IBM Plex (`public/fonts/ibm-plex/`, `src/shell/tokens.css`, [ADR-0001](../adr/ADR-0001-shell-tokens.md) line 44). |
-| f | `hm-clock` | Listed as "H-M Wall Clock" (README:20; mock line 660, short name "Wall Clock"). | `hm-clock` stays and must exist as a mode (decision 6). |
+| # | Topic | Earlier plan text | Design proposal (master) | Status |
+|---|---|---|---|---|
+| a | Apps on the landing page | Five: Clock, M/S Timer, Calendar, Playground, Counter (decision 3) | Four: Live Clock, Stopwatch (M/S Timer & Stopwatch), Calendar, Playground (README:7, :58; mock `featured:true` at lines 657, 686, 749, 789). The Counter belongs to Cubes (mock line 732, no `featured`). | Follow the proposal |
+| b | Second page | "Others" (decision 3) | "Cubes": the Cube collection, a flat gallery of the nine other cubes (README:8; mock line 1041). | Follow the proposal |
+| c | Routing | `index.html?app=<id>` (decision 7), no redirects or shims (decision 2), no transitional links (decision 8) | The mock uses `#home`, `#cubes` (old `#more` redirects) and `#app-<id>` (README:7-9). README:67 says production keeps `?application=` plus kiosk and autostart flags. The implementing brief supplied with the proposal (not in the repository, line 39) says to redirect the existing per-app URLs into the unified view. | OPEN: the owner has not given a concrete answer; both sources stand side by side |
+| e | Fonts | Self-hosted IBM Plex (ADR-0001 line 44, `src/shell/tokens.css`) | The mock loads IBM Plex and Noto Sans from `fonts.googleapis.com` (mock lines 8-10); README:47 calls the type pairing a proposal. | Check item: the repository keeps self-hosting; the owner confirms |
+| f | `hm-clock` | Stays and must exist as a mode (decision 6) | Listed as "H-M Wall Clock" (README:20; mock line 660, short name "Wall Clock"). | Follow the proposal (name); the mode requirement is unchanged |
 
-Row d: the ten deviations that README:56-67 lists under "Deviations that need an owner decision" are all OPEN. No owner statement in this repository decides any of them, except that items 1 (landing page with two categories) and 10 (deep links) overlap rows a to c above.
+Row d: the ten deviations that README:56-67 lists under "Deviations that need an owner decision" are OPEN. The owner has said nothing concrete about them. Items 1, 4, 5 and 10 touch rows a to c; items 2, 3 and 6 to 9 touch only shell behavior. The mock's 13-entry switcher (README:61) is part of item 4.
 
 | No. | README line | Deviation | Status |
 |---|---|---|---|
@@ -90,7 +89,7 @@ Row d: the ten deviations that README:56-67 lists under "Deviations that need an
 | 7 | 64 | Readout under each cube; committed-moves table moves into the hidden Nerd drawer | OPEN |
 | 8 | 65 | The clock gets a primary action (Pause / Resume) | OPEN |
 | 9 | 66 | Label style options renamed (title case or lower case) | OPEN |
-| 10 | 67 | Deep links: `#app-clock` in the mock; production keeps `?application=` | OPEN (conflicts with decision 7) |
+| 10 | 67 | Deep links: `#app-clock` in the mock; production keeps `?application=` | OPEN |
 
 ## Open decisions
 Not decided. Each recommendation comes from the code reading behind this plan; the price is what it costs. Decided items (name, `hm-clock`, URL scheme, transitional links, `licenses.html`) are in the section "Decisions".
