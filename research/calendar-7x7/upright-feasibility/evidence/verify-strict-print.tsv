@@ -1,0 +1,17 @@
+pure-print-orbit	-3	-3	19	3	19	5	0
+pure-print-orbit	-3	-2	15	2	15	9	0
+pure-print-orbit	-3	-1	21	2	21	3	0
+pure-print-orbit	-3	0	22	2	22	2	0
+pure-print-orbit	-3	1	20	2	20	4	0
+pure-print-orbit	-3	2	20	1	20	4	0
+pure-print-orbit	-2	-2	16	0	16	8	0
+pure-print-orbit	-2	-1	21	1	21	3	0
+pure-print-orbit	-2	0	21	0	21	3	0
+pure-print-orbit	-2	1	17	1	17	7	0
+pure-print-orbit	-1	-1	22	2	22	2	0
+pure-print-orbit	-1	0	23	1	23	1	0
+pure-print-orbit	0	0	6	0	6	0	0
+strict-supply-missing	0
+strict-matchability	0
+strict-printed	243
+strict-verdict	NECESSARY_CONDITIONS_MET
