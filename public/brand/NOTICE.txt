@@ -1,12 +1,14 @@
 Cubistry mark and favicon set (draft)
-Copyright 2026 Cubistry contributors
+Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
 
 Origin: original marks created with Claude Design for the owner. The SVG files
 are copied unchanged from the Claude Design delivery and contain only simple
 shapes (svg, g, rect), no text and no fonts. The PNG files come from the same
 delivery. No third-party images, platform glyphs, or stock artwork are included.
 
-License: license to be decided by the owner.
+License: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). The marks are art data, not AGPL program code.
 
 SVG sources (authoritative; sha256):
   8cdb96035bbb6595d16378be46ffb3e4e1e8c18677252df3829fa6d428236137  public/favicon.svg

@@ -105,8 +105,9 @@ compressed bytes depend on the zlib build linked into Python. A different zlib
 identical. Byte-identical PDFs and ZIPs require the same zlib implementation.
 All sticker glyphs are vector paths. Calendar glyphs and HSM unit words
 derive from pinned local Noto Sans fonts under the retained SIL Open Font License;
-HSM digits and large unit symbols are original geometric artwork. The project
-artwork license is retained separately. Font metadata is conditional, so the
+HSM digits and large unit symbols are original geometric artwork. The sticker
+artwork is licensed under CC BY-SA 4.0 (`ARTWORK-LICENSE.txt`, art data, not AGPL
+program code). Font metadata is conditional, so the
 symbol-only HSM print is not described as font-derived.
 
 The physical/PDF checker and eight corruption controls were independently authored

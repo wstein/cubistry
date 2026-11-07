@@ -440,6 +440,17 @@ writeFileSync(new URL("net.svg", dir), `<svg xmlns="http://www.w3.org/2000/svg" 
 
 const pdir = new URL("../assets/playground-pastel-proposals/", import.meta.url);
 mkdirSync(pdir, { recursive: true });
+writeFileSync(
+  new URL("NOTICE.txt", pdir),
+  `Pastel Garden draft proposals (unused)
+Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+These draft SVGs are part of the Pastel Garden artwork, see public/playground-pastel/NOTICE.txt.
+They are art data, not AGPL program code. Generator: scripts/build-pastel-garden-art.mjs
+`,
+);
 for (const [id, p] of Object.entries(proposals))
   writeFileSync(new URL(`${id}.svg`, pdir), `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">${p.art}</svg>\n`);
 // Review sheets (preview only, not print or app assets): each proposal attached to the continuous belt.

@@ -163,8 +163,12 @@ The following third-party libraries and modules are bundled, linked, or distribu
 * **License**: the data (`public/calendar7/`, `data/calendar7/` and the research data it is derived from) is a separate work under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), SPDX-License-Identifier: CC-BY-SA-4.0. Notice: "Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry." The code that reads, derives and tests it (`src/apps/calendar7/`, `scripts/prepare-calendar7.mjs`, `scripts/calendar7/export-julia.jl`, `tests/calendar7-replay.test.mjs`) remains AGPL-3.0-or-later; the AGPL copyleft does not cover the data.
 * **Provenance and regeneration**: pinned by research commit and SHA-256 in `calendar7-source.json`; verify with `node scripts/prepare-calendar7.mjs --check`; see `docs/CALENDAR_7X7.md`.
 * **Cubistry mark and favicon**: Original marks created with Claude Design for the owner; no third-party images or fonts (`public/brand/NOTICE.txt`).
-* **Copyright**: © 2026 Cubistry contributors.
-* **License**: license to be decided by the owner.
+* **Copyright**: Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+* **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), SPDX-License-Identifier: CC-BY-SA-4.0; the marks are art data, not AGPL program code.
+* **Super Picture presets**: The three preset artworks (`src/apps/picture3/presets.ts`) are generated vector illustrations; the file is the editable art source (art data, not AGPL program code).
+* **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), SPDX-License-Identifier: CC-BY-SA-4.0. Notice: "Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry."
+* **Sticker glyph artwork**: The counter digits (`public/assets/digits/0-9.svg`), the H/S/M symbols (`public/assets/hsm/`), the H/M sticker net (`public/assets/hm/`, generator `scripts/hm/render-net.mjs`) and the print templates in `public/print/` (`ARTWORK-LICENSE.txt`; font-derived outlines additionally retain the SIL OFL).
+* **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), SPDX-License-Identifier: CC-BY-SA-4.0; art data, not AGPL program code.
 
 ---
 

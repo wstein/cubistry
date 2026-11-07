@@ -37,7 +37,7 @@ for name,h in M['files'].items():need(sha(OUT/name)==h,'output byte hash '+name)
 for name,h in M['artInputs'].items():need(sha(ROOT/name)==h,'original artwork input hash '+name)
 for r in rec.values():
  for entry,param in [('sizeMm','sizeMm'),('cornerRadiusMm','cornerRadiusMm'),('bleedMm','bleedMm'),('safeMm','safeMm')]:need(r[entry]==M['parameters'][param],'declared physical parameters match every sticker')
-need((OUT/'ARTWORK-LICENSE.txt').read_bytes()==(ROOT/'LICENSE').read_bytes(),'project artwork license retained')
+need((OUT/'ARTWORK-LICENSE.txt').read_bytes()==(ROOT/'scripts/print/ARTWORK-LICENSE.txt').read_bytes(),'project artwork license retained')
 if M['design']=='hsm-symbols':need(M['font'] is None,'geometric symbol artwork is not falsely attributed to a font')
 else:need((OUT/'OFL.txt').read_bytes()==(ROOT/'public/fonts/OFL.txt').read_bytes(),'source font license retained')
 

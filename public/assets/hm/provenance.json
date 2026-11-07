@@ -7,7 +7,7 @@
     "sha256": "635e9325dea8e5da5c495d94918c82bf85e3fabfa53817cd4ad584e859210939"
   },
   "generator": "scripts/hm/render-net.mjs",
-  "license": "AGPL-3.0-or-later (project artwork; no fonts, no raster data)",
+  "license": "CC-BY-SA-4.0 (Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry. Project artwork; no fonts, no raster data.)",
   "layout": "Cross net of the solved source pose, outside view of each face: U above F; L, F, R, B in a row; D below F. Each face is a 2x2 grid; rotation is the clockwise turn of the glyph art so that its top points along the sticker's print-up vector.",
   "faces": [
     {
@@ -353,6 +353,6 @@
   ],
   "output": {
     "path": "public/assets/hm/m3-sh-net.svg",
-    "sha256": "b75d1d9d50264f25ddf1b5f60582c122ea345106f993e8d379d00edcc33d4e4a"
+    "sha256": "069ea7a60090e35469e44531b6bb2b92d799d2a2c109bb8dcf4b23cf431960e6"
   }
 }
