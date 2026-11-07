@@ -431,19 +431,13 @@ async function initMsTimerMode(isCurrent) {
   cardsContainer.setAttribute("data-count", "3");
   cardsContainer.innerHTML = `
     <article class="clock-card">
-      <h2>Minutes (min)</h2>
-      <div id="ms-minutes" data-unit="M" aria-busy="true"></div>
-      <p id="ms-minutes-state" class="clock-state" role="status">Preparing…</p>
+      <div id="ms-minutes" data-unit="M" aria-busy="true" role="img" aria-label="Minutes cube"></div>
     </article>
     <article class="clock-card">
-      <h2>Seconds (sec)</h2>
-      <div id="ms-seconds" data-unit="S" aria-busy="true"></div>
-      <p id="ms-seconds-state" class="clock-state" role="status">Preparing…</p>
+      <div id="ms-seconds" data-unit="S" aria-busy="true" role="img" aria-label="Seconds cube"></div>
     </article>
     <article class="clock-card">
-      <h2>1/10 Second (1/10)</h2>
-      <div id="ms-tenths" data-unit="T" aria-busy="true"></div>
-      <p id="ms-tenths-state" class="clock-state" role="status">Preparing…</p>
+      <div id="ms-tenths" data-unit="T" aria-busy="true" role="img" aria-label="Tenth-second cube"></div>
     </article>
   `;
 
@@ -469,10 +463,6 @@ async function initMsTimerMode(isCurrent) {
         <button id="timer-start" class="primary" type="button">Start</button>
         <button id="timer-reset" type="button">Reset</button>
       </div>
-      <p id="timer-sync" class="small timer-motion" role="status" style="margin-top: 12px;">
-        <span id="timer-motion-label">Idle</span><br />
-        <span id="timer-effective" class="small"></span>
-      </p>
     </div>
   `);
 
@@ -539,9 +529,6 @@ async function initMsTimerMode(isCurrent) {
     if (!timer || !isCurrent()) return;
     const idle = !timer.running && !timer.busy;
     $("timer-logical").textContent = timer.text;
-    $("ms-minutes-state").textContent = `${String(pair.major.currentValue).padStart(2, "0")}${pair.major.busy ? " · Moving" : ""}`;
-    $("ms-seconds-state").textContent = `${String(pair.minor.currentValue).padStart(2, "0")}${pair.minor.busy ? " · Moving" : ""}`;
-    $("ms-tenths-state").textContent = `.${tenth.currentValue}${tenth.busy ? " · Moving" : ""}`;
 
     $("timer-start").textContent = timer.running ? "Pause" : "Start";
     $("timer-mode").disabled = !idle;
@@ -550,8 +537,6 @@ async function initMsTimerMode(isCurrent) {
     $("timer-reset").disabled = timer.running;
 
     $("timer-duration-setting").hidden = timer.mode === "stopwatch";
-    const motionLabel = timer.busy ? "Moving / Synchronizing" : timer.running ? "Running" : "Idle";
-    $("timer-motion-label").textContent = motionLabel;
   }
 
   $("timer-start").addEventListener("click", () => {
@@ -606,21 +591,16 @@ async function initHmClockMode(isCurrent) {
   cardsContainer.setAttribute("data-count", "2");
   cardsContainer.innerHTML = `
     <article class="clock-card">
-      <h2>Hours</h2>
-      <div id="clock-hours" data-unit="H" aria-busy="true"></div>
-      <p id="hours-state" class="clock-state" role="status">Preparing…</p>
+      <div id="clock-hours" data-unit="H" aria-busy="true" role="img" aria-label="Hours cube"></div>
     </article>
     <article class="clock-card">
-      <h2>Minutes</h2>
-      <div id="clock-minutes" data-unit="M" aria-busy="true"></div>
-      <p id="minutes-state" class="clock-state" role="status">Preparing…</p>
+      <div id="clock-minutes" data-unit="M" aria-busy="true" role="img" aria-label="Minutes cube"></div>
     </article>
   `;
 
   renderStudioHud("Live Wall Time", `
     <div class="clock-digital">
       <output id="clock-digital" class="studio-digital-huge" aria-label="Current local time">--:--</output>
-      <span id="clock-status" class="small" role="status">Synchronizing…</span>
     </div>
     <label for="clock-lettering">Sticker lettering</label>
     <select id="clock-lettering">
@@ -692,14 +672,6 @@ async function initHmClockMode(isCurrent) {
       if (digital) {
         digital.textContent = `${String(snapshot.values[0]).padStart(2, "0")}:${String(snapshot.values[1]).padStart(2, "0")}`;
       }
-      units.forEach((u, i) => {
-        const node = $(names[i] + "-state");
-        if (node) {
-          const state = snapshot.motion[i];
-          node.dataset.state = state;
-          node.textContent = `${String(u.controller.currentValue).padStart(2, "0")}${state === "idle" ? "" : " · Moving"}`;
-        }
-      });
     } catch (e) {
       console.error(e);
     }
@@ -724,7 +696,6 @@ async function initTenthMode(isCurrent) {
     <article class="clock-card" style="text-align: center;">
       <h2>Tenth-Second Display</h2>
       <output id="tenth-value-display" class="studio-digital-huge" style="display: block;">.0</output>
-      <p id="tenth-state" class="clock-state" role="status">Ready</p>
     </article>
   `;
 
@@ -777,7 +748,6 @@ async function initTenthMode(isCurrent) {
     (v, progress, err) => {
       if (!isCurrent()) return;
       $("tenth-value-display").textContent = `.${v}`;
-      $("tenth-state").textContent = progress ? "Moving…" : "Ready";
       if (err) console.error(err);
     },
     resolveAssets,
@@ -827,7 +797,6 @@ async function initCounterMode(isCurrent) {
     <article class="clock-card" style="text-align: center;">
       <h2>Counter Value</h2>
       <output id="counter-value-display" class="studio-digital-huge" style="display: block;">00</output>
-      <p id="counter-state" class="clock-state" role="status">Ready</p>
     </article>
   `;
 
@@ -863,7 +832,6 @@ async function initCounterMode(isCurrent) {
     onState: (v, busy) => {
       if (!isCurrent()) return;
       $("counter-value-display").textContent = String(v).padStart(2, "0");
-      $("counter-state").textContent = busy ? "Turning…" : "Ready";
     },
     resolveAssets,
   });
@@ -913,7 +881,6 @@ async function initTimerMode(fiveSecond, isCurrent) {
       <output id="timer-display" class="studio-digital-huge" style="display: block;">
         ${fiveSecond ? "00:05.0" : "15:00"}
       </output>
-      <p id="timer-state" class="clock-state" role="status">Ready</p>
     </article>
   `;
 
@@ -942,7 +909,6 @@ async function initTimerMode(fiveSecond, isCurrent) {
     manifest,
     (v, busy) => {
       if (!isCurrent()) return;
-      $("timer-state").textContent = busy ? "Moving…" : "Ready";
     },
     resolveAssets,
   );
@@ -1005,7 +971,6 @@ async function initHsmSingleMode(variant, isCurrent) {
     <article class="clock-card" style="text-align: center;">
       <h2 id="single-hsm-title">Counter 00–59</h2>
       <output id="hsm-value-display" class="studio-digital-huge" style="display: block;">00</output>
-      <p id="hsm-state" class="clock-state" role="status">Ready</p>
     </article>
   `;
 
@@ -1060,7 +1025,6 @@ async function initHsmSingleMode(variant, isCurrent) {
     (v, busy) => {
       if (!isCurrent()) return;
       $("hsm-value-display").textContent = String(v).padStart(2, "0");
-      $("hsm-state").textContent = busy ? "Turning…" : "Ready";
     },
     resolveAssets,
   );
