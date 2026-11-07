@@ -1,0 +1,232 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: 7x7 jump experiment E1
+
+# Manually dispatched. Experiment E1/E2 of the 7x7 solver feasibility study: does the
+# unchanged pure-split producer (research/calendar-7x7/pure-split-states/pilot) reach a display
+# front from arbitrary legal poses, and does the orbit solve always finish? The harness and the
+# analysis live on the research branch (research/calendar-7x7/jump-e1); like pure-split-chain.yml
+# this file only checks that ref out. Julia only, no Python. Candidate tooling: no word it finds
+# is a chain edge or verified by the chain verifiers.
+#
+# Cost: 4 shards of 15 cases, about 75 minutes each, about 5 runner hours. smoke_mode runs one
+# case on one shard (about 10 minutes). Do not dispatch the full run without the owner's approval.
+
+on:
+  workflow_dispatch:
+    inputs:
+      research_ref:
+        description: Branch or tag of this repository that holds the research code
+        type: string
+        default: research/cube-display-feasibility
+      smoke_mode:
+        description: One case on one shard, about 10 minutes
+        type: boolean
+        default: true
+      with_rotations:
+        description: Let the random walk use whole-cube rotations (UNKNOWN whether the core prefix copes)
+        type: boolean
+        default: false
+      deadline_minutes:
+        description: Stop starting new cases in a shard after this many minutes (60-320)
+        type: string
+        default: "300"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jump-e1
+  cancel-in-progress: false
+
+env:
+  E1_DIR: research/calendar-7x7/jump-e1
+  PURE_DIR: research/calendar-7x7/pure-split-states
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+      shards: ${{ steps.validate.outputs.shards }}
+      nshards: ${{ steps.validate.outputs.nshards }}
+      expected: ${{ steps.validate.outputs.expected }}
+      smoke: ${{ steps.validate.outputs.smoke }}
+      rot: ${{ steps.validate.outputs.rot }}
+      deadline: ${{ steps.validate.outputs.deadline }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true # prepare only fetches this repository; no untrusted code runs here
+      - name: Validate inputs
+        id: validate
+        env:
+          IN_SMOKE: ${{ inputs.smoke_mode }}
+          IN_ROT: ${{ inputs.with_rotations }}
+          IN_DEADLINE: ${{ inputs.deadline_minutes }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          [[ "$IN_DEADLINE" =~ ^[0-9]{2,3}$ ]] || fail "deadline_minutes must be a number"
+          [ "$IN_DEADLINE" -ge 60 ] && [ "$IN_DEADLINE" -le 320 ] || fail "deadline_minutes must be 60-320"
+          if [ "$IN_SMOKE" = "true" ]; then
+            shards='[0]'; nshards=1; expected=1; smoke=true
+          else
+            shards='[0,1,2,3]'; nshards=4; expected=60; smoke=false
+          fi
+          rot=0; [ "$IN_ROT" = "true" ] && rot=1
+          {
+            echo "shards=$shards"; echo "nshards=$nshards"; echo "expected=$expected"
+            echo "smoke=$smoke"; echo "rot=$rot"; echo "deadline=$IN_DEADLINE"
+          } >> "$GITHUB_OUTPUT"
+      - name: Resolve research ref
+        id: resolve
+        env:
+          REF: ${{ inputs.research_ref }}
+          SMOKE: ${{ steps.validate.outputs.smoke }}
+          SHARDS: ${{ steps.validate.outputs.shards }}
+          ROT: ${{ steps.validate.outputs.rot }}
+          DEADLINE: ${{ steps.validate.outputs.deadline }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          [[ "$REF" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$ ]] || fail "research_ref has unsupported characters"
+          case "$REF" in *..*|*//*|*.lock) fail "research_ref is not a plain ref name";; esac
+          # Only a branch or tag that exists in this repository is accepted; no raw SHAs, URLs or fork refs.
+          git fetch --no-tags --depth=1 origin "+refs/heads/$REF:refs/remotes/research/ref" 2>/dev/null \
+            || git fetch --no-tags --depth=1 origin "+refs/tags/$REF:refs/remotes/research/ref" 2>/dev/null \
+            || fail "research_ref '$REF' is not a branch or tag of $GITHUB_REPOSITORY"
+          sha=$(git rev-parse --verify "refs/remotes/research/ref^{commit}")
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "research_ref $REF resolved to $sha"
+          missing=0
+          for f in "$E1_DIR/jump_e1.jl" "$E1_DIR/analyze_e1.jl" \
+                   "$PURE_DIR/pilot/producer-resume.jl" "$PURE_DIR/pilot/evidence/pure-orbitfb.moves.tsv" \
+                   "$PURE_DIR/evidence/print-pure-A.tsv" "$PURE_DIR/evidence/dag-all.tsv.gz" \
+                   research/calendar-7x7/english/evidence/targets.tsv; do
+            git cat-file -e "$sha:$f" 2>/dev/null || { echo "::error::$f is missing at $sha"; missing=1; }
+          done
+          if [ "$missing" != 0 ]; then
+            fail "research ref lacks required files (the harness is added by a
+            separate PR against research/cube-display-feasibility)"
+          fi
+          {
+            echo "### 7x7 jump experiment E1/E2"
+            echo "- research_ref: \`$REF\`"
+            echo "- resolved SHA: \`$sha\`"
+            echo "- smoke: \`$SMOKE\`, shards: $SHARDS"
+            echo "- rotations in walk: $ROT, deadline: $DEADLINE min"
+            [ "$SMOKE" != true ] || echo "- **SMOKE RUN: no verdict, one case only**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  shard:
+    needs: [prepare]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 345
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.prepare.outputs.shards) }}
+    env:
+      SHA: ${{ needs.prepare.outputs.sha }}
+      NSHARDS: ${{ needs.prepare.outputs.nshards }}
+      SHARD: ${{ matrix.shard }}
+      E1_SMOKE: ${{ needs.prepare.outputs.smoke == 'true' && '1' || '0' }}
+      E1_ROT: ${{ needs.prepare.outputs.rot }}
+      E1_DEADLINE_MIN: ${{ needs.prepare.outputs.deadline }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          path: src
+          persist-credentials: false
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - name: Prepare work directory
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          gzip -dc "src/$PURE_DIR/evidence/dag-all.tsv.gz" > "$GITHUB_WORKSPACE/out/dag-all.tsv"
+          sha256sum "$GITHUB_WORKSPACE/out/dag-all.tsv" "src/$PURE_DIR/pilot/producer-resume.jl" "src/$E1_DIR/jump_e1.jl"
+      - name: Run shard
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out
+          cd "src/$E1_DIR"
+          julia --version
+          # One producer process per job: the library build costs 40 to 64 s and about 3 GB.
+          set +e
+          timeout 330m julia --startup-file=no jump_e1.jl "$out/dag-all.tsv" \
+            ../pure-split-states/evidence/print-pure-A.tsv \
+            ../pure-split-states/pilot/evidence/pure-orbitfb.moves.tsv \
+            "$out" "$SHARD" "$NSHARDS" 2>&1 | tee "$out/run-shard$SHARD.log"
+          rc=${PIPESTATUS[0]}
+          set -e
+          [ "$rc" = 0 ] || { echo "::error::harness exited with $rc (124 = timeout)"; exit "$rc"; }
+          test -s "$out/e1-shard$SHARD.tsv"
+      - name: Package artifact
+        if: always()
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out
+          mkdir -p "$GITHUB_WORKSPACE/pack"
+          cp "$out"/e1-shard*.tsv "$out"/e1-stats-shard*.tsv \
+            "$out"/run-shard*.log "$GITHUB_WORKSPACE/pack/" 2>/dev/null || true
+          prov=$GITHUB_WORKSPACE/pack/PROVENANCE-shard$SHARD.txt
+          {
+            echo "research_ref_sha=$SHA"
+            echo "run_id=$GITHUB_RUN_ID shard=$SHARD of $NSHARDS"
+            echo "sha256 of the inputs:"
+            (cd "$GITHUB_WORKSPACE" && sha256sum out/dag-all.tsv \
+              "src/$PURE_DIR/pilot/producer-resume.jl" \
+              "src/$E1_DIR/jump_e1.jl" "src/$E1_DIR/analyze_e1.jl") || true
+            echo "sha256 of the outputs:"
+            (cd "$GITHUB_WORKSPACE/pack" && sha256sum e1-shard*.tsv \
+              e1-stats-shard*.tsv run-shard*.log) || true
+          } > "$prov"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: jump-e1-shard-${{ matrix.shard }}
+          path: pack/
+          retention-days: 90
+          if-no-files-found: warn
+
+  report:
+    needs: [prepare, shard]
+    if: ${{ always() && needs.prepare.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      EXPECTED: ${{ needs.prepare.outputs.expected }}
+      SMOKE: ${{ needs.prepare.outputs.smoke }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          path: src
+          persist-credentials: false
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: jump-e1-shard-*
+          path: res
+          merge-multiple: true
+      - name: Analyze
+        run: |
+          set -euo pipefail
+          if [ "$SMOKE" = true ]; then
+            echo "**SMOKE RUN: one case. No verdict.**" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          julia --startup-file=no "src/$E1_DIR/analyze_e1.jl" res "$EXPECTED" | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jump-e1-report-${{ github.run_id }}
+          path: res/
+          retention-days: 90
+          if-no-files-found: error
