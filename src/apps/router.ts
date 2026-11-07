@@ -1,6 +1,7 @@
 import { urlAfterAppSwitch } from "../app-switch-url.mjs";
 import { createModeSwitcher, type IsCurrent } from "./chronocube/mode-switch.ts";
 import type { AppMode, AppRegistry } from "./registry.ts";
+import { createInertShell, type ShellHost } from "./shell/slot-api.ts";
 
 /** The single URL key of the application: `index.html?app=<id>`. */
 export const APP_PARAM = "app";
@@ -39,6 +40,8 @@ export interface RouterOptions {
   /** Id used when the URL names no registered app. */
   fallback: string;
   env?: RouterEnv;
+  /** Owns the dock regions; every mount gets a `ModeShell` from it. Without one, modes get an inert shell. */
+  shellHost?: ShellHost;
   /** Runs for the incoming mode after the previous mode was disposed and before its mount. */
   onBefore?: (mode: AppMode) => void;
   /** Runs when the mode finished mounting and is still the latest switch. */
@@ -75,8 +78,20 @@ export function createRouter(options: RouterOptions) {
     target = id;
     const ok = await switcher.switchTo(
       async (isCurrent: IsCurrent) => {
-        const instance = await mode.mount(root as HTMLElement, params, { isCurrent });
-        return () => instance?.dispose();
+        const shell = options.shellHost?.begin(isCurrent) ?? createInertShell();
+        try {
+          const instance = await mode.mount(root as HTMLElement, params, { isCurrent, shell });
+          return () => {
+            try {
+              instance?.dispose();
+            } finally {
+              shell.dispose();
+            }
+          };
+        } catch (err) {
+          shell.dispose();
+          throw err;
+        }
       },
       () => {
         current = id;
@@ -107,6 +122,7 @@ export function createRouter(options: RouterOptions) {
       stopPop?.();
       stopPop = null;
       void switcher.switchTo(async () => null);
+      options.shellHost?.reset();
       current = null;
     },
   };

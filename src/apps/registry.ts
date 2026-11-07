@@ -1,4 +1,5 @@
 import type { IsCurrent } from "./chronocube/mode-switch.ts";
+import type { ModeShell } from "./shell/slot-api.ts";
 
 /** Landing-page section of the design proposal: featured modes are "apps", all others are "cubes". */
 export const APP_GROUPS = ["apps", "cubes"] as const;
@@ -12,6 +13,11 @@ export interface ModeInstance {
 export interface MountContext {
   /** True while this mount is still the latest one; check it after every await. */
   isCurrent: IsCurrent;
+  /**
+   * The dock slots, status chip, primary action, readout and Nerd drawer of this mount. Writes after the mode was
+   * replaced are dropped, and the router disposes it with the mode, so a mode never has to clear its own content.
+   */
+  shell: ModeShell;
 }
 
 /** Static description of a mode. Pure data, safe to import without a DOM. */
