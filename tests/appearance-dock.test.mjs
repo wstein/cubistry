@@ -93,10 +93,10 @@ test("floating mode is unchanged for pages without a dock", () => withDocument((
   assert.equal(controls.panel.style.position, "absolute");
 }));
 
-test("header Appearance button: a plain disclosure that opens the section, mirrors its state and gets the focus back", () => withDocument(({ scene, doc }) => {
+test("header Appearance button: a plain disclosure that opens the section, mirrors its state and gets the focus back", () => withDocument(({ scene, doc, dock }) => {
   const button = new Node("button", "appearance-btn"); button.attributes["aria-expanded"] = "false";
   doc.getElementById = id => id === "appearance-btn" ? button : null;
-  doc.querySelector = selector => selector === ".cube-appearance.is-docked" ? panel : null;
+  doc.querySelector = selector => selector === ".cube-appearance.is-docked" ? panel : selector === '[data-region="view-controls"]' ? dock : null;
   const controls = installAppearanceControls(scene, () => {}), panel = controls.panel;
   const toggle = walk(panel).find(n => n.className === "cube-appearance-disclosure");
   installAppearanceButton(doc);
