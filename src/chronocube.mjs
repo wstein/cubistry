@@ -315,21 +315,9 @@ async function initClockMode(isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "3");
   cardsContainer.innerHTML = `
-    <article class="clock-card">
-      <h2>Hours</h2>
-      <div id="clock-hours" data-unit="H" aria-busy="true"></div>
-      <p id="hours-state" class="clock-state" role="status">Preparing…</p>
-    </article>
-    <article class="clock-card">
-      <h2>Minutes</h2>
-      <div id="clock-minutes" data-unit="M" aria-busy="true"></div>
-      <p id="minutes-state" class="clock-state" role="status">Preparing…</p>
-    </article>
-    <article class="clock-card">
-      <h2>Seconds</h2>
-      <div id="clock-seconds" data-unit="S" aria-busy="true"></div>
-      <p id="seconds-state" class="clock-state" role="status">Preparing…</p>
-    </article>
+    <div id="clock-hours" data-unit="H" aria-busy="true"></div>
+    <div id="clock-minutes" data-unit="M" aria-busy="true"></div>
+    <div id="clock-seconds" data-unit="S" aria-busy="true"></div>
   `;
 
   renderStudioHud("Live Time", `
@@ -482,14 +470,6 @@ async function initClockMode(isCurrent) {
           ? "Synchronizing to current time"
           : "Live · local time";
       }
-      units.forEach((u, i) => {
-        const node = $(names[i] + "-state");
-        if (node) {
-          const state = snapshot.motion[i];
-          node.dataset.state = state;
-          node.textContent = `${String(u.controller.currentValue).padStart(2, "0")}${state === "idle" ? "" : state === "moving" ? " · Moving" : " · Synchronizing"}`;
-        }
-      });
     } catch (e) {
       console.error(e);
     }
