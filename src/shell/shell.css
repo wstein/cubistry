@@ -1,5 +1,5 @@
 /* Unified shell layout for the Chronocube Studio page: header above the stage, controls always visible.
-   Regions are addressed by [data-region] and [data-slot] (chronocube.html). Tokens: ./tokens.css.
+   Regions are addressed by [data-region] and [data-slot] (index.html). Tokens: ./tokens.css.
    The legacy stylesheets are imported before this file, so rules here use the extra class `.shell` to win. */
 
 /* The legacy full-viewport rule uses :has(#cube, ...), so its specificity includes an id; match it here. */
