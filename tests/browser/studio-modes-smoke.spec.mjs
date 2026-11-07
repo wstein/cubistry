@@ -14,11 +14,7 @@ const MODES = ["clock", "ms-timer", "hm-clock", "tenth", "counter", "timer", "fi
 
 // Console errors a mode is known to log on the current code. Everything else fails. An entry is the exact
 // message fragment and the issue that tracks the defect; remove it when the issue is fixed.
-const KNOWN_ERRORS = {
-  // initHmClockMode passes 2 units to LiveClockScheduler.tick, which demands 3; draw() catches and logs the
-  // error every 100 ms. The mode still renders. Tracked in wstein/cubistry#265.
-  "hm-clock": ["Invalid live clock snapshot"],
-};
+const KNOWN_ERRORS = {};
 
 // On the CI runners (software GL, shared CPU) a step takes 4 to 9 times its local time, so the ready wait is 30 s
 // (it includes ensureProof and the design fetches), and a test gets the slow limit (3 x 30 s). The
