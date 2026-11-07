@@ -248,6 +248,93 @@ Chain controls (in [results.tsv](evidence/negative-controls/results.tsv)):
 - The **unchanged** PR #99 Julia chain verifier also rejects the chain, because
   its print and displays differ. That is why the parametrization is needed.
 
+## Stage 4: the 2028-01 to 2076-01 chain (committed workflow output)
+
+Status: **research candidate, not certified.** This section commits the output
+of the manual workflow `.github/workflows/pure-split-chain.yml` (on `main`) so
+that the chain does not depend on the 90-day retention of GitHub Actions
+artifacts and so that other repositories can pin it by commit and SHA-256. The
+chain was produced by [pilot/producer-resume.jl](pilot/producer-resume.jl) and
+verified by [pure_chain.jl](pure_chain.jl) and the Flix `chain` command in the
+workflow. The files here are workflow output copied byte for byte; nothing was
+edited or regenerated.
+
+Files:
+
+| File | Content |
+|---|---|
+| [chain-2028-2076.moves.tsv](evidence/chain-2028-2076.moves.tsv) | cumulative chain, 576 edges, `cubistry.calendar7.chain.v1`; root is display 25 (2028-01), last edge ends at 2076-01 |
+| [chain-2028-2076-edges.tsv](evidence/chain-2028-2076-edges.tsv) | search log: `from to method htm seconds` |
+| [chain-2028-2076.julia.tsv](evidence/receipts/chain-2028-2076.julia.tsv) | receipt of the Julia verifier |
+| [chain-2028-2076.flix.tsv](evidence/receipts/chain-2028-2076.flix.tsv) | receipt of the Flix verifier (byte-identical to the Julia receipt) |
+
+Verification result (job `seg4` of run 42338197349, both verifiers):
+`status VALID_CONTINUOUS_CHAIN 576 218 294 49`, identical receipts. Re-run with
+the workflow's own commands, from this directory:
+
+```sh
+gunzip -c evidence/dag-all.tsv.gz > /tmp/dag-all.tsv
+julia --startup-file=no pure_chain.jl evidence/print-pure-A.tsv /tmp/dag-all.tsv \
+  evidence/chain-2028-2076.moves.tsv > /tmp/receipt.julia.tsv
+cmp /tmp/receipt.julia.tsv evidence/receipts/chain-2028-2076.julia.tsv
+```
+
+Provenance:
+
+- Workflow file: `.github/workflows/pure-split-chain.yml` on `main`
+  (SHA-256 `6d998ce0d2dd79ef3cad0f6fe4815674c077f94e3e2e120fc00ed0a548dfb2d8`
+  at main commit `d7166c60832952c02ed4f7f215ecef177178868b`).
+- Research ref used by all runs: `research/cube-display-feasibility` resolved
+  to `743e17d035dae11787acc3cf02c88c3b22942f4d` (the base of this commit).
+- Inputs of every run after the first: `start_year=2028`, `start_month=1`,
+  `edges_per_job=36`, `jobs=4`, `smoke_mode=false`; `prior_run_id` continues
+  the previous run's last artifact.
+- Run lineage (each continues the last artifact of the previous one):
+  `42176202391` (smoke, 2 edges from 2028-01) is not part of the chain;
+  `42177775429` (fresh, `prior_run_id` empty, edges 1-144),
+  `42229311160` (`prior_run_id=42177775429`, edges 145-288),
+  `42297036432` (`prior_run_id=42229311160`, edges 289-432),
+  `42338197349` (`prior_run_id=42297036432`, edges 433-576).
+- Committed files come from artifact `psc-chain-42338197349-s4`
+  (`VERIFIED.txt`: `research_ref_sha=743e17d0...`, `run_id=42338197349`,
+  `segment=4`, `edges_total=576`; its `SHA256SUMS` was checked with
+  `sha256sum --check --strict`). Flix jar SHA-256 used by the workflow:
+  `2289a071ca982cafde58ee776f6768cbed455bb003f0a267eb45565fb2909d3d`.
+- Inputs of the verifiers (already in this directory):
+  `evidence/print-pure-A.tsv` SHA-256
+  `425e647b29ec28fec29ea719b9074ad3b6977e2b95aea8f7e458f85270042784`,
+  `evidence/dag-all.tsv.gz` SHA-256
+  `ec74769c335722f45165e9061c56375af62fd187fcd5a17042d9683d732c1d88`.
+
+SHA-256 of the committed files:
+
+```
+34925dacbc356c243bf5fddd9fa999e4581d0b5eab42bd84a1726157144a88e0  evidence/chain-2028-2076.moves.tsv
+51d9565b4738c00cf558768c58cd3a9183cfb1cd041cbeb906f9a4885b680700  evidence/chain-2028-2076-edges.tsv
+696d78087767e3a66892d845f375c67d93d241272330328611aba0b81a8bc655  evidence/receipts/chain-2028-2076.julia.tsv
+696d78087767e3a66892d845f375c67d93d241272330328611aba0b81a8bc655  evidence/receipts/chain-2028-2076.flix.tsv
+```
+
+Source-state hash (root, display 25, 2028-01):
+`fbf48c2095bdb6a8f3f6ce767244c013d903f27946bde0f1756c4c9c367a8f14`; endpoint
+(2076-01) hash:
+`56254c62bef457b6362ffa5cbd477fff8036d26b465f105387fdb74ed6f8875d`.
+
+**Not covered:**
+
+- The chain does **not** reach 2099-12. Its last month is 2076-01; 287 edges
+  (to 2099-12, 863 in total from 2028-01) are still to be produced. Later runs
+  of the workflow were in progress when this was committed. Extending this
+  file is a follow-up, not part of this commit.
+- The chain **begins at 2028-01**. 2026-11 to 2027-12 are not in this chain
+  (the separate 2027 chain and the pilot chains above use other roots).
+- There is no setup route from a solved cube to the root state. Only the
+  state itself (294 sticker poses) can be derived from the DAG and the print.
+- No shortcut or star routes; every jump is a walk along the chain.
+- Same status as the rest of this directory: independent checkers share the
+  front rule and the structural port (see "Provenance and common-mode risks").
+  No independent review of the new states exists. Not certified.
+
 ## Cost comparison with the PR #99 layout (owner request)
 
 ### A. Layout-level metric (no search; not a cost)
