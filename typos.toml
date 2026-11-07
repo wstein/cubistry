@@ -1,6 +1,8 @@
 # US English for documentation and source identifiers.
 [default]
 locale = "en-us"
+# The German sentence of the quoted owner confirmation in the unified-application plan; a free "passt" is still reported.
+extend-ignore-re = ["Stufe 3 passt"]
 
 [files]
 extend-exclude = [
@@ -28,8 +30,6 @@ extend-exclude = [
 Chronocube = "Chronocube"
 Cubistry = "Cubistry"
 cubie = "cubie"
-# German word in the quoted owner confirmation "Ja, Stufe 3 passt." (unified-application plan).
-passt = "passt"
 cubies = "cubies"
 # User-specified German state word on immutable Quality Cube physical artwork.
 OFFEN = "OFFEN"
