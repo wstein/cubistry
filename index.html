@@ -90,7 +90,7 @@
             </div>
           </section>
           <div class="shell-readout" data-region="readout" hidden></div>
-          <div class="shell-nerd" data-region="nerd-drawer" hidden></div>
+          <div class="shell-nerd" id="shell-nerd" data-region="nerd-drawer" hidden></div>
         </div>
 
         <div class="shell-dock" data-region="dock" aria-label="Controls">
@@ -107,6 +107,7 @@
             <!-- Dynamically populated per active mode -->
           </aside>
           <div class="shell-view-controls" data-region="view-controls" hidden></div>
+          <button type="button" class="shell-btn shell-nerd-toggle" id="nerd-toggle" aria-pressed="false" aria-controls="shell-nerd" hidden>Nerd mode</button>
         </div>
       </div>
 
