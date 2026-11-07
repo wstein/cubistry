@@ -2,7 +2,7 @@
 /** DOM mount of the English 7x7 calendar mode (research candidate, not certified). */
 import type { ModeInstance } from "../registry.ts";
 import { parseDisplays, parseGraph } from "./graph.ts";
-import { buildModel, chainRange, chooseMonth, pageHtml, type YearMonth } from "./month-view.ts";
+import { announce, buildModel, chainRange, chooseMonth, pageHtml, type YearMonth } from "./month-view.ts";
 
 export interface MountEnv {
   /** Base URL of the site, ending in a slash. */
@@ -23,7 +23,10 @@ export async function mountCalendar7(
   params: URLSearchParams,
   env: MountEnv,
 ): Promise<ModeInstance | void> {
-  root.innerHTML = '<p class="c7-loading" role="status">Loading the 7x7 calendar data…</p>';
+  root.innerHTML =
+    '<div class="c7-live" role="status" aria-live="polite"></div><div class="c7-view"><p class="c7-loading">Loading the 7x7 calendar data…</p></div>';
+  const view = root.querySelector(".c7-view") as HTMLElement;
+  const live = root.querySelector(".c7-live") as HTMLElement;
   const [graphJson, displaysJson] = await Promise.all([
     env.fetchJson(`${env.base}calendar7/graph.v1.json`),
     env.fetchJson(`${env.base}calendar7/displays.v1.json`),
@@ -35,11 +38,14 @@ export async function mountCalendar7(
   const d = env.now();
   const today: YearMonth = { year: d.getFullYear(), month: d.getMonth() + 1 };
 
-  const show = (p: URLSearchParams): void => {
-    const choice = chooseMonth(p, today, range);
-    root.innerHTML = pageHtml(buildModel(graph, table, choice, today));
+  const show = (p: URLSearchParams, moveFocus: boolean): void => {
+    const model = buildModel(graph, table, chooseMonth(p, today, range), today);
+    view.innerHTML = pageHtml(model);
+    live.textContent = announce(model);
+    // The link that was clicked is gone after the re-render: keep the keyboard position at the new month.
+    if (moveFocus) (view.querySelector("[data-focus]") as HTMLElement | null)?.focus();
   };
-  show(params);
+  show(params, false);
 
   // Navigation links are plain `?app=calendar7&year=&month=` links; follow them without a reload.
   const onClick = (e: Event): void => {
@@ -51,7 +57,7 @@ export async function mountCalendar7(
     for (const k of MY_PARAMS) keep.delete(k);
     for (const k of MY_PARAMS) if (next.has(k)) keep.set(k, next.get(k) as string);
     env.replaceQuery(`?${keep.toString()}`);
-    show(next);
+    show(next, true);
   };
   root.addEventListener("click", onClick);
   return { dispose: () => root.removeEventListener("click", onClick) };

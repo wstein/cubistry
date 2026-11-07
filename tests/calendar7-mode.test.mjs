@@ -15,6 +15,7 @@ import {
   chooseMonth,
   href,
   moveToken,
+  rawToken,
   nodeIndex,
   pageHtml,
   sheetCells,
@@ -126,6 +127,31 @@ test("moveToken names axis, layer and turn", () => {
   assert.deepEqual(decodeMoves("A").map(moveToken), ["x-3"]);
 });
 
+test("rawToken lists generator and exponent, and the step shows both notations", () => {
+  assert.equal(rawToken([11, 1]), "g11:+1");
+  assert.equal(rawToken([3, -1]), "g3:-1");
+  assert.equal(rawToken([21, 2]), "g21:2");
+  const today = { year: 2026, month: 11 };
+  const model = buildModel(graph, table, chooseMonth(q("year=2028&month=5"), today, range), today);
+  const html = pageHtml(model);
+  const raw = model.next.moves.map(rawToken).join(" ");
+  assert.ok(html.includes(`data-raw="next">${raw}</p>`));
+  assert.ok(html.includes(`data-word="next">${model.next.moves.map(moveToken).join(" ").replace(/'/g, "&#39;")}</p>`));
+  assert.match(html, /Raw generators/);
+});
+
+test("the rotation count is pluralized", () => {
+  const today = { year: 2026, month: 11 };
+  const texts = [];
+  for (let k = 0; k < 40; k++) {
+    const m = graph.nodes[k];
+    const html = pageHtml(buildModel(graph, table, chooseMonth(q(`year=${m.year}&month=${m.month}`), today, range), today));
+    texts.push(...(html.match(/\d+ whole-cube rotations?\./g) ?? []));
+  }
+  assert.ok(texts.some((t) => t.startsWith("1 whole-cube rotation.")), "a singular occurs");
+  assert.ok(texts.every((t) => !/^1 whole-cube rotations/.test(t)));
+});
+
 test("the page shows the sheet, both steps and the scope notice for a month inside the chain", () => {
   const today = { year: 2026, month: 11 };
   const html = pageHtml(buildModel(graph, table, chooseMonth(q("year=2028&month=1"), today, range), today));
@@ -158,9 +184,16 @@ test("a month outside the chain shows a not-available message and no sheet", () 
 
 function fakeRoot() {
   const listeners = new Set();
+  const focused = [];
+  const view = { innerHTML: "", querySelector: () => ({ focus: () => focused.push(view.innerHTML.match(/data-month="([^"]+)"/)?.[1] ?? "other") }) };
+  const live = { textContent: "" };
   return {
     innerHTML: "",
+    view,
+    live,
+    focused,
     listeners,
+    querySelector: (sel) => (sel === ".c7-view" ? view : live),
     contains: () => true,
     addEventListener: (_t, l) => listeners.add(l),
     removeEventListener: (_t, l) => listeners.delete(l),
@@ -191,12 +224,14 @@ test("mount renders today's outside notice, follows a step link and keeps other 
   const root = fakeRoot();
   const e = env();
   const inst = await mountCalendar7(root, q(""), e);
-  assert.match(root.innerHTML, /Not available yet/);
+  assert.match(root.view.innerHTML, /Not available yet/);
   assert.equal(root.click(href({ year: 2028, month: 1 })), true);
-  assert.match(root.innerHTML, /data-month="2028-01"/);
+  assert.match(root.view.innerHTML, /data-month="2028-01"/);
   assert.deepEqual(e.calls.query, ["?app=calendar7&kiosk=1&year=2028&month=1"]);
+  assert.deepEqual(root.focused, ["2028-01"], "focus moves to the new heading");
+  assert.equal(root.live.textContent, "Showing January 2028");
   assert.equal(root.click(href({ year: 2028, month: 2 })), true);
-  assert.match(root.innerHTML, /data-month="2028-02"/);
+  assert.match(root.view.innerHTML, /data-month="2028-02"/);
   inst.dispose();
   assert.equal(root.listeners.size, 0);
 });
@@ -204,10 +239,10 @@ test("mount renders today's outside notice, follows a step link and keeps other 
 test("mount renders the URL month and does nothing once the mount is stale", async () => {
   const root = fakeRoot();
   await mountCalendar7(root, q("year=2050&month=6"), env());
-  assert.match(root.innerHTML, /data-month="2050-06"/);
+  assert.match(root.view.innerHTML, /data-month="2050-06"/);
   const stale = fakeRoot();
   const r = await mountCalendar7(stale, q("year=2050&month=6"), env({ isCurrent: () => false }));
   assert.equal(r, undefined);
   assert.equal(stale.listeners.size, 0);
-  assert.doesNotMatch(stale.innerHTML, /c7-sheet/);
+  assert.doesNotMatch(stale.view.innerHTML, /c7-sheet/);
 });

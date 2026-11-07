@@ -124,6 +124,9 @@ export function moveToken(move: Move): string {
   return `${axis}${layer}${q === -1 ? "'" : q === 2 ? "²" : ""}`;
 }
 
+/** Raw form of one move: generator 1..21 and the exponent, e.g. `g11:+1`, `g3:-1`, `g21:2`. */
+export const rawToken = (move: Move): string => `g${move[0]}:${move[1] === 1 ? "+1" : move[1] === -1 ? "-1" : "2"}`;
+
 export interface Step {
   readonly direction: "forward" | "backward";
   readonly from: YearMonth;
@@ -196,13 +199,24 @@ const stepHtml = (step: Step | null, label: string, end: string): string => {
   if (!step)
     return `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3><p>${esc(end)}</p></div>`;
   const word = step.moves.map(moveToken).join(" ");
+  const raw = step.moves.map(rawToken).join(" ");
+  const rotations = `${step.rot} whole-cube rotation${step.rot === 1 ? "" : "s"}`;
   return (
     `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3>` +
     `<p><a class="c7-nav" data-nav="${label.toLowerCase()}" href="${esc(href(step.to))}">${esc(monthLabel(step.to))}</a>: ` +
-    `${step.htm} turns (HTM), ${step.qtm} quarter turns (QTM), ${step.rot} whole-cube rotations.</p>` +
-    `<details><summary>Move word</summary><p class="c7-word" data-word="${label.toLowerCase()}">${esc(word)}</p></details></div>`
+    `${step.htm} turns (HTM), ${step.qtm} quarter turns (QTM), ${rotations}.</p>` +
+    `<details><summary>Move word</summary><p class="c7-word" data-word="${label.toLowerCase()}">${esc(word)}</p></details>` +
+    `<details><summary>Raw generators</summary><p class="c7-word" data-raw="${label.toLowerCase()}">${esc(raw)}</p></details></div>`
   );
 };
+
+/** Text announced in the live region after a navigation. */
+export const announce = (model: PageModel): string =>
+  model.choice.kind === "ok"
+    ? `Showing ${monthLabel(model.choice.ym)}`
+    : model.choice.kind === "outside"
+      ? `${monthLabel(model.choice.ym)} is not available yet`
+      : "Invalid month";
 
 /** The whole page body of the mode. */
 export function pageHtml(model: PageModel): string {
@@ -213,20 +227,20 @@ export function pageHtml(model: PageModel): string {
     `${esc(NOT_YET)}</p>`;
   if (choice.kind === "invalid")
     return (
-      `<div class="c7-page"><p class="c7-unavailable" role="alert">Invalid month: ${esc(choice.reason)}.</p>` +
+      `<div class="c7-page"><p class="c7-unavailable" role="alert" tabindex="-1" data-focus>Invalid month: ${esc(choice.reason)}.</p>` +
       `<p><a class="c7-nav" href="${esc(href(range.first))}">Open ${esc(monthLabel(range.first))}</a></p>${status}</div>`
     );
   if (choice.kind === "outside") {
     const what = choice.source === "today" ? `The current month, ${monthLabel(choice.ym)},` : `${monthLabel(choice.ym)}`;
     return (
-      `<div class="c7-page"><p class="c7-unavailable" role="alert">Not available yet. ${esc(what)} is outside ` +
+      `<div class="c7-page"><p class="c7-unavailable" role="alert" tabindex="-1" data-focus>Not available yet. ${esc(what)} is outside ` +
       `the proven chain (${esc(rangeText)}).</p>` +
       `<p><a class="c7-nav" data-nav="start" href="${esc(href(range.first))}">Open ${esc(monthLabel(range.first))}</a> ` +
       `<a class="c7-nav" data-nav="end" href="${esc(href(range.last))}">Open ${esc(monthLabel(range.last))}</a></p>${status}</div>`
     );
   }
   return (
-    `<div class="c7-page"><h2 class="c7-month" data-month="${ymKey(choice.ym)}">${esc(monthLabel(choice.ym))}</h2>` +
+    `<div class="c7-page"><h2 class="c7-month" tabindex="-1" data-focus data-month="${ymKey(choice.ym)}">${esc(monthLabel(choice.ym))}</h2>` +
     sheetHtml(model.cells as readonly Cell[], `7x7 calendar sheet, ${monthLabel(choice.ym)}`) +
     `<div class="c7-steps">${stepHtml(model.prev, "Previous", `No earlier month: ${monthLabel(range.first)} is the start of the chain.`)}` +
     `${stepHtml(model.next, "Next", `No later month: ${monthLabel(range.last)} is the end of the chain.`)}</div>` +
