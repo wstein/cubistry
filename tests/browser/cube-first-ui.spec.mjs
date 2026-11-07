@@ -253,14 +253,36 @@ test("one stable Run/Stop button supports keyboard operation and returns to Run 
   expect(await button.boundingBox()).toEqual(before);
 });
 
+// Immersive layout (docs/CUBE_FIRST_UI.md): the cube canvas fills the viewport and the header island, the
+// control and Appearance panels and the bottom dock float over it. "Fits" therefore means: every panel
+// and every control inside it is inside the viewport and inside its own panel, the page has no horizontal
+// overflow, the panels do not overlap each other, and enough of the canvas stays uncovered.
+const viewportHeight = 1000;
+const PANELS = {
+  header: "header.floating-island",
+  controls: "#counter-controls",
+  appearance: "aside.cube-appearance",
+  dock: ".cube-footer.floating-dock",
+};
+const EPSILON = 0.5;
+const inside = (box, outer) =>
+  box.x >= outer.x - EPSILON &&
+  box.y >= outer.y - EPSILON &&
+  box.x + box.width <= outer.x + outer.width + EPSILON &&
+  box.y + box.height <= outer.y + outer.height + EPSILON;
+const overlaps = (a, b) =>
+  a.x < b.x + b.width - EPSILON &&
+  b.x < a.x + a.width - EPSILON &&
+  a.y < b.y + b.height - EPSILON &&
+  b.y < a.y + a.height - EPSILON;
 for (const width of [1440, 768, 390, 320])
-  test(`header, visible stats and speed fit at ${width}px without covering the cube`, async ({
+  test(`header, HUD panels and dock fit the viewport and leave the cube visible at ${width}px`, async ({
     page,
   }) => {
-    await page.setViewportSize({ width, height: 1000 });
+    await page.setViewportSize({ width, height: viewportHeight });
     await ready(page);
-    const header = page.locator("header"),
-      chooser = page.locator("header #application");
+    const viewport = { x: 0, y: 0, width, height: viewportHeight };
+    const chooser = page.locator("header #application");
     await expect(chooser).toHaveCount(1);
     await expect(chooser).toBeVisible();
     const wrap = await page.locator("#wrap").boundingBox();
@@ -270,6 +292,7 @@ for (const width of [1440, 768, 390, 320])
     await expect(
       page.getByRole("button", { name: "Reset session moves" }),
     ).toBeVisible();
+    await expect(page.locator(PANELS.appearance)).toBeVisible();
     // No collapsible help or status blocks; the shared Appearance panel and its "More" group are <details> by design.
     await expect(
       page.locator("details:not(.cube-appearance):not(.cube-appearance-more),#application-status"),
@@ -278,30 +301,78 @@ for (const width of [1440, 768, 390, 320])
     await expect(page.locator(".counter-stats")).not.toContainText(
       /certified|permanent print/i,
     );
-    const rect = async (selector) => page.locator(selector).boundingBox();
-    const h = await header.boundingBox(),
-      c = await rect(".cube-card"),
-      a = await rect("#counter-controls"),
-      canvas = await rect("#cube"),
-      stats = await rect(".counter-stats"),
-      speed = await rect(".speed-control"),
-      slider = await rect("#rotation-speed");
-    expect(h.y + h.height).toBeLessThanOrEqual(c.y);
-    if (width > 760) expect(a.y).toBe(c.y);
-    expect(stats.y).toBeGreaterThanOrEqual(canvas.y + canvas.height);
-    expect(speed.y).toBeGreaterThanOrEqual(stats.y + stats.height);
-    expect(slider.y).toBeGreaterThan(speed.y);
+    // No horizontal overflow of the page.
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-    const boxes = await page
-      .locator(".move-summary dd")
-      .evaluateAll((nodes) =>
-        nodes.map((n) => n.getBoundingClientRect().right),
-      );
-    expect(Math.abs(boxes[0] - boxes[1])).toBeLessThan(1);
+    // Each panel is visible and inside the viewport; the header is not wider than the viewport.
+    const panels = {};
+    for (const [name, selector] of Object.entries(PANELS)) {
+      await expect(page.locator(selector), name).toBeVisible();
+      panels[name] = await page.locator(selector).boundingBox();
+      expect(inside(panels[name], viewport), `${name} inside viewport`).toBe(true);
+    }
+    expect(panels.header.width).toBeLessThanOrEqual(width);
+    // Controls are visible, inside the viewport and inside the panel that holds them (not clipped by it).
+    const held = {
+      header: ["#application", "#print-stickers", "#presentation-btn"],
+      controls: ["#counter-print", "#value", "#set", "#run", '#counter-controls [data-delta="1"]', "#wrap", "#format"],
+      dock: [
+        "#status",
+        "#session-moves",
+        "#move-progress",
+        "#reset-session-moves",
+        ".speed-control",
+        "#rotation-speed",
+      ],
+    };
+    for (const [panel, selectors] of Object.entries(held))
+      for (const selector of selectors) {
+        const locator = page.locator(selector);
+        await expect(locator, selector).toBeVisible();
+        const box = await locator.boundingBox();
+        expect(inside(box, viewport), `${selector} inside viewport`).toBe(true);
+        expect(inside(box, panels[panel]), `${selector} inside ${panel}`).toBe(true);
+      }
+    // Panels do not overlap each other.
+    const names = Object.keys(panels);
+    for (let i = 0; i < names.length; i++)
+      for (let j = i + 1; j < names.length; j++)
+        expect(
+          overlaps(panels[names[i]], panels[names[j]]),
+          `${names[i]} overlaps ${names[j]}`,
+        ).toBe(false);
+    // The cube stays uncovered: sampled over the viewport, at least a third of the points hit the canvas,
+    // and where the panels sit beside the cube (not stacked over a phone-width viewport) its center is free.
+    const sampled = await page.evaluate(() => {
+      const onCanvas = (x, y) =>
+        !!document.elementFromPoint(x, y)?.closest("#cube canvas");
+      let all = 0,
+        allHits = 0,
+        center = 0,
+        centerHits = 0;
+      for (let i = 0; i < 20; i++)
+        for (let j = 0; j < 20; j++) {
+          all++;
+          if (onCanvas(((i + 0.5) / 20) * innerWidth, ((j + 0.5) / 20) * innerHeight)) allHits++;
+        }
+      for (let i = 0; i < 5; i++)
+        for (let j = 0; j < 5; j++) {
+          center++;
+          if (
+            onCanvas(
+              (0.4 + (i / 4) * 0.2) * innerWidth,
+              (0.4 + (j / 4) * 0.2) * innerHeight,
+            )
+          )
+            centerHits++;
+        }
+      return { all, allHits, center, centerHits };
+    });
+    expect(sampled.allHits / sampled.all).toBeGreaterThanOrEqual(1 / 3);
+    if (width >= 768) expect(sampled.centerHits).toBe(sampled.center);
     await page.locator("#reset-session-moves").focus();
     await page.keyboard.press("Tab");
     await expect(page.locator("#rotation-speed")).toBeFocused();
