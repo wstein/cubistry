@@ -3,6 +3,7 @@ import { ClockStage } from "./apps/clock/stage.ts";
 import { LiveClockScheduler, clockText } from "./apps/clock/scheduler.ts";
 import { ClockMoveStatistics, formatMean } from "./apps/clock/statistics.ts";
 import { createStudioHsmController, createStudioSingleController } from "./apps/chronocube/hsm-mode.ts";
+import { createStudioCounter } from "./apps/chronocube/counter-mode.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";
 import hsmPin from "../hsm-source.json";
 import { loadMsDesign } from "./apps/ms/design.ts";
@@ -38,9 +39,7 @@ import {
 } from "./apps/chronocube/timer-mode.ts";
 import { loadTimerRoute, loadFiveSecondRoute } from "./apps/timer/design.ts";
 import { timerMotion } from "./apps/timer/status.ts";
-import { CounterController } from "./apps/counter/controller.ts";
 import { loadCounterDesign } from "./apps/counter/design.ts";
-import { loadCertifiedCounter } from "./apps/counter/certified.ts";
 import { loadBlankTopCounter } from "./apps/counter/blank-top.ts";
 import blankTopPin from "../counter-blank-top-source.json";
 import { CubeViewer, BASE_MOVE_DURATION_MS } from "@cubistry/cube-viewer";
@@ -916,27 +915,22 @@ async function initCounterMode() {
   activeViewer = viewer;
   viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 100);
 
-  const [counterDesign, certified] = await Promise.all([
-    loadCounterDesign(undefined, base),
-    loadCertifiedCounter(base),
-  ]);
+  const manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont);
 
-  let manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont);
-
-  const controller = new CounterController(viewer, counterDesign, {
-    certified,
-    assets: manifest,
+  const controller = await createStudioCounter({
+    base,
+    view: viewer,
+    manifest,
     onState: (v, busy) => {
       $("counter-value-display").textContent = String(v).padStart(2, "0");
       $("counter-state").textContent = busy ? "Turning…" : "Ready";
     },
+    resolveAssets,
   });
 
   setupAppearancePanel($("studio-scene"), async (nextManifest) => {
     await controller.updateManifest(nextManifest);
   });
-
-  await controller.configure(0);
 
   const step = (delta) => {
     const cur = controller.currentValue;
