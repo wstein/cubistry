@@ -26,7 +26,7 @@ For every N the checker only CLASSIFIES (`perN.<N>.classification`, module `src/
 
 - per sticker symmetry order `none`, `2-fold`, `4-fold` (a 90 or 180 degree turn changes at most 3 % of the pixels);
 - identical groups (duplicate stones) and rotation-twin groups, found by distance (share of pixels over the pixel threshold on a downsampled probe, at most 3 %, complete linkage), so a sub-pixel shift or antialiasing does not hide a duplicate;
-- for odd N the fixed center sticker of each face; a 2-fold or 4-fold symmetric center is reported as "no orientation needed" (`orientationNeeded: false`); `period` gives the exact rule (solved modulo 4, 2 or 1 quarter turns).
+- for odd N the fixed center sticker of each face; `period` gives the rule (D10): a center is solved modulo 4, 2 or 1 quarter turns for none, 2-fold and 4-fold. The v1 flag `orientationNeeded` is false for 2-fold and 4-fold stickers (legacy meaning, kept for stable output); only order 4 truly needs no orientation, so read `period`.
 
 None of this fails a run: the owner accepts equal-looking stickers and orientations (the cube then counts as visually solved). The numbers are for the hand-back and for the app's suitability display, which calls the same package.
 
@@ -39,11 +39,10 @@ None of this fails a run: the owner accepts equal-looking stickers and orientati
 Decided:
 
 1. **Ambiguity is acceptable.** Equal-looking orientations and duplicate stones are accepted: the cube counts as visually solved. The checker classifies them and does not fail on them.
-2. **Symmetric centers need not be turned** (for 2-fold centers see the OPEN question 6). On odd N (3, 5, 7) a 2-fold or 4-fold symmetric center sticker is reported as "no orientation needed". This is a new rule. [`docs/SUPER_PICTURE_CUBE.md`](../../../../docs/SUPER_PICTURE_CUBE.md) describes the existing 3x3 picture cube, whose exact-solved test counts all six center orientations, and so predates it (the doc now states the current rule); `packages/cube-appearance` implements it (`analyzeCenters`, goal predicate); the suitability display has no center logic yet, and the solved test and solver must still adopt it. Even N >= 4 has movable center blocks and no single center; the 2x2 has no centers.
+2. **Symmetric centers need not be turned, within their period (D10, decided 2026-11-07).** On odd N (3, 5, 7) a 4-fold symmetric center is solved in any turn, a 2-fold one modulo a half turn, an asymmetric one only exactly. This is a new rule; `period` in the checker JSON carries it. [`docs/SUPER_PICTURE_CUBE.md`](../../../../docs/SUPER_PICTURE_CUBE.md) describes the existing 3x3 picture cube, whose exact-solved test counts all six center orientations, and so predates it (the doc now states the current rule); `packages/cube-appearance` implements it (`analyzeCenters`, goal predicate); the suitability display has no center logic yet, and the solved test and solver must still adopt it. Even N >= 4 has movable center blocks and no single center; the 2x2 has no centers.
 
 Open:
 
 3. **Hero and centers.** Should the hero be centered on the odd-N center piece, and may a center carry a near-symmetric motif? (Allowed under rule 2; a decision is needed only for composition.)
 4. **Strictness for N >= 3.** Currently flat stickers at N >= 3 are warnings. Decide whether N = 3 (or all N) must have zero flat stickers.
 5. **Legacy 320 px faces.** Re-export at 420 px, or accept fractional stickers at N = 3, 6, 7 (the theme stack's `build-playground-theme.mjs` requires 320 px faces).
-6. **OPEN (owner decision pending): 2-fold centers.** Is a 2-fold symmetric center solved in any turn (the wording of rule 2 and of `orientationNeeded: false`) or only modulo a half turn (`packages/cube-appearance`, the `period` key)? Marked open the same way in `docs/CUBE_APPEARANCE.md` and `docs/SUPER_PICTURE_CUBE.md`; no rule was changed.
