@@ -104,7 +104,14 @@ research/cube-display-feasibility`. The SHA-256 values of the data do not change
 
 ## Licensing
 
-Code is AGPL-3.0-or-later. The data files are part of the Cubistry source; see the
-entry "English 7x7 calendar data" in [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
-No artwork is included; any later sticker artwork is CC BY-SA 4.0 like the other
-Cubistry artwork.
+The code (`src/apps/calendar7/`, `scripts/prepare-calendar7.mjs`,
+`scripts/calendar7/export-julia.jl` and the tests) remains AGPL-3.0-or-later. The data
+(`public/calendar7/`, `data/calendar7/` and the research data they come from: print,
+display sheets, states, chain, move words, edges and receipts) is a separate work under
+CC BY-SA 4.0, SPDX-License-Identifier: CC-BY-SA-4.0:
+
+> Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0
+> (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+Each data directory carries a `NOTICE.txt`; see also
+[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).

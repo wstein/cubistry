@@ -1,0 +1,12 @@
+English 7x7 calendar cube data (research candidate, not certified)
+Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+The files in this directory (print, display sheets, states, chain, move words, edges and
+receipts) are a work separate from the Cubistry program code, which stays under
+AGPL-3.0-or-later. The data is licensed under CC BY-SA 4.0; the AGPL copyleft does
+not cover it. No third-party images, fonts or code are included.
+
+Provenance and regeneration: calendar7-source.json, scripts/prepare-calendar7.mjs,
+docs/CALENDAR_7X7.md.
