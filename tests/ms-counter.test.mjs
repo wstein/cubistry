@@ -816,3 +816,20 @@ test("updateManifest reinstalls the cube with the new manifest and keeps pose an
   await idle.updateManifest({ id: "third" });
   assert.equal(seen.length, 2);
 });
+
+test("a failed updateManifest keeps the previous manifest and the cube usable", async () => {
+  const seen = [];
+  let fail = false;
+  const resolveAssets = async (manifest) => {
+    seen.push(manifest.id);
+    if (fail) throw Error("asset load failed");
+    return { dispose() {} };
+  };
+  const c = new MsController(view, s3, { id: "first" }, "S", () => {}, resolveAssets);
+  await c.configure(7);
+  fail = true;
+  await assert.rejects(c.updateManifest({ id: "second" }), /asset load failed/);
+  fail = false;
+  await c.configure(7);
+  assert.deepEqual(seen, ["first", "second", "first"], "configure() still uses the manifest that loaded");
+});
