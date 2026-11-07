@@ -26,16 +26,37 @@ const modes = {
 
 for (const [name, code] of Object.entries(modes)) {
   test(`${name} mode renders and writes no state text`, () => {
-    assert(!/-state\b/.test(code), "no *-state ids");
+    assert(!/id="[^"]*-state"|\+ "-state"|\$\("[a-z-]*-state"\)/.test(code), "no *-state ids or writers");
     assert(!/clock-state/.test(code), "no readout class");
-    assert(!/Moving|Turning|Synchronizing to|"Ready"|>Ready</.test(code), "no state strings");
-    assert(!/timer-motion-label/.test(code), "no motion label");
+    assert(!/Moving|Turning|Synchroniz|Counting down|Paused|"Ready"|>Ready</.test(code), "no state strings");
+    assert(!/timer-motion-label|timer-sync|timer-status-info|clock-status/.test(code), "no status elements");
+    assert(!/role="status"/.test(code), "no live status regions");
   });
 }
 
 test("M/S Timer and H-M Wall Clock render no unit headings", () => {
   assert(!/<h2>/.test(modes["M/S Timer"]));
   assert(!/<h2>/.test(modes["H-M Wall Clock"]));
+});
+
+test("M/S Timer and H-M Wall Clock host bare cubes like the Live Clock: no wrapper cards, no stuck aria-busy", () => {
+  for (const name of ["M/S Timer", "H-M Wall Clock"]) {
+    assert(!/clock-card/.test(modes[name]), `${name}: no wrapper article`);
+    assert(!/aria-busy|role="img"/.test(modes[name]), `${name}: no aria-busy or role=img on hosts`);
+    assert(/data-unit="[HMST]"/.test(modes[name]), `${name}: data-unit kept`);
+  }
+});
+
+test("the four single-cube modes have no card heading; the HUD title stays", () => {
+  for (const name of ["Tenth", "Counter", "Timer", "HSM"]) {
+    assert(!/<h2/.test(modes[name].split("renderStudioHud(")[0]), `${name}: no card h2`);
+    assert(modes[name].includes("renderStudioHud("), `${name}: HUD kept`);
+  }
+});
+
+test("the Live Clock mode keeps its status line", () => {
+  const live = section("async function initClockMode(", "// Mode 2:");
+  assert(live.includes('id="clock-status"'));
 });
 
 test("modes still host their cube elements and value displays", () => {
