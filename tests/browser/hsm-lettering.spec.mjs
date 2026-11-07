@@ -39,6 +39,13 @@ async function bounds(page, letter) {
 test("word print replaces large unit symbols and keeps the counter value", async ({
   page,
 }) => {
+  // In CI run 42363500526 (trace of the failed test) every assertion passed and
+  // the 30 s default expired inside the last step, at 30.0 s of about 31.5 s.
+  // Under SwiftShader the page's render loop keeps the main thread busy: each
+  // of the three bounds() evaluations took 4.0 to 4.8 s, the fullPage
+  // screenshot 2.1 s, and passing runs of this test take 18 to 26 s. Budget:
+  // 3x the slowest passing run.
+  test.setTimeout(90000);
   await page.goto("/counter.html?application=hsm-counter");
   await expect(page.locator("#cube")).toHaveAttribute(
     "data-application",
