@@ -19,8 +19,8 @@ const isStaleCheck = (stmt) =>
   ts.isIfStatement(stmt) &&
   /^!isCurrent\(\)$/.test(stmt.expression.getText(file));
 
-test("the studio has seven mode init functions, each taking isCurrent", () => {
-  assert.equal(inits.length, 7); // initHsmSingleMode and initTimerMode each serve several modes
+test("the studio has eight mode init functions, each taking isCurrent", () => {
+  assert.equal(inits.length, 8); // initHsmSingleMode and initTimerMode each serve several modes
   for (const fn of inits)
     assert.ok(
       fn.parameters.some((p) => p.name.getText(file) === "isCurrent"),
