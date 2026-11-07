@@ -129,10 +129,10 @@ for (const style of ["symbols", "words"])
       window.liveEpoch = Date.parse("2026-10-28T11:34:56.100Z");
       Date.now = () => window.liveEpoch;
     });
-    await page.goto(`/clock.html?lettering=${style}`);
+    await page.goto(`/index.html?app=clock&lettering=${style}`);
     await expect(page.locator("#seconds-speed")).toBeEnabled();
     await page.evaluate(async () => {
-      const { clockUnits } = await import("/src/clock.mjs");
+      const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
       const c = clockUnits[2].controller,
         original = c.view.animate.bind(c.view);
       window.liveStarts = [];
@@ -163,7 +163,7 @@ for (const style of ["symbols", "words"])
     await expect
       .poll(() =>
         page.evaluate(async () => {
-          const { clockUnits } = await import("/src/clock.mjs");
+          const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
           return clockUnits[2].controller.progress.queuedTarget;
         }),
       )
@@ -178,7 +178,7 @@ for (const style of ["symbols", "words"])
       "false",
     );
     const result = await page.evaluate(async () => {
-      const { clockUnits } = await import("/src/clock.mjs");
+      const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
       const { stateEquals } = await import("/packages/cube-core/src/index.ts");
       const { matchesTarget } = await import(
         "/packages/cube-mechanics/src/index.ts"
@@ -201,5 +201,5 @@ for (const style of ["symbols", "words"])
     expect(result.valid).toBe(true);
     expect(result.continuous).toBe(true);
     expect(result.session).toBe(result.count);
-    await expect(page.locator("#clock-scene canvas")).toHaveCount(1);
+    await expect(page.locator("#studio-scene canvas")).toHaveCount(1);
   });

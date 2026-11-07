@@ -14,7 +14,7 @@ async function ready(page, path = "/picture3.html") {
 async function snapshot(page, kind = "picture") {
   return page.evaluate(async kind => {
     const view = kind === "picture" ? (window.__picture3App?.viewer ?? (await import("/src/apps/picture3/page.ts")).picture3App.viewer)
-      : (window.__clockStage ?? (await import("/src/clock.mjs")).clockStage);
+      : (await import("/src/apps/clock/live-mode.mjs")).clockStage;
     const c = view.rotation.controller;
     return { phase: c.phase, speed: c.angularSpeed, deadline: c.returnDeadline, orientation: view.presentation.quaternion.toArray(),
       anchor: c.anchor.toArray(), distance: view.presentation.quaternion.angleTo(c.anchor), state: JSON.stringify(view.presentedState),
@@ -78,7 +78,7 @@ test("flick inertia is capped, a tap interrupts return, and Free/Classic/reduced
   expect(end.phase).toBe("idle"); expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
 });
 test("real touch release coasts and the clock rotates one rigid assembly with a stationary camera", async ({ page }) => {
-  await ready(page, "/clock.html"); const before = await snapshot(page, "clock"), box = await page.locator("#clock-scene canvas").boundingBox();
+  await ready(page, "/index.html?app=clock"); const before = await snapshot(page, "clock"), box = await page.locator("#studio-scene canvas").boundingBox();
   const client = await page.context().newCDPSession(page), x = box.x + box.width / 2, y = box.y + box.height / 2;
   await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y, id: 0 }] }); await page.clock.runFor(100);
   await Promise.all([
@@ -87,7 +87,7 @@ test("real touch release coasts and the clock rotates one rigid assembly with a 
   ]);
   expect((await snapshot(page, "clock")).phase).toBe("coasting"); await page.clock.runFor(100);
   const geometry = await page.evaluate(async () => {
-    const { clockStage, clockUnits } = await import("/src/clock.mjs"); clockStage.scene.updateMatrixWorld(true);
+    const { clockStage, clockUnits } = await import("/src/apps/clock/live-mode.mjs"); clockStage.scene.updateMatrixWorld(true);
     const centers = clockUnits.map(u => u.controller.view.scene.getWorldPosition(clockStage.camera.position.clone()));
     return { midpoint: centers[0].clone().add(centers[2]).length(), // Presentation containment is one uniform scale; local rigid spacing stays 5.6.
       span: centers[0].distanceTo(centers[2]) / clockStage.presentation.scale.x,

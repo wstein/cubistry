@@ -44,17 +44,22 @@ test("calendar print downloads preserve the selected physical print and exact pr
 test("HSM word lettering opens the corresponding whole-cube sheet, including all unit words", async ({
   page,
 }) => {
-  await page.goto("/clock.html?lettering=words");
+  await page.goto("/index.html?app=clock&lettering=words");
   await expect(page.locator("#clock-lettering")).toBeEnabled();
-  await page.locator("#print-stickers").click();
-  await expect(page.locator("#print-design")).toHaveValue("hsm-words");
-  await expect(page.locator("#print-summary")).toHaveText(
+  // The shared header link opens the sheet in a new tab.
+  const [sheet] = await Promise.all([
+    page.waitForEvent("popup"),
+    page.locator("#print-stickers").click(),
+  ]);
+  await expect(sheet.locator("#print-design")).toHaveValue("hsm-words");
+  await expect(sheet.locator("#print-summary")).toHaveText(
     "3 complete cubes · 72 stickers · 1 A4 sheet",
   );
-  await expect(page.locator("#print-pdf")).toHaveAttribute(
+  await expect(sheet.locator("#print-pdf")).toHaveAttribute(
     "href",
     /hsm-words-20mm-3sets\/print\.pdf$/,
   );
+  await sheet.close();
   await page.goto("/counter.html?application=hsm-counter&lettering=words");
   await expect(page.locator("#hsm-lettering")).toBeEnabled();
   await page.locator("#print-stickers").click();
