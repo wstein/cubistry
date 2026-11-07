@@ -16,7 +16,7 @@ Restore via history verifies and plays the inverse of the applied history prefix
 
 ## Local images and persistence
 
-Six labeled inputs accept PNG, JPEG or WebP raster images; uploaded SVG and remote URLs are unsupported. Zoom and horizontal/vertical position controls are keyboard-operable, with live face/cube previews. Canonical image frames are 768×768 and the nine tiles are 256×256. Three original AGPL-3.0-or-later vector example sets live in `src/apps/picture3/presets.ts`; they need no external photos or fonts.
+Six labeled inputs accept PNG, JPEG or WebP raster images; uploaded SVG and remote URLs are unsupported. Zoom and horizontal/vertical position controls are keyboard-operable, with live face/cube previews. Canonical image frames are 768×768 and the nine tiles are 256×256. Three original vector example sets (CC BY-SA 4.0, art data, not AGPL program code) live in `src/apps/picture3/presets.ts`; they need no external photos or fonts.
 
 Limits are 8 MiB per source, 32 MiB per active set, 16 megapixels and 8192 pixels per source side. Headers are checked before decoding. Serialized decoding and aspect-preserving resizing bound retained sources to at most 1536 pixels per side, including EXIF-oriented photos. Full-set replacement temporarily retains both old and staged rasters to make failure atomic; browser decoder/GPU overhead varies. Image/canvas resources are closed or released on replacement and permanent teardown. Trusted preset object URLs are always revoked. Stale upload/set/preset work cannot replace a newer choice.
 
