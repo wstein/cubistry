@@ -23,6 +23,7 @@ import {
   tenthTurnSpeedForInterval,
 } from "./apps/ms-timer/tenth.ts";
 import { createModeSwitcher, whenCurrent } from "./apps/chronocube/mode-switch.ts";
+import { MODE_CATALOG } from "./apps/mode-catalog.ts";
 import { PairController } from "./apps/pair/controller.ts";
 import { MsTimerCube } from "./apps/ms-timer/cube.ts";
 import { MsTimer } from "./apps/ms-timer/timer.ts";
@@ -52,69 +53,10 @@ import { buildStudioManifest } from "./apps/chronocube/manifest.ts";
 const $ = (id) => document.getElementById(id);
 const base = import.meta.env.BASE_URL;
 
-// Mode definitions and metadata
-const MODES = {
-  clock: {
-    title: "Live H–M–S Clock",
-    subtitle: "One current time. Three physical cubes (Hours · Minutes · Seconds).",
-    count: 3,
-    badge: "H · M · S",
-  },
-  "ms-timer": {
-    title: "M/S Timer & Stopwatch",
-    subtitle: "Minutes, seconds, and tenth-second precision timer.",
-    count: 3,
-    badge: "Min · Sec · 1/10s",
-  },
-  "hm-clock": {
-    title: "H–M Wall Clock",
-    subtitle: "Two physical cubes for hours and minutes.",
-    count: 2,
-    badge: "H · M",
-  },
-  tenth: {
-    title: "1/10-Second Counter",
-    subtitle: "Fast single-cube tenth-second counter (0–9).",
-    count: 1,
-    badge: "1/10 Sec (0–9)",
-  },
-  counter: {
-    title: "Counter 0–99",
-    subtitle: "Certified 2-digit twisty puzzle counter.",
-    count: 1,
-    badge: "0–99 Counter",
-  },
-  timer: {
-    title: "60-Minute Workshop Timer",
-    subtitle: "Physical countdown with real-time settlement.",
-    count: 1,
-    badge: "60-Min Timer",
-  },
-  "five-second-timer": {
-    title: "5-Second Precision Timer",
-    subtitle: "5-second countdown with verified route.",
-    count: 1,
-    badge: "5-Sec Timer",
-  },
-  "hsm-counter": {
-    title: "H/M/S Counter 00–59",
-    subtitle: "Single-cube 00–59 counter with H, M, S unit stickers.",
-    count: 1,
-    badge: "H/M/S (00–59)",
-  },
-  "ms-counter": {
-    title: "M/S Counter 00–59",
-    subtitle: "Single-cube 00–59 counter with min / sec stickers.",
-    count: 1,
-    badge: "M/S (00–59)",
-  },
-  "hm-one-cube": {
-    title: "H/M One-Cube Counter",
-    subtitle: "Single physical cube with hours and minutes.",
-    count: 1,
-    badge: "H/M One-Cube",
-  },
-};
+// Mode metadata comes from the shared catalog (src/apps/mode-catalog.ts).
+const MODES = Object.fromEntries(
+  MODE_CATALOG.map((m) => [m.id, { title: m.title, subtitle: m.subtitle, count: m.cubes, badge: m.badge }]),
+);
 
 // Global Appearance state (persisted across mode switches)
 let currentDisplay = localStorage.getItem("cubistry_digit_font") || "noto-sans";
