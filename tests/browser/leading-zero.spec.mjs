@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
 import { PNG } from "pngjs";
 import { frontStickerPoint } from "../helpers/front-projection.mjs";
+import { countChangedPixels, renderedFieldShot } from "../helpers/changed-pixels.mjs";
 async function ready(page) {
   await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
@@ -109,21 +110,7 @@ function changedPixels(before, after, value) {
     maxX = Math.max(...corners.map((p) => p[0])) + 3,
     minY = Math.min(...corners.map((p) => p[1])) - 3,
     maxY = Math.max(...corners.map((p) => p[1])) + 3;
-  let changed = 0,
-    outside = 0;
-  for (let y = 0; y < a.height; y++)
-    for (let x = 0; x < a.width; x++) {
-      const i = (y * a.width + x) * 4;
-      if (
-        Math.abs(a.data[i] - b.data[i]) +
-          Math.abs(a.data[i + 1] - b.data[i + 1]) +
-          Math.abs(a.data[i + 2] - b.data[i + 2]) >
-        10
-      ) {
-        changed++;
-        if (!(x >= minX && x <= maxX && y >= minY && y <= maxY)) outside++;
-      }
-    }
+  const { changed, outside } = countChangedPixels(a, b, { minX, maxX, minY, maxY });
   expect(outside).toBe(0);
   if (value < 10) expect(changed).toBeGreaterThan(100);
   else expect(changed).toBe(0);
@@ -141,10 +128,10 @@ for (const value of [0, 1, 7, 9, 10, 42, 99])
     await ready(page);
     await go(page, value);
     const a = await snapshot(page),
-      on = await page.locator("#cube canvas").screenshot();
+      on = await renderedFieldShot(page);
     await page.locator("#format").uncheck();
     const b = await snapshot(page),
-      off = await page.locator("#cube canvas").screenshot();
+      off = await renderedFieldShot(page);
     compare(a, b, value < 10 ? 1 : 0);
     changedPixels(on, off, value);
     expect(b.configurations).toBe(0);
