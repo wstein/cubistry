@@ -222,7 +222,7 @@ const hedge = (() => {
   const feet = `<ellipse cx="${cx - 14}" cy="305" rx="13" ry="7" fill="#f2d3b4" ${o3}/><ellipse cx="${cx + 18}" cy="305" rx="13" ry="7" fill="#f2d3b4" ${o3}/>`;
   const faceShape = `<ellipse cx="${cx}" cy="${cy + 8}" rx="31" ry="25"/><ellipse cx="${cx + 22}" cy="${cy - 6}" rx="7" ry="8"/>`;
   return feet + shaded(spines, "#c58a74", "#a46d5c", "", [cx, cy]) + shaded(faceShape, "#fff0d4", "#f2d3b4", "", [cx, cy + 6], 0.92) +
-    
+
     eye(cx - 14, cy + 2, 4) + eye(cx + 14, cy + 2, 4) + cheeks(cx, cy + 12, 21, H.pink.dark) + `<ellipse cx="${cx}" cy="${cy + 10}" rx="4.4" ry="3.2" fill="${ink}"/>` + smile(cx, cy + 14, 5) +
     pole(222, 292, 196, 234) + string(234, 186, 198) + lanternPumpkin(234, 218, 0.95) +
     merged(arm(230, 288, 35, 8, 14), "#fff0d4") + merged(arm(286, 296, -20, 8, 13), "#fff0d4");
