@@ -17,6 +17,7 @@ class Node extends EventTarget {
   insertBefore(node, ref) { node.parent = this; const at = this.children.indexOf(ref); this.children.splice(at < 0 ? this.children.length : at, 0, node); }
   setAttribute(name, value) { this.attributes[name] = String(value); }
   getAttribute(name) { return this.attributes[name] ?? null; }
+  removeAttribute(name) { delete this.attributes[name]; }
   remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); }
   focus() { this.focused++; globalThis.document.activeElement = this; }
   scrollIntoView() {}
@@ -72,7 +73,7 @@ test("docked: the open state is not remembered, a second install starts closed a
   assert.equal(toggle.attributes["aria-expanded"], "false");
 }));
 
-test("Escape closes the open section and returns focus to the opener (the View button) or the section toggle", () => withDocument(({ scene }) => {
+test("Escape closes the open section and returns focus to the opener (the header Appearance button) or the section toggle", () => withDocument(({ scene }) => {
   const controls = installAppearanceControls(scene, () => {}), panel = controls.panel;
   const toggle = walk(panel).find(n => n.className === "cube-appearance-disclosure");
   const opener = new Node("button");
@@ -94,12 +95,13 @@ test("floating mode is unchanged for pages without a dock", () => withDocument((
 }));
 
 test("header Appearance button: a plain disclosure that opens the section, mirrors its state and gets the focus back", () => withDocument(({ scene, doc, dock }) => {
-  const button = new Node("button", "appearance-btn"); button.attributes["aria-expanded"] = "false";
+  const button = new Node("button", "appearance-btn"); button.attributes["aria-expanded"] = "false"; button.hidden = true;
   doc.getElementById = id => id === "appearance-btn" ? button : null;
   doc.querySelector = selector => selector === ".cube-appearance.is-docked" ? panel : selector === '[data-region="view-controls"]' ? dock : null;
   const controls = installAppearanceControls(scene, () => {}), panel = controls.panel;
   const toggle = walk(panel).find(n => n.className === "cube-appearance-disclosure");
   installAppearanceButton(doc);
+  assert.equal(button.hidden, false, "a mode with a docked panel shows the button");
   assert.equal(button.attributes["aria-controls"], "cube-appearance-body");
   assert.equal(button.attributes.role, undefined, "no menu role");
   button.dispatchEvent(new Event("click"));
@@ -115,6 +117,11 @@ test("header Appearance button: a plain disclosure that opens the section, mirro
   const next = installAppearanceControls(scene, () => {});
   assert.equal(button.attributes["aria-expanded"], "false", "a new panel (mode switch) starts closed and the button follows");
   next.dispose();
+  assert.equal(button.hidden, true, "a mode without a docked panel (after dispose) hides the button");
+  assert.equal(button.attributes["aria-controls"], undefined, "aria-controls does not dangle");
+  const again = installAppearanceControls(scene, () => {});
+  assert.equal(button.hidden, false); assert.equal(button.attributes["aria-controls"], "cube-appearance-body");
+  again.dispose();
 }));
 
 test("setupAppearancePanel finds the docked panel for hosts that name a dock, and the panel inside the host otherwise", () => {
@@ -129,13 +136,18 @@ test("setupAppearancePanel finds the docked panel for hosts that name a dock, an
   assert(!source.includes('container.querySelector(".cube-appearance")'));
 });
 
-test("markup and styles: scene declares the dock, header has the View menu, docked styles use tokens and no translucency", () => {
+test("markup and styles: scene declares the dock, header has the Appearance button, docked styles use tokens and no translucency", () => {
   const html = readFileSync("index.html", "utf8"), css = readFileSync("src/shell/shell.css", "utf8");
   assert.match(html, /id="studio-scene"[^>]*data-appearance-dock="view-controls"/);
   assert.match(html, /id="appearance-btn"[^>]*aria-expanded="false"/);
+  assert.match(html, /id="appearance-btn"[^>]*\bhidden\b/, "hidden until a mode installs a docked panel");
+  assert.match(css, /\.shell \.shell-btn\[hidden\]\s*\{\s*display:\s*none/, "the hidden attribute is not overridden by the button display rule");
   assert(!/role="menu"|aria-haspopup/.test(html), "no menu role: a plain disclosure until the full View menu exists");
   const block = css.slice(css.indexOf(".is-docked"), css.indexOf(".is-docked") + 2500);
   assert(css.includes(".is-docked") && /position:\s*static/.test(block));
   assert(/var\(--surface\)/.test(css.slice(css.indexOf("/* ---------- appearance section"))));
+  const docked = block.slice(0, block.indexOf("}"));
+  assert(/opacity:\s*1\s*!important/.test(docked) && /(?<!-webkit-)backdrop-filter:\s*none\s*!important/.test(docked) && /-webkit-backdrop-filter:\s*none\s*!important/.test(docked),
+    "the legacy ambient rule (opacity .38, blur) does not apply to the docked panel");
   assert(!/backdrop-filter:\s*blur/.test(css.slice(css.indexOf("/* ---------- appearance section"), css.indexOf("/* ---------- error line"))));
 });
