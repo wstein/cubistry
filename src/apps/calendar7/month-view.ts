@@ -3,9 +3,9 @@
  * English 7x7 calendar cube, mode logic (research candidate, not certified). Pure functions only:
  * no DOM, no network, no timers. The mount in `mount.ts` feeds them the parsed data files.
  *
- * Scope of this stage: show the month sheet of one month of the proven chain and step to the
- * adjacent month along it, with the move word of that edge. There is no solver and no jump
- * between non-adjacent months: every such jump would be a walk along the chain.
+ * Scope of this stage: show the month sheet and the 3D cube of one month of the proven chain and
+ * step to the adjacent month along it, playing the move word of that edge. There is no solver and
+ * no jump between non-adjacent months: every such jump would be a walk along the chain.
  */
 import { type Move, generatorAxis, generatorLayer, isRotation } from "./engine.ts";
 import type { Cell } from "./display.ts";
@@ -218,12 +218,42 @@ export const announce = (model: PageModel): string =>
       ? `${monthLabel(model.choice.ym)} is not available yet`
       : "Invalid month";
 
+const SPEED_LABELS: readonly [number, string][] = [
+  [0.5, "0.5×"],
+  [1, "1×"],
+  [2, "2×"],
+  [4, "4×"],
+  [8, "8×"],
+  [16, "16×"],
+];
+
+/** The controls of the 3D view. They live outside the re-rendered page so that a button keeps its focus while a step plays. */
+export function playerHtml(defaultSpeed: number): string {
+  const options = SPEED_LABELS.map(
+    ([v, label]) => `<option value="${v}"${v === defaultSpeed ? " selected" : ""}>${label}</option>`,
+  ).join("");
+  return (
+    '<section class="c7-player" data-c7="player" aria-label="Cube animation controls" hidden>' +
+    '<div class="c7-controls">' +
+    '<button type="button" class="c7-btn" data-c7="play" disabled>Play</button>' +
+    '<button type="button" class="c7-btn" data-c7="skip" disabled>Skip to end</button>' +
+    `<label class="c7-speed">Speed <select data-c7="speed">${options}</select></label>` +
+    '<button type="button" class="c7-btn" data-c7="reset">Reset view</button>' +
+    "</div>" +
+    '<p class="c7-progress" data-c7="progress"></p>' +
+    '<p class="c7-note" data-c7="note" hidden>Reduced motion is on: a step jumps straight to the end state, without animation.</p>' +
+    '<p class="c7-error" data-c7="error" role="alert" hidden></p>' +
+    '<div class="c7-rotation" data-c7="rotation"></div>' +
+    "</section>"
+  );
+}
+
 /** The whole page body of the mode. */
 export function pageHtml(model: PageModel): string {
   const { choice, range } = model;
   const rangeText = `${monthLabel(range.first)} to ${monthLabel(range.last)}`;
   const status =
-    '<p class="c7-status">Research candidate, not certified. Stage 1: month display and adjacent steps only. ' +
+    '<p class="c7-status">Research candidate, not certified. Stage 2: month display, 3D cube and animated adjacent steps only. ' +
     `${esc(NOT_YET)}</p>`;
   if (choice.kind === "invalid")
     return (
