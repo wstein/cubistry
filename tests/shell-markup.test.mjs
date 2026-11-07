@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-// Unit checks for the shell markup (chronocube.html) and how the studio loads the shell styles. Source only.
+// Unit checks for the shell markup (index.html) and how the studio loads the shell styles. Source only.
 
 const read = path => readFileSync(resolve(path), "utf8");
 
@@ -11,7 +11,7 @@ const regions = ["header", "app-switcher", "stage", "reference-view", "hints", "
   "readout", "presentation", "nerd-drawer", "view-controls", "present-action"];
 
 test("the shell markup carries every region once and the five dock slots in order", () => {
-  const html = read("chronocube.html");
+  const html = read("index.html");
   const found = [...html.matchAll(/data-region="([^"]+)"/g)].map(m => m[1]);
   assert.deepEqual([...found].sort(), [...regions].sort());
   assert.deepEqual([...html.matchAll(/data-slot="([^"]+)"/g)].map(m => m[1]), ["1", "2", "3", "4", "5"]);

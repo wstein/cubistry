@@ -1125,6 +1125,7 @@ const router = createRouter({
     delete $("shell").dataset.modeReady; // test hook, set again in onMounted
 
     // Update header text
+    document.title = `Cubistry · ${mode.title}`;
     $("studio-heading").textContent = mode.title;
     $("studio-subtitle").textContent = mode.subtitle;
     $("studio-cube-count-badge").textContent = `${mode.cubes} CUBE${mode.cubes > 1 ? "S" : ""}`;
@@ -1149,12 +1150,7 @@ async function initStudio() {
   await ensureProof();
 
   $("studio-application").addEventListener("change", (e) => {
-    const val = e.target.value;
-    if (registry.has(val)) {
-      router.go(val);
-    } else {
-      location.assign(val);
-    }
+    router.go(e.target.value);
   });
 
   await router.start();

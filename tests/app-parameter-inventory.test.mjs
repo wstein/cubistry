@@ -16,8 +16,8 @@ const ALL_IDS = registry.ids();
 const SINGLE_CUBE = ["counter", "tenth", "timer", "five-second-timer", "hsm-counter", "ms-counter", "hm-one-cube"];
 // Applications that read parameters but have no registered mode yet (stage 4 ports them).
 const PENDING_MODES = ["calendar"];
-// Pages that stay pages (print.html: owner decision 10) or are redirects that leave in stage 3 (index.html).
-const PAGES = ["print.html", "index.html"];
+// Pages that stay pages (print.html: owner decision 10).
+const PAGES = ["print.html"];
 
 const MAIN = "src/main.mjs";
 const row = (params, file, modes, pattern) => ({ params, file, modes, pattern });
@@ -34,7 +34,6 @@ const row = (params, file, modes, pattern) => ({ params, file, modes, pattern })
 const INVENTORY = [
   row(["app"], "src/apps/router.ts", ALL_IDS, /export const APP_PARAM = "app"/),
   row(["application"], MAIN, SINGLE_CUBE),
-  row(["application"], "index.html", ["index.html"]),
   row(["mode"], MAIN, SINGLE_CUBE),
   row(["val", "value"], MAIN, SINGLE_CUBE),
   row(["duration"], MAIN, SINGLE_CUBE),
