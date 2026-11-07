@@ -319,6 +319,9 @@ test("checkPose requires all stickers of one piece to share one position", () =>
   // The set of slots and bodies is unchanged, so only the per-piece consistency can reject it.
   const a = 0;
   const b = printing.piece.findIndex((piece) => piece !== printing.piece[a]);
+  // At least one of the two pieces has several stickers, so the swap splits a piece.
+  const count = (piece) => printing.piece.filter((x) => x === piece).length;
+  assert.ok(count(printing.piece[a]) > 1 || count(printing.piece[b]) > 1);
   const mixed = clonePose(pose);
   for (const field of ["pos", "normal", "up"]) {
     for (let j = 0; j < 3; j++) {
