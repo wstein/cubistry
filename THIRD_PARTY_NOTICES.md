@@ -124,9 +124,11 @@ The following third-party libraries and modules are bundled, linked, or distribu
 **Picture-theme artwork licensing.** The picture themes of the playground are licensed under **CC BY-SA 4.0** (https://creativecommons.org/licenses/by-sa/4.0/, full legal code at that address), with the notice "Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.". The AGPL-3.0-or-later copyleft covers the program code only; these images are a separate work under CC BY-SA 4.0, and an art generator committed beside a theme is art data under the same license. Pictures that a user adds in the browser stay in that browser, are never uploaded to a server, and remain the uploader's responsibility. The original Playground and Pastel Garden artwork is relicensed to CC BY-SA 4.0 in the same way.
 
 * **Playground Artwork**: Six original vector illustrations (`F.svg`, `B.svg`, `R.svg`, `L.svg`, `U.svg`, `D.svg`) and their cropped tiles (`public/playground/NOTICE.txt`).
+* **Copyright**: © 2026 Werner Stein; created with AI assistance (Claude, Anthropic). Attribution: Werner Stein, Cubistry.
 * **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); the committed art generator is art data under the same license.
 * **Regeneration**: Deterministically built using `node scripts/build-playground-art.mjs`.
 * **Pastel Garden Artwork**: Six original vector illustrations and their 24 cropped SVG sticker tiles; the characters (Pip, Nimbo, Tulia, Moss, Sunny, Plop) are original inventions, not modeled on any licensed character (`public/playground-pastel/NOTICE.txt`).
+* **Copyright**: © 2026 Werner Stein; created with AI assistance (Claude, Anthropic). Attribution: Werner Stein, Cubistry.
 * **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); the committed art generator is art data under the same license.
 * **Regeneration**: Deterministically built using `node scripts/build-pastel-garden-art.mjs`.
 * **Four Seasons Artwork**: Six whole-face vector illustrations for the `seasons` playground theme (`public/playground-seasons/NOTICE.txt`).
