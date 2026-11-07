@@ -1,9 +1,9 @@
 {
   "status": "research candidate, not certified",
   "repository": "wstein/cubistry",
-  "branch": "research/commit-pure-split-chain-2028",
-  "commit": "0690b1c5034b1c11427adffa84f2b331a052813e",
-  "commitNote": "This is the head of the S0 branch research/commit-pure-split-chain-2028 (pull request #292). The research branch is merged by rebase, which rewrites commit ids: update branch and commit with `node scripts/prepare-calendar7.mjs --pin <merged commit> --branch research/cube-display-feasibility` once the pull request is merged. The SHA-256 values below do not change.",
+  "branch": "research/cube-display-feasibility",
+  "commit": "bcee891dd0d247383d5b7604f106cb76180c98d7",
+  "commitNote": "Pinned to the merge of research pull request #292 on research/cube-display-feasibility. Research is merged by rebase, so a later research commit needs a new pin: `node scripts/prepare-calendar7.mjs --pin <commit> --branch research/cube-display-feasibility`. The SHA-256 values below do not change.",
   "chain": {
     "format": "cubistry.calendar7.chain.v1",
     "root": "2028-01 (display 25)",
