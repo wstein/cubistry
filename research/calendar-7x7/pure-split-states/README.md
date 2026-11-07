@@ -320,6 +320,8 @@ Source-state hash (root, display 25, 2028-01):
 (2076-01) hash:
 `56254c62bef457b6362ffa5cbd477fff8036d26b465f105387fdb74ed6f8875d`.
 
+License of the Stage 4 data files: CC BY-SA 4.0 (SPDX-License-Identifier: CC-BY-SA-4.0). Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
 **Not covered:**
 
 - The chain does **not** reach 2099-12. Its last month is 2076-01; 287 edges
