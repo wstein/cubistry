@@ -24,6 +24,26 @@ const copy = () => { const d = mkdtempSync(`${tmpdir()}/cube-case-`); cpSync(bas
 const edit = (d, file, fn) => writeFileSync(`${d}/${file}`, fn(readFileSync(`${d}/${file}`, "utf8")));
 const inject = (d, file, markup) => edit(d, file, (t) => t.replace("</svg>", `${markup}</svg>`));
 
+test("conflicting --tol, --sym-tol and --dup-tol exit 2; equal values are accepted (no browser needed)", () => {
+  for (const bad of [["--sym-tol", "0.03", "--dup-tol", "0.02"], ["--tol", "0.03", "--sym-tol", "0.02"], ["--tol", "0.01", "--dup-tol", "0.02"]]) {
+    const r = run(base, ...bad);
+    assert.equal(r.code, 2, `${bad.join(" ")} -> ${r.code}\n${r.out}`);
+    assert.match(r.out, /conflicting thresholds/);
+  }
+  assert.doesNotMatch(run(base, "--sym-tol", "0.03", "--dup-tol", "0.03", "--n", "x").out, /conflicting/); // fails later on --n, not on the thresholds
+});
+
+test("a missing classifier environment is an environment error: message and exit 2, not a crash (no browser needed)", () => {
+  // A copy of the skill outside the repository cannot reach packages/cube-appearance.
+  const root = mkdtempSync(`${tmpdir()}/cube-env-`);
+  cpSync(fileURLToPath(new URL("..", import.meta.url)), `${root}/skill`, { recursive: true });
+  const r = spawnSync(process.execPath, [`${root}/skill/scripts/check-cube-set.mjs`, base], { encoding: "utf8" });
+  assert.equal(r.status, 2, r.stdout + r.stderr);
+  assert.match(r.stderr, /cannot load the classifier \(packages\/cube-appearance\)/);
+  assert.match(r.stderr, /npm ci/);
+  assert.doesNotMatch(r.stdout + r.stderr, /RESULT:/);
+});
+
 test("usage errors exit 2 (no browser needed)", () => {
   assert.equal(run().code, 2);
   assert.equal(run("/nonexistent-dir-for-cube-check").code, 2);
@@ -160,4 +180,18 @@ test("non-periodic belt horizon is reported when a theme is built", () => {
   const t = defineTheme({ name: "np", size: 420, belt, faces: { L: draw, F: draw, R: draw, B: draw, U: draw, D: draw } });
   const rep = t.build(mkdtempSync(`${tmpdir()}/cube-np-`));
   assert.equal(rep.warnings.length, 1);
+});
+
+test("--tol reaches the classifier and tiles.json (and a tighter value splits a near duplicate)", { skip }, () => {
+  const d = copy();
+  rmTiles(d);
+  const r = run(d, "--n", "2", "--tol", "0.2");
+  const j = JSON.parse(readFileSync(`${d}/tiles.json`, "utf8"));
+  assert.equal(j.thresholds.tol, 0.2, r.out);
+  assert.equal(j.thresholds.symmetryTol, 0.2);
+  assert.equal(j.thresholds.duplicateTol, 0.2);
+  assert.equal(j.perN[2].classification.thresholds.symmetry, 0.2);
+  assert.equal(j.perN[2].classification.thresholds.duplicate, 0.2);
+  const alias = run(copy(), "--n", "2", "--dup-tol", "0.2", "--json", `${d}/alias.json`);
+  assert.equal(JSON.parse(readFileSync(`${d}/alias.json`, "utf8")).thresholds.tol, 0.2, alias.out);
 });

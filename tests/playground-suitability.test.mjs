@@ -23,7 +23,9 @@ const rot = (d, quarter) => {
   return out;
 };
 const flat = (c = [200, 200, 200]) => tile(() => c);
-// Asymmetric picture: a distinct color per quadrant plus a stripe, seeded so tiles differ.
+// Asymmetric picture: a distinct color per quadrant plus a stripe, seeded so tiles differ. The stripe width steps by
+// 6 px per seed: with a step of 3 px, seeds 0 and 3 differ in under 3 percent of the 20 px block-average pixels and the
+// loose level (rightly) groups them as identical.
 const asym = (seed = 0) => tile((x, y) => {
   const base = [[250, 30, 30], [30, 250, 30], [30, 30, 250], [240, 240, 30]][(x < N / 2 ? 0 : 1) + (y < N / 2 ? 0 : 2)];
   return x < 14 + seed * 6 && y < 40 ? [0, 0, 0] : base.map((c, i) => (i === seed % 3 ? 255 - c : c));
@@ -151,8 +153,11 @@ test("the display calls the shared classifier at its loose level (one implementa
   const r = analyzeStickers(stickers, 2);
   assert.deepEqual(r.identicalGroups.map((g) => [...g]), c.loose.identical.filter((g) => g.members.length > 1).map((g) => [...g.members]));
   assert.deepEqual(r.twinGroups.map((g) => [...g]), c.loose.twins.filter((g) => g.identical.length > 1).map((g) => g.members.map((x) => x.id)));
-  assert.deepEqual(r.symmetric4, c.tiles.filter((t) => t.order.loose === 4).map((t) => t.id));
-  assert.deepEqual(r.symmetric2, c.tiles.filter((t) => t.order.loose === 2).map((t) => t.id));
+  // Symmetry is measured on the full 80 px sticker with the package's primitives, groups on the coarse copy.
+  assert.deepEqual(r.symmetric4, stickers.filter((s) => symmetryOf(measureRgba(s.data)) === 4).map((s) => s.id));
+  assert.deepEqual(r.symmetric2, stickers.filter((s) => symmetryOf(measureRgba(s.data)) === 2).map((s) => s.id));
+  assert.deepEqual(r.symmetric2, ["B_0_0"]);
+  assert.deepEqual(r.symmetric4, ["B_0_1"]);
   assert.equal(LOOSE_THRESHOLDS.share, 0.03);
 });
 
@@ -162,4 +167,24 @@ test("near copies within the loose tolerance count as identical, and the light s
   const r = analyzeStickers([{ id: "F_0_0", data: asym(1) }, { id: "F_0_1", data: tweak }, { id: "F_1_0", data: asym(2) }], 2);
   assert.deepEqual(r.identicalGroups.map((g) => [...g]), [["F_0_0", "F_0_1"]]);
   assert.equal(r.light, "green"); // identical, symmetric and turned stickers are information, never red
+});
+
+test("groups and symmetry come from the loose level, not the strict one", () => {
+  // An 8 x 8 px patch is 1 percent of the sticker: within the loose share (3 percent), over the strict one (0.5 percent).
+  const patch = (d) => { const e = Uint8ClampedArray.from(d); for (let y = 60; y < 68; y++) for (let x = 60; x < 68; x++) e.set([0, 0, 0, 255], (y * N + x) * 4); return e; };
+  const r = analyzeStickers([{ id: "F_0_0", data: sym4 }, { id: "F_0_1", data: patch(sym4) }, { id: "F_1_0", data: asym(1) }], 2);
+  assert.deepEqual(r.identicalGroups.map((g) => [...g]), [["F_0_0", "F_0_1"]]);
+  const tw = analyzeStickers([{ id: "F_0_0", data: asym(1) }, { id: "F_0_1", data: patch(rot(asym(1), 1)) }], 2);
+  assert.deepEqual(tw.twinGroups.map((g) => [...g]), [["F_0_0", "F_0_1"]]); // a turned near copy: twin at the loose level only
+  assert.deepEqual(r.symmetric4, ["F_0_0", "F_0_1"]); // the patched rosette still counts as 4-fold (about 2 percent)
+  assert.equal(symmetryOf(measureRgba(patch(sym4))), 4);
+  assert.equal(classifyTiles([{ id: "x", side: N, data: patch(sym4) }]).strict.identical[0].order, 1); // strict would say none
+  assert.equal(classifyTiles([{ id: "a", side: N, data: asym(1) }, { id: "b", side: N, data: patch(rot(asym(1), 1)) }]).strict.twins.filter((g) => g.identical.length > 1).length, 0);
+});
+
+test("the pixel tolerance is the loose 24, not the strict 16", () => {
+  // A rosette whose left half is 20 levels darker in red: within 24 for every rotation, over 16.
+  const shaded = tile((x, y) => (Math.hypot(x - 39.5, y - 39.5) < 20 ? [200 - (x < 40 ? 20 : 0), 20, 20] : [240, 240, 240]));
+  assert.equal(symmetryOf(measureRgba(shaded)), 4);
+  assert.deepEqual(analyzeStickers([{ id: "F_0_0", data: shaded }], 2).symmetric4, ["F_0_0"]);
 });

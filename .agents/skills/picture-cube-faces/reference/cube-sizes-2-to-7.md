@@ -39,10 +39,11 @@ None of this fails a run: the owner accepts equal-looking stickers and orientati
 Decided:
 
 1. **Ambiguity is acceptable.** Equal-looking orientations and duplicate stones are accepted: the cube counts as visually solved. The checker classifies them and does not fail on them.
-2. **Symmetric centers need not be turned.** On odd N (3, 5, 7) a 2-fold or 4-fold symmetric center sticker is reported as "no orientation needed". This is a new rule. [`docs/SUPER_PICTURE_CUBE.md`](../../../../docs/SUPER_PICTURE_CUBE.md) describes the existing 3x3 picture cube, whose exact-solved test counts all six center orientations, and so predates it (the doc now states the current rule); the suitability display already reports it through the package; the solved test and solver must still adopt it (`packages/cube-appearance`). Even N >= 4 has movable center blocks and no single center; the 2x2 has no centers.
+2. **Symmetric centers need not be turned** (for 2-fold centers see the OPEN question 6). On odd N (3, 5, 7) a 2-fold or 4-fold symmetric center sticker is reported as "no orientation needed". This is a new rule. [`docs/SUPER_PICTURE_CUBE.md`](../../../../docs/SUPER_PICTURE_CUBE.md) describes the existing 3x3 picture cube, whose exact-solved test counts all six center orientations, and so predates it (the doc now states the current rule); the suitability display already reports it through the package; the solved test and solver must still adopt it (`packages/cube-appearance`). Even N >= 4 has movable center blocks and no single center; the 2x2 has no centers.
 
 Open:
 
 3. **Hero and centers.** Should the hero be centered on the odd-N center piece, and may a center carry a near-symmetric motif? (Allowed under rule 2; a decision is needed only for composition.)
 4. **Strictness for N >= 3.** Currently flat stickers at N >= 3 are warnings. Decide whether N = 3 (or all N) must have zero flat stickers.
 5. **Legacy 320 px faces.** Re-export at 420 px, or accept fractional stickers at N = 3, 6, 7 (the theme stack's `build-playground-theme.mjs` requires 320 px faces).
+6. **OPEN (owner decision pending): 2-fold centers.** Is a 2-fold symmetric center solved in any turn (the wording of rule 2 and of `orientationNeeded: false`) or only modulo a half turn (`packages/cube-appearance`, the `period` key)? Marked open the same way in `docs/CUBE_APPEARANCE.md` and `docs/SUPER_PICTURE_CUBE.md`; no rule was changed.
