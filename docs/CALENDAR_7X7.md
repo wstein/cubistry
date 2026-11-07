@@ -1,15 +1,16 @@
 # English 7×7 calendar cube (data stage and first mode)
 
 **Status: research candidate, not certified.** This page describes the data, the
-pin, the replay test and the first user interface of the English 7×7 monthly
+pin, the replay test and the user interface (month sheet and 3D cube) of the English 7×7 monthly
 calendar cube. The 3×3 [calendar page](../calendar.html) and its
 [documentation](CALENDAR_CUBES.md) are unchanged.
 
-## The mode (stage 1)
+## The mode (stages 1 and 2)
 
 The chooser of `index.html` lists **7x7 Calendar** (mode id `calendar7`, group
 cubes, one cube); it opens at `index.html?app=calendar7`. The mode shows the 7×7
-month sheet of one month and the move word to the previous and to the next month.
+cube in 3D, the 7×7 month sheet of the same month and the move word to the previous and to
+the next month.
 
 - URL parameters: `year` and `month` (1 to 12), only together. Without them the
   current month is used.
@@ -22,12 +23,43 @@ month sheet of one month and the move word to the previous and to the next month
   whole cube), then `'` for a counter-clockwise quarter turn or `²` for a half turn.
   Each step also lists the raw generators (`g<generator>:<+1|-1|2>`, generators 1 to 21 as
   defined below) in a collapsible block.
+- **The 3D view (stage 2).** The studio scene shows the cube with its 218 surface bodies
+  and 294 stickers in the pose of the displayed month. A sticker shows the text and ink
+  of the print (`state.v1.json`), so the stickers read as printed (the print uses the digits
+  `1` and `0` where the sheet shows `I` and `O`, for example `FR1`). The cube sits slightly turned
+  so that three faces show; drag it, or use the Rotation selector and Reset view, to look
+  around. The month sheet below stays the reference for what the front face must show.
+- **The animated step.** Choosing the previous or next month plays the stored move word
+  move by move on the cube: forward is the stored edge, backward is the inverse of the edge
+  before it. A move turns the layer of its axis, or the whole cube for `rot`, by the exponent
+  of the move; the engine's right-handed quarter turn is the right-handed rotation of the
+  scene. The controls are **Play/Pause** (pauses after the move in flight), **Skip to end**,
+  **Speed** (0.5× to 16×, default 2×; 90 ms per move at 1×) and **Reset view**. Previous or
+  Next during a step first brings the cube to the end of that step, then plays the new step.
+  Under `prefers-reduced-motion: reduce` nothing animates: a step jumps to its end state and
+  the page says so.
+- **The shown state is the engine state.** The cube always shows a pose of the engine, never an
+  approximation. At the end of every step (played, skipped, interrupted or jumped) the
+  SHA-256 digest of the pose is compared with the stored hash of the month's node
+  (`graph.v1.json`); a difference stops the view with a message and leaves the month sheet
+  alone. The page publishes the digest it computed as `data-c7-digest` on `#calendar7-root`
+  (with `data-c7-month` and `data-c7-state`); the browser test compares it with the graph.
 - **Not in this stage:** no solver, no jump to a non-adjacent month (a jump would
-  walk the chain, up to tens of thousands of moves), no 3D view of the cube, no
-  route from a solved cube, no sticker sheet. The page says so.
-- Code: `src/apps/calendar7/month-view.ts` (pure) and `mount.ts` (DOM); tests in
-  `tests/calendar7-mode.test.mjs`. The mode uses the existing display, graph and
-  engine modules and adds no new mathematics.
+  walk the chain, up to tens of thousands of moves; a month given in the URL is shown at once
+  by replaying the stored edges from the chain root), no route from a solved cube, no
+  sticker sheet. The page says so. The status stays **research candidate, not certified**.
+- Code: `src/apps/calendar7/month-view.ts` (pure), `player.ts` (step state machine, no DOM),
+  `tween.ts` (one timed move), `sticker-art.ts` (paper, inks, text fitting), `viewer.ts` (the
+  WebGL scene) and `mount.ts` (DOM); tests in `tests/calendar7-mode.test.mjs`,
+  `tests/calendar7-player.test.mjs` and `tests/browser/calendar7-3d.spec.mjs`. The mode uses the
+  existing display, graph and engine modules and adds no new mathematics.
+- **Renderer.** The view reuses the 3×3 calendar's composition, built from the exported
+  size-neutral parts of `@cubistry/cube-viewer` (`PhysicalCubeScene`, presentation geometry,
+  plastic and sticker materials, studio lighting, camera fitting, smart rotation). Only
+  `CubeViewer` itself is limited to the size-2 print and state contract, so it is not used. One
+  deviation: the bodies use one bevel segment instead of three (108 instead of 588
+  triangles per body, 23k instead of 128k for the cube). The scene renders on demand: an idle
+  cube draws nothing, and a frame of a turn allocates nothing.
 
 ## What this is
 
@@ -54,7 +86,7 @@ states exists yet. This is why the status stays "research candidate, not certifi
 | All 91 display types (7 start weekdays × 13 month types) occur on the chain | **2076-02 to 2099-12**: the chain does not reach 2099-12 yet; 287 more edges are still to be produced |
 | The display sheets of all 888 months 2026 to 2099 | A route from a solved cube to the chain root: no practical setup route exists |
 | Replay, hash equality with the research receipts, inverse restoration, front check | Shortcut or star routes: every jump would be a walk along the chain |
-| | A 3D view, optimizer, solver, sticker sheet or physical build instruction |
+| | Optimizer, solver, sticker sheet or physical build instruction |
 
 ### Start state
 
@@ -75,9 +107,11 @@ of the chain.
 | `public/calendar7/graph.v1.json` | Route graph: 577 nodes (state hash, display, month) and 576 edges (move words) |
 | `public/calendar7/displays.v1.json` | 91 display sheets and the display id of each month 2026 to 2099 |
 | [scripts/prepare-calendar7.mjs](../scripts/prepare-calendar7.mjs) | Pin, convert and check (Node, no Python) |
-| `src/apps/calendar7/` | Pure engine, display, graph and month-view modules (no DOM, no timers) and the DOM mount of the mode |
+| `src/apps/calendar7/` | Pure engine, display, graph, month-view, player and tween modules (no DOM, no timers), the sticker art, the WebGL viewer and the DOM mount of the mode |
 | [tests/calendar7-replay.test.mjs](../tests/calendar7-replay.test.mjs) | Full replay and negative controls, part of `npm test` |
 | [tests/calendar7-mode.test.mjs](../tests/calendar7-mode.test.mjs) | Registry entry, month choice, navigation bounds, move words and mount |
+| [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
+| [tests/browser/calendar7-3d.spec.mjs](../tests/browser/calendar7-3d.spec.mjs) | The 3D view in a browser: pose digest, animated step, controls, 375 px |
 
 ### Conventions
 
