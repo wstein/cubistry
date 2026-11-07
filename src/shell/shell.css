@@ -109,9 +109,12 @@ body.chronocube-page:has(#shell) {
   margin: 2px 0 0;
   color: var(--ink-2);
   font: var(--t-sm) / 1.3 var(--f-ui);
-  white-space: nowrap;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 .shell .studio-mode-pill {
   background: var(--surface-2);
