@@ -6,6 +6,11 @@ import { countChangedPixels, renderedFieldShot } from "../helpers/changed-pixels
 async function ready(page) {
   await page.goto("/counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  // aria-busy turns false after the first view.configure, but initialize() then awaits
+  // view.updateManifest(), which reloads the assets and configures the viewer again. The controls
+  // (#set is in .controls) enable only after that, when controlsUi() runs with ready = true.
+  // Patch the prototype afterwards so the boot configure is not counted as a reconfiguration.
+  await expect(page.locator("#set")).toBeEnabled();
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
     const setter = CubeViewer.prototype.setFaceletImageOverride;
