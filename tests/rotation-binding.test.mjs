@@ -79,3 +79,15 @@ test('held settings pointers freeze explicit leveling across outside releases, o
  h.window.dispatchEvent(new Event('focus'));assert.equal(h.binding.controller.phase,'leveling');h.step(101);assert.notEqual(h.binding.controller.phase,'dragging');
  h.binding.dispose();const final=h.root.quaternion.clone();h.panel.dispatchEvent(event('pointerdown',9));h.window.dispatchEvent(new Event('blur'));h.document.dispatchEvent(event('pointerup',9));h.step(200);same(h.root.quaternion,final);
 });
+
+test("a mode chosen while the reduced-motion change event is still pending is applied, not reverted to the old mode",()=>{
+ const h=harness("free");h.element.pointer("pointerdown");h.time(.1);h.element.pointer("pointermove",170,140);h.time(.2);h.element.pointer("pointermove",140,190);h.time(.4);h.element.pointer("pointerup");
+ assert.equal(h.binding.controller.mode,"free");
+ // The preference flipped, but its "change" event has not been delivered yet.
+ h.media.matches=true;
+ h.time(1);h.select.value="classic";h.select.dispatchEvent(new Event("change"));
+ assert.equal(h.binding.controller.mode,"classic");assert.equal(h.select.value,"classic");
+ assert.equal(h.binding.controller.reducedMotion,true);assert.equal(h.binding.controller.phase,"leveling");
+ assert.equal(JSON.parse(h.data.get(rotationStorageKey("/test"))).mode,"classic");
+ h.binding.dispose();
+});
