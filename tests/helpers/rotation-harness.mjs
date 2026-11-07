@@ -15,6 +15,6 @@ export function rotationHarness({mode="smart",root=new Group(),initial,sensitivi
  const data=new Map([[rotationStorageKey("/test"),JSON.stringify({version:1,mode})]]);
  const env={now:()=>at,document,media,window,pathname:"/test",storage:{getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)}};
  const binding=bindSmartRotation(element,root,{sensitivity,threshold,panel,environment:env});
- const select=panel.children[0].children[0],note=panel.children[1];
+ const select=panel.children[0].children[0],note=panel.children.find(c=>String(c.id).startsWith('cube-rotation-note'));
  return{element,panel,root,document,media,window,env,binding,select,note,data,time(value){at=value;},step(value){at=value;binding.step();}};
 }

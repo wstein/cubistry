@@ -89,3 +89,26 @@ test("long hints are short hints; the full text sits behind a visible, labeled i
   h.binding.dispose();
   assert(!h.panel.children.includes(row), "dispose removes the added nodes");
 }));
+
+test("sticker font fields land under More; the Stickers & Type / 3D & Viewport tabs are gone", () => withGlobals(() => {
+  const source = readFileSync("packages/cube-viewer/src/appearance.ts", "utf8");
+  assert(!source.includes("Stickers & Type") && !source.includes("3D & Viewport"));
+  const host = new Element("div"), controls = installAppearanceControls(host, () => {});
+  const fields = new Element("div"); fields.className = "studio-appearance-fields"; fields.textContent = "Display font";
+  controls.panel.append(fields);
+  const more = walk(host).find(node => node.className === "cube-appearance-more");
+  assert(walk(more).includes(fields), "sticker fields are under More");
+  assert(!walk(host).some(node => String(node.className).includes("cube-appearance-tab")), "no tab bar");
+}));
+
+test("rotation DOM order is reading order: control, hint with i button, then the collapsed details", () => {
+  const h = rotationHarness({ mode: "smart" });
+  const at = node => h.panel.children.indexOf(node);
+  const row = h.panel.children.find(node => node.className === "cube-appearance-hint-row");
+  assert(at(h.panel.children.find(node => node.tagName === "label")) < at(row));
+  assert(at(row) < at(h.note), "the note follows the i button that controls it");
+});
+
+test("the counter spec counts disclosure blocks other than the Appearance panel and its More group", () => {
+  assert.match(readFileSync("tests/browser/cube-first-ui.spec.mjs", "utf8"), /details:not\(\.cube-appearance\):not\(\.cube-appearance-more\)/);
+});
