@@ -150,8 +150,8 @@ Both former copies of the classification logic now call this package, so there i
     center is solved only modulo a half turn. The additive key `centers[].period` carries the exact rule.
     Decided (D10, 2026-11-07): the package reading is the rule. Only order 4 needs no orientation; a 2-fold
     center is solved modulo a half turn. The version-1 flag stays as it was (its name predates D10) and
-    must not be read as "2-fold needs no turn": read `period`. Aligning the flag and the checker wording
-    with D10 is a code change for a later PR.
+    must not be read as "2-fold needs no turn": read `period`. The checker wording follows D10 (#307);
+    the version-1 flag keeps its legacy meaning by design.
   - No JSON field was removed or renamed, so the version stays 1: `thresholds.symmetry` and `thresholds.duplicate`
     now carry the same value, and the checker's `thresholds` object keeps `symmetryTol` and `duplicateTol` next
     to the new `tol`. The checker needs the repository's `node_modules` (the package imports
