@@ -9,12 +9,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry</title>
-    <script type="module" crossorigin src="/cubistry/assets/index-DRUKuJyE.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/index-C26U4UGP.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-P2Xu9kJm.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/mode-catalog-C18jqk4v.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/preload-helper-D9dmXOBl.js">
     <link rel="stylesheet" crossorigin href="/cubistry/assets/index-CdEIHXKU.css">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/chronocube-BVkosIwg.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/chronocube-6ZUbx_cw.css">
   </head>
   <body class="chronocube-page">
     <div class="shell" id="shell" data-view="landing">
@@ -55,6 +55,7 @@
           <span id="studio-mode-label">H · M · S</span>
         </span>
         <a class="print-stickers-link shell-link" data-app-only id="print-stickers" href="print.html?design=words-pascal" target="_blank" rel="noopener">Print stickers</a>
+        <button type="button" class="shell-btn" id="appearance-btn" data-app-only hidden aria-expanded="false" title="Appearance"><span class="btn-icon" aria-hidden="true">☰</span><span class="btn-text"> Appearance</span></button>
         <button type="button" class="shell-btn" id="presentation-btn" data-region="present-action" data-app-only title="Presentation Mode" aria-label="Enter presentation mode"><span class="btn-icon" aria-hidden="true">⛶</span><span class="btn-text"> Presentation</span></button>
       </header>
 
@@ -80,7 +81,7 @@
       <div class="shell-body">
         <div class="shell-main" role="main">
           <section class="shell-stage" id="studio-stage" data-region="stage" aria-label="Chronocube Studio Stage">
-            <div id="studio-scene" class="clock-viewer"></div>
+            <div id="studio-scene" class="clock-viewer" data-appearance-dock="view-controls"></div>
             <div id="studio-cards" class="clock-cubes" data-count="3"></div>
             <div class="shell-hints" data-region="hints" hidden></div>
             <button type="button" class="shell-btn shell-reference" data-region="reference-view" hidden>Reference view</button>
