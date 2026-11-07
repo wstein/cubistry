@@ -21,19 +21,10 @@ function tile(mode) {
   return a;
 }
 
-/** Fills the landing page: the tiles of the Apps and Cubes sections and the ticking readout of the hero. */
+/** Fills the landing page: the tiles of the Apps and Cubes sections. */
 export function showLanding() {
   const { hero, apps, cubes } = landingSections(MODE_CATALOG);
   $("landing-open-clock").href = appHref(hero.id);
   $("landing-apps").replaceChildren(...apps.map(tile));
   $("landing-cubes").replaceChildren(...cubes.map(tile));
-  const pad = (n) => String(n).padStart(2, "0");
-  const tick = () => {
-    const now = new Date();
-    $("landing-hours").textContent = pad(now.getHours());
-    $("landing-minutes").textContent = pad(now.getMinutes());
-    $("landing-seconds").textContent = pad(now.getSeconds());
-  };
-  tick();
-  setInterval(tick, 250);
 }
