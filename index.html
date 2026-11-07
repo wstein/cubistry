@@ -9,12 +9,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f3eb" />
     <title>Cubistry</title>
-    <script type="module" crossorigin src="/cubistry/assets/index-DDC0ZYyF.js"></script>
+    <script type="module" crossorigin src="/cubistry/assets/index-DRUKuJyE.js"></script>
     <link rel="modulepreload" crossorigin href="/cubistry/assets/modulepreload-polyfill-P2Xu9kJm.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/mode-catalog-C18jqk4v.js">
     <link rel="modulepreload" crossorigin href="/cubistry/assets/preload-helper-D9dmXOBl.js">
     <link rel="stylesheet" crossorigin href="/cubistry/assets/index-CdEIHXKU.css">
-    <link rel="stylesheet" crossorigin href="/cubistry/assets/chronocube-yiwViqEr.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/assets/chronocube-BVkosIwg.css">
   </head>
   <body class="chronocube-page">
     <div class="shell" id="shell" data-view="landing">
@@ -96,7 +96,7 @@
             </div>
           </section>
           <div class="shell-readout" data-region="readout" hidden></div>
-          <div class="shell-nerd" data-region="nerd-drawer" hidden></div>
+          <div class="shell-nerd" id="shell-nerd" data-region="nerd-drawer" hidden></div>
         </div>
 
         <div class="shell-dock" data-region="dock" aria-label="Controls">
@@ -113,6 +113,7 @@
             <!-- Dynamically populated per active mode -->
           </aside>
           <div class="shell-view-controls" data-region="view-controls" hidden></div>
+          <button type="button" class="shell-btn shell-nerd-toggle" id="nerd-toggle" aria-pressed="false" aria-controls="shell-nerd" hidden>Nerd mode</button>
         </div>
       </div>
 
