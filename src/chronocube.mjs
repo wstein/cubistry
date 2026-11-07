@@ -1063,9 +1063,12 @@ async function initTimerMode(fiveSecond, isCurrent) {
 
   update();
   const intervalId = setInterval(update, 100);
+  const driverId = setInterval(() => driver.tick(), 50);
 
   return () => {
     clearInterval(intervalId);
+    clearInterval(driverId);
+    driver.dispose();
     viewer.destroy();
   };
 }
