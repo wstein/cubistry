@@ -2,10 +2,9 @@ import "./chronocube.css";
 import { ClockStage } from "./apps/clock/stage.ts";
 import { LiveClockScheduler, clockText } from "./apps/clock/scheduler.ts";
 import { ClockMoveStatistics, formatMean } from "./apps/clock/statistics.ts";
-import { HsmController } from "./apps/hsm/controller.ts";
+import { createStudioHsmController, createStudioSingleController } from "./apps/chronocube/hsm-mode.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";
 import hsmPin from "../hsm-source.json";
-import { MsController } from "./apps/ms/controller.ts";
 import { loadMsDesign } from "./apps/ms/design.ts";
 import msPin from "../ms-source.json";
 import { HM_VARIANT, hmImages, loadHmDesign } from "./apps/hm/variant.ts";
@@ -431,13 +430,18 @@ async function initClockMode() {
     setDuration(duration);
 
     const manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, currentLettering);
-    const controller = new HsmController(viewer, sourceDesign, {
-      printDefinition: sourceDesign.printDefinition,
-      name: names[i],
-      assets: manifest,
-      onMoveCommitted: (m) => statistics.recordMove(i, m),
-      onRotationCommitted: (r) => statistics.recordRotation(i, r),
-    });
+    const controller = createStudioHsmController(
+      viewer,
+      sourceDesign,
+      manifest,
+      ["H", "M", "S"][i],
+      (value, busy, error, progress) => {
+        if (progress) statistics.observe(i, progress);
+        if (error) $("studio-error").textContent = error.message;
+      },
+      resolveAssets,
+      i === 0 ? 23 : 59,
+    );
     await controller.configure(initial[i]);
     controllers.push(controller);
     units.push({ controller, duration, setDuration });
@@ -718,11 +722,17 @@ async function initHmClockMode() {
     setDuration(duration);
 
     const manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, currentLettering);
-    const controller = new HsmController(viewer, sourceDesign, {
-      printDefinition: sourceDesign.printDefinition,
-      name: names[i],
-      assets: manifest,
-    });
+    const controller = createStudioHsmController(
+      viewer,
+      sourceDesign,
+      manifest,
+      ["H", "M"][i],
+      (value, busy, error) => {
+        if (error) $("studio-error").textContent = error.message;
+      },
+      resolveAssets,
+      i === 0 ? 23 : 59,
+    );
     await controller.configure(initial[i]);
     controllers.push(controller);
     units.push({ controller, duration, setDuration });
@@ -1089,15 +1099,18 @@ async function initHsmSingleMode(variant = "hsm") {
 
   let manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, currentLettering);
 
-  const controller = new HsmController(viewer, design, {
-    printDefinition: design.printDefinition,
-    name: "unit",
-    assets: manifest,
-    onState: (v, busy) => {
+  const controller = createStudioSingleController(
+    variant,
+    viewer,
+    design,
+    manifest,
+    $("single-unit-select").value,
+    (v, busy) => {
       $("hsm-value-display").textContent = String(v).padStart(2, "0");
       $("hsm-state").textContent = busy ? "Turning…" : "Ready";
     },
-  });
+    resolveAssets,
+  );
 
   setupAppearancePanel($("studio-scene"), async (nextManifest) => {
     await controller.updateManifest(nextManifest);
