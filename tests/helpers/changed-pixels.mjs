@@ -10,7 +10,6 @@ export const HIDE_HUD_LAYERS_STYLE = [
   ".floating-dock",
   ".floating-glass-pill",
   ".presentation-exit-btn",
-  "#viewer-hint",
 ].map((selector) => `${selector} { visibility: hidden !important; }`).join("\n");
 
 /** Rendered-field screenshot: only the WebGL canvas, without the HUD layers above it. */

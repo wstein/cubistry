@@ -58,7 +58,7 @@ test("every hidden HUD selector exists in counter.html, its styles or the viewer
   const sources = ["counter.html", "src/style.css", "packages/cube-viewer/src/appearance.ts"]
     .map((f) => readFileSync(new URL(`../${f}`, import.meta.url), "utf8")).join("\n");
   const selectors = [...HIDE_HUD_LAYERS_STYLE.matchAll(/^([^\s{]+) \{/gm)].map((m) => m[1]);
-  assert.ok(selectors.length >= 6);
+  assert.ok(selectors.length >= 5);
   for (const s of selectors) {
     const name = s.slice(1);
     assert.ok(new RegExp(`${s[0] === "#" ? 'id="' : "[\\s\"'.]"}${name}[\\s"'{,.:]`).test(sources), s);
