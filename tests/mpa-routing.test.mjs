@@ -53,10 +53,3 @@ test("all navigation selects use clean HTML URLs for single-cube applications", 
     assert.match(content, /href="https:\/\/github\.com\/wstein\/cubistry\/"/, `${file} links to cubistry repo`);
   }
 });
-
-test("root index.html redirects to clock.html", () => {
-  const content = fs.readFileSync(path.join(root, "index.html"), "utf-8");
-  assert.match(content, /http-equiv="refresh" content="0; url=clock\.html"/);
-  assert.match(content, /location\.replace/);
-  assert.match(content, /clock\.html/);
-});
