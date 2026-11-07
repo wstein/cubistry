@@ -22,6 +22,7 @@ import {
   DEFAULT_TENTH_STEP_INTERVAL,
   tenthTurnSpeedForInterval,
 } from "./apps/ms-timer/tenth.ts";
+import { createModeSwitcher } from "./apps/chronocube/mode-switch.ts";
 import { PairController } from "./apps/pair/controller.ts";
 import { MsTimerCube } from "./apps/ms-timer/cube.ts";
 import { MsTimer } from "./apps/ms-timer/timer.ts";
@@ -124,7 +125,6 @@ let currentLettering = localStorage.getItem("cubistry_lettering") || "words-pasc
 let activeMode = null;
 let activeStage = null;
 let activeViewer = null;
-let activeCleanup = null;
 let proofData = null;
 
 // Preload counter design for shared asset manifest
@@ -1136,60 +1136,58 @@ async function initHsmSingleMode(variant = "hsm") {
 // -------------------------------------------------------------
 // Orchestrator: Switch active mode
 // -------------------------------------------------------------
+const modeSwitcher = createModeSwitcher(
+  (err) => {
+    console.error("Failed to initialize mode:", err);
+    $("studio-error").textContent = `Failed to load mode ${activeMode}: ${err.message}`;
+  },
+  (e) => console.warn("Cleanup error:", e),
+);
+
+const MODE_INITS = {
+  clock: () => initClockMode(),
+  "ms-timer": () => initMsTimerMode(),
+  "hm-clock": () => initHmClockMode(),
+  tenth: () => initTenthMode(),
+  counter: () => initCounterMode(),
+  timer: () => initTimerMode(false),
+  "five-second-timer": () => initTimerMode(true),
+  "hsm-counter": () => initHsmSingleMode("hsm"),
+  "ms-counter": () => initHsmSingleMode("ms"),
+  "hm-one-cube": () => initHsmSingleMode("hm"),
+};
+
 async function switchMode(newMode, pushHistory = true) {
   if (!MODES[newMode]) newMode = "clock";
-  if (activeCleanup) {
-    try {
-      activeCleanup();
-    } catch (e) {
-      console.warn("Cleanup error:", e);
-    }
-    activeCleanup = null;
-  }
-
-  // Clear scene and cards
-  $("studio-scene").innerHTML = "";
-  $("studio-cards").innerHTML = "";
-  $("studio-controls").innerHTML = "";
-  $("studio-error").textContent = "";
-
-  activeMode = newMode;
   const meta = MODES[newMode];
-  delete $("shell").dataset.modeReady; // test hook, set again below once the init function has resolved
+  const ok = await modeSwitcher.switchTo(MODE_INITS[newMode], () => {
+    // Clear scene and cards
+    $("studio-scene").innerHTML = "";
+    $("studio-cards").innerHTML = "";
+    $("studio-controls").innerHTML = "";
+    $("studio-error").textContent = "";
 
-  // Update header text
-  $("studio-heading").textContent = meta.title;
-  $("studio-subtitle").textContent = meta.subtitle;
-  $("studio-cube-count-badge").textContent = `${meta.count} CUBE${meta.count > 1 ? "S" : ""}`;
-  $("studio-mode-label").textContent = meta.badge;
+    activeMode = newMode;
+    delete $("shell").dataset.modeReady; // test hook, set again below once the init function has resolved
 
-  // Sync dropdown
-  $("studio-application").value = newMode;
+    // Update header text
+    $("studio-heading").textContent = meta.title;
+    $("studio-subtitle").textContent = meta.subtitle;
+    $("studio-cube-count-badge").textContent = `${meta.count} CUBE${meta.count > 1 ? "S" : ""}`;
+    $("studio-mode-label").textContent = meta.badge;
 
-  if (pushHistory) {
-    const url = new URL(location.href);
-    url.searchParams.set("mode", newMode);
-    history.replaceState(null, "", url);
-    localStorage.setItem("cubistry_chronocube_mode", newMode);
-  }
+    // Sync dropdown
+    $("studio-application").value = newMode;
 
-  try {
-    if (newMode === "clock") activeCleanup = await initClockMode();
-    else if (newMode === "ms-timer") activeCleanup = await initMsTimerMode();
-    else if (newMode === "hm-clock") activeCleanup = await initHmClockMode();
-    else if (newMode === "tenth") activeCleanup = await initTenthMode();
-    else if (newMode === "counter") activeCleanup = await initCounterMode();
-    else if (newMode === "timer") activeCleanup = await initTimerMode(false);
-    else if (newMode === "five-second-timer") activeCleanup = await initTimerMode(true);
-    else if (newMode === "hsm-counter") activeCleanup = await initHsmSingleMode("hsm");
-    else if (newMode === "ms-counter") activeCleanup = await initHsmSingleMode("ms");
-    else if (newMode === "hm-one-cube") activeCleanup = await initHsmSingleMode("hm");
-    // Test hook (tests/browser/studio-modes-smoke.spec.mjs): the mode finished initializing without an exception.
-    if (activeMode === newMode) $("shell").dataset.modeReady = newMode;
-  } catch (err) {
-    console.error("Failed to initialize mode:", err);
-    $("studio-error").textContent = `Failed to load mode ${newMode}: ${err.message}`;
-  }
+    if (pushHistory) {
+      const url = new URL(location.href);
+      url.searchParams.set("mode", newMode);
+      history.replaceState(null, "", url);
+      localStorage.setItem("cubistry_chronocube_mode", newMode);
+    }
+  });
+  // Test hook (tests/browser/studio-modes-smoke.spec.mjs): the mode finished initializing without an exception.
+  if (ok && activeMode === newMode) $("shell").dataset.modeReady = newMode;
 }
 
 // Initialize on DOM ready
