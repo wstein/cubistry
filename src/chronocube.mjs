@@ -33,6 +33,7 @@ import {
   formatMsTimer,
 } from "./apps/timer/clock.ts";
 import {
+  StudioTimerDriver,
   createStudioTimerController,
   studioTimerDefaultBucket,
   studioTimerProfile,
@@ -1043,15 +1044,20 @@ async function initTimerMode(fiveSecond, isCurrent) {
     $("timer-status-info").textContent = clock.running ? "Counting down…" : "Paused";
   }
 
+  const driver = new StudioTimerDriver({
+    clock,
+    controller,
+    setDuration: (ms) => viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / ms),
+  });
+
   $("timer-toggle-btn").addEventListener("click", () => {
-    if (clock.running) clock.pause();
-    else clock.start();
+    if (clock.running) driver.pause();
+    else driver.start();
     update();
   });
 
   $("timer-reset-btn").addEventListener("click", () => {
-    clock.reset();
-    controller.request(defaultSec);
+    driver.reset();
     update();
   });
 

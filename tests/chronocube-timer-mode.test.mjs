@@ -40,3 +40,41 @@ for (const [five, start, readout] of [
     assert.equal(studioTimerReadout(bucket, profile), readout);
   });
 }
+
+// Fake clock time so the countdown advances without waiting.
+const drive = async (five) => {
+  const { WorkshopClock } = await import("../src/apps/timer/clock.ts");
+  const { StudioTimerDriver } = await import("../src/apps/chronocube/timer-mode.ts");
+  const profile = studioTimerProfile(five);
+  let t = 1000;
+  const clock = new WorkshopClock(() => t, profile);
+  const controller = createStudioTimerController(view, routes[five], manifest(), () => {}, resolveAssets);
+  await controller.configure(studioTimerDefaultBucket(profile));
+  const durations = [];
+  const driver = new StudioTimerDriver({ clock, controller, setDuration: (d) => durations.push(d) });
+  const settle = async () => {
+    for (let i = 0; controller.busy && i < 5000; i++) await new Promise((r) => setImmediate(r));
+  };
+  // Advances the fake clock in 50 ms ticks, as the mode's interval does.
+  const advance = async (ms) => {
+    for (let spent = 0; spent < ms; spent += 50) {
+      t += 50;
+      driver.tick();
+      await settle();
+    }
+  };
+  return { clock, controller, driver, advance, settle, profile };
+};
+
+for (const five of [false, true]) {
+  test(`studio ${five ? "five-second-timer" : "timer"}: Reset returns the cube to the start bucket`, async () => {
+    const { clock, controller, driver, settle, profile } = await drive(five);
+    const start = studioTimerDefaultBucket(profile);
+    controller.request(start - 3);
+    await settle();
+    driver.reset();
+    await settle();
+    assert.equal(controller.currentValue, start);
+    assert.equal(clock.snapshot().bucket, start);
+  });
+}
