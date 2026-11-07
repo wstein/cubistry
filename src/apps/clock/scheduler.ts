@@ -64,7 +64,9 @@ export class LiveClockScheduler {
     units: readonly ClockUnit[],
   ): { values: ClockValues; motion: ClockMotion[] } {
     demand(
-      Number.isFinite(epoch) && Number.isFinite(mono) && units.length === 3,
+      Number.isFinite(epoch) &&
+        Number.isFinite(mono) &&
+        (units.length === 2 || units.length === 3),
       "Invalid live clock snapshot",
     );
     const jump =
