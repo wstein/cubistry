@@ -92,3 +92,15 @@ test("studio hours cube counts 00-23: the range is applied before configure", as
   await settle(c);
   assert.equal(c.currentValue, 0);
 });
+
+test("studio ms-timer and tenth cubes construct and configure with the studio inputs", async () => {
+  const { MsTimerCube } = await import("../src/apps/ms-timer/cube.ts");
+  const { MsTimerTenthCube } = await import("../src/apps/ms-timer/tenth.ts");
+  const design = await loadMsDesign("/", msPin.runtimeSHA256);
+  const cube = new MsTimerCube(view, design.print, manifest(), "S", () => {}, resolveAssets);
+  await cube.configure(3);
+  assert.equal(cube.currentValue, 3);
+  const tenth = new MsTimerTenthCube(view, manifest(), () => {}, resolveAssets);
+  await tenth.configure(0);
+  assert.equal(tenth.currentValue, 0);
+});
