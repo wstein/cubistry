@@ -12,7 +12,7 @@
  * at a strict N. Everything else is a WARNING or INFORMATION.
  * INFORMATION (never a failure; the owner accepts equal-looking stickers and orientations, the cube then counts as
  * visually solved): per N the symmetry class of every sticker (none, 2-fold, 4-fold), groups of identical stickers,
- * groups of rotation twins, and for odd N which center stickers need no orientation. The classification is
+ * groups of rotation twins, and for odd N which center stickers need no orientation within their period (D10: 4-fold any turn, 2-fold modulo a half turn). The classification is
  * packages/cube-appearance (loose level), reached through src/symmetry.mjs and is written to the json (key perN.<N>.classification).
  *
  * Options: --strict-n 2,3  --min-detail 0.08  --tol 0.03 (--sym-tol and --dup-tol are aliases)  --seam-mean 3  --seam-segment 9
@@ -238,7 +238,7 @@ try {
     else (strict ? fail : warn)(`${line}${strict ? "" : "  [warning: flat stickers at N >= 3: strictness is an owner decision]"}`);
     const show = (label, list) => list.length && console.log(`       ${label}: ${list.slice(0, 8).map((x) => (Array.isArray(x) ? `{${x.slice(0, 6).join(",")}${x.length > 6 ? ",..." : ""}}` : x)).join(" ")}${list.length > 8 ? ` ... (+${list.length - 8})` : ""}`);
     show("lack detail", c.lackDetail); show("identical (info)", c.identicalGroups); show("rotation twins (info)", c.rotationTwinGroups);
-    if (c.centers.length) console.log(`       centers: ${c.centers.map((x) => `${x.face} ${x.symmetry}${x.orientationNeeded ? "" : " (no orientation needed)"}`).join(", ")}`);
+    if (c.centers.length) console.log(`       centers: ${c.centers.map((x) => `${x.face} ${x.symmetry}${x.orientationNeeded ? "" : ` (${x.period === 1 ? "any turn solves it" : "solved modulo a half turn"})`}`).join(", ")}`);
   }
   await browser.close();
   browser = null;

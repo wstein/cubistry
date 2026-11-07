@@ -42,11 +42,11 @@ test("identical and rotation-twin groups are found by distance, not by exact pix
   assert.equal(d.counts.rotationTwinGroups, 0);
 });
 
-test("odd N reports center stickers; symmetric centers need no orientation; even N reports none", () => {
+test("odd N reports center stickers; symmetric centers need no orientation within their period; even N reports none", () => {
   const tiles = ["U", "L", "F", "R", "B", "D"].map((f, i) => ({ id: `${f}_1_1`, px: [disc, bar, corner, disc, corner, bar][i] }));
   const c = classifyTiles(tiles, { n: 3, probe: n });
   assert.deepEqual(c.centers.map((x) => [x.face, x.symmetry, x.orientationNeeded]), [["U", "4-fold", false], ["L", "2-fold", false], ["F", "none", true], ["R", "4-fold", false], ["B", "none", true], ["D", "2-fold", false]]);
-  assert.match(summarize(c), /centers: 4 of 6 need no orientation/);
+  assert.match(summarize(c), /centers: 4 of 6 need no orientation within their period/);
   assert.deepEqual(classifyTiles([{ id: "F_1_1", px: disc }], { n: 4, probe: n }).centers, []);
 });
 
