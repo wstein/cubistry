@@ -1,6 +1,8 @@
 # US English for documentation and source identifiers.
 [default]
 locale = "en-us"
+# The German sentence of the quoted owner confirmation in the unified-application plan; a free "passt" is still reported.
+extend-ignore-re = ["Stufe 3 passt"]
 
 [files]
 extend-exclude = [
