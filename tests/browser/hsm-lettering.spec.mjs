@@ -120,11 +120,20 @@ test("word print replaces large unit symbols and keeps the counter value", async
 test("the shared live clock offers bottom-only words and retains preferred speeds", async ({
   page,
 }) => {
+  // Changing the lettering reloads the page, and the select stays disabled
+  // until the module graph, the assets and three viewers have initialized.
+  // In CI run 42363500526 (trace of the failed test) the reload's document
+  // arrived at once, but the first module request followed 4.6 s later (the
+  // main thread was busy under SwiftShader), so the 5 s default wait ended
+  // while the select still showed its markup state. The wait is 30 s, the CI
+  // bound used for page loads in playground-upload.spec.mjs, inside a 60 s test.
+  test.setTimeout(60000);
+  const RELOAD_MS = 30000;
   await page.addInitScript(() => {
     Date.now = () => Date.parse("2026-10-28T11:34:56Z");
   });
   await page.goto("/clock.html?lettering=words&nerd=1");
-  await expect(page.locator("#clock-lettering")).toBeEnabled();
+  await expect(page.locator("#clock-lettering")).toBeEnabled({ timeout: RELOAD_MS });
   await expect(page.locator("canvas")).toHaveCount(1);
   expect(
     await page.evaluate(async () => {
@@ -146,7 +155,7 @@ test("the shared live clock offers bottom-only words and retains preferred speed
     fullPage: true,
   });
   await page.selectOption("#clock-lettering", "symbols");
-  await expect(page.locator("#clock-lettering")).toBeEnabled();
+  await expect(page.locator("#clock-lettering")).toBeEnabled({ timeout: RELOAD_MS });
   await expect(page.locator("#hours-speed")).toHaveValue("250");
   await expect(page.locator("#minutes-speed")).toHaveValue("250");
   await expect(page.locator("#seconds-speed")).toHaveValue("100");
