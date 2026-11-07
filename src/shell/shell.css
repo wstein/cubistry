@@ -267,6 +267,191 @@ body.chronocube-page:has(#shell) {
   color: var(--on-accent);
 }
 
+/* ---------- dock content filled through the ModeShell API (src/apps/shell/slot-api.ts) ----------
+   Status chip, primary action, the five labeled slots, readout bar and Nerd drawer. Tokens only, so light and dark
+   follow tokens.css. Empty regions carry `hidden` (src/style.css) and take no room. */
+.shell .shell-controls:empty {
+  display: none;
+}
+.shell .shell-chip {
+  --c: var(--s-ready);
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  max-width: 100%;
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid color-mix(in srgb, var(--c) 38%, transparent);
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--c) 12%, var(--surface));
+  color: var(--c);
+  font: 500 var(--t-sm) / 1.2 var(--f-ui);
+  overflow-wrap: anywhere;
+}
+.shell .shell-chip[data-state="ready"] { --c: var(--s-ready); }
+.shell .shell-chip[data-state="moving"] { --c: var(--s-moving); }
+.shell .shell-chip[data-state="sync"] { --c: var(--s-sync); }
+.shell .shell-chip[data-state="paused"] { --c: var(--s-paused); }
+.shell .shell-chip[data-state="done"] { --c: var(--s-done); }
+.shell .shell-chip[data-state="warn"] { --c: var(--s-warn); }
+.shell .shell-chip[data-state="error"] { --c: var(--s-error); }
+
+.shell .shell-primary-btn {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 600 var(--t-md) var(--f-ui);
+  cursor: pointer;
+}
+.shell .shell-primary-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.shell .shell-slot-label {
+  margin: 0 0 var(--sp-2);
+  color: var(--ink-2);
+  font: 500 var(--t-cap) / 1 var(--f-num);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.shell .shell-slot-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+/* Building blocks for slot content, so modes need no colors of their own. */
+.shell .shell-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+.shell .shell-field label {
+  color: var(--ink);
+  font: 500 var(--t-sm) var(--f-ui);
+}
+.shell .shell-slot-body :is(select, input) {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  background: var(--bg);
+  color: var(--ink);
+  font: var(--t-sm) var(--f-ui);
+}
+.shell .shell-slot-body button {
+  min-height: 40px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 var(--t-sm) var(--f-ui);
+  cursor: pointer;
+}
+.shell .shell-slot-body button:hover {
+  background: var(--surface-2);
+}
+.shell .shell-btn-row {
+  display: flex;
+  gap: var(--sp-2);
+}
+.shell .shell-btn-row > * {
+  flex: 1 1 0;
+}
+.shell .shell-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+.shell .shell-quick-grid button {
+  font-family: var(--f-num);
+}
+
+.shell .shell-readout:not([hidden]) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-5);
+  justify-content: center;
+}
+.shell .shell-readout-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.shell .shell-readout-role {
+  color: var(--ink-2);
+  font: 500 var(--t-cap) / 1.2 var(--f-num);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.shell .shell-readout-value {
+  color: var(--ink);
+  font: 500 var(--t-xl) / 1.1 var(--f-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.shell .shell-nerd {
+  max-height: 34vh;
+  overflow: auto;
+}
+.shell .shell-nerd-title {
+  margin: 0 0 var(--sp-2);
+  color: var(--ink-2);
+  font: 500 var(--t-cap) / 1 var(--f-num);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.shell .shell-nerd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.shell .shell-nerd-table :is(th, td) {
+  padding: 3px var(--sp-2);
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  white-space: nowrap;
+}
+.shell .shell-nerd-table :is(th, td):first-child {
+  padding-left: 0;
+  text-align: left;
+}
+.shell .shell-nerd-table th {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.shell .shell-nerd-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
+  margin: var(--sp-2) 0 0;
+  color: var(--ink-2);
+}
+.shell .shell-nerd-facts dt,
+.shell .shell-nerd-facts dd {
+  display: inline;
+  margin: 0;
+}
+.shell .shell-nerd-facts dd {
+  color: var(--ink);
+  font-weight: 600;
+}
+.shell .shell-nerd-toggle[aria-pressed="true"] {
+  background: var(--surface-2);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+body.presentation-mode .shell .shell-nerd-toggle {
+  display: none;
+}
+
 /* Legacy session-move table and reset button carry light-theme colors; the dock follows the tokens. */
 .shell .shell-controls .clock-move-table,
 .shell .shell-controls .clock-move-table caption {
