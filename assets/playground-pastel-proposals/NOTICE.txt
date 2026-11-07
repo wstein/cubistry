@@ -1,0 +1,7 @@
+Pastel Garden draft proposals (unused)
+Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+These draft SVGs are part of the Pastel Garden artwork, see public/playground-pastel/NOTICE.txt.
+They are art data, not AGPL program code. Generator: scripts/build-pastel-garden-art.mjs

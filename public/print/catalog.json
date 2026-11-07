@@ -12,14 +12,14 @@
       "pages": 1,
       "directory": "de-a-15mm-2sets/",
       "files": {
-        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "ARTWORK-LICENSE.txt": "927cabcf8bd518e043b8b062f72dae914e367b776b13e08b8eed467378a9e14e",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
-        "README.txt": "c4f9a823821616a8c881b5d32e0a3b0481ce05ae58ba0a5c7c59a6777cdc5bad",
+        "README.txt": "f3951e160aba7c945d4830bc2750c06754f2e18f4a331db1a1b2135fc049bfb6",
         "artwork-1.svg": "c6ba7e266fad9838351c92ceb08183c4ec4ce8bb47874e797fe7ff09afd2bc69",
         "assembly.pdf": "50502c9fb7f92fc6b549bd288d2cfa95a4c4609e40444c6e3cbd893aa3617775",
-        "bundle.zip": "0c82a3901dc4a1b8a55feb452984d558dfaba3bd7755d0f5c46c6bfd640bd1ea",
+        "bundle.zip": "5abd74db062d415b1b05b3354cc0dcf09796d465b2615686b9ba2903dd9f39bb",
         "cuts-1.svg": "78b4606a42612b92ef22ccd1713b7c132784f8b08ec25d359072c8840f970149",
-        "manifest.json": "d53aeba41ff95cd1d82429b12abfea476f8ddf5fd334817702cc21d3b2a21ba9",
+        "manifest.json": "c1e8d149a9188cefd32debb136a124fd3e0e134f019a8791330bcffb810cc55f",
         "print.pdf": "be2dade91c55d0e4704719da8684a1bde35e8812598b6106d0296bd55e8cb3f2"
       }
     },
@@ -32,14 +32,14 @@
       "pages": 1,
       "directory": "de-a-16mm-2sets/",
       "files": {
-        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "ARTWORK-LICENSE.txt": "927cabcf8bd518e043b8b062f72dae914e367b776b13e08b8eed467378a9e14e",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
-        "README.txt": "5de43b1e07ca02cd4b3918330d4743f8ff48a5c769dc353da57edfc1efaab196",
+        "README.txt": "3d7e988a706d3444ac2b4a491c5ed90bb077b2171de1b00c447d1a5a47338b4d",
         "artwork-1.svg": "7d3f40c4f6d1b97a74e2b3f7e5537d9d1ea509d6b77bcdb88ea3906761e21820",
         "assembly.pdf": "ef4bb35d2dced4b5e1f0c156b12db8c912b913273fb453be3bc88c79e80e9d6a",
-        "bundle.zip": "bb3a8542c67351fda2a71431c18fe8de7d5d5a5949e0aff6b00825f0bd755398",
+        "bundle.zip": "a920e450aed064a994cc814bc26a36ffe2286b49c4b3d61e7670f1237b88f2f9",
         "cuts-1.svg": "bd6e5ad784bf465212b3257dac4ada28e632a0e348e344bf88c0c8e86b838e2e",
-        "manifest.json": "999513e9ee46e3b282b3ee8e40e7872a7cb958c273248ebce7b212b698859336",
+        "manifest.json": "8569ed755561aa86885420ac325d7a61ef1f75b46a1edb6b6766aefd41d855b5",
         "print.pdf": "fab84a9733b90f0e02d60af5365873d91cdb27436142ed50d66861f9b0430824"
       }
     },
@@ -52,14 +52,14 @@
       "pages": 1,
       "directory": "en-3-15mm-2sets/",
       "files": {
-        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "ARTWORK-LICENSE.txt": "927cabcf8bd518e043b8b062f72dae914e367b776b13e08b8eed467378a9e14e",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
-        "README.txt": "1d92457f73fcf02569f233df01ccc84c54ffb6a906e2947bf4dcf5e1f0b425e2",
+        "README.txt": "5886745c18fcc695360e18fce752cf12be67f13cba2f58721d019c9ede0a51cc",
         "artwork-1.svg": "4e09579a168b7dc7e1970650701352b95062f201ec9776893787ba9fc6c48edf",
         "assembly.pdf": "6c62afa8877d91c734fe57c61aa5c1931a10977a515b6465f5b9ee77b5f086a7",
-        "bundle.zip": "bcec638e649bae2d5b29c1037d92ff59791505293c12699e035e504848b817ed",
+        "bundle.zip": "5601adfc37ac0b973658937b6a2ca82ef507b69cfd0e0de824d9883b2780ea84",
         "cuts-1.svg": "78b4606a42612b92ef22ccd1713b7c132784f8b08ec25d359072c8840f970149",
-        "manifest.json": "1f98a3e35ae786c9d8438dde61e7c93dc5740a66c563676afa31f454b8d6a296",
+        "manifest.json": "d740eec3bf01b2892d234dad7748277c0fdb2c530bfd084a38b7f303994d4bfa",
         "print.pdf": "e6b847667a3a306fa290eb3018e7a51a61f8fc969cd7ae93e20eaaf2d45ff4f1"
       }
     },
@@ -72,14 +72,14 @@
       "pages": 1,
       "directory": "en-3-16mm-2sets/",
       "files": {
-        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "ARTWORK-LICENSE.txt": "927cabcf8bd518e043b8b062f72dae914e367b776b13e08b8eed467378a9e14e",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
-        "README.txt": "c7c9121507ad28c4d00fc8815830fc9bfc69f6c81abed4bde879f2bbf28534c8",
+        "README.txt": "25901ab44ab61d88a5fffadca87516bf7a6373169979e7c111424d3c7cef0b1d",
         "artwork-1.svg": "336606e68bebfaabe4616d86569e5ce8ebca4a8b0028ae60cdc2464ed0f52e52",
         "assembly.pdf": "c2804fcabceaf5a14fcd66ebe3a7c6dd135e6303fef15af52d83ba79c0b55abc",
-        "bundle.zip": "57ba134b0ce0e4214cb2954232a5d1685bb1b9146dbf8debc4cc0a4943d44403",
+        "bundle.zip": "031423c89f0a9cc887099539568e5ea96d128cc670ced30e483a3304f12e8ab5",
         "cuts-1.svg": "bd6e5ad784bf465212b3257dac4ada28e632a0e348e344bf88c0c8e86b838e2e",
-        "manifest.json": "a516df30d07fb2f517970a0fb4f66b98c30f9dec196cc73295c8528aa00da78d",
+        "manifest.json": "be4c6d501ec02342f5dc43b9ad9ffbf04417cc17216628e7b66159d59dfa8bd6",
         "print.pdf": "0d71f38cd69c6302384a9279191fdabaf5ba99252059c81a0635ec35e743c73c"
       }
     },
@@ -92,13 +92,13 @@
       "pages": 1,
       "directory": "hsm-symbols-20mm-3sets/",
       "files": {
-        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
-        "README.txt": "dd5b40e34312ff434b95b21f8bb454c3ec2c74195649282682bd93cd19740563",
+        "ARTWORK-LICENSE.txt": "927cabcf8bd518e043b8b062f72dae914e367b776b13e08b8eed467378a9e14e",
+        "README.txt": "9509ab2795b63a07495c76b58faa99d5ba79441eb058936325c0a029a2571e99",
         "artwork-1.svg": "731cbe8a544ad0c4577584719fbae3fa1e120f6dba4e509f8c0da3b721a5d285",
         "assembly.pdf": "f5e66c6ec0e5587842c7e05da571c4fdc966918422935e8898e572f2462657c9",
-        "bundle.zip": "746edffc905ec82aa26c5cd962ae4f4d3a4b7a11c8e77966dec4ef1e6def9443",
+        "bundle.zip": "cc46a0fe2e671fe7a5767092f870f6257f970115f2656372d4c214c81d3dff17",
         "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
-        "manifest.json": "1586831c62983a8b363323d982346fa0b514f6f7c52858e5f61323157d45883c",
+        "manifest.json": "15585ad164015a84744b77da528a4bfe7731c879cf2682d69d9619f894e2aedd",
         "print.pdf": "770991b99fe406f37bbdf823c5cc7d12b2d0819466887ac49e0fa66d4585a6db"
       }
     },
@@ -111,15 +111,15 @@
       "pages": 1,
       "directory": "hsm-words-20mm-3sets/",
       "files": {
-        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "ARTWORK-LICENSE.txt": "927cabcf8bd518e043b8b062f72dae914e367b776b13e08b8eed467378a9e14e",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
-        "README.txt": "8f4241fc1233b83c789137f1e97329d860340c24f256cc8125975fb63b76dc6c",
+        "README.txt": "c2d767acadf338804a324abe50bcca2058009c93276a11b0cb06b89bb8dd6550",
         "WORD-ART-PROVENANCE.json": "91dbd93fce7ee55e06b0d543c9908a0d45d63aab5cb2ce7197624eaa39fc50bf",
         "artwork-1.svg": "1ff6f9460107221fee20ce2aeb07500114eb97aab105beb3b948db51fa3ceece",
         "assembly.pdf": "c380b782d17af65236018b110c98be96b143cd6635cf0376a58832e496674f25",
-        "bundle.zip": "6faaebc7b09a440632e004114a895518c1b7ee35f6d5eb2e177152499d8cb77a",
+        "bundle.zip": "d917c756917f7d8f4ec64e1afc7e4f90e5e487046f1cd9df835265d1fa244e64",
         "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
-        "manifest.json": "3dbba1bd76df188a11fc0fbf0526fe387ae8ddcb86777a5bc1753b63ad85f32f",
+        "manifest.json": "43b91981165ecb023842ace7c00b436d34fa34e8bc04d1756a112becf410d960",
         "print.pdf": "bbfe1d15b61a87aa1e2eaa2e1c623225e1157852df2219b621314529bd71e2d8"
       }
     },
@@ -132,15 +132,15 @@
       "pages": 1,
       "directory": "hsm-words-pascal-20mm-3sets/",
       "files": {
-        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "ARTWORK-LICENSE.txt": "927cabcf8bd518e043b8b062f72dae914e367b776b13e08b8eed467378a9e14e",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
-        "README.txt": "439ce2e831bda6342f13c350efad773221cec72872f3c749a4dd29e0d5e56161",
+        "README.txt": "cf0244a6f2eabad36dd1e248d95889dd2f982c4d820da5fe1f233d342b895c95",
         "WORD-ART-PROVENANCE.json": "eb12906f2487638ecfeb1d342b9513062d281e5062c4fefb95584e0f9a7832f3",
         "artwork-1.svg": "feb10fef0741e5404decacf2e52b3fe4cd147c0bef2dbc6eab54f9b43720b04f",
         "assembly.pdf": "71e01e7052262bfea0bcb71ac39b4bc3ad1c602471b9b0cfd6e063c3a785e3da",
-        "bundle.zip": "6b0a3a69d18b9e493a97daa25228c492c7426adca290eee86c8d18f4c13b0bef",
+        "bundle.zip": "544243c6ee8630be1bb6e0053249041d5adc903f6529b4541ca0d6c29b60f7a6",
         "cuts-1.svg": "8be8645893dde36e801c02fda7c343c10f0ecc140ff897ddfe39d448bc1c7c9e",
-        "manifest.json": "2a22dcf1fa11b57eb2cdc7b069bac8a807ee48f373dabc40703109cd59d0e551",
+        "manifest.json": "907eb09864e0bfe183669802f91613443d0cd60c60e6a9cfafe0fb67f4007d2a",
         "print.pdf": "c2422d37ee66ff887013e3b83499e275d7d34d612bd77f7a8c6218667ca4b916"
       }
     },
@@ -153,15 +153,15 @@
       "pages": 1,
       "directory": "ms-timer-tenth-20mm-3sets/",
       "files": {
-        "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "ARTWORK-LICENSE.txt": "927cabcf8bd518e043b8b062f72dae914e367b776b13e08b8eed467378a9e14e",
         "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
-        "README.txt": "00a960af708f55f1b6050b2ea8cdd06cdd01e79473421734b490ee548ffedad9",
+        "README.txt": "31ada39f4734f502863bb25e3670c307f38eb72b60b88a75da2bfd06a459d713",
         "WORD-ART-PROVENANCE.json": "91dbd93fce7ee55e06b0d543c9908a0d45d63aab5cb2ce7197624eaa39fc50bf",
         "artwork-1.svg": "8855ac042af464df85a853d31fd33594e8b6d6767b66c3960303b586502bf496",
         "assembly.pdf": "3f84e6b4e6ca0dd781dbe5d56403d53d043e0c3f8032ec0141dc44e8e2732497",
-        "bundle.zip": "64038d858e6f2d9b4cfd290dd7e45e83e0873538ba17a6682046bcd562815024",
+        "bundle.zip": "6656fe16e954ec82be3821503afcd5a633741016feb9f2d096e92bb783b95acf",
         "cuts-1.svg": "b6533900ddb47802485944b25cc2b726a59a8e8d26d51e9c4836c88f0074bf5a",
-        "manifest.json": "4c9c4f2bef12953bc20c92116764b8b32cc9956c2bccd614fa2f489edc138c41",
+        "manifest.json": "853d15d29d998d535f98945d40ee34de6b41398a250e652deec5787dc34beab2",
         "print.pdf": "f960746592c8b7dae7212695ef4befb527d06b0f00aade0fe3f589f71c32d914"
       }
     }

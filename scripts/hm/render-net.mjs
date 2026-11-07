@@ -3,6 +3,13 @@
 // artwork turned to its print-up vector. Pure vector output, no fonts, no
 // raster data and no external references; the glyphs are the unchanged H/S/M
 // symbol and counter digit SVGs, embedded verbatim.
+//
+// Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under
+// CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution:
+// Werner Stein, Cubistry.
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// This generator is the editable source of the net artwork: art data, not AGPL
+// program code.
 import { createHash } from "node:crypto";
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -92,6 +99,7 @@ export function renderNet(printing, read, { label, source }) {
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">` +
     `<title>H/M one-cube counter print ${label}: sticker net, solved source pose</title>` +
+    `<desc>Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry. SPDX-License-Identifier: CC-BY-SA-4.0</desc>` +
     `<rect width="${width}" height="${height}" fill="#ffffff"/>` +
     body.join("") +
     outlines.join("") +
@@ -102,7 +110,8 @@ export function renderNet(printing, read, { label, source }) {
     label,
     source,
     generator: "scripts/hm/render-net.mjs",
-    license: "AGPL-3.0-or-later (project artwork; no fonts, no raster data)",
+    license:
+      "CC-BY-SA-4.0 (Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry. Project artwork; no fonts, no raster data.)",
     layout:
       "Cross net of the solved source pose, outside view of each face: U above F; L, F, R, B in a row; D below F. Each face is a 2x2 grid; rotation is the clockwise turn of the glyph art so that its top points along the sticker's print-up vector.",
     faces: FACES.map(({ face, n, up, right }) => ({ face, n, up, right })),
