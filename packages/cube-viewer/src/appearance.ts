@@ -175,8 +175,16 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     panel,
     setDefaultColor(color: string) { defaultColor = color; refresh(); },
     dispose() {
+      // A superseded mode can dispose late, after a newer mode docked its own panel (which removed this one): then the
+      // dock and the header button belong to the newer panel and stay as they are.
+      const wasDocked = !!dock?.contains(panel);
       panel.remove();
-      if (dock) { if (!dock.children.length) dock.hidden = true; document.dispatchEvent?.(new CustomEvent("cube-appearance:state", { detail: { open: false, present: false } })); } else host.style.position = previousPosition;
+      if (dock) {
+        if (wasDocked) {
+          if (!dock.children.length) dock.hidden = true;
+          document.dispatchEvent?.(new CustomEvent("cube-appearance:state", { detail: { open: false, present: false } }));
+        }
+      } else host.style.position = previousPosition;
     },
   };
 }
