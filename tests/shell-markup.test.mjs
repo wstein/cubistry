@@ -31,3 +31,16 @@ test("the studio stylesheet loads tokens and shell layout after the legacy style
   assert(order.every(i => i >= 0));
   assert.deepEqual([...order].sort((a, b) => a - b), order);
 });
+
+test("the header subtitle wraps to two lines instead of ending in an ellipsis", () => {
+  const css = read("src/shell/shell.css"), rule = css.slice(css.indexOf(".shell .shell-title p {"), css.indexOf("}", css.indexOf(".shell .shell-title p {")));
+  assert(/-webkit-line-clamp:\s*2/.test(rule) && /white-space:\s*normal/.test(rule));
+  assert(!/white-space:\s*nowrap/.test(rule));
+});
+
+test("the dock region of the Appearance section is not shown in presentation mode, and pseudo-elements honor reduced motion", () => {
+  const css = read("src/shell/shell.css");
+  assert.match(css, /body\.presentation-mode \.shell \.shell-view-controls\s*\{\s*display:\s*none/);
+  const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
+  assert(reduced.includes("::after") && reduced.includes("::before"));
+});
