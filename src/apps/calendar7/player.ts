@@ -53,7 +53,7 @@ export class StateMismatchError extends Error {
 }
 
 export const BASE_MOVE_MS = 90;
-/** Nominal speeds: 90 ms per move at 1x; a frame is about 17 ms, so 8x is one frame per move. */
+/** Nominal speeds: 90 ms per move at 1x; a frame is about 17 ms, so 8x is one frame per move when the display keeps up. */
 export const SPEEDS = [0.5, 1, 2, 4, 8] as const;
 export const DEFAULT_SPEED = 2;
 

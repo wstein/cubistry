@@ -34,7 +34,7 @@ the next month.
   before it. A move turns the layer of its axis, or the whole cube for `rot`, by the exponent
   of the move; the engine's right-handed quarter turn is the right-handed rotation of the
   scene. The controls are **Play/Pause** (pauses after the move in flight), **Skip to end**,
-  **Speed** (0.5× to 8×, default 2×; nominal 90 ms per move at 1×, so 8× is about one frame per move) and **Reset view**. Previous or
+  **Speed** (0.5× to 8×, default 2×; nominal 90 ms per move at 1×, so 8× is about one frame per move when the display keeps up, otherwise it can equal 4×) and **Reset view**. Previous or
   Next during a step first brings the cube to the end of that step, then plays the new step.
   Under `prefers-reduced-motion: reduce` nothing animates: a step jumps to its end state and
   the page says so.
