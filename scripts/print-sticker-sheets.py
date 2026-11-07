@@ -419,7 +419,7 @@ def write_design(design, output, size, gap, bleed, radius, safe, artwork, copies
             at -= 3.2
     guide.showPage()
     guide.save()
-    shutil.copyfile(ROOT/'LICENSE', output/'ARTWORK-LICENSE.txt')
+    shutil.copyfile(ROOT/'scripts/print/ARTWORK-LICENSE.txt', output/'ARTWORK-LICENSE.txt')
     font = None
     extra_files = ['ARTWORK-LICENSE.txt']
     if design['size'] == 3 or design.get('lettering') in ('words', 'words-pascal'):
@@ -465,7 +465,7 @@ C1, C2, ... mark complete copies. Sticker IDs and face positions map every
 physical image back to the immutable application source. Setup words in the
 guide/manifest bring the completed source-pose print to readable examples.
 
-The original geometric/arranged artwork is distributed with ARTWORK-LICENSE.txt.
+The original geometric/arranged artwork is licensed under CC BY-SA 4.0, see ARTWORK-LICENSE.txt.
 Font-derived outlines, where used, additionally retain the included OFL.txt.
 No external font service or raster sticker image is required by these exports.
 '''
@@ -480,7 +480,7 @@ No external font service or raster sticker image is required by these exports.
                 'artInputs': dict(sorted(artwork.inputs.items())),
                 'generator': {'path': 'scripts/print-sticker-sheets.py', 'sha256': sha(Path(__file__)), 'artInputAdapter': sha(ROOT/'scripts/print/inputs.mjs'), 'tools': {n: importlib.metadata.version(n) for n in ['reportlab', 'fonttools', 'brotli']}},
                 'font': font,
-                'artworkLicense': {'spdx': 'AGPL-3.0-or-later', 'file': 'ARTWORK-LICENSE.txt'},
+                'artworkLicense': {'spdx': 'CC-BY-SA-4.0', 'file': 'ARTWORK-LICENSE.txt'},
                 'orientation': 'Outside view of each source face. Positive glyph rotation is clockwise on the sheet.',
                 'providerStatus': 'Generic vector export. Confirm size, tolerance, radius, bleed and spot-color requirements with the chosen printer; not a PDF/X certification.',
                 'stickers': records,

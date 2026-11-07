@@ -1,5 +1,11 @@
 // Generate the assembly net SVG of the 1/10-second cube print preset (ms-timer-tenth-20mm-3sets).
 //   node scripts/export-tenth-print.mjs
+// Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under
+// CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution:
+// Werner Stein, Cubistry.
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// This generator is the editable source of the net artwork: art data, not AGPL
+// program code.
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -82,6 +88,7 @@ export function buildTenthPrint() {
   const netSvg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${netWidth}" height="${netHeight}" viewBox="0 0 ${netWidth} ${netHeight}">` +
     `<title>1/10-Second Counter print, printed state (shows 0.0), outside view of each face</title>` +
+    `<desc>Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry. SPDX-License-Identifier: CC-BY-SA-4.0</desc>` +
     `<rect width="${netWidth}" height="${netHeight}" fill="#ffffff"/>` +
     `<g font-family="sans-serif" font-size="28" fill="#5b6560">${netLabels}</g>` +
     netCells.join("") +

@@ -44,7 +44,7 @@
   },
   "generator": {
     "path": "scripts/print-sticker-sheets.py",
-    "sha256": "bc209cbb3515e82d53c246498f1dd5a32cbc3d7ec699c81144e75861f55493f7",
+    "sha256": "1510ee653b32d462d74cc8d76b9c545e0cf67edf169730bfdb1bc8f74135466b",
     "artInputAdapter": "0d104d066b81b45c33374b268c3624f951f477eefa6122ad5e49705c1f876172",
     "tools": {
       "reportlab": "4.4.9",
@@ -64,7 +64,7 @@
     "licenseFile": "OFL.txt"
   },
   "artworkLicense": {
-    "spdx": "AGPL-3.0-or-later",
+    "spdx": "CC-BY-SA-4.0",
     "file": "ARTWORK-LICENSE.txt"
   },
   "orientation": "Outside view of each source face. Positive glyph rotation is clockwise on the sheet.",
@@ -5178,9 +5178,9 @@
   "files": {
     "print.pdf": "0d71f38cd69c6302384a9279191fdabaf5ba99252059c81a0635ec35e743c73c",
     "assembly.pdf": "c2804fcabceaf5a14fcd66ebe3a7c6dd135e6303fef15af52d83ba79c0b55abc",
-    "ARTWORK-LICENSE.txt": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+    "ARTWORK-LICENSE.txt": "927cabcf8bd518e043b8b062f72dae914e367b776b13e08b8eed467378a9e14e",
     "OFL.txt": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
-    "README.txt": "c7c9121507ad28c4d00fc8815830fc9bfc69f6c81abed4bde879f2bbf28534c8",
+    "README.txt": "25901ab44ab61d88a5fffadca87516bf7a6373169979e7c111424d3c7cef0b1d",
     "artwork-1.svg": "336606e68bebfaabe4616d86569e5ce8ebca4a8b0028ae60cdc2464ed0f52e52",
     "cuts-1.svg": "bd6e5ad784bf465212b3257dac4ada28e632a0e348e344bf88c0c8e86b838e2e"
   }

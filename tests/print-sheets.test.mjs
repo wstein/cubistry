@@ -209,7 +209,11 @@ test("print downloads are pinned, original geometric art and font-derived outlin
       assert.equal(sha(file), hash, file);
     assert.equal(sha(m.generator.path), m.generator.sha256);
     assert.equal(sha("scripts/print/inputs.mjs"), m.generator.artInputAdapter);
-    assert.equal(sha(dir + m.artworkLicense.file), sha("LICENSE"));
+    assert.equal(m.artworkLicense.spdx, "CC-BY-SA-4.0");
+    assert.equal(
+      sha(dir + m.artworkLicense.file),
+      sha("scripts/print/ARTWORK-LICENSE.txt"),
+    );
     if (entry.design === "hsm-symbols") assert.equal(m.font, null);
     else {
       assert.equal(m.font.family, "Noto Sans");
