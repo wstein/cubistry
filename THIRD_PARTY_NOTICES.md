@@ -159,6 +159,9 @@ The following third-party libraries and modules are bundled, linked, or distribu
 * **Copyright**: © 2026 Werner Stein; created with AI assistance (Claude, Anthropic). Attribution: Werner Stein, Cubistry.
 * **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); the committed art generator is art data under the same license.
 * **Regeneration**: Deterministically built using `node scripts/build-halloween-art.mjs`, then pinned with `node scripts/build-playground-theme.mjs halloween`.
+* **English 7x7 calendar data** (research candidate, not certified): `calendar7-source.json`, `data/calendar7/`, `public/calendar7/` and `scripts/calendar7/`. Byte copies of Cubistry research evidence (the print, the chain and its receipts), exports of the Cubistry research code, and files derived from them by `scripts/prepare-calendar7.mjs`. They contain sticker texts and ink names, poses, move words and hashes, no picture, font or other third-party artwork. No third-party code or data is included.
+* **License**: data files are part of the Cubistry source and follow the project license, AGPL-3.0-or-later; the Cubistry research code and evidence they come from carry the same copyright (© 2026 Werner Stein and Cubistry contributors). Any picture or sticker artwork made from these data later is separate artwork under CC BY-SA 4.0 with the notice above; no such artwork is part of this data.
+* **Provenance and regeneration**: pinned by research commit and SHA-256 in `calendar7-source.json`; verify with `node scripts/prepare-calendar7.mjs --check`; see `docs/CALENDAR_7X7.md`.
 * **Cubistry mark and favicon**: Original marks created with Claude Design for the owner; no third-party images or fonts (`public/brand/NOTICE.txt`).
 * **Copyright**: © 2026 Cubistry contributors.
 * **License**: license to be decided by the owner.
