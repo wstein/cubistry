@@ -71,8 +71,8 @@ test("production root remains present, indexable and interactive beside both pre
   await expect(
     page.getByText("non-production preview", { exact: false }),
   ).toHaveCount(0);
-  await expect(page).toHaveURL(/clock\.html$/);
-  await expect(page.locator("#clock-scene canvas")).toBeVisible();
+  await expect(page).not.toHaveURL(/clock\.html/);
+  await expect(page.locator("#landing")).toBeVisible();
   for (const number of [52, 53])
     expect(
       (await request.get(`pr-preview/pr-${number}/index.html`)).status(),

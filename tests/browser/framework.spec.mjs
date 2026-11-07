@@ -261,12 +261,6 @@ test("missing secure Web Crypto gives an actionable startup and asset diagnostic
   expect(diagnostic).toContain('Secure Web Crypto is unavailable');expect(diagnostic).toContain('localhost');expect(diagnostic).toContain('HTTPS');expect(errors).toEqual([]);
 });
 
-test("root URL redirects to clock.html", async ({ page }) => {
-  await page.goto("/");
-  await expect(page).toHaveURL(/clock\.html$/);
-  await expect(page.locator("#clock-scene canvas")).toBeVisible();
-});
-
 test("destroying a shared cube preserves the caller-owned canvas and other cube", async ({
   page,
 }) => {
