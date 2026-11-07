@@ -63,7 +63,7 @@ const drive = async (five) => {
       await settle();
     }
   };
-  return { clock, controller, driver, advance, settle, profile };
+  return { clock, controller, driver, advance, settle, profile, durations };
 };
 
 for (const five of [false, true]) {
@@ -103,3 +103,24 @@ for (const five of [false, true]) {
     assert.equal(controller.currentValue, start - 2);
   });
 }
+
+test("studio timer: Pause restores the preferred move duration, as src/main.mjs does", async () => {
+  const { driver, advance, settle, durations, profile } = await drive(false);
+  driver.start();
+  await advance(profile.stepSeconds * 1000 + 200);
+  durations.push(-1); // marker: everything after it comes from the Pause
+  driver.pause();
+  await settle();
+  const after = durations.slice(durations.indexOf(-1) + 1);
+  assert(after.length > 0);
+  assert.equal(after[0], 100);
+});
+
+test("studio timer: an error in the periodic tick goes to onError instead of escaping", async () => {
+  const { StudioTimerDriver } = await import("../src/apps/chronocube/timer-mode.ts");
+  const errors = [];
+  const clock = { snapshot() { throw new Error("tick failed"); } };
+  const driver = new StudioTimerDriver({ clock, controller: {}, setDuration() {}, onError: (e) => errors.push(e.message) });
+  assert.doesNotThrow(() => driver.tick());
+  assert.deepEqual(errors, ["tick failed"]);
+});
