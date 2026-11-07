@@ -80,11 +80,26 @@ export async function mountCalendar7(
   let wanted: number | null = null;
   let previous: PlayerSnapshot | null = null;
   const reduced = (): boolean => env.reducedMotion?.() ?? false;
+  /** After a failed check the 3D view stays stopped until the page is reloaded. */
+  let failed = false;
+  /** aria-disabled, not disabled: a button that becomes inactive at the end of a step keeps the keyboard focus. */
+  const setInactive = (el: HTMLElement | null, inactive: boolean): void => {
+    if (!el) return;
+    if (inactive) el.setAttribute("aria-disabled", "true");
+    else el.removeAttribute("aria-disabled");
+  };
 
   const fail = (error: Error): void => {
+    failed = true;
+    wanted = null;
+    player?.dispose();
+    player = null;
+    stage?.destroy();
+    stage = null;
+    root.setAttribute("data-c7-state", "failed");
     const box = q("error");
     if (box) {
-      box.textContent = `The 3D view stopped: ${error.message}. The month sheet above is not affected.`;
+      box.textContent = `The 3D view stopped: ${error.message}. The month sheet below is not affected. Reload the page to try again.`;
       box.hidden = false;
     }
     (q("player") as HTMLElement | null)?.removeAttribute("hidden");
@@ -95,6 +110,7 @@ export async function mountCalendar7(
   };
 
   const render = (snap: PlayerSnapshot): void => {
+    if (failed) return;
     const playing = snap.status === "playing";
     const active = snap.total > 0;
     const motionOff = reduced();
@@ -103,9 +119,9 @@ export async function mountCalendar7(
     const speed = q("speed") as HTMLSelectElement | null;
     if (play) {
       play.textContent = playing ? "Pause" : "Play";
-      play.disabled = !active || motionOff;
     }
-    if (skip) skip.disabled = !active || motionOff;
+    setInactive(play, !active || motionOff);
+    setInactive(skip, !active || motionOff);
     if (speed) {
       speed.value = String(snap.speed);
       speed.disabled = motionOff;
@@ -159,7 +175,7 @@ export async function mountCalendar7(
   };
 
   const syncStage = async (index: number | null): Promise<void> => {
-    if (!threeD) return;
+    if (!threeD || failed) return;
     wanted = index;
     if (index === null) {
       if (sceneHost) sceneHost.hidden = true;
@@ -211,7 +227,8 @@ export async function mountCalendar7(
 
   const onControl = (e: Event): void => {
     const el = (e.target as Element | null)?.closest?.("[data-c7]") as HTMLElement | null;
-    if (!el || !root.contains(el) || !player) return;
+    if (!el || !root.contains(el) || !player || failed) return;
+    if (el.getAttribute("aria-disabled") === "true") return;
     try {
       switch (el.getAttribute("data-c7")) {
         case "play":

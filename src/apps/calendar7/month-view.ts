@@ -224,7 +224,6 @@ const SPEED_LABELS: readonly [number, string][] = [
   [2, "2×"],
   [4, "4×"],
   [8, "8×"],
-  [16, "16×"],
 ];
 
 /** The controls of the 3D view. They live outside the re-rendered page so that a button keeps its focus while a step plays. */
@@ -235,8 +234,8 @@ export function playerHtml(defaultSpeed: number): string {
   return (
     '<section class="c7-player" data-c7="player" aria-label="Cube animation controls" hidden>' +
     '<div class="c7-controls">' +
-    '<button type="button" class="c7-btn" data-c7="play" disabled>Play</button>' +
-    '<button type="button" class="c7-btn" data-c7="skip" disabled>Skip to end</button>' +
+    '<button type="button" class="c7-btn" data-c7="play" aria-disabled="true">Play</button>' +
+    '<button type="button" class="c7-btn" data-c7="skip" aria-disabled="true">Skip to end</button>' +
     `<label class="c7-speed">Speed <select data-c7="speed">${options}</select></label>` +
     '<button type="button" class="c7-btn" data-c7="reset">Reset view</button>' +
     "</div>" +

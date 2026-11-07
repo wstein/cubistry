@@ -10,7 +10,7 @@ interface Active {
   readonly update: (progress: number) => void;
   readonly end: (completed: boolean) => void;
   readonly resolve: () => void;
-  start: number | null;
+  readonly start: number;
 }
 
 export class MoveTween {
@@ -22,12 +22,13 @@ export class MoveTween {
 
   /**
    * Starts a tween. `update` receives the eased progress 0..1 on every tick; `end(true)` runs once at the end of the
-   * time, `end(false)` if the tween is cancelled; the returned promise resolves after `end`.
+   * time, `end(false)` if the tween is cancelled; the returned promise resolves after `end`. The clock starts at
+   * `startAt` (the caller's frame-time base, milliseconds), so a move shorter than a frame ends on the next frame.
    */
-  begin(ms: number, update: (progress: number) => void, end: (completed: boolean) => void): Promise<void> {
+  begin(ms: number, update: (progress: number) => void, end: (completed: boolean) => void, startAt: number): Promise<void> {
     this.cancel();
     return new Promise<void>((resolve) => {
-      this.active = { ms: Math.max(1, ms), update, end, resolve, start: null };
+      this.active = { ms: Math.max(1, ms), update, end, resolve, start: startAt };
     });
   }
 
@@ -35,7 +36,6 @@ export class MoveTween {
   tick(now: number): boolean {
     const a = this.active;
     if (!a) return false;
-    a.start ??= now;
     const p = Math.min(1, Math.max(0, (now - a.start) / a.ms));
     a.update(smoothstep(p));
     if (p >= 1) this.finish(a, true);
