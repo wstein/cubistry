@@ -1,0 +1,99 @@
+import type { ModeMeta } from "./registry.ts";
+
+/**
+ * The modes that exist today, in studio order. The ids are the unified `app` keys: the legacy `application` key
+ * `certified` is `counter` and `tenth-counter` is `tenth`. Titles follow the design proposal
+ * (docs/design/README.md). Applications without a mode yet (calendar, playground, picture3, status) join in stage 4.
+ */
+export const MODE_CATALOG: readonly ModeMeta[] = [
+  {
+    id: "clock",
+    title: "Live H–M–S Clock",
+    subtitle: "One current time. Three physical cubes (Hours · Minutes · Seconds).",
+    cubes: 3,
+    badge: "H · M · S",
+    group: "apps",
+    help: "docs/LIVE_CLOCK.md",
+  },
+  {
+    id: "ms-timer",
+    title: "M/S Timer & Stopwatch",
+    subtitle: "Minutes, seconds, and tenth-second precision timer.",
+    cubes: 3,
+    badge: "Min · Sec · 1/10s",
+    group: "apps",
+    help: "docs/MS_TIMER.md",
+  },
+  {
+    id: "hm-clock",
+    title: "H–M Wall Clock",
+    subtitle: "Two physical cubes for hours and minutes.",
+    cubes: 2,
+    badge: "H · M",
+    group: "cubes",
+    help: "docs/APPLICATIONS.md",
+  },
+  {
+    id: "tenth",
+    title: "1/10-Second Counter",
+    subtitle: "Fast single-cube tenth-second counter (0–9).",
+    cubes: 1,
+    badge: "1/10 Sec (0–9)",
+    group: "cubes",
+    help: "docs/APPLICATIONS.md",
+  },
+  {
+    id: "counter",
+    title: "Counter 0–99",
+    subtitle: "Certified 2-digit twisty puzzle counter.",
+    cubes: 1,
+    badge: "0–99 Counter",
+    group: "cubes",
+    help: "docs/COUNTER_USAGE.md",
+  },
+  {
+    id: "timer",
+    title: "60-Minute Workshop Timer",
+    subtitle: "Physical countdown with real-time settlement.",
+    cubes: 1,
+    badge: "60-Min Timer",
+    group: "cubes",
+    help: "docs/WORKSHOP_TIMER.md",
+  },
+  {
+    id: "five-second-timer",
+    title: "5-Second Precision Timer",
+    subtitle: "5-second countdown with verified route.",
+    cubes: 1,
+    badge: "5-Sec Timer",
+    group: "cubes",
+    help: "docs/FIVE_SECOND_TIMER.md",
+  },
+  {
+    id: "hsm-counter",
+    title: "H/M/S Counter 00–59",
+    subtitle: "Single-cube 00–59 counter with H, M, S unit stickers.",
+    cubes: 1,
+    badge: "H/M/S (00–59)",
+    group: "cubes",
+    help: "docs/HSM_COUNTER.md",
+  },
+  {
+    id: "ms-counter",
+    title: "M/S Counter 00–59",
+    subtitle: "Single-cube 00–59 counter with min / sec stickers.",
+    cubes: 1,
+    badge: "M/S (00–59)",
+    group: "cubes",
+    help: "docs/MS_COUNTER.md",
+  },
+  {
+    id: "hm-one-cube",
+    title: "H/M One-Cube Counter",
+    subtitle: "Single physical cube with hours and minutes.",
+    cubes: 1,
+    badge: "H/M One-Cube",
+    group: "cubes",
+    help: "docs/HM_ONE_CUBE_COUNTER.md",
+  },
+];

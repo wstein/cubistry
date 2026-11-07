@@ -80,3 +80,10 @@ test("createRegistry rejects entries that break the mode contract", () => {
   assert.throws(() => createRegistry([{ ...ok, id: "a.html" }]), /id/);
 });
 
+
+test("the studio select lists exactly the catalog ids, in catalog order", async () => {
+  const { readFileSync } = await import("node:fs");
+  const html = readFileSync(resolve("chronocube.html"), "utf8");
+  const ids = [...html.matchAll(/<option value="([^"]+)"/g)].map((m) => m[1]).filter((v) => !v.endsWith(".html"));
+  assert.deepEqual(ids, MODE_CATALOG.map((m) => m.id));
+});
