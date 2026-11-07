@@ -22,7 +22,7 @@ import {
   DEFAULT_TENTH_STEP_INTERVAL,
   tenthTurnSpeedForInterval,
 } from "./apps/ms-timer/tenth.ts";
-import { createModeSwitcher } from "./apps/chronocube/mode-switch.ts";
+import { createModeSwitcher, whenCurrent } from "./apps/chronocube/mode-switch.ts";
 import { PairController } from "./apps/pair/controller.ts";
 import { MsTimerCube } from "./apps/ms-timer/cube.ts";
 import { MsTimer } from "./apps/ms-timer/timer.ts";
@@ -310,7 +310,7 @@ window.addEventListener("keydown", (e) => {
 // -------------------------------------------------------------
 // Mode 1: Live H-M-S Clock (3 cubes)
 // -------------------------------------------------------------
-async function initClockMode() {
+async function initClockMode(isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "3");
   cardsContainer.innerHTML = `
@@ -392,12 +392,14 @@ async function initClockMode() {
 
   const stage = new ClockStage($("studio-scene"), 3);
   activeStage = stage;
+  const abandon = () => (stage.destroy(), null);
 
   const names = ["hours", "minutes", "seconds"];
   const initial = [new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()];
   const speeds = { hours: 500, minutes: 250, seconds: 100 };
 
   const sourceDesign = await loadHsmDesign(base, hsmPin.runtimeSHA256);
+  if (!isCurrent()) return abandon();
   const statistics = new ClockMoveStatistics(names.length);
   const scheduler = new LiveClockScheduler();
   let shownStatistics = -1;
@@ -435,6 +437,7 @@ async function initClockMode() {
       manifest,
       ["H", "M", "S"][i],
       (value, busy, error, progress) => {
+        if (!isCurrent()) return;
         if (progress) statistics.observe(i, progress);
         if (error) $("studio-error").textContent = error.message;
       },
@@ -442,13 +445,14 @@ async function initClockMode() {
       i === 0 ? 23 : 59,
     );
     await controller.configure(initial[i]);
+    if (!isCurrent()) return abandon();
     controllers.push(controller);
     units.push({ controller, duration, setDuration });
   }
 
-  setupAppearancePanel(stage.appearancePanel, async (nextManifest) => {
+  setupAppearancePanel(stage.appearancePanel, whenCurrent(isCurrent, async (nextManifest) => {
     await Promise.all(controllers.map((c) => c.updateManifest(nextManifest)));
-  });
+  }));
 
   $("clock-lettering").addEventListener("change", async () => {
     currentLettering = $("clock-lettering").value;
@@ -502,7 +506,7 @@ async function initClockMode() {
 // -------------------------------------------------------------
 // Mode 2: M/S Timer & Stopwatch (3 cubes)
 // -------------------------------------------------------------
-async function initMsTimerMode() {
+async function initMsTimerMode(isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "3");
   cardsContainer.innerHTML = `
@@ -554,8 +558,10 @@ async function initMsTimerMode() {
 
   const stage = new ClockStage($("studio-scene"), 3);
   activeStage = stage;
+  const abandon = () => (stage.destroy(), null);
 
   const design = await loadMsDesign(base, msPin.runtimeSHA256);
+  if (!isCurrent()) return abandon();
   let manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, "words-pascal");
 
   const viewers = {
@@ -596,13 +602,13 @@ async function initMsTimerMode() {
     refresh: () => tick(),
   });
 
-  setupAppearancePanel(stage.appearancePanel, async (nextManifest) => {
+  setupAppearancePanel(stage.appearancePanel, whenCurrent(isCurrent, async (nextManifest) => {
     await Promise.all([
       majorUnit?.updateManifest(nextManifest),
       minorUnit?.updateManifest(nextManifest),
       tenth?.updateManifest(nextManifest),
     ]);
-  });
+  }));
 
   function tick() {
     timer.tick();
@@ -610,7 +616,7 @@ async function initMsTimerMode() {
   }
 
   function ui() {
-    if (!timer) return;
+    if (!timer || !isCurrent()) return;
     const idle = !timer.running && !timer.busy;
     $("timer-logical").textContent = timer.text;
     $("ms-minutes-state").textContent = `${String(pair.major.currentValue).padStart(2, "0")}${pair.major.busy ? " · Moving" : ""}`;
@@ -658,6 +664,7 @@ async function initMsTimerMode() {
   });
 
   await Promise.all([pair.configure(ONE_SECOND_TIMER.defaultSeconds), tenth.configure(0)]);
+  if (!isCurrent()) return abandon();
   setDurationOf("minor")(100);
   setDurationOf("major")(250);
   setDurationOf("tenth")(50);
@@ -674,7 +681,7 @@ async function initMsTimerMode() {
 // -------------------------------------------------------------
 // Mode 3: H-M Wall Clock (2 cubes)
 // -------------------------------------------------------------
-async function initHmClockMode() {
+async function initHmClockMode(isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "2");
   cardsContainer.innerHTML = `
@@ -707,12 +714,14 @@ async function initHmClockMode() {
 
   const stage = new ClockStage($("studio-scene"), 2);
   activeStage = stage;
+  const abandon = () => (stage.destroy(), null);
 
   const names = ["hours", "minutes"];
   const initial = [new Date().getHours(), new Date().getMinutes()];
   const speeds = { hours: 500, minutes: 250 };
 
   const sourceDesign = await loadHsmDesign(base, hsmPin.runtimeSHA256);
+  if (!isCurrent()) return abandon();
   const scheduler = new LiveClockScheduler();
 
   const controllers = [];
@@ -731,19 +740,21 @@ async function initHmClockMode() {
       manifest,
       ["H", "M"][i],
       (value, busy, error) => {
+        if (!isCurrent()) return;
         if (error) $("studio-error").textContent = error.message;
       },
       resolveAssets,
       i === 0 ? 23 : 59,
     );
     await controller.configure(initial[i]);
+    if (!isCurrent()) return abandon();
     controllers.push(controller);
     units.push({ controller, duration, setDuration });
   }
 
-  setupAppearancePanel(stage.appearancePanel, async (nextManifest) => {
+  setupAppearancePanel(stage.appearancePanel, whenCurrent(isCurrent, async (nextManifest) => {
     await Promise.all(controllers.map((c) => c.updateManifest(nextManifest)));
-  });
+  }));
 
   $("clock-lettering").addEventListener("change", async () => {
     currentLettering = $("clock-lettering").value;
@@ -786,7 +797,7 @@ async function initHmClockMode() {
 // -------------------------------------------------------------
 // Mode 4: 1/10-Second Precision Counter (1 cube)
 // -------------------------------------------------------------
-async function initTenthMode() {
+async function initTenthMode(isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = `
@@ -828,6 +839,7 @@ async function initTenthMode() {
 
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
+  const abandon = () => (viewer.destroy(), null);
 
   let manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, "words-pascal");
   let stepInterval = 100;
@@ -843,6 +855,7 @@ async function initTenthMode() {
     viewer,
     manifest,
     (v, progress, err) => {
+      if (!isCurrent()) return;
       $("tenth-value-display").textContent = `.${v}`;
       $("tenth-state").textContent = progress ? "Moving…" : "Ready";
       if (err) console.error(err);
@@ -850,11 +863,12 @@ async function initTenthMode() {
     resolveAssets,
   );
 
-  setupAppearancePanel($("studio-scene"), async (nextManifest) => {
+  setupAppearancePanel($("studio-scene"), whenCurrent(isCurrent, async (nextManifest) => {
     await tenth.updateManifest(nextManifest);
-  });
+  }));
 
   await tenth.configure(0);
+  if (!isCurrent()) return abandon();
 
   $("studio-controls").querySelectorAll(".tenth-quick-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -886,7 +900,7 @@ async function initTenthMode() {
 // -------------------------------------------------------------
 // Mode 5: Certified Counter 0–99 (1 cube)
 // -------------------------------------------------------------
-async function initCounterMode() {
+async function initCounterMode(isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = `
@@ -917,6 +931,7 @@ async function initCounterMode() {
 
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
+  const abandon = () => (viewer.destroy(), null);
   viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 100);
 
   const manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont);
@@ -926,15 +941,17 @@ async function initCounterMode() {
     view: viewer,
     manifest,
     onState: (v, busy) => {
+      if (!isCurrent()) return;
       $("counter-value-display").textContent = String(v).padStart(2, "0");
       $("counter-state").textContent = busy ? "Turning…" : "Ready";
     },
     resolveAssets,
   });
+  if (!isCurrent()) return abandon();
 
-  setupAppearancePanel($("studio-scene"), async (nextManifest) => {
+  setupAppearancePanel($("studio-scene"), whenCurrent(isCurrent, async (nextManifest) => {
     await controller.updateManifest(nextManifest);
-  });
+  }));
 
   const step = (delta) => {
     const cur = controller.currentValue;
@@ -967,7 +984,7 @@ async function initCounterMode() {
 // -------------------------------------------------------------
 // Mode 6: 60-Minute Workshop Timer / 5-Second Timer (1 cube)
 // -------------------------------------------------------------
-async function initTimerMode(fiveSecond = false) {
+async function initTimerMode(fiveSecond, isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = `
@@ -990,9 +1007,11 @@ async function initTimerMode(fiveSecond = false) {
 
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
+  const abandon = () => (viewer.destroy(), null);
   viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 100);
 
   const route = fiveSecond ? await loadFiveSecondRoute(base) : await loadTimerRoute(base);
+  if (!isCurrent()) return abandon();
   const spec = studioTimerProfile(fiveSecond);
   const clock = new WorkshopClock(undefined, spec);
 
@@ -1002,18 +1021,20 @@ async function initTimerMode(fiveSecond = false) {
     route,
     manifest,
     (v, busy) => {
+      if (!isCurrent()) return;
       $("timer-state").textContent = busy ? "Moving…" : "Ready";
     },
     resolveAssets,
   );
 
-  setupAppearancePanel($("studio-scene"), async (nextManifest) => {
+  setupAppearancePanel($("studio-scene"), whenCurrent(isCurrent, async (nextManifest) => {
     await controller.updateManifest(nextManifest);
-  });
+  }));
 
   // Controller values are step buckets, not seconds.
   const defaultSec = studioTimerDefaultBucket(spec);
   await controller.configure(defaultSec);
+  if (!isCurrent()) return abandon();
 
   function update() {
     const snap = clock.snapshot();
@@ -1046,7 +1067,7 @@ async function initTimerMode(fiveSecond = false) {
 // -------------------------------------------------------------
 // Mode 7: Single-Cube HSM / MS / HM Counter (1 cube)
 // -------------------------------------------------------------
-async function initHsmSingleMode(variant = "hsm") {
+async function initHsmSingleMode(variant, isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = `
@@ -1087,6 +1108,7 @@ async function initHsmSingleMode(variant = "hsm") {
 
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
+  const abandon = () => (viewer.destroy(), null);
   viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 100);
 
   const design = variant === "ms"
@@ -1094,6 +1116,7 @@ async function initHsmSingleMode(variant = "hsm") {
     : variant === "hm"
       ? await loadHmDesign(base, hmPin.runtimeSHA256)
       : await loadHsmDesign(base, hsmPin.runtimeSHA256);
+  if (!isCurrent()) return abandon();
 
   let manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, currentLettering);
 
@@ -1104,17 +1127,19 @@ async function initHsmSingleMode(variant = "hsm") {
     manifest,
     $("single-unit-select").value,
     (v, busy) => {
+      if (!isCurrent()) return;
       $("hsm-value-display").textContent = String(v).padStart(2, "0");
       $("hsm-state").textContent = busy ? "Turning…" : "Ready";
     },
     resolveAssets,
   );
 
-  setupAppearancePanel($("studio-scene"), async (nextManifest) => {
+  setupAppearancePanel($("studio-scene"), whenCurrent(isCurrent, async (nextManifest) => {
     await controller.updateManifest(nextManifest);
-  });
+  }));
 
   await controller.configure(0);
+  if (!isCurrent()) return abandon();
 
   const step = (delta) => {
     const cur = controller.currentValue;
@@ -1145,16 +1170,16 @@ const modeSwitcher = createModeSwitcher(
 );
 
 const MODE_INITS = {
-  clock: () => initClockMode(),
-  "ms-timer": () => initMsTimerMode(),
-  "hm-clock": () => initHmClockMode(),
-  tenth: () => initTenthMode(),
-  counter: () => initCounterMode(),
-  timer: () => initTimerMode(false),
-  "five-second-timer": () => initTimerMode(true),
-  "hsm-counter": () => initHsmSingleMode("hsm"),
-  "ms-counter": () => initHsmSingleMode("ms"),
-  "hm-one-cube": () => initHsmSingleMode("hm"),
+  clock: (isCurrent) => initClockMode(isCurrent),
+  "ms-timer": (isCurrent) => initMsTimerMode(isCurrent),
+  "hm-clock": (isCurrent) => initHmClockMode(isCurrent),
+  tenth: (isCurrent) => initTenthMode(isCurrent),
+  counter: (isCurrent) => initCounterMode(isCurrent),
+  timer: (isCurrent) => initTimerMode(false, isCurrent),
+  "five-second-timer": (isCurrent) => initTimerMode(true, isCurrent),
+  "hsm-counter": (isCurrent) => initHsmSingleMode("hsm", isCurrent),
+  "ms-counter": (isCurrent) => initHsmSingleMode("ms", isCurrent),
+  "hm-one-cube": (isCurrent) => initHsmSingleMode("hm", isCurrent),
 };
 
 async function switchMode(newMode, pushHistory = true) {
