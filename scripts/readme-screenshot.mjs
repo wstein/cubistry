@@ -19,7 +19,7 @@ const page = await browser.newPage({
   viewport: { width: 1440, height: 810 },
   deviceScaleFactor: 1,
 });
-await page.goto(`${base}/clock.html`);
+await page.goto(`${base}/index.html?app=clock`);
 await page.waitForTimeout(8000); // let the cubes install their poses and settle
 const shown = await page.evaluate(() => document.body.innerText.match(/\d\d:\d\d:\d\d/)?.[0]);
 await page.screenshot({ path: out });

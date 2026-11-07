@@ -31,7 +31,6 @@ test("dedicated MPA pages exist and contain valid markup", () => {
 test("all navigation selects use clean HTML URLs for single-cube applications", () => {
   const htmlFiles = [
     "counter.html",
-    "clock.html",
     "ms-timer.html",
     "calendar.html",
     "playground.html",

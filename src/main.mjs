@@ -979,7 +979,6 @@ const normalizeAppKey = (req) => {
   if (!req) return "certified";
   const stripped = req.replace(/\.html$/, "");
   if (stripped === "index" || stripped === "counter") return "certified";
-  if (stripped === "clock") return "live-clock";
   if (stripped === "status") return "status-cube";
   return stripped;
 };
@@ -1127,7 +1126,6 @@ async function switchApplication(requested, { initial = false } = {}) {
     "calendar": "calendar.html",
     "status-cube": "status.html",
     "ms-timer": "ms-timer.html",
-    "live-clock": "clock.html",
     "picture3": "picture3.html",
   };
   if (externalMap[targetKey]) {

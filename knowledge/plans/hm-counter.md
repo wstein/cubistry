@@ -13,7 +13,7 @@ Add an **H/M Counter**: two physical 2×2 cubes, one showing hours and one showi
 This plan only records assumptions, acceptance criteria and the decisions still needed. It does not approve implementation, and it makes no claim about physical routes beyond what the existing H/M/S print and its verified periods already cover.
 
 ## What exists (verified in the repository at the time of writing)
-- The Live H–M–S Clock (`clock.html`, `src/clock.mjs`) creates one `HsmController` per cube on one shared WebGL scene (`ClockStage`, `src/apps/clock/stage.ts`) and drives them from `LiveClockScheduler` (`src/apps/clock/scheduler.ts`).
+- The Live H–M–S Clock (mode `clock`, `src/apps/clock/live-mode.mjs`; formerly `clock.html`) creates one `HsmController` per cube on one shared WebGL scene (`ClockStage`, `src/apps/clock/stage.ts`) and drives them from `LiveClockScheduler` (`src/apps/clock/scheduler.ts`).
 - Each HSM cube uses the seconds-first print with the unit letters H, M and S, and supports the count ranges 00–59, 00–23 and 00–11 (`src/apps/hsm/design.ts`, `docs/HSM_COUNTER.md`).
 - The H/M/S Counter (`index.html?application=hsm-counter`, `src/main.mjs`) has the controls Unit, Count range, Direction, Set value, Run/Stop, Reset, ±1 and a Rotation Speed slider whose default is 100 ms per HTM move for every unit.
 - `ClockStage` is fixed to three cubes: `createCube` rejects an index of three or more, `clockCenters` is `[-2.8, 0, 2.8]`, the caster centers array has three entries and the framing helpers (`src/apps/clock/framing.ts`) assume that row.

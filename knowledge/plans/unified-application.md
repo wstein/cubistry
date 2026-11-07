@@ -198,7 +198,7 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | `print` | `src/main.mjs:1757` | single-cube pages |
 | `autoplay`, `run` | `src/main.mjs:1117`, `src/ms-timer.mjs:455` | single-cube pages, M/S Timer |
 | `kiosk`, `presentation` | `src/main.mjs:1109`, `src/calendar.mjs:363`, `src/ms-timer.mjs:451`, `src/chronocube.mjs:1182` | all of these |
-| `nerd`, `dev`, `expert` | `src/clock.mjs:345-347`, `src/apps/shell/slot-api.ts` (`nerdOpenFromSearch`, `nerd` only) | clock page, all modes |
+| `nerd` | `src/apps/shell/slot-api.ts` (`nerdOpenFromSearch`) | all modes (opens the Nerd drawer; the aliases `dev` and `expert` of the former Clock page are not read) |
 | `hours-speed`, `minutes-speed`, `seconds-speed` | `src/apps/clock/params.ts` | clock mode |
 | `date`, `lang`, `language`, `design` | `src/calendar.mjs:344`, `:331` | calendar |
 | `design` | `src/print.mjs:75` | print |
