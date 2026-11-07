@@ -268,3 +268,19 @@ test("an impossibly short remaining slot stays Synchronizing instead of snapping
     u[2].scheduledQuarterDuration >= 10 && u[2].scheduledQuarterDuration < 100,
   );
 });
+test("a two-unit hours/minutes clock ticks without error and reports two motions", () => {
+  const u = units([12, 34]),
+    s = new LiveClockScheduler(utc),
+    snapshot = s.tick(Date.UTC(2026, 0, 1, 12, 34, 10), 1000, u);
+  assert.deepEqual(snapshot.values.slice(0, 2), [12, 34]);
+  assert.equal(snapshot.motion.length, 2);
+  assert.deepEqual(snapshot.motion, ["idle", "idle"]);
+});
+test("a unit count other than two or three is rejected", () => {
+  const s = new LiveClockScheduler(utc);
+  for (const n of [0, 1, 4])
+    assert.throws(
+      () => s.tick(Date.UTC(2026, 0, 1, 12, 34, 10), 1000, units([1, 2, 3, 4].slice(0, n))),
+      /Invalid live clock snapshot/,
+    );
+});
