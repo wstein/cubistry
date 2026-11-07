@@ -218,7 +218,9 @@ test("a retained state hashes to each node on a spot check of the stored words",
 });
 
 test("negative controls: every corruption is rejected", () => {
-  const rejects = (fn, message) => assert.throws(fn, (e) => e instanceof ReplayError, message);
+  // Every control must fail with its own reason, not just fail.
+  const rejects = (fn, reason) =>
+    assert.throws(fn, (e) => e instanceof ReplayError && reason.test(e.message), String(reason));
   const edge0 = graph.edges[0];
   const withEdge = (i, patch) => ({
     nodes: graph.nodes,
@@ -229,31 +231,62 @@ test("negative controls: every corruption is rejected", () => {
   // A flipped move (first move that is not a half turn).
   const k = edge0.moves.findIndex((m) => m[1] !== 2);
   const flipped = edge0.moves.map((m, i) => (i === k ? [m[0], -m[1]] : m));
-  rejects(() => run(withEdge(0, { moves: flipped })), "flipped move");
+  rejects(() => run(withEdge(0, { moves: flipped })), /front differs|end hash differs/);
   // A changed edge: another generator in one move, metrics kept consistent.
   const changed = edge0.moves.map((m, i) => (i === k ? [(m[0] % 21) + 1, m[1]] : m));
-  rejects(() => run(withEdge(0, { moves: changed, ...metrics(changed) })), "changed generator");
+  rejects(() => run(withEdge(0, { moves: changed, ...metrics(changed) })), /front differs|end hash differs/);
   // A whole-cube rotation substituted for a layer move, metrics kept consistent.
   const rotated = edge0.moves.map((m, i) => (i === k ? [7 * (Math.floor((m[0] - 1) / 7) + 1), m[1]] : m));
-  rejects(() => run(withEdge(0, { moves: rotated, ...metrics(rotated) })), "rotation for layer move");
+  rejects(() => run(withEdge(0, { moves: rotated, ...metrics(rotated) })), /front differs|end hash differs/);
   // Declared metrics that do not match the word; a truncated word.
-  rejects(() => run(withEdge(0, { htm: edge0.htm + 1 })), "metrics");
+  rejects(() => run(withEdge(0, { htm: edge0.htm + 1 })), /declared metrics differ/);
   const cut = edge0.moves.slice(0, -1);
-  rejects(() => run(withEdge(0, { moves: cut, ...metrics(cut) })), "truncated word");
+  rejects(() => run(withEdge(0, { moves: cut, ...metrics(cut) })), /front differs|end hash differs/);
+  rejects(() => run(withEdge(0, { moves: cut })), /declared metrics differ/);
   // A changed print: one sticker text differs, so the complete-state hash differs.
   const other = { ...printing, text: printing.text.map((t, i) => (i === 4 ? "Z" : t)) };
-  rejects(() => run(graph, other), "changed print");
-  rejects(() => verifyChain(other, pose, table, graph), "changed print, chain");
+  rejects(() => run(graph, other), /retained source differs/);
+  rejects(() => verifyChain(other, pose, table, graph), /root digest differs/);
   // Wrong root: the state of the neighboring month is not the root of this chain.
   const next = applyMoves(pose, edge0.moves);
-  rejects(() => verifyChain(printing, next, table, graph), "neighbor root");
-  rejects(() => run(graph, printing, next, 0), "wrong source state");
+  rejects(() => verifyChain(printing, next, table, graph), /root digest differs/);
+  rejects(() => run(graph, printing, next, 0), /retained source differs/);
   // Swapped edge order and truncated chain.
-  rejects(() => verifyChain(printing, pose, table, { nodes: graph.nodes, edges: [graph.edges[1], graph.edges[0], ...graph.edges.slice(2)] }), "swapped edges");
-  rejects(() => verifyChain(printing, pose, table, { nodes: graph.nodes.slice(0, 3), edges: graph.edges.slice(0, 3) }), "node/edge count");
+  rejects(() => verifyChain(printing, pose, table, { nodes: graph.nodes, edges: [graph.edges[1], graph.edges[0], ...graph.edges.slice(2)] }), /is not chain edge 0 -> 1/);
+  rejects(() => verifyChain(printing, pose, table, { nodes: graph.nodes.slice(0, 3), edges: graph.edges.slice(0, 3) }), /one edge fewer than nodes/);
   // A node that claims the wrong display.
   const lied = { edges: graph.edges, nodes: graph.nodes.map((n, i) => (i === 1 ? { ...n, display: n.display % 91 + 1 } : n)) };
-  rejects(() => run(lied), "wrong display id");
+  rejects(() => run(lied), /wrong display for its month/);
+  // Front failures with a correct hash chain: the front check must be what rejects.
+  const cellOf = (st, row, column) =>
+    [...Array(STICKERS).keys()].find(
+      (i) => st.pos[3 * i] === column - 4 && st.pos[3 * i + 1] === 4 - row && st.pos[3 * i + 2] === 3 && st.normal[3 * i + 2] === 1,
+    );
+  const rootCells = table.displays[start.node.display - 1].cells;
+  // A plain dark date printed with the wrong ink.
+  const dark = rootCells.findIndex((c) => c.ink === "dark");
+  const darkSticker = cellOf(pose, Math.floor(dark / 7) + 1, (dark % 7) + 1);
+  const wrongInk = { ...printing, ink: printing.ink.map((t, i) => (i === darkSticker ? "red" : t)) };
+  assert.equal(frontFailure(printing, pose, rootCells), null);
+  assert.equal(frontFailure(wrongInk, pose, rootCells)?.why, "plain-mismatch");
+  // A plain weekday name turned by a quarter turn is not upright.
+  const monday = cellOf(pose, 2, 2);
+  assert.equal(printing.text[monday], "M0N");
+  const sideways = clonePose(pose);
+  sideways.up.set([-1, 0, 0], 3 * monday);
+  assert.equal(frontFailure(printing, sideways, rootCells)?.why, "plain-mismatch");
+  // A tampered display table: a cell of the root display and of the first target display.
+  const tamperAt = (id, cell) => ({
+    ...table,
+    displays: table.displays.map((d) =>
+      d.id === id ? { ...d, cells: d.cells.map((c, k) => (k === cell ? { ...c, ink: c.ink === "red" ? "dark" : "red" } : c)) } : d,
+    ),
+  });
+  rejects(() => verifyChain(printing, pose, tamperAt(start.node.display, dark), graph), /root front differs from display/);
+  const targetDisplay = graph.nodes[1].display;
+  const targetCell = table.displays[targetDisplay - 1].cells.findIndex((c) => c.ink === "dark");
+  rejects(() => verifyEdge(printing, tamperAt(targetDisplay, targetCell), graph, 0, pose), /edge 0: front differs from display/);
+  rejects(() => verifyChain(printing, pose, tamperAt(targetDisplay, targetCell), graph), /edge 0: front differs from display/);
   // A wrong pin is detected by the data check.
   const wrongPin = structuredClone(pin);
   const file = Object.keys(wrongPin.runtime)[0];
