@@ -40,7 +40,7 @@ import {
   verifyChain,
   verifyEdge,
 } from "../src/apps/calendar7/graph.ts";
-import { check, RESEARCH_FILES } from "../scripts/prepare-calendar7.mjs";
+import { check, parsePrint, RESEARCH_FILES } from "../scripts/prepare-calendar7.mjs";
 
 const started = Date.now();
 const read = (p, encoding) => readFileSync(p, encoding);
@@ -311,6 +311,31 @@ test("negative controls: every corruption is rejected", () => {
   // Parsers refuse malformed data.
   assert.throws(() => parseGraph({ ...json("public/calendar7/graph.v1.json"), alphabet: "x" }));
   assert.throws(() => parseState({ ...json("public/calendar7/state.v1.json"), version: 2 }));
+});
+
+test("checkPose requires all stickers of one piece to share one position", () => {
+  checkPose(printing, pose);
+  // Exchange the complete slot (position, normal, up) of two stickers that belong to different pieces.
+  // The set of slots and bodies is unchanged, so only the per-piece consistency can reject it.
+  const a = 0;
+  const b = printing.piece.findIndex((piece) => piece !== printing.piece[a]);
+  const mixed = clonePose(pose);
+  for (const field of ["pos", "normal", "up"]) {
+    for (let j = 0; j < 3; j++) {
+      const t = mixed[field][3 * a + j];
+      mixed[field][3 * a + j] = mixed[field][3 * b + j];
+      mixed[field][3 * b + j] = t;
+    }
+  }
+  assert.throws(() => checkPose(printing, mixed), /same position/);
+});
+
+test("the strict TSV reader refuses CRLF text", () => {
+  const printText = read(pin.copies[Object.keys(pin.copies).find((k) => /print/.test(k))], "utf8");
+  assert.ok(parsePrint(printText).length === 294); // LF text parses
+  assert.throws(() => parsePrint(printText.replace(/\n/g, "\r\n")), /not strict LF text/);
+  assert.throws(() => parsePrint(printText.replace(/\n$/, "\r\n")), /not strict LF text/);
+  assert.throws(() => parsePrint(printText.slice(0, -1)), /not strict LF text/);
 });
 
 test("the whole test stays within the runtime budget", () => {
