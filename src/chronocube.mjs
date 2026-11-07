@@ -852,7 +852,7 @@ async function initTenthMode() {
 
   await tenth.configure(0);
 
-  controlsContainer.querySelectorAll(".tenth-quick-btn").forEach((btn) => {
+  $("studio-controls").querySelectorAll(".tenth-quick-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       tenth.stepTo(Number(btn.dataset.val), direction);
     });
