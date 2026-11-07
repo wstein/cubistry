@@ -167,7 +167,7 @@ The following third-party libraries and modules are bundled, linked, or distribu
 * **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), SPDX-License-Identifier: CC-BY-SA-4.0; the marks are art data, not AGPL program code.
 * **Super Picture presets**: The three preset artworks (`src/apps/picture3/presets.ts`) are generated vector illustrations; the file is the editable art source (art data, not AGPL program code).
 * **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), SPDX-License-Identifier: CC-BY-SA-4.0. Notice: "Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry."
-* **Sticker glyph artwork**: The counter digits (`public/assets/digits/0-9.svg`), the H/S/M symbols (`public/assets/hsm/`), the H/M sticker net (`public/assets/hm/`, generator `scripts/hm/render-net.mjs`) and the print templates in `public/print/` (`ARTWORK-LICENSE.txt`; font-derived outlines additionally retain the SIL OFL).
+* **Sticker glyph artwork**: The counter digits (`public/assets/digits/0-9.svg`), the H/S/M symbols (`public/assets/hsm/{H,S,M}.svg`; the Noto Sans word stickers in `hsm/words/` and `hsm/words-pascal/` stay under SIL OFL-1.1), the H/M sticker net (`public/assets/hm/`, generator `scripts/hm/render-net.mjs`) and the print templates in `public/print/` (`ARTWORK-LICENSE.txt`; font-derived outlines additionally retain the SIL OFL).
 * **License**: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), SPDX-License-Identifier: CC-BY-SA-4.0; art data, not AGPL program code.
 
 ---

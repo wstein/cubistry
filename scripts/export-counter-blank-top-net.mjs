@@ -5,6 +5,12 @@
 //   node scripts/export-counter-blank-top-net.mjs          # rewrite the net
 //   node scripts/export-counter-blank-top-net.mjs --check  # fail when stale
 // This is not production cut artwork: no bleed, kiss-cut channel or scaling.
+// Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under
+// CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution:
+// Werner Stein, Cubistry.
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// This generator is the editable source of the net artwork: art data, not AGPL
+// program code.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -77,6 +83,7 @@ export function exportNet() {
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">` +
     `<title>Blank-top Counter print, printed state (shows 00), outside view of each face</title>` +
+    `<desc>Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry. SPDX-License-Identifier: CC-BY-SA-4.0</desc>` +
     `<rect width="${width}" height="${height}" fill="#ffffff"/>` +
     `<g font-family="sans-serif" font-size="28" fill="#5b6560">${labels}</g>` +
     cells.join("") +

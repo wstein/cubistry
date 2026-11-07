@@ -1,3 +1,6 @@
+// Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// presetSvg() is the editable source of the preset artwork: art data, not AGPL program code. No fonts or external resources.
 import { FACE_FRAMES, type Face } from "./model.ts";
 export const PRESETS = [
   { id: "coast", name: "Coastal landscapes" },
@@ -5,11 +8,6 @@ export const PRESETS = [
   { id: "blocks", name: "Color studies" },
 ] as const;
 export type Preset = typeof PRESETS[number]["id"];
-/**
- * Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
- * SPDX-License-Identifier: CC-BY-SA-4.0
- * This function is the editable source of the preset artwork: art data, not AGPL program code. No fonts or external resources.
- */
 export function presetSvg(preset: Preset, face: Face): string {
   const index = FACE_FRAMES.findIndex(f => f.face === face);
   if (index < 0 || !PRESETS.some(p => p.id === preset)) throw Error("Unknown picture preset");

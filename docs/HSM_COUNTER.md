@@ -363,7 +363,8 @@ period start (8–10 HTM) is excluded from the laps.
 ## Artwork
 
 The H/M/S SVG assets are original geometric paths, authored for this application
-under the repository's AGPL-3.0-or-later license. They contain no fonts, raster
+under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); they are
+art data, not AGPL program code. Notice: "Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry." They contain no fonts, raster
 content, or external references. Their canonical dimensions and viewBox are
 256 × 256, with the same background, ink, and bottom orientation marker as the
 existing digit assets. Image digests are recorded in
