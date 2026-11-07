@@ -45,7 +45,9 @@ test("index.html is the landing page and the host, not a redirect", () => {
 test("the hero shows the name, one sentence and the Open Live Clock link, and no time text", () => {
   const hero = html.slice(html.indexOf('class="landing-hero"'), html.indexOf("</section>", html.indexOf('class="landing-hero"')));
   assert(hero.includes('<a class="landing-open" id="landing-open-clock" href="index.html?app=clock">Open Live Clock</a>'));
-  assert(/<h1>Live H–M–S Clock<\/h1>/.test(hero));
+  assert(/<h1>Cubistry<\/h1>/.test(hero));
+  assert(!/H–M–S|Live/.test(hero.replace("Open Live Clock", "")), "no clock wording in the hero text");
+  assert(hero.startsWith('class="landing-hero" aria-label="Cubistry"'));
   assert.equal((hero.match(/<p /g) ?? []).length, 1, "one sentence");
   assert(!/<output|landing-clock|landing-hours|landing-minutes|landing-seconds|role="timer"/.test(hero), "no H/M/S readout");
 });

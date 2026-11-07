@@ -73,6 +73,8 @@ test("production root remains present, indexable and interactive beside both pre
   ).toHaveCount(0);
   await expect(page).not.toHaveURL(/clock\.html/);
   await expect(page.locator("#landing")).toBeVisible();
+  await page.locator('.landing-tile[data-app="counter"]').click();
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "counter", { timeout: 30000 });
   for (const number of [52, 53])
     expect(
       (await request.get(`pr-preview/pr-${number}/index.html`)).status(),
