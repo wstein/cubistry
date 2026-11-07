@@ -92,7 +92,8 @@ test("go to the current app keeps its parameters", async () => {
   const router = createRouter({ registry: makeRegistry(log), root: {}, fallback: "clock", env });
   await router.start();
   await router.go("timer");
-  assert.match(state.pushed[0] ?? state.replaced[0] ?? "", /val=45/);
+  assert.deepEqual(state.pushed, [], "same URL, nothing to push");
+  assert.equal(log.at(-1), "mount timer val=45");
 });
 
 test("back and forward mount the app of the URL without pushing history", async () => {

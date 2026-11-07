@@ -22,8 +22,10 @@ import {
   DEFAULT_TENTH_STEP_INTERVAL,
   tenthTurnSpeedForInterval,
 } from "./apps/ms-timer/tenth.ts";
-import { createModeSwitcher, whenCurrent } from "./apps/chronocube/mode-switch.ts";
+import { whenCurrent } from "./apps/chronocube/mode-switch.ts";
 import { MODE_CATALOG } from "./apps/mode-catalog.ts";
+import { createRegistry } from "./apps/registry.ts";
+import { createRouter } from "./apps/router.ts";
 import { PairController } from "./apps/pair/controller.ts";
 import { MsTimerCube } from "./apps/ms-timer/cube.ts";
 import { MsTimer } from "./apps/ms-timer/timer.ts";
@@ -53,11 +55,6 @@ import { buildStudioManifest } from "./apps/chronocube/manifest.ts";
 const $ = (id) => document.getElementById(id);
 const base = import.meta.env.BASE_URL;
 
-// Mode metadata comes from the shared catalog (src/apps/mode-catalog.ts).
-const MODES = Object.fromEntries(
-  MODE_CATALOG.map((m) => [m.id, { title: m.title, subtitle: m.subtitle, count: m.cubes, badge: m.badge }]),
-);
-
 // Global Appearance state (persisted across mode switches)
 let currentDisplay = localStorage.getItem("cubistry_digit_font") || "noto-sans";
 let currentMarker = localStorage.getItem("cubistry_marker_mode") || "line-auto";
@@ -65,7 +62,6 @@ let currentLetterFont = localStorage.getItem("cubistry_letter_font") || "same";
 let currentLettering = localStorage.getItem("cubistry_lettering") || "words-pascal";
 
 // Active runtime state
-let activeMode = null;
 let activeStage = null;
 let activeViewer = null;
 let proofData = null;
@@ -1112,17 +1108,6 @@ async function initHsmSingleMode(variant, isCurrent) {
   };
 }
 
-// -------------------------------------------------------------
-// Orchestrator: Switch active mode
-// -------------------------------------------------------------
-const modeSwitcher = createModeSwitcher(
-  (err) => {
-    console.error("Failed to initialize mode:", err);
-    $("studio-error").textContent = `Failed to load mode ${activeMode}: ${err.message}`;
-  },
-  (e) => console.warn("Cleanup error:", e),
-);
-
 const MODE_INITS = {
   clock: (isCurrent) => initClockMode(isCurrent),
   "ms-timer": (isCurrent) => initMsTimerMode(isCurrent),
@@ -1136,65 +1121,64 @@ const MODE_INITS = {
   "hm-one-cube": (isCurrent) => initHsmSingleMode("hm", isCurrent),
 };
 
-async function switchMode(newMode, pushHistory = true) {
-  if (!MODES[newMode]) newMode = "clock";
-  const meta = MODES[newMode];
-  const ok = await modeSwitcher.switchTo(MODE_INITS[newMode], () => {
+const registry = createRegistry(
+  MODE_CATALOG.map((meta) => ({
+    ...meta,
+    async mount(_root, _params, { isCurrent }) {
+      const cleanup = await MODE_INITS[meta.id](isCurrent);
+      return typeof cleanup === "function" ? { dispose: cleanup } : undefined;
+    },
+  })),
+);
+
+const router = createRouter({
+  registry,
+  root: $("studio-scene"),
+  fallback: "clock",
+  onBefore(mode) {
     // Clear scene and cards
     $("studio-scene").innerHTML = "";
     $("studio-cards").innerHTML = "";
     $("studio-controls").innerHTML = "";
     $("studio-error").textContent = "";
 
-    activeMode = newMode;
-    delete $("shell").dataset.modeReady; // test hook, set again below once the init function has resolved
+    delete $("shell").dataset.modeReady; // test hook, set again in onMounted
 
     // Update header text
-    $("studio-heading").textContent = meta.title;
-    $("studio-subtitle").textContent = meta.subtitle;
-    $("studio-cube-count-badge").textContent = `${meta.count} CUBE${meta.count > 1 ? "S" : ""}`;
-    $("studio-mode-label").textContent = meta.badge;
+    $("studio-heading").textContent = mode.title;
+    $("studio-subtitle").textContent = mode.subtitle;
+    $("studio-cube-count-badge").textContent = `${mode.cubes} CUBE${mode.cubes > 1 ? "S" : ""}`;
+    $("studio-mode-label").textContent = mode.badge;
 
     // Sync dropdown
-    $("studio-application").value = newMode;
-
-    if (pushHistory) {
-      const url = new URL(location.href);
-      url.searchParams.set("mode", newMode);
-      history.replaceState(null, "", url);
-      localStorage.setItem("cubistry_chronocube_mode", newMode);
-    }
-  });
+    $("studio-application").value = mode.id;
+  },
   // Test hook (tests/browser/studio-modes-smoke.spec.mjs): the mode finished initializing without an exception.
-  if (ok && activeMode === newMode) $("shell").dataset.modeReady = newMode;
-}
+  onMounted(mode) {
+    $("shell").dataset.modeReady = mode.id;
+  },
+  onError(err, id) {
+    console.error("Failed to initialize mode:", err);
+    $("studio-error").textContent = `Failed to load mode ${id}: ${err.message}`;
+  },
+  onCleanupError: (e) => console.warn("Cleanup error:", e),
+});
 
 // Initialize on DOM ready
 async function initStudio() {
   await ensureProof();
 
-  const urlParams = new URLSearchParams(location.search);
-  const initialMode =
-    urlParams.get("mode") ||
-    localStorage.getItem("cubistry_chronocube_mode") ||
-    "clock";
-
   $("studio-application").addEventListener("change", (e) => {
     const val = e.target.value;
-    if (MODES[val]) {
-      switchMode(val, true);
+    if (registry.has(val)) {
+      router.go(val);
     } else {
       location.assign(val);
     }
   });
 
-  window.addEventListener("popstate", () => {
-    const params = new URLSearchParams(location.search);
-    const m = params.get("mode") || "clock";
-    switchMode(m, false);
-  });
-
-  await switchMode(initialMode, false);
+  await router.start();
+  const urlParams = new URLSearchParams(location.search);
   const presParam = urlParams.get("presentation") ?? urlParams.get("kiosk");
   if (presParam === "1" || presParam === "true") {
     setTimeout(() => togglePresentation(true), 200);
