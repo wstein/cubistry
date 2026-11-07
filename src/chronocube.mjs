@@ -430,15 +430,9 @@ async function initMsTimerMode(isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "3");
   cardsContainer.innerHTML = `
-    <article class="clock-card">
-      <div id="ms-minutes" data-unit="M" aria-busy="true" role="img" aria-label="Minutes cube"></div>
-    </article>
-    <article class="clock-card">
-      <div id="ms-seconds" data-unit="S" aria-busy="true" role="img" aria-label="Seconds cube"></div>
-    </article>
-    <article class="clock-card">
-      <div id="ms-tenths" data-unit="T" aria-busy="true" role="img" aria-label="Tenth-second cube"></div>
-    </article>
+    <div id="ms-minutes" data-unit="M"></div>
+    <div id="ms-seconds" data-unit="S"></div>
+    <div id="ms-tenths" data-unit="T"></div>
   `;
 
   renderStudioHud("M/S Timer", `
@@ -590,12 +584,8 @@ async function initHmClockMode(isCurrent) {
   const cardsContainer = $("studio-cards");
   cardsContainer.setAttribute("data-count", "2");
   cardsContainer.innerHTML = `
-    <article class="clock-card">
-      <div id="clock-hours" data-unit="H" aria-busy="true" role="img" aria-label="Hours cube"></div>
-    </article>
-    <article class="clock-card">
-      <div id="clock-minutes" data-unit="M" aria-busy="true" role="img" aria-label="Minutes cube"></div>
-    </article>
+    <div id="clock-hours" data-unit="H"></div>
+    <div id="clock-minutes" data-unit="M"></div>
   `;
 
   renderStudioHud("Live Wall Time", `
@@ -694,7 +684,6 @@ async function initTenthMode(isCurrent) {
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = `
     <article class="clock-card" style="text-align: center;">
-      <h2>Tenth-Second Display</h2>
       <output id="tenth-value-display" class="studio-digital-huge" style="display: block;">.0</output>
     </article>
   `;
@@ -795,7 +784,6 @@ async function initCounterMode(isCurrent) {
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = `
     <article class="clock-card" style="text-align: center;">
-      <h2>Counter Value</h2>
       <output id="counter-value-display" class="studio-digital-huge" style="display: block;">00</output>
     </article>
   `;
@@ -877,7 +865,6 @@ async function initTimerMode(fiveSecond, isCurrent) {
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = `
     <article class="clock-card" style="text-align: center;">
-      <h2>${fiveSecond ? "5-Second Countdown" : "60-Minute Countdown"}</h2>
       <output id="timer-display" class="studio-digital-huge" style="display: block;">
         ${fiveSecond ? "00:05.0" : "15:00"}
       </output>
@@ -889,7 +876,6 @@ async function initTimerMode(fiveSecond, isCurrent) {
       <button id="timer-toggle-btn" class="primary" style="flex: 1;">Start</button>
       <button id="timer-reset-btn" style="flex: 1;">Reset</button>
     </div>
-    <p id="timer-status-info" class="small">Idle · Tap Start to countdown</p>
   `);
 
   const viewer = new CubeViewer($("studio-scene"));
@@ -907,9 +893,7 @@ async function initTimerMode(fiveSecond, isCurrent) {
     viewer,
     route,
     manifest,
-    (v, busy) => {
-      if (!isCurrent()) return;
-    },
+    () => {},
     resolveAssets,
   );
 
@@ -926,7 +910,6 @@ async function initTimerMode(fiveSecond, isCurrent) {
     const snap = clock.snapshot();
     $("timer-display").textContent = studioTimerReadout(snap.bucket, spec);
     $("timer-toggle-btn").textContent = clock.running ? "Pause" : "Start";
-    $("timer-status-info").textContent = clock.running ? "Counting down…" : "Paused";
   }
 
   const driver = new StudioTimerDriver({
@@ -969,7 +952,6 @@ async function initHsmSingleMode(variant, isCurrent) {
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = `
     <article class="clock-card" style="text-align: center;">
-      <h2 id="single-hsm-title">Counter 00–59</h2>
       <output id="hsm-value-display" class="studio-digital-huge" style="display: block;">00</output>
     </article>
   `;
