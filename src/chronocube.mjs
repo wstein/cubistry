@@ -1150,12 +1150,7 @@ async function initStudio() {
   await ensureProof();
 
   $("studio-application").addEventListener("change", (e) => {
-    const val = e.target.value;
-    if (registry.has(val)) {
-      router.go(val);
-    } else {
-      location.assign(val);
-    }
+    router.go(e.target.value);
   });
 
   await router.start();

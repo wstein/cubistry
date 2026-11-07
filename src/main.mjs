@@ -1129,7 +1129,6 @@ function checkAutoRun(app) {
 async function switchApplication(requested, { initial = false } = {}) {
   const targetKey = normalizeAppKey(requested);
   const externalMap = {
-    "chronocube": "chronocube.html",
     "playground": "playground.html",
     "calendar": "calendar.html",
     "status-cube": "status.html",
