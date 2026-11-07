@@ -150,42 +150,6 @@ body.chronocube-page:has(#shell) {
   background: var(--surface-2);
 }
 
-/* View menu in the header (design: view-controls; it opens the Appearance section of the right-hand pane). */
-.shell .shell-view {
-  position: relative;
-  flex: none;
-}
-.shell .shell-menu {
-  position: absolute;
-  top: calc(100% + var(--sp-1));
-  right: 0;
-  z-index: 40;
-  min-width: 180px;
-  padding: var(--sp-1);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-2);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 18%, transparent);
-}
-.shell .shell-menu[hidden] {
-  display: none;
-}
-.shell .shell-menu button {
-  display: block;
-  width: 100%;
-  min-height: 44px;
-  padding: 0 var(--sp-3);
-  border: 0;
-  border-radius: var(--r-1);
-  background: transparent;
-  color: var(--ink);
-  font: 500 var(--t-sm) var(--f-ui);
-  text-align: left;
-  cursor: pointer;
-}
-.shell .shell-menu button:hover {
-  background: var(--surface-2);
-}
 
 /* ---------- body: stage column and dock ---------- */
 .shell .shell-body {
@@ -591,7 +555,7 @@ body.presentation-mode .shell .shell-nerd-toggle {
   font: var(--t-cap) / 1.4 var(--f-ui);
 }
 .shell .cube-appearance.is-docked select,
-.shell .cube-appearance.is-docked button:not(.cube-appearance-disclosure) {
+.shell .cube-appearance.is-docked button:not(.cube-appearance-disclosure):not(.cube-appearance-info) {
   background: var(--bg);
   color: var(--ink);
   border: 1px solid var(--line);
@@ -599,20 +563,11 @@ body.presentation-mode .shell .shell-nerd-toggle {
   font: 500 var(--t-sm) var(--f-ui);
   min-height: 40px;
 }
-.shell .cube-appearance.is-docked .cube-appearance-info {
-  min-height: 0;
-  width: 28px;
-  height: 28px;
+.shell .cube-appearance.is-docked .cube-appearance-more {
+  border-top-color: var(--line);
 }
-.shell .cube-appearance.is-docked .cube-appearance-tabs {
-  background: var(--surface-2);
-}
-.shell .cube-appearance.is-docked .cube-appearance-tab {
-  color: var(--ink-2);
-}
-.shell .cube-appearance.is-docked .cube-appearance-tab.active {
-  background: var(--surface);
-  color: var(--ink);
+.shell .cube-appearance.is-docked input[type="color"] {
+  border-color: var(--line);
 }
 
 /* ---------- error line and footer ---------- */
@@ -769,8 +724,14 @@ body.presentation-mode .shell .shell-footer:focus-within {
   opacity: 0.95;
 }
 
+body.presentation-mode .shell .shell-view-controls {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .shell * {
+  .shell *,
+  .shell *::before,
+  .shell *::after {
     transition: none !important;
   }
 }
