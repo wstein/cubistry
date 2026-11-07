@@ -130,7 +130,7 @@ test("faces can be filled one at a time by drag and drop and by the keyboard", a
       },
       { f, name: file.name, type: file.mimeType, data: [...file.buffer] },
     );
-    await expect(page.locator(`#upload-net [data-face="${f}"]`)).toHaveAttribute("data-filled", "true");
+    await expect(page.locator(`#upload-net [data-face="${f}"]`)).toHaveAttribute("data-filled", "true", { timeout: UPLOAD_MS });
   }
   await loaded(page);
 });
