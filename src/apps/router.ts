@@ -63,7 +63,8 @@ export function createRouter(options: RouterOptions) {
     const mode = registry.get(id) as AppMode;
     const next = new URL(env.href());
     next.searchParams.set(APP_PARAM, id);
-    const url = urlAfterAppSwitch(next.href, current, id);
+    // Back and forward restore a URL the browser already holds: only a push drops the previous app's parameters.
+    const url = urlAfterAppSwitch(next.href, current, id, history !== "push");
     const here = new URL(env.href());
     if (history !== "none" && url !== here.pathname + here.search + here.hash) {
       if (history === "push") env.push(url);
@@ -90,11 +91,12 @@ export function createRouter(options: RouterOptions) {
     /** Mounts the app named by the current URL and starts following back/forward. */
     async start(): Promise<boolean> {
       stopPop?.();
-      stopPop = env.onPop(() => {
-        void show(parseAppRoute(new URL(env.href()).search, registry, fallback).id, "none");
-      });
-      const route = parseAppRoute(new URL(env.href()).search, registry, fallback);
-      return show(route.id, route.known ? "none" : "replace");
+      const fromUrl = () => {
+        const route = parseAppRoute(new URL(env.href()).search, registry, fallback);
+        return show(route.id, route.known ? "none" : "replace");
+      };
+      stopPop = env.onPop(() => void fromUrl());
+      return fromUrl();
     },
     /** Switches to `id` without a reload. App-scoped parameters of the previous app are dropped. */
     go(id: string): Promise<boolean> {
