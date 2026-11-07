@@ -229,8 +229,11 @@ test("built Pages Workshop Timer loads its immutable certificate below the proje
   expect(errors).toEqual([]);
 });
 
-test("built Pages root redirects to live clock", async ({ page }) => {
+test("built Pages root shows the landing page and a tile opens its mode", async ({ page }) => {
   await page.goto("./");
-  await expect(page).toHaveURL(/clock\.html$/);
-  await expect(page.locator("#clock-scene canvas")).toBeVisible();
+  await expect(page).not.toHaveURL(/clock\.html/);
+  await expect(page.locator("#landing")).toBeVisible();
+  await page.locator('.landing-tile[data-app="counter"]').click();
+  await expect(page).toHaveURL(/[?&]app=counter(&|$)/);
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "counter", { timeout: 30000 });
 });

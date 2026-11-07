@@ -8,7 +8,7 @@ import { test, expect } from "@playwright/test";
 // removes at every switch. A switch is only triggered after the previous mode is ready: switchMode has no
 // generation guard (#267), so a switch during init lets the old init write into the new mode.
 
-// Same order and ids as the <option> values of #studio-application that are not page links (chronocube.html);
+// Same order and ids as the <option> values of #studio-application (index.html);
 // the first test compares this list with the page.
 const MODES = ["clock", "ms-timer", "hm-clock", "tenth", "counter", "timer", "five-second-timer", "hsm-counter", "ms-counter", "hm-one-cube"];
 
@@ -72,15 +72,15 @@ test.beforeEach(() => {
 });
 
 test("the mode list matches the studio select", async ({ page }) => {
-  await page.goto("/chronocube.html");
+  await page.goto("/index.html?app=clock");
   const values = await page.locator("#studio-application option").evaluateAll((os) => os.map((o) => o.value));
-  expect(values.filter((v) => !v.endsWith(".html"))).toEqual(MODES);
+  expect(values).toEqual(MODES);
 });
 
 for (const id of MODES) {
   test(`mode ${id} loads without errors`, async ({ page }) => {
     const seen = watch(page);
-    await page.goto(`/chronocube.html?app=${id}`);
+    await page.goto(`/index.html?app=${id}`);
     await assertLoaded(page, seen, id);
   });
 }
@@ -88,7 +88,7 @@ for (const id of MODES) {
 test("switching through all modes in one session loads each without errors", async ({ page }) => {
   test.setTimeout(10 * 30000);
   const seen = watch(page);
-  await page.goto(`/chronocube.html?app=${MODES[0]}`);
+  await page.goto(`/index.html?app=${MODES[0]}`);
   await assertLoaded(page, seen, MODES[0]);
   for (const id of MODES.slice(1)) {
     await switchTo(page, id);

@@ -23,7 +23,7 @@ test.beforeAll(async ({ browser }) => {
   context = await browser.newContext({ viewport: { width: 1440, height: 900 }, storageState: undefined });
   page = await context.newPage();
   page.on("pageerror", e => errors.push(e.message));
-  await page.goto("/chronocube.html");
+  await page.goto("/index.html?app=clock");
   await page.locator('[data-region="header"]').waitFor();
   await page.locator("#studio-controls .hud-body").waitFor({ timeout: 25000 });
 });
