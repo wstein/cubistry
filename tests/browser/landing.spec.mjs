@@ -14,7 +14,8 @@ test("the root URL shows the landing page without a redirect", async ({ page }) 
   await expect(page.locator("#shell")).toHaveAttribute("data-view", "landing");
   await expect(page.locator("#landing")).toBeVisible();
   await expect(page.locator("#studio-scene")).toBeHidden();
-  await expect(page.locator("#landing-seconds")).toHaveText(/^\d\d$/);
+  await expect(page.locator("#landing-open-clock")).toHaveText("Open Live Clock");
+  await expect(page.locator(".landing-hero output")).toHaveCount(0);
 });
 
 test("every tile and the hero button link to index.html?app=<id>, and no link targets an application page", async ({ page }) => {

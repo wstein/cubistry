@@ -42,6 +42,20 @@ test("index.html is the landing page and the host, not a redirect", () => {
   assert(!html.includes("chronocube.mjs"), "the studio bundle loads lazily from src/index.mjs");
 });
 
+test("the hero shows the name, one sentence and the Open Live Clock link, and no time text", () => {
+  const hero = html.slice(html.indexOf('class="landing-hero"'), html.indexOf("</section>", html.indexOf('class="landing-hero"')));
+  assert(hero.includes('<a class="landing-open" id="landing-open-clock" href="index.html?app=clock">Open Live Clock</a>'));
+  assert(/<h1>Live H–M–S Clock<\/h1>/.test(hero));
+  assert.equal((hero.match(/<p /g) ?? []).length, 1, "one sentence");
+  assert(!/<output|landing-clock|landing-hours|landing-minutes|landing-seconds|role="timer"/.test(hero), "no H/M/S readout");
+});
+
+test("the landing script has no clock ticker and the landing entry imports no studio code", () => {
+  const landing = readFileSync(resolve("src/landing.mjs"), "utf8");
+  assert(!/setInterval|new Date|landing-hours/.test(landing));
+  assert(!/chronocube|clock\//.test(landing));
+});
+
 test("index.html carries the studio markup the modes mount into", () => {
   for (const id of ["shell", "studio-scene", "studio-cards", "studio-controls", "studio-error", "studio-application", "studio-heading"]) {
     assert.equal(html.split(`id="${id}"`).length - 1, 1, id);
