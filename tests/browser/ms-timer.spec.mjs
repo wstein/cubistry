@@ -63,11 +63,17 @@ test("the chooser offers the M/S Timer and the page shows three cubes: minutes, 
     "aria-label",
     /Three physical cubes/,
   );
-  const minutes = await page.locator("#ms-minutes").boundingBox(),
-    seconds = await page.locator("#ms-seconds").boundingBox(),
-    tenths = await page.locator("#ms-tenths").boundingBox();
-  expect(minutes.x).toBeLessThan(seconds.x);
-  expect(seconds.x).toBeLessThan(tenths.x);
+  // The three unit elements are screen-reader/state elements (.sr-only, no
+  // layout), so assert their source order rather than on-screen positions.
+  const order = await page.evaluate(() => {
+    const [m, s, t] = ["ms-minutes", "ms-seconds", "ms-tenths"].map((id) =>
+      document.getElementById(id),
+    );
+    const before = (a, b) =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    return [before(m, s), before(s, t)];
+  });
+  expect(order).toEqual([true, true]);
   await expect(page.locator("#ms-minutes")).toHaveAttribute("data-value", "15");
   await expect(page.locator("#ms-seconds")).toHaveAttribute("data-value", "0");
   await expect(page.locator("#ms-tenths")).toHaveAttribute("data-value", "0");
