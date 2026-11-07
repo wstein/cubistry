@@ -1,5 +1,6 @@
 import "./chronocube.css";
-import { installViewMenu } from "./shell/view-menu.ts";
+import { installAppearanceButton } from "./shell/appearance-button.ts";
+import { findAppearancePanel } from "./apps/chronocube/appearance-panel.ts";
 import { ClockStage } from "./apps/clock/stage.ts";
 import { LiveClockScheduler, clockText } from "./apps/clock/scheduler.ts";
 import { ClockMoveStatistics, formatMean } from "./apps/clock/statistics.ts";
@@ -95,7 +96,7 @@ const resolveAssets = (m, prints, signal) => loadAssets(m, prints, signal, base)
 
 // Mount Appearance panel into host stage
 function setupAppearancePanel(container, onUpdate) {
-  const panel = container.querySelector(".cube-appearance");
+  const panel = findAppearancePanel(container, document);
   if (!panel) return;
   if (panel.querySelector("#studio-display-font")) return;
 
@@ -204,7 +205,7 @@ function renderStudioHud(title, bodyHtml) {
 }
 
 document.querySelector("#presentation-btn, .island-presentation-btn")?.addEventListener("click", () => togglePresentation(true));
-installViewMenu();
+installAppearanceButton();
 
 let exitTimer = null;
 function togglePresentation(enable) {

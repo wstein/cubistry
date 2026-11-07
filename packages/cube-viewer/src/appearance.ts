@@ -117,16 +117,20 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     disclosure.textContent = "Appearance"; disclosure.setAttribute("aria-expanded", "false"); disclosure.setAttribute("aria-controls", popover.id);
     title.textContent = ""; title.append(disclosure);
     let opener: HTMLElement | null = null;
-    setOpen = (open: boolean) => { popover.hidden = !open; disclosure.setAttribute("aria-expanded", String(open)); };
+    setOpen = (open: boolean) => {
+      popover.hidden = !open; disclosure.setAttribute("aria-expanded", String(open));
+      document.dispatchEvent?.(new CustomEvent("cube-appearance:state", { detail: { open } }));
+    };
     disclosure.addEventListener("click", () => { opener = null; setOpen(popover.hidden); });
     panel.addEventListener("cube-appearance:open", (event) => {
       opener = (event as CustomEvent).detail?.opener ?? null; setOpen(true); disclosure.focus(); panel.scrollIntoView?.({ block: "nearest" });
     });
+    panel.addEventListener("cube-appearance:close", () => setOpen(false));
     panel.addEventListener("keydown", (event) => {
       if ((event as KeyboardEvent).key !== "Escape" || popover.hidden) return;
       event.preventDefault(); setOpen(false); (opener ?? disclosure).focus();
     });
-    dock.hidden = false; dock.append(panel);
+    dock.hidden = false; dock.append(panel); setOpen(false);
   } else host.append(panel);
 
   const originalAppend = panel.append.bind(panel);
@@ -172,7 +176,7 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     setDefaultColor(color: string) { defaultColor = color; refresh(); },
     dispose() {
       panel.remove();
-      if (dock) { if (!dock.children.length) dock.hidden = true; } else host.style.position = previousPosition;
+      if (dock) { if (!dock.children.length) dock.hidden = true; document.dispatchEvent?.(new CustomEvent("cube-appearance:state", { detail: { open: false } })); } else host.style.position = previousPosition;
     },
   };
 }
