@@ -141,9 +141,9 @@ export class MsController extends PhysicalPlayback {
     this.configuring = true;
     let assets;
     try {
-      this.manifest = manifest;
       assets = await this.resolveAssets(manifest, [this.msPrint.print]);
       this.install(this.msPrint.print, state, assets, this.current);
+      this.manifest = manifest;
       assets = undefined;
     } finally {
       assets?.dispose();
