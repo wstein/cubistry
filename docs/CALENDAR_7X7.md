@@ -14,12 +14,14 @@ month sheet of one month and the move word to the previous and to the next month
 - URL parameters: `year` and `month` (1 to 12), only together. Without them the
   current month is used.
 - Range: only the months of the proven chain, **January 2028 to January 2076**, can
-  be shown. Any other month, including today (November 2026), gets a "Not available
+  be shown. Any other month, including the current month while it is outside that range, gets a "Not available
   yet" message with links to the first and the last chain month.
 - Steps: previous and next month along the chain. The move word of a forward step is
   the stored edge; a backward step is the inverse of the edge before it. A token is
   the axis (`x`, `y`, `z`), the layer (`-3` to `-1`, `+1` to `+3`, or `rot` for the
   whole cube), then `'` for a counter-clockwise quarter turn or `²` for a half turn.
+  Each step also lists the raw generators (`g<generator>:<+1|-1|2>`, generators 1 to 21 as
+  defined below) in a collapsible block.
 - **Not in this stage:** no solver, no jump to a non-adjacent month (a jump would
   walk the chain, up to tens of thousands of moves), no 3D view of the cube, no
   route from a solved cube, no sticker sheet. The page says so.
