@@ -32,6 +32,7 @@ Evidence level: the current-state facts below were re-read on `origin/main` at `
 15. **Clock port (owner, 2026-11-07).** The port of `src/clock.mjs` with all its parameters is its own stage 3 PR after the stack of the host, the landing page and the deletion of `chronocube.html` (PRs #301 to #303) is reviewed and merged. `clock.html` stays until then. The port is not started earlier.
 16. **Intermediate state (owner, 2026-11-07).** Until stage 4 the legacy pages have no link to the unified view (their "Integrated Studio" chooser entry is removed with `chronocube.html`).
 17. **Cubes (owner, 2026-11-07).** The Cubes catalog is a section of the landing page. There is no second page and no `?page=cubes`. This deviates from the mock (`#cubes`).
+18. **Slot API first (owner, 2026-11-07, "Erst Slot-API bauen").** Before the Clock port, the shell gets the typed API through which a mode fills the dock slots, the status chip, the primary action, the readout and the Nerd drawer (section "Dock slot API"). The Clock port (decision 15) is rebuilt on it afterwards. A small mode migrates first as the reference user (the 1/10-Second Counter).
 
 Recommendations in this plan that go beyond these statements (mounting existing engines instead of rewriting them) are recommendations, not decisions; see "Open decisions".
 
@@ -70,6 +71,44 @@ Link scheme: `index.html` without a parameter is the landing page; `index.html?a
 2. Section "Apps": one tile per registered mode of the group `apps`; a mode joins when it exists (decision 8). Section "Cubes": the catalog of the group `cubes` from `src/apps/mode-catalog.ts`. Every tile is `index.html?app=<id>`; no tile links to a `*.html` application page.
 3. Shared header, footer (with `licenses.html`), tokens and dark theme from `src/shell/shell.css` and `tokens.css`.
 4. Steps: (a) `index.html` becomes the landing page and the host: no `app` parameter shows the landing page, a registered id mounts through the router, an unknown id shows the landing page; the switcher lists the ten registered modes only; the browser specs move from `chronocube.html?app=<id>` to `index.html?app=<id>`; the node tests of the host and the catalog come first. (b) Delete `chronocube.html`, its vite input and its markup checks, and edit every file of the list above; the page checks (`tests/mpa-routing.test.mjs`, `tests/shell-markup.test.mjs`) stay green. (c) The Clock port and the deletion of `clock.html`, as the row above lists them: its own PR after (a) and (b) are merged (decision 15).
+
+## Dock slot API
+Status: built in the stack #324 (API, markup, styles, tests) and #325 (reference mode); `UNKNOWN` in a browser until the Playwright lane has run on them. Source: `src/apps/shell/slot-api.ts`; the region names and the slot map are those of the [design proposal](../../docs/design/README.md).
+
+A mode receives a `ModeShell` in its mount context (`MountContext.shell`) and uses it instead of touching the regions of `index.html`:
+- `setSlot(n, { label, element | render })`, `clearSlot(n)`, `clearSlots()`: slots 1 Action, 2 Value, 3 Mode, 4 Motion, 5 Print & appearance. A filled slot is a `role="group"` labeled by an `h2`; an empty slot keeps `hidden`. DOM order is tab order.
+- `setPrimaryAction({ label, onClick, disabled? })`: the one berry button.
+- `setStatus(state, text?)`: one chip in the existing `role="status"` zone, states `ready, moving, sync, paused, done, warn, error` (tokens `--s-*`). The same state and text writes nothing; callers set it on state transitions, never per frame. The readout (`setReadout`, `updateReadout`) is plain text without a live region.
+- `setNerd({ title, render })`, `refreshNerd()`: the drawer is hidden until the Nerd button (`#nerd-toggle`, end of the dock) is pressed; `render` runs only while it is open. `nerdTable` and `nerdFacts` build the content.
+- `setHint(text | null)`, `setReferenceView(handler | null)`, `listen(...)`, `onDispose(fn)`.
+
+Cleanup: the router creates the shell per mount and disposes it with the mode. Every write checks `isCurrent()`, so a mode that is superseded during an async init cannot put content into the next mode.
+
+### Slot inventory
+Slots the design fills per registered mode (`src/apps/shell/slot-map.ts`, compared with the design's slot map by `tests/shell-slot-map.test.mjs`) and whether the mode fills them through `ModeShell` (`migrated`) or still renders its HUD controls (`pending`). `calendar7` is not in the design's slot map.
+
+| Mode | Slots | Status |
+|---|---|---|
+| `clock` | 1, 2, 3, 4, 5 | pending |
+| `ms-timer` | 1, 2, 3, 4, 5 | pending |
+| `hm-clock` | 1, 2, 3, 4, 5 | pending |
+| `tenth` | 1, 2, 3, 4 | migrated |
+| `counter` | 1, 2, 3, 4, 5 | pending |
+| `timer` | 1, 2, 3, 4, 5 | pending |
+| `five-second-timer` | 1, 2, 3, 4 | pending |
+| `hsm-counter` | 1, 2, 3, 4, 5 | pending |
+| `ms-counter` | 1, 2, 3, 4, 5 | pending |
+| `hm-one-cube` | 1, 2, 3, 4, 5 | pending |
+| `calendar7` | none | pending |
+
+`tenth` fills slots 1 to 4 with its existing controls (Step, Value, Direction, Step speed); the design row lists Run / Stop, Stop after and Wrap, which this mode does not have today and which were not added.
+
+Open questions for the owner:
+1. Nerd drawer versus the Clock page's Nerd panel. The design's drawer is read-only diagnostics under the stage (committed-moves table, timing facts, renderer). The Clock page's panel (`clock.html`, `clock-nerd-details`, URL `nerd`, `dev`, `expert`, key `cubistry_clock_nerd_mode`) holds per-cube speed selects (preferred quarter-turn time) with a timing line each. In the slot map, per-cube move time is slot 4 (Motion) of the Clock; the drawer is not meant for controls. Recommendation: the speed selects go to slot 4, the drawer shows the effective values; `nerd=1` opens the drawer.
+2. "Maybe move stats": the per-cube session statistics and the committed-moves table of the Live Clock move into the drawer (design deviation 7). The API supports it (`nerdTable`, `refreshNerd`); the move itself belongs to the Clock port. Recommendation: move both, keep "Reset session moves" as a button inside the drawer.
+3. Nerd button placement. The design puts it in the header (desktop) and at the end of the sheet (phone). It sits at the end of the dock now, because #321 changes the header (View menu). Recommendation: move it into the View menu after #321 merges.
+4. Warning and error rows. The design has dismissible `role="alert"` rows besides the chip; the API has the `warn` and `error` chip states only. Recommendation: add the rows with the Clock port.
+5. The phone sheet (grab handle, snap states) is not built; the dock stays the stacked area of the current layout.
 
 ## Risks
 - Known red or flaky specs on `main` (owner list, not re-run for this plan): `ms-timer:33`, `presentation:38` (two), `smart-rotation:101`, intermittent `hsm-lettering:39` and `:113`, `presentation:160`. Layout specs stay red until the layout rework. The workflow "Counter checks" was reported failing on `7dae282` (fast groups 2 and 3, timing 1; issue #202 describes broad e2e failures, cause unknown). A port PR compares the red set before and after: the same set, no new entries, and no spec weakened "because of the move".
