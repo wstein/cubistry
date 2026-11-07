@@ -24,11 +24,30 @@ test("a change outside the box counts as outside (mutation: a sticker or HUD pix
   assert.deepEqual(countChangedPixels(a, b, box), { changed: 2, outside: 1 });
 });
 
-test("box edges are inclusive and the threshold is a strict greater-than", () => {
+test("all four box edges are inclusive; pixels one step beyond them are outside", () => {
   const a = image(8, 8), b = image(8, 8);
-  paint(b, 5, 5, [190, 200, 200]);
-  paint(b, 6, 5, [189, 200, 200]);
-  assert.deepEqual(countChangedPixels(a, b, box), { changed: 1, outside: 1 });
+  for (const [x, y] of [[2, 2], [5, 2], [2, 5], [5, 5]]) paint(b, x, y, [189, 200, 200]);
+  assert.deepEqual(countChangedPixels(a, b, box), { changed: 4, outside: 0 });
+  for (const [x, y] of [[1, 3], [6, 3], [3, 1], [3, 6]]) paint(b, x, y, [189, 200, 200]);
+  assert.deepEqual(countChangedPixels(a, b, box), { changed: 8, outside: 4 });
+});
+
+test("the threshold is a strict greater-than of the summed RGB difference", () => {
+  const a = image(8, 8), b = image(8, 8);
+  paint(b, 3, 3, [190, 200, 200]);
+  paint(b, 4, 4, [195, 195, 200]);
+  assert.deepEqual(countChangedPixels(a, b, box), { changed: 0, outside: 0 });
+  paint(b, 4, 4, [195, 194, 200]);
+  assert.deepEqual(countChangedPixels(a, b, box), { changed: 1, outside: 0 });
+});
+
+test("a difference in only one channel counts (each of R, G, B)", () => {
+  for (const c of [0, 1, 2]) {
+    const a = image(8, 8), b = image(8, 8), rgb = [200, 200, 200];
+    rgb[c] = 150;
+    paint(b, 7, 7, rgb);
+    assert.deepEqual(countChangedPixels(a, b, box), { changed: 1, outside: 1 }, `channel ${c}`);
+  }
 });
 
 test("a size mismatch throws", () => {
