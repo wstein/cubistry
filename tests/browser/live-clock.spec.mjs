@@ -7,12 +7,12 @@ async function ready(page, time) {
   const target = new Date(time);
   await page.clock.install({ time: new Date(target.getTime() - 10_000) });
   await page.clock.pauseAt(target);
-  await page.goto("/clock.html");
+  await page.goto("/index.html?app=clock");
   await expect(page.locator("#seconds-speed")).toBeEnabled();
 }
 async function physical(page) {
   return page.evaluate(async () => {
-    const { clockUnits } = await import("/src/clock.mjs");
+    const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
     const { validateHsmDesign, hsmTarget } = await import(
       "/src/apps/hsm/design.ts"
     );
@@ -62,7 +62,7 @@ test("live H M S clock initializes from one local instant with real blanks and i
   await expect(page.locator("canvas")).toHaveCount(1);
   expect(
     await page.evaluate(async () => {
-      const { clockUnits, clockStage } = await import("/src/clock.mjs");
+      const { clockUnits, clockStage } = await import("/src/apps/clock/live-mode.mjs");
       const cubes = clockStage.presentation.children.filter((o) => o.type === "Group");
       return {
         roots: cubes.length,
@@ -88,10 +88,10 @@ test("live H M S clock initializes from one local instant with real blanks and i
     bodies: [9, 9, 9], // eight cubies plus the static core ball
   });
   await page.clock.runFor(100);
-  const canvas = page.locator("#clock-scene canvas"),
+  const canvas = page.locator("#studio-scene canvas"),
     box = await canvas.boundingBox();
   const before = await page.evaluate(async () => {
-    const { clockStage } = await import("/src/clock.mjs");
+    const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
     return { camera: clockStage.camera.position.toArray(), presentation: clockStage.presentation.quaternion.toArray() };
   });
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -101,12 +101,12 @@ test("live H M S clock initializes from one local instant with real blanks and i
   await page.clock.runFor(50);
   expect(
     await page.evaluate(async () => {
-      const { clockStage } = await import("/src/clock.mjs");
+      const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
       return clockStage.presentation.quaternion.toArray();
     }),
   ).not.toEqual(before.presentation);
   expect(await page.evaluate(async () => {
-    const { clockStage } = await import("/src/clock.mjs");
+    const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
     return clockStage.camera.position.toArray();
   })).toEqual(before.camera);
   expect((await physical(page)).every((u) => u.valid)).toBe(true);
@@ -142,7 +142,7 @@ test("live clock selects the preferred quarter-turn defaults H 500 ms, M 250 ms,
   }
   expect(
     await page.evaluate(async () => {
-      const { clockUnits } = await import("/src/clock.mjs");
+      const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
       return clockUnits.map((u) => u.duration);
     }),
   ).toEqual([500, 250, 100]);
@@ -151,7 +151,7 @@ test("the previous preferred speeds stay selectable through query parameters", a
   page,
 }) => {
   await page.goto(
-    "/clock.html?hours-speed=250&minutes-speed=100&seconds-speed=50",
+    "/index.html?app=clock&hours-speed=250&minutes-speed=100&seconds-speed=50",
   );
   await expect(page.locator("#seconds-speed")).toBeEnabled();
   for (const [name, speed] of [
@@ -162,7 +162,7 @@ test("the previous preferred speeds stay selectable through query parameters", a
     await expect(page.locator("#" + name + "-speed")).toHaveValue(speed);
   expect(
     await page.evaluate(async () => {
-      const { clockUnits } = await import("/src/clock.mjs");
+      const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
       return clockUnits.map((u) => u.duration);
     }),
   ).toEqual([250, 100, 50]);
@@ -173,7 +173,7 @@ test("midnight wrap schedules all three final turns to the same target instant",
   await ready(page, "2026-12-31T22:59:56Z");
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
-    const { clockUnits } = await import("/src/clock.mjs");
+    const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
     const animate = CubeViewer.prototype.animate;
     window.clockEndpoints = [];
     CubeViewer.prototype.animate = async function (p, timing) {
@@ -220,10 +220,9 @@ test("returning from suspension synchronizes to live seconds without a missed-ti
   const values = await physical(page);
   expect(values.every((v) => v.valid)).toBe(true);
   expect(values[2].value).toBe(26);
-  await page.selectOption(
-    "#clock-application",
-    "index.html?app=hsm-counter",
-  );
+  // The unified application switches mode without a reload; the clock leaves its canvas and its timers behind.
+  await page.selectOption("#studio-application", "hsm-counter");
+  await expect(page).toHaveURL(/app=hsm-counter/);
   await expect(page.locator("#shell")).toHaveAttribute(
     "data-mode-ready",
     "hsm-counter",
@@ -239,11 +238,11 @@ test("real animation ends all three midnight sequences at the shared live deadli
       epoch = Date.parse("2026-12-31T22:59:54Z");
     Date.now = () => epoch + performance.now() - start;
   });
-  await page.goto("/clock.html");
+  await page.goto("/index.html?app=clock");
   await expect(page.locator("#seconds-speed")).toBeEnabled();
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
-    const { clockUnits } = await import("/src/clock.mjs");
+    const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
     const animate = CubeViewer.prototype.animate;
     window.realClockEndpoints = [];
     window.realClockMoves = [];
@@ -332,26 +331,26 @@ test.describe("high-density shared clock viewport", () => {
     await page.addInitScript(() => {
       Date.now = () => Date.parse("2026-10-28T11:34:56Z");
     });
-    await page.goto("/clock.html");
+    await page.goto("/index.html?app=clock");
     await expect(page.locator("#seconds-speed")).toBeEnabled();
     for (const viewport of [
       { width: 1440, height: 1000 },
       { width: 390, height: 844 },
     ]) {
       const previous = await page.evaluate(async () => {
-        const { clockStage } = await import("/src/clock.mjs");
+        const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
         return clockStage.renderer.info.render.frame;
       });
       await page.setViewportSize(viewport);
       await expect
         .poll(() =>
           page.evaluate(async (previous) => {
-            const { clockStage } = await import("/src/clock.mjs");
+            const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
             return (
               clockStage.renderer.info.render.frame > previous + 2 &&
               clockStage.renderer.domElement.width ===
                 Math.floor(
-                  document.getElementById("clock-scene").clientWidth *
+                  document.getElementById("studio-scene").clientWidth *
                     clockStage.renderer.getPixelRatio(),
                 )
             );
@@ -359,18 +358,23 @@ test.describe("high-density shared clock viewport", () => {
         )
         .toBe(true);
       await expect(page.locator("canvas")).toHaveCount(1);
-      const host = await page.locator("#clock-scene").boundingBox(),
-        canvas = await page.locator("#clock-scene canvas").boundingBox(),
-        rawControls = await page.locator(".clock-cubes").boundingBox(),
-        controls = rawControls ?? { y: canvas.y + canvas.height, top: canvas.y + canvas.height, right: canvas.x + canvas.width };
+      const host = await page.locator("#studio-scene").boundingBox(),
+        canvas = await page.locator("#studio-scene canvas").boundingBox(),
+        dock = await page.locator('[data-region="dock"]').boundingBox();
       expect(Math.abs(host.width - canvas.width)).toBeLessThan(1);
       expect(Math.abs(host.height - canvas.height)).toBeLessThan(1);
-      expect(canvas.y + canvas.height).toBeLessThanOrEqual(controls.y + 1);
+      // The canvas does not overflow into the controls: the dock lies beside it or below it.
+      expect(
+        dock.x >= canvas.x + canvas.width - 1 ||
+          dock.y >= canvas.y + canvas.height - 1 ||
+          dock.x + dock.width <= canvas.x + 1 ||
+          dock.y + dock.height <= canvas.y + 1,
+      ).toBe(true);
       expect(
         await page.locator("html").evaluate((e) => e.scrollWidth),
       ).toBeLessThanOrEqual(viewport.width);
       const points = await page.evaluate(async () => {
-        const { clockStage } = await import("/src/clock.mjs");
+        const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
         clockStage.camera.updateMatrixWorld();
         return clockStage.presentation.children
           .filter((o) => o.type === "Group")
@@ -419,7 +423,7 @@ test("slow preferences show fitted quarter and half durations without relabeling
   );
   await expect(page.locator("#seconds-speed")).toHaveValue("2000");
   const rate = await page.evaluate(async () => {
-    const { clockUnits } = await import("/src/clock.mjs");
+    const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
     return {
       preferred: clockUnits[2].duration,
       quarter: clockUnits[2].scheduledQuarterDuration,
@@ -443,12 +447,12 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
   await page.clock.runFor(100);
   expect(
     await page.evaluate(async () => {
-      const { clockStage } = await import("/src/clock.mjs");
+      const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
       return clockStage.renderer.info.render.frame;
     }),
   ).toBeGreaterThan(3);
   await page.evaluate(async () => {
-    const { clockUnits, clockStage } = await import("/src/clock.mjs");
+    const { clockUnits, clockStage } = await import("/src/apps/clock/live-mode.mjs");
     const { LiveClockScheduler } = await import("/src/apps/clock/scheduler.ts");
     // Freeze only automatic scheduling; RAF, physical motion and timers stay on the page's (fake) clock.
     LiveClockScheduler.prototype.tick = () => ({
@@ -525,13 +529,13 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
   for (let spent = 0; ; spent += 16) {
     // Finished means: turns have started and the controller is idle again (it starts on the first frame).
     const finished = await page.evaluate(async () => {
-      const { clockUnits } = await import("/src/clock.mjs");
+      const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
       return window.angularTrace.length > 0 && !clockUnits[2].controller.busy;
     });
     if (finished) break;
     if (spent > budget) {
       const seen = await page.evaluate(async () => {
-        const { clockUnits } = await import("/src/clock.mjs");
+        const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
         return { turns: window.angularTrace.length, busy: clockUnits[2].controller.busy };
       });
       throw Error(`The mixed turn sequence did not finish within ${budget} ms of fake time: ${JSON.stringify(seen)}`);
@@ -580,14 +584,14 @@ test("untimed recovery honors quarter-based clock speed while the default viewer
   await page.addInitScript(() => {
     Date.now = () => Date.parse("2026-10-28T11:34:56Z");
   });
-  await page.goto("/clock.html");
+  await page.goto("/index.html?app=clock");
   await expect(page.locator("#seconds-speed")).toBeEnabled();
   // A long move period keeps frame quantization (up to 300 ms in software GL) small against the signal: if the
   // legacy "move" metric were ignored, half turns would take twice the period.
   const period = 720;
   const run = async (metric) =>
     page.evaluate(async ({ metric, period }) => {
-      const { clockUnits, clockStage } = await import("/src/clock.mjs"),
+      const { clockUnits, clockStage } = await import("/src/apps/clock/live-mode.mjs"),
         { LiveClockScheduler } = await import("/src/apps/clock/scheduler.ts");
       LiveClockScheduler.prototype.tick = () => ({
         values: [12, 34, 56],
@@ -694,3 +698,103 @@ test("move statistics block is present, stable in layout and updates after clock
   expect(table.x).toBeGreaterThanOrEqual(0);
   expect(table.x + table.width).toBeLessThanOrEqual(390);
 });
+
+// Parameters and panels the Clock page offered, now in the unified clock mode (index.html?app=clock).
+const CLOCK = "/index.html?app=clock";
+async function clockReady(page, query = "") {
+  await page.addInitScript(() => {
+    Date.now = () => Date.parse("2026-10-28T11:34:56Z");
+  });
+  await page.goto(CLOCK + query);
+  await expect(page.locator("#seconds-speed")).toBeEnabled({ timeout: 30000 });
+}
+test("an unlisted speed parameter falls back to the unit default", async ({ page }) => {
+  await clockReady(page, "&hours-speed=123&minutes-speed=abc&seconds-speed=50");
+  for (const [name, speed] of [
+    ["hours", "500"],
+    ["minutes", "250"],
+    ["seconds", "50"],
+  ])
+    await expect(page.locator("#" + name + "-speed")).toHaveValue(speed);
+});
+for (const query of ["&nerd=1", "&dev", "&expert=1", "&seconds-speed=50"])
+  test(`the Nerd panel starts open for ${query}`, async ({ page }) => {
+    await clockReady(page, query);
+    await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", true);
+    await expect(page.locator("#clock-nerd-toggle-btn")).toHaveClass(/is-active/);
+  });
+test("the Nerd panel starts closed, opens from its header button and the choice is remembered", async ({ page }) => {
+  await clockReady(page);
+  await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", false);
+  await page.locator("#clock-nerd-toggle-btn").click();
+  await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", true);
+  await page.reload();
+  await expect(page.locator("#seconds-speed")).toBeEnabled({ timeout: 30000 });
+  await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", true);
+  await page.locator("#clock-nerd-toggle-btn").click();
+  await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", false);
+});
+test("the Nerd panel shows no per-cube value text, only the timing", async ({ page }) => {
+  await clockReady(page, "&nerd=1");
+  await expect(page.locator("#hours-state, #minutes-state, #seconds-state")).toHaveCount(0);
+  await expect(page.locator("#seconds-timing")).toContainText("Scheduled: quarter");
+});
+test("the sticker lettering changes in place, rewrites the URL, keeps the speeds and moves the print link", async ({ page }) => {
+  await clockReady(page, "&lettering=words&hours-speed=250");
+  await page.evaluate(() => (window.sameDocument = true));
+  await expect(page.locator("#print-stickers")).toHaveAttribute("href", /design=hsm-words$/);
+  expect(
+    await page.evaluate(async () => {
+      const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
+      return clockUnits.map((u) => u.controller.view.presentedPrint.id);
+    }),
+  ).toEqual(Array(3).fill("hsm_counter_seconds_first_words"));
+  await page.selectOption("#clock-lettering", "symbols");
+  await expect(page.locator("#clock-lettering")).toBeEnabled({ timeout: 30000 });
+  await expect(page).toHaveURL(/lettering=symbols/);
+  await expect(page.locator("#print-stickers")).toHaveAttribute("href", /design=hsm-symbols$/);
+  await expect(page.locator("#hours-speed")).toHaveValue("250");
+  expect(await page.evaluate(() => window.sameDocument)).toBe(true);
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
+        return clockUnits.map((u) => u.controller.view.presentedPrint.id);
+      }),
+    )
+    .toEqual(Array(3).fill("hsm_counter_seconds_first"));
+});
+test("the print link of the default clock opens the Pascal-case words sheet", async ({ page }) => {
+  await clockReady(page);
+  await expect(page.locator("#print-stickers")).toHaveAttribute("href", /design=hsm-words-pascal$/);
+});
+test("the clock shows the Reference view button and the time zone; another mode hides the button and ends the clock", async ({
+  page,
+}) => {
+  await clockReady(page);
+  await expect(page.getByRole("button", { name: "Reference view" })).toBeVisible();
+  await expect(page.locator("#clock-zone")).toHaveText("Europe/Berlin");
+  await page.selectOption("#studio-application", "counter");
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "counter", { timeout: 30000 });
+  await expect(page.getByRole("button", { name: "Reference view" })).toBeHidden();
+  await expect(page.locator("#clock-digital")).toHaveCount(0);
+  await expect(page.locator("#studio-controls")).not.toHaveClass(/clock-control/);
+  await expect(page.locator("#print-stickers")).toHaveAttribute("href", /design=words-pascal$/);
+  expect(
+    await page.evaluate(async () => {
+      const { clockUnits, clockStage } = await import("/src/apps/clock/live-mode.mjs");
+      return { units: clockUnits.length, stage: clockStage };
+    }),
+  ).toEqual({ units: 0, stage: null });
+  await page.selectOption("#studio-application", "clock");
+  await expect(page.locator("#seconds-speed")).toBeEnabled({ timeout: 30000 });
+  await expect(page.getByRole("button", { name: "Reference view" })).toBeVisible();
+  await expect(page.locator("canvas")).toHaveCount(1);
+});
+for (const flag of ["kiosk=1", "presentation=true"])
+  test(`${flag} starts the clock in presentation mode`, async ({ page }) => {
+    await clockReady(page, "&" + flag);
+    await expect(page.locator("body")).toHaveClass(/presentation-mode/);
+    await expect(page.locator("#clock-digital")).toBeVisible();
+    await expect(page.locator("#clock-lettering")).toBeHidden();
+  });

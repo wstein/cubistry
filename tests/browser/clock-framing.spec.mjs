@@ -5,9 +5,9 @@ test("the shared clock stays framed at simultaneous yaw and pitch extremes", asy
   await page.addInitScript(() => {
     Date.now = () => Date.parse("2026-10-28T11:34:56Z");
   });
-  await page.goto("/clock.html");
+  await page.goto("/index.html?app=clock");
   await expect(page.locator("#seconds-speed")).toBeEnabled();
-  const canvas = page.locator("#clock-scene canvas");
+  const canvas = page.locator("#studio-scene canvas");
   for (const [dx, dy] of [
     [200, 200],
     [-200, 200],
@@ -15,7 +15,7 @@ test("the shared clock stays framed at simultaneous yaw and pitch extremes", asy
     [-200, -200],
   ]) {
     await page.evaluate(async () => {
-      const { clockUnits } = await import("/src/clock.mjs");
+      const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
       clockUnits[0].controller.view.resetCamera();
     });
     const box = await canvas.boundingBox(),
@@ -26,19 +26,19 @@ test("the shared clock stays framed at simultaneous yaw and pitch extremes", asy
     await page.mouse.move(x + dx, y + dy);
     await page.mouse.up();
     const before = await page.evaluate(async () => {
-      const { clockStage } = await import("/src/clock.mjs");
+      const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
       return clockStage.renderer.info.render.frame;
     });
     await expect
       .poll(() =>
         page.evaluate(async (before) => {
-          const { clockStage } = await import("/src/clock.mjs");
+          const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
           return clockStage.renderer.info.render.frame > before + 1;
         }, before),
       )
       .toBe(true);
     const points = await page.evaluate(async () => {
-      const { clockStage } = await import("/src/clock.mjs");
+      const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
       const { clockBounds } = await import("/src/apps/clock/framing.ts");
       return clockBounds.map((p) =>
         clockStage.camera.position
@@ -62,18 +62,18 @@ test("the reference top-right viewpoint resets and fits the shared row on deskto
   await page.addInitScript(() => {
     Date.now = () => Date.parse("2026-10-29T04:35:42Z");
   });
-  await page.goto("/clock.html?lettering=words");
+  await page.goto("/index.html?app=clock&lettering=words");
   await expect(page.locator("#seconds-speed")).toBeEnabled();
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.evaluate(async () => {
-      const { clockUnits } = await import("/src/clock.mjs");
+      const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
       clockUnits[0].controller.view.resetCamera();
     });
     await expect
       .poll(async () =>
         page.evaluate(async () => {
-          const { clockStage } = await import("/src/clock.mjs");
+          const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
           return (
             clockStage.renderer.domElement.width ===
             Math.round(
@@ -87,25 +87,25 @@ test("the reference top-right viewpoint resets and fits the shared row on deskto
     await expect
       .poll(async () =>
         page.evaluate(async () => {
-          const { clockStage } = await import("/src/clock.mjs");
+          const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
           return -clockStage.presentation.rotation.y;
         }),
       )
       .toBeCloseTo(0.2, 5);
     const frame = await page.evaluate(async () => {
-      const { clockStage } = await import("/src/clock.mjs");
+      const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
       return clockStage.renderer.info.render.frame;
     });
     await expect
       .poll(async () =>
         page.evaluate(async () => {
-          const { clockStage } = await import("/src/clock.mjs");
+          const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
           return clockStage.renderer.info.render.frame;
         }),
       )
       .toBeGreaterThan(frame + 1);
     const fit = await page.evaluate(async () => {
-      const { clockStage } = await import("/src/clock.mjs");
+      const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
       const { clockBounds } = await import("/src/apps/clock/framing.ts");
       return clockBounds.every((p) => {
         const q = clockStage.camera.position
