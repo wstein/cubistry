@@ -1,8 +1,12 @@
 Pastel Garden picture-cube artwork with original characters (draft)
-Copyright 2026 Cubistry contributors
+Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
 
 These six original vector illustrations and their 24 cropped SVG sticker tiles
-are licensed under AGPL-3.0-or-later, matching the Cubistry repository license.
+are a work separate from the Cubistry program code, which stays under
+AGPL-3.0-or-later. The images are licensed under CC BY-SA 4.0; the AGPL copyleft
+does not cover them.
 The six characters (Pip, Nimbo, Tulia, Moss, Sunny, Plop) are original inventions
 and are not modeled on any licensed character. The SVG files in this directory
 contain no text and no fonts; no third-party images, platform glyphs, or stock
@@ -12,7 +16,12 @@ Editable source and deterministic regeneration:
   scripts/build-pastel-garden-art.mjs
   node scripts/build-pastel-garden-art.mjs
 
+The art generator is the editable source of the artwork, so it is art data under
+the same CC BY-SA 4.0 license, not AGPL program code. The unused Up/Down draft
+proposals in assets/playground-pastel-proposals/ are part of the same artwork
+and carry the same license.
+
 Source repository: https://github.com/wstein/cubistry
-License: https://www.gnu.org/licenses/agpl-3.0.html
+License: https://creativecommons.org/licenses/by-sa/4.0/
 Each full face uses a 320 by 320 viewBox; quadrant files use a 160 by 160
 viewBox with the original face offset. net.svg is an assembly preview only.
