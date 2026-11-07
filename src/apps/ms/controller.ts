@@ -24,7 +24,7 @@ export class MsController extends PhysicalPlayback {
   readonly msPrint: MsPrint;
   readonly letter: MsLetter;
   readonly period: MsPeriod;
-  private readonly manifest: AssetManifest;
+  private manifest: AssetManifest;
   protected readonly resolveAssets: typeof loadAssets;
   private planned: readonly LegalMove[] = [];
   private prepared: {
@@ -128,5 +128,26 @@ export class MsController extends PhysicalPlayback {
       this.configuring = false;
     }
     this.notify();
+  }
+
+  /** Switch the asset manifest (lettering, marker) in place; pose and value stay. */
+  async updateManifest(manifest: AssetManifest): Promise<void> {
+    if (!this.state) return;
+    while (this.busy || this.configuring || this.view.animating) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    const state = this.state;
+    if (!state) return;
+    this.configuring = true;
+    let assets;
+    try {
+      this.manifest = manifest;
+      assets = await this.resolveAssets(manifest, [this.msPrint.print]);
+      this.install(this.msPrint.print, state, assets, this.current);
+      assets = undefined;
+    } finally {
+      assets?.dispose();
+      this.configuring = false;
+    }
   }
 }
