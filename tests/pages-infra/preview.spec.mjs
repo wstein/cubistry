@@ -5,6 +5,13 @@ for (const number of [52, 53])
   test(`PR${number} deep-base static preview renders real moves, noindex and reload without root asset leaks`, async ({
     page,
   }) => {
+    // In CI run 42367255937 (trace of the failed PR52 case) no assertion failed:
+    // the 30 s default expired while waiting for aria-busy after the reload.
+    // Context creation took 6.4 s, each of the two canvas screenshots 6.6 and
+    // 7.3 s, and the reload 5 s under SwiftShader. The PR53 case passed at
+    // 26.1 s, and both cases took 14.8 and 12.3 s in run 42363477803.
+    // Budget: 3x the failed case.
+    test.setTimeout(90000);
     const errors = [],
       bad = [],
       paths = [];
