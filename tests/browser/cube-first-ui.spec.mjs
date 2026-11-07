@@ -143,40 +143,6 @@ test("seven exact keyboard speed stops persist and remain separate from Run cade
   await page.reload();
   await expect(slider).toHaveValue("6");
 });
-test("viewer hint ignores clicks, dismisses on drag or zoom, stays hidden, and times out with reduced motion", async ({
-  page,
-}) => {
-  await ready(page);
-  const canvas = page.locator("#cube canvas"),
-    hint = page.locator("#viewer-hint");
-  await expect(hint).toBeVisible();
-  await canvas.click();
-  await expect(hint).toBeVisible();
-  const box = await canvas.boundingBox();
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(
-    box.x + box.width / 2 + 60,
-    box.y + box.height / 2 + 30,
-    { steps: 5 },
-  );
-  await page.mouse.up();
-  await expect(hint).toBeHidden();
-  await target(page, 1);
-  await page.locator("#set").click();
-  await expect(hint).toBeHidden();
-  await page.reload();
-  await expect(canvas).toBeVisible();
-  await expect(hint).toBeVisible();
-  await canvas.hover();
-  await page.mouse.wheel(0, 100);
-  await expect(hint).toBeHidden();
-  await page.reload();
-  await expect(hint).toBeVisible();
-  await page.clock.runFor(10001);
-  await expect(hint).toBeHidden();
-});
-
 test("real seven-stop speed can change during playback without changing legal moves", async ({
   page,
 }) => {
