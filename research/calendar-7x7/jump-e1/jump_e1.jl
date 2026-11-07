@@ -65,12 +65,12 @@ end
 println("E1 prelude done after ", round(time() - E1_T0; digits=1), " s; chain end ", lastym[1], "-", lastym[2]); flush(stdout)
 const E1_PRELUDE_SEC = time() - E1_T0
 
-# ---- catalogue builds are timed here, so they do not inflate the first case ----
+# ---- catalog builds are timed here, so they do not inflate the first case ----
 t_cat = time()
 const E1_CATS = Ref{Any}(P.chain_catalogues(action))
 CACHE[] === nothing && (CACHE[] = M.cached_catalogues(action, a; relax_budget=60000))
 const E1_CATALOGUE_SEC = time() - t_cat
-println("E1 catalogues built in ", round(E1_CATALOGUE_SEC; digits=1), " s"); flush(stdout)
+println("E1 catalogs built in ", round(E1_CATALOGUE_SEC; digits=1), " s"); flush(stdout)
 
 # ---- library statistics (input for a sparse WASM layout estimate) ----
 let nm = length(MACS)

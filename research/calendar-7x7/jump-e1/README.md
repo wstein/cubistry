@@ -36,7 +36,7 @@ starts off the chain.
 - **Library statistics.** Number of macros and mean stickers moved per
   macro, to estimate a sparse in-memory layout for a WASM port.
 - **Resources.** Seconds per case and peak resident set per shard. The
-  catalogue builds (orbit and hybrid) are done once before the first
+  catalog builds (orbit and hybrid) are done once before the first
   case and timed separately, so they do not inflate the first case.
 
 ## Output and re-check
@@ -72,12 +72,13 @@ changes, the harness stops with an error.
 | E1 length | median HTM at most 200 and nearest-rank p95 at most 500, over the successes |
 | E2 floor | the orbit solve succeeds on every start |
 | Stop rule (plan) | E1 success below 80 % ends the beam approach |
+| Re-check | no state or digest mismatch (any mismatch: FAIL); an unavailable or errored re-check: INCONCLUSIVE |
 
 The median is the nearest-rank value, so for an even number of
 successes it is the lower of the two middle values. `analyze_e1.jl`
 prints a verdict only for the full run (60 expected, 60 distinct cases
 present, none skipped). A smoke run prints `SMOKE (no verdict)`, an
-incomplete run `INCOMPLETE (no verdict)`. Duplicate case ids are an
+incomplete run `INCOMPLETE (no verdict)`. Per-gate lines read `n/a` unless the run is complete. Duplicate case ids are an
 error. A pass only allows the next step (E3, a Rust WASM
 micro-benchmark of the macro scan).
 
@@ -85,10 +86,10 @@ micro-benchmark of the macro scan).
 
 The dispatch-only workflow `.github/workflows/jump-e1.yml` on `main`
 takes `research_ref`, runs 4 shards of 15 cases (one producer process
-each, about 3 GB), uploads the shard tables and runs `analyze_e1.jl`.
+each, about 3.5 GB peak), uploads the shard tables and runs `analyze_e1.jl`.
 Estimated cost: 4 jobs of about 75 minutes each, about 5 runner hours
 (library build 40 to 64 s per process, about 260 s per case, plus the
-E2 solve and the catalogue builds). A smoke run (one case, about 10
+E2 solve and the catalog builds). A smoke run (one case, about 10
 minutes) comes first. No local run is intended.
 
 ```sh
@@ -109,6 +110,9 @@ julia --startup-file=no analyze_e1.jl OUT 60
 - Few starts per target: the success rate has a wide interval.
 - The 6 strata are not all weekdays of every month type; two displays
   per stratum are a sample, not a coverage proof.
+- On the E1 orbit-fallback path `solve_edge` rebuilds `P.chain_catalogues`,
+  so those E1 times include a catalog build and are not comparable with
+  E2 (whose catalog is built once, before the first case).
 - Moves are counted as in the producer (`M.htm`); whole-cube rotation
   steps are counted separately as grouped steps (consecutive moves of
   one generator merge) and cost 0 HTM.

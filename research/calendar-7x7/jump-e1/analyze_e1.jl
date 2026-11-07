@@ -6,6 +6,8 @@
 # Gates (owner decision): E1 success >= 95 %, median HTM <= 200, p95 HTM <= 500 (nearest rank, so the
 # median of an even count is the lower middle value; over successful cases); E2 must succeed on every
 # start. Plan stop rule: E1 success below 80 % ends the beam approach.
+# Re-check: any state or digest mismatch makes the verdict FAIL; an unavailable or errored re-check makes it
+# INCONCLUSIVE. Gate lines show n/a unless the run is complete (60 distinct cases, none skipped).
 # A verdict (PASS or FAIL) is printed only for the full run (EXPECTED_CASES == 60) with all 60 distinct
 # cases present and none skipped. Anything else prints SMOKE (EXPECTED_CASES < 60) or INCOMPLETE.
 length(ARGS) == 2 || error("usage: analyze_e1.jl DIR EXPECTED_CASES")
@@ -50,7 +52,7 @@ else
     println(io, "| E1 failed / skipped (budget) / missing | ", length(fail1), " / ", length(skipped), " / ", EXPECTED - length(rows), " |")
     if !isempty(ok1)
         println(io, "| E1 HTM median / p95 / max | ", rank(htm, 0.5), " / ", rank(htm, 0.95), " / ", maximum(htm), " |")
-        println(io, "| E1 seconds median / p95 / max (catalogue builds excluded) | ", rank(secs, 0.5), " / ", rank(secs, 0.95), " / ", maximum(secs), " |")
+        println(io, "| E1 seconds median / p95 / max (catalog builds excluded) | ", rank(secs, 0.5), " / ", rank(secs, 0.95), " / ", maximum(secs), " |")
         rsteps = [fl(r, "e1_rot_steps") for r in ok1]
         println(io, "| E1 whole-cube rotation steps (grouped) median / max | ", rank(rsteps, 0.5), " / ", maximum(rsteps), " |")
     end
@@ -95,9 +97,13 @@ else
         println(io, "\n### Macro library (input for a sparse WASM layout)\n")
         println(io, "- macros: ", stats["macros"], "; mean stickers moved per macro: ", stats["mean_stickers_moved"], "; mean constrained positions moved: ", stats["mean_constrained_positions_moved"])
         println(io, "- sparse layout estimate (4 bytes per moved sticker + 16 bytes word): ", round(nm * (4mv + 16) / 2^20; digits=1), " MB; dense u16 (", stats["perm_length"], " entries): ", round(nm * 2 * parse(Float64, stats["perm_length"]) / 2^20; digits=1), " MB")
-        haskey(stats, "catalogue_seconds") && println(io, "- one-time seconds per shard: prelude (library build) ", stats["prelude_seconds"], ", catalogues ", stats["catalogue_seconds"])
+        haskey(stats, "catalogue_seconds") && println(io, "- one-time seconds per shard: prelude (library build) ", stats["prelude_seconds"], ", catalogs ", stats["catalogue_seconds"])
     end
 end
+rc_all = vcat([r["e1_recheck"] for r in ok1], [r["e2_recheck"] for r in ok2])
+rc_bad = count(s -> s in ("state-mismatch", "digest-mismatch"), rc_all)
+rc_unavail = count(s -> s != "ok" && !(s in ("state-mismatch", "digest-mismatch")), rc_all)
+g_rc = rc_bad == 0 && rc_unavail == 0
 g_rate = rate >= 0.95
 g_med = !isempty(htm) && rank(htm, 0.5) <= 200
 g_p95 = !isempty(htm) && rank(htm, 0.95) <= 500
@@ -105,12 +111,14 @@ g_e2 = ran > 0 && length(ok2) == ran
 stop80 = rate < 0.80
 complete = EXPECTED == FULL && length(rows) == FULL && isempty(skipped)
 println(io, "\n### Gates\n")
-println(io, "- success >= 95 %: ", g_rate ? "PASS" : "FAIL")
-println(io, "- median HTM <= 200 (lower median): ", g_med ? "PASS" : "FAIL")
-println(io, "- p95 HTM <= 500: ", g_p95 ? "PASS" : "FAIL")
-println(io, "- E2 floor succeeds on every start: ", g_e2 ? "PASS" : "FAIL")
-println(io, "- plan stop rule (success < 80 % ends the beam approach): ", stop80 ? "TRIGGERED" : "not triggered")
-verdict = EXPECTED < FULL ? "SMOKE (no verdict)" : !complete ? "INCOMPLETE (no verdict)" : (g_rate && g_med && g_p95 && g_e2) ? "PASS" : "FAIL"
+gl(label, ok) = println(io, "- ", label, ": ", complete ? (ok ? "PASS" : "FAIL") : "n/a (run not complete)")
+gl("success >= 95 %", g_rate)
+gl("median HTM <= 200 (lower median)", g_med)
+gl("p95 HTM <= 500", g_p95)
+gl("E2 floor succeeds on every start", g_e2)
+println(io, "- algebra re-check (no state or digest mismatch, none unavailable): ", !complete ? "n/a (run not complete)" : rc_bad > 0 ? "FAIL (" * string(rc_bad) * " mismatches)" : rc_unavail > 0 ? "INCONCLUSIVE (" * string(rc_unavail) * " unavailable or errored)" : "PASS")
+println(io, "- plan stop rule (success < 80 % ends the beam approach): ", !complete ? "n/a (run not complete)" : stop80 ? "TRIGGERED" : "not triggered")
+verdict = EXPECTED < FULL ? "SMOKE (no verdict)" : !complete ? "INCOMPLETE (no verdict)" : rc_bad > 0 ? "FAIL" : rc_unavail > 0 ? "INCONCLUSIVE" : (g_rate && g_med && g_p95 && g_e2) ? "PASS" : "FAIL"
 println(io, "- verdict: **", verdict, "**")
 println(io, "\nCandidates only: each word passed the planner's validate_front and, where the re-check is ok, a replay with the continuous verifier's direct_move. None is a chain edge or verified by the Julia or Flix chain verifiers; the front rule is the producer's own. A PASS lets the study go on to E3; it is not a proof of anything.")
 println(io, "\nLicense: CC BY-SA 4.0 (SPDX-License-Identifier: CC-BY-SA-4.0). Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.")
