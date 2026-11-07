@@ -1711,8 +1711,6 @@ body.licenses-page main.licenses-container {
   border-radius: 0;
   backdrop-filter: none;
   transform: none;
-}
-.cube-appearance .cube-appearance-more > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
