@@ -1097,6 +1097,10 @@ async function initCalendar7Mode(isCurrent, params) {
   cardsContainer.setAttribute("data-count", "1");
   cardsContainer.innerHTML = '<div class="c7-root" id="calendar7-root"></div>';
   const instance = await mountCalendar7($("calendar7-root"), params, browserMountEnv(base, isCurrent));
+  if (!isCurrent()) {
+    instance?.dispose();
+    return;
+  }
   return instance ? () => instance.dispose() : undefined;
 }
 
