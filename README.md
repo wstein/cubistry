@@ -8,8 +8,8 @@ real cubes that show numbers, time or status using only legal moves.
        alt="The Live H-M-S Clock page: three 2x2 cubes showing 12, 10 and 17 as hours, minutes and seconds, with a live time panel reading 12:10:17 UTC">
 </p>
 
-*The Live H-M-S Clock, captured from this repository's `clock.html`
-([provenance](docs/assets/readme/README.md)).* Three physical 2x2 cubes show the
+*The Live H-M-S Clock, captured from this repository's former `clock.html` page,
+now `index.html?app=clock` ([provenance](docs/assets/readme/README.md)).* Three physical 2x2 cubes show the
 hours, minutes and seconds of the current time. Each cube keeps its own physical
 state, and every change of the display is a sequence of legal
 face turns, never a redrawn sticker.
@@ -47,7 +47,7 @@ application chooser in the page header switches between these:
 
 | Application | What it shows | Entry point |
 | --- | --- | --- |
-| Live H-M-S Clock | Current time on three cubes (default page) | `clock.html` ([docs](docs/LIVE_CLOCK.md)) |
+| Live H-M-S Clock | Current time on three cubes (first app) | `index.html?app=clock` ([docs](docs/LIVE_CLOCK.md)) |
 | Counter 0-99 | A two-digit counter | `counter.html` ([docs](docs/COUNTER_USAGE.md)) |
 | H/M/S Counter 00-59 | Seconds, minutes or hours | `hsm-counter.html` ([docs](docs/HSM_COUNTER.md)) |
 | 60-Minute and 5-Second Timers | Countdown and stopwatch | `timer.html`, `five-second-timer.html` ([docs](docs/WORKSHOP_TIMER.md), [docs](docs/FIVE_SECOND_TIMER.md)) |
@@ -68,7 +68,7 @@ npm run setup   # prepares the pinned solver packages, installs dependencies
 npm run dev     # builds the ReScript core, starts Vite on http://localhost:5173
 ```
 
-Open `http://localhost:5173/clock.html` for the live clock. Remote or LAN clients
+Open `http://localhost:5173/index.html?app=clock` for the live clock. Remote or LAN clients
 need HTTPS because print and asset checks use Web Crypto. Test commands, sandbox
 notes and the full list are in [Development](docs/DEVELOPMENT.md) and
 [Evidence and checks](docs/EVIDENCE_AND_CHECKS.md).

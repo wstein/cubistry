@@ -7,7 +7,7 @@ Clock. It is not a print export and not a mock-up.
 
 | Field | Value |
 | --- | --- |
-| Page | `clock.html` (Live H-M-S Clock) served by Vite from this repository |
+| Page | the former `clock.html` (Live H-M-S Clock), now `index.html?app=clock`, served by Vite from this repository |
 | Source commit | `db4fff9c30a5c2108f26e693fd9363178c4e6084` (`origin/main`) |
 | Captured | 2026-11-01 12:10:17 UTC; the page showed 12:10:17 (UTC), sticker lettering "Small hour / min / sec" (page default) |
 | Viewport | 1440x810 CSS pixels, device scale factor 1 |

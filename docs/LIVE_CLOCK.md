@@ -1,6 +1,7 @@
 # Live H–M–S clock
 
-The separate [clock page](../clock.html) implements #62 using three independent
+The clock mode of the unified application (`index.html?app=clock`, id `clock`, code in
+`src/apps/clock/live-mode.mjs`) implements #62 using three independent
 copies of the seconds-first HSM print (see [HSM counter](HSM_COUNTER.md), which also
 lists the changed stickers and the reprint decision). Hours use 00–23; minutes and seconds
 use 00–59. Each unit keeps its own full physical state, assets, animation speed,
@@ -14,8 +15,9 @@ extension leaves standalone viewers in control of their own renderer. Timed
 shared endpoints are painted together by the stage frame loop.
 
 The sticker lettering selector chooses either large H/M/S or only small
-`hour`/`min`/`sec` at the bottom of R1C2. It reloads a different immutable print
-at current local time, preserving the three preferred turn settings. The two
+`hour`/`min`/`sec` at the bottom of R1C2. It installs a different immutable print
+in place, at the current pose, preserving the three preferred turn settings and
+the session move counts, and writes the choice to the `lettering` parameter. The two
 styles never appear together on a sticker. See [artwork provenance](HSM_COUNTER.md#sticker-lettering-variants).
 
 The shared control panel follows the five-second timer's typography and shows
@@ -34,6 +36,21 @@ their existing speed semantics.
 Use **Present** for the [presentation layout](PRESENTATION_MODE.md), with native
 fullscreen when supported. **Reference view** restores the camera without
 changing the displayed value, print, date or active motion.
+
+## URL parameters
+
+`index.html?app=clock` takes these parameters (the same ones the former standalone
+page read; unknown values fall back to the default):
+
+| Parameter | Effect |
+| --- | --- |
+| `lettering` | `symbols`, `words` or `words-pascal` (default, or the last choice made in the panel). |
+| `hours-speed`, `minutes-speed`, `seconds-speed` | Preferred quarter-turn time in ms: 2000, 1000, 500, 250, 100, 50 or 10. Defaults 500, 250, 100. Any of them opens the Nerd panel. |
+| `nerd`, `dev`, `expert` | Open the Nerd panel (timing and speeds). The panel button in the header of the control panel toggles it and the choice is remembered. |
+| `kiosk`, `presentation` | `1` or `true` starts in presentation mode. |
+
+The Nerd panel shows the preferred quarter-turn time per cube and the scheduled
+quarter and half durations; it no longer repeats the cube value as text.
 
 ## Predictive playback
 
@@ -121,9 +138,9 @@ HSM routes consist of outer-face moves only, so that column stays at zero.
   display. It keeps two integers, no per-tick history. A dash means no change
   has completed yet; Reset session moves clears it. The Total row has no
   average.
-- Session counters restart on page load or when the print changes, and with the
-  Reset session moves button. They survive re-rendering and presentation mode
-  and are not stored in the browser. Presentation mode hides the block, like the
+- Session counters restart on page load, when the mode is opened again, and with
+  the Reset session moves button. They survive a lettering change, re-rendering
+  and presentation mode and are not stored in the browser. Presentation mode hides the block, like the
   per-cube status lines.
 - Only exact figures are shown, no estimates; the average is rounded for display.
 - On the seconds-first print the seconds cube averages 2.65 HTM per tick (159 per

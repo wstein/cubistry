@@ -70,7 +70,7 @@ test("face colors use explicit metadata and image-backed art is never sampled or
   assert.equal(sourceFaceColor("picture", manifest, "#abcdef"), "#abcdef");
 });
 test("per-page appearance preferences are bounded, fail closed, and reset to the style default", () => {
-  assert.notEqual(appearanceStorageKey("/clock.html"), appearanceStorageKey("/calendar.html"));
+  assert.notEqual(appearanceStorageKey("/ms-timer.html"), appearanceStorageKey("/calendar.html"));
   assert(appearanceStorageKey("x".repeat(1000)).length < 240);
   const valid = { version: 1, construction: "stickerless", frameColor: "#1a2b3c" };
   assert.deepEqual(readAppearance({ getItem: () => JSON.stringify(valid) }, "k"),
@@ -94,11 +94,11 @@ test("appearance controls apply saved construction, restore style color and rele
   }
   const names = ["document", "location", "localStorage"];
   const originals = names.map(name => Object.getOwnPropertyDescriptor(globalThis, name));
-  const key = appearanceStorageKey("/clock.html"), data = new Map([[key,
+  const key = appearanceStorageKey("/ms-timer.html"), data = new Map([[key,
     JSON.stringify({ version: 1, construction: "stickerless", frameColor: "#abc123" })]]);
   const host = new Element("div"); host.style.position = "static";
   const values = [];
-  const globals = { document: { createElement: tag => new Element(tag) }, location: { pathname: "/clock.html" },
+  const globals = { document: { createElement: tag => new Element(tag) }, location: { pathname: "/ms-timer.html" },
     localStorage: { getItem: k => data.get(k) ?? null, setItem: (k, value) => data.set(k, value) } };
   for (const name of names) Object.defineProperty(globalThis, name, { value: globals[name], configurable: true });
   try {
