@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createModeSwitcher } from "../src/apps/chronocube/mode-switch.ts";
+import { createModeSwitcher, whenCurrent } from "../src/apps/chronocube/mode-switch.ts";
 
 const deferred = () => {
   let resolve, reject;
@@ -56,4 +56,39 @@ test("a throwing cleanup does not stop the switch", async () => {
   await sw.switchTo(async () => () => { throw new Error("cleanup"); });
   assert.equal(await sw.switchTo(async () => () => {}), true);
   assert.deepEqual(warned, ["cleanup"]);
+});
+
+test("isCurrent is true while an init is the latest switch and false once a newer switch starts", async () => {
+  const sw = createModeSwitcher();
+  const gate = deferred();
+  let seen;
+  const first = sw.switchTo(async (isCurrent) => {
+    seen = isCurrent;
+    assert.equal(isCurrent(), true);
+    await gate.promise;
+  });
+  assert.equal(seen(), true);
+  await sw.switchTo(async () => {});
+  assert.equal(seen(), false);
+  gate.resolve();
+  await first;
+});
+
+test("isCurrent turns false for the active init once its own mode is cleaned up", async () => {
+  const sw = createModeSwitcher();
+  let seen;
+  await sw.switchTo(async (isCurrent) => ((seen = isCurrent), () => {}));
+  assert.equal(seen(), true);
+  await sw.switchTo(async () => {});
+  assert.equal(seen(), false);
+});
+
+test("whenCurrent runs the callback while current and drops the call once stale", () => {
+  let current = true;
+  const calls = [];
+  const wrapped = whenCurrent(() => current, (...args) => calls.push(args));
+  wrapped(1, 2);
+  current = false;
+  wrapped(3);
+  assert.deepEqual(calls, [[1, 2]]);
 });
