@@ -3,13 +3,19 @@
 export function installAppearanceButton(doc: Document = document): void {
   const button = doc.getElementById("appearance-btn");
   if (!button) return;
-  button.setAttribute("aria-controls", "cube-appearance-body");
   const panel = () => doc.querySelector(".cube-appearance.is-docked");
   button.addEventListener("click", () => {
     const open = button.getAttribute("aria-expanded") === "true";
     panel()?.dispatchEvent(new CustomEvent(open ? "cube-appearance:close" : "cube-appearance:open", { detail: { opener: button } }));
   });
+  // Hidden (and without aria-controls) while the active mode has no docked panel.
+  const show = (open: boolean, present: boolean) => {
+    button.setAttribute("aria-expanded", String(open)); button.hidden = !present;
+    if (present) button.setAttribute("aria-controls", "cube-appearance-body"); else button.removeAttribute("aria-controls");
+  };
+  show(false, panel() !== null);
   doc.addEventListener("cube-appearance:state", (event) => {
-    button.setAttribute("aria-expanded", String((event as CustomEvent).detail.open));
+    const { open, present } = (event as CustomEvent).detail;
+    show(open, present);
   });
 }

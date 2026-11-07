@@ -152,7 +152,9 @@ body.chronocube-page:has(#shell) {
 .shell .shell-btn:hover {
   background: var(--surface-2);
 }
-
+.shell .shell-btn[hidden] {
+  display: none;
+}
 
 /* ---------- body: stage column and dock ---------- */
 .shell .shell-body {
@@ -509,6 +511,10 @@ body.presentation-mode .shell .shell-nerd-toggle {
   background: transparent;
   border: 0;
   box-shadow: none;
+  /* The legacy ambient HUD rule (style.css: opacity .38, blur) targets aside.cube-appearance; the docked section is solid. */
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   color: var(--ink);
   font: var(--t-sm) / 1.4 var(--f-ui);
 }
