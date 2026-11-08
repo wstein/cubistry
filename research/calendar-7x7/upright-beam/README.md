@@ -27,7 +27,7 @@ not run.** Every word below was replayed by the independent `verify_moves.jl` co
 | 4-edge smoke from 2028-01, one retained state | 142, 105, 126, 108 = **481 HTM** (was 1604); all four by the beam, none by the orbit-solve fallback; `verify_smoke.jl` **ACCEPT** [V] |
 | Seconds per edge | 98 transitions (four single-thread processes at once on 4 cores): mean 68 s, max 127 s [V]. Smoke, one process alone, single-threaded: 64 to 81 s [V, `evidence/chain-smoke-edges.tsv`]; with 4 threads 21 to 39 s with identical words [measured, not archived: no evidence file holds that run] |
 | Target < 60 HTM per edge | **not met**: 7 transitions that change only 6 cells cost 22 HTM on average, the other 91 (about 36 cells change) cost 120 HTM, 2.6 HTM per wrong cell [V]. I do not see a way under 60 with this macro method [I] |
-| Target < 60 s per edge | met with 4 threads (about 30 s, measured, not archived), not single-threaded (about 70 s) [V] |
+| Target < 60 s per edge | met with 4 threads (about 30 s, measured, not archived), not single-threaded (about 70 s) [V for single-threaded] |
 | 863-edge chain | about **98 000 HTM** (was about 350 000) and **7 h** CPU wall with 4 threads, **17 h** single-threaded (was about 55 h) [estimate; the 7 h rests on the 4-thread timing that is not archived] |
 | Flix port and Flix replay | **not done** [D] |
 
@@ -54,7 +54,7 @@ the pose it needs sits:
    display) or a whole-cube rotation.
    With core weight 100 the beam never gives the core up. Core weight 1 fails (UNKNOWN)
    on 4 of 8 development edges even with all other fixes (`evidence/ablation-8edges.tsv`).
-2. **The old hybrid finish is self-defeating** (shown on the edge 25 -> 26 snapshots; for display 1 it is an inference [I]). It restarts `orbit_solve` from a beam
+2. **The old hybrid finish is self-defeating**. It restarts `orbit_solve` from a beam
    snapshot, and `orbit_solve` begins with `chain_core_prefix`. The core of every
    snapshot is wrong, so the prefix rotates the whole cube (`[21,21,21]`): 4 wrong cells
    become 47. The result is the 436 to 448 HTM of the hybrid experiments in
@@ -130,8 +130,8 @@ chosen `lambda=3`. `no_tightening` and `core_weight_1` change one setting each.
 `-1` means UNKNOWN (stall). The last mile (`finishN`, method column of the edge files)
 starts from a beam snapshot with N wrong cells (N is the number of wrong cells of the
 snapshot, not the number of macros); `solve_edge` tries the 6 snapshots with the fewest
-wrong cells. The committed runs used `tight=1` (tightening on, the default of
-`edge_batch.jl`), except in the `no_tightening` column.
+wrong cells. The committed runs presumably used `tight=1` (tightening on), per the default of
+`edge_batch.jl`; no edge TSV records its options. The `no_tightening` column is the exception.
 
 ## Measurements [V]
 
@@ -150,7 +150,7 @@ wrong cells. The committed runs used `tight=1` (tightening on, the default of
 - `evidence/chain-estimate.txt` (`chain_estimate.jl`): sum over the 98 transitions weighted
   by how often the 863-edge chain uses each: 113.3 HTM and 69.7 s per edge (contended),
   97 762 HTM and 16.7 CPU hours. Single-threaded smoke average 73 s -> 17.6 h; 4 threads
-  30 s -> 7.2 h.
+  30 s -> 7.2 h [4-thread figure measured, not archived].
 
 ## 863-edge chain, re-estimate [I]
 
