@@ -130,8 +130,14 @@ jobs:
       - name: Build Flix verifier jar
         run: |
           set -euo pipefail
-          jar=$(bash "src/$PURE_DIR/flix/build.sh" | tail -n 1)
-          test -f "$jar"
+          # flixw downloads flix.jar from a GitHub release and the dependencies from Maven; a
+          # transient 5xx there fails the build, so retry (the build itself is deterministic).
+          jar=""
+          for attempt in 1 2 3 4; do
+            if built=$(bash "src/$PURE_DIR/flix/build.sh"); then jar=$(printf "%s\n" "$built" | tail -n 1); break; fi
+            echo "::warning::Flix build attempt $attempt failed; retrying"; sleep $((attempt * 30))
+          done
+          test -n "$jar" && test -f "$jar"
           echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
           sha256sum "$jar" | tee "$GITHUB_WORKSPACE/out/flix-jar.sha256"
       - name: Produce edges
