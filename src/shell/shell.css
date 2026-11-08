@@ -323,6 +323,9 @@ body.chronocube-page:has(#shell) {
 .shell .shell-chip[data-state="warn"] { --c: var(--s-warn); }
 .shell .shell-chip[data-state="error"] { --c: var(--s-error); }
 
+.shell .shell-alerts:empty { display: none; }
+.shell .shell-alerts { display: grid; gap: var(--sp-2); }
+
 /* Warning and error rows beside the chip (ModeShell.setWarning, setError). */
 .shell .shell-alert-row {
   --c: var(--s-warn);

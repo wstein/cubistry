@@ -82,6 +82,15 @@ export class FakeElement {
   contains(node) {
     return node === this || this.descendants().includes(node);
   }
+  insertBefore(node, before) {
+    if (node === before) return;
+    this.log.push(["insert", this, node, before]);
+    node.remove();
+    const index = before === null ? this.children.length : this.children.indexOf(before);
+    if (index < 0) throw Error("Reference child is missing");
+    node.parentNode = this;
+    this.children.splice(index, 0, node);
+  }
   focus() {
     if (this.ownerDocument) this.ownerDocument.activeElement = this;
   }
@@ -146,6 +155,7 @@ export function fakeRegions() {
   }
   const regions = {
     status: el("div", false),
+    alerts: el("div", false),
     primary: el("div"),
     slots,
     readout: el("div"),

@@ -93,8 +93,8 @@ export interface ModeShell {
   setStatus(state: StatusState, text?: string): void;
   clearStatus(): void;
   /**
-   * One dismissible warning row and one error row in the status zone, beside the chip (`null` removes the row). The same
-   * row again writes nothing. The rows carry `role="alert"` and no live region of their own; Dismiss removes the row and
+   * One dismissible warning row and one error row outside the polite status zone (`null` removes the row). The same
+   * row again writes nothing. The rows use only the implicit assertive semantics of `role="alert"`; Dismiss removes the row and
    * runs `onDismiss`.
    */
   setWarning(row: WarningRow | null): void;
@@ -126,6 +126,7 @@ export interface ModeShell {
 /** The elements of index.html that the shell drives. */
 export interface ShellRegions {
   status: HTMLElement;
+  alerts: HTMLElement;
   primary: HTMLElement;
   slots: Readonly<Record<SlotNumber, HTMLElement>>;
   readout: HTMLElement;
@@ -157,6 +158,7 @@ export function findShellRegions(root: Pick<ParentNode, "querySelector">): Shell
   const slots = Object.fromEntries(SLOT_NUMBERS.map((n) => [n, need(`[data-slot="${n}"]`)])) as Record<SlotNumber, HTMLElement>;
   return {
     status: need('[data-region="status-zone"]'),
+    alerts: need('[data-region="alerts"]'),
     primary: need('[data-region="primary-action"]'),
     slots,
     readout: need('[data-region="readout"]'),
@@ -292,11 +294,20 @@ export function createShellHost(regions: ShellRegions, doc: Doc, options: ShellH
   }
 
   // ----- status
-  /** The status zone holds the chip first, then the warning row, then the error row. */
+  /** The polite region owns only the status chip; assertive rows are siblings outside it. */
   function paintStatus(): void {
-    const nodes = [chipNode, alertNodes.warn, alertNodes.error].filter((n): n is HTMLElement => n !== null);
-    if (nodes.length === 0 && regions.status.children.length === 0) return;
-    regions.status.replaceChildren(...nodes);
+    if (chipNode === null && regions.status.children.length === 0) return;
+    regions.status.replaceChildren(...(chipNode ? [chipNode] : []));
+  }
+  function paintAlerts(): void {
+    const wanted = [alertNodes.warn, alertNodes.error].filter((n): n is HTMLElement => n !== null);
+    for (const child of Array.from(regions.alerts.children))
+      if (!wanted.includes(child as HTMLElement)) child.remove();
+    wanted.forEach((node, index) => {
+      // Re-inserting an unchanged alert can announce it again and blur its Dismiss button.
+      if (regions.alerts.children[index] !== node)
+        regions.alerts.insertBefore(node, regions.alerts.children[index] ?? null);
+    });
   }
   function clearStatusChip(): void {
     status = null;
@@ -308,7 +319,7 @@ export function createShellHost(regions: ShellRegions, doc: Doc, options: ShellH
       if (alertNodes[kind] === null) return;
       alertNodes[kind] = null;
       alertKeys[kind] = null;
-      paintStatus();
+      paintAlerts();
       return;
     }
     if (typeof row.text !== "string" || row.text.trim() === "") throw new TypeError("an alert row needs text");
@@ -327,13 +338,13 @@ export function createShellHost(regions: ShellRegions, doc: Doc, options: ShellH
       if (alertNodes[kind] !== node) return;
       alertNodes[kind] = null;
       alertKeys[kind] = null;
-      paintStatus();
+      paintAlerts();
       runCleanup(row.onDismiss);
     });
     node.append(lead, text, dismiss);
     alertNodes[kind] = node;
     alertKeys[kind] = key;
-    paintStatus();
+    paintAlerts();
   }
 
   // ----- readout
@@ -414,7 +425,7 @@ export function createShellHost(regions: ShellRegions, doc: Doc, options: ShellH
     clearStatusChip();
     alertNodes.warn = alertNodes.error = null;
     alertKeys.warn = alertKeys.error = null;
-    paintStatus();
+    paintAlerts();
     clearReadoutBar();
     nerdSpec = null;
     drawNerd();
