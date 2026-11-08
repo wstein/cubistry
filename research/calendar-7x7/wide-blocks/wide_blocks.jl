@@ -5,6 +5,7 @@
 #
 #   wide_blocks.jl RUN  OUTDIR [CHAIN_MOVES_TSV]   all sets, replay-checked, writes OUTDIR
 #   wide_blocks.jl WORD "7,21,-1,-2,-3"             one signed generator word, prints plans
+#   wide_blocks.jl GEOM OUTFILE                    layer geometry check, writes OUTFILE
 #
 # Model. A layer of axis a is the slab pos[a] = L, L in -3..3 (physical index p = L+4,
 # 1..7; layer 0 = p 4 exists physically but has no generator). All layers of one axis turn
@@ -434,8 +435,8 @@ function main_run(outdir, chain_path)
     # negative controls: damaged plans must be rejected by the replay
     negs = IOBuffer(); println(negs, "control\ttried\trejected")
     toks_all = [WB.normalize(WB.tokens(w)) for (_, w) in sets[1][2]]
-    for (cname, damage) in (("drop last block", p -> p[1:end-1]), ("angle +1 on first block", p -> (b = p[1]; vcat([(b[1], b[2], b[3], mod(b[4], 3) + 1)], p[2:end]))),
-                            ("widen last block by one layer", p -> (b = p[end]; b[3] < 7 ? vcat(p[1:end-1], [(b[1], b[2], b[3] + 1, b[4])]) : vcat(p[1:end-1], [(b[1], b[2] + 1, b[3], b[4])]))))
+    for (cname, damage) in (("drop last block", p -> p[1:end-1]), ("angle changed on first block (t to t mod 3 + 1)", p -> (b = p[1]; vcat([(b[1], b[2], b[3], mod(b[4], 3) + 1)], p[2:end]))),
+                            ("widen or narrow last block by one layer", p -> (b = p[end]; b[3] < 7 ? vcat(p[1:end-1], [(b[1], b[2], b[3] + 1, b[4])]) : vcat(p[1:end-1], [(b[1], b[2] + 1, b[3], b[4])]))))
         tried = 0; rej = 0
         for toks in toks_all[1:20]
             plan = WB.plan_word(toks, :W, :c, :htm, tabs); plan2 = damage(plan)
@@ -487,5 +488,5 @@ if abspath(PROGRAM_FILE) == @__FILE__
     if ARGS[1] == "RUN"; main_run(ARGS[2], length(ARGS) >= 3 ? ARGS[3] : nothing)
     elseif ARGS[1] == "WORD"; main_word(ARGS[2])
     elseif ARGS[1] == "GEOM"; main_geom(ARGS[2])
-    else; error("usage: wide_blocks.jl RUN OUTDIR [CHAIN_TSV] | WORD gens"); end
+    else; error("usage: wide_blocks.jl RUN OUTDIR [CHAIN_TSV] | WORD gens | GEOM OUTFILE"); end
 end
