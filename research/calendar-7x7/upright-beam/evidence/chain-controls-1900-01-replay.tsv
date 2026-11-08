@@ -1,0 +1,11 @@
+control	expected	verdict	exit	detail
+valid	ACCEPT	ACCEPT	0	chain-verdict	ACCEPT_CHAIN	2	1900-3
+old-print	REJECT	REJECT	1	chain-root	1900-1	REJECT	bad=8	sha=MISMATCH
+drop-first-move	REJECT	REJECT	1	chain-edge	1	1900-2	REJECT	139	bad=3	turned=1
+generator-22	REJECT	REJECT	1	ERROR: LoadError: AssertionError: move 4
+extra-move	REJECT	REJECT	1	chain-edge	1	1900-2	REJECT	141	bad=6	turned=1
+non-adjacent-month	REJECT	REJECT	1	chain-edge	1	1900-3	REJECT	140	bad=6	turned=1
+wrong-source-month	REJECT	REJECT	1	chain-root	1900-2	REJECT	bad=34	sha=match
+substituted-source-hash	REJECT	REJECT	1	chain-edge	2	1900-3	REJECT	15	bad=0	turned=1
+wrong-root-word	REJECT	REJECT	1	chain-root	1900-1	REJECT	bad=48	sha=MISMATCH
+other-layer-same-metrics	REJECT	REJECT	1	chain-edge	1	1900-2	REJECT	140	bad=16	turned=0

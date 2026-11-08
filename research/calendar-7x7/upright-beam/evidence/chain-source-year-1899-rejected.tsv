@@ -1,0 +1,4 @@
+checker	exit	detail
+julia	1	INVALID	AssertionError: 1 <= root <= 91 && (1900 <= year <= 2099 && 1 <= month <= 12)
+replay	1	chain-verdict	REJECT	2	1899-3
+flix	1	invalid	java.lang.IllegalArgumentException: month in1900..2099

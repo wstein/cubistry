@@ -277,8 +277,8 @@ A chain is **one retained state from its own root**. A chain started at 2026-05 
 no byte of the 2028 chains changes.
 
 Cost: about 30 to 50 s per edge (4 threads); 2026-05 .. 2028-01 is 20 edges (about 11 to
-17 min), 1900-01 .. 2099-12 is 2399 edges (about 20 h, 16 segments of 150, two or three runs
-with `prior_run_id`) [D, estimate from the measured per-edge times, not run].
+17 min), 1900-01 .. 2099-12 is 2399 edges (an estimate of 20 to 33 h at 30 to 50 s per edge, 16 segments
+of 150, two or three runs with `prior_run_id`) [D, estimate from the measured per-edge times, not run].
 
 ### Evidence from this change [V, local run on a 4-core machine, not Actions]
 
@@ -286,8 +286,8 @@ with `prior_run_id`) [D, estimate from the measured per-edge times, not run].
 |---|---|
 | `chain-2026-05-smoke.moves.tsv` (2026-05 .. 2026-08, 121, 125, 137 HTM) | Julia and Flix `VALID_CONTINUOUS_CHAIN 3 218 294 49`, byte-identical receipts, replay `ACCEPT_CHAIN 3 2026-8`; nine controls rejected by each of the three checkers (`chain-controls-2026-05-*.tsv`) |
 | `chain-2025-11-smoke.moves.tsv` (2025-11 .. 2026-02, a start before 2026) | the same three verdicts and nine controls (`chain-controls-2025-11-*.tsv`) |
-| `chain-1900-01-smoke.moves.tsv` (2 edges, 1900-01 .. 1900-03) | Julia, Flix `VALID_CONTINUOUS_CHAIN 2 218 294 49`, replay `ACCEPT_CHAIN 2 1900-3` |
-| A chain whose source year is 1899 | rejected by Julia and Flix |
+| `chain-1900-01-smoke.moves.tsv` (2 edges, 1900-01 .. 1900-03) | Julia, Flix `VALID_CONTINUOUS_CHAIN 2 218 294 49`, replay `ACCEPT_CHAIN 2 1900-3`; nine controls rejected by each checker (`chain-controls-1900-01-*.tsv`) |
+| A chain whose source year is 1899 | rejected by all three (`chain-source-year-1899-rejected.tsv`): Julia and Flix by the year gate, the replay (no year gate) because the declared month no longer matches the source display and the hashes |
 | Regression: `chain-smoke.moves.tsv` (2028-01, 4 edges) with the changed verifiers | Julia, Flix and replay receipts byte-identical to the committed ones |
 
 The producer change is one assertion, so a 2028 start produces the same bytes as before
