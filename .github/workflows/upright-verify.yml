@@ -172,6 +172,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "$CAL/verification/flix"
+          unset FLIX_JAR # flixw would otherwise treat the replay jar as an override
           export FLIX_CACHE_HOME=${FLIX_CACHE_HOME:-/tmp/cubistry-flix-cache} COURSIER_CACHE=${COURSIER_CACHE:-/tmp/cubistry-flix-coursier}
           ./flixw build-jar > "$RUNNER_TEMP/out/flix-verification-build.log" 2>&1 || { tail -n 40 "$RUNNER_TEMP/out/flix-verification-build.log"; exit 1; }
           tail -n 3 "$RUNNER_TEMP/out/flix-verification-build.log"
