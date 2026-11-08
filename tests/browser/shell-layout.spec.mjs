@@ -135,6 +135,18 @@ for (const theme of themes) {
   });
 }
 
+for (const theme of themes) {
+  test(`${theme}: the open Clock Nerd drawer meets 4.5:1 contrast on a phone`, async () => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ colorScheme: theme });
+    await expect(page.locator("#seconds-speed")).toBeEnabled();
+    if (await page.locator("#shell-nerd").isHidden()) await page.locator("#nerd-toggle").click();
+    await expect(page.locator("#reset-clock-moves")).toBeVisible();
+    expect(await textContrastFailures(".shell-nerd")).toEqual([]);
+    await page.locator("#nerd-toggle").click();
+  });
+}
+
 // Entering presentation mode requests fullscreen and leaving exits it, both asynchronously. Wait for each to settle:
 // a viewport resize is refused while the window is fullscreen, and a late fullscreenchange would end a new session.
 const enterPresentation = async () => {
