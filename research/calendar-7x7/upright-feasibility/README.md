@@ -61,7 +61,8 @@ diagonal (first number top left, slash in the middle, second number bottom right
 Missing copies by label (46): 10: 7, 20: 7, 21: 7, 22: 5, 11: 3, 1/2/5/8: 3
 each, **O: 2, FRI: 1, MON: 1**, N: 1 (month letter, upright). The orbit slack is
 >= 0 in all 13 orbits (0 for orbits (-3,0), (-1,-1), (-1,0) and the core), so
-the budget **fits** and 46 is the minimum number of surfaces to reprint.
+the budget **fits**; 46 is the number of missing class copies, and the proposed print
+reprints 48 surfaces. Whether 48 is the minimum is not proven [I].
 
 ## 2. Glyphs: measured Noto Sans SemiBold [V] (`evidence/glyph-geometry.tsv`)
 
@@ -122,8 +123,8 @@ copies (the two orbits of those cells). Letter I appears only inside FRI.
   `print-pure-A.tsv`. Every `piece`, `home`, `normal` is unchanged; `up`, `text`,
   `ink` of 48 surfaces differ (`evidence/print-changes.tsv`). Net text changes
   against the pure-split A print: +10, +20, +21 (7 each), +8 (3), +FRI, +MON,
-  month O (2 stickers, was 2 letters and 1 digit), `01`, `02` (-7 each), `12`
-  (-7), `FR1`, `M0N`, month `0` retired, 3 stickers become printed.
+  month O (2 stickers; before, one letter O and one digit 0), `01`, `02` (-7 each),
+  `12` (-7), `FR1`, `M0N`, month `0` retired, 3 stickers become printed.
 - **Diagonal split label** (stickers 4, 218, 219: `23/30` red, `24/31` dark and
   red): the rule is *text contains `/` means diagonal*, the print table keeps its columns. Digit
   height 0.346 of the text square at clearance 0.04 of the square (font size
@@ -184,6 +185,6 @@ julia --startup-file=no render_acceptance.jl OUT.tsv $P NotoSans-SemiBold.ttf .
 julia --startup-file=no glyph_geometry.jl NotoSans-SemiBold.ttf
 ```
 
-Julia 1.10.5. The font is `public/fonts/noto-sans/NotoSans-SemiBold.ttf` on
+Julia 1.10.x (1.10.5 used). The font is `public/fonts/noto-sans/NotoSans-SemiBold.ttf` on
 `main` (OFL-1.1, not copied here). Tests only via GitHub Actions; nothing was
 added to a workflow.
