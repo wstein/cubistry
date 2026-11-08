@@ -14,7 +14,7 @@ def digest(raw: String): String \ IO = HexFormat.of().formatHex(MessageDigest.ge
 def sha(s: String): String \ IO = {
     require(String.length(s)==64 and List.count(c -> List.memberOf(c,String.toList("0123456789abcdef")),String.toList(s))==64,"canonical lowercase SHA256 required");s
 }
-def validMonth(y: Int32,m: Int32): Unit \ IO = require(y>=2026 and y<=2099 and m>=1 and m<=12,"month in2026..2099")
+def validMonth(y: Int32,m: Int32): Unit \ IO = require(y>=1900 and y<=2099 and m>=1 and m<=12,"month in1900..2099")
 def readStep(row: String): Step \ IO = match fields(row) {
     case "move"::g::q::Nil => {
         let gen=integer(g);let turns=integer(q);
@@ -35,7 +35,7 @@ def readMoves(rows: List[String],moves: List[Step],count: Int32): (List[Step],Li
 def readEdges(rows: List[String],edges: List[Edge],count: Int32): List[Edge] \ IO = match rows {
     case "finish"::Nil => {require(count>=2,"chain requires at least two edges");List.reverse(edges)}
     case row::rest => {
-        require(count<1000,"bounded1000edges per chain");
+        require(count<2400,"bounded2400edges per chain");
         match fields(row) {
             case "edge"::ys::ms::hs::qs::rs::rqs::ss::ds::Nil => {
                 let y=integer(ys);let m=integer(ms);validMonth(y,m);

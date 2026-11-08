@@ -62,7 +62,7 @@ function main(dag,print_path,moves_path,outp,nedges,startarg,priorpath)
     else
         @assert priorpath=="-" "a fresh chain needs PRIOR_MOVES to be -"
         mt=match(r"^(\d{4})-(\d{1,2})$",startarg);@assert !isnothing(mt) "START must be YYYY-MM or resume"
-        sy=parse(Int,mt[1]);sm=parse(Int,mt[2]);@assert 2026<=sy<=2099 && 1<=sm<=12 "START out of range"
+        sy=parse(Int,mt[1]);sm=parse(Int,mt[2]);@assert 1900<=sy<=2099 && 1<=sm<=12 "START out of range (1900-01 .. 2099-12)"
         rootid=idof[join(string.(stacked_board(sy,sm,PURE_VARIANT)),"|")];hash0="";prior=nothing;blocks=Block[]
     end
     rootrow=rows[rootid]
