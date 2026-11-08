@@ -36,6 +36,7 @@ export async function mountLiveClock(studio, params, shell, isCurrent) {
   const { $ } = studio;
   const choice = parseClockParams(params, { lettering: studio.lettering() });
   let lettering = choice.lettering;
+  const manifest = () => studio.buildManifest(lettering);
   studio.useLettering(lettering);
 
   $("studio-cards").setAttribute("data-count", "3");
@@ -195,7 +196,6 @@ export async function mountLiveClock(studio, params, shell, isCurrent) {
     const design = await loadHsmDesign(studio.base, hsmPin.runtimeSHA256);
     if (!isCurrent()) return dispose();
     const initial = localValues(Date.now());
-    const manifest = () => studio.buildManifest(lettering);
     stage = new ClockStage($("studio-scene"), 3);
     studio.setActiveStage(stage);
     clockStage = stage;
