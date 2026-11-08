@@ -17,7 +17,7 @@ const run = (...args) => { const r = spawnSync(process.execPath, [CHECK, ...args
 
 let browserError = null;
 try { const b = await openBrowser(); await b.close(); } catch (e) { browserError = e.message; }
-if (browserError && process.env.CI) throw new Error(`CI requires the checker browser tests to run, but: ${browserError.split("\n")[0]}`);
+if (browserError && ["true", "1"].includes(process.env.CI ?? "")) throw new Error(`CI requires the checker browser tests to run, but: ${browserError.split("\n")[0]}`);
 const skip = browserError ? `no browser: ${browserError.split("\n")[0]}` : false;
 
 const base = mkdtempSync(`${tmpdir()}/cube-base-`);
