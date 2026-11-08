@@ -1,0 +1,11 @@
+control	expected	verdict	exit	detail
+valid	ACCEPT	ACCEPT	0	status	VALID_CONTINUOUS_CHAIN	2	218	294	49
+old-print	REJECT	REJECT	1	INVALID	AssertionError: strict chain requires the pinned strict print
+drop-first-move	REJECT	REJECT	1	INVALID	AssertionError: Declared transition metrics mismatch
+generator-22	REJECT	REJECT	1	INVALID	AssertionError: 1 <= g <= 21 && q in (-1, 1, 2)
+extra-move	REJECT	REJECT	1	INVALID	AssertionError: Declared transition metrics mismatch
+non-adjacent-month	REJECT	REJECT	1	INVALID	AssertionError: Chronological adjacency required
+wrong-source-month	REJECT	REJECT	1	INVALID	AssertionError: Declared source month must match source-root display
+substituted-source-hash	REJECT	REJECT	1	INVALID	AssertionError: Retained source differs: reset/substitution forbidden
+wrong-root-word	REJECT	REJECT	1	INVALID	AssertionError: Source front
+other-layer-same-metrics	REJECT	REJECT	1	INVALID	AssertionError: Edge 1 front
