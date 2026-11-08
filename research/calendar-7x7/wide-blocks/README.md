@@ -87,7 +87,8 @@ states in real life; a word is a group element and the 294 stickers are all dist
 so equality of the final state from the solved cube is equality of the words
 (the same argument as `crosscheck_library.jl`). Negative controls
 (`evidence/negative-controls.tsv`): dropping the last block, changing the angle of the
-first block (t to t mod 3 + 1), widening or narrowing the last block each broke the digest in 20 of 20 words.
+first block (t to t mod 3 + 1), widening or narrowing the last block each
+broke the digest in 20 of 20 words.
 
 ## Results (rule columns, `W` mode, optimal under the stated rule) [V]
 
@@ -228,8 +229,9 @@ Options: (1) display-only, rotation plus inverse complement, no new generators
 alphabet; (3) a camera rubber band.
 
 1. **Yes, show the block count as a second metric column** (next to HTM and QTM)
-   and compute it with rule b for the existing alphabet (no layer 0): it is exactly meaning-preserving and near-minimal (rule cn, the exact
-   minimum without layer 0, is slightly lower: edges 8926 vs 8939, chain 55920 vs
+   and compute it with rule b for the existing alphabet (no layer 0): it is
+   exactly meaning-preserving and near-minimal (rule cn, the exact minimum
+   without layer 0, is slightly lower: edges 8926 vs 8939, chain 55920 vs
    56083, roots QTM 33757 vs 33833), mechanical, needs no solver change, and lowers the printed numbers by about 19%
    (roots 447 to 360 median, old chain 134 to 99). Name it a block-turn metric and
    keep HTM unchanged for continuity.
@@ -242,7 +244,8 @@ alphabet; (3) a camera rubber band.
    by post-processing the existing words; 90% of the same-axis runs are single turns,
    which no block alphabet can merge. A larger alphabet multiplies the
    branching: per axis 27 block intervals times 3 angles = 81 non-rotation moves
-   against 18 now, 4.5 times as many, on top of the 673,464 macros [I: figure from the task statement; not found in the repo, the global-search README records 654,752 for L5]. Whether the
+   against 18 now, 4.5 times as many, on top of the 673,464 macros [I: figure from the task statement; not found
+   in the repo, the global-search README records 654,752 for L5]. Whether the
    search would find shorter words is **not measured** and I cannot justify a
    number from this run structure; the free post-processing gain (19% to 24%) is
    the only solid figure. If the owner wants a trial, first re-score the existing
