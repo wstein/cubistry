@@ -105,9 +105,10 @@ pin, which the Julia and Flix verifiers do),
 `make_chain.jl` (untrusted chain writer from edge words), `chain_runner_*.sh` and
 `chain_controls.sh` (nine mutated inputs per checker).
 
-### Evidence (GitHub Actions run 42463812245, `upright-verify.yml` from branch
-`ci/upright-chain`, research code `research/strict-chain-ci` at `8bcea588` = this branch plus
-the producer of the follow-up PR) [V]
+### Evidence (GitHub Actions run 42471798386, `upright-verify.yml` from branch
+`ci/upright-chain`, research code = this branch `feat/strict-chain-flix` at `cb6cd82e`;
+all jobs green, the chain-production smoke jobs are skipped because this branch has no
+producer) [V]
 
 | Check | Result |
 |---|---|
