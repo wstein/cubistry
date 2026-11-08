@@ -39,6 +39,7 @@ test("the time zone is read-only text", () => {
   const { regions } = setup();
   const zone = byId(regions, "clock-zone");
   assert.equal(zone.textContent, "Europe/Berlin");
+  assert.equal(zone.tagName, "SPAN", "plain text must not acquire the implicit status role of output");
   assert.notEqual(zone.tagName, "SELECT");
   assert.notEqual(zone.tagName, "INPUT");
 });
