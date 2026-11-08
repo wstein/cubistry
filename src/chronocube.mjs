@@ -2,6 +2,7 @@ import "./chronocube.css";
 import { installAppearanceButton } from "./shell/appearance-button.ts";
 import { findAppearancePanel } from "./apps/chronocube/appearance-panel.ts";
 import { ClockStage } from "./apps/clock/stage.ts";
+import { createPresentationGate, documentFullscreenEnv } from "./apps/shared/presentation-gate.ts";
 import { LiveClockScheduler, clockText } from "./apps/clock/scheduler.ts";
 import { ClockMoveStatistics, formatMean } from "./apps/clock/statistics.ts";
 import { createStudioHsmController, createStudioSingleController } from "./apps/chronocube/hsm-mode.ts";
@@ -208,46 +209,35 @@ document.querySelector("#presentation-btn, .island-presentation-btn")?.addEventL
 installAppearanceButton();
 
 let exitTimer = null;
-function togglePresentation(enable) {
-  const active = typeof enable === "boolean" ? enable : !document.body.classList.contains("presentation-mode");
-  document.body.classList.toggle("presentation-mode", active);
-  if (active) {
-    document.body.classList.add("show-exit-btn");
-    clearTimeout(exitTimer);
-    exitTimer = setTimeout(() => {
-      document.body.classList.remove("show-exit-btn");
-    }, 2500);
-    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
-  } else {
+function showExitButton() {
+  document.body.classList.add("show-exit-btn");
+  clearTimeout(exitTimer);
+  exitTimer = setTimeout(() => {
     document.body.classList.remove("show-exit-btn");
-    if (document.fullscreenElement && document.exitFullscreen) {
-      document.exitFullscreen().catch(() => {});
-    }
-  }
+  }, 2500);
+}
+// One Present button for every mode; the gate keeps the fullscreen rules of the former Clock page (a request that
+// completes after the viewer left, or after a newer request, neither re-enters nor strands fullscreen).
+const presentation = createPresentationGate(documentFullscreenEnv(), (active) => {
+  document.body.classList.toggle("presentation-mode", active);
+  if (active) showExitButton();
+  else document.body.classList.remove("show-exit-btn");
   activeStage?.resetCamera?.();
   activeViewer?.resetCamera?.();
+});
+function togglePresentation(enable) {
+  const active = typeof enable === "boolean" ? enable : !presentation.active;
+  void (active ? presentation.enter() : presentation.leave());
 }
 
 window.addEventListener("mousemove", () => {
-  if (document.body.classList.contains("presentation-mode")) {
-    document.body.classList.add("show-exit-btn");
-    clearTimeout(exitTimer);
-    exitTimer = setTimeout(() => {
-      document.body.classList.remove("show-exit-btn");
-    }, 2500);
-  }
+  if (presentation.active) showExitButton();
 });
 
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement && document.body.classList.contains("presentation-mode")) {
-    togglePresentation(false);
-  }
-});
+document.addEventListener("fullscreenchange", () => presentation.nativeChange());
 $("exit-presentation-btn")?.addEventListener("click", () => togglePresentation(false));
 window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {
+  if (e.key === "Escape" && presentation.active) {
     togglePresentation(false);
   }
 });
