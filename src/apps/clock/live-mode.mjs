@@ -131,15 +131,18 @@ export async function mountLiveClock(studio, params, shell, isCurrent) {
 
   // A lettering change swaps the stickers in place; a failure keeps the old print and shows an error row.
   async function changeLettering(value) {
+    if (disposed || !isCurrent()) return;
     const before = lettering;
     lettering = value;
     controls.setEnabled(false);
     try {
       studio.rememberLettering(lettering);
       await Promise.all(controllers.map((c) => c.updateManifest(manifest())));
+      if (disposed || !isCurrent()) return;
       history.replaceState(null, "", urlWithLettering(location.href, lettering));
       showPrintLink();
     } catch (e) {
+      if (disposed || !isCurrent()) return;
       lettering = before;
       controls.setLettering(before);
       studio.rememberLettering(before);

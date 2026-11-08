@@ -806,3 +806,41 @@ for (const flag of ["kiosk=1", "presentation=true"])
     await expect(page.locator("#clock-digital")).toBeVisible();
     await expect(page.locator("#clock-lettering")).toBeHidden();
   });
+
+test("a lettering change completing after a mode switch leaves the new mode alone", async ({ page }) => {
+  await clockReady(page);
+  await page.evaluate(async () => {
+    const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
+    window.letteringSettled = 0;
+    for (const { controller } of clockUnits) {
+      const update = controller.updateManifest;
+      controller.updateManifest = async function (...args) {
+        try { return await update.apply(this, args); }
+        finally { window.letteringSettled++; }
+      };
+    }
+  });
+  let release, reached;
+  const held = new Promise((resolve) => { release = resolve; });
+  const requested = new Promise((resolve) => { reached = resolve; });
+  await page.route("**/assets/letters/noto-sans/words/M.svg", async (route) => {
+    const response = await route.fetch();
+    reached();
+    await held;
+    await route.fulfill({ response });
+  });
+  try {
+    await page.selectOption("#clock-lettering", "words");
+    await requested;
+    await page.selectOption("#studio-application", "counter");
+    await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "counter");
+    const url = page.url();
+    const printLink = await page.locator("#print-stickers").getAttribute("href");
+    release();
+    await expect.poll(() => page.evaluate(() => window.letteringSettled)).toBe(3);
+    await expect(page).toHaveURL(url);
+    await expect(page.locator("#print-stickers")).toHaveAttribute("href", printLink);
+  } finally {
+    release();
+  }
+});
