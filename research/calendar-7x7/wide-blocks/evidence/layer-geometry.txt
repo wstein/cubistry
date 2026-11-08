@@ -1,0 +1,5 @@
+axis 1 stickers in slab pos[axis]=-3..3: [77, 28, 28, 28, 28, 28, 77]
+axis 2 stickers in slab pos[axis]=-3..3: [77, 28, 28, 28, 28, 28, 77]
+axis 3 stickers in slab pos[axis]=-3..3: [77, 28, 28, 28, 28, 28, 77]
+surface bodies: 218 (218 expected)
+generators 1..21 equal slab turns p=slot->layer, same direction per axis: true
