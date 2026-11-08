@@ -134,10 +134,50 @@ The measurement behind it is `research/calendar-7x7/wide-blocks` (research pull 
 - **Playback.** The player plays rule-c blocks by default, one tween per block; a slice block is animated as a real slab turn of
   its interval including layer 0 (the camera does not move). The option **Middle slice counts as a move** (in the animation
   controls) switches back to the blocks without the middle slice for the next step; a step in progress keeps its blocks. The progress line
-  reads `block k of n` in both modes (n counts the rotation blocks too). A mismatch of the end-of-step SHA-256 still raises
+  reads `block k of n` in both modes (n counts the rotation blocks too, unless the rotations are deferred, see the next section). A mismatch of the end-of-step SHA-256 still raises
   `StateMismatchError` and stops the view.
 - **Not covered.** Nothing stored changes, no search in a larger alphabet, no camera rubber band, no rewriting across runs
   of different axes. Words with different groupings reach the same state, so the same digest.
+
+## Deferred rotations and end alignment
+
+**Display only, again.** Generators 1 to 21, `graph.v1.json`, `calendar7-source.json` and the engine alphabet do not change.
+Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the easing) and the player. This is mode F of the research
+(`research/calendar-7x7/wide-blocks`, research pull request 346), where the equality of the three digests was verified.
+
+- **The played word has no whole-cube rotation.** A rotation R followed by a layer move m is the same as the conjugate move
+  m' = R^-1 m R followed by R. So the page walks the stored word, keeps the product R of the rotations seen so far, and plays
+  every later layer move as its conjugate (the same turn of the same slab, named in the frame the cube has by then: axis k, layer
+  s times L, exponent s times q, where the sign s = +1 or -1 is the single nonzero entry of row a of R). Nothing is merged,
+  cancelled or added, so the number of layer moves (HTM) is exactly that of the stored word. The rule-c grouping of the previous
+  section is applied to that word, and the rotation blocks it still forms (a free rotation next to a block) are deferred the
+  same way, on the blocks (an interval lo..hi becomes -hi..-lo when s = -1). All rotation components add up to one net rotation.
+- **Intermediate orientation.** Between the start and the end of a step the cube may be oriented differently from the stored
+  frame. That is accepted: a step starts and ends in the stored frame, and the digest is checked only there. A step without
+  stored rotations and without rule-c rotations has no alignment.
+- **The alignment.** At the end of the layer blocks the player compares the shown state with the stored target of the step, for
+  each of the 24 whole-cube orientations, by SHA-256 digest. Exactly one orientation turns the state into the target (the 294
+  stickers are all distinct); it is the product of the deferred rotations, and the tests check that. No match, or a second one,
+  raises `StateMismatchError`, as for a wrong digest before. Only after the alignment is the end-of-step digest checked.
+- **The alignment is not a move.** It is a free whole-cube rotation, like every rotation before: it adds nothing to the layer
+  moves (HTM) or to the block moves (with or without the middle slice), which count the layer blocks only. The page shows it apart:
+  `Alignment: x+, y2` (the rotations in the order they turn, `+` a quarter turn in the engine direction, `-` the opposite, `2` a
+  half turn) or `Alignment: none`. At most two rotations are needed; the words are chosen deterministically (fewest rotations,
+  then fewest quarter turns, then the order x, y, z with exponents +1, -1, 2).
+- **Animation.** The alignment is a rotation of the model (all bodies turn about their axis), not a camera move; the Smart
+  Rubber Band camera controller is untouched. It uses its soft start, the critically damped response
+  x(t) = x0 e^(-rt) (1 + rt + (rt)^2 / 2) with r = 9 per second, ending when less than 1 mrad is left (about 1.3 s for a quarter
+  turn at 1x; the speed setting scales the time). The cube viewer exports no pure function for it, so the formula is repeated in
+  `soft-start.ts` and a test compares the rate with `ROTATION_TUNING.returnRate`. Under reduced motion a step jumps and needs
+  no alignment; if the preference turns on while a step plays, the alignment takes 150 ms.
+- **Progress.** `block k of n` counts the layer blocks. The alignment is a final phase after block n, shown as
+  `aligning the cube at the end (x+, y2)`; skip and pause work in it.
+- **Control.** The option **Align at the end** (on by default) switches the deferral off for the next step; the player class itself
+  defaults to the stored behavior (`defer: false`).
+- **Tests.** `tests/calendar7-deferral.test.mjs`: seeded random words with many rotations and every stored edge in both
+  directions, in both groupings (no rotation entry, unchanged layer moves, the found alignment equal to the product of the removed
+  rotations, equal pose and digest), the search finding exactly one of 24, the mismatch cases, negative controls (a wrong rotation,
+  a wrong conjugation sign, a dropped alignment), the player phases. The scene test checks the tween end pose to 1e-6.
 
 ## What this is
 
@@ -190,6 +230,7 @@ of the chain.
 | [tests/calendar7-mode.test.mjs](../tests/calendar7-mode.test.mjs) | Registry entry, month choice, navigation bounds, move words and mount |
 | [tests/calendar7-blocks.test.mjs](../tests/calendar7-blocks.test.mjs) | Block moves: examples, property tests on random words (same state and digest, same multiset), identical digest for every stored edge in both directions, notation and counts on the page |
 | [tests/calendar7-slice.test.mjs](../tests/calendar7-slice.test.mjs) | Middle-slice blocks (rule c): examples, independent slab-turn and exact-minimum oracles, property tests on random words, identical digest for every stored edge both ways, counts of the research (91 roots from `tests/fixtures/calendar7-roots91.tsv`, 576 edges), negative controls, the player and the page |
+| [tests/calendar7-deferral.test.mjs](../tests/calendar7-deferral.test.mjs) | Deferred rotations and the end alignment: properties, every stored edge both ways, search of the 24 orientations, mismatch, negative controls, soft start, player phases |
 | [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
 | [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, diagonal split-label geometry and drawing |
 | [tests/calendar7-sheet-colors.test.mjs](../tests/calendar7-sheet-colors.test.mjs) | Month sheet palette: every ink on its cell at 4.5:1 in light and dark |
