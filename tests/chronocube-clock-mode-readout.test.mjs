@@ -5,11 +5,10 @@ import { resolve } from "node:path";
 
 // The cube display already shows the time; the Live Clock studio mode must not
 // add a Hours / Minutes / Seconds text readout below it.
-const source = readFileSync(resolve("src/chronocube.mjs"), "utf8");
-const start = source.indexOf("async function initClockMode(");
-const end = source.indexOf("// Mode 2:", start);
-assert(start > 0 && end > start, "initClockMode section not found");
-const clockMode = source.slice(start, end);
+// The mode lives in src/apps/clock/ (mount, panel, dock controls, Nerd drawer).
+const clockMode = ["live-mode.mjs", "hud.ts", "controls.ts", "nerd.ts"]
+  .map((name) => readFileSync(resolve("src/apps/clock", name), "utf8"))
+  .join("\n");
 
 test("Live Clock mode renders no text readout below the cubes", () => {
   assert(!/<h2>/.test(clockMode), "no unit headings");
