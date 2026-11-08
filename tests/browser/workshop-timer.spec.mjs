@@ -686,7 +686,7 @@ test("Set replaces a pending duration safely during an active legal animation wi
   await verifyActualTimerMoves(page, 90, 2, "/tmp/cubistry-set-browser-commits.json");
 });
 
-for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844 }, { width: 320, height: 740 }]) {
+for (const viewport of [{ width: 1280, height: 560 }, { width: 390, height: 844 }, { width: 320, height: 740 }]) {
   test(`Timer status distinguishes movement from backlog and keeps the active slider stable at ${viewport.width}px`, async ({ page }, testInfo) => {
     test.setTimeout(scaled(60000));
     await page.setViewportSize(viewport);
