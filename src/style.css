@@ -1412,40 +1412,50 @@ body.presentation-mode .presentation-exit-btn:hover {
 /* The bottom dock is as wide as its content, capped at min(94vw, 920px)
    (or 100vw - 16px below 600 px). Its rows used to be nowrap, so on a
    narrow viewport or with larger text the content spilled past both
-   edges. Let the rows wrap. It sits before the 600 px block so
-   that block still wins below 600 px. It follows the 1180 px block so its
-   760 px gap wins at 601-760 px. */
-.cube-footer.floating-dock,
-.floating-dock,
-.floating-dock .counter-stats,
-.floating-dock .stats-summary,
-.floating-dock .move-summary {
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-/* A long status message wraps instead of widening the dock. */
-.floating-dock #status {
-  white-space: normal;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-@media (max-width: 760px) {
-  .floating-dock #status {
-    text-align: center;
+   edges. Up to 1000 px let the rows wrap and the status take its own row.
+   Above that the dock stays one row like before: with real messages its
+   content fits the viewport (about 3 px past each pill edge at most).
+   These rules follow the 1180 px block, so their gap wins there, and
+   precede the 600 px block, so its values still win below 600 px. */
+@media (max-width: 1000px) {
+  .cube-footer.floating-dock,
+  .floating-dock,
+  .floating-dock .counter-stats,
+  .floating-dock .stats-summary,
+  .floating-dock .move-summary {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .cube-footer.floating-dock,
   .floating-dock {
     gap: 6px 12px;
-    border-radius: 20px;
   }
 
   .floating-dock .counter-stats,
   .floating-dock .stats-summary,
   .floating-dock .move-summary {
     gap: 4px 12px;
+  }
+
+  .floating-dock .speed-control {
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 100%;
+  }
+
+  .floating-dock #status {
+    white-space: normal;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+}
+
+@media (max-width: 760px) {
+  .cube-footer.floating-dock,
+  .floating-dock {
+    border-radius: 20px;
   }
 }
 
@@ -1518,10 +1528,12 @@ aside#counter-controls.floating-hud {
   }
 }
 
-.floating-dock .speed-control {
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 100%;
+/* Below 600 px the wrapped dock is about 110 px tall and sits above the panel bottom. Stop the panel above it and let
+   it scroll, so its last controls are not covered by the dock. */
+@media (max-width: 600px) {
+  aside#counter-controls.floating-hud {
+    max-height: calc(100vh - var(--counter-top, var(--counter-top-fallback, 16px)) - 170px);
+  }
 }
 
 /* ==========================================================================
