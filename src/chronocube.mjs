@@ -2,9 +2,9 @@ import "./chronocube.css";
 import { installAppearanceButton } from "./shell/appearance-button.ts";
 import { findAppearancePanel } from "./apps/chronocube/appearance-panel.ts";
 import { ClockStage } from "./apps/clock/stage.ts";
+import { mountLiveClock } from "./apps/clock/live-mode.mjs";
 import { createPresentationGate, documentFullscreenEnv } from "./apps/shared/presentation-gate.ts";
-import { LiveClockScheduler, clockText } from "./apps/clock/scheduler.ts";
-import { ClockMoveStatistics, formatMean } from "./apps/clock/statistics.ts";
+import { LiveClockScheduler } from "./apps/clock/scheduler.ts";
 import { createStudioHsmController, createStudioSingleController } from "./apps/chronocube/hsm-mode.ts";
 import { createStudioCounter } from "./apps/chronocube/counter-mode.ts";
 import { loadHsmDesign } from "./apps/hsm/design.ts";
@@ -243,179 +243,34 @@ window.addEventListener("keydown", (e) => {
 });
 
 // -------------------------------------------------------------
-// Mode 1: Live H-M-S Clock (3 cubes)
+// Mode 1: Live H-M-S Clock (3 cubes), src/apps/clock/live-mode.mjs
 // -------------------------------------------------------------
-async function initClockMode(isCurrent) {
-  const cardsContainer = $("studio-cards");
-  cardsContainer.setAttribute("data-count", "3");
-  cardsContainer.innerHTML = `
-    <div id="clock-hours" data-unit="H" aria-busy="true"></div>
-    <div id="clock-minutes" data-unit="M" aria-busy="true"></div>
-    <div id="clock-seconds" data-unit="S" aria-busy="true"></div>
-  `;
+const clockStudio = {
+  $,
+  base,
+  renderHud: renderStudioHud,
+  setupAppearancePanel,
+  buildManifest: (lettering) => buildManifest(currentDisplay, currentMarker, currentLetterFont, lettering),
+  lettering: () => currentLettering,
+  // The URL chooses the lettering for this visit; only a choice made in the panel is remembered.
+  useLettering: (value) => {
+    currentLettering = value;
+  },
+  rememberLettering: (value) => {
+    currentLettering = value;
+    localStorage.setItem("cubistry_lettering", value);
+  },
+  resolveAssets,
+  setActiveStage: (stage) => {
+    activeStage = stage;
+  },
+  releaseStage: (stage) => {
+    if (activeStage === stage) activeStage = null;
+  },
+};
 
-  renderStudioHud("Live Time", `
-    <div class="clock-digital">
-      <output id="clock-digital" aria-label="Current local time">--:--:--</output>
-      <span id="clock-status" class="small" role="status">Preparing…</span>
-    </div>
-    <label for="clock-lettering">Sticker lettering</label>
-    <select id="clock-lettering">
-      <option value="symbols">Large H / M / S</option>
-      <option value="words-pascal" selected>Small Hour / Min / Sec</option>
-      <option value="words">Small hour / min / sec</option>
-    </select>
-    <section class="clock-stats" role="status" aria-label="Clock moves" style="margin-top: 16px;">
-      <table class="clock-move-table">
-        <caption>Committed moves this session</caption>
-        <thead>
-          <tr>
-            <th scope="col">Cube</th>
-            <th scope="col">Total HTM</th>
-            <th scope="col">Rotations</th>
-            <th scope="col">Last</th>
-            <th scope="col">Max</th>
-            <th scope="col">Average</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr data-unit="H">
-            <th scope="row">Hours</th>
-            <td id="hours-session-moves">0</td>
-            <td id="hours-session-rotations">0</td>
-            <td id="hours-last-moves">—</td>
-            <td id="hours-max-moves">—</td>
-            <td id="hours-mean-moves">—</td>
-          </tr>
-          <tr data-unit="M">
-            <th scope="row">Minutes</th>
-            <td id="minutes-session-moves">0</td>
-            <td id="minutes-session-rotations">0</td>
-            <td id="minutes-last-moves">—</td>
-            <td id="minutes-max-moves">—</td>
-            <td id="minutes-mean-moves">—</td>
-          </tr>
-          <tr data-unit="S">
-            <th scope="row">Seconds</th>
-            <td id="seconds-session-moves">0</td>
-            <td id="seconds-session-rotations">0</td>
-            <td id="seconds-last-moves">—</td>
-            <td id="seconds-max-moves">—</td>
-            <td id="seconds-mean-moves">—</td>
-          </tr>
-        </tbody>
-      </table>
-      <button id="reset-clock-moves" class="quiet clock-stats-reset" type="button" style="margin-top: 8px;">
-        Reset session moves
-      </button>
-    </section>
-  `);
-
-  $("clock-lettering").value = currentLettering;
-
-  const stage = new ClockStage($("studio-scene"), 3);
-  activeStage = stage;
-  const abandon = () => (stage.destroy(), null);
-
-  const names = ["hours", "minutes", "seconds"];
-  const initial = [new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()];
-  const speeds = { hours: 500, minutes: 250, seconds: 100 };
-
-  const sourceDesign = await loadHsmDesign(base, hsmPin.runtimeSHA256);
-  if (!isCurrent()) return abandon();
-  const statistics = new ClockMoveStatistics(names.length);
-  const scheduler = new LiveClockScheduler();
-  let shownStatistics = -1;
-  function statisticsUi() {
-    const snapshot = statistics.snapshot();
-    if (snapshot.revision === shownStatistics) return;
-    shownStatistics = snapshot.revision;
-    const show = (id, v, fmt = (x) => String(x)) => {
-      const el = $(id);
-      if (el) el.textContent = v === null ? "—" : fmt(v);
-    };
-    snapshot.units.forEach((unit, i) => {
-      const name = names[i];
-      show(name + "-session-moves", unit.session.htm);
-      show(name + "-session-rotations", unit.session.rotations);
-      show(name + "-last-moves", unit.last);
-      show(name + "-max-moves", unit.max);
-      show(name + "-mean-moves", unit.mean, formatMean);
-    });
-  }
-
-  const controllers = [];
-  const units = [];
-
-  for (let i = 0; i < 3; i++) {
-    const viewer = stage.createCube($("clock-" + names[i]), i);
-    const duration = speeds[names[i]];
-    const setDuration = (ms) => viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / ms, "quarter-turn");
-    setDuration(duration);
-
-    const manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, currentLettering);
-    const controller = createStudioHsmController(
-      viewer,
-      sourceDesign,
-      manifest,
-      ["H", "M", "S"][i],
-      (value, busy, error, progress) => {
-        if (!isCurrent()) return;
-        if (progress) statistics.observe(i, progress);
-        if (error) $("studio-error").textContent = error.message;
-      },
-      resolveAssets,
-      i === 0 ? 23 : 59,
-    );
-    await controller.configure(initial[i]);
-    if (!isCurrent()) return abandon();
-    controllers.push(controller);
-    units.push({ controller, duration, setDuration });
-  }
-
-  setupAppearancePanel(stage.appearancePanel, whenCurrent(isCurrent, async (nextManifest) => {
-    await Promise.all(controllers.map((c) => c.updateManifest(nextManifest)));
-  }));
-
-  $("clock-lettering").addEventListener("change", async () => {
-    currentLettering = $("clock-lettering").value;
-    localStorage.setItem("cubistry_lettering", currentLettering);
-    const nextManifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, currentLettering);
-    await Promise.all(controllers.map((c) => c.updateManifest(nextManifest)));
-  });
-
-  $("reset-clock-moves")?.addEventListener("click", () => {
-    statistics.reset();
-    statisticsUi();
-  });
-
-  function draw() {
-    try {
-      const epoch = Date.now(),
-        mono = performance.now(),
-        snapshot = scheduler.tick(epoch, mono, units);
-      statistics.closeTick();
-      statisticsUi();
-      const digital = $("clock-digital");
-      if (digital) digital.textContent = clockText(snapshot.values);
-      const status = $("clock-status");
-      if (status) {
-        status.textContent = snapshot.motion.includes("synchronizing")
-          ? "Synchronizing to current time"
-          : "Live · local time";
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  const intervalId = setInterval(draw, 100);
-  draw();
-
-  return () => {
-    clearInterval(intervalId);
-    stage.destroy();
-  };
+function initClockMode(isCurrent, params, shell) {
+  return mountLiveClock(clockStudio, params, shell, isCurrent);
 }
 
 // -------------------------------------------------------------
@@ -1000,7 +855,7 @@ async function initCalendar7Mode(isCurrent, params) {
 }
 
 const MODE_INITS = {
-  clock: (isCurrent) => initClockMode(isCurrent),
+  clock: (isCurrent, params, shell) => initClockMode(isCurrent, params, shell),
   "ms-timer": (isCurrent) => initMsTimerMode(isCurrent),
   "hm-clock": (isCurrent) => initHmClockMode(isCurrent),
   tenth: (isCurrent, _params, shell) => initTenthMode(isCurrent, shell),
@@ -1026,6 +881,9 @@ const registry = createRegistry(
 // Dock slots, status chip, primary action, readout and Nerd drawer of index.html; each mode gets its own ModeShell.
 const shellHost = createShellHost(findShellRegions(document), document, { nerdOpen: nerdOpenFromSearch(location.search) });
 
+const printLink = $("print-stickers");
+const defaultPrintHref = printLink.getAttribute("href");
+
 const router = createRouter({
   registry,
   shellHost,
@@ -1037,6 +895,9 @@ const router = createRouter({
     $("studio-cards").innerHTML = "";
     $("studio-controls").innerHTML = "";
     $("studio-error").textContent = "";
+    // Shared elements a mode may change: the next mode starts from the default.
+    $("studio-controls").classList.remove("clock-control");
+    printLink.setAttribute("href", defaultPrintHref);
 
     delete $("shell").dataset.modeReady; // test hook, set again in onMounted
 
