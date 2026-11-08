@@ -1,0 +1,5 @@
+replayed 2 prior edges; chain end 2028-3; state digest 484a50ed496be590463033b9ef2704e2bcd69bb5bd355eab6efca22d25f8d992
+setup 26.3 s, library 673464 threads 4
+EDGE 2028-4 beam htm=126 34.4 s
+EDGE 2028-5 beam htm=108 36.2 s
+CHAIN COMPLETE 4 edges

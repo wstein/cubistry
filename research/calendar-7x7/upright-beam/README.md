@@ -4,8 +4,9 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 -->
 # Why the global beam stalls under the strict upright rule, and cheap chain edges
 
-**Status: research study, not certified. Research only: no change to the app, the
-chain workflow, `.github`, the old checkers or Flix. The chain was not started.**
+**Status: research study, not certified. The study itself changed no app file, workflow,
+old checker or Flix. The chain producer section at the end was added later; the chain was
+not started by the study.**
 Base: branch `research/cube-display-feasibility` (head `e3af2033`), print
 `../upright-feasibility/evidence/print-strict-upright.tsv`, rule: only the digit 0
 and 6 <-> 9 read the same after a half turn. Read `../upright-moves/README.md` first.
@@ -201,3 +202,37 @@ test covers these scripts yet.
   chain is available).
 - The Hall/twist analysis is per orbit and by example (edge 25 -> 26); I did not prove that
   no other stall class exists, the 102 edges solved here are the only evidence.
+
+## Chain production in segments (`chain_segment.jl`)
+
+`chain_segment.jl DAG PRINT ROOT_MOVES OUT_PREFIX EDGES START PRIOR_MOVES` is the untrusted
+producer behind the workflow `upright-chain.yml` (PR against `main`). It runs `solve_edge`
+of `beam2.jl` exactly as `edge_batch.jl` smoke mode does (core weight 100, catalog macros,
+exact last mile, `lambda=3`, 4 threads), but on **one retained state** and **resumable**:
+
+- `START=YYYY-MM` with `PRIOR_MOVES=-` begins at the root word of that display; `START=resume`
+  with a cumulative `chain.v1` file first replays that file from its root (every declared
+  source and end SHA-256 and every front must match) and continues from its end.
+- Output: `OUT_PREFIX.moves.tsv` (cumulative chain, prior blocks copied verbatim) and
+  `OUT_PREFIX-edges.tsv` (the new edges: from, to, method, HTM, seconds).
+- An edge nobody finishes falls back to the planner orbit solve (about 450 HTM); none
+  of the 4 smoke edges needed it. It stops at 2099-12, or before the next edge once
+  `CHAIN_DEADLINE_SECONDS` of the edge loop have passed, so a segment is shorter instead of
+  hitting the 6 h job limit.
+- Anything it writes is only a candidate. The workflow accepts a segment only when the Julia
+  `pure_chain.jl` (strict rule), the Flix `chain` command (strict rule) and the independent
+  replay `verify_chain.jl` all accept the **cumulative** chain and the two receipts are
+  byte-identical (`../upright-flix/README.md`, "Strict chain command").
+
+### Smoke evidence [V] (GitHub Actions run 42465455889, `upright-verify.yml` from branch `ci/upright-chain`)
+
+| Check | Result |
+|---|---|
+| Two chained segments of 2 edges from 2028-01, the second resumed from the verified artifact of the first | cumulative chain **byte-identical** to `evidence/chain-smoke.moves.tsv`, which the earlier `edge_batch.jl` smoke run (another machine, one process) produced; same words 142, 105, 126, 108 = 481 HTM |
+| Checkers on the cumulative chain | Julia and Flix `VALID_CONTINUOUS_CHAIN 4 218 294 49`, receipts equal, replay `ACCEPT_CHAIN 4 2028-5` |
+| Time on the hosted runner (4 cores, 4 threads) | setup 27 s (673 464 macros); 22, 22, 34, 36 s per edge (`evidence/chain-segments-smoke.edges.tsv`) [V]; the 30 s planning figure of the study holds, 70 s single-threaded is not re-measured here |
+| Local check on a 4-core machine (not a test) | 2 + 2 edges, resumed: same bytes, 24 to 53 s per edge |
+
+Not shown: that all 863 edges succeed (the study solved 98 transitions from root states and
+a 4-edge chain; the retained state changes every edge) and the cost of the full chain; those
+come from the chain run itself [D].
