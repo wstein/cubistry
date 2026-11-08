@@ -211,7 +211,7 @@ export class Calendar7Viewer implements StageView {
   }
 
   /** One block is ONE tween: every layer of the block turns together about the axis by the same angle. */
-  turn(block: Block, before: Pose, ms: number): Promise<void> {
+  turn(block: Block, before: Pose, ms: number, ease?: (p: number) => number): Promise<void> {
     if (this.destroyed || !this.cube) return Promise.resolve();
     this.tween.cancel();
     const { axis, lo, hi, angle: q } = block;
@@ -241,6 +241,7 @@ export class Calendar7Viewer implements StageView {
         if (completed) this.sync(after);
       },
       performance.now(),
+      ease,
     );
   }
 

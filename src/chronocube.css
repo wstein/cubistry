@@ -189,10 +189,10 @@
 .c7-btn { font: inherit; font-weight: 700; min-height: 40px; padding: 4px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); cursor: pointer; }
 .c7-btn:hover:not(:disabled):not([aria-disabled="true"]) { border-color: var(--mark-ink); }
 .c7-btn:disabled, .c7-btn[aria-disabled="true"] { color: var(--ink-2); cursor: default; opacity: 0.8; }
-.c7-btn:focus-visible, .c7-speed select:focus-visible, .c7-slice input:focus-visible, .c7-rotation select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.c7-speed, .c7-slice, .c7-rotation label { display: inline-flex; gap: 6px; align-items: center; font-size: 0.9rem; color: var(--ink); }
-.c7-slice { min-height: 40px; }
-.c7-slice input { width: 20px; height: 20px; accent-color: var(--focus); }
+.c7-btn:focus-visible, .c7-speed select:focus-visible, .c7-slice input:focus-visible, .c7-defer input:focus-visible, .c7-rotation select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.c7-speed, .c7-slice, .c7-defer, .c7-rotation label { display: inline-flex; gap: 6px; align-items: center; font-size: 0.9rem; color: var(--ink); }
+.c7-slice, .c7-defer { min-height: 40px; }
+.c7-slice input, .c7-defer input { width: 20px; height: 20px; accent-color: var(--focus); }
 .c7-speed select, .c7-rotation select { font: inherit; min-height: 40px; max-width: 100%; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; }
 .c7-progress { margin: 0; font-size: 0.85rem; color: var(--ink); font-variant-numeric: tabular-nums; }
 .c7-error { margin: 0; font-size: 0.85rem; color: var(--ink); border: 1px solid var(--s-warn); border-radius: 8px; padding: 8px 12px; }
@@ -204,7 +204,7 @@
 .c7-rotation .cube-appearance-info { flex: none; box-sizing: border-box; width: 44px; height: 44px; padding: 0; border: 10px solid transparent; border-radius: 50%; background: var(--surface-2) padding-box; color: var(--ink); font: italic 12px/1 var(--f-ui); cursor: pointer; }
 .c7-rotation .cube-appearance-info:hover { background: var(--line) padding-box; }
 .c7-rotation .cube-appearance-info:focus-visible { outline: 2px solid var(--focus); outline-offset: 0; }
-.c7-note, .c7-rotation p { margin: 0; font-size: 0.8rem; color: var(--ink-2); }
+.c7-alignment, .c7-note, .c7-rotation p { margin: 0; font-size: 0.8rem; color: var(--ink-2); }
 .c7-live {
   position: absolute;
   width: 1px;

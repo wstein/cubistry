@@ -9,7 +9,8 @@
  * state digest of the pose must equal the stored hash of the target node. A mismatch throws `StateMismatchError`;
  * the view is never left showing a state the engine does not know.
  */
-import { applyBlockInPlace, type Block, groupBlocks } from "./blocks.ts";
+import { applyBlockInPlace, type Block } from "./blocks.ts";
+import { alignmentText, findAlignments, playedBlocks, rotationBlock } from "./deferral.ts";
 import {
   applyMoveInPlace,
   clonePose,
@@ -20,6 +21,7 @@ import {
   stateDigest,
 } from "./engine.ts";
 import type { Graph } from "./graph.ts";
+import { softStartEase, softStartMs } from "./soft-start.ts";
 
 /** What the player needs from the 3D scene. */
 export interface StageView {
@@ -29,22 +31,34 @@ export interface StageView {
    * Turns one block (several layers of one axis and exponent together, or one layer, or the whole cube) of `before`
    * over `ms` milliseconds as ONE animation and leaves the cube showing the pose after the block.
    * Reads `before` synchronously; the caller may change it once the promise has settled. Resolves early when
-   * `show` interrupts it.
+   * `show` interrupts it. `ease` (default smoothstep) maps the progress of the time to the fraction turned; the end
+   * alignment passes the soft start of the Smart Rubber Band.
    */
-  turn(block: Block, before: Pose, ms: number): Promise<void>;
+  turn(block: Block, before: Pose, ms: number, ease?: (p: number) => number): Promise<void>;
 }
 
 export type PlayerStatus = "idle" | "playing" | "paused";
+/** `blocks`: layer blocks are turning; `alignment`: the end alignment (a free whole-cube rotation) is turning; `idle`: no step. */
+export type PlayerPhase = "idle" | "blocks" | "alignment";
 export interface PlayerSnapshot {
   /** Chain node index the cube shows, or is turning to. */
   readonly index: number;
   readonly status: PlayerStatus;
-  /** Blocks of the current step already played, and blocks in the step (a block is one animation); 0 and 0 when idle. */
+  /**
+   * Blocks of the current step already played, and blocks in the step (a block is one animation); 0 and 0 when idle.
+   * With deferred rotations these are layer blocks only; the end alignment is a separate final phase, not counted.
+   */
   readonly done: number;
   readonly total: number;
   /** Month node the current step starts from; equals `index` when idle. */
   readonly from: number;
   readonly speed: number;
+  readonly phase: PlayerPhase;
+  /**
+   * The end alignment: `at the end` while a deferred step plays its blocks, then the found rotation (`x+, y2`), `none`
+   * when no rotation is needed or the step does not defer rotations. After a step it stays until the next one.
+   */
+  readonly alignment: string;
 }
 
 export class StateMismatchError extends Error {
@@ -61,6 +75,10 @@ export const SPEEDS = [0.5, 1, 2, 4, 8] as const;
 export const DEFAULT_SPEED = 2;
 /** The page plays rule-c blocks (the middle slice counts as a move) unless the viewer turns it off; see `blocks.ts`. */
 export const DEFAULT_SLICE = true;
+/** The page defers whole-cube rotations to one end alignment unless the viewer turns it off; see `deferral.ts`. */
+export const DEFAULT_DEFER = true;
+/** Duration of the alignment under reduced motion, if the preference turns on while a step is playing. */
+export const REDUCED_ALIGN_MS = 150;
 
 export interface PlayerOptions {
   readonly graph: Graph;
@@ -74,6 +92,8 @@ export interface PlayerOptions {
   readonly onError?: (error: Error) => void;
   /** Group the steps with rule c (blocks may contain the middle layer). Default false: the blocks of one side. */
   readonly slice?: boolean;
+  /** Move the whole-cube rotations of a step to the end and find the alignment there. Default false: rotations stay in place. */
+  readonly defer?: boolean;
 }
 
 interface Plan {
@@ -82,6 +102,10 @@ interface Plan {
   /** The stored word of the step, grouped into blocks (display only; same state as the word). */
   readonly blocks: readonly Block[];
   done: number;
+  /** Deferred rotations: the alignment found at the end of the blocks (moves still to turn start at `alignDone`), else null. */
+  readonly defer: boolean;
+  align: readonly Move[] | null;
+  alignDone: number;
 }
 
 export class Calendar7Player {
@@ -101,6 +125,8 @@ export class Calendar7Player {
   private loopFor = -1;
   private disposed = false;
   private slice: boolean;
+  private defer: boolean;
+  private lastAlignment = "none";
   /** Bumped whenever the running loop must stop; a loop that wakes with an older value leaves. */
   private generation = 0;
 
@@ -114,6 +140,16 @@ export class Calendar7Player {
     this.onError = options.onError;
     this.pose = clonePose(options.root);
     this.slice = options.slice ?? false;
+    this.defer = options.defer ?? false;
+  }
+
+  /** True when the whole-cube rotations of a step are moved to the end alignment. */
+  get alignAtEnd(): boolean {
+    return this.defer;
+  }
+  /** Chooses it for the NEXT step; a step in progress keeps its plan. */
+  setDefer(on: boolean): void {
+    this.defer = on;
   }
 
   /** True when steps are grouped with rule c. */
@@ -134,6 +170,8 @@ export class Calendar7Player {
       total: p ? p.blocks.length : 0,
       from: p ? p.from : this.index,
       speed: this.speed,
+      phase: !p ? "idle" : p.defer && p.done >= p.blocks.length ? "alignment" : "blocks",
+      alignment: p ? (p.defer ? (p.align ? alignmentText(p.align) : "at the end") : "none") : this.lastAlignment,
     };
   }
   /** The pose the view shows right now (a copy). */
@@ -181,6 +219,7 @@ export class Calendar7Player {
     if (this.disposed) return;
     this.settle();
     this.walkTo(target);
+    this.lastAlignment = "none";
     this.view.show(this.pose);
     this.index = target;
     this.check(target);
@@ -205,8 +244,8 @@ export class Calendar7Player {
       this.jump(target);
       return;
     }
-    const blocks = groupBlocks(this.stepMoves(this.index, target), { slice: this.slice });
-    this.plan = { from: this.index, target, blocks, done: 0 };
+    const { blocks } = playedBlocks(this.stepMoves(this.index, target), { slice: this.slice, defer: this.defer });
+    this.plan = { from: this.index, target, blocks, done: 0, defer: this.defer, align: null, alignDone: 0 };
     this.status = "playing";
     this.notify();
     void this.run();
@@ -224,10 +263,42 @@ export class Calendar7Player {
     this.plan = null;
     this.status = "idle";
     for (let i = plan.done; i < plan.blocks.length; i++) applyBlockInPlace(this.pose, plan.blocks[i]);
+    let failure: Error | null = null;
+    if (plan.defer) {
+      try {
+        const align = this.alignmentOf(plan);
+        for (let i = plan.alignDone; i < align.length; i++) applyMoveInPlace(this.pose, align[i]);
+        this.lastAlignment = alignmentText(align);
+      } catch (error) {
+        failure = error as Error;
+      }
+    } else this.lastAlignment = "none";
     this.view.show(this.pose);
     this.index = plan.target;
+    if (failure) {
+      this.notify();
+      throw failure;
+    }
     this.check(plan.target);
     this.notify();
+  }
+
+  /**
+   * The end alignment of a deferred step, found once the blocks are played: the one of the 24 whole-cube orientations that
+   * turns the shown state into the stored target. None, or more than one, is a mismatch.
+   */
+  private alignmentOf(plan: Plan): readonly Move[] {
+    if (plan.align) return plan.align;
+    const found = findAlignments(this.printing, this.pose, this.graph.nodes[plan.target].hash);
+    if (found.length !== 1)
+      throw new StateMismatchError(
+        `no whole-cube orientation turns the cube into the stored state of node ${plan.target} (${found.length} of 24 match)`,
+      );
+    return (plan.align = found[0].moves);
+  }
+
+  private finished(plan: Plan): boolean {
+    return plan.done >= plan.blocks.length && (!plan.defer || (plan.align !== null && plan.alignDone >= plan.align.length));
   }
 
   play(): void {
@@ -254,19 +325,35 @@ export class Calendar7Player {
     try {
       while (this.plan && this.status === "playing" && this.generation === mine && !this.disposed) {
         const plan = this.plan;
-        if (plan.done >= plan.blocks.length) break;
-        const block = plan.blocks[plan.done];
-        await this.view.turn(block, this.pose, BASE_MOVE_MS / this.speed);
-        if (this.disposed || this.generation !== mine || this.plan !== plan) return;
-        applyBlockInPlace(this.pose, block);
-        plan.done++;
-        this.notify();
+        if (plan.done < plan.blocks.length) {
+          const block = plan.blocks[plan.done];
+          await this.view.turn(block, this.pose, BASE_MOVE_MS / this.speed);
+          if (this.disposed || this.generation !== mine || this.plan !== plan) return;
+          applyBlockInPlace(this.pose, block);
+          plan.done++;
+          this.notify();
+        } else if (plan.defer) {
+          // Final phase: the alignment, one or two whole-cube rotations of the model, with the soft start of the rubber band.
+          const first = plan.align === null;
+          const align = this.alignmentOf(plan);
+          if (first) this.notify();
+          if (plan.alignDone >= align.length) break;
+          const move = align[plan.alignDone];
+          const reduced = this.reducedMotion();
+          const ms = reduced ? REDUCED_ALIGN_MS : softStartMs(Math.abs(move[1])) / this.speed;
+          await this.view.turn(rotationBlock(move), this.pose, ms, reduced ? undefined : softStartEase(Math.abs(move[1])));
+          if (this.disposed || this.generation !== mine || this.plan !== plan) return;
+          applyMoveInPlace(this.pose, move);
+          plan.alignDone++;
+          this.notify();
+        } else break;
       }
-      if (this.plan && this.generation === mine && !this.disposed && this.plan.done >= this.plan.blocks.length) {
+      if (this.plan && this.generation === mine && !this.disposed && this.finished(this.plan)) {
         const plan = this.plan;
         this.plan = null;
         this.status = "idle";
         this.index = plan.target;
+        this.lastAlignment = plan.align ? alignmentText(plan.align) : "none";
         this.check(plan.target);
         this.notify();
       }

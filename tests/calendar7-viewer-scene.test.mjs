@@ -11,7 +11,9 @@ import { STICKERS, applyMoves, clonePose, inverseMoves, samePose } from "../src/
 import { parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
 import { groupBlocks, expand } from "../src/apps/calendar7/blocks.ts";
 import { Calendar7Viewer } from "../src/apps/calendar7/viewer.ts";
-import { MoveTween } from "../src/apps/calendar7/tween.ts";
+import { MoveTween, smoothstep } from "../src/apps/calendar7/tween.ts";
+import { allOrientations, rotationBlock } from "../src/apps/calendar7/deferral.ts";
+import { softStartEase, softStartMs } from "../src/apps/calendar7/soft-start.ts";
 
 const json = (p) => JSON.parse(readFileSync(p, "utf8"));
 const graph = parseGraph(json("public/calendar7/graph.v1.json"));
@@ -57,9 +59,10 @@ const later = (ms) => performance.now() + ms;
 // Capture the pose of the scene at progress 1, before the pivot is released and the bodies are synced.
 const realBegin = cube.beginTurn.bind(cube);
 let atEnd = null;
+const seen = [];
 cube.beginTurn = (pieces, axis, angle) => {
   const t = realBegin(pieces, axis, angle);
-  return { update: (p) => (t.update(p), p === 1 && (atEnd = snapshot())), dispose: () => t.dispose() };
+  return { update: (p) => (seen.push(p), t.update(p), p === 1 && (atEnd = snapshot())), dispose: () => t.dispose() };
 };
 
 const stats = { quarter: 0, quarterBack: 0, half: 0, rot: 0, single: 0, "outer-wide": 0, "inner-wide": 0 };
@@ -173,4 +176,56 @@ test("negative control: a slab that leaves out layer 0 does not end on the pose 
     cube.sync(frames(narrowed ? applyMoves(start, expand([narrowed])) : start));
     assert.ok(!sameMaps(atEnd, snapshot()), `${JSON.stringify(block)} is not the slab without layer 0`);
   }
+});
+
+test("end alignment: the whole model turns about the axis with the soft start and ends on the rotated pose (1e-6); all 24 orientations", () => {
+  const start = nodePose(40);
+  let moves = 0;
+  for (const o of allOrientations()) {
+    let pose = start;
+    for (const move of o.moves) {
+      const block = rotationBlock(move);
+      const quarters = Math.abs(move[1]);
+      cube.sync(frames(pose));
+      seen.length = 0;
+      atEnd = null;
+      void viewer.turn(block, pose, softStartMs(quarters), softStartEase(quarters));
+      viewer.tween.tick(performance.now() + softStartMs(quarters) * 0.5);
+      const mid = seen.at(-1);
+      const expected = softStartEase(quarters)(0.5);
+      assert.ok(mid >= expected && mid <= softStartEase(quarters)(0.52), `eased progress at half time: ${mid} vs ${expected}`);
+      assert.notEqual(mid, smoothstep(0.5), "not the smoothstep of the layer moves");
+      viewer.tween.tick(later(10 * softStartMs(quarters)));
+      assert.equal(seen.at(-1), 1);
+      assert.ok(atEnd, "reached progress 1");
+      const after = applyMoves(pose, expand([block]));
+      const afterTurn = snapshot();
+      cube.sync(frames(after));
+      assert.ok(sameMaps(atEnd, snapshot()) && sameMaps(afterTurn, snapshot()), `rotation ${JSON.stringify(move)}`);
+      pose = after;
+      moves++;
+    }
+    // The pose after the alignment equals the engine pose of the two rotations in the stored frame.
+    assert.ok(samePose(pose, applyMoves(start, o.moves)));
+  }
+  assert.equal(moves, 9 + 2 * 14, "nine single rotations, fourteen pairs");
+  // Reduced motion hands no easing: the plain smoothstep, and the same end pose.
+  cube.sync(frames(start));
+  seen.length = 0;
+  void viewer.turn(rotationBlock([14, 1]), start, 150);
+  viewer.tween.tick(performance.now() + 75);
+  assert.ok(Math.abs(seen.at(-1) - 0.5) < 0.02);
+  viewer.tween.tick(later(1000));
+  assert.ok(samePose(applyMoves(start, [[14, 1]]), applyMoves(start, expand([rotationBlock([14, 1])]))));
+});
+
+test("negative control: the opposite rotation does not end on the pose of the alignment", () => {
+  const start = nodePose(40);
+  cube.sync(frames(start));
+  atEnd = null;
+  void viewer.turn(rotationBlock([7, -1]), start, 10, softStartEase(1));
+  viewer.tween.tick(later(0));
+  viewer.tween.tick(later(10000));
+  cube.sync(frames(applyMoves(start, [[7, 1]])));
+  assert.ok(!sameMaps(atEnd, snapshot()));
 });
