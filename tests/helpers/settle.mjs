@@ -74,10 +74,10 @@ export const ariaBusy = (page, selector, busy, options) =>
  * controller publishes its first idle state (`aria-busy="false"`) from `configure()`, before `main.mjs` has
  * installed the final assets and set `ready`; only then do `#set` and the other controls leave `disabled`. So
  * `aria-busy="false"` alone is not "booted": it is the state the page passes through. Software-rendered CI
- * runners need longer than the 5 s default of `expect` for the module graph, the verified counter data and the
- * first render, hence an explicit budget (`timeout`, default 40 s: about four times the slowest boot seen).
+ * runners are slow to boot, so the gate must name the state instead of assuming it. The budget is the same as the
+ * `expect` timeout of the CI group (5 s fast, 20 s timing, see playwright.config), not a longer one.
  */
-export const booted = (page, { timeout = 40000 } = {}) =>
+export const booted = (page, { timeout = process.env.CUBISTRY_E2E_GROUP === "timing" ? 20000 : 5000 } = {}) =>
   until(
     page,
     'the Counter page has booted (#set enabled, #cube aria-busy="false")',
