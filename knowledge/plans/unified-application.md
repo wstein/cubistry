@@ -79,7 +79,7 @@ A mode receives a `ModeShell` in its mount context (`MountContext.shell`) and us
 - `setSlot(n, { label, element | render })`, `clearSlot(n)`, `clearSlots()`: slots 1 Action, 2 Value, 3 Mode, 4 Motion, 5 Print & appearance. A filled slot is a `role="group"` labeled by an `h2`; an empty slot keeps `hidden`. DOM order is tab order.
 - `setPrimaryAction({ label, onClick, disabled? })`: the one berry button.
 - `setStatus(state, text?)`: one chip in the existing `role="status"` zone, states `ready, moving, sync, paused, done, warn, error` (tokens `--s-*`). The same state and text writes nothing; callers set it on state transitions, never per frame. The readout (`setReadout`, `updateReadout`) is plain text without a live region.
-- `setNerd({ title, render })`, `refreshNerd()`: the drawer is hidden until the Nerd button (`#nerd-toggle`, end of the dock) is pressed; `render` runs only while it is open. `nerdTable` and `nerdFacts` build the content.
+- `setNerd({ title, render })`, `refreshNerd()`: the drawer is hidden until the Nerd button (`#nerd-toggle`, in the header between Appearance and Presentation) is pressed or the URL has `nerd=1`; `render` runs only while it is open, and a refresh keeps the focused control and the scroll position. `nerdTable` and `nerdFacts` build the content.
 - `setHint(text | null)`, `setReferenceView(handler | null)`, `listen(...)`, `onDispose(fn)`.
 
 Cleanup: the router creates the shell per mount and disposes it with the mode. Every write checks `isCurrent()`, so a mode that is superseded during an async init cannot put content into the next mode.
@@ -103,12 +103,14 @@ Slots the design fills per registered mode (`src/apps/shell/slot-map.ts`, compar
 
 `tenth` fills slots 1 to 4 with Step, Value, Direction and Step speed; the design row lists Run / Stop, Stop after and Wrap, which this mode does not have. This deviation is accepted (owner decision 5, 2026-11-08) and recorded as `ACCEPTED_DEVIATIONS` in `src/apps/shell/slot-map.ts`.
 
+Owner decisions of 2026-11-08 on the Nerd drawer:
+1. Nerd drawer versus the Clock page's Nerd panel: the per-cube speed selects go to slot 4; the drawer shows the effective values only; `nerd=1` opens the drawer. Built: `nerd=1` (`nerdOpenFromSearch`). Open: the speed selects and the drawer content belong to the Clock port (`clock.html` is still the page that has them).
+2. Stats and session moves of the Live Clock move into the drawer with a "Reset session moves" button. Built: the drawer keeps focus and scroll position on refresh. Open: the move itself, with the Clock port.
+3. The Nerd button sits in the header like in the mock. Built: between Appearance and Presentation, same button build, label kept on a phone.
+
 Open questions for the owner:
-1. Nerd drawer versus the Clock page's Nerd panel. The design's drawer is read-only diagnostics under the stage (committed-moves table, timing facts, renderer). The Clock page's panel (`clock.html`, `clock-nerd-details`, URL `nerd`, `dev`, `expert`, key `cubistry_clock_nerd_mode`) holds per-cube speed selects (preferred quarter-turn time) with a timing line each. In the slot map, per-cube move time is slot 4 (Motion) of the Clock; the drawer is not meant for controls. Recommendation: the speed selects go to slot 4, the drawer shows the effective values; `nerd=1` opens the drawer.
-2. "Maybe move stats": the per-cube session statistics and the committed-moves table of the Live Clock move into the drawer (design deviation 7). The API supports it (`nerdTable`, `refreshNerd`); the move itself belongs to the Clock port. Recommendation: move both, keep "Reset session moves" as a button inside the drawer.
-3. Nerd button placement. The design puts it in the header (desktop) and at the end of the sheet (phone). It sits at the end of the dock now, because #321 changes the header (View menu). Recommendation: move it into the View menu after #321 merges.
-4. Warning and error rows. The design has dismissible `role="alert"` rows besides the chip; the API has the `warn` and `error` chip states only. Recommendation: add the rows with the Clock port.
-5. The phone sheet (grab handle, snap states) is not built; the dock stays the stacked area of the current layout.
+1. Warning and error rows. The design has dismissible `role="alert"` rows besides the chip; the API has the `warn` and `error` chip states only. Recommendation: add the rows with the Clock port.
+2. The phone sheet (grab handle, snap states) is not built; the dock stays the stacked area of the current layout.
 
 ## Risks
 - Known red or flaky specs on `main` (owner list, not re-run for this plan): `ms-timer:33`, `presentation:38` (two), `smart-rotation:101`, intermittent `hsm-lettering:39` and `:113`, `presentation:160`. Layout specs stay red until the layout rework. The workflow "Counter checks" was reported failing on `7dae282` (fast groups 2 and 3, timing 1; issue #202 describes broad e2e failures, cause unknown). A port PR compares the red set before and after: the same set, no new entries, and no spec weakened "because of the move".
