@@ -640,6 +640,7 @@ test("move statistics block is present, stable in layout and updates after clock
     "Average / tick",
   ]);
   const before = await page.locator("#studio-scene").boundingBox();
+  const tableBefore = await page.locator(".clock-move-table").boundingBox();
   await page.clock.runFor(4000);
   await expect
     .poll(() => page.locator("#seconds-session-moves").textContent())
@@ -661,6 +662,7 @@ test("move statistics block is present, stable in layout and updates after clock
     await read("seconds-last-moves"),
   );
   expect(await page.locator("#studio-scene").boundingBox()).toEqual(before);
+  expect(await page.locator(".clock-move-table").boundingBox()).toEqual(tableBefore);
   // The average appears with the first completed change and stays in range.
   await expect
     .poll(() => page.locator("#seconds-mean-moves").textContent())
@@ -679,6 +681,21 @@ test("move statistics block is present, stable in layout and updates after clock
   const table = await page.locator(".clock-move-table").boundingBox();
   expect(table.x).toBeGreaterThanOrEqual(0);
   expect(table.x + table.width).toBeLessThanOrEqual(390);
+  // Headings may wrap between words, but each word must remain on one line.
+  const splitWords = await page.locator(".clock-move-table th").evaluateAll((heads) => {
+    const split = [];
+    for (const head of heads) {
+      const text = head.firstChild;
+      for (const match of head.textContent.matchAll(/\S+/g)) {
+        const range = document.createRange();
+        range.setStart(text, match.index);
+        range.setEnd(text, match.index + match[0].length);
+        if (range.getClientRects().length > 1) split.push(match[0]);
+      }
+    }
+    return split;
+  });
+  expect(splitWords).toEqual([]);
 });
 
 // Parameters and panels the Clock page offered, now in the unified clock mode (index.html?app=clock).
