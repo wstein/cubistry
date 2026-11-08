@@ -1,0 +1,9 @@
+control	exit	verdict
+valid	0	edge-verdict	ACCEPT_ALL
+old-print	1	edge-verdict	REJECT
+drop-first-move	1	edge-verdict	REJECT
+swap-two-edge-words	1	edge-verdict	REJECT
+generator-22	1	ERROR: LoadError: AssertionError: generator outside 1..21 (no layer 0)
+wrong-htm	1	edge-verdict	REJECT
+wrong-target-month	1	edge-verdict	REJECT
+wrong-source-display	1	edge-verdict	REJECT

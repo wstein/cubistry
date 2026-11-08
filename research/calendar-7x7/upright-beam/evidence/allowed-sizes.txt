@@ -1,0 +1,6 @@
+allowed-sizes	strict	cells	4459	mean_size	1.64	size1_share	0.826	pairs_dropped_by_tightening_total	470
+allowed-hist	strict	1:3682 2:170 3:118 4:132 5:174 7:65 9:118
+allowed-core-hist	strict	1:91
+allowed-sizes	old	cells	4459	mean_size	1.67	size1_share	0.808	pairs_dropped_by_tightening_total	480
+allowed-hist	old	1:3604 2:156 3:210 4:132 5:174 7:65 9:118
+allowed-core-hist	old	1:52 2:39

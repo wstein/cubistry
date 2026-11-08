@@ -1,0 +1,32 @@
+== A original problem, core weight 1 (what synth_strict.jl ran): dropped pairs=0, status=stalled, stall=[4, 22, 40, 253]
+   snapshot with 4 wrong cells, word htm=108
+     cell 4 (orbit 1) holds pose 9; allowed: pose 8 hidden at position 5 [same cubie as the occupant of the cell: right cubie, wrong twist]
+     cell 22 (orbit 1) holds pose 11; allowed: pose 2 sits in front cell 10 that is satisfied (flexible cell holds a scarce piece)
+     cell 40 (orbit 2) holds pose 46; allowed: pose 47 sits in front cell 36 that is satisfied (flexible cell holds a scarce piece)
+     cell 253 (orbit 11) holds pose 255; allowed: pose 253 hidden at position 254 [same cubie as the occupant of the cell: right cubie, wrong twist]
+     old hybrid finish: core right=false, planner core prefix on this snapshot=[21, 21, 21], wrong cells before 4 after prefix 47
+   snapshot with 5 wrong cells, word htm=105
+     cell 4 (orbit 1) holds pose 9; allowed: pose 8 hidden at position 5 [same cubie as the occupant of the cell: right cubie, wrong twist]
+     cell 22 (orbit 1) holds pose 11; allowed: pose 2 sits in front cell 10 that is satisfied (flexible cell holds a scarce piece)
+     cell 40 (orbit 2) holds pose 46; allowed: pose 47 sits in front cell 36 that is satisfied (flexible cell holds a scarce piece)
+     cell 112 (orbit 5) holds pose 101; allowed: pose 108 hidden at position 101
+     cell 253 (orbit 11) holds pose 255; allowed: pose 253 hidden at position 254 [same cubie as the occupant of the cell: right cubie, wrong twist]
+     old hybrid finish: core right=false, planner core prefix on this snapshot=[21, 21, 21], wrong cells before 5 after prefix 47
+== B tightened allowed sets, core weight 1: dropped pairs=7, status=stalled, stall=[4]
+   snapshot with 1 wrong cells, word htm=142
+     cell 4 (orbit 1) holds pose 9; allowed: pose 8 hidden at position 5 [same cubie as the occupant of the cell: right cubie, wrong twist]
+     old hybrid finish: core right=true, planner core prefix on this snapshot=Int64[], wrong cells before 1 after prefix 1
+   snapshot with 2 wrong cells, word htm=137
+     cell 4 (orbit 1) holds pose 9; allowed: pose 8 hidden at position 5 [same cubie as the occupant of the cell: right cubie, wrong twist]
+     cell 112 (orbit 5) holds pose 116; allowed: pose 108 hidden at position 105
+     old hybrid finish: core right=true, planner core prefix on this snapshot=Int64[], wrong cells before 2 after prefix 2
+== C tightened, core weight 100 (core protected), no catalog macros: dropped pairs=7, status=stalled, stall=[60, 112]
+   snapshot with 2 wrong cells, word htm=138
+     cell 60 (orbit 3) holds pose 51; allowed: pose 50 sits in front cell 62 that is satisfied (flexible cell holds a scarce piece) | pose 68 hidden at position 53 | pose 71 hidden at position 67
+     cell 112 (orbit 5) holds pose 116; allowed: pose 108 hidden at position 111
+     old hybrid finish: core right=true, planner core prefix on this snapshot=Int64[], wrong cells before 2 after prefix 2
+   snapshot with 3 wrong cells, word htm=135
+     cell 60 (orbit 3) holds pose 51; allowed: pose 50 sits in front cell 62 that is satisfied (flexible cell holds a scarce piece) | pose 68 hidden at position 53 | pose 71 hidden at position 67
+     cell 112 (orbit 5) holds pose 116; allowed: pose 108 hidden at position 111
+     cell 200 (orbit 9) holds pose 204; allowed: pose 201 hidden at position 196
+     old hybrid finish: core right=true, planner core prefix on this snapshot=Int64[], wrong cells before 3 after prefix 3

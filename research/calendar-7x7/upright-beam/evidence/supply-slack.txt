@@ -1,0 +1,13 @@
+supply	orbit	(-3, -3)	demand_nonblank	19	printed	19	slack	0	blank_demand	3	blank_supply	5
+supply	orbit	(-3, -2)	demand_nonblank	15	printed	15	slack	0	blank_demand	2	blank_supply	9
+supply	orbit	(-3, -1)	demand_nonblank	21	printed	21	slack	0	blank_demand	2	blank_supply	3
+supply	orbit	(-3, 0)	demand_nonblank	22	printed	22	slack	0	blank_demand	2	blank_supply	2
+supply	orbit	(-3, 1)	demand_nonblank	20	printed	20	slack	0	blank_demand	2	blank_supply	4
+supply	orbit	(-3, 2)	demand_nonblank	20	printed	20	slack	0	blank_demand	1	blank_supply	4
+supply	orbit	(-2, -2)	demand_nonblank	16	printed	16	slack	0	blank_demand	0	blank_supply	8
+supply	orbit	(-2, -1)	demand_nonblank	21	printed	21	slack	0	blank_demand	1	blank_supply	3
+supply	orbit	(-2, 0)	demand_nonblank	21	printed	21	slack	0	blank_demand	0	blank_supply	3
+supply	orbit	(-2, 1)	demand_nonblank	17	printed	17	slack	0	blank_demand	1	blank_supply	7
+supply	orbit	(-1, -1)	demand_nonblank	22	printed	22	slack	0	blank_demand	2	blank_supply	2
+supply	orbit	(-1, 0)	demand_nonblank	23	printed	23	slack	0	blank_demand	1	blank_supply	1
+supply	orbit	(0, 0)	demand_nonblank	6	printed	6	slack	0	blank_demand	0	blank_supply	0

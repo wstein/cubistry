@@ -1,0 +1,9 @@
+chain-estimate	transitions_measured	98	of	98
+chain-estimate	htm_per_transition	median=115.0	mean=112.9	min=17	max=156
+chain-estimate	seconds_per_transition	mean=68.2	max=127.3
+chain-estimate	weighted_edges_covered	863	of	863
+chain-estimate	weighted_mean_htm_per_edge	113.3
+chain-estimate	weighted_mean_seconds_per_edge	69.7
+chain-estimate	estimated_chain_htm_863_edges	97762
+chain-estimate	estimated_chain_cpu_hours_863_edges	16.7
+chain-estimate	naive_concatenation_htm_863_edges	771974	(upper bound from chain-plan)

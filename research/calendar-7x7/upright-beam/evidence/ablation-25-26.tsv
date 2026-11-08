@@ -1,0 +1,14 @@
+tight	core_weight	catalog_in_beam	last_mile	result	htm	seconds	stall_or_method
+0	1	0	0	STALLED	-1	38.0	[4, 22, 40, 253]
+1	1	0	0	STALLED	-1	38.4	[4]
+0	100	0	0	STALLED	-1	34.1	[4, 22, 40]
+1	100	0	0	STALLED	-1	32.2	[60, 112]
+0	1	1	0	STALLED	-1	35.8	[253]
+0	100	1	0	SOLVED	153	32.9	beam
+1	1	1	0	STALLED	-1	37.0	[4]
+1	100	1	0	SOLVED	158	35.8	beam
+1	100	0	1	SOLVED	159	45.1	finish2
+0	100	0	1	SOLVED	156	61.1	finish3
+1	100	1	1	SOLVED	158	37.3	beam
+0	1	0	1	STALLED	-1	64.7	[4, 22, 40, 253]
+0	1	1	1	STALLED	-1	59.5	[253]

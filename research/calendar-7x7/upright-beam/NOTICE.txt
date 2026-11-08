@@ -1,0 +1,6 @@
+Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+Applies to README.md and evidence/. The Julia scripts in this
+directory are program code under AGPL-3.0-or-later (SPDX header in each file).

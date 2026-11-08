@@ -1,0 +1,7 @@
+smoke-root	2028-1	ACCEPT
+smoke-edge	2028-1->2028-2	ACCEPT	142	beam
+smoke-edge	2028-2->2028-3	ACCEPT	105	beam
+smoke-edge	2028-3->2028-4	ACCEPT	126	beam
+smoke-edge	2028-4->2028-5	ACCEPT	108	beam
+smoke-total-edge-htm	481	edges	4
+smoke-verdict	ACCEPT
