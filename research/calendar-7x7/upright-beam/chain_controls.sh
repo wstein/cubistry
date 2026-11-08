@@ -3,8 +3,8 @@
 # Driver only: the decision is made by the chain verifier behind RUNNER. The valid chain must
 # be ACCEPTED and every mutated input REJECTED; exit 1 on any deviation.
 #   chain_controls.sh OUT_TSV RUNNER CHAIN [PRINT [ROOT_MOVES]]       (run from this directory)
-# RUNNER is chain_runner_julia.sh or chain_runner_flix.sh (PRINT CHAIN ROOT_MOVES; exit 0 only
-# when the status line VALID_CONTINUOUS_CHAIN is printed). CHAIN is a strict chain with >= 2 edges.
+# RUNNER is chain_runner_julia.sh, chain_runner_flix.sh or chain_runner_replay.sh (PRINT CHAIN ROOT_MOVES; exit 0 only
+# when VALID_CONTINUOUS_CHAIN / ACCEPT_CHAIN is printed). CHAIN is a strict chain with >= 2 edges.
 set -u
 out=$1; runner=$2; chain=$3
 print=${4:-../upright-feasibility/evidence/print-strict-upright.tsv}
@@ -15,9 +15,9 @@ printf 'control\texpected\tverdict\texit\tdetail\n' > "$out"
 run() { # name expected print chain moves
   local name=$1 want=$2 p=$3 c=$4 m=$5 code v
   "$runner" "$p" "$c" "$m" > "$tmp/o.txt" 2> "$tmp/e.txt"; code=$?
-  if [ "$code" = 0 ] && grep -q $'^status\tVALID_CONTINUOUS_CHAIN' "$tmp/o.txt"; then v=ACCEPT; else v=REJECT; fi
+  if [ "$code" = 0 ] && grep -qE $'^(status\tVALID_CONTINUOUS_CHAIN|chain-verdict\tACCEPT_CHAIN)' "$tmp/o.txt"; then v=ACCEPT; else v=REJECT; fi
   [ "$v" = "$want" ] || bad=1
-  printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$want" "$v" "$code" "$(cat "$tmp/e.txt" "$tmp/o.txt" | grep -E 'INVALID|invalid|Error|status' | head -1 | cut -c1-140)" >> "$out"
+  printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$want" "$v" "$code" "$(cat "$tmp/e.txt" "$tmp/o.txt" | grep -E "INVALID|invalid|Error|status|verdict|REJECT" | head -1 | cut -c1-140)" >> "$out"
 }
 run valid ACCEPT "$print" "$chain" "$moves"
 # 1. the old print (pinned print digest and old glyphs).
