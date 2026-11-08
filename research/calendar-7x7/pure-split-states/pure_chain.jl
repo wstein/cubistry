@@ -50,13 +50,13 @@ function read_chain(path)
     f=split(lines[2],'\t')
     @assert length(f)==5 && f[1]=="source"
     root,year,month=canonical_integer.(f[2:4]); hash=chain_hash(f[5])
-    @assert 1<=root<=91 && 2026<=year<=2099 && 1<=month<=12
+    @assert 1<=root<=91 && 1900<=year<=2099 && 1<=month<=12
     edges=Any[];cursor=3
     while cursor<=length(lines) && lines[cursor]!="finish"
         f=split(lines[cursor],'\t');cursor+=1
         @assert length(f)==9 && f[1]=="edge"
         y,m,htm,qtm,rot,rotq=canonical_integer.(f[2:7])
-        @assert 2026<=y<=2099 && 1<=m<=12 && 0<=htm<=100000 && 0<=qtm<=200000 && 0<=rot<=100000 && 0<=rotq<=200000
+        @assert 1900<=y<=2099 && 1<=m<=12 && 0<=htm<=100000 && 0<=qtm<=200000 && 0<=rot<=100000 && 0<=rotq<=200000
         source_hash=chain_hash(f[8]);end_hash=chain_hash(f[9]);moves=Tuple{Int,Int}[]
         while cursor<=length(lines) && lines[cursor]!="end"
             f=split(lines[cursor],'\t');cursor+=1
@@ -68,7 +68,7 @@ function read_chain(path)
         @assert cursor<=length(lines) && lines[cursor]=="end"
         cursor+=1
         push!(edges,(;year=y,month=m,htm,qtm,rot,rotq,source_hash,end_hash,moves))
-        @assert length(edges)<=1000
+        @assert length(edges)<=2400
     end
     @assert cursor==length(lines) && lines[cursor]=="finish" && length(edges)>=2
     (;root,year,month,hash,edges)
