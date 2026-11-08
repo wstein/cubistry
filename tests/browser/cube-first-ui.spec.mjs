@@ -415,8 +415,10 @@ for (const [width, textPercent] of [
     }
   });
 
-// Real status messages from src/main.mjs; the dock must wrap them, not widen.
+// The text is modeled on the status messages at src/main.mjs:631 and :420; the dock must wrap it, not widen.
 for (const [width, textPercent] of [
+  [1440, 150],
+  [768, 125],
   [700, 100],
   [600, 100],
   [390, 100],
