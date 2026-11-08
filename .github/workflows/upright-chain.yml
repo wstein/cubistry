@@ -61,6 +61,9 @@ concurrency:
 
 env:
   WORKFLOW_PATH: .github/workflows/upright-chain.yml
+  # A prior run is only continued when it was dispatched by hand from this branch.
+  REQUIRED_PRIOR_EVENT: workflow_dispatch
+  REQUIRED_PRIOR_BRANCH: main
   CAL: research/calendar-7x7
 
 jobs:
@@ -77,7 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          persist-credentials: true # prepare only fetches this repository; no untrusted code runs here
+          persist-credentials: false # the repository is public; prepare only fetches refs of it, no untrusted code runs here
       - name: Validate inputs
         id: validate
         env:
@@ -115,15 +118,34 @@ jobs:
           PRIOR: ${{ steps.validate.outputs.prior_run_id }}
         run: |
           set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
           # The API path is scoped to this repository, so a foreign run id is a 404.
-          read -r path conclusion < <(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$PRIOR" --jq '[.path, .conclusion] | @tsv')
+          IFS=$'\t' read -r path conclusion event branch < <(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$PRIOR" --jq '[.path, .conclusion, .event, .head_branch] | @tsv')
           # .path may carry an @ref suffix.
-          [ "${path%%@*}" = "$WORKFLOW_PATH" ] || { echo "::error::run $PRIOR is not a run of $WORKFLOW_PATH ($path)"; exit 1; }
-          [ "$conclusion" = "success" ] || { echo "::error::run $PRIOR did not succeed ($conclusion)"; exit 1; }
+          [ "${path%%@*}" = "$WORKFLOW_PATH" ] || fail "run $PRIOR is not a run of $WORKFLOW_PATH ($path)"
+          [ "$event" = "$REQUIRED_PRIOR_EVENT" ] || fail "run $PRIOR was started by '$event', not '$REQUIRED_PRIOR_EVENT'"
+          [ "$branch" = "$REQUIRED_PRIOR_BRANCH" ] || fail "run $PRIOR ran from branch '$branch', not '$REQUIRED_PRIOR_BRANCH'"
+          # A run that failed or was cancelled after verified segments can be continued: a segment
+          # artifact is uploaded only after the three checkers accepted the cumulative chain, and
+          # the next segment re-checks its checksums and re-verifies the whole chain anyway, so
+          # the conclusion adds no trust. It needs at least one unexpired chain artifact.
+          case "$conclusion" in
+            success) ;;
+            failure|cancelled|timed_out)
+              n=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$PRIOR/artifacts" --paginate --jq '[.artifacts[] | select((.name | startswith("upc-chain-")) and (.expired | not))] | length' | awk '{s+=$1} END{print s+0}')
+              [ "$n" -ge 1 ] || fail "run $PRIOR ended with $conclusion and has no chain artifact"
+              echo "::warning::continuing run $PRIOR ($conclusion) from its verified chain artifacts";;
+            *) fail "run $PRIOR is not finished or has the conclusion '$conclusion'";;
+          esac
       - name: Resolve research ref
         id: resolve
         env:
           REF: ${{ inputs.research_ref }}
+          OUT_SMOKE: ${{ steps.validate.outputs.smoke }}
+          OUT_JOBS: ${{ steps.validate.outputs.jobs }}
+          OUT_EDGES: ${{ steps.validate.outputs.edges }}
+          OUT_START: ${{ steps.validate.outputs.start }}
+          OUT_PRIOR: ${{ steps.validate.outputs.prior_run_id }}
         run: |
           set -euo pipefail
           fail() { echo "::error::$1"; exit 1; }
@@ -148,7 +170,7 @@ jobs:
             echo "### Upright chain"
             echo "- research_ref: \`$REF\`"
             echo "- resolved SHA: \`$sha\`"
-            echo "- smoke: \`${{ steps.validate.outputs.smoke }}\`, jobs: ${{ steps.validate.outputs.jobs }}, edges per job: ${{ steps.validate.outputs.edges }}, start: ${{ steps.validate.outputs.start }}, prior run: \`${{ steps.validate.outputs.prior_run_id }}\`"
+            echo "- smoke: \`$OUT_SMOKE\`, jobs: $OUT_JOBS, edges per job: $OUT_EDGES, start: $OUT_START, prior run: \`$OUT_PRIOR\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
   seg1:

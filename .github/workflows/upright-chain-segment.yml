@@ -122,6 +122,8 @@ jobs:
               if [ "$n" -gt "$most" ]; then most=$n; best=$d; fi
             done < <(find "$GITHUB_WORKSPACE/prev" -name VERIFIED.txt)
             [ -n "$best" ] || { echo "::error::no verified chain artifact found to continue"; exit 1; }
+            prior_sha=$(sed -n 's/^research_ref_sha=\([0-9a-f]\{40\}\)$/\1/p' "$best/VERIFIED.txt" | head -n 1)
+            [ "$prior_sha" = "$SHA" ] || echo "::warning::prior chain was produced with research SHA $prior_sha, this segment uses $SHA"
             cp "$best/moves.tsv" "$out/prior.moves.tsv"
             cp "$best/edges.tsv" "$out/prior.edges.tsv"
             echo "continuing from $best ($most edges)"
@@ -134,8 +136,12 @@ jobs:
           # transient 5xx there fails the build, so retry for up to 21 minutes (the build itself is deterministic).
           jar=""
           for attempt in 1 2 3 4 5 6; do
-            if built=$(bash "src/$PURE_DIR/flix/build.sh"); then jar=$(printf "%s\n" "$built" | tail -n 1); break; fi
-            echo "::warning::Flix build attempt $attempt failed; retrying"; sleep $((attempt * 60))
+            if built=$(bash "src/$PURE_DIR/flix/build.sh" 2>&1); then jar=$(printf "%s\n" "$built" | tail -n 1); break; fi
+            printf "%s\n" "$built" | tail -n 30
+            # Retry only a failed download (flixw FLIXW005 or an HTTP 5xx), never a compile error.
+            printf "%s\n" "$built" | grep -qE 'FLIXW005|HTTP 5[0-9][0-9]' || { echo "::error::Flix build failed (not a download error)"; exit 1; }
+            [ "$attempt" -lt 6 ] || { echo "::error::Flix download failed six times"; exit 1; }
+            echo "::warning::Flix download attempt $attempt failed; retrying"; sleep $((attempt * 60))
           done
           test -n "$jar" && test -f "$jar"
           echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
@@ -177,7 +183,9 @@ jobs:
           grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.flix.stdout" > "$out/receipt.flix.tsv"
           tail -n 2 "$out/receipt.flix.tsv"
           cmp "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" || { echo "::error::Julia and Flix receipts differ"; exit 1; }
-          grep -q '^status.VALID_CONTINUOUS_CHAIN' "$out/receipt.flix.tsv"
+          n=$(awk -F'\t' '$1=="status"{print $3}' "$out/receipt.flix.tsv")
+          grep -qx $'status\tVALID_CONTINUOUS_CHAIN\t'"$n"$'\t218\t294\t49' "$out/receipt.flix.tsv" || { echo "::error::Flix status line is not the exact VALID_CONTINUOUS_CHAIN line"; exit 1; }
+          grep -qx $'status\tVALID_CONTINUOUS_CHAIN\t'"$n"$'\t218\t294\t49' "$out/receipt.julia.tsv" || { echo "::error::Julia status line is not the exact VALID_CONTINUOUS_CHAIN line"; exit 1; }
       - name: Independent Julia replay (verify_chain.jl)
         run: |
           set -euo pipefail
@@ -189,14 +197,18 @@ jobs:
           n=$(awk -F'\t' '$1=="status"{print $3}' "$out/receipt.flix.tsv")
           end=$(awk -F'\t' '$1=="edge"{y=$3;m=$4} END{print y"-"m}' "$out/receipt.flix.tsv")
           grep -qx $'chain-verdict\tACCEPT_CHAIN\t'"$n"$'\t'"$end" "$out/receipt.replay.tsv" || { echo "::error::replay verdict differs from the Flix receipt ($n edges, end $end)"; exit 1; }
-          echo "chain_end=$end" >> "$GITHUB_ENV"
+          # The cumulative edge count of the receipts must equal the rows of the cumulative edges.tsv.
+          lines=$(($(wc -l < "$out/edges.tsv") - 1))
+          [ "$n" = "$lines" ] || { echo "::error::receipts count $n edges but edges.tsv has $lines"; exit 1; }
+          echo "edges_total=$n" >> "$GITHUB_ENV"
+          echo "chain_end=$(awk -F'\t' '$1=="edge"{y=$3;m=$4} END{printf "%d-%02d",y,m}' "$out/receipt.flix.tsv")" >> "$GITHUB_ENV"
       - name: Package artifact
         run: |
           set -euo pipefail
           out=$GITHUB_WORKSPACE/out
           mkdir "$GITHUB_WORKSPACE/pack"
           cp "$out/moves.tsv" "$out/edges.tsv" "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" "$out/receipt.replay.tsv" "$out/run.log" "$out/flix-jar.sha256" "$GITHUB_WORKSPACE/pack/"
-          total=$(($(wc -l < "$out/edges.tsv") - 1))
+          total=$edges_total
           {
             echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "segment=$SEG"
             echo "edges_total=$total"; echo "chain_end=$chain_end"
