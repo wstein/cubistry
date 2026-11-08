@@ -158,7 +158,7 @@ test("at 375 px the page scrolls instead of clipping and the controls are reacha
   });
   expect(stageOverflow.sw).toBeLessThanOrEqual(0);
   expect(stageOverflow.canScroll).toBe(true);
-  for (const name of ["speed", "slice", "reset"]) {
+  for (const name of ["speed", "slice", "defer", "reset"]) {
     await page.locator(`[data-c7="${name}"]`).focus();
     await expect(page.locator(`[data-c7="${name}"]`)).toBeFocused();
   }
@@ -271,3 +271,17 @@ for (const [width, height] of [[375, 800], [768, 900], [1000, 700], [1440, 900]]
     expect(seen).toEqual([]);
   });
 }
+
+test("the sentence about the deferred rotations follows the 'Align at the end' option", async ({ page }) => {
+  const seen = watch(page);
+  await page.goto("/index.html?app=calendar7&year=2028&month=1");
+  await idle(page, "2028-01");
+  const sentence = page.locator('[data-align="next"]');
+  await expect(sentence).toBeVisible();
+  await expect(sentence).toContainText(`Alignment at the end (free, not a move): ${FEB_ALIGNMENT} with the middle slice`);
+  await page.locator('[data-c7="defer"]').uncheck();
+  await expect(sentence).toBeHidden();
+  await page.locator('[data-c7="defer"]').check();
+  await expect(sentence).toBeVisible();
+  expect(seen).toEqual([]);
+});

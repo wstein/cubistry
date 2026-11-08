@@ -106,6 +106,8 @@ interface Plan {
   readonly defer: boolean;
   align: readonly Move[] | null;
   alignDone: number;
+  /** The alignment the deferral predicts (empty without deferral); the digest search must find the same one. */
+  readonly expected: readonly Move[];
 }
 
 export class Calendar7Player {
@@ -244,8 +246,8 @@ export class Calendar7Player {
       this.jump(target);
       return;
     }
-    const { blocks } = playedBlocks(this.stepMoves(this.index, target), { slice: this.slice, defer: this.defer });
-    this.plan = { from: this.index, target, blocks, done: 0, defer: this.defer, align: null, alignDone: 0 };
+    const { blocks, alignment } = playedBlocks(this.stepMoves(this.index, target), { slice: this.slice, defer: this.defer });
+    this.plan = { from: this.index, target, blocks, done: 0, defer: this.defer, align: null, alignDone: 0, expected: alignment };
     this.status = "playing";
     this.notify();
     void this.run();
@@ -294,7 +296,12 @@ export class Calendar7Player {
       throw new StateMismatchError(
         `no whole-cube orientation turns the cube into the stored state of node ${plan.target} (${found.length} of 24 match)`,
       );
-    return (plan.align = found[0].moves);
+    const word = found[0].moves;
+    if (alignmentText(word) !== alignmentText(plan.expected))
+      throw new StateMismatchError(
+        `the alignment found by digest (${alignmentText(word)}) differs from the deferred rotations (${alignmentText(plan.expected)})`,
+      );
+    return (plan.align = word);
   }
 
   private finished(plan: Plan): boolean {
@@ -336,7 +343,7 @@ export class Calendar7Player {
           // Final phase: the alignment, one or two whole-cube rotations of the model, with the soft start of the rubber band.
           const first = plan.align === null;
           const align = this.alignmentOf(plan);
-          if (first) this.notify();
+          if (first && align.length > 0) this.notify(); // no transient phase for an identity alignment
           if (plan.alignDone >= align.length) break;
           const move = align[plan.alignDone];
           const reduced = this.reducedMotion();

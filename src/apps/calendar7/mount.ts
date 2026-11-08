@@ -202,10 +202,16 @@ export async function mountCalendar7(
     }
   };
 
+  /** The static sentence about the deferred rotations belongs to the 3D view and to the option being on. */
+  const syncAlignText = (): void => {
+    const on = threeD && ((q("defer") as HTMLInputElement | null)?.checked ?? DEFAULT_DEFER);
+    view.querySelectorAll?.("[data-align]").forEach((el) => ((el as HTMLElement).hidden = !on));
+  };
   const show = (p: URLSearchParams, moveFocus: boolean): void => {
     const choice = chooseMonth(p, today, range);
     const model = buildModel(graph, table, choice, today);
     view.innerHTML = pageHtml(model);
+    syncAlignText();
     live.textContent = announce(model);
     // The link that was clicked is gone after the re-render: keep the keyboard position at the new month.
     // No scroll: the cube above must stay in view while the step plays.
@@ -256,6 +262,7 @@ export async function mountCalendar7(
           break;
         case "defer":
           player.setDefer((el as HTMLInputElement).checked);
+          syncAlignText();
           break;
       }
     } catch (error) {
