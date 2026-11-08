@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { SLOT_MAP, MIGRATION, NO_DESIGN_ROW, slotsOf } from "../src/apps/shell/slot-map.ts";
+import { SLOT_MAP, MIGRATION, NO_DESIGN_ROW, ACCEPTED_DEVIATIONS, slotsOf } from "../src/apps/shell/slot-map.ts";
 import { MODE_CATALOG } from "../src/apps/mode-catalog.ts";
 import { SLOT_NUMBERS } from "../src/apps/shell/slot-api.ts";
 
@@ -62,4 +62,21 @@ test("migration status: every registered mode is listed; only the 1/10-Second Co
   for (const status of Object.values(MIGRATION)) assert.ok(["pending", "migrated"].includes(status));
   const migrated = Object.entries(MIGRATION).filter(([, s]) => s === "migrated").map(([id]) => id);
   assert.deepEqual(migrated, ["tenth"]);
+});
+
+test("accepted deviations: the 1/10-Second Counter maps Step, Value, Direction, Step speed instead of the design row (owner decision 5, 2026-11-08)", () => {
+  assert.deepEqual(Object.keys(ACCEPTED_DEVIATIONS), ["tenth"]);
+  const design = SLOT_MAP.find((r) => r.modes.includes("tenth"));
+  const actual = ACCEPTED_DEVIATIONS.tenth;
+  assert.deepEqual([...actual.slots], ["Step", "Value", "Direction", "Step speed", null]);
+  assert.notDeepEqual([...actual.slots], [...design.slots], "a deviation differs from the design");
+  assert.deepEqual(actual.omitted, ["Run / Stop", "Stop after", "Wrap"]);
+  for (const label of actual.slots.filter(Boolean)) {
+    assert.ok(readFileSync("src/apps/chronocube/tenth-controls.ts", "utf8").includes(`label: "${label}"`), `${label} is a slot label of the mode`);
+  }
+  // The filled slot numbers agree with what the design row would fill, so slotsOf stays correct for the mode.
+  assert.deepEqual(slotsOf("tenth"), actual.slots.flatMap((l, i) => (l ? [i + 1] : [])));
+  const plan = readFileSync("knowledge/plans/unified-application.md", "utf8");
+  assert.match(plan, /`tenth` fills slots 1 to 4 with Step, Value, Direction and Step speed/);
+  assert.match(plan, /Run \/ Stop, Stop after and Wrap, which this mode does not have\. This deviation is accepted/);
 });

@@ -85,6 +85,24 @@ export const SLOT_MAP: readonly SlotMapRow[] = [
 ];
 
 /**
+ * Modes whose slots differ from the design row, accepted by the owner. `slots` are the labels the mode sets today,
+ * `omitted` the design entries it does not have. The design row stays in `SLOT_MAP` (it is compared with the design).
+ */
+export interface AcceptedDeviation {
+  slots: readonly [string | null, string | null, string | null, string | null, string | null];
+  omitted: readonly string[];
+  decision: string;
+}
+
+export const ACCEPTED_DEVIATIONS: Readonly<Record<string, AcceptedDeviation>> = {
+  tenth: {
+    slots: ["Step", "Value", "Direction", "Step speed", null],
+    omitted: ["Run / Stop", "Stop after", "Wrap"],
+    decision: "owner decision 5, 2026-11-08",
+  },
+};
+
+/**
  * Registered modes that the design's slot map does not cover. `calendar7` is a research candidate (plain HTML, no
  * cube stage); it fills no slot until the design gives it a row.
  */
