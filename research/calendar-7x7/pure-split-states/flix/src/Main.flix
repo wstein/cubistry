@@ -88,8 +88,10 @@ def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
         match Sys.Env.getArgs() {
             case "matchability"::printing::oldRoot::Nil => matchability(printing,oldRoot)
             case "chain"::printing::dag::path::oldRoot::geometry::Nil => runPureChain(printing,dag,path,oldRoot,geometry)
+            case "chain"::printing::dag::path::oldRoot::geometry::"strict"::rootMoves::Nil => runPureChainR(HalfRule.Strict,rootMoves,printing,dag,path,oldRoot,geometry)
+            case "chain"::printing::dag::path::oldRoot::geometry::"legacy"::Nil => runPureChain(printing,dag,path,oldRoot,geometry)
             case printing::dag::targets::oldRoot::geometry::Nil => checkPure(printing,dag,targets,oldRoot,geometry)
-            case _ => throw new IllegalArgumentException("PRINT DAG TARGETS ORIGINAL_EVIDENCE GEOMETRY | matchability PRINT ORIGINAL_EVIDENCE | chain PRINT DAG CHAIN ORIGINAL_EVIDENCE GEOMETRY")
+            case _ => throw new IllegalArgumentException("PRINT DAG TARGETS ORIGINAL_EVIDENCE GEOMETRY | matchability PRINT ORIGINAL_EVIDENCE | chain PRINT DAG CHAIN ORIGINAL_EVIDENCE GEOMETRY [legacy | strict ROOT_MOVES] (strict: DAG is not read, pass -)")
         }
     } catch {case ex: Exception => {println("invalid\t"+ex.toString());System.exit(1)}}
 })
@@ -150,13 +152,49 @@ def matchability(printPath: String,oldRoot: String): Unit \ IO = {
 
 // Chain verifier for the pure split (same replay as ../../continuous/flix, parametrized
 // for the new print and the pure-split displays under the strict stacked rule).
-def pureFront(state: Vector[Sticker],y: Int32,m: Int32,what: String): Unit \ IO =
-    require(frontFailure(state,stackedBoard(pureVariant(),y,m),"strict")=="-\t-\t-\t-",what)
-def runPureChain(printPath: String,dagPath: String,path: String,oldRoot: String,geometry: String): Unit \ IO = {
+def pureFront(rule: HalfRule,state: Vector[Sticker],y: Int32,m: Int32,what: String): Unit \ IO =
+    require(frontFailureR(rule,state,stackedBoard(pureVariant(),y,m),"strict")=="-\t-\t-\t-",what)
+// SHA-256 of research/calendar-7x7/upright-feasibility/evidence/print-strict-upright.tsv (strict chain only).
+def strictPrintSha(): String = "4fc44606e5dcdd745647f57b3086570910b4068a48d001553f99b1625106bcab"
+// Root word of display `id` from upright-moves/evidence/moves-strict.tsv: signed generators 1..21.
+def rootWord(rootMovesPath: String,id: Int32,sy: Int32,sm: Int32): List[Step] \ IO = {
+    let rows=match lines(read(rootMovesPath)) {
+        case _::rest => rest
+        case Nil => throw new IllegalArgumentException("root moves header")
+    };
+    let hits=List.filter(row -> match fields(row) {
+        case idS::_ => integer(idS)==id
+        case Nil => false
+    },rows);
+    match hits {
+        case row::Nil => match fields(row) {
+            case _::yS::mS::status::_::wordS::_::Nil => {
+                require(integer(yS)==sy and integer(mS)==sm,"root word row must be the declared source month");
+                require(String.contains(substr="FOUND",status),"root word row must be a found word");
+                List.map(t -> {
+                    let g=integer(t);
+                    require(g != 0 and Int32.abs(g)<=21,"root word generator outside 1..21");
+                    Step.M(Int32.abs(g),if(g>0)1 else -1)
+                },String.splitOn(substr=",",wordS))
+            }
+            case _ => throw new IllegalArgumentException("root moves row shape")
+        }
+        case _ => throw new IllegalArgumentException("root word must occur exactly once")
+    }
+}
+def runPureChain(printPath: String,dagPath: String,path: String,oldRoot: String,geometry: String): Unit \ IO =
+    runPureChainR(HalfRule.Legacy,"",printPath,dagPath,path,oldRoot,geometry)
+// rule Legacy: the source state is the DAG root state (the chains in main).
+// rule Strict: the print is pinned, DAG is not read, the source state is the solved print turned by the
+// root word of the source display (rootMovesPath), and every front is checked with the strict rule.
+def runPureChainR(rule: HalfRule,rootMovesPath: String,printPath: String,dagPath: String,path: String,oldRoot: String,geometry: String): Unit \ IO = {
+    let strict=rule==HalfRule.Strict;
     let CalendarChain.C(source,sy,sm,sourceHash,edges)=readChain(read(path));
     let oldRaw=read(oldRoot+"/physical-print.tsv");
     require(digest(oldRaw)=="b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931","unchanged PR99 printing provenance");
-    let old=readPrint(oldRaw);let printing=readPrint(read(printPath));
+    let printRaw=read(printPath);
+    require(not strict or digest(printRaw)==strictPrintSha(),"strict chain requires the pinned strict print");
+    let old=readPrint(oldRaw);let printing=readPrint(printRaw);
     List.forEach(i -> {
         let Sticker.S(_,a,b,c,_,_,_)=Vector.get(i,old);let Sticker.S(_,a2,b2,c2,_,_,_)=Vector.get(i,printing);
         require((a,b,c)==(a2,b2,c2),"surface identity changed")
@@ -166,12 +204,16 @@ def runPureChain(printPath: String,dagPath: String,path: String,oldRoot: String,
     let reps=representatives();validateTargets(read(oldRoot+"/targets.tsv"),reps);
     let goals=stackedGoals(pureVariant(),reps);
     require(goalBoard(at(goals,source-1))==stackedBoard(pureVariant(),sy,sm),"source root display must match declared source month");
-    let results=readDag(read(dagPath),poses,false);
-    let start=match Map.get(source,results) {
-        case Some(p) => p
-        case None => throw new IllegalArgumentException("source root absent from legal DAG")
+    let rootSteps=if(strict) rootWord(rootMovesPath,source,sy,sm) else Nil;
+    let start=if(strict) List.foldLeft((p,step) -> compose(p,stepPerm(step,poses)),permIdentity(),rootSteps) else {
+        let results=readDag(read(dagPath),poses,false);
+        match Map.get(source,results) {
+            case Some(p) => p
+            case None => throw new IllegalArgumentException("source root absent from legal DAG")
+        }
     };
-    let initial=liftState(start,printing,poses);pureFront(initial,sy,sm,"source front");
+    let initial=liftState(start,printing,poses);pureFront(rule,initial,sy,sm,"source front");
+    require(not strict or initial==List.foldLeft((s,step) -> directStep(step,s),printing,rootSteps),"root word pose replay agrees with direct294-sticker replay");
     require(fullDigest(initial)==sourceHash,"initial full physical source SHA mismatch");
     println("source-sha256\t${sourceHash}");
     let(end,final,_,_)=List.foldLeft((current,pair) -> {
@@ -186,7 +228,7 @@ def runPureChain(printPath: String,dagPath: String,path: String,oldRoot: String,
         },(before,state),steps);
         let lifted=liftState(after,printing,poses);
         require(lifted==direct,"pose replay agrees with direct294-sticker physical replay");
-        pureFront(lifted,year,month,"edge front");
+        pureFront(rule,lifted,year,month,"edge front");
         require(fullDigest(lifted)==ds,"edge destination full physical SHA mismatch");
         let(inversePose,inverseDirect)=List.foldLeft((poseState,step) -> {
             let(p,s)=poseState;let inv=inverseStep(step);
