@@ -4,6 +4,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
+import { expand, groupBlocks } from "../src/apps/calendar7/blocks.ts";
 import { applyMoves, clonePose, inverseMoves, samePose, stateDigest } from "../src/apps/calendar7/engine.ts";
 import { parseDisplays, parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
 import { href, monthLabel } from "../src/apps/calendar7/month-view.ts";
@@ -34,8 +35,8 @@ function fakeView({ manual = false } = {}) {
       log.shows.push(clonePose(pose));
       while (pending.length) pending.shift()(); // an interrupted turn resolves
     },
-    turn(move, before, ms) {
-      log.turns.push({ move, before: clonePose(before), ms });
+    turn(block, before, ms) {
+      log.turns.push({ block, before: clonePose(before), ms });
       if (!manual) return Promise.resolve();
       return new Promise((resolve) => pending.push(resolve));
     },
@@ -77,11 +78,12 @@ test("a sample of steps, forward and backward, ends on the stored hash of the ta
     assert.equal(player.snapshot.status, "playing");
     await settle(player);
     const word = to > from ? graph.edges[from].moves : inverseMoves(graph.edges[to].moves);
-    assert.equal(view.log.turns.length, word.length, `moves ${from}->${to}`);
-    assert.deepEqual(view.log.turns.map((t) => t.move), word.map((m) => [...m]));
-    // Every turn starts from the pose the previous moves produced.
-    for (const i of [0, Math.floor(word.length / 2), word.length - 1])
-      assert.ok(samePose(view.log.turns[i].before, applyMoves(makeStart(from), word.slice(0, i))), `before ${i}`);
+    const blocks = groupBlocks(word);
+    assert.equal(view.log.turns.length, blocks.length, `blocks ${from}->${to}`);
+    assert.deepEqual(view.log.turns.map((t) => t.block), blocks);
+    // Every turn starts from the pose the previous blocks produced.
+    for (const i of [0, Math.floor(blocks.length / 2), blocks.length - 1])
+      assert.ok(samePose(view.log.turns[i].before, applyMoves(makeStart(from), expand(blocks.slice(0, i)))), `before ${i}`);
     assert.equal(player.snapshot.status, "idle");
     assert.equal(player.snapshot.index, to);
     assert.equal(digest(player.shownPose), graph.nodes[to].hash, `end ${to}`);
@@ -170,7 +172,7 @@ test("Previous/Next during a step: the step is brought to its end state, then th
   assert.equal(player.snapshot.from, 31);
   assert.equal(player.snapshot.index, 32);
   assert.equal(player.snapshot.done, 0);
-  assert.deepEqual(view.log.turns.at(-1).move, [...graph.edges[31].moves[0]]);
+  assert.deepEqual(view.log.turns.at(-1).block, groupBlocks(graph.edges[31].moves)[0]);
   player.skip();
   assert.equal(digest(player.shownPose), graph.nodes[32].hash);
   // And backwards from the middle of a step.
@@ -205,9 +207,9 @@ test("pause stops after the move in flight, play resumes, the word is played exa
     view.pending.shift()?.();
     await flush();
   }
-  const word = graph.edges[5].moves;
-  assert.equal(view.log.turns.length, word.length);
-  assert.deepEqual(view.log.turns.map((t) => t.move), word.map((m) => [...m]));
+  const blocks = groupBlocks(graph.edges[5].moves);
+  assert.equal(view.log.turns.length, blocks.length);
+  assert.deepEqual(view.log.turns.map((t) => t.block), blocks);
   assert.equal(digest(player.shownPose), graph.nodes[6].hash);
 });
 
@@ -508,7 +510,7 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   await flush();
   assert.equal(root.el("play").textContent, "Pause");
   assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", false);
-  assert.match(root.el("progress").textContent, /^Turning to February 2028: move 0 of 138$/);
+  assert.match(root.el("progress").textContent, /^Turning to February 2028: block 0 of 103$/);
   root.press("play"); // pause
   assert.equal(root.el("play").textContent, "Play");
   root.choose("speed", "8");

@@ -132,7 +132,7 @@ export async function mountCalendar7(
     const progress = q("progress");
     if (progress && target) {
       progress.textContent = active
-        ? `Turning to ${monthLabel(target)}: move ${snap.done} of ${snap.total}${snap.status === "paused" ? " (paused)" : ""}`
+        ? `Turning to ${monthLabel(target)}: block ${snap.done} of ${snap.total}${snap.status === "paused" ? " (paused)" : ""}`
         : `The cube shows ${monthLabel(target)}.`;
     }
     if (target) stage?.setLabel(`7x7 calendar cube showing ${monthLabel(target)}`);

@@ -61,7 +61,7 @@ test("a step plays move by move; pause, play, speed and skip to the end reach th
   const progress = page.locator('[data-c7="progress"]');
   await page.locator('a[data-nav="next"]').click();
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "playing");
-  await expect(progress).toHaveText(/^Turning to February 2028: move \d+ of 138$/);
+  await expect(progress).toHaveText(/^Turning to February 2028: block \d+ of 103$/);
   // The heading, sheet and live region already name the new month; the digest is that of the pose being turned only at the end.
   await expect(page.locator(".c7-month")).toHaveText("February 2028");
   await page.locator('[data-c7="speed"]').selectOption("8");

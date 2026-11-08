@@ -9,6 +9,7 @@
  * state digest of the pose must equal the stored hash of the target node. A mismatch throws `StateMismatchError`;
  * the view is never left showing a state the engine does not know.
  */
+import { applyBlockInPlace, type Block, groupBlocks } from "./blocks.ts";
 import {
   applyMoveInPlace,
   clonePose,
@@ -25,11 +26,12 @@ export interface StageView {
   /** Shows `pose` at once and ends a turn in progress (its promise then resolves). */
   show(pose: Pose): void;
   /**
-   * Turns one move of `before` over `ms` milliseconds and leaves the cube showing the pose after the move.
+   * Turns one block (several layers of one axis and exponent together, or one layer, or the whole cube) of `before`
+   * over `ms` milliseconds as ONE animation and leaves the cube showing the pose after the block.
    * Reads `before` synchronously; the caller may change it once the promise has settled. Resolves early when
    * `show` interrupts it.
    */
-  turn(move: Move, before: Pose, ms: number): Promise<void>;
+  turn(block: Block, before: Pose, ms: number): Promise<void>;
 }
 
 export type PlayerStatus = "idle" | "playing" | "paused";
@@ -37,7 +39,7 @@ export interface PlayerSnapshot {
   /** Chain node index the cube shows, or is turning to. */
   readonly index: number;
   readonly status: PlayerStatus;
-  /** Moves of the current step already played, and moves in the step; 0 and 0 when idle. */
+  /** Blocks of the current step already played, and blocks in the step (a block is one animation); 0 and 0 when idle. */
   readonly done: number;
   readonly total: number;
   /** Month node the current step starts from; equals `index` when idle. */
@@ -52,6 +54,7 @@ export class StateMismatchError extends Error {
   }
 }
 
+/** Duration of one block (one animation) at 1x. A wide block turns as long as a single layer: it is one move. */
 export const BASE_MOVE_MS = 90;
 /** Nominal speeds: 90 ms per move at 1x; a frame is about 17 ms, so 8x is one frame per move when the display keeps up. */
 export const SPEEDS = [0.5, 1, 2, 4, 8] as const;
@@ -72,7 +75,8 @@ export interface PlayerOptions {
 interface Plan {
   readonly from: number;
   readonly target: number;
-  readonly moves: readonly Move[];
+  /** The stored word of the step, grouped into blocks (display only; same state as the word). */
+  readonly blocks: readonly Block[];
   done: number;
 }
 
@@ -112,7 +116,7 @@ export class Calendar7Player {
       index: p ? p.target : this.index,
       status: this.status,
       done: p ? p.done : 0,
-      total: p ? p.moves.length : 0,
+      total: p ? p.blocks.length : 0,
       from: p ? p.from : this.index,
       speed: this.speed,
     };
@@ -186,8 +190,8 @@ export class Calendar7Player {
       this.jump(target);
       return;
     }
-    const moves = this.stepMoves(this.index, target);
-    this.plan = { from: this.index, target, moves, done: 0 };
+    const blocks = groupBlocks(this.stepMoves(this.index, target));
+    this.plan = { from: this.index, target, blocks, done: 0 };
     this.status = "playing";
     this.notify();
     void this.run();
@@ -204,7 +208,7 @@ export class Calendar7Player {
     this.generation++;
     this.plan = null;
     this.status = "idle";
-    for (let i = plan.done; i < plan.moves.length; i++) applyMoveInPlace(this.pose, plan.moves[i]);
+    for (let i = plan.done; i < plan.blocks.length; i++) applyBlockInPlace(this.pose, plan.blocks[i]);
     this.view.show(this.pose);
     this.index = plan.target;
     this.check(plan.target);
@@ -235,15 +239,15 @@ export class Calendar7Player {
     try {
       while (this.plan && this.status === "playing" && this.generation === mine && !this.disposed) {
         const plan = this.plan;
-        if (plan.done >= plan.moves.length) break;
-        const move = plan.moves[plan.done];
-        await this.view.turn(move, this.pose, BASE_MOVE_MS / this.speed);
+        if (plan.done >= plan.blocks.length) break;
+        const block = plan.blocks[plan.done];
+        await this.view.turn(block, this.pose, BASE_MOVE_MS / this.speed);
         if (this.disposed || this.generation !== mine || this.plan !== plan) return;
-        applyMoveInPlace(this.pose, move);
+        applyBlockInPlace(this.pose, block);
         plan.done++;
         this.notify();
       }
-      if (this.plan && this.generation === mine && !this.disposed && this.plan.done >= this.plan.moves.length) {
+      if (this.plan && this.generation === mine && !this.disposed && this.plan.done >= this.plan.blocks.length) {
         const plan = this.plan;
         this.plan = null;
         this.status = "idle";

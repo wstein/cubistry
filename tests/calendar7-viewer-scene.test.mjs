@@ -7,8 +7,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import * as THREE from "three";
 import { PhysicalCubeScene, createPlasticMaterial, createPresentationGeometry } from "@cubistry/cube-viewer";
-import { STICKERS, applyMoves, clonePose, inverseMoves } from "../src/apps/calendar7/engine.ts";
+import { STICKERS, applyMoves, clonePose, inverseMoves, samePose } from "../src/apps/calendar7/engine.ts";
 import { parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
+import { groupBlocks, expand } from "../src/apps/calendar7/blocks.ts";
 import { Calendar7Viewer } from "../src/apps/calendar7/viewer.ts";
 import { MoveTween } from "../src/apps/calendar7/tween.ts";
 
@@ -61,31 +62,34 @@ cube.beginTurn = (pieces, axis, angle) => {
   return { update: (p) => (t.update(p), p === 1 && (atEnd = snapshot())), dispose: () => t.dispose() };
 };
 
-const stats = { quarter: 0, quarterBack: 0, half: 0, rot: 0 };
-function playMove(before, move) {
+const stats = { quarter: 0, quarterBack: 0, half: 0, rot: 0, single: 0, "outer-wide": 0, "inner-wide": 0 };
+function playMove(before, block) {
   atEnd = null;
-  const done = viewer.turn(move, before, 10);
+  const done = viewer.turn(block, before, 10);
   viewer.tween.tick(later(0));
   viewer.tween.tick(later(1000));
   assert.ok(atEnd, "the turn reached progress 1");
-  const after = applyMoves(before, [move]);
+  const after = applyMoves(before, expand([block]));
   const afterTurn = snapshot(); // the viewer's own sync after the turn
   cube.sync(frames(after));
   const reference = snapshot();
   return { done, ok: sameMaps(atEnd, reference) && sameMaps(afterTurn, reference), after };
 }
+/** Plays the blocks of a word, each as ONE animation; the result must equal the plain engine replay of the word. */
 function walk(from, moves) {
   let pose = clonePose(from);
-  for (const move of moves) {
+  for (const block of groupBlocks(moves)) {
     cube.sync(frames(pose));
-    const r = playMove(pose, move);
-    assert.ok(r.ok, `world pose differs from the engine after move g${move[0]}:${move[1]}`);
-    if (move[0] % 7 === 0) stats.rot++;
-    else if (move[1] === 2) stats.half++;
-    else if (move[1] === 1) stats.quarter++;
+    const r = playMove(pose, block);
+    assert.ok(r.ok, `world pose differs from the engine after block ${JSON.stringify(block)}`);
+    if (block.kind === "rotation") stats.rot++;
+    else if (block.angle === 2) stats.half++;
+    else if (block.angle === 1) stats.quarter++;
     else stats.quarterBack++;
+    stats[block.kind] = (stats[block.kind] ?? 0) + 1;
     pose = r.after;
   }
+  assert.ok(samePose(pose, applyMoves(from, moves)), "blocks end on the pose of the plain word");
   return pose;
 }
 const nodePose = (k) => {
@@ -104,13 +108,15 @@ test("each animated move ends on the engine pose: forward and backward, quarter,
     const end = walk(start, graph.edges[e].moves);
     walk(end, inverseMoves(graph.edges[e].moves));
   }
+  // Explicit wide blocks: x-3..-1 (outer), y+1..+2' (inner-wide), z+2..+3 half turn (outer), a rotation, y-3..-2 half.
+  walk(root, [[1, 1], [2, 1], [3, 1], [11, -1], [12, -1], [19, 2], [20, 2], [21, 1], [8, 2], [9, 2], [10, 1]]);
   for (const [kind, n] of Object.entries(stats)) assert.ok(n > 0, `sample includes ${kind} moves`);
 });
 
 test("a skipped (cancelled) turn leaves the bodies at the given pose", () => {
   const pose = nodePose(2);
   cube.sync(frames(pose));
-  void viewer.turn(graph.edges[2].moves[0], pose, 100);
+  void viewer.turn(groupBlocks(graph.edges[2].moves)[0], pose, 100);
   viewer.tween.tick(later(50));
   const target = nodePose(3);
   viewer.show(target);

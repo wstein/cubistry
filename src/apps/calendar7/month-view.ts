@@ -7,6 +7,7 @@
  * step to the adjacent month along it, playing the move word of that edge. There is no solver and
  * no jump between non-adjacent months: every such jump would be a walk along the chain.
  */
+import { blockCounts, blockToken, groupBlocks } from "./blocks.ts";
 import { type Move, generatorAxis, generatorLayer, isRotation } from "./engine.ts";
 import type { Cell } from "./display.ts";
 import type { DisplayTable, Edge, Graph } from "./graph.ts";
@@ -200,11 +201,15 @@ const stepHtml = (step: Step | null, label: string, end: string): string => {
     return `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3><p>${esc(end)}</p></div>`;
   const word = step.moves.map(moveToken).join(" ");
   const raw = step.moves.map(rawToken).join(" ");
+  const blocks = groupBlocks(step.moves);
+  const blockWord = blocks.map(blockToken).join(" ");
+  const { blockMoves } = blockCounts(blocks);
   const rotations = `${step.rot} whole-cube rotation${step.rot === 1 ? "" : "s"}`;
   return (
     `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3>` +
     `<p><a class="c7-nav" data-nav="${label.toLowerCase()}" href="${esc(href(step.to))}">${esc(monthLabel(step.to))}</a>: ` +
-    `${step.htm} turns (HTM), ${step.qtm} quarter turns (QTM), ${rotations}.</p>` +
+    `${step.htm} layer moves (HTM), ${blockMoves} block moves, ${step.qtm} quarter turns (QTM), ${rotations}.</p>` +
+    `<details><summary>Block word</summary><p class="c7-word" data-blocks="${label.toLowerCase()}">${esc(blockWord)}</p></details>` +
     `<details><summary>Move word</summary><p class="c7-word" data-word="${label.toLowerCase()}">${esc(word)}</p></details>` +
     `<details><summary>Raw generators</summary><p class="c7-word" data-raw="${label.toLowerCase()}">${esc(raw)}</p></details></div>`
   );
