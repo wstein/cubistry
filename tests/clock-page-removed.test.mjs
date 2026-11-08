@@ -38,3 +38,12 @@ test("no tracked script or document outside the history names the removed page a
   for (const file of ["README.md", "docs/APPLICATIONS.md", "docs/LIVE_CLOCK.md", "scripts/readme-screenshot.mjs"])
     assert.doesNotMatch(read(file), /(?<!former `|former )clock\.html/, file);
 });
+
+
+test("legacy choosers link to the unified Clock instead of the deleted page", () => {
+  for (const page of pages) {
+    const source = read(page);
+    if (/<option\b[^>]*value="calendar\.html"/.test(source))
+      assert.match(source, /<option value="index\.html\?app=clock">Live H–M–S Clock<\/option>/, page);
+  }
+});
