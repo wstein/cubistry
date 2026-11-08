@@ -8,7 +8,11 @@
 # The helpers below are copied unchanged from ../practical/verify.jl (turn_vector,
 # direct_move) and ../continuous/verify.jl (chain_hash, read_chain, chain_metrics) at
 # base 7eaebaf, because including those files twice would redefine constants.
-#   pure_chain.jl PRINT DAG CHAIN
+#   pure_chain.jl PRINT DAG CHAIN                 legacy rule (default): source = DAG root state
+#   CUBISTRY_RULE=strict pure_chain.jl PRINT DAG CHAIN ROOT_MOVES
+#       strict upright rule: the print is pinned (SHA-256 below), the DAG supplies only the 21
+#       generator permutations, and the source state is the solved print turned by the root word
+#       of the source display in ROOT_MOVES (upright-moves/evidence/moves-strict.tsv).
 include(joinpath(@__DIR__,"pure_common.jl"))
 # Glyph half-turn rule: CUBISTRY_RULE=legacy (default, the rule of the chains in main) or
 # strict (../upright-flix/rule_select.jl). Two separate top-level statements on purpose.
@@ -81,15 +85,40 @@ function chain_metrics(moves)
     (htm,qtm,rot,rotq,length(moves))
 end
 const OK_FRONT="-\t-\t-\t-"
-function verify_pure_chain(print_path,dag_path,path)
+const STRICT_PRINT_SHA="4fc44606e5dcdd745647f57b3086570910b4068a48d001553f99b1625106bcab"
+function root_word(moves_path,root,year,month)
+    rows=[split(l,'\t') for l in readlines(moves_path)[2:end] if !isempty(l) && parse(Int,split(l,'\t')[1])==root]
+    @assert length(rows)==1 "root word must occur exactly once"
+    f=only(rows)
+    @assert length(f)==7 && parse(Int,f[2])==year && parse(Int,f[3])==month "root word row must be the declared source month"
+    @assert occursin("FOUND",f[4]) "root word row must be a found word"
+    map(split(f[6],',')) do t
+        s=parse(Int,t);@assert s!=0 && abs(s)<=21 "root word generator outside 1..21"
+        (abs(s),s>0 ? 1 : -1)
+    end
+end
+function verify_pure_chain(print_path,dag_path,path,root_moves=nothing)
+    strict=cubistry_rule()=="strict"
+    @assert strict==!isnothing(root_moves) "ROOT_MOVES is required exactly with CUBISTRY_RULE=strict"
+    strict && @assert bytes2hex(sha256(read(print_path)))==STRICT_PRINT_SHA "strict chain requires the pinned strict print"
     @assert bytes2hex(sha256(read(PR99_PRINT)))==PR99_PRINT_SHA "unchanged PR99 printing provenance"
     old=read_physical(PR99_PRINT);printing=read_physical(print_path)
     @assert all((old[i].piece,old[i].home,old[i].normal)==(printing[i].piece,printing[i].home,printing[i].normal) for i in 1:294) "surface identity changed"
     goals=stacked_goals(PURE_VARIANT);disp(y,m)=stacked_board(y,m,PURE_VARIANT)
     input=read_chain(path)
     proof=replay_dag(dag_path;require_full=false)
-    @assert haskey(proof.targets,input.root)
-    p=signed_perm(proof.registers,proof.targets[input.root])
+    if strict
+        p=UInt16.(1:length(proof.action.generators[1]))
+        base=decode_physical(printing,p,proof.action);direct=base
+        for (g,q) in root_word(root_moves,input.root,input.year,input.month)
+            direct=direct_move(direct,g,q)
+            for _ in 1:mod(q,4);p=compose(p,UInt16.(proof.action.generators[g]));end
+        end
+        @assert direct==decode_physical(printing,p,proof.action) "Root word: direct294/pose264 disagreement"
+    else
+        @assert haskey(proof.targets,input.root)
+        p=signed_perm(proof.registers,proof.targets[input.root])
+    end
     state=decode_physical(printing,p,proof.action)
     @assert goals[input.root].board==disp(input.year,input.month) "Declared source month must match source-root display"
     @assert front_failure(state,disp(input.year,input.month),"strict")==OK_FRONT "Source front"
@@ -133,7 +162,7 @@ function verify_pure_chain(print_path,dag_path,path)
 end
 if abspath(PROGRAM_FILE)==@__FILE__
     try
-        @assert length(ARGS)==3 "PRINT DAG CHAIN"
+        @assert length(ARGS) in (3,4) "PRINT DAG CHAIN [ROOT_MOVES]"
         verify_pure_chain(ARGS...)
     catch exception
         println(stderr,"INVALID\t",sprint(showerror,exception));exit(1)

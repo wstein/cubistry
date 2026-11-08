@@ -175,24 +175,29 @@ def stackedPrint(raw: String,oldRaw: String,variant: String): (Vector[Sticker],I
     (source,printed,List.count(x -> x==1,changes),List.count(x -> x==2,changes))
 }
 
-def stackedMatch(text: String,ink: String,angle: Int32,want: (String,String),mode: String): Bool \ IO = {
+def stackedMatch(text: String,ink: String,angle: Int32,want: (String,String),mode: String): Bool \ IO =
+    stackedMatchR(HalfRule.Legacy,text,ink,angle,want,mode)
+// Glyph half-turn rule selectable (Legacy = the chains in main, Strict = owner rule of upright-flix).
+def stackedMatchR(rule: HalfRule,text: String,ink: String,angle: Int32,want: (String,String),mode: String): Bool \ IO = {
     let(g,wantInk)=want;
     match stackedParse(text) {
         case Some((a,b)) => angle==0 and ink==wantInk and (g==text or (mode=="context" and (g=="${a}" or g=="${b}")))
-        case None => optic(text,angle,ink)==optic(g,0,wantInk)
+        case None => opticR(rule,text,angle,ink)==opticR(rule,g,0,wantInk)
     }
 }
-def frontFailure(state: Vector[Sticker],board: List[(String,String)],mode: String): String \ IO = {
+def frontFailure(state: Vector[Sticker],board: List[(String,String)],mode: String): String \ IO =
+    frontFailureR(HalfRule.Legacy,state,board,mode)
+def frontFailureR(rule: HalfRule,state: Vector[Sticker],board: List[(String,String)],mode: String): String \ IO = {
     let failing=List.flatMap(q -> {
         let((r,c),want)=q;
         let hits=List.filter(s -> {let Sticker.S(_,_,p,n,_,_,_)=s;p==(c-4,4-r,3) and n==(0,0,1)},Vector.toList(state));
         require(List.length(hits)==1,"one physical front surface per cell");
         let Sticker.S(sid,_,_,_,up,text,ink)=at(hits,0);
         let angle=upAngle(up);
-        if(stackedMatch(text,ink,angle,want,mode)) Nil else {
+        if(stackedMatchR(rule,text,ink,angle,want,mode)) Nil else {
             let why=match stackedParse(text) {
                 case None => "plain-mismatch"
-                case Some(_) => if(angle != 0 and stackedMatch(text,ink,0,want,mode)) "stacked-not-upright" else "stacked-mismatch"
+                case Some(_) => if(angle != 0 and stackedMatchR(rule,text,ink,0,want,mode)) "stacked-not-upright" else "stacked-mismatch"
             };
             List#{"${r},${c}\t${sid}\t${angle}\t${why}"}
         }
