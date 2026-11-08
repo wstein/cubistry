@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { booted } from "../helpers/settle.mjs";
 async function settled(page, value) {
   await expect(page.locator("#cube")).toHaveAttribute(
     "data-value",
@@ -8,7 +9,7 @@ async function settled(page, value) {
 }
 async function choose(page) {
   await page.goto("/counter.html");
-  await expect(page.locator("#application")).toBeEnabled();
+  await booted(page);
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
     const configure = CubeViewer.prototype.configure;
