@@ -1272,6 +1272,54 @@ aside.clock-control.is-minimized .hud-header {
   accent-color: var(--color-plastic-berry, #9e0b5c);
 }
 
+/* The Timer motion caption ("Moving", "Synchronizing · Late", "1582 ms effective")
+   changes text with every state. As an in-flow flex item it took part in the
+   dock's size negotiation: the dock widened while a caption was shown and, once it
+   reached its max-width, the caption wrapped to a third line, so the speed slider
+   moved by up to 9.9 px depending on the digits of the effective duration. The
+   caption floats above the dock instead, so the dock's size never depends on it.
+   Idle it is transparent (not hidden) so the live region keeps announcing. */
+.floating-dock .timer-motion {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+  width: max-content;
+  max-width: 100%;
+  min-block-size: 0;
+  margin: 0;
+  padding: 2px 14px;
+  border: 1px solid rgba(21, 59, 97, 0.16);
+  border-radius: 14px;
+  background: rgba(255, 253, 246, 0.88);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+}
+.floating-dock .timer-motion:not([data-state="idle"]),
+.floating-dock .timer-motion:has(#timer-effective:not([hidden])) {
+  opacity: 1;
+}
+/* The dock is centered and sized to its content, so every text in it (status,
+   move counts, speed label) would move the speed slider horizontally. In the Timer
+   apps (the ones that have the caption above) it gets the width of its cap instead,
+   the slider stays on its right edge, and the statistics on its left give way when
+   space runs out (they used to overflow the pill on both sides). */
+.floating-dock:has(.timer-motion:not([hidden])) {
+  width: min(94vw, 920px);
+  justify-content: space-between;
+}
+.floating-dock:has(.timer-motion:not([hidden])) .counter-stats {
+  min-width: 0;
+  overflow: hidden;
+}
+@media (max-width: 600px) {
+  .floating-dock:has(.timer-motion:not([hidden])) {
+    width: calc(100vw - 16px);
+  }
+}
+
 /* ==========================================================================
    Presentation Mode: 100% full screen w/o controls
    ========================================================================== */
