@@ -15,10 +15,29 @@ const at = (needle) => {
 };
 const tag = (needle) => html.slice(html.lastIndexOf("<", at(needle)), html.indexOf(">", at(needle)) + 1);
 
-test("the dock lists status, primary action, the five slots in order, the legacy controls and the Nerd button", () => {
+test("the dock lists status, primary action, the five slots in order and the legacy controls", () => {
   const order = ['data-region="status-zone"', 'data-region="primary-action"', 'data-slot="1"', 'data-slot="2"', 'data-slot="3"',
-    'data-slot="4"', 'data-slot="5"', 'id="studio-controls"', 'id="nerd-toggle"'].map(at);
+    'data-slot="4"', 'data-slot="5"', 'id="studio-controls"'].map(at);
   assert.deepEqual([...order].sort((a, b) => a - b), order, "document order is tab order");
+});
+
+test("the Nerd button sits in the header after the Appearance button and before Presentation, built like them", () => {
+  const header = html.slice(at('<header class="shell-header"'), at("</header>"));
+  const order = ['id="appearance-btn"', 'id="nerd-toggle"', 'id="presentation-btn"'].map((n) => {
+    const i = header.indexOf(n);
+    assert.ok(i >= 0, `${n} is inside the header`);
+    return i;
+  });
+  assert.deepEqual([...order].sort((a, b) => a - b), order, "focus order: Appearance, Nerd, Presentation");
+  const nerd = tag('id="nerd-toggle"');
+  assert.match(nerd, /class="shell-btn[ "]/);
+  assert.match(nerd, /\sdata-app-only[\s>]/, "hidden on the landing page like the other header buttons");
+  assert.match(nerd, /aria-label="Nerd mode"/, "the label survives the phone width, where .btn-text is hidden");
+  const at2 = html.indexOf('id="nerd-toggle"');
+  const inner = html.slice(at2, html.indexOf("</button>", at2));
+  assert.match(inner, /class="btn-icon" aria-hidden="true"/);
+  assert.match(inner, /class="btn-text"> Nerd mode</);
+  assert.ok(html.indexOf('data-region="dock"') > html.indexOf("</header>") && !html.slice(html.indexOf('data-region="dock"')).includes('id="nerd-toggle"'), "no second button in the dock");
 });
 
 test("slots, primary action, readout, nerd drawer, hints and reference view start hidden", () => {
