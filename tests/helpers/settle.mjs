@@ -68,3 +68,23 @@ export const ariaBusy = (page, selector, busy, options) =>
     () => page.locator(selector).getAttribute("aria-busy", { timeout: 1000 }),
     { accept: (value) => value === String(busy), ...options },
   );
+
+/**
+ * Wait until the Counter page has finished booting. The page starts with `#cube aria-busy="true"`, but the
+ * controller publishes its first idle state (`aria-busy="false"`) from `configure()`, before `main.mjs` has
+ * installed the final assets and set `ready`; only then do `#set` and the other controls leave `disabled`. So
+ * `aria-busy="false"` alone is not "booted": it is the state the page passes through. Software-rendered CI
+ * runners need longer than the 5 s default of `expect` for the module graph, the verified counter data and the
+ * first render, hence an explicit budget (`timeout`, default 40 s: about four times the slowest boot seen).
+ */
+export const booted = (page, { timeout = 40000 } = {}) =>
+  until(
+    page,
+    'the Counter page has booted (#set enabled, #cube aria-busy="false")',
+    () =>
+      page.evaluate(() => {
+        const set = document.querySelector("#set");
+        return !!set && !set.disabled && document.querySelector("#cube")?.getAttribute("aria-busy") === "false";
+      }),
+    { timeout },
+  );
