@@ -254,7 +254,7 @@ test("one stable Run/Stop button supports keyboard operation and returns to Run 
 });
 
 for (const width of [1440, 768, 390, 320])
-  test(`header, visible stats and speed fit at ${width}px without covering the cube`, async ({
+  test(`header, visible stats and speed fit at ${width}px without covering controls or the cube centre`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 1000 });
@@ -263,9 +263,13 @@ for (const width of [1440, 768, 390, 320])
       chooser = page.locator("header #application");
     await expect(chooser).toHaveCount(1);
     await expect(chooser).toBeVisible();
-    const wrap = await page.locator("#wrap").boundingBox();
-    const format = await page.locator("#format").boundingBox();
-    expect(wrap.y).toBe(format.y);
+    // Both option checkboxes stay inside the panel; they may wrap onto two rows in a 280 px wide panel.
+    const panel = await page.locator("#counter-controls").boundingBox();
+    for (const id of ["#wrap", "#format"]) {
+      const box = await page.locator(id).boundingBox();
+      expect(box.x).toBeGreaterThanOrEqual(panel.x);
+      expect(box.x + box.width).toBeLessThanOrEqual(panel.x + panel.width);
+    }
     await expect(page.locator("#status")).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Reset session moves" }),
@@ -280,17 +284,58 @@ for (const width of [1440, 768, 390, 320])
     );
     const rect = async (selector) => page.locator(selector).boundingBox();
     const h = await header.boundingBox(),
-      c = await rect(".cube-card"),
-      a = await rect("#counter-controls"),
       canvas = await rect("#cube"),
       stats = await rect(".counter-stats"),
       speed = await rect(".speed-control"),
       slider = await rect("#rotation-speed");
-    expect(h.y + h.height).toBeLessThanOrEqual(c.y);
-    if (width > 760) expect(a.y).toBe(c.y);
-    expect(stats.y).toBeGreaterThanOrEqual(canvas.y + canvas.height);
-    expect(speed.y).toBeGreaterThanOrEqual(stats.y + stats.height);
-    expect(slider.y).toBeGreaterThan(speed.y);
+    // The island floats over the full-bleed canvas on purpose (position: fixed), so it may overlap the canvas. It must
+    // stay on screen, keep clear of the canvas centre and never sit on top of an interactive control.
+    expect(h.x).toBeGreaterThanOrEqual(0);
+    expect(h.x + h.width).toBeLessThanOrEqual(width);
+    const cx = canvas.x + canvas.width / 2,
+      cy = canvas.y + canvas.height / 2;
+    expect(
+      cx >= h.x && cx <= h.x + h.width && cy >= h.y && cy <= h.y + h.height,
+      `header ${JSON.stringify(h)} covers the canvas centre ${cx},${cy}`,
+    ).toBe(false);
+    const overlaps = (p, q) =>
+      p.x < q.x + q.width &&
+      q.x < p.x + p.width &&
+      p.y < q.y + q.height &&
+      q.y < p.y + p.height;
+    for (const selector of [
+      "#counter-controls",
+      "#counter-controls .hud-title",
+      "#counter-controls .hud-toggle-btn",
+      ".counter-stats",
+      ".speed-control",
+      "#rotation-speed",
+    ]) {
+      const box = await rect(selector);
+      expect(
+        overlaps(h, box),
+        `header ${JSON.stringify(h)} overlaps ${selector} ${JSON.stringify(box)}`,
+      ).toBe(false);
+      // Hit test at the centre: the header must not receive the pointer (null: that centre is off screen, see below).
+      expect(
+        await page
+          .locator(selector)
+          .evaluate((el) => {
+            const r = el.getBoundingClientRect();
+            const top = document.elementFromPoint(
+              r.left + r.width / 2,
+              r.top + r.height / 2,
+            );
+            return top === null ? "outside viewport" : document.querySelector("header").contains(top) ? "header" : "page";
+          }),
+        `${selector} centre hit target`,
+      ).not.toBe("header");
+    }
+    // Stats and speed live in the bottom dock, well below the island.
+    expect(Math.min(stats.y, speed.y)).toBeGreaterThan(h.y + h.height);
+    // The speed label and its slider share one dock row.
+    expect(slider.y).toBeLessThan(speed.y + speed.height);
+    expect(speed.y).toBeLessThan(slider.y + slider.height);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -299,8 +344,9 @@ for (const width of [1440, 768, 390, 320])
     const boxes = await page
       .locator(".move-summary dd")
       .evaluateAll((nodes) =>
-        nodes.map((n) => n.getBoundingClientRect().right),
+        nodes.map((n) => n.getBoundingClientRect().top),
       );
+    // The dock shows the two move counters side by side, on one row.
     expect(Math.abs(boxes[0] - boxes[1])).toBeLessThan(1);
     await page.locator("#reset-session-moves").focus();
     await page.keyboard.press("Tab");
