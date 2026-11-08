@@ -17,7 +17,7 @@ on:
       research_ref:
         description: Branch or tag of this repository that holds the research code
         type: string
-        default: research/upright-flix
+        default: research/upright-flix-2
   pull_request:
     paths:
       - .github/workflows/upright-verify.yml
@@ -27,7 +27,7 @@ permissions:
 
 env:
   CAL: research/calendar-7x7
-  RESEARCH_REF: ${{ inputs.research_ref || 'research/upright-flix' }}
+  RESEARCH_REF: ${{ inputs.research_ref || 'research/upright-flix-2' }}
 
 jobs:
   prepare:
@@ -99,6 +99,11 @@ jobs:
           set -euo pipefail
           cd "$CAL/upright-flix"
           bash controls.sh "$RUNNER_TEMP/out/julia-controls-rule-replay-strict.tsv" env CUBISTRY_RULE=strict julia --startup-file=no rule_replay.jl
+      - name: Alias controls with the legacy rule (O as 0 and I as 1 must be accepted)
+        run: |
+          set -euo pipefail
+          cd "$CAL/upright-flix"
+          CONTROLS_RULE=legacy bash controls.sh "$RUNNER_TEMP/out/julia-controls-rule-replay-legacy.tsv" env CUBISTRY_RULE=legacy julia --startup-file=no rule_replay.jl
       - name: Legacy rule on the strict print (reported, not a gate)
         run: |
           cd "$CAL/upright-flix"
@@ -164,6 +169,10 @@ jobs:
         run: |
           set -euo pipefail
           bash "$CAL/upright-flix/controls.sh" "$RUNNER_TEMP/out/flix-controls-replay-strict.tsv" java -Dstdout.encoding=UTF-8 -Xmx4g -jar "$FLIX_JAR" replay strict
+      - name: Alias controls with the legacy rule (O as 0 and I as 1 must be accepted)
+        run: |
+          set -euo pipefail
+          CONTROLS_RULE=legacy bash "$CAL/upright-flix/controls.sh" "$RUNNER_TEMP/out/flix-controls-replay-legacy.tsv" java -Dstdout.encoding=UTF-8 -Xmx4g -jar "$FLIX_JAR" replay legacy
       - name: Legacy rule on the strict print (reported, not a gate)
         run: |
           java -Dstdout.encoding=UTF-8 -Xmx4g -jar "$FLIX_JAR" replay legacy "$CAL/upright-feasibility/evidence/print-strict-upright.tsv" "$CAL/upright-moves/evidence/moves-strict.tsv" > "$RUNNER_TEMP/out/flix-replay-legacy.tsv" 2>&1 || true
