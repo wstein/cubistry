@@ -64,7 +64,7 @@ export function mountClockControls(shell: ModeShell, doc: Doc, options: ClockCon
     return select;
   };
 
-  const zone = make("output", options.zone, "clock-zone");
+  const zone = make("span", options.zone, "clock-zone");
   zone.className = "small";
   shell.setSlot(2, { label: "Time zone", element: zone });
 
