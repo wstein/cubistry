@@ -1,0 +1,226 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Upright chain segment
+
+# Reusable job of upright-chain.yml (also called by upright-verify.yml for a short smoke
+# check): one segment of the strict upright calendar chain of research/calendar-7x7. It
+#   1. continues the verified cumulative chain of the previous segment (or of a prior run),
+#   2. produces the next month edges with the upright-beam solver (chain_segment.jl, 4 threads),
+#   3. verifies the CUMULATIVE chain with three independent checkers: Julia pure_chain.jl
+#      (strict rule), the Flix chain command (strict rule) and the Julia replay verify_chain.jl
+#      (own geometry), and requires the Julia and Flix receipts to be byte-identical,
+#   4. uploads moves, edges, receipts and checksums as one artifact.
+# The research code is checked out at the resolved commit SHA given by the caller. The
+# solver output is untrusted until all three checkers accept it.
+
+on:
+  workflow_call:
+    inputs:
+      sha:
+        description: Resolved commit SHA of the research code (40 hex digits)
+        type: string
+        required: true
+      seg:
+        description: Segment number 1-8 (artifact name suffix)
+        type: string
+        required: true
+      edges:
+        description: Month edges this segment may produce
+        type: string
+        required: true
+      start:
+        description: YYYY-MM root month of a fresh chain (ignored when a prior chain is continued)
+        type: string
+        required: true
+      smoke:
+        description: Short run (25 minute production limit)
+        type: boolean
+        default: false
+      prior_run_id:
+        description: Run id of an earlier run whose verified chain artifact is continued (segment 1 only)
+        type: string
+        default: ""
+      prev_artifact:
+        description: Artifact name of the previous segment of this run (segments 2 and later)
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+  # Needed only to download the artifact of a prior run.
+  actions: read
+
+env:
+  CAL: research/calendar-7x7
+  PURE_DIR: research/calendar-7x7/pure-split-states
+  BEAM_DIR: research/calendar-7x7/upright-beam
+  PRINT_REL: research/calendar-7x7/upright-feasibility/evidence/print-strict-upright.tsv
+  MOVES_REL: research/calendar-7x7/upright-moves/evidence/moves-strict.tsv
+  # SHA-256 of the strict print; the Julia and Flix chain verifiers pin the same digest.
+  STRICT_PRINT_SHA256: 4fc44606e5dcdd745647f57b3086570910b4068a48d001553f99b1625106bcab
+  # No new edge is started after this many seconds of the edge loop (4 h); the job limit is 6 h.
+  CHAIN_DEADLINE_SECONDS: "14400"
+
+jobs:
+  segment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 345
+    env:
+      SHA: ${{ inputs.sha }}
+      SEG: ${{ inputs.seg }}
+      EDGES: ${{ inputs.edges }}
+      START: ${{ inputs.start }}
+      SMOKE: ${{ inputs.smoke }}
+    steps:
+      - name: Validate inputs
+        run: |
+          set -euo pipefail
+          [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::sha must be 40 lowercase hex digits"; exit 1; }
+          [[ "$SEG" =~ ^[1-8]$ ]] || { echo "::error::seg must be 1-8"; exit 1; }
+          [[ "$EDGES" =~ ^[1-9][0-9]{0,2}$ ]] || { echo "::error::edges must be a positive integer"; exit 1; }
+          [[ "$START" =~ ^20[0-9]{2}-(0[1-9]|1[0-2])$ ]] || { echo "::error::start must be YYYY-MM"; exit 1; }
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ inputs.sha }}
+          path: src
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - name: Download prior run artifact
+        if: inputs.prior_run_id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: upc-chain-*
+          path: prev
+          run-id: ${{ inputs.prior_run_id }}
+          github-token: ${{ github.token }}
+      - name: Download previous segment artifact
+        if: inputs.prev_artifact != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ inputs.prev_artifact }}
+          path: prev
+      - name: Prepare work directory
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; mkdir -p "$out"
+          echo "$STRICT_PRINT_SHA256  src/$PRINT_REL" | sha256sum --check --strict
+          if [ -d "$GITHUB_WORKSPACE/prev" ]; then
+            # A prior artifact is untrusted input until its checksums and marker verify. Take the
+            # verified chain with the most edges (a rerun or several segments may be present).
+            best=""; most=-1
+            while IFS= read -r marker; do
+              d=$(dirname "$marker")
+              (cd "$d" && sha256sum --check --strict SHA256SUMS >/dev/null) || { echo "::error::checksum failure in $d"; exit 1; }
+              n=$(sed -n 's/^edges_total=\([0-9]\{1,\}\)$/\1/p' "$marker" | head -n 1)
+              [ -n "$n" ] || continue
+              if [ "$n" -gt "$most" ]; then most=$n; best=$d; fi
+            done < <(find "$GITHUB_WORKSPACE/prev" -name VERIFIED.txt)
+            [ -n "$best" ] || { echo "::error::no verified chain artifact found to continue"; exit 1; }
+            cp "$best/moves.tsv" "$out/prior.moves.tsv"
+            cp "$best/edges.tsv" "$out/prior.edges.tsv"
+            echo "continuing from $best ($most edges)"
+          fi
+          gzip -dc "src/$PURE_DIR/evidence/dag-all.tsv.gz" > "$out/dag-all.tsv"
+      - name: Build Flix verifier jar
+        run: |
+          set -euo pipefail
+          jar=$(bash "src/$PURE_DIR/flix/build.sh" | tail -n 1)
+          test -f "$jar"
+          echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
+          sha256sum "$jar" | tee "$GITHUB_WORKSPACE/out/flix-jar.sha256"
+      - name: Produce edges
+        run: |
+          set -euo pipefail
+          cd "src/$BEAM_DIR"
+          out=$GITHUB_WORKSPACE/out
+          if [ -f "$out/prior.moves.tsv" ]; then start=resume; prior=$out/prior.moves.tsv; else start=$START; prior=-; fi
+          limit=285m; [ "$SMOKE" = true ] && limit=25m
+          julia --version; nproc
+          set +e
+          timeout "$limit" julia --startup-file=no --threads=4 chain_segment.jl "$out/dag-all.tsv" \
+            "$GITHUB_WORKSPACE/src/$PRINT_REL" "$GITHUB_WORKSPACE/src/$MOVES_REL" "$out/chain" "$EDGES" "$start" "$prior" 2>&1 | tee "$out/run.log"
+          rc=${PIPESTATUS[0]}
+          set -e
+          [ "$rc" = 0 ] || { echo "::error::producer exited with $rc (124 = timeout)"; exit "$rc"; }
+          test -s "$out/chain.moves.tsv" && test -s "$out/chain-edges.tsv"
+          mv "$out/chain.moves.tsv" "$out/moves.tsv"
+          if [ -f "$out/prior.edges.tsv" ]; then
+            { cat "$out/prior.edges.tsv"; tail -n +2 "$out/chain-edges.tsv"; } > "$out/edges.tsv"
+          else
+            cp "$out/chain-edges.tsv" "$out/edges.tsv"
+          fi
+      - name: Verify cumulative chain with Julia (pure_chain.jl, strict rule)
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$BEAM_DIR"
+          export DAG=$out/dag-all.tsv
+          ./chain_runner_julia.sh "$GITHUB_WORKSPACE/src/$PRINT_REL" "$out/moves.tsv" "$GITHUB_WORKSPACE/src/$MOVES_REL" > "$out/verify.julia.stdout" 2> "$out/verify.julia.stderr" || { cat "$out/verify.julia.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.julia.stdout" > "$out/receipt.julia.tsv"
+          tail -n 2 "$out/receipt.julia.tsv"
+      - name: Verify cumulative chain with Flix (chain command, strict rule)
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$BEAM_DIR"
+          ./chain_runner_flix.sh "$GITHUB_WORKSPACE/src/$PRINT_REL" "$out/moves.tsv" "$GITHUB_WORKSPACE/src/$MOVES_REL" > "$out/verify.flix.stdout" 2> "$out/verify.flix.stderr" || { cat "$out/verify.flix.stderr"; exit 1; }
+          grep -E '^(source|edge|metrics|endpoint|status)' "$out/verify.flix.stdout" > "$out/receipt.flix.tsv"
+          tail -n 2 "$out/receipt.flix.tsv"
+          cmp "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" || { echo "::error::Julia and Flix receipts differ"; exit 1; }
+          grep -q '^status.VALID_CONTINUOUS_CHAIN' "$out/receipt.flix.tsv"
+      - name: Independent Julia replay (verify_chain.jl)
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out; cd "src/$BEAM_DIR"
+          ./chain_runner_replay.sh "$GITHUB_WORKSPACE/src/$PRINT_REL" "$out/moves.tsv" "$GITHUB_WORKSPACE/src/$MOVES_REL" > "$out/verify.replay.stdout" 2> "$out/verify.replay.stderr" || { tail -n 5 "$out/verify.replay.stdout"; cat "$out/verify.replay.stderr"; exit 1; }
+          cp "$out/verify.replay.stdout" "$out/receipt.replay.tsv"
+          tail -n 2 "$out/receipt.replay.tsv"
+          # The three checkers must agree on the number of edges and on the end month.
+          n=$(awk -F'\t' '$1=="status"{print $3}' "$out/receipt.flix.tsv")
+          end=$(awk -F'\t' '$1=="edge"{y=$3;m=$4} END{print y"-"m}' "$out/receipt.flix.tsv")
+          grep -qx $'chain-verdict\tACCEPT_CHAIN\t'"$n"$'\t'"$end" "$out/receipt.replay.tsv" || { echo "::error::replay verdict differs from the Flix receipt ($n edges, end $end)"; exit 1; }
+          echo "chain_end=$end" >> "$GITHUB_ENV"
+      - name: Package artifact
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out
+          mkdir "$GITHUB_WORKSPACE/pack"
+          cp "$out/moves.tsv" "$out/edges.tsv" "$out/receipt.julia.tsv" "$out/receipt.flix.tsv" "$out/receipt.replay.tsv" "$out/run.log" "$out/flix-jar.sha256" "$GITHUB_WORKSPACE/pack/"
+          total=$(($(wc -l < "$out/edges.tsv") - 1))
+          {
+            echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "segment=$SEG"
+            echo "edges_total=$total"; echo "chain_end=$chain_end"
+          } > "$GITHUB_WORKSPACE/pack/VERIFIED.txt"
+          (cd "$GITHUB_WORKSPACE/pack" && sha256sum moves.tsv edges.tsv receipt.julia.tsv receipt.flix.tsv receipt.replay.tsv run.log flix-jar.sha256 VERIFIED.txt > SHA256SUMS)
+          {
+            echo "### Segment $SEG verified"
+            echo "- research SHA: \`$SHA\`"
+            echo "- cumulative edges: $total, chain end: $chain_end"
+            echo "- Julia, Flix and replay: $(tail -n 1 "$out/receipt.flix.tsv" | tr '\t' ' ') / $(tail -n 1 "$out/receipt.replay.tsv" | tr '\t' ' ')"
+            echo '```'; cat "$GITHUB_WORKSPACE/pack/SHA256SUMS"; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: upc-chain-${{ github.run_id }}-s${{ inputs.seg }}
+          path: pack/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Collect failure logs
+        if: failure() || cancelled()
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/fail"
+          cp -f "$GITHUB_WORKSPACE"/out/*.log "$GITHUB_WORKSPACE"/out/verify.* "$GITHUB_WORKSPACE"/out/receipt.* "$GITHUB_WORKSPACE"/out/chain-edges.tsv "$GITHUB_WORKSPACE"/out/chain.moves.tsv "$GITHUB_WORKSPACE/fail/" 2>/dev/null || true
+          # Not a chain artifact: no VERIFIED.txt, never used as a prior.
+          echo "segment $SEG failed or was cancelled; partial logs only" > "$GITHUB_WORKSPACE/fail/FAILED.txt"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure() || cancelled()
+        with:
+          name: upc-failure-${{ github.run_id }}-s${{ inputs.seg }}
+          path: fail/
+          retention-days: 14
+          if-no-files-found: ignore
+          overwrite: true
