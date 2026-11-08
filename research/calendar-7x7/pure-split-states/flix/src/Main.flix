@@ -152,8 +152,8 @@ def matchability(printPath: String,oldRoot: String): Unit \ IO = {
 
 // Chain verifier for the pure split (same replay as ../../continuous/flix, parametrized
 // for the new print and the pure-split displays under the strict stacked rule).
-def pureFront(rule: HalfRule,state: Vector[Sticker],y: Int32,m: Int32,what: String): Unit \ IO =
-    require(frontFailureR(rule,state,stackedBoard(pureVariant(),y,m),"strict")=="-\t-\t-\t-",what)
+def pureFrontOk(rule: HalfRule,state: Vector[Sticker],y: Int32,m: Int32): Bool \ IO =
+    frontFailureR(rule,state,stackedBoard(pureVariant(),y,m),"strict")=="-\t-\t-\t-"
 // SHA-256 of research/calendar-7x7/upright-feasibility/evidence/print-strict-upright.tsv (strict chain only).
 def strictPrintSha(): String = "4fc44606e5dcdd745647f57b3086570910b4068a48d001553f99b1625106bcab"
 // Root word of display `id` from upright-moves/evidence/moves-strict.tsv: signed generators 1..21.
@@ -169,7 +169,7 @@ def rootWord(rootMovesPath: String,id: Int32): List[Step] \ IO = {
     match hits {
         case row::Nil => match fields(row) {
             case _::_::_::status::_::wordS::_::Nil => {
-                require(status=="FOUND_GLOBAL" or status=="FOUND_ORBIT" or String.contains(substr="FOUND_HYBRID",status),"root word row must be a found word");
+                require(status=="FOUND_GLOBAL" or status=="FOUND_ORBIT" or String.startsWith(prefix="FOUND_HYBRID",status),"root word row must be a found word");
                 List.map(t -> {
                     let g=integer(t);
                     require(g != 0 and Int32.abs(g)<=21,"root word generator outside 1..21");
@@ -192,7 +192,9 @@ def frontOf(state: Vector[Sticker],r: Int32,c: Int32): Sticker \ IO = {
 }
 def replaceSticker(state: Vector[Sticker],id: Int32,f: Sticker -> Sticker): Vector[Sticker] =
     Vector.map(s -> {let Sticker.S(i,_,_,_,_,_,_)=s;if(i==id) f(s) else s},state)
-def ruleSelfcheck(rule: HalfRule,state: Vector[Sticker],y: Int32,m: Int32): Unit \ IO = {
+// `front` is THE front check of the chain run (bound once in runPureChainR and used at the source and
+// at every edge), so a front check that ignores the selected rule fails here.
+def ruleSelfcheck(rule: HalfRule,front: (Vector[Sticker],Int32,Int32) -> Bool \ IO,state: Vector[Sticker],y: Int32,m: Int32): Unit \ IO = {
     let board=stackedBoard(pureVariant(),y,m);
     let cellWith = (wanted: List[String]) -> List.filter(q -> {let(r,c)=q;let Sticker.S(_,_,_,_,_,t,_)=frontOf(state,r,c);List.memberOf(t,wanted)},cells());
     let turnCells=cellWith(List#{"1","2","5","8"});
@@ -204,7 +206,7 @@ def ruleSelfcheck(rule: HalfRule,state: Vector[Sticker],y: Int32,m: Int32): Unit
     let turned=replaceSticker(state,id1,s -> {let Sticker.S(i,p,pos,n,u,t,ink)=s;let(a,b,d)=u;Sticker.S(i,p,pos,n,(0-a,0-b,0-d),t,ink)});
     let aliased=replaceSticker(state,id2,s -> {let Sticker.S(i,p,pos,n,u,_,ink)=s;Sticker.S(i,p,pos,n,u,"I",ink)});
     let want=rule==HalfRule.Legacy;
-    let tT=okFront(board,turned,HalfRule.Legacy);let tA=okFront(board,turned,rule);let iT=okFront(board,aliased,HalfRule.Legacy);let iA=okFront(board,aliased,rule);
+    let tT=okFront(board,turned,HalfRule.Legacy);let tA=front(turned,y,m);let iT=okFront(board,aliased,HalfRule.Legacy);let iA=front(aliased,y,m);
     println("rule-selfcheck\t${ruleName(rule)}\thalf-turned-glyph\tlegacy=${verdictName(tT)}\tactive=${verdictName(tA)}\tI-as-1\tlegacy=${verdictName(iT)}\tactive=${verdictName(iA)}");
     require(tT and iT,"self-check: the legacy rule must accept the half-turned glyph and I as 1");
     require(tA==want and iA==want,"self-check: the active front rule does not behave as the selected rule")
@@ -223,6 +225,7 @@ def runPureChain(printPath: String,dagPath: String,path: String,oldRoot: String,
 // root word of the source display (rootMovesPath), and every front is checked with the strict rule.
 def runPureChainR(rule: HalfRule,rootMovesPath: String,printPath: String,dagPath: String,path: String,oldRoot: String,geometry: String): Unit \ IO = {
     let strict=rule==HalfRule.Strict;
+    let front = (st: Vector[Sticker],y: Int32,m: Int32) -> pureFrontOk(rule,st,y,m);
     let CalendarChain.C(source,sy,sm,sourceHash,edges)=readChain(read(path));
     let oldRaw=read(oldRoot+"/physical-print.tsv");
     require(digest(oldRaw)=="b2a9fa1fd96343c6403cb4a9d7bb0f684b539cc26c0b6154c71728f3053c7931","unchanged PR99 printing provenance");
@@ -246,7 +249,7 @@ def runPureChainR(rule: HalfRule,rootMovesPath: String,printPath: String,dagPath
             case None => throw new IllegalArgumentException("source root absent from legal DAG")
         }
     };
-    let initial=liftState(start,printing,poses);pureFront(rule,initial,sy,sm,"source front");ruleSelfcheck(rule,initial,sy,sm);
+    let initial=liftState(start,printing,poses);require(front(initial,sy,sm),"source front");ruleSelfcheck(rule,front,initial,sy,sm);
     require(not strict or initial==List.foldLeft((s,step) -> directStep(step,s),printing,rootSteps),"root word pose replay agrees with direct294-sticker replay");
     require(fullDigest(initial)==sourceHash,"initial full physical source SHA mismatch");
     println("source-sha256\t${sourceHash}");
@@ -262,7 +265,7 @@ def runPureChainR(rule: HalfRule,rootMovesPath: String,printPath: String,dagPath
         },(before,state),steps);
         let lifted=liftState(after,printing,poses);
         require(lifted==direct,"pose replay agrees with direct294-sticker physical replay");
-        pureFront(rule,lifted,year,month,"edge front");
+        require(front(lifted,year,month),"edge front");
         require(fullDigest(lifted)==ds,"edge destination full physical SHA mismatch");
         let(inversePose,inverseDirect)=List.foldLeft((poseState,step) -> {
             let(p,s)=poseState;let inv=inverseStep(step);
