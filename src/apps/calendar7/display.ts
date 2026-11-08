@@ -115,7 +115,8 @@ export function displayIds(firstYear = 2026, lastYear = 2099): number[] {
 // ---------------------------------------------------------------------------------------
 // Front rule, ported 1:1 from the research (english/prepare_physical.jl image_normal,
 // orientation_screen.jl HALF, pure-split-states/stacked_common.jl stacked_match and
-// front_failure, strict mode). This is NOT "cube appearance": glyph equivalences O = 0,
+// front_failure (the research calls its stacked check "strict mode"; that is unrelated to the strict profile).
+// This is NOT "cube appearance": glyph equivalences O = 0,
 // I = 1 and half-turn pairs are accepted, but a stacked "a/b" must be upright with exactly
 // the same text and the same ink.
 

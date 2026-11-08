@@ -18,7 +18,10 @@ import {
   TEXTURE,
   TEXT_SQUARE,
   drawSticker,
+  SPLIT_MIN_GAP,
+  SPLIT_SLASH_LIFT,
   isSplitLabel,
+  splitInkGaps,
   splitLayout,
 } from "../src/apps/calendar7/sticker-art.ts";
 
@@ -155,7 +158,7 @@ test("strict front: letters MON and FRI, 0 and O, 1 and I, 6 and 9 on a real she
   assert.equal(frontFailure(nine, turnTo(f.pose, six, [-1, 0, 0]), f.cells, "strict")?.why, "plain-mismatch");
   assert.equal(frontFailure(f.printing, turnTo(f.pose, one, [0, -1, 0]), f.cells, "strict")?.why, "plain-mismatch");
   assert.equal(frontFailure(f.printing, turnTo(f.pose, one, [0, -1, 0]), f.cells, "legacy"), null);
-  // The digit 0 (a date 10) is not a letter; a sticker "0" turned any way still reads 0 when 0 is wanted.
+  // The digit 0 (a date 10) is not a letter; a letter O inside 10 ("1O") is not the digit 0.
   const ten = f.front[f.cells.findIndex((c) => c.text === "10")];
   assert.equal(frontFailure(retext(f.printing, ten, "1O"), f.pose, f.cells, "strict")?.why, "plain-mismatch");
 });
@@ -171,22 +174,12 @@ test("strict front: split labels stay upright with exact text and ink", () => {
   assert.equal(frontFailure({ ...f.printing, ink: f.printing.ink.map((x, j) => (j === s ? (x === "red" ? "dark" : "red") : x)) }, f.pose, f.cells, "strict")?.why, "stacked-mismatch");
   // The un-split date is a plain mismatch.
   assert.equal(frontFailure(retext(f.printing, s, "24"), f.pose, f.cells, "strict")?.why, "plain-mismatch");
-  // The mirrored label 31/24 is not 24/31 even half-turned (the slash is not in the half-turn set).
+  // A label turned by a half turn is never accepted, even a look-alike such as 13/42 (the slash is not in the half-turn set).
   assert.equal(frontFailure(retext(f.printing, s, "13/42"), turnTo(f.pose, s, [0, -1, 0]), f.cells, "strict")?.why, "stacked-mismatch");
 });
 
 const inside = (b, lo, hi) => b.x0 >= lo && b.y0 >= lo && b.x1 <= hi && b.y1 <= hi;
 const overlap = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
-/** True when the segment (x0,y0)-(x1,y1) touches the box. */
-function segmentHits(p, q, b) {
-  for (let t = 0; t <= 1; t += 1 / 512) {
-    const x = p[0] + (q[0] - p[0]) * t;
-    const y = p[1] + (q[1] - p[1]) * t;
-    if (x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1) return true;
-  }
-  return false;
-}
-
 test("diagonal layout of 23/30 and 24/31: top-left, slash in the middle, bottom-right, upright, inside the sticker", () => {
   for (const label of ["23/30", "24/31"]) {
     assert.ok(isSplitLabel(label));
@@ -207,19 +200,23 @@ test("diagonal layout of 23/30 and 24/31: top-left, slash in the middle, bottom-
     assert.equal(second.align, "right");
     assert.ok(Math.abs(first.box.x0 - lo) < 1e-9 && Math.abs(first.box.y0 - lo) < 1e-9);
     assert.ok(Math.abs(second.box.x1 - hi) < 1e-9 && Math.abs(second.box.y1 - hi) < 1e-9);
-    assert.ok(first.box.x1 <= TEXTURE / 2 + 10 && first.box.y1 <= TEXTURE / 2 - 10 + 20);
-    assert.ok(second.box.x0 >= TEXTURE / 2 - 10 && second.box.y0 >= TEXTURE / 2 - 20 + 20 - 10);
+    assert.ok(first.box.x1 <= TEXTURE / 2 + 10 && first.box.y1 <= TEXTURE / 2);
+    assert.ok(second.box.x0 >= TEXTURE / 2 - 10 && second.box.y0 >= TEXTURE / 2);
     assert.ok(first.box.y1 < second.box.y0, "numbers do not share a row band");
     assert.ok(!overlap(first.box, second.box), "numbers do not overlap");
-    // The slash is centered, and its stroke (bottom-left to top-right) clears both numbers.
+    // The slash is centered (lift 0), inside the text square.
     const cx = (slash.box.x0 + slash.box.x1) / 2;
     const cy = (slash.box.y0 + slash.box.y1) / 2;
-    assert.ok(Math.abs(cx - TEXTURE / 2) < 1e-9 && Math.abs(cy - TEXTURE / 2) < 1e-9);
+    assert.ok(Math.abs(cx - TEXTURE / 2) < 1e-9);
+    assert.ok(Math.abs(cy - (TEXTURE / 2 - SPLIT_SLASH_LIFT * TEXTURE)) < 1e-9);
     assert.ok(inside(slash.box, lo, hi));
-    const bl = [slash.box.x0 + 0.01 * TEXTURE, slash.box.y1];
-    const tr = [slash.box.x1 - 0.01 * TEXTURE, slash.box.y0];
-    assert.ok(!segmentHits(bl, tr, first.box), "slash clears the first number");
-    assert.ok(!segmentHits(bl, tr, second.box), "slash clears the second number");
+    // Stroke-aware: the slash stroke (polygon) keeps a real ink gap to both numbers' ink.
+    const gaps = splitInkGaps({ first, slash, second });
+    assert.ok(gaps.first >= SPLIT_MIN_GAP * TEXTURE, `${label} slash to ${a}: ${gaps.first.toFixed(2)} px`);
+    assert.ok(gaps.second >= SPLIT_MIN_GAP * TEXTURE, `${label} slash to ${b}: ${gaps.second.toFixed(2)} px`);
+    // Negative control: the old centered 0.45 slash (a measured 1 px collision in Chromium) is caught.
+    const old = splitInkGaps(splitLayout(label, 0.45, 0));
+    assert.ok(Math.min(old.first, old.second) < SPLIT_MIN_GAP * TEXTURE, `${label} old layout rejected`);
   }
   assert.throws(() => splitLayout("23"));
   assert.throws(() => splitLayout("MON"));

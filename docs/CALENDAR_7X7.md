@@ -137,7 +137,7 @@ The app has two rule profiles, selected in one place: `DEFAULT_RULE_PROFILE` in
 | | `legacy` (default, shipped) | `strict` (prepared, not active) |
 | --- | --- | --- |
 | Glyph aliases | O = 0 and I = 1 | none: O is not 0, I is not 1 |
-| Equal after a turn | 0 1 2 5 8 H N S X Z (half turn) and 6 and 9 | only the digit 0 (any turn) and 6 and 9 (half turn) |
+| Equal after a turn | 0 (any turn), 1 2 5 8 H N S X Z (half turn) and 6 and 9 | only the digit 0 (any turn) and 6 and 9 (half turn) |
 | Weekday labels in the print | `M0N`, `FR1` | the letters `MON`, `FRI` |
 | Split labels (`23/30`, `24/31`) | upright, one line | upright, drawn diagonally |
 
@@ -152,8 +152,13 @@ with exactly the same text and ink in both profiles.
 number sits top-left (left-aligned), the second bottom-right (right-aligned), the slash is
 centered between them, all three upright. The digit ink height is 0.35 of the text square
 (Noto Sans digit ink height 0.735 em, so the font size is 0.35 times the square divided by 0.735).
-The slash ink height is 0.45 of the text square and its stroke clears both numbers. The pure
-geometry is `splitLayout` in `src/apps/calendar7/sticker-art.ts`. The Noto Sans font
+The slash is centered, upright and short on purpose (ink height 0.24 of the text square): the numbers
+sit in the corners, so a taller slash stroke would touch them. The layout is stroke-aware: the slash is
+modeled as a stroke polygon (about 0.12 em thick) and the numbers by their digit ink (side bearings
+removed), and the unit test requires an ink gap of at least 0.02 of the texture (about 3.8 px at
+192 px; the model gives about 5 px) to both numbers for 23/30 and 24/31. A browser check of the real
+font (Chromium, 192 px) is still advisable before the switch. The pure geometry is `splitLayout` and
+`splitInkGaps` in `src/apps/calendar7/sticker-art.ts`. The Noto Sans font
 (OFL-1.1) is unchanged.
 
 **What is profile-gated.** `imageNormal` and `frontFailure` in `display.ts` take the profile as
