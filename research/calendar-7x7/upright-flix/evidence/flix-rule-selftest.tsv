@@ -1,0 +1,27 @@
+rule-selftest	legacy	six-nine-half-turn	true	PASS
+rule-selftest	legacy	six-quarter-turn-differs	false	PASS
+rule-selftest	legacy	six-half-turn-not-upright	false	PASS
+rule-selftest	legacy	zero-any-turn	true	PASS
+rule-selftest	legacy	eight-half-turn	true	PASS
+rule-selftest	legacy	N-half-turn	true	PASS
+rule-selftest	legacy	12-vs-21-half-turn	true	PASS
+rule-selftest	legacy	letter-O-is-zero	true	PASS
+rule-selftest	legacy	letter-I-is-one	true	PASS
+rule-selftest	legacy	half-char-eight	true	PASS
+rule-selftest	legacy	half-char-zero	true	PASS
+rule-selftest	legacy	half-char-six	true	PASS
+rule-selftest	legacy	old-optic-is-legacy	true	PASS
+rule-selftest	strict	six-nine-half-turn	true	PASS
+rule-selftest	strict	six-quarter-turn-differs	false	PASS
+rule-selftest	strict	six-half-turn-not-upright	false	PASS
+rule-selftest	strict	zero-any-turn	true	PASS
+rule-selftest	strict	eight-half-turn	false	PASS
+rule-selftest	strict	N-half-turn	false	PASS
+rule-selftest	strict	12-vs-21-half-turn	false	PASS
+rule-selftest	strict	letter-O-is-zero	false	PASS
+rule-selftest	strict	letter-I-is-one	false	PASS
+rule-selftest	strict	half-char-eight	false	PASS
+rule-selftest	strict	half-char-zero	true	PASS
+rule-selftest	strict	half-char-six	true	PASS
+rule-selftest	strict	old-optic-is-legacy	true	PASS
+rule-selftest-verdict	PASS	0
