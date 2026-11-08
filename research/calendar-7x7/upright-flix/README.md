@@ -101,7 +101,8 @@ Also new in `../upright-beam/`: `verify_chain.jl` (independent third checker: it
 `verify_moves.jl`, with its own geometry, boards, strict front rule and SHA-256 of the state
 text; it parses the chain itself and checks adjacency, HTM, the declared source and end
 hashes and every front; it does not recompute the QTM and rotation fields and has no print
-pin, which the Julia and Flix verifiers do),
+pin, which the Julia and Flix verifiers do; it also does no status or row-shape check on
+ROOT_MOVES, it only reads the word of the root id),
 `make_chain.jl` (untrusted chain writer from edge words), `chain_runner_*.sh` and
 `chain_controls.sh` (nine mutated inputs per checker).
 
@@ -127,7 +128,10 @@ in a "1" cell must be rejected by the strict rule (Legacy must accept them; Juli
 print `rule-selfcheck` and abort on a deviation, the replay is strict only). The nine
 mutations themselves are rejected for structural reasons (hash, metrics, front, print
 pin). The Julia and Flix verifiers also require the exact `FOUND` status in the root-word
-row. Common-mode
+row. In Flix the front check is bound once (`front`) and the self-check calls that
+same binding, so changing the rule of the bound check is caught; a hand-written call with
+another rule at a single edge site is not, and only a chain control whose end front is
+legacy-legal but strict-illegal would catch it (not built here). Common-mode
 risk is unchanged: boards and rule are one reading of the owner rule, Julia and Flix by the
 same author.
 
