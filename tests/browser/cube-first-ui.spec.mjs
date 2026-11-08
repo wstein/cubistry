@@ -353,38 +353,66 @@ for (const [width, textPercent] of [
           ? "header"
           : "page";
       });
-      if (hit === "off screen")
-        // Known bug, fixed separately: below 760 px, or with enlarged text, the bottom dock is wider than the viewport,
-        // so the centers of the stats bar and the speed control can lie outside it. Nothing else may be off screen.
-        expect(
-          (width <= 760 || textPercent > 100) &&
-            [".counter-stats", ".speed-control", "#rotation-speed"].includes(
-              selector,
-            ),
-          `${selector} is off screen at ${width}px, ${textPercent}% text`,
-        ).toBe(true);
-      else expect(hit, `${selector} center hit target`).toBe("page");
+      expect(hit, `${selector} center hit target`).toBe("page");
     }
     // Stats and speed live in the bottom dock, well below the island.
     expect(Math.min(stats.y, speed.y)).toBeGreaterThan(h.y + h.height);
-    // The speed label and its slider share one dock row.
-    expect(slider.y).toBeLessThan(speed.y + speed.height);
-    expect(speed.y).toBeLessThan(slider.y + slider.height);
+    expect(slider.y).toBeGreaterThan(h.y + h.height);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-    const boxes = await page
+    // The two move counters sit side by side or, when the dock wraps, one above the other; they never overlap.
+    const counters = await page
       .locator(".move-summary dd")
       .evaluateAll((nodes) =>
-        nodes.map((n) => n.getBoundingClientRect().top),
+        nodes.map((n) => {
+          const r = n.getBoundingClientRect();
+          return { x: r.x, y: r.y, width: r.width, height: r.height };
+        }),
       );
-    // The dock shows the two move counters side by side, on one row.
-    expect(Math.abs(boxes[0] - boxes[1])).toBeLessThan(1);
+    expect(counters).toHaveLength(2);
+    expect(overlaps(counters[0], counters[1])).toBe(false);
     await page.locator("#reset-session-moves").focus();
     await page.keyboard.press("Tab");
     await expect(page.locator("#rotation-speed")).toBeFocused();
+  });
+
+for (const [width, textPercent] of [
+  [1440, 100],
+  [768, 100],
+  [700, 100],
+  [600, 100],
+  [390, 100],
+  [320, 100],
+  [768, 125],
+  [390, 125],
+  [320, 125],
+])
+  test(`the bottom dock lies inside the viewport at ${width}px, ${textPercent}% text`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await ready(page);
+    await page.evaluate((percent) => {
+      document.documentElement.style.fontSize = `${percent}%`;
+    }, textPercent);
+    for (const selector of [
+      ".floating-dock",
+      ".counter-stats",
+      "#session-moves",
+      "#reset-session-moves",
+      ".speed-control",
+      "#rotation-speed",
+    ]) {
+      const box = await page.locator(selector).boundingBox();
+      expect(box.x, `${selector} left edge ${box.x}`).toBeGreaterThanOrEqual(0);
+      expect(
+        box.x + box.width,
+        `${selector} right edge ${box.x + box.width}`,
+      ).toBeLessThanOrEqual(width);
+    }
   });
 
 for (const saved of [
