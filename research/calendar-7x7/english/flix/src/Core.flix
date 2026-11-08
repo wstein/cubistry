@@ -105,24 +105,39 @@ def representatives(): List[Goal] \ IO = List.reverse(List.foldLeft((seen,p)  ->
     if(List.count(old  ->  goalBoard(old)==goalBoard(g),seen)>0)seen else g::seen
 },Nil,calendarMonths()))
 
-def halfChar(c: Char): Option[Char] = match c {
+// Half-turn rule. Legacy is the rule of every chain in main (halfturn-equal glyphs
+// 0 1 2 5 8 H N S X Z and 6<->9; letters O and I fold to the digits 0 and 1). Strict is the
+// owner rule of research/calendar-7x7/upright-feasibility: only the digit 0 (circular)
+// and 6<->9 are half-turn equal, and there is NO aliasing (O is not 0, I is not 1).
+// halfChar, halfWord and optic keep their old meaning (Legacy); opticR selects the rule.
+enum HalfRule with Eq { case Legacy, Strict }
+def halfCharR(rule: HalfRule,c: Char): Option[Char] = match c {
     case '6' => Some('9')
     case '9' => Some('6')
-    case _  =>  if(List.memberOf(c,String.toList("01258HNSXZ")))Some(c) else None
+    case _  =>  match rule {
+        case HalfRule.Legacy => if(List.memberOf(c,String.toList("01258HNSXZ")))Some(c) else None
+        case HalfRule.Strict => if(c=='0')Some(c) else None
+    }
 }
-def halfWord(s: String): Option[String] = List.foldLeft((acc,c) -> match(acc,halfChar(c)) {
+def halfWordR(rule: HalfRule,s: String): Option[String] = List.foldLeft((acc,c) -> match(acc,halfCharR(rule,c)) {
     case(Some(a),Some(b)) => Some(a+"${b}")
     case _ => None
 },Some(""),List.reverse(String.toList(s)))
+def halfChar(c: Char): Option[Char] = halfCharR(HalfRule.Legacy,c)
+def halfWord(s: String): Option[String] = halfWordR(HalfRule.Legacy,s)
 // Optic normalizer preserves actual angle, INCLUDING core stickers.
-def optic(raw: String,angle: Int32,ink: String): Art \ IO = {
-    let s=String.replace(src="I",dst="1",String.replace(src="O",dst="0",raw));
+def opticR(rule: HalfRule,raw: String,angle: Int32,ink: String): Art \ IO = {
+    let s=match rule {
+        case HalfRule.Legacy => String.replace(src="I",dst="1",String.replace(src="O",dst="0",raw))
+        case HalfRule.Strict => raw
+    };
     if(s=="") ("",0,"blank") else if(s=="0") (s,0,ink)
-    else match halfWord(s) {
+    else match halfWordR(rule,s) {
         case None  =>  (s,angle,ink)
         case Some(h)  =>  at(List.sort(List#{(s,angle,ink),(h,Int32.modulo(angle+2,4),ink)}),0)
     }
 }
+def optic(raw: String,angle: Int32,ink: String): Art \ IO = opticR(HalfRule.Legacy,raw,angle,ink)
 // This additional core quotient is for the INVENTORY LOWER BOUND only.
 def lowerArt(raw: String,ink: String,row: Int32,col: Int32): Art \ IO = {
     if(orbit(row,col)==(0,0)) at(List.sort(List.map(q  ->  optic(raw,q,ink),List.range(0,4))),0)
