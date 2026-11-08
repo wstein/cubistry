@@ -1,4 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { alignmentText, playedBlocks } from "../../src/apps/calendar7/deferral.ts";
+import { parseGraph } from "../../src/apps/calendar7/graph.ts";
 
 // English 7x7 calendar mode, stage 2 (research candidate, not certified): the 3D cube and the animated step between
 // adjacent months. The project config emulates prefers-reduced-motion: reduce, so the animation tests switch it off per
@@ -7,6 +10,11 @@ import { test, expect } from "@playwright/test";
 // test compares it with the stored hash of the node in graph.v1.json.
 
 const ROOT = "#calendar7-root";
+// What the page plays for January to February 2028 (rule c, rotations deferred), from the unit-level function: the number
+// of layer blocks and the end alignment. The numbers are pinned as well, so that a change of either is noticed.
+const FEB = playedBlocks(parseGraph(JSON.parse(readFileSync("public/calendar7/graph.v1.json", "utf8"))).edges[0].moves, { slice: true, defer: true });
+const FEB_BLOCKS = FEB.blocks.length;
+const FEB_ALIGNMENT = alignmentText(FEB.alignment);
 const watch = (page) => {
   const seen = [];
   page.on("pageerror", (e) => seen.push(`pageerror: ${e.message}`));
@@ -61,7 +69,10 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   const progress = page.locator('[data-c7="progress"]');
   await page.locator('a[data-nav="next"]').click();
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "playing");
-  await expect(progress).toHaveText(/^Turning to February 2028: block \d+ of 103$/);
+  expect([FEB_BLOCKS, FEB_ALIGNMENT]).toEqual([98, "y+"]);
+  await expect(progress).toHaveText(new RegExp(`^Turning to February 2028: block \\d+ of ${FEB_BLOCKS}$`));
+  // The alignment is a separate, free indicator: it is found at the end of the layer blocks.
+  await expect(page.locator('[data-c7="alignment"]')).toHaveText("Alignment: at the end");
   // The heading, sheet and live region already name the new month; the digest is that of the pose being turned only at the end.
   await expect(page.locator(".c7-month")).toHaveText("February 2028");
   await page.locator('[data-c7="speed"]').selectOption("8");
@@ -81,6 +92,8 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   await expect(page.locator('[data-c7="skip"]')).toBeFocused();
   await expect(page.locator('[data-c7="skip"]')).toHaveAttribute("aria-disabled", "true");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[1].hash);
+  await expect(page.locator('[data-c7="alignment"]')).toHaveText(`Alignment: ${FEB_ALIGNMENT}`);
+  await expect(progress).toHaveText("The cube shows February 2028.");
   await expect(page.locator(".c7-live")).toContainText("The cube has turned to February 2028");
   // Backward: the inverse of the previous edge; and Next during the step ends it at once.
   await page.locator('a[data-nav="previous"]').click();
