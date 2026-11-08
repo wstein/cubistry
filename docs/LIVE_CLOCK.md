@@ -45,12 +45,18 @@ page read; unknown values fall back to the default):
 | Parameter | Effect |
 | --- | --- |
 | `lettering` | `symbols`, `words` or `words-pascal` (default, or the last choice made in the panel). |
-| `hours-speed`, `minutes-speed`, `seconds-speed` | Preferred quarter-turn time in ms: 2000, 1000, 500, 250, 100, 50 or 10. Defaults 500, 250, 100. Any of them opens the Nerd panel. |
-| `nerd`, `dev`, `expert` | Open the Nerd panel (timing and speeds). The panel button in the header of the control panel toggles it and the choice is remembered. |
+| `hours-speed`, `minutes-speed`, `seconds-speed` | Preferred quarter-turn time in ms: 2000, 1000, 500, 250, 100, 50 or 10. Defaults 500, 250, 100. |
+| `nerd` | `1` opens the Nerd drawer. The Nerd button in the header toggles it. The aliases `dev` and `expert` of the former page are not read. |
 | `kiosk`, `presentation` | `1` or `true` starts in presentation mode. |
 
-The Nerd panel shows the preferred quarter-turn time per cube and the scheduled
-quarter and half durations; it no longer repeats the cube value as text.
+## Controls
+
+Dock slot 2 shows the time zone (read-only), slot 4 the preferred quarter-turn
+time per cube and slot 5 the sticker lettering. The Nerd drawer shows the
+effective values only: the scheduled quarter and half turn time per cube, with
+a note when it was fitted to live time, and the committed-moves table with
+**Reset session moves**. Errors appear as dismissible alert rows in the status
+zone. The digital clock and the status line stay in the panel.
 
 ## Predictive playback
 
@@ -116,7 +122,7 @@ units before the live schedule is fitted.
 
 ## Move statistics
 
-A status block under the cubes shows, per cube (Hours, Minutes, Seconds) and in
+The Nerd drawer shows, per cube (Hours, Minutes, Seconds) and in
 total, the committed HTM moves and whole-cube rotations of the session, the cost
 of the last completed tick, the largest tick cost so far, and the average cost
 per tick of each cube. It reuses the
