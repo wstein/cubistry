@@ -131,11 +131,11 @@ jobs:
         run: |
           set -euo pipefail
           # flixw downloads flix.jar from a GitHub release and the dependencies from Maven; a
-          # transient 5xx there fails the build, so retry (the build itself is deterministic).
+          # transient 5xx there fails the build, so retry for up to 21 minutes (the build itself is deterministic).
           jar=""
-          for attempt in 1 2 3 4; do
+          for attempt in 1 2 3 4 5 6; do
             if built=$(bash "src/$PURE_DIR/flix/build.sh"); then jar=$(printf "%s\n" "$built" | tail -n 1); break; fi
-            echo "::warning::Flix build attempt $attempt failed; retrying"; sleep $((attempt * 30))
+            echo "::warning::Flix build attempt $attempt failed; retrying"; sleep $((attempt * 60))
           done
           test -n "$jar" && test -f "$jar"
           echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
