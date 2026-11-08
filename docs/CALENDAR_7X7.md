@@ -22,7 +22,8 @@ the next month.
   the axis (`x`, `y`, `z`), the layer (`-3` to `-1`, `+1` to `+3`, or `rot` for the
   whole cube), then `'` for a counter-clockwise quarter turn or `²` for a half turn.
   Each step also lists the raw generators (`g<generator>:<+1|-1|2>`, generators 1 to 21 as
-  defined below) in a collapsible block.
+  defined below) in a collapsible block, and the same word as block moves (see
+  [Block moves](#block-moves-wide-and-inner-wide), a display layer only).
 - **The 3D view (stage 2).** The studio scene shows the cube with its 218 surface bodies
   and 294 stickers in the pose of the displayed month. A sticker shows the text and ink
   of the print (`state.v1.json`), so the stickers read as printed (the print uses the digits
@@ -31,8 +32,8 @@ the next month.
   around. The month sheet below stays the reference for what the front face must show.
 - **The animated step.** Choosing the previous or next month plays the stored move word
   move by move on the cube: forward is the stored edge, backward is the inverse of the edge
-  before it. A move turns the layer of its axis, or the whole cube for `rot`, by the exponent
-  of the move; the engine's right-handed quarter turn is the right-handed rotation of the
+  before it. A block (one or several layers of one axis, or the whole cube for `rot`) turns by the exponent
+  of its moves as one animation; the engine's right-handed quarter turn is the right-handed rotation of the
   scene. The controls are **Play/Pause** (pauses after the move in flight), **Skip to end**,
   **Speed** (0.5× to 8×, default 2×; nominal 90 ms per move at 1×, so 8× is about one frame per move when the display keeps up, otherwise it can equal 4×) and **Reset view**. Previous or
   Next during a step first brings the cube to the end of that step, then plays the new step.
@@ -60,6 +61,47 @@ the next month.
   deviation: the bodies use one bevel segment instead of three (108 instead of 588
   triangles per body, 23k instead of 128k for the cube). The scene renders on demand: an idle
   cube draws nothing, and a frame of a turn allocates nothing.
+
+## Block moves (wide and inner-wide)
+
+**Display layer only.** The stored data (`graph.v1.json`, generators 1 to 21, three exponents)
+and the legacy behavior are unchanged: a word is still a sequence of single-layer moves and
+rotations, the digest check after a step is unchanged, and `calendar7-source.json` is
+untouched. The page regroups the word of a step into **blocks** for the notation and the animation.
+Code: `src/apps/calendar7/blocks.ts` (pure).
+
+- **Why it is safe.** Moves about one axis commute (they turn disjoint layers about the same
+  axis). So inside a maximal run of consecutive single-layer moves about the same axis the moves may be
+  reordered, and moves with the same exponent on layers that are next to each other may turn together. The
+  grouping keeps the multiset of (axis, layer, exponent) of every run exactly: nothing is cancelled,
+  added or rewritten, so playing the blocks reaches the same state, hence the same SHA-256 digest, as the word.
+- **Block.** An axis (`x`, `y`, `z`), a range of layers `lo..hi` on one side of the middle, and one exponent for
+  all of its layers. Layers are -3, -2, -1, 1, 2, 3; layer 0 is never turned alone, so -1 and +1 are
+  not neighbors (a block across the middle would turn layer 0 too, which no word does).
+  Kinds: `single` (one layer), `outer-wide` (several layers including the outer layer -3 or +3, for example
+  the `3Rw`-style turn of the three outer layers on one side) and `inner-wide` (several layers, inner only:
+  -2..-1 or +1..+2). A whole-cube rotation is its own block of kind `rotation`: it is free as before, and it ends a
+  run (nothing is merged across it). Same exponent means the same physical turn of every layer in the block: the engine's
+  quarter turn is the same positive rotation about the axis for every layer.
+- **Grouping.** Per run and exponent (in order of first appearance), round r takes the layers that turn more than r
+  times and splits them into ranges of neighbor layers, lowest first. This is the smallest number of blocks for the run.
+  The function is deterministic: `groupBlocks(word)` gives the blocks, `expand(blocks)` the word of single-layer
+  moves they stand for (state-identical to the original word, another order inside each run).
+- **Notation.** Axis, layers, turn: `x-3` one layer, `x-3..-1` the layers -3 to -1 together (outer-wide),
+  `y+1..+2'` the inner layers +1 and +2 together (inner-wide), `zrot` the whole cube. The turn is empty for a positive
+  quarter turn, `'` for a counter-clockwise one (exponent -1) and `²` for a half turn. Single-layer and rotation tokens
+  are the same as in the move word; only ranges are new. The raw generators (`g<generator>:<+1|-1|2>`) and the
+  move word in the notation of single layers stay visible next to the block word.
+- **Two counts.** *Layer moves* (HTM) is the existing count: every layer of every block counts once, a half turn once,
+  rotations not at all. *Block moves* counts one per non-rotation block. For the same step block moves never exceed layer moves;
+  whole-cube rotations are counted separately and stay free, as today.
+- **Animation.** The player plays one block as ONE tween: every layer of the block turns together by the same angle in
+  the time of one move (90 ms at 1x, the speeds 0.5x to 8x are unchanged). The progress line reads
+  `block k of n`. Skip, Pause, Previous/Next during a step, reduced motion (a step jumps to its end state) and the digest check
+  at the end of every step are unchanged and work on blocks; `StateMismatchError` still stops the view.
+- **Not covered.** No change to the stored words, to the chain or to the metrics in the graph; no search for shorter
+  words (merging only regroups what the stored word already contains); no merging across a rotation or across the middle layer.
+  How much a different word choice could save is measured separately in the research branch.
 
 ## What this is
 
@@ -110,6 +152,7 @@ of the chain.
 | `src/apps/calendar7/` | Pure engine, display, graph, month-view, player and tween modules (no DOM, no timers), the sticker art, the WebGL viewer and the DOM mount of the mode |
 | [tests/calendar7-replay.test.mjs](../tests/calendar7-replay.test.mjs) | Full replay and negative controls, part of `npm test` |
 | [tests/calendar7-mode.test.mjs](../tests/calendar7-mode.test.mjs) | Registry entry, month choice, navigation bounds, move words and mount |
+| [tests/calendar7-blocks.test.mjs](../tests/calendar7-blocks.test.mjs) | Block moves: examples, property tests on random words (same state and digest, same multiset), identical digest for every stored edge in both directions, notation and counts on the page |
 | [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
 | [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, diagonal split-label geometry and drawing |
 | [tests/calendar7-sheet-colors.test.mjs](../tests/calendar7-sheet-colors.test.mjs) | Month sheet palette: every ink on its cell at 4.5:1 in light and dark |

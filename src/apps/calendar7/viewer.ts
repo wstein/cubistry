@@ -29,13 +29,10 @@ import {
   rotatePresentation,
   type SmartRotationBinding,
 } from "@cubistry/cube-viewer";
+import { type Block, expand } from "./blocks.ts";
 import {
   applyMoves,
   CUBIES,
-  generatorAxis,
-  generatorLayer,
-  isRotation,
-  type Move,
   type Pose,
   type Printing,
   STICKERS,
@@ -213,17 +210,18 @@ export class Calendar7Viewer implements StageView {
     this.dirty = true;
   }
 
-  turn(move: Move, before: Pose, ms: number): Promise<void> {
+  /** One block is ONE tween: every layer of the block turns together about the axis by the same angle. */
+  turn(block: Block, before: Pose, ms: number): Promise<void> {
     if (this.destroyed || !this.cube) return Promise.resolve();
     this.tween.cancel();
-    const [g, q] = move;
-    const axis = generatorAxis(g);
-    const layer = generatorLayer(g);
-    const whole = isRotation(g);
+    const { axis, lo, hi, angle: q } = block;
+    const whole = block.kind === "rotation";
     const pieces: number[] = [];
     this.onLayer.fill(0);
     for (let i = 0; i < STICKERS; i++) {
-      if (!whole && before.pos[3 * i + axis] !== layer) continue;
+      const at = before.pos[3 * i + axis];
+      // A block is a contiguous range of layers on one side of the middle layer, so a range test selects exactly its layers.
+      if (!whole && (at < lo || at > hi)) continue;
       const piece = (this.printing as Printing).piece[i];
       if (!this.onLayer[piece]) {
         this.onLayer[piece] = 1;
@@ -231,7 +229,7 @@ export class Calendar7Viewer implements StageView {
       }
     }
     const turn = this.cube.beginTurn(pieces, axis, (q * Math.PI) / 2);
-    const after = applyMoves(before, [move]);
+    const after = applyMoves(before, expand([block]));
     this.dirty = true;
     return this.tween.begin(
       ms,
