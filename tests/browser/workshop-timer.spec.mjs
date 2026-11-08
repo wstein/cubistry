@@ -824,6 +824,7 @@ test("10ms is a seventh independent rotation preset and commits verified physica
 
 test("Sequence numbers identify actual starts, retain the finished number and ignore coalesced targets or move-stat resets", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize(RENDER_VIEWPORT);
   await page.clock.install();
   await chooseTimer(page);
   const number = page.locator("#sequence-number");
@@ -964,6 +965,8 @@ function expectEndpoint(observation, preferred) {
 // speed of the machine, and the assertions in `expectEndpoint` are unchanged. The 10 ms preference pins a lateness
 // that real rendering causes; it models the frame cost by stalling the fake clock for 120 ms per frame.
 const FRAME_MS = 16;
+// These specs read the DOM and window state, not pixels. A small canvas keeps each software-rendered frame cheap.
+const RENDER_VIEWPORT = { width: 640, height: 360 };
 async function driveToValue(page, value, preferredMs, frameMs = FRAME_MS, stall = false) {
   // Skip the idle preroll in one jump, stopping well before the active window (at most five turns, and the
   // sequence budget of 5 s) so every turn is still planned and played frame by frame.
@@ -985,6 +988,7 @@ async function driveToValue(page, value, preferredMs, frameMs = FRAME_MS, stall 
 }
 async function timerEndpointCases(page, testInfo, cases, { deterministic = true, frameMs = FRAME_MS, stall = false } = {}) {
   await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize(RENDER_VIEWPORT);
   if (deterministic) await page.clock.install();
   await chooseTimer(page);
   await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
@@ -1056,6 +1060,7 @@ test("100x10ms reports infeasible budget honestly and still commits a full legal
 test("pause reconciles active sequences and a active final turn through legal moves; Resume keeps fractions", async({page})=>{
   test.setTimeout(scaled(60000));
   await page.emulateMedia({reducedMotion:"no-preference"});
+  await page.setViewportSize(RENDER_VIEWPORT);
   await page.clock.install();
   await chooseTimer(page);
   await pauseSoon(page);
@@ -1096,6 +1101,7 @@ test("pause reconciles active sequences and a active final turn through legal mo
 });
 
 test("live readout advances each second while cube keeps ten-second buckets, including fractional Stopwatch pause",async({page})=>{
+  await page.setViewportSize(RENDER_VIEWPORT);
   await page.clock.install();await chooseTimer(page);await duration(page,"00:20");
   await pauseSoon(page);
   const moves=await page.locator("#session-moves").innerText();
