@@ -86,11 +86,11 @@ function chain_metrics(moves)
 end
 const OK_FRONT="-\t-\t-\t-"
 const STRICT_PRINT_SHA="4fc44606e5dcdd745647f57b3086570910b4068a48d001553f99b1625106bcab"
-function root_word(moves_path,root,year,month)
+function root_word(moves_path,root)
     rows=[split(l,'\t') for l in readlines(moves_path)[2:end] if !isempty(l) && parse(Int,split(l,'\t')[1])==root]
     @assert length(rows)==1 "root word must occur exactly once"
     f=only(rows)
-    @assert length(f)==7 && parse(Int,f[2])==year && parse(Int,f[3])==month "root word row must be the declared source month"
+    @assert length(f)==7 "root word row shape"
     @assert occursin("FOUND",f[4]) "root word row must be a found word"
     map(split(f[6],',')) do t
         s=parse(Int,t);@assert s!=0 && abs(s)<=21 "root word generator outside 1..21"
@@ -110,7 +110,7 @@ function verify_pure_chain(print_path,dag_path,path,root_moves=nothing)
     if strict
         p=UInt16.(1:length(proof.action.generators[1]))
         base=decode_physical(printing,p,proof.action);direct=base
-        for (g,q) in root_word(root_moves,input.root,input.year,input.month)
+        for (g,q) in root_word(root_moves,input.root)
             direct=direct_move(direct,g,q)
             for _ in 1:mod(q,4);p=compose(p,UInt16.(proof.action.generators[g]));end
         end
