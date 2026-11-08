@@ -57,6 +57,7 @@ const INVENTORY = [
   row(["kiosk", "presentation"], "src/ms-timer.mjs", ["ms-timer"]),
   row(["kiosk", "presentation"], "src/chronocube.mjs", ALL_IDS),
   row(["nerd", "dev", "expert"], "src/clock.mjs", ["clock"]),
+  row(["nerd"], "src/apps/shell/slot-api.ts", ALL_IDS, /get\("nerd"\) === "1"/),
   row(
     ["hours-speed", "minutes-speed", "seconds-speed"],
     "src/clock.mjs",

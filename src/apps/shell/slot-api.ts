@@ -178,7 +178,17 @@ function assertSlot(n: number): asserts n is SlotNumber {
   if (!SLOT_NUMBERS.includes(n as SlotNumber)) throw new RangeError(`slot must be 1 to 5, got ${n}`);
 }
 
-export function createShellHost(regions: ShellRegions, doc: Doc): ShellHost {
+export interface ShellHostOptions {
+  /** The drawer starts open (URL parameter `nerd=1`); it shows as soon as a mode gives it content. */
+  nerdOpen?: boolean;
+}
+
+/** True for the URL parameter `nerd=1`; any other value leaves the drawer closed. */
+export function nerdOpenFromSearch(search: string): boolean {
+  return new URLSearchParams(search).get("nerd") === "1";
+}
+
+export function createShellHost(regions: ShellRegions, doc: Doc, options: ShellHostOptions = {}): ShellHost {
   /** Identifies the shell that owns the regions; a new `begin` replaces it. */
   let owner: object | null = null;
   /** The shell of the running mode, ended by the next `begin` even if the router's cleanup never ran. */
@@ -193,7 +203,7 @@ export function createShellHost(regions: ShellRegions, doc: Doc): ShellHost {
   let readoutNodes: HTMLElement[] = [];
   let nerdSpec: NerdSpec | null = null;
   let nerdCleanup: (() => void) | null = null;
-  let nerdOpen = false;
+  let nerdOpen = options.nerdOpen === true;
   let hintText: string | null = null;
   let referenceHandler: (() => void) | null = null;
 
