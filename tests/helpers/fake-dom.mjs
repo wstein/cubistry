@@ -2,9 +2,11 @@
 // src/apps/shell/ uses and counts every mutation in `log`, so tests can assert that nothing is written needlessly.
 
 export class FakeElement {
-  constructor(tag, log) {
+  constructor(tag, log, ownerDocument = null) {
     this.tagName = tag.toUpperCase();
     this.log = log;
+    this.ownerDocument = ownerDocument;
+    this.scrollTop = 0;
     this.children = [];
     this.parentNode = null;
     this.dataset = {};
@@ -14,6 +16,9 @@ export class FakeElement {
     this._text = "";
     this._hidden = false;
     this._listeners = new Map();
+  }
+  get parentElement() {
+    return this.parentNode;
   }
   get hidden() {
     return this._hidden;
@@ -45,6 +50,9 @@ export class FakeElement {
     return this._attrs.has(k);
   }
   _detachAll() {
+    // A browser blurs a focused element that leaves the document.
+    const doc = this.ownerDocument;
+    if (doc?.activeElement && this.contains(doc.activeElement) && doc.activeElement !== this) doc.activeElement = null;
     for (const c of this.children) if (typeof c !== "string") c.parentNode = null;
     this.children = [];
     this._text = "";
@@ -70,7 +78,14 @@ export class FakeElement {
       this.children.push(n);
     }
   }
+  contains(node) {
+    return node === this || this.descendants().includes(node);
+  }
+  focus() {
+    if (this.ownerDocument) this.ownerDocument.activeElement = this;
+  }
   remove() {
+    if (this.ownerDocument?.activeElement === this) this.ownerDocument.activeElement = null;
     if (!this.parentNode) return;
     this.parentNode.children = this.parentNode.children.filter((c) => c !== this);
     this.parentNode = null;
@@ -104,9 +119,10 @@ export class FakeElement {
 export class FakeDocument {
   constructor() {
     this.log = [];
+    this.activeElement = null;
   }
   createElement(tag) {
-    return new FakeElement(tag, this.log);
+    return new FakeElement(tag, this.log, this);
   }
   /** Writes since the last call; ignores nothing. */
   drain() {
