@@ -1,0 +1,8 @@
+control	expect	exit	result	verdict
+valid	ACCEPT	0	PASS	move-verdict strict ACCEPT_ALL_91 91 0
+old-print	REJECT	1	PASS	move-verdict strict REJECT 0 91
+drop-first-move	REJECT	1	PASS	move-verdict strict REJECT 90 1
+swap-two-words	REJECT	1	PASS	move-verdict strict REJECT 89 2
+generator-22	generator outside	1	PASS	invalid java.lang.IllegalArgumentException: generator outside 1..21 (no layer 0)
+wrong-htm	REJECT	1	PASS	move-verdict strict REJECT 90 1
+duplicate-display	duplicates	1	PASS	invalid java.lang.IllegalArgumentException: display 3 duplicates or is not one of the 91 boards
