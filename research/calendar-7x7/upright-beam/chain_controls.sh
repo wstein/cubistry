@@ -17,7 +17,7 @@ run() { # name expected print chain moves
   "$runner" "$p" "$c" "$m" > "$tmp/o.txt" 2> "$tmp/e.txt"; code=$?
   if [ "$code" = 0 ] && grep -qE $'^(status\tVALID_CONTINUOUS_CHAIN|chain-verdict\tACCEPT_CHAIN)' "$tmp/o.txt"; then v=ACCEPT; else v=REJECT; fi
   [ "$v" = "$want" ] || bad=1
-  printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$want" "$v" "$code" "$(cat "$tmp/e.txt" "$tmp/o.txt" | grep -E "INVALID|invalid|Error|status|verdict|REJECT" | head -1 | cut -c1-140)" >> "$out"
+  printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$want" "$v" "$code" "$(cat "$tmp/e.txt" "$tmp/o.txt" | grep -v "^rule-selfcheck" | grep -E "INVALID|invalid|Error|status|verdict|REJECT" | head -1 | cut -c1-140)" >> "$out"
 }
 run valid ACCEPT "$print" "$chain" "$moves"
 # 1. the old print (pinned print digest and old glyphs).
@@ -41,7 +41,7 @@ run wrong-source-month REJECT "$print" "$tmp/srcm.tsv" "$moves"
 awk -F'\t' 'BEGIN{OFS="\t"} /^edge\t/ {n++; if(n==1) h=$8; if(n==2) $8=h} {print}' "$chain" > "$tmp/hash.tsv"
 run substituted-source-hash REJECT "$print" "$tmp/hash.tsv" "$moves"
 # 8. the root word of the source display loses its first generator (wrong source state).
-awk -F'\t' 'BEGIN{OFS="\t"} NR>1 && $1==25 {n=split($6,w,","); s=w[2]; for(i=3;i<=n;i++) s=s","w[i]; $6=s} {print}' "$moves" > "$tmp/root.tsv"
+awk -F'\t' -v root="$(awk -F'\t' '/^source\t/ {print $2}' "$chain")" 'BEGIN{OFS="\t"} NR>1 && $1==root {n=split($6,w,","); s=w[2]; for(i=3;i<=n;i++) s=s","w[i]; $6=s} {print}' "$moves" > "$tmp/root.tsv"
 run wrong-root-word REJECT "$print" "$chain" "$tmp/root.tsv"
 # 9. the first move turns another layer (same declared metrics, physical hashes differ).
 awk -F'\t' 'BEGIN{OFS="\t"} /^move\t/ && !d {d=1; if($2%7!=0) $2=($2==1?2:1)} {print}' "$chain" > "$tmp/layer.tsv"
