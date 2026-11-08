@@ -103,7 +103,6 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
     "Picture Puzzle Playground",
     "CI Quality Cube · Workflow monitor",
     "Calendar · Deutsch / English",
-    "Live H–M–S Clock",
     "H/M/S Counter 00–59",
     "M/S Counter 00–59",
     "H/M One-Cube Counter",
