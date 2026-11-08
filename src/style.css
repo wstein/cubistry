@@ -1503,6 +1503,17 @@ body.presentation-mode .presentation-exit-btn:hover {
   }
 }
 
+/* The Timer dock has a fixed width and pins its speed control to the right edge with
+   space-between. That rule has a higher specificity (:has) than the centering of the
+   wrapped dock above, so between 601 and 1000 px, where the rows wrap, it is centered
+   here too, like the Counter dock. Up to 600 px the slider must keep its place while
+   the status text changes, which only the pinned layout guarantees. */
+@media (min-width: 601px) and (max-width: 1000px) {
+  .floating-dock:has(.timer-motion:not([hidden])) {
+    justify-content: center;
+  }
+}
+
 @media (max-width: 760px) {
   .cube-footer.floating-dock,
   .floating-dock {
