@@ -86,8 +86,8 @@ this to the accepted strict-front replay. Edge and chain words start from other
 states in real life; a word is a group element and the 294 stickers are all distinct,
 so equality of the final state from the solved cube is equality of the words
 (the same argument as `crosscheck_library.jl`). Negative controls
-(`evidence/negative-controls.tsv`): dropping the last block, adding 90 degrees to the
-first block, widening the last block each broke the digest in 20 of 20 words.
+(`evidence/negative-controls.tsv`): dropping the last block, changing the angle of the
+first block (t to t mod 3 + 1), widening or narrowing the last block each broke the digest in 20 of 20 words.
 
 ## Results (rule columns, `W` mode, optimal under the stated rule) [V]
 
@@ -152,7 +152,7 @@ Cells: min / median / mean / max / **total** of the per-word move count.
 Reductions of the total (HTM-like): root words 40642 to a 32764 (-19.4%), b 32670
 (-19.6%), cn 32670, c 30696 (-24.5%). Edge words 11066 to 8939 (-19.2%) and 8449
 (-23.6%). Orbit smoke 1604 to 1282 and 1199 (-25.2%), beam smoke 481 to 391 and 367
-(-23.7%). Old chain 75433 to 56083 (-25.6%) and 52594 (-30.3%). QTM-like totals fall
+(-23.7%). Old chain 75433 to 56083 (-25.7%) and 52594 (-30.3%). QTM-like totals fall
 by almost the same share (roots 41780 to 33900 and 31753).
 
 Words with at least one merge (cost below base, rule a / rule c): roots 91/91 and
@@ -196,10 +196,10 @@ of it. Old chain: 14224 of 47200 runs and 56.3% of the turns are in runs of 2 or
 
 ## Potential upper bound
 
-Rule c is the exact minimum per run for rewriting of the existing words without
+Rule c is the exact minimum per run (model: each same-axis run rewritten on its own, order of runs of different axes fixed, free rotations) for rewriting of the existing words without
 changing the order of moves of different axes: about **24% fewer** moves on the roots
 and edges and 30% on the old chain, in both HTM-like and QTM-like counting. No
-rewriting of these fixed words can beat it **[V as a minimum under the model]**.
+rewriting within that per-run, fixed-axis-order model can beat it **[V as a minimum under the model]**; a rewrite that also reorders or re-synthesizes across runs is outside the model.
 A solver that searches in a block alphabet could find different, shorter words;
 that is not measured here.
 
@@ -218,9 +218,14 @@ that is not measured here.
 
 ## Recommendation
 
+Owner decision recorded: rule c is the preferred direction (the middle slice counts
+as a move, realised display-only via rotation plus inverse complement; no new
+generators, no camera rubber band).
+
 1. **Yes, show the block count as a second metric column** (next to HTM and QTM)
-   and compute it with rule b for the existing alphabet (no layer 0): it is exact,
-   mechanical, needs no solver change, and lowers the printed numbers by about 19%
+   and compute it with rule b for the existing alphabet (no layer 0): it is exactly meaning-preserving and near-minimal (rule cn, the exact
+   minimum without layer 0, is slightly lower: edges 8926 vs 8939, chain 55920 vs
+   56083, roots QTM 33757 vs 33833), mechanical, needs no solver change, and lowers the printed numbers by about 19%
    (roots 447 to 360 median, old chain 134 to 99). Name it a block-turn metric and
    keep HTM unchanged for continuity.
 2. **Wide notation in the app: worth it for outer-wide blocks** (12% of blocks in
@@ -232,7 +237,7 @@ that is not measured here.
    by post-processing the existing words; 90% of the same-axis runs are single turns,
    which no block alphabet can merge. A larger alphabet multiplies the
    branching: per axis 27 block intervals times 3 angles = 81 non-rotation moves
-   against 18 now, 4.5 times as many, on top of the 673,464 macros. Whether the
+   against 18 now, 4.5 times as many, on top of the 673,464 macros [I: figure from the task statement; not found in the repo, the global-search README records 654,752 for L5]. Whether the
    search would find shorter words is **not measured** and I cannot justify a
    number from this run structure; the free post-processing gain (19% to 24%) is
    the only solid figure. If the owner wants a trial, first re-score the existing
@@ -244,7 +249,7 @@ that is not measured here.
 ```sh
 cd research/calendar-7x7/wide-blocks
 git show origin/main:data/calendar7/research/chain-2028-2076.moves.tsv > /tmp/chain.tsv   # sha256 34925dac...a88e0
-julia --startup-file=no wide_blocks.jl RUN evidence /tmp/chain.tsv   # about 2.5 min
+julia --startup-file=no wide_blocks.jl RUN evidence /tmp/chain.tsv | tee evidence/run.log   # about 2.5 min (progress lines carry timings)
 julia --startup-file=no wide_blocks.jl GEOM evidence/layer-geometry.txt
 julia --startup-file=no wide_blocks.jl WORD "7,-1,-2,-3,-4,-5,-6,-20,6"   # one word, all rules
 ```

@@ -1,4 +1,4 @@
 control	tried	rejected
 drop last block	20	20
-angle +1 on first block	20	20
-widen last block by one layer	20	20
+angle changed on first block	20	20
+widen or narrow last block by one layer	20	20
