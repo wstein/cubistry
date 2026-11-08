@@ -232,7 +232,7 @@ of the chain.
 | [tests/calendar7-slice.test.mjs](../tests/calendar7-slice.test.mjs) | Middle-slice blocks (rule c): examples, independent slab-turn and exact-minimum oracles, property tests on random words, identical digest for every stored edge both ways, counts of the research (91 roots from `tests/fixtures/calendar7-roots91.tsv`, 576 edges), negative controls, the player and the page |
 | [tests/calendar7-deferral.test.mjs](../tests/calendar7-deferral.test.mjs) | Deferred rotations and the end alignment: properties, every stored edge both ways, search of the 24 orientations, mismatch, negative controls, soft start, player phases |
 | [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
-| [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, diagonal split-label geometry and drawing |
+| [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, split-label geometry and drawing |
 | [tests/calendar7-sheet-colors.test.mjs](../tests/calendar7-sheet-colors.test.mjs) | Month sheet palette: every ink on its cell at 4.5:1 in light and dark |
 | [tests/browser/calendar7-3d.spec.mjs](../tests/browser/calendar7-3d.spec.mjs) | The 3D view in a browser: pose digest, animated step, controls, 375 px |
 
@@ -260,7 +260,7 @@ The app has two rule profiles, selected in one place: `DEFAULT_RULE_PROFILE` in
 | Glyph aliases | O = 0 and I = 1 | none: O is not 0, I is not 1 |
 | Equal after a turn | 0 (any turn), 1 2 5 8 H N S X Z (half turn) and 6 and 9 | only the digit 0 (any turn) and 6 and 9 (half turn) |
 | Weekday labels in the print | `M0N`, `FR1` | the letters `MON`, `FRI` |
-| Split labels (`23/30`, `24/31`) | upright, one line | upright, drawn diagonally |
+| Split labels (`23/30`, `24/31`) | upright, one line | upright, big first number and small second number (no slash) |
 
 The strict rule mirrors `research/calendar-7x7/upright-moves/verify_moves.jl` on
 `research/cube-display-feasibility` (`HALFMAP` and `reading`): a sticker reads as the wanted
@@ -269,18 +269,18 @@ its half-turn reading (reversed, 0 6 9 only) equals the wanted text at angle 2. 
 including a quarter-turned letter or an O for a 0, is a mismatch. A split label stays upright
 with exactly the same text and ink in both profiles.
 
-**Diagonal split labels (strict art).** The text square is 86 percent of the sticker. The first
-number sits top-left (left-aligned), the second bottom-right (right-aligned), the slash is
-centered between them, all three upright. The digit ink height is 0.35 of the text square
-(Noto Sans digit ink height 0.735 em, so the font size is 0.35 times the square divided by 0.735).
-The slash is centered, upright and short on purpose (ink height 0.24 of the text square): the numbers
-sit in the corners, so a taller slash stroke would touch them. The layout is stroke-aware: the slash is
-modeled as a stroke polygon (about 0.12 em thick) and the numbers by their digit ink (side bearings
-removed), and the unit test requires an ink gap of at least 0.02 of the texture (about 3.8 px at
-192 px; the model gives about 5 px) to both numbers for 23/30 and 24/31. A browser check of the real
-font (Chromium, 192 px) is still advisable before the switch. The pure geometry is `splitLayout` and
-`splitInkGaps` in `src/apps/calendar7/sticker-art.ts`. The Noto Sans font
-(OFL-1.1) is unchanged.
+**Split labels (strict art).** The label text stays `23/30` and `24/31` in the data and the print;
+only the drawing changes, and only in the strict profile (legacy keeps one line). The first number is
+drawn at the normal two-digit size (110 px on the 192 px texture, the same size as any other two-digit
+label), centered, and lifted so that its digit ink is centered 18 px above the sticker center. The second
+number is small (50 px), right-aligned at x = 178 with its baseline at y = 178, so it sits in the lower
+right with about 13 to 17 px of margin. No slash is drawn, and both numbers are upright (no rotation).
+The pure geometry is `splitLayout` and `splitInkGap` in `src/apps/calendar7/sticker-art.ts`; the unit test
+requires the normal size, the lift, the lower-right alignment with margins of at least 12 px and a gap of
+at least 0.0625 of the texture (12 px) between the numbers. The browser spec
+`tests/browser/calendar7-split-label.spec.mjs` draws the real Noto Sans 600 in Chromium and measures the
+real ink on the canvas: the gap is about 23 px for `23/30` and about 24 px for `24/31`, and it requires
+at least 12 px of gap and 10 px of margin. The Noto Sans font (OFL-1.1) is unchanged.
 
 **What is profile-gated.** `imageNormal` and `frontFailure` in `display.ts` take the profile as
 the last argument, and `drawSticker` in `sticker-art.ts` takes it as the fourth; the default is
