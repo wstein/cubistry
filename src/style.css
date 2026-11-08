@@ -1478,6 +1478,37 @@ aside#counter-controls.floating-hud {
   }
 }
 
+/* The bottom dock is as wide as its content, capped at 94vw (or 100vw - 16px below 600 px). Its rows used to be
+   nowrap, so on a narrow viewport or with larger text the content spilled past both edges. Let the rows wrap. */
+.cube-footer.floating-dock,
+.floating-dock,
+.floating-dock .counter-stats,
+.floating-dock .stats-summary,
+.floating-dock .move-summary {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 760px) {
+  .cube-footer.floating-dock,
+  .floating-dock {
+    gap: 6px 12px;
+    border-radius: 20px;
+  }
+
+  .floating-dock .counter-stats,
+  .floating-dock .stats-summary,
+  .floating-dock .move-summary {
+    gap: 4px 12px;
+  }
+}
+
+.floating-dock .speed-control {
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+}
+
 /* ==========================================================================
    Licenses & Open Source Compliance Document Page
    ========================================================================== */
