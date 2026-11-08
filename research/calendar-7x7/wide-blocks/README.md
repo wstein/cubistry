@@ -218,9 +218,11 @@ that is not measured here.
 
 ## Recommendation
 
-Owner decision recorded: rule c is the preferred direction (the middle slice counts
-as a move, realised display-only via rotation plus inverse complement; no new
-generators, no camera rubber band).
+Owner preference recorded: rule c is the preferred direction (the middle slice
+counts as a move). The realisation is still open and awaits the owner's answer.
+Options: (1) display-only, rotation plus inverse complement, no new generators
+(recommended, pending owner decision); (2) new slice generators in the
+alphabet; (3) a camera rubber band.
 
 1. **Yes, show the block count as a second metric column** (next to HTM and QTM)
    and compute it with rule b for the existing alphabet (no layer 0): it is exactly meaning-preserving and near-minimal (rule cn, the exact
