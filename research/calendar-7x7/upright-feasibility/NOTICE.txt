@@ -2,6 +2,6 @@ Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under C
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 
-Applies to README.md and everything in evidence/. The Julia scripts in this directory
+Applies to README.md, evidence/ and acceptance/ (the pages draw Noto Sans glyph outlines, OFL-1.1). The Julia scripts in this directory
 are program code under AGPL-3.0-or-later (SPDX header in each file). No font is
 included; glyph_geometry.jl reads Noto Sans SemiBold (SIL OFL 1.1) from a path you give.

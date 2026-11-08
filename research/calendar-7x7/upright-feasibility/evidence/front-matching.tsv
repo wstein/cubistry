@@ -1,0 +1,4460 @@
+display	year	month	row	column	want_text	want_ink	sticker	piece	sticker_text	sticker_ink	angle	turned_reading
+1	2026	1	1	1		blank	1	1		blank	3	
+1	2026	1	1	2		blank	5	2		blank	3	
+1	2026	1	1	3		blank	10	5		blank	3	
+1	2026	1	1	4		blank	69	46		blank	3	
+1	2026	1	1	5	J	month	268	204	J	month	0	
+1	2026	1	1	6	A	month	277	211	A	month	0	
+1	2026	1	1	7	N	month	293	218	N	month	0	
+1	2026	1	2	1	SUN	red	66	44	SUN	red	0	
+1	2026	1	2	2	MON	weekday	200	154	MON	weekday	0	
+1	2026	1	2	3	TUE	weekday	237	179	TUE	weekday	0	
+1	2026	1	2	4	WED	weekday	213	166	WED	weekday	0	
+1	2026	1	2	5	THU	weekday	202	156	THU	weekday	0	
+1	2026	1	2	6	FRI	weekday	55	37	FRI	weekday	0	
+1	2026	1	2	7	SAT	red	290	217	SAT	red	0	
+1	2026	1	3	1		blank	6	3		blank	0	
+1	2026	1	3	2		blank	32	20		blank	1	
+1	2026	1	3	3		blank	264	200		blank	3	
+1	2026	1	3	4		blank	265	201		blank	3	
+1	2026	1	3	5	1	dark	248	188	1	dark	0	
+1	2026	1	3	6	2	dark	127	92	2	dark	0	
+1	2026	1	3	7	3	red	125	91	3	red	0	
+1	2026	1	4	1	4	red	286	215	4	red	0	
+1	2026	1	4	2	5	dark	152	114	5	dark	0	
+1	2026	1	4	3	6	dark	175	133	6	dark	0	
+1	2026	1	4	4	7	dark	157	118	7	dark	0	
+1	2026	1	4	5	8	dark	257	195	8	dark	0	
+1	2026	1	4	6	9	dark	155	116	6	dark	2	6->9
+1	2026	1	4	7	10	red	43	28	10	red	0	
+1	2026	1	5	1	11	red	26	15	11	red	0	
+1	2026	1	5	2	12	dark	81	52	12	dark	0	
+1	2026	1	5	3	13	dark	109	76	13	dark	0	
+1	2026	1	5	4	14	dark	129	94	14	dark	0	
+1	2026	1	5	5	15	dark	122	88	15	dark	0	
+1	2026	1	5	6	16	dark	94	64	16	dark	0	
+1	2026	1	5	7	17	red	71	47	17	red	0	
+1	2026	1	6	1	18	red	210	163	18	red	0	
+1	2026	1	6	2	19	dark	84	55	19	dark	0	
+1	2026	1	6	3	20	dark	58	40	20	dark	0	
+1	2026	1	6	4	21	dark	37	23	21	dark	0	
+1	2026	1	6	5	22	dark	124	90	22	dark	0	
+1	2026	1	6	6	23	dark	96	66	23	dark	0	
+1	2026	1	6	7	24	red	271	205	24	red	0	
+1	2026	1	7	1	25	red	231	176	25	red	0	
+1	2026	1	7	2	26	dark	18	8	26	dark	0	
+1	2026	1	7	3	27	dark	163	122	27	dark	0	
+1	2026	1	7	4	28	dark	161	121	28	dark	0	
+1	2026	1	7	5	29	dark	107	74	29	dark	0	
+1	2026	1	7	6	30	dark	241	183	30	dark	0	
+1	2026	1	7	7	31	red	281	212	31	red	0	
+2	2026	2	1	1		blank	75	49		blank	3	
+2	2026	2	1	2		blank	12	6		blank	3	
+2	2026	2	1	3		blank	250	190		blank	3	
+2	2026	2	1	4		blank	69	46		blank	3	
+2	2026	2	1	5	F	month	262	198	F	month	0	
+2	2026	2	1	6	E	month	282	213	E	month	0	
+2	2026	2	1	7	B	month	2	1	B	month	0	
+2	2026	2	2	1	SUN	red	66	44	SUN	red	0	
+2	2026	2	2	2	MON	weekday	200	154	MON	weekday	0	
+2	2026	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+2	2026	2	2	4	WED	weekday	213	166	WED	weekday	0	
+2	2026	2	2	5	THU	weekday	202	156	THU	weekday	0	
+2	2026	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+2	2026	2	2	7	SAT	red	290	217	SAT	red	0	
+2	2026	2	3	1	1	red	33	21	1	red	0	
+2	2026	2	3	2	2	dark	168	127	2	dark	0	
+2	2026	2	3	3	3	dark	184	141	3	dark	0	
+2	2026	2	3	4	4	dark	158	119	4	dark	0	
+2	2026	2	3	5	5	dark	177	135	5	dark	0	
+2	2026	2	3	6	6	dark	212	165	6	dark	0	
+2	2026	2	3	7	7	red	67	45	7	red	0	
+2	2026	2	4	1	8	red	253	191	8	red	0	
+2	2026	2	4	2	9	dark	159	120	6	dark	2	6->9
+2	2026	2	4	3	10	dark	38	24	10	dark	0	
+2	2026	2	4	4	11	dark	138	101	11	dark	0	
+2	2026	2	4	5	12	dark	110	77	12	dark	0	
+2	2026	2	4	6	13	dark	91	61	13	dark	0	
+2	2026	2	4	7	14	red	153	115	14	red	0	
+2	2026	2	5	1	15	red	188	145	15	red	0	
+2	2026	2	5	2	16	dark	115	81	16	dark	0	
+2	2026	2	5	3	17	dark	165	124	17	dark	0	
+2	2026	2	5	4	18	dark	146	108	18	dark	0	
+2	2026	2	5	5	19	dark	174	132	19	dark	0	
+2	2026	2	5	6	20	dark	214	167	20	dark	0	
+2	2026	2	5	7	21	red	44	29	21	red	0	
+2	2026	2	6	1	22	red	221	171	22	red	0	
+2	2026	2	6	2	23	dark	95	65	23	dark	0	
+2	2026	2	6	3	24	dark	183	140	24	dark	0	
+2	2026	2	6	4	25	dark	143	105	25	dark	0	
+2	2026	2	6	5	26	dark	187	144	26	dark	0	
+2	2026	2	6	6	27	dark	196	151	27	dark	0	
+2	2026	2	6	7	28	red	234	177	28	red	0	
+2	2026	2	7	1		blank	62	43		blank	0	
+2	2026	2	7	2		blank	24	14		blank	1	
+2	2026	2	7	3		blank	6	3		blank	1	
+2	2026	2	7	4		blank	42	28		blank	1	
+2	2026	2	7	5		blank	10	5		blank	1	
+2	2026	2	7	6		blank	5	2		blank	1	
+2	2026	2	7	7		blank	14	7		blank	1	
+3	2026	3	1	1		blank	14	7		blank	3	
+3	2026	3	1	2		blank	12	6		blank	3	
+3	2026	3	1	3		blank	250	190		blank	3	
+3	2026	3	1	4		blank	69	46		blank	3	
+3	2026	3	1	5	M	month	284	214	M	month	0	
+3	2026	3	1	6	A	month	277	211	A	month	0	
+3	2026	3	1	7	R	month	294	218	R	month	0	
+3	2026	3	2	1	SUN	red	66	44	SUN	red	0	
+3	2026	3	2	2	MON	weekday	200	154	MON	weekday	0	
+3	2026	3	2	3	TUE	weekday	237	179	TUE	weekday	0	
+3	2026	3	2	4	WED	weekday	213	166	WED	weekday	0	
+3	2026	3	2	5	THU	weekday	202	156	THU	weekday	0	
+3	2026	3	2	6	FRI	weekday	55	37	FRI	weekday	0	
+3	2026	3	2	7	SAT	red	290	217	SAT	red	0	
+3	2026	3	3	1	1	red	33	21	1	red	0	
+3	2026	3	3	2	2	dark	168	127	2	dark	0	
+3	2026	3	3	3	3	dark	184	141	3	dark	0	
+3	2026	3	3	4	4	dark	158	119	4	dark	0	
+3	2026	3	3	5	5	dark	177	135	5	dark	0	
+3	2026	3	3	6	6	dark	212	165	6	dark	0	
+3	2026	3	3	7	7	red	67	45	7	red	0	
+3	2026	3	4	1	8	red	253	191	8	red	0	
+3	2026	3	4	2	9	dark	159	120	6	dark	2	6->9
+3	2026	3	4	3	10	dark	38	24	10	dark	0	
+3	2026	3	4	4	11	dark	138	101	11	dark	0	
+3	2026	3	4	5	12	dark	110	77	12	dark	0	
+3	2026	3	4	6	13	dark	91	61	13	dark	0	
+3	2026	3	4	7	14	red	153	115	14	red	0	
+3	2026	3	5	1	15	red	188	145	15	red	0	
+3	2026	3	5	2	16	dark	115	81	16	dark	0	
+3	2026	3	5	3	17	dark	165	124	17	dark	0	
+3	2026	3	5	4	18	dark	146	108	18	dark	0	
+3	2026	3	5	5	19	dark	174	132	19	dark	0	
+3	2026	3	5	6	20	dark	214	167	20	dark	0	
+3	2026	3	5	7	21	red	44	29	21	red	0	
+3	2026	3	6	1	22	red	221	171	22	red	0	
+3	2026	3	6	2	23	dark	95	65	23	dark	0	
+3	2026	3	6	3	24	dark	183	140	24	dark	0	
+3	2026	3	6	4	25	dark	143	105	25	dark	0	
+3	2026	3	6	5	26	dark	187	144	26	dark	0	
+3	2026	3	6	6	27	dark	196	151	27	dark	0	
+3	2026	3	6	7	28	red	234	177	28	red	0	
+3	2026	3	7	1	29	red	280	212	29	red	0	
+3	2026	3	7	2	30	dark	217	169	30	dark	0	
+3	2026	3	7	3	31	dark	227	174	31	dark	0	
+3	2026	3	7	4		blank	42	28		blank	1	
+3	2026	3	7	5		blank	10	5		blank	1	
+3	2026	3	7	6		blank	5	2		blank	1	
+3	2026	3	7	7		blank	1	1		blank	1	
+4	2026	4	1	1		blank	14	7		blank	3	
+4	2026	4	1	2		blank	12	6		blank	3	
+4	2026	4	1	3		blank	10	5		blank	3	
+4	2026	4	1	4		blank	42	28		blank	3	
+4	2026	4	1	5	A	month	251	190	A	month	0	
+4	2026	4	1	6	P	month	86	56	P	month	0	
+4	2026	4	1	7	R	month	294	218	R	month	0	
+4	2026	4	2	1	SUN	red	66	44	SUN	red	0	
+4	2026	4	2	2	MON	weekday	200	154	MON	weekday	0	
+4	2026	4	2	3	TUE	weekday	237	179	TUE	weekday	0	
+4	2026	4	2	4	WED	weekday	213	166	WED	weekday	0	
+4	2026	4	2	5	THU	weekday	202	156	THU	weekday	0	
+4	2026	4	2	6	FRI	weekday	55	37	FRI	weekday	0	
+4	2026	4	2	7	SAT	red	290	217	SAT	red	0	
+4	2026	4	3	1		blank	6	3		blank	0	
+4	2026	4	3	2		blank	32	20		blank	1	
+4	2026	4	3	3		blank	264	200		blank	3	
+4	2026	4	3	4	1	dark	40	26	1	dark	0	
+4	2026	4	3	5	2	dark	29	17	2	dark	0	
+4	2026	4	3	6	3	dark	195	150	3	dark	0	
+4	2026	4	3	7	4	red	51	35	4	red	0	
+4	2026	4	4	1	5	red	260	197	5	red	0	
+4	2026	4	4	2	6	dark	155	116	6	dark	0	
+4	2026	4	4	3	7	dark	185	142	7	dark	0	
+4	2026	4	4	4	8	dark	256	194	8	dark	0	
+4	2026	4	4	5	9	dark	175	133	6	dark	2	6->9
+4	2026	4	4	6	10	dark	57	39	10	dark	0	
+4	2026	4	4	7	11	red	141	104	11	red	0	
+4	2026	4	5	1	12	red	113	80	12	red	0	
+4	2026	4	5	2	13	dark	93	63	13	dark	0	
+4	2026	4	5	3	14	dark	117	83	14	dark	0	
+4	2026	4	5	4	15	dark	137	100	15	dark	0	
+4	2026	4	5	5	16	dark	130	95	16	dark	0	
+4	2026	4	5	6	17	dark	100	69	17	dark	0	
+4	2026	4	5	7	18	red	106	74	18	red	0	
+4	2026	4	6	1	19	red	216	169	19	red	0	
+4	2026	4	6	2	20	dark	19	9	20	dark	0	
+4	2026	4	6	3	21	dark	20	10	21	dark	0	
+4	2026	4	6	4	22	dark	21	11	22	dark	0	
+4	2026	4	6	5	23	dark	164	123	23	dark	0	
+4	2026	4	6	6	24	dark	99	68	24	dark	0	
+4	2026	4	6	7	25	red	222	171	25	red	0	
+4	2026	4	7	1	26	red	279	212	26	red	0	
+4	2026	4	7	2	27	dark	53	36	27	dark	0	
+4	2026	4	7	3	28	dark	169	128	28	dark	0	
+4	2026	4	7	4	29	dark	225	173	29	dark	0	
+4	2026	4	7	5	30	dark	34	21	30	dark	0	
+4	2026	4	7	6		blank	5	2		blank	1	
+4	2026	4	7	7		blank	1	1		blank	1	
+5	2026	5	1	1		blank	1	1		blank	3	
+5	2026	5	1	2		blank	5	2		blank	3	
+5	2026	5	1	3		blank	10	5		blank	3	
+5	2026	5	1	4		blank	42	28		blank	3	
+5	2026	5	1	5	M	month	284	214	M	month	0	
+5	2026	5	1	6	A	month	277	211	A	month	0	
+5	2026	5	1	7	Y	month	77	49	Y	month	0	
+5	2026	5	2	1	SUN	red	66	44	SUN	red	0	
+5	2026	5	2	2	MON	weekday	200	154	MON	weekday	0	
+5	2026	5	2	3	TUE	weekday	237	179	TUE	weekday	0	
+5	2026	5	2	4	WED	weekday	213	166	WED	weekday	0	
+5	2026	5	2	5	THU	weekday	202	156	THU	weekday	0	
+5	2026	5	2	6	FRI	weekday	55	37	FRI	weekday	0	
+5	2026	5	2	7	SAT	red	290	217	SAT	red	0	
+5	2026	5	3	1		blank	6	3		blank	0	
+5	2026	5	3	2		blank	32	20		blank	1	
+5	2026	5	3	3		blank	266	202		blank	3	
+5	2026	5	3	4		blank	265	201		blank	3	
+5	2026	5	3	5		blank	264	200		blank	2	
+5	2026	5	3	6	1	dark	22	12	1	dark	0	
+5	2026	5	3	7	2	red	170	128	2	red	0	
+5	2026	5	4	1	3	red	252	191	3	red	0	
+5	2026	5	4	2	4	dark	151	113	4	dark	0	
+5	2026	5	4	3	5	dark	166	125	5	dark	0	
+5	2026	5	4	4	6	dark	148	110	6	dark	0	
+5	2026	5	4	5	7	dark	247	187	7	dark	0	
+5	2026	5	4	6	8	dark	101	70	8	dark	0	
+5	2026	5	4	7	9	red	287	215	6	red	2	6->9
+5	2026	5	5	1	10	red	228	174	10	red	0	
+5	2026	5	5	2	11	dark	56	38	11	dark	0	
+5	2026	5	5	3	12	dark	49	33	12	dark	0	
+5	2026	5	5	4	13	dark	120	86	13	dark	0	
+5	2026	5	5	5	14	dark	118	84	14	dark	0	
+5	2026	5	5	6	15	dark	89	59	15	dark	0	
+5	2026	5	5	7	16	red	68	45	16	red	0	
+5	2026	5	6	1	17	red	198	152	17	red	0	
+5	2026	5	6	2	18	dark	80	51	18	dark	0	
+5	2026	5	6	3	19	dark	131	96	19	dark	0	
+5	2026	5	6	4	20	dark	238	180	20	dark	0	
+5	2026	5	6	5	21	dark	28	16	21	dark	0	
+5	2026	5	6	6	22	dark	276	210	22	dark	0	
+5	2026	5	6	7	23	red	104	73	23	red	0	
+5	2026	5	7	1	24/31	red	219	170	24/31	red	0	
+5	2026	5	7	2	25	dark	98	67	25	dark	0	
+5	2026	5	7	3	26	dark	132	97	26	dark	0	
+5	2026	5	7	4	27	dark	154	115	27	dark	0	
+5	2026	5	7	5	28	dark	162	122	28	dark	0	
+5	2026	5	7	6	29	dark	235	177	29	dark	0	
+5	2026	5	7	7	30	red	64	43	30	red	0	
+6	2026	6	1	1		blank	14	7		blank	3	
+6	2026	6	1	2		blank	17	8		blank	3	
+6	2026	6	1	3		blank	250	190		blank	3	
+6	2026	6	1	4		blank	69	46		blank	3	
+6	2026	6	1	5	J	month	268	204	J	month	0	
+6	2026	6	1	6	U	month	78	50	U	month	0	
+6	2026	6	1	7	N	month	293	218	N	month	0	
+6	2026	6	2	1	SUN	red	66	44	SUN	red	0	
+6	2026	6	2	2	MON	weekday	200	154	MON	weekday	0	
+6	2026	6	2	3	TUE	weekday	237	179	TUE	weekday	0	
+6	2026	6	2	4	WED	weekday	213	166	WED	weekday	0	
+6	2026	6	2	5	THU	weekday	202	156	THU	weekday	0	
+6	2026	6	2	6	FRI	weekday	55	37	FRI	weekday	0	
+6	2026	6	2	7	SAT	red	290	217	SAT	red	0	
+6	2026	6	3	1		blank	6	3		blank	0	
+6	2026	6	3	2	1	dark	46	30	1	dark	0	
+6	2026	6	3	3	2	dark	178	136	2	dark	0	
+6	2026	6	3	4	3	dark	150	112	3	dark	0	
+6	2026	6	3	5	4	dark	246	186	4	dark	0	
+6	2026	6	3	6	5	dark	206	160	5	dark	0	
+6	2026	6	3	7	6	red	72	47	6	red	0	
+6	2026	6	4	1	7	red	9	4	7	red	0	
+6	2026	6	4	2	8	dark	204	158	8	dark	0	
+6	2026	6	4	3	9	dark	176	134	6	dark	2	6->9
+6	2026	6	4	4	10	dark	39	25	10	dark	0	
+6	2026	6	4	5	11	dark	30	18	11	dark	0	
+6	2026	6	4	6	12	dark	82	53	12	dark	0	
+6	2026	6	4	7	13	red	36	22	13	red	0	
+6	2026	6	5	1	14	red	182	139	14	red	0	
+6	2026	6	5	2	15	dark	112	79	15	dark	0	
+6	2026	6	5	3	16	dark	128	93	16	dark	0	
+6	2026	6	5	4	17	dark	145	107	17	dark	0	
+6	2026	6	5	5	18	dark	173	131	18	dark	0	
+6	2026	6	5	6	19	dark	123	89	19	dark	0	
+6	2026	6	5	7	20	red	27	15	20	red	0	
+6	2026	6	6	1	21	red	97	67	21	red	0	
+6	2026	6	6	2	22	dark	87	57	22	dark	0	
+6	2026	6	6	3	23	dark	180	138	23	dark	0	
+6	2026	6	6	4	24	dark	140	103	24	dark	0	
+6	2026	6	6	5	25	dark	179	137	25	dark	0	
+6	2026	6	6	6	26	dark	192	147	26	dark	0	
+6	2026	6	6	7	27	red	13	6	27	red	0	
+6	2026	6	7	1	28	red	232	176	28	red	0	
+6	2026	6	7	2	29	dark	191	146	29	dark	0	
+6	2026	6	7	3	30	dark	189	145	30	dark	0	
+6	2026	6	7	4		blank	42	28		blank	1	
+6	2026	6	7	5		blank	10	5		blank	1	
+6	2026	6	7	6		blank	5	2		blank	1	
+6	2026	6	7	7		blank	1	1		blank	1	
+7	2026	7	1	1		blank	14	7		blank	3	
+7	2026	7	1	2		blank	5	2		blank	3	
+7	2026	7	1	3		blank	10	5		blank	3	
+7	2026	7	1	4		blank	42	28		blank	3	
+7	2026	7	1	5	J	month	268	204	J	month	0	
+7	2026	7	1	6	U	month	78	50	U	month	0	
+7	2026	7	1	7	L	month	292	218	L	month	0	
+7	2026	7	2	1	SUN	red	66	44	SUN	red	0	
+7	2026	7	2	2	MON	weekday	200	154	MON	weekday	0	
+7	2026	7	2	3	TUE	weekday	237	179	TUE	weekday	0	
+7	2026	7	2	4	WED	weekday	213	166	WED	weekday	0	
+7	2026	7	2	5	THU	weekday	202	156	THU	weekday	0	
+7	2026	7	2	6	FRI	weekday	55	37	FRI	weekday	0	
+7	2026	7	2	7	SAT	red	290	217	SAT	red	0	
+7	2026	7	3	1		blank	6	3		blank	0	
+7	2026	7	3	2		blank	32	20		blank	1	
+7	2026	7	3	3		blank	264	200		blank	3	
+7	2026	7	3	4	1	dark	40	26	1	dark	0	
+7	2026	7	3	5	2	dark	29	17	2	dark	0	
+7	2026	7	3	6	3	dark	195	150	3	dark	0	
+7	2026	7	3	7	4	red	51	35	4	red	0	
+7	2026	7	4	1	5	red	260	197	5	red	0	
+7	2026	7	4	2	6	dark	155	116	6	dark	0	
+7	2026	7	4	3	7	dark	185	142	7	dark	0	
+7	2026	7	4	4	8	dark	256	194	8	dark	0	
+7	2026	7	4	5	9	dark	175	133	6	dark	2	6->9
+7	2026	7	4	6	10	dark	57	39	10	dark	0	
+7	2026	7	4	7	11	red	141	104	11	red	0	
+7	2026	7	5	1	12	red	113	80	12	red	0	
+7	2026	7	5	2	13	dark	93	63	13	dark	0	
+7	2026	7	5	3	14	dark	117	83	14	dark	0	
+7	2026	7	5	4	15	dark	137	100	15	dark	0	
+7	2026	7	5	5	16	dark	130	95	16	dark	0	
+7	2026	7	5	6	17	dark	100	69	17	dark	0	
+7	2026	7	5	7	18	red	106	74	18	red	0	
+7	2026	7	6	1	19	red	216	169	19	red	0	
+7	2026	7	6	2	20	dark	19	9	20	dark	0	
+7	2026	7	6	3	21	dark	20	10	21	dark	0	
+7	2026	7	6	4	22	dark	21	11	22	dark	0	
+7	2026	7	6	5	23	dark	164	123	23	dark	0	
+7	2026	7	6	6	24	dark	99	68	24	dark	0	
+7	2026	7	6	7	25	red	222	171	25	red	0	
+7	2026	7	7	1	26	red	279	212	26	red	0	
+7	2026	7	7	2	27	dark	53	36	27	dark	0	
+7	2026	7	7	3	28	dark	169	128	28	dark	0	
+7	2026	7	7	4	29	dark	225	173	29	dark	0	
+7	2026	7	7	5	30	dark	34	21	30	dark	0	
+7	2026	7	7	6	31	dark	270	205	31	dark	0	
+7	2026	7	7	7		blank	1	1		blank	1	
+8	2026	8	1	1		blank	14	7		blank	3	
+8	2026	8	1	2		blank	12	6		blank	3	
+8	2026	8	1	3		blank	285	214		blank	3	
+8	2026	8	1	4		blank	42	28		blank	3	
+8	2026	8	1	5	A	month	251	190	A	month	0	
+8	2026	8	1	6	U	month	78	50	U	month	0	
+8	2026	8	1	7	G	month	3	1	G	month	0	
+8	2026	8	2	1	SUN	red	66	44	SUN	red	0	
+8	2026	8	2	2	MON	weekday	200	154	MON	weekday	0	
+8	2026	8	2	3	TUE	weekday	237	179	TUE	weekday	0	
+8	2026	8	2	4	WED	weekday	213	166	WED	weekday	0	
+8	2026	8	2	5	THU	weekday	202	156	THU	weekday	0	
+8	2026	8	2	6	FRI	weekday	55	37	FRI	weekday	0	
+8	2026	8	2	7	SAT	red	290	217	SAT	red	0	
+8	2026	8	3	1		blank	11	5		blank	0	
+8	2026	8	3	2		blank	32	20		blank	1	
+8	2026	8	3	3		blank	266	202		blank	3	
+8	2026	8	3	4		blank	265	201		blank	3	
+8	2026	8	3	5		blank	264	200		blank	2	
+8	2026	8	3	6		blank	249	189		blank	2	
+8	2026	8	3	7	1	red	45	29	1	red	0	
+8	2026	8	4	1	2	red	160	121	2	red	0	
+8	2026	8	4	2	3	dark	144	106	3	dark	0	
+8	2026	8	4	3	4	dark	156	117	4	dark	0	
+8	2026	8	4	4	5	dark	147	109	5	dark	0	
+8	2026	8	4	5	6	dark	176	134	6	dark	0	
+8	2026	8	4	6	7	dark	203	157	7	dark	0	
+8	2026	8	4	7	8	red	8	4	8	red	0	
+8	2026	8	5	1	9	red	72	47	6	red	2	6->9
+8	2026	8	5	2	10	dark	50	34	10	dark	0	
+8	2026	8	5	3	11	dark	47	31	11	dark	0	
+8	2026	8	5	4	12	dark	119	85	12	dark	0	
+8	2026	8	5	5	13	dark	111	78	13	dark	0	
+8	2026	8	5	6	14	dark	83	54	14	dark	0	
+8	2026	8	5	7	15	red	52	35	15	red	0	
+8	2026	8	6	1	16	red	190	146	16	red	0	
+8	2026	8	6	2	17	dark	59	41	17	dark	0	
+8	2026	8	6	3	18	dark	116	82	18	dark	0	
+8	2026	8	6	4	19	dark	92	62	19	dark	0	
+8	2026	8	6	5	20	dark	90	60	20	dark	0	
+8	2026	8	6	6	21	dark	199	153	21	dark	0	
+8	2026	8	6	7	22	red	209	163	22	red	0	
+8	2026	8	7	1	23/30	red	218	170	23/30	red	0	
+8	2026	8	7	2	24/31	dark	4	2	24/31	dark	0	
+8	2026	8	7	3	25	dark	126	91	25	dark	0	
+8	2026	8	7	4	26	dark	35	22	26	dark	0	
+8	2026	8	7	5	27	dark	7	3	27	dark	0	
+8	2026	8	7	6	28	dark	230	175	28	dark	0	
+8	2026	8	7	7	29	red	233	176	29	red	0	
+9	2026	9	1	1		blank	14	7		blank	3	
+9	2026	9	1	2		blank	12	6		blank	3	
+9	2026	9	1	3		blank	250	190		blank	3	
+9	2026	9	1	4		blank	42	28		blank	3	
+9	2026	9	1	5	S	month	289	216	S	month	0	
+9	2026	9	1	6	E	month	282	213	E	month	0	
+9	2026	9	1	7	P	month	76	49	P	month	0	
+9	2026	9	2	1	SUN	red	66	44	SUN	red	0	
+9	2026	9	2	2	MON	weekday	200	154	MON	weekday	0	
+9	2026	9	2	3	TUE	weekday	237	179	TUE	weekday	0	
+9	2026	9	2	4	WED	weekday	213	166	WED	weekday	0	
+9	2026	9	2	5	THU	weekday	202	156	THU	weekday	0	
+9	2026	9	2	6	FRI	weekday	55	37	FRI	weekday	0	
+9	2026	9	2	7	SAT	red	290	217	SAT	red	0	
+9	2026	9	3	1		blank	6	3		blank	0	
+9	2026	9	3	2		blank	32	20		blank	1	
+9	2026	9	3	3	1	dark	31	19	1	dark	0	
+9	2026	9	3	4	2	dark	149	111	2	dark	0	
+9	2026	9	3	5	3	dark	186	143	3	dark	0	
+9	2026	9	3	6	4	dark	201	155	4	dark	0	
+9	2026	9	3	7	5	red	223	172	5	red	0	
+9	2026	9	4	1	6	red	287	215	6	red	0	
+9	2026	9	4	2	7	dark	194	149	7	dark	0	
+9	2026	9	4	3	8	dark	255	193	8	dark	0	
+9	2026	9	4	4	9	dark	148	110	6	dark	2	6->9
+9	2026	9	4	5	10	dark	48	32	10	dark	0	
+9	2026	9	4	6	11	dark	41	27	11	dark	0	
+9	2026	9	4	7	12	red	142	104	12	red	0	
+9	2026	9	5	1	13	red	133	97	13	red	0	
+9	2026	9	5	2	14	dark	102	71	14	dark	0	
+9	2026	9	5	3	15	dark	121	87	15	dark	0	
+9	2026	9	5	4	16	dark	139	102	16	dark	0	
+9	2026	9	5	5	17	dark	167	126	17	dark	0	
+9	2026	9	5	6	18	dark	108	75	18	dark	0	
+9	2026	9	5	7	19	red	114	80	19	red	0	
+9	2026	9	6	1	20	red	105	73	20	red	0	
+9	2026	9	6	2	21	dark	88	58	21	dark	0	
+9	2026	9	6	3	22	dark	171	129	22	dark	0	
+9	2026	9	6	4	23	dark	136	99	23	dark	0	
+9	2026	9	6	5	24	dark	172	130	24	dark	0	
+9	2026	9	6	6	25	dark	103	72	25	dark	0	
+9	2026	9	6	7	26	red	242	183	26	red	0	
+9	2026	9	7	1	27	red	63	43	27	red	0	
+9	2026	9	7	2	28	dark	229	175	28	dark	0	
+9	2026	9	7	3	29	dark	181	139	29	dark	0	
+9	2026	9	7	4	30	dark	259	197	30	dark	0	
+9	2026	9	7	5		blank	10	5		blank	1	
+9	2026	9	7	6		blank	5	2		blank	1	
+9	2026	9	7	7		blank	1	1		blank	1	
+10	2026	10	1	1		blank	14	7		blank	3	
+10	2026	10	1	2	O	month	85	56	O	month	0	
+10	2026	10	1	3	C	month	269	204	C	month	0	
+10	2026	10	1	4	T	month	134	98	T	month	0	
+10	2026	10	1	5		blank	11	5		blank	3	
+10	2026	10	1	6		blank	24	14		blank	3	
+10	2026	10	1	7		blank	1	1		blank	2	
+10	2026	10	2	1	SUN	red	66	44	SUN	red	0	
+10	2026	10	2	2	MON	weekday	200	154	MON	weekday	0	
+10	2026	10	2	3	TUE	weekday	237	179	TUE	weekday	0	
+10	2026	10	2	4	WED	weekday	213	166	WED	weekday	0	
+10	2026	10	2	5	THU	weekday	202	156	THU	weekday	0	
+10	2026	10	2	6	FRI	weekday	55	37	FRI	weekday	0	
+10	2026	10	2	7	SAT	red	290	217	SAT	red	0	
+10	2026	10	3	1		blank	6	3		blank	0	
+10	2026	10	3	2		blank	32	20		blank	1	
+10	2026	10	3	3		blank	264	200		blank	3	
+10	2026	10	3	4		blank	265	201		blank	3	
+10	2026	10	3	5	1	dark	248	188	1	dark	0	
+10	2026	10	3	6	2	dark	127	92	2	dark	0	
+10	2026	10	3	7	3	red	125	91	3	red	0	
+10	2026	10	4	1	4	red	286	215	4	red	0	
+10	2026	10	4	2	5	dark	152	114	5	dark	0	
+10	2026	10	4	3	6	dark	175	133	6	dark	0	
+10	2026	10	4	4	7	dark	157	118	7	dark	0	
+10	2026	10	4	5	8	dark	257	195	8	dark	0	
+10	2026	10	4	6	9	dark	155	116	6	dark	2	6->9
+10	2026	10	4	7	10	red	43	28	10	red	0	
+10	2026	10	5	1	11	red	26	15	11	red	0	
+10	2026	10	5	2	12	dark	81	52	12	dark	0	
+10	2026	10	5	3	13	dark	109	76	13	dark	0	
+10	2026	10	5	4	14	dark	129	94	14	dark	0	
+10	2026	10	5	5	15	dark	122	88	15	dark	0	
+10	2026	10	5	6	16	dark	94	64	16	dark	0	
+10	2026	10	5	7	17	red	71	47	17	red	0	
+10	2026	10	6	1	18	red	210	163	18	red	0	
+10	2026	10	6	2	19	dark	84	55	19	dark	0	
+10	2026	10	6	3	20	dark	58	40	20	dark	0	
+10	2026	10	6	4	21	dark	37	23	21	dark	0	
+10	2026	10	6	5	22	dark	124	90	22	dark	0	
+10	2026	10	6	6	23	dark	96	66	23	dark	0	
+10	2026	10	6	7	24	red	271	205	24	red	0	
+10	2026	10	7	1	25	red	231	176	25	red	0	
+10	2026	10	7	2	26	dark	18	8	26	dark	0	
+10	2026	10	7	3	27	dark	163	122	27	dark	0	
+10	2026	10	7	4	28	dark	161	121	28	dark	0	
+10	2026	10	7	5	29	dark	107	74	29	dark	0	
+10	2026	10	7	6	30	dark	241	183	30	dark	0	
+10	2026	10	7	7	31	red	281	212	31	red	0	
+11	2026	11	1	1		blank	62	43		blank	3	
+11	2026	11	1	2	N	month	74	48	N	month	0	
+11	2026	11	1	3	O	month	244	184	O	month	0	
+11	2026	11	1	4	V	month	135	98	V	month	0	
+11	2026	11	1	5		blank	6	3		blank	3	
+11	2026	11	1	6		blank	24	14		blank	3	
+11	2026	11	1	7		blank	14	7		blank	2	
+11	2026	11	2	1	SUN	red	66	44	SUN	red	0	
+11	2026	11	2	2	MON	weekday	200	154	MON	weekday	0	
+11	2026	11	2	3	TUE	weekday	237	179	TUE	weekday	0	
+11	2026	11	2	4	WED	weekday	213	166	WED	weekday	0	
+11	2026	11	2	5	THU	weekday	202	156	THU	weekday	0	
+11	2026	11	2	6	FRI	weekday	55	37	FRI	weekday	0	
+11	2026	11	2	7	SAT	red	290	217	SAT	red	0	
+11	2026	11	3	1	1	red	33	21	1	red	0	
+11	2026	11	3	2	2	dark	168	127	2	dark	0	
+11	2026	11	3	3	3	dark	184	141	3	dark	0	
+11	2026	11	3	4	4	dark	158	119	4	dark	0	
+11	2026	11	3	5	5	dark	177	135	5	dark	0	
+11	2026	11	3	6	6	dark	212	165	6	dark	0	
+11	2026	11	3	7	7	red	67	45	7	red	0	
+11	2026	11	4	1	8	red	253	191	8	red	0	
+11	2026	11	4	2	9	dark	159	120	6	dark	2	6->9
+11	2026	11	4	3	10	dark	38	24	10	dark	0	
+11	2026	11	4	4	11	dark	138	101	11	dark	0	
+11	2026	11	4	5	12	dark	110	77	12	dark	0	
+11	2026	11	4	6	13	dark	91	61	13	dark	0	
+11	2026	11	4	7	14	red	153	115	14	red	0	
+11	2026	11	5	1	15	red	188	145	15	red	0	
+11	2026	11	5	2	16	dark	115	81	16	dark	0	
+11	2026	11	5	3	17	dark	165	124	17	dark	0	
+11	2026	11	5	4	18	dark	146	108	18	dark	0	
+11	2026	11	5	5	19	dark	174	132	19	dark	0	
+11	2026	11	5	6	20	dark	214	167	20	dark	0	
+11	2026	11	5	7	21	red	44	29	21	red	0	
+11	2026	11	6	1	22	red	221	171	22	red	0	
+11	2026	11	6	2	23	dark	95	65	23	dark	0	
+11	2026	11	6	3	24	dark	183	140	24	dark	0	
+11	2026	11	6	4	25	dark	143	105	25	dark	0	
+11	2026	11	6	5	26	dark	187	144	26	dark	0	
+11	2026	11	6	6	27	dark	196	151	27	dark	0	
+11	2026	11	6	7	28	red	234	177	28	red	0	
+11	2026	11	7	1	29	red	280	212	29	red	0	
+11	2026	11	7	2	30	dark	217	169	30	dark	0	
+11	2026	11	7	3		blank	224	172		blank	1	
+11	2026	11	7	4		blank	42	28		blank	1	
+11	2026	11	7	5		blank	10	5		blank	1	
+11	2026	11	7	6		blank	5	2		blank	1	
+11	2026	11	7	7		blank	1	1		blank	1	
+12	2026	12	1	1		blank	75	49		blank	3	
+12	2026	12	1	2	D	month	25	14	D	month	0	
+12	2026	12	1	3	E	month	261	198	E	month	0	
+12	2026	12	1	4	C	month	70	46	C	month	0	
+12	2026	12	1	5		blank	11	5		blank	3	
+12	2026	12	1	6		blank	73	48		blank	3	
+12	2026	12	1	7		blank	14	7		blank	2	
+12	2026	12	2	1	SUN	red	66	44	SUN	red	0	
+12	2026	12	2	2	MON	weekday	200	154	MON	weekday	0	
+12	2026	12	2	3	TUE	weekday	237	179	TUE	weekday	0	
+12	2026	12	2	4	WED	weekday	213	166	WED	weekday	0	
+12	2026	12	2	5	THU	weekday	202	156	THU	weekday	0	
+12	2026	12	2	6	FRI	weekday	55	37	FRI	weekday	0	
+12	2026	12	2	7	SAT	red	290	217	SAT	red	0	
+12	2026	12	3	1		blank	6	3		blank	0	
+12	2026	12	3	2		blank	32	20		blank	1	
+12	2026	12	3	3	1	dark	31	19	1	dark	0	
+12	2026	12	3	4	2	dark	149	111	2	dark	0	
+12	2026	12	3	5	3	dark	186	143	3	dark	0	
+12	2026	12	3	6	4	dark	201	155	4	dark	0	
+12	2026	12	3	7	5	red	223	172	5	red	0	
+12	2026	12	4	1	6	red	287	215	6	red	0	
+12	2026	12	4	2	7	dark	194	149	7	dark	0	
+12	2026	12	4	3	8	dark	255	193	8	dark	0	
+12	2026	12	4	4	9	dark	148	110	6	dark	2	6->9
+12	2026	12	4	5	10	dark	48	32	10	dark	0	
+12	2026	12	4	6	11	dark	41	27	11	dark	0	
+12	2026	12	4	7	12	red	142	104	12	red	0	
+12	2026	12	5	1	13	red	133	97	13	red	0	
+12	2026	12	5	2	14	dark	102	71	14	dark	0	
+12	2026	12	5	3	15	dark	121	87	15	dark	0	
+12	2026	12	5	4	16	dark	139	102	16	dark	0	
+12	2026	12	5	5	17	dark	167	126	17	dark	0	
+12	2026	12	5	6	18	dark	108	75	18	dark	0	
+12	2026	12	5	7	19	red	114	80	19	red	0	
+12	2026	12	6	1	20	red	105	73	20	red	0	
+12	2026	12	6	2	21	dark	88	58	21	dark	0	
+12	2026	12	6	3	22	dark	171	129	22	dark	0	
+12	2026	12	6	4	23	dark	136	99	23	dark	0	
+12	2026	12	6	5	24	dark	172	130	24	dark	0	
+12	2026	12	6	6	25	dark	103	72	25	dark	0	
+12	2026	12	6	7	26	red	242	183	26	red	0	
+12	2026	12	7	1	27	red	63	43	27	red	0	
+12	2026	12	7	2	28	dark	229	175	28	dark	0	
+12	2026	12	7	3	29	dark	181	139	29	dark	0	
+12	2026	12	7	4	30	dark	259	197	30	dark	0	
+12	2026	12	7	5	31	dark	288	216	31	dark	0	
+12	2026	12	7	6		blank	5	2		blank	1	
+12	2026	12	7	7		blank	1	1		blank	1	
+13	2027	1	1	1		blank	1	1		blank	3	
+13	2027	1	1	2		blank	5	2		blank	3	
+13	2027	1	1	3		blank	10	5		blank	3	
+13	2027	1	1	4		blank	42	28		blank	3	
+13	2027	1	1	5	J	month	268	204	J	month	0	
+13	2027	1	1	6	A	month	277	211	A	month	0	
+13	2027	1	1	7	N	month	293	218	N	month	0	
+13	2027	1	2	1	SUN	red	66	44	SUN	red	0	
+13	2027	1	2	2	MON	weekday	200	154	MON	weekday	0	
+13	2027	1	2	3	TUE	weekday	237	179	TUE	weekday	0	
+13	2027	1	2	4	WED	weekday	213	166	WED	weekday	0	
+13	2027	1	2	5	THU	weekday	202	156	THU	weekday	0	
+13	2027	1	2	6	FRI	weekday	55	37	FRI	weekday	0	
+13	2027	1	2	7	SAT	red	290	217	SAT	red	0	
+13	2027	1	3	1		blank	6	3		blank	0	
+13	2027	1	3	2		blank	32	20		blank	1	
+13	2027	1	3	3		blank	266	202		blank	3	
+13	2027	1	3	4		blank	265	201		blank	3	
+13	2027	1	3	5		blank	264	200		blank	2	
+13	2027	1	3	6	1	dark	22	12	1	dark	0	
+13	2027	1	3	7	2	red	170	128	2	red	0	
+13	2027	1	4	1	3	red	252	191	3	red	0	
+13	2027	1	4	2	4	dark	151	113	4	dark	0	
+13	2027	1	4	3	5	dark	166	125	5	dark	0	
+13	2027	1	4	4	6	dark	148	110	6	dark	0	
+13	2027	1	4	5	7	dark	247	187	7	dark	0	
+13	2027	1	4	6	8	dark	101	70	8	dark	0	
+13	2027	1	4	7	9	red	287	215	6	red	2	6->9
+13	2027	1	5	1	10	red	228	174	10	red	0	
+13	2027	1	5	2	11	dark	56	38	11	dark	0	
+13	2027	1	5	3	12	dark	49	33	12	dark	0	
+13	2027	1	5	4	13	dark	120	86	13	dark	0	
+13	2027	1	5	5	14	dark	118	84	14	dark	0	
+13	2027	1	5	6	15	dark	89	59	15	dark	0	
+13	2027	1	5	7	16	red	68	45	16	red	0	
+13	2027	1	6	1	17	red	198	152	17	red	0	
+13	2027	1	6	2	18	dark	80	51	18	dark	0	
+13	2027	1	6	3	19	dark	131	96	19	dark	0	
+13	2027	1	6	4	20	dark	238	180	20	dark	0	
+13	2027	1	6	5	21	dark	28	16	21	dark	0	
+13	2027	1	6	6	22	dark	276	210	22	dark	0	
+13	2027	1	6	7	23	red	104	73	23	red	0	
+13	2027	1	7	1	24/31	red	219	170	24/31	red	0	
+13	2027	1	7	2	25	dark	98	67	25	dark	0	
+13	2027	1	7	3	26	dark	132	97	26	dark	0	
+13	2027	1	7	4	27	dark	154	115	27	dark	0	
+13	2027	1	7	5	28	dark	162	122	28	dark	0	
+13	2027	1	7	6	29	dark	235	177	29	dark	0	
+13	2027	1	7	7	30	red	64	43	30	red	0	
+14	2027	2	1	1		blank	62	43		blank	3	
+14	2027	2	1	2		blank	17	8		blank	3	
+14	2027	2	1	3		blank	250	190		blank	3	
+14	2027	2	1	4		blank	69	46		blank	3	
+14	2027	2	1	5	F	month	262	198	F	month	0	
+14	2027	2	1	6	E	month	282	213	E	month	0	
+14	2027	2	1	7	B	month	2	1	B	month	0	
+14	2027	2	2	1	SUN	red	66	44	SUN	red	0	
+14	2027	2	2	2	MON	weekday	200	154	MON	weekday	0	
+14	2027	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+14	2027	2	2	4	WED	weekday	213	166	WED	weekday	0	
+14	2027	2	2	5	THU	weekday	202	156	THU	weekday	0	
+14	2027	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+14	2027	2	2	7	SAT	red	290	217	SAT	red	0	
+14	2027	2	3	1		blank	6	3		blank	0	
+14	2027	2	3	2	1	dark	46	30	1	dark	0	
+14	2027	2	3	3	2	dark	178	136	2	dark	0	
+14	2027	2	3	4	3	dark	150	112	3	dark	0	
+14	2027	2	3	5	4	dark	246	186	4	dark	0	
+14	2027	2	3	6	5	dark	206	160	5	dark	0	
+14	2027	2	3	7	6	red	72	47	6	red	0	
+14	2027	2	4	1	7	red	9	4	7	red	0	
+14	2027	2	4	2	8	dark	204	158	8	dark	0	
+14	2027	2	4	3	9	dark	176	134	6	dark	2	6->9
+14	2027	2	4	4	10	dark	39	25	10	dark	0	
+14	2027	2	4	5	11	dark	30	18	11	dark	0	
+14	2027	2	4	6	12	dark	82	53	12	dark	0	
+14	2027	2	4	7	13	red	36	22	13	red	0	
+14	2027	2	5	1	14	red	182	139	14	red	0	
+14	2027	2	5	2	15	dark	112	79	15	dark	0	
+14	2027	2	5	3	16	dark	128	93	16	dark	0	
+14	2027	2	5	4	17	dark	145	107	17	dark	0	
+14	2027	2	5	5	18	dark	173	131	18	dark	0	
+14	2027	2	5	6	19	dark	123	89	19	dark	0	
+14	2027	2	5	7	20	red	27	15	20	red	0	
+14	2027	2	6	1	21	red	97	67	21	red	0	
+14	2027	2	6	2	22	dark	87	57	22	dark	0	
+14	2027	2	6	3	23	dark	180	138	23	dark	0	
+14	2027	2	6	4	24	dark	140	103	24	dark	0	
+14	2027	2	6	5	25	dark	179	137	25	dark	0	
+14	2027	2	6	6	26	dark	192	147	26	dark	0	
+14	2027	2	6	7	27	red	13	6	27	red	0	
+14	2027	2	7	1	28	red	232	176	28	red	0	
+14	2027	2	7	2		blank	24	14		blank	1	
+14	2027	2	7	3		blank	224	172		blank	1	
+14	2027	2	7	4		blank	42	28		blank	1	
+14	2027	2	7	5		blank	10	5		blank	1	
+14	2027	2	7	6		blank	5	2		blank	1	
+14	2027	2	7	7		blank	14	7		blank	1	
+15	2027	3	1	1		blank	14	7		blank	3	
+15	2027	3	1	2		blank	17	8		blank	3	
+15	2027	3	1	3		blank	250	190		blank	3	
+15	2027	3	1	4		blank	42	28		blank	3	
+15	2027	3	1	5	M	month	284	214	M	month	0	
+15	2027	3	1	6	A	month	277	211	A	month	0	
+15	2027	3	1	7	R	month	294	218	R	month	0	
+15	2027	3	2	1	SUN	red	66	44	SUN	red	0	
+15	2027	3	2	2	MON	weekday	200	154	MON	weekday	0	
+15	2027	3	2	3	TUE	weekday	237	179	TUE	weekday	0	
+15	2027	3	2	4	WED	weekday	213	166	WED	weekday	0	
+15	2027	3	2	5	THU	weekday	202	156	THU	weekday	0	
+15	2027	3	2	6	FRI	weekday	55	37	FRI	weekday	0	
+15	2027	3	2	7	SAT	red	290	217	SAT	red	0	
+15	2027	3	3	1		blank	6	3		blank	0	
+15	2027	3	3	2	1	dark	46	30	1	dark	0	
+15	2027	3	3	3	2	dark	178	136	2	dark	0	
+15	2027	3	3	4	3	dark	150	112	3	dark	0	
+15	2027	3	3	5	4	dark	246	186	4	dark	0	
+15	2027	3	3	6	5	dark	206	160	5	dark	0	
+15	2027	3	3	7	6	red	72	47	6	red	0	
+15	2027	3	4	1	7	red	9	4	7	red	0	
+15	2027	3	4	2	8	dark	204	158	8	dark	0	
+15	2027	3	4	3	9	dark	176	134	6	dark	2	6->9
+15	2027	3	4	4	10	dark	39	25	10	dark	0	
+15	2027	3	4	5	11	dark	30	18	11	dark	0	
+15	2027	3	4	6	12	dark	82	53	12	dark	0	
+15	2027	3	4	7	13	red	36	22	13	red	0	
+15	2027	3	5	1	14	red	182	139	14	red	0	
+15	2027	3	5	2	15	dark	112	79	15	dark	0	
+15	2027	3	5	3	16	dark	128	93	16	dark	0	
+15	2027	3	5	4	17	dark	145	107	17	dark	0	
+15	2027	3	5	5	18	dark	173	131	18	dark	0	
+15	2027	3	5	6	19	dark	123	89	19	dark	0	
+15	2027	3	5	7	20	red	27	15	20	red	0	
+15	2027	3	6	1	21	red	97	67	21	red	0	
+15	2027	3	6	2	22	dark	87	57	22	dark	0	
+15	2027	3	6	3	23	dark	180	138	23	dark	0	
+15	2027	3	6	4	24	dark	140	103	24	dark	0	
+15	2027	3	6	5	25	dark	179	137	25	dark	0	
+15	2027	3	6	6	26	dark	192	147	26	dark	0	
+15	2027	3	6	7	27	red	13	6	27	red	0	
+15	2027	3	7	1	28	red	232	176	28	red	0	
+15	2027	3	7	2	29	dark	191	146	29	dark	0	
+15	2027	3	7	3	30	dark	189	145	30	dark	0	
+15	2027	3	7	4	31	dark	226	173	31	dark	0	
+15	2027	3	7	5		blank	10	5		blank	1	
+15	2027	3	7	6		blank	5	2		blank	1	
+15	2027	3	7	7		blank	1	1		blank	1	
+16	2027	4	1	1		blank	14	7		blank	3	
+16	2027	4	1	2		blank	5	2		blank	3	
+16	2027	4	1	3		blank	10	5		blank	3	
+16	2027	4	1	4		blank	69	46		blank	3	
+16	2027	4	1	5	A	month	251	190	A	month	0	
+16	2027	4	1	6	P	month	86	56	P	month	0	
+16	2027	4	1	7	R	month	294	218	R	month	0	
+16	2027	4	2	1	SUN	red	66	44	SUN	red	0	
+16	2027	4	2	2	MON	weekday	200	154	MON	weekday	0	
+16	2027	4	2	3	TUE	weekday	237	179	TUE	weekday	0	
+16	2027	4	2	4	WED	weekday	213	166	WED	weekday	0	
+16	2027	4	2	5	THU	weekday	202	156	THU	weekday	0	
+16	2027	4	2	6	FRI	weekday	55	37	FRI	weekday	0	
+16	2027	4	2	7	SAT	red	290	217	SAT	red	0	
+16	2027	4	3	1		blank	6	3		blank	0	
+16	2027	4	3	2		blank	32	20		blank	1	
+16	2027	4	3	3		blank	264	200		blank	3	
+16	2027	4	3	4		blank	265	201		blank	3	
+16	2027	4	3	5	1	dark	248	188	1	dark	0	
+16	2027	4	3	6	2	dark	127	92	2	dark	0	
+16	2027	4	3	7	3	red	125	91	3	red	0	
+16	2027	4	4	1	4	red	286	215	4	red	0	
+16	2027	4	4	2	5	dark	152	114	5	dark	0	
+16	2027	4	4	3	6	dark	175	133	6	dark	0	
+16	2027	4	4	4	7	dark	157	118	7	dark	0	
+16	2027	4	4	5	8	dark	257	195	8	dark	0	
+16	2027	4	4	6	9	dark	155	116	6	dark	2	6->9
+16	2027	4	4	7	10	red	43	28	10	red	0	
+16	2027	4	5	1	11	red	26	15	11	red	0	
+16	2027	4	5	2	12	dark	81	52	12	dark	0	
+16	2027	4	5	3	13	dark	109	76	13	dark	0	
+16	2027	4	5	4	14	dark	129	94	14	dark	0	
+16	2027	4	5	5	15	dark	122	88	15	dark	0	
+16	2027	4	5	6	16	dark	94	64	16	dark	0	
+16	2027	4	5	7	17	red	71	47	17	red	0	
+16	2027	4	6	1	18	red	210	163	18	red	0	
+16	2027	4	6	2	19	dark	84	55	19	dark	0	
+16	2027	4	6	3	20	dark	58	40	20	dark	0	
+16	2027	4	6	4	21	dark	37	23	21	dark	0	
+16	2027	4	6	5	22	dark	124	90	22	dark	0	
+16	2027	4	6	6	23	dark	96	66	23	dark	0	
+16	2027	4	6	7	24	red	271	205	24	red	0	
+16	2027	4	7	1	25	red	231	176	25	red	0	
+16	2027	4	7	2	26	dark	18	8	26	dark	0	
+16	2027	4	7	3	27	dark	163	122	27	dark	0	
+16	2027	4	7	4	28	dark	161	121	28	dark	0	
+16	2027	4	7	5	29	dark	107	74	29	dark	0	
+16	2027	4	7	6	30	dark	241	183	30	dark	0	
+16	2027	4	7	7		blank	1	1		blank	1	
+17	2027	5	1	1		blank	1	1		blank	3	
+17	2027	5	1	2		blank	12	6		blank	3	
+17	2027	5	1	3		blank	250	190		blank	3	
+17	2027	5	1	4		blank	42	28		blank	3	
+17	2027	5	1	5	M	month	284	214	M	month	0	
+17	2027	5	1	6	A	month	277	211	A	month	0	
+17	2027	5	1	7	Y	month	77	49	Y	month	0	
+17	2027	5	2	1	SUN	red	66	44	SUN	red	0	
+17	2027	5	2	2	MON	weekday	200	154	MON	weekday	0	
+17	2027	5	2	3	TUE	weekday	237	179	TUE	weekday	0	
+17	2027	5	2	4	WED	weekday	213	166	WED	weekday	0	
+17	2027	5	2	5	THU	weekday	202	156	THU	weekday	0	
+17	2027	5	2	6	FRI	weekday	55	37	FRI	weekday	0	
+17	2027	5	2	7	SAT	red	290	217	SAT	red	0	
+17	2027	5	3	1		blank	11	5		blank	0	
+17	2027	5	3	2		blank	32	20		blank	1	
+17	2027	5	3	3		blank	266	202		blank	3	
+17	2027	5	3	4		blank	265	201		blank	3	
+17	2027	5	3	5		blank	264	200		blank	2	
+17	2027	5	3	6		blank	249	189		blank	2	
+17	2027	5	3	7	1	red	45	29	1	red	0	
+17	2027	5	4	1	2	red	160	121	2	red	0	
+17	2027	5	4	2	3	dark	144	106	3	dark	0	
+17	2027	5	4	3	4	dark	156	117	4	dark	0	
+17	2027	5	4	4	5	dark	147	109	5	dark	0	
+17	2027	5	4	5	6	dark	176	134	6	dark	0	
+17	2027	5	4	6	7	dark	203	157	7	dark	0	
+17	2027	5	4	7	8	red	8	4	8	red	0	
+17	2027	5	5	1	9	red	72	47	6	red	2	6->9
+17	2027	5	5	2	10	dark	50	34	10	dark	0	
+17	2027	5	5	3	11	dark	47	31	11	dark	0	
+17	2027	5	5	4	12	dark	119	85	12	dark	0	
+17	2027	5	5	5	13	dark	111	78	13	dark	0	
+17	2027	5	5	6	14	dark	83	54	14	dark	0	
+17	2027	5	5	7	15	red	52	35	15	red	0	
+17	2027	5	6	1	16	red	190	146	16	red	0	
+17	2027	5	6	2	17	dark	59	41	17	dark	0	
+17	2027	5	6	3	18	dark	116	82	18	dark	0	
+17	2027	5	6	4	19	dark	92	62	19	dark	0	
+17	2027	5	6	5	20	dark	90	60	20	dark	0	
+17	2027	5	6	6	21	dark	199	153	21	dark	0	
+17	2027	5	6	7	22	red	209	163	22	red	0	
+17	2027	5	7	1	23/30	red	218	170	23/30	red	0	
+17	2027	5	7	2	24/31	dark	4	2	24/31	dark	0	
+17	2027	5	7	3	25	dark	126	91	25	dark	0	
+17	2027	5	7	4	26	dark	35	22	26	dark	0	
+17	2027	5	7	5	27	dark	7	3	27	dark	0	
+17	2027	5	7	6	28	dark	230	175	28	dark	0	
+17	2027	5	7	7	29	red	233	176	29	red	0	
+18	2027	6	1	1		blank	14	7		blank	3	
+18	2027	6	1	2		blank	12	6		blank	3	
+18	2027	6	1	3		blank	250	190		blank	3	
+18	2027	6	1	4		blank	42	28		blank	3	
+18	2027	6	1	5	J	month	268	204	J	month	0	
+18	2027	6	1	6	U	month	78	50	U	month	0	
+18	2027	6	1	7	N	month	293	218	N	month	0	
+18	2027	6	2	1	SUN	red	66	44	SUN	red	0	
+18	2027	6	2	2	MON	weekday	200	154	MON	weekday	0	
+18	2027	6	2	3	TUE	weekday	237	179	TUE	weekday	0	
+18	2027	6	2	4	WED	weekday	213	166	WED	weekday	0	
+18	2027	6	2	5	THU	weekday	202	156	THU	weekday	0	
+18	2027	6	2	6	FRI	weekday	55	37	FRI	weekday	0	
+18	2027	6	2	7	SAT	red	290	217	SAT	red	0	
+18	2027	6	3	1		blank	6	3		blank	0	
+18	2027	6	3	2		blank	32	20		blank	1	
+18	2027	6	3	3	1	dark	31	19	1	dark	0	
+18	2027	6	3	4	2	dark	149	111	2	dark	0	
+18	2027	6	3	5	3	dark	186	143	3	dark	0	
+18	2027	6	3	6	4	dark	201	155	4	dark	0	
+18	2027	6	3	7	5	red	223	172	5	red	0	
+18	2027	6	4	1	6	red	287	215	6	red	0	
+18	2027	6	4	2	7	dark	194	149	7	dark	0	
+18	2027	6	4	3	8	dark	255	193	8	dark	0	
+18	2027	6	4	4	9	dark	148	110	6	dark	2	6->9
+18	2027	6	4	5	10	dark	48	32	10	dark	0	
+18	2027	6	4	6	11	dark	41	27	11	dark	0	
+18	2027	6	4	7	12	red	142	104	12	red	0	
+18	2027	6	5	1	13	red	133	97	13	red	0	
+18	2027	6	5	2	14	dark	102	71	14	dark	0	
+18	2027	6	5	3	15	dark	121	87	15	dark	0	
+18	2027	6	5	4	16	dark	139	102	16	dark	0	
+18	2027	6	5	5	17	dark	167	126	17	dark	0	
+18	2027	6	5	6	18	dark	108	75	18	dark	0	
+18	2027	6	5	7	19	red	114	80	19	red	0	
+18	2027	6	6	1	20	red	105	73	20	red	0	
+18	2027	6	6	2	21	dark	88	58	21	dark	0	
+18	2027	6	6	3	22	dark	171	129	22	dark	0	
+18	2027	6	6	4	23	dark	136	99	23	dark	0	
+18	2027	6	6	5	24	dark	172	130	24	dark	0	
+18	2027	6	6	6	25	dark	103	72	25	dark	0	
+18	2027	6	6	7	26	red	242	183	26	red	0	
+18	2027	6	7	1	27	red	63	43	27	red	0	
+18	2027	6	7	2	28	dark	229	175	28	dark	0	
+18	2027	6	7	3	29	dark	181	139	29	dark	0	
+18	2027	6	7	4	30	dark	259	197	30	dark	0	
+18	2027	6	7	5		blank	10	5		blank	1	
+18	2027	6	7	6		blank	5	2		blank	1	
+18	2027	6	7	7		blank	1	1		blank	1	
+19	2027	7	1	1		blank	1	1		blank	3	
+19	2027	7	1	2		blank	5	2		blank	3	
+19	2027	7	1	3		blank	10	5		blank	3	
+19	2027	7	1	4		blank	69	46		blank	3	
+19	2027	7	1	5	J	month	268	204	J	month	0	
+19	2027	7	1	6	U	month	78	50	U	month	0	
+19	2027	7	1	7	L	month	292	218	L	month	0	
+19	2027	7	2	1	SUN	red	66	44	SUN	red	0	
+19	2027	7	2	2	MON	weekday	200	154	MON	weekday	0	
+19	2027	7	2	3	TUE	weekday	237	179	TUE	weekday	0	
+19	2027	7	2	4	WED	weekday	213	166	WED	weekday	0	
+19	2027	7	2	5	THU	weekday	202	156	THU	weekday	0	
+19	2027	7	2	6	FRI	weekday	55	37	FRI	weekday	0	
+19	2027	7	2	7	SAT	red	290	217	SAT	red	0	
+19	2027	7	3	1		blank	6	3		blank	0	
+19	2027	7	3	2		blank	32	20		blank	1	
+19	2027	7	3	3		blank	264	200		blank	3	
+19	2027	7	3	4		blank	265	201		blank	3	
+19	2027	7	3	5	1	dark	248	188	1	dark	0	
+19	2027	7	3	6	2	dark	127	92	2	dark	0	
+19	2027	7	3	7	3	red	125	91	3	red	0	
+19	2027	7	4	1	4	red	286	215	4	red	0	
+19	2027	7	4	2	5	dark	152	114	5	dark	0	
+19	2027	7	4	3	6	dark	175	133	6	dark	0	
+19	2027	7	4	4	7	dark	157	118	7	dark	0	
+19	2027	7	4	5	8	dark	257	195	8	dark	0	
+19	2027	7	4	6	9	dark	155	116	6	dark	2	6->9
+19	2027	7	4	7	10	red	43	28	10	red	0	
+19	2027	7	5	1	11	red	26	15	11	red	0	
+19	2027	7	5	2	12	dark	81	52	12	dark	0	
+19	2027	7	5	3	13	dark	109	76	13	dark	0	
+19	2027	7	5	4	14	dark	129	94	14	dark	0	
+19	2027	7	5	5	15	dark	122	88	15	dark	0	
+19	2027	7	5	6	16	dark	94	64	16	dark	0	
+19	2027	7	5	7	17	red	71	47	17	red	0	
+19	2027	7	6	1	18	red	210	163	18	red	0	
+19	2027	7	6	2	19	dark	84	55	19	dark	0	
+19	2027	7	6	3	20	dark	58	40	20	dark	0	
+19	2027	7	6	4	21	dark	37	23	21	dark	0	
+19	2027	7	6	5	22	dark	124	90	22	dark	0	
+19	2027	7	6	6	23	dark	96	66	23	dark	0	
+19	2027	7	6	7	24	red	271	205	24	red	0	
+19	2027	7	7	1	25	red	231	176	25	red	0	
+19	2027	7	7	2	26	dark	18	8	26	dark	0	
+19	2027	7	7	3	27	dark	163	122	27	dark	0	
+19	2027	7	7	4	28	dark	161	121	28	dark	0	
+19	2027	7	7	5	29	dark	107	74	29	dark	0	
+19	2027	7	7	6	30	dark	241	183	30	dark	0	
+19	2027	7	7	7	31	red	281	212	31	red	0	
+20	2027	8	1	1		blank	62	43		blank	3	
+20	2027	8	1	2		blank	12	6		blank	3	
+20	2027	8	1	3		blank	285	214		blank	3	
+20	2027	8	1	4		blank	69	46		blank	3	
+20	2027	8	1	5	A	month	251	190	A	month	0	
+20	2027	8	1	6	U	month	78	50	U	month	0	
+20	2027	8	1	7	G	month	3	1	G	month	0	
+20	2027	8	2	1	SUN	red	66	44	SUN	red	0	
+20	2027	8	2	2	MON	weekday	200	154	MON	weekday	0	
+20	2027	8	2	3	TUE	weekday	237	179	TUE	weekday	0	
+20	2027	8	2	4	WED	weekday	213	166	WED	weekday	0	
+20	2027	8	2	5	THU	weekday	202	156	THU	weekday	0	
+20	2027	8	2	6	FRI	weekday	55	37	FRI	weekday	0	
+20	2027	8	2	7	SAT	red	290	217	SAT	red	0	
+20	2027	8	3	1	1	red	33	21	1	red	0	
+20	2027	8	3	2	2	dark	168	127	2	dark	0	
+20	2027	8	3	3	3	dark	184	141	3	dark	0	
+20	2027	8	3	4	4	dark	158	119	4	dark	0	
+20	2027	8	3	5	5	dark	177	135	5	dark	0	
+20	2027	8	3	6	6	dark	212	165	6	dark	0	
+20	2027	8	3	7	7	red	67	45	7	red	0	
+20	2027	8	4	1	8	red	253	191	8	red	0	
+20	2027	8	4	2	9	dark	159	120	6	dark	2	6->9
+20	2027	8	4	3	10	dark	38	24	10	dark	0	
+20	2027	8	4	4	11	dark	138	101	11	dark	0	
+20	2027	8	4	5	12	dark	110	77	12	dark	0	
+20	2027	8	4	6	13	dark	91	61	13	dark	0	
+20	2027	8	4	7	14	red	153	115	14	red	0	
+20	2027	8	5	1	15	red	188	145	15	red	0	
+20	2027	8	5	2	16	dark	115	81	16	dark	0	
+20	2027	8	5	3	17	dark	165	124	17	dark	0	
+20	2027	8	5	4	18	dark	146	108	18	dark	0	
+20	2027	8	5	5	19	dark	174	132	19	dark	0	
+20	2027	8	5	6	20	dark	214	167	20	dark	0	
+20	2027	8	5	7	21	red	44	29	21	red	0	
+20	2027	8	6	1	22	red	221	171	22	red	0	
+20	2027	8	6	2	23	dark	95	65	23	dark	0	
+20	2027	8	6	3	24	dark	183	140	24	dark	0	
+20	2027	8	6	4	25	dark	143	105	25	dark	0	
+20	2027	8	6	5	26	dark	187	144	26	dark	0	
+20	2027	8	6	6	27	dark	196	151	27	dark	0	
+20	2027	8	6	7	28	red	234	177	28	red	0	
+20	2027	8	7	1	29	red	280	212	29	red	0	
+20	2027	8	7	2	30	dark	217	169	30	dark	0	
+20	2027	8	7	3	31	dark	227	174	31	dark	0	
+20	2027	8	7	4		blank	42	28		blank	1	
+20	2027	8	7	5		blank	10	5		blank	1	
+20	2027	8	7	6		blank	5	2		blank	1	
+20	2027	8	7	7		blank	14	7		blank	1	
+21	2027	9	1	1		blank	14	7		blank	3	
+21	2027	9	1	2		blank	12	6		blank	3	
+21	2027	9	1	3		blank	10	5		blank	3	
+21	2027	9	1	4		blank	42	28		blank	3	
+21	2027	9	1	5	S	month	289	216	S	month	0	
+21	2027	9	1	6	E	month	282	213	E	month	0	
+21	2027	9	1	7	P	month	76	49	P	month	0	
+21	2027	9	2	1	SUN	red	66	44	SUN	red	0	
+21	2027	9	2	2	MON	weekday	200	154	MON	weekday	0	
+21	2027	9	2	3	TUE	weekday	237	179	TUE	weekday	0	
+21	2027	9	2	4	WED	weekday	213	166	WED	weekday	0	
+21	2027	9	2	5	THU	weekday	202	156	THU	weekday	0	
+21	2027	9	2	6	FRI	weekday	55	37	FRI	weekday	0	
+21	2027	9	2	7	SAT	red	290	217	SAT	red	0	
+21	2027	9	3	1		blank	6	3		blank	0	
+21	2027	9	3	2		blank	32	20		blank	1	
+21	2027	9	3	3		blank	264	200		blank	3	
+21	2027	9	3	4	1	dark	40	26	1	dark	0	
+21	2027	9	3	5	2	dark	29	17	2	dark	0	
+21	2027	9	3	6	3	dark	195	150	3	dark	0	
+21	2027	9	3	7	4	red	51	35	4	red	0	
+21	2027	9	4	1	5	red	260	197	5	red	0	
+21	2027	9	4	2	6	dark	155	116	6	dark	0	
+21	2027	9	4	3	7	dark	185	142	7	dark	0	
+21	2027	9	4	4	8	dark	256	194	8	dark	0	
+21	2027	9	4	5	9	dark	175	133	6	dark	2	6->9
+21	2027	9	4	6	10	dark	57	39	10	dark	0	
+21	2027	9	4	7	11	red	141	104	11	red	0	
+21	2027	9	5	1	12	red	113	80	12	red	0	
+21	2027	9	5	2	13	dark	93	63	13	dark	0	
+21	2027	9	5	3	14	dark	117	83	14	dark	0	
+21	2027	9	5	4	15	dark	137	100	15	dark	0	
+21	2027	9	5	5	16	dark	130	95	16	dark	0	
+21	2027	9	5	6	17	dark	100	69	17	dark	0	
+21	2027	9	5	7	18	red	106	74	18	red	0	
+21	2027	9	6	1	19	red	216	169	19	red	0	
+21	2027	9	6	2	20	dark	19	9	20	dark	0	
+21	2027	9	6	3	21	dark	20	10	21	dark	0	
+21	2027	9	6	4	22	dark	21	11	22	dark	0	
+21	2027	9	6	5	23	dark	164	123	23	dark	0	
+21	2027	9	6	6	24	dark	99	68	24	dark	0	
+21	2027	9	6	7	25	red	222	171	25	red	0	
+21	2027	9	7	1	26	red	279	212	26	red	0	
+21	2027	9	7	2	27	dark	53	36	27	dark	0	
+21	2027	9	7	3	28	dark	169	128	28	dark	0	
+21	2027	9	7	4	29	dark	225	173	29	dark	0	
+21	2027	9	7	5	30	dark	34	21	30	dark	0	
+21	2027	9	7	6		blank	5	2		blank	1	
+21	2027	9	7	7		blank	1	1		blank	1	
+22	2027	10	1	1		blank	14	7		blank	3	
+22	2027	10	1	2	O	month	85	56	O	month	0	
+22	2027	10	1	3	C	month	269	204	C	month	0	
+22	2027	10	1	4	T	month	134	98	T	month	0	
+22	2027	10	1	5		blank	11	5		blank	3	
+22	2027	10	1	6		blank	24	14		blank	3	
+22	2027	10	1	7		blank	1	1		blank	2	
+22	2027	10	2	1	SUN	red	66	44	SUN	red	0	
+22	2027	10	2	2	MON	weekday	200	154	MON	weekday	0	
+22	2027	10	2	3	TUE	weekday	237	179	TUE	weekday	0	
+22	2027	10	2	4	WED	weekday	213	166	WED	weekday	0	
+22	2027	10	2	5	THU	weekday	202	156	THU	weekday	0	
+22	2027	10	2	6	FRI	weekday	55	37	FRI	weekday	0	
+22	2027	10	2	7	SAT	red	290	217	SAT	red	0	
+22	2027	10	3	1		blank	6	3		blank	0	
+22	2027	10	3	2		blank	32	20		blank	1	
+22	2027	10	3	3		blank	266	202		blank	3	
+22	2027	10	3	4		blank	265	201		blank	3	
+22	2027	10	3	5		blank	264	200		blank	2	
+22	2027	10	3	6	1	dark	22	12	1	dark	0	
+22	2027	10	3	7	2	red	170	128	2	red	0	
+22	2027	10	4	1	3	red	252	191	3	red	0	
+22	2027	10	4	2	4	dark	151	113	4	dark	0	
+22	2027	10	4	3	5	dark	166	125	5	dark	0	
+22	2027	10	4	4	6	dark	148	110	6	dark	0	
+22	2027	10	4	5	7	dark	247	187	7	dark	0	
+22	2027	10	4	6	8	dark	101	70	8	dark	0	
+22	2027	10	4	7	9	red	287	215	6	red	2	6->9
+22	2027	10	5	1	10	red	228	174	10	red	0	
+22	2027	10	5	2	11	dark	56	38	11	dark	0	
+22	2027	10	5	3	12	dark	49	33	12	dark	0	
+22	2027	10	5	4	13	dark	120	86	13	dark	0	
+22	2027	10	5	5	14	dark	118	84	14	dark	0	
+22	2027	10	5	6	15	dark	89	59	15	dark	0	
+22	2027	10	5	7	16	red	68	45	16	red	0	
+22	2027	10	6	1	17	red	198	152	17	red	0	
+22	2027	10	6	2	18	dark	80	51	18	dark	0	
+22	2027	10	6	3	19	dark	131	96	19	dark	0	
+22	2027	10	6	4	20	dark	238	180	20	dark	0	
+22	2027	10	6	5	21	dark	28	16	21	dark	0	
+22	2027	10	6	6	22	dark	276	210	22	dark	0	
+22	2027	10	6	7	23	red	104	73	23	red	0	
+22	2027	10	7	1	24/31	red	219	170	24/31	red	0	
+22	2027	10	7	2	25	dark	98	67	25	dark	0	
+22	2027	10	7	3	26	dark	132	97	26	dark	0	
+22	2027	10	7	4	27	dark	154	115	27	dark	0	
+22	2027	10	7	5	28	dark	162	122	28	dark	0	
+22	2027	10	7	6	29	dark	235	177	29	dark	0	
+22	2027	10	7	7	30	red	64	43	30	red	0	
+23	2027	11	1	1		blank	62	43		blank	3	
+23	2027	11	1	2	N	month	74	48	N	month	0	
+23	2027	11	1	3	O	month	244	184	O	month	0	
+23	2027	11	1	4	V	month	135	98	V	month	0	
+23	2027	11	1	5		blank	6	3		blank	3	
+23	2027	11	1	6		blank	24	14		blank	3	
+23	2027	11	1	7		blank	14	7		blank	2	
+23	2027	11	2	1	SUN	red	66	44	SUN	red	0	
+23	2027	11	2	2	MON	weekday	200	154	MON	weekday	0	
+23	2027	11	2	3	TUE	weekday	237	179	TUE	weekday	0	
+23	2027	11	2	4	WED	weekday	213	166	WED	weekday	0	
+23	2027	11	2	5	THU	weekday	202	156	THU	weekday	0	
+23	2027	11	2	6	FRI	weekday	55	37	FRI	weekday	0	
+23	2027	11	2	7	SAT	red	290	217	SAT	red	0	
+23	2027	11	3	1		blank	224	172		blank	0	
+23	2027	11	3	2	1	dark	46	30	1	dark	0	
+23	2027	11	3	3	2	dark	178	136	2	dark	0	
+23	2027	11	3	4	3	dark	150	112	3	dark	0	
+23	2027	11	3	5	4	dark	246	186	4	dark	0	
+23	2027	11	3	6	5	dark	206	160	5	dark	0	
+23	2027	11	3	7	6	red	72	47	6	red	0	
+23	2027	11	4	1	7	red	9	4	7	red	0	
+23	2027	11	4	2	8	dark	204	158	8	dark	0	
+23	2027	11	4	3	9	dark	176	134	6	dark	2	6->9
+23	2027	11	4	4	10	dark	39	25	10	dark	0	
+23	2027	11	4	5	11	dark	30	18	11	dark	0	
+23	2027	11	4	6	12	dark	82	53	12	dark	0	
+23	2027	11	4	7	13	red	36	22	13	red	0	
+23	2027	11	5	1	14	red	182	139	14	red	0	
+23	2027	11	5	2	15	dark	112	79	15	dark	0	
+23	2027	11	5	3	16	dark	128	93	16	dark	0	
+23	2027	11	5	4	17	dark	145	107	17	dark	0	
+23	2027	11	5	5	18	dark	173	131	18	dark	0	
+23	2027	11	5	6	19	dark	123	89	19	dark	0	
+23	2027	11	5	7	20	red	27	15	20	red	0	
+23	2027	11	6	1	21	red	97	67	21	red	0	
+23	2027	11	6	2	22	dark	87	57	22	dark	0	
+23	2027	11	6	3	23	dark	180	138	23	dark	0	
+23	2027	11	6	4	24	dark	140	103	24	dark	0	
+23	2027	11	6	5	25	dark	179	137	25	dark	0	
+23	2027	11	6	6	26	dark	192	147	26	dark	0	
+23	2027	11	6	7	27	red	13	6	27	red	0	
+23	2027	11	7	1	28	red	232	176	28	red	0	
+23	2027	11	7	2	29	dark	191	146	29	dark	0	
+23	2027	11	7	3	30	dark	189	145	30	dark	0	
+23	2027	11	7	4		blank	42	28		blank	1	
+23	2027	11	7	5		blank	10	5		blank	1	
+23	2027	11	7	6		blank	5	2		blank	1	
+23	2027	11	7	7		blank	1	1		blank	1	
+24	2027	12	1	1		blank	62	43		blank	3	
+24	2027	12	1	2	D	month	25	14	D	month	0	
+24	2027	12	1	3	E	month	261	198	E	month	0	
+24	2027	12	1	4	C	month	70	46	C	month	0	
+24	2027	12	1	5		blank	11	5		blank	3	
+24	2027	12	1	6		blank	73	48		blank	3	
+24	2027	12	1	7		blank	14	7		blank	2	
+24	2027	12	2	1	SUN	red	66	44	SUN	red	0	
+24	2027	12	2	2	MON	weekday	200	154	MON	weekday	0	
+24	2027	12	2	3	TUE	weekday	237	179	TUE	weekday	0	
+24	2027	12	2	4	WED	weekday	213	166	WED	weekday	0	
+24	2027	12	2	5	THU	weekday	202	156	THU	weekday	0	
+24	2027	12	2	6	FRI	weekday	55	37	FRI	weekday	0	
+24	2027	12	2	7	SAT	red	290	217	SAT	red	0	
+24	2027	12	3	1		blank	6	3		blank	0	
+24	2027	12	3	2		blank	32	20		blank	1	
+24	2027	12	3	3		blank	264	200		blank	3	
+24	2027	12	3	4	1	dark	40	26	1	dark	0	
+24	2027	12	3	5	2	dark	29	17	2	dark	0	
+24	2027	12	3	6	3	dark	195	150	3	dark	0	
+24	2027	12	3	7	4	red	51	35	4	red	0	
+24	2027	12	4	1	5	red	260	197	5	red	0	
+24	2027	12	4	2	6	dark	155	116	6	dark	0	
+24	2027	12	4	3	7	dark	185	142	7	dark	0	
+24	2027	12	4	4	8	dark	256	194	8	dark	0	
+24	2027	12	4	5	9	dark	175	133	6	dark	2	6->9
+24	2027	12	4	6	10	dark	57	39	10	dark	0	
+24	2027	12	4	7	11	red	141	104	11	red	0	
+24	2027	12	5	1	12	red	113	80	12	red	0	
+24	2027	12	5	2	13	dark	93	63	13	dark	0	
+24	2027	12	5	3	14	dark	117	83	14	dark	0	
+24	2027	12	5	4	15	dark	137	100	15	dark	0	
+24	2027	12	5	5	16	dark	130	95	16	dark	0	
+24	2027	12	5	6	17	dark	100	69	17	dark	0	
+24	2027	12	5	7	18	red	106	74	18	red	0	
+24	2027	12	6	1	19	red	216	169	19	red	0	
+24	2027	12	6	2	20	dark	19	9	20	dark	0	
+24	2027	12	6	3	21	dark	20	10	21	dark	0	
+24	2027	12	6	4	22	dark	21	11	22	dark	0	
+24	2027	12	6	5	23	dark	164	123	23	dark	0	
+24	2027	12	6	6	24	dark	99	68	24	dark	0	
+24	2027	12	6	7	25	red	222	171	25	red	0	
+24	2027	12	7	1	26	red	279	212	26	red	0	
+24	2027	12	7	2	27	dark	53	36	27	dark	0	
+24	2027	12	7	3	28	dark	169	128	28	dark	0	
+24	2027	12	7	4	29	dark	225	173	29	dark	0	
+24	2027	12	7	5	30	dark	34	21	30	dark	0	
+24	2027	12	7	6	31	dark	270	205	31	dark	0	
+24	2027	12	7	7		blank	1	1		blank	1	
+25	2028	1	1	1		blank	1	1		blank	3	
+25	2028	1	1	2		blank	12	6		blank	3	
+25	2028	1	1	3		blank	250	190		blank	3	
+25	2028	1	1	4		blank	42	28		blank	3	
+25	2028	1	1	5	J	month	268	204	J	month	0	
+25	2028	1	1	6	A	month	277	211	A	month	0	
+25	2028	1	1	7	N	month	293	218	N	month	0	
+25	2028	1	2	1	SUN	red	66	44	SUN	red	0	
+25	2028	1	2	2	MON	weekday	200	154	MON	weekday	0	
+25	2028	1	2	3	TUE	weekday	237	179	TUE	weekday	0	
+25	2028	1	2	4	WED	weekday	213	166	WED	weekday	0	
+25	2028	1	2	5	THU	weekday	202	156	THU	weekday	0	
+25	2028	1	2	6	FRI	weekday	55	37	FRI	weekday	0	
+25	2028	1	2	7	SAT	red	290	217	SAT	red	0	
+25	2028	1	3	1		blank	11	5		blank	0	
+25	2028	1	3	2		blank	32	20		blank	1	
+25	2028	1	3	3		blank	266	202		blank	3	
+25	2028	1	3	4		blank	265	201		blank	3	
+25	2028	1	3	5		blank	264	200		blank	2	
+25	2028	1	3	6		blank	249	189		blank	2	
+25	2028	1	3	7	1	red	45	29	1	red	0	
+25	2028	1	4	1	2	red	160	121	2	red	0	
+25	2028	1	4	2	3	dark	144	106	3	dark	0	
+25	2028	1	4	3	4	dark	156	117	4	dark	0	
+25	2028	1	4	4	5	dark	147	109	5	dark	0	
+25	2028	1	4	5	6	dark	176	134	6	dark	0	
+25	2028	1	4	6	7	dark	203	157	7	dark	0	
+25	2028	1	4	7	8	red	8	4	8	red	0	
+25	2028	1	5	1	9	red	72	47	6	red	2	6->9
+25	2028	1	5	2	10	dark	50	34	10	dark	0	
+25	2028	1	5	3	11	dark	47	31	11	dark	0	
+25	2028	1	5	4	12	dark	119	85	12	dark	0	
+25	2028	1	5	5	13	dark	111	78	13	dark	0	
+25	2028	1	5	6	14	dark	83	54	14	dark	0	
+25	2028	1	5	7	15	red	52	35	15	red	0	
+25	2028	1	6	1	16	red	190	146	16	red	0	
+25	2028	1	6	2	17	dark	59	41	17	dark	0	
+25	2028	1	6	3	18	dark	116	82	18	dark	0	
+25	2028	1	6	4	19	dark	92	62	19	dark	0	
+25	2028	1	6	5	20	dark	90	60	20	dark	0	
+25	2028	1	6	6	21	dark	199	153	21	dark	0	
+25	2028	1	6	7	22	red	209	163	22	red	0	
+25	2028	1	7	1	23/30	red	218	170	23/30	red	0	
+25	2028	1	7	2	24/31	dark	4	2	24/31	dark	0	
+25	2028	1	7	3	25	dark	126	91	25	dark	0	
+25	2028	1	7	4	26	dark	35	22	26	dark	0	
+25	2028	1	7	5	27	dark	7	3	27	dark	0	
+25	2028	1	7	6	28	dark	230	175	28	dark	0	
+25	2028	1	7	7	29	red	233	176	29	red	0	
+26	2028	2	1	1		blank	75	49		blank	3	
+26	2028	2	1	2		blank	12	6		blank	3	
+26	2028	2	1	3		blank	250	190		blank	3	
+26	2028	2	1	4		blank	69	46		blank	3	
+26	2028	2	1	5	F	month	262	198	F	month	0	
+26	2028	2	1	6	E	month	282	213	E	month	0	
+26	2028	2	1	7	B	month	2	1	B	month	0	
+26	2028	2	2	1	SUN	red	66	44	SUN	red	0	
+26	2028	2	2	2	MON	weekday	200	154	MON	weekday	0	
+26	2028	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+26	2028	2	2	4	WED	weekday	213	166	WED	weekday	0	
+26	2028	2	2	5	THU	weekday	202	156	THU	weekday	0	
+26	2028	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+26	2028	2	2	7	SAT	red	290	217	SAT	red	0	
+26	2028	2	3	1		blank	6	3		blank	0	
+26	2028	2	3	2		blank	32	20		blank	1	
+26	2028	2	3	3	1	dark	31	19	1	dark	0	
+26	2028	2	3	4	2	dark	149	111	2	dark	0	
+26	2028	2	3	5	3	dark	186	143	3	dark	0	
+26	2028	2	3	6	4	dark	201	155	4	dark	0	
+26	2028	2	3	7	5	red	223	172	5	red	0	
+26	2028	2	4	1	6	red	287	215	6	red	0	
+26	2028	2	4	2	7	dark	194	149	7	dark	0	
+26	2028	2	4	3	8	dark	255	193	8	dark	0	
+26	2028	2	4	4	9	dark	148	110	6	dark	2	6->9
+26	2028	2	4	5	10	dark	48	32	10	dark	0	
+26	2028	2	4	6	11	dark	41	27	11	dark	0	
+26	2028	2	4	7	12	red	142	104	12	red	0	
+26	2028	2	5	1	13	red	133	97	13	red	0	
+26	2028	2	5	2	14	dark	102	71	14	dark	0	
+26	2028	2	5	3	15	dark	121	87	15	dark	0	
+26	2028	2	5	4	16	dark	139	102	16	dark	0	
+26	2028	2	5	5	17	dark	167	126	17	dark	0	
+26	2028	2	5	6	18	dark	108	75	18	dark	0	
+26	2028	2	5	7	19	red	114	80	19	red	0	
+26	2028	2	6	1	20	red	105	73	20	red	0	
+26	2028	2	6	2	21	dark	88	58	21	dark	0	
+26	2028	2	6	3	22	dark	171	129	22	dark	0	
+26	2028	2	6	4	23	dark	136	99	23	dark	0	
+26	2028	2	6	5	24	dark	172	130	24	dark	0	
+26	2028	2	6	6	25	dark	103	72	25	dark	0	
+26	2028	2	6	7	26	red	242	183	26	red	0	
+26	2028	2	7	1	27	red	63	43	27	red	0	
+26	2028	2	7	2	28	dark	229	175	28	dark	0	
+26	2028	2	7	3	29	dark	181	139	29	dark	0	
+26	2028	2	7	4		blank	42	28		blank	1	
+26	2028	2	7	5		blank	10	5		blank	1	
+26	2028	2	7	6		blank	5	2		blank	1	
+26	2028	2	7	7		blank	14	7		blank	1	
+27	2028	3	1	1		blank	14	7		blank	3	
+27	2028	3	1	2		blank	5	2		blank	3	
+27	2028	3	1	3		blank	10	5		blank	3	
+27	2028	3	1	4		blank	42	28		blank	3	
+27	2028	3	1	5	M	month	284	214	M	month	0	
+27	2028	3	1	6	A	month	277	211	A	month	0	
+27	2028	3	1	7	R	month	294	218	R	month	0	
+27	2028	3	2	1	SUN	red	66	44	SUN	red	0	
+27	2028	3	2	2	MON	weekday	200	154	MON	weekday	0	
+27	2028	3	2	3	TUE	weekday	237	179	TUE	weekday	0	
+27	2028	3	2	4	WED	weekday	213	166	WED	weekday	0	
+27	2028	3	2	5	THU	weekday	202	156	THU	weekday	0	
+27	2028	3	2	6	FRI	weekday	55	37	FRI	weekday	0	
+27	2028	3	2	7	SAT	red	290	217	SAT	red	0	
+27	2028	3	3	1		blank	6	3		blank	0	
+27	2028	3	3	2		blank	32	20		blank	1	
+27	2028	3	3	3		blank	264	200		blank	3	
+27	2028	3	3	4	1	dark	40	26	1	dark	0	
+27	2028	3	3	5	2	dark	29	17	2	dark	0	
+27	2028	3	3	6	3	dark	195	150	3	dark	0	
+27	2028	3	3	7	4	red	51	35	4	red	0	
+27	2028	3	4	1	5	red	260	197	5	red	0	
+27	2028	3	4	2	6	dark	155	116	6	dark	0	
+27	2028	3	4	3	7	dark	185	142	7	dark	0	
+27	2028	3	4	4	8	dark	256	194	8	dark	0	
+27	2028	3	4	5	9	dark	175	133	6	dark	2	6->9
+27	2028	3	4	6	10	dark	57	39	10	dark	0	
+27	2028	3	4	7	11	red	141	104	11	red	0	
+27	2028	3	5	1	12	red	113	80	12	red	0	
+27	2028	3	5	2	13	dark	93	63	13	dark	0	
+27	2028	3	5	3	14	dark	117	83	14	dark	0	
+27	2028	3	5	4	15	dark	137	100	15	dark	0	
+27	2028	3	5	5	16	dark	130	95	16	dark	0	
+27	2028	3	5	6	17	dark	100	69	17	dark	0	
+27	2028	3	5	7	18	red	106	74	18	red	0	
+27	2028	3	6	1	19	red	216	169	19	red	0	
+27	2028	3	6	2	20	dark	19	9	20	dark	0	
+27	2028	3	6	3	21	dark	20	10	21	dark	0	
+27	2028	3	6	4	22	dark	21	11	22	dark	0	
+27	2028	3	6	5	23	dark	164	123	23	dark	0	
+27	2028	3	6	6	24	dark	99	68	24	dark	0	
+27	2028	3	6	7	25	red	222	171	25	red	0	
+27	2028	3	7	1	26	red	279	212	26	red	0	
+27	2028	3	7	2	27	dark	53	36	27	dark	0	
+27	2028	3	7	3	28	dark	169	128	28	dark	0	
+27	2028	3	7	4	29	dark	225	173	29	dark	0	
+27	2028	3	7	5	30	dark	34	21	30	dark	0	
+27	2028	3	7	6	31	dark	270	205	31	dark	0	
+27	2028	3	7	7		blank	1	1		blank	1	
+28	2028	4	1	1		blank	1	1		blank	3	
+28	2028	4	1	2		blank	5	2		blank	3	
+28	2028	4	1	3		blank	285	214		blank	3	
+28	2028	4	1	4		blank	42	28		blank	3	
+28	2028	4	1	5	A	month	251	190	A	month	0	
+28	2028	4	1	6	P	month	86	56	P	month	0	
+28	2028	4	1	7	R	month	294	218	R	month	0	
+28	2028	4	2	1	SUN	red	66	44	SUN	red	0	
+28	2028	4	2	2	MON	weekday	200	154	MON	weekday	0	
+28	2028	4	2	3	TUE	weekday	237	179	TUE	weekday	0	
+28	2028	4	2	4	WED	weekday	213	166	WED	weekday	0	
+28	2028	4	2	5	THU	weekday	202	156	THU	weekday	0	
+28	2028	4	2	6	FRI	weekday	55	37	FRI	weekday	0	
+28	2028	4	2	7	SAT	red	290	217	SAT	red	0	
+28	2028	4	3	1		blank	11	5		blank	0	
+28	2028	4	3	2		blank	32	20		blank	1	
+28	2028	4	3	3		blank	266	202		blank	3	
+28	2028	4	3	4		blank	265	201		blank	3	
+28	2028	4	3	5		blank	264	200		blank	2	
+28	2028	4	3	6		blank	249	189		blank	2	
+28	2028	4	3	7	1	red	45	29	1	red	0	
+28	2028	4	4	1	2	red	160	121	2	red	0	
+28	2028	4	4	2	3	dark	144	106	3	dark	0	
+28	2028	4	4	3	4	dark	156	117	4	dark	0	
+28	2028	4	4	4	5	dark	147	109	5	dark	0	
+28	2028	4	4	5	6	dark	176	134	6	dark	0	
+28	2028	4	4	6	7	dark	203	157	7	dark	0	
+28	2028	4	4	7	8	red	8	4	8	red	0	
+28	2028	4	5	1	9	red	72	47	6	red	2	6->9
+28	2028	4	5	2	10	dark	50	34	10	dark	0	
+28	2028	4	5	3	11	dark	47	31	11	dark	0	
+28	2028	4	5	4	12	dark	119	85	12	dark	0	
+28	2028	4	5	5	13	dark	111	78	13	dark	0	
+28	2028	4	5	6	14	dark	83	54	14	dark	0	
+28	2028	4	5	7	15	red	52	35	15	red	0	
+28	2028	4	6	1	16	red	190	146	16	red	0	
+28	2028	4	6	2	17	dark	59	41	17	dark	0	
+28	2028	4	6	3	18	dark	116	82	18	dark	0	
+28	2028	4	6	4	19	dark	92	62	19	dark	0	
+28	2028	4	6	5	20	dark	90	60	20	dark	0	
+28	2028	4	6	6	21	dark	199	153	21	dark	0	
+28	2028	4	6	7	22	red	209	163	22	red	0	
+28	2028	4	7	1	23/30	red	218	170	23/30	red	0	
+28	2028	4	7	2	24	dark	61	42	24	dark	0	
+28	2028	4	7	3	25	dark	126	91	25	dark	0	
+28	2028	4	7	4	26	dark	35	22	26	dark	0	
+28	2028	4	7	5	27	dark	7	3	27	dark	0	
+28	2028	4	7	6	28	dark	230	175	28	dark	0	
+28	2028	4	7	7	29	red	233	176	29	red	0	
+29	2028	5	1	1		blank	14	7		blank	3	
+29	2028	5	1	2		blank	17	8		blank	3	
+29	2028	5	1	3		blank	250	190		blank	3	
+29	2028	5	1	4		blank	42	28		blank	3	
+29	2028	5	1	5	M	month	284	214	M	month	0	
+29	2028	5	1	6	A	month	277	211	A	month	0	
+29	2028	5	1	7	Y	month	77	49	Y	month	0	
+29	2028	5	2	1	SUN	red	66	44	SUN	red	0	
+29	2028	5	2	2	MON	weekday	200	154	MON	weekday	0	
+29	2028	5	2	3	TUE	weekday	237	179	TUE	weekday	0	
+29	2028	5	2	4	WED	weekday	213	166	WED	weekday	0	
+29	2028	5	2	5	THU	weekday	202	156	THU	weekday	0	
+29	2028	5	2	6	FRI	weekday	55	37	FRI	weekday	0	
+29	2028	5	2	7	SAT	red	290	217	SAT	red	0	
+29	2028	5	3	1		blank	6	3		blank	0	
+29	2028	5	3	2	1	dark	46	30	1	dark	0	
+29	2028	5	3	3	2	dark	178	136	2	dark	0	
+29	2028	5	3	4	3	dark	150	112	3	dark	0	
+29	2028	5	3	5	4	dark	246	186	4	dark	0	
+29	2028	5	3	6	5	dark	206	160	5	dark	0	
+29	2028	5	3	7	6	red	72	47	6	red	0	
+29	2028	5	4	1	7	red	9	4	7	red	0	
+29	2028	5	4	2	8	dark	204	158	8	dark	0	
+29	2028	5	4	3	9	dark	176	134	6	dark	2	6->9
+29	2028	5	4	4	10	dark	39	25	10	dark	0	
+29	2028	5	4	5	11	dark	30	18	11	dark	0	
+29	2028	5	4	6	12	dark	82	53	12	dark	0	
+29	2028	5	4	7	13	red	36	22	13	red	0	
+29	2028	5	5	1	14	red	182	139	14	red	0	
+29	2028	5	5	2	15	dark	112	79	15	dark	0	
+29	2028	5	5	3	16	dark	128	93	16	dark	0	
+29	2028	5	5	4	17	dark	145	107	17	dark	0	
+29	2028	5	5	5	18	dark	173	131	18	dark	0	
+29	2028	5	5	6	19	dark	123	89	19	dark	0	
+29	2028	5	5	7	20	red	27	15	20	red	0	
+29	2028	5	6	1	21	red	97	67	21	red	0	
+29	2028	5	6	2	22	dark	87	57	22	dark	0	
+29	2028	5	6	3	23	dark	180	138	23	dark	0	
+29	2028	5	6	4	24	dark	140	103	24	dark	0	
+29	2028	5	6	5	25	dark	179	137	25	dark	0	
+29	2028	5	6	6	26	dark	192	147	26	dark	0	
+29	2028	5	6	7	27	red	13	6	27	red	0	
+29	2028	5	7	1	28	red	232	176	28	red	0	
+29	2028	5	7	2	29	dark	191	146	29	dark	0	
+29	2028	5	7	3	30	dark	189	145	30	dark	0	
+29	2028	5	7	4	31	dark	226	173	31	dark	0	
+29	2028	5	7	5		blank	10	5		blank	1	
+29	2028	5	7	6		blank	5	2		blank	1	
+29	2028	5	7	7		blank	1	1		blank	1	
+30	2028	6	1	1		blank	14	7		blank	3	
+30	2028	6	1	2		blank	5	2		blank	3	
+30	2028	6	1	3		blank	10	5		blank	3	
+30	2028	6	1	4		blank	69	46		blank	3	
+30	2028	6	1	5	J	month	268	204	J	month	0	
+30	2028	6	1	6	U	month	78	50	U	month	0	
+30	2028	6	1	7	N	month	293	218	N	month	0	
+30	2028	6	2	1	SUN	red	66	44	SUN	red	0	
+30	2028	6	2	2	MON	weekday	200	154	MON	weekday	0	
+30	2028	6	2	3	TUE	weekday	237	179	TUE	weekday	0	
+30	2028	6	2	4	WED	weekday	213	166	WED	weekday	0	
+30	2028	6	2	5	THU	weekday	202	156	THU	weekday	0	
+30	2028	6	2	6	FRI	weekday	55	37	FRI	weekday	0	
+30	2028	6	2	7	SAT	red	290	217	SAT	red	0	
+30	2028	6	3	1		blank	6	3		blank	0	
+30	2028	6	3	2		blank	32	20		blank	1	
+30	2028	6	3	3		blank	264	200		blank	3	
+30	2028	6	3	4		blank	265	201		blank	3	
+30	2028	6	3	5	1	dark	248	188	1	dark	0	
+30	2028	6	3	6	2	dark	127	92	2	dark	0	
+30	2028	6	3	7	3	red	125	91	3	red	0	
+30	2028	6	4	1	4	red	286	215	4	red	0	
+30	2028	6	4	2	5	dark	152	114	5	dark	0	
+30	2028	6	4	3	6	dark	175	133	6	dark	0	
+30	2028	6	4	4	7	dark	157	118	7	dark	0	
+30	2028	6	4	5	8	dark	257	195	8	dark	0	
+30	2028	6	4	6	9	dark	155	116	6	dark	2	6->9
+30	2028	6	4	7	10	red	43	28	10	red	0	
+30	2028	6	5	1	11	red	26	15	11	red	0	
+30	2028	6	5	2	12	dark	81	52	12	dark	0	
+30	2028	6	5	3	13	dark	109	76	13	dark	0	
+30	2028	6	5	4	14	dark	129	94	14	dark	0	
+30	2028	6	5	5	15	dark	122	88	15	dark	0	
+30	2028	6	5	6	16	dark	94	64	16	dark	0	
+30	2028	6	5	7	17	red	71	47	17	red	0	
+30	2028	6	6	1	18	red	210	163	18	red	0	
+30	2028	6	6	2	19	dark	84	55	19	dark	0	
+30	2028	6	6	3	20	dark	58	40	20	dark	0	
+30	2028	6	6	4	21	dark	37	23	21	dark	0	
+30	2028	6	6	5	22	dark	124	90	22	dark	0	
+30	2028	6	6	6	23	dark	96	66	23	dark	0	
+30	2028	6	6	7	24	red	271	205	24	red	0	
+30	2028	6	7	1	25	red	231	176	25	red	0	
+30	2028	6	7	2	26	dark	18	8	26	dark	0	
+30	2028	6	7	3	27	dark	163	122	27	dark	0	
+30	2028	6	7	4	28	dark	161	121	28	dark	0	
+30	2028	6	7	5	29	dark	107	74	29	dark	0	
+30	2028	6	7	6	30	dark	241	183	30	dark	0	
+30	2028	6	7	7		blank	1	1		blank	1	
+31	2028	7	1	1		blank	1	1		blank	3	
+31	2028	7	1	2		blank	12	6		blank	3	
+31	2028	7	1	3		blank	250	190		blank	3	
+31	2028	7	1	4		blank	42	28		blank	3	
+31	2028	7	1	5	J	month	268	204	J	month	0	
+31	2028	7	1	6	U	month	78	50	U	month	0	
+31	2028	7	1	7	L	month	292	218	L	month	0	
+31	2028	7	2	1	SUN	red	66	44	SUN	red	0	
+31	2028	7	2	2	MON	weekday	200	154	MON	weekday	0	
+31	2028	7	2	3	TUE	weekday	237	179	TUE	weekday	0	
+31	2028	7	2	4	WED	weekday	213	166	WED	weekday	0	
+31	2028	7	2	5	THU	weekday	202	156	THU	weekday	0	
+31	2028	7	2	6	FRI	weekday	55	37	FRI	weekday	0	
+31	2028	7	2	7	SAT	red	290	217	SAT	red	0	
+31	2028	7	3	1		blank	11	5		blank	0	
+31	2028	7	3	2		blank	32	20		blank	1	
+31	2028	7	3	3		blank	266	202		blank	3	
+31	2028	7	3	4		blank	265	201		blank	3	
+31	2028	7	3	5		blank	264	200		blank	2	
+31	2028	7	3	6		blank	249	189		blank	2	
+31	2028	7	3	7	1	red	45	29	1	red	0	
+31	2028	7	4	1	2	red	160	121	2	red	0	
+31	2028	7	4	2	3	dark	144	106	3	dark	0	
+31	2028	7	4	3	4	dark	156	117	4	dark	0	
+31	2028	7	4	4	5	dark	147	109	5	dark	0	
+31	2028	7	4	5	6	dark	176	134	6	dark	0	
+31	2028	7	4	6	7	dark	203	157	7	dark	0	
+31	2028	7	4	7	8	red	8	4	8	red	0	
+31	2028	7	5	1	9	red	72	47	6	red	2	6->9
+31	2028	7	5	2	10	dark	50	34	10	dark	0	
+31	2028	7	5	3	11	dark	47	31	11	dark	0	
+31	2028	7	5	4	12	dark	119	85	12	dark	0	
+31	2028	7	5	5	13	dark	111	78	13	dark	0	
+31	2028	7	5	6	14	dark	83	54	14	dark	0	
+31	2028	7	5	7	15	red	52	35	15	red	0	
+31	2028	7	6	1	16	red	190	146	16	red	0	
+31	2028	7	6	2	17	dark	59	41	17	dark	0	
+31	2028	7	6	3	18	dark	116	82	18	dark	0	
+31	2028	7	6	4	19	dark	92	62	19	dark	0	
+31	2028	7	6	5	20	dark	90	60	20	dark	0	
+31	2028	7	6	6	21	dark	199	153	21	dark	0	
+31	2028	7	6	7	22	red	209	163	22	red	0	
+31	2028	7	7	1	23/30	red	218	170	23/30	red	0	
+31	2028	7	7	2	24/31	dark	4	2	24/31	dark	0	
+31	2028	7	7	3	25	dark	126	91	25	dark	0	
+31	2028	7	7	4	26	dark	35	22	26	dark	0	
+31	2028	7	7	5	27	dark	7	3	27	dark	0	
+31	2028	7	7	6	28	dark	230	175	28	dark	0	
+31	2028	7	7	7	29	red	233	176	29	red	0	
+32	2028	8	1	1		blank	75	49		blank	3	
+32	2028	8	1	2		blank	12	6		blank	3	
+32	2028	8	1	3		blank	10	5		blank	3	
+32	2028	8	1	4		blank	42	28		blank	3	
+32	2028	8	1	5	A	month	251	190	A	month	0	
+32	2028	8	1	6	U	month	78	50	U	month	0	
+32	2028	8	1	7	G	month	3	1	G	month	0	
+32	2028	8	2	1	SUN	red	66	44	SUN	red	0	
+32	2028	8	2	2	MON	weekday	200	154	MON	weekday	0	
+32	2028	8	2	3	TUE	weekday	237	179	TUE	weekday	0	
+32	2028	8	2	4	WED	weekday	213	166	WED	weekday	0	
+32	2028	8	2	5	THU	weekday	202	156	THU	weekday	0	
+32	2028	8	2	6	FRI	weekday	55	37	FRI	weekday	0	
+32	2028	8	2	7	SAT	red	290	217	SAT	red	0	
+32	2028	8	3	1		blank	6	3		blank	0	
+32	2028	8	3	2		blank	32	20		blank	1	
+32	2028	8	3	3	1	dark	31	19	1	dark	0	
+32	2028	8	3	4	2	dark	149	111	2	dark	0	
+32	2028	8	3	5	3	dark	186	143	3	dark	0	
+32	2028	8	3	6	4	dark	201	155	4	dark	0	
+32	2028	8	3	7	5	red	223	172	5	red	0	
+32	2028	8	4	1	6	red	287	215	6	red	0	
+32	2028	8	4	2	7	dark	194	149	7	dark	0	
+32	2028	8	4	3	8	dark	255	193	8	dark	0	
+32	2028	8	4	4	9	dark	148	110	6	dark	2	6->9
+32	2028	8	4	5	10	dark	48	32	10	dark	0	
+32	2028	8	4	6	11	dark	41	27	11	dark	0	
+32	2028	8	4	7	12	red	142	104	12	red	0	
+32	2028	8	5	1	13	red	133	97	13	red	0	
+32	2028	8	5	2	14	dark	102	71	14	dark	0	
+32	2028	8	5	3	15	dark	121	87	15	dark	0	
+32	2028	8	5	4	16	dark	139	102	16	dark	0	
+32	2028	8	5	5	17	dark	167	126	17	dark	0	
+32	2028	8	5	6	18	dark	108	75	18	dark	0	
+32	2028	8	5	7	19	red	114	80	19	red	0	
+32	2028	8	6	1	20	red	105	73	20	red	0	
+32	2028	8	6	2	21	dark	88	58	21	dark	0	
+32	2028	8	6	3	22	dark	171	129	22	dark	0	
+32	2028	8	6	4	23	dark	136	99	23	dark	0	
+32	2028	8	6	5	24	dark	172	130	24	dark	0	
+32	2028	8	6	6	25	dark	103	72	25	dark	0	
+32	2028	8	6	7	26	red	242	183	26	red	0	
+32	2028	8	7	1	27	red	63	43	27	red	0	
+32	2028	8	7	2	28	dark	229	175	28	dark	0	
+32	2028	8	7	3	29	dark	181	139	29	dark	0	
+32	2028	8	7	4	30	dark	259	197	30	dark	0	
+32	2028	8	7	5	31	dark	288	216	31	dark	0	
+32	2028	8	7	6		blank	5	2		blank	1	
+32	2028	8	7	7		blank	14	7		blank	1	
+33	2028	9	1	1		blank	1	1		blank	3	
+33	2028	9	1	2		blank	5	2		blank	3	
+33	2028	9	1	3		blank	10	5		blank	3	
+33	2028	9	1	4		blank	42	28		blank	3	
+33	2028	9	1	5	S	month	289	216	S	month	0	
+33	2028	9	1	6	E	month	282	213	E	month	0	
+33	2028	9	1	7	P	month	76	49	P	month	0	
+33	2028	9	2	1	SUN	red	66	44	SUN	red	0	
+33	2028	9	2	2	MON	weekday	200	154	MON	weekday	0	
+33	2028	9	2	3	TUE	weekday	237	179	TUE	weekday	0	
+33	2028	9	2	4	WED	weekday	213	166	WED	weekday	0	
+33	2028	9	2	5	THU	weekday	202	156	THU	weekday	0	
+33	2028	9	2	6	FRI	weekday	55	37	FRI	weekday	0	
+33	2028	9	2	7	SAT	red	290	217	SAT	red	0	
+33	2028	9	3	1		blank	6	3		blank	0	
+33	2028	9	3	2		blank	32	20		blank	1	
+33	2028	9	3	3		blank	266	202		blank	3	
+33	2028	9	3	4		blank	265	201		blank	3	
+33	2028	9	3	5		blank	264	200		blank	2	
+33	2028	9	3	6	1	dark	22	12	1	dark	0	
+33	2028	9	3	7	2	red	170	128	2	red	0	
+33	2028	9	4	1	3	red	252	191	3	red	0	
+33	2028	9	4	2	4	dark	151	113	4	dark	0	
+33	2028	9	4	3	5	dark	166	125	5	dark	0	
+33	2028	9	4	4	6	dark	148	110	6	dark	0	
+33	2028	9	4	5	7	dark	247	187	7	dark	0	
+33	2028	9	4	6	8	dark	101	70	8	dark	0	
+33	2028	9	4	7	9	red	287	215	6	red	2	6->9
+33	2028	9	5	1	10	red	228	174	10	red	0	
+33	2028	9	5	2	11	dark	56	38	11	dark	0	
+33	2028	9	5	3	12	dark	49	33	12	dark	0	
+33	2028	9	5	4	13	dark	120	86	13	dark	0	
+33	2028	9	5	5	14	dark	118	84	14	dark	0	
+33	2028	9	5	6	15	dark	89	59	15	dark	0	
+33	2028	9	5	7	16	red	68	45	16	red	0	
+33	2028	9	6	1	17	red	198	152	17	red	0	
+33	2028	9	6	2	18	dark	80	51	18	dark	0	
+33	2028	9	6	3	19	dark	131	96	19	dark	0	
+33	2028	9	6	4	20	dark	238	180	20	dark	0	
+33	2028	9	6	5	21	dark	28	16	21	dark	0	
+33	2028	9	6	6	22	dark	276	210	22	dark	0	
+33	2028	9	6	7	23	red	104	73	23	red	0	
+33	2028	9	7	1	24	red	16	7	24	red	0	
+33	2028	9	7	2	25	dark	98	67	25	dark	0	
+33	2028	9	7	3	26	dark	132	97	26	dark	0	
+33	2028	9	7	4	27	dark	154	115	27	dark	0	
+33	2028	9	7	5	28	dark	162	122	28	dark	0	
+33	2028	9	7	6	29	dark	235	177	29	dark	0	
+33	2028	9	7	7	30	red	64	43	30	red	0	
+34	2028	10	1	1		blank	62	43		blank	3	
+34	2028	10	1	2	O	month	85	56	O	month	0	
+34	2028	10	1	3	C	month	269	204	C	month	0	
+34	2028	10	1	4	T	month	134	98	T	month	0	
+34	2028	10	1	5		blank	6	3		blank	3	
+34	2028	10	1	6		blank	24	14		blank	3	
+34	2028	10	1	7		blank	14	7		blank	2	
+34	2028	10	2	1	SUN	red	66	44	SUN	red	0	
+34	2028	10	2	2	MON	weekday	200	154	MON	weekday	0	
+34	2028	10	2	3	TUE	weekday	237	179	TUE	weekday	0	
+34	2028	10	2	4	WED	weekday	213	166	WED	weekday	0	
+34	2028	10	2	5	THU	weekday	202	156	THU	weekday	0	
+34	2028	10	2	6	FRI	weekday	55	37	FRI	weekday	0	
+34	2028	10	2	7	SAT	red	290	217	SAT	red	0	
+34	2028	10	3	1	1	red	33	21	1	red	0	
+34	2028	10	3	2	2	dark	168	127	2	dark	0	
+34	2028	10	3	3	3	dark	184	141	3	dark	0	
+34	2028	10	3	4	4	dark	158	119	4	dark	0	
+34	2028	10	3	5	5	dark	177	135	5	dark	0	
+34	2028	10	3	6	6	dark	212	165	6	dark	0	
+34	2028	10	3	7	7	red	67	45	7	red	0	
+34	2028	10	4	1	8	red	253	191	8	red	0	
+34	2028	10	4	2	9	dark	159	120	6	dark	2	6->9
+34	2028	10	4	3	10	dark	38	24	10	dark	0	
+34	2028	10	4	4	11	dark	138	101	11	dark	0	
+34	2028	10	4	5	12	dark	110	77	12	dark	0	
+34	2028	10	4	6	13	dark	91	61	13	dark	0	
+34	2028	10	4	7	14	red	153	115	14	red	0	
+34	2028	10	5	1	15	red	188	145	15	red	0	
+34	2028	10	5	2	16	dark	115	81	16	dark	0	
+34	2028	10	5	3	17	dark	165	124	17	dark	0	
+34	2028	10	5	4	18	dark	146	108	18	dark	0	
+34	2028	10	5	5	19	dark	174	132	19	dark	0	
+34	2028	10	5	6	20	dark	214	167	20	dark	0	
+34	2028	10	5	7	21	red	44	29	21	red	0	
+34	2028	10	6	1	22	red	221	171	22	red	0	
+34	2028	10	6	2	23	dark	95	65	23	dark	0	
+34	2028	10	6	3	24	dark	183	140	24	dark	0	
+34	2028	10	6	4	25	dark	143	105	25	dark	0	
+34	2028	10	6	5	26	dark	187	144	26	dark	0	
+34	2028	10	6	6	27	dark	196	151	27	dark	0	
+34	2028	10	6	7	28	red	234	177	28	red	0	
+34	2028	10	7	1	29	red	280	212	29	red	0	
+34	2028	10	7	2	30	dark	217	169	30	dark	0	
+34	2028	10	7	3	31	dark	227	174	31	dark	0	
+34	2028	10	7	4		blank	42	28		blank	1	
+34	2028	10	7	5		blank	10	5		blank	1	
+34	2028	10	7	6		blank	5	2		blank	1	
+34	2028	10	7	7		blank	1	1		blank	1	
+35	2028	11	1	1		blank	62	43		blank	3	
+35	2028	11	1	2	N	month	74	48	N	month	0	
+35	2028	11	1	3	O	month	244	184	O	month	0	
+35	2028	11	1	4	V	month	135	98	V	month	0	
+35	2028	11	1	5		blank	11	5		blank	3	
+35	2028	11	1	6		blank	24	14		blank	3	
+35	2028	11	1	7		blank	14	7		blank	2	
+35	2028	11	2	1	SUN	red	66	44	SUN	red	0	
+35	2028	11	2	2	MON	weekday	200	154	MON	weekday	0	
+35	2028	11	2	3	TUE	weekday	237	179	TUE	weekday	0	
+35	2028	11	2	4	WED	weekday	213	166	WED	weekday	0	
+35	2028	11	2	5	THU	weekday	202	156	THU	weekday	0	
+35	2028	11	2	6	FRI	weekday	55	37	FRI	weekday	0	
+35	2028	11	2	7	SAT	red	290	217	SAT	red	0	
+35	2028	11	3	1		blank	6	3		blank	0	
+35	2028	11	3	2		blank	32	20		blank	1	
+35	2028	11	3	3		blank	264	200		blank	3	
+35	2028	11	3	4	1	dark	40	26	1	dark	0	
+35	2028	11	3	5	2	dark	29	17	2	dark	0	
+35	2028	11	3	6	3	dark	195	150	3	dark	0	
+35	2028	11	3	7	4	red	51	35	4	red	0	
+35	2028	11	4	1	5	red	260	197	5	red	0	
+35	2028	11	4	2	6	dark	155	116	6	dark	0	
+35	2028	11	4	3	7	dark	185	142	7	dark	0	
+35	2028	11	4	4	8	dark	256	194	8	dark	0	
+35	2028	11	4	5	9	dark	175	133	6	dark	2	6->9
+35	2028	11	4	6	10	dark	57	39	10	dark	0	
+35	2028	11	4	7	11	red	141	104	11	red	0	
+35	2028	11	5	1	12	red	113	80	12	red	0	
+35	2028	11	5	2	13	dark	93	63	13	dark	0	
+35	2028	11	5	3	14	dark	117	83	14	dark	0	
+35	2028	11	5	4	15	dark	137	100	15	dark	0	
+35	2028	11	5	5	16	dark	130	95	16	dark	0	
+35	2028	11	5	6	17	dark	100	69	17	dark	0	
+35	2028	11	5	7	18	red	106	74	18	red	0	
+35	2028	11	6	1	19	red	216	169	19	red	0	
+35	2028	11	6	2	20	dark	19	9	20	dark	0	
+35	2028	11	6	3	21	dark	20	10	21	dark	0	
+35	2028	11	6	4	22	dark	21	11	22	dark	0	
+35	2028	11	6	5	23	dark	164	123	23	dark	0	
+35	2028	11	6	6	24	dark	99	68	24	dark	0	
+35	2028	11	6	7	25	red	222	171	25	red	0	
+35	2028	11	7	1	26	red	279	212	26	red	0	
+35	2028	11	7	2	27	dark	53	36	27	dark	0	
+35	2028	11	7	3	28	dark	169	128	28	dark	0	
+35	2028	11	7	4	29	dark	225	173	29	dark	0	
+35	2028	11	7	5	30	dark	34	21	30	dark	0	
+35	2028	11	7	6		blank	5	2		blank	1	
+35	2028	11	7	7		blank	1	1		blank	1	
+36	2028	12	1	1		blank	14	7		blank	3	
+36	2028	12	1	2	D	month	25	14	D	month	0	
+36	2028	12	1	3	E	month	261	198	E	month	0	
+36	2028	12	1	4	C	month	70	46	C	month	0	
+36	2028	12	1	5		blank	11	5		blank	3	
+36	2028	12	1	6		blank	73	48		blank	3	
+36	2028	12	1	7		blank	1	1		blank	2	
+36	2028	12	2	1	SUN	red	66	44	SUN	red	0	
+36	2028	12	2	2	MON	weekday	200	154	MON	weekday	0	
+36	2028	12	2	3	TUE	weekday	237	179	TUE	weekday	0	
+36	2028	12	2	4	WED	weekday	213	166	WED	weekday	0	
+36	2028	12	2	5	THU	weekday	202	156	THU	weekday	0	
+36	2028	12	2	6	FRI	weekday	55	37	FRI	weekday	0	
+36	2028	12	2	7	SAT	red	290	217	SAT	red	0	
+36	2028	12	3	1		blank	6	3		blank	0	
+36	2028	12	3	2		blank	32	20		blank	1	
+36	2028	12	3	3		blank	266	202		blank	3	
+36	2028	12	3	4		blank	265	201		blank	3	
+36	2028	12	3	5		blank	264	200		blank	2	
+36	2028	12	3	6	1	dark	22	12	1	dark	0	
+36	2028	12	3	7	2	red	170	128	2	red	0	
+36	2028	12	4	1	3	red	252	191	3	red	0	
+36	2028	12	4	2	4	dark	151	113	4	dark	0	
+36	2028	12	4	3	5	dark	166	125	5	dark	0	
+36	2028	12	4	4	6	dark	148	110	6	dark	0	
+36	2028	12	4	5	7	dark	247	187	7	dark	0	
+36	2028	12	4	6	8	dark	101	70	8	dark	0	
+36	2028	12	4	7	9	red	287	215	6	red	2	6->9
+36	2028	12	5	1	10	red	228	174	10	red	0	
+36	2028	12	5	2	11	dark	56	38	11	dark	0	
+36	2028	12	5	3	12	dark	49	33	12	dark	0	
+36	2028	12	5	4	13	dark	120	86	13	dark	0	
+36	2028	12	5	5	14	dark	118	84	14	dark	0	
+36	2028	12	5	6	15	dark	89	59	15	dark	0	
+36	2028	12	5	7	16	red	68	45	16	red	0	
+36	2028	12	6	1	17	red	198	152	17	red	0	
+36	2028	12	6	2	18	dark	80	51	18	dark	0	
+36	2028	12	6	3	19	dark	131	96	19	dark	0	
+36	2028	12	6	4	20	dark	238	180	20	dark	0	
+36	2028	12	6	5	21	dark	28	16	21	dark	0	
+36	2028	12	6	6	22	dark	276	210	22	dark	0	
+36	2028	12	6	7	23	red	104	73	23	red	0	
+36	2028	12	7	1	24/31	red	219	170	24/31	red	0	
+36	2028	12	7	2	25	dark	98	67	25	dark	0	
+36	2028	12	7	3	26	dark	132	97	26	dark	0	
+36	2028	12	7	4	27	dark	154	115	27	dark	0	
+36	2028	12	7	5	28	dark	162	122	28	dark	0	
+36	2028	12	7	6	29	dark	235	177	29	dark	0	
+36	2028	12	7	7	30	red	64	43	30	red	0	
+37	2029	1	1	1		blank	14	7		blank	3	
+37	2029	1	1	2		blank	17	8		blank	3	
+37	2029	1	1	3		blank	250	190		blank	3	
+37	2029	1	1	4		blank	42	28		blank	3	
+37	2029	1	1	5	J	month	268	204	J	month	0	
+37	2029	1	1	6	A	month	277	211	A	month	0	
+37	2029	1	1	7	N	month	293	218	N	month	0	
+37	2029	1	2	1	SUN	red	66	44	SUN	red	0	
+37	2029	1	2	2	MON	weekday	200	154	MON	weekday	0	
+37	2029	1	2	3	TUE	weekday	237	179	TUE	weekday	0	
+37	2029	1	2	4	WED	weekday	213	166	WED	weekday	0	
+37	2029	1	2	5	THU	weekday	202	156	THU	weekday	0	
+37	2029	1	2	6	FRI	weekday	55	37	FRI	weekday	0	
+37	2029	1	2	7	SAT	red	290	217	SAT	red	0	
+37	2029	1	3	1		blank	6	3		blank	0	
+37	2029	1	3	2	1	dark	46	30	1	dark	0	
+37	2029	1	3	3	2	dark	178	136	2	dark	0	
+37	2029	1	3	4	3	dark	150	112	3	dark	0	
+37	2029	1	3	5	4	dark	246	186	4	dark	0	
+37	2029	1	3	6	5	dark	206	160	5	dark	0	
+37	2029	1	3	7	6	red	72	47	6	red	0	
+37	2029	1	4	1	7	red	9	4	7	red	0	
+37	2029	1	4	2	8	dark	204	158	8	dark	0	
+37	2029	1	4	3	9	dark	176	134	6	dark	2	6->9
+37	2029	1	4	4	10	dark	39	25	10	dark	0	
+37	2029	1	4	5	11	dark	30	18	11	dark	0	
+37	2029	1	4	6	12	dark	82	53	12	dark	0	
+37	2029	1	4	7	13	red	36	22	13	red	0	
+37	2029	1	5	1	14	red	182	139	14	red	0	
+37	2029	1	5	2	15	dark	112	79	15	dark	0	
+37	2029	1	5	3	16	dark	128	93	16	dark	0	
+37	2029	1	5	4	17	dark	145	107	17	dark	0	
+37	2029	1	5	5	18	dark	173	131	18	dark	0	
+37	2029	1	5	6	19	dark	123	89	19	dark	0	
+37	2029	1	5	7	20	red	27	15	20	red	0	
+37	2029	1	6	1	21	red	97	67	21	red	0	
+37	2029	1	6	2	22	dark	87	57	22	dark	0	
+37	2029	1	6	3	23	dark	180	138	23	dark	0	
+37	2029	1	6	4	24	dark	140	103	24	dark	0	
+37	2029	1	6	5	25	dark	179	137	25	dark	0	
+37	2029	1	6	6	26	dark	192	147	26	dark	0	
+37	2029	1	6	7	27	red	13	6	27	red	0	
+37	2029	1	7	1	28	red	232	176	28	red	0	
+37	2029	1	7	2	29	dark	191	146	29	dark	0	
+37	2029	1	7	3	30	dark	189	145	30	dark	0	
+37	2029	1	7	4	31	dark	226	173	31	dark	0	
+37	2029	1	7	5		blank	10	5		blank	1	
+37	2029	1	7	6		blank	5	2		blank	1	
+37	2029	1	7	7		blank	1	1		blank	1	
+38	2029	2	1	1		blank	62	43		blank	3	
+38	2029	2	1	2		blank	12	6		blank	3	
+38	2029	2	1	3		blank	250	190		blank	3	
+38	2029	2	1	4		blank	69	46		blank	3	
+38	2029	2	1	5	F	month	262	198	F	month	0	
+38	2029	2	1	6	E	month	282	213	E	month	0	
+38	2029	2	1	7	B	month	2	1	B	month	0	
+38	2029	2	2	1	SUN	red	66	44	SUN	red	0	
+38	2029	2	2	2	MON	weekday	200	154	MON	weekday	0	
+38	2029	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+38	2029	2	2	4	WED	weekday	213	166	WED	weekday	0	
+38	2029	2	2	5	THU	weekday	202	156	THU	weekday	0	
+38	2029	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+38	2029	2	2	7	SAT	red	290	217	SAT	red	0	
+38	2029	2	3	1		blank	6	3		blank	0	
+38	2029	2	3	2		blank	32	20		blank	1	
+38	2029	2	3	3		blank	264	200		blank	3	
+38	2029	2	3	4		blank	265	201		blank	3	
+38	2029	2	3	5	1	dark	248	188	1	dark	0	
+38	2029	2	3	6	2	dark	127	92	2	dark	0	
+38	2029	2	3	7	3	red	125	91	3	red	0	
+38	2029	2	4	1	4	red	286	215	4	red	0	
+38	2029	2	4	2	5	dark	152	114	5	dark	0	
+38	2029	2	4	3	6	dark	175	133	6	dark	0	
+38	2029	2	4	4	7	dark	157	118	7	dark	0	
+38	2029	2	4	5	8	dark	257	195	8	dark	0	
+38	2029	2	4	6	9	dark	155	116	6	dark	2	6->9
+38	2029	2	4	7	10	red	43	28	10	red	0	
+38	2029	2	5	1	11	red	26	15	11	red	0	
+38	2029	2	5	2	12	dark	81	52	12	dark	0	
+38	2029	2	5	3	13	dark	109	76	13	dark	0	
+38	2029	2	5	4	14	dark	129	94	14	dark	0	
+38	2029	2	5	5	15	dark	122	88	15	dark	0	
+38	2029	2	5	6	16	dark	94	64	16	dark	0	
+38	2029	2	5	7	17	red	71	47	17	red	0	
+38	2029	2	6	1	18	red	210	163	18	red	0	
+38	2029	2	6	2	19	dark	84	55	19	dark	0	
+38	2029	2	6	3	20	dark	58	40	20	dark	0	
+38	2029	2	6	4	21	dark	37	23	21	dark	0	
+38	2029	2	6	5	22	dark	124	90	22	dark	0	
+38	2029	2	6	6	23	dark	96	66	23	dark	0	
+38	2029	2	6	7	24	red	271	205	24	red	0	
+38	2029	2	7	1	25	red	231	176	25	red	0	
+38	2029	2	7	2	26	dark	18	8	26	dark	0	
+38	2029	2	7	3	27	dark	163	122	27	dark	0	
+38	2029	2	7	4	28	dark	161	121	28	dark	0	
+38	2029	2	7	5		blank	10	5		blank	1	
+38	2029	2	7	6		blank	5	2		blank	1	
+38	2029	2	7	7		blank	14	7		blank	1	
+39	2029	3	1	1		blank	1	1		blank	3	
+39	2029	3	1	2		blank	5	2		blank	3	
+39	2029	3	1	3		blank	10	5		blank	3	
+39	2029	3	1	4		blank	69	46		blank	3	
+39	2029	3	1	5	M	month	284	214	M	month	0	
+39	2029	3	1	6	A	month	277	211	A	month	0	
+39	2029	3	1	7	R	month	294	218	R	month	0	
+39	2029	3	2	1	SUN	red	66	44	SUN	red	0	
+39	2029	3	2	2	MON	weekday	200	154	MON	weekday	0	
+39	2029	3	2	3	TUE	weekday	237	179	TUE	weekday	0	
+39	2029	3	2	4	WED	weekday	213	166	WED	weekday	0	
+39	2029	3	2	5	THU	weekday	202	156	THU	weekday	0	
+39	2029	3	2	6	FRI	weekday	55	37	FRI	weekday	0	
+39	2029	3	2	7	SAT	red	290	217	SAT	red	0	
+39	2029	3	3	1		blank	6	3		blank	0	
+39	2029	3	3	2		blank	32	20		blank	1	
+39	2029	3	3	3		blank	264	200		blank	3	
+39	2029	3	3	4		blank	265	201		blank	3	
+39	2029	3	3	5	1	dark	248	188	1	dark	0	
+39	2029	3	3	6	2	dark	127	92	2	dark	0	
+39	2029	3	3	7	3	red	125	91	3	red	0	
+39	2029	3	4	1	4	red	286	215	4	red	0	
+39	2029	3	4	2	5	dark	152	114	5	dark	0	
+39	2029	3	4	3	6	dark	175	133	6	dark	0	
+39	2029	3	4	4	7	dark	157	118	7	dark	0	
+39	2029	3	4	5	8	dark	257	195	8	dark	0	
+39	2029	3	4	6	9	dark	155	116	6	dark	2	6->9
+39	2029	3	4	7	10	red	43	28	10	red	0	
+39	2029	3	5	1	11	red	26	15	11	red	0	
+39	2029	3	5	2	12	dark	81	52	12	dark	0	
+39	2029	3	5	3	13	dark	109	76	13	dark	0	
+39	2029	3	5	4	14	dark	129	94	14	dark	0	
+39	2029	3	5	5	15	dark	122	88	15	dark	0	
+39	2029	3	5	6	16	dark	94	64	16	dark	0	
+39	2029	3	5	7	17	red	71	47	17	red	0	
+39	2029	3	6	1	18	red	210	163	18	red	0	
+39	2029	3	6	2	19	dark	84	55	19	dark	0	
+39	2029	3	6	3	20	dark	58	40	20	dark	0	
+39	2029	3	6	4	21	dark	37	23	21	dark	0	
+39	2029	3	6	5	22	dark	124	90	22	dark	0	
+39	2029	3	6	6	23	dark	96	66	23	dark	0	
+39	2029	3	6	7	24	red	271	205	24	red	0	
+39	2029	3	7	1	25	red	231	176	25	red	0	
+39	2029	3	7	2	26	dark	18	8	26	dark	0	
+39	2029	3	7	3	27	dark	163	122	27	dark	0	
+39	2029	3	7	4	28	dark	161	121	28	dark	0	
+39	2029	3	7	5	29	dark	107	74	29	dark	0	
+39	2029	3	7	6	30	dark	241	183	30	dark	0	
+39	2029	3	7	7	31	red	281	212	31	red	0	
+40	2029	4	1	1		blank	14	7		blank	3	
+40	2029	4	1	2		blank	12	6		blank	3	
+40	2029	4	1	3		blank	285	214		blank	3	
+40	2029	4	1	4		blank	69	46		blank	3	
+40	2029	4	1	5	A	month	251	190	A	month	0	
+40	2029	4	1	6	P	month	86	56	P	month	0	
+40	2029	4	1	7	R	month	294	218	R	month	0	
+40	2029	4	2	1	SUN	red	66	44	SUN	red	0	
+40	2029	4	2	2	MON	weekday	200	154	MON	weekday	0	
+40	2029	4	2	3	TUE	weekday	237	179	TUE	weekday	0	
+40	2029	4	2	4	WED	weekday	213	166	WED	weekday	0	
+40	2029	4	2	5	THU	weekday	202	156	THU	weekday	0	
+40	2029	4	2	6	FRI	weekday	55	37	FRI	weekday	0	
+40	2029	4	2	7	SAT	red	290	217	SAT	red	0	
+40	2029	4	3	1	1	red	33	21	1	red	0	
+40	2029	4	3	2	2	dark	168	127	2	dark	0	
+40	2029	4	3	3	3	dark	184	141	3	dark	0	
+40	2029	4	3	4	4	dark	158	119	4	dark	0	
+40	2029	4	3	5	5	dark	177	135	5	dark	0	
+40	2029	4	3	6	6	dark	212	165	6	dark	0	
+40	2029	4	3	7	7	red	67	45	7	red	0	
+40	2029	4	4	1	8	red	253	191	8	red	0	
+40	2029	4	4	2	9	dark	159	120	6	dark	2	6->9
+40	2029	4	4	3	10	dark	38	24	10	dark	0	
+40	2029	4	4	4	11	dark	138	101	11	dark	0	
+40	2029	4	4	5	12	dark	110	77	12	dark	0	
+40	2029	4	4	6	13	dark	91	61	13	dark	0	
+40	2029	4	4	7	14	red	153	115	14	red	0	
+40	2029	4	5	1	15	red	188	145	15	red	0	
+40	2029	4	5	2	16	dark	115	81	16	dark	0	
+40	2029	4	5	3	17	dark	165	124	17	dark	0	
+40	2029	4	5	4	18	dark	146	108	18	dark	0	
+40	2029	4	5	5	19	dark	174	132	19	dark	0	
+40	2029	4	5	6	20	dark	214	167	20	dark	0	
+40	2029	4	5	7	21	red	44	29	21	red	0	
+40	2029	4	6	1	22	red	221	171	22	red	0	
+40	2029	4	6	2	23	dark	95	65	23	dark	0	
+40	2029	4	6	3	24	dark	183	140	24	dark	0	
+40	2029	4	6	4	25	dark	143	105	25	dark	0	
+40	2029	4	6	5	26	dark	187	144	26	dark	0	
+40	2029	4	6	6	27	dark	196	151	27	dark	0	
+40	2029	4	6	7	28	red	234	177	28	red	0	
+40	2029	4	7	1	29	red	280	212	29	red	0	
+40	2029	4	7	2	30	dark	217	169	30	dark	0	
+40	2029	4	7	3		blank	6	3		blank	1	
+40	2029	4	7	4		blank	42	28		blank	1	
+40	2029	4	7	5		blank	10	5		blank	1	
+40	2029	4	7	6		blank	5	2		blank	1	
+40	2029	4	7	7		blank	1	1		blank	1	
+41	2029	5	1	1		blank	14	7		blank	3	
+41	2029	5	1	2		blank	12	6		blank	3	
+41	2029	5	1	3		blank	10	5		blank	3	
+41	2029	5	1	4		blank	42	28		blank	3	
+41	2029	5	1	5	M	month	284	214	M	month	0	
+41	2029	5	1	6	A	month	277	211	A	month	0	
+41	2029	5	1	7	Y	month	77	49	Y	month	0	
+41	2029	5	2	1	SUN	red	66	44	SUN	red	0	
+41	2029	5	2	2	MON	weekday	200	154	MON	weekday	0	
+41	2029	5	2	3	TUE	weekday	237	179	TUE	weekday	0	
+41	2029	5	2	4	WED	weekday	213	166	WED	weekday	0	
+41	2029	5	2	5	THU	weekday	202	156	THU	weekday	0	
+41	2029	5	2	6	FRI	weekday	55	37	FRI	weekday	0	
+41	2029	5	2	7	SAT	red	290	217	SAT	red	0	
+41	2029	5	3	1		blank	6	3		blank	0	
+41	2029	5	3	2		blank	32	20		blank	1	
+41	2029	5	3	3	1	dark	31	19	1	dark	0	
+41	2029	5	3	4	2	dark	149	111	2	dark	0	
+41	2029	5	3	5	3	dark	186	143	3	dark	0	
+41	2029	5	3	6	4	dark	201	155	4	dark	0	
+41	2029	5	3	7	5	red	223	172	5	red	0	
+41	2029	5	4	1	6	red	287	215	6	red	0	
+41	2029	5	4	2	7	dark	194	149	7	dark	0	
+41	2029	5	4	3	8	dark	255	193	8	dark	0	
+41	2029	5	4	4	9	dark	148	110	6	dark	2	6->9
+41	2029	5	4	5	10	dark	48	32	10	dark	0	
+41	2029	5	4	6	11	dark	41	27	11	dark	0	
+41	2029	5	4	7	12	red	142	104	12	red	0	
+41	2029	5	5	1	13	red	133	97	13	red	0	
+41	2029	5	5	2	14	dark	102	71	14	dark	0	
+41	2029	5	5	3	15	dark	121	87	15	dark	0	
+41	2029	5	5	4	16	dark	139	102	16	dark	0	
+41	2029	5	5	5	17	dark	167	126	17	dark	0	
+41	2029	5	5	6	18	dark	108	75	18	dark	0	
+41	2029	5	5	7	19	red	114	80	19	red	0	
+41	2029	5	6	1	20	red	105	73	20	red	0	
+41	2029	5	6	2	21	dark	88	58	21	dark	0	
+41	2029	5	6	3	22	dark	171	129	22	dark	0	
+41	2029	5	6	4	23	dark	136	99	23	dark	0	
+41	2029	5	6	5	24	dark	172	130	24	dark	0	
+41	2029	5	6	6	25	dark	103	72	25	dark	0	
+41	2029	5	6	7	26	red	242	183	26	red	0	
+41	2029	5	7	1	27	red	63	43	27	red	0	
+41	2029	5	7	2	28	dark	229	175	28	dark	0	
+41	2029	5	7	3	29	dark	181	139	29	dark	0	
+41	2029	5	7	4	30	dark	259	197	30	dark	0	
+41	2029	5	7	5	31	dark	288	216	31	dark	0	
+41	2029	5	7	6		blank	5	2		blank	1	
+41	2029	5	7	7		blank	1	1		blank	1	
+42	2029	6	1	1		blank	1	1		blank	3	
+42	2029	6	1	2		blank	5	2		blank	3	
+42	2029	6	1	3		blank	10	5		blank	3	
+42	2029	6	1	4		blank	42	28		blank	3	
+42	2029	6	1	5	J	month	268	204	J	month	0	
+42	2029	6	1	6	U	month	78	50	U	month	0	
+42	2029	6	1	7	N	month	293	218	N	month	0	
+42	2029	6	2	1	SUN	red	66	44	SUN	red	0	
+42	2029	6	2	2	MON	weekday	200	154	MON	weekday	0	
+42	2029	6	2	3	TUE	weekday	237	179	TUE	weekday	0	
+42	2029	6	2	4	WED	weekday	213	166	WED	weekday	0	
+42	2029	6	2	5	THU	weekday	202	156	THU	weekday	0	
+42	2029	6	2	6	FRI	weekday	55	37	FRI	weekday	0	
+42	2029	6	2	7	SAT	red	290	217	SAT	red	0	
+42	2029	6	3	1		blank	6	3		blank	0	
+42	2029	6	3	2		blank	32	20		blank	1	
+42	2029	6	3	3		blank	266	202		blank	3	
+42	2029	6	3	4		blank	265	201		blank	3	
+42	2029	6	3	5		blank	264	200		blank	2	
+42	2029	6	3	6	1	dark	22	12	1	dark	0	
+42	2029	6	3	7	2	red	170	128	2	red	0	
+42	2029	6	4	1	3	red	252	191	3	red	0	
+42	2029	6	4	2	4	dark	151	113	4	dark	0	
+42	2029	6	4	3	5	dark	166	125	5	dark	0	
+42	2029	6	4	4	6	dark	148	110	6	dark	0	
+42	2029	6	4	5	7	dark	247	187	7	dark	0	
+42	2029	6	4	6	8	dark	101	70	8	dark	0	
+42	2029	6	4	7	9	red	287	215	6	red	2	6->9
+42	2029	6	5	1	10	red	228	174	10	red	0	
+42	2029	6	5	2	11	dark	56	38	11	dark	0	
+42	2029	6	5	3	12	dark	49	33	12	dark	0	
+42	2029	6	5	4	13	dark	120	86	13	dark	0	
+42	2029	6	5	5	14	dark	118	84	14	dark	0	
+42	2029	6	5	6	15	dark	89	59	15	dark	0	
+42	2029	6	5	7	16	red	68	45	16	red	0	
+42	2029	6	6	1	17	red	198	152	17	red	0	
+42	2029	6	6	2	18	dark	80	51	18	dark	0	
+42	2029	6	6	3	19	dark	131	96	19	dark	0	
+42	2029	6	6	4	20	dark	238	180	20	dark	0	
+42	2029	6	6	5	21	dark	28	16	21	dark	0	
+42	2029	6	6	6	22	dark	276	210	22	dark	0	
+42	2029	6	6	7	23	red	104	73	23	red	0	
+42	2029	6	7	1	24	red	16	7	24	red	0	
+42	2029	6	7	2	25	dark	98	67	25	dark	0	
+42	2029	6	7	3	26	dark	132	97	26	dark	0	
+42	2029	6	7	4	27	dark	154	115	27	dark	0	
+42	2029	6	7	5	28	dark	162	122	28	dark	0	
+42	2029	6	7	6	29	dark	235	177	29	dark	0	
+42	2029	6	7	7	30	red	64	43	30	red	0	
+43	2029	7	1	1		blank	14	7		blank	3	
+43	2029	7	1	2		blank	12	6		blank	3	
+43	2029	7	1	3		blank	250	190		blank	3	
+43	2029	7	1	4		blank	69	46		blank	3	
+43	2029	7	1	5	J	month	268	204	J	month	0	
+43	2029	7	1	6	U	month	78	50	U	month	0	
+43	2029	7	1	7	L	month	292	218	L	month	0	
+43	2029	7	2	1	SUN	red	66	44	SUN	red	0	
+43	2029	7	2	2	MON	weekday	200	154	MON	weekday	0	
+43	2029	7	2	3	TUE	weekday	237	179	TUE	weekday	0	
+43	2029	7	2	4	WED	weekday	213	166	WED	weekday	0	
+43	2029	7	2	5	THU	weekday	202	156	THU	weekday	0	
+43	2029	7	2	6	FRI	weekday	55	37	FRI	weekday	0	
+43	2029	7	2	7	SAT	red	290	217	SAT	red	0	
+43	2029	7	3	1	1	red	33	21	1	red	0	
+43	2029	7	3	2	2	dark	168	127	2	dark	0	
+43	2029	7	3	3	3	dark	184	141	3	dark	0	
+43	2029	7	3	4	4	dark	158	119	4	dark	0	
+43	2029	7	3	5	5	dark	177	135	5	dark	0	
+43	2029	7	3	6	6	dark	212	165	6	dark	0	
+43	2029	7	3	7	7	red	67	45	7	red	0	
+43	2029	7	4	1	8	red	253	191	8	red	0	
+43	2029	7	4	2	9	dark	159	120	6	dark	2	6->9
+43	2029	7	4	3	10	dark	38	24	10	dark	0	
+43	2029	7	4	4	11	dark	138	101	11	dark	0	
+43	2029	7	4	5	12	dark	110	77	12	dark	0	
+43	2029	7	4	6	13	dark	91	61	13	dark	0	
+43	2029	7	4	7	14	red	153	115	14	red	0	
+43	2029	7	5	1	15	red	188	145	15	red	0	
+43	2029	7	5	2	16	dark	115	81	16	dark	0	
+43	2029	7	5	3	17	dark	165	124	17	dark	0	
+43	2029	7	5	4	18	dark	146	108	18	dark	0	
+43	2029	7	5	5	19	dark	174	132	19	dark	0	
+43	2029	7	5	6	20	dark	214	167	20	dark	0	
+43	2029	7	5	7	21	red	44	29	21	red	0	
+43	2029	7	6	1	22	red	221	171	22	red	0	
+43	2029	7	6	2	23	dark	95	65	23	dark	0	
+43	2029	7	6	3	24	dark	183	140	24	dark	0	
+43	2029	7	6	4	25	dark	143	105	25	dark	0	
+43	2029	7	6	5	26	dark	187	144	26	dark	0	
+43	2029	7	6	6	27	dark	196	151	27	dark	0	
+43	2029	7	6	7	28	red	234	177	28	red	0	
+43	2029	7	7	1	29	red	280	212	29	red	0	
+43	2029	7	7	2	30	dark	217	169	30	dark	0	
+43	2029	7	7	3	31	dark	227	174	31	dark	0	
+43	2029	7	7	4		blank	42	28		blank	1	
+43	2029	7	7	5		blank	10	5		blank	1	
+43	2029	7	7	6		blank	5	2		blank	1	
+43	2029	7	7	7		blank	1	1		blank	1	
+44	2029	8	1	1		blank	62	43		blank	3	
+44	2029	8	1	2		blank	5	2		blank	3	
+44	2029	8	1	3		blank	10	5		blank	3	
+44	2029	8	1	4		blank	42	28		blank	3	
+44	2029	8	1	5	A	month	251	190	A	month	0	
+44	2029	8	1	6	U	month	78	50	U	month	0	
+44	2029	8	1	7	G	month	3	1	G	month	0	
+44	2029	8	2	1	SUN	red	66	44	SUN	red	0	
+44	2029	8	2	2	MON	weekday	200	154	MON	weekday	0	
+44	2029	8	2	3	TUE	weekday	237	179	TUE	weekday	0	
+44	2029	8	2	4	WED	weekday	213	166	WED	weekday	0	
+44	2029	8	2	5	THU	weekday	202	156	THU	weekday	0	
+44	2029	8	2	6	FRI	weekday	55	37	FRI	weekday	0	
+44	2029	8	2	7	SAT	red	290	217	SAT	red	0	
+44	2029	8	3	1		blank	6	3		blank	0	
+44	2029	8	3	2		blank	32	20		blank	1	
+44	2029	8	3	3		blank	264	200		blank	3	
+44	2029	8	3	4	1	dark	40	26	1	dark	0	
+44	2029	8	3	5	2	dark	29	17	2	dark	0	
+44	2029	8	3	6	3	dark	195	150	3	dark	0	
+44	2029	8	3	7	4	red	51	35	4	red	0	
+44	2029	8	4	1	5	red	260	197	5	red	0	
+44	2029	8	4	2	6	dark	155	116	6	dark	0	
+44	2029	8	4	3	7	dark	185	142	7	dark	0	
+44	2029	8	4	4	8	dark	256	194	8	dark	0	
+44	2029	8	4	5	9	dark	175	133	6	dark	2	6->9
+44	2029	8	4	6	10	dark	57	39	10	dark	0	
+44	2029	8	4	7	11	red	141	104	11	red	0	
+44	2029	8	5	1	12	red	113	80	12	red	0	
+44	2029	8	5	2	13	dark	93	63	13	dark	0	
+44	2029	8	5	3	14	dark	117	83	14	dark	0	
+44	2029	8	5	4	15	dark	137	100	15	dark	0	
+44	2029	8	5	5	16	dark	130	95	16	dark	0	
+44	2029	8	5	6	17	dark	100	69	17	dark	0	
+44	2029	8	5	7	18	red	106	74	18	red	0	
+44	2029	8	6	1	19	red	216	169	19	red	0	
+44	2029	8	6	2	20	dark	19	9	20	dark	0	
+44	2029	8	6	3	21	dark	20	10	21	dark	0	
+44	2029	8	6	4	22	dark	21	11	22	dark	0	
+44	2029	8	6	5	23	dark	164	123	23	dark	0	
+44	2029	8	6	6	24	dark	99	68	24	dark	0	
+44	2029	8	6	7	25	red	222	171	25	red	0	
+44	2029	8	7	1	26	red	279	212	26	red	0	
+44	2029	8	7	2	27	dark	53	36	27	dark	0	
+44	2029	8	7	3	28	dark	169	128	28	dark	0	
+44	2029	8	7	4	29	dark	225	173	29	dark	0	
+44	2029	8	7	5	30	dark	34	21	30	dark	0	
+44	2029	8	7	6	31	dark	270	205	31	dark	0	
+44	2029	8	7	7		blank	14	7		blank	1	
+45	2029	9	1	1		blank	1	1		blank	3	
+45	2029	9	1	2		blank	5	2		blank	3	
+45	2029	9	1	3		blank	250	190		blank	3	
+45	2029	9	1	4		blank	42	28		blank	3	
+45	2029	9	1	5	S	month	289	216	S	month	0	
+45	2029	9	1	6	E	month	282	213	E	month	0	
+45	2029	9	1	7	P	month	76	49	P	month	0	
+45	2029	9	2	1	SUN	red	66	44	SUN	red	0	
+45	2029	9	2	2	MON	weekday	200	154	MON	weekday	0	
+45	2029	9	2	3	TUE	weekday	237	179	TUE	weekday	0	
+45	2029	9	2	4	WED	weekday	213	166	WED	weekday	0	
+45	2029	9	2	5	THU	weekday	202	156	THU	weekday	0	
+45	2029	9	2	6	FRI	weekday	55	37	FRI	weekday	0	
+45	2029	9	2	7	SAT	red	290	217	SAT	red	0	
+45	2029	9	3	1		blank	11	5		blank	0	
+45	2029	9	3	2		blank	32	20		blank	1	
+45	2029	9	3	3		blank	266	202		blank	3	
+45	2029	9	3	4		blank	265	201		blank	3	
+45	2029	9	3	5		blank	264	200		blank	2	
+45	2029	9	3	6		blank	249	189		blank	2	
+45	2029	9	3	7	1	red	45	29	1	red	0	
+45	2029	9	4	1	2	red	160	121	2	red	0	
+45	2029	9	4	2	3	dark	144	106	3	dark	0	
+45	2029	9	4	3	4	dark	156	117	4	dark	0	
+45	2029	9	4	4	5	dark	147	109	5	dark	0	
+45	2029	9	4	5	6	dark	176	134	6	dark	0	
+45	2029	9	4	6	7	dark	203	157	7	dark	0	
+45	2029	9	4	7	8	red	8	4	8	red	0	
+45	2029	9	5	1	9	red	72	47	6	red	2	6->9
+45	2029	9	5	2	10	dark	50	34	10	dark	0	
+45	2029	9	5	3	11	dark	47	31	11	dark	0	
+45	2029	9	5	4	12	dark	119	85	12	dark	0	
+45	2029	9	5	5	13	dark	111	78	13	dark	0	
+45	2029	9	5	6	14	dark	83	54	14	dark	0	
+45	2029	9	5	7	15	red	52	35	15	red	0	
+45	2029	9	6	1	16	red	190	146	16	red	0	
+45	2029	9	6	2	17	dark	59	41	17	dark	0	
+45	2029	9	6	3	18	dark	116	82	18	dark	0	
+45	2029	9	6	4	19	dark	92	62	19	dark	0	
+45	2029	9	6	5	20	dark	90	60	20	dark	0	
+45	2029	9	6	6	21	dark	199	153	21	dark	0	
+45	2029	9	6	7	22	red	209	163	22	red	0	
+45	2029	9	7	1	23/30	red	218	170	23/30	red	0	
+45	2029	9	7	2	24	dark	61	42	24	dark	0	
+45	2029	9	7	3	25	dark	126	91	25	dark	0	
+45	2029	9	7	4	26	dark	35	22	26	dark	0	
+45	2029	9	7	5	27	dark	7	3	27	dark	0	
+45	2029	9	7	6	28	dark	230	175	28	dark	0	
+45	2029	9	7	7	29	red	233	176	29	red	0	
+46	2029	10	1	1		blank	62	43		blank	3	
+46	2029	10	1	2	O	month	85	56	O	month	0	
+46	2029	10	1	3	C	month	269	204	C	month	0	
+46	2029	10	1	4	T	month	134	98	T	month	0	
+46	2029	10	1	5		blank	6	3		blank	3	
+46	2029	10	1	6		blank	24	14		blank	3	
+46	2029	10	1	7		blank	14	7		blank	2	
+46	2029	10	2	1	SUN	red	66	44	SUN	red	0	
+46	2029	10	2	2	MON	weekday	200	154	MON	weekday	0	
+46	2029	10	2	3	TUE	weekday	237	179	TUE	weekday	0	
+46	2029	10	2	4	WED	weekday	213	166	WED	weekday	0	
+46	2029	10	2	5	THU	weekday	202	156	THU	weekday	0	
+46	2029	10	2	6	FRI	weekday	55	37	FRI	weekday	0	
+46	2029	10	2	7	SAT	red	290	217	SAT	red	0	
+46	2029	10	3	1		blank	224	172		blank	0	
+46	2029	10	3	2	1	dark	46	30	1	dark	0	
+46	2029	10	3	3	2	dark	178	136	2	dark	0	
+46	2029	10	3	4	3	dark	150	112	3	dark	0	
+46	2029	10	3	5	4	dark	246	186	4	dark	0	
+46	2029	10	3	6	5	dark	206	160	5	dark	0	
+46	2029	10	3	7	6	red	72	47	6	red	0	
+46	2029	10	4	1	7	red	9	4	7	red	0	
+46	2029	10	4	2	8	dark	204	158	8	dark	0	
+46	2029	10	4	3	9	dark	176	134	6	dark	2	6->9
+46	2029	10	4	4	10	dark	39	25	10	dark	0	
+46	2029	10	4	5	11	dark	30	18	11	dark	0	
+46	2029	10	4	6	12	dark	82	53	12	dark	0	
+46	2029	10	4	7	13	red	36	22	13	red	0	
+46	2029	10	5	1	14	red	182	139	14	red	0	
+46	2029	10	5	2	15	dark	112	79	15	dark	0	
+46	2029	10	5	3	16	dark	128	93	16	dark	0	
+46	2029	10	5	4	17	dark	145	107	17	dark	0	
+46	2029	10	5	5	18	dark	173	131	18	dark	0	
+46	2029	10	5	6	19	dark	123	89	19	dark	0	
+46	2029	10	5	7	20	red	27	15	20	red	0	
+46	2029	10	6	1	21	red	97	67	21	red	0	
+46	2029	10	6	2	22	dark	87	57	22	dark	0	
+46	2029	10	6	3	23	dark	180	138	23	dark	0	
+46	2029	10	6	4	24	dark	140	103	24	dark	0	
+46	2029	10	6	5	25	dark	179	137	25	dark	0	
+46	2029	10	6	6	26	dark	192	147	26	dark	0	
+46	2029	10	6	7	27	red	13	6	27	red	0	
+46	2029	10	7	1	28	red	232	176	28	red	0	
+46	2029	10	7	2	29	dark	191	146	29	dark	0	
+46	2029	10	7	3	30	dark	189	145	30	dark	0	
+46	2029	10	7	4	31	dark	226	173	31	dark	0	
+46	2029	10	7	5		blank	10	5		blank	1	
+46	2029	10	7	6		blank	5	2		blank	1	
+46	2029	10	7	7		blank	1	1		blank	1	
+47	2029	11	1	1		blank	62	43		blank	3	
+47	2029	11	1	2	N	month	74	48	N	month	0	
+47	2029	11	1	3	O	month	244	184	O	month	0	
+47	2029	11	1	4	V	month	135	98	V	month	0	
+47	2029	11	1	5		blank	11	5		blank	3	
+47	2029	11	1	6		blank	24	14		blank	3	
+47	2029	11	1	7		blank	14	7		blank	2	
+47	2029	11	2	1	SUN	red	66	44	SUN	red	0	
+47	2029	11	2	2	MON	weekday	200	154	MON	weekday	0	
+47	2029	11	2	3	TUE	weekday	237	179	TUE	weekday	0	
+47	2029	11	2	4	WED	weekday	213	166	WED	weekday	0	
+47	2029	11	2	5	THU	weekday	202	156	THU	weekday	0	
+47	2029	11	2	6	FRI	weekday	55	37	FRI	weekday	0	
+47	2029	11	2	7	SAT	red	290	217	SAT	red	0	
+47	2029	11	3	1		blank	6	3		blank	0	
+47	2029	11	3	2		blank	32	20		blank	1	
+47	2029	11	3	3		blank	264	200		blank	3	
+47	2029	11	3	4		blank	265	201		blank	3	
+47	2029	11	3	5	1	dark	248	188	1	dark	0	
+47	2029	11	3	6	2	dark	127	92	2	dark	0	
+47	2029	11	3	7	3	red	125	91	3	red	0	
+47	2029	11	4	1	4	red	286	215	4	red	0	
+47	2029	11	4	2	5	dark	152	114	5	dark	0	
+47	2029	11	4	3	6	dark	175	133	6	dark	0	
+47	2029	11	4	4	7	dark	157	118	7	dark	0	
+47	2029	11	4	5	8	dark	257	195	8	dark	0	
+47	2029	11	4	6	9	dark	155	116	6	dark	2	6->9
+47	2029	11	4	7	10	red	43	28	10	red	0	
+47	2029	11	5	1	11	red	26	15	11	red	0	
+47	2029	11	5	2	12	dark	81	52	12	dark	0	
+47	2029	11	5	3	13	dark	109	76	13	dark	0	
+47	2029	11	5	4	14	dark	129	94	14	dark	0	
+47	2029	11	5	5	15	dark	122	88	15	dark	0	
+47	2029	11	5	6	16	dark	94	64	16	dark	0	
+47	2029	11	5	7	17	red	71	47	17	red	0	
+47	2029	11	6	1	18	red	210	163	18	red	0	
+47	2029	11	6	2	19	dark	84	55	19	dark	0	
+47	2029	11	6	3	20	dark	58	40	20	dark	0	
+47	2029	11	6	4	21	dark	37	23	21	dark	0	
+47	2029	11	6	5	22	dark	124	90	22	dark	0	
+47	2029	11	6	6	23	dark	96	66	23	dark	0	
+47	2029	11	6	7	24	red	271	205	24	red	0	
+47	2029	11	7	1	25	red	231	176	25	red	0	
+47	2029	11	7	2	26	dark	18	8	26	dark	0	
+47	2029	11	7	3	27	dark	163	122	27	dark	0	
+47	2029	11	7	4	28	dark	161	121	28	dark	0	
+47	2029	11	7	5	29	dark	107	74	29	dark	0	
+47	2029	11	7	6	30	dark	241	183	30	dark	0	
+47	2029	11	7	7		blank	1	1		blank	1	
+48	2029	12	1	1		blank	14	7		blank	3	
+48	2029	12	1	2	D	month	25	14	D	month	0	
+48	2029	12	1	3	E	month	261	198	E	month	0	
+48	2029	12	1	4	C	month	70	46	C	month	0	
+48	2029	12	1	5		blank	224	172		blank	3	
+48	2029	12	1	6		blank	73	48		blank	3	
+48	2029	12	1	7		blank	1	1		blank	2	
+48	2029	12	2	1	SUN	red	66	44	SUN	red	0	
+48	2029	12	2	2	MON	weekday	200	154	MON	weekday	0	
+48	2029	12	2	3	TUE	weekday	237	179	TUE	weekday	0	
+48	2029	12	2	4	WED	weekday	213	166	WED	weekday	0	
+48	2029	12	2	5	THU	weekday	202	156	THU	weekday	0	
+48	2029	12	2	6	FRI	weekday	55	37	FRI	weekday	0	
+48	2029	12	2	7	SAT	red	290	217	SAT	red	0	
+48	2029	12	3	1		blank	11	5		blank	0	
+48	2029	12	3	2		blank	32	20		blank	1	
+48	2029	12	3	3		blank	266	202		blank	3	
+48	2029	12	3	4		blank	265	201		blank	3	
+48	2029	12	3	5		blank	264	200		blank	2	
+48	2029	12	3	6		blank	249	189		blank	2	
+48	2029	12	3	7	1	red	45	29	1	red	0	
+48	2029	12	4	1	2	red	160	121	2	red	0	
+48	2029	12	4	2	3	dark	144	106	3	dark	0	
+48	2029	12	4	3	4	dark	156	117	4	dark	0	
+48	2029	12	4	4	5	dark	147	109	5	dark	0	
+48	2029	12	4	5	6	dark	176	134	6	dark	0	
+48	2029	12	4	6	7	dark	203	157	7	dark	0	
+48	2029	12	4	7	8	red	8	4	8	red	0	
+48	2029	12	5	1	9	red	72	47	6	red	2	6->9
+48	2029	12	5	2	10	dark	50	34	10	dark	0	
+48	2029	12	5	3	11	dark	47	31	11	dark	0	
+48	2029	12	5	4	12	dark	119	85	12	dark	0	
+48	2029	12	5	5	13	dark	111	78	13	dark	0	
+48	2029	12	5	6	14	dark	83	54	14	dark	0	
+48	2029	12	5	7	15	red	52	35	15	red	0	
+48	2029	12	6	1	16	red	190	146	16	red	0	
+48	2029	12	6	2	17	dark	59	41	17	dark	0	
+48	2029	12	6	3	18	dark	116	82	18	dark	0	
+48	2029	12	6	4	19	dark	92	62	19	dark	0	
+48	2029	12	6	5	20	dark	90	60	20	dark	0	
+48	2029	12	6	6	21	dark	199	153	21	dark	0	
+48	2029	12	6	7	22	red	209	163	22	red	0	
+48	2029	12	7	1	23/30	red	218	170	23/30	red	0	
+48	2029	12	7	2	24/31	dark	4	2	24/31	dark	0	
+48	2029	12	7	3	25	dark	126	91	25	dark	0	
+48	2029	12	7	4	26	dark	35	22	26	dark	0	
+48	2029	12	7	5	27	dark	7	3	27	dark	0	
+48	2029	12	7	6	28	dark	230	175	28	dark	0	
+48	2029	12	7	7	29	red	233	176	29	red	0	
+49	2030	1	1	1		blank	14	7		blank	3	
+49	2030	1	1	2		blank	12	6		blank	3	
+49	2030	1	1	3		blank	10	5		blank	3	
+49	2030	1	1	4		blank	42	28		blank	3	
+49	2030	1	1	5	J	month	268	204	J	month	0	
+49	2030	1	1	6	A	month	277	211	A	month	0	
+49	2030	1	1	7	N	month	293	218	N	month	0	
+49	2030	1	2	1	SUN	red	66	44	SUN	red	0	
+49	2030	1	2	2	MON	weekday	200	154	MON	weekday	0	
+49	2030	1	2	3	TUE	weekday	237	179	TUE	weekday	0	
+49	2030	1	2	4	WED	weekday	213	166	WED	weekday	0	
+49	2030	1	2	5	THU	weekday	202	156	THU	weekday	0	
+49	2030	1	2	6	FRI	weekday	55	37	FRI	weekday	0	
+49	2030	1	2	7	SAT	red	290	217	SAT	red	0	
+49	2030	1	3	1		blank	6	3		blank	0	
+49	2030	1	3	2		blank	32	20		blank	1	
+49	2030	1	3	3	1	dark	31	19	1	dark	0	
+49	2030	1	3	4	2	dark	149	111	2	dark	0	
+49	2030	1	3	5	3	dark	186	143	3	dark	0	
+49	2030	1	3	6	4	dark	201	155	4	dark	0	
+49	2030	1	3	7	5	red	223	172	5	red	0	
+49	2030	1	4	1	6	red	287	215	6	red	0	
+49	2030	1	4	2	7	dark	194	149	7	dark	0	
+49	2030	1	4	3	8	dark	255	193	8	dark	0	
+49	2030	1	4	4	9	dark	148	110	6	dark	2	6->9
+49	2030	1	4	5	10	dark	48	32	10	dark	0	
+49	2030	1	4	6	11	dark	41	27	11	dark	0	
+49	2030	1	4	7	12	red	142	104	12	red	0	
+49	2030	1	5	1	13	red	133	97	13	red	0	
+49	2030	1	5	2	14	dark	102	71	14	dark	0	
+49	2030	1	5	3	15	dark	121	87	15	dark	0	
+49	2030	1	5	4	16	dark	139	102	16	dark	0	
+49	2030	1	5	5	17	dark	167	126	17	dark	0	
+49	2030	1	5	6	18	dark	108	75	18	dark	0	
+49	2030	1	5	7	19	red	114	80	19	red	0	
+49	2030	1	6	1	20	red	105	73	20	red	0	
+49	2030	1	6	2	21	dark	88	58	21	dark	0	
+49	2030	1	6	3	22	dark	171	129	22	dark	0	
+49	2030	1	6	4	23	dark	136	99	23	dark	0	
+49	2030	1	6	5	24	dark	172	130	24	dark	0	
+49	2030	1	6	6	25	dark	103	72	25	dark	0	
+49	2030	1	6	7	26	red	242	183	26	red	0	
+49	2030	1	7	1	27	red	63	43	27	red	0	
+49	2030	1	7	2	28	dark	229	175	28	dark	0	
+49	2030	1	7	3	29	dark	181	139	29	dark	0	
+49	2030	1	7	4	30	dark	259	197	30	dark	0	
+49	2030	1	7	5	31	dark	288	216	31	dark	0	
+49	2030	1	7	6		blank	5	2		blank	1	
+49	2030	1	7	7		blank	1	1		blank	1	
+50	2030	2	1	1		blank	75	49		blank	3	
+50	2030	2	1	2		blank	12	6		blank	3	
+50	2030	2	1	3		blank	10	5		blank	3	
+50	2030	2	1	4		blank	42	28		blank	3	
+50	2030	2	1	5	F	month	262	198	F	month	0	
+50	2030	2	1	6	E	month	282	213	E	month	0	
+50	2030	2	1	7	B	month	2	1	B	month	0	
+50	2030	2	2	1	SUN	red	66	44	SUN	red	0	
+50	2030	2	2	2	MON	weekday	200	154	MON	weekday	0	
+50	2030	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+50	2030	2	2	4	WED	weekday	213	166	WED	weekday	0	
+50	2030	2	2	5	THU	weekday	202	156	THU	weekday	0	
+50	2030	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+50	2030	2	2	7	SAT	red	290	217	SAT	red	0	
+50	2030	2	3	1		blank	6	3		blank	0	
+50	2030	2	3	2		blank	32	20		blank	1	
+50	2030	2	3	3		blank	266	202		blank	3	
+50	2030	2	3	4		blank	265	201		blank	3	
+50	2030	2	3	5		blank	264	200		blank	2	
+50	2030	2	3	6	1	dark	22	12	1	dark	0	
+50	2030	2	3	7	2	red	170	128	2	red	0	
+50	2030	2	4	1	3	red	252	191	3	red	0	
+50	2030	2	4	2	4	dark	151	113	4	dark	0	
+50	2030	2	4	3	5	dark	166	125	5	dark	0	
+50	2030	2	4	4	6	dark	148	110	6	dark	0	
+50	2030	2	4	5	7	dark	247	187	7	dark	0	
+50	2030	2	4	6	8	dark	101	70	8	dark	0	
+50	2030	2	4	7	9	red	287	215	6	red	2	6->9
+50	2030	2	5	1	10	red	228	174	10	red	0	
+50	2030	2	5	2	11	dark	56	38	11	dark	0	
+50	2030	2	5	3	12	dark	49	33	12	dark	0	
+50	2030	2	5	4	13	dark	120	86	13	dark	0	
+50	2030	2	5	5	14	dark	118	84	14	dark	0	
+50	2030	2	5	6	15	dark	89	59	15	dark	0	
+50	2030	2	5	7	16	red	68	45	16	red	0	
+50	2030	2	6	1	17	red	198	152	17	red	0	
+50	2030	2	6	2	18	dark	80	51	18	dark	0	
+50	2030	2	6	3	19	dark	131	96	19	dark	0	
+50	2030	2	6	4	20	dark	238	180	20	dark	0	
+50	2030	2	6	5	21	dark	28	16	21	dark	0	
+50	2030	2	6	6	22	dark	276	210	22	dark	0	
+50	2030	2	6	7	23	red	104	73	23	red	0	
+50	2030	2	7	1	24	red	16	7	24	red	0	
+50	2030	2	7	2	25	dark	98	67	25	dark	0	
+50	2030	2	7	3	26	dark	132	97	26	dark	0	
+50	2030	2	7	4	27	dark	154	115	27	dark	0	
+50	2030	2	7	5	28	dark	162	122	28	dark	0	
+50	2030	2	7	6		blank	5	2		blank	1	
+50	2030	2	7	7		blank	62	43		blank	1	
+51	2030	3	1	1		blank	1	1		blank	3	
+51	2030	3	1	2		blank	5	2		blank	3	
+51	2030	3	1	3		blank	10	5		blank	3	
+51	2030	3	1	4		blank	42	28		blank	3	
+51	2030	3	1	5	M	month	284	214	M	month	0	
+51	2030	3	1	6	A	month	277	211	A	month	0	
+51	2030	3	1	7	R	month	294	218	R	month	0	
+51	2030	3	2	1	SUN	red	66	44	SUN	red	0	
+51	2030	3	2	2	MON	weekday	200	154	MON	weekday	0	
+51	2030	3	2	3	TUE	weekday	237	179	TUE	weekday	0	
+51	2030	3	2	4	WED	weekday	213	166	WED	weekday	0	
+51	2030	3	2	5	THU	weekday	202	156	THU	weekday	0	
+51	2030	3	2	6	FRI	weekday	55	37	FRI	weekday	0	
+51	2030	3	2	7	SAT	red	290	217	SAT	red	0	
+51	2030	3	3	1		blank	6	3		blank	0	
+51	2030	3	3	2		blank	32	20		blank	1	
+51	2030	3	3	3		blank	266	202		blank	3	
+51	2030	3	3	4		blank	265	201		blank	3	
+51	2030	3	3	5		blank	264	200		blank	2	
+51	2030	3	3	6	1	dark	22	12	1	dark	0	
+51	2030	3	3	7	2	red	170	128	2	red	0	
+51	2030	3	4	1	3	red	252	191	3	red	0	
+51	2030	3	4	2	4	dark	151	113	4	dark	0	
+51	2030	3	4	3	5	dark	166	125	5	dark	0	
+51	2030	3	4	4	6	dark	148	110	6	dark	0	
+51	2030	3	4	5	7	dark	247	187	7	dark	0	
+51	2030	3	4	6	8	dark	101	70	8	dark	0	
+51	2030	3	4	7	9	red	287	215	6	red	2	6->9
+51	2030	3	5	1	10	red	228	174	10	red	0	
+51	2030	3	5	2	11	dark	56	38	11	dark	0	
+51	2030	3	5	3	12	dark	49	33	12	dark	0	
+51	2030	3	5	4	13	dark	120	86	13	dark	0	
+51	2030	3	5	5	14	dark	118	84	14	dark	0	
+51	2030	3	5	6	15	dark	89	59	15	dark	0	
+51	2030	3	5	7	16	red	68	45	16	red	0	
+51	2030	3	6	1	17	red	198	152	17	red	0	
+51	2030	3	6	2	18	dark	80	51	18	dark	0	
+51	2030	3	6	3	19	dark	131	96	19	dark	0	
+51	2030	3	6	4	20	dark	238	180	20	dark	0	
+51	2030	3	6	5	21	dark	28	16	21	dark	0	
+51	2030	3	6	6	22	dark	276	210	22	dark	0	
+51	2030	3	6	7	23	red	104	73	23	red	0	
+51	2030	3	7	1	24/31	red	219	170	24/31	red	0	
+51	2030	3	7	2	25	dark	98	67	25	dark	0	
+51	2030	3	7	3	26	dark	132	97	26	dark	0	
+51	2030	3	7	4	27	dark	154	115	27	dark	0	
+51	2030	3	7	5	28	dark	162	122	28	dark	0	
+51	2030	3	7	6	29	dark	235	177	29	dark	0	
+51	2030	3	7	7	30	red	64	43	30	red	0	
+52	2030	4	1	1		blank	14	7		blank	3	
+52	2030	4	1	2		blank	17	8		blank	3	
+52	2030	4	1	3		blank	285	214		blank	3	
+52	2030	4	1	4		blank	69	46		blank	3	
+52	2030	4	1	5	A	month	251	190	A	month	0	
+52	2030	4	1	6	P	month	86	56	P	month	0	
+52	2030	4	1	7	R	month	294	218	R	month	0	
+52	2030	4	2	1	SUN	red	66	44	SUN	red	0	
+52	2030	4	2	2	MON	weekday	200	154	MON	weekday	0	
+52	2030	4	2	3	TUE	weekday	237	179	TUE	weekday	0	
+52	2030	4	2	4	WED	weekday	213	166	WED	weekday	0	
+52	2030	4	2	5	THU	weekday	202	156	THU	weekday	0	
+52	2030	4	2	6	FRI	weekday	55	37	FRI	weekday	0	
+52	2030	4	2	7	SAT	red	290	217	SAT	red	0	
+52	2030	4	3	1		blank	6	3		blank	0	
+52	2030	4	3	2	1	dark	46	30	1	dark	0	
+52	2030	4	3	3	2	dark	178	136	2	dark	0	
+52	2030	4	3	4	3	dark	150	112	3	dark	0	
+52	2030	4	3	5	4	dark	246	186	4	dark	0	
+52	2030	4	3	6	5	dark	206	160	5	dark	0	
+52	2030	4	3	7	6	red	72	47	6	red	0	
+52	2030	4	4	1	7	red	9	4	7	red	0	
+52	2030	4	4	2	8	dark	204	158	8	dark	0	
+52	2030	4	4	3	9	dark	176	134	6	dark	2	6->9
+52	2030	4	4	4	10	dark	39	25	10	dark	0	
+52	2030	4	4	5	11	dark	30	18	11	dark	0	
+52	2030	4	4	6	12	dark	82	53	12	dark	0	
+52	2030	4	4	7	13	red	36	22	13	red	0	
+52	2030	4	5	1	14	red	182	139	14	red	0	
+52	2030	4	5	2	15	dark	112	79	15	dark	0	
+52	2030	4	5	3	16	dark	128	93	16	dark	0	
+52	2030	4	5	4	17	dark	145	107	17	dark	0	
+52	2030	4	5	5	18	dark	173	131	18	dark	0	
+52	2030	4	5	6	19	dark	123	89	19	dark	0	
+52	2030	4	5	7	20	red	27	15	20	red	0	
+52	2030	4	6	1	21	red	97	67	21	red	0	
+52	2030	4	6	2	22	dark	87	57	22	dark	0	
+52	2030	4	6	3	23	dark	180	138	23	dark	0	
+52	2030	4	6	4	24	dark	140	103	24	dark	0	
+52	2030	4	6	5	25	dark	179	137	25	dark	0	
+52	2030	4	6	6	26	dark	192	147	26	dark	0	
+52	2030	4	6	7	27	red	13	6	27	red	0	
+52	2030	4	7	1	28	red	232	176	28	red	0	
+52	2030	4	7	2	29	dark	191	146	29	dark	0	
+52	2030	4	7	3	30	dark	189	145	30	dark	0	
+52	2030	4	7	4		blank	42	28		blank	1	
+52	2030	4	7	5		blank	10	5		blank	1	
+52	2030	4	7	6		blank	5	2		blank	1	
+52	2030	4	7	7		blank	1	1		blank	1	
+53	2030	5	1	1		blank	14	7		blank	3	
+53	2030	5	1	2		blank	5	2		blank	3	
+53	2030	5	1	3		blank	10	5		blank	3	
+53	2030	5	1	4		blank	42	28		blank	3	
+53	2030	5	1	5	M	month	284	214	M	month	0	
+53	2030	5	1	6	A	month	277	211	A	month	0	
+53	2030	5	1	7	Y	month	77	49	Y	month	0	
+53	2030	5	2	1	SUN	red	66	44	SUN	red	0	
+53	2030	5	2	2	MON	weekday	200	154	MON	weekday	0	
+53	2030	5	2	3	TUE	weekday	237	179	TUE	weekday	0	
+53	2030	5	2	4	WED	weekday	213	166	WED	weekday	0	
+53	2030	5	2	5	THU	weekday	202	156	THU	weekday	0	
+53	2030	5	2	6	FRI	weekday	55	37	FRI	weekday	0	
+53	2030	5	2	7	SAT	red	290	217	SAT	red	0	
+53	2030	5	3	1		blank	6	3		blank	0	
+53	2030	5	3	2		blank	32	20		blank	1	
+53	2030	5	3	3		blank	264	200		blank	3	
+53	2030	5	3	4	1	dark	40	26	1	dark	0	
+53	2030	5	3	5	2	dark	29	17	2	dark	0	
+53	2030	5	3	6	3	dark	195	150	3	dark	0	
+53	2030	5	3	7	4	red	51	35	4	red	0	
+53	2030	5	4	1	5	red	260	197	5	red	0	
+53	2030	5	4	2	6	dark	155	116	6	dark	0	
+53	2030	5	4	3	7	dark	185	142	7	dark	0	
+53	2030	5	4	4	8	dark	256	194	8	dark	0	
+53	2030	5	4	5	9	dark	175	133	6	dark	2	6->9
+53	2030	5	4	6	10	dark	57	39	10	dark	0	
+53	2030	5	4	7	11	red	141	104	11	red	0	
+53	2030	5	5	1	12	red	113	80	12	red	0	
+53	2030	5	5	2	13	dark	93	63	13	dark	0	
+53	2030	5	5	3	14	dark	117	83	14	dark	0	
+53	2030	5	5	4	15	dark	137	100	15	dark	0	
+53	2030	5	5	5	16	dark	130	95	16	dark	0	
+53	2030	5	5	6	17	dark	100	69	17	dark	0	
+53	2030	5	5	7	18	red	106	74	18	red	0	
+53	2030	5	6	1	19	red	216	169	19	red	0	
+53	2030	5	6	2	20	dark	19	9	20	dark	0	
+53	2030	5	6	3	21	dark	20	10	21	dark	0	
+53	2030	5	6	4	22	dark	21	11	22	dark	0	
+53	2030	5	6	5	23	dark	164	123	23	dark	0	
+53	2030	5	6	6	24	dark	99	68	24	dark	0	
+53	2030	5	6	7	25	red	222	171	25	red	0	
+53	2030	5	7	1	26	red	279	212	26	red	0	
+53	2030	5	7	2	27	dark	53	36	27	dark	0	
+53	2030	5	7	3	28	dark	169	128	28	dark	0	
+53	2030	5	7	4	29	dark	225	173	29	dark	0	
+53	2030	5	7	5	30	dark	34	21	30	dark	0	
+53	2030	5	7	6	31	dark	270	205	31	dark	0	
+53	2030	5	7	7		blank	1	1		blank	1	
+54	2030	6	1	1		blank	1	1		blank	3	
+54	2030	6	1	2		blank	5	2		blank	3	
+54	2030	6	1	3		blank	250	190		blank	3	
+54	2030	6	1	4		blank	42	28		blank	3	
+54	2030	6	1	5	J	month	268	204	J	month	0	
+54	2030	6	1	6	U	month	78	50	U	month	0	
+54	2030	6	1	7	N	month	293	218	N	month	0	
+54	2030	6	2	1	SUN	red	66	44	SUN	red	0	
+54	2030	6	2	2	MON	weekday	200	154	MON	weekday	0	
+54	2030	6	2	3	TUE	weekday	237	179	TUE	weekday	0	
+54	2030	6	2	4	WED	weekday	213	166	WED	weekday	0	
+54	2030	6	2	5	THU	weekday	202	156	THU	weekday	0	
+54	2030	6	2	6	FRI	weekday	55	37	FRI	weekday	0	
+54	2030	6	2	7	SAT	red	290	217	SAT	red	0	
+54	2030	6	3	1		blank	11	5		blank	0	
+54	2030	6	3	2		blank	32	20		blank	1	
+54	2030	6	3	3		blank	266	202		blank	3	
+54	2030	6	3	4		blank	265	201		blank	3	
+54	2030	6	3	5		blank	264	200		blank	2	
+54	2030	6	3	6		blank	249	189		blank	2	
+54	2030	6	3	7	1	red	45	29	1	red	0	
+54	2030	6	4	1	2	red	160	121	2	red	0	
+54	2030	6	4	2	3	dark	144	106	3	dark	0	
+54	2030	6	4	3	4	dark	156	117	4	dark	0	
+54	2030	6	4	4	5	dark	147	109	5	dark	0	
+54	2030	6	4	5	6	dark	176	134	6	dark	0	
+54	2030	6	4	6	7	dark	203	157	7	dark	0	
+54	2030	6	4	7	8	red	8	4	8	red	0	
+54	2030	6	5	1	9	red	72	47	6	red	2	6->9
+54	2030	6	5	2	10	dark	50	34	10	dark	0	
+54	2030	6	5	3	11	dark	47	31	11	dark	0	
+54	2030	6	5	4	12	dark	119	85	12	dark	0	
+54	2030	6	5	5	13	dark	111	78	13	dark	0	
+54	2030	6	5	6	14	dark	83	54	14	dark	0	
+54	2030	6	5	7	15	red	52	35	15	red	0	
+54	2030	6	6	1	16	red	190	146	16	red	0	
+54	2030	6	6	2	17	dark	59	41	17	dark	0	
+54	2030	6	6	3	18	dark	116	82	18	dark	0	
+54	2030	6	6	4	19	dark	92	62	19	dark	0	
+54	2030	6	6	5	20	dark	90	60	20	dark	0	
+54	2030	6	6	6	21	dark	199	153	21	dark	0	
+54	2030	6	6	7	22	red	209	163	22	red	0	
+54	2030	6	7	1	23/30	red	218	170	23/30	red	0	
+54	2030	6	7	2	24	dark	61	42	24	dark	0	
+54	2030	6	7	3	25	dark	126	91	25	dark	0	
+54	2030	6	7	4	26	dark	35	22	26	dark	0	
+54	2030	6	7	5	27	dark	7	3	27	dark	0	
+54	2030	6	7	6	28	dark	230	175	28	dark	0	
+54	2030	6	7	7	29	red	233	176	29	red	0	
+55	2030	7	1	1		blank	14	7		blank	3	
+55	2030	7	1	2		blank	17	8		blank	3	
+55	2030	7	1	3		blank	250	190		blank	3	
+55	2030	7	1	4		blank	42	28		blank	3	
+55	2030	7	1	5	J	month	268	204	J	month	0	
+55	2030	7	1	6	U	month	78	50	U	month	0	
+55	2030	7	1	7	L	month	292	218	L	month	0	
+55	2030	7	2	1	SUN	red	66	44	SUN	red	0	
+55	2030	7	2	2	MON	weekday	200	154	MON	weekday	0	
+55	2030	7	2	3	TUE	weekday	237	179	TUE	weekday	0	
+55	2030	7	2	4	WED	weekday	213	166	WED	weekday	0	
+55	2030	7	2	5	THU	weekday	202	156	THU	weekday	0	
+55	2030	7	2	6	FRI	weekday	55	37	FRI	weekday	0	
+55	2030	7	2	7	SAT	red	290	217	SAT	red	0	
+55	2030	7	3	1		blank	6	3		blank	0	
+55	2030	7	3	2	1	dark	46	30	1	dark	0	
+55	2030	7	3	3	2	dark	178	136	2	dark	0	
+55	2030	7	3	4	3	dark	150	112	3	dark	0	
+55	2030	7	3	5	4	dark	246	186	4	dark	0	
+55	2030	7	3	6	5	dark	206	160	5	dark	0	
+55	2030	7	3	7	6	red	72	47	6	red	0	
+55	2030	7	4	1	7	red	9	4	7	red	0	
+55	2030	7	4	2	8	dark	204	158	8	dark	0	
+55	2030	7	4	3	9	dark	176	134	6	dark	2	6->9
+55	2030	7	4	4	10	dark	39	25	10	dark	0	
+55	2030	7	4	5	11	dark	30	18	11	dark	0	
+55	2030	7	4	6	12	dark	82	53	12	dark	0	
+55	2030	7	4	7	13	red	36	22	13	red	0	
+55	2030	7	5	1	14	red	182	139	14	red	0	
+55	2030	7	5	2	15	dark	112	79	15	dark	0	
+55	2030	7	5	3	16	dark	128	93	16	dark	0	
+55	2030	7	5	4	17	dark	145	107	17	dark	0	
+55	2030	7	5	5	18	dark	173	131	18	dark	0	
+55	2030	7	5	6	19	dark	123	89	19	dark	0	
+55	2030	7	5	7	20	red	27	15	20	red	0	
+55	2030	7	6	1	21	red	97	67	21	red	0	
+55	2030	7	6	2	22	dark	87	57	22	dark	0	
+55	2030	7	6	3	23	dark	180	138	23	dark	0	
+55	2030	7	6	4	24	dark	140	103	24	dark	0	
+55	2030	7	6	5	25	dark	179	137	25	dark	0	
+55	2030	7	6	6	26	dark	192	147	26	dark	0	
+55	2030	7	6	7	27	red	13	6	27	red	0	
+55	2030	7	7	1	28	red	232	176	28	red	0	
+55	2030	7	7	2	29	dark	191	146	29	dark	0	
+55	2030	7	7	3	30	dark	189	145	30	dark	0	
+55	2030	7	7	4	31	dark	226	173	31	dark	0	
+55	2030	7	7	5		blank	10	5		blank	1	
+55	2030	7	7	6		blank	5	2		blank	1	
+55	2030	7	7	7		blank	1	1		blank	1	
+56	2030	8	1	1		blank	14	7		blank	3	
+56	2030	8	1	2		blank	5	2		blank	3	
+56	2030	8	1	3		blank	10	5		blank	3	
+56	2030	8	1	4		blank	69	46		blank	3	
+56	2030	8	1	5	A	month	251	190	A	month	0	
+56	2030	8	1	6	U	month	78	50	U	month	0	
+56	2030	8	1	7	G	month	3	1	G	month	0	
+56	2030	8	2	1	SUN	red	66	44	SUN	red	0	
+56	2030	8	2	2	MON	weekday	200	154	MON	weekday	0	
+56	2030	8	2	3	TUE	weekday	237	179	TUE	weekday	0	
+56	2030	8	2	4	WED	weekday	213	166	WED	weekday	0	
+56	2030	8	2	5	THU	weekday	202	156	THU	weekday	0	
+56	2030	8	2	6	FRI	weekday	55	37	FRI	weekday	0	
+56	2030	8	2	7	SAT	red	290	217	SAT	red	0	
+56	2030	8	3	1		blank	6	3		blank	0	
+56	2030	8	3	2		blank	32	20		blank	1	
+56	2030	8	3	3		blank	264	200		blank	3	
+56	2030	8	3	4		blank	265	201		blank	3	
+56	2030	8	3	5	1	dark	248	188	1	dark	0	
+56	2030	8	3	6	2	dark	127	92	2	dark	0	
+56	2030	8	3	7	3	red	125	91	3	red	0	
+56	2030	8	4	1	4	red	286	215	4	red	0	
+56	2030	8	4	2	5	dark	152	114	5	dark	0	
+56	2030	8	4	3	6	dark	175	133	6	dark	0	
+56	2030	8	4	4	7	dark	157	118	7	dark	0	
+56	2030	8	4	5	8	dark	257	195	8	dark	0	
+56	2030	8	4	6	9	dark	155	116	6	dark	2	6->9
+56	2030	8	4	7	10	red	43	28	10	red	0	
+56	2030	8	5	1	11	red	26	15	11	red	0	
+56	2030	8	5	2	12	dark	81	52	12	dark	0	
+56	2030	8	5	3	13	dark	109	76	13	dark	0	
+56	2030	8	5	4	14	dark	129	94	14	dark	0	
+56	2030	8	5	5	15	dark	122	88	15	dark	0	
+56	2030	8	5	6	16	dark	94	64	16	dark	0	
+56	2030	8	5	7	17	red	71	47	17	red	0	
+56	2030	8	6	1	18	red	210	163	18	red	0	
+56	2030	8	6	2	19	dark	84	55	19	dark	0	
+56	2030	8	6	3	20	dark	58	40	20	dark	0	
+56	2030	8	6	4	21	dark	37	23	21	dark	0	
+56	2030	8	6	5	22	dark	124	90	22	dark	0	
+56	2030	8	6	6	23	dark	96	66	23	dark	0	
+56	2030	8	6	7	24	red	271	205	24	red	0	
+56	2030	8	7	1	25	red	231	176	25	red	0	
+56	2030	8	7	2	26	dark	18	8	26	dark	0	
+56	2030	8	7	3	27	dark	163	122	27	dark	0	
+56	2030	8	7	4	28	dark	161	121	28	dark	0	
+56	2030	8	7	5	29	dark	107	74	29	dark	0	
+56	2030	8	7	6	30	dark	241	183	30	dark	0	
+56	2030	8	7	7	31	red	281	212	31	red	0	
+57	2030	9	1	1		blank	14	7		blank	3	
+57	2030	9	1	2		blank	12	6		blank	3	
+57	2030	9	1	3		blank	250	190		blank	3	
+57	2030	9	1	4		blank	69	46		blank	3	
+57	2030	9	1	5	S	month	289	216	S	month	0	
+57	2030	9	1	6	E	month	282	213	E	month	0	
+57	2030	9	1	7	P	month	76	49	P	month	0	
+57	2030	9	2	1	SUN	red	66	44	SUN	red	0	
+57	2030	9	2	2	MON	weekday	200	154	MON	weekday	0	
+57	2030	9	2	3	TUE	weekday	237	179	TUE	weekday	0	
+57	2030	9	2	4	WED	weekday	213	166	WED	weekday	0	
+57	2030	9	2	5	THU	weekday	202	156	THU	weekday	0	
+57	2030	9	2	6	FRI	weekday	55	37	FRI	weekday	0	
+57	2030	9	2	7	SAT	red	290	217	SAT	red	0	
+57	2030	9	3	1	1	red	33	21	1	red	0	
+57	2030	9	3	2	2	dark	168	127	2	dark	0	
+57	2030	9	3	3	3	dark	184	141	3	dark	0	
+57	2030	9	3	4	4	dark	158	119	4	dark	0	
+57	2030	9	3	5	5	dark	177	135	5	dark	0	
+57	2030	9	3	6	6	dark	212	165	6	dark	0	
+57	2030	9	3	7	7	red	67	45	7	red	0	
+57	2030	9	4	1	8	red	253	191	8	red	0	
+57	2030	9	4	2	9	dark	159	120	6	dark	2	6->9
+57	2030	9	4	3	10	dark	38	24	10	dark	0	
+57	2030	9	4	4	11	dark	138	101	11	dark	0	
+57	2030	9	4	5	12	dark	110	77	12	dark	0	
+57	2030	9	4	6	13	dark	91	61	13	dark	0	
+57	2030	9	4	7	14	red	153	115	14	red	0	
+57	2030	9	5	1	15	red	188	145	15	red	0	
+57	2030	9	5	2	16	dark	115	81	16	dark	0	
+57	2030	9	5	3	17	dark	165	124	17	dark	0	
+57	2030	9	5	4	18	dark	146	108	18	dark	0	
+57	2030	9	5	5	19	dark	174	132	19	dark	0	
+57	2030	9	5	6	20	dark	214	167	20	dark	0	
+57	2030	9	5	7	21	red	44	29	21	red	0	
+57	2030	9	6	1	22	red	221	171	22	red	0	
+57	2030	9	6	2	23	dark	95	65	23	dark	0	
+57	2030	9	6	3	24	dark	183	140	24	dark	0	
+57	2030	9	6	4	25	dark	143	105	25	dark	0	
+57	2030	9	6	5	26	dark	187	144	26	dark	0	
+57	2030	9	6	6	27	dark	196	151	27	dark	0	
+57	2030	9	6	7	28	red	234	177	28	red	0	
+57	2030	9	7	1	29	red	280	212	29	red	0	
+57	2030	9	7	2	30	dark	217	169	30	dark	0	
+57	2030	9	7	3		blank	6	3		blank	1	
+57	2030	9	7	4		blank	42	28		blank	1	
+57	2030	9	7	5		blank	10	5		blank	1	
+57	2030	9	7	6		blank	5	2		blank	1	
+57	2030	9	7	7		blank	1	1		blank	1	
+58	2030	10	1	1		blank	75	49		blank	3	
+58	2030	10	1	2	O	month	85	56	O	month	0	
+58	2030	10	1	3	C	month	269	204	C	month	0	
+58	2030	10	1	4	T	month	134	98	T	month	0	
+58	2030	10	1	5		blank	11	5		blank	3	
+58	2030	10	1	6		blank	24	14		blank	3	
+58	2030	10	1	7		blank	14	7		blank	2	
+58	2030	10	2	1	SUN	red	66	44	SUN	red	0	
+58	2030	10	2	2	MON	weekday	200	154	MON	weekday	0	
+58	2030	10	2	3	TUE	weekday	237	179	TUE	weekday	0	
+58	2030	10	2	4	WED	weekday	213	166	WED	weekday	0	
+58	2030	10	2	5	THU	weekday	202	156	THU	weekday	0	
+58	2030	10	2	6	FRI	weekday	55	37	FRI	weekday	0	
+58	2030	10	2	7	SAT	red	290	217	SAT	red	0	
+58	2030	10	3	1		blank	6	3		blank	0	
+58	2030	10	3	2		blank	32	20		blank	1	
+58	2030	10	3	3	1	dark	31	19	1	dark	0	
+58	2030	10	3	4	2	dark	149	111	2	dark	0	
+58	2030	10	3	5	3	dark	186	143	3	dark	0	
+58	2030	10	3	6	4	dark	201	155	4	dark	0	
+58	2030	10	3	7	5	red	223	172	5	red	0	
+58	2030	10	4	1	6	red	287	215	6	red	0	
+58	2030	10	4	2	7	dark	194	149	7	dark	0	
+58	2030	10	4	3	8	dark	255	193	8	dark	0	
+58	2030	10	4	4	9	dark	148	110	6	dark	2	6->9
+58	2030	10	4	5	10	dark	48	32	10	dark	0	
+58	2030	10	4	6	11	dark	41	27	11	dark	0	
+58	2030	10	4	7	12	red	142	104	12	red	0	
+58	2030	10	5	1	13	red	133	97	13	red	0	
+58	2030	10	5	2	14	dark	102	71	14	dark	0	
+58	2030	10	5	3	15	dark	121	87	15	dark	0	
+58	2030	10	5	4	16	dark	139	102	16	dark	0	
+58	2030	10	5	5	17	dark	167	126	17	dark	0	
+58	2030	10	5	6	18	dark	108	75	18	dark	0	
+58	2030	10	5	7	19	red	114	80	19	red	0	
+58	2030	10	6	1	20	red	105	73	20	red	0	
+58	2030	10	6	2	21	dark	88	58	21	dark	0	
+58	2030	10	6	3	22	dark	171	129	22	dark	0	
+58	2030	10	6	4	23	dark	136	99	23	dark	0	
+58	2030	10	6	5	24	dark	172	130	24	dark	0	
+58	2030	10	6	6	25	dark	103	72	25	dark	0	
+58	2030	10	6	7	26	red	242	183	26	red	0	
+58	2030	10	7	1	27	red	63	43	27	red	0	
+58	2030	10	7	2	28	dark	229	175	28	dark	0	
+58	2030	10	7	3	29	dark	181	139	29	dark	0	
+58	2030	10	7	4	30	dark	259	197	30	dark	0	
+58	2030	10	7	5	31	dark	288	216	31	dark	0	
+58	2030	10	7	6		blank	5	2		blank	1	
+58	2030	10	7	7		blank	1	1		blank	1	
+59	2030	11	1	1		blank	75	49		blank	3	
+59	2030	11	1	2	N	month	74	48	N	month	0	
+59	2030	11	1	3	O	month	244	184	O	month	0	
+59	2030	11	1	4	V	month	135	98	V	month	0	
+59	2030	11	1	5		blank	11	5		blank	3	
+59	2030	11	1	6		blank	24	14		blank	3	
+59	2030	11	1	7		blank	1	1		blank	2	
+59	2030	11	2	1	SUN	red	66	44	SUN	red	0	
+59	2030	11	2	2	MON	weekday	200	154	MON	weekday	0	
+59	2030	11	2	3	TUE	weekday	237	179	TUE	weekday	0	
+59	2030	11	2	4	WED	weekday	213	166	WED	weekday	0	
+59	2030	11	2	5	THU	weekday	202	156	THU	weekday	0	
+59	2030	11	2	6	FRI	weekday	55	37	FRI	weekday	0	
+59	2030	11	2	7	SAT	red	290	217	SAT	red	0	
+59	2030	11	3	1		blank	6	3		blank	0	
+59	2030	11	3	2		blank	32	20		blank	1	
+59	2030	11	3	3		blank	266	202		blank	3	
+59	2030	11	3	4		blank	265	201		blank	3	
+59	2030	11	3	5		blank	264	200		blank	2	
+59	2030	11	3	6	1	dark	22	12	1	dark	0	
+59	2030	11	3	7	2	red	170	128	2	red	0	
+59	2030	11	4	1	3	red	252	191	3	red	0	
+59	2030	11	4	2	4	dark	151	113	4	dark	0	
+59	2030	11	4	3	5	dark	166	125	5	dark	0	
+59	2030	11	4	4	6	dark	148	110	6	dark	0	
+59	2030	11	4	5	7	dark	247	187	7	dark	0	
+59	2030	11	4	6	8	dark	101	70	8	dark	0	
+59	2030	11	4	7	9	red	287	215	6	red	2	6->9
+59	2030	11	5	1	10	red	228	174	10	red	0	
+59	2030	11	5	2	11	dark	56	38	11	dark	0	
+59	2030	11	5	3	12	dark	49	33	12	dark	0	
+59	2030	11	5	4	13	dark	120	86	13	dark	0	
+59	2030	11	5	5	14	dark	118	84	14	dark	0	
+59	2030	11	5	6	15	dark	89	59	15	dark	0	
+59	2030	11	5	7	16	red	68	45	16	red	0	
+59	2030	11	6	1	17	red	198	152	17	red	0	
+59	2030	11	6	2	18	dark	80	51	18	dark	0	
+59	2030	11	6	3	19	dark	131	96	19	dark	0	
+59	2030	11	6	4	20	dark	238	180	20	dark	0	
+59	2030	11	6	5	21	dark	28	16	21	dark	0	
+59	2030	11	6	6	22	dark	276	210	22	dark	0	
+59	2030	11	6	7	23	red	104	73	23	red	0	
+59	2030	11	7	1	24	red	16	7	24	red	0	
+59	2030	11	7	2	25	dark	98	67	25	dark	0	
+59	2030	11	7	3	26	dark	132	97	26	dark	0	
+59	2030	11	7	4	27	dark	154	115	27	dark	0	
+59	2030	11	7	5	28	dark	162	122	28	dark	0	
+59	2030	11	7	6	29	dark	235	177	29	dark	0	
+59	2030	11	7	7	30	red	64	43	30	red	0	
+60	2030	12	1	1		blank	62	43		blank	3	
+60	2030	12	1	2	D	month	25	14	D	month	0	
+60	2030	12	1	3	E	month	261	198	E	month	0	
+60	2030	12	1	4	C	month	70	46	C	month	0	
+60	2030	12	1	5		blank	6	3		blank	3	
+60	2030	12	1	6		blank	73	48		blank	3	
+60	2030	12	1	7		blank	14	7		blank	2	
+60	2030	12	2	1	SUN	red	66	44	SUN	red	0	
+60	2030	12	2	2	MON	weekday	200	154	MON	weekday	0	
+60	2030	12	2	3	TUE	weekday	237	179	TUE	weekday	0	
+60	2030	12	2	4	WED	weekday	213	166	WED	weekday	0	
+60	2030	12	2	5	THU	weekday	202	156	THU	weekday	0	
+60	2030	12	2	6	FRI	weekday	55	37	FRI	weekday	0	
+60	2030	12	2	7	SAT	red	290	217	SAT	red	0	
+60	2030	12	3	1	1	red	33	21	1	red	0	
+60	2030	12	3	2	2	dark	168	127	2	dark	0	
+60	2030	12	3	3	3	dark	184	141	3	dark	0	
+60	2030	12	3	4	4	dark	158	119	4	dark	0	
+60	2030	12	3	5	5	dark	177	135	5	dark	0	
+60	2030	12	3	6	6	dark	212	165	6	dark	0	
+60	2030	12	3	7	7	red	67	45	7	red	0	
+60	2030	12	4	1	8	red	253	191	8	red	0	
+60	2030	12	4	2	9	dark	159	120	6	dark	2	6->9
+60	2030	12	4	3	10	dark	38	24	10	dark	0	
+60	2030	12	4	4	11	dark	138	101	11	dark	0	
+60	2030	12	4	5	12	dark	110	77	12	dark	0	
+60	2030	12	4	6	13	dark	91	61	13	dark	0	
+60	2030	12	4	7	14	red	153	115	14	red	0	
+60	2030	12	5	1	15	red	188	145	15	red	0	
+60	2030	12	5	2	16	dark	115	81	16	dark	0	
+60	2030	12	5	3	17	dark	165	124	17	dark	0	
+60	2030	12	5	4	18	dark	146	108	18	dark	0	
+60	2030	12	5	5	19	dark	174	132	19	dark	0	
+60	2030	12	5	6	20	dark	214	167	20	dark	0	
+60	2030	12	5	7	21	red	44	29	21	red	0	
+60	2030	12	6	1	22	red	221	171	22	red	0	
+60	2030	12	6	2	23	dark	95	65	23	dark	0	
+60	2030	12	6	3	24	dark	183	140	24	dark	0	
+60	2030	12	6	4	25	dark	143	105	25	dark	0	
+60	2030	12	6	5	26	dark	187	144	26	dark	0	
+60	2030	12	6	6	27	dark	196	151	27	dark	0	
+60	2030	12	6	7	28	red	234	177	28	red	0	
+60	2030	12	7	1	29	red	280	212	29	red	0	
+60	2030	12	7	2	30	dark	217	169	30	dark	0	
+60	2030	12	7	3	31	dark	227	174	31	dark	0	
+60	2030	12	7	4		blank	42	28		blank	1	
+60	2030	12	7	5		blank	10	5		blank	1	
+60	2030	12	7	6		blank	5	2		blank	1	
+60	2030	12	7	7		blank	1	1		blank	1	
+61	2031	1	1	1		blank	14	7		blank	3	
+61	2031	1	1	2		blank	5	2		blank	3	
+61	2031	1	1	3		blank	10	5		blank	3	
+61	2031	1	1	4		blank	42	28		blank	3	
+61	2031	1	1	5	J	month	268	204	J	month	0	
+61	2031	1	1	6	A	month	277	211	A	month	0	
+61	2031	1	1	7	N	month	293	218	N	month	0	
+61	2031	1	2	1	SUN	red	66	44	SUN	red	0	
+61	2031	1	2	2	MON	weekday	200	154	MON	weekday	0	
+61	2031	1	2	3	TUE	weekday	237	179	TUE	weekday	0	
+61	2031	1	2	4	WED	weekday	213	166	WED	weekday	0	
+61	2031	1	2	5	THU	weekday	202	156	THU	weekday	0	
+61	2031	1	2	6	FRI	weekday	55	37	FRI	weekday	0	
+61	2031	1	2	7	SAT	red	290	217	SAT	red	0	
+61	2031	1	3	1		blank	6	3		blank	0	
+61	2031	1	3	2		blank	32	20		blank	1	
+61	2031	1	3	3		blank	264	200		blank	3	
+61	2031	1	3	4	1	dark	40	26	1	dark	0	
+61	2031	1	3	5	2	dark	29	17	2	dark	0	
+61	2031	1	3	6	3	dark	195	150	3	dark	0	
+61	2031	1	3	7	4	red	51	35	4	red	0	
+61	2031	1	4	1	5	red	260	197	5	red	0	
+61	2031	1	4	2	6	dark	155	116	6	dark	0	
+61	2031	1	4	3	7	dark	185	142	7	dark	0	
+61	2031	1	4	4	8	dark	256	194	8	dark	0	
+61	2031	1	4	5	9	dark	175	133	6	dark	2	6->9
+61	2031	1	4	6	10	dark	57	39	10	dark	0	
+61	2031	1	4	7	11	red	141	104	11	red	0	
+61	2031	1	5	1	12	red	113	80	12	red	0	
+61	2031	1	5	2	13	dark	93	63	13	dark	0	
+61	2031	1	5	3	14	dark	117	83	14	dark	0	
+61	2031	1	5	4	15	dark	137	100	15	dark	0	
+61	2031	1	5	5	16	dark	130	95	16	dark	0	
+61	2031	1	5	6	17	dark	100	69	17	dark	0	
+61	2031	1	5	7	18	red	106	74	18	red	0	
+61	2031	1	6	1	19	red	216	169	19	red	0	
+61	2031	1	6	2	20	dark	19	9	20	dark	0	
+61	2031	1	6	3	21	dark	20	10	21	dark	0	
+61	2031	1	6	4	22	dark	21	11	22	dark	0	
+61	2031	1	6	5	23	dark	164	123	23	dark	0	
+61	2031	1	6	6	24	dark	99	68	24	dark	0	
+61	2031	1	6	7	25	red	222	171	25	red	0	
+61	2031	1	7	1	26	red	279	212	26	red	0	
+61	2031	1	7	2	27	dark	53	36	27	dark	0	
+61	2031	1	7	3	28	dark	169	128	28	dark	0	
+61	2031	1	7	4	29	dark	225	173	29	dark	0	
+61	2031	1	7	5	30	dark	34	21	30	dark	0	
+61	2031	1	7	6	31	dark	270	205	31	dark	0	
+61	2031	1	7	7		blank	1	1		blank	1	
+62	2031	2	1	1		blank	75	49		blank	3	
+62	2031	2	1	2		blank	5	2		blank	3	
+62	2031	2	1	3		blank	250	190		blank	3	
+62	2031	2	1	4		blank	42	28		blank	3	
+62	2031	2	1	5	F	month	262	198	F	month	0	
+62	2031	2	1	6	E	month	282	213	E	month	0	
+62	2031	2	1	7	B	month	2	1	B	month	0	
+62	2031	2	2	1	SUN	red	66	44	SUN	red	0	
+62	2031	2	2	2	MON	weekday	200	154	MON	weekday	0	
+62	2031	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+62	2031	2	2	4	WED	weekday	213	166	WED	weekday	0	
+62	2031	2	2	5	THU	weekday	202	156	THU	weekday	0	
+62	2031	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+62	2031	2	2	7	SAT	red	290	217	SAT	red	0	
+62	2031	2	3	1		blank	11	5		blank	0	
+62	2031	2	3	2		blank	32	20		blank	1	
+62	2031	2	3	3		blank	266	202		blank	3	
+62	2031	2	3	4		blank	265	201		blank	3	
+62	2031	2	3	5		blank	264	200		blank	2	
+62	2031	2	3	6		blank	249	189		blank	2	
+62	2031	2	3	7	1	red	45	29	1	red	0	
+62	2031	2	4	1	2	red	160	121	2	red	0	
+62	2031	2	4	2	3	dark	144	106	3	dark	0	
+62	2031	2	4	3	4	dark	156	117	4	dark	0	
+62	2031	2	4	4	5	dark	147	109	5	dark	0	
+62	2031	2	4	5	6	dark	176	134	6	dark	0	
+62	2031	2	4	6	7	dark	203	157	7	dark	0	
+62	2031	2	4	7	8	red	8	4	8	red	0	
+62	2031	2	5	1	9	red	72	47	6	red	2	6->9
+62	2031	2	5	2	10	dark	50	34	10	dark	0	
+62	2031	2	5	3	11	dark	47	31	11	dark	0	
+62	2031	2	5	4	12	dark	119	85	12	dark	0	
+62	2031	2	5	5	13	dark	111	78	13	dark	0	
+62	2031	2	5	6	14	dark	83	54	14	dark	0	
+62	2031	2	5	7	15	red	52	35	15	red	0	
+62	2031	2	6	1	16	red	190	146	16	red	0	
+62	2031	2	6	2	17	dark	59	41	17	dark	0	
+62	2031	2	6	3	18	dark	116	82	18	dark	0	
+62	2031	2	6	4	19	dark	92	62	19	dark	0	
+62	2031	2	6	5	20	dark	90	60	20	dark	0	
+62	2031	2	6	6	21	dark	199	153	21	dark	0	
+62	2031	2	6	7	22	red	209	163	22	red	0	
+62	2031	2	7	1	23	red	15	7	23	red	0	
+62	2031	2	7	2	24	dark	61	42	24	dark	0	
+62	2031	2	7	3	25	dark	126	91	25	dark	0	
+62	2031	2	7	4	26	dark	35	22	26	dark	0	
+62	2031	2	7	5	27	dark	7	3	27	dark	0	
+62	2031	2	7	6	28	dark	230	175	28	dark	0	
+62	2031	2	7	7		blank	62	43		blank	1	
+63	2031	3	1	1		blank	1	1		blank	3	
+63	2031	3	1	2		blank	12	6		blank	3	
+63	2031	3	1	3		blank	250	190		blank	3	
+63	2031	3	1	4		blank	42	28		blank	3	
+63	2031	3	1	5	M	month	284	214	M	month	0	
+63	2031	3	1	6	A	month	277	211	A	month	0	
+63	2031	3	1	7	R	month	294	218	R	month	0	
+63	2031	3	2	1	SUN	red	66	44	SUN	red	0	
+63	2031	3	2	2	MON	weekday	200	154	MON	weekday	0	
+63	2031	3	2	3	TUE	weekday	237	179	TUE	weekday	0	
+63	2031	3	2	4	WED	weekday	213	166	WED	weekday	0	
+63	2031	3	2	5	THU	weekday	202	156	THU	weekday	0	
+63	2031	3	2	6	FRI	weekday	55	37	FRI	weekday	0	
+63	2031	3	2	7	SAT	red	290	217	SAT	red	0	
+63	2031	3	3	1		blank	11	5		blank	0	
+63	2031	3	3	2		blank	32	20		blank	1	
+63	2031	3	3	3		blank	266	202		blank	3	
+63	2031	3	3	4		blank	265	201		blank	3	
+63	2031	3	3	5		blank	264	200		blank	2	
+63	2031	3	3	6		blank	249	189		blank	2	
+63	2031	3	3	7	1	red	45	29	1	red	0	
+63	2031	3	4	1	2	red	160	121	2	red	0	
+63	2031	3	4	2	3	dark	144	106	3	dark	0	
+63	2031	3	4	3	4	dark	156	117	4	dark	0	
+63	2031	3	4	4	5	dark	147	109	5	dark	0	
+63	2031	3	4	5	6	dark	176	134	6	dark	0	
+63	2031	3	4	6	7	dark	203	157	7	dark	0	
+63	2031	3	4	7	8	red	8	4	8	red	0	
+63	2031	3	5	1	9	red	72	47	6	red	2	6->9
+63	2031	3	5	2	10	dark	50	34	10	dark	0	
+63	2031	3	5	3	11	dark	47	31	11	dark	0	
+63	2031	3	5	4	12	dark	119	85	12	dark	0	
+63	2031	3	5	5	13	dark	111	78	13	dark	0	
+63	2031	3	5	6	14	dark	83	54	14	dark	0	
+63	2031	3	5	7	15	red	52	35	15	red	0	
+63	2031	3	6	1	16	red	190	146	16	red	0	
+63	2031	3	6	2	17	dark	59	41	17	dark	0	
+63	2031	3	6	3	18	dark	116	82	18	dark	0	
+63	2031	3	6	4	19	dark	92	62	19	dark	0	
+63	2031	3	6	5	20	dark	90	60	20	dark	0	
+63	2031	3	6	6	21	dark	199	153	21	dark	0	
+63	2031	3	6	7	22	red	209	163	22	red	0	
+63	2031	3	7	1	23/30	red	218	170	23/30	red	0	
+63	2031	3	7	2	24/31	dark	4	2	24/31	dark	0	
+63	2031	3	7	3	25	dark	126	91	25	dark	0	
+63	2031	3	7	4	26	dark	35	22	26	dark	0	
+63	2031	3	7	5	27	dark	7	3	27	dark	0	
+63	2031	3	7	6	28	dark	230	175	28	dark	0	
+63	2031	3	7	7	29	red	233	176	29	red	0	
+64	2031	4	1	1		blank	14	7		blank	3	
+64	2031	4	1	2		blank	12	6		blank	3	
+64	2031	4	1	3		blank	285	214		blank	3	
+64	2031	4	1	4		blank	42	28		blank	3	
+64	2031	4	1	5	A	month	251	190	A	month	0	
+64	2031	4	1	6	P	month	86	56	P	month	0	
+64	2031	4	1	7	R	month	294	218	R	month	0	
+64	2031	4	2	1	SUN	red	66	44	SUN	red	0	
+64	2031	4	2	2	MON	weekday	200	154	MON	weekday	0	
+64	2031	4	2	3	TUE	weekday	237	179	TUE	weekday	0	
+64	2031	4	2	4	WED	weekday	213	166	WED	weekday	0	
+64	2031	4	2	5	THU	weekday	202	156	THU	weekday	0	
+64	2031	4	2	6	FRI	weekday	55	37	FRI	weekday	0	
+64	2031	4	2	7	SAT	red	290	217	SAT	red	0	
+64	2031	4	3	1		blank	6	3		blank	0	
+64	2031	4	3	2		blank	32	20		blank	1	
+64	2031	4	3	3	1	dark	31	19	1	dark	0	
+64	2031	4	3	4	2	dark	149	111	2	dark	0	
+64	2031	4	3	5	3	dark	186	143	3	dark	0	
+64	2031	4	3	6	4	dark	201	155	4	dark	0	
+64	2031	4	3	7	5	red	223	172	5	red	0	
+64	2031	4	4	1	6	red	287	215	6	red	0	
+64	2031	4	4	2	7	dark	194	149	7	dark	0	
+64	2031	4	4	3	8	dark	255	193	8	dark	0	
+64	2031	4	4	4	9	dark	148	110	6	dark	2	6->9
+64	2031	4	4	5	10	dark	48	32	10	dark	0	
+64	2031	4	4	6	11	dark	41	27	11	dark	0	
+64	2031	4	4	7	12	red	142	104	12	red	0	
+64	2031	4	5	1	13	red	133	97	13	red	0	
+64	2031	4	5	2	14	dark	102	71	14	dark	0	
+64	2031	4	5	3	15	dark	121	87	15	dark	0	
+64	2031	4	5	4	16	dark	139	102	16	dark	0	
+64	2031	4	5	5	17	dark	167	126	17	dark	0	
+64	2031	4	5	6	18	dark	108	75	18	dark	0	
+64	2031	4	5	7	19	red	114	80	19	red	0	
+64	2031	4	6	1	20	red	105	73	20	red	0	
+64	2031	4	6	2	21	dark	88	58	21	dark	0	
+64	2031	4	6	3	22	dark	171	129	22	dark	0	
+64	2031	4	6	4	23	dark	136	99	23	dark	0	
+64	2031	4	6	5	24	dark	172	130	24	dark	0	
+64	2031	4	6	6	25	dark	103	72	25	dark	0	
+64	2031	4	6	7	26	red	242	183	26	red	0	
+64	2031	4	7	1	27	red	63	43	27	red	0	
+64	2031	4	7	2	28	dark	229	175	28	dark	0	
+64	2031	4	7	3	29	dark	181	139	29	dark	0	
+64	2031	4	7	4	30	dark	259	197	30	dark	0	
+64	2031	4	7	5		blank	10	5		blank	1	
+64	2031	4	7	6		blank	5	2		blank	1	
+64	2031	4	7	7		blank	1	1		blank	1	
+65	2031	5	1	1		blank	1	1		blank	3	
+65	2031	5	1	2		blank	5	2		blank	3	
+65	2031	5	1	3		blank	10	5		blank	3	
+65	2031	5	1	4		blank	69	46		blank	3	
+65	2031	5	1	5	M	month	284	214	M	month	0	
+65	2031	5	1	6	A	month	277	211	A	month	0	
+65	2031	5	1	7	Y	month	77	49	Y	month	0	
+65	2031	5	2	1	SUN	red	66	44	SUN	red	0	
+65	2031	5	2	2	MON	weekday	200	154	MON	weekday	0	
+65	2031	5	2	3	TUE	weekday	237	179	TUE	weekday	0	
+65	2031	5	2	4	WED	weekday	213	166	WED	weekday	0	
+65	2031	5	2	5	THU	weekday	202	156	THU	weekday	0	
+65	2031	5	2	6	FRI	weekday	55	37	FRI	weekday	0	
+65	2031	5	2	7	SAT	red	290	217	SAT	red	0	
+65	2031	5	3	1		blank	6	3		blank	0	
+65	2031	5	3	2		blank	32	20		blank	1	
+65	2031	5	3	3		blank	264	200		blank	3	
+65	2031	5	3	4		blank	265	201		blank	3	
+65	2031	5	3	5	1	dark	248	188	1	dark	0	
+65	2031	5	3	6	2	dark	127	92	2	dark	0	
+65	2031	5	3	7	3	red	125	91	3	red	0	
+65	2031	5	4	1	4	red	286	215	4	red	0	
+65	2031	5	4	2	5	dark	152	114	5	dark	0	
+65	2031	5	4	3	6	dark	175	133	6	dark	0	
+65	2031	5	4	4	7	dark	157	118	7	dark	0	
+65	2031	5	4	5	8	dark	257	195	8	dark	0	
+65	2031	5	4	6	9	dark	155	116	6	dark	2	6->9
+65	2031	5	4	7	10	red	43	28	10	red	0	
+65	2031	5	5	1	11	red	26	15	11	red	0	
+65	2031	5	5	2	12	dark	81	52	12	dark	0	
+65	2031	5	5	3	13	dark	109	76	13	dark	0	
+65	2031	5	5	4	14	dark	129	94	14	dark	0	
+65	2031	5	5	5	15	dark	122	88	15	dark	0	
+65	2031	5	5	6	16	dark	94	64	16	dark	0	
+65	2031	5	5	7	17	red	71	47	17	red	0	
+65	2031	5	6	1	18	red	210	163	18	red	0	
+65	2031	5	6	2	19	dark	84	55	19	dark	0	
+65	2031	5	6	3	20	dark	58	40	20	dark	0	
+65	2031	5	6	4	21	dark	37	23	21	dark	0	
+65	2031	5	6	5	22	dark	124	90	22	dark	0	
+65	2031	5	6	6	23	dark	96	66	23	dark	0	
+65	2031	5	6	7	24	red	271	205	24	red	0	
+65	2031	5	7	1	25	red	231	176	25	red	0	
+65	2031	5	7	2	26	dark	18	8	26	dark	0	
+65	2031	5	7	3	27	dark	163	122	27	dark	0	
+65	2031	5	7	4	28	dark	161	121	28	dark	0	
+65	2031	5	7	5	29	dark	107	74	29	dark	0	
+65	2031	5	7	6	30	dark	241	183	30	dark	0	
+65	2031	5	7	7	31	red	281	212	31	red	0	
+66	2031	6	1	1		blank	14	7		blank	3	
+66	2031	6	1	2		blank	12	6		blank	3	
+66	2031	6	1	3		blank	250	190		blank	3	
+66	2031	6	1	4		blank	69	46		blank	3	
+66	2031	6	1	5	J	month	268	204	J	month	0	
+66	2031	6	1	6	U	month	78	50	U	month	0	
+66	2031	6	1	7	N	month	293	218	N	month	0	
+66	2031	6	2	1	SUN	red	66	44	SUN	red	0	
+66	2031	6	2	2	MON	weekday	200	154	MON	weekday	0	
+66	2031	6	2	3	TUE	weekday	237	179	TUE	weekday	0	
+66	2031	6	2	4	WED	weekday	213	166	WED	weekday	0	
+66	2031	6	2	5	THU	weekday	202	156	THU	weekday	0	
+66	2031	6	2	6	FRI	weekday	55	37	FRI	weekday	0	
+66	2031	6	2	7	SAT	red	290	217	SAT	red	0	
+66	2031	6	3	1	1	red	33	21	1	red	0	
+66	2031	6	3	2	2	dark	168	127	2	dark	0	
+66	2031	6	3	3	3	dark	184	141	3	dark	0	
+66	2031	6	3	4	4	dark	158	119	4	dark	0	
+66	2031	6	3	5	5	dark	177	135	5	dark	0	
+66	2031	6	3	6	6	dark	212	165	6	dark	0	
+66	2031	6	3	7	7	red	67	45	7	red	0	
+66	2031	6	4	1	8	red	253	191	8	red	0	
+66	2031	6	4	2	9	dark	159	120	6	dark	2	6->9
+66	2031	6	4	3	10	dark	38	24	10	dark	0	
+66	2031	6	4	4	11	dark	138	101	11	dark	0	
+66	2031	6	4	5	12	dark	110	77	12	dark	0	
+66	2031	6	4	6	13	dark	91	61	13	dark	0	
+66	2031	6	4	7	14	red	153	115	14	red	0	
+66	2031	6	5	1	15	red	188	145	15	red	0	
+66	2031	6	5	2	16	dark	115	81	16	dark	0	
+66	2031	6	5	3	17	dark	165	124	17	dark	0	
+66	2031	6	5	4	18	dark	146	108	18	dark	0	
+66	2031	6	5	5	19	dark	174	132	19	dark	0	
+66	2031	6	5	6	20	dark	214	167	20	dark	0	
+66	2031	6	5	7	21	red	44	29	21	red	0	
+66	2031	6	6	1	22	red	221	171	22	red	0	
+66	2031	6	6	2	23	dark	95	65	23	dark	0	
+66	2031	6	6	3	24	dark	183	140	24	dark	0	
+66	2031	6	6	4	25	dark	143	105	25	dark	0	
+66	2031	6	6	5	26	dark	187	144	26	dark	0	
+66	2031	6	6	6	27	dark	196	151	27	dark	0	
+66	2031	6	6	7	28	red	234	177	28	red	0	
+66	2031	6	7	1	29	red	280	212	29	red	0	
+66	2031	6	7	2	30	dark	217	169	30	dark	0	
+66	2031	6	7	3		blank	6	3		blank	1	
+66	2031	6	7	4		blank	42	28		blank	1	
+66	2031	6	7	5		blank	10	5		blank	1	
+66	2031	6	7	6		blank	5	2		blank	1	
+66	2031	6	7	7		blank	1	1		blank	1	
+67	2031	7	1	1		blank	14	7		blank	3	
+67	2031	7	1	2		blank	12	6		blank	3	
+67	2031	7	1	3		blank	10	5		blank	3	
+67	2031	7	1	4		blank	42	28		blank	3	
+67	2031	7	1	5	J	month	268	204	J	month	0	
+67	2031	7	1	6	U	month	78	50	U	month	0	
+67	2031	7	1	7	L	month	292	218	L	month	0	
+67	2031	7	2	1	SUN	red	66	44	SUN	red	0	
+67	2031	7	2	2	MON	weekday	200	154	MON	weekday	0	
+67	2031	7	2	3	TUE	weekday	237	179	TUE	weekday	0	
+67	2031	7	2	4	WED	weekday	213	166	WED	weekday	0	
+67	2031	7	2	5	THU	weekday	202	156	THU	weekday	0	
+67	2031	7	2	6	FRI	weekday	55	37	FRI	weekday	0	
+67	2031	7	2	7	SAT	red	290	217	SAT	red	0	
+67	2031	7	3	1		blank	6	3		blank	0	
+67	2031	7	3	2		blank	32	20		blank	1	
+67	2031	7	3	3	1	dark	31	19	1	dark	0	
+67	2031	7	3	4	2	dark	149	111	2	dark	0	
+67	2031	7	3	5	3	dark	186	143	3	dark	0	
+67	2031	7	3	6	4	dark	201	155	4	dark	0	
+67	2031	7	3	7	5	red	223	172	5	red	0	
+67	2031	7	4	1	6	red	287	215	6	red	0	
+67	2031	7	4	2	7	dark	194	149	7	dark	0	
+67	2031	7	4	3	8	dark	255	193	8	dark	0	
+67	2031	7	4	4	9	dark	148	110	6	dark	2	6->9
+67	2031	7	4	5	10	dark	48	32	10	dark	0	
+67	2031	7	4	6	11	dark	41	27	11	dark	0	
+67	2031	7	4	7	12	red	142	104	12	red	0	
+67	2031	7	5	1	13	red	133	97	13	red	0	
+67	2031	7	5	2	14	dark	102	71	14	dark	0	
+67	2031	7	5	3	15	dark	121	87	15	dark	0	
+67	2031	7	5	4	16	dark	139	102	16	dark	0	
+67	2031	7	5	5	17	dark	167	126	17	dark	0	
+67	2031	7	5	6	18	dark	108	75	18	dark	0	
+67	2031	7	5	7	19	red	114	80	19	red	0	
+67	2031	7	6	1	20	red	105	73	20	red	0	
+67	2031	7	6	2	21	dark	88	58	21	dark	0	
+67	2031	7	6	3	22	dark	171	129	22	dark	0	
+67	2031	7	6	4	23	dark	136	99	23	dark	0	
+67	2031	7	6	5	24	dark	172	130	24	dark	0	
+67	2031	7	6	6	25	dark	103	72	25	dark	0	
+67	2031	7	6	7	26	red	242	183	26	red	0	
+67	2031	7	7	1	27	red	63	43	27	red	0	
+67	2031	7	7	2	28	dark	229	175	28	dark	0	
+67	2031	7	7	3	29	dark	181	139	29	dark	0	
+67	2031	7	7	4	30	dark	259	197	30	dark	0	
+67	2031	7	7	5	31	dark	288	216	31	dark	0	
+67	2031	7	7	6		blank	5	2		blank	1	
+67	2031	7	7	7		blank	1	1		blank	1	
+68	2031	8	1	1		blank	14	7		blank	3	
+68	2031	8	1	2		blank	5	2		blank	3	
+68	2031	8	1	3		blank	10	5		blank	3	
+68	2031	8	1	4		blank	42	28		blank	3	
+68	2031	8	1	5	A	month	251	190	A	month	0	
+68	2031	8	1	6	U	month	78	50	U	month	0	
+68	2031	8	1	7	G	month	3	1	G	month	0	
+68	2031	8	2	1	SUN	red	66	44	SUN	red	0	
+68	2031	8	2	2	MON	weekday	200	154	MON	weekday	0	
+68	2031	8	2	3	TUE	weekday	237	179	TUE	weekday	0	
+68	2031	8	2	4	WED	weekday	213	166	WED	weekday	0	
+68	2031	8	2	5	THU	weekday	202	156	THU	weekday	0	
+68	2031	8	2	6	FRI	weekday	55	37	FRI	weekday	0	
+68	2031	8	2	7	SAT	red	290	217	SAT	red	0	
+68	2031	8	3	1		blank	6	3		blank	0	
+68	2031	8	3	2		blank	32	20		blank	1	
+68	2031	8	3	3		blank	266	202		blank	3	
+68	2031	8	3	4		blank	265	201		blank	3	
+68	2031	8	3	5		blank	264	200		blank	2	
+68	2031	8	3	6	1	dark	22	12	1	dark	0	
+68	2031	8	3	7	2	red	170	128	2	red	0	
+68	2031	8	4	1	3	red	252	191	3	red	0	
+68	2031	8	4	2	4	dark	151	113	4	dark	0	
+68	2031	8	4	3	5	dark	166	125	5	dark	0	
+68	2031	8	4	4	6	dark	148	110	6	dark	0	
+68	2031	8	4	5	7	dark	247	187	7	dark	0	
+68	2031	8	4	6	8	dark	101	70	8	dark	0	
+68	2031	8	4	7	9	red	287	215	6	red	2	6->9
+68	2031	8	5	1	10	red	228	174	10	red	0	
+68	2031	8	5	2	11	dark	56	38	11	dark	0	
+68	2031	8	5	3	12	dark	49	33	12	dark	0	
+68	2031	8	5	4	13	dark	120	86	13	dark	0	
+68	2031	8	5	5	14	dark	118	84	14	dark	0	
+68	2031	8	5	6	15	dark	89	59	15	dark	0	
+68	2031	8	5	7	16	red	68	45	16	red	0	
+68	2031	8	6	1	17	red	198	152	17	red	0	
+68	2031	8	6	2	18	dark	80	51	18	dark	0	
+68	2031	8	6	3	19	dark	131	96	19	dark	0	
+68	2031	8	6	4	20	dark	238	180	20	dark	0	
+68	2031	8	6	5	21	dark	28	16	21	dark	0	
+68	2031	8	6	6	22	dark	276	210	22	dark	0	
+68	2031	8	6	7	23	red	104	73	23	red	0	
+68	2031	8	7	1	24/31	red	219	170	24/31	red	0	
+68	2031	8	7	2	25	dark	98	67	25	dark	0	
+68	2031	8	7	3	26	dark	132	97	26	dark	0	
+68	2031	8	7	4	27	dark	154	115	27	dark	0	
+68	2031	8	7	5	28	dark	162	122	28	dark	0	
+68	2031	8	7	6	29	dark	235	177	29	dark	0	
+68	2031	8	7	7	30	red	64	43	30	red	0	
+69	2031	9	1	1		blank	14	7		blank	3	
+69	2031	9	1	2		blank	17	8		blank	3	
+69	2031	9	1	3		blank	250	190		blank	3	
+69	2031	9	1	4		blank	69	46		blank	3	
+69	2031	9	1	5	S	month	289	216	S	month	0	
+69	2031	9	1	6	E	month	282	213	E	month	0	
+69	2031	9	1	7	P	month	76	49	P	month	0	
+69	2031	9	2	1	SUN	red	66	44	SUN	red	0	
+69	2031	9	2	2	MON	weekday	200	154	MON	weekday	0	
+69	2031	9	2	3	TUE	weekday	237	179	TUE	weekday	0	
+69	2031	9	2	4	WED	weekday	213	166	WED	weekday	0	
+69	2031	9	2	5	THU	weekday	202	156	THU	weekday	0	
+69	2031	9	2	6	FRI	weekday	55	37	FRI	weekday	0	
+69	2031	9	2	7	SAT	red	290	217	SAT	red	0	
+69	2031	9	3	1		blank	6	3		blank	0	
+69	2031	9	3	2	1	dark	46	30	1	dark	0	
+69	2031	9	3	3	2	dark	178	136	2	dark	0	
+69	2031	9	3	4	3	dark	150	112	3	dark	0	
+69	2031	9	3	5	4	dark	246	186	4	dark	0	
+69	2031	9	3	6	5	dark	206	160	5	dark	0	
+69	2031	9	3	7	6	red	72	47	6	red	0	
+69	2031	9	4	1	7	red	9	4	7	red	0	
+69	2031	9	4	2	8	dark	204	158	8	dark	0	
+69	2031	9	4	3	9	dark	176	134	6	dark	2	6->9
+69	2031	9	4	4	10	dark	39	25	10	dark	0	
+69	2031	9	4	5	11	dark	30	18	11	dark	0	
+69	2031	9	4	6	12	dark	82	53	12	dark	0	
+69	2031	9	4	7	13	red	36	22	13	red	0	
+69	2031	9	5	1	14	red	182	139	14	red	0	
+69	2031	9	5	2	15	dark	112	79	15	dark	0	
+69	2031	9	5	3	16	dark	128	93	16	dark	0	
+69	2031	9	5	4	17	dark	145	107	17	dark	0	
+69	2031	9	5	5	18	dark	173	131	18	dark	0	
+69	2031	9	5	6	19	dark	123	89	19	dark	0	
+69	2031	9	5	7	20	red	27	15	20	red	0	
+69	2031	9	6	1	21	red	97	67	21	red	0	
+69	2031	9	6	2	22	dark	87	57	22	dark	0	
+69	2031	9	6	3	23	dark	180	138	23	dark	0	
+69	2031	9	6	4	24	dark	140	103	24	dark	0	
+69	2031	9	6	5	25	dark	179	137	25	dark	0	
+69	2031	9	6	6	26	dark	192	147	26	dark	0	
+69	2031	9	6	7	27	red	13	6	27	red	0	
+69	2031	9	7	1	28	red	232	176	28	red	0	
+69	2031	9	7	2	29	dark	191	146	29	dark	0	
+69	2031	9	7	3	30	dark	189	145	30	dark	0	
+69	2031	9	7	4		blank	42	28		blank	1	
+69	2031	9	7	5		blank	10	5		blank	1	
+69	2031	9	7	6		blank	5	2		blank	1	
+69	2031	9	7	7		blank	1	1		blank	1	
+70	2031	10	1	1		blank	62	43		blank	3	
+70	2031	10	1	2	O	month	85	56	O	month	0	
+70	2031	10	1	3	C	month	269	204	C	month	0	
+70	2031	10	1	4	T	month	134	98	T	month	0	
+70	2031	10	1	5		blank	11	5		blank	3	
+70	2031	10	1	6		blank	24	14		blank	3	
+70	2031	10	1	7		blank	14	7		blank	2	
+70	2031	10	2	1	SUN	red	66	44	SUN	red	0	
+70	2031	10	2	2	MON	weekday	200	154	MON	weekday	0	
+70	2031	10	2	3	TUE	weekday	237	179	TUE	weekday	0	
+70	2031	10	2	4	WED	weekday	213	166	WED	weekday	0	
+70	2031	10	2	5	THU	weekday	202	156	THU	weekday	0	
+70	2031	10	2	6	FRI	weekday	55	37	FRI	weekday	0	
+70	2031	10	2	7	SAT	red	290	217	SAT	red	0	
+70	2031	10	3	1		blank	6	3		blank	0	
+70	2031	10	3	2		blank	32	20		blank	1	
+70	2031	10	3	3		blank	264	200		blank	3	
+70	2031	10	3	4	1	dark	40	26	1	dark	0	
+70	2031	10	3	5	2	dark	29	17	2	dark	0	
+70	2031	10	3	6	3	dark	195	150	3	dark	0	
+70	2031	10	3	7	4	red	51	35	4	red	0	
+70	2031	10	4	1	5	red	260	197	5	red	0	
+70	2031	10	4	2	6	dark	155	116	6	dark	0	
+70	2031	10	4	3	7	dark	185	142	7	dark	0	
+70	2031	10	4	4	8	dark	256	194	8	dark	0	
+70	2031	10	4	5	9	dark	175	133	6	dark	2	6->9
+70	2031	10	4	6	10	dark	57	39	10	dark	0	
+70	2031	10	4	7	11	red	141	104	11	red	0	
+70	2031	10	5	1	12	red	113	80	12	red	0	
+70	2031	10	5	2	13	dark	93	63	13	dark	0	
+70	2031	10	5	3	14	dark	117	83	14	dark	0	
+70	2031	10	5	4	15	dark	137	100	15	dark	0	
+70	2031	10	5	5	16	dark	130	95	16	dark	0	
+70	2031	10	5	6	17	dark	100	69	17	dark	0	
+70	2031	10	5	7	18	red	106	74	18	red	0	
+70	2031	10	6	1	19	red	216	169	19	red	0	
+70	2031	10	6	2	20	dark	19	9	20	dark	0	
+70	2031	10	6	3	21	dark	20	10	21	dark	0	
+70	2031	10	6	4	22	dark	21	11	22	dark	0	
+70	2031	10	6	5	23	dark	164	123	23	dark	0	
+70	2031	10	6	6	24	dark	99	68	24	dark	0	
+70	2031	10	6	7	25	red	222	171	25	red	0	
+70	2031	10	7	1	26	red	279	212	26	red	0	
+70	2031	10	7	2	27	dark	53	36	27	dark	0	
+70	2031	10	7	3	28	dark	169	128	28	dark	0	
+70	2031	10	7	4	29	dark	225	173	29	dark	0	
+70	2031	10	7	5	30	dark	34	21	30	dark	0	
+70	2031	10	7	6	31	dark	270	205	31	dark	0	
+70	2031	10	7	7		blank	1	1		blank	1	
+71	2031	11	1	1		blank	14	7		blank	3	
+71	2031	11	1	2	N	month	74	48	N	month	0	
+71	2031	11	1	3	O	month	244	184	O	month	0	
+71	2031	11	1	4	V	month	135	98	V	month	0	
+71	2031	11	1	5		blank	224	172		blank	3	
+71	2031	11	1	6		blank	24	14		blank	3	
+71	2031	11	1	7		blank	1	1		blank	2	
+71	2031	11	2	1	SUN	red	66	44	SUN	red	0	
+71	2031	11	2	2	MON	weekday	200	154	MON	weekday	0	
+71	2031	11	2	3	TUE	weekday	237	179	TUE	weekday	0	
+71	2031	11	2	4	WED	weekday	213	166	WED	weekday	0	
+71	2031	11	2	5	THU	weekday	202	156	THU	weekday	0	
+71	2031	11	2	6	FRI	weekday	55	37	FRI	weekday	0	
+71	2031	11	2	7	SAT	red	290	217	SAT	red	0	
+71	2031	11	3	1		blank	11	5		blank	0	
+71	2031	11	3	2		blank	32	20		blank	1	
+71	2031	11	3	3		blank	266	202		blank	3	
+71	2031	11	3	4		blank	265	201		blank	3	
+71	2031	11	3	5		blank	264	200		blank	2	
+71	2031	11	3	6		blank	249	189		blank	2	
+71	2031	11	3	7	1	red	45	29	1	red	0	
+71	2031	11	4	1	2	red	160	121	2	red	0	
+71	2031	11	4	2	3	dark	144	106	3	dark	0	
+71	2031	11	4	3	4	dark	156	117	4	dark	0	
+71	2031	11	4	4	5	dark	147	109	5	dark	0	
+71	2031	11	4	5	6	dark	176	134	6	dark	0	
+71	2031	11	4	6	7	dark	203	157	7	dark	0	
+71	2031	11	4	7	8	red	8	4	8	red	0	
+71	2031	11	5	1	9	red	72	47	6	red	2	6->9
+71	2031	11	5	2	10	dark	50	34	10	dark	0	
+71	2031	11	5	3	11	dark	47	31	11	dark	0	
+71	2031	11	5	4	12	dark	119	85	12	dark	0	
+71	2031	11	5	5	13	dark	111	78	13	dark	0	
+71	2031	11	5	6	14	dark	83	54	14	dark	0	
+71	2031	11	5	7	15	red	52	35	15	red	0	
+71	2031	11	6	1	16	red	190	146	16	red	0	
+71	2031	11	6	2	17	dark	59	41	17	dark	0	
+71	2031	11	6	3	18	dark	116	82	18	dark	0	
+71	2031	11	6	4	19	dark	92	62	19	dark	0	
+71	2031	11	6	5	20	dark	90	60	20	dark	0	
+71	2031	11	6	6	21	dark	199	153	21	dark	0	
+71	2031	11	6	7	22	red	209	163	22	red	0	
+71	2031	11	7	1	23/30	red	218	170	23/30	red	0	
+71	2031	11	7	2	24	dark	61	42	24	dark	0	
+71	2031	11	7	3	25	dark	126	91	25	dark	0	
+71	2031	11	7	4	26	dark	35	22	26	dark	0	
+71	2031	11	7	5	27	dark	7	3	27	dark	0	
+71	2031	11	7	6	28	dark	230	175	28	dark	0	
+71	2031	11	7	7	29	red	233	176	29	red	0	
+72	2031	12	1	1		blank	62	43		blank	3	
+72	2031	12	1	2	D	month	25	14	D	month	0	
+72	2031	12	1	3	E	month	261	198	E	month	0	
+72	2031	12	1	4	C	month	70	46	C	month	0	
+72	2031	12	1	5		blank	6	3		blank	3	
+72	2031	12	1	6		blank	73	48		blank	3	
+72	2031	12	1	7		blank	14	7		blank	2	
+72	2031	12	2	1	SUN	red	66	44	SUN	red	0	
+72	2031	12	2	2	MON	weekday	200	154	MON	weekday	0	
+72	2031	12	2	3	TUE	weekday	237	179	TUE	weekday	0	
+72	2031	12	2	4	WED	weekday	213	166	WED	weekday	0	
+72	2031	12	2	5	THU	weekday	202	156	THU	weekday	0	
+72	2031	12	2	6	FRI	weekday	55	37	FRI	weekday	0	
+72	2031	12	2	7	SAT	red	290	217	SAT	red	0	
+72	2031	12	3	1		blank	224	172		blank	0	
+72	2031	12	3	2	1	dark	46	30	1	dark	0	
+72	2031	12	3	3	2	dark	178	136	2	dark	0	
+72	2031	12	3	4	3	dark	150	112	3	dark	0	
+72	2031	12	3	5	4	dark	246	186	4	dark	0	
+72	2031	12	3	6	5	dark	206	160	5	dark	0	
+72	2031	12	3	7	6	red	72	47	6	red	0	
+72	2031	12	4	1	7	red	9	4	7	red	0	
+72	2031	12	4	2	8	dark	204	158	8	dark	0	
+72	2031	12	4	3	9	dark	176	134	6	dark	2	6->9
+72	2031	12	4	4	10	dark	39	25	10	dark	0	
+72	2031	12	4	5	11	dark	30	18	11	dark	0	
+72	2031	12	4	6	12	dark	82	53	12	dark	0	
+72	2031	12	4	7	13	red	36	22	13	red	0	
+72	2031	12	5	1	14	red	182	139	14	red	0	
+72	2031	12	5	2	15	dark	112	79	15	dark	0	
+72	2031	12	5	3	16	dark	128	93	16	dark	0	
+72	2031	12	5	4	17	dark	145	107	17	dark	0	
+72	2031	12	5	5	18	dark	173	131	18	dark	0	
+72	2031	12	5	6	19	dark	123	89	19	dark	0	
+72	2031	12	5	7	20	red	27	15	20	red	0	
+72	2031	12	6	1	21	red	97	67	21	red	0	
+72	2031	12	6	2	22	dark	87	57	22	dark	0	
+72	2031	12	6	3	23	dark	180	138	23	dark	0	
+72	2031	12	6	4	24	dark	140	103	24	dark	0	
+72	2031	12	6	5	25	dark	179	137	25	dark	0	
+72	2031	12	6	6	26	dark	192	147	26	dark	0	
+72	2031	12	6	7	27	red	13	6	27	red	0	
+72	2031	12	7	1	28	red	232	176	28	red	0	
+72	2031	12	7	2	29	dark	191	146	29	dark	0	
+72	2031	12	7	3	30	dark	189	145	30	dark	0	
+72	2031	12	7	4	31	dark	226	173	31	dark	0	
+72	2031	12	7	5		blank	10	5		blank	1	
+72	2031	12	7	6		blank	5	2		blank	1	
+72	2031	12	7	7		blank	1	1		blank	1	
+73	2032	2	1	1		blank	62	43		blank	3	
+73	2032	2	1	2		blank	12	6		blank	3	
+73	2032	2	1	3		blank	250	190		blank	3	
+73	2032	2	1	4		blank	69	46		blank	3	
+73	2032	2	1	5	F	month	262	198	F	month	0	
+73	2032	2	1	6	E	month	282	213	E	month	0	
+73	2032	2	1	7	B	month	2	1	B	month	0	
+73	2032	2	2	1	SUN	red	66	44	SUN	red	0	
+73	2032	2	2	2	MON	weekday	200	154	MON	weekday	0	
+73	2032	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+73	2032	2	2	4	WED	weekday	213	166	WED	weekday	0	
+73	2032	2	2	5	THU	weekday	202	156	THU	weekday	0	
+73	2032	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+73	2032	2	2	7	SAT	red	290	217	SAT	red	0	
+73	2032	2	3	1	1	red	33	21	1	red	0	
+73	2032	2	3	2	2	dark	168	127	2	dark	0	
+73	2032	2	3	3	3	dark	184	141	3	dark	0	
+73	2032	2	3	4	4	dark	158	119	4	dark	0	
+73	2032	2	3	5	5	dark	177	135	5	dark	0	
+73	2032	2	3	6	6	dark	212	165	6	dark	0	
+73	2032	2	3	7	7	red	67	45	7	red	0	
+73	2032	2	4	1	8	red	253	191	8	red	0	
+73	2032	2	4	2	9	dark	159	120	6	dark	2	6->9
+73	2032	2	4	3	10	dark	38	24	10	dark	0	
+73	2032	2	4	4	11	dark	138	101	11	dark	0	
+73	2032	2	4	5	12	dark	110	77	12	dark	0	
+73	2032	2	4	6	13	dark	91	61	13	dark	0	
+73	2032	2	4	7	14	red	153	115	14	red	0	
+73	2032	2	5	1	15	red	188	145	15	red	0	
+73	2032	2	5	2	16	dark	115	81	16	dark	0	
+73	2032	2	5	3	17	dark	165	124	17	dark	0	
+73	2032	2	5	4	18	dark	146	108	18	dark	0	
+73	2032	2	5	5	19	dark	174	132	19	dark	0	
+73	2032	2	5	6	20	dark	214	167	20	dark	0	
+73	2032	2	5	7	21	red	44	29	21	red	0	
+73	2032	2	6	1	22	red	221	171	22	red	0	
+73	2032	2	6	2	23	dark	95	65	23	dark	0	
+73	2032	2	6	3	24	dark	183	140	24	dark	0	
+73	2032	2	6	4	25	dark	143	105	25	dark	0	
+73	2032	2	6	5	26	dark	187	144	26	dark	0	
+73	2032	2	6	6	27	dark	196	151	27	dark	0	
+73	2032	2	6	7	28	red	234	177	28	red	0	
+73	2032	2	7	1	29	red	280	212	29	red	0	
+73	2032	2	7	2		blank	24	14		blank	1	
+73	2032	2	7	3		blank	6	3		blank	1	
+73	2032	2	7	4		blank	42	28		blank	1	
+73	2032	2	7	5		blank	10	5		blank	1	
+73	2032	2	7	6		blank	5	2		blank	1	
+73	2032	2	7	7		blank	14	7		blank	1	
+74	2033	2	1	1		blank	75	49		blank	3	
+74	2033	2	1	2		blank	12	6		blank	3	
+74	2033	2	1	3		blank	250	190		blank	3	
+74	2033	2	1	4		blank	69	46		blank	3	
+74	2033	2	1	5	F	month	262	198	F	month	0	
+74	2033	2	1	6	E	month	282	213	E	month	0	
+74	2033	2	1	7	B	month	2	1	B	month	0	
+74	2033	2	2	1	SUN	red	66	44	SUN	red	0	
+74	2033	2	2	2	MON	weekday	200	154	MON	weekday	0	
+74	2033	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+74	2033	2	2	4	WED	weekday	213	166	WED	weekday	0	
+74	2033	2	2	5	THU	weekday	202	156	THU	weekday	0	
+74	2033	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+74	2033	2	2	7	SAT	red	290	217	SAT	red	0	
+74	2033	2	3	1		blank	6	3		blank	0	
+74	2033	2	3	2		blank	32	20		blank	1	
+74	2033	2	3	3	1	dark	31	19	1	dark	0	
+74	2033	2	3	4	2	dark	149	111	2	dark	0	
+74	2033	2	3	5	3	dark	186	143	3	dark	0	
+74	2033	2	3	6	4	dark	201	155	4	dark	0	
+74	2033	2	3	7	5	red	223	172	5	red	0	
+74	2033	2	4	1	6	red	287	215	6	red	0	
+74	2033	2	4	2	7	dark	194	149	7	dark	0	
+74	2033	2	4	3	8	dark	255	193	8	dark	0	
+74	2033	2	4	4	9	dark	148	110	6	dark	2	6->9
+74	2033	2	4	5	10	dark	48	32	10	dark	0	
+74	2033	2	4	6	11	dark	41	27	11	dark	0	
+74	2033	2	4	7	12	red	142	104	12	red	0	
+74	2033	2	5	1	13	red	133	97	13	red	0	
+74	2033	2	5	2	14	dark	102	71	14	dark	0	
+74	2033	2	5	3	15	dark	121	87	15	dark	0	
+74	2033	2	5	4	16	dark	139	102	16	dark	0	
+74	2033	2	5	5	17	dark	167	126	17	dark	0	
+74	2033	2	5	6	18	dark	108	75	18	dark	0	
+74	2033	2	5	7	19	red	114	80	19	red	0	
+74	2033	2	6	1	20	red	105	73	20	red	0	
+74	2033	2	6	2	21	dark	88	58	21	dark	0	
+74	2033	2	6	3	22	dark	171	129	22	dark	0	
+74	2033	2	6	4	23	dark	136	99	23	dark	0	
+74	2033	2	6	5	24	dark	172	130	24	dark	0	
+74	2033	2	6	6	25	dark	103	72	25	dark	0	
+74	2033	2	6	7	26	red	242	183	26	red	0	
+74	2033	2	7	1	27	red	63	43	27	red	0	
+74	2033	2	7	2	28	dark	229	175	28	dark	0	
+74	2033	2	7	3		blank	243	184		blank	1	
+74	2033	2	7	4		blank	42	28		blank	1	
+74	2033	2	7	5		blank	10	5		blank	1	
+74	2033	2	7	6		blank	5	2		blank	1	
+74	2033	2	7	7		blank	14	7		blank	1	
+75	2033	3	1	1		blank	14	7		blank	3	
+75	2033	3	1	2		blank	12	6		blank	3	
+75	2033	3	1	3		blank	10	5		blank	3	
+75	2033	3	1	4		blank	42	28		blank	3	
+75	2033	3	1	5	M	month	284	214	M	month	0	
+75	2033	3	1	6	A	month	277	211	A	month	0	
+75	2033	3	1	7	R	month	294	218	R	month	0	
+75	2033	3	2	1	SUN	red	66	44	SUN	red	0	
+75	2033	3	2	2	MON	weekday	200	154	MON	weekday	0	
+75	2033	3	2	3	TUE	weekday	237	179	TUE	weekday	0	
+75	2033	3	2	4	WED	weekday	213	166	WED	weekday	0	
+75	2033	3	2	5	THU	weekday	202	156	THU	weekday	0	
+75	2033	3	2	6	FRI	weekday	55	37	FRI	weekday	0	
+75	2033	3	2	7	SAT	red	290	217	SAT	red	0	
+75	2033	3	3	1		blank	6	3		blank	0	
+75	2033	3	3	2		blank	32	20		blank	1	
+75	2033	3	3	3	1	dark	31	19	1	dark	0	
+75	2033	3	3	4	2	dark	149	111	2	dark	0	
+75	2033	3	3	5	3	dark	186	143	3	dark	0	
+75	2033	3	3	6	4	dark	201	155	4	dark	0	
+75	2033	3	3	7	5	red	223	172	5	red	0	
+75	2033	3	4	1	6	red	287	215	6	red	0	
+75	2033	3	4	2	7	dark	194	149	7	dark	0	
+75	2033	3	4	3	8	dark	255	193	8	dark	0	
+75	2033	3	4	4	9	dark	148	110	6	dark	2	6->9
+75	2033	3	4	5	10	dark	48	32	10	dark	0	
+75	2033	3	4	6	11	dark	41	27	11	dark	0	
+75	2033	3	4	7	12	red	142	104	12	red	0	
+75	2033	3	5	1	13	red	133	97	13	red	0	
+75	2033	3	5	2	14	dark	102	71	14	dark	0	
+75	2033	3	5	3	15	dark	121	87	15	dark	0	
+75	2033	3	5	4	16	dark	139	102	16	dark	0	
+75	2033	3	5	5	17	dark	167	126	17	dark	0	
+75	2033	3	5	6	18	dark	108	75	18	dark	0	
+75	2033	3	5	7	19	red	114	80	19	red	0	
+75	2033	3	6	1	20	red	105	73	20	red	0	
+75	2033	3	6	2	21	dark	88	58	21	dark	0	
+75	2033	3	6	3	22	dark	171	129	22	dark	0	
+75	2033	3	6	4	23	dark	136	99	23	dark	0	
+75	2033	3	6	5	24	dark	172	130	24	dark	0	
+75	2033	3	6	6	25	dark	103	72	25	dark	0	
+75	2033	3	6	7	26	red	242	183	26	red	0	
+75	2033	3	7	1	27	red	63	43	27	red	0	
+75	2033	3	7	2	28	dark	229	175	28	dark	0	
+75	2033	3	7	3	29	dark	181	139	29	dark	0	
+75	2033	3	7	4	30	dark	259	197	30	dark	0	
+75	2033	3	7	5	31	dark	288	216	31	dark	0	
+75	2033	3	7	6		blank	5	2		blank	1	
+75	2033	3	7	7		blank	1	1		blank	1	
+76	2033	4	1	1		blank	1	1		blank	3	
+76	2033	4	1	2		blank	5	2		blank	3	
+76	2033	4	1	3		blank	10	5		blank	3	
+76	2033	4	1	4		blank	42	28		blank	3	
+76	2033	4	1	5	A	month	251	190	A	month	0	
+76	2033	4	1	6	P	month	86	56	P	month	0	
+76	2033	4	1	7	R	month	294	218	R	month	0	
+76	2033	4	2	1	SUN	red	66	44	SUN	red	0	
+76	2033	4	2	2	MON	weekday	200	154	MON	weekday	0	
+76	2033	4	2	3	TUE	weekday	237	179	TUE	weekday	0	
+76	2033	4	2	4	WED	weekday	213	166	WED	weekday	0	
+76	2033	4	2	5	THU	weekday	202	156	THU	weekday	0	
+76	2033	4	2	6	FRI	weekday	55	37	FRI	weekday	0	
+76	2033	4	2	7	SAT	red	290	217	SAT	red	0	
+76	2033	4	3	1		blank	6	3		blank	0	
+76	2033	4	3	2		blank	32	20		blank	1	
+76	2033	4	3	3		blank	266	202		blank	3	
+76	2033	4	3	4		blank	265	201		blank	3	
+76	2033	4	3	5		blank	264	200		blank	2	
+76	2033	4	3	6	1	dark	22	12	1	dark	0	
+76	2033	4	3	7	2	red	170	128	2	red	0	
+76	2033	4	4	1	3	red	252	191	3	red	0	
+76	2033	4	4	2	4	dark	151	113	4	dark	0	
+76	2033	4	4	3	5	dark	166	125	5	dark	0	
+76	2033	4	4	4	6	dark	148	110	6	dark	0	
+76	2033	4	4	5	7	dark	247	187	7	dark	0	
+76	2033	4	4	6	8	dark	101	70	8	dark	0	
+76	2033	4	4	7	9	red	287	215	6	red	2	6->9
+76	2033	4	5	1	10	red	228	174	10	red	0	
+76	2033	4	5	2	11	dark	56	38	11	dark	0	
+76	2033	4	5	3	12	dark	49	33	12	dark	0	
+76	2033	4	5	4	13	dark	120	86	13	dark	0	
+76	2033	4	5	5	14	dark	118	84	14	dark	0	
+76	2033	4	5	6	15	dark	89	59	15	dark	0	
+76	2033	4	5	7	16	red	68	45	16	red	0	
+76	2033	4	6	1	17	red	198	152	17	red	0	
+76	2033	4	6	2	18	dark	80	51	18	dark	0	
+76	2033	4	6	3	19	dark	131	96	19	dark	0	
+76	2033	4	6	4	20	dark	238	180	20	dark	0	
+76	2033	4	6	5	21	dark	28	16	21	dark	0	
+76	2033	4	6	6	22	dark	276	210	22	dark	0	
+76	2033	4	6	7	23	red	104	73	23	red	0	
+76	2033	4	7	1	24	red	16	7	24	red	0	
+76	2033	4	7	2	25	dark	98	67	25	dark	0	
+76	2033	4	7	3	26	dark	132	97	26	dark	0	
+76	2033	4	7	4	27	dark	154	115	27	dark	0	
+76	2033	4	7	5	28	dark	162	122	28	dark	0	
+76	2033	4	7	6	29	dark	235	177	29	dark	0	
+76	2033	4	7	7	30	red	64	43	30	red	0	
+77	2033	5	1	1		blank	14	7		blank	3	
+77	2033	5	1	2		blank	12	6		blank	3	
+77	2033	5	1	3		blank	250	190		blank	3	
+77	2033	5	1	4		blank	69	46		blank	3	
+77	2033	5	1	5	M	month	284	214	M	month	0	
+77	2033	5	1	6	A	month	277	211	A	month	0	
+77	2033	5	1	7	Y	month	77	49	Y	month	0	
+77	2033	5	2	1	SUN	red	66	44	SUN	red	0	
+77	2033	5	2	2	MON	weekday	200	154	MON	weekday	0	
+77	2033	5	2	3	TUE	weekday	237	179	TUE	weekday	0	
+77	2033	5	2	4	WED	weekday	213	166	WED	weekday	0	
+77	2033	5	2	5	THU	weekday	202	156	THU	weekday	0	
+77	2033	5	2	6	FRI	weekday	55	37	FRI	weekday	0	
+77	2033	5	2	7	SAT	red	290	217	SAT	red	0	
+77	2033	5	3	1	1	red	33	21	1	red	0	
+77	2033	5	3	2	2	dark	168	127	2	dark	0	
+77	2033	5	3	3	3	dark	184	141	3	dark	0	
+77	2033	5	3	4	4	dark	158	119	4	dark	0	
+77	2033	5	3	5	5	dark	177	135	5	dark	0	
+77	2033	5	3	6	6	dark	212	165	6	dark	0	
+77	2033	5	3	7	7	red	67	45	7	red	0	
+77	2033	5	4	1	8	red	253	191	8	red	0	
+77	2033	5	4	2	9	dark	159	120	6	dark	2	6->9
+77	2033	5	4	3	10	dark	38	24	10	dark	0	
+77	2033	5	4	4	11	dark	138	101	11	dark	0	
+77	2033	5	4	5	12	dark	110	77	12	dark	0	
+77	2033	5	4	6	13	dark	91	61	13	dark	0	
+77	2033	5	4	7	14	red	153	115	14	red	0	
+77	2033	5	5	1	15	red	188	145	15	red	0	
+77	2033	5	5	2	16	dark	115	81	16	dark	0	
+77	2033	5	5	3	17	dark	165	124	17	dark	0	
+77	2033	5	5	4	18	dark	146	108	18	dark	0	
+77	2033	5	5	5	19	dark	174	132	19	dark	0	
+77	2033	5	5	6	20	dark	214	167	20	dark	0	
+77	2033	5	5	7	21	red	44	29	21	red	0	
+77	2033	5	6	1	22	red	221	171	22	red	0	
+77	2033	5	6	2	23	dark	95	65	23	dark	0	
+77	2033	5	6	3	24	dark	183	140	24	dark	0	
+77	2033	5	6	4	25	dark	143	105	25	dark	0	
+77	2033	5	6	5	26	dark	187	144	26	dark	0	
+77	2033	5	6	6	27	dark	196	151	27	dark	0	
+77	2033	5	6	7	28	red	234	177	28	red	0	
+77	2033	5	7	1	29	red	280	212	29	red	0	
+77	2033	5	7	2	30	dark	217	169	30	dark	0	
+77	2033	5	7	3	31	dark	227	174	31	dark	0	
+77	2033	5	7	4		blank	42	28		blank	1	
+77	2033	5	7	5		blank	10	5		blank	1	
+77	2033	5	7	6		blank	5	2		blank	1	
+77	2033	5	7	7		blank	1	1		blank	1	
+78	2033	6	1	1		blank	14	7		blank	3	
+78	2033	6	1	2		blank	12	6		blank	3	
+78	2033	6	1	3		blank	10	5		blank	3	
+78	2033	6	1	4		blank	42	28		blank	3	
+78	2033	6	1	5	J	month	268	204	J	month	0	
+78	2033	6	1	6	U	month	78	50	U	month	0	
+78	2033	6	1	7	N	month	293	218	N	month	0	
+78	2033	6	2	1	SUN	red	66	44	SUN	red	0	
+78	2033	6	2	2	MON	weekday	200	154	MON	weekday	0	
+78	2033	6	2	3	TUE	weekday	237	179	TUE	weekday	0	
+78	2033	6	2	4	WED	weekday	213	166	WED	weekday	0	
+78	2033	6	2	5	THU	weekday	202	156	THU	weekday	0	
+78	2033	6	2	6	FRI	weekday	55	37	FRI	weekday	0	
+78	2033	6	2	7	SAT	red	290	217	SAT	red	0	
+78	2033	6	3	1		blank	6	3		blank	0	
+78	2033	6	3	2		blank	32	20		blank	1	
+78	2033	6	3	3		blank	264	200		blank	3	
+78	2033	6	3	4	1	dark	40	26	1	dark	0	
+78	2033	6	3	5	2	dark	29	17	2	dark	0	
+78	2033	6	3	6	3	dark	195	150	3	dark	0	
+78	2033	6	3	7	4	red	51	35	4	red	0	
+78	2033	6	4	1	5	red	260	197	5	red	0	
+78	2033	6	4	2	6	dark	155	116	6	dark	0	
+78	2033	6	4	3	7	dark	185	142	7	dark	0	
+78	2033	6	4	4	8	dark	256	194	8	dark	0	
+78	2033	6	4	5	9	dark	175	133	6	dark	2	6->9
+78	2033	6	4	6	10	dark	57	39	10	dark	0	
+78	2033	6	4	7	11	red	141	104	11	red	0	
+78	2033	6	5	1	12	red	113	80	12	red	0	
+78	2033	6	5	2	13	dark	93	63	13	dark	0	
+78	2033	6	5	3	14	dark	117	83	14	dark	0	
+78	2033	6	5	4	15	dark	137	100	15	dark	0	
+78	2033	6	5	5	16	dark	130	95	16	dark	0	
+78	2033	6	5	6	17	dark	100	69	17	dark	0	
+78	2033	6	5	7	18	red	106	74	18	red	0	
+78	2033	6	6	1	19	red	216	169	19	red	0	
+78	2033	6	6	2	20	dark	19	9	20	dark	0	
+78	2033	6	6	3	21	dark	20	10	21	dark	0	
+78	2033	6	6	4	22	dark	21	11	22	dark	0	
+78	2033	6	6	5	23	dark	164	123	23	dark	0	
+78	2033	6	6	6	24	dark	99	68	24	dark	0	
+78	2033	6	6	7	25	red	222	171	25	red	0	
+78	2033	6	7	1	26	red	279	212	26	red	0	
+78	2033	6	7	2	27	dark	53	36	27	dark	0	
+78	2033	6	7	3	28	dark	169	128	28	dark	0	
+78	2033	6	7	4	29	dark	225	173	29	dark	0	
+78	2033	6	7	5	30	dark	34	21	30	dark	0	
+78	2033	6	7	6		blank	5	2		blank	1	
+78	2033	6	7	7		blank	1	1		blank	1	
+79	2033	7	1	1		blank	1	1		blank	3	
+79	2033	7	1	2		blank	5	2		blank	3	
+79	2033	7	1	3		blank	10	5		blank	3	
+79	2033	7	1	4		blank	42	28		blank	3	
+79	2033	7	1	5	J	month	268	204	J	month	0	
+79	2033	7	1	6	U	month	78	50	U	month	0	
+79	2033	7	1	7	L	month	292	218	L	month	0	
+79	2033	7	2	1	SUN	red	66	44	SUN	red	0	
+79	2033	7	2	2	MON	weekday	200	154	MON	weekday	0	
+79	2033	7	2	3	TUE	weekday	237	179	TUE	weekday	0	
+79	2033	7	2	4	WED	weekday	213	166	WED	weekday	0	
+79	2033	7	2	5	THU	weekday	202	156	THU	weekday	0	
+79	2033	7	2	6	FRI	weekday	55	37	FRI	weekday	0	
+79	2033	7	2	7	SAT	red	290	217	SAT	red	0	
+79	2033	7	3	1		blank	6	3		blank	0	
+79	2033	7	3	2		blank	32	20		blank	1	
+79	2033	7	3	3		blank	266	202		blank	3	
+79	2033	7	3	4		blank	265	201		blank	3	
+79	2033	7	3	5		blank	264	200		blank	2	
+79	2033	7	3	6	1	dark	22	12	1	dark	0	
+79	2033	7	3	7	2	red	170	128	2	red	0	
+79	2033	7	4	1	3	red	252	191	3	red	0	
+79	2033	7	4	2	4	dark	151	113	4	dark	0	
+79	2033	7	4	3	5	dark	166	125	5	dark	0	
+79	2033	7	4	4	6	dark	148	110	6	dark	0	
+79	2033	7	4	5	7	dark	247	187	7	dark	0	
+79	2033	7	4	6	8	dark	101	70	8	dark	0	
+79	2033	7	4	7	9	red	287	215	6	red	2	6->9
+79	2033	7	5	1	10	red	228	174	10	red	0	
+79	2033	7	5	2	11	dark	56	38	11	dark	0	
+79	2033	7	5	3	12	dark	49	33	12	dark	0	
+79	2033	7	5	4	13	dark	120	86	13	dark	0	
+79	2033	7	5	5	14	dark	118	84	14	dark	0	
+79	2033	7	5	6	15	dark	89	59	15	dark	0	
+79	2033	7	5	7	16	red	68	45	16	red	0	
+79	2033	7	6	1	17	red	198	152	17	red	0	
+79	2033	7	6	2	18	dark	80	51	18	dark	0	
+79	2033	7	6	3	19	dark	131	96	19	dark	0	
+79	2033	7	6	4	20	dark	238	180	20	dark	0	
+79	2033	7	6	5	21	dark	28	16	21	dark	0	
+79	2033	7	6	6	22	dark	276	210	22	dark	0	
+79	2033	7	6	7	23	red	104	73	23	red	0	
+79	2033	7	7	1	24/31	red	219	170	24/31	red	0	
+79	2033	7	7	2	25	dark	98	67	25	dark	0	
+79	2033	7	7	3	26	dark	132	97	26	dark	0	
+79	2033	7	7	4	27	dark	154	115	27	dark	0	
+79	2033	7	7	5	28	dark	162	122	28	dark	0	
+79	2033	7	7	6	29	dark	235	177	29	dark	0	
+79	2033	7	7	7	30	red	64	43	30	red	0	
+80	2033	8	1	1		blank	62	43		blank	3	
+80	2033	8	1	2		blank	17	8		blank	3	
+80	2033	8	1	3		blank	285	214		blank	3	
+80	2033	8	1	4		blank	42	28		blank	3	
+80	2033	8	1	5	A	month	251	190	A	month	0	
+80	2033	8	1	6	U	month	78	50	U	month	0	
+80	2033	8	1	7	G	month	3	1	G	month	0	
+80	2033	8	2	1	SUN	red	66	44	SUN	red	0	
+80	2033	8	2	2	MON	weekday	200	154	MON	weekday	0	
+80	2033	8	2	3	TUE	weekday	237	179	TUE	weekday	0	
+80	2033	8	2	4	WED	weekday	213	166	WED	weekday	0	
+80	2033	8	2	5	THU	weekday	202	156	THU	weekday	0	
+80	2033	8	2	6	FRI	weekday	55	37	FRI	weekday	0	
+80	2033	8	2	7	SAT	red	290	217	SAT	red	0	
+80	2033	8	3	1		blank	6	3		blank	0	
+80	2033	8	3	2	1	dark	46	30	1	dark	0	
+80	2033	8	3	3	2	dark	178	136	2	dark	0	
+80	2033	8	3	4	3	dark	150	112	3	dark	0	
+80	2033	8	3	5	4	dark	246	186	4	dark	0	
+80	2033	8	3	6	5	dark	206	160	5	dark	0	
+80	2033	8	3	7	6	red	72	47	6	red	0	
+80	2033	8	4	1	7	red	9	4	7	red	0	
+80	2033	8	4	2	8	dark	204	158	8	dark	0	
+80	2033	8	4	3	9	dark	176	134	6	dark	2	6->9
+80	2033	8	4	4	10	dark	39	25	10	dark	0	
+80	2033	8	4	5	11	dark	30	18	11	dark	0	
+80	2033	8	4	6	12	dark	82	53	12	dark	0	
+80	2033	8	4	7	13	red	36	22	13	red	0	
+80	2033	8	5	1	14	red	182	139	14	red	0	
+80	2033	8	5	2	15	dark	112	79	15	dark	0	
+80	2033	8	5	3	16	dark	128	93	16	dark	0	
+80	2033	8	5	4	17	dark	145	107	17	dark	0	
+80	2033	8	5	5	18	dark	173	131	18	dark	0	
+80	2033	8	5	6	19	dark	123	89	19	dark	0	
+80	2033	8	5	7	20	red	27	15	20	red	0	
+80	2033	8	6	1	21	red	97	67	21	red	0	
+80	2033	8	6	2	22	dark	87	57	22	dark	0	
+80	2033	8	6	3	23	dark	180	138	23	dark	0	
+80	2033	8	6	4	24	dark	140	103	24	dark	0	
+80	2033	8	6	5	25	dark	179	137	25	dark	0	
+80	2033	8	6	6	26	dark	192	147	26	dark	0	
+80	2033	8	6	7	27	red	13	6	27	red	0	
+80	2033	8	7	1	28	red	232	176	28	red	0	
+80	2033	8	7	2	29	dark	191	146	29	dark	0	
+80	2033	8	7	3	30	dark	189	145	30	dark	0	
+80	2033	8	7	4	31	dark	226	173	31	dark	0	
+80	2033	8	7	5		blank	10	5		blank	1	
+80	2033	8	7	6		blank	5	2		blank	1	
+80	2033	8	7	7		blank	14	7		blank	1	
+81	2033	9	1	1		blank	14	7		blank	3	
+81	2033	9	1	2		blank	5	2		blank	3	
+81	2033	9	1	3		blank	10	5		blank	3	
+81	2033	9	1	4		blank	69	46		blank	3	
+81	2033	9	1	5	S	month	289	216	S	month	0	
+81	2033	9	1	6	E	month	282	213	E	month	0	
+81	2033	9	1	7	P	month	76	49	P	month	0	
+81	2033	9	2	1	SUN	red	66	44	SUN	red	0	
+81	2033	9	2	2	MON	weekday	200	154	MON	weekday	0	
+81	2033	9	2	3	TUE	weekday	237	179	TUE	weekday	0	
+81	2033	9	2	4	WED	weekday	213	166	WED	weekday	0	
+81	2033	9	2	5	THU	weekday	202	156	THU	weekday	0	
+81	2033	9	2	6	FRI	weekday	55	37	FRI	weekday	0	
+81	2033	9	2	7	SAT	red	290	217	SAT	red	0	
+81	2033	9	3	1		blank	6	3		blank	0	
+81	2033	9	3	2		blank	32	20		blank	1	
+81	2033	9	3	3		blank	264	200		blank	3	
+81	2033	9	3	4		blank	265	201		blank	3	
+81	2033	9	3	5	1	dark	248	188	1	dark	0	
+81	2033	9	3	6	2	dark	127	92	2	dark	0	
+81	2033	9	3	7	3	red	125	91	3	red	0	
+81	2033	9	4	1	4	red	286	215	4	red	0	
+81	2033	9	4	2	5	dark	152	114	5	dark	0	
+81	2033	9	4	3	6	dark	175	133	6	dark	0	
+81	2033	9	4	4	7	dark	157	118	7	dark	0	
+81	2033	9	4	5	8	dark	257	195	8	dark	0	
+81	2033	9	4	6	9	dark	155	116	6	dark	2	6->9
+81	2033	9	4	7	10	red	43	28	10	red	0	
+81	2033	9	5	1	11	red	26	15	11	red	0	
+81	2033	9	5	2	12	dark	81	52	12	dark	0	
+81	2033	9	5	3	13	dark	109	76	13	dark	0	
+81	2033	9	5	4	14	dark	129	94	14	dark	0	
+81	2033	9	5	5	15	dark	122	88	15	dark	0	
+81	2033	9	5	6	16	dark	94	64	16	dark	0	
+81	2033	9	5	7	17	red	71	47	17	red	0	
+81	2033	9	6	1	18	red	210	163	18	red	0	
+81	2033	9	6	2	19	dark	84	55	19	dark	0	
+81	2033	9	6	3	20	dark	58	40	20	dark	0	
+81	2033	9	6	4	21	dark	37	23	21	dark	0	
+81	2033	9	6	5	22	dark	124	90	22	dark	0	
+81	2033	9	6	6	23	dark	96	66	23	dark	0	
+81	2033	9	6	7	24	red	271	205	24	red	0	
+81	2033	9	7	1	25	red	231	176	25	red	0	
+81	2033	9	7	2	26	dark	18	8	26	dark	0	
+81	2033	9	7	3	27	dark	163	122	27	dark	0	
+81	2033	9	7	4	28	dark	161	121	28	dark	0	
+81	2033	9	7	5	29	dark	107	74	29	dark	0	
+81	2033	9	7	6	30	dark	241	183	30	dark	0	
+81	2033	9	7	7		blank	1	1		blank	1	
+82	2033	10	1	1		blank	14	7		blank	3	
+82	2033	10	1	2	O	month	85	56	O	month	0	
+82	2033	10	1	3	C	month	269	204	C	month	0	
+82	2033	10	1	4	T	month	134	98	T	month	0	
+82	2033	10	1	5		blank	224	172		blank	3	
+82	2033	10	1	6		blank	24	14		blank	3	
+82	2033	10	1	7		blank	1	1		blank	2	
+82	2033	10	2	1	SUN	red	66	44	SUN	red	0	
+82	2033	10	2	2	MON	weekday	200	154	MON	weekday	0	
+82	2033	10	2	3	TUE	weekday	237	179	TUE	weekday	0	
+82	2033	10	2	4	WED	weekday	213	166	WED	weekday	0	
+82	2033	10	2	5	THU	weekday	202	156	THU	weekday	0	
+82	2033	10	2	6	FRI	weekday	55	37	FRI	weekday	0	
+82	2033	10	2	7	SAT	red	290	217	SAT	red	0	
+82	2033	10	3	1		blank	11	5		blank	0	
+82	2033	10	3	2		blank	32	20		blank	1	
+82	2033	10	3	3		blank	266	202		blank	3	
+82	2033	10	3	4		blank	265	201		blank	3	
+82	2033	10	3	5		blank	264	200		blank	2	
+82	2033	10	3	6		blank	249	189		blank	2	
+82	2033	10	3	7	1	red	45	29	1	red	0	
+82	2033	10	4	1	2	red	160	121	2	red	0	
+82	2033	10	4	2	3	dark	144	106	3	dark	0	
+82	2033	10	4	3	4	dark	156	117	4	dark	0	
+82	2033	10	4	4	5	dark	147	109	5	dark	0	
+82	2033	10	4	5	6	dark	176	134	6	dark	0	
+82	2033	10	4	6	7	dark	203	157	7	dark	0	
+82	2033	10	4	7	8	red	8	4	8	red	0	
+82	2033	10	5	1	9	red	72	47	6	red	2	6->9
+82	2033	10	5	2	10	dark	50	34	10	dark	0	
+82	2033	10	5	3	11	dark	47	31	11	dark	0	
+82	2033	10	5	4	12	dark	119	85	12	dark	0	
+82	2033	10	5	5	13	dark	111	78	13	dark	0	
+82	2033	10	5	6	14	dark	83	54	14	dark	0	
+82	2033	10	5	7	15	red	52	35	15	red	0	
+82	2033	10	6	1	16	red	190	146	16	red	0	
+82	2033	10	6	2	17	dark	59	41	17	dark	0	
+82	2033	10	6	3	18	dark	116	82	18	dark	0	
+82	2033	10	6	4	19	dark	92	62	19	dark	0	
+82	2033	10	6	5	20	dark	90	60	20	dark	0	
+82	2033	10	6	6	21	dark	199	153	21	dark	0	
+82	2033	10	6	7	22	red	209	163	22	red	0	
+82	2033	10	7	1	23/30	red	218	170	23/30	red	0	
+82	2033	10	7	2	24/31	dark	4	2	24/31	dark	0	
+82	2033	10	7	3	25	dark	126	91	25	dark	0	
+82	2033	10	7	4	26	dark	35	22	26	dark	0	
+82	2033	10	7	5	27	dark	7	3	27	dark	0	
+82	2033	10	7	6	28	dark	230	175	28	dark	0	
+82	2033	10	7	7	29	red	233	176	29	red	0	
+83	2033	11	1	1		blank	75	49		blank	3	
+83	2033	11	1	2	N	month	74	48	N	month	0	
+83	2033	11	1	3	O	month	244	184	O	month	0	
+83	2033	11	1	4	V	month	135	98	V	month	0	
+83	2033	11	1	5		blank	11	5		blank	3	
+83	2033	11	1	6		blank	24	14		blank	3	
+83	2033	11	1	7		blank	14	7		blank	2	
+83	2033	11	2	1	SUN	red	66	44	SUN	red	0	
+83	2033	11	2	2	MON	weekday	200	154	MON	weekday	0	
+83	2033	11	2	3	TUE	weekday	237	179	TUE	weekday	0	
+83	2033	11	2	4	WED	weekday	213	166	WED	weekday	0	
+83	2033	11	2	5	THU	weekday	202	156	THU	weekday	0	
+83	2033	11	2	6	FRI	weekday	55	37	FRI	weekday	0	
+83	2033	11	2	7	SAT	red	290	217	SAT	red	0	
+83	2033	11	3	1		blank	6	3		blank	0	
+83	2033	11	3	2		blank	32	20		blank	1	
+83	2033	11	3	3	1	dark	31	19	1	dark	0	
+83	2033	11	3	4	2	dark	149	111	2	dark	0	
+83	2033	11	3	5	3	dark	186	143	3	dark	0	
+83	2033	11	3	6	4	dark	201	155	4	dark	0	
+83	2033	11	3	7	5	red	223	172	5	red	0	
+83	2033	11	4	1	6	red	287	215	6	red	0	
+83	2033	11	4	2	7	dark	194	149	7	dark	0	
+83	2033	11	4	3	8	dark	255	193	8	dark	0	
+83	2033	11	4	4	9	dark	148	110	6	dark	2	6->9
+83	2033	11	4	5	10	dark	48	32	10	dark	0	
+83	2033	11	4	6	11	dark	41	27	11	dark	0	
+83	2033	11	4	7	12	red	142	104	12	red	0	
+83	2033	11	5	1	13	red	133	97	13	red	0	
+83	2033	11	5	2	14	dark	102	71	14	dark	0	
+83	2033	11	5	3	15	dark	121	87	15	dark	0	
+83	2033	11	5	4	16	dark	139	102	16	dark	0	
+83	2033	11	5	5	17	dark	167	126	17	dark	0	
+83	2033	11	5	6	18	dark	108	75	18	dark	0	
+83	2033	11	5	7	19	red	114	80	19	red	0	
+83	2033	11	6	1	20	red	105	73	20	red	0	
+83	2033	11	6	2	21	dark	88	58	21	dark	0	
+83	2033	11	6	3	22	dark	171	129	22	dark	0	
+83	2033	11	6	4	23	dark	136	99	23	dark	0	
+83	2033	11	6	5	24	dark	172	130	24	dark	0	
+83	2033	11	6	6	25	dark	103	72	25	dark	0	
+83	2033	11	6	7	26	red	242	183	26	red	0	
+83	2033	11	7	1	27	red	63	43	27	red	0	
+83	2033	11	7	2	28	dark	229	175	28	dark	0	
+83	2033	11	7	3	29	dark	181	139	29	dark	0	
+83	2033	11	7	4	30	dark	259	197	30	dark	0	
+83	2033	11	7	5		blank	250	190		blank	1	
+83	2033	11	7	6		blank	5	2		blank	1	
+83	2033	11	7	7		blank	1	1		blank	1	
+84	2033	12	1	1		blank	14	7		blank	3	
+84	2033	12	1	2	D	month	25	14	D	month	0	
+84	2033	12	1	3	E	month	261	198	E	month	0	
+84	2033	12	1	4	C	month	70	46	C	month	0	
+84	2033	12	1	5		blank	11	5		blank	3	
+84	2033	12	1	6		blank	73	48		blank	3	
+84	2033	12	1	7		blank	1	1		blank	2	
+84	2033	12	2	1	SUN	red	66	44	SUN	red	0	
+84	2033	12	2	2	MON	weekday	200	154	MON	weekday	0	
+84	2033	12	2	3	TUE	weekday	237	179	TUE	weekday	0	
+84	2033	12	2	4	WED	weekday	213	166	WED	weekday	0	
+84	2033	12	2	5	THU	weekday	202	156	THU	weekday	0	
+84	2033	12	2	6	FRI	weekday	55	37	FRI	weekday	0	
+84	2033	12	2	7	SAT	red	290	217	SAT	red	0	
+84	2033	12	3	1		blank	6	3		blank	0	
+84	2033	12	3	2		blank	32	20		blank	1	
+84	2033	12	3	3		blank	264	200		blank	3	
+84	2033	12	3	4		blank	265	201		blank	3	
+84	2033	12	3	5	1	dark	248	188	1	dark	0	
+84	2033	12	3	6	2	dark	127	92	2	dark	0	
+84	2033	12	3	7	3	red	125	91	3	red	0	
+84	2033	12	4	1	4	red	286	215	4	red	0	
+84	2033	12	4	2	5	dark	152	114	5	dark	0	
+84	2033	12	4	3	6	dark	175	133	6	dark	0	
+84	2033	12	4	4	7	dark	157	118	7	dark	0	
+84	2033	12	4	5	8	dark	257	195	8	dark	0	
+84	2033	12	4	6	9	dark	155	116	6	dark	2	6->9
+84	2033	12	4	7	10	red	43	28	10	red	0	
+84	2033	12	5	1	11	red	26	15	11	red	0	
+84	2033	12	5	2	12	dark	81	52	12	dark	0	
+84	2033	12	5	3	13	dark	109	76	13	dark	0	
+84	2033	12	5	4	14	dark	129	94	14	dark	0	
+84	2033	12	5	5	15	dark	122	88	15	dark	0	
+84	2033	12	5	6	16	dark	94	64	16	dark	0	
+84	2033	12	5	7	17	red	71	47	17	red	0	
+84	2033	12	6	1	18	red	210	163	18	red	0	
+84	2033	12	6	2	19	dark	84	55	19	dark	0	
+84	2033	12	6	3	20	dark	58	40	20	dark	0	
+84	2033	12	6	4	21	dark	37	23	21	dark	0	
+84	2033	12	6	5	22	dark	124	90	22	dark	0	
+84	2033	12	6	6	23	dark	96	66	23	dark	0	
+84	2033	12	6	7	24	red	271	205	24	red	0	
+84	2033	12	7	1	25	red	231	176	25	red	0	
+84	2033	12	7	2	26	dark	18	8	26	dark	0	
+84	2033	12	7	3	27	dark	163	122	27	dark	0	
+84	2033	12	7	4	28	dark	161	121	28	dark	0	
+84	2033	12	7	5	29	dark	107	74	29	dark	0	
+84	2033	12	7	6	30	dark	241	183	30	dark	0	
+84	2033	12	7	7	31	red	281	212	31	red	0	
+85	2034	1	1	1		blank	14	7		blank	3	
+85	2034	1	1	2		blank	12	6		blank	3	
+85	2034	1	1	3		blank	250	190		blank	3	
+85	2034	1	1	4		blank	69	46		blank	3	
+85	2034	1	1	5	J	month	268	204	J	month	0	
+85	2034	1	1	6	A	month	277	211	A	month	0	
+85	2034	1	1	7	N	month	293	218	N	month	0	
+85	2034	1	2	1	SUN	red	66	44	SUN	red	0	
+85	2034	1	2	2	MON	weekday	200	154	MON	weekday	0	
+85	2034	1	2	3	TUE	weekday	237	179	TUE	weekday	0	
+85	2034	1	2	4	WED	weekday	213	166	WED	weekday	0	
+85	2034	1	2	5	THU	weekday	202	156	THU	weekday	0	
+85	2034	1	2	6	FRI	weekday	55	37	FRI	weekday	0	
+85	2034	1	2	7	SAT	red	290	217	SAT	red	0	
+85	2034	1	3	1	1	red	33	21	1	red	0	
+85	2034	1	3	2	2	dark	168	127	2	dark	0	
+85	2034	1	3	3	3	dark	184	141	3	dark	0	
+85	2034	1	3	4	4	dark	158	119	4	dark	0	
+85	2034	1	3	5	5	dark	177	135	5	dark	0	
+85	2034	1	3	6	6	dark	212	165	6	dark	0	
+85	2034	1	3	7	7	red	67	45	7	red	0	
+85	2034	1	4	1	8	red	253	191	8	red	0	
+85	2034	1	4	2	9	dark	159	120	6	dark	2	6->9
+85	2034	1	4	3	10	dark	38	24	10	dark	0	
+85	2034	1	4	4	11	dark	138	101	11	dark	0	
+85	2034	1	4	5	12	dark	110	77	12	dark	0	
+85	2034	1	4	6	13	dark	91	61	13	dark	0	
+85	2034	1	4	7	14	red	153	115	14	red	0	
+85	2034	1	5	1	15	red	188	145	15	red	0	
+85	2034	1	5	2	16	dark	115	81	16	dark	0	
+85	2034	1	5	3	17	dark	165	124	17	dark	0	
+85	2034	1	5	4	18	dark	146	108	18	dark	0	
+85	2034	1	5	5	19	dark	174	132	19	dark	0	
+85	2034	1	5	6	20	dark	214	167	20	dark	0	
+85	2034	1	5	7	21	red	44	29	21	red	0	
+85	2034	1	6	1	22	red	221	171	22	red	0	
+85	2034	1	6	2	23	dark	95	65	23	dark	0	
+85	2034	1	6	3	24	dark	183	140	24	dark	0	
+85	2034	1	6	4	25	dark	143	105	25	dark	0	
+85	2034	1	6	5	26	dark	187	144	26	dark	0	
+85	2034	1	6	6	27	dark	196	151	27	dark	0	
+85	2034	1	6	7	28	red	234	177	28	red	0	
+85	2034	1	7	1	29	red	280	212	29	red	0	
+85	2034	1	7	2	30	dark	217	169	30	dark	0	
+85	2034	1	7	3	31	dark	227	174	31	dark	0	
+85	2034	1	7	4		blank	42	28		blank	1	
+85	2034	1	7	5		blank	10	5		blank	1	
+85	2034	1	7	6		blank	5	2		blank	1	
+85	2034	1	7	7		blank	1	1		blank	1	
+86	2034	2	1	1		blank	62	43		blank	3	
+86	2034	2	1	2		blank	12	6		blank	3	
+86	2034	2	1	3		blank	250	190		blank	3	
+86	2034	2	1	4		blank	69	46		blank	3	
+86	2034	2	1	5	F	month	262	198	F	month	0	
+86	2034	2	1	6	E	month	282	213	E	month	0	
+86	2034	2	1	7	B	month	2	1	B	month	0	
+86	2034	2	2	1	SUN	red	66	44	SUN	red	0	
+86	2034	2	2	2	MON	weekday	200	154	MON	weekday	0	
+86	2034	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+86	2034	2	2	4	WED	weekday	213	166	WED	weekday	0	
+86	2034	2	2	5	THU	weekday	202	156	THU	weekday	0	
+86	2034	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+86	2034	2	2	7	SAT	red	290	217	SAT	red	0	
+86	2034	2	3	1		blank	6	3		blank	0	
+86	2034	2	3	2		blank	32	20		blank	1	
+86	2034	2	3	3		blank	264	200		blank	3	
+86	2034	2	3	4	1	dark	40	26	1	dark	0	
+86	2034	2	3	5	2	dark	29	17	2	dark	0	
+86	2034	2	3	6	3	dark	195	150	3	dark	0	
+86	2034	2	3	7	4	red	51	35	4	red	0	
+86	2034	2	4	1	5	red	260	197	5	red	0	
+86	2034	2	4	2	6	dark	155	116	6	dark	0	
+86	2034	2	4	3	7	dark	185	142	7	dark	0	
+86	2034	2	4	4	8	dark	256	194	8	dark	0	
+86	2034	2	4	5	9	dark	175	133	6	dark	2	6->9
+86	2034	2	4	6	10	dark	57	39	10	dark	0	
+86	2034	2	4	7	11	red	141	104	11	red	0	
+86	2034	2	5	1	12	red	113	80	12	red	0	
+86	2034	2	5	2	13	dark	93	63	13	dark	0	
+86	2034	2	5	3	14	dark	117	83	14	dark	0	
+86	2034	2	5	4	15	dark	137	100	15	dark	0	
+86	2034	2	5	5	16	dark	130	95	16	dark	0	
+86	2034	2	5	6	17	dark	100	69	17	dark	0	
+86	2034	2	5	7	18	red	106	74	18	red	0	
+86	2034	2	6	1	19	red	216	169	19	red	0	
+86	2034	2	6	2	20	dark	19	9	20	dark	0	
+86	2034	2	6	3	21	dark	20	10	21	dark	0	
+86	2034	2	6	4	22	dark	21	11	22	dark	0	
+86	2034	2	6	5	23	dark	164	123	23	dark	0	
+86	2034	2	6	6	24	dark	99	68	24	dark	0	
+86	2034	2	6	7	25	red	222	171	25	red	0	
+86	2034	2	7	1	26	red	279	212	26	red	0	
+86	2034	2	7	2	27	dark	53	36	27	dark	0	
+86	2034	2	7	3	28	dark	169	128	28	dark	0	
+86	2034	2	7	4		blank	42	28		blank	1	
+86	2034	2	7	5		blank	10	5		blank	1	
+86	2034	2	7	6		blank	5	2		blank	1	
+86	2034	2	7	7		blank	14	7		blank	1	
+87	2036	2	1	1		blank	75	49		blank	3	
+87	2036	2	1	2		blank	5	2		blank	3	
+87	2036	2	1	3		blank	10	5		blank	3	
+87	2036	2	1	4		blank	42	28		blank	3	
+87	2036	2	1	5	F	month	262	198	F	month	0	
+87	2036	2	1	6	E	month	282	213	E	month	0	
+87	2036	2	1	7	B	month	2	1	B	month	0	
+87	2036	2	2	1	SUN	red	66	44	SUN	red	0	
+87	2036	2	2	2	MON	weekday	200	154	MON	weekday	0	
+87	2036	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+87	2036	2	2	4	WED	weekday	213	166	WED	weekday	0	
+87	2036	2	2	5	THU	weekday	202	156	THU	weekday	0	
+87	2036	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+87	2036	2	2	7	SAT	red	290	217	SAT	red	0	
+87	2036	2	3	1		blank	6	3		blank	0	
+87	2036	2	3	2		blank	32	20		blank	1	
+87	2036	2	3	3		blank	266	202		blank	3	
+87	2036	2	3	4		blank	265	201		blank	3	
+87	2036	2	3	5		blank	264	200		blank	2	
+87	2036	2	3	6	1	dark	22	12	1	dark	0	
+87	2036	2	3	7	2	red	170	128	2	red	0	
+87	2036	2	4	1	3	red	252	191	3	red	0	
+87	2036	2	4	2	4	dark	151	113	4	dark	0	
+87	2036	2	4	3	5	dark	166	125	5	dark	0	
+87	2036	2	4	4	6	dark	148	110	6	dark	0	
+87	2036	2	4	5	7	dark	247	187	7	dark	0	
+87	2036	2	4	6	8	dark	101	70	8	dark	0	
+87	2036	2	4	7	9	red	287	215	6	red	2	6->9
+87	2036	2	5	1	10	red	228	174	10	red	0	
+87	2036	2	5	2	11	dark	56	38	11	dark	0	
+87	2036	2	5	3	12	dark	49	33	12	dark	0	
+87	2036	2	5	4	13	dark	120	86	13	dark	0	
+87	2036	2	5	5	14	dark	118	84	14	dark	0	
+87	2036	2	5	6	15	dark	89	59	15	dark	0	
+87	2036	2	5	7	16	red	68	45	16	red	0	
+87	2036	2	6	1	17	red	198	152	17	red	0	
+87	2036	2	6	2	18	dark	80	51	18	dark	0	
+87	2036	2	6	3	19	dark	131	96	19	dark	0	
+87	2036	2	6	4	20	dark	238	180	20	dark	0	
+87	2036	2	6	5	21	dark	28	16	21	dark	0	
+87	2036	2	6	6	22	dark	276	210	22	dark	0	
+87	2036	2	6	7	23	red	104	73	23	red	0	
+87	2036	2	7	1	24	red	16	7	24	red	0	
+87	2036	2	7	2	25	dark	98	67	25	dark	0	
+87	2036	2	7	3	26	dark	132	97	26	dark	0	
+87	2036	2	7	4	27	dark	154	115	27	dark	0	
+87	2036	2	7	5	28	dark	162	122	28	dark	0	
+87	2036	2	7	6	29	dark	235	177	29	dark	0	
+87	2036	2	7	7		blank	62	43		blank	1	
+88	2040	2	1	1		blank	62	43		blank	3	
+88	2040	2	1	2		blank	12	6		blank	3	
+88	2040	2	1	3		blank	250	190		blank	3	
+88	2040	2	1	4		blank	42	28		blank	3	
+88	2040	2	1	5	F	month	262	198	F	month	0	
+88	2040	2	1	6	E	month	282	213	E	month	0	
+88	2040	2	1	7	B	month	2	1	B	month	0	
+88	2040	2	2	1	SUN	red	66	44	SUN	red	0	
+88	2040	2	2	2	MON	weekday	200	154	MON	weekday	0	
+88	2040	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+88	2040	2	2	4	WED	weekday	213	166	WED	weekday	0	
+88	2040	2	2	5	THU	weekday	202	156	THU	weekday	0	
+88	2040	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+88	2040	2	2	7	SAT	red	290	217	SAT	red	0	
+88	2040	2	3	1		blank	6	3		blank	0	
+88	2040	2	3	2		blank	32	20		blank	1	
+88	2040	2	3	3		blank	264	200		blank	3	
+88	2040	2	3	4	1	dark	40	26	1	dark	0	
+88	2040	2	3	5	2	dark	29	17	2	dark	0	
+88	2040	2	3	6	3	dark	195	150	3	dark	0	
+88	2040	2	3	7	4	red	51	35	4	red	0	
+88	2040	2	4	1	5	red	260	197	5	red	0	
+88	2040	2	4	2	6	dark	155	116	6	dark	0	
+88	2040	2	4	3	7	dark	185	142	7	dark	0	
+88	2040	2	4	4	8	dark	256	194	8	dark	0	
+88	2040	2	4	5	9	dark	175	133	6	dark	2	6->9
+88	2040	2	4	6	10	dark	57	39	10	dark	0	
+88	2040	2	4	7	11	red	141	104	11	red	0	
+88	2040	2	5	1	12	red	113	80	12	red	0	
+88	2040	2	5	2	13	dark	93	63	13	dark	0	
+88	2040	2	5	3	14	dark	117	83	14	dark	0	
+88	2040	2	5	4	15	dark	137	100	15	dark	0	
+88	2040	2	5	5	16	dark	130	95	16	dark	0	
+88	2040	2	5	6	17	dark	100	69	17	dark	0	
+88	2040	2	5	7	18	red	106	74	18	red	0	
+88	2040	2	6	1	19	red	216	169	19	red	0	
+88	2040	2	6	2	20	dark	19	9	20	dark	0	
+88	2040	2	6	3	21	dark	20	10	21	dark	0	
+88	2040	2	6	4	22	dark	21	11	22	dark	0	
+88	2040	2	6	5	23	dark	164	123	23	dark	0	
+88	2040	2	6	6	24	dark	99	68	24	dark	0	
+88	2040	2	6	7	25	red	222	171	25	red	0	
+88	2040	2	7	1	26	red	279	212	26	red	0	
+88	2040	2	7	2	27	dark	53	36	27	dark	0	
+88	2040	2	7	3	28	dark	169	128	28	dark	0	
+88	2040	2	7	4	29	dark	225	173	29	dark	0	
+88	2040	2	7	5		blank	10	5		blank	1	
+88	2040	2	7	6		blank	5	2		blank	1	
+88	2040	2	7	7		blank	14	7		blank	1	
+89	2044	2	1	1		blank	62	43		blank	3	
+89	2044	2	1	2		blank	17	8		blank	3	
+89	2044	2	1	3		blank	250	190		blank	3	
+89	2044	2	1	4		blank	69	46		blank	3	
+89	2044	2	1	5	F	month	262	198	F	month	0	
+89	2044	2	1	6	E	month	282	213	E	month	0	
+89	2044	2	1	7	B	month	2	1	B	month	0	
+89	2044	2	2	1	SUN	red	66	44	SUN	red	0	
+89	2044	2	2	2	MON	weekday	200	154	MON	weekday	0	
+89	2044	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+89	2044	2	2	4	WED	weekday	213	166	WED	weekday	0	
+89	2044	2	2	5	THU	weekday	202	156	THU	weekday	0	
+89	2044	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+89	2044	2	2	7	SAT	red	290	217	SAT	red	0	
+89	2044	2	3	1		blank	6	3		blank	0	
+89	2044	2	3	2	1	dark	46	30	1	dark	0	
+89	2044	2	3	3	2	dark	178	136	2	dark	0	
+89	2044	2	3	4	3	dark	150	112	3	dark	0	
+89	2044	2	3	5	4	dark	246	186	4	dark	0	
+89	2044	2	3	6	5	dark	206	160	5	dark	0	
+89	2044	2	3	7	6	red	72	47	6	red	0	
+89	2044	2	4	1	7	red	9	4	7	red	0	
+89	2044	2	4	2	8	dark	204	158	8	dark	0	
+89	2044	2	4	3	9	dark	176	134	6	dark	2	6->9
+89	2044	2	4	4	10	dark	39	25	10	dark	0	
+89	2044	2	4	5	11	dark	30	18	11	dark	0	
+89	2044	2	4	6	12	dark	82	53	12	dark	0	
+89	2044	2	4	7	13	red	36	22	13	red	0	
+89	2044	2	5	1	14	red	182	139	14	red	0	
+89	2044	2	5	2	15	dark	112	79	15	dark	0	
+89	2044	2	5	3	16	dark	128	93	16	dark	0	
+89	2044	2	5	4	17	dark	145	107	17	dark	0	
+89	2044	2	5	5	18	dark	173	131	18	dark	0	
+89	2044	2	5	6	19	dark	123	89	19	dark	0	
+89	2044	2	5	7	20	red	27	15	20	red	0	
+89	2044	2	6	1	21	red	97	67	21	red	0	
+89	2044	2	6	2	22	dark	87	57	22	dark	0	
+89	2044	2	6	3	23	dark	180	138	23	dark	0	
+89	2044	2	6	4	24	dark	140	103	24	dark	0	
+89	2044	2	6	5	25	dark	179	137	25	dark	0	
+89	2044	2	6	6	26	dark	192	147	26	dark	0	
+89	2044	2	6	7	27	red	13	6	27	red	0	
+89	2044	2	7	1	28	red	232	176	28	red	0	
+89	2044	2	7	2	29	dark	191	146	29	dark	0	
+89	2044	2	7	3		blank	224	172		blank	1	
+89	2044	2	7	4		blank	42	28		blank	1	
+89	2044	2	7	5		blank	10	5		blank	1	
+89	2044	2	7	6		blank	5	2		blank	1	
+89	2044	2	7	7		blank	14	7		blank	1	
+90	2048	2	1	1		blank	62	43		blank	3	
+90	2048	2	1	2		blank	5	2		blank	3	
+90	2048	2	1	3		blank	250	190		blank	3	
+90	2048	2	1	4		blank	42	28		blank	3	
+90	2048	2	1	5	F	month	262	198	F	month	0	
+90	2048	2	1	6	E	month	282	213	E	month	0	
+90	2048	2	1	7	B	month	2	1	B	month	0	
+90	2048	2	2	1	SUN	red	66	44	SUN	red	0	
+90	2048	2	2	2	MON	weekday	200	154	MON	weekday	0	
+90	2048	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+90	2048	2	2	4	WED	weekday	213	166	WED	weekday	0	
+90	2048	2	2	5	THU	weekday	202	156	THU	weekday	0	
+90	2048	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+90	2048	2	2	7	SAT	red	290	217	SAT	red	0	
+90	2048	2	3	1		blank	11	5		blank	0	
+90	2048	2	3	2		blank	32	20		blank	1	
+90	2048	2	3	3		blank	266	202		blank	3	
+90	2048	2	3	4		blank	265	201		blank	3	
+90	2048	2	3	5		blank	264	200		blank	2	
+90	2048	2	3	6		blank	249	189		blank	2	
+90	2048	2	3	7	1	red	45	29	1	red	0	
+90	2048	2	4	1	2	red	160	121	2	red	0	
+90	2048	2	4	2	3	dark	144	106	3	dark	0	
+90	2048	2	4	3	4	dark	156	117	4	dark	0	
+90	2048	2	4	4	5	dark	147	109	5	dark	0	
+90	2048	2	4	5	6	dark	176	134	6	dark	0	
+90	2048	2	4	6	7	dark	203	157	7	dark	0	
+90	2048	2	4	7	8	red	8	4	8	red	0	
+90	2048	2	5	1	9	red	72	47	6	red	2	6->9
+90	2048	2	5	2	10	dark	50	34	10	dark	0	
+90	2048	2	5	3	11	dark	47	31	11	dark	0	
+90	2048	2	5	4	12	dark	119	85	12	dark	0	
+90	2048	2	5	5	13	dark	111	78	13	dark	0	
+90	2048	2	5	6	14	dark	83	54	14	dark	0	
+90	2048	2	5	7	15	red	52	35	15	red	0	
+90	2048	2	6	1	16	red	190	146	16	red	0	
+90	2048	2	6	2	17	dark	59	41	17	dark	0	
+90	2048	2	6	3	18	dark	116	82	18	dark	0	
+90	2048	2	6	4	19	dark	92	62	19	dark	0	
+90	2048	2	6	5	20	dark	90	60	20	dark	0	
+90	2048	2	6	6	21	dark	199	153	21	dark	0	
+90	2048	2	6	7	22	red	209	163	22	red	0	
+90	2048	2	7	1	23	red	15	7	23	red	0	
+90	2048	2	7	2	24	dark	61	42	24	dark	0	
+90	2048	2	7	3	25	dark	126	91	25	dark	0	
+90	2048	2	7	4	26	dark	35	22	26	dark	0	
+90	2048	2	7	5	27	dark	7	3	27	dark	0	
+90	2048	2	7	6	28	dark	230	175	28	dark	0	
+90	2048	2	7	7	29	red	233	176	29	red	0	
+91	2052	2	1	1		blank	62	43		blank	3	
+91	2052	2	1	2		blank	12	6		blank	3	
+91	2052	2	1	3		blank	10	5		blank	3	
+91	2052	2	1	4		blank	69	46		blank	3	
+91	2052	2	1	5	F	month	262	198	F	month	0	
+91	2052	2	1	6	E	month	282	213	E	month	0	
+91	2052	2	1	7	B	month	2	1	B	month	0	
+91	2052	2	2	1	SUN	red	66	44	SUN	red	0	
+91	2052	2	2	2	MON	weekday	200	154	MON	weekday	0	
+91	2052	2	2	3	TUE	weekday	237	179	TUE	weekday	0	
+91	2052	2	2	4	WED	weekday	213	166	WED	weekday	0	
+91	2052	2	2	5	THU	weekday	202	156	THU	weekday	0	
+91	2052	2	2	6	FRI	weekday	55	37	FRI	weekday	0	
+91	2052	2	2	7	SAT	red	290	217	SAT	red	0	
+91	2052	2	3	1		blank	6	3		blank	0	
+91	2052	2	3	2		blank	32	20		blank	1	
+91	2052	2	3	3		blank	264	200		blank	3	
+91	2052	2	3	4		blank	265	201		blank	3	
+91	2052	2	3	5	1	dark	248	188	1	dark	0	
+91	2052	2	3	6	2	dark	127	92	2	dark	0	
+91	2052	2	3	7	3	red	125	91	3	red	0	
+91	2052	2	4	1	4	red	286	215	4	red	0	
+91	2052	2	4	2	5	dark	152	114	5	dark	0	
+91	2052	2	4	3	6	dark	175	133	6	dark	0	
+91	2052	2	4	4	7	dark	157	118	7	dark	0	
+91	2052	2	4	5	8	dark	257	195	8	dark	0	
+91	2052	2	4	6	9	dark	155	116	6	dark	2	6->9
+91	2052	2	4	7	10	red	43	28	10	red	0	
+91	2052	2	5	1	11	red	26	15	11	red	0	
+91	2052	2	5	2	12	dark	81	52	12	dark	0	
+91	2052	2	5	3	13	dark	109	76	13	dark	0	
+91	2052	2	5	4	14	dark	129	94	14	dark	0	
+91	2052	2	5	5	15	dark	122	88	15	dark	0	
+91	2052	2	5	6	16	dark	94	64	16	dark	0	
+91	2052	2	5	7	17	red	71	47	17	red	0	
+91	2052	2	6	1	18	red	210	163	18	red	0	
+91	2052	2	6	2	19	dark	84	55	19	dark	0	
+91	2052	2	6	3	20	dark	58	40	20	dark	0	
+91	2052	2	6	4	21	dark	37	23	21	dark	0	
+91	2052	2	6	5	22	dark	124	90	22	dark	0	
+91	2052	2	6	6	23	dark	96	66	23	dark	0	
+91	2052	2	6	7	24	red	271	205	24	red	0	
+91	2052	2	7	1	25	red	231	176	25	red	0	
+91	2052	2	7	2	26	dark	18	8	26	dark	0	
+91	2052	2	7	3	27	dark	163	122	27	dark	0	
+91	2052	2	7	4	28	dark	161	121	28	dark	0	
+91	2052	2	7	5	29	dark	107	74	29	dark	0	
+91	2052	2	7	6		blank	5	2		blank	1	
+91	2052	2	7	7		blank	14	7		blank	1	
