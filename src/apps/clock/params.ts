@@ -17,14 +17,6 @@ export interface ClockParams {
   readonly lettering: Lettering;
   /** Preferred quarter-turn time per unit, in the order of CLOCK_UNIT_NAMES. */
   readonly speeds: readonly [number, number, number];
-  /** True when the Nerd panel (timing and speeds) starts open. */
-  readonly nerd: boolean;
-}
-
-/** Values the page remembered from an earlier visit; any of them may be missing. */
-export interface StoredClockChoices {
-  readonly lettering?: string | null;
-  readonly nerd?: string | null;
 }
 
 function speedOf(params: URLSearchParams, name: ClockUnitName): number {
@@ -34,17 +26,14 @@ function speedOf(params: URLSearchParams, name: ClockUnitName): number {
 }
 
 /**
- * The URL rules of the former clock.html: `lettering`, `hours-speed`/`minutes-speed`/`seconds-speed`, and the Nerd panel
- * that opens for `nerd`, `dev`, `expert`, any speed parameter, or the remembered choice.
+ * The URL rules of the former clock.html: `lettering` and `hours-speed`/`minutes-speed`/`seconds-speed`. The Nerd drawer
+ * opens through the shell host (`nerd=1`), not here. `stored` is the lettering remembered from an earlier visit.
  */
-export function parseClockParams(params: URLSearchParams, stored: StoredClockChoices = {}): ClockParams {
+export function parseClockParams(params: URLSearchParams, stored: { readonly lettering?: string | null } = {}): ClockParams {
   const speeds = CLOCK_UNIT_NAMES.map((name) => speedOf(params, name)) as unknown as ClockParams["speeds"];
-  const nerdParam = ["nerd", "dev", "expert"].some((key) => params.has(key));
-  const speedParam = CLOCK_UNIT_NAMES.some((name) => params.has(name + "-speed"));
   return {
     lettering: parseLettering(params.get("lettering") ?? stored.lettering ?? "words-pascal"),
     speeds,
-    nerd: nerdParam || speedParam || stored.nerd === "true",
   };
 }
 
