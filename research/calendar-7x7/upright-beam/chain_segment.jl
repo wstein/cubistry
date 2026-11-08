@@ -4,7 +4,7 @@
 # verifier decide) of consecutive month edges of the strict upright chain, one retained
 # physical state. The edge solver is beam2.jl exactly as edge_batch.jl uses it (core
 # protection, catalog macros, exact last mile, lambda=3), the fallback for an edge nobody
-# finishes is the planner orbit solve (chain_smoke.jl). Run with threads: julia -t 4.
+# finishes is the planner orbit solve (../upright-moves/chain_smoke.jl). Run with threads: julia -t 4.
 #   chain_segment.jl DAG PRINT ROOT_MOVES OUT_PREFIX EDGES START PRIOR_MOVES
 #   EDGES        number of new month edges (stops early after 2099-12 or at the deadline)
 #   START        YYYY-MM root month of a fresh chain (PRIOR_MOVES is "-"), or "resume" to
@@ -14,7 +14,9 @@
 #                than EDGES (a later segment continues from its end).
 # Writes OUT_PREFIX.moves.tsv (cumulative: prior edge blocks copied verbatim, then the new
 # blocks) and OUT_PREFIX-edges.tsv (header plus the new edges only). Exits non-zero (and
-# writes no moves file) when the prior chain does not replay or an edge cannot be produced.
+# writes no moves file) when the prior chain does not replay or an edge cannot be produced,
+# and exits 3 (no moves file) when the deadline stops it before the first new edge, so a
+# segment never claims progress it did not make.
 const HERE=@__DIR__
 const CAL=joinpath(HERE,"..")
 include(joinpath(CAL,"pure-split-states","pure_common.jl"))
@@ -112,6 +114,10 @@ function main(dag,print_path,moves_path,outp,nedges,startarg,priorpath)
         dt=round(time()-t;digits=1)
         open(outp*"-edges.tsv","a") do io;println(io,"$py-$pm\t$y-$m\t$method\t",G.M.htm(word),'\t',dt);end
         println("EDGE ",y,"-",m," ",method," htm=",G.M.htm(word)," ",dt," s");flush(stdout)
+    end
+    if isempty(words) && !isempty(months)
+        println("NO NEW EDGES: the deadline of ",deadline," s was reached before the first edge; no moves file written")
+        exit(3)
     end
     # ---- cumulative chain: prior edge blocks verbatim, then the new blocks ----
     tmp=outp*".new-blocks.tmp"
