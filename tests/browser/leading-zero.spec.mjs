@@ -143,6 +143,18 @@ for (const value of [0, 1, 7, 9, 10, 42, 99])
     await page.locator("#format").check();
     expect(await snapshot(page)).toEqual(a);
   });
+// Play fake frames only until the cube shows the value and is idle, instead of a fixed span of hundreds of frames.
+async function playUntilValue(page, value, limitMs = 12000) {
+  for (let played = 0; played < limitMs; played += 48) {
+    const done = await page.evaluate((value) => {
+      const cube = document.querySelector("#cube");
+      return cube.dataset.value === value && cube.getAttribute("aria-busy") === "false";
+    }, value);
+    if (done) return;
+    await page.clock.runFor(48);
+  }
+  throw Error(`Cube did not show ${value} within ${limitMs} ms of fake time`);
+}
 test("formatting remains available during actual Set animation and Run without resetting in-flight work or draft target", async ({
   page,
 }) => {
@@ -165,7 +177,7 @@ test("formatting remains available during actual Set animation and Run without r
   await expect(page.locator("#format")).toBeEnabled();
   await page.locator("#format").uncheck();
   compare(before, await snapshot(page), 1);
-  await page.clock.runFor(4000);
+  await playUntilValue(page, "7");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "7");
   await page.locator("#value").fill("9");
   await page.locator("#run").click();
@@ -174,7 +186,7 @@ test("formatting remains available during actual Set animation and Run without r
   compare(runBefore, await snapshot(page), 1);
   await expect(page.locator("#run")).toHaveText("Stop");
   await expect(page.locator("#value")).toHaveValue("9");
-  await page.clock.runFor(6000);
+  await playUntilValue(page, "9");
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "9");
   await expect(page.locator("#run")).toHaveText("Run");
   expect((await snapshot(page)).configurations).toBe(0);
