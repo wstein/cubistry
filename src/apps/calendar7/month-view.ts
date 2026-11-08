@@ -202,8 +202,11 @@ const tokensHtml = (tokens: readonly string[]): string => tokens.map((t) => `<sp
 const LEGEND =
   "Block notation: axis x, y or z, then the layers. <code>x-3</code> is one layer; <code>x-3..-1</code> turns the layers -3 to -1 " +
   "together (wide, with the outer layer); <code>y+1..+2</code> turns inner layers only (inner-wide); <code>zrot</code> is the whole cube " +
-  "(free). A trailing <code>'</code> is a counter-clockwise quarter turn, <code>²</code> a half turn. " +
-  "Layer moves (HTM) count every layer once; block moves count every block once.";
+  "(free). With the middle slice a block may also contain layer 0: <code>x0</code> is the middle slice alone, <code>x-3..0</code> and " +
+  "<code>y-1..+2'</code> are intervals that include it. A trailing <code>'</code> is a counter-clockwise quarter turn, <code>²</code> a half turn. " +
+  "Counts: layer moves (HTM) count every layer once. Block moves count every block once, either without the middle slice (blocks on one side of the " +
+  "middle layer, as in the Block word) or with it (the Block word with middle slice, where turning the middle slice counts as a move). " +
+  "Whole-cube rotations stay free in every count.";
 
 const stepHtml = (step: Step | null, label: string, end: string): string => {
   if (!step)
@@ -213,11 +216,17 @@ const stepHtml = (step: Step | null, label: string, end: string): string => {
   const blocks = groupBlocks(step.moves);
   const blockWord = tokensHtml(blocks.map(blockToken));
   const { blockMoves } = blockCounts(blocks);
+  const sliced = groupBlocks(step.moves, { slice: true });
+  const sliceWord = tokensHtml(sliced.map(blockToken));
+  const sliceMoves = blockCounts(sliced).blockMoves;
   const rotations = `${step.rot} whole-cube rotation${step.rot === 1 ? "" : "s"}`;
   return (
     `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3>` +
     `<p><a class="c7-nav" data-nav="${label.toLowerCase()}" href="${esc(href(step.to))}">${esc(monthLabel(step.to))}</a>: ` +
-    `${step.htm} layer moves (HTM), ${blockMoves} block moves, ${step.qtm} quarter turns (QTM), ${rotations}.</p>` +
+    `${step.htm} layer moves (HTM), ${blockMoves} block moves, without the middle slice, ` +
+    `${sliceMoves} block moves, with the middle slice (it counts as a move there), ` +
+    `${step.qtm} quarter turns (QTM), ${rotations}.</p>` +
+    `<details><summary>Block word with middle slice</summary><p class="c7-word" data-blocks-slice="${label.toLowerCase()}">${sliceWord}</p></details>` +
     `<details><summary>Block word</summary><p class="c7-word" data-blocks="${label.toLowerCase()}">${blockWord}</p></details>` +
     `<details><summary>Move word</summary><p class="c7-word" data-word="${label.toLowerCase()}">${word}</p></details>` +
     `<details><summary>Raw generators</summary><p class="c7-word" data-raw="${label.toLowerCase()}">${raw}</p></details></div>`
@@ -251,6 +260,7 @@ export function playerHtml(defaultSpeed: number): string {
     '<button type="button" class="c7-btn" data-c7="play" aria-disabled="true">Play</button>' +
     '<button type="button" class="c7-btn" data-c7="skip" aria-disabled="true">Skip to end</button>' +
     `<label class="c7-speed">Speed <select data-c7="speed">${options}</select></label>` +
+    `<label class="c7-slice"><input type="checkbox" data-c7="slice" checked> Middle slice counts as a move</label>` +
     '<button type="button" class="c7-btn" data-c7="reset">Reset view</button>' +
     "</div>" +
     '<p class="c7-progress" data-c7="progress"></p>' +

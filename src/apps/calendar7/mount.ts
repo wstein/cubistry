@@ -14,7 +14,7 @@ import {
   playerHtml,
   type YearMonth,
 } from "./month-view.ts";
-import { Calendar7Player, DEFAULT_SPEED, type PlayerSnapshot, type StageView } from "./player.ts";
+import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, type PlayerSnapshot, type StageView } from "./player.ts";
 
 /** The 3D scene the mount drives (src/apps/calendar7/viewer.ts; a fake in the tests). */
 export interface Stage extends StageView {
@@ -103,7 +103,7 @@ export async function mountCalendar7(
       box.hidden = false;
     }
     (q("player") as HTMLElement | null)?.removeAttribute("hidden");
-    for (const name of ["play", "skip", "speed", "reset"]) q(name)?.setAttribute("disabled", "");
+    for (const name of ["play", "skip", "speed", "reset", "slice"]) q(name)?.setAttribute("disabled", "");
     live.textContent = "The 3D view stopped. The month sheet is still shown.";
     if (sceneHost) sceneHost.hidden = true;
     console.error(error);
@@ -169,6 +169,7 @@ export async function mountCalendar7(
         reducedMotion: reduced,
         onChange: render,
         onError: fail,
+        slice: (q("slice") as HTMLInputElement | null)?.checked ?? DEFAULT_SLICE,
       });
     })();
     return pending;
@@ -243,6 +244,9 @@ export async function mountCalendar7(
           break;
         case "speed":
           player.setSpeed(Number((el as HTMLSelectElement).value));
+          break;
+        case "slice":
+          player.setSlice((el as HTMLInputElement).checked);
           break;
       }
     } catch (error) {
