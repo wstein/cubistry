@@ -1,16 +1,28 @@
 import { test, expect } from "@playwright/test";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
+import { booted } from "../helpers/settle.mjs";
 async function ready(page) {
   await page.clock.install();
   await page.goto("/counter.html");
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  // `aria-busy="false"` is published before the page is ready (see `booted`); gate on the real boot while the
+  // fake clock still runs, then pause it.
+  await booted(page);
   await pauseSoon(page);
+}
+// Lets fake time pass in one-second jumps instead of `runFor`. The viewer renders on every animation frame, and
+// `runFor(5000)` plays about 300 of them; in software-rendered Chromium a frame can take 100 ms to 2 s, so such a
+// call alone can use the whole test timeout. A jump fires each timer once, like the one-second ticks of the Run
+// cadence, without playing the frames in between.
+async function elapse(page, ms) {
+  for (let left = ms; left > 0; left -= 1000) await page.clock.fastForward(Math.min(1000, left));
 }
 async function target(page, n) {
   await page.locator("#value").fill(String(n));
 }
 async function step(page, n) {
-  await page.clock.runFor(1050);
+  // One second of Run cadence: a jump fires the interval once; 50 ms of frames then play the move's commit.
+  await page.clock.fastForward(1000);
+  await page.clock.runFor(50);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", String(n));
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 }
@@ -60,18 +72,26 @@ test("start=target, edit during Run, Stop, Set interruption and reload never sta
   await expect(page.locator("#value")).toHaveValue("40");
   await expect(page.locator("#status")).toContainText("Running to 9");
   await page.locator("#run").click();
-  await page.clock.runFor(3000);
+  await elapse(page, 3000);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "2");
   await page.locator("#run").click();
   await step(page, 3);
   await target(page, 7);
   await page.locator("#set").click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "7");
-  await page.clock.runFor(3000);
+  await elapse(page, 3000);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "7");
+  // A reload needs the page's own timers (module and font loading) to run: resume the clock for the reload, wait
+  // for the boot, pause it again, then let fake time pass to prove that nothing starts counting by itself.
+  await page.clock.resume();
   await page.reload();
+  await booted(page);
+  await pauseSoon(page);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "7");
   await expect(page.locator("#run")).toBeVisible();
+  await elapse(page, 3000);
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "7");
+  await expect(page.locator("#run")).toHaveText("Run");
 });
 test("slow physical Run never skips a value and Stop completes the active value only", async ({
   page,
@@ -95,7 +115,7 @@ test("slow physical Run never skips a value and Stop completes the active value 
     "data-target",
     "1",
   );
-  await page.clock.runFor(8000);
+  await elapse(page, 8000);
   await expect(page.locator("#move-progress")).toHaveAttribute(
     "data-target",
     "1",
@@ -113,7 +133,7 @@ test("slow physical Run never skips a value and Stop completes the active value 
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   expect(await page.evaluate(() => window.moves.length)).toBe(5);
-  await page.clock.runFor(5000);
+  await elapse(page, 5000);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
 });
 test("seven exact keyboard speed stops persist and remain separate from Run cadence", async ({
