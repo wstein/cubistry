@@ -824,7 +824,8 @@ for (const flag of ["kiosk=1", "presentation=true"])
     await expect(page.locator("#clock-lettering")).toBeHidden();
   });
 
-test("a lettering change completing after a mode switch leaves the new mode alone", async ({ page }) => {
+for (const outcome of ["success", "404"])
+test(`a lettering change completing after a mode switch leaves the new mode alone (${outcome})`, async ({ page }) => {
   await clockReady(page);
   await page.evaluate(async () => {
     const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
@@ -844,18 +845,21 @@ test("a lettering change completing after a mode switch leaves the new mode alon
     const response = await route.fetch();
     reached();
     await held;
-    await route.fulfill({ response });
+    await route.fulfill(outcome === "404" ? { status: 404, body: "Not found" } : { response });
   });
   try {
     await page.selectOption("#clock-lettering", "words");
     await requested;
     await page.selectOption("#studio-application", "counter");
     await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "counter");
+    // A preference made by the new app must survive a failed request from the retired Clock.
+    await page.evaluate(() => localStorage.setItem("cubistry_lettering", "symbols"));
     const url = page.url();
     const printLink = await page.locator("#print-stickers").getAttribute("href");
     release();
     await expect.poll(() => page.evaluate(() => window.letteringSettled)).toBe(3);
     await expect(page).toHaveURL(url);
+    expect(await page.evaluate(() => localStorage.getItem("cubistry_lettering"))).toBe("symbols");
     await expect(page.locator("#print-stickers")).toHaveAttribute("href", printLink);
   } finally {
     release();
