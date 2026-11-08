@@ -686,7 +686,7 @@ test("Set replaces a pending duration safely during an active legal animation wi
   await verifyActualTimerMoves(page, 90, 2, "/tmp/cubistry-set-browser-commits.json");
 });
 
-for (const viewport of [{ width: 1280, height: 800 }, { width: 390, height: 844 }, { width: 320, height: 740 }]) {
+for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844 }, { width: 320, height: 740 }]) {
   test(`Timer status distinguishes movement from backlog and keeps the active slider stable at ${viewport.width}px`, async ({ page }, testInfo) => {
     test.setTimeout(scaled(60000));
     await page.setViewportSize(viewport);
@@ -931,10 +931,13 @@ async function endpointObservation(page, value = 1) {
   }, value)) };
 }
 function expectEndpoint(observation, preferred) {
-  // KNOWN ISSUE at the 10 ms preference (cause not verified): the final turn settles 96 to 177 ms after the deadline in
-  // software GL. Only that lateness is pinned (`knownLate`); every other check stays strict. Unverified hypothesis:
-  // motion-timing.ts creates a deadline window only if endAt - at >= min(10, remaining), so a late final 10 ms move may
-  // fall back to frame-stepped motion. When the lateness is gone, the pin fails: then delete `knownLate`.
+  // KNOWN ISSUE at the 10 ms preference (cause not verified): on the real clock in software GL the final turn settles
+  // 96 to 177 ms after the deadline. That lateness is NOT asserted any more: it comes from the cost of real rendering,
+  // and on the fake clock these specs run on no frame has a cost, so it cannot be observed or pinned there (a stalled
+  // fake clock only reproduces the stall, not the app). It is deliberately left uncovered for now; covering it needs a
+  // real-clock measurement outside the blocking e2e shards. Unverified hypothesis: motion-timing.ts creates a deadline
+  // window only if endAt - at >= min(10, remaining), so a late final 10 ms move may fall back to frame-stepped motion.
+  // Every other invariant stays strict for the 10 ms case, so the lateness check is the only one given up.
   const knownLate = preferred === LATE_FINAL_TURN_PREFERENCE_MS;
   expect(observation.exactFullState).toBe(true);
   expect(observation.actualMoveDurations).toHaveLength(5);
@@ -945,8 +948,6 @@ function expectEndpoint(observation, preferred) {
   else expect(Math.max(...observation.nominalDurations)).toBeLessThan(preferred);
   const tolerance = ENDPOINT_TOLERANCE_MS;
   if (knownLate) {
-    expect(observation.settledAt - observation.deadline).toBeGreaterThan(tolerance);
-    expect(observation.renderedAt - observation.deadline).toBeGreaterThan(tolerance);
     expect(observation.deadline - observation.startedAt).toBeLessThanOrEqual(5000);
   } else {
     expect(Math.abs(observation.settledAt - observation.deadline)).toBeLessThanOrEqual(tolerance);
@@ -962,34 +963,32 @@ function expectEndpoint(observation, preferred) {
 // runner, so one 250 ms turn can render only once and the render lands late. They therefore run on the page's fake
 // clock: setup runs on the running fake clock, the clock is paused before Start, and `driveToValue` advances it one
 // 16 ms frame at a time. Every animation frame, timer and deadline then sits at an exact fake time, whatever the
-// speed of the machine, and the assertions in `expectEndpoint` are unchanged. The 10 ms preference pins a lateness
-// that real rendering causes; it models the frame cost by stalling the fake clock for 120 ms per frame.
+// speed of the machine, and the assertions in `expectEndpoint` are unchanged. The 10 ms preference gave up its
+// real-clock lateness check (see `expectEndpoint`).
 const FRAME_MS = 16;
 // These specs read the DOM and window state, not pixels. A small canvas keeps each software-rendered frame cheap.
 const RENDER_VIEWPORT = { width: 640, height: 360 };
-async function driveToValue(page, value, preferredMs, frameMs = FRAME_MS, stall = false) {
+async function driveToValue(page, value, preferredMs) {
   // Skip the idle preroll in one jump, stopping well before the active window (at most five turns, and the
   // sequence budget of 5 s) so every turn is still planned and played frame by frame.
   const lead = Math.min(5 * preferredMs, 5000) + 1500;
   const idle = await page.evaluate((lead) => Math.max(0, window.actualDeadline - performance.now() - lead), lead);
   if (idle > 0) await page.clock.fastForward(idle);
   const limit = 25000;
-  for (let spent = 0; ; spent += frameMs) {
+  for (let spent = 0; ; spent += FRAME_MS) {
     const reached = await page.evaluate((value) => {
       const cube = document.querySelector("#cube");
       return cube.dataset.value === value && cube.getAttribute("aria-busy") === "false";
     }, value);
     if (reached) return spent;
     if (spent >= limit) throw Error(`Cube did not settle at ${value} within ${limit} ms of fake time`);
-    // A stalled frame: the clock jumps and each due timer or frame callback fires once, at the end of the jump.
-    if (stall) await page.clock.fastForward(frameMs);
-    else await page.clock.runFor(frameMs);
+    await page.clock.runFor(FRAME_MS);
   }
 }
-async function timerEndpointCases(page, testInfo, cases, { deterministic = true, frameMs = FRAME_MS, stall = false } = {}) {
+async function timerEndpointCases(page, testInfo, cases) {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.setViewportSize(RENDER_VIEWPORT);
-  if (deterministic) await page.clock.install();
+  await page.clock.install();
   await chooseTimer(page);
   await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
   await observeEndpoints(page);
@@ -997,12 +996,12 @@ async function timerEndpointCases(page, testInfo, cases, { deterministic = true,
   const path = testInfo.outputPath("endpoint-observations.json");
   try {
     for (const [stop, preferred] of cases) {
-      if (deterministic) await page.clock.resume();
+      await page.clock.resume();
       await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
       await page.locator("#rotation-speed").fill(stop); await clearEndpointObservation(page);
-      if (deterministic) await pauseSoon(page);
+      await pauseSoon(page);
       await page.click("#timer-start");
-      if (deterministic) await driveToValue(page, "00:10", preferred, frameMs, stall); else await settled(page, "00:10");
+      await driveToValue(page, "00:10", preferred);
       const observation = await endpointObservation(page);
       observations.push({ preferredMilliseconds: preferred, ...observation });
       // Write the evidence before asserting: a failing case must still leave its measurements.
@@ -1022,12 +1021,9 @@ test("real Timer final turn meets the actual clock endpoint within20ms at250ms a
   test.setTimeout(scaled(60000));
   await timerEndpointCases(page, testInfo, [["3", 250], ["0", 2000]]);
 });
-test("real Timer final turn at 10ms keeps every endpoint invariant strict and pins the known lateness", async ({ page }, testInfo) => {
+test("real Timer final turn at 10ms keeps every endpoint invariant strict (its real-clock lateness is not covered)", async ({ page }, testInfo) => {
   test.setTimeout(scaled(60000));
-  await timerEndpointCases(page, testInfo, [["6", LATE_FINAL_TURN_PREFERENCE_MS]],
-    // A software-rendered frame takes 100 to 300 ms on a CI runner. Stall the fake clock for 120 ms per frame so
-    // the lateness this test pins comes from the modeled frame cost instead of from the speed of the machine.
-    { frameMs: 120, stall: true });
+  await timerEndpointCases(page, testInfo, [["6", LATE_FINAL_TURN_PREFERENCE_MS]]);
 });
 test("real Stopwatch final physical state and live clock share the target endpoint within20ms", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
