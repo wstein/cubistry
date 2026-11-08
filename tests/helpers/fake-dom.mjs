@@ -54,6 +54,7 @@ export class FakeElement {
     const doc = this.ownerDocument;
     if (doc?.activeElement && this.contains(doc.activeElement) && doc.activeElement !== this) doc.activeElement = null;
     for (const c of this.children) if (typeof c !== "string") c.parentNode = null;
+    this.scrollTop = 0; // replaced content resets the scroll position, as it does when the content shrinks
     this.children = [];
     this._text = "";
   }
