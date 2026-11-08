@@ -14,7 +14,7 @@ import {
   playerHtml,
   type YearMonth,
 } from "./month-view.ts";
-import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, type PlayerSnapshot, type StageView } from "./player.ts";
+import { Calendar7Player, DEFAULT_DEFER, DEFAULT_SLICE, DEFAULT_SPEED, type PlayerSnapshot, type StageView } from "./player.ts";
 
 /** The 3D scene the mount drives (src/apps/calendar7/viewer.ts; a fake in the tests). */
 export interface Stage extends StageView {
@@ -103,7 +103,7 @@ export async function mountCalendar7(
       box.hidden = false;
     }
     (q("player") as HTMLElement | null)?.removeAttribute("hidden");
-    for (const name of ["play", "skip", "speed", "reset", "slice"]) q(name)?.setAttribute("disabled", "");
+    for (const name of ["play", "skip", "speed", "reset", "slice", "defer"]) q(name)?.setAttribute("disabled", "");
     live.textContent = "The 3D view stopped. The month sheet is still shown.";
     if (sceneHost) sceneHost.hidden = true;
     console.error(error);
@@ -132,9 +132,14 @@ export async function mountCalendar7(
     const progress = q("progress");
     if (progress && target) {
       progress.textContent = active
-        ? `Turning to ${monthLabel(target)}: block ${snap.done} of ${snap.total}${snap.status === "paused" ? " (paused)" : ""}`
+        ? snap.phase === "alignment"
+          ? `Turning to ${monthLabel(target)}: aligning the cube at the end (${snap.alignment})${snap.status === "paused" ? " (paused)" : ""}`
+          : `Turning to ${monthLabel(target)}: block ${snap.done} of ${snap.total}${snap.status === "paused" ? " (paused)" : ""}`
         : `The cube shows ${monthLabel(target)}.`;
     }
+    // The alignment is a free whole-cube rotation, shown apart from the move counts.
+    const alignment = q("alignment");
+    if (alignment) alignment.textContent = `Alignment: ${snap.alignment}`;
     if (target) stage?.setLabel(`7x7 calendar cube showing ${monthLabel(target)}`);
     if (!active && player) {
       root.setAttribute("data-c7-state", "idle");
@@ -170,6 +175,7 @@ export async function mountCalendar7(
         onChange: render,
         onError: fail,
         slice: (q("slice") as HTMLInputElement | null)?.checked ?? DEFAULT_SLICE,
+        defer: (q("defer") as HTMLInputElement | null)?.checked ?? DEFAULT_DEFER,
       });
     })();
     return pending;
@@ -247,6 +253,9 @@ export async function mountCalendar7(
           break;
         case "slice":
           player.setSlice((el as HTMLInputElement).checked);
+          break;
+        case "defer":
+          player.setDefer((el as HTMLInputElement).checked);
           break;
       }
     } catch (error) {

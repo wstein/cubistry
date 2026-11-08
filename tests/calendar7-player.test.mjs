@@ -7,6 +7,7 @@ import ts from "typescript";
 import { expand, groupBlocks } from "../src/apps/calendar7/blocks.ts";
 import { applyMoves, clonePose, inverseMoves, samePose, stateDigest } from "../src/apps/calendar7/engine.ts";
 import { parseDisplays, parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
+import { alignmentText, playedBlocks } from "../src/apps/calendar7/deferral.ts";
 import { href, monthLabel } from "../src/apps/calendar7/month-view.ts";
 import { Calendar7Player, DEFAULT_SPEED, SPEEDS, StateMismatchError } from "../src/apps/calendar7/player.ts";
 import { MoveTween, smoothstep } from "../src/apps/calendar7/tween.ts";
@@ -510,7 +511,7 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   await flush();
   assert.equal(root.el("play").textContent, "Pause");
   assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", false);
-  assert.match(root.el("progress").textContent, /^Turning to February 2028: block 0 of 103$/);
+  assert.match(root.el("progress").textContent, new RegExp(`^Turning to February 2028: block 0 of ${playedBlocks(graph.edges[0].moves, { slice: true, defer: true }).blocks.length}$`));
   root.press("play"); // pause
   assert.equal(root.el("play").textContent, "Play");
   root.choose("speed", "8");
@@ -531,7 +532,7 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   inst.dispose();
 });
 
-test("mount: the middle slice option plays rule-c blocks by default; switching it off plays the plain blocks of the next step", async () => {
+test("mount: the middle slice option plays rule-c blocks (rotations deferred) by default; switching it off plays the plain blocks of the next step", async () => {
   const root = fakeRoot();
   const stage = fakeStage({ manual: true });
   const { env } = mountEnv({ stage });
@@ -541,23 +542,50 @@ test("mount: the middle slice option plays rule-c blocks by default; switching i
   const [first, second] = [graph.edges[0].moves, graph.edges[1].moves];
   root.clickLink(href({ year: 2028, month: 2 }));
   await flush();
-  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${groupBlocks(first, { slice: true }).length}$`));
+  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${playedBlocks(first, { slice: true, defer: true }).blocks.length}$`));
   root.press("skip");
   assert.equal(root.getAttribute("data-c7-state"), "idle");
   root.el("slice").checked = false;
   root.choose("slice", "");
   root.clickLink(href({ year: 2028, month: 3 }));
   await flush();
-  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${groupBlocks(second).length}$`), "plain blocks of the next step");
+  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${playedBlocks(second, { defer: true }).blocks.length}$`), "plain blocks of the next step");
   root.press("skip");
   assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[2].hash);
   root.el("slice").checked = true;
   root.choose("slice", "");
   root.clickLink(href({ year: 2028, month: 2 }));
   await flush();
-  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${groupBlocks(inverseMoves(second), { slice: true }).length}$`));
+  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${playedBlocks(inverseMoves(second), { slice: true, defer: true }).blocks.length}$`));
   root.press("skip");
   assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[1].hash);
+  inst.dispose();
+});
+
+test("mount: 'Align at the end' is offered and on; the alignment is shown apart from the progress; switching it off keeps the stored rotations", async () => {
+  const root = fakeRoot();
+  const stage = fakeStage({ manual: true });
+  const { env } = mountEnv({ stage });
+  const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+  await idle(root);
+  assert.match(root.html, /data-c7="defer" checked> Align at the end/);
+  assert.match(root.html, /data-c7="alignment">Alignment: none</);
+  const aligned = playedBlocks(graph.edges[0].moves, { slice: true, defer: true });
+  root.clickLink(href({ year: 2028, month: 2 }));
+  await flush();
+  assert.equal(root.el("alignment").textContent, "Alignment: at the end");
+  assert.ok(stage.log.turns.every((t) => t.block.kind !== "rotation"), "no rotation mid-word");
+  root.press("skip");
+  assert.equal(root.el("alignment").textContent, `Alignment: ${alignmentText(aligned.alignment)}`);
+  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[1].hash);
+  root.el("defer").checked = false;
+  root.choose("defer", "");
+  root.clickLink(href({ year: 2028, month: 3 }));
+  await flush();
+  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${groupBlocks(graph.edges[1].moves, { slice: true }).length}$`));
+  assert.equal(root.el("alignment").textContent, "Alignment: none");
+  root.press("skip");
+  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[2].hash);
   inst.dispose();
 });
 
@@ -655,7 +683,7 @@ test("mount: a digest mismatch stops the 3D view for good: scene hidden, control
     root.clickLink(href({ year: 2028, month: 2 }));
     for (let i = 0; i < 100000 && root.getAttribute("data-c7-state") !== "failed"; i++) await Promise.resolve();
     assert.equal(root.getAttribute("data-c7-state"), "failed");
-    assert.match(root.el("error").textContent, /differs from the stored hash of node 1/);
+    assert.match(root.el("error").textContent, /no whole-cube orientation turns the cube into the stored state of node 1/);
     assert.match(root.el("error").textContent, /sheet below/);
     assert.equal(root.el("error").hidden, false);
     assert.equal(host.hidden, true);

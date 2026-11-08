@@ -8,6 +8,7 @@
  * no jump between non-adjacent months: every such jump would be a walk along the chain.
  */
 import { blockCounts, blockToken, groupBlocks } from "./blocks.ts";
+import { alignmentText, playedBlocks } from "./deferral.ts";
 import { type Move, generatorAxis, generatorLayer, isRotation } from "./engine.ts";
 import type { Cell } from "./display.ts";
 import type { DisplayTable, Edge, Graph } from "./graph.ts";
@@ -206,7 +207,7 @@ const LEGEND =
   "<code>y-1..+2'</code> are intervals that include it. A trailing <code>'</code> is a counter-clockwise quarter turn, <code>²</code> a half turn. " +
   "Counts: layer moves (HTM) count every layer once. Block moves count every block once, either without the middle slice (blocks on one side of the " +
   "middle layer, as in the Block word) or with it (the Block word with middle slice, where turning the middle slice counts as a move). " +
-  "Whole-cube rotations stay free in every count.";
+  "Whole-cube rotations stay free in every count. The 3D view plays the rotations deferred to one alignment at the end of the step (also free, not a move).";
 
 const stepHtml = (step: Step | null, label: string, end: string): string => {
   if (!step)
@@ -220,12 +221,21 @@ const stepHtml = (step: Step | null, label: string, end: string): string => {
   const sliceWord = tokensHtml(sliced.map(blockToken));
   const sliceMoves = blockCounts(sliced).blockMoves;
   const rotations = `${step.rot} stored rotation${step.rot === 1 ? "" : "s"}`;
+  // What the page plays: the rotations moved to one alignment at the end (free, not a move); only layer blocks are counted.
+  const playedPlain = playedBlocks(step.moves, { defer: true });
+  const playedSlice = playedBlocks(step.moves, { slice: true, defer: true });
+  const played =
+    `<p class="c7-align" data-align="${label.toLowerCase()}">Played with the rotations deferred: ` +
+    `${blockCounts(playedPlain.blocks).blockMoves} block moves without the middle slice, ` +
+    `${blockCounts(playedSlice.blocks).blockMoves} with it. Alignment at the end (free, not a move): ` +
+    `${alignmentText(playedSlice.alignment)} with the middle slice, ${alignmentText(playedPlain.alignment)} without it.</p>`;
   return (
     `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3>` +
     `<p><a class="c7-nav" data-nav="${label.toLowerCase()}" href="${esc(href(step.to))}">${esc(monthLabel(step.to))}</a>: ` +
     `${step.htm} layer moves (HTM), ${blockMoves} block moves, without the middle slice, ` +
     `${sliceMoves} block moves, with the middle slice (it counts as a move there), ` +
     `${step.qtm} quarter turns (QTM), ${rotations}.</p>` +
+    played +
     `<details><summary>Block word with middle slice</summary><p class="c7-word" data-blocks-slice="${label.toLowerCase()}">${sliceWord}</p></details>` +
     `<details><summary>Block word</summary><p class="c7-word" data-blocks="${label.toLowerCase()}">${blockWord}</p></details>` +
     `<details><summary>Move word</summary><p class="c7-word" data-word="${label.toLowerCase()}">${word}</p></details>` +
@@ -261,9 +271,11 @@ export function playerHtml(defaultSpeed: number): string {
     '<button type="button" class="c7-btn" data-c7="skip" aria-disabled="true">Skip to end</button>' +
     `<label class="c7-speed">Speed <select data-c7="speed">${options}</select></label>` +
     `<label class="c7-slice"><input type="checkbox" data-c7="slice" checked> Middle slice counts as a move</label>` +
+    `<label class="c7-defer"><input type="checkbox" data-c7="defer" checked> Align at the end</label>` +
     '<button type="button" class="c7-btn" data-c7="reset">Reset view</button>' +
     "</div>" +
     '<p class="c7-progress" data-c7="progress"></p>' +
+    '<p class="c7-alignment" data-c7="alignment">Alignment: none</p>' +
     '<p class="c7-note" data-c7="note" hidden>Reduced motion is on: a step jumps straight to the end state, without animation.</p>' +
     '<p class="c7-error" data-c7="error" role="alert" hidden></p>' +
     '<div class="c7-rotation" data-c7="rotation"></div>' +
