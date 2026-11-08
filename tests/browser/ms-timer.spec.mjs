@@ -3,6 +3,7 @@
 // millisecond deadline guarantees are covered by the deterministic
 // virtual-clock tests (tests/ms-timer.test.mjs).
 import { test, expect } from "@playwright/test";
+import { booted } from "../helpers/settle.mjs";
 import { scaled } from "../helpers/timeout-scale.mjs";
 
 const display = (page) => page.locator("#ms-timer-display");
@@ -34,7 +35,7 @@ test("the chooser offers the M/S Timer and the page shows three cubes: minutes, 
   page,
 }) => {
   await page.goto("/counter.html");
-  await expect(page.locator("#application")).toBeEnabled();
+  await booted(page);
   await expect(
     page.locator("#application option", { hasText: "M/S Timer" }),
   ).toHaveCount(1);
