@@ -1,5 +1,6 @@
 // End-to-end tests of scripts/check-cube-set.mjs (exit codes, negative controls, advisory classification).
-// The rendering ones need Playwright's Chromium; they are skipped (and say so) when the browser cannot be started.
+// The rendering ones need Playwright's Chromium. Locally they are skipped (and say so) when the browser cannot be
+// started; under CI that is an error, so a missing browser can never turn the checker tests green by skipping.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -16,6 +17,7 @@ const run = (...args) => { const r = spawnSync(process.execPath, [CHECK, ...args
 
 let browserError = null;
 try { const b = await openBrowser(); await b.close(); } catch (e) { browserError = e.message; }
+if (browserError && process.env.CI) throw new Error(`CI requires the checker browser tests to run, but: ${browserError.split("\n")[0]}`);
 const skip = browserError ? `no browser: ${browserError.split("\n")[0]}` : false;
 
 const base = mkdtempSync(`${tmpdir()}/cube-base-`);
