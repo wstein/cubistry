@@ -19,6 +19,8 @@ name: Upright chain
 # Contract with the research branch (upright-beam/chain_segment.jl): see that file.
 
 on:
+  push:
+    branches: [ci/upright-chain-test2]
   workflow_dispatch:
     inputs:
       research_ref:
@@ -62,8 +64,8 @@ concurrency:
 env:
   WORKFLOW_PATH: .github/workflows/upright-chain.yml
   # A prior run is only continued when it was dispatched by hand from this branch.
-  REQUIRED_PRIOR_EVENT: workflow_dispatch
-  REQUIRED_PRIOR_BRANCH: main
+  REQUIRED_PRIOR_EVENT: push
+  REQUIRED_PRIOR_BRANCH: ci/upright-chain-test2
   CAL: research/calendar-7x7
 
 jobs:
@@ -84,10 +86,10 @@ jobs:
       - name: Validate inputs
         id: validate
         env:
-          IN_YEAR: ${{ inputs.start_year }}
-          IN_MONTH: ${{ inputs.start_month }}
-          IN_EDGES: ${{ inputs.edges_per_job }}
-          IN_JOBS: ${{ inputs.jobs }}
+          IN_YEAR: ${{ inputs.start_year || '2028' }}
+          IN_MONTH: ${{ inputs.start_month || '1' }}
+          IN_EDGES: ${{ inputs.edges_per_job || '2' }}
+          IN_JOBS: ${{ inputs.jobs || '2' }}
           IN_PRIOR: ${{ inputs.prior_run_id }}
           IN_SMOKE: ${{ inputs.smoke_mode }}
         run: |
@@ -140,7 +142,7 @@ jobs:
       - name: Resolve research ref
         id: resolve
         env:
-          REF: ${{ inputs.research_ref }}
+          REF: ${{ inputs.research_ref || 'research/strict-chain-ci' }}
           OUT_SMOKE: ${{ steps.validate.outputs.smoke }}
           OUT_JOBS: ${{ steps.validate.outputs.jobs }}
           OUT_EDGES: ${{ steps.validate.outputs.edges }}

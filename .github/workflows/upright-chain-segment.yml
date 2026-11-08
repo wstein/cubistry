@@ -242,3 +242,6 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
           overwrite: true
+      - name: Injected failure for the test
+        if: inputs.seg == '2'
+        run: exit 1
