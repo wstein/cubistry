@@ -20,6 +20,7 @@ import {
   type Printing,
   STICKERS,
 } from "./engine.ts";
+import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
 
 export const INKS = ["blank", "dark", "month", "red", "weekday"] as const;
 export type Ink = (typeof INKS)[number];
@@ -133,6 +134,11 @@ const HALF: Readonly<Record<string, string>> = {
   X: "X",
   Z: "Z",
 };
+/**
+ * Strict profile (research/calendar-7x7/upright-moves/verify_moves.jl `HALFMAP`): only the
+ * digit 0 and the pair 6 <-> 9 read as another or the same glyph after a half turn.
+ */
+const HALF_STRICT: Readonly<Record<string, string>> = { "0": "0", "6": "9", "9": "6" };
 /** Image "up" vectors for angles 0..3. */
 export const IMAGE_UPS: readonly (readonly [number, number, number])[] = [
   [0, 1, 0],
@@ -145,17 +151,27 @@ type Image = readonly [text: string, angle: number, ink: string] | "blank";
 const cmpImage = (a: readonly [string, number, string], b: typeof a): number =>
   a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1] - b[1] || (a[2] < b[2] ? -1 : a[2] > b[2] ? 1 : 0);
 
-/** Canonical image of text drawn at quarter-turn `angle`: O and I read as 0 and 1. */
-export function imageNormal(text: string, angle: number, ink: string): Image {
+/**
+ * Canonical image of text drawn at quarter-turn `angle`. Legacy: O and I read as 0 and 1.
+ * Strict: no aliasing, and only 0 and 6 <-> 9 have a half-turn reading.
+ */
+export function imageNormal(
+  text: string,
+  angle: number,
+  ink: string,
+  profile: RuleProfile = DEFAULT_RULE_PROFILE,
+): Image {
   if (text === "") return "blank";
-  const g = text.replaceAll("O", "0").replaceAll("I", "1");
+  const strict = profile === "strict";
+  const half = strict ? HALF_STRICT : HALF;
+  const g = strict ? text : text.replaceAll("O", "0").replaceAll("I", "1");
   if (g === "0") return [g, 0, ink];
   const choices: (readonly [string, number, string])[] = [
     [g, ((angle % 4) + 4) % 4, ink],
   ];
-  if ([...g].every((c) => c in HALF))
+  if ([...g].every((c) => c in half))
     choices.push([
-      [...g].reverse().map((c) => HALF[c]).join(""),
+      [...g].reverse().map((c) => half[c]).join(""),
       (((angle + 2) % 4) + 4) % 4,
       ink,
     ]);
@@ -181,6 +197,7 @@ export function frontFailure(
   printing: Printing,
   state: Pose,
   cells: readonly Cell[],
+  profile: RuleProfile = DEFAULT_RULE_PROFILE,
 ): FrontFailure | null {
   if (cells.length !== 49) throw new Error("a display has 49 cells");
   // Index the 49 front stickers by cell.
@@ -228,7 +245,12 @@ export function frontFailure(
           : "stacked-mismatch",
       );
     }
-    if (!sameImage(imageNormal(text, angle, ink), imageNormal(want.text, 0, want.ink)))
+    if (
+      !sameImage(
+        imageNormal(text, angle, ink, profile),
+        imageNormal(want.text, 0, want.ink, profile),
+      )
+    )
       return fail("plain-mismatch");
   }
   return null;

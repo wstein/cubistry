@@ -111,6 +111,7 @@ of the chain.
 | [tests/calendar7-replay.test.mjs](../tests/calendar7-replay.test.mjs) | Full replay and negative controls, part of `npm test` |
 | [tests/calendar7-mode.test.mjs](../tests/calendar7-mode.test.mjs) | Registry entry, month choice, navigation bounds, move words and mount |
 | [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
+| [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, diagonal split-label geometry and drawing |
 | [tests/calendar7-sheet-colors.test.mjs](../tests/calendar7-sheet-colors.test.mjs) | Month sheet palette: every ink on its cell at 4.5:1 in light and dark |
 | [tests/browser/calendar7-3d.spec.mjs](../tests/browser/calendar7-3d.spec.mjs) | The 3D view in a browser: pose digest, animated step, controls, 375 px |
 
@@ -124,9 +125,51 @@ of the chain.
   rotations are counted separately.
 - A word in `graph.v1.json` uses one character per move; the alphabet and index
   formula are in the file.
-- The front rule is the Research rule, not appearance matching: O and 0, I and 1 are
-  equal glyphs, half-turn symmetric glyphs and the pairs 6 and 9 are accepted, and a
-  stacked label must be upright with exactly the same text and ink.
+- The front rule of the shipped (legacy) profile is the Research rule, not appearance
+  matching: O and 0, I and 1 are equal glyphs, half-turn symmetric glyphs and the pairs 6
+  and 9 are accepted, and a stacked label must be upright with exactly the same text and ink.
+
+## Rule profiles: legacy and strict
+
+The app has two rule profiles, selected in one place: `DEFAULT_RULE_PROFILE` in
+`src/apps/calendar7/profile.ts`. There is no URL parameter and no user-facing switch.
+
+| | `legacy` (default, shipped) | `strict` (prepared, not active) |
+| --- | --- | --- |
+| Glyph aliases | O = 0 and I = 1 | none: O is not 0, I is not 1 |
+| Equal after a turn | 0 1 2 5 8 H N S X Z (half turn) and 6 and 9 | only the digit 0 (any turn) and 6 and 9 (half turn) |
+| Weekday labels in the print | `M0N`, `FR1` | the letters `MON`, `FRI` |
+| Split labels (`23/30`, `24/31`) | upright, one line | upright, drawn diagonally |
+
+The strict rule mirrors `research/calendar-7x7/upright-moves/verify_moves.jl` on
+`research/cube-display-feasibility` (`HALFMAP` and `reading`): a sticker reads as the wanted
+cell when its text and ink are equal and it is upright, or it is the digit 0 against a 0, or
+its half-turn reading (reversed, 0 6 9 only) equals the wanted text at angle 2. Anything else,
+including a quarter-turned letter or an O for a 0, is a mismatch. A split label stays upright
+with exactly the same text and ink in both profiles.
+
+**Diagonal split labels (strict art).** The text square is 86 percent of the sticker. The first
+number sits top-left (left-aligned), the second bottom-right (right-aligned), the slash is
+centered between them, all three upright. The digit ink height is 0.35 of the text square
+(Noto Sans digit ink height 0.735 em, so the font size is 0.35 times the square divided by 0.735).
+The slash ink height is 0.45 of the text square and its stroke clears both numbers. The pure
+geometry is `splitLayout` in `src/apps/calendar7/sticker-art.ts`. The Noto Sans font
+(OFL-1.1) is unchanged.
+
+**What is profile-gated.** `imageNormal` and `frontFailure` in `display.ts` take the profile as
+the last argument, and `drawSticker` in `sticker-art.ts` takes it as the fourth; the default is
+`DEFAULT_RULE_PROFILE`. Every call in the mode (chain verification, the 3D viewer) uses the
+default, so the shipped behavior, the pinned data and the existing tests are unchanged.
+`monthCells` is not gated: the display sheet already uses `MON`, `FRI`, `23/30` and `24/31`.
+
+**What is pending.** The strict print (`print-strict-upright.tsv` on the research branch)
+needs its move words and chain, which are not available yet. Until then
+`calendar7-source.json` stays pinned to the legacy research commit and the data in
+`public/calendar7/` and `data/calendar7/` stays the legacy print and chain. Switching to strict
+later is a data change (new print, graph, state and pin) plus setting `DEFAULT_RULE_PROFILE`
+to `"strict"`; the legacy-print assertions in the existing tests (for example `M0N`) will then
+be replaced by the strict ones in the same change. The HTML month sheet still shows split
+labels on one line in both profiles.
 
 ## Verification
 
