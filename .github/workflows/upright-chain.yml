@@ -2,9 +2,13 @@
 name: Upright chain
 
 # Manually dispatched producer and verifier for the strict upright calendar chain of
-# research/calendar-7x7 (2028-01 .. 2099-12 = 863 month edges, one retained physical state,
-# strict half-turn rule: only 0 and 6/9). It cannot be dispatched until this file is on the
-# default branch (main). The work is done by upright-chain-segment.yml, called once per
+# research/calendar-7x7 (any start month from 1900-01 to 2099-12, up to 2099-12: the default
+# 2028-01 .. 2099-12 is 863 month edges, 1900-01 .. 2099-12 is 2399; one retained physical
+# state, strict half-turn rule: only 0 and 6/9). The 91 displays and the 98 distinct display
+# transitions are the same for every start; a start before 2026 needs the research ref to
+# contain the widened verifier gates (1900..2099); a start from 2026 works with older refs.
+# It cannot be dispatched until this file is on the default branch (main).
+# The work is done by upright-chain-segment.yml, called once per
 # segment; every segment continues the verified cumulative chain of the one before it.
 #
 # Cost (measured, research/calendar-7x7/upright-beam/README.md): about 30 s per edge with 4
@@ -13,8 +17,8 @@ name: Upright chain
 # cannot be shortened by more processes. Defaults: 150 edges per job = about 1.3 h (2.9 h at
 # 70 s), well inside the 6 h job limit; the producer additionally stops starting new edges
 # after 4 h of the edge loop, so a slow run makes a shorter segment, never a failed one. The
-# whole chain needs 6 segments (863 / 150); this workflow offers up to 8 per run. A shorter
-# run is continued with prior_run_id.
+# whole 2028 chain needs 6 segments (863 / 150), 1900-01 .. 2099-12 needs 16; this
+# workflow offers up to 8 per run. A shorter run is continued with prior_run_id.
 #
 # Contract with the research branch (upright-beam/chain_segment.jl): see that file.
 
@@ -26,7 +30,7 @@ on:
         type: string
         default: research/cube-display-feasibility
       start_year:
-        description: Root year of a fresh chain (ignored with prior_run_id)
+        description: Root year of a fresh chain, 1900-2099 (ignored with prior_run_id)
         type: string
         default: "2028"
       start_month:
@@ -97,9 +101,9 @@ jobs:
             edges=4; jobs=1; start=2028-01; prior=""; smoke=true
           else
             smoke=false
-            [[ "$IN_YEAR" =~ ^20[0-9]{2}$ ]] || fail "start_year must be 4 digits"
+            [[ "$IN_YEAR" =~ ^(19|20)[0-9]{2}$ ]] || fail "start_year must be 4 digits"
             [[ "$IN_MONTH" =~ ^([1-9]|1[0-2])$ ]] || fail "start_month must be 1-12"
-            [ "$IN_YEAR" -ge 2028 ] && [ "$IN_YEAR" -le 2099 ] || fail "start_year must be 2028-2099"
+            [ "$IN_YEAR" -ge 1900 ] && [ "$IN_YEAR" -le 2099 ] || fail "start_year must be 1900-2099"
             [[ "$IN_EDGES" =~ ^[1-9][0-9]{0,2}$ ]] || fail "edges_per_job must be a positive integer"
             [ "$IN_EDGES" -ge 2 ] && [ "$IN_EDGES" -le 200 ] || fail "edges_per_job must be 2-200 (above 200 does not fit the 6 h job limit at 70 s per edge)"
             [[ "$IN_JOBS" =~ ^[1-8]$ ]] || fail "jobs must be 1-8"
