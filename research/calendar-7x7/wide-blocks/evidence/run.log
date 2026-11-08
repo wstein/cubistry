@@ -1,0 +1,14 @@
+tables built in 0.3s
+moves91: 91 words, replay mismatches 0
+edges98: 98 words, replay mismatches 0
+smoke-orbit4: 4 words, replay mismatches 0
+smoke-beam4: 4 words, replay mismatches 0
+  chain576 100/576 (14s)
+  chain576 200/576 (29s)
+  chain576 300/576 (42s)
+  chain576 400/576 (56s)
+  chain576 500/576 (70s)
+chain576: 576 words, replay mismatches 0
+existing-digest mismatches (moves91 vs verify-moves.tsv): 0
+TOTAL replay mismatches: 0
+verdict	ALL_DIGESTS_EQUAL
