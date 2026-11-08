@@ -19,6 +19,8 @@ name: Upright chain
 # Contract with the research branch (upright-beam/chain_segment.jl): see that file.
 
 on:
+  push:
+    branches: [ci/upright-chain-test]
   workflow_dispatch:
     inputs:
       research_ref:
@@ -81,10 +83,10 @@ jobs:
       - name: Validate inputs
         id: validate
         env:
-          IN_YEAR: ${{ inputs.start_year }}
-          IN_MONTH: ${{ inputs.start_month }}
-          IN_EDGES: ${{ inputs.edges_per_job }}
-          IN_JOBS: ${{ inputs.jobs }}
+          IN_YEAR: ${{ inputs.start_year || '2028' }}
+          IN_MONTH: ${{ inputs.start_month || '1' }}
+          IN_EDGES: ${{ inputs.edges_per_job || '2' }}
+          IN_JOBS: ${{ inputs.jobs || '2' }}
           IN_PRIOR: ${{ inputs.prior_run_id }}
           IN_SMOKE: ${{ inputs.smoke_mode }}
         run: |
@@ -123,7 +125,7 @@ jobs:
       - name: Resolve research ref
         id: resolve
         env:
-          REF: ${{ inputs.research_ref }}
+          REF: ${{ inputs.research_ref || 'research/strict-chain-ci' }}
         run: |
           set -euo pipefail
           fail() { echo "::error::$1"; exit 1; }
