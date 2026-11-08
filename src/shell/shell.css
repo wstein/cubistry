@@ -745,6 +745,12 @@ body.presentation-mode .shell .shell-dock {
   max-height: calc(100dvh - 2 * var(--sp-4));
   opacity: 0.9;
 }
+/* While presenting, the dock keeps the status, the alert rows and the panel with the digital clock; the controls hide. */
+body.presentation-mode .shell .shell-slots,
+body.presentation-mode .shell .shell-primary,
+body.presentation-mode .shell .shell-controls.clock-control .hud-header {
+  display: none;
+}
 body.presentation-mode .shell .shell-footer {
   position: fixed;
   bottom: var(--sp-4);

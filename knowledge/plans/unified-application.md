@@ -191,15 +191,15 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | `range` | `src/main.mjs:1042` | single-cube pages |
 | `speed` | `src/main.mjs:1049` | single-cube pages |
 | `timer-speed`, `rate` | `src/main.mjs:1099` | single-cube pages |
-| `lettering` | `src/main.mjs:63`, `:1059`, `src/clock.mjs:37` | single-cube pages, clock |
+| `lettering` | `src/main.mjs:63`, `:1059`, `src/apps/clock/params.ts` | single-cube pages, clock mode |
 | `display`, `font` | `src/main.mjs:688`, `:1066` | single-cube pages |
 | `pad`, `padding` | `src/main.mjs:1086`, `src/calendar.mjs:340` | single-cube pages, calendar |
 | `marker` | `src/main.mjs:1078` | single-cube pages |
 | `print` | `src/main.mjs:1757` | single-cube pages |
 | `autoplay`, `run` | `src/main.mjs:1117`, `src/ms-timer.mjs:455` | single-cube pages, M/S Timer |
-| `kiosk`, `presentation` | `src/main.mjs:1109`, `src/clock.mjs:418`, `src/calendar.mjs:363`, `src/ms-timer.mjs:451`, `src/chronocube.mjs:1182` | all of these |
-| `nerd`, `dev`, `expert` | `src/clock.mjs:345-347` | clock |
-| `hours-speed`, `minutes-speed`, `seconds-speed` | `src/clock.mjs:42`, `:314` | clock |
+| `kiosk`, `presentation` | `src/main.mjs:1109`, `src/calendar.mjs:363`, `src/ms-timer.mjs:451`, `src/chronocube.mjs:1182` | all of these |
+| `nerd`, `dev`, `expert` | `src/clock.mjs:345-347`, `src/apps/shell/slot-api.ts` (`nerdOpenFromSearch`, `nerd` only) | clock page, all modes |
+| `hours-speed`, `minutes-speed`, `seconds-speed` | `src/apps/clock/params.ts` | clock mode |
 | `date`, `lang`, `language`, `design` | `src/calendar.mjs:344`, `:331` | calendar |
 | `design` | `src/print.mjs:75` | print |
 | `year`, `month` | `src/apps/calendar7/month-view.ts` (`chooseMonth`) | 7x7 calendar mode (`calendar7`) |
