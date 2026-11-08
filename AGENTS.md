@@ -37,6 +37,8 @@ Skill instructions are task-specific and do not override accepted project ADRs o
 - Merge: Rebase and merge only.
 - Leave automatic remote branch deletion enabled for merged short-lived feature branches.
 - `research/cube-display-feasibility` is the active long-lived protected research branch: never delete it, force-push it, or retarget research into `main` without a separate approved PR. Ordinary non-force research commits are permitted.
+- Agents may rewrite the history of a branch they created for their own open PR (rebase onto a moved base, restack, reword) with `git push --force-with-lease=<branch>:<expected-sha>`. Do not open a replacement PR for that. Never force-push `main`, the research branch above, or a branch another person or agent owns.
+- After such a push, compare `git diff <base>...<head> | git patch-id` with the reviewed head and post the new head in the PR. An equal patch-id keeps the existing review valid; any content change gets a delta review. Fixes requested in a review are new commits, not rewrites.
 
 ## Language and documentation quality
 - Write all project documentation, code comments, identifier prose, PR descriptions, and contributor-facing text in **US English (`en-US`)**. Preserve externally specified names, legal notices, quotations and data formats when required.
