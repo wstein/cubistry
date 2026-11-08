@@ -639,7 +639,7 @@ test("move statistics block is present, stable in layout and updates after clock
     "Max / tick",
     "Average / tick",
   ]);
-  const before = await page.locator(".clock-cubes").boundingBox();
+  const before = await page.locator("#studio-scene").boundingBox();
   await page.clock.runFor(4000);
   await expect
     .poll(() => page.locator("#seconds-session-moves").textContent())
@@ -660,7 +660,7 @@ test("move statistics block is present, stable in layout and updates after clock
   expect(await read("seconds-max-moves")).toBeGreaterThanOrEqual(
     await read("seconds-last-moves"),
   );
-  expect(await page.locator(".clock-cubes").boundingBox()).toEqual(before);
+  expect(await page.locator("#studio-scene").boundingBox()).toEqual(before);
   // The average appears with the first completed change and stays in range.
   await expect
     .poll(() => page.locator("#seconds-mean-moves").textContent())
