@@ -141,6 +141,7 @@ export async function mountLiveClock(studio, params, shell, isCurrent) {
       if (disposed || !isCurrent()) return;
       history.replaceState(null, "", urlWithLettering(location.href, lettering));
       showPrintLink();
+      shell.setError(null);
     } catch (e) {
       if (disposed || !isCurrent()) return;
       lettering = before;

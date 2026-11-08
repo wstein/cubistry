@@ -745,20 +745,33 @@ test("the time zone, the move times and the label style sit in dock slots 2, 4 a
   await expect(page.locator('[data-slot="1"]')).toBeHidden();
   await expect(page.locator('[data-slot="3"]')).toBeHidden();
 });
-test("a failed lettering change keeps the old print and shows a dismissible alert row", async ({ page }) => {
-  await page.route("**/assets/letters/noto-sans/words/M.svg", async (route) => {
+test("a failed lettering change keeps the URL and print link, and a successful retry clears the error", async ({ page }) => {
+  const asset = "**/assets/letters/noto-sans/words/M.svg";
+  await page.route(asset, async (route) => {
     const response = await route.fetch();
     await route.fulfill({ response, body: (await response.text()) + " " });
   });
-  await clockReady(page);
-  await page.selectOption("#clock-lettering", "words");
+  await clockReady(page, "&lettering=words-pascal");
+  const beforeUrl = page.url();
+  const beforePrint = await page.locator("#print-stickers").getAttribute("href");
   const row = page.locator('.shell-alert-row[data-kind="error"]');
-  await expect(row).toBeVisible({ timeout: 30000 });
-  await expect(row).toHaveAttribute("role", "alert");
-  await expect(row).toContainText("Asset integrity check failed");
-  await expect(page.locator("#clock-lettering")).toHaveValue("words-pascal");
+  // A second failure must restore the same choice, rather than the first failed choice.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await page.selectOption("#clock-lettering", "words");
+    await expect(page.locator("#clock-lettering")).toBeEnabled();
+    await expect(row).toContainText("Asset integrity check failed");
+    await expect(row).toHaveAttribute("role", "alert");
+    await expect(page.locator("#clock-lettering")).toHaveValue("words-pascal");
+    await expect(page).toHaveURL(beforeUrl);
+    await expect(page.locator("#print-stickers")).toHaveAttribute("href", beforePrint);
+    expect(await page.evaluate(() => localStorage.getItem("cubistry_lettering"))).toBe("words-pascal");
+  }
+  expect(await row.evaluate((el) => el.parentElement.closest('[aria-live="polite"], [role="status"]') === null)).toBe(true);
+  await page.unroute(asset);
+  await page.selectOption("#clock-lettering", "words");
   await expect(page.locator("#clock-lettering")).toBeEnabled();
-  await row.getByRole("button", { name: "Dismiss error" }).click();
+  await expect(page).toHaveURL(/lettering=words(?:&|$)/);
+  await expect(page.locator("#print-stickers")).toHaveAttribute("href", /design=hsm-words$/);
   await expect(row).toHaveCount(0);
 });
 test("the sticker lettering changes in place, rewrites the URL, keeps the speeds and moves the print link", async ({ page }) => {
