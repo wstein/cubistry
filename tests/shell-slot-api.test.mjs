@@ -462,3 +462,14 @@ test("nerdOpenFromSearch reads nerd=1 and nothing else", async () => {
   assert.equal(nerdOpenFromSearch("?app=tenth&nerd=1"), true);
   for (const s of ["", "?nerd=0", "?nerd", "?nerd=true", "?nerd=11", "?xnerd=1", "?app=clock"]) assert.equal(nerdOpenFromSearch(s), false, s);
 });
+
+test("refreshNerd does not move focus onto a different kind of element that took the place", () => {
+  const { doc, regions, shell } = setup();
+  let tag = "button";
+  shell.setNerd({ title: "T", render: (body) => body.append(doc.createElement(tag)) });
+  regions.nerdToggle.click();
+  regions.nerd.children[1].children[0].focus();
+  tag = "p";
+  shell.refreshNerd();
+  assert.equal(doc.activeElement, null);
+});
