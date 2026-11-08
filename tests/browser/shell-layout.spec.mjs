@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 // Layout of the unified shell on the Chronocube Studio page. Measures geometry only: no moves are awaited and the
 // page is loaded once; frames and themes change through setViewportSize and emulateMedia.
 
-const regions = ["header", "app-switcher", "stage", "reference-view", "hints", "dock", "status-zone", "primary-action",
+const regions = ["header", "app-switcher", "stage", "reference-view", "hints", "dock", "status-zone", "alerts", "primary-action",
   "readout", "presentation", "nerd-drawer", "view-controls", "present-action"];
 const frames = [
   { name: "1440x900", width: 1440, height: 900 },
