@@ -275,6 +275,7 @@ body.chronocube-page:has(#shell) {
   color: var(--ink);
   font: 600 var(--t-md) var(--f-ui);
 }
+.shell .shell-slot .small,
 .shell .shell-controls .small,
 .shell .shell-controls label {
   color: var(--ink-2);
