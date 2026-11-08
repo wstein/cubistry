@@ -415,9 +415,9 @@ for (const [width, textPercent] of [
     }
   });
 
-// The text is modeled on the status messages at src/main.mjs:631 and :420; the dock must wrap it, not widen.
+// The text is modeled on the print-install and setup-switch messages in src/main.mjs; the dock must wrap it, not
+// widen.
 for (const [width, textPercent] of [
-  [1440, 150],
   [768, 125],
   [700, 100],
   [600, 100],
@@ -426,7 +426,9 @@ for (const [width, textPercent] of [
   [390, 125],
   [320, 125],
 ])
-  test(`a long status message keeps the dock inside the viewport at ${width}px, ${textPercent}% text`, async ({ page }) => {
+  test(`a long status message keeps the dock inside the viewport at ${width}px, ${textPercent}% text`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width, height: 1000 });
     await ready(page);
     await page.evaluate((percent) => {
@@ -439,6 +441,28 @@ for (const [width, textPercent] of [
       expect(box.x, `${selector} left edge ${box.x}`).toBeGreaterThanOrEqual(0);
       expect(box.x + box.width, `${selector} right edge ${box.x + box.width}`).toBeLessThanOrEqual(width);
     }
+  });
+
+// Wide viewports keep the dock on one row for every realistic status, as before the wrap rules were added.
+for (const width of [1440, 1280, 1181])
+  test(`the bottom dock stays one row for real status messages at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await ready(page);
+    const dockHeight = async (text) => {
+      await page.evaluate((text) => {
+        document.getElementById("status").textContent = text;
+      }, text);
+      return (await page.locator(".floating-dock").boundingBox()).height;
+    };
+    const oneRow = await dockHeight("Current 0");
+    for (const text of [
+      "Running to 37 · Current 12",
+      "Running to 9999 · Current 9999",
+      "Turn sequence stopped.",
+      "Switching to LZ · 1 / 8 setup moves",
+      "Blank-top print, NZ installed at 37. Session moves restart at 0.",
+    ])
+      expect(await dockHeight(text), text).toBeLessThan(oneRow * 1.5);
   });
 
 for (const saved of [
