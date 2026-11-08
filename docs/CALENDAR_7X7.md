@@ -169,7 +169,7 @@ Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the easing) and 
   x(t) = x0 e^(-rt) (1 + rt + (rt)^2 / 2) with r = 9 per second, ending when less than 1 mrad is left (about 1.3 s for a quarter
   turn at 1x; the speed setting scales the time). The cube viewer exports no pure function for it, so the formula is repeated in
   `soft-start.ts` and a test compares the rate with `ROTATION_TUNING.returnRate`. Under reduced motion a step jumps and needs
-  no alignment; if the preference turns on while a step plays, the alignment takes 150 ms.
+  no alignment; if the preference turns on while a step plays, the alignment takes 150 ms per rotation (up to 300 ms).
 - **Progress.** `block k of n` counts the layer blocks. The alignment is a final phase after block n, shown as
   `aligning the cube at the end (x+, y2)`; skip and pause work in it.
 - **Control.** The option **Align at the end** (on by default) switches the deferral off for the next step; the player class itself
