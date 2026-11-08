@@ -1,8 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { expectedCertifiedHtm as total } from "../helpers/certified-counts.mjs";
+import { booted } from "../helpers/settle.mjs";
+// Each test boots the page first, which can take most of the default 30 s on a slow runner.
+test.beforeEach(() => test.setTimeout(60000));
 async function ready(page) {
   await page.goto("/counter.html");
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  // Not just `aria-busy="false"`: that is published before the page is ready (see `booted`).
+  await booted(page);
   await page.locator("#format").uncheck();
   await expect(page.locator("#application")).toBeEnabled();
   await page.locator("#value").fill("15");
