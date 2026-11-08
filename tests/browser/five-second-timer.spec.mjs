@@ -117,8 +117,8 @@ test("five-second option has exact cap, inherited rotation stops, independent pr
 // as many frames as it has moves (reduced motion), so the count follows the work and not a fixed time: the viewer
 // renders on every frame, and on a 2-vCPU runner each software-rendered frame costs 100 to 300 ms. A fixed 100 ms
 // slice rendered seven frames per bucket and, over 360 buckets, pushed this test past its 600 s limit.
-// The limit of 7 frames is the fake-time budget of the former fixed 100 ms slice.
-async function playFramesUntilSettled(page, value, limit = 7) {
+// The limit of 6 frames is the frame count the former fixed runFor(100) played (floor(100 / 16)).
+async function playFramesUntilSettled(page, value, limit = 6) {
   for (let frames = 0; frames < limit; frames++) {
     const reached = await page.evaluate((value) => {
       const cube = document.querySelector("#cube");
