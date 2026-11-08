@@ -57,7 +57,8 @@ test("the four single-cube modes have no card heading; the HUD title stays excep
 });
 
 test("the Live Clock mode keeps its status line", () => {
-  const live = section("async function initClockMode(", "// Mode 2:");
+  // The mode moved to src/apps/clock/; its panel markup is hud.ts.
+  const live = readFileSync(resolve("src/apps/clock/hud.ts"), "utf8");
   assert(live.includes('id="clock-status"'));
 });
 
