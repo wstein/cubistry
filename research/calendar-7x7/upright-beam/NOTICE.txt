@@ -2,6 +2,6 @@ Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under C
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 
-Applies to README.md and evidence/. The Julia scripts in this
-directory (*.jl) and negative_controls.sh are program code under AGPL-3.0-or-later
-(SPDX header in each file).
+Applies to README.md and evidence/. The Julia scripts (*.jl),
+negative_controls.sh and the chain_*.sh shell scripts in this directory
+are program code under AGPL-3.0-or-later (SPDX header in each file).

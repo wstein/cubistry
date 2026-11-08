@@ -64,10 +64,11 @@ sum of that column over the 91 accepted rows.
 
 ## How it ran
 
-Workflow `.github/workflows/upright-verify.yml` lives on `main` (wstein/cubistry#339), because `research/cube-display-feasibility` has no
-`.github` and the existing workflows only start chains. It takes a `research_ref`
-input. Until it is on main it also runs on that PR (pull_request trigger limited to the
-workflow file), with research ref `research/upright-flix-2`. Run 42449972802 (research
+Workflow `.github/workflows/upright-verify.yml` lives on `main` (wstein/cubistry#339),
+because `research/cube-display-feasibility` has no `.github` and the existing
+workflows only start chains. It takes a `research_ref` input (default
+`research/cube-display-feasibility`). The first run of this section was made from that
+PR before it was merged, with research ref `research/upright-flix-2`: run 42449972802 (research
 commit `f7762f1`): jobs `julia`, `flix`, `flix-legacy` all succeeded; the evidence
 files are from that run. An earlier run on the superseded branch `research/upright-flix`
 had failed once on a wrong self-test expectation (6 and 9 are two artwork classes of
@@ -76,7 +77,8 @@ one cell) and on a leaked `FLIX_JAR` variable in the workflow; both are fixed.
 ## Strict chain command (Flix) and strict path of `pure_chain.jl` (Julia)
 
 The chain verifiers now take the half-turn rule. **Default stays Legacy**, so the committed
-chains (2027, 2028-2076) verify exactly as before; the legacy regression jobs of
+chains (`chain-2027` and `chain-2028-2076`, the file names under
+`pure-split-states/evidence/`) verify exactly as before; the legacy regression jobs of
 `upright-verify.yml` compare their receipts byte for byte.
 
 | Command | Rule | Source state |
@@ -97,7 +99,9 @@ command still uses Legacy (not needed for the chain) [D].
 
 Also new in `../upright-beam/`: `verify_chain.jl` (independent third checker: it shares only
 `verify_moves.jl`, with its own geometry, boards, strict front rule and SHA-256 of the state
-text; it parses the chain itself and also checks the declared source and end hashes),
+text; it parses the chain itself and checks adjacency, HTM, the declared source and end
+hashes and every front; it does not recompute the QTM and rotation fields and has no print
+pin, which the Julia and Flix verifiers do),
 `make_chain.jl` (untrusted chain writer from edge words), `chain_runner_*.sh` and
 `chain_controls.sh` (nine mutated inputs per checker).
 
@@ -114,9 +118,15 @@ the producer of the follow-up PR) [V]
 | Legacy regression (Julia and Flix chain 2027, matchability) | still byte-identical to the committed receipts (jobs `julia`, `flix-legacy` of the same run) |
 | 91-word replays and rule self-tests | unchanged, all pass (jobs `julia`, `flix`) |
 
-What this does **not** show: the chain-level controls separate the two rules only through
-the replay alias controls above (O as 0, I as 1), not through a chain mutation; the nine
-mutations are rejected for structural reasons (hash, metrics, front, print pin). Common-mode
+Rule self-check: a chain mutation that only a legacy checker would accept needs an
+edge whose end front differs between the rules, which the smoke chain does not have. So
+each of the three chain verifiers (Julia, Flix, replay) runs a start-up self-check on the
+source front before replaying: a 1/2/5/8 sticker turned by 180 degrees and an "I" sticker
+in a "1" cell must be rejected by the strict rule (Legacy must accept them; Julia and Flix
+print `rule-selfcheck` and abort on a deviation, the replay is strict only). The nine
+mutations themselves are rejected for structural reasons (hash, metrics, front, print
+pin). The Julia and Flix verifiers also require the exact `FOUND` status in the root-word
+row. Common-mode
 risk is unchanged: boards and rule are one reading of the owner rule, Julia and Flix by the
 same author.
 

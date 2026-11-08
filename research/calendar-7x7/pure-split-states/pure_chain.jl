@@ -85,13 +85,33 @@ function chain_metrics(moves)
     (htm,qtm,rot,rotq,length(moves))
 end
 const OK_FRONT="-\t-\t-\t-"
+# Startup self-check of the front rule on the real source state: one front sticker turned by 180
+# degrees (a glyph the legacy rule reads as upright: 1 2 5 8) and one sticker printed as the letter I
+# where the board wants the digit 1. Legacy accepts both, strict must reject both. It calls the same
+# front_failure as the chain check, so a verifier whose front check ignores the rule fails here.
+function rule_selfcheck(state,board)
+    front(r,c)=only(i for (i,s) in enumerate(state) if Tuple(s.pos)==(c-4,4-r,3) && Tuple(s.normal)==(0,0,1))
+    i1=nothing;i2=nothing
+    for r in 1:7,c in 1:7
+        t=board[r,c][1];i=front(r,c)
+        isnothing(i1) && t in ("1","2","5","8") && (i1=i)
+        isnothing(i2) && t=="1" && (i2=i)
+    end
+    @assert !isnothing(i1) && !isnothing(i2) "self-check needs a 1/2/5/8 cell and a 1 cell on the source front"
+    turned=copy(state);turned[i1]=merge(state[i1],(up=map(-,state[i1].up),))
+    aliased=copy(state);aliased[i2]=merge(state[i2],(text="I",))
+    a=front_failure(turned,board,"strict")==OK_FRONT;b=front_failure(aliased,board,"strict")==OK_FRONT
+    want=cubistry_rule()=="legacy"
+    println("rule-selfcheck\t",cubistry_rule(),"\tactive-rule\thalf-turned-glyph=",a ? "ACCEPT" : "REJECT","\tI-as-1=",b ? "ACCEPT" : "REJECT")
+    @assert a==want && b==want "self-check: the active front rule does not behave as the selected rule"
+end
 const STRICT_PRINT_SHA="4fc44606e5dcdd745647f57b3086570910b4068a48d001553f99b1625106bcab"
 function root_word(moves_path,root)
     rows=[split(l,'\t') for l in readlines(moves_path)[2:end] if !isempty(l) && parse(Int,split(l,'\t')[1])==root]
     @assert length(rows)==1 "root word must occur exactly once"
     f=only(rows)
     @assert length(f)==7 "root word row shape"
-    @assert occursin("FOUND",f[4]) "root word row must be a found word"
+    @assert f[4] in ("FOUND_GLOBAL","FOUND_ORBIT") || startswith(f[4],"FOUND_HYBRID") "root word row must be a found word"
     map(split(f[6],',')) do t
         s=parse(Int,t);@assert s!=0 && abs(s)<=21 "root word generator outside 1..21"
         (abs(s),s>0 ? 1 : -1)
@@ -122,6 +142,7 @@ function verify_pure_chain(print_path,dag_path,path,root_moves=nothing)
     state=decode_physical(printing,p,proof.action)
     @assert goals[input.root].board==disp(input.year,input.month) "Declared source month must match source-root display"
     @assert front_failure(state,disp(input.year,input.month),"strict")==OK_FRONT "Source front"
+    rule_selfcheck(state,disp(input.year,input.month))
     @assert state_digest(state)==input.hash "Initial actual physical state digest"
     initial_state=copy(state);initial_perm=copy(p)
     y=input.year;m=input.month;all_moves=Tuple{Int,Int}[]
