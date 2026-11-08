@@ -926,8 +926,34 @@ function expectEndpoint(observation, preferred) {
   expect(observation.liveAtCommit).toBe(observation.target);
   if (preferred > 10) expect(observation.intermediateAngles.length).toBeGreaterThan(1);
 }
-async function timerEndpointCases(page, testInfo, cases) {
+// The endpoint specs below assert millisecond bounds (20 ms) and "several intermediate frames" on the final turns.
+// On the real clock both depend on the speed of software-rendered Chromium: a frame takes 100 to 300 ms on a 2-vCPU
+// runner, so one 250 ms turn can render only once and the render lands late. They therefore run on the page's fake
+// clock: setup runs on the running fake clock, the clock is paused before Start, and `driveToValue` advances it one
+// 16 ms frame at a time. Every animation frame, timer and deadline then sits at an exact fake time, whatever the
+// speed of the machine, and the assertions in `expectEndpoint` are unchanged. The 10 ms preference keeps the real
+// clock because it pins a lateness that only real rendering shows (see `expectEndpoint`).
+const FRAME_MS = 16;
+async function driveToValue(page, value, preferredMs) {
+  // Skip the idle preroll in one jump, stopping well before the active window (at most five turns, and the
+  // sequence budget of 5 s) so every turn is still planned and played frame by frame.
+  const lead = Math.min(5 * preferredMs, 5000) + 1500;
+  const idle = await page.evaluate((lead) => Math.max(0, window.actualDeadline - performance.now() - lead), lead);
+  if (idle > 0) await page.clock.fastForward(idle);
+  const limit = 25000;
+  for (let spent = 0; ; spent += FRAME_MS) {
+    const reached = await page.evaluate((value) => {
+      const cube = document.querySelector("#cube");
+      return cube.dataset.value === value && cube.getAttribute("aria-busy") === "false";
+    }, value);
+    if (reached) return spent;
+    if (spent >= limit) throw Error(`Cube did not settle at ${value} within ${limit} ms of fake time`);
+    await page.clock.runFor(FRAME_MS);
+  }
+}
+async function timerEndpointCases(page, testInfo, cases, { deterministic = true } = {}) {
   await page.emulateMedia({ reducedMotion: "no-preference" });
+  if (deterministic) await page.clock.install();
   await chooseTimer(page);
   await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
   await observeEndpoints(page);
@@ -935,9 +961,12 @@ async function timerEndpointCases(page, testInfo, cases) {
   const path = testInfo.outputPath("endpoint-observations.json");
   try {
     for (const [stop, preferred] of cases) {
+      if (deterministic) await page.clock.resume();
       await page.locator("#rotation-speed").fill("6"); await duration(page, "00:20");
       await page.locator("#rotation-speed").fill(stop); await clearEndpointObservation(page);
-      await page.click("#timer-start"); await settled(page, "00:10");
+      if (deterministic) await pauseSoon(page);
+      await page.click("#timer-start");
+      if (deterministic) await driveToValue(page, "00:10", preferred); else await settled(page, "00:10");
       const observation = await endpointObservation(page);
       observations.push({ preferredMilliseconds: preferred, ...observation });
       // Write the evidence before asserting: a failing case must still leave its measurements.
@@ -959,14 +988,16 @@ test("real Timer final turn meets the actual clock endpoint within20ms at250ms a
 });
 test("real Timer final turn at 10ms keeps every endpoint invariant strict and pins the known lateness", async ({ page }, testInfo) => {
   test.setTimeout(scaled(60000));
-  await timerEndpointCases(page, testInfo, [["6", LATE_FINAL_TURN_PREFERENCE_MS]]);
+  await timerEndpointCases(page, testInfo, [["6", LATE_FINAL_TURN_PREFERENCE_MS]], { deterministic: false });
 });
 test("real Stopwatch final physical state and live clock share the target endpoint within20ms", async ({ page }, testInfo) => {
-  await page.emulateMedia({ reducedMotion: "no-preference" }); await chooseTimer(page);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.clock.install(); await chooseTimer(page);
   await page.locator("#rotation-speed").fill("6"); await page.selectOption("#timer-mode", "stopwatch");
   await settled(page, "00:00"); await page.locator("#rotation-speed").fill("3");
   await observeEndpoints(page); await clearEndpointObservation(page);
-  await page.click("#timer-start"); await settled(page, "00:10");
+  await pauseSoon(page);
+  await page.click("#timer-start"); await driveToValue(page, "00:10", 250);
   const observation = await endpointObservation(page); expectEndpoint(observation, 250);
   const path = testInfo.outputPath("stopwatch-endpoint.json");
   writeFileSync(path, JSON.stringify({ implementationHead: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(), observedAt: new Date().toISOString(), ...observation }, null, 2));
@@ -1058,10 +1089,12 @@ test("live readout advances each second while cube keeps ten-second buckets, inc
 });
 
 test("automatic terminal tick preserves the real final turn endpoint and commits zero within20ms",async({page},testInfo)=>{
-  await page.emulateMedia({reducedMotion:"no-preference"});await chooseTimer(page);
+  await page.emulateMedia({reducedMotion:"no-preference"});
+  await page.clock.install();await chooseTimer(page);
   await page.locator("#rotation-speed").fill("6");await duration(page,"00:10");
   await page.locator("#rotation-speed").fill("3");await observeEndpoints(page);await clearEndpointObservation(page);
-  await page.click("#timer-start");await settled(page,"00:00");
+  await pauseSoon(page);
+  await page.click("#timer-start");await driveToValue(page,"00:00",250);
   const observation=await endpointObservation(page,0);expectEndpoint(observation,250);
   await expect(page.locator("#status")).toHaveText("Countdown · Complete");
   const path=testInfo.outputPath("terminal-endpoint.json");writeFileSync(path,JSON.stringify({implementationHead:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),observedAt:new Date().toISOString(),...observation},null,2));
