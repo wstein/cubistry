@@ -139,7 +139,7 @@ test("absolute fifteen-minute deadline visits all91 actual displays and independ
         text,
       );
       if (done) break;
-      await page.clock.runFor(48);
+      await page.clock.runFor(Math.min(48, 300 - played));
     }
     await settled(page, text);
     const step = await page.evaluate((offset) => {
@@ -932,13 +932,12 @@ async function endpointObservation(page, value = 1) {
 }
 function expectEndpoint(observation, preferred) {
   // KNOWN ISSUE at the 10 ms preference (cause not verified): on the real clock in software GL the final turn settles
-  // 96 to 177 ms after the deadline. That lateness is NOT asserted any more: it comes from the cost of real rendering,
-  // and on the fake clock these specs run on no frame has a cost, so it cannot be observed or pinned there (a stalled
-  // fake clock only reproduces the stall, not the app). It is deliberately left uncovered for now; covering it needs a
-  // real-clock measurement outside the blocking e2e shards. Unverified hypothesis: motion-timing.ts creates a deadline
-  // window only if endAt - at >= min(10, remaining), so a late final 10 ms move may fall back to frame-stepped motion.
-  // Every other invariant stays strict for the 10 ms case, so the lateness check is the only one given up.
-  const knownLate = preferred === LATE_FINAL_TURN_PREFERENCE_MS;
+  // 96 to 177 ms after the deadline. That real-clock lateness is NOT pinned any more: it comes from the cost of real
+  // rendering. On the fake clock these specs run on no frame has a cost, so the 10 ms case lands exactly on the
+  // deadline and meets the strict endpoint bound below like every other case. The lateness itself is deliberately left
+  // uncovered for now; covering it needs a real-clock measurement outside the blocking e2e shards. Unverified
+  // hypothesis: motion-timing.ts creates a deadline window only if endAt - at >= min(10, remaining), so a late final
+  // 10 ms move may fall back to frame-stepped motion.
   expect(observation.exactFullState).toBe(true);
   expect(observation.actualMoveDurations).toHaveLength(5);
   expect(observation.motionWindows).toHaveLength(5);
@@ -947,13 +946,9 @@ function expectEndpoint(observation, preferred) {
   if (preferred <= 250) expect(observation.nominalDurations).toEqual(Array(5).fill(preferred));
   else expect(Math.max(...observation.nominalDurations)).toBeLessThan(preferred);
   const tolerance = ENDPOINT_TOLERANCE_MS;
-  if (knownLate) {
-    expect(observation.deadline - observation.startedAt).toBeLessThanOrEqual(5000);
-  } else {
-    expect(Math.abs(observation.settledAt - observation.deadline)).toBeLessThanOrEqual(tolerance);
-    expect(Math.abs(observation.renderedAt - observation.deadline)).toBeLessThanOrEqual(tolerance);
-    expect(observation.settledAt - observation.startedAt).toBeLessThanOrEqual(5000);
-  }
+  expect(Math.abs(observation.settledAt - observation.deadline)).toBeLessThanOrEqual(tolerance);
+  expect(Math.abs(observation.renderedAt - observation.deadline)).toBeLessThanOrEqual(tolerance);
+  expect(observation.settledAt - observation.startedAt).toBeLessThanOrEqual(5000);
   expect(observation.renderedAt).toBeLessThanOrEqual(observation.settledAt);
   expect(observation.liveAtCommit).toBe(observation.target);
   if (preferred > 10) expect(observation.intermediateAngles.length).toBeGreaterThan(1);
@@ -1021,7 +1016,7 @@ test("real Timer final turn meets the actual clock endpoint within20ms at250ms a
   test.setTimeout(scaled(60000));
   await timerEndpointCases(page, testInfo, [["3", 250], ["0", 2000]]);
 });
-test("real Timer final turn at 10ms keeps every endpoint invariant strict (its real-clock lateness is not covered)", async ({ page }, testInfo) => {
+test("real Timer final turn at 10ms meets the strict endpoint bound on the fake clock (real-clock lateness not covered)", async ({ page }, testInfo) => {
   test.setTimeout(scaled(60000));
   await timerEndpointCases(page, testInfo, [["6", LATE_FINAL_TURN_PREFERENCE_MS]]);
 });
