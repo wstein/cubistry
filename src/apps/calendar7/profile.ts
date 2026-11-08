@@ -8,7 +8,8 @@
  *    print uses M0N and FR1, split labels are drawn on one line.
  *  - "strict": the accepted upright rule: only the digit 0 (any turn) and 6 <-> 9 (half
  *    turn) read as the wanted glyph, O is not 0 and I is not 1 (no aliasing), the print
- *    uses the letters MON and FRI, split labels such as 23/30 are drawn diagonally.
+ *    uses the letters MON and FRI, split labels such as 23/30 are drawn as a big
+ *    first number and a small second number in the lower right (no slash).
  *
  * The data (print, chain, pin) is still the legacy data, so the default stays "legacy".
  * Switching to "strict" later is a data change plus changing DEFAULT_RULE_PROFILE here.

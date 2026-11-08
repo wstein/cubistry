@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // English 7x7 calendar cube: the "strict" rule profile (research candidate, not certified).
 // Strict = only the digit 0 and 6 <-> 9 equal after a turn, O != 0, I != 1, upright split labels
-// drawn diagonally, weekday letters MON and FRI. Mirrors research/calendar-7x7/upright-moves/
+// (big first number, small second number, no slash), weekday letters MON and FRI. Mirrors research/calendar-7x7/upright-moves/
 // verify_moves.jl (branch research/cube-display-feasibility). Deterministic, no DOM.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -14,14 +14,13 @@ import {
   EM,
   INK_COLORS,
   PAPER,
-  SPLIT_DIGIT_FRACTION,
-  TEXTURE,
-  TEXT_SQUARE,
-  drawSticker,
+  SPLIT_FIRST_LIFT,
   SPLIT_MIN_GAP,
-  SPLIT_SLASH_LIFT,
+  TEXTURE,
+  baseFontSize,
+  drawSticker,
   isSplitLabel,
-  splitInkGaps,
+  splitInkGap,
   splitLayout,
 } from "../src/apps/calendar7/sticker-art.ts";
 
@@ -178,49 +177,44 @@ test("strict front: split labels stay upright with exact text and ink", () => {
   assert.equal(frontFailure(retext(f.printing, s, "13/42"), turnTo(f.pose, s, [0, -1, 0]), f.cells, "strict")?.why, "stacked-mismatch");
 });
 
-const inside = (b, lo, hi) => b.x0 >= lo && b.y0 >= lo && b.x1 <= hi && b.y1 <= hi;
 const overlap = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
-test("diagonal layout of 23/30 and 24/31: top-left, slash in the middle, bottom-right, upright, inside the sticker", () => {
+test("split layout of 23/30 and 24/31: big first number lifted, small second number lower right, upright", () => {
   for (const label of ["23/30", "24/31"]) {
     assert.ok(isSplitLabel(label));
-    const { first, slash, second } = splitLayout(label);
+    const { first, second } = splitLayout(label);
     const [a, b] = label.split("/");
-    assert.deepEqual([first.text, slash.text, second.text], [a, "/", b]);
-    const lo = (TEXTURE - TEXT_SQUARE) / 2;
-    const hi = lo + TEXT_SQUARE;
-    // Digit ink height is 0.35 of the text square (0.735 em ink height of the Noto Sans digits).
-    for (const p of [first, second]) {
-      assert.ok(Math.abs(p.size * EM.digitInk - SPLIT_DIGIT_FRACTION * TEXT_SQUARE) < 1e-9);
-      assert.ok(Math.abs(p.box.y1 - p.box.y0 - 0.35 * TEXT_SQUARE) < 1e-9);
-      assert.equal(p.baseline, p.box.y1);
-      assert.ok(inside(p.box, 0, TEXTURE) && inside(p.box, lo - 1e-9, hi + 1e-9), `${p.text} inside the sticker`);
-    }
-    // First number top-left, second bottom-right, both in their own half of the diagonal.
-    assert.equal(first.align, "left");
+    assert.deepEqual([first.text, second.text], [a, b]);
+    // (a) The first number has the normal two-digit size of a one-line label.
+    assert.equal(first.size, baseFontSize(2));
+    assert.equal(first.size, 110);
+    assert.ok(second.size < first.size / 2 + 1e-9, "second number is small");
+    // (b) The first number is lifted: its digit ink is centered 18 px above the texture center.
+    assert.equal(SPLIT_FIRST_LIFT, 18);
+    assert.ok(Math.abs((first.box.y0 + first.box.y1) / 2 - (TEXTURE / 2 - 18)) < 1e-9);
+    assert.ok(Math.abs(first.box.y1 - first.box.y0 - EM.digitInk * first.size) < 1e-9);
+    assert.equal(first.baseline, first.box.y1);
+    assert.equal(first.align, "center");
+    assert.ok(Math.abs((first.box.x0 + first.box.x1) / 2 - TEXTURE / 2) < 1e-9);
+    // (c) Upright runs (no rotation exists in the part), the second number right and bottom aligned with margins of 12 px or more.
     assert.equal(second.align, "right");
-    assert.ok(Math.abs(first.box.x0 - lo) < 1e-9 && Math.abs(first.box.y0 - lo) < 1e-9);
-    assert.ok(Math.abs(second.box.x1 - hi) < 1e-9 && Math.abs(second.box.y1 - hi) < 1e-9);
-    assert.ok(first.box.x1 <= TEXTURE / 2 + 10 && first.box.y1 <= TEXTURE / 2);
-    assert.ok(second.box.x0 >= TEXTURE / 2 - 10 && second.box.y0 >= TEXTURE / 2);
-    assert.ok(first.box.y1 < second.box.y0, "numbers do not share a row band");
+    assert.equal(second.baseline, second.box.y1);
+    assert.ok(TEXTURE - second.box.x1 >= 12, `${label} right margin ${TEXTURE - second.box.x1}`);
+    assert.ok(TEXTURE - second.box.y1 >= 12, `${label} bottom margin ${TEXTURE - second.box.y1}`);
+    assert.ok(first.box.x0 >= 12 && first.box.y0 >= 12 && TEXTURE - first.box.x1 >= 12, "first number inside the sticker");
+    assert.ok(second.box.x0 >= 12 && second.box.y0 >= 12);
+    // (d) Ink gap of at least 12 px (0.0625 of the texture); no overlap, no slash.
     assert.ok(!overlap(first.box, second.box), "numbers do not overlap");
-    // The slash is centered (lift 0), inside the text square.
-    const cx = (slash.box.x0 + slash.box.x1) / 2;
-    const cy = (slash.box.y0 + slash.box.y1) / 2;
-    assert.ok(Math.abs(cx - TEXTURE / 2) < 1e-9);
-    assert.ok(Math.abs(cy - (TEXTURE / 2 - SPLIT_SLASH_LIFT * TEXTURE)) < 1e-9);
-    assert.ok(inside(slash.box, lo, hi));
-    // Stroke-aware: the slash stroke (polygon) keeps a real ink gap to both numbers' ink.
-    const gaps = splitInkGaps({ first, slash, second });
-    assert.ok(gaps.first >= SPLIT_MIN_GAP * TEXTURE, `${label} slash to ${a}: ${gaps.first.toFixed(2)} px`);
-    assert.ok(gaps.second >= SPLIT_MIN_GAP * TEXTURE, `${label} slash to ${b}: ${gaps.second.toFixed(2)} px`);
-    // Negative control: the old centered 0.45 slash (a measured 1 px collision in Chromium) is caught.
-    const old = splitInkGaps(splitLayout(label, 0.45, 0));
-    assert.ok(Math.min(old.first, old.second) < SPLIT_MIN_GAP * TEXTURE, `${label} old layout rejected`);
+    const gap = splitInkGap({ first, second });
+    assert.ok(gap >= SPLIT_MIN_GAP * TEXTURE, `${label} gap ${gap.toFixed(2)} px`);
+    assert.equal(SPLIT_MIN_GAP * TEXTURE, 12);
+    assert.equal(splitLayout(label).slash, undefined);
   }
   assert.throws(() => splitLayout("23"));
   assert.throws(() => splitLayout("MON"));
   assert.equal(isSplitLabel("0/5"), false);
+  // The gap check itself rejects touching and overlapping numbers.
+  const l = splitLayout("23/30");
+  assert.equal(splitInkGap({ first: l.first, second: { ...l.second, box: { ...l.first.box } } }), 0);
 });
 
 function drawRun(text, ink, profile) {
@@ -246,15 +240,21 @@ function drawRun(text, ink, profile) {
   return calls;
 }
 
-test("sticker art: strict draws split labels as three upright runs, other labels as before", () => {
+test("sticker art: strict draws split labels as two upright runs, other labels as before", () => {
   const c = drawRun("23/30", "red", "strict");
   assert.equal(c.fills[0], PAPER);
   assert.ok(c.fills.includes(INK_COLORS.red));
-  assert.deepEqual(c.texts.map((t) => t[0]), ["23", "/", "30"]);
+  assert.deepEqual(c.texts.map((t) => t[0]), ["23", "30"]);
   const l = splitLayout("23/30");
-  assert.deepEqual(c.texts.map((t) => [t[1], t[2]]), [[l.first.x, l.first.baseline], [l.slash.x, l.slash.baseline], [l.second.x, l.second.baseline]]);
-  assert.deepEqual(c.aligns, ["left", "center", "right"]);
+  assert.deepEqual(c.texts.map((t) => [t[1], t[2]]), [[l.first.x, l.first.baseline], [l.second.x, l.second.baseline]]);
+  assert.deepEqual(c.fonts.filter((f) => f.startsWith("600")).slice(0, 2).map((f) => f.match(/^600 (\d+)px/)[1]), ["110", "50"]);
+  assert.deepEqual(c.aligns, ["center", "right"]);
   assert.ok(c.baselines.every((b) => b === "alphabetic"));
+  // Legacy and the default profile are unchanged: one line, centered, middle baseline, fitted size.
+  const old = drawRun("23/30", "red", "legacy");
+  assert.deepEqual(old.aligns, ["center"]);
+  assert.deepEqual(old.baselines, ["middle"]);
+  assert.deepEqual(old.texts.map((t) => [t[1], t[2]]), [[TEXTURE / 2, TEXTURE / 2 + Number(old.fonts.at(-1).match(/(\d+)px/)[1]) * 0.04]]);
   // Legacy keeps the one-line label; strict draws MON and FRI as plain one-line letters.
   assert.deepEqual(drawRun("23/30", "red", "legacy").texts.map((t) => t[0]), ["23/30"]);
   assert.deepEqual(drawRun("23/30", "red").texts.map((t) => t[0]), ["23/30"]);
