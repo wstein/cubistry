@@ -241,6 +241,28 @@ for (const resource of ["distances.u8", "quality-build-open.svg"])
     await expect(page.locator("#status-build")).toBeDisabled();
     await expect(page.locator("#status-reload")).toBeVisible();
   });
+// A drag that should turn the camera must start and stay on the canvas itself. At 390 px the workflow controls
+// (a floating panel) cover the middle of the canvas, so a drag from the center operates the panel and the camera
+// never turns; the test then waited for a rotation that could not come. This returns the canvas point nearest to
+// the center from which the drag (start, middle and end) hits the canvas, or null when there is none.
+function freeDragStart(page, dx, dy) {
+  return page.evaluate(([dx, dy]) => {
+    const canvas = document.querySelector("#status-viewer canvas");
+    const r = canvas.getBoundingClientRect();
+    const hits = (x, y) => document.elementFromPoint(x, y) === canvas;
+    const cx = r.x + r.width / 2,
+      cy = r.y + r.height / 2,
+      candidates = [];
+    for (let y = Math.max(r.y, 0) + 4; y < Math.min(r.bottom, innerHeight) - 4; y += 8)
+      for (let x = r.x + 4; x < Math.min(r.right, innerWidth) - 4; x += 8)
+        candidates.push([x, y]);
+    candidates.sort((a, b) => Math.hypot(a[0] - cx, a[1] - cy) - Math.hypot(b[0] - cx, b[1] - cy));
+    const found = candidates.find(
+      ([x, y]) => [0, 0.25, 0.5, 0.75, 1].every((t) => hits(x + dx * t, y + dy * t)),
+    );
+    return found ? { x: found[0], y: found[1] } : null;
+  }, [dx, dy]);
+}
 for (const [name, viewport] of [
   ["desktop", { width: 1280, height: 1000 }],
   ["mobile", { width: 390, height: 844 }],
@@ -312,12 +334,11 @@ for (const [name, viewport] of [
           moves: c.progress.sessionTotal,
         };
       });
-      const { x, y, width, height } = geometry.canvas;
-      await page.mouse.move(x + width / 2, y + height / 2);
+      const grab = await freeDragStart(page, 45, 25);
+      expect(grab, "a canvas point from which the whole drag stays on the canvas").not.toBeNull();
+      await page.mouse.move(grab.x, grab.y);
       await page.mouse.down();
-      await page.mouse.move(x + width / 2 + 45, y + height / 2 + 25, {
-        steps: 5,
-      });
+      await page.mouse.move(grab.x + 45, grab.y + 25, { steps: 5 });
       await page.mouse.up();
       await expect
         .poll(async () =>
