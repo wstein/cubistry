@@ -245,7 +245,35 @@
 .c7-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 .c7-step { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
 .c7-step h3 { margin: 0 0 4px; font-size: 1rem; }
-.c7-word { overflow-wrap: anywhere; font-family: var(--f-num); font-size: 0.8rem; max-height: 10rem; overflow: auto; }
+/* A word is shown in full: tokens never break inside (.c7-tok), the line wraps between tokens, the box grows. */
+.c7-word { margin: 6px 0 0; overflow-wrap: break-word; font-family: var(--f-num); font-size: 0.8rem; line-height: 1.6; }
+.c7-tok { white-space: nowrap; }
+.c7-step summary { min-height: 24px; cursor: pointer; }
+.c7-legend { grid-column: 1 / -1; margin: 0; font-size: 0.8rem; color: var(--ink-2); }
+.c7-legend code { font-family: var(--f-num); color: var(--ink); }
+/* The calendar mode has nothing in the dock (its controls sit above the sheet): the dock collapses and the stage takes
+   the width. On a wide stage the sheet and the step panels sit side by side; narrow stays one column (16px gutter). */
+.shell .shell-body:has(.c7-root) {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+.shell .shell-body:has(.c7-root) .shell-dock {
+  display: none;
+}
+@media (min-width: 900px) {
+  .shell .shell-stage .clock-cubes[data-count="1"]:has(.c7-root) {
+    max-width: 1080px;
+  }
+  .c7-page {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: 20px;
+  }
+  .c7-page > * { grid-column: 1 / -1; }
+  .c7-page > .c7-month { grid-column: 1; }
+  .c7-page > .c7-sheet { grid-column: 1; }
+  .c7-page > .c7-steps { grid-column: 2; grid-row: 1 / span 2; grid-template-columns: minmax(0, 1fr); }
+}
 .c7-unavailable { background: var(--surface); color: var(--ink); border: 1px solid var(--s-warn); border-radius: 8px; padding: 8px 12px; margin: 0; }
 .c7-status, .c7-range { font-size: 0.85rem; margin: 0; color: var(--ink); }
 .c7-nav { font-weight: 700; color: var(--mark-ink); text-decoration: underline; }

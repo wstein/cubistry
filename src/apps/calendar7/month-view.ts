@@ -196,22 +196,31 @@ const NOT_YET =
   "No solver and no jumps: only the step to the previous or next month along the chain is available. " +
   "A jump to a distant month would have to walk the chain, which can take thousands of moves.";
 
+/** A word as tokens that never break inside (a hyphen in `x-3..-1` must not wrap), separated by plain spaces that wrap. */
+const tokensHtml = (tokens: readonly string[]): string => tokens.map((t) => `<span class="c7-tok">${esc(t)}</span>`).join(" ");
+
+const LEGEND =
+  "Block notation: axis x, y or z, then the layers. <code>x-3</code> is one layer; <code>x-3..-1</code> turns the layers -3 to -1 " +
+  "together (wide, with the outer layer); <code>y+1..+2</code> turns inner layers only (inner-wide); <code>zrot</code> is the whole cube " +
+  "(free). A trailing <code>'</code> is a counter-clockwise quarter turn, <code>²</code> a half turn. " +
+  "Layer moves (HTM) count every layer once; block moves count every block once.";
+
 const stepHtml = (step: Step | null, label: string, end: string): string => {
   if (!step)
     return `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3><p>${esc(end)}</p></div>`;
-  const word = step.moves.map(moveToken).join(" ");
-  const raw = step.moves.map(rawToken).join(" ");
+  const word = tokensHtml(step.moves.map(moveToken));
+  const raw = tokensHtml(step.moves.map(rawToken));
   const blocks = groupBlocks(step.moves);
-  const blockWord = blocks.map(blockToken).join(" ");
+  const blockWord = tokensHtml(blocks.map(blockToken));
   const { blockMoves } = blockCounts(blocks);
   const rotations = `${step.rot} whole-cube rotation${step.rot === 1 ? "" : "s"}`;
   return (
     `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3>` +
     `<p><a class="c7-nav" data-nav="${label.toLowerCase()}" href="${esc(href(step.to))}">${esc(monthLabel(step.to))}</a>: ` +
     `${step.htm} layer moves (HTM), ${blockMoves} block moves, ${step.qtm} quarter turns (QTM), ${rotations}.</p>` +
-    `<details><summary>Block word</summary><p class="c7-word" data-blocks="${label.toLowerCase()}">${esc(blockWord)}</p></details>` +
-    `<details><summary>Move word</summary><p class="c7-word" data-word="${label.toLowerCase()}">${esc(word)}</p></details>` +
-    `<details><summary>Raw generators</summary><p class="c7-word" data-raw="${label.toLowerCase()}">${esc(raw)}</p></details></div>`
+    `<details><summary>Block word</summary><p class="c7-word" data-blocks="${label.toLowerCase()}">${blockWord}</p></details>` +
+    `<details><summary>Move word</summary><p class="c7-word" data-word="${label.toLowerCase()}">${word}</p></details>` +
+    `<details><summary>Raw generators</summary><p class="c7-word" data-raw="${label.toLowerCase()}">${raw}</p></details></div>`
   );
 };
 
@@ -277,7 +286,8 @@ export function pageHtml(model: PageModel): string {
     `<div class="c7-page"><h2 class="c7-month" tabindex="-1" data-focus data-month="${ymKey(choice.ym)}">${esc(monthLabel(choice.ym))}</h2>` +
     sheetHtml(model.cells as readonly Cell[], `7x7 calendar sheet, ${monthLabel(choice.ym)}`) +
     `<div class="c7-steps">${stepHtml(model.prev, "Previous", `No earlier month: ${monthLabel(range.first)} is the start of the chain.`)}` +
-    `${stepHtml(model.next, "Next", `No later month: ${monthLabel(range.last)} is the end of the chain.`)}</div>` +
+    `${stepHtml(model.next, "Next", `No later month: ${monthLabel(range.last)} is the end of the chain.`)}` +
+    `<p class="c7-legend" data-c7-legend>${LEGEND}</p></div>` +
     `<p class="c7-range">Proven chain: ${esc(rangeText)}, ${range.edges} steps.</p>${status}</div>`
   );
 }

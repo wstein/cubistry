@@ -216,3 +216,45 @@ for (const scheme of ["light", "dark"]) {
     }
   });
 }
+
+// Layout of the mode: no empty dock, and the move words are shown in full (block word, move word, raw generators).
+for (const [width, height] of [[375, 800], [768, 900], [1000, 700], [1440, 900]]) {
+  test(`layout at ${width} px: no empty dock, words fully visible, no horizontal scroll, notation legend`, async ({ page }) => {
+    const seen = watch(page);
+    await page.setViewportSize({ width, height });
+    await page.goto("/index.html?app=calendar7&year=2028&month=2");
+    await idle(page, "2028-02");
+    // The mode puts nothing into the dock, so the dock is collapsed and the stage takes its width.
+    await expect(page.locator(".shell-dock")).toBeHidden();
+    await expect(page.locator("[data-c7-legend]")).toBeVisible();
+    for (const [kind, label] of [["blocks", "Block word"], ["word", "Move word"], ["raw", "Raw generators"]]) {
+      await page.locator(`.c7-step[data-step="next"] summary:text-is("${label}")`).click();
+      const box = page.locator(`[data-${kind}="next"]`);
+      await expect(box).toBeVisible();
+      // Not clipped: the box grows to its text, nothing scrolls inside it, and no token is wider than the box.
+      const m = await box.evaluate((el) => ({
+        sh: el.scrollHeight - el.clientHeight,
+        sw: el.scrollWidth - el.clientWidth,
+        right: el.getBoundingClientRect().right,
+        tokenRight: Math.max(...[...el.querySelectorAll(".c7-tok")].map((t) => t.getBoundingClientRect().right)),
+        tokens: el.querySelectorAll(".c7-tok").length,
+        overflowY: getComputedStyle(el).overflowY,
+      }));
+      expect(m.sh).toBeLessThanOrEqual(1);
+      expect(m.sw).toBeLessThanOrEqual(0);
+      expect(m.tokenRight).toBeLessThanOrEqual(m.right + 0.5);
+      expect(m.tokens).toBeGreaterThan(20);
+      expect(m.overflowY).toBe("visible");
+    }
+    // 16px gutter on the left of the content and no page-wide horizontal scroll.
+    const g = await page.evaluate(() => ({
+      over: document.documentElement.scrollWidth - window.innerWidth,
+      left: document.querySelector(".c7-step").getBoundingClientRect().left,
+      right: window.innerWidth - document.querySelector(".c7-step").getBoundingClientRect().right,
+    }));
+    expect(g.over).toBeLessThanOrEqual(0);
+    expect(g.left).toBeGreaterThanOrEqual(16);
+    expect(g.right).toBeGreaterThanOrEqual(16);
+    expect(seen).toEqual([]);
+  });
+}

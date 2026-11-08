@@ -157,10 +157,12 @@ test("the page shows block word, move word and raw generators, and both counts",
   const { layerMoves, blockMoves } = blockCounts(blocks);
   assert.equal(layerMoves, step.htm);
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/'/g, "&#39;");
+  const toks = (a) => a.map((t) => `<span class="c7-tok">${esc(t)}</span>`).join(" ");
   assert.ok(html.includes(`${step.htm} layer moves (HTM), ${blockMoves} block moves,`));
-  assert.ok(html.includes(`data-blocks="next">${esc(blocks.map(blockToken).join(" "))}</p>`));
-  assert.ok(html.includes(`data-word="next">${esc(step.moves.map(moveToken).join(" "))}</p>`), "own move notation still shown");
-  assert.ok(html.includes(`data-raw="next">${step.moves.map(rawToken).join(" ")}</p>`), "raw generators still shown");
+  assert.ok(html.includes(`data-blocks="next">${toks(blocks.map(blockToken))}</p>`));
+  assert.ok(html.includes(`data-word="next">${toks(step.moves.map(moveToken))}</p>`), "own move notation still shown");
+  assert.ok(html.includes(`data-raw="next">${toks(step.moves.map(rawToken))}</p>`), "raw generators still shown");
+  assert.ok(html.includes("data-c7-legend"), "the notation legend is shown");
   assert.equal(encodeMoves(step.moves), encodeMoves(graph.edges[1].moves), "the stored word is untouched");
 });
 
