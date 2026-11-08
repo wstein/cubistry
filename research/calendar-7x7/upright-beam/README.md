@@ -25,10 +25,10 @@ not run.** Every word below was replayed by the independent `verify_moves.jl` co
 | Before (naive strict beam, fallback to orbit solve) | 270 to 462 HTM per edge, 4-edge smoke 1604 HTM [V, PR #337] |
 | Old rule chain (pure split, 576 edges) | median 134, mean 131.0, min 14, max 471 HTM; mean 158 s per edge [V, `pure-split-states/evidence/chain-2028-2076-edges.tsv`] |
 | 4-edge smoke from 2028-01, one retained state | 142, 105, 126, 108 = **481 HTM** (was 1604); all four by the beam, none by the orbit-solve fallback; `verify_smoke.jl` **ACCEPT** [V] |
-| Seconds per edge | 98 transitions (four single-thread processes at once on 4 cores): mean 68 s, max 127 s. Smoke, one process alone: 64 to 81 s single-threaded, **21 to 39 s with 4 threads** (identical words) [V] |
+| Seconds per edge | 98 transitions (four single-thread processes at once on 4 cores): mean 68 s, max 127 s [V]. Smoke, one process alone, single-threaded: 64 to 81 s [V, `evidence/chain-smoke-edges.tsv`]; with 4 threads 21 to 39 s with identical words [measured, not archived: no evidence file holds that run] |
 | Target < 60 HTM per edge | **not met**: 7 transitions that change only 6 cells cost 22 HTM on average, the other 91 (about 36 cells change) cost 120 HTM, 2.6 HTM per wrong cell [V]. I do not see a way under 60 with this macro method [I] |
-| Target < 60 s per edge | met with 4 threads (about 30 s), not single-threaded (about 70 s) [V] |
-| 863-edge chain | about **98 000 HTM** (was about 350 000) and **7 h** CPU wall with 4 threads, **17 h** single-threaded (was about 55 h) [estimate, from V data] |
+| Target < 60 s per edge | met with 4 threads (about 30 s, measured, not archived), not single-threaded (about 70 s) [V] |
+| 863-edge chain | about **98 000 HTM** (was about 350 000) and **7 h** CPU wall with 4 threads, **17 h** single-threaded (was about 55 h) [estimate; the 7 h rests on the 4-thread timing that is not archived] |
 | Flix port and Flix replay | **not done** [D] |
 
 A correction to the task text: the old chain's median is 134 HTM, not 15. 15 is about its
@@ -54,12 +54,13 @@ the pose it needs sits:
    display) or a whole-cube rotation.
    With core weight 100 the beam never gives the core up. Core weight 1 fails (UNKNOWN)
    on 4 of 8 development edges even with all other fixes (`evidence/ablation-8edges.tsv`).
-2. **The old hybrid finish is self-defeating.** It restarts `orbit_solve` from a beam
+2. **The old hybrid finish is self-defeating** (shown on the edge 25 -> 26 snapshots; for display 1 it is an inference [I]). It restarts `orbit_solve` from a beam
    snapshot, and `orbit_solve` begins with `chain_core_prefix`. The core of every
    snapshot is wrong, so the prefix rotates the whole cube (`[21,21,21]`): 4 wrong cells
    become 47. The result is the 436 to 448 HTM of the hybrid experiments in
-   `../upright-moves/evidence/beam-experiments-display1.tsv`, which is the plain orbit
-   solve from scratch (440) in disguise.
+   `../upright-moves/evidence/beam-experiments-display1.tsv`, which looks like the plain orbit
+   solve from scratch (440) in disguise [I for display 1: the mechanism was
+   only shown on the 25 -> 26 snapshots, the match of the HTM is circumstantial].
 3. **Plateaus that strict progress cannot cross (cell 4).** The cell holds the right
    corner cubie in the wrong twist (pose 9 where pose 8 of the same cubie is needed).
    Untwisting needs two orbit-isolated macros (cubie out, cubie in); the first has zero
@@ -80,7 +81,7 @@ the pose it needs sits:
 What I could **not** show [I]: that the strict rule itself makes the stall worse. The
 allowed sets are about equally small under both rules (mean size 1.64 strict, 1.67 old;
 81 to 83 % of the cells have exactly one allowed pose; `evidence/allowed-sizes.txt`), and
-the beam stalled on about half of the old edges too (294 of 576 old edges are "hybrid" =
+the beam stalled on about half of the old edges too (299 of 576 old edges are "hybrid" (294 at l=12/w=40, 3 at l=8/w=30, 2 at w=60), plus 1 orbit-solve fallback; hybrid =
 beam stall + orbit finish). What changed is that every finish now fails (point 2), because
 the core is wrong in every snapshot; under the old rule the core of 39 of 91 displays had
 two allowed poses, which probably hid point 1 more often. Per-edge stall rates of the old
@@ -109,8 +110,8 @@ but a front display exists for every start tried.
    into a wrong cell (index over (cell, source position)). A macro with strictly positive
    progress must do that, so the child pool is identical; `check_equivalence.jl`
    compares it with the unchanged `GlobalSearch.beam_search` (word, snapshots, trace,
-   stall; `evidence/equivalence.txt`). 4 to 6 times faster; threads over beam nodes give
-   another factor 2.6 to 3, and 1 and 4 threads return the same words (smoke: byte-identical).
+   stall; `evidence/equivalence.txt`). 4 to 6 times faster [measured, not archived]; threads over beam nodes give
+   another factor 2.6 to 3, and 1 and 4 threads returned the same words (smoke: byte-identical) [both measured, not archived: no output file; re-run to confirm].
 5. **Tightened allowed sets** (`tighten`), optional (see 4. above).
 6. `lambda=3` (default 12): sums over 8 development edges 995 (lambda 3), 1020 (2), 1028
    (5), 1085 (8), 1169 (12) HTM (`evidence/lambda-tuning.tsv`). The spread between
@@ -122,6 +123,15 @@ Ablation on the first edge (`evidence/ablation-25-26.tsv`, lambda 12): of 13 com
 only the ones with core protection **and** (catalog in the beam or last mile) solve it,
 153 to 159 HTM. Tightening alone, core protection alone, tightening plus core protection
 all stall ([4], [4,22,40], [60,112]).
+
+`evidence/ablation-8edges.tsv` (8 development edges, HTM): the column `full` is
+`lambda=5` (it equals the `lambda5` column of `evidence/lambda-tuning.tsv`), not the
+chosen `lambda=3`. `no_tightening` and `core_weight_1` change one setting each.
+`-1` means UNKNOWN (stall). The last mile (`finishN`, method column of the edge files)
+starts from a beam snapshot with N wrong cells (N is the number of wrong cells of the
+snapshot, not the number of macros); `solve_edge` tries the 6 snapshots with the fewest
+wrong cells. The committed runs used `tight=1` (tightening on, the default of
+`edge_batch.jl`), except in the `no_tightening` column.
 
 ## Measurements [V]
 
@@ -140,13 +150,13 @@ all stall ([4], [4,22,40], [60,112]).
 - `evidence/chain-estimate.txt` (`chain_estimate.jl`): sum over the 98 transitions weighted
   by how often the 863-edge chain uses each: 113.3 HTM and 69.7 s per edge (contended),
   97 762 HTM and 16.7 CPU hours. Single-threaded smoke average 73 s -> 17.6 h; 4 threads
-  30 s -> 7.1 h.
+  30 s -> 7.2 h.
 
 ## 863-edge chain, re-estimate [I]
 
 | | edges | HTM per edge | total HTM | CPU |
 |---|---|---|---|---|
-| naive strict beam (PR #337) | 863 | 270 to 480 | about 350 000 | about 55 h |
+| naive strict beam (PR #337) | 863 | 270 to 462 | about 350 000 | about 55 h |
 | old rule, pure split chain | 576 (2028-2076) | 131 | about 75 000 | 158 s each |
 | this work | 863 | 113 | **about 98 000** | **7 h wall (4 threads) to 17 h** |
 
