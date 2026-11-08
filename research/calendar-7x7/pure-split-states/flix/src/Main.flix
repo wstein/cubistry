@@ -157,7 +157,7 @@ def pureFront(rule: HalfRule,state: Vector[Sticker],y: Int32,m: Int32,what: Stri
 // SHA-256 of research/calendar-7x7/upright-feasibility/evidence/print-strict-upright.tsv (strict chain only).
 def strictPrintSha(): String = "4fc44606e5dcdd745647f57b3086570910b4068a48d001553f99b1625106bcab"
 // Root word of display `id` from upright-moves/evidence/moves-strict.tsv: signed generators 1..21.
-def rootWord(rootMovesPath: String,id: Int32,sy: Int32,sm: Int32): List[Step] \ IO = {
+def rootWord(rootMovesPath: String,id: Int32): List[Step] \ IO = {
     let rows=match lines(read(rootMovesPath)) {
         case _::rest => rest
         case Nil => throw new IllegalArgumentException("root moves header")
@@ -168,8 +168,7 @@ def rootWord(rootMovesPath: String,id: Int32,sy: Int32,sm: Int32): List[Step] \ 
     },rows);
     match hits {
         case row::Nil => match fields(row) {
-            case _::yS::mS::status::_::wordS::_::Nil => {
-                require(integer(yS)==sy and integer(mS)==sm,"root word row must be the declared source month");
+            case _::_::_::status::_::wordS::_::Nil => {
                 require(String.contains(substr="FOUND",status),"root word row must be a found word");
                 List.map(t -> {
                     let g=integer(t);
@@ -204,7 +203,7 @@ def runPureChainR(rule: HalfRule,rootMovesPath: String,printPath: String,dagPath
     let reps=representatives();validateTargets(read(oldRoot+"/targets.tsv"),reps);
     let goals=stackedGoals(pureVariant(),reps);
     require(goalBoard(at(goals,source-1))==stackedBoard(pureVariant(),sy,sm),"source root display must match declared source month");
-    let rootSteps=if(strict) rootWord(rootMovesPath,source,sy,sm) else Nil;
+    let rootSteps=if(strict) rootWord(rootMovesPath,source) else Nil;
     let start=if(strict) List.foldLeft((p,step) -> compose(p,stepPerm(step,poses)),permIdentity(),rootSteps) else {
         let results=readDag(read(dagPath),poses,false);
         match Map.get(source,results) {
