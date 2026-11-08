@@ -107,7 +107,8 @@ export interface GroupOptions {
 /** Index 0..6 of the physical layer -3..3. */
 const SLOT = (layer: number): number => layer + 3;
 const SLICE_STATES = 4 ** 7;
-const FULL_WEIGHT = 0;
+/** A whole-cube rotation costs no block move, but a small weight keeps the plan from adding one that saves no block. */
+const FULL_WEIGHT = 100;
 
 interface SliceTable {
   readonly parent: Int32Array;
@@ -121,7 +122,7 @@ let sliceTable: SliceTable | null = null;
 
 /**
  * Dijkstra from the zero state over the states "exponent mod 4 per layer" (4^7): a move is an interval of layers with an
- * exponent 1..3. Weight 1000 + width (fewest blocks first, then the narrowest), the full interval (a whole-cube rotation)
+ * exponent 1..3. Weight 1000 + width (fewest blocks first, then the narrowest), the full interval (a whole-cube rotation: 100, above any total width, free as a move but never added for nothing)
  * is free. Deterministic: moves in a fixed order, a state keeps the first parent that reaches its distance.
  */
 function buildSliceTable(): SliceTable {
@@ -170,6 +171,7 @@ const angleOf = (t: number): Angle => (t === 1 ? 1 : t === 2 ? 2 : -1);
 /** The blocks of one run under rule c: layer moves and rotations about `axis`, in any order (they commute). */
 function groupRunSlice(axis: number, run: readonly Move[], out: Block[]): void {
   sliceTable ??= buildSliceTable();
+  // The target is the exact net exponent per physical layer; a rotation of the run turns all seven layers.
   const net = [0, 0, 0, 0, 0, 0, 0];
   let rotation = 0;
   for (const [g, q] of run) {
@@ -178,7 +180,8 @@ function groupRunSlice(axis: number, run: readonly Move[], out: Block[]): void {
     else net[SLOT(generatorLayer(g))] += t;
   }
   let s = 0;
-  for (let i = 0; i < 7; i++) s |= (net[i] & 3) << (2 * i);
+  for (let i = 0; i < 7; i++) s |= ((net[i] + rotation) & 3) << (2 * i);
+  rotation = 0;
   const found: { lo: number; hi: number; t: number }[] = [];
   while (s !== 0) {
     const m = sliceTable.move[s];

@@ -61,7 +61,7 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   const progress = page.locator('[data-c7="progress"]');
   await page.locator('a[data-nav="next"]').click();
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "playing");
-  await expect(progress).toHaveText(/^Turning to February 2028: block \d+ of 104$/);
+  await expect(progress).toHaveText(/^Turning to February 2028: block \d+ of 103$/);
   // The heading, sheet and live region already name the new month; the digest is that of the pose being turned only at the end.
   await expect(page.locator(".c7-month")).toHaveText("February 2028");
   await page.locator('[data-c7="speed"]').selectOption("8");
@@ -145,7 +145,7 @@ test("at 375 px the page scrolls instead of clipping and the controls are reacha
   });
   expect(stageOverflow.sw).toBeLessThanOrEqual(0);
   expect(stageOverflow.canScroll).toBe(true);
-  for (const name of ["speed", "reset"]) {
+  for (const name of ["speed", "slice", "reset"]) {
     await page.locator(`[data-c7="${name}"]`).focus();
     await expect(page.locator(`[data-c7="${name}"]`)).toBeFocused();
   }
@@ -227,7 +227,7 @@ for (const [width, height] of [[375, 800], [768, 900], [1000, 700], [1440, 900]]
     // The mode puts nothing into the dock, so the dock is collapsed and the stage takes its width.
     await expect(page.locator(".shell-dock")).toBeHidden();
     await expect(page.locator("[data-c7-legend]")).toBeVisible();
-    for (const [kind, label] of [["blocks", "Block word"], ["word", "Move word"], ["raw", "Raw generators"]]) {
+    for (const [kind, label] of [["blocks-slice", "Block word with middle slice"], ["blocks", "Block word"], ["word", "Move word"], ["raw", "Raw generators"]]) {
       await page.locator(`.c7-step[data-step="next"] summary:text-is("${label}")`).click();
       const box = page.locator(`[data-${kind}="next"]`);
       await expect(box).toBeVisible();

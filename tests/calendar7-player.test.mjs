@@ -510,7 +510,7 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   await flush();
   assert.equal(root.el("play").textContent, "Pause");
   assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", false);
-  assert.match(root.el("progress").textContent, /^Turning to February 2028: block 0 of 104$/);
+  assert.match(root.el("progress").textContent, /^Turning to February 2028: block 0 of 103$/);
   root.press("play"); // pause
   assert.equal(root.el("play").textContent, "Play");
   root.choose("speed", "8");

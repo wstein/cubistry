@@ -124,7 +124,7 @@ The measurement behind it is `research/calendar-7x7/wide-blocks` (research pull 
   (they commute with its layers); a rotation about another axis ends it. The run is replaced by the fewest intervals (any exponent,
   nested allowed) whose turns add up to the same net exponent per layer, where seven-layer intervals are free rotations. It is
   the exact minimum (Dijkstra over the 4^7 states of one axis; a plain breadth-first search in the tests agrees on random
-  runs); ties go to the narrower blocks. Opposite turns of one layer cancel, so the multiset of the moves is **not** kept, only the state.
+  runs); among plans with the fewest blocks, one without an added rotation wins (a rotation is only in the plan when it saves a block, or the run itself contains one), then the narrower blocks. Opposite turns of one layer cancel, so the multiset of the moves is **not** kept, only the state.
 - **Notation.** The same as for blocks, with layer 0 allowed in the range: `x0` the middle slice, `x-3..0` the layers -3 to 0,
   `y-1..+2'` the layers -1 to +2 counter-clockwise, `z-2..0²` a half turn. Kind `slice` in the code. Rotations are `xrot` and so on, as before.
 - **Three counts.** The page shows, for each step: *layer moves* (HTM, the stored count, unchanged), *block moves without the middle

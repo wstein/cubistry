@@ -147,10 +147,10 @@ test("the rotation count is pluralized", () => {
   for (let k = 0; k < 40; k++) {
     const m = graph.nodes[k];
     const html = pageHtml(buildModel(graph, table, chooseMonth(q(`year=${m.year}&month=${m.month}`), today, range), today));
-    texts.push(...(html.match(/\d+ whole-cube rotations?\./g) ?? []));
+    texts.push(...(html.match(/\d+ stored rotations?\./g) ?? []));
   }
-  assert.ok(texts.some((t) => t.startsWith("1 whole-cube rotation.")), "a singular occurs");
-  assert.ok(texts.every((t) => !/^1 whole-cube rotations/.test(t)));
+  assert.ok(texts.some((t) => t.startsWith("1 stored rotation.")), "a singular occurs");
+  assert.ok(texts.every((t) => !/^1 stored rotations/.test(t)));
 });
 
 test("the page shows the sheet, both steps and the scope notice for a month inside the chain", () => {
