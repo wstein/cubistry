@@ -11,7 +11,7 @@ import {
 import { buildStudioManifest, normalizeMarkerMode } from "../src/apps/chronocube/manifest.ts";
 
 // The Live Clock mode reads the parameters that clock.html read (knowledge/plans/unified-application.md, appendix rows
-// lettering, nerd/dev/expert, hours-speed/minutes-speed/seconds-speed). These tests pin the rules of src/clock.mjs.
+// lettering, hours-speed/minutes-speed/seconds-speed). The Nerd drawer opens through the shell host (nerd=1).
 
 const parse = (search, stored = {}) => parseClockParams(new URLSearchParams(search), stored);
 
@@ -22,7 +22,6 @@ test("the defaults are Hours 500 ms, Minutes 250 ms, Seconds 100 ms and the Pasc
   const p = parse("");
   assert.deepEqual(p.speeds, [500, 250, 100]);
   assert.equal(p.lettering, "words-pascal");
-  assert.equal(p.nerd, false);
 });
 
 test("a listed speed parameter selects that quarter-turn time per unit", () => {
@@ -46,12 +45,8 @@ test("lettering: the URL wins over the stored choice, the stored choice over the
   assert.equal(parse("?lettering=Hour").lettering, "symbols");
 });
 
-test("the Nerd panel opens for nerd, dev, expert, any speed parameter, or the stored choice", () => {
-  for (const q of ["?nerd", "?nerd=1", "?dev", "?expert=0", "?hours-speed=250", "?seconds-speed=bad", "?minutes-speed="])
-    assert.equal(parse(q).nerd, true, q);
-  assert.equal(parse("", { nerd: "true" }).nerd, true);
-  for (const stored of ["false", null, undefined, "1"]) assert.equal(parse("", { nerd: stored }).nerd, false);
-  assert.equal(parse("?lettering=words&kiosk=1").nerd, false);
+test("the parameters carry no Nerd rule: the shell host owns nerd=1", () => {
+  assert.deepEqual(Object.keys(parse("?nerd=1&dev&expert&hours-speed=250", { nerd: "true" })).sort(), ["lettering", "speeds"]);
 });
 
 test("the print link follows the sticker lettering", () => {
