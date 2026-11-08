@@ -23,7 +23,8 @@ the next month.
   whole cube), then `'` for a counter-clockwise quarter turn or `²` for a half turn.
   Each step also lists the raw generators (`g<generator>:<+1|-1|2>`, generators 1 to 21 as
   defined below) in a collapsible block, and the same word as block moves (see
-  [Block moves](#block-moves-wide-and-inner-wide), a display layer only).
+  [Block moves](#block-moves-wide-and-inner-wide) and
+  [the middle slice](#middle-slice-blocks-rule-c), a display layer only).
 - **The 3D view (stage 2).** The studio scene shows the cube with its 218 surface bodies
   and 294 stickers in the pose of the displayed month. A sticker shows the text and ink
   of the print (`state.v1.json`), so the stickers read as printed (the print uses the digits
@@ -31,11 +32,12 @@ the next month.
   so that three faces show; drag it, or use the Rotation selector and Reset view, to look
   around. The month sheet below stays the reference for what the front face must show.
 - **The animated step.** Choosing the previous or next month plays the stored move word
-  move by move on the cube: forward is the stored edge, backward is the inverse of the edge
+  block by block on the cube: forward is the stored edge, backward is the inverse of the edge
   before it. A block (one or several layers of one axis, or the whole cube for `rot`) turns by the exponent
   of its moves as one animation; the engine's right-handed quarter turn is the right-handed rotation of the
   scene. The controls are **Play/Pause** (pauses after the move in flight), **Skip to end**,
-  **Speed** (0.5× to 8×, default 2×; nominal 90 ms per move at 1×, so 8× is about one frame per move when the display keeps up, otherwise it can equal 4×) and **Reset view**. Previous or
+  **Speed** (0.5× to 8×, default 2×; nominal 90 ms per block at 1×, so 8× is about one frame per block when the display keeps up, otherwise it can equal 4×)
+  and the option **Middle slice counts as a move** (on by default, see below) and **Reset view**. Previous or
   Next during a step first brings the cube to the end of that step, then plays the new step.
   Under `prefers-reduced-motion: reduce` nothing animates: a step jumps to its end state and
   the page says so.
@@ -92,7 +94,7 @@ Code: `src/apps/calendar7/blocks.ts` (pure).
   quarter turn, `'` for a counter-clockwise one (exponent -1) and `²` for a half turn. Single-layer and rotation tokens
   are the same as in the move word; only ranges are new. The raw generators (`g<generator>:<+1|-1|2>`) and the
   move word in the notation of single layers stay visible next to the block word.
-- **Two counts.** *Layer moves* (HTM) is the existing count: every layer of every block counts once, a half turn once,
+- **Two counts** (a third one with the middle slice follows in the next section). *Layer moves* (HTM) is the existing count: every layer of every block counts once, a half turn once,
   rotations not at all. *Block moves* counts one per non-rotation block. For the same step block moves never exceed layer moves;
   whole-cube rotations are counted separately and stay free, as today.
 - **Animation.** The player plays one block as ONE tween: every layer of the block turns together by the same angle in
@@ -100,8 +102,42 @@ Code: `src/apps/calendar7/blocks.ts` (pure).
   `block k of n`. Skip, Pause, Previous/Next during a step, reduced motion (a step jumps to its end state) and the digest check
   at the end of every step are unchanged and work on blocks; `StateMismatchError` still stops the view.
 - **Not covered.** No change to the stored words, to the chain or to the metrics in the graph; no search for shorter
-  words (merging only regroups what the stored word already contains); no merging across a rotation or across the middle layer.
+  words (merging only regroups what the stored word already contains); no merging across a rotation or across the middle layer (the next section lifts both limits as an opt-in).
   How much a different word choice could save is measured separately in the research branch.
+
+## Middle-slice blocks (rule c)
+
+**Display only, like the blocks above.** `graph.v1.json`, generators 1 to 21, `calendar7-source.json`, the solver and the
+chain are not touched, and there is no new generator. Code: `groupBlocks(word, { slice: true })` in
+`src/apps/calendar7/blocks.ts` (the call without the option keeps the behavior of the previous section).
+The measurement behind it is `research/calendar-7x7/wide-blocks` (research pull request 346, rule c).
+
+- **Physical layers.** The cube has the layers -3 to +3 on every axis; layer 0 exists (28 stickers) but no generator turns it
+  alone. A block may be any interval of the layers -3..+3 that contains layer 0, for example `x0` (the middle slice), `x-3..0`
+  or `y-1..+2`. An interval of all seven layers is a whole-cube rotation and stays free.
+- **Why it is the same state.** The slab turn of an interval I by the exponent q equals the whole-cube rotation by q followed
+  by the opposite turns (-q) of the layers outside I (at most two intervals, neither contains layer 0). So
+  `expand` of a slice block is a word of generators 1 to 21 and the digest check after a step is unchanged.
+  The research verified this identity with equal digests for 773 words, and the tests here check it against an independent
+  slab-turn implementation for every interval, axis and exponent.
+- **Grouping (exact minimum).** In this mode a run is a maximal sequence of moves about one axis, rotations of that axis included
+  (they commute with its layers); a rotation about another axis ends it. The run is replaced by the fewest intervals (any exponent,
+  nested allowed) whose turns add up to the same net exponent per layer, where seven-layer intervals are free rotations. It is
+  the exact minimum (Dijkstra over the 4^7 states of one axis; a plain breadth-first search in the tests agrees on random
+  runs); ties go to the narrower blocks. Opposite turns of one layer cancel, so the multiset of the moves is **not** kept, only the state.
+- **Notation.** The same as for blocks, with layer 0 allowed in the range: `x0` the middle slice, `x-3..0` the layers -3 to 0,
+  `y-1..+2'` the layers -1 to +2 counter-clockwise, `z-2..0²` a half turn. Kind `slice` in the code. Rotations are `xrot` and so on, as before.
+- **Three counts.** The page shows, for each step: *layer moves* (HTM, the stored count, unchanged), *block moves without the middle
+  slice* (the blocks of the previous section) and *block moves with the middle slice* (rule c). In the third count turning the middle slice
+  counts as a move; whole-cube rotations stay free in all three. On the 91 root words of the research
+  the layer moves total 40642 and the block moves with the middle slice 30696; on the 576 stored edges 75433 and 52594.
+- **Playback.** The player plays rule-c blocks by default, one tween per block; a slice block is animated as a real slab turn of
+  its interval including layer 0 (the camera does not move). The option **Middle slice counts as a move** (in the animation
+  controls) switches back to the blocks without the middle slice for the next step; a step in progress keeps its blocks. The progress line
+  reads `block k of n` in both modes (n counts the rotation blocks too). A mismatch of the end-of-step SHA-256 still raises
+  `StateMismatchError` and stops the view.
+- **Not covered.** Nothing stored changes, no search in a larger alphabet, no camera rubber band, no rewriting across runs
+  of different axes. Words with different groupings reach the same state, so the same digest.
 
 ## What this is
 
@@ -153,6 +189,7 @@ of the chain.
 | [tests/calendar7-replay.test.mjs](../tests/calendar7-replay.test.mjs) | Full replay and negative controls, part of `npm test` |
 | [tests/calendar7-mode.test.mjs](../tests/calendar7-mode.test.mjs) | Registry entry, month choice, navigation bounds, move words and mount |
 | [tests/calendar7-blocks.test.mjs](../tests/calendar7-blocks.test.mjs) | Block moves: examples, property tests on random words (same state and digest, same multiset), identical digest for every stored edge in both directions, notation and counts on the page |
+| [tests/calendar7-slice.test.mjs](../tests/calendar7-slice.test.mjs) | Middle-slice blocks (rule c): examples, independent slab-turn and exact-minimum oracles, property tests on random words, identical digest for every stored edge both ways, counts of the research (91 roots from `tests/fixtures/calendar7-roots91.tsv`, 576 edges), negative controls, the player and the page |
 | [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
 | [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, diagonal split-label geometry and drawing |
 | [tests/calendar7-sheet-colors.test.mjs](../tests/calendar7-sheet-colors.test.mjs) | Month sheet palette: every ink on its cell at 4.5:1 in light and dark |

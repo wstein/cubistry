@@ -56,9 +56,11 @@ export class StateMismatchError extends Error {
 
 /** Duration of one block (one animation) at 1x. A wide block turns as long as a single layer: it is one move. */
 export const BASE_MOVE_MS = 90;
-/** Nominal speeds: 90 ms per move at 1x; a frame is about 17 ms, so 8x is one frame per move when the display keeps up. */
+/** Nominal speeds: 90 ms per block at 1x; a frame is about 17 ms, so 8x is one frame per block when the display keeps up. */
 export const SPEEDS = [0.5, 1, 2, 4, 8] as const;
 export const DEFAULT_SPEED = 2;
+/** The page plays rule-c blocks (the middle slice counts as a move) unless the viewer turns it off; see `blocks.ts`. */
+export const DEFAULT_SLICE = true;
 
 export interface PlayerOptions {
   readonly graph: Graph;
@@ -70,6 +72,8 @@ export interface PlayerOptions {
   readonly onChange?: (snapshot: PlayerSnapshot) => void;
   /** Called when a step fails the digest check or the view throws while playing. */
   readonly onError?: (error: Error) => void;
+  /** Group the steps with rule c (blocks may contain the middle layer). Default false: the blocks of one side. */
+  readonly slice?: boolean;
 }
 
 interface Plan {
@@ -96,6 +100,7 @@ export class Calendar7Player {
   /** Generation of the loop that is playing, or -1. */
   private loopFor = -1;
   private disposed = false;
+  private slice: boolean;
   /** Bumped whenever the running loop must stop; a loop that wakes with an older value leaves. */
   private generation = 0;
 
@@ -108,6 +113,16 @@ export class Calendar7Player {
     this.onChange = options.onChange;
     this.onError = options.onError;
     this.pose = clonePose(options.root);
+    this.slice = options.slice ?? false;
+  }
+
+  /** True when steps are grouped with rule c. */
+  get middleSlice(): boolean {
+    return this.slice;
+  }
+  /** Chooses the grouping of the NEXT step; a step in progress keeps its blocks. */
+  setSlice(on: boolean): void {
+    this.slice = on;
   }
 
   get snapshot(): PlayerSnapshot {
@@ -190,7 +205,7 @@ export class Calendar7Player {
       this.jump(target);
       return;
     }
-    const blocks = groupBlocks(this.stepMoves(this.index, target));
+    const blocks = groupBlocks(this.stepMoves(this.index, target), { slice: this.slice });
     this.plan = { from: this.index, target, blocks, done: 0 };
     this.status = "playing";
     this.notify();

@@ -76,9 +76,9 @@ function playMove(before, block) {
   return { done, ok: sameMaps(atEnd, reference) && sameMaps(afterTurn, reference), after };
 }
 /** Plays the blocks of a word, each as ONE animation; the result must equal the plain engine replay of the word. */
-function walk(from, moves) {
+function walk(from, moves, options) {
   let pose = clonePose(from);
-  for (const block of groupBlocks(moves)) {
+  for (const block of groupBlocks(moves, options)) {
     cube.sync(frames(pose));
     const r = playMove(pose, block);
     assert.ok(r.ok, `world pose differs from the engine after block ${JSON.stringify(block)}`);
@@ -124,4 +124,53 @@ test("a skipped (cancelled) turn leaves the bodies at the given pose", () => {
   cube.sync(frames(target));
   assert.ok(sameMaps(shown, snapshot()));
   assert.equal(viewer.tween.running, false);
+});
+
+test("middle-slice blocks (rule c) animate as one slab turn of the interval including layer 0 and end on the engine pose", () => {
+  // Every interval of the layers -3..3 that contains layer 0 (not the whole cube), every axis, every exponent, from a mixed pose.
+  const start = nodePose(40);
+  let n = 0;
+  for (let axis = 0; axis < 3; axis++)
+    for (let lo = -3; lo <= 0; lo++)
+      for (let hi = 0; hi <= 3; hi++) {
+        if (lo === -3 && hi === 3) continue;
+        for (const angle of [1, -1, 2]) {
+          cube.sync(frames(start));
+          const block = { axis, lo, hi, angle, kind: "slice" };
+          const r = playMove(start, block);
+          assert.ok(r.ok, `slab turn of ${JSON.stringify(block)} differs from the engine`);
+          n++;
+        }
+      }
+  assert.equal(n, 3 * 15 * 3);
+  // Stored edges grouped with the middle slice, forward and backward: every block (slice, wide, single, rotation) matches.
+  stats.slice = 0;
+  for (const e of [0, 300, LAST - 1]) {
+    const from = nodePose(e);
+    const end = walk(from, graph.edges[e].moves, { slice: true });
+    walk(end, inverseMoves(graph.edges[e].moves), { slice: true });
+  }
+  assert.ok(stats.slice > 0, "the sample includes slice blocks");
+});
+
+test("negative control: a slab that leaves out layer 0 does not end on the pose of the slice block", () => {
+  const start = nodePose(40);
+  for (const block of [
+    { axis: 0, lo: 0, hi: 0, angle: 1, kind: "slice" },
+    { axis: 1, lo: -2, hi: 0, angle: -1, kind: "slice" },
+    { axis: 2, lo: -1, hi: 2, angle: 2, kind: "slice" },
+  ]) {
+    cube.sync(frames(start));
+    atEnd = null;
+    void viewer.turn(block, start, 10);
+    viewer.tween.tick(later(0));
+    viewer.tween.tick(later(1000));
+    // The reference pose of the slice block, and of the same interval without layer 0 (the middle slice left out).
+    cube.sync(frames(applyMoves(start, expand([block]))));
+    const full = snapshot();
+    assert.ok(sameMaps(atEnd, full));
+    const narrowed = block.lo === block.hi ? null : { ...block, lo: block.lo < 0 ? block.lo : 1, hi: block.hi > 0 ? block.hi : -1, kind: "single" };
+    cube.sync(frames(narrowed ? applyMoves(start, expand([narrowed])) : start));
+    assert.ok(!sameMaps(atEnd, snapshot()), `${JSON.stringify(block)} is not the slab without layer 0`);
+  }
 });
