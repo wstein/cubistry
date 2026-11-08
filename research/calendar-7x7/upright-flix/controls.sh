@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Driver only: the decision is made by the checker. Runs one checker on the valid
-# strict print and moves and on six negative controls (the same controls as
-# ../upright-moves/negative_controls.sh). The valid input must be ACCEPTED (exit 0 and
-# ACCEPT_ALL_91), every control must be REJECTED (exit non-zero and the stated reason).
-# Usage: controls.sh OUT_TSV CHECKER...    CHECKER... is a command prefix; PRINT and MOVES_TSV
-# are appended. Exit code 1 if any line is not as expected.
+# strict print and moves, on six negative controls (the same controls as
+# ../upright-moves/negative_controls.sh) and on two alias controls (the strict print with
+# the letter O printed as the digit 0, and with the letter I printed as the digit 1).
+# The valid input must be ACCEPTED (exit 0 and ACCEPT_ALL_91); every control must be
+# REJECTED (exit non-zero and the stated reason), except that the two alias controls are
+# ACCEPTED when CONTROLS_RULE=legacy (the legacy rule folds O to 0 and I to 1) and
+# REJECTED otherwise (default CONTROLS_RULE=strict). The alias controls are what tells
+# the two rules apart; the old-print control only tests sticker positions.
+# Usage: [CONTROLS_RULE=strict|legacy] controls.sh OUT_TSV CHECKER...
+# CHECKER... is a command prefix; PRINT and MOVES_TSV are appended.
+# Exit code 1 if any line is not as expected.
 set -u
 out=${1:?OUT_TSV required}; shift
 here=$(cd -- "$(dirname -- "$0")" && pwd)
@@ -27,7 +33,8 @@ check() {
     printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$expect" "$code" "$r" "$verdict" >> "$out"
 }
 check valid ACCEPT "$print" "$moves" "$@"
-# 1. the pure-split A print (old rule, digit 0 / digit 1 aliases): the same words must fail.
+# 1. the pure-split A print: a POSITIONS control only (different sticker layout, so every rule
+#    rejects it); it does not discriminate between the strict and the legacy rule.
 check old-print REJECT "$old" "$moves" "$@"
 # 2. one move dropped from the word of display 1.
 awk -F'\t' 'BEGIN{OFS="\t"} NR==2{n=split($6,w,","); s=w[2]; for(i=3;i<=n;i++) s=s","w[i]; $6=s} {print}' "$moves" > "$tmp/drop.tsv"
@@ -44,5 +51,12 @@ check wrong-htm REJECT "$print" "$tmp/htm.tsv" "$@"
 # 6. display 3 listed twice (91 rows, 90 distinct boards).
 awk -F'\t' 'BEGIN{OFS="\t"} NR==3{$1=3;$2=2026;$3=3} {print}' "$moves" > "$tmp/dup.tsv"
 check duplicate-display 'duplicates' "$print" "$tmp/dup.tsv" "$@"
+# 7. alias controls: O printed as 0, I printed as 1 (text column only). The legacy rule
+#    treats these as the same glyph, the strict rule does not.
+alias_expect=REJECT; [ "${CONTROLS_RULE:-strict}" = legacy ] && alias_expect=ACCEPT
+awk -F'\t' 'BEGIN{OFS="\t"} NR>1{gsub(/O/,"0",$6)} {print}' "$print" > "$tmp/alias-o.tsv"
+check alias-O-to-0 "$alias_expect" "$tmp/alias-o.tsv" "$moves" "$@"
+awk -F'\t' 'BEGIN{OFS="\t"} NR>1{gsub(/I/,"1",$6)} {print}' "$print" > "$tmp/alias-i.tsv"
+check alias-I-to-1 "$alias_expect" "$tmp/alias-i.tsv" "$moves" "$@"
 rm -rf "$tmp"; cat "$out"
 if [ "$bad" = 0 ]; then printf "controls-verdict\tALL_AS_EXPECTED\n"; else printf "controls-verdict\t%s_UNEXPECTED\n" "$bad"; exit 1; fi
