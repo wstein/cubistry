@@ -274,6 +274,29 @@ export function createShellHost(regions: ShellRegions, doc: Doc): ShellHost {
   }
 
   // ----- nerd drawer
+  /** Child-index path from the drawer to the focused element inside it, or null when focus is elsewhere. */
+  function focusPath(): number[] | null {
+    const active = regions.nerd.ownerDocument?.activeElement;
+    if (!active || active === regions.nerd || !regions.nerd.contains(active)) return null;
+    const path: number[] = [];
+    for (let node: Element | null = active; node && node !== regions.nerd; node = node.parentElement) {
+      const parent: Element | null = node.parentElement;
+      if (!parent) return null;
+      path.unshift(Array.prototype.indexOf.call(parent.children, node));
+    }
+    return path;
+  }
+  /** Re-renders the open drawer and gives focus and scroll position back; a redraw must not cost the viewer their place. */
+  function redrawNerd(): void {
+    const path = focusPath();
+    const tag = (regions.nerd.ownerDocument?.activeElement as Element | null | undefined)?.tagName;
+    const top = regions.nerd.scrollTop;
+    drawNerd();
+    let target: Element | null = regions.nerd;
+    for (const i of path ?? []) target = target?.children[i] ?? null;
+    if (path && target && target !== regions.nerd && target.tagName === tag) (target as HTMLElement).focus({ preventScroll: true });
+    regions.nerd.scrollTop = top;
+  }
   function drawNerd(): void {
     runCleanup(nerdCleanup);
     nerdCleanup = null;
@@ -417,7 +440,7 @@ export function createShellHost(regions: ShellRegions, doc: Doc): ShellHost {
         drawNerd();
       }),
       refreshNerd: w(() => {
-        if (nerdSpec && nerdOpen) drawNerd();
+        if (nerdSpec && nerdOpen) redrawNerd();
       }),
       clearNerd: w(() => {
         nerdSpec = null;

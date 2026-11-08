@@ -397,3 +397,43 @@ test("the inert shell accepts every call and does nothing, so a mode runs withou
   shell.setNerd({ title: "A", render: () => {} });
   shell.dispose();
 });
+
+test("refreshNerd keeps the focused control and the scroll position of the open drawer", () => {
+  const { doc, regions, shell } = setup();
+  let rows = 3;
+  shell.setNerd({
+    title: "Timing",
+    render: (body) => {
+      const list = doc.createElement("div");
+      list.append(doc.createElement("button"), doc.createElement("button"));
+      body.append(list, ...Array.from({ length: rows }, () => doc.createElement("p")));
+    },
+  });
+  regions.nerdToggle.click();
+  const second = regions.nerd.children[1].children[0].children[1];
+  second.focus();
+  regions.nerd.scrollTop = 120;
+  rows = 4;
+  shell.refreshNerd();
+  const again = regions.nerd.children[1].children[0].children[1];
+  assert.notEqual(again, second, "the content is rendered anew");
+  assert.equal(doc.activeElement, again, "focus returns to the same control");
+  assert.equal(regions.nerd.scrollTop, 120);
+});
+
+test("refreshNerd leaves focus outside the drawer alone and does not steal it", () => {
+  const { doc, regions, shell } = setup();
+  shell.setNerd({ title: "T", render: (body) => body.append(doc.createElement("button")) });
+  regions.nerdToggle.click();
+  regions.nerdToggle.focus();
+  shell.refreshNerd();
+  assert.equal(doc.activeElement, regions.nerdToggle);
+});
+
+test("opening the drawer does not move focus into it", () => {
+  const { doc, regions, shell } = setup();
+  shell.setNerd({ title: "T", render: (body) => body.append(doc.createElement("button")) });
+  regions.nerdToggle.focus();
+  regions.nerdToggle.click();
+  assert.equal(doc.activeElement, regions.nerdToggle);
+});
