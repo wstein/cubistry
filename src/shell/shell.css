@@ -485,6 +485,11 @@ body.chronocube-page:has(#shell) {
   color: var(--ink-2);
   font-weight: 500;
 }
+/* The Clock has six columns: its long headings must wrap inside a phone-width Nerd drawer. */
+.shell .clock-move-table th {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .shell .shell-nerd-facts {
   display: flex;
   flex-wrap: wrap;
