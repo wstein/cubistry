@@ -219,7 +219,7 @@ const stepHtml = (step: Step | null, label: string, end: string): string => {
   const sliced = groupBlocks(step.moves, { slice: true });
   const sliceWord = tokensHtml(sliced.map(blockToken));
   const sliceMoves = blockCounts(sliced).blockMoves;
-  const rotations = `${step.rot} whole-cube rotation${step.rot === 1 ? "" : "s"}`;
+  const rotations = `${step.rot} stored rotation${step.rot === 1 ? "" : "s"}`;
   return (
     `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3>` +
     `<p><a class="c7-nav" data-nav="${label.toLowerCase()}" href="${esc(href(step.to))}">${esc(monthLabel(step.to))}</a>: ` +
