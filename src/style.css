@@ -1388,42 +1388,6 @@ body.presentation-mode .presentation-exit-btn:hover {
   transform: scale(1.02);
 }
 
-/* The bottom dock is as wide as its content, capped at min(94vw, 920px)
-   (or 100vw - 16px below 600 px). Its rows used to be nowrap, so on a
-   narrow viewport or with larger text the content spilled past both
-   edges. Let the rows wrap. This block sits before the 600 px block so
-   that block still wins below 600 px. */
-.cube-footer.floating-dock,
-.floating-dock,
-.floating-dock .counter-stats,
-.floating-dock .stats-summary,
-.floating-dock .move-summary {
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-@media (max-width: 760px) {
-  /* A long status message wraps instead of widening the dock. */
-  .floating-dock #status {
-    white-space: normal;
-    min-width: 0;
-    overflow-wrap: anywhere;
-    text-align: center;
-  }
-
-  .cube-footer.floating-dock,
-  .floating-dock {
-    gap: 6px 12px;
-    border-radius: 20px;
-  }
-
-  .floating-dock .counter-stats,
-  .floating-dock .stats-summary,
-  .floating-dock .move-summary {
-    gap: 4px 12px;
-  }
-}
-
 /* Responsive Layout & Compact Rules */
 @media (max-width: 1180px) {
   /* Island presentation button shows icon ⛶ only */
@@ -1442,6 +1406,46 @@ body.presentation-mode .presentation-exit-btn:hover {
     bottom: 50px;
     padding: 5px 14px;
     gap: 12px;
+  }
+}
+
+/* The bottom dock is as wide as its content, capped at min(94vw, 920px)
+   (or 100vw - 16px below 600 px). Its rows used to be nowrap, so on a
+   narrow viewport or with larger text the content spilled past both
+   edges. Let the rows wrap. It sits before the 600 px block so
+   that block still wins below 600 px. It follows the 1180 px block so its
+   760 px gap wins at 601-760 px. */
+.cube-footer.floating-dock,
+.floating-dock,
+.floating-dock .counter-stats,
+.floating-dock .stats-summary,
+.floating-dock .move-summary {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* A long status message wraps instead of widening the dock. */
+.floating-dock #status {
+  white-space: normal;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .floating-dock #status {
+    text-align: center;
+  }
+
+  .cube-footer.floating-dock,
+  .floating-dock {
+    gap: 6px 12px;
+    border-radius: 20px;
+  }
+
+  .floating-dock .counter-stats,
+  .floating-dock .stats-summary,
+  .floating-dock .move-summary {
+    gap: 4px 12px;
   }
 }
 
