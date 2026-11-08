@@ -220,7 +220,7 @@ export class Calendar7Viewer implements StageView {
     this.onLayer.fill(0);
     for (let i = 0; i < STICKERS; i++) {
       const at = before.pos[3 * i + axis];
-      // A block is a contiguous range of layers on one side of the middle layer, so a range test selects exactly its layers.
+      // A block is a contiguous range of layers (a middle-slice block includes layer 0), so a range test selects exactly its layers.
       if (!whole && (at < lo || at > hi)) continue;
       const piece = (this.printing as Printing).piece[i];
       if (!this.onLayer[piece]) {
@@ -229,6 +229,7 @@ export class Calendar7Viewer implements StageView {
       }
     }
     const turn = this.cube.beginTurn(pieces, axis, (q * Math.PI) / 2);
+    // A middle-slice block expands to the rotation plus the inverse outer turns: the state of the slab turn animated above.
     const after = applyMoves(before, expand([block]));
     this.dirty = true;
     return this.tween.begin(

@@ -510,7 +510,7 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   await flush();
   assert.equal(root.el("play").textContent, "Pause");
   assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", false);
-  assert.match(root.el("progress").textContent, /^Turning to February 2028: block 0 of 103$/);
+  assert.match(root.el("progress").textContent, /^Turning to February 2028: block 0 of 104$/);
   root.press("play"); // pause
   assert.equal(root.el("play").textContent, "Play");
   root.choose("speed", "8");
@@ -528,6 +528,36 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   assert.match(root.el("progress").textContent, /Turning to February 2028/);
   root.press("reset");
   assert.equal(stage.resets, 1);
+  inst.dispose();
+});
+
+test("mount: the middle slice option plays rule-c blocks by default; switching it off plays the plain blocks of the next step", async () => {
+  const root = fakeRoot();
+  const stage = fakeStage({ manual: true });
+  const { env } = mountEnv({ stage });
+  const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+  await idle(root);
+  assert.match(root.html, /data-c7="slice" checked/, "the option is offered and on");
+  const [first, second] = [graph.edges[0].moves, graph.edges[1].moves];
+  root.clickLink(href({ year: 2028, month: 2 }));
+  await flush();
+  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${groupBlocks(first, { slice: true }).length}$`));
+  root.press("skip");
+  assert.equal(root.getAttribute("data-c7-state"), "idle");
+  root.el("slice").checked = false;
+  root.choose("slice", "");
+  root.clickLink(href({ year: 2028, month: 3 }));
+  await flush();
+  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${groupBlocks(second).length}$`), "plain blocks of the next step");
+  root.press("skip");
+  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[2].hash);
+  root.el("slice").checked = true;
+  root.choose("slice", "");
+  root.clickLink(href({ year: 2028, month: 2 }));
+  await flush();
+  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${groupBlocks(inverseMoves(second), { slice: true }).length}$`));
+  root.press("skip");
+  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[1].hash);
   inst.dispose();
 });
 
