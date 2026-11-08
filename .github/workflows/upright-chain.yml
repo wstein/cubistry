@@ -64,8 +64,8 @@ concurrency:
 env:
   WORKFLOW_PATH: .github/workflows/upright-chain.yml
   # A prior run is only continued when it was dispatched by hand from this branch.
-  REQUIRED_PRIOR_EVENT: push
-  REQUIRED_PRIOR_BRANCH: ci/upright-chain-test2
+  REQUIRED_PRIOR_EVENT: workflow_dispatch
+  REQUIRED_PRIOR_BRANCH: main
   CAL: research/calendar-7x7
 
 jobs:
