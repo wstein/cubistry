@@ -2,21 +2,18 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Orbit inventory of the pure split A under two front rules, and the supply of the
 # current print against each. Necessary conditions only (no cubie matching, no search).
-#   upright_inventory.jl PRINT RULE      RULE = relaxed (today) | strict (owner)
-# strict: only 0 (any turn) and the single digits 6<->9 read the same after a half
-# turn; 1, 2, 5, 8, H, N, S, X, Z and every multi-character label must be upright.
+#   upright_inventory.jl PRINT RULE      RULE = relaxed (today) | strict-alias (v1) | strict-halfO (sensitivity) | strict (owner, no O=0 or I=1 aliasing)
+# strict: only the digit 0 and the single digits 6<->9 read the same after a half
+# turn; every other glyph, letters O and I included, and every multi-character label must be upright.
 include(joinpath(@__DIR__,"..","pure-split-states","pure_common.jl"))
+include(joinpath(@__DIR__,"strict_rule.jl"))
 function set_rule(rule)
-    empty!(HALF)
-    if rule=="strict"
-        merge!(HALF,Dict('0'=>'0','6'=>'9','9'=>'6'))
-    else
-        merge!(HALF,Dict('0'=>'0','1'=>'1','2'=>'2','5'=>'5','6'=>'9','9'=>'6','8'=>'8',
-            'H'=>'H','N'=>'N','S'=>'S','X'=>'X','Z'=>'Z'))
-    end
+    rule=="strict" && return apply_strict_rule!(Main)                 # owner rule, no aliasing
+    rule=="strict-halfO" && return apply_strict_rule!(Main;half_o=true) # sensitivity: letter O half-turn equal (measured 0.011)
+    rule=="strict-alias" && return apply_strict_rule!(Main;alias=true) # earlier v1 reading (O=0, I=1)
+    @assert rule=="relaxed"  # today (research code unchanged)
 end
 function main(print_path,rule)
-    set_rule(rule)
     source=read_physical(print_path);goals=stacked_goals(PURE_VARIANT)
     req=pure_requirement(goals);have=Dict{Tuple{Int,Int},Dict{NTuple{3,String},Int}}()
     for s in source
@@ -39,4 +36,5 @@ function main(print_path,rule)
     println("inventory-summary\t",rule,"\trequired_total=",tot_need,"\tprint_missing_total=",tot_short,"\torbits_over_capacity=",tot_slack_neg)
     # spare printable positions: capacity - required - blank peak, summed over orbits
 end
+set_rule(ARGS[2])   # top level on purpose (world age of the redefinitions)
 main(ARGS...)

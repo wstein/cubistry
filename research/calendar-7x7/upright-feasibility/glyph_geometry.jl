@@ -11,78 +11,7 @@
 #      plain dates drawn by src/apps/calendar7/sticker-art.ts.
 #   glyph_geometry.jl NotoSans-SemiBold.ttf
 using Printf
-function parse_font(path)
-    b=read(path)
-    u16(o)=Int(b[o+1])<<8|Int(b[o+2]);i16(o)=(v=u16(o);v>=32768 ? v-65536 : v)
-    u32(o)=Int(u16(o))<<16|u16(o+2)
-    n=u16(4);tab=Dict{String,Tuple{Int,Int}}()
-    for i in 0:n-1;o=12+16i;tab[String(b[o+1:o+4])]=(u32(o+8),u32(o+12));end
-    head=tab["head"][1];upem=u16(head+18);locfmt=i16(head+50)
-    nh=u16(tab["hhea"][1]+34);numg=u16(tab["maxp"][1]+4)
-    adv(g)=u16(tab["hmtx"][1]+4*min(g,nh-1))
-    # cmap format 4
-    cm=tab["cmap"][1];ns=u16(cm+2);sub=0
-    for i in 0:ns-1;o=cm+4+8i;pid=u16(o);eid=u16(o+2);off=u32(o+4);(pid==3&&eid==1)&&(sub=cm+off);end
-    segx2=u16(sub+6);segs=segx2÷2
-    endc(i)=u16(sub+14+2i);startc(i)=u16(sub+16+segx2+2i);delta(i)=i16(sub+16+2segx2+2i)
-    roff(i)=u16(sub+16+3segx2+2i)
-    function gid(ch)
-        c=Int(ch)
-        for i in 0:segs-1
-            c<=endc(i) || continue
-            c>=startc(i) || return 0
-            if roff(i)==0;return (c+delta(i))&0xffff;end
-            o=sub+16+3segx2+2i+roff(i)+2(c-startc(i));g=u16(o);return g==0 ? 0 : (g+delta(i))&0xffff
-        end
-        0
-    end
-    glyf=tab["glyf"][1];loca=tab["loca"][1]
-    locof(g)=locfmt==0 ? 2u16(loca+2g) : u32(loca+4g)
-    function outline(g)
-        o=glyf+locof(g);locof(g+1)==locof(g) && return Vector{Vector{Tuple{Float64,Float64}}}()
-        nc=i16(o);@assert nc>=0 "composite glyph unsupported"
-        ends=[u16(o+10+2i) for i in 0:nc-1];np=ends[end]+1
-        il=u16(o+10+2nc);p=o+12+2nc+il
-        flags=UInt8[];while length(flags)<np
-            f=b[p+1];p+=1;push!(flags,f)
-            if f&8!=0;r=b[p+1];p+=1;for _ in 1:r;push!(flags,f);end;end
-        end
-        xs=zeros(Int,np);ys=zeros(Int,np);v=0
-        for i in 1:np;f=flags[i]
-            if f&2!=0;d=Int(b[p+1]);p+=1;v+=(f&16!=0 ? d : -d)
-            elseif f&16==0;v+=i16(p);p+=2;end
-            xs[i]=v;end
-        v=0
-        for i in 1:np;f=flags[i]
-            if f&4!=0;d=Int(b[p+1]);p+=1;v+=(f&32!=0 ? d : -d)
-            elseif f&32==0;v+=i16(p);p+=2;end
-            ys[i]=v;end
-        cs=Vector{Vector{Tuple{Float64,Float64}}}();s=1
-        for e in ends
-            pts=[(Float64(xs[i]),Float64(ys[i]),flags[i]&1!=0) for i in s:e+1];s=e+2
-            # expand implied on-curve points, flatten quadratics
-            ex=Tuple{Float64,Float64,Bool}[]
-            for (i,q) in enumerate(pts)
-                push!(ex,q);nx=pts[mod1(i+1,length(pts))]
-                (!q[3] && !nx[3]) && push!(ex,((q[1]+nx[1])/2,(q[2]+nx[2])/2,true))
-            end
-            k=findfirst(q->q[3],ex);ex=vcat(ex[k:end],ex[1:k-1]);push!(ex,ex[1])
-            poly=Tuple{Float64,Float64}[];i=1
-            while i<length(ex)
-                a=ex[i]
-                if ex[i+1][3];push!(poly,(a[1],a[2]));i+=1
-                else c=ex[i+1];d=ex[i+2]
-                    for t in 0:0.125:0.875;m=1-t
-                        push!(poly,(m*m*a[1]+2m*t*c[1]+t*t*d[1],m*m*a[2]+2m*t*c[2]+t*t*d[2]));end
-                    i+=2
-                end
-            end
-            push!(cs,poly)
-        end
-        cs
-    end
-    (;upem,gid,adv,outline)
-end
+include(joinpath(@__DIR__,"noto_font.jl"))
 # Nonzero-winding raster of a set of contours (font units) into an N x N boolean grid
 # covering [x0,x0+w] x [y0,y0+w] (y up).
 function raster(cs,x0,y0,w,N)
@@ -109,21 +38,27 @@ function main(path)
              minimum(p[2] for c in cs for p in c),maximum(p[2] for c in cs for p in c))
     println("glyph-header\tchar\tadvance_em\tink_w_em\tink_h_em\tink_ymin_em")
     M=Dict{Char,Any}()
-    for ch in "0123456789/"
+    for ch in "0123456789/OI"
         g=F.gid(ch);cs=F.outline(g);bx=box(cs);M[ch]=(g=g,adv=F.adv(g)/U,cs=cs,bx=bx)
         @printf("glyph\t%c\t%.4f\t%.4f\t%.4f\t%.4f\n",ch,F.adv(g)/U,(bx[2]-bx[1])/U,(bx[4]-bx[3])/U,bx[3]/U)
     end
     # half-turn residual: rotate glyph 6 by 180 deg about its ink box centre, compare
     # to glyph 9 aligned by ink-box centre; report symmetric difference / union (IoU gap).
     N=240
-    function turned_gap(a,b)
+    function turned_gap(a,b;turn=true)
         ca=M[a].cs;cb=M[b].cs;ba=M[a].bx;bb=M[b].bx
         cxa=(ba[1]+ba[2])/2;cya=(ba[3]+ba[4])/2;cxb=(bb[1]+bb[2])/2;cyb=(bb[3]+bb[4])/2
-        rot=[[(2cxa-p[1],2cya-p[2]) for p in c] for c in ca]   # half turn about own centre
+        rot=turn ? [[(2cxa-p[1],2cya-p[2]) for p in c] for c in ca] : ca   # half turn about own centre
         sh=[[(p[1]-cxa+cxb,p[2]-cya+cyb) for p in c] for c in rot]
         x0=cxb-U*0.6;y0=cyb-U*0.6;w=1.2U
         A=raster(sh,x0,y0,w,N);B=raster(cb,x0,y0,w,N)
         sum(A.⊻B)/sum(A.|B)
+    end
+    for (a,b) in (('O','O'),('I','I'))
+        @printf("halfturn\t%c vs %c\tsymmetric_difference/union=%.4f\n",a,b,turned_gap(a,b))
+    end
+    for (a,b) in (('0','O'),('1','I'))   # shape difference, no turn: are they the same glyph?
+        @printf("sameglyph\t%c vs %c (no turn)\tsymmetric_difference/union=%.4f\n",a,b,turned_gap(a,b;turn=false))
     end
     for (a,b) in (('6','9'),('2','2'),('5','5'),('8','8'),('1','1'),('0','0'))
         @printf("halfturn\t%c vs %c\tsymmetric_difference/union=%.4f\n",a,b,turned_gap(a,b))

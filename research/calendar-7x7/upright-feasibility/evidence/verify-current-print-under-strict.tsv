@@ -1,108 +1,108 @@
 pure-print-orbit	-3	-3	19	3	19	5	1
-pure-print-orbit	-3	-2	15	2	15	9	2
-pure-print-orbit	-3	-1	21	2	21	3	4
+pure-print-orbit	-3	-2	15	2	15	9	3
+pure-print-orbit	-3	-1	21	2	21	3	5
 pure-print-orbit	-3	0	22	2	21	3	3
 pure-print-orbit	-3	1	20	2	20	4	2
 pure-print-orbit	-3	2	20	1	20	4	1
-pure-print-orbit	-2	-2	16	0	16	8	4
+pure-print-orbit	-2	-2	16	0	16	8	6
 pure-print-orbit	-2	-1	21	1	21	3	7
 pure-print-orbit	-2	0	21	0	20	4	6
 pure-print-orbit	-2	1	17	1	17	7	4
 pure-print-orbit	-1	-1	22	2	22	2	3
 pure-print-orbit	-1	0	23	1	22	2	4
 pure-print-orbit	0	0	6	0	6	0	1
-strict-supply-missing	42
-strict-unmatched	1	2026	1	8
-strict-unmatched	2	2026	2	4
-strict-unmatched	3	2026	3	4
-strict-unmatched	4	2026	4	6
-strict-unmatched	5	2026	5	7
-strict-unmatched	6	2026	6	6
-strict-unmatched	7	2026	7	6
-strict-unmatched	8	2026	8	6
-strict-unmatched	9	2026	9	6
-strict-unmatched	10	2026	10	7
-strict-unmatched	11	2026	11	4
-strict-unmatched	12	2026	12	6
-strict-unmatched	13	2027	1	8
-strict-unmatched	14	2027	2	5
-strict-unmatched	15	2027	3	5
-strict-unmatched	16	2027	4	7
-strict-unmatched	17	2027	5	6
-strict-unmatched	18	2027	6	7
-strict-unmatched	19	2027	7	7
-strict-unmatched	20	2027	8	4
-strict-unmatched	21	2027	9	6
-strict-unmatched	22	2027	10	7
-strict-unmatched	23	2027	11	5
-strict-unmatched	24	2027	12	6
-strict-unmatched	25	2028	1	7
-strict-unmatched	26	2028	2	6
-strict-unmatched	27	2028	3	6
-strict-unmatched	28	2028	4	6
-strict-unmatched	29	2028	5	5
-strict-unmatched	30	2028	6	8
-strict-unmatched	31	2028	7	6
-strict-unmatched	32	2028	8	6
-strict-unmatched	33	2028	9	7
-strict-unmatched	34	2028	10	4
-strict-unmatched	35	2028	11	6
-strict-unmatched	36	2028	12	7
-strict-unmatched	37	2029	1	6
-strict-unmatched	38	2029	2	7
-strict-unmatched	39	2029	3	7
-strict-unmatched	40	2029	4	4
-strict-unmatched	41	2029	5	6
-strict-unmatched	42	2029	6	8
-strict-unmatched	43	2029	7	4
-strict-unmatched	44	2029	8	6
-strict-unmatched	45	2029	9	6
-strict-unmatched	46	2029	10	5
-strict-unmatched	47	2029	11	7
-strict-unmatched	48	2029	12	6
-strict-unmatched	49	2030	1	7
-strict-unmatched	50	2030	2	7
-strict-unmatched	51	2030	3	7
-strict-unmatched	52	2030	4	5
-strict-unmatched	53	2030	5	6
-strict-unmatched	54	2030	6	7
-strict-unmatched	55	2030	7	5
-strict-unmatched	56	2030	8	7
-strict-unmatched	57	2030	9	4
-strict-unmatched	58	2030	10	6
-strict-unmatched	59	2030	11	7
-strict-unmatched	60	2030	12	4
-strict-unmatched	61	2031	1	7
-strict-unmatched	62	2031	2	6
-strict-unmatched	63	2031	3	6
-strict-unmatched	64	2031	4	6
-strict-unmatched	65	2031	5	7
-strict-unmatched	66	2031	6	5
-strict-unmatched	67	2031	7	6
-strict-unmatched	68	2031	8	7
-strict-unmatched	69	2031	9	5
-strict-unmatched	70	2031	10	6
-strict-unmatched	71	2031	11	6
-strict-unmatched	72	2031	12	5
-strict-unmatched	73	2032	2	4
-strict-unmatched	74	2033	2	6
-strict-unmatched	75	2033	3	6
-strict-unmatched	76	2033	4	7
-strict-unmatched	77	2033	5	4
-strict-unmatched	78	2033	6	7
-strict-unmatched	79	2033	7	7
-strict-unmatched	80	2033	8	5
-strict-unmatched	81	2033	9	7
-strict-unmatched	82	2033	10	6
-strict-unmatched	83	2033	11	6
-strict-unmatched	84	2033	12	7
-strict-unmatched	85	2034	1	5
-strict-unmatched	86	2034	2	6
-strict-unmatched	87	2036	2	7
-strict-unmatched	88	2040	2	6
-strict-unmatched	89	2044	2	5
-strict-unmatched	90	2048	2	6
-strict-unmatched	91	2052	2	7
+strict-supply-missing	46
+strict-unmatched	1	2026	1	10
+strict-unmatched	2	2026	2	6
+strict-unmatched	3	2026	3	6
+strict-unmatched	4	2026	4	8
+strict-unmatched	5	2026	5	9
+strict-unmatched	6	2026	6	8
+strict-unmatched	7	2026	7	8
+strict-unmatched	8	2026	8	8
+strict-unmatched	9	2026	9	8
+strict-unmatched	10	2026	10	10
+strict-unmatched	11	2026	11	7
+strict-unmatched	12	2026	12	8
+strict-unmatched	13	2027	1	10
+strict-unmatched	14	2027	2	7
+strict-unmatched	15	2027	3	7
+strict-unmatched	16	2027	4	9
+strict-unmatched	17	2027	5	8
+strict-unmatched	18	2027	6	9
+strict-unmatched	19	2027	7	9
+strict-unmatched	20	2027	8	6
+strict-unmatched	21	2027	9	8
+strict-unmatched	22	2027	10	10
+strict-unmatched	23	2027	11	8
+strict-unmatched	24	2027	12	8
+strict-unmatched	25	2028	1	9
+strict-unmatched	26	2028	2	8
+strict-unmatched	27	2028	3	8
+strict-unmatched	28	2028	4	8
+strict-unmatched	29	2028	5	7
+strict-unmatched	30	2028	6	10
+strict-unmatched	31	2028	7	8
+strict-unmatched	32	2028	8	8
+strict-unmatched	33	2028	9	9
+strict-unmatched	34	2028	10	7
+strict-unmatched	35	2028	11	9
+strict-unmatched	36	2028	12	9
+strict-unmatched	37	2029	1	8
+strict-unmatched	38	2029	2	9
+strict-unmatched	39	2029	3	9
+strict-unmatched	40	2029	4	6
+strict-unmatched	41	2029	5	8
+strict-unmatched	42	2029	6	10
+strict-unmatched	43	2029	7	6
+strict-unmatched	44	2029	8	8
+strict-unmatched	45	2029	9	8
+strict-unmatched	46	2029	10	8
+strict-unmatched	47	2029	11	10
+strict-unmatched	48	2029	12	8
+strict-unmatched	49	2030	1	9
+strict-unmatched	50	2030	2	9
+strict-unmatched	51	2030	3	9
+strict-unmatched	52	2030	4	7
+strict-unmatched	53	2030	5	8
+strict-unmatched	54	2030	6	9
+strict-unmatched	55	2030	7	7
+strict-unmatched	56	2030	8	9
+strict-unmatched	57	2030	9	6
+strict-unmatched	58	2030	10	9
+strict-unmatched	59	2030	11	10
+strict-unmatched	60	2030	12	6
+strict-unmatched	61	2031	1	9
+strict-unmatched	62	2031	2	8
+strict-unmatched	63	2031	3	8
+strict-unmatched	64	2031	4	8
+strict-unmatched	65	2031	5	9
+strict-unmatched	66	2031	6	7
+strict-unmatched	67	2031	7	8
+strict-unmatched	68	2031	8	9
+strict-unmatched	69	2031	9	7
+strict-unmatched	70	2031	10	9
+strict-unmatched	71	2031	11	9
+strict-unmatched	72	2031	12	7
+strict-unmatched	73	2032	2	6
+strict-unmatched	74	2033	2	8
+strict-unmatched	75	2033	3	8
+strict-unmatched	76	2033	4	9
+strict-unmatched	77	2033	5	6
+strict-unmatched	78	2033	6	9
+strict-unmatched	79	2033	7	9
+strict-unmatched	80	2033	8	7
+strict-unmatched	81	2033	9	9
+strict-unmatched	82	2033	10	9
+strict-unmatched	83	2033	11	9
+strict-unmatched	84	2033	12	9
+strict-unmatched	85	2034	1	7
+strict-unmatched	86	2034	2	8
+strict-unmatched	87	2036	2	9
+strict-unmatched	88	2040	2	8
+strict-unmatched	89	2044	2	7
+strict-unmatched	90	2048	2	8
+strict-unmatched	91	2052	2	9
 strict-matchability	91
 strict-printed	240
 strict-verdict	FAIL

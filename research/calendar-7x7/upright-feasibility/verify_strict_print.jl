@@ -5,7 +5,7 @@
 # the 91 displays has a cubie-level front matching. Not a legal-state proof.
 #   verify_strict_print.jl PRINT
 include(joinpath(@__DIR__,"..","pure-split-states","pure_common.jl"))
-empty!(HALF);merge!(HALF,Dict('0'=>'0','6'=>'9','9'=>'6'))
+include(joinpath(@__DIR__,"strict_rule.jl"));apply_strict_rule!(Main)
 function main(path)
     source=read_physical(path);goals=stacked_goals(PURE_VARIANT)
     short=print_supply(source,goals)
