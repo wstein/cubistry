@@ -133,12 +133,8 @@ test("live clock selects the preferred quarter-turn defaults H 500 ms, M 250 ms,
     ["minutes", "250"],
     ["seconds", "100"],
   ]) {
-    const select = page.locator("#" + name + "-speed");
-    await expect(select).toHaveValue(speed);
-    // The HTML default and the effective unit setting agree.
-    expect(
-      await select.evaluate((e) => e.querySelector("option[selected]").value),
-    ).toBe(speed);
+    // The select (dock slot 4) shows the effective unit setting.
+    await expect(page.locator('[data-slot="4"] #' + name + "-speed")).toHaveValue(speed);
   }
   expect(
     await page.evaluate(async () => {
@@ -413,10 +409,10 @@ test("slow preferences show fitted quarter and half durations without relabeling
   page,
 }) => {
   await ready(page, "2026-10-28T11:34:56Z");
-  await page.locator("#clock-nerd-details summary").click();
+  await page.locator("#nerd-toggle").click();
   await page.selectOption("#seconds-speed", "2000");
   await expect(page.locator('label[for="seconds-speed"]')).toHaveText(
-    "Preferred quarter-turn time",
+    "Seconds: quarter-turn time",
   );
   await expect(page.locator("#seconds-timing")).toContainText(
     "fitted to live time",
@@ -641,6 +637,8 @@ test("move statistics block is present, stable in layout and updates after clock
   page,
 }) => {
   await ready(page, "2026-10-28T11:34:56Z");
+  // The committed-moves table lives in the Nerd drawer.
+  await page.locator("#nerd-toggle").click();
   const block = page.locator("#clock-stats");
   await expect(block).toHaveAttribute("role", "status");
   await expect(block).toHaveAttribute("aria-label", "Clock moves");
@@ -717,27 +715,49 @@ test("an unlisted speed parameter falls back to the unit default", async ({ page
   ])
     await expect(page.locator("#" + name + "-speed")).toHaveValue(speed);
 });
-for (const query of ["&nerd=1", "&dev", "&expert=1", "&seconds-speed=50"])
-  test(`the Nerd panel starts open for ${query}`, async ({ page }) => {
-    await clockReady(page, query);
-    await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", true);
-    await expect(page.locator("#clock-nerd-toggle-btn")).toHaveClass(/is-active/);
-  });
-test("the Nerd panel starts closed, opens from its header button and the choice is remembered", async ({ page }) => {
+test("the Nerd drawer starts closed, opens from the header button and closes again", async ({ page }) => {
   await clockReady(page);
-  await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", false);
-  await page.locator("#clock-nerd-toggle-btn").click();
-  await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", true);
-  await page.reload();
-  await expect(page.locator("#seconds-speed")).toBeEnabled({ timeout: 30000 });
-  await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", true);
-  await page.locator("#clock-nerd-toggle-btn").click();
-  await expect(page.locator("#clock-nerd-details")).toHaveJSProperty("open", false);
+  await expect(page.locator("#shell-nerd")).toBeHidden();
+  await expect(page.locator("#nerd-toggle")).toHaveAttribute("aria-pressed", "false");
+  await page.locator("#nerd-toggle").click();
+  await expect(page.locator("#shell-nerd")).toBeVisible();
+  await expect(page.locator("#nerd-toggle")).toHaveAttribute("aria-pressed", "true");
+  await page.locator("#nerd-toggle").click();
+  await expect(page.locator("#shell-nerd")).toBeHidden();
 });
-test("the Nerd panel shows no per-cube value text, only the timing", async ({ page }) => {
+test("nerd=1 opens the Nerd drawer with the effective timing and the moves table, and no control but Reset", async ({ page }) => {
   await clockReady(page, "&nerd=1");
-  await expect(page.locator("#hours-state, #minutes-state, #seconds-state")).toHaveCount(0);
+  await expect(page.locator("#shell-nerd")).toBeVisible();
   await expect(page.locator("#seconds-timing")).toContainText("Scheduled: quarter");
+  await expect(page.locator("#clock-stats")).toBeVisible();
+  await expect(page.locator("#shell-nerd select, #shell-nerd input")).toHaveCount(0);
+  await expect(page.locator("#shell-nerd button")).toHaveText(["Reset session moves"]);
+  await expect(page.locator("#hours-state, #minutes-state, #seconds-state")).toHaveCount(0);
+});
+test("the time zone, the move times and the label style sit in dock slots 2, 4 and 5", async ({ page }) => {
+  await clockReady(page);
+  await expect(page.locator('[data-slot="2"] #clock-zone')).toHaveText("Europe/Berlin");
+  for (const name of ["hours", "minutes", "seconds"])
+    await expect(page.locator(`[data-slot="4"] #${name}-speed`)).toBeEnabled();
+  await expect(page.locator('[data-slot="5"] #clock-lettering')).toBeEnabled();
+  await expect(page.locator('[data-slot="1"], [data-slot="3"]')).toHaveCount(2);
+  await expect(page.locator('[data-slot="1"]')).toBeHidden();
+  await expect(page.locator('[data-slot="3"]')).toBeHidden();
+});
+test("a failed lettering change keeps the old print and shows a dismissible alert row", async ({ page }) => {
+  await page.route("**/assets/hsm/words/M.svg", async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({ response, body: (await response.text()) + " " });
+  });
+  await clockReady(page);
+  await page.selectOption("#clock-lettering", "words");
+  const row = page.locator('.shell-alert-row[data-kind="error"]');
+  await expect(row).toBeVisible({ timeout: 30000 });
+  await expect(row).toHaveAttribute("role", "alert");
+  await expect(page.locator("#clock-lettering")).toHaveValue("words-pascal");
+  await expect(page.locator("#clock-lettering")).toBeEnabled();
+  await row.getByRole("button", { name: "Dismiss error" }).click();
+  await expect(row).toHaveCount(0);
 });
 test("the sticker lettering changes in place, rewrites the URL, keeps the speeds and moves the print link", async ({ page }) => {
   await clockReady(page, "&lettering=words&hours-speed=250");
@@ -768,12 +788,11 @@ test("the print link of the default clock opens the Pascal-case words sheet", as
   await clockReady(page);
   await expect(page.locator("#print-stickers")).toHaveAttribute("href", /design=hsm-words-pascal$/);
 });
-test("the clock shows the Reference view button and the time zone; another mode hides the button and ends the clock", async ({
+test("the clock shows the Reference view button; another mode hides the button and ends the clock", async ({
   page,
 }) => {
   await clockReady(page);
   await expect(page.getByRole("button", { name: "Reference view" })).toBeVisible();
-  await expect(page.locator("#clock-zone")).toHaveText("Europe/Berlin");
   await page.selectOption("#studio-application", "counter");
   await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "counter", { timeout: 30000 });
   await expect(page.getByRole("button", { name: "Reference view" })).toBeHidden();
