@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 
 const read = path => readFileSync(resolve(path), "utf8");
 
-const regions = ["header", "app-switcher", "stage", "reference-view", "hints", "dock", "status-zone", "primary-action",
+const regions = ["header", "app-switcher", "stage", "reference-view", "hints", "dock", "status-zone", "alerts", "primary-action",
   "readout", "presentation", "nerd-drawer", "view-controls", "present-action"];
 
 test("the shell markup carries every region once and the five dock slots in order", () => {
