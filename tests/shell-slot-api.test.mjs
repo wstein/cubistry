@@ -437,3 +437,28 @@ test("opening the drawer does not move focus into it", () => {
   regions.nerdToggle.click();
   assert.equal(doc.activeElement, regions.nerdToggle);
 });
+
+test("a host created with nerdOpen shows the drawer as soon as content arrives (URL parameter nerd=1)", () => {
+  const { doc, regions } = fakeRegions();
+  const shell = createShellHost(regions, doc, { nerdOpen: true }).begin(() => true);
+  assert.equal(regions.nerd.hidden, true, "no content, no drawer");
+  shell.setNerd({ title: "Timing", render: (body) => body.append(doc.createElement("p")) });
+  assert.equal(regions.nerd.hidden, false);
+  assert.equal(regions.nerdToggle.getAttribute("aria-pressed"), "true");
+  regions.nerdToggle.click();
+  assert.equal(regions.nerd.hidden, true, "the viewer can still close it");
+});
+
+test("nerdOpen defaults to closed", () => {
+  const { doc, regions } = fakeRegions();
+  const shell = createShellHost(regions, doc).begin(() => true);
+  shell.setNerd({ title: "T", render: () => {} });
+  assert.equal(regions.nerd.hidden, true);
+});
+
+test("nerdOpenFromSearch reads nerd=1 and nothing else", async () => {
+  const { nerdOpenFromSearch } = await import("../src/apps/shell/slot-api.ts");
+  assert.equal(nerdOpenFromSearch("?nerd=1"), true);
+  assert.equal(nerdOpenFromSearch("?app=tenth&nerd=1"), true);
+  for (const s of ["", "?nerd=0", "?nerd", "?nerd=true", "?nerd=11", "?xnerd=1", "?app=clock"]) assert.equal(nerdOpenFromSearch(s), false, s);
+});

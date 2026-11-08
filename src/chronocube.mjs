@@ -29,7 +29,7 @@ import { browserMountEnv, mountCalendar7 } from "./apps/calendar7/mount.ts";
 import { MODE_CATALOG } from "./apps/mode-catalog.ts";
 import { createRegistry } from "./apps/registry.ts";
 import { createRouter } from "./apps/router.ts";
-import { createShellHost, findShellRegions } from "./apps/shell/slot-api.ts";
+import { createShellHost, findShellRegions, nerdOpenFromSearch } from "./apps/shell/slot-api.ts";
 import { mountTenthControls } from "./apps/chronocube/tenth-controls.ts";
 import { PairController } from "./apps/pair/controller.ts";
 import { MsTimerCube } from "./apps/ms-timer/cube.ts";
@@ -1034,7 +1034,7 @@ const registry = createRegistry(
 );
 
 // Dock slots, status chip, primary action, readout and Nerd drawer of index.html; each mode gets its own ModeShell.
-const shellHost = createShellHost(findShellRegions(document), document);
+const shellHost = createShellHost(findShellRegions(document), document, { nerdOpen: nerdOpenFromSearch(location.search) });
 
 const router = createRouter({
   registry,
