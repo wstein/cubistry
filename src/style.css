@@ -1451,6 +1451,30 @@ body.presentation-mode .presentation-exit-btn:hover {
   }
 }
 
+/* The floating island and the Counter panel share the top edge. Where they would overlap, the panel starts below
+   the island: one row (55 px bottom) up to 1100 px, two rows (about 89 px) up to 900 px, three rows (about 120 px)
+   up to 760 px. The 760 px rule above pins controls to 80 px with !important, hence !important here too. */
+@media (max-width: 1100px) {
+  aside#counter-controls.floating-hud {
+    top: 72px !important;
+    max-height: calc(100vh - 88px);
+  }
+}
+
+@media (max-width: 900px) {
+  aside#counter-controls.floating-hud {
+    top: 104px !important;
+    max-height: calc(100vh - 120px);
+  }
+}
+
+@media (max-width: 760px) {
+  aside#counter-controls.floating-hud {
+    top: 136px !important;
+    max-height: calc(100vh - 152px);
+  }
+}
+
 /* ==========================================================================
    Licenses & Open Source Compliance Document Page
    ========================================================================== */
