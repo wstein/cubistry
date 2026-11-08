@@ -7,7 +7,7 @@
 # EDGES_TSV: header + rows  from_id to_id from_year from_month to_year to_month htm seconds method word
 # Mode A (rows with from_id != "-"): start = root word of from_id, apply the edge word,
 #   the front must show the month of to_id (boards recomputed from the calendar).
-# For a retained-state chain (rows share one state) use verify_chain.jl.
+# For a retained-state chain (rows share one state) use ../upright-moves/verify_smoke.jl.
 include(joinpath(@__DIR__,"..","upright-moves","verify_moves.jl"))
 function edges(print_path,moves_path,edges_path)
     st0=read_print(print_path)

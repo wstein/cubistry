@@ -2,14 +2,14 @@
 # UNTRUSTED candidate tooling (verify_edges.jl decides). Fixes for the global beam search
 # under the strict upright rule. Included after global-search/search.jl (module G).
 #
-# Root cause (see README): the beam counts a front cell as satisfied when its occupant
-# lies in the cell's allowed set, treating the 49 cells as independent. Under the strict
-# rule most allowed sets have one element and the print supply has no slack, so a
-# "flexible" cell (blank, or a glyph with several equal stickers) is easily filled with
-# a piece that another cell can only get from there. Tightening = all-different
-# filtering (Regin): drop (cell,pose) pairs that occur in no complete assignment of the
-# orbit's cells to distinct poses. It is lossless (every solution is a complete
-# assignment) and makes the heuristic see the scarce pieces.
+# Root cause (see README): four defects, three of them needed: the beam gives up the core
+# cell (core weight 1), the old hybrid finish re-applies the core frame prefix and
+# rotates the cube, strict progress cannot cross a right-cubie wrong-twist plateau, and
+# a flexible cell can hold a scarce piece (greedy trap). Core weight 100 plus orbit-isolated
+# catalog macros (beam or exact last mile) fix the stall. Tightening (below) removes the
+# greedy trap, is lossless, but is NOT needed (README, evidence/ablation-8edges.tsv).
+# Tightening = all-different filtering (Regin): drop (cell,pose) pairs that occur in no
+# complete assignment of the orbit's cells to distinct poses.
 
 "All-different filtering of one Problem: returns a Problem with the same constrained
 cells and a (not larger) allowed matrix; throws if some orbit has no complete matching."
