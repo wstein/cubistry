@@ -218,7 +218,8 @@ exact last mile, `lambda=3`, 4 threads), but on **one retained state** and **res
 - An edge nobody finishes falls back to the planner orbit solve (about 450 HTM); none
   of the 4 smoke edges needed it. It stops at 2099-12, or before the next edge once
   `CHAIN_DEADLINE_SECONDS` of the edge loop have passed, so a segment is shorter instead of
-  hitting the 6 h job limit.
+  hitting the 6 h job limit. If the deadline stops it before the first new edge it exits 3 and writes no moves
+  file (the segment job fails instead of passing off the old chain as progress).
 - Anything it writes is only a candidate. The workflow accepts a segment only when the Julia
   `pure_chain.jl` (strict rule), the Flix `chain` command (strict rule) and the independent
   replay `verify_chain.jl` all accept the **cumulative** chain and the two receipts are
@@ -228,7 +229,7 @@ exact last mile, `lambda=3`, 4 threads), but on **one retained state** and **res
 
 | Check | Result |
 |---|---|
-| Two chained segments of 2 edges from 2028-01, the second resumed from the verified artifact of the first | cumulative chain **byte-identical** to `evidence/chain-smoke.moves.tsv`, which the earlier `edge_batch.jl` smoke run (another machine, one process) produced; same words 142, 105, 126, 108 = 481 HTM |
+| Two chained segments of 2 edges from 2028-01, the second resumed from the verified artifact of the first | cumulative chain **byte-identical** to the 4-edge smoke chain `chain-smoke.moves.tsv` (`../upright-beam/evidence/` of PR #347, compared by the job `chain-segment-smoke-compare`), which `make_chain.jl` wrote from `evidence/chain-smoke-edges.tsv`, the words of the earlier `edge_batch.jl` smoke run (another machine, one process); same words 142, 105, 126, 108 = 481 HTM |
 | Checkers on the cumulative chain | Julia and Flix `VALID_CONTINUOUS_CHAIN 4 218 294 49`, receipts equal, replay `ACCEPT_CHAIN 4 2028-5` |
 | Time on the hosted runner (4 cores, 4 threads) | setup 27 s (673 464 macros); 22, 22, 34, 36 s per edge (`evidence/chain-segments-smoke.edges.tsv`) [V]; the 30 s planning figure of the study holds, 70 s single-threaded is not re-measured here |
 | Local check on a 4-core machine (not a test) | 2 + 2 edges, resumed: same bytes, 24 to 53 s per edge |
