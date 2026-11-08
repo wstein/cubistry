@@ -1,4 +1,4 @@
 control	tried	rejected
 drop last block	20	20
-angle changed on first block	20	20
+angle changed on first block (t to t mod 3 + 1)	20	20
 widen or narrow last block by one layer	20	20

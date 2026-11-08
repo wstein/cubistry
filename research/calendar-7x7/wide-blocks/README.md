@@ -196,10 +196,13 @@ of it. Old chain: 14224 of 47200 runs and 56.3% of the turns are in runs of 2 or
 
 ## Potential upper bound
 
-Rule c is the exact minimum per run (model: each same-axis run rewritten on its own, order of runs of different axes fixed, free rotations) for rewriting of the existing words without
-changing the order of moves of different axes: about **24% fewer** moves on the roots
-and edges and 30% on the old chain, in both HTM-like and QTM-like counting. No
-rewriting within that per-run, fixed-axis-order model can beat it **[V as a minimum under the model]**; a rewrite that also reorders or re-synthesizes across runs is outside the model.
+Rule c is the exact minimum per run for rewriting the existing words. The model:
+each same-axis run is rewritten on its own, the order of runs of different axes
+is fixed, rotations are free. Result: about **24% fewer** moves on the roots and
+edges and 30% on the old chain, in both HTM-like and QTM-like counting. No
+rewriting within that per-run, fixed-axis-order model can beat it
+**[V as a minimum under the model]**; a rewrite that also reorders or
+re-synthesizes across runs is outside the model.
 A solver that searches in a block alphabet could find different, shorter words;
 that is not measured here.
 
@@ -221,7 +224,7 @@ that is not measured here.
 Owner preference recorded: rule c is the preferred direction (the middle slice
 counts as a move). The realisation is still open and awaits the owner's answer.
 Options: (1) display-only, rotation plus inverse complement, no new generators
-(recommended, pending owner decision); (2) new slice generators in the
+(pending owner decision); (2) new slice generators in the
 alphabet; (3) a camera rubber band.
 
 1. **Yes, show the block count as a second metric column** (next to HTM and QTM)
