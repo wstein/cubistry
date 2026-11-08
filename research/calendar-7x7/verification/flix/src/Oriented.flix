@@ -2,29 +2,43 @@
 // Every token stores artwork in the same reference position as its coordinate.
 def quarterTo(x: Int32,y: Int32,key: (Int32,Int32),q: Int32): Int32 =
     if ((x,y)==key) q else quarterTo(-y,x,key,q+1)
-def halfChar(c: Char): Option[Char] = match c {
+// Half-turn rule. Legacy is the rule of the existing screens (halfturn-equal glyphs
+// 0 1 2 5 8 H N S X Z and 6<->9; O and I fold to 0 and 1). Strict is the owner rule of
+// research/calendar-7x7/upright-feasibility: only the digit 0 and 6<->9, no aliasing.
+// halfChar, halfWord and orientedArt keep their old meaning (Legacy).
+enum HalfRule with Eq { case Legacy, Strict }
+def halfCharR(rule: HalfRule, c: Char): Option[Char] = match c {
     case '6' => Some('9')
     case '9' => Some('6')
-    case _ => if (List.memberOf(c,String.toList("01258HNSXZ"))) Some(c) else None
+    case _ => match rule {
+        case HalfRule.Legacy => if (List.memberOf(c,String.toList("01258HNSXZ"))) Some(c) else None
+        case HalfRule.Strict => if (c == '0') Some(c) else None
+    }
 }
-def halfWord(s: String): Option[String] =
-    List.foldLeft((acc,c) -> match (acc,halfChar(c)) {
+def halfWordR(rule: HalfRule, s: String): Option[String] =
+    List.foldLeft((acc,c) -> match (acc,halfCharR(rule,c)) {
         case (Some(a),Some(b)) => Some(a+"${b}")
         case _ => None
     },Some(""),List.reverse(String.toList(s)))
-def orientedArt(raw: String,ink: String,r: Int32,c: Int32): (String,Int32,String) \ IO = {
-    let s=String.replace(src="I",dst="1",String.replace(src="O",dst="0",raw));
+def halfChar(c: Char): Option[Char] = halfCharR(HalfRule.Legacy,c)
+def halfWord(s: String): Option[String] = halfWordR(HalfRule.Legacy,s)
+def orientedArtR(rule: HalfRule,raw: String,ink: String,r: Int32,c: Int32): (String,Int32,String) \ IO = {
+    let s=match rule {
+        case HalfRule.Legacy => String.replace(src="I",dst="1",String.replace(src="O",dst="0",raw))
+        case HalfRule.Strict => raw
+    };
     let key=orbit(r,c);
     if (s=="0") (s,0,ink) else {
         let q=quarterTo(c-4,4-r,key,0);
         let turns=if (key==(0,0)) List.range(0,4) else List#{q};
-        let variants=List.flatMap(a -> match halfWord(s) {
+        let variants=List.flatMap(a -> match halfWordR(rule,s) {
             case None => List#{(s,a,ink)}
             case Some(h) => List#{(s,a,ink),(h,Int32.modulo(a+2,4),ink)}
         },turns);
         at(List.sort(variants),0)
     }
 }
+def orientedArt(raw: String,ink: String,r: Int32,c: Int32): (String,Int32,String) \ IO = orientedArtR(HalfRule.Legacy,raw,ink,r,c)
 def orientedBase(de: Bool,upper: Int32): List[((Int32,Int32),(String,Int32,String))] \ IO =
     List.flatMap(p -> {
         let (y,m)=p;
