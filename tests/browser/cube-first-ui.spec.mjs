@@ -254,7 +254,7 @@ test("one stable Run/Stop button supports keyboard operation and returns to Run 
 });
 
 for (const width of [1440, 768, 390, 320])
-  test(`header, visible stats and speed fit at ${width}px without covering controls or the cube centre`, async ({
+  test(`header, visible stats and speed fit at ${width}px without covering controls or the cube center`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 1000 });
@@ -289,14 +289,14 @@ for (const width of [1440, 768, 390, 320])
       speed = await rect(".speed-control"),
       slider = await rect("#rotation-speed");
     // The island floats over the full-bleed canvas on purpose (position: fixed), so it may overlap the canvas. It must
-    // stay on screen, keep clear of the canvas centre and never sit on top of an interactive control.
+    // stay on screen, keep clear of the canvas center and never sit on top of an interactive control.
     expect(h.x).toBeGreaterThanOrEqual(0);
     expect(h.x + h.width).toBeLessThanOrEqual(width);
     const cx = canvas.x + canvas.width / 2,
       cy = canvas.y + canvas.height / 2;
     expect(
       cx >= h.x && cx <= h.x + h.width && cy >= h.y && cy <= h.y + h.height,
-      `header ${JSON.stringify(h)} covers the canvas centre ${cx},${cy}`,
+      `header ${JSON.stringify(h)} covers the canvas center ${cx},${cy}`,
     ).toBe(false);
     const overlaps = (p, q) =>
       p.x < q.x + q.width &&
@@ -316,7 +316,7 @@ for (const width of [1440, 768, 390, 320])
         overlaps(h, box),
         `header ${JSON.stringify(h)} overlaps ${selector} ${JSON.stringify(box)}`,
       ).toBe(false);
-      // Hit test at the centre: the header must not receive the pointer (null: that centre is off screen, see below).
+      // Hit test at the center: the header must not receive the pointer (null: that center is off screen, see below).
       expect(
         await page
           .locator(selector)
@@ -328,7 +328,7 @@ for (const width of [1440, 768, 390, 320])
             );
             return top === null ? "outside viewport" : document.querySelector("header").contains(top) ? "header" : "page";
           }),
-        `${selector} centre hit target`,
+        `${selector} center hit target`,
       ).not.toBe("header");
     }
     // Stats and speed live in the bottom dock, well below the island.
