@@ -330,7 +330,7 @@ body.chronocube-page:has(#shell) {
   gap: var(--sp-2);
   padding: var(--sp-2) var(--sp-3);
   border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-2);
   background: color-mix(in srgb, var(--c) 10%, var(--surface));
   color: var(--ink);
   font: 400 var(--t-sm) / 1.35 var(--f-ui);
