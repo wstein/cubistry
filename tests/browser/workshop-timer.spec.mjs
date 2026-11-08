@@ -961,27 +961,29 @@ function expectEndpoint(observation, preferred) {
 // runner, so one 250 ms turn can render only once and the render lands late. They therefore run on the page's fake
 // clock: setup runs on the running fake clock, the clock is paused before Start, and `driveToValue` advances it one
 // 16 ms frame at a time. Every animation frame, timer and deadline then sits at an exact fake time, whatever the
-// speed of the machine, and the assertions in `expectEndpoint` are unchanged. The 10 ms preference keeps the real
-// clock because it pins a lateness that only real rendering shows (see `expectEndpoint`).
+// speed of the machine, and the assertions in `expectEndpoint` are unchanged. The 10 ms preference pins a lateness
+// that real rendering causes; it models the frame cost by stalling the fake clock for 120 ms per frame.
 const FRAME_MS = 16;
-async function driveToValue(page, value, preferredMs) {
+async function driveToValue(page, value, preferredMs, frameMs = FRAME_MS, stall = false) {
   // Skip the idle preroll in one jump, stopping well before the active window (at most five turns, and the
   // sequence budget of 5 s) so every turn is still planned and played frame by frame.
   const lead = Math.min(5 * preferredMs, 5000) + 1500;
   const idle = await page.evaluate((lead) => Math.max(0, window.actualDeadline - performance.now() - lead), lead);
   if (idle > 0) await page.clock.fastForward(idle);
   const limit = 25000;
-  for (let spent = 0; ; spent += FRAME_MS) {
+  for (let spent = 0; ; spent += frameMs) {
     const reached = await page.evaluate((value) => {
       const cube = document.querySelector("#cube");
       return cube.dataset.value === value && cube.getAttribute("aria-busy") === "false";
     }, value);
     if (reached) return spent;
     if (spent >= limit) throw Error(`Cube did not settle at ${value} within ${limit} ms of fake time`);
-    await page.clock.runFor(FRAME_MS);
+    // A stalled frame: the clock jumps and each due timer or frame callback fires once, at the end of the jump.
+    if (stall) await page.clock.fastForward(frameMs);
+    else await page.clock.runFor(frameMs);
   }
 }
-async function timerEndpointCases(page, testInfo, cases, { deterministic = true } = {}) {
+async function timerEndpointCases(page, testInfo, cases, { deterministic = true, frameMs = FRAME_MS, stall = false } = {}) {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   if (deterministic) await page.clock.install();
   await chooseTimer(page);
@@ -996,7 +998,7 @@ async function timerEndpointCases(page, testInfo, cases, { deterministic = true 
       await page.locator("#rotation-speed").fill(stop); await clearEndpointObservation(page);
       if (deterministic) await pauseSoon(page);
       await page.click("#timer-start");
-      if (deterministic) await driveToValue(page, "00:10", preferred); else await settled(page, "00:10");
+      if (deterministic) await driveToValue(page, "00:10", preferred, frameMs, stall); else await settled(page, "00:10");
       const observation = await endpointObservation(page);
       observations.push({ preferredMilliseconds: preferred, ...observation });
       // Write the evidence before asserting: a failing case must still leave its measurements.
@@ -1018,7 +1020,10 @@ test("real Timer final turn meets the actual clock endpoint within20ms at250ms a
 });
 test("real Timer final turn at 10ms keeps every endpoint invariant strict and pins the known lateness", async ({ page }, testInfo) => {
   test.setTimeout(scaled(60000));
-  await timerEndpointCases(page, testInfo, [["6", LATE_FINAL_TURN_PREFERENCE_MS]], { deterministic: false });
+  await timerEndpointCases(page, testInfo, [["6", LATE_FINAL_TURN_PREFERENCE_MS]],
+    // A software-rendered frame takes 100 to 300 ms on a CI runner. Stall the fake clock for 120 ms per frame so
+    // the lateness this test pins comes from the modeled frame cost instead of from the speed of the machine.
+    { frameMs: 120, stall: true });
 });
 test("real Stopwatch final physical state and live clock share the target endpoint within20ms", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
