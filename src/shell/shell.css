@@ -275,6 +275,7 @@ body.chronocube-page:has(#shell) {
   color: var(--ink);
   font: 600 var(--t-md) var(--f-ui);
 }
+.shell .shell-nerd .small,
 .shell .shell-slot .small,
 .shell .shell-controls .small,
 .shell .shell-controls label {
@@ -517,18 +518,18 @@ body.presentation-mode .shell .shell-nerd-toggle {
   display: none;
 }
 
-/* Legacy session-move table and reset button carry light-theme colors; the dock follows the tokens. */
-.shell .shell-controls .clock-move-table,
-.shell .shell-controls .clock-move-table caption {
+/* Legacy session-move text and the Reset button need theme tokens in both the dock and Nerd drawer. */
+.shell :is(.shell-controls, .shell-nerd) .clock-move-table,
+.shell :is(.shell-controls, .shell-nerd) .clock-move-table caption {
   color: var(--ink-2);
 }
-.shell .shell-controls .clock-move-table tfoot :is(th, td) {
+.shell :is(.shell-controls, .shell-nerd) .clock-move-table tfoot :is(th, td) {
   border-top-color: var(--line);
 }
-.shell .shell-controls .clock-stats {
+.shell :is(.shell-controls, .shell-nerd) .clock-stats {
   border-top-color: var(--line);
 }
-.shell .shell-controls .clock-stats-reset {
+.shell :is(.shell-controls, .shell-nerd) .clock-stats-reset {
   background: var(--surface-2);
   border-color: var(--line);
   color: var(--ink);
