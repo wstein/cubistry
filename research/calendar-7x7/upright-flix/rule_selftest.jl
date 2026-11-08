@@ -25,7 +25,7 @@ function selftest()
     chk("letter-I-is-one",image_normal("I",0,ink)==image_normal("1",0,ink),!strict)
     chk("artwork-O-is-zero",artwork("O",ink,2,3)==artwork("0",ink,2,3),!strict)
     chk("artwork-I-is-one",artwork("I",ink,2,3)==artwork("1",ink,2,3),!strict)
-    chk("artwork-six-nine",artwork("6",ink,2,3)==artwork("9",ink,2,3),true)
+    chk("artwork-six-and-nine-are-two-classes",artwork("6",ink,2,3)==artwork("9",ink,2,3),false)
     println("rule-selftest-verdict\t",rule,'\t',bad[]==0 ? "PASS" : "FAIL",'\t',bad[])
     bad[]==0
 end
