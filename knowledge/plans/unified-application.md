@@ -101,7 +101,7 @@ Slots the design fills per registered mode (`src/apps/shell/slot-map.ts`, compar
 | `hm-one-cube` | 1, 2, 3, 4, 5 | pending |
 | `calendar7` | none | pending |
 
-`tenth` fills slots 1 to 4 with its existing controls (Step, Value, Direction, Step speed); the design row lists Run / Stop, Stop after and Wrap, which this mode does not have today and which were not added.
+`tenth` fills slots 1 to 4 with Step, Value, Direction and Step speed; the design row lists Run / Stop, Stop after and Wrap, which this mode does not have. This deviation is accepted (owner decision 5, 2026-11-08) and recorded as `ACCEPTED_DEVIATIONS` in `src/apps/shell/slot-map.ts`.
 
 Open questions for the owner:
 1. Nerd drawer versus the Clock page's Nerd panel. The design's drawer is read-only diagnostics under the stage (committed-moves table, timing facts, renderer). The Clock page's panel (`clock.html`, `clock-nerd-details`, URL `nerd`, `dev`, `expert`, key `cubistry_clock_nerd_mode`) holds per-cube speed selects (preferred quarter-turn time) with a timing line each. In the slot map, per-cube move time is slot 4 (Motion) of the Clock; the drawer is not meant for controls. Recommendation: the speed selects go to slot 4, the drawer shows the effective values; `nerd=1` opens the drawer.
