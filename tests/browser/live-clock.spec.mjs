@@ -13,24 +13,15 @@ async function ready(page, time) {
 async function physical(page) {
   return page.evaluate(async () => {
     const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
-    const { validateHsmDesign, hsmTarget } = await import(
-      "/src/apps/hsm/design.ts"
-    );
+    const { hsmTarget } = await import("/src/apps/hsm/design.ts");
     const { matchesTarget } = await import(
       "/packages/cube-mechanics/src/index.ts"
     );
-    // The live clock defaults to words-pascal lettering, which has its own print id.
-    const { hsmDesignFor } = await import("/src/apps/hsm/lettering.ts");
-    const lettering =
-      new URLSearchParams(location.search).get("lettering") ?? "words-pascal";
-    const d = hsmDesignFor(
-      validateHsmDesign(await (await fetch("/hsm-counter.v3.json")).json()),
-      lettering,
-    );
+    // The studio keeps one physical print identity and replaces its pinned image manifest for lettering.
     return clockUnits.map((u, i) => ({
       value: u.controller.currentValue,
       valid: matchesTarget(
-        d.print,
+        u.controller.view.presentedPrint,
         u.controller.state,
         hsmTarget(["H", "M", "S"][i], u.controller.currentValue),
       ),
@@ -168,8 +159,8 @@ test("midnight wrap schedules all three final turns to the same target instant",
 }) => {
   await ready(page, "2026-12-31T22:59:56Z");
   await page.evaluate(async () => {
-    const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
     const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
+    const CubeViewer = Object.getPrototypeOf(clockUnits[0].controller.view).constructor;
     const animate = CubeViewer.prototype.animate;
     window.clockEndpoints = [];
     CubeViewer.prototype.animate = async function (p, timing) {
@@ -237,8 +228,8 @@ test("real animation ends all three midnight sequences at the shared live deadli
   await page.goto("/index.html?app=clock");
   await expect(page.locator("#seconds-speed")).toBeEnabled();
   await page.evaluate(async () => {
-    const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
     const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
+    const CubeViewer = Object.getPrototypeOf(clockUnits[0].controller.view).constructor;
     const animate = CubeViewer.prototype.animate;
     window.realClockEndpoints = [];
     window.realClockMoves = [];
@@ -288,28 +279,21 @@ test("real animation ends all three midnight sequences at the shared live deadli
   // Inspect the exact committed endpoint, not a later instant when S may already
   // be moving toward01. The digital clock remains live throughout that motion.
   const proof = await page.evaluate(async () => {
-    const { validateHsmDesign, hsmTarget } = await import(
-      "/src/apps/hsm/design.ts"
-    );
+    const { hsmTarget } = await import("/src/apps/hsm/design.ts");
     const { matchesTarget } = await import(
       "/packages/cube-mechanics/src/index.ts"
     );
-    const { hsmDesignFor } = await import("/src/apps/hsm/lettering.ts");
-    const lettering =
-      new URLSearchParams(location.search).get("lettering") ?? "words-pascal";
-    const design = hsmDesignFor(
-      validateHsmDesign(await (await fetch("/hsm-counter.v3.json")).json()),
-      lettering,
-    );
+    const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
+    const print = clockUnits[0].controller.view.presentedPrint;
     const endpoints = ["H", "M", "S"].map((unit) =>
       window.realClockEndpoints.filter((e) => e.unit === unit).at(-1),
     );
     return {
-      print: design.print,
+      print,
       endpoints,
       moves: window.realClockMoves,
       valid: endpoints.every((e) =>
-        matchesTarget(design.print, e.state, hsmTarget(e.unit, 0)),
+        matchesTarget(print, e.state, hsmTarget(e.unit, 0)),
       ),
     };
   });
@@ -745,7 +729,7 @@ test("the time zone, the move times and the label style sit in dock slots 2, 4 a
   await expect(page.locator('[data-slot="3"]')).toBeHidden();
 });
 test("a failed lettering change keeps the old print and shows a dismissible alert row", async ({ page }) => {
-  await page.route("**/assets/hsm/words/M.svg", async (route) => {
+  await page.route("**/assets/letters/noto-sans/words/M.svg", async (route) => {
     const response = await route.fetch();
     await route.fulfill({ response, body: (await response.text()) + " " });
   });
@@ -754,6 +738,7 @@ test("a failed lettering change keeps the old print and shows a dismissible aler
   const row = page.locator('.shell-alert-row[data-kind="error"]');
   await expect(row).toBeVisible({ timeout: 30000 });
   await expect(row).toHaveAttribute("role", "alert");
+  await expect(row).toContainText("Asset integrity check failed");
   await expect(page.locator("#clock-lettering")).toHaveValue("words-pascal");
   await expect(page.locator("#clock-lettering")).toBeEnabled();
   await row.getByRole("button", { name: "Dismiss error" }).click();
@@ -766,9 +751,11 @@ test("the sticker lettering changes in place, rewrites the URL, keeps the speeds
   expect(
     await page.evaluate(async () => {
       const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
-      return clockUnits.map((u) => u.controller.view.presentedPrint.id);
+      return clockUnits.map((u) => u.controller.assets.manifest.images
+          .filter((image) => ["H", "M", "S"].includes(image.id))
+          .map((image) => image.url));
     }),
-  ).toEqual(Array(3).fill("hsm_counter_seconds_first_words"));
+  ).toEqual(Array(3).fill(["H", "M", "S"].map((id) => `/assets/letters/noto-sans/words/${id}.svg`)));
   await page.selectOption("#clock-lettering", "symbols");
   await expect(page.locator("#clock-lettering")).toBeEnabled({ timeout: 30000 });
   await expect(page).toHaveURL(/lettering=symbols/);
@@ -779,10 +766,12 @@ test("the sticker lettering changes in place, rewrites the URL, keeps the speeds
     .poll(() =>
       page.evaluate(async () => {
         const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
-        return clockUnits.map((u) => u.controller.view.presentedPrint.id);
+        return clockUnits.map((u) => u.controller.assets.manifest.images
+          .filter((image) => ["H", "M", "S"].includes(image.id))
+          .map((image) => image.url));
       }),
     )
-    .toEqual(Array(3).fill("hsm_counter_seconds_first"));
+    .toEqual(Array(3).fill(["H", "M", "S"].map((id) => `/assets/letters/noto-sans/symbols/${id}.svg`)));
 });
 test("the print link of the default clock opens the Pascal-case words sheet", async ({ page }) => {
   await clockReady(page);

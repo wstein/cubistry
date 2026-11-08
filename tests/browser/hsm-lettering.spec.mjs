@@ -138,9 +138,11 @@ test("the shared live clock offers bottom-only words and retains preferred speed
   expect(
     await page.evaluate(async () => {
       const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
-      return clockUnits.map((u) => u.controller.view.presentedPrint.id);
+      return clockUnits.map((u) => u.controller.assets.manifest.images
+          .filter((image) => ["H", "M", "S"].includes(image.id))
+          .map((image) => image.url));
     }),
-  ).toEqual(Array(3).fill("hsm_counter_seconds_first_words"));
+  ).toEqual(Array(3).fill(["H", "M", "S"].map((id) => `/assets/letters/noto-sans/words/${id}.svg`)));
   await page.selectOption("#hours-speed", "250");
   await expect
     .poll(() =>
@@ -163,10 +165,12 @@ test("the shared live clock offers bottom-only words and retains preferred speed
     .poll(() =>
       page.evaluate(async () => {
         const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
-        return clockUnits.map((u) => u.controller.view.presentedPrint.id);
+        return clockUnits.map((u) => u.controller.assets.manifest.images
+          .filter((image) => ["H", "M", "S"].includes(image.id))
+          .map((image) => image.url));
       }),
     )
-    .toEqual(Array(3).fill("hsm_counter_seconds_first"));
+    .toEqual(Array(3).fill(["H", "M", "S"].map((id) => `/assets/letters/noto-sans/symbols/${id}.svg`)));
 });
 test("an invalid word asset leaves the existing fixed print and value usable", async ({
   page,
