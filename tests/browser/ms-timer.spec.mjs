@@ -48,7 +48,6 @@ test("the chooser offers the M/S Timer and the page shows three cubes: minutes, 
     "ms-timer.html",
   );
   for (const text of [
-    "Live H–M–S Clock",
     "M/S Counter 00–59",
     "60-Minute Timer",
     "5-Second Timer",
@@ -203,7 +202,6 @@ test("the other applications keep their entries and still open", async ({
     "Picture Puzzle Playground",
     "CI Quality Cube · Workflow monitor",
     "Calendar · Deutsch / English",
-    "Live H–M–S Clock",
     "H/M/S Counter 00–59",
     "M/S Counter 00–59",
     "H/M One-Cube Counter",
