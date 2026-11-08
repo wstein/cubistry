@@ -1413,8 +1413,11 @@ body.presentation-mode .presentation-exit-btn:hover {
    (or 100vw - 16px below 600 px). Its rows used to be nowrap, so on a
    narrow viewport or with larger text the content spilled past both
    edges. Up to 1000 px let the rows wrap and the status take its own row.
-   Above that the dock stays one row like before: with real messages its
-   content fits the viewport (about 3 px past each pill edge at most).
+   Above that the dock stays one row, unchanged from before. That is not
+   always enough: at 100% text the Blank-top install message still runs
+   past the viewport up to about 1060 px, and "Switching to ..." at 125%
+   text up to 1181 px or more. This is the earlier behavior and is left
+   out of this change on purpose.
    These rules follow the 1180 px block, so their gap wins there, and
    precede the 600 px block, so its values still win below 600 px. */
 @media (max-width: 1000px) {
@@ -1529,7 +1532,9 @@ aside#counter-controls.floating-hud {
 }
 
 /* Below 600 px the wrapped dock is about 110 px tall and sits above the panel bottom. Stop the panel above it and let
-   it scroll, so its last controls are not covered by the dock. */
+   it scroll, so its last controls are not covered by the dock. The 170px is a magic number measured on phones at
+   100% text only; larger text makes the dock taller. Follow-up: publish the measured dock height as a CSS variable,
+   like src/apps/shared/island-clearance.ts does for the island. */
 @media (max-width: 600px) {
   aside#counter-controls.floating-hud {
     max-height: calc(100vh - var(--counter-top, var(--counter-top-fallback, 16px)) - 170px);

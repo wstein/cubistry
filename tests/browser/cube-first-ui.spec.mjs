@@ -443,7 +443,8 @@ for (const [width, textPercent] of [
     }
   });
 
-// Wide viewports keep the dock on one row for every realistic status, as before the wrap rules were added.
+// Wide viewports keep the dock on one row for every realistic status, as before the wrap rules were added. This
+// checks only the dock height, not whether the content overflows the pill or the viewport.
 for (const width of [1440, 1280, 1181])
   test(`the bottom dock stays one row for real status messages at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
