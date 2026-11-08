@@ -432,30 +432,32 @@ test("slow preferences show fitted quarter and half durations without relabeling
 test("actual mixed quarter and half turns keep 2:1 durations without a final-turn dwell", async ({
   page,
 }) => {
+  // What this proves: with real quarter and half turns, a half turn lasts twice a quarter turn, consecutive
+  // turns share their boundary instant, every turn is rendered moving (not parked in its start pose) and the
+  // last turn ends at the scheduled instant. It runs on the paused fake clock and advances it one 16 ms frame
+  // at a time. On the real clock a software-rendered frame took 100 to 300 ms on CI, so a whole 120 ms turn
+  // could pass between two renders ("firstMotion" stayed null) and the timing bounds measured the machine.
+  // Here every turn is rendered at exact fake times, whatever the speed of the machine.
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.addInitScript(() => {
-    Date.now = () => Date.parse("2026-10-28T11:34:56Z");
-  });
-  await page.goto("/index.html?app=clock");
-  await expect(page.locator("#seconds-speed")).toBeEnabled();
-  await expect
-    .poll(() =>
-      page.evaluate(async () => {
-        const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
-        return clockStage.renderer.info.render.frame;
-      }),
-    )
-    .toBeGreaterThan(3);
+  await ready(page, "2026-10-28T11:34:56Z");
+  await page.clock.runFor(100);
+  expect(
+    await page.evaluate(async () => {
+      const { clockStage } = await import("/src/apps/clock/live-mode.mjs");
+      return clockStage.renderer.info.render.frame;
+    }),
+  ).toBeGreaterThan(3);
   await page.evaluate(async () => {
     const { clockUnits, clockStage } = await import("/src/apps/clock/live-mode.mjs");
     const { LiveClockScheduler } = await import("/src/apps/clock/scheduler.ts");
-    const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
-    // Freeze only automatic scheduling; RAF, physical motion and timers stay native.
+    // Freeze only automatic scheduling; RAF, physical motion and timers stay on the page's (fake) clock.
     LiveClockScheduler.prototype.tick = () => ({
       values: [12, 34, 56],
       motion: ["idle", "idle", "idle"],
     });
     const unit = clockUnits[2];
+    // The viewer class of the running page: a module imported by URL from the test can be a second instance.
+    const CubeViewer = Object.getPrototypeOf(unit.controller.view).constructor;
     // The saved period's 56 to 57 edge is three quarter turns, so choose the
     // first nearby target whose shortest route mixes half and quarter turns.
     const target = [57, 58, 59, 0, 1, 2, 3, 4].find((value) => {
@@ -465,13 +467,9 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
     if (target === undefined) throw Error("Missing mixed turn fixture");
     const moves = unit.controller.prepare(target),
       work = moves.reduce((n, m) => n + Math.abs(m.turns), 0);
-    // Software rendering on CI can miss an entire 120 ms turn. Choose a
-    // feasible fixture period from native RAF cadence while preserving the
-    // timing, angular-ratio and no-deliberate-dwell assertions below.
-    const frames = [];
-    for (let i = 0; i < 7; i++)
-      frames.push(await new Promise((resolve) => requestAnimationFrame(resolve)));
-    const frameGap = Math.max(...frames.slice(1).map((t, i) => t - frames[i]));
+    // The fake clock delivers a frame every 16 ms, so the quarter-turn time keeps its floor of 120 ms
+    // (`Math.max(120, ceil(3 * frameGap))`, the rule the real-clock version used for slower frames).
+    const frameGap = 16;
     const quarter = Math.max(120, Math.ceil(frameGap * 3));
     window.angularQuarter = quarter;
     window.angularFrameGap = frameGap;
@@ -522,14 +520,24 @@ test("actual mixed quarter and half turns keep 2:1 durations without a final-tur
     unit.controller.setDeadline(target, window.angularEndAt, quarter);
     unit.controller.request(target);
   });
-  await expect
-    .poll(() =>
-      page.evaluate(async () => {
+  // Advance one frame at a time until the whole sequence has been played, bounded by its length plus slack.
+  const budget = await page.evaluate(() => window.angularEndAt - performance.now() + 2000);
+  for (let spent = 0; ; spent += 16) {
+    // Finished means: turns have started and the controller is idle again (it starts on the first frame).
+    const finished = await page.evaluate(async () => {
+      const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
+      return window.angularTrace.length > 0 && !clockUnits[2].controller.busy;
+    });
+    if (finished) break;
+    if (spent > budget) {
+      const seen = await page.evaluate(async () => {
         const { clockUnits } = await import("/src/apps/clock/live-mode.mjs");
-        return clockUnits[2].controller.busy;
-      }),
-    )
-    .toBe(false);
+        return { turns: window.angularTrace.length, busy: clockUnits[2].controller.busy };
+      });
+      throw Error(`The mixed turn sequence did not finish within ${budget} ms of fake time: ${JSON.stringify(seen)}`);
+    }
+    await page.clock.runFor(16);
+  }
   const evidence = await page.evaluate(() => ({
     endAt: window.angularEndAt,
     quarter: window.angularQuarter,
