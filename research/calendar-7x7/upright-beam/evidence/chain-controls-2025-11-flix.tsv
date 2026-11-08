@@ -1,0 +1,11 @@
+control	expected	verdict	exit	detail
+valid	ACCEPT	ACCEPT	0	status	VALID_CONTINUOUS_CHAIN	3	218	294	49
+old-print	REJECT	REJECT	1	invalid	java.lang.IllegalArgumentException: strict chain requires the pinned strict print
+drop-first-move	REJECT	REJECT	1	invalid	java.lang.IllegalArgumentException: declared HTM/QTM/rotation metrics differ from raw moves
+generator-22	REJECT	REJECT	1	invalid	java.lang.IllegalArgumentException: generator1..21
+extra-move	REJECT	REJECT	1	invalid	java.lang.IllegalArgumentException: declared HTM/QTM/rotation metrics differ from raw moves
+non-adjacent-month	REJECT	REJECT	1	invalid	java.lang.IllegalArgumentException: edges must be consecutive chronological months
+wrong-source-month	REJECT	REJECT	1	invalid	java.lang.IllegalArgumentException: source root display must match declared source month
+substituted-source-hash	REJECT	REJECT	1	invalid	java.lang.IllegalArgumentException: edge source hash must equal retained complete physical state
+wrong-root-word	REJECT	REJECT	1	invalid	java.lang.IllegalArgumentException: source front
+other-layer-same-metrics	REJECT	REJECT	1	invalid	java.lang.IllegalArgumentException: edge front

@@ -247,3 +247,52 @@ exact last mile, `lambda=3`, 4 threads), but on **one retained state** and **res
 Not shown: that all 863 edges succeed (the study solved 98 transitions from root states and
 a 4-edge chain; the retained state changes every edge) and the cost of the full chain; those
 come from the chain run itself [D].
+
+## Start months from 1900-01 (not only 2028-01)
+
+The strict chain tooling accepts a chain that starts at any month from **1900-01** and runs to
+at most **2099-12**. Nothing about the data had to change [V]: the 91 displays are the 91 start
+weekday x month type combinations, and every month 1900-01 .. 2099-12 (2400 months) shows one of
+the same 91 boards (checked with `pure_common.jl` `stacked_goals` against `stacked_board` and
+`wrapped_board` for 1900..2099: 0 mismatches; 1900 is not a leap year, 2000 is, both handled by
+the calendar functions). The display ids stay those of the first occurrence in 2026..2099 (2026-01 is
+display 1, 2028-01 is 25, 1900-01 is 37, 2025-11 is 71). The distinct directed display transitions
+are the same 98 for 1900..2099 as for 2028..2099, so the root words (`moves-strict.tsv`), the
+strict print (pin `4fc44606...bcab`) and the chain plan stay valid. What changed is only a gate:
+
+| File | Change |
+|---|---|
+| `chain_segment.jl` | `START` accepts 1900-01 .. 2099-12 (was 2026..2099) |
+| `../pure-split-states/pure_chain.jl` | year bound 1900..2099, edge bound 2400 (was 2026..2099, 1000) |
+| `../pure-split-states/flix/src/Chain.flix` | `validMonth` 1900..2099, edge bound 2400 (same) |
+| `verify_chain.jl`, `make_chain.jl`, `chain_runner_*.sh`, `chain_controls.sh` | none (no year assumption) |
+| `.github/workflows/upright-chain.yml`, `upright-chain-segment.yml` (PR against `main`) | `start_year` 1900..2099, `start` `YYYY-MM` with 19xx or 20xx |
+
+`chain_plan.jl` still describes 2028..2099 (863 edges, 91 displays, 98 transitions) and is
+unchanged; it is planning output only.
+
+A chain is **one retained state from its own root**. A chain started at 2026-05 that runs to
+2028-01 is therefore an independent chain: its state at 2028-01 is not the root state of the
+2028-01 chain (`chain-smoke.moves.tsv`, `chain-2028-2076`), the two cannot be concatenated, and
+no byte of the 2028 chains changes.
+
+Cost: about 30 to 50 s per edge (4 threads); 2026-05 .. 2028-01 is 20 edges (about 11 to
+17 min), 1900-01 .. 2099-12 is 2399 edges (about 20 h, 16 segments of 150, two or three runs
+with `prior_run_id`) [D, estimate from the measured per-edge times, not run].
+
+### Evidence from this change [V, local run on a 4-core machine, not Actions]
+
+| Chain (3 edges unless noted) | Result |
+|---|---|
+| `chain-2026-05-smoke.moves.tsv` (2026-05 .. 2026-08, 121, 125, 137 HTM) | Julia and Flix `VALID_CONTINUOUS_CHAIN 3 218 294 49`, byte-identical receipts, replay `ACCEPT_CHAIN 3 2026-8`; nine controls rejected by each of the three checkers (`chain-controls-2026-05-*.tsv`) |
+| `chain-2025-11-smoke.moves.tsv` (2025-11 .. 2026-02, a start before 2026) | the same three verdicts and nine controls (`chain-controls-2025-11-*.tsv`) |
+| `chain-1900-01-smoke.moves.tsv` (2 edges, 1900-01 .. 1900-03) | Julia, Flix `VALID_CONTINUOUS_CHAIN 2 218 294 49`, replay `ACCEPT_CHAIN 2 1900-3` |
+| A chain whose source year is 1899 | rejected by Julia and Flix |
+| Regression: `chain-smoke.moves.tsv` (2028-01, 4 edges) with the changed verifiers | Julia, Flix and replay receipts byte-identical to the committed ones |
+
+The producer change is one assertion, so a 2028 start produces the same bytes as before
+(not re-run here; the committed byte-identical resume evidence above is unchanged).
+
+Not shown: that the edges of a long chain from 2026 or 1900 all succeed (only the short chains above and the
+edges produced there), the cost of the full chain, and a run on Actions (`upright-chain.yml` with
+`start_year` before 2028 can be dispatched only after the workflow change is on `main`).

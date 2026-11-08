@@ -1,0 +1,6 @@
+rule-selfcheck	strict	half-turned-glyph=REJECT	I-as-1=REJECT
+chain-root	1900-1	ACCEPT	bad=0	sha=match
+chain-edge	1	1900-2	ACCEPT	140	bad=0	turned=1
+chain-edge	2	1900-3	ACCEPT	15	bad=0	turned=1
+chain-total-htm	155	edges	2	end	1900-3
+chain-verdict	ACCEPT_CHAIN	2	1900-3
