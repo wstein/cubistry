@@ -322,6 +322,36 @@ body.chronocube-page:has(#shell) {
 .shell .shell-chip[data-state="warn"] { --c: var(--s-warn); }
 .shell .shell-chip[data-state="error"] { --c: var(--s-error); }
 
+/* Warning and error rows beside the chip (ModeShell.setWarning, setError). */
+.shell .shell-alert-row {
+  --c: var(--s-warn);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--c) 10%, var(--surface));
+  color: var(--ink);
+  font: 400 var(--t-sm) / 1.35 var(--f-ui);
+  overflow-wrap: anywhere;
+}
+.shell .shell-alert-row[data-kind="error"] { --c: var(--s-error); }
+.shell .shell-alert-row b { color: var(--c); }
+.shell .shell-alert-text { flex: 1 1 auto; }
+.shell .shell-alert-dismiss {
+  flex: 0 0 auto;
+  min-width: 28px;
+  min-height: 28px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  cursor: pointer;
+}
+.shell .shell-alert-dismiss:hover { color: var(--ink); }
+
 .shell .shell-primary-btn {
   width: 100%;
   min-height: 44px;

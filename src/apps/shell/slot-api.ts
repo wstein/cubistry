@@ -64,6 +64,18 @@ export interface NerdSpec {
   render: (body: HTMLElement) => void | (() => void);
 }
 
+/**
+ * A warning or error row beside the chip (design: `warnrow`, `errrow`): `role="alert"` with a Dismiss button. A warning
+ * has a bold title ("Late: ..."); an error starts with "Error: ".
+ */
+export interface AlertRow {
+  text: string;
+  onDismiss?: () => void;
+}
+export interface WarningRow extends AlertRow {
+  title: string;
+}
+
 export interface ModeShell {
   /** Fills slot `n` (1 to 5), replacing what it held. The label becomes the heading of the group. */
   setSlot(n: SlotNumber, spec: SlotSpec): void;
@@ -80,6 +92,13 @@ export interface ModeShell {
    */
   setStatus(state: StatusState, text?: string): void;
   clearStatus(): void;
+  /**
+   * One dismissible warning row and one error row in the status zone, beside the chip (`null` removes the row). The same
+   * row again writes nothing. The rows carry `role="alert"` and no live region of their own; Dismiss removes the row and
+   * runs `onDismiss`.
+   */
+  setWarning(row: WarningRow | null): void;
+  setError(row: AlertRow | null): void;
 
   /** The readout bar under the stage: plain text, no live region. */
   setReadout(items: readonly ReadoutItem[]): void;
@@ -160,6 +179,8 @@ export function createInertShell(): ModeShell {
     clearPrimaryAction: () => {},
     setStatus: () => {},
     clearStatus: () => {},
+    setWarning: () => {},
+    setError: () => {},
     setReadout: () => {},
     updateReadout: () => {},
     clearReadout: () => {},
@@ -199,6 +220,9 @@ export function createShellHost(regions: ShellRegions, doc: Doc, options: ShellH
   let primaryButton: HTMLElement | null = null;
   let primaryOff: (() => void) | null = null;
   let status: { state: StatusState; text: string } | null = null;
+  let chipNode: HTMLElement | null = null;
+  const alertNodes: { warn: HTMLElement | null; error: HTMLElement | null } = { warn: null, error: null };
+  const alertKeys: { warn: string | null; error: string | null } = { warn: null, error: null };
   let readoutValues: string[] = [];
   let readoutNodes: HTMLElement[] = [];
   let nerdSpec: NerdSpec | null = null;
@@ -268,9 +292,48 @@ export function createShellHost(regions: ShellRegions, doc: Doc, options: ShellH
   }
 
   // ----- status
+  /** The status zone holds the chip first, then the warning row, then the error row. */
+  function paintStatus(): void {
+    const nodes = [chipNode, alertNodes.warn, alertNodes.error].filter((n): n is HTMLElement => n !== null);
+    if (nodes.length === 0 && regions.status.children.length === 0) return;
+    regions.status.replaceChildren(...nodes);
+  }
   function clearStatusChip(): void {
     status = null;
-    if (regions.status.children.length > 0) regions.status.replaceChildren();
+    chipNode = null;
+    paintStatus();
+  }
+  function setAlert(kind: "warn" | "error", row: (AlertRow & { title?: string }) | null): void {
+    if (row === null) {
+      if (alertNodes[kind] === null) return;
+      alertNodes[kind] = null;
+      alertKeys[kind] = null;
+      paintStatus();
+      return;
+    }
+    if (typeof row.text !== "string" || row.text.trim() === "") throw new TypeError("an alert row needs text");
+    if (kind === "warn" && (typeof row.title !== "string" || row.title.trim() === "")) throw new TypeError("a warning needs a title");
+    const key = `${row.title ?? ""}\u0000${row.text}`;
+    if (alertKeys[kind] === key && alertNodes[kind]) return;
+    const node = make("div", `shell-alert-row shell-alert-${kind}`);
+    node.dataset.kind = kind;
+    node.setAttribute("role", "alert");
+    const lead = make("b", undefined, kind === "warn" ? `${row.title}: ` : "Error: ");
+    const text = make("span", "shell-alert-text", row.text);
+    const dismiss = make("button", "shell-alert-dismiss", "×");
+    dismiss.setAttribute("type", "button");
+    dismiss.setAttribute("aria-label", kind === "warn" ? "Dismiss warning" : "Dismiss error");
+    dismiss.addEventListener("click", () => {
+      if (alertNodes[kind] !== node) return;
+      alertNodes[kind] = null;
+      alertKeys[kind] = null;
+      paintStatus();
+      runCleanup(row.onDismiss);
+    });
+    node.append(lead, text, dismiss);
+    alertNodes[kind] = node;
+    alertKeys[kind] = key;
+    paintStatus();
   }
 
   // ----- readout
@@ -349,6 +412,9 @@ export function createShellHost(regions: ShellRegions, doc: Doc, options: ShellH
     for (const n of SLOT_NUMBERS) clearSlot(n);
     clearPrimary();
     clearStatusChip();
+    alertNodes.warn = alertNodes.error = null;
+    alertKeys.warn = alertKeys.error = null;
+    paintStatus();
     clearReadoutBar();
     nerdSpec = null;
     drawNerd();
@@ -419,10 +485,13 @@ export function createShellHost(regions: ShellRegions, doc: Doc, options: ShellH
         if (status && status.state === state && status.text === label) return;
         const chip = make("span", "shell-chip", label);
         chip.dataset.state = state;
-        regions.status.replaceChildren(chip);
+        chipNode = chip;
         status = { state, text: label };
+        paintStatus();
       },
       clearStatus: w(clearStatusChip),
+      setWarning: w((row: WarningRow | null) => setAlert("warn", row)),
+      setError: w((row: AlertRow | null) => setAlert("error", row)),
 
       setReadout: w((items: readonly ReadoutItem[]) => {
         clearReadoutBar();

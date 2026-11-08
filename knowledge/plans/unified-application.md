@@ -79,6 +79,7 @@ A mode receives a `ModeShell` in its mount context (`MountContext.shell`) and us
 - `setSlot(n, { label, element | render })`, `clearSlot(n)`, `clearSlots()`: slots 1 Action, 2 Value, 3 Mode, 4 Motion, 5 Print & appearance. A filled slot is a `role="group"` labeled by an `h2`; an empty slot keeps `hidden`. DOM order is tab order.
 - `setPrimaryAction({ label, onClick, disabled? })`: the one berry button.
 - `setStatus(state, text?)`: one chip in the existing `role="status"` zone, states `ready, moving, sync, paused, done, warn, error` (tokens `--s-*`). The same state and text writes nothing; callers set it on state transitions, never per frame. The readout (`setReadout`, `updateReadout`) is plain text without a live region.
+- `setWarning({ title, text, onDismiss? })`, `setError({ text, onDismiss? })` (`null` clears): one dismissible `role="alert"` row per kind in the status zone beside the chip; no live region of their own.
 - `setNerd({ title, render })`, `refreshNerd()`: the drawer is hidden until the Nerd button (`#nerd-toggle`, in the header between Appearance and Presentation) is pressed or the URL has `nerd=1`; `render` runs only while it is open, and a refresh keeps the focused control and the scroll position. `nerdTable` and `nerdFacts` build the content.
 - `setHint(text | null)`, `setReferenceView(handler | null)`, `listen(...)`, `onDispose(fn)`.
 
@@ -109,7 +110,7 @@ Owner decisions of 2026-11-08 on the Nerd drawer:
 3. The Nerd button sits in the header like in the mock. Built: between Appearance and Presentation, same button build, label kept on a phone.
 
 Open questions for the owner:
-1. Warning and error rows. The design has dismissible `role="alert"` rows besides the chip; the API has the `warn` and `error` chip states only. Recommendation: add the rows with the Clock port.
+1. Warning and error rows. DECIDED (owner, 2026-11-08): rows are `role="alert"` and dismissible. Built with the Clock port: `setWarning` and `setError`.
 2. The phone sheet (grab handle, snap states) is not built; the dock stays the stacked area of the current layout.
 
 ## Risks
