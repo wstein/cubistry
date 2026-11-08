@@ -159,6 +159,7 @@ jobs:
             "$GITHUB_WORKSPACE/src/$PRINT_REL" "$GITHUB_WORKSPACE/src/$MOVES_REL" "$out/chain" "$EDGES" "$start" "$prior" 2>&1 | tee "$out/run.log"
           rc=${PIPESTATUS[0]}
           set -e
+          if [ "$rc" = 3 ]; then echo "::error::no new edge: the producer deadline passed before the first edge of this segment (exit 3); nothing to verify or continue from"; exit 3; fi
           [ "$rc" = 0 ] || { echo "::error::producer exited with $rc (124 = timeout)"; exit "$rc"; }
           test -s "$out/chain.moves.tsv" && test -s "$out/chain-edges.tsv"
           mv "$out/chain.moves.tsv" "$out/moves.tsv"
