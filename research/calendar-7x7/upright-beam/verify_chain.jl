@@ -33,12 +33,30 @@ function read_chain_file(path)
     end
     (src=src,edges=edges)
 end
+# Start-up self-check: this verifier must apply the STRICT rule. On the source front a sticker of
+# a 1/2/5/8 cell turned by 180 degrees and a sticker "I" in a "1" cell must each be rejected.
+function rule_selfcheck(state,b)
+    idx(r,c)=only(i for (i,s) in enumerate(state) if s.pos==(c-4,4-r,3) && s.normal==(0,0,1))
+    i1=nothing;i2=nothing
+    for r in 1:7,c in 1:7
+        t=b[r,c][1]
+        isnothing(i1) && t in ("1","2","5","8") && (i1=idx(r,c))
+        isnothing(i2) && t=="1" && (i2=idx(r,c))
+    end
+    @assert !isnothing(i1) && !isnothing(i2) "self-check needs a 1/2/5/8 cell and a 1 cell on the source front"
+    s=state[i1];turned=copy(state);turned[i1]=merge(s,(up=map(-,s.up),))
+    aliased=copy(state);aliased[i2]=merge(state[i2],(text="I",))
+    a=check_front(turned,b).bad;c=check_front(aliased,b).bad
+    println("rule-selfcheck\tstrict\thalf-turned-glyph=",a>0 ? "REJECT" : "ACCEPT","\tI-as-1=",c>0 ? "REJECT" : "ACCEPT")
+    @assert a>0 && c>0 "self-check: the strict front rule is not active"
+end
 function verify_chain(print_path,moves_path,chain_path)
     st0=read_print(print_path)
     roots=Dict(parse(Int,split(l,'\t')[1])=>parse.(Int,split(split(l,'\t')[6],',')) for l in readlines(moves_path)[2:end] if !isempty(l))
     ch=read_chain_file(chain_path);ok=true;total=0
     state=apply_word(st0,roots[ch.src.root])
     r=check_front(state,board(ch.src.year,ch.src.month))
+    rule_selfcheck(state,board(ch.src.year,ch.src.month))
     sh=state_sha(state)
     v=r.bad==0 && sh==ch.src.hash
     println("chain-root\t",ch.src.year,'-',ch.src.month,'\t',v ? "ACCEPT" : "REJECT","\tbad=",r.bad,"\tsha=",sh==ch.src.hash ? "match" : "MISMATCH");ok&=v
