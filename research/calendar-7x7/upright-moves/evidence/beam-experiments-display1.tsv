@@ -1,0 +1,8 @@
+variant	beam_result	best_word	htm	seconds
+beam default (lambda=12 width=40 fanout=4 patience=8 strict)	stalled	orbit solve	440	271
+width=80 patience=16	stalled	orbit solve	440	547
+strict=false	stalled (patience)	orbit solve	440	417
+lambda=6 width=40 patience=16 maxdepth=120	stalled	orbit solve	440	311
+hybrid finish, default beam	stalled	ORBIT 440 (HYBRID4 448)	440	296
+hybrid finish, width=20 patience=4	stalled	HYBRID4	436	176
+hybrid finish, strict=false width=20 patience=4	stalled (patience)	HYBRID4	436	212

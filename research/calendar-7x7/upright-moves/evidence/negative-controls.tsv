@@ -1,0 +1,8 @@
+control	exit	verdict
+valid	0	move-verdict	ACCEPT_ALL_91	91	0
+old-print	1	move-verdict	REJECT	0	91
+drop-first-move	1	move-verdict	REJECT	90	1
+swap-two-words	1	move-verdict	REJECT	89	2
+generator-22	1	ERROR: LoadError: AssertionError: generator outside 1..21 (no layer 0)
+wrong-htm	1	move-verdict	REJECT	90	1
+duplicate-display	1	ERROR: LoadError: AssertionError: display 3 duplicates or is not one of the 91 boards

@@ -1,0 +1,19 @@
+start unsat=43
+status=stalled stall=[4, 22, 40, 253]
+(depth = 1, beam = 40, min_unsat = 31, min_cost = 2, best = -1)
+(depth = 2, beam = 40, min_unsat = 27, min_cost = 6, best = -1)
+(depth = 3, beam = 40, min_unsat = 24, min_cost = 25, best = -1)
+(depth = 4, beam = 40, min_unsat = 22, min_cost = 33, best = -1)
+(depth = 5, beam = 40, min_unsat = 19, min_cost = 41, best = -1)
+(depth = 6, beam = 40, min_unsat = 17, min_cost = 47, best = -1)
+(depth = 7, beam = 40, min_unsat = 14, min_cost = 51, best = -1)
+(depth = 8, beam = 40, min_unsat = 12, min_cost = 71, best = -1)
+(depth = 9, beam = 40, min_unsat = 10, min_cost = 79, best = -1)
+(depth = 10, beam = 40, min_unsat = 9, min_cost = 92, best = -1)
+(depth = 11, beam = 40, min_unsat = 8, min_cost = 96, best = -1)
+(depth = 12, beam = 40, min_unsat = 7, min_cost = 99, best = -1)
+(depth = 13, beam = 40, min_unsat = 6, min_cost = 102, best = -1)
+(depth = 14, beam = 40, min_unsat = 5, min_cost = 105, best = -1)
+(depth = 15, beam = 40, min_unsat = 4, min_cost = 108, best = -1)
+(depth = 16, beam = 0, min_unsat = -1, min_cost = -1, best = -1)
+stall orbits=[1, 1, 2, 11]

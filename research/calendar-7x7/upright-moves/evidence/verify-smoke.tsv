@@ -1,0 +1,7 @@
+smoke-root	2028-1	ACCEPT
+smoke-edge	2028-1->2028-2	ACCEPT	442	orbit
+smoke-edge	2028-2->2028-3	ACCEPT	462	orbit
+smoke-edge	2028-3->2028-4	ACCEPT	270	orbit
+smoke-edge	2028-4->2028-5	ACCEPT	430	orbit
+smoke-total-edge-htm	1604	edges	4
+smoke-verdict	ACCEPT
