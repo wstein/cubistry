@@ -108,14 +108,21 @@ const bfs = (() => {
   }
   return { dist, pack };
 })();
-/** Exact minimum of block turns for the net exponents of a one-axis word; any whole-cube rotation is free. */
-function minimumBlocks(word) {
+/** Net exponent per physical layer of a one-axis word (a rotation turns all seven layers). */
+function netVector(word) {
   const e = [0, 0, 0, 0, 0, 0, 0];
   for (const [g, q] of word) for (let i = isRotation(g) ? 0 : generatorLayer(g) + 3; i <= (isRotation(g) ? 6 : generatorLayer(g) + 3); i++) e[i] += q;
+  return e;
+}
+/** Exact minimum of block turns for a one-axis word; whole-cube rotations are free (any k added to all layers). */
+function minimumBlocks(word) {
+  const e = netVector(word);
   let best = Infinity;
   for (let k = 0; k < 4; k++) best = Math.min(best, bfs.dist[bfs.pack(e.map((v) => v + k))]);
   return best;
 }
+/** Block turns needed without any added rotation: the exact target. */
+const blocksWithoutRotation = (word) => bfs.dist[bfs.pack(netVector(word))];
 
 /** The root words of the research measurement, merged like its htm count (adjacent equal generators add up mod 4). */
 function rootWords() {
@@ -145,8 +152,9 @@ test("fixed examples: the middle slice, intervals across it, rotations of the sa
   assert.deepEqual(tokens(six), ["x0'", "xrot"]);
   // An interval that contains layer 0 and has no cheaper form: -2..0 (its complement is two blocks).
   assert.deepEqual(tokens([[7, 1], [1, -1], [4, -1], [5, -1], [6, -1]]), ["x-2..0"]);
-  // Equal cost: the layers -3..0 together, or the layers +1..+3 the other way round with a rotation; the narrower one wins.
-  assert.deepEqual(tokens([[7, 1], [4, -1], [5, -1], [6, -1]]), ["x+1..+3'", "xrot"]);
+  // Equal block count: the layers -3..0 together, or the layers +1..+3 the other way round plus a rotation. No rotation is added
+  // when it saves no block, so the first.
+  assert.deepEqual(tokens([[7, 1], [4, -1], [5, -1], [6, -1]]), ["x-3..0"]);
   assert.deepEqual(tokens([[1, 1], [2, 1], [3, 1]]), ["x-3..-1"], "no layer 0 needed: as before");
   assert.deepEqual(tokens([[5, 1], [6, 1]]), ["x+2..+3"], "an interval without layer 0 stays what it is");
   assert.equal(tokens([[3, 2], [4, 2]]).length, 2, "layers -1 and +1 alone are two blocks");
@@ -261,6 +269,10 @@ test("property: the number of block moves of a run is the exact minimum (indepen
       word.push([7 * axis + 1 + Math.floor(next() * (next() < 0.1 ? 7 : 6)), next() < 0.7 ? q : [1, -1, 2][Math.floor(next() * 3)]]);
     const blocks = groupBlocks(word, { slice: true });
     assert.equal(blockCounts(blocks).blockMoves, minimumBlocks(word), `minimum, case ${n}: ${blocks.map(blockToken).join(" ")}`);
+    // A rotation is only in the plan when the exact target needs more blocks without it.
+    if (blocksWithoutRotation(word) === minimumBlocks(word))
+      assert.ok(blocks.every((b) => b.kind !== "rotation"), `no needless rotation, case ${n}: ${blocks.map(blockToken).join(" ")}`);
+    else assert.ok(blocks.some((b) => b.kind === "rotation"), `the rotation saves a block, case ${n}`);
     if (blockCounts(groupBlocks(word)).blockMoves > blocks.length) beatsPlain++;
   }
   assert.ok(beatsPlain > 20, "rule c is sometimes strictly better than the blocks of one side");
@@ -322,7 +334,7 @@ test("the 91 root words of the research measurement: 40642 layer moves, 30696 bl
   assert.equal(htm, 40642);
   assert.equal(blocks, 30696);
   assert.equal(total, blocks);
-  assert.equal(sliceTouching, 2051, "blocks touching layer 0 in the rule c plans of the research");
+  assert.equal(sliceTouching, 2062, "blocks touching layer 0 (the research plans, which add a rotation freely, have 2051)");
 });
 
 test("negative controls: a dropped, turned, narrowed or half expanded slice block changes the state", () => {
