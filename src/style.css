@@ -1451,27 +1451,30 @@ body.presentation-mode .presentation-exit-btn:hover {
   }
 }
 
-/* The floating island and the Counter panel share the top edge. Where they would overlap, the panel starts below
-   the island: one row (55 px bottom) up to 1100 px, two rows (about 89 px) up to 900 px, three rows (about 120 px)
-   up to 760 px. The 760 px rule above pins controls to 80 px with !important, hence !important here too. */
-@media (max-width: 1100px) {
+/* The floating island and the Counter panel share the top edge. src/apps/shared/island-clearance.ts measures both and
+   sets --counter-top (16 px, or just below the island where they would collide). Until it has run, these breakpoint
+   values are the fallback: one header row up to 1280 px, two up to 900 px, three up to 760 px. The 760 px rule above
+   pins controls to 80 px with !important, hence !important here too. */
+aside#counter-controls.floating-hud {
+  top: var(--counter-top, var(--counter-top-fallback, 16px)) !important;
+  max-height: calc(100vh - var(--counter-top, var(--counter-top-fallback, 16px)) - 16px);
+}
+
+@media (max-width: 1280px) {
   aside#counter-controls.floating-hud {
-    top: 72px !important;
-    max-height: calc(100vh - 88px);
+    --counter-top-fallback: 72px;
   }
 }
 
 @media (max-width: 900px) {
   aside#counter-controls.floating-hud {
-    top: 104px !important;
-    max-height: calc(100vh - 120px);
+    --counter-top-fallback: 104px;
   }
 }
 
 @media (max-width: 760px) {
   aside#counter-controls.floating-hud {
-    top: 136px !important;
-    max-height: calc(100vh - 152px);
+    --counter-top-fallback: 136px;
   }
 }
 
