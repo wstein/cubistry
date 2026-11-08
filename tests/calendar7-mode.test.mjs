@@ -134,9 +134,10 @@ test("rawToken lists generator and exponent, and the step shows both notations",
   const today = { year: 2026, month: 11 };
   const model = buildModel(graph, table, chooseMonth(q("year=2028&month=5"), today, range), today);
   const html = pageHtml(model);
-  const raw = model.next.moves.map(rawToken).join(" ");
-  assert.ok(html.includes(`data-raw="next">${raw}</p>`));
-  assert.ok(html.includes(`data-word="next">${model.next.moves.map(moveToken).join(" ").replace(/'/g, "&#39;")}</p>`));
+  // Tokens are unbreakable spans separated by plain spaces (a hyphen must not wrap).
+  const toks = (a) => a.map((t) => `<span class="c7-tok">${t.replace(/'/g, "&#39;")}</span>`).join(" ");
+  assert.ok(html.includes(`data-raw="next">${toks(model.next.moves.map(rawToken))}</p>`));
+  assert.ok(html.includes(`data-word="next">${toks(model.next.moves.map(moveToken))}</p>`));
   assert.match(html, /Raw generators/);
 });
 
