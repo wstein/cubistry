@@ -253,12 +253,38 @@ test("one stable Run/Stop button supports keyboard operation and returns to Run 
   expect(await button.boundingBox()).toEqual(before);
 });
 
-for (const width of [1440, 768, 390, 320])
-  test(`header, visible stats and speed fit at ${width}px without covering controls or the cube center`, async ({
+// [viewport width, root font size in percent]. The island and the panel both grow with the text size.
+for (const [width, textPercent] of [
+  [1440, 100],
+  [1280, 100],
+  [1200, 100],
+  [768, 100],
+  [390, 100],
+  [320, 100],
+  [1280, 125],
+  [1200, 150],
+  [768, 125],
+  [390, 125],
+  [320, 125],
+])
+  test(`header, visible stats and speed fit at ${width}px, ${textPercent}% text, without covering controls or the cube center`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 1000 });
     await ready(page);
+    await page.evaluate((percent) => {
+      document.documentElement.style.fontSize = `${percent}%`;
+      // Resolves once the resize observers have run, among them the one that places the panel below the island.
+      // (Not requestAnimationFrame: page.clock.install() fakes it.)
+      return new Promise((done) => {
+        const probe = new ResizeObserver(() => {
+          probe.disconnect();
+          done();
+        });
+        probe.observe(document.querySelector("header"));
+        probe.observe(document.querySelector("#counter-controls"));
+      });
+    }, textPercent);
     const header = page.locator("header"),
       chooser = page.locator("header #application");
     await expect(chooser).toHaveCount(1);
@@ -316,20 +342,28 @@ for (const width of [1440, 768, 390, 320])
         overlaps(h, box),
         `header ${JSON.stringify(h)} overlaps ${selector} ${JSON.stringify(box)}`,
       ).toBe(false);
-      // Hit test at the center: the header must not receive the pointer (null: that center is off screen, see below).
-      expect(
-        await page
-          .locator(selector)
-          .evaluate((el) => {
-            const r = el.getBoundingClientRect();
-            const top = document.elementFromPoint(
-              r.left + r.width / 2,
-              r.top + r.height / 2,
-            );
-            return top === null ? "outside viewport" : document.querySelector("header").contains(top) ? "header" : "page";
-          }),
-        `${selector} center hit target`,
-      ).not.toBe("header");
+      // Hit test at the center: the header must not receive the pointer.
+      const hit = await page.locator(selector).evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const x = r.left + r.width / 2,
+          y = r.top + r.height / 2;
+        if (x < 0 || x > innerWidth || y < 0 || y > innerHeight)
+          return "off screen";
+        return document.querySelector("header").contains(document.elementFromPoint(x, y))
+          ? "header"
+          : "page";
+      });
+      if (hit === "off screen")
+        // Known bug, fixed separately: below 760 px, or with enlarged text, the bottom dock is wider than the viewport,
+        // so the centers of the stats bar and the speed control can lie outside it. Nothing else may be off screen.
+        expect(
+          (width <= 760 || textPercent > 100) &&
+            [".counter-stats", ".speed-control", "#rotation-speed"].includes(
+              selector,
+            ),
+          `${selector} is off screen at ${width}px, ${textPercent}% text`,
+        ).toBe(true);
+      else expect(hit, `${selector} center hit target`).toBe("page");
     }
     // Stats and speed live in the bottom dock, well below the island.
     expect(Math.min(stats.y, speed.y)).toBeGreaterThan(h.y + h.height);
