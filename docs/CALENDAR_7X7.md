@@ -274,7 +274,7 @@ only the drawing changes, and only in the strict profile (legacy keeps one line)
 drawn at the normal two-digit size (110 px on the 192 px texture, the same size as any other two-digit
 label), centered, and lifted so that its digit ink is centered 18 px above the sticker center. The second
 number is small (50 px), right-aligned at x = 178 with its baseline at y = 178, so it sits in the lower
-right with about 13 to 17 px of margin. No slash is drawn, and both numbers are upright (no rotation).
+right with a margin of at least 14 px. No slash is drawn, and both numbers are upright (no rotation).
 The pure geometry is `splitLayout` and `splitInkGap` in `src/apps/calendar7/sticker-art.ts`; the unit test
 requires the normal size, the lift, the lower-right alignment with margins of at least 12 px and a gap of
 at least 0.0625 of the texture (12 px) between the numbers. The browser spec

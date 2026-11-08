@@ -56,7 +56,8 @@ for (const label of ["23/30", "24/31"]) {
       Math.max(first.y0 - second.y1, 0, second.y0 - first.y1),
     );
     expect(gap, `ink gap ${gap.toFixed(1)} px`).toBeGreaterThanOrEqual(MIN_GAP);
-    // Big number: lifted, ink centered about 18 px above the texture center; margins to the edges.
+    // Big number: horizontally centered, lifted (ink centered about 18 px above the texture center); margins to the edges.
+    expect(Math.abs((first.x0 + first.x1) / 2 - size / 2)).toBeLessThanOrEqual(3);
     expect(Math.abs((first.y0 + first.y1) / 2 - (size / 2 - 18))).toBeLessThanOrEqual(3);
     for (const m of [first.x0, first.y0, size - first.x1]) expect(m).toBeGreaterThanOrEqual(MIN_MARGIN);
     // Small number: lower right, margins to the right and bottom edge.
