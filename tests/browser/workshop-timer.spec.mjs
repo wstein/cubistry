@@ -108,10 +108,13 @@ test("absolute fifteen-minute deadline visits all91 actual displays and independ
   page,
 }) => {
   test.setTimeout(scaled(120000));
+  // The assertions read the DOM and window state, not pixels: a small canvas
+  // makes each of the ~1700 software-rendered frames cheap.
+  await page.setViewportSize({ width: 320, height: 240 });
   await page.clock.install();
   await chooseTimer(page);
   await pauseSoon(page);
-  await page.click("#timer-start");
+  await page.evaluate(() => document.querySelector("#timer-start").click());
   const epoch = await page.evaluate(() => performance.now());
   let offset = 0;
   const transitions = [];
@@ -119,11 +122,25 @@ test("absolute fifteen-minute deadline visits all91 actual displays and independ
     const goal = epoch + (90 - value) * 10000 + 300;
     const now = await page.evaluate(() => performance.now());
     await page.clock.fastForward(Math.max(0, goal - now - 300));
-    await page.clock.runFor(300);
     const text =
       String(Math.floor(value / 6)).padStart(2, "0") +
       ":" +
       String((value % 6) * 10).padStart(2, "0");
+    // Play frames only until the cube shows this bucket, at most 300 ms.
+    for (let played = 0; played < 300; played += 48) {
+      const done = await page.evaluate(
+        (text) => {
+          const cube = document.querySelector("#cube");
+          return (
+            cube.dataset.value === text &&
+            cube.getAttribute("aria-busy") === "false"
+          );
+        },
+        text,
+      );
+      if (done) break;
+      await page.clock.runFor(48);
+    }
     await settled(page, text);
     const step = await page.evaluate((offset) => {
       const moves = window.timerMoves.slice(offset);
@@ -669,7 +686,7 @@ test("Set replaces a pending duration safely during an active legal animation wi
   await verifyActualTimerMoves(page, 90, 2, "/tmp/cubistry-set-browser-commits.json");
 });
 
-for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844 }, { width: 320, height: 740 }]) {
+for (const viewport of [{ width: 1280, height: 800 }, { width: 390, height: 844 }, { width: 320, height: 740 }]) {
   test(`Timer status distinguishes movement from backlog and keeps the active slider stable at ${viewport.width}px`, async ({ page }, testInfo) => {
     test.setTimeout(scaled(60000));
     await page.setViewportSize(viewport);
@@ -700,10 +717,23 @@ for (const viewport of [{ width: 1280, height: 1000 }, { width: 390, height: 844
     };
     const capture = async (phase) => {
       const path = testInfo.outputPath(`${phase}.png`);
-      if (viewport.width < 760) {
-        await page.locator(".cube-footer").screenshot({ path });
-      } else {
-        await page.screenshot({ path, fullPage: true });
+      // Evidence only. Playwright's own screenshot waits for animation frames
+      // and stalls behind the paused fake clock at desktop width, so ask the
+      // browser for the footer pixels directly.
+      const rect = await page.locator(".cube-footer").evaluate((e) => {
+        const r = e.getBoundingClientRect();
+        return { x: r.x + scrollX, y: r.y + scrollY, width: r.width, height: r.height, scale: 1 };
+      });
+      const cdp = await page.context().newCDPSession(page);
+      try {
+        const { data } = await cdp.send("Page.captureScreenshot", {
+          format: "png",
+          clip: rect,
+          captureBeyondViewport: true,
+        });
+        writeFileSync(path, Buffer.from(data, "base64"));
+      } finally {
+        await cdp.detach();
       }
     };
     await page.evaluate(() => {
