@@ -1,0 +1,223 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Upright verify
+
+# Tests for the strict upright rule of research/calendar-7x7 (upright-flix): the Flix and
+# Julia replays of the 91 move words, their negative controls, the rule self-tests, and a
+# regression check that the legacy rule still reproduces the committed 2027 chain receipts
+# and the matchability receipt. It does NOT start any chain (no 863-edge run, no producer).
+# Julia and Flix only, no Python. The research code is checked out from research_ref.
+#
+# workflow_dispatch can only be used once this file is on main. Until then the
+# pull_request trigger below (limited to this file) runs the same jobs for the PR that adds
+# it, using the default research ref.
+
+on:
+  workflow_dispatch:
+    inputs:
+      research_ref:
+        description: Branch or tag of this repository that holds the research code
+        type: string
+        default: research/upright-flix
+  pull_request:
+    paths:
+      - .github/workflows/upright-verify.yml
+
+permissions:
+  contents: read
+
+env:
+  CAL: research/calendar-7x7
+  RESEARCH_REF: ${{ inputs.research_ref || 'research/upright-flix' }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true # prepare only fetches this repository; no untrusted code runs here
+      - name: Resolve research ref
+        id: resolve
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          REF=$RESEARCH_REF
+          [[ "$REF" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$ ]] || fail "research_ref has unsupported characters"
+          case "$REF" in *..*|*//*|*.lock) fail "research_ref is not a plain ref name";; esac
+          git fetch --no-tags --depth=1 origin "+refs/heads/$REF:refs/remotes/research/ref" 2>/dev/null \
+            || git fetch --no-tags --depth=1 origin "+refs/tags/$REF:refs/remotes/research/ref" 2>/dev/null \
+            || fail "research_ref '$REF' is not a branch or tag of $GITHUB_REPOSITORY"
+          sha=$(git rev-parse --verify "refs/remotes/research/ref^{commit}")
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          for f in upright-flix/controls.sh upright-flix/rule_replay.jl upright-flix/flix/build.sh upright-moves/verify_moves.jl upright-moves/evidence/moves-strict.tsv; do
+            git cat-file -e "$sha:$CAL/$f" 2>/dev/null || fail "$CAL/$f is missing at $sha"
+          done
+          {
+            echo "### Upright verify"
+            echo "- research_ref: \`$REF\`"
+            echo "- resolved SHA: \`$sha\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  julia:
+    needs: [prepare]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          persist-credentials: false
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - name: Rule self-test (legacy and strict)
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/out"; cd "$CAL/upright-flix"
+          julia --version
+          for r in legacy strict; do
+            CUBISTRY_RULE=$r julia --startup-file=no rule_selftest.jl | tee -a "$RUNNER_TEMP/out/julia-rule-selftest.tsv"
+          done
+          test "$(grep -c '^rule-selftest-verdict.*PASS' "$RUNNER_TEMP/out/julia-rule-selftest.tsv")" = 2
+      - name: Independent replay verify_moves.jl (91 words, strict rule)
+        run: |
+          set -euo pipefail
+          cd "$CAL/upright-moves"
+          julia --startup-file=no verify_moves.jl ../upright-feasibility/evidence/print-strict-upright.tsv evidence/moves-strict.tsv | tee "$RUNNER_TEMP/out/julia-verify-moves.tsv" | tail -n 3
+          grep -q '^move-verdict.ACCEPT_ALL_91' "$RUNNER_TEMP/out/julia-verify-moves.tsv"
+      - name: Negative controls for verify_moves.jl
+        run: |
+          set -euo pipefail
+          cd "$CAL/upright-flix"
+          bash controls.sh "$RUNNER_TEMP/out/julia-controls-verify-moves.tsv" julia --startup-file=no ../upright-moves/verify_moves.jl
+      - name: Research-checker replay rule_replay.jl, strict rule, with negative controls
+        run: |
+          set -euo pipefail
+          cd "$CAL/upright-flix"
+          bash controls.sh "$RUNNER_TEMP/out/julia-controls-rule-replay-strict.tsv" env CUBISTRY_RULE=strict julia --startup-file=no rule_replay.jl
+      - name: Legacy rule on the strict print (reported, not a gate)
+        run: |
+          cd "$CAL/upright-flix"
+          CUBISTRY_RULE=legacy julia --startup-file=no rule_replay.jl ../upright-feasibility/evidence/print-strict-upright.tsv ../upright-moves/evidence/moves-strict.tsv > "$RUNNER_TEMP/out/julia-rule-replay-legacy.tsv" 2>&1 || true
+          grep '^move-verdict' "$RUNNER_TEMP/out/julia-rule-replay-legacy.tsv" || tail -n 3 "$RUNNER_TEMP/out/julia-rule-replay-legacy.tsv"
+      - name: check_pure.jl matchability with the strict rule on the strict print
+        run: |
+          set -euo pipefail
+          cd "$CAL/pure-split-states"
+          CUBISTRY_RULE=strict julia --startup-file=no check_pure.jl matchability ../upright-feasibility/evidence/print-strict-upright.tsv | tee "$RUNNER_TEMP/out/julia-matchability-strict.tsv"
+          grep -qx $'pure-matchability\t0' "$RUNNER_TEMP/out/julia-matchability-strict.tsv"
+      - name: Legacy regression (default rule) against committed receipts
+        run: |
+          set -euo pipefail
+          cd "$CAL/pure-split-states"
+          julia --startup-file=no check_pure.jl matchability evidence/print-pure-A.tsv | grep '^pure-' > "$RUNNER_TEMP/out/julia-matchability-legacy.tsv"
+          cmp "$RUNNER_TEMP/out/julia-matchability-legacy.tsv" evidence/receipts/matchability.julia.tsv
+          gzip -dc evidence/dag-all.tsv.gz > "$RUNNER_TEMP/dag-all.tsv"
+          julia --startup-file=no pure_chain.jl evidence/print-pure-A.tsv "$RUNNER_TEMP/dag-all.tsv" evidence/chain-2027.moves.tsv > "$RUNNER_TEMP/chain-2027.julia.stdout"
+          grep -E '^(source|edge|metrics|endpoint|status)' "$RUNNER_TEMP/chain-2027.julia.stdout" > "$RUNNER_TEMP/out/julia-chain-2027-legacy.tsv"
+          cmp "$RUNNER_TEMP/out/julia-chain-2027-legacy.tsv" evidence/receipts/chain-2027.julia.tsv
+          tail -n 1 "$RUNNER_TEMP/out/julia-chain-2027-legacy.tsv"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: upright-julia-${{ github.run_id }}
+          path: ${{ runner.temp }}/out/
+          retention-days: 30
+
+  flix:
+    needs: [prepare]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Build the Flix replay jar
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/out"
+          jar=$(bash "$CAL/upright-flix/flix/build.sh" | tail -n 1)
+          test -f "$jar"
+          echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
+          sha256sum "$jar" | tee "$RUNNER_TEMP/out/flix-replay-jar.sha256"
+      - name: Rule self-test (legacy and strict)
+        run: |
+          set -euo pipefail
+          java -Dstdout.encoding=UTF-8 -Xmx4g -jar "$FLIX_JAR" selftest | tee "$RUNNER_TEMP/out/flix-rule-selftest.tsv"
+          grep -q '^rule-selftest-verdict.PASS' "$RUNNER_TEMP/out/flix-rule-selftest.tsv"
+      - name: Replay the 91 words, strict rule
+        run: |
+          set -euo pipefail
+          java -Dstdout.encoding=UTF-8 -Xmx4g -jar "$FLIX_JAR" replay strict "$CAL/upright-feasibility/evidence/print-strict-upright.tsv" "$CAL/upright-moves/evidence/moves-strict.tsv" | tee "$RUNNER_TEMP/out/flix-replay-strict.tsv" | tail -n 3
+          grep -q '^move-verdict.strict.ACCEPT_ALL_91' "$RUNNER_TEMP/out/flix-replay-strict.tsv"
+      - name: Negative controls for the Flix replay
+        run: |
+          set -euo pipefail
+          bash "$CAL/upright-flix/controls.sh" "$RUNNER_TEMP/out/flix-controls-replay-strict.tsv" java -Dstdout.encoding=UTF-8 -Xmx4g -jar "$FLIX_JAR" replay strict
+      - name: Legacy rule on the strict print (reported, not a gate)
+        run: |
+          java -Dstdout.encoding=UTF-8 -Xmx4g -jar "$FLIX_JAR" replay legacy "$CAL/upright-feasibility/evidence/print-strict-upright.tsv" "$CAL/upright-moves/evidence/moves-strict.tsv" > "$RUNNER_TEMP/out/flix-replay-legacy.tsv" 2>&1 || true
+          grep '^move-verdict' "$RUNNER_TEMP/out/flix-replay-legacy.tsv" || tail -n 3 "$RUNNER_TEMP/out/flix-replay-legacy.tsv"
+      - name: Compile the verification project (Oriented.flix port)
+        run: |
+          set -euo pipefail
+          cd "$CAL/verification/flix"
+          export FLIX_CACHE_HOME=${FLIX_CACHE_HOME:-/tmp/cubistry-flix-cache} COURSIER_CACHE=${COURSIER_CACHE:-/tmp/cubistry-flix-coursier}
+          ./flixw build-jar > "$RUNNER_TEMP/out/flix-verification-build.log" 2>&1 || { tail -n 40 "$RUNNER_TEMP/out/flix-verification-build.log"; exit 1; }
+          tail -n 3 "$RUNNER_TEMP/out/flix-verification-build.log"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: upright-flix-${{ github.run_id }}
+          path: ${{ runner.temp }}/out/
+          retention-days: 30
+
+  flix-legacy:
+    needs: [prepare]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Build the pure-split Flix jar (uses the rule-parametrized Core.flix)
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/out"
+          jar=$(bash "$CAL/pure-split-states/flix/build.sh" | tail -n 1)
+          test -f "$jar"
+          echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
+          sha256sum "$jar" | tee "$RUNNER_TEMP/out/flix-pure-jar.sha256"
+      - name: Legacy regression (Flix chain verifier) against committed receipts
+        run: |
+          set -euo pipefail
+          cd "$CAL/pure-split-states"
+          java -Dstdout.encoding=UTF-8 -Xmx6g -jar "$FLIX_JAR" matchability evidence/print-pure-A.tsv ../english/evidence | grep '^pure-' > "$RUNNER_TEMP/out/flix-matchability-legacy.tsv"
+          cmp "$RUNNER_TEMP/out/flix-matchability-legacy.tsv" evidence/receipts/matchability.flix.tsv
+          gzip -dc evidence/dag-all.tsv.gz > "$RUNNER_TEMP/dag-all.tsv"
+          java -Dstdout.encoding=UTF-8 -Xmx6g -jar "$FLIX_JAR" chain evidence/print-pure-A.tsv "$RUNNER_TEMP/dag-all.tsv" evidence/chain-2027.moves.tsv ../english/evidence ../en-physical-review > "$RUNNER_TEMP/chain-2027.flix.stdout"
+          grep -E '^(source|edge|metrics|endpoint|status)' "$RUNNER_TEMP/chain-2027.flix.stdout" > "$RUNNER_TEMP/out/flix-chain-2027-legacy.tsv"
+          cmp "$RUNNER_TEMP/out/flix-chain-2027-legacy.tsv" evidence/receipts/chain-2027.flix.tsv
+          tail -n 1 "$RUNNER_TEMP/out/flix-chain-2027-legacy.tsv"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: upright-flix-legacy-${{ github.run_id }}
+          path: ${{ runner.temp }}/out/
+          retention-days: 30
