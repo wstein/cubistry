@@ -90,7 +90,7 @@ jobs:
           IN_MONTH: ${{ inputs.start_month || '1' }}
           IN_EDGES: ${{ inputs.edges_per_job || '2' }}
           IN_JOBS: ${{ inputs.jobs || '2' }}
-          IN_PRIOR: ${{ inputs.prior_run_id }}
+          IN_PRIOR: ${{ inputs.prior_run_id || '42470374989' }}
           IN_SMOKE: ${{ inputs.smoke_mode }}
         run: |
           set -euo pipefail
