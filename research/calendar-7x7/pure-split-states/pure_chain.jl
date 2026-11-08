@@ -10,6 +10,10 @@
 # base 7eaebaf, because including those files twice would redefine constants.
 #   pure_chain.jl PRINT DAG CHAIN
 include(joinpath(@__DIR__,"pure_common.jl"))
+# Glyph half-turn rule: CUBISTRY_RULE=legacy (default, the rule of the chains in main) or
+# strict (../upright-flix/rule_select.jl). Two separate top-level statements on purpose.
+include(joinpath(@__DIR__,"..","upright-flix","rule_select.jl"))
+select_rule!(Main)
 # Explicit coordinate formulas independently rotate the actual sticker poses.
 function turn_vector(v, axis)
     axis == 1 && return (v[1], -v[3], v[2])
