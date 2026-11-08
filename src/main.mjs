@@ -1124,6 +1124,7 @@ function checkAutoRun(app) {
 async function switchApplication(requested, { initial = false } = {}) {
   const targetKey = normalizeAppKey(requested);
   const externalMap = {
+    "index.html?app=clock": "index.html?app=clock",
     "playground": "playground.html",
     "calendar": "calendar.html",
     "status-cube": "status.html",

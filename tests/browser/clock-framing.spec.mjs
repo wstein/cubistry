@@ -124,3 +124,15 @@ test("the reference top-right viewpoint resets and fits the shared row on deskto
     });
   }
 });
+
+for (const [path, selector] of [["/counter.html", "#application"], ["/ms-timer.html", "#ms-timer-application"]]) {
+  test(`the legacy chooser on ${path} opens the unified Live Clock`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.locator(selector)).toBeEnabled();
+    const clock = page.locator(selector).getByRole("option", { name: "Live H–M–S Clock", exact: true });
+    await expect(clock).toHaveAttribute("value", "index.html?app=clock");
+    await page.selectOption(selector, "index.html?app=clock");
+    await expect(page).toHaveURL(/index\.html\?app=clock$/);
+    await expect(page.locator("#seconds-speed")).toBeEnabled({ timeout: 30000 });
+  });
+}
