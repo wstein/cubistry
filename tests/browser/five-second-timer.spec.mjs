@@ -113,14 +113,34 @@ test("five-second option has exact cap, inherited rotation stops, independent pr
   await page.locator('[data-delta="1"]').click();
   await settled(page, "1");
 });
+// Plays the paused fake clock one 16 ms frame at a time until the cube shows `value` and is idle. A bucket needs only
+// as many frames as it has moves (reduced motion), so the count follows the work and not a fixed time: the viewer
+// renders on every frame, and on a 2-vCPU runner each software-rendered frame costs 100 to 300 ms. A fixed 100 ms
+// slice rendered seven frames per bucket and, over 360 buckets, pushed this test past its 600 s limit.
+async function playFramesUntilSettled(page, value, limit = 120) {
+  for (let frames = 0; frames < limit; frames++) {
+    const reached = await page.evaluate((value) => {
+      const cube = document.querySelector("#cube");
+      return cube.dataset.value === value && cube.getAttribute("aria-busy") === "false";
+    }, value);
+    if (reached) return frames;
+    await page.clock.runFor(16);
+  }
+  return limit;
+}
 test("full thirty-minute countdown visits all361 actual states and independently replays1681HTM", async ({
   page,
 }) => {
   test.setTimeout(600000);
+  // This test proves the physical moves and states of the countdown, not its pixels or layout. The viewer renders
+  // every move synchronously, and in software-rendered Chromium the cost of a render follows the canvas area
+  // (measured: about four times faster at this size than at 1280x1000), so a small viewport keeps the 1681 renders
+  // far enough below the 600 s limit. The Start click goes through the DOM because the small layout overlaps panels.
+  await page.setViewportSize({ width: 320, height: 240 });
   await page.clock.install();
   await choose(page);
   await pauseSoon(page, 1000);
-  await page.click("#timer-start");
+  await page.evaluate(() => document.querySelector("#timer-start").click());
   const epoch = await page.evaluate(() => performance.now());
   let offset = 0;
   const transitions = [];
@@ -129,7 +149,7 @@ test("full thirty-minute countdown visits all361 actual states and independently
     await page.clock.fastForward(
       Math.max(0, epoch + (360 - value) * 5000 - now),
     );
-    await page.clock.runFor(100);
+    await playFramesUntilSettled(page, formatted(value));
     await settled(page, formatted(value));
     const step = await page.evaluate((offset) => {
       const moves = window.fiveMoves.slice(offset);
@@ -149,6 +169,7 @@ test("full thirty-minute countdown visits all361 actual states and independently
     transitions.push({ value, word: step.word, state: step.state });
   }
   expect(offset).toBe(1681);
+  await page.clock.runFor(100);
   await expect(page.locator("#session-moves")).toHaveText("1681");
   await expect(page.locator("#status")).toHaveText("Countdown · Complete");
   expect(
