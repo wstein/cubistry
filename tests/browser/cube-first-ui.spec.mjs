@@ -415,6 +415,30 @@ for (const [width, textPercent] of [
     }
   });
 
+// Real status messages from src/main.mjs; the dock must wrap them, not widen.
+for (const [width, textPercent] of [
+  [700, 100],
+  [600, 100],
+  [390, 100],
+  [320, 100],
+  [390, 125],
+  [320, 125],
+])
+  test(`a long status message keeps the dock inside the viewport at ${width}px, ${textPercent}% text`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await ready(page);
+    await page.evaluate((percent) => {
+      document.documentElement.style.fontSize = `${percent}%`;
+      document.getElementById("status").textContent =
+        "Blank-top print, NZ installed at 37. Session moves restart at 0. Switching to LZ · 12 / 31 setup moves";
+    }, textPercent);
+    for (const selector of ["#status", ".floating-dock", ".counter-stats", "#reset-session-moves"]) {
+      const box = await page.locator(selector).boundingBox();
+      expect(box.x, `${selector} left edge ${box.x}`).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width, `${selector} right edge ${box.x + box.width}`).toBeLessThanOrEqual(width);
+    }
+  });
+
 for (const saved of [
   { value: 7 },
   { value: 7, moveDuration: 100 },
