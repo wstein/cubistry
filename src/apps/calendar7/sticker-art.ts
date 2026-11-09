@@ -80,6 +80,36 @@ export function splitInkGap(layout: SplitLayout): number {
   );
 }
 
+/**
+ * Real ink extents of the digits 6 and 9 in Noto Sans 600, in em (canvas `measureText` actualBoundingBox at 1000 px,
+ * baseline alphabetic): ascent and descent about the baseline (the round digits overshoot it) and the horizontal ink
+ * extent measured from the left edge of the advance box. The 6 and the 9 differ only in their right edge.
+ */
+const HALF_TURN_INK: Readonly<Record<string, { ascent: number; descent: number; left: number; right: number }>> = {
+  "6": { ascent: 0.735, descent: 0.016, left: 0.031, right: 0.547 },
+  "9": { ascent: 0.735, descent: 0.016, left: 0.031, right: 0.532 },
+};
+
+/** True for the single digits 6 and 9 in the strict profile: they read as each other after a half turn, so their ink must sit exactly on the sticker center. */
+export const isHalfTurnDigit = (text: string, profile: RuleProfile): boolean => profile === "strict" && text in HALF_TURN_INK;
+
+/**
+ * Placement of a strict 6 or 9 at font size `size` so that the ink box is centered on the sticker, drawn with
+ * `textAlign` "center" and an alphabetic baseline (texture pixels, y down). A half-turned label is shown rotated by 180
+ * degrees about the sticker center, so an ink offset d from the center shows as a drift of 2d between the two readings.
+ * Pure geometry, like `splitLayout`; `box` is the ink box.
+ */
+export function halfTurnDigitPlacement(text: string, size: number): { x: number; baseline: number; box: { x0: number; y0: number; x1: number; y1: number } } {
+  const ink = HALF_TURN_INK[text];
+  if (!ink) throw new Error(`not a half-turn digit: ${text}`);
+  const baseline = TEXTURE / 2 + ((ink.ascent - ink.descent) * size) / 2;
+  // The advance box is centered on x; the ink center sits at (left + right) / 2 inside it.
+  const x = TEXTURE / 2 - (((ink.left + ink.right) / 2 - EM.digitAdvance / 2) * size);
+  const w = EM.digitAdvance * size;
+  const x0 = x - w / 2;
+  return { x, baseline, box: { x0: x0 + ink.left * size, y0: baseline - ink.ascent * size, x1: x0 + ink.right * size, y1: baseline + ink.descent * size } };
+}
+
 type Context = Pick<
   CanvasRenderingContext2D,
   "fillStyle" | "fillRect" | "fillText" | "font" | "measureText" | "textAlign" | "textBaseline"
@@ -107,11 +137,15 @@ export function drawSticker(
     return;
   }
   ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+  const exact = isHalfTurnDigit(text, profile);
+  ctx.textBaseline = exact ? "alphabetic" : "middle";
   const base = baseFontSize(text.length);
   ctx.font = `600 ${base}px ${FONT}`;
   const width = ctx.measureText(text).width;
   const size = Math.floor(Math.min(base, (base * TEXTURE * 0.86) / Math.max(width, 1)));
   ctx.font = `600 ${size}px ${FONT}`;
-  ctx.fillText(text, TEXTURE / 2, TEXTURE / 2 + size * 0.04);
+  if (exact) {
+    const at = halfTurnDigitPlacement(text, size);
+    ctx.fillText(text, at.x, at.baseline);
+  } else ctx.fillText(text, TEXTURE / 2, TEXTURE / 2 + size * 0.04);
 }
