@@ -23,7 +23,6 @@ import {
   tenthAssetImages,
   TENTH_MOVE_MS,
   DEFAULT_TENTH_STEP_INTERVAL,
-  tenthTurnSpeedForInterval,
 } from "./apps/ms-timer/tenth.ts";
 import { whenCurrent } from "./apps/chronocube/mode-switch.ts";
 import { browserMountEnv, mountCalendar7 } from "./apps/calendar7/mount.ts";
@@ -545,10 +544,9 @@ async function initTenthMode(isCurrent, shell) {
   let manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont, "words-pascal");
 
   function updateViewerSpeed(intervalMs) {
-    const turnDuration = tenthTurnSpeedForInterval(intervalMs);
-    viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / turnDuration);
+    viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / intervalMs);
   }
-  updateViewerSpeed(100);
+  updateViewerSpeed(250);
 
   const tenth = new MsTimerTenthCube(
     viewer,
@@ -613,7 +611,7 @@ async function initCounterMode(isCurrent) {
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
   const abandon = () => (viewer.destroy(), null);
-  viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 100);
+  viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 250);
 
   const manifest = buildManifest(currentDisplay, currentMarker, currentLetterFont);
 
@@ -685,7 +683,7 @@ async function initTimerMode(fiveSecond, isCurrent) {
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
   const abandon = () => (viewer.destroy(), null);
-  viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 100);
+  viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 250);
 
   const route = fiveSecond ? await loadFiveSecondRoute(base) : await loadTimerRoute(base);
   if (!isCurrent()) return abandon();
@@ -791,7 +789,7 @@ async function initHsmSingleMode(variant, isCurrent) {
   const viewer = new CubeViewer($("studio-scene"));
   activeViewer = viewer;
   const abandon = () => (viewer.destroy(), null);
-  viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 100);
+  viewer.setAnimationSpeed(BASE_MOVE_DURATION_MS / 250);
 
   const design = variant === "ms"
     ? await loadMsDesign(base, msPin.runtimeSHA256)

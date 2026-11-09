@@ -18,7 +18,8 @@ test("adaptive plans reserve real overhead, never slow preference, and explicitl
 function mock() {
   const requests = [];
   const c = {state:route.states[90],currentValue:90,busy:false, progress:{target:90,queuedTarget:null,total:5,completed:0},
-    prepare(){return Array(5)}, setDeadline(){},clearDeadline(){}, request(value){requests.push(value);this.busy=true;this.progress.target=value;} };
+    get remainingQuarterTurns(){return this.progress.total-this.progress.completed;},
+    prepare(){return Array.from({length:5},()=>({face:"R",turns:1}))}, setDeadline(){},clearDeadline(){}, request(value){requests.push(value);this.busy=true;this.progress.target=value;} };
   return {c,requests};
 }
 const snapshot = (at, deadline=10000, bucket=90) => ({at,bucket,running:true,next:{target:bucket-1,deadline,interval:10000}});
@@ -78,7 +79,7 @@ test("slowing an active infeasible clock clears an obsolete budget warning", () 
 });
 test("a changed full prepared source forces preparation again before dispatch", () => {
   const s=new TimerScheduler(),{c}=mock();let preparations=0;
-  c.prepare=()=>{preparations++;return Array(5);};
+  c.prepare=()=>{preparations++;return Array.from({length:5},()=>({face:"R",turns:1}));};
   s.tick(snapshot(0),c,250,()=>{});
   c.state=route.states[20];
   s.tick(snapshot(100),c,250,()=>{});
@@ -133,4 +134,21 @@ test("a clock jump beyond the planned target clears published pacing before late
   s.tick({at:9050,bucket:80,running:true,next:{target:79,deadline:9150,interval:100}},c,250,v=>effective=v);
   assert.equal(published,null);assert.equal(effective,10);assert.equal(s.warning,"Late");
   assert.deepEqual(requests,[89,80]);s.invalidate();
+});
+
+test("angular plans preserve token overhead and spend twice the motion budget on half turns",()=>{
+ const p=planSequence(2,250,10000,10000,3);
+ assert.equal(p.effective,250);assert.equal(p.duration,908);
+ assert.equal(planSequence(2,250,10000,928,3).effective,250);
+});
+test('active retiming budgets remaining angle while progress stays in HTM tokens',()=>{
+ const {c,requests}=mock();c.prepare=()=>[{face:'R',turns:2},{face:'U',turns:1}];
+ Object.defineProperty(c,'remainingQuarterTurns',{get:()=>3});
+ c.progress.total=2;
+ const s=new TimerScheduler();let duration;
+ s.tick(snapshot(0),c,250,v=>duration=v);
+ s.tick(snapshot(9100),c,250,v=>duration=v);assert.deepEqual(requests,[89]);
+ s.tick(snapshot(9100,10000),c,500,v=>duration=v);
+ assert.equal(duration,planSequence(2,500,10000,900,3).effective);
+ assert.equal(c.progress.total,2);assert.equal(c.progress.completed,0);s.invalidate();
 });

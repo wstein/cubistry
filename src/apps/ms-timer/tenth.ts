@@ -21,7 +21,7 @@ import {
   type MoveProgress,
   type PhysicalView,
 } from "../shared/playback.ts";
-import { routeTurnTiming } from "../shared/turn-timing.ts";
+import { quarterTurnUnits, routeTurnTiming } from "../shared/turn-timing.ts";
 import { positions } from "../hsm/design.ts";
 import type { MsRun } from "../ms/design.ts";
 import { MsPeriod } from "../ms/period.ts";
@@ -719,7 +719,7 @@ export class TenthScheduler {
       !controller.state ||
       !stateEquals(p.source, controller.state)
     ) {
-      const moves = controller.prepare(next.target).length;
+      const moves = quarterTurnUnits(controller.prepare(next.target));
       const duration = moves * TENTH_MOVE_MS;
       p = this.plan = {
         target: next.target,

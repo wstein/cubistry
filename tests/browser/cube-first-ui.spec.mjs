@@ -141,7 +141,7 @@ test("seven exact keyboard speed stops persist and remain separate from Run cade
 }) => {
   await ready(page);
   const slider = page.getByLabel("Rotation Speed");
-  await expect(slider).toHaveValue("4");
+  await expect(slider).toHaveValue("3");
   await expect(slider).toHaveAttribute("min", "0");
   await expect(slider).toHaveAttribute("max", "6");
   await expect(slider).toHaveAttribute("step", "1");
@@ -152,7 +152,7 @@ test("seven exact keyboard speed stops persist and remain separate from Run cade
     await expect(slider).toHaveValue(String(i));
     await expect(slider).toHaveAttribute(
       "aria-valuetext",
-      `${labels[i]} per HTM move`,
+      `${labels[i]} per quarter turn`,
     );
     if (i < labels.length - 1) await slider.press("ArrowRight");
   }

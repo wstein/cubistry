@@ -150,7 +150,7 @@ export class MsTimerCube extends MsController {
             this.timing.endAt,
             this.timing.durationMs,
             this.timing.revision,
-            "htm",
+            "quarter",
           )
         : null,
     );

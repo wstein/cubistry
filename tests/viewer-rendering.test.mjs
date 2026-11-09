@@ -328,15 +328,17 @@ test("production shared gestures inspect rear/bottom and preserve rigid placemen
  assert(new THREE.Vector3(0,-1,0).applyQuaternion(root.quaternion).z>.9);verify();
  const deadline=h.binding.controller.returnDeadline;h.step(deadline+.3);assert.equal(h.binding.controller.phase,"returning");verify();
  const event=presentMove(state,parseMove("R")),frames=[],oldRAF=globalThis.requestAnimationFrame;
+ const oldNow=Object.getOwnPropertyDescriptor(performance,"now");Object.defineProperty(performance,"now",{configurable:true,value:()=>0});
  globalThis.requestAnimationFrame=cb=>(frames.push(cb),frames.length);
  try{await withMotion(false,async()=>{
    const animation=cubes[2].animate(event);const bodies=new Set(cubes[2].cube.bodies.values());const pivot=cubes[2].scene.children.find(o=>!bodies.has(o)&&!o.userData.plasticCore);assert(pivot);assert.equal(pivot.parent,cubes[2].scene);
    h.time(deadline+.31);h.element.pointer("pointerdown");h.time(deadline+.4);h.element.pointer("pointermove",150,130);
-   frames.shift()(performance.now()+40);assert(pivot.rotation.x!==0);
+   frames.shift()(40);assert(pivot.rotation.x!==0);
    stage.updatePresentationBounds();const scaleDuring=root.scale.x,floorDuring=studio.floor.position.y;stage.updatePresentationBounds();
    assert.equal(root.scale.x,scaleDuring);assert.equal(studio.floor.position.y,floorDuring);assert(stateEquals(cubes[2].presentedState,state));
    const parent=pivot.parent;h.element.pointer("pointerup",150,130);h.step(deadline+.5);assert.equal(h.binding.controller.phase,"coasting");assert.equal(pivot.parent,parent);
-   frames.shift()?.(performance.now()+200);await animation;verify();assert(stateEquals(cubes[2].presentedState,event.to));
+   frames.shift()(249);for(let flush=0;flush<5;flush++)await Promise.resolve();assert(cubes[2].animating);assert(stateEquals(cubes[2].presentedState,state));
+   frames.shift()(250);await animation;verify();assert(stateEquals(cubes[2].presentedState,event.to));
   });
   h.step(deadline+3);verify();const next=h.binding.controller.returnDeadline;if(next!==null){h.step(next+.5);assert.equal(h.binding.controller.phase,"returning");verify();}
   // Explicit zoom changes the observer distance without cancelling containment.
@@ -345,7 +347,7 @@ test("production shared gestures inspect rear/bottom and preserve rigid placemen
   assert(Math.abs(camera.position.z/distanceBefore-.8/1.8)<1e-12);
   stage.zoom=1.8;stage.fitCamera();
   cubes[0].resetCamera();assert(root.quaternion.angleTo(initial)<1e-7);assert(h.binding.controller.anchor.angleTo(initial)<1e-7);assert.equal(stage.zoom,1.8);verify();
- }finally{if(oldRAF)globalThis.requestAnimationFrame=oldRAF;else delete globalThis.requestAnimationFrame;h.binding.dispose();studio.dispose();cubes.forEach(c=>c.destroy());}
+ }finally{if(oldNow)Object.defineProperty(performance,"now",oldNow);else delete performance.now;if(oldRAF)globalThis.requestAnimationFrame=oldRAF;else delete globalThis.requestAnimationFrame;h.binding.dispose();studio.dispose();cubes.forEach(c=>c.destroy());}
 });
 
 test('standalone 2x2 and shared Calendar/Picture 3x3 bindings level rolled Free views without changing any canonical sticker frame or camera',async()=>{
@@ -369,4 +371,39 @@ test('standalone 2x2 and shared Calendar/Picture 3x3 bindings level rolled Free 
   h.binding.dispose();
  }
  two.viewer.destroy();three.dispose();material.dispose();
+});
+
+test("ordinary playback uses quarter-turn time for both directions and twice that time for a half turn", async () => {
+  const previousNow = Object.getOwnPropertyDescriptor(performance, "now");
+  const previousRaf = Object.getOwnPropertyDescriptor(globalThis, "requestAnimationFrame");
+  let at = 0, id = 0;
+  const frames = new Map();
+  Object.defineProperty(performance, "now", { configurable: true, value: () => at });
+  Object.defineProperty(globalThis, "requestAnimationFrame", { configurable: true, value: (cb) => (frames.set(++id, cb), id) });
+  try {
+    await withMotion(false, async () => {
+      for (const duration of [100, 250, 500, 1000]) for (const token of ["R", "R'", "R2", "U", "U'", "U2", "L", "L'", "L2", "D", "D'", "D2", "F", "F'", "F2", "B", "B'", "B2"]) {
+        const h = fixture();
+        h.viewer.setAnimationSpeed(75 / duration);
+        at = 0;
+        const event = presentMove(h.state, parseMove(token));
+        const promise = h.viewer.animate(event);
+        let finishedAt = null;
+        for (let step = 0; step <= 12 && h.viewer.animating; step++) {
+          at = step * duration / 4;
+          const pending = [...frames.values()]; frames.clear();
+          for (const cb of pending) cb(at);
+          for (let flush = 0; flush < 5; flush++) await Promise.resolve();
+          if (!h.viewer.animating) finishedAt = at;
+        }
+        assert.equal(finishedAt, duration * Math.abs(event.move.turns), token);
+        await promise;
+        assert(stateEquals(h.viewer.presentedState, event.to));
+        h.viewer.destroy();
+      }
+    });
+  } finally {
+    if (previousNow) Object.defineProperty(performance, "now", previousNow); else delete performance.now;
+    if (previousRaf) Object.defineProperty(globalThis, "requestAnimationFrame", previousRaf); else delete globalThis.requestAnimationFrame;
+  }
 });

@@ -1,12 +1,12 @@
 import type { ModeShell } from "../shell/slot-api.ts";
 
-/** Step intervals of the 1/10-Second Counter in milliseconds; the second entry is the default. */
+/** Step intervals of the 1/10-Second Counter in milliseconds; 250 ms is the default quarter-turn time. */
 export const TENTH_STEP_INTERVALS = [50, 100, 250, 500] as const;
 
 const INTERVAL_LABELS: Readonly<Record<(typeof TENTH_STEP_INTERVALS)[number], string>> = {
   50: "50 ms (Fast)",
-  100: "100 ms (Default)",
-  250: "250 ms",
+  100: "100 ms",
+  250: "250 ms (Default)",
   500: "500 ms",
 };
 
@@ -86,9 +86,9 @@ export function mountTenthControls(shell: ModeShell, doc: Doc, handlers: TenthCo
     label: "Step speed",
     element: select(
       "tenth-speed-select",
-      "Step speed",
+      "Quarter-turn time",
       TENTH_STEP_INTERVALS.map((ms) => [String(ms), INTERVAL_LABELS[ms]] as [string, string]),
-      "100",
+      "250",
       (v) => handlers.setStepInterval(Number(v)),
     ),
   });

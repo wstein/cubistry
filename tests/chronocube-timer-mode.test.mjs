@@ -113,7 +113,7 @@ test("studio timer: Pause restores the preferred move duration, as src/main.mjs 
   await settle();
   const after = durations.slice(durations.indexOf(-1) + 1);
   assert(after.length > 0);
-  assert.equal(after[0], 100);
+  assert.equal(after[0], 250);
 });
 
 test("studio timer: an error in the periodic tick goes to onError instead of escaping", async () => {

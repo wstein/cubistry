@@ -48,6 +48,8 @@ export { rotatePresentation, cubePresentationRadius, presentationCameraRadius, f
 const spacing = 0.5;
 /** Physical-state viewer: no target selection, solver or mechanics ownership. */
 export const BASE_MOVE_DURATION_MS = 75;
+/** Default time for a quarter turn on a standalone cube. */
+export const DEFAULT_QUARTER_TURN_MS = 250;
 export const MIN_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 2000;
 export const MAX_ANIMATION_SPEED = BASE_MOVE_DURATION_MS / 10;
 /** A caller-owned viewport can render several independent physical cubes. */
@@ -60,11 +62,11 @@ export interface SharedCubeViewport {
   readonly onDefaultPlasticColor?: (color: string) => void;
 }
 export class CubeViewer {
-  private animationSpeed = 1;
-  private durationUnit: "move" | "quarter-turn" = "move";
+  private animationSpeed = BASE_MOVE_DURATION_MS / DEFAULT_QUARTER_TURN_MS;
+  private durationUnit: "move" | "quarter-turn" = "quarter-turn";
   setAnimationSpeed(
     speed: number,
-    durationUnit: "move" | "quarter-turn" = "move",
+    durationUnit: "move" | "quarter-turn" = "quarter-turn",
   ): void {
     demand(
       Number.isFinite(speed) &&

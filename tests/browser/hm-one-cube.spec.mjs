@@ -139,8 +139,8 @@ test("Set, Reset, unit change and validation behave like the H/M/S counter", asy
 }) => {
   await choose(page);
   await unit(page, "M");
-  // 100 ms per HTM move for every unit, as in the H/M/S counter.
-  await expect(page.locator("#rotation-speed")).toHaveValue("4");
+  // 250 ms per quarter turn for every unit, as in the H/M/S counter.
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
   await page.fill("#hsm-value", "60");
   await page.locator("#hsm-set-form").evaluate((f) => f.requestSubmit());
   await expect(page.locator("#error")).toContainText("00 to 59");
@@ -164,12 +164,12 @@ test("Set, Reset, unit change and validation behave like the H/M/S counter", asy
   await page.fill("#hsm-value", "05");
   await page.locator("#hsm-set-form").evaluate((f) => f.requestSubmit());
   await settled(page, 5);
-  // A non-default speed stop first, so the unit change visibly re-applies 100 ms.
+  // A non-default speed stop first, so the unit change visibly re-applies 250 ms.
   await page.locator("#rotation-speed").fill("2");
   await expect(page.locator("#rotation-speed")).toHaveValue("2");
   await unit(page, "H");
   await expect(page.locator("#status")).toContainText("H · 00");
-  await expect(page.locator("#rotation-speed")).toHaveValue("4");
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
   await physical(page, "H", 0);
   expect(await options(page, "hsm-range")).toEqual(["23", "11"]);
   // H 00–23 rejects 24; H 00–11 wraps 11 -> 00.

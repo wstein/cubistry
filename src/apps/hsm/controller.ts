@@ -108,7 +108,7 @@ export class HsmController extends PhysicalPlayback {
     revision: number;
   } | null = null;
   private revision = 0;
-  /** Clock-only angular schedule; standalone counting keeps its existing speed contract. */
+  /** Angular deadline schedule; standalone counting uses its selected quarter-turn time. */
   setDeadline(target: number, endAt: number, quarterDurationMs: number): void {
     demand(
       Number.isFinite(endAt) &&

@@ -105,7 +105,7 @@ export async function rig({
       };
       await animateTimedProgress(
         source ?? (() => null),
-        () => speed[unit],
+        () => speed[unit]*Math.abs(presentation.move.turns),
         () => row.samples++,
         runtime,
       );

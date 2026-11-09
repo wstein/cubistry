@@ -40,8 +40,8 @@ export interface StudioTimerParts {
   onError?: (err: Error) => void;
 }
 
-/** Preferred move duration (ms) of the Studio timer cube; the scheduler shortens it when a deadline needs it. */
-export const STUDIO_TIMER_MOVE_MS = 100;
+/** Preferred quarter-turn duration (ms) of the Studio timer cube; the scheduler shortens it when a deadline needs it. */
+export const STUDIO_TIMER_MOVE_MS = 250;
 
 /** Start, Pause, Reset and the periodic tick of the Studio timer modes. */
 export class StudioTimerDriver {

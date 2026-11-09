@@ -35,7 +35,7 @@ export class CalendarViewer {
   private rotation?: SmartRotationBinding;
   private current: State | null = null;
   private busy = false;
-  duration = 100;
+  duration = 250;
   get presentedState(): State | null {
     return this.current;
   }
@@ -185,7 +185,7 @@ export class CalendarViewer {
         const start = performance.now();
         await new Promise<void>((resolve) => {
           const tick = (now: number) => {
-            const p = Math.min(1, (now - start) / this.duration);
+            const p = Math.min(1, (now - start) / (this.duration * Math.abs(turns)));
             turn!.update(p * p * (3 - 2 * p));
             if (p < 1) requestAnimationFrame(tick);
             else resolve();

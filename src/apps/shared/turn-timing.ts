@@ -3,8 +3,8 @@ import type { MotionTiming } from "@cubistry/cube-viewer";
 /** Angular work: a half turn covers twice the angle of a quarter turn. */
 export const quarterTurnUnits = (moves: readonly LegalMove[]): number =>
   moves.reduce((total, move) => total + Math.abs(move.turns), 0);
-/** Contiguous windows end at the route deadline. HSM defaults to angular units;
- * Timer explicitly uses one HTM unit per legal token, including half turns. */
+/** Contiguous windows end at the route deadline. Angular units preserve
+ * a half turn's twice-quarter duration independently of HTM progress counts. */
 export function routeTurnTiming(
   moves: readonly LegalMove[],
   index: number,

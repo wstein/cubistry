@@ -8,6 +8,7 @@ import {
 import { presentMove, type MovePresentation } from "@cubistry/cube-mechanics";
 import type { MotionTimingSource } from "@cubistry/cube-viewer";
 import { type LoadedAssets } from "@cubistry/cube-assets";
+import { quarterTurnUnits } from "./turn-timing.ts";
 export interface PhysicalView {
   configure(
     print: PrintDefinition,
@@ -47,6 +48,11 @@ export abstract class PhysicalPlayback {
   protected queued = false;
   protected failed = false;
   protected activeTarget: number | null = null;
+  private activeMoves: readonly LegalMove[] = [];
+  /** Angular work remaining; progress and session counters remain HTM. */
+  get remainingQuarterTurns(): number {
+    return this.busy ? quarterTurnUnits(this.activeMoves.slice(this.playback.completed)) : 0;
+  }
   protected stopping = false;
   private betweenTargets = false;
   protected playback: MoveProgress = Object.freeze({
@@ -212,6 +218,7 @@ export abstract class PhysicalPlayback {
         }
         const targetState = this.targetState(target);
         const moves = this.targetMoves(this.authoritative, targetState, target);
+        this.activeMoves = moves;
         this.activeTarget = target;
         this.progressUpdate({
           completed: 0,
