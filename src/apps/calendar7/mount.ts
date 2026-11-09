@@ -19,6 +19,7 @@ import {
   type YearMonth,
   type PageModel,
 } from "./month-view.ts";
+import { schemeById } from "./schemes.ts";
 import type { Surface } from "./sticker-art.ts";
 import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnapshot, type StageView } from "./player.ts";
 
@@ -26,6 +27,8 @@ import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnaps
 export interface Stage extends StageView {
   configure(printing: Printing, pose: Pose, surface?: Surface): void;
   setLabel(text: string): void;
+  /** Color scheme by id (src/apps/calendar7/schemes.ts); an unknown id gives the default. Optional: a fake stage may omit it. */
+  setScheme?(id: string | null | undefined): void;
   resetView(): void;
   destroy(): void;
 }
@@ -49,11 +52,19 @@ export interface MountEnv {
 
 const MY_PARAMS = ["year", "month"];
 
+/** The URL parameter that picks the color scheme of the 3D view (`?scheme=paper-blue`); unknown values use the default. */
+export const SCHEME_PARAM = "scheme";
+
+/** The mounted mode: the dispose of every mode plus the in-memory scheme setter the catalog will call. */
+export interface Calendar7Instance extends ModeInstance {
+  setScheme(id: string | null): void;
+}
+
 export async function mountCalendar7(
   root: HTMLElement,
   params: URLSearchParams,
   env: MountEnv,
-): Promise<ModeInstance | void> {
+): Promise<Calendar7Instance | void> {
   const threeD = Boolean(env.sceneHost && env.createStage);
   root.innerHTML =
     '<div class="c7-live" role="status" aria-live="polite"></div>' +
@@ -88,6 +99,10 @@ export async function mountCalendar7(
   let wordOptions: WordOptions = { ...DEFAULT_WORD_OPTIONS };
   let currentModel: PageModel | null = null;
   let selectedSpeed: number = DEFAULT_SPEED;
+  let schemeId: string | null = params.get(SCHEME_PARAM);
+  /** Test hook and proof for readers: the id of the scheme the 3D view uses (an unknown id shows as the default). */
+  const publishScheme = (): void => root.setAttribute("data-c7-scheme", schemeById(schemeId).id);
+  if (threeD) publishScheme();
   let focusPlayback = false;
   let resizeObserver: ResizeObserver | null = null;
   let activeWord: { blocks: readonly Block[]; plan: NotationPlan; notation: Notation } | null = null;
@@ -236,6 +251,7 @@ export async function mountCalendar7(
       }
       stage = made;
       const s = start as NonNullable<typeof start>;
+      made.setScheme?.(schemeId);
       made.configure(s.printing, s.pose, s.surface);
       player = new Calendar7Player({
         graph,
@@ -375,6 +391,12 @@ export async function mountCalendar7(
   }
 
   return {
+    /** Chooses the color scheme of the 3D view by id (in memory only; unknown id: default). */
+    setScheme: (id: string | null) => {
+      schemeId = id;
+      if (threeD) publishScheme();
+      stage?.setScheme?.(id);
+    },
     dispose: () => {
       disposed = true;
       root.removeEventListener("click", onClick);
