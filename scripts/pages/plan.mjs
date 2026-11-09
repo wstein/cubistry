@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { writeFile, appendFile } from "node:fs/promises";
 import { GitHub } from "./api.mjs";
 import { plan, previewInventory, BUILD_WORKFLOW, hasPreviewLabel } from "./policy.mjs";
+import { readPublication } from './publication.mjs';
+import { optimizePlan, notificationNumbers, commentMarker } from './reconciliation.mjs';
+import { trustedPublisher } from './notification.mjs';
 const api = new GitHub();
 const pages = await api.request("pages");
 if (
@@ -26,15 +30,40 @@ const runs = await api.pages(
   `actions/workflows/pages.yml/runs?head_sha=${main.sha}`,
   "workflow_runs",
 );
-const result = plan({
+let result = plan({
   pulls,
   inventory,
   builds,
   main: { sha: main.sha, runs },
 });
+let published=await readPublication();
+if(published){
+  const source=await api.request(`actions/runs/${published.run}`);
+  if(!trustedPublisher(source)||source.run_attempt!==published.attempt||source.head_sha!==published.sha)published=null;
+}
+const production=await metadata('.cubistry-production.json');
+const previews={};
+for(const entry of result.entries)if(entry.action==='deploy')previews[entry.number]=await metadata(`pr-preview/pr-${entry.number}/preview-info.json`);
+result=optimizePlan(result,{storage:tree?.sha,published,production,previews});
+// Migrate old stable comments once. Later receipts retain only relevant PRs,
+// so normal reconciliation never scans the entire historical PR collection.
+const bootstrap=[];
+if(!published){
+  for(const pr of await api.pages('pulls?state=all')){
+    if(pr.head?.repo?.full_name!=='wstein/cubistry')continue;
+    const comments=await api.pages(`issues/${pr.number}/comments`);
+    if(comments.some(c=>c.user?.login==='github-actions[bot]'&&c.body?.includes(commentMarker)))bootstrap.push(pr.number);
+  }
+}
+result.notify=notificationNumbers({pulls,inventory,published,bootstrap});
+result.tracked=notificationNumbers({pulls,inventory:[],published:null});
+async function metadata(path){
+  const blob=await api.request(`contents/${path}?ref=gh-pages`);
+  try{return blob?.content?JSON.parse(Buffer.from(blob.content,'base64').toString()):null;}catch{return null;}
+}
 await writeFile("pages-plan.json", JSON.stringify(result));
 // A sentinel keeps the matrix structurally valid when no previews exist.
 await appendFile(
   process.env.GITHUB_OUTPUT,
-  `matrix=${JSON.stringify({ include: result.entries.length ? result.entries : [{ number: 0, action: "none", status: "empty" }] })}\nproduction=${JSON.stringify({ number: 0, ...result.production })}\n`,
+  `matrix=${JSON.stringify({ include: result.entries.filter(x=>x.action!=='none').length ? result.entries.filter(x=>x.action!=='none') : [{ number: 0, action: "none", status: "empty" }] })}\nproduction=${JSON.stringify({ number: 0, ...result.production })}\nearly=${result.early}\npreviews=${result.previews}\nnotify=${JSON.stringify(result.notify)}\ntracked=${JSON.stringify(result.tracked)}\n`,
 );

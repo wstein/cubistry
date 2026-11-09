@@ -28,9 +28,10 @@ or deployment runs. Read-only PR/main builds may produce artifacts.
 After activation, `gh-pages` is a static storage branch, not a second Pages
 publishing source. Ross writes `pr-preview/pr-N/`; the pinned JamesIves action
 updates production root with `force: false` and `clean-exclude: pr-preview/`.
-An early Actions Pages deployment publishes the verified production update before
-preview reconciliation. After every preview matrix entry finishes, a second
-deployment publishes a fresh combined snapshot. Preview failures cannot block
+An early Actions Pages deployment publishes a changed or not-yet-verified production
+snapshot before preview reconciliation. After every nonempty preview matrix finishes,
+a second deployment publishes changed combined storage. A live, nonce-bearing
+publication receipt proves an unchanged snapshot before either phase can be skipped. Preview failures cannot block
 the early production deployment; successful preview updates and cleanup can
 still publish if another matrix entry fails. The old and
 new deployers have mutually exclusive gate conditions and share the same global
@@ -174,8 +175,8 @@ uses `always()` to permit partial preview failures, and still requires successfu
 production staging and the early deployment. `!cancelled()` prevents this
 additional privileged publication after an operator cancels reconciliation;
 ordinary preview failures still permit successful updates to publish.
-Notification consumes only its
-result. Failure of this final deployment reports previews/cleanup as pending
+Notification runs in a separate trusted-main workflow and consumes a bounded,
+immutable receipt from the exact publisher run and attempt. Failure of this final deployment reports previews/cleanup as pending
 while the already published production site remains available.
 
 `node --test tests/pages-publication.test.mjs tests/pages-workflow.test.mjs tests/pages-policy.test.mjs tests/pages-stage.test.mjs`
@@ -188,3 +189,41 @@ This maintenance change preserves activation gates and does not activate,
 dispatch or deploy the workflow; trusted-main behavior changes only after a
 human merges the reviewed fix. The initial activation procedure above remains
 historical setup guidance for inactive installations.
+
+
+## Queue bounds and deployment receipts
+
+Read-only build supersession does not cancel this publisher. Ross storage writes
+and both publication phases remain under the existing global publication lock.
+Exact production build metadata and preview metadata avoid restaging unchanged
+artifacts. Empty preview matrices do not allocate a runner. An unchanged tree is
+skipped only when the public `.cubistry-publication.json` receipt identifies that
+exact Git storage tree and a verified trusted publisher run. A storage write
+followed by a failed deployment therefore remains eligible for repair.
+
+The trusted standard-library Node deployment helper keeps the existing official
+Pages artifact upload and uses the same REST creation payload and default OIDC
+audience as the pinned deploy action. It waits at most ten minutes, including
+request time, and reattempts creation only after an explicit HTTP 400 response
+that says another named deployment is in progress. It polls that deployment's
+supported SHA identity. Network failures, other HTTP errors and ambiguous write
+outcomes never replay creation. No deployment is automatically cancelled.
+
+A successful API status alone is insufficient when both phases reuse the same
+main SHA: the helper also waits for the public receipt's unique nonce, run,
+attempt and storage tree to match the intended snapshot. Public reads use a fixed
+HTTPS origin, no credentials or redirects, a cache-busting query, timeouts and a
+32 KiB limit. CDN delay fails closed at the deadline. Receipts contain no secrets.
+The observed busy-deployment failure and this protection are covered by mocked
+API regressions; a new live deployment is not claimed by those tests.
+
+The separate notification workflow validates the publisher repository, workflow
+path, main context, event, run, attempt and bounded artifact identity before
+reading data. It checks current publisher, live receipt, storage tree, PR head
+and label immediately before each comment write. Old receipts cannot qualify a
+newer snapshot. Notification has its own serialized group and does not hold the
+publication lock. Normal runs inspect only active previews, inventoried storage
+and prior receipt candidates. A first-run historical bot-comment scan preserves
+old cleanup comments when migrating an installation without a receipt; later
+receipts retain only currently relevant preview numbers. Browser code and PR
+artifacts are never executed in these privileged jobs.

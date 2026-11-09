@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { GitHub } from "./api.mjs";
 import {
   REPOSITORY,
@@ -6,11 +7,12 @@ import {
   hasPreviewLabel,
   hasPreviewContent,
 } from "./policy.mjs";
-const api = new GitHub(),
-  marker = "<!-- cubistry-pr-preview -->",
-  deployOK = process.env.DEPLOY_OK === "true";
-const pulls = await api.pages("pulls?state=all");
-for (const pr of pulls) {
+import {loadNotification,currentNotification} from "./notification.mjs";
+export async function notifyPreviews(api,receipt,{fresh=()=>currentNotification(api,receipt)}={}) {
+const marker = "<!-- cubistry-pr-preview -->", deployOK=receipt.proof!==null;
+for (const number of receipt.numbers) {
+  const pr=await api.request(`pulls/${number}`);
+  if(!pr)continue;
   if (pr.head?.repo?.full_name !== REPOSITORY) continue;
   const comments = await api.pages(`issues/${pr.number}/comments`);
   const existing = comments.find(
@@ -56,6 +58,11 @@ for (const pr of pulls) {
   }
   const body = `${marker}\n### Cubistry PR preview\n${text}`;
   if (existing?.body === body) continue;
+  // Recheck immediately before every write: older reconciliations cannot
+  // overwrite a newer publisher, PR head, label state or live snapshot.
+  if(!await fresh())return;
+  const current=await api.request(`pulls/${pr.number}`);
+  if(!current || current.state!==pr.state || current.head?.sha!==pr.head?.sha || hasPreviewLabel(current)!==hasPreviewLabel(pr) || current.head?.repo?.full_name!==REPOSITORY)continue;
   await api.request(
     existing
       ? `issues/comments/${existing.id}`
@@ -66,4 +73,11 @@ for (const pr of pulls) {
       headers: { "Content-Type": "application/json" },
     },
   );
+}
+
+}
+if(process.argv[1]?.endsWith("/notify.mjs")){
+ const api=new GitHub();
+ const receipt=await loadNotification(api,Number(process.env.PUBLISH_RUN));
+ await notifyPreviews(api,receipt);
 }

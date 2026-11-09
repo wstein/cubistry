@@ -48,6 +48,9 @@ function planned() {
         pull(2, "b", [{ name: "e2e" }]),
       ],
       "commits/main": { sha: sha("c") },
+      "contents/.cubistry-production.json?ref=gh-pages": null,
+      "contents/pr-preview/pr-1/preview-info.json?ref=gh-pages": null,
+      "pulls?state=all&per_page=100&page=1": [],
       "git/trees/gh-pages?recursive=1": {
         truncated: false,
         tree: [
@@ -63,7 +66,7 @@ function planned() {
     };
     writeFileSync(
       join(dir, "mock.mjs"),
-      `const responses=${JSON.stringify(responses)};globalThis.fetch=async url=>{const path=String(url).split('/repos/wstein/cubistry/')[1];if(!(path in responses))throw Error('Unexpected API access: '+path);return new Response(JSON.stringify(responses[path]),{status:200,headers:{'Content-Type':'application/json'}});};`,
+      `const responses=${JSON.stringify(responses)};globalThis.fetch=async url=>{if(String(url).startsWith('https://wstein.github.io/'))return new Response('',{status:404});const path=String(url).split('/repos/wstein/cubistry/')[1];if(!(path in responses))throw Error('Unexpected API access: '+path);return new Response(JSON.stringify(responses[path]),{status:200,headers:{'Content-Type':'application/json'}});};`,
     );
     execFileSync(
       process.execPath,
