@@ -760,11 +760,16 @@ test("a failed lettering change keeps the URL and print link, and a successful r
     await page.selectOption("#clock-lettering", "words");
     await expect(page.locator("#clock-lettering")).toBeEnabled();
     await expect(row).toContainText("Asset integrity check failed");
+    await expect(row).toBeVisible();
     await expect(row).toHaveAttribute("role", "alert");
     await expect(page.locator("#clock-lettering")).toHaveValue("words-pascal");
     await expect(page).toHaveURL(beforeUrl);
     await expect(page.locator("#print-stickers")).toHaveAttribute("href", beforePrint);
     expect(await page.evaluate(() => localStorage.getItem("cubistry_lettering"))).toBe("words-pascal");
+    if (attempt === 0) {
+      await row.getByRole("button", { name: "Dismiss error" }).click();
+      await expect(row).toHaveCount(0);
+    }
   }
   expect(await row.evaluate((el) => el.parentElement.closest('[aria-live="polite"], [role="status"]') === null)).toBe(true);
   await page.unroute(asset);
