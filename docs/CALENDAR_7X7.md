@@ -363,10 +363,16 @@ at least 12 px of gap and 10 px of margin. The Noto Sans font (OFL-1.1) is uncha
 is built, then `PhysicalCubeScene.setConstruction("stickerless")` (the 3x3 calendar uses the same call) hides the 294
 sticker meshes and gives each cubie face the label texture, so there is no sticker body and no gap between stickers;
 the cut faces keep the plastic color. The face texture is the sticker art (`drawSticker`: sizes, fit, split labels,
-6 and 9 rule) scaled about the center by `FACE_FLAT` (0.9106, the flat part of the body face in texture space, checked
-against the real geometry): the 86% text square covers 86% of the flat face, as it does on a sticker, and the paper
-fills the whole texture. Labels of up to three letters use the unchanged fit (font 80 px reduced to the text
-square). Nothing selects `"face"` yet: the shipped mount passes no surface, so scheme A is drawn as before. The
+6 and 9 rule) scaled about the center by `FACE_SCALE`. `FACE_FLAT` (0.9106) is the flat part of the body face in
+texture space (checked against the real geometry); the text square of the face label is `FACE_TEXT_SQUARE` = 0.92 of
+the flat face (a sticker label uses 0.86 of its sticker), so `FACE_SCALE` = 0.9106 * 0.92 / 0.86. The paper fills the
+whole texture. 0.92 was picked from the candidates 0.86, 0.92 and 0.97 on the real ink of three-letter labels: it is
+the largest with at least 4% of the flat width clear on every side (VEM is the tightest, 4.2%; at 0.97 it is 1.4%).
+Labels of up to three letters use the unchanged fit (font 80 px reduced to the text square).
+
+The surface is chosen by the optional top-level field `"surface"` of the state file (`parseState`): `"sticker"`
+(default when absent) or `"face"`; any other value is the error `state surface must be "sticker" or "face"`. The
+mount passes it to `Calendar7Viewer.configure`. The shipped `state.v1.json` has no such field and draws stickers. The
 sticker print sheet is not affected. Tests: `tests/calendar7-stickerless.test.mjs` (pure drawing, geometry, scene) and
 `tests/browser/calendar7-stickerless.spec.mjs` (real viewer and Noto Sans), both on the hand-made fixture
 `tests/calendar7-fixture.mjs`.

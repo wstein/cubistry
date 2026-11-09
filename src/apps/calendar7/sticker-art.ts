@@ -161,6 +161,15 @@ export function drawSticker(
  * tests/calendar7-stickerless.test.mjs (preset body width .99, radius .055, one bevel segment).
  */
 export const FACE_FLAT = 0.9106;
+/**
+ * The text square of a face label as a fraction of the flat face (a sticker label uses 0.86 of its sticker).
+ * Measured with real Noto Sans 600 on candidates 0.86, 0.92 and 0.97: the ink margin to the flat-face edge of the
+ * three-letter labels (VEM, EMB, BER, MON, WED, WWW) is at least 7.1%, 4.2% and 1.4% of the flat width; 0.92 is the
+ * largest candidate with at least 4% on every side (VEM is the tightest, 4.2% on the left).
+ */
+export const FACE_TEXT_SQUARE = 0.92;
+/** Scale of the sticker label about the texture center: the 86% text square becomes `FACE_TEXT_SQUARE` of the flat face. */
+export const FACE_SCALE = (FACE_FLAT * FACE_TEXT_SQUARE) / 0.86;
 /** How the 3D view draws the labels: on sticker bodies (scheme A, default) or directly on the cubie faces. */
 export type Surface = "sticker" | "face";
 
@@ -177,7 +186,7 @@ export function drawFace(
   ctx.fillRect(0, 0, TEXTURE, TEXTURE);
   ctx.save();
   ctx.translate(TEXTURE / 2, TEXTURE / 2);
-  ctx.scale(FACE_FLAT, FACE_FLAT);
+  ctx.scale(FACE_SCALE, FACE_SCALE);
   ctx.translate(-TEXTURE / 2, -TEXTURE / 2);
   // drawSticker paints the same paper again over the scaled square (same color), then the label.
   drawSticker(ctx, text, ink, profile);
