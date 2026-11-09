@@ -41,13 +41,13 @@
     "@cubistry/cube-viewer": "*",
     "@puzlwerk/solver-2x2": "file:.puzlwerk-dependency/solver-2x2.tgz",
     "@puzlwerk/solver-3x3-picture": "file:.puzlwerk-dependency/solver-3x3-picture.tgz",
-    "three": "0.186.1"
+    "three": "0.187.0"
   },
   "devDependencies": {
     "@fontsource/noto-sans": "5.3.0",
     "@playwright/test": "1.64.1",
     "@types/node": "24.10.1",
-    "@types/three": "0.186.0",
+    "@types/three": "0.187.0",
     "cubing": "0.66.1",
     "pngjs": "7.0.0",
     "rescript": "12.3.1",
