@@ -312,6 +312,8 @@ globally; no date-dependent profile selection or second runtime data set exists.
 | [tests/calendar7-center.test.mjs](../tests/calendar7-center.test.mjs) | Strict 6 and 9: ink box centered on the sticker (also turned by a half turn); other labels and legacy unchanged |
 | [tests/calendar7-sheet-colors.test.mjs](../tests/calendar7-sheet-colors.test.mjs) | Month sheet palette: every ink on its cell at 4.5:1 in light and dark |
 | [tests/calendar7-schemes.test.mjs](../tests/calendar7-schemes.test.mjs) | Color scheme data: ten schemes, one default, roles present, frozen, text contrast gates and line contrast |
+| [tests/calendar7-scheme-apply.test.mjs](../tests/calendar7-scheme-apply.test.mjs) | Schemes applied to the sticker and face art: every label class in all ten schemes (ground, ink, contrast), blank tiles, folded labels, weekday-row line, `schemeById` |
+| [tests/browser/calendar7-schemes.spec.mjs](../tests/browser/calendar7-schemes.spec.mjs) | Schemes in the real viewer: sampled texture pixels for Paper Red, Paper Blue and Dracula, in-place redraw without new textures, stickerless body color, `?scheme=` |
 | [tests/browser/calendar7-3d.spec.mjs](../tests/browser/calendar7-3d.spec.mjs) | The 3D view in a browser: pose digest, animated step, controls, 375 px |
 
 ### Conventions
@@ -329,9 +331,28 @@ globally; no date-dependent profile selection or second runtime data set exists.
 
 ## Color schemes
 
-`src/apps/calendar7/schemes.ts` holds ten color schemes of the month sheet as plain role tokens (day fill and ink, weekday ink, weekend fill or tint and ink, band, month ink, weekday row, empty days, seam, the two lines and the SUN/SAT ink): Paper Red (default), Paper Blue, Classic, Solarized Light, Gruvbox Light, Dracula, Monokai, Gruvbox Dark, Catppuccin Mocha and High Contrast. Saturday and Sunday share one weekend token set. The data is not yet applied to the 3D view and has no UI. [tests/calendar7-schemes.test.mjs](../tests/calendar7-schemes.test.mjs) checks the structure and the contrast of every text pair (4.5:1; 3:1 only for the two large bold pairs of Paper Red: weekend numerals and SUN/SAT letters; the small second number of folded weekend labels uses `weekendInkSmall` at 4.5:1) and of every line against the tiles it touches, empty days included (3:1); band edges are not gated. The six third-party palettes (inspired by Solarized, Gruvbox, Dracula, Monokai, Catppuccin) are written from memory, not checked against official sources, and need a license check.
+`src/apps/calendar7/schemes.ts` holds ten color schemes of the month sheet as plain role tokens (day fill and ink, weekday ink, weekend fill or tint and ink, band, month ink, weekday row, empty days, seam, the two lines and the SUN/SAT ink): Paper Red (default), Paper Blue, Classic, Solarized Light, Gruvbox Light, Dracula, Monokai, Gruvbox Dark, Catppuccin Mocha and High Contrast. Saturday and Sunday share one weekend token set. The 3D view applies what it can of a scheme (see below); there is no scheme UI yet. [tests/calendar7-schemes.test.mjs](../tests/calendar7-schemes.test.mjs) checks the structure and the contrast of every text pair (4.5:1; 3:1 only for the two large bold pairs of Paper Red: weekend numerals and SUN/SAT letters; the small second number of folded weekend labels uses `weekendInkSmall` at 4.5:1) and of every line against the tiles it touches, empty days included (3:1); band edges are not gated. The six third-party palettes (inspired by Solarized, Gruvbox, Dracula, Monokai, Catppuccin) are written from memory, not checked against official sources, and need a license check.
 
-Limitation: the shipped print (`public/calendar7/state.v1.json`, 294 stickers; ink classes blank 51, dark 151, red 62, month 25, weekday 5) has one blank class, and `src/apps/calendar7/sticker-art.ts` fills by `text === ""` (`BLANK_PAPER`) versus `PAPER`. A band that runs continuously over the blank tiles of row 1, a line under row 1, or white empty days next to a colored band need a separate "band blank" tile class and therefore new print data, planned with the row-1 name layout. This change provides only the role data and the tests.
+Limitation: the shipped print (`public/calendar7/state.v1.json`, 294 stickers; ink classes blank 51, dark 151, red 62, month 25, weekday 5) has one blank class, and `src/apps/calendar7/sticker-art.ts` fills by `text === ""` (`BLANK_PAPER`) versus `PAPER`. A band that runs continuously over the blank tiles of row 1, a line under row 1, or white empty days next to a colored band need a separate "band blank" tile class and therefore new print data, planned with the row-1 name layout. The 3D view applies the rest, as described next.
+
+### Schemes in the 3D view
+
+The default scheme is Paper Red (`isDefault` in `schemes.ts`); `?scheme=<id>` picks another one (`paper-blue`, `classic`, `dracula`, ...), an unknown or empty id gives the default without an error, and `Calendar7Viewer.setScheme(id)` (also on the mounted mode) changes it in memory. The choice is not stored between visits: the shared Appearance storage knows only construction and frame color, so a persistent choice waits for the catalog. `classic` is the sheet look of the data (cream band, brick weekend), not the print look the 3D view drew before schemes (`drawSticker` without a scheme still draws that, and `INK_COLORS`, `PAPER` and `BLANK_PAPER` stay as they were).
+
+The mapping uses only the printed label and its ink class, never the position of a tile, because a tile is a moving object:
+
+| Tile (label, print ink) | Ground | Ink |
+| --- | --- | --- |
+| digits, ink dark | `dayFill` | `dayInk` |
+| MON to FRI, ink weekday | `weekdayRowFill` or `dayFill` | `weekdayInk` |
+| weekend digits and folded labels, ink red | `weekendFill`, else `weekendTint` | `weekendInk`; the small second number of a folded label `weekendInkSmall` |
+| SUN and SAT, ink red | `weekdayRowFill`, else the weekend ground | `sunSatInk` |
+| month letters, ink month | `bandFill` or `dayFill` | `monthInk` |
+| blank | `emptyFill` | none |
+
+A scheme with `lineRow2` draws that line at the bottom edge of the weekday-name tiles (MON to FRI, SUN, SAT), `px` times 4 texture pixels thick (the texture is 192 px, a sheet tile about 48 px); on a stickerless face it sits on the bottom edge of the flat part. The folded labels keep the strict art and the 6/9 rule is unchanged. A stickerless cube takes the day fill as its body color; a sticker cube keeps the dark plastic frame.
+
+What waits for a new print class `band` (with the row-1 name layout): the print has one blank class, so a blank tile of row 1 cannot join the month band and shows `emptyFill`, and white empty days next to a colored band are not possible; `lineRow1` (the line under row 1) is not drawn; the `seam` token is used by the sheet only (the 3D view has no drawn seam). Until then a band scheme shows its band on the month-letter tiles only.
 
 ## Rule profiles: legacy and strict
 
