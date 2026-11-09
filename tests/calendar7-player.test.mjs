@@ -433,7 +433,10 @@ function fakeStage(opts) {
     labels: [],
     resets: 0,
     surfaces: [],
+    schemes: [],
+    setScheme: (id) => stage.schemes.push(id),
     configure(_printing, _pose, surface) {
+      stage.schemes.push("configure");
       stage.configured++;
       stage.surfaces.push(surface);
     },
@@ -469,6 +472,28 @@ const q = (s) => new URLSearchParams(s);
 const idle = async (root) => {
   for (let i = 0; i < 100000 && root.getAttribute("data-c7-state") !== "idle"; i++) await Promise.resolve();
 };
+
+test("mount: the scheme parameter reaches the stage before it is configured; setScheme forwards the id", async () => {
+  const root = fakeRoot();
+  const { env, stage } = mountEnv();
+  const inst = await mountCalendar7(root, q("year=2028&month=3&scheme=paper-blue"), env);
+  await idle(root);
+  assert.deepEqual(stage.schemes, ["paper-blue", "configure"]);
+  assert.equal(root.getAttribute("data-c7-scheme"), "paper-blue");
+  inst.setScheme("dracula");
+  assert.equal(root.getAttribute("data-c7-scheme"), "dracula");
+  inst.setScheme(null);
+  assert.deepEqual(stage.schemes.slice(2), ["dracula", null]);
+  assert.equal(root.getAttribute("data-c7-scheme"), "paper-red"); // null: the default scheme
+  inst.dispose();
+  // No parameter: the stage gets null (the default scheme).
+  const second = mountEnv();
+  const root2 = fakeRoot();
+  const inst2 = await mountCalendar7(root2, q("year=2028&month=3"), second.env);
+  await idle(root2);
+  assert.deepEqual(second.stage.schemes.slice(0, 1), [null]);
+  inst2.dispose();
+});
 
 test("mount with a 3D view: the shown digest equals the stored hash for the URL month and after each step, both ways", async () => {
   const root = fakeRoot();

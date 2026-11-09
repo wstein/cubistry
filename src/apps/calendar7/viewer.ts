@@ -38,7 +38,8 @@ import {
   STICKERS,
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
-import { BLANK_PAPER, drawFace, drawSticker, PAPER, PLASTIC, type Surface, TEXTURE } from "./sticker-art.ts";
+import { type ColorScheme, DEFAULT_SCHEME, schemeById } from "./schemes.ts";
+import { drawFace, drawSticker, PLASTIC, tileRoles, type Surface, TEXTURE } from "./sticker-art.ts";
 import { MoveTween } from "./tween.ts";
 
 /**
@@ -66,6 +67,12 @@ export class Calendar7Viewer implements StageView {
   private cube: PhysicalCubeScene | null = null;
   private resources: { dispose(): void }[] = [];
   private printing: Printing | null = null;
+  private pose: Pose | null = null;
+  private surface: Surface = "sticker";
+  /** The color scheme of the labels (`setScheme`); the default scheme until one is chosen. */
+  private scheme: ColorScheme = DEFAULT_SCHEME;
+  /** One entry per distinct texture of the current build: redrawn in place when the scheme changes. */
+  private art: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; text: string; ink: string }[] = [];
   /** Reused every sync: frames are rewritten in place, so a move allocates no frame objects. */
   private frames: { id: number; cubie: number; p: number[]; n: number[]; up: number[] }[] = [];
   private readonly tween = new MoveTween();
@@ -126,7 +133,41 @@ export class Calendar7Viewer implements StageView {
     this.rotation.reset();
   }
 
+  /** The scheme that is drawn now. */
+  get currentScheme(): ColorScheme {
+    return this.scheme;
+  }
+
+  /**
+   * Chooses the color scheme by id (an unknown id or null gives the default scheme; never throws). The textures of the
+   * current cube are redrawn in place (no new canvas, texture or material, nothing to dispose); a stickerless cube is
+   * rebuilt instead while no move is turning, because its body color (the day fill) is fixed when the scene is built.
+   * A scheme chosen before `configure` is used by it. The same scheme again does nothing.
+   */
+  setScheme(id: string | null | undefined): void {
+    if (this.destroyed) return;
+    const next = schemeById(id);
+    if (next === this.scheme) return;
+    this.scheme = next;
+    if (!this.printing || !this.pose) return;
+    if (this.surface === "face" && !this.tween.running) {
+      this.configure(this.printing, this.pose, this.surface);
+      return;
+    }
+    for (const a of this.art) {
+      this.draw(a.canvas, a.text, a.ink);
+      a.texture.needsUpdate = true;
+    }
+    this.dirty = true;
+  }
+
+  private draw(canvas: HTMLCanvasElement, text: string, ink: string): void {
+    const art = this.surface === "face" ? drawFace : drawSticker;
+    art(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, undefined, this.scheme);
+  }
+
   private clear(): void {
+    this.art = [];
     this.cube?.dispose();
     this.cube = null;
     for (const r of this.resources) r.dispose();
@@ -140,6 +181,8 @@ export class Calendar7Viewer implements StageView {
   configure(printing: Printing, pose: Pose, surface: Surface = "sticker"): void {
     this.clear();
     this.printing = printing;
+    this.pose = pose;
+    this.surface = surface;
     const plastic = createPlasticMaterial(PLASTIC, 0.55);
     this.resources.push(plastic);
     const anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
@@ -151,9 +194,9 @@ export class Calendar7Viewer implements StageView {
       if (!material) {
         const canvas = document.createElement("canvas");
         canvas.width = canvas.height = TEXTURE;
-        const art = surface === "face" ? drawFace : drawSticker;
-        art(canvas.getContext("2d") as CanvasRenderingContext2D, printing.text[i], printing.ink[i]);
+        this.draw(canvas, printing.text[i], printing.ink[i]);
         const texture = new THREE.CanvasTexture(canvas);
+        this.art.push({ canvas, texture, text: printing.text[i], ink: printing.ink[i] });
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = anisotropy;
         material = createStickerMaterial(texture);
@@ -171,7 +214,7 @@ export class Calendar7Viewer implements StageView {
     }));
     this.writeFrames(pose);
     const faceColors = new Map<number, string>();
-    for (let i = 0; i < STICKERS; i++) faceColors.set(i + 1, printing.text[i] === "" ? BLANK_PAPER : PAPER);
+    for (let i = 0; i < STICKERS; i++) faceColors.set(i + 1, tileRoles(this.scheme, printing.text[i], printing.ink[i]).fill);
     this.cube = new PhysicalCubeScene(
       this.presentation,
       this.frames as unknown as readonly PhysicalStickerFrame[],
@@ -180,7 +223,8 @@ export class Calendar7Viewer implements StageView {
       1,
       lightGeometry(),
       faceColors,
-      { bodyColor: PLASTIC },
+      // Stickerless: the body is the day background (owner decision); with stickers it is the plastic frame between them.
+      { bodyColor: surface === "face" ? this.scheme.dayFill : PLASTIC },
     );
     // A sticker is a flat sheet on its body: it needs no shadow of its own (halves the shadow pass).
     this.presentation.traverse((o) => {
@@ -211,6 +255,7 @@ export class Calendar7Viewer implements StageView {
   }
 
   private sync(pose: Pose): void {
+    this.pose = pose;
     this.writeFrames(pose);
     this.cube?.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
     this.dirty = true;
