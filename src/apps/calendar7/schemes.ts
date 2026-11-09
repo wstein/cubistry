@@ -10,6 +10,8 @@
  * - weekdayInk: the labels MON to FRI.
  * - weekendFill: tile fill of a weekend date (null when the scheme uses a tint instead).
  * - weekendInk: weekend numerals, on weekendFill or on weekendTint.
+ * - weekendInkSmall: ink of the small second number of a folded weekend date (split label); equals weekendInk except in Paper
+ *   Red, where #e0282c is darkened to the minimal #d5262a (4.50:1 on the tint) because the small number is not large text.
  * - weekendTint: light tint behind weekend numerals in the paper schemes (null otherwise).
  * - bandFill: fill of the month name band (null in line style).
  * - monthInk: ink of the month name, on bandFill or on dayFill.
@@ -38,6 +40,7 @@ export interface ColorScheme {
   readonly weekdayInk: string;
   readonly weekendFill: string | null;
   readonly weekendInk: string;
+  readonly weekendInkSmall: string;
   readonly weekendTint: string | null;
   readonly bandFill: string | null;
   readonly monthInk: string;
@@ -72,6 +75,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#3a3a3a",
     weekendFill: null,
     weekendInk: "#e0282c",
+    weekendInkSmall: "#d5262a",
     weekendTint: "#fdeeee",
     bandFill: "#e0282c",
     monthInk: "#ffffff",
@@ -95,6 +99,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#3a3a3a",
     weekendFill: null,
     weekendInk: "#1558d8",
+    weekendInkSmall: "#1558d8",
     weekendTint: "#e3ebfa",
     bandFill: null,
     monthInk: "#1558d8",
@@ -118,6 +123,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#2c4a6b",
     weekendFill: "#9e1f1a",
     weekendInk: "#ffffff",
+    weekendInkSmall: "#ffffff",
     weekendTint: null,
     bandFill: "#efe2c4",
     monthInk: "#8a4a12",
@@ -141,6 +147,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#2076b3",
     weekendFill: "#c8337c",
     weekendInk: "#fdf6e3",
+    weekendInkSmall: "#fdf6e3",
     weekendTint: null,
     bandFill: "#2aa198",
     monthInk: "#002b36",
@@ -164,6 +171,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#af3a03",
     weekendFill: "#076678",
     weekendInk: "#fbf1c7",
+    weekendInkSmall: "#fbf1c7",
     weekendTint: null,
     bandFill: "#d79921",
     monthInk: "#282828",
@@ -187,6 +195,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#8be9fd",
     weekendFill: "#bd93f9",
     weekendInk: "#282a36",
+    weekendInkSmall: "#282a36",
     weekendTint: null,
     bandFill: "#ff79c6",
     monthInk: "#282a36",
@@ -210,6 +219,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#66d9ef",
     weekendFill: "#a6e22e",
     weekendInk: "#272822",
+    weekendInkSmall: "#272822",
     weekendTint: null,
     bandFill: "#fd971f",
     monthInk: "#272822",
@@ -233,6 +243,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#fabd2f",
     weekendFill: "#fb4934",
     weekendInk: "#1d2021",
+    weekendInkSmall: "#1d2021",
     weekendTint: null,
     bandFill: "#83a598",
     monthInk: "#1d2021",
@@ -256,6 +267,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#b4befe",
     weekendFill: "#f38ba8",
     weekendInk: "#11111b",
+    weekendInkSmall: "#11111b",
     weekendTint: null,
     bandFill: "#94e2d5",
     monthInk: "#11111b",
@@ -279,6 +291,7 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     weekdayInk: "#00e5ff",
     weekendFill: "#ffe600",
     weekendInk: "#000000",
+    weekendInkSmall: "#000000",
     weekendTint: null,
     bandFill: "#ffffff",
     monthInk: "#000000",

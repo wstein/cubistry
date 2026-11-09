@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { contrast, mix } from "./calendar7-contrast.mjs";
+import { contrast, mix, shiftToContrast } from "./calendar7-contrast.mjs";
 import { SCHEMES } from "../src/apps/calendar7/schemes.ts";
 
 // Gates (WCAG 2.x): SMALL_TEXT for normal text, LARGE_TEXT for large bold labels and numerals, NON_TEXT for lines.
@@ -9,18 +9,20 @@ const LARGE_TEXT = 3;
 const NON_TEXT = 3;
 
 // Pairs that use the 3:1 large-text gate instead of 4.5:1 (owner accepted this for the fresh Paper Red). Every other
-// text pair must read at 4.5:1. Paper Red's weekend numerals (4.13:1 on the tint) and SUN/SAT labels (3.94:1 on the gray
-// row) are large bold text; its white month name on the red band reads 4.66:1 and needs no exception.
+// text pair must read at 4.5:1. Paper Red's large bold weekend numerals (4.13:1 on the tint) and SUN/SAT labels (3.94:1 on
+// the gray row) use it; its white month name on the red band reads 4.66:1 and needs no exception. The small second number
+// of a folded weekend split label is not large text: weekendInkSmall is gated at 4.5:1 (Paper Red darkens it to #d5262a).
 const LARGE_TEXT_PAIRS = { "paper-red": ["weekendInk", "sunSatInk"] };
 
-// Lines (and band edges) that may stay below 3:1 against a neighbor. Empty: every line that exists reads at 3:1.
+// Lines that may stay below 3:1 against a neighbor. Empty: every line that exists reads at 3:1. Band edges carry no text
+// or control and are not gated (WCAG does not require it).
 const LINE_EXCEPTIONS = {};
 
 const ORDER = [
   "paper-red", "paper-blue", "classic", "solarized-light", "gruvbox-light",
   "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast",
 ];
-const COLOR_ROLES = ["dayFill", "dayInk", "weekdayInk", "weekendInk", "monthInk", "emptyFill", "seam", "sunSatInk"];
+const COLOR_ROLES = ["dayFill", "dayInk", "weekdayInk", "weekendInk", "weekendInkSmall", "monthInk", "emptyFill", "seam", "sunSatInk"];
 const NULLABLE_COLOR_ROLES = ["weekendFill", "weekendTint", "bandFill", "weekdayRowFill"];
 const HEX = /^#[0-9a-f]{6}$/;
 const byId = Object.fromEntries(SCHEMES.map((s) => [s.id, s]));
@@ -30,6 +32,7 @@ const grounds = (s) => ({
   dayInk: s.dayFill,
   weekdayInk: s.weekdayRowFill ?? s.dayFill,
   weekendInk: s.weekendFill ?? s.weekendTint,
+  weekendInkSmall: s.weekendFill ?? s.weekendTint,
   monthInk: s.bandFill ?? s.dayFill,
   sunSatInk: s.weekdayRowFill ?? s.weekendFill ?? s.weekendTint,
 });
@@ -75,7 +78,7 @@ test("every role is present and well formed", () => {
 
 test("Saturday and Sunday share one weekend token set by construction", () => {
   // The key list is closed: one weekend fill/tint/ink and one SUN/SAT label ink, no per-day fields.
-  const keys = ["id", "name", "kind", "style", "isDefault", "source", "inspiredBy", "dayFill", "dayInk", "weekdayInk", "weekendFill", "weekendInk",
+  const keys = ["id", "name", "kind", "style", "isDefault", "source", "inspiredBy", "dayFill", "dayInk", "weekdayInk", "weekendFill", "weekendInk", "weekendInkSmall",
     "weekendTint", "bandFill", "monthInk", "weekdayRowFill", "emptyFill", "seam", "lineRow1", "lineRow2", "sunSatInk"].sort();
   for (const s of SCHEMES) assert.deepEqual(Object.keys(s).sort(), keys, s.id);
 });
@@ -107,6 +110,19 @@ test("paper schemes: line style has no band, the weekend tint is the accent mixe
   assert.equal(blue.emptyFill, "#ffffff");
 });
 
+test("weekendInkSmall equals weekendInk, except Paper Red: the minimal darkening that reads 4.5:1 on the tint", () => {
+  for (const s of SCHEMES) {
+    if (s.id !== "paper-red") assert.equal(s.weekendInkSmall, s.weekendInk, s.id);
+  }
+  const red = byId["paper-red"];
+  assert.equal(red.weekendInkSmall, shiftToContrast(red.weekendInk, red.weekendTint, SMALL_TEXT));
+  assert.equal(red.weekendInkSmall, "#d5262a");
+});
+
+test("High Contrast empty days are #2a2a2a (owner decision, lighter than the mock's #161616)", () => {
+  assert.equal(byId["high-contrast"].emptyFill, "#2a2a2a");
+});
+
 test("the weekday line exists only for Paper Red, Paper Blue, Monokai and High Contrast", () => {
   assert.deepEqual(SCHEMES.filter((s) => s.lineRow2 !== null).map((s) => s.id), ["paper-red", "paper-blue", "monokai", "high-contrast"]);
   assert.deepEqual(SCHEMES.filter((s) => s.lineRow1 !== null).map((s) => s.id), ["paper-blue"]);
@@ -128,7 +144,7 @@ test("text pairs: 4.5:1, or 3:1 for the named large-text pairs", () => {
 
 test("lines read at 3:1 against the tiles they touch", () => {
   for (const s of SCHEMES) {
-    const neighbors = [s.dayFill, s.weekdayRowFill, s.weekendFill, s.weekendTint].filter((c) => c !== null);
+    const neighbors = [s.dayFill, s.weekdayRowFill, s.weekendFill, s.weekendTint, s.emptyFill].filter((c) => c !== null);
     for (const row of ["lineRow1", "lineRow2"]) {
       if (s[row] === null) continue;
       for (const n of neighbors) {
