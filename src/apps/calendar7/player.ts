@@ -72,11 +72,14 @@ export class StateMismatchError extends Error {
 }
 
 /**
- * Offered speeds: milliseconds per turn, the repository's Rotation Speed stops (100, 250, 500 ms and 1 s). One block is one
- * turn: a wide block, a middle slice and a whole-cube rotation (x, y, z) last exactly as long as a single layer.
+ * Offered speeds: milliseconds per quarter turn, the repository's Rotation Speed stops (100, 250, 500 ms and 1 s). A block
+ * lasts the speed times its quarter turns (a half turn takes twice as long), whatever its kind: single layer, wide block,
+ * middle slice, whole-cube rotation (x, y, z) or end alignment.
  */
 export const SPEEDS = [100, 250, 500, 1000] as const;
-export const DEFAULT_SPEED = 100;
+export const DEFAULT_SPEED = 250;
+/** Duration of a block at `speed` ms per quarter turn: the quarter turns of the block (1 or 2; the sign is the direction) times the speed. */
+export const blockMs = (block: Block, speed: number): number => speed * Math.abs(block.angle);
 /** The page plays rule-c blocks (the middle slice counts as a move) unless the viewer turns it off; see `blocks.ts`. */
 export const DEFAULT_SLICE = true;
 /** Compatibility default for callers of the older defer option. The page selects DEFAULT_ORIENTATION explicitly. */
@@ -358,27 +361,27 @@ export class Calendar7Player {
         if (plan.orientation === "before" && plan.alignDone < plan.expected.length) {
           const move = plan.expected[plan.alignDone];
           const reduced = this.reducedMotion();
-          await this.view.turn(rotationBlock(move), this.pose, reduced ? REDUCED_ALIGN_MS : this.speed);
+          await this.view.turn(rotationBlock(move), this.pose, reduced ? REDUCED_ALIGN_MS : blockMs(rotationBlock(move), this.speed));
           if (this.disposed || this.generation !== mine || this.plan !== plan) return;
           applyMoveInPlace(this.pose, move);
           plan.alignDone++;
           this.notify();
         } else if (plan.done < plan.blocks.length) {
           const block = plan.blocks[plan.done];
-          await this.view.turn(block, this.pose, this.speed);
+          await this.view.turn(block, this.pose, blockMs(block, this.speed));
           if (this.disposed || this.generation !== mine || this.plan !== plan) return;
           applyBlockInPlace(this.pose, block);
           plan.done++;
           this.notify();
         } else if (plan.defer) {
-          // Final phase: the alignment, one or two whole-cube rotations of the model, timed and eased like a layer turn.
+          // Final phase: the alignment, one or two whole-cube rotations of the model, timed and eased like a layer turn (speed times quarter turns).
           const first = plan.align === null;
           const align = this.alignmentOf(plan);
           if (first && align.length > 0) this.notify(); // no transient phase for an identity alignment
           if (plan.alignDone >= align.length) break;
           const move = align[plan.alignDone];
           const reduced = this.reducedMotion();
-          await this.view.turn(rotationBlock(move), this.pose, reduced ? REDUCED_ALIGN_MS : this.speed);
+          await this.view.turn(rotationBlock(move), this.pose, reduced ? REDUCED_ALIGN_MS : blockMs(rotationBlock(move), this.speed));
           if (this.disposed || this.generation !== mine || this.plan !== plan) return;
           applyMoveInPlace(this.pose, move);
           plan.alignDone++;
