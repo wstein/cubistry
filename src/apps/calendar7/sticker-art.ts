@@ -121,8 +121,8 @@ export function drawSticker(
  *
  * The body face texture (the 0..1 UV square of the rounded body) is flat only in its middle: the flat part spans
  * `FACE_FLAT` of the texture, centered, the rest wraps the bevel around the cubie. The label is the same drawing
- * as on a sticker (`drawSticker`: same sizes, fit, split labels, 6/9 rule) scaled about the center by `FACE_FLAT`,
- * so its 86% text square covers 86% of the flat face, as on a sticker; the paper fills the whole texture, so
+ * as on a sticker (`drawSticker`: same sizes, fit, split labels, 6/9 rule) scaled about the center by `FACE_SCALE`,
+ * so its text square covers `FACE_TEXT_SQUARE` (0.92) of the flat face; the paper fills the whole texture, so
  * there is no gap and no sticker edge. The value is checked against the real body geometry in
  * tests/calendar7-stickerless.test.mjs (preset body width .99, radius .055, one bevel segment).
  */
@@ -141,7 +141,7 @@ export type Surface = "sticker" | "face";
 
 type FaceContext = Context & Pick<CanvasRenderingContext2D, "save" | "restore" | "translate" | "scale">;
 
-/** Draws one cubie face: paper on the whole texture, then the sticker label scaled about the center by `FACE_FLAT`. */
+/** Draws one cubie face: paper on the whole texture, then the sticker label scaled about the center by `FACE_SCALE`. */
 export function drawFace(
   ctx: FaceContext,
   text: string,

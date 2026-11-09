@@ -79,7 +79,7 @@ test("stickerless surface: no sticker bodies, labels on the cubie faces, same ar
   // MON in real Noto Sans: the face art is the sticker art scaled by FACE_SCALE, centered on the texture.
   expect(r.sticker.mon.w).toBeGreaterThan(40);
   const ratio = r.faceMode.mon.w / r.sticker.mon.w;
-  expect(Math.abs(ratio - r.FACE_SCALE), `ink width ratio ${ratio}`).toBeLessThan(0.03);
+  expect(Math.abs(ratio - r.FACE_SCALE), `ink width ratio ${ratio}`).toBeLessThan(0.01); // 1 - FACE_SCALE is 0.026: the sticker art unscaled (ratio 1) fails
   expect(Math.abs(r.faceMode.mon.cx - 96)).toBeLessThanOrEqual(1.5);
   expect(Math.abs(r.faceMode.mon.cy - 96)).toBeLessThanOrEqual(4); // MON is not digits: same middle-baseline drift as on the sticker, scaled
   // The label stays inside the flat part of the face (no ink on the bevel).
