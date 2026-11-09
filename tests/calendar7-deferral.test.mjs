@@ -2,11 +2,10 @@
 // English 7x7 calendar cube: deferred whole-cube rotations and the end alignment (research candidate, not certified).
 // A display layer over the stored words (mode F of research PR #346): the played word has no rotation, one alignment at the
 // end restores the stored frame. Properties on seeded random words, the stored digest for EVERY stored edge in both
-// directions, the player (phases, skip, pause, reduced motion, mismatch), the soft-start easing, and negative controls.
+// directions, the player (phases, skip, pause, reduced motion, mismatch), and negative controls.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { ROTATION_TUNING } from "@cubistry/cube-viewer";
 import { blockCounts, expand, groupBlocks, layerGenerator } from "../src/apps/calendar7/blocks.ts";
 import {
   IDENTITY,
@@ -35,14 +34,6 @@ import {
 } from "../src/apps/calendar7/engine.ts";
 import { parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
 import { Calendar7Player, REDUCED_ALIGN_MS, StateMismatchError } from "../src/apps/calendar7/player.ts";
-import {
-  SOFT_START_EPSILON,
-  SOFT_START_RATE,
-  softStartEase,
-  softStartMs,
-  softStartRemaining,
-  softStartSeconds,
-} from "../src/apps/calendar7/soft-start.ts";
 
 const json = (p) => JSON.parse(readFileSync(p, "utf8"));
 const graph = parseGraph(json("public/calendar7/graph.v1.json"));
@@ -102,35 +93,6 @@ test("the 24 orientations: all distinct, each a word of at most two rotations, t
   assert.throws(() => alignmentMoves([2, 0, 0, 0, 1, 0, 0, 0, 1]), RangeError);
   // Deterministic: a second call returns the same words.
   assert.deepEqual(allOrientations().map((o) => o.moves), all.map((o) => o.moves));
-});
-
-test("soft start: the formula of the rubber band, rate 9 per second, monotone, zero speed at the start, no overshoot", () => {
-  assert.equal(SOFT_START_RATE, ROTATION_TUNING.returnRate);
-  assert.equal(SOFT_START_EPSILON, ROTATION_TUNING.returnEpsilon);
-  for (const t of [0, 0.05, 0.3, 1, 2]) {
-    const u = SOFT_START_RATE * t;
-    assert.ok(Math.abs(softStartRemaining(u) - Math.exp(-u) * (1 + u + (u * u) / 2)) < 1e-15);
-  }
-  assert.equal(softStartRemaining(0), 1);
-  for (const quarters of [1, 2]) {
-    const ease = softStartEase(quarters);
-    assert.equal(ease(0), 0);
-    assert.equal(ease(1), 1);
-    let last = 0;
-    for (let i = 1; i <= 1000; i++) {
-      const v = ease(i / 1000);
-      assert.ok(v >= last && v <= 1, "monotone, never past the target");
-      last = v;
-    }
-    assert.ok(ease(0.001) < 1e-4, "starts with zero speed (second order contact)");
-    // The time scale is that of the rubber band: the remaining offset at progress p is the formula at u = r * seconds * p.
-    const s = softStartSeconds((quarters * Math.PI) / 2);
-    assert.ok(Math.abs(ease(0.5) - (1 - softStartRemaining(SOFT_START_RATE * s * 0.5))) < 1e-12);
-    // Ends when less than 1 mrad is left.
-    assert.ok(((quarters * Math.PI) / 2) * softStartRemaining(SOFT_START_RATE * s) <= SOFT_START_EPSILON * 1.0001);
-    assert.ok(((quarters * Math.PI) / 2) * softStartRemaining(SOFT_START_RATE * s * 0.99) > SOFT_START_EPSILON);
-  }
-  assert.ok(softStartMs(1) > 1000 && softStartMs(1) < 1500 && softStartMs(2) > softStartMs(1), `${softStartMs(1)} ms`);
 });
 
 test("property: seeded random words with many rotations: no rotation left, same layer moves, word = deferred word + alignment", () => {

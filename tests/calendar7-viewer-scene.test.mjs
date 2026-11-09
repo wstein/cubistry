@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // English 7x7 calendar cube: the real Calendar7Viewer.turn on a real PhysicalCubeScene (research candidate, not
 // certified). No WebGL: the scene graph is driven directly. At the end of each animated move the three.js world
 // matrices of every body and sticker must equal those of a scene synced to the engine pose after that move. A flipped
@@ -13,7 +14,6 @@ import { groupBlocks, expand } from "../src/apps/calendar7/blocks.ts";
 import { Calendar7Viewer } from "../src/apps/calendar7/viewer.ts";
 import { MoveTween, smoothstep } from "../src/apps/calendar7/tween.ts";
 import { allOrientations, rotationBlock } from "../src/apps/calendar7/deferral.ts";
-import { softStartEase, softStartMs } from "../src/apps/calendar7/soft-start.ts";
 
 const json = (p) => JSON.parse(readFileSync(p, "utf8"));
 const graph = parseGraph(json("public/calendar7/graph.v1.json"));
@@ -178,7 +178,8 @@ test("negative control: a slab that leaves out layer 0 does not end on the pose 
   }
 });
 
-test("end alignment: the whole model turns about the axis with the soft start and ends on the rotated pose (1e-6); all 24 orientations", () => {
+for (const [label, ease] of [["default smoothstep", undefined], ["custom easing", (p) => p * p]])
+test(`end alignment: ${label} preserves the rotated pose (1e-6) for all 24 orientations`, () => {
   const start = nodePose(40);
   let moves = 0;
   for (const o of allOrientations()) {
@@ -189,13 +190,18 @@ test("end alignment: the whole model turns about the axis with the soft start an
       cube.sync(frames(pose));
       seen.length = 0;
       atEnd = null;
-      void viewer.turn(block, pose, softStartMs(quarters), softStartEase(quarters));
-      viewer.tween.tick(performance.now() + softStartMs(quarters) * 0.5);
+      const duration = 1000 * quarters;
+      void viewer.turn(block, pose, duration, ease);
+      const curve = ease ?? smoothstep;
+      viewer.tween.tick(performance.now() + duration * 0.25);
+      const quarter = seen.at(-1);
+      assert.ok(quarter >= curve(0.25) && quarter <= curve(0.27), `quarter-time progress: ${quarter}`);
+      viewer.tween.tick(performance.now() + duration * 0.5);
       const mid = seen.at(-1);
-      const expected = softStartEase(quarters)(0.5);
-      assert.ok(mid >= expected && mid <= softStartEase(quarters)(0.52), `eased progress at half time: ${mid} vs ${expected}`);
-      assert.notEqual(mid, smoothstep(0.5), "not the smoothstep of the layer moves");
-      viewer.tween.tick(later(10 * softStartMs(quarters)));
+      const expected = curve(0.5);
+      assert.ok(mid >= expected && mid <= curve(0.52), `eased progress at half time: ${mid} vs ${expected}`);
+      if (ease) assert.notEqual(mid, smoothstep(0.5), "the custom curve overrides smoothstep");
+      viewer.tween.tick(later(10 * duration));
       assert.equal(seen.at(-1), 1);
       assert.ok(atEnd, "reached progress 1");
       const after = applyMoves(pose, expand([block]));
@@ -223,7 +229,7 @@ test("negative control: the opposite rotation does not end on the pose of the al
   const start = nodePose(40);
   cube.sync(frames(start));
   atEnd = null;
-  void viewer.turn(rotationBlock([7, -1]), start, 10, softStartEase(1));
+  void viewer.turn(rotationBlock([7, -1]), start, 10);
   viewer.tween.tick(later(0));
   viewer.tween.tick(later(10000));
   cube.sync(frames(applyMoves(start, [[7, 1]])));
