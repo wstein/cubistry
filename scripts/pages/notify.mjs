@@ -7,6 +7,7 @@ import {
   hasPreviewLabel,
   hasPreviewContent,
 } from "./policy.mjs";
+import {receiptMarker} from "./reconciliation.mjs";
 import {loadNotification,currentNotification} from "./notification.mjs";
 export async function notifyPreviews(api,receipt,{fresh=()=>currentNotification(api,receipt)}={}) {
 const marker = "<!-- cubistry-pr-preview -->", deployOK=receipt.proof!==null;
@@ -56,7 +57,7 @@ for (const number of receipt.numbers) {
     if (build.run)
       text += `\n\n[Build details](https://github.com/${REPOSITORY}/actions/runs/${build.run}).`;
   }
-  const body = `${marker}\n### Cubistry PR preview\n${text}`;
+  const body = `${marker}\n### Cubistry PR preview\n${text}${receipt.proof?`\n${receiptMarker(receipt.proof.nonce)}`:""}`;
   if (existing?.body === body) continue;
   // Recheck immediately before every write: older reconciliations cannot
   // overwrite a newer publisher, PR head, label state or live snapshot.

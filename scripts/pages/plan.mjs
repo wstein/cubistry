@@ -3,7 +3,7 @@ import { writeFile, appendFile } from "node:fs/promises";
 import { GitHub } from "./api.mjs";
 import { plan, previewInventory, BUILD_WORKFLOW, hasPreviewLabel } from "./policy.mjs";
 import { readPublication } from './publication.mjs';
-import { optimizePlan, notificationNumbers, commentMarker } from './reconciliation.mjs';
+import { optimizePlan, notificationNumbers, retainNotificationCandidates, commentMarker } from './reconciliation.mjs';
 import { trustedPublisher } from './notification.mjs';
 const api = new GitHub();
 const pages = await api.request("pages");
@@ -44,7 +44,6 @@ if(published){
 const production=await metadata('.cubistry-production.json');
 const previews={};
 for(const entry of result.entries)if(entry.action==='deploy')previews[entry.number]=await metadata(`pr-preview/pr-${entry.number}/preview-info.json`);
-result=optimizePlan(result,{storage:tree?.sha,published,production,previews});
 // Migrate old stable comments once. Later receipts retain only relevant PRs,
 // so normal reconciliation never scans the entire historical PR collection.
 const bootstrap=[];
@@ -56,7 +55,8 @@ if(!published){
   }
 }
 result.notify=notificationNumbers({pulls,inventory,published,bootstrap});
-result.tracked=notificationNumbers({pulls,inventory:[],published:null});
+result.tracked=await retainNotificationCandidates(api,{numbers:result.notify,pulls,inventory,published});
+result=optimizePlan(result,{storage:tree?.sha,published,production,previews,tracked:result.tracked});
 async function metadata(path){
   const blob=await api.request(`contents/${path}?ref=gh-pages`);
   try{return blob?.content?JSON.parse(Buffer.from(blob.content,'base64').toString()):null;}catch{return null;}

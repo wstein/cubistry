@@ -106,3 +106,39 @@ test('pending previews persist their candidate identity even before a directory 
  const value={production:{sha,run:20,status:'pending'},entries:[{number:8,action:'none',status:'pending'}]};
  assert.equal(optimizePlan(value,{storage,published:receipt}).early,true,'a pending-only preview must remain discoverable after later closure');
 });
+import {retainNotificationCandidates} from '../scripts/pages/reconciliation.mjs';
+test('cleanup candidates survive notification failure and supersession until matching live receipt acknowledgement',async()=>{
+ const closed={number:7,state:'closed',head:{sha,repo:{full_name:'wstein/cubistry'}},labels:[]};
+ const old='<!-- cubistry-pr-preview -->\nPreview pending or publication/validation failed.';
+ let body=old;
+ const api={request:async()=>closed,pages:async()=>[{user:{login:'github-actions[bot]'},body}]};
+ const args={numbers:[7],pulls:[],inventory:[],published:receipt};
+ assert.deepEqual(await retainNotificationCandidates(api,args),[7],'failed detached notifier must retain cleanup for next run');
+ assert.deepEqual(await retainNotificationCandidates(api,args),[7],'superseded detached notifier must retain cleanup again');
+ body='<!-- cubistry-pr-preview -->\nPreview removed after this PR closed or merged.\n<!-- cubistry-pr-preview-receipt:'+('d'.repeat(32))+' -->';
+ assert.deepEqual(await retainNotificationCandidates(api,args),[7],'an older snapshot acknowledgement cannot discharge current cleanup');
+ body='<!-- cubistry-pr-preview -->\nPreview removed after this PR closed or merged.\n<!-- cubistry-pr-preview-receipt:'+receipt.nonce+' -->';
+ assert.deepEqual(await retainNotificationCandidates(api,args),[]);
+ assert.deepEqual(await retainNotificationCandidates(api,{...args,inventory:[7]}),[7],'remaining storage prevents acknowledgement');
+});
+test('candidate tracking drops a nonexistent comment obligation but preserves reopened and pending-only previews',async()=>{
+ const pr={number:7,state:'closed',head:{sha,repo:{full_name:'wstein/cubistry'}},labels:[]};
+ const api={request:async()=>pr,pages:async()=>[]};
+ assert.deepEqual(await retainNotificationCandidates(api,{numbers:[7],pulls:[],inventory:[],published:receipt}),[]);
+ assert.deepEqual(await retainNotificationCandidates(api,{numbers:[7],pulls:[{...pr,state:'open',labels:[{name:'preview'}]}],inventory:[],published:receipt}),[7]);
+});
+test('actual cleanup notification supplies the durable acknowledgement consumed by next reconciliation',async()=>{
+ const pr={number:7,state:'closed',head:{sha,repo:{full_name:'wstein/cubistry'}},labels:[]};let body;
+ const api={pages:async()=>[{id:8,user:{login:'github-actions[bot]'},body:'<!-- cubistry-pr-preview --> old'}],request:async(path,options={})=>{
+  if(options.method){body=JSON.parse(options.body).body;return {};}
+  return path.startsWith('pulls/')?pr:null;
+ }};
+ await notifyPreviews(api,note,{fresh:async()=>true});
+ assert.match(body,/Preview removed after this PR closed or merged\./);
+ const next={request:async()=>pr,pages:async()=>[{user:{login:'github-actions[bot]'},body}]};
+ assert.deepEqual(await retainNotificationCandidates(next,{numbers:[7],pulls:[],inventory:[],published:receipt}),[]);
+});
+test('unacknowledged candidate backlog fails closed at its explicit bound',async()=>{
+ const pulls=Array.from({length:401},(_,i)=>({number:i+1,head:{repo:{full_name:'wstein/cubistry'}},labels:[{name:'preview'}]}));
+ await assert.rejects(retainNotificationCandidates({}, {numbers:[],pulls,inventory:[],published:null}),/Too many pending/);
+});

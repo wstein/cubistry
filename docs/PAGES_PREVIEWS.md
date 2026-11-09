@@ -225,5 +225,9 @@ newer snapshot. Notification has its own serialized group and does not hold the
 publication lock. Normal runs inspect only active previews, inventoried storage
 and prior receipt candidates. A first-run historical bot-comment scan preserves
 old cleanup comments when migrating an installation without a receipt; later
-receipts retain only currently relevant preview numbers. Browser code and PR
+receipts retain currently relevant preview numbers and unacknowledged cleanup
+candidates. Closed cleanup remains retryable after a failed or superseded notifier
+until the stable bot comment acknowledges the current public receipt nonce. A
+missing comment creates no cleanup-comment obligation. Tracking is bounded at
+400 candidates and fails closed if that bound is exceeded. Browser code and PR
 artifacts are never executed in these privileged jobs.
