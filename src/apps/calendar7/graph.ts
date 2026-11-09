@@ -26,6 +26,7 @@ import {
   stateDigest,
   inverseMoves,
 } from "./engine.ts";
+import type { Surface } from "./sticker-art.ts";
 import { type Cell, type Display, frontFailure, INKS, type Ink } from "./display.ts";
 
 export const STATE_SCHEMA = "cubistry.calendar7.state";
@@ -73,6 +74,8 @@ export interface Start {
   readonly printing: Printing;
   readonly pose: Pose;
   readonly node: Node;
+  /** How the 3D view draws the labels: the optional state field "surface"; "sticker" when absent. */
+  readonly surface?: Surface;
 }
 export interface DisplayTable {
   readonly displays: readonly Display[];
@@ -152,7 +155,9 @@ export function parseState(json: unknown): Start {
     year: int(r.year, "root year", 2026, 2099),
     month: int(r.month, "root month", 1, 12),
   };
-  return { printing, pose, node };
+  const surface = j.surface === undefined ? "sticker" : j.surface;
+  if (surface !== "sticker" && surface !== "face") throw new Error('state surface must be "sticker" or "face"');
+  return { printing, pose, node, surface };
 }
 
 /** Parse displays.v1.json. */
