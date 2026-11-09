@@ -22,7 +22,9 @@ No timeout, retry, assertion, worker count or low-effects setting is relaxed.
 
 PR updates and newer main pushes supersede older read-only validation in their
 own groups. Event names isolate scheduled and manual runs from main pushes.
-Adding an unrelated PR label neither starts nor cancels the browser matrix.
+Unrelated PR label runs use their own run-ID group: they neither start/cancel
+the browser matrix nor evict a newer head still pending while cancellation
+finishes.
 Documentation validation follows the newest PR/main-push head as well.
 
 Pages concurrency applies only to the read-only **build job**. Its legacy deploy
@@ -53,6 +55,12 @@ Playwright 1.64.1 package, Chromium revision 1248/version 156.0.8078.4, Ubuntu
 system fonts. The image supplies Node 26, so `setup-node` explicitly selects
 Node 24 before any repository command. Jobs set `TZ=UTC` to preserve the runner's
 previous time-zone behavior. Python 3.12 setup remains explicit where needed.
+
+After checkout, the disposable bind-mounted workspace is assigned to the job
+container user with `chown -hR`, without following symlinks. Empty, root,
+noncanonical and symlink workspace paths fail closed. Git ownership checks
+remain enabled; no trust-list or global Git configuration workaround is added.
+This precedes all repository Git work and records ownership before/after.
 
 There is no per-job `playwright install --with-deps` or apt installation. Container
 options retain shared memory through `--ipc=host` and use `--init`, as recommended
