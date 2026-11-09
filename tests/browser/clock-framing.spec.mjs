@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { test, expect } from "@playwright/test";
 test("the shared clock stays framed at simultaneous yaw and pitch extremes", async ({
   page,
@@ -125,14 +126,27 @@ test("the reference top-right viewpoint resets and fits the shared row on deskto
   }
 });
 
-for (const [path, selector] of [["/counter.html", "#application"], ["/ms-timer.html", "#ms-timer-application"]]) {
-  test(`the legacy chooser on ${path} opens the unified Live Clock`, async ({ page }) => {
+for (const [path, selector, delayed] of [
+  ["/counter.html", "#application", false],
+  ["/ms-timer.html", "#ms-timer-application", false],
+  ["/counter.html", "#application", true],
+]) {
+  test(`the legacy chooser on ${path} opens the unified Live Clock${delayed ? " during delayed document navigation" : ""}`, async ({ page }) => {
+    if (delayed) await page.route("**/index.html?app=clock", async (route) => {
+      // Model a document navigation that exceeds the URL assertion budget but
+      // remains within the existing Clock readiness budget.
+      await new Promise((resolve) => setTimeout(resolve, 6000));
+      await route.continue();
+    });
     await page.goto(path);
     await expect(page.locator(selector)).toBeEnabled();
     const clock = page.locator(selector).getByRole("option", { name: "Live H–M–S Clock", exact: true });
     await expect(clock).toHaveAttribute("value", "index.html?app=clock");
     await page.selectOption(selector, "index.html?app=clock");
-    await expect(page).toHaveURL(/index\.html\?app=clock$/);
+    // The readiness budget includes document navigation and Clock initialization.
+    // Check the final URL after that milestone, retaining its five-second budget.
     await expect(page.locator("#seconds-speed")).toBeEnabled({ timeout: 30000 });
+    await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "clock");
+    await expect(page).toHaveURL(/index\.html\?app=clock$/);
   });
 }
