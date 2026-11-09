@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Validate pinned browser environment
+description: Verify the fixed Playwright image and retain a browser setup receipt.
+inputs:
+  receipt-name:
+    description: Unique job or shard name for the setup receipt.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Verify browser, fonts and software rendering
+      shell: bash
+      run: node scripts/ci/browser-environment.mjs --output "$RUNNER_TEMP/browser-environment.json"
+    - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      if: always()
+      with:
+        name: browser-environment-${{ inputs.receipt-name }}
+        path: ${{ runner.temp }}/browser-environment.json
+        retention-days: 7

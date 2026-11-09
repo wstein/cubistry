@@ -10,12 +10,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: pages-build-${{ github.event.pull_request.number || github.ref }}
-  # Labeling with something other than `preview` starts a run whose job is
-  # skipped; it must not cancel a running preview build.
-  cancel-in-progress: ${{ github.event_name == 'pull_request' && (github.event.action != 'labeled' || github.event.label.name == 'preview') }}
-
 jobs:
   build:
     # Pull requests are built only while they carry the `preview` label. Adding
@@ -26,7 +20,16 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       contains(github.event.pull_request.labels.*.name, 'preview') &&
       (github.event.action != 'labeled' || github.event.label.name == 'preview'))
+    # Only the read-only build may be superseded; deployment keeps its own lock.
+    concurrency:
+      group: pages-build-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ (github.event_name == 'pull_request' && (github.event.action != 'labeled' || github.event.label.name == 'preview')) || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f
+      options: --ipc=host --init
+    env:
+      TZ: UTC
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -36,11 +39,16 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
       - run: npm run prepare:solver
       - run: npm ci
       # Browser tests on pull requests only run with the `e2e` label.
       - if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
-        run: npx playwright install --with-deps chromium
+        uses: ./.github/actions/browser-environment
+        with:
+          receipt-name: build
       # Preserve the existing production WebGL/static-asset gate before upload.
       - if: github.ref == 'refs/heads/main'
         run: npm run test:pages

@@ -14,7 +14,8 @@ test("inactive publisher cannot coalesce away a pending legacy production deploy
     publisher,
     /group: \$\{\{ vars\.PAGES_PREVIEWS_ENABLED == 'true' && github\.event_name != 'pull_request_target' && github\.ref == 'refs\/heads\/main' && \(github\.event_name != 'workflow_run' \|\| contains\(fromJSON\('\["success","failure"\]'\), github\.event\.workflow_run\.conclusion\)\) && 'counter-pages-publish' \|\| format\('inactive-or-signal-pages-\{0\}', github\.run_id\) \}\}/,
   );
-  assert.match(builder, /concurrency:\n  group: pages-build-/);
+  assert.doesNotMatch(builder.split("jobs:\n")[0], /\nconcurrency:/);
+  assert.match(builder, /    concurrency:\n      group: pages-build-/);
   assert.match(
     builder,
     /  deploy:\n    if: github.ref == 'refs\/heads\/main' && vars.PAGES_PREVIEWS_ENABLED != 'true'/,
@@ -22,7 +23,7 @@ test("inactive publisher cannot coalesce away a pending legacy production deploy
   assert.match(builder, /    concurrency:\n      group: counter-pages-publish/);
   assert.match(
     builder,
-    /cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' && \(github\.event\.action != 'labeled' \|\| github\.event\.label\.name == 'preview'\) \}\}/,
+    /cancel-in-progress: \$\{\{ \(github\.event_name == 'pull_request' && \(github\.event\.action != 'labeled' \|\| github\.event\.label\.name == 'preview'\)\) \|\| \(github\.event_name == 'push' && github\.ref == 'refs\/heads\/main'\) \}\}/,
   );
   const groups = new Map();
   const submit = (id, group) => {
@@ -177,4 +178,19 @@ test("only completed successful or failed builds reach the publisher's group and
   const comment = publisher.split("  workflow_run:")[0];
   assert.match(comment, /still starts a run/);
   assert.doesNotMatch(comment, /does not reach|start(s)? no/);
+});
+
+test("only the read-only Pages build supersedes older main heads", () => {
+  const builder = readFileSync(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
+  const build = builder.split("  build:\n")[1].split("  deploy:\n")[0];
+  const deploy = builder.split("  deploy:\n")[1];
+  const expression = build.match(/^      cancel-in-progress: \$\{\{ (.*) \}\}$/m)[1];
+  const cancel = github => Function("github", `return (${expression});`)(github);
+  const event = (name, action, label) => ({event_name:name,ref:"refs/heads/main",event:{action,label:{name:label}}});
+  assert.equal(cancel(event("push")),true);
+  assert.equal(cancel(event("workflow_dispatch")),false);
+  assert.equal(cancel(event("pull_request","labeled","preview")),true);
+  assert.equal(cancel(event("pull_request","labeled","e2e")),false);
+  assert.match(deploy,/group: counter-pages-publish\n      cancel-in-progress: false/);
+  assert.doesNotMatch(builder.split("jobs:\n")[0],/\nconcurrency:/);
 });

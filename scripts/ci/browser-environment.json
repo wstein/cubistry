@@ -1,0 +1,24 @@
+{
+  "SPDX-License-Identifier": "AGPL-3.0-or-later",
+  "image": "mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f",
+  "imageTag": "mcr.microsoft.com/playwright:v1.64.1-noble",
+  "playwright": "1.64.1",
+  "chromiumRevision": "1248",
+  "chromiumVersion": "156.0.8078.4",
+  "nodeMajor": 24,
+  "os": {
+    "ID": "ubuntu",
+    "VERSION_ID": "24.04"
+  },
+  "architecture": "x64",
+  "browserRoot": "/ms-playwright",
+  "timezone": "UTC",
+  "fonts": {
+    "public/fonts/noto-sans-latin-600.woff2": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed",
+    "public/fonts/noto-sans-latin-800.woff2": "a5650ea2e07952bc6cd44f67cea720697ac9fdc9e35f33e76ccc5004370c21a6"
+  },
+  "launchArgs": [
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader"
+  ]
+}
