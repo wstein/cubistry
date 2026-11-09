@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // The Live H-M-S Clock mode of the unified application (id `clock`). It carries everything the former clock.html page
 // did: three cubes in one scene, the live scheduler, per-cube quarter-turn times, the committed-moves table, the Nerd
 // drawer, the sticker lettering and the URL parameters (docs/LIVE_CLOCK.md). Controls sit in the dock slots (controls.ts),
@@ -88,6 +89,7 @@ export async function mountLiveClock(studio, params, shell, isCurrent) {
   let stage = null;
   let ready = false;
   let failed = false;
+  let letteringError = false;
   let intervalId = 0;
   let disposed = false;
   let shownStatistics = -1;
@@ -101,6 +103,7 @@ export async function mountLiveClock(studio, params, shell, isCurrent) {
 
   function fail(error) {
     failed = true;
+    letteringError = false; // The stopped clock owns the error row from now on.
     shell.setError({ text: error?.message ?? "Clock initialization failed" });
     const status = $("clock-status");
     if (status) status.textContent = "Clock stopped. Reload to recover.";
@@ -144,13 +147,19 @@ export async function mountLiveClock(studio, params, shell, isCurrent) {
       if (disposed || !isCurrent()) return;
       history.replaceState(null, "", urlWithLettering(location.href, lettering));
       showPrintLink();
-      shell.setError(null);
+      if (letteringError) {
+        shell.setError(null);
+        letteringError = false;
+      }
     } catch (e) {
       if (disposed || !isCurrent()) return;
       lettering = before;
       controls.setLettering(before);
       studio.rememberLettering(before);
-      shell.setError({ text: e?.message ?? "The sticker lettering could not be changed" });
+      if (!failed) {
+        letteringError = true;
+        shell.setError({ text: e?.message ?? "The sticker lettering could not be changed" });
+      }
     } finally {
       controls.setEnabled(true);
     }
