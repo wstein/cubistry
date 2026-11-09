@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Align container workspace ownership
+description: Match the disposable checkout owner to the job container before repository Git commands.
+runs:
+  using: composite
+  steps:
+    - name: Align workspace ownership
+      shell: bash
+      run: bash scripts/ci/align-workspace.sh

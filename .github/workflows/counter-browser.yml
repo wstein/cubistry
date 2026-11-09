@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: counter-browser-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: counter-browser-${{ github.event_name }}-${{ github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name != 'e2e' && format('ignored-label-{0}', github.run_id) || github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ (github.event_name == 'pull_request' && (github.event.action != 'labeled' || github.event.label.name == 'e2e')) || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
 
 jobs:
@@ -43,6 +43,7 @@ jobs:
       matrix: ${{ fromJSON(github.event_name == 'pull_request' && '{"include":[{"group":"fast","shard":1,"of":3},{"group":"fast","shard":2,"of":3},{"group":"fast","shard":3,"of":3}]}' || '{"include":[{"group":"fast","shard":1,"of":3},{"group":"fast","shard":2,"of":3},{"group":"fast","shard":3,"of":3},{"group":"timing","shard":1,"of":3},{"group":"timing","shard":2,"of":3},{"group":"timing","shard":3,"of":3}]}') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/container-workspace
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
@@ -79,6 +80,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/container-workspace
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24

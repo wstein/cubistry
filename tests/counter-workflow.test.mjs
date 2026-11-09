@@ -13,8 +13,9 @@ const context = (event, action, label) => ({
   event_name: event, ref: "refs/heads/main",
   event: { action, label: { name: label }, pull_request: { number: event === "pull_request" ? 7 : null, labels: [{ name: "e2e" }] } },
 });
-const evaluate = (expression, github) => Function("github", "contains", `return (${expression});`)(
+const evaluate = (expression, github) => Function("github", "contains", "format", `return (${expression});`)(
   github, (values, value) => values.includes(value),
+  (template, ...values) => template.replace(/\{(\d+)\}/g, (_, i) => String(values[Number(i)])),
 );
 const cancel = workflow => {
   const expression = workflow.match(/^  cancel-in-progress: \$\{\{ (.*) \}\}$/m);
@@ -108,4 +109,23 @@ test("every Counter browser consumer uses the same immutable matching environmen
     assert.equal((workflow.match(/uses: \.\/.github\/actions\/browser-environment/g) || []).length, jobs);
     assert.ok(workflow.indexOf("actions/browser-environment") < workflow.indexOf("run: npm run check") || workflow === browser);
   }
+});
+
+test("an unrelated label cannot evict a qualified browser run while cancellation is pending", () => {
+  const queue = new Map();
+  const submit = (id, github) => {
+    const name = group(browser, github), state = queue.get(name) || { active: null, pending: null };
+    if (state.active === null) state.active = id;
+    else state.pending = id; // GitHub replaces pending work even when cancel-in-progress is false.
+    queue.set(name, state);
+    return name;
+  };
+  const a = { ...context("pull_request", "synchronize"), run_id: 1001 };
+  const b = { ...context("pull_request", "synchronize"), run_id: 1002 };
+  const c = { ...context("pull_request", "labeled", "preview"), run_id: 1003 };
+  const qualified = submit("A", a);
+  submit("B", b);
+  submit("C", c);
+  assert.equal(queue.get(qualified).pending, "B", "the newest qualified head must stay pending");
+  assert.notEqual(group(browser, b), group(browser, c));
 });
