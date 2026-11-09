@@ -430,29 +430,25 @@ test("setSlice chooses the grouping of the next step only; skipping a slice step
   assert.equal(digest(player.shownPose), graph.nodes[13].hash);
 });
 
-test("the page shows the three counts, both block words and the note on the middle slice; the option is offered", () => {
+test("the selected slice word is shown alone and alternative counts stay technical", () => {
   const range = chainRange(graph);
   const today = { year: 2028, month: 1 };
   const choice = chooseMonth(new URLSearchParams("year=2028&month=2"), today, range);
-  const html = pageHtml(buildModel(graph, parseDisplays(json("public/calendar7/displays.v1.json")), choice, today));
-  const esc = (s) => s.replace(/&/g, "&amp;").replace(/'/g, "&#39;");
-  const toks = (a) => a.map((t) => `<span class="c7-tok">${esc(t)}</span>`).join(" ");
-  for (const [label, delta] of [["next", 1], ["previous", -1]]) {
-    const step = stepFrom(graph, range, { year: 2028, month: 2 }, delta);
-    const plain = groupBlocks(step.moves);
-    const sliced = groupBlocks(step.moves, { slice: true });
-    const [b, c] = [blockCounts(plain).blockMoves, blockCounts(sliced).blockMoves];
-    assert.ok(c < b && b < step.htm, "three different counts");
-    assert.ok(
-      html.includes(`${step.htm} layer moves (HTM), ${b} block moves, without the middle slice, ${c} block moves, with the middle slice (it counts as a move there), ${step.qtm} quarter turns (QTM),`),
-      `${label} counts`,
-    );
-    assert.ok(html.includes(`data-blocks-slice="${label}">${toks(sliced.map(blockToken))}</p>`), `${label} slice block word`);
-    assert.ok(html.includes(`data-blocks="${label}">${toks(plain.map(blockToken))}</p>`), `${label} plain block word`);
-    assert.ok(html.includes(`data-word="${label}">`), "the move word stays");
+  const model = buildModel(graph, parseDisplays(json("public/calendar7/displays.v1.json")), choice, today);
+  for (const slice of [false,true]) {
+    const html = pageHtml(model,{orientation:"stored",slice,notation:"blocks"});
+    for (const [label, delta] of [["next", 1], ["previous", -1]]) {
+      const step = stepFrom(graph, range, { year: 2028, month: 2 }, delta);
+      const selected = groupBlocks(step.moves,{slice});
+      const count = blockCounts(selected).blockMoves;
+      assert.ok(html.includes(`${count} moves`));
+      assert.ok(html.includes(`${step.htm} layer moves (HTM)`));
+      const word = html.match(new RegExp(`data-notation-word="${label}">(.*?)</p>`))[1];
+      const tokens = [...word.matchAll(/class="c7-tok(?: c7-free)?">([^<]*)/g)].map(m=>m[1].replace(/&#39;/g,"'"));
+      assert.deepEqual(tokens, selected.map(blockToken));
+    }
+    assert.equal((html.match(/<summary>Technical details<\/summary>/g)??[]).length,2);
+    assert.match(html,/Whole-cube rotations are free/);
   }
-  assert.match(html, /Whole-cube rotations stay free in every count/);
-  assert.match(html, /<code>x0<\/code> is the middle slice alone/);
-  const controls = playerHtml(2);
-  assert.match(controls, /<input type="checkbox" data-c7="slice" checked> Middle slice counts as a move/);
+  assert.match(playerHtml(2), /<input type="checkbox" data-c7="slice" checked> Middle slice counts as a move/);
 });

@@ -134,12 +134,14 @@ test("rawToken lists generator and exponent, and the step shows both notations",
   assert.equal(rawToken([21, 2]), "g21:2");
   const today = { year: 2026, month: 11 };
   const model = buildModel(graph, table, chooseMonth(q("year=2028&month=5"), today, range), today);
-  const html = pageHtml(model);
-  // Tokens are unbreakable spans separated by plain spaces (a hyphen must not wrap).
-  const toks = (a) => a.map((t) => `<span class="c7-tok">${t.replace(/'/g, "&#39;")}</span>`).join(" ");
-  assert.ok(html.includes(`data-raw="next">${toks(model.next.moves.map(rawToken))}</p>`));
-  assert.ok(html.includes(`data-word="next">${toks(model.next.moves.map(moveToken))}</p>`));
-  assert.match(html, /Raw generators/);
+  const raw = pageHtml(model, {orientation:"stored",slice:false,notation:"raw"});
+  const layers = pageHtml(model, {orientation:"stored",slice:false,notation:"layers"});
+  assert.match(raw, /Raw generators \(equivalent expansion\)/);
+  assert.match(raw, /g[0-9]+:[+-]?[12]/);
+  assert.doesNotMatch(layers, /g[0-9]+:[+-]?[12]/);
+  assert.match(layers, /Layer moves \(equivalent expansion\)/);
+  assert.equal((raw.match(/data-notation-word=/g) ?? []).length, 2);
+  assert.equal((layers.match(/data-notation-word=/g) ?? []).length, 2);
 });
 
 test("the rotation count is pluralized", () => {
@@ -163,7 +165,7 @@ test("the page shows the sheet, both steps and the scope notice for a month insi
   assert.match(html, /February 2028/);
   assert.match(html, /December 2027/);
   assert.match(html, /No solver and no jumps/);
-  assert.match(html, /data-word="next"/);
+  assert.match(html, /data-notation-word="next"/);
   assert.match(html, /JAN|>J</);
 });
 
@@ -171,7 +173,7 @@ test("the end of the chain has no next step", () => {
   const today = { year: 2026, month: 11 };
   const html = pageHtml(buildModel(graph, table, chooseMonth(q("year=2099&month=12"), today, range), today));
   assert.match(html, /No later month: December 2099 is the end of the chain/);
-  assert.match(html, /data-word="previous"/);
+  assert.match(html, /data-notation-word="previous"/);
 });
 
 test("a month outside the chain shows a not-available message and no sheet", () => {

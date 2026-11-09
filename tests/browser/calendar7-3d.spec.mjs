@@ -66,14 +66,15 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/index.html?app=calendar7&year=2028&month=1");
   await idle(page, "2028-01");
+  await page.locator('[data-c7="orientation"]').selectOption("after");
   await expect(page.locator('[data-c7="note"]')).toBeHidden();
   const progress = page.locator('[data-c7="progress"]');
   await page.locator('a[data-nav="next"]').click();
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "playing");
   expect([FEB_BLOCKS, FEB_ALIGNMENT]).toEqual([101, "x+, y2"]);
-  await expect(progress).toHaveText(new RegExp(`^Turning to February 2028: block \\d+ of ${FEB_BLOCKS}$`));
+  await expect(progress).toHaveText(new RegExp(`^Turning to February 2028: move \\d+ of ${FEB_BLOCKS}$`));
   // The alignment is a separate, free indicator: it is found at the end of the layer blocks.
-  await expect(page.locator('[data-c7="alignment"]')).toHaveText("Alignment: at the end");
+  await expect(page.locator('[data-c7="alignment"]')).toHaveText(`Orientation at the end (free): ${FEB_ALIGNMENT}.`);
   // The heading, sheet and live region already name the new month; the digest is that of the pose being turned only at the end.
   await expect(page.locator(".c7-month")).toHaveText("February 2028");
   await page.locator('[data-c7="speed"]').selectOption("8");
@@ -93,7 +94,7 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   await expect(page.locator('[data-c7="skip"]')).toBeFocused();
   await expect(page.locator('[data-c7="skip"]')).toHaveAttribute("aria-disabled", "true");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[21].hash);
-  await expect(page.locator('[data-c7="alignment"]')).toHaveText(`Alignment: ${FEB_ALIGNMENT}`);
+  await expect(page.locator('[data-c7="alignment"]')).toBeHidden();
   await expect(progress).toHaveText("The cube shows February 2028.");
   await expect(page.locator(".c7-live")).toContainText("The cube has turned to February 2028");
   // Backward: the inverse of the previous edge; and Next during the step ends it at once.
@@ -159,7 +160,7 @@ test("at 375 px the page scrolls instead of clipping and the controls are reacha
   });
   expect(stageOverflow.sw).toBeLessThanOrEqual(0);
   expect(stageOverflow.canScroll).toBe(true);
-  for (const name of ["speed", "slice", "defer", "reset"]) {
+  for (const name of ["speed", "slice", "orientation", "notation", "reset"]) {
     await page.locator(`[data-c7="${name}"]`).focus();
     await expect(page.locator(`[data-c7="${name}"]`)).toBeFocused();
   }
@@ -241,24 +242,24 @@ for (const [width, height] of [[375, 800], [768, 900], [1000, 700], [1440, 900]]
     // The mode puts nothing into the dock, so the dock is collapsed and the stage takes its width.
     await expect(page.locator(".shell-dock")).toBeHidden();
     await expect(page.locator("[data-c7-legend]")).toBeVisible();
-    for (const [kind, label] of [["blocks-slice", "Block word with middle slice"], ["blocks", "Block word"], ["word", "Move word"], ["raw", "Raw generators"]]) {
-      await page.locator(`.c7-step[data-step="next"] summary:text-is("${label}")`).click();
-      const box = page.locator(`[data-${kind}="next"]`);
+    for (const notation of ["blocks", "layers", "raw"]) {
+      await page.locator('[data-c7="notation"]').selectOption(notation);
+      await page.locator('.c7-step[data-step="next"] .c7-word-panel summary').click();
+      const box = page.locator('[data-notation-word="next"]');
       await expect(box).toBeVisible();
-      // Not clipped: the box grows to its text, nothing scrolls inside it, and no token is wider than the box.
-      const m = await box.evaluate((el) => ({
-        sh: el.scrollHeight - el.clientHeight,
-        sw: el.scrollWidth - el.clientWidth,
-        right: el.getBoundingClientRect().right,
-        tokenRight: Math.max(...[...el.querySelectorAll(".c7-tok")].map((t) => t.getBoundingClientRect().right)),
-        tokens: el.querySelectorAll(".c7-tok").length,
-        overflowY: getComputedStyle(el).overflowY,
-      }));
-      expect(m.sh).toBeLessThanOrEqual(1);
-      expect(m.sw).toBeLessThanOrEqual(0);
-      expect(m.tokenRight).toBeLessThanOrEqual(m.right + 0.5);
+      // The word has bounded vertical scrolling; all tokens remain readable without page-wide overflow.
+      const m = await box.evaluate((el) => {
+        el.scrollTop=el.scrollHeight;
+        return {sw:el.scrollWidth-el.clientWidth,right:el.getBoundingClientRect().right,
+          tokenRight:Math.max(...[...el.querySelectorAll('.c7-tok')].map(t=>t.getBoundingClientRect().right)),
+          tokens:el.querySelectorAll('.c7-tok').length,overflowY:getComputedStyle(el).overflowY,
+          lastBottom:el.lastElementChild.getBoundingClientRect().bottom,bottom:el.getBoundingClientRect().bottom};
+      });
+      expect(m.sw).toBeLessThanOrEqual(1);
+      expect(m.tokenRight).toBeLessThanOrEqual(m.right+0.5);
       expect(m.tokens).toBeGreaterThan(20);
-      expect(m.overflowY).toBe("visible");
+      expect(m.overflowY).toBe("auto");
+      expect(m.lastBottom).toBeLessThanOrEqual(m.bottom+1);
     }
     // 16px gutter on the left of the content and no page-wide horizontal scroll.
     const g = await page.evaluate(() => ({
@@ -273,16 +274,12 @@ for (const [width, height] of [[375, 800], [768, 900], [1000, 700], [1440, 900]]
   });
 }
 
-test("the sentence about the deferred rotations follows the 'Align at the end' option", async ({ page }) => {
-  const seen = watch(page);
-  await page.goto("/index.html?app=calendar7&year=2028&month=1");
-  await idle(page, "2028-01");
-  const sentence = page.locator('[data-align="next"]');
-  await expect(sentence).toBeVisible();
-  await expect(sentence).toContainText(`Alignment at the end (free, not a move): ${FEB_ALIGNMENT} with the middle slice`);
-  await page.locator('[data-c7="defer"]').uncheck();
-  await expect(sentence).toBeHidden();
-  await page.locator('[data-c7="defer"]').check();
-  await expect(sentence).toBeVisible();
-  expect(seen).toEqual([]);
+test("orientation previews show only the selected mode once", async ({page})=>{
+  await page.goto('/index.html?app=calendar7&year=2028&month=1');await idle(page,'2028-01');
+  for(const [mode,text]of [["before","before moves"],["after","at the end"],["stored","stay in the word"]]){
+    await page.locator('[data-c7="orientation"]').selectOption(mode);
+    await page.locator('.c7-step[data-step="next"] .c7-word-panel summary').click();
+    const note=page.locator('.c7-step[data-step="next"] .c7-orientation');
+    await expect(note).toHaveCount(1);await expect(note).toContainText(text);
+  }
 });

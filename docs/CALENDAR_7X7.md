@@ -64,6 +64,35 @@ the next month.
   triangles per body, 23k instead of 128k for the cube). The scene renders on demand: an idle
   cube draws nothing, and a frame of a turn allocates nothing.
 
+## Reading and following a step
+
+The **Orientation** control defaults to **Before moves**. The cube first turns
+into its target frame using at most three free x/y rotations, then builds the
+month using conjugated layer blocks. **After moves** retains the previous end
+alignment, and **Stored rotations** leaves whole-cube rotations in the played
+word. Orientation and middle-slice changes apply to the next step; the current
+step keeps its plan through pauses and navigation interruptions.
+
+Previous/Next show the destination and the number of actual animated moves.
+This counts nonrotation blocks with the selected middle-slice setting, regardless
+of notation. Whole-cube rotations are free. Alternative counts, including the
+stored HTM/QTM and equivalent generator expansion, live under **Technical details**.
+
+**Notation** selects one word: **Blocks**, **Layer moves (equivalent)** or
+**Raw generators (equivalent)**. Expansions describe the same played blocks in
+legal generators 1 through 21. A physical middle slice has no generator of its
+own: its expansion uses a whole-cube rotation and opposite outer-layer turns.
+Those algebraic rotations are marked free and are not separate animations.
+Each highlighted expansion group plays together as one block.
+
+During a step, its original source and destination stay in the active word panel,
+even though the sheet already names the target month. Preview words are hidden
+while that panel is active. The current group is outlined, completed groups use
+secondary ink, and following scrolls only the bounded word box. Focus and page
+scroll remain in place. Changing notation during playback applies to the next
+step so the active mapping stays fixed. Skip, replacement navigation and failure
+clear the retired highlight.
+
 ## Block moves (wide and inner-wide)
 
 **Display layer only.** Block grouping reads the stored data (`graph.v1.json`,
@@ -98,8 +127,7 @@ Code: `src/apps/calendar7/blocks.ts` (pure).
   rotations not at all. *Block moves* counts one per non-rotation block. For the same step block moves never exceed layer moves;
   whole-cube rotations are counted separately and stay free, as today.
 - **Animation.** The player plays one block as ONE tween: every layer of the block turns together by the same angle in
-  the time of one move (90 ms at 1x, the speeds 0.5x to 8x are unchanged). The progress line reads
-  `block k of n`. Skip, Pause, Previous/Next during a step, reduced motion (a step jumps to its end state) and the digest check
+  the time of one move (90 ms at 1x, the speeds 0.5x to 8x are unchanged). The progress line counts actual animated nonrotation moves. Skip, Pause, Previous/Next during a step, reduced motion (a step jumps to its end state) and the digest check
   at the end of every step are unchanged and work on blocks; `StateMismatchError` still stops the view.
 - **Not covered.** No change to the stored words, to the chain or to the metrics in the graph; no search for shorter
   words (merging only regroups what the stored word already contains); no merging across a rotation or across the middle layer (the next section lifts both limits as an opt-in).
@@ -127,14 +155,13 @@ The measurement behind it is `research/calendar-7x7/wide-blocks` (research pull 
   runs); among plans with the fewest blocks, one without an added rotation wins (a rotation is only in the plan when it saves a block, or the run itself contains one), then the narrower blocks. Opposite turns of one layer cancel, so the multiset of the moves is **not** kept, only the state.
 - **Notation.** The same as for blocks, with layer 0 allowed in the range: `x0` the middle slice, `x-3..0` the layers -3 to 0,
   `y-1..+2'` the layers -1 to +2 counter-clockwise, `z-2..0²` a half turn. Kind `slice` in the code. Rotations are `xrot` and so on, as before.
-- **Three counts.** The page shows, for each step: *layer moves* (HTM, the stored count, unchanged), *block moves without the middle
+- **Three counts.** Technical details list, for each step: *layer moves* (HTM, the stored count, unchanged), *block moves without the middle
   slice* (the blocks of the previous section) and *block moves with the middle slice* (rule c). In the third count turning the middle slice
   counts as a move; whole-cube rotations stay free in all three. On the 91 root words of the research
   the layer moves total 40642 and the block moves with the middle slice 30696; on the 883 stored strict edges 103618 and 79100.
 - **Playback.** The player plays rule-c blocks by default, one tween per block; a slice block is animated as a real slab turn of
   its interval including layer 0 (the camera does not move). The option **Middle slice counts as a move** (in the animation
-  controls) switches back to the blocks without the middle slice for the next step; a step in progress keeps its blocks. The progress line
-  reads `block k of n` in both modes (n counts the rotation blocks too, unless the rotations are deferred, see the next section). A mismatch of the end-of-step SHA-256 still raises
+  controls) switches back to the blocks without the middle slice for the next step; a step in progress keeps its blocks. The progress line counts the actual nonrotation blocks; rotations are named separately as free. A mismatch of the end-of-step SHA-256 still raises
   `StateMismatchError` and stops the view.
 - **Not covered.** Nothing stored changes, no search in a larger alphabet, no camera rubber band, no rewriting across runs
   of different axes. Words with different groupings reach the same state, so the same digest.
@@ -142,6 +169,14 @@ The measurement behind it is `research/calendar-7x7/wide-blocks` (research pull 
 ## Deferred rotations and end alignment
 
 **Display only, again.** Generators 1 to 21, `graph.v1.json`, `calendar7-source.json` and the engine alphabet do not change.
+The factorization below describes **After moves**. The default **Before moves**
+uses the equivalent prefix factorization: if B followed by R is the original
+word, R followed by the conjugate R B R^-1 reaches the exact same full pose.
+Axes, layer signs and exponents are transformed together; the words are never
+arbitrarily reordered. The prefix uses only x/y turns (all 24 orientations need
+at most three); software tests check every stored edge in both directions and
+both slice settings, including inverse restoration. This is application
+equivalence testing, not a new research proof.
 Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the easing) and the player. This is mode F of the research
 (`research/calendar-7x7/wide-blocks`, research pull request 346), where the equality of the three digests was verified.
 
@@ -170,10 +205,11 @@ Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the easing) and 
   turn at 1x; the speed setting scales the time). The cube viewer exports no pure function for it, so the formula is repeated in
   `soft-start.ts` and a test compares the rate with `ROTATION_TUNING.returnRate`. Under reduced motion a step jumps and needs
   no alignment; if the preference turns on while a step plays, the alignment takes 150 ms per rotation (up to 300 ms).
-- **Progress.** `block k of n` counts the layer blocks. The alignment is a final phase after block n, shown as
-  `aligning the cube at the end (x+, y2)`; skip and pause work in it.
-- **Control.** The option **Align at the end** (on by default) switches the deferral off for the next step; the player class itself
-  defaults to the stored behavior (`defer: false`).
+- **Progress.** The free orientation is a separate prefix or suffix phase. Only
+  nonrotation blocks contribute to the move count; skip and pause work in every phase.
+- **Control.** **Orientation** selects Before moves (the page default), After moves
+  or Stored rotations. The player class retains its stored default for compatibility;
+  an explicit orientation overrides the older `defer` option.
 - **Tests.** `tests/calendar7-deferral.test.mjs`: seeded random words with many rotations and every stored edge in both
   directions, in both groupings (no rotation entry, unchanged layer moves, the found alignment equal to the product of the removed
   rotations, equal pose and digest), the search finding exactly one of 24, the mismatch cases, negative controls (a wrong rotation,

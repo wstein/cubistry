@@ -10,7 +10,7 @@
  * the view is never left showing a state the engine does not know.
  */
 import { applyBlockInPlace, type Block } from "./blocks.ts";
-import { alignmentText, findAlignments, playedBlocks, rotationBlock } from "./deferral.ts";
+import { alignmentText, findAlignments, playedBlocks, rotationBlock, type RotationPlacement } from "./deferral.ts";
 import {
   applyMoveInPlace,
   clonePose,
@@ -38,9 +38,12 @@ export interface StageView {
 }
 
 export type PlayerStatus = "idle" | "playing" | "paused";
-/** `blocks`: layer blocks are turning; `alignment`: the end alignment (a free whole-cube rotation) is turning; `idle`: no step. */
-export type PlayerPhase = "idle" | "blocks" | "alignment";
+/** `orientation`: free prefix; `blocks`: grouped turns; `alignment`: free suffix; `idle`: no step. */
+export type PlayerPhase = "idle" | "orientation" | "blocks" | "alignment";
 export interface PlayerSnapshot {
+  /** Frozen while a step plays; controls choose the next step. */
+  readonly orientation: RotationPlacement;
+  readonly slice: boolean;
   /** Chain node index the cube shows, or is turning to. */
   readonly index: number;
   readonly status: PlayerStatus;
@@ -75,12 +78,14 @@ export const SPEEDS = [0.5, 1, 2, 4, 8] as const;
 export const DEFAULT_SPEED = 2;
 /** The page plays rule-c blocks (the middle slice counts as a move) unless the viewer turns it off; see `blocks.ts`. */
 export const DEFAULT_SLICE = true;
-/** The page defers whole-cube rotations to one end alignment unless the viewer turns it off; see `deferral.ts`. */
+/** Compatibility default for callers of the older defer option. The page selects DEFAULT_ORIENTATION explicitly. */
 export const DEFAULT_DEFER = true;
+export const DEFAULT_ORIENTATION: RotationPlacement = "before";
 /** Duration of the alignment under reduced motion, if the preference turns on while a step is playing. */
 export const REDUCED_ALIGN_MS = 150;
 
 export interface PlayerOptions {
+  readonly orientation?: RotationPlacement;
   readonly graph: Graph;
   readonly printing: Printing;
   /** The pose of chain node 0. Not modified. */
@@ -97,6 +102,8 @@ export interface PlayerOptions {
 }
 
 interface Plan {
+  readonly orientation: RotationPlacement;
+  readonly slice: boolean;
   readonly from: number;
   readonly target: number;
   /** The stored word of the step, grouped into blocks (display only; same state as the word). */
@@ -127,7 +134,7 @@ export class Calendar7Player {
   private loopFor = -1;
   private disposed = false;
   private slice: boolean;
-  private defer: boolean;
+  private orientation: RotationPlacement;
   private lastAlignment = "none";
   /** Bumped whenever the running loop must stop; a loop that wakes with an older value leaves. */
   private generation = 0;
@@ -142,17 +149,27 @@ export class Calendar7Player {
     this.onError = options.onError;
     this.pose = clonePose(options.root);
     this.slice = options.slice ?? false;
-    this.defer = options.defer ?? false;
+    this.orientation = options.orientation ?? (options.defer ? "after" : "stored");
   }
 
   /** True when the whole-cube rotations of a step are moved to the end alignment. */
   get alignAtEnd(): boolean {
-    return this.defer;
+    return this.orientation === "after";
   }
   /** Chooses it for the NEXT step; a step in progress keeps its plan. */
   setDefer(on: boolean): void {
-    this.defer = on;
+    this.orientation = on ? "after" : "stored";
   }
+
+  setOrientation(orientation: RotationPlacement): void {
+    if (!["before", "after", "stored"].includes(orientation)) throw new RangeError("unknown orientation placement");
+    this.orientation = orientation;
+  }
+
+  /** Exact animation blocks of the frozen current plan. */
+  get stepBlocks(): readonly Block[] { return this.plan?.blocks ?? []; }
+
+  get stepAlignment(): readonly Move[] { return this.plan?.expected ?? []; }
 
   /** True when steps are grouped with rule c. */
   get middleSlice(): boolean {
@@ -166,14 +183,16 @@ export class Calendar7Player {
   get snapshot(): PlayerSnapshot {
     const p = this.plan;
     return {
+      orientation: p?.orientation ?? this.orientation,
+      slice: p?.slice ?? this.slice,
       index: p ? p.target : this.index,
       status: this.status,
       done: p ? p.done : 0,
       total: p ? p.blocks.length : 0,
       from: p ? p.from : this.index,
       speed: this.speed,
-      phase: !p ? "idle" : p.defer && p.done >= p.blocks.length ? "alignment" : "blocks",
-      alignment: p ? (p.defer ? (p.align ? alignmentText(p.align) : "at the end") : "none") : this.lastAlignment,
+      phase: !p ? "idle" : p.orientation === "before" && p.alignDone < p.expected.length ? "orientation" : p.defer && p.done >= p.blocks.length ? "alignment" : "blocks",
+      alignment: p ? (p.orientation === "before" ? alignmentText(p.expected) : p.defer ? (p.align ? alignmentText(p.align) : "at the end") : "none") : this.lastAlignment,
     };
   }
   /** The pose the view shows right now (a copy). */
@@ -246,8 +265,9 @@ export class Calendar7Player {
       this.jump(target);
       return;
     }
-    const { blocks, alignment } = playedBlocks(this.stepMoves(this.index, target), { slice: this.slice, defer: this.defer });
-    this.plan = { from: this.index, target, blocks, done: 0, defer: this.defer, align: null, alignDone: 0, expected: alignment };
+    const orientation = this.orientation;
+    const { blocks, alignment } = playedBlocks(this.stepMoves(this.index, target), { slice: this.slice, orientation });
+    this.plan = { orientation, slice: this.slice, from: this.index, target, blocks, done: 0, defer: orientation === "after", align: orientation === "before" ? alignment : null, alignDone: 0, expected: alignment };
     this.status = "playing";
     this.notify();
     void this.run();
@@ -264,6 +284,8 @@ export class Calendar7Player {
     this.generation++;
     this.plan = null;
     this.status = "idle";
+    if (plan.orientation === "before")
+      for (let i = plan.alignDone; i < plan.expected.length; i++) applyMoveInPlace(this.pose, plan.expected[i]);
     for (let i = plan.done; i < plan.blocks.length; i++) applyBlockInPlace(this.pose, plan.blocks[i]);
     let failure: Error | null = null;
     if (plan.defer) {
@@ -274,7 +296,7 @@ export class Calendar7Player {
       } catch (error) {
         failure = error as Error;
       }
-    } else this.lastAlignment = "none";
+    } else this.lastAlignment = plan.orientation === "before" ? alignmentText(plan.expected) : "none";
     this.view.show(this.pose);
     this.index = plan.target;
     if (failure) {
@@ -305,7 +327,7 @@ export class Calendar7Player {
   }
 
   private finished(plan: Plan): boolean {
-    return plan.done >= plan.blocks.length && (!plan.defer || (plan.align !== null && plan.alignDone >= plan.align.length));
+    return plan.done >= plan.blocks.length && (plan.orientation !== "before" || plan.alignDone >= plan.expected.length) && (!plan.defer || (plan.align !== null && plan.alignDone >= plan.align.length));
   }
 
   play(): void {
@@ -332,7 +354,15 @@ export class Calendar7Player {
     try {
       while (this.plan && this.status === "playing" && this.generation === mine && !this.disposed) {
         const plan = this.plan;
-        if (plan.done < plan.blocks.length) {
+        if (plan.orientation === "before" && plan.alignDone < plan.expected.length) {
+          const move = plan.expected[plan.alignDone];
+          const reduced = this.reducedMotion();
+          await this.view.turn(rotationBlock(move), this.pose, reduced ? REDUCED_ALIGN_MS : softStartMs(Math.abs(move[1])) / this.speed, reduced ? undefined : softStartEase(Math.abs(move[1])));
+          if (this.disposed || this.generation !== mine || this.plan !== plan) return;
+          applyMoveInPlace(this.pose, move);
+          plan.alignDone++;
+          this.notify();
+        } else if (plan.done < plan.blocks.length) {
           const block = plan.blocks[plan.done];
           await this.view.turn(block, this.pose, BASE_MOVE_MS / this.speed);
           if (this.disposed || this.generation !== mine || this.plan !== plan) return;

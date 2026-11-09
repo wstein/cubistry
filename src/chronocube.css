@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
 @import "./style.css";
 @import "./clock.css";
 @import "./ms-timer.css";
@@ -280,3 +281,19 @@
 .c7-status, .c7-range { font-size: 0.85rem; margin: 0; color: var(--ink); }
 .c7-nav { font-weight: 700; color: var(--mark-ink); text-decoration: underline; }
 .c7-nav:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Calendar notation follows the frozen animation plan inside its own scroll box. */
+.c7-root { overflow-anchor: none; }
+.c7-orientation-select, .c7-notation-select { display: flex; align-items: center; gap: 6px; }
+.c7-controls select { font: inherit; min-height: 40px; max-width: 100%; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; }
+.c7-active-step { min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.c7-active-step[hidden] { display: none; }
+.c7-active-step h3 { margin: 0 0 4px; font-size: 0.9rem; }
+.c7-word { max-height: 14rem; overflow: auto; overscroll-behavior: contain; scroll-behavior: auto; padding: 6px; }
+.c7-token-group { display: inline; box-decoration-break: clone; border-radius: 3px; padding: 1px 3px; }
+.c7-token-group.c7-past { color: var(--ink-2); }
+.c7-token-group.c7-current { color: var(--ink); background: var(--surface-2); outline: 2px solid var(--focus); outline-offset: -1px; }
+.c7-free-mark { font: inherit; font-size: 0.75em; }
+.c7-word-note, .c7-orientation { margin: 4px 0; color: var(--ink-2); font-size: 0.8rem; }
+.c7-step-summary { font-variant-numeric: tabular-nums; }
+.c7-technical { margin-top: 8px; font-size: 0.8rem; }

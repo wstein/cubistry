@@ -507,12 +507,13 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   const { env } = mountEnv({ stage });
   const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
   await idle(root);
+  root.choose("orientation", "after");
   assert.equal(root.el("play").getAttribute("aria-disabled") === "true", true, "nothing to play yet");
   root.clickLink(href({ year: 2028, month: 2 }));
   await flush();
   assert.equal(root.el("play").textContent, "Pause");
   assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", false);
-  assert.match(root.el("progress").textContent, new RegExp(`^Turning to February 2028: block 0 of ${playedBlocks(graph.edges[20].moves, { slice: true, defer: true }).blocks.length}$`));
+  assert.match(root.el("progress").textContent, new RegExp(`^Turning to February 2028: move 1 of ${playedBlocks(graph.edges[20].moves, { slice: true, defer: true }).blocks.length}$`));
   root.press("play"); // pause
   assert.equal(root.el("play").textContent, "Play");
   root.choose("speed", "8");
@@ -539,52 +540,53 @@ test("mount: the middle slice option plays rule-c blocks (rotations deferred) by
   const { env } = mountEnv({ stage });
   const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
   await idle(root);
+  root.choose("orientation", "after");
   assert.match(root.html, /data-c7="slice" checked/, "the option is offered and on");
   const [first, second] = [graph.edges[20].moves, graph.edges[21].moves];
   root.clickLink(href({ year: 2028, month: 2 }));
   await flush();
-  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${playedBlocks(first, { slice: true, defer: true }).blocks.length}$`));
+  assert.match(root.el("progress").textContent, new RegExp(`move 1 of ${playedBlocks(first, { slice: true, defer: true }).blocks.length}$`));
   root.press("skip");
   assert.equal(root.getAttribute("data-c7-state"), "idle");
   root.el("slice").checked = false;
   root.choose("slice", "");
   root.clickLink(href({ year: 2028, month: 3 }));
   await flush();
-  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${playedBlocks(second, { defer: true }).blocks.length}$`), "plain blocks of the next step");
+  assert.match(root.el("progress").textContent, new RegExp(`move 1 of ${playedBlocks(second, { defer: true }).blocks.length}$`), "plain blocks of the next step");
   root.press("skip");
   assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[22].hash);
   root.el("slice").checked = true;
   root.choose("slice", "");
   root.clickLink(href({ year: 2028, month: 2 }));
   await flush();
-  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${playedBlocks(inverseMoves(second), { slice: true, defer: true }).blocks.length}$`));
+  assert.match(root.el("progress").textContent, new RegExp(`move 1 of ${playedBlocks(inverseMoves(second), { slice: true, defer: true }).blocks.length}$`));
   root.press("skip");
   assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[21].hash);
   inst.dispose();
 });
 
-test("mount: 'Align at the end' is offered and on; the alignment is shown apart from the progress; switching it off keeps the stored rotations", async () => {
+test("mount: After moves is available; the alignment is shown apart from the progress; switching it off keeps the stored rotations", async () => {
   const root = fakeRoot();
   const stage = fakeStage({ manual: true });
   const { env } = mountEnv({ stage });
   const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
   await idle(root);
-  assert.match(root.html, /data-c7="defer" checked> Align at the end/);
-  assert.match(root.html, /data-c7="alignment">Alignment: none</);
+  root.choose("orientation", "after");
+  assert.match(root.html, /value="after">After moves/);
+  assert.equal(root.el("alignment").hidden, true);
   const aligned = playedBlocks(graph.edges[20].moves, { slice: true, defer: true });
   root.clickLink(href({ year: 2028, month: 2 }));
   await flush();
-  assert.equal(root.el("alignment").textContent, "Alignment: at the end");
+  assert.equal(root.el("alignment").textContent, `Orientation at the end (free): ${alignmentText(aligned.alignment)}.`);
   assert.ok(stage.log.turns.every((t) => t.block.kind !== "rotation"), "no rotation mid-word");
   root.press("skip");
-  assert.equal(root.el("alignment").textContent, `Alignment: ${alignmentText(aligned.alignment)}`);
+  assert.equal(root.el("alignment").hidden, true);
   assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[21].hash);
-  root.el("defer").checked = false;
-  root.choose("defer", "");
+  root.choose("orientation", "stored");
   root.clickLink(href({ year: 2028, month: 3 }));
   await flush();
-  assert.match(root.el("progress").textContent, new RegExp(`block 0 of ${groupBlocks(graph.edges[21].moves, { slice: true }).length}$`));
-  assert.equal(root.el("alignment").textContent, "Alignment: none");
+  assert.match(root.el("progress").textContent, /whole-cube rotation \(free\)|move 1 of/);
+  assert.equal(root.el("alignment").textContent, "Whole-cube rotations stay in the word (free).");
   root.press("skip");
   assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[22].hash);
   inst.dispose();
@@ -681,6 +683,7 @@ test("mount: a digest mismatch stops the 3D view for good: scene hidden, control
   try {
     const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
     await idle(root);
+    root.choose("orientation", "after");
     root.clickLink(href({ year: 2028, month: 2 }));
     for (let i = 0; i < 100000 && root.getAttribute("data-c7-state") !== "failed"; i++) await Promise.resolve();
     assert.equal(root.getAttribute("data-c7-state"), "failed");

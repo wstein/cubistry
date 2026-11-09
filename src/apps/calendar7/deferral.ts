@@ -163,12 +163,16 @@ export const rotationBlock = ([g, q]: Move): Block => ({ axis: generatorAxis(g),
 export interface PlayedWord {
   /** The blocks to play. With `defer`, none of them is a rotation. */
   readonly blocks: Block[];
-  /** The net whole-cube rotation moved to the end (identity without `defer`: the rotations stay in the blocks). */
+  /** The factored net rotation (identity in stored mode). */
   readonly rotation: Mat;
-  /** The canonical rotation word of `rotation` (at most two moves). */
+  /** The canonical rotation word: at most three x/y moves before, at most two after. */
   readonly alignment: readonly Move[];
 }
+export type RotationPlacement = "before" | "after" | "stored";
+
 export interface PlayOptions {
+  /** Before: orient first and conjugate the layer blocks into that frame. */
+  readonly orientation?: RotationPlacement;
   readonly slice?: boolean;
   /** Move the whole-cube rotations to the end (mode F). Default false: `groupBlocks` as it is. */
   readonly defer?: boolean;
@@ -180,9 +184,36 @@ export interface PlayOptions {
  */
 export function playedBlocks(word: readonly Move[], options: PlayOptions = {}): PlayedWord {
   const slice = options.slice ?? false;
-  if (!options.defer) return { blocks: groupBlocks(word, { slice }), rotation: IDENTITY, alignment: [] };
+  const placement = options.orientation ?? (options.defer ? "after" : "stored");
+  if (placement === "stored") return { blocks: groupBlocks(word, { slice }), rotation: IDENTITY, alignment: [] };
   const first = deferRotations(word);
   const second = deferRotationBlocks(groupBlocks(first.word, { slice }));
   const rotation = matMul(first.rotation, second.rotation);
+  if (placement === "before") {
+    // B then R equals R then (R B R^-1). rowOf expects the inverse
+    // frame, so transpose the orthogonal integer rotation matrix.
+    const inverse = [0, 1, 2].flatMap((i) => [rotation[i], rotation[3 + i], rotation[6 + i]]);
+    const blocks = second.blocks.map((b): Block => {
+      const { k, s } = rowOf(inverse, b.axis);
+      return { ...b, axis: k, lo: s > 0 ? b.lo : -b.hi, hi: s > 0 ? b.hi : -b.lo, angle: (s > 0 ? b.angle : flip(b.angle)) as Block["angle"] };
+    });
+    return { blocks, rotation, alignment: beforeAlignmentMoves(rotation) };
+  }
   return { blocks: second.blocks, rotation, alignment: alignmentMoves(rotation) };
+}
+
+/** Canonical x/y-only orientation: fewest rotations, then fixed x/y/exponent order. */
+export function beforeAlignmentMoves(matrix: Mat): readonly Move[] {
+  const queue: { matrix: Mat; moves: Move[] }[] = [{ matrix: IDENTITY, moves: [] }];
+  const seen = new Set([IDENTITY.join(",")]);
+  for (let i = 0; i < queue.length; i++) {
+    const current = queue[i];
+    if (sameMat(current.matrix, matrix)) return current.moves;
+    for (const axis of [0, 1]) for (const q of [1, -1, 2]) {
+      const next = matMul(axisMatrix(axis, q), current.matrix);
+      const key = next.join(",");
+      if (!seen.has(key)) { seen.add(key); queue.push({ matrix: next, moves: [...current.moves, rotationMove(axis, q)] }); }
+    }
+  }
+  throw new RangeError("not a whole-cube orientation");
 }
