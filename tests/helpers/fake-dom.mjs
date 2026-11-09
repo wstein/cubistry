@@ -83,7 +83,12 @@ export class FakeElement {
     return node === this || this.descendants().includes(node);
   }
   insertBefore(node, before) {
-    if (node === before) return;
+    // The DOM pre-insertion algorithm resolves a self-reference to the next
+    // sibling, then removes and reinserts the node. This also blurs descendants.
+    if (node === before) {
+      const index = this.children.indexOf(node);
+      before = this.children[index + 1] ?? null;
+    }
     this.log.push(["insert", this, node, before]);
     node.remove();
     const index = before === null ? this.children.length : this.children.indexOf(before);
@@ -95,8 +100,9 @@ export class FakeElement {
     if (this.ownerDocument) this.ownerDocument.activeElement = this;
   }
   remove() {
-    if (this.ownerDocument?.activeElement === this) this.ownerDocument.activeElement = null;
     if (!this.parentNode) return;
+    if (this.contains(this.ownerDocument?.activeElement)) this.ownerDocument.activeElement = null;
+    this.log.push(["remove", this.parentNode, this]);
     this.parentNode.children = this.parentNode.children.filter((c) => c !== this);
     this.parentNode = null;
   }

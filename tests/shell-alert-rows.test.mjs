@@ -118,3 +118,17 @@ test("changing the polite status never detaches an existing alert or its focused
   assert.equal(rows(regions)[0], row);
   assert.equal(doc.drain().some((entry) => entry.slice(1).includes(row)), false);
 });
+
+test("adding a warning never reinserts the error with the focused Dismiss button", () => {
+  const { doc, regions, shell } = setup();
+  shell.setError({ text: "Keep this error" });
+  const row = rows(regions)[0];
+  const button = row.find((element) => element.tagName === "BUTTON");
+  button.focus();
+  doc.drain();
+  shell.setWarning({ title: "Warning", text: "Added beside the error" });
+  assert.equal(doc.activeElement, button, "updating another alert must preserve focus");
+  assert.equal(rows(regions)[1], row);
+  assert.deepEqual(rows(regions).map((element) => element.dataset.kind), ["warn", "error"]);
+  assert.equal(doc.drain().some(([kind, , node]) => kind === "remove" && node === row), false);
+});
