@@ -7,9 +7,11 @@
  * step to the adjacent month along it, playing the move word of that edge. There is no solver and
  * no jump between non-adjacent months: every such jump would be a walk along the chain.
  */
-import { blockCounts, blockToken, groupBlocks } from "./blocks.ts";
-import { alignmentText, playedBlocks } from "./deferral.ts";
-import { type Move, generatorAxis, generatorLayer, isRotation } from "./engine.ts";
+import { blockCounts } from "./blocks.ts";
+import { playedBlocks } from "./deferral.ts";
+import { DEFAULT_WORD_OPTIONS, expansionNote, notationHtml, notationLabel, orientationLabel, stepNotation, type WordOptions } from "./notation.ts";
+export { moveToken, rawToken } from "./notation.ts";
+import { type Move } from "./engine.ts";
 import type { Cell } from "./display.ts";
 import type { DisplayTable, Edge, Graph } from "./graph.ts";
 
@@ -116,19 +118,6 @@ export function stepMonth(range: ChainRange, ym: YearMonth, delta: 1 | -1): Year
   return { year: Math.floor(index / 12), month: (index % 12) + 1 };
 }
 
-const AXES = ["x", "y", "z"] as const;
-
-/** Readable token of one move: axis, layer (`rot` for the whole cube), then `'` for a counter-clockwise or `²` for a half turn. */
-export function moveToken(move: Move): string {
-  const [g, q] = move;
-  const axis = AXES[generatorAxis(g)];
-  const layer = isRotation(g) ? "rot" : `${generatorLayer(g) > 0 ? "+" : ""}${generatorLayer(g)}`;
-  return `${axis}${layer}${q === -1 ? "'" : q === 2 ? "²" : ""}`;
-}
-
-/** Raw form of one move: generator 1..21 and the exponent, e.g. `g11:+1`, `g3:-1`, `g21:2`. */
-export const rawToken = (move: Move): string => `g${move[0]}:${move[1] === 1 ? "+1" : move[1] === -1 ? "-1" : "2"}`;
-
 export interface Step {
   readonly direction: "forward" | "backward";
   readonly from: YearMonth;
@@ -197,50 +186,24 @@ const NOT_YET =
   "No solver and no jumps: only the step to the previous or next month along the chain is available. " +
   "A jump to a distant month would have to walk the chain, which can take thousands of moves.";
 
-/** A word as tokens that never break inside (a hyphen in `x-3..-1` must not wrap), separated by plain spaces that wrap. */
-const tokensHtml = (tokens: readonly string[]): string => tokens.map((t) => `<span class="c7-tok">${esc(t)}</span>`).join(" ");
-
-const LEGEND =
-  "Block notation: axis x, y or z, then the layers. <code>x-3</code> is one layer; <code>x-3..-1</code> turns the layers -3 to -1 " +
-  "together (wide, with the outer layer); <code>y+1..+2</code> turns inner layers only (inner-wide); <code>zrot</code> is the whole cube " +
-  "(free). With the middle slice a block may also contain layer 0: <code>x0</code> is the middle slice alone, <code>x-3..0</code> and " +
-  "<code>y-1..+2'</code> are intervals that include it. A trailing <code>'</code> is a counter-clockwise quarter turn, <code>²</code> a half turn. " +
-  "Counts: layer moves (HTM) count every layer once. Block moves count every block once, either without the middle slice (blocks on one side of the " +
-  "middle layer, as in the Block word) or with it (the Block word with middle slice, where turning the middle slice counts as a move). " +
-  "Whole-cube rotations stay free in every count. The 3D view plays the rotations deferred to one alignment at the end of the step (also free, not a move).";
-
-const stepHtml = (step: Step | null, label: string, end: string): string => {
-  if (!step)
-    return `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3><p>${esc(end)}</p></div>`;
-  const word = tokensHtml(step.moves.map(moveToken));
-  const raw = tokensHtml(step.moves.map(rawToken));
-  const blocks = groupBlocks(step.moves);
-  const blockWord = tokensHtml(blocks.map(blockToken));
-  const { blockMoves } = blockCounts(blocks);
-  const sliced = groupBlocks(step.moves, { slice: true });
-  const sliceWord = tokensHtml(sliced.map(blockToken));
-  const sliceMoves = blockCounts(sliced).blockMoves;
-  const rotations = `${step.rot} stored rotation${step.rot === 1 ? "" : "s"}`;
-  // What the page plays: the rotations moved to one alignment at the end (free, not a move); only layer blocks are counted.
-  const playedPlain = playedBlocks(step.moves, { defer: true });
-  const playedSlice = playedBlocks(step.moves, { slice: true, defer: true });
-  const played =
-    `<p class="c7-align" data-align="${label.toLowerCase()}">Played with the rotations deferred: ` +
-    `${blockCounts(playedPlain.blocks).blockMoves} block moves without the middle slice, ` +
-    `${blockCounts(playedSlice.blocks).blockMoves} with it. Alignment at the end (free, not a move): ` +
-    `${alignmentText(playedSlice.alignment)} with the middle slice, ${alignmentText(playedPlain.alignment)} without it.</p>`;
-  return (
-    `<div class="c7-step" data-step="${label.toLowerCase()}"><h3>${label}</h3>` +
-    `<p><a class="c7-nav" data-nav="${label.toLowerCase()}" href="${esc(href(step.to))}">${esc(monthLabel(step.to))}</a>: ` +
-    `${step.htm} layer moves (HTM), ${blockMoves} block moves, without the middle slice, ` +
-    `${sliceMoves} block moves, with the middle slice (it counts as a move there), ` +
-    `${step.qtm} quarter turns (QTM), ${rotations}.</p>` +
-    played +
-    `<details><summary>Block word with middle slice</summary><p class="c7-word" data-blocks-slice="${label.toLowerCase()}">${sliceWord}</p></details>` +
-    `<details><summary>Block word</summary><p class="c7-word" data-blocks="${label.toLowerCase()}">${blockWord}</p></details>` +
-    `<details><summary>Move word</summary><p class="c7-word" data-word="${label.toLowerCase()}">${word}</p></details>` +
-    `<details><summary>Raw generators</summary><p class="c7-word" data-raw="${label.toLowerCase()}">${raw}</p></details></div>`
-  );
+const LEGEND = "Layer: <code>x-3</code>. Block: <code>x-3..-1</code> (layers together). Whole cube: <code>xrot</code>. " +
+  "<code>'</code> reverses a quarter turn; <code>²</code> is a half turn. Whole-cube rotations are free.";
+const stepHtml = (step: Step | null, label: string, end: string, options: WordOptions): string => {
+  const key = label.toLowerCase();
+  if (!step) return `<div class="c7-step" data-step="${key}"><h3>${label}</h3><p>${esc(end)}</p></div>`;
+  const plan = stepNotation(step.moves, options);
+  const alternative = playedBlocks(step.moves, { ...options, slice: !options.slice });
+  const alternativeMoves = blockCounts(alternative.blocks).blockMoves;
+  const counts = alternativeMoves === plan.moves ?
+    `${plan.moves} block moves with or without the middle slice.` :
+    `${alternativeMoves} block moves ${options.slice ? "without" : "with"} the middle slice.`;
+  return `<div class="c7-step" data-step="${key}"><h3>${label}</h3>` +
+    `<p class="c7-step-summary"><a class="c7-nav" data-nav="${key}" href="${esc(href(step.to))}">${esc(monthLabel(step.to))}</a> · ${plan.moves} moves</p>` +
+    `<details class="c7-word-panel"><summary>Moves · ${notationLabel(options.notation)}</summary>` +
+    `<p class="c7-word-note">${expansionNote(options.notation)}</p>` +
+    `<p class="c7-orientation">${orientationLabel(plan.played.alignment, options.orientation)}</p>` +
+    `<p class="c7-word" data-notation-word="${key}">${notationHtml(plan)}</p></details>` +
+    `<details class="c7-technical"><summary>Technical details</summary><p>Stored word: ${step.htm} layer moves (HTM), ${step.qtm} quarter turns (QTM), ${step.rot} stored rotation${step.rot === 1 ? "" : "s"}. ${counts} Equivalent expansion: ${plan.expandedLayerMoves} layer moves. Free rotations are excluded from move counts.</p></details></div>`;
 };
 
 /** Text announced in the live region after a navigation. */
@@ -271,11 +234,14 @@ export function playerHtml(defaultSpeed: number): string {
     '<button type="button" class="c7-btn" data-c7="skip" aria-disabled="true">Skip to end</button>' +
     `<label class="c7-speed">Speed <select data-c7="speed">${options}</select></label>` +
     `<label class="c7-slice"><input type="checkbox" data-c7="slice" checked> Middle slice counts as a move</label>` +
-    `<label class="c7-defer"><input type="checkbox" data-c7="defer" checked> Align at the end</label>` +
+    '<label class="c7-orientation-select">Orientation <select data-c7="orientation"><option value="before" selected>Before moves</option><option value="after">After moves</option><option value="stored">Stored rotations</option></select></label>' +
+    '<label class="c7-notation-select">Notation <select data-c7="notation"><option value="blocks" selected>Blocks</option><option value="layers">Layer moves (equivalent)</option><option value="raw">Raw generators (equivalent)</option></select></label>' +
     '<button type="button" class="c7-btn" data-c7="reset">Reset view</button>' +
     "</div>" +
+    '<p class="c7-word-note">Orientation, middle-slice and notation changes apply to the next step.</p>' +
     '<p class="c7-progress" data-c7="progress"></p>' +
-    '<p class="c7-alignment" data-c7="alignment">Alignment: none</p>' +
+    '<p class="c7-alignment" data-c7="alignment"></p>' +
+    '<section class="c7-active-step" data-c7="active-step" hidden><h3 data-c7="active-title"></h3><p class="c7-word-note" data-c7="active-note"></p><p class="c7-word" data-c7="active-word"></p></section>' +
     '<p class="c7-note" data-c7="note" hidden>Reduced motion is on: a step jumps straight to the end state, without animation.</p>' +
     '<p class="c7-error" data-c7="error" role="alert" hidden></p>' +
     '<div class="c7-rotation" data-c7="rotation"></div>' +
@@ -284,7 +250,7 @@ export function playerHtml(defaultSpeed: number): string {
 }
 
 /** The whole page body of the mode. */
-export function pageHtml(model: PageModel): string {
+export function pageHtml(model: PageModel, options: WordOptions = DEFAULT_WORD_OPTIONS): string {
   const { choice, range } = model;
   const rangeText = `${monthLabel(range.first)} to ${monthLabel(range.last)}`;
   const status =
@@ -307,8 +273,8 @@ export function pageHtml(model: PageModel): string {
   return (
     `<div class="c7-page"><h2 class="c7-month" tabindex="-1" data-focus data-month="${ymKey(choice.ym)}">${esc(monthLabel(choice.ym))}</h2>` +
     sheetHtml(model.cells as readonly Cell[], `7x7 calendar sheet, ${monthLabel(choice.ym)}`) +
-    `<div class="c7-steps">${stepHtml(model.prev, "Previous", `No earlier month: ${monthLabel(range.first)} is the start of the chain.`)}` +
-    `${stepHtml(model.next, "Next", `No later month: ${monthLabel(range.last)} is the end of the chain.`)}` +
+    `<div class="c7-steps">${stepHtml(model.prev, "Previous", `No earlier month: ${monthLabel(range.first)} is the start of the chain.`, options)}` +
+    `${stepHtml(model.next, "Next", `No later month: ${monthLabel(range.last)} is the end of the chain.`, options)}` +
     `<p class="c7-legend" data-c7-legend>${LEGEND}</p></div>` +
     `<p class="c7-range">Proven chain: ${esc(rangeText)}, ${range.edges} steps.</p>${status}</div>`
   );

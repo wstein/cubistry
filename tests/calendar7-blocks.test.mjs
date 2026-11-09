@@ -147,22 +147,27 @@ test("every stored edge, forward and backward: the grouped word reaches the stor
   assert.ok(rotations > 0);
 });
 
-test("the page shows block word, move word and raw generators, and both counts", () => {
+test("the page shows block word, move word and raw generators, and its technical counts", () => {
   const range = chainRange(graph);
   const today = { year: 2028, month: 1 };
   const choice = chooseMonth(new URLSearchParams("year=2028&month=2"), today, range);
   const model = buildModel(graph, json_displays(), choice, today);
-  const html = pageHtml(model);
+  const html = pageHtml(model, {orientation:"stored",slice:false,notation:"blocks"});
   const step = stepFrom(graph, range, { year: 2028, month: 2 }, 1);
   const blocks = groupBlocks(step.moves);
   const { layerMoves, blockMoves } = blockCounts(blocks);
   assert.equal(layerMoves, step.htm);
-  const esc = (s) => s.replace(/&/g, "&amp;").replace(/'/g, "&#39;");
-  const toks = (a) => a.map((t) => `<span class="c7-tok">${esc(t)}</span>`).join(" ");
-  assert.ok(html.includes(`${step.htm} layer moves (HTM), ${blockMoves} block moves,`));
-  assert.ok(html.includes(`data-blocks="next">${toks(blocks.map(blockToken))}</p>`));
-  assert.ok(html.includes(`data-word="next">${toks(step.moves.map(moveToken))}</p>`), "own move notation still shown");
-  assert.ok(html.includes(`data-raw="next">${toks(step.moves.map(rawToken))}</p>`), "raw generators still shown");
+  assert.ok(html.includes(`${blockMoves} moves`));
+  assert.ok(html.includes(`${step.htm} layer moves (HTM)`));
+  const word = html.match(/data-notation-word="next">(.*?)<\/p>/)[1];
+  const tokens = [...word.matchAll(/class="c7-tok(?: c7-free)?">([^<]*)/g)].map(m=>m[1].replace(/&#39;/g,"'"));
+  assert.deepEqual(tokens, blocks.map(blockToken), "selected block word is the exact played grouping");
+  for (const notation of ["layers", "raw"]) {
+    const html = pageHtml(model, {orientation:"stored",slice:false,notation});
+    const word = html.match(/data-notation-word="next">(.*?)<\/p>/)[1];
+    const tokens = [...word.matchAll(/class="c7-tok(?: c7-free)?">([^<]*)/g)].map(m=>m[1].replace(/&#39;/g,"'"));
+    assert.deepEqual(tokens, expand(blocks).map(notation === "raw" ? rawToken : moveToken));
+  }
   assert.ok(html.includes("data-c7-legend"), "the notation legend is shown");
   const source = graph.nodes.findIndex((node) => node.year === 2028 && node.month === 2);
   assert.equal(source, 21, "February 2028 is node 21 of the strict chain");

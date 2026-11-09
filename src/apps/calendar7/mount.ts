@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 /** DOM mount of the English 7x7 calendar mode (research candidate, not certified). */
+import { DEFAULT_WORD_OPTIONS, expansionNote, markProgress, notationForBlocks, notationHtml, notationLabel, orientationLabel, type Notation, type NotationPlan, type WordOptions } from "./notation.ts";
+import type { Block } from "./blocks.ts";
+import type { RotationPlacement } from "./deferral.ts";
 import type { ModeInstance } from "../registry.ts";
 import { parseDisplays, parseGraph, parseState } from "./graph.ts";
 import { type Pose, type Printing, stateDigest } from "./engine.ts";
@@ -13,8 +16,9 @@ import {
   pageHtml,
   playerHtml,
   type YearMonth,
+  type PageModel,
 } from "./month-view.ts";
-import { Calendar7Player, DEFAULT_DEFER, DEFAULT_SLICE, DEFAULT_SPEED, type PlayerSnapshot, type StageView } from "./player.ts";
+import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, type PlayerSnapshot, type StageView } from "./player.ts";
 
 /** The 3D scene the mount drives (src/apps/calendar7/viewer.ts; a fake in the tests). */
 export interface Stage extends StageView {
@@ -79,6 +83,9 @@ export async function mountCalendar7(
   let pending: Promise<void> | null = null;
   let wanted: number | null = null;
   let previous: PlayerSnapshot | null = null;
+  let wordOptions: WordOptions = { ...DEFAULT_WORD_OPTIONS };
+  let currentModel: PageModel | null = null;
+  let activeWord: { blocks: readonly Block[]; plan: NotationPlan; notation: Notation } | null = null;
   const reduced = (): boolean => env.reducedMotion?.() ?? false;
   /** After a failed check the 3D view stays stopped until the page is reloaded. */
   let failed = false;
@@ -91,6 +98,11 @@ export async function mountCalendar7(
 
   const fail = (error: Error): void => {
     failed = true;
+    const activeBox = q("active-word");
+    if (activeBox) activeBox.innerHTML = "";
+    const activePanel = q("active-step");
+    if (activePanel) activePanel.hidden = true;
+    activeWord = null;
     wanted = null;
     player?.dispose();
     player = null;
@@ -103,7 +115,7 @@ export async function mountCalendar7(
       box.hidden = false;
     }
     (q("player") as HTMLElement | null)?.removeAttribute("hidden");
-    for (const name of ["play", "skip", "speed", "reset", "slice", "defer"]) q(name)?.setAttribute("disabled", "");
+    for (const name of ["play", "skip", "speed", "reset", "slice", "orientation", "notation"]) q(name)?.setAttribute("disabled", "");
     live.textContent = "The 3D view stopped. The month sheet is still shown.";
     if (sceneHost) sceneHost.hidden = true;
     console.error(error);
@@ -111,8 +123,9 @@ export async function mountCalendar7(
 
   const render = (snap: PlayerSnapshot): void => {
     if (failed) return;
+    root.setAttribute("data-c7-phase", snap.phase);
     const playing = snap.status === "playing";
-    const active = snap.total > 0;
+    const active = snap.phase !== "idle";
     const motionOff = reduced();
     const play = q("play") as HTMLButtonElement | null;
     const skip = q("skip") as HTMLButtonElement | null;
@@ -130,16 +143,40 @@ export async function mountCalendar7(
     if (note) note.hidden = !motionOff;
     const target = graph.nodes[snap.index];
     const progress = q("progress");
-    if (progress && target) {
-      progress.textContent = active
-        ? snap.phase === "alignment"
-          ? `Turning to ${monthLabel(target)}: aligning the cube at the end (${snap.alignment})${snap.status === "paused" ? " (paused)" : ""}`
-          : `Turning to ${monthLabel(target)}: block ${snap.done} of ${snap.total}${snap.status === "paused" ? " (paused)" : ""}`
-        : `The cube shows ${monthLabel(target)}.`;
+    const panel = q("active-step");
+    const wordBox = q("active-word");
+    if (panel) panel.hidden = !active;
+    if (active && player && target) {
+      const blocks = player.stepBlocks;
+      if (!activeWord || activeWord.blocks !== blocks) {
+        const plan = notationForBlocks(blocks, wordOptions.notation);
+        activeWord = { blocks, plan, notation: wordOptions.notation };
+        if (wordBox) wordBox.innerHTML = notationHtml(plan);
+        const title = q("active-title");
+        if (title) title.textContent = `${monthLabel(graph.nodes[snap.from])} → ${monthLabel(target)} · ${plan.moves} moves · ${notationLabel(activeWord.notation)}`;
+        const note = q("active-note");
+        if (note) note.textContent = expansionNote(activeWord.notation);
+      }
+      const plan = activeWord.plan;
+      const done = plan.completedMoves[snap.done];
+      const free = plan.groups[snap.done]?.free;
+      if (progress) progress.textContent = snap.phase === "orientation"
+        ? `Turning to ${monthLabel(target)}: orienting before moves (free)`
+        : snap.phase === "alignment"
+          ? `Turning to ${monthLabel(target)}: aligning the cube at the end (free)`
+          : `Turning to ${monthLabel(target)}: ${free ? "whole-cube rotation (free)" : `move ${done + 1} of ${plan.moves}`}${snap.status === "paused" ? " (paused)" : ""}`;
+      if (wordBox?.querySelectorAll) markProgress(wordBox, snap.done, snap.phase === "blocks", true);
+    } else {
+      if (progress && target) progress.textContent = `The cube shows ${monthLabel(target)}.`;
+      if (activeWord && wordBox) wordBox.innerHTML = "";
+      activeWord = null;
     }
-    // The alignment is a free whole-cube rotation, shown apart from the move counts.
     const alignment = q("alignment");
-    if (alignment) alignment.textContent = `Alignment: ${snap.alignment}`;
+    if (alignment) {
+      alignment.hidden = !active;
+      alignment.textContent = player ? orientationLabel(player.stepAlignment, snap.orientation) : "";
+    }
+    view.querySelectorAll?.(".c7-word-panel").forEach((el) => ((el as HTMLElement).hidden = active));
     if (target) stage?.setLabel(`7x7 calendar cube showing ${monthLabel(target)}`);
     if (!active && player) {
       root.setAttribute("data-c7-state", "idle");
@@ -175,7 +212,7 @@ export async function mountCalendar7(
         onChange: render,
         onError: fail,
         slice: (q("slice") as HTMLInputElement | null)?.checked ?? DEFAULT_SLICE,
-        defer: (q("defer") as HTMLInputElement | null)?.checked ?? DEFAULT_DEFER,
+        orientation: wordOptions.orientation,
       });
     })();
     return pending;
@@ -202,16 +239,17 @@ export async function mountCalendar7(
     }
   };
 
-  /** The static sentence about the deferred rotations belongs to the 3D view and to the option being on. */
-  const syncAlignText = (): void => {
-    const on = threeD && ((q("defer") as HTMLInputElement | null)?.checked ?? DEFAULT_DEFER);
-    view.querySelectorAll?.("[data-align]").forEach((el) => ((el as HTMLElement).hidden = !on));
+  const refreshPreviews = (): void => {
+    if (!currentModel) return;
+    view.innerHTML = pageHtml(currentModel, wordOptions);
+    const active = player && player.snapshot.phase !== "idle";
+    view.querySelectorAll?.(".c7-word-panel").forEach((el) => ((el as HTMLElement).hidden = Boolean(active)));
   };
   const show = (p: URLSearchParams, moveFocus: boolean): void => {
     const choice = chooseMonth(p, today, range);
     const model = buildModel(graph, table, choice, today);
-    view.innerHTML = pageHtml(model);
-    syncAlignText();
+    currentModel = model;
+    refreshPreviews();
     live.textContent = announce(model);
     // The link that was clicked is gone after the re-render: keep the keyboard position at the new month.
     // No scroll: the cube above must stay in view while the step plays.
@@ -258,12 +296,22 @@ export async function mountCalendar7(
           player.setSpeed(Number((el as HTMLSelectElement).value));
           break;
         case "slice":
-          player.setSlice((el as HTMLInputElement).checked);
+          wordOptions = { ...wordOptions, slice: (el as HTMLInputElement).checked };
+          player.setSlice(wordOptions.slice);
+          refreshPreviews();
           break;
-        case "defer":
-          player.setDefer((el as HTMLInputElement).checked);
-          syncAlignText();
+        case "orientation":
+          wordOptions = { ...wordOptions, orientation: (el as HTMLSelectElement).value as RotationPlacement };
+          player.setOrientation(wordOptions.orientation);
+          refreshPreviews();
           break;
+        case "notation": {
+          const notation = (el as HTMLSelectElement).value;
+          if (!["blocks", "layers", "raw"].includes(notation)) throw new RangeError("unknown notation");
+          wordOptions = { ...wordOptions, notation: notation as Notation };
+          refreshPreviews();
+          break;
+        }
       }
     } catch (error) {
       fail(error as Error);
