@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import * as THREE from "three";
 import {
   demand,
@@ -285,7 +286,7 @@ export class CubeViewer {
     this.cube = new PhysicalCubeScene(this.presentation,
       print.stickers.map((s) => ({ ...s, p: print.cubies.find((c) => c.id === s.cubie)!.position, n: s.normal })),
       this.stickerMaterials, plastic, spacing,
-      createPresentationGeometry(),
+      createPresentationGeometry(print.topology.size),
       new Map(print.stickers.map((s) => [s.id,
         sourceFaceColor(s.assetId, assets.manifest, assets.materials.get(s.materialId)!.color)])),
       // Optional manifest materials: "body" overrides cut faces, "core" the stickerless core.

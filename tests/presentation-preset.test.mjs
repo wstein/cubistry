@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
@@ -6,6 +7,42 @@ import {
   createPlasticMaterial, createStickerMaterial, presentationPixelRatio,
   configurePresentationRenderer, addPresentationLighting,
 } from "../packages/cube-viewer/src/presentation-preset.ts";
+
+test("size-2 bodies keep narrow planar seams without changing pitch or larger cubes", () => {
+  const geometries = [createPresentationGeometry(2), createPresentationGeometry(3), createPresentationGeometry()];
+  try {
+    const flatWidth = body => {
+      const p = body.getAttribute("position"), n = body.getAttribute("normal");
+      const x = [];
+      for (let i = 0; i < p.count; i++) if (n.getZ(i) > .999999) x.push(p.getX(i));
+      return Math.max(...x) - Math.min(...x);
+    };
+    assert(1 - flatWidth(geometries[0].body) <= .071, "size-2 front bevels should leave a narrow seam");
+    assert(Math.abs(flatWidth(geometries[1].body) - .88) < 1e-6);
+    assert.deepEqual(Array.from(geometries[1].body.getAttribute("position").array),
+      Array.from(geometries[2].body.getAttribute("position").array));
+    for (const { body, sticker, stickerOffset } of geometries) {
+      body.computeBoundingBox(); sticker.computeBoundingBox();
+      assert(Math.abs(body.boundingBox.max.x - .495) < 1e-6);
+      assert(Math.abs(sticker.boundingBox.max.x - .435) < 1e-6);
+      assert.equal(stickerOffset, .502);
+    }
+    // Every legal layer turn preserves its axis coordinate. Sample the actual
+    // shell vertices through both turn directions, including intermediate poses.
+    const positions = geometries[0].body.getAttribute("position");
+    for (const axis of [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)])
+      for (const turns of [-2, -1, 1, 2]) for (let step = 0; step <= 16; step++) {
+        const q = new THREE.Quaternion().setFromAxisAngle(axis, turns * Math.PI / 2 * step / 16);
+        let movingMin = Infinity, fixedMax = -Infinity;
+        for (let i = 0; i < positions.count; i++) {
+          const v = new THREE.Vector3().fromBufferAttribute(positions, i);
+          movingMin = Math.min(movingMin, v.clone().addScaledVector(axis, .5).applyQuaternion(q).dot(axis));
+          fixedMax = Math.max(fixedMax, v.addScaledVector(axis, -.5).dot(axis));
+        }
+        assert(movingMin - fixedMax > .009999, "moving and fixed layer shells must remain separated");
+      }
+  } finally { for (const g of geometries) { g.body.dispose(); g.core.dispose(); g.sticker.dispose(); } }
+});
 
 test("presentation geometry fits existing turn envelopes with bounded triangles and smooth bevel normals", () => {
   const { body, core, sticker, stickerOffset } = createPresentationGeometry();

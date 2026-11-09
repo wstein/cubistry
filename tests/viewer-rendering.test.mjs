@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
@@ -28,6 +29,20 @@ function fixture(design = createDesign("picture"), state = initialState(design.p
   viewer.configure(design.print, state, assets);
   return { viewer, design, state, assets, scene, stage };
 }
+test("configured size-2 viewers use the narrower body bevel without moving stickers", () => {
+  const h = fixture();
+  try {
+    const shell = [...h.viewer.cube.bodies.values()][0].children[0];
+    const p = shell.geometry.getAttribute("position"), n = shell.geometry.getAttribute("normal");
+    const x = [];
+    for (let i = 0; i < p.count; i++) if (n.getZ(i) > .999999) x.push(p.getX(i));
+    assert(1 - (Math.max(...x) - Math.min(...x)) <= .071);
+    const stickers = [];
+    h.scene.traverse(o => { if (o.userData.stickerId !== undefined) stickers.push(o); });
+    assert.equal(stickers.length, 24);
+    for (const sticker of stickers) assert(Math.abs(sticker.position.length() - .502) < 1e-10);
+  } finally { h.viewer.destroy(); }
+});
 async function withMotion(reduced, action) {
   const previous = Object.getOwnPropertyDescriptor(globalThis, "matchMedia");
   Object.defineProperty(globalThis, "matchMedia", {

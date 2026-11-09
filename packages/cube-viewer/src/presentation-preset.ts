@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
@@ -8,6 +9,8 @@ export const PRESENTATION_PRESET = Object.freeze({
   cubiePitch: 1,
   bodyWidth: 0.99,
   bodyRadius: 0.055,
+  /** Smaller 2×2 bevels reduce the visible seam without closing the turn clearance. */
+  size2BodyRadius: 0.03,
   bevelSegments: 3,
   stickerWidth: 0.87,
   stickerRadius: 0.055,
@@ -61,10 +64,10 @@ export const PRESENTATION_PRESET = Object.freeze({
   shadowFillShadowIntensity: 0.55,
 });
 
-export function createPresentationGeometry() {
+export function createPresentationGeometry(size?: number) {
   const p = PRESENTATION_PRESET;
   const body = new RoundedBoxGeometry(p.bodyWidth, p.bodyWidth, p.bodyWidth,
-    p.bevelSegments, p.bodyRadius);
+    p.bevelSegments, size === 2 ? p.size2BodyRadius : p.bodyRadius);
   const h = p.stickerWidth / 2, r = p.stickerRadius;
   const shape = new THREE.Shape();
   shape.moveTo(-h + r, -h);
