@@ -2,6 +2,7 @@
 import { REPOSITORY } from './policy.mjs';
 export const PUBLICATION_PATH = '.cubistry-publication.json';
 export const PUBLICATION_URL = `https://wstein.github.io/cubistry/${PUBLICATION_PATH}`;
+export const PUBLISH_WORKFLOW='.github/workflows/pages-publish.yml';
 const hash = value => typeof value === 'string' && /^[a-f0-9]{40}$/.test(value);
 const integer = value => Number.isSafeInteger(value) && value > 0;
 export function parsePublication(text) {
@@ -27,6 +28,17 @@ export async function readPublication({fetch: request = fetch,timeout=15000} = {
     return parsePublication(Buffer.concat(parts).toString('utf8'));
   } catch { return null; }
 }
+export function trustedPublisher(run,{context}={}){
+  const own=context&&run?.id===context.run&&run?.run_attempt===context.attempt&&run?.head_sha===context.sha;
+  return Boolean(run&&integer(run.id)&&integer(run.run_attempt)&&run.repository?.full_name===REPOSITORY&&run.head_repository?.full_name===REPOSITORY&&run.path===PUBLISH_WORKFLOW&&run.head_branch==='main'&&hash(run.head_sha)&&['workflow_dispatch','workflow_run'].includes(run.event)&&(run.status==='completed'||(own&&run.status==='in_progress')));
+}
+/** Every no-op boundary must independently authenticate the public source. */
+export async function readVerifiedPublication(api,{fetch:request=fetch,context}={}){
+  const receipt=await readPublication({fetch:request});
+  if(!receipt)return null;
+  const run=await api.request(`actions/runs/${receipt.run}`);
+  return trustedPublisher(run,{context})&&run.run_attempt===receipt.attempt&&run.head_sha===receipt.sha?receipt:null;
+}
 const terminalFailure = new Set(['deployment_failed','deployment_content_failed','deployment_cancelled','deployment_lost']);
 /** Reattempt only a server-confirmed rejection. An ambiguous POST is never replayed. */
 export async function deployPages({receipt,artifact,token,oidc,fetch:request=fetch,sleep=ms=>new Promise(r=>setTimeout(r,ms)),attempts=60,now=()=>performance.now(),timeout=600000}) {
@@ -46,7 +58,8 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
   };
   let id;
   for (;;) {
-    const idToken=await oidc();
+    const oidcTimeout=budget();
+    const idToken=await oidc({timeout:oidcTimeout,signal:AbortSignal.timeout(oidcTimeout)});
     const response=await request(`https://api.github.com/repos/${REPOSITORY}/pages/deployments`,{method:'POST',headers:{...headers,'Content-Type':'application/json'},redirect:'error',signal:AbortSignal.timeout(budget()),body:JSON.stringify({artifact_id:artifact,pages_build_version:receipt.sha,oidc_token:idToken})});
     const data=await response.json();
     if(response.ok){ id=data.id; if(!hash(id))throw Error('Invalid Pages deployment identity'); break; }

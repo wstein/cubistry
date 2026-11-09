@@ -142,3 +142,33 @@ test('unacknowledged candidate backlog fails closed at its explicit bound',async
  const pulls=Array.from({length:401},(_,i)=>({number:i+1,head:{repo:{full_name:'wstein/cubistry'}},labels:[{name:'preview'}]}));
  await assert.rejects(retainNotificationCandidates({}, {numbers:[],pulls,inventory:[],published:null}),/Too many pending/);
 });
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync} from 'node:fs';
+import {join,resolve} from 'node:path';
+import {execFileSync} from 'node:child_process';
+test('prepare repairs an untrusted live receipt instead of overriding the planner provenance rejection',()=>{
+ const dir=mkdtempSync('/tmp/cubistry-prepare-trust-');
+ try{
+  mkdirSync(join(dir,'bin'));mkdirSync(join(dir,'combined-site'));
+  writeFileSync(join(dir,'bin/git'),`#!/bin/sh\nprintf '%s\\n' '${storage}'\n`,{mode:0o755});
+  const live={...receipt,tracked:[]};
+  writeFileSync(join(dir,'mock.mjs'),`globalThis.fetch=async(url)=>new Response(JSON.stringify(String(url).startsWith('https://wstein.github.io/')?${JSON.stringify(live)}:String(url).includes('/actions/runs/')?{event:'pull_request'}:{sha:'${storage}',tree:[],truncated:false}));`);
+  execFileSync(process.execPath,['--import',join(dir,'mock.mjs'),resolve('scripts/pages/publish.mjs'),'prepare'],{cwd:dir,env:{...process.env,PATH:`${dir}/bin:/usr/bin:/bin`,GH_TOKEN:'test-only',GITHUB_RUN_ID:'200',GITHUB_RUN_ATTEMPT:'1',GITHUB_SHA:sha,GITHUB_OUTPUT:join(dir,'out'),TRACKED:'[]'},stdio:'pipe'});
+  assert.match(readFileSync(join(dir,'out'),'utf8'),/publish=true/);
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+test('OIDC acquisition receives the remaining deadline and stops without creating after expiry',async()=>{
+ let time=0,posts=0,received;
+ await assert.rejects(deployPages({receipt,artifact:55,token:'test',timeout:10,now:()=>time,oidc:async(options)=>{received=options;assert.equal(options.timeout,10);assert(options.signal instanceof AbortSignal);time+=options.timeout;throw Error('OIDC deadline expired');},fetch:async()=>{posts++;return json({id:sha},201);}}),/deadline/);
+ assert.equal(received.timeout,10);assert.equal(time,10);assert.equal(posts,0);
+});
+import {readVerifiedPublication} from '../scripts/pages/publication.mjs';
+test('both no-op boundaries require source provenance and permit only their own active publisher context',async()=>{
+ const api=run=>({request:async()=>run});
+ const options={fetch:async()=>json(receipt)};
+ assert.deepEqual(await readVerifiedPublication(api(publisher),options),receipt);
+ assert.equal(await readVerifiedPublication(api({...publisher,event:'pull_request'}),options),null);
+ assert.equal(await readVerifiedPublication(api({...publisher,run_attempt:2}),options),null);
+ assert.equal(await readVerifiedPublication(api({...publisher,status:'in_progress'}),options),null);
+ assert.deepEqual(await readVerifiedPublication(api({...publisher,status:'in_progress'}),{...options,context:{run:123,attempt:1,sha}}),receipt);
+ assert.equal(await readVerifiedPublication(api({...publisher,status:'in_progress'}),{...options,context:{run:124,attempt:1,sha}}),null);
+});

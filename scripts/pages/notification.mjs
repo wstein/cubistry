@@ -2,11 +2,8 @@
 import {readFile,lstat,readdir,appendFile} from 'node:fs/promises';
 import {GitHub} from './api.mjs';
 import {REPOSITORY} from './policy.mjs';
-import {parsePublication,readPublication,samePublication} from './publication.mjs';
-export const PUBLISH_WORKFLOW='.github/workflows/pages-publish.yml';
-export function trustedPublisher(run){
- return Boolean(run&&Number.isSafeInteger(run.id)&&run.id>0&&Number.isSafeInteger(run.run_attempt)&&run.run_attempt>0&&run.repository?.full_name===REPOSITORY&&run.head_repository?.full_name===REPOSITORY&&run.path===PUBLISH_WORKFLOW&&run.head_branch==='main'&&/^[a-f0-9]{40}$/.test(run.head_sha)&&['workflow_dispatch','workflow_run'].includes(run.event)&&run.status==='completed');
-}
+import {parsePublication,readPublication,samePublication,trustedPublisher,PUBLISH_WORKFLOW} from './publication.mjs';
+export {trustedPublisher,PUBLISH_WORKFLOW} from './publication.mjs';
 export function parseNotification(text,run){
  if(Buffer.byteLength(text)>65536)throw Error('Notification receipt exceeds budget');
  const value=JSON.parse(text);
