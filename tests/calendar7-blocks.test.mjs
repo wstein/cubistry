@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // English 7x7 calendar cube: block moves (wide and inner-wide), a display layer over the stored words (research
 // candidate, not certified). Properties of groupBlocks/expand, the identical SHA-256 digest for every stored edge in both
 // directions, and the notation and counts on the page. Deterministic: seeded random words, no network, no timers.
@@ -163,7 +164,9 @@ test("the page shows block word, move word and raw generators, and both counts",
   assert.ok(html.includes(`data-word="next">${toks(step.moves.map(moveToken))}</p>`), "own move notation still shown");
   assert.ok(html.includes(`data-raw="next">${toks(step.moves.map(rawToken))}</p>`), "raw generators still shown");
   assert.ok(html.includes("data-c7-legend"), "the notation legend is shown");
-  assert.equal(encodeMoves(step.moves), encodeMoves(graph.edges[1].moves), "the stored word is untouched");
+  const source = graph.nodes.findIndex((node) => node.year === 2028 && node.month === 2);
+  assert.equal(source, 21, "February 2028 is node 21 of the strict chain");
+  assert.equal(encodeMoves(step.moves), encodeMoves(graph.edges[source].moves), "the stored word is untouched");
 });
 
 import { parseDisplays } from "../src/apps/calendar7/graph.ts";
