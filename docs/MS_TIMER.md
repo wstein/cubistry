@@ -38,9 +38,9 @@ The plan and the owner decisions of 2026-11-01 are in
   Reset returns to the configured duration (Countdown) or to 00:00.0 (Stopwatch).
 - **Timer speed is 1× only** in this version; the page shows it as fixed. The
   tests use a virtual clock and need no acceleration.
-- **Rotation Speed** defaults to 100 ms per HTM move on the minutes and seconds
+- **Rotation Speed** defaults to 100 ms per quarter turn on the minutes and seconds
   cubes (shortened per step by the scheduler so turns fit the one-second
-  budget), while the 1/10-second cube turns at a fixed **50 ms per QTM move**.
+  budget), while the 1/10-second cube turns at a fixed **50 ms per quarter turn**.
 - **Set and Reset walk the saved periods** of both cubes turn by turn, the way
   the M/S Counter does (the direction with fewer HTM, no free jumps). A newer
   target interrupts a walk between two turns of a saved word.
@@ -54,8 +54,8 @@ In addition to the 3-cube timer, a **dedicated 1/10-Second Counter** (`tenth-cou
 is provided for standalone interactive study and simulation:
 - Replays the 10-step Period-1 sequence `L | L | B L | B L | D | B D | B L | D | L | D`
   holding the `1/10` mark stationary at `r1c2` and displaying `0–9` at `r2c1`.
-- Provides Step (+1/−1), Set (0–9), Reset, Run/Pause, and Speed controls (100 ms real-time,
-  250 ms, 500 ms visual demo) in the main viewer (`index.html?application=tenth-counter`).
+- Provides Step (+1/−1), Set (0–9), Reset, Run/Pause, and Speed controls (50, 100, 250 and 500 ms per quarter turn,
+  default 250 ms) in the main viewer (`index.html?application=tenth-counter`).
 - **Physical print sheet**: `ms-timer-tenth-20mm-3sets` in `public/print/` delivers 72
   20 mm stickers (3 complete cube sets) with cut and bleed lines, alongside an outside-view
   sticker net (`net.svg`).

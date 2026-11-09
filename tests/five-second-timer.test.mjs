@@ -232,7 +232,7 @@ test("five-second scheduler fits six-move normal/adaptive plans into half an int
   for (const preferred of [250, 2000, 10]) {
     const word = timerStep(route, route.states[1], 1, 0);
     assert.equal(word.length, 6);
-    const planned = planSequence(word.length, preferred, 5000);
+    const planned = planSequence(word.length, preferred, 5000,5000,word.reduce((n,m)=>n+Math.abs(m.turns),0));
     assert.ok(planned.feasible);
     assert.ok(planned.duration <= 2500);
     assert.ok(planned.effective <= preferred);

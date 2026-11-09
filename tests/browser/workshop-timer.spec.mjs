@@ -312,7 +312,7 @@ test("application switches apply Timer250 and Counter100 defaults while preservi
   expect(saved.padded).toBe(false);
   await page.selectOption("#application", "certified");
   await settled(page, "42");
-  await expect(page.locator("#rotation-speed")).toHaveValue("4");
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
   await expect(page.locator("#format")).not.toBeChecked();
   await page.selectOption("#application", "timer");
   await settled(page, "15:00");

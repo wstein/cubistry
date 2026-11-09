@@ -38,8 +38,8 @@ interval callbacks do not accumulate drift. The selected multiplier remains when
 switching modes within this application.
 
 **Rotation Speed** stays beneath the cube with its six original presets plus **10 ms**. Switching
-applications while physically idle applies **250 ms per move for Timer** and
-**100 ms for Counter**. In Timer this is a preferred duration; the effective duration during a scheduled
+applications while physically idle applies **250 ms per quarter turn for Timer** and
+**250 ms per quarter turn for Counter**. In Timer this is a preferred duration; the effective duration during a scheduled
 sequence appears in the motion status. Rotation changes within Timer do not overwrite Counter's
 saved value/format/speed record. No new cross-application preference persistence
 is implied. Mode changes retain the selected rotation preference and never cancel an
@@ -57,32 +57,30 @@ Countdown's ceiling, Stopwatch's floor, and the independent one-second live
 readout still come from the same monotonic clock.
 
 The controller prepares the complete legal word from its full committed source
-state. For `N > 0` moves, let `I = 10000 / Timer speed` milliseconds and
+state. For `N > 0` legal tokens and angular work `Q = sum(abs(turns))`, let `I = 10000 / Timer speed` milliseconds and
 `B = min(I / 2, deadline - preparationFinishedAt)`. The scheduler reserves 75 ms
 per move for frame/render/commit work, 8 ms for dispatch, and the accepted 20 ms
 endpoint tolerance **inside** the half-interval budget:
 
 ```text
 overhead = 75 * N + 8
-effective = min(preferred, max(10, (B - overhead - 20) / N))
-plannedSequenceDuration = overhead + N * effective
+effective = min(preferred, max(10, (B - overhead - 20) / Q))
+plannedSequenceDuration = overhead + Q * effective
 startAt = T - plannedSequenceDuration
-firstMotionStart = T - N * effective
-turnWindow(i) = [T - (N-i) * effective, T - (N-i-1) * effective]
+firstMotionStart = T - Q * effective
+turnWindow(i) = [T - sum(abs(turns[i:])) * effective,
+                 T - sum(abs(turns[i+1:])) * effective]
 ```
 
-A feasible plan satisfies `plannedSequenceDuration + 20 <= B`. A normal five-move
-edge at a 2,000 ms preference uses 919.4 ms nominal turns in a 4,980 ms planned
-sequence. Faster 250 ms and 10 ms preferences remain unchanged when they fit.
-The owner follow-up removes the legacy final-turn hold. Every move now has a
-live absolute timing source and adjacent windows through `T`, using one HTM unit
-for either a quarter or half turn. The unchanged reserve is consumed before the
-first motion window, not between turns. For the real three-HTM 90→89 edge at
-250 ms, request dispatch is 9017, first motion starts at 9250, and commits occur
-at 9500, 9750 and 10000. At 10 ms the same reserve precedes three contiguous
-10 ms turns. The cube does not reach its final pose early and delay its display
-or count. See [continuous timer timing](TIMER_CONTIGUOUS_TIMING.md) for diagnosis
-and deterministic verification; Live H–M–S retains its separate angular metric.
+A feasible plan satisfies `plannedSequenceDuration + 20 <= B`. The owner
+follow-up on November 9, 2026 applies angular timing to every cube: a half
+turn takes twice a quarter turn under the same easing curve. HTM route lengths,
+progress and session counters still count legal tokens. The scheduling reserve
+remains before the first motion window. For the real three-HTM 90→89 edge
+`D2 B2 R2` at 250 ms per quarter turn, dispatch is 8267, motion starts at
+8500, and commits occur at 9000, 9500 and 10000. Adaptive preferences may be
+shortened to meet the unchanged absolute deadline and half-interval budget.
+See [continuous timer timing](TIMER_CONTIGUOUS_TIMING.md).
 
 A guarded one-shot wake starts the word. Every turn interpolates to its own
 absolute endpoint, with a guarded timer competing safely with animation

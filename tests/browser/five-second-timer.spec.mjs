@@ -109,7 +109,7 @@ test("five-second option has exact cap, inherited rotation stops, independent pr
   await expect(page.locator("#rotation-speed")).toHaveValue("3");
   await page.selectOption("#application", "certified");
   await settled(page, "0");
-  await expect(page.locator("#rotation-speed")).toHaveValue("4");
+  await expect(page.locator("#rotation-speed")).toHaveValue("3");
   await page.locator('[data-delta="1"]').click();
   await settled(page, "1");
 });

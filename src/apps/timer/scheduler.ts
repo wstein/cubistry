@@ -1,4 +1,5 @@
-import { stateEquals, type CubeState } from "@cubistry/cube-core";
+import { stateEquals, type CubeState, type LegalMove } from "@cubistry/cube-core";
+import { quarterTurnUnits } from "../shared/turn-timing.ts";
 import type { ClockSnapshot } from "./clock.ts";
 import type { MoveProgress } from "../shared/playback.ts";
 
@@ -11,7 +12,8 @@ export interface TimerCube {
   readonly busy: boolean;
   readonly progress: MoveProgress;
   readonly state: CubeState | null;
-  prepare(value: number): readonly unknown[];
+  prepare(value: number): readonly LegalMove[];
+  readonly remainingQuarterTurns: number;
   request(value: number): void;
   setDeadline(target: number, endAt: number, durationMs: number): void;
   clearDeadline(): void;
@@ -22,13 +24,13 @@ export const FRAME_ALLOWANCE_MS = 75;
 export const WAKE_ALLOWANCE_MS = 8;
 export const MIN_MOVE_MS = 10;
 export const ENDPOINT_TOLERANCE_MS = 20;
-export function planSequence(moves: number, preferred: number, interval: number, available = interval) {
+export function planSequence(moves: number, preferred: number, interval: number, available = interval, quarterTurns = moves) {
   const budget = Math.min(interval / 2, Math.max(0, available));
   const overhead = WAKE_ALLOWANCE_MS + moves * FRAME_ALLOWANCE_MS;
-  const feasible = overhead + moves * MIN_MOVE_MS + ENDPOINT_TOLERANCE_MS <= budget;
+  const feasible = overhead + quarterTurns * MIN_MOVE_MS + ENDPOINT_TOLERANCE_MS <= budget;
   const effective = moves === 0 ? preferred : Math.min(preferred,
-    Math.max(MIN_MOVE_MS, (budget - overhead - ENDPOINT_TOLERANCE_MS) / moves));
-  return { effective, duration: moves === 0 ? 0 : overhead + moves * effective, feasible };
+    Math.max(MIN_MOVE_MS, (budget - overhead - ENDPOINT_TOLERANCE_MS) / quarterTurns));
+  return { effective, duration: moves === 0 ? 0 : overhead + quarterTurns * effective, feasible };
 }
 interface Plan {
   target: number;
@@ -101,7 +103,7 @@ export class TimerScheduler {
         if (changedDeadline || preferred !== p.preferred) {
           if (changedDeadline && next) { p.deadline = next.deadline; p.interval = next.interval; }
           const remaining = Math.max(1, controller.progress.total - controller.progress.completed);
-          const revised = planSequence(remaining, preferred, p.interval, p.deadline - at);
+          const revised = planSequence(remaining, preferred, p.interval, p.deadline - at, controller.remainingQuarterTurns);
           p.effective = Math.min(p.effective, revised.effective);
           p.feasible = revised.feasible;
           p.preferred = preferred;
@@ -119,7 +121,7 @@ export class TimerScheduler {
           const initial = this.initial;
           if (!initial || initial.target !== bucket || initial.total !== controller.progress.total ||
             initial.preferred !== preferred || Math.abs(initial.deadline - next.deadline) > 0.01) {
-            const budget = planSequence(remaining, preferred, next.interval, next.deadline - at);
+            const budget = planSequence(remaining, preferred, next.interval, next.deadline - at, controller.remainingQuarterTurns);
             this.initial = { target: bucket, total: controller.progress.total, preferred,
               deadline: next.deadline, effective: budget.effective, feasible: budget.feasible };
           }
@@ -149,7 +151,9 @@ export class TimerScheduler {
       return; // Already ready for the boundary; never turn back to the old bucket.
     }
     if (!p || p.started || p.target !== next.target || Math.abs(p.deadline - next.deadline) > 0.01 || p.preferred !== preferred || !controller.state || !stateEquals(p.source, controller.state)) {
-      const moves = controller.prepare(next.target).length;
+      const route = controller.prepare(next.target);
+      const moves = route.length;
+      const angularWork = quarterTurnUnits(route);
       const fresh = this.readClock?.() ?? snapshot;
       if (!fresh.running || fresh.bucket !== bucket || fresh.next?.target !== next.target ||
         Math.abs(fresh.next.deadline - next.deadline) > 0.01) {
@@ -159,7 +163,7 @@ export class TimerScheduler {
       }
       at = fresh.at;
       p = this.plan = { ...next, source: controller.state!, preferred, moves,
-        ...planSequence(moves, preferred, next.interval, next.deadline - at), started: false };
+        ...planSequence(moves, preferred, next.interval, next.deadline - at, angularWork), started: false };
       if (this.wake !== null) clearTimeout(this.wake);
       this.wake = setTimeout(() => { this.wake = null; this.refresh(); },
         Math.max(0, Math.ceil(p.deadline - p.duration - at)));

@@ -4,7 +4,7 @@ The separate **H/M/S Counter 00–59** application uses the seconds-first print
 from the Research investigation. Choose the unit once per cube, then use
 Set, single steps, Reset, or Run/Stop. Counting can run up or down over 00–59,
 00–23, or 00–11, with leading zeros and wrap enabled. The default rotation speed
-is 100 ms per HTM move. Run requests one step per second while settled; slow
+is 250 ms per quarter turn. Run requests one step per second while settled; slow
 animation does not queue an unbounded backlog.
 
 The two digits occupy the lower front row, and the upright H, S, or M occupies
@@ -407,8 +407,8 @@ for seconds and eight for minutes and hours; this narrower result does not cover
 arbitrary poses. A recovery step after a catch-up has at most five HTM, so at
 most ten quarter units. The clock shows scheduled quarter/half
 times when it fits a route into the available live interval. Standalone counter
-rotation settings keep their per-move behavior; choosing the unit (or opening the
-HSM counter) sets the slider to the default of 100 ms for every unit (the slower
+rotation settings use the same quarter-turn duration unit; choosing the unit (or opening the
+HSM counter) sets the slider to the default of 250 ms for every unit (the slower
 500/250 ms preferences for hours and minutes belong only to the live clock), which
 can then be changed freely.
 

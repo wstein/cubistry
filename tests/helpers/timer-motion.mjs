@@ -12,7 +12,7 @@ export async function timerMotion(route,value,duration=250,startAt=0){
   timer(cb,delay){const n=++id;timers.set(n,{cb,at:at+delay});history.push(cb);return n;},cancelTimer(n){timers.delete(n);}};
  const controller=new TimerController({configure(){},resetCamera(){},async animate(event,source){
   const row={event,source,calledAt:at,samples:[],completeAt:null};rows.push(row);
-  await animateTimedProgress(source??(()=>null),()=>speed,progress=>row.samples.push({at,progress}),runtime);row.completeAt=at;
+  await animateTimedProgress(source??(()=>null),()=>speed*Math.abs(event.move.turns),progress=>row.samples.push({at,progress}),runtime);row.completeAt=at;
  }},route,design.assets,(_v,_busy,error)=>{if(error)failure=error;},async manifest=>({manifest,images:new Map(),materials:new Map(),textureOrigin:'bottom-left',dispose(){}}),prepareTestSolver);
  await controller.configure(value);
  async function advance(time){at=time;const due=[...timers.entries()].filter(([,t])=>t.at<=at);
@@ -23,7 +23,7 @@ export async function timerMotion(route,value,duration=250,startAt=0){
  }
  return {controller,rows,frames,timers,history,runtime,get now(){return at;},setDuration(v){speed=v;},advance,
   async finishRow(){const row=rows.at(-1),plan=row.source?.(),from=row.samples.at(-1).progress;
-   const end=plan?.endAt??at+speed*(1-from),start=plan?Math.max(at,end-plan.durationMs*(1-from)):at;
+   const end=plan?.endAt??at+speed*Math.abs(row.event.move.turns)*(1-from),start=plan?Math.max(at,end-plan.durationMs*(1-from)):at;
    await advance(start);await advance((start+end)/2);await advance(end);return row;},
  };
 }

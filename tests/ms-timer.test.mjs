@@ -14,6 +14,7 @@ import {
   TENTH_WORDS,
 } from "../src/apps/ms-timer/tenth.ts";
 import { planSequence } from "../src/apps/timer/scheduler.ts";
+import { parseAlg } from "@cubistry/cube-mechanics";
 import { stateEquals } from "../packages/cube-core/src/index.ts";
 import { inverseWord } from "../scripts/ms/convert-witness.mjs";
 import { at, label, ms, rig, startPose } from "./helpers/ms-timer-rig.mjs";
@@ -141,7 +142,7 @@ test("each tenth of a second the 1/10-second cube turns at 50 ms per QTM and clo
   );
 });
 
-test("each second the seconds cube turns about 82 ms per HTM and finishes at the boundary", async () => {
+test("each second the seconds cube uses its angular budget and finishes at the boundary", async () => {
   const r = await rig({ from: 0, mode: "stopwatch" });
   r.timer.start();
   const report = await runChecked(r, 1000, 6, (k) => k);
@@ -196,12 +197,13 @@ for (const [low, high, four] of CARRY_EDGES) {
       [mm0, mm1] = span(carry.major);
     assert.ok(mm0 < ms1 && ms0 < mm1, "windows overlap");
     // One budget per cube, planned for its own word: consecutive turns of a
-    // cube end one effective turn time apart (about 43 ms for 4 HTM).
+    // cube end one angular turn duration apart.
     for (const rows of [carry.minor, carry.major]) {
-      const eff = planSequence(rows.length, 100, 1000).effective;
+      const units = rows.reduce((n,row)=>n+Math.abs(parseAlg(row.move)[0].turns),0);
+      const eff = planSequence(rows.length, 100, 1000,1000,units).effective;
       for (let i = 1; i < rows.length; i++)
         assert.ok(
-          Math.abs(rows[i].completeAt - rows[i - 1].completeAt - eff) <= 2,
+          Math.abs(rows[i].completeAt - rows[i - 1].completeAt - eff*Math.abs(parseAlg(rows[i].move)[0].turns)) <= 2,
           `${rows.length} HTM: turns ${eff.toFixed(1)} ms apart`,
         );
     }

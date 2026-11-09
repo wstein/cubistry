@@ -60,12 +60,12 @@ test("the step buttons move five steps back or forth, following the direction se
   assert.deepEqual(calls, [["step", 5], ["step", -5], ["step", -5], ["step", 5]]);
 });
 
-test("the step speed select offers the four intervals, defaults to 100 ms and reports the chosen number", () => {
+test("the step speed select offers the four intervals, defaults to 250 ms and reports the chosen number", () => {
   const { all, calls } = rig();
   const speed = all(4).find((e) => e.tagName === "SELECT");
   assert.deepEqual(speed.children.map((o) => o.getAttribute("value")), TENTH_STEP_INTERVALS.map(String));
   assert.deepEqual([...TENTH_STEP_INTERVALS], [50, 100, 250, 500]);
-  assert.equal(speed.value, "100");
+  assert.equal(speed.value, "250");
   speed.value = "250";
   speed.fire("change");
   assert.deepEqual(calls, [["interval", 250]]);

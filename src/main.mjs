@@ -79,12 +79,12 @@ $("hsm-lettering").addEventListener("change", syncHsmUnitLabels);
 const run = new CounterRun();
 const sequenceNumber = new SequenceNumber();
 const durations = [2000, 1000, 500, 250, 100, 50, 10];
-// Default rotation stop per HSM unit (index into `durations`): 100 ms for every
+// Default rotation stop per HSM unit (index into `durations`): 250 ms for every
 // unit. Only the live clock keeps its slower H 500 ms / M 250 ms preferences.
 // Changing the unit or entering the HSM counter applies it.
 // Recovery searches run in slices that yield to the event loop (docs/HSM_COUNTER.md).
 const recoveryExecutor = new SlicedExecutor();
-const hsmDefaultStops = { H: 4, M: 4, S: 4 };
+const hsmDefaultStops = { H: 3, M: 3, S: 3 };
 const speedLabels = [
   "2 s",
   "1 s",
@@ -648,7 +648,7 @@ function speedUi() {
     viewer?.setAnimationSpeed(BASE_MOVE_DURATION_MS / durations[stop]);
   $("speed-label").textContent = isTimer()
     ? `${speedLabels[stop]} preferred`
-    : `${speedLabels[stop]} per HTM move`;
+    : `${speedLabels[stop]} per quarter turn`;
   $("rotation-speed").setAttribute(
     "aria-valuetext",
     $("speed-label").textContent,
@@ -758,7 +758,7 @@ function tick() {
   if (isHsm()) {
     if (hsmRunning && !view.busy) {
       const now = performance.now();
-      const turnDuration = durations[Number($("rotation-speed").value)] || 100;
+      const turnDuration = durations[Number($("rotation-speed").value)] || 250;
       if (now >= hsmTargetDeadline - turnDuration) {
         if (now > hsmTargetDeadline) {
           hsmTargetDeadline = now + 1000;
@@ -774,7 +774,7 @@ function tick() {
   if (isMs()) {
     if (msRunning && !view.busy) {
       const now = performance.now();
-      const turnDuration = durations[Number($("rotation-speed").value)] || 100;
+      const turnDuration = durations[Number($("rotation-speed").value)] || 250;
       if (now >= msTargetDeadline - turnDuration) {
         if (now > msTargetDeadline) {
           msTargetDeadline = now + 1000;
@@ -1270,10 +1270,10 @@ async function switchApplication(requested, { initial = false } = {}) {
     $("rotation-speed").value = isTimer()
       ? "3"
       : isHsm()
-        ? String(hsmDefaultStops[$("hsm-letter").value] ?? 4)
+        ? String(hsmDefaultStops[$("hsm-letter").value] ?? 3)
         : isMs()
-          ? String(hsmDefaultStops[$("ms-letter").value] ?? 4)
-          : "4";
+          ? String(hsmDefaultStops[$("ms-letter").value] ?? 3)
+          : "3";
     speedUi();
     formatUi();
     ready = true;
@@ -1495,7 +1495,7 @@ for (const id of ["hsm-letter", "hsm-lettering"])
       value = initial;
       if (id === "hsm-letter") {
         $("rotation-speed").value = String(
-          hsmDefaultStops[$("hsm-letter").value] ?? 4,
+          hsmDefaultStops[$("hsm-letter").value] ?? 3,
         );
         speedUi();
       }
@@ -1646,7 +1646,7 @@ $("ms-letter").addEventListener("change", async () => {
     view = candidate;
     value = 0;
     $("rotation-speed").value = String(
-      hsmDefaultStops[$("ms-letter").value] ?? 4,
+      hsmDefaultStops[$("ms-letter").value] ?? 3,
     );
     speedUi();
     ready = true;
@@ -1683,7 +1683,7 @@ async function initialize() {
         saved.moveDuration ??
         (Number.isFinite(saved.speed) && saved.speed > 0
           ? BASE_MOVE_DURATION_MS / saved.speed
-          : 100);
+          : 250);
       $("rotation-speed").value = String(
         durations.reduce(
           (best, n, i) =>

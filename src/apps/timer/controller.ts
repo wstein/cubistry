@@ -56,7 +56,7 @@ export class TimerController extends PhysicalPlayback {
     return this.view.animate(presentation, () =>
       this.timing?.target === target
         ? routeTurnTiming(route, index, this.timing.motion.endAt,
-            this.timing.motion.durationMs, this.timing.motion.revision, "htm")
+            this.timing.motion.durationMs, this.timing.motion.revision)
         : null,
     );
   }
