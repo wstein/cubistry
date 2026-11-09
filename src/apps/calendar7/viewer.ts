@@ -38,7 +38,7 @@ import {
   STICKERS,
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
-import { BLANK_PAPER, drawSticker, PAPER, PLASTIC, TEXTURE } from "./sticker-art.ts";
+import { BLANK_PAPER, drawFace, drawSticker, PAPER, PLASTIC, type Surface, TEXTURE } from "./sticker-art.ts";
 import { MoveTween } from "./tween.ts";
 
 /**
@@ -133,8 +133,11 @@ export class Calendar7Viewer implements StageView {
     this.resources = [];
   }
 
-  /** Builds the cube from the printing and shows `pose`. */
-  configure(printing: Printing, pose: Pose): void {
+  /**
+   * Builds the cube from the printing and shows `pose`. `surface` "sticker" (default) draws the 294 sticker bodies;
+   * "face" is the stickerless cube: no sticker body is drawn and each label is the texture of its cubie face.
+   */
+  configure(printing: Printing, pose: Pose, surface: Surface = "sticker"): void {
     this.clear();
     this.printing = printing;
     const plastic = createPlasticMaterial(PLASTIC, 0.55);
@@ -143,12 +146,13 @@ export class Calendar7Viewer implements StageView {
     const materials = new Map<number, THREE.Material>();
     const byKey = new Map<string, THREE.Material>();
     for (let i = 0; i < STICKERS; i++) {
-      const key = `${printing.ink[i]}|${printing.text[i]}`;
+      const key = `${printing.ink[i]}|${printing.text[i]}`; // one surface per configure: the key needs no surface
       let material = byKey.get(key);
       if (!material) {
         const canvas = document.createElement("canvas");
         canvas.width = canvas.height = TEXTURE;
-        drawSticker(canvas.getContext("2d") as CanvasRenderingContext2D, printing.text[i], printing.ink[i]);
+        const art = surface === "face" ? drawFace : drawSticker;
+        art(canvas.getContext("2d") as CanvasRenderingContext2D, printing.text[i], printing.ink[i]);
         const texture = new THREE.CanvasTexture(canvas);
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = anisotropy;
@@ -182,6 +186,8 @@ export class Calendar7Viewer implements StageView {
     this.presentation.traverse((o) => {
       if (o.userData.stickerId !== undefined) (o as THREE.Mesh).castShadow = false;
     });
+    // The scene hides the sticker meshes and gives each cubie face the label texture (bodyColor PLASTIC stays for the cut faces).
+    this.cube.setConstruction(surface === "face" ? "stickerless" : "stickered");
     this.cube.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
     this.dirty = true;
   }

@@ -19,11 +19,12 @@ import {
   type YearMonth,
   type PageModel,
 } from "./month-view.ts";
+import type { Surface } from "./sticker-art.ts";
 import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnapshot, type StageView } from "./player.ts";
 
 /** The 3D scene the mount drives (src/apps/calendar7/viewer.ts; a fake in the tests). */
 export interface Stage extends StageView {
-  configure(printing: Printing, pose: Pose): void;
+  configure(printing: Printing, pose: Pose, surface?: Surface): void;
   setLabel(text: string): void;
   resetView(): void;
   destroy(): void;
