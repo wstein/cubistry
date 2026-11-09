@@ -121,7 +121,7 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
       popover.hidden = !open; disclosure.setAttribute("aria-expanded", String(open));
       document.dispatchEvent?.(new CustomEvent("cube-appearance:state", { detail: { open, present: true } }));
     };
-    disclosure.addEventListener("click", () => { opener = null; setOpen(popover.hidden); });
+    disclosure.addEventListener("click", () => { opener = null; setOpen(Boolean(popover.hidden)); });
     panel.addEventListener("cube-appearance:open", (event) => {
       opener = (event as CustomEvent).detail?.opener ?? null; setOpen(true); disclosure.focus(); panel.scrollIntoView?.({ block: "nearest" });
     });

@@ -165,3 +165,20 @@ test("markup and styles: scene declares the dock, header has the Appearance butt
     "the legacy ambient rule (opacity .38, blur) does not apply to the docked panel");
   assert(!/backdrop-filter:\s*blur/.test(css.slice(css.indexOf("/* ---------- appearance section"), css.indexOf("/* ---------- error line"))));
 });
+
+test("the disclosure normalizes the until-found hidden state to a boolean", () => withDocument(({ scene, doc }) => {
+  const controls = installAppearanceControls(scene, () => {});
+  const toggle = walk(controls.panel).find(node => node.className === "cube-appearance-disclosure");
+  const body = walk(controls.panel).find(node => node.id === toggle.attributes["aria-controls"]);
+  const updates = [];
+  doc.addEventListener("cube-appearance:state", event => updates.push(event.detail));
+  for (const [hidden, open] of [["until-found", true], [false, false], [true, true]]) {
+    body.hidden = hidden;
+    toggle.dispatchEvent(new Event("click"));
+    assert.equal(typeof updates.at(-1).open, "boolean");
+    assert.equal(updates.at(-1).open, open);
+    assert.equal(toggle.attributes["aria-expanded"], String(open));
+    assert.equal(body.hidden, !open);
+  }
+  controls.dispose();
+}));
