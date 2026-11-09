@@ -29,7 +29,7 @@ This plan only records assumptions, acceptance criteria and the decisions still 
 1. Generalize `ClockStage` and the framing helpers from exactly three cubes to a given count (two or three), keeping the three-cube clock unchanged and its tests green.
 2. A small pair controller that owns two `HsmController`s, the carry rule and the step/run state; unit tests with the existing physical replay helpers.
 3. The page or application entry (`application` choice, controls, presentation, print link), reusing the H/M/S Counter controls where possible.
-4. Documentation (`docs/`), the application choice lists in `index.html?app=clock`, `calendar.html`, and browser tests.
+4. Documentation (`docs/`), `index.html` and the chooser lists of the legacy pages, and browser tests.
 
 ## Acceptance criteria
 - The three-cube Live Clock and the H/M/S Counter behave exactly as before.
