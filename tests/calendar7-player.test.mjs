@@ -5,6 +5,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
+import { contrast } from "./calendar7-contrast.mjs";
 import { expand, groupBlocks } from "../src/apps/calendar7/blocks.ts";
 import { applyMoves, clonePose, inverseMoves, samePose, stateDigest } from "../src/apps/calendar7/engine.ts";
 import { parseDisplays, parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
@@ -303,15 +304,6 @@ test("MoveTween: eased progress over the given time, one end, cancel resolves at
   tween.cancel();
   await second;
 });
-
-function contrast(a, b) {
-  const lum = (hex) => {
-    const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-  };
-  const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
-  return (x + 0.05) / (y + 0.05);
-}
 
 test("sticker art: every ink reads on the paper at 4.5:1, text is fitted into the sticker, blank is plain paper", () => {
   for (const [ink, color] of Object.entries(INK_COLORS)) assert.ok(contrast(color, PAPER) >= 4.5, `${ink} ${contrast(color, PAPER).toFixed(2)}`);

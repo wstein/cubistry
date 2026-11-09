@@ -1,18 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { contrast } from "./calendar7-contrast.mjs";
 
 // The month sheet palette lives in the calendar7 block of chronocube.css as --c7-* tokens (light in .c7-root, dark in
 // the two dark selectors). Every ink on its cell reads at 4.5:1 in both themes. The print inks are untouched.
 const css = readFileSync(new URL("../src/chronocube.css", import.meta.url), "utf8");
-const lum = (hex) => {
-  const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-};
-const contrast = (a, b) => {
-  const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
-  return (x + 0.05) / (y + 0.05);
-};
 const tokens = (block) => Object.fromEntries([...block.matchAll(/--c7-([a-z-]+):\s*(#[0-9a-f]{6});/g)].map((m) => [m[1], m[2]]));
 const light = tokens(css.slice(css.indexOf(".c7-root {"), css.indexOf("}", css.indexOf(".c7-root {"))));
 const darkAt = css.indexOf(':root[data-theme="dark"] .c7-root {');
