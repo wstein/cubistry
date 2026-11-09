@@ -126,12 +126,18 @@ test("the reference top-right viewpoint resets and fits the shared row on deskto
   }
 });
 
-for (const [path, selector, delayed] of [
+for (const [path, selector, delayed, cold = false] of [
   ["/counter.html", "#application", false],
   ["/ms-timer.html", "#ms-timer-application", false],
   ["/counter.html", "#application", true],
+  ["/counter.html", "#application", false, true],
 ]) {
-  test(`the legacy chooser on ${path} opens the unified Live Clock${delayed ? " during delayed document navigation" : ""}`, async ({ page }) => {
+  test(`the legacy chooser on ${path} opens the unified Live Clock${delayed ? " during delayed document navigation" : ""}${cold ? " after a cold design load" : ""}`, async ({ page }) => {
+    if (cold) await page.route("**/counter-design.v2.json", async (route) => {
+      // Hold the real boot dependency beyond the old five-second chooser wait.
+      await new Promise((resolve) => setTimeout(resolve, 6000));
+      await route.continue();
+    });
     if (delayed) await page.route("**/index.html?app=clock", async (route) => {
       // Model a document navigation that exceeds the URL assertion budget but
       // remains within the existing Clock readiness budget.
@@ -139,7 +145,10 @@ for (const [path, selector, delayed] of [
       await route.continue();
     });
     await page.goto(path);
-    await expect(page.locator(selector)).toBeEnabled();
+    // The chooser stays disabled through the verified design's async cold load
+    // (#368). Use the existing 30-second startup budget, not the URL budget.
+    // Mode-ready and the original final-URL assertion still prove navigation.
+    await expect(page.locator(selector)).toBeEnabled({ timeout: 30000 });
     const clock = page.locator(selector).getByRole("option", { name: "Live H–M–S Clock", exact: true });
     await expect(clock).toHaveAttribute("value", "index.html?app=clock");
     await page.selectOption(selector, "index.html?app=clock");
