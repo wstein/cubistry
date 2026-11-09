@@ -306,6 +306,7 @@ globally; no date-dependent profile selection or second runtime data set exists.
 | [tests/calendar7-deferral.test.mjs](../tests/calendar7-deferral.test.mjs) | Deferred rotations and the end alignment: properties, every stored edge both ways, search of the 24 orientations, mismatch, negative controls, soft start, player phases |
 | [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
 | [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, split-label geometry and drawing |
+| [tests/calendar7-center.test.mjs](../tests/calendar7-center.test.mjs) | Strict 6 and 9: ink box centered on the sticker (also turned by a half turn); other labels and legacy unchanged |
 | [tests/calendar7-sheet-colors.test.mjs](../tests/calendar7-sheet-colors.test.mjs) | Month sheet palette: every ink on its cell at 4.5:1 in light and dark |
 | [tests/browser/calendar7-3d.spec.mjs](../tests/browser/calendar7-3d.spec.mjs) | The 3D view in a browser: pose digest, animated step, controls, 375 px |
 
@@ -353,6 +354,16 @@ at least 0.0625 of the texture (12 px) between the numbers. The browser spec
 `tests/browser/calendar7-split-label.spec.mjs` draws the real Noto Sans 600 in Chromium and measures the
 real ink on the canvas: the gap is about 23 px for `23/30` and about 24 px for `24/31`, and it requires
 at least 12 px of gap and 10 px of margin. The Noto Sans font (OFL-1.1) is unchanged.
+
+**Centered 6 and 9 (strict art).** The strict rule accepts a 6 shown as a 9 turned by a half turn, so the
+sticker is rotated by 180 degrees about its center and any ink offset from the center shows as twice that drift
+between the two readings. The single digits `6` and `9` are therefore drawn with an alphabetic baseline at the font
+size 140 px, placed from the real Noto Sans 600 ink extents so that the ink box is centered on the 192 px sticker,
+horizontally and vertically (`halfTurnDigitPlacement` in `sticker-art.ts`; before, the "middle" baseline put the ink
+center about 5 px above the center, so the two readings differed by about 10 px in height). Legacy, other digits,
+two-digit labels, letters and split labels keep their drawing. The unit test is
+`tests/calendar7-center.test.mjs`; `tests/browser/calendar7-center.spec.mjs` measures the real ink in Chromium
+(at most 0.5 px off the center, upright and turned). The sticker colors are the same in both page themes.
 
 **What is profile-gated.** `imageNormal` and `frontFailure` in `display.ts` take the profile as
 the last argument, and `drawSticker` in `sticker-art.ts` takes it as the fourth; the default is
