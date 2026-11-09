@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 /**
- * Color schemes of the Calendar7 month sheet as plain role tokens. Data only: no DOM, no rendering, not yet applied to
- * the 3D view. Saturday and Sunday are styled identically in every scheme, so there is one weekend token set and one
+ * Color schemes of the Calendar7 month sheet as plain role tokens. Data only: no DOM, no rendering, applied to the 3D view by
+ * sticker-art.ts (`tileRoles`). Saturday and Sunday are styled identically in every scheme, so there is one weekend token set and one
  * SUN/SAT label ink, never separate Saturday and Sunday fields.
  *
  * Roles (all colors are lowercase #rrggbb):
@@ -303,3 +303,11 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     sunSatInk: "#000000",
   },
 ]);
+
+/** The scheme of the app: the one marked `isDefault` (Paper Red). */
+export const DEFAULT_SCHEME: ColorScheme = SCHEMES.find((s) => s.isDefault) as ColorScheme;
+
+/** The scheme with this id; null, undefined and an unknown id give `DEFAULT_SCHEME` (never throws). */
+export function schemeById(id: string | null | undefined): ColorScheme {
+  return SCHEMES.find((s) => s.id === id) ?? DEFAULT_SCHEME;
+}
