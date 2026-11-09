@@ -1,0 +1,33 @@
+replayed 0 prior edges; chain end 2026-5; state digest 9da4994464d38700eeea0f41622109035462e1999194130c6e84ee02cf8eea49
+chain catalog orbit=1 count=1008
+chain catalog orbit=2 count=4048
+chain catalog orbit=3 count=4048
+chain catalog orbit=4 count=1760
+chain catalog orbit=5 count=4048
+chain catalog orbit=6 count=4048
+chain catalog orbit=7 count=4048
+chain catalog orbit=8 count=4048
+chain catalog orbit=9 count=4048
+chain catalog orbit=10 count=4048
+setup 26.4 s, library 673464 threads 4
+EDGE 2026-6 beam htm=121 25.1 s
+EDGE 2026-7 beam htm=125 43.1 s
+EDGE 2026-8 beam htm=137 41.1 s
+EDGE 2026-9 finish1 htm=131 27.8 s
+EDGE 2026-10 beam htm=114 40.2 s
+EDGE 2026-11 finish1 htm=130 22.6 s
+EDGE 2026-12 beam htm=127 21.1 s
+EDGE 2027-1 beam htm=109 33.2 s
+EDGE 2027-2 beam htm=117 39.0 s
+EDGE 2027-3 beam htm=20 23.1 s
+EDGE 2027-4 beam htm=126 31.0 s
+EDGE 2027-5 beam htm=106 57.0 s
+EDGE 2027-6 beam htm=126 81.2 s
+EDGE 2027-7 beam htm=108 26.8 s
+EDGE 2027-8 beam htm=99 20.0 s
+EDGE 2027-9 beam htm=109 22.4 s
+EDGE 2027-10 beam htm=120 17.3 s
+EDGE 2027-11 beam htm=105 26.4 s
+EDGE 2027-12 beam htm=100 52.0 s
+EDGE 2028-1 beam htm=125 59.3 s
+CHAIN COMPLETE 20 edges

@@ -62,7 +62,8 @@
         "data/calendar7/research/strict/window/moves.tsv": "72d05414d13b661eab186740c745a1df948027bcf194bf22cf2fbb1983eba764",
         "data/calendar7/research/strict/window/receipt.flix.tsv": "cf1de4324de604051c74543f3892794719e7b9cbb2ac71577f7fc4b977994b64",
         "data/calendar7/research/strict/window/receipt.julia.tsv": "cf1de4324de604051c74543f3892794719e7b9cbb2ac71577f7fc4b977994b64",
-        "data/calendar7/research/strict/window/receipt.replay.tsv": "ba6b01f3d19214507005d8424f192d1671726a838309024e2064a394cf3b7fa7"
+        "data/calendar7/research/strict/window/receipt.replay.tsv": "ba6b01f3d19214507005d8424f192d1671726a838309024e2064a394cf3b7fa7",
+        "data/calendar7/research/strict/window/run.log": "bafe481d6712cb8e0138145492d9537b74cd767937b9bae19b6ac670e0a21c84"
       }
     },
     {
@@ -78,7 +79,8 @@
         "data/calendar7/research/strict/full/moves.tsv": "df7a6c628d137eda1ae23ec75ab67e325a94c975e67c1f776693d4de0266945a",
         "data/calendar7/research/strict/full/receipt.flix.tsv": "ddb1e9df37d54b4ac521a06ce70e5771b96d6e6fcd9b979cb89cd9a2cd9d1a93",
         "data/calendar7/research/strict/full/receipt.julia.tsv": "ddb1e9df37d54b4ac521a06ce70e5771b96d6e6fcd9b979cb89cd9a2cd9d1a93",
-        "data/calendar7/research/strict/full/receipt.replay.tsv": "ff6cbf5e979dba344d4a7f4fedf99fc4551274f411e6fed0f9ee4d0c505cefd1"
+        "data/calendar7/research/strict/full/receipt.replay.tsv": "ff6cbf5e979dba344d4a7f4fedf99fc4551274f411e6fed0f9ee4d0c505cefd1",
+        "data/calendar7/research/strict/full/run.log": "e011212cc241265233a3d9570a4532355f855144dcfa97be55943694e15240a7"
       }
     }
   ],
