@@ -21,7 +21,6 @@ import {
   stateDigest,
 } from "./engine.ts";
 import type { Graph } from "./graph.ts";
-import { softStartEase, softStartMs } from "./soft-start.ts";
 
 /** What the player needs from the 3D scene. */
 export interface StageView {
@@ -31,8 +30,8 @@ export interface StageView {
    * Turns one block (several layers of one axis and exponent together, or one layer, or the whole cube) of `before`
    * over `ms` milliseconds as ONE animation and leaves the cube showing the pose after the block.
    * Reads `before` synchronously; the caller may change it once the promise has settled. Resolves early when
-   * `show` interrupts it. `ease` (default smoothstep) maps the progress of the time to the fraction turned; the end
-   * alignment passes the soft start of the Smart Rubber Band.
+   * `show` interrupts it. `ease` (default smoothstep) maps the progress of the time to the fraction turned; the player passes none, so
+   * every turn, whole-cube rotations included, uses the same easing.
    */
   turn(block: Block, before: Pose, ms: number, ease?: (p: number) => number): Promise<void>;
 }
@@ -55,6 +54,7 @@ export interface PlayerSnapshot {
   readonly total: number;
   /** Month node the current step starts from; equals `index` when idle. */
   readonly from: number;
+  /** Milliseconds per turn, one of `SPEEDS`. */
   readonly speed: number;
   readonly phase: PlayerPhase;
   /**
@@ -71,11 +71,12 @@ export class StateMismatchError extends Error {
   }
 }
 
-/** Duration of one block (one animation) at 1x. A wide block turns as long as a single layer: it is one move. */
-export const BASE_MOVE_MS = 90;
-/** Nominal speeds: 90 ms per block at 1x; a frame is about 17 ms, so 8x is one frame per block when the display keeps up. */
-export const SPEEDS = [0.5, 1, 2, 4, 8] as const;
-export const DEFAULT_SPEED = 2;
+/**
+ * Offered speeds: milliseconds per turn, the repository's Rotation Speed stops (100, 250, 500 ms and 1 s). One block is one
+ * turn: a wide block, a middle slice and a whole-cube rotation (x, y, z) last exactly as long as a single layer.
+ */
+export const SPEEDS = [100, 250, 500, 1000] as const;
+export const DEFAULT_SPEED = 100;
 /** The page plays rule-c blocks (the middle slice counts as a move) unless the viewer turns it off; see `blocks.ts`. */
 export const DEFAULT_SLICE = true;
 /** Compatibility default for callers of the older defer option. The page selects DEFAULT_ORIENTATION explicitly. */
@@ -357,28 +358,27 @@ export class Calendar7Player {
         if (plan.orientation === "before" && plan.alignDone < plan.expected.length) {
           const move = plan.expected[plan.alignDone];
           const reduced = this.reducedMotion();
-          await this.view.turn(rotationBlock(move), this.pose, reduced ? REDUCED_ALIGN_MS : softStartMs(Math.abs(move[1])) / this.speed, reduced ? undefined : softStartEase(Math.abs(move[1])));
+          await this.view.turn(rotationBlock(move), this.pose, reduced ? REDUCED_ALIGN_MS : this.speed);
           if (this.disposed || this.generation !== mine || this.plan !== plan) return;
           applyMoveInPlace(this.pose, move);
           plan.alignDone++;
           this.notify();
         } else if (plan.done < plan.blocks.length) {
           const block = plan.blocks[plan.done];
-          await this.view.turn(block, this.pose, BASE_MOVE_MS / this.speed);
+          await this.view.turn(block, this.pose, this.speed);
           if (this.disposed || this.generation !== mine || this.plan !== plan) return;
           applyBlockInPlace(this.pose, block);
           plan.done++;
           this.notify();
         } else if (plan.defer) {
-          // Final phase: the alignment, one or two whole-cube rotations of the model, with the soft start of the rubber band.
+          // Final phase: the alignment, one or two whole-cube rotations of the model, timed and eased like a layer turn.
           const first = plan.align === null;
           const align = this.alignmentOf(plan);
           if (first && align.length > 0) this.notify(); // no transient phase for an identity alignment
           if (plan.alignDone >= align.length) break;
           const move = align[plan.alignDone];
           const reduced = this.reducedMotion();
-          const ms = reduced ? REDUCED_ALIGN_MS : softStartMs(Math.abs(move[1])) / this.speed;
-          await this.view.turn(rotationBlock(move), this.pose, ms, reduced ? undefined : softStartEase(Math.abs(move[1])));
+          await this.view.turn(rotationBlock(move), this.pose, reduced ? REDUCED_ALIGN_MS : this.speed);
           if (this.disposed || this.generation !== mine || this.plan !== plan) return;
           applyMoveInPlace(this.pose, move);
           plan.alignDone++;
