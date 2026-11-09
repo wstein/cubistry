@@ -23,6 +23,9 @@ test("stickerless surface: no sticker bodies, labels on the cubie faces, same ar
     const panel = document.createElement("div");
     document.body.append(panel);
     const viewer = new Calendar7Viewer(host, panel);
+    // This test measures the label geometry as dark ink on light paper. The default scheme (Paper Red) draws a red line under
+    // the weekday names, which the dark-ink threshold below would count as ink; Classic has no line.
+    viewer.setScheme("classic");
     const mon = printing.text.indexOf("MON") + 1;
     const inkWidth = (canvas) => {
       const d = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data;
