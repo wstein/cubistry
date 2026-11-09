@@ -115,3 +115,37 @@ export function drawSticker(
   ctx.font = `600 ${size}px ${FONT}`;
   ctx.fillText(text, TEXTURE / 2, TEXTURE / 2 + size * 0.04);
 }
+
+/**
+ * Stickerless surface: how the label is placed on the cubie face instead of on a sticker.
+ *
+ * The body face texture (the 0..1 UV square of the rounded body) is flat only in its middle: the flat part spans
+ * `FACE_FLAT` of the texture, centered, the rest wraps the bevel around the cubie. The label is the same drawing
+ * as on a sticker (`drawSticker`: same sizes, fit, split labels, 6/9 rule) scaled about the center by `FACE_FLAT`,
+ * so its 86% text square covers 86% of the flat face, as on a sticker; the paper fills the whole texture, so
+ * there is no gap and no sticker edge. The value is checked against the real body geometry in
+ * tests/calendar7-stickerless.test.mjs (preset body width .99, radius .055, one bevel segment).
+ */
+export const FACE_FLAT = 0.9106;
+/** How the 3D view draws the labels: on sticker bodies (scheme A, default) or directly on the cubie faces. */
+export type Surface = "sticker" | "face";
+
+type FaceContext = Context & Pick<CanvasRenderingContext2D, "save" | "restore" | "translate" | "scale">;
+
+/** Draws one cubie face: paper on the whole texture, then the sticker label scaled about the center by `FACE_FLAT`. */
+export function drawFace(
+  ctx: FaceContext,
+  text: string,
+  ink: string,
+  profile: RuleProfile = DEFAULT_RULE_PROFILE,
+): void {
+  ctx.fillStyle = text === "" ? BLANK_PAPER : PAPER;
+  ctx.fillRect(0, 0, TEXTURE, TEXTURE);
+  ctx.save();
+  ctx.translate(TEXTURE / 2, TEXTURE / 2);
+  ctx.scale(FACE_FLAT, FACE_FLAT);
+  ctx.translate(-TEXTURE / 2, -TEXTURE / 2);
+  // drawSticker paints the same paper again over the scaled square (same color), then the label.
+  drawSticker(ctx, text, ink, profile);
+  ctx.restore();
+}
