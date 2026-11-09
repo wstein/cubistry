@@ -60,3 +60,10 @@ test("the exact centering is only for single 6 and 9 in the strict profile", () 
     assert.deepEqual(c.texts, [[t, TEXTURE / 2, TEXTURE / 2 + sizeOf(c) * 0.04]], `${t} ${p}`);
   }
 });
+
+test("inherited object keys are not half-turn digits: they throw like any unknown glyph, not NaN", () => {
+  for (const t of ["toString", "constructor", "__proto__", "hasOwnProperty", "valueOf"]) {
+    assert.equal(isHalfTurnDigit(t, "strict"), false, t);
+    assert.throws(() => halfTurnDigitPlacement(t, 140), /not a half-turn digit/, t);
+  }
+});

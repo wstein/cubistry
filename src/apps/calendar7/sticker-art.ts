@@ -91,7 +91,7 @@ const HALF_TURN_INK: Readonly<Record<string, { ascent: number; descent: number; 
 };
 
 /** True for the single digits 6 and 9 in the strict profile: they read as each other after a half turn, so their ink must sit exactly on the sticker center. */
-export const isHalfTurnDigit = (text: string, profile: RuleProfile): boolean => profile === "strict" && text in HALF_TURN_INK;
+export const isHalfTurnDigit = (text: string, profile: RuleProfile): boolean => profile === "strict" && Object.hasOwn(HALF_TURN_INK, text);
 
 /**
  * Placement of a strict 6 or 9 at font size `size` so that the ink box is centered on the sticker, drawn with
@@ -100,7 +100,7 @@ export const isHalfTurnDigit = (text: string, profile: RuleProfile): boolean => 
  * Pure geometry, like `splitLayout`; `box` is the ink box.
  */
 export function halfTurnDigitPlacement(text: string, size: number): { x: number; baseline: number; box: { x0: number; y0: number; x1: number; y1: number } } {
-  const ink = HALF_TURN_INK[text];
+  const ink = Object.hasOwn(HALF_TURN_INK, text) ? HALF_TURN_INK[text] : undefined;
   if (!ink) throw new Error(`not a half-turn digit: ${text}`);
   const baseline = TEXTURE / 2 + ((ink.ascent - ink.descent) * size) / 2;
   // The advance box is centered on x; the ink center sits at (left + right) / 2 inside it.
