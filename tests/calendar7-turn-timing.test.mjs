@@ -24,12 +24,15 @@ const recordingView = () => {
 const settle = async (player) => {
   for (let i = 0; i < 100000 && player.snapshot.status === "playing"; i++) await Promise.resolve();
 };
-/** First edge whose played step contains at least one rotation turn and at least one layer turn under `orientation`. */
+/**
+ * First edge whose played step contains a half-turn rotation (prefix, alignment or stored block) and a layer turn under
+ * `orientation`; "before" is the page default and its prefix rotations are often half turns.
+ */
 const edgeFor = (orientation) => {
   for (let e = 5; e < LAST; e++) {
     const p = playedBlocks(graph.edges[e].moves, { slice: true, orientation });
-    const rotations = p.alignment.length + p.blocks.filter((b) => b.kind === "rotation").length;
-    if (rotations > 0 && p.blocks.some((b) => b.kind !== "rotation")) return e;
+    const half = p.alignment.filter((m) => Math.abs(m[1]) === 2).length + p.blocks.filter((b) => b.kind === "rotation" && Math.abs(b.angle) === 2).length;
+    if (half > 0 && p.blocks.some((b) => b.kind !== "rotation")) return e;
   }
   throw new Error(`no edge with rotations for ${orientation}`);
 };
@@ -60,6 +63,7 @@ for (const orientation of ["before", "after", "stored"]) {
         assert.equal(t.ms, speed * Math.abs(t.block.angle), `${t.block.kind} turn of ${t.block.angle} at ${speed}`);
         assert.equal(t.ease, undefined, `${t.block.kind} turn at ${speed} uses the view's default easing`);
       }
+      assert.ok(rotations.some((t) => Math.abs(t.block.angle) === 2 && t.ms === 2 * speed), `a half-turn rotation lasts ${2 * speed} ms`);
       assert.equal(player.snapshot.speed, speed);
     }
   });
