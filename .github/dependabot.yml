@@ -10,6 +10,10 @@ updates:
     open-pull-requests-limit: 3
     cooldown:
       default-days: 7
+    # TypeScript 7 migration is a separate task (appearance.ts TS2345; tests/calendar7-player.test.mjs uses the compiler API).
+    ignore:
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
     commit-message:
       prefix: build(deps)
       prefix-development: build(deps-dev)
