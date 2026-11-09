@@ -35,7 +35,14 @@ for (let i = 1; i <= STICKERS; i++) materials.set(i, basic);
 const cube = new PhysicalCubeScene(presentation, frames(root), materials, createPlasticMaterial(), 1, createPresentationGeometry());
 // The viewer without its WebGL constructor: only what turn() and show() use.
 const viewer = Object.create(Calendar7Viewer.prototype);
-Object.assign(viewer, { destroyed: false, cube, printing, tween: new MoveTween(), onLayer: new Uint8Array(219), frames: frames(root), dirty: false });
+const tween = new MoveTween();
+const beginTween = tween.begin.bind(tween);
+let tweenStart = 0;
+tween.begin = (ms, update, end, startAt, ease) => {
+  tweenStart = startAt;
+  return beginTween(ms, update, end, startAt, ease);
+};
+Object.assign(viewer, { destroyed: false, cube, printing, tween, onLayer: new Uint8Array(219), frames: frames(root), dirty: false });
 
 /** World matrices of every body (group holding stickers) and of its first sticker, by sticker id. */
 const snapshot = () => {
@@ -53,8 +60,8 @@ const sameMaps = (a, b) =>
     const o = b.get(id);
     return o && w.every((x, k) => Math.abs(x - o[0][k]) < 1e-6) && s.every((x, k) => Math.abs(x - o[1][k]) < 1e-6);
   });
-/** Frame time far after the start of the tween that just began (its clock starts at performance.now()). */
-const later = (ms) => performance.now() + ms;
+/** Frame time relative to the actual start supplied by the viewer, independent of later clock reads or scheduling. */
+const later = (ms) => tweenStart + ms;
 
 // Capture the pose of the scene at progress 1, before the pivot is released and the bodies are synced.
 const realBegin = cube.beginTurn.bind(cube);
@@ -193,12 +200,15 @@ test(`end alignment: ${label} preserves the rotated pose (1e-6) for all 24 orien
       const duration = 1000 * quarters;
       void viewer.turn(block, pose, duration, ease);
       const curve = ease ?? smoothstep;
-      viewer.tween.tick(performance.now() + duration * 0.25);
+      const quarterTime = later(duration * 0.25);
+      viewer.tween.tick(quarterTime);
       const quarter = seen.at(-1);
-      assert.ok(quarter >= curve(0.25) && quarter <= curve(0.27), `quarter-time progress: ${quarter}`);
-      viewer.tween.tick(performance.now() + duration * 0.5);
+      // Use the representable frame fraction: adding to a fractional start can round by one floating-point bit.
+      assert.ok(quarter >= curve((quarterTime - tweenStart) / duration) && quarter <= curve(0.27), `quarter-time progress: ${quarter}`);
+      const midTime = later(duration * 0.5);
+      viewer.tween.tick(midTime);
       const mid = seen.at(-1);
-      const expected = curve(0.5);
+      const expected = curve((midTime - tweenStart) / duration);
       assert.ok(mid >= expected && mid <= curve(0.52), `eased progress at half time: ${mid} vs ${expected}`);
       if (ease) assert.notEqual(mid, smoothstep(0.5), "the custom curve overrides smoothstep");
       viewer.tween.tick(later(10 * duration));
@@ -219,7 +229,7 @@ test(`end alignment: ${label} preserves the rotated pose (1e-6) for all 24 orien
   cube.sync(frames(start));
   seen.length = 0;
   void viewer.turn(rotationBlock([14, 1]), start, 150);
-  viewer.tween.tick(performance.now() + 75);
+  viewer.tween.tick(later(75));
   assert.ok(Math.abs(seen.at(-1) - 0.5) < 0.02);
   viewer.tween.tick(later(1000));
   assert.ok(samePose(applyMoves(start, [[14, 1]]), applyMoves(start, expand([rotationBlock([14, 1])]))));
