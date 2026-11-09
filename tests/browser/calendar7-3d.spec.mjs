@@ -77,7 +77,7 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   await expect(page.locator('[data-c7="alignment"]')).toHaveText(`Orientation at the end (free): ${FEB_ALIGNMENT}.`);
   // The heading, sheet and live region already name the new month; the digest is that of the pose being turned only at the end.
   await expect(page.locator(".c7-month")).toHaveText("February 2028");
-  await page.locator('[data-c7="speed"]').selectOption("8");
+  await page.locator('[data-c7="speed"]').selectOption("100");
   await page.locator('[data-c7="play"]').click(); // Pause
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "paused");
   await expect(page.locator('[data-c7="play"]')).toHaveText("Play");
