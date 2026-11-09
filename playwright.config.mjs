@@ -10,7 +10,7 @@ const lowEffects = {
   cookies: [],
   origins: [{ origin: baseURL, localStorage: [{ name: "cubistry-lowfx", value: "shadows" }] }],
 };
-// CI splits the suite into two jobs (.github/workflows/counter.yml). Specs that wait on real animation time or assert
+// CI splits the suite into fast/timing shards (.github/workflows/counter-browser.yml). Specs that wait on real animation time or assert
 // millisecond precision are slow in software GL, so they run in their own job with a longer per-test limit.
 // status-cube is in this group only for runtime: its screenshot test exceeded 30 s in the fast group.
 // CUBISTRY_E2E_GROUP=fast runs everything else, =timing only these files; unset (the default) runs all of them.
