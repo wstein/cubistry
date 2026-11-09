@@ -1,0 +1,16 @@
+{
+  "SPDX-License-Identifier": "CC-BY-SA-4.0",
+  "format": "cubistry.calendar7.row1-names-inventory.v1",
+  "baseCommit": "8c823fe6f6e3cd3c9ecc4e5797177498944ac285",
+  "input": "layout.tsv",
+  "inputSHA256": "46e12d0b162a8a7703d8a2ea614ffc5a1fa7e85bea47caf41cf9b0761bf2d4a8",
+  "domain": { "first": "1900-01", "last": "2099-12", "months": 2400, "displayShapes": 91 },
+  "profile": { "singleZeroQuarterNeutral": true, "sixNineHalfTurn": true, "letterDigitAliases": false, "singleOQuarterNeutral": false, "inkDistinct": true, "transportedOrientationDistinct": true },
+  "tools": { "julia": "1.11.5", "flix": "0.79.0", "jdk": "21.0.13+9" },
+  "resources": { "maximumCommandSeconds": 290, "flixReplayHeap": "2g", "concurrentHeavyProcesses": 1 },
+  "result": { "inventory": "OBSTRUCTED", "overloadedOrbits": 1, "cornerRequired": 25, "cornerCapacity": 24, "physicalFeasibility": "UNKNOWN" },
+  "newReceiptSHA256": "ff24d34e5e9b39a61f37f0e98c6ea5c885444565826fc87f292e55607e5cb7d3",
+  "historicalReceiptSHA256": "1ba5df84626b29cf62fdb730cd9c1a84267bfb6a1366a19ab1ae5e918e2f1dfa",
+  "negativeControls": { "rawInputMutations": 4, "juliaRejected": 4, "flixRejected": 4 },
+  "notRun": ["print", "cubie-matching", "states", "chains", "route-search", "app-export", "full-mutation-sweep"]
+}
