@@ -236,7 +236,7 @@ export async function mountCalendar7(
       }
       stage = made;
       const s = start as NonNullable<typeof start>;
-      made.configure(s.printing, s.pose);
+      made.configure(s.printing, s.pose, s.surface);
       player = new Calendar7Player({
         graph,
         printing: s.printing,

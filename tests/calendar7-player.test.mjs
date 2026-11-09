@@ -440,8 +440,10 @@ function fakeStage(opts) {
     destroyed: 0,
     labels: [],
     resets: 0,
-    configure() {
+    surfaces: [],
+    configure(_printing, _pose, surface) {
       stage.configured++;
+      stage.surfaces.push(surface);
     },
     setLabel: (t) => stage.labels.push(t),
     resetView: () => stage.resets++,
@@ -787,4 +789,18 @@ test("the page text keeps the status: research candidate, not certified, no solv
   assert.match(text, /No solver and no jumps/);
   assert.equal(monthLabel({ year: 2028, month: 1 }), "January 2028");
   assert.ok(table.displays.length === 91);
+});
+
+test("mount passes the surface of the state file to the stage: sticker by default, face when the state says so", async () => {
+  const state = json("public/calendar7/state.v1.json");
+  for (const [field, want] of [[{}, "sticker"], [{ surface: "face" }, "face"], [{ surface: "sticker" }, "sticker"]]) {
+    const { env, stage } = mountEnv({
+      fetchJson: async (url) =>
+        url.endsWith("graph.v1.json") ? json("public/calendar7/graph.v1.json") : url.endsWith("state.v1.json") ? { ...state, ...field } : json("public/calendar7/displays.v1.json"),
+    });
+    const inst = await mountCalendar7(fakeRoot(), q("year=2028&month=3"), env);
+    await flush();
+    assert.deepEqual(stage.surfaces, [want], JSON.stringify(field));
+    inst.dispose();
+  }
 });
