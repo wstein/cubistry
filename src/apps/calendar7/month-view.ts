@@ -215,11 +215,10 @@ export const announce = (model: PageModel): string =>
       : "Invalid month";
 
 const SPEED_LABELS: readonly [number, string][] = [
-  [0.5, "0.5×"],
-  [1, "1×"],
-  [2, "2×"],
-  [4, "4×"],
-  [8, "8×"],
+  [100, "100 ms"],
+  [250, "250 ms"],
+  [500, "500 ms"],
+  [1000, "1 s"],
 ];
 
 /** The controls of the 3D view. They live outside the re-rendered page so that a button keeps its focus while a step plays. */

@@ -218,16 +218,17 @@ test("pause stops after the move in flight, play resumes, the word is played exa
 test("speed changes the move duration; unknown speeds are refused", async () => {
   const { player, view } = makePlayer();
   player.jump(7);
-  player.setSpeed(1);
+  player.setSpeed(1000);
   player.go(8);
   await settle(player);
-  player.setSpeed(8);
+  player.setSpeed(100);
   player.go(9);
   await settle(player);
-  const slow = view.log.turns[0].ms;
-  const fast = view.log.turns.at(-1).ms;
-  assert.ok(slow > 0 && fast > 0 && Math.abs(slow / fast - 8) < 1e-9);
-  assert.throws(() => player.setSpeed(3), RangeError);
+  const first = view.log.turns[0];
+  const last = view.log.turns.at(-1);
+  assert.equal(first.ms, 1000 * Math.abs(first.block.angle));
+  assert.equal(last.ms, 100 * Math.abs(last.block.angle));
+  assert.throws(() => player.setSpeed(300), RangeError);
 });
 
 test("a stored hash that differs from the pose is an error, never a silent mismatch", async () => {
@@ -518,8 +519,8 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   assert.match(root.el("progress").textContent, new RegExp(`^Turning to February 2028: move 1 of ${playedBlocks(graph.edges[20].moves, { slice: true, defer: true }).blocks.length}$`));
   root.press("play"); // pause
   assert.equal(root.el("play").textContent, "Play");
-  root.choose("speed", "8");
-  assert.equal(root.el("speed").value, "8");
+  root.choose("speed", "1000");
+  assert.equal(root.el("speed").value, "1000");
   root.press("play"); // resume
   assert.equal(root.el("play").textContent, "Pause");
   root.press("skip");

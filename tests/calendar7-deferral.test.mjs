@@ -340,7 +340,7 @@ test("the default player keeps the stored rotations in the word and reports no a
   assert.equal(digest(player.shownPose), graph.nodes[e + 1].hash);
 });
 
-test("deferred player: layer blocks first, then the alignment as a separate final phase with the soft start; digest after it", async () => {
+test("deferred player: layer blocks first, then the alignment as a separate final phase timed and eased like a layer turn; digest after it", async () => {
   const e = edgeWith((a) => a.length === 2);
   const { player, view, changes, errors } = makePlayer({ defer: true, slice: true });
   assert.equal(player.alignAtEnd, true);
@@ -355,8 +355,7 @@ test("deferred player: layer blocks first, then the alignment as a separate fina
   assert.deepEqual(turns.slice(0, played.blocks.length).map((t) => t.block), played.blocks);
   assert.ok(turns.slice(0, played.blocks.length).every((t) => t.block.kind !== "rotation" && t.ease === undefined));
   const tail = turns.slice(played.blocks.length);
-  assert.ok(tail.every((t) => t.block.kind === "rotation" && typeof t.ease === "function"), "the alignment is a rotation of the whole model");
-  assert.ok(tail.every((t) => Math.abs(t.ease(0.5) - softStartEase(Math.abs(t.block.angle))(0.5)) < 1e-15));
+  assert.ok(tail.every((t) => t.block.kind === "rotation" && t.ease === undefined && t.ms === player.snapshot.speed * Math.abs(t.block.angle)), "the alignment is a rotation of the whole model, with the default easing and the speed setting");
   assert.deepEqual(tail.map((t) => [7 * t.block.axis + 7, t.block.angle]), played.alignment);
   assert.equal(player.snapshot.alignment, alignmentText(played.alignment));
   assert.equal(player.snapshot.phase, "idle");
@@ -369,10 +368,10 @@ test("deferred player: layer blocks first, then the alignment as a separate fina
   assert.ok(changes.some((c) => c.phase === "alignment" && c.alignment === alignmentText(played.alignment)));
 });
 
-test("deferred player: the speed scales the alignment time; the first block starts from the stored frame", async () => {
+test("deferred player: the speed is the alignment time in ms per turn; the first block starts from the stored frame", async () => {
   const e = edgeWith((a) => a.length === 1);
   const times = [];
-  for (const speed of [1, 4]) {
+  for (const speed of [250, 1000]) {
     const { player, view } = makePlayer({ defer: true, slice: true });
     player.setSpeed(speed);
     player.jump(e);
@@ -382,8 +381,8 @@ test("deferred player: the speed scales the alignment time; the first block star
     times.push(last.ms);
     assert.ok(samePose(view.log.turns[0].before, NODE_POSES[e]));
   }
-  assert.ok(Math.abs(times[0] / times[1] - 4) < 1e-9, `${times}`);
-  assert.equal(times[0], softStartMs(Math.abs(playedBlocks(graph.edges[e].moves, { slice: true, defer: true }).alignment[0][1])));
+  const q = Math.abs(playedBlocks(graph.edges[e].moves, { slice: true, defer: true }).alignment[0][1]);
+  assert.deepEqual(times, [250 * q, 1000 * q]);
 });
 
 test("deferred player: skip in the blocks phase and during the alignment ends on the stored state; pause holds the alignment", async () => {

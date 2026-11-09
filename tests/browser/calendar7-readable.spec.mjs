@@ -115,7 +115,7 @@ for (const viewport of [{width:1280,height:1000},{width:900,height:700},{width:3
   await page.setViewportSize(viewport);
   await page.emulateMedia({reducedMotion:"no-preference"});
   await page.goto('/index.html?app=calendar7&year=2026&month=11');await idle(page,'2026-11');
-  await page.locator('[data-c7="speed"]').selectOption('0.5');
+  await page.locator('[data-c7="speed"]').selectOption('500');
   await page.locator('a[data-nav="next"]').click();
   await page.locator('[data-c7="active-word"] [aria-current="step"]').waitFor();
   const geometry=await page.evaluate(()=>{
@@ -141,15 +141,15 @@ for (const loading of ["viewer","data"]) test(`all playback selections made whil
     await page.goto('/index.html?app=calendar7&year=2028&month=1',{waitUntil:'domcontentloaded'});await requested;
     if(loading==='data') {
       // Hidden initial controls can receive browser-restored values before handlers attach.
-      await page.evaluate(()=>{for(const [name,value] of Object.entries({orientation:"after",notation:"raw",speed:"4"})) document.querySelector(`[data-c7="${name}"]`).value=value;document.querySelector('[data-c7="slice"]').checked=false});
+      await page.evaluate(()=>{for(const [name,value] of Object.entries({orientation:"after",notation:"raw",speed:"500"})) document.querySelector(`[data-c7="${name}"]`).value=value;document.querySelector('[data-c7="slice"]').checked=false});
     } else {
       await page.locator('[data-c7="orientation"]').selectOption('after');
       await page.locator('[data-c7="notation"]').selectOption('raw');
       await page.locator('[data-c7="slice"]').uncheck();
-      await page.locator('[data-c7="speed"]').selectOption('4');
+      await page.locator('[data-c7="speed"]').selectOption('500');
     }
     release();await idle(page,'2028-01');
-    await expect(page.locator('[data-c7="speed"]')).toHaveValue('4');
+    await expect(page.locator('[data-c7="speed"]')).toHaveValue('500');
     await expect(page.locator('[data-c7="orientation"]')).toHaveValue('after');
     await expect(page.locator('[data-c7="notation"]')).toHaveValue('raw');
     await expect(page.locator('[data-c7="slice"]')).not.toBeChecked();

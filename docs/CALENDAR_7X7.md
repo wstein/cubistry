@@ -36,7 +36,7 @@ the next month.
   before it. A block (one or several layers of one axis, or the whole cube for `rot`) turns by the exponent
   of its moves as one animation; the engine's right-handed quarter turn is the right-handed rotation of the
   scene. The controls are **Play/Pause** (pauses after the move in flight), **Skip to end**,
-  **Speed** (0.5× to 8×, default 2×; nominal 90 ms per block at 1×, so 8× is about one frame per block when the display keeps up, otherwise it can equal 4×)
+  **Speed** (milliseconds per quarter turn: 100, 250, 500 ms or 1 s, default 250 ms)
   and the option **Middle slice counts as a move** (on by default, see below) and **Reset view**. Previous or
   Next during a step first brings the cube to the end of that step, then plays the new step.
   Under `prefers-reduced-motion: reduce` nothing animates: a step jumps to its end state and
@@ -130,7 +130,9 @@ Code: `src/apps/calendar7/blocks.ts` (pure).
   rotations not at all. *Block moves* counts one per non-rotation block. For the same step block moves never exceed layer moves;
   whole-cube rotations are counted separately and stay free, as today.
 - **Animation.** The player plays one block as ONE tween: every layer of the block turns together by the same angle in
-  the time of one move (90 ms at 1x, the speeds 0.5x to 8x are unchanged). The progress line counts actual animated nonrotation moves. Skip, Pause, Previous/Next during a step, reduced motion (a step jumps to its end state) and the digest check
+  the time of its turns. **Speed** is the time per quarter turn, the repository's Rotation Speed stops: 100 ms, 250 ms (default), 500 ms and 1 s.
+  A block lasts the speed times its quarter turns (a half turn takes twice as long, as in the cube viewer's "quarter-turn" duration unit). This holds for
+  single layers, wide blocks, the middle slice and whole-cube rotations (x, y, z, x2, y2, z2, wherever they sit), with the same easing. The progress line counts actual animated nonrotation moves. Skip, Pause, Previous/Next during a step, reduced motion (a step jumps to its end state) and the digest check
   at the end of every step are unchanged and work on blocks; `StateMismatchError` still stops the view.
 - **Not covered.** No change to the stored words, to the chain or to the metrics in the graph; no search for shorter
   words (merging only regroups what the stored word already contains); no merging across a rotation or across the middle layer (the next section lifts both limits as an opt-in).
@@ -180,7 +182,7 @@ arbitrarily reordered. The prefix uses only x/y turns (all 24 orientations need
 at most three); software tests check every stored edge in both directions and
 both slice settings, including inverse restoration. This is application
 equivalence testing, not a new research proof.
-Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the easing) and the player. This is mode F of the research
+Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the earlier soft-start easing, no longer used by the player) and the player. This is mode F of the research
 (`research/calendar-7x7/wide-blocks`, research pull request 346), where the equality of the three digests was verified.
 
 - **The played word has no whole-cube rotation.** A rotation R followed by a layer move m is the same as the conjugate move
@@ -203,10 +205,9 @@ Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the easing) and 
   half turn) or `Alignment: none`. At most two rotations are needed; the words are chosen deterministically (fewest rotations,
   then fewest quarter turns, then the order x, y, z with exponents +1, -1, 2).
 - **Animation.** The alignment is a rotation of the model (all bodies turn about their axis), not a camera move; the Smart
-  Rubber Band camera controller is untouched. It uses its soft start, the critically damped response
-  x(t) = x0 e^(-rt) (1 + rt + (rt)^2 / 2) with r = 9 per second, ending when less than 1 mrad is left (about 1.3 s for a quarter
-  turn at 1x; the speed setting scales the time). The cube viewer exports no pure function for it, so the formula is repeated in
-  `soft-start.ts` and a test compares the rate with `ROTATION_TUNING.returnRate`. Under reduced motion a step jumps and needs
+  Rubber Band camera controller is untouched. It is timed and eased exactly like a single-layer turn: the Speed setting times its quarter turns is
+  its duration and the view's smoothstep is its easing. The earlier soft start (critically damped response,
+  about 1.3 s for a quarter turn) is no longer used by the player; `soft-start.ts` stays as a tested helper. Under reduced motion a step jumps and needs
   no alignment; if the preference turns on while a step plays, the alignment takes 150 ms per rotation (up to 300 ms).
 - **Progress.** The free orientation is a separate prefix or suffix phase. Only
   nonrotation blocks contribute to the move count; skip and pause work in every phase.
@@ -303,10 +304,12 @@ globally; no date-dependent profile selection or second runtime data set exists.
 | [tests/calendar7-mode.test.mjs](../tests/calendar7-mode.test.mjs) | Registry entry, month choice, navigation bounds, move words and mount |
 | [tests/calendar7-blocks.test.mjs](../tests/calendar7-blocks.test.mjs) | Block moves: examples, property tests on random words (same state and digest, same multiset), identical digest for every stored edge in both directions, notation and counts on the page |
 | [tests/calendar7-slice.test.mjs](../tests/calendar7-slice.test.mjs) | Middle-slice blocks (rule c): examples, independent slab-turn and exact-minimum oracles, property tests on random words, identical digest for every stored edge both ways, counts of the research (91 historical roots from `tests/fixtures/calendar7-roots91.tsv`, 883 strict edges), negative controls, the player and the page |
+| [tests/calendar7-turn-timing.test.mjs](../tests/calendar7-turn-timing.test.mjs) | Speed stops (100/250/500/1000 ms per quarter turn), rotation turns equal layer turns in duration (speed x quarter turns) and easing in every orientation |
 | [tests/calendar7-deferral.test.mjs](../tests/calendar7-deferral.test.mjs) | Deferred rotations and the end alignment: properties, every stored edge both ways, search of the 24 orientations, mismatch, negative controls, soft start, player phases |
 | [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
 | [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, split-label geometry and drawing |
 | [tests/calendar7-stickerless.test.mjs](../tests/calendar7-stickerless.test.mjs) | Stickerless face art and scene on a hand-made layout fixture (`tests/calendar7-fixture.mjs`) |
+| [tests/calendar7-center.test.mjs](../tests/calendar7-center.test.mjs) | Strict 6 and 9: ink box centered on the sticker (also turned by a half turn); other labels and legacy unchanged |
 | [tests/calendar7-sheet-colors.test.mjs](../tests/calendar7-sheet-colors.test.mjs) | Month sheet palette: every ink on its cell at 4.5:1 in light and dark |
 | [tests/browser/calendar7-3d.spec.mjs](../tests/browser/calendar7-3d.spec.mjs) | The 3D view in a browser: pose digest, animated step, controls, 375 px |
 
@@ -373,6 +376,16 @@ mount passes it to `Calendar7Viewer.configure`. The shipped `state.v1.json` has 
 sticker print sheet is not affected. Tests: `tests/calendar7-stickerless.test.mjs` (pure drawing, geometry, scene) and
 `tests/browser/calendar7-stickerless.spec.mjs` (real viewer and Noto Sans), both on the hand-made fixture
 `tests/calendar7-fixture.mjs`.
+
+**Centered 6 and 9 (strict art).** The strict rule accepts a 6 shown as a 9 turned by a half turn, so the
+sticker is rotated by 180 degrees about its center and any ink offset from the center shows as twice that drift
+between the two readings. The single digits `6` and `9` are therefore drawn with an alphabetic baseline at the font
+size 140 px, placed from the real Noto Sans 600 ink extents so that the ink box is centered on the 192 px sticker,
+horizontally and vertically (`halfTurnDigitPlacement` in `sticker-art.ts`; before, the "middle" baseline put the ink
+center about 5 px above the center, so the two readings differed by about 10 px in height). Legacy, other digits,
+two-digit labels, letters and split labels keep their drawing. The unit test is
+`tests/calendar7-center.test.mjs`; `tests/browser/calendar7-center.spec.mjs` measures the real ink in Chromium
+(at most 0.5 px off the center, upright and turned). The sticker colors are the same in both page themes.
 
 **What is profile-gated.** `imageNormal` and `frontFailure` in `display.ts` take the profile as
 the last argument, and `drawSticker` in `sticker-art.ts` takes it as the fourth; the default is
