@@ -10,10 +10,13 @@ const host = () => ({
   docker: { driverVersion: expected.playwright, dockerImageName: expected.imageTag },
   chromiumRevision: expected.chromiumRevision, chromiumVersion: expected.chromiumVersion,
   executable: `/ms-playwright/chromium-${expected.chromiumRevision}/chrome-linux64/chrome`,
+  selectedBrowser: "chromium-headless-shell", selectedRevision: expected.chromiumRevision, selectedDescriptorVersion: expected.chromiumVersion,
+  selectedExecutable: `/ms-playwright/chromium_headless_shell-${expected.chromiumRevision}/chrome-headless-shell-linux64/chrome-headless-shell`,
+  selectedExecutableExists: true, selectedBinaryVersion: expected.runtimeVersion,
   executableExists: true, fonts: { ...expected.fonts },
 });
 const browser = () => ({
-  version: expected.chromiumVersion, renderer: "ANGLE (Google, Vulkan (SwiftShader Device))",
+  version: expected.runtimeVersion, renderer: "ANGLE (Google, Vulkan (SwiftShader Device))",
   timezone: "UTC", webglVersion: "WebGL 2.0", pixels: [21, 59, 97, 255],
   fontLoaded: true, textWidth: 420, launchArgs: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
 });
@@ -34,4 +37,14 @@ test("the browser probe requires actual SwiftShader, WebGL2, loaded font and exa
 });
 test("OS release fields are read without executing shell content", () => {
   assert.deepEqual(parseOsRelease('ID=ubuntu\nVERSION_ID="24.04"\nNAME="Ubuntu"\n'), { ID: "ubuntu", VERSION_ID: "24.04", NAME: "Ubuntu" });
+});
+
+test("the image runtime and both npm descriptors have separate exact identities", () => {
+  assert.equal(expected.runtimeVersion, "156.0.8078.80");
+  assert.equal(expected.chromiumVersion, "156.0.8078.4");
+  for (const [key, value] of Object.entries({ selectedBrowser: "chromium", selectedRevision: "1247", selectedDescriptorVersion: "156.0.8078.80", selectedExecutable: "/ms-playwright/chromium-1248/chrome-linux64/chrome", selectedExecutableExists: false, selectedBinaryVersion: "156.0.8078.4" })) {
+    assert.ok(validateHost({ ...host(), [key]: value }, expected).length > 0, key);
+  }
+  assert.ok(validateHost({ ...host(), chromiumVersion: "156.0.8078.80" }, expected).length > 0);
+  assert.ok(validateBrowser({ ...browser(), version: "156.0.8078.4" }, expected).length > 0);
 });
