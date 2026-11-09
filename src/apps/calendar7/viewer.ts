@@ -69,6 +69,8 @@ export class Calendar7Viewer implements StageView {
   private printing: Printing | null = null;
   private pose: Pose | null = null;
   private surface: Surface = "sticker";
+  /** A scheme was chosen during a move on a stickerless cube: the body color waits for the end of the move. */
+  private bodyStale = false;
   /** The color scheme of the labels (`setScheme`); the default scheme until one is chosen. */
   private scheme: ColorScheme = DEFAULT_SCHEME;
   /** One entry per distinct texture of the current build: redrawn in place when the scheme changes. */
@@ -141,7 +143,8 @@ export class Calendar7Viewer implements StageView {
   /**
    * Chooses the color scheme by id (an unknown id or null gives the default scheme; never throws). The textures of the
    * current cube are redrawn in place (no new canvas, texture or material, nothing to dispose); a stickerless cube is
-   * rebuilt instead while no move is turning, because its body color (the day fill) is fixed when the scene is built.
+   * rebuilt instead while no move is turning, because its body color (the day fill) is fixed when the scene is built;
+   * during a move only its textures are redrawn and the rebuild follows when the move ends.
    * A scheme chosen before `configure` is used by it. The same scheme again does nothing.
    */
   setScheme(id: string | null | undefined): void {
@@ -154,11 +157,18 @@ export class Calendar7Viewer implements StageView {
       this.configure(this.printing, this.pose, this.surface);
       return;
     }
+    if (this.surface === "face") this.bodyStale = true;
     for (const a of this.art) {
       this.draw(a.canvas, a.text, a.ink);
       a.texture.needsUpdate = true;
     }
     this.dirty = true;
+  }
+
+  /** Rebuilds a stickerless cube whose body color is stale; only between moves, with the pose the cube shows. */
+  private applyBodyColor(): void {
+    if (!this.bodyStale || this.tween.running || !this.printing || !this.pose || this.destroyed) return;
+    this.configure(this.printing, this.pose, this.surface);
   }
 
   private draw(canvas: HTMLCanvasElement, text: string, ink: string): void {
@@ -180,6 +190,7 @@ export class Calendar7Viewer implements StageView {
    */
   configure(printing: Printing, pose: Pose, surface: Surface = "sticker"): void {
     this.clear();
+    this.bodyStale = false;
     this.printing = printing;
     this.pose = pose;
     this.surface = surface;
@@ -230,7 +241,7 @@ export class Calendar7Viewer implements StageView {
     this.presentation.traverse((o) => {
       if (o.userData.stickerId !== undefined) (o as THREE.Mesh).castShadow = false;
     });
-    // The scene hides the sticker meshes and gives each cubie face the label texture (bodyColor PLASTIC stays for the cut faces).
+    // The scene hides the sticker meshes and gives each cubie face the label texture (the cut faces take bodyColor: the day fill when stickerless).
     this.cube.setConstruction(surface === "face" ? "stickerless" : "stickered");
     this.cube.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
     this.dirty = true;
@@ -290,6 +301,7 @@ export class Calendar7Viewer implements StageView {
         // Release the pivot and put every body at its final frame in the same tick: no frame shows the gap.
         turn.dispose();
         if (completed) this.sync(after);
+        this.applyBodyColor();
       },
       performance.now(),
       ease,
