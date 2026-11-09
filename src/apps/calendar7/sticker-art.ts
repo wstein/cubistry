@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
+import type { ColorScheme, SchemeLine } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
 
-/** Printed paper and the plastic body. Fixed in both page themes: the studio backdrop is light in both. */
+/**
+ * Printed paper and the plastic body. `PAPER`, `BLANK_PAPER` and `INK_COLORS` are the print look WITHOUT a scheme (what
+ * `drawSticker` draws when no scheme is passed); the viewer always passes a scheme (default Paper Red). Fixed in both page themes: the studio backdrop is light in both. */
 export const PAPER = "#fffdf6";
 export const BLANK_PAPER = "#d9d3c2";
 export const PLASTIC = "#23272e";
@@ -15,6 +18,54 @@ export const INK_COLORS: Readonly<Record<string, string>> = {
   weekday: "#2c4a6b",
 };
 export const TEXTURE = 192;
+
+/** The role of a tile, decided by its printed label and ink class only, never by where the tile sits (tiles move). */
+export type TileClass = "blank" | "day" | "weekend" | "weekday" | "sunsat" | "month";
+
+/** What a scheme gives one tile: ground, ink, ink of the small number of a split label, and the bottom line. */
+export interface TileRoles {
+  readonly cls: TileClass;
+  readonly fill: string;
+  readonly ink: string;
+  readonly inkSmall: string;
+  readonly line: SchemeLine | null;
+}
+
+/** Texture pixels per scheme line pixel: scheme widths are pixels of a sheet tile of about 48 px, the texture is 192 px. */
+export const LINE_SCALE = 4;
+
+/**
+ * Class of a tile from its label and ink. The ink classes are the print's: dark = weekday digits, red = weekend digits
+ * and the labels SUN and SAT, weekday = MON..FRI, month = month letters, blank = no text.
+ */
+export function tileClass(text: string, ink: string): TileClass {
+  if (text === "") return "blank";
+  if (ink === "month") return "month";
+  if (ink === "weekday") return "weekday";
+  if (ink === "red") return text === "SUN" || text === "SAT" ? "sunsat" : "weekend";
+  return "day";
+}
+
+/**
+ * Fill and inks of a tile in a scheme. The grounds are the ones tests/calendar7-schemes.test.mjs gates the inks on:
+ * weekend digits sit on weekendFill or weekendTint, SUN/SAT on weekdayRowFill, else the weekend ground, month letters on
+ * bandFill or dayFill. A blank tile is emptyFill: the print has one blank class, so it cannot join a band (see
+ * docs/CALENDAR_7X7.md). The line under the weekday row (lineRow2) is drawn on the weekday-name tiles; lineRow1 is not
+ * applied (it needs band tiles).
+ */
+export function tileRoles(scheme: ColorScheme, text: string, ink: string): TileRoles {
+  const cls = tileClass(text, ink);
+  const weekend = scheme.weekendFill ?? scheme.weekendTint ?? scheme.dayFill;
+  const roles = (fill: string, color: string, small = color, line: SchemeLine | null = null): TileRoles => ({ cls, fill, ink: color, inkSmall: small, line });
+  switch (cls) {
+    case "blank": return roles(scheme.emptyFill, scheme.dayInk);
+    case "day": return roles(scheme.dayFill, scheme.dayInk);
+    case "weekday": return roles(scheme.weekdayRowFill ?? scheme.dayFill, scheme.weekdayInk, scheme.weekdayInk, scheme.lineRow2);
+    case "sunsat": return roles(scheme.weekdayRowFill ?? weekend, scheme.sunSatInk, scheme.sunSatInk, scheme.lineRow2);
+    case "weekend": return roles(weekend, scheme.weekendInk, scheme.weekendInkSmall);
+    case "month": return roles(scheme.bandFill ?? scheme.dayFill, scheme.monthInk);
+  }
+}
 /** The text square: the part of the sticker the text may use (the legacy fit uses the same 86%). */
 export const TEXT_SQUARE = TEXTURE * 0.86;
 /** Noto Sans metrics in em (research glyph-geometry.tsv): digit ink height and digit advance. */
@@ -115,39 +166,55 @@ type Context = Pick<
   "fillStyle" | "fillRect" | "fillText" | "font" | "measureText" | "textAlign" | "textBaseline"
 >;
 
-/** Draws one sticker: paper, then the text centered and fitted into the sticker. Blank text is plain blank paper. */
+/**
+ * Draws one sticker: paper, then the text centered and fitted into the sticker. Blank text is plain blank paper.
+ * Without `scheme` the print look (`PAPER`, `BLANK_PAPER`, `INK_COLORS`) is drawn; with one, `tileRoles` gives the fill,
+ * the inks and the weekday-row line (a bottom edge line on the sticker).
+ */
 export function drawSticker(
   ctx: Context,
   text: string,
   ink: string,
   profile: RuleProfile = DEFAULT_RULE_PROFILE,
+  scheme?: ColorScheme,
 ): void {
-  ctx.fillStyle = text === "" ? BLANK_PAPER : PAPER;
+  paintSticker(ctx, text, ink, profile, scheme ? tileRoles(scheme, text, ink) : null, true);
+}
+
+function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean): void {
+  ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
   ctx.fillRect(0, 0, TEXTURE, TEXTURE);
   if (text === "") return;
-  ctx.fillStyle = INK_COLORS[ink] ?? INK_COLORS.dark;
+  const big = roles ? roles.ink : (INK_COLORS[ink] ?? INK_COLORS.dark);
+  ctx.fillStyle = big;
   if (profile === "strict" && isSplitLabel(text)) {
     ctx.textBaseline = "alphabetic";
     const l = splitLayout(text);
     for (const p of [l.first, l.second]) {
       ctx.font = `600 ${p.size}px ${FONT}`;
       ctx.textAlign = p.align;
+      if (roles) ctx.fillStyle = p === l.first ? roles.ink : roles.inkSmall;
       ctx.fillText(p.text, p.x, p.baseline);
     }
-    return;
+  } else {
+    ctx.textAlign = "center";
+    const exact = isHalfTurnDigit(text, profile);
+    ctx.textBaseline = exact ? "alphabetic" : "middle";
+    const base = baseFontSize(text.length);
+    ctx.font = `600 ${base}px ${FONT}`;
+    const width = ctx.measureText(text).width;
+    const size = Math.floor(Math.min(base, (base * TEXTURE * 0.86) / Math.max(width, 1)));
+    ctx.font = `600 ${size}px ${FONT}`;
+    if (exact) {
+      const at = halfTurnDigitPlacement(text, size);
+      ctx.fillText(text, at.x, at.baseline);
+    } else ctx.fillText(text, TEXTURE / 2, TEXTURE / 2 + size * 0.04);
   }
-  ctx.textAlign = "center";
-  const exact = isHalfTurnDigit(text, profile);
-  ctx.textBaseline = exact ? "alphabetic" : "middle";
-  const base = baseFontSize(text.length);
-  ctx.font = `600 ${base}px ${FONT}`;
-  const width = ctx.measureText(text).width;
-  const size = Math.floor(Math.min(base, (base * TEXTURE * 0.86) / Math.max(width, 1)));
-  ctx.font = `600 ${size}px ${FONT}`;
-  if (exact) {
-    const at = halfTurnDigitPlacement(text, size);
-    ctx.fillText(text, at.x, at.baseline);
-  } else ctx.fillText(text, TEXTURE / 2, TEXTURE / 2 + size * 0.04);
+  if (roles?.line && edgeLine) {
+    const h = roles.line.px * LINE_SCALE;
+    ctx.fillStyle = roles.line.color;
+    ctx.fillRect(0, TEXTURE - h, TEXTURE, h);
+  }
 }
 
 /**
@@ -175,20 +242,31 @@ export type Surface = "sticker" | "face";
 
 type FaceContext = Context & Pick<CanvasRenderingContext2D, "save" | "restore" | "translate" | "scale">;
 
-/** Draws one cubie face: paper on the whole texture, then the sticker label scaled about the center by `FACE_SCALE`. */
+/**
+ * Draws one cubie face: the ground on the whole texture, then the sticker label scaled about the center by `FACE_SCALE`.
+ * With a `scheme` the weekday-row line sits on the bottom edge of the flat face, not of the scaled sticker square.
+ */
 export function drawFace(
   ctx: FaceContext,
   text: string,
   ink: string,
   profile: RuleProfile = DEFAULT_RULE_PROFILE,
+  scheme?: ColorScheme,
 ): void {
-  ctx.fillStyle = text === "" ? BLANK_PAPER : PAPER;
+  const roles = scheme ? tileRoles(scheme, text, ink) : null;
+  ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
   ctx.fillRect(0, 0, TEXTURE, TEXTURE);
   ctx.save();
   ctx.translate(TEXTURE / 2, TEXTURE / 2);
   ctx.scale(FACE_SCALE, FACE_SCALE);
   ctx.translate(-TEXTURE / 2, -TEXTURE / 2);
-  // drawSticker paints the same paper again over the scaled square (same color), then the label.
-  drawSticker(ctx, text, ink, profile);
+  // paintSticker paints the same ground again over the scaled square (same color), then the label.
+  paintSticker(ctx, text, ink, profile, roles, false);
   ctx.restore();
+  if (roles?.line) {
+    const h = roles.line.px * LINE_SCALE;
+    const edge = TEXTURE * ((1 + FACE_FLAT) / 2);
+    ctx.fillStyle = roles.line.color;
+    ctx.fillRect(TEXTURE * ((1 - FACE_FLAT) / 2), edge - h, TEXTURE * FACE_FLAT, h);
+  }
 }
