@@ -88,10 +88,13 @@ Each highlighted expansion group plays together as one block.
 During a step, its original source and destination stay in the active word panel,
 even though the sheet already names the target month. Preview words are hidden
 while that panel is active. The current group is outlined, completed groups use
-secondary ink, and following scrolls only the bounded word box. Focus and page
-scroll remain in place. Changing notation during playback applies to the next
-step so the active mapping stays fixed. Skip, replacement navigation and failure
-clear the retired highlight.
+secondary ink, and following scrolls only the bounded word box. Navigation first
+fits the cube and controls into the studio scrollport and focuses the active
+heading without another scroll. Subsequent move following preserves ancestor
+scroll positions and keyboard focus. Changing notation during playback applies
+to the next step so the active mapping stays fixed. Settings selected while the
+viewer loads are retained. Skip, replacement navigation and failure clear the
+retired highlight.
 
 ## Block moves (wide and inner-wide)
 

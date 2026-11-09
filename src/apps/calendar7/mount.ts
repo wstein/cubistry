@@ -3,6 +3,7 @@
 import { DEFAULT_WORD_OPTIONS, expansionNote, markProgress, notationForBlocks, notationHtml, notationLabel, orientationLabel, type Notation, type NotationPlan, type WordOptions } from "./notation.ts";
 import type { Block } from "./blocks.ts";
 import type { RotationPlacement } from "./deferral.ts";
+import { revealPlayback, resetPlaybackVisibility } from "./playback-visibility.ts";
 import type { ModeInstance } from "../registry.ts";
 import { parseDisplays, parseGraph, parseState } from "./graph.ts";
 import { type Pose, type Printing, stateDigest } from "./engine.ts";
@@ -18,7 +19,7 @@ import {
   type YearMonth,
   type PageModel,
 } from "./month-view.ts";
-import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, type PlayerSnapshot, type StageView } from "./player.ts";
+import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnapshot, type StageView } from "./player.ts";
 
 /** The 3D scene the mount drives (src/apps/calendar7/viewer.ts; a fake in the tests). */
 export interface Stage extends StageView {
@@ -85,7 +86,20 @@ export async function mountCalendar7(
   let previous: PlayerSnapshot | null = null;
   let wordOptions: WordOptions = { ...DEFAULT_WORD_OPTIONS };
   let currentModel: PageModel | null = null;
+  let selectedSpeed: number = DEFAULT_SPEED;
+  let focusPlayback = false;
+  let resizeObserver: ResizeObserver | null = null;
   let activeWord: { blocks: readonly Block[]; plan: NotationPlan; notation: Notation } | null = null;
+  // Browser/autofill selections can exist before data and event handlers finish loading.
+  const initialOrientation = (q("orientation") as HTMLSelectElement | null)?.value;
+  const initialNotation = (q("notation") as HTMLSelectElement | null)?.value;
+  wordOptions = {
+    orientation: ["before", "after", "stored"].includes(initialOrientation ?? "") ? initialOrientation as RotationPlacement : DEFAULT_WORD_OPTIONS.orientation,
+    notation: ["blocks", "layers", "raw"].includes(initialNotation ?? "") ? initialNotation as Notation : DEFAULT_WORD_OPTIONS.notation,
+    slice: (q("slice") as HTMLInputElement | null)?.checked ?? DEFAULT_SLICE,
+  };
+  const initialSpeed = Number((q("speed") as HTMLSelectElement | null)?.value);
+  if (SPEEDS.includes(initialSpeed as typeof SPEEDS[number])) selectedSpeed = initialSpeed;
   const reduced = (): boolean => env.reducedMotion?.() ?? false;
   /** After a failed check the 3D view stays stopped until the page is reloaded. */
   let failed = false;
@@ -98,6 +112,8 @@ export async function mountCalendar7(
 
   const fail = (error: Error): void => {
     failed = true;
+    resizeObserver?.disconnect();
+    if (sceneHost && typeof sceneHost.closest === "function") resetPlaybackVisibility(sceneHost, q("active-word"));
     const activeBox = q("active-word");
     if (activeBox) activeBox.innerHTML = "";
     const activePanel = q("active-step");
@@ -122,6 +138,7 @@ export async function mountCalendar7(
   };
 
   const render = (snap: PlayerSnapshot): void => {
+    if (snap.index < 0) return; // Settings may change before the first pose is installed.
     if (failed) return;
     root.setAttribute("data-c7-phase", snap.phase);
     const playing = snap.status === "playing";
@@ -144,6 +161,7 @@ export async function mountCalendar7(
     const target = graph.nodes[snap.index];
     const progress = q("progress");
     const panel = q("active-step");
+    const hadPlaybackFocus = Boolean(panel?.contains?.(root.ownerDocument?.activeElement ?? null));
     const wordBox = q("active-word");
     if (panel) panel.hidden = !active;
     if (active && player && target) {
@@ -177,6 +195,17 @@ export async function mountCalendar7(
       alignment.textContent = player ? orientationLabel(player.stepAlignment, snap.orientation) : "";
     }
     view.querySelectorAll?.(".c7-word-panel").forEach((el) => ((el as HTMLElement).hidden = active));
+    if (active && player && sceneHost && focusPlayback) {
+      const controls = q("player"), box = q("active-word");
+      if (controls && box && typeof sceneHost.getBoundingClientRect === "function") revealPlayback(sceneHost, controls, box);
+      q("active-title")?.focus({ preventScroll: true });
+      focusPlayback = false;
+    } else if (!active && sceneHost) {
+      if (typeof sceneHost.closest === "function") resetPlaybackVisibility(sceneHost, q("active-word"));
+      if (hadPlaybackFocus) (view.querySelector("[data-focus]") as HTMLElement | null)?.focus({ preventScroll: true });
+      if (snap.index === wanted) focusPlayback = false;
+    }
+    setInactive(q("reset"), !player);
     if (target) stage?.setLabel(`7x7 calendar cube showing ${monthLabel(target)}`);
     if (!active && player) {
       root.setAttribute("data-c7-state", "idle");
@@ -200,6 +229,10 @@ export async function mountCalendar7(
         made.destroy();
         return;
       }
+      if (failed) {
+        made.destroy();
+        return;
+      }
       stage = made;
       const s = start as NonNullable<typeof start>;
       made.configure(s.printing, s.pose);
@@ -211,9 +244,19 @@ export async function mountCalendar7(
         reducedMotion: reduced,
         onChange: render,
         onError: fail,
-        slice: (q("slice") as HTMLInputElement | null)?.checked ?? DEFAULT_SLICE,
+        slice: wordOptions.slice,
         orientation: wordOptions.orientation,
       });
+      player.setSpeed(selectedSpeed);
+      const port = host.closest?.(".shell-stage");
+      if (port && typeof ResizeObserver !== "undefined") {
+        resizeObserver = new ResizeObserver(() => {
+          if (!alive() || failed || player?.snapshot.phase === "idle") return;
+          const controls = q("player"), box = q("active-word");
+          if (controls && box) revealPlayback(host, controls, box);
+        });
+        resizeObserver.observe(port);
+      }
     })();
     return pending;
   };
@@ -232,6 +275,7 @@ export async function mountCalendar7(
     try {
       await ensure();
       if (!alive()) return;
+      if (failed) return;
       if (wanted === null || !player) return;
       player.go(wanted);
     } catch (error) {
@@ -246,6 +290,7 @@ export async function mountCalendar7(
     view.querySelectorAll?.(".c7-word-panel").forEach((el) => ((el as HTMLElement).hidden = Boolean(active)));
   };
   const show = (p: URLSearchParams, moveFocus: boolean): void => {
+    focusPlayback = moveFocus;
     const choice = chooseMonth(p, today, range);
     const model = buildModel(graph, table, choice, today);
     currentModel = model;
@@ -278,31 +323,37 @@ export async function mountCalendar7(
 
   const onControl = (e: Event): void => {
     const el = (e.target as Element | null)?.closest?.("[data-c7]") as HTMLElement | null;
-    if (!el || !root.contains(el) || !player || failed) return;
+    if (!el || !root.contains(el) || !alive() || failed) return;
     if (el.getAttribute("aria-disabled") === "true") return;
     try {
       switch (el.getAttribute("data-c7")) {
         case "play":
-          if (player.snapshot.status === "playing") player.pause();
-          else player.play();
+          if (player?.snapshot.status === "playing") player.pause();
+          else player?.play();
           break;
         case "skip":
-          player.skip();
+          player?.skip();
           break;
         case "reset":
           stage?.resetView();
           break;
         case "speed":
-          player.setSpeed(Number((el as HTMLSelectElement).value));
+          selectedSpeed = Number((el as HTMLSelectElement).value);
+          if (!SPEEDS.includes(selectedSpeed as typeof SPEEDS[number])) throw new RangeError("unknown speed");
+          player?.setSpeed(selectedSpeed);
           break;
         case "slice":
           wordOptions = { ...wordOptions, slice: (el as HTMLInputElement).checked };
-          player.setSlice(wordOptions.slice);
+          player?.setSlice(wordOptions.slice);
           refreshPreviews();
           break;
         case "orientation":
-          wordOptions = { ...wordOptions, orientation: (el as HTMLSelectElement).value as RotationPlacement };
-          player.setOrientation(wordOptions.orientation);
+          {
+            const value = (el as HTMLSelectElement).value;
+            if (!["before", "after", "stored"].includes(value)) throw new RangeError("unknown orientation");
+            wordOptions = { ...wordOptions, orientation: value as RotationPlacement };
+          }
+          player?.setOrientation(wordOptions.orientation);
           refreshPreviews();
           break;
         case "notation": {
@@ -330,6 +381,8 @@ export async function mountCalendar7(
         root.removeEventListener("click", onControl);
         root.removeEventListener("change", onControl);
       }
+      resizeObserver?.disconnect();
+      if (sceneHost?.closest) resetPlaybackVisibility(sceneHost, q("active-word"));
       player?.dispose();
       stage?.destroy();
       if (sceneHost) sceneHost.hidden = false;
