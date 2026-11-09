@@ -752,6 +752,7 @@ test("a failed lettering change keeps the URL and print link, and a successful r
     await route.fulfill({ response, body: (await response.text()) + " " });
   });
   await clockReady(page, "&lettering=words-pascal");
+  await page.setViewportSize({ width: 390, height: 844 });
   const beforeUrl = page.url();
   const beforePrint = await page.locator("#print-stickers").getAttribute("href");
   const row = page.locator('.shell-alert-row[data-kind="error"]');
@@ -767,7 +768,18 @@ test("a failed lettering change keeps the URL and print link, and a successful r
     await expect(page.locator("#print-stickers")).toHaveAttribute("href", beforePrint);
     expect(await page.evaluate(() => localStorage.getItem("cubistry_lettering"))).toBe("words-pascal");
     if (attempt === 0) {
-      await row.getByRole("button", { name: "Dismiss error" }).click();
+      const dismiss = row.getByRole("button", { name: "Dismiss error" });
+      const target = await dismiss.boundingBox();
+      expect(target.width).toBeGreaterThanOrEqual(44);
+      expect(target.height).toBeGreaterThanOrEqual(44);
+      expect(target.y).toBeGreaterThanOrEqual(0);
+      expect(target.y + target.height).toBeLessThanOrEqual(844);
+      expect(await page.locator("html").evaluate((element) => element.scrollWidth)).toBeLessThanOrEqual(390);
+      expect(await dismiss.evaluate((button) => {
+        const box = button.getBoundingClientRect();
+        return document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2) === button;
+      })).toBe(true);
+      await dismiss.click();
       await expect(row).toHaveCount(0);
     }
   }
