@@ -142,19 +142,19 @@
   top: 0;
   inset: 0 auto auto 0;
   width: 100%;
-  height: clamp(240px, 46vh, 520px);
+  height: var(--c7-playback-scene-height, clamp(240px, 46vh, 520px));
   flex: none;
   z-index: 3;
 }
 /* A focused control scrolled into view must not end up behind the pinned cube (WCAG 2.4.11): same height as the scene. */
 .chronocube-page .shell .shell-stage:has(.c7-root) {
-  scroll-padding-top: clamp(240px, 46vh, 520px);
+  scroll-padding-top: var(--c7-playback-scene-height, clamp(240px, 46vh, 520px));
 }
 /* Narrow or short stage (the shell gives it little height): the cube scrolls with the page instead of pinning. */
 @media (max-width: 699px), (max-height: 640px) {
   .chronocube-page .shell .shell-stage:has(.c7-root) #studio-scene {
     position: relative;
-    height: clamp(220px, 70vw, 320px);
+    height: var(--c7-playback-scene-height, clamp(220px, 70vw, 320px));
   }
   .chronocube-page .shell .shell-stage:has(.c7-root) {
     scroll-padding-top: 0;
@@ -248,7 +248,7 @@
 .c7-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 .c7-step { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
 .c7-step h3 { margin: 0 0 4px; font-size: 1rem; }
-/* A word is shown in full: tokens never break inside (.c7-tok), the line wraps between tokens, the box grows. */
+/* Tokens never break inside (.c7-tok); lines wrap inside a bounded, vertically scrollable word box. */
 .c7-word { margin: 6px 0 0; overflow-wrap: break-word; font-family: var(--f-num); font-size: 0.8rem; line-height: 1.6; }
 .c7-tok { white-space: nowrap; }
 .c7-step summary { min-height: 24px; cursor: pointer; }
@@ -297,3 +297,5 @@
 .c7-word-note, .c7-orientation { margin: 4px 0; color: var(--ink-2); font-size: 0.8rem; }
 .c7-step-summary { font-variant-numeric: tabular-nums; }
 .c7-technical { margin-top: 8px; font-size: 0.8rem; }
+
+.c7-active-step h3:focus { outline: 2px solid var(--focus); outline-offset: 2px; }

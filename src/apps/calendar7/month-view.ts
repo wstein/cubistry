@@ -236,12 +236,12 @@ export function playerHtml(defaultSpeed: number): string {
     `<label class="c7-slice"><input type="checkbox" data-c7="slice" checked> Middle slice counts as a move</label>` +
     '<label class="c7-orientation-select">Orientation <select data-c7="orientation"><option value="before" selected>Before moves</option><option value="after">After moves</option><option value="stored">Stored rotations</option></select></label>' +
     '<label class="c7-notation-select">Notation <select data-c7="notation"><option value="blocks" selected>Blocks</option><option value="layers">Layer moves (equivalent)</option><option value="raw">Raw generators (equivalent)</option></select></label>' +
-    '<button type="button" class="c7-btn" data-c7="reset">Reset view</button>' +
+    '<button type="button" class="c7-btn" data-c7="reset" aria-disabled="true">Reset view</button>' +
     "</div>" +
     '<p class="c7-word-note">Orientation, middle-slice and notation changes apply to the next step.</p>' +
     '<p class="c7-progress" data-c7="progress"></p>' +
     '<p class="c7-alignment" data-c7="alignment"></p>' +
-    '<section class="c7-active-step" data-c7="active-step" hidden><h3 data-c7="active-title"></h3><p class="c7-word-note" data-c7="active-note"></p><p class="c7-word" data-c7="active-word"></p></section>' +
+    '<section class="c7-active-step" data-c7="active-step" hidden><h3 data-c7="active-title" tabindex="-1"></h3><p class="c7-word-note" data-c7="active-note"></p><p class="c7-word" data-c7="active-word"></p></section>' +
     '<p class="c7-note" data-c7="note" hidden>Reduced motion is on: a step jumps straight to the end state, without animation.</p>' +
     '<p class="c7-error" data-c7="error" role="alert" hidden></p>' +
     '<div class="c7-rotation" data-c7="rotation"></div>' +
