@@ -27,8 +27,8 @@ the next month.
   [the middle slice](#middle-slice-blocks-rule-c), a display layer only).
 - **The 3D view (stage 2).** The studio scene shows the cube with its 218 surface bodies
   and 294 stickers in the pose of the displayed month. A sticker shows the text and ink
-  of the print (`state.v1.json`), so the stickers read as printed (the print uses the digits
-  `1` and `0` where the sheet shows `I` and `O`, for example `FR1`). The cube sits slightly turned
+  of the strict print (`state.v1.json`), including the letters `MON` and `FRI`.
+  Letters and digits are distinct; `I` is not `1` and `O` is not `0`. The cube sits slightly turned
   so that three faces show; drag it, or use the Rotation selector and Reset view, to look
   around. The month sheet below stays the reference for what the front face must show.
 - **The animated step.** Choosing the previous or next month plays the stored move word
@@ -49,7 +49,7 @@ the next month.
   (with `data-c7-month` and `data-c7-state`); the browser test compares it with the graph.
 - **Not in this stage:** no solver, no jump to a non-adjacent month (a jump would
   walk the chain, up to tens of thousands of moves; a month given in the URL is shown at once
-  by replaying the stored edges from the chain root), no route from a solved cube, no
+  by replaying the stored edges from the chain root), no setup tutorial from a solved cube, no
   sticker sheet. The page says so. The status stays **research candidate, not certified**.
 - Code: `src/apps/calendar7/month-view.ts` (pure), `player.ts` (step state machine, no DOM),
   `tween.ts` (one timed move), `sticker-art.ts` (paper, inks, text fitting), `viewer.ts` (the
@@ -66,10 +66,10 @@ the next month.
 
 ## Block moves (wide and inner-wide)
 
-**Display layer only.** The stored data (`graph.v1.json`, generators 1 to 21, three exponents)
-and the legacy behavior are unchanged: a word is still a sequence of single-layer moves and
-rotations, the digest check after a step is unchanged, and `calendar7-source.json` is
-untouched. The page regroups the word of a step into **blocks** for the notation and the animation.
+**Display layer only.** Block grouping reads the stored data (`graph.v1.json`,
+generators 1 to 21, three exponents) without modifying it or its source pin. A word
+is a sequence of single-layer moves and rotations. The page regroups it into
+**blocks** for notation and animation; the end-of-step digest check still applies.
 Code: `src/apps/calendar7/blocks.ts` (pure).
 
 - **Why it is safe.** Moves about one axis commute (they turn disjoint layers about the same
@@ -192,9 +192,11 @@ Research branch (`research/calendar-7x7/pure-split-states`):
   to 4 for October to December;
 - 243 stickers are printed and 51 are blank.
 
-The checkers behind it (Julia `pure_chain.jl` and a Flix port) share the front rule
-and a structural port of the same logic. No independent review of the 91 display
-states exists yet. This is why the status stays "research candidate, not certified".
+The joined chain is accepted by Julia `pure_chain.jl`, the Flix chain checker,
+and the separately implemented Julia `upright-beam/verify_chain.jl`. These checks
+replay all 883 edges against physical sticker states and calendar fronts. The
+status remains "research candidate, not certified": this is retained-state replay
+evidence, not a physical build certification or a claim of shortest routes.
 
 ## Domain: what is covered and what is not
 
@@ -251,7 +253,7 @@ globally; no date-dependent profile selection or second runtime data set exists.
 | File | Content |
 | --- | --- |
 | [calendar7-source.json](../calendar7-source.json) | The pin: research commit, SHA-256 of every research file, Julia export and runtime file, provenance |
-| `data/calendar7/research/` | Byte copies of the pinned research print, chain and Julia receipt |
+| `data/calendar7/research/strict/` | Original pinned research/artifact inputs, the derived joined chain and its three replay receipts |
 | `data/calendar7/julia/` | Output of [scripts/calendar7/export-julia.jl](../scripts/calendar7/export-julia.jl): root pose snapshot and display sheets |
 | `public/calendar7/state.v1.json` | The printing (piece, text, ink) and the root pose of each sticker |
 | `public/calendar7/graph.v1.json` | Route graph: 884 nodes (state hash, display, month) and 883 edges (move words) |
