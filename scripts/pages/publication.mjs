@@ -7,7 +7,7 @@ const integer = value => Number.isSafeInteger(value) && value > 0;
 export function parsePublication(text) {
   if (Buffer.byteLength(text) > 32768) throw Error('Publication receipt exceeds budget');
   const value = JSON.parse(text);
-  if (!value || Object.keys(value).sort().join(',') !== 'attempt,nonce,run,schema,sha,storage,tracked' || value.schema !== 1 || !integer(value.run) || !integer(value.attempt) || !hash(value.sha) || !hash(value.storage) || !/^[a-f0-9]{32}$/.test(value.nonce) || !Array.isArray(value.tracked) || value.tracked.length > 200 || value.tracked.some(x => !integer(x)) || new Set(value.tracked).size !== value.tracked.length) throw Error('Invalid publication receipt');
+  if (!value || Object.keys(value).sort().join(',') !== 'attempt,nonce,run,schema,sha,storage,tracked' || value.schema !== 1 || !integer(value.run) || !integer(value.attempt) || !hash(value.sha) || !hash(value.storage) || !/^[a-f0-9]{32}$/.test(value.nonce) || !Array.isArray(value.tracked) || value.tracked.length > 400 || value.tracked.some(x => !integer(x)) || new Set(value.tracked).size !== value.tracked.length) throw Error('Invalid publication receipt');
   return value;
 }
 export function samePublication(a, b) {
