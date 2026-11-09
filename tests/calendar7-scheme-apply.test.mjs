@@ -90,6 +90,16 @@ for (const scheme of SCHEMES) {
     }
   });
 
+  test(`${scheme.id}: folded labels sit on the weekend ground, like other weekend digits`, () => {
+    for (const text of ["23/30", "24/31"]) {
+      for (const draw of [(c) => drawSticker(c, text, "red", "strict", scheme), (c) => drawFace(c, text, "red", "strict", scheme)]) {
+        assert.deepEqual(record(draw)[0], ["fillStyle", scheme.weekendFill ?? scheme.weekendTint], `${text} ground`);
+      }
+      // A folded label on a weekday tile (dark ink) sits on the day ground.
+      assert.deepEqual(record((c) => drawSticker(c, text, "dark", "strict", scheme))[0], ["fillStyle", scheme.dayFill], `${text} weekday ground`);
+    }
+  });
+
   test(`${scheme.id}: the weekday-row line is drawn on weekday-name tiles only, lineRow1 never`, () => {
     for (const [cls, [text, ink]] of Object.entries(TILES)) {
       const names = cls === "weekday" || cls === "sun" || cls === "sat";

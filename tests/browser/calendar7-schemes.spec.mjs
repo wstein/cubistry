@@ -84,8 +84,22 @@ test("the viewer draws the grounds, inks and weekday line of the chosen scheme, 
     viewer.setScheme("dracula");
     const bodyDracula = bare();
     const stickerBody = (() => { viewer.configure(printing, pose, "sticker"); return viewer.currentScheme.id; })();
+    // Sticker cube: the frame between the stickers (shown plastic and cut-face body color) stays the dark plastic under a light and a dark scheme.
+    const frame = () => {
+      const colors = new Set();
+      viewer.presentation.traverse((o) => {
+        if (o.userData.sourceFaceStickerIds && !Array.isArray(o.material)) colors.add("#" + o.material.color.getHexString());
+      });
+      // The shown frame is the plastic; the cut-face materials the scene keeps for the stickerless mode carry the body color.
+      for (const { stickerless } of viewer.cube.shells.values()) for (const m of stickerless) if (!m.map) colors.add("#" + m.color.getHexString());
+      return [...colors].sort();
+    };
+    viewer.setScheme("paper-blue");
+    const frameLight = frame();
+    viewer.setScheme("dracula");
+    const frameDark = frame();
     viewer.destroy();
-    return { bodyRed, bodyDracula, stickerBody, uploads, missing, red, blue, drac, rt, unknown, nullId, before, after };
+    return { frameLight, frameDark, bodyRed, bodyDracula, stickerBody, uploads, missing, red, blue, drac, rt, unknown, nullId, before, after };
   });
   expect(errors).toEqual([]);
   expect(r.missing).toEqual([]);
@@ -127,8 +141,50 @@ test("the viewer draws the grounds, inks and weekday line of the chosen scheme, 
   expect(r.bodyRed).toEqual(["#ffffff"]);
   expect(r.bodyDracula).toEqual(["#282a36"]);
   expect(r.stickerBody).toBe("dracula");
+  expect(r.frameLight).toEqual(["#23272e"]);
+  expect(r.frameDark).toEqual(["#23272e"]);
   expect(r.unknown).toBe("paper-red");
   expect(r.nullId).toBe("paper-red");
+});
+
+test("stickerless: a scheme chosen during a move reaches the body when the move ends", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
+  page.on("console", (m) => m.type() === "error" && errors.push(`console.error: ${m.text()}`));
+  await page.goto("/licenses.html");
+  const r = await page.evaluate(async () => {
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { layoutFixture } = await import("/tests/calendar7-fixture.mjs");
+    const { printing, pose } = layoutFixture();
+    const host = document.createElement("div");
+    host.style.cssText = "width:480px;height:480px;position:fixed;left:0;top:0";
+    document.body.append(host);
+    const panel = document.createElement("div");
+    document.body.append(panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    viewer.configure(printing, pose, "face");
+    const bare = () => {
+      const colors = new Set();
+      viewer.presentation.traverse((o) => {
+        if (!o.userData.sourceFaceStickerIds || !Array.isArray(o.material)) return;
+        for (const m of o.material) if (!m.map) colors.add("#" + m.color.getHexString());
+      });
+      return [...colors].sort();
+    };
+    const first = bare();
+    const done = viewer.turn({ axis: 2, lo: 3, hi: 3, angle: 1, kind: "layer" }, pose, 60);
+    viewer.setScheme("dracula"); // the move is running
+    await done;
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const after = bare();
+    const id = viewer.currentScheme.id;
+    viewer.destroy();
+    return { first, after, id };
+  });
+  expect(errors).toEqual([]);
+  expect(r.first).toEqual(["#ffffff"]);
+  expect(r.id).toBe("dracula");
+  expect(r.after).toEqual(["#282a36"]);
 });
 
 for (const [query, id] of [["", "paper-red"], ["&scheme=paper-blue", "paper-blue"], ["&scheme=dracula", "dracula"], ["&scheme=nope", "paper-red"]]) {
