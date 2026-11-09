@@ -1,0 +1,292 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+/**
+ * Color schemes of the Calendar7 month sheet as plain role tokens. Data only: no DOM, no rendering, not yet applied to
+ * the 3D view. Saturday and Sunday are styled identically in every scheme, so there is one weekend token set and one
+ * SUN/SAT label ink, never separate Saturday and Sunday fields.
+ *
+ * Roles (all colors are lowercase #rrggbb):
+ * - dayFill: tile fill of an ordinary day (the body of the sheet).
+ * - dayInk: numerals of Monday to Friday dates.
+ * - weekdayInk: the labels MON to FRI.
+ * - weekendFill: tile fill of a weekend date (null when the scheme uses a tint instead).
+ * - weekendInk: weekend numerals, on weekendFill or on weekendTint.
+ * - weekendTint: light tint behind weekend numerals in the paper schemes (null otherwise).
+ * - bandFill: fill of the month name band (null in line style).
+ * - monthInk: ink of the month name, on bandFill or on dayFill.
+ * - weekdayRowFill: fill of the weekday label row (null when it follows the day or weekend fill).
+ * - emptyFill: fill of a day outside the month.
+ * - seam: seam between tiles.
+ * - lineRow1: line under the month name row (color and width in px), or null.
+ * - lineRow2: line under the weekday label row, or null.
+ * - sunSatInk: ink of the SUN and SAT labels.
+ */
+export interface SchemeLine {
+  readonly color: string;
+  readonly px: number;
+}
+
+export interface ColorScheme {
+  readonly id: string;
+  readonly name: string;
+  readonly kind: "light" | "dark";
+  readonly style: "band" | "line";
+  readonly isDefault: boolean;
+  readonly source: string;
+  readonly inspiredBy: string | null;
+  readonly dayFill: string;
+  readonly dayInk: string;
+  readonly weekdayInk: string;
+  readonly weekendFill: string | null;
+  readonly weekendInk: string;
+  readonly weekendTint: string | null;
+  readonly bandFill: string | null;
+  readonly monthInk: string;
+  readonly weekdayRowFill: string | null;
+  readonly emptyFill: string;
+  readonly seam: string;
+  readonly lineRow1: SchemeLine | null;
+  readonly lineRow2: SchemeLine | null;
+  readonly sunSatInk: string;
+}
+
+const UNCHECKED = "Hex values from memory, not checked against official sources; license check pending.";
+
+const line = (color: string, px: number): SchemeLine => ({ color, px });
+
+const deepFreeze = <T extends object>(value: T): T => {
+  for (const v of Object.values(value)) if (v !== null && typeof v === "object") deepFreeze(v);
+  return Object.freeze(value);
+};
+
+export const SCHEMES: readonly ColorScheme[] = deepFreeze([
+  {
+    id: "paper-red",
+    name: "Paper Red",
+    kind: "light",
+    style: "band",
+    isDefault: true,
+    source: "Own design, owner-approved mock. Red band, gray weekday row, white tiles; weekend tint is 8% of the accent over white.",
+    inspiredBy: null,
+    dayFill: "#ffffff",
+    dayInk: "#1a1a1a",
+    weekdayInk: "#3a3a3a",
+    weekendFill: null,
+    weekendInk: "#e0282c",
+    weekendTint: "#fdeeee",
+    bandFill: "#e0282c",
+    monthInk: "#ffffff",
+    weekdayRowFill: "#ececec",
+    emptyFill: "#ffffff",
+    seam: "#d4d4d4",
+    lineRow1: null,
+    lineRow2: line("#e0282c", 2),
+    sunSatInk: "#e0282c",
+  },
+  {
+    id: "paper-blue",
+    name: "Paper Blue",
+    kind: "light",
+    style: "line",
+    isDefault: false,
+    source: "Own design, owner-approved mock. No band: blue month name and lines on white, weekend tint behind numerals and SUN/SAT.",
+    inspiredBy: null,
+    dayFill: "#ffffff",
+    dayInk: "#1a1a1a",
+    weekdayInk: "#3a3a3a",
+    weekendFill: null,
+    weekendInk: "#1558d8",
+    weekendTint: "#e3ebfa",
+    bandFill: null,
+    monthInk: "#1558d8",
+    weekdayRowFill: null,
+    emptyFill: "#ffffff",
+    seam: "#d4d4d4",
+    lineRow1: line("#1558d8", 3),
+    lineRow2: line("#1558d8", 2),
+    sunSatInk: "#1558d8",
+  },
+  {
+    id: "classic",
+    name: "Classic",
+    kind: "light",
+    style: "band",
+    isDefault: false,
+    source: "The existing sheet look: cream band, cream tiles, brick weekend. Own palette.",
+    inspiredBy: null,
+    dayFill: "#fffdf6",
+    dayInk: "#1f2933",
+    weekdayInk: "#2c4a6b",
+    weekendFill: "#9e1f1a",
+    weekendInk: "#ffffff",
+    weekendTint: null,
+    bandFill: "#efe2c4",
+    monthInk: "#8a4a12",
+    weekdayRowFill: null,
+    emptyFill: "#ece7d6",
+    seam: "#d6d0bf",
+    lineRow1: null,
+    lineRow2: null,
+    sunSatInk: "#ffffff",
+  },
+  {
+    id: "solarized-light",
+    name: "Solarized Light",
+    kind: "light",
+    style: "band",
+    isDefault: false,
+    source: `${UNCHECKED} Weekday ink shifted #268bd2 to #2076b3 and weekend fill #d33682 to #c8337c to reach 4.5:1.`,
+    inspiredBy: "Solarized (Ethan Schoonover)",
+    dayFill: "#fdf6e3",
+    dayInk: "#073642",
+    weekdayInk: "#2076b3",
+    weekendFill: "#c8337c",
+    weekendInk: "#fdf6e3",
+    weekendTint: null,
+    bandFill: "#2aa198",
+    monthInk: "#002b36",
+    weekdayRowFill: null,
+    emptyFill: "#eee8d5",
+    seam: "#93a1a1",
+    lineRow1: null,
+    lineRow2: null,
+    sunSatInk: "#fdf6e3",
+  },
+  {
+    id: "gruvbox-light",
+    name: "Gruvbox Light",
+    kind: "light",
+    style: "band",
+    isDefault: false,
+    source: UNCHECKED,
+    inspiredBy: "Gruvbox (Pavel Pertsev)",
+    dayFill: "#fbf1c7",
+    dayInk: "#3c3836",
+    weekdayInk: "#af3a03",
+    weekendFill: "#076678",
+    weekendInk: "#fbf1c7",
+    weekendTint: null,
+    bandFill: "#d79921",
+    monthInk: "#282828",
+    weekdayRowFill: null,
+    emptyFill: "#ebdbb2",
+    seam: "#bdae93",
+    lineRow1: null,
+    lineRow2: null,
+    sunSatInk: "#fbf1c7",
+  },
+  {
+    id: "dracula",
+    name: "Dracula",
+    kind: "dark",
+    style: "band",
+    isDefault: false,
+    source: UNCHECKED,
+    inspiredBy: "Dracula theme",
+    dayFill: "#282a36",
+    dayInk: "#f8f8f2",
+    weekdayInk: "#8be9fd",
+    weekendFill: "#bd93f9",
+    weekendInk: "#282a36",
+    weekendTint: null,
+    bandFill: "#ff79c6",
+    monthInk: "#282a36",
+    weekdayRowFill: null,
+    emptyFill: "#1e1f29",
+    seam: "#44475a",
+    lineRow1: null,
+    lineRow2: null,
+    sunSatInk: "#282a36",
+  },
+  {
+    id: "monokai",
+    name: "Monokai",
+    kind: "dark",
+    style: "band",
+    isDefault: false,
+    source: `${UNCHECKED} The weekday line is the band orange shifted to #a76414 to reach 3:1 against the tiles.`,
+    inspiredBy: "Monokai (Wimer Hazenberg)",
+    dayFill: "#272822",
+    dayInk: "#f8f8f2",
+    weekdayInk: "#66d9ef",
+    weekendFill: "#a6e22e",
+    weekendInk: "#272822",
+    weekendTint: null,
+    bandFill: "#fd971f",
+    monthInk: "#272822",
+    weekdayRowFill: null,
+    emptyFill: "#1c1d19",
+    seam: "#49483e",
+    lineRow1: null,
+    lineRow2: line("#a76414", 2),
+    sunSatInk: "#272822",
+  },
+  {
+    id: "gruvbox-dark",
+    name: "Gruvbox Dark",
+    kind: "dark",
+    style: "band",
+    isDefault: false,
+    source: UNCHECKED,
+    inspiredBy: "Gruvbox (Pavel Pertsev)",
+    dayFill: "#282828",
+    dayInk: "#ebdbb2",
+    weekdayInk: "#fabd2f",
+    weekendFill: "#fb4934",
+    weekendInk: "#1d2021",
+    weekendTint: null,
+    bandFill: "#83a598",
+    monthInk: "#1d2021",
+    weekdayRowFill: null,
+    emptyFill: "#1d2021",
+    seam: "#504945",
+    lineRow1: null,
+    lineRow2: null,
+    sunSatInk: "#1d2021",
+  },
+  {
+    id: "catppuccin-mocha",
+    name: "Catppuccin Mocha",
+    kind: "dark",
+    style: "band",
+    isDefault: false,
+    source: UNCHECKED,
+    inspiredBy: "Catppuccin Mocha",
+    dayFill: "#1e1e2e",
+    dayInk: "#cdd6f4",
+    weekdayInk: "#b4befe",
+    weekendFill: "#f38ba8",
+    weekendInk: "#11111b",
+    weekendTint: null,
+    bandFill: "#94e2d5",
+    monthInk: "#11111b",
+    weekdayRowFill: null,
+    emptyFill: "#181825",
+    seam: "#45475a",
+    lineRow1: null,
+    lineRow2: null,
+    sunSatInk: "#11111b",
+  },
+  {
+    id: "high-contrast",
+    name: "High Contrast",
+    kind: "dark",
+    style: "band",
+    isDefault: false,
+    source: "Own design. Black tiles, white ink, cyan weekdays, yellow weekend, white band; empty days #2a2a2a (lighter than the mock's #161616); weekday line #828282.",
+    inspiredBy: null,
+    dayFill: "#000000",
+    dayInk: "#ffffff",
+    weekdayInk: "#00e5ff",
+    weekendFill: "#ffe600",
+    weekendInk: "#000000",
+    weekendTint: null,
+    bandFill: "#ffffff",
+    monthInk: "#000000",
+    weekdayRowFill: null,
+    emptyFill: "#2a2a2a",
+    seam: "#555555",
+    lineRow1: null,
+    lineRow2: line("#828282", 2),
+    sunSatInk: "#000000",
+  },
+]);

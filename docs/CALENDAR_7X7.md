@@ -311,6 +311,7 @@ globally; no date-dependent profile selection or second runtime data set exists.
 | [tests/calendar7-stickerless.test.mjs](../tests/calendar7-stickerless.test.mjs) | Stickerless face art and scene on a hand-made layout fixture (`tests/calendar7-fixture.mjs`) |
 | [tests/calendar7-center.test.mjs](../tests/calendar7-center.test.mjs) | Strict 6 and 9: ink box centered on the sticker (also turned by a half turn); other labels and legacy unchanged |
 | [tests/calendar7-sheet-colors.test.mjs](../tests/calendar7-sheet-colors.test.mjs) | Month sheet palette: every ink on its cell at 4.5:1 in light and dark |
+| [tests/calendar7-schemes.test.mjs](../tests/calendar7-schemes.test.mjs) | Color scheme data: ten schemes, one default, roles present, frozen, text contrast gates and line contrast |
 | [tests/browser/calendar7-3d.spec.mjs](../tests/browser/calendar7-3d.spec.mjs) | The 3D view in a browser: pose digest, animated step, controls, 375 px |
 
 ### Conventions
@@ -325,6 +326,12 @@ globally; no date-dependent profile selection or second runtime data set exists.
   formula are in the file.
 - The shipped strict rule has no glyph aliases. Only 0 (any turn) and 6/9
   (half turn) have neutral readings; other glyphs and split labels must be upright.
+
+## Color schemes
+
+`src/apps/calendar7/schemes.ts` holds ten color schemes of the month sheet as plain role tokens (day fill and ink, weekday ink, weekend fill or tint and ink, band, month ink, weekday row, empty days, seam, the two lines and the SUN/SAT ink): Paper Red (default), Paper Blue, Classic, Solarized Light, Gruvbox Light, Dracula, Monokai, Gruvbox Dark, Catppuccin Mocha and High Contrast. Saturday and Sunday share one weekend token set. The data is not yet applied to the 3D view and has no UI. [tests/calendar7-schemes.test.mjs](../tests/calendar7-schemes.test.mjs) checks the structure and the contrast of every text pair (4.5:1; 3:1 for the two named large-bold pairs of Paper Red) and of every line (3:1). The six third-party palettes (inspired by Solarized, Gruvbox, Dracula, Monokai, Catppuccin) are written from memory, not checked against official sources, and need a license check.
+
+Limitation: the shipped print (`public/calendar7/state.v1.json`, 294 stickers; ink classes blank 51, dark 151, red 62, month 25, weekday 5) has one blank class, and `src/apps/calendar7/sticker-art.ts` fills by `text === ""` (`BLANK_PAPER`) versus `PAPER`. A band that runs continuously over the blank tiles of row 1, a line under row 1, or white empty days next to a colored band need a separate "band blank" tile class and therefore new print data, planned with the row-1 name layout. This change provides only the role data and the tests.
 
 ## Rule profiles: legacy and strict
 
