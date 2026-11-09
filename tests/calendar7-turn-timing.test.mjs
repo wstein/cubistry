@@ -9,7 +9,7 @@ import { clonePose } from "../src/apps/calendar7/engine.ts";
 import { parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
 import { playedBlocks } from "../src/apps/calendar7/deferral.ts";
 import { playerHtml } from "../src/apps/calendar7/month-view.ts";
-import { Calendar7Player, DEFAULT_SPEED, SPEEDS } from "../src/apps/calendar7/player.ts";
+import { Calendar7Player, DEFAULT_SPEED, SPEEDS, blockMs } from "../src/apps/calendar7/player.ts";
 
 const json = (p) => JSON.parse(readFileSync(p, "utf8"));
 const graph = parseGraph(json("public/calendar7/graph.v1.json"));
@@ -34,17 +34,17 @@ const edgeFor = (orientation) => {
   throw new Error(`no edge with rotations for ${orientation}`);
 };
 
-test("the speeds are the repository's Rotation Speed stops in milliseconds per turn: 100, 250, 500 ms and 1 s", () => {
+test("the speeds are the repository's Rotation Speed stops in milliseconds per quarter turn: 100, 250, 500 ms and 1 s", () => {
   assert.deepEqual([...SPEEDS], [100, 250, 500, 1000]);
-  assert.equal(DEFAULT_SPEED, 100);
+  assert.equal(DEFAULT_SPEED, 250);
   const html = playerHtml(DEFAULT_SPEED);
   const options = [...html.matchAll(/<option value="(\d+)"( selected)?>([^<]+)<\/option>/g)].filter((m) => SPEEDS.includes(Number(m[1])));
   assert.deepEqual(options.map((m) => [m[1], m[3]]), [["100", "100 ms"], ["250", "250 ms"], ["500", "500 ms"], ["1000", "1 s"]]);
-  assert.deepEqual(options.filter((m) => m[2]).map((m) => m[1]), ["100"]);
+  assert.deepEqual(options.filter((m) => m[2]).map((m) => m[1]), ["250"]);
 });
 
 for (const orientation of ["before", "after", "stored"]) {
-  test(`orientation ${orientation}: a whole-cube rotation turns exactly like a layer turn at every speed (same ms, same easing)`, async () => {
+  test(`orientation ${orientation}: a whole-cube rotation turns exactly like a layer turn at every speed (ms = speed x quarter turns, same easing)`, async () => {
     const e = edgeFor(orientation);
     for (const speed of SPEEDS) {
       const view = recordingView();
@@ -57,7 +57,7 @@ for (const orientation of ["before", "after", "stored"]) {
       const layers = view.turns.filter((t) => t.block.kind !== "rotation");
       assert.ok(rotations.length > 0 && layers.length > 0, `${orientation}: ${rotations.length} rotations, ${layers.length} layer turns`);
       for (const t of view.turns) {
-        assert.equal(t.ms, speed, `${t.block.kind} turn at ${speed}`);
+        assert.equal(t.ms, speed * Math.abs(t.block.angle), `${t.block.kind} turn of ${t.block.angle} at ${speed}`);
         assert.equal(t.ease, undefined, `${t.block.kind} turn at ${speed} uses the view's default easing`);
       }
       assert.equal(player.snapshot.speed, speed);
@@ -65,20 +65,34 @@ for (const orientation of ["before", "after", "stored"]) {
   });
 }
 
-test("a half-turn rotation (x2, y2, z2) lasts as long as a quarter-turn layer", async () => {
+test("duration = speed x quarter turns for layer and rotation blocks: q = 1, -1 and 2 at every speed", () => {
+  const block = (kind, angle) => ({ axis: 0, lo: kind === "rotation" ? -3 : 1, hi: kind === "rotation" ? 3 : 1, angle, kind });
+  for (const speed of SPEEDS) {
+    for (const kind of ["single", "outer-wide", "slice", "rotation"]) {
+      assert.equal(blockMs(block(kind, 1), speed), speed);
+      assert.equal(blockMs(block(kind, -1), speed), speed, "the direction does not change the time");
+      assert.equal(blockMs(block(kind, 2), speed), 2 * speed, `${kind} half turn takes twice a quarter turn`);
+    }
+  }
+});
+
+test("played half turns (layer and rotation) last twice a quarter turn, quarter turns last one speed", async () => {
   let found = null;
   for (let e = 5; e < LAST && !found; e++) {
     const blocks = playedBlocks(graph.edges[e].moves, { slice: true, orientation: "stored" }).blocks;
-    if (blocks.some((b) => b.kind === "rotation" && Math.abs(b.angle) === 2) && blocks.some((b) => b.kind !== "rotation" && Math.abs(b.angle) === 1)) found = e;
+    const has = (rot, q) => blocks.some((b) => (b.kind === "rotation") === rot && Math.abs(b.angle) === q);
+    if (has(true, 2) && has(false, 1) && has(false, 2)) found = e;
   }
-  assert.notEqual(found, null, "an edge with a half-turn rotation and a quarter-turn layer exists");
+  assert.notEqual(found, null, "an edge with a half-turn rotation, a half-turn layer and a quarter-turn layer exists");
   const view = recordingView();
   const player = new Calendar7Player({ graph, printing, root, view, reducedMotion: () => false, orientation: "stored", slice: true });
   player.setSpeed(500);
   player.jump(found);
   player.go(found + 1);
   await settle(player);
-  assert.ok(view.turns.every((t) => t.ms === 500 && t.ease === undefined));
+  const seen = new Set(view.turns.map((t) => `${t.block.kind === "rotation" ? "rot" : "layer"}${Math.abs(t.block.angle)}:${t.ms}`));
+  for (const k of ["rot2:1000", "layer1:500", "layer2:1000"]) assert.ok(seen.has(k), `${k} in ${[...seen]}`);
+  assert.ok(view.turns.every((t) => t.ease === undefined));
 });
 
 test("the old multiplier speeds are refused", () => {

@@ -224,10 +224,10 @@ test("speed changes the move duration; unknown speeds are refused", async () => 
   player.setSpeed(100);
   player.go(9);
   await settle(player);
-  const slow = view.log.turns[0].ms;
-  const fast = view.log.turns.at(-1).ms;
-  assert.equal(slow, 1000);
-  assert.equal(fast, 100);
+  const first = view.log.turns[0];
+  const last = view.log.turns.at(-1);
+  assert.equal(first.ms, 1000 * Math.abs(first.block.angle));
+  assert.equal(last.ms, 100 * Math.abs(last.block.angle));
   assert.throws(() => player.setSpeed(300), RangeError);
 });
 
