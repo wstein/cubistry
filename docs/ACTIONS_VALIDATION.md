@@ -89,3 +89,12 @@ native-browser probes do not qualify the amd64 image.
 
 Browser or font updates require updating the explicit pin and repeating that
 qualification. Existing developer commands remain in [Evidence and checks](EVIDENCE_AND_CHECKS.md).
+
+The immutable amd64 image's default headless-shell binary reports
+`156.0.8078.80`, although both Playwright 1.64.1 npm descriptors report
+`156.0.8078.4` (revision 1248). The qualification profile pins these identities
+separately: both descriptors, the selected registry executable and its
+`--version`, and the launched browser version must match exactly. The mismatch
+was observed in Counter run 42653650504; the official [v1.64.1 browser descriptors](https://github.com/microsoft/playwright/blob/v1.64.1/packages/playwright-core/browsers.json)
+retains `.4`. There is no channel override or version-prefix fallback.
+The earlier native arm64 `.4` probe does not qualify this amd64 `.80` runtime.

@@ -30,6 +30,10 @@ export function validateHost(actual, expected) {
   check(actual.docker?.driverVersion === expected.playwright && actual.docker?.dockerImageName === expected.imageTag, "Playwright image marker differs");
   check(actual.chromiumRevision === expected.chromiumRevision && actual.chromiumVersion === expected.chromiumVersion, "bundled browser revision differs");
   check(actual.executableExists && actual.executable?.startsWith(`${expected.browserRoot}/chromium-${expected.chromiumRevision}/`), "preinstalled Chromium is missing");
+  check(actual.selectedBrowser === "chromium-headless-shell", "default headless browser differs");
+  check(actual.selectedRevision === expected.chromiumRevision && actual.selectedDescriptorVersion === expected.chromiumVersion, "headless descriptor differs");
+  check(actual.selectedExecutableExists && actual.selectedExecutable === `${expected.browserRoot}/chromium_headless_shell-${expected.chromiumRevision}/chrome-headless-shell-linux64/chrome-headless-shell`, "selected headless executable differs");
+  check(actual.selectedBinaryVersion === expected.runtimeVersion, "selected binary version differs");
   for (const [font, hash] of Object.entries(expected.fonts))
     check(actual.fonts?.[font] === hash, `font bytes differ: ${font}`);
   return errors;
@@ -37,7 +41,7 @@ export function validateHost(actual, expected) {
 export function validateBrowser(actual, expected) {
   const errors = [];
   const check = (condition, label) => { if (!condition) errors.push(label); };
-  check(actual.version === expected.chromiumVersion, "launched Chromium version differs");
+  check(actual.version === expected.runtimeVersion, "launched Chromium version differs");
   check(/SwiftShader/i.test(actual.renderer || ""), "software renderer differs");
   check(actual.webglVersion?.startsWith("WebGL 2.0"), "WebGL2 is unavailable");
   check(equal(actual.pixels, [21, 59, 97, 255]), "rendered pixel differs");
@@ -51,6 +55,11 @@ export function inspectHost() {
   const browsers = JSON.parse(readFileSync(new URL("browsers.json", `file://${core}`)));
   const browser = browsers.browsers.find(item => item.name === "chromium");
   const executable = chromium.executablePath();
+  // Playwright's no-channel, headless launch selects this exact registry entry.
+  // This internal API is covered by the exact package pin; no fallback is allowed.
+  const selected = require("playwright-core/lib/coreBundle").registry.registry.findExecutable("chromium-headless-shell");
+  const selectedExecutable = selected.executablePath();
+  const selectedBinaryVersion = execFileSync(selectedExecutable, ["--version"], { encoding: "utf8" }).trim().replace(/^Google Chrome for Testing |^Chromium |^Google Chrome |^Chrome Headless Shell /, "");
   return {
     nodeVersion: process.versions.node, playwright: require("@playwright/test/package.json").version,
     architecture: process.arch, platform: process.platform,
@@ -58,6 +67,9 @@ export function inspectHost() {
     browserRoot: process.env.PLAYWRIGHT_BROWSERS_PATH,
     docker: JSON.parse(readFileSync("/ms-playwright/.docker-info", "utf8")),
     chromiumRevision: browser.revision, chromiumVersion: browser.browserVersion,
+    selectedBrowser: selected.name, selectedRevision: selected.revision,
+    selectedDescriptorVersion: selected.browserVersion, selectedExecutable,
+    selectedExecutableExists: existsSync(selectedExecutable), selectedBinaryVersion,
     executable, executableExists: existsSync(executable),
     fonts: Object.fromEntries(Object.keys(environment.fonts).map(path => [path, createHash("sha256").update(readFileSync(path)).digest("hex")])),
     systemSans: execFileSync("fc-match", ["--format", "%{family}|%{style}|%{file}\n", "sans-serif"], { encoding: "utf8" }).trim(),
