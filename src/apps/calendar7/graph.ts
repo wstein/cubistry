@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 /**
  * English 7x7 calendar cube: route graph data model, strict parsers and replay checks
  * (research candidate, not certified). Pure functions only; reused by the later engine.
@@ -6,7 +7,7 @@
  *  - node: a verified complete physical state, named by the SHA-256 of its 294-sticker
  *    state text, with the display it shows (display id, year, month);
  *  - edge: a move word between two nodes. The inverse edge is free (inverseMoves);
- *  - the shipped graph is a chain 2028-01 .. 2076-01, but the checks below are written
+ *  - the shipped graph is a chain 2026-05 .. 2099-12, but the checks below are written
  *    for edges between arbitrary nodes so that shortcuts can be added without code change.
  */
 import {

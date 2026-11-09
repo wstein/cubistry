@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // English 7x7 calendar mode (research candidate, not certified): registry entry, month choice, navigation bounds,
 // move words and the mount with a small fake DOM. Deterministic: no network, no timers, no browser.
 import { test } from "node:test";
@@ -47,8 +48,8 @@ test("the studio select has a calendar7 option", () => {
   assert.match(html, /<option value="calendar7">7x7 Calendar \(1 cube\)<\/option>/);
 });
 
-test("the chain range is January 2028 to January 2076 with 576 edges", () => {
-  assert.deepEqual(range, { first: { year: 2028, month: 1 }, last: { year: 2076, month: 1 }, edges: 576 });
+test("the chain range is May 2026 to December 2099 with 883 edges", () => {
+  assert.deepEqual(range, { first: { year: 2026, month: 5 }, last: { year: 2099, month: 12 }, edges: 883 });
 });
 
 test("chooseMonth takes the URL month, else today, and reports outside and invalid input", () => {
@@ -58,25 +59,25 @@ test("chooseMonth takes the URL month, else today, and reports outside and inval
     ym: { year: 2030, month: 5 },
     source: "url",
   });
-  assert.equal(chooseMonth(q(""), today, range).kind, "outside");
+  assert.equal(chooseMonth(q(""), today, range).kind, "ok");
   assert.equal(chooseMonth(q(""), today, range).source, "today");
   assert.equal(chooseMonth(q(""), { year: 2040, month: 3 }, range).kind, "ok");
-  assert.equal(chooseMonth(q("year=2027&month=12"), today, range).kind, "outside");
-  assert.equal(chooseMonth(q("year=2076&month=2"), today, range).kind, "outside");
+  assert.equal(chooseMonth(q("year=2026&month=4"), today, range).kind, "outside");
+  assert.equal(chooseMonth(q("year=2100&month=1"), today, range).kind, "outside");
   assert.equal(chooseMonth(q("year=2028&month=1"), today, range).kind, "ok");
-  assert.equal(chooseMonth(q("year=2076&month=1"), today, range).kind, "ok");
+  assert.equal(chooseMonth(q("year=2099&month=12"), today, range).kind, "ok");
   for (const bad of ["year=2030", "month=5", "year=abc&month=5", "year=2030&month=13", "year=2030&month=0", "year=2030&month=1.5"])
     assert.equal(chooseMonth(q(bad), today, range).kind, "invalid", bad);
 });
 
 test("navigation stops at both ends of the chain and crosses year boundaries", () => {
-  assert.equal(stepMonth(range, { year: 2028, month: 1 }, -1), null);
-  assert.equal(stepMonth(range, { year: 2076, month: 1 }, 1), null);
+  assert.equal(stepMonth(range, { year: 2026, month: 5 }, -1), null);
+  assert.equal(stepMonth(range, { year: 2099, month: 12 }, 1), null);
   assert.deepEqual(stepMonth(range, { year: 2028, month: 12 }, 1), { year: 2029, month: 1 });
   assert.deepEqual(stepMonth(range, { year: 2029, month: 1 }, -1), { year: 2028, month: 12 });
-  assert.equal(stepMonth(range, { year: 2027, month: 12 }, 1), null);
-  assert.equal(nodeIndex(range, { year: 2076, month: 1 }), 576);
-  assert.equal(nodeIndex(range, { year: 2076, month: 2 }), -1);
+  assert.equal(stepMonth(range, { year: 2026, month: 4 }, 1), null);
+  assert.equal(nodeIndex(range, { year: 2099, month: 12 }), 883);
+  assert.equal(nodeIndex(range, { year: 2100, month: 1 }), -1);
 });
 
 test("the sheet of every chain month equals the independent month generator", () => {
@@ -84,7 +85,7 @@ test("the sheet of every chain month equals the independent month generator", ()
     const { year, month } = graph.nodes[k];
     assert.deepEqual(sheetCells(graph, table, range, { year, month }), monthCells(year, month), `${year}-${month}`);
   }
-  assert.throws(() => sheetCells(graph, table, range, { year: 2027, month: 12 }), RangeError);
+  assert.throws(() => sheetCells(graph, table, range, { year: 2026, month: 4 }), RangeError);
 });
 
 test("a forward step is the edge word and a backward step is its inverse", () => {
@@ -96,13 +97,13 @@ test("a forward step is the edge word and a backward step is its inverse", () =>
   const back = stepFrom(graph, range, { year: 2028, month: 6 }, -1);
   assert.deepEqual(back.to, ym);
   assert.equal(back.moves.length, fwd.moves.length);
-  assert.equal(stepFrom(graph, range, { year: 2028, month: 1 }, -1), null);
-  assert.equal(stepFrom(graph, range, { year: 2076, month: 1 }, 1), null);
+  assert.equal(stepFrom(graph, range, { year: 2026, month: 5 }, -1), null);
+  assert.equal(stepFrom(graph, range, { year: 2099, month: 12 }, 1), null);
 });
 
 test("walking the first steps by the shown words reaches the chain nodes (forward and back)", () => {
   const start = parseState(json("public/calendar7/state.v1.json"));
-  let ym = { year: 2028, month: 1 };
+  let ym = { year: 2026, month: 5 };
   let pose = clonePose(start.pose);
   const poses = [clonePose(pose)];
   for (let i = 0; i < 3; i++) {
@@ -160,7 +161,7 @@ test("the page shows the sheet, both steps and the scope notice for a month insi
   assert.equal((html.match(/<tr>/g) ?? []).length, 7);
   assert.equal((html.match(/<td /g) ?? []).length, 49);
   assert.match(html, /February 2028/);
-  assert.match(html, /No earlier month: January 2028 is the start of the chain/);
+  assert.match(html, /December 2027/);
   assert.match(html, /No solver and no jumps/);
   assert.match(html, /data-word="next"/);
   assert.match(html, /JAN|>J</);
@@ -168,17 +169,18 @@ test("the page shows the sheet, both steps and the scope notice for a month insi
 
 test("the end of the chain has no next step", () => {
   const today = { year: 2026, month: 11 };
-  const html = pageHtml(buildModel(graph, table, chooseMonth(q("year=2076&month=1"), today, range), today));
-  assert.match(html, /No later month: January 2076 is the end of the chain/);
+  const html = pageHtml(buildModel(graph, table, chooseMonth(q("year=2099&month=12"), today, range), today));
+  assert.match(html, /No later month: December 2099 is the end of the chain/);
   assert.match(html, /data-word="previous"/);
 });
 
 test("a month outside the chain shows a not-available message and no sheet", () => {
   const today = { year: 2026, month: 11 };
-  const html = pageHtml(buildModel(graph, table, chooseMonth(q(""), today, range), today));
-  assert.match(html, /Not available yet\. The current month, November 2026, is outside the proven chain \(January 2028 to January 2076\)/);
+  const outside = { year: 2026, month: 4 };
+  const html = pageHtml(buildModel(graph, table, chooseMonth(q(""), outside, range), outside));
+  assert.match(html, /Not available yet\. The current month, April 2026, is outside the proven chain \(May 2026 to December 2099\)/);
   assert.doesNotMatch(html, /c7-sheet/);
-  assert.match(html, new RegExp("year=2028&amp;month=1"));
+  assert.match(html, new RegExp("year=2026&amp;month=5"));
   const bad = pageHtml(buildModel(graph, table, chooseMonth(q("year=x&month=1"), today, range), today));
   assert.match(bad, /Invalid month/);
 });
@@ -221,11 +223,11 @@ const env = (over = {}) => {
   };
 };
 
-test("mount renders today's outside notice, follows a step link and keeps other parameters", async () => {
+test("mount renders today's covered month, follows a step link and keeps other parameters", async () => {
   const root = fakeRoot();
   const e = env();
   const inst = await mountCalendar7(root, q(""), e);
-  assert.match(root.view.innerHTML, /Not available yet/);
+  assert.match(root.view.innerHTML, /data-month="2026-11"/);
   assert.equal(root.click(href({ year: 2028, month: 1 })), true);
   assert.match(root.view.innerHTML, /data-month="2028-01"/);
   assert.deepEqual(e.calls.query, ["?app=calendar7&kiosk=1&year=2028&month=1"]);

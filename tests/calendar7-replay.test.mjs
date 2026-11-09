@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // English 7x7 calendar cube, stage S1: data, pin and full replay (no UI, no browser).
 // Research candidate, not certified. Deterministic, no timers or network.
 import { test } from "node:test";
@@ -52,7 +53,7 @@ const start = parseState(json("public/calendar7/state.v1.json"));
 const table = parseDisplays(json("public/calendar7/displays.v1.json"));
 const graph = parseGraph(json("public/calendar7/graph.v1.json"));
 const { printing, pose } = start;
-const RECEIPT = "data/calendar7/research/chain-2028-2076.receipt.julia.tsv";
+const RECEIPT = "data/calendar7/research/strict/chain-2026-2099.receipt.julia.tsv";
 
 test("the pin binds the research commit, every research file, the Julia exports and the runtime files", () => {
   assert.match(pin.commit, /^[0-9a-f]{40}$/);
@@ -63,7 +64,7 @@ test("the pin binds the research commit, every research file, the Julia exports 
     assert.equal(sha(read(copy)), pin.sources[research], copy);
   for (const research of Object.keys(RESEARCH_FILES)) assert.ok(pin.sources[research], research);
   // Both verifiers produced the same receipt bytes.
-  const receipts = Object.entries(pin.sources).filter(([k]) => k.includes("/receipts/chain-2028-2076."));
+  const receipts = Object.entries(pin.generatedSources).filter(([k]) => /chain-2026-2099.receipt\.(julia|flix)\.tsv$/.test(k));
   assert.equal(receipts.length, 2);
   assert.equal(receipts[0][1], receipts[1][1]);
   // Rederive the runtime files from the pinned copies; compare with the research commit when present.
@@ -126,7 +127,7 @@ test("the move word encoding round-trips and rejects non-moves", () => {
 test("the root is a legal 294-sticker, 218-body pose and its digest is the research source hash", () => {
   checkPose(printing, pose);
   assert.equal(new Set(printing.piece).size, CUBIES);
-  assert.equal(printing.text.filter((t) => t !== "").length, 240);
+  assert.equal(printing.text.filter((t) => t !== "").length, 243);
   const text = stateText(printing, pose);
   assert.equal(sha(text), start.node.hash);
   assert.ok(text === read("data/calendar7/julia/root-state.tsv", "utf8"));
@@ -156,12 +157,12 @@ test("display sheets: the independent generator equals the Julia display table f
 });
 
 test("front rule: glyph equivalences, half-turn pairs, stacked labels upright with exact text and ink", () => {
-  assert.deepEqual(imageNormal("O", 0, "dark"), imageNormal("0", 0, "dark"));
-  assert.deepEqual(imageNormal("I", 1, "dark"), imageNormal("1", 3, "dark")); // 1 is half-turn symmetric
+  assert.notDeepEqual(imageNormal("O", 0, "dark"), imageNormal("0", 0, "dark"));
+  assert.notDeepEqual(imageNormal("I", 1, "dark"), imageNormal("1", 3, "dark")); // No glyph aliasing
   assert.deepEqual(imageNormal("9", 2, "dark"), imageNormal("6", 0, "dark"));
   assert.notDeepEqual(imageNormal("9", 0, "dark"), imageNormal("6", 0, "dark"));
   assert.deepEqual(imageNormal("0", 3, "red"), imageNormal("0", 0, "red")); // zero has no direction
-  assert.notDeepEqual(imageNormal("M0N", 2, "weekday"), imageNormal("M0N", 0, "weekday"));
+  assert.notDeepEqual(imageNormal("MON", 2, "weekday"), imageNormal("MON", 0, "weekday"));
   assert.equal(imageNormal("", 1, "blank"), "blank");
   // The root front passes; each tamper below must fail with the stated reason.
   const cells = table.displays[start.node.display - 1].cells;
@@ -182,7 +183,7 @@ test("front rule: glyph equivalences, half-turn pairs, stacked labels upright wi
   assert.equal(frontFailure(printing, upside, cells)?.why, "stacked-not-upright");
   const text = { ...printing, text: printing.text.map((t, i) => (i === front ? "23/30" : t)) };
   assert.equal(frontFailure(text, pose, cells)?.why, "stacked-mismatch");
-  const ink = { ...printing, ink: printing.ink.map((t, i) => (i === front ? "red" : t)) };
+  const ink = { ...printing, ink: printing.ink.map((t, i) => (i === front ? "dark" : t)) };
   assert.equal(frontFailure(ink, pose, cells)?.why, "stacked-mismatch");
   const plain = { ...printing, text: printing.text.map((t, i) => (i === front ? "24" : t)) };
   assert.equal(frontFailure(plain, pose, cells)?.why, "plain-mismatch");
@@ -190,21 +191,21 @@ test("front rule: glyph equivalences, half-turn pairs, stacked labels upright wi
 
 let chain;
 test("replay of the whole chain: states, hashes, metrics, fronts, inverse per edge and for the chain", () => {
-  assert.equal(graph.nodes.length, 577);
-  assert.equal(graph.edges.length, 576);
-  assert.deepEqual([graph.nodes[0].year, graph.nodes[0].month, graph.nodes[0].display], [2028, 1, 25]);
+  assert.equal(graph.nodes.length, 884);
+  assert.equal(graph.edges.length, 883);
+  assert.deepEqual([graph.nodes[0].year, graph.nodes[0].month, graph.nodes[0].display], [2026, 5, 5]);
   const last = graph.nodes.at(-1);
-  assert.deepEqual([last.year, last.month], [2076, 1]);
+  assert.deepEqual([last.year, last.month], [2099, 12]);
   assert.equal(new Set(graph.nodes.map((n) => n.display)).size, 91, "all 91 display types occur");
   chain = verifyChain(printing, pose, table, graph);
-  assert.equal(chain.edges.length, 576);
+  assert.equal(chain.edges.length, 883);
   // Complete-state hash equality with the research receipt, byte for byte.
   const receipt = chainReceipt(chain);
   // Compare digests first: a failing string comparison of 100 kB would only produce a diff.
   assert.equal(sha(receipt), sha(read(RECEIPT)));
   assert.ok(receipt === read(RECEIPT, "utf8"), "receipt differs from the research Julia receipt");
-  assert.equal(sha(receipt), pin.sources[Object.keys(pin.sources).find((k) => k.endsWith("receipts/chain-2028-2076.julia.tsv"))]);
-  assert.match(receipt, /status\tVALID_CONTINUOUS_CHAIN\t576\t218\t294\t49\n$/);
+  assert.equal(sha(receipt), pin.generatedSources[RECEIPT]);
+  assert.match(receipt, /status\tVALID_CONTINUOUS_CHAIN\t883\t218\t294\t49\n$/);
   assert.equal(chain.source, graph.nodes[0].hash);
   assert.equal(chain.endpoint, graph.nodes.at(-1).hash);
 });
@@ -231,17 +232,17 @@ test("negative controls: every corruption is rejected", () => {
   // A flipped move (first move that is not a half turn).
   const k = edge0.moves.findIndex((m) => m[1] !== 2);
   const flipped = edge0.moves.map((m, i) => (i === k ? [m[0], -m[1]] : m));
-  rejects(() => run(withEdge(0, { moves: flipped })), /edge 0: front differs from display 26/);
+  rejects(() => run(withEdge(0, { moves: flipped })), /edge 0: front differs from display 6/);
   // A changed edge: another generator in one move, metrics kept consistent.
   const changed = edge0.moves.map((m, i) => (i === k ? [(m[0] % 21) + 1, m[1]] : m));
-  rejects(() => run(withEdge(0, { moves: changed, ...metrics(changed) })), /edge 0: front differs from display 26/);
+  rejects(() => run(withEdge(0, { moves: changed, ...metrics(changed) })), /edge 0: front differs from display 6/);
   // A whole-cube rotation substituted for a layer move, metrics kept consistent.
   const rotated = edge0.moves.map((m, i) => (i === k ? [7 * (Math.floor((m[0] - 1) / 7) + 1), m[1]] : m));
-  rejects(() => run(withEdge(0, { moves: rotated, ...metrics(rotated) })), /edge 0: front differs from display 26/);
+  rejects(() => run(withEdge(0, { moves: rotated, ...metrics(rotated) })), /edge 0: front differs from display 6/);
   // Declared metrics that do not match the word; a truncated word.
   rejects(() => run(withEdge(0, { htm: edge0.htm + 1 })), /declared metrics differ/);
   const cut = edge0.moves.slice(0, -1);
-  rejects(() => run(withEdge(0, { moves: cut, ...metrics(cut) })), /edge 0: front differs from display 26/);
+  rejects(() => run(withEdge(0, { moves: cut, ...metrics(cut) })), /edge 0: front differs from display 6/);
   rejects(() => run(withEdge(0, { moves: cut })), /declared metrics differ/);
   // The end-hash guard fires only when the front is right and the hash is wrong: a correct word
   // against a wrong target hash.
@@ -283,7 +284,7 @@ test("negative controls: every corruption is rejected", () => {
   assert.equal(frontFailure(wrongInk, pose, rootCells)?.why, "plain-mismatch");
   // A plain weekday name turned by a quarter turn is not upright.
   const monday = cellOf(pose, 2, 2);
-  assert.equal(printing.text[monday], "M0N");
+  assert.equal(printing.text[monday], "MON");
   const sideways = clonePose(pose);
   sideways.up.set([-1, 0, 0], 3 * monday);
   assert.equal(frontFailure(printing, sideways, rootCells)?.why, "plain-mismatch");
