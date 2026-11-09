@@ -130,7 +130,8 @@ Code: `src/apps/calendar7/blocks.ts` (pure).
   rotations not at all. *Block moves* counts one per non-rotation block. For the same step block moves never exceed layer moves;
   whole-cube rotations are counted separately and stay free, as today.
 - **Animation.** The player plays one block as ONE tween: every layer of the block turns together by the same angle in
-  the time of one move (90 ms at 1x, the speeds 0.5x to 8x are unchanged). The progress line counts actual animated nonrotation moves. Skip, Pause, Previous/Next during a step, reduced motion (a step jumps to its end state) and the digest check
+  the time of one turn. **Speed** is that time per turn, the repository's Rotation Speed stops: 100 ms (default), 250 ms, 500 ms and 1 s.
+  A wide block, a middle slice and a whole-cube rotation (x, y, z, wherever it sits) last exactly as long as a single layer, with the same easing. The progress line counts actual animated nonrotation moves. Skip, Pause, Previous/Next during a step, reduced motion (a step jumps to its end state) and the digest check
   at the end of every step are unchanged and work on blocks; `StateMismatchError` still stops the view.
 - **Not covered.** No change to the stored words, to the chain or to the metrics in the graph; no search for shorter
   words (merging only regroups what the stored word already contains); no merging across a rotation or across the middle layer (the next section lifts both limits as an opt-in).
@@ -203,10 +204,9 @@ Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the easing) and 
   half turn) or `Alignment: none`. At most two rotations are needed; the words are chosen deterministically (fewest rotations,
   then fewest quarter turns, then the order x, y, z with exponents +1, -1, 2).
 - **Animation.** The alignment is a rotation of the model (all bodies turn about their axis), not a camera move; the Smart
-  Rubber Band camera controller is untouched. It uses its soft start, the critically damped response
-  x(t) = x0 e^(-rt) (1 + rt + (rt)^2 / 2) with r = 9 per second, ending when less than 1 mrad is left (about 1.3 s for a quarter
-  turn at 1x; the speed setting scales the time). The cube viewer exports no pure function for it, so the formula is repeated in
-  `soft-start.ts` and a test compares the rate with `ROTATION_TUNING.returnRate`. Under reduced motion a step jumps and needs
+  Rubber Band camera controller is untouched. It is timed and eased exactly like a single-layer turn: the Speed setting is
+  its duration (a half turn too) and the view's smoothstep is its easing. The earlier soft start (critically damped response,
+  about 1.3 s for a quarter turn at 1x) is no longer used by the player; `soft-start.ts` stays as a tested helper. Under reduced motion a step jumps and needs
   no alignment; if the preference turns on while a step plays, the alignment takes 150 ms per rotation (up to 300 ms).
 - **Progress.** The free orientation is a separate prefix or suffix phase. Only
   nonrotation blocks contribute to the move count; skip and pause work in every phase.
@@ -303,6 +303,7 @@ globally; no date-dependent profile selection or second runtime data set exists.
 | [tests/calendar7-mode.test.mjs](../tests/calendar7-mode.test.mjs) | Registry entry, month choice, navigation bounds, move words and mount |
 | [tests/calendar7-blocks.test.mjs](../tests/calendar7-blocks.test.mjs) | Block moves: examples, property tests on random words (same state and digest, same multiset), identical digest for every stored edge in both directions, notation and counts on the page |
 | [tests/calendar7-slice.test.mjs](../tests/calendar7-slice.test.mjs) | Middle-slice blocks (rule c): examples, independent slab-turn and exact-minimum oracles, property tests on random words, identical digest for every stored edge both ways, counts of the research (91 historical roots from `tests/fixtures/calendar7-roots91.tsv`, 883 strict edges), negative controls, the player and the page |
+| [tests/calendar7-turn-timing.test.mjs](../tests/calendar7-turn-timing.test.mjs) | Speed stops (100/250/500/1000 ms per turn), rotation turns equal layer turns in duration and easing in every orientation |
 | [tests/calendar7-deferral.test.mjs](../tests/calendar7-deferral.test.mjs) | Deferred rotations and the end alignment: properties, every stored edge both ways, search of the 24 orientations, mismatch, negative controls, soft start, player phases |
 | [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
 | [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, split-label geometry and drawing |
