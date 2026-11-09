@@ -8,7 +8,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { PRESENTATION_PRESET, PhysicalCubeScene, createPlasticMaterial, createPresentationGeometry } from "@cubistry/cube-viewer";
 import { STICKERS, checkPose } from "../src/apps/calendar7/engine.ts";
-import { BLANK_PAPER, FACE_FLAT, PAPER, TEXTURE, drawFace, drawSticker } from "../src/apps/calendar7/sticker-art.ts";
+import { BLANK_PAPER, FACE_FLAT, FACE_SCALE, FACE_TEXT_SQUARE, PAPER, TEXTURE, drawFace, drawSticker } from "../src/apps/calendar7/sticker-art.ts";
 import { frontCells, layoutFixture } from "./calendar7-fixture.mjs";
 
 function record(draw) {
@@ -55,17 +55,26 @@ test("FACE_FLAT is the real flat part of the body face in texture space (same ge
   assert.ok(Math.abs((u0 + u1) / 2 - 0.5) < 1e-6, "the flat face is centered in the texture");
   assert.ok(Math.abs(x1 - x0 - (p.bodyWidth - 2 * p.bodyRadius)) < 1e-6, "the flat face is the body width minus both bevels");
   // The art keeps clear of the bevel: the 86% text square scaled by FACE_FLAT is inside the flat part with margin.
-  assert.ok(0.86 * FACE_FLAT < FACE_FLAT);
+  assert.ok(FACE_TEXT_SQUARE < 1);
 });
 
-test("drawFace: paper on the whole texture, then the sticker label scaled about the center by FACE_FLAT", () => {
+test("the stickerless text size is pinned: text square 0.92 of the flat face, picked from the candidates 0.86, 0.92, 0.97", () => {
+  // Picked on the real ink of the three-letter labels (tests/browser/calendar7-stickerless.spec.mjs: at least 4% of the
+  // flat face on every side); a different value needs a new measurement, so this test fails on purpose.
+  assert.equal(FACE_TEXT_SQUARE, 0.92);
+  assert.ok(Math.abs(FACE_SCALE - (FACE_FLAT * 0.92) / 0.86) < 1e-12);
+  assert.ok(Math.abs(FACE_SCALE - 0.97416) < 1e-4, `scale ${FACE_SCALE}`);
+  assert.equal(FACE_FLAT, 0.9106);
+});
+
+test("drawFace: paper on the whole texture, then the sticker label scaled about the center by FACE_SCALE", () => {
   for (const [text, ink, profile] of [["7", "dark", "strict"], ["MON", "weekday", "strict"], ["NO", "month", "strict"], ["23/30", "red", "strict"], ["6", "dark", "strict"], ["23/30", "red", "legacy"]]) {
     const sticker = record((c) => drawSticker(c, text, ink, profile));
     const face = record((c) => drawFace(c, text, ink, profile));
     assert.deepEqual(face.slice(0, 2), [["fillStyle", PAPER], ["fillRect", 0, 0, TEXTURE, TEXTURE]], `${text} paper`);
     const at = face.findIndex((e) => e[0] === "save");
     assert.ok(at > 1, "transform is scoped by save");
-    assert.deepEqual(face.slice(at, at + 4), [["save"], ["translate", TEXTURE / 2, TEXTURE / 2], ["scale", FACE_FLAT, FACE_FLAT], ["translate", -TEXTURE / 2, -TEXTURE / 2]]);
+    assert.deepEqual(face.slice(at, at + 4), [["save"], ["translate", TEXTURE / 2, TEXTURE / 2], ["scale", FACE_SCALE, FACE_SCALE], ["translate", -TEXTURE / 2, -TEXTURE / 2]]);
     assert.deepEqual(face.at(-1), ["restore"]);
     // The label is exactly the one of the sticker path: same fonts, alignment, baselines and positions.
     assert.deepEqual(labelLog(face), labelLog(sticker), `${text} label shared with the sticker path`);
@@ -78,14 +87,13 @@ test("drawFace: a blank face is blank paper, with no label", () => {
   assert.deepEqual(labelLog(log), []);
 });
 
-test("labels of up to three letters fit inside the flat face with a margin, with the same text square rule", () => {
-  for (const t of ["NO", "VEM", "BER", "MON", "WED", "SEP", "M", "28"]) {
+test("labels of up to three letters fit the 86% text square before scaling, and the scaled square stays in the flat face", () => {
+  for (const t of ["NO", "VEM", "BER", "EMB", "MON", "WED", "M", "28"]) {
     const log = record((c) => drawFace(c, t, "dark", "strict"));
     const size = Number(log.filter((e) => e[0] === "font").at(-1)[1].match(/(\d+)px/)[1]);
     const width = size * 0.6 * t.length; // the recording context's width model
     assert.ok(width <= 0.86 * TEXTURE + 1e-9, `${t} fits the 86% text square`);
-    const shown = width * FACE_FLAT;
-    assert.ok((TEXTURE * FACE_FLAT - shown) / 2 >= 0.07 * TEXTURE * FACE_FLAT - 1e-9, `${t} margin to the flat face edge`);
+    assert.ok(width * FACE_SCALE <= FACE_TEXT_SQUARE * TEXTURE * FACE_FLAT + 1e-9, `${t} inside the text square of the flat face`);
   }
 });
 
