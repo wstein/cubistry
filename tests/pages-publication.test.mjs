@@ -14,15 +14,21 @@ function notify({deployOK,metadata=sha,closed=false,remaining=false,unlabeled=fa
   const pr={number:1,state:closed?'closed':'open',labels:unlabeled?[{name:'e2e'}]:[{name:'preview'}],head:{sha,repo},base:{repo}};
   const run={id:99,head_sha:sha,event:'pull_request',path:'.github/workflows/pages.yml',repository:repo,head_repository:repo,
    pull_requests:[{number:1,head:{sha,repo},base:{repo}}],status:'completed',conclusion:'success'};
+  const proof={schema:1,run:123,attempt:1,sha,storage:'c'.repeat(40),nonce:'d'.repeat(32),tracked:[1]};
+  const publisher={id:123,run_attempt:1,head_sha:sha,head_branch:'main',path:'.github/workflows/pages-publish.yml',repository:repo,head_repository:repo,event:'workflow_dispatch',status:'completed'};
+  mkdirSync(join(dir,'receipt'));writeFileSync(join(dir,'receipt/notification.json'),JSON.stringify({schema:1,run:123,attempt:1,sha,numbers:[1],proof:deployOK?proof:null}));
   const responses={
-   'pulls?state=all&per_page=100&page=1':[pr],
+   'pulls/1':pr,
+   'actions/runs/123':publisher,
+   'actions/workflows/pages-publish.yml/runs?branch=main&per_page=100&page=1':{workflow_runs:[publisher]},
+   'git/trees/gh-pages?recursive=1':{sha:proof.storage},
    'issues/1/comments?per_page=100&page=1':comment?[{id:7,user:{login:'github-actions[bot]'},body:'<!-- cubistry-pr-preview --> old'}]:[],
    [`actions/workflows/pages.yml/runs?event=pull_request&head_sha=${sha}&per_page=100&page=1`]:{workflow_runs:[run]},
    'contents/pr-preview/pr-1/preview-info.json?ref=gh-pages':{content:Buffer.from(JSON.stringify({sha:metadata})).toString('base64')},
    'contents/pr-preview/pr-1?ref=gh-pages':remaining?[{name:'.nojekyll'},{name:'index.html'}]:leftover?[{name:'.nojekyll'}]:null,
   };
-  writeFileSync(join(dir,'mock.mjs'),`import{writeFileSync}from'node:fs';const responses=${JSON.stringify(responses)};globalThis.fetch=async(url,options)=>{const path=String(url).split('/repos/wstein/cubistry/')[1];if(options.method==='POST'||options.method==='PATCH'){writeFileSync(${JSON.stringify(join(dir,'comment'))},options.body);return new Response('{}');}if(!(path in responses))throw Error('Unexpected API request '+path);return new Response(JSON.stringify(responses[path]),{status:responses[path]===null?404:200});};`);
-  execFileSync(process.execPath,['--import',join(dir,'mock.mjs'),resolve('scripts/pages/notify.mjs')],{env:{...process.env,GH_TOKEN:'unit-test-only',DEPLOY_OK:String(deployOK)},stdio:'pipe'});
+  writeFileSync(join(dir,'mock.mjs'),`import{writeFileSync}from'node:fs';const responses=${JSON.stringify(responses)};globalThis.fetch=async(url,options={})=>{if(String(url).startsWith('https://wstein.github.io/'))return new Response(${JSON.stringify(JSON.stringify(proof))});const path=String(url).split('/repos/wstein/cubistry/')[1];if(options.method==='POST'||options.method==='PATCH'){writeFileSync(${JSON.stringify(join(dir,'comment'))},options.body);return new Response('{}');}if(!(path in responses))throw Error('Unexpected API request '+path);return new Response(JSON.stringify(responses[path]),{status:responses[path]===null?404:200});};`);
+  execFileSync(process.execPath,['--import',join(dir,'mock.mjs'),resolve('scripts/pages/notify.mjs')],{cwd:dir,env:{...process.env,GH_TOKEN:'unit-test-only',PUBLISH_RUN:'123'},stdio:'pipe'});
   return JSON.parse(readFileSync(join(dir,'comment'),'utf8')).body;
  }finally{rmSync(dir,{recursive:true,force:true});}
 }
@@ -35,7 +41,7 @@ function publication({previewFailure=false,previewCancelled=false,earlyFailure=f
   if(results.has(id))return;for(const dependency of needs(id))run(dependency);
   const body=jobs.get(id),jobIf=body.match(/^    if: (.*)$/m)?.[1]??'',always=/always\(\)/.test(jobIf);
   const conditions=[...jobIf.matchAll(/needs\.([a-z-]+)\.result == '([^']+)'/g)];
-  if((/!cancelled\(\)/.test(jobIf)&&cancelled)||(!always&&needs(id).some(n=>results.get(n)!=='success'))||conditions.some(m=>results.get(m[1])!==m[2])){results.set(id,'skipped');return;}
+  if((/!cancelled\(\)/.test(jobIf)&&cancelled)||(!always&&needs(id).some(n=>results.get(n)!=='success'))||conditions.some(m=>results.get(m[1])!==m[2])||[...jobIf.matchAll(/contains\(fromJSON\('\["success","skipped"\]'\), needs\.([a-z-]+)\.result\)/g)].some(m=>!['success','skipped'].includes(results.get(m[1])))){results.set(id,'skipped');return;}
   if(id==='previews'){
    writeFileSync(join(storage,'pr-preview/pr-1/preview-info.json'),JSON.stringify({sha}));for(const f of ['index.html','preview-info.json'])rmSync(join(storage,'pr-preview/pr-2',f),{force:true});/* rsync keeps the protected .nojekyll */
    if(previewCancelled)cancelled=true;results.set(id,previewCancelled?'cancelled':previewFailure?'failure':'success');return;
@@ -48,8 +54,8 @@ function publication({previewFailure=false,previewCancelled=false,earlyFailure=f
   results.set(id,'success');
  }
  try{
-  run('notify');assert.equal(results.get('notify'),'success','status notification must still run after a publication failure/cancellation');
-  const gate=jobs.get('notify').match(/DEPLOY_OK: \$\{\{ needs\.([a-z-]+)\.result == 'success' \}\}/)?.[1];assert(gate,'notify must name its actual deployment dependency');
+  run('receipt');assert.equal(results.get('receipt'),'success','status notification must still run after a publication failure/cancellation');
+  const gate='deploy-previews';assert(needs('receipt').includes(gate),'receipt must wait for the final deployment');
   return {published:published&&JSON.parse(readFileSync(join(published,'pr-preview/pr-1/preview-info.json'))).sha,
    removed:published&&!existsSync(join(published,'pr-preview/pr-2/index.html')),leftover:published&&existsSync(join(published,'pr-preview/pr-2/.nojekyll')),results,comment:notify({deployOK:results.get(gate)==='success'})};
  }finally{rmSync(dir,{recursive:true,force:true});}
@@ -81,22 +87,25 @@ test('final snapshot preserves trusted-main boundary, distinct immutable artifac
  assert(needs('previews').includes('deploy'));
  const final=jobs.get('deploy-previews');assert(final);
  for(const id of ['plan','production','deploy','previews'])assert(needs('deploy-previews').includes(id));
- assert.match(final,/if: always\(\).*needs\.production\.result == 'success'.*needs\.deploy\.result == 'success'/);
+ assert.match(final,/if: always\(\).*needs\.plan\.outputs\.previews == 'true'/);
+ for(const dependency of ['production','deploy'])assert(final.includes(`contains(fromJSON('["success","skipped"]'), needs.${dependency}.result)`));
  assert.doesNotMatch(final,/needs\.previews\.result == 'success'/);
  const refs=[...final.matchAll(/          ref: (.+)/g)].map(m=>m[1]);assert.deepEqual(refs,['main','gh-pages']);
  assert.match(final,/permissions:\n      contents: read\n      pages: write\n      id-token: write/);
  assert.doesNotMatch(final,/head_ref|pull_request\.head|npm |matrix\./);
- const upload=final.match(/name: (github-pages[^\n]+)/)?.[1],deployment=final.match(/artifact_name: ([^\n]+)/)?.[1];
+ const upload=final.match(/name: (github-pages[^\n]+)/)?.[1],deployment=final.match(/ARTIFACT_NAME: ([^\n]+)/)?.[1];
  assert(upload&&upload!=='github-pages');assert.equal(upload,deployment);
  // Expected pins come from pages.yml, so a Dependabot bump needs no test edit. Both must be full commit SHAs and equal.
  const pagesYml=readFileSync('.github/workflows/pages.yml','utf8');
- for(const action of ['actions/upload-pages-artifact','actions/deploy-pages']){
+ for(const action of ['actions/upload-pages-artifact']){
   const re=new RegExp(`${action}@([^\\s#]+)`);
   const expected=pagesYml.match(re)?.[1];
   assert.match(expected??'',/^[0-9a-f]{40}$/,`${action} in pages.yml must be pinned to a commit SHA`);
   assert.equal(final.match(re)?.[1],expected,`${action} in pages-publish.yml must use the same commit SHA as pages.yml`);
  }
- assert.match(jobs.get('notify'),/DEPLOY_OK: \$\{\{ needs\.deploy-previews\.result == 'success' \}\}/);
+ assert(!jobs.has('notify'),'comment writers must not retain the publication lock');
+ assert.match(final,/run: node code\/scripts\/pages\/publish\.mjs deploy/);
+ assert(needs('receipt').includes('deploy-previews'));
 });
 
 test('operator cancellation after early production prevents final publication and fresh availability or cleanup claims',()=>{

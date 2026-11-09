@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { writeFile, mkdir, appendFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { GitHub } from "./api.mjs";
@@ -77,5 +78,6 @@ if (action === "deploy") {
       "artifact-site/preview-info.json",
       JSON.stringify({ number: entry.number, sha: entry.sha, run: entry.run }),
     );
+  else await writeFile('artifact-site/.cubistry-production.json',JSON.stringify({sha:entry.sha,run:entry.run}));
 }
 await appendFile(process.env.GITHUB_OUTPUT, `action=${action}\n`);
