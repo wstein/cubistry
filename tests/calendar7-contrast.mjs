@@ -15,3 +15,11 @@ export const mix = (hex, target, k) => {
   const t = ch(target);
   return "#" + ch(hex).map((v, i) => Math.round(v + (t[i] - v) * k).toString(16).padStart(2, "0")).join("");
 };
+
+/** Minimal shift of `hex` toward black (when lighter than `ref`) or white, in 1% steps, until it reads `min`:1 on `ref`. */
+export const shiftToContrast = (hex, ref, min) => {
+  if (contrast(hex, ref) >= min) return hex;
+  const target = lum(hex) >= lum(ref) ? "#ffffff" : "#000000";
+  for (let k = 0.01; k <= 1.0001; k += 0.01) if (contrast(mix(hex, target, k), ref) >= min) return mix(hex, target, k);
+  return hex;
+};
