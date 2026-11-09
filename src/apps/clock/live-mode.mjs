@@ -130,6 +130,9 @@ export async function mountLiveClock(studio, params, shell, isCurrent) {
   }
 
   // A lettering change swaps the stickers in place; a failure keeps the old print and shows an error row.
+  // The entry guard is defensive: shell.listen retires the UI callback with its mode.
+  // Keep disposed alongside isCurrent after each await as well: direct cleanup can
+  // end this mount without advancing the router generation.
   async function changeLettering(value) {
     if (disposed || !isCurrent()) return;
     const before = lettering;
