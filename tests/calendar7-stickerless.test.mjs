@@ -54,8 +54,9 @@ test("FACE_FLAT is the real flat part of the body face in texture space (same ge
   assert.ok(Math.abs(u1 - u0 - FACE_FLAT) < 1e-3, `flat uv span ${u1 - u0}`);
   assert.ok(Math.abs((u0 + u1) / 2 - 0.5) < 1e-6, "the flat face is centered in the texture");
   assert.ok(Math.abs(x1 - x0 - (p.bodyWidth - 2 * p.bodyRadius)) < 1e-6, "the flat face is the body width minus both bevels");
-  // The art keeps clear of the bevel: the 86% text square scaled by FACE_FLAT is inside the flat part with margin.
-  assert.ok(FACE_TEXT_SQUARE < 1);
+  // The art keeps clear of the bevel: the text square is FACE_TEXT_SQUARE (0.92) of the flat face, so 4% of the flat
+  // width stays free on each side; pinned to the measured value in the next test.
+  assert.equal(FACE_TEXT_SQUARE, 0.92);
 });
 
 test("the stickerless text size is pinned: text square 0.92 of the flat face, picked from the candidates 0.86, 0.92, 0.97", () => {
