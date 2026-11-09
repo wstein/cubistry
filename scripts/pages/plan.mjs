@@ -2,9 +2,8 @@
 import { writeFile, appendFile } from "node:fs/promises";
 import { GitHub } from "./api.mjs";
 import { plan, previewInventory, BUILD_WORKFLOW, hasPreviewLabel } from "./policy.mjs";
-import { readPublication } from './publication.mjs';
+import { readVerifiedPublication } from './publication.mjs';
 import { optimizePlan, notificationNumbers, retainNotificationCandidates, commentMarker } from './reconciliation.mjs';
-import { trustedPublisher } from './notification.mjs';
 const api = new GitHub();
 const pages = await api.request("pages");
 if (
@@ -36,11 +35,7 @@ let result = plan({
   builds,
   main: { sha: main.sha, runs },
 });
-let published=await readPublication();
-if(published){
-  const source=await api.request(`actions/runs/${published.run}`);
-  if(!trustedPublisher(source)||source.run_attempt!==published.attempt||source.head_sha!==published.sha)published=null;
-}
+const published=await readVerifiedPublication(api);
 const production=await metadata('.cubistry-production.json');
 const previews={};
 for(const entry of result.entries)if(entry.action==='deploy')previews[entry.number]=await metadata(`pr-preview/pr-${entry.number}/preview-info.json`);
