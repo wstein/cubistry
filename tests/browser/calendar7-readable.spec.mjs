@@ -141,15 +141,15 @@ for (const loading of ["viewer","data"]) test(`all playback selections made whil
     await page.goto('/index.html?app=calendar7&year=2028&month=1',{waitUntil:'domcontentloaded'});await requested;
     if(loading==='data') {
       // Hidden initial controls can receive browser-restored values before handlers attach.
-      await page.evaluate(()=>{for(const [name,value] of Object.entries({orientation:"after",notation:"raw",speed:"250"})) document.querySelector(`[data-c7="${name}"]`).value=value;document.querySelector('[data-c7="slice"]').checked=false});
+      await page.evaluate(()=>{for(const [name,value] of Object.entries({orientation:"after",notation:"raw",speed:"500"})) document.querySelector(`[data-c7="${name}"]`).value=value;document.querySelector('[data-c7="slice"]').checked=false});
     } else {
       await page.locator('[data-c7="orientation"]').selectOption('after');
       await page.locator('[data-c7="notation"]').selectOption('raw');
       await page.locator('[data-c7="slice"]').uncheck();
-      await page.locator('[data-c7="speed"]').selectOption('250');
+      await page.locator('[data-c7="speed"]').selectOption('500');
     }
     release();await idle(page,'2028-01');
-    await expect(page.locator('[data-c7="speed"]')).toHaveValue('250');
+    await expect(page.locator('[data-c7="speed"]')).toHaveValue('500');
     await expect(page.locator('[data-c7="orientation"]')).toHaveValue('after');
     await expect(page.locator('[data-c7="notation"]')).toHaveValue('raw');
     await expect(page.locator('[data-c7="slice"]')).not.toBeChecked();

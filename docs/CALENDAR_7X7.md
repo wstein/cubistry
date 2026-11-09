@@ -207,7 +207,7 @@ Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the earlier soft
 - **Animation.** The alignment is a rotation of the model (all bodies turn about their axis), not a camera move; the Smart
   Rubber Band camera controller is untouched. It is timed and eased exactly like a single-layer turn: the Speed setting times its quarter turns is
   its duration and the view's smoothstep is its easing. The earlier soft start (critically damped response,
-  about 1.3 s for a quarter turn at 1x) is no longer used by the player; `soft-start.ts` stays as a tested helper. Under reduced motion a step jumps and needs
+  about 1.3 s for a quarter turn) is no longer used by the player; `soft-start.ts` stays as a tested helper. Under reduced motion a step jumps and needs
   no alignment; if the preference turns on while a step plays, the alignment takes 150 ms per rotation (up to 300 ms).
 - **Progress.** The free orientation is a separate prefix or suffix phase. Only
   nonrotation blocks contribute to the move count; skip and pause work in every phase.
