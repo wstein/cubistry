@@ -1,0 +1,8 @@
+Created by Werner Stein with AI assistance (Codex, OpenAI). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+The joined chain and exports were generated with Codex, OpenAI. The unchanged
+research print, root words, and original Actions artifacts retain their original
+attribution: Created by Werner Stein with AI assistance (Claude, Anthropic).
+See calendar7-source.json and docs/CALENDAR_7X7.md for source pins.

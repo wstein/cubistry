@@ -2,7 +2,7 @@
 // English 7x7 calendar cube: middle-slice block moves ("rule c", research candidate, not certified). A display layer
 // over the stored words: `groupBlocks(word, { slice: true })` regroups a word into blocks that may contain layer 0.
 // Properties on seeded random words, the same stored digest for every stored edge in both directions, the counts of the
-// research measurement (research/calendar-7x7/wide-blocks, PR #346) for the 91 root words and the 576 chain edges, an
+// research measurement (research/calendar-7x7/wide-blocks, PR #346) for the 91 historical root words and the shipped chain edges, an
 // independent slab-turn oracle, an independent exact-minimum oracle (plain BFS), and negative controls.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -308,11 +308,11 @@ test("every stored edge, forward and backward, with slice blocks: the stored dig
     if (blocks.some((b) => b.kind === "slice")) withSlice++;
     pose = forward;
   }
-  // The research measurement (chain576, rule c, HTM-like): 75433 layer moves become 52594 block moves.
-  assert.equal(htm, 75433);
-  assert.equal(sliceBlocks, 52594);
+  // The joined strict chain: exact stored layer count and measured rule-c block count.
+  assert.equal(htm, 103618);
+  assert.equal(sliceBlocks, 79100);
   assert.ok(plainBlocks > sliceBlocks && plainBlocks < htm);
-  assert.ok(withSlice > 400, `slice blocks occur on ${withSlice} of 576 edges`);
+  assert.ok(withSlice > 400, `slice blocks occur on ${withSlice} of 883 edges`);
 });
 
 test("the 91 root words of the research measurement: 40642 layer moves, 30696 block moves with the middle slice", () => {

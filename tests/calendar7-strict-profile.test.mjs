@@ -28,11 +28,11 @@ const { pose: root } = parseState(JSON.parse(readFileSync("public/calendar7/stat
 const strictNorm = (t, a, i = "dark") => imageNormal(t, a, i, "strict");
 const legacyNorm = (t, a, i = "dark") => imageNormal(t, a, i, "legacy");
 
-test("profiles: legacy is the default and the only switch is DEFAULT_RULE_PROFILE", () => {
+test("profiles: strict is the default and the only switch is DEFAULT_RULE_PROFILE", () => {
   assert.deepEqual([...RULE_PROFILES], ["legacy", "strict"]);
-  assert.equal(DEFAULT_RULE_PROFILE, "legacy");
-  assert.deepEqual(imageNormal("O", 0, "dark"), legacyNorm("O", 0));
-  assert.deepEqual(imageNormal("O", 0, "dark"), legacyNorm("0", 0));
+  assert.equal(DEFAULT_RULE_PROFILE, "strict");
+  assert.deepEqual(imageNormal("O", 0, "dark"), strictNorm("O", 0));
+  assert.notDeepEqual(imageNormal("O", 0, "dark"), strictNorm("0", 0));
 });
 
 test("strict glyph rule: 0 versus O, 1 versus I, 6 and 9, no other half-turn reading", () => {
@@ -250,14 +250,14 @@ test("sticker art: strict draws split labels as two upright runs, other labels a
   assert.deepEqual(c.fonts.filter((f) => f.startsWith("600")).slice(0, 2).map((f) => f.match(/^600 (\d+)px/)[1]), ["110", "50"]);
   assert.deepEqual(c.aligns, ["center", "right"]);
   assert.ok(c.baselines.every((b) => b === "alphabetic"));
-  // Legacy and the default profile are unchanged: one line, centered, middle baseline, fitted size.
+  // Legacy is unchanged: one line, centered, middle baseline, fitted size.
   const old = drawRun("23/30", "red", "legacy");
   assert.deepEqual(old.aligns, ["center"]);
   assert.deepEqual(old.baselines, ["middle"]);
   assert.deepEqual(old.texts.map((t) => [t[1], t[2]]), [[TEXTURE / 2, TEXTURE / 2 + Number(old.fonts.at(-1).match(/(\d+)px/)[1]) * 0.04]]);
   // Legacy keeps the one-line label; strict draws MON and FRI as plain one-line letters.
   assert.deepEqual(drawRun("23/30", "red", "legacy").texts.map((t) => t[0]), ["23/30"]);
-  assert.deepEqual(drawRun("23/30", "red").texts.map((t) => t[0]), ["23/30"]);
+  assert.deepEqual(drawRun("23/30", "red").texts.map((t) => t[0]), ["23", "30"]);
   for (const t of ["MON", "FRI", "7", "28", "O"]) assert.deepEqual(drawRun(t, "weekday", "strict").texts.map((x) => x[0]), [t]);
   assert.deepEqual(drawRun("", "blank", "strict").texts, []);
 });

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { alignmentText, playedBlocks } from "../../src/apps/calendar7/deferral.ts";
@@ -12,7 +13,7 @@ import { parseGraph } from "../../src/apps/calendar7/graph.ts";
 const ROOT = "#calendar7-root";
 // What the page plays for January to February 2028 (rule c, rotations deferred), from the unit-level function: the number
 // of layer blocks and the end alignment. The numbers are pinned as well, so that a change of either is noticed.
-const FEB = playedBlocks(parseGraph(JSON.parse(readFileSync("public/calendar7/graph.v1.json", "utf8"))).edges[0].moves, { slice: true, defer: true });
+const FEB = playedBlocks(parseGraph(JSON.parse(readFileSync("public/calendar7/graph.v1.json", "utf8"))).edges[20].moves, { slice: true, defer: true });
 const FEB_BLOCKS = FEB.blocks.length;
 const FEB_ALIGNMENT = alignmentText(FEB.alignment);
 const watch = (page) => {
@@ -37,7 +38,7 @@ test("the 3D cube shows the month of the URL in the pose of the stored node", as
   expect(box.width).toBeGreaterThan(200);
   expect(box.height).toBeGreaterThan(200);
   await expect(canvas).toHaveAttribute("aria-label", /7x7 calendar cube showing March 2028/);
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[2].hash);
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[22].hash);
   await expect(page.locator(".c7-month")).toHaveText("March 2028");
   expect(seen).toEqual([]);
 });
@@ -51,10 +52,10 @@ test("under reduced motion a step jumps: no animation, the state still equals th
   await expect(page.locator('[data-c7="play"]')).toBeDisabled();
   await page.locator('a[data-nav="next"]').click();
   await idle(page, "2028-02");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[1].hash);
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[21].hash);
   await page.locator('a[data-nav="previous"]').click();
   await idle(page, "2028-01");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[0].hash);
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[20].hash);
   expect(seen).toEqual([]);
 });
 
@@ -69,7 +70,7 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   const progress = page.locator('[data-c7="progress"]');
   await page.locator('a[data-nav="next"]').click();
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "playing");
-  expect([FEB_BLOCKS, FEB_ALIGNMENT]).toEqual([98, "y+"]);
+  expect([FEB_BLOCKS, FEB_ALIGNMENT]).toEqual([101, "x+, y2"]);
   await expect(progress).toHaveText(new RegExp(`^Turning to February 2028: block \\d+ of ${FEB_BLOCKS}$`));
   // The alignment is a separate, free indicator: it is found at the end of the layer blocks.
   await expect(page.locator('[data-c7="alignment"]')).toHaveText("Alignment: at the end");
@@ -91,7 +92,7 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   // The button is inactive now but keeps the keyboard focus.
   await expect(page.locator('[data-c7="skip"]')).toBeFocused();
   await expect(page.locator('[data-c7="skip"]')).toHaveAttribute("aria-disabled", "true");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[1].hash);
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[21].hash);
   await expect(page.locator('[data-c7="alignment"]')).toHaveText(`Alignment: ${FEB_ALIGNMENT}`);
   await expect(progress).toHaveText("The cube shows February 2028.");
   await expect(page.locator(".c7-live")).toContainText("The cube has turned to February 2028");
@@ -102,24 +103,24 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   await expect(progress).toHaveText(/^Turning to February 2028/);
   await page.locator('[data-c7="skip"]').click();
   await idle(page, "2028-02");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[1].hash);
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[21].hash);
   await page.locator('a[data-nav="previous"]').click();
   await page.locator('[data-c7="skip"]').click();
   await idle(page, "2028-01");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[0].hash);
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[20].hash);
   expect(seen).toEqual([]);
 });
 
 test("the chain ends: the last month steps back, the first has no previous step", async ({ page }) => {
   const seen = watch(page);
   const nodes = await graph(page);
-  await page.goto("/index.html?app=calendar7&year=2076&month=1");
-  await idle(page, "2076-01");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[576].hash);
+  await page.goto("/index.html?app=calendar7&year=2099&month=12");
+  await idle(page, "2099-12");
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[883].hash);
   await expect(page.locator('a[data-nav="next"]')).toHaveCount(0);
   await page.locator('a[data-nav="previous"]').click();
-  await idle(page, "2075-12");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[575].hash);
+  await idle(page, "2099-11");
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", nodes[882].hash);
   expect(seen).toEqual([]);
 });
 
@@ -129,7 +130,7 @@ test("a month outside the chain hides the cube; leaving the mode releases the sc
   await expect(page.locator(".c7-unavailable")).toBeVisible();
   await expect(page.locator("#studio-scene")).toBeHidden();
   await page.locator('a[data-nav="start"]').click();
-  await idle(page, "2028-01");
+  await idle(page, "2026-05");
   await expect(page.locator("#studio-scene")).toBeVisible();
   await expect(page.locator("#studio-scene canvas")).toHaveCount(1);
   await page.evaluate(() => {

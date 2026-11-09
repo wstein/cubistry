@@ -11,11 +11,11 @@
  *    uses the letters MON and FRI, split labels such as 23/30 are drawn as a big
  *    first number and a small second number in the lower right (no slash).
  *
- * The data (print, chain, pin) is still the legacy data, so the default stays "legacy".
- * Switching to "strict" later is a data change plus changing DEFAULT_RULE_PROFILE here.
+ * The shipped print, root, joined chain and pin use the strict upright rule.
+ * Legacy remains available explicitly for historical fixtures and compatibility tests.
  */
 export const RULE_PROFILES = ["legacy", "strict"] as const;
 export type RuleProfile = (typeof RULE_PROFILES)[number];
 
 /** The only switch: the profile every default argument of the mode uses. */
-export const DEFAULT_RULE_PROFILE: RuleProfile = "legacy";
+export const DEFAULT_RULE_PROFILE: RuleProfile = "strict";

@@ -14,7 +14,7 @@ the next month.
 
 - URL parameters: `year` and `month` (1 to 12), only together. Without them the
   current month is used.
-- Range: only the months of the proven chain, **January 2028 to January 2076**, can
+- Range: only the months of the proven chain, **May 2026 to December 2099**, can
   be shown. Any other month, including the current month while it is outside that range, gets a "Not available
   yet" message with links to the first and the last chain month.
 - Steps: previous and next month along the chain. The move word of a forward step is
@@ -130,7 +130,7 @@ The measurement behind it is `research/calendar-7x7/wide-blocks` (research pull 
 - **Three counts.** The page shows, for each step: *layer moves* (HTM, the stored count, unchanged), *block moves without the middle
   slice* (the blocks of the previous section) and *block moves with the middle slice* (rule c). In the third count turning the middle slice
   counts as a move; whole-cube rotations stay free in all three. On the 91 root words of the research
-  the layer moves total 40642 and the block moves with the middle slice 30696; on the 576 stored edges 75433 and 52594.
+  the layer moves total 40642 and the block moves with the middle slice 30696; on the 883 stored strict edges 103618 and 79100.
 - **Playback.** The player plays rule-c blocks by default, one tween per block; a slice block is animated as a real slab turn of
   its interval including layer 0 (the camera does not move). The option **Middle slice counts as a move** (in the animation
   controls) switches back to the blocks without the middle slice for the next step; a step in progress keeps its blocks. The progress line
@@ -190,7 +190,7 @@ Research branch (`research/calendar-7x7/pure-split-states`):
   a stacked sticker (`23/30` or `24/31`); there are no overflow marks;
 - the month letters sit in columns 5 to 7 for January to September and in columns 2
   to 4 for October to December;
-- 240 stickers are printed and 54 are blank.
+- 243 stickers are printed and 51 are blank.
 
 The checkers behind it (Julia `pure_chain.jl` and a Flix port) share the front rule
 and a structural port of the same logic. No independent review of the 91 display
@@ -198,21 +198,53 @@ states exists yet. This is why the status stays "research candidate, not certifi
 
 ## Domain: what is covered and what is not
 
-| Covered | Not covered |
-| --- | --- |
-| A chain of 576 month-to-month edges from **January 2028** to **January 2076**, one physical state kept throughout | Anything before 2028-01, in particular **2026-11 to 2027-12** (this period lies before the chain starts) |
-| All 91 display types (7 start weekdays × 13 month types) occur on the chain | **2076-02 to 2099-12**: the chain does not reach 2099-12 yet; 287 more edges are still to be produced |
-| The display sheets of all 888 months 2026 to 2099 | A route from a solved cube to the chain root: no practical setup route exists |
-| Replay, hash equality with the research receipts, inverse restoration, front check | Shortcut or star routes: every jump would be a walk along the chain |
-| | Optimizer, solver, sticker sheet or physical build instruction |
+The shipped strict chain covers **May 2026 through December 2099**: 884 nodes,
+883 chronological edges and 103618 layer moves (HTM). November 2026 works without
+URL parameters. The display table covers all 888 months in 2026 through 2099,
+but January through April 2026 have no shipped physical route. Dates outside that
+range, shortest routes, an optimizer, a print sheet generator and physical build
+instructions are not provided.
+
+### Data flow and the January 2028 seam
+
+The app consumes one immutable printing and root pose from state.v1.json, one
+chronological retained-state chain from graph.v1.json, and the 91 display sheets
+with month-to-display IDs from displays.v1.json. The player walks stored edge
+words for jumps; adjacent months play that edge or its inverse. Each completed
+step checks the full 294-sticker state digest. Display identity alone cannot
+replace physical state identity, and the 98 display transitions are not reusable
+edges between arbitrary retained states.
+
+Two verified Actions artifacts supply the source chains: run 42523213490,
+artifact upc-chain-42523213490-s1 (May 2026 to January 2028, 20 edges, 2255 HTM),
+and run 42479620239, artifact upc-chain-42479620239-s6 (January 2028 to December
+2099, 863 edges, 98431 HTM). Their January 2028 digests differ. The original
+artifacts and receipts stay separately pinned and unchanged.
+
+The final window edge (December 2027 to January 2028) is derived from its original
+word, the inverse of the entire window chain, the inverse of the window root
+word, and the full-chain root word. Adjacent equal generators are
+combined modulo four; the original window endpoint may be canceled from this
+route. No state is reset or substituted. The final digest is the
+full-chain root digest, after which its 863 edges are unchanged. There is one
+January 2028 node. The seam costs **3057 HTM**, 2932 more than the original window
+edge (125 HTM); it is intentionally long and makes no optimality claim.
+
+The bridge generator normalizes adjacent equal generators because the independent
+upright replay checker measures HTM after that normalization. An initial raw
+concatenation produced equal states but inconsistent declared HTM (3334 versus
+3057); only the generated word was corrected. No checker was changed. All three
+unchanged checkers then replayed the normalized chain.
 
 ### Start state
 
-Because there is no setup route, the start state is a **pose snapshot**: the 294
-stickers are applied to the cube in the pose listed in `state.v1.json` (D-3 of the
-design). The snapshot is the January 2028 root of the chain, derived by the Research
-code from the print and the legal word DAG; its SHA-256 digest equals the source hash
-of the chain.
+The root pose snapshot is May 2026, exported by the pinned Julia research code
+from the strict print and its strict root word. Its SHA-256 equals the chain
+source digest. The root word gives a legal setup from the solved printing; this
+app still starts with the snapshot and does not present a setup tutorial.
+
+DEFAULT_RULE_PROFILE is global. All runtime data is strict, so it switches
+globally; no date-dependent profile selection or second runtime data set exists.
 
 ## Files
 
@@ -222,14 +254,14 @@ of the chain.
 | `data/calendar7/research/` | Byte copies of the pinned research print, chain and Julia receipt |
 | `data/calendar7/julia/` | Output of [scripts/calendar7/export-julia.jl](../scripts/calendar7/export-julia.jl): root pose snapshot and display sheets |
 | `public/calendar7/state.v1.json` | The printing (piece, text, ink) and the root pose of each sticker |
-| `public/calendar7/graph.v1.json` | Route graph: 577 nodes (state hash, display, month) and 576 edges (move words) |
+| `public/calendar7/graph.v1.json` | Route graph: 884 nodes (state hash, display, month) and 883 edges (move words) |
 | `public/calendar7/displays.v1.json` | 91 display sheets and the display id of each month 2026 to 2099 |
 | [scripts/prepare-calendar7.mjs](../scripts/prepare-calendar7.mjs) | Pin, convert and check (Node, no Python) |
 | `src/apps/calendar7/` | Pure engine, display, graph, month-view, player and tween modules (no DOM, no timers), the sticker art, the WebGL viewer and the DOM mount of the mode |
 | [tests/calendar7-replay.test.mjs](../tests/calendar7-replay.test.mjs) | Full replay and negative controls, part of `npm test` |
 | [tests/calendar7-mode.test.mjs](../tests/calendar7-mode.test.mjs) | Registry entry, month choice, navigation bounds, move words and mount |
 | [tests/calendar7-blocks.test.mjs](../tests/calendar7-blocks.test.mjs) | Block moves: examples, property tests on random words (same state and digest, same multiset), identical digest for every stored edge in both directions, notation and counts on the page |
-| [tests/calendar7-slice.test.mjs](../tests/calendar7-slice.test.mjs) | Middle-slice blocks (rule c): examples, independent slab-turn and exact-minimum oracles, property tests on random words, identical digest for every stored edge both ways, counts of the research (91 roots from `tests/fixtures/calendar7-roots91.tsv`, 576 edges), negative controls, the player and the page |
+| [tests/calendar7-slice.test.mjs](../tests/calendar7-slice.test.mjs) | Middle-slice blocks (rule c): examples, independent slab-turn and exact-minimum oracles, property tests on random words, identical digest for every stored edge both ways, counts of the research (91 historical roots from `tests/fixtures/calendar7-roots91.tsv`, 883 strict edges), negative controls, the player and the page |
 | [tests/calendar7-deferral.test.mjs](../tests/calendar7-deferral.test.mjs) | Deferred rotations and the end alignment: properties, every stored edge both ways, search of the 24 orientations, mismatch, negative controls, soft start, player phases |
 | [tests/calendar7-player.test.mjs](../tests/calendar7-player.test.mjs) | Step player (digest equals the stored hash after each step, both directions, chain ends, skip, pause, reduced motion, dispose), tween, sticker art, 3D mount |
 | [tests/calendar7-strict-profile.test.mjs](../tests/calendar7-strict-profile.test.mjs) | Strict profile: glyph rule (0 and O, 1 and I, 6 and 9, upright stacks, MON and FRI), agreement with the verifier reading, split-label geometry and drawing |
@@ -246,16 +278,15 @@ of the chain.
   rotations are counted separately.
 - A word in `graph.v1.json` uses one character per move; the alphabet and index
   formula are in the file.
-- The front rule of the shipped (legacy) profile is the Research rule, not appearance
-  matching: O and 0, I and 1 are equal glyphs, half-turn symmetric glyphs and the pairs 6
-  and 9 are accepted, and a stacked label must be upright with exactly the same text and ink.
+- The shipped strict rule has no glyph aliases. Only 0 (any turn) and 6/9
+  (half turn) have neutral readings; other glyphs and split labels must be upright.
 
 ## Rule profiles: legacy and strict
 
 The app has two rule profiles, selected in one place: `DEFAULT_RULE_PROFILE` in
 `src/apps/calendar7/profile.ts`. There is no URL parameter and no user-facing switch.
 
-| | `legacy` (default, shipped) | `strict` (prepared, not active) |
+| | `legacy` (explicit compatibility profile) | `strict` (default, shipped) |
 | --- | --- | --- |
 | Glyph aliases | O = 0 and I = 1 | none: O is not 0, I is not 1 |
 | Equal after a turn | 0 (any turn), 1 2 5 8 H N S X Z (half turn) and 6 and 9 | only the digit 0 (any turn) and 6 and 9 (half turn) |
@@ -285,17 +316,12 @@ at least 12 px of gap and 10 px of margin. The Noto Sans font (OFL-1.1) is uncha
 **What is profile-gated.** `imageNormal` and `frontFailure` in `display.ts` take the profile as
 the last argument, and `drawSticker` in `sticker-art.ts` takes it as the fourth; the default is
 `DEFAULT_RULE_PROFILE`. Every call in the mode (chain verification, the 3D viewer) uses the
-default, so the shipped behavior, the pinned data and the existing tests are unchanged.
+default strict profile. Explicit legacy tests remain for its historical behavior.
 `monthCells` is not gated: the display sheet already uses `MON`, `FRI`, `23/30` and `24/31`.
 
-**What is pending.** The strict print (`print-strict-upright.tsv` on the research branch)
-needs its move words and chain, which are not available yet. Until then
-`calendar7-source.json` stays pinned to the legacy research commit and the data in
-`public/calendar7/` and `data/calendar7/` stays the legacy print and chain. Switching to strict
-later is a data change (new print, graph, state and pin) plus setting `DEFAULT_RULE_PROFILE`
-to `"strict"`; the legacy-print assertions in the existing tests (for example `M0N`) will then
-be replaced by the strict ones in the same change. The HTML month sheet still shows split
-labels on one line in both profiles.
+The strict print and root words are copied unchanged from research. The HTML
+month sheet still shows split labels on one line in both profiles. A printable
+sticker sheet generator remains separate future work.
 
 ## Verification
 
@@ -320,24 +346,40 @@ and a quarter-turned plain sticker are checked through the reason of `frontFailu
 the pin controls only through the word "pin". The two inverse-restoration checks cannot be
 falsified without corrupting the engine itself.
 
-Regenerate the Julia exports with Julia 1.13 as in `mise.toml` and a checkout of the pinned research
-commit at `$RESEARCH`:
+Regenerate from a checkout of the pinned research commit at `$RESEARCH`:
 
 ```sh
 PURE=$RESEARCH/research/calendar-7x7/pure-split-states
-gunzip -c $PURE/evidence/dag-all.tsv.gz > /tmp/dag-all.tsv
+STRICT=data/calendar7/research/strict
+DAG=/tmp/calendar7-strict-dag.tsv
+gunzip -c "$PURE/evidence/dag-all.tsv.gz" > "$DAG"
+julia --startup-file=no scripts/calendar7/join-strict-chains.jl \
+  "$PURE" "$STRICT/window/moves.tsv" "$STRICT/full/moves.tsv" \
+  "$STRICT/moves-strict.tsv" "$STRICT/chain-2026-2099.moves.tsv"
 julia --startup-file=no scripts/calendar7/export-julia.jl \
-  $PURE /tmp/dag-all.tsv data/calendar7/research/chain-2028-2076.moves.tsv data/calendar7/julia
+  "$PURE" "$DAG" "$STRICT/chain-2026-2099.moves.tsv" \
+  "$STRICT/print-strict-upright.tsv" "$STRICT/moves-strict.tsv" data/calendar7/julia
 node scripts/prepare-calendar7.mjs
 ```
 
+The research checkers are pure_chain.jl (CUBISTRY_RULE=strict, PRINT DAG CHAIN
+ROOT_MOVES), the pure-split Flix jar's chain command, and
+upright-beam/verify_chain.jl (PRINT ROOT_MOVES CHAIN). Store the generated Julia
+and Flix receipts without their startup rule-selfcheck line; they must be
+byte-identical. Pin their hashes and the independent replay receipt under
+calendar7-source.json generatedSources. Never relabel artifact receipts as the
+joined-chain receipt. The TypeScript replay is an application regression check,
+not a replacement for the Julia and Flix proof checkers.
+
 ## Pin
 
-The pin names the research commit `bcee891dd0d247383d5b7604f106cb76180c98d7` on
-`research/cube-display-feasibility`, the merge of the pull request that stores the chain
-there. Research is merged by rebase, which rewrites commit ids, so a new research commit
-needs a new pin: `node scripts/prepare-calendar7.mjs --pin <commit> --branch
-research/cube-display-feasibility`. The SHA-256 values of the data do not change.
+The strict research inputs are pinned to
+8c823fe6f6e3cd3c9ecc4e5797177498944ac285. The full artifact used research ref
+7b704c368e9ea497be9e3e8dd54e5b5ff761bbba. Artifact run workflow heads are separate
+from those research refs and are recorded in calendar7-source.json. Its sources
+bind research bytes; artifacts bind original downloaded bytes; generatedSources
+bind the joined chain, generator and new receipts. The strict print SHA-256 is
+4fc44606e5dcdd745647f57b3086570910b4068a48d001553f99b1625106bcab.
 
 ## Licensing
 
@@ -347,7 +389,7 @@ The code (`src/apps/calendar7/`, `scripts/prepare-calendar7.mjs`,
 display sheets, states, chain, move words, edges and receipts) is a separate work under
 CC BY-SA 4.0, SPDX-License-Identifier: CC-BY-SA-4.0:
 
-> Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0
+> Created by Werner Stein with AI assistance (Codex, OpenAI). Licensed under CC BY-SA 4.0
 > (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
 
 Each data directory carries a `NOTICE.txt`; see also

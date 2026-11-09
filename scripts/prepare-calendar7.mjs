@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Pin, convert and verify the English 7x7 calendar data (pure split, month-letter scheme A)
 // from the research branch. Research candidate, not certified. No hand-edited data: the
-// files under data/calendar7 are byte copies of pinned research files or Julia exports,
+// files under data/calendar7 are pinned research/artifact copies or Julia-derived data,
 // and public/calendar7 is derived from them by this script alone.
 //
 //   node scripts/prepare-calendar7.mjs --check [--require-commit]
@@ -29,20 +30,22 @@ export const PIN = "calendar7-source.json";
 export const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
 const R = "research/calendar-7x7/pure-split-states/";
-const CHAIN = `${R}evidence/chain-2028-2076.moves.tsv`;
-const PRINT = `${R}evidence/print-pure-A.tsv`;
-const RECEIPT = `${R}evidence/receipts/chain-2028-2076.julia.tsv`;
-/** Research files that are pinned, and where the app keeps a byte copy (null: hash only). */
+const CHAIN = "data/calendar7/research/strict/chain-2026-2099.moves.tsv";
+const PRINT = "research/calendar-7x7/upright-feasibility/evidence/print-strict-upright.tsv";
+/** Immutable strict research inputs; artifact outputs are pinned separately. */
 export const RESEARCH_FILES = {
-  [PRINT]: "data/calendar7/research/print-pure-A.tsv",
-  [CHAIN]: "data/calendar7/research/chain-2028-2076.moves.tsv",
-  [RECEIPT]: "data/calendar7/research/chain-2028-2076.receipt.julia.tsv",
-  [`${R}evidence/receipts/chain-2028-2076.flix.tsv`]: null,
-  [`${R}evidence/chain-2028-2076-edges.tsv`]: null,
+  [`${R}flix/src/Chain.flix`]: null,
+  [`${R}flix/src/Main.flix`]: null,
+  [`${R}flix/src/Stacked.flix`]: null,
+  [PRINT]: "data/calendar7/research/strict/print-strict-upright.tsv",
+  "research/calendar-7x7/upright-moves/evidence/moves-strict.tsv": "data/calendar7/research/strict/moves-strict.tsv",
   [`${R}evidence/dag-all.tsv.gz`]: null,
   [`${R}pure_chain.jl`]: null,
   [`${R}pure_common.jl`]: null,
   [`${R}stacked_common.jl`]: null,
+  "research/calendar-7x7/upright-flix/rule_select.jl": null,
+  "research/calendar-7x7/upright-beam/verify_chain.jl": null,
+  "research/calendar-7x7/upright-moves/verify_moves.jl": null,
 };
 /** Julia exports (scripts/calendar7/export-julia.jl) and the script that makes them. */
 export const JULIA = {
@@ -164,7 +167,7 @@ export function build(pin) {
   const print = parsePrint(readText(pin.copies[PRINT]));
   const rootRaw = readText(JULIA.root);
   const root = parseRoot(rootRaw);
-  const chain = parseChain(readText(pin.copies[CHAIN]));
+  const chain = parseChain(readText(CHAIN));
   const table = parseDisplaysTsv(readText(JULIA.displays));
   if (sha256(rootRaw) !== chain.source.hash) throw Error("root-state.tsv does not hash to the chain source hash");
   root.forEach((s, i) => {
@@ -185,7 +188,9 @@ export function build(pin) {
     schema: "cubistry.calendar7.state",
     version: 1,
     status: "research candidate, not certified",
-    print: "pure split, month-letter scheme A",
+    print: "strict upright, pure split, month-letter scheme A",
+    license: pin.dataNotice,
+    spdx: "CC-BY-SA-4.0",
     root: { display: chain.source.root, year: chain.source.year, month: chain.source.month, hash: chain.source.hash },
   };
   const state = serialize(stateHeader, { stickers: root.map((s) => ({ id: s.id, piece: s.piece, text: s.text, ink: s.ink, p: s.p, n: s.n, up: s.up })) });
@@ -194,6 +199,8 @@ export function build(pin) {
       schema: "cubistry.calendar7.graph",
       version: 1,
       status: "research candidate, not certified",
+      license: pin.dataNotice,
+      spdx: "CC-BY-SA-4.0",
       alphabet: MOVE_ALPHABET,
       encoding: "one character per move: index = (generator - 1) * 3 + {1: 0, -1: 1, 2: 2}",
     },
@@ -204,6 +211,8 @@ export function build(pin) {
       schema: "cubistry.calendar7.displays",
       version: 1,
       status: "research candidate, not certified",
+      license: pin.dataNotice,
+      spdx: "CC-BY-SA-4.0",
       inks: INKS,
       cell: "ink:text",
       firstYear: 2026,
@@ -227,6 +236,11 @@ function writeOutputs(pin) {
 }
 
 export function check(pin, { requireCommit = false } = {}) {
+  for (const [file, digest] of Object.entries(pin.generatedSources ?? {}))
+    if (sha256(readFileSync(path(file))) !== digest) throw Error(`${file} does not match its generated pin`);
+  for (const artifact of pin.artifacts ?? [])
+    for (const [file, digest] of Object.entries(artifact.files))
+      if (sha256(readFileSync(path(file))) !== digest) throw Error(`${file} does not match its artifact pin`);
   for (const [research, copy] of Object.entries(pin.copies))
     if (sha256(readFileSync(path(copy))) !== pin.sources[research]) throw Error(`${copy} does not match its pin`);
   for (const [name, file] of Object.entries({ root: JULIA.root, displays: JULIA.displays, script: JULIA.script }))

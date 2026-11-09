@@ -1,0 +1,5 @@
+research_ref_sha=7b704c368e9ea497be9e3e8dd54e5b5ff761bbba
+run_id=42479620239
+segment=6
+edges_total=863
+chain_end=2099-12
