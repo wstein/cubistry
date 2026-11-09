@@ -346,8 +346,8 @@ body.chronocube-page:has(#shell) {
 .shell .shell-alert-text { flex: 1 1 auto; }
 .shell .shell-alert-dismiss {
   flex: 0 0 auto;
-  min-width: 28px;
-  min-height: 28px;
+  min-width: 44px;
+  min-height: 44px;
   border: 0;
   border-radius: var(--r-pill);
   background: transparent;
