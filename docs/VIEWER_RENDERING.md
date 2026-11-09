@@ -103,8 +103,16 @@ The initial design combined a 1.04-unit center pitch, 0.99-unit bodies and
 symmetric 0.055-unit bevels. Its 0.05-unit air gaps widened at beveled junctions,
 explaining the disconnected look. CubeAssembler instead uses unit pitch,
 seam-specific bevel coverage and interior cut-face caps. Both consumers now use
-unit pitch (0.5 times the size-2 ±1 lattice), retaining the approved 0.99-unit
-rounded outer shell and 0.055-unit bevels. The visible shell seam is 0.01 units.
+unit pitch (0.5 times the size-2 ±1 lattice), retaining the 0.99-unit rounded
+outer shell. The minimum shell clearance is 0.01 units; the bevels widen the
+visible groove around the planar faces.
+
+The shared 2×2 viewer uses smaller 0.03-unit body bevels. The narrower bevel
+reduces the apparent groove between adjacent front faces while retaining the
+0.01-unit physical shell clearance. Body width, center pitch, sticker size and
+sticker offset are unchanged. Larger cubes and callers that omit a size retain
+the 0.055-unit bevel. Layer turns preserve the separating axis coordinate, so
+the shell clearance remains positive throughout quarter and half turns.
 
 **Core ball (supersedes per-cubie box cores).** The former per-cubie plastic box
 cores are removed. Each cube has one static core ball at its center, diameter
