@@ -36,7 +36,7 @@ the next month.
   before it. A block (one or several layers of one axis, or the whole cube for `rot`) turns by the exponent
   of its moves as one animation; the engine's right-handed quarter turn is the right-handed rotation of the
   scene. The controls are **Play/Pause** (pauses after the move in flight), **Skip to end**,
-  **Speed** (0.5× to 8×, default 2×; nominal 90 ms per block at 1×, so 8× is about one frame per block when the display keeps up, otherwise it can equal 4×)
+  **Speed** (milliseconds per turn: 100, 250, 500 ms or 1 s, default 100 ms)
   and the option **Middle slice counts as a move** (on by default, see below) and **Reset view**. Previous or
   Next during a step first brings the cube to the end of that step, then plays the new step.
   Under `prefers-reduced-motion: reduce` nothing animates: a step jumps to its end state and
@@ -181,7 +181,7 @@ arbitrarily reordered. The prefix uses only x/y turns (all 24 orientations need
 at most three); software tests check every stored edge in both directions and
 both slice settings, including inverse restoration. This is application
 equivalence testing, not a new research proof.
-Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the easing) and the player. This is mode F of the research
+Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the earlier soft-start easing, no longer used by the player) and the player. This is mode F of the research
 (`research/calendar-7x7/wide-blocks`, research pull request 346), where the equality of the three digests was verified.
 
 - **The played word has no whole-cube rotation.** A rotation R followed by a layer move m is the same as the conjugate move
