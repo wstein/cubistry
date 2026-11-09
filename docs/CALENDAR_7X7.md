@@ -182,7 +182,7 @@ arbitrarily reordered. The prefix uses only x/y turns (all 24 orientations need
 at most three); software tests check every stored edge in both directions and
 both slice settings, including inverse restoration. This is application
 equivalence testing, not a new research proof.
-Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the earlier soft-start easing, no longer used by the player) and the player. This is mode F of the research
+Code: `src/apps/calendar7/deferral.ts` (pure) and the player. This is mode F of the research
 (`research/calendar-7x7/wide-blocks`, research pull request 346), where the equality of the three digests was verified.
 
 - **The played word has no whole-cube rotation.** A rotation R followed by a layer move m is the same as the conjugate move
@@ -206,9 +206,11 @@ Code: `src/apps/calendar7/deferral.ts` (pure), `soft-start.ts` (the earlier soft
   then fewest quarter turns, then the order x, y, z with exponents +1, -1, 2).
 - **Animation.** The alignment is a rotation of the model (all bodies turn about their axis), not a camera move; the Smart
   Rubber Band camera controller is untouched. It is timed and eased exactly like a single-layer turn: the Speed setting times its quarter turns is
-  its duration and the view's smoothstep is its easing. The earlier soft start (critically damped response,
-  about 1.3 s for a quarter turn) is no longer used by the player; `soft-start.ts` stays as a tested helper. Under reduced motion a step jumps and needs
-  no alignment; if the preference turns on while a step plays, the alignment takes 150 ms per rotation (up to 300 ms).
+  its duration and the view's smoothstep is its easing. The prefix follows the selected speed too: at the default 250 ms,
+  a quarter turn takes 250 ms and a half turn takes 500 ms; at 1 s, they take 1000 ms and 2000 ms. There is no fixed
+  one-second prefix override. The unused earlier soft-start helper has been removed. Under reduced motion a step jumps
+  and needs no orientation turns; if the preference turns on while a step plays, each remaining prefix or suffix
+  rotation takes 150 ms, independent of its angle and the selected speed.
 - **Progress.** The free orientation is a separate prefix or suffix phase. Only
   nonrotation blocks contribute to the move count; skip and pause work in every phase.
 - **Control.** **Orientation** selects Before moves (the page default), After moves

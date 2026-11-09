@@ -5,7 +5,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { clonePose } from "../src/apps/calendar7/engine.ts";
+import { applyMoves, clonePose, stateDigest } from "../src/apps/calendar7/engine.ts";
 import { parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
 import { playedBlocks } from "../src/apps/calendar7/deferral.ts";
 import { playerHtml } from "../src/apps/calendar7/month-view.ts";
@@ -102,4 +102,41 @@ test("played half turns (layer and rotation) last twice a quarter turn, quarter 
 test("the old multiplier speeds are refused", () => {
   const player = new Calendar7Player({ graph, printing, root, view: recordingView(), reducedMotion: () => false });
   for (const old of [0.5, 1, 2, 4, 8]) assert.throws(() => player.setSpeed(old), RangeError, `${old}`);
+});
+
+test("a reduced-motion change keeps each prefix or suffix rotation at 150 ms for every direction, angle and speed", async () => {
+  for (const orientation of ["before", "after"]) for (const angle of [1, -1, 2]) for (const speed of SPEEDS) {
+    const moves = [[7, angle], [1, 1]];
+    const target = applyMoves(root, moves);
+    const g = { nodes: [{ hash: stateDigest(printing, root) }, { hash: stateDigest(printing, target) }], edges: [{ moves }] };
+    const view = recordingView();
+    let reduced = false;
+    const phases = [];
+    const player = new Calendar7Player({
+      graph: g, printing, root, view, orientation, slice: false,
+      reducedMotion: () => reduced,
+      onChange(snapshot) {
+        phases.push(snapshot.phase);
+        if (snapshot.status === "playing" && snapshot.phase === (orientation === "before" ? "orientation" : "alignment")) reduced = true;
+      },
+    });
+    player.setSpeed(speed);
+    player.jump(0);
+    player.go(1);
+    await settle(player);
+    const rotations = view.turns.filter((t) => t.block.kind === "rotation");
+    assert.equal(rotations.length, 1, `${orientation}, q=${angle}, speed=${speed}`);
+    assert.equal(rotations[0].block.angle, angle);
+    assert.equal(rotations[0].ms, 150, "150 ms is per rotation, independent of angle and selected speed");
+    assert.equal(rotations[0].ease, undefined);
+    assert.ok(view.turns.filter((t) => t.block.kind !== "rotation").every((t) => t.ms === speed * Math.abs(t.block.angle)));
+    assert.equal(player.snapshot.phase, "idle");
+    assert.equal(stateDigest(printing, player.shownPose), g.nodes[1].hash);
+    assert.ok(phases.includes(orientation === "before" ? "orientation" : "alignment"));
+    const count = view.turns.length;
+    player.go(0);
+    assert.equal(view.turns.length, count, "an initially reduced-motion step jumps without a rotation");
+    assert.equal(stateDigest(printing, player.shownPose), g.nodes[0].hash);
+    player.dispose();
+  }
 });
