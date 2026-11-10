@@ -50,7 +50,14 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
   const pause = async () => { if (--remaining <= 0) throw Error('Pages deployment wait budget exhausted'); await sleep(Math.min(10000,budget()));budget(); };
   const headers={Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
   const status = async id => {
-    const response=await request(`https://api.github.com/repos/${REPOSITORY}/pages/deployments/${id}`,{headers,redirect:'error',signal:AbortSignal.timeout(budget())});
+    const limit=budget();
+    let response;
+    try{response=await request(`https://api.github.com/repos/${REPOSITORY}/pages/deployments/${id}`,{headers,redirect:'error',signal:AbortSignal.timeout(limit)});}
+    catch(error){
+      // An abort caused by the shrinking overall budget is budget exhaustion, not a separate failure.
+      if((error?.name==='TimeoutError'||error?.name==='AbortError')&&(limit<30000||now()>=deadline))throw Error('Pages deployment wait budget exhausted');
+      throw error;
+    }
     if(!response.ok)throw Error(`Pages status request failed (${response.status})`);
     const data=await response.json();
     if(terminalFailure.has(data.status))throw Error('Pages deployment failed');
