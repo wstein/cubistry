@@ -53,6 +53,10 @@ for (const word of NAME_WORDS) {
 }
 export const nameAlign = (label: string): NameAlign => ALIGN.get(label) ?? "center";
 
+/** Center x of letter `i` of a name tile on the 3-slot grid of a text square `square` wide, centered in a texture `texture` wide. The one place of the slot math (sticker art and font art). */
+export const nameSlotCenter = (label: string, i: number, square: number, texture: number): number =>
+  texture / 2 - square / 2 + (nameSlotStart(label) + i + 0.5) * (square / NAME_SLOTS);
+
 /** First slot (0-based, may be fractional for a centered tile) of the letters of a name tile. */
 export function nameSlotStart(label: string): number {
   const n = Math.min(label.length, NAME_SLOTS);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
-import { type Layout, NAME_SLOTS, nameSlotStart } from "./layout.ts";
+import { type Layout, nameSlotCenter } from "./layout.ts";
 import type { ColorScheme, SchemeLine } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
@@ -99,10 +99,7 @@ export interface NameLetter {
  * letters of the three tiles of a month name line up as one word (first tile right-flush, last left-flush, see layout.ts).
  */
 export function nameGrid(text: string): readonly NameLetter[] {
-  const slot = TEXT_SQUARE / NAME_SLOTS;
-  const left = TEXTURE / 2 - TEXT_SQUARE / 2;
-  const start = nameSlotStart(text);
-  return [...text].map((char, i) => ({ char, x: left + (start + i + 0.5) * slot, size: NAME_FONT_SIZE }));
+  return [...text].map((char, i) => ({ char, x: nameSlotCenter(text, i, TEXT_SQUARE, TEXTURE), size: NAME_FONT_SIZE }));
 }
 
 /** Normal font size of a one-line label by its length (shared by the one-line fit and the big split number). */
