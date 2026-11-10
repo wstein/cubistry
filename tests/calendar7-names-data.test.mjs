@@ -7,12 +7,13 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { build, check } from "../scripts/export-calendar7-names.mjs";
 import { applyMoves, clonePose, inverseMoves, metrics, stateDigest } from "../src/apps/calendar7/engine.ts";
 import { frontFailure, imageNormal, monthCells } from "../src/apps/calendar7/display.ts";
-import { displayIdOf, parseDisplays, parseGraph, parseState, verifyChain, verifyEdge } from "../src/apps/calendar7/graph.ts";
+import { displayIdOf, namesWindowContains, parseDisplays, parseGraph, parseState, verifyChain, verifyEdge } from "../src/apps/calendar7/graph.ts";
 
 const DIR = "public/calendar7/names/";
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -247,6 +248,136 @@ test("exporter: output is byte-identical to the committed files (needs CALENDAR7
   if (!research) return t.skip("CALENDAR7_NAMES_RESEARCH not set");
   const out = mkdtempSync(join(tmpdir(), "names-data-"));
   execFileSync(process.execPath, ["scripts/export-calendar7-names.mjs", research, "--out", out]);
-  for (const f of ["state.v1.json", "graph.v1.json", "displays.v1.json", "NOTICE.txt", "manifest.sha256"])
+  for (const f of ["state.v1.json", "graph.v1.json", "displays.v1.json", "NOTICE.txt", "manifest.sha256", "research-inputs.sha256"])
     assert.equal(readFileSync(join(out, f), "utf8"), readFileSync(DIR + f, "utf8"), f);
+});
+
+// ---------------------------------------------------------------------------------------------------------
+// Negative tests of the exporter and of --check.
+
+/** The committed names folder, copied to a fresh directory; `edit(dir)` tampers with it. */
+function namesCopy(edit) {
+  const dir = mkdtempSync(join(tmpdir(), "names-data-copy-"));
+  cpSync(DIR, dir, { recursive: true });
+  edit?.(dir);
+  return dir;
+}
+/** Rewrite manifest.sha256 of `dir` so that it matches the (tampered) files. */
+function remanifest(dir) {
+  const out = ["NOTICE.txt", "displays.v1.json", "graph.v1.json", "state.v1.json"].map((n) => `${sha(readFileSync(join(dir, n)))}  ${n}\n`);
+  writeFileSync(join(dir, "manifest.sha256"), out.join(""));
+}
+
+test("check(): the committed names folder passes; a changed file fails the manifest", () => {
+  assert.doesNotThrow(() => check(namesCopy()));
+  const dir = namesCopy((d) => writeFileSync(join(d, "NOTICE.txt"), readFileSync(join(d, "NOTICE.txt"), "utf8") + "x\n"));
+  assert.throws(() => check(dir), /NOTICE\.txt does not match manifest\.sha256/);
+});
+
+test("check(): a consistent chain with 19 edges fails the totals", () => {
+  const dir = namesCopy((d) => {
+    const g = JSON.parse(readFileSync(join(d, "graph.v1.json"), "utf8"));
+    g.nodes.pop();
+    g.edges.pop();
+    const text = readFileSync(join(d, "graph.v1.json"), "utf8");
+    const head = text.slice(0, text.indexOf('"nodes":['));
+    const item = (v) => "  " + JSON.stringify(v);
+    writeFileSync(join(d, "graph.v1.json"), `${head}"nodes":[\n${g.nodes.map(item).join(",\n")}\n],\n"edges":[\n${g.edges.map(item).join(",\n")}\n]\n}\n`);
+    remanifest(d);
+  });
+  assert.throws(() => check(dir), /totals differ/);
+});
+
+test("check(): research-inputs.sha256 holds the digests of experiment.json and is verified offline", () => {
+  const file = readFileSync(DIR + "research-inputs.sha256", "utf8");
+  assert.equal(
+    file,
+    [
+      "c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db  research/calendar-7x7/row1-revision/layout.tsv",
+      "0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127  research/calendar-7x7/row1-window-print/evidence/printing.tsv",
+      "7db8c8a1073f79e73f1e59ab953e25fc47342d5659d5058d8ae9cf5eb8bbe1db  research/calendar-7x7/row1-window-chain/evidence/moves.tsv",
+      "c1adcfff7488d3bcfb08dd2161cc3ba6158333fbe1e7fd1ea75805b65058679d  research/calendar-7x7/row1-window-chain/evidence/states.sha256",
+      "",
+    ].join("\n"),
+  );
+  const dir = namesCopy((d) => writeFileSync(join(d, "research-inputs.sha256"), file.replace("c5671d", "c5671e")));
+  assert.throws(() => check(dir), /research-inputs\.sha256/);
+});
+
+/** A copy of the research inputs the exporter reads; `edit(root)` tampers with it. */
+function researchCopy(root, edit) {
+  const out = mkdtempSync(join(tmpdir(), "names-data-research-"));
+  const cal = "research/calendar-7x7/";
+  for (const rel of ["row1-revision/layout.tsv", "row1-window-print/evidence/printing.tsv", "row1-window-chain/evidence/moves.tsv", "row1-window-chain/evidence/states.sha256"]) {
+    mkdirSync(join(out, cal, rel, ".."), { recursive: true });
+    cpSync(join(root, cal, rel), join(out, cal, rel));
+  }
+  cpSync(join(root, cal, "row1-window-chain/evidence/states"), join(out, cal, "row1-window-chain/evidence/states"), { recursive: true });
+  edit?.(out);
+  return out;
+}
+const research = process.env.CALENDAR7_NAMES_RESEARCH;
+const edit = (root, rel, fn) => {
+  const f = join(root, "research/calendar-7x7/", rel);
+  writeFileSync(f, fn(readFileSync(f, "utf8")));
+};
+const rows = (root, rel) => readFileSync(join(root, "research/calendar-7x7/", rel), "utf8");
+
+test("exporter guards (need CALENDAR7_NAMES_RESEARCH): digest pin and, behind it, metrics, snapshot and front", (t) => {
+  if (!research) return t.skip("CALENDAR7_NAMES_RESEARCH not set");
+  assert.doesNotThrow(() => build(researchCopy(research)));
+  const L = "row1-revision/layout.tsv";
+  const M = "row1-window-chain/evidence/moves.tsv";
+  const S = "row1-window-chain/evidence/states/state-05.tsv";
+  // The digest pin stops any changed input.
+  for (const rel of [L, M, "row1-window-print/evidence/printing.tsv", "row1-window-chain/evidence/states.sha256"]) {
+    const root = researchCopy(research, (r) => edit(r, rel, (x) => x.replace(/\n/, "\n\n")));
+    assert.throws(() => build(root), /digest differs from experiment\.json/, rel);
+  }
+  // The checks behind the pin are reached with the test-only option (not available from the command line).
+  const unpinned = (root) => build(root, { testOnlySkipDigestPins: true });
+  assert.doesNotThrow(() => unpinned(researchCopy(research)));
+  const metrics = researchCopy(research, (r) => edit(r, M, (x) => x.replace(/^(edge\t2026\t6\t)450/m, "$1451")));
+  assert.throws(() => unpinned(metrics), /edge 1: declared metrics differ from the words/);
+  const snapshot = researchCopy(research, (r) => {
+    edit(r, S, (x) => x.replace(/\t[A-Z]{3}\tweekday\n/, "\tXXX\tweekday\n"));
+    const sum = createHash("sha256").update(readFileSync(join(r, "research/calendar-7x7/", S))).digest("hex");
+    edit(r, "row1-window-chain/evidence/states.sha256", (x) => x.replace(/^[0-9a-f]{64}( {2}state-05\.tsv)$/m, `${sum}$1`));
+  });
+  assert.throws(() => unpinned(snapshot), /edge 4: replay differs from state-5\.tsv/);
+  const front = researchCopy(research, (r) => edit(r, L, (x) => x.replace("5\tMA\tY", "5\tMA\tZ")));
+  assert.throws(() => unpinned(front), /front differs from its display/);
+  const order = researchCopy(research, (r) => edit(r, M, (x) => x.replace(/^edge\t2026\t6\t/m, "edge\t2026\t7\t")));
+  assert.throws(() => unpinned(order), /edge 1: month out of order/);
+  assert.equal(rows(research, L).includes("5\tMA\tY"), true);
+});
+
+// ---------------------------------------------------------------------------------------------------------
+// Window table guards of parseDisplays and namesWindowContains.
+
+test("window tables: month/display consistency, month count bound and the ink-table branches", () => {
+  const disp = json(DIR + "displays.v1.json");
+  const swapped = [...disp.months];
+  [swapped[3], swapped[4]] = [swapped[4], swapped[3]];
+  assert.throws(() => parseDisplays({ ...disp, months: swapped }), /names display \d+ of another month/);
+  assert.throws(() => parseDisplays({ ...disp, firstMonth: 6 }), /another month/);
+  assert.throws(() => parseDisplays({ ...disp, months: [] }), /1 to 1201 months/);
+  assert.throws(() => parseDisplays({ ...disp, months: new Array(1202).fill(1) }), /1 to 1201 months/);
+  // Ink tables: 5 entries are the shipped table (band cells are then unknown), 6 are the names table, others fail.
+  assert.throws(() => parseDisplays({ ...disp, inks: disp.inks.slice(0, 5) }), /bad cell band:/);
+  const plain = { ...disp, inks: disp.inks.slice(0, 5), displays: disp.displays.map((d) => ({ ...d, cells: d.cells.map((c) => c.replace(/^band:/, "blank:")) })) };
+  assert.equal(parseDisplays(plain).months.length, 21);
+  assert.throws(() => parseDisplays({ ...disp, inks: [...disp.inks, "x"] }), /ink table differs/);
+  assert.throws(() => parseDisplays({ ...disp, inks: disp.inks.slice(0, 4) }), /ink table differs/);
+  assert.throws(() => parseDisplays({ ...disp, inks: [...disp.inks.slice(1), "blank"] }), /ink table differs/);
+});
+
+test("namesWindowContains answers without throwing: only the 21 window months are inside", () => {
+  WINDOW.forEach(([y, m]) => assert.equal(namesWindowContains(table, y, m), true, `${y}-${m}`));
+  for (const [y, m] of [[2026, 4], [2028, 2], [1999, 12], [2100, 1], [2027, 0], [2027, 13], [2027, 5.5], [2027.5, 5], [NaN, 5], [2027, NaN], ["2027", 5]])
+    assert.equal(namesWindowContains(table, y, m), false, `${y}-${m}`);
+  const shipped = parseDisplays(json("public/calendar7/displays.v1.json"));
+  assert.equal(namesWindowContains(shipped, 2026, 1), true);
+  assert.equal(namesWindowContains(shipped, 2099, 12), true);
+  assert.equal(namesWindowContains(shipped, 2100, 1), false);
 });
