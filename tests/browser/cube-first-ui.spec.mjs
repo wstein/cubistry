@@ -503,6 +503,6 @@ for (const saved of [
     await page.goto("/counter.html");
     await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
     await expect(page.locator("#rotation-speed")).toHaveValue(
-      saved.moveDuration === 250 || saved.speed === 0.3 ? "3" : "4",
+      saved.moveDuration === 100 ? "4" : "3",
     );
   });
