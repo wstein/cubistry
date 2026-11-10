@@ -290,7 +290,7 @@ test("real animation budgets measure committed five-move edges at default250ms, 
   );
 });
 
-test("application switches apply Timer250 and Counter100 defaults while preserving Counter state", async ({
+test("application switches apply Timer250 and Counter250 defaults while preserving Counter state", async ({
   page,
 }) => {
   await page.goto("/counter.html");
