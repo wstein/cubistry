@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
-import { type Layout, nameSlotOffset } from "./layout.ts";
+import { type Layout, NAME_SLOTS, nameSlotOffset, nameSlotStart } from "./layout.ts";
 import { NAMES_FACE_PX_PER_UNIT } from "./geometry.ts";
 import { type ColorScheme, namesGround, type SchemeLine } from "./schemes.ts";
 
@@ -39,12 +39,13 @@ export const LINE_SCALE = 4;
 export const NAMES_LINE_FACTOR = 1.5;
 
 /**
- * The rectangle of a tile line in texture pixels. Standard layout: on a sticker the full width at the bottom edge, on a cubie
- * face the flat width (`FACE_FLAT`) at the bottom edge of the flat face. Names layout: always the full texture width, so the
- * lines of neighboring cubies meet as one continuous line, and `NAMES_LINE_FACTOR` times as thick.
+ * The rectangle of a tile line in texture pixels. On a sticker (the 2D sheet) the full width at the bottom edge, on a cubie
+ * face the flat width (`FACE_FLAT`) at the bottom edge of the flat face. Names layout on a cubie face (the 3D cube): the
+ * full texture width, so the lines of neighboring cubies meet as one continuous line, and `NAMES_LINE_FACTOR` times as
+ * thick. The sheet (sticker surface) keeps its look in both layouts.
  */
 export function lineRect(line: SchemeLine, layout: Layout, face: boolean): { x: number; y: number; w: number; h: number } {
-  const names = layout === "names";
+  const names = layout === "names" && face;
   const h = line.px * LINE_SCALE * (names ? NAMES_LINE_FACTOR : 1);
   const bottom = face ? TEXTURE * (1 + FACE_FLAT) / 2 : TEXTURE;
   if (face && !names) return { x: TEXTURE * (1 - FACE_FLAT) / 2, y: bottom - h, w: TEXTURE * FACE_FLAT, h };
@@ -111,17 +112,20 @@ export interface NameLetter {
   readonly size: number;
 }
 
-/** The width of a sticker body in scene units (PRESENTATION_PRESET.stickerWidth): a sticker texture spans it. */
-const STICKER_WIDTH = 0.87;
-
 /**
- * Texture pixels (in drawing coordinates) per scene unit of the cubie pitch. On a cubie face the drawing is scaled about the
+ * Texture pixels (in drawing coordinates) per scene unit of the cubie pitch on a cubie face the drawing is scaled about the
  * center by `FACE_SCALE`, so the drawing pitch is the on-screen pitch of the flat face divided by it.
  */
-export const namePxPerUnit = (face: boolean): number => (face ? NAMES_FACE_PX_PER_UNIT / FACE_SCALE : TEXTURE / STICKER_WIDTH);
+export const namePxPerUnit = (): number => NAMES_FACE_PX_PER_UNIT / FACE_SCALE;
 
-/** Center x (drawing coordinates) of letter `i` of a name tile: the slot grid of layout.ts, thirds of the cubie pitch. */
-export const nameLetterX = (text: string, i: number, face: boolean): number => TEXTURE / 2 + nameSlotOffset(text, i) * namePxPerUnit(face);
+/**
+ * Center x (drawing coordinates) of letter `i` of a name tile. On a cubie face (the 3D cube): the slot grid of layout.ts,
+ * thirds of the cubie pitch, uniform across tiles. On a sticker (the 2D sheet): as before, three slots of the text square.
+ */
+export const nameLetterX = (text: string, i: number, face: boolean): number =>
+  face
+    ? TEXTURE / 2 + nameSlotOffset(text, i) * namePxPerUnit()
+    : TEXTURE / 2 - TEXT_SQUARE / 2 + (nameSlotStart(text) + i + 0.5) * (TEXT_SQUARE / NAME_SLOTS);
 
 /**
  * Letters of a name tile on the one uniform grid of the whole name row: a third of a cubie pitch between two letters, also

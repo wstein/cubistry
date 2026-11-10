@@ -95,12 +95,10 @@ test("names layout: white fields (weekday row, date cells, empty days) use the o
 });
 
 // ---- 2. the line under the weekday names ----
-test("names layout: the weekday line runs from the left to the right end of the texture, 1.5 times as thick, on face and sticker", () => {
+test("names layout: on the cubie face the weekday line runs from the left to the right end of the texture, 1.5 times as thick; the sheet (sticker surface) keeps its line", () => {
   for (const [name, draw, bottom] of [
     ["face", (c) => drawFace(c, "MON", "weekday", "strict", PAPER_RED, "names"), TEXTURE * ((1 + FACE_FLAT) / 2)],
-    ["sticker", (c) => drawSticker(c, "MON", "weekday", "strict", PAPER_RED, "names"), TEXTURE],
     ["font face", (c) => drawFontSticker(c, "MON", "weekday", font, PAPER_RED, "face", undefined, "names"), TEXTURE * ((1 + FACE_FLAT) / 2)],
-    ["font sticker", (c) => drawFontSticker(c, "MON", "weekday", font, PAPER_RED, "sticker", undefined, "names"), TEXTURE],
   ]) {
     const last = rects(record(draw)).at(-1);
     const h = PAPER_RED.lineRow2.px * LINE_SCALE * 1.5;
@@ -110,43 +108,26 @@ test("names layout: the weekday line runs from the left to the right end of the 
     assert.equal(last[5], h, `${name}: 1.5 times the standard thickness`);
     assert.ok(Math.abs(last[3] + last[5] - bottom) < 1e-9, `${name}: bottom edge`);
   }
+  for (const draw of [(c) => drawSticker(c, "MON", "weekday", "strict", PAPER_RED, "names"), (c) => drawFontSticker(c, "MON", "weekday", font, PAPER_RED, "sticker", undefined, "names")]) {
+    const last = rects(record(draw)).at(-1);
+    assert.deepEqual(last.slice(2), [0, TEXTURE - PAPER_RED.lineRow2.px * LINE_SCALE, TEXTURE, PAPER_RED.lineRow2.px * LINE_SCALE], "sheet line as in the standard layout");
+  }
   // Standard layout: the line is the shipped one (shorter on the face, original thickness).
   const std = rects(record((c) => drawFace(c, "MON", "weekday", "strict", PAPER_RED))).at(-1);
   assert.equal(std[4], TEXTURE * FACE_FLAT);
   assert.equal(std[5], PAPER_RED.lineRow2.px * LINE_SCALE);
 });
 
-// ---- 3. red cut faces ----
-test("PhysicalCubeScene: the cut faces next to a sticker with a cut color show it (not the opposite one), setBodyColor leaves them, setCutColors changes them, other cubies keep the body color", () => {
-  // Two cubies side by side along x; each has one sticker (+z), so the other five faces are cut faces.
-  const frames = [1, 2].map((id) => ({ id, cubie: id, p: [id - 1, 0, 0], n: [0, 0, 1], up: [0, 1, 0] }));
-  const mats = new Map(frames.map((f) => [f.id, new THREE.MeshStandardMaterial({ color: "#ffffff" })]));
-  const geometry = { body: new RoundedBoxGeometry(0.99, 0.99, 0.99, 1, 0.055), sticker: new THREE.PlaneGeometry(1, 1), stickerOffset: 0.502 };
-  const root = new THREE.Group();
-  const scene = new PhysicalCubeScene(root, frames, mats, createPlasticMaterial("#23272e", 0.55), 1, geometry, new Map(), { bodyColor: "#f0f0f0", coreColor: "#f0f0f0", cutColors: new Map([[1, "#e0282c"]]) }); // sticker id 1
-  scene.setConstruction("stickerless");
-  const cutOf = (cubie) => {
-    const shell = [...root.children].filter((c) => c.children[0]?.isMesh && Array.isArray(c.children[0].material))[cubie - 1].children[0];
-    return shell.material.filter((_, i) => i !== 4).map((m) => m.color.getHexString()); // index 4 is +z, the sticker side; the order is +x -x +y -y -z
-  };
-  assert.deepEqual(cutOf(1), ["e0282c", "e0282c", "e0282c", "e0282c", "f0f0f0"], "+x -x +y -y red, the back (-z, opposite the sticker) keeps the body color");
-  assert.deepEqual([...new Set(cutOf(2))], ["f0f0f0"]);
-  scene.setBodyColor("#101010");
-  assert.deepEqual(cutOf(1), ["e0282c", "e0282c", "e0282c", "e0282c", "101010"], "setBodyColor leaves the red faces");
-  assert.deepEqual([...new Set(cutOf(2))], ["101010"]);
-  scene.setCutColors(new Map([[1, "#2a2aff"]]));
-  assert.deepEqual(cutOf(1), ["2a2aff", "2a2aff", "2a2aff", "2a2aff", "101010"]);
-  assert.throws(() => scene.setCutColors(new Map([[1, "red"]])), /Invalid cut color/);
-});
+// ---- 3. cut faces colored as on a real cube: see tests/calendar7-cut-faces.test.mjs ----
 
 // ---- 4. one uniform letter pitch ----
 test("names layout: letters of a name sit on one uniform center pitch over all tiles, the tile centers stepping 1 cubie", () => {
   const pitch = NAMES_FACE_PX_PER_UNIT / 3; // final (on-screen) texture pixels between two letters: a third of a cubie
-  for (const surface of ["face"]) for (const [name, words] of [["DECEMBER", NAME_WORDS[11]], ["JANUARY", NAME_WORDS[0]], ["MAY", NAME_WORDS[4]], ["SEPTEMBER", NAME_WORDS[8]], ["NOVEMBER", NAME_WORDS[10]], ["FEBRUARY", NAME_WORDS[1]], ["OCTOBER", NAME_WORDS[9]]]) {
+  for (const [name, words] of [["DECEMBER", NAME_WORDS[11]], ["JANUARY", NAME_WORDS[0]], ["MAY", NAME_WORDS[4]], ["SEPTEMBER", NAME_WORDS[8]], ["NOVEMBER", NAME_WORDS[10]], ["FEBRUARY", NAME_WORDS[1]], ["OCTOBER", NAME_WORDS[9]]]) {
     // Row x of a letter in final pixels: tile k spans [k * cubie, (k + 1) * cubie), cubie = NAMES_FACE_PX_PER_UNIT.
     const centers = [];
     words.forEach((tile, k) => {
-      for (const l of nameLabelLayout(tile, font, surface)) centers.push(k * NAMES_FACE_PX_PER_UNIT + TEXTURE / 2 + (l.x - TEXTURE / 2) * FACE_SCALE);
+      for (const l of nameLabelLayout(tile, font, "face")) centers.push(k * NAMES_FACE_PX_PER_UNIT + TEXTURE / 2 + (l.x - TEXTURE / 2) * FACE_SCALE);
     });
     assert.equal(centers.length, name.length);
     for (let i = 1; i < centers.length; i++) assert.ok(Math.abs(centers[i] - centers[i - 1] - pitch) < 1e-6, `${name} letter ${i}: ${centers[i] - centers[i - 1]} vs ${pitch}`);
@@ -161,15 +142,21 @@ test("names layout: a letter never leaves its tile and the letter size is one fo
   }
   assert.equal(sizes.size, 1);
 });
-test("names layout: the font drawing places the letters of a tile at the layout x (face and sticker)", () => {
+test("names layout: the font drawing places the letters of a tile at the layout x; the sheet (sticker surface) keeps its 3-slot pitch of 55 px", () => {
   for (const surface of ["face", "sticker"]) {
     const xs = nameLabelLayout("EMB", font, surface).map((l) => l.x);
     assert.equal(xs.length, 3);
     assert.ok(Math.abs(xs[1] - TEXTURE / 2) < 1e-9, "middle letter on the tile center");
     assert.ok(xs[1] - xs[0] > 0 && Math.abs(xs[1] - xs[0] - (xs[2] - xs[1])) < 1e-9);
   }
-  // The sticker body is narrower than the body face texture's flat: its pitch in sticker pixels is larger.
-  assert.ok(nameLabelLayout("EMB", font, "sticker")[1].x - nameLabelLayout("EMB", font, "sticker")[0].x > nameLabelLayout("EMB", font, "face")[1].x - nameLabelLayout("EMB", font, "face")[0].x);
+  const s = nameLabelLayout("EMB", font, "sticker");
+  assert.ok(Math.abs(s[1].x - s[0].x - (TEXTURE * 0.86) / 3) < 1e-9, "sheet pitch as before: a third of the 86% text square");
+});
+// The 2D sheet draws the names layout as on origin/main 71aa90f (letters and size); only the 3D face drawing changed.
+test("names layout on the sheet: the letter run of every name tile is exactly the old one", () => {
+  const h = createHash("sha256");
+  for (const word of NAME_WORDS) for (const tile of word) h.update(JSON.stringify(nameLabelLayout(tile, font, "sticker")));
+  assert.equal(h.digest("hex"), "ec8e0702852b558c61fa31d6bc1a21a95296ccbf139c220fc9288d043dad11d7");
 });
 
 // ---- 5. the gap ----
