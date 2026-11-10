@@ -1,0 +1,57 @@
+{
+  "applicationMainCommit": "b8e161846f4e83e4ea7bbf0b449a0a035e190f69",
+  "applicationRuntimeSHA256": "1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56",
+  "authorVerdict": "UNSAT",
+  "certificate": "requested-certificate.json",
+  "checkers": {
+    "flix": "0.79.0; Java 21.0.13; jackson-core 2.22.4",
+    "julia": "1.11.5; JSON 1.13.0; Dates 1.11.0"
+  },
+  "confirmation": "PENDING_INDEPENDENT_REVIEW",
+  "controls": {
+    "accepted": 4,
+    "checks": 24,
+    "dissent": false,
+    "fullMutationSweep": "not run, by owner decision",
+    "rejected": 20
+  },
+  "date": "2026-11-10",
+  "frozenCorpusAudit": {
+    "cases": 195,
+    "command": "python3 proof-checkers/tools/audit_corpus.py",
+    "manifestSHA256": "c0d0fa2fc6d692c7c89e436fe5a2670503d8a8a6c86a2cc0d1397be983832e01",
+    "role": "hash/count audit only; no Python proof verification",
+    "sourceMain": "b8e161846f4e83e4ea7bbf0b449a0a035e190f69",
+    "status": "PASS_DATA_PINS"
+  },
+  "model": "requested-model.json",
+  "nativeCounts": {
+    "combinations": 350,
+    "crossField": 155,
+    "dates": 146097,
+    "images": 22,
+    "pairs": 231,
+    "parity": 76
+  },
+  "schema": "cubistry.german-a-red-only-dual-check",
+  "scope": "German A fixed single-letter positions and role inks, full SA/SO red, unchanged weight 600",
+  "sha256": {
+    "Manifest.toml": "503fae47b1a20b1b4ff67864b69a7c4260985b5b3be96b8193e36dd22827d82c",
+    "Project.toml": "accb7ee8dd804dbb11123533463ea0076bf3427cc8f2b1de4bc9191f4281b086",
+    "certificate.json": "eec12bfa56f2568e7ce391a4d1b5e178d24f6b00311681541302ff0986f9e6d7",
+    "check.jl": "dc7cc3b58892008cbf655fc8fb8b322600a6548de874c9fa61470891d5b36b53",
+    "controls.jl": "d10c440e5e241d5174469a7eb9e1a7a091855a5cad479af26ba8d7cf60c9b473",
+    "evidence/author-controls.tsv": "4ff10669b822db33bb43de93469d219f0ea04ae51846401c28f19379de5799b9",
+    "evidence/valid.flix.stdout": "cb716e7dffff2b7c8ebbbf778c64e113d5400bbd15177ce2e23d05950872aa78",
+    "evidence/valid.julia.stdout": "cb716e7dffff2b7c8ebbbf778c64e113d5400bbd15177ce2e23d05950872aa78",
+    "flix/.flixw/flixw.java": "bcba5019e4cc593cb04350dbe45b16976a2a6dd537fb44f57b467fe469f54943",
+    "flix/.flixw/lock.toml": "75135dd33bc9c1749b5fda8374d3b02afa13602204d6ca0a75f2f9487e44604d",
+    "flix/src/JsonRead.flix": "e087082a4cdf6881c7bce2500b8668dce4295415dbdd1ca08880e5f59c0a356d",
+    "flix/src/Main.flix": "3ab362d4d0cf305d33d520e57702083c6d3926f02d57a40065c40e5ae950fab4",
+    "model.json": "c66142c64a2aa55d4c46b1a3367288d9cfeb88b3dcdb95c314912f907f7c3770",
+    "requested-certificate.json": "16593cdc166cc23bcd5382bd7c5700e6c8c69c8fd6305430d9c1dd3102b1679f",
+    "requested-model.json": "6f5a56ed87c844aeaaf24175409927f0dfe4f58b80024f878687c87da07f33cb"
+  },
+  "sourceResearchCommit": "f76ea3117fa314e8742da088882dc8b2c6d7a41a",
+  "version": 1
+}
