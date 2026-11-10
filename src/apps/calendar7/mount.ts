@@ -5,7 +5,7 @@ import type { Block } from "./blocks.ts";
 import type { RotationPlacement } from "./deferral.ts";
 import { revealPlayback, resetPlaybackVisibility } from "./playback-visibility.ts";
 import type { ModeInstance } from "../registry.ts";
-import { type DisplayTable, type Graph, parseDisplays, parseGraph, parseState, type Start } from "./graph.ts";
+import { type DisplayTable, type Graph, namesWindowContains, parseDisplays, parseGraph, parseState, type Start } from "./graph.ts";
 import { type Layout, LAYOUT_PARAM, NAMES_LOAD_NOTICE, NAMES_NOTICE, parseLayout } from "./layout.ts";
 import { type Pose, type Printing, stateDigest } from "./engine.ts";
 import {
@@ -444,7 +444,7 @@ export async function mountCalendar7(
     let note = "";
     if (layoutMode === "names") {
       if (!names) note = NAMES_LOAD_NOTICE;
-      else if (wantedMonth.kind === "invalid" || nodeIndex(names.range, wantedMonth.ym) >= 0) data = names;
+      else if (wantedMonth.kind === "invalid" || namesWindowContains(names.table, wantedMonth.ym.year, wantedMonth.ym.month)) data = names;
       else note = NAMES_NOTICE;
     }
     const choice = chooseMonth(p, today, data.range);
