@@ -1,0 +1,5 @@
+case	julia	flix
+lowercase	REJECT	REJECT
+duplicate-month	REJECT	REJECT
+column-four	REJECT	REJECT
+crlf	REJECT	REJECT

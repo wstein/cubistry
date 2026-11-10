@@ -1,0 +1,4 @@
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+Applies to layout.tsv, experiment.json and evidence/ inventory data and receipts.
+Created by Werner Stein with AI assistance (Codex, OpenAI). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
