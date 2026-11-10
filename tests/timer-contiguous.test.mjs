@@ -51,7 +51,7 @@ test('nonfinal timing attaches live, explicit revisions stay monotone, clearing 
  const first=h.rows[0];assert.equal(first.source(),null);await h.advance(125*Math.abs(first.event.move.turns));assert.equal(first.samples.at(-1).progress,.5);
  h.controller.setDeadline(89,10000,250);const revision=first.source().revision;h.controller.setDeadline(89,10000,250);assert.equal(first.source().revision,revision);
  await h.advance(h.now+1);assert.equal(first.samples.at(-1).progress,.5);const firstTimer=[...h.timers.values()][0].cb;
- const firstEnd=first.source().endAt;await h.advance((h.now+firstEnd)/2);assert(first.samples.at(-1).progress>=.5);await h.advance(firstEnd);assert.equal(first.completeAt,firstEnd);
+ const firstEnd=first.source().endAt;await h.advance(firstEnd-first.source().durationMs/4);assert.equal(first.samples.at(-1).progress,.75,"retimed active turn must actually advance");await h.advance(firstEnd);assert.equal(first.completeAt,firstEnd);
  const second=h.rows[1],secondTimer=[...h.timers.values()][0].cb;h.controller.clearDeadline();assert.equal(second.source(),null);
  await h.advance(h.now+1);const clearAt=h.now,duration=250*Math.abs(second.event.move.turns);await h.advance(clearAt+duration/2);assert.equal(second.samples.at(-1).progress,.5);firstTimer();secondTimer();assert.equal(second.samples.at(-1).progress,.5);
  await h.advance(clearAt+duration);assert.equal(second.completeAt,clearAt+duration);const third=h.rows[2];
