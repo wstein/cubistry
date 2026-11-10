@@ -123,6 +123,7 @@ function verify_window_chain(layout,printing,path,statesdir)
         append!(allmoves,edge.moves);total=map(+,total,metrics)
         println("edge\t",i,'\t',goal.year,'\t',goal.month,'\t',join(metrics,'\t'),'\t',edge.source,'\t',edge.finish,"\tPASS")
     end
+    @assert (edges[end].year,edges[end].month)==(goals[end].year,goals[end].month) && length(goals)==WINDOW_MONTHS "window end matches the last chain edge"
     for (g,e) in reverse(allmoves);state=chain_move(state,g,e==2 ? 2 : -e);end
     @assert state==initial "whole-chain inverse restores all 294 surfaces"
     println("summary\t",WINDOW_MONTHS,'\t',WINDOW_MONTHS-1,'\t',join(total,'\t'),'\t',WINDOW_END,"\tINVERSE_PASS")

@@ -20,6 +20,8 @@ flix_extra=(); [[ "$window_end" == 2028-01 ]] || flix_extra=("$window_end" "${CA
 "$java_bin" -Xmx2g -jar "$jar" "$layout" "$printing" "$chain" "$states" "$evidence" "${flix_extra[@]}" > "$out/flix.tsv"
 cmp "$out/julia.tsv" "$out/flix.tsv"
 "$julia_bin" --startup-file=no "$here/verify_chain.jl" "$layout" "$printing" "$chain" "$states" > "$out/independent.tsv"
+# SEAM_STORED=1: CHAIN_OVERRIDE extends the stored evidence chain; check the join explicitly.
+[[ -z "${SEAM_STORED:-}" ]] || "$julia_bin" --startup-file=no "$here/check_seam.jl" "$here/evidence/moves.tsv" "$here/evidence/states" "$chain" "$states" > "$out/seam.tsv"
 if [[ "$mode" == --mutations ]]; then
     "$julia_bin" --startup-file=no "$here/negative_cases.jl" "$chain" "$states" "$out/mutations" > "$out/cases.txt"
     printf 'case\tjulia\tflix\n' > "$out/negative.tsv"
