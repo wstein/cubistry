@@ -1,0 +1,17 @@
+{
+  "SPDX-License-Identifier": "CC-BY-SA-4.0",
+  "format": "cubistry.calendar7.row1-corner-coupling.v1",
+  "baseCommit": "96cf09a864e3c51758991b4be7b7826dcdedec5f",
+  "layout": "../row1-revision/layout.tsv",
+  "layoutSHA256": "c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db",
+  "gateOneReceiptSHA256": "f1a9d7fb18d1852c184fde414902e8627341230d83e07ad1ca8a13e4f1651c51",
+  "review": "PENDING_INDEPENDENT_REVIEW",
+  "model": { "size": 7, "cornerBodies": 8, "facesPerCorner": 3, "properRotations": 24, "tangentUpFrames": 96, "printingPermanent": true, "bandDistinctFromBlank": true, "bandBottomLineAsymmetric": true, "OIsUprightAndNotZero": true },
+  "all": { "targets": 91, "classes": 23, "requiredCopies": 24, "capacity": 24, "anchorPeak": 1, "anchorTargets": 91, "otherCopiesNeeded": 23, "otherSurfacesAvailable": 21, "verdict": "UNSAT", "scope": "fixed-print corner-body front matching", "receiptSHA256": "3bf936dd9f824a14b4248e8edcd1adca8932582ae93d643a4c22bf046ab241e0" },
+  "window": { "first": "2026-05", "last": "2028-01", "targets": 21, "classes": 21, "requiredCopies": 21, "capacity": 24, "verdict": "UNKNOWN", "reason": "singleton-anchor lemma is inapplicable with capacity slack", "receiptSHA256": "98afbbdf16fd2032b3183d58185b0ec8db46a663fa5c9584340663adbda87cfc" },
+  "subset": { "first": "2000-01", "last": "2100-01", "allTargetDatesContained": true, "complete1201MonthPositiveCoverageChecked": false },
+  "controls": { "namesWithoutBandAll": "UNKNOWN", "historicalSchemeAAll": "UNKNOWN", "juliaLemmaTests": 14, "flixLemmaTests": 11, "targetedSourceMutantsPerLanguage": 5 },
+  "tools": { "julia": "1.11.5", "flix": "0.79.0", "jdk": "21.0.13+9" },
+  "resources": { "maximumCommandSeconds": 290, "replayHeap": "2g", "concurrentHeavyProcesses": 1 },
+  "notRun": ["legal-states", "chains", "app-export", "full-mutation-sweep"]
+}

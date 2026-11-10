@@ -1,0 +1,6 @@
+case	julia	flix
+capacity	REJECT	REJECT
+singleton	REJECT	REJECT
+nonempty-domain	REJECT	REJECT
+all-targets	REJECT	REJECT
+body-faces	REJECT	REJECT

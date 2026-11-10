@@ -1,0 +1,16 @@
+case	julia	flix
+band-quarter-turn	REJECT	REJECT
+band-as-blank	REJECT	REJECT
+nonaxis-up	REJECT	REJECT
+unknown-empty-ink	REJECT	REJECT
+surface-piece-reassigned	REJECT	REJECT
+missing-back-surface	REJECT	REJECT
+missing-match	REJECT	REJECT
+reflected-body	REJECT	REJECT
+wrong-target-date	REJECT	REJECT
+letter-zero-alias	REJECT	REJECT
+weekday-digit-alias	REJECT	REJECT
+duplicate-body	REJECT	REJECT
+print-crlf	REJECT	REJECT
+matches-crlf	REJECT	REJECT
+unused-invalid-utf8	REJECT	REJECT
