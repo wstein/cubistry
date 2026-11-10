@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import { deployPages, parsePublication, readPublication } from '../scripts/pages/publication.mjs';
 const sha='a'.repeat(40), storage='b'.repeat(40);
 const receipt={schema:1,run:123,attempt:1,sha,storage,nonce:'c'.repeat(32),tracked:[7]};
+// GitHub resolves git/trees/<branch> to the branch's commit sha; the tree sha is commits/<branch>.commit.tree.sha.
+const commitSha='e'.repeat(40);
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status});
 test('publication receipt validates identity, bounded input and exact fields',()=>{
  assert.deepEqual(parsePublication(JSON.stringify(receipt)),receipt);
@@ -79,7 +81,7 @@ test('detached notification accepts only trusted main publisher provenance and b
 const runsPath=path=>path.startsWith('actions/workflows/pages-publish.yml/runs?');
 const pageOf=path=>Number(new URL(`https://x/${path}`).searchParams.get('page')||1);
 test('detached notification rejects newer publishers and changed storage or live receipt before writing',async()=>{
- const api=({newer=false,tree=storage}={})=>({request:async path=>runsPath(path)?{workflow_runs:newer?[{id:124,event:'workflow_dispatch'}]:[publisher]}:path.startsWith('actions/runs/')?publisher:{sha:tree}});
+ const api=({newer=false,tree=storage}={})=>({request:async path=>runsPath(path)?{workflow_runs:newer?[{id:124,event:'workflow_dispatch'}]:[publisher]}:path.startsWith('actions/runs/')?publisher:path==='commits/gh-pages'?{sha:commitSha,commit:{tree:{sha:tree}}}:{sha:commitSha}});
  assert.equal(await currentNotification(api(),note,{fetch:async()=>json(receipt)}),true);
  assert.equal(await currentNotification(api({newer:true}),note,{fetch:async()=>json(receipt)}),false);
  assert.equal(await currentNotification(api({tree:sha}),note,{fetch:async()=>json(receipt)}),false);
@@ -89,7 +91,7 @@ test('freshness check reads only the newest run page once the receipt run is rea
  const run=id=>({id,event:'workflow_run',conclusion:'success'});
  const make=pages=>{const reads=[];return {reads,request:async path=>{
   if(runsPath(path)){reads.push(pageOf(path));assert.ok(reads.length<=pages.length,'read beyond the last page');return {workflow_runs:pages[pageOf(path)-1]};}
-  return path.startsWith('actions/runs/')?publisher:{sha:storage};
+  return path.startsWith('actions/runs/')?publisher:path==='commits/gh-pages'?{sha:commitSha,commit:{tree:{sha:storage}}}:{sha:commitSha};
  }};};
  // Newest-first page of 100 that includes the receipt run (123): one request, no further paging.
  const first=Array.from({length:100},(_,i)=>run(123-i));
@@ -174,7 +176,7 @@ test('prepare repairs an untrusted live receipt instead of overriding the planne
   mkdirSync(join(dir,'bin'));mkdirSync(join(dir,'combined-site'));
   writeFileSync(join(dir,'bin/git'),`#!/bin/sh\nprintf '%s\\n' '${storage}'\n`,{mode:0o755});
   const live={...receipt,tracked:[]};
-  writeFileSync(join(dir,'mock.mjs'),`globalThis.fetch=async(url)=>new Response(JSON.stringify(String(url).startsWith('https://wstein.github.io/')?${JSON.stringify(live)}:String(url).includes('/actions/runs/')?{event:'pull_request'}:{sha:'${storage}',tree:[],truncated:false}));`);
+  writeFileSync(join(dir,'mock.mjs'),`globalThis.fetch=async(url)=>new Response(JSON.stringify(String(url).startsWith('https://wstein.github.io/')?${JSON.stringify(live)}:String(url).includes('/actions/runs/')?{event:'pull_request'}:String(url).endsWith('/commits/gh-pages')?{sha:'${commitSha}',commit:{tree:{sha:'${storage}'}}}:{sha:'${commitSha}',tree:[],truncated:false}));`);
   execFileSync(process.execPath,['--import',join(dir,'mock.mjs'),resolve('scripts/pages/publish.mjs'),'prepare'],{cwd:dir,env:{...process.env,PATH:`${dir}/bin:/usr/bin:/bin`,GH_TOKEN:'test-only',GITHUB_RUN_ID:'200',GITHUB_RUN_ATTEMPT:'1',GITHUB_SHA:sha,GITHUB_OUTPUT:join(dir,'out'),TRACKED:'[]'},stdio:'pipe'});
   assert.match(readFileSync(join(dir,'out'),'utf8'),/publish=true/);
  }finally{rmSync(dir,{recursive:true,force:true});}
@@ -201,7 +203,7 @@ function runPublish(mode,{live,treeSha=storage,env={}}){
  try{
   mkdirSync(join(dir,'bin'));mkdirSync(join(dir,'combined-site'));
   writeFileSync(join(dir,'bin/git'),`#!/bin/sh\nprintf '%s\\n' '${storage}'\n`,{mode:0o755});
-  writeFileSync(join(dir,'mock.mjs'),`globalThis.fetch=async(url)=>new Response(JSON.stringify(String(url).startsWith('https://wstein.github.io/')?${JSON.stringify(live)}:String(url).includes('/actions/runs/')?${JSON.stringify(publisher)}:{sha:'${treeSha}',tree:[],truncated:false}));`);
+  writeFileSync(join(dir,'mock.mjs'),`globalThis.fetch=async(url)=>new Response(JSON.stringify(String(url).startsWith('https://wstein.github.io/')?${JSON.stringify(live)}:String(url).includes('/actions/runs/')?${JSON.stringify(publisher)}:String(url).endsWith('/commits/gh-pages')?{sha:'${commitSha}',commit:{tree:{sha:'${treeSha}'}}}:{sha:'${commitSha}',tree:[],truncated:false}));`);
   execFileSync(process.execPath,['--import',join(dir,'mock.mjs'),resolve('scripts/pages/publish.mjs'),mode],{cwd:dir,env:{...process.env,PATH:`${dir}/bin:/usr/bin:/bin`,GH_TOKEN:'test-only',GITHUB_RUN_ID:'200',GITHUB_RUN_ATTEMPT:'1',GITHUB_SHA:sha,GITHUB_OUTPUT:join(dir,'out'),...env},stdio:'pipe'});
   const read=name=>existsSync(join(dir,name))?readFileSync(join(dir,name),'utf8'):'';
   return {out:read('out'),notification:read('notification.json')};
@@ -221,7 +223,7 @@ test('notification receipt carries the live proof only when its storage matches 
 test('freshness pagination stops exactly at the receipt run or at a short page',async()=>{
  const make=pages=>{const reads=[];return {reads,request:async path=>{
   if(runsPath(path)){reads.push(pageOf(path));assert.ok(reads.length<=pages.length,'read beyond the last page');return {workflow_runs:pages[pageOf(path)-1]};}
-  return path.startsWith('actions/runs/')?publisher:{sha:storage};
+  return path.startsWith('actions/runs/')?publisher:path==='commits/gh-pages'?{sha:commitSha,commit:{tree:{sha:storage}}}:{sha:commitSha};
  }};};
  // The receipt run (123) is the last entry of a full page: that page ends the scan.
  const full=Array.from({length:100},(_,i)=>({id:222-i,event:'workflow_run',conclusion:'skipped'}));

@@ -31,10 +31,22 @@ const build = (number, c) => ({
   conclusion: "success",
 });
 const blob = (path) => ({ path, type: "blob" });
+const remoteTree = sha("f");
+const publisher = {
+  id: 123,
+  run_attempt: 1,
+  head_sha: sha("b"),
+  head_branch: "main",
+  path: ".github/workflows/pages-publish.yml",
+  repository,
+  head_repository: repository,
+  event: "workflow_dispatch",
+  status: "completed",
+};
 const runs = (head) =>
   `actions/workflows/pages.yml/runs?${head}&per_page=100&page=1`;
 // Runs the real plan.mjs against a mocked API; an unmocked path throws.
-function planned() {
+function planned({ receipt } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "pages-plan-"));
   try {
     const responses = {
@@ -51,7 +63,11 @@ function planned() {
       "contents/.cubistry-production.json?ref=gh-pages": null,
       "contents/pr-preview/pr-1/preview-info.json?ref=gh-pages": null,
       "pulls?state=all&per_page=100&page=1": [],
+      // Like GitHub: the branch name resolves to the commit sha; the tree sha is on the commit.
+      "commits/gh-pages": { sha: sha("e"), commit: { tree: { sha: remoteTree } } },
+      "actions/runs/123": publisher,
       "git/trees/gh-pages?recursive=1": {
+        sha: sha("e"),
         truncated: false,
         tree: [
           blob("index.html"),
@@ -66,7 +82,7 @@ function planned() {
     };
     writeFileSync(
       join(dir, "mock.mjs"),
-      `const responses=${JSON.stringify(responses)};globalThis.fetch=async url=>{if(String(url).startsWith('https://wstein.github.io/'))return new Response('',{status:404});const path=String(url).split('/repos/wstein/cubistry/')[1];if(!(path in responses))throw Error('Unexpected API access: '+path);return new Response(JSON.stringify(responses[path]),{status:200,headers:{'Content-Type':'application/json'}});};`,
+      `const responses=${JSON.stringify(responses)};globalThis.fetch=async url=>{if(String(url).startsWith('https://wstein.github.io/'))return ${JSON.stringify(receipt)}===undefined?new Response('',{status:404}):new Response(${JSON.stringify(JSON.stringify(receipt))});const path=String(url).split('/repos/wstein/cubistry/')[1];if(!(path in responses))throw Error('Unexpected API access: '+path);return new Response(JSON.stringify(responses[path]),{status:200,headers:{'Content-Type':'application/json'}});};`,
     );
     execFileSync(
       process.execPath,
@@ -94,4 +110,19 @@ test("plan.mjs removes inventoried previews, skips .nojekyll leftovers and fetch
       [5, "remove"],
     ],
   );
+});
+test("plan.mjs compares the published receipt with the remote tree sha, not the branch commit sha", () => {
+  const { tracked } = planned();
+  const receipt = (storage) => ({
+    schema: 1,
+    run: 123,
+    attempt: 1,
+    sha: sha("b"),
+    storage,
+    nonce: "d".repeat(32),
+    tracked,
+  });
+  assert.equal(planned({ receipt: receipt(remoteTree) }).early, false);
+  assert.equal(planned({ receipt: receipt(sha("9")) }).early, true);
+  assert.equal(planned({ receipt: receipt(sha("e")) }).early, true);
 });

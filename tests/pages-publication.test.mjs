@@ -21,7 +21,9 @@ function notify({deployOK,metadata=sha,closed=false,remaining=false,unlabeled=fa
    'pulls/1':pr,
    'actions/runs/123':publisher,
    'actions/workflows/pages-publish.yml/runs?branch=main&per_page=100&page=1':{workflow_runs:[publisher]},
-   'git/trees/gh-pages?recursive=1':{sha:proof.storage},
+   // Like GitHub: a branch name resolves to the commit SHA here; the tree SHA lives on the commit.
+   'git/trees/gh-pages?recursive=1':{sha:'e'.repeat(40),truncated:false,tree:[]},
+   'commits/gh-pages':{sha:'e'.repeat(40),commit:{tree:{sha:proof.storage}}},
    'issues/1/comments?per_page=100&page=1':comment?[{id:7,user:{login:'github-actions[bot]'},body:'<!-- cubistry-pr-preview --> old'}]:[],
    [`actions/workflows/pages.yml/runs?event=pull_request&head_sha=${sha}&per_page=100&page=1`]:{workflow_runs:[run]},
    'contents/pr-preview/pr-1/preview-info.json?ref=gh-pages':{content:Buffer.from(JSON.stringify({sha:metadata})).toString('base64')},
@@ -114,4 +116,44 @@ test('operator cancellation after early production prevents final publication an
  assert.doesNotMatch(result.comment,/Open non-production PR preview/);assert.match(result.comment,/pending|failed/);
  const final=jobs.get('deploy-previews');assert.match(final,/if: always\(\) && !cancelled\(\)/);
  assert.doesNotMatch(notify({deployOK:false,closed:true}),/^.*Preview removed/m);
+});
+
+// Runs the real publish.mjs against a mocked API. GitHub answers git/trees/<branch> with the COMMIT sha
+// of the branch; the tree sha is only available as commits/<branch>.commit.tree.sha.
+const commitSha='e'.repeat(40),treeSha='f'.repeat(40);
+function publish(mode,{localTree=treeSha,remoteTree=treeSha,proof,env={}}={}){
+ const dir=mkdtempSync(join(tmpdir(),'pages-publish-'));
+ try{
+  mkdirSync(join(dir,'combined-site'));writeFileSync(join(dir,'output'),'');
+  const responses={
+   'git/trees/gh-pages?recursive=1':{sha:commitSha,truncated:false,tree:[{path:'pr-preview/pr-5/index.html',type:'blob'}]},
+   'commits/gh-pages':{sha:commitSha,commit:{tree:{sha:remoteTree}}},
+  };
+  writeFileSync(join(dir,'mock.mjs'),`import cp from'node:child_process';import{syncBuiltinESMExports}from'node:module';
+cp.execFileSync=()=>${JSON.stringify(localTree+'\n')};syncBuiltinESMExports();
+const responses=${JSON.stringify(responses)};
+globalThis.fetch=async url=>{if(String(url).startsWith('https://wstein.github.io/'))return ${JSON.stringify(proof)}===undefined?new Response('',{status:404}):new Response(${JSON.stringify(JSON.stringify(proof))});const path=String(url).split('/repos/wstein/cubistry/')[1];if(!(path in responses))throw Error('Unexpected API request '+path);return new Response(JSON.stringify(responses[path]),{status:200,headers:{'Content-Type':'application/json'}});};`);
+  const run=()=>execFileSync(process.execPath,['--import',join(dir,'mock.mjs'),resolve('scripts/pages/publish.mjs'),mode],{cwd:dir,env:{...process.env,GH_TOKEN:'unit-test-only',GITHUB_RUN_ID:'123',GITHUB_RUN_ATTEMPT:'1',GITHUB_SHA:sha,GITHUB_OUTPUT:join(dir,'output'),TRACKED:'[]',NOTIFY:'[1]',...env},stdio:'pipe'});
+  return {run,read:name=>JSON.parse(readFileSync(join(dir,name),'utf8')),output:()=>readFileSync(join(dir,'output'),'utf8'),cleanup:()=>rmSync(dir,{recursive:true,force:true})};
+ }catch(error){rmSync(dir,{recursive:true,force:true});throw error;}
+}
+test('publish prepare accepts storage whose remote tree sha (commits/gh-pages) equals the local tree',()=>{
+ const p=publish('prepare');
+ try{
+  p.run();
+  assert.match(p.output(),/^publish=true$/m);
+  assert.equal(p.read('publication.json').storage,treeSha,'receipt must carry the tree sha, not the commit sha');
+  assert.deepEqual(p.read('publication.json').tracked,[5],'inventory still comes from git/trees');
+ }finally{p.cleanup();}
+});
+test('publish prepare still rejects storage that changed between reading and publishing',()=>{
+ const p=publish('prepare',{remoteTree:'9'.repeat(40)});
+ try{assert.throws(()=>p.run(),error=>/Storage changed while preparing publication/.test(String(error.stderr)));}finally{p.cleanup();}
+});
+test('publish receipt keeps the proof only while the remote tree sha equals the proof storage',()=>{
+ const proof={schema:1,run:123,attempt:1,sha,storage:treeSha,nonce:'d'.repeat(32),tracked:[1]};
+ const same=publish('receipt',{proof});
+ try{same.run();assert.deepEqual(same.read('notification.json').proof,proof);}finally{same.cleanup();}
+ const changed=publish('receipt',{proof,remoteTree:'9'.repeat(40)});
+ try{changed.run();assert.equal(changed.read('notification.json').proof,null);}finally{changed.cleanup();}
 });
