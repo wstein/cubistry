@@ -204,6 +204,9 @@ test("negative controls: wrong order, wrong hash, wrong label, wrong class are r
   const hash = structuredClone(graph);
   hash.nodes[7] = { ...hash.nodes[7], hash: "0".repeat(64) };
   assert.throws(() => verifyChain(printing, pose, table, hash), /edge (6|7)/);
+  const last = structuredClone(graph);
+  last.nodes[20] = { ...last.nodes[20], hash: "0".repeat(64) };
+  assert.throws(() => verifyChain(printing, pose, table, last), /edge 19: end hash differs from node 20/);
   const label = structuredClone(table);
   const d = label.displays[displayIdOf(label, 2027, 11) - 1];
   d.cells[1] = { text: "EMX", ink: "month" };
