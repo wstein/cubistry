@@ -43,7 +43,7 @@ export class PhysicalCubeScene {
   /** Stickerless core: visible only in seams; never follows a frame color. */
   private readonly coreMaterial: THREE.MeshStandardMaterial;
   private readonly cutMaterials = new Map<string, THREE.Material>();
-  private readonly bodyColor: string | null;
+  private bodyColor: string | null;
   private readonly faceMaterials: THREE.Material[] = [];
   private readonly geometries: THREE.BufferGeometry[];
   private readonly parent: THREE.Scene | THREE.Group;
@@ -153,12 +153,20 @@ export class PhysicalCubeScene {
       else surface.color.set(fallback);
     }
   }
-  /** Update only this scene's cut faces and core; printed materials and geometry stay owned in place. */
+  /** Update only this scene's cut faces and core; printed materials and geometry stay owned in place.
+   * Only a scene built with an explicit body color has one cut color to replace: without it the cut
+   * faces follow their bordering exterior faces, so this does nothing. */
   setBodyColor(color: string): void {
-    if (this.bodies.size === 0) return;
+    if (this.bodies.size === 0 || this.bodyColor === null) return;
     demand(HEX_COLOR.test(color), "Invalid body color");
     this.coreMaterial.color.set(color);
-    for (const material of this.cutMaterials.values()) (material as THREE.MeshStandardMaterial).color.set(color);
+    const materials = [...this.cutMaterials.values()];
+    this.cutMaterials.clear();
+    for (const material of materials) {
+      (material as THREE.MeshStandardMaterial).color.set(color);
+      this.cutMaterials.set(color, material);
+    }
+    this.bodyColor = color;
   }
   /** Stickerless core color; takes effect immediately, including during a turn. */
   setCoreColor(color: string): void {
