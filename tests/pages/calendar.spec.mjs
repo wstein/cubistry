@@ -27,6 +27,9 @@ for (const [design, moves, front, sourceIso, targetIso] of [
   }) => {
     await page.addInitScript((iso) => {
       Date.now = () => new Date(iso + "T11:00:00Z").getTime();
+      // Slow runners must finish the solve; the move limit below stays.
+      // Kept below the 15 s busy wait so a deadline still releases the page.
+      window.__calendarSolverTimeoutMs = 13000;
     }, sourceIso);
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));

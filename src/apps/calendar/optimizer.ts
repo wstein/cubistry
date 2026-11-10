@@ -19,6 +19,14 @@ interface Request {
   interimWord?: string;
   interimDiagnostics?: Readonly<Record<string, unknown>>;
 }
+/** Main-thread deadline for one solve; product behavior. */
+export const DEFAULT_SOLVER_TIMEOUT_MS = 8000;
+/** A finite positive number overrides the default; anything else is ignored. */
+export function solverTimeoutMs(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0
+    ? value
+    : DEFAULT_SOLVER_TIMEOUT_MS;
+}
 /** At most one solve and one replaceable pending request; hard worker deadline. */
 export class CalendarOptimizer {
   private worker: PlanningWorker | null = null;
@@ -49,7 +57,7 @@ export class CalendarOptimizer {
       new Worker(new URL("./optimizer-worker.ts", import.meta.url), {
         type: "module",
       }),
-    timeoutMs = 8000,
+    timeoutMs = DEFAULT_SOLVER_TIMEOUT_MS,
   ) {
     this.createWorker = createWorker;
     this.timeoutMs = timeoutMs;
