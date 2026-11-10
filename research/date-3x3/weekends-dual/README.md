@@ -35,7 +35,10 @@ which is inside that range.
 | --- | ---: | ---: | ---: |
 | Corners | 22 | 1 | 24 |
 | Edges | 22 | 1 | 24 |
-| Centers | 4 | 1 | 6 |
+| Centers | 4 | 0 | 6 |
+
+Every target center shows a padded day tens digit 0–3. The two blank centers in
+the existing print are unused capacity, not target requirements.
 
 These raw necessary counts fit. They do not prove physical feasibility. The
 existing edge print uses four weekday images, eight month images (two brown O
@@ -72,6 +75,8 @@ fragments, movable fields, optical aliases or arbitrary German calendar cubes.
 Recoloring only S would be a partial weekend marker and needs a separate design
 decision. A whole-weekday sticker with separate month letters needs new evidence;
 no alternative print is selected here.
+Implementation and a fixed print optimized for day increment/decrement remain
+conditional on a feasible, validated design.
 
 ## Native checks
 
