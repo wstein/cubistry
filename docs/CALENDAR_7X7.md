@@ -374,7 +374,7 @@ app engine, requires each result to equal the research snapshot `state-NN.tsv`, 
 sheet, and writes the same bytes on every run.
 
 The digest pin of the exporter stops any changed research input first. The checks behind it (declared metrics,
-snapshot against replay, display front, month order) are defence in depth on the command line; the tests reach each of
+snapshot against replay, display front, month order) are defense in depth on the command line; the tests reach each of
 them through the test-only option `testOnlySkipDigestPins` of `build()`, which the command line never sets (these
 tests need `CALENDAR7_NAMES_RESEARCH`). `namesWindowContains(table, year, month)` in `graph.ts` tells a caller without
 exceptions whether a month lies inside a display table.
