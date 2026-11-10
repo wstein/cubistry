@@ -1,0 +1,6 @@
+Root cause investigation, Codex Sol, 2026-11-10
+Initial Flix accepted the pinned shifted-weekend model/certificate; Julia rejected it as integer JSON numbers. Status set UNKNOWN immediately.
+The new Julia raw-input numeric policy was applied to both the certificate and model. In Julia, Bool is a subtype of Number. The model intentionally contains opticalAliases=false and reflections=false, so the certificate-specific rejection of Boolean numeric substitutes incorrectly rejected valid model Boolean fields. The Flix raw parser correctly retains J.Bool and accepts the byte-pinned model.
+This is a Julia schema-policy defect, not a count or mathematical dissent. The fix allows Boolean tokens only when parsing the byte-pinned model; the certificate still rejects all Boolean numeric substitutes. All raw model pins, certificate data, target rows and Flix code remain unchanged.
+Both native checkers must rerun before reevaluation. Targeted controls must retain Boolean certificate rejection and prove model=false remains accepted.
+Reevaluation: after the documented correction, BOTH Julia and Flix accepted the same raw inputs with identical complete result rows. All sixteen author controls then matched expectations (two accepts, fourteen rejects), including Boolean certificate-version rejection. Independent review remains pending.

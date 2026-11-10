@@ -1,0 +1,17 @@
+{
+  "schema": "cubistry.german-weekend-shift-input-pins",
+  "version": 1,
+  "sourceMainCommit": "b8e161846f4e83e4ea7bbf0b449a0a035e190f69",
+  "sourceRuntime": "public/calendar/de-a.json",
+  "sourceRuntimeSHA256": "1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56",
+  "historicalProofHead": "d919ed5507fc7379c9d011fb448726da05846c70",
+  "inputs": {
+    "model.json": "4f6aebe0784d83d823c3f4316384c7280cc3bf5917a18a4d6abec12fdc9ddb2b",
+    "weekdays.tsv": "b3f586b0245e7a3947c7e10bf7b087c4d5bad259eef263dc6fff2fe6d9a67044",
+    "months.tsv": "df2de9ee2db42ccff03e7512be05c50dc740d3223d1203622684af902abd0f74",
+    "baseline-print.tsv": "608a6a525a3723394e2c54c7151157b97c3ac753f1f30cf4435a748828978e64",
+    "targets.tsv": "5e4ddb23b5e3d125eea77520b4dbba4030b010c752564845393cdb6a657a6db9"
+  },
+  "status": "AUTHOR_DUAL_ACCEPTED_PENDING_INDEPENDENT_REVIEW",
+  "gate": "Julia and Flix accepted the same raw inputs after documented Boolean schema-policy root-cause fix"
+}

@@ -1,0 +1,8 @@
+weekday	name	left	middle	right	ink
+0	MO	M	O		weekday
+1	DI	D	I		weekday
+2	MI	M	I		weekday
+3	DO	D	O		weekday
+4	FR	F	R		weekday
+5	SA		S	A	weekend
+6	SO		S	O	weekend
