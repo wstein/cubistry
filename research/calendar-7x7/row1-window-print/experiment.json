@@ -1,0 +1,24 @@
+{
+  "SPDX-License-Identifier": "CC-BY-SA-4.0",
+  "format": "cubistry.calendar7.row1-window-print.v1",
+  "baseCommit": "96cf09a864e3c51758991b4be7b7826dcdedec5f",
+  "layout": "../row1-revision/layout.tsv",
+  "layoutSHA256": "c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db",
+  "printing": "evidence/printing.tsv",
+  "printingSHA256": "0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127",
+  "frontMatches": "evidence/front-matches.tsv",
+  "frontMatchesSHA256": "9289130bd817a27d24375f6afbd7704e13e896d183547f577cc3cdc5001d8434",
+  "receiptSHA256": "a9cacb56eba61bf8d251713d03bf10d8ef2809539c039eec766a055c6eb1243f",
+  "scope": { "first": "2026-05", "last": "2028-01", "months": 21, "physicalSurfaces": 294, "physicalBodies": 218, "frontMatches": 1029 },
+  "result": { "fixedPrintRigidFrontMatchability": "SAT", "legalStates": "UNKNOWN", "chain": "NOT_RUN", "globalCoverage": "NOT_CLAIMED", "independentReview": "PENDING" },
+  "generator": {
+    "trusted": false, "language": "Julia", "solver": "Z3 5.4.0", "componentDeadlineMilliseconds": 45000, "multiFaceComponents": 4, "trialWallSeconds": 18.748,
+    "officialNativeArtifact": "https://github.com/Z3Prover/z3/releases/download/z3-5.4.0/z3-5.4.0-linux-arm64.jar",
+    "artifactSHA256": "cedf05f3bb1b1f96bfcb764ecedfd3d47ef14923845cc1a7f1c2028a9ab4ca61",
+    "nativeLibrarySHA256": "fe799d476ccc5c271619cb9935958647aacae64527000e4d50a423509786385d",
+    "systemInstallation": false
+  },
+  "tools": { "julia": "1.11.5", "flix": "0.79.0", "jdk": "21.0.13+9" },
+  "controls": { "rawNegativeCases": 15, "juliaRejections": 15, "flixRejections": 15, "sixNineTwinAcceptedByBoth": true },
+  "notRun": ["legal-state-synthesis", "chain-search", "independent-chain-replay", "app-export", "print-sheet-generator", "full-mutation-sweep"]
+}
