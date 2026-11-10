@@ -860,12 +860,20 @@ test("Sequence numbers identify actual starts, retain the finished number and ig
   await expect(number).toHaveText("—");
   await page.locator("#value").fill("1");
   await page.click("#set");
-  // The certified route 0 -> 1 takes several quarter turns at the 250 ms default; advance the fake clock until the
-  // cube reports the commit instead of assuming a fixed duration.
-  await expect.poll(async () => {
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
+  await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
+  // The certified route 0 -> 1 takes several quarter turns at the 250 ms default. Advance the fake clock in bounded
+  // steps until the cube shows the value and is idle (the commit), instead of assuming a fixed duration.
+  const limitMs = 10000;
+  let committed = false;
+  for (let played = 0; played < limitMs && !committed; played += 250) {
     await page.clock.runFor(250);
-    return page.locator("#cube").getAttribute("data-value");
-  }).toBe("1");
+    committed = await page.evaluate(() => {
+      const cube = document.querySelector("#cube");
+      return cube.dataset.value === "1" && cube.getAttribute("aria-busy") === "false";
+    });
+  }
+  expect(committed, `Certified Counter did not commit 1 within ${limitMs} ms of fake time`).toBe(true);
   await expect(number).toHaveText("1");
 });
 
