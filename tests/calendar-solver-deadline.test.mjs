@@ -1,4 +1,4 @@
-import { test, mock } from "node:test";
+import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import * as optimizerModule from "../src/apps/calendar/optimizer.ts";
@@ -26,11 +26,15 @@ const fakeWorker = () => ({
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
 /** Interim route at once, final route after `finalAfterMs` of fake time. */
-async function slowSolve(optimizer, worker, finalAfterMs) {
-  const result = optimizer.plan(context);
+async function slowSolve(t, optimizer, worker, finalAfterMs) {
+  // Attach the handler first: a rejection must fail this test, not the process.
+  const result = optimizer.plan(context).then(
+    (word) => word,
+    (error) => `rejected: ${error.message}`,
+  );
   const { id } = worker.messages[0];
   worker.onmessage({ data: { id, interimWord: "interim" } });
-  mock.timers.tick(finalAfterMs);
+  t.mock.timers.tick(finalAfterMs);
   await flush();
   // A deadline has already terminated the worker and ignores this reply.
   worker.onmessage({
@@ -39,56 +43,44 @@ async function slowSolve(optimizer, worker, finalAfterMs) {
   return result;
 }
 
-test("the default solver deadline stays 8000 ms", async () => {
-  mock.timers.enable({ apis: ["setTimeout"] });
-  try {
-    assert.equal(optimizerModule.DEFAULT_SOLVER_TIMEOUT_MS, 8000);
-    const worker = fakeWorker();
-    const optimizer = new CalendarOptimizer(() => worker);
-    assert.equal(await slowSolve(optimizer, worker, 7999), "final");
-    const late = fakeWorker();
-    const second = new CalendarOptimizer(() => late);
-    assert.equal(await slowSolve(second, late, 8000), "interim");
-    assert.equal(second.solverStatus, "deadline");
-    assert.equal(late.dead, true);
-    optimizer.dispose();
-    second.dispose();
-  } finally {
-    mock.timers.reset();
-  }
+test("the default solver deadline stays 8000 ms", async (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  assert.equal(optimizerModule.DEFAULT_SOLVER_TIMEOUT_MS, 8000);
+  const worker = fakeWorker();
+  const optimizer = new CalendarOptimizer(() => worker);
+  assert.equal(await slowSolve(t, optimizer, worker, 7999), "final");
+  const late = fakeWorker();
+  const second = new CalendarOptimizer(() => late);
+  assert.equal(await slowSolve(t, second, late, 8000), "interim");
+  assert.equal(second.solverStatus, "deadline");
+  assert.equal(late.dead, true);
+  optimizer.dispose();
+  second.dispose();
 });
 
-test("a configured larger deadline lets a slow solve finish instead of retaining the interim route", async () => {
-  mock.timers.enable({ apis: ["setTimeout"] });
-  try {
-    const worker = fakeWorker();
-    const optimizer = new CalendarOptimizer(
-      () => worker,
-      optimizerModule.solverTimeoutMs(30000),
-    );
-    assert.equal(await slowSolve(optimizer, worker, 9000), "final");
-    assert.equal(optimizer.solverStatus, "solved");
-    assert.notEqual(worker.dead, true);
-    optimizer.dispose();
-  } finally {
-    mock.timers.reset();
-  }
+test("a configured larger deadline lets a slow solve finish instead of retaining the interim route", async (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const worker = fakeWorker();
+  const optimizer = new CalendarOptimizer(
+    () => worker,
+    optimizerModule.solverTimeoutMs(30000),
+  );
+  assert.equal(await slowSolve(t, optimizer, worker, 9000), "final");
+  assert.equal(optimizer.solverStatus, "solved");
+  assert.notEqual(worker.dead, true);
+  optimizer.dispose();
 });
 
-test("a configured deadline still ends a stalled solve with the interim route", async () => {
-  mock.timers.enable({ apis: ["setTimeout"] });
-  try {
-    const worker = fakeWorker();
-    const optimizer = new CalendarOptimizer(
-      () => worker,
-      optimizerModule.solverTimeoutMs(30000),
-    );
-    assert.equal(await slowSolve(optimizer, worker, 30000), "interim");
-    assert.equal(optimizer.solverStatus, "deadline");
-    optimizer.dispose();
-  } finally {
-    mock.timers.reset();
-  }
+test("a configured deadline still ends a stalled solve with the interim route", async (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const worker = fakeWorker();
+  const optimizer = new CalendarOptimizer(
+    () => worker,
+    optimizerModule.solverTimeoutMs(30000),
+  );
+  assert.equal(await slowSolve(t, optimizer, worker, 30000), "interim");
+  assert.equal(optimizer.solverStatus, "deadline");
+  optimizer.dispose();
 });
 
 test("solverTimeoutMs accepts only a finite positive number and otherwise yields the default", () => {
