@@ -70,7 +70,7 @@ export class Calendar7Viewer implements StageView {
   private resources: { dispose(): void }[] = [];
   private printing: Printing | null = null;
   private pose: Pose | null = null;
-  private surface: Surface = "sticker";
+  private surface: Surface = "face";
   /** A scheme was chosen during a move on a stickerless cube: the body color waits for the end of the move. */
   private bodyStale = false;
   /** The color scheme of the labels (`setScheme`); the default scheme until one is chosen. */
@@ -145,9 +145,8 @@ export class Calendar7Viewer implements StageView {
 
   /**
    * Chooses the color scheme by id (an unknown id or null gives the default scheme; never throws). The textures of the
-   * current cube are redrawn in place (no new canvas, texture or material, nothing to dispose); a stickerless cube is
-   * rebuilt instead while no move is turning, because its body color (the day fill) is fixed when the scene is built;
-   * during a move only its textures are redrawn and the rebuild follows when the move ends.
+   * current cube are redrawn in place (no new canvas, texture or material, nothing to dispose). The cut faces and core
+   * take the day fill in place; during a move that color update waits until its endpoint.
    * A scheme chosen before `configure` is used by it. The same scheme again does nothing.
    */
   setScheme(id: string | null | undefined): void {
@@ -156,22 +155,20 @@ export class Calendar7Viewer implements StageView {
     if (next === this.scheme) return;
     this.scheme = next;
     if (!this.printing || !this.pose) return;
-    if (this.surface === "face" && !this.tween.running) {
-      this.configure(this.printing, this.pose, this.surface);
-      return;
-    }
-    if (this.surface === "face") this.bodyStale = true;
+    this.bodyStale = true;
     for (const a of this.art) {
       this.draw(a.canvas, a.text, a.ink);
       a.texture.needsUpdate = true;
     }
+    this.applyBodyColor();
     this.dirty = true;
   }
 
-  /** Rebuilds a stickerless cube whose body color is stale; only between moves, with the pose the cube shows. */
+  /** Updates a stickerless cube whose body color is stale; only between moves, with the pose the cube shows. */
   private applyBodyColor(): void {
     if (!this.bodyStale || this.tween.running || !this.printing || !this.pose || this.destroyed) return;
-    this.configure(this.printing, this.pose, this.surface);
+    this.cube?.setBodyColor(this.scheme.dayFill);
+    this.bodyStale = false;
   }
 
   /** Font changes redraw in place, including an active pivot, without rebuilding. */
@@ -197,10 +194,11 @@ export class Calendar7Viewer implements StageView {
   }
 
   /**
-   * Builds the cube from the printing and shows `pose`. `surface` "sticker" (default) draws the 294 sticker bodies;
-   * "face" is the stickerless cube: no sticker body is drawn and each label is the texture of its cubie face.
+   * Builds the stickerless Calendar7 cube. The legacy surface argument is accepted but cannot restore stickers.
+   * This rendering policy does not change the state schema or any other viewer.
    */
-  configure(printing: Printing, pose: Pose, surface: Surface = "sticker"): void {
+  configure(printing: Printing, pose: Pose, _surface: Surface = "face"): void {
+    const surface: Surface = "face";
     this.clear();
     this.bodyStale = false;
     this.printing = printing;
@@ -247,14 +245,14 @@ export class Calendar7Viewer implements StageView {
       lightGeometry(),
       faceColors,
       // Stickerless: the body is the day background (owner decision); with stickers it is the plastic frame between them.
-      { bodyColor: surface === "face" ? this.scheme.dayFill : PLASTIC },
+      { bodyColor: this.scheme.dayFill, coreColor: this.scheme.dayFill },
     );
     // A sticker is a flat sheet on its body: it needs no shadow of its own (halves the shadow pass).
     this.presentation.traverse((o) => {
       if (o.userData.stickerId !== undefined) (o as THREE.Mesh).castShadow = false;
     });
     // The scene hides the sticker meshes and gives each cubie face the label texture (the cut faces take bodyColor: the day fill when stickerless).
-    this.cube.setConstruction(surface === "face" ? "stickerless" : "stickered");
+    this.cube.setConstruction("stickerless");
     this.cube.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
     this.dirty = true;
   }

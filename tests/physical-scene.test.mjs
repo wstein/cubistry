@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -167,4 +168,21 @@ test("the static core ball ignores scrambled poses on all six sides and intermed
     }
     h.adapter.dispose(); h.material.dispose();
   }
+});
+
+test('body color changes stay in one scene and preserve its printed textures, geometry and active pivot',()=>{
+ const design=createDesign('picture'),frames=stickerPoses(design.print,initialState(design.print));
+ const texture=new THREE.DataTexture(new Uint8Array([255,255,255,255]),1,1),source=new THREE.MeshStandardMaterial({map:texture}),plastic=new THREE.MeshStandardMaterial({color:'#9e0b5c'});
+ const make=()=>{const parent=new THREE.Group(),scene=new PhysicalCubeScene(parent,frames,new Map(frames.map(f=>[f.id,source])),plastic,1,createPresentationGeometry(),new Map(),{bodyColor:'#fffdf6',coreColor:'#fffdf6'});scene.sync(frames);scene.setConstruction('stickerless');return{scene,parent};};
+ const a=make(),b=make();assert.equal(typeof a.scene.setBodyColor,'function');
+ const state=({scene,parent})=>{parent.updateMatrixWorld(true);const geometry=[],materials=[],maps=[],cuts=[],printed=[];parent.traverse(o=>{if(!o.isMesh)return;geometry.push(o.geometry.uuid);for(const m of(Array.isArray(o.material)?o.material:[o.material])){materials.push(m.uuid);if(m.map)maps.push(m.map.uuid);}if(o.userData.sourceFaceStickerIds)o.material.forEach((m,i)=>(o.userData.sourceFaceStickerIds[i]===null?cuts:printed).push(m.color.getHexString()));});return{geometry,materials,maps,cuts,printed,core:scene.coreMaterial.color.getHexString()};};
+ const beforeA=state(a),beforeB=state(b),turn=a.scene.beginTurn([frames[0].cubie],0,Math.PI/2);turn.update(.4);
+ a.parent.updateMatrixWorld(true);
+ const parents=[...a.scene.bodies.values()].map(body=>body.parent),matrices=[...a.scene.bodies.values()].map(body=>body.matrixWorld.elements.slice());
+ a.scene.setBodyColor('#112233');const afterA=state(a);for(const k of['geometry','materials','maps','printed'])assert.deepEqual(afterA[k].slice().sort(),beforeA[k].slice().sort(),k);
+ assert(afterA.cuts.every(c=>c==='112233'));assert.equal(afterA.core,'112233');assert.deepEqual(state(b),beforeB);assert.equal(plastic.color.getHexString(),'9e0b5c');assert.equal(source.color.getHexString(),'ffffff');
+ assert.deepEqual([...a.scene.bodies.values()].map(body=>body.parent),parents);a.parent.updateMatrixWorld(true);assert.deepEqual([...a.scene.bodies.values()].map(body=>body.matrixWorld.elements.slice()),matrices);
+ assert.throws(()=>a.scene.setBodyColor('red'),/Invalid body color/);turn.dispose();
+ const retired=[...a.scene.cutMaterials.values(),a.scene.coreMaterial],colors=retired.map(m=>m.color.getHexString());a.scene.dispose();a.scene.setBodyColor('#445566');assert.deepEqual(retired.map(m=>m.color.getHexString()),colors);assert.equal(a.parent.children.length,0);assert.deepEqual(state(b),beforeB);
+ b.scene.dispose();source.dispose();plastic.dispose();texture.dispose();
 });

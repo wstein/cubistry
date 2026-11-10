@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import * as THREE from "three";
 import { bodyArtworkKey, orientBodyArtwork, sourceFaceIndex } from "./body-artwork.ts";
 import type { Construction } from "./appearance.ts";
@@ -151,6 +152,13 @@ export class PhysicalCubeScene {
       if (source.map) surface.color.copy(source.color);
       else surface.color.set(fallback);
     }
+  }
+  /** Update only this scene's cut faces and core; printed materials and geometry stay owned in place. */
+  setBodyColor(color: string): void {
+    if (this.bodies.size === 0) return;
+    demand(HEX_COLOR.test(color), "Invalid body color");
+    this.coreMaterial.color.set(color);
+    for (const material of this.cutMaterials.values()) (material as THREE.MeshStandardMaterial).color.set(color);
   }
   /** Stickerless core color; takes effect immediately, including during a turn. */
   setCoreColor(color: string): void {
