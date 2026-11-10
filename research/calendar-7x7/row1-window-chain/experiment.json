@@ -1,0 +1,23 @@
+{
+  "schema": "cubistry.calendar7.row1-window-chain.v1",
+  "scope": "May 2026 through January 2028 only",
+  "status": "NATIVE_ACCEPTED_INDEPENDENT_REVIEW_PENDING",
+  "states": 21,
+  "edges": 20,
+  "htm": 7338,
+  "qtm": 7514,
+  "rotations": 368,
+  "rotation_qtm": 376,
+  "optimized": false,
+  "layout_sha256": "c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db",
+  "printing_sha256": "0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127",
+  "moves_sha256": "7db8c8a1073f79e73f1e59ab953e25fc47342d5659d5058d8ae9cf5eb8bbe1db",
+  "native_receipt_sha256": "5421d8d19e990f05cfef70a234cb08629201673dd07ae22bb45b76cf202732de",
+  "independent_receipt_sha256": "cce1ca3289bf509bf799f44708c70c2bc13b895b1773a95e49d85afb97bce21c",
+  "states_manifest_sha256": "c1adcfff7488d3bcfb08dd2161cc3ba6158333fbe1e7fd1ea75805b65058679d",
+  "controls": {"raw_negative_cases": 13, "julia_rejections": 13, "flix_rejections": 13, "generator_reproduced_identical_words_and_21_snapshots": true},
+  "checks": ["Julia direct294/pose264 replay", "Flix direct294/pose264 replay", "adapted independent verify_chain.jl", "edge and whole-chain inverse replay"],
+  "not_run": ["GitHub Actions", "app export", "browser tests", "full mutation sweep", "2000-2100 chain"],
+  "spdx_license_identifier": "CC-BY-SA-4.0",
+  "attribution": "Created by Werner Stein with AI assistance (Codex, OpenAI). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry."
+}
