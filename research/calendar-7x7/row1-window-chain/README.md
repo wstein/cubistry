@@ -52,8 +52,10 @@ The window end is a parameter: `WINDOW_END=YYYY-MM` (default `2028-01`) for `che
 `verify_chain.jl`, `generate.jl` and `run_checks.sh`, and the optional arguments
 `WINDOW_END PRINT_SHA256` of the Flix checker. The 21-month defaults and the stored evidence are
 unchanged byte for byte. A longer window needs the SHA-256 of its print in `CAL7_WINDOW_PRINT_SHA`
-(`run_checks.sh` also takes `PRINT_OVERRIDE`, `CHAIN_OVERRIDE`, `STATES_OVERRIDE`). Every checker
-asserts that the window end equals the last chain edge.
+(`run_checks.sh` also takes `PRINT_OVERRIDE`, `CHAIN_OVERRIDE`, `STATES_OVERRIDE`). Julia and Flix
+chain checkers assert that the window end equals the year and month of the last chain edge
+(`verify_chain.jl` asserts the final month). The Flix print checker in `../row1-window-print` is
+fixed at 21 months and its messages say 21; the Julia print checker follows the window end.
 
 Seam. The chain stays one chain when the stored chain is extended from its end state with the
 stored print: `SEAM_CHAIN=evidence/moves.tsv SEAM_STATES=evidence/states WINDOW_END=2028-03 julia
@@ -63,13 +65,24 @@ rows and snapshots verbatim and continues. `check_seam.jl` (run by `run_checks.s
 edge starts at the stored end digest. `test_seam.jl` extends to 2028-02 and breaks the seam three
 ways. The same join point is meant for a later backward extension.
 
-Result with the stored print and the stored states: 2028-02 and 2028-03 have a legal chain (Julia
-and Flix receipts byte-identical, independent replay accepts; HTM 7338 then 7781 then 8057). The
-stored print has no whole-body front matching for 2028-04 (`window_match` in
-`../row1-window-print/common.jl`, Julia only), so a seamless chain over this print stops at
-2028-03; the generator reports 2028-04 as UNKNOWN (search stalled). A longer window needs another
-print, hence new states for all months: `evidence/extended-window.tsv` lists whole-chain
-recomputations with a print designed for each window end. They do not extend the stored chain.
+Result with the stored print and the stored states: 2028-02 and 2028-03 have a legal chain (SAT:
+Julia and Flix receipts byte-identical, independent replay accepts; HTM 7338, then 7781, then
+8057). Julia matchers find no whole-body front matching for the stored print from 2028-04 (a second
+independent Julia matcher agrees); that is UNKNOWN, with no Flix confirmation. The generator
+reports 2028-04 as UNKNOWN (search stalled).
+
+Decision: the way forward is a new print with a whole recomputed chain; the stored months then
+change, because a new print has a new identity root. `evidence/extended-window.tsv` lists the
+recomputations per window end. Only the chosen end 2029-12 (44 months, HTM 15305) has a committed
+witness, in `evidence/window-2029-12/` (print, front matches, solver log, chain, 44 states). The
+other SAT rows are exploration rows without a committed witness; they are not reproducible from the
+repository. Re-check the witness:
+
+```sh
+WINDOW_END=2029-12 CAL7_WINDOW_PRINT_SHA=$(sha256sum evidence/window-2029-12/printing.tsv | cut -d' ' -f1) \
+PRINT_OVERRIDE=$PWD/evidence/window-2029-12/printing.tsv CHAIN_OVERRIDE=$PWD/evidence/window-2029-12/moves.tsv \
+STATES_OVERRIDE=$PWD/evidence/window-2029-12/states bash run_checks.sh JULIA JAVA CHAIN_JAR SCRATCH_DIR
+```
 
 ## Scope and limits
 
