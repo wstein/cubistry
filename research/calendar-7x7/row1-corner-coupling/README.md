@@ -72,7 +72,10 @@ They are not proofs of physical feasibility. Julia's 14 scalar lemma tests and
 Flix's 11 scalar tests include capacity slack, multiple anchor copies, an anchor
 missing from a target, an empty target domain, and one-face bodies that hide no
 other face. Targeted source mutants independently remove five premises or the
-body-face bound. The full mutation sweep is not run by default.
+body-face bound. The full mutation sweep is not run by default. The opt-in
+`run_source_mutants.sh JULIA JAVA FLIX_BUILD_DIR NEW_SCRATCH_DIR` prepares and
+runs the five Julia and five Flix mutants (each Flix mutant is rebuilt) and
+compares its receipt byte for byte with `evidence/source-negative.tsv`.
 
 Both implementations inherit calendar and geometry helpers from their own
 language's frozen research modules. Those inherited model assumptions remain a
