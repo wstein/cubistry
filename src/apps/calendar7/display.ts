@@ -23,7 +23,13 @@ import {
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
 
 export const INKS = ["blank", "dark", "month", "red", "weekday"] as const;
-export type Ink = (typeof INKS)[number];
+/**
+ * Ink table of the names layout data (public/calendar7/names): the shipped table plus `band`, the empty
+ * tiles of row 1. A band tile has empty text like a blank tile but a bottom line, so it must be upright
+ * and is a different class from `blank` (the empty days of rows 3-7).
+ */
+export const INKS_WITH_BAND = [...INKS, "band"] as const;
+export type Ink = (typeof INKS_WITH_BAND)[number];
 export interface Cell {
   readonly text: string;
   readonly ink: Ink;
@@ -162,7 +168,7 @@ export function imageNormal(
   ink: string,
   profile: RuleProfile = DEFAULT_RULE_PROFILE,
 ): Image {
-  if (text === "") return "blank";
+  if (text === "") return ink === "band" ? ["", ((angle % 4) + 4) % 4, "band"] : "blank";
   const strict = profile === "strict";
   const half = strict ? HALF_STRICT : HALF;
   const g = strict ? text : text.replaceAll("O", "0").replaceAll("I", "1");
