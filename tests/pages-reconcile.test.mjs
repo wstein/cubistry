@@ -165,7 +165,7 @@ test('unacknowledged candidate backlog fails closed at its explicit bound',async
  const pulls=Array.from({length:401},(_,i)=>({number:i+1,head:{repo:{full_name:'wstein/cubistry'}},labels:[{name:'preview'}]}));
  await assert.rejects(retainNotificationCandidates({}, {numbers:[],pulls,inventory:[],published:null}),/Too many pending/);
 });
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync,existsSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
 test('prepare repairs an untrusted live receipt instead of overriding the planner provenance rejection',()=>{
@@ -194,4 +194,27 @@ test('both no-op boundaries require source provenance and permit only their own 
  assert.equal(await readVerifiedPublication(api({...publisher,status:'in_progress'}),options),null);
  assert.deepEqual(await readVerifiedPublication(api({...publisher,status:'in_progress'}),{...options,context:{run:123,attempt:1,sha}}),receipt);
  assert.equal(await readVerifiedPublication(api({...publisher,status:'in_progress'}),{...options,context:{run:124,attempt:1,sha}}),null);
+});
+
+function runPublish(mode,{live,treeSha=storage,env={}}){
+ const dir=mkdtempSync('/tmp/cubistry-publish-mode-');
+ try{
+  mkdirSync(join(dir,'bin'));mkdirSync(join(dir,'combined-site'));
+  writeFileSync(join(dir,'bin/git'),`#!/bin/sh\nprintf '%s\\n' '${storage}'\n`,{mode:0o755});
+  writeFileSync(join(dir,'mock.mjs'),`globalThis.fetch=async(url)=>new Response(JSON.stringify(String(url).startsWith('https://wstein.github.io/')?${JSON.stringify(live)}:String(url).includes('/actions/runs/')?${JSON.stringify(publisher)}:{sha:'${treeSha}',tree:[],truncated:false}));`);
+  execFileSync(process.execPath,['--import',join(dir,'mock.mjs'),resolve('scripts/pages/publish.mjs'),mode],{cwd:dir,env:{...process.env,PATH:`${dir}/bin:/usr/bin:/bin`,GH_TOKEN:'test-only',GITHUB_RUN_ID:'200',GITHUB_RUN_ATTEMPT:'1',GITHUB_SHA:sha,GITHUB_OUTPUT:join(dir,'out'),...env},stdio:'pipe'});
+  const read=name=>existsSync(join(dir,name))?readFileSync(join(dir,name),'utf8'):'';
+  return {out:read('out'),notification:read('notification.json')};
+ }finally{rmSync(dir,{recursive:true,force:true});}
+}
+test('prepare skips publication only when storage and the tracked preview set both match the live receipt',()=>{
+ const live={...receipt,tracked:[7]};
+ assert.match(runPublish('prepare',{live,env:{TRACKED:'[7]'}}).out,/publish=false/);
+ assert.match(runPublish('prepare',{live,env:{TRACKED:'[7,8]'}}).out,/publish=true/,'a changed tracked set must publish');
+ assert.match(runPublish('prepare',{live,env:{TRACKED:'[]'}}).out,/publish=true/,'a removed tracked preview must publish');
+});
+test('notification receipt carries the live proof only when its storage matches the gh-pages tree',()=>{
+ const proof=value=>JSON.parse(value.notification).proof;
+ assert.deepEqual(proof(runPublish('receipt',{live:receipt,env:{NOTIFY:'[7]'}})),receipt);
+ assert.equal(proof(runPublish('receipt',{live:receipt,treeSha:sha,env:{NOTIFY:'[7]'}})),null,'a proof for other storage is dropped');
 });

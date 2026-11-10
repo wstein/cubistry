@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, existsSync, mkdtempSync, mkdirSync, symlinkSync, rmSync } from "node:fs";
+import { readFileSync, existsSync, mkdtempSync, mkdirSync, symlinkSync, rmSync, writeFileSync } from "node:fs";
 import { execFileSync, spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -41,5 +41,22 @@ test("empty, root, traversal and symlink workspaces fail before recursive owners
       const result = spawnSync("bash", [script], { env: { ...process.env, GITHUB_WORKSPACE: workspace }, encoding: "utf8" });
       assert.notEqual(result.status, 0, workspace);
     }
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+test("the root workspace is rejected by its own guard, not by a missing .git", () => {
+  const root = mkdtempSync(join(tmpdir(), "cubistry ownership root "));
+  try {
+    mkdirSync(join(root, "bin"));
+    const marker = join(root, "chown-called");
+    writeFileSync(join(root, "bin", "chown"), `#!/bin/sh\necho "$@" >> '${marker}'\n`, { mode: 0o755 });
+    // Drop the .git checks so that only the root guard can stop the script; chown is a recording stub.
+    const guarded = readFileSync(script, "utf8").split("\n").filter(line => !line.includes("/.git")).join("\n");
+    writeFileSync(join(root, "align.sh"), guarded);
+    const run = workspace => spawnSync("bash", [join(root, "align.sh")], { env: { ...process.env, PATH: `${join(root, "bin")}:${process.env.PATH}`, GITHUB_WORKSPACE: workspace }, encoding: "utf8" });
+    assert.notEqual(run("/").status, 0);
+    assert.equal(existsSync(marker), false, "chown never ran for the root workspace");
+    const ok = join(root, "ok"); mkdirSync(ok);
+    run(ok);
+    assert.equal(existsSync(marker), true, "the stubbed script reaches chown for a valid workspace");
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
