@@ -10,7 +10,7 @@
   "frontMatchesSHA256": "9289130bd817a27d24375f6afbd7704e13e896d183547f577cc3cdc5001d8434",
   "receiptSHA256": "a9cacb56eba61bf8d251713d03bf10d8ef2809539c039eec766a055c6eb1243f",
   "scope": { "first": "2026-05", "last": "2028-01", "months": 21, "physicalSurfaces": 294, "physicalBodies": 218, "frontMatches": 1029 },
-  "result": { "fixedPrintRigidFrontMatchability": "SAT", "legalStates": "UNKNOWN", "chain": "NOT_RUN", "globalCoverage": "NOT_CLAIMED", "independentReview": "PENDING" },
+  "result": { "fixedPrintRigidFrontMatchability": "SAT", "legalStates": "NOT_GENERATED_HERE", "chain": "NOT_GENERATED_HERE", "chainExperiment": "../row1-window-chain", "globalCoverage": "NOT_CLAIMED", "independentReview": "PENDING" },
   "generator": {
     "trusted": false, "language": "Julia", "solver": "Z3 5.4.0", "componentDeadlineMilliseconds": 45000, "multiFaceComponents": 4, "trialWallSeconds": 18.748,
     "officialNativeArtifact": "https://github.com/Z3Prover/z3/releases/download/z3-5.4.0/z3-5.4.0-linux-arm64.jar",
@@ -20,5 +20,5 @@
   },
   "tools": { "julia": "1.11.5", "flix": "0.79.0", "jdk": "21.0.13+9" },
   "controls": { "rawNegativeCases": 15, "juliaRejections": 15, "flixRejections": 15, "sixNineTwinAcceptedByBoth": true },
-  "notRun": ["legal-state-synthesis", "chain-search", "independent-chain-replay", "app-export", "print-sheet-generator", "full-mutation-sweep"]
+  "notRun": ["app-export", "print-sheet-generator", "full-mutation-sweep"]
 }
