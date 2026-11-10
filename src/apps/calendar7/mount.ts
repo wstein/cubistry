@@ -21,8 +21,9 @@ import {
 } from "./month-view.ts";
 import { FONT_STYLES, FontSelection, fontStyleById, loadCalendarFont, type LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
+import { watchSheetTheme } from "./sheet-theme.ts";
 import { schemeById } from "./schemes.ts";
-import { tileRoles, type Surface } from "./sticker-art.ts";
+import type { Surface } from "./sticker-art.ts";
 import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnapshot, type StageView } from "./player.ts";
 
 /** The 3D scene the mount drives (src/apps/calendar7/viewer.ts; a fake in the tests). */
@@ -115,17 +116,18 @@ export async function mountCalendar7(
     view.querySelectorAll<HTMLTableCellElement>(".c7-sheet td").forEach((td, index) => {
       const cell = cells[index], canvas = document.createElement("canvas"), label = document.createElement("span");
       // Keep the existing compact table rows; contain the square art without stretching its glyphs.
-      const em = parseFloat(getComputedStyle(td).fontSize) || 16;
+      const colors = getComputedStyle(td);
+      const em = parseFloat(colors.fontSize) || 16;
       const height = td.getBoundingClientRect().height || em * 1.5;
       td.style.height = `${height / em}em`;
-      td.style.backgroundColor = tileRoles(schemeById(schemeId), cell.text, cell.ink).fill;
       canvas.width = canvas.height = 192;canvas.setAttribute("aria-hidden", "true");
       const ctx = canvas.getContext("2d");if (!ctx) return;
-      drawFontSticker(ctx, cell.text, cell.ink, chosen, schemeById(schemeId));
+      drawFontSticker(ctx, cell.text, cell.ink, chosen, schemeById(schemeId), "sticker", { fill: colors.backgroundColor, ink: colors.color });
       label.className = "c7-cell-text";label.textContent = cell.text;
       td.replaceChildren(label, canvas);
     });
   };
+  const stopSheetTheme = env.loadFont ? watchSheetTheme(() => { if (alive()) paintSheet(); }) : null;
   const fontSelect = env.loadFont ? root.querySelector<HTMLSelectElement>("[data-c7-font]") : null;
   const fontStatus = root.querySelector<HTMLElement>("[data-c7-font-status]");
   const fontChoice = env.loadFont ? new FontSelection(env.loadFont, chosen => {
@@ -440,6 +442,7 @@ export async function mountCalendar7(
     },
     dispose: () => {
       disposed = true;
+      stopSheetTheme?.();
       fontChoice?.dispose();fontSelect?.removeEventListener("change", onFont);
       root.removeEventListener("click", onClick);
       if (threeD) {
