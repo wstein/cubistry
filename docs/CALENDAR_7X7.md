@@ -498,3 +498,10 @@ CC BY-SA 4.0, SPDX-License-Identifier: CC-BY-SA-4.0:
 
 Each data directory carries a `NOTICE.txt`; see also
 [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
+
+## Font styles
+
+The Font style control offers local lettering choices for the sheet and cube;
+Noto Sans 600 remains the default. Dates use a constant size per font, and each
+6/9 pair uses one native master plus its half-turned copy. Font changes preserve
+pose and playback. See the [font drawing and licensing contract](CALENDAR_7X7_FONTS.md).
