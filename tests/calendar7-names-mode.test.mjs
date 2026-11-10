@@ -9,7 +9,7 @@ import { LAYOUT_PARAM, NAME_SLOTS, NAME_WORDS, NAMES_NOTICE, nameAlign, nameSlot
 import { SCHEMES } from "../src/apps/calendar7/schemes.ts";
 import { FACE_FLAT, LINE_SCALE, NAME_FONT_SIZE, TEXTURE, TEXT_SQUARE, drawFace, drawSticker, nameGrid, tileClass, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { parseDisplays, parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
-import { nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
+import { drawFontSticker, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
 import { mountCalendar7 } from "../src/apps/calendar7/mount.ts";
 import { href } from "../src/apps/calendar7/month-view.ts";
 import { clonePose } from "../src/apps/calendar7/engine.ts";
@@ -460,4 +460,36 @@ test("font path: name letters sit on the 3-slot grid, one size for every tile, t
   // A single run would have a different x for the second letter.
   const two = nameLabelLayout("MA", fakeFont);
   assert.ok(Math.abs(two[1].x - two[0].x - slot) < 1e-9, "letters are one slot apart");
+});
+
+/** Records the letters drawFontSticker draws: text and the x of the translate in effect (drawFontRun translates to the run). */
+function recordFont(text, ink, layout, surface = "sticker") {
+  const stack = [], runs = [];
+  let tx = 0, tr = 0;
+  const ctx = {
+    set fillStyle(v) {}, set font(v) {}, set fontKerning(v) {}, set textAlign(v) {}, set textBaseline(v) {},
+    fillRect() {},
+    save() { stack.push([tx, tr]); }, restore() { [tx, tr] = stack.pop(); },
+    translate(x) { tx += x; }, rotate() {}, scale() {},
+    fillText(t) { runs.push([t, tx]); },
+  };
+  drawFontSticker(ctx, text, ink, fakeFont, SCHEMES[0], surface, undefined, layout);
+  return runs;
+}
+
+test("font path: drawFontSticker draws a name tile as one run per letter at the slot x, and any other label as before", () => {
+  const slot = TEXT_SQUARE / NAME_SLOTS;
+  const at = (k) => TEXTURE / 2 - TEXT_SQUARE / 2 + (k + 0.5) * slot;
+  const close = (runs, want) => { assert.equal(runs.length, want.length); runs.forEach((r, i) => { assert.equal(r[0], want[i][0]); assert.ok(Math.abs(r[1] - want[i][1]) < 1e-9, `${r[0]} x ${r[1]} want ${want[i][1]}`); }); };
+  close(recordFont("MA", "month", "names"), [["M", at(1)], ["A", at(2)]]);
+  close(recordFont("ER", "month", "names"), [["E", at(0)], ["R", at(1)]]);
+  close(recordFont("J", "month", "names"), [["J", at(2)]]);
+  // Not a name tile: the standard label drawing (one centered run), also for a month tile in the standard layout.
+  assert.equal(recordFont("MA", "month", "standard").length, 2);
+  const standardX = recordFont("MA", "month", "standard").map((r) => r[1]);
+  assert.notDeepEqual(standardX, [at(1), at(2)]);
+  const digits = recordFont("28", "red", "names");
+  assert.deepEqual(digits.map((r) => r[0]), ["2", "8"]);
+  assert.deepEqual(digits.map((r) => r[1]), recordFont("28", "red", "standard").map((r) => r[1]));
+  assert.deepEqual(recordFont("MON", "weekday", "names").map((r) => r[1]), recordFont("MON", "weekday", "standard").map((r) => r[1]));
 });
