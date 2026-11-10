@@ -40,6 +40,8 @@ import {
 import type { StageView } from "./player.ts";
 import { type ColorScheme, DEFAULT_SCHEME, schemeById } from "./schemes.ts";
 import { drawFace, drawSticker, PLASTIC, tileRoles, type Surface, TEXTURE } from "./sticker-art.ts";
+import type { LoadedFont } from "./fonts.ts";
+import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
 
 /**
@@ -73,6 +75,7 @@ export class Calendar7Viewer implements StageView {
   private bodyStale = false;
   /** The color scheme of the labels (`setScheme`); the default scheme until one is chosen. */
   private scheme: ColorScheme = DEFAULT_SCHEME;
+  private font: LoadedFont | null = null;
   /** One entry per distinct texture of the current build: redrawn in place when the scheme changes. */
   private art: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; text: string; ink: string }[] = [];
   /** Reused every sync: frames are rewritten in place, so a move allocates no frame objects. */
@@ -171,7 +174,16 @@ export class Calendar7Viewer implements StageView {
     this.configure(this.printing, this.pose, this.surface);
   }
 
+  /** Font changes redraw in place, including an active pivot, without rebuilding. */
+  setFont(font: LoadedFont): void {
+    if (this.destroyed || this.font === font) return;
+    this.font = font;
+    for (const a of this.art) { this.draw(a.canvas, a.text, a.ink); a.texture.needsUpdate = true; }
+    this.dirty = true;
+  }
+
   private draw(canvas: HTMLCanvasElement, text: string, ink: string): void {
+    if (this.font) { drawFontSticker(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, this.font, this.scheme, this.surface); return; }
     const art = this.surface === "face" ? drawFace : drawSticker;
     art(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, undefined, this.scheme);
   }

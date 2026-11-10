@@ -19,8 +19,10 @@ import {
   type YearMonth,
   type PageModel,
 } from "./month-view.ts";
+import { FONT_STYLES, FontSelection, fontStyleById, loadCalendarFont, type LoadedFont } from "./fonts.ts";
+import { drawFontSticker } from "./font-art.ts";
 import { schemeById } from "./schemes.ts";
-import type { Surface } from "./sticker-art.ts";
+import { tileRoles, type Surface } from "./sticker-art.ts";
 import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnapshot, type StageView } from "./player.ts";
 
 /** The 3D scene the mount drives (src/apps/calendar7/viewer.ts; a fake in the tests). */
@@ -29,6 +31,7 @@ export interface Stage extends StageView {
   setLabel(text: string): void;
   /** Color scheme by id (src/apps/calendar7/schemes.ts); an unknown id gives the default. Optional: a fake stage may omit it. */
   setScheme?(id: string | null | undefined): void;
+  setFont?(font: LoadedFont): void;
   resetView(): void;
   destroy(): void;
 }
@@ -37,6 +40,7 @@ export interface MountEnv {
   /** Base URL of the site, ending in a slash. */
   base: string;
   fetchJson(url: string): Promise<unknown>;
+  loadFont?(id: string): Promise<LoadedFont>;
   now(): Date;
   /** Current query string of the address bar, with the leading `?` or empty. */
   search(): string;
@@ -68,6 +72,7 @@ export async function mountCalendar7(
   const threeD = Boolean(env.sceneHost && env.createStage);
   root.innerHTML =
     '<div class="c7-live" role="status" aria-live="polite"></div>' +
+    `<div class="c7-font-choice"><label for="c7-font-style">Font style</label><select id="c7-font-style" data-c7-font>${FONT_STYLES.map(f => `<option value="${f.id}"${f.id === fontStyleById(params.get("font")).id ? " selected" : ""}>${f.label}</option>`).join("")}</select></div><p class="c7-font-status" role="status" data-c7-font-status></p>` +
     (threeD ? playerHtml(DEFAULT_SPEED) : "") +
     '<div class="c7-view"><p class="c7-loading">Loading the 7x7 calendar data…</p></div>';
   const view = root.querySelector(".c7-view") as HTMLElement;
@@ -99,10 +104,41 @@ export async function mountCalendar7(
   let wordOptions: WordOptions = { ...DEFAULT_WORD_OPTIONS };
   let currentModel: PageModel | null = null;
   let selectedSpeed: number = DEFAULT_SPEED;
+  let font: LoadedFont | null = null;
   let schemeId: string | null = params.get(SCHEME_PARAM);
   /** Test hook and proof for readers: the id of the scheme the 3D view uses (an unknown id shows as the default). */
   const publishScheme = (): void => root.setAttribute("data-c7-scheme", schemeById(schemeId).id);
   if (threeD) publishScheme();
+  const paintSheet = (): void => {
+    if (!font || !currentModel?.cells) return;
+    const chosen = font, cells = currentModel.cells;
+    view.querySelectorAll<HTMLTableCellElement>(".c7-sheet td").forEach((td, index) => {
+      const cell = cells[index], canvas = document.createElement("canvas"), label = document.createElement("span");
+      // Keep the existing compact table rows; contain the square art without stretching its glyphs.
+      const em = parseFloat(getComputedStyle(td).fontSize) || 16;
+      const height = td.getBoundingClientRect().height || em * 1.5;
+      td.style.height = `${height / em}em`;
+      td.style.backgroundColor = tileRoles(schemeById(schemeId), cell.text, cell.ink).fill;
+      canvas.width = canvas.height = 192;canvas.setAttribute("aria-hidden", "true");
+      const ctx = canvas.getContext("2d");if (!ctx) return;
+      drawFontSticker(ctx, cell.text, cell.ink, chosen, schemeById(schemeId));
+      label.className = "c7-cell-text";label.textContent = cell.text;
+      td.replaceChildren(label, canvas);
+    });
+  };
+  const fontSelect = env.loadFont ? root.querySelector<HTMLSelectElement>("[data-c7-font]") : null;
+  const fontStatus = root.querySelector<HTMLElement>("[data-c7-font-status]");
+  const fontChoice = env.loadFont ? new FontSelection(env.loadFont, chosen => {
+    if (!alive()) return;
+    font = chosen;if (fontSelect) fontSelect.value = chosen.style.id;
+    root.setAttribute("data-c7-font", chosen.style.id);
+    stage?.setFont?.(chosen);paintSheet();
+    if (!stage && currentModel?.choice.kind === "ok") void syncStage(nodeIndex(range, currentModel.choice.ym));
+  }, message => { if (alive() && fontStatus) fontStatus.textContent = message; }) : null;
+  const onFont = (): void => {
+    if (fontSelect && fontChoice) void fontChoice.choose(fontSelect.value);
+  };
+  fontSelect?.addEventListener("change", onFont);
   let focusPlayback = false;
   let resizeObserver: ResizeObserver | null = null;
   let activeWord: { blocks: readonly Block[]; plan: NotationPlan; notation: Notation } | null = null;
@@ -252,6 +288,7 @@ export async function mountCalendar7(
       stage = made;
       const s = start as NonNullable<typeof start>;
       made.setScheme?.(schemeId);
+      if (font) made.setFont?.(font);
       made.configure(s.printing, s.pose, s.surface);
       player = new Calendar7Player({
         graph,
@@ -286,6 +323,7 @@ export async function mountCalendar7(
       (q("player") as HTMLElement | null)?.setAttribute("hidden", "");
       return;
     }
+    if (fontChoice && !font) return;
     // The space is reserved at once; the cube appears when the scene is built.
     (sceneHost as HTMLElement).hidden = false;
     (q("player") as HTMLElement).hidden = false;
@@ -303,6 +341,7 @@ export async function mountCalendar7(
   const refreshPreviews = (): void => {
     if (!currentModel) return;
     view.innerHTML = pageHtml(currentModel, wordOptions);
+    paintSheet();
     const active = player && player.snapshot.phase !== "idle";
     view.querySelectorAll?.(".c7-word-panel").forEach((el) => ((el as HTMLElement).hidden = Boolean(active)));
   };
@@ -322,6 +361,7 @@ export async function mountCalendar7(
       void syncStage(k >= 0 ? k : null);
     }
   };
+  onFont();
   show(params, false);
 
   // Navigation links are plain `?app=calendar7&year=&month=` links; follow them without a reload.
@@ -396,9 +436,11 @@ export async function mountCalendar7(
       schemeId = id;
       if (threeD) publishScheme();
       stage?.setScheme?.(id);
+      paintSheet();
     },
     dispose: () => {
       disposed = true;
+      fontChoice?.dispose();fontSelect?.removeEventListener("change", onFont);
       root.removeEventListener("click", onClick);
       if (threeD) {
         root.removeEventListener("click", onControl);
@@ -417,6 +459,7 @@ export async function mountCalendar7(
 export function browserMountEnv(base: string, isCurrent: () => boolean): MountEnv {
   return {
     base,
+    loadFont: id => loadCalendarFont(id, base),
     fetchJson: async (url) => {
       const r = await fetch(url);
       if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`);
@@ -429,13 +472,6 @@ export function browserMountEnv(base: string, isCurrent: () => boolean): MountEn
     sceneHost: () => document.getElementById("studio-scene"),
     reducedMotion: () => matchMedia("(prefers-reduced-motion: reduce)").matches,
     createStage: async (host, panel) => {
-      // The sticker texts use the page font when it is available; drawing never waits for it longer than 1.5 s.
-      try {
-        const wait = new Promise((resolve) => setTimeout(resolve, 1500));
-        await Promise.race([document.fonts.load('600 40px "Counter Sans"'), wait]);
-      } catch {
-        /* the fallback font is used */
-      }
       // Three.js and the viewer are loaded only when a month of the chain is shown.
       const { Calendar7Viewer } = await import("./viewer.ts");
       return new Calendar7Viewer(host, panel);
