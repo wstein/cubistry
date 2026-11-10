@@ -26,7 +26,8 @@ the next month.
   [Block moves](#block-moves-wide-and-inner-wide) and
   [the middle slice](#middle-slice-blocks-rule-c), a display layer only).
 - **The 3D view (stage 2).** The studio scene shows the cube with its 218 surface bodies
-  and 294 stickers in the pose of the displayed month. A sticker shows the text and ink
+  and 294 printed faces in the pose of the displayed month. Calendar7 always draws labels directly
+  on the cubie faces, without visible sticker meshes. Each face shows the text and ink
   of the strict print (`state.v1.json`), including the letters `MON` and `FRI`.
   Letters and digits are distinct; `I` is not `1` and `O` is not `0`. The cube sits slightly turned
   so that three faces show; drag it, or use the Rotation selector and Reset view, to look
@@ -352,7 +353,7 @@ The mapping uses only the printed label and its ink class, never the position of
 | month letters, ink month | `bandFill` or `dayFill` | `monthInk` |
 | blank | `emptyFill` | none |
 
-A scheme with `lineRow2` draws that line at the bottom edge of the weekday-name tiles (MON to FRI, SUN, SAT), `px` times 4 texture pixels thick (the texture is 192 px, a sheet tile about 48 px); on a stickerless face it sits on the bottom edge of the flat part. The folded labels keep the strict art and the 6/9 rule is unchanged. A stickerless cube takes the day fill as its body color; a sticker cube keeps the dark plastic frame.
+A scheme with `lineRow2` draws that line at the bottom edge of the weekday-name tiles (MON to FRI, SUN, SAT), `px` times 4 texture pixels thick (the texture is 192 px, a sheet tile about 48 px); on a stickerless face it sits on the bottom edge of the flat part. The folded labels keep the strict art and the 6/9 rule is unchanged. Calendar7 always uses stickerless faces; its cut faces and core take the scheme day fill. Color changes update owned materials in place, with a pending body-color change applied after the active turn. Texture, body and geometry identities remain stable.
 
 What waits for a new print class `band` (with the row-1 name layout): the print has one blank class, so a blank tile of row 1 cannot join the month band and shows `emptyFill`, and white empty days next to a colored band are not possible; `lineRow1` (the line under row 1) is not drawn; the `seam` token is used by the sheet only (the 3D view has no drawn seam). Until then a band scheme shows its band on the month-letter tiles only.
 
@@ -388,24 +389,31 @@ at least 0.0625 of the texture (12 px) between the numbers. The browser spec
 real ink on the canvas: the gap is about 23 px for `23/30` and about 24 px for `24/31`, and it requires
 at least 12 px of gap and 10 px of margin. The Noto Sans font (OFL-1.1) is unchanged.
 
-**Stickerless surface (3D view).** `Calendar7Viewer.configure(printing, pose, surface)` takes the surface
-`"sticker"` (default, unchanged: 294 sticker bodies on 218 surface bodies) or `"face"`. With `"face"` the same scene
-is built, then `PhysicalCubeScene.setConstruction("stickerless")` (the 3x3 calendar uses the same call) hides the 294
-sticker meshes and gives each cubie face the label texture, so there is no sticker body and no gap between stickers;
-the cut faces keep the plastic color. The face texture is the sticker art (`drawSticker`: sizes, fit, split labels,
-6 and 9 rule) scaled about the center by `FACE_SCALE`. `FACE_FLAT` (0.9106) is the flat part of the body face in
-texture space (checked against the real geometry); the text square of the face label is `FACE_TEXT_SQUARE` = 0.92 of
-the flat face (a sticker label uses 0.86 of its sticker), so `FACE_SCALE` = 0.9106 * 0.92 / 0.86. The paper fills the
-whole texture. 0.92 was picked from the candidates 0.86, 0.92 and 0.97 on the real ink of three-letter labels: it is
-the largest with at least 4% of the flat width clear on every side (VEM is the tightest, 4.2%; at 0.97 it is 1.4%).
-Labels of up to three letters use the unchanged fit (font 80 px reduced to the text square).
+**Stickerless surface (3D view).** Calendar7 always uses stickerless faces (owner
+decision, November 10, 2026). The 294 canonical sticker frames remain in the
+scene, but their separate sticker meshes are hidden and each cubie face carries
+its label texture. There is no construction toggle for Calendar7. Shared
+Appearance preferences, URL construction hints and legacy surface arguments
+cannot restore stickers and are not overwritten. Other apps retain their own
+construction choices. Body dimensions, bevels, spacing and camera fitting are
+unchanged; the 0.93-width/0.09-radius study remains a comparison only.
 
-The surface is chosen by the optional top-level field `"surface"` of the state file (`parseState`): `"sticker"`
-(default when absent) or `"face"`; any other value is the error `state surface must be "sticker" or "face"`. The
-mount passes it to `Calendar7Viewer.configure`. The shipped `state.v1.json` has no such field and draws stickers. The
-sticker print sheet is not affected. Tests: `tests/calendar7-stickerless.test.mjs` (pure drawing, geometry, scene) and
-`tests/browser/calendar7-stickerless.spec.mjs` (real viewer and Noto Sans), both on the hand-made fixture
-`tests/calendar7-fixture.mjs`.
+The face texture is centered and scaled by `FACE_SCALE`. `FACE_FLAT` (0.9106)
+is the measured flat part of the existing body face in texture space; the label
+text square is `FACE_TEXT_SQUARE` = 0.92 of that flat part, so `FACE_SCALE` is
+0.9106 * 0.92 / 0.86. The ground fills the whole texture. The original Noto Sans
+measurements and the pure sticker/face drawing helpers remain testable. App font
+choices follow the [shared font contract](CALENDAR_7X7_FONTS.md); all fourteen
+styles are checked for ink margins and separated split labels on the flat face.
+
+The optional state-file `surface` field still parses as `"sticker"` when absent
+and accepts `"sticker"` or `"face"` for schema compatibility. Runtime projection
+ignores that hint: both the mount and Calendar7Viewer enforce faces. The shipped
+state bytes, print, root poses, move words, digests and source pins stay unchanged.
+The cut faces and core use the selected scheme's day fill. A scheme change
+redraws existing textures and updates instance-owned body materials; it waits
+until a running turn ends before changing the body color, without rebuilding
+cubies or resetting camera, history or pose.
 
 **Centered 6 and 9 (strict art).** The strict rule accepts a 6 shown as a 9 turned by a half turn, so the
 sticker is rotated by 180 degrees about its center and any ink offset from the center shows as twice that drift

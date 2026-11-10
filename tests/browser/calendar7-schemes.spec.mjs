@@ -40,11 +40,12 @@ test("the viewer draws the grounds, inks and weekday line of the chosen scheme, 
       const want = [1, 3, 5].map((i) => parseInt(inkColor.slice(i, i + 2), 16));
       let inks = 0;
       for (let i = 0; i < d.length; i += 4) if (d[i] === want[0] && d[i + 1] === want[1] && d[i + 2] === want[2]) inks++;
-      return { ground: px(4, 4), inks, bottom: px(96, 190) };
+      return { ground: px(4, 4), inks, bottom: px(96, Math.floor(c.height * (1 + FACE_FLAT) / 2) - 2) };
     };
     const weekendText = printing.text.find((t, k) => printing.ink[k] === "red" && /^[0-9]+$/.test(t));
     const tiles = { day: ["7", "dark", "dayInk"], weekend: [weekendText, "red", "weekendInk"], mon: ["MON", "weekday", "weekdayInk"], sun: ["SUN", "red", "sunSatInk"], month: ["VEM", "month", "monthInk"] };
     const { SCHEMES } = await import("/src/apps/calendar7/schemes.ts");
+    const { FACE_FLAT } = await import("/src/apps/calendar7/sticker-art.ts");
     const missing = Object.entries(tiles).filter(([, [t, i]]) => !printing.text.some((x, k) => x === t && printing.ink[k] === i)).map(([k]) => k);
     const take = (id) => {
       viewer.setScheme(id);
@@ -84,7 +85,7 @@ test("the viewer draws the grounds, inks and weekday line of the chosen scheme, 
     viewer.setScheme("dracula");
     const bodyDracula = bare();
     const stickerBody = (() => { viewer.configure(printing, pose, "sticker"); return viewer.currentScheme.id; })();
-    // Sticker cube: the frame between the stickers (shown plastic and cut-face body color) stays the dark plastic under a light and a dark scheme.
+    // A legacy sticker hint cannot restore a plastic frame: cut faces still follow the scheme day fill.
     const frame = () => {
       const colors = new Set();
       viewer.presentation.traverse((o) => {
@@ -141,8 +142,8 @@ test("the viewer draws the grounds, inks and weekday line of the chosen scheme, 
   expect(r.bodyRed).toEqual(["#ffffff"]);
   expect(r.bodyDracula).toEqual(["#282a36"]);
   expect(r.stickerBody).toBe("dracula");
-  expect(r.frameLight).toEqual(["#23272e"]);
-  expect(r.frameDark).toEqual(["#23272e"]);
+  expect(r.frameLight).toEqual(["#ffffff"]);
+  expect(r.frameDark).toEqual(["#282a36"]);
   expect(r.unknown).toBe("paper-red");
   expect(r.nullId).toBe("paper-red");
 });

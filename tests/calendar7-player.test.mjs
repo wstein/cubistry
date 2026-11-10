@@ -809,9 +809,9 @@ test("the page text keeps the status: research candidate, not certified, no solv
   assert.ok(table.displays.length === 91);
 });
 
-test("mount passes the surface of the state file to the stage: sticker by default, face when the state says so", async () => {
+test("mount always requests stickerless faces while retaining the raw state schema", async () => {
   const state = json("public/calendar7/state.v1.json");
-  for (const [field, want] of [[{}, "sticker"], [{ surface: "face" }, "face"], [{ surface: "sticker" }, "sticker"]]) {
+  for (const [field, want] of [[{}, "face"], [{ surface: "face" }, "face"], [{ surface: "sticker" }, "face"]]) {
     const { env, stage } = mountEnv({
       fetchJson: async (url) =>
         url.endsWith("graph.v1.json") ? json("public/calendar7/graph.v1.json") : url.endsWith("state.v1.json") ? { ...state, ...field } : json("public/calendar7/displays.v1.json"),
@@ -829,7 +829,7 @@ test('mount: color theme offers exactly ten named schemes with Paper Red and URL
   assert.match(root.html,/Cube color theme/);
   const html=root.html.match(/<select[^>]+data-c7="scheme"[^>]*>([\s\S]*?)<\/select>/)?.[1];assert(html,'a labeled scheme select exists');
   assert.deepEqual([...html.matchAll(/<option value="([^"]+)"/g)].map(m=>m[1]),SCHEMES.map(s=>s.id));
-  assert.equal(SCHEMES.length,10);assert.equal(root.el('scheme').value,want);assert.equal(root.getAttribute('data-c7-scheme'),want);inst.dispose();
+  assert.equal(SCHEMES.length,10);assert.deepEqual([...html.matchAll(/<option value="([^"]+)" selected>/g)].map(m=>m[1]),[want]);assert.equal(root.el('scheme').value,want);assert.equal(root.getAttribute('data-c7-scheme'),want);inst.dispose();
  }
 });
 test('mount: color theme changes synchronize stage and picker while preserving unrelated query parameters',async()=>{

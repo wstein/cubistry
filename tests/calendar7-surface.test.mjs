@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // English 7x7 calendar cube: the optional top-level "surface" field of the state file ("sticker" default, or "face" for
-// the stickerless 3D view). The shipped state file has no such field and keeps drawing stickers.
+// the legacy face hint). The shipped file and parser default stay frozen; runtime Calendar7 always draws faces.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";

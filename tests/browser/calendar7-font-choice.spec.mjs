@@ -8,29 +8,31 @@ test('all local styles render uniformly sized dates and separated split ink with
   const {FONT_STYLES,loadCalendarFont}=await import('/src/apps/calendar7/fonts.ts');
   const {drawFontSticker,drawFontRun,labelLayout}=await import('/src/apps/calendar7/font-art.ts');
   const {DEFAULT_SCHEME}=await import('/src/apps/calendar7/schemes.ts');
+  const {FACE_SCALE,FACE_FLAT}=await import('/src/apps/calendar7/sticker-art.ts');
   const out=[];
-  for(const style of FONT_STYLES){const font=await loadCalendarFont(style.id,'/'),sizes=[],boxes=[];
+  for(const style of FONT_STYLES){const font=await loadCalendarFont(style.id,'/');for(const surface of ['sticker','face']){const sizes=[],boxes=[];
    for(const text of [...Array.from({length:31},(_,i)=>String(i+1)),'23/30','24/31','MON','FRI','SUN','SAT','VEM']){
     const c=document.createElement('canvas');c.width=c.height=192;const ctx=c.getContext('2d');
-    drawFontSticker(ctx,text,'dark',font,DEFAULT_SCHEME);const data=ctx.getImageData(0,0,192,192).data;
+    drawFontSticker(ctx,text,'dark',font,DEFAULT_SCHEME,surface);const data=ctx.getImageData(0,0,192,192).data;
     const bg=[1,3,5].map(i=>parseInt(DEFAULT_SCHEME.dayFill.slice(i,i+2),16));let x0=192,y0=192,x1=-1,y1=-1,count=0;
     for(let y=0;y<192;y++)for(let x=0;x<192;x++){const i=(y*192+x)*4;if(bg.some((v,k)=>Math.abs(data[i+k]-v)>8)){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);count++;}}
     const parts=labelLayout(text,font);if(/^\d+$/.test(text))sizes.push(parts[0].size);
     const partBoxes=parts.length===2?parts.map(part=>{
-     const m=document.createElement('canvas');m.width=m.height=192;const mc=m.getContext('2d');mc.fillStyle='#000';drawFontRun(mc,part.text,font,part.size,part.x,part.y);
+     const m=document.createElement('canvas');m.width=m.height=192;const mc=m.getContext('2d');mc.fillStyle='#000';if(surface==='face'){mc.translate(96,96);mc.scale(FACE_SCALE,FACE_SCALE);mc.translate(-96,-96);}drawFontRun(mc,part.text,font,part.size,part.x,part.y);
      const a=mc.getImageData(0,0,192,192).data;let min=192,max=-1;
      for(let y=0;y<192;y++)for(let x=0;x<192;x++)if(a[(y*192+x)*4+3]>8){min=Math.min(min,y);max=Math.max(max,y);}
      return {y0:min,y1:max};
     }):[];
     boxes.push({text,x0,y0,x1,y1,count,parts,partBoxes});
    }
-   out.push({id:style.id,sizes,boxes,loaded:document.fonts.check(`${style.weight} 40px "${font.family}"`)});
-  }return out;
+   out.push({id:style.id,surface,flat:FACE_FLAT,sizes,boxes,loaded:document.fonts.check(`${style.weight} 40px "${font.family}"`)});
+  }}return out;
  });
  await info.attach("font-fit.json",{body:JSON.stringify(rows,null,2),contentType:"application/json"});
- expect(rows).toHaveLength(14);
+ expect(rows).toHaveLength(28);
  for(const row of rows){expect(row.loaded,row.id).toBe(true);expect(new Set(row.sizes).size,row.id).toBe(1);
-  for(const box of row.boxes){expect(box.count,`${row.id} ${box.text}`).toBeGreaterThan(0);expect(Math.min(box.x0,box.y0,191-box.x1,191-box.y1),`${row.id} ${box.text} ink margin`).toBeGreaterThanOrEqual(10);
+  for(const box of row.boxes){if(row.surface==='face'){const lo=192*(1-row.flat)/2,hi=192*(1+row.flat)/2;expect(Math.min(box.x0-lo,box.y0-lo,hi-box.x1-1,hi-box.y1-1),`${row.id} ${box.text} flat-face margin`).toBeGreaterThanOrEqual(192*row.flat*.04);}
+   expect(box.count,`${row.id} ${box.text}`).toBeGreaterThan(0);expect(Math.min(box.x0,box.y0,191-box.x1,191-box.y1),`${row.id} ${box.text} ink margin`).toBeGreaterThanOrEqual(10);
    if(box.parts.length===2)expect(box.partBoxes[1].y0-box.partBoxes[0].y1-1,`${row.id} ${box.text} gap`).toBeGreaterThanOrEqual(12);
   }
  }
@@ -63,7 +65,7 @@ test('bad font bytes fall back to verified Noto without losing the current month
  await expect(page.locator('[data-c7-digest]')).toHaveAttribute('data-c7-digest',digest);
 });
 
-test('font redraws retain GPU textures, body identity and active layer pivots on both surfaces',async({page})=>{
+test('font redraws retain GPU textures, body identity and active layer pivots under legacy surface hints',async({page})=>{
  await page.goto('/licenses.html');
  const result=await page.evaluate(async()=>{
   const {Calendar7Viewer}=await import('/src/apps/calendar7/viewer.ts');

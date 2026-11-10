@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 // The real Calendar7Viewer (WebGL, Chromium) on a hand-made layout fixture (tests/calendar7-fixture.mjs, not research data):
-// the default surface keeps 294 sticker bodies; the "face" surface draws no sticker body and puts the label on the 218
+// all legacy surface hints keep sticker meshes hidden and put the label on the 218
 // cubie faces, and the face art is the sticker art at the flat part of the face (ratio FACE_SCALE) with real Noto Sans.
 
 test("stickerless surface: no sticker bodies, labels on the cubie faces, same art at the flat-face scale", async ({ page }) => {
@@ -14,7 +14,7 @@ test("stickerless surface: no sticker bodies, labels on the cubie faces, same ar
     document.fonts.add(await face.load());
     await document.fonts.load('600 80px "Counter Sans"');
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
-    const { FACE_FLAT, FACE_SCALE } = await import("/src/apps/calendar7/sticker-art.ts");
+    const { FACE_FLAT, FACE_SCALE, drawSticker } = await import("/src/apps/calendar7/sticker-art.ts");
     const { layoutFixture } = await import("/tests/calendar7-fixture.mjs");
     const { printing, pose } = layoutFixture();
     const host = document.createElement("div");
@@ -56,6 +56,10 @@ test("stickerless surface: no sticker bodies, labels on the cubie faces, same ar
         mon: inkWidth(monSticker.material.map.image),
       };
     };
+    const controlCanvas = document.createElement("canvas");controlCanvas.width = controlCanvas.height = 192;
+    const { schemeById } = await import("/src/apps/calendar7/schemes.ts");
+    drawSticker(controlCanvas.getContext("2d"), "MON", "weekday", undefined, schemeById("classic"));
+    const control = inkWidth(controlCanvas);
     viewer.configure(printing, pose);
     const sticker = inspect();
     viewer.configure(printing, pose, "face");
@@ -64,15 +68,16 @@ test("stickerless surface: no sticker bodies, labels on the cubie faces, same ar
     const again = inspect();
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     viewer.destroy();
-    return { sticker, faceMode, again, FACE_FLAT, FACE_SCALE };
+    return { sticker, faceMode, again, control, FACE_FLAT, FACE_SCALE };
   });
   expect(errors).toEqual([]);
-  // Default and explicit "sticker": 294 sticker bodies on 218 bodies, as before.
-  for (const s of [r.sticker, r.again]) {
+  // All hints use faces: canonical sticker frames remain, while their separate meshes are hidden.
+  for (const s of [r.sticker, r.faceMode, r.again]) {
     expect(s.stickers).toBe(294);
-    expect(s.visible).toBe(294);
+    expect(s.visible).toBe(0);
     expect(s.shells).toBe(218);
-    expect(s.shellArrays).toBe(0);
+    expect(s.shellArrays).toBe(218);
+    expect(s.faceHasMap).toBe(true);
   }
   // "face": the sticker meshes stay in the graph but are not drawn; the cubie faces carry the label textures.
   expect(r.faceMode.visible).toBe(0);
@@ -80,8 +85,8 @@ test("stickerless surface: no sticker bodies, labels on the cubie faces, same ar
   expect(r.faceMode.shellArrays).toBe(218);
   expect(r.faceMode.faceHasMap).toBe(true);
   // MON in real Noto Sans: the face art is the sticker art scaled by FACE_SCALE, centered on the texture.
-  expect(r.sticker.mon.w).toBeGreaterThan(40);
-  const ratio = r.faceMode.mon.w / r.sticker.mon.w;
+  expect(r.control.w).toBeGreaterThan(40);
+  const ratio = r.faceMode.mon.w / r.control.w;
   expect(Math.abs(ratio - r.FACE_SCALE), `ink width ratio ${ratio}`).toBeLessThan(0.01); // 1 - FACE_SCALE is 0.026: the sticker art unscaled (ratio 1) fails
   expect(Math.abs(r.faceMode.mon.cx - 96)).toBeLessThanOrEqual(1.5);
   expect(Math.abs(r.faceMode.mon.cy - 96)).toBeLessThanOrEqual(4); // MON is not digits: same middle-baseline drift as on the sticker, scaled

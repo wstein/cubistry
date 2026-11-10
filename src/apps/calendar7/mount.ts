@@ -307,7 +307,7 @@ export async function mountCalendar7(
       const s = start as NonNullable<typeof start>;
       made.setScheme?.(schemeId);
       if (font) made.setFont?.(font);
-      made.configure(s.printing, s.pose, s.surface);
+      made.configure(s.printing, s.pose, "face");
       player = new Calendar7Player({
         graph,
         printing: s.printing,

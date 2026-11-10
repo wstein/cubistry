@@ -45,8 +45,8 @@ page-theme foreground and background colors: canvas and HTML use the same
 computed CSS pair, preserving the 4.5:1 text contrast contract in both themes.
 Automatic color-scheme changes and explicit page-theme changes redraw the
 canvases; both listeners are released when the mode is disposed. The cube keeps
-its selected printed color scheme, independent of the page theme, and applies its
-existing stickerless face scale when needed. Its weekday bottom line remains
+its selected printed color scheme, independent of the page theme, and always
+applies its existing stickerless face scale. Its weekday bottom line remains
 a property of the printed weekday tile. The body day-fill color is applied
 only to stickerless faces, as before.
 
