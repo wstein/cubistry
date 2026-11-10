@@ -18,6 +18,8 @@ const pulls = await api.pages("pulls?state=open"),
   main = await api.request("commits/main");
 const tree = await api.request("git/trees/gh-pages?recursive=1");
 const inventory = previewInventory(tree);
+// git/trees/<branch> reports the commit sha; the tree sha is on the commit.
+const remoteTree = (await api.request("commits/gh-pages"))?.commit?.tree?.sha;
 const builds = {};
 for (const pr of pulls)
   if (pr.head?.repo?.full_name === "wstein/cubistry" && hasPreviewLabel(pr))
@@ -51,7 +53,7 @@ if(!published){
 }
 result.notify=notificationNumbers({pulls,inventory,published,bootstrap});
 result.tracked=await retainNotificationCandidates(api,{numbers:result.notify,pulls,inventory,published});
-result=optimizePlan(result,{storage:tree?.sha,published,production,previews,tracked:result.tracked});
+result=optimizePlan(result,{storage:remoteTree,published,production,previews,tracked:result.tracked});
 async function metadata(path){
   const blob=await api.request(`contents/${path}?ref=gh-pages`);
   try{return blob?.content?JSON.parse(Buffer.from(blob.content,'base64').toString()):null;}catch{return null;}
