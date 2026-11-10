@@ -1,5 +1,6 @@
 import { frontStickerPoint } from "../helpers/front-projection.mjs";
 import { canvasShot } from "../helpers/canvas-shot.mjs";
+import { solverRenderTimeout } from "../helpers/solver-render-timeout.mjs";
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 import { readFileSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
@@ -70,9 +71,12 @@ test("live solver selection executes fresh paths and actual rendered digits matc
     expect(result.solverInvocations).toBe(2);
     expect(result.backend.id).toBe("cubing/experimentalSolve2x2x2");
     cases.push(result);
+    // The page awaits each real turn at the viewer default before it verifies.
+    // Keep the existing readiness reserve in addition to the actual angular work.
     await expect(page.locator("#cube")).toHaveAttribute(
       "data-verified",
       "true",
+      { timeout: solverRenderTimeout(result.word) },
     );
     await expect(page.locator("#cube")).toHaveAttribute(
       "data-value",
