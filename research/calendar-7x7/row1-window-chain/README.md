@@ -46,6 +46,31 @@ bounded orbit solver with a private in-memory band profile. Run it under an
 external 290-second timeout and verify its output independently. It stops
 starting new targets after 240 seconds. No frozen solver or proof is edited.
 
+## Window end after January 2028
+
+The window end is a parameter: `WINDOW_END=YYYY-MM` (default `2028-01`) for `check.jl`,
+`verify_chain.jl`, `generate.jl` and `run_checks.sh`, and the optional arguments
+`WINDOW_END PRINT_SHA256` of the Flix checker. The 21-month defaults and the stored evidence are
+unchanged byte for byte. A longer window needs the SHA-256 of its print in `CAL7_WINDOW_PRINT_SHA`
+(`run_checks.sh` also takes `PRINT_OVERRIDE`, `CHAIN_OVERRIDE`, `STATES_OVERRIDE`). Every checker
+asserts that the window end equals the last chain edge.
+
+Seam. The chain stays one chain when the stored chain is extended from its end state with the
+stored print: `SEAM_CHAIN=evidence/moves.tsv SEAM_STATES=evidence/states WINDOW_END=2028-03 julia
+generate.jl OUT`. The generator replays the stored words, checks the end digest, copies the stored
+rows and snapshots verbatim and continues. `check_seam.jl` (run by `run_checks.sh` with
+`SEAM_STORED=1`) checks the byte-identical prefix, the unchanged snapshots and that the first new
+edge starts at the stored end digest. `test_seam.jl` extends to 2028-02 and breaks the seam three
+ways. The same join point is meant for a later backward extension.
+
+Result with the stored print and the stored states: 2028-02 and 2028-03 have a legal chain (Julia
+and Flix receipts byte-identical, independent replay accepts; HTM 7338 then 7781 then 8057). The
+stored print has no whole-body front matching for 2028-04 (`window_match` in
+`../row1-window-print/common.jl`, Julia only), so a seamless chain over this print stops at
+2028-03; the generator reports 2028-04 as UNKNOWN (search stalled). A longer window needs another
+print, hence new states for all months: `evidence/extended-window.tsv` lists whole-chain
+recomputations with a print designed for each window end. They do not extend the stored chain.
+
 ## Scope and limits
 
 This is a window witness, not a print for every calendar shape. The separate

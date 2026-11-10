@@ -1,0 +1,27 @@
+mode	end	months	status	htm	qtm	rotations	rotation_qtm	print_sha256	note
+seam	2028-02	22	SAT	7781	7970	389	398	0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127	stored print, stored chain verbatim, JOIN_PASS
+seam	2028-03	23	SAT	8057	8250	401	410	0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127	stored print, stored chain verbatim, JOIN_PASS
+seam	2028-04	24	UNKNOWN	-	-	-	-	0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127	stored print has no whole-body front matching for 2028-04 (Julia matcher only); generator search stalled
+recompute	2028-02	22	SAT	7786	7964	383	392	c76ebdf78fe07f3cdf3e6294c1814a6954927c63f3605f3f211532e2d3de7054	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-03	23	SAT	8068	8264	395	404	423ddea93900ab88f1a2e5bf0d4a5ff15279805a7e9b69912acf1c9622c80319	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-04	24	SAT	8320	8520	407	416	23967a2e584912d8dd3c9c4032654177e3e600e1f025dc7c0ddca56e552b9d31	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-05	25	SAT	8621	8836	425	434	62e21a2a3ce6be17b3135af454ee93a95552d66d5fbaded279ff1e2e980fbd65	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-06	26	SAT	9025	9246	444	453	4347a2a7c7f012c2c2ffaf62bc1efa57cd7013f4b0dc50ab44035d54d362fd70	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-07	27	SAT	9310	9542	457	466	082f99cf51f036d882e49fa6bdc0cee89822d1fc90bf23ec44efeb95bfa9bd4a	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-08	28	SAT	9738	9960	472	482	35b5abb44f97534783ebb969f8eba8ac080a9bdec2f9f66c8187c684184e0bcc	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-09	29	SAT	10136	10376	493	504	8cc1fb3bcfde36328c3d16a5c13a24a7a31b86cf67ddd60eaf8b9f482f653b20	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-10	30	SAT	10452	10696	513	525	ac7b5fcf5f5e2baba0b8eeb69b35429489d592d4637a8d52557a9849415bc209	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-11	31	SAT	10801	11076	530	542	390b9706bb2f670a58395046f06743e3bb9bdb12cdbbde36a96bf38a6f203dea	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2028-12	-	UNKNOWN	-	-	-	-	-	print design: Z3 UNKNOWN (timeout 200 s per component, 266 s total)
+recompute	2029-01	33	SAT	11464	11732	565	578	b2a944b22b402f835700e34d7a9124e14c5dc66b595b558b03cc64f28c0f7615	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2029-02	34	SAT	11890	12164	586	599	acde08d44e840181a97e635f07779fa49513548eea6ce80344d9408cfd7729ec	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2029-03	35	SAT	11944	12212	586	599	04553d57f1cb8fdc6e8ed742262350a345b3058efe6d972ef2d3e8cd02a3b563	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2029-04	36	SAT	12432	12734	595	609	b4be243f02a95b8cb97f64bd384de477060162ace87d98f8e31d0b8dbba24130	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2029-05	-	UNKNOWN	-	-	-	-	-	print design: Z3 UNKNOWN (timeout)
+recompute	2029-06	-	UNKNOWN	-	-	-	-	-	print found; chain generation timed out at 16 of 37 edges (293 s)
+recompute	2029-07	-	UNKNOWN	-	-	-	-	-	print design: Z3 UNKNOWN (timeout)
+recompute	2029-08	40	SAT	13929	14260	688	704	0aea1274bdba35df4ddf7369e1bef9cf78647f09f1642fbf2d5477d34212a457	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2029-09	41	SAT	14406	14736	710	726	16ac5cfeae4e4f6af1d1b4ee023812e25c29824c50b78f3b9a1d52fcc6ba2785	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2029-10	42	SAT	14618	14930	726	742	249ce41f0dd23a2193043a1f8937103333c9875184a296f32078f2a931755b14	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
+recompute	2029-11	-	UNKNOWN	-	-	-	-	-	print design: Z3 UNKNOWN (timeout)
+recompute	2029-12	44	SAT	15305	15664	756	772	73e8e6394167759d284c07ce010ce726f9f5aefa522792323cacc9c1bd7c1192	new print, whole chain recomputed; Julia and Flix receipts byte-identical, independent replay accepts
