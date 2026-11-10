@@ -33,12 +33,14 @@ which is inside that range.
 
 | Physical pool | Mandatory nonblank images | Blank demand | Sticker capacity |
 | --- | ---: | ---: | ---: |
-| Corners | 22 | 1 | 24 |
+| Corners | 21 | 1 | 24 |
 | Edges | 22 | 1 | 24 |
 | Centers | 4 | 0 | 6 |
 
 Every target center shows a padded day tens digit 0–3. The two blank centers in
 the existing print are unused capacity, not target requirements.
+The brown month N shared by left and right month positions is one corner image
+class; identical artwork does not become distinct merely by occupying two fields.
 
 These raw necessary counts fit. They do not prove physical feasibility. The
 existing edge print uses four weekday images, eight month images (two brown O
