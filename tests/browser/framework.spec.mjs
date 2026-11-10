@@ -134,9 +134,21 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
   const evil =
       '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><script>alert(1)</script></svg>',
     sha = createHash("sha256").update(evil).digest("hex");
-  await page.route("**/assets/test/evil.svg", (r) =>
-    r.fulfill({ body: evil, contentType: "image/svg+xml" }),
-  );
+  await page.route("**/assets/test/evil.svg", async (r) => {
+    // Hold rejection until a real Counter asset replacement has closed assets.
+    await page.evaluate(() =>
+      document.getElementById("tenth-display").dispatchEvent(new Event("change")),
+    );
+    await page.waitForFunction(() => window.__counterBitmapClosed);
+    const ownedBeforeReject = await page.evaluate(
+      () => window.__unsafeOwnedCloseCount,
+    );
+    await page.evaluate(() => {
+      window.__unsafeFontsBeforeReject = document.fonts.size;
+    });
+    await r.fulfill({ body: evil, contentType: "image/svg+xml" });
+    expect(ownedBeforeReject).toBe(0);
+  });
   const result = await page.evaluate(
     async ({ sha }) => {
       const { loadAssets } = await import("/packages/cube-assets/src/index.ts");
@@ -144,7 +156,7 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
       const manifest = {
         ...wire.assets,
         images: [
-          { id: "temporary", kind: "color", color: "#ff0000" },
+          { id: "temporary", kind: "color", color: "#12ab34" },
           {
             id: "evil",
             kind: "image",
@@ -155,10 +167,26 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
         ],
       };
       const original = ImageBitmap.prototype.close;
-      let closed = 0;
-      const before = document.fonts.size;
+      const createBitmap = window.createImageBitmap;
+      const owned = new Map();
+      window.__counterBitmapClosed = false;
+      window.__unsafeOwnedCloseCount = 0;
+      window.createImageBitmap = async function (source, ...options) {
+        const bitmap = await createBitmap.call(this, source, ...options);
+        // Identify the transaction's real bitmap by its unique fixture color.
+        if (source instanceof HTMLCanvasElement) {
+          const pixel = source.getContext("2d").getImageData(0, 0, 1, 1).data;
+          if (pixel.join() === "18,171,52,255") owned.set(bitmap, 0);
+        }
+        return bitmap;
+      };
       ImageBitmap.prototype.close = function () {
-        closed++;
+        if (owned.has(this)) {
+          owned.set(this, owned.get(this) + 1);
+          window.__unsafeOwnedCloseCount++;
+        } else {
+          window.__counterBitmapClosed = true;
+        }
         return original.call(this);
       };
       try {
@@ -166,26 +194,30 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
           await loadAssets(manifest, []);
           return {
             error: "accepted",
-            closed,
-            before,
+            closed: [...owned.values()],
+            before: window.__unsafeFontsBeforeReject,
             after: document.fonts.size,
           };
         } catch (e) {
           return {
             error: e.message,
-            closed,
-            before,
+            closed: [...owned.values()],
+            before: window.__unsafeFontsBeforeReject,
             after: document.fonts.size,
           };
         }
       } finally {
         ImageBitmap.prototype.close = original;
+        window.createImageBitmap = createBitmap;
+        delete window.__counterBitmapClosed;
+        delete window.__unsafeOwnedCloseCount;
+        delete window.__unsafeFontsBeforeReject;
       }
     },
     { sha },
   );
   expect(result.error).toContain("Unsafe SVG");
-  expect(result.closed).toBe(1);
+  expect(result.closed).toEqual([1]);
   expect(result.after).toBe(result.before);
   await page.locator('[data-delta="1"]').click();
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
