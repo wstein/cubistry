@@ -1,7 +1,10 @@
 #!/usr/bin/env julia
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # UNTRUSTED bounded chronological word trial; native independent replay required.
-@assert length(ARGS)==1 "generate.jl OUT (unique scratch directory)"
+@assert 1<=length(ARGS)<=2 "generate.jl OUT [PRINT] (unique scratch directory; optional print for WINDOW_END)"
+# Window end: env WINDOW_END (YYYY-MM, default 2028-01); a longer window needs its own print as PRINT.
+# Env GENERATE_DEADLINE_S (default 240) stops starting new targets after that many seconds.
+const DEADLINE=parse(Float64,get(ENV,"GENERATE_DEADLINE_S","240"))
 const CAL=normpath(joinpath(@__DIR__,".."))
 include(joinpath(CAL,"row1-window-print/common.jl"))
 module WindowPlanner
@@ -18,7 +21,8 @@ Core.eval(P,:(image_normal(g,q,ink)=Main.coupled_optic(g,q,ink)))
 include(joinpath(CAL,"pure-split-states/orbit_solve.jl"))
 labels=coupled_labels(read(joinpath(CAL,"row1-revision/layout.tsv"),String))
 goals=coupled_goals(labels,"names-band","window")
-source=window_read_print(joinpath(CAL,"row1-window-print/evidence/printing.tsv"))
+@assert length(ARGS)==2 || get(ENV,"WINDOW_END","2028-01")=="2028-01" "a window end after 2028-01 needs its own print"
+source=window_read_print(length(ARGS)==2 ? ARGS[2] : joinpath(CAL,"row1-window-print/evidence/printing.tsv"))
 action=P.pose_action();gens=[UInt16.(g) for g in action.generators]
 out=ARGS[1];@assert !ispath(out) "Use a new scratch output directory";mkpath(out)
 function dump_candidate(rows,out)
@@ -46,7 +50,7 @@ function trial()
         println(log,"target\tyear\tmonth\tstatus\thtm\tseconds\tsource-sha256\tend-sha256\treason")
         println(log,"1\t2026\t5\tUNCHECKED_IDENTITY\t0\t0\t$hash0\t$hash0\tnative replay required");flush(log)
         for id in 2:length(goals)
-            if time()-started>240;println(log,"$id\t$(goals[id].year)\t$(goals[id].month)\tUNKNOWN\t-\t-\t-\t-\tbounded trial deadline");break;end
+            if time()-started>DEADLINE;println(log,"$id\t$(goals[id].year)\t$(goals[id].month)\tUNKNOWN\t-\t-\t-\t-\tbounded trial deadline");break;end
             target=goals[id];before=P.state_digest(P.decode_physical(source,state,action));t=time()
             r=orbit_solve(P,source,state,target,action,catalogs)
             if isnothing(r)
