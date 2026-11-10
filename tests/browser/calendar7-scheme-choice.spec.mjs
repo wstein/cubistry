@@ -70,3 +70,12 @@ for(const width of [320,360,390])test(`the font and color selectors share one to
  expect(f.x+f.width).toBeLessThanOrEqual(t.x);expect(t.x+t.width).toBeLessThanOrEqual(width);expect(f.x).toBeGreaterThanOrEqual(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
 });
+
+test('a 3D failure disables the color theme selector together with the other playback controls',async({page})=>{
+ await page.route('**/src/apps/calendar7/viewer.ts*',route=>route.abort());
+ await page.goto('/index.html?app=calendar7&year=2026&month=11');
+ await expect(page.locator('#calendar7-root')).toHaveAttribute('data-c7-state','failed',{timeout:30000});
+ await expect(page.getByLabel('Cube color theme',{exact:true})).toBeDisabled();
+ await expect(page.locator('[data-c7="speed"]')).toBeDisabled();
+ await expect(page.getByLabel('Font style',{exact:true})).toBeEnabled();
+});
