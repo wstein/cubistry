@@ -38,7 +38,8 @@ import {
   STICKERS,
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
-import { type ColorScheme, DEFAULT_SCHEME, schemeById } from "./schemes.ts";
+import { type ColorScheme, DEFAULT_SCHEME, namesGround, schemeById } from "./schemes.ts";
+import { bodyWidthFor } from "./geometry.ts";
 import type { Layout } from "./layout.ts";
 import { drawFace, drawSticker, PLASTIC, tileRoles, type Surface, TEXTURE } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
@@ -49,11 +50,29 @@ import { MoveTween } from "./tween.ts";
  * The presentation geometry with a lighter body: 218 bodies at the preset's three bevel segments are 588 triangles each
  * (128,184 in all); one segment keeps the rounded edge profile of the preset at a fifth of the cost.
  */
-function lightGeometry() {
+function lightGeometry(layout: Layout) {
   const geometry = createPresentationGeometry();
   const p = PRESENTATION_PRESET;
+  const width = bodyWidthFor(layout); // standard: the preset's .99; names: pitch minus 0.01 mm (geometry.ts)
   geometry.body.dispose();
-  return { ...geometry, body: new RoundedBoxGeometry(p.bodyWidth, p.bodyWidth, p.bodyWidth, 1, p.bodyRadius) };
+  return { ...geometry, body: new RoundedBoxGeometry(width, width, width, 1, p.bodyRadius) };
+}
+
+/** Body color of the cut faces and the core: the day fill; the names layout shows it as its near-white. */
+const bodyFill = (scheme: ColorScheme, layout: Layout): string => (layout === "names" ? namesGround(scheme.dayFill) : scheme.dayFill);
+
+/**
+ * Names layout: sticker id to color for every month name and band tile: the cut faces next to the tile take its fill (the
+ * red of the band), so the color runs to the end of the cubie, over bevel and sides. Empty in the standard layout.
+ */
+function cutColors(printing: Printing, scheme: ColorScheme, layout: Layout): Map<number, string> {
+  const colors = new Map<number, string>();
+  if (layout !== "names") return colors;
+  for (let i = 0; i < STICKERS; i++) {
+    const roles = tileRoles(scheme, printing.text[i], printing.ink[i], layout);
+    if (roles.cls === "month" || roles.cls === "band") colors.set(i + 1, roles.fill);
+  }
+  return colors;
 }
 
 /** Camera distance relative to the fit of the bounding sphere: the cube fills the picture, the sphere keeps some air. */
@@ -170,7 +189,8 @@ export class Calendar7Viewer implements StageView {
   /** Updates a stickerless cube whose body color is stale; only between moves, with the pose the cube shows. */
   private applyBodyColor(): void {
     if (!this.bodyStale || this.tween.running || !this.printing || !this.pose || this.destroyed) return;
-    this.cube?.setBodyColor(this.scheme.dayFill);
+    this.cube?.setBodyColor(bodyFill(this.scheme, this.layout));
+    if (this.layout === "names") this.cube?.setCutColors(cutColors(this.printing, this.scheme, this.layout));
     this.bodyStale = false;
   }
 
@@ -248,10 +268,10 @@ export class Calendar7Viewer implements StageView {
       materials,
       plastic,
       1,
-      lightGeometry(),
+      lightGeometry(layout),
       faceColors,
       // Stickerless: the body is the day background (owner decision); with stickers it is the plastic frame between them.
-      { bodyColor: this.scheme.dayFill, coreColor: this.scheme.dayFill },
+      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), cutColors: cutColors(printing, this.scheme, layout) },
     );
     // A sticker is a flat sheet on its body: it needs no shadow of its own (halves the shadow pass).
     this.presentation.traverse((o) => {
