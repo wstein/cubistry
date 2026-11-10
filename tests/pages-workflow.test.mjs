@@ -194,3 +194,15 @@ test("only the read-only Pages build supersedes older main heads", () => {
   assert.match(deploy,/group: counter-pages-publish\n      cancel-in-progress: false/);
   assert.doesNotMatch(builder.split("jobs:\n")[0],/\nconcurrency:/);
 });
+
+test("every external action in the Pages build and Counter workflows is pinned by commit SHA", () => {
+  for (const name of ["pages.yml", "counter.yml", "counter-browser.yml"]) {
+    const source = readFileSync(new URL(`../.github/workflows/${name}`, import.meta.url), "utf8");
+    const uses = [...source.matchAll(/^\s*(?:- )?uses: (?!\.\/)(\S+)(.*)$/gm)];
+    assert.ok(uses.length > 0, name);
+    for (const [, ref, rest] of uses) {
+      assert.match(ref, /^[\w.-]+\/[\w./-]+@[0-9a-f]{40}$/, `${name}: ${ref} is pinned by SHA`);
+      assert.match(rest, /^ # v\d+\.\d+\.\d+$/, `${name}: ${ref} names its release`);
+    }
+  }
+});
