@@ -218,3 +218,20 @@ test('notification receipt carries the live proof only when its storage matches 
  assert.deepEqual(proof(runPublish('receipt',{live:receipt,env:{NOTIFY:'[7]'}})),receipt);
  assert.equal(proof(runPublish('receipt',{live:receipt,treeSha:sha,env:{NOTIFY:'[7]'}})),null,'a proof for other storage is dropped');
 });
+test('freshness pagination stops exactly at the receipt run or at a short page',async()=>{
+ const make=pages=>{const reads=[];return {reads,request:async path=>{
+  if(runsPath(path)){reads.push(pageOf(path));assert.ok(reads.length<=pages.length,'read beyond the last page');return {workflow_runs:pages[pageOf(path)-1]};}
+  return path.startsWith('actions/runs/')?publisher:{sha:storage};
+ }};};
+ // The receipt run (123) is the last entry of a full page: that page ends the scan.
+ const full=Array.from({length:100},(_,i)=>({id:222-i,event:'workflow_run',conclusion:'skipped'}));
+ assert.equal(full.at(-1).id,123);
+ const a=make([full]);
+ assert.equal(await currentNotification(a,note,{fetch:async()=>json(receipt)}),true);
+ assert.deepEqual(a.reads,[1]);
+ // A short page without the receipt run is the last page: no further read.
+ const short=Array.from({length:5},(_,i)=>({id:400-i,event:'workflow_run',conclusion:'skipped'}));
+ const b=make([short]);
+ assert.equal(await currentNotification(b,note,{fetch:async()=>json(receipt)}),true);
+ assert.deepEqual(b.reads,[1]);
+});
