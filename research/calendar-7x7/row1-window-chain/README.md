@@ -20,6 +20,8 @@ hidden faces. Their receipts are byte-identical. A separate adaptation of the
 existing independent `verify_chain.jl` also accepts all 20 edges and inverses;
 that third replay checks HTM and hashes, while the first two check all metrics.
 Its geometry, calendar construction and optics do not call the producer.
+Silent self-checks of its band and blank optics reject a quarter-turned band, a
+blank tile read as band and a band read as blank.
 
 The profile keeps the bottom line on every empty row-one band tile upright.
 Plain empty date tiles remain distinct. O is upright and differs from 0;
