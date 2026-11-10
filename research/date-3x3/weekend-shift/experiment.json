@@ -1,0 +1,85 @@
+{
+  "schema": "cubistry.german-weekend-shift-experiment",
+  "version": 1,
+  "date": "2026-11-10",
+  "baseProofHead": "d919ed5507fc7379c9d011fb448726da05846c70",
+  "sourceMainCommit": "b8e161846f4e83e4ea7bbf0b449a0a035e190f69",
+  "authorVerdict": "UNSAT",
+  "confirmation": "PENDING_INDEPENDENT_REVIEW",
+  "scope": "Only owner-authorized shifted SA/SO positions, permanent strict upright nonblank prints, retained role inks and weight 600",
+  "geometry": {
+    "stickerFaces": 54,
+    "cornerBodies": 8,
+    "cornerFacesPerBody": 3,
+    "cornerFaces": 24
+  },
+  "counts": {
+    "sourceDates": 146097,
+    "distinctTargets": 2562,
+    "weekdayDistinctIncludingBlank": [
+      4,
+      4,
+      3
+    ],
+    "cornerOrientedClassesBySlot": [
+      3,
+      2,
+      8,
+      10
+    ],
+    "nonblankByPool": {
+      "corner": 23,
+      "edge": 21,
+      "center": 4
+    },
+    "blankPeaks": {
+      "corner": 1,
+      "edge": 1,
+      "center": 0
+    },
+    "reservedBlankBodyLeavesFaces": 21
+  },
+  "checkers": {
+    "julia": "1.11.5; JSON 1.13.0; Dates 1.11.0",
+    "flix": "0.79.0; Java 21.0.13; Jackson Core 2.22.4"
+  },
+  "toolingSource": "../weekends-dual at d919ed5507fc7379c9d011fb448726da05846c70",
+  "limits": {
+    "compilerHeap": "2 GiB",
+    "compilerThreads": 2,
+    "flixRuntimeHeap": "768 MiB",
+    "execution": "serial, bounded below five minutes; no solver search"
+  },
+  "controls": {
+    "checks": 16,
+    "accepted": 2,
+    "rejected": 14,
+    "finalDissent": false,
+    "initialDissent": "Julia rejected model booleans as numeric certificate tokens; documented root cause, fix, and both reruns",
+    "fullMutationSweep": "not run, by owner decision"
+  },
+  "notRun": [
+    "state witness search",
+    "print optimization",
+    "application changes",
+    "print export",
+    "frozen issue-74 corpus repeat"
+  ],
+  "sha256": {
+    "model.json": "4f6aebe0784d83d823c3f4316384c7280cc3bf5917a18a4d6abec12fdc9ddb2b",
+    "certificate.json": "f4a2ffc5c5385162d0418feeb546e3a355b6769cc269bcb413894316e4b0d452",
+    "weekdays.tsv": "b3f586b0245e7a3947c7e10bf7b087c4d5bad259eef263dc6fff2fe6d9a67044",
+    "months.tsv": "df2de9ee2db42ccff03e7512be05c50dc740d3223d1203622684af902abd0f74",
+    "baseline-print.tsv": "608a6a525a3723394e2c54c7151157b97c3ac753f1f30cf4435a748828978e64",
+    "targets.tsv": "5e4ddb23b5e3d125eea77520b4dbba4030b010c752564845393cdb6a657a6db9",
+    "input-pins.json": "8c962f043aeef1cc7314531b853787600a3d3cd1e9c189c94e3c139e5fe09c28",
+    "check.jl": "d057c6d98eaf5c9df7ea6881460296857b096c9045f9bdaa8a54684f39e3574f",
+    "flix/Main.flix": "636021102bfcae4a25d7056ad6c886bad7f8600bca9c8aebf4bb76daacac8302",
+    "generate-targets.jl": "4c04f8379f4dccbc0b37cb97e425363c08d0b920a1631b25e92c9cfdc3ad81dd",
+    "controls.jl": "87fb0b951e2663d14a1571e1d2f5cb23cc7ae7e7c7f3ab7ba672016514719dec",
+    "evidence/julia-result.tsv": "f5cb8395d741355c9fc774b751debf9050f451c13b7e22ca8bfa12424e273437",
+    "evidence/flix-result.tsv": "f5cb8395d741355c9fc774b751debf9050f451c13b7e22ca8bfa12424e273437",
+    "evidence/controls.tsv": "ac30063371ac999059d465dfaec8dfa31ce73dd679e8abcd05815e8e51b009a9",
+    "evidence/dissent-rc.txt": "e7f7c976b30e855d96e3fe9339053527009827151660551f44a3dae677438ad8"
+  }
+}

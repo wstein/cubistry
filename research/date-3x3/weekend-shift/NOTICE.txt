@@ -1,0 +1,5 @@
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+Applies to model.json, certificate.json, weekdays.tsv, months.tsv, targets.tsv, input-pins.json, experiment.json and evidence/ data and receipts.
+Created by Werner Stein with AI assistance (Codex, OpenAI). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+baseline-print.tsv preserves the printing and full physical frames of public/calendar/de-a.json at main b8e161846f4e83e4ea7bbf0b449a0a035e190f69; source SHA-256 1f5ecf89f4127ac1dd27e662c51193ca7d24677ba49abbca2737e306dc9cef56. Checker and generator code is AGPL-3.0-or-later.

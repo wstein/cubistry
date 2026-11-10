@@ -1,0 +1,49 @@
+{
+  "schema": "cubistry.german-weekend-shift-corner-certificate",
+  "version": 1,
+  "modelSHA256": "4f6aebe0784d83d823c3f4316384c7280cc3bf5917a18a4d6abec12fdc9ddb2b",
+  "weekdaySHA256": "b3f586b0245e7a3947c7e10bf7b087c4d5bad259eef263dc6fff2fe6d9a67044",
+  "monthSHA256": "df2de9ee2db42ccff03e7512be05c50dc740d3223d1203622684af902abd0f74",
+  "baselineSHA256": "608a6a525a3723394e2c54c7151157b97c3ac753f1f30cf4435a748828978e64",
+  "claim": "UNSAT",
+  "scope": "Only the owner-authorized German shifted-weekend layout with exact upright nonblank frames and retained role inks, weight 600",
+  "dates": 146097,
+  "targets": 2562,
+  "weekdayDistinctIncludingBlank": [
+    4,
+    4,
+    3
+  ],
+  "mandatoryNonblankByPool": {
+    "corner": 23,
+    "edge": 21,
+    "center": 4
+  },
+  "blankPeakByPool": {
+    "corner": 1,
+    "edge": 1,
+    "center": 0
+  },
+  "cornerClassesBySlot": [
+    3,
+    2,
+    8,
+    10
+  ],
+  "cornerFaces": 24,
+  "cornerBodies": 8,
+  "cornerFacesPerBody": 3,
+  "maximumBlankFaces": 1,
+  "zeroBlankCase": "Every target requires a blank corner",
+  "oneBlankCase": {
+    "reservedBodies": 1,
+    "remainingFaces": 21,
+    "requiredNonblankClasses": 23
+  },
+  "twoOrMoreBlankCase": {
+    "minimumFaces": 25,
+    "availableFaces": 24
+  },
+  "transport": "A nonblank sticker conserves dot(p,up) and dot(p,cross(n,up)); exact front normal and up therefore fix its upright front cell. Blank orientation is neutral.",
+  "targetSHA256": "5e4ddb23b5e3d125eea77520b4dbba4030b010c752564845393cdb6a657a6db9"
+}

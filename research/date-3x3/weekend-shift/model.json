@@ -1,0 +1,19 @@
+{
+  "schema": "cubistry.german-weekend-shift-model",
+  "version": 1,
+  "geometry": {"size": 3, "cornerBodies": 8, "cornerFacesPerBody": 3, "cornerFaces": 24},
+  "front": {"weekday": [0, 1, 2], "day": [3, 4, 5], "month": [6, 7, 8]},
+  "weekdayFile": "weekdays.tsv",
+  "monthFile": "months.tsv",
+  "weekday": {"color": "#25343e", "weight": 600},
+  "weekend": {"color": "#ba302c", "weight": 600},
+  "month": {"color": "#925a32", "weight": 600},
+  "day": {"color": "#315d4e", "weight": 600},
+  "blank": {"color": null, "weight": null, "orientation": "neutral"},
+  "orientation": {"nonblank": "exact upright frame", "opticalAliases": false, "reflections": false},
+  "dayFormat": "blank, padded tens, units",
+  "civilDateRange": ["0001-01-01", "9999-12-31"],
+  "proofDomain": ["2000-01-01", "2399-12-31"],
+  "fixedPrint": "54 permanent sticker faces; rigid cubies; outer turns and whole-cube rotations",
+  "optimization": "Only after a validated feasible print: minimize day +1 and -1 transitions on one print; report HTM and QTM mean, median, p95 and maximum, including month/year/leap seams"
+}
