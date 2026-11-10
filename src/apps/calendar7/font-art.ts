@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 /** Shared 2D/3D artwork: original glyphs, with one source for each 6/9 pair. */
 import { numberLayout, type LoadedFont } from "./fonts.ts";
-import { type Layout, NAME_SLOTS, nameSlotStart } from "./layout.ts";
+import { type Layout, NAME_SLOTS, nameSlotCenter } from "./layout.ts";
 import { FACE_FLAT, FACE_SCALE, LINE_SCALE, TEXT_SQUARE, TEXTURE, tileRoles, type Surface } from "./sticker-art.ts";
 import type { ColorScheme } from "./schemes.ts";
 
@@ -29,13 +29,12 @@ const NAME_LETTERS = "JANUARYFEBRUCHMPILTSGOVDE";
  * a three-letter label, or smaller when the widest capital would not fit its slot). Each letter is centered in its slot.
  */
 export function nameLabelLayout(text: string, font: LoadedFont): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
-  const slot = TEXT_SQUARE / NAME_SLOTS, left = TEXTURE / 2 - TEXT_SQUARE / 2;
+  const slot = TEXT_SQUARE / NAME_SLOTS;
   const capHeight = Math.max(...[...NAME_LETTERS].map(c => font.glyphs[c].bottom - font.glyphs[c].top));
   const widest = Math.max(...[...NAME_LETTERS].map(c => numberLayout(c, font, 1).width));
   const size = Math.min(58 / capHeight, (slot * 0.95) / widest);
-  const start = nameSlotStart(text);
   return [...text].map((char, i) => {
-    const p = numberLayout(char, font, size), x = left + (start + i + 0.5) * slot;
+    const p = numberLayout(char, font, size), x = nameSlotCenter(text, i, TEXT_SQUARE, TEXTURE);
     return { text: char, size, x, y: 96, box: { x0: x - p.width / 2, y0: 96 - p.height / 2, x1: x + p.width / 2, y1: 96 + p.height / 2 } };
   });
 }
