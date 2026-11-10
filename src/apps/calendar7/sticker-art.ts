@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
-import { type Layout, nameSlotCenter } from "./layout.ts";
-import type { ColorScheme, SchemeLine } from "./schemes.ts";
+import { type Layout, nameSlotOffset } from "./layout.ts";
+import { NAMES_FACE_PX_PER_UNIT } from "./geometry.ts";
+import { type ColorScheme, namesGround, type SchemeLine } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
 
@@ -34,6 +35,21 @@ export interface TileRoles {
 
 /** Texture pixels per scheme line pixel: scheme widths are pixels of a sheet tile of about 48 px, the texture is 192 px. */
 export const LINE_SCALE = 4;
+/** Names layout: the lines under row 1 and the weekday row are this many times as thick as in the standard layout. */
+export const NAMES_LINE_FACTOR = 1.5;
+
+/**
+ * The rectangle of a tile line in texture pixels. Standard layout: on a sticker the full width at the bottom edge, on a cubie
+ * face the flat width (`FACE_FLAT`) at the bottom edge of the flat face. Names layout: always the full texture width, so the
+ * lines of neighboring cubies meet as one continuous line, and `NAMES_LINE_FACTOR` times as thick.
+ */
+export function lineRect(line: SchemeLine, layout: Layout, face: boolean): { x: number; y: number; w: number; h: number } {
+  const names = layout === "names";
+  const h = line.px * LINE_SCALE * (names ? NAMES_LINE_FACTOR : 1);
+  const bottom = face ? TEXTURE * (1 + FACE_FLAT) / 2 : TEXTURE;
+  if (face && !names) return { x: TEXTURE * (1 - FACE_FLAT) / 2, y: bottom - h, w: TEXTURE * FACE_FLAT, h };
+  return { x: 0, y: bottom - h, w: TEXTURE, h };
+}
 
 /**
  * Class of a tile from its label and ink. The ink classes are the print's: dark = weekday digits, red = weekend digits
@@ -59,7 +75,8 @@ export function tileClass(text: string, ink: string): TileClass {
 export function tileRoles(scheme: ColorScheme, text: string, ink: string, layout: Layout = "standard"): TileRoles {
   const cls = tileClass(text, ink);
   const weekend = scheme.weekendFill ?? scheme.weekendTint ?? scheme.dayFill;
-  const roles = (fill: string, color: string, small = color, line: SchemeLine | null = null): TileRoles => ({ cls, fill, ink: color, inkSmall: small, line });
+  const ground = (fill: string): string => (layout === "names" ? namesGround(fill) : fill);
+  const roles = (fill: string, color: string, small = color, line: SchemeLine | null = null): TileRoles => ({ cls, fill: ground(fill), ink: color, inkSmall: small, line });
   switch (cls) {
     case "blank": return roles(scheme.emptyFill, scheme.dayInk);
     case "band": return roles(scheme.bandFill ?? scheme.dayFill, scheme.monthInk, scheme.monthInk, layout === "names" ? scheme.lineRow1 : null);
@@ -94,12 +111,24 @@ export interface NameLetter {
   readonly size: number;
 }
 
+/** The width of a sticker body in scene units (PRESENTATION_PRESET.stickerWidth): a sticker texture spans it. */
+const STICKER_WIDTH = 0.87;
+
 /**
- * Letters of a name tile on the monospaced 3-slot grid of the text square: every letter is centered in its slot, so the
- * letters of the three tiles of a month name line up as one word (first tile right-flush, last left-flush, see layout.ts).
+ * Texture pixels (in drawing coordinates) per scene unit of the cubie pitch. On a cubie face the drawing is scaled about the
+ * center by `FACE_SCALE`, so the drawing pitch is the on-screen pitch of the flat face divided by it.
  */
-export function nameGrid(text: string): readonly NameLetter[] {
-  return [...text].map((char, i) => ({ char, x: nameSlotCenter(text, i, TEXT_SQUARE, TEXTURE), size: NAME_FONT_SIZE }));
+export const namePxPerUnit = (face: boolean): number => (face ? NAMES_FACE_PX_PER_UNIT / FACE_SCALE : TEXTURE / STICKER_WIDTH);
+
+/** Center x (drawing coordinates) of letter `i` of a name tile: the slot grid of layout.ts, thirds of the cubie pitch. */
+export const nameLetterX = (text: string, i: number, face: boolean): number => TEXTURE / 2 + nameSlotOffset(text, i) * namePxPerUnit(face);
+
+/**
+ * Letters of a name tile on the one uniform grid of the whole name row: a third of a cubie pitch between two letters, also
+ * across tile boundaries, independent of the glyph widths (first tile right-flush, last left-flush, see layout.ts).
+ */
+export function nameGrid(text: string, face = true): readonly NameLetter[] {
+  return [...text].map((char, i) => ({ char, x: nameLetterX(text, i, face), size: NAME_FONT_SIZE }));
 }
 
 /** Normal font size of a one-line label by its length (shared by the one-line fit and the big split number). */
@@ -201,28 +230,28 @@ export function drawSticker(
   scheme?: ColorScheme,
   layout: Layout = "standard",
 ): void {
-  paintSticker(ctx, text, ink, profile, scheme ? tileRoles(scheme, text, ink, layout) : null, true, layout);
+  paintSticker(ctx, text, ink, profile, scheme ? tileRoles(scheme, text, ink, layout) : null, true, layout, false);
 }
 
-function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean, layout: Layout = "standard"): void {
+function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean, layout: Layout = "standard", face = false): void {
   ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
   ctx.fillRect(0, 0, TEXTURE, TEXTURE);
-  if (text !== "") paintLabel(ctx, text, ink, profile, roles, layout);
+  if (text !== "") paintLabel(ctx, text, ink, profile, roles, layout, face);
   if (roles?.line && edgeLine) {
-    const h = roles.line.px * LINE_SCALE;
+    const r = lineRect(roles.line, layout, false);
     ctx.fillStyle = roles.line.color;
-    ctx.fillRect(0, TEXTURE - h, TEXTURE, h);
+    ctx.fillRect(r.x, r.y, r.w, r.h);
   }
 }
 
-function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, layout: Layout): void {
+function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, layout: Layout, face: boolean): void {
   const big = roles ? roles.ink : (INK_COLORS[ink] ?? INK_COLORS.dark);
   ctx.fillStyle = big;
   if (layout === "names" && ink === "month") {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = `600 ${NAME_FONT_SIZE}px ${FONT}`;
-    for (const l of nameGrid(text)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04);
+    for (const l of nameGrid(text, face)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04);
   } else if (profile === "strict" && isSplitLabel(text)) {
     ctx.textBaseline = "alphabetic";
     const l = splitLayout(text);
@@ -293,12 +322,11 @@ export function drawFace(
   ctx.scale(FACE_SCALE, FACE_SCALE);
   ctx.translate(-TEXTURE / 2, -TEXTURE / 2);
   // paintSticker paints the same ground again over the scaled square (same color), then the label.
-  paintSticker(ctx, text, ink, profile, roles, false, layout);
+  paintSticker(ctx, text, ink, profile, roles, false, layout, true);
   ctx.restore();
   if (roles?.line) {
-    const h = roles.line.px * LINE_SCALE;
-    const edge = TEXTURE * ((1 + FACE_FLAT) / 2);
+    const r = lineRect(roles.line, layout, true);
     ctx.fillStyle = roles.line.color;
-    ctx.fillRect(TEXTURE * ((1 - FACE_FLAT) / 2), edge - h, TEXTURE * FACE_FLAT, h);
+    ctx.fillRect(r.x, r.y, r.w, r.h);
   }
 }

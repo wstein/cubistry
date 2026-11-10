@@ -53,9 +53,12 @@ for (const word of NAME_WORDS) {
 }
 export const nameAlign = (label: string): NameAlign => ALIGN.get(label) ?? "center";
 
-/** Center x of letter `i` of a name tile on the 3-slot grid of a text square `square` wide, centered in a texture `texture` wide. The one place of the slot math (sticker art and font art). */
-export const nameSlotCenter = (label: string, i: number, square: number, texture: number): number =>
-  texture / 2 - square / 2 + (nameSlotStart(label) + i + 0.5) * (square / NAME_SLOTS);
+/**
+ * Offset of letter `i` of a name tile from the tile center, in cubie pitches (scene units). The slots are thirds of the
+ * cubie pitch, so the letter pitch is 1/3 over the whole row of tiles, across tile boundaries too (a middle tile of three
+ * letters fills its pitch exactly). The one place of the slot math (sticker art and font art).
+ */
+export const nameSlotOffset = (label: string, i: number): number => (nameSlotStart(label) + i + 0.5) / NAME_SLOTS - 0.5;
 
 /** First slot (0-based, may be fractional for a centered tile) of the letters of a name tile. */
 export function nameSlotStart(label: string): number {

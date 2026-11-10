@@ -125,7 +125,8 @@ async function bandProbe(page, scheme, scramble) {
 
 for (const scheme of ["paper-red", "paper-blue", "dracula", "high-contrast"]) test(`${scheme}: band tiles take the band fill and the row 1 line, blank tiles the empty fill`, async ({ page }) => {
   const { rows } = await bandProbe(page, scheme, false);
-  const sch = { "paper-red": { band: "#e0282c", empty: "#ffffff", line: null }, "paper-blue": { band: "#ffffff", empty: "#ffffff", line: "#1558d8" }, dracula: { band: "#ff79c6", empty: "#1e1f29", line: null }, "high-contrast": { band: "#ffffff", empty: "#2a2a2a", line: null } }[scheme];
+  const W = "#fdfdfd"; // NAMES_WHITE: the names layout draws a neutral white ground as this token
+  const sch = { "paper-red": { band: "#e0282c", empty: W, line: null }, "paper-blue": { band: W, empty: W, line: "#1558d8" }, dracula: { band: "#ff79c6", empty: "#1e1f29", line: null }, "high-contrast": { band: W, empty: "#2a2a2a", line: null } }[scheme];
   const by = (c) => rows.filter((r) => r.cls === c);
   expect(by("band")).toHaveLength(12);
   expect(by("month")).toHaveLength(24);

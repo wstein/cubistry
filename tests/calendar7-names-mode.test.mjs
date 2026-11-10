@@ -6,8 +6,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { LAYOUT_PARAM, NAME_SLOTS, NAME_WORDS, NAMES_NOTICE, nameAlign, nameSlotStart, parseLayout } from "../src/apps/calendar7/layout.ts";
-import { SCHEMES } from "../src/apps/calendar7/schemes.ts";
-import { FACE_FLAT, LINE_SCALE, NAME_FONT_SIZE, TEXTURE, TEXT_SQUARE, drawFace, drawSticker, nameGrid, tileClass, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
+import { SCHEMES, namesGround } from "../src/apps/calendar7/schemes.ts";
+import { FACE_FLAT, LINE_SCALE, NAMES_LINE_FACTOR, NAME_FONT_SIZE, namePxPerUnit, TEXTURE, TEXT_SQUARE, drawFace, drawSticker, nameGrid, tileClass, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { parseDisplays, parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
 import { drawFontSticker, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
 import { mountCalendar7 } from "../src/apps/calendar7/mount.ts";
@@ -79,14 +79,14 @@ for (const scheme of SCHEMES) {
     const band = tileRoles(scheme, "", "band", "names");
     const month = tileRoles(scheme, "J", "month", "names");
     const blank = tileRoles(scheme, "", "blank", "names");
-    const fill = scheme.bandFill ?? scheme.dayFill;
+    const fill = namesGround(scheme.bandFill ?? scheme.dayFill);
     assert.equal(band.cls, "band");
     assert.equal(band.fill, fill);
     assert.equal(month.fill, fill);
     assert.equal(month.ink, scheme.monthInk);
     assert.deepEqual(band.line, scheme.lineRow1);
     assert.deepEqual(month.line, scheme.lineRow1);
-    assert.equal(blank.fill, scheme.emptyFill);
+    assert.equal(blank.fill, namesGround(scheme.emptyFill));
     assert.equal(blank.line, null);
     assert.notDeepEqual([band.fill, band.line], [blank.fill, blank.line], "band differs from blank in fill or line");
     // Weekday line is a property of the weekday tile classes in both layouts.
@@ -127,39 +127,37 @@ for (const scheme of SCHEMES) {
   test(`${scheme.id}: a band tile draws its ground, no text and the row 1 line; a blank tile never does`, () => {
     for (const [name, draw] of [["sticker", (c) => drawSticker(c, "", "band", "strict", scheme, "names")], ["face", (c) => drawFace(c, "", "band", "strict", scheme, "names")]]) {
       const log = record(draw);
-      assert.deepEqual(log[0], ["fillStyle", scheme.bandFill ?? scheme.dayFill], `${name} ground`);
+      assert.deepEqual(log[0], ["fillStyle", namesGround(scheme.bandFill ?? scheme.dayFill)], `${name} ground`);
       assert.equal(texts(log).length, 0);
       const last = rects(log).at(-1);
       if (scheme.lineRow1) {
-        const h = scheme.lineRow1.px * LINE_SCALE;
+        const h = scheme.lineRow1.px * LINE_SCALE * NAMES_LINE_FACTOR;
         assert.equal(last[1], scheme.lineRow1.color, `${name} line color`);
         assert.equal(last[5], h);
-        if (name === "sticker") assert.deepEqual(last.slice(2), [0, TEXTURE - h, TEXTURE, h]);
-        else assert.ok(Math.abs(last[3] + last[5] - TEXTURE * ((1 + FACE_FLAT) / 2)) < 1e-9);
-      } else assert.ok(rects(log).every((e) => e[1] === (scheme.bandFill ?? scheme.dayFill)), `${name} only the ground`);
+        assert.deepEqual(last.slice(2, 5), [0, name === "sticker" ? TEXTURE - h : TEXTURE * ((1 + FACE_FLAT) / 2) - h, TEXTURE], `${name} full width`);
+      } else assert.ok(rects(log).every((e) => e[1] === namesGround(scheme.bandFill ?? scheme.dayFill)), `${name} only the ground`);
     }
     const blank = record((c) => drawFace(c, "", "blank", "strict", scheme, "names"));
-    assert.deepEqual(blank[0], ["fillStyle", scheme.emptyFill]);
-    assert.ok(rects(blank).every((e) => e[1] === scheme.emptyFill));
+    assert.deepEqual(blank[0], ["fillStyle", namesGround(scheme.emptyFill)]);
+    assert.ok(rects(blank).every((e) => e[1] === namesGround(scheme.emptyFill)));
     // The standard layout draws exactly what it drew before.
     assert.deepEqual(record((c) => drawSticker(c, "J", "month", "strict", scheme)), record((c) => drawSticker(c, "J", "month", "strict", scheme, "standard")));
   });
 }
 
-test("name tiles use one monospaced 3-slot grid: right-flush first tile, left-flush last tile, full middle, centered otherwise", () => {
+test("name tiles use one monospaced 3-slot grid (thirds of the cubie pitch): right-flush first tile, left-flush last tile, full middle, centered otherwise", () => {
   const slot = TEXT_SQUARE / NAME_SLOTS;
-  const left = TEXTURE / 2 - TEXT_SQUARE / 2;
-  const at = (k) => left + (k + 0.5) * slot;
+  const at = (k, face = true) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit(face);
   const cases = { J: [2], FE: [1, 2], MA: [1, 2], OC: [1, 2], ANU: [0, 1, 2], ER: [0, 1], IL: [0, 1], Y: [0], BER: [0, 1, 2] };
   for (const [label, slots] of Object.entries(cases)) {
     const grid = nameGrid(label);
     assert.deepEqual(grid.map((g) => g.char), label.split(""), label);
-    assert.deepEqual(grid.map((g) => g.x), slots.map(at), label);
+    assert.deepEqual(grid.map((g) => g.x), slots.map((k) => at(k)), label);
     assert.ok(grid.every((g) => g.size === NAME_FONT_SIZE), "one size for every name tile");
   }
   // The same grid is what the sticker draws: size and x of each letter.
   const log = record((c) => drawSticker(c, "FE", "month", "strict", SCHEMES[0], "names"));
-  assert.deepEqual(texts(log).map((e) => [e[2], e[3]]), [["F", at(1)], ["E", at(2)]]);
+  assert.deepEqual(texts(log).map((e) => [e[2], e[3]]), [["F", at(1, false)], ["E", at(2, false)]]);
   assert.ok(texts(log).every((e) => e[6].includes(`${NAME_FONT_SIZE}px`) && e[5] === "center"));
   // Standard layout: the label is one centered run.
   const std1 = texts(record((c) => drawSticker(c, "FE", "month", "strict", SCHEMES[0])));
@@ -444,7 +442,7 @@ const fakeFont = { style: { master: "0" }, glyphs: Object.fromEntries([..."01234
 
 test("font path: name letters sit on the 3-slot grid, one size for every tile, the same x as the sticker grid", () => {
   const slot = TEXT_SQUARE / NAME_SLOTS;
-  const at = (k) => TEXTURE / 2 - TEXT_SQUARE / 2 + (k + 0.5) * slot;
+  const at = (k) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit(true);
   const cases = { J: [2], MA: [1, 2], ER: [0, 1], ANU: [0, 1, 2], Y: [0], OC: [1, 2] };
   const sizes = new Set();
   for (const [label, slots] of Object.entries(cases)) {
@@ -459,7 +457,7 @@ test("font path: name letters sit on the 3-slot grid, one size for every tile, t
   assert.ok(size * 0.91 <= slot, "the widest capital fits a slot");
   // A single run would have a different x for the second letter.
   const two = nameLabelLayout("MA", fakeFont);
-  assert.ok(Math.abs(two[1].x - two[0].x - slot) < 1e-9, "letters are one slot apart");
+  assert.ok(Math.abs(two[1].x - two[0].x - namePxPerUnit(true) / NAME_SLOTS) < 1e-9, "letters are one third of a cubie apart");
 });
 
 /** Records the letters drawFontSticker draws: text and the x of the translate in effect (drawFontRun translates to the run). */
@@ -478,8 +476,7 @@ function recordFont(text, ink, layout, surface = "sticker") {
 }
 
 test("font path: drawFontSticker draws a name tile as one run per letter at the slot x, and any other label as before", () => {
-  const slot = TEXT_SQUARE / NAME_SLOTS;
-  const at = (k) => TEXTURE / 2 - TEXT_SQUARE / 2 + (k + 0.5) * slot;
+  const at = (k) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit(false); // recordFont draws on the sticker surface
   const close = (runs, want) => { assert.equal(runs.length, want.length); runs.forEach((r, i) => { assert.equal(r[0], want[i][0]); assert.ok(Math.abs(r[1] - want[i][1]) < 1e-9, `${r[0]} x ${r[1]} want ${want[i][1]}`); }); };
   close(recordFont("MA", "month", "names"), [["M", at(1)], ["A", at(2)]]);
   close(recordFont("ER", "month", "names"), [["E", at(0)], ["R", at(1)]]);

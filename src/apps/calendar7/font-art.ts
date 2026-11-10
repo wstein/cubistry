@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 /** Shared 2D/3D artwork: original glyphs, with one source for each 6/9 pair. */
 import { numberLayout, type LoadedFont } from "./fonts.ts";
-import { type Layout, NAME_SLOTS, nameSlotCenter } from "./layout.ts";
-import { FACE_FLAT, FACE_SCALE, LINE_SCALE, TEXT_SQUARE, TEXTURE, tileRoles, type Surface } from "./sticker-art.ts";
+import { type Layout, NAME_SLOTS } from "./layout.ts";
+import { lineRect, nameLetterX, TEXT_SQUARE, TEXTURE, FACE_SCALE, tileRoles, type Surface } from "./sticker-art.ts";
 import type { ColorScheme } from "./schemes.ts";
 
 export interface InkBox { readonly x0: number; readonly y0: number; readonly x1: number; readonly y1: number }
@@ -25,16 +25,17 @@ export function labelLayout(text: string, font: LoadedFont): readonly { text: st
 /** Letters of the name labels: the one font size of the names layout is fitted to them. */
 const NAME_LETTERS = "JANUARYFEBRUCHMPILTSGOVDE";
 /**
- * Names layout: the letters of a name tile on the monospaced 3-slot grid, one size for every name tile (the cap height of
- * a three-letter label, or smaller when the widest capital would not fit its slot). Each letter is centered in its slot.
+ * Names layout: the letters of a name tile on the uniform letter grid of the whole name row (a third of a cubie pitch
+ * between two letters, across tile boundaries too, see layout.ts), one size for every name tile (the cap height of a
+ * three-letter label, or smaller when the widest capital would not fit its slot). Each letter's ink is centered on its slot.
  */
-export function nameLabelLayout(text: string, font: LoadedFont): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
+export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface = "face"): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
   const slot = TEXT_SQUARE / NAME_SLOTS;
   const capHeight = Math.max(...[...NAME_LETTERS].map(c => font.glyphs[c].bottom - font.glyphs[c].top));
   const widest = Math.max(...[...NAME_LETTERS].map(c => numberLayout(c, font, 1).width));
   const size = Math.min(58 / capHeight, (slot * 0.95) / widest);
   return [...text].map((char, i) => {
-    const p = numberLayout(char, font, size), x = nameSlotCenter(text, i, TEXT_SQUARE, TEXTURE);
+    const p = numberLayout(char, font, size), x = nameLetterX(text, i, surface === "face");
     return { text: char, size, x, y: 96, box: { x0: x - p.width / 2, y0: 96 - p.height / 2, x1: x + p.width / 2, y1: 96 + p.height / 2 } };
   });
 }
@@ -61,16 +62,15 @@ export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink
   if (surface === "face") {
     ctx.save();ctx.translate(96, 96);ctx.scale(FACE_SCALE, FACE_SCALE);ctx.translate(-96, -96);
   }
-  const parts = layout === "names" && printed.cls === "month" ? nameLabelLayout(text, font) : labelLayout(text, font);
+  const parts = layout === "names" && printed.cls === "month" ? nameLabelLayout(text, font, surface) : labelLayout(text, font);
   if (text) for (const [index, part] of parts.entries()) {
     ctx.fillStyle = index === 1 ? roles.inkSmall : roles.ink;
     drawFontRun(ctx, part.text, font, part.size, part.x, part.y);
   }
   if (surface === "face") ctx.restore();
   if (roles.line) {
-    const h = roles.line.px * LINE_SCALE;
+    const r = lineRect(roles.line, layout, surface === "face");
     ctx.fillStyle = roles.line.color;
-    if (surface === "face") ctx.fillRect(TEXTURE * (1 - FACE_FLAT) / 2, TEXTURE * (1 + FACE_FLAT) / 2 - h, TEXTURE * FACE_FLAT, h);
-    else ctx.fillRect(0, TEXTURE - h, TEXTURE, h);
+    ctx.fillRect(r.x, r.y, r.w, r.h);
   }
 }

@@ -311,3 +311,15 @@ export const DEFAULT_SCHEME: ColorScheme = SCHEMES.find((s) => s.isDefault) as C
 export function schemeById(id: string | null | undefined): ColorScheme {
   return SCHEMES.find((s) => s.id === id) ?? DEFAULT_SCHEME;
 }
+
+/**
+ * The white of the names layout: the grounds of the weekday row, the date cells and the empty days. Neutral (no warm tint)
+ * and lighter than the grey #ececec of the weekday row in the standard layout.
+ */
+export const NAMES_WHITE = "#fdfdfd";
+
+/** Names layout: a neutral light ground (white or light grey) becomes `NAMES_WHITE`; every other fill stays. */
+export const namesGround = (fill: string): string => {
+  const m = /^#([0-9a-f]{2})\1\1$/i.exec(fill);
+  return m && parseInt(m[1], 16) >= 0xec ? NAMES_WHITE : fill;
+};
