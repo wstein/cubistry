@@ -18,6 +18,8 @@
 // research-inputs.sha256 (new folder, new files only; the shipped scheme A files are never touched).
 // It stops on any mismatch: input digests, snapshots against the replay of the stored words, declared
 // metrics, and the front of every state against its display sheet. The output is byte-deterministic.
+// The digest pin stops any changed input first, so the later checks are defence in depth on the command line;
+// build(root, { testOnlySkipDigestPins: true }) reaches each of them in tests/calendar7-names-data.test.mjs.
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -75,6 +77,11 @@ export function windowCells(layout, year, month) {
   return row1.concat(monthCells(year, month).slice(7));
 }
 
+const inputsText = () =>
+  Object.entries(INPUTS)
+    .map(([name, rel]) => `${PINNED[name]}  ${rel}\n`)
+    .join("");
+
 const serialize = (header, arrays) => {
   const head = Object.entries(header)
     .map(([k, v]) => `${JSON.stringify(k)}:${JSON.stringify(v)}`)
@@ -85,12 +92,16 @@ const serialize = (header, arrays) => {
   return `{\n${head},\n${body}\n}\n`;
 };
 
-export function build(researchRoot) {
+/**
+ * `options.testOnlySkipDigestPins` skips the pinned input digests so that tests can reach the checks behind
+ * them (declared metrics, snapshots, front). The command line never sets it.
+ */
+export function build(researchRoot, options = {}) {
   const read = (rel) => readFileSync(join(researchRoot, rel));
   const raw = {};
   for (const [name, rel] of Object.entries(INPUTS)) {
     raw[name] = read(rel);
-    if (sha256(raw[name]) !== PINNED[name]) throw Error(`${rel}: digest differs from experiment.json`);
+    if (!options.testOnlySkipDigestPins && sha256(raw[name]) !== PINNED[name]) throw Error(`${rel}: digest differs from experiment.json`);
   }
   const layout = parseLayout(raw.layout.toString("utf8"));
   const print = parsePrint(raw.printing.toString("utf8"));
@@ -201,7 +212,7 @@ export function build(researchRoot) {
   };
   files["NOTICE.txt"] =
     `English 7x7 calendar cube, names layout data (${STATUS})\n` +
-    `Window ${WINDOW} only (21 months, 20 edges). English only. Outside the window the app uses the shipped scheme A data.\n` +
+    `Window ${WINDOW} only (21 months, 20 edges). English only. The app mode that reads this folder, with scheme A as the planned fallback outside the window, is a later change.\n` +
     `Status: ${STATUS}. No shortest-route, global-print or build-certification claim.\n` +
     `${LICENSE}\n\nSPDX-License-Identifier: CC-BY-SA-4.0\n\n` +
     `Source: research/calendar-7x7/row1-revision, row1-window-print and row1-window-chain on research/cube-display-feasibility\n` +
@@ -210,9 +221,7 @@ export function build(researchRoot) {
     `public/calendar7/state.v1.json, graph.v1.json and displays.v1.json are not changed by this folder.\n`;
   const hashes = (names) => names.map((n) => `${sha256(files[n])}  ${n}\n`).join("");
   files["manifest.sha256"] = hashes(["NOTICE.txt", "displays.v1.json", "graph.v1.json", "state.v1.json"]);
-  files["research-inputs.sha256"] = Object.entries(INPUTS)
-    .map(([name, rel]) => `${PINNED[name]}  ${rel}\n`)
-    .join("");
+  files["research-inputs.sha256"] = inputsText();
   return files;
 }
 
@@ -223,6 +232,7 @@ export function check(dir, researchRoot) {
     const [digest, name] = line.split("  ");
     if (sha256(readFileSync(join(dir, name))) !== digest) throw Error(`${name} does not match manifest.sha256`);
   }
+  if (text("research-inputs.sha256") !== inputsText()) throw Error("research-inputs.sha256 differs from the pinned digests");
   const start = parseState(JSON.parse(text("state.v1.json")));
   if (start.surface !== "face") throw Error('state surface must be "face"');
   const table = parseDisplays(JSON.parse(text("displays.v1.json")));
