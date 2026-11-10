@@ -17,9 +17,16 @@ import {
 } from "./apps/calendar/model.ts";
 import { CalendarViewer } from "./apps/calendar/viewer.ts";
 import { CalendarController } from "./apps/calendar/controller.ts";
-import { CalendarOptimizer } from "./apps/calendar/optimizer.ts";
+import {
+  CalendarOptimizer,
+  solverTimeoutMs,
+} from "./apps/calendar/optimizer.ts";
 import pin from "../calendar-source.json";
-const optimizer = new CalendarOptimizer();
+// Internal test hook (Pages tests on slow runners); unset in production.
+const optimizer = new CalendarOptimizer(
+  undefined,
+  solverTimeoutMs(window.__calendarSolverTimeoutMs),
+);
 const $ = (id) => document.getElementById(id),
   base = deploymentBasePath(import.meta.env.BASE_URL),
   cache = new Map();
