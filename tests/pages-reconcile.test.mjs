@@ -76,12 +76,35 @@ test('detached notification accepts only trusted main publisher provenance and b
  for(const run of [{...publisher,event:'pull_request'},{...publisher,head_branch:'feature'},{...publisher,path:'.github/workflows/other.yml'},{...publisher,head_repository:{full_name:'fork/cubistry'}}])assert.throws(()=>parseNotification(JSON.stringify(note),run));
  for(const value of [{...note,run:124},{...note,attempt:2},{...note,numbers:[-1]},{...note,extra:true},{...note,proof:{...receipt,nonce:'x'}}])assert.throws(()=>parseNotification(JSON.stringify(value),publisher));
 });
+const runsPath=path=>path.startsWith('actions/workflows/pages-publish.yml/runs?');
+const pageOf=path=>Number(new URL(`https://x/${path}`).searchParams.get('page')||1);
 test('detached notification rejects newer publishers and changed storage or live receipt before writing',async()=>{
- const api=({newer=false,tree=storage}={})=>({request:async path=>path.startsWith('actions/runs/')?publisher:{sha:tree},pages:async()=>newer?[{id:124,event:'workflow_dispatch'}]:[publisher]});
+ const api=({newer=false,tree=storage}={})=>({request:async path=>runsPath(path)?{workflow_runs:newer?[{id:124,event:'workflow_dispatch'}]:[publisher]}:path.startsWith('actions/runs/')?publisher:{sha:tree}});
  assert.equal(await currentNotification(api(),note,{fetch:async()=>json(receipt)}),true);
  assert.equal(await currentNotification(api({newer:true}),note,{fetch:async()=>json(receipt)}),false);
  assert.equal(await currentNotification(api({tree:sha}),note,{fetch:async()=>json(receipt)}),false);
  assert.equal(await currentNotification(api(),note,{fetch:async()=>json({...receipt,nonce:'d'.repeat(32)})}),false);
+});
+test('freshness check reads only the newest run page once the receipt run is reached',async()=>{
+ const run=id=>({id,event:'workflow_run',conclusion:'success'});
+ const make=pages=>{const reads=[];return {reads,request:async path=>{
+  if(runsPath(path)){reads.push(pageOf(path));assert.ok(reads.length<=pages.length,'read beyond the last page');return {workflow_runs:pages[pageOf(path)-1]};}
+  return path.startsWith('actions/runs/')?publisher:{sha:storage};
+ }};};
+ // Newest-first page of 100 that includes the receipt run (123): one request, no further paging.
+ const first=Array.from({length:100},(_,i)=>run(123-i));
+ const a=make([first,Array.from({length:100},(_,i)=>run(23-i)),[]]);
+ assert.equal(await currentNotification(a,note,{fetch:async()=>json(receipt)}),true);
+ assert.deepEqual(a.reads,[1]);
+ // A newer publisher on the first page ends the check at once.
+ const b=make([[run(124),...first.slice(0,99)],first]);
+ assert.equal(await currentNotification(b,note,{fetch:async()=>json(receipt)}),false);
+ assert.deepEqual(b.reads,[1]);
+ // Correctness first: 100 newer skipped runs hide a newer real run on page 2; the receipt run is not yet reached.
+ const skipped=Array.from({length:100},(_,i)=>({id:400-i,event:'workflow_run',conclusion:'skipped'}));
+ const c=make([skipped,[run(200),run(123)]]);
+ assert.equal(await currentNotification(c,note,{fetch:async()=>json(receipt)}),false);
+ assert.deepEqual(c.reads,[1,2]);
 });
 test('deployment budget includes request latency rather than only polling count',async()=>{
  let time=0,posts=0;

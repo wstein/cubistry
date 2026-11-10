@@ -14,8 +14,13 @@ export function parseNotification(text,run){
 export async function currentNotification(api,receipt,{fetch:request=fetch}={}){
  const current=await api.request(`actions/runs/${receipt.run}`);
  if(!trustedPublisher(current)||current.run_attempt!==receipt.attempt||current.head_sha!==receipt.sha)return false;
- const latest=await api.pages('actions/workflows/pages-publish.yml/runs?branch=main','workflow_runs');
- if(latest.some(x=>x.id>receipt.run&&x.conclusion!=='skipped'&&['workflow_run','workflow_dispatch'].includes(x.event)))return false;
+ // Runs arrive newest first and ids grow with creation: stop once the receipt's own run is reached (usually page 1).
+ for(let page=1;;page++){
+  const data=await api.request(`actions/workflows/pages-publish.yml/runs?branch=main&per_page=100&page=${page}`);
+  const runs=data?.workflow_runs;if(!Array.isArray(runs)||page>50)throw Error('Invalid paginated API response');
+  if(runs.some(x=>x.id>receipt.run&&x.conclusion!=='skipped'&&['workflow_run','workflow_dispatch'].includes(x.event)))return false;
+  if(runs.length<100||runs.some(x=>x.id<=receipt.run))break;
+ }
  const tree=await api.request('git/trees/gh-pages?recursive=1');
  const live=await readPublication({fetch:request});
  if(receipt.proof){
