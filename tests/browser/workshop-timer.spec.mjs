@@ -860,8 +860,12 @@ test("Sequence numbers identify actual starts, retain the finished number and ig
   await expect(number).toHaveText("—");
   await page.locator("#value").fill("1");
   await page.click("#set");
-  await page.clock.runFor(1000);
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "1");
+  // The certified route 0 -> 1 takes several quarter turns at the 250 ms default; advance the fake clock until the
+  // cube reports the commit instead of assuming a fixed duration.
+  await expect.poll(async () => {
+    await page.clock.runFor(250);
+    return page.locator("#cube").getAttribute("data-value");
+  }).toBe("1");
   await expect(number).toHaveText("1");
 });
 
