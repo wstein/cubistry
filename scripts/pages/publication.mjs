@@ -47,8 +47,9 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
   let remaining=attempts;
   const deadline=now()+timeout;
   let last=null;
+  const secrets=[token];
   // Diagnostics carry only the deployment id, status and the response's errors/message, redacted and bounded; never credentials.
-  const field=value=>{if(value===undefined||value===null)return 'none';const text=typeof value==='string'?value:JSON.stringify(value);return text.split(token).join('[redacted]').slice(0,500);};
+  const field=value=>{if(value===undefined||value===null)return 'none';const text=typeof value==='string'?value:JSON.stringify(value);return secrets.filter(Boolean).flatMap(secret=>[secret,encodeURIComponent(secret)]).reduce((out,secret)=>out.split(secret).join('[redacted]'),text).slice(0,500);};
   const exhausted=()=>{
     const detail=last?` (deployment ${last.id}, last status ${field(last.status)}, errors ${field(last.errors)}, message ${field(last.message)})`:' (no status received)';
     const error=Error(`Pages deployment wait budget exhausted${detail}`);
@@ -56,7 +57,7 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
     return error;
   };
   const budget=()=>{const left=deadline-now();if(left<=0)throw exhausted();return Math.max(1,Math.min(30000,Math.floor(left)));};
-  const pause = async () => { if (--remaining <= 0) throw Error('Pages deployment wait budget exhausted'); await sleep(Math.min(10000,budget()));budget(); };
+  const pause = async () => { if (--remaining <= 0) throw exhausted(); await sleep(Math.min(10000,budget()));budget(); };
   const headers={Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
   const status = async id => {
     const limit=budget();
@@ -77,6 +78,7 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
   for (;;) {
     const oidcTimeout=budget();
     const idToken=await oidc({timeout:oidcTimeout,signal:AbortSignal.timeout(oidcTimeout)});
+    if(typeof idToken==='string')secrets.push(idToken);
     const response=await request(`https://api.github.com/repos/${REPOSITORY}/pages/deployments`,{method:'POST',headers:{...headers,'Content-Type':'application/json'},redirect:'error',signal:AbortSignal.timeout(budget()),body:JSON.stringify({artifact_id:artifact,pages_build_version:receipt.sha,oidc_token:idToken})});
     const data=await response.json();
     if(response.ok){ id=data.id; if(!hash(id))throw Error('Invalid Pages deployment identity'); break; }
