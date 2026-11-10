@@ -14,6 +14,7 @@ import { href, monthLabel } from "../src/apps/calendar7/month-view.ts";
 import { Calendar7Player, DEFAULT_SPEED, SPEEDS, StateMismatchError } from "../src/apps/calendar7/player.ts";
 import { MoveTween, smoothstep } from "../src/apps/calendar7/tween.ts";
 import { BLANK_PAPER, INK_COLORS, PAPER, TEXTURE, drawSticker } from "../src/apps/calendar7/sticker-art.ts";
+import { SCHEMES } from "../src/apps/calendar7/schemes.ts";
 import { mountCalendar7 } from "../src/apps/calendar7/mount.ts";
 
 const json = (p) => JSON.parse(readFileSync(p, "utf8"));
@@ -414,12 +415,12 @@ function fakeRoot() {
     },
     press(name) {
       const el = get(name);
-      for (const l of [...listeners.click]) l({ target: { closest: (s) => (s === "a.c7-nav" ? null : el) }, preventDefault() {} });
+      for (const l of [...listeners.click]) l({ type: "click", target: { closest: (s) => (s === "a.c7-nav" ? null : el) }, preventDefault() {} });
     },
     choose(name, value) {
       const el = get(name);
       el.value = value;
-      for (const l of [...listeners.change]) l({ target: { closest: (s) => (s === "a.c7-nav" ? null : el) } });
+      for (const l of [...listeners.change]) l({ type: "change", target: { closest: (s) => (s === "a.c7-nav" ? null : el) } });
     },
   };
   return root;
@@ -820,4 +821,30 @@ test("mount passes the surface of the state file to the stage: sticker by defaul
     assert.deepEqual(stage.surfaces, [want], JSON.stringify(field));
     inst.dispose();
   }
+});
+
+test('mount: color theme offers exactly ten named schemes with Paper Red and URL fallback',async()=>{
+ for(const [input,want]of[['','paper-red'],['paper-blue','paper-blue'],['unknown','paper-red']]){
+  const root=fakeRoot(),{env}=mountEnv();const inst=await mountCalendar7(root,q(`year=2028&month=3&scheme=${input}`),env);await idle(root);
+  assert.match(root.html,/Cube color theme/);
+  const html=root.html.match(/<select[^>]+data-c7="scheme"[^>]*>([\s\S]*?)<\/select>/)?.[1];assert(html,'a labeled scheme select exists');
+  assert.deepEqual([...html.matchAll(/<option value="([^"]+)"/g)].map(m=>m[1]),SCHEMES.map(s=>s.id));
+  assert.equal(SCHEMES.length,10);assert.equal(root.el('scheme').value,want);assert.equal(root.getAttribute('data-c7-scheme'),want);inst.dispose();
+ }
+});
+test('mount: color theme changes synchronize stage and picker while preserving unrelated query parameters',async()=>{
+ const root=fakeRoot();let search='?app=calendar7&year=2028&month=3&font=nunito&extra=keep';const{env,stage}=mountEnv({search:()=>search,replaceQuery:s=>search=s});
+ const inst=await mountCalendar7(root,q(search),env);await idle(root);const before=root.getAttribute('data-c7-digest');
+ root.choose('scheme','dracula');assert.equal(stage.schemes.at(-1),'dracula');assert.equal(root.el('scheme').value,'dracula');
+ const selected=new URLSearchParams(search);assert.equal(selected.get('scheme'),'dracula');for(const[k,v]of[['year','2028'],['month','3'],['font','nunito'],['extra','keep']])assert.equal(selected.get(k),v);
+ const current=search;inst.setScheme('paper-blue');assert.equal(root.el('scheme').value,'paper-blue');assert.equal(stage.schemes.at(-1),'paper-blue');assert.equal(search,current,'the programmatic setter stays in memory');
+ inst.setScheme('bad');assert.equal(root.el('scheme').value,'paper-red');assert.equal(root.getAttribute('data-c7-scheme'),'paper-red');
+ assert.equal(root.getAttribute('data-c7-digest'),before);assert.equal(stage.configured,1);const n=stage.schemes.length;root.press('scheme');assert.equal(stage.schemes.length,n,'opening a select is not a change');
+ inst.dispose();root.choose('scheme','dracula');inst.setScheme('dracula');assert.equal(stage.schemes.length,n,'disposed controls and setters are inert');
+});
+test('mount: color theme selected while the viewer loads is used on its first configure',async()=>{
+ const root=fakeRoot(),stage=fakeStage();let release;const gate=new Promise(r=>release=r);
+ const{env}=mountEnv({createStage:()=>gate});const inst=await mountCalendar7(root,q('year=2028&month=3&scheme=paper-blue'),env);
+ root.choose('scheme','dracula');assert.equal(root.getAttribute('data-c7-scheme'),'dracula');release(stage);await idle(root);
+ assert.deepEqual(stage.schemes,['dracula','configure']);assert.equal(stage.configured,1);inst.dispose();
 });
