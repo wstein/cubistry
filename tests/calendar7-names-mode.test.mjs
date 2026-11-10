@@ -9,6 +9,7 @@ import { LAYOUT_PARAM, NAME_SLOTS, NAME_WORDS, NAMES_NOTICE, nameAlign, nameSlot
 import { SCHEMES } from "../src/apps/calendar7/schemes.ts";
 import { FACE_FLAT, LINE_SCALE, NAME_FONT_SIZE, TEXTURE, TEXT_SQUARE, drawFace, drawSticker, nameGrid, tileClass, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { parseDisplays, parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
+import { nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
 import { mountCalendar7 } from "../src/apps/calendar7/mount.ts";
 import { href } from "../src/apps/calendar7/month-view.ts";
 import { clonePose } from "../src/apps/calendar7/engine.ts";
@@ -410,4 +411,53 @@ test("stepping from a fallback month into the window switches the print at the n
   await settle(root, "2027-12");
   assert.equal(root.getAttribute("data-c7-digest"), names.graph.nodes[19].hash);
   inst.dispose();
+});
+
+test("lower window edge: May 2026 mounts in the names layout without a notice", async () => {
+  const root = fakeRoot();
+  const { env, stage } = setup();
+  const inst = await mountCalendar7(root, q("year=2026&month=5&layout=names"), env);
+  await settle(root, "2026-05");
+  assert.equal(notice(root).hidden, true);
+  assert.equal(stage.configs.at(-1).layout, "names");
+  assert.equal(root.getAttribute("data-c7-layout"), "names");
+  assert.equal(root.getAttribute("data-c7-digest"), names.graph.nodes[0].hash);
+  inst.dispose();
+});
+
+test("an invalid month in names mode shows no notice", async () => {
+  for (const search of ["year=2027", "month=5", "year=abc&month=5", "year=2027&month=13"]) {
+    const root = fakeRoot();
+    const { env } = setup();
+    const inst = await mountCalendar7(root, q(`${search}&layout=names`), env);
+    await flush();
+    assert.equal(notice(root).hidden, true, search);
+    assert.equal(notice(root).textContent, "", search);
+    assert.match(root.view.innerHTML, /Invalid month/, search);
+    inst.dispose();
+  }
+});
+
+// ---- the font path of the name tiles (what the app draws) ----
+const glyph = { advance: 0.7, left: 0.05, right: 0.65, top: -0.72, bottom: 0 };
+const fakeFont = { style: { master: "0" }, glyphs: Object.fromEntries([..."0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map((c) => [c, c === "M" || c === "W" ? { ...glyph, advance: 0.95, left: 0.04, right: 0.91 } : glyph])), dateSize: 100 };
+
+test("font path: name letters sit on the 3-slot grid, one size for every tile, the same x as the sticker grid", () => {
+  const slot = TEXT_SQUARE / NAME_SLOTS;
+  const at = (k) => TEXTURE / 2 - TEXT_SQUARE / 2 + (k + 0.5) * slot;
+  const cases = { J: [2], MA: [1, 2], ER: [0, 1], ANU: [0, 1, 2], Y: [0], OC: [1, 2] };
+  const sizes = new Set();
+  for (const [label, slots] of Object.entries(cases)) {
+    const parts = nameLabelLayout(label, fakeFont);
+    assert.deepEqual(parts.map((p) => p.text), label.split(""), label);
+    assert.deepEqual(parts.map((p) => p.x), slots.map(at), label);
+    assert.deepEqual(parts.map((p) => p.x), nameGrid(label).map((g) => g.x), `${label} same slots as the sticker grid`);
+    parts.forEach((p) => sizes.add(p.size));
+  }
+  assert.equal(sizes.size, 1, "one font size");
+  const [size] = sizes;
+  assert.ok(size * 0.91 <= slot, "the widest capital fits a slot");
+  // A single run would have a different x for the second letter.
+  const two = nameLabelLayout("MA", fakeFont);
+  assert.ok(Math.abs(two[1].x - two[0].x - slot) < 1e-9, "letters are one slot apart");
 });
