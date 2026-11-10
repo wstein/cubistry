@@ -49,8 +49,19 @@ function reading(s,angle,want)
     !isnothing(h) && angle==2 && h==w && return :turned
     :bad
 end
+# Silent negative controls of the optics above; a wrong reading aborts as INVALID.
+function optics_selfcheck()
+    band=(text="",ink="band");blank=(text="",ink="blank");want_band=("","band");want_blank=("","blank")
+    @assert reading(band,0,want_band)==:upright && reading(blank,0,want_blank)==:upright "optics self-check: positives"
+    for a in (1,2,3)
+        @assert reading(band,a,want_band)==:bad "optics self-check: turned band must be rejected"
+    end
+    @assert reading(blank,0,want_band)==:bad "optics self-check: blank must not serve as band"
+    @assert reading(band,0,want_blank)==:bad "optics self-check: band must not serve as blank"
+    @assert reading((text="1",ink="band"),0,want_band)==:bad "optics self-check: inked tile must not serve as band"
+end
 function verify(layout,printing,chain,statesdir)
-    load_names(layout);@assert bytes2hex(sha256(read(printing)))==EXPECT_PRINT "new print pin"
+    optics_selfcheck();load_names(layout);@assert bytes2hex(sha256(read(printing)))==EXPECT_PRINT "new print pin"
     original=read_print(printing);state=copy(original);ch=read_chain_file(chain)
     @assert (ch.src.root,ch.src.year,ch.src.month)==(5,2026,5) && length(ch.edges)==20
     @assert check_front(state,board(2026,5)).bad==0 && state_sha(state)==ch.src.hash
