@@ -4,7 +4,14 @@
 # Frozen upright-beam/verify_chain.jl and strict print/root pins remain unchanged.
 module IndependentRowOne
 include(joinpath(@__DIR__,"..","upright-beam/verify_chain.jl"))
-const EXPECT_PRINT="0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127"
+const END_TEXT=get(ENV,"WINDOW_END","2028-01")
+const END_MATCH=match(r"^(\d{4})-(\d{2})\z",END_TEXT)
+@assert !isnothing(END_MATCH) "window end is YYYY-MM"
+const END_YM=Tuple(parse.(Int,END_MATCH.captures))
+@assert 1<=END_YM[2]<=12 && END_YM>=(2026,5) && END_YM<=(2100,1) "window end lies within May 2026 to January 2100"
+const END_COUNT=(END_YM[1]-2026)*12+END_YM[2]-4
+# The 21-month print stays pinned; a longer window needs its own print SHA-256 in CAL7_WINDOW_PRINT_SHA.
+const EXPECT_PRINT=END_TEXT=="2028-01" ? "0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127" : get(ENV,"CAL7_WINDOW_PRINT_SHA","")
 const EXPECT_LAYOUT="c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db"
 const NAMES=Vector{Vector{String}}()
 function load_names(path)
@@ -63,7 +70,7 @@ end
 function verify(layout,printing,chain,statesdir)
     optics_selfcheck();load_names(layout);@assert bytes2hex(sha256(read(printing)))==EXPECT_PRINT "new print pin"
     original=read_print(printing);state=copy(original);ch=read_chain_file(chain)
-    @assert (ch.src.root,ch.src.year,ch.src.month)==(5,2026,5) && length(ch.edges)==20
+    @assert (ch.src.root,ch.src.year,ch.src.month)==(5,2026,5) && length(ch.edges)==END_COUNT-1
     @assert check_front(state,board(2026,5)).bad==0 && state_sha(state)==ch.src.hash
     rule_selfcheck(state,board(2026,5))
     encode(st)="sticker\tpiece\tposition\tnormal\tup\ttext\tink\n"*join([join((s.id,s.piece,join(s.pos,','),join(s.normal,','),join(s.up,','),s.text,s.ink),'\t')*"\n" for s in st])
@@ -84,8 +91,8 @@ function verify(layout,printing,chain,statesdir)
         append!(words,e.word);total+=e.htm
         println("independent-edge\t",i,'\t',y,'\t',m,'\t',e.htm,'\t',state_sha(state),"\tACCEPT")
     end
-    @assert (y,m)==(2028,1) && apply_word(state,-reverse(words))==original
-    println("independent-verdict\tACCEPT_CHAIN\t21\t20\t",total,"\tINVERSE_PASS")
+    @assert (y,m)==END_YM && apply_word(state,-reverse(words))==original
+    println("independent-verdict\tACCEPT_CHAIN\t",END_COUNT,'\t',END_COUNT-1,'\t',total,"\tINVERSE_PASS")
 end
 end
 try
