@@ -3,6 +3,16 @@
 import java.lang.{Exception, IllegalArgumentException, System}
 
 enum WEdge { case E(Int32,Int32,(Int32,Int32,Int32,Int32),String,String,List[(Int32,Int32)]) }
+// Window end "YYYY-MM" from May 2026 to January 2100 as the month count from May 2026.
+def wEnd(text: String): Int32 \ IO = {
+    let digits=List.append(String.toList(String.slice(start=0,end=4,text)),String.toList(String.slice(start=5,end=7,text)));
+    require(String.length(text)==7 and String.slice(start=4,end=5,text)=="-" and List.forAll(c -> List.memberOf(c,String.toList("0123456789")),digits),"window end is YYYY-MM");
+    let y=match Int32.fromString(String.slice(start=0,end=4,text)) {case Some(n) => n case None => 0};
+    let m=match Int32.fromString(String.slice(start=5,end=7,text)) {case Some(n) => n case None => 0};
+    let n=(y-2026)*12+m-4;
+    require(m>=1 and m<=12 and n>=1 and (y<2100 or (y==2100 and m==1)),"window end lies within May 2026 to January 2100");
+    n
+}
 def wHash(s: String): Bool = String.length(s)==64 and List.forAll(c -> List.memberOf(c,String.toList("0123456789abcdef")),String.toList(s))
 def wMoves(rows: List[String],acc: List[(Int32,Int32)]): (List[(Int32,Int32)],List[String]) \ IO = match rows {
     case "end"::rest => (List.reverse(acc),rest)
@@ -16,29 +26,29 @@ def wMoves(rows: List[String],acc: List[(Int32,Int32)]): (List[(Int32,Int32)],Li
     }
     case Nil => throw new IllegalArgumentException("missing edge end")
 }
-def wEdges(rows: List[String],acc: List[WEdge]): List[WEdge] \ IO = match rows {
-    case "finish"::Nil => {require(List.length(acc)==20,"exactly 20 chronological edges");List.reverse(acc)}
+def wEdges(count: Int32,rows: List[String],acc: List[WEdge]): List[WEdge] \ IO = match rows {
+    case "finish"::Nil => {require(List.length(acc)==count-1,"exactly ${count-1} chronological edges");List.reverse(acc)}
     case line::rest => match fields(line) {
         case "edge"::yy::mm::hh::qq::rr::rq::sh::eh::Nil => {
             let y=integer(yy);let m=integer(mm);let h=integer(hh);let q=integer(qq);let r=integer(rr);let rotq=integer(rq);
             require(h>=0 and h<=100000 and q>=0 and q<=200000 and r>=0 and r<=100000 and rotq>=0 and rotq<=200000,"bounded nonnegative metrics");
             require(wHash(sh) and wHash(eh),"canonical edge digest");
-            let(moves,remaining)=wMoves(rest,Nil);require(List.length(acc)<20,"at most 20 edges");
-            wEdges(remaining,WEdge.E(y,m,(h,q,r,rotq),sh,eh,moves)::acc)
+            let(moves,remaining)=wMoves(rest,Nil);require(List.length(acc)<count-1,"at most ${count-1} edges");
+            wEdges(count,remaining,WEdge.E(y,m,(h,q,r,rotq),sh,eh,moves)::acc)
         }
         case _ => throw new IllegalArgumentException("edge record")
     }
     case Nil => throw new IllegalArgumentException("missing chain finish")
 }
-def wRead(raw: String): (String,List[WEdge]) \ IO = {
+def wRead(count: Int32,raw: String): (String,List[WEdge]) \ IO = {
     require(String.length(raw)<=16000000,"bounded chain input");
     match lines(raw) {
         case "cubistry.calendar7.chain.v1"::source::rest => match fields(source) {
             case "source"::r::y::m::h::Nil => {
                 require((integer(r),integer(y),integer(m))==(5,2026,5),"May 2026 identity root");require(wHash(h),"root digest");
-                let edges=wEdges(rest,Nil);
-                let count=List.foldLeft((n,e) -> {let WEdge.E(_,_,_,_,_,moves)=e;n+List.length(moves)},0,edges);
-                require(count<=100000,"bounded total moves");(h,edges)
+                let edges=wEdges(count,rest,Nil);
+                let total=List.foldLeft((n,e) -> {let WEdge.E(_,_,_,_,_,moves)=e;n+List.length(moves)},0,edges);
+                require(total<=100000,"bounded total moves");(h,edges)
             }
             case _ => throw new IllegalArgumentException("source record")
         }
@@ -90,14 +100,16 @@ def wMetrics(moves: List[(Int32,Int32)]): (Int32,Int32,Int32,Int32) = List.foldL
     let(h,q,r,rq)=acc;let(g,e)=m;
     if(Int32.modulo(g,7)==0)(h,q,r+1,rq+Int32.abs(e)) else(h+1,q+Int32.abs(e),r,rq)
 },(0,0,0,0),moves)
-def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot: String): Unit \ IO = {
+def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot: String,endText: String,printPin: String): Unit \ IO = {
     let rawLayout=read(layout);let rawPrint=read(printing);let rawChain=read(chain);
     let layoutSHA="c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db";
-    let printSHA="0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127";
+    let count=wEnd(endText);
+    // The 21-month print stays pinned; a longer window needs its own print SHA-256 as the last argument.
+    let printSHA=if(endText=="2028-01")"0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127" else printPin;
     require(stackSha(rawLayout)==layoutSHA,"new layout pin");require(stackSha(rawPrint)==printSHA,"new immutable print pin");
-    let goals=coupledGoals(coupledLabels(rawLayout),"names-band","window",oldRoot);
+    let goals=coupledGoalsN(coupledLabels(rawLayout),"names-band","window",oldRoot,count);
     let source=windowReadPrint(rawPrint);let poses=derivedPoses();let gens=List.map(i -> generator(i,poses),List.range(1,22));
-    let(root,edges)=wRead(rawChain);
+    let(root,edges)=wRead(count,rawChain);
     require(source==liftState(permIdentity(),source,poses) and wFront(source,at(goals,0)),"identity root front");
     wSelf(source,at(goals,0),poses,gens);
     require(stackSha(wText(source))==root,"root digest");
@@ -127,12 +139,13 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
     let restored=List.foldLeft((s,mv) -> {let(g,q)=mv;wMove(s,g,wInverse(q))},final,List.reverse(allMoves));
     require(restored==source,"whole-chain inverse restores all 294 surfaces");
     let(h,q,r,rq)=total;
-    println("summary\t21\t20\t${h}\t${q}\t${r}\t${rq}\t2028-01\tINVERSE_PASS");
-    println("verdict\tSAT\tlegal-retained-state-window-chain\t21\t20")
+    println("summary\t${count}\t${count-1}\t${h}\t${q}\t${r}\t${rq}\t${endText}\tINVERSE_PASS");
+    println("verdict\tSAT\tlegal-retained-state-window-chain\t${count}\t${count-1}")
 }
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {match Sys.Env.getArgs() {
-        case layout::printing::chain::states::oldRoot::Nil => wVerify(layout,printing,chain,states,oldRoot)
-        case _ => throw new IllegalArgumentException("LAYOUT PRINT CHAIN STATES_DIRECTORY ORIGINAL_EVIDENCE")
+        case layout::printing::chain::states::oldRoot::Nil => wVerify(layout,printing,chain,states,oldRoot,"2028-01","")
+        case layout::printing::chain::states::oldRoot::endText::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,endText,printPin)
+        case _ => throw new IllegalArgumentException("LAYOUT PRINT CHAIN STATES_DIRECTORY ORIGINAL_EVIDENCE [WINDOW_END PRINT_SHA256]")
     }} catch {case e: Exception => {println("INVALID\t${e.getMessage()}");System.exit(1)}}
 })
