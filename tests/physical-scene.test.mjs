@@ -186,3 +186,23 @@ test('body color changes stay in one scene and preserve its printed textures, ge
  const retired=[...a.scene.cutMaterials.values(),a.scene.coreMaterial],colors=retired.map(m=>m.color.getHexString());a.scene.dispose();a.scene.setBodyColor('#445566');assert.deepEqual(retired.map(m=>m.color.getHexString()),colors);assert.equal(a.parent.children.length,0);assert.deepEqual(state(b),beforeB);
  b.scene.dispose();source.dispose();plastic.dispose();texture.dispose();
 });
+
+test('setBodyColor leaves a scene built without an explicit body color unchanged',()=>{
+ const design=createDesign('picture'),frames=stickerPoses(design.print,initialState(design.print));
+ const source=new THREE.MeshStandardMaterial(),plastic=new THREE.MeshStandardMaterial({color:'#9e0b5c'});
+ const parent=new THREE.Group(),scene=new PhysicalCubeScene(parent,frames,new Map(frames.map(f=>[f.id,source])),plastic,1,createPresentationGeometry(),new Map(),{});scene.sync(frames);scene.setConstruction('stickerless');
+ const cuts=()=>{const out=[];parent.traverse(o=>{if(o.userData.sourceFaceStickerIds)o.material.forEach((m,i)=>{if(o.userData.sourceFaceStickerIds[i]===null)out.push(m.uuid+m.color.getHexString());});});return out.sort();};
+ const before=cuts(),keys=[...scene.cutMaterials.keys()],core=scene.coreMaterial.color.getHexString();
+ scene.setBodyColor('#112233');
+ assert.deepEqual(cuts(),before);assert.deepEqual([...scene.cutMaterials.keys()],keys);assert.equal(scene.coreMaterial.color.getHexString(),core);
+ scene.dispose();source.dispose();plastic.dispose();
+});
+
+test('setBodyColor keeps the body color field and the cut material key in step',()=>{
+ const design=createDesign('picture'),frames=stickerPoses(design.print,initialState(design.print));
+ const source=new THREE.MeshStandardMaterial(),plastic=new THREE.MeshStandardMaterial({color:'#9e0b5c'});
+ const parent=new THREE.Group(),scene=new PhysicalCubeScene(parent,frames,new Map(frames.map(f=>[f.id,source])),plastic,1,createPresentationGeometry(),new Map(),{bodyColor:'#fffdf6',coreColor:'#fffdf6'});scene.sync(frames);
+ scene.setBodyColor('#112233');
+ assert.equal(scene.bodyColor,'#112233');assert.deepEqual([...scene.cutMaterials.keys()],['#112233']);
+ scene.dispose();source.dispose();plastic.dispose();
+});
