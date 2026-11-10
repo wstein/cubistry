@@ -341,7 +341,7 @@ mode reads yet.
 
 Status: **research candidate, not certified**. English only. Data for a second mode, "names layout", in which row 1
 carries the month name as name labels of one to three letters each (columns 1 to 3, for example `MA|Y`, `NOV|EMB|ER`) and the
-empty tiles of row 1 are a separate ink class `band`. The app mode is not part of this data change. The shipped
+empty tiles of row 1 are a separate ink class `band`. The app mode is described in the next section. The shipped
 scheme A files (`public/calendar7/state.v1.json`, `graph.v1.json`, `displays.v1.json`) are unchanged and stay frozen
 by `calendar7-source.json`; the names data lives under new names in `public/calendar7/names/`.
 
@@ -381,14 +381,25 @@ exceptions whether a month lies inside a display table.
 
 Not claimed: coverage of 2000 to 2100 (or of any month outside the window), a single print for the 91 displays (the
 research corner-coupling result obstructs one permanent print for the full domain under this band model), shortest
-routes, physical build certification, a German layout, or app rendering of the `band` class (the sticker art still
-fills by empty text). Independent review of the research data is pending.
+routes, physical build certification, or a German layout. Independent review of the research data is pending.
+
+### Names layout mode in the app (preview)
+
+Status: **research candidate, not certified**. The mode is a second layout of the 7x7 calendar, not the default.
+
+- **Control.** The appearance row has a Layout selector (accessible name "Cube layout") beside Font style and Cube color theme: "Standard" and "Names (preview, May 2026 - Jan 2028)". The URL parameter is `layout=names`; every other value, and no value, is the standard layout. The selector updates only `layout` in the current URL (like the color theme); nothing is stored elsewhere. Below 601 px the three selects share one row of 44 px controls, the labels are visually hidden and the accessible names stay.
+- **Window.** The names layout is proven for May 2026 to January 2028 only. The month shown is the month of the URL (`year` and `month`), else today's month. Outside the window the app shows the standard layout (scheme A) and a visible notice, also exposed as a status region: "The names layout covers May 2026 to January 2028. Showing the standard layout." If the names files cannot be loaded, the same fallback shows "The names layout data could not be loaded. Showing the standard layout." Both cases raise no error and the selector keeps the chosen value.
+- **Loading.** `public/calendar7/names/{state,graph,displays}.v1.json` are fetched only when the mode is selected (at mount with `layout=names`, or when the selector changes), once per page.
+- **A mode switch is a different print.** The cube is rebuilt from the state file of the layout in effect at the displayed month (a jump, no animation); the old player and pose are dropped and nothing of the old state is carried over. Stepping from a month outside the window into it (or out of it) switches the print the same way. The step links inside the window follow the names chain; its ends are January 2028 and May 2026.
+- **Rendering.** `band` is its own tile class (empty text, ink `band`), distinct from `blank` (the empty days of rows 3 to 7). A band tile takes the fill of the month name tiles (`bandFill`, else `dayFill`); band and name tiles carry the row 1 line `lineRow1` where a scheme has one, the weekday-name tiles carry `lineRow2`, `blank` keeps `emptyFill`. The line and the fill are properties of the tile class (label and ink), never of the position, so they travel with the tile after a scramble. Name labels keep the ink class month, MON to FRI the weekday class, SUN and SAT the red class. The standard layout is unchanged (`lineRow1` stays off there).
+- **Name tiles.** Every name tile is a monospaced grid of three slots with one font size: the first tile of a multi-tile word is right-flush, the last tile left-flush, a middle tile full, a single tile centered (`src/apps/calendar7/layout.ts`; the alignment is derived from the label, since a tile moves). The 3D view has no seam between cubies that the app can remove; the seam token is used by the sheet only.
+- **Not claimed.** Coverage of 2000 to 2100 or of any month outside the window (a corner-pool obstruction was proven for all 91 displays), certification, a physical build, shortest routes. Default stays Standard.
 
 ## Color schemes
 
 `src/apps/calendar7/schemes.ts` holds ten color schemes of the month sheet as plain role tokens (day fill and ink, weekday ink, weekend fill or tint and ink, band, month ink, weekday row, empty days, seam, the two lines and the SUN/SAT ink): Paper Red (default), Paper Blue, Classic, Solarized Light, Gruvbox Light, Dracula, Monokai, Gruvbox Dark, Catppuccin Mocha and High Contrast. Saturday and Sunday share one weekend token set. The 3D view applies what it can of a scheme (see below); the Cube color theme selector beside Font style offers all ten schemes. [tests/calendar7-schemes.test.mjs](../tests/calendar7-schemes.test.mjs) checks the structure and the contrast of every text pair (4.5:1; 3:1 only for the two large bold pairs of Paper Red: weekend numerals and SUN/SAT letters; the small second number of folded weekend labels uses `weekendInkSmall` at 4.5:1) and of every line against the tiles it touches, empty days included (3:1); band edges are not gated. The six third-party palettes (inspired by Solarized, Gruvbox, Dracula, Monokai, Catppuccin) are written from memory, not checked against official sources, and need a license check.
 
-Limitation: the shipped print (`public/calendar7/state.v1.json`, 294 stickers; ink classes blank 51, dark 151, red 62, month 25, weekday 5) has one blank class, and `src/apps/calendar7/sticker-art.ts` fills by `text === ""` (`BLANK_PAPER`) versus `PAPER`. A band that runs continuously over the blank tiles of row 1, a line under row 1, or white empty days next to a colored band need a separate "band blank" tile class and therefore new print data, planned with the row-1 name layout. The 3D view applies the rest, as described next.
+Limitation of the standard layout: the shipped print (`public/calendar7/state.v1.json`, 294 stickers; ink classes blank 51, dark 151, red 62, month 25, weekday 5) has one blank class, so a band that runs over the blank tiles of row 1, a line under row 1, or white empty days next to a colored band need the separate tile class `band` of the names layout. The 3D view applies the rest, as described next.
 
 ### Schemes in the 3D view
 
@@ -404,10 +415,11 @@ The mapping uses only the printed label and its ink class, never the position of
 | SUN and SAT, ink red | `weekdayRowFill`, else the weekend ground | `sunSatInk` |
 | month letters, ink month | `bandFill` or `dayFill` | `monthInk` |
 | blank | `emptyFill` | none |
+| band (names layout only), empty text with ink band | `bandFill` or `dayFill` | none; `lineRow1` at the bottom edge |
 
 A scheme with `lineRow2` draws that line at the bottom edge of the weekday-name tiles (MON to FRI, SUN, SAT), `px` times 4 texture pixels thick (the texture is 192 px, a sheet tile about 48 px); on a stickerless face it sits on the bottom edge of the flat part. The folded labels keep the strict art and the 6/9 rule is unchanged. Calendar7 always uses stickerless faces; its cut faces and core take the scheme day fill. Color changes update owned materials in place, with a pending body-color change applied after the active turn. Texture, body and geometry identities remain stable.
 
-What waits for a new print class `band` (with the row-1 name layout): the print has one blank class, so a blank tile of row 1 cannot join the month band and shows `emptyFill`, and white empty days next to a colored band are not possible; `lineRow1` (the line under row 1) is not drawn; the `seam` token is used by the sheet only (the 3D view has no drawn seam). Until then a band scheme shows its band on the month-letter tiles only.
+The tile class `band` exists in the names layout (see above): there a blank tile of row 1 joins the month band, empty days stay `emptyFill` and `lineRow1` is drawn on band and name tiles. In the standard layout the shipped print has one blank class, so its blank tiles of row 1 show `emptyFill`, `lineRow1` is not drawn and a band scheme shows its band on the month-letter tiles only. The `seam` token is used by the sheet only (the 3D view has no drawn seam).
 
 ## Rule profiles: legacy and strict
 
