@@ -3,6 +3,11 @@
 # Native retained-state replay: independent direct294 and pose264 actions.
 include(joinpath(@__DIR__,"..","row1-window-print/common.jl"))
 const WINDOW_PRINT_SHA="0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127"
+# Window end YYYY-MM (env WINDOW_END, default 2028-01). The 21-month print stays pinned; a longer
+# window needs its own print, whose SHA-256 must be supplied in CAL7_WINDOW_PRINT_SHA.
+const WINDOW_END=get(ENV,"WINDOW_END","2028-01")
+const WINDOW_MONTHS=window_end_months(WINDOW_END)
+const WINDOW_PRINT_EXPECT=WINDOW_END=="2028-01" ? WINDOW_PRINT_SHA : get(ENV,"CAL7_WINDOW_PRINT_SHA","")
 const WINDOW_LAYOUT_SHA="c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db"
 function chain_lines(path)
     raw=read(path,String)
@@ -30,9 +35,9 @@ function read_window_chain(path)
         end
         @assert cursor<length(ls) && ls[cursor]=="end";cursor+=1
         push!(edges,(year=y,month=m,metrics=(h,q,r,rq),source=f[8],finish=f[9],moves=moves))
-        @assert length(edges)<=20
+        @assert length(edges)<=WINDOW_MONTHS-1
     end
-    @assert cursor==length(ls) && length(edges)==20 "exactly 20 chronological edges"
+    @assert cursor==length(ls) && length(edges)==WINDOW_MONTHS-1 "exactly $(WINDOW_MONTHS-1) chronological edges"
     root,edges
 end
 function chain_turn(v,axis)
@@ -83,7 +88,7 @@ function chain_selfcheck(state,goal,source,action,gens)
 end
 function verify_window_chain(layout,printing,path,statesdir)
     @assert bytes2hex(sha256(read(layout)))==WINDOW_LAYOUT_SHA "new layout pin"
-    @assert bytes2hex(sha256(read(printing)))==WINDOW_PRINT_SHA "new immutable print pin"
+    @assert bytes2hex(sha256(read(printing)))==WINDOW_PRINT_EXPECT "new immutable print pin"
     labels=coupled_labels(read(layout,String));goals=coupled_goals(labels,"names-band","window")
     source=window_read_print(printing);action=pose_action();gens=[UInt16.(g) for g in action.generators]
     state=[(id=s.id,piece=s.piece,pos=s.home,normal=s.normal,up=s.up,text=s.text,ink=s.ink) for s in source]
@@ -92,7 +97,7 @@ function verify_window_chain(layout,printing,path,statesdir)
     chain_selfcheck(state,goals[1],source,action,gens)
     @assert chain_digest(state)==root "root digest"
     @assert read(joinpath(statesdir,"state-01.tsv"),String)==chain_state_text(state;header=true) "root full-state snapshot"
-    println("input\t",WINDOW_LAYOUT_SHA,'\t',WINDOW_PRINT_SHA,'\t',bytes2hex(sha256(read(path))))
+    println("input\t",WINDOW_LAYOUT_SHA,'\t',WINDOW_PRINT_EXPECT,'\t',bytes2hex(sha256(read(path))))
     println("root\t2026\t5\t",root)
     total=(0,0,0,0);allmoves=Tuple{Int,Int}[]
     for (i,edge) in enumerate(edges)
@@ -120,8 +125,8 @@ function verify_window_chain(layout,printing,path,statesdir)
     end
     for (g,e) in reverse(allmoves);state=chain_move(state,g,e==2 ? 2 : -e);end
     @assert state==initial "whole-chain inverse restores all 294 surfaces"
-    println("summary\t21\t20\t",join(total,'\t'),"\t2028-01\tINVERSE_PASS")
-    println("verdict\tSAT\tlegal-retained-state-window-chain\t21\t20")
+    println("summary\t",WINDOW_MONTHS,'\t',WINDOW_MONTHS-1,'\t',join(total,'\t'),'\t',WINDOW_END,"\tINVERSE_PASS")
+    println("verdict\tSAT\tlegal-retained-state-window-chain\t",WINDOW_MONTHS,'\t',WINDOW_MONTHS-1)
 end
 if abspath(PROGRAM_FILE)==(@__FILE__)
     try
