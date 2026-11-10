@@ -36,7 +36,14 @@ function coupled_optic(text,angle,ink)
     image_normal(text,mod(angle,4),ink)
 end
 coupled_art(text,ink,r,c)=coupled_optic(text,coupled_angle(r,c),ink)
-function coupled_goals(labels,profile,domain)
+# Number of window months from May 2026 through WINDOW_END (YYYY-MM); the default is January 2028.
+function window_end_months(window_end)
+    m=match(r"^(\d{4})-(\d{2})\z",window_end);@assert !isnothing(m) "window end is YYYY-MM"
+    y,mo=parse.(Int,m.captures);@assert 1<=mo<=12 "window end month"
+    n=(y-2026)*12+mo-4;@assert n>=1 && (y,mo)<=(2100,1) "window end lies within May 2026 to January 2100"
+    n
+end
+function coupled_goals(labels,profile,domain;window_end=get(ENV,"WINDOW_END","2028-01"))
     @assert profile in ("names-band","names","scheme-a") "known profile"
     @assert domain in ("all","window") "known domain"
     goals=if domain=="all"
@@ -46,8 +53,8 @@ function coupled_goals(labels,profile,domain)
         @assert all((m,offset(y,m,"EN"),daysinmonth(Date(y,m,1))) in shapes for y in 1900:2099 for m in 1:12) "2400-month shape coverage"
         [(year=g.year,month=g.month,board=copy(g.board)) for g in reps]
     else
-        ds=collect(Date(2026,5,1):Month(1):Date(2028,1,1))
-        @assert length(ds)==21
+        n=window_end_months(window_end);ds=collect(Date(2026,5,1):Month(1):Date(2026,5,1)+Month(n-1))
+        @assert length(ds)==n
         [(year=year(d),month=month(d),board=stacked_board(year(d),month(d),PURE_VARIANT)) for d in ds]
     end
     if profile!="scheme-a"
