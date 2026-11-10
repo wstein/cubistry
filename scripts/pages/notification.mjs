@@ -21,13 +21,13 @@ export async function currentNotification(api,receipt,{fetch:request=fetch}={}){
   if(runs.some(x=>x.id>receipt.run&&x.conclusion!=='skipped'&&['workflow_run','workflow_dispatch'].includes(x.event)))return false;
   if(runs.length<100||runs.some(x=>x.id<=receipt.run))break;
  }
- const tree=await api.request('git/trees/gh-pages?recursive=1');
+ const remote=(await api.request('commits/gh-pages'))?.commit?.tree?.sha;
  const live=await readPublication({fetch:request});
  if(receipt.proof){
   const source=await api.request(`actions/runs/${receipt.proof.run}`);
   if(!trustedPublisher(source)||source.run_attempt!==receipt.proof.attempt||source.head_sha!==receipt.proof.sha)return false;
  }
- return receipt.proof===null || Boolean(receipt.proof.storage===tree?.sha&&samePublication(receipt.proof,live));
+ return receipt.proof===null || Boolean(receipt.proof.storage===remote&&samePublication(receipt.proof,live));
 }
 export async function loadNotification(api,runId){
  const run=await api.request(`actions/runs/${runId}`);

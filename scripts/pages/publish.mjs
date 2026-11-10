@@ -11,8 +11,10 @@ const numbers=text=>{const value=JSON.parse(text||'[]');if(!Array.isArray(value)
 const mode=process.argv[2];
 if(mode==='prepare'){
  const storage=execFileSync('git',['-C','site','rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim();
+ // git/trees/<branch> reports the branch's commit sha; the tree sha is on the commit.
+ const remote=(await api.request('commits/gh-pages'))?.commit?.tree?.sha;
  const tree=await api.request('git/trees/gh-pages?recursive=1');
- if(tree?.sha!==storage)throw Error('Storage changed while preparing publication');
+ if(remote!==storage)throw Error('Storage changed while preparing publication');
  const live=await readVerifiedPublication(api,{context:{run,attempt,sha}});
  const tracked=[...new Set([...previewInventory(tree),...numbers(process.env.TRACKED)])].sort((a,b)=>a-b);
  const publish=live?.storage!==storage||JSON.stringify(live?.tracked)!==JSON.stringify(tracked);
@@ -39,7 +41,7 @@ if(mode==='prepare'){
  }});
 }else if(mode==='receipt'){
  const proof=await readPublication();
- const tree=await api.request('git/trees/gh-pages?recursive=1');
- const value={schema:1,run,attempt,sha,numbers:numbers(process.env.NOTIFY),proof:proof?.storage===tree?.sha?proof:null};
+ const remote=(await api.request('commits/gh-pages'))?.commit?.tree?.sha;
+ const value={schema:1,run,attempt,sha,numbers:numbers(process.env.NOTIFY),proof:proof?.storage===remote?proof:null};
  await writeFile('notification.json',JSON.stringify(value));
 }else throw Error('Unknown publication mode');
