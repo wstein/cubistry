@@ -2,7 +2,8 @@
 // Pin, convert and verify the English 7x7 calendar data (pure split, month-letter scheme A)
 // from the research branch. Research candidate, not certified. No hand-edited data: the
 // files under data/calendar7 are pinned research/artifact copies or Julia-derived data,
-// and public/calendar7 is derived from them by this script alone.
+// and the scheme A files in public/calendar7 are derived from them by this script alone (the names folder is
+// derived by scripts/export-calendar7-names.mjs).
 //
 //   node scripts/prepare-calendar7.mjs --check [--require-commit]
 //       Verify the pinned copies and Julia exports (SHA-256), that the runtime files equal
