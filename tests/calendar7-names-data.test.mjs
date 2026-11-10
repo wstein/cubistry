@@ -219,7 +219,7 @@ test("parsers: band needs empty text, window displays need consistent counts", (
   bad.stickers[ib].text = "X";
   assert.throws(() => parseState(bad), /blank text and blank ink must coincide|band/);
   const disp = json(DIR + "displays.v1.json");
-  assert.throws(() => parseDisplays({ ...disp, months: disp.months.slice(1) }), /months/);
+  assert.throws(() => parseDisplays({ ...disp, months: disp.months.slice(1) }), /1 display per month at most/);
   assert.throws(() => parseDisplays({ ...disp, firstMonth: 13 }), /firstMonth/);
   assert.throws(() => parseDisplays({ ...disp, inks: ["blank", "dark", "month", "red", "weekday", "x"] }), /ink table/);
 });
@@ -232,6 +232,11 @@ test("the shipped scheme A files are frozen and the repository check still passe
   }
   const out = execFileSync(process.execPath, ["scripts/prepare-calendar7.mjs", "--check"], { encoding: "utf8" });
   assert.match(out, /calendar7 data OK/);
+});
+
+test("the repository check of the names data passes (npm run verify:calendar7-names)", () => {
+  const out = execFileSync(process.execPath, ["scripts/export-calendar7-names.mjs", "--check"], { encoding: "utf8" });
+  assert.match(out, /calendar7 names data OK \(21 states, 20 edges, 7338 HTM, 7514 QTM, 368 rotations\)/);
 });
 
 test("exporter: output is byte-identical to the committed files (needs CALENDAR7_NAMES_RESEARCH)", (t) => {
