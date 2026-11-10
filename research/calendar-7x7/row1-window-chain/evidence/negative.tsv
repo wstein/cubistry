@@ -1,0 +1,14 @@
+case	julia	flix
+wrong-adjacent-month	REJECT	REJECT
+wrong-htm	REJECT	REJECT
+wrong-qtm	REJECT	REJECT
+wrong-rotation-count	REJECT	REJECT
+wrong-rotation-qtm	REJECT	REJECT
+wrong-source-hash	REJECT	REJECT
+wrong-end-hash	REJECT	REJECT
+middle-slice-generator	REJECT	REJECT
+zero-exponent	REJECT	REJECT
+noncanonical-lf	REJECT	REJECT
+missing-finish	REJECT	REJECT
+changed-hidden-root-surface	REJECT	REJECT
+changed-retained-surface	REJECT	REJECT
