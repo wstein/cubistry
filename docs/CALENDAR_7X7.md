@@ -301,6 +301,9 @@ globally; no date-dependent profile selection or second runtime data set exists.
 | `public/calendar7/state.v1.json` | The printing (piece, text, ink) and the root pose of each sticker |
 | `public/calendar7/graph.v1.json` | Route graph: 884 nodes (state hash, display, month) and 883 edges (move words) |
 | `public/calendar7/displays.v1.json` | 91 display sheets and the display id of each month 2026 to 2099 |
+| `public/calendar7/names/` | Names layout data, window May 2026 to January 2028 only: `state.v1.json`, `graph.v1.json`, `displays.v1.json`, `NOTICE.txt`, `manifest.sha256`, `research-inputs.sha256` (see "Names layout data") |
+| [scripts/export-calendar7-names.mjs](../scripts/export-calendar7-names.mjs) | Exporter and check of the names data (Node, standard library plus the app engine) |
+| [tests/calendar7-names-data.test.mjs](../tests/calendar7-names-data.test.mjs) | Parse, full replay with totals, owner layout in rows 1 and 2, glyph and strict-art rules of the names data |
 | [scripts/prepare-calendar7.mjs](../scripts/prepare-calendar7.mjs) | Pin, convert and check (Node, no Python) |
 | `src/apps/calendar7/` | Pure engine, display, graph, month-view, player and tween modules (no DOM, no timers), the sticker art, the WebGL viewer and the DOM mount of the mode |
 | [tests/calendar7-replay.test.mjs](../tests/calendar7-replay.test.mjs) | Full replay and negative controls, part of `npm test` |
@@ -331,6 +334,47 @@ globally; no date-dependent profile selection or second runtime data set exists.
   formula are in the file.
 - The shipped strict rule has no glyph aliases. Only 0 (any turn) and 6/9
   (half turn) have neutral readings; other glyphs and split labels must be upright.
+
+## Names layout data (window May 2026 to January 2028)
+
+Status: **research candidate, not certified**. English only. Data for a second mode, "names layout", in which row 1
+carries the month name as one to three multi-letter labels (columns 1 to 3, for example `MA|Y`, `NOV|EMB|ER`) and the
+empty tiles of row 1 are a separate ink class `band`. The app mode is not part of this data change. The shipped
+scheme A files (`public/calendar7/state.v1.json`, `graph.v1.json`, `displays.v1.json`) are unchanged and stay frozen
+by `calendar7-source.json`; the names data lives under new names in `public/calendar7/names/`.
+
+| Item | Names data |
+| --- | --- |
+| Window | May 2026 to January 2028: 21 states, 20 chronological edges (outside the window the app keeps scheme A) |
+| Moves | 7338 HTM, 7514 QTM, 368 whole-cube rotations (376 rotation QTM); stored words, not optimized |
+| State | `"surface":"face"` (stickerless labels on the cubie faces); ink classes red 68, month 24, band 12, dark 153, blank 32, weekday 5 |
+| Displays | `firstMonth` 5 turns the table into a window table: 21 displays, one per month; inks `blank dark month red weekday band` |
+| Source | `research/calendar-7x7/row1-revision`, `row1-window-print`, `row1-window-chain` on `research/cube-display-feasibility` (commit `cc50ebaad0e0fe66d654121a67088f3d6c78c6a8`) |
+
+Ink classes: a `month` tile is a name label, a `band` tile is empty and belongs to row 1 (its bottom line must be
+upright), a `blank` tile is an empty day of rows 3 to 7. `band` and `blank` both have empty text, so the state parser
+requires empty text exactly for these two inks, and the front rule compares `band` with its orientation and never
+with `blank`. The strict rules are unchanged: 6 and 9 read as each other after a half turn, 0 reads under any turn,
+O is upright and is not 0, split labels `23/30` and `24/31` stay upright. No single-character 0 or O tile exists in
+this print.
+
+Regenerate and check (research branch checkout or archive at `$RESEARCH`):
+
+```sh
+node scripts/export-calendar7-names.mjs "$RESEARCH"       # writes public/calendar7/names/
+npm run verify:calendar7-names                            # manifest, parsers, replay of 20 edges, totals
+npm run verify:calendar7-names -- "$RESEARCH"             # also regenerates and compares byte for byte
+node --test tests/calendar7-names-data.test.mjs           # CALENDAR7_NAMES_RESEARCH=$RESEARCH also runs the exporter
+```
+
+The exporter refuses input whose digests differ from the research `experiment.json`, replays every stored word with the
+app engine, requires each result to equal the research snapshot `state-NN.tsv`, the stored hash and the display
+sheet, and writes the same bytes on every run.
+
+Not claimed: coverage of 2000 to 2100 (or of any month outside the window), a single print for the 91 displays (the
+research corner-coupling result obstructs one permanent print for the full domain under this band model), shortest
+routes, physical build certification, a German layout, or app rendering of the `band` class (the sticker art still
+fills by empty text). Independent review of the research data is pending.
 
 ## Color schemes
 

@@ -19,6 +19,7 @@ extend-exclude = [
   "**/*.pdf",
   # Generated 7x7 calendar route graph: encoded move words, one character per move.
   "public/calendar7/graph.v1.json",
+  "public/calendar7/names/graph.v1.json",
   # Exact upstream notices: retain their original legal wording verbatim.
   "third-party/cubing/xyzzy-kilominx-NOTICE.txt",
   "third-party/cubing/fto-MIT-NOTICE.txt",
