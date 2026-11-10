@@ -21,9 +21,15 @@ interface Request {
 }
 /** Main-thread deadline for one solve; product behavior. */
 export const DEFAULT_SOLVER_TIMEOUT_MS = 8000;
-/** A finite positive number overrides the default; anything else is ignored. */
+/**
+ * A finite positive number up to the setTimeout limit (2^31 - 1 ms) overrides
+ * the default; anything else is ignored.
+ */
 export function solverTimeoutMs(value: unknown): number {
-  return typeof value === "number" && Number.isFinite(value) && value > 0
+  return typeof value === "number" &&
+    Number.isFinite(value) &&
+    value > 0 &&
+    value <= 2 ** 31 - 1
     ? value
     : DEFAULT_SOLVER_TIMEOUT_MS;
 }
