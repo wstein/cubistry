@@ -319,7 +319,10 @@ test("every Timer move keeps live timing attachable after an initially untimed t
   for(let i=0;!source&&i<20;i++)await new Promise(r=>setImmediate(r));
   assert.equal(typeof source,"function");assert.equal(source(),null);
   assert.equal(seen.length,1); // The first, nonfinal turn owns the live callback.
-  h.c.setDeadline(89,10000,250);assert.equal(source().endAt,9500);
+  h.c.setDeadline(89,10000,250);
+  // D2 B2 R2: the first half turn ends before four remaining quarter units.
+  assert.equal(source().endAt,9000);assert.equal(source().durationMs,500);
+  assert.equal(source().lateDurationMs,20);
   h.c.clearDeadline();assert.equal(source(),null);
   release();await settle(h.c);assert.equal(stateEquals(h.c.state,route.states[89]),true);
   assert.equal(seen.length,3);assert(seen.every(s=>typeof s==="function"&&s()===null));
