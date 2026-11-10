@@ -1,5 +1,5 @@
 English 7x7 calendar cube, names layout data (research candidate, not certified)
-Window May 2026 to January 2028 only (21 months, 20 edges). English only. Outside the window the app uses the shipped scheme A data.
+Window May 2026 to January 2028 only (21 months, 20 edges). English only. The app mode that reads this folder, with scheme A as the planned fallback outside the window, is a later change.
 Status: research candidate, not certified. No shortest-route, global-print or build-certification claim.
 Created by Werner Stein with AI assistance (Codex, OpenAI). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
 
