@@ -20,5 +20,12 @@ chain=joinpath(ext,"candidate.moves.tsv")
     @test_throws "seam join" check_seam(stored,sstates,broken(r->(r[i]=field(r[i],8,repeat("0",64));r)),ext)
     @test_throws "byte-identical prefix" check_seam(stored,sstates,broken(r->(r[3]=field(r[3],4,"1");r)),ext)
     @test_throws "byte-identical prefix" check_seam(stored,sstates,stored,sstates)
+    # CM6: a stored chain whose last end digest is wrong must make the generator fail at the seam.
+    bad=joinpath(out,"bad-stored.tsv");rs=readlines(stored);j=findlast(startswith("edge\t"),rs)
+    rs[j]=field(rs[j],9,repeat("0",64));write(bad,join(rs,'\n')*"\n")
+    benv=merge(ENV,Dict("WINDOW_END"=>"2028-02","SEAM_CHAIN"=>bad,"SEAM_STATES"=>sstates))
+    err=joinpath(out,"bad.err")
+    @test !success(pipeline(ignorestatus(setenv(`$(Base.julia_cmd()) --startup-file=no $(joinpath(HERE,"generate.jl")) $(joinpath(out,"bad-out"))`,benv));stdout=devnull,stderr=err))
+    @test occursin("seam: replayed stored end state",read(err,String))
 end
 println("mutations: seam join, stored prefix and equal chain above; no full sweep")

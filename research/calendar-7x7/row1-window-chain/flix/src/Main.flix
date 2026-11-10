@@ -137,7 +137,8 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
     },(source,permIdentity(),Nil,(0,0,0,0)),List.zipWithIndex(edges));
     let(final,_,allMoves,total)=result;
     let Goal.G(lastYear,lastMonth,_)=at(goals,count-1);
-    require(List.length(goals)==count and List.length(edges)==count-1 and (lastYear*12+lastMonth)-(2026*12+5)==count-1,"window end matches the last chain edge");
+    let WEdge.E(edgeYear,edgeMonth,_,_,_,_)=at(edges,count-2);
+    require(List.length(goals)==count and List.length(edges)==count-1 and (edgeYear,edgeMonth)==(lastYear,lastMonth) and (lastYear*12+lastMonth)-(2026*12+5)==count-1,"window end matches the last chain edge");
     let restored=List.foldLeft((s,mv) -> {let(g,q)=mv;wMove(s,g,wInverse(q))},final,List.reverse(allMoves));
     require(restored==source,"whole-chain inverse restores all 294 surfaces");
     let(h,q,r,rq)=total;
