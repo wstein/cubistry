@@ -54,6 +54,24 @@ for (const word of NAME_WORDS) {
 export const nameAlign = (label: string): NameAlign => ALIGN.get(label) ?? "center";
 
 /**
+ * Edge a name tile is anchored to when it is wider than a cubie pitch (a tile on a thick outer layer of the names layout):
+ * 1 = its right edge (the first tile of a multi-tile word, also a three-letter one), -1 = its left edge (the last tile),
+ * 0 = its center. Anchoring to the shared edge keeps the letter pitch uniform across the tile boundary; the tiles of the
+ * first column sit on corner cubies and are always first tiles. Built from `NAME_WORDS`; a label used with two anchors throws.
+ */
+const ANCHOR = new Map<string, -1 | 0 | 1>();
+for (const word of NAME_WORDS) {
+  word.forEach((tile, k) => {
+    const anchor = word.length === 1 ? 0 : k === 0 ? 1 : k === word.length - 1 ? -1 : 0;
+    if (ANCHOR.has(tile) && ANCHOR.get(tile) !== anchor) throw new Error(`name tile ${tile} has two anchors`);
+    ANCHOR.set(tile, anchor);
+  });
+}
+export const nameAnchor = (label: string): -1 | 0 | 1 => ANCHOR.get(label) ?? 0;
+/** Shift (cubie pitches) of the letters of a tile of width `width` (in cubie pitches) from the 1-wide placement: anchor * (width - 1) / 2. */
+export const nameTileShift = (label: string, width: number): number => (nameAnchor(label) * (width - 1)) / 2;
+
+/**
  * Offset of letter `i` of a name tile from the tile center, in cubie pitches (scene units). The slots are thirds of the
  * cubie pitch, so the letter pitch is 1/3 over the whole row of tiles, across tile boundaries too (a middle tile of three
  * letters fills its pitch exactly). The one place of the slot math (sticker art and font art).
