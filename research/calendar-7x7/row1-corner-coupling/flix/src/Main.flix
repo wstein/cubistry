@@ -43,7 +43,11 @@ def coupledOptic(g: String,a: Int32,ink: String): Art \ IO = {
     } else opticR(HalfRule.Strict,g,q,ink)
 }
 def coupledArt(g: String,ink: String,row: Int32,col: Int32): Art \ IO = coupledOptic(g,orbitAngle(row,col),ink)
-def coupledGoals(labels: List[List[String]],profile: String,domain: String,oldRoot: String): List[Goal] \ IO = {
+def coupledGoals(labels: List[List[String]],profile: String,domain: String,oldRoot: String): List[Goal] \ IO =
+    coupledGoalsN(labels,profile,domain,oldRoot,21)
+// windowMonths counts the window months from May 2026; the default window ends in January 2028 (21 months).
+def coupledGoalsN(labels: List[List[String]],profile: String,domain: String,oldRoot: String,windowMonths: Int32): List[Goal] \ IO = {
+    require(windowMonths>=1 and windowMonths<=885,"window end lies within May 2026 to January 2100");
     require(profile=="names-band" or profile=="names" or profile=="scheme-a","known profile");
     require(domain=="all" or domain=="window","known domain");
     let reps=representatives();validateTargets(read(oldRoot+"/targets.tsv"),reps);
@@ -57,8 +61,8 @@ def coupledGoals(labels: List[List[String]],profile: String,domain: String,oldRo
         let gs=List.map(i -> {
             let y=2026+(i+4)/12;let m=Int32.modulo(i+4,12)+1;
             Goal.G(y,m,stackedBoard("F31=bfold,S30=bfold,S31=bfold;H=555555555222",y,m))
-        },List.range(0,21));
-        require(List.length(gs)==21,"21 window months");gs
+        },List.range(0,windowMonths));
+        require(List.length(gs)==windowMonths,"${windowMonths} window months");gs
     };
     List.map(g -> {
         let Goal.G(y,m,board)=g;
