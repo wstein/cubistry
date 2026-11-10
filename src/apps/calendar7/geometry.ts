@@ -25,3 +25,11 @@ export const NAMES_BODY_WIDTH = 1 - NAMES_GAP;
 export const NAMES_FACE_PX_PER_UNIT = 196.77;
 
 export const bodyWidthFor = (layout: Layout): number => (layout === "names" ? NAMES_BODY_WIDTH : STANDARD_BODY_WIDTH);
+
+/**
+ * Tone-mapping exposure of the renderer (renderer.toneMappingExposure). 1 is the shared presentation value and stays the
+ * value of the standard layout and of every other app; the names layout raises it so white fields do not render grey.
+ */
+export const STANDARD_EXPOSURE = 1;
+export const NAMES_EXPOSURE = 2.6;
+export const exposureFor = (layout: Layout): number => (layout === "names" ? NAMES_EXPOSURE : STANDARD_EXPOSURE);
