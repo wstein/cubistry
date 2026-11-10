@@ -237,3 +237,20 @@ test('freshness pagination stops exactly at the receipt run or at a short page',
  assert.equal(await currentNotification(b,note,{fetch:async()=>json(receipt)}),true);
  assert.deepEqual(b.reads,[1]);
 });
+// Fake status endpoint that never leaves in_progress; the fake clock advances only through sleep.
+function stuckFetch({delay=0,body={status:'deployment_in_progress'}}={}){
+ return async(url,options={})=>{
+  if(options.method==='POST')return json({id:sha},201);
+  await new Promise((resolve,reject)=>{
+   const timer=setTimeout(resolve,delay);
+   options.signal?.addEventListener('abort',()=>{clearTimeout(timer);reject(options.signal.reason);});
+  });
+  return json(body);
+ };
+}
+test('a status poll in the last milliseconds ends with the budget error, never TimeoutError',async()=>{
+ let time=0;
+ // After two 10 s sleeps 1 ms is left; the 30 ms status response outlives the 1 ms request timeout.
+ await assert.rejects(deployPages({receipt,artifact:55,token:'test',oidc:async()=>'oidc-test',now:()=>time,timeout:20001,sleep:async ms=>{time+=ms;},attempts:60,fetch:stuckFetch({delay:30})}),
+  error=>{assert.match(error.message,/Pages deployment wait budget exhausted/);assert.notEqual(error.name,'TimeoutError');return true;});
+});
