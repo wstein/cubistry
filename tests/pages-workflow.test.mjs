@@ -195,14 +195,26 @@ test("only the read-only Pages build supersedes older main heads", () => {
   assert.doesNotMatch(builder.split("jobs:\n")[0],/\nconcurrency:/);
 });
 
-test("every external action in the Pages build and Counter workflows is pinned by commit SHA", () => {
+// Expected pins. A new or changed pin in these workflows must update this table (release name verified by a human against the upstream tag).
+const PINS = new Map([
+  ["actions/checkout", ["3d3c42e5aac5ba805825da76410c181273ba90b1", "v7.0.1"]],
+  ["actions/setup-node", ["949feb2413d6458794dcd2491c4babbbce0c15c1", "v7.1.0"]],
+  ["actions/setup-python", ["6d4fd22b20465ccc0f7354476588e8df7c9ca0e0", "v7.1.0"]],
+  ["actions/upload-artifact", ["cf430e030ddbb5b0abf93d22962f4752f3646cd9", "v7.0.2"]],
+  ["actions/upload-pages-artifact", ["fc324d3547104276b827a68afc52ff2a11cc49c9", "v5.0.0"]],
+  ["actions/deploy-pages", ["368f82528645a54fb793d4d04e342629a3f51346", "v5.0.1"]],
+]);
+test("every external action in the Pages build and Counter workflows matches the expected SHA and release pin", () => {
   for (const name of ["pages.yml", "counter.yml", "counter-browser.yml"]) {
     const source = readFileSync(new URL(`../.github/workflows/${name}`, import.meta.url), "utf8");
     const uses = [...source.matchAll(/^\s*(?:- )?uses: (?!\.\/)(\S+)(.*)$/gm)];
     assert.ok(uses.length > 0, name);
     for (const [, ref, rest] of uses) {
-      assert.match(ref, /^[\w.-]+\/[\w./-]+@[0-9a-f]{40}$/, `${name}: ${ref} is pinned by SHA`);
-      assert.match(rest, /^ # v\d+\.\d+\.\d+$/, `${name}: ${ref} names its release`);
+      const [action, sha] = ref.split("@");
+      const expected = PINS.get(action);
+      assert.ok(expected, `${name}: ${action} is not in the expected pin table`);
+      assert.equal(sha, expected[0], `${name}: ${action} SHA differs from the expected pin`);
+      assert.equal(rest, ` # ${expected[1]}`, `${name}: ${action} release comment differs from ${expected[1]}`);
     }
   }
 });
