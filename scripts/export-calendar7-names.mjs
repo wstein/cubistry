@@ -18,7 +18,7 @@
 // research-inputs.sha256 (new folder, new files only; the shipped scheme A files are never touched).
 // It stops on any mismatch: input digests, snapshots against the replay of the stored words, declared
 // metrics, and the front of every state against its display sheet. The output is byte-deterministic.
-// The digest pin stops any changed input first, so the later checks are defence in depth on the command line;
+// The digest pin stops any changed input first, so the later checks are defense in depth on the command line;
 // build(root, { testOnlySkipDigestPins: true }) reaches each of them in tests/calendar7-names-data.test.mjs.
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
