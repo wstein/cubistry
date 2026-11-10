@@ -302,14 +302,16 @@
 
 /* Calendar artwork shares the same fixed 192 px canvas in the sheet and cube. */
 .c7-appearance-choices { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-block: .5rem; }
-.c7-font-choice, .c7-scheme-choice { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .5rem; max-width: 100%; min-width: 0; }
+.c7-font-choice, .c7-scheme-choice, .c7-layout-choice { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .5rem; max-width: 100%; min-width: 0; }
 .c7-appearance-choices select { max-width: 100%; min-width: 0; }
 .c7-font-status { margin: 0; }
-/* Narrow screens: the two selects share one 47 px row and keep their accessible names; the labels are visually hidden so the playback controls stay inside the stage. */
+.c7-layout-notice { margin: .25rem 0; padding: .4rem .6rem; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.c7-layout-notice[hidden] { display: none; }
+/* Narrow screens: the three selects share one 47 px row and keep their accessible names; the labels are visually hidden so the playback controls stay inside the stage. */
 @media (max-width: 600px) {
-  .c7-appearance-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
-  .c7-font-choice, .c7-scheme-choice { display: block; }
-  .c7-font-choice label, .c7-scheme-choice label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .c7-appearance-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+  .c7-font-choice, .c7-scheme-choice, .c7-layout-choice { display: block; }
+  .c7-font-choice label, .c7-scheme-choice label, .c7-layout-choice label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .c7-appearance-choices select { width: 100%; min-height: 44px; text-overflow: ellipsis; }
 }
 .c7-sheet td { position: relative; }

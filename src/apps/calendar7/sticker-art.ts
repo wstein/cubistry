@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
+import { type Layout, NAME_SLOTS, nameSlotStart } from "./layout.ts";
 import type { ColorScheme, SchemeLine } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
@@ -20,7 +21,7 @@ export const INK_COLORS: Readonly<Record<string, string>> = {
 export const TEXTURE = 192;
 
 /** The role of a tile, decided by its printed label and ink class only, never by where the tile sits (tiles move). */
-export type TileClass = "blank" | "day" | "weekend" | "weekday" | "sunsat" | "month";
+export type TileClass = "blank" | "band" | "day" | "weekend" | "weekday" | "sunsat" | "month";
 
 /** What a scheme gives one tile: ground, ink, ink of the small number of a split label, and the bottom line. */
 export interface TileRoles {
@@ -36,10 +37,11 @@ export const LINE_SCALE = 4;
 
 /**
  * Class of a tile from its label and ink. The ink classes are the print's: dark = weekday digits, red = weekend digits
- * and the labels SUN and SAT, weekday = MON..FRI, month = month letters, blank = no text.
+ * and the labels SUN and SAT, weekday = MON..FRI, month = month letters, blank = no text, band = no text with ink
+ * `band` (the empty tiles of row 1 in the names layout; never an empty day).
  */
 export function tileClass(text: string, ink: string): TileClass {
-  if (text === "") return "blank";
+  if (text === "") return ink === "band" ? "band" : "blank";
   if (ink === "month") return "month";
   if (ink === "weekday") return "weekday";
   if (ink === "red") return text === "SUN" || text === "SAT" ? "sunsat" : "weekend";
@@ -49,21 +51,23 @@ export function tileClass(text: string, ink: string): TileClass {
 /**
  * Fill and inks of a tile in a scheme. The grounds are the ones tests/calendar7-schemes.test.mjs gates the inks on:
  * weekend digits sit on weekendFill or weekendTint, SUN/SAT on weekdayRowFill, else the weekend ground, month letters on
- * bandFill or dayFill. A blank tile is emptyFill: the print has one blank class, so it cannot join a band (see
- * docs/CALENDAR_7X7.md). The line under the weekday row (lineRow2) is drawn on the weekday-name tiles; lineRow1 is not
- * applied (it needs band tiles).
+ * bandFill or dayFill. A blank tile is emptyFill. The line under the weekday row (lineRow2) is drawn on the weekday-name
+ * tiles. In the names layout (`layout` "names") a `band` tile takes the fill of the month name tiles (bandFill, else
+ * dayFill, ink monthInk) and both carry the line under row 1 (lineRow1); in the standard layout lineRow1 is not applied
+ * and a band tile does not occur.
  */
-export function tileRoles(scheme: ColorScheme, text: string, ink: string): TileRoles {
+export function tileRoles(scheme: ColorScheme, text: string, ink: string, layout: Layout = "standard"): TileRoles {
   const cls = tileClass(text, ink);
   const weekend = scheme.weekendFill ?? scheme.weekendTint ?? scheme.dayFill;
   const roles = (fill: string, color: string, small = color, line: SchemeLine | null = null): TileRoles => ({ cls, fill, ink: color, inkSmall: small, line });
   switch (cls) {
     case "blank": return roles(scheme.emptyFill, scheme.dayInk);
+    case "band": return roles(scheme.bandFill ?? scheme.dayFill, scheme.monthInk, scheme.monthInk, layout === "names" ? scheme.lineRow1 : null);
     case "day": return roles(scheme.dayFill, scheme.dayInk);
     case "weekday": return roles(scheme.weekdayRowFill ?? scheme.dayFill, scheme.weekdayInk, scheme.weekdayInk, scheme.lineRow2);
     case "sunsat": return roles(scheme.weekdayRowFill ?? weekend, scheme.sunSatInk, scheme.sunSatInk, scheme.lineRow2);
     case "weekend": return roles(weekend, scheme.weekendInk, scheme.weekendInkSmall);
-    case "month": return roles(scheme.bandFill ?? scheme.dayFill, scheme.monthInk);
+    case "month": return roles(scheme.bandFill ?? scheme.dayFill, scheme.monthInk, scheme.monthInk, layout === "names" ? scheme.lineRow1 : null);
   }
 }
 /** The text square: the part of the sticker the text may use (the legacy fit uses the same 86%). */
@@ -79,6 +83,27 @@ export const SPLIT_SECOND_BASELINE = 178;
 /** Strict split labels: required minimum ink gap between the two numbers, as a fraction of the texture (12 px at 192 px). */
 export const SPLIT_MIN_GAP = 0.0625;
 const FONT = '"Counter Sans", "Noto Sans", system-ui, sans-serif';
+
+/** Names layout: the one font size of every name tile (texture pixels); a capital M or W fits one of the three slots. */
+export const NAME_FONT_SIZE = 56;
+
+/** One letter of a name tile: the character, its slot center x and its size (texture pixels). */
+export interface NameLetter {
+  readonly char: string;
+  readonly x: number;
+  readonly size: number;
+}
+
+/**
+ * Letters of a name tile on the monospaced 3-slot grid of the text square: every letter is centered in its slot, so the
+ * letters of the three tiles of a month name line up as one word (first tile right-flush, last left-flush, see layout.ts).
+ */
+export function nameGrid(text: string): readonly NameLetter[] {
+  const slot = TEXT_SQUARE / NAME_SLOTS;
+  const left = TEXTURE / 2 - TEXT_SQUARE / 2;
+  const start = nameSlotStart(text);
+  return [...text].map((char, i) => ({ char, x: left + (start + i + 0.5) * slot, size: NAME_FONT_SIZE }));
+}
 
 /** Normal font size of a one-line label by its length (shared by the one-line fit and the big split number). */
 export const baseFontSize = (length: number): number => (length === 1 ? 140 : length === 2 ? 110 : 80);
@@ -177,17 +202,31 @@ export function drawSticker(
   ink: string,
   profile: RuleProfile = DEFAULT_RULE_PROFILE,
   scheme?: ColorScheme,
+  layout: Layout = "standard",
 ): void {
-  paintSticker(ctx, text, ink, profile, scheme ? tileRoles(scheme, text, ink) : null, true);
+  paintSticker(ctx, text, ink, profile, scheme ? tileRoles(scheme, text, ink, layout) : null, true, layout);
 }
 
-function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean): void {
+function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean, layout: Layout = "standard"): void {
   ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
   ctx.fillRect(0, 0, TEXTURE, TEXTURE);
-  if (text === "") return;
+  if (text !== "") paintLabel(ctx, text, ink, profile, roles, layout);
+  if (roles?.line && edgeLine) {
+    const h = roles.line.px * LINE_SCALE;
+    ctx.fillStyle = roles.line.color;
+    ctx.fillRect(0, TEXTURE - h, TEXTURE, h);
+  }
+}
+
+function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, layout: Layout): void {
   const big = roles ? roles.ink : (INK_COLORS[ink] ?? INK_COLORS.dark);
   ctx.fillStyle = big;
-  if (profile === "strict" && isSplitLabel(text)) {
+  if (layout === "names" && ink === "month") {
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `600 ${NAME_FONT_SIZE}px ${FONT}`;
+    for (const l of nameGrid(text)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04);
+  } else if (profile === "strict" && isSplitLabel(text)) {
     ctx.textBaseline = "alphabetic";
     const l = splitLayout(text);
     for (const p of [l.first, l.second]) {
@@ -209,11 +248,6 @@ function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProf
       const at = halfTurnDigitPlacement(text, size);
       ctx.fillText(text, at.x, at.baseline);
     } else ctx.fillText(text, TEXTURE / 2, TEXTURE / 2 + size * 0.04);
-  }
-  if (roles?.line && edgeLine) {
-    const h = roles.line.px * LINE_SCALE;
-    ctx.fillStyle = roles.line.color;
-    ctx.fillRect(0, TEXTURE - h, TEXTURE, h);
   }
 }
 
@@ -252,8 +286,9 @@ export function drawFace(
   ink: string,
   profile: RuleProfile = DEFAULT_RULE_PROFILE,
   scheme?: ColorScheme,
+  layout: Layout = "standard",
 ): void {
-  const roles = scheme ? tileRoles(scheme, text, ink) : null;
+  const roles = scheme ? tileRoles(scheme, text, ink, layout) : null;
   ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
   ctx.fillRect(0, 0, TEXTURE, TEXTURE);
   ctx.save();
@@ -261,7 +296,7 @@ export function drawFace(
   ctx.scale(FACE_SCALE, FACE_SCALE);
   ctx.translate(-TEXTURE / 2, -TEXTURE / 2);
   // paintSticker paints the same ground again over the scaled square (same color), then the label.
-  paintSticker(ctx, text, ink, profile, roles, false);
+  paintSticker(ctx, text, ink, profile, roles, false, layout);
   ctx.restore();
   if (roles?.line) {
     const h = roles.line.px * LINE_SCALE;

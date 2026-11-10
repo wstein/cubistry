@@ -39,6 +39,7 @@ import {
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
 import { type ColorScheme, DEFAULT_SCHEME, schemeById } from "./schemes.ts";
+import type { Layout } from "./layout.ts";
 import { drawFace, drawSticker, PLASTIC, tileRoles, type Surface, TEXTURE } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
@@ -71,6 +72,8 @@ export class Calendar7Viewer implements StageView {
   private printing: Printing | null = null;
   private pose: Pose | null = null;
   private surface: Surface = "face";
+  /** Front layout of the print this cube was built from; the names layout adds the `band` tile and the row 1 line (sticker-art.ts). */
+  private layout: Layout = "standard";
   /** A scheme was chosen during a move on a stickerless cube: the body color waits for the end of the move. */
   private bodyStale = false;
   /** The color scheme of the labels (`setScheme`); the default scheme until one is chosen. */
@@ -180,9 +183,9 @@ export class Calendar7Viewer implements StageView {
   }
 
   private draw(canvas: HTMLCanvasElement, text: string, ink: string): void {
-    if (this.font) { drawFontSticker(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, this.font, this.scheme, this.surface); return; }
+    if (this.font) { drawFontSticker(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, this.font, this.scheme, this.surface, undefined, this.layout); return; }
     const art = this.surface === "face" ? drawFace : drawSticker;
-    art(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, undefined, this.scheme);
+    art(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, undefined, this.scheme, this.layout);
   }
 
   private clear(): void {
@@ -197,8 +200,11 @@ export class Calendar7Viewer implements StageView {
    * Builds the stickerless Calendar7 cube. The legacy surface argument is accepted but cannot restore stickers.
    * This rendering policy does not change the state schema or any other viewer.
    */
-  configure(printing: Printing, pose: Pose, _surface: Surface = "face"): void {
+  configure(printing: Printing, pose: Pose, _surface: Surface = "face", layout: Layout = "standard"): void {
     const surface: Surface = "face";
+    // A new print replaces the cube: a turn in progress ends first (its pivot belongs to the old cube).
+    this.tween.cancel();
+    this.layout = layout;
     this.clear();
     this.bodyStale = false;
     this.printing = printing;
@@ -235,7 +241,7 @@ export class Calendar7Viewer implements StageView {
     }));
     this.writeFrames(pose);
     const faceColors = new Map<number, string>();
-    for (let i = 0; i < STICKERS; i++) faceColors.set(i + 1, tileRoles(this.scheme, printing.text[i], printing.ink[i]).fill);
+    for (let i = 0; i < STICKERS; i++) faceColors.set(i + 1, tileRoles(this.scheme, printing.text[i], printing.ink[i], layout).fill);
     this.cube = new PhysicalCubeScene(
       this.presentation,
       this.frames as unknown as readonly PhysicalStickerFrame[],

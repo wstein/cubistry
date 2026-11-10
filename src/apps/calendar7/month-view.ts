@@ -14,6 +14,7 @@ export { moveToken, rawToken } from "./notation.ts";
 import { type Move } from "./engine.ts";
 import type { Cell } from "./display.ts";
 import type { DisplayTable, Edge, Graph } from "./graph.ts";
+import type { Layout } from "./layout.ts";
 
 export interface YearMonth {
   readonly year: number;
@@ -176,6 +177,8 @@ export interface PageModel {
   readonly choice: MonthChoice;
   readonly range: ChainRange;
   readonly today: YearMonth;
+  /** The front layout of the data the page was built from; absent means standard. */
+  readonly layout?: Layout;
   /** Present for an "ok" choice. */
   readonly cells?: readonly Cell[];
   readonly prev: Step | null;
@@ -275,7 +278,9 @@ export function pageHtml(model: PageModel, options: WordOptions = DEFAULT_WORD_O
     `<div class="c7-steps">${stepHtml(model.prev, "Previous", `No earlier month: ${monthLabel(range.first)} is the start of the chain.`, options)}` +
     `${stepHtml(model.next, "Next", `No later month: ${monthLabel(range.last)} is the end of the chain.`, options)}` +
     `<p class="c7-legend" data-c7-legend>${LEGEND}</p></div>` +
-    `<p class="c7-range">Proven chain: ${esc(rangeText)}, ${range.edges} steps.</p>${status}</div>`
+    (model.layout === "names"
+      ? `<p class="c7-range">Names layout window: ${esc(rangeText)}, ${range.edges} steps. Research candidate, not certified; not proven outside this window.</p>`
+      : `<p class="c7-range">Proven chain: ${esc(rangeText)}, ${range.edges} steps.</p>`) + `${status}</div>`
   );
 }
 
@@ -285,13 +290,15 @@ export function buildModel(
   table: DisplayTable,
   choice: MonthChoice,
   today: YearMonth,
+  layout: Layout = "standard",
 ): PageModel {
   const range = chainRange(graph);
-  if (choice.kind !== "ok") return { choice, range, today, prev: null, next: null };
+  if (choice.kind !== "ok") return { choice, range, today, layout, prev: null, next: null };
   return {
     choice,
     range,
     today,
+    layout,
     cells: sheetCells(graph, table, range, choice.ym),
     prev: stepFrom(graph, range, choice.ym, -1),
     next: stepFrom(graph, range, choice.ym, 1),

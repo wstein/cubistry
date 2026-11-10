@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 /** Shared 2D/3D artwork: original glyphs, with one source for each 6/9 pair. */
 import { numberLayout, type LoadedFont } from "./fonts.ts";
-import { FACE_FLAT, FACE_SCALE, LINE_SCALE, TEXTURE, tileRoles, type Surface } from "./sticker-art.ts";
+import { type Layout, NAME_SLOTS, nameSlotStart } from "./layout.ts";
+import { FACE_FLAT, FACE_SCALE, LINE_SCALE, TEXT_SQUARE, TEXTURE, tileRoles, type Surface } from "./sticker-art.ts";
 import type { ColorScheme } from "./schemes.ts";
 
 export interface InkBox { readonly x0: number; readonly y0: number; readonly x1: number; readonly y1: number }
@@ -21,6 +22,23 @@ export function labelLayout(text: string, font: LoadedFont): readonly { text: st
   const normal = (text.length === 1 ? 100 : text.length === 2 ? 79 : 58) / capHeight, width = numberLayout(text, font, normal).width;
   return [part(text, Math.min(normal, normal * 164 / width), 96, 96)];
 }
+/** Letters of the name labels: the one font size of the names layout is fitted to them. */
+const NAME_LETTERS = "JANUARYFEBRUCHMPILTSGOVDE";
+/**
+ * Names layout: the letters of a name tile on the monospaced 3-slot grid, one size for every name tile (the cap height of
+ * a three-letter label, or smaller when the widest capital would not fit its slot). Each letter is centered in its slot.
+ */
+export function nameLabelLayout(text: string, font: LoadedFont): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
+  const slot = TEXT_SQUARE / NAME_SLOTS, left = TEXTURE / 2 - TEXT_SQUARE / 2;
+  const capHeight = Math.max(...[...NAME_LETTERS].map(c => font.glyphs[c].bottom - font.glyphs[c].top));
+  const widest = Math.max(...[...NAME_LETTERS].map(c => numberLayout(c, font, 1).width));
+  const size = Math.min(58 / capHeight, (slot * 0.95) / widest);
+  const start = nameSlotStart(text);
+  return [...text].map((char, i) => {
+    const p = numberLayout(char, font, size), x = left + (start + i + 0.5) * slot;
+    return { text: char, size, x, y: 96, box: { x0: x - p.width / 2, y0: 96 - p.height / 2, x1: x + p.width / 2, y1: 96 + p.height / 2 } };
+  });
+}
 export function drawFontRun(ctx: CanvasRenderingContext2D, text: string, font: LoadedFont, size: number, x: number, y: number): void {
   ctx.font = `${font.style.weight} ${size}px "${font.family}"`;
   ctx.fontKerning = "none";
@@ -35,8 +53,8 @@ export function drawFontRun(ctx: CanvasRenderingContext2D, text: string, font: L
   }
 }
 /** Redraws existing canvases. The physical sticker identity and frame never change. */
-export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink: string, font: LoadedFont, scheme: ColorScheme, surface: Surface = "sticker", sheetColors?: { readonly fill: string; readonly ink: string }): void {
-  const printed = tileRoles(scheme, text, ink);
+export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink: string, font: LoadedFont, scheme: ColorScheme, surface: Surface = "sticker", sheetColors?: { readonly fill: string; readonly ink: string }, layout: Layout = "standard"): void {
+  const printed = tileRoles(scheme, text, ink, layout);
   // The HTML sheet retains its accessible page-theme palette; the cube retains its printed scheme.
   const roles = sheetColors ? { ...printed, fill: sheetColors.fill, ink: sheetColors.ink, inkSmall: sheetColors.ink } : printed;
   ctx.fillStyle = roles.fill;
@@ -44,7 +62,8 @@ export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink
   if (surface === "face") {
     ctx.save();ctx.translate(96, 96);ctx.scale(FACE_SCALE, FACE_SCALE);ctx.translate(-96, -96);
   }
-  if (text) for (const [index, part] of labelLayout(text, font).entries()) {
+  const parts = layout === "names" && printed.cls === "month" ? nameLabelLayout(text, font) : labelLayout(text, font);
+  if (text) for (const [index, part] of parts.entries()) {
     ctx.fillStyle = index === 1 ? roles.inkSmall : roles.ink;
     drawFontRun(ctx, part.text, font, part.size, part.x, part.y);
   }

@@ -5,7 +5,8 @@ import type { Block } from "./blocks.ts";
 import type { RotationPlacement } from "./deferral.ts";
 import { revealPlayback, resetPlaybackVisibility } from "./playback-visibility.ts";
 import type { ModeInstance } from "../registry.ts";
-import { parseDisplays, parseGraph, parseState } from "./graph.ts";
+import { type DisplayTable, type Graph, parseDisplays, parseGraph, parseState, type Start } from "./graph.ts";
+import { type Layout, LAYOUT_PARAM, NAMES_LOAD_NOTICE, NAMES_NOTICE, parseLayout } from "./layout.ts";
 import { type Pose, type Printing, stateDigest } from "./engine.ts";
 import {
   announce,
@@ -18,6 +19,7 @@ import {
   playerHtml,
   type YearMonth,
   type PageModel,
+  type ChainRange,
 } from "./month-view.ts";
 import { FONT_STYLES, FontSelection, fontStyleById, loadCalendarFont, type LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
@@ -28,7 +30,8 @@ import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnaps
 
 /** The 3D scene the mount drives (src/apps/calendar7/viewer.ts; a fake in the tests). */
 export interface Stage extends StageView {
-  configure(printing: Printing, pose: Pose, surface?: Surface): void;
+  /** Builds the cube of one print; `layout` selects the tile classes of the names layout (`band`, row 1 line). */
+  configure(printing: Printing, pose: Pose, surface?: Surface, layout?: Layout): void;
   setLabel(text: string): void;
   /** Color scheme by id (src/apps/calendar7/schemes.ts); an unknown id gives the default. Optional: a fake stage may omit it. */
   setScheme?(id: string | null | undefined): void;
@@ -57,6 +60,15 @@ export interface MountEnv {
 
 const MY_PARAMS = ["year", "month"];
 
+/** The data of one layout: its graph, displays and (with a 3D view) the print and the pose of the chain root. */
+interface Dataset {
+  readonly layout: Layout;
+  readonly graph: Graph;
+  readonly table: DisplayTable;
+  readonly start: Start | null;
+  readonly range: ChainRange;
+}
+
 /** The URL parameter that picks the color scheme of the 3D view (`?scheme=paper-blue`); unknown values use the default. */
 export const SCHEME_PARAM = "scheme";
 
@@ -75,8 +87,10 @@ export async function mountCalendar7(
     '<div class="c7-live" role="status" aria-live="polite"></div>' +
     '<div class="c7-appearance-choices">' +
     `<div class="c7-font-choice"><label for="c7-font-style">Font style</label><select id="c7-font-style" data-c7-font>${FONT_STYLES.map(f => `<option value="${f.id}"${f.id === fontStyleById(params.get("font")).id ? " selected" : ""}>${f.label}</option>`).join("")}</select></div>` +
+    (threeD ? `<div class="c7-layout-choice"><label for="c7-layout">Cube layout</label><select id="c7-layout" data-c7="layout"><option value="standard"${parseLayout(params.get(LAYOUT_PARAM)) === "standard" ? " selected" : ""}>Standard</option><option value="names"${parseLayout(params.get(LAYOUT_PARAM)) === "names" ? " selected" : ""}>Names (preview, May 2026 - Jan 2028)</option></select></div>` : "") +
     (threeD ? `<div class="c7-scheme-choice"><label for="c7-color-theme">Cube color theme</label><select id="c7-color-theme" data-c7="scheme">${SCHEMES.map(s => `<option value="${s.id}"${s.id === schemeById(params.get(SCHEME_PARAM)).id ? " selected" : ""}>${s.name}</option>`).join("")}</select></div>` : "") +
     '</div><p class="c7-font-status" role="status" data-c7-font-status></p>' +
+    (threeD ? '<p class="c7-layout-notice" role="status" data-c7="layout-notice" hidden></p>' : "") +
     (threeD ? playerHtml(DEFAULT_SPEED) : "") +
     '<div class="c7-view"><p class="c7-loading">Loading the 7x7 calendar data…</p></div>';
   const view = root.querySelector(".c7-view") as HTMLElement;
@@ -87,10 +101,14 @@ export async function mountCalendar7(
     threeD ? env.fetchJson(`${env.base}calendar7/state.v1.json`) : undefined,
   ]);
   if (!env.isCurrent()) return;
-  const graph = parseGraph(graphJson);
-  const table = parseDisplays(displaysJson);
-  const start = threeD ? parseState(stateJson) : null;
-  const range = chainRange(graph);
+  const standardGraph = parseGraph(graphJson);
+  const standard: Dataset = {
+    layout: "standard",
+    graph: standardGraph,
+    table: parseDisplays(displaysJson),
+    start: threeD ? parseState(stateJson) : null,
+    range: chainRange(standardGraph),
+  };
   const d = env.now();
   const today: YearMonth = { year: d.getFullYear(), month: d.getMonth() + 1 };
   let disposed = false;
@@ -104,6 +122,21 @@ export async function mountCalendar7(
   let player: Calendar7Player | null = null;
   let pending: Promise<void> | null = null;
   let wanted: number | null = null;
+  /** The data of the page shown, of the cube the player owns, and of the month the cube is wanted at. A different print is a different physical state: the player is rebuilt, never reused. */
+  let shown: Dataset = standard;
+  let played: Dataset = standard;
+  let wantedData: Dataset = standard;
+  /** The selected layout (control and URL); the layout in effect is `shown.layout` (the standard layout outside the names window). */
+  let layoutMode: Layout = threeD ? parseLayout(params.get(LAYOUT_PARAM)) : "standard";
+  const layoutSelect = q("layout") as HTMLSelectElement | null;
+  if (layoutSelect?.value) layoutMode = parseLayout(layoutSelect.value);
+  const layoutNotice = q("layout-notice");
+  /** The names data: loaded once, only when the mode is selected; `namesFailed` after a failed load (the standard layout is shown). */
+  let names: Dataset | null = null;
+  let namesLoading: Promise<void> | null = null;
+  let namesFailed = false;
+  let currentParams: URLSearchParams = params;
+  let showSeq = 0;
   let previous: PlayerSnapshot | null = null;
   let wordOptions: WordOptions = { ...DEFAULT_WORD_OPTIONS };
   let currentModel: PageModel | null = null;
@@ -131,7 +164,7 @@ export async function mountCalendar7(
       td.style.height = `${height / em}em`;
       canvas.width = canvas.height = 192;canvas.setAttribute("aria-hidden", "true");
       const ctx = canvas.getContext("2d");if (!ctx) return;
-      drawFontSticker(ctx, cell.text, cell.ink, chosen, schemeById(schemeId), "sticker", { fill: colors.backgroundColor, ink: colors.color });
+      drawFontSticker(ctx, cell.text, cell.ink, chosen, schemeById(schemeId), "sticker", { fill: colors.backgroundColor, ink: colors.color }, currentModel?.layout ?? "standard");
       label.className = "c7-cell-text";label.textContent = cell.text;
       td.replaceChildren(label, canvas);
     });
@@ -151,7 +184,7 @@ export async function mountCalendar7(
     font = chosen;if (fontSelect) fontSelect.value = chosen.style.id;
     root.setAttribute("data-c7-font", chosen.style.id);
     stage?.setFont?.(chosen);paintSheet();
-    if (!stage && currentModel?.choice.kind === "ok") void syncStage(nodeIndex(range, currentModel.choice.ym));
+    if (!stage && currentModel?.choice.kind === "ok") void syncStage(nodeIndex(shown.range, currentModel.choice.ym), shown);
   }, message => { if (alive() && fontStatus) fontStatus.textContent = message; }) : null;
   const onFont = (): void => {
     if (fontSelect && fontChoice) void fontChoice.choose(fontSelect.value);
@@ -201,7 +234,7 @@ export async function mountCalendar7(
       box.hidden = false;
     }
     (q("player") as HTMLElement | null)?.removeAttribute("hidden");
-    for (const name of ["play", "skip", "speed", "reset", "slice", "orientation", "notation", "scheme"]) q(name)?.setAttribute("disabled", "");
+    for (const name of ["play", "skip", "speed", "reset", "slice", "orientation", "notation", "scheme", "layout"]) q(name)?.setAttribute("disabled", "");
     live.textContent = "The 3D view stopped. The month sheet is still shown.";
     if (sceneHost) sceneHost.hidden = true;
     console.error(error);
@@ -228,6 +261,7 @@ export async function mountCalendar7(
     }
     const note = q("note");
     if (note) note.hidden = !motionOff;
+    const graph = played.graph;
     const target = graph.nodes[snap.index];
     const progress = q("progress");
     const panel = q("active-step");
@@ -280,7 +314,7 @@ export async function mountCalendar7(
     if (!active && player) {
       root.setAttribute("data-c7-state", "idle");
       // Test hook and proof for readers: the digest of the pose the view shows, computed here, not copied from the graph.
-      root.setAttribute("data-c7-digest", stateDigest((start as { printing: Printing }).printing, player.shownPose));
+      root.setAttribute("data-c7-digest", stateDigest((played.start as { printing: Printing }).printing, player.shownPose));
       root.setAttribute("data-c7-month", `${target.year}-${String(target.month).padStart(2, "0")}`);
       if (previous && previous.total > 0 && !motionOff) live.textContent = `The cube has turned to ${monthLabel(target)}.`;
     } else {
@@ -289,7 +323,7 @@ export async function mountCalendar7(
     previous = snap;
   };
 
-  /** Creates the stage and the player once; later calls wait for the same work. */
+  /** Creates the stage once; later calls wait for the same work. */
   const ensure = (): Promise<void> => {
     pending ??= (async () => {
       const host = sceneHost as HTMLElement;
@@ -304,22 +338,8 @@ export async function mountCalendar7(
         return;
       }
       stage = made;
-      const s = start as NonNullable<typeof start>;
       made.setScheme?.(schemeId);
       if (font) made.setFont?.(font);
-      made.configure(s.printing, s.pose, "face");
-      player = new Calendar7Player({
-        graph,
-        printing: s.printing,
-        root: s.pose,
-        view: made,
-        reducedMotion: reduced,
-        onChange: render,
-        onError: fail,
-        slice: wordOptions.slice,
-        orientation: wordOptions.orientation,
-      });
-      player.setSpeed(selectedSpeed);
       const port = host.closest?.(".shell-stage");
       if (port && typeof ResizeObserver !== "undefined") {
         resizeObserver = new ResizeObserver(() => {
@@ -333,9 +353,43 @@ export async function mountCalendar7(
     return pending;
   };
 
-  const syncStage = async (index: number | null): Promise<void> => {
+  /**
+   * Builds the cube and the player of `data` unless they already belong to it. A different layout is a different print
+   * (another state file, another graph): the cube is rebuilt from that print at the month wanted, the old player is
+   * dropped, and nothing of the old pose is carried over.
+   */
+  const bind = (data: Dataset): void => {
+    const made = stage;
+    if (!made || (player && played === data)) return;
+    const s = data.start as NonNullable<Dataset["start"]>;
+    player?.dispose();
+    player = null;
+    activeWord = null;
+    previous = null;
+    const wordBox = q("active-word"), activePanel = q("active-step");
+    if (wordBox) wordBox.innerHTML = "";
+    if (activePanel) activePanel.hidden = true;
+    root.setAttribute("data-c7-state", "building");
+    played = data;
+    made.configure(s.printing, s.pose, "face", data.layout);
+    player = new Calendar7Player({
+      graph: data.graph,
+      printing: s.printing,
+      root: s.pose,
+      view: made,
+      reducedMotion: reduced,
+      onChange: render,
+      onError: fail,
+      slice: wordOptions.slice,
+      orientation: wordOptions.orientation,
+    });
+    player.setSpeed(selectedSpeed);
+  };
+
+  const syncStage = async (index: number | null, data: Dataset = shown): Promise<void> => {
     if (!threeD || failed) return;
     wanted = index;
+    wantedData = data;
     if (index === null) {
       if (sceneHost) sceneHost.hidden = true;
       (q("player") as HTMLElement | null)?.setAttribute("hidden", "");
@@ -349,7 +403,9 @@ export async function mountCalendar7(
       await ensure();
       if (!alive()) return;
       if (failed) return;
-      if (wanted === null || !player) return;
+      if (wanted === null) return;
+      bind(wantedData);
+      if (!player) return;
       player.go(wanted);
     } catch (error) {
       if (alive()) fail(error as Error);
@@ -363,11 +419,47 @@ export async function mountCalendar7(
     const active = player && player.snapshot.phase !== "idle";
     view.querySelectorAll?.(".c7-word-panel").forEach((el) => ((el as HTMLElement).hidden = Boolean(active)));
   };
-  const show = (p: URLSearchParams, moveFocus: boolean): void => {
+  /** Loads the names data once, only when the names layout is selected. A failure is remembered: the standard layout is shown with a notice. */
+  const loadNames = (): Promise<void> => {
+    const dir = `${env.base}calendar7/names/`;
+    namesLoading ??= Promise.all([env.fetchJson(`${dir}graph.v1.json`), env.fetchJson(`${dir}displays.v1.json`), env.fetchJson(`${dir}state.v1.json`)])
+      .then(([g, d, st]) => {
+        const graph = parseGraph(g);
+        names = { layout: "names", graph, table: parseDisplays(d), start: parseState(st), range: chainRange(graph) };
+      })
+      .catch(() => {
+        namesFailed = true;
+      });
+    return namesLoading;
+  };
+  /**
+   * The month shown is the month of the URL (`year` and `month`), else today's month. The names layout is in effect only
+   * when it is selected, its data is loaded and that month is inside its window; otherwise the standard layout is shown
+   * (with a notice when the names layout was selected).
+   */
+  const apply = (p: URLSearchParams, moveFocus: boolean): void => {
     focusPlayback = moveFocus;
-    const choice = chooseMonth(p, today, range);
-    const model = buildModel(graph, table, choice, today);
+    const wantedMonth = chooseMonth(p, today, standard.range);
+    let data: Dataset = standard;
+    let note = "";
+    if (layoutMode === "names") {
+      if (!names) note = NAMES_LOAD_NOTICE;
+      else if (wantedMonth.kind === "invalid" || nodeIndex(names.range, wantedMonth.ym) >= 0) data = names;
+      else note = NAMES_NOTICE;
+    }
+    const choice = chooseMonth(p, today, data.range);
+    shown = data;
+    const model = buildModel(data.graph, data.table, choice, today, data.layout);
     currentModel = model;
+    if (threeD) {
+      // Test hooks and proof for readers: the layout in effect and the layout selected.
+      root.setAttribute("data-c7-layout", data.layout);
+      root.setAttribute("data-c7-layout-mode", layoutMode);
+    }
+    if (layoutNotice) {
+      layoutNotice.textContent = note;
+      layoutNotice.hidden = note === "";
+    }
     refreshPreviews();
     live.textContent = announce(model);
     // The link that was clicked is gone after the re-render: keep the keyboard position at the new month.
@@ -375,9 +467,21 @@ export async function mountCalendar7(
     if (moveFocus) (view.querySelector("[data-focus]") as HTMLElement | null)?.focus({ preventScroll: true });
     if (threeD) {
       // A sheet exists exactly when the month is on the chain; the cube follows the same month.
-      const k = choice.kind === "ok" ? nodeIndex(range, choice.ym) : -1;
-      void syncStage(k >= 0 ? k : null);
+      const k = choice.kind === "ok" ? nodeIndex(data.range, choice.ym) : -1;
+      void syncStage(k >= 0 ? k : null, data);
     }
+  };
+  const show = (p: URLSearchParams, moveFocus: boolean): void => {
+    currentParams = p;
+    const seq = ++showSeq;
+    if (layoutMode === "names" && !names && !namesFailed) {
+      live.textContent = "Loading the names layout…";
+      void loadNames().then(() => {
+        if (alive() && seq === showSeq) apply(p, moveFocus);
+      });
+      return;
+    }
+    apply(p, moveFocus);
   };
   onFont();
   show(params, false);
@@ -402,6 +506,16 @@ export async function mountCalendar7(
     if (el.getAttribute("aria-disabled") === "true") return;
     try {
       switch (el.getAttribute("data-c7")) {
+        case "layout": {
+          if (e.type !== "change") break;
+          layoutMode = parseLayout((el as HTMLSelectElement).value);
+          (el as HTMLSelectElement).value = layoutMode;
+          const query = new URLSearchParams(env.search());
+          query.set(LAYOUT_PARAM, layoutMode);
+          env.replaceQuery(`?${query.toString()}`);
+          show(currentParams, false);
+          break;
+        }
         case "scheme": {
           if (e.type !== "change") break;
           applyScheme((el as HTMLSelectElement).value);
