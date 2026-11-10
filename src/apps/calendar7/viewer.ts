@@ -23,6 +23,7 @@ import {
   createStickerMaterial,
   cubePresentationRadius,
   fitPresentationCamera,
+  type LayerProfile,
   PhysicalCubeScene,
   PRESENTATION_PRESET,
   type PhysicalStickerFrame,
@@ -39,9 +40,9 @@ import {
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
 import { type ColorScheme, DEFAULT_SCHEME, namesGround, schemeById } from "./schemes.ts";
-import { bodyWidthFor, exposureFor } from "./geometry.ts";
+import { bodyWidthFor, exposureFor, faceTileOf, halfEdgeOf, layerWidthsOf, namesBodySize } from "./geometry.ts";
 import type { Layout } from "./layout.ts";
-import { drawFace, drawSticker, PLASTIC, tileRoles, type Surface, TEXTURE } from "./sticker-art.ts";
+import { drawFace, drawSticker, type FaceTile, PLASTIC, tileCanvasSize, tileRoles, type Surface } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
@@ -56,6 +57,16 @@ function lightGeometry(layout: Layout) {
   const width = bodyWidthFor(layout); // standard: the preset's .99; names: pitch minus 0.01 mm (geometry.ts)
   geometry.body.dispose();
   return { ...geometry, body: new RoundedBoxGeometry(width, width, width, 1, p.bodyRadius) };
+}
+
+/**
+ * Layer profile of a layout (the names layout: thick outer layers of the 7x7): the widths and the body geometry of a cubie
+ * of a given cell (its layer widths) with the 0.01 mm gap and the preset bevel. The standard layout has none (unit pitch).
+ */
+function layerProfileFor(layout: Layout): LayerProfile | undefined {
+  const widths = layerWidthsOf(layout);
+  if (!widths) return undefined;
+  return { widths, body: (cell) => { const [x, y, z] = namesBodySize(cell); return new RoundedBoxGeometry(x, y, z, 1, PRESENTATION_PRESET.bodyRadius); } };
 }
 
 /** Body color of the cut faces and the core: the day fill; the names layout shows it as its near-white. */
@@ -76,7 +87,10 @@ export class Calendar7Viewer implements StageView {
   readonly scene = new THREE.Scene();
   readonly presentation = new THREE.Group();
   readonly camera = new THREE.PerspectiveCamera(24, 1, 0.1, 200);
-  private readonly studio: ReturnType<typeof createPresentationStudio>;
+  private studio: ReturnType<typeof createPresentationStudio>;
+  private readonly host: HTMLElement;
+  /** Half the cube edge in scene units: the studio (floor, shadow frustum) and the camera fit follow it. */
+  private extent = halfEdgeOf("standard");
   private readonly resize: ResizeObserver;
   private readonly rotation: SmartRotationBinding;
   private cube: PhysicalCubeScene | null = null;
@@ -92,7 +106,7 @@ export class Calendar7Viewer implements StageView {
   private scheme: ColorScheme = DEFAULT_SCHEME;
   private font: LoadedFont | null = null;
   /** One entry per distinct texture of the current build: redrawn in place when the scheme changes. */
-  private art: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; text: string; ink: string }[] = [];
+  private art: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; text: string; ink: string; tile?: FaceTile }[] = [];
   /** Reused every sync: frames are rewritten in place, so a move allocates no frame objects. */
   private frames: { id: number; cubie: number; p: number[]; n: number[]; up: number[] }[] = [];
   private readonly tween = new MoveTween();
@@ -109,15 +123,15 @@ export class Calendar7Viewer implements StageView {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
-    const extent = 3.5;
-    this.studio = createPresentationStudio(this.scene, extent, extent, host, cubePresentationRadius(extent));
+    this.host = host;
+    this.studio = createPresentationStudio(this.scene, this.extent, this.extent, host, cubePresentationRadius(this.extent));
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth;
       const h = host.clientHeight;
       if (!w || !h) return;
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
-      fitPresentationCamera(this.camera, cubePresentationRadius(extent), ZOOM);
+      fitPresentationCamera(this.camera, cubePresentationRadius(this.extent), ZOOM);
       this.dirty = true;
     });
     this.resize.observe(host);
@@ -126,7 +140,7 @@ export class Calendar7Viewer implements StageView {
     el.setAttribute("aria-label", "7x7 calendar cube. Drag to rotate the cube.");
     rotatePresentation(this.presentation, 0.3, 0.22);
     this.rotation = bindSmartRotation(el, this.presentation, { sensitivity: 0.006, panel });
-    fitPresentationCamera(this.camera, cubePresentationRadius(extent), ZOOM);
+    fitPresentationCamera(this.camera, cubePresentationRadius(this.extent), ZOOM);
     this.lastQuaternion.copy(this.presentation.quaternion);
     // On-demand rendering: an idle cube costs only the rotation step, never a 500-mesh draw.
     this.renderer.setAnimationLoop((now: number) => this.frame(now));
@@ -172,7 +186,7 @@ export class Calendar7Viewer implements StageView {
     if (!this.printing || !this.pose) return;
     this.bodyStale = true;
     for (const a of this.art) {
-      this.draw(a.canvas, a.text, a.ink);
+      this.draw(a.canvas, a.text, a.ink, a.tile);
       a.texture.needsUpdate = true;
     }
     this.applyBodyColor();
@@ -191,14 +205,24 @@ export class Calendar7Viewer implements StageView {
   setFont(font: LoadedFont): void {
     if (this.destroyed || this.font === font) return;
     this.font = font;
-    for (const a of this.art) { this.draw(a.canvas, a.text, a.ink); a.texture.needsUpdate = true; }
+    for (const a of this.art) { this.draw(a.canvas, a.text, a.ink, a.tile); a.texture.needsUpdate = true; }
     this.dirty = true;
   }
 
-  private draw(canvas: HTMLCanvasElement, text: string, ink: string): void {
-    if (this.font) { drawFontSticker(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, this.font, this.scheme, this.surface, undefined, this.layout); return; }
-    const art = this.surface === "face" ? drawFace : drawSticker;
-    art(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, undefined, this.scheme, this.layout);
+  private draw(canvas: HTMLCanvasElement, text: string, ink: string, tile?: FaceTile): void {
+    if (this.font) { drawFontSticker(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, this.font, this.scheme, this.surface, undefined, this.layout, tile); return; }
+    if (this.surface === "face") { drawFace(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, undefined, this.scheme, this.layout, tile); return; }
+    drawSticker(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, undefined, this.scheme, this.layout);
+  }
+
+  /** The studio and the camera follow the cube size of the layout (the names layout is a larger cube: thick outer layers). */
+  private fitExtent(layout: Layout): void {
+    const extent = halfEdgeOf(layout);
+    if (extent === this.extent) return;
+    this.extent = extent;
+    this.studio.dispose();
+    this.studio = createPresentationStudio(this.scene, extent, extent, this.host, cubePresentationRadius(extent));
+    fitPresentationCamera(this.camera, cubePresentationRadius(extent), ZOOM);
   }
 
   private clear(): void {
@@ -218,6 +242,7 @@ export class Calendar7Viewer implements StageView {
     // A new print replaces the cube: a turn in progress ends first (its pivot belongs to the old cube).
     this.tween.cancel();
     this.layout = layout;
+    this.fitExtent(layout);
     this.renderer.toneMappingExposure = exposureFor(layout); // 1 (the shared value) except in the names layout
     this.clear();
     this.bodyStale = false;
@@ -229,15 +254,18 @@ export class Calendar7Viewer implements StageView {
     const anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
     const materials = new Map<number, THREE.Material>();
     const byKey = new Map<string, THREE.Material>();
+    const widths = layerWidthsOf(layout);
     for (let i = 0; i < STICKERS; i++) {
-      const key = `${printing.ink[i]}|${printing.text[i]}`; // one surface per configure: the key needs no surface
+      // Layer profile: a tile is as large as the face of its cubie (the texture is 192 px per unit of width), so the key has the size too.
+      const tile = widths ? faceTileOf(pose.pos.subarray(3 * i, 3 * i + 3), pose.normal.subarray(3 * i, 3 * i + 3), pose.up.subarray(3 * i, 3 * i + 3), widths) : undefined;
+      const key = `${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}` : ""}`; // one surface per configure: the key needs no surface
       let material = byKey.get(key);
       if (!material) {
         const canvas = document.createElement("canvas");
-        canvas.width = canvas.height = TEXTURE;
-        this.draw(canvas, printing.text[i], printing.ink[i]);
+        [canvas.width, canvas.height] = tileCanvasSize(tile);
+        this.draw(canvas, printing.text[i], printing.ink[i], tile);
         const texture = new THREE.CanvasTexture(canvas);
-        this.art.push({ canvas, texture, text: printing.text[i], ink: printing.ink[i] });
+        this.art.push({ canvas, texture, text: printing.text[i], ink: printing.ink[i], tile });
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = anisotropy;
         material = createStickerMaterial(texture);
@@ -264,7 +292,7 @@ export class Calendar7Viewer implements StageView {
       lightGeometry(layout),
       faceColors,
       // Stickerless: the body is the day background (owner decision); with stickers it is the plastic frame between them.
-      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), miterCutFaces: layout === "names" }, // names layout: cut faces colored as on a real cube (cut-faces.ts)
+      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), miterCutFaces: layout === "names", layers: layerProfileFor(layout) }, // names layout: cut faces colored as on a real cube (cut-faces.ts)
     );
     // A sticker is a flat sheet on its body: it needs no shadow of its own (halves the shadow pass).
     this.presentation.traverse((o) => {
