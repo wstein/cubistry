@@ -39,8 +39,13 @@ and a 45% second date at the lower right, without a slash. Both ink extents and
 outer margins are checked using rendered pixels. Month and weekday labels keep
 letters, with a separate width fit for their existing label lengths.
 
-The compact month sheet contains the same square artwork, proportionally
-contained in its existing cells, plus accessible text. The cube applies its
+The compact month sheet contains the same glyph artwork, proportionally
+contained in its existing cells, plus accessible text. It retains the original
+page-theme foreground and background colors: canvas and HTML use the same
+computed CSS pair, preserving the 4.5:1 text contrast contract in both themes.
+Automatic color-scheme changes and explicit page-theme changes redraw the
+canvases; both listeners are released when the mode is disposed. The cube keeps
+its selected printed color scheme, independent of the page theme, and applies its
 existing stickerless face scale when needed. Its weekday bottom line remains
 a property of the printed weekday tile. The body day-fill color is applied
 only to stickerless faces, as before.

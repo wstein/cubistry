@@ -35,8 +35,10 @@ export function drawFontRun(ctx: CanvasRenderingContext2D, text: string, font: L
   }
 }
 /** Redraws existing canvases. The physical sticker identity and frame never change. */
-export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink: string, font: LoadedFont, scheme: ColorScheme, surface: Surface = "sticker"): void {
-  const roles = tileRoles(scheme, text, ink);
+export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink: string, font: LoadedFont, scheme: ColorScheme, surface: Surface = "sticker", sheetColors?: { readonly fill: string; readonly ink: string }): void {
+  const printed = tileRoles(scheme, text, ink);
+  // The HTML sheet retains its accessible page-theme palette; the cube retains its printed scheme.
+  const roles = sheetColors ? { ...printed, fill: sheetColors.fill, ink: sheetColors.ink, inkSmall: sheetColors.ink } : printed;
   ctx.fillStyle = roles.fill;
   ctx.fillRect(0, 0, TEXTURE, TEXTURE);
   if (surface === "face") {
