@@ -29,6 +29,12 @@ export interface StickerlessBodyOptions {
   readonly bodyColor?: string | null;
   /** Stickerless core color. Absent: DEFAULT_CORE_COLOR. */
   readonly coreColor?: string;
+  /**
+   * Cut color of the cubie that carries a printed sticker (sticker id to color): the cut faces next to that sticker (all but
+   * the one opposite it) take the color instead of `bodyColor`, so the color of the sticker runs over the sides of its
+   * cubie. Only those cubies; `setBodyColor` leaves them alone, `setCutColors` changes them. Absent: no cubie is special.
+   */
+  readonly cutColors?: ReadonlyMap<number, string>;
 }
 /** Size-neutral scene adapter. Callers validate prints, state and legal moves.
  * Textures/materials and animation deadlines stay caller-owned. */
@@ -43,6 +49,8 @@ export class PhysicalCubeScene {
   /** Stickerless core: visible only in seams; never follows a frame color. */
   private readonly coreMaterial: THREE.MeshStandardMaterial;
   private readonly cutMaterials = new Map<string, THREE.Material>();
+  /** One cut material per cubie with its own cut color (`StickerlessBodyOptions.cutColors`). */
+  private readonly cubieCutMaterials = new Map<number, { material: THREE.MeshStandardMaterial; sticker: number }>();
   private bodyColor: string | null;
   private readonly faceMaterials: THREE.Material[] = [];
   private readonly geometries: THREE.BufferGeometry[];
@@ -65,6 +73,7 @@ export class PhysicalCubeScene {
     const coreColor = options.coreColor ?? DEFAULT_CORE_COLOR;
     demand(HEX_COLOR.test(coreColor), "Invalid core color");
     demand(options.bodyColor == null || HEX_COLOR.test(options.bodyColor), "Invalid body color");
+    for (const color of options.cutColors?.values() ?? []) demand(HEX_COLOR.test(color), "Invalid cut color");
     this.bodyColor = options.bodyColor ?? null;
     // The core belongs to construction, never a selected frame color.
     this.coreMaterial = this.neutralPlastic(coreColor) as THREE.MeshStandardMaterial;
@@ -107,8 +116,12 @@ export class PhysicalCubeScene {
         }
         // Inward-facing cut faces take the color of a bordering exterior face
         // (or the explicit body color), like real stickerless cubes.
+        const ownFace = sourceFaces.find(face => options.cutColors?.has(face.id));
+        const own = ownFace === undefined ? undefined : options.cutColors!.get(ownFace.id)!;
+        const opposite = ownFace === undefined ? -1 : sourceFaceIndex(ownFace.n) ^ 1;
         for (let index = 0; index < 6; index++)
-          if (!faceMaterials[index]) faceMaterials[index] = this.cutMaterial(index, exterior);
+          if (!faceMaterials[index])
+            faceMaterials[index] = ownFace === undefined || index === opposite ? this.cutMaterial(index, exterior) : this.cubieCutMaterial(s.cubie, ownFace.id, own!);
         shell.userData.sourceFaceStickerIds = sourceIds;
         this.shells.set(s.cubie, { mesh: shell, stickerless: faceMaterials });
         this.bodies.set(s.cubie, body);
@@ -168,6 +181,14 @@ export class PhysicalCubeScene {
     }
     this.bodyColor = color;
   }
+  /** Changes the cut color of the cubies that were built with one (`StickerlessBodyOptions.cutColors`, by sticker id); other cubies are not touched. */
+  setCutColors(colors: ReadonlyMap<number, string>): void {
+    for (const color of colors.values()) demand(HEX_COLOR.test(color), "Invalid cut color");
+    for (const { material, sticker } of this.cubieCutMaterials.values()) {
+      const color = colors.get(sticker);
+      if (color !== undefined) material.color.set(color);
+    }
+  }
   /** Stickerless core color; takes effect immediately, including during a turn. */
   setCoreColor(color: string): void {
     demand(HEX_COLOR.test(color), "Invalid core color");
@@ -180,6 +201,11 @@ export class PhysicalCubeScene {
     (material as THREE.MeshStandardMaterial).map = null;
     this.faceMaterials.push(material);
     return material;
+  }
+  private cubieCutMaterial(cubie: number, sticker: number, color: string): THREE.Material {
+    let own = this.cubieCutMaterials.get(cubie);
+    if (!own) { own = { material: this.neutralPlastic(color) as THREE.MeshStandardMaterial, sticker }; this.cubieCutMaterials.set(cubie, own); }
+    return own.material;
   }
   /** Bounded: one shared material per distinct color, never per cubie face. */
   private cutMaterial(index: number, exterior: readonly { index: number; color: string }[]): THREE.Material {
