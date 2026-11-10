@@ -94,6 +94,10 @@ test("a configured deadline still ends a stalled solve with the interim route", 
 test("solverTimeoutMs accepts only a finite positive number and otherwise yields the default", () => {
   const { solverTimeoutMs } = optimizerModule;
   assert.equal(solverTimeoutMs(30000), 30000);
+  // setTimeout overflows above 2^31 - 1 ms and would fire after about 1 ms.
+  assert.equal(solverTimeoutMs(2 ** 31 - 1), 2 ** 31 - 1);
+  for (const value of [2 ** 31, 3e9])
+    assert.equal(solverTimeoutMs(value), 8000, String(value));
   for (const value of [
     undefined,
     null,
