@@ -12,7 +12,7 @@ import { NAME_WORDS } from "../src/apps/calendar7/layout.ts";
 import { NAMES_WHITE, SCHEMES } from "../src/apps/calendar7/schemes.ts";
 import { FACE_FLAT, FACE_SCALE, LINE_SCALE, TEXTURE, drawFace, drawSticker, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { drawFontSticker, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
-import { CUBIE_PITCH_MM, NAMES_BODY_WIDTH, NAMES_FACE_PX_PER_UNIT, NAMES_GAP, NAMES_GAP_MM, STANDARD_BODY_WIDTH, bodyWidthFor } from "../src/apps/calendar7/geometry.ts";
+import { CUBE_EDGE_MM_7X7, INNER_CUBIE_EDGE_MM, NAMES_BODY_WIDTH, NAMES_FACE_PX_PER_UNIT, NAMES_GAP, NAMES_GAP_MM, STANDARD_BODY_WIDTH, bodyWidthFor } from "../src/apps/calendar7/geometry.ts";
 import { layoutFixture } from "./calendar7-fixture.mjs";
 
 const PAPER_RED = SCHEMES.find((s) => s.id === "paper-red");
@@ -160,13 +160,14 @@ test("names layout on the sheet: the letter run of every name tile is exactly th
 });
 
 // ---- 5. the gap ----
-test("names layout: the gap between cubies is 0.01 mm, stated in scene units (cubie pitch 1 = CUBIE_PITCH_MM)", () => {
+test("names layout: the gap between cubies is 0.01 mm, stated in scene units (inner cubie = 66.5 mm / (5 + 2 f))", () => {
   assert.equal(NAMES_GAP_MM, 0.01);
-  assert.equal(CUBIE_PITCH_MM, 16); // assumption: the 16 mm calendar print preset (docs/PRINT_STICKERS.md); the app has no mm unit
-  assert.ok(Math.abs(NAMES_GAP - 0.01 / 16) < 1e-12, "0.01 mm / 16 mm = 0.000625 scene units");
+  assert.equal(CUBE_EDGE_MM_7X7, 66.5); // assumption: middle of the 61.5 to 70 mm range of common 7x7 cubes (not measured)
+  assert.ok(Math.abs(INNER_CUBIE_EDGE_MM - 66.5 / 8.6) < 1e-9, "5 + 2 * 1.8 = 8.6 inner widths: 7.7326 mm");
+  assert.ok(Math.abs(NAMES_GAP - 0.01 / (66.5 / 8.6)) < 1e-12, "0.01 mm / 7.7326 mm = 0.0012932 scene units");
   assert.ok(NAMES_GAP > 0, "never zero");
   assert.equal(bodyWidthFor("names"), NAMES_BODY_WIDTH);
-  assert.ok(Math.abs(NAMES_BODY_WIDTH - (1 - 0.000625)) < 1e-12);
+  assert.ok(Math.abs(NAMES_BODY_WIDTH - (1 - 0.0012932)) < 1e-6);
   // Real geometry: two neighboring bodies at pitch 1 are NAMES_GAP apart.
   const g = new RoundedBoxGeometry(NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, 1, PRESENTATION_PRESET.bodyRadius);
   g.computeBoundingBox();

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
-import { type Layout, NAME_SLOTS, nameSlotOffset, nameSlotStart } from "./layout.ts";
-import { NAMES_FACE_PX_PER_UNIT } from "./geometry.ts";
+import { type Layout, NAME_SLOTS, nameSlotOffset, nameSlotStart, nameTileShift } from "./layout.ts";
+import { faceFlatShare, facePixelsPerUnit, NAMES_FACE_PX_PER_UNIT } from "./geometry.ts";
 import { type ColorScheme, namesGround, type SchemeLine } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
@@ -39,14 +39,38 @@ export const LINE_SCALE = 4;
 export const NAMES_LINE_FACTOR = 1.5;
 
 /**
+ * Size of a tile on a cubie face of the names layout, in widths of an inner layer (the layer-width profile makes outer
+ * tiles larger): `w` along the texture x axis (sticker right), `h` along y (sticker up). No tile means 1 x 1.
+ */
+export interface FaceTile { readonly w: number; readonly h: number }
+/** Canvas pixels of a tile: 192 per unit of width. */
+export const tileCanvasSize = (tile?: FaceTile): [number, number] => (tile ? [Math.round(TEXTURE * tile.w), Math.round(TEXTURE * tile.h)] : [TEXTURE, TEXTURE]);
+/**
+ * Transform of the drawing (192 x 192 sticker coordinates) onto the canvas of a cubie face: the drawing center (96, 96) goes
+ * to the canvas center, the scale is `FACE_SCALE` on a 1 x 1 face and follows the pixels per unit of the face's real geometry
+ * (the texture is mapped along the arc length of the bevel, so a larger face has slightly fewer pixels per unit). No tile:
+ * exactly the historical centered `FACE_SCALE`.
+ */
+export function faceTransform(tile?: FaceTile): { cx: number; cy: number; kx: number; ky: number } {
+  if (!tile) return { cx: TEXTURE / 2, cy: TEXTURE / 2, kx: FACE_SCALE, ky: FACE_SCALE };
+  const [W, H] = tileCanvasSize(tile);
+  return { cx: W / 2, cy: H / 2, kx: FACE_SCALE * facePixelsPerUnit(tile.w, W) / NAMES_FACE_PX_PER_UNIT, ky: FACE_SCALE * facePixelsPerUnit(tile.h, H) / NAMES_FACE_PX_PER_UNIT };
+}
+
+/**
  * The rectangle of a tile line in texture pixels. On a sticker (the 2D sheet) the full width at the bottom edge, on a cubie
  * face the flat width (`FACE_FLAT`) at the bottom edge of the flat face. Names layout on a cubie face (the 3D cube): the
  * full texture width, so the lines of neighboring cubies meet as one continuous line, and `NAMES_LINE_FACTOR` times as
  * thick. The sheet (sticker surface) keeps its look in both layouts.
  */
-export function lineRect(line: SchemeLine, layout: Layout, face: boolean): { x: number; y: number; w: number; h: number } {
+export function lineRect(line: SchemeLine, layout: Layout, face: boolean, tile?: FaceTile): { x: number; y: number; w: number; h: number } {
   const names = layout === "names" && face;
   const h = line.px * LINE_SCALE * (names ? NAMES_LINE_FACTOR : 1);
+  if (names && tile) {
+    // A tile of any size: the full tile width, at the bottom edge of the flat face (the flat share of the height).
+    const [W, H] = tileCanvasSize(tile);
+    return { x: 0, y: H * (1 + faceFlatShare(tile.h)) / 2 - h, w: W, h };
+  }
   const bottom = face ? TEXTURE * (1 + FACE_FLAT) / 2 : TEXTURE;
   if (face && !names) return { x: TEXTURE * (1 - FACE_FLAT) / 2, y: bottom - h, w: TEXTURE * FACE_FLAT, h };
   return { x: 0, y: bottom - h, w: TEXTURE, h };
@@ -122,17 +146,17 @@ export const namePxPerUnit = (): number => NAMES_FACE_PX_PER_UNIT / FACE_SCALE;
  * Center x (drawing coordinates) of letter `i` of a name tile. On a cubie face (the 3D cube): the slot grid of layout.ts,
  * thirds of the cubie pitch, uniform across tiles. On a sticker (the 2D sheet): as before, three slots of the text square.
  */
-export const nameLetterX = (text: string, i: number, face: boolean): number =>
+export const nameLetterX = (text: string, i: number, face: boolean, tileWidth = 1): number =>
   face
-    ? TEXTURE / 2 + nameSlotOffset(text, i) * namePxPerUnit()
+    ? TEXTURE / 2 + (nameSlotOffset(text, i) + nameTileShift(text, tileWidth)) * namePxPerUnit()
     : TEXTURE / 2 - TEXT_SQUARE / 2 + (nameSlotStart(text) + i + 0.5) * (TEXT_SQUARE / NAME_SLOTS);
 
 /**
  * Letters of a name tile on the one uniform grid of the whole name row: a third of a cubie pitch between two letters, also
  * across tile boundaries, independent of the glyph widths (first tile right-flush, last left-flush, see layout.ts).
  */
-export function nameGrid(text: string, face = true): readonly NameLetter[] {
-  return [...text].map((char, i) => ({ char, x: nameLetterX(text, i, face), size: NAME_FONT_SIZE }));
+export function nameGrid(text: string, face = true, tileWidth = 1): readonly NameLetter[] {
+  return [...text].map((char, i) => ({ char, x: nameLetterX(text, i, face, tileWidth), size: NAME_FONT_SIZE }));
 }
 
 /** Normal font size of a one-line label by its length (shared by the one-line fit and the big split number). */
@@ -237,10 +261,10 @@ export function drawSticker(
   paintSticker(ctx, text, ink, profile, scheme ? tileRoles(scheme, text, ink, layout) : null, true, layout, false);
 }
 
-function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean, layout: Layout = "standard", face = false): void {
+function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean, layout: Layout = "standard", face = false, tile?: FaceTile): void {
   ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
   ctx.fillRect(0, 0, TEXTURE, TEXTURE);
-  if (text !== "") paintLabel(ctx, text, ink, profile, roles, layout, face);
+  if (text !== "") paintLabel(ctx, text, ink, profile, roles, layout, face, tile);
   if (roles?.line && edgeLine) {
     const r = lineRect(roles.line, layout, false);
     ctx.fillStyle = roles.line.color;
@@ -248,14 +272,14 @@ function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProf
   }
 }
 
-function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, layout: Layout, face: boolean): void {
+function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, layout: Layout, face: boolean, tile?: FaceTile): void {
   const big = roles ? roles.ink : (INK_COLORS[ink] ?? INK_COLORS.dark);
   ctx.fillStyle = big;
   if (layout === "names" && ink === "month") {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = `600 ${NAME_FONT_SIZE}px ${FONT}`;
-    for (const l of nameGrid(text, face)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04);
+    for (const l of nameGrid(text, face, tile ? tile.w : 1)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04);
   } else if (profile === "strict" && isSplitLabel(text)) {
     ctx.textBaseline = "alphabetic";
     const l = splitLayout(text);
@@ -317,19 +341,23 @@ export function drawFace(
   profile: RuleProfile = DEFAULT_RULE_PROFILE,
   scheme?: ColorScheme,
   layout: Layout = "standard",
+  tile?: FaceTile,
 ): void {
   const roles = scheme ? tileRoles(scheme, text, ink, layout) : null;
+  const t = layout === "names" ? tile : undefined; // only the names layout has tiles of other sizes
+  const [W, H] = tileCanvasSize(t);
   ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
-  ctx.fillRect(0, 0, TEXTURE, TEXTURE);
+  ctx.fillRect(0, 0, W, H);
+  const { cx, cy, kx, ky } = faceTransform(t);
   ctx.save();
-  ctx.translate(TEXTURE / 2, TEXTURE / 2);
-  ctx.scale(FACE_SCALE, FACE_SCALE);
+  ctx.translate(cx, cy);
+  ctx.scale(kx, ky);
   ctx.translate(-TEXTURE / 2, -TEXTURE / 2);
   // paintSticker paints the same ground again over the scaled square (same color), then the label.
-  paintSticker(ctx, text, ink, profile, roles, false, layout, true);
+  paintSticker(ctx, text, ink, profile, roles, false, layout, true, t);
   ctx.restore();
   if (roles?.line) {
-    const r = lineRect(roles.line, layout, true);
+    const r = lineRect(roles.line, layout, true, t);
     ctx.fillStyle = roles.line.color;
     ctx.fillRect(r.x, r.y, r.w, r.h);
   }
