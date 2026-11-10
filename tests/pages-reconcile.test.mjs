@@ -271,3 +271,69 @@ test('budget exhaustion names deployment, last status and error fields without l
   });
  assert(logged.some(line=>line.includes('artifact not ready')&&line.includes(sha)));
 });
+// Zero-latency fake: the clock moves only through sleep (and `jump`); GET number > failAfter throws `error()`.
+function budgetRun({token='ghs_TOK',oidcValue='oidc-secret-jwt',timeout,attempts=1000,body={status:'deployment_in_progress'},failAfter=Infinity,error,jump=0}){
+ let time=0,gets=0;
+ return deployPages({receipt,artifact:55,token,oidc:async()=>oidcValue,now:()=>time,timeout,attempts,sleep:async ms=>{time+=ms;},
+  fetch:async(url,options={})=>{
+   if(options.method==='POST')return json({id:sha},201);
+   gets++;
+   if(gets>failAfter){time+=jump;throw error();}
+   return json(body);
+  }});
+}
+const abortError=name=>()=>new DOMException(`${name} for test`,name);
+const mute=t=>{const logged=[];t.mock.method(console,'error',(...args)=>logged.push(args.join(' ')));return logged;};
+test('attempts cap at default attempts and timeout carries the full diagnostics',async t=>{
+ const logged=mute(t);
+ await assert.rejects(budgetRun({timeout:600000,attempts:60,body:{status:'deployment_in_progress',errors:['E5marker']}}),error=>{
+  assert(error.message.startsWith('Pages deployment wait budget exhausted'));
+  assert(error.message.includes(`deployment ${sha}`));assert(error.message.includes('last status deployment_in_progress'));assert(error.message.includes('E5marker'));
+  return true;
+ });
+ assert.equal(logged.length,1);assert(logged[0].includes('E5marker'));
+});
+test('a genuine 30000 ms request timeout propagates unchanged',async t=>{
+ mute(t);
+ await assert.rejects(budgetRun({timeout:40000,failAfter:0,error:abortError('TimeoutError')}),error=>error.name==='TimeoutError'&&!/budget/.test(error.message));
+});
+test('a budget-bound abort becomes the budget error with full diagnostics at the catch site',async t=>{
+ const logged=mute(t);
+ // The first status arrives with 29999 ms left, the second request (19999 ms left) aborts.
+ await assert.rejects(budgetRun({timeout:29999,failAfter:1,body:{status:'deployment_in_progress',errors:['E2marker']},error:abortError('TimeoutError')}),error=>{
+  assert.equal(error.message,`Pages deployment wait budget exhausted (deployment ${sha}, last status deployment_in_progress, errors ["E2marker"], message none)`);
+  return true;
+ });
+ assert.equal(logged.length,1);
+ await assert.rejects(budgetRun({timeout:29999,failAfter:0,error:abortError('TimeoutError')}),/budget exhausted \(no status received\)/);
+});
+test('AbortError is treated like TimeoutError, other errors propagate',async t=>{
+ mute(t);
+ await assert.rejects(budgetRun({timeout:29999,failAfter:0,error:abortError('AbortError')}),/budget exhausted/);
+ await assert.rejects(budgetRun({timeout:20001,failAfter:2,error:()=>new TypeError('fetch failed')}),error=>error instanceof TypeError);
+});
+test('an abort after the deadline passed is budget exhaustion even at a full request timeout',async t=>{
+ mute(t);
+ await assert.rejects(budgetRun({timeout:40000,failAfter:0,jump:40000,error:abortError('TimeoutError')}),/budget exhausted/);
+});
+test('diagnostics redact the GitHub and the OIDC token everywhere, including URL-encoded forms',async t=>{
+ const logged=mute(t);
+ const oidc='oidc.secret/jwt+value=';
+ const body={status:'deployment_in_progress',errors:[{detail:'Bearer ghs_TOK'}],message:`echo ${oidc} and ${encodeURIComponent(oidc)}`};
+ await assert.rejects(budgetRun({timeout:20000,oidcValue:oidc,body}),error=>{
+  for(const text of [error.message,...logged]){assert(!text.includes('ghs_TOK'));assert(!text.includes(oidc));assert(!text.includes(encodeURIComponent(oidc)));}
+  assert(error.message.includes('[redacted]'));
+  return true;
+ });
+ await assert.rejects(budgetRun({timeout:20000,body:{status:'ghs_TOK'}}),error=>{assert(!error.message.includes('ghs_TOK'));assert(error.message.includes('last status [redacted]'));return true;});
+});
+test('each diagnostic field is cut at 500 characters after redaction, so no token prefix survives the cut',async t=>{
+ const logged=mute(t);
+ const token='ghs_ABCDEFGHIJKLMNOP';
+ await assert.rejects(budgetRun({token,timeout:20000,body:{status:'S'.repeat(600),message:'y'.repeat(492)+token+'z'.repeat(50)}}),error=>{
+  for(const text of [error.message,...logged]){
+   assert(!text.includes('ghs_'));assert(!text.includes('S'.repeat(501)));assert(!text.includes('y'.repeat(493)));assert(text.includes('S'.repeat(500)));
+  }
+  return true;
+ });
+});
