@@ -87,6 +87,7 @@ async function bandProbe(page, scheme, scramble) {
     const { applyMoves } = await import("/src/apps/calendar7/engine.ts");
     const { schemeById } = await import("/src/apps/calendar7/schemes.ts");
     const { tileClass, tileRoles } = await import("/src/apps/calendar7/sticker-art.ts");
+    const { faceFlatShare } = await import("/src/apps/calendar7/geometry.ts");
     const get = async (p) => (await fetch(p)).json();
     const { printing, pose } = parseState(await get("/calendar7/names/state.v1.json"));
     const graph = parseGraph(await get("/calendar7/names/graph.v1.json"));
@@ -115,7 +116,9 @@ async function bandProbe(page, scheme, scramble) {
         const i = id - 1, cls = tileClass(printing.text[i], printing.ink[i]);
         const roles = tileRoles(sch, printing.text[i], printing.ink[i], "names");
         const px = (x, y) => hex(ctx.getImageData(x, y, 1, 1).data);
-        rows.push({ cls, text: printing.text[i], fill: px(8, 8), want: roles.fill, line: px(96, 180), lineWant: roles.line ? roles.line.color : null, wantLineless: roles.fill });
+        // The canvas is 192 px per unit of the tile (corner 346 x 346, ring 192 x 346): the line sits just above the bottom edge of the flat part.
+        const W = canvas.width, H = canvas.height, lineY = Math.floor(H * (1 + faceFlatShare(H / 192)) / 2) - 4;
+        rows.push({ cls, text: printing.text[i], fill: px(8, 8), want: roles.fill, line: px(Math.floor(W / 2), lineY), lineWant: roles.line ? roles.line.color : null, wantLineless: roles.fill });
       });
     });
     viewer.destroy();
@@ -200,11 +203,12 @@ test("the renderer exposure is raised in the names layout only and is the shared
   expect(seen).toEqual({ fresh: 1, wanted: 2.6, standard: 1, names: 2.6, back: 1 });
 });
 
-test("viewer wiring: names layout colors the cut faces per adjacent tile (flat colors and miter textures), the rest near-white, with a narrower body, and follows a scheme switch; the standard layout has none of it", async ({ page }) => {
+test("viewer wiring: names layout colors the cut faces per adjacent tile (flat colors and miter textures), the rest near-white, with thick outer layers (bodies, tiles, core, camera) and follows a scheme switch; the standard layout has none of it", async ({ page }) => {
   await page.goto("/licenses.html");
   const seen = await page.evaluate(async () => {
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
     const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const { NAMES_GAP } = await import("/src/apps/calendar7/geometry.ts");
     const get = async (p) => (await fetch(p)).json();
     const names = parseState(await get("/calendar7/names/state.v1.json"));
     const standard = parseState(await get("/calendar7/state.v1.json"));
@@ -213,15 +217,20 @@ test("viewer wiring: names layout colors the cut faces per adjacent tile (flat c
     document.body.append(host, panel);
     const viewer = new Calendar7Viewer(host, panel);
     const probe = () => {
-      const cut = new Map(), widths = new Set();
+      const cut = new Map(), widths = new Set(), canvases = new Set();
+      let center = 0;
       viewer.presentation.traverse((o) => {
         const ids = o.userData.sourceFaceStickerIds;
         if (!ids || !Array.isArray(o.material)) return;
         o.geometry.computeBoundingBox();
         widths.add(Math.round((o.geometry.boundingBox.max.x - o.geometry.boundingBox.min.x) * 1e6) / 1e6);
-        ids.forEach((id, i) => { if (id === null) { const k = o.material[i].map ? "mapped" : o.material[i].color.getHexString(); cut.set(k, (cut.get(k) ?? 0) + 1); } });
+        center = Math.max(center, Math.abs(o.parent.position.x), Math.abs(o.parent.position.y), Math.abs(o.parent.position.z));
+        ids.forEach((id, i) => {
+          if (id === null) { const k = o.material[i].map ? "mapped" : o.material[i].color.getHexString(); cut.set(k, (cut.get(k) ?? 0) + 1); }
+          else { const im = o.material[i].map.image; canvases.add(im.width + "x" + im.height); }
+        });
       });
-      return { cut: Object.fromEntries(cut), widths: [...widths] };
+      return { cut: Object.fromEntries(cut), widths: [...widths].sort(), canvases: [...canvases].sort(), center: Math.round(center * 1e6) / 1e6, cameraZ: viewer.camera.position.z, core: viewer.presentation.children.find((c) => c.userData.plasticCore).scale.x };
     };
     viewer.configure(standard.printing, standard.pose, "face", "standard");
     const std = probe();
@@ -230,12 +239,26 @@ test("viewer wiring: names layout colors the cut faces per adjacent tile (flat c
     viewer.setScheme("dracula");
     const dracula = probe();
     viewer.setScheme("paper-red");
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    const back = probe();
     viewer.destroy();
-    return { std, red, dracula };
+    return { std, red, dracula, back, gap: NAMES_GAP };
   });
   expect(Object.keys(seen.std.cut)).toEqual(["ffffff"]); // standard: one body color, the raw day fill
   expect(seen.std.widths).toEqual([0.99]);
-  expect(seen.red.widths).toEqual([0.999375]);
+  // The layer-width profile is on in the names layout only: 1.8 outer layers (bodies 1.8 - gap and 1 - gap wide), centers up to 3.4, a larger core and camera.
+  const r6 = (x) => Math.round(x * 1e6) / 1e6;
+  expect(seen.red.widths).toEqual([r6(1 - seen.gap), r6(1.8 - seen.gap)]);
+  expect(seen.std.center).toBe(3);
+  expect(seen.red.center).toBe(3.4);
+  expect(seen.std.canvases).toEqual(["192x192"]);
+  expect(seen.red.canvases).toEqual(["192x192", "192x346", "346x192", "346x346"]);
+  expect(seen.red.core / seen.std.core).toBeCloseTo(4.3 / 3.5, 6);
+  expect(seen.red.cameraZ / seen.std.cameraZ).toBeCloseTo((4.3 + 0.001) / (3.5 + 0.001), 6); // framing follows the total edge (N - 2) + 2 f
+  expect(seen.back.widths).toEqual([0.99]); // switching back restores the unit pitch, the textures and the framing
+  expect(seen.back.center).toBe(3);
+  expect(seen.back.canvases).toEqual(["192x192"]);
+  expect(seen.back.cameraZ).toBeCloseTo(seen.std.cameraZ, 9);
   expect(Object.keys(seen.red.cut).sort()).toEqual(["e0282c", "fdeeee", "fdfdfd", "mapped"]); // red, weekend-tint and near-white sides (and body), miter textures; no raw ffffff
   expect(seen.red.cut.e0282c).toBeGreaterThan(0);
   expect(seen.red.cut.mapped).toBeGreaterThan(0);
