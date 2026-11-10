@@ -59,3 +59,14 @@ test('a color selected while the viewer loads reaches the first cube',async({pag
  let release;const gate=new Promise(r=>release=r);await page.route('**/src/apps/calendar7/viewer.ts*',async route=>{await gate;await route.continue();});
  await page.goto('/index.html?app=calendar7&year=2026&month=11&scheme=paper-blue');const select=page.getByLabel('Cube color theme',{exact:true});await expect(select).toHaveValue('paper-blue');await select.selectOption('dracula');await expect(page.locator('#calendar7-root')).toHaveAttribute('data-c7-scheme','dracula');release();await expect(page.locator('#calendar7-root')).toHaveAttribute('data-c7-month','2026-11',{timeout:30000});await expect(select).toHaveValue('dracula');
 });
+
+for(const width of [320,360,390])test(`the font and color selectors share one touch-sized row at ${width}px and keep their names`,async({page})=>{
+ await page.setViewportSize({width,height:844});
+ await page.goto('/index.html?app=calendar7&year=2026&month=11');
+ await expect(page.locator('#calendar7-root')).toHaveAttribute('data-c7-month','2026-11',{timeout:30000});
+ const font=page.getByRole('combobox',{name:'Font style',exact:true}),theme=page.getByRole('combobox',{name:'Cube color theme',exact:true});
+ const[f,t]=await Promise.all([font.boundingBox(),theme.boundingBox()]);
+ expect(Math.abs(f.y-t.y),'same row').toBeLessThan(1);expect(f.height).toBeGreaterThanOrEqual(44);expect(t.height).toBeGreaterThanOrEqual(44);
+ expect(f.x+f.width).toBeLessThanOrEqual(t.x);expect(t.x+t.width).toBeLessThanOrEqual(width);expect(f.x).toBeGreaterThanOrEqual(0);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+});
