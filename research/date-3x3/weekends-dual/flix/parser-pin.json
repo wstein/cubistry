@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "artifact": "com.fasterxml.jackson.core:jackson-core:2.22.4",
+  "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.22.4/jackson-core-2.22.4.jar",
+  "sha256": "2d30c375cddea9657a1e1ef97547a2694b663b355facb4de53a097782b312d1a",
+  "license": "Apache-2.0",
+  "licenseFile": "PARSER-LICENSE.txt",
+  "noticeFile": "PARSER-NOTICE.txt",
+  "boundary": "JSON tokenization only; all schema, integer policy, geometry, reachability and proof validation are Flix code"
+}

@@ -1,0 +1,5 @@
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+Applies to requested-model.json, requested-certificate.json, experiment.json and evidence/ data and receipts.
+Created by Werner Stein with AI assistance (Codex, OpenAI). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+model.json and certificate.json are byte-identical retained copies from research/date-3x3/weekends at f76ea3117fa314e8742da088882dc8b2c6d7a41a; their existing provenance is preserved. Checker code is AGPL-3.0-or-later; the wrapper and parser dependency licenses are retained under flix/.
