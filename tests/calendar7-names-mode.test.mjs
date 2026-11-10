@@ -131,7 +131,7 @@ for (const scheme of SCHEMES) {
       assert.equal(texts(log).length, 0);
       const last = rects(log).at(-1);
       if (scheme.lineRow1) {
-        const h = scheme.lineRow1.px * LINE_SCALE * NAMES_LINE_FACTOR;
+        const h = scheme.lineRow1.px * LINE_SCALE * (name === "sticker" ? 1 : NAMES_LINE_FACTOR); // the sheet keeps its thickness
         assert.equal(last[1], scheme.lineRow1.color, `${name} line color`);
         assert.equal(last[5], h);
         assert.deepEqual(last.slice(2, 5), [0, name === "sticker" ? TEXTURE - h : TEXTURE * ((1 + FACE_FLAT) / 2) - h, TEXTURE], `${name} full width`);
@@ -147,17 +147,18 @@ for (const scheme of SCHEMES) {
 
 test("name tiles use one monospaced 3-slot grid (thirds of the cubie pitch): right-flush first tile, left-flush last tile, full middle, centered otherwise", () => {
   const slot = TEXT_SQUARE / NAME_SLOTS;
-  const at = (k, face = true) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit(face);
+  const atFace = (k) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit();
+  const atSheet = (k) => TEXTURE / 2 - TEXT_SQUARE / 2 + (k + 0.5) * slot; // the 2D sheet (sticker surface) keeps the 3-slot text square
   const cases = { J: [2], FE: [1, 2], MA: [1, 2], OC: [1, 2], ANU: [0, 1, 2], ER: [0, 1], IL: [0, 1], Y: [0], BER: [0, 1, 2] };
   for (const [label, slots] of Object.entries(cases)) {
     const grid = nameGrid(label);
     assert.deepEqual(grid.map((g) => g.char), label.split(""), label);
-    assert.deepEqual(grid.map((g) => g.x), slots.map((k) => at(k)), label);
+    assert.deepEqual(grid.map((g) => g.x), slots.map(atFace), label);
     assert.ok(grid.every((g) => g.size === NAME_FONT_SIZE), "one size for every name tile");
   }
   // The same grid is what the sticker draws: size and x of each letter.
   const log = record((c) => drawSticker(c, "FE", "month", "strict", SCHEMES[0], "names"));
-  assert.deepEqual(texts(log).map((e) => [e[2], e[3]]), [["F", at(1, false)], ["E", at(2, false)]]);
+  assert.deepEqual(texts(log).map((e) => [e[2], e[3]]), [["F", atSheet(1)], ["E", atSheet(2)]]);
   assert.ok(texts(log).every((e) => e[6].includes(`${NAME_FONT_SIZE}px`) && e[5] === "center"));
   // Standard layout: the label is one centered run.
   const std1 = texts(record((c) => drawSticker(c, "FE", "month", "strict", SCHEMES[0])));
@@ -442,7 +443,7 @@ const fakeFont = { style: { master: "0" }, glyphs: Object.fromEntries([..."01234
 
 test("font path: name letters sit on the 3-slot grid, one size for every tile, the same x as the sticker grid", () => {
   const slot = TEXT_SQUARE / NAME_SLOTS;
-  const at = (k) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit(true);
+  const at = (k) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit();
   const cases = { J: [2], MA: [1, 2], ER: [0, 1], ANU: [0, 1, 2], Y: [0], OC: [1, 2] };
   const sizes = new Set();
   for (const [label, slots] of Object.entries(cases)) {
@@ -457,7 +458,7 @@ test("font path: name letters sit on the 3-slot grid, one size for every tile, t
   assert.ok(size * 0.91 <= slot, "the widest capital fits a slot");
   // A single run would have a different x for the second letter.
   const two = nameLabelLayout("MA", fakeFont);
-  assert.ok(Math.abs(two[1].x - two[0].x - namePxPerUnit(true) / NAME_SLOTS) < 1e-9, "letters are one third of a cubie apart");
+  assert.ok(Math.abs(two[1].x - two[0].x - namePxPerUnit() / NAME_SLOTS) < 1e-9, "letters are one third of a cubie apart");
 });
 
 /** Records the letters drawFontSticker draws: text and the x of the translate in effect (drawFontRun translates to the run). */
@@ -476,7 +477,7 @@ function recordFont(text, ink, layout, surface = "sticker") {
 }
 
 test("font path: drawFontSticker draws a name tile as one run per letter at the slot x, and any other label as before", () => {
-  const at = (k) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit(false); // recordFont draws on the sticker surface
+  const at = (k) => TEXTURE / 2 - TEXT_SQUARE / 2 + (k + 0.5) * (TEXT_SQUARE / NAME_SLOTS); // recordFont draws on the sticker surface (the 2D sheet): as before
   const close = (runs, want) => { assert.equal(runs.length, want.length); runs.forEach((r, i) => { assert.equal(r[0], want[i][0]); assert.ok(Math.abs(r[1] - want[i][1]) < 1e-9, `${r[0]} x ${r[1]} want ${want[i][1]}`); }); };
   close(recordFont("MA", "month", "names"), [["M", at(1)], ["A", at(2)]]);
   close(recordFont("ER", "month", "names"), [["E", at(0)], ["R", at(1)]]);

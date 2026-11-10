@@ -36,6 +36,7 @@ export {
   PRESENTATION_PRESET, createPresentationGeometry, createPlasticMaterial,
   createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
 } from "./presentation-preset.ts";
+export { CUT_TEXTURE_SIZE, cutColorAt, cutFaceEdges, cutPatternKey, faceUvAxes, flatCutColor, paintCutPattern, type CutEdge, type CutEdgeColor, type FaceUvAxes } from "./cut-faces.ts";
 export { PhysicalCubeScene, stickerFrame, DEFAULT_CORE_COLOR, type PhysicalStickerFrame, type StickerlessBodyOptions } from "./physical-scene.ts";
 import { bindSmartRotation, type SmartRotationBinding } from "./rotation-binding.ts";
 import { bindLightingSwitches, type LightingSwitches } from "./lighting-switches.ts";

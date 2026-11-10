@@ -199,3 +199,46 @@ test("the renderer exposure is raised in the names layout only and is the shared
   });
   expect(seen).toEqual({ fresh: 1, wanted: 2.6, standard: 1, names: 2.6, back: 1 });
 });
+
+test("viewer wiring: names layout colors the cut faces per adjacent tile (flat colors and miter textures), the rest near-white, with a narrower body, and follows a scheme switch; the standard layout has none of it", async ({ page }) => {
+  await page.goto("/licenses.html");
+  const seen = await page.evaluate(async () => {
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const get = async (p) => (await fetch(p)).json();
+    const names = parseState(await get("/calendar7/names/state.v1.json"));
+    const standard = parseState(await get("/calendar7/state.v1.json"));
+    const host = document.createElement("div"), panel = document.createElement("div");
+    host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
+    document.body.append(host, panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    const probe = () => {
+      const cut = new Map(), widths = new Set();
+      viewer.presentation.traverse((o) => {
+        const ids = o.userData.sourceFaceStickerIds;
+        if (!ids || !Array.isArray(o.material)) return;
+        o.geometry.computeBoundingBox();
+        widths.add(Math.round((o.geometry.boundingBox.max.x - o.geometry.boundingBox.min.x) * 1e6) / 1e6);
+        ids.forEach((id, i) => { if (id === null) { const k = o.material[i].map ? "mapped" : o.material[i].color.getHexString(); cut.set(k, (cut.get(k) ?? 0) + 1); } });
+      });
+      return { cut: Object.fromEntries(cut), widths: [...widths] };
+    };
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    const std = probe();
+    viewer.configure(names.printing, names.pose, "face", "names");
+    const red = probe();
+    viewer.setScheme("dracula");
+    const dracula = probe();
+    viewer.setScheme("paper-red");
+    viewer.destroy();
+    return { std, red, dracula };
+  });
+  expect(Object.keys(seen.std.cut)).toEqual(["ffffff"]); // standard: one body color, the raw day fill
+  expect(seen.std.widths).toEqual([0.99]);
+  expect(seen.red.widths).toEqual([0.999375]);
+  expect(Object.keys(seen.red.cut).sort()).toEqual(["e0282c", "fdeeee", "fdfdfd", "mapped"]); // red, weekend-tint and near-white sides (and body), miter textures; no raw ffffff
+  expect(seen.red.cut.e0282c).toBeGreaterThan(0);
+  expect(seen.red.cut.mapped).toBeGreaterThan(0);
+  expect(Object.keys(seen.dracula.cut)).not.toContain("e0282c"); // the cut colors follow the scheme switch
+  expect(Object.keys(seen.dracula.cut)).toContain("ff79c6");
+});

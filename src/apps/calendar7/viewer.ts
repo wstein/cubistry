@@ -61,18 +61,11 @@ function lightGeometry(layout: Layout) {
 /** Body color of the cut faces and the core: the day fill; the names layout shows it as its near-white. */
 const bodyFill = (scheme: ColorScheme, layout: Layout): string => (layout === "names" ? namesGround(scheme.dayFill) : scheme.dayFill);
 
-/**
- * Names layout: sticker id to color for every month name and band tile: the cut faces next to the tile take its fill (the
- * red of the band), so the color runs to the end of the cubie, over bevel and sides. Empty in the standard layout.
- */
-function cutColors(printing: Printing, scheme: ColorScheme, layout: Layout): Map<number, string> {
-  const colors = new Map<number, string>();
-  if (layout !== "names") return colors;
-  for (let i = 0; i < STICKERS; i++) {
-    const roles = tileRoles(scheme, printing.text[i], printing.ink[i], layout);
-    if (roles.cls === "month" || roles.cls === "band") colors.set(i + 1, roles.fill);
-  }
-  return colors;
+/** Fill of every printed tile (sticker id to color): what the exterior faces show and the cut faces next to them take (miter). */
+function faceFills(printing: Printing, scheme: ColorScheme, layout: Layout): Map<number, string> {
+  const fills = new Map<number, string>();
+  for (let i = 0; i < STICKERS; i++) fills.set(i + 1, tileRoles(scheme, printing.text[i], printing.ink[i], layout).fill);
+  return fills;
 }
 
 /** Camera distance relative to the fit of the bounding sphere: the cube fills the picture, the sphere keeps some air. */
@@ -190,7 +183,7 @@ export class Calendar7Viewer implements StageView {
   private applyBodyColor(): void {
     if (!this.bodyStale || this.tween.running || !this.printing || !this.pose || this.destroyed) return;
     this.cube?.setBodyColor(bodyFill(this.scheme, this.layout));
-    if (this.layout === "names") this.cube?.setCutColors(cutColors(this.printing, this.scheme, this.layout));
+    if (this.layout === "names") this.cube?.setFaceColors(faceFills(this.printing, this.scheme, this.layout));
     this.bodyStale = false;
   }
 
@@ -261,8 +254,7 @@ export class Calendar7Viewer implements StageView {
       up: [0, 0, 0],
     }));
     this.writeFrames(pose);
-    const faceColors = new Map<number, string>();
-    for (let i = 0; i < STICKERS; i++) faceColors.set(i + 1, tileRoles(this.scheme, printing.text[i], printing.ink[i], layout).fill);
+    const faceColors = faceFills(printing, this.scheme, layout);
     this.cube = new PhysicalCubeScene(
       this.presentation,
       this.frames as unknown as readonly PhysicalStickerFrame[],
@@ -272,7 +264,7 @@ export class Calendar7Viewer implements StageView {
       lightGeometry(layout),
       faceColors,
       // Stickerless: the body is the day background (owner decision); with stickers it is the plastic frame between them.
-      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), cutColors: cutColors(printing, this.scheme, layout) },
+      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), miterCutFaces: layout === "names" }, // names layout: cut faces colored as on a real cube (cut-faces.ts)
     );
     // A sticker is a flat sheet on its body: it needs no shadow of its own (halves the shadow pass).
     this.presentation.traverse((o) => {

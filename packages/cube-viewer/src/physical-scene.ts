@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { bodyArtworkKey, orientBodyArtwork, sourceFaceIndex } from "./body-artwork.ts";
 import type { Construction } from "./appearance.ts";
 import { cross, demand, type Vec3 } from "@cubistry/cube-core";
+import { type CutEdgeColor, cutFaceEdges, cutPatternKey, cutPatternTexture, type FaceUvAxes, faceUvAxes, flatCutColor } from "./cut-faces.ts";
 
 /** Render-only projection of canonical sticker frames; never an authoritative state. */
 export interface PhysicalStickerFrame {
@@ -30,11 +31,12 @@ export interface StickerlessBodyOptions {
   /** Stickerless core color. Absent: DEFAULT_CORE_COLOR. */
   readonly coreColor?: string;
   /**
-   * Cut color of the cubie that carries a printed sticker (sticker id to color): the cut faces next to that sticker (all but
-   * the one opposite it) take the color instead of `bodyColor`, so the color of the sticker runs over the sides of its
-   * cubie. Only those cubies; `setBodyColor` leaves them alone, `setCutColors` changes them. Absent: no cubie is special.
+   * Colors the cut faces as a real cube is made: a cut face next to an exterior face carries the color of that face (the
+   * `faceColors` of the scene), split diagonally where it borders two exterior faces of different colors; a cut face that
+   * touches no exterior face keeps `bodyColor`. Default off: every cut face is `bodyColor` (or follows its bordering face).
+   * `setFaceColors` follows a change of the face colors.
    */
-  readonly cutColors?: ReadonlyMap<number, string>;
+  readonly miterCutFaces?: boolean;
 }
 /** Size-neutral scene adapter. Callers validate prints, state and legal moves.
  * Textures/materials and animation deadlines stay caller-owned. */
@@ -49,9 +51,14 @@ export class PhysicalCubeScene {
   /** Stickerless core: visible only in seams; never follows a frame color. */
   private readonly coreMaterial: THREE.MeshStandardMaterial;
   private readonly cutMaterials = new Map<string, THREE.Material>();
-  /** One cut material per cubie with its own cut color (`StickerlessBodyOptions.cutColors`). */
-  private readonly cubieCutMaterials = new Map<number, { material: THREE.MeshStandardMaterial; sticker: number }>();
   private bodyColor: string | null;
+  /** Miter mode (`StickerlessBodyOptions.miterCutFaces`): face colors by sticker id, the cut slots and the pooled materials. */
+  private readonly miter: boolean;
+  private readonly faceColorOf = new Map<number, string>();
+  private uvAxes: readonly FaceUvAxes[] = [];
+  private readonly miterSlots: { materials: THREE.Material[]; index: number; ids: (number | null)[] }[] = [];
+  private readonly miterMaterials = new Map<string, THREE.Material>();
+  private readonly miterTextures: THREE.Texture[] = [];
   private readonly faceMaterials: THREE.Material[] = [];
   private readonly geometries: THREE.BufferGeometry[];
   private readonly parent: THREE.Scene | THREE.Group;
@@ -73,8 +80,10 @@ export class PhysicalCubeScene {
     const coreColor = options.coreColor ?? DEFAULT_CORE_COLOR;
     demand(HEX_COLOR.test(coreColor), "Invalid core color");
     demand(options.bodyColor == null || HEX_COLOR.test(options.bodyColor), "Invalid body color");
-    for (const color of options.cutColors?.values() ?? []) demand(HEX_COLOR.test(color), "Invalid cut color");
     this.bodyColor = options.bodyColor ?? null;
+    this.miter = options.miterCutFaces === true;
+    if (this.miter) this.uvAxes = faceUvAxes(geometry.body);
+    for (const [id, color] of faceColors) this.faceColorOf.set(id, color);
     // The core belongs to construction, never a selected frame color.
     this.coreMaterial = this.neutralPlastic(coreColor) as THREE.MeshStandardMaterial;
     this.spacing = spacing;
@@ -116,12 +125,13 @@ export class PhysicalCubeScene {
         }
         // Inward-facing cut faces take the color of a bordering exterior face
         // (or the explicit body color), like real stickerless cubes.
-        const ownFace = sourceFaces.find(face => options.cutColors?.has(face.id));
-        const own = ownFace === undefined ? undefined : options.cutColors!.get(ownFace.id)!;
-        const opposite = ownFace === undefined ? -1 : sourceFaceIndex(ownFace.n) ^ 1;
-        for (let index = 0; index < 6; index++)
-          if (!faceMaterials[index])
-            faceMaterials[index] = ownFace === undefined || index === opposite ? this.cutMaterial(index, exterior) : this.cubieCutMaterial(s.cubie, ownFace.id, own!);
+        for (let index = 0; index < 6; index++) {
+          if (faceMaterials[index]) continue;
+          if (!this.miter) { faceMaterials[index] = this.cutMaterial(index, exterior); continue; }
+          for (const face of sourceFaces) if (!this.faceColorOf.has(face.id)) this.faceColorOf.set(face.id, exterior.find(e => e.index === sourceFaceIndex(face.n))!.color);
+          this.miterSlots.push({ materials: faceMaterials, index, ids: sourceIds });
+          faceMaterials[index] = this.miterMaterial(index, sourceIds, exterior);
+        }
         shell.userData.sourceFaceStickerIds = sourceIds;
         this.shells.set(s.cubie, { mesh: shell, stickerless: faceMaterials });
         this.bodies.set(s.cubie, body);
@@ -181,13 +191,30 @@ export class PhysicalCubeScene {
     }
     this.bodyColor = color;
   }
-  /** Changes the cut color of the cubies that were built with one (`StickerlessBodyOptions.cutColors`, by sticker id); other cubies are not touched. */
-  setCutColors(colors: ReadonlyMap<number, string>): void {
-    for (const color of colors.values()) demand(HEX_COLOR.test(color), "Invalid cut color");
-    for (const { material, sticker } of this.cubieCutMaterials.values()) {
-      const color = colors.get(sticker);
-      if (color !== undefined) material.color.set(color);
+  /** Miter mode: the exterior colors changed (sticker id to color); every cut face takes the new colors in place. */
+  setFaceColors(colors: ReadonlyMap<number, string>): void {
+    if (!this.miter) return;
+    for (const color of colors.values()) demand(HEX_COLOR.test(color), "Invalid face color");
+    for (const [id, color] of colors) this.faceColorOf.set(id, color);
+    for (const slot of this.miterSlots) slot.materials[slot.index] = this.miterMaterial(slot.index, slot.ids, []);
+  }
+  /** The material of cut face `index` of a cubie whose exterior faces carry the sticker ids `ids` (null: a cut face). */
+  private miterMaterial(index: number, ids: readonly (number | null)[], exterior: readonly { index: number; color: string }[]): THREE.Material {
+    const edges = cutFaceEdges(index, ids.map(id => (id === null ? null : this.faceColorOf.get(id) ?? null)), this.uvAxes);
+    if (edges.length === 0) return this.cutMaterial(index, exterior);
+    const flat = flatCutColor(edges);
+    const key = flat ?? cutPatternKey(edges);
+    let material = this.miterMaterials.get(key);
+    if (!material) {
+      material = this.neutralPlastic(flat ?? "#ffffff");
+      if (flat === null) {
+        const texture = cutPatternTexture(edges as readonly CutEdgeColor[]);
+        (material as THREE.MeshStandardMaterial).map = texture;
+        this.miterTextures.push(texture);
+      }
+      this.miterMaterials.set(key, material);
     }
+    return material;
   }
   /** Stickerless core color; takes effect immediately, including during a turn. */
   setCoreColor(color: string): void {
@@ -201,11 +228,6 @@ export class PhysicalCubeScene {
     (material as THREE.MeshStandardMaterial).map = null;
     this.faceMaterials.push(material);
     return material;
-  }
-  private cubieCutMaterial(cubie: number, sticker: number, color: string): THREE.Material {
-    let own = this.cubieCutMaterials.get(cubie);
-    if (!own) { own = { material: this.neutralPlastic(color) as THREE.MeshStandardMaterial, sticker }; this.cubieCutMaterials.set(cubie, own); }
-    return own.material;
   }
   /** Bounded: one shared material per distinct color, never per cubie face. */
   private cutMaterial(index: number, exterior: readonly { index: number; color: string }[]): THREE.Material {
@@ -270,6 +292,10 @@ export class PhysicalCubeScene {
     this.stickers.length = 0;
     this.artwork.length = 0;
     this.bodyVariants.clear();
+    this.miterSlots.length = 0;
+    this.miterMaterials.clear();
+    for (const texture of this.miterTextures) texture.dispose();
+    this.miterTextures.length = 0;
     for (const material of this.faceMaterials) material.dispose();
     for (const geometry of this.geometries) geometry.dispose();
   }
