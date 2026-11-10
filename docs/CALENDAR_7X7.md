@@ -289,7 +289,9 @@ source digest. The root word gives a legal setup from the solved printing; this
 app still starts with the snapshot and does not present a setup tutorial.
 
 DEFAULT_RULE_PROFILE is global. All runtime data is strict, so it switches
-globally; no date-dependent profile selection or second runtime data set exists.
+globally; no date-dependent profile selection exists. The shipped app reads one runtime data set (scheme A); the
+names layout data under `public/calendar7/names/` (see "Names layout data") is a second, separate data set that no
+mode reads yet.
 
 ## Files
 
@@ -338,7 +340,7 @@ globally; no date-dependent profile selection or second runtime data set exists.
 ## Names layout data (window May 2026 to January 2028)
 
 Status: **research candidate, not certified**. English only. Data for a second mode, "names layout", in which row 1
-carries the month name as one to three multi-letter labels (columns 1 to 3, for example `MA|Y`, `NOV|EMB|ER`) and the
+carries the month name as name labels of one to three letters each (columns 1 to 3, for example `MA|Y`, `NOV|EMB|ER`) and the
 empty tiles of row 1 are a separate ink class `band`. The app mode is not part of this data change. The shipped
 scheme A files (`public/calendar7/state.v1.json`, `graph.v1.json`, `displays.v1.json`) are unchanged and stay frozen
 by `calendar7-source.json`; the names data lives under new names in `public/calendar7/names/`.
@@ -370,6 +372,12 @@ node --test tests/calendar7-names-data.test.mjs           # CALENDAR7_NAMES_RESE
 The exporter refuses input whose digests differ from the research `experiment.json`, replays every stored word with the
 app engine, requires each result to equal the research snapshot `state-NN.tsv`, the stored hash and the display
 sheet, and writes the same bytes on every run.
+
+The digest pin of the exporter stops any changed research input first. The checks behind it (declared metrics,
+snapshot against replay, display front, month order) are defence in depth on the command line; the tests reach each of
+them through the test-only option `testOnlySkipDigestPins` of `build()`, which the command line never sets (these
+tests need `CALENDAR7_NAMES_RESEARCH`). `namesWindowContains(table, year, month)` in `graph.ts` tells a caller without
+exceptions whether a month lies inside a display table.
 
 Not claimed: coverage of 2000 to 2100 (or of any month outside the window), a single print for the 91 displays (the
 research corner-coupling result obstructs one permanent print for the full domain under this band model), shortest
