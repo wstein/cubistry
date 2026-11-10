@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import * as optimizerModule from "../src/apps/calendar/optimizer.ts";
 
-const { CalendarOptimizer } = optimizerModule;
+const { CalendarOptimizer, solverTimeoutMs } = optimizerModule;
 const context = {
   design: {},
   from: [],
@@ -113,4 +113,30 @@ test("the calendar page takes the deadline from an internal test hook, not from 
     /new CalendarOptimizer\(\s*undefined,\s*solverTimeoutMs\(window\.__calendarSolverTimeoutMs\),?\s*\)/,
   );
   assert.doesNotMatch(source, /params\.get\(["']solver/i);
+});
+
+test("the Pages spec sets the same hook to a finite deadline below its busy wait", () => {
+  const spec = readFileSync(
+    new URL("./pages/calendar.spec.mjs", import.meta.url),
+    "utf8",
+  );
+  const page = readFileSync(
+    new URL("../src/calendar.mjs", import.meta.url),
+    "utf8",
+  );
+  const hook = page.match(/window\.(__calendarSolverTimeoutMs)/)?.[1];
+  assert.ok(hook, "calendar.mjs reads the hook");
+  const set = [...spec.matchAll(/window\.(\w+)\s*=\s*([\d_]+)\s*;/g)].filter(
+    (m) => m[1] === hook,
+  );
+  assert.equal(set.length, 1, `spec sets window.${hook} exactly once`);
+  const deadline = Number(set[0][2].replaceAll("_", ""));
+  const busy = Number(
+    spec.match(/"aria-busy",\s*"false",\s*\{\s*timeout:\s*(\d+)/)?.[1],
+  );
+  assert.ok(busy > 0, "spec has a busy wait");
+  assert.equal(solverTimeoutMs(deadline), deadline, "deadline is accepted");
+  assert.ok(deadline > 8000, "deadline exceeds the default");
+  assert.ok(deadline < busy, "deadline stays below the busy wait");
+  assert.match(spec, /toBeLessThanOrEqual\(\s*moves,?\s*\)/);
 });
