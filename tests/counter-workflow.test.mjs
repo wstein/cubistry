@@ -95,6 +95,12 @@ test("quick and browser concurrency are independent and latest main pushes super
     assert.notEqual(group(workflow, main), group(workflow, manual));
   }
 });
+test("the Pages build image is the same immutable environment as the Counter browser jobs", () => {
+  const pages = read("pages.yml");
+  const images = [...pages.matchAll(/^ {6}image: (mcr\.microsoft\.com\/playwright:[^\s]+)$/gm)];
+  assert.equal(images.length, 1, "the Pages build job pins its image");
+  assert.equal(images[0][1], expectedEnvironment.image);
+});
 test("every Counter browser consumer uses the same immutable matching environment", () => {
   for (const [workflow, jobs] of [[quick, 1], [browser, 2]]) {
     const images = [...workflow.matchAll(/^      image: (mcr\.microsoft\.com\/playwright:[^\s]+)$/gm)];

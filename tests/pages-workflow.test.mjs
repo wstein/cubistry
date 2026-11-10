@@ -206,3 +206,16 @@ test("every external action in the Pages build and Counter workflows is pinned b
     }
   }
 });
+
+test("Pages build concurrency never lets a manual or push run supersede another event on the same ref", () => {
+  const builder = readFileSync(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
+  const expression = builder.match(/^ {6}group: (pages-build-.*)$/m);
+  assert.ok(expression, "the build job has its own concurrency group");
+  const group = (event_name, ref, number = null) => expression[1].replace(/\$\{\{ (.*?) \}\}/g, (_, expr) =>
+    Function("github", `return (${expr});`)({ event_name, ref, event: { pull_request: { number } } }));
+  const main = "refs/heads/main";
+  assert.notEqual(group("push", main), group("workflow_dispatch", main));
+  assert.notEqual(group("push", main), group("schedule", main));
+  assert.notEqual(group("pull_request", main, 7), group("pull_request", main, 8));
+  assert.equal(group("push", main), group("push", main));
+});
