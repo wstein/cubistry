@@ -220,6 +220,17 @@ export function displayIdOf(table: DisplayTable, year: number, month: number): n
   return table.months[index];
 }
 
+/**
+ * True when the table has an entry for the calendar month: integer year, integer month 1..12 and inside the
+ * table's range. Never throws; callers (the names mode falls back to the shipped layout outside its window)
+ * need no try/catch. `displayIdOf` is unchanged.
+ */
+export function namesWindowContains(table: DisplayTable, year: number, month: number): boolean {
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) return false;
+  const index = (year - table.firstYear) * 12 + month - (table.firstMonth ?? 1);
+  return index >= 0 && index < table.months.length;
+}
+
 /** Parse graph.v1.json. */
 export function parseGraph(json: unknown): Graph {
   const j = obj(json, "graph");
