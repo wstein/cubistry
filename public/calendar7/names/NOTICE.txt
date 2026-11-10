@@ -1,0 +1,11 @@
+English 7x7 calendar cube, names layout data (research candidate, not certified)
+Window May 2026 to January 2028 only (21 months, 20 edges). English only. Outside the window the app uses the shipped scheme A data.
+Status: research candidate, not certified. No shortest-route, global-print or build-certification claim.
+Created by Werner Stein with AI assistance (Codex, OpenAI). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+Source: research/calendar-7x7/row1-revision, row1-window-print and row1-window-chain on research/cube-display-feasibility
+(research commit cc50ebaad0e0fe66d654121a67088f3d6c78c6a8). Regenerate with scripts/export-calendar7-names.mjs.
+The files are a work separate from the Cubistry program code (AGPL-3.0-or-later). The shipped files
+public/calendar7/state.v1.json, graph.v1.json and displays.v1.json are not changed by this folder.

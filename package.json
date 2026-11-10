@@ -29,9 +29,10 @@
     "pretypecheck": "npm run prepare:five-second",
     "test:five-second-proof": "npm run prepare:five-second && python3 .five-second-research/research/five-second-timer/verify.py .five-second-research/research/five-second-timer/optimized-certificate.json && python3 .five-second-research/research/five-second-timer/physical_replay.py .five-second-research/research/five-second-timer/optimized-certificate.json && python3 -m unittest discover -s .five-second-research/research/five-second-timer -p test_verify.py && python3 .five-second-research/research/five-second-timer/verify_trace.py test-results/five-second-commits.json",
     "verify:ms": "node scripts/prepare-ms.mjs --check",
-    "precheck": "npm run verify:hm && npm run verify:calendar7",
+    "precheck": "npm run verify:hm && npm run verify:calendar7 && npm run verify:calendar7-names",
     "verify:hm": "node scripts/prepare-hm.mjs --check",
-    "verify:calendar7": "node scripts/prepare-calendar7.mjs --check"
+    "verify:calendar7": "node scripts/prepare-calendar7.mjs --check",
+    "verify:calendar7-names": "node scripts/export-calendar7-names.mjs --check"
   },
   "dependencies": {
     "@cubistry/cube-appearance": "*",
