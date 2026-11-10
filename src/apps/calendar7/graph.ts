@@ -27,7 +27,7 @@ import {
   inverseMoves,
 } from "./engine.ts";
 import type { Surface } from "./sticker-art.ts";
-import { type Cell, type Display, frontFailure, INKS, type Ink } from "./display.ts";
+import { type Cell, type Display, frontFailure, INKS, INKS_WITH_BAND, type Ink } from "./display.ts";
 
 export const STATE_SCHEMA = "cubistry.calendar7.state";
 export const GRAPH_SCHEMA = "cubistry.calendar7.graph";
@@ -82,6 +82,8 @@ export interface DisplayTable {
   /** Display id of each month from `first`, in calendar order. */
   readonly months: readonly number[];
   readonly firstYear: number;
+  /** Month (1-12) of `months[0]`; absent means 1 (January). Only window tables (names layout) set it. */
+  readonly firstMonth?: number;
 }
 
 type Json = Record<string, unknown>;
@@ -138,8 +140,8 @@ export function parseState(json: unknown): Start {
     piece.push(int(s.piece, "piece", 1, CUBIES));
     text.push(str(s.text, "text"));
     const k = str(s.ink, "ink");
-    if (!INKS.includes(k as Ink)) throw new Error(`unknown ink ${k}`);
-    if ((text[i] === "") !== (k === "blank"))
+    if (!INKS_WITH_BAND.includes(k as Ink)) throw new Error(`unknown ink ${k}`);
+    if ((text[i] === "") !== (k === "blank" || k === "band"))
       throw new Error(`sticker ${i + 1}: blank text and blank ink must coincide`);
     ink.push(k);
     pose.pos.set(vec(s.p, "p"), 3 * i);
@@ -160,20 +162,26 @@ export function parseState(json: unknown): Start {
   return { printing, pose, node, surface };
 }
 
-/** Parse displays.v1.json. */
+/**
+ * Parse displays.v1.json. Two shapes: the shipped table (no `firstMonth`: the five inks, 91 displays,
+ * the 888 months 2026-2099) and a window table (`firstMonth` present, the names layout: the five inks or
+ * the six with `band`, one to 1201 months from `firstYear`/`firstMonth`, at most one display per month).
+ */
 export function parseDisplays(json: unknown): DisplayTable {
   const j = obj(json, "displays");
   schema(j, DISPLAYS_SCHEMA);
+  const window = j.firstMonth !== undefined;
   const inks = arr(j.inks, "inks");
-  if (inks.join() !== INKS.join()) throw new Error("ink table differs from the engine");
+  const table: readonly string[] = window && inks.length === INKS_WITH_BAND.length ? INKS_WITH_BAND : INKS;
+  if (inks.join() !== table.join()) throw new Error("ink table differs from the engine");
   const displays = arr(j.displays, "displays").map((raw, i): Display => {
     const d = obj(raw, `display ${i + 1}`);
-    if (d.id !== i + 1) throw new Error("display ids must be 1..91 in order");
+    if (d.id !== i + 1) throw new Error(`display ids must be 1..${window ? "N" : "91"} in order`);
     const cells = arr(d.cells, "cells").map((c, k): Cell => {
       const s = str(c, `cell ${k}`);
       const colon = s.indexOf(":");
       const ink = s.slice(0, colon);
-      if (colon < 0 || !INKS.includes(ink as Ink)) throw new Error(`bad cell ${s}`);
+      if (colon < 0 || !table.includes(ink)) throw new Error(`bad cell ${s}`);
       return { ink: ink as Ink, text: s.slice(colon + 1) };
     });
     if (cells.length !== 49) throw new Error("49 cells per display");
@@ -184,17 +192,31 @@ export function parseDisplays(json: unknown): DisplayTable {
       cells,
     };
   });
-  if (displays.length !== 91) throw new Error("91 displays required");
-  const months = arr(j.months, "months").map((x) => int(x, "month id", 1, 91));
-  const firstYear = int(j.firstYear, "firstYear", 2026, 2026);
-  if (months.length !== 888) throw new Error("888 months required");
-  return { displays, months, firstYear };
+  if (!window) {
+    if (displays.length !== 91) throw new Error("91 displays required");
+    const months = arr(j.months, "months").map((x) => int(x, "month id", 1, 91));
+    const firstYear = int(j.firstYear, "firstYear", 2026, 2026);
+    if (months.length !== 888) throw new Error("888 months required");
+    return { displays, months, firstYear };
+  }
+  const firstMonth = int(j.firstMonth, "firstMonth", 1, 12);
+  const firstYear = int(j.firstYear, "firstYear", 2026, 2099);
+  const months = arr(j.months, "months").map((x) => int(x, "month id", 1, displays.length));
+  if (months.length < 1 || months.length > 1201) throw new Error("a window has 1 to 1201 months");
+  if (displays.length < 1 || displays.length > months.length) throw new Error("a window has 1 display per month at most");
+  months.forEach((id, k) => {
+    const index = firstMonth - 1 + k;
+    const d = displays[id - 1];
+    if (d.year !== firstYear + Math.floor(index / 12) || d.month !== (index % 12) + 1)
+      throw new Error(`month ${k} names display ${id} of another month`);
+  });
+  return { displays, months, firstYear, firstMonth };
 }
 
 /** Display id of a calendar month in 2026-2099. */
 export function displayIdOf(table: DisplayTable, year: number, month: number): number {
-  const index = (year - table.firstYear) * 12 + month - 1;
-  if (!(index >= 0 && index < table.months.length)) throw new RangeError("month outside 2026-2099");
+  const index = (year - table.firstYear) * 12 + month - (table.firstMonth ?? 1);
+  if (!(index >= 0 && index < table.months.length)) throw new RangeError("month outside the display table");
   return table.months[index];
 }
 
