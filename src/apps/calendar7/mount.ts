@@ -22,7 +22,7 @@ import {
 import { FONT_STYLES, FontSelection, fontStyleById, loadCalendarFont, type LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { watchSheetTheme } from "./sheet-theme.ts";
-import { schemeById } from "./schemes.ts";
+import { SCHEMES, schemeById } from "./schemes.ts";
 import type { Surface } from "./sticker-art.ts";
 import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnapshot, type StageView } from "./player.ts";
 
@@ -73,7 +73,10 @@ export async function mountCalendar7(
   const threeD = Boolean(env.sceneHost && env.createStage);
   root.innerHTML =
     '<div class="c7-live" role="status" aria-live="polite"></div>' +
-    `<div class="c7-font-choice"><label for="c7-font-style">Font style</label><select id="c7-font-style" data-c7-font>${FONT_STYLES.map(f => `<option value="${f.id}"${f.id === fontStyleById(params.get("font")).id ? " selected" : ""}>${f.label}</option>`).join("")}</select></div><p class="c7-font-status" role="status" data-c7-font-status></p>` +
+    '<div class="c7-appearance-choices">' +
+    `<div class="c7-font-choice"><label for="c7-font-style">Font style</label><select id="c7-font-style" data-c7-font>${FONT_STYLES.map(f => `<option value="${f.id}"${f.id === fontStyleById(params.get("font")).id ? " selected" : ""}>${f.label}</option>`).join("")}</select></div>` +
+    (threeD ? `<div class="c7-scheme-choice"><label for="c7-color-theme">Cube color theme</label><select id="c7-color-theme" data-c7="scheme">${SCHEMES.map(s => `<option value="${s.id}"${s.id === schemeById(params.get(SCHEME_PARAM)).id ? " selected" : ""}>${s.name}</option>`).join("")}</select></div>` : "") +
+    '</div><p class="c7-font-status" role="status" data-c7-font-status></p>' +
     (threeD ? playerHtml(DEFAULT_SPEED) : "") +
     '<div class="c7-view"><p class="c7-loading">Loading the 7x7 calendar data…</p></div>';
   const view = root.querySelector(".c7-view") as HTMLElement;
@@ -107,8 +110,14 @@ export async function mountCalendar7(
   let selectedSpeed: number = DEFAULT_SPEED;
   let font: LoadedFont | null = null;
   let schemeId: string | null = params.get(SCHEME_PARAM);
+  const schemeSelect = q("scheme") as HTMLSelectElement | null;
+  if (schemeSelect?.value && SCHEMES.some(s => s.id === schemeSelect.value)) schemeId = schemeSelect.value;
   /** Test hook and proof for readers: the id of the scheme the 3D view uses (an unknown id shows as the default). */
-  const publishScheme = (): void => root.setAttribute("data-c7-scheme", schemeById(schemeId).id);
+  const publishScheme = (): void => {
+    const id = schemeById(schemeId).id;
+    root.setAttribute("data-c7-scheme", id);
+    if (schemeSelect) schemeSelect.value = id;
+  };
   if (threeD) publishScheme();
   const paintSheet = (): void => {
     if (!font || !currentModel?.cells) return;
@@ -126,6 +135,13 @@ export async function mountCalendar7(
       label.className = "c7-cell-text";label.textContent = cell.text;
       td.replaceChildren(label, canvas);
     });
+  };
+  const applyScheme = (id: string | null): void => {
+    if (!alive()) return;
+    schemeId = id;
+    if (threeD) publishScheme();
+    stage?.setScheme?.(id);
+    paintSheet();
   };
   const stopSheetTheme = env.loadFont ? watchSheetTheme(() => { if (alive()) paintSheet(); }) : null;
   const fontSelect = env.loadFont ? root.querySelector<HTMLSelectElement>("[data-c7-font]") : null;
@@ -185,7 +201,7 @@ export async function mountCalendar7(
       box.hidden = false;
     }
     (q("player") as HTMLElement | null)?.removeAttribute("hidden");
-    for (const name of ["play", "skip", "speed", "reset", "slice", "orientation", "notation"]) q(name)?.setAttribute("disabled", "");
+    for (const name of ["play", "skip", "speed", "reset", "slice", "orientation", "notation", "scheme"]) q(name)?.setAttribute("disabled", "");
     live.textContent = "The 3D view stopped. The month sheet is still shown.";
     if (sceneHost) sceneHost.hidden = true;
     console.error(error);
@@ -386,6 +402,14 @@ export async function mountCalendar7(
     if (el.getAttribute("aria-disabled") === "true") return;
     try {
       switch (el.getAttribute("data-c7")) {
+        case "scheme": {
+          if (e.type !== "change") break;
+          applyScheme((el as HTMLSelectElement).value);
+          const query = new URLSearchParams(env.search());
+          query.set(SCHEME_PARAM, schemeById(schemeId).id);
+          env.replaceQuery(`?${query.toString()}`);
+          break;
+        }
         case "play":
           if (player?.snapshot.status === "playing") player.pause();
           else player?.play();
@@ -434,12 +458,7 @@ export async function mountCalendar7(
 
   return {
     /** Chooses the color scheme of the 3D view by id (in memory only; unknown id: default). */
-    setScheme: (id: string | null) => {
-      schemeId = id;
-      if (threeD) publishScheme();
-      stage?.setScheme?.(id);
-      paintSheet();
-    },
+    setScheme: applyScheme,
     dispose: () => {
       disposed = true;
       stopSheetTheme?.();
