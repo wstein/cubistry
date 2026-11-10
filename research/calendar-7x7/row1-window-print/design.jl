@@ -5,7 +5,7 @@
 include(joinpath(@__DIR__,"common.jl"))
 @assert length(ARGS)==3 "design.jl LAYOUT_TSV NATIVE_Z3_LIBRARY OUTPUT_DIRECTORY"
 const WINDOW_Z3LIB=abspath(ARGS[2])
-function window_z3(smt;timeout_ms=45000)
+function window_z3(smt;timeout_ms=parse(Int,get(ENV,"SMT_TIMEOUT_MS","45000")))
     cfg=ccall((:Z3_mk_config,WINDOW_Z3LIB),Ptr{Cvoid},())
     ctx=ccall((:Z3_mk_context,WINDOW_Z3LIB),Ptr{Cvoid},(Ptr{Cvoid},),cfg)
     ccall((:Z3_del_config,WINDOW_Z3LIB),Cvoid,(Ptr{Cvoid},),cfg)

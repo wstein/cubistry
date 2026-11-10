@@ -21,7 +21,7 @@ Core.eval(P,:(image_normal(g,q,ink)=Main.coupled_optic(g,q,ink)))
 include(joinpath(CAL,"pure-split-states/orbit_solve.jl"))
 labels=coupled_labels(read(joinpath(CAL,"row1-revision/layout.tsv"),String))
 goals=coupled_goals(labels,"names-band","window")
-@assert length(ARGS)==2 || get(ENV,"WINDOW_END","2028-01")=="2028-01" "a window end after 2028-01 needs its own print"
+@assert length(ARGS)==2 || haskey(ENV,"SEAM_CHAIN") || get(ENV,"WINDOW_END","2028-01")=="2028-01" "a window end after 2028-01 needs its own print or the stored chain as SEAM_CHAIN"
 source=window_read_print(length(ARGS)==2 ? ARGS[2] : joinpath(CAL,"row1-window-print/evidence/printing.tsv"))
 action=P.pose_action();gens=[UInt16.(g) for g in action.generators]
 out=ARGS[1];@assert !ispath(out) "Use a new scratch output directory";mkpath(out)
@@ -40,16 +40,38 @@ function snapshot(source,state,id,g,out)
     end
     P.state_digest(actual)
 end
+# Seam mode: SEAM_CHAIN=<stored moves.tsv> SEAM_STATES=<its states directory>. The stored chain is
+# replayed with the print and copied verbatim; new months start from its end state. The join is
+# checked here (end digest of the last stored edge) and again by check_seam.jl and the chain checkers.
+function replay_seam(path,statesdir)
+    ls=String.(split(chop(read(path,String);tail=1),'\n'));@assert ls[1]=="cubistry.calendar7.chain.v1" && ls[end]=="finish"
+    rows=ls[1:end-1];state=P.identity_perm();k=0;lastend=String(split(ls[2],'\t')[5])
+    for l in rows[3:end]
+        f=String.(split(l,'\t'))
+        if f[1]=="edge";k+=1;lastend=f[9]
+        elseif f[1]=="move";g,q=parse(Int,f[2]),parse(Int,f[3]);for _ in 1:(q==-1 ? 3 : q);state=P.compose(state,gens[g]);end
+        end
+    end
+    @assert k+1<=length(goals) "stored chain is longer than the requested window"
+    @assert P.state_digest(P.decode_physical(source,state,action))==lastend "seam: replayed stored end state does not match its end digest"
+    for i in 1:k+1;cp(joinpath(statesdir,"state-"*lpad(string(i),2,'0')*".tsv"),joinpath(out,"state-"*lpad(string(i),2,'0')*".tsv"));end
+    String.(rows),state,k+1
+end
 function trial()
-    started=time();state=P.identity_perm()
-    hash0=snapshot(source,state,1,goals[1],out)
-    rows=String["cubistry.calendar7.chain.v1","source\t5\t2026\t5\t$hash0"]
+    started=time()
+    if haskey(ENV,"SEAM_CHAIN")
+        rows,state,first_id=replay_seam(ENV["SEAM_CHAIN"],ENV["SEAM_STATES"])
+    else
+        state=P.identity_perm();first_id=1
+        hash0=snapshot(source,state,1,goals[1],out)
+        rows=String["cubistry.calendar7.chain.v1","source\t5\t2026\t5\t$hash0"]
+    end
     dump_candidate(rows,out)
     catalogs=P.chain_catalogues(action)
     open(joinpath(out,"attempts.tsv"),"w") do log
         println(log,"target\tyear\tmonth\tstatus\thtm\tseconds\tsource-sha256\tend-sha256\treason")
-        println(log,"1\t2026\t5\tUNCHECKED_IDENTITY\t0\t0\t$hash0\t$hash0\tnative replay required");flush(log)
-        for id in 2:length(goals)
+        first_id==1 ? println(log,"1\t2026\t5\tUNCHECKED_IDENTITY\t0\t0\t$hash0\t$hash0\tnative replay required") : println(log,"$first_id\t-\t-\tUNCHECKED_SEAM_JOIN\t0\t0\t-\t-\tstored chain replayed; join digest matched");flush(log)
+        for id in first_id+1:length(goals)
             if time()-started>DEADLINE;println(log,"$id\t$(goals[id].year)\t$(goals[id].month)\tUNKNOWN\t-\t-\t-\t-\tbounded trial deadline");break;end
             target=goals[id];before=P.state_digest(P.decode_physical(source,state,action));t=time()
             r=orbit_solve(P,source,state,target,action,catalogs)
