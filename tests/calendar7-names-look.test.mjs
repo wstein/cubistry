@@ -194,3 +194,13 @@ test("names layout: the face pixels per unit of the letter grid match the real b
   }
   assert.ok(Math.abs(TEXTURE * (u1 - u0) / (x1 - x0) - NAMES_FACE_PX_PER_UNIT) < 0.05, `${TEXTURE * (u1 - u0) / (x1 - x0)}`);
 });
+
+// ---- exposure (owner decision: white must not render grey) ----
+import { NAMES_EXPOSURE, STANDARD_EXPOSURE, exposureFor } from "../src/apps/calendar7/geometry.ts";
+test("exposure: the standard layout keeps the shared presentation value 1, the names layout raises it", () => {
+  assert.equal(STANDARD_EXPOSURE, 1);
+  assert.equal(exposureFor("standard"), 1);
+  assert.equal(exposureFor("names"), NAMES_EXPOSURE);
+  assert.equal(NAMES_EXPOSURE, 2.6); // rendered near-white #f5f6f7 on the lit front face at this value, see the PR text
+  assert.equal(PRESENTATION_PRESET.version, 1); // the shared preset (toneMappingExposure 1 in configurePresentationRenderer) is not touched
+});

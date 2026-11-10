@@ -173,3 +173,29 @@ test("the layout survives a reload through the URL and unknown values give the s
   await expect(select).toHaveValue("standard");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "standard");
 });
+
+test("the renderer exposure is raised in the names layout only and is the shared 1 in the standard layout, also after switching back", async ({ page }) => {
+  await page.goto("/licenses.html");
+  const seen = await page.evaluate(async () => {
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const { NAMES_EXPOSURE } = await import("/src/apps/calendar7/geometry.ts");
+    const get = async (p) => (await fetch(p)).json();
+    const names = parseState(await get("/calendar7/names/state.v1.json"));
+    const standard = parseState(await get("/calendar7/state.v1.json"));
+    const host = document.createElement("div"), panel = document.createElement("div");
+    host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
+    document.body.append(host, panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    const out = { fresh: viewer.renderer.toneMappingExposure, wanted: NAMES_EXPOSURE };
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    out.standard = viewer.renderer.toneMappingExposure;
+    viewer.configure(names.printing, names.pose, "face", "names");
+    out.names = viewer.renderer.toneMappingExposure;
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    out.back = viewer.renderer.toneMappingExposure;
+    viewer.destroy();
+    return out;
+  });
+  expect(seen).toEqual({ fresh: 1, wanted: 2.6, standard: 1, names: 2.6, back: 1 });
+});

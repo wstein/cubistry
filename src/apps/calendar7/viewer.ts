@@ -39,7 +39,7 @@ import {
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
 import { type ColorScheme, DEFAULT_SCHEME, namesGround, schemeById } from "./schemes.ts";
-import { bodyWidthFor } from "./geometry.ts";
+import { bodyWidthFor, exposureFor } from "./geometry.ts";
 import type { Layout } from "./layout.ts";
 import { drawFace, drawSticker, PLASTIC, tileRoles, type Surface, TEXTURE } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
@@ -225,6 +225,7 @@ export class Calendar7Viewer implements StageView {
     // A new print replaces the cube: a turn in progress ends first (its pivot belongs to the old cube).
     this.tween.cancel();
     this.layout = layout;
+    this.renderer.toneMappingExposure = exposureFor(layout); // 1 (the shared value) except in the names layout
     this.clear();
     this.bodyStale = false;
     this.printing = printing;
