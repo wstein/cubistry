@@ -254,3 +254,20 @@ test('a status poll in the last milliseconds ends with the budget error, never T
  await assert.rejects(deployPages({receipt,artifact:55,token:'test',oidc:async()=>'oidc-test',now:()=>time,timeout:20001,sleep:async ms=>{time+=ms;},attempts:60,fetch:stuckFetch({delay:30})}),
   error=>{assert.match(error.message,/Pages deployment wait budget exhausted/);assert.notEqual(error.name,'TimeoutError');return true;});
 });
+test('budget exhaustion names deployment, last status and error fields without leaking the token',async t=>{
+ const token='ghs_SECRETTOKEN123';
+ const logged=[];t.mock.method(console,'error',(...args)=>logged.push(args.join(' ')));
+ let time=0;
+ const body={status:'deployment_in_progress',errors:['artifact not ready'],message:`still working for ${token}`};
+ await assert.rejects(deployPages({receipt,artifact:55,token,oidc:async()=>'oidc-secret',now:()=>time,timeout:25000,sleep:async ms=>{time+=ms;},attempts:60,fetch:stuckFetch({body})}),
+  error=>{
+   assert.match(error.message,/Pages deployment wait budget exhausted/);
+   assert(error.message.includes(`deployment ${sha}`));
+   assert(error.message.includes('last status deployment_in_progress'));
+   assert(error.message.includes('artifact not ready'));
+   assert(error.message.includes('still working for'));
+   for(const text of [error.message,...logged]){assert(!text.includes(token));assert(!text.includes('oidc-secret'));}
+   return true;
+  });
+ assert(logged.some(line=>line.includes('artifact not ready')&&line.includes(sha)));
+});

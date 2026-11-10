@@ -46,7 +46,16 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
   if (!integer(artifact) || !token || typeof oidc !== 'function') throw Error('Invalid deployment inputs');
   let remaining=attempts;
   const deadline=now()+timeout;
-  const budget=()=>{const left=deadline-now();if(left<=0)throw Error('Pages deployment wait budget exhausted');return Math.max(1,Math.min(30000,Math.floor(left)));};
+  let last=null;
+  // Diagnostics carry only the deployment id, status and the response's errors/message, redacted and bounded; never credentials.
+  const field=value=>{if(value===undefined||value===null)return 'none';const text=typeof value==='string'?value:JSON.stringify(value);return text.split(token).join('[redacted]').slice(0,500);};
+  const exhausted=()=>{
+    const detail=last?` (deployment ${last.id}, last status ${field(last.status)}, errors ${field(last.errors)}, message ${field(last.message)})`:' (no status received)';
+    const error=Error(`Pages deployment wait budget exhausted${detail}`);
+    console.error(error.message);
+    return error;
+  };
+  const budget=()=>{const left=deadline-now();if(left<=0)throw exhausted();return Math.max(1,Math.min(30000,Math.floor(left)));};
   const pause = async () => { if (--remaining <= 0) throw Error('Pages deployment wait budget exhausted'); await sleep(Math.min(10000,budget()));budget(); };
   const headers={Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
   const status = async id => {
@@ -55,11 +64,12 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
     try{response=await request(`https://api.github.com/repos/${REPOSITORY}/pages/deployments/${id}`,{headers,redirect:'error',signal:AbortSignal.timeout(limit)});}
     catch(error){
       // An abort caused by the shrinking overall budget is budget exhaustion, not a separate failure.
-      if((error?.name==='TimeoutError'||error?.name==='AbortError')&&(limit<30000||now()>=deadline))throw Error('Pages deployment wait budget exhausted');
+      if((error?.name==='TimeoutError'||error?.name==='AbortError')&&(limit<30000||now()>=deadline))throw exhausted();
       throw error;
     }
     if(!response.ok)throw Error(`Pages status request failed (${response.status})`);
     const data=await response.json();
+    last={id,status:data.status,errors:data.errors,message:data.message};
     if(terminalFailure.has(data.status))throw Error('Pages deployment failed');
     return data.status;
   };
