@@ -185,7 +185,6 @@ test("names letters keep the uniform 1/3-unit pitch over a word whose first tile
     if (word.length < 2) continue;
     for (const draw of [
       (tile, t) => track((c) => drawFace(c, tile, "month", "strict", PAPER_RED, "names", t)).texts.map((x) => x.x),
-      (tile, t) => { const { cx, kx } = faceTransform(t); return nameLabelLayout(tile, font, "face", t.w).map((l) => cx + kx * (l.x - 96)); },
     ]) {
       const xs = letterCenters(word, draw);
       for (let i = 1; i < xs.length; i++) near(xs[i] - xs[i - 1], 1 / 3, 0.004, `${word} letter ${i}`);

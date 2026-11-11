@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 /** Shared 2D/3D artwork: original glyphs, with one source for each 6/9 pair. */
 import { numberLayout, type LoadedFont } from "./fonts.ts";
-import { type Layout, NAME_SLOTS } from "./layout.ts";
-import { faceTransform, type FaceTile, lineRect, nameLetterX, TEXT_SQUARE, TEXTURE, tileCanvasSize, tileRoles, type Surface } from "./sticker-art.ts";
+import { type Layout, NAME_SLOTS, NAME_WORDS, nameAnchor } from "./layout.ts";
+import { CALENDAR7_SIZE, outerLayerWidth } from "./geometry.ts";
+import { faceTransform, type FaceTile, lineRect, nameLetterX, namePxPerUnit, TEXT_SQUARE, TEXTURE, tileCanvasSize, tileRoles, type Surface } from "./sticker-art.ts";
 import type { ColorScheme } from "./schemes.ts";
 
 export interface InkBox { readonly x0: number; readonly y0: number; readonly x1: number; readonly y1: number }
@@ -22,14 +23,149 @@ export function labelLayout(text: string, font: LoadedFont): readonly { text: st
   const normal = (text.length === 1 ? 100 : text.length === 2 ? 79 : 58) / capHeight, width = numberLayout(text, font, normal).width;
   return [part(text, Math.min(normal, normal * 164 / width), 96, 96)];
 }
-/** Letters of the name labels: the one font size of the names layout is fitted to them. */
+/** Letters of the name labels: the size of the sheet's name tiles is fitted to them. */
 const NAME_LETTERS = "JANUARYFEBRUCHMPILTSGOVDE";
+
+/** Names layout on the cubie faces: the least ink gap inside a tile (drawing px), every pair of letters keeps it. */
+export const NAME_MIN_INK_GAP = 2;
+/** Names layout on the cubie faces: ink stays this far (drawing px, a bit more than one canvas px) inside the texture edge, so anti-aliasing never reaches it. */
+export const NAME_EDGE_MARGIN = 1.5;
+const WEEKDAY_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+/** Per name tile of the 3D face layout: tracking added to the natural gaps and the resulting ink gaps (drawing px). */
+export interface NameTileFit {
+  readonly label: string;
+  readonly anchor: -1 | 0 | 1;
+  /** Tracking in px at the font's size: the uniform extra space per gap before the 2 px floor. */
+  readonly tracking: number;
+  /** Ink gaps between neighboring letters in px. */
+  readonly gaps: readonly number[];
+  /** Pairs whose natural gap is below the floor and was raised to it ("R-Y"). */
+  readonly raised: readonly string[];
+  readonly months: readonly string[];
+}
+export interface NameFace {
+  readonly size: number;
+  /** The largest weekday label size of the font (the month size must reach it). */
+  readonly weekday: number;
+  /** Ink gap at every seam between two name tiles (px); the seam is in its middle. */
+  readonly seamGap: number;
+  readonly tiles: ReadonlyMap<string, NameTileFit>;
+  /** Empty when `size >= weekday`; otherwise the tiles (and months) that do not fit at the weekday size. */
+  readonly blocked: readonly { label: string; months: readonly string[] }[];
+}
+
+interface TileInfo { readonly label: string; readonly anchor: -1 | 0 | 1; readonly width: number; readonly months: readonly string[] }
+const TILES: readonly TileInfo[] = (() => {
+  const seen = new Map<string, TileInfo>(), names = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+  NAME_WORDS.forEach((word, i) => word.forEach(label => {
+    const anchor = nameAnchor(label), old = seen.get(label);
+    seen.set(label, { label, anchor, width: anchor === 1 ? outerLayerWidth(CALENDAR7_SIZE) : 1, months: [...(old?.months ?? []), names[i] ?? word.join("")] });
+  }));
+  return [...seen.values()];
+})();
+
+const textureHalf = (w: number): { x: number; y: number } => {
+  const [W, H] = tileCanvasSize({ w, h: 1 }), t = faceTransform({ w, h: 1 });
+  return { x: W / 2 / t.kx, y: H / 2 / t.ky };
+};
+
+/** Natural geometry of a label in em: summed ink widths and the natural ink gaps between neighbors. */
+function natural(font: LoadedFont, label: string): { glyphs: number; gaps: number[]; height: number } {
+  const g = [...label].map(c => font.glyphs[c]);
+  return {
+    glyphs: g.reduce((sum, m) => sum + m.right - m.left, 0),
+    gaps: g.slice(1).map((m, i) => g[i].advance - g[i].right + m.left),
+    height: Math.max(...g.map(m => m.bottom - m.top))
+  };
+}
+const inkAt = (s: number, tau: number, n: { glyphs: number; gaps: number[] }): number => s * n.glyphs + n.gaps.reduce((sum, e) => sum + Math.max(NAME_MIN_INK_GAP, s * e + tau), 0);
+/** Largest tracking whose ink is at most `target`, or null when even the floored gaps are too wide. */
+function trackingFor(s: number, n: { glyphs: number; gaps: number[] }, target: number): number | null {
+  if (!n.gaps.length) return s * n.glyphs <= target ? 0 : null;
+  let lo = -1e4, hi = 1e4;
+  if (inkAt(s, lo, n) > target) return null;
+  for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (inkAt(s, mid, n) <= target) lo = mid; else hi = mid; }
+  return lo;
+}
+
+/** The layout of all name tiles at glyph size `s`, or the tiles that do not fit. */
+function fitAt(font: LoadedFont, s: number, c: number): { ok: true; m: number; taus: Map<string, number> } | { ok: false; fails: string[] } {
+  const ppu = namePxPerUnit(), fails: string[] = [], taus = new Map<string, number>();
+  const m = Math.max(c * s / 2, ...TILES.map(t => t.width * ppu / 2 - textureHalf(t.width).x + NAME_EDGE_MARGIN));
+  const nat = new Map(TILES.map(t => [t.label, natural(font, t.label)]));
+  for (const t of TILES) if (t.anchor === 0) {
+    const tau = trackingFor(s, nat.get(t.label)!, t.width * ppu - 2 * m);
+    if (tau === null) fails.push(t.label); else taus.set(t.label, tau);
+  }
+  const mean = taus.size ? [...taus.values()].reduce((a, b) => a + b, 0) / taus.size : 0;
+  for (const t of TILES) {
+    const n = nat.get(t.label)!;
+    if (n.height * s > 2 * textureHalf(t.width).y) { fails.push(t.label); continue; }
+    if (t.anchor === 0) continue;
+    const limit = t.width * ppu / 2 + textureHalf(t.width).x - NAME_EDGE_MARGIN - m, tau = trackingFor(s, n, limit);
+    if (tau === null) fails.push(t.label); else taus.set(t.label, Math.min(mean, tau));
+  }
+  return fails.length ? { ok: false, fails } : { ok: true, m, taus };
+}
+
+const NAME_FACES = new WeakMap<LoadedFont, NameFace & { m: number }>();
 /**
- * Names layout: the letters of a name tile on the uniform letter grid of the whole name row (a third of a cubie pitch
- * between two letters, across tile boundaries too, see layout.ts), one size for every name tile (the cap height of a
- * three-letter label, or smaller when the widest capital would not fit its slot). Each letter's ink is centered on its slot.
+ * Names layout on the cubie faces (owner decision of 2026-11-11, "option 4"): one glyph size per font and per tile one
+ * uniform extra tracking, solved from the font's real metrics. The seam between two tiles is in the middle of the ink gap
+ * between their letters, and that gap is the same at every seam (`seamGap`). A middle tile fills its cubie between the two
+ * half seam gaps; the outer tiles of a word take the mean tracking of the middle tiles, less if they would leave the texture.
+ * No ink gap inside a tile is below `NAME_MIN_INK_GAP`. The size is the one that fills the middle tiles with the median
+ * natural gap, at least the weekday size, and smaller only when a tile cannot fit; `blocked` then names it.
+ */
+export function nameFaceTable(font: LoadedFont): NameFace {
+  const cached = NAME_FACES.get(font);
+  if (cached) return cached;
+  const ppu = namePxPerUnit(), nat = new Map(TILES.map(t => [t.label, natural(font, t.label)]));
+  const all = [...nat.values()].flatMap(n => n.gaps).sort((a, b) => a - b);
+  const c = all.length % 2 ? all[(all.length - 1) / 2] : (all[all.length / 2 - 1] + all[all.length / 2]) / 2;
+  const middle = TILES.filter(t => t.anchor === 0);
+  const ref = middle.reduce((sum, t) => { const n = nat.get(t.label)!; return sum + ppu / (n.glyphs + n.gaps.reduce((a, b) => a + b, 0) + c); }, 0) / middle.length;
+  const weekday = Math.max(...WEEKDAY_LABELS.map(d => labelLayout(d, font)[0].size));
+  let size = Math.max(Math.floor(ref * 4) / 4, weekday), fit = fitAt(font, size, c);
+  while (!fit.ok && size > 10) { size -= 0.25; fit = fitAt(font, size, c); }
+  if (!fit.ok) throw new Error("no name size fits");
+  const blocked = size >= weekday ? [] : (() => {
+    const at = fitAt(font, weekday, c);
+    return at.ok ? [] : at.fails.map(label => ({ label, months: TILES.find(t => t.label === label)!.months }));
+  })();
+  const tiles = new Map<string, NameTileFit>();
+  for (const t of TILES) {
+    const n = nat.get(t.label)!, tracking = fit.taus.get(t.label) ?? 0, letters = [...t.label];
+    const gaps = n.gaps.map(e => Math.max(NAME_MIN_INK_GAP, size * e + tracking));
+    const raised = n.gaps.flatMap((e, i) => (size * e < NAME_MIN_INK_GAP ? [`${letters[i]}-${letters[i + 1]}`] : []));
+    tiles.set(t.label, { label: t.label, anchor: t.anchor, tracking, gaps, raised, months: t.months });
+  }
+  const face = { size, weekday, seamGap: 2 * fit.m, tiles, blocked, m: fit.m };
+  NAME_FACES.set(font, face);
+  return face;
+}
+
+/**
+ * Names layout: the letters of a name tile. On the 3D face (`nameFaceTable`): the font's one size and per-tile tracking,
+ * the ink of the first tile of a word flush to its right seam, of the last to its left seam, of a middle tile centered, each
+ * half a seam gap away from the seam. On the sheet (`surface` "sticker"): the letters of a three-slot grid at one size (the
+ * cap height of a three-letter label, or smaller when the widest capital would not fit its slot); each ink is centered on its slot.
  */
 export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface = "face", tileWidth = 1): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
+  if (surface === "face") {
+    const face = nameFaceTable(font) as NameFace & { m: number }, fit = face.tiles.get(text);
+    if (fit) {
+      const ppu = namePxPerUnit(), glyphs = [...text].map(c => font.glyphs[c]);
+      const ink = glyphs.reduce((sum, g) => sum + (g.right - g.left) * face.size, 0) + fit.gaps.reduce((a, b) => a + b, 0);
+      let x = fit.anchor === 1 ? TEXTURE / 2 + tileWidth * ppu / 2 - face.m - ink : fit.anchor === -1 ? TEXTURE / 2 - tileWidth * ppu / 2 + face.m : TEXTURE / 2 - ink / 2;
+      return [...text].map((char, i) => {
+        const p = numberLayout(char, font, face.size), cx = x + p.width / 2;
+        x += p.width + (fit.gaps[i] ?? 0);
+        return { text: char, size: face.size, x: cx, y: 96, box: { x0: cx - p.width / 2, y0: 96 - p.height / 2, x1: cx + p.width / 2, y1: 96 + p.height / 2 } };
+      });
+    }
+  }
   const slot = TEXT_SQUARE / NAME_SLOTS;
   const capHeight = Math.max(...[...NAME_LETTERS].map(c => font.glyphs[c].bottom - font.glyphs[c].top));
   const widest = Math.max(...[...NAME_LETTERS].map(c => numberLayout(c, font, 1).width));

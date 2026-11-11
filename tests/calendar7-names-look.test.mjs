@@ -10,7 +10,7 @@ import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.j
 import { PRESENTATION_PRESET, PhysicalCubeScene, createPlasticMaterial } from "@cubistry/cube-viewer";
 import { NAME_WORDS } from "../src/apps/calendar7/layout.ts";
 import { NAMES_WHITE, SCHEMES } from "../src/apps/calendar7/schemes.ts";
-import { FACE_FLAT, FACE_SCALE, LINE_SCALE, TEXTURE, drawFace, drawSticker, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
+import { FACE_FLAT, FACE_SCALE, LINE_SCALE, TEXTURE, drawFace, drawSticker, nameGrid, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { drawFontSticker, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
 import { CUBE_EDGE_MM_7X7, INNER_CUBIE_EDGE_MM, NAMES_BODY_WIDTH, NAMES_FACE_PX_PER_UNIT, NAMES_GAP, NAMES_GAP_MM, STANDARD_BODY_WIDTH, bodyWidthFor } from "../src/apps/calendar7/geometry.ts";
 import { layoutFixture } from "./calendar7-fixture.mjs";
@@ -121,29 +121,20 @@ test("names layout: on the cubie face the weekday line runs from the left to the
 // ---- 3. cut faces colored as on a real cube: see tests/calendar7-cut-faces.test.mjs ----
 
 // ---- 4. one uniform letter pitch ----
-test("names layout: letters of a name sit on one uniform center pitch over all tiles, the tile centers stepping 1 cubie", () => {
+test("names layout (built-in font grid): letters of a name sit on one uniform center pitch over all tiles, the tile centers stepping 1 cubie", () => {
   const pitch = NAMES_FACE_PX_PER_UNIT / 3; // final (on-screen) texture pixels between two letters: a third of a cubie
   for (const [name, words] of [["DECEMBER", NAME_WORDS[11]], ["JANUARY", NAME_WORDS[0]], ["MAY", NAME_WORDS[4]], ["SEPTEMBER", NAME_WORDS[8]], ["NOVEMBER", NAME_WORDS[10]], ["FEBRUARY", NAME_WORDS[1]], ["OCTOBER", NAME_WORDS[9]]]) {
     // Row x of a letter in final pixels: tile k spans [k * cubie, (k + 1) * cubie), cubie = NAMES_FACE_PX_PER_UNIT.
     const centers = [];
     words.forEach((tile, k) => {
-      for (const l of nameLabelLayout(tile, font, "face")) centers.push(k * NAMES_FACE_PX_PER_UNIT + TEXTURE / 2 + (l.x - TEXTURE / 2) * FACE_SCALE);
+      for (const l of nameGrid(tile)) centers.push(k * NAMES_FACE_PX_PER_UNIT + TEXTURE / 2 + (l.x - TEXTURE / 2) * FACE_SCALE);
     });
     assert.equal(centers.length, name.length);
     for (let i = 1; i < centers.length; i++) assert.ok(Math.abs(centers[i] - centers[i - 1] - pitch) < 1e-6, `${name} letter ${i}: ${centers[i] - centers[i - 1]} vs ${pitch}`);
   }
 });
-test("names layout: a letter never leaves its tile and the letter size is one for every name tile", () => {
-  const sizes = new Set();
-  for (const word of NAME_WORDS) for (const tile of word) for (const l of nameLabelLayout(tile, font, "face")) {
-    sizes.add(l.size);
-    const x0 = TEXTURE / 2 + (l.box.x0 - TEXTURE / 2) * FACE_SCALE, x1 = TEXTURE / 2 + (l.box.x1 - TEXTURE / 2) * FACE_SCALE;
-    assert.ok(x0 > 0 && x1 < TEXTURE, `${tile}: ${l.text} box ${x0}..${x1} stays inside the cubie face`);
-  }
-  assert.equal(sizes.size, 1);
-});
-test("names layout: the font drawing places the letters of a tile at the layout x; the sheet (sticker surface) keeps its 3-slot pitch of 55 px", () => {
-  for (const surface of ["face", "sticker"]) {
+test("names layout: the sheet (sticker surface) keeps its 3-slot pitch of 55 px", () => {
+  for (const surface of ["sticker"]) {
     const xs = nameLabelLayout("EMB", font, surface).map((l) => l.x);
     assert.equal(xs.length, 3);
     assert.ok(Math.abs(xs[1] - TEXTURE / 2) < 1e-9, "middle letter on the tile center");
