@@ -1,0 +1,5 @@
+stage	A	2026-05	2026-06	2	SAT	exact	a13bcb71837f548c826391ae75fa1ea881e74a60432e4b2c3f91adcb01edffaa	7ebb7b5b9152ea4c7d44b940bbcdbc7d35fdb8068f0116aaa21db836ee43959a
+stage	B	2026-06	2028-01	20	SAT	exact	7ebb7b5b9152ea4c7d44b940bbcdbc7d35fdb8068f0116aaa21db836ee43959a	ef2a9a8bf378cb236a895c434961c6d8cfe9b7140e3acf9bfe0d752c694fa1dc
+junction	A	B	2026-06	joined	7ebb7b5b9152ea4c7d44b940bbcdbc7d35fdb8068f0116aaa21db836ee43959a	7ebb7b5b9152ea4c7d44b940bbcdbc7d35fdb8068f0116aaa21db836ee43959a
+composed	2026-05	2028-01	21	A,B
+counts	stages	2	joined	1	junctions	1	exact_runs	1
