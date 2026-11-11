@@ -16,7 +16,8 @@
  */
 export const DEFAULT_PLASTICITY = 0.6;
 
-export const clampPlasticity = (p: number): number => (Number.isFinite(p) ? Math.min(1, Math.max(0, p)) : DEFAULT_PLASTICITY);
+/** Clamps to [0, 1] (also ±Infinity); NaN, as from garbage text, gives the default. */
+export const clampPlasticity = (p: number): number => (Number.isNaN(p) ? DEFAULT_PLASTICITY : Math.min(1, Math.max(0, p)));
 
 /** Parses `?plasticity=0.6`; absent or invalid gives the default. */
 export const parsePlasticity = (text: string | null | undefined): number => (text === null || text === undefined || text.trim() === "" ? DEFAULT_PLASTICITY : clampPlasticity(Number(text)));
