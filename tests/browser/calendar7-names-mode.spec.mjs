@@ -177,7 +177,7 @@ test("the layout survives a reload through the URL and unknown values give the s
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "standard");
 });
 
-test("the renderer exposure is raised in the names layout only and is the shared 1 in the standard layout, also after switching back", async ({ page }) => {
+test("the renderer uses Linear tone mapping at the calibrated exposure in the names layout only and is the shared Neutral at 1 in the standard layout, also after switching back", async ({ page }) => {
   await page.goto("/licenses.html");
   const seen = await page.evaluate(async () => {
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
@@ -190,17 +190,21 @@ test("the renderer exposure is raised in the names layout only and is the shared
     host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
     document.body.append(host, panel);
     const viewer = new Calendar7Viewer(host, panel);
-    const out = { fresh: viewer.renderer.toneMappingExposure, wanted: NAMES_EXPOSURE };
+    const out = { fresh: viewer.renderer.toneMappingExposure, wanted: NAMES_EXPOSURE, freshMap: viewer.renderer.toneMapping };
     viewer.configure(standard.printing, standard.pose, "face", "standard");
     out.standard = viewer.renderer.toneMappingExposure;
+    out.standardMap = viewer.renderer.toneMapping;
     viewer.configure(names.printing, names.pose, "face", "names");
     out.names = viewer.renderer.toneMappingExposure;
+    out.namesMap = viewer.renderer.toneMapping;
     viewer.configure(standard.printing, standard.pose, "face", "standard");
     out.back = viewer.renderer.toneMappingExposure;
+    out.backMap = viewer.renderer.toneMapping;
     viewer.destroy();
     return out;
   });
-  expect(seen).toEqual({ fresh: 1, wanted: 2.6, standard: 1, names: 2.6, back: 1 });
+  const NEUTRAL = 7, LINEAR = 1; // THREE.NeutralToneMapping, THREE.LinearToneMapping
+  expect(seen).toEqual({ fresh: 1, freshMap: NEUTRAL, wanted: 1.217, standard: 1, standardMap: NEUTRAL, names: 1.217, namesMap: LINEAR, back: 1, backMap: NEUTRAL });
 });
 
 test("viewer wiring: names layout colors the cut faces per adjacent tile (flat colors and miter textures), the rest near-white, with thick outer layers (bodies, tiles, core, camera) and follows a scheme switch; the standard layout has none of it", async ({ page }) => {

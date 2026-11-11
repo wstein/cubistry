@@ -176,10 +176,26 @@ test("names layout: the face pixels per unit of the letter grid match the real b
 
 // ---- exposure (owner decision: white must not render grey) ----
 import { NAMES_EXPOSURE, STANDARD_EXPOSURE, exposureFor } from "../src/apps/calendar7/geometry.ts";
-test("exposure: the standard layout keeps the shared presentation value 1, the names layout raises it", () => {
+test("exposure: the standard layout keeps the shared presentation value 1, the names layout uses the inverse of the front face radiance", () => {
   assert.equal(STANDARD_EXPOSURE, 1);
   assert.equal(exposureFor("standard"), 1);
   assert.equal(exposureFor("names"), NAMES_EXPOSURE);
-  assert.equal(NAMES_EXPOSURE, 2.6); // rendered near-white #f5f6f7 on the lit front face at this value, see the PR text
-  assert.equal(PRESENTATION_PRESET.version, 1); // the shared preset (toneMappingExposure 1 in configurePresentationRenderer) is not touched
+  assert.equal(PRESENTATION_PRESET.version, 1); // the shared preset (Neutral tone mapping, exposure 1 in configurePresentationRenderer) is not touched
+});
+
+// Radiance of a white diffuse surface facing the camera (n = +z) under addPresentationLighting: three.js lights give
+// irradiance / pi times the albedo, ambient and hemisphere are not shaded, directional lights add intensity * max(0, n . l).
+// Exposure 1 / radiance makes the lit front face show its albedo, so a token renders as itself (browser spec calendar7-names-color).
+test("exposure: NAMES_EXPOSURE is 1 / (front face radiance of the presentation lights) within 0.5%", () => {
+  const p = PRESENTATION_PRESET, n = new THREE.Vector3(0, 0, 1);
+  const key = new THREE.Vector3(...p.keyPosition), horizontal = Math.hypot(key.x, key.z), elevation = Math.atan2(key.y, horizontal);
+  const azimuth = Math.atan2(key.x, key.z) - THREE.MathUtils.degToRad(p.shadowFillAzimuthDegrees);
+  const fillElevation = elevation + THREE.MathUtils.degToRad(p.shadowFillElevationDelta);
+  const shadowFill = new THREE.Vector3(Math.cos(fillElevation) * Math.sin(azimuth), Math.sin(fillElevation), Math.cos(fillElevation) * Math.cos(azimuth));
+  const directional = [[key, p.keyIntensity], [new THREE.Vector3(-4, 1, 2), p.fillIntensity], [new THREE.Vector3(1, 3, -4), p.rimIntensity], [shadowFill, p.shadowFillIntensity]]
+    .reduce((sum, [l, i]) => sum + i * Math.max(0, n.dot(l.clone().normalize())), 0);
+  // The hemisphere light mixes sky (white) and ground (0x77808d, linear) by 0.5 + 0.5 n.up; the green channel stands for white.
+  const ground = new THREE.Color(0x77808d).g, hemisphere = p.hemisphereIntensity * (0.5 + 0.5 * ground);
+  const radiance = (p.ambientIntensity + hemisphere + directional) / Math.PI;
+  assert.ok(Math.abs(NAMES_EXPOSURE * radiance - 1) < 0.005, `${NAMES_EXPOSURE} * ${radiance}`);
 });

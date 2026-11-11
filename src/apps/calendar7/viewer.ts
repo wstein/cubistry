@@ -113,6 +113,8 @@ export class Calendar7Viewer implements StageView {
   private dirty = true;
   private destroyed = false;
   private readonly lastQuaternion = new THREE.Quaternion();
+  /** The shared presentation tone mapping (read from the renderer at construction); the names layout uses Linear (a plain exposure scale). */
+  private readonly standardToneMapping: THREE.ToneMapping;
   /** Marks of the pieces on the turning layer (indexed by piece id), reused for every move. */
   private readonly onLayer = new Uint8Array(CUBIES + 1);
 
@@ -122,6 +124,7 @@ export class Calendar7Viewer implements StageView {
     this.scene.add(this.presentation);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     configurePresentationRenderer(this.renderer);
+    this.standardToneMapping = this.renderer.toneMapping;
     host.append(this.renderer.domElement);
     this.host = host;
     this.studio = createPresentationStudio(this.scene, this.extent, this.extent, host, cubePresentationRadius(this.extent));
@@ -243,13 +246,16 @@ export class Calendar7Viewer implements StageView {
     this.tween.cancel();
     this.layout = layout;
     this.fitExtent(layout);
-    this.renderer.toneMappingExposure = exposureFor(layout); // 1 (the shared value) except in the names layout
+    // The shared tone mapping and exposure 1, except in the names layout: its colors are the scheme tokens (geometry.ts).
+    this.renderer.toneMapping = layout === "names" ? THREE.LinearToneMapping : this.standardToneMapping;
+    this.renderer.toneMappingExposure = exposureFor(layout);
     this.clear();
     this.bodyStale = false;
     this.printing = printing;
     this.pose = pose;
     this.surface = surface;
     const plastic = createPlasticMaterial(PLASTIC, 0.55);
+    if (layout === "names") { plastic.specularIntensity = 0; plastic.clearcoat = 0; } // printed paper tiles: no specular white on the tokens (geometry.ts)
     this.resources.push(plastic);
     const anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
     const materials = new Map<number, THREE.Material>();
