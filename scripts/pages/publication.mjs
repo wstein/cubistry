@@ -41,7 +41,7 @@ export async function readVerifiedPublication(api,{fetch:request=fetch,context}=
 }
 const terminalFailure = new Set(['deployment_failed','deployment_content_failed','deployment_cancelled','deployment_lost']);
 /** Reattempt only a server-confirmed rejection. An ambiguous POST is never replayed. */
-export async function deployPages({receipt,artifact,token,oidc,fetch:request=fetch,sleep=ms=>new Promise(r=>setTimeout(r,ms)),attempts=60,now=()=>performance.now(),timeout=600000}) {
+export async function deployPages({receipt,artifact,token,oidc,fetch:request=fetch,sleep=ms=>new Promise(r=>setTimeout(r,ms)),attempts=120,now=()=>performance.now(),timeout=1200000}) {
   parsePublication(JSON.stringify(receipt));
   if (!integer(artifact) || !token || typeof oidc !== 'function') throw Error('Invalid deployment inputs');
   let remaining=attempts;

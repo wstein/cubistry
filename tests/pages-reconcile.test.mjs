@@ -357,3 +357,24 @@ test('a succeeded status of another (busy) deployment does not trigger the recei
   }}),
   error=>{assert(error.message.includes(`deployment ${storage}, last status succeed`));assert(!error.message.includes('receipt not found'));return true;});
 });
+// The Pages CDN ignores the ?receipt= query and keeps a 404 or an old receipt for max-age=600, so the default wait must outlast one such interval.
+function defaultBudgetRun(appearsAt){
+ let time=0;const state={time:()=>time};
+ const promise=deployPages({receipt,artifact:55,token:'test',oidc:async()=>'oidc-test',now:()=>time,sleep:async ms=>{time+=ms;},
+  fetch:async(url,options={})=>{
+   if(options.method==='POST')return json({id:sha},201);
+   if(new URL(url).origin==='https://api.github.com')return json({status:'succeed'});
+   return time>=appearsAt?json(receipt):new Response('missing',{status:404});
+  }});
+ return {promise,state};
+}
+test('the default wait outlasts a receipt cached as 404 for 600 s',async()=>{
+ const {promise}=defaultBudgetRun(700000);
+ assert.equal((await promise).nonce,receipt.nonce);
+});
+test('the default wait still ends with the receipt hint when the receipt never appears',async t=>{
+ mute(t);
+ const {promise,state}=defaultBudgetRun(Infinity);
+ await assert.rejects(promise,/receipt not found or not matching/);
+ assert(state.time()>=1200000-10000);
+});
