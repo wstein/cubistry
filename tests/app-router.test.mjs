@@ -81,8 +81,9 @@ test("go switches without a reload, disposes the previous mode once and drops th
   const router = createRouter({ registry: makeRegistry(log), root: {}, fallback: "clock", env });
   await router.start();
   assert.equal(await router.go("counter"), true);
-  assert.deepEqual(state.pushed, ["/index.html?app=counter&kiosk=1&lettering=words-pascal"]);
-  assert.deepEqual(log.slice(1), ["dispose timer", "mount counter kiosk=1&lettering=words-pascal"]);
+  // lettering belongs to other apps (Clock, letter counters) and is not owned by the timer: it goes too; kiosk is global.
+  assert.deepEqual(state.pushed, ["/index.html?app=counter&kiosk=1"]);
+  assert.deepEqual(log.slice(1), ["dispose timer", "mount counter kiosk=1"]);
   assert.equal(router.current(), "counter");
 });
 
