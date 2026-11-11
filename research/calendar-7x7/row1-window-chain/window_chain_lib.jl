@@ -6,7 +6,7 @@
 module WindowChainLib
 using SHA
 export parse_ym, ym_str, ym_index, month_range, read_month_list, root_month, chain_plan, chain_flags, month_records, write_months,
-    read_claims, read_best_effort, next_best_effort, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row,
+    read_claims, read_best_effort, next_best_effort, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row, read_segments,
     STATUSES, EDGES_HEADER, MONTHS_HEADER, SEGMENTS_HEADER, DEFAULT_DEADLINE_S, YM_MIN, YM_MAX
 
 const YM_MIN=(1900,1)
@@ -169,6 +169,14 @@ function read_edges(path,k)
     methods
 end
 greedy_count(methods)=count(==("greedy"),methods)
+
+"Rows of a (cumulative) segments.tsv, header and field count checked."
+function read_segments(path)
+    ls=split(chomp(read(path,String)),'\n')
+    ls[1]==SEGMENTS_HEADER || error("segments.tsv header")
+    for (i,l) in enumerate(ls[2:end]);length(split(l,'\t'))==10 || error("segments.tsv row $i has $(length(split(l,'\t'))) fields");end
+    String.(ls[2:end])
+end
 
 "One row of segments.tsv: the inputs of one run, so a continued chain shows which research commit, library and beam parameters made each segment."
 function segment_row(;run_id,research_ref,library,width,lambda,print_sha,months_sha,root,edges_from,edges_to)
