@@ -6,9 +6,15 @@ const WINDOW_PRINT_SHA="0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1
 # Window end YYYY-MM (env WINDOW_END, default 2028-01). The 21-month print stays pinned; a longer
 # window needs its own print, whose SHA-256 must be supplied in CAL7_WINDOW_PRINT_SHA.
 const WINDOW_END=get(ENV,"WINDOW_END","2028-01")
-const WINDOW_MONTHS=window_end_months(WINDOW_END)
-const WINDOW_PRINT_EXPECT=WINDOW_END=="2028-01" ? WINDOW_PRINT_SHA : get(ENV,"CAL7_WINDOW_PRINT_SHA","")
-const WINDOW_LAYOUT_SHA="c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db"
+# An explicit month list S (CAL7_WINDOW_MONTHS, CAL7_WINDOW_MONTHS_SHA256) replaces WINDOW_END; its first month is the chain
+# root and must be May 2026 (the identity pose of the committed prints). Gaps in S are bridged by one edge.
+const LIST_MODE=!isempty(get(ENV,"CAL7_WINDOW_MONTHS",""))
+const WINDOW_LIST=window_month_list()
+const WINDOW_MONTHS=length(WINDOW_LIST)
+const WINDOW_BRIDGES=month_list_bridges(WINDOW_LIST)
+const WINDOW_PRINT_EXPECT=(!LIST_MODE && WINDOW_END=="2028-01") ? WINDOW_PRINT_SHA : get(ENV,"CAL7_WINDOW_PRINT_SHA","")
+# The layout pin is a parameter so that a window-local layout can be pinned without touching the checker.
+const WINDOW_LAYOUT_SHA=get(ENV,"CAL7_WINDOW_LAYOUT_SHA256","c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db")
 function chain_lines(path)
     raw=read(path,String)
     @assert isvalid(raw) && endswith(raw,"\n") && !occursin('\r',raw) "canonical chain UTF-8/LF"
@@ -19,6 +25,7 @@ end
 function read_window_chain(path)
     ls=chain_lines(path);@assert length(ls)>=4 && ls[1]=="cubistry.calendar7.chain.v1" && ls[end]=="finish" "chain header and trailer"
     f=String.(split(ls[2],'\t'));@assert length(f)==5 && f[1]=="source"
+    @assert WINDOW_LIST[1]==MONTH_LIST_ROOT "chain root month is May 2026"
     @assert canonical_integer.(f[2:4])==[5,2026,5] "May 2026 identity root"
     validhash(s)=occursin(r"^[0-9a-f]{64}$",s)
     @assert validhash(f[5]);root=String(f[5]);cursor=3;edges=[];totalmoves=0
@@ -35,7 +42,7 @@ function read_window_chain(path)
         end
         @assert cursor<length(ls) && ls[cursor]=="end";cursor+=1
         push!(edges,(year=y,month=m,metrics=(h,q,r,rq),source=f[8],finish=f[9],moves=moves))
-        @assert length(edges)<=WINDOW_MONTHS-1
+        @assert length(edges)<=WINDOW_MONTHS-1 "at most $(WINDOW_MONTHS-1) edges"
     end
     @assert cursor==length(ls) && length(edges)==WINDOW_MONTHS-1 "exactly $(WINDOW_MONTHS-1) chronological edges"
     root,edges
@@ -98,6 +105,7 @@ function verify_window_chain(layout,printing,path,statesdir)
     @assert chain_digest(state)==root "root digest"
     @assert read(joinpath(statesdir,"state-01.tsv"),String)==chain_state_text(state;header=true) "root full-state snapshot"
     println("input\t",WINDOW_LAYOUT_SHA,'\t',WINDOW_PRINT_EXPECT,'\t',bytes2hex(sha256(read(path))))
+    ml=month_list_line(WINDOW_LIST);isnothing(ml) || println(ml)
     println("root\t2026\t5\t",root)
     total=(0,0,0,0);allmoves=Tuple{Int,Int}[]
     for (i,edge) in enumerate(edges)
@@ -121,12 +129,12 @@ function verify_window_chain(layout,printing,path,statesdir)
         end
         @assert inverse==before && inversep==beforep "edge inverse restores full state"
         append!(allmoves,edge.moves);total=map(+,total,metrics)
-        println("edge\t",i,'\t',goal.year,'\t',goal.month,'\t',join(metrics,'\t'),'\t',edge.source,'\t',edge.finish,"\tPASS")
+        println("edge\t",i,'\t',goal.year,'\t',goal.month,'\t',join(metrics,'\t'),'\t',edge.source,'\t',edge.finish,"\tPASS",WINDOW_BRIDGES[i] ? "\tBRIDGE" : "")
     end
     @assert (edges[end].year,edges[end].month)==(goals[end].year,goals[end].month) && length(goals)==WINDOW_MONTHS "window end matches the last chain edge"
     for (g,e) in reverse(allmoves);state=chain_move(state,g,e==2 ? 2 : -e);end
     @assert state==initial "whole-chain inverse restores all 294 surfaces"
-    println("summary\t",WINDOW_MONTHS,'\t',WINDOW_MONTHS-1,'\t',join(total,'\t'),'\t',WINDOW_END,"\tINVERSE_PASS")
+    println("summary\t",WINDOW_MONTHS,'\t',WINDOW_MONTHS-1,'\t',join(total,'\t'),'\t',LIST_MODE ? "list:"*month_text(WINDOW_LIST[end]) : WINDOW_END,"\tINVERSE_PASS")
     println("verdict\tSAT\tlegal-retained-state-window-chain\t",WINDOW_MONTHS,'\t',WINDOW_MONTHS-1)
 end
 if abspath(PROGRAM_FILE)==(@__FILE__)

@@ -4,15 +4,34 @@
 # Frozen upright-beam/verify_chain.jl and strict print/root pins remain unchanged.
 module IndependentRowOne
 include(joinpath(@__DIR__,"..","upright-beam/verify_chain.jl"))
-const END_TEXT=get(ENV,"WINDOW_END","2028-01")
-const END_MATCH=match(r"^(\d{4})-(\d{2})\z",END_TEXT)
-@assert !isnothing(END_MATCH) "window end is YYYY-MM"
-const END_YM=Tuple(parse.(Int,END_MATCH.captures))
+# Month list S: own reader (shares nothing with check.jl). CAL7_WINDOW_MONTHS/CAL7_WINDOW_MONTHS_SHA256 exclude WINDOW_END.
+const LIST_PATH=get(ENV,"CAL7_WINDOW_MONTHS","")
+const LISTED=!isempty(LIST_PATH)
+function listed_months()
+    @assert !haskey(ENV,"WINDOW_END") "list and window end are exclusive"
+    pin=get(ENV,"CAL7_WINDOW_MONTHS_SHA256","");@assert length(pin)==64 && all(c->c in "0123456789abcdef",pin) "list pin"
+    bytes=read(LIST_PATH);@assert bytes2hex(sha256(bytes))==pin "list hash"
+    txt=String(copy(bytes));@assert isvalid(txt) && endswith(txt,"\n") && !occursin('\r',txt) "list is canonical LF"
+    out=Tuple{Int,Int}[]
+    for row in split(chop(txt),"\n")
+        mm=match(r"^(\d{4})-(\d{2})$",row);@assert !isnothing(mm) "list row is YYYY-MM"
+        t=Tuple(parse.(Int,mm.captures));@assert 1<=t[2]<=12 && (2026,1)<=t<=(2100,1) "list row in range"
+        @assert isempty(out) || t>out[end] "list strictly increasing"
+        push!(out,t)
+    end
+    out
+end
+const MONTHS=LISTED ? listed_months() : nothing
+const END_TEXT=LISTED ? "list" : get(ENV,"WINDOW_END","2028-01")
+const END_MATCH=LISTED ? nothing : match(r"^(\d{4})-(\d{2})\z",END_TEXT)
+@assert LISTED || !isnothing(END_MATCH) "window end is YYYY-MM"
+const END_YM=LISTED ? MONTHS[end] : Tuple(parse.(Int,END_MATCH.captures))
 @assert 1<=END_YM[2]<=12 && END_YM>=(2026,5) && END_YM<=(2100,1) "window end lies within May 2026 to January 2100"
-const END_COUNT=(END_YM[1]-2026)*12+END_YM[2]-4
+const END_COUNT=LISTED ? length(MONTHS) : (END_YM[1]-2026)*12+END_YM[2]-4
+const NEXT=LISTED ? Dict(MONTHS[i]=>MONTHS[i+1] for i in 1:length(MONTHS)-1) : nothing
 # The 21-month print stays pinned; a longer window needs its own print SHA-256 in CAL7_WINDOW_PRINT_SHA.
-const EXPECT_PRINT=END_TEXT=="2028-01" ? "0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127" : get(ENV,"CAL7_WINDOW_PRINT_SHA","")
-const EXPECT_LAYOUT="c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db"
+const EXPECT_PRINT=(!LISTED && END_TEXT=="2028-01") ? "0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127" : get(ENV,"CAL7_WINDOW_PRINT_SHA","")
+const EXPECT_LAYOUT=get(ENV,"CAL7_WINDOW_LAYOUT_SHA256","c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db")
 const NAMES=Vector{Vector{String}}()
 function load_names(path)
     @assert bytes2hex(sha256(read(path)))==EXPECT_LAYOUT "new layout pin"
@@ -70,15 +89,16 @@ end
 function verify(layout,printing,chain,statesdir)
     optics_selfcheck();load_names(layout);@assert bytes2hex(sha256(read(printing)))==EXPECT_PRINT "new print pin"
     original=read_print(printing);state=copy(original);ch=read_chain_file(chain)
+    @assert !LISTED || MONTHS[1]==(2026,5) "chain root month is May 2026"
     @assert (ch.src.root,ch.src.year,ch.src.month)==(5,2026,5) && length(ch.edges)==END_COUNT-1
     @assert check_front(state,board(2026,5)).bad==0 && state_sha(state)==ch.src.hash
     rule_selfcheck(state,board(2026,5))
     encode(st)="sticker\tpiece\tposition\tnormal\tup\ttext\tink\n"*join([join((s.id,s.piece,join(s.pos,','),join(s.normal,','),join(s.up,','),s.text,s.ink),'\t')*"\n" for s in st])
     @assert read(joinpath(statesdir,"state-01.tsv"),String)==encode(state)
-    y,m=2026,5;total=0;words=Int[]
+    y,m=2026,5;py,pm=2026,5;total=0;words=Int[]
     println("independent-root\t2026-05\t",state_sha(state),"\tACCEPT")
     for (i,e) in enumerate(ch.edges)
-        y,m=m==12 ? (y+1,1) : (y,m+1)
+        y,m=LISTED ? NEXT[(y,m)] : (m==12 ? (y+1,1) : (y,m+1))
         @assert (e.year,e.month)==(y,m) "chronological adjacency"
         before=copy(state);@assert state_sha(before)==e.sh "source continuity"
         state=apply_word(state,e.word)
@@ -89,7 +109,8 @@ function verify(layout,printing,chain,statesdir)
         @assert apply_word(state,-reverse(e.word))==before "edge inverse restores full state"
         @assert read(joinpath(statesdir,"state-"*lpad(string(i+1),2,'0')*".tsv"),String)==encode(state)
         append!(words,e.word);total+=e.htm
-        println("independent-edge\t",i,'\t',y,'\t',m,'\t',e.htm,'\t',state_sha(state),"\tACCEPT")
+        println("independent-edge\t",i,'\t',y,'\t',m,'\t',e.htm,'\t',state_sha(state),"\tACCEPT",LISTED && (y*12+m)-(py*12+pm)>1 ? "\tBRIDGE" : "")
+        py,pm=y,m
     end
     @assert (y,m)==END_YM && apply_word(state,-reverse(words))==original
     println("independent-verdict\tACCEPT_CHAIN\t",END_COUNT,'\t',END_COUNT-1,'\t',total,"\tINVERSE_PASS")

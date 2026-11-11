@@ -88,6 +88,7 @@ function window_match_check(layout_path,print_path,matches_path)
     @assert isvalid(raw_matches) && !occursin('\r',raw_matches) && endswith(raw_matches,"\n") "canonical match TSV"
     @assert length(rows)==1+length(goals)*49 && rows[1]=="target\tyear\tmonth\trow\tcolumn\tpiece\tx-image\ty-image\tz-image" "21 complete front matches"
     println("input\t",bytes2hex(sha256(codeunits(raw_layout))),'\t',bytes2hex(sha256(read(print_path))),'\t',bytes2hex(sha256(read(matches_path))))
+    ml=month_list_line([(g.year,g.month) for g in goals]);isnothing(ml) || println(ml)
     println("printing\t294\t218\t",length(goals),"\t",49*length(goals))
     homes=all_homes();byhome=Dict(h=>filter(s->s.home==h,source) for h in homes)
     parsevec(s)=begin vs=split(s,',');@assert length(vs)==3;tuple((canonical_integer(String(v)) for v in vs)...);end
