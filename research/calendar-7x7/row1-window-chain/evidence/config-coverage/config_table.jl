@@ -12,6 +12,7 @@ const CAL=normpath(joinpath(@__DIR__,"..","..",".."))
 const LAYOUT=joinpath(CAL,"row1-revision","layout.tsv")
 const PRINT_B=joinpath(CAL,"row1-window-chain","evidence","window-skip","printing-S2.tsv")
 const PRINT_C=joinpath(@__DIR__,"printing-C.tsv")
+const PRINT_D=joinpath(@__DIR__,"printing-C1980.tsv")
 const PRINT_OLD=joinpath(CAL,"row1-window-chain","evidence","window-2037-01","printing.tsv")
 module ConfigTable
 using Dates,SHA
@@ -114,8 +115,8 @@ function best_effort(cs,result,prints...)
     end
     String(take!(io))
 end
-function build(layout,printB,printOld,printC)
-    labels=coupled_labels(read(layout,String));srcB=window_read_print(printB);srcOld=window_read_print(printOld);srcC=window_read_print(printC)
+function build(layout,printB,printOld,printC,printD)
+    labels=coupled_labels(read(layout,String));srcB=window_read_print(printB);srcOld=window_read_print(printOld);srcC=window_read_print(printC);srcD=window_read_print(printD)
     seen=Dict{Tuple{Int,Int,Int},Any}()
     for y in 2026:2099,m in 1:12;k=ckey(y,m);haskey(seen,k) || (seen[k]=(y,m));end
     cs=[(;month=k[1],weekday=k[2],length=k[3],rep=seen[k],board=board_of(labels,seen[k]...)) for k in sort!(collect(keys(seen)))]
@@ -123,19 +124,20 @@ function build(layout,printB,printOld,printC)
     resB=Dict((c.month,c.weekday,c.length)=>result_of(srcB,c.board) for c in cs)
     resO=Dict((c.month,c.weekday,c.length)=>result_of(srcOld,c.board) for c in cs)
     resC=Dict((c.month,c.weekday,c.length)=>result_of(srcC,c.board) for c in cs)
-    result(nm,c)=(nm=="B" ? resB : nm=="C" ? resC : resO)[(c.month,c.weekday,c.length)]
+    resD=Dict((c.month,c.weekday,c.length)=>result_of(srcD,c.board) for c in cs)
+    result(nm,c)=(nm=="B" ? resB : nm=="C" ? resC : nm=="D" ? resD : resO)[(c.month,c.weekday,c.length)]
     cyc=cycle_facts(labels,cs)
     io=IOBuffer()
-    println(io,"config\tmonth\tmonth_name\tweekday_of_1st\tlength\tfirst_rep_month\tboard_sha256\tyears_2026_2100\tyears_1900_2200\tB_status\tB_unmatched\told_status\told_unmatched\tC_status\tC_unmatched")
+    println(io,"config\tmonth\tmonth_name\tweekday_of_1st\tlength\tfirst_rep_month\tboard_sha256\tyears_2026_2100\tyears_1900_2200\tB_status\tB_unmatched\told_status\told_unmatched\tC_status\tC_unmatched\tC1980_status\tC1980_unmatched")
     for c in cs
-        b,o,cc=result("B",c),result("old",c),result("C",c)
+        b,o,cc,dd=result("B",c),result("old",c),result("C",c),result("D",c)
         y1=years(c,2026,2100);c.month==1 || (y1=[y for y in y1 if y<=2099]) # 2100-01 is the last month of the range; later months of 2100 are out
         println(io,join((c.id,c.month,MN[c.month],WD[c.weekday],c.length,ymstr(c.rep...),bytes2hex(sha256(bsig(c.board))),
-            join(y1,','),join(years(c,1900,2200),','),b.status,b.unmatched,o.status,o.unmatched,cc.status,cc.unmatched),'\t'))
+            join(y1,','),join(years(c,1900,2200),','),b.status,b.unmatched,o.status,o.unmatched,cc.status,cc.unmatched,dd.status,dd.unmatched),'\t'))
     end
     table=String(take!(io))
     println(io,"print\tconfig\tmonth_name\tweekday_of_1st\tlength\tdates_2026-01_to_2100-01\tcount\tunmatched")
-    for (nm,lab) in (("B","B"),("old","old"),("C","C")),c in cs
+    for (nm,lab) in (("B","B"),("old","old"),("C","C"),("D","C1980")),c in cs
         r=result(nm,c);r.status=="SAT" && continue
         ds=[ymstr(y,c.month) for y in years(c,2026,2100) if (y,c.month)<=(2100,1)]
         println(io,join((lab,c.id,MN[c.month],WD[c.weekday],c.length,join(ds,','),length(ds),r.unmatched),'\t'))
@@ -191,17 +193,17 @@ for (a,b) in (((2026,1),(2050,1)),((2026,5),(2050,1)),((2026,1),(2100,1)))
     println(io,join((string(ymstr(a...),"..",ymstr(b...)),n,length(seq),length(seq)-1,length(pairs)),'\t'))
 end
 chain_tsv=String(take!(io))
-best_effort_tsv=best_effort(cs,result,("B",srcB),("C",srcC))
+best_effort_tsv=best_effort(cs,result,("B",srcB),("C",srcC),("D",srcD))
 (;configs=cs,chain_tsv,best_effort_tsv,labels,srcB,srcOld,srcC,result,table_tsv=table,failing_tsv=failing,matches_B=matches_tsv(cs,Dict(k=>v for (k,v) in resB)),
-      matches_old=matches_tsv(cs,Dict(k=>v for (k,v) in resO)),matches_C=matches_tsv(cs,Dict(k=>v for (k,v) in resC)),lemma_tsv,lemma=(;B_set=BS,old_set=OS,all91,rows),cycle=cyc,cycle_txt=cyc_txt,
+      matches_old=matches_tsv(cs,Dict(k=>v for (k,v) in resO)),matches_C=matches_tsv(cs,Dict(k=>v for (k,v) in resC)),matches_D=matches_tsv(cs,Dict(k=>v for (k,v) in resD)),srcD,lemma_tsv,lemma=(;B_set=BS,old_set=OS,all91,rows),cycle=cyc,cycle_txt=cyc_txt,
       years,byid,config_of)
 end
 end # module
 using .ConfigTable
 if abspath(PROGRAM_FILE)==(@__FILE__) && length(ARGS)==2 && ARGS[1]=="write"
-    T=ConfigTable.build(LAYOUT,PRINT_B,PRINT_OLD,PRINT_C);out=ARGS[2];mkpath(out)
+    T=ConfigTable.build(LAYOUT,PRINT_B,PRINT_OLD,PRINT_C,PRINT_D);out=ARGS[2];mkpath(out)
     for (n,s) in (("config-table.tsv",T.table_tsv),("failing-dates.tsv",T.failing_tsv),("front-matches-config-B.tsv",T.matches_B),
-                  ("front-matches-config-old.tsv",T.matches_old),("front-matches-config-C.tsv",T.matches_C),("best-effort-feb-sunday-28.tsv",T.best_effort_tsv),("lemma-config.tsv",T.lemma_tsv),("gregorian-400.txt",T.cycle_txt),("chain-size.tsv",T.chain_tsv))
+                  ("front-matches-config-old.tsv",T.matches_old),("front-matches-config-C.tsv",T.matches_C),("front-matches-config-C1980.tsv",T.matches_D),("best-effort-feb-sunday-28.tsv",T.best_effort_tsv),("lemma-config.tsv",T.lemma_tsv),("gregorian-400.txt",T.cycle_txt),("chain-size.tsv",T.chain_tsv))
         write(joinpath(out,n),s)
     end
 end
