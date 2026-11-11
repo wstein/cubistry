@@ -252,7 +252,7 @@ test("plasticity: 0 is the flat look, the parts grow with it, the default is in 
   const full = plasticityParts(1);
   // Never past the shared plastic (specular 1, clearcoat 0.18, shadows 1): the old look is the comparison, not the top of the range.
   assert.ok(full.specular <= 0.3 && full.clearcoat <= 0.1 && full.shadowStrength <= 0.85 && full.shadowStrength >= MIN_SHADOW_STRENGTH);
-  assert.ok(DEFAULT_PLASTICITY > 0 && DEFAULT_PLASTICITY < 1);
+  assert.equal(DEFAULT_PLASTICITY, 0.6); // owner decision 2026-11-11
   assert.equal(clampPlasticity(-3), 0); assert.equal(clampPlasticity(7), 1); assert.equal(clampPlasticity(Number.NaN), DEFAULT_PLASTICITY);
   assert.equal(parsePlasticity(null), DEFAULT_PLASTICITY); assert.equal(parsePlasticity(""), DEFAULT_PLASTICITY); assert.equal(parsePlasticity("0.6"), 0.6); assert.equal(parsePlasticity("x"), DEFAULT_PLASTICITY);
   assert.equal(floorOpacityFactor(MIN_SHADOW_STRENGTH) * 0.3, 1); // the floor shadow material reaches opacity 1 at the minimum strength: its darkness is kept

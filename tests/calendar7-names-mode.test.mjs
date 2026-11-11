@@ -10,7 +10,8 @@ import { SCHEMES, namesGround } from "../src/apps/calendar7/schemes.ts";
 import { FACE_FLAT, LINE_SCALE, NAMES_LINE_FACTOR, NAME_FONT_SIZE, namePxPerUnit, TEXTURE, TEXT_SQUARE, drawFace, drawSticker, nameGrid, tileClass, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { parseDisplays, parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
 import { drawFontSticker, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
-import { mountCalendar7 } from "../src/apps/calendar7/mount.ts";
+import { PLASTICITY_PARAM, mountCalendar7 } from "../src/apps/calendar7/mount.ts";
+import { DEFAULT_PLASTICITY } from "../src/apps/calendar7/names-plasticity.ts";
 import { href } from "../src/apps/calendar7/month-view.ts";
 import { clonePose } from "../src/apps/calendar7/engine.ts";
 
@@ -216,6 +217,7 @@ function fakeStage() {
     show() { stage.shows++; },
     turn() { stage.turns++; return Promise.resolve(); },
     setScheme() {},
+    plasticities: [], setPlasticity(v) { stage.plasticities.push(v); },
     configure(printing, pose, surface, layout) { stage.configs.push({ printing, pose: clonePose(pose), surface, layout }); },
     setLabel: (t) => stage.labels.push(t),
     resetView() {}, destroy: () => stage.destroyed++,
@@ -272,6 +274,19 @@ test("standard mode (default, unknown value) never fetches the names files and u
     assert.equal(stage.configs[0].layout, "standard");
     assert.equal(root.getAttribute("data-c7-layout"), "standard");
     assert.equal(notice(root).hidden, true);
+    inst.dispose();
+  }
+});
+
+test("the plasticity URL parameter reaches the stage (absent or invalid: the default, clamped to 0..1)", async () => {
+  const want = { "": DEFAULT_PLASTICITY, "&plasticity=0": 0, "&plasticity=0.3": 0.3, "&plasticity=7": 1, "&plasticity=x": DEFAULT_PLASTICITY };
+  assert.equal(PLASTICITY_PARAM, "plasticity");
+  for (const [extra, value] of Object.entries(want)) {
+    const root = fakeRoot();
+    const { env, stage } = setup();
+    const inst = await mountCalendar7(root, q("year=2027&month=3&layout=names" + extra), env);
+    await settle(root, "2027-03");
+    assert.deepEqual(stage.plasticities, [value], extra);
     inst.dispose();
   }
 });
