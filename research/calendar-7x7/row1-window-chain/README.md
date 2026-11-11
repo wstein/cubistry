@@ -84,6 +84,15 @@ PRINT_OVERRIDE=$PWD/evidence/window-2029-12/printing.tsv CHAIN_OVERRIDE=$PWD/evi
 STATES_OVERRIDE=$PWD/evidence/window-2029-12/states bash run_checks.sh JULIA JAVA CHAIN_JAR SCRATCH_DIR
 ```
 
+## Explicit month list instead of a window end
+
+`CAL7_WINDOW_MONTHS=<file>` with `CAL7_WINDOW_MONTHS_SHA256=<hex>` (Flix: `months MONTHS_FILE MONTHS_SHA256 PRINT_SHA256`) replaces `WINDOW_END`
+in `check.jl`, `verify_chain.jl`, the Flix chain jar and `run_checks.sh`. The list is strictly increasing; its first month is the chain
+root (May 2026, identity pose); edge i must carry the month of member i+1; an edge across skipped calendar months is a bridge edge
+(`BRIDGE` on the receipt line). Format, root rule, coverage and receipts: [evidence/month-list/README.md](evidence/month-list/README.md).
+Tests: `test_month_list.jl`, `run_month_list_checks.sh` (positive bridge chain and 12 negatives, Julia, Flix and the independent verifier),
+`test_month_coverage.jl`. `generate.jl` and `beam_edge.jl` take their targets from the same goals and were not changed or run for a list.
+
 ## Beam pilot: Nov 2026 to Dec 2026
 
 The stored edge into December 2026 (greedy orbit solver) has 271 HTM and 276 QTM. `beam_edge.jl`
