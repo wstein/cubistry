@@ -101,13 +101,24 @@ export type TileEdgeColors = Partial<Record<"left" | "right" | "top" | "bottom",
  */
 export function tileEdgeColors(roles: TileRoles, ground: string, tile: FaceTile): TileEdgeColors | null {
   const g = tileGrid(tile), banner = isBannerClass(roles.cls), r = banner ? g.banner : g.cell;
-  if (!banner && !hasBand(tile)) return null;
+  const lr = roles.line ? lineRect(roles.line, "names", true, tile, banner) : null; // the line runs over the edge where it reaches the tile edge
+  if (!banner && !hasBand(tile) && !lr) return null;
   const along = (lo: number, hi: number, size: number): string | readonly TileEdgeStop[] => {
     const stops = [{ to: lo / size, color: ground }, { to: hi / size, color: roles.fill }, { to: 1, color: ground }].filter((s, i, all) => s.to > (i === 0 ? 0 : all[i - 1].to) + 1e-9);
     return stops.length === 1 ? stops[0].color : stops;
   };
   const up = along(g.H - r.y1, g.H - r.y0, g.H), right = along(r.x0, r.x1, g.W); // up: from the bottom of the face, right: from the left
-  return { left: r.x0 > 0 ? ground : up, right: r.x1 < g.W ? ground : up, top: r.y0 > 0 ? ground : right, bottom: r.y1 < g.H ? ground : right };
+  const withLine = (edge: string | readonly TileEdgeStop[], reaches: boolean): string | readonly TileEdgeStop[] => {
+    if (!lr || !reaches) return edge;
+    const a = (g.H - (lr.y + lr.h)) / g.H, b = (g.H - lr.y) / g.H, color = roles.line!.color, base: readonly TileEdgeStop[] = typeof edge === "string" ? [{ to: 1, color: edge }] : edge;
+    const colorAt = (t: number): string => (base.find((x) => t <= x.to + 1e-12) ?? base[base.length - 1]).color;
+    const cuts = [...new Set([...base.map((x) => x.to), a, b, 1])].filter((t) => t > 1e-9 && t <= 1 + 1e-12).sort((p, q) => p - q);
+    const out: TileEdgeStop[] = [];
+    let from = 0;
+    for (const t of cuts) { const mid = (from + t) / 2, c = mid > a && mid < b ? color : colorAt(mid); if (out.length && out[out.length - 1].color === c) out[out.length - 1] = { to: t, color: c }; else out.push({ to: t, color: c }); from = t; }
+    return out.length === 1 ? out[0].color : out;
+  };
+  return { left: r.x0 > 0 ? ground : withLine(up, lr !== null && lr.x <= 0.5), right: r.x1 < g.W ? ground : withLine(up, lr !== null && lr.x + lr.w >= g.W - 0.5), top: r.y0 > 0 ? ground : right, bottom: r.y1 < g.H ? ground : right };
 }
 /** Weekday words (SUN to SAT) of a tile of the unit grid sit `NAMES_WEEKDAY_DOWN` below the cell center: the vertical shift in drawing px. */
 export const weekdayShift = (cls: TileClass): number => (cls === "weekday" || cls === "sunsat" ? NAMES_WEEKDAY_DOWN * namePxPerUnit() : 0);
@@ -143,7 +154,8 @@ export function lineRect(line: SchemeLine, layout: Layout, face: boolean, tile?:
     // A tile of any size: the width of the unit cell (the full tile width without bands), at the bottom edge of the flat face
     // (the flat share of the height); in the month row at the bottom edge of the red banner.
     const g = tileGrid(tile);
-    return { x: g.cell.x0, y: (banner ? g.banner.y1 : g.H * (1 + faceFlatShare(tile.h)) / 2) - h, w: g.cell.x1 - g.cell.x0, h };
+    const r = banner ? g.banner : g.cell; // the month line spans the banner, the weekday line the unit cell: one line across the seven columns
+    return { x: r.x0, y: (banner ? g.banner.y1 : g.H * (1 + faceFlatShare(tile.h)) / 2) - h, w: r.x1 - r.x0, h };
   }
   const bottom = face ? TEXTURE * (1 + FACE_FLAT) / 2 : TEXTURE;
   if (face && !names) return { x: TEXTURE * (1 - FACE_FLAT) / 2, y: bottom - h, w: TEXTURE * FACE_FLAT, h };
