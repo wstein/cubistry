@@ -1,5 +1,5 @@
 {
-  "headline": {"kind": "exact-gapless", "from": "2026-05", "to": "2037-01", "months": 129},
+  "headline": {"kind": "planned-exact-gapless", "from": "2026-05", "to": "2037-01", "months": 129},
   "list": {"sha256": "1df5ef9ee763b65fa49ab418e84100383ad2a0050dc1bc0f401f86bd653d831c", "members": 286, "root": "2026-05", "start": "2026-05", "range": ["2026-01", "2050-01"]},
   "counts": {"chain_members": 283, "exact_runs": 3, "best_effort": 0, "gaps": 2, "bridges": 2, "before_start": 4},
   "exact_runs": [{"from": "2026-05", "to": "2037-01", "count": 129}, {"from": "2037-03", "to": "2043-01", "count": 71}, {"from": "2043-03", "to": "2050-01", "count": 83}],

@@ -57,11 +57,11 @@ function coverage(ms,status,last,START,ROOT,best)
 end
 function tsv(io,c,pin,last,nlist,START,ROOT)
     h=c.head
-    println(io,"headline\texact-gapless\t",isnothing(h) ? "-\t-\t0" : string(mt(h[1]),'\t',mt(h[2]),'\t',idx(h[2])-idx(h[1])+1))
+    println(io,"headline\tplanned-exact-gapless\t",isnothing(h) ? "-\t-\t0" : string(mt(h[1]),'\t',mt(h[2]),'\t',idx(h[2])-idx(h[1])+1))
     println(io,"list\t",pin,'\t',nlist,"\troot\t",mt(ROOT),"\tstart\t",mt(START),"\trange\t",mt(FIRST),'\t',mt(last))
     println(io,"counts\tchain_members\t",length(c.members),"\texact_runs\t",length(c.runs),"\tbest_effort\t",length(c.best),"\tgaps\t",length(c.gaps),"\tbridges\t",length(c.bridges),"\tbefore_start\t",length(c.before))
     println(io,"kind\tfrom\tto\tcount\tstatus\tevidence")
-    for (a,b) in c.runs;println(io,"run\t",mt(a),'\t',mt(b),'\t',idx(b)-idx(a)+1,"\texact\t");end
+    for (a,b) in c.runs;println(io,"run\t",mt(a),'\t',mt(b),'\t',idx(b)-idx(a)+1,"\tplanned_exact\t");end
     for k in sort(collect(keys(c.best)))
         st,cells,ev=c.best[k];println(io,"best_effort\t",k,'\t',k,"\t1\t",st,"\twrong=",cells," evidence=",ev)
     end
@@ -74,7 +74,7 @@ end
 function json(io,c,pin,last,nlist,START,ROOT)
     h=c.head;q(s)="\""*s*"\""
     println(io,"{")
-    println(io,"  \"headline\": {\"kind\": \"exact-gapless\", \"from\": ",isnothing(h) ? "null" : q(mt(h[1])),", \"to\": ",isnothing(h) ? "null" : q(mt(h[2])),", \"months\": ",isnothing(h) ? 0 : idx(h[2])-idx(h[1])+1,"},")
+    println(io,"  \"headline\": {\"kind\": \"planned-exact-gapless\", \"from\": ",isnothing(h) ? "null" : q(mt(h[1])),", \"to\": ",isnothing(h) ? "null" : q(mt(h[2])),", \"months\": ",isnothing(h) ? 0 : idx(h[2])-idx(h[1])+1,"},")
     println(io,"  \"list\": {\"sha256\": ",q(pin),", \"members\": ",nlist,", \"root\": ",q(mt(ROOT)),", \"start\": ",q(mt(START)),", \"range\": [",q(mt(FIRST)),", ",q(mt(last)),"]},")
     println(io,"  \"counts\": {\"chain_members\": ",length(c.members),", \"exact_runs\": ",length(c.runs),", \"best_effort\": ",length(c.best),", \"gaps\": ",length(c.gaps),", \"bridges\": ",length(c.bridges),", \"before_start\": ",length(c.before),"},")
     println(io,"  \"exact_runs\": [",join(["{\"from\": $(q(mt(a))), \"to\": $(q(mt(b))), \"count\": $(idx(b)-idx(a)+1)}" for (a,b) in c.runs],", "),"],")

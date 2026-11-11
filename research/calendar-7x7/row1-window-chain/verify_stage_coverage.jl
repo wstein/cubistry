@@ -9,12 +9,12 @@ function info(p)
     @assert !isnothing(r) && !isempty(es) && !isnothing(v) "receipt shape"
     js=match(r"(?m)^join\tstart\t([0-9a-f]{64})$",t);je=match(r"(?m)^join\tend\t([0-9a-f]{64})$",t)
     ym(a,b)=string(a,'-',lpad(b,2,'0'))
-    (first=ym(r[1],r[2]),last=ym(es[end][1],es[end][2]),start=String(r[3]),fin=String(es[end][3]),verdict=String(v[1]),count=parse(Int,v[2]),
+    (free=occursin(r"(?m)^start\tfree\t",t),first=ym(r[1],r[2]),last=ym(es[end][1],es[end][2]),start=String(r[3]),fin=String(es[end][3]),verdict=String(v[1]),count=parse(Int,v[2]),
      js=isnothing(js) ? "" : String(js[1]),je=isnothing(je) ? "" : String(je[1]),exact=(v[1]=="SAT" && !any(e->occursin(r"BRIDGE|ROOTEDGE",e[4]),es)))
 end
 S=[]
 for l in readlines(stages)
-    n,j,f=split(l,'\t');@assert read(joinpath(evdir,j))==read(joinpath(evdir,f)) "$n: receipts differ"
+    n,j,f=split(l,'\t');@assert realpath(joinpath(evdir,j))!=realpath(joinpath(evdir,f)) "$n: receipts are one file";@assert read(joinpath(evdir,j))==read(joinpath(evdir,f)) "$n: receipts differ"
     push!(S,(name=n,i=info(joinpath(evdir,j))))
 end
 want=String[]
@@ -30,7 +30,7 @@ let k=1,runs=0
         if !S[k].i.exact;k+=1;continue;end
         e=k;while e<length(S) && J[e] && S[e+1].i.exact;e+=1;end
         n=sum(S[x].i.count for x in k:e)-(e-k)
-        push!(want,"$(e>k ? "composed" : "single")\t$(S[k].i.first)\t$(S[e].i.last)\t$n\t$(join([S[x].name for x in k:e],','))");runs+=1;k=e+1
+        push!(want,"$(S[k].i.free ? "free_" : "")$(e>k ? "composed" : "single")\t$(S[k].i.first)\t$(S[e].i.last)\t$n\t$(join([S[x].name for x in k:e],','))");runs+=1;k=e+1
     end
     push!(want,"counts\tstages\t$(length(S))\tjoined\t$(count(J))\tjunctions\t$(length(J))\texact_runs\t$runs")
 end

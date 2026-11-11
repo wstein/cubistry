@@ -1,10 +1,10 @@
-headline	exact-gapless	2026-03	2037-01	131
+headline	planned-exact-gapless	2026-03	2037-01	131
 list	894aca2aa38074ae9254a01befbab964e821b7ddbd39c5c311157f19ef5a9988	287	root	1980-01	start	2026-03	range	2026-01	2050-01
 counts	chain_members	287	exact_runs	3	best_effort	2	gaps	0	bridges	0	before_start	2
 kind	from	to	count	status	evidence
-run	2026-03	2037-01	131	exact	
-run	2037-03	2043-01	71	exact	
-run	2043-03	2050-01	83	exact	
+run	2026-03	2037-01	131	planned_exact	
+run	2037-03	2043-01	71	planned_exact	
+run	2043-03	2050-01	83	planned_exact	
 best_effort	2037-02	2037-02	1	best_effort_unverified	wrong=7,7 evidence=february-hall-S2.tsv
 best_effort	2043-02	2043-02	1	best_effort_unverified	wrong=7,7 evidence=february-hall-S2.tsv
 before_start	2026-01	2026-01	1	before_start	print_member=no
