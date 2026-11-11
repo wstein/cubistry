@@ -4,17 +4,22 @@ import {readFileSync} from 'node:fs';
 import {PUBLICATION_PATH} from '../scripts/pages/publication.mjs';
 const workflow=readFileSync('.github/workflows/pages-publish.yml','utf8');
 const publish=readFileSync('scripts/pages/publish.mjs','utf8');
-// Every step that starts with "- " and uses upload-pages-artifact, with its `with:` block.
-const steps=[...workflow.matchAll(/^ {6}- (?:if: .*\n {8})?uses: actions\/upload-pages-artifact@[^\n]*\n(?: {8,}[^\n]*\n)*/gm)].map(m=>m[0]);
+// Split into steps (lines starting with six spaces and "- "), keep those that use upload-pages-artifact.
+const steps=workflow.split(/^(?= {6}- )/m).filter(s=>/^ {6}- [\s\S]*?uses: actions\/upload-pages-artifact@/.test(s));
+const withBlock=step=>step.match(/^ {8}with:\n((?: {10,}[^\n]*\n?)*)/m)?.[1]??'';
 
 test('the receipt is a dotfile, which upload-pages-artifact drops unless include-hidden-files is set',()=>{
   assert.match(PUBLICATION_PATH,/^\./);
 });
-test('both publisher uploads package combined-site with include-hidden-files: true',()=>{
+test('every upload-pages-artifact use is a parsed step',()=>{
   assert.equal(steps.length,2);
+  assert.equal(workflow.split('upload-pages-artifact@').length-1,steps.length);
+});
+test('each upload packages combined-site with include-hidden-files: true inside its with: block',()=>{
   for(const step of steps){
-    assert.match(step,/^ {10}path: combined-site$/m);
-    assert.match(step,/^ {10}include-hidden-files: true$/m,`missing include-hidden-files in:\n${step}`);
+    const block=withBlock(step);
+    assert.match(block,/^ {10}path: combined-site$/m);
+    assert.match(block,/^ {10}include-hidden-files: true$/m,`missing include-hidden-files in with: of:\n${step}`);
   }
 });
 test('prepare writes the receipt at PUBLICATION_PATH inside the uploaded directory',()=>{
