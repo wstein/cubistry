@@ -1,32 +1,61 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Pure logic of window_chain.jl (no solver, no print): month plan, month status records, resume
-# bookkeeping and the deadline rule. UNTRUSTED tooling; check.jl, the Flix checker and
-# verify_chain.jl decide whether a chain is valid. Tested by test_window_chain.jl.
+# Pure logic of window_chain.jl (no solver, no print): month list, root month, chain plan, month status records, resume
+# bookkeeping and the deadline rule. UNTRUSTED tooling; check.jl, the Flix chain checker and verify_chain.jl decide whether
+# a chain is valid. The run contract (month list S, root month, bridge edges) is the one of those checkers
+# (CAL7_WINDOW_MONTHS, CAL7_ROOT_MONTH). Tested by test_window_chain.jl.
 module WindowChainLib
-export parse_ym, ym_str, ym_index, month_range, chain_months, month_records, write_months,
-    read_claims, chain_progress, may_start_edge, unsafe_stop, stop_reason, read_edges, greedy_count, STATUSES, ROOT, EDGES_HEADER, MONTHS_HEADER
+using SHA
+export parse_ym, ym_str, ym_index, month_range, read_month_list, root_month, chain_plan, chain_flags, month_records, write_months,
+    read_claims, read_best_effort, next_best_effort, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row,
+    STATUSES, EDGES_HEADER, MONTHS_HEADER, SEGMENTS_HEADER, DEFAULT_DEADLINE_S, YM_MIN, YM_MAX
 
-const ROOT=(2026,5)   # the chain root of every window print is May 2026 (identity pose)
+const YM_MIN=(1900,1)
+const YM_MAX=(2100,1)
 # Month status vocabulary. A month is `valid` only when the chain has an edge into it (or it is the root).
-# `unavailable_*` claims a certificate and needs confirmed=both (Julia and Flix); everything else is `unknown`.
-const STATUSES=("valid","unavailable_nomatch","unavailable_unsat","unknown")
+# `unavailable_*` and `best_effort` claim a certificate and need confirmed=both (Julia and Flix); everything else is `unknown`.
+# `best_effort` is a chain member whose edge has wrong cells with Hall witnesses (chain.v2); this producer writes chain.v1 only
+# and never produces one, so it appears only through a claims file.
+const STATUSES=("valid","best_effort","unavailable_nomatch","unavailable_unsat","unknown")
 const EDGES_HEADER="id\tyear\tmonth\tmethod\thtm\tqtm\tseconds\tsource_sha256\tend_sha256"
 const MONTHS_HEADER="month\tstatus\treason\tedge\tmethod\tevidence"
+const SEGMENTS_HEADER="run_id\tresearch_ref\tlibrary\twidth\tlambda\tprint_sha256\tmonths_sha256\troot_month\tedges_from\tedges_to"
+# A segment is about one hour: no new edge after 3000 s of the edge loop; the workflow job limit (about 70 min) covers setup and slack.
+const DEFAULT_DEADLINE_S=3000.0
 
 function parse_ym(s)
     m=match(r"^(\d{4})-(0[1-9]|1[0-2])\z",s);m===nothing && error("month must be YYYY-MM: $s")
-    (parse(Int,m.captures[1]),parse(Int,m.captures[2]))
+    ym=(parse(Int,m.captures[1]),parse(Int,m.captures[2]))
+    YM_MIN<=ym<=YM_MAX || error("month $s is outside 1900-01 .. 2100-01")
+    ym
 end
 ym_str(ym)=string(lpad(ym[1],4,'0'),"-",lpad(ym[2],2,'0'))
 ym_index(ym)=ym[1]*12+ym[2]-1
 index_ym(i)=(div(i,12),mod(i,12)+1)
 month_range(a,b)=[index_ym(i) for i in ym_index(a):ym_index(b)]
 
-"Months the chain can contain: from ROOT to min(range end, print window end). Empty when the range ends before ROOT."
-function chain_months(start,fin,window_end)
-    ym_index(start)<=ym_index(ROOT) || error("chain root is $(ym_str(ROOT)); start $(ym_str(start)) lies after it")
-    last=ym_index(fin)<ym_index(window_end) ? fin : window_end
-    ym_index(last)<ym_index(ROOT) ? typeof(ROOT)[] : month_range(ROOT,last)
+"Month list S as the checkers read it: SHA-256 pin, UTF-8, LF, one YYYY-MM per row, 1900-01 .. 2100-01, strictly increasing."
+function read_month_list(path,pin)
+    occursin(r"^[0-9a-f]{64}\z",pin) || error("month list pin must be 64 lowercase hex digits")
+    bytes=read(path);bytes2hex(sha256(bytes))==pin || error("month list pin does not match $path")
+    raw=String(copy(bytes));isvalid(raw) && endswith(raw,"\n") && !occursin('\r',raw) && sizeof(raw)<=100000 || error("month list must be canonical UTF-8 with LF line ends and a final LF")
+    isempty(chomp(raw)) && error("month list is empty")
+    ms=Tuple{Int,Int}[]
+    for t in split(chop(raw),'\n')
+        ym=parse_ym(String(t));isempty(ms) || ms[end]<ym || error("month list must be strictly increasing at $t");push!(ms,ym)
+    end
+    ms
+end
+
+"Root month (CAL7_ROOT_MONTH): the month whose board the identity pose of the print shows; default the first member of S."
+root_month(text,members)=isempty(text) ? members[1] : parse_ym(text)
+
+"Chain months: the root month first; when it is not the first member of S an extra root edge leads from the identity pose to S[1]."
+chain_plan(members,root)=root==members[1] ? collect(members) : vcat([root],members)
+
+"Edge flags as the checkers print them: ROOTEDGE (first edge of a rooted chain), BRIDGE (edge across skipped calendar months)."
+function chain_flags(members,root)
+    plan=chain_plan(members,root);rooted=root!=members[1]
+    [(i==1 && rooted) ? "ROOTEDGE" : (ym_index(b)-ym_index(a)>1 ? "BRIDGE" : "") for (i,(a,b)) in enumerate(zip(plan[1:end-1],plan[2:end]))]
 end
 
 "Claims: month => (status,reason,evidence,confirmed). Rows: month, status, reason, evidence, confirmed (both|julia_only|none)."
@@ -43,30 +72,51 @@ function read_claims(path)
     d
 end
 
+"Declared best-effort months (file of the coverage tools): month => (status,wrong cells,evidence)."
+function read_best_effort(path)
+    d=Dict{Tuple{Int,Int},NTuple{3,String}}()
+    for (n,l) in enumerate(split(chomp(read(path,String)),'\n'))
+        n==1 && (l=="month\tstatus\twrong_cells\tevidence" || error("best-effort header"));n==1 && continue
+        f=String.(split(l,'\t'));length(f)==4 || error("best-effort row $n has $(length(f)) fields")
+        f[2] in ("best_effort","best_effort_unverified") || error("best-effort status $(f[2]) in row $n")
+        ym=parse_ym(f[1]);haskey(d,ym) && error("best-effort row $n: duplicate month $(f[1])")
+        d[ym]=(f[2],f[3],f[4])
+    end
+    d
+end
+"The next chain month to produce (plan[produced+1]) when it is a declared best-effort month, else nothing."
+function next_best_effort(plan,produced,best)
+    produced<length(plan) && haskey(best,plan[produced+1]) ? plan[produced+1] : nothing
+end
+
 """
-Status record of every month of start..fin. `produced` months (in chain order from ROOT) are valid; the first
-`stop` (nothing when the chain is complete) names why the rest of the chain months have no edge. A month
-outside the chain is `unknown` unless a claim says more; an `unavailable_*` claim without confirmed=both is
-downgraded to `unknown` (AGENTS.md: UNSAT needs both checkers).
+Status record of every month of start..fin. `produced` months (in chain order) are valid; the first `stop` (nothing when the
+chain is complete) names why the rest of the chain months have no edge. A month outside the chain is `unknown` unless a claim
+says more (before_chain_root, skipped_gap between chain months, after_month_list); an `unavailable_*` or `best_effort` claim
+without confirmed=both is downgraded to `unknown` (AGENTS.md: UNSAT needs both checkers). A claim on a chain month is an error. `rooted` says that the first edge is the root edge.
+Declared best-effort months that were not produced say `best_effort_month` with their evidence.
 """
-function month_records(start,fin,window_end,produced,stop;methods,claims=Dict{Tuple{Int,Int},NTuple{4,String}}())
-    chain=chain_months(start,fin,window_end);np=length(produced)
-    np<=length(chain) && all(produced[i]==chain[i] for i in 1:np) || error("produced months are not the chain prefix")
+function month_records(start,fin,plan,produced,stop;methods,rooted=false,claims=Dict{Tuple{Int,Int},NTuple{4,String}}(),best=Dict{Tuple{Int,Int},NTuple{3,String}}())
+    np=length(produced)
+    np<=length(plan) && all(produced[i]==plan[i] for i in 1:np) || error("produced months are not the chain prefix")
     length(methods)==max(np-1,0) || error("one solver method per edge is required")
-    np<length(chain) && stop===nothing && error("an incomplete chain needs a stop reason")
+    np<length(plan) && stop===nothing && error("an incomplete chain needs a stop reason")
+    for k in keys(best);k in plan || error("best-effort month $(ym_str(k)) is not a chain month");end
+    for k in keys(claims);k in plan && error("claim for chain month $(ym_str(k)): the chain decides it");end
     rows=NTuple{6,String}[]
     for ym in month_range(start,fin)
-        i=findfirst(==(ym),chain)
+        i=findfirst(==(ym),plan)
         if i!==nothing && i<=np
-            push!(rows,(ym_str(ym),"valid",i==1 ? "root" : "chain_edge",i==1 ? "0" : string(i-1),i==1 ? "-" : methods[i-1],"-"))
+            reason=i==1 ? "root" : (i==2 && rooted ? "root_edge" : (ym_index(ym)-ym_index(plan[i-1])>1 ? "bridge_edge" : "chain_edge"))
+            push!(rows,(ym_str(ym),"valid",reason,i==1 ? "0" : string(i-1),i==1 ? "-" : methods[i-1],"-"))
         elseif i!==nothing
-            push!(rows,(ym_str(ym),"unknown",stop,"-","-","-"))
+            haskey(best,ym) ? push!(rows,(ym_str(ym),"unknown","best_effort_month","-","-",best[ym][3])) : push!(rows,(ym_str(ym),"unknown",stop,"-","-","-"))
         else
-            default=ym_index(ym)<ym_index(ROOT) ? "before_chain_root" : "after_print_window"
+            default=ym_index(ym)<ym_index(plan[1]) ? "before_chain_root" : ym_index(ym)>ym_index(plan[end]) ? "after_month_list" : "skipped_gap"
             c=get(claims,ym,nothing)
             if c===nothing
                 push!(rows,(ym_str(ym),"unknown",default,"-","-","-"))
-            elseif startswith(c[1],"unavailable") && c[4]!="both"
+            elseif (startswith(c[1],"unavailable") || c[1]=="best_effort") && c[4]!="both"
                 push!(rows,(ym_str(ym),"unknown","claimed_"*c[1]*"_"*c[4],"-","-",c[3]))
             else
                 push!(rows,(ym_str(ym),c[1],c[2],"-","-",c[3]))
@@ -80,28 +130,26 @@ function write_months(path,rows)
     write(tmp,join(vcat([MONTHS_HEADER],[join(r,'\t') for r in rows]),'\n')*"\n");mv(tmp,path;force=true)
 end
 
-"Edge months of a chain file (lines), checked to be consecutive from the month after ROOT: (months, count)."
-function chain_progress(ls)
-    ls[1]=="cubistry.calendar7.chain.v1" && ls[end]=="finish" || error("chain header or finish row")
-    src=split(ls[2],'\t');(src[1]=="source" && (parse(Int,src[3]),parse(Int,src[4]))==ROOT) || error("chain source is not $(ym_str(ROOT))")
+"""
+Edge months of a chain file (lines) checked against the plan: header chain.v1, the source record names the root month (the month
+field twice and the year), the edges are the plan months after the root, in order. (months, edge count).
+"""
+function chain_progress(ls,plan)
+    ls[1]=="cubistry.calendar7.chain.v1" && ls[end]=="finish" || error("chain header (chain.v1 only) or finish row")
+    src=split(ls[2],'\t');root=plan[1]
+    (src[1]=="source" && length(src)==5 && (parse(Int,src[2]),parse(Int,src[3]),parse(Int,src[4]))==(root[2],root[1],root[2])) || error("chain source is not the root month $(ym_str(root))")
     months=[(parse(Int,f[2]),parse(Int,f[3])) for f in (split(l,'\t') for l in ls if startswith(l,"edge\t"))]
-    prev=ROOT
-    for ym in months;ym_index(ym)==ym_index(prev)+1 || error("edge $(ym_str(ym)) does not follow $(ym_str(prev)): a gap inside the chain is not allowed");prev=ym;end
-    ([ROOT;months],length(months))
+    length(months)<=length(plan)-1 || error("chain has more edges ($(length(months))) than the plan ($(length(plan)-1))")
+    for (i,ym) in enumerate(months);ym==plan[i+1] || error("edge $(ym_str(ym)) does not follow the plan: expected $(ym_str(plan[i+1]))");end
+    (plan[1:length(months)+1],length(months))
 end
 
 "Start another edge only when the slowest edge so far still fits before the deadline (seconds)."
 may_start_edge(elapsed,slowest,deadline)=elapsed+1.25*slowest<=deadline
-"""
-A chain that ends exactly at 2028-01 is never checkable with a new print: both chain checkers pin the stored 2028-01 print and
-reject any other (a new window end needs a new immutable print pin). A stop there is therefore never clean; the producer takes one
-more edge instead (when the plan has one) and the workflow rejects 2028-01 as end or window end.
-"""
-unsafe_stop(last_ym)=last_ym==(2028,1)
 
-"Why no new edge starts, or nothing: max_edges and the deadline rule, both overridden by unsafe_stop at the current chain end."
-function stop_reason(done,max_edges,elapsed,slowest,deadline,cur)
-    unsafe_stop(cur) && return nothing
+"Why no new edge starts, or nothing: a declared best-effort month as next target (the producer cannot write its edge), max_edges, the deadline rule."
+function stop_reason(done,max_edges,elapsed,slowest,deadline,next;next_best=nothing)
+    next_best===nothing || return "best_effort_month"
     done>=max_edges && return "max_edges"
     may_start_edge(elapsed,slowest,deadline) || return "deadline"
     nothing
@@ -121,4 +169,11 @@ function read_edges(path,k)
     methods
 end
 greedy_count(methods)=count(==("greedy"),methods)
+
+"One row of segments.tsv: the inputs of one run, so a continued chain shows which research commit, library and beam parameters made each segment."
+function segment_row(;run_id,research_ref,library,width,lambda,print_sha,months_sha,root,edges_from,edges_to)
+    f=string.((run_id,research_ref,library,width,lambda,print_sha,months_sha,root,edges_from,edges_to))
+    any(x->occursin(r"[\t\n\r]",x),f) && error("segment field contains a tab or line break")
+    join(f,'\t')
+end
 end
