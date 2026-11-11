@@ -198,6 +198,31 @@ interface Matching {
   readonly unmatched: [number, number][];
 }
 /**
+ * Maximum bipartite matching by augmenting paths: `options[k]` lists the pieces cell `k` accepts; the result is the index
+ * into `options[k]` chosen for each cell, or -1 when the cell stays unmatched. A later cell can move an earlier one to another piece.
+ */
+export function assignPieces(options: readonly { piece: number }[][]): number[] {
+  const owner = new Map<number, number>();
+  const choice: number[] = new Array(options.length).fill(-1);
+  const augment = (k: number, seen: Set<number>): boolean => {
+    for (let n = 0; n < options[k].length; n++) {
+      const piece = options[k][n].piece;
+      if (seen.has(piece)) continue;
+      seen.add(piece);
+      const other = owner.get(piece);
+      if (other === undefined || augment(other, seen)) {
+        owner.set(piece, k);
+        choice[k] = n;
+        return true;
+      }
+    }
+    return false;
+  };
+  for (let k = 0; k < options.length; k++) augment(k, new Set());
+  return choice;
+}
+
+/**
  * Maximum front matching of a display with the fixed print: one distinct body and rotation per front cell such that the
  * sticker on the front shows the cell (`cellFailure`, the rule of `frontFailure`). Bipartite matching by augmenting paths,
  * cells and bodies in index order (deterministic); a cell that cannot be matched stays `null` and the others keep a maximum matching.
@@ -228,24 +253,9 @@ function maximumMatching(printing: Printing, root: Pose, cells: readonly Cell[])
     }
     options.push(list);
   }
-  const owner = new Map<number, number>();
-  const choice: number[] = new Array(49).fill(-1);
-  const augment = (k: number, seen: Set<number>): boolean => {
-    for (let n = 0; n < options[k].length; n++) {
-      const piece = options[k][n].piece;
-      if (seen.has(piece)) continue;
-      seen.add(piece);
-      const other = owner.get(piece);
-      if (other === undefined || augment(other, seen)) {
-        owner.set(piece, k);
-        choice[k] = n;
-        return true;
-      }
-    }
-    return false;
-  };
+  const choice = assignPieces(options);
   const unmatched: [number, number][] = [];
-  for (let k = 0; k < 49; k++) if (!augment(k, new Set())) unmatched.push([Math.floor(k / 7) + 1, (k % 7) + 1]);
+  for (let k = 0; k < 49; k++) if (choice[k] < 0) unmatched.push([Math.floor(k / 7) + 1, (k % 7) + 1]);
   // A later augmentation can move an earlier cell to another body: the body of a cell is the one its last choice names.
   const front = choice.map((n, k) => (n < 0 ? null : options[k][n]));
   return { front, unmatched };
