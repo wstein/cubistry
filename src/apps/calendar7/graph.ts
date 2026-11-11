@@ -154,7 +154,7 @@ export function parseState(json: unknown): Start {
   const node: Node = {
     hash: hash(r.hash, "root hash"),
     display: int(r.display, "root display", 1, 91),
-    year: int(r.year, "root year", 2026, 2099),
+    year: int(r.year, "root year", 1, 9999),
     month: int(r.month, "root month", 1, 12),
   };
   const surface = j.surface === undefined ? "sticker" : j.surface;

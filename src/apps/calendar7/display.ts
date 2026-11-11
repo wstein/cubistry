@@ -224,6 +224,16 @@ export function frontFailure(
   cells: readonly Cell[],
   profile: RuleProfile = DEFAULT_RULE_PROFILE,
 ): FrontFailure | null {
+  return frontFailures(printing, state, cells, profile)[0] ?? null;
+}
+
+/** Every cell (row-major) whose front sticker does not show the display; empty when the front shows it. */
+export function frontFailures(
+  printing: Printing,
+  state: Pose,
+  cells: readonly Cell[],
+  profile: RuleProfile = DEFAULT_RULE_PROFILE,
+): FrontFailure[] {
   if (cells.length !== 49) throw new Error("a display has 49 cells");
   // Index the 49 front stickers by cell.
   const front: number[] = new Array(49).fill(-1);
@@ -242,6 +252,7 @@ export function frontFailure(
       throw new Error(`front sticker ${i + 1} outside the 7x7 front`);
     front[(row - 1) * 7 + column - 1] = i;
   }
+  const failures: FrontFailure[] = [];
   for (let k = 0; k < 49; k++) {
     const row = Math.floor(k / 7) + 1;
     const column = (k % 7) + 1;
@@ -253,7 +264,7 @@ export function frontFailure(
     );
     if (angle < 0) throw new Error(`front sticker ${i + 1} has no image orientation`);
     const why = cellFailure(printing.text[i], printing.ink[i], angle, cells[k], profile);
-    if (why) return { row, column, sticker: i + 1, angle, why };
+    if (why) failures.push({ row, column, sticker: i + 1, angle, why });
   }
-  return null;
+  return failures;
 }

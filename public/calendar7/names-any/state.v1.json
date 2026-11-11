@@ -2,7 +2,7 @@
 "schema":"cubistry.calendar7.state",
 "version":1,
 "status":"research candidate, not certified, print B not frozen",
-"print":"print B (printing-S2), names layout, ink classes band and blank, English only; the pose is the identity pose (May 2026)",
+"print":"printing-S2.tsv, names layout, ink classes band and blank, English only; the pose is the identity pose (2026-05)",
 "surface":"face",
 "license":"Created by Werner Stein with AI assistance (Codex and Claude, OpenAI and Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.",
 "spdx":"CC-BY-SA-4.0",
