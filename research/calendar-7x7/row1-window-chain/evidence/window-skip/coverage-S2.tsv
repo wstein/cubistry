@@ -1,0 +1,11 @@
+gapless: 2026-03 .. 2037-01 (131 months)
+valid	286	gaps	3	runs	4
+kind	from	to	count	status	evidence
+run	2026-01	2026-01	1		
+run	2026-03	2037-01	131		
+run	2037-03	2043-01	71		
+run	2043-03	2050-01	83		
+gap	2026-02	2026-02	1	unknown	corner lemma UNSAT on base+2026-02 (130 targets), Julia only, Flix not run: corner-2026-02-julia.tsv
+gap	2037-02	2037-02	1	unavailable_unsat	corner lemma UNSAT on base+2037-02 (130 targets), Julia and Flix: ../window-2037-01/corner-2037-02-julia.tsv, corner-2037-02-flix.tsv
+gap	2043-02	2043-02	1	unknown	corner lemma UNSAT on base+2043-02 (130 targets), Julia only, Flix not run: corner-2043-02-julia.tsv
+valid_per_year	2026=11 2027=12 2028=12 2029=12 2030=12 2031=12 2032=12 2033=12 2034=12 2035=12 2036=12 2037=11 2038=12 2039=12 2040=12 2041=12 2042=12 2043=11 2044=12 2045=12 2046=12 2047=12 2048=12 2049=12 2050=1

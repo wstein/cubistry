@@ -1,0 +1,8 @@
+month	status	evidence
+2026-02	unknown	corner lemma UNSAT on base+2026-02 (130 targets), Julia only, Flix not run: corner-2026-02-julia.tsv
+2026-04	unavailable_nomatch	no rigid front matching on the 2037-01 print (scan-fixed-P1.tsv); fits printing-S2.tsv; not a proof for other prints
+2037-02	unavailable_unsat	corner lemma UNSAT on base+2037-02 (130 targets), Julia and Flix: ../window-2037-01/corner-2037-02-julia.tsv, corner-2037-02-flix.tsv
+2037-04	unavailable_nomatch	no rigid front matching on the 2037-01 print (scan-fixed-P1.tsv); fits printing-S2.tsv; not a proof for other prints
+2043-02	unknown	corner lemma UNSAT on base+2043-02 (130 targets), Julia only, Flix not run: corner-2043-02-julia.tsv
+2043-04	unavailable_nomatch	no rigid front matching on the 2037-01 print (scan-fixed-P1.tsv); fits printing-S2.tsv; not a proof for other prints
+2048-04	unavailable_nomatch	no rigid front matching on the 2037-01 print (scan-fixed-P1.tsv); fits printing-S2.tsv; not a proof for other prints

@@ -1,0 +1,7 @@
+S_valid	282	demand_lemma	(23, false)
+gap	(2026, 2)	S+gap	(24, true)
+gap	(2026, 2)	single_drops_with_demand<=23	0	
+gap	(2037, 2)	S+gap	(24, true)
+gap	(2037, 2)	single_drops_with_demand<=23	0	
+gap	(2043, 2)	S+gap	(24, true)
+gap	(2043, 2)	single_drops_with_demand<=23	0	

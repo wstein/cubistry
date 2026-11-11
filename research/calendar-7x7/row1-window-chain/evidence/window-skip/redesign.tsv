@@ -1,0 +1,50 @@
+run	result	wall_s	changed_surfaces	changed_visible_in_old_matches	old_months_broken_of_129	parameters
+A-2026-04	UNSAT_under_freeze_untrusted	9				targets=S1+2026-04; freeze=all 270 surfaces visible in the 129 old matches
+A-2037-04	UNSAT_under_freeze_untrusted	9				targets=S1+2037-04; freeze=all 270 surfaces visible in the 129 old matches
+A-2043-04	UNSAT_under_freeze_untrusted	9				targets=S1+2043-04; freeze=all 270 surfaces visible in the 129 old matches
+A-2048-04	UNSAT_under_freeze_untrusted	9				targets=S1+2048-04; freeze=all 270 surfaces visible in the 129 old matches
+B0	SAT	6				targets=S1; freeze=all visible (sanity: reproduces the 2037-01 print)
+F-2026-04-0.4-0	SAT	204				targets=S1+2026; hash freeze frac=0.4 salt=0
+F-2026-04-0.6-0	UNSAT_under_freeze_untrusted	57				targets=S1+2026; hash freeze frac=0.6 salt=0
+F-2026-04-0.8-0	UNSAT_under_freeze_untrusted	20				targets=S1+2026; hash freeze frac=0.8 salt=0
+F-2026-04-0.9-0	UNSAT_under_freeze_untrusted	19				targets=S1+2026; hash freeze frac=0.9 salt=0
+F-2037-04-0.4-0	SAT	202				targets=S1+2037; hash freeze frac=0.4 salt=0
+F-2037-04-0.6-0	UNSAT_under_freeze_untrusted	53				targets=S1+2037; hash freeze frac=0.6 salt=0
+F-2037-04-0.8-0	UNSAT_under_freeze_untrusted	19				targets=S1+2037; hash freeze frac=0.8 salt=0
+F-2037-04-0.9-0	UNSAT_under_freeze_untrusted	20				targets=S1+2037; hash freeze frac=0.9 salt=0
+F-2043-04-0.4-0	SAT	188				targets=S1+2043; hash freeze frac=0.4 salt=0
+F-2043-04-0.6-0	UNSAT_under_freeze_untrusted	47				targets=S1+2043; hash freeze frac=0.6 salt=0
+F-2043-04-0.8-0	UNSAT_under_freeze_untrusted	15				targets=S1+2043; hash freeze frac=0.8 salt=0
+F-2043-04-0.9-0	UNSAT_under_freeze_untrusted	18				targets=S1+2043; hash freeze frac=0.9 salt=0
+F-2048-04-0.4-0	SAT	208				targets=S1+2048; hash freeze frac=0.4 salt=0
+F-2048-04-0.6-0	UNSAT_under_freeze_untrusted	43				targets=S1+2048; hash freeze frac=0.6 salt=0
+F-2048-04-0.8-0	UNSAT_under_freeze_untrusted	19				targets=S1+2048; hash freeze frac=0.8 salt=0
+F-2048-04-0.9-0	UNSAT_under_freeze_untrusted	13				targets=S1+2048; hash freeze frac=0.9 salt=0
+G-0.4-0	SAT	214	62	57	128	targets=S1+4 Aprils; hash freeze frac=0.4 salt=0
+G-0.4-1	SAT	251	76	75	128	targets=S1+4 Aprils; hash freeze frac=0.4 salt=1
+G-0.4-2	SAT	65	80	77	128	targets=S1+4 Aprils; hash freeze frac=0.4 salt=2
+G-0.5-0	SAT	127	66	61	128	targets=S1+4 Aprils; hash freeze frac=0.5 salt=0
+G-0.5-1	SAT	122	52	51	128	targets=S1+4 Aprils; hash freeze frac=0.5 salt=1
+G-0.5-2	SAT	231	60	59	128	targets=S1+4 Aprils; hash freeze frac=0.5 salt=2
+G-0.55-0	SAT	126	58	53	128	targets=S1+4 Aprils; hash freeze frac=0.55 salt=0
+G-0.55-1	SAT	149	50	50	128	targets=S1+4 Aprils; hash freeze frac=0.55 salt=1
+G-0.55-2	SAT	83	55	54	128	targets=S1+4 Aprils; hash freeze frac=0.55 salt=2
+H-four-0.0-0	UNKNOWN_timeout	296				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.0 salt=0
+H-four-0.0-1	UNKNOWN_timeout	299				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.0 salt=1
+H-four-0.3-0	UNKNOWN_timeout	300				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.3 salt=0
+H-four-0.3-1	UNKNOWN_timeout	298				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.3 salt=1
+H-four-0.5-0	SAT	147	19	18	128	targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.5 salt=0
+H-four-0.5-1	SAT	140	23	22	128	targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.5 salt=1
+H-four-0.6-0	UNSAT_under_freeze_untrusted	128				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.6 salt=0
+H-four-0.6-1	UNKNOWN_timeout	322				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.6 salt=1
+H-four-0.6-2	SAT	151	16	15	123	targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.6 salt=2
+H-four-0.6-3	UNSAT_under_freeze_untrusted	69				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.6 salt=3
+H-four-0.7-0	UNSAT_under_freeze_untrusted	91				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.7 salt=0
+H-four-0.7-1	UNSAT_under_freeze_untrusted	78				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.7 salt=1
+H-four-0.7-2	UNSAT_under_freeze_untrusted	85				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.7 salt=2
+H-four-0.7-3	UNSAT_under_freeze_untrusted	36				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.7 salt=3
+H-four-0.8-0	UNSAT_under_freeze_untrusted	33				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.8 salt=0
+H-four-0.8-1	UNSAT_under_freeze_untrusted	34				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.8 salt=1
+H-four-0.8-2	UNSAT_under_freeze_untrusted	34				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.8 salt=2
+H-four-0.8-3	UNSAT_under_freeze_untrusted	28				targets=S1+4 Aprils; freeze all bodies except class -3,-3,-2; inside it frozen frac=0.8 salt=3
+t129	SAT	7				targets=129 base; freeze=all (sanity)
