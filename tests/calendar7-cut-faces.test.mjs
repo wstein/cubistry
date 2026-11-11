@@ -42,12 +42,12 @@ const upOf = (n) => (n[1] === 0 ? [0, 1, 0] : [0, 0, 1]);
 const FACE_INDEX = { "+x": 0, "-x": 1, "+y": 2, "-y": 3, "+z": 4, "-z": 5 };
 
 /** One cubie (id 1) with the given exterior faces [[name, color]] in this id order; returns the shell and its cut materials. */
-function build(faces) {
+function build(faces, faceEdgeColors) {
   const frames = faces.map(([name], k) => ({ id: k + 1, cubie: 1, p: [0, 0, 0], n: NORMALS[name], up: upOf(NORMALS[name]) }));
   const mats = new Map(frames.map((f) => [f.id, new THREE.MeshStandardMaterial({ color: "#ffffff" })]));
   const colors = new Map(faces.map(([, color], k) => [k + 1, color]));
   const root = new THREE.Group();
-  const scene = new PhysicalCubeScene(root, frames, mats, createPlasticMaterial("#23272e", 0.55), 1, geometry(), colors, { bodyColor: BODY, coreColor: BODY, miterCutFaces: true });
+  const scene = new PhysicalCubeScene(root, frames, mats, createPlasticMaterial("#23272e", 0.55), 1, geometry(), colors, { bodyColor: BODY, coreColor: BODY, miterCutFaces: true, faceEdgeColors });
   scene.setConstruction("stickerless");
   const shell = root.children.find((c) => c.children[0]?.isMesh && Array.isArray(c.children[0].material)).children[0];
   return { scene, shell, colors };
@@ -158,4 +158,46 @@ test("cutFaceEdges and faceUvAxes: the uv axes are measured from the real geomet
   assert.equal(edges.length, 1);
   assert.equal(edges[0].color, RED);
   assert.deepEqual(cutFaceEdges(5, ext, axes), [], "the face opposite touches nothing");
+});
+
+// ---- edge colors: a white strip along one edge of a red face (the month banner of the unit grid) ----
+test("scene: faceEdgeColors: a cut face takes the color of the edge it borders, not of the whole face (red banner with a white strip at its top and bottom edge)", () => {
+  const edges = new Map([[1, { top: WHITE, bottom: WHITE }]]);
+  const { shell } = build([["+z", RED]], edges);
+  // the +z face has up +y, right +x: its bottom edge borders -y, its top edge +y, its side edges +x and -x
+  assert.equal(colorNextTo(shell, "-y", "+z"), WHITE, "below the banner: the white strip");
+  assert.equal(colorNextTo(shell, "+y", "+z"), WHITE, "above the banner: the white strip");
+  assert.equal(colorNextTo(shell, "+x", "+z"), RED, "beside the banner: red");
+  assert.equal(colorNextTo(shell, "-x", "+z"), RED);
+  // without edge colors the whole face color applies (the previous model)
+  assert.equal(colorNextTo(build([["+z", RED]]).shell, "-y", "+z"), RED);
+});
+test("scene: faceEdgeColors with an edge cubie: the miter uses the edge colors of the face (white bottom strip, red sides) next to a second face", () => {
+  const edges = new Map([[1, { bottom: WHITE }]]);
+  const { shell } = build([["+z", RED], ["+x", BLUE]], edges); // red front with a white bottom edge, blue right face
+  assert.equal(colorNextTo(shell, "-y", "+z"), WHITE, "the cut face below borders the white bottom strip of the front");
+  assert.equal(colorNextTo(shell, "-y", "+x"), BLUE, "and the blue right face (miter)");
+  assert.equal(colorNextTo(shell, "+y", "+z"), RED, "the top edge has no strip");
+});
+test("scene: setFaceColors with edge colors follows them in place (a replaced map clears the old edges, no map keeps them)", () => {
+  const { scene, shell } = build([["+z", RED]], new Map([[1, { bottom: WHITE }]]));
+  assert.equal(colorNextTo(shell, "-y", "+z"), WHITE);
+  scene.setFaceColors(new Map([[1, BLUE]]));
+  assert.equal(colorNextTo(shell, "-y", "+z"), WHITE, "edge colors stay when no map is given");
+  assert.equal(colorNextTo(shell, "+y", "+z"), BLUE);
+  scene.setFaceColors(new Map([[1, BLUE]]), new Map([[1, { top: RED }]]));
+  assert.equal(colorNextTo(shell, "-y", "+z"), BLUE, "a new map replaces the old edges");
+  assert.equal(colorNextTo(shell, "+y", "+z"), RED);
+  assert.throws(() => scene.setFaceColors(new Map([[1, BLUE]]), new Map([[1, { top: "red" }]])), /Invalid face edge color/);
+});
+test("scene: the edge follows the sticker's up and right, also on a face with another orientation (+x face with up +z: its bottom edge borders -z)", () => {
+  const frames = [{ id: 1, cubie: 1, p: [0, 0, 0], n: [1, 0, 0], up: [0, 0, 1] }];
+  const root = new THREE.Group();
+  const scene = new PhysicalCubeScene(root, frames, new Map([[1, new THREE.MeshStandardMaterial({ color: "#ffffff" })]]), createPlasticMaterial("#23272e", 0.55), 1, geometry(), new Map([[1, RED]]), { bodyColor: BODY, coreColor: BODY, miterCutFaces: true, faceEdgeColors: new Map([[1, { bottom: WHITE }]]) });
+  scene.setConstruction("stickerless");
+  const shell = root.children.find((c) => c.children[0]?.isMesh && Array.isArray(c.children[0].material)).children[0];
+  assert.equal(colorNextTo(shell, "-z", "+x"), WHITE, "bottom edge (up = +z) borders -z");
+  assert.equal(colorNextTo(shell, "+z", "+x"), RED);
+  assert.equal(colorNextTo(shell, "+y", "+x"), RED, "right = up x n = (0,1,0)... a side edge");
+  assert.equal(colorNextTo(shell, "-y", "+x"), RED);
 });
