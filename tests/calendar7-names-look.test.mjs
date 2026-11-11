@@ -255,6 +255,9 @@ test("plasticity: 0 is the flat look, the parts grow with it, the default is in 
   assert.equal(DEFAULT_PLASTICITY, 0.6); // owner decision 2026-11-11
   assert.equal(clampPlasticity(-3), 0); assert.equal(clampPlasticity(7), 1); assert.equal(clampPlasticity(Number.NaN), DEFAULT_PLASTICITY);
   assert.equal(parsePlasticity(null), DEFAULT_PLASTICITY); assert.equal(parsePlasticity(""), DEFAULT_PLASTICITY); assert.equal(parsePlasticity("0.6"), 0.6); assert.equal(parsePlasticity("x"), DEFAULT_PLASTICITY);
+  // Out of range clamps, whether finite or not; only NaN (garbage) gives the default.
+  for (const [text, want] of [["7", 1], ["1e9", 1], ["Infinity", 1], ["-Infinity", 0], ["-1", 0], ["NaN", DEFAULT_PLASTICITY]]) assert.equal(parsePlasticity(text), want, text);
+  assert.equal(clampPlasticity(Infinity), 1); assert.equal(clampPlasticity(-Infinity), 0);
   assert.equal(floorOpacityFactor(MIN_SHADOW_STRENGTH) * 0.3, 1); // the floor shadow material reaches opacity 1 at the minimum strength: its darkness is kept
 });
 test("plasticity: the exposure gain gives back what shadows, specular and clearcoat take; without a shadow map only the specular part", () => {
