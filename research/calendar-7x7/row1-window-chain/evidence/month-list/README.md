@@ -25,39 +25,80 @@ A month list is a file `months-*.tsv`: one `YYYY-MM` per row, strictly increasin
 - Layout override is a parameter: `CAL7_WINDOW_LAYOUT_SHA256` (Julia) and the optional last Flix chain argument pin a
   window-local `layout.tsv`; the layout path is already an argument. The layout parser still requires the twelve full
   English month names, so the April label `AP|RIL` needs a parser change later; it is not done here.
-- Chain format `cubistry.calendar7.chain.v1` is unchanged. The `edge year month` of edge i must equal member i+1 of S.
+- Chain format `cubistry.calendar7.chain.v1` is unchanged (v2 and v3 below). The `edge year month` of edge i must equal member i+1 of S.
   An edge whose month is more than one calendar month after the previous member is a bridge edge (state edge across a
   gap); Julia, Flix and the independent verifier mark it with a trailing `BRIDGE` field on the edge line, and the `months`
   line of a list-mode receipt gives the number of bridge edges. WINDOW_END receipts have no new field and no `months` line.
 - Receipts of print, corner and chain checkers in list mode have one added line, `months<TAB>sha<TAB>count<TAB>first<TAB>last<TAB>bridges`.
 
-## Start month (chain root)
+## Root month, first member and free start
 
-The start of the chain is a parameter: the first month of S. The chain root is the identity pose of the print, so the
-checkers (Julia, Flix, independent) enforce two things for any start: the `source` record of the chain reads
-`<month> <year> <month>` of the first member, and the front of the identity state equals the board of that month. Nothing
-else is pinned to May 2026 any more (the self-check also finds the first of the start month on the board). A start month is
-therefore only accepted when the print shows it when solved: a start before May 2026 needs a print whose identity front is
-that month. `printing-S2.tsv`, the 2037-01 print and the stored 21-month print show only May months when solved (2026-05,
-2037-05, 2043-05, 2048-05; `identity_front.jl`, `identity-front.tsv`), so with these prints 2026-03 is rejected at
-`identity root front` (fixture `start-front-mismatch`) and 2037-05 is accepted (fixture `start-2037-05`: the stored first
-seven edges relabeled to 2037-05 .. 2037-12, same calendar as 2026; accepted by Julia, Flix and the independent verifier).
-Months before the start that front-match the print are `before_root` in the coverage (not chain members, not gaps).
-The decision that needs a new print (one whose identity front shows March 2026) is a design question, not a checker change.
+The chain root is a parameter, separate from the first member of S. `CAL7_ROOT_MONTH=YYYY-MM` (1900-01 .. 2100-01; Flix:
+the argument after the layout pin, `-` for the default) names the month whose board the identity pose of the print shows; the default is
+S[1]. The `source` record of the chain reads `<month> <year> <month>` of the root month and the identity front must equal the
+board of the root month (configuration lookup in all three checkers). If the root month is not S[1], the chain has one
+extra root edge from the identity pose to S[1]; it is counted as an edge, carries `ROOTEDGE` on the receipt line and may have zero
+moves when both boards agree. A root month other than S[1] needs a list. The solved cube shows January 1980 (Jan/Tue/31);
+no print in this repository shows it yet, so the root fixtures use 2037-05 (same calendar as 2026-05): `root-edge-2037-05`,
+`root-edge-zero-moves`, `root-equals-first-member` accepted; `root-month-1980-01` and `root-record-mismatch` rejected
+(`root_best_effort_cases.jl`). A root month the print does not show is rejected at `identity root front`.
+
+Chains are computed in stages (owner decision 2026-11-11). A chain file is always stored in time order; a stage computed backward is
+inverted by the solver, so there is no direction flag. Chain format `cubistry.calendar7.chain.v3` adds an optional block after
+the `source` line:
+
+```
+start<TAB>N              N move lines (move<TAB>generator<TAB>exponent) from the identity pose to the start state
+```
+
+Without the block the start state is the identity pose (root stage). With it the start state is any legal state reached from the identity
+pose by the listed moves (legal by construction, no group-membership test needed); its front must equal the board of the first member
+(`free start front is the first member`), its digest is the `source` digest and is printed as `start<TAB>free<TAB>N<TAB>digest`.
+A free start and a root edge exclude each other. The start moves are not edges: they are not in the metrics and not in the move count of the summary.
+Header v1 and v2 stay valid; a `start` block in them is rejected.
+
+Junctions: `CAL7_JOIN_START` and `CAL7_JOIN_END` (Julia and independent verifier; Flix: the two arguments after the root month, `-`
+for none) hold 64 hex or `identity`, the digest the start (end) state must have. `identity` is the digest of the identity pose of the print. A
+checker that was given a digest prints `join<TAB>start|end<TAB>digest` (independent: `independent-join`) only after the comparison succeeded; a
+mismatch is `start junction digest` / `end junction digest`. A stage that ends at the root passes `identity` as the end digest; the stage that
+follows passes the digest the previous stage ended with as start digest.
+
+`stage_coverage.jl` composes stages from their Julia and Flix receipts (byte-identical): adjacent stages are `joined` when the first ends in the
+month the second starts in, the digests are equal and both receipts carry the junction lines; otherwise `mismatch` (digests or months differ) or
+`unchecked` (no junction lines). It states `composed FIRST LAST N` for maximal runs of exact stages (verdict SAT, no bridge or root edge)
+with only joined junctions and lists every other stage separately. `verify_stage_coverage.jl` re-reads the receipts with its own code.
+Committed example: `stage-A-*` (2026-05, 2026-06) and `stage-B-*` (2026-06 .. 2028-01, free start) give `composed 2026-05 2028-01 21` (`stage-summary.tsv`).
+The stage inputs here are fixtures from the stored 21-month chain; no real stage run (2026-01 .. 2050-01 and the backward stages) exists yet.
+
+## Best-effort months
+
+`cubistry.calendar7.chain.v2` (and v3) allow per edge, between the edge line and its moves, optional lines
+`wrong<TAB>r<TAB>c` (strictly increasing, row-major) and `hall<TAB>r,c;r,c;...` (cells strictly increasing). Rule, checked by all three checkers
+with their own code: the cells whose sticker does not show the board (strict optics) must equal the listed wrong cells exactly; the
+`hall` sets are disjoint, each lies inside one body class, covers part of the wrong cells, and the number of wrong cells in a set equals the
+deficiency |X| - |N(X)| >= 1, where N(X) are the bodies of that class that can show some cell of X exactly under a rigid rotation. Every legal
+state then shows at least that many wrong cells in X, so the recorded wrong cells are a minimum (Hall violation witness, verified, not trusted). An exact
+month has no `wrong` and no `hall` lines. Receipt suffix `BEST_EFFORT<TAB>k<TAB>r,c;...`, line `status<TAB>exact<TAB>N<TAB>best_effort<TAB>K`, verdict
+`BEST_EFFORT` (independent: `ACCEPT_BEST_EFFORT_CHAIN`). The tie rule of the owner (shortest move sequence from the predecessor) is a solver
+objective and not checkable by these checkers. Fixtures: `best-effort-center` accepted; `-no-hall`, `-unlisted-wrong`, `-not-minimal`, `-hall-two-classes`,
+`-v1-header`, `-wrong-unsorted`, `exact-month-with-hall` rejected; `exact-v2` accepted.
+
+For the two Februaries (2037-02, 2043-02; Feb/Sun/28) on `printing-S2.tsv`, `february_hall.jl` finds the deficiency: X = {(7,1),(7,7)} has deficiency 1, so at least
+one wrong cell per February (`february-hall-S2.tsv`). This is verified by the Julia witness check only (`test_best_effort.jl`); no chain with these months exists, so the
+status in the coverage is `best_effort_unverified` and the minimum is UNKNOWN as a proof until Julia and Flix chain receipts exist. Print C (root Jan/Tue/31) may change the cells.
 
 ## Coverage
 
-`month_coverage.jl` (argument `START_MONTH`) generates `coverage-S2.tsv` and `coverage-S2.json` for start 2026-05 from the pinned list `months-S2.tsv` (286 months) and the
-gap statuses in `status-S2.tsv`. `verify_coverage.jl` (separate code) recomputes the headline, every run, gap, bridge and
-before_root month from the list alone, checks that runs and gaps partition May 2026 .. 2050-01, checks that the JSON agrees,
-and fails on any mismatch. A gap is `unavailable_unsat` only if it cites a Julia and a Flix corner receipt that are
-byte-identical, say UNSAT, and contain the gap month, with all other targets in S; otherwise `unknown`. The coverage
-tools are bookkeeping and Julia only; the UNSAT facts are the cited receipts.
+`month_coverage.jl` takes the root month and the start month separately (`LIST PIN STATUS LAST START ROOT BEST|-`). Months of the list before START are
+`before_start`; chain members from START to LAST are exact unless listed in the best-effort table (`best-effort-chain.tsv`: month, status, wrong cells, evidence); gaps are
+calendar months between START and LAST that are not in S (bridged, status from `status-*.tsv`). Headline `exact-gapless FIRST..LAST (N months)` is the first maximal run of exact calendar-consecutive
+members; best-effort months are chain members listed separately, not gaps. A best-effort month is `best_effort` only with Julia and Flix chain receipts that carry the
+`BEST_EFFORT` edge line with exactly those cells, otherwise `best_effort_unverified` (Julia Hall table `february-hall-S2.tsv`). `verify_coverage.jl` (separate code) recomputes everything from the
+list and checks the JSON. `coverage-S2.*` (list `months-S2.tsv`, start = root = 2026-05) and `coverage-chain-2026-03.*` (list `months-chain-2026-03.tsv`, root 1980-01, start 2026-03, both Februaries best-effort) are committed.
 
 ```
-gapless: 2026-05 .. 2037-01 (129 months)      chain members 283, runs 3, gaps 2, bridges 2, before_root 4
-gaps:    2037-02, 2043-02                       both unavailable_unsat (corner receipts Julia and Flix identical)
-before_root: 2026-01 (print member), 2026-02 (not), 2026-03, 2026-04 (print members)
+coverage-S2:            exact-gapless 2026-05 .. 2037-01 (129 months)   chain members 283, exact runs 3, best-effort 0, gaps 2, bridges 2, before_start 4
+coverage-chain-2026-03: exact-gapless 2026-03 .. 2037-01 (131 months)   chain members 287, exact runs 3, best-effort 2 (2037-02, 2043-02), gaps 0, before_start 2
 ```
 
 ## Receipts (Julia and Flix byte-identical, committed here)
@@ -89,13 +130,3 @@ S2 are not run.
 - `row1-window-chain/run_month_list_receipts.sh`: regression (committed 2028-01 chain receipts, 129-month print and corner
   receipts, 21-month print) and the S2 receipts above.
 - `row1-window-chain/run_month_list_mutants.sh`: source mutants of the list logic (Julia, Flix, coverage), each must make its test fail.
-
-## Planned: exact and best-effort months (not implemented)
-
-Owner decision 2026-11-11: a per-month status `exact | best-effort`; a best-effort month lists its wrong cells (expected for
-2037-02 and 2043-02); definition: fewest wrong cells, ties by the shortest move sequence from the predecessor; the coverage states
-"exact gapless X..Y" and lists best-effort months separately. Not built here because the checkers verify exact fronts only: it
-needs (1) a chain-format field per edge for the wrong-cell list and a checker rule (front equals board except the listed cells,
-list size equals the claimed minimum), (2) a minimality argument or proof for "fewest wrong cells" (UNKNOWN without one), (3) a
-change of the coverage `status` column and of `verify_coverage.jl`. The current `gap` rows of 2037-02 and 2043-02 would become
-best-effort months of the chain instead of bridged gaps.
