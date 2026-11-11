@@ -48,7 +48,7 @@ function main()
     expect=n0==0 ? ["headline","planned-exact-gapless","-","-","0"] : ["headline","planned-exact-gapless",txt(START),txt(hrun),string(n0)]
     @assert f(1)==expect "headline mismatch: recomputed $(join(expect[3:5]," "))"
     bridges=[(a,b) for (a,b) in zip(members[1:end-1],members[2:end]) if mdiff(b,a)>1]
-    c=f(3);@assert c==["counts","chain_members",string(length(members)),"exact_runs",string(length(runs)),"best_effort",string(length(berows)),"gaps",string(length(gaps)),"bridges",string(length(bridges)),"before_start",string(length(before))] "counts mismatch"
+    c=f(3);@assert c==["counts","chain_members",string(length(members)),"planned_exact_runs",string(length(runs)),"best_effort",string(length(berows)),"gaps",string(length(gaps)),"bridges",string(length(bridges)),"before_start",string(length(before))] "counts mismatch"
     @assert [(r[2],r[3],r[4],r[5]) for r in runrows]==[(txt(a),txt(b),string(mdiff(b,a)+1),"planned_exact") for (a,b) in runs] "runs mismatch"
     @assert [r[2] for r in gaprows]==txt.(gaps) && all(r->r[2]==r[3] && r[4]=="1",gaprows) "gaps mismatch"
     @assert [(r[2],r[3],r[4]) for r in bridgerows]==[(txt(a),txt(b),string(mdiff(b,a)-1)) for (a,b) in bridges] "bridges mismatch"
@@ -91,12 +91,12 @@ function main()
     end
     J=read(jsonpath,String)
     @assert occursin("\"headline\": {\"kind\": \"planned-exact-gapless\", \"from\": "*(n0==0 ? "null, \"to\": null, \"months\": 0}" : "\"$(txt(START))\", \"to\": \"$(txt(hrun))\", \"months\": $n0}"),J) "json headline mismatch"
-    @assert occursin("\"counts\": {\"chain_members\": $(length(members)), \"exact_runs\": $(length(runs)), \"best_effort\": $(length(berows)), \"gaps\": $(length(gaps)), \"bridges\": $(length(bridges)), \"before_start\": $(length(before))}",J) "json counts mismatch"
+    @assert occursin("\"counts\": {\"chain_members\": $(length(members)), \"planned_exact_runs\": $(length(runs)), \"best_effort\": $(length(berows)), \"gaps\": $(length(gaps)), \"bridges\": $(length(bridges)), \"before_start\": $(length(before))}",J) "json counts mismatch"
     @assert [m.captures[1] for m in eachmatch(r"\{\"gap\": \"(\d{4}-\d{2})\"",J)]==txt.(gaps) "json gaps mismatch"
     @assert [m.captures[1] for m in eachmatch(r"\{\"month\": \"(\d{4}-\d{2})\", \"status\": \"best_effort",J)]==bemonths "json best-effort mismatch"
     @assert [(m.captures[1],m.captures[2]) for m in eachmatch(r"\{\"month\": \"(\d{4}-\d{2})\", \"status\": \"(best_effort\w*)\"",J)]==[(r[2],r[5]) for r in berows] "json best-effort status mismatch"
     @assert [(m.captures[1],m.captures[2]) for m in eachmatch(r"\{\"from\": \"(\d{4}-\d{2})\", \"to\": \"(\d{4}-\d{2})\", \"count\"",J)]==[(txt(a),txt(b)) for (a,b) in runs] "json runs mismatch"
     @assert [(m.captures[1],m.captures[2]) for m in eachmatch(r"\{\"month\": \"(\d{4}-\d{2})\", \"print_member\": (true|false)\}",J)]==[(txt(m),string(inp)) for (m,inp) in before] "json before_start mismatch"
-    println("coverage verified\tplanned exact ",n0==0 ? "none" : txt(START)*" .. "*txt(hrun)*" ("*string(n0)*" months)","\texact runs ",length(runs),"\tbest-effort ",length(berows),"\tgaps ",length(gaps),"\tunsat gaps ",count(r->r[5]=="unavailable_unsat",gaprows),"\tbefore_start ",length(before))
+    println("coverage verified\tplanned exact ",n0==0 ? "none" : txt(START)*" .. "*txt(hrun)*" ("*string(n0)*" months)","\tplanned exact runs ",length(runs),"\tbest-effort ",length(berows),"\tgaps ",length(gaps),"\tunsat gaps ",count(r->r[5]=="unavailable_unsat",gaprows),"\tbefore_start ",length(before))
 end
 try main() catch e;println(stderr,"INVALID\t",sprint(showerror,e));exit(1) end
