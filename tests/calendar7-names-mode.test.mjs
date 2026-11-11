@@ -45,9 +45,9 @@ test("the name words match the row 1 of the window data and name alignment is co
   assert.equal(nameAlign("MA"), "right");
   assert.equal(nameAlign("OC"), "right");
   assert.equal(nameAlign("ER"), "left");
-  assert.equal(nameAlign("IL"), "left");
+  assert.equal(nameAlign("AP"), "right"); // April is "AP" + "RIL" (owner decision of 2026-11-11)
   assert.equal(nameAlign("Y"), "left");
-  for (const full of ["ANU", "ARY", "BRU", "RCH", "APR", "UNE", "ULY", "AUG", "UST", "SEP", "TEM", "BER", "TOB", "NOV", "EMB", "DEC"]) assert.equal(nameAlign(full), "full", full);
+  for (const full of ["ANU", "ARY", "BRU", "RCH", "RIL", "UNE", "ULY", "AUG", "UST", "SEP", "TEM", "BER", "TOB", "NOV", "EMB", "DEC"]) assert.equal(nameAlign(full), "full", full);
   assert.equal(nameAlign("QQ"), "center"); // not a name tile: unchanged centered look
   assert.equal(nameSlotStart("J"), 2);
   assert.equal(nameSlotStart("FE"), 1);
@@ -150,7 +150,7 @@ test("name tiles use one monospaced 3-slot grid (thirds of the cubie pitch): rig
   const slot = TEXT_SQUARE / NAME_SLOTS;
   const atFace = (k) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit();
   const atSheet = (k) => TEXTURE / 2 - TEXT_SQUARE / 2 + (k + 0.5) * slot; // the 2D sheet (sticker surface) keeps the 3-slot text square
-  const cases = { J: [2], FE: [1, 2], MA: [1, 2], OC: [1, 2], ANU: [0, 1, 2], ER: [0, 1], IL: [0, 1], Y: [0], BER: [0, 1, 2] };
+  const cases = { J: [2], FE: [1, 2], MA: [1, 2], OC: [1, 2], ANU: [0, 1, 2], ER: [0, 1], AP: [1, 2], RIL: [0, 1, 2], Y: [0], BER: [0, 1, 2] };
   for (const [label, slots] of Object.entries(cases)) {
     const grid = nameGrid(label);
     assert.deepEqual(grid.map((g) => g.char), label.split(""), label);
