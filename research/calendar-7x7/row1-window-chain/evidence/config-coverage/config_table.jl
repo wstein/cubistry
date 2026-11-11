@@ -43,12 +43,12 @@ function cycle_facts(labels,cs)
     miss=length(setdiff(Set((c.month,c.weekday,c.length) for c in cs),Set(ckey(y,m) for y in 2026:2099 for m in 1:12)))
     (;months,configs=length(seen),board_mismatch,shift_mismatch=shift,first_missing_2026_2099=miss)
 end
-function match_config(source,board)
+function match_config(source,board;skip=nothing)
     homes=all_homes();byhome=Dict(h=>filter(s->s.home==h,source) for h in homes)
     answer=Dict{Tuple{Int,Int},Tuple{Int,Any}}();unmatched=Any[];hall=(0,0);zero=Any[]
     for key in sort!(unique(bodykey(h) for h in homes))
         hs=[h for h in homes if bodykey(h)==key]
-        cells=[(r,c) for r in 1:7 for c in 1:7 if bodykey((c-4,4-r,3))==key]
+        cells=[(r,c) for r in 1:7 for c in 1:7 if bodykey((c-4,4-r,3))==key && (r,c)!=skip]
         options=[[window_piece_options(byhome[h],h,(c-4,4-r,3),board[r,c]) for h in hs] for (r,c) in cells]
         owner=zeros(Int,length(hs))
         function augment(slot,seen)
@@ -94,6 +94,22 @@ function matches_tsv(cs,res)
         for rr in 1:7,cc in 1:7
             pid,rot=r.answer[(rr,cc)]
             println(io,join((id,c.rep[1],c.rep[2],rr,cc,pid,join(rotate((1,0,0),rot),','),join(rotate((0,1,0),rot),','),join(rotate((0,0,1),rot),',')),'\t'))
+        end
+    end
+    String(take!(io))
+end
+# best effort for non-matchable configurations: every cell x such that the other 48 cells match (one wrong cell), with that matching
+function best_effort(cs,result,prints...)
+    io=IOBuffer();println(io,"print\tmonth_name\tweekday_of_1st\tlength\twrong_cell_row\twrong_cell_column\tcell_row\tcell_column\tpiece\tx-image\ty-image\tz-image")
+    for (nm,src) in prints,c in cs
+        result(nm,c).status=="SAT" && continue
+        for x in [(r,k) for r in 1:7 for k in 1:7]
+            r=match_config(src,c.board;skip=x);isempty(r.unmatched) || continue
+            for rr in 1:7,k in 1:7
+                (rr,k)==x && continue
+                pid,rot=r.answer[(rr,k)]
+                println(io,join((nm,MN[c.month],WD[c.weekday],c.length,x[1],x[2],rr,k,pid,join(rotate((1,0,0),rot),','),join(rotate((0,1,0),rot),','),join(rotate((0,0,1),rot),',')),'\t'))
+            end
         end
     end
     String(take!(io))
@@ -175,7 +191,8 @@ for (a,b) in (((2026,1),(2050,1)),((2026,5),(2050,1)),((2026,1),(2100,1)))
     println(io,join((string(ymstr(a...),"..",ymstr(b...)),n,length(seq),length(seq)-1,length(pairs)),'\t'))
 end
 chain_tsv=String(take!(io))
-(;configs=cs,chain_tsv,labels,srcB,srcOld,srcC,result,table_tsv=table,failing_tsv=failing,matches_B=matches_tsv(cs,Dict(k=>v for (k,v) in resB)),
+best_effort_tsv=best_effort(cs,result,("B",srcB),("C",srcC))
+(;configs=cs,chain_tsv,best_effort_tsv,labels,srcB,srcOld,srcC,result,table_tsv=table,failing_tsv=failing,matches_B=matches_tsv(cs,Dict(k=>v for (k,v) in resB)),
       matches_old=matches_tsv(cs,Dict(k=>v for (k,v) in resO)),matches_C=matches_tsv(cs,Dict(k=>v for (k,v) in resC)),lemma_tsv,lemma=(;B_set=BS,old_set=OS,all91,rows),cycle=cyc,cycle_txt=cyc_txt,
       years,byid,config_of)
 end
@@ -184,7 +201,7 @@ using .ConfigTable
 if abspath(PROGRAM_FILE)==(@__FILE__) && length(ARGS)==2 && ARGS[1]=="write"
     T=ConfigTable.build(LAYOUT,PRINT_B,PRINT_OLD,PRINT_C);out=ARGS[2];mkpath(out)
     for (n,s) in (("config-table.tsv",T.table_tsv),("failing-dates.tsv",T.failing_tsv),("front-matches-config-B.tsv",T.matches_B),
-                  ("front-matches-config-old.tsv",T.matches_old),("front-matches-config-C.tsv",T.matches_C),("lemma-config.tsv",T.lemma_tsv),("gregorian-400.txt",T.cycle_txt),("chain-size.tsv",T.chain_tsv))
+                  ("front-matches-config-old.tsv",T.matches_old),("front-matches-config-C.tsv",T.matches_C),("best-effort-feb-sunday-28.tsv",T.best_effort_tsv),("lemma-config.tsv",T.lemma_tsv),("gregorian-400.txt",T.cycle_txt),("chain-size.tsv",T.chain_tsv))
         write(joinpath(out,n),s)
     end
 end

@@ -1,0 +1,39 @@
+run	seed	setting	class	status	seconds	wall
+D1	printing-S2	all classes CLASS_FRACS -3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=280s	-3,-3,-3	UNTRUSTED_SAT	28	wall=514s
+D1	printing-S2	all classes CLASS_FRACS -3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=280s	-3,-3,-2	UNSAT	201	wall=514s
+D1	printing-S2	all classes CLASS_FRACS -3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=280s	-3,-3,-1	UNKNOWN	280	wall=514s
+D1	printing-S2	all classes CLASS_FRACS -3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=280s	-3,-3,0	UNTRUSTED_SAT	0	wall=514s
+D2	printing-S2	all classes CLASS_FRACS -3,-3,-3:0.0;-3,-3,-2:0.4;-3,-3,-1:0.4;-3,-3,0:0.3 salt=2 timeout=280s	-3,-3,-3	UNTRUSTED_SAT	27	wall=594s
+D2	printing-S2	all classes CLASS_FRACS -3,-3,-3:0.0;-3,-3,-2:0.4;-3,-3,-1:0.4;-3,-3,0:0.3 salt=2 timeout=280s	-3,-3,-2	UNKNOWN	280	wall=594s
+D2	printing-S2	all classes CLASS_FRACS -3,-3,-3:0.0;-3,-3,-2:0.4;-3,-3,-1:0.4;-3,-3,0:0.3 salt=2 timeout=280s	-3,-3,-1	UNKNOWN	280	wall=594s
+D2	printing-S2	all classes CLASS_FRACS -3,-3,-3:0.0;-3,-3,-2:0.4;-3,-3,-1:0.4;-3,-3,0:0.3 salt=2 timeout=280s	-3,-3,0	UNTRUSTED_SAT	0	wall=594s
+E2-f0.3	printing-S2	ONLY class -3,-3,-2 frac=0.3 salt=1 timeout=280s	-3,-3,-2	UNKNOWN	280	wall=287s
+E2-f0.6	printing-S2	ONLY class -3,-3,-2 frac=0.6 salt=1 timeout=280s	-3,-3,-2	UNSAT	222	wall=228s
+E2-f0.0	printing-S2	ONLY class -3,-3,-2 frac=0.0 salt=1 timeout=280s	-3,-3,-2	UNKNOWN	280	wall=287s
+E2-f0.5-s2	printing-S2	ONLY class -3,-3,-2 frac=0.5 salt=2 timeout=280s	-3,-3,-2	UNSAT	145	wall=157s
+E2-f0.4-s1	printing-S2	ONLY class -3,-3,-2 frac=0.4 salt=1 timeout=280s	-3,-3,-2	UNKNOWN	280	wall=292s
+E2-f0.45-s3	printing-S2	ONLY class -3,-3,-2 frac=0.45 salt=3 timeout=280s	-3,-3,-2	UNKNOWN	280	wall=294s
+E2-f0.2-s1	printing-S2	ONLY class -3,-3,-2 frac=0.2 salt=1 timeout=280s	-3,-3,-2	UNKNOWN	280	wall=293s
+F2-f0.9	printing-C	ONLY class -3,-3,-2 frac=0.9 salt=1 timeout=280s	-3,-3,-2	UNSAT	1	wall=8s
+F2-f0.8	printing-C	ONLY class -3,-3,-2 frac=0.8 salt=1 timeout=280s	-3,-3,-2	UNSAT	1	wall=8s
+F2-f0.6	printing-C	ONLY class -3,-3,-2 frac=0.6 salt=1 timeout=280s	-3,-3,-2	UNSAT	128	wall=135s
+F2-f0.95	printing-C	ONLY class -3,-3,-2 frac=0.95 salt=1 timeout=280s	-3,-3,-2	UNSAT	0	wall=8s
+F2-f0.4	printing-C	ONLY class -3,-3,-2 frac=0.4 salt=1 timeout=280s	-3,-3,-2	UNKNOWN	280	wall=286s
+F2-f0.5	printing-C	ONLY class -3,-3,-2 frac=0.5 salt=1 timeout=280s	-3,-3,-2	UNSAT	206	wall=216s
+F2-f0.7	printing-C	ONLY class -3,-3,-2 frac=0.7 salt=1 timeout=280s	-3,-3,-2	UNSAT	6	wall=12s
+G2-f0.0-long	printing-S2	ONLY class -3,-3,-2 frac=0.0 salt=1 timeout=840s	-3,-3,-2	UNTRUSTED_SAT	553	wall=562s
+G2-f0.3-seedC-long	printing-C	ONLY class -3,-3,-2 frac=0.3 salt=1 timeout=840s	-3,-3,-2	UNKNOWN	840	wall=849s
+H3-f0.2	printing-S2	ONLY class -3,-3,-1 frac=0.2 salt=1 timeout=150s	-3,-3,-1	UNTRUSTED_SAT	120	wall=133s
+H3-f0.0	printing-S2	ONLY class -3,-3,-1 frac=0.0 salt=1 timeout=150s	-3,-3,-1	UNTRUSTED_SAT	2	wall=14s
+H3-f0.4	printing-S2	ONLY class -3,-3,-1 frac=0.4 salt=1 timeout=150s	-3,-3,-1	UNKNOWN	150	wall=163s
+H4-f0.3	printing-S2	ONLY class -3,-3,0 frac=0.3 salt=1 timeout=150s	-3,-3,0	UNTRUSTED_SAT	0	wall=12s
+D3	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=840s (killed by me during class -3,-3,-1)	-3,-3,-3	UNTRUSTED_SAT	31	wall=1209s
+D3	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=840s (killed by me during class -3,-3,-1)	-3,-3,-2	UNTRUSTED_SAT	503	wall=1209s
+D4	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.0;-3,-3,0:0.3 salt=1 timeout=840s (machine load 30)	-3,-3,-3	UNTRUSTED_SAT	63	wall=931s
+D4	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.0;-3,-3,0:0.3 salt=1 timeout=840s (machine load 30)	-3,-3,-2	UNKNOWN	840	wall=931s
+D4	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.0;-3,-3,0:0.3 salt=1 timeout=840s (machine load 30)	-3,-3,-1	UNTRUSTED_SAT	5	wall=931s
+D4	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.0;-3,-3,0:0.3 salt=1 timeout=840s (machine load 30)	-3,-3,0	UNTRUSTED_SAT	0	wall=931s
+D5	printing-S2	same as D4, timeout=1500s (machine load 30-40)	-3,-3,-3	UNTRUSTED_SAT	153	wall=1695s
+D5	printing-S2	same as D4, timeout=1500s (machine load 30-40)	-3,-3,-2	UNKNOWN	1500	wall=1695s
+D5	printing-S2	same as D4, timeout=1500s (machine load 30-40)	-3,-3,-1	UNTRUSTED_SAT	3	wall=1695s
+D5	printing-S2	same as D4, timeout=1500s (machine load 30-40)	-3,-3,0	UNTRUSTED_SAT	0	wall=1695s

@@ -30,6 +30,7 @@ end
     @test slurp(f("front-matches-config-B.tsv"))==T.matches_B
     @test slurp(f("front-matches-config-old.tsv"))==T.matches_old
     @test slurp(f("front-matches-config-C.tsv"))==T.matches_C
+    @test slurp(f("best-effort-feb-sunday-28.tsv"))==T.best_effort_tsv
     @test slurp(f("lemma-config.tsv"))==T.lemma_tsv
     @test slurp(f("gregorian-400.txt"))==T.cycle_txt
     @test slurp(f("chain-size.tsv"))==T.chain_tsv
@@ -75,5 +76,29 @@ end
     want=[(y,m) for y in 2026:2050 for m in 1:12 if (y,m)<=(2050,1) && T.result("B",T.config_of(T.configs,y,m)).status=="SAT"]
     @test ms==want && ms[1]==(2026,1) && length(ms)==286
     @test all(ym->T.result("C",T.config_of(T.configs,ym...)).status=="SAT",ms)
+end
+@testset "best effort for February/Sunday/28" begin
+    # every listed matching: 48 cells, distinct bodies, rigid rotation reaches the cell, upright art equals the board cell
+    rows=[split(l,'\t') for l in split(strip(slurp(f("best-effort-feb-sunday-28.tsv"))),'\n')[2:end]]
+    feb=T.byid(T.configs,2,7,28);homes=all_homes();wrongs=Set()
+    for nm in ("B","C")
+        src=Dict("B"=>T.srcB,"C"=>T.srcC)[nm];byhome=Dict(h=>filter(s->s.home==h,src) for h in homes)
+        rs=[r for r in rows if r[1]==nm];@test !isempty(rs)
+        for w in unique((r[5],r[6]) for r in rs)
+            push!(wrongs,w);mine=[r for r in rs if (r[5],r[6])==w];@test length(mine)==48
+            @test length(unique(r[9] for r in mine))==48 && !any(r->(r[7],r[8])==w,mine)
+            for r in mine
+                rr,cc,pid=parse.(Int,r[7:9]);basis=tuple((tuple(parse.(Int,split(x,','))...) for x in r[10:12])...)
+                rot=only(q for q in ROTATIONS if (rotate((1,0,0),q),rotate((0,1,0),q),rotate((0,0,1),q))==basis)
+                @test rotate(homes[pid],rot)==(cc-4,4-rr,3)
+                fr=only(filter(s->rotate(s.normal,rot)==FRONT_NORMAL,byhome[homes[pid]]))
+                a=only(findall(==(rotate(fr.up,rot)),IMAGE_UPS))-1
+                @test coupled_optic(fr.text,a,fr.ink)==coupled_optic(feb.board[rr,cc][1],0,feb.board[rr,cc][2])
+            end
+        end
+    end
+    @test wrongs==Set([("7","1"),("7","7")])        # the two blank bottom corners; the wrong cell is a free choice between them
+    # no other single wrong cell works: for any other cell x the other 48 cells do not all match
+    @test all(x->!isempty(ConfigTable.match_config(T.srcB,feb.board;skip=x).unmatched),[(r,k) for r in 1:7 for k in 1:7 if (r,k) ∉ ((7,1),(7,7))])
 end
 end
