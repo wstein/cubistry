@@ -43,7 +43,7 @@ test("every registered mode has exactly one row or is listed as a mode without a
   }
   assert.deepEqual(
     SLOT_MAP.filter((r) => !r.registered).flatMap((r) => r.modes),
-    ["calendar", "playground", "ci"],
+    ["calendar", "playground"],
   );
 });
 
@@ -57,11 +57,11 @@ test("slotsOf lists the filled slot numbers of a mode and rejects an unknown id"
   for (const row of SLOT_MAP) assert.ok(slotsOf(row.modes[0]).every((n) => SLOT_NUMBERS.includes(n)));
 });
 
-test("migration status: every registered mode is listed; only the 1/10-Second Counter has been migrated", () => {
+test("migration status: every registered mode is listed; only the 1/10-Second Counter and the CI Quality Cube have been migrated", () => {
   assert.deepEqual(Object.keys(MIGRATION).sort(), MODE_CATALOG.map((m) => m.id).sort());
   for (const status of Object.values(MIGRATION)) assert.ok(["pending", "migrated"].includes(status));
   const migrated = Object.entries(MIGRATION).filter(([, s]) => s === "migrated").map(([id]) => id);
-  assert.deepEqual(migrated, ["tenth"]);
+  assert.deepEqual(migrated, ["tenth", "ci"]);
 });
 
 test("accepted deviations: the 1/10-Second Counter maps Step, Value, Direction, Step speed instead of the design row (owner decision 5, 2026-11-08)", () => {
@@ -79,4 +79,12 @@ test("accepted deviations: the 1/10-Second Counter maps Step, Value, Direction, 
   const plan = readFileSync("knowledge/plans/unified-application.md", "utf8");
   assert.match(plan, /`tenth` fills slots 1 to 4 with Step, Value, Direction and Step speed/);
   assert.match(plan, /Run \/ Stop, Stop after and Wrap, which this mode does not have\. This deviation is accepted/);
+});
+
+test("the CI Quality Cube fills the design's slots 1 and 2 through the shell with its own labels", () => {
+  assert.deepEqual(slotsOf("ci"), [1, 2]);
+  const mount = readFileSync("src/apps/status/mount.ts", "utf8");
+  assert.match(mount, /shell\.setSlot\(1, \{ label: "Simulated events"/);
+  assert.match(mount, /shell\.setSlot\(2, \{ label: "Workflow"/);
+  assert.doesNotMatch(mount, /shell\.setSlot\([345],/);
 });

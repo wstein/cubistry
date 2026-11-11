@@ -74,6 +74,8 @@ const INVENTORY = [
   row(["banner"], "src/apps/calendar7/mount.ts", ["calendar7"], /BANNER_PARAM = "banner"/),
   row(["font"], "src/apps/calendar7/mount.ts", ["calendar7"]),
   row(["size"], "src/playground.mjs", ["playground"]),
+  row(["turn"], "src/apps/status/params.ts", ["ci"]),
+  row(["build", "test", "analyze", "review"], "src/apps/status/params.ts", ["ci"], /params\.get\(\s*category\.id\s*\)/),
 ];
 
 const read = (file) => readFileSync(file, "utf8");

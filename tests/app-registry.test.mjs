@@ -17,7 +17,7 @@ const meta = (over = {}) => ({
   ...over,
 });
 
-test("the catalog holds the eleven studio modes under one id each", () => {
+test("the catalog holds the twelve modes under one id each", () => {
   assert.deepEqual(
     MODE_CATALOG.map((m) => m.id),
     [
@@ -32,6 +32,7 @@ test("the catalog holds the eleven studio modes under one id each", () => {
       "ms-counter",
       "hm-one-cube",
       "calendar7",
+      "ci",
     ],
   );
 });
@@ -56,7 +57,7 @@ test("every catalog entry has a title, a known group, a cube count and an existi
 test("the groups follow the design proposal: the featured modes are apps, the rest are cubes", () => {
   const byGroup = (g) => MODE_CATALOG.filter((m) => m.group === g).map((m) => m.id);
   assert.deepEqual(byGroup("apps"), ["clock", "ms-timer"]);
-  assert.equal(byGroup("cubes").length, 9);
+  assert.equal(byGroup("cubes").length, 10);
 });
 
 test("createRegistry exposes get, has, ids and list in catalog order", () => {

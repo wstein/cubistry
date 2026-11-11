@@ -1,0 +1,467 @@
+import { test, expect } from "@playwright/test";
+import { PNG } from "pngjs";
+// Canonical URL of the hosted CI Quality Cube. The cases below are the cases of status-cube.spec.mjs (legacy page
+// /status.html, kept unchanged until the page is retired) with the locators of the host: error row, status chip,
+// readout bar and primary action instead of the legacy panel ids.
+const errorRow = (page) => page.locator('[data-region="alerts"] .shell-alert-error');
+const errorText = (page) => errorRow(page).locator(".shell-alert-text");
+const chip = (page) => page.locator('[data-region="status-zone"] .shell-chip');
+const readout = (page) => page.locator('[data-region="readout"] .shell-readout-value');
+const primary = (page) => page.locator('[data-region="primary-action"] button');
+async function ready(page) {
+  await page.goto("/index.html?app=ci");
+  await expect(page.locator("#status-build")).toBeEnabled();
+  await expect(page.locator("#status-viewer")).toHaveAttribute(
+    "data-sync",
+    "idle",
+  );
+  await expect(page.locator("canvas")).toHaveCount(1);
+}
+async function exact(page, snapshot) {
+  await expect(page.locator("#status-viewer")).toHaveAttribute(
+    "data-current",
+    snapshot.join(","),
+  );
+  await expect(page.locator("#status-viewer")).toHaveAttribute(
+    "data-sync",
+    "idle",
+  );
+  expect(
+    await page.evaluate(async (snapshot) => {
+      const { statusController: c, statusDefinition: d } = await import(
+        "/src/apps/status/mount.ts"
+      );
+      const { stateEquals } = await import("/packages/cube-core/src/index.ts");
+      const { matchesTarget } = await import(
+        "/packages/cube-mechanics/src/index.ts"
+      );
+      const { displayTarget } = await import("/src/apps/status/definition.ts");
+      return (
+        stateEquals(c.state, c.view.presentedState) &&
+        matchesTarget(d.print, c.state, displayTarget(snapshot))
+      );
+    }, snapshot),
+  ).toBe(true);
+}
+test("five fixed vector states render for all four categories, with native keyboard controls", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await ready(page);
+  await page.locator("#status-build").focus();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Tab");
+  await exact(page, ["running", "open", "open", "open"]);
+  const categories = ["build", "test", "analyze", "review"];
+  for (const [state, word, color] of [
+    ["open", "OFFEN", "#56616a"],
+    ["running", "LÄUFT", "#145a91"],
+    ["ok", "OK", "#187044"],
+    ["error", "FEHLER", "#b12c2c"],
+    ["blocked", "BLOCKIERT", "#855600"],
+  ]) {
+    for (const category of categories)
+      await page.selectOption(`#status-${category}`, state);
+    await exact(page, Array(4).fill(state));
+    await expect(page.locator("#status-front")).toHaveText(
+      categories.map((c) => `${c.toUpperCase()} ${word}`).join(" · "),
+    );
+    // Inspect the actual installed bitmap pixels, not just the declarative manifest or accessibility text.
+    const result = await page.evaluate(
+      async ({ state, color, categories }) => {
+        const { statusController: c } = await import("/src/apps/status/mount.ts");
+        const expected = color
+          .slice(1)
+          .match(/../g)
+          .map((v) => parseInt(v, 16));
+        const counts = [];
+        for (const category of categories) {
+          const bitmap = c.assets.images.get(`quality-${category}-${state}`);
+          const canvas = document.createElement("canvas");
+          canvas.width = canvas.height = 256;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(bitmap, 0, 0);
+          const pixels = ctx.getImageData(0, 0, 256, 256).data;
+          let colored = 0,
+            dark = 0;
+          for (let i = 0; i < pixels.length; i += 4) {
+            if (expected.every((v, j) => Math.abs(v - pixels[i + j]) < 5))
+              colored++;
+            if (pixels[i] < 60 && pixels[i + 1] < 70 && pixels[i + 2] < 85)
+              dark++;
+          }
+          counts.push({ colored, dark });
+        }
+        return counts;
+      },
+      { state, color, categories },
+    );
+    for (const count of result) {
+      expect(count.colored).toBeGreaterThan(1500);
+      expect(count.dark).toBeGreaterThan(400);
+    }
+    const pixels = PNG.sync.read(
+      await page.locator("#status-viewer").screenshot(),
+    );
+    expect(pixels.width).toBeGreaterThan(300);
+    await page.screenshot({
+      path: `test-results/quality-hosted-${state}.png`,
+      fullPage: true,
+    });
+  }
+  expect(errors).toEqual([]);
+});
+test("events enforce requested transitions and distinguish failure from unavailable prerequisites", async ({
+  page,
+}) => {
+  await ready(page);
+  await page.selectOption("#status-event", "passed");
+  await primary(page).click();
+  await expect(errorText(page)).toContainText("not allowed");
+  await exact(page, ["open", "open", "open", "open"]);
+  await page.selectOption("#status-event", "failed");
+  await primary(page).click();
+  await exact(page, ["error", "open", "open", "open"]);
+  await expect(chip(page)).toContainText("attempt failed");
+  await page.selectOption("#status-build", "open");
+  await page.selectOption("#status-event-category", "test");
+  await page.selectOption("#status-event", "blocked");
+  await primary(page).click();
+  await exact(page, ["open", "blocked", "open", "open"]);
+  await expect(chip(page)).toContainText("prerequisite");
+  await page.click("#status-burst");
+  await exact(page, ["ok", "ok", "ok", "ok"]);
+  await expect(errorRow(page)).toHaveCount(0);
+  await page.click("#status-demo");
+  await expect(page.locator("#status-demo")).toHaveText("Stop demo");
+  await page.click("#status-demo");
+  await expect(page.locator("#status-demo")).toHaveText("Run demo");
+});
+test("rapid real animation finishes only active legal turn then uses latest actual full pose", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await ready(page);
+  await page.selectOption("#status-speed", "500");
+  await page.evaluate(async () => {
+    const { statusController: c } = await import("/src/apps/status/mount.ts");
+    const animate = c.view.animate.bind(c.view);
+    window.started = [];
+    c.view.animate = (p) => {
+      window.started.push(JSON.stringify(p));
+      return animate(p);
+    };
+  });
+  await page.selectOption("#status-build", "running");
+  await expect(page.locator("#status-viewer")).toHaveAttribute(
+    "data-sync",
+    "moving",
+  );
+  await page.selectOption("#status-test", "blocked");
+  await page.selectOption("#status-build", "error");
+  await exact(page, ["error", "blocked", "open", "open"]);
+  const replay = await page.evaluate(async () => {
+    const { statusController: c, statusDefinition: d } = await import(
+      "/src/apps/status/mount.ts"
+    );
+    const { stateEquals } = await import("/packages/cube-core/src/index.ts");
+    const { applyMoves, initialState } = await import(
+      "/packages/cube-mechanics/src/index.ts"
+    );
+    const { QualityPolicy } = await import("/src/apps/status/policy.ts");
+    const p = await QualityPolicy.load(d),
+      started = window.started.map(JSON.parse),
+      first = started[0],
+      expected = p.plan(first.to, ["error", "blocked", "open", "open"]);
+    return {
+      valid: stateEquals(
+        applyMoves(
+          initialState(d.print),
+          started.map((p) => p.move),
+        ),
+        c.state,
+      ),
+      actual: started.slice(1).map((p) => p.move),
+      expected: expected.moves,
+      total: c.progress.sessionTotal,
+    };
+  });
+  expect(replay.valid).toBe(true);
+  expect(replay.actual).toEqual(replay.expected);
+  expect(replay.total).toBeLessThanOrEqual(8);
+});
+test("animation failure freezes last committed pose and explicit reload recovers", async ({
+  page,
+}) => {
+  await ready(page);
+  await page.evaluate(async () => {
+    const { statusController: c } = await import("/src/apps/status/mount.ts");
+    const animate = c.view.animate.bind(c.view);
+    let moves = 0;
+    c.view.animate = async (p) => {
+      if (++moves === 2) throw Error("Injected animation failure");
+      await animate(p);
+    };
+  });
+  await page.selectOption("#status-build", "running");
+  await expect(errorText(page)).toHaveText("Injected animation failure");
+  await expect(page.locator("#status-viewer")).toHaveAttribute(
+    "data-sync",
+    "failed",
+  );
+  await expect(page.locator("#status-viewer")).toHaveAttribute(
+    "data-session-moves",
+    "1",
+  );
+  await expect(page.locator("#status-build")).toBeDisabled();
+  expect(
+    await page.evaluate(async () => {
+      const { statusController: c } = await import("/src/apps/status/mount.ts");
+      const { stateEquals } = await import("/packages/cube-core/src/index.ts");
+      return (
+        c.currentStatus.join(",") === "open,open,open,open" &&
+        stateEquals(c.state, c.view.presentedState)
+      );
+    }),
+  ).toBe(true);
+  await expect(primary(page)).toHaveText("Reload application");
+  await primary(page).click();
+  await exact(page, ["open", "open", "open", "open"]);
+});
+for (const resource of ["distances.u8", "quality-build-open.svg"])
+  test(`corrupt ${resource} freezes fresh load without false completion`, async ({
+    page,
+  }) => {
+    await page.route(`**/assets/quality/${resource}`, (route) =>
+      route.fulfill({
+        contentType: resource.endsWith("svg")
+          ? "image/svg+xml"
+          : "application/octet-stream",
+        body: "corrupt",
+      }),
+    );
+    await page.goto("/index.html?app=ci");
+    await expect(errorText(page)).toContainText("integrity");
+    await expect(readout(page).nth(0)).toHaveText("Not configured");
+    await expect(page.locator("#status-build")).toBeDisabled();
+    await expect(primary(page)).toHaveText("Reload application");
+  });
+// A drag that should turn the camera must start and stay on the canvas itself. At 390 px the workflow controls
+// (a floating panel) cover the middle of the canvas, so a drag from the center operates the panel and the camera
+// never turns; the test then waited for a rotation that could not come. This returns the canvas point nearest to
+// the center from which the drag (start, middle and end) hits the canvas, or null when there is none.
+function freeDragStart(page, dx, dy) {
+  return page.evaluate(([dx, dy]) => {
+    const canvas = document.querySelector("#status-viewer canvas");
+    const r = canvas.getBoundingClientRect();
+    const hits = (x, y) => document.elementFromPoint(x, y) === canvas;
+    const cx = r.x + r.width / 2,
+      cy = r.y + r.height / 2,
+      candidates = [];
+    for (let y = Math.max(r.y, 0) + 4; y < Math.min(r.bottom, innerHeight) - 4; y += 8)
+      for (let x = r.x + 4; x < Math.min(r.right, innerWidth) - 4; x += 8)
+        candidates.push([x, y]);
+    candidates.sort((a, b) => Math.hypot(a[0] - cx, a[1] - cy) - Math.hypot(b[0] - cx, b[1] - cy));
+    const found = candidates.find(
+      ([x, y]) => [0, 0.25, 0.5, 0.75, 1].every((t) => hits(x + dx * t, y + dy * t)),
+    );
+    return found ? { x: found[0], y: found[1] } : null;
+  }, [dx, dy]);
+}
+for (const [name, viewport] of [
+  ["desktop", { width: 1280, height: 1000 }],
+  ["mobile", { width: 390, height: 844 }],
+]) {
+  test(`DPR2 ${name} contains its high-resolution canvas and camera interaction preserves physical state`, async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({
+      baseURL,
+      viewport,
+      deviceScaleFactor: 2,
+      reducedMotion: "reduce",
+    });
+    const page = await context.newPage();
+    try {
+      await ready(page);
+      const geometry = await page.evaluate(() => {
+        const host = document.querySelector("#status-viewer");
+        const canvas = host.querySelector("canvas");
+        const bounds = (node) => {
+          const r = node.getBoundingClientRect();
+          return {
+            x: r.x,
+            y: r.y,
+            width: r.width,
+            height: r.height,
+            right: r.right,
+            bottom: r.bottom,
+          };
+        };
+        return {
+          host: bounds(host),
+          canvas: bounds(canvas),
+          buffer: { width: canvas.width, height: canvas.height },
+          dpr: devicePixelRatio,
+          pageWidth: document.documentElement.scrollWidth,
+          viewportWidth: innerWidth,
+        };
+      });
+      expect(geometry.dpr).toBe(2);
+      expect(
+        Math.abs(geometry.canvas.width - geometry.host.width),
+      ).toBeLessThanOrEqual(1);
+      expect(
+        Math.abs(geometry.canvas.height - geometry.host.height),
+      ).toBeLessThanOrEqual(1);
+      expect(geometry.canvas.x).toBeGreaterThanOrEqual(geometry.host.x - 1);
+      expect(geometry.canvas.y).toBeGreaterThanOrEqual(geometry.host.y - 1);
+      expect(geometry.canvas.right).toBeLessThanOrEqual(
+        geometry.host.right + 1,
+      );
+      expect(geometry.canvas.bottom).toBeLessThanOrEqual(
+        geometry.host.bottom + 1,
+      );
+      expect(
+        Math.abs(geometry.buffer.width - geometry.host.width * 2),
+      ).toBeLessThanOrEqual(2);
+      expect(
+        Math.abs(geometry.buffer.height - geometry.host.height * 2),
+      ).toBeLessThanOrEqual(2);
+      expect(geometry.pageWidth).toBeLessThanOrEqual(geometry.viewportWidth);
+      const before = await page.evaluate(async () => {
+        const { statusController: c } = await import("/src/apps/status/mount.ts");
+        return {
+          state: JSON.stringify(c.state),
+          camera: c.view.camera.position.toArray(),
+          presentation: c.view.presentation.quaternion.toArray(),
+          moves: c.progress.sessionTotal,
+        };
+      });
+      const grab = await freeDragStart(page, 45, 25);
+      expect(grab, "a canvas point from which the whole drag stays on the canvas").not.toBeNull();
+      await page.mouse.move(grab.x, grab.y);
+      await page.mouse.down();
+      await page.mouse.move(grab.x + 45, grab.y + 25, { steps: 5 });
+      await page.mouse.up();
+      await expect
+        .poll(async () =>
+          page.evaluate(async () => {
+            const { statusController: c } = await import("/src/apps/status/mount.ts");
+            return c.view.presentation.quaternion.toArray();
+          }),
+        )
+        .not.toEqual(before.presentation);
+      const after = await page.evaluate(async () => {
+        const { statusController: c } = await import("/src/apps/status/mount.ts");
+        return {
+          state: JSON.stringify(c.state),
+          moves: c.progress.sessionTotal,
+        };
+      });
+      expect(await page.evaluate(async () => {
+        const { statusController: c } = await import("/src/apps/status/mount.ts");
+        return c.view.camera.position.toArray();
+      })).toEqual(before.camera);
+      expect(after.state).toBe(before.state);
+      expect(after.moves).toBe(before.moves);
+      await page.selectOption("#status-build", "running");
+      await exact(page, ["running", "open", "open", "open"]);
+      for (const [category, state] of [
+        ["build", "blocked"],
+        ["test", "running"],
+        ["analyze", "error"],
+        ["review", "ok"],
+      ]) {
+        await page.selectOption(`#status-${category}`, state);
+      }
+      await exact(page, ["blocked", "running", "error", "ok"]);
+      await page.evaluate(async () => {
+        const { statusController: c } = await import("/src/apps/status/mount.ts");
+        c.resetCamera();
+      });
+      await page.locator("#status-viewer").scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: `test-results/quality-hosted-${name}-dpr2-mixed.png`,
+        fullPage: true,
+      });
+      await page
+        .locator("#status-viewer")
+        .screenshot({
+          path: `test-results/quality-hosted-${name}-dpr2-mixed-cube.png`,
+        });
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    } finally {
+      await context.close();
+    }
+  });
+}
+
+test("the mode registers under ?app=ci, reports ready and keeps the shell regions in use", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await ready(page);
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "ci");
+  await expect(page.locator("#studio-application")).toHaveValue("ci");
+  await expect(page.locator("#studio-heading")).toHaveText("CI Quality Cube");
+  await expect(chip(page)).toHaveAttribute("data-state", "done");
+  await expect(primary(page)).toHaveText("Send event");
+  await expect(page.locator('[data-slot="1"]')).toBeVisible();
+  await expect(page.locator('[data-slot="2"]')).toBeVisible();
+  for (const n of [3, 4, 5]) await expect(page.locator(`[data-slot="${n}"]`)).toBeHidden();
+  await expect(readout(page)).toHaveCount(3);
+  await expect(readout(page).nth(0)).toHaveText("BUILD: Open · TEST: Open · ANALYZE: Open · REVIEW: Open");
+  expect(errors).toEqual([]);
+});
+
+test("URL parameters turn, build, test, analyze and review set the speed and the requested snapshot", async ({ page }) => {
+  await page.goto("/index.html?app=ci&turn=50&build=ok&test=error&analyze=nope");
+  await expect(page.locator("#status-build")).toBeEnabled();
+  await expect(page.locator("#status-speed")).toHaveValue("50");
+  await expect(page.locator("#status-viewer")).toHaveAttribute("data-current", "ok,error,open,open", { timeout: 30000 });
+  await expect(page.locator("#status-viewer")).toHaveAttribute("data-sync", "idle");
+  await expect(page.locator("#status-analyze")).toHaveValue("open");
+  // The address bar follows the user's choices without a history entry.
+  const entries = await page.evaluate(() => history.length);
+  await page.selectOption("#status-review", "blocked");
+  await expect(page).toHaveURL(/[?&]review=blocked(&|$)/);
+  await expect(page).toHaveURL(/[?&]turn=50(&|$)/);
+  expect(await page.evaluate(() => history.length)).toBe(entries);
+});
+
+test("the Nerd drawer lists the recent local events", async ({ page }) => {
+  await page.goto("/index.html?app=ci&nerd=1");
+  await expect(page.locator("#status-build")).toBeEnabled();
+  await page.selectOption("#status-event", "start");
+  await primary(page).click();
+  await expect(page.locator('[data-region="nerd-drawer"]')).toContainText("Recent local events");
+  await expect(page.locator('[data-region="nerd-drawer"] li').last()).toHaveText("build: Start or retry");
+});
+
+test("leaving the mode while the cube moves and coming back mounts a fresh cube without errors", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await ready(page);
+  await page.selectOption("#status-speed", "500");
+  await page.selectOption("#status-build", "running");
+  await expect(page.locator("#status-viewer")).toHaveAttribute("data-sync", "moving");
+  await page.selectOption("#studio-application", "counter");
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "counter", { timeout: 30000 });
+  await expect(page.locator("#status-viewer")).toHaveCount(0);
+  await expect(page.locator("#status-build")).toHaveCount(0);
+  await expect(page).not.toHaveURL(/[?&]build=/);
+  await page.selectOption("#studio-application", "ci");
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "ci", { timeout: 30000 });
+  await exact(page, ["open", "open", "open", "open"]);
+  await expect(page.locator("canvas")).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
