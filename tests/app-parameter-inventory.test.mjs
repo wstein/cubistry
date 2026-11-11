@@ -15,7 +15,7 @@ const ALL_IDS = registry.ids();
 // Single-cube family: the pages that load src/main.mjs, by their unified id.
 const SINGLE_CUBE = ["counter", "tenth", "timer", "five-second-timer", "hsm-counter", "ms-counter", "hm-one-cube"];
 // Applications that read parameters but have no registered mode yet (stage 4 ports them).
-const PENDING_MODES = ["calendar"];
+const PENDING_MODES = ["calendar", "playground"];
 // Pages that stay pages (print.html: owner decision 10).
 const PAGES = ["print.html"];
 
@@ -66,6 +66,7 @@ const INVENTORY = [
   row(["design"], "src/print.mjs", ["print.html"]),
   row(["year", "month"], "src/apps/calendar7/month-view.ts", ["calendar7"]),
   row(["outer"], "src/apps/calendar7/geometry.ts", ["calendar7"]),
+  row(["size"], "src/playground.mjs", ["playground"]),
 ];
 
 const read = (file) => readFileSync(file, "utf8");
