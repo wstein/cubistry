@@ -1,0 +1,10 @@
+run	mode	library	width	lambda	htm	qtm	seconds
+greedy	greedy	-	-	-	271	276	4.6
+b-L1-w20	beam	L1	20	3	99	120	15.7
+b-L1-w40	beam	L1	40	3	101	112	15.9
+b-L4-w20	beam	L4	20	3	86	102	39.9
+b-L4-w40	beam	L4	40	3	78	89	33.7
+b-L5-w40	beam	L5	40	3	61	71	38.4
+b-L5-w80	beam	L5	80	3	61	72	35.9
+b-L5-w40-l2	beam	L5	40	2	67	82	32.8
+b-L5-w40-l6	beam	L5	40	6	64	74	26.7
