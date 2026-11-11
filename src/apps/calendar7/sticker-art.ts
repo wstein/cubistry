@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
 import { type Layout, NAME_SLOTS, nameSlotOffset, nameSlotStart, nameTileShift } from "./layout.ts";
-import { type FaceBands, faceFlatShare, facePixelsPerUnit, monthBanner, nameAboveShare, NAMES_BANNER_RADIUS, NAMES_BOTTOM_STRIP, NAMES_FACE_PX_PER_UNIT, NAMES_MONTH_SIDE_BAND, NAMES_TOP_STRIP, NAMES_WEEKDAY_DOWN } from "./geometry.ts";
+import { type FaceBands, faceFlatShare, facePixelsPerUnit, bannerOf, monthBanner, nameAboveShare, NAMES_BANNER_RADIUS_RATIO, NAMES_FACE_PX_PER_UNIT, NAMES_WEEKDAY_DOWN, outerLayerWidth, CALENDAR7_SIZE } from "./geometry.ts";
 import { type ColorScheme, namesGround, type SchemeLine } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
@@ -59,13 +59,14 @@ export interface PxRect { readonly x0: number; readonly y0: number; readonly x1:
  * The unit cell of a tile on its canvas: its center (`cx`, `cy`) and its rectangle (`cell`: a side with a band ends at the cell
  * edge, a side without one at the canvas edge; the face is flat inside, so the cell edge is exact there), with the canvas pixels
  * per unit along both axes (`px`, `py`: the flat part of the real face). `banner`: the red banner of the month row (horizontally inset
- * by `NAMES_MONTH_SIDE_BAND` from the cube edge on a side with a band; vertically the tile less the top strip and the bottom strip).
+ * by the side band W - p from the cube edge on a side with a band; vertically the tile less the top gap and the bottom gap; W = `outer`, the outer cubie width of the layer profile, `bannerOf`).
  */
-export function tileGrid(tile?: FaceTile): { W: number; H: number; px: number; py: number; cx: number; cy: number; cell: PxRect; banner: PxRect } {
+export function tileGrid(tile?: FaceTile, outer: number = outerLayerWidth(CALENDAR7_SIZE)): { W: number; H: number; px: number; py: number; cx: number; cy: number; cell: PxRect; banner: PxRect } {
   const [W, H] = tileCanvasSize(tile), t = tile ?? { w: 1, h: 1 }, b = t.band ?? NO_BAND;
   const px = facePixelsPerUnit(t.w, W), py = facePixelsPerUnit(t.h, H);
   const cell = { x0: b.l > 0 ? W / 2 - (t.w / 2 - b.l) * px : 0, x1: b.r > 0 ? W / 2 + (t.w / 2 - b.r) * px : W, y0: b.t > 0 ? H / 2 - (t.h / 2 - b.t) * py : 0, y1: b.b > 0 ? H / 2 + (t.h / 2 - b.b) * py : H };
-  const banner = { x0: b.l > 0 ? W / 2 - (t.w / 2 - NAMES_MONTH_SIDE_BAND) * px : 0, x1: b.r > 0 ? W / 2 + (t.w / 2 - NAMES_MONTH_SIDE_BAND) * px : W, y0: H / 2 - (t.h / 2 - NAMES_TOP_STRIP) * py, y1: H / 2 + (t.h / 2 - NAMES_BOTTOM_STRIP) * py };
+  const bn = bannerOf(outer); // W = the outer cubie width of the layer profile (the month row tile is W high)
+  const banner = { x0: b.l > 0 ? W / 2 - (t.w / 2 - bn.sideBand) * px : 0, x1: b.r > 0 ? W / 2 + (t.w / 2 - bn.sideBand) * px : W, y0: H / 2 - (t.h / 2 - bn.topGap) * py, y1: H / 2 + (t.h / 2 - bn.bottomGap) * py };
   return { W, H, px, py, cx: W / 2 + (b.l - b.r) / 2 * px, cy: H / 2 + (b.t - b.b) / 2 * py, cell, banner };
 }
 /** Tile classes drawn as the red banner of the month row (names layout). */
@@ -83,7 +84,7 @@ export function paintTileGround(ctx: GroundContext, roles: TileRoles, scheme: Co
   ctx.fillStyle = namesGround(scheme.dayFill);
   ctx.fillRect(0, 0, g.W, g.H);
   ctx.fillStyle = roles.fill;
-  const rad = banner ? NAMES_BANNER_RADIUS * g.px : 0, b = tile.band ?? NO_BAND; // rounded outer corners of the banner (variant), only at a cube edge
+  const rad = banner ? bannerOf().radius * g.px : 0, b = tile.band ?? NO_BAND; // rounded outer corners of the banner (variant), only at a cube edge
   if (rad > 0 && ctx.roundRect && ctx.beginPath && ctx.fill && (b.l > 0 || b.r > 0)) {
     ctx.beginPath();
     ctx.roundRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0, [b.l > 0 ? rad : 0, b.r > 0 ? rad : 0, b.r > 0 ? rad : 0, b.l > 0 ? rad : 0]);
@@ -126,7 +127,7 @@ export const weekdayShift = (cls: TileClass): number => (cls === "weekday" || cl
  * Vertical center of the month name in the cell frame (units above the unit cell center): the free height of the banner is
  * split with `nameAboveShare` above the ink (2/3 with square banner corners, 1/2 centered with rounded ones), `capUnits` is the ink height.
  */
-export const nameCenterUp = (capUnits: number, radius: number = NAMES_BANNER_RADIUS): number => { const b = monthBanner(); return b.top - nameAboveShare(radius) * (b.height - capUnits) - capUnits / 2; };
+export const nameCenterUp = (capUnits: number, radiusRatio: number = NAMES_BANNER_RADIUS_RATIO, outer: number = outerLayerWidth(CALENDAR7_SIZE)): number => { const b = monthBanner(outer); return b.top - nameAboveShare(radiusRatio) * (b.height - capUnits) - capUnits / 2; };
 /** Canvas pixels of a tile: 192 per unit of width. */
 export const tileCanvasSize = (tile?: FaceTile): [number, number] => (tile ? [Math.round(TEXTURE * tile.w), Math.round(TEXTURE * tile.h)] : [TEXTURE, TEXTURE]);
 /**

@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import { NAME_WORDS } from "../src/apps/calendar7/layout.ts";
 import { faceTransform, namePxPerUnit, tileGrid } from "../src/apps/calendar7/sticker-art.ts";
 import { labelLayout, nameFaceTable, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
-import { outerLayerWidth, CALENDAR7_SIZE, monthBanner, NAMES_MONTH_SIDE_BAND } from "../src/apps/calendar7/geometry.ts";
+import { outerLayerWidth, CALENDAR7_SIZE, monthBanner, bannerOf } from "../src/apps/calendar7/geometry.ts";
 import { FONT_METRICS } from "./calendar7-font-metrics.mjs";
 
 const PPU = namePxPerUnit();
@@ -25,7 +25,7 @@ const tileOf = (k) => (k === 0 ? { w: F, h: F, band: { l: BAND, r: 0, t: BAND, b
 /** Room of a tile in drawing px from the center of its unit cell: texture edge, or the edge of the red banner on a side with a band; up/down: the red banner. */
 const edge = (k) => {
   const g = tileGrid(tileOf(k)), kx = faceTransform(tileOf(k)).kx, b = monthBanner();
-  return { left: k === 0 ? (F - 0.5 - NAMES_MONTH_SIDE_BAND) * PPU : g.cx / kx, right: (g.W - g.cx) / kx, top: b.top * PPU, bottom: -b.bottom * PPU };
+  return { left: k === 0 ? (bannerOf(F).endPiece - 0.5) * PPU : g.cx / kx, right: (g.W - g.cx) / kx, top: b.top * PPU, bottom: -b.bottom * PPU };
 };
 
 /** Absolute x (drawing px, the first seam at 0) of every letter box of a month, per tile, plus the seam positions: every tile is one unit wide. */
@@ -34,7 +34,7 @@ function month(font, word) {
   const tiles = word.map((label, k) => {
     const center = (k - 0.5) * PPU;
     const boxes = nameLabelLayout(label, font, "face").map((l) => ({ ...l, x0: center + l.box.x0 - 96, x1: center + l.box.x1 - 96 }));
-    return { label, center, boxes, lo: center - (k === 0 ? F - 0.5 - NAMES_MONTH_SIDE_BAND : 0.5) * PPU, hi: center + PPU / 2 }; // the banner starts 0.4 inside the cube edge
+    return { label, center, boxes, lo: center - (k === 0 ? bannerOf(F).endPiece - 0.5 : 0.5) * PPU, hi: center + PPU / 2 }; // the banner starts 0.4 inside the cube edge
   });
   return { tiles, seams };
 }
