@@ -39,7 +39,7 @@ const tileDump = () => {
 // Digests taken at the head 72e44d0b (accepted design: banner 1.0 tall at y 2.9 .. 3.9, x -3.8 .. 3.8, radius 0.3, f = 1.8).
 const PINS = { table: "a7e43093e437a385c76b485a79ad1b2437b9f7f792cb843b9448abed857e93e0", tiles: "e12f85796b086640d133fe3bca215b90aca233b311a20cb599c24dba03b645fa" };
 
-test("at f = 1.8 the banner defined by the three ratios reproduces the geometry of the accepted design exactly (14-font table, grid rectangles and cut-face edge colors of all 294 tiles in all 10 schemes)", () => {
+test("at f = 1.8 the banner defined by its absolute unit-grid constants reproduces the geometry of the accepted design exactly (14-font table, grid rectangles and cut-face edge colors of all 294 tiles in all 10 schemes)", () => {
   assert.equal(outerLayerWidth(CALENDAR7_SIZE), 1.8);
   assert.equal(sha(tableDump()), PINS.table);
   assert.equal(sha(tileDump()), PINS.tiles);
@@ -88,15 +88,23 @@ test("invariance: the weekday line and the month line are at the same unit-grid 
   }
 });
 
-test("invariance: the cut-face edge colors follow the unit-grid banner at every f (the same colors along the same unit-grid stretches of the tile edges)", () => {
-  const roles = tileRoles(SCHEMES[0], "", "band", "names"), ground = namesGround(SCHEMES[0].dayFill);
+test("invariance: the cut-face edge colors follow the unit-grid banner at every f (the red stretch of a side edge runs over y 2.9 .. 3.9 of the unit grid, clipped at the face)", () => {
+  const roles = tileRoles(SCHEMES[0], "", "band", "names"), ground = namesGround(SCHEMES[0].dayFill), red = SCHEMES[0].bandFill;
   for (const f of [1.4, 1.5, 1.6, 1.8, 2.1]) for (const { c, tile } of rowTiles(f)) {
+    if (c === 0 || c === 6) continue;
     const e = tileEdgeColors(roles, ground, tile, f), g = tileGrid(tile, f);
-    // the banner covers y 2.9 .. 3.9; a side edge of a middle tile is red over exactly that stretch, measured from the bottom of the face
-    if (c > 0 && c < 6) {
-      assert.ok(Array.isArray(e.left), `f ${f}: stops along the side edge`);
-      assert.ok(e.left.some((s) => s.color === SCHEMES[0].bandFill), `f ${f}: red stretch`);
-      void g;
+    // an edge position t (0 at the bottom of the face, 1 at the top) is the texture row H (1 - t); its unit-grid y is read off the same mapping as the banner
+    const yAt = (t) => grid(g, c, 0, 0, g.H * (1 - t), 0, g.H * (1 - t)).top, faceBottom = yAt(0), faceTop = yAt(1);
+    for (const side of ["left", "right"]) {
+      const stops = e[side];
+      assert.ok(Array.isArray(stops), `f ${f} column ${c}: stops along the ${side} edge`);
+      let from = 0, reds = 0;
+      for (const s of stops) {
+        if (s.color === red) { reds++; near(yAt(from), Math.max(2.9, faceBottom), 2e-3, `f ${f} column ${c} ${side}: red starts at y 2.9`); near(yAt(Math.min(1, s.to)), Math.min(3.9, faceTop), 2e-3, `f ${f} column ${c} ${side}: red ends at y 3.9`); }
+        else assert.equal(s.color, ground, `f ${f} column ${c} ${side}: white outside the banner`);
+        from = s.to;
+      }
+      assert.equal(reds, 1, `f ${f} column ${c} ${side}: one red stretch`);
     }
   }
 });
