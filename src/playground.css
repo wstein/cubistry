@@ -498,3 +498,29 @@ footer {
 .thumbs li {
   position: relative;
 }
+/* Picture Cube size control: one segment per size, the sizes the engine cannot turn yet are disabled. */
+.size-control {
+  display: inline-flex;
+  border: 1px solid #cfd8d2;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.size-control button {
+  border: 0;
+  border-radius: 0;
+  padding: 6px 9px;
+  font-size: 12px;
+}
+.size-control button + button {
+  border-left: 1px solid #cfd8d2;
+}
+.size-control button[aria-checked="true"] {
+  background: #254f43;
+  color: white;
+  font-weight: 650;
+}
+.size-note {
+  margin: 0 0 12px;
+  font-size: 11px;
+  color: #4b6b60;
+}

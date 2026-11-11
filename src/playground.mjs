@@ -6,8 +6,37 @@ import { serializeMove } from "@cubistry/cube-mechanics";
 import { createDesign, ALLOWED_MOVES, UPLOAD_STYLE } from "./apps/playground/model.ts";
 import { initPictures } from "./apps/playground/pictures.ts";
 import { THEMES } from "./apps/playground/themes.ts";
+import { CUBE_SIZES, PLAYABLE_SIZES, resolveSize, sizeNote, sizeSearch } from "./apps/playground/size.ts";
 import { PlaygroundController } from "./apps/playground/controller.ts";
 const $ = (id) => document.getElementById(id);
+// Size control (2 to 7). Only the sizes in PLAYABLE_SIZES can be turned; the others are shown disabled, with a note.
+const choice = resolveSize(new URLSearchParams(location.search).get("size"));
+function showSize(size) {
+  for (const b of $("size-control").children) {
+    const on = Number(b.dataset.size) === size;
+    b.setAttribute("aria-checked", String(on));
+    b.tabIndex = on ? 0 : -1;
+  }
+  $("cube").dataset.size = String(size);
+}
+for (const n of CUBE_SIZES) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.setAttribute("role", "radio");
+  b.dataset.size = String(n);
+  b.textContent = `${n}×${n}`;
+  if (!PLAYABLE_SIZES.includes(n)) {
+    b.disabled = true;
+    b.title = "Not playable yet";
+  } else
+    b.addEventListener("click", () => {
+      showSize(n);
+      history.replaceState(null, "", sizeSearch(location.search, n) + location.hash);
+    });
+  $("size-control").append(b);
+}
+$("size-note").textContent = choice.note || sizeNote();
+showSize(choice.size);
 let controller, viewer;
 const sessions = new Map();
 // Picture themes are fetched when first selected (a set is at most about 820 KB of SVG, no single file over 210 KB), once even if

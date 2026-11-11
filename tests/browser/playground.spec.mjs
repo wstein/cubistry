@@ -317,3 +317,30 @@ test("untrusted picture assets fail startup explicitly without a canvas or enabl
   await expect(page.locator("canvas")).toHaveCount(0);
   await expect(page.locator("#apply")).toBeDisabled();
 });
+
+test("the size control offers 2 to 7, plays 2x2 only and keeps size= honest", async ({
+  page,
+}) => {
+  await ready(page);
+  await expect(page.locator("h1")).toHaveText("Picture Cube");
+  await expect(page).toHaveTitle(/Picture Cube/);
+  const radios = page.locator("#size-control [role=radio]");
+  await expect(radios).toHaveText(["2×2", "3×3", "4×4", "5×5", "6×6", "7×7"]);
+  await expect(radios.nth(0)).toBeEnabled();
+  await expect(radios.nth(0)).toHaveAttribute("aria-checked", "true");
+  for (const i of [1, 2, 3, 4, 5]) await expect(radios.nth(i)).toBeDisabled();
+  await expect(page.locator("#size-note")).toContainText("Sizes 3 to 7 are not playable yet");
+  await expect(page.locator("#cube")).toHaveAttribute("data-size", "2");
+  await radios.nth(0).click();
+  expect(new URL(page.url()).searchParams.get("size")).toBe("2");
+  // A valid size the engine cannot turn: the 2x2 stays, the page says why.
+  await page.goto("/playground.html?size=5");
+  await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
+  await expect(page.locator("#cube")).toHaveAttribute("data-size", "2");
+  await expect(page.locator("#size-note")).toContainText("5×5 is not playable yet");
+  await expect(page.locator("#size-control [aria-checked=true]")).toHaveText("2×2");
+  // An invalid value falls back with a note.
+  await page.goto("/playground.html?size=9");
+  await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
+  await expect(page.locator("#size-note")).toContainText("size= must be a whole number from 2 to 7");
+});
