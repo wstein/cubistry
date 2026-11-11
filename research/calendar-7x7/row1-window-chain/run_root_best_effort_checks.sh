@@ -3,7 +3,7 @@
 # Root month (root != first member of S), best-effort months and stages (free start, junction digests) for the chain checkers.
 #   run_root_best_effort_checks.sh JULIA JAVA CHAIN_JAR OUT
 # Every accept fixture of root_best_effort_cases.jl is accepted by Julia, Flix and the independent verifier with identical
-# Julia and Flix receipts; every reject fixture is rejected by all three at the named reason.
+# Julia and Flix receipts (GROUP=k/n runs a share of the fixtures); every reject fixture is rejected by all three at the named reason.
 set -euo pipefail
 here=$(cd -- "$(dirname -- "$0")" && pwd)
 julia_bin=${1:?Julia executable}; java_bin=${2:?Java executable}; jar=${3:?Chain verifier jar}; out=${4:?Unique workspace scratch directory}
@@ -28,9 +28,13 @@ run_all() { # dir -> sets JR FR IR (1 = rejected)
     unset CAL7_WINDOW_MONTHS CAL7_WINDOW_MONTHS_SHA256 CAL7_WINDOW_PRINT_SHA CAL7_ROOT_MONTH CAL7_JOIN_START CAL7_JOIN_END
     JR=$jr FR=$fr IR=$ir
 }
-printf 'case\tjulia\tflix\tindependent\n' > "$out/results.tsv"; na=0; nr=0
+printf 'case\tjulia\tflix\tindependent\n' > "$out/results.tsv"; na=0; nr=0; idx=0
+# GROUP=k/n runs every n-th fixture starting at k (0 <= k < n), so one run stays short; ONLY="name ..." selects by name.
+gk=${GROUP%%/*}; gn=${GROUP##*/}
 while IFS=$'\t' read -r name kind jreason freason ireason; do
+    idx=$((idx+1))
     [[ -z "${ONLY:-}" || " $ONLY " == *" $name "* ]] || continue
+    [[ -z "${GROUP:-}" || $((idx % gn)) == "$gk" ]] || continue
     d="$out/cases/$name"; run_all "$d"
     if [[ $kind == accept ]]; then
         [[ $JR == 0 && $FR == 0 && $IR == 0 ]] || { echo "$name rejected (julia=$JR flix=$FR independent=$IR): $(head -c 300 "$d/julia.err") $(head -c 300 "$d/flix.out") $(head -c 300 "$d/ind.err")" >&2; exit 1; }
@@ -43,7 +47,7 @@ while IFS=$'\t' read -r name kind jreason freason ireason; do
     fi
 done < "$out/cases/cases.tsv"
 # shape of the accepted receipts
-if [[ -z "${ONLY:-}" ]]; then
+if [[ -z "${ONLY:-}" && -z "${GROUP:-}" ]]; then
     d="$out/cases/root-edge-2037-05"
     grep -q $'^root\t2037\t5\t' "$d/julia.out"; [[ $(grep -c $'\tROOTEDGE$' "$d/julia.out") == 1 && $(grep -c $'\tROOTEDGE$' "$d/ind.out") == 1 && $(grep -c $'\tROOTEDGE$' "$d/flix.out") == 1 ]]
     grep -q $'^verdict\tSAT\tlegal-retained-state-window-chain\t21\t20$' "$d/julia.out"

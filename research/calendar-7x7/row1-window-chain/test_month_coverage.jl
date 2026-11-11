@@ -25,13 +25,14 @@ ctamper(t,j;kw...)=tamper(t,j;l=clist,p=cpin,start="2026-03",root="1980-01",kw..
     @test genC("tsv")==ctsv && genC("json")==cjson
     @test verify(joinpath(dir,"coverage-S2.tsv"),joinpath(dir,"coverage-S2.json"))[1]
     @test verify(joinpath(dir,"coverage-chain-2026-03.tsv"),joinpath(dir,"coverage-chain-2026-03.json");l=clist,p=cpin,start="2026-03",root="1980-01")[1]
-    @test occursin("headline\texact-gapless\t2026-05\t2037-01\t129\n",tsv)
-    @test occursin("headline\texact-gapless\t2026-03\t2037-01\t131\n",ctsv) && occursin("best_effort\t2\t",ctsv) && occursin("root\t1980-01\tstart\t2026-03",ctsv)
+    @test occursin("headline\tplanned-exact-gapless\t2026-05\t2037-01\t129\n",tsv)
+    @test occursin("headline\tplanned-exact-gapless\t2026-03\t2037-01\t131\n",ctsv) && occursin("best_effort\t2\t",ctsv) && occursin("root\t1980-01\tstart\t2026-03",ctsv)
     ok,e=tamper(replace(tsv,"2037-01\t129\n"=>"2037-01\t130\n";count=1),json);@test !ok && occursin("headline mismatch",e)
-    ok,e=tamper(replace(tsv,"exact-gapless\t2026-05"=>"exact-gapless\t2026-03";count=1),json);@test !ok && occursin("headline mismatch",e)
+    ok,e=tamper(replace(tsv,"planned-exact-gapless\t2026-05"=>"planned-exact-gapless\t2026-03";count=1),json);@test !ok && occursin("headline mismatch",e)
     ok,e=tamper(replace(tsv,"run\t2037-03\t2043-01\t71"=>"run\t2037-03\t2043-01\t70";count=1),json);@test !ok && occursin("runs mismatch",e)
     ok,e=tamper(replace(tsv,r"gap\t2043-02[^\n]*\n"=>"";count=1),json);@test !ok
     ok,e=tamper(replace(tsv,"corner-2043-02-julia.tsv;corner-2043-02-flix.tsv"=>"corner-2043-02-julia.tsv";count=1),json);@test !ok && occursin("Julia and a Flix receipt",e)
+    ok,e=tamper(replace(tsv,"corner-2043-02-julia.tsv;corner-2043-02-flix.tsv"=>"corner-2043-02-julia.tsv;corner-2043-02-julia.tsv";count=1),json);@test !ok && occursin("distinct files",e)
     ok,e=tamper(replace(tsv,"corner-2043-02-flix.tsv"=>"corner-2043-02-nope.tsv";count=1),json);@test !ok && occursin("receipts exist",e)
     ok,e=tamper(replace(tsv,"corner-2043-02-julia.tsv;corner-2043-02-flix.tsv"=>"corner-2026-02-julia.tsv;corner-2026-02-flix.tsv";count=1),json);@test !ok && occursin("receipt contains the gap month",e)
     base=mktempdir();ev2=joinpath(base,"month-list");mkpath(ev2);w37=joinpath(base,"window-2037-01");mkpath(w37)
@@ -45,10 +46,10 @@ ctamper(t,j;kw...)=tamper(t,j;l=clist,p=cpin,start="2026-03",root="1980-01",kw..
     ok,e=tamper(tsv,json;p=repeat("0",64));@test !ok && occursin("month list pin",e)
     @test_throws ProcessFailedException genS2("tsv";p=repeat("0",64))
     st=tempname();write(st,"month\tstatus\tevidence\n2026-07\tunknown\tx\n");@test_throws ProcessFailedException genS2("tsv";status=st)
-    @test occursin("headline\texact-gapless\t2026-05\t2037-01\t129",genS2("tsv";last="2043-12"))
+    @test occursin("headline\tplanned-exact-gapless\t2026-05\t2037-01\t129",genS2("tsv";last="2043-12"))
     # the start month is a parameter: from 2026-03 the headline grows to 131 months and only 2026-01 and 2026-02 are before_start
     t3=genS2("tsv";start="2026-03");j3=genS2("json";start="2026-03")
-    @test occursin("headline\texact-gapless\t2026-03\t2037-01\t131\n",t3) && occursin("before_start\t2\n",t3)
+    @test occursin("headline\tplanned-exact-gapless\t2026-03\t2037-01\t131\n",t3) && occursin("before_start\t2\n",t3)
     d3=mktempdir();write(joinpath(d3,"c.tsv"),t3);write(joinpath(d3,"c.json"),j3)
     @test verify(joinpath(d3,"c.tsv"),joinpath(d3,"c.json");start="2026-03")[1]
     ok,e=verify(joinpath(d3,"c.tsv"),joinpath(d3,"c.json");start="2026-05");@test !ok && occursin("list line",e)
@@ -66,7 +67,7 @@ ctamper(t,j;kw...)=tamper(t,j;l=clist,p=cpin,start="2026-03",root="1980-01",kw..
     l2=tempname();write(l2,"2026-05\n2026-06\n");p2=sha(l2);bl=tempname()
     write(bl,"month\tstatus\twrong_cells\tevidence\n2026-06\tbest_effort\t4,4\tfixture-best-effort-center-julia.tsv;fixture-best-effort-center-flix.tsv\n")
     t4=gen("tsv",l2,p2,joinpath(dir,"status-none.tsv"),"2026-06","2026-05","2026-05",bl);j4=gen("json",l2,p2,joinpath(dir,"status-none.tsv"),"2026-06","2026-05","2026-05",bl)
-    @test occursin("headline\texact-gapless\t2026-05\t2026-05\t1\n",t4) && occursin("best_effort\t2026-06\t2026-06\t1\tbest_effort\twrong=4,4",t4)
+    @test occursin("headline\tplanned-exact-gapless\t2026-05\t2026-05\t1\n",t4) && occursin("best_effort\t2026-06\t2026-06\t1\tbest_effort\twrong=4,4",t4)
     d4=mktempdir();write(joinpath(d4,"c.tsv"),t4);write(joinpath(d4,"c.json"),j4)
     @test verify(joinpath(d4,"c.tsv"),joinpath(d4,"c.json");l=l2,p=p2)[1]
     ok,e=verify(joinpath(d4,"c.tsv"),joinpath(d4,"c.json");l=l2,p=p2)  # unchanged: accepted

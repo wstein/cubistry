@@ -10,7 +10,7 @@ rd(f)=read(joinpath(dir,f),String)
 function verify(stages,ev,summary)
     err=IOBuffer();ok=success(pipeline(`$julia --startup-file=no $(joinpath(@__DIR__,"verify_stage_coverage.jl")) $stages $ev $summary`;stderr=err,stdout=devnull));ok,String(take!(err))
 end
-function workdir(;edit=identity)       # copy of the receipts; edit(name,text) may change them
+function workdir(;edit=(f,t)->t)       # copy of the receipts; edit(name,text) may change them
     d=mktempdir()
     for f in ("stage-A-julia.tsv","stage-A-flix.tsv","stage-B-julia.tsv","stage-B-flix.tsv");write(joinpath(d,f),edit(f,rd(f)));end
     write(joinpath(d,"stages.tsv"),rd("stages.tsv"));d
@@ -41,6 +41,14 @@ summary_of(d)=stage_summary(joinpath(d,"stages.tsv"),d)
     # a best-effort stage is not exact: no composition across it
     d=workdir(edit=(f,t)->startswith(f,"stage-B") ? replace(replace(t,r"(?m)^verdict\tSAT"=>"verdict\tBEST_EFFORT"),r"(?m)^status\texact\t\d+\tbest_effort\t0$"=>"status\texact\t18\tbest_effort\t1") : t);s=summary_of(d)
     @test occursin("not_exact_gapless",s) && !occursin("composed",s)
+    # a free-start stage that is not joined to a predecessor is not anchored at the identity pose
+    d=workdir(edit=(f,t)->startswith(f,"stage-B") ? replace(t,startB=>fake) : t);s=summary_of(d)
+    @test occursin("free_single\t2026-06\t2028-01\t20\tB\n",s) && !occursin("\nsingle\t2026-06",s)
+    @test !occursin("free_",want)                                                        # joined to A: one run anchored at A
+    # the Julia and Flix receipt of a stage must be two different files
+    d=workdir();write(joinpath(d,"stages.tsv"),"A\tstage-A-julia.tsv\tstage-A-julia.tsv\nB\tstage-B-julia.tsv\tstage-B-flix.tsv\n")
+    @test_throws AssertionError summary_of(d)
+    ok,e=verify(joinpath(d,"stages.tsv"),d,joinpath(dir,"stage-summary.tsv"));@test !ok && occursin("receipts are one file",e)
     # a bridge edge makes a stage not gapless
     d=workdir(edit=(f,t)->startswith(f,"stage-A") ? replace(t,r"(?m)^(edge\t1\t[^\n]*\tPASS)$"=>s"\1\tBRIDGE") : t);@test occursin("A\t2026-05\t2026-06\t2\tSAT\tnot_exact_gapless",summary_of(d))
     # a summary that claims composition across a mismatch is rejected by the verifier
