@@ -19,6 +19,7 @@ import { drawFontSticker, nameLabelLayout } from "../src/apps/calendar7/font-art
 import { SCHEMES } from "../src/apps/calendar7/schemes.ts";
 import { STICKERS, applyMoves } from "../src/apps/calendar7/engine.ts";
 import { parseState } from "../src/apps/calendar7/graph.ts";
+import { layerProfileFor } from "../src/apps/calendar7/viewer.ts";
 
 const near = (a, b, eps = 1e-9, what = "") => assert.ok(Math.abs(a - b) <= eps, `${what} ${a} != ${b}`);
 const F = 1.8;
@@ -248,4 +249,18 @@ test("names print on the profile: every layer turn (21 generators x 3 exponents,
     n++;
   }
   assert.equal(n, 63);
+});
+
+test("viewer profile: the bevel radius is the preset 0.055 on a body of every size (not scaled with the cubie)", () => {
+  const profile = layerProfileFor("names");
+  assert.deepEqual(profile.widths, layerWidthsFor(7));
+  assert.equal(layerProfileFor("standard"), undefined);
+  for (const cell of [[1, 1, 1], [1.8, 1, 1], [1, 1.8, 1.8], [1.8, 1.8, 1.8]]) {
+    const g = profile.body(cell), p = g.parameters;
+    assert.equal(p.radius, PRESENTATION_PRESET.bodyRadius, `radius of ${cell}`);
+    near(p.width, cell[0] - NAMES_GAP, 1e-12); near(p.height, cell[1] - NAMES_GAP, 1e-12); near(p.depth, cell[2] - NAMES_GAP, 1e-12);
+    g.computeBoundingBox();
+    const box = g.boundingBox;
+    near(box.max.x - box.min.x, cell[0] - NAMES_GAP, 1e-6);
+  }
 });

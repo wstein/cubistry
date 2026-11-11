@@ -166,7 +166,7 @@ test("core: centered, radius from the whole edge (N - 2) + 2 f, with the profile
   }
 });
 
-test("sticker meshes lie on the face of their box and cover it in proportion (1 x f on a ring piece); disposal frees the sized bodies", () => {
+test("sticker meshes lie on the face of their box and cover it in proportion (1 x f on a ring piece)", () => {
   const widths = thickOuterLayerWidths(7, 1.8), { parent, fr, scene } = build(7, widths);
   const s = fr.find((x) => x.p.join() === "0,3,3" && x.n.join() === "0,0,1"); // ring piece on the front face: 1 wide, 1.8 tall
   let mesh;
@@ -280,4 +280,15 @@ test("miter in the scene with the profile: the ring piece (1 x 1.8 x 1.8) and th
   const g = body([1, 1.8, 1.8]);
   assert.equal(cutFaceEdges(0, [null, null, WHITE, null, RED, null], faceUvAxes(g)).length, 2);
   assert.ok(paintCutPattern(two).length > 0);
+});
+
+test("disposal: every body geometry the profile factory made (one per cell size) is disposed with the scene", () => {
+  const widths = thickOuterLayerWidths(7, 1.8), made = [], disposed = new Set();
+  const recording = (cell) => { const g = body(cell); g.addEventListener("dispose", () => disposed.add(g)); made.push(g); return g; };
+  const fr = frames(7), parent = new THREE.Group(), basic = new THREE.MeshStandardMaterial();
+  const scene = new PhysicalCubeScene(parent, fr, new Map(fr.map((s) => [s.id, basic])), basic, 1, { ...createPresentationGeometry(), body: unitBody() }, new Map(), { layers: { widths, body: recording } });
+  assert.equal(made.length, 7, "one geometry per cell size of a surface cubie: f or 1 in each axis, not 1 x 1 x 1");
+  assert.equal(disposed.size, 0);
+  scene.dispose();
+  assert.equal(disposed.size, made.length, "all sized bodies are disposed");
 });

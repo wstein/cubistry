@@ -63,7 +63,7 @@ function lightGeometry(layout: Layout) {
  * Layer profile of a layout (the names layout: thick outer layers of the 7x7): the widths and the body geometry of a cubie
  * of a given cell (its layer widths) with the 0.01 mm gap and the preset bevel. The standard layout has none (unit pitch).
  */
-function layerProfileFor(layout: Layout): LayerProfile | undefined {
+export function layerProfileFor(layout: Layout): LayerProfile | undefined {
   const widths = layerWidthsOf(layout);
   if (!widths) return undefined;
   return { widths, body: (cell) => { const [x, y, z] = namesBodySize(cell); return new RoundedBoxGeometry(x, y, z, 1, PRESENTATION_PRESET.bodyRadius); } };
