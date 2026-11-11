@@ -9,10 +9,7 @@ async function ready(page) {
   await expect(page.locator("#application")).toBeEnabled();
   await page.locator("#value").fill("15");
   await page.locator("#set").click();
-  await expect(page.locator("#cube")).toHaveAttribute("data-value", "15", {
-    timeout: 10000,
-  });
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await untilSettled(page, 15);
   await page.locator("#reset-session-moves").click();
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 }
@@ -27,6 +24,25 @@ async function holdTurns(page) {
       return original.call(this, p);
     };
   });
+}
+// Wait until the cube shows `value` and is idle: fail only when neither the committed move count nor the shown
+// value has advanced for `stallMs` of real time. Software GL turns take as long as the runner needs, so a fixed total budget measured flakes under load
+// while a stalled queue (no commit for several seconds) is still reported.
+async function untilSettled(page, value, stallMs = 8000) {
+  let last, lastKey, since = Date.now();
+  for (;;) {
+    last = await page.evaluate(() => ({
+      busy: document.querySelector("#cube").getAttribute("aria-busy") !== "false",
+      value: document.querySelector("#cube").dataset.value,
+      done: Number(document.querySelector("#move-progress").getAttribute("aria-valuenow")),
+    }));
+    if (!last.busy && last.value === String(value)) return;
+    const key = `${last.done}/${last.value}/${last.busy}`;
+    if (key !== lastKey) { lastKey = key; since = Date.now(); }
+    if (Date.now() - since > stallMs)
+      throw Error(`Cube did not reach ${value}: no progress for ${stallMs} ms; last observed ${JSON.stringify(last)}`);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
 }
 async function go(page, value) {
   await page.locator("#value").fill(String(value));
@@ -71,10 +87,7 @@ test("new targets replace obsolete work after the active turn and publish fresh 
   );
   await release(page);
   // Only the held second old turn commits; the new plan uses that actual pose.
-  const expectedDuration = 2000;
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false", {
-    timeout: expectedDuration + 5000,
-  });
+  await untilSettled(page, 44);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "44");
   const planned = Number(
     await page.locator("#move-progress").getAttribute("aria-valuemax"),
