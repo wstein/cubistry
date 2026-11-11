@@ -31,6 +31,11 @@ export interface ModeMeta {
   group: AppGroup;
   /** Repository-relative path of the documentation page of this mode. */
   help: string;
+  /**
+   * Canonical keys (see PARAM_SPECS in param-specs.ts) of the setup parameters this mode owns. They are dropped from
+   * the URL when the user switches to an app that does not own them. Global flags are not listed here.
+   */
+  params?: readonly string[];
 }
 
 /**

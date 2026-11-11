@@ -14,6 +14,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "H · M · S",
     group: "apps",
     help: "docs/LIVE_CLOCK.md",
+    params: ["lettering", "hours-speed", "minutes-speed", "seconds-speed"],
   },
   {
     id: "ms-timer",
@@ -23,6 +24,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "Min · Sec · 1/10s",
     group: "apps",
     help: "docs/MS_TIMER.md",
+    params: ["autoplay"],
   },
   {
     id: "hm-clock",
@@ -32,6 +34,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "H · M",
     group: "cubes",
     help: "docs/APPLICATIONS.md",
+    params: ["pad"],
   },
   {
     id: "tenth",
@@ -41,6 +44,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "1/10 Sec (0–9)",
     group: "cubes",
     help: "docs/APPLICATIONS.md",
+    params: ["dir", "speed", "display", "marker", "autoplay"],
   },
   {
     id: "counter",
@@ -50,6 +54,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "0–99 Counter",
     group: "cubes",
     help: "docs/COUNTER_USAGE.md",
+    params: ["val", "pad", "print", "autoplay"],
   },
   {
     id: "timer",
@@ -59,6 +64,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "60-Min Timer",
     group: "cubes",
     help: "docs/WORKSHOP_TIMER.md",
+    params: ["duration", "mode", "timer-speed", "autoplay"],
   },
   {
     id: "five-second-timer",
@@ -68,6 +74,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "5-Sec Timer",
     group: "cubes",
     help: "docs/FIVE_SECOND_TIMER.md",
+    params: ["duration", "mode", "timer-speed", "autoplay"],
   },
   {
     id: "hsm-counter",
@@ -77,6 +84,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "H/M/S (00–59)",
     group: "cubes",
     help: "docs/HSM_COUNTER.md",
+    params: ["val", "unit", "dir", "range", "speed", "lettering", "pad", "autoplay"],
   },
   {
     id: "ms-counter",
@@ -86,6 +94,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "M/S (00–59)",
     group: "cubes",
     help: "docs/MS_COUNTER.md",
+    params: ["val", "unit", "dir", "speed", "lettering", "pad", "autoplay"],
   },
   {
     id: "hm-one-cube",
@@ -95,6 +104,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "H/M One-Cube",
     group: "cubes",
     help: "docs/HM_ONE_CUBE_COUNTER.md",
+    params: ["val", "unit", "dir", "range", "speed", "lettering", "pad", "autoplay"],
   },
   {
     id: "calendar7",
@@ -104,5 +114,6 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "7x7 Calendar",
     group: "cubes",
     help: "docs/CALENDAR_7X7.md",
+    params: ["year", "month", "outer"],
   },
 ];
