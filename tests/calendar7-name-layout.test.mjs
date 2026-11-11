@@ -25,7 +25,7 @@ const tileOf = (k) => (k === 0 ? { w: F, h: F, band: { l: BAND, r: 0, t: BAND, b
 /** Room of a tile in drawing px from the center of its unit cell: texture edge, or the edge of the red banner on a side with a band; up/down: the red banner. */
 const edge = (k) => {
   const g = tileGrid(tileOf(k)), kx = faceTransform(tileOf(k)).kx, b = monthBanner();
-  return { left: k === 0 ? (0.5 + NAMES_MONTH_SIDE_BAND) * PPU : g.cx / kx, right: (g.W - g.cx) / kx, top: b.top * PPU, bottom: -b.bottom * PPU };
+  return { left: k === 0 ? (F - 0.5 - NAMES_MONTH_SIDE_BAND) * PPU : g.cx / kx, right: (g.W - g.cx) / kx, top: b.top * PPU, bottom: -b.bottom * PPU };
 };
 
 /** Absolute x (drawing px, the first seam at 0) of every letter box of a month, per tile, plus the seam positions: every tile is one unit wide. */
@@ -34,7 +34,7 @@ function month(font, word) {
   const tiles = word.map((label, k) => {
     const center = (k - 0.5) * PPU;
     const boxes = nameLabelLayout(label, font, "face").map((l) => ({ ...l, x0: center + l.box.x0 - 96, x1: center + l.box.x1 - 96 }));
-    return { label, center, boxes, lo: center - (k === 0 ? 0.5 + NAMES_MONTH_SIDE_BAND : 0.5) * PPU, hi: center + PPU / 2 }; // the banner starts 0.4 inside the cube edge
+    return { label, center, boxes, lo: center - (k === 0 ? F - 0.5 - NAMES_MONTH_SIDE_BAND : 0.5) * PPU, hi: center + PPU / 2 }; // the banner starts 0.4 inside the cube edge
   });
   return { tiles, seams };
 }
@@ -179,7 +179,7 @@ test("name layout: a font whose tiles do not fit at the weekday size gets a smal
 });
 
 test("name layout: the glyphs fit the height of the red banner (a tall font gets a smaller size)", () => {
-  const font = synth(1, 3), t = nameFaceTable(font), tall = Math.max(...Object.values(font.glyphs).map((g) => g.bottom - g.top)), banner = monthBanner().height * PPU;
+  const font = synth(1, 4), t = nameFaceTable(font), tall = Math.max(...Object.values(font.glyphs).map((g) => g.bottom - g.top)), banner = monthBanner().height * PPU;
   assert.ok(t.size < 96 && t.blocked.length === 0, `size ${t.size}`);
   assert.ok(tall * t.size + 3 <= banner + 1e-9, `glyph height ${tall * t.size} plus the two 1.5 px margins within the banner ${banner}`);
   assert.ok(tall * 96 + 3 > banner, "the size of the shipped Noto would clip");
@@ -193,5 +193,5 @@ test("name layout: the month size is never below the weekday size when the weekd
 
 test("name layout: no size fits a font with huge glyphs", () => {
   assert.throws(() => nameFaceTable(synth(20, 1)), /no name size fits/);
-  assert.throws(() => nameFaceTable(synth(1, 30)), /no name size fits/);
+  assert.throws(() => nameFaceTable(synth(1, 60)), /no name size fits/);
 });

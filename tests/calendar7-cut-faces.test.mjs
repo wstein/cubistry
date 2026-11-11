@@ -261,7 +261,7 @@ import { NAMES_BODY_WIDTH, NAMES_GAP, layerWidthsOf, unitGridTileOf } from "../s
 import { SCHEMES, namesGround } from "../src/apps/calendar7/schemes.ts";
 import { parseState } from "../src/apps/calendar7/graph.ts";
 import { faceEdgeFills, faceFills } from "../src/apps/calendar7/viewer.ts";
-test("names print: the cut face under every month row ring cubie is one flat white (the banner has a white strip of 0.5 below it), the previous red is gone", () => {
+test("names print: the cut face under every month row ring cubie is one flat white (the banner has a white strip of 0.2 below it), the previous red is gone", () => {
   const { printing, pose } = parseState(JSON.parse(readFileSync("public/calendar7/names/state.v1.json", "utf8")));
   const n = printing.text.length, frames = Array.from({ length: n }, (_, i) => ({ id: i + 1, cubie: printing.piece[i], p: [...pose.pos.slice(3 * i, 3 * i + 3)], n: [...pose.normal.slice(3 * i, 3 * i + 3)], up: [...pose.up.slice(3 * i, 3 * i + 3)] }));
   const tiles = frames.map((f) => unitGridTileOf(f.p, f.n, f.up, layerWidthsOf("names")));
@@ -287,13 +287,13 @@ test("names print: the cut face under every month row ring cubie is one flat whi
   const edges = faceEdgeFills(printing, scheme, "names", tiles);
   assert.ok(edges.size >= 7, `edge colors for ${edges.size} banner stickers`);
   assert.equal(faceEdgeFills(printing, scheme, "standard", tiles).size, 0);
-  for (let i = 0; i < n; i++) { // beside the banner: white strip 0.5 / red 1.2 / white strip 0.1 of the 1.8 tall cubie, from the bottom up
+  for (let i = 0; i < n; i++) { // beside the banner: white strip 0.2 / red 1.4 / white strip 0.2 of the 1.8 tall cubie, from the bottom up
     if (printing.ink[i] !== "month" && printing.ink[i] !== "band") continue;
     const e = edges.get(i + 1);
     if (!Array.isArray(e.left) && !Array.isArray(e.right)) continue; // a month tile on another face of the print: no thick row, no strips beside it
     for (const side of [e.left, e.right].filter(Array.isArray)) { // the outer edge of a corner tile is the white band: a plain color
       assert.deepEqual(side.map((x) => x.color), [namesGround(scheme.dayFill), scheme.bandFill, namesGround(scheme.dayFill)]);
-      near(side[0].to, 0.5 / 1.8, 0.03); near(side[1].to, 1 - 0.1 / 1.8, 0.03); assert.equal(side[2].to, 1);
+      near(side[0].to, 0.2 / 1.8, 0.03); near(side[1].to, 1 - 0.2 / 1.8, 0.03); assert.equal(side[2].to, 1);
     }
     assert.equal(e.top, namesGround(scheme.dayFill)); assert.equal(e.bottom, namesGround(scheme.dayFill));
   }});

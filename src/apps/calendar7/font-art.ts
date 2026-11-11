@@ -78,7 +78,7 @@ const OUTER = outerLayerWidth(CALENDAR7_SIZE);
 const roomOf = (anchor: -1 | 0 | 1): { left: number; right: number } => {
   const first = anchor === 1, tile: FaceTile = first ? { w: OUTER, h: OUTER, band: { l: OUTER - 1, r: 0, t: OUTER - 1, b: 0 } } : { w: 1, h: OUTER, band: { l: 0, r: 0, t: OUTER - 1, b: 0 } };
   const g = tileGrid(tile), k = faceTransform(tile).kx, ppu = namePxPerUnit();
-  return { left: first ? (0.5 + NAMES_MONTH_SIDE_BAND) * ppu : g.cx / k, right: (g.W - g.cx) / k }; // the first tile: the banner starts 0.4 inside the cube edge, 0.9 from the cell center
+  return { left: first ? (OUTER - 0.5 - NAMES_MONTH_SIDE_BAND) * ppu : g.cx / k, right: (g.W - g.cx) / k }; // the first tile: the banner starts 0.4 inside the cube edge, 0.9 from the cell center
 };
 
 /** Natural geometry of a label in em: summed ink widths and the natural ink gaps between neighbors. */
