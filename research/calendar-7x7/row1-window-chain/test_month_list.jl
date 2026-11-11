@@ -16,10 +16,11 @@ end
     @test_throws AssertionError read_month_list(p,repeat("0",64))                       # wrong list hash
     @test_throws AssertionError read_month_list(p,uppercase(sha(t)))                     # hash must be lowercase hex
     for bad in ("2026-06\n2026-05\n","2026-05\n2026-05\n","2026-05\r\n2026-06\r\n","2026-05\n2026-06","2026-05\n\n2026-06\n",
-                "2025-12\n2026-01\n","2026-13\n","2026-5\n","","2100-01\n2100-02\n","2026-05 \n"," 2026-05\n","2026-05\n2026-06\n\n")
+                "1899-12\n1900-01\n","2026-13\n","2026-5\n","","2100-01\n2100-02\n","2026-05 \n"," 2026-05\n","2026-05\n2026-06\n\n")
         q=listfile(bad);@test_throws AssertionError read_month_list(q,sha(bad))
     end
     @test read_month_list(listfile("2026-01\n2100-01\n"),sha("2026-01\n2100-01\n"))==[(2026,1),(2100,1)]
+    @test read_month_list(listfile("1900-01\n1980-01\n2026-01\n"),sha("1900-01\n1980-01\n2026-01\n"))==[(1900,1),(1980,1),(2026,1)]    # backward stages reach 1900
 end
 @testset "window month list in coupled_goals" begin
     t="2026-05\n2026-06\n2026-08\n2027-01\n";p=listfile(t)
