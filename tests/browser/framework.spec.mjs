@@ -1,13 +1,16 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
+import { booted } from "../helpers/settle.mjs";
 const design = JSON.parse(
   readFileSync(new URL("../../public/counter-design.v2.json", import.meta.url)),
 );
 async function ready(page) {
   await page.goto("/counter.html");
+  // aria-busy="false" is published before main.mjs sets `ready`; a "change" dispatched or a click made in
+  // that window is ignored or hits a disabled control. Wait for the booted state (see settle.mjs).
+  await booted(page);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
 }
 for (const [field, value] of [
   ["schema", "bad"],
@@ -166,6 +169,12 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
           },
         ],
       };
+      // loadAssets and the Counter replacement each abort after a 10 s wall-clock budget. This test holds the
+      // fetch until the Counter replacement has closed assets, which takes several seconds in software GL
+      // and more on a loaded runner, so the budget would fire first ("signal timed out", or a failed Counter
+      // that stays disabled). The test is about the transaction, not about time: use signals that never fire.
+      const originalTimeout = AbortSignal.timeout;
+      AbortSignal.timeout = () => new AbortController().signal;
       const original = ImageBitmap.prototype.close;
       const createBitmap = window.createImageBitmap;
       const owned = new Map();
@@ -207,6 +216,7 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
           };
         }
       } finally {
+        AbortSignal.timeout = originalTimeout;
         ImageBitmap.prototype.close = original;
         window.createImageBitmap = createBitmap;
         delete window.__counterBitmapClosed;
