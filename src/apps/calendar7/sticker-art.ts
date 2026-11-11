@@ -98,7 +98,7 @@ export type TileEdgeColors = Partial<Record<"left" | "right" | "top" | "bottom",
  * The colors along the four edges of a tile of the names layout, as drawn by `paintTileGround` (what a cut face next to the edge
  * must show): a side edge runs bottom to top, a top or bottom edge left to right. An edge that lies in the white margin is
  * the ground, an edge along the fill is changing between the ground and the fill where the fill rectangle (the unit cell or the
- * banner) starts and ends. null when the whole tile edge is the fill (a tile without bands or banner): the face color applies.
+ * banner) starts and ends; the rounded banner corner is not part of it (the banner rectangle reaches a tile edge only at an outer factor from 1.3 to 1.6, reachable by `?outer` only, where the corner pixels at the edge are ground). null when the whole tile edge is the fill (a tile without bands or banner): the face color applies.
  */
 export function tileEdgeColors(roles: TileRoles, ground: string, tile: FaceTile, outer: number = outerLayerWidth(CALENDAR7_SIZE)): TileEdgeColors | null {
   const g = tileGrid(tile, outer), banner = isBannerClass(roles.cls), r = banner ? g.banner : g.cell;
