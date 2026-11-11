@@ -6,7 +6,7 @@ import { test, expect } from "@playwright/test";
 const ROOT = "#calendar7-root";
 const at = (page, month) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-month", month, { timeout: 30000 });
 const row1 = (page) => page.locator(".c7-sheet tr:first-child td .c7-cell-text").allTextContents();
-const NOTICE = "The names layout covers May 2026 to January 2028. Showing the standard layout.";
+const NOTICE = "Display only: no move sequence for this date (print B).";
 
 test("the layout control switches row 1 between the standard letters and the month name, and rebuilds the cube from the new print", async ({ page }) => {
   const errors = [];
@@ -33,7 +33,7 @@ test("the layout control switches row 1 between the standard letters and the mon
   expect(errors).toEqual([]);
 });
 
-test("outside the window the notice is visible and accessible and the standard layout is shown without errors", async ({ page }) => {
+test("outside the window the names layout shows the month from print B, display only, with the notice and no standard fallback; stepping into the window shows the chain", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));
   await page.goto("/index.html?app=calendar7&year=2030&month=5&layout=names");
@@ -41,16 +41,17 @@ test("outside the window the notice is visible and accessible and the standard l
   const notice = page.getByRole("status").filter({ hasText: NOTICE });
   await expect(notice).toBeVisible();
   await expect(notice).toHaveText(NOTICE);
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "standard");
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names");
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "state");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout-mode", "names");
   await expect(page.getByRole("combobox", { name: "Cube layout", exact: true })).toHaveValue("names");
-  // Stepping from the fallback month into the window: January 2028 shows the names layout and no notice.
-  await page.goto("/index.html?app=calendar7&year=2028&month=2&layout=names");
-  await at(page, "2028-02");
-  await expect(notice).toBeVisible();
-  await page.locator('a[data-nav="previous"]').click();
+  expect(await row1(page)).toEqual(["MA", "Y", "", "", "", "", ""]);
+  // The date form moves into the window: January 2028 is on the chain (names layout, Previous and Next, no notice).
+  await page.getByLabel("Year").fill("2028");
+  await page.getByLabel("Month").selectOption("1");
+  await page.getByRole("button", { name: "Show" }).click();
   await at(page, "2028-01");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names", { timeout: 30000 });
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "off", { timeout: 30000 });
   await expect(notice).toBeHidden();
   expect(await row1(page)).toEqual(["J", "ANU", "ARY", "", "", "", ""]);
   expect(errors).toEqual([]);

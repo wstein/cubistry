@@ -374,7 +374,7 @@ class El {
   }
 }
 function fakeRoot() {
-  const listeners = { click: new Set(), change: new Set() };
+  const listeners = { click: new Set(), change: new Set(), submit: new Set() };
   const els = new Map();
   const view = new El();
   const live = new El();
