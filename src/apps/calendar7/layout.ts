@@ -12,8 +12,18 @@ export const LAYOUT_PARAM = "layout";
 
 export const parseLayout = (value: string | null | undefined): Layout => (value === "names" ? "names" : "standard");
 
-/** Shown when the names layout is selected but the displayed month is outside its window. */
-export const NAMES_NOTICE = "The names layout covers May 2026 to January 2028. Showing the standard layout.";
+/**
+ * Any-date selection (not a layout of its own: the front is rendered as `names`). `?layout=names-any` shows print B
+ * (public/calendar7/names-any) for every date, display only. The `names` layout uses the same display for every month
+ * outside its chain window. `parseLayout` never returns it; the dropdown lists the option only while it is selected through the URL.
+ */
+export type LayoutMode = Layout | "names-any";
+export const NAMES_ANY_MODE = "names-any";
+export const parseLayoutMode = (value: string | null | undefined): LayoutMode => (value === NAMES_ANY_MODE ? NAMES_ANY_MODE : parseLayout(value));
+export const NAMES_ANY_LABEL = "Names (any date, print B, display only)";
+export const NAMES_ANY_LOAD_NOTICE = "The names layout data for any date could not be loaded. Showing the standard layout.";
+/** Shown for every date displayed from print B (the names layout outside its chain window, and `names-any`). */
+export const ANY_DISPLAY_ONLY_NOTICE = "Display only: no move sequence for this date (print B).";
 /** Shown when the names data cannot be loaded. */
 export const NAMES_LOAD_NOTICE = "The names layout data could not be loaded. Showing the standard layout.";
 
