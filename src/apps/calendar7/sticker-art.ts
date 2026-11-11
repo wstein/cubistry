@@ -453,3 +453,67 @@ export function drawFace(
     ctx.fillRect(r.x, r.y, r.w, r.h);
   }
 }
+
+/** The cell a print cannot show (best effort, anydate.ts): grey field, hatching, strike-through, red frame crossed out. */
+export const WRONG_CELL = { field: "#c6c6c6", hatch: "#5b5b5b", strike: "#262626", frame: "#d0021b", halo: "#ffffff" } as const;
+/** Minimal 2D context the drawing needs (a recording fake in the tests). */
+export interface WrongCellContext {
+  fillStyle: string | CanvasGradient | CanvasPattern;
+  strokeStyle: string | CanvasGradient | CanvasPattern;
+  lineWidth: number;
+  lineCap: CanvasLineCap;
+  save(): void;
+  restore(): void;
+  fillRect(x: number, y: number, w: number, h: number): void;
+  strokeRect(x: number, y: number, w: number, h: number): void;
+  beginPath(): void;
+  moveTo(x: number, y: number): void;
+  lineTo(x: number, y: number): void;
+  stroke(): void;
+  rect(x: number, y: number, w: number, h: number): void;
+  clip(): void;
+}
+/** Number of hatch lines across a tile of the width `w` (one per `w / HATCH_LINES`). */
+export const HATCH_LINES = 10;
+/**
+ * Draws the differing cell over the whole texture `w` x `h` of its cubie face: the texture turns with the cube, so the mark
+ * is projected with the face. Order: grey field, 45 degree hatching, a dark strike-through of the field, the red frame
+ * (with a white halo so it reads on dark schemes too) and a red strike-through of the frame.
+ */
+export function drawWrongCell(ctx: WrongCellContext, w: number, h: number): void {
+  const unit = Math.min(w, h);
+  ctx.save();
+  ctx.fillStyle = WRONG_CELL.field;
+  ctx.fillRect(0, 0, w, h);
+  ctx.beginPath();
+  ctx.rect(0, 0, w, h);
+  ctx.clip();
+  ctx.strokeStyle = WRONG_CELL.hatch;
+  ctx.lineWidth = Math.max(2, unit / 48);
+  ctx.beginPath();
+  const step = unit / HATCH_LINES;
+  for (let d = -h; d < w; d += step) {
+    ctx.moveTo(d, h);
+    ctx.lineTo(d + h, 0);
+  }
+  ctx.stroke();
+  ctx.lineCap = "round";
+  ctx.strokeStyle = WRONG_CELL.strike;
+  ctx.lineWidth = unit / 14;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(w, h);
+  ctx.stroke();
+  const inset = unit * 0.14;
+  const line = unit / 11;
+  for (const [color, width] of [[WRONG_CELL.halo, line * 1.9], [WRONG_CELL.frame, line]] as const) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.strokeRect(inset, inset, w - 2 * inset, h - 2 * inset);
+    ctx.beginPath();
+    ctx.moveTo(w - inset, inset);
+    ctx.lineTo(inset, h - inset);
+    ctx.stroke();
+  }
+  ctx.restore();
+}

@@ -7,7 +7,7 @@ import { revealPlayback, resetPlaybackVisibility } from "./playback-visibility.t
 import type { ModeInstance } from "../registry.ts";
 import { type DisplayTable, type Graph, namesWindowContains, parseDisplays, parseGraph, parseState, type Start } from "./graph.ts";
 import { type Layout, type LayoutMode, ANY_DISPLAY_ONLY_NOTICE, LAYOUT_PARAM, NAMES_ANY_LABEL, NAMES_ANY_LOAD_NOTICE, NAMES_ANY_MODE, NAMES_LOAD_NOTICE, parseLayoutMode } from "./layout.ts";
-import { type AnyData, type AnyState, chooseAnyMonth, parseAnyData, stateForDate } from "./anydate.ts";
+import { type AnyData, type AnyState, chooseAnyMonth, parseAnyData, stateForDate, wrongStickerIndices } from "./anydate.ts";
 import { anyDateModel, anyDatePageHtml } from "./anydate-view.ts";
 import { type Pose, type Printing, stateDigest } from "./engine.ts";
 import {
@@ -35,7 +35,7 @@ import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnaps
 /** The 3D scene the mount drives (src/apps/calendar7/viewer.ts; a fake in the tests). */
 export interface Stage extends StageView {
   /** Builds the cube of one print; `layout` selects the tile classes of the names layout (`band`, row 1 line). */
-  configure(printing: Printing, pose: Pose, surface?: Surface, layout?: Layout): void;
+  configure(printing: Printing, pose: Pose, surface?: Surface, layout?: Layout, wrong?: readonly number[]): void;
   setLabel(text: string): void;
   /** Color scheme by id (src/apps/calendar7/schemes.ts); an unknown id gives the default. Optional: a fake stage may omit it. */
   setScheme?(id: string | null | undefined): void;
@@ -149,7 +149,9 @@ export async function mountCalendar7(
   let anyFailed = false;
   /** True while the page shows a month from print B without a move sequence; `anyWanted` is the state the cube shows then (null: no cube). */
   let anyActive = false;
-  let anyWanted: Extract<AnyState, { kind: "state" }> | null = null;
+  let anyWanted: Extract<AnyState, { kind: "state" | "best-effort" }> | null = null;
+  /** The wrong stickers the cube was built with (best effort); another set means another build. */
+  let anyWrongKey = "";
   /** True while the cube is configured with print B for the any-date display (the player is then disposed). */
   let anyBound = false;
   let anyLabel = "";
@@ -479,7 +481,7 @@ export async function mountCalendar7(
     const state = choice.kind === "ok" ? stateForDate(data, choice.ym.year, choice.ym.month) : null;
     const model = anyDateModel(choice, state, today, standard.range);
     anyActive = true;
-    anyWanted = state?.kind === "state" ? state : null;
+    anyWanted = state?.kind === "state" || state?.kind === "best-effort" ? state : null;
     currentModel = model;
     if (threeD) {
       root.setAttribute("data-c7-layout", "names");
@@ -518,7 +520,8 @@ export async function mountCalendar7(
       if (failed || anyWanted !== target) return;
       const data = anyData as AnyData;
       const made = stage as Stage;
-      if (!anyBound) {
+      const wrong = target.kind === "best-effort" ? wrongStickerIndices(target.pose, target.wrong) : [];
+      if (!anyBound || anyWrongKey !== wrong.join()) {
         player?.dispose();
         player = null;
         activeWord = null;
@@ -526,8 +529,9 @@ export async function mountCalendar7(
         const wordBox = q("active-word"), activePanel = q("active-step");
         if (wordBox) wordBox.innerHTML = "";
         if (activePanel) activePanel.hidden = true;
-        made.configure(data.start.printing, data.start.pose, "face", "names");
+        made.configure(data.start.printing, data.start.pose, "face", "names", wrong);
         anyBound = true;
+        anyWrongKey = wrong.join();
       }
       made.show(target.pose);
       made.setLabel(`7x7 calendar cube showing ${anyLabel}, display only`);

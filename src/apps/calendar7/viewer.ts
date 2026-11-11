@@ -41,9 +41,9 @@ import {
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
 import { type ColorScheme, DEFAULT_SCHEME, namesGround, schemeById } from "./schemes.ts";
-import { bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, unitGridTileOf } from "./geometry.ts";
+import { CALENDAR7_SIZE, outerLayerWidth, bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, unitGridTileOf } from "./geometry.ts";
 import type { Layout } from "./layout.ts";
-import { drawFace, drawSticker, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileEdgeColors, tileRoles, type Surface } from "./sticker-art.ts";
+import { drawFace, drawSticker, drawWrongCell, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileEdgeColors, tileRoles, type Surface, WRONG_CELL, type WrongCellContext } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
@@ -76,9 +76,9 @@ export function layerProfileFor(layout: Layout): LayerProfile | undefined {
 const bodyFill = (scheme: ColorScheme, layout: Layout): string => (layout === "names" ? namesGround(scheme.dayFill) : scheme.dayFill);
 
 /** Fill of every printed tile (sticker id to color): what the exterior faces show and the cut faces next to them take (miter). */
-export function faceFills(printing: Printing, scheme: ColorScheme, layout: Layout): Map<number, string> {
+export function faceFills(printing: Printing, scheme: ColorScheme, layout: Layout, wrong: ReadonlySet<number> = new Set()): Map<number, string> {
   const fills = new Map<number, string>();
-  for (let i = 0; i < STICKERS; i++) fills.set(i + 1, tileRoles(scheme, printing.text[i], printing.ink[i], layout).fill);
+  for (let i = 0; i < STICKERS; i++) fills.set(i + 1, wrong.has(i) ? WRONG_CELL.field : tileRoles(scheme, printing.text[i], printing.ink[i], layout).fill);
   return fills;
 }
 
@@ -127,13 +127,17 @@ export class Calendar7Viewer implements StageView {
   private plastic: THREE.MeshPhysicalMaterial | null = null;
   /** A scheme was chosen during a move on a stickerless cube: the body color waits for the end of the move. */
   private bodyStale = false;
+  /** 0-based sticker indices drawn as the differing cell (best effort); empty for an exact state. */
+  private wrongIds: ReadonlySet<number> = new Set();
   /** The color scheme of the labels (`setScheme`); the default scheme until one is chosen. */
   private scheme: ColorScheme = DEFAULT_SCHEME;
   private font: LoadedFont | null = null;
   /** One entry per distinct texture of the current build: redrawn in place when the scheme changes. */
   /** Face tile of every sticker at the pose the cube was built from (undefined without a layer profile). */
   private tiles: (FaceTile | undefined)[] = [];
-  private art: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; text: string; ink: string; tile?: FaceTile }[] = [];
+  private art: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; text: string; ink: string; tile?: FaceTile; wrong?: boolean }[] = [];
+  /** Sticker meshes of the cells that differ from the board (best effort): their screen position is published as `data-c7-wrong`. */
+  private wrongMeshes: THREE.Object3D[] = [];
   /** Reused every sync: frames are rewritten in place, so a move allocates no frame objects. */
   private frames: { id: number; cubie: number; p: number[]; n: number[]; up: number[] }[] = [];
   private readonly tween = new MoveTween();
@@ -188,6 +192,7 @@ export class Calendar7Viewer implements StageView {
       this.dirty = false;
       this.syncExposure();
       this.renderer.render(this.scene, this.camera);
+      this.publishWrong();
     }
   }
 
@@ -230,6 +235,29 @@ export class Calendar7Viewer implements StageView {
     this.renderer.toneMappingExposure = this.layout === "names" ? namesExposure(this.scene, this.presentation.quaternion, this.camera) * plasticityGain(this.plasticity, this.renderer.shadowMap.enabled) : STANDARD_EXPOSURE;
   }
 
+  /**
+   * Test hook and proof for readers: the screen position of each differing cell (center and radius in CSS pixels of the
+   * canvas, and whether its face looks at the camera) as JSON in `data-c7-wrong`, updated with every drawn frame.
+   */
+  private publishWrong(): void {
+    if (!this.wrongMeshes.length) return;
+    this.scene.updateMatrixWorld();
+    const w = this.host.clientWidth, h = this.host.clientHeight;
+    const world = new THREE.Vector3(), normal = new THREE.Vector3(), quaternion = new THREE.Quaternion(), edge = new THREE.Vector3();
+    const right = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0).normalize();
+    const half = outerLayerWidth(CALENDAR7_SIZE) / 2;
+    const cells = this.wrongMeshes.map((mesh) => {
+      mesh.getWorldPosition(world);
+      normal.set(0, 0, 1).applyQuaternion(mesh.getWorldQuaternion(quaternion));
+      const facing = normal.dot(edge.copy(this.camera.position).sub(world)) > 0;
+      edge.copy(world).addScaledVector(right, half).project(this.camera);
+      const center = world.clone().project(this.camera);
+      const x = ((center.x + 1) / 2) * w, y = ((1 - center.y) / 2) * h;
+      return { id: mesh.userData.stickerId, x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10, r: Math.round(Math.abs(((edge.x + 1) / 2) * w - x) * 10) / 10, facing };
+    });
+    this.renderer.domElement.setAttribute("data-c7-wrong", JSON.stringify(cells));
+  }
+
   setLabel(text: string): void {
     this.renderer.domElement.setAttribute("aria-label", `${text}. Drag to rotate the cube.`);
   }
@@ -256,7 +284,7 @@ export class Calendar7Viewer implements StageView {
     if (!this.printing || !this.pose) return;
     this.bodyStale = true;
     for (const a of this.art) {
-      this.draw(a.canvas, a.text, a.ink, a.tile);
+      this.draw(a.canvas, a.text, a.ink, a.tile, a.wrong);
       a.texture.needsUpdate = true;
     }
     this.applyBodyColor();
@@ -267,7 +295,7 @@ export class Calendar7Viewer implements StageView {
   private applyBodyColor(): void {
     if (!this.bodyStale || this.tween.running || !this.printing || !this.pose || this.destroyed) return;
     this.cube?.setBodyColor(bodyFill(this.scheme, this.layout));
-    if (this.layout === "names") this.cube?.setFaceColors(faceFills(this.printing, this.scheme, this.layout), faceEdgeFills(this.printing, this.scheme, this.layout, this.tiles));
+    if (this.layout === "names") this.cube?.setFaceColors(faceFills(this.printing, this.scheme, this.layout, this.wrongIds), faceEdgeFills(this.printing, this.scheme, this.layout, this.tiles));
     this.bodyStale = false;
   }
 
@@ -275,11 +303,12 @@ export class Calendar7Viewer implements StageView {
   setFont(font: LoadedFont): void {
     if (this.destroyed || this.font === font) return;
     this.font = font;
-    for (const a of this.art) { this.draw(a.canvas, a.text, a.ink, a.tile); a.texture.needsUpdate = true; }
+    for (const a of this.art) { this.draw(a.canvas, a.text, a.ink, a.tile, a.wrong); a.texture.needsUpdate = true; }
     this.dirty = true;
   }
 
-  private draw(canvas: HTMLCanvasElement, text: string, ink: string, tile?: FaceTile): void {
+  private draw(canvas: HTMLCanvasElement, text: string, ink: string, tile?: FaceTile, wrong = false): void {
+    if (wrong) { drawWrongCell(canvas.getContext("2d") as unknown as WrongCellContext, canvas.width, canvas.height); return; }
     if (this.font) { drawFontSticker(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, this.font, this.scheme, this.surface, undefined, this.layout, tile); return; }
     if (this.surface === "face") { drawFace(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, undefined, this.scheme, this.layout, tile); return; }
     drawSticker(canvas.getContext("2d") as CanvasRenderingContext2D, text, ink, undefined, this.scheme, this.layout);
@@ -307,7 +336,7 @@ export class Calendar7Viewer implements StageView {
    * Builds the stickerless Calendar7 cube. The legacy surface argument is accepted but cannot restore stickers.
    * This rendering policy does not change the state schema or any other viewer.
    */
-  configure(printing: Printing, pose: Pose, _surface: Surface = "face", layout: Layout = "standard"): void {
+  configure(printing: Printing, pose: Pose, _surface: Surface = "face", layout: Layout = "standard", wrong: readonly number[] = []): void {
     const surface: Surface = "face";
     // A new print replaces the cube: a turn in progress ends first (its pivot belongs to the old cube).
     this.tween.cancel();
@@ -318,6 +347,9 @@ export class Calendar7Viewer implements StageView {
     this.syncExposure();
     this.clear();
     this.bodyStale = false;
+    this.wrongIds = new Set(wrong);
+    this.wrongMeshes = [];
+    this.renderer.domElement.removeAttribute("data-c7-wrong");
     this.printing = printing;
     this.pose = pose;
     this.surface = surface;
@@ -333,14 +365,15 @@ export class Calendar7Viewer implements StageView {
       // Layer profile: a tile is as large as the face of its cubie (the texture is 192 px per unit of width), so the key has the size too.
       const tile = widths ? unitGridTileOf(pose.pos.subarray(3 * i, 3 * i + 3), pose.normal.subarray(3 * i, 3 * i + 3), pose.up.subarray(3 * i, 3 * i + 3), widths) : undefined;
       this.tiles[i] = tile;
-      const key = `${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}|${tile.band.l},${tile.band.r},${tile.band.t},${tile.band.b}` : ""}`; // one surface per configure: the key needs no surface
+      const isWrong = this.wrongIds.has(i);
+      const key = `${isWrong ? "wrong|" : ""}${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}|${tile.band.l},${tile.band.r},${tile.band.t},${tile.band.b}` : ""}`; // one surface per configure: the key needs no surface
       let material = byKey.get(key);
       if (!material) {
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = tileCanvasSize(tile);
-        this.draw(canvas, printing.text[i], printing.ink[i], tile);
+        this.draw(canvas, printing.text[i], printing.ink[i], tile, isWrong);
         const texture = new THREE.CanvasTexture(canvas);
-        this.art.push({ canvas, texture, text: printing.text[i], ink: printing.ink[i], tile });
+        this.art.push({ canvas, texture, text: printing.text[i], ink: printing.ink[i], tile, wrong: isWrong });
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = anisotropy;
         material = createStickerMaterial(texture);
@@ -357,7 +390,7 @@ export class Calendar7Viewer implements StageView {
       up: [0, 0, 0],
     }));
     this.writeFrames(pose);
-    const faceColors = faceFills(printing, this.scheme, layout);
+    const faceColors = faceFills(printing, this.scheme, layout, this.wrongIds);
     this.cube = new PhysicalCubeScene(
       this.presentation,
       this.frames as unknown as readonly PhysicalStickerFrame[],
@@ -377,6 +410,9 @@ export class Calendar7Viewer implements StageView {
     this.cube.setConstruction("stickerless");
     this.applyPlasticity();
     this.cube.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
+    this.presentation.traverse((o) => {
+      if (o.userData.stickerId !== undefined && this.wrongIds.has(o.userData.stickerId - 1)) this.wrongMeshes.push(o);
+    });
     this.dirty = true;
   }
 
