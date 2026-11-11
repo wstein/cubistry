@@ -40,12 +40,12 @@ def wEdges(count: Int32,rows: List[String],acc: List[WEdge]): List[WEdge] \ IO =
     }
     case Nil => throw new IllegalArgumentException("missing chain finish")
 }
-def wRead(count: Int32,raw: String): (String,List[WEdge]) \ IO = {
+def wRead(count: Int32,raw: String,start: (Int32,Int32)): (String,List[WEdge]) \ IO = {
     require(String.length(raw)<=16000000,"bounded chain input");
     match lines(raw) {
         case "cubistry.calendar7.chain.v1"::source::rest => match fields(source) {
             case "source"::r::y::m::h::Nil => {
-                require((integer(r),integer(y),integer(m))==(5,2026,5),"May 2026 identity root");require(wHash(h),"root digest");
+                let(sy,sm)=start;require((integer(r),integer(y),integer(m))==(sm,sy,sm),"identity root record is the first month of S");require(wHash(h),"root digest");
                 let edges=wEdges(count,rest,Nil);
                 let total=List.foldLeft((n,e) -> {let WEdge.E(_,_,_,_,_,moves)=e;n+List.length(moves)},0,edges);
                 require(total<=100000,"bounded total moves");(h,edges)
@@ -73,17 +73,21 @@ def wFront(st: Vector[Sticker],g: Goal): Bool \ IO = List.forAll(cell -> {
     }
 },cells())
 def wSelf(st: Vector[Sticker],g: Goal,poses: Vector[Pose],gens: List[Perm]): Unit \ IO = {
+    // the first of the start month: first board cell with text "1"
+    let ones=List.filter(p -> {let(_,x)=p;let(t,_)=x;t=="1"},List.zipWithIndex(goalBoard(g)));
+let oneIndex=match ones {case (i,_)::_ => i case Nil => throw new IllegalArgumentException("start month shows a 1")};
+    let onePos=(Int32.modulo(oneIndex,7)-3,4-(oneIndex/7+1),3);
     List.forEach(index -> List.forEach(q -> {
         let s=wMove(st,index,q);let p=wPose(permIdentity(),index,q,gens);
         require(s==liftState(p,st,poses),"single-move direct294/pose264 agreement");
         require(wMove(s,index,wInverse(q))==st,"single-move inverse")
     },List#{-1,1,2}),List.range(1,22));
     let badOne=Vector.map(s -> {let Sticker.S(id,p,p0,n,u,text,ink)=s;
-        if(p0==(2,1,3) and n==(0,0,1)) Sticker.S(id,p,p0,n,scale(-1,u),text,ink) else s
+        if(p0==onePos and n==(0,0,1)) Sticker.S(id,p,p0,n,scale(-1,u),text,ink) else s
     },st);
     require(not wFront(badOne,g),"strict upside-down one rejected");
     let aliased=Vector.map(s -> {let Sticker.S(id,p,p0,n,u,_,ink)=s;
-        if(p0==(2,1,3) and n==(0,0,1)) Sticker.S(id,p,p0,n,u,"I",ink) else s
+        if(p0==onePos and n==(0,0,1)) Sticker.S(id,p,p0,n,u,"I",ink) else s
     },st);
     require(not wFront(aliased,g),"I is not one");
     let band=Vector.map(s -> {let Sticker.S(id,p,p0,n,_,text,ink)=s;
@@ -112,10 +116,9 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
     require(stackSha(rawLayout)==layoutSHA,"new layout pin");require(stackSha(rawPrint)==printSHA,"new immutable print pin");
     let goals=if(monthsFile=="") coupledGoalsN(coupledLabels(rawLayout),"names-band","window",oldRoot,count) else coupledGoalsM(coupledLabels(rawLayout),"names-band",oldRoot,listed);
     let ms=List.map(g -> {let Goal.G(y,m,_)=g;(y,m)},goals);
-    require(monthsFile=="" or at(listed,0)==(2026,5),"chain root month is May 2026");
     let bridges=List.map(p -> {let(a,b)=p;monthIndex(b)-monthIndex(a)>1},List.zip(List.take(count-1,ms),List.drop(1,ms)));
     let source=windowReadPrint(rawPrint);let poses=derivedPoses();let gens=List.map(i -> generator(i,poses),List.range(1,22));
-    let(root,edges)=wRead(count,rawChain);
+    let(root,edges)=wRead(count,rawChain,at(ms,0));
     require(source==liftState(permIdentity(),source,poses) and wFront(source,at(goals,0)),"identity root front");
     wSelf(source,at(goals,0),poses,gens);
     require(stackSha(wText(source))==root,"root digest");
@@ -123,7 +126,7 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
     require(read(states+"/state-01.tsv")==stateHeader+wText(source),"root full-state snapshot");
     println("input\t${layoutSHA}\t${printSHA}\t${stackSha(rawChain)}");
     if(monthsFile != "") println(monthListLine(monthsPin,listed)) else ();
-    println("root\t2026\t5\t${root}");
+    let(sy,sm)=at(ms,0);println("root\t${sy}\t${sm}\t${root}");
     let result=List.foldLeft((acc,pair) -> {
         let(st,perm,allMoves,total)=acc;let(i,edge)=pair;
         let WEdge.E(y,m,declared,sh,eh,moves)=edge;let goal=at(goals,i+1);let Goal.G(yy,mm,_)=goal;

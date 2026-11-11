@@ -1,12 +1,12 @@
 #!/usr/bin/env julia
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Coverage of a month list S: generator (tsv or json) for the chain from the root month May 2026.
-#   month_coverage.jl tsv|json LIST LIST_SHA256 STATUS_TSV LAST_MONTH
+# Coverage of a month list S: generator (tsv or json) for the chain from the start month (the chain root).
+#   month_coverage.jl tsv|json LIST LIST_SHA256 STATUS_TSV LAST_MONTH START_MONTH
 # LIST is the print month list (strictly increasing, pinned). Months from the root on are chain members; a month before the root
 # that fits the print is before_root (not a chain member, not a gap). Gaps lie between the root and LAST_MONTH and are bridged
 # by one state edge. STATUS_TSV: month<TAB>status<TAB>evidence for gaps (unavailable_unsat | unknown); a gap without a row is unknown.
 using SHA
-const FIRST=(2026,1);const ROOT=(2026,5)
+const FIRST=(2026,1)
 idx((y,m))=y*12+m;fromidx(i)=(div(i-1,12),mod(i-1,12)+1)
 mt((y,m))=string(y,'-',lpad(m,2,'0'))
 function read_list(path,pin)
@@ -26,7 +26,7 @@ function read_status(path)
     end
     d
 end
-function coverage(ms,status,last)
+function coverage(ms,status,last,ROOT)
     @assert ROOT in ms "root month is a member";@assert last in ms && last>=ROOT
     inlist=Set(idx.(ms))
     members=[m for m in ms if m>=ROOT && m<=last]
@@ -40,7 +40,7 @@ function coverage(ms,status,last)
     before=[(fromidx(i),i in inlist) for i in idx(FIRST):idx(ROOT)-1]
     (members=members,runs=runs,gaps=gaps,before=before,status=status)
 end
-function tsv(io,c,pin,last,nlist)
+function tsv(io,c,pin,last,nlist,ROOT)
     r=c.runs[1]
     println(io,"headline\tchain-gapless\t",mt(r[1]),'\t',mt(r[2]),'\t',idx(r[2])-idx(r[1])+1)
     println(io,"list\t",pin,'\t',nlist,"\troot\t",mt(ROOT),"\trange\t",mt(FIRST),'\t',mt(last))
@@ -57,7 +57,7 @@ function tsv(io,c,pin,last,nlist)
     end
     for (m,inp) in c.before;println(io,"before_root\t",mt(m),'\t',mt(m),"\t1\tbefore_root\tprint_member=",inp ? "yes" : "no");end
 end
-function json(io,c,pin,last,nlist)
+function json(io,c,pin,last,nlist,ROOT)
     r=c.runs[1];q(s)="\""*s*"\""
     println(io,"{")
     println(io,"  \"headline\": {\"kind\": \"chain-gapless\", \"from\": ",q(mt(r[1])),", \"to\": ",q(mt(r[2])),", \"months\": ",idx(r[2])-idx(r[1])+1,"},")
@@ -73,11 +73,12 @@ function json(io,c,pin,last,nlist)
 end
 if abspath(PROGRAM_FILE)==(@__FILE__)
     try
-        @assert length(ARGS)==5 "month_coverage.jl tsv|json LIST LIST_SHA256 STATUS_TSV LAST_MONTH"
-        kind,list,pin,statusfile,lastt=ARGS
+        @assert length(ARGS)==6 "month_coverage.jl tsv|json LIST LIST_SHA256 STATUS_TSV LAST_MONTH START_MONTH"
+        kind,list,pin,statusfile,lastt,startt=ARGS
+        sm=match(r"^(\d{4})-(\d{2})$",startt);@assert !isnothing(sm);start=Tuple(parse.(Int,sm.captures))
         m=match(r"^(\d{4})-(\d{2})$",lastt);@assert !isnothing(m);last=Tuple(parse.(Int,m.captures))
-        ms=read_list(list,pin);c=coverage(ms,read_status(statusfile),last)
-        (kind=="tsv" ? tsv : kind=="json" ? json : error("tsv or json"))(stdout,c,pin,last,length(ms))
+        ms=read_list(list,pin);c=coverage(ms,read_status(statusfile),last,start)
+        (kind=="tsv" ? tsv : kind=="json" ? json : error("tsv or json"))(stdout,c,pin,last,length(ms),start)
     catch e
         println(stderr,"INVALID\t",sprint(showerror,e));exit(1)
     end

@@ -60,7 +60,6 @@ function read_month_list(path,expected_sha)
 end
 # bridge[i] is true when the edge into member i+1 skips calendar months (a state edge across a gap).
 month_list_bridges(ms)=[(b[1]*12+b[2])-(a[1]*12+a[2])>1 for (a,b) in zip(ms[1:end-1],ms[2:end])]
-const MONTH_LIST_ROOT=(2026,5)
 month_text((y,m))=string(y,'-',lpad(m,2,'0'))
 # Receipt line for a list-mode run (nothing for the WINDOW_END default, so legacy receipts are unchanged).
 function month_list_line(ms)

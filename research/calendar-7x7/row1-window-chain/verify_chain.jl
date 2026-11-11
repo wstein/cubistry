@@ -89,14 +89,14 @@ end
 function verify(layout,printing,chain,statesdir)
     optics_selfcheck();load_names(layout);@assert bytes2hex(sha256(read(printing)))==EXPECT_PRINT "new print pin"
     original=read_print(printing);state=copy(original);ch=read_chain_file(chain)
-    @assert !LISTED || MONTHS[1]==(2026,5) "chain root month is May 2026"
-    @assert (ch.src.root,ch.src.year,ch.src.month)==(5,2026,5) && length(ch.edges)==END_COUNT-1
-    @assert check_front(state,board(2026,5)).bad==0 && state_sha(state)==ch.src.hash
-    rule_selfcheck(state,board(2026,5))
+    SY,SM=LISTED ? MONTHS[1] : (2026,5)      # the chain starts at the identity pose; its front must show the first month of S
+    @assert (ch.src.root,ch.src.year,ch.src.month)==(SM,SY,SM) && length(ch.edges)==END_COUNT-1 "root record and edge count"
+    @assert check_front(state,board(SY,SM)).bad==0 && state_sha(state)==ch.src.hash "identity root front"
+    rule_selfcheck(state,board(SY,SM))
     encode(st)="sticker\tpiece\tposition\tnormal\tup\ttext\tink\n"*join([join((s.id,s.piece,join(s.pos,','),join(s.normal,','),join(s.up,','),s.text,s.ink),'\t')*"\n" for s in st])
     @assert read(joinpath(statesdir,"state-01.tsv"),String)==encode(state)
-    y,m=2026,5;py,pm=2026,5;total=0;words=Int[]
-    println("independent-root\t2026-05\t",state_sha(state),"\tACCEPT")
+    y,m=SY,SM;py,pm=SY,SM;total=0;words=Int[]
+    println("independent-root\t",SY,'-',lpad(SM,2,'0'),'\t',state_sha(state),"\tACCEPT")
     for (i,e) in enumerate(ch.edges)
         y,m=LISTED ? NEXT[(y,m)] : (m==12 ? (y+1,1) : (y,m+1))
         @assert (e.year,e.month)==(y,m) "chronological adjacency"
