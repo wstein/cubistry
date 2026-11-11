@@ -59,7 +59,7 @@ Counts are **tracked UTF-8 text files / literal substring occurrences**, obtaine
 
 Keep the existing registry/router and extend their contracts; do not introduce another app registry, hash router, document navigation or iframe wrapper. The proposed utility key `view=print|licenses` is a small extension of `resolveHostView` and `createRouter`, not another product entry point. It needs plan review before implementation. A utility may retain `app` as its return context: `index.html?app=calendar&view=print&design=de-a`. With no `app`, closing a utility returns to landing. `view` takes display precedence while the app context is suspended. Unknown app IDs retain the existing landing behavior; unknown utility values resolve to the app/landing rather than a blank shell. Utilities are absent from `AppGroup` and the app chooser. Internal fixtures never join either.
 
-A single typed route parser/serializer owns app, optional utility and per-mode setup. Mode IDs stay those already accepted, with `calendar`, `playground` and `ci` joining only when functional. Proposed `cube=2|3` selects Playground's engine (superseded by `size=` per the owner decision of 2026-11-10, pending D1 in the [Picture Cube host plan](#picture-cube-host-plan-proposal-2026-11-11)); there is no canonical `picture3` ID. Normalize only at the new host: the removed filenames, `application=` as an application selector and hash-style app aliases are not retained. The removed application-selection meaning of `mode` must not remove the timer value contract `mode=countdown|stopwatch`. Existing value aliases within an application's parameters can continue to parse on its new URL, with a canonical serialization; no old URL is redirected. Existing documentation's old URL examples must be rewritten as new host examples.
+A single typed route parser/serializer owns app, optional utility and per-mode setup. Mode IDs stay those already accepted, with `calendar`, `playground` and `ci` joining only when functional. Proposed `cube=2|3` selects Playground's engine (superseded by `size=` per the owner decision of 2026-11-10, decided by the owner 2026-11-11 (D1) in the [Picture Cube host plan](#picture-cube-host-plan-proposal-2026-11-11)); there is no canonical `picture3` ID. Normalize only at the new host: the removed filenames, `application=` as an application selector and hash-style app aliases are not retained. The removed application-selection meaning of `mode` must not remove the timer value contract `mode=countdown|stopwatch`. Existing value aliases within an application's parameters can continue to parse on its new URL, with a canonical serialization; no old URL is redirected. Existing documentation's old URL examples must be rewritten as new host examples.
 
 | State domain | Owner and migration rule | Required regression |
 |---|---|---|
@@ -122,9 +122,9 @@ This is an intentional breaking URL change. Before publication, README, `docs/AP
 
 ## Picture Cube host plan (proposal, 2026-11-11)
 
-This section is the plan for the Picture Cube inside the host. It extends the rows `playground.html` and `picture3.html`, the `Pictures` state row and slices P1/P2 above; it is not a second plan. It records the owner decisions of 2026-11-10 and 2026-11-11 (Picture Cube for sizes 2 to 7, default size 3, old URLs return 404 without shims, plan before stack PR 2) and proposes the rest. Nothing here authorizes implementation; the owner decisions at the end of the section are open.
+This section is the plan for the Picture Cube inside the host. It extends the rows `playground.html` and `picture3.html`, the `Pictures` state row and slices P1/P2 above; it is not a second plan. It records the owner decisions of 2026-11-10 and 2026-11-11 (Picture Cube for sizes 2 to 7, default size 3, plan before stack PR 2; the 404-without-shims policy comes from the amendment above and is still to be confirmed against the owner's "redirect" stack notes, D5) and proposes the rest. Nothing here authorizes implementation; the owner decisions at the end of the section are open.
 
-Markers: **V** verified in the repository at `origin/main` `a255079e` (file:line), **P** proposed, **U** UNKNOWN (not measured or not found). Stack PR 1 (size control and name, #420) is merged **V** (`src/apps/playground/size.ts:4-11`, `tests/browser/playground.spec.mjs:321`).
+Markers: **O** owner decision (MCQ 2026-11-11), **V** verified in the repository at `origin/main` `a255079e` (file:line), **P** proposed, **U** UNKNOWN (not measured or not found). Stack PR 1 (size control and name, #420) is merged **V** (`src/apps/playground/size.ts:4-11`, `tests/browser/playground.spec.mjs:321`).
 
 ### 1. Mounting into the host
 
@@ -134,7 +134,7 @@ Markers: **V** verified in the repository at `origin/main` `a255079e` (file:line
 - **P** New `src/apps/playground/mount.ts` exports `mountPlayground(root, params, ctx)`; `MODE_CATALOG` gets one entry `playground` (title "Picture Cube", group `apps`, help `docs/PICTURE_PLAYGROUND.md`). It joins the registry only in the PR that makes it functional (the rule of the route section above).
 
 **Parameters.**
-- **V** `size` (2 to 7) is read by `resolveSize`; an invalid or not yet playable value falls back with a note (`src/apps/playground/size.ts:26-39`). The amendment above still says `cube=2|3` (this file, line 62 and rows 48/49); owner decision 2026-11-10 replaced it by `size=` (URL inventory row). The brief of this plan says `cube=N`. **U** which name the owner wants: see D1. This section writes `size`.
+- **V** `size` (2 to 7) is read by `resolveSize`; an invalid or not yet playable value falls back with a note (`src/apps/playground/size.ts:26-39`). The amendment above still says `cube=2|3` (this file, line 62 and rows 48/49); owner decision 2026-11-10 replaced it by `size=` (URL inventory row). The brief of this plan says `cube=N`. **O** The owner decided `size` on 2026-11-11 (D1); `cube=2|3` is superseded.
 - **P** Share URLs carry setup only: `size`, and later `design=<built-in theme id>`. Never `design=upload`, never picture bytes (the `Pictures` row above). `src/app-switch-url.mjs:3` (`APP_SCOPED_PARAMS`) must list `size` and `design` so they do not leak to another app (the test `tests/app-switch-url.test.mjs` gets a row).
 
 **Slots (P).** Slot 1 Scramble (primary action Solve only where a solver exists, see section 3); slot 2 the 18 face-turn buttons; slot 3 the size segment control 2 to 7 plus Undo/Redo; slot 4 Move time; slot 5 design choice and "Your pictures". The long forms (picture upload, crops, fit analysis, saved sets) are an integrated scrollable content region with headings, not slots and not the Nerd drawer (amendment, "Use the accepted five dock slots"). History list and counters go to the readout; the Nerd drawer shows solver status and state classification. The phone sheet gap stays a host item (H2).
@@ -148,7 +148,7 @@ Markers: **V** verified in the repository at `origin/main` `a255079e` (file:line
 
 **Storage ownership (P).** The mount owns the picture library. **V** the existing library is the IndexedDB database `cubistry-picture-sets` version 1, 10 sets and 64 MB at most (`src/apps/picture3/storage.ts:2,17`). Reuse that database and record format so saved sets survive the migration (persistence row above). A face set is size-independent (**V** `src/apps/playground/themes.ts:1-7,66-80`: slicing happens per cube), so the current pictures and the library are shared by all sizes; only sessions are per cube. This narrows the wording "cube-specific" of the `Pictures` row: see D4. The IndexedDB connection is opened at mount, closed on dispose, a failed open leaves the pictures usable (as today, `src/apps/picture3/storage.ts:12`).
 
-**Old URLs (owner decision, V in this plan).** `playground.html` and `picture3.html` are deleted and return 404; no redirect, alias or compatibility page (this plan, amendment, first bullets). The merged PR 1 text and the four-PR brief mention "redirects" in PR 4; that item is void (D5). The canonical entries are `index.html?app=playground&size=2` and `index.html?app=playground&size=3`; there is no `picture3` id.
+**Old URLs (amendment above; D5 open).** `playground.html` and `picture3.html` are deleted and return 404; no redirect, alias or compatibility page (this plan, amendment, first bullets). The merged PR 1 text and the four-PR brief mention "redirects" in PR 4; that item conflicts with this plan and is not decided: the owner's own 2026-11-11 stack notes also mention "redirect", so D5 needs his explicit confirmation before PR 4. The canonical entries are `index.html?app=playground&size=2` and `index.html?app=playground&size=3`; there is no `picture3` id.
 
 ### 2. Mapping of stack PR 2 to 4 onto the host mount
 
@@ -156,10 +156,10 @@ Markers: **V** verified in the repository at `origin/main` `a255079e` (file:line
 
 **Options for the order.**
 - **M1, page first.** PR 2 to 4 land on the standalone `playground.html`, a last PR mounts it into the host. Price: the UI is ported twice (page markup, then mount and slots); the last PR is large (about 12 to 15 files, **P** estimate) and re-writes the specs that PR 2 to 4 just extended. Gain: no dependency on the host work (H1/H2); PR 2 can start now.
-- **M2, mount first (recommended).** One PR mounts the existing 2x2 page content as `app=playground` (slice P1), then PR 2 to 4 change only mount code and tests. Price: one more PR before PR 2, and PR 2 waits for it; **U** whether H1/H2 are merged enough (slot API exists **V**; route-update hook and phone sheet are not built, amendment above). Gain: each feature is written once; the Back/Forward and dispose tests exist from the first PR.
+- **M2, mount first (decided by the owner 2026-11-11, D2).** One PR mounts the existing 2x2 page content as `app=playground` (slice P1), then PR 2 to 4 change only mount code and tests. Price: one more PR before PR 2, and PR 2 waits for it; **U** whether H1/H2 are merged enough (slot API exists **V**; route-update hook and phone sheet are not built, amendment above). Gain: each feature is written once; the Back/Forward and dispose tests exist from the first PR.
 - **M3, shared control model.** A declarative control list rendered by the page and by the host. Not recommended: a third UI layer to maintain for a page that is deleted within the stack.
 
-**Recommendation: M2.** If H1 is not merged when PR 2 should start, fall back to M1 for PR 2 only (it touches upload and paste, not the chrome) and keep PR 3 and 4 behind the mount. **U** H1/H2 state: read from GitHub before starting.
+**Decided by the owner 2026-11-11 (D2): M2.** The mount PR (S0a) comes first as an extra PR before stack PR 2; PR 2 waits for H1 (H1a to H1c are in progress by another author, per the coordinator; state **U** here, read from GitHub). The M1 fallback is not used.
 
 **What lands where (P).**
 
@@ -197,7 +197,7 @@ Other sources. **V** (sibling checkout `/Users/werner/whr/cubing/cubacle` at `de
 | E4 | Solve for 4 to 7 (reduction with picture centers, or search) | research-sized | high: the strict picture target is not an ordinary reduction target (`picture-cube-concept.md:285-292`) | none | No; label as research, never as a feature |
 | S1 | "Back to start": the inverse of the recorded history, animated. Exact for any state reached through the app's own moves; not a solver | small per size, once history exists (PR 3) | low | logic only; test must replay the full pose | Yes, for every size including 2 and 3; named "Back to start", not "Solve" |
 
-Recommendation: E0 now, S1 with PR 3, E1 as a separate stack once the owner sets its priority. Nothing in the UI, README or docs claims a solver for 4 to 7; the Solve control is shown for 2 and 3 only, and for 4 to 7 the note reads "No solver. Use Back to start."
+Decided by the owner 2026-11-11 (D3): E0 now; sizes 4 to 7 stay suitability display only; E1 is decided after stack PR 4. Proposed: S1 with PR 3. Nothing in the UI, README or docs claims a solver for 4 to 7; the Solve control is shown for 2 and 3 only, and for 4 to 7 the note reads "No solver. Use Back to start."
 
 ### 4. Where picture3 folds in, and the parity guard
 
@@ -219,15 +219,15 @@ Stack order, heavy lane only on the stack top. The numbers in brackets are the o
 
 | Slice | Content | Depends on | Files (estimate) |
 |---|---|---|---|
-| S0a | `mount.ts` for the existing 2x2 page, catalog entry, `MODE_INITS` hook, `app-switch-url` rows, mount tests; `playground.html` stays | H1 (U), PR 1 | 8 to 10 |
+| S0a | `mount.ts` for the existing 2x2 page, catalog entry, `MODE_INITS` hook, `app-switch-url` rows, mount tests; `playground.html` stays | PR 1; first slice, before S2 | 8 to 10 |
 | S0b | Retire `playground.html`: Vite input, `mpa-routing` test, specs to the new URL, README and docs, built-artifact 404 check | S0a | 6 to 10 |
 | S1 | Characterization browser spec for `picture3.html` | none (can run in parallel) | 1 to 3 |
-| S2 [2] | Paste, camera, JPEG by canvas, local only | S0a (or M1) | 6 to 9 |
+| S2 [2] | Paste, camera, JPEG by canvas, local only | S0a and H1 (owner decision D2) | 6 to 9 |
 | S3 | Engine interface, 3x3 adapter, play only (no Solve), size control enables 3, per-cube sessions, default size 3 | S0a, S1 | 8 to 10 |
 | S4 [3] | Crop editor onto `FaceSet`, presets, IndexedDB library, history, "Back to start" | S3 | 9 to 10 (split in two if larger) |
 | S5 [4] | 3x3 exact Solve (worker), 2x2 Solve in the mount, delete `picture3.html`, move specs, docs | S3, S4 | 8 to 10 |
 | S6 | Frieden preset (owner assets, CC BY-SA 4.0, provenance line as decided) | S4 | 3 to 5 |
-| L1 to L3 | Large sizes E1: engine package with differential tests, viewer adapter, UI for 4 to 7 | owner decision D3, S5 | not sized |
+| L1 to L3 | Large sizes E1: engine package with differential tests, viewer adapter, UI for 4 to 7 | owner decision after S5 (D3) | not sized |
 
 Docs that change with the slices: `docs/PICTURE_PLAYGROUND.md:81-97` ("3x3 evaluation: unsupported") is wrong from S3 on and is rewritten there; `docs/SUPER_PICTURE_CUBE.md` is merged into it or linked in S5.
 
@@ -235,11 +235,11 @@ Docs that change with the slices: `docs/PICTURE_PLAYGROUND.md:81-97` ("3x3 evalu
 
 | # | Question | Recommendation |
 |---|---|---|
-| D1 | URL parameter `size` (merged in #420, decision 2026-11-10) or `cube` (amendment text and brief)? | `size`; fix the `cube=` wording above to match |
-| D2 | Order: M2 mount first (one extra PR, PR 2 waits for H1) or M1 page first (UI ported twice)? | M2; M1 only for PR 2 if H1 is late |
-| D3 | Sizes 4 to 7: E0 for the stack, then E1 (play only, "Back to start", no solver) as a separate stack, and when? | E0 now; decide E1 priority after S5 |
+| D1 | URL parameter `size` or `cube`? | Decided by the owner 2026-11-11: `size`; `cube=2|3` is superseded |
+| D2 | Order: mount first or page first? | Decided by the owner 2026-11-11: M2, mount first as an extra PR before stack PR 2; PR 2 waits for H1 |
+| D3 | Sizes 4 to 7 | Decided by the owner 2026-11-11: E0 now (suitability display only, no solver claim); E1 is decided after stack PR 4 |
 | D4 | One picture set and library shared by all sizes, sessions per cube (narrows "cube-specific" in the `Pictures` row)? | Yes, shared |
-| D5 | Confirm: no redirect in PR 4 (404 for `playground.html` and `picture3.html`), the "redirect" item of the four-PR brief is void? | Yes |
+| D5 | Confirm: no redirect in PR 4 (404 for `playground.html` and `picture3.html`), the "redirect" item of the four-PR brief is void? | Yes; needs the owner's explicit confirmation because his 2026-11-11 stack notes mention "redirect" |
 | D6 | One image model: the `FaceSet` of the 2x2 page, with the crop editor producing faces for it; the second pipeline of picture3 goes away? | Yes |
 | D7 | Size switch while a turn, solve or load is pending: disabled (not cancel)? | Disabled |
 | D8 | Size switch history entry: replace now, push once the route-update hook exists? | Yes |
