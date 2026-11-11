@@ -195,3 +195,15 @@ test("name layout: no size fits a font with huge glyphs", () => {
   assert.throws(() => nameFaceTable(synth(20, 1)), /no name size fits/);
   assert.throws(() => nameFaceTable(synth(1, 60)), /no name size fits/);
 });
+
+test("name layout: a first tile that is too wide for its room is tightened until its ink starts half a seam gap inside the red banner edge, 0.8 unit left of the cell center", () => {
+  // G and V twice as wide: the three-letter first tiles AUG and NOV cannot take the mean tracking of the other tiles
+  const font = { ...FONT_METRICS.noto, glyphs: Object.fromEntries(Object.entries(FONT_METRICS.noto.glyphs).map(([c, g]) => [c, "GV".includes(c) ? { ...g, advance: g.advance * 2, left: g.left * 2, right: g.right * 2 } : g])) };
+  const t = nameFaceTable(font), m = t.seamGap / 2, tiles = [...t.tiles.values()], mean = tiles.find((x) => x.label === "FE").tracking;
+  for (const label of ["AUG", "NOV"]) {
+    const x = t.tiles.get(label), ink = [...label].reduce((s, c) => s + (font.glyphs[c].right - font.glyphs[c].left) * t.size, 0) + x.gaps.reduce((a, b) => a + b, 0);
+    assert.ok(x.tracking < mean - 1, `${label}: tracking ${x.tracking} is below the mean ${mean}`);
+    // the ink ends half a seam gap before the seam (cell center + 0.5 unit) and starts half a seam gap inside the banner edge (cell center - 0.8 unit)
+    assert.ok(Math.abs(ink - ((0.5 + 0.8) * PPU - 2 * m)) < 1e-6, `${label}: ink ${ink} fills 1.3 units less two half seam gaps`);
+  }
+});
