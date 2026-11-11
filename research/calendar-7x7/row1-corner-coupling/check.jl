@@ -43,6 +43,41 @@ function window_end_months(window_end)
     n=(y-2026)*12+mo-4;@assert n>=1 && (y,mo)<=(2100,1) "window end lies within May 2026 to January 2100"
     n
 end
+# Explicit ordered month list S (file with one YYYY-MM per line, strictly increasing, LF, pinned by SHA-256).
+# CAL7_WINDOW_MONTHS=path and CAL7_WINDOW_MONTHS_SHA256=hex select it; it excludes WINDOW_END.
+function read_month_list(path,expected_sha)
+    @assert occursin(r"^[0-9a-f]{64}\z",expected_sha) "month list SHA-256 pin is 64 lowercase hex"
+    bytes=read(path);@assert bytes2hex(sha256(bytes))==expected_sha "month list pin"
+    raw=String(bytes);@assert isvalid(raw) && endswith(raw,"\n") && !occursin('\r',raw) && sizeof(raw)<=100000 "canonical month list UTF-8/LF"
+    ms=Tuple{Int,Int}[]
+    for t in split(chop(raw;tail=1),'\n')
+        m=match(r"^(\d{4})-(\d{2})\z",t);@assert !isnothing(m) "month list row is YYYY-MM"
+        y,mo=parse.(Int,m.captures);@assert 1<=mo<=12 && (2026,1)<=(y,mo)<=(2100,1) "month list row lies within 2026-01 to 2100-01"
+        @assert isempty(ms) || ms[end]<(y,mo) "month list strictly increasing"
+        push!(ms,(y,mo))
+    end
+    ms
+end
+# bridge[i] is true when the edge into member i+1 skips calendar months (a state edge across a gap).
+month_list_bridges(ms)=[(b[1]*12+b[2])-(a[1]*12+a[2])>1 for (a,b) in zip(ms[1:end-1],ms[2:end])]
+const MONTH_LIST_ROOT=(2026,5)
+month_text((y,m))=string(y,'-',lpad(m,2,'0'))
+# Receipt line for a list-mode run (nothing for the WINDOW_END default, so legacy receipts are unchanged).
+function month_list_line(ms)
+    isempty(get(ENV,"CAL7_WINDOW_MONTHS","")) && return nothing
+    string("months\t",ENV["CAL7_WINDOW_MONTHS_SHA256"],'\t',length(ms),'\t',month_text(ms[1]),'\t',month_text(ms[end]),'\t',count(month_list_bridges(ms)))
+end
+# Window months: the explicit list when CAL7_WINDOW_MONTHS is set, else May 2026 through the window end.
+function window_month_list(;window_end=get(ENV,"WINDOW_END","2028-01"))
+    path=get(ENV,"CAL7_WINDOW_MONTHS","")
+    if isempty(path)
+        @assert !haskey(ENV,"CAL7_WINDOW_MONTHS_SHA256") "month list pin without a month list"
+        n=window_end_months(window_end);return [(year(d),month(d)) for d in Date(2026,5,1):Month(1):Date(2026,5,1)+Month(n-1)]
+    end
+    @assert !haskey(ENV,"WINDOW_END") "month list and WINDOW_END are exclusive"
+    @assert haskey(ENV,"CAL7_WINDOW_MONTHS_SHA256") "month list needs CAL7_WINDOW_MONTHS_SHA256"
+    read_month_list(path,ENV["CAL7_WINDOW_MONTHS_SHA256"])
+end
 function coupled_goals(labels,profile,domain;window_end=get(ENV,"WINDOW_END","2028-01"))
     @assert profile in ("names-band","names","scheme-a") "known profile"
     @assert domain in ("all","window") "known domain"
@@ -53,9 +88,7 @@ function coupled_goals(labels,profile,domain;window_end=get(ENV,"WINDOW_END","20
         @assert all((m,offset(y,m,"EN"),daysinmonth(Date(y,m,1))) in shapes for y in 1900:2099 for m in 1:12) "2400-month shape coverage"
         [(year=g.year,month=g.month,board=copy(g.board)) for g in reps]
     else
-        n=window_end_months(window_end);ds=collect(Date(2026,5,1):Month(1):Date(2026,5,1)+Month(n-1))
-        @assert length(ds)==n
-        [(year=year(d),month=month(d),board=stacked_board(year(d),month(d),PURE_VARIANT)) for d in ds]
+        [(year=y,month=m,board=stacked_board(y,m,PURE_VARIANT)) for (y,m) in window_month_list(;window_end)]
     end
     if profile!="scheme-a"
         for g in goals,c in 1:7
@@ -141,6 +174,7 @@ function coupled_check(path,profile,domain)
     @assert coupled_art("29","red",7,1)!=coupled_art("29","red",7,7)
     capacity=length(homes)*3;required=sum(values(peaks))
     println("input\t",bytes2hex(sha256(codeunits(raw))),"\t",profile,"\t",domain,"\t",length(goals))
+    ml=month_list_line([(g.year,g.month) for g in goals]);isnothing(ml) || println(ml)
     println("subset\t2000-01\t2100-01\t",length(goals))
     println("geometry\t24\t",length(homes),"\t3\t",capacity,"\t",length(frames),"\t96\t",optic_checks)
     for (h,n,u,phase) in frames
