@@ -441,24 +441,23 @@ test("an invalid month in names mode shows no notice", async () => {
 const glyph = { advance: 0.7, left: 0.05, right: 0.65, top: -0.72, bottom: 0 };
 const fakeFont = { style: { master: "0" }, glyphs: Object.fromEntries([..."0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map((c) => [c, c === "M" || c === "W" ? { ...glyph, advance: 0.95, left: 0.04, right: 0.91 } : glyph])), dateSize: 100 };
 
-test("font path: name letters sit on the 3-slot grid, one size for every tile, the same x as the sticker grid", () => {
+test("font path on the sheet: name letters sit on the 3-slot grid, one size for every tile, the same x as the sticker grid", () => {
   const slot = TEXT_SQUARE / NAME_SLOTS;
-  const at = (k) => TEXTURE / 2 + ((k + 0.5) / NAME_SLOTS - 0.5) * namePxPerUnit();
   const cases = { J: [2], MA: [1, 2], ER: [0, 1], ANU: [0, 1, 2], Y: [0], OC: [1, 2] };
   const sizes = new Set();
   for (const [label, slots] of Object.entries(cases)) {
-    const parts = nameLabelLayout(label, fakeFont);
+    const parts = nameLabelLayout(label, fakeFont, "sticker");
     assert.deepEqual(parts.map((p) => p.text), label.split(""), label);
-    assert.deepEqual(parts.map((p) => p.x), slots.map(at), label);
-    assert.deepEqual(parts.map((p) => p.x), nameGrid(label).map((g) => g.x), `${label} same slots as the sticker grid`);
+    assert.deepEqual(parts.map((p) => p.x), slots.map((k) => TEXTURE / 2 - TEXT_SQUARE / 2 + (k + 0.5) * slot), label);
+    assert.deepEqual(parts.map((p) => p.x), nameGrid(label, false).map((g) => g.x), `${label} same slots as the sticker grid`);
     parts.forEach((p) => sizes.add(p.size));
   }
   assert.equal(sizes.size, 1, "one font size");
-  const [size] = sizes;
-  assert.ok(size * 0.91 <= slot, "the widest capital fits a slot");
-  // A single run would have a different x for the second letter.
-  const two = nameLabelLayout("MA", fakeFont);
-  assert.ok(Math.abs(two[1].x - two[0].x - namePxPerUnit() / NAME_SLOTS) < 1e-9, "letters are one third of a cubie apart");
+  assert.ok([...sizes][0] * 0.91 <= slot, "the widest capital fits a slot");
+});
+test("font path on the face: one glyph size for every name tile (the layout itself is tests/calendar7-name-layout.test.mjs)", () => {
+  const sizes = new Set(["J", "MA", "ER", "ANU", "Y", "OC"].flatMap((label) => nameLabelLayout(label, fakeFont).map((p) => p.size)));
+  assert.equal(sizes.size, 1);
 });
 
 /** Records the letters drawFontSticker draws: text and the x of the translate in effect (drawFontRun translates to the run). */
