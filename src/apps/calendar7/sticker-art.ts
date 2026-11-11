@@ -124,7 +124,7 @@ export function tileEdgeColors(roles: TileRoles, ground: string, tile: FaceTile)
 export const weekdayShift = (cls: TileClass): number => (cls === "weekday" || cls === "sunsat" ? NAMES_WEEKDAY_DOWN * namePxPerUnit() : 0);
 /**
  * Vertical center of the month name in the cell frame (units above the unit cell center): the free height of the banner is
- * split with `NAME_ABOVE_SHARE` above the ink (clearly more red above the name than below), `capUnits` is the ink height.
+ * split with `NAME_ABOVE_SHARE` above the ink (1/2: centered), `capUnits` is the ink height.
  */
 export const nameCenterUp = (capUnits: number): number => { const b = monthBanner(); return b.top - NAME_ABOVE_SHARE * (b.height - capUnits) - capUnits / 2; };
 /** Canvas pixels of a tile: 192 per unit of width. */
@@ -367,7 +367,7 @@ function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfil
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = `600 ${NAME_FONT_SIZE}px ${FONT}`;
-    // On a tile of the unit grid the drawing is in the frame of the unit cell: no shift for a thick tile, the name in the upper part of the banner.
+    // On a tile of the unit grid the drawing is in the frame of the unit cell: no shift for a thick tile, the name centered in the banner.
     const up = face && tile ? nameCenterUp(0.714 * NAME_FONT_SIZE / namePxPerUnit()) * namePxPerUnit() : 0;
     for (const l of nameGrid(text, face, 1)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04 - up);
   } else if (profile === "strict" && isSplitLabel(text)) {
