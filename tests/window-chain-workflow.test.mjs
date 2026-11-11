@@ -37,9 +37,13 @@ const runLines = s => s.run.split("\n").map(l => l.trim());
 const GATES = {
  "validate": [
   "[[ \"$IN_REF\" =~ ^[0-9a-f]{40}$ ]] || fail \"research_ref must be a 40-digit lowercase hex commit SHA\"",
-  "[[ \"$IN_START\" =~ $ym && \"$IN_END\" =~ $ym && \"$IN_WINDOW_END\" =~ $ym ]] || fail \"start, end and print_window_end must be YYYY-MM (2000-2099)\"",
-  "[[ \"$IN_START\" < \"2026-06\" ]] || fail \"start must be 2026-05 or earlier: the chain root is May 2026\"",
-  "[[ \"$IN_END\" > \"2026-05\" ]] || fail \"end must be after 2026-05\"",
+  "[ -z \"$IN_ROOT\" ] || ymok \"$IN_ROOT\" || fail \"root_month must be YYYY-MM between 1900-01 and 2100-01\"",
+  "[ -z \"$IN_START\" ] || ymok \"$IN_START\" || fail \"start must be YYYY-MM between 1900-01 and 2100-01\"",
+  "[ -z \"$IN_END\" ] || ymok \"$IN_END\" || fail \"end must be YYYY-MM between 1900-01 and 2100-01\"",
+  "[[ \"$IN_MONTHS_PATH\" =~ $path ]] && [[ \"$IN_MONTHS_PATH\" != *..* ]] || fail \"months_path is not a plain repository path\"",
+  "[[ \"$IN_MONTHS_SHA\" =~ ^[0-9a-f]{64}$ ]] || fail \"months_sha256 must be 64 lowercase hex digits\"",
+  "[ -z \"$IN_BEST\" ] || { [[ \"$IN_BEST\" =~ $path ]] && [[ \"$IN_BEST\" != *..* ]]; } || fail \"best_effort_path is not a plain repository path\"",
+  "ymok() { [[ \"$1\" =~ $ym ]] && [[ ! \"$1\" > 2100-01 ]]; }",
   "[[ \"$IN_PRINT_PATH\" =~ $path ]] && [[ \"$IN_PRINT_PATH\" != *..* ]] || fail \"print_path is not a plain repository path\"",
   "[ -z \"$IN_CLAIMS\" ] || { [[ \"$IN_CLAIMS\" =~ $path ]] && [[ \"$IN_CLAIMS\" != *..* ]]; } || fail \"claims_path is not a plain repository path\"",
   "[[ \"$IN_PRINT_SHA\" =~ ^[0-9a-f]{64}$ ]] || fail \"print_sha256 must be 64 lowercase hex digits\"",
@@ -47,8 +51,7 @@ const GATES = {
   "[[ \"$IN_WIDTH\" =~ ^[1-9][0-9]{0,2}$ ]] && [ \"$IN_WIDTH\" -le 200 ] || fail \"width must be 1-200\"",
   "[[ \"$IN_LAMBDA\" =~ ^([1-9]|10)$ ]] || fail \"lambda must be 1-10\"",
   "[ -z \"$IN_PRIOR\" ] || [[ \"$IN_PRIOR\" =~ ^[0-9]{1,20}$ ]] || fail \"prior_run_id must be digits\"",
-  "[ \"$IN_END\" != 2028-01 ] && [ \"$IN_WINDOW_END\" != 2028-01 ] || fail \"end and print_window_end must not be 2028-01 (new immutable print pin needed)\"",
-  "ym='^20[0-9]{2}-(0[1-9]|1[0-2])$'",
+  "ym='^(19[0-9]{2}|20[0-9]{2}|2100)-(0[1-9]|1[0-2])$'",
   "path='^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$'",
   "if [ \"$IN_SMOKE\" = \"true\" ]; then max=3; prior=\"\"; fi",
   "max=100000; prior=$IN_PRIOR"
@@ -61,8 +64,11 @@ const GATES = {
   "[ \"$n\" -ge 1 ] || fail \"run $PRIOR ($conclusion) has no unexpired verified chain artifact\""
  ],
  "research": [
-  "git fetch --no-tags --depth=1 origin \"$SHA\" || fail \"commit $SHA is not fetchable from $GITHUB_REPOSITORY\"",
+  "git fetch --no-tags origin \"+refs/heads/$RESEARCH_BRANCH:refs/remotes/origin/$RESEARCH_BRANCH\" || fail \"cannot fetch $RESEARCH_BRANCH\"",
+  "git fetch --no-tags origin \"$SHA\" || fail \"commit $SHA is not fetchable from $GITHUB_REPOSITORY\"",
   "[ \"$(git rev-parse --verify \"$SHA^{commit}\")\" = \"$SHA\" ] || fail \"research_ref does not resolve to itself\"",
+  "git merge-base --is-ancestor \"$SHA\" \"refs/remotes/origin/$RESEARCH_BRANCH\" || fail \"research_ref is not an ancestor of $RESEARCH_BRANCH\"",
+  "[ \"$(git show \"$SHA:$MONTHS_PATH\" | sha256sum | cut -d' ' -f1)\" = \"$MONTHS_SHA\" ] || fail \"month list differs from months_sha256\"",
   "[ \"$missing\" = 0 ] || fail \"research commit lacks required files\""
  ],
  "produce": [
@@ -70,18 +76,28 @@ const GATES = {
   "(cd \"$d\" && sha256sum --check --strict SHA256SUMS >/dev/null) || { echo \"::error::checksum failure in $d\"; exit 1; }",
   "[ -n \"$best\" ] || { echo \"::error::no verified chain artifact found to continue\"; exit 1; }",
   "grep -qx \"print_sha256=$PRINT_SHA\" \"$best/VERIFIED.txt\" || { echo \"::error::the prior chain was produced with another print\"; exit 1; }",
-  "timeout 285m julia --startup-file=no --threads=4 \"src/$WC/window_chain.jl\" \"$out\" \"src/$PRINT_PATH\" \"${args[@]}\" 2>&1 | tee \"$GITHUB_WORKSPACE/out/run.log\"",
+  "echo \"$MONTHS_SHA  src/$MONTHS_PATH\" | sha256sum --check --strict",
+  "grep -qx \"months_sha256=$MONTHS_SHA\" \"$best/VERIFIED.txt\" || { echo \"::error::the prior chain was produced with another month list\"; exit 1; }",
+  "grep -qx \"root_month=${ROOT_MONTH:--}\" \"$best/VERIFIED.txt\" || { echo \"::error::the prior chain was produced with another root month\"; exit 1; }",
+  "export CAL7_WINDOW_MONTHS=\"$GITHUB_WORKSPACE/src/$MONTHS_PATH\" CAL7_WINDOW_MONTHS_SHA256=\"$MONTHS_SHA\" CAL7_WINDOW_PRINT_SHA=\"$PRINT_SHA\"",
+  "[ -z \"$ROOT_MONTH\" ] || export CAL7_ROOT_MONTH=\"$ROOT_MONTH\"",
+  "timeout 65m julia --startup-file=no --threads=4 \"src/$WC/window_chain.jl\" \"$out\" \"src/$PRINT_PATH\" \"${args[@]}\" 2>&1 | tee \"$GITHUB_WORKSPACE/out/run.log\"",
   "if [ \"$rc\" = 3 ]; then echo \"::error::no new edge: the deadline passed or the search stalled before the first edge of this run (exit 3); nothing to verify or continue from\"; exit 3; fi",
   "[ \"$rc\" = 0 ] || { echo \"::error::producer exited with $rc (124 = timeout)\"; exit \"$rc\"; }"
  ],
  "verify": [
   "[ -n \"$chain_end\" ] && [ -n \"$edges_total\" ] && [ -n \"$complete\" ] || { echo \"::error::PROGRESS.txt is incomplete\"; exit 1; }",
   "[ \"$edges_total\" -ge 1 ] || { echo \"::error::no edge to verify\"; exit 1; }",
-  "[ \"$chain_end\" != 2028-01 ] || { echo \"::error::a chain ending at 2028-01 is checked without the print digest; the producer must not stop there\"; exit 1; }",
-  "export WINDOW_END=$chain_end CAL7_WINDOW_PRINT_SHA=$PRINT_SHA",
+  "echo \"$MONTHS_SHA  src/$MONTHS_PATH\" | sha256sum --check --strict",
+  "[ -n \"$best_effort\" ] || { echo \"::error::PROGRESS.txt has no best_effort_edges\"; exit 1; }",
+  "mkdir -p \"$GITHUB_WORKSPACE/out\"; awk -v end=\"$chain_end\" '$0 <= end' \"src/$MONTHS_PATH\" > \"$cut\"",
+  "export CAL7_WINDOW_MONTHS=$cut CAL7_WINDOW_MONTHS_SHA256=$cut_sha CAL7_WINDOW_PRINT_SHA=$PRINT_SHA",
+  "[ -z \"$ROOT_MONTH\" ] || export CAL7_ROOT_MONTH=$ROOT_MONTH",
+  "if [ \"$best_effort\" = 0 ]; then jv=SAT; iv=ACCEPT_CHAIN; else jv=BEST_EFFORT; iv=ACCEPT_BEST_EFFORT_CHAIN; fi",
   "cmp \"$out/julia.tsv\" \"$out/flix.tsv\" || { echo \"::error::Julia and Flix receipts differ\"; exit 1; }",
-  "grep -qx $'verdict\\tSAT\\tlegal-retained-state-window-chain\\t'\"$((edges_total + 1))\"$'\\t'\"$edges_total\" \"$out/julia.tsv\" || { echo \"::error::Julia verdict line is not the exact SAT line for $edges_total edges\"; exit 1; }",
-  "grep -q $'^independent-verdict\\tACCEPT_CHAIN\\t'\"$((edges_total + 1))\"$'\\t'\"$edges_total\"$'\\t' \"$out/independent.tsv\" || { echo \"::error::independent verdict differs ($edges_total edges)\"; exit 1; }",
+  "grep -qx $'verdict\\t'\"$jv\"$'\\tlegal-retained-state-window-chain\\t'\"$((edges_total + 1))\"$'\\t'\"$edges_total\" \"$out/julia.tsv\" || { echo \"::error::Julia verdict line is not the exact $jv line for $edges_total edges\"; exit 1; }",
+  "grep -q $'^independent-verdict\\t'\"$iv\"$'\\t'\"$((edges_total + 1))\"$'\\t'\"$edges_total\"$'\\t' \"$out/independent.tsv\" || { echo \"::error::independent verdict differs ($edges_total edges)\"; exit 1; }",
+  "[ \"$best_effort\" = 0 ] || grep -qx $'status\\texact\\t'\"$((edges_total - best_effort))\"$'\\tbest_effort\\t'\"$best_effort\" \"$out/julia.tsv\" || { echo \"::error::Julia status line differs from $best_effort best-effort edges\"; exit 1; }",
   "[ \"$lines\" = \"$edges_total\" ] || { echo \"::error::chain has $lines edges, PROGRESS.txt says $edges_total\"; exit 1; }",
   "[ \"$greedy\" = \"$(sed -n 's/^greedy_edges=\\([0-9]\\{1,\\}\\)$/\\1/p' \"$c/PROGRESS.txt\")\" ] || { echo \"::error::greedy edge count of PROGRESS.txt differs from edges.tsv\"; exit 1; }",
   "[ \"$(awk 'NR>1' \"$c/edges.tsv\" | wc -l)\" = \"$edges_total\" ] || { echo \"::error::edges.tsv does not list $edges_total edges\"; exit 1; }",
@@ -110,11 +126,51 @@ test("every action is pinned to a full commit SHA", () => {
   assert.ok(uses.length >= 10, `found ${uses.length} actions`);
   for (const u of uses) assert.match(u, /^[\w.-]+\/[\w.-]+@[0-9a-f]{40}( #.*)?$/, u);
 });
-test("serialized, and every job stays within the 6 h limit", () => {
+test("serialized; segments of about one hour: 3000 s edge loop, 65 min timeout, 70 min job limit", () => {
   assert.match(text, /^concurrency:\n  group: window-chain\n  cancel-in-progress: false\n/m);
   for (const [name, j] of Object.entries(jobs)) { const t = Number(j["timeout-minutes"]); assert.ok(t > 0 && t <= 345, `${name} timeout ${t}`); }
-  assert.equal(jobs.produce.env.GENERATE_DEADLINE_S, '"14400"');
-  assert.ok(runLines(step("produce", "Produce edges")).some(l => l.startsWith("timeout 285m julia")));
+  assert.equal(jobs.produce["timeout-minutes"], "70");
+  assert.equal(jobs.produce.env.GENERATE_DEADLINE_S, '"3000"');
+  const t = runLines(step("produce", "Produce edges")).find(l => l.startsWith("timeout "));
+  assert.ok(t && t.startsWith("timeout 65m julia"), t);
+  // the job limit covers the timeout plus checkout, Julia setup and the artifact download
+  assert.ok(Number(jobs.produce["timeout-minutes"]) > 65 && 3000 / 60 < 65);
+});
+test("run contract: month list, root month and print are inputs, nothing is hard-wired to one print, root or century", () => {
+  const head = text.split("\njobs:")[0];
+  for (const i of ["months_path", "months_sha256", "root_month", "best_effort_path", "print_path", "print_sha256"]) assert.match(head, new RegExp(`^      ${i}:\n`, "m"), i);
+  assert.doesNotMatch(head, /print_window_end/);
+  // print_path has no default (the print of a stage is an input, not window-2037-01)
+  assert.match(head, /^      print_path:\n        description: [^\n]*\n        type: string\n        required: true\n/m);
+  assert.match(head, /^      months_path:\n        description: [^\n]*\n        type: string\n        required: true\n/m);
+  assert.doesNotMatch(text, /window-2037-01|2037-01|WINDOW_END|window_end|2028-01|20\[0-9\]{2}-|May 2026|2026-05/);
+  // the checkers get the contract through their environment: list, pin, print pin, root month
+  const p = step("produce", "Produce edges"), v = step("verify", "Verify chain (Julia, Flix, independent replay)");
+  assert.ok(p.run.includes("CAL7_WINDOW_MONTHS=") && p.run.includes("CAL7_WINDOW_MONTHS_SHA256=") && p.run.includes("CAL7_WINDOW_PRINT_SHA=") && p.run.includes("CAL7_ROOT_MONTH="));
+  assert.ok(v.run.includes("CAL7_WINDOW_MONTHS=") && v.run.includes("CAL7_WINDOW_MONTHS_SHA256=") && v.run.includes("CAL7_WINDOW_PRINT_SHA=") && v.run.includes("CAL7_ROOT_MONTH="));
+  // the root month is never replaced by a default in the verify step: it is exported only when the input is set
+  assert.ok(runLines(v).includes("[ -z \"$ROOT_MONTH\" ] || export CAL7_ROOT_MONTH=$ROOT_MONTH"));
+  assert.equal(jobs.verify.env.ROOT_MONTH, "${{ inputs.root_month }}");
+  assert.equal(jobs.produce.env.ROOT_MONTH, "${{ inputs.root_month }}");
+  assert.equal(jobs.verify.env.MONTHS_SHA, "${{ inputs.months_sha256 }}");
+  assert.equal(jobs.produce.env.MONTHS_SHA, "${{ inputs.months_sha256 }}");
+});
+test("research_ref must lie on the research branch", () => {
+  assert.match(text, /^  RESEARCH_BRANCH: research\/cube-display-feasibility$/m);
+  const prep = step("prepare", "Check research commit");
+  const l = runLines(prep), i = l.findIndex(x => x.startsWith("git merge-base --is-ancestor")), f = l.findIndex(x => x.startsWith("git fetch --no-tags origin \"$SHA\""));
+  assert.ok(f >= 0 && i > f, "ancestor check after the fetch of the commit");
+  assert.ok(prep.run.includes("refs/pull/N/head"), "comment names the pull request refs");
+  assert.doesNotMatch(prep.run, /only in a fork is not fetchable/);
+});
+test("every segment records research_ref, library, width and lambda (segments.tsv), carried through resume", () => {
+  const p = step("produce", "Produce edges"), a = runLines(p).find(l => l.startsWith("args=("));
+  for (const k of ['library="$LIBRARY"', 'width="$WIDTH"', 'lambda="$LAMBDA"', 'run_id="$GITHUB_RUN_ID"', 'research_ref="$SHA"']) assert.ok(a.includes(k), k);
+  requireJobLines("produce", ['cp "$best/chain.moves.tsv" "$best/edges.tsv" "$best/segments.tsv" "$GITHUB_WORKSPACE/prior/"; cp -R "$best/states" "$GITHUB_WORKSPACE/prior/states"']);
+  assert.ok(runLines(step("produce", "Produce edges")).some(l => l.includes('test -s "$out/segments.tsv"')));
+  const pk = step("verify", "Package artifact");
+  assert.ok(pk.run.includes('"$c/segments.tsv"'));
+  assert.ok(pk.run.includes('echo "months_sha256=$MONTHS_SHA"; echo "root_month=${ROOT_MONTH:--}"'));
 });
 test("no workflow expression inside any run block (script injection)", () => {
   for (const [name, j] of Object.entries(jobs)) for (const s of j.steps) assert.doesNotMatch(s.run, /\$\{\{/, `${name}/${s.name ?? s.uses}: expression in run`);
@@ -122,7 +178,7 @@ test("no workflow expression inside any run block (script injection)", () => {
 });
 test("every input reaches the scripts through env, with the exact mapping", () => {
   const v = step("prepare", "Validate inputs").env;
-  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_WINDOW_END: "print_window_end", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode" };
+  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_MONTHS_PATH: "months_path", IN_MONTHS_SHA: "months_sha256", IN_ROOT: "root_month", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_BEST: "best_effort_path", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode" };
   assert.deepEqual(Object.keys(v).sort(), Object.keys(want).sort());
   for (const [k, input] of Object.entries(want)) assert.equal(v[k], `\${{ inputs.${input} }}`, k);
   const inputsDeclared = [...text.matchAll(/^      ([a-z_0-9]+):\n        description:/gm)].map(m => m[1]).sort();
@@ -151,7 +207,7 @@ test("a prior run is continued only from a verified artifact of a manual run on 
   assert.equal(d.if, "needs.prepare.outputs.prior_run_id != ''");
   assert.equal(d.with.pattern, "wc-chain-*");
   requireJobLines("produce", GATES.produce);
-  requireJobLines("produce", ['cp "$best/chain.moves.tsv" "$best/edges.tsv" "$GITHUB_WORKSPACE/prior/"; cp -R "$best/states" "$GITHUB_WORKSPACE/prior/states"']);   // the solver record travels with the chain
+  requireJobLines("produce", ['cp "$best/chain.moves.tsv" "$best/edges.tsv" "$best/segments.tsv" "$GITHUB_WORKSPACE/prior/"; cp -R "$best/states" "$GITHUB_WORKSPACE/prior/states"']);   // the solver and parameter record travel with the chain
 });
 test("produce stops cleanly and uploads the candidate", () => {
   const up = jobs.produce.steps.at(-1);
