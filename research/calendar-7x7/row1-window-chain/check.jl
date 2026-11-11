@@ -7,7 +7,8 @@ const WINDOW_PRINT_SHA="0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1
 # window needs its own print, whose SHA-256 must be supplied in CAL7_WINDOW_PRINT_SHA.
 const WINDOW_END=get(ENV,"WINDOW_END","2028-01")
 # An explicit month list S (CAL7_WINDOW_MONTHS, CAL7_WINDOW_MONTHS_SHA256) replaces WINDOW_END; its first month is the chain
-# root and must be May 2026 (the identity pose of the committed prints). Gaps in S are bridged by one edge.
+# root: the chain starts at the identity pose of the print, whose front must show that month (the start is a parameter).
+# Gaps in S are bridged by one edge.
 const LIST_MODE=!isempty(get(ENV,"CAL7_WINDOW_MONTHS",""))
 const WINDOW_LIST=window_month_list()
 const WINDOW_MONTHS=length(WINDOW_LIST)
@@ -25,8 +26,8 @@ end
 function read_window_chain(path)
     ls=chain_lines(path);@assert length(ls)>=4 && ls[1]=="cubistry.calendar7.chain.v1" && ls[end]=="finish" "chain header and trailer"
     f=String.(split(ls[2],'\t'));@assert length(f)==5 && f[1]=="source"
-    @assert WINDOW_LIST[1]==MONTH_LIST_ROOT "chain root month is May 2026"
-    @assert canonical_integer.(f[2:4])==[5,2026,5] "May 2026 identity root"
+    sy,sm=WINDOW_LIST[1]
+    @assert canonical_integer.(f[2:4])==[sm,sy,sm] "identity root record is the first month of S"
     validhash(s)=occursin(r"^[0-9a-f]{64}$",s)
     @assert validhash(f[5]);root=String(f[5]);cursor=3;edges=[];totalmoves=0
     while cursor<length(ls)
@@ -80,8 +81,8 @@ function chain_selfcheck(state,goal,source,action,gens)
         @assert direct==decode_physical(source,p,action) "single-move direct294/pose264 agreement"
         @assert chain_move(direct,g,e==2 ? 2 : -e)==state "single-move inverse"
     end
-    idx=only(i for (i,s) in enumerate(state) if s.pos==(2,1,3) && s.normal==FRONT_NORMAL)
-    @assert goal.board[3,6][1]=="1"
+    r1,c1=first((r,c) for r in 1:7 for c in 1:7 if goal.board[r,c][1]=="1")     # the first of the start month
+    idx=only(i for (i,s) in enumerate(state) if s.pos==(c1-4,4-r1,3) && s.normal==FRONT_NORMAL)
     turned=copy(state);turned[idx]=merge(turned[idx],(up=map(-,turned[idx].up),))
     @assert !chain_front_ok(turned,goal.board) "strict upside-down one rejected"
     alias=copy(state);alias[idx]=merge(alias[idx],(text="I",))
@@ -106,7 +107,7 @@ function verify_window_chain(layout,printing,path,statesdir)
     @assert read(joinpath(statesdir,"state-01.tsv"),String)==chain_state_text(state;header=true) "root full-state snapshot"
     println("input\t",WINDOW_LAYOUT_SHA,'\t',WINDOW_PRINT_EXPECT,'\t',bytes2hex(sha256(read(path))))
     ml=month_list_line(WINDOW_LIST);isnothing(ml) || println(ml)
-    println("root\t2026\t5\t",root)
+    println("root\t",WINDOW_LIST[1][1],'\t',WINDOW_LIST[1][2],'\t',root)
     total=(0,0,0,0);allmoves=Tuple{Int,Int}[]
     for (i,edge) in enumerate(edges)
         goal=goals[i+1];@assert (edge.year,edge.month)==(goal.year,goal.month) "chronological month adjacency"

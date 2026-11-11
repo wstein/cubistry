@@ -3,10 +3,10 @@
 # Verifier of a coverage summary (coverage.tsv and coverage.json) against the pinned month list; shares no code with
 # month_coverage.jl. It recomputes the headline, runs, gaps and before_root months from the list alone and fails on any mismatch.
 # A gap marked unavailable_unsat must cite a Julia and a Flix corner receipt that are byte-identical and say UNSAT.
-#   verify_coverage.jl LIST LIST_SHA256 COVERAGE_TSV COVERAGE_JSON EVIDENCE_DIR
+#   verify_coverage.jl LIST LIST_SHA256 COVERAGE_TSV COVERAGE_JSON EVIDENCE_DIR START_MONTH
 # Coverage bookkeeping only: the UNSAT facts are the cited receipts of the Julia and Flix corner checkers.
 using SHA, Dates
-list,pin,tsvpath,jsonpath,evdir=ARGS
+list,pin,tsvpath,jsonpath,evdir,startt=ARGS
 d(s)=Date(parse(Int,s[1:4]),parse(Int,s[6:7]),1)
 txt(x)=Dates.format(x,"yyyy-mm")
 mdiff(a,b)=(year(a)-year(b))*12+month(a)-month(b)
@@ -15,7 +15,7 @@ function main()
     raw=String(bytes);@assert endswith(raw,"\n") && !occursin('\r',raw)
     rows=split(chop(raw),'\n');@assert all(r->occursin(r"^\d{4}-\d{2}$",r),rows)
     S=[d(r) for r in rows];@assert issorted(S) && allunique(S) "increasing list"
-    inS=Set(S);ROOT=Date(2026,5,1);FIRST=Date(2026,1,1);@assert ROOT in inS "root in list"
+    inS=Set(S);ROOT=d(startt);FIRST=Date(2026,1,1);@assert ROOT in inS "root in list"
     L=readlines(tsvpath);@assert endswith(read(tsvpath,String),"\n")
     f(i)=split(L[i],'\t')
     # range and list line
