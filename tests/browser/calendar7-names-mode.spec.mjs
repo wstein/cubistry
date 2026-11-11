@@ -315,3 +315,41 @@ test("names layout: every face texture is the size of its own tile (192 px per u
   expect(seen.names.kinds).toEqual(["192x192", "192x346", "346x192", "346x346"]);
   expect(seen.standard).toEqual({ faces: 294, wrong: 0, kinds: ["192x192"] });
 });
+
+test("turning the cube changes the names exposure through the render loop (no manual sync), the standard layout keeps 1", async ({ page }) => {
+  await page.goto("/licenses.html");
+  const seen = await page.evaluate(async () => {
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const get = async (p) => (await fetch(p)).json();
+    const names = parseState(await get("/calendar7/names/state.v1.json"));
+    const standard = parseState(await get("/calendar7/state.v1.json"));
+    const host = document.createElement("div"), panel = document.createElement("div");
+    host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
+    document.body.append(host, panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    const frames = (n) => new Promise((done) => { const tick = () => (n-- > 0 ? requestAnimationFrame(tick) : done()); tick(); });
+    // The smart rotation copies its own quaternion onto the presentation every frame: turn the cube through it, as a drag would.
+    const turn = (pitch, yaw) => viewer.rotation.controller.quaternion.setFromEuler(new viewer.presentation.rotation.constructor(pitch, yaw, 0, "XYZ"));
+    const out = {};
+    viewer.configure(names.printing, names.pose, "face", "names");
+    await frames(4);
+    out.start = viewer.renderer.toneMappingExposure;
+    turn(0, 0); // head on: the front face is lit more, the exposure falls
+    await frames(4);
+    out.headOn = viewer.renderer.toneMappingExposure;
+    turn(0.9, -0.3);
+    await frames(4);
+    out.steep = viewer.renderer.toneMappingExposure;
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    turn(0, 0);
+    await frames(4);
+    out.standard = viewer.renderer.toneMappingExposure;
+    viewer.destroy();
+    return out;
+  });
+  expect(seen.headOn).toBeCloseTo(1.217, 2);
+  expect(seen.start).toBeGreaterThan(seen.headOn + 0.1);
+  expect(Math.abs(seen.steep - seen.headOn)).toBeGreaterThan(0.05);
+  expect(seen.standard).toBe(1);
+});

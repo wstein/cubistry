@@ -313,6 +313,9 @@ export class Calendar7Viewer implements StageView {
     });
     // The scene hides the sticker meshes and gives each cubie face the label texture (the cut faces take bodyColor: the day fill when stickerless).
     this.cube.setConstruction("stickerless");
+    // Names layout: the cube faces show their tokens. A face that receives the shadow map renders darker than its token (up to
+    // 25 of 255 on white), and Linear tone mapping no longer compresses that as Neutral did. The floor keeps the cube's shadow.
+    if (layout === "names") this.presentation.traverse((o) => { if ((o as THREE.Mesh).isMesh) o.receiveShadow = false; });
     this.cube.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
     this.dirty = true;
   }

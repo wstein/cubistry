@@ -176,7 +176,7 @@ test("names layout: the face pixels per unit of the letter grid match the real b
 
 // ---- exposure (owner decision: white must not render grey) ----
 import { STANDARD_EXPOSURE } from "../src/apps/calendar7/geometry.ts";
-import { FACE_WEIGHT_POWER, irradiance, namesExposure } from "../src/apps/calendar7/names-exposure.ts";
+import { irradiance, namesExposure } from "../src/apps/calendar7/names-exposure.ts";
 import { addPresentationLighting } from "@cubistry/cube-viewer";
 test("exposure: the standard layout keeps the shared presentation value 1 and the preset is not touched", () => {
   assert.equal(STANDARD_EXPOSURE, 1);
@@ -204,16 +204,36 @@ test("exposure: head on, the names exposure is pi / front face irradiance of the
   assert.ok(Math.abs(irradiance(scene, new THREE.Vector3(0, 0, 1)) - hand) < 1e-6, `${irradiance(scene, new THREE.Vector3(0, 0, 1))} vs ${hand}`);
 });
 
-test("exposure: it follows the face that looks at the camera, is continuous while the cube turns and tracks the light switches", () => {
+const stepsOf = (scene, cam, rotationAt, from, to) => {
+  let prev = namesExposure(scene, rotationAt(from), cam), worst = 0;
+  for (let a = from + 0.01; a <= to + 1e-9; a += 0.01) { const e = namesExposure(scene, rotationAt(a), cam); worst = Math.max(worst, Math.abs(e - prev)); prev = e; }
+  return worst;
+};
+
+test("exposure: it follows the face that looks at the camera and is continuous while the cube turns about y, about x and at a pitch", () => {
   const scene = studioScene(), cam = camera();
   const tilted = namesExposure(scene, turned(0.3, 0.22), cam), head = namesExposure(scene, new THREE.Quaternion(), cam);
   assert.ok(tilted > head + 0.1, `${tilted} ${head}`); // the default tilt lights the front face less: the exposure rises
-  // The cube turns a quarter about y: no jump of the exposure between two faces looking at the camera.
-  let prev = namesExposure(scene, turned(0, 0), cam), worst = 0;
-  for (let a = 0.01; a <= Math.PI / 2 + 1e-9; a += 0.01) { const e = namesExposure(scene, turned(a, 0), cam); worst = Math.max(worst, Math.abs(e - prev)); prev = e; }
-  assert.ok(worst < 0.05, `largest step of 0.01 rad: ${worst}`);
-  // A switched-off light leaves the irradiance and the exposure follows.
-  scene.traverse((o) => { if (o.isDirectionalLight) o.visible = false; });
+  // Largest change of the exposure per 0.01 rad of turn. A hard switch to the most facing face jumps at the
+  // crossover; the smooth weighting stays below 0.16 (bound 0.3); a hard switch gives 1.4 to 4.5.
+  const sweeps = {
+    "yaw at pitch 0": stepsOf(scene, cam, (a) => turned(a, 0), 0, Math.PI),
+    "yaw at pitch 0.5": stepsOf(scene, cam, (a) => turned(a, 0.5), 0, Math.PI),
+    "pitch at yaw 0": stepsOf(scene, cam, (a) => turned(0, a), -Math.PI / 2, Math.PI / 2),
+    "pitch at yaw 0.3": stepsOf(scene, cam, (a) => turned(0.3, a), -Math.PI / 2, Math.PI / 2),
+    "pitch at yaw 0.8": stepsOf(scene, cam, (a) => turned(0.8, a), -Math.PI / 2, Math.PI / 2),
+  };
+  for (const [name, worst] of Object.entries(sweeps)) assert.ok(worst < 0.3, `${name}: largest step of 0.01 rad ${worst}`);
+});
+
+test("exposure: the studio has only the light types the irradiance counts, and a scene without light gives the shared 1", () => {
+  const scene = studioScene(), cam = camera();
+  const types = new Set();
+  scene.traverse((o) => { if (o.isLight) types.add(o.type); });
+  assert.deepEqual([...types].sort(), ["AmbientLight", "DirectionalLight", "HemisphereLight"]);
+  const head = namesExposure(scene, new THREE.Quaternion(), cam);
+  scene.traverse((o) => { if (o.isDirectionalLight) o.visible = false; }); // a switched-off light leaves the irradiance
   assert.ok(namesExposure(scene, new THREE.Quaternion(), cam) > head + 0.5);
-  assert.equal(FACE_WEIGHT_POWER, 8);
+  scene.traverse((o) => { if (o.isLight) o.visible = false; });
+  assert.equal(namesExposure(scene, new THREE.Quaternion(), cam), 1);
 });
