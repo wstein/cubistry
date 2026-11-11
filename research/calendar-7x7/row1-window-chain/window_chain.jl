@@ -2,18 +2,27 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # UNTRUSTED candidate producer (check.jl, the Flix checker and verify_chain.jl decide).
 # Window chain with optimized edges: loops the beam edge of beam_edge.jl (global macro beam, greedy orbit solver
-# as fallback) sequentially from the retained state over the months of the print window. The library is built once
-# per process. Months outside the print window get a status record (months.tsv), not an edge.
+# as fallback) sequentially from the retained state over the chain months: the root month (the identity pose of the print),
+# then the months of the month list S; a gap in S is one bridge edge. The library is built once per process. Months that are
+# not chain months get a status record (months.tsv), not an edge.
 #   julia --threads=4 window_chain.jl OUT PRINT [key=value ...]
-# Env WINDOW_END (YYYY-MM): the window of PRINT (default 2037-01 here); GENERATE_DEADLINE_S: no new edge starts when
-# the slowest edge so far would not fit before this many seconds (default 14400).
-# Options: start=YYYY-MM end=YYYY-MM (range of months.tsv; default 2026-01 .. 2050-01) prior=DIR (continue DIR/chain.moves.tsv
-# with DIR/edges.tsv, and DIR/states) claims=FILE max_edges=N library=L1|L4|L5 width lambda corew fanout maxdepth patience nsnap finish_depth.
-# Output OUT: chain.moves.tsv, states/state-NN.tsv, months.tsv, edges.tsv (cumulative with prior=, column method: beam,
+# Run contract (the environment of the chain checkers, nothing is hard-wired here):
+#   CAL7_WINDOW_MONTHS, CAL7_WINDOW_MONTHS_SHA256  month list S (file, pinned by SHA-256; 1900-01 .. 2100-01); required
+#   CAL7_ROOT_MONTH                                 month the identity pose shows (default: first member of S); a root other than
+#                                                   S[1] adds one root edge from the identity pose to S[1]
+#   CAL7_WINDOW_PRINT_SHA                           SHA-256 of PRINT (checked here when set)
+# GENERATE_DEADLINE_S: no new edge starts when the slowest edge so far would not fit before this many seconds (default 3000,
+# one segment of about an hour).
+# Options: start=YYYY-MM end=YYYY-MM (range of months.tsv; default the chain range) prior=DIR (continue DIR/chain.moves.tsv
+# with DIR/edges.tsv, and DIR/states) claims=FILE best_effort=FILE (declared best-effort months: the run stops before such a month,
+# its edge needs wrong cells and Hall witnesses that this producer does not write) max_edges=N library=L1|L4|L5 width lambda corew
+# fanout maxdepth patience nsnap finish_depth.
+# Output OUT: chain.moves.tsv (chain.v1), states/state-NN.tsv, months.tsv, edges.tsv (cumulative with prior=, column method: beam,
 # finishN or greedy), PROGRESS.txt (incl. greedy_edges).
 # Exit: 0 chain complete or stopped cleanly (PROGRESS.txt says which), 3 no new edge was produced, otherwise error.
 @assert length(ARGS)>=2 "usage: window_chain.jl OUT PRINT [key=value ...]"
-ENV["WINDOW_END"]=get(ENV,"WINDOW_END","2037-01")
+@assert !isempty(get(ENV,"CAL7_WINDOW_MONTHS","")) "set CAL7_WINDOW_MONTHS and CAL7_WINDOW_MONTHS_SHA256 (month list S)"
+@assert !haskey(ENV,"WINDOW_END") "the month list and WINDOW_END are exclusive"
 const T0=time()
 const CAL=normpath(joinpath(@__DIR__,".."))
 include(joinpath(@__DIR__,"window_chain_lib.jl"));using .WindowChainLib
@@ -29,17 +38,24 @@ const P=G.P
 
 out,printpath=ARGS[1:2]
 opts=Dict(String.(split(x,'='))[1]=>String.(split(x,'='))[2] for x in ARGS[3:end])
-window_end=parse_ym(ENV["WINDOW_END"]);range_start=parse_ym(get(opts,"start","2026-01"));range_end=parse_ym(get(opts,"end","2050-01"))
-max_edges=parse(Int,get(opts,"max_edges","100000"));deadline=parse(Float64,get(ENV,"GENERATE_DEADLINE_S","14400"))
+members=read_month_list(ENV["CAL7_WINDOW_MONTHS"],get(ENV,"CAL7_WINDOW_MONTHS_SHA256",""))
+@assert members==window_month_list() "producer and checker readers disagree on the month list"
+root=root_month(get(ENV,"CAL7_ROOT_MONTH",""),members);rooted=root!=members[1]
+plan=chain_plan(members,root);flags=chain_flags(members,root)
+range_start=isempty(get(opts,"start","")) ? min(plan[1],members[1]) : parse_ym(opts["start"]);range_end=isempty(get(opts,"end","")) ? plan[end] : parse_ym(opts["end"])
+max_edges=parse(Int,get(opts,"max_edges","100000"));deadline=parse(Float64,get(ENV,"GENERATE_DEADLINE_S",string(DEFAULT_DEADLINE_S)))
 claims=haskey(opts,"claims") ? read_claims(opts["claims"]) : Dict{Tuple{Int,Int},NTuple{4,String}}()
+best=haskey(opts,"best_effort") ? read_best_effort(opts["best_effort"]) : Dict{Tuple{Int,Int},NTuple{3,String}}()
 @assert !ispath(out) "Use a new scratch output directory";mkpath(joinpath(out,"states"))
 
 labels=coupled_labels(read(joinpath(CAL,"row1-revision/layout.tsv"),String))
-goals=coupled_goals(labels,"names-band","window")      # months May 2026 .. WINDOW_END
+goals=coupled_goals(labels,"names-band","window")      # the members of S
+rooted && (goals=vcat([coupled_month_goal(labels,root...)],goals))   # the root month is not a member: its goal comes first
+@assert [(g.year,g.month) for g in goals]==plan "goals follow the chain plan"
+isempty(get(ENV,"CAL7_WINDOW_PRINT_SHA","")) || @assert bytes2hex(sha256(read(printpath)))==ENV["CAL7_WINDOW_PRINT_SHA"] "print SHA-256 differs from CAL7_WINDOW_PRINT_SHA"
 source=window_read_print(printpath)
 action=P.pose_action();gens=[UInt16.(g) for g in action.generators];a=G.M.Algebra(action)
 digest(st)=P.state_digest(P.decode_physical(source,st,action))
-plan=chain_months(range_start,range_end,window_end);@assert length(plan)<=length(goals)
 statepath(id)=joinpath(out,"states","state-"*lpad(string(id),2,'0')*".tsv")
 function snapshot(state,id,g)
     actual=P.decode_physical(source,state,action);P.validate_front(actual,g)
@@ -49,10 +65,10 @@ function snapshot(state,id,g)
     end
     P.state_digest(actual)
 end
-# Start: identity (May 2026) or a prior chain, replayed with the print; its rows and snapshots are copied verbatim.
+# Start: identity (the root month) or a prior chain, replayed with the print; its rows and snapshots are copied verbatim.
 if haskey(opts,"prior")
     ls=String.(split(chop(read(joinpath(opts["prior"],"chain.moves.tsv"),String);tail=1),'\n'))
-    months,k=chain_progress(ls);@assert months==plan[1:k+1] "prior chain months do not match the plan (print window or range changed)"
+    months,k=chain_progress(ls,plan);@assert months==plan[1:k+1] "prior chain months do not match the plan (month list or root changed)"
     state=P.identity_perm();lastend=String(split(ls[2],'\t')[5])
     for l in ls[3:end-1];global state,lastend;f=String.(split(l,'\t'))
         if f[1]=="edge";lastend=f[9]
@@ -62,9 +78,11 @@ if haskey(opts,"prior")
     for i in 1:k+1;cp(joinpath(opts["prior"],"states","state-"*lpad(string(i),2,'0')*".tsv"),statepath(i));end
     rows=ls[1:end-1];edges_before=k
     prior_methods=read_edges(joinpath(opts["prior"],"edges.tsv"),k)   # the solver record of earlier segments is carried forward
+    prior_segments=read_segments(joinpath(opts["prior"],"segments.tsv"))   # so are the inputs of earlier segments
 else
     state=P.identity_perm();h0=snapshot(state,1,goals[1])
-    rows=String["cubistry.calendar7.chain.v1","source\t5\t2026\t5\t$h0"];edges_before=0;prior_methods=String[]
+    prior_segments=String[]
+    rows=String["cubistry.calendar7.chain.v1","source\t$(root[2])\t$(root[1])\t$(root[2])\t$h0"];edges_before=0;prior_methods=String[]
 end
 function dump(rows)
     tmp=joinpath(out,"chain.moves.tsv.tmp");write(tmp,join(vcat(rows,["finish"]),'\n')*"\n");mv(tmp,joinpath(out,"chain.moves.tsv");force=true)
@@ -88,7 +106,7 @@ new_methods=String[]
 done=0;slowest=0.0;stop=nothing;loop0=time()
 for id in edges_before+2:length(plan)
     global state,done,slowest,stop
-    stop=stop_reason(done,max_edges,time()-loop0,slowest,deadline,plan[edges_before+1+done])
+    stop=stop_reason(done,max_edges,time()-loop0,slowest,deadline,plan[edges_before+1+done];next_best=next_best_effort(plan,edges_before+1+done,best))
     stop===nothing || break
     target=goals[id];@assert (target.year,target.month)==plan[id] "goal order";t=time();before=digest(state)
     r=solve_edge(source,state,target,action,a,gens,lib,index,cats,params;finish_depth=parse(Int,get(opts,"finish_depth","3")),nsnap=parse(Int,get(opts,"nsnap","6")),tight=true,finish=true)
@@ -111,12 +129,20 @@ for id in edges_before+2:length(plan)
 end
 close(elog)
 produced=plan[1:edges_before+1+done];complete=length(produced)==length(plan)
-write_months(joinpath(out,"months.tsv"),month_records(range_start,range_end,window_end,produced,complete ? nothing : something(stop,"deadline");claims,methods=vcat(prior_methods,new_methods)))
+write_months(joinpath(out,"months.tsv"),month_records(range_start,range_end,plan,produced,complete ? nothing : something(stop,"deadline");claims,best,rooted,methods=vcat(prior_methods,new_methods)))
+# Provenance of this segment next to those of the earlier ones (run id and research commit come from the workflow; library, beam width
+# and lambda are the options of this run).
+open(joinpath(out,"segments.tsv"),"w") do io
+    println(io,SEGMENTS_HEADER);foreach(r->println(io,r),prior_segments)
+    println(io,segment_row(run_id=get(opts,"run_id","local"),research_ref=get(opts,"research_ref","local"),library=get(opts,"library","L5"),width=get(opts,"width","40"),lambda=get(opts,"lambda","3"),
+        print_sha=bytes2hex(sha256(read(printpath))),months_sha=ENV["CAL7_WINDOW_MONTHS_SHA256"],root=ym_str(root),edges_from=edges_before,edges_to=edges_before+done))
+end
 open(joinpath(out,"PROGRESS.txt"),"w") do io
     println(io,"complete=",complete);println(io,"stop_reason=",complete ? "-" : something(stop,"deadline"))
     println(io,"edges_total=",edges_before+done);println(io,"edges_new=",done);println(io,"chain_end=",ym_str(produced[end]))
     println(io,"greedy_edges=",greedy_count(vcat(prior_methods,new_methods)))
-    println(io,"plan_end=",ym_str(plan[end]));println(io,"seconds=",round(time()-T0;digits=1))
+    println(io,"plan_end=",ym_str(plan[end]));println(io,"root_month=",ym_str(root));println(io,"rooted=",rooted);println(io,"bridge_edges=",count(==("BRIDGE"),flags))
+println(io,"best_effort_edges=0");println(io,"seconds=",round(time()-T0;digits=1))
 end
 println("RESULT complete=",complete," greedy=",greedy_count(vcat(prior_methods,new_methods))," stop=",complete ? "-" : something(stop,"deadline")," edges_total=",edges_before+done," chain_end=",ym_str(produced[end])," seconds=",round(time()-T0;digits=1))
 done==0 && !complete && exit(3)
