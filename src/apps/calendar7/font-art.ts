@@ -78,7 +78,7 @@ const OUTER = outerLayerWidth(CALENDAR7_SIZE);
 const roomOf = (anchor: -1 | 0 | 1): { left: number; right: number } => {
   const first = anchor === 1, tile: FaceTile = first ? { w: OUTER, h: OUTER, band: { l: OUTER - 1, r: 0, t: OUTER - 1, b: 0 } } : { w: 1, h: OUTER, band: { l: 0, r: 0, t: OUTER - 1, b: 0 } };
   const g = tileGrid(tile), k = faceTransform(tile).kx, ppu = namePxPerUnit();
-  return { left: first ? (OUTER - 0.5 - NAMES_MONTH_SIDE_BAND) * ppu : g.cx / k, right: (g.W - g.cx) / k }; // the first tile: the banner starts 0.4 inside the cube edge, 0.9 from the cell center
+  return { left: first ? (OUTER - 0.5 - NAMES_MONTH_SIDE_BAND) * ppu : g.cx / k, right: (g.W - g.cx) / k }; // the first tile: the banner starts 0.6 inside the cube edge, 0.7 from the cell center (f - 0.5 - side)
 };
 
 /** Natural geometry of a label in em: summed ink widths and the natural ink gaps between neighbors. */
@@ -101,7 +101,7 @@ function trackingFor(s: number, n: { glyphs: number; gaps: number[] }, target: n
 }
 
 /**
- * Variant under review: the first tile of a name with three letters (AUG, SEP, NOV, DEC) fills its 1.4 units of banner
+ * Variant under review: the first tile of a name with three letters (AUG, SEP, NOV, DEC) fills its 1.2 units of banner
  * (looser tracking than the other tiles) so that its ink keeps half a seam gap from the banner edge. Off: it takes the mean
  * tracking like the other outer tiles and sits flush to its right seam with the rest of the banner width as left margin.
  */
