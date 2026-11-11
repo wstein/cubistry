@@ -47,15 +47,13 @@ test("September 1967 in the names layout: no chain notice, the 3D face shows SEP
   expect(errors).toEqual([]);
 });
 
-test("February 2026 has no state with the print: the message and the reason are shown, the cube is hidden", async ({ page }) => {
+test("February 2026 is a best-effort cube with one sentence; the technical reason is not on the page", async ({ page }) => {
   await page.goto("/index.html?app=calendar7&layout=names&year=2026&month=2");
   await at(page, "2026-02");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "none");
-  const message = page.locator("[data-c7-no-state]");
-  await expect(message).toBeVisible();
-  await expect(message).toContainText("No state for this date with the print.");
-  await expect(message).toContainText("February with 28 days starting on a Sunday");
-  await expect(page.locator("#studio-scene")).toBeHidden();
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "best-effort");
+  await expect(page.locator("[data-c7-best-effort]")).toHaveText("Not exactly possible with this print: cell bottom right (row 7, column 7) differs.");
+  await expect(page.locator("#studio-scene")).toBeVisible();
+  await expect(page.locator("body")).not.toContainText("No state for this date");
   await expect(page.getByRole("status").filter({ hasText: NOTICE })).toBeVisible();
 });
 

@@ -9,13 +9,14 @@ import { createHash } from "node:crypto";
 import { cpSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { build, check, IMPOSSIBLE_KEY, parseFronts } from "../scripts/export-calendar7-names-anydate.mjs";
+import { build, check, DEFAULTS, IMPOSSIBLE_KEY, parseFlags, parseFronts } from "../scripts/export-calendar7-names-anydate.mjs";
 import {
-  ANY_FIRST_YEAR, ANY_LAST_YEAR, ROTATIONS, allConfigs, chooseAnyMonth, configOf, matchFront, namesCells, parseAnyData, parseFront, poseFromFront, rotationOf, stateForDate,
+  ANY_FIRST_YEAR, ANY_LAST_YEAR, ROTATIONS, allConfigs, bestEffortFront, bestEffortSentence, cellWhere, chooseAnyMonth, configOf, matchFront, namesCells, parseAnyData, parseFront, poseFromFront, rotationOf, stateForDate, wrongStickerIndices,
 } from "../src/apps/calendar7/anydate.ts";
-import { anyDatePageHtml, anyDateModel, NO_STATE_LEAD } from "../src/apps/calendar7/anydate-view.ts";
+import { anyDatePageHtml, anyDateModel, HIDDEN_SHEET_CLASS, NO_STATE_LEAD } from "../src/apps/calendar7/anydate-view.ts";
 import { checkPose, stateDigest } from "../src/apps/calendar7/engine.ts";
-import { frontFailure } from "../src/apps/calendar7/display.ts";
+import { frontFailure, frontFailures } from "../src/apps/calendar7/display.ts";
+import { drawWrongCell, HATCH_LINES, WRONG_CELL } from "../src/apps/calendar7/sticker-art.ts";
 import { ANY_DISPLAY_ONLY_NOTICE, NAMES_ANY_LABEL, NAMES_ANY_LOAD_NOTICE, parseLayout, parseLayoutMode } from "../src/apps/calendar7/layout.ts";
 import { parseDisplays, parseState } from "../src/apps/calendar7/graph.ts";
 import { chainRange, monthLabel } from "../src/apps/calendar7/month-view.ts";
@@ -100,13 +101,15 @@ test("the names cells are the month name and band tiles in row 1 then the calend
 });
 
 // ---- the data ----
-test("the data folder checks clean: 90 of 91 configurations have a state, February with 28 days from a Sunday has none, sizes within budget", () => {
+test("the data folder checks clean: 90 configurations are exact, February with 28 days from a Sunday is best effort with its wrong cell, sizes within budget", () => {
   check(DIR);
   const entries = [...data.entries.values()];
   assert.equal(entries.length, 91);
   assert.deepEqual(entries.filter((e) => e.status !== "match").map((e) => e.key), [IMPOSSIBLE_KEY]);
-  assert.equal(data.entries.get(IMPOSSIBLE_KEY).status, "none");
-  assert.match(data.entries.get(IMPOSSIBLE_KEY).reason, /February with 28 days starting on a Sunday/);
+  const best = data.entries.get(IMPOSSIBLE_KEY);
+  assert.equal(best.status, "best-effort");
+  assert.deepEqual(best.wrong, [[7, 7]], "research match_config on print B: 48 of 49 cells, the solver reports (7,7)");
+  assert.match(best.reason, /February with 28 days starting on a Sunday/); // the research reason lives in the data only
   const bytes = ["state.v1.json", "configs.v1.json", "NOTICE.txt", "manifest.sha256", "research-inputs.sha256"].reduce((a, n) => a + statSync(`${DIR}/${n}`).size, 0);
   assert.ok(bytes < 80000, `${bytes} bytes`);
   // 2-4-29 (February 2024) is not in the research months 2026-05 to 2050-01: the exporter's own matching supplies it.
@@ -162,11 +165,14 @@ test("the boards of the named dates: September 1967, February 2000 (leap), 2100 
   assert.equal(has(front(1900, 2).cells, "29"), false);
   assert.deepEqual([1, 2, 3].map((c) => front(2100, 2).texts.get(`1,${c}`)), ["FE", "BRU", "ARY"]);
 });
-test("February 2026 (and every 28-day February from a Sunday) has no state and says why; February 2024 has one", () => {
+test("February 2026 (and every 28-day February from a Sunday) is a best-effort state that fails on exactly its listed cell; February 2024 is exact", () => {
   for (const [y, m] of [[2026, 2], [2037, 2], [2043, 2], [2015, 2]]) {
     const s = stateForDate(data, y, m);
-    assert.equal(s.kind, "none", `${y}-${m}`);
-    assert.match(s.reason, /no front matching with print B/);
+    assert.equal(s.kind, "best-effort", `${y}-${m}`);
+    checkPose(printing, s.pose);
+    const failed = frontFailures(printing, s.pose, namesCells(y, m));
+    assert.deepEqual(failed.map((f) => [f.row, f.column]), s.wrong.map((w) => [...w]), `${y}-${m}: the front differs on exactly the listed cells`);
+    assert.equal(failed.length, 1, "48 of 49 cells: the fewest wrong cells");
   }
   assert.equal(stateForDate(data, 2024, 2).kind, "state");
   assert.equal(stateForDate(data, 2028, 2).kind, "state");
@@ -176,6 +182,50 @@ test("the exporter's own matching: it matches a research month, and finds none f
   assert.notEqual(sample, null);
   assert.equal(frontFailure(printing, poseFromFront(printing, data.start.pose, sample), namesCells(2027, 3)), null);
   assert.equal(matchFront(printing, data.start.pose, namesCells(2026, 2)), null);
+});
+test("the best-effort front is a maximum matching: 48 of 49 cells on the Sunday February, and the filler of the wrong cell is an unused corner body", () => {
+  const best = bestEffortFront(printing, data.start.pose, namesCells(2026, 2));
+  assert.deepEqual(best.wrong, [[7, 7]]);
+  assert.equal(new Set(best.front.map((f) => f.piece)).size, 49, "49 distinct bodies");
+  assert.equal(frontFailures(printing, poseFromFront(printing, data.start.pose, best.front), namesCells(2026, 2)).length, 1);
+  // An exact board has no wrong cell.
+  assert.deepEqual(bestEffortFront(printing, data.start.pose, namesCells(2027, 3)).wrong, []);
+});
+test("the wrong cell has exactly one front sticker, on the corner cubie of that cell", () => {
+  const s = stateForDate(data, 2026, 2);
+  const [i] = wrongStickerIndices(s.pose, s.wrong);
+  const o = 3 * i;
+  assert.deepEqual([s.pose.pos[o], s.pose.pos[o + 1], s.pose.pos[o + 2]], [3, -3, 3], "front, bottom right: x 3, y -3, z 3");
+  assert.deepEqual([s.pose.normal[o], s.pose.normal[o + 1], s.pose.normal[o + 2]], [0, 0, 1]);
+  assert.throws(() => wrongStickerIndices(s.pose, [[8, 1]]), /has 0 stickers/);
+  // Row and column are not interchangeable: row 7, column 1 is bottom left (x -3, y -3), row 1, column 7 top right (x 3, y 3).
+  for (const [cell, want] of [[[7, 1], [-3, -3]], [[1, 7], [3, 3]], [[1, 1], [-3, 3]]]) {
+    const [j] = wrongStickerIndices(s.pose, [cell]);
+    assert.deepEqual([s.pose.pos[3 * j], s.pose.pos[3 * j + 1]], want, `cell ${cell}`);
+  }
+  const exact = stateForDate(data, 1967, 9).pose;
+  assert.deepEqual(wrongStickerIndices(exact, [[7, 7]]).length, 1);
+  assert.notEqual(wrongStickerIndices(exact, [[7, 7]])[0], wrongStickerIndices(exact, [[7, 1]])[0]);
+});
+test("where a cell is is derived from its coordinates: corners by name, the others by row and column; the sentence follows the list", () => {
+  assert.equal(cellWhere(7, 7), "bottom right (row 7, column 7)");
+  assert.equal(cellWhere(7, 1), "bottom left (row 7, column 1)");
+  assert.equal(cellWhere(1, 1), "top left (row 1, column 1)");
+  assert.equal(cellWhere(1, 7), "top right (row 1, column 7)");
+  assert.equal(cellWhere(3, 4), "row 3, column 4");
+  assert.equal(bestEffortSentence([[7, 7]]), "Not exactly possible with this print: cell bottom right (row 7, column 7) differs.");
+  assert.equal(bestEffortSentence([[7, 1]]), "Not exactly possible with this print: cell bottom left (row 7, column 1) differs.");
+  assert.equal(bestEffortSentence([[7, 1], [3, 4]]), "Not exactly possible with this print: cells bottom left (row 7, column 1) and row 3, column 4 differ.");
+});
+test("the data contract: a best-effort entry needs a list of distinct cells in 1..7, a front and a reason", () => {
+  const entry = (patch) => { const c = structuredClone(configsJson); Object.assign(c.configs.find((e) => e.key === IMPOSSIBLE_KEY), patch); return c; };
+  assert.doesNotThrow(() => parseAnyData(stateJson, entry({})));
+  assert.throws(() => parseAnyData(stateJson, entry({ wrong: [] })), /wrong cells required/);
+  assert.throws(() => parseAnyData(stateJson, entry({ wrong: undefined })), /wrong cells required/);
+  assert.throws(() => parseAnyData(stateJson, entry({ wrong: [[8, 1]] })), /wrong cell/);
+  assert.throws(() => parseAnyData(stateJson, entry({ wrong: [[7, 0]] })), /wrong cell/);
+  assert.throws(() => parseAnyData(stateJson, entry({ wrong: [[7, 7], [7, 7]] })), /repeat/);
+  assert.throws(() => parseAnyData(stateJson, entry({ reason: undefined })), /source, front and reason/);
 });
 test("a front with a wrong rotation, a repeated body or a cell the body cannot reach is refused", () => {
   const front = data.entries.get("9-5-30").front.map((f) => ({ ...f }));
@@ -201,6 +251,39 @@ test("check stops on a tampered folder: changed front without the manifest, and 
   const manifest = readFileSync(join(dir, "manifest.sha256"), "utf8").split("\n").map((l) => (l.endsWith("  configs.v1.json") ? `${createHash("sha256").update(text).digest("hex")}  configs.v1.json` : l)).join("\n");
   writeFileSync(join(dir, "manifest.sha256"), manifest);
   assert.throws(() => check(dir), /configuration 9-5-30: front differs/);
+});
+test("check stops when the list of wrong cells does not match the front: another cell, a missing cell, an extra cell", () => {
+  const forged = (patch) => {
+    const dir = copyDir();
+    const cfg = json(join(dir, "configs.v1.json"));
+    patch(cfg.configs.find((c) => c.key === IMPOSSIBLE_KEY));
+    const body = JSON.stringify(cfg);
+    writeFileSync(join(dir, "configs.v1.json"), body);
+    const manifest = readFileSync(join(dir, "manifest.sha256"), "utf8").split("\n").map((l) => (l.endsWith("  configs.v1.json") ? `${createHash("sha256").update(body).digest("hex")}  configs.v1.json` : l)).join("\n");
+    writeFileSync(join(dir, "manifest.sha256"), manifest);
+    return dir;
+  };
+  assert.throws(() => check(forged((e) => (e.wrong = [[7, 1]]))), /configuration 2-0-28: front differs at \[7,7\], the list of wrong cells is \[7,1\]/);
+  assert.throws(() => check(forged((e) => (e.wrong = [[7, 7], [1, 1]]))), /the list of wrong cells is \[7,7 1,1\]/);
+  const exact = forged((e) => { Object.assign(e, data.entries.get("2-1-28") && { status: "match", source: "x" }); delete e.wrong; delete e.reason; });
+  assert.throws(() => check(exact), /configuration 2-0-28: front differs at \[7,7\], the list of wrong cells is \[\]/);
+});
+test("the exporter parameters: print, fronts and root are flags; a print needs its sha; the defaults are print B", () => {
+  assert.deepEqual(parseFlags(["root"]).options, {});
+  const p = parseFlags(["r", "--print", "x/printing-C.tsv", "--print-sha", "a".repeat(64), "--fronts", "none", "--root", "1980-01", "--out", "o"]);
+  assert.deepEqual(p.options, { printPath: "x/printing-C.tsv", printSha: "a".repeat(64), frontsPath: undefined, root: { year: 1980, month: 1 } });
+  assert.equal(p.out, "o");
+  assert.throws(() => parseFlags(["r", "--print", "x"]), /--print needs --print-sha/);
+  assert.throws(() => parseFlags(["r", "--fronts", "f.tsv"]), /--fronts needs --fronts-sha/);
+  assert.throws(() => parseFlags(["r", "--root", "1980-13"]), /YYYY-MM/);
+  assert.throws(() => parseFlags(["r", "--bogus", "1"]), /unknown flag/);
+  assert.equal(DEFAULTS.printPath.endsWith("printing-S2.tsv"), true);
+});
+test("the root year of a state may be any year from 1 (a print whose identity shows January 1980)", () => {
+  const j = structuredClone(stateJson);
+  j.root.year = 1980;
+  j.root.month = 1;
+  assert.equal(parseAnyData(j, configsJson).start.node.year, 1980);
 });
 test("check refuses a folder whose configuration table lacks one of the 91 configurations", () => {
   const cfg = structuredClone(configsJson);
@@ -253,11 +336,32 @@ test("the Gregorian note appears only for years before 1583", () => {
   assert.match(page(1582, 10), /proleptic Gregorian calendar/);
   assert.doesNotMatch(page(1583, 1), /proleptic/);
 });
-test("February 2026 shows the message and the reason", () => {
+test("February 2026 shows the one sentence, no technical reason, and the month table only as visually hidden text", () => {
   const html = page(2026, 2);
-  assert.match(html, /data-c7-no-state="none"/);
-  assert.ok(html.includes(`${NO_STATE_LEAD} Reason: February with 28 days starting on a Sunday has no front matching with print B`));
-  assert.match(html, /role="alert"/);
+  assert.ok(html.includes('<p class="c7-best-effort" role="status" data-c7-best-effort>Not exactly possible with this print: cell bottom right (row 7, column 7) differs.</p>'));
+  assert.doesNotMatch(html, /scan-fixed|corner demand|Julia|NOMATCH|\.tsv|Reason:|data-c7-no-state/);
+  assert.ok(html.includes(`<div class="${HIDDEN_SHEET_CLASS}" data-c7-sheet-hidden><table class="c7-sheet"`), "the table is inside the hidden wrapper");
+  assert.match(html, /aria-label="7x7 calendar sheet, February 2026"/, "the table keeps its accessible name");
+  // An exact month shows its table as before.
+  assert.doesNotMatch(page(1967, 9), /c7-sr-only|data-c7-best-effort/);
+});
+test("a configuration without any state shows the short line without a reason", () => {
+  const html = anyDatePageHtml({ ...anyDateModel(chooseAnyMonth(new URLSearchParams("year=2026&month=2"), today), null, today, graphRange), anyDate: { kind: "none", key: "2-0-28" } });
+  assert.ok(html.includes(`${NO_STATE_LEAD}</p>`));
+  assert.doesNotMatch(html, /Reason/);
+});
+test("the differing cell is drawn as a grey hatched field with a strike-through and a red frame crossed out", () => {
+  const log = [];
+  const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : (...a) => log.push([String(k), ...a, t.strokeStyle, t.fillStyle])), set: (t, k, v) => { t[k] = v; log.push(["set", k, v]); return true; } });
+  drawWrongCell(ctx, 346, 346);
+  const calls = (name) => log.filter((l) => l[0] === name);
+  assert.deepEqual(calls("fillRect")[0].slice(1, 5), [0, 0, 346, 346]);
+  assert.equal(log.find((l) => l[0] === "set" && l[1] === "fillStyle")[2], WRONG_CELL.field);
+  assert.ok(calls("moveTo").length >= HATCH_LINES, "hatching: one line per step");
+  const strokes = log.filter((l) => l[0] === "set" && l[1] === "strokeStyle").map((l) => l[2]);
+  assert.deepEqual(strokes, [WRONG_CELL.hatch, WRONG_CELL.strike, WRONG_CELL.halo, WRONG_CELL.frame]);
+  assert.equal(calls("strokeRect").length, 2, "the frame, with its halo");
+  assert.equal(calls("stroke").length, 4, "hatching, strike-through, and the cross-out of the frame with its halo");
 });
 test("an invalid month shows the reason and keeps the date form", () => {
   const html = anyDatePageHtml(anyDateModel(chooseAnyMonth(new URLSearchParams("year=0&month=5"), today), null, today, graphRange));
@@ -307,7 +411,7 @@ function fakeRoot() {
   };
 }
 const fakeStage = () => {
-  const stage = { configs: [], shows: [], show: (pose) => stage.shows.push(pose), turn: () => Promise.resolve(), setScheme() {}, setLabel: (t) => (stage.label = t), resetView() {}, destroy() {}, configure(printing, pose, surface, layout) { stage.configs.push({ printing, layout }); } };
+  const stage = { configs: [], shows: [], show: (pose) => stage.shows.push(pose), turn: () => Promise.resolve(), setScheme() {}, setLabel: (t) => (stage.label = t), resetView() {}, destroy() {}, configure(printing, pose, surface, layout, wrong) { stage.configs.push({ printing, layout, wrong }); } };
   return stage;
 };
 const settle = async (root, want) => {
@@ -373,16 +477,22 @@ test("mount with layout=names-any shows September 1967 from print B: one cube bu
   inst.dispose();
 });
 
-test("February 2026 builds no cube, hides the scene and shows the reason; the notice stays", async () => {
+test("February 2026 builds the best-effort cube with the wrong cell marked, shows one sentence and keeps the notice", async () => {
   const root = fakeRoot();
   const { env, stage, host } = setup();
   const inst = await mountCalendar7(root, new URLSearchParams("year=2026&month=2&layout=names-any"), env);
   await settle(root, "2026-02");
-  assert.equal(root.getAttribute("data-c7-any"), "none");
-  assert.equal(stage.configs.length, 0);
-  assert.equal(host.hidden, true);
-  assert.match(root.view.innerHTML, /No state for this date with the print\. Reason: February with 28 days starting on a Sunday/);
+  assert.equal(root.getAttribute("data-c7-any"), "best-effort");
+  assert.equal(stage.configs.length, 1);
+  const s = stateForDate(data, 2026, 2);
+  assert.deepEqual(stage.configs[0].wrong, wrongStickerIndices(s.pose, s.wrong), "the sticker on the wrong cell is the one marked");
+  assert.equal(stage.configs[0].wrong.length, 1);
+  assert.equal(host.hidden, false);
+  assert.equal(root.getAttribute("data-c7-digest"), stateDigest(printing, s.pose));
+  assert.match(root.view.innerHTML, /Not exactly possible with this print: cell bottom right \(row 7, column 7\) differs\./);
+  assert.doesNotMatch(root.view.innerHTML, /scan-fixed|corner demand|Julia/);
   assert.equal(root.el("layout-notice").textContent, ANY_DISPLAY_ONLY_NOTICE);
+  assert.equal(root.el("player").hidden, true, "no move controls");
   inst.dispose();
 });
 
@@ -414,10 +524,14 @@ test("the date form changes the month without rebuilding the cube, updates the a
   assert.deepEqual(calls.query, ["?year=2100&month=2"]);
   assert.equal(root.submit(2026, 2), true);
   await settle(root, "2026-02");
-  assert.equal(root.getAttribute("data-c7-any"), "none");
+  assert.equal(root.getAttribute("data-c7-any"), "best-effort");
+  assert.equal(stage.configs.length, 2, "a different set of wrong stickers is another build");
+  assert.equal(stage.configs[1].wrong.length, 1);
   assert.equal(root.submit(2028, 2), true);
   await settle(root, "2028-02");
   assert.equal(root.getAttribute("data-c7-any"), "state");
+  assert.equal(stage.configs.length, 3);
+  assert.deepEqual(stage.configs[2].wrong, []);
   inst.dispose();
   assert.equal(root.listeners.submit.size, 0);
 });

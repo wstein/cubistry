@@ -180,7 +180,7 @@ export interface PageModel {
   /** The front layout of the data the page was built from; absent means standard. */
   readonly layout?: Layout;
   /** Present when the month is shown from print B without a move sequence (names layout for any date; see anydate-view.ts). */
-  readonly anyDate?: { readonly kind: "state" | "none" | "pending"; readonly key: string; readonly reason?: string };
+  readonly anyDate?: { readonly kind: "state" | "best-effort" | "none" | "pending"; readonly key: string; readonly wrong?: readonly (readonly [number, number])[] };
   /** Present for an "ok" choice. */
   readonly cells?: readonly Cell[];
   readonly prev: Step | null;
