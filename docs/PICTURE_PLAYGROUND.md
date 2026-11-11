@@ -1,4 +1,11 @@
-# Picture Puzzle Playground
+# Picture Cube (formerly Picture Puzzle Playground)
+
+Status: the application is being widened to cube sizes 2 to 7 in a stack of four pull requests
+(size control, upload and fit for every size, editor and history from the 3×3 page, solver for
+2×2 and 3×3 plus redirects). Step 1 is the name and the size control: the page offers 2×2 to 7×7
+and `size=2` to `size=7` in the URL, but **only 2×2 is playable**. The shared mechanics and viewer
+run size 2 only. A larger size is shown disabled, and `size=3` to `size=7` keep the 2×2 with a note.
+The default size is 2 for now and becomes 3 when 3×3 is playable here.
 
 The [playground](../playground.html) combines manual legal turns, repeatable
 scrambles, exact Solve, undo/redo, and move history for a physical 2×2 cube.

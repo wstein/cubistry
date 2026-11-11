@@ -5,7 +5,7 @@ Preview status, the Status Cube, acceptance examples, sticker sheets and the pla
 ## Application overview
 
 The application chooser in the page header lists the applications up to the
-Picture Puzzle Playground below. The remaining pages are opened directly or by
+Picture Cube below. The remaining pages are opened directly or by
 link. Entry points are relative to the site root, for example
 `http://localhost:5173/` locally.
 
@@ -21,7 +21,7 @@ link. Entry points are relative to the site root, for example
 | 7x7 Calendar | English monthly calendar on one 7x7 cube with a 3D view, Jan 2028 to Jan 2076, adjacent months only (research candidate) | chooser (`index.html?app=calendar7`) | [7x7 calendar](CALENDAR_7X7.md) |
 | Calendar | German and English calendar cubes (3x3) | `calendar.html` | [Calendar cubes](CALENDAR_CUBES.md) |
 | CI Quality Cube | Six-face workflow status prototype | `status.html` | [Status Cube](STATUS_CUBE.md) |
-| Picture Puzzle Playground | Free-play 2x2 with picture stickers | `playground.html` | [Playground](PICTURE_PLAYGROUND.md) |
+| Picture Cube | Free-play 2x2 with picture stickers | `playground.html` | [Picture Cube](PICTURE_PLAYGROUND.md) |
 | 3x3 Super Picture Cube | Picture cube on a 3x3 | `picture3.html` | [Super Picture Cube](SUPER_PICTURE_CUBE.md) |
 | Print stickers | Vector print/cut sheets | `print.html` | [Print stickers](PRINT_STICKERS.md) |
 | Library example, solver acceptance | Development-only M1 demos | `library-example.html`, `solver-acceptance.html` | [M1 acceptance](M1_ACCEPTANCE.md) |
@@ -78,9 +78,10 @@ checked on the actual cube before ordering. See the
 [print/export contract](PRINT_STICKERS.md) for source-face assembly maps,
 cut contours, licenses and reproducible custom-size exports.
 
-## Picture Puzzle Playground
+## Picture Cube
 
-Open `playground.html` or choose Picture Puzzle Playground in the application
-chooser. Explore a physical 2×2 with original landscape stickers or classic
+Open `playground.html` or choose Picture Cube in the application chooser. The
+other pages' choosers still list it as Picture Puzzle Playground until the old
+URL is redirected. Explore a physical 2×2 with original landscape stickers or classic
 colors, legal face turns, seeded scrambles, undo/redo and verified exact Solve.
 See [behavior, supported capabilities and architecture lessons](PICTURE_PLAYGROUND.md).
