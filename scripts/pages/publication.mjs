@@ -52,7 +52,8 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
   const field=value=>{if(value===undefined||value===null)return 'none';const text=typeof value==='string'?value:JSON.stringify(value);return secrets.filter(Boolean).flatMap(secret=>[secret,encodeURIComponent(secret)]).reduce((out,secret)=>out.split(secret).join('[redacted]'),text).slice(0,500);};
   const exhausted=()=>{
     const detail=last?` (deployment ${last.id}, last status ${field(last.status)}, errors ${field(last.errors)}, message ${field(last.message)})`:' (no status received)';
-    const error=Error(`Pages deployment wait budget exhausted${detail}`);
+    const hint=last?.status==='succeed'?`; deployment succeeded but receipt not found or not matching at ${PUBLICATION_URL}`:'';
+    const error=Error(`Pages deployment wait budget exhausted${detail}${hint}`);
     console.error(error.message);
     return error;
   };
