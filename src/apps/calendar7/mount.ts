@@ -6,7 +6,9 @@ import type { RotationPlacement } from "./deferral.ts";
 import { revealPlayback, resetPlaybackVisibility } from "./playback-visibility.ts";
 import type { ModeInstance } from "../registry.ts";
 import { type DisplayTable, type Graph, namesWindowContains, parseDisplays, parseGraph, parseState, type Start } from "./graph.ts";
-import { type Layout, LAYOUT_PARAM, NAMES_LOAD_NOTICE, NAMES_NOTICE, parseLayout } from "./layout.ts";
+import { type Layout, type LayoutMode, ANY_DISPLAY_ONLY_NOTICE, LAYOUT_PARAM, NAMES_ANY_LABEL, NAMES_ANY_LOAD_NOTICE, NAMES_ANY_MODE, NAMES_LOAD_NOTICE, parseLayoutMode } from "./layout.ts";
+import { type AnyData, type AnyState, chooseAnyMonth, parseAnyData, stateForDate } from "./anydate.ts";
+import { anyDateModel, anyDatePageHtml } from "./anydate-view.ts";
 import { type Pose, type Printing, stateDigest } from "./engine.ts";
 import {
   announce,
@@ -15,6 +17,7 @@ import {
   chooseMonth,
   monthLabel,
   nodeIndex,
+  ymKey,
   pageHtml,
   playerHtml,
   type YearMonth,
@@ -92,7 +95,7 @@ export async function mountCalendar7(
     '<div class="c7-live" role="status" aria-live="polite"></div>' +
     '<div class="c7-appearance-choices">' +
     `<div class="c7-font-choice"><label for="c7-font-style">Font style</label><select id="c7-font-style" data-c7-font>${FONT_STYLES.map(f => `<option value="${f.id}"${f.id === fontStyleById(params.get("font")).id ? " selected" : ""}>${f.label}</option>`).join("")}</select></div>` +
-    (threeD ? `<div class="c7-layout-choice"><label for="c7-layout">Cube layout</label><select id="c7-layout" data-c7="layout"><option value="standard"${parseLayout(params.get(LAYOUT_PARAM)) === "standard" ? " selected" : ""}>Standard</option><option value="names"${parseLayout(params.get(LAYOUT_PARAM)) === "names" ? " selected" : ""}>Names (preview, May 2026 - Jan 2028)</option></select></div>` : "") +
+    (threeD ? `<div class="c7-layout-choice"><label for="c7-layout">Cube layout</label><select id="c7-layout" data-c7="layout"><option value="standard"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "standard" ? " selected" : ""}>Standard</option><option value="names"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "names" ? " selected" : ""}>Names (preview, May 2026 - Jan 2028)</option>${params.get(LAYOUT_PARAM) === NAMES_ANY_MODE ? `<option value="${NAMES_ANY_MODE}" selected>${NAMES_ANY_LABEL}</option>` : ""}</select></div>` : "") +
     (threeD ? `<div class="c7-scheme-choice"><label for="c7-color-theme">Cube color theme</label><select id="c7-color-theme" data-c7="scheme">${SCHEMES.map(s => `<option value="${s.id}"${s.id === schemeById(params.get(SCHEME_PARAM)).id ? " selected" : ""}>${s.name}</option>`).join("")}</select></div>` : "") +
     '</div><p class="c7-font-status" role="status" data-c7-font-status></p>' +
     (threeD ? '<p class="c7-layout-notice" role="status" data-c7="layout-notice" hidden></p>' : "") +
@@ -132,14 +135,24 @@ export async function mountCalendar7(
   let played: Dataset = standard;
   let wantedData: Dataset = standard;
   /** The selected layout (control and URL); the layout in effect is `shown.layout` (the standard layout outside the names window). */
-  let layoutMode: Layout = threeD ? parseLayout(params.get(LAYOUT_PARAM)) : "standard";
+  let layoutMode: LayoutMode = threeD ? parseLayoutMode(params.get(LAYOUT_PARAM)) : "standard";
   const layoutSelect = q("layout") as HTMLSelectElement | null;
-  if (layoutSelect?.value) layoutMode = parseLayout(layoutSelect.value);
+  if (layoutSelect?.value) layoutMode = parseLayoutMode(layoutSelect.value);
   const layoutNotice = q("layout-notice");
   /** The names data: loaded once, only when the mode is selected; `namesFailed` after a failed load (the standard layout is shown). */
   let names: Dataset | null = null;
   let namesLoading: Promise<void> | null = null;
   let namesFailed = false;
+  /** The print B data of the any-date display (public/calendar7/names-any): same life cycle as the names data. */
+  let anyData: AnyData | null = null;
+  let anyLoading: Promise<void> | null = null;
+  let anyFailed = false;
+  /** True while the page shows a month from print B without a move sequence; `anyWanted` is the state the cube shows then (null: no cube). */
+  let anyActive = false;
+  let anyWanted: Extract<AnyState, { kind: "state" }> | null = null;
+  /** True while the cube is configured with print B for the any-date display (the player is then disposed). */
+  let anyBound = false;
+  let anyLabel = "";
   let currentParams: URLSearchParams = params;
   let showSeq = 0;
   let previous: PlayerSnapshot | null = null;
@@ -189,7 +202,8 @@ export async function mountCalendar7(
     font = chosen;if (fontSelect) fontSelect.value = chosen.style.id;
     root.setAttribute("data-c7-font", chosen.style.id);
     stage?.setFont?.(chosen);paintSheet();
-    if (!stage && currentModel?.choice.kind === "ok") void syncStage(nodeIndex(shown.range, currentModel.choice.ym), shown);
+    if (!stage && anyActive) void syncAny();
+    else if (!stage && currentModel?.choice.kind === "ok") void syncStage(nodeIndex(shown.range, currentModel.choice.ym), shown);
   }, message => { if (alive() && fontStatus) fontStatus.textContent = message; }) : null;
   const onFont = (): void => {
     if (fontSelect && fontChoice) void fontChoice.choose(fontSelect.value);
@@ -377,6 +391,7 @@ export async function mountCalendar7(
     if (activePanel) activePanel.hidden = true;
     root.setAttribute("data-c7-state", "building");
     played = data;
+    anyBound = false;
     made.configure(s.printing, s.pose, "face", data.layout);
     player = new Calendar7Player({
       graph: data.graph,
@@ -420,7 +435,7 @@ export async function mountCalendar7(
 
   const refreshPreviews = (): void => {
     if (!currentModel) return;
-    view.innerHTML = pageHtml(currentModel, wordOptions);
+    view.innerHTML = anyActive ? anyDatePageHtml(currentModel) : pageHtml(currentModel, wordOptions);
     paintSheet();
     const active = player && player.snapshot.phase !== "idle";
     view.querySelectorAll?.(".c7-word-panel").forEach((el) => ((el as HTMLElement).hidden = Boolean(active)));
@@ -438,6 +453,90 @@ export async function mountCalendar7(
       });
     return namesLoading;
   };
+  /** Loads the print B data of the any-date display once, when it is first needed. A failure is remembered: the standard layout is shown with a notice. */
+  const loadAny = (): Promise<void> => {
+    const dir = `${env.base}calendar7/names-any/`;
+    anyLoading ??= Promise.all([env.fetchJson(`${dir}state.v1.json`), env.fetchJson(`${dir}configs.v1.json`)])
+      .then(([st, cfg]) => {
+        anyData = parseAnyData(st, cfg);
+      })
+      .catch(() => {
+        anyFailed = true;
+      });
+    return anyLoading;
+  };
+  /** True when the month of `p` is shown from print B: always in `names-any`, and in `names` for a month outside the chain window. */
+  const wantsAny = (p: URLSearchParams): boolean => {
+    if (layoutMode === NAMES_ANY_MODE) return true;
+    if (layoutMode !== "names" || !names) return false;
+    const m = chooseMonth(p, today, standard.range);
+    return m.kind !== "invalid" && !namesWindowContains(names.table, m.ym.year, m.ym.month);
+  };
+  /** Shows print B (display only) for the month of `p`; the cube shows the state of the month's configuration, or no cube when there is none. */
+  const applyAny = (p: URLSearchParams, moveFocus: boolean): void => {
+    const data = anyData as AnyData;
+    const choice = chooseAnyMonth(p, today);
+    const state = choice.kind === "ok" ? stateForDate(data, choice.ym.year, choice.ym.month) : null;
+    const model = anyDateModel(choice, state, today, standard.range);
+    anyActive = true;
+    anyWanted = state?.kind === "state" ? state : null;
+    currentModel = model;
+    if (threeD) {
+      root.setAttribute("data-c7-layout", "names");
+      root.setAttribute("data-c7-layout-mode", layoutMode);
+      root.setAttribute("data-c7-any", state ? state.kind : "invalid");
+      root.setAttribute("data-c7-state", anyWanted ? "building" : "idle");
+      if (choice.kind === "ok") root.setAttribute("data-c7-month", ymKey(choice.ym));
+    }
+    anyLabel = choice.kind === "ok" ? monthLabel(choice.ym) : "";
+    if (layoutNotice) {
+      layoutNotice.textContent = ANY_DISPLAY_ONLY_NOTICE;
+      layoutNotice.hidden = false;
+    }
+    refreshPreviews();
+    live.textContent = announce(model);
+    if (moveFocus) (view.querySelector("[data-focus]") as HTMLElement | null)?.focus({ preventScroll: true });
+    if (threeD) void syncAny();
+  };
+  /** The cube of the any-date display: print B, the pose of the month's configuration, no player and no moves. */
+  const syncAny = async (): Promise<void> => {
+    if (!threeD || failed) return;
+    wanted = null; // a chain month that is still waiting for the stage is dropped
+    const target = anyWanted;
+    const controls = q("player") as HTMLElement;
+    if (!target) {
+      (sceneHost as HTMLElement).hidden = true;
+      controls.hidden = true;
+      return;
+    }
+    if (fontChoice && !font) return;
+    (sceneHost as HTMLElement).hidden = false;
+    controls.hidden = true;
+    try {
+      await ensure();
+      if (!alive()) return;
+      if (failed || anyWanted !== target) return;
+      const data = anyData as AnyData;
+      const made = stage as Stage;
+      if (!anyBound) {
+        player?.dispose();
+        player = null;
+        activeWord = null;
+        previous = null;
+        const wordBox = q("active-word"), activePanel = q("active-step");
+        if (wordBox) wordBox.innerHTML = "";
+        if (activePanel) activePanel.hidden = true;
+        made.configure(data.start.printing, data.start.pose, "face", "names");
+        anyBound = true;
+      }
+      made.show(target.pose);
+      made.setLabel(`7x7 calendar cube showing ${anyLabel}, display only`);
+      root.setAttribute("data-c7-state", "idle");
+      root.setAttribute("data-c7-digest", stateDigest(data.start.printing, target.pose));
+    } catch (error) {
+      if (alive()) fail(error as Error);
+    }
+  };
   /**
    * The month shown is the month of the URL (`year` and `month`), else today's month. The names layout is in effect only
    * when it is selected, its data is loaded and that month is inside its window; otherwise the standard layout is shown
@@ -448,11 +547,16 @@ export async function mountCalendar7(
     const wantedMonth = chooseMonth(p, today, standard.range);
     let data: Dataset = standard;
     let note = "";
-    if (layoutMode === "names") {
+    if (layoutMode === NAMES_ANY_MODE) {
+      if (!anyData) note = NAMES_ANY_LOAD_NOTICE;
+    } else if (layoutMode === "names") {
       if (!names) note = NAMES_LOAD_NOTICE;
       else if (wantedMonth.kind === "invalid" || namesWindowContains(names.table, wantedMonth.ym.year, wantedMonth.ym.month)) data = names;
-      else note = NAMES_NOTICE;
+      else if (!anyData) note = NAMES_ANY_LOAD_NOTICE;
     }
+    if (anyData && wantsAny(p)) return applyAny(p, moveFocus);
+    anyActive = false;
+    anyWanted = null;
     const choice = chooseMonth(p, today, data.range);
     shown = data;
     const model = buildModel(data.graph, data.table, choice, today, data.layout);
@@ -461,6 +565,7 @@ export async function mountCalendar7(
       // Test hooks and proof for readers: the layout in effect and the layout selected.
       root.setAttribute("data-c7-layout", data.layout);
       root.setAttribute("data-c7-layout-mode", layoutMode);
+      root.setAttribute("data-c7-any", "off");
     }
     if (layoutNotice) {
       layoutNotice.textContent = note;
@@ -480,14 +585,15 @@ export async function mountCalendar7(
   const show = (p: URLSearchParams, moveFocus: boolean): void => {
     currentParams = p;
     const seq = ++showSeq;
-    if (layoutMode === "names" && !names && !namesFailed) {
+    const step = (): void => {
+      const loading = layoutMode === "names" && !names && !namesFailed ? loadNames() : wantsAny(p) && !anyData && !anyFailed ? loadAny() : null;
+      if (!loading) return apply(p, moveFocus);
       live.textContent = "Loading the names layout…";
-      void loadNames().then(() => {
-        if (alive() && seq === showSeq) apply(p, moveFocus);
+      void loading.then(() => {
+        if (alive() && seq === showSeq) step();
       });
-      return;
-    }
-    apply(p, moveFocus);
+    };
+    step();
   };
   onFont();
   show(params, false);
@@ -505,6 +611,20 @@ export async function mountCalendar7(
     show(next, true);
   };
   root.addEventListener("click", onClick);
+  /** The date form of the any-date page: year and month go to the address bar and the page shows that month. */
+  const onSubmit = (e: Event): void => {
+    if (e.type !== "submit") return;
+    const form = (e.target as Element | null)?.closest?.("[data-c7-date-form]") as HTMLFormElement | null;
+    if (!form || !root.contains(form)) return;
+    e.preventDefault();
+    const field = (name: string): string => ((form.querySelector(`[name="${name}"]`) as HTMLInputElement | null)?.value ?? "").trim();
+    const next = new URLSearchParams({ year: field("year"), month: field("month") });
+    const keep = new URLSearchParams(env.search());
+    for (const k of MY_PARAMS) keep.set(k, next.get(k) as string);
+    env.replaceQuery(`?${keep.toString()}`);
+    show(next, true);
+  };
+  root.addEventListener("submit", onSubmit);
 
   const onControl = (e: Event): void => {
     const el = (e.target as Element | null)?.closest?.("[data-c7]") as HTMLElement | null;
@@ -514,7 +634,7 @@ export async function mountCalendar7(
       switch (el.getAttribute("data-c7")) {
         case "layout": {
           if (e.type !== "change") break;
-          layoutMode = parseLayout((el as HTMLSelectElement).value);
+          layoutMode = parseLayoutMode((el as HTMLSelectElement).value);
           (el as HTMLSelectElement).value = layoutMode;
           const query = new URLSearchParams(env.search());
           query.set(LAYOUT_PARAM, layoutMode);
@@ -584,6 +704,7 @@ export async function mountCalendar7(
       stopSheetTheme?.();
       fontChoice?.dispose();fontSelect?.removeEventListener("change", onFont);
       root.removeEventListener("click", onClick);
+      root.removeEventListener("submit", onSubmit);
       if (threeD) {
         root.removeEventListener("click", onControl);
         root.removeEventListener("change", onControl);

@@ -5,7 +5,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { LAYOUT_PARAM, NAME_SLOTS, NAME_WORDS, NAMES_NOTICE, nameAlign, nameSlotStart, parseLayout } from "../src/apps/calendar7/layout.ts";
+import { LAYOUT_PARAM, NAME_SLOTS, NAME_WORDS, nameAlign, nameSlotStart, parseLayout } from "../src/apps/calendar7/layout.ts";
 import { SCHEMES, namesGround } from "../src/apps/calendar7/schemes.ts";
 import { FACE_FLAT, LINE_SCALE, NAMES_LINE_FACTOR, NAME_FONT_SIZE, namePxPerUnit, TEXTURE, TEXT_SQUARE, drawFace, drawSticker, nameGrid, tileClass, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { parseDisplays, parseGraph, parseState } from "../src/apps/calendar7/graph.ts";
@@ -178,7 +178,7 @@ class El {
   focus() { this.focused++; }
 }
 function fakeRoot() {
-  const listeners = { click: new Set(), change: new Set() };
+  const listeners = { click: new Set(), change: new Set(), submit: new Set() };
   const els = new Map();
   const view = new El();
   const live = new El();
@@ -242,7 +242,7 @@ function setup({ search = "?app=calendar7&year=2027&month=3", fail = false, now 
     fetchJson: async (url) => {
       calls.fetched.push(url);
       if (fail && url.includes("/names/")) throw new Error("HTTP 404");
-      const dir = url.includes("/names/") ? "public/calendar7/names/" : "public/calendar7/";
+      const dir = url.includes("/names/") ? "public/calendar7/names/" : url.includes("/names-any/") ? "public/calendar7/names-any/" : "public/calendar7/";
       return json(dir + url.split("/").pop());
     },
     now: () => now,
@@ -257,11 +257,7 @@ function setup({ search = "?app=calendar7&year=2027&month=3", fail = false, now 
 }
 const namesFetches = (calls) => calls.fetched.filter((u) => u.includes("/names/"));
 const notice = (root) => root.el("layout-notice");
-const NOTICE = "The names layout covers May 2026 to January 2028. Showing the standard layout.";
-
-test("the notice text is the owner's sentence", () => {
-  assert.equal(NAMES_NOTICE, NOTICE);
-});
+const NOTICE = "Display only: no move sequence for this date (print B).";
 
 test("standard mode (default, unknown value) never fetches the names files and uses the shipped print", async () => {
   for (const search of ["year=2027&month=3", "year=2027&month=3&layout=standard", "year=2027&month=3&layout=bogus"]) {
@@ -307,31 +303,33 @@ test("names mode inside the window loads the three names files once and builds t
   inst.dispose();
 });
 
-test("names mode outside the window shows the notice and the standard layout without error; the notice goes away inside", async () => {
+test("names mode outside the window shows print B display only with the notice (no standard fallback); the notice goes away inside", async () => {
   for (const ym of ["2030&month=5", "2026&month=4", "2028&month=2", "2099&month=12"]) {
     const root = fakeRoot();
     const { env, stage } = setup();
     const inst = await mountCalendar7(root, q(`year=${ym}&layout=names`), env);
     const month = ym.replace("&month=", "-").replace(/-(\d)$/, "-0$1");
-    if (ym.startsWith("2026&month=4")) { await flush(); assert.equal(notice(root).textContent, NOTICE); assert.equal(notice(root).hidden, false); inst.dispose(); continue; }
     await settle(root, month);
     assert.equal(notice(root).textContent, NOTICE, ym);
     assert.equal(notice(root).hidden, false);
-    assert.equal(stage.configs.at(-1).layout, "standard", ym);
-    assert.equal(root.getAttribute("data-c7-layout"), "standard");
+    assert.equal(stage.configs.at(-1).layout, "names", ym);
+    assert.equal(root.getAttribute("data-c7-layout"), "names");
     assert.equal(root.getAttribute("data-c7-layout-mode"), "names");
-    assert.equal(root.getAttribute("data-c7-digest"), std.graph.nodes[(Number(ym.slice(0, 4)) - 2026) * 12 + Number(ym.split("=")[1]) - 5].hash);
+    assert.equal(root.getAttribute("data-c7-any"), "state");
+    assert.match(root.view.innerHTML, /Display only: no move sequence for this date \(print B\)/);
+    assert.doesNotMatch(root.view.innerHTML, /data-step=/, "no previous or next step");
     inst.dispose();
   }
 });
 
-test("today outside the window: the selected month is today's month; names mode falls back with the notice", async () => {
+test("today outside the window: the selected month is today's month; names mode shows it display only", async () => {
   const root = fakeRoot();
   const { env, stage } = setup({ now: new Date(2030, 6, 1) });
   const inst = await mountCalendar7(root, q("layout=names"), env);
   await settle(root, "2030-07");
   assert.equal(notice(root).textContent, NOTICE);
-  assert.equal(stage.configs[0].layout, "standard");
+  assert.equal(stage.configs[0].layout, "names");
+  assert.equal(root.getAttribute("data-c7-any"), "state");
   inst.dispose();
   const r2 = fakeRoot();
   const second = setup({ now: new Date(2026, 10, 10) });
@@ -339,6 +337,7 @@ test("today outside the window: the selected month is today's month; names mode 
   await settle(r2, "2026-11");
   assert.equal(notice(r2).hidden, true);
   assert.equal(second.stage.configs[0].layout, "names");
+  assert.equal(r2.getAttribute("data-c7-any"), "off");
   i2.dispose();
 });
 
