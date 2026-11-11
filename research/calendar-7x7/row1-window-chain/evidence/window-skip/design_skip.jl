@@ -1,6 +1,6 @@
 #!/usr/bin/env julia
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# design_skip.jl: UNTRUSTED. row1-window-print/design.jl with (a) the explicit month list WINDOW_MONTHS (months.jl), (b) optional seeding SEED_PRINT/SEED_FRAC/SEED_SALT, (c) FREEZE_MATCHES=front-matches.tsv of the seed print: every surface that is a front in those matches keeps its class., (d) FREE_KEY/IN_FRAC: freeze all but one body class.
+# design_skip.jl: UNTRUSTED. Root month = first month of WINDOW_MONTHS (identity pose; optional ROOT=YYYY-MM asserts it; root front surfaces are never frozen). row1-window-print/design.jl with (a) the explicit month list WINDOW_MONTHS (months.jl), (b) optional seeding SEED_PRINT/SEED_FRAC/SEED_SALT, (c) FREEZE_MATCHES=front-matches.tsv of the seed print: every surface that is a front in those matches keeps its class., (d) FREE_KEY/IN_FRAC: freeze all but one body class.
 # UNTRUSTED bounded print designer. Native Julia/Flix witness checks decide.
 # Uses the repo's coupled front-matching SMT relaxation with explicit band art.
 include(joinpath(@__DIR__,"months.jl"))
@@ -62,11 +62,17 @@ function load_visible(path)
         fr=only(filter(s->rotate(s.normal,rot)==FRONT_NORMAL,byhome[homes[parse(Int,f[6])]]));push!(VIS,(fr.home,fr.normal))
     end
 end
+# CLASS_FRACS=x,y,z:f;x,y,z:f frozen fraction per body class (classes not listed are fully frozen); overrides FREE_KEY.
+const CLASS_FRACS=Dict{String,Float64}(split(t,':')[1]=>parse(Float64,split(t,':')[2]) for t in split(get(ENV,"CLASS_FRACS",""),';';keepempty=false))
 const FREE_KEY=get(ENV,"FREE_KEY","");const IN_FRAC=parse(Float64,get(ENV,"IN_FRAC","0.0"))
-# FREE_KEY=x,y,z: every body outside that body class is frozen to the seed; inside it IN_FRAC of the faces (hash) is frozen.
+# FREE_KEY=x,y,z[;x,y,z...]: every body outside these body classes is frozen to the seed; inside it IN_FRAC of the faces (hash) is frozen.
+# The root month (first month of WINDOW_MONTHS) is the identity pose: its 49 front surfaces carry the root board and are never frozen to the seed.
+root_front(h,n)=h[3]==3 && n==FRONT_NORMAL
 function frozen_face(h,n)
     haskey(SEED,(h,n)) || return false
-    if !isempty(FREE_KEY);return join(bodykey(h),',')!=FREE_KEY || (hash((h,n,SEED_SALT))%10000)<round(Int,IN_FRAC*10000);end
+    root_front(h,n) && return false
+    if !isempty(CLASS_FRACS);return (hash((h,n,SEED_SALT))%10000)<round(Int,get(CLASS_FRACS,join(bodykey(h),','),1.0)*10000);end
+    if !isempty(FREE_KEY);return !(join(bodykey(h),',') in split(FREE_KEY,';')) || (hash((h,n,SEED_SALT))%10000)<round(Int,IN_FRAC*10000);end
     (h,n) in VIS || (hash((h,n,SEED_SALT))%10000)<round(Int,SEED_FRAC*10000)
 end
 function window_problem(goals,hs)
@@ -124,12 +130,18 @@ function design_window(layout_path,out)
     @assert isfile(WINDOW_Z3LIB) "explicit native Z3 library"
     load_seed();haskey(ENV,"FREEZE_MATCHES") && load_visible(ENV["FREEZE_MATCHES"])
     labels=coupled_labels(read(layout_path,String));goals=coupled_goals(labels,"names-band","window")
+    # ROOT=YYYY-MM (optional) states the intended root month and must equal the first month of WINDOW_MONTHS.
+    haskey(ENV,"ROOT") && @assert parse_months(ENV["ROOT"])==[(goals[1].year,goals[1].month)] "ROOT is the first month of WINDOW_MONTHS"
     homes=all_homes();allkeys=sort!(unique(bodykey(h) for h in homes));mkpath(out)
     assigned=Dict{Tuple{V3,V3},Tuple{String,Int,String}}()
     version=unsafe_string(ccall((:Z3_get_full_version,WINDOW_Z3LIB),Cstring,()))
+    failed=Ref(0)
     open(joinpath(out,"solver.tsv"),"w") do log
         println(log,"tool\tZ3\t",version,'\t',bytes2hex(sha256(read(WINDOW_Z3LIB))))
+        # survey counter lives outside this block
         for (component,key) in enumerate(allkeys)
+            # ONLY=x,y,z (survey): work on one body class only; the others count as not designed
+            !isempty(get(ENV,"ONLY","")) && join(key,',')!=ENV["ONLY"] && (failed[]+=1;continue)
             hs=[h for h in homes if bodykey(h)==key]
             if length(normal_faces(first(hs)))==1
                 k=surfacekey(first(hs),only(normal_faces(first(hs))))
@@ -144,7 +156,8 @@ function design_window(layout_path,out)
                 end
                 for h in hs
                     n=only(normal_faces(h))
-                    if frozen_face(h,n) && !haskey(assigned,(h,n)) && SEED[(h,n)] in classes;assigned[(h,n)]=SEED[(h,n)];end
+                    # RELEASE_SURPLUS=1: a frozen seed face is kept only while its artwork is still needed (peak not yet reached); default keeps all, as before
+                    if frozen_face(h,n) && !haskey(assigned,(h,n)) && SEED[(h,n)] in classes && (get(ENV,"RELEASE_SURPLUS","")!="1" || count(g->get(assigned,(g,only(normal_faces(g))),nothing)==SEED[(h,n)],hs)<peaks[SEED[(h,n)]]);assigned[(h,n)]=SEED[(h,n)];end
                 end
                 free=[(h,only(normal_faces(h))) for h in hs if !haskey(assigned,(h,only(normal_faces(h))))]
                 for a in classes
@@ -159,6 +172,7 @@ function design_window(layout_path,out)
                 write(joinpath(out,"component-$component.smt2"),problem.smt*"(check-sat)\n")
                 result=window_z3(problem.smt)
                 println(log,"component\t",component,'\t',join(key,','),'\t',result.status==1 ? "UNTRUSTED_SAT" : (result.status==-1 ? "UNSAT" : "UNKNOWN"),'\t',result.elapsed,'\t',result.reason);flush(log)
+                if result.status!=1 && get(ENV,"CONTINUE","")=="1";failed[]+=1;continue;end   # survey mode: log every class, then stop without a print
                 @assert result.status==1 "bounded untrusted designer did not find a print for $key"
                 for (p,h) in enumerate(hs),f in eachindex(problem.face_lists[p])
                     n=problem.face_lists[p][f];k=findfirst(==(surfacekey(h,n)),problem.keys)
@@ -169,6 +183,7 @@ function design_window(layout_path,out)
             end
         end
     end
+    failed[]>0 && (println("survey: ",failed[]," component(s) without an untrusted SAT; no print written");return)
     source=Any[]
     for (pid,h) in enumerate(homes),n in normal_faces(h)
         u=first(v for v in IMAGE_UPS ∪ [(0,0,1),(0,0,-1)] if sum(v.*n)==0)
