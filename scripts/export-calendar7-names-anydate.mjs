@@ -47,8 +47,10 @@ import {
   wrongStickerIndices,
 } from "../src/apps/calendar7/anydate.ts";
 import { parsePrint } from "./prepare-calendar7.mjs";
-import { parseLayout, windowCells } from "./export-calendar7-names.mjs";
+import { RELABEL, parseLayout, windowCells } from "./export-calendar7-names.mjs";
 
+/** April is "AP" + "RIL" in the app (RELABEL, owner decision of 2026-11-11); the research files keep the old labels, their digests are pinned, the bodies stay. */
+const relabel = (text) => (Object.hasOwn(RELABEL, text) ? RELABEL[text] : text);
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const ROOT = "research/calendar-7x7/";
 const SKIP = `${ROOT}row1-window-chain/evidence/window-skip/`;
@@ -106,7 +108,7 @@ function printState(text) {
     if (!INKS_WITH_BAND.includes(f[6])) throw Error(`unknown ink ${f[6]}`);
     return { id: i + 1, piece: print[i].piece, text: print[i].text, ink: print[i].ink, p: vec(f[2], "home"), n: vec(f[3], "normal"), up: vec(f[4], "up") };
   });
-  return stickers;
+  return stickers.map((s) => ({ ...s, text: relabel(s.text) }));
 }
 
 /** front-matches-S2.tsv: Map "year-month" -> the 49 front bodies in row-major cell order. */
@@ -169,7 +171,7 @@ export function build(researchRoot, options = {}) {
     pins.push(["fronts", p.frontsPath, p.frontsSha]);
   }
   if (!options.testOnlySkipDigestPins) for (const [name, rel, sha] of pins) if (sha256(raw[name]) !== sha) throw Error(`${rel}: digest differs from the pinned digest`);
-  const layout = parseLayout(raw.layout.toString("utf8"));
+  const layout = parseLayout(raw.layout.toString("utf8")).map((row) => row.map(relabel));
   const stickers = printState(raw.printing.toString("utf8"));
   const printingRows = { piece: stickers.map((s) => s.piece), text: stickers.map((s) => s.text), ink: stickers.map((s) => s.ink) };
   const root = { pos: Int8Array.from(stickers.flatMap((s) => s.p)), normal: Int8Array.from(stickers.flatMap((s) => s.n)), up: Int8Array.from(stickers.flatMap((s) => s.up)) };
