@@ -315,6 +315,7 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | `date`, `lang`, `language`, `design` | `src/calendar.mjs:344`, `:331` | calendar |
 | `design` | `src/print.mjs:75` | print |
 | `year`, `month` | `src/apps/calendar7/month-view.ts` (`chooseMonth`) | 7x7 calendar mode (`calendar7`) |
+| `outer` | `src/apps/calendar7/geometry.ts` (`outerOverride`) | 7x7 calendar mode (`calendar7`; local look at another outer layer factor, 1.2 to 2.4) |
 
 Owner decision 7 sets `app` as the key of the application in `index.html?app=<id>`; it replaces `application` (and the application meaning of `mode`). The names of the other parameters are not changed by it. `src/app-switch-url.mjs` drops `val`, `value`, `duration`, `year` and `month` when switching applications. `playground.html`, `picture3.html` and `status.html` read none by this search (not further verified).
 
