@@ -58,12 +58,12 @@ def coupledGoalsN(labels: List[List[String]],profile: String,domain: String,oldR
         require(List.forAll(y -> List.forAll(m -> List.memberOf((m,offset(y,m),monthDays(y,m)),shapes),List.range(1,13)),List.range(1900,2100)),"2400-month shape coverage");
         gs
     } else {
-        let gs=List.map(i -> {
-            let y=2026+(i+4)/12;let m=Int32.modulo(i+4,12)+1;
-            Goal.G(y,m,stackedBoard("F31=bfold,S30=bfold,S31=bfold;H=555555555222",y,m))
-        },List.range(0,windowMonths));
+        let gs=windowGoalsOf(List.map(i -> (2026+(i+4)/12,Int32.modulo(i+4,12)+1),List.range(0,windowMonths)));
         require(List.length(gs)==windowMonths,"${windowMonths} window months");gs
     };
+    applyProfile(labels,profile,originals)
+}
+def applyProfile(labels: List[List[String]],profile: String,originals: List[Goal]): List[Goal] \ IO = {
     List.map(g -> {
         let Goal.G(y,m,board)=g;
         if(profile=="scheme-a") g else Goal.G(y,m,List.map(pair -> {
@@ -74,6 +74,39 @@ def coupledGoalsN(labels: List[List[String]],profile: String,domain: String,oldR
             }
         },List.zipWithIndex(board)))
     },originals)
+}
+// Explicit ordered month list S (file with one YYYY-MM per row, strictly increasing, pinned by SHA-256). The window goals of S
+// replace the contiguous window; coupledGoalsM keeps the representative-target validation of coupledGoalsN.
+def windowGoalsOf(ms: List[(Int32,Int32)]): List[Goal] \ IO = List.map(ym -> {
+    let(y,m)=ym;Goal.G(y,m,stackedBoard("F31=bfold,S30=bfold,S31=bfold;H=555555555222",y,m))
+},ms)
+def monthIndex(ym: (Int32,Int32)): Int32 = {let(y,m)=ym;y*12+m}
+def monthText(ym: (Int32,Int32)): String = {let(y,m)=ym;if(m<10) "${y}-0${m}" else "${y}-${m}"}
+def monthRow(row: String): (Int32,Int32) \ IO = {
+    let digits=List.append(String.toList(String.slice(start=0,end=4,row)),String.toList(String.slice(start=5,end=7,row)));
+    require(String.length(row)==7 and String.slice(start=4,end=5,row)=="-" and List.forAll(c -> List.memberOf(c,String.toList("0123456789")),digits),"month list row is YYYY-MM");
+    let y=match Int32.fromString(String.slice(start=0,end=4,row)) {case Some(n) => n case None => 0};
+    let m=match Int32.fromString(String.slice(start=5,end=7,row)) {case Some(n) => n case None => 0};
+    require(m>=1 and m<=12 and monthIndex((y,m))>=monthIndex((2026,1)) and monthIndex((y,m))<=monthIndex((2100,1)),"month list row lies within 2026-01 to 2100-01");
+    (y,m)
+}
+def monthListRead(path: String,pin: String): List[(Int32,Int32)] \ IO = {
+    require(String.length(pin)==64 and List.forAll(c -> List.memberOf(c,String.toList("0123456789abcdef")),String.toList(pin)),"month list SHA-256 pin is 64 lowercase hex");
+    let raw=read(path);require(stackSha(raw)==pin,"month list pin");
+    require(String.length(raw)<=100000,"canonical month list UTF-8/LF");
+    let ms=List.map(monthRow,lines(raw));
+    require(List.length(ms)>=1,"non-empty month list");
+    require(List.forAll(p -> {let(a,b)=p;monthIndex(a)<monthIndex(b)},List.zip(List.take(List.length(ms)-1,ms),List.drop(1,ms))),"month list strictly increasing");
+    ms
+}
+def monthBridges(ms: List[(Int32,Int32)]): Int32 =
+    List.count(p -> {let(a,b)=p;monthIndex(b)-monthIndex(a)>1},List.zip(List.take(List.length(ms)-1,ms),List.drop(1,ms)))
+def monthListLine(pin: String,ms: List[(Int32,Int32)]): String \ IO =
+    "months\t${pin}\t${List.length(ms)}\t${monthText(at(ms,0))}\t${monthText(at(ms,List.length(ms)-1))}\t${monthBridges(ms)}"
+def coupledGoalsM(labels: List[List[String]],profile: String,oldRoot: String,ms: List[(Int32,Int32)]): List[Goal] \ IO = {
+    require(profile=="names-band" or profile=="names" or profile=="scheme-a","known profile");
+    let reps=representatives();validateTargets(read(oldRoot+"/targets.tsv"),reps);
+    applyProfile(labels,profile,windowGoalsOf(ms))
 }
 def coupledHomes(): List[Vec] = List.flatMap(x -> List.flatMap(y -> List.map(z -> (x,y,z),List#{-3,3}),List#{-3,3}),List#{-3,3})
 def coupledGeometry(): List[CFrame] \ IO = {
@@ -129,8 +162,12 @@ def coupledOptics(tags: List[(String,String)]): Int32 \ IO = {
     },samples);
     List.length(checks)
 }
-def coupledCheck(path: String,profile: String,domain: String,oldRoot: String): Unit \ IO = {
-    let raw=read(path);let labels=coupledLabels(raw);let gs=coupledGoals(labels,profile,domain,oldRoot);
+// monthsFile "" selects the default window; otherwise the explicit month list (window domain only), pinned by monthsPin.
+def coupledCheck(path: String,profile: String,domain: String,oldRoot: String,monthsFile: String,monthsPin: String): Unit \ IO = {
+    require(monthsFile=="" or domain=="window","month list needs the window domain");
+    let raw=read(path);let labels=coupledLabels(raw);
+    let listed=if(monthsFile=="") Nil else monthListRead(monthsFile,monthsPin);
+    let gs=if(monthsFile=="") coupledGoals(labels,profile,domain,oldRoot) else coupledGoalsM(labels,profile,oldRoot,listed);
     require(List.forAll(g -> {let Goal.G(y,m,_)=g;y>=2000 and m>=1 and m<=12 and (y<2100 or (y==2100 and m==1))},gs),"targets lie within requested extended domain");
     let frames=coupledGeometry();let hs=coupledHomes();
     let per=List.map(g -> List.map(cell -> {
@@ -145,6 +182,7 @@ def coupledCheck(path: String,profile: String,domain: String,oldRoot: String): U
     require(coupledArt("29","red",7,1)!=coupledArt("29","red",7,7),"red 29 corner transport");
     let capacity=List.length(hs)*3;let required=List.foldLeft((n,p) -> {let(_,v)=p;n+v},0,peaks);
     println("input\t${stackSha(raw)}\t${profile}\t${domain}\t${List.length(gs)}");
+    if(monthsFile != "") println(monthListLine(monthsPin,listed)) else ();
     println("subset\t2000-01\t2100-01\t${List.length(gs)}");
     println("geometry\t24\t${List.length(hs)}\t3\t${capacity}\t${List.length(frames)}\t96\t${opticChecks}");
     List.forEach(frame -> {let(h,n,u,phase)=frame;println("frame\t${vecText(h)}\t${vecText(n)}\t${vecText(u)}\t${phase}")},frames);
@@ -176,7 +214,8 @@ def coupledCheck(path: String,profile: String,domain: String,oldRoot: String): U
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {match Sys.Env.getArgs() {
         case "self-test"::Nil => coupledLemmaTests()
-        case path::profile::domain::oldRoot::Nil => coupledCheck(path,profile,domain,oldRoot)
-        case _ => throw new IllegalArgumentException("LAYOUT_TSV names-band|names|scheme-a all|window ORIGINAL_EVIDENCE")
+        case path::profile::domain::oldRoot::Nil => coupledCheck(path,profile,domain,oldRoot,"","")
+        case path::profile::domain::oldRoot::monthsFile::monthsPin::Nil => coupledCheck(path,profile,domain,oldRoot,monthsFile,monthsPin)
+        case _ => throw new IllegalArgumentException("LAYOUT_TSV names-band|names|scheme-a all|window ORIGINAL_EVIDENCE [MONTHS_FILE MONTHS_SHA256]")
     }} catch {case e: Exception => {println("INVALID\t${e.getMessage()}");System.exit(1)}}
 })

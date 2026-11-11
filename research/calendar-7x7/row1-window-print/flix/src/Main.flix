@@ -25,20 +25,24 @@ def windowReadPrint(raw: String): Vector[Sticker] \ IO = {
     require(List.length(List.distinct(List.map(s -> {let Sticker.S(_,_,h,_,_,_,_)=s;h},source)))==218,"218 printed physical bodies");
     List.toVector(source)
 }
-def windowCheck(layoutPath: String,printPath: String,matchesPath: String,oldRoot: String): Unit \ IO = {
+// monthsFile "" selects the 21-month default window; otherwise the explicit month list pinned by monthsPin.
+def windowCheck(layoutPath: String,printPath: String,matchesPath: String,oldRoot: String,monthsFile: String,monthsPin: String): Unit \ IO = {
     let rawLayout=read(layoutPath);let labels=coupledLabels(rawLayout);
-    let goals=coupledGoals(labels,"names-band","window",oldRoot);
+    let listed=if(monthsFile=="") Nil else monthListRead(monthsFile,monthsPin);
+    let goals=if(monthsFile=="") coupledGoals(labels,"names-band","window",oldRoot) else coupledGoalsM(labels,"names-band",oldRoot,listed);
+    let nt=List.length(goals);
     let rawPrint=read(printPath);let printing=windowReadPrint(rawPrint);
     let rawMatches=read(matchesPath);
     let records=match lines(rawMatches) {
         case "target\tyear\tmonth\trow\tcolumn\tpiece\tx-image\ty-image\tz-image"::rest => rest
         case _ => throw new IllegalArgumentException("21 complete front matches")
     };
-    require(List.length(goals)==21 and List.length(records)==21*49,"21 complete front matches");
+    require(nt>=1 and List.length(records)==nt*49,"21 complete front matches");
     let rs=rotations();require(List.length(rs)==24,"24 proper rotations");
     List.forEach(r -> require(cross(rotate((1,0,0),r),rotate((0,1,0),r))==rotate((0,0,1),r),"proper rotation only"),rs);
     println("input\t${stackSha(rawLayout)}\t${stackSha(rawPrint)}\t${stackSha(rawMatches)}");
-    println("printing\t294\t218\t21\t1029");
+    if(monthsFile != "") println(monthListLine(monthsPin,listed)) else ();
+    println("printing\t294\t218\t${nt}\t${nt*49}");
     List.forEach(pair -> {
         let(i,g)=pair;let Goal.G(y,m,board)=g;
         let matches=List.map(cell -> {
@@ -69,11 +73,12 @@ def windowCheck(layoutPath: String,printPath: String,matchesPath: String,oldRoot
         let snapshot=List.foldLeft((s,p) -> {let(_,text)=p;s+text},"",matches);
         println("target\t${i+1}\t${y}\t${m}\t49\t${stackSha(snapshot)}")
     },List.zipWithIndex(goals));
-    println("verdict\tSAT\tfixed-print-rigid-front-matching\t21\t1029\tlegal-states=UNKNOWN\tchain=NOT_RUN")
+    println("verdict\tSAT\tfixed-print-rigid-front-matching\t${nt}\t${nt*49}\tlegal-states=UNKNOWN\tchain=NOT_RUN")
 }
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {match Sys.Env.getArgs() {
-        case layout::printing::matches::oldRoot::Nil => windowCheck(layout,printing,matches,oldRoot)
-        case _ => throw new IllegalArgumentException("LAYOUT_TSV PRINT_TSV FRONT_MATCHES_TSV ORIGINAL_EVIDENCE")
+        case layout::printing::matches::oldRoot::Nil => windowCheck(layout,printing,matches,oldRoot,"","")
+        case layout::printing::matches::oldRoot::monthsFile::monthsPin::Nil => windowCheck(layout,printing,matches,oldRoot,monthsFile,monthsPin)
+        case _ => throw new IllegalArgumentException("LAYOUT_TSV PRINT_TSV FRONT_MATCHES_TSV ORIGINAL_EVIDENCE [MONTHS_FILE MONTHS_SHA256]")
     }} catch {case e: Exception => {println("INVALID\t${e.getMessage()}");System.exit(1)}}
 })

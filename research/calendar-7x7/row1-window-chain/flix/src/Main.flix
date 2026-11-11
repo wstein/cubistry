@@ -100,14 +100,20 @@ def wMetrics(moves: List[(Int32,Int32)]): (Int32,Int32,Int32,Int32) = List.foldL
     let(h,q,r,rq)=acc;let(g,e)=m;
     if(Int32.modulo(g,7)==0)(h,q,r+1,rq+Int32.abs(e)) else(h+1,q+Int32.abs(e),r,rq)
 },(0,0,0,0),moves)
-def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot: String,endText: String,printPin: String): Unit \ IO = {
+// monthsFile "" selects the window end endText; otherwise the explicit month list (first month = chain root = May 2026) pinned by monthsPin.
+// layoutPin "" keeps the built-in layout pin; a window-local layout is pinned by passing its SHA-256.
+def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot: String,endText: String,printPin: String,monthsFile: String,monthsPin: String,layoutPin: String): Unit \ IO = {
     let rawLayout=read(layout);let rawPrint=read(printing);let rawChain=read(chain);
-    let layoutSHA="c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db";
-    let count=wEnd(endText);
+    let layoutSHA=if(layoutPin=="") "c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db" else layoutPin;
+    let listed=if(monthsFile=="") Nil else monthListRead(monthsFile,monthsPin);
+    let count=if(monthsFile=="") wEnd(endText) else List.length(listed);
     // The 21-month print stays pinned; a longer window needs its own print SHA-256 as the last argument.
-    let printSHA=if(endText=="2028-01")"0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127" else printPin;
+    let printSHA=if(monthsFile=="" and endText=="2028-01")"0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127" else printPin;
     require(stackSha(rawLayout)==layoutSHA,"new layout pin");require(stackSha(rawPrint)==printSHA,"new immutable print pin");
-    let goals=coupledGoalsN(coupledLabels(rawLayout),"names-band","window",oldRoot,count);
+    let goals=if(monthsFile=="") coupledGoalsN(coupledLabels(rawLayout),"names-band","window",oldRoot,count) else coupledGoalsM(coupledLabels(rawLayout),"names-band",oldRoot,listed);
+    let ms=List.map(g -> {let Goal.G(y,m,_)=g;(y,m)},goals);
+    require(monthsFile=="" or at(listed,0)==(2026,5),"chain root month is May 2026");
+    let bridges=List.map(p -> {let(a,b)=p;monthIndex(b)-monthIndex(a)>1},List.zip(List.take(count-1,ms),List.drop(1,ms)));
     let source=windowReadPrint(rawPrint);let poses=derivedPoses();let gens=List.map(i -> generator(i,poses),List.range(1,22));
     let(root,edges)=wRead(count,rawChain);
     require(source==liftState(permIdentity(),source,poses) and wFront(source,at(goals,0)),"identity root front");
@@ -116,6 +122,7 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
     let stateHeader="sticker\tpiece\tposition\tnormal\tup\ttext\tink\n";
     require(read(states+"/state-01.tsv")==stateHeader+wText(source),"root full-state snapshot");
     println("input\t${layoutSHA}\t${printSHA}\t${stackSha(rawChain)}");
+    if(monthsFile != "") println(monthListLine(monthsPin,listed)) else ();
     println("root\t2026\t5\t${root}");
     let result=List.foldLeft((acc,pair) -> {
         let(st,perm,allMoves,total)=acc;let(i,edge)=pair;
@@ -132,23 +139,25 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
         let backp=List.foldLeft((p,mv) -> {let(g,q)=mv;wPose(p,g,wInverse(q),gens)},nextp,List.reverse(moves));
         require(back==st and backp==perm,"edge inverse restores full state");
         let(h,q,r,rq)=metrics;let(th,tq,tr,trq)=total;
-        println("edge\t${i+1}\t${y}\t${m}\t${h}\t${q}\t${r}\t${rq}\t${sh}\t${eh}\tPASS");
+        println("edge\t${i+1}\t${y}\t${m}\t${h}\t${q}\t${r}\t${rq}\t${sh}\t${eh}\tPASS${if(at(bridges,i)) "\tBRIDGE" else ""}");
         (next,nextp,List.append(allMoves,moves),(th+h,tq+q,tr+r,trq+rq))
     },(source,permIdentity(),Nil,(0,0,0,0)),List.zipWithIndex(edges));
     let(final,_,allMoves,total)=result;
     let Goal.G(lastYear,lastMonth,_)=at(goals,count-1);
     let WEdge.E(edgeYear,edgeMonth,_,_,_,_)=at(edges,count-2);
-    require(List.length(goals)==count and List.length(edges)==count-1 and (edgeYear,edgeMonth)==(lastYear,lastMonth) and (lastYear*12+lastMonth)-(2026*12+5)==count-1,"window end matches the last chain edge");
+    require(List.length(goals)==count and List.length(edges)==count-1 and (edgeYear,edgeMonth)==(lastYear,lastMonth) and (monthsFile != "" or (lastYear*12+lastMonth)-(2026*12+5)==count-1),"window end matches the last chain edge");
     let restored=List.foldLeft((s,mv) -> {let(g,q)=mv;wMove(s,g,wInverse(q))},final,List.reverse(allMoves));
     require(restored==source,"whole-chain inverse restores all 294 surfaces");
     let(h,q,r,rq)=total;
-    println("summary\t${count}\t${count-1}\t${h}\t${q}\t${r}\t${rq}\t${endText}\tINVERSE_PASS");
+    println("summary\t${count}\t${count-1}\t${h}\t${q}\t${r}\t${rq}\t${if(monthsFile=="") endText else "list:${monthText(at(ms,count-1))}"}\tINVERSE_PASS");
     println("verdict\tSAT\tlegal-retained-state-window-chain\t${count}\t${count-1}")
 }
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {match Sys.Env.getArgs() {
-        case layout::printing::chain::states::oldRoot::Nil => wVerify(layout,printing,chain,states,oldRoot,"2028-01","")
-        case layout::printing::chain::states::oldRoot::endText::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,endText,printPin)
-        case _ => throw new IllegalArgumentException("LAYOUT PRINT CHAIN STATES_DIRECTORY ORIGINAL_EVIDENCE [WINDOW_END PRINT_SHA256]")
+        case layout::printing::chain::states::oldRoot::Nil => wVerify(layout,printing,chain,states,oldRoot,"2028-01","","","","")
+        case layout::printing::chain::states::oldRoot::endText::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,endText,printPin,"","","")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,"")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin)
+        case _ => throw new IllegalArgumentException("LAYOUT PRINT CHAIN STATES_DIRECTORY ORIGINAL_EVIDENCE [WINDOW_END PRINT_SHA256 | months MONTHS_FILE MONTHS_SHA256 PRINT_SHA256 [LAYOUT_SHA256]]")
     }} catch {case e: Exception => {println("INVALID\t${e.getMessage()}");System.exit(1)}}
 })
