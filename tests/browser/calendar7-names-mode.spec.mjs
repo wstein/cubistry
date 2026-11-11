@@ -115,10 +115,15 @@ async function bandProbe(page, scheme, scramble) {
         const canvas = o.material[face].map.image, ctx = canvas.getContext("2d");
         const i = id - 1, cls = tileClass(printing.text[i], printing.ink[i]);
         const roles = tileRoles(sch, printing.text[i], printing.ink[i], "names");
-        const px = (x, y) => hex(ctx.getImageData(x, y, 1, 1).data);
-        // The canvas is 192 px per unit of the tile (corner 346 x 346, ring 192 x 346): the line sits just above the bottom edge of the flat part.
-        const W = canvas.width, H = canvas.height, lineY = Math.floor(H * (1 + faceFlatShare(H / 192)) / 2) - 4;
-        rows.push({ cls, text: printing.text[i], fill: px(8, 8), want: roles.fill, line: px(Math.floor(W / 2), lineY), lineWant: roles.line ? roles.line.color : null, wantLineless: roles.fill });
+        // Unit grid: the fill covers the unit cell (a blank tile) or the banner (month row), the rest of the tile is the white margin;
+        // the share of the fill color and the number of line pixels are counted on a 4 px grid of the whole canvas.
+        const W = canvas.width, H = canvas.height, data = ctx.getImageData(0, 0, W, H).data, count = (want) => {
+          let n = 0, all = 0;
+          for (let y = 2; y < H; y += 4) for (let x = 2; x < W; x += 4, all++) if (hex(data.subarray((y * W + x) * 4, (y * W + x) * 4 + 4)) === want) n++;
+          return [n, all];
+        };
+        const [nf, all] = count(roles.fill), [nl] = roles.line ? count(roles.line.color) : [0];
+        rows.push({ cls, text: printing.text[i], fillShare: Math.round(nf / all * 20) / 20, want: roles.fill, lines: nl > 0, lineWant: roles.line ? roles.line.color : null });
       });
     });
     viewer.destroy();
@@ -134,23 +139,23 @@ for (const scheme of ["paper-red", "paper-blue", "dracula", "high-contrast"]) te
   expect(by("band")).toHaveLength(12);
   expect(by("month")).toHaveLength(24);
   expect(by("blank")).toHaveLength(32);
-  for (const r of by("band")) { expect(r.fill).toBe(sch.band); expect(r.line).toBe(sch.line ?? sch.band); }
-  for (const r of by("month")) { expect(r.fill).toBe(sch.band); expect(r.line).toBe(sch.line ?? sch.band); }
-  for (const r of by("blank")) { expect(r.fill).toBe(sch.empty); expect(r.line).toBe(sch.empty); }
-  if (scheme === "paper-red") expect(by("band")[0].fill).not.toBe(by("blank")[0].fill);
+  for (const r of [...by("band"), ...by("month")]) { expect(r.want).toBe(sch.band); expect(r.lineWant).toBe(sch.line); expect(r.lines).toBe(sch.line !== null); }
+  for (const r of by("blank")) { expect(r.want).toBe(sch.empty); expect(r.lines).toBe(false); }
+  // The fill color covers at least a fifth of the canvas of every banner tile (the banner is 1.2 high of at most 1.8, minus the lettering); a white-fill scheme has the white ground as its fill.
+  if (sch.band !== W) for (const r of [...by("band"), ...by("month")]) expect(r.fillShare, `${r.cls} ${r.text}`).toBeGreaterThanOrEqual(0.25);
+  if (scheme === "paper-red") expect(by("band")[0].want).not.toBe(by("blank")[0].want);
 });
 
 test("after a scramble the band and month classes (fill and line) stay with their tiles, not with positions", async ({ page }) => {
   const plain = await bandProbe(page, "paper-blue", false);
   const scrambled = await bandProbe(page, "paper-blue", true);
   expect(scrambled.moved, "band stickers did move").toBeGreaterThan(0);
-  const key = (rows) => rows.map((r) => `${r.cls}:${r.text}:${r.fill}:${r.line}`).sort();
+  const key = (rows) => rows.map((r) => `${r.cls}:${r.text}:${r.fillShare}:${r.lines}`).sort();
   expect(key(scrambled.rows)).toEqual(key(plain.rows));
   for (const r of scrambled.rows) {
-    expect(r.fill, `${r.cls} ${r.text}`).toBe(r.want);
-    if (r.cls === "band" || r.cls === "month") expect(r.line).toBe("#1558d8");
-    if (r.cls === "weekday") expect(r.line).toBe("#1558d8");
-    if (r.cls === "blank" || r.cls === "day") expect(r.line).toBe(r.fill);
+    if (r.cls === "band" || r.cls === "month" || r.cls === "weekday") expect(r.lines, `${r.cls} ${r.text} line`).toBe(true);
+    if (r.cls === "blank" || r.cls === "day") expect(r.lines, `${r.cls} ${r.text} no line`).toBe(false);
+    if (r.cls === "band" || r.cls === "month" || r.cls === "blank") expect(r.fillShare, `${r.cls} ${r.text}`).toBeGreaterThan(0.2);
   }
 });
 
@@ -283,11 +288,10 @@ test("viewer wiring: names layout colors the cut faces per adjacent tile (flat c
   expect(seen.back.center).toBe(3);
   expect(seen.back.canvases).toEqual(["192x192"]);
   expect(seen.back.cameraZ).toBeCloseTo(seen.std.cameraZ, 9);
-  expect(Object.keys(seen.red.cut).sort()).toEqual(["e0282c", "fdeeee", "fdfdfd", "mapped"]); // red, weekend-tint and near-white sides (and body), miter textures; no raw ffffff
-  expect(seen.red.cut.e0282c).toBeGreaterThan(0);
+  expect(Object.keys(seen.red.cut).sort()).toEqual(["fdeeee", "fdfdfd", "mapped"]); // weekend-tint and near-white sides (and body), miter textures (the red banner sides are edge-colored textures: red and white along one edge); no raw ffffff
   expect(seen.red.cut.mapped).toBeGreaterThan(0);
   expect(Object.keys(seen.dracula.cut)).not.toContain("e0282c"); // the cut colors follow the scheme switch
-  expect(Object.keys(seen.dracula.cut)).toContain("ff79c6");
+  expect(Object.keys(seen.dracula.cut)).toContain("282a36"); // the dracula ground (the band sides are edge-colored textures)
 });
 
 test("names layout: every face texture is the size of its own tile (192 px per unit of width and height), for all 294 faces; the standard layout has 192 x 192 everywhere", async ({ page }) => {
