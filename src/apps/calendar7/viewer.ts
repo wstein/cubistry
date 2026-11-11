@@ -40,12 +40,13 @@ import {
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
 import { type ColorScheme, DEFAULT_SCHEME, namesGround, schemeById } from "./schemes.ts";
-import { bodyWidthFor, exposureFor, faceTileOf, halfEdgeOf, layerWidthsOf, namesBodySize } from "./geometry.ts";
+import { bodyWidthFor, STANDARD_EXPOSURE, faceTileOf, halfEdgeOf, layerWidthsOf, namesBodySize } from "./geometry.ts";
 import type { Layout } from "./layout.ts";
 import { drawFace, drawSticker, type FaceTile, PLASTIC, tileCanvasSize, tileRoles, type Surface } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
+import { namesExposure } from "./names-exposure.ts";
 
 /**
  * The presentation geometry with a lighter body: 218 bodies at the preset's three bevel segments are 588 triangles each
@@ -159,8 +160,14 @@ export class Calendar7Viewer implements StageView {
     if (this.tween.tick(now)) this.dirty = true;
     if (this.dirty) {
       this.dirty = false;
+      this.syncExposure();
       this.renderer.render(this.scene, this.camera);
     }
+  }
+
+  /** The names layout follows the face that looks at the camera (names-exposure.ts); the standard layout keeps the shared value. */
+  syncExposure(): void {
+    this.renderer.toneMappingExposure = this.layout === "names" ? namesExposure(this.scene, this.presentation.quaternion, this.camera) : STANDARD_EXPOSURE;
   }
 
   setLabel(text: string): void {
@@ -248,7 +255,7 @@ export class Calendar7Viewer implements StageView {
     this.fitExtent(layout);
     // The shared tone mapping and exposure 1, except in the names layout: its colors are the scheme tokens (geometry.ts).
     this.renderer.toneMapping = layout === "names" ? THREE.LinearToneMapping : this.standardToneMapping;
-    this.renderer.toneMappingExposure = exposureFor(layout);
+    this.syncExposure();
     this.clear();
     this.bodyStale = false;
     this.printing = printing;

@@ -91,15 +91,11 @@ export const halfEdgeOf = (layout: Layout): number => (layout === "names" ? NAME
  * Tone mapping of the renderer. The standard layout and every other app keep the shared presentation value (Neutral tone
  * mapping, exposure 1). The names layout reproduces its color tokens on screen, with the paper white as the reference:
  * - Linear tone mapping (the exposure scales the linear color, clipped at 1; three.js ignores the exposure without any tone
- *   mapping). Neutral compresses every channel above 0.76 and then mixes the color toward white, so a saturated red
- *   at the raised exposure that makes white read white came out as #f85759 instead of #e0282c;
- * - the exposure is the inverse of the radiance a white diffuse surface facing the camera gets from the presentation
- *   lights (PRESENTATION_PRESET), so a lit front face shows its albedo: (ambient + hemisphere(n = +z) + sum of
- *   intensity * max(0, n . l) over key, fill, rim and shadow fill) / pi = 0.82, the exposure is 1 / 0.82 = 1.217
- *   (tests/calendar7-names-look.test.mjs recomputes it from the preset);
+ *   mapping). Neutral compresses every channel above 0.76 and then mixes the color toward white, so a saturated red at the
+ *   raised exposure that makes white read white came out as #f85759 instead of #e0282c;
+ * - the exposure follows the face that looks at the camera (names-exposure.ts): the inverse of the radiance a white diffuse
+ *   surface gets there, 1.217 head on at the shared presentation lights;
  * - the plastic has no specular and no clearcoat there: they add about 1.3% linear white to every color (#e0282c rendered
  *   #e1373a). The tiles are printed paper; the standard layout keeps its gloss.
  */
 export const STANDARD_EXPOSURE = 1;
-export const NAMES_EXPOSURE = 1.217;
-export const exposureFor = (layout: Layout): number => (layout === "names" ? NAMES_EXPOSURE : STANDARD_EXPOSURE);
