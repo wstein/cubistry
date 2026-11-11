@@ -1,0 +1,6 @@
+stage	from	to	months	pairs	new_pairs	feb_sun28_months	pairs_with_feb_sun28	cumulative_months	cumulative_pairs
+1	1980-01	2050-01	841	98	98	8	2	841	98
+2	1950-01	1980-01	361	98	0	3	2	1202	98
+3	1900-01	1950-01	601	98	0	5	2	1803	98
+4	2050-01	2100-01	601	98	0	6	2	2404	98
+all	1900-01	2100-01	2401	98		22	2	2404	98
