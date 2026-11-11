@@ -6,7 +6,7 @@
 # A stage is a chain run (chain.v1 to v3) whose Julia and Flix receipts are byte-identical. Adjacent stages A, B are joined when
 #   A ends in the month B starts in, A's end digest equals B's start digest, and both receipts carry the junction line the checker
 #   writes only after comparing the digest to its parameter (`join end` in A, `join start` in B). Otherwise the junction is reported
-#   as mismatch (digests differ or months differ) or unchecked (no junction lines). Composition states "exact-gapless FIRST..LAST"
+#   as mismatch (digests differ or months differ) or unchecked (no junction lines). Composition states `composed FIRST LAST N`
 #   for maximal runs of exact stages (verdict SAT, no bridge or root edge) whose junctions are all joined; every other stage is listed per stage.
 function read_receipt(path)
     t=read(path,String);@assert endswith(t,"\n") && !occursin('\r',t) "canonical receipt"
