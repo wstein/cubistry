@@ -88,24 +88,37 @@ test("invariance: the weekday line and the month line are at the same unit-grid 
   }
 });
 
-test("invariance: the cut-face edge colors follow the unit-grid banner at every f (the red stretch of a side edge runs over y 2.9 .. 3.9 of the unit grid, clipped at the face)", () => {
+test("invariance: the cut-face edge colors of all seven columns and all four edges follow the unit-grid banner at every f (red exactly where the edge runs inside x -3.8 .. 3.8, y 2.9 .. 3.9)", () => {
   const roles = tileRoles(SCHEMES[0], "", "band", "names"), ground = namesGround(SCHEMES[0].dayFill), red = SCHEMES[0].bandFill;
-  for (const f of [1.4, 1.5, 1.6, 1.8, 2.1]) for (const { c, tile } of rowTiles(f)) {
-    if (c === 0 || c === 6) continue;
-    const e = tileEdgeColors(roles, ground, tile, f), g = tileGrid(tile, f);
-    // an edge position t (0 at the bottom of the face, 1 at the top) is the texture row H (1 - t); its unit-grid y is read off the same mapping as the banner
-    const yAt = (t) => grid(g, c, 0, 0, g.H * (1 - t), 0, g.H * (1 - t)).top, faceBottom = yAt(0), faceTop = yAt(1);
-    for (const side of ["left", "right"]) {
-      const stops = e[side];
-      assert.ok(Array.isArray(stops), `f ${f} column ${c}: stops along the ${side} edge`);
-      let from = 0, reds = 0;
-      for (const s of stops) {
-        if (s.color === red) { reds++; near(yAt(from), Math.max(2.9, faceBottom), 2e-3, `f ${f} column ${c} ${side}: red starts at y 2.9`); near(yAt(Math.min(1, s.to)), Math.min(3.9, faceTop), 2e-3, `f ${f} column ${c} ${side}: red ends at y 3.9`); }
-        else assert.equal(s.color, ground, `f ${f} column ${c} ${side}: white outside the banner`);
-        from = s.to;
+  const colorAt = (edge, t) => (typeof edge === "string" ? edge : (edge.find((s) => t <= s.to + 1e-12) ?? edge[edge.length - 1]).color);
+  const inside = (v, lo, hi) => (v > lo + 1e-3 && v < hi - 1e-3 ? true : v < lo - 1e-3 || v > hi + 1e-3 ? false : null); // null: on the boundary, not compared
+  let compared = 0;
+  for (const f of [1.2, 1.4, 1.5, 1.6, 1.8, 2.1]) for (const { c, tile } of rowTiles(f)) {
+    const e = tileEdgeColors(roles, ground, tile, f), g = tileGrid(tile, f), at = (x, y) => grid(g, c, 0, x, y, x, y);
+    for (let k = 1; k < 100; k++) {
+      const t = k / 100;
+      // side edges run bottom to top (t from the bottom), top and bottom edges left to right
+      const probes = [
+        ["left", at(0, g.H * (1 - t)), (p) => [inside(p.x0, -3.8, 3.8), inside(p.top, 2.9, 3.9)]],
+        ["right", at(g.W, g.H * (1 - t)), (p) => [inside(p.x0, -3.8, 3.8), inside(p.top, 2.9, 3.9)]],
+        ["top", at(g.W * t, 0), (p) => [inside(p.x0, -3.8, 3.8), inside(p.top, 2.9, 3.9)]],
+        ["bottom", at(g.W * t, g.H), (p) => [inside(p.x0, -3.8, 3.8), inside(p.top, 2.9, 3.9)]],
+      ];
+      for (const [edge, p, test] of probes) {
+        const [ix, iy] = test(p);
+        if (ix === null || iy === null) continue;
+        compared++;
+        assert.equal(colorAt(e[edge], t), ix && iy ? red : ground, `f ${f} column ${c} ${edge} edge at ${t}: unit-grid (${p.x0.toFixed(3)}, ${p.top.toFixed(3)})`);
       }
-      assert.equal(reds, 1, `f ${f} column ${c} ${side}: one red stretch`);
     }
+  }
+  assert.ok(compared > 3000, `compared ${compared} edge positions`);
+});
+
+test("invariance: a banner tile that is not in the thick month row keeps the banner 0.4 unit from its top and bottom edge at every f", () => {
+  for (const f of [1.2, 1.5, 1.8, 2.1]) for (const tile of [{ w: 1, h: 1 }, { w: f, h: 1, band: { l: f - 1, r: 0, t: 0, b: 0 } }]) {
+    const g = tileGrid(tile, f);
+    near(g.banner.y0 / g.py, 0.4, 0.02, `f ${f}: banner top margin`); near((g.H - g.banner.y1) / g.py, 0.4, 0.02, `f ${f}: banner bottom margin`);
   }
 });
 
