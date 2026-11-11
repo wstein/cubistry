@@ -61,6 +61,20 @@ end
 # bridge[i] is true when the edge into member i+1 skips calendar months (a state edge across a gap).
 month_list_bridges(ms)=[(b[1]*12+b[2])-(a[1]*12+a[2])>1 for (a,b) in zip(ms[1:end-1],ms[2:end])]
 month_text((y,m))=string(y,'-',lpad(m,2,'0'))
+# Chain root month (CAL7_ROOT_MONTH=YYYY-MM, 1900-01 .. 2100-01): the month whose board the identity pose shows. Default: first month of S.
+# When it differs from the first month of S the chain has one extra root edge from the identity pose to S[1].
+function chain_root_month(first_member)
+    t=get(ENV,"CAL7_ROOT_MONTH","");isempty(t) && return first_member
+    m=match(r"^(\d{4})-(\d{2})\z",t);@assert !isnothing(m) "root month is YYYY-MM"
+    y,mo=parse.(Int,m.captures);@assert 1<=mo<=12 && (1900,1)<=(y,mo)<=(2100,1) "root month lies within 1900-01 to 2100-01"
+    (y,mo)
+end
+# One goal (names-band profile) for any month, used for the root month outside the list.
+function coupled_month_goal(labels,y,m)
+    g=(year=y,month=m,board=stacked_board(y,m,PURE_VARIANT))
+    for c in 1:7;t=labels[m][c];g.board[1,c]=(t,isempty(t) ? "band" : "month");end
+    g
+end
 # Receipt line for a list-mode run (nothing for the WINDOW_END default, so legacy receipts are unchanged).
 function month_list_line(ms)
     isempty(get(ENV,"CAL7_WINDOW_MONTHS","")) && return nothing
