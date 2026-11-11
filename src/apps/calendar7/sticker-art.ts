@@ -78,7 +78,7 @@ interface BannerShape { readonly rect: PxRect; readonly radii: readonly [number,
 /** Outer and inner shapes share the existing banner bounds and font placement. */
 function bannerShapes(roles: TileRoles, tile: FaceTile, outer: number = outerLayerWidth(CALENDAR7_SIZE)): readonly BannerShape[] {
   const g = tileGrid(tile, outer), r = g.banner, b = tile.band ?? NO_BAND;
-  const radius = roles.banner?.style === "square" ? 0 : NAMES_BANNER_RADIUS * g.px;
+  const radius = roles.banner?.style === "square" || roles.banner?.style === "boxed" ? 0 : NAMES_BANNER_RADIUS * g.px;
   const radii = (rad: number): [number, number, number, number] => [b.l > 0 ? rad : 0, b.r > 0 ? rad : 0, b.r > 0 ? rad : 0, b.l > 0 ? rad : 0];
   const shape = (rect: PxRect, rad: number, color: string): BannerShape => {
     const corners = radii(rad), w = rect.x1 - rect.x0, h = rect.y1 - rect.y0;
@@ -266,8 +266,13 @@ export function tileRoles(scheme: ColorScheme, text: string, ink: string, layout
       const color = underlineInk(scheme);
       return { ...roles(scheme.dayFill, color, color, { color, px: scheme.lineRow1?.px ?? 3 }), banner: { style: "underline", outline: null } };
     }
-    const outline = scheme.bandFill === null ? scheme.lineRow1 ?? { color: scheme.monthInk, px: 3 } : null;
-    return { ...roles(scheme.bandFill ?? scheme.dayFill, scheme.monthInk, scheme.monthInk), banner: { style: scheme.bannerStyle, outline } };
+    if (scheme.bannerStyle === "boxed" || scheme.bannerStyle === "rounded-box") {
+      const color = underlineInk(scheme), outline = { color, px: scheme.lineRow1?.px ?? 3 };
+      return { ...roles(scheme.dayFill, color, color), banner: { style: scheme.bannerStyle, outline } };
+    }
+    // A palette without a band fill can still draw a filled banner using its existing month ink and paper colors.
+    const fill = scheme.bandFill ?? scheme.monthInk, color = scheme.bandFill === null ? scheme.dayFill : scheme.monthInk;
+    return { ...roles(fill, color, color), banner: { style: scheme.bannerStyle, outline: null } };
   }
   switch (cls) {
     case "blank": return roles(scheme.emptyFill, scheme.dayInk);
