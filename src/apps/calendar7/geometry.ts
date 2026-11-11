@@ -107,6 +107,15 @@ export const unitGridTileOf = (pos: ArrayLike<number>, normal: ArrayLike<number>
 /** Month row (row 1) of the names layout, in units (owner decision of 2026-11-11): white strip at the very top (no red over the cube edge), red banner, white strip below it (separates the name from the weekday row). */
 export const NAMES_TOP_STRIP = 0.1;
 export const NAMES_BOTTOM_STRIP = 0.5;
+/**
+ * Owner decision of 2026-11-11 (after the first preview): in the month row the red banner is inset by only this much from the
+ * left and right cube edge (white band of 0.4 on the outer month cubies); the other rows keep the band of f - 1 (0.8).
+ */
+export const NAMES_MONTH_SIDE_BAND = 0.4;
+/** Weekday words (SUN to SAT) sit this far below the center of their unit cell, in units (owner decision of 2026-11-11). */
+export const NAMES_WEEKDAY_DOWN = 0.08;
+/** Corner radius of the red banner at the left and right cube edge, in units; 0 is square (variant under review). */
+export const NAMES_BANNER_RADIUS = 0;
 /** Share of the free height of the banner that is above the month name (about 2:1 above to below). */
 export const NAME_ABOVE_SHARE = 2 / 3;
 /** The red banner of the month row relative to the unit cell center of a row 1 cubie, in units (y up): bottom and top edge. */

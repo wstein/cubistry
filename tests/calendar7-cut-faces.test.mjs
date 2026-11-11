@@ -257,18 +257,19 @@ test("scene: edge colors with stops: the side cut face is white along the two st
 
 // ---- the real names print (unit grid): the cut faces under the month row ----
 import { readFileSync } from "node:fs";
-import { NAMES_BODY_WIDTH, NAMES_GAP, layerWidthsOf } from "../src/apps/calendar7/geometry.ts";
+import { NAMES_BODY_WIDTH, NAMES_GAP, layerWidthsOf, unitGridTileOf } from "../src/apps/calendar7/geometry.ts";
 import { SCHEMES, namesGround } from "../src/apps/calendar7/schemes.ts";
 import { parseState } from "../src/apps/calendar7/graph.ts";
 import { faceEdgeFills, faceFills } from "../src/apps/calendar7/viewer.ts";
 test("names print: the cut face under every month row ring cubie is one flat white (the banner has a white strip of 0.5 below it), the previous red is gone", () => {
   const { printing, pose } = parseState(JSON.parse(readFileSync("public/calendar7/names/state.v1.json", "utf8")));
   const n = printing.text.length, frames = Array.from({ length: n }, (_, i) => ({ id: i + 1, cubie: printing.piece[i], p: [...pose.pos.slice(3 * i, 3 * i + 3)], n: [...pose.normal.slice(3 * i, 3 * i + 3)], up: [...pose.up.slice(3 * i, 3 * i + 3)] }));
+  const tiles = frames.map((f) => unitGridTileOf(f.p, f.n, f.up, layerWidthsOf("names")));
   const mats = new Map(frames.map((f) => [f.id, new THREE.MeshStandardMaterial({ color: "#ffffff" })]));
   const geo = { body: new RoundedBoxGeometry(NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, 1, 0.055), sticker: new THREE.PlaneGeometry(1, 1), stickerOffset: 0.502 };
   const scheme = SCHEMES.find((s) => s.id === "paper-red");
   const root = new THREE.Group();
-  const scene = new PhysicalCubeScene(root, frames, mats, createPlasticMaterial("#23272e", 0.55), 1, geo, faceFills(printing, scheme, "names"), { bodyColor: namesGround(scheme.dayFill), coreColor: namesGround(scheme.dayFill), miterCutFaces: true, faceEdgeColors: faceEdgeFills(printing, scheme, "names"), layers: { widths: layerWidthsOf("names"), body: (c) => new RoundedBoxGeometry(c[0] - NAMES_GAP, c[1] - NAMES_GAP, c[2] - NAMES_GAP, 1, 0.055) } });
+  const scene = new PhysicalCubeScene(root, frames, mats, createPlasticMaterial("#23272e", 0.55), 1, geo, faceFills(printing, scheme, "names"), { bodyColor: namesGround(scheme.dayFill), coreColor: namesGround(scheme.dayFill), miterCutFaces: true, faceEdgeColors: faceEdgeFills(printing, scheme, "names", tiles), layers: { widths: layerWidthsOf("names"), body: (c) => new RoundedBoxGeometry(c[0] - NAMES_GAP, c[1] - NAMES_GAP, c[2] - NAMES_GAP, 1, 0.055) } });
   scene.setConstruction("stickerless");
   const shells = root.children.filter((g) => g.children[0]?.isMesh && Array.isArray(g.children[0].material)).map((g) => g.children[0]);
   let checked = 0;
@@ -283,14 +284,16 @@ test("names print: the cut face under every month row ring cubie is one flat whi
   }
   assert.ok(checked >= 5, `${checked} month row cubies checked`);
   // the same cubies without the edge colors would be red below (the previous model)
-  const edges = faceEdgeFills(printing, scheme, "names");
+  const edges = faceEdgeFills(printing, scheme, "names", tiles);
   assert.ok(edges.size >= 7, `edge colors for ${edges.size} banner stickers`);
-  assert.equal(faceEdgeFills(printing, scheme, "standard").size, 0);
-  for (const e of edges.values()) { // beside the banner: white strip 0.5 / red 1.2 / white strip 0.1 of the 1.8 tall cubie, from the bottom up
-    for (const side of [e.left, e.right]) {
+  assert.equal(faceEdgeFills(printing, scheme, "standard", tiles).size, 0);
+  for (let i = 0; i < n; i++) { // beside the banner: white strip 0.5 / red 1.2 / white strip 0.1 of the 1.8 tall cubie, from the bottom up
+    if (printing.ink[i] !== "month" && printing.ink[i] !== "band") continue;
+    const e = edges.get(i + 1);
+    if (!Array.isArray(e.left) && !Array.isArray(e.right)) continue; // a month tile on another face of the print: no thick row, no strips beside it
+    for (const side of [e.left, e.right].filter(Array.isArray)) { // the outer edge of a corner tile is the white band: a plain color
       assert.deepEqual(side.map((x) => x.color), [namesGround(scheme.dayFill), scheme.bandFill, namesGround(scheme.dayFill)]);
       near(side[0].to, 0.5 / 1.8, 0.03); near(side[1].to, 1 - 0.1 / 1.8, 0.03); assert.equal(side[2].to, 1);
     }
     assert.equal(e.top, namesGround(scheme.dayFill)); assert.equal(e.bottom, namesGround(scheme.dayFill));
-  }
-});
+  }});

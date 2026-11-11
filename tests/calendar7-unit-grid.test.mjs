@@ -9,9 +9,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { layerCenters } from "@cubistry/cube-viewer";
-import { CALENDAR7_SIZE, NAMES_BOTTOM_STRIP, NAMES_TOP_STRIP, faceBandsOf, layerWidthsFor, monthBanner, outerLayerWidth, unitGridTileOf } from "../src/apps/calendar7/geometry.ts";
+import { CALENDAR7_SIZE, NAMES_BOTTOM_STRIP, NAMES_MONTH_SIDE_BAND, NAMES_TOP_STRIP, NAMES_WEEKDAY_DOWN, faceBandsOf, layerWidthsFor, monthBanner, outerLayerWidth, unitGridTileOf } from "../src/apps/calendar7/geometry.ts";
 import { NAMES_WHITE, SCHEMES, namesGround } from "../src/apps/calendar7/schemes.ts";
-import { drawFace, namePxPerUnit, nameCenterUp, tileGrid, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
+import { drawFace, namePxPerUnit, nameCenterUp, tileEdgeColors, tileGrid, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { drawFontSticker, labelLayout, nameFaceTable, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
 import { STICKERS } from "../src/apps/calendar7/engine.ts";
 import { parseState } from "../src/apps/calendar7/graph.ts";
@@ -129,18 +129,19 @@ test("every front tile, font and built-in drawing: white margin ground, the fill
       near(lt.y - rb.y, F - NAMES_TOP_STRIP - NAMES_BOTTOM_STRIP, 1e-9, `${tag} banner height 1.2`);
       near(lt.y - rb.y, 1.2, 1e-9, `${tag} banner height 1.2 (literal)`);
       near(lt.y, 4.2, 1e-9, `${tag} banner top`); near(rb.y, 3.0, 1e-9, `${tag} banner bottom`);
-      if (f.c === 0) near(lt.x, -3.5, 1e-9, `${tag} red starts 0.8 inside the left cube edge`); else assert.equal(cell.x0, 0);
-      if (f.c === 6) near(rb.x, 3.5, 1e-9, `${tag} red ends 0.8 inside the right cube edge`); else assert.equal(cell.x1, g.W);
+      // the banner is inset by 0.4 (NAMES_MONTH_SIDE_BAND) from the cube edges, not by the 0.8 band of the other rows
+      if (f.c === 0) near(lt.x, -4.3 + NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red starts 0.4 inside the left cube edge`); else assert.equal(cell.x0, 0);
+      if (f.c === 6) near(rb.x, 4.3 - NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red ends 0.4 inside the right cube edge`); else assert.equal(cell.x1, g.W);
     }
   }
 });
 
-test("the left and right margins are the same 0.8 white in every row including the month row (cube edge -4.3 .. -3.5 and 3.5 .. 4.3)", () => {
+test("the left and right margins: 0.8 white in every row (cube edge -4.3 .. -3.5 and 3.5 .. 4.3), 0.4 in the month row (the banner sticks out 0.4 beyond the grid)", () => {
   for (const f of FRONT.filter((x) => x.c === 0 || x.c === 6)) {
     const g = tileGrid(f.tile), cell = DRAWINGS.font(f).rects[1]; // [0] is the white ground, [1] the fill of the cell or banner
     const edge = f.c === 0 ? f.center.x - F / 2 : f.center.x + F / 2;
     const inner = f.c === 0 ? scene(f, cell.x0, 0).x : scene(f, cell.x1, 0).x;
-    near(Math.abs(inner - edge), BAND, 1e-9, `row ${f.r} column ${f.c}: margin`);
+    near(Math.abs(inner - edge), f.r === 0 ? NAMES_MONTH_SIDE_BAND : BAND, 1e-9, `row ${f.r} column ${f.c}: margin`);
     assert.equal(f.c === 0 ? g.cell.x0 > 0 : g.cell.x1 < g.W, true);
   }
 });
@@ -148,14 +149,14 @@ test("the left and right margins are the same 0.8 white in every row including t
 test("digits and weekday words sit in the center of the unit cell of their tile, also on the outer cubies (font and built-in drawing)", () => {
   for (const [name, draw] of Object.entries(DRAWINGS)) for (const f of FRONT) {
     if (f.r === 0 || f.text === "" || /^[0-9]+\/[0-9]+$/.test(f.text)) continue;
-    const texts = draw(f).texts;
+    const texts = draw(f).texts, weekday = f.r === 1; // the weekday words sit NAMES_WEEKDAY_DOWN below the cell center
     assert.ok(texts.length > 0, `${name} (${f.c},${f.r}) "${f.text}" draws text`);
     const cx = texts.reduce((s, t) => s + runAt(name, f, t).x, 0) / texts.length, want = cellCenter(f);
     // the built-in drawing centers the text by the middle baseline (0.04 em lower)
     near(cx, want.x, 0.06, `${name} (${f.c},${f.r}) "${f.text}" x`); // the mean of the run centers is not the ink center of a word of unequal letters
     for (const t of texts) { const s = runAt(name, f, t); assert.ok(Math.abs(s.x - want.x) < 0.5 && Math.abs(s.y - want.y) < 0.5, `${name} (${f.c},${f.r}) "${f.text}" run inside its cell (${s.x}, ${s.y})`); }
     const cy = texts.reduce((s, t) => s + runAt(name, f, t).y, 0) / texts.length;
-    if (name === "font") near(cy, want.y, 0.06, `${name} (${f.c},${f.r}) "${f.text}" y`); // the built-in drawing anchors on a baseline (6 and 9)
+    if (name === "font") near(cy, want.y - (weekday ? NAMES_WEEKDAY_DOWN : 0), 0.06, `${name} (${f.c},${f.r}) "${f.text}" y`); // the built-in drawing anchors on a baseline (6 and 9)
   }
 });
 
@@ -235,4 +236,30 @@ test("other schemes follow the same geometry: ground is the scheme's day ground,
 test("labelLayout of digits is the cell frame: the same box on every tile (no shift for a thick outer cubie)", () => {
   const box = labelLayout("28", NOTO)[0].box;
   assert.ok(Math.abs((box.x0 + box.x1) / 2 - 96) < 1e-9 && Math.abs((box.y0 + box.y1) / 2 - 96) < 1e-9);
+});
+
+/** Color of a point of a tile as drawn (painter's algorithm over the recorded fills). */
+const colorAtPx = (rects, x, y) => [...rects].reverse().find((r) => x >= r.x0 && x < r.x1 && y >= r.y0 && y < r.y1)?.fill;
+const stopColor = (spec, t) => (typeof spec === "string" ? spec : spec.find((s) => t <= s.to).color);
+
+test("tileEdgeColors: along every edge of every front tile the color is the color the drawing has at that edge (red band, white strips, tint, white margins), all 10 schemes", () => {
+  let samples = 0;
+  for (const scheme of SCHEMES) for (const f of FRONT) {
+    const ground = namesGround(scheme.dayFill), roles = tileRoles(scheme, f.text, f.ink, "names"), g = tileGrid(f.tile);
+    const all = track((c) => drawFontSticker(c, f.text, f.ink, NOTO, scheme, "face", undefined, "names", f.tile)).rects;
+    const rects = roles.line ? all.slice(0, -1) : all; // the scheme's line is the last fill: it is not the color of the face edge
+    const edges = tileEdgeColors(roles, ground, f.tile);
+    for (const edge of ["left", "right", "top", "bottom"]) {
+      const spec = edges?.[edge] ?? roles.fill;
+      for (let k = 1; k < 100; k++) {
+        const t = k / 100, vertical = edge === "left" || edge === "right";
+        if (typeof spec !== "string" && spec.some((x) => Math.abs(x.to - t) < 0.015)) continue; // the pixel of a boundary is either color
+        // 1.5 px inside the edge; vertical edges run bottom to top, horizontal ones left to right
+        const px = vertical ? (edge === "left" ? 1.5 : g.W - 1.5) : t * g.W, py = vertical ? (1 - t) * g.H : edge === "top" ? 1.5 : g.H - 1.5;
+        assert.equal(stopColor(spec, t), colorAtPx(rects, px, py), `${scheme.id} (${f.c},${f.r}) "${f.text}" ${edge} at ${t}`);
+        samples++;
+      }
+    }
+  }
+  assert.ok(samples > 100000, `${samples} samples`);
 });

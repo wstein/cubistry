@@ -2,8 +2,8 @@
 /** Shared 2D/3D artwork: original glyphs, with one source for each 6/9 pair. */
 import { numberLayout, type LoadedFont } from "./fonts.ts";
 import { type Layout, NAME_SLOTS, NAME_WORDS, nameAnchor } from "./layout.ts";
-import { CALENDAR7_SIZE, monthBanner, outerLayerWidth } from "./geometry.ts";
-import { faceTransform, type FaceTile, isBannerClass, lineRect, nameCenterUp, nameLetterX, namePxPerUnit, paintTileGround, TEXT_SQUARE, TEXTURE, tileCanvasSize, tileGrid, tileRoles, type Surface } from "./sticker-art.ts";
+import { CALENDAR7_SIZE, monthBanner, NAMES_MONTH_SIDE_BAND, outerLayerWidth } from "./geometry.ts";
+import { faceTransform, type FaceTile, isBannerClass, lineRect, nameCenterUp, nameLetterX, namePxPerUnit, paintTileGround, TEXT_SQUARE, weekdayShift, TEXTURE, tileCanvasSize, tileGrid, tileRoles, type Surface } from "./sticker-art.ts";
 import type { ColorScheme } from "./schemes.ts";
 
 export interface InkBox { readonly x0: number; readonly y0: number; readonly x1: number; readonly y1: number }
@@ -78,7 +78,7 @@ const OUTER = outerLayerWidth(CALENDAR7_SIZE);
 const roomOf = (anchor: -1 | 0 | 1): { left: number; right: number } => {
   const first = anchor === 1, tile: FaceTile = first ? { w: OUTER, h: OUTER, band: { l: OUTER - 1, r: 0, t: OUTER - 1, b: 0 } } : { w: 1, h: OUTER, band: { l: 0, r: 0, t: OUTER - 1, b: 0 } };
   const g = tileGrid(tile), k = faceTransform(tile).kx, ppu = namePxPerUnit();
-  return { left: first ? ppu / 2 : g.cx / k, right: (g.W - g.cx) / k };
+  return { left: first ? (0.5 + NAMES_MONTH_SIDE_BAND) * ppu : g.cx / k, right: (g.W - g.cx) / k }; // the first tile: the banner starts 0.4 inside the cube edge, 0.9 from the cell center
 };
 
 /** Natural geometry of a label in em: summed ink widths and the natural ink gaps between neighbors. */
@@ -100,6 +100,12 @@ function trackingFor(s: number, n: { glyphs: number; gaps: number[] }, target: n
   return lo;
 }
 
+/**
+ * Variant under review: the first tile of a name with three letters (AUG, SEP, NOV, DEC) fills its 1.4 units of banner
+ * (looser tracking than the other tiles) so that its ink keeps half a seam gap from the banner edge. Off: it takes the mean
+ * tracking like the other outer tiles and sits flush to its right seam with the rest of the banner width as left margin.
+ */
+export const NAMES_FIRST_TILE_FILL = false;
 /**
  * The layout of all name tiles at glyph size `s`, or the tiles that do not fit. Every tile has one unit of content (the unit
  * cell): a middle tile fills it between two half seam gaps, the first tile is flush right to its seam and its ink keeps half a seam gap
@@ -124,7 +130,9 @@ function fitAt(font: LoadedFont, s: number, c: number): { ok: true; m: number; t
     if (n.height * s + 2 * NAME_EDGE_MARGIN > banner) { fails.push(t.label); continue; }
     if (t.anchor === 0) continue;
     const room = roomOf(t.anchor), limit = ppu / 2 + (t.anchor === 1 ? room.left - m : room.right - NAME_EDGE_MARGIN) - m, tau = trackingFor(s, n, limit);
-    if (tau === null) fails.push(t.label); else taus.set(t.label, Math.min(mean, tau));
+    if (tau === null) fails.push(t.label);
+    else if (t.anchor === 1 && t.label.length >= 3 && NAMES_FIRST_TILE_FILL) taus.set(t.label, tau); // fill the first tile: the ink from half a seam gap inside the banner edge to half a seam gap before the seam
+    else taus.set(t.label, Math.min(mean, tau));
   }
   return fails.length ? { ok: false, fails } : { ok: true, m, taus };
 }
@@ -230,7 +238,7 @@ export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink
   const parts = layout === "names" && printed.cls === "month" ? nameLabelLayout(text, font, surface) : labelLayout(text, font);
   if (text) for (const [index, part] of parts.entries()) {
     ctx.fillStyle = index === 1 ? roles.inkSmall : roles.ink;
-    drawFontRun(ctx, part.text, font, part.size, part.x, part.y);
+    drawFontRun(ctx, part.text, font, part.size, part.x, part.y + (t ? weekdayShift(roles.cls) : 0)); // weekday words a little below the cell center
   }
   if (surface === "face") ctx.restore();
   if (roles.line) {
