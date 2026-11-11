@@ -25,6 +25,7 @@ import { FONT_STYLES, FontSelection, fontStyleById, loadCalendarFont, type Loade
 import { drawFontSticker } from "./font-art.ts";
 import { watchSheetTheme } from "./sheet-theme.ts";
 import { SCHEMES, schemeById } from "./schemes.ts";
+import { parsePlasticity } from "./names-plasticity.ts";
 import type { Surface } from "./sticker-art.ts";
 import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnapshot, type StageView } from "./player.ts";
 
@@ -36,6 +37,8 @@ export interface Stage extends StageView {
   /** Color scheme by id (src/apps/calendar7/schemes.ts); an unknown id gives the default. Optional: a fake stage may omit it. */
   setScheme?(id: string | null | undefined): void;
   setFont?(font: LoadedFont): void;
+  /** Plasticity of the names layout, 0 to 1 (names-plasticity.ts). Optional: a fake stage may omit it. */
+  setPlasticity?(value: number): void;
   resetView(): void;
   destroy(): void;
 }
@@ -71,6 +74,8 @@ interface Dataset {
 
 /** The URL parameter that picks the color scheme of the 3D view (`?scheme=paper-blue`); unknown values use the default. */
 export const SCHEME_PARAM = "scheme";
+/** The URL parameter that sets the plasticity of the names layout (`?plasticity=0.6`, 0 to 1; absent: the default). */
+export const PLASTICITY_PARAM = "plasticity";
 
 /** The mounted mode: the dispose of every mode plus the in-memory scheme setter the catalog will call. */
 export interface Calendar7Instance extends ModeInstance {
@@ -339,6 +344,7 @@ export async function mountCalendar7(
       }
       stage = made;
       made.setScheme?.(schemeId);
+      made.setPlasticity?.(parsePlasticity(params.get(PLASTICITY_PARAM)));
       if (font) made.setFont?.(font);
       const port = host.closest?.(".shell-stage");
       if (port && typeof ResizeObserver !== "undefined") {

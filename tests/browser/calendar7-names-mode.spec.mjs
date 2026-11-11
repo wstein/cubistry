@@ -189,6 +189,7 @@ test("the renderer uses Linear tone mapping at the face-following exposure in th
     host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
     document.body.append(host, panel);
     const viewer = new Calendar7Viewer(host, panel);
+    viewer.setPlasticity(0); // the flat look: the exposure is exactly the lights' (names-plasticity.ts adds a gain for the shading)
     const out = { fresh: viewer.renderer.toneMappingExposure, freshMap: viewer.renderer.toneMapping };
     viewer.configure(standard.printing, standard.pose, "face", "standard");
     out.standard = viewer.renderer.toneMappingExposure;
@@ -227,7 +228,9 @@ test("viewer wiring: names layout colors the cut faces per adjacent tile (flat c
     const probe = () => {
       const cut = new Map(), widths = new Set(), canvases = new Set();
       let center = 0;
+      const recv = new Set(), spec = new Set(), coat = new Set(), shadowLights = [];
       viewer.presentation.traverse((o) => {
+        if (o.isMesh) { recv.add(o.receiveShadow); for (const m of [].concat(o.material)) if (m.isMeshPhysicalMaterial) { spec.add(m.specularIntensity); coat.add(Math.round(m.clearcoat * 1e6) / 1e6); } }
         const ids = o.userData.sourceFaceStickerIds;
         if (!ids || !Array.isArray(o.material)) return;
         o.geometry.computeBoundingBox();
@@ -238,20 +241,33 @@ test("viewer wiring: names layout colors the cut faces per adjacent tile (flat c
           else { const im = o.material[i].map.image; canvases.add(im.width + "x" + im.height); }
         });
       });
-      return { cut: Object.fromEntries(cut), widths: [...widths].sort(), canvases: [...canvases].sort(), center: Math.round(center * 1e6) / 1e6, cameraZ: viewer.camera.position.z, core: viewer.presentation.children.find((c) => c.userData.plasticCore).scale.x };
+      viewer.scene.traverse((o) => { if (o.isDirectionalLight && o.castShadow) shadowLights.push(Math.round(o.shadow.intensity * 1e6) / 1e6); if (o.name === "studio-shadow-receiver") shadowLights.push("floor", Math.round(o.material.opacity * 1e6) / 1e6); });
+      return { shade: { recv: [...recv], spec: [...spec].sort(), coat: [...coat].sort(), shadowLights }, cut: Object.fromEntries(cut), widths: [...widths].sort(), canvases: [...canvases].sort(), center: Math.round(center * 1e6) / 1e6, cameraZ: viewer.camera.position.z, core: viewer.presentation.children.find((c) => c.userData.plasticCore).scale.x };
     };
     viewer.configure(standard.printing, standard.pose, "face", "standard");
     const std = probe();
     viewer.configure(names.printing, names.pose, "face", "names");
     const red = probe();
+    viewer.setPlasticity(0);
+    const flat = probe();
+    viewer.setPlasticity(0.5);
+    const half = probe();
     viewer.setScheme("dracula");
     const dracula = probe();
     viewer.setScheme("paper-red");
     viewer.configure(standard.printing, standard.pose, "face", "standard");
     const back = probe();
     viewer.destroy();
-    return { std, red, dracula, back, gap: NAMES_GAP };
+    return { std, red, flat, half, dracula, back, gap: NAMES_GAP };
   });
+  // Shading (names-plasticity.ts): the standard layout keeps the shared plastic (specular 1, clearcoat 0.18), faces that receive shadows and
+  // the preset's shadow strength (key 1, shadow fill 0.55, floor opacity 0.3); the names layout has its own, plasticity 0 is flat.
+  expect(seen.std.shade).toEqual({ recv: [true], spec: [1], coat: [0.12, 0.18], shadowLights: [1, 0.55, "floor", 0.3] });
+  expect(seen.back.shade).toEqual(seen.std.shade); // switching back restores it
+  expect(seen.red.shade).toEqual({ recv: [true], spec: [0.05], coat: [0.015], shadowLights: [0.425, 0.23375, "floor", 0.705882] }); // the default plasticity 0.25
+  expect(seen.flat.shade).toEqual({ recv: [false], spec: [0], coat: [0], shadowLights: [0.3, 0.165, "floor", 1] });
+  expect(seen.half.shade.recv).toEqual([true]);
+  expect(seen.half.shade.spec[0]).toBeGreaterThan(seen.red.shade.spec[0]);
   expect(Object.keys(seen.std.cut)).toEqual(["ffffff"]); // standard: one body color, the raw day fill
   expect(seen.std.widths).toEqual([0.99]);
   // The layer-width profile is on in the names layout only: 1.8 outer layers (bodies 1.8 - gap and 1 - gap wide), centers up to 3.4, a larger core and camera.
@@ -328,6 +344,7 @@ test("turning the cube changes the names exposure through the render loop (no ma
     host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
     document.body.append(host, panel);
     const viewer = new Calendar7Viewer(host, panel);
+    viewer.setPlasticity(0); // the flat look: the exposure is exactly the lights' (names-plasticity.ts adds a gain for the shading)
     const frames = (n) => new Promise((done) => { const tick = () => (n-- > 0 ? requestAnimationFrame(tick) : done()); tick(); });
     // The smart rotation copies its own quaternion onto the presentation every frame: turn the cube through it, as a drag would.
     const turn = (pitch, yaw) => viewer.rotation.controller.quaternion.setFromEuler(new viewer.presentation.rotation.constructor(pitch, yaw, 0, "XYZ"));

@@ -47,6 +47,7 @@ import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
 import { namesExposure } from "./names-exposure.ts";
+import { DEFAULT_PLASTICITY, clampPlasticity, floorOpacityFactor, plasticityGain, plasticityParts } from "./names-plasticity.ts";
 
 /**
  * The presentation geometry with a lighter body: 218 bodies at the preset's three bevel segments are 588 triangles each
@@ -101,6 +102,9 @@ export class Calendar7Viewer implements StageView {
   private surface: Surface = "face";
   /** Front layout of the print this cube was built from; the names layout adds the `band` tile and the row 1 line (sticker-art.ts). */
   private layout: Layout = "standard";
+  /** Plasticity of the names layout (names-plasticity.ts); the standard layout has the shared plastic. */
+  private plasticity = DEFAULT_PLASTICITY;
+  private plastic: THREE.MeshPhysicalMaterial | null = null;
   /** A scheme was chosen during a move on a stickerless cube: the body color waits for the end of the move. */
   private bodyStale = false;
   /** The color scheme of the labels (`setScheme`); the default scheme until one is chosen. */
@@ -165,9 +169,43 @@ export class Calendar7Viewer implements StageView {
     }
   }
 
+  /**
+   * Plasticity of the names layout, 0 to 1 (names-plasticity.ts); the default is `DEFAULT_PLASTICITY`. The standard layout ignores it.
+   * Sets specular and clearcoat of every plastic, whether the faces receive the shadow map, the strength of the cube shadow
+   * (the floor shadow keeps its darkness) and the exposure that gives back what the shading takes from a flat area.
+   */
+  setPlasticity(value: number): void {
+    this.plasticity = clampPlasticity(value);
+    this.applyPlasticity();
+    this.syncExposure();
+    this.dirty = true;
+  }
+
+  private applyPlasticity(): void {
+    const names = this.layout === "names", parts = plasticityParts(this.plasticity);
+    if (names) this.presentation.traverse((o) => {
+      if (!(o as THREE.Mesh).isMesh) return;
+      o.receiveShadow = parts.faceShadows;
+      for (const m of [].concat((o as THREE.Mesh).material as never) as THREE.Material[]) {
+        if (!(m as THREE.MeshPhysicalMaterial).isMeshPhysicalMaterial) continue;
+        (m as THREE.MeshPhysicalMaterial).specularIntensity = parts.specular;
+        (m as THREE.MeshPhysicalMaterial).clearcoat = parts.clearcoat;
+      }
+    });
+    if (names && this.plastic) { this.plastic.specularIntensity = parts.specular; this.plastic.clearcoat = parts.clearcoat; }
+    // The lights' shadow strength (the preset's value times `strength`) and the floor opacity that keeps the cube shadow's darkness.
+    const strength = names ? parts.shadowStrength : 1;
+    this.scene.traverse((o) => {
+      const light = o as THREE.DirectionalLight;
+      if (light.isDirectionalLight && light.castShadow) light.shadow.intensity = ((light.userData.c7ShadowBase ??= light.shadow.intensity) as number) * strength;
+    });
+    const floor = this.studio.floor.material;
+    floor.opacity = ((floor.userData.c7OpacityBase ??= floor.opacity) as number) * floorOpacityFactor(strength);
+  }
+
   /** The names layout follows the face that looks at the camera (names-exposure.ts); the standard layout keeps the shared value. */
   syncExposure(): void {
-    this.renderer.toneMappingExposure = this.layout === "names" ? namesExposure(this.scene, this.presentation.quaternion, this.camera) : STANDARD_EXPOSURE;
+    this.renderer.toneMappingExposure = this.layout === "names" ? namesExposure(this.scene, this.presentation.quaternion, this.camera) * plasticityGain(this.plasticity, this.renderer.shadowMap.enabled) : STANDARD_EXPOSURE;
   }
 
   setLabel(text: string): void {
@@ -262,7 +300,7 @@ export class Calendar7Viewer implements StageView {
     this.pose = pose;
     this.surface = surface;
     const plastic = createPlasticMaterial(PLASTIC, 0.55);
-    if (layout === "names") { plastic.specularIntensity = 0; plastic.clearcoat = 0; } // printed paper tiles: no specular white on the tokens (geometry.ts)
+    this.plastic = plastic;
     this.resources.push(plastic);
     const anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
     const materials = new Map<number, THREE.Material>();
@@ -313,9 +351,7 @@ export class Calendar7Viewer implements StageView {
     });
     // The scene hides the sticker meshes and gives each cubie face the label texture (the cut faces take bodyColor: the day fill when stickerless).
     this.cube.setConstruction("stickerless");
-    // Names layout: the cube faces show their tokens. A face that receives the shadow map renders darker than its token (up to
-    // 25 of 255 on white), and Linear tone mapping no longer compresses that as Neutral did. The floor keeps the cube's shadow.
-    if (layout === "names") this.presentation.traverse((o) => { if ((o as THREE.Mesh).isMesh) o.receiveShadow = false; });
+    this.applyPlasticity();
     this.cube.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
     this.dirty = true;
   }
