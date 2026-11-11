@@ -102,8 +102,8 @@ function trackingFor(s: number, n: { glyphs: number; gaps: number[] }, target: n
 
 /**
  * The layout of all name tiles at glyph size `s`, or the tiles that do not fit. Every tile has one unit of content (the unit
- * cell): a middle tile fills it between two half seam gaps, the first tile is flush right to its seam and ends 1.5 px before
- * the red banner edge at most, the last is flush left and ends 1.5 px before the texture edge at most. The glyphs must fit
+ * cell): a middle tile fills it between two half seam gaps, the first tile is flush right to its seam and its ink keeps half a seam gap
+ * (as at a seam) from the red banner edge at most, the last is flush left and ends 1.5 px before the texture edge at most. The glyphs must fit
  * the height of the red banner.
  */
 function fitAt(font: LoadedFont, s: number, c: number): { ok: true; m: number; taus: Map<string, number> } | { ok: false; fails: string[] } {
@@ -123,7 +123,7 @@ function fitAt(font: LoadedFont, s: number, c: number): { ok: true; m: number; t
     const n = nat.get(t.label)!;
     if (n.height * s + 2 * NAME_EDGE_MARGIN > banner) { fails.push(t.label); continue; }
     if (t.anchor === 0) continue;
-    const room = roomOf(t.anchor), limit = ppu / 2 + (t.anchor === 1 ? room.left : room.right) - NAME_EDGE_MARGIN - m, tau = trackingFor(s, n, limit);
+    const room = roomOf(t.anchor), limit = ppu / 2 + (t.anchor === 1 ? room.left - m : room.right - NAME_EDGE_MARGIN) - m, tau = trackingFor(s, n, limit);
     if (tau === null) fails.push(t.label); else taus.set(t.label, Math.min(mean, tau));
   }
   return fails.length ? { ok: false, fails } : { ok: true, m, taus };
