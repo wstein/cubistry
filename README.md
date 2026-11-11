@@ -54,7 +54,7 @@ application chooser in the page header switches between these:
 | M/S Timer | Countdown and stopwatch on two cubes, 00:00-59:59 | `ms-timer.html` ([docs](docs/MS_TIMER.md)) |
 | Calendar | German and English calendar cubes | `calendar.html` ([docs](docs/CALENDAR_CUBES.md)) |
 | CI Quality Cube | Workflow status on six faces | `status.html` ([docs](docs/STATUS_CUBE.md)) |
-| Picture Puzzle Playground | Free-play 2x2 with picture stickers | `playground.html` ([docs](docs/PICTURE_PLAYGROUND.md)) |
+| Picture Cube | Free-play 2x2 with picture stickers; size control 2 to 7 (only 2x2 playable yet) | `playground.html` ([docs](docs/PICTURE_PLAYGROUND.md)) |
 
 More pages, including sticker sheet export, are listed in
 [Applications](docs/APPLICATIONS.md).
