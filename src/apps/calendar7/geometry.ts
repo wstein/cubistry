@@ -114,8 +114,8 @@ export const NAMES_BOTTOM_STRIP = 0.4;
 export const NAMES_MONTH_SIDE_BAND = 0.6;
 /** Weekday words (SUN to SAT) sit this far below the center of their unit cell, in units (owner decision of 2026-11-11). */
 export const NAMES_WEEKDAY_DOWN = 0.08;
-/** Corner radius of the red banner at the left and right cube edge, in units; 0 is square (variant under review). */
-export const NAMES_BANNER_RADIUS = 0;
+/** Corner radius of the red banner at the left and right cube edge, in units: 0.3 (owner decision of 2026-11-11); 0 is square (name 2:1 above to below). */
+export const NAMES_BANNER_RADIUS = 0.3;
 /** Share of the free height of the banner that is above the month name with square corners: 2/3 (2:1 above to below, owner decision of 2026-11-11). */
 export const NAME_ABOVE_SHARE = 2 / 3;
 /** With rounded banner corners (`NAMES_BANNER_RADIUS` > 0) the ink of the name is centered in the banner: 1/2 (owner decision of 2026-11-11). */

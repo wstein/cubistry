@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { layerCenters } from "@cubistry/cube-viewer";
-import { CALENDAR7_SIZE, NAMES_BOTTOM_STRIP, NAMES_MONTH_SIDE_BAND, NAMES_TOP_STRIP, NAMES_WEEKDAY_DOWN, faceBandsOf, layerWidthsFor, monthBanner, outerLayerWidth, unitGridTileOf } from "../src/apps/calendar7/geometry.ts";
+import { CALENDAR7_SIZE, NAMES_BANNER_RADIUS, NAMES_BOTTOM_STRIP, NAMES_MONTH_SIDE_BAND, NAMES_TOP_STRIP, NAMES_WEEKDAY_DOWN, faceBandsOf, layerWidthsFor, monthBanner, outerLayerWidth, unitGridTileOf } from "../src/apps/calendar7/geometry.ts";
 import { NAMES_WHITE, SCHEMES, namesGround } from "../src/apps/calendar7/schemes.ts";
 import { drawFace, namePxPerUnit, nameCenterUp, tileEdgeColors, tileGrid, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { drawFontSticker, labelLayout, nameFaceTable, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
@@ -181,7 +181,7 @@ test("Saturday/Sunday tint: only the unit cell is tinted (column 1 and 7 include
   }
 });
 
-test("the month name sits in the upper part of the red banner: more red above than below (2:1 of the free height) in all 14 fonts, and the name is inside the banner", () => {
+test("month name placement of the default banner: square corners keep 2:1 above to below, rounded corners (the default, radius 0.3) center the ink box (1 px), in all 14 fonts, and the name is inside the banner", () => {
   for (const [id, font] of Object.entries(FONT_METRICS)) {
     const table = nameFaceTable(font), banner = monthBanner();
     near(table.bannerHeight, 1.0, 1e-12, id);
@@ -189,24 +189,27 @@ test("the month name sits in the upper part of the red banner: more red above th
     for (const word of ["J", "ANU", "ARY", "NOV", "EMB", "DEC", "SEP", "AUG", "UST"]) for (const l of nameLabelLayout(word, font, "face")) {
       const above = (l.box.y0 - (96 - banner.top * PPU)) / PPU, below = ((96 - banner.bottom * PPU) - l.box.y1) / PPU; // units of red above and below this glyph
       assert.ok(above > 0.2 && below > 0.1, `${id} ${word} ${l.text}: red above ${above}, below ${below}`);
-      assert.ok(above > below * 1.4, `${id} ${word} ${l.text}: clearly more red above (${above.toFixed(3)}) than below (${below.toFixed(3)})`);
+      if (NAMES_BANNER_RADIUS > 0) assert.ok(Math.abs(above - below) <= 4 / PPU, `${id} ${word} ${l.text}: red above ${above.toFixed(4)} and below ${below.toFixed(4)} differ by more than 4 px (a glyph with overshoot or a descender)`);
+      else assert.ok(above > below * 1.4, `${id} ${word} ${l.text}: clearly more red above (${above.toFixed(3)}) than below (${below.toFixed(3)})`);
       tops.push(l.box.y0); bottoms.push(l.box.y1);
     }
     const aboveAll = (Math.min(...tops) - (96 - banner.top * PPU)) / PPU, belowAll = ((96 - banner.bottom * PPU) - Math.max(...bottoms)) / PPU;
-    near(aboveAll / belowAll, 2, 0.15, `${id}: above:below of the tallest ink over the name tiles is about 2:1 (${aboveAll.toFixed(3)} : ${belowAll.toFixed(3)})`);
+    if (NAMES_BANNER_RADIUS > 0) assert.ok(Math.abs(aboveAll - belowAll) <= 1 / PPU, `${id}: the ink box of the name tiles is centered in the banner: above ${(aboveAll * PPU).toFixed(2)} px, below ${(belowAll * PPU).toFixed(2)} px`);
+    else near(aboveAll / belowAll, 2, 0.15, `${id}: above:below of the tallest ink over the name tiles is about 2:1 (${aboveAll.toFixed(3)} : ${belowAll.toFixed(3)})`);
     // the center line follows the formula and is one value for all tiles and months
     near(table.centerUp, nameCenterUp(Math.max(...tops.map((_, k) => bottoms[k] - tops[k])) / PPU), 0.03, id);
   }
 });
 
-test("month name on the real front: ink inside the red banner (front projection, scene units), 2:1, the red banner 0.4 inside the top and bottom of its row; font and built-in drawing", () => {
+test("month name on the real front: ink inside the red banner (front projection, scene units), placed by the radius, the red banner 0.4 inside the top and bottom of its row; font and built-in drawing", () => {
   const first = FRONT.filter((f) => f.r === 0 && f.text !== "");
   assert.ok(first.length >= 2, "a month name of at least two tiles");
   for (const [name, draw] of Object.entries(DRAWINGS)) for (const f of first) {
     const texts = draw(f).texts, y = texts.map((t) => runAt(name, f, t).y);
     for (const v of y) assert.ok(v < 3.9 && v > 2.9, `${name} ${f.text}: letter center ${v} inside the banner 2.9 .. 3.9`);
     const above = 3.9 - Math.max(...y), below = Math.min(...y) - 2.9;
-    assert.ok(above > below, `${name} ${f.text}: red above ${above.toFixed(3)} vs below ${below.toFixed(3)}`);
+    if (NAMES_BANNER_RADIUS > 0) assert.ok(Math.abs(above - below) <= (name === "font" ? 2 / PPU : 0.03), `${name} ${f.text}: red above ${above.toFixed(4)} vs below ${below.toFixed(4)}: the letter centers are in the middle of the banner (the built-in drawing anchors on the middle baseline, not on the ink: 6 px)`);
+    else assert.ok(above > below, `${name} ${f.text}: red above ${above.toFixed(3)} vs below ${below.toFixed(3)}`);
   }
 });
 
@@ -264,13 +267,13 @@ test("tileEdgeColors: along every edge of every front tile the color is the colo
   assert.ok(samples > 100000, `${samples} samples`);
 });
 
-test("owner decisions as literals: month row banner 0.4 top strip, 0.4 bottom strip, 0.6 side band, weekday words 0.08 lower, square banner corners", async () => {
+test("owner decisions as literals: month row banner 0.4 top strip, 0.4 bottom strip, 0.6 side band, weekday words 0.08 lower, rounded banner corners 0.3", async () => {
   const g = await import("../src/apps/calendar7/geometry.ts");
   assert.equal(g.NAMES_TOP_STRIP, 0.4);
   assert.equal(g.NAMES_BOTTOM_STRIP, 0.4);
   assert.equal(g.NAMES_MONTH_SIDE_BAND, 0.6);
   assert.equal(g.NAMES_WEEKDAY_DOWN, 0.08);
-  assert.equal(g.NAMES_BANNER_RADIUS, 0);
+  assert.equal(g.NAMES_BANNER_RADIUS, 0.3);
 });
 
 test("weekday line: the cut faces beside every weekday tile carry the line color at the height of the line where the line reaches the tile edge (one continuous line over the seams), all schemes with a line", () => {
@@ -289,9 +292,9 @@ test("weekday line: the cut faces beside every weekday tile carry the line color
   assert.ok(checked >= 5 * 8, `${checked} edges checked`);
 });
 
-test("month name placement follows the banner corner radius: square (the default) keeps 2:1 above to below, rounded (radius > 0) centers the ink box (tolerance 1 px), all 14 fonts", async () => {
+test("month name placement follows the banner corner radius: square (radius 0) keeps 2:1 above to below, rounded (radius > 0, the default 0.3) centers the ink box (tolerance 1 px), all 14 fonts", async () => {
   const g = await import("../src/apps/calendar7/geometry.ts");
-  assert.equal(g.NAMES_BANNER_RADIUS, 0, "square is the default");
+  assert.equal(g.NAMES_BANNER_RADIUS, 0.3, "rounded 0.3 is the default");
   assert.equal(g.nameAboveShare(0), 2 / 3);
   assert.equal(g.nameAboveShare(0.3), 1 / 2);
   assert.equal(g.nameAboveShare(), g.nameAboveShare(g.NAMES_BANNER_RADIUS), "the default follows the switch");
