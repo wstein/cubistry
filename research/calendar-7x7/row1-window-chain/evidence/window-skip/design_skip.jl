@@ -45,6 +45,22 @@ function window_z3(smt;timeout_ms=parse(Int,get(ENV,"SMT_TIMEOUT_MS","45000")))
     ccall((:Z3_del_context,WINDOW_Z3LIB),Cvoid,(Ptr{Cvoid},),ctx)
     (;status,elapsed,values,reason)
 end
+# RESULT_DIR=dir (optional): every UNTRUSTED_SAT class result is stored as dir/<sha256 of the SMT text>.tsv and read back instead of
+# solving again. Only SAT is stored; the digest line is checked on reading; without RESULT_DIR nothing changes.
+function solve_cached(smt,dir="";solver=window_z3)
+    digest=bytes2hex(sha256(smt));path=isempty(dir) ? "" : joinpath(dir,digest*".tsv")
+    if !isempty(path) && isfile(path)
+        ls=readlines(path)
+        if length(ls)>=1 && ls[1]=="digest\t"*digest
+            return (;status=1,elapsed=0.0,values=Dict{String,Int}(split(l,'\t')[1]=>parse(Int,split(l,'\t')[2]) for l in ls[2:end]),reason="cached")
+        end
+    end
+    result=solver(smt)
+    if !isempty(path) && result.status==1
+        mkpath(dir);write(path,"digest\t"*digest*"\n"*join(("$k\t$v\n" for (k,v) in sort!(collect(result.values))),""))
+    end
+    result
+end
 # FRONTIER EXPERIMENT: optional seed print; hash-selected SEED_FRAC of faces are frozen to the seed artwork class.
 const SEED_PATH=get(ENV,"SEED_PRINT","");const SEED_FRAC=parse(Float64,get(ENV,"SEED_FRAC","1.0"));const SEED_SALT=parse(Int,get(ENV,"SEED_SALT","0"))
 const SEED=Dict{Tuple{V3,V3},Tuple{String,Int,String}}()
@@ -170,7 +186,7 @@ function design_window(layout_path,out)
             else
                 problem=window_problem(goals,hs)
                 write(joinpath(out,"component-$component.smt2"),problem.smt*"(check-sat)\n")
-                result=window_z3(problem.smt)
+                result=solve_cached(problem.smt,get(ENV,"RESULT_DIR",""))
                 println(log,"component\t",component,'\t',join(key,','),'\t',result.status==1 ? "UNTRUSTED_SAT" : (result.status==-1 ? "UNSAT" : "UNKNOWN"),'\t',result.elapsed,'\t',result.reason);flush(log)
                 if result.status!=1 && get(ENV,"CONTINUE","")=="1";failed[]+=1;continue;end   # survey mode: log every class, then stop without a print
                 @assert result.status==1 "bounded untrusted designer did not find a print for $key"
