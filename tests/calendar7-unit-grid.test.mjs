@@ -123,12 +123,12 @@ test("every front tile, font and built-in drawing: white margin ground, the fill
       if (f.tile.band.t > 0) near(lt.y, want.y + 0.5, 1e-9, `${tag} fill top`); else assert.equal(cell.y0, 0);
       if (f.tile.band.b > 0) near(rb.y, want.y - 0.5, 1e-9, `${tag} fill bottom`); else assert.equal(cell.y1, g.H);
     } else {
-      // month row: 0.1 white at the very top of the cubie, banner 1.2 tall, 0.5 white below it (strips of the row: cubie top and bottom)
+      // month row: 0.2 white at the top of the cubie, banner 1.4 tall, 0.2 white below it (strips of the row: cubie top and bottom)
       near(f.center.y + F / 2 - lt.y, NAMES_TOP_STRIP, 1e-9, `${tag} top strip`);
       near(rb.y - (f.center.y - F / 2), NAMES_BOTTOM_STRIP, 1e-9, `${tag} bottom strip`);
       near(lt.y - rb.y, F - NAMES_TOP_STRIP - NAMES_BOTTOM_STRIP, 1e-9, `${tag} banner height 1.2`);
-      near(lt.y - rb.y, 1.2, 1e-9, `${tag} banner height 1.2 (literal)`);
-      near(lt.y, 4.2, 1e-9, `${tag} banner top`); near(rb.y, 3.0, 1e-9, `${tag} banner bottom`);
+      near(lt.y - rb.y, 1.4, 1e-9, `${tag} banner height 1.4 (literal)`);
+      near(lt.y, 4.1, 1e-9, `${tag} banner top`); near(rb.y, 2.7, 1e-9, `${tag} banner bottom`);
       // the banner is inset by 0.4 (NAMES_MONTH_SIDE_BAND) from the cube edges, not by the 0.8 band of the other rows
       if (f.c === 0) near(lt.x, -4.3 + NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red starts 0.4 inside the left cube edge`); else assert.equal(cell.x0, 0);
       if (f.c === 6) near(rb.x, 4.3 - NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red ends 0.4 inside the right cube edge`); else assert.equal(cell.x1, g.W);
@@ -184,7 +184,7 @@ test("Saturday/Sunday tint: only the unit cell is tinted (column 1 and 7 include
 test("the month name sits in the upper part of the red banner: more red above than below (2:1 of the free height) in all 14 fonts, and the name is inside the banner", () => {
   for (const [id, font] of Object.entries(FONT_METRICS)) {
     const table = nameFaceTable(font), banner = monthBanner();
-    near(table.bannerHeight, 1.2, 1e-12, id);
+    near(table.bannerHeight, 1.4, 1e-12, id);
     const tops = [], bottoms = [];
     for (const word of ["J", "ANU", "ARY", "NOV", "EMB", "DEC", "SEP", "AUG", "UST"]) for (const l of nameLabelLayout(word, font, "face")) {
       const above = (l.box.y0 - (96 - banner.top * PPU)) / PPU, below = ((96 - banner.bottom * PPU) - l.box.y1) / PPU; // units of red above and below this glyph
@@ -204,8 +204,8 @@ test("month name on the real front: ink inside the red banner (front projection,
   assert.ok(first.length >= 2, "a month name of at least two tiles");
   for (const [name, draw] of Object.entries(DRAWINGS)) for (const f of first) {
     const texts = draw(f).texts, y = texts.map((t) => runAt(name, f, t).y);
-    for (const v of y) assert.ok(v < 4.2 && v > 3.0, `${name} ${f.text}: letter center ${v} inside the banner 3.0 .. 4.2`);
-    const above = 4.2 - Math.max(...y), below = Math.min(...y) - 3.0;
+    for (const v of y) assert.ok(v < 4.1 && v > 2.7, `${name} ${f.text}: letter center ${v} inside the banner 2.7 .. 4.1`);
+    const above = 4.1 - Math.max(...y), below = Math.min(...y) - 2.7;
     assert.ok(above > below * 1.4, `${name} ${f.text}: red above ${above.toFixed(3)} vs below ${below.toFixed(3)}`);
   }
 });
@@ -217,7 +217,7 @@ test("the weekday line sits at the bottom of the red banner for schemes with a l
     const r = track((c) => drawFontSticker(c, f.text, f.ink, NOTO, blue, "face", undefined, "names", f.tile)).rects, line = r.at(-1), g = tileGrid(f.tile);
     assert.equal(line.fill, blue.lineRow1.color);
     near(line.y1, g.banner.y1, 1e-9, "the line ends at the bottom of the banner");
-    assert.equal(line.x0, g.cell.x0); assert.equal(line.x1, g.cell.x1);
+    assert.equal(line.x0, g.banner.x0); assert.equal(line.x1, g.banner.x1); // the month line spans the banner (one line over the seven columns)
   }
 });
 
@@ -228,7 +228,7 @@ test("other schemes follow the same geometry: ground is the scheme's day ground,
     if (f.tile.band.l + f.tile.band.r + f.tile.band.t + f.tile.band.b === 0) { assert.equal(rects[0].fill, roles.fill); continue; }
     assert.equal(rects[0].fill, namesGround(scheme.dayFill), `${scheme.id} (${f.c},${f.r}) ground`);
     assert.equal(rects[1].fill, roles.fill, `${scheme.id} (${f.c},${f.r}) fill`);
-    if (f.r === 0) near(rects[1].y1 - rects[1].y0, 1.2 * g.py, 1e-9, `${scheme.id} banner`);
+    if (f.r === 0) near(rects[1].y1 - rects[1].y0, 1.4 * g.py, 1e-9, `${scheme.id} banner`);
     void r;
   }
 });
@@ -247,7 +247,7 @@ test("tileEdgeColors: along every edge of every front tile the color is the colo
   for (const scheme of SCHEMES) for (const f of FRONT) {
     const ground = namesGround(scheme.dayFill), roles = tileRoles(scheme, f.text, f.ink, "names"), g = tileGrid(f.tile);
     const all = track((c) => drawFontSticker(c, f.text, f.ink, NOTO, scheme, "face", undefined, "names", f.tile)).rects;
-    const rects = roles.line ? all.slice(0, -1) : all; // the scheme's line is the last fill: it is not the color of the face edge
+    const rects = all; // the scheme line is the last fill: it is part of the color of the edge where it reaches it
     const edges = tileEdgeColors(roles, ground, f.tile);
     for (const edge of ["left", "right", "top", "bottom"]) {
       const spec = edges?.[edge] ?? roles.fill;
@@ -264,11 +264,27 @@ test("tileEdgeColors: along every edge of every front tile the color is the colo
   assert.ok(samples > 100000, `${samples} samples`);
 });
 
-test("owner decisions as literals: month row banner 0.1 top strip, 0.5 bottom strip, 0.4 side band, weekday words 0.08 lower, square banner corners", async () => {
+test("owner decisions as literals: month row banner 0.2 top strip, 0.2 bottom strip, 0.4 side band, weekday words 0.08 lower, square banner corners", async () => {
   const g = await import("../src/apps/calendar7/geometry.ts");
-  assert.equal(g.NAMES_TOP_STRIP, 0.1);
-  assert.equal(g.NAMES_BOTTOM_STRIP, 0.5);
+  assert.equal(g.NAMES_TOP_STRIP, 0.2);
+  assert.equal(g.NAMES_BOTTOM_STRIP, 0.2);
   assert.equal(g.NAMES_MONTH_SIDE_BAND, 0.4);
   assert.equal(g.NAMES_WEEKDAY_DOWN, 0.08);
   assert.equal(g.NAMES_BANNER_RADIUS, 0);
+});
+
+test("weekday line: the cut faces beside every weekday tile carry the line color at the height of the line where the line reaches the tile edge (one continuous line over the seams), all schemes with a line", () => {
+  let checked = 0;
+  for (const scheme of SCHEMES) {
+    for (const f of FRONT.filter((x) => x.r === 1)) {
+      const roles = tileRoles(scheme, f.text, f.ink, "names"), g = tileGrid(f.tile), e = tileEdgeColors(roles, namesGround(scheme.dayFill), f.tile);
+      if (!roles.line) continue;
+      const colors = (spec) => (typeof spec === "string" ? [spec] : spec.map((x) => x.color));
+      const lineAt = (spec) => typeof spec !== "string" && spec.some((x) => x.color === roles.line.color);
+      if (f.c !== 0) { assert.ok(lineAt(e.left), `${scheme.id} (${f.c}) left edge has the line`); checked++; } else assert.equal(colors(e.left).includes(roles.line.color), false, "column 1: the band side is white");
+      if (f.c !== 6) { assert.ok(lineAt(e.right), `${scheme.id} (${f.c}) right edge has the line`); checked++; } else assert.equal(colors(e.right).includes(roles.line.color), false, "column 7: the band side is white");
+      void g;
+    }
+  }
+  assert.ok(checked >= 5 * 8, `${checked} edges checked`);
 });
