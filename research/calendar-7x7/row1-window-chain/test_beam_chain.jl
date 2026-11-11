@@ -68,7 +68,7 @@ end
     st=lines(STORED);cut=findfirst(l->startswith(l,"edge\t2027\t7\t"),st)-1
     greedy=vcat(st[1:cut],["finish"])
     bad=chain_failures(greedy)
-    @test length(filter(startswith("bound "),bad))==6   # all six months, Mar 2027 included (greedy 60 > 24 + 5)
+    @test length(filter(startswith("bound "),bad))==6   # all six months, Mar 2027 included (greedy 60 > 34 + 5)
     @test !any(b->startswith(b,"front")||startswith(b,"digest")||startswith(b,"adjacency")||startswith(b,"prefix"),bad)
 end
 println("mutations: not run (opt-in)")
