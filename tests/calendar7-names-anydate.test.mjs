@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { build, check, DEFAULTS, IMPOSSIBLE_KEY, parseFlags, parseFronts } from "../scripts/export-calendar7-names-anydate.mjs";
 import {
-  ANY_FIRST_YEAR, ANY_LAST_YEAR, ROTATIONS, allConfigs, bestEffortFront, bestEffortSentence, cellWhere, chooseAnyMonth, configOf, matchFront, namesCells, parseAnyData, parseFront, poseFromFront, rotationOf, stateForDate, wrongStickerIndices,
+  ANY_FIRST_YEAR, ANY_LAST_YEAR, ROTATIONS, allConfigs, assignPieces, bestEffortFront, bestEffortSentence, cellWhere, chooseAnyMonth, configOf, matchFront, namesCells, parseAnyData, parseFront, poseFromFront, rotationOf, stateForDate, wrongStickerIndices,
 } from "../src/apps/calendar7/anydate.ts";
 import { anyDatePageHtml, anyDateModel, HIDDEN_SHEET_CLASS, NO_STATE_LEAD } from "../src/apps/calendar7/anydate-view.ts";
 import { checkPose, stateDigest } from "../src/apps/calendar7/engine.ts";
@@ -350,7 +350,7 @@ test("a configuration without any state shows the short line without a reason", 
   assert.ok(html.includes(`${NO_STATE_LEAD}</p>`));
   assert.doesNotMatch(html, /Reason/);
 });
-test("the differing cell is drawn as a grey hatched field with a strike-through and a red frame crossed out", () => {
+test("the differing cell is drawn as a gray hatched field with a strike-through and a red frame crossed out", () => {
   const log = [];
   const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : (...a) => log.push([String(k), ...a, t.strokeStyle, t.fillStyle])), set: (t, k, v) => { t[k] = v; log.push(["set", k, v]); return true; } });
   drawWrongCell(ctx, 346, 346);
@@ -580,4 +580,11 @@ test("the standard layout never reads print B", async () => {
   assert.equal(calls.fetched.filter((u) => u.includes("names-any")).length, 0);
   assert.equal(monthLabel({ year: 1967, month: 9 }), "September 1967");
   inst.dispose();
+});
+
+test("assignPieces moves an earlier cell to another piece when a later cell needs its first choice (augmenting path)", () => {
+  // Cell 0 takes piece 1 first; cell 1 accepts only piece 1, so cell 0 must move to piece 2. Greedy matching leaves cell 1 unmatched.
+  assert.deepEqual(assignPieces([[{ piece: 1 }, { piece: 2 }], [{ piece: 1 }]]), [1, 0]);
+  // A chain of two moves, and a cell no piece can serve stays unmatched next to a maximum matching of the others.
+  assert.deepEqual(assignPieces([[{ piece: 1 }, { piece: 2 }], [{ piece: 2 }, { piece: 3 }], [{ piece: 1 }], [{ piece: 1 }]]), [1, 1, 0, -1]);
 });
