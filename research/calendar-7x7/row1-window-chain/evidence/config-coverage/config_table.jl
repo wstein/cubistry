@@ -14,6 +14,8 @@ const PRINT_B=joinpath(CAL,"row1-window-chain","evidence","window-skip","printin
 const PRINT_C=joinpath(@__DIR__,"printing-C.tsv")
 const PRINT_D=joinpath(@__DIR__,"printing-C1980.tsv")
 const PRINT_OLD=joinpath(CAL,"row1-window-chain","evidence","window-2037-01","printing.tsv")
+# the 2037-01 print carries its own layout (April tiles AP+RIL since 284e196c); every other print uses the shared layout
+const LAYOUT_OLD=joinpath(CAL,"row1-window-chain","evidence","window-2037-01","layout.tsv")
 module ConfigTable
 using Dates,SHA
 import ..coupled_labels,..stacked_board,..PURE_VARIANT,..window_read_print,..window_piece_options,..all_homes,..bodykey,..rotate,..ROTATIONS
@@ -115,14 +117,14 @@ function best_effort(cs,result,prints...)
     end
     String(take!(io))
 end
-function build(layout,printB,printOld,printC,printD)
-    labels=coupled_labels(read(layout,String));srcB=window_read_print(printB);srcOld=window_read_print(printOld);srcC=window_read_print(printC);srcD=window_read_print(printD)
+function build(layout,printB,printOld,printC,printD,layoutOld)
+    labels=coupled_labels(read(layout,String));labelsOld=coupled_labels(read(layoutOld,String));srcB=window_read_print(printB);srcOld=window_read_print(printOld);srcC=window_read_print(printC);srcD=window_read_print(printD)
     seen=Dict{Tuple{Int,Int,Int},Any}()
     for y in 2026:2099,m in 1:12;k=ckey(y,m);haskey(seen,k) || (seen[k]=(y,m));end
-    cs=[(;month=k[1],weekday=k[2],length=k[3],rep=seen[k],board=board_of(labels,seen[k]...)) for k in sort!(collect(keys(seen)))]
+    cs=[(;month=k[1],weekday=k[2],length=k[3],rep=seen[k],board=board_of(labels,seen[k]...),board_old=board_of(labelsOld,seen[k]...)) for k in sort!(collect(keys(seen)))]
     cs=[merge(c,(;id=i)) for (i,c) in enumerate(cs)]
     resB=Dict((c.month,c.weekday,c.length)=>result_of(srcB,c.board) for c in cs)
-    resO=Dict((c.month,c.weekday,c.length)=>result_of(srcOld,c.board) for c in cs)
+    resO=Dict((c.month,c.weekday,c.length)=>result_of(srcOld,c.board_old) for c in cs)
     resC=Dict((c.month,c.weekday,c.length)=>result_of(srcC,c.board) for c in cs)
     resD=Dict((c.month,c.weekday,c.length)=>result_of(srcD,c.board) for c in cs)
     result(nm,c)=(nm=="B" ? resB : nm=="C" ? resC : nm=="D" ? resD : resO)[(c.month,c.weekday,c.length)]
@@ -146,11 +148,12 @@ function build(layout,printB,printOld,printC,printD)
     # corner lemma over configuration sets (months.jl corner_demand on one representative month per configuration)
     repsof(f)=[c.rep for c in cs if f(c)]
     setB=repsof(c->result("B",c).status=="SAT");setO=repsof(c->result("old",c).status=="SAT")
-    dsum(ms)=(d=corner_demand(labels,ms);(;n=length(ms),demand=d.required,blank=d.blank,lemma=d.lemma))
-    all91=dsum([c.rep for c in cs]);BS=dsum(setB);OS=dsum(setO)
+    dsumL(L,ms)=(d=corner_demand(L,ms);(;n=length(ms),demand=d.required,blank=d.blank,lemma=d.lemma))
+    dsum(ms)=dsumL(labels,ms);dsumO(ms)=dsumL(labelsOld,ms)
+    all91=dsum([c.rep for c in cs]);BS=dsum(setB);OS=dsumO(setO)
     rows=[]
     for c in cs
-        db=dsum(vcat(setB,c.rep in setB ? [] : [c.rep]));do_=dsum(vcat(setO,c.rep in setO ? [] : [c.rep]))
+        db=dsum(vcat(setB,c.rep in setB ? [] : [c.rep]));do_=dsumO(vcat(setO,c.rep in setO ? [] : [c.rep]))
         push!(rows,(;id=c.id,month=c.month,weekday=c.weekday,length=c.length,B_status=result("B",c).status,B_demand=db.demand,B_blank=db.blank,B_lemma=db.lemma,
             old_status=result("old",c).status,old_demand=do_.demand,old_blank=do_.blank,old_lemma=do_.lemma))
     end
@@ -169,11 +172,11 @@ function build(layout,printB,printOld,printC,printD)
     println(io,"drop_print\tnon_matchable_config\tdemand_set_plus_config\tdrops_with_demand_le_23\tconfigs")
     for (nm,set) in (("B",setB),("old",setO)),f in cs
         result(nm,f).status=="SAT" && continue
-        d0=dsum(vcat(set,[f.rep]))
+        ds=nm=="old" ? dsumO : dsum;d0=ds(vcat(set,[f.rep]))
         if d0.demand<=23 && !d0.lemma
             println(io,join((nm,f.id,d0.demand,"not applicable (config does not raise the demand)",""),"\t"));continue
         end
-        ok=[x for x in cs if x.rep in set && (d=dsum(vcat([r for r in set if r!=x.rep],[f.rep]));d.demand<=23 && !d.lemma)]
+        ok=[x for x in cs if x.rep in set && (d=ds(vcat([r for r in set if r!=x.rep],[f.rep]));d.demand<=23 && !d.lemma)]
         println(io,join((nm,f.id,d0.demand,length(ok),join([x.id for x in ok],",")),"\t"))
     end
     lemma_tsv=String(take!(io))
@@ -201,7 +204,7 @@ end
 end # module
 using .ConfigTable
 if abspath(PROGRAM_FILE)==(@__FILE__) && length(ARGS)==2 && ARGS[1]=="write"
-    T=ConfigTable.build(LAYOUT,PRINT_B,PRINT_OLD,PRINT_C,PRINT_D);out=ARGS[2];mkpath(out)
+    T=ConfigTable.build(LAYOUT,PRINT_B,PRINT_OLD,PRINT_C,PRINT_D,LAYOUT_OLD);out=ARGS[2];mkpath(out)
     for (n,s) in (("config-table.tsv",T.table_tsv),("failing-dates.tsv",T.failing_tsv),("front-matches-config-B.tsv",T.matches_B),
                   ("front-matches-config-old.tsv",T.matches_old),("front-matches-config-C.tsv",T.matches_C),("front-matches-config-C1980.tsv",T.matches_D),("best-effort-feb-sunday-28.tsv",T.best_effort_tsv),("lemma-config.tsv",T.lemma_tsv),("gregorian-400.txt",T.cycle_txt),("chain-size.tsv",T.chain_tsv))
         write(joinpath(out,n),s)
