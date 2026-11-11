@@ -62,7 +62,7 @@ export const faceFlatShare = (w: number): number => {
   const length = w - NAMES_GAP, r = bevelRadius(length);
   return (length - 2 * r) / (length - (2 - Math.PI / 2) * r);
 };
-/** Texture pixels of a 1 x 1 face of the names layout: 192 / (L - (2 - pi/2) r) = 196.6. */
+/** Texture pixels of a 1 x 1 face of the names layout: 192 / (L - (2 - pi/2) r) = 196.9. */
 export const NAMES_FACE_PX_PER_UNIT = facePixelsPerUnit(1, 192);
 
 /**

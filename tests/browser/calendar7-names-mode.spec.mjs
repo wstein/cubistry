@@ -265,3 +265,45 @@ test("viewer wiring: names layout colors the cut faces per adjacent tile (flat c
   expect(Object.keys(seen.dracula.cut)).not.toContain("e0282c"); // the cut colors follow the scheme switch
   expect(Object.keys(seen.dracula.cut)).toContain("ff79c6");
 });
+
+test("names layout: every face texture is the size of its own tile (192 px per unit of width and height), for all 294 faces; the standard layout has 192 x 192 everywhere", async ({ page }) => {
+  await page.goto("/licenses.html");
+  const seen = await page.evaluate(async () => {
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const { faceTileOf, layerWidthsFor } = await import("/src/apps/calendar7/geometry.ts");
+    const { tileCanvasSize } = await import("/src/apps/calendar7/sticker-art.ts");
+    const get = async (p) => (await fetch(p)).json();
+    const names = parseState(await get("/calendar7/names/state.v1.json"));
+    const standard = parseState(await get("/calendar7/state.v1.json"));
+    const host = document.createElement("div"), panel = document.createElement("div");
+    host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
+    document.body.append(host, panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    const check = (state, layout) => {
+      viewer.configure(state.printing, state.pose, "face", layout);
+      const byId = new Map();
+      viewer.presentation.traverse((o) => {
+        const ids = o.userData.sourceFaceStickerIds;
+        if (!ids || !Array.isArray(o.material)) return;
+        ids.forEach((id, face) => { if (id !== null) byId.set(id, o.material[face].map.image); });
+      });
+      let wrong = 0, kinds = new Set();
+      for (const [id, image] of byId) {
+        const i = id - 1, p = state.pose;
+        const tile = layout === "names" ? faceTileOf(p.pos.subarray(3 * i, 3 * i + 3), p.normal.subarray(3 * i, 3 * i + 3), p.up.subarray(3 * i, 3 * i + 3), layerWidthsFor(7)) : undefined;
+        const [W, H] = tileCanvasSize(tile);
+        kinds.add(image.width + "x" + image.height);
+        if (image.width !== W || image.height !== H) wrong++;
+      }
+      return { faces: byId.size, wrong, kinds: [...kinds].sort() };
+    };
+    const out = { names: check(names, "names"), standard: check(standard, "standard") };
+    viewer.destroy();
+    return out;
+  });
+  expect(seen.names.faces).toBe(294);
+  expect(seen.names.wrong).toBe(0);
+  expect(seen.names.kinds).toEqual(["192x192", "192x346", "346x192", "346x346"]);
+  expect(seen.standard).toEqual({ faces: 294, wrong: 0, kinds: ["192x192"] });
+});
