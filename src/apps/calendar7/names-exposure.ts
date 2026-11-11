@@ -13,7 +13,7 @@ import * as THREE from "three";
  * visibility), so the lighting switches and the preset are followed.
  *
  * Limit (measured, Paper Red, production effects): up to the start view (pitch 0.22, yaw 0.3) every fill is within 1 of 255 of its
- * token. At a steeper pitch the brighter top face pulls the weighted irradiance up and the face that looks at the camera renders
+ * token at plasticity 0 and within 6 at the default 0.6 (names-plasticity.ts). At a steeper pitch the brighter top face pulls the weighted irradiance up and the face that looks at the camera renders
  * darker than its token (pitch 0.63, yaw 0.3: weekend tint #d6cbcd instead of #fdeeee, 39 off). Faces that look away are shaded by
  * the lights, as on a real cube.
  */

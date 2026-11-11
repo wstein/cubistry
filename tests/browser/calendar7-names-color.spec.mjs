@@ -2,8 +2,9 @@
 // Calendar7 names layout: the colors on screen are the scheme tokens. The real viewer renders the front face of the window
 // print (WebGL, Chromium) head on or in the start view; every tile class is sampled and compared with the token it was drawn
 // from. The names layout uses Linear tone mapping at the exposure that makes the face looking at the camera show its albedo
-// (names-exposure.ts), no specular, and cube faces that do not receive shadows, so a token renders as itself with the paper
-// white (NAMES_WHITE) as the reference. Both effect modes are measured: the repo's test mode (cubistry-lowfx=shadows from
+// (names-exposure.ts), times the gain that gives back what its shading takes (plasticity, names-plasticity.ts, default 0.6),
+// so the mean color of a flat area is its token with the paper white (NAMES_WHITE) as the reference; single tiles differ a few
+// levels by the shading. Both effect modes are measured: the repo's test mode (cubistry-lowfx=shadows from
 // playwright.config.mjs: shadow map off) and the production effects (shadow map on, what users get).
 import { test, expect } from "@playwright/test";
 
@@ -79,7 +80,7 @@ async function sample(page, scheme, tilted = false, production = false, plastici
 /** Median over all tiles of the largest channel difference: the shading must not move the mean color of the flat areas. */
 const medianFill = (rows) => [...rows.map((r) => r.fill)].sort((a, b) => a - b)[rows.length >> 1];
 
-/** Median bound per scheme: 2, except where most tiles are near black or a dark token and the specular white of the plasticity shows (measured at 0.6). */
+/** Median bound per scheme: 2, except High Contrast (5) and Gruvbox Light (4), measured at 0.6: there the shading shows more, partly shadow variance (Gruvbox Light: day tiles 2 to 5 darker, band and month tiles 6 brighter, the dark weekend token 4 to 5 lighter) and partly the specular white on near-black and dark tokens. At plasticity 0 both are exact. */
 const MEDIAN_TOL = { "high-contrast": 5, "gruvbox-light": 4 };
 const medianTol = (scheme) => MEDIAN_TOL[scheme] ?? 2;
 
