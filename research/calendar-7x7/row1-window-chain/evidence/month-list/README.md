@@ -7,7 +7,7 @@ below say which of them accepted what. Stacked on the skip-capacity study (`../w
 ## Mechanism
 
 A month list is a file `months-*.tsv`: one `YYYY-MM` per row, strictly increasing, UTF-8, LF, final LF, from
-2026-01 to 2100-01. It is pinned by its SHA-256 (`sha256.txt`, passed on the command line like the print hash).
+1900-01 to 2100-01. It is pinned by its SHA-256 (`sha256.txt`, passed on the command line like the print hash).
 
 | Checker | Selects the list | Without a list |
 |---|---|---|
@@ -17,7 +17,7 @@ A month list is a file `months-*.tsv`: one `YYYY-MM` per row, strictly increasin
 | Flix print jar | trailing arguments `MONTHS_FILE MONTHS_SHA256` | same |
 | Flix chain jar | `... ORIGINAL_EVIDENCE months MONTHS_FILE MONTHS_SHA256 PRINT_SHA256 [LAYOUT_SHA256]` | `[WINDOW_END PRINT_SHA256]` |
 
-- The list and `WINDOW_END` exclude each other; a list without a hash, a wrong hash, a row outside 2026-01..2100-01,
+- The list and `WINDOW_END` exclude each other; a list without a hash, a wrong hash, a row outside 1900-01..2100-01,
   CRLF, a missing final LF, a blank row and a non-increasing row are rejected by Julia and by Flix.
 - Flix reads the list at runtime (`read(path)` as for all other inputs), so no patched constants and no generator are
   needed. Julia and Flix parse the list in separate code (`verify_chain.jl` does not include `check.jl`).
@@ -66,7 +66,7 @@ follows passes the digest the previous stage ended with as start digest.
 `stage_coverage.jl` composes stages from their Julia and Flix receipts (byte-identical): adjacent stages are `joined` when the first ends in the
 month the second starts in, the digests are equal and both receipts carry the junction lines; otherwise `mismatch` (digests or months differ) or
 `unchecked` (no junction lines). It states `composed FIRST LAST N` for maximal runs of exact stages (verdict SAT, no bridge or root edge)
-with only joined junctions and lists every other stage separately. `verify_stage_coverage.jl` re-reads the receipts with its own code.
+with only joined junctions and lists every other stage separately. A run whose first stage has a free start and is not joined to a predecessor is `free_single` / `free_composed`: exact, but not anchored at the identity pose. Julia and Flix receipt of a stage must be two different files. `verify_stage_coverage.jl` re-reads the receipts with its own code.
 Committed example: `stage-A-*` (2026-05, 2026-06) and `stage-B-*` (2026-06 .. 2028-01, free start) give `composed 2026-05 2028-01 21` (`stage-summary.tsv`).
 The stage inputs here are fixtures from the stored 21-month chain; no real stage run (2026-01 .. 2050-01 and the backward stages) exists yet.
 
@@ -91,14 +91,14 @@ status in the coverage is `best_effort_unverified` and the minimum is UNKNOWN as
 
 `month_coverage.jl` takes the root month and the start month separately (`LIST PIN STATUS LAST START ROOT BEST|-`). Months of the list before START are
 `before_start`; chain members from START to LAST are exact unless listed in the best-effort table (`best-effort-chain.tsv`: month, status, wrong cells, evidence); gaps are
-calendar months between START and LAST that are not in S (bridged, status from `status-*.tsv`). Headline `exact-gapless FIRST..LAST (N months)` is the first maximal run of exact calendar-consecutive
+calendar months between START and LAST that are not in S (bridged, status from `status-*.tsv`). The `exact` status is planned: it is derived from the list and the status files only and no chain receipt is read for exact months (a best-effort month is `best_effort` only with chain receipts). Headline `planned-exact-gapless FIRST..LAST (N months)` is the first maximal run of exact calendar-consecutive
 members; best-effort months are chain members listed separately, not gaps. A best-effort month is `best_effort` only with Julia and Flix chain receipts that carry the
 `BEST_EFFORT` edge line with exactly those cells, otherwise `best_effort_unverified` (Julia Hall table `february-hall-S2.tsv`). `verify_coverage.jl` (separate code) recomputes everything from the
 list and checks the JSON. `coverage-S2.*` (list `months-S2.tsv`, start = root = 2026-05) and `coverage-chain-2026-03.*` (list `months-chain-2026-03.tsv`, root 1980-01, start 2026-03, both Februaries best-effort) are committed.
 
 ```
-coverage-S2:            exact-gapless 2026-05 .. 2037-01 (129 months)   chain members 283, exact runs 3, best-effort 0, gaps 2, bridges 2, before_start 4
-coverage-chain-2026-03: exact-gapless 2026-03 .. 2037-01 (131 months)   chain members 287, exact runs 3, best-effort 2 (2037-02, 2043-02), gaps 0, before_start 2
+coverage-S2:            planned-exact-gapless 2026-05 .. 2037-01 (129 months)   chain members 283, exact runs 3, best-effort 0, gaps 2, bridges 2, before_start 4
+coverage-chain-2026-03: planned-exact-gapless 2026-03 .. 2037-01 (131 months)   chain members 287, exact runs 3, best-effort 2 (2037-02, 2043-02), gaps 0, before_start 2
 ```
 
 ## Receipts (Julia and Flix byte-identical, committed here)
@@ -126,12 +126,12 @@ S2 are not run.
   list hash, interior-gap chain presented as contiguous list, interior-gap chain under the default `WINDOW_END`, list not
   increasing, duplicate month, root record mismatch, start month the print does not show, 2037-05 chain under a 2026-05 list, bridge edge declaring the skipped month, wrong end digest on a bridge edge,
   CRLF list, month after 2100-01, month before 1900-01) are rejected by all three at the named reason.
-- `row1-window-chain/root_best_effort_cases.jl` and `run_root_best_effort_checks.sh`: 26 fixtures, 9 accepted and 17 rejected by Julia, Flix and the independent verifier at the
+- `row1-window-chain/root_best_effort_cases.jl` and `run_root_best_effort_checks.sh`: 31 fixtures, 10 accepted and 21 rejected (`GROUP=k/n` runs a share, 4 groups of about 8 fixtures take 1 to 2 minutes each) by Julia, Flix and the independent verifier at the
   named reason (root month, best-effort months, stages with free start and junction digests).
-- `row1-window-chain/test_best_effort.jl` (16 tests: `chain_root_month`, Hall witness on `printing-S2.tsv` for February 2037), `test_stage_coverage.jl` (15 tests: junction mismatch, missing
+- `row1-window-chain/test_best_effort.jl` (16 tests: `chain_root_month`, Hall witness on `printing-S2.tsv` for February 2037), `test_stage_coverage.jl` (19 tests: junction mismatch, missing
   junction lines, different months, differing receipts, best-effort and bridge stages, verifier agreement).
-- `row1-window-chain/test_month_coverage.jl` (35 tests): generator output equals the stored coverage; tampered copies are rejected; start 2026-03 gives 131 months and two before_start months; root and start are separate parameters; verified and unverified best-effort months.
+- `row1-window-chain/test_month_coverage.jl` (36 tests): generator output equals the stored coverage; tampered copies are rejected; start 2026-03 gives 131 months and two before_start months; root and start are separate parameters; verified and unverified best-effort months.
 - `row1-window-chain/run_month_list_receipts.sh`: regression (committed 2028-01 chain receipts, 129-month print and corner
   receipts, 21-month print) and the S2 receipts above.
-- `row1-window-chain/run_month_list_mutants.sh`: 44 source mutants (list logic, root edge, Hall rule, start moves, junction digests in Julia, Flix and the independent verifier; coverage and stage composition), each must make its test fail.
+- `row1-window-chain/run_month_list_mutants.sh`: 58 source mutants (list logic, root edge, Hall rule, start moves, junction digests in Julia, Flix and the independent verifier; coverage and stage composition), each must make its test fail.
   Not mutation-tested: the Hall count rule `wrong cells == deficiency` in the independent verifier and in Flix (the Julia rule is covered by `test_best_effort.jl`, mutant H2).

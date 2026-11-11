@@ -6,8 +6,8 @@ const WINDOW_PRINT_SHA="0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1
 # Window end YYYY-MM (env WINDOW_END, default 2028-01). The 21-month print stays pinned; a longer
 # window needs its own print, whose SHA-256 must be supplied in CAL7_WINDOW_PRINT_SHA.
 const WINDOW_END=get(ENV,"WINDOW_END","2028-01")
-# An explicit month list S (CAL7_WINDOW_MONTHS, CAL7_WINDOW_MONTHS_SHA256) replaces WINDOW_END; its first month is the chain
-# root: the chain starts at the identity pose of the print, whose front must show that month (the start is a parameter).
+# An explicit month list S (CAL7_WINDOW_MONTHS, CAL7_WINDOW_MONTHS_SHA256) replaces WINDOW_END; the chain root
+# (CAL7_ROOT_MONTH, default its first month) is the month the identity pose of the print shows; a free start (chain.v3) replaces the identity pose.
 # Gaps in S are bridged by one edge.
 const LIST_MODE=!isempty(get(ENV,"CAL7_WINDOW_MONTHS",""))
 const WINDOW_LIST=window_month_list()
