@@ -8,8 +8,9 @@
 # Env WINDOW_END (YYYY-MM): the window of PRINT (default 2037-01 here); GENERATE_DEADLINE_S: no new edge starts when
 # the slowest edge so far would not fit before this many seconds (default 14400).
 # Options: start=YYYY-MM end=YYYY-MM (range of months.tsv; default 2026-01 .. 2050-01) prior=DIR (continue DIR/chain.moves.tsv
-# and DIR/states) claims=FILE max_edges=N library=L1|L4|L5 width lambda corew fanout maxdepth patience nsnap finish_depth.
-# Output OUT: chain.moves.tsv, states/state-NN.tsv, months.tsv, edges.tsv, PROGRESS.txt.
+# with DIR/edges.tsv, and DIR/states) claims=FILE max_edges=N library=L1|L4|L5 width lambda corew fanout maxdepth patience nsnap finish_depth.
+# Output OUT: chain.moves.tsv, states/state-NN.tsv, months.tsv, edges.tsv (cumulative with prior=, column method: beam,
+# finishN or greedy), PROGRESS.txt (incl. greedy_edges).
 # Exit: 0 chain complete or stopped cleanly (PROGRESS.txt says which), 3 no new edge was produced, otherwise error.
 @assert length(ARGS)>=2 "usage: window_chain.jl OUT PRINT [key=value ...]"
 ENV["WINDOW_END"]=get(ENV,"WINDOW_END","2037-01")
@@ -60,9 +61,10 @@ if haskey(opts,"prior")
     @assert digest(state)==lastend "resume: replayed prior end state does not match its end digest"
     for i in 1:k+1;cp(joinpath(opts["prior"],"states","state-"*lpad(string(i),2,'0')*".tsv"),statepath(i));end
     rows=ls[1:end-1];edges_before=k
+    prior_methods=read_edges(joinpath(opts["prior"],"edges.tsv"),k)   # the solver record of earlier segments is carried forward
 else
     state=P.identity_perm();h0=snapshot(state,1,goals[1])
-    rows=String["cubistry.calendar7.chain.v1","source\t5\t2026\t5\t$h0"];edges_before=0
+    rows=String["cubistry.calendar7.chain.v1","source\t5\t2026\t5\t$h0"];edges_before=0;prior_methods=String[]
 end
 function dump(rows)
     tmp=joinpath(out,"chain.moves.tsv.tmp");write(tmp,join(vcat(rows,["finish"]),'\n')*"\n");mv(tmp,joinpath(out,"chain.moves.tsv");force=true)
@@ -78,13 +80,16 @@ lib=G.build_library(action,a,spec);catalogs=P.chain_catalogues(action)
 lib=merge_macros(lib,catalog_macros(catalogs,action,gens));index=build_index(lib);cats=orbit_cats(catalogs,gens)
 println("setup ",round(time()-T0;digits=1)," s, library ",length(lib)," threads ",Threads.nthreads());flush(stdout)
 
-elog=open(joinpath(out,"edges.tsv"),"w");println(elog,"id\tyear\tmonth\tmethod\thtm\tqtm\tseconds\tsource_sha256\tend_sha256")
+elog=open(joinpath(out,"edges.tsv"),"w");println(elog,EDGES_HEADER)
+if haskey(opts,"prior")   # cumulative edges.tsv: prior rows verbatim, then the new ones
+    for l in split(chomp(read(joinpath(opts["prior"],"edges.tsv"),String)),'\n')[2:end];println(elog,l);end
+end;flush(elog)
+new_methods=String[]
 done=0;slowest=0.0;stop=nothing;loop0=time()
 for id in edges_before+2:length(plan)
     global state,done,slowest,stop
-    cur=plan[edges_before+1+done]
-    if done>=max_edges && !unsafe_stop(cur);stop="max_edges";break;end
-    if !may_start_edge(time()-loop0,slowest,deadline) && !unsafe_stop(cur);stop="deadline";break;end
+    stop=stop_reason(done,max_edges,time()-loop0,slowest,deadline,plan[edges_before+1+done])
+    stop===nothing || break
     target=goals[id];@assert (target.year,target.month)==plan[id] "goal order";t=time();before=digest(state)
     r=solve_edge(source,state,target,action,a,gens,lib,index,cats,params;finish_depth=parse(Int,get(opts,"finish_depth","3")),nsnap=parse(Int,get(opts,"nsnap","6")),tight=true,finish=true)
     word=r.word;method=r.method
@@ -100,17 +105,18 @@ for id in edges_before+2:length(plan)
     after=snapshot(next,id,target);m=P.chain_metrics(word,action)
     push!(rows,join(("edge",target.year,target.month,m.htm,m.qtm,m.rotations,m.rotation_qtm,before,after),'\t'))
     append!(rows,["move\t$g\t$q" for (g,q) in P.macro_moves(word)]);push!(rows,"end")
-    state=next;done+=1;secs=time()-t;slowest=max(slowest,secs);dump(rows)
+    state=next;done+=1;push!(new_methods,method);secs=time()-t;slowest=max(slowest,secs);dump(rows)
     println(elog,join((id,target.year,target.month,method,m.htm,m.qtm,round(secs;digits=1),before,after),'\t'));flush(elog)
     println("edge ",id," ",target.year,"-",lpad(target.month,2,'0')," ",method," HTM ",m.htm," QTM ",m.qtm," ",round(secs;digits=1)," s");flush(stdout)
 end
 close(elog)
 produced=plan[1:edges_before+1+done];complete=length(produced)==length(plan)
-write_months(joinpath(out,"months.tsv"),month_records(range_start,range_end,window_end,produced,complete ? nothing : something(stop,"deadline");claims))
+write_months(joinpath(out,"months.tsv"),month_records(range_start,range_end,window_end,produced,complete ? nothing : something(stop,"deadline");claims,methods=vcat(prior_methods,new_methods)))
 open(joinpath(out,"PROGRESS.txt"),"w") do io
     println(io,"complete=",complete);println(io,"stop_reason=",complete ? "-" : something(stop,"deadline"))
     println(io,"edges_total=",edges_before+done);println(io,"edges_new=",done);println(io,"chain_end=",ym_str(produced[end]))
+    println(io,"greedy_edges=",greedy_count(vcat(prior_methods,new_methods)))
     println(io,"plan_end=",ym_str(plan[end]));println(io,"seconds=",round(time()-T0;digits=1))
 end
-println("RESULT complete=",complete," stop=",complete ? "-" : something(stop,"deadline")," edges_total=",edges_before+done," chain_end=",ym_str(produced[end])," seconds=",round(time()-T0;digits=1))
+println("RESULT complete=",complete," greedy=",greedy_count(vcat(prior_methods,new_methods))," stop=",complete ? "-" : something(stop,"deadline")," edges_total=",edges_before+done," chain_end=",ym_str(produced[end])," seconds=",round(time()-T0;digits=1))
 done==0 && !complete && exit(3)
