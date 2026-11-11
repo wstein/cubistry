@@ -31,20 +31,23 @@ A month list is a file `months-*.tsv`: one `YYYY-MM` per row, strictly increasin
   line of a list-mode receipt gives the number of bridge edges. WINDOW_END receipts have no new field and no `months` line.
 - Receipts of print, corner and chain checkers in list mode have one added line, `months<TAB>sha<TAB>count<TAB>first<TAB>last<TAB>bridges`.
 
-## Root rule
+## Start month (chain root)
 
-The chain root is the identity pose of the print. The checkers enforce it twice: the chain `source` record must read
-`5 2026 5`, and the front of the identity state must equal the board of the first member of S. The first member is
-therefore fixed to 2026-05 in all three chain checkers (Julia, Flix, independent), and a list that starts elsewhere
-(`root-mismatch`) is rejected. A chain that starts before May 2026 needs a print whose solved front shows that month:
-`printing-S2.tsv` (and the 2037-01 print and the stored 21-month print) show only May months when solved (2026-05,
-2037-05, 2043-05, 2048-05). Months before the root (2026-01, 2026-03, 2026-04) front-match the S2 print but are
-not chain members; `coverage-S2.tsv` lists them as `before_root`, separate from gaps. This follows the owner decision
-that the chain starts at the May 2026 identity root.
+The start of the chain is a parameter: the first month of S. The chain root is the identity pose of the print, so the
+checkers (Julia, Flix, independent) enforce two things for any start: the `source` record of the chain reads
+`<month> <year> <month>` of the first member, and the front of the identity state equals the board of that month. Nothing
+else is pinned to May 2026 any more (the self-check also finds the first of the start month on the board). A start month is
+therefore only accepted when the print shows it when solved: a start before May 2026 needs a print whose identity front is
+that month. `printing-S2.tsv`, the 2037-01 print and the stored 21-month print show only May months when solved (2026-05,
+2037-05, 2043-05, 2048-05; `identity_front.jl`, `identity-front.tsv`), so with these prints 2026-03 is rejected at
+`identity root front` (fixture `start-front-mismatch`) and 2037-05 is accepted (fixture `start-2037-05`: the stored first
+seven edges relabeled to 2037-05 .. 2037-12, same calendar as 2026; accepted by Julia, Flix and the independent verifier).
+Months before the start that front-match the print are `before_root` in the coverage (not chain members, not gaps).
+The decision that needs a new print (one whose identity front shows March 2026) is a design question, not a checker change.
 
 ## Coverage
 
-`month_coverage.jl` generates `coverage-S2.tsv` and `coverage-S2.json` from the pinned list `months-S2.tsv` (286 months) and the
+`month_coverage.jl` (argument `START_MONTH`) generates `coverage-S2.tsv` and `coverage-S2.json` for start 2026-05 from the pinned list `months-S2.tsv` (286 months) and the
 gap statuses in `status-S2.tsv`. `verify_coverage.jl` (separate code) recomputes the headline, every run, gap, bridge and
 before_root month from the list alone, checks that runs and gaps partition May 2026 .. 2050-01, checks that the JSON agrees,
 and fails on any mismatch. A gap is `unavailable_unsat` only if it cites a Julia and a Flix corner receipt that are
@@ -78,11 +81,21 @@ S2 are not run.
 - `row1-window-chain/test_month_list.jl`: reader, hash, structure, `coupled_goals` with a list (Julia unit tests).
 - `row1-window-chain/month_list_cases.jl` and `run_month_list_checks.sh`: the stored 21-month chain with 2027-03 skipped
   (the edges of 2027-03 and 2027-04 merged into one bridge edge, no solver) is accepted by Julia, Flix and the independent
-  verifier with identical Julia/Flix receipts; 12 negatives (skipped month with an edge into it, missing member, wrong
+  verifier with identical Julia/Flix receipts; a second positive starts at 2037-05 (same calendar as 2026, stored print and first seven edges relabeled); 14 negatives (skipped month with an edge into it, missing member, wrong
   list hash, interior-gap chain presented as contiguous list, interior-gap chain under the default `WINDOW_END`, list not
-  increasing, duplicate month, root mismatch, bridge edge declaring the skipped month, wrong end digest on a bridge edge,
+  increasing, duplicate month, root record mismatch, start month the print does not show, 2037-05 chain under a 2026-05 list, bridge edge declaring the skipped month, wrong end digest on a bridge edge,
   CRLF list, month out of range) are rejected by all three at the named reason.
-- `row1-window-chain/test_month_coverage.jl`: generator output equals the stored coverage; 12 tampered copies are rejected.
+- `row1-window-chain/test_month_coverage.jl`: generator output equals the stored coverage; 12 tampered copies are rejected; start 2026-03 gives 131 months and two before_root months.
 - `row1-window-chain/run_month_list_receipts.sh`: regression (committed 2028-01 chain receipts, 129-month print and corner
   receipts, 21-month print) and the S2 receipts above.
 - `row1-window-chain/run_month_list_mutants.sh`: source mutants of the list logic (Julia, Flix, coverage), each must make its test fail.
+
+## Planned: exact and best-effort months (not implemented)
+
+Owner decision 2026-11-11: a per-month status `exact | best-effort`; a best-effort month lists its wrong cells (expected for
+2037-02 and 2043-02); definition: fewest wrong cells, ties by the shortest move sequence from the predecessor; the coverage states
+"exact gapless X..Y" and lists best-effort months separately. Not built here because the checkers verify exact fronts only: it
+needs (1) a chain-format field per edge for the wrong-cell list and a checker rule (front equals board except the listed cells,
+list size equals the claimed minimum), (2) a minimality argument or proof for "fewest wrong cells" (UNKNOWN without one), (3) a
+change of the coverage `status` column and of `verify_coverage.jl`. The current `gap` rows of 2037-02 and 2043-02 would become
+best-effort months of the chain instead of bridged gaps.

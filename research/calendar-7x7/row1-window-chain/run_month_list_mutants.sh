@@ -35,21 +35,25 @@ mutate J2-list-hash-check "$corner/check.jl" 's/bytes2hex(sha256(bytes))==expect
 mutate J3-list-ignored "$corner/check.jl" 's/if isempty(path)/if true/' t1
 mutate J4-bridge-detection "$corner/check.jl" 's/>1 for (a,b)/>9 for (a,b)/' t1
 mutate J5-exclusive-window-end "$corner/check.jl" 's/@assert !haskey(ENV,"WINDOW_END") "month list and WINDOW_END are exclusive"/@assert true/' t1
-mutate J6-chain-root-month "$chain/check.jl" 's/@assert WINDOW_LIST\[1\]==MONTH_LIST_ROOT/@assert true/' t2 root-mismatch
+mutate J6-root-record "$chain/check.jl" 's/@assert canonical_integer.(f\[2:4\])==\[sm,sy,sm\]/@assert true/' t2 "root-mismatch start-record-mismatch"
 mutate J7-chain-adjacency "$chain/check.jl" 's/@assert (edge.year,edge.month)==(goal.year,goal.month)/@assert true/' t2 "skipped-month-with-edge bridge-edge-declares-skipped-month"
 mutate J8-bridge-flag-output "$chain/check.jl" 's/WINDOW_BRIDGES\[i\] ? "\\tBRIDGE" : ""/""/' t2 none
 mutate J9-independent-next-member "$chain/verify_chain.jl" 's/y,m=LISTED ? NEXT\[(y,m)\] : /y,m=/' t2 none
 mutate J10-independent-increasing "$chain/verify_chain.jl" 's/@assert isempty(out) || t>out\[end\]/@assert true/' t2 "list-not-increasing"
+mutate J11-start-ignored-check "$chain/check.jl" 's/sy,sm=WINDOW_LIST\[1\]/sy,sm=(2026,5)/' t2 start-2037-05
+mutate J12-start-ignored-independent "$chain/verify_chain.jl" 's/SY,SM=LISTED ? MONTHS\[1\] : (2026,5)/SY,SM=(2026,5)/' t2 start-2037-05
 mutate C1-coverage-run-break "$chain/month_coverage.jl" 's/idx(m)==idx(p)+1 || (push!/idx(m)==idx(p)+2 || (push!/' t3
 mutate C2-coverage-before-root "$chain/month_coverage.jl" 's/i in inlist) for i in idx(FIRST)/true) for i in idx(FIRST)/' t3
 mutate C3-verify-receipts-identical "$chain/verify_coverage.jl" 's/@assert read(a)==read(b) "Julia and Flix receipts byte-identical"/@assert true/' t3
+mutate C4-coverage-start-ignored "$chain/month_coverage.jl" 's/function coverage(ms,status,last,ROOT)/function coverage(ms,status,last,ROOT0)\n    ROOT=(2026,5)/' t3
 fi
 if [[ $which == flix || $which == all ]]; then
 mutate F1-flix-increasing "$corner/flix/src/Main.flix" 's/monthIndex(a)<monthIndex(b)/monthIndex(a)<monthIndex(b) or true/' flix "list-not-increasing list-duplicate-month"
 mutate F2-flix-list-pin "$corner/flix/src/Main.flix" 's/require(stackSha(raw)==pin,"month list pin");//' flix "wrong-list-hash"
-mutate F3-flix-root-month "$chain/flix/src/Main.flix" 's/require(monthsFile=="" or at(listed,0)==(2026,5),"chain root month is May 2026");//' flix "root-mismatch"
+mutate F3-flix-root-record "$chain/flix/src/Main.flix" 's/require((integer(r),integer(y),integer(m))==(sm,sy,sm),/require(true or (integer(r),integer(y),integer(m))==(sm,sy,sm),/' flix "root-mismatch start-record-mismatch"
 mutate F4-flix-bridge-flag "$chain/flix/src/Main.flix" 's/monthIndex(b)-monthIndex(a)>1},List.zip(List.take(count-1,ms)/monthIndex(b)-monthIndex(a)>99},List.zip(List.take(count-1,ms)/' flix none
 mutate F5-flix-adjacency "$chain/flix/src/Main.flix" 's/require((y,m)==(yy,mm),"chronological month adjacency");/require(true or (y,m)==(yy,mm),"chronological month adjacency");/' flix "skipped-month-with-edge bridge-edge-declares-skipped-month"
+mutate F6-flix-start-ignored "$chain/flix/src/Main.flix" 's/let(sy,sm)=start;require/let(sy,sm)=if(true) (2026,5) else start;require/' flix start-2037-05
 fi
 echo "mutants: killed $ok, not killed or not applied $bad"
 [[ $bad == 0 ]]
