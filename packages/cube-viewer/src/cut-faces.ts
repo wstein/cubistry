@@ -11,7 +11,16 @@ import * as THREE from "three";
 /** The four edges of a face in its texture space: `u1` is the edge at u = 1, `v0` the edge at v = 0 and so on. */
 export type CutEdge = "u0" | "u1" | "v0" | "v1";
 /** An exterior face touching a cut face: the edge of the cut face it borders and its color. */
-export interface CutEdgeColor { readonly edge: CutEdge; readonly color: string }
+export interface CutEdgeColor {
+  readonly edge: CutEdge;
+  readonly color: string;
+  /** The color changes along the edge: stops from the low to the high end of the coordinate along the edge (v for a u edge, u for a v edge); `color` is the first. */
+  readonly stops?: readonly EdgeStop[];
+}
+/** A stretch of an edge up to the fraction `to` (0..1) of its length. The last stop ends at 1. */
+export interface EdgeStop { readonly to: number; readonly color: string }
+/** The stops of an exterior face along one of its edges and the direction (a body-local vector) in which they run. */
+export interface EdgeProfile { readonly stops: readonly EdgeStop[]; readonly dir: readonly number[] }
 /** How the texture space (u, v) of a face group lies on the body: which tangent axis grows with u and v, and the sign. */
 export interface FaceUvAxes { readonly uAxis: number; readonly uSign: 1 | -1; readonly vAxis: number; readonly vSign: 1 | -1 }
 
@@ -53,13 +62,21 @@ export function faceUvAxes(geometry: THREE.BufferGeometry): readonly FaceUvAxes[
  * null when face k is a cut face too. A neighbor of the cut face is a face on one of its two tangent axes; it lies on the
  * edge of the cut face on that side.
  */
-export function cutFaceEdges(face: number, exterior: readonly (string | null)[], axes: readonly FaceUvAxes[]): readonly CutEdgeColor[] {
+export function cutFaceEdges(face: number, exterior: readonly (string | null)[], axes: readonly FaceUvAxes[], profiles: readonly (EdgeProfile | null | undefined)[] = []): readonly CutEdgeColor[] {
   const { uAxis, uSign, vAxis, vSign } = axes[face];
   const side = (axis: number, sign: 1 | -1, high: CutEdge, low: CutEdge): [number, CutEdge][] => [[axis * 2 + (sign > 0 ? 0 : 1), high], [axis * 2 + (sign > 0 ? 1 : 0), low]];
   const edges: CutEdgeColor[] = [];
   for (const [neighbor, edge] of [...side(uAxis, uSign, "u1", "u0"), ...side(vAxis, vSign, "v1", "v0")]) {
     const color = exterior[neighbor];
-    if (color) edges.push({ edge, color });
+    if (!color) continue;
+    const profile = profiles[neighbor];
+    // along the edge runs the other tangent axis of the cut face; the stops run along `dir`, this is the same way iff dir points to growing uv
+    const along = edge[0] === "u" ? { axis: vAxis, sign: vSign } : { axis: uAxis, sign: uSign };
+    const same = profile ? profile.dir[along.axis] * along.sign : 0;
+    if (profile && same !== 0) {
+      const stops = same > 0 ? profile.stops : profile.stops.map((stop, i, all) => ({ to: 1 - (i === 0 ? 0 : all[i - 1].to), color: stop.color })).reverse();
+      edges.push({ edge, color: stops[0].color, stops });
+    } else edges.push({ edge, color });
   }
   return edges;
 }
@@ -78,15 +95,18 @@ export function cutColorAt(edges: readonly CutEdgeColor[], u: number, v: number)
     const d = distance(e.edge, u, v);
     if (d < bestDistance) { best = e; bestDistance = d; }
   }
-  return best ? best.color : null;
+  if (!best) return null;
+  if (!best.stops) return best.color;
+  const q = best.edge[0] === "u" ? v : u;
+  return (best.stops.find(stop => q <= stop.to) ?? best.stops[best.stops.length - 1]).color;
 }
 
 /** The single color of a cut face when every exterior edge has the same color (no miter needed), else null. */
 export const flatCutColor = (edges: readonly CutEdgeColor[]): string | null =>
-  edges.length > 0 && edges.every(e => e.color === edges[0].color) ? edges[0].color : null;
+  edges.length > 0 && edges.every(e => !e.stops && e.color === edges[0].color) ? edges[0].color : null;
 
 /** Stable key of a miter pattern. */
-export const cutPatternKey = (edges: readonly CutEdgeColor[]): string => edges.map(e => `${e.edge}${e.color}`).sort().join("|");
+export const cutPatternKey = (edges: readonly CutEdgeColor[]): string => edges.map(e => `${e.edge}${e.color}${e.stops ? e.stops.map(stop => `${stop.to.toFixed(4)}${stop.color}`).join(",") : ""}`).sort().join("|");
 
 const hexBytes = (color: string): [number, number, number] => [1, 3, 5].map(i => parseInt(color.slice(i, i + 2), 16)) as [number, number, number];
 export const CUT_TEXTURE_SIZE = 64;

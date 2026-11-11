@@ -4,7 +4,7 @@ import { bodyArtworkKey, orientBodyArtwork, sourceFaceIndex } from "./body-artwo
 import type { Construction } from "./appearance.ts";
 import { cross, demand, dot, type Vec3 } from "@cubistry/cube-core";
 import { layerCenters, layerEdge, layerIndexOf, type LayerWidths, validateLayerWidths } from "./layer-widths.ts";
-import { type CutEdgeColor, cutFaceEdges, cutPatternKey, cutPatternTexture, type FaceUvAxes, faceUvAxes, flatCutColor } from "./cut-faces.ts";
+import { type CutEdgeColor, cutFaceEdges, type EdgeProfile, type EdgeStop, cutPatternKey, cutPatternTexture, type FaceUvAxes, faceUvAxes, flatCutColor } from "./cut-faces.ts";
 
 /** Render-only projection of canonical sticker frames; never an authoritative state. */
 export interface PhysicalStickerFrame {
@@ -29,7 +29,7 @@ export const DEFAULT_CORE_COLOR = "#3a3d42";
 /** An edge of an exterior face in its texture orientation (the sticker's right and up). */
 export type FaceEdgeName = "left" | "right" | "top" | "bottom";
 /** Colors of single edges of an exterior face that differ from its face color (a printed margin along that edge). */
-export type FaceEdgeColors = Partial<Record<FaceEdgeName, string>>;
+export type FaceEdgeColors = Partial<Record<FaceEdgeName, string | readonly EdgeStop[]>>;
 export interface StickerlessBodyOptions {
   /** Explicit color for every inward cut face. Absent: follow the bordering face. */
   readonly bodyColor?: string | null;
@@ -82,7 +82,7 @@ export class PhysicalCubeScene {
   private readonly faceColorOf = new Map<number, string>();
   private readonly edgeColorOf = new Map<number, FaceEdgeColors>();
   private uvAxes: readonly FaceUvAxes[] = [];
-  private readonly miterSlots: { materials: THREE.Material[]; index: number; ids: (number | null)[]; edges: (FaceEdgeName | null)[] }[] = [];
+  private readonly miterSlots: { materials: THREE.Material[]; index: number; ids: (number | null)[]; edges: (FaceEdgeName | null)[]; dirs: (readonly number[] | null)[] }[] = [];
   private readonly miterMaterials = new Map<string, THREE.Material>();
   private readonly miterTextures: THREE.Texture[] = [];
   private readonly faceMaterials: THREE.Material[] = [];
@@ -170,14 +170,16 @@ export class PhysicalCubeScene {
           if (!this.miter) { faceMaterials[index] = this.cutMaterial(index, exterior); continue; }
           for (const face of sourceFaces) if (!this.faceColorOf.has(face.id)) this.faceColorOf.set(face.id, exterior.find(e => e.index === sourceFaceIndex(face.n))!.color);
           // The texture edge of each exterior face that borders this cut face (its direction from the face center: the cut face's normal).
-          const edges: (FaceEdgeName | null)[] = Array(6).fill(null);
+          const edges: (FaceEdgeName | null)[] = Array(6).fill(null), dirs: (readonly number[] | null)[] = Array(6).fill(null);
           const t3 = [0, 0, 0]; t3[index >> 1] = (index & 1) === 0 ? 1 : -1; const toward = t3 as unknown as Vec3;
           for (const face of sourceFaces) {
             const right = cross(face.up, face.n), d = (v: Vec3) => dot(v, toward);
-            edges[sourceFaceIndex(face.n)] = d(face.up) === 1 ? "top" : d(face.up) === -1 ? "bottom" : d(right) === 1 ? "right" : d(right) === -1 ? "left" : null;
+            const k = sourceFaceIndex(face.n);
+            edges[k] = d(face.up) === 1 ? "top" : d(face.up) === -1 ? "bottom" : d(right) === 1 ? "right" : d(right) === -1 ? "left" : null;
+            dirs[k] = edges[k] === "left" || edges[k] === "right" ? face.up : right; // the stops of a side edge run up, of a top or bottom edge to the right
           }
-          this.miterSlots.push({ materials: faceMaterials, index, ids: sourceIds, edges });
-          faceMaterials[index] = this.miterMaterial(index, sourceIds, edges, exterior);
+          this.miterSlots.push({ materials: faceMaterials, index, ids: sourceIds, edges, dirs });
+          faceMaterials[index] = this.miterMaterial(index, sourceIds, edges, dirs, exterior);
         }
         shell.userData.sourceFaceStickerIds = sourceIds;
         this.shells.set(s.cubie, { mesh: shell, stickerless: faceMaterials });
@@ -261,14 +263,16 @@ export class PhysicalCubeScene {
   setFaceColors(colors: ReadonlyMap<number, string>, edgeColors?: ReadonlyMap<number, FaceEdgeColors>): void {
     if (!this.miter) return;
     for (const color of colors.values()) demand(HEX_COLOR.test(color), "Invalid face color");
-    for (const edges of edgeColors?.values() ?? []) for (const color of Object.values(edges)) demand(HEX_COLOR.test(color), "Invalid face edge color");
+    for (const edges of edgeColors?.values() ?? []) for (const spec of Object.values(edges)) for (const color of typeof spec === "string" ? [spec] : spec.map(stop => stop.color)) demand(HEX_COLOR.test(color), "Invalid face edge color");
     for (const [id, color] of colors) this.faceColorOf.set(id, color);
     if (edgeColors) { this.edgeColorOf.clear(); for (const [id, edges] of edgeColors) this.edgeColorOf.set(id, edges); }
-    for (const slot of this.miterSlots) slot.materials[slot.index] = this.miterMaterial(slot.index, slot.ids, slot.edges, []);
+    for (const slot of this.miterSlots) slot.materials[slot.index] = this.miterMaterial(slot.index, slot.ids, slot.edges, slot.dirs, []);
   }
   /** The material of cut face `index` of a cubie whose exterior faces carry the sticker ids `ids` (null: a cut face). */
-  private miterMaterial(index: number, ids: readonly (number | null)[], edgeNames: readonly (FaceEdgeName | null)[], exterior: readonly { index: number; color: string }[]): THREE.Material {
-    const edges = cutFaceEdges(index, ids.map((id, k) => (id === null ? null : (edgeNames[k] ? this.edgeColorOf.get(id)?.[edgeNames[k]!] : undefined) ?? this.faceColorOf.get(id) ?? null)), this.uvAxes);
+  private miterMaterial(index: number, ids: readonly (number | null)[], edgeNames: readonly (FaceEdgeName | null)[], dirs: readonly (readonly number[] | null)[], exterior: readonly { index: number; color: string }[]): THREE.Material {
+    const specs = ids.map((id, k) => (id !== null && edgeNames[k] ? this.edgeColorOf.get(id)?.[edgeNames[k]!] : undefined));
+    const profiles: (EdgeProfile | null)[] = specs.map((spec, k) => (spec && typeof spec !== "string" && dirs[k] ? { stops: spec, dir: dirs[k]! } : null));
+    const edges = cutFaceEdges(index, ids.map((id, k) => (id === null ? null : (typeof specs[k] === "string" ? specs[k] as string : specs[k] ? (specs[k] as readonly EdgeStop[])[0].color : undefined) ?? this.faceColorOf.get(id) ?? null)), this.uvAxes, profiles);
     if (edges.length === 0) return this.cutMaterial(index, exterior);
     const flat = flatCutColor(edges);
     const key = flat ?? cutPatternKey(edges);
