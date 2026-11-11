@@ -373,7 +373,7 @@ jobs:
           [ -n "$chain_end" ] && [ -n "$edges_total" ] && [ -n "$complete" ] || { echo "::error::PROGRESS.txt is incomplete"; exit 1; }
           [ "$edges_total" -ge 1 ] || { echo "::error::no edge to verify"; exit 1; }
           echo "$MONTHS_SHA  src/$MONTHS_PATH" | sha256sum --check --strict
-          best_effort=$(sed -n 's/^best_effort_edges=\([0-9]{1,}\)$/\1/p' "$c/PROGRESS.txt")
+          best_effort=$(sed -n 's/^best_effort_edges=\([0-9]\{1,\}\)$/\1/p' "$c/PROGRESS.txt")
           [ -n "$best_effort" ] || { echo "::error::PROGRESS.txt has no best_effort_edges"; exit 1; }
           # The checkers want a month list that ends at the last chain edge (they assert it); a stopped segment is checked against the
           # members of S up to chain_end (YYYY-MM sorts as text). The root month stays the parameter of the run.
