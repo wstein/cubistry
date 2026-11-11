@@ -13,16 +13,19 @@ ok=0; bad=0
 t3() { "$J" --startup-file=no "$chain/test_month_coverage.jl" > "$out/t.log" 2>&1; }
 t1() { "$J" --startup-file=no "$chain/test_month_list.jl" > "$out/t.log" 2>&1; }
 t2() { ONLY="$1" "$chain/run_month_list_checks.sh" "$J" "$JAVA" "$out/jar/artifact/jar.jar" "$out/run" > "$out/t.log" 2>&1; }
+t4() { ONLY="$1" "$chain/run_root_best_effort_checks.sh" "$J" "$JAVA" "$out/jar/artifact/jar.jar" "$out/run" > "$out/t.log" 2>&1; }
+t5() { "$J" --startup-file=no "$chain/test_stage_coverage.jl" > "$out/t.log" 2>&1; }
+t6() { "$J" --startup-file=no "$chain/test_best_effort.jl" > "$out/t.log" 2>&1; }
 mutate() { # id file sed-expr test-kind [ONLY list]
     local id=$1 f=$2 expr=$3 kind=$4 only=${5:-none}
     cp "$f" "$f.orig"; sed -i "$expr" "$f"
     if cmp -s "$f" "$f.orig"; then echo "NOT-APPLIED $id"; mv "$f.orig" "$f"; bad=$((bad+1)); return; fi
-    if [[ $kind == flix ]]; then
+    if [[ $kind == flix || $kind == flix4 ]]; then
         rm -rf "$out/jar-build" "$out/jar/artifact/jar.jar"; CALENDAR7_CHAIN_FLIX_BUILD_DIR="$out/jar-build" bash "$chain/flix/build.sh" > "$out/build.log" 2>&1 || true
         if ! cp "$out/jar-build/artifact/"*.jar "$out/jar/artifact/jar.jar" 2>/dev/null; then echo "NOT-BUILT $id"; mv "$f.orig" "$f"; bad=$((bad+1)); return; fi
     fi
     rm -rf "$out/run"
-    if [[ $kind == t1 ]]; then t1; elif [[ $kind == t3 ]]; then t3; else t2 "$only"; fi; local rc=$?
+    if [[ $kind == t1 ]]; then t1; elif [[ $kind == t3 ]]; then t3; elif [[ $kind == t5 ]]; then t5; elif [[ $kind == t6 ]]; then t6; elif [[ $kind == t4 || $kind == flix4 ]]; then t4 "$only"; else t2 "$only"; fi; local rc=$?
     mv "$f.orig" "$f"
     if [[ $rc != 0 ]]; then echo "KILLED   $id [$kind] $(grep -m1 -E "Fail|Error|accepted|rejected|differ|cmp:|EOF" "$out/t.log" | cut -c1-100)"; ok=$((ok+1)); else echo "SURVIVED $id"; bad=$((bad+1)); fi
 }
@@ -40,8 +43,25 @@ mutate J7-chain-adjacency "$chain/check.jl" 's/@assert (edge.year,edge.month)==(
 mutate J8-bridge-flag-output "$chain/check.jl" 's/WINDOW_BRIDGES\[i\] ? "\\tBRIDGE" : ""/""/' t2 none
 mutate J9-independent-next-member "$chain/verify_chain.jl" 's/y,m=LISTED ? NEXT\[(y,m)\] : /y,m=/' t2 none
 mutate J10-independent-increasing "$chain/verify_chain.jl" 's/@assert isempty(out) || t>out\[end\]/@assert true/' t2 "list-not-increasing"
-mutate J11-start-ignored-check "$chain/check.jl" 's/sy,sm=WINDOW_LIST\[1\]/sy,sm=(2026,5)/' t2 start-2037-05
-mutate J12-start-ignored-independent "$chain/verify_chain.jl" 's/SY,SM=LISTED ? MONTHS\[1\] : (2026,5)/SY,SM=(2026,5)/' t2 start-2037-05
+mutate J11-start-ignored-check "$chain/check.jl" 's/sy,sm=CHAIN_ROOT/sy,sm=(2026,5)/' t2 start-2037-05
+mutate J12-start-ignored-independent "$chain/verify_chain.jl" 's/SY,SM=ROOTM /SY,SM=(2026,5) /' t2 start-2037-05
+# root month separate from the first member of S, Hall witnesses, free start and junction digests
+mutate R1-root-edge-ignored-check "$chain/check.jl" 's/^const ROOTED=CHAIN_ROOT!=WINDOW_LIST\[1\]/const ROOTED=false/' t4 "root-edge-2037-05 root-edge-zero-moves"
+mutate R2-root-edge-ignored-independent "$chain/verify_chain.jl" 's/^const ROOTED=ROOTM!=FIRSTM/const ROOTED=false/' t4 "root-edge-2037-05 root-edge-zero-moves"
+mutate H1-hall-deficiency-check "$chain/check.jl" 's/@assert d>=1 "Hall set has a deficiency"/@assert true "x"/' t4 best-effort-not-minimal
+mutate H2-hall-count-check "$chain/check.jl" 's/@assert count(w->w in X,wrong)==d "wrong cells in a Hall set equal its deficiency"/@assert true "x"/' t6
+mutate H3-hall-deficiency-independent "$chain/verify_chain.jl" 's/@assert d>=1 "Hall set has a deficiency"/@assert true "x"/' t4 best-effort-not-minimal
+mutate H5-wrong-cells-independent "$chain/verify_chain.jl" 's/@assert bad==e.wrong "strict row-one-name front"/@assert true "x"/' t4 best-effort-unlisted-wrong
+mutate S1-join-start-check "$chain/check.jl" 's/@assert(root==(JOIN_START=="identity" ? identity_digest : JOIN_START),"start junction digest")/@assert(true,"x")/' t4 "stage-wrong-start-digest stage-start-not-identity"
+mutate S2-join-end-check "$chain/check.jl" 's/@assert(chain_digest(state)==(JOIN_END=="identity" ? identity_digest : JOIN_END),"end junction digest")/@assert(true,"x")/' t4 "stage-wrong-end-digest stage-end-not-identity"
+mutate S3-join-start-independent "$chain/verify_chain.jl" 's/@assert(state_sha(state)==(JSTART=="identity" ? identity_hash : JSTART),"start junction digest")/@assert(true,"x")/' t4 "stage-wrong-start-digest stage-start-not-identity"
+mutate S4-join-end-independent "$chain/verify_chain.jl" 's/@assert(state_sha(state)==(JEND=="identity" ? identity_hash : JEND),"end junction digest")/@assert(true,"x")/' t4 "stage-wrong-end-digest stage-end-not-identity"
+mutate S5-start-moves-ignored-check "$chain/check.jl" 's/for (g,e) in something(startmoves,Tuple{Int,Int}\[\])/for (g,e) in Tuple{Int,Int}[]/' t4 "stage-free-start stage-join-both"
+mutate S6-start-moves-ignored-independent "$chain/verify_chain.jl" 's/free && (state=apply_word(state,ch.startword))/free \&\& (state=state)/' t4 "stage-free-start stage-join-both"
+mutate S7-free-front-check "$chain/check.jl" 's/state==decode_physical(source,p,action) && chain_front_ok(state,goals\[1\].board) (free/state==decode_physical(source,p,action) \&\& true (free/' t4 stage-front-not-first-member
+mutate SC1-stage-digest-equality "$chain/stage_coverage.jl" 's/same=a.last==b.first \&\& a.finish==b.start/same=a.last==b.first/' t5
+mutate SC2-stage-junction-lines "$chain/stage_coverage.jl" 's/(a.jend==a.finish \&\& b.jstart==b.start)/true/' t5
+mutate SC3-stage-verifier-digest "$chain/verify_stage_coverage.jl" 's/ok=a.last==b.first \&\& a.fin==b.start/ok=a.last==b.first/' t5
 mutate C1-coverage-run-break "$chain/month_coverage.jl" 's/idx(m)==idx(p)+1 || (push!/idx(m)==idx(p)+2 || (push!/' t3
 mutate C2-coverage-before-root "$chain/month_coverage.jl" 's/i in inlist) for i in idx(FIRST)/true) for i in idx(FIRST)/' t3
 mutate C3-verify-receipts-identical "$chain/verify_coverage.jl" 's/@assert read(a)==read(b) "Julia and Flix receipts byte-identical"/@assert true/' t3
@@ -54,6 +74,12 @@ mutate F3-flix-root-record "$chain/flix/src/Main.flix" 's/require((integer(r),in
 mutate F4-flix-bridge-flag "$chain/flix/src/Main.flix" 's/monthIndex(b)-monthIndex(a)>1},List.zip(List.take(count-1,ms)/monthIndex(b)-monthIndex(a)>99},List.zip(List.take(count-1,ms)/' flix none
 mutate F5-flix-adjacency "$chain/flix/src/Main.flix" 's/require((y,m)==(yy,mm),"chronological month adjacency");/require(true or (y,m)==(yy,mm),"chronological month adjacency");/' flix "skipped-month-with-edge bridge-edge-declares-skipped-month"
 mutate F6-flix-start-ignored "$chain/flix/src/Main.flix" 's/let(sy,sm)=start;require/let(sy,sm)=if(true) (2026,5) else start;require/' flix start-2037-05
+mutate FR1-flix-root-edge-ignored "$chain/flix/src/Main.flix" 's/let rooted=monthsFile != "" and rootMonth != at(listed,0);/let rooted=false;/' flix4 "root-edge-2037-05 root-edge-zero-moves"
+mutate FH1-flix-hall-deficiency "$chain/flix/src/Main.flix" 's/require(d>=1,"Hall set has a deficiency");/require(true or d>=1,"Hall set has a deficiency");/' flix4 best-effort-not-minimal
+mutate FH2-flix-wrong-cells "$chain/flix/src/Main.flix" 's/let mism=wMismatch(next,goal);require(mism==wrong,/let mism=wMismatch(next,goal);require(true or mism==wrong,/' flix4 best-effort-unlisted-wrong
+mutate FS1-flix-join-start "$chain/flix/src/Main.flix" 's/require(root==(if(joinStart=="identity") identityDigest else joinStart),"start junction digest")/require(true,"start junction digest")/' flix4 "stage-wrong-start-digest stage-start-not-identity"
+mutate FS2-flix-join-end "$chain/flix/src/Main.flix" 's/require(fd==(if(joinEnd=="identity") identityDigest else joinEnd),"end junction digest")/require(true,"end junction digest")/' flix4 "stage-wrong-end-digest stage-end-not-identity"
+mutate FS3-flix-start-moves-ignored "$chain/flix/src/Main.flix" 's/let sm0=match startMoves {case Some(l) => l case None => Nil};/let sm0=match startMoves {case Some(_) => Nil case None => Nil};/' flix4 "stage-free-start stage-join-both"
 fi
 echo "mutants: killed $ok, not killed or not applied $bad"
 [[ $bad == 0 ]]

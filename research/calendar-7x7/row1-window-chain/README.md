@@ -87,11 +87,12 @@ STATES_OVERRIDE=$PWD/evidence/window-2029-12/states bash run_checks.sh JULIA JAV
 ## Explicit month list instead of a window end
 
 `CAL7_WINDOW_MONTHS=<file>` with `CAL7_WINDOW_MONTHS_SHA256=<hex>` (Flix: `months MONTHS_FILE MONTHS_SHA256 PRINT_SHA256`) replaces `WINDOW_END`
-in `check.jl`, `verify_chain.jl`, the Flix chain jar and `run_checks.sh`. The list is strictly increasing; its first month is the chain
-root (identity pose; a parameter: the print must show it solved); edge i must carry the month of member i+1; an edge across skipped calendar months is a bridge edge
-(`BRIDGE` on the receipt line). Format, root rule, coverage and receipts: [evidence/month-list/README.md](evidence/month-list/README.md).
+in `check.jl`, `verify_chain.jl`, the Flix chain jar and `run_checks.sh`. The list is strictly increasing (1900-01 .. 2100-01); edge i must carry the month of member i+1; an edge across skipped calendar months is a bridge edge
+(`BRIDGE` on the receipt line). The root month (`CAL7_ROOT_MONTH`, the month the identity pose shows) is separate from the first member; a different root adds a root edge (`ROOTEDGE`).
+Chain format v2 adds per-edge wrong cells with Hall witnesses (best-effort months); v3 adds a free start state (`start` block) for stages, and `CAL7_JOIN_START` / `CAL7_JOIN_END` pin the start and end digest of a stage
+(Flix: arguments after the root month). Format, root rule, stages, best-effort rule, coverage and receipts: [evidence/month-list/README.md](evidence/month-list/README.md).
 Tests: `test_month_list.jl`, `run_month_list_checks.sh` (two positives, a bridge chain and a chain starting at 2037-05, and 14 negatives; Julia, Flix and the independent verifier),
-`test_month_coverage.jl`. `generate.jl` and `beam_edge.jl` take their targets from the same goals and were not changed or run for a list.
+`test_month_coverage.jl`, `test_best_effort.jl`, `test_stage_coverage.jl`, `run_root_best_effort_checks.sh` (root, best-effort and stage fixtures, three checkers). `generate.jl` and `beam_edge.jl` take their targets from the same goals and were not changed or run for a list.
 
 ## Beam pilot: Nov 2026 to Dec 2026
 
