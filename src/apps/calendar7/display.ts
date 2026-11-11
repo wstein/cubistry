@@ -199,6 +199,24 @@ export interface FrontFailure {
   readonly why: "plain-mismatch" | "stacked-not-upright" | "stacked-mismatch";
 }
 
+/**
+ * Why one front sticker (printed `text` and `ink`, upright angle 0..3) does not show the display cell `want`, or null
+ * when it does. The per-cell rule of `frontFailure`, shared with the any-date matching (anydate.ts).
+ */
+export function cellFailure(
+  text: string,
+  ink: string,
+  angle: number,
+  want: Cell,
+  profile: RuleProfile = DEFAULT_RULE_PROFILE,
+): FrontFailure["why"] | null {
+  if (STACKED.test(text)) {
+    if (angle === 0 && ink === want.ink && text === want.text) return null;
+    return angle !== 0 && ink === want.ink && text === want.text ? "stacked-not-upright" : "stacked-mismatch";
+  }
+  return sameImage(imageNormal(text, angle, ink, profile), imageNormal(want.text, 0, want.ink, profile)) ? null : "plain-mismatch";
+}
+
 /** First cell (row-major) whose front sticker does not show the display, or null. */
 export function frontFailure(
   printing: Printing,
@@ -234,31 +252,8 @@ export function frontFailure(
       (u) => u[0] === state.up[o] && u[1] === state.up[o + 1] && u[2] === state.up[o + 2],
     );
     if (angle < 0) throw new Error(`front sticker ${i + 1} has no image orientation`);
-    const text = printing.text[i];
-    const ink = printing.ink[i];
-    const want = cells[k];
-    const fail = (why: FrontFailure["why"]): FrontFailure => ({
-      row,
-      column,
-      sticker: i + 1,
-      angle,
-      why,
-    });
-    if (STACKED.test(text)) {
-      if (angle === 0 && ink === want.ink && text === want.text) continue;
-      return fail(
-        angle !== 0 && ink === want.ink && text === want.text
-          ? "stacked-not-upright"
-          : "stacked-mismatch",
-      );
-    }
-    if (
-      !sameImage(
-        imageNormal(text, angle, ink, profile),
-        imageNormal(want.text, 0, want.ink, profile),
-      )
-    )
-      return fail("plain-mismatch");
+    const why = cellFailure(printing.text[i], printing.ink[i], angle, cells[k], profile);
+    if (why) return { row, column, sticker: i + 1, angle, why };
   }
   return null;
 }
