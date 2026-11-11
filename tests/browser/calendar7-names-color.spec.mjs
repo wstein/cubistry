@@ -9,12 +9,12 @@ import { test, expect } from "@playwright/test";
 
 // Tolerance in 8-bit sRGB per channel. Fills are the median of the tile interior (shading and antialiasing do not matter);
 // ink and line are the best matching pixel of the tile (thin strokes never cover whole pixels but the best one is a stroke core).
-const FILL_TOL = 4, STROKE_TOL = 6;
+const FILL_TOL = 5, STROKE_TOL = 6; // at the default plasticity: it shades the faces (a tile can be a few levels off), the mean of all tiles is checked at 2
 const SCHEMES = ["paper-red", "paper-blue", "classic", "solarized-light", "gruvbox-light", "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast"];
 
-async function sample(page, scheme, tilted = false, production = false) {
+async function sample(page, scheme, tilted = false, production = false, plasticity = undefined) {
   await page.goto("/licenses.html");
-  return page.evaluate(async ({ scheme, tilted, production }) => {
+  return page.evaluate(async ({ scheme, tilted, production, plasticity }) => {
     if (production) localStorage.removeItem("cubistry-lowfx"); // read by configurePresentationRenderer: no key = shadow map on
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
     const { loadCalendarFont } = await import("/src/apps/calendar7/fonts.ts");
@@ -28,9 +28,10 @@ async function sample(page, scheme, tilted = false, production = false) {
     const viewer = new Calendar7Viewer(host, panel);
     viewer.setFont(await loadCalendarFont("noto", "/"));
     viewer.setScheme(scheme);
+    if (plasticity !== undefined) viewer.setPlasticity(plasticity);
     viewer.configure(printing, pose, "face", "names");
     // Head on to the front face, or the default start view of the app (yaw 0.3, pitch 0.22: the cube as the page first shows it).
-    if (tilted) viewer.presentation.rotation.set(0.22, -0.3, 0); else viewer.presentation.rotation.set(0, 0, 0);
+    if (tilted) viewer.presentation.rotation.set(tilted === true ? 0.22 : tilted, -0.3, 0); else viewer.presentation.rotation.set(0, 0, 0);
     viewer.presentation.updateMatrixWorld(true);
     viewer.syncExposure(); // the render loop does it before a frame; this probe renders by hand
     const cv = viewer.renderer.domElement;
@@ -72,8 +73,11 @@ async function sample(page, scheme, tilted = false, production = false) {
     });
     viewer.destroy();
     return out;
-  }, { scheme, tilted, production });
+  }, { scheme, tilted, production, plasticity });
 }
+
+/** Median over all tiles of the largest channel difference: the shading must not move the mean color of the flat areas. */
+const medianFill = (rows) => [...rows.map((r) => r.fill)].sort((a, b) => a - b)[rows.length >> 1];
 
 const MODES = [["test mode", false], ["production effects", true]];
 
@@ -85,6 +89,7 @@ for (const [mode, production] of MODES) {
     const classes = new Set(rows.map((r) => r.cls));
     for (const c of ["blank", "day", "weekday", "weekend", "sunsat"]) expect(classes, c).toContain(c);
     if (process.env.C7_COLOR_TABLE) console.log(`${scheme} ${mode}\n` + JSON.stringify(rows));
+    expect(medianFill(rows), `${scheme} median fill delta`).toBeLessThanOrEqual(2);
     for (const r of rows) {
       const id = `${scheme} ${r.cls} "${r.text}"`;
       expect(r.fill, `${id} fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(FILL_TOL);
@@ -99,6 +104,26 @@ for (const [mode, production] of MODES) {
     test.setTimeout(90000);
     const rows = await sample(page, scheme, true, production);
     expect(rows.length).toBeGreaterThan(40);
+    expect(medianFill(rows), `${scheme} median fill delta`).toBeLessThanOrEqual(2);
     for (const r of rows) expect(r.fill, `${scheme} ${r.cls} "${r.text}" fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(FILL_TOL);
   });
 }
+
+// The plasticity parameter (names-plasticity.ts), production effects: 0 is flat and exact; 1 shades more, the mean stays on the token.
+for (const [plasticity, tol] of [[0, 4], [1, 10]]) for (const scheme of ["paper-red", "dracula"]) test(`${scheme} (production effects): plasticity ${plasticity} keeps the median fill on the token and every fill within ${tol}`, async ({ page }) => {
+  test.setTimeout(90000);
+  const rows = await sample(page, scheme, false, true, plasticity);
+  expect(medianFill(rows), `${scheme} ${plasticity} median`).toBeLessThanOrEqual(plasticity === 0 ? 1 : 3);
+  for (const r of rows) expect(r.fill, `${scheme} ${plasticity} ${r.cls} "${r.text}" fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(tol);
+});
+
+// A steeper start than the app's: pitch 0.4, yaw 0.3. The face that looks at the camera is still the face the exposure follows
+// (weighting exponent 8); with a flatter weighting (exponent 4) the brighter top face pulls the exposure down and white renders darker.
+test("paper-red (production effects): at pitch 0.4 the fills are the tokens too (the exposure follows the face that looks at the camera)", async ({ page }) => {
+  test.setTimeout(90000);
+  const rows = await sample(page, "paper-red", 0.4, true);
+  expect(rows.length).toBeGreaterThan(40);
+  expect(medianFill(rows), "median fill delta").toBeLessThanOrEqual(3);
+  if (process.env.C7_COLOR_TABLE) console.log("pitch 0.4 " + JSON.stringify(rows.slice(0, 12)));
+  for (const r of rows) expect(r.fill, `${r.cls} "${r.text}" fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(8); // 6 off at most (the tint is a little light), exponent 4 gives 13 or more
+});
