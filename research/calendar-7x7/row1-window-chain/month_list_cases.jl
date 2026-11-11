@@ -109,6 +109,8 @@ add("bridge-edge-wrong-end-digest","edge end digest","edge end digest","end hash
 write_fixture("list-crlf",ms_skip,chain_text(bridged);listtext_override=replace(listtext(ms_skip),"\n"=>"\r\n"),statesidx=idx_skip)
 add("list-crlf","canonical month list UTF-8/LF","CR forbidden in canonical TSV","list is canonical LF")
 write_fixture("list-month-out-of-range",ms_skip,chain_text(bridged);listtext_override=listtext(ms_skip)*"2100-02\n",statesidx=idx_skip)
-add("list-month-out-of-range","month list row lies within 2026-01 to 2100-01","month list row lies within 2026-01 to 2100-01","list row in range")
+add("list-month-out-of-range","month list row lies within 1900-01 to 2100-01","month list row lies within 1900-01 to 2100-01","list row in range")
+write_fixture("list-month-before-1900",ms_skip,chain_text(bridged);listtext_override="1899-12\n"*listtext(ms_skip),statesidx=idx_skip)
+add("list-month-before-1900","month list row lies within 1900-01 to 2100-01","month list row lies within 1900-01 to 2100-01","list row in range")
 open(joinpath(out,"cases.tsv"),"w") do io;for c in cases;println(io,c);end;end
 println("skipped\t",mtext(skipped),"\tmembers\t",length(ms_skip),"\tcases\t",length(cases))
