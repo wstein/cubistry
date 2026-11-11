@@ -46,13 +46,13 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
   if (!integer(artifact) || !token || typeof oidc !== 'function') throw Error('Invalid deployment inputs');
   let remaining=attempts;
   const deadline=now()+timeout;
-  let last=null;
+  let last=null,id;
   const secrets=[token];
   // Diagnostics carry only the deployment id, status and the response's errors/message, redacted and bounded; never credentials.
   const field=value=>{if(value===undefined||value===null)return 'none';const text=typeof value==='string'?value:JSON.stringify(value);return secrets.filter(Boolean).flatMap(secret=>[secret,encodeURIComponent(secret)]).reduce((out,secret)=>out.split(secret).join('[redacted]'),text).slice(0,500);};
   const exhausted=()=>{
     const detail=last?` (deployment ${last.id}, last status ${field(last.status)}, errors ${field(last.errors)}, message ${field(last.message)})`:' (no status received)';
-    const hint=last?.status==='succeed'?`; deployment succeeded but receipt not found or not matching at ${PUBLICATION_URL}`:'';
+    const hint=last?.id===id&&last.status==='succeed'?`; deployment succeeded but receipt not found or not matching at ${PUBLICATION_URL}`:'';
     const error=Error(`Pages deployment wait budget exhausted${detail}${hint}`);
     console.error(error.message);
     return error;
@@ -75,7 +75,6 @@ export async function deployPages({receipt,artifact,token,oidc,fetch:request=fet
     if(terminalFailure.has(data.status))throw Error('Pages deployment failed');
     return data.status;
   };
-  let id;
   for (;;) {
     const oidcTimeout=budget();
     const idToken=await oidc({timeout:oidcTimeout,signal:AbortSignal.timeout(oidcTimeout)});

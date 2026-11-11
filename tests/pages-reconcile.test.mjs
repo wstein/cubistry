@@ -348,3 +348,12 @@ test('a succeeded deployment whose receipt is missing says so in the budget erro
   });
  assert.equal(logged.length,1);
 });
+test('a succeeded status of another (busy) deployment does not trigger the receipt hint',async t=>{
+ mute(t);
+ await assert.rejects(deployPages({receipt,artifact:55,token:'test',oidc:async()=>'oidc-test',sleep:async()=>{},attempts:2,
+  fetch:async(url,options={})=>{
+   if(options.method==='POST')return json({message:`Deployment request failed for ${sha} due to in progress deployment. Please cancel ${storage} first or wait for it to complete.`},400);
+   return json({status:'succeed'});
+  }}),
+  error=>{assert(error.message.includes(`deployment ${storage}, last status succeed`));assert(!error.message.includes('receipt not found'));return true;});
+});
