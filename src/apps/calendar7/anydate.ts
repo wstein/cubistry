@@ -192,12 +192,17 @@ export function poseFromFront(printing: Printing, root: Pose, front: readonly Fr
   return pose;
 }
 
+interface Matching {
+  readonly front: (FrontBody | null)[];
+  /** Cells (row, column, 1-based) no body could be matched to, in row-major order. */
+  readonly unmatched: [number, number][];
+}
 /**
- * Front matching of a display with the fixed print: one distinct body and rotation per front cell such that the sticker on
- * the front shows the cell (`cellFailure`, the rule of `frontFailure`). Bipartite matching by augmenting paths, cells and
- * bodies in index order (deterministic). Returns null when no matching exists (exhaustive for this rule).
+ * Maximum front matching of a display with the fixed print: one distinct body and rotation per front cell such that the
+ * sticker on the front shows the cell (`cellFailure`, the rule of `frontFailure`). Bipartite matching by augmenting paths,
+ * cells and bodies in index order (deterministic); a cell that cannot be matched stays `null` and the others keep a maximum matching.
  */
-export function matchFront(printing: Printing, root: Pose, cells: readonly Cell[]): FrontBody[] | null {
+function maximumMatching(printing: Printing, root: Pose, cells: readonly Cell[]): Matching {
   if (cells.length !== 49) throw new Error("a display has 49 cells");
   const bodies = [...bodiesOf(printing, root).values()].sort((a, b) => a.piece - b.piece);
   const options: { piece: number; rot: string }[][] = [];
@@ -239,14 +244,84 @@ export function matchFront(printing: Printing, root: Pose, cells: readonly Cell[
     }
     return false;
   };
-  for (let k = 0; k < 49; k++) if (!augment(k, new Set())) return null;
-  return choice.map((n, k) => options[k][n]);
+  const unmatched: [number, number][] = [];
+  for (let k = 0; k < 49; k++) if (!augment(k, new Set())) unmatched.push([Math.floor(k / 7) + 1, (k % 7) + 1]);
+  // A later augmentation can move an earlier cell to another body: the body of a cell is the one its last choice names.
+  const front = choice.map((n, k) => (n < 0 ? null : options[k][n]));
+  return { front, unmatched };
+}
+
+/** Exact front matching, or null when some cell cannot be matched (exhaustive for this rule). */
+export function matchFront(printing: Printing, root: Pose, cells: readonly Cell[]): FrontBody[] | null {
+  const m = maximumMatching(printing, root, cells);
+  return m.unmatched.length === 0 ? (m.front as FrontBody[]) : null;
+}
+
+/**
+ * Best effort for a display the print cannot show exactly: a maximum matching, so the fewest wrong cells; each unmatched
+ * cell gets the lowest unused body of its position orbit with the first rotation that takes it there (its front sticker is
+ * the wrong one). The front is a complete matching of 49 bodies: `poseFromFront` completes the pose like an exact month.
+ * `wrong` lists the cells (row, column) whose front differs from the display, in row-major order.
+ */
+export interface BestEffort {
+  readonly front: FrontBody[];
+  readonly wrong: [number, number][];
+}
+export function bestEffortFront(printing: Printing, root: Pose, cells: readonly Cell[]): BestEffort {
+  const { front, unmatched } = maximumMatching(printing, root, cells);
+  const bodies = bodiesOf(printing, root);
+  const used = new Set(front.filter((f): f is FrontBody => f !== null).map((f) => f.piece));
+  for (const [row, column] of unmatched) {
+    const k = (row - 1) * 7 + column - 1;
+    const want = cellPosition(k);
+    const body = [...bodies.values()].sort((a, b) => a.piece - b.piece).find((c) => !used.has(c.piece) && classOf(c.home) === classOf(want));
+    const rot = body && ROTATIONS.find((r) => same(turn(r, body.home), want));
+    if (!body || !rot) throw new Error(`no unused body for front cell ${row},${column}`);
+    used.add(body.piece);
+    front[k] = { piece: body.piece, rot: rot.code };
+  }
+  return { front: front as FrontBody[], wrong: unmatched };
+}
+
+/** Sticker indices (0-based) on the front cells `wrong` of `pose`: the stickers the viewer draws as the differing cell. */
+export function wrongStickerIndices(pose: Pose, wrong: readonly (readonly [number, number])[]): number[] {
+  return wrong.map(([row, column]) => {
+    const hits: number[] = [];
+    for (let i = 0; i < STICKERS; i++) {
+      const o = 3 * i;
+      if (pose.normal[o + 2] === 1 && pose.pos[o + 2] === 3 && pose.pos[o] + 4 === column && 4 - pose.pos[o + 1] === row) hits.push(i);
+    }
+    if (hits.length !== 1) throw new Error(`front cell ${row},${column} has ${hits.length} stickers`);
+    return hits[0];
+  });
+}
+
+const CORNER_NAMES: Record<string, string> = { "1,1": "top left", "1,7": "top right", "7,1": "bottom left", "7,7": "bottom right" };
+/** Where a cell is, from its coordinates: a corner by name with its row and column, any other cell by row and column. */
+export function cellWhere(row: number, column: number): string {
+  const corner = CORNER_NAMES[`${row},${column}`];
+  return corner ? `${corner} (row ${row}, column ${column})` : `row ${row}, column ${column}`;
+}
+/** The one sentence of a best-effort page, derived from the list of wrong cells. */
+export function bestEffortSentence(wrong: readonly (readonly [number, number])[]): string {
+  const where = wrong.map(([r, c]) => cellWhere(r, c));
+  return `Not exactly possible with this print: cell${where.length > 1 ? "s" : ""} ${where.join(" and ")} differ${where.length > 1 ? "" : "s"}.`;
 }
 
 // ---- data files ----
 
 export type AnyEntry =
   | { readonly key: string; readonly status: "match"; readonly source: string; readonly front: readonly FrontBody[] }
+  | {
+      readonly key: string;
+      readonly status: "best-effort";
+      readonly source: string;
+      readonly front: readonly FrontBody[];
+      /** Cells (row, column) whose front differs from the board: the fewest the print allows. */
+      readonly wrong: readonly (readonly [number, number])[];
+      /** The research reason (data and docs only, never shown on the page). */
+      readonly reason: string;
+    }
   | { readonly key: string; readonly status: "none" | "pending"; readonly reason: string };
 export interface AnyData {
   readonly start: Start;
@@ -268,6 +343,16 @@ export function parseAnyData(stateJson: unknown, configsJson: unknown): AnyData 
     if (raw.status === "match") {
       if (typeof raw.source !== "string" || typeof raw.front !== "string") throw new Error(`config ${key}: source and front`);
       entries.set(key, { key, status: "match", source: raw.source, front: parseFront(raw.front) });
+    } else if (raw.status === "best-effort") {
+      if (typeof raw.source !== "string" || typeof raw.front !== "string" || typeof raw.reason !== "string") throw new Error(`config ${key}: source, front and reason`);
+      const wrongRaw = raw.wrong;
+      if (!Array.isArray(wrongRaw) || wrongRaw.length === 0) throw new Error(`config ${key}: wrong cells required`);
+      const wrong = wrongRaw.map((w): [number, number] => {
+        if (!Array.isArray(w) || w.length !== 2 || !w.every((x) => Number.isInteger(x) && x >= 1 && x <= 7)) throw new Error(`config ${key}: wrong cell`);
+        return [w[0], w[1]];
+      });
+      if (new Set(wrong.map((w) => w.join())).size !== wrong.length) throw new Error(`config ${key}: wrong cells repeat`);
+      entries.set(key, { key, status: "best-effort", source: raw.source, front: parseFront(raw.front), wrong, reason: raw.reason });
     } else if (raw.status === "none" || raw.status === "pending") {
       if (typeof raw.reason !== "string" || raw.reason === "") throw new Error(`config ${key}: reason`);
       entries.set(key, { key, status: raw.status, reason: raw.reason });
@@ -280,6 +365,7 @@ export function parseAnyData(stateJson: unknown, configsJson: unknown): AnyData 
 
 export type AnyState =
   | { readonly kind: "state"; readonly config: Config; readonly entry: AnyEntry; readonly pose: Pose }
+  | { readonly kind: "best-effort"; readonly config: Config; readonly entry: AnyEntry; readonly pose: Pose; readonly wrong: readonly (readonly [number, number])[] }
   | { readonly kind: "none" | "pending"; readonly config: Config; readonly reason: string };
 
 /** The state of a date: the pose of its configuration, or the reason there is none. */
@@ -287,7 +373,8 @@ export function stateForDate(data: AnyData, year: number, month: number): AnySta
   const config = configOf(year, month);
   const entry = data.entries.get(config.key);
   if (!entry) throw new Error(`no entry for configuration ${config.key}`);
-  if (entry.status !== "match") return { kind: entry.status, config, reason: entry.reason };
+  if (entry.status !== "match" && entry.status !== "best-effort") return { kind: entry.status, config, reason: entry.reason };
+  if (entry.status === "best-effort") return { kind: "best-effort", config, entry, pose: poseFromFront(data.start.printing, data.start.pose, entry.front), wrong: entry.wrong };
   return { kind: "state", config, entry, pose: poseFromFront(data.start.printing, data.start.pose, entry.front) };
 }
 
