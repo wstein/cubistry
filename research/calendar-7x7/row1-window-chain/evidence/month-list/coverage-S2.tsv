@@ -1,15 +1,15 @@
-headline	chain-gapless	2026-05	2037-01	129
-list	1df5ef9ee763b65fa49ab418e84100383ad2a0050dc1bc0f401f86bd653d831c	286	root	2026-05	range	2026-01	2050-01
-counts	chain_members	283	runs	3	gaps	2	bridges	2	before_root	4
+headline	exact-gapless	2026-05	2037-01	129
+list	1df5ef9ee763b65fa49ab418e84100383ad2a0050dc1bc0f401f86bd653d831c	286	root	2026-05	start	2026-05	range	2026-01	2050-01
+counts	chain_members	283	exact_runs	3	best_effort	0	gaps	2	bridges	2	before_start	4
 kind	from	to	count	status	evidence
-run	2026-05	2037-01	129	chain	
-run	2037-03	2043-01	71	chain	
-run	2043-03	2050-01	83	chain	
+run	2026-05	2037-01	129	exact	
+run	2037-03	2043-01	71	exact	
+run	2043-03	2050-01	83	exact	
 gap	2037-02	2037-02	1	unavailable_unsat	../window-2037-01/corner-2037-02-julia.tsv;../window-2037-01/corner-2037-02-flix.tsv
 gap	2043-02	2043-02	1	unavailable_unsat	corner-2043-02-julia.tsv;corner-2043-02-flix.tsv
 bridge	2037-01	2037-03	1	state-edge	skips 1 calendar month(s)
 bridge	2043-01	2043-03	1	state-edge	skips 1 calendar month(s)
-before_root	2026-01	2026-01	1	before_root	print_member=yes
-before_root	2026-02	2026-02	1	before_root	print_member=no
-before_root	2026-03	2026-03	1	before_root	print_member=yes
-before_root	2026-04	2026-04	1	before_root	print_member=yes
+before_start	2026-01	2026-01	1	before_start	print_member=yes
+before_start	2026-02	2026-02	1	before_start	print_member=no
+before_start	2026-03	2026-03	1	before_start	print_member=yes
+before_start	2026-04	2026-04	1	before_start	print_member=yes
