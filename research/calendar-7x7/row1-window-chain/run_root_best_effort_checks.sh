@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Root month (root != first member of S) and best-effort months for the chain checkers.
+# Root month (root != first member of S), best-effort months and stages (free start, junction digests) for the chain checkers.
 #   run_root_best_effort_checks.sh JULIA JAVA CHAIN_JAR OUT
 # Every accept fixture of root_best_effort_cases.jl is accepted by Julia, Flix and the independent verifier with identical
 # Julia and Flix receipts; every reject fixture is rejected by all three at the named reason.
@@ -14,13 +14,18 @@ run_all() { # dir -> sets JR FR IR (1 = rejected)
     local d=$1 jr=0 fr=0 ir=0 root="" pin psha
     pin=$(cat "$d/months.sha256"); psha=$(cat "$d/print.sha256")
     [[ ! -f "$d/root.txt" ]] || root=$(cat "$d/root.txt")
+    local js="" je=""
+    if [[ -f "$d/join.txt" ]]; then js=$(sed -n 's/^start=//p' "$d/join.txt"); je=$(sed -n 's/^end=//p' "$d/join.txt"); fi
+    if [[ -n "$js" ]]; then export CAL7_JOIN_START="$js"; else unset CAL7_JOIN_START; fi
+    if [[ -n "$je" ]]; then export CAL7_JOIN_END="$je"; else unset CAL7_JOIN_END; fi
     export CAL7_WINDOW_MONTHS="$d/months.tsv" CAL7_WINDOW_MONTHS_SHA256="$pin" CAL7_WINDOW_PRINT_SHA="$psha"
     if [[ -n "$root" ]]; then export CAL7_ROOT_MONTH="$root"; else unset CAL7_ROOT_MONTH; fi
     "$julia_bin" --startup-file=no "$here/check.jl" "$layout" "$d/print.tsv" "$d/moves.tsv" "$d/states" > "$d/julia.out" 2> "$d/julia.err" || jr=1
     "$julia_bin" --startup-file=no "$here/verify_chain.jl" "$layout" "$d/print.tsv" "$d/moves.tsv" "$d/states" > "$d/ind.out" 2> "$d/ind.err" || ir=1
-    local fx=(months "$d/months.tsv" "$pin" "$psha"); [[ -z "$root" ]] || fx+=(- "$root")
+    local fx=(months "$d/months.tsv" "$pin" "$psha"); [[ -z "$root$js$je" ]] || fx+=(- "${root:--}")
+    [[ -z "$js$je" ]] || fx+=("${js:--}" "${je:--}")
     "$java_bin" -Xmx2g -jar "$jar" "$layout" "$d/print.tsv" "$d/moves.tsv" "$d/states" "$evidence" "${fx[@]}" > "$d/flix.out" 2> "$d/flix.err" || fr=1
-    unset CAL7_WINDOW_MONTHS CAL7_WINDOW_MONTHS_SHA256 CAL7_WINDOW_PRINT_SHA CAL7_ROOT_MONTH
+    unset CAL7_WINDOW_MONTHS CAL7_WINDOW_MONTHS_SHA256 CAL7_WINDOW_PRINT_SHA CAL7_ROOT_MONTH CAL7_JOIN_START CAL7_JOIN_END
     JR=$jr FR=$fr IR=$ir
 }
 printf 'case\tjulia\tflix\tindependent\n' > "$out/results.tsv"; na=0; nr=0

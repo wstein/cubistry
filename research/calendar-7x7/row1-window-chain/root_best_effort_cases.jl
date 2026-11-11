@@ -87,5 +87,42 @@ add("best-effort-wrong-unsorted","reject","wrong cells strictly increasing","wro
 c,s=two_state(printtext,v2,["hall\t4,4"]);fixture("exact-month-with-hall",two,printtext,c,s)
 add("exact-month-with-hall","reject","Hall witnesses without wrong cells","Hall witnesses without wrong cells","Hall witnesses without wrong cells")
 c,s=two_state(printtext,v2,String[]);fixture("exact-v2",two,printtext,c,s);add("exact-v2","accept")
+# ---- stages: free start state (chain.v3 start block) and junction digests --------------------------------------------
+# A stage whose first member is not the root starts at any legal state that shows the first member. Here the stored chain is cut after
+# its first edge: the stage 2026-06 .. 2028-01 starts at the state after edge 1, reached from the identity pose by edge 1's moves.
+v3="cubistry.calendar7.chain.v3"
+function fixture_join(name;start="",stop="")           # junction digests are read by the runner (join.txt)
+    d=joinpath(out,name);open(joinpath(d,"join.txt"),"w") do io;println(io,"start=",start);println(io,"end=",stop);end
+end
+startblock(mv)=join(vcat(["start\t$(length(mv))"],mv),"\n")
+rec3(y,m,h,mv)="source\t$m\t$y\t$m\t$h\n"*startblock(mv)
+stage_edges=edges[2:end];stage_months=months[2:end];stage_states=stored_states[2:end]
+free_c=chain_text(v3,rec3(2026,6,edges[1].fin,edges[1].moves),stage_edges)
+fixture("stage-free-start",stage_months,printtext,free_c,stage_states);fixture_join("stage-free-start");add("stage-free-start","accept")
+fixture("stage-join-both",stage_months,printtext,free_c,stage_states);fixture_join("stage-join-both";start=edges[1].fin,stop=edges[end].fin);add("stage-join-both","accept")
+fixture("stage-join-identity-start",months,printtext,join(rows,"\n")*"\n",stored_states);fixture_join("stage-join-identity-start";start="identity");add("stage-join-identity-start","accept")
+# a stage that ends at the identity pose: 2026-06 (free start) back to the identity pose, which shows the 2037-05 board
+inv=[let f=split(l,'\t');"move\t$(f[2])\t$(f[3]=="2" ? 2 : -parse(Int,f[3]))" end for l in reverse(edges[1].moves)]
+back=(ym=(2037,5),metrics=edges[1].metrics,src=edges[1].fin,fin=hash0,moves=inv)
+fixture("stage-end-identity",[(2026,6),(2037,5)],printtext,chain_text(v3,rec3(2026,6,edges[1].fin,edges[1].moves),[back]),[stored_states[2],stored_states[1]]);fixture_join("stage-end-identity";stop="identity");add("stage-end-identity","accept")
+# first stage of a two-stage pair: identity root 2026-05 -> 2026-06, whose end digest is the start digest of stage-free-start
+c,s=two_state(printtext,v3,String[]);fixture("stage-pair-first",two,printtext,c,s);fixture_join("stage-pair-first";stop=edges[1].fin);add("stage-pair-first","accept")
+fixture("stage-wrong-start-digest",stage_months,printtext,free_c,stage_states);fixture_join("stage-wrong-start-digest";start=edges[2].fin)
+add("stage-wrong-start-digest","reject","start junction digest","start junction digest","start junction digest")
+fixture("stage-wrong-end-digest",stage_months,printtext,free_c,stage_states);fixture_join("stage-wrong-end-digest";stop=edges[end-1].fin)
+add("stage-wrong-end-digest","reject","end junction digest","end junction digest","end junction digest")
+fixture("stage-end-not-identity",stage_months,printtext,free_c,stage_states);fixture_join("stage-end-not-identity";stop="identity")
+add("stage-end-not-identity","reject","end junction digest","end junction digest","end junction digest")
+fixture("stage-start-not-identity",stage_months,printtext,free_c,stage_states);fixture_join("stage-start-not-identity";start="identity")
+add("stage-start-not-identity","reject","start junction digest","start junction digest","start junction digest")
+fixture("stage-front-not-first-member",stage_months,printtext,chain_text(v3,rec3(2026,6,hash0,String[]),stage_edges),stage_states)
+add("stage-front-not-first-member","reject","free start front is the first member","free start front is the first member","free start front is the first member")
+fixture("stage-start-digest-mismatch",stage_months,printtext,chain_text(v3,rec3(2026,6,edges[2].fin,edges[1].moves),stage_edges),stage_states)
+add("stage-start-digest-mismatch","reject","root digest","root digest","root digest")
+fixture("stage-start-in-v2",stage_months,printtext,chain_text(v2,rec3(2026,6,edges[1].fin,edges[1].moves),stage_edges),stage_states)
+add("stage-start-in-v2","reject","free start block needs chain.v3","free start block needs chain.v3","free start block needs chain.v3")
+zero2=(ym=(2026,6),metrics="0\t0\t0\t0",src=edges[1].fin,fin=edges[1].fin,moves=String[])
+fixture("stage-free-and-root-edge",stage_months,printtext,chain_text(v3,rec3(2037,5,edges[1].fin,edges[1].moves),vcat([zero2],stage_edges)),vcat([stored_states[2]],stage_states);root="2037-05")
+add("stage-free-and-root-edge","reject","a free start has no root edge","a free start has no root edge","a free start has no root edge")
 open(joinpath(out,"cases.tsv"),"w") do io;for c in cases;println(io,c);end;end
 println("cases\t",length(cases))
