@@ -10,9 +10,9 @@ import { test, expect } from "@playwright/test";
 const FILL_TOL = 4, STROKE_TOL = 6;
 const SCHEMES = ["paper-red", "paper-blue", "classic", "solarized-light", "gruvbox-light", "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast"];
 
-async function sample(page, scheme) {
+async function sample(page, scheme, tilted = false) {
   await page.goto("/licenses.html");
-  return page.evaluate(async (scheme) => {
+  return page.evaluate(async ({ scheme, tilted }) => {
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
     const { loadCalendarFont } = await import("/src/apps/calendar7/fonts.ts");
     const { parseState } = await import("/src/apps/calendar7/graph.ts");
@@ -26,8 +26,10 @@ async function sample(page, scheme) {
     viewer.setFont(await loadCalendarFont("noto", "/"));
     viewer.setScheme(scheme);
     viewer.configure(printing, pose, "face", "names");
-    viewer.presentation.rotation.set(0, 0, 0); // head on to the front face
+    // Head on to the front face, or the default start view of the app (yaw 0.3, pitch 0.22: the cube as the page first shows it).
+    if (tilted) viewer.presentation.rotation.set(0.22, -0.3, 0); else viewer.presentation.rotation.set(0, 0, 0);
     viewer.presentation.updateMatrixWorld(true);
+    viewer.syncExposure(); // the render loop does it before a frame; this probe renders by hand
     const cv = viewer.renderer.domElement;
     viewer.renderer.render(viewer.scene, viewer.camera);
     const copy = document.createElement("canvas");
@@ -50,15 +52,15 @@ async function sample(page, scheme) {
       const lo = at(box.min.x, box.min.y), hi = at(box.max.x, box.max.y), mid = at((box.min.x + box.max.x) / 2, (box.min.y + box.max.y) / 2);
       const W = Math.abs(hi.x - lo.x) * 0.5 * cv.width, H = Math.abs(hi.y - lo.y) * 0.5 * cv.height;
       const cx = (mid.x * 0.5 + 0.5) * cv.width, cy = (1 - (mid.y * 0.5 + 0.5)) * cv.height;
-      const w = Math.round(W * 0.8), h = Math.round(H * 0.8), x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
+      const share = tilted ? 0.3 : 0.8, w = Math.round(W * share), h = Math.round(H * share), x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
       const d = ctx.getImageData(x0, y0, w, h).data, pix = [];
       for (let k = 0; k < w * h; k++) pix.push([d[4 * k], d[4 * k + 1], d[4 * k + 2]]);
       const cls = tileClass(printing.text[i], printing.ink[i]), roles = tileRoles(sch, printing.text[i], printing.ink[i], "names");
       const fill = [0, 1, 2].map((c) => med(pix.map((p) => p[c])));
       const best = (px, want) => px.reduce((m, p) => Math.min(m, diff(p, want)), 255);
       const row = { cls, text: printing.text[i], want: roles.fill, got: hex(fill), fill: diff(fill, rgb(roles.fill)) };
-      if (printing.text[i] !== "" && cls !== "month" && !printing.text[i].includes("/")) { row.inkWant = roles.ink; row.ink = best(pix, rgb(roles.ink)); }
-      if (roles.line) { // the line sits just above the bottom edge of the flat part: the lowest 30% of the tile
+      if (!tilted && printing.text[i] !== "" && cls !== "month" && !printing.text[i].includes("/")) { row.inkWant = roles.ink; row.ink = best(pix, rgb(roles.ink)); }
+      if (!tilted && roles.line) { // the line sits just above the bottom edge of the flat part: the lowest 30% of the tile
         const sh = Math.round(H * 0.3), sd = ctx.getImageData(x0, Math.round(cy + H * 0.5) - sh, w, sh).data, strip = [];
         for (let k = 0; k < w * sh; k++) strip.push([sd[4 * k], sd[4 * k + 1], sd[4 * k + 2]]);
         row.lineWant = roles.line.color; row.line = best(strip, rgb(roles.line.color));
@@ -67,7 +69,7 @@ async function sample(page, scheme) {
     });
     viewer.destroy();
     return out;
-  }, scheme);
+  }, { scheme, tilted });
 }
 
 for (const scheme of SCHEMES) test(`${scheme}: the names layout renders its fills, inks and lines as the scheme tokens (within ${FILL_TOL} / ${STROKE_TOL} of 255)`, async ({ page }) => {
@@ -83,4 +85,13 @@ for (const scheme of SCHEMES) test(`${scheme}: the names layout renders its fill
     if (r.ink !== undefined) expect(r.ink, `${id} ink vs ${r.inkWant}`).toBeLessThanOrEqual(STROKE_TOL);
     if (r.line !== undefined) expect(r.line, `${id} line vs ${r.lineWant}`).toBeLessThanOrEqual(STROKE_TOL);
   }
+});
+
+// The default start view is turned (yaw 0.3, pitch 0.22): the exposure follows the face that looks at the camera, so the paper
+// white and the red are the tokens there too (fills only: the digits of a turned face are thin parallelograms).
+for (const scheme of ["paper-red", "paper-blue", "dracula"]) test(`${scheme}: the start view of the app (turned cube) renders the fills as the tokens too`, async ({ page }) => {
+  test.setTimeout(90000);
+  const rows = await sample(page, scheme, true);
+  expect(rows.length).toBeGreaterThan(40);
+  for (const r of rows) expect(r.fill, `${scheme} ${r.cls} "${r.text}" fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(FILL_TOL);
 });

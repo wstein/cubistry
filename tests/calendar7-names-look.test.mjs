@@ -175,27 +175,45 @@ test("names layout: the face pixels per unit of the letter grid match the real b
 });
 
 // ---- exposure (owner decision: white must not render grey) ----
-import { NAMES_EXPOSURE, STANDARD_EXPOSURE, exposureFor } from "../src/apps/calendar7/geometry.ts";
-test("exposure: the standard layout keeps the shared presentation value 1, the names layout uses the inverse of the front face radiance", () => {
+import { STANDARD_EXPOSURE } from "../src/apps/calendar7/geometry.ts";
+import { FACE_WEIGHT_POWER, irradiance, namesExposure } from "../src/apps/calendar7/names-exposure.ts";
+import { addPresentationLighting } from "@cubistry/cube-viewer";
+test("exposure: the standard layout keeps the shared presentation value 1 and the preset is not touched", () => {
   assert.equal(STANDARD_EXPOSURE, 1);
-  assert.equal(exposureFor("standard"), 1);
-  assert.equal(exposureFor("names"), NAMES_EXPOSURE);
   assert.equal(PRESENTATION_PRESET.version, 1); // the shared preset (Neutral tone mapping, exposure 1 in configurePresentationRenderer) is not touched
 });
 
-// Radiance of a white diffuse surface facing the camera (n = +z) under addPresentationLighting: three.js lights give
-// irradiance / pi times the albedo, ambient and hemisphere are not shaded, directional lights add intensity * max(0, n . l).
-// Exposure 1 / radiance makes the lit front face show its albedo, so a token renders as itself (browser spec calendar7-names-color).
-test("exposure: NAMES_EXPOSURE is 1 / (front face radiance of the presentation lights) within 0.5%", () => {
-  const p = PRESENTATION_PRESET, n = new THREE.Vector3(0, 0, 1);
-  const key = new THREE.Vector3(...p.keyPosition), horizontal = Math.hypot(key.x, key.z), elevation = Math.atan2(key.y, horizontal);
-  const azimuth = Math.atan2(key.x, key.z) - THREE.MathUtils.degToRad(p.shadowFillAzimuthDegrees);
-  const fillElevation = elevation + THREE.MathUtils.degToRad(p.shadowFillElevationDelta);
-  const shadowFill = new THREE.Vector3(Math.cos(fillElevation) * Math.sin(azimuth), Math.sin(fillElevation), Math.cos(fillElevation) * Math.cos(azimuth));
-  const directional = [[key, p.keyIntensity], [new THREE.Vector3(-4, 1, 2), p.fillIntensity], [new THREE.Vector3(1, 3, -4), p.rimIntensity], [shadowFill, p.shadowFillIntensity]]
-    .reduce((sum, [l, i]) => sum + i * Math.max(0, n.dot(l.clone().normalize())), 0);
-  // The hemisphere light mixes sky (white) and ground (0x77808d, linear) by 0.5 + 0.5 n.up; the green channel stands for white.
-  const ground = new THREE.Color(0x77808d).g, hemisphere = p.hemisphereIntensity * (0.5 + 0.5 * ground);
-  const radiance = (p.ambientIntensity + hemisphere + directional) / Math.PI;
-  assert.ok(Math.abs(NAMES_EXPOSURE * radiance - 1) < 0.005, `${NAMES_EXPOSURE} * ${radiance}`);
+// A white diffuse surface shows albedo * irradiance / pi (three.js); exposure = pi / irradiance on the face that looks at
+// the camera makes that face show its albedo, so a token renders as itself (browser spec calendar7-names-color).
+const studioScene = () => { const scene = new THREE.Scene(); addPresentationLighting(scene); return scene; };
+const camera = () => { const c = new THREE.PerspectiveCamera(24, 1, 0.1, 200); c.position.set(0, 0, 20); return c; };
+const turned = (yaw, pitch) => new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch, -yaw, 0, "XYZ")); // rotatePresentation
+
+test("exposure: head on, the names exposure is pi / front face irradiance of the studio lights, 1.217 at the shared preset", () => {
+  const scene = studioScene(), p = PRESENTATION_PRESET;
+  const e = namesExposure(scene, new THREE.Quaternion(), camera());
+  assert.ok(Math.abs(e - 1.217) < 0.003, String(e));
+  // The same number from the preset by hand: ambient + hemisphere (sky white, ground 0x77808d) + key, fill, rim, shadow fill at n = +z.
+  const dir = (v) => new THREE.Vector3(...v).normalize().z;
+  const k = p.keyPosition, az = Math.atan2(k[0], k[2]) - THREE.MathUtils.degToRad(p.shadowFillAzimuthDegrees);
+  const el = Math.atan2(k[1], Math.hypot(k[0], k[2])) + THREE.MathUtils.degToRad(p.shadowFillElevationDelta);
+  const sum = p.keyIntensity * dir(k) + p.fillIntensity * dir([-4, 1, 2]) + p.rimIntensity * Math.max(0, dir([1, 3, -4])) +
+    p.shadowFillIntensity * dir([Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)]);
+  const ground = new THREE.Color(0x77808d), lum = (c) => 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+  const hand = p.ambientIntensity + p.hemisphereIntensity * (0.5 + 0.5 * lum(ground)) + sum;
+  assert.ok(Math.abs(irradiance(scene, new THREE.Vector3(0, 0, 1)) - hand) < 1e-6, `${irradiance(scene, new THREE.Vector3(0, 0, 1))} vs ${hand}`);
+});
+
+test("exposure: it follows the face that looks at the camera, is continuous while the cube turns and tracks the light switches", () => {
+  const scene = studioScene(), cam = camera();
+  const tilted = namesExposure(scene, turned(0.3, 0.22), cam), head = namesExposure(scene, new THREE.Quaternion(), cam);
+  assert.ok(tilted > head + 0.1, `${tilted} ${head}`); // the default tilt lights the front face less: the exposure rises
+  // The cube turns a quarter about y: no jump of the exposure between two faces looking at the camera.
+  let prev = namesExposure(scene, turned(0, 0), cam), worst = 0;
+  for (let a = 0.01; a <= Math.PI / 2 + 1e-9; a += 0.01) { const e = namesExposure(scene, turned(a, 0), cam); worst = Math.max(worst, Math.abs(e - prev)); prev = e; }
+  assert.ok(worst < 0.05, `largest step of 0.01 rad: ${worst}`);
+  // A switched-off light leaves the irradiance and the exposure follows.
+  scene.traverse((o) => { if (o.isDirectionalLight) o.visible = false; });
+  assert.ok(namesExposure(scene, new THREE.Quaternion(), cam) > head + 0.5);
+  assert.equal(FACE_WEIGHT_POWER, 8);
 });
