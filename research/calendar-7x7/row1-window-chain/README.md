@@ -106,7 +106,14 @@ julia --threads=4 beam_edge.jl OUT evidence/window-2029-12/printing.tsv evidence
 checks the prefix, every front and the digests.
 
 
-## Beam chain: Nov 2026 to Jun 2027
+## Beam chain: Nov 2026 to Jun 2027 (demo)
+
+Demo and pilot on the print `window-2029-12`, which is not the final print. The owner decided on the final print
+(Print B/C, root Jan 1980) and a full chain; see the research PRs (#408, #411, #413, #414) and their notes.
+
+- Stays valid when the print changes: `beam_edge.jl`, the chaining change, the settings (L5, lambda 3, width 40 and
+  80) and the order of magnitude of 95 to 130 HTM per edge.
+- Does not stay valid: moves, states, hashes and receipts; every edge is re-solved on the new print.
 
 The pilot chain continued by six edges, each re-solved by `beam_edge.jl` from the state the previous beam edge
 ended in (`evidence/beam-chain-2026-06/`: the stored chain up to Nov 2026 byte for byte, the pilot Dec 2026 edge,
@@ -153,26 +160,14 @@ Checks of the chain with `WINDOW_END=2027-06`: Julia `check.jl` SAT, Flix receip
 ACCEPT_CHAIN, negative cases of `run_checks.sh --mutations` (see the PR text for the numbers), the independent
 simulator state match for all 7 edges, and `test_beam_chain.jl` (bounds per edge, greedy chain must fail).
 
-### What Calendar7 needs to adopt this chain
+### Relation to the Calendar7 app
 
-Nothing in the app or the public data changes in this branch. Facts about the current app (main):
-- `public/calendar7/graph.v1.json` is the strict scheme A graph (2026-05 to 2099-12, 883 edges); `public/calendar7/names/graph.v1.json`
-  is the names layout for the 21-month window May 2026 to Jan 2028 (20 edges, exported from the stored print and
-  `evidence/moves.tsv` by `scripts/export-calendar7-names.mjs`, pinned by digests). Both store per edge `from`, `to`,
-  `metrics [htm, qtm, rot, rotq]` and `moves` as one character per move (generator and exponent, alphabet in `graph.ts`).
-  `month-view.ts` plays the edge word, shows the block-move count (`playedBlocks`/`blockCounts`, with or without the middle
-  slice) as "N moves" and HTM/QTM/rotations under "Technical details". HTM is not shown as the move count.
-- The beam chain uses another print (`evidence/window-2029-12/printing.tsv`, 44 months to Dec 2029, new identity root)
-  and nodes hash different state texts, so it is not a drop-in for the names data (stored print, 21 months).
-Missing: (1) a decision for which window and print the app ships (the names window is Jan 2028 and the print differs);
-(2) a full-chain generator for all 44 months (another author builds it; only Dec 2026 to Jun 2027 exist here);
-(3) the exporter generalized to the window-2029-12 print (the 21-month constant, the digest pins and
-`research-inputs.sha256`) and new data files `state.v1.json`, `displays.v1.json`, `graph.v1.json` for it, or a new
-data folder; the exporter header and the UI notice name the 21-month window; (4) a Flix and Julia confirmation
-of the full chain and the exporter replay check (`verify:calendar7-names`); (5) the owner's choice on the displayed count:
-block moves are about 0.84 of HTM, so the app would show about 80 moves for a 95 HTM edge; (6) reverse playback
-(backward steps use the inverse edge) is unchanged. Because every later edge depends on the state before it, any change
-of an earlier edge forces a re-solve of all later edges.
+Nothing in the app or the public data changes in this branch. The demo chain uses the print `window-2029-12`
+(`evidence/window-2029-12/printing.tsv`, 44 months to Dec 2029, own identity root), and its nodes hash other state
+texts than `public/calendar7/names/graph.v1.json` (stored print, 21 months), so it is not a drop-in for the app data.
+The final print, the month list and the full chain are decided and tracked in the research PRs (#408, #411, #413,
+#414) and their notes, not here. On this demo the app's block-move count is about 0.84 of HTM (proxy). Because every
+later edge depends on the state before it, a change of an earlier edge forces a re-solve of all later edges.
 
 ## Scope and limits
 
