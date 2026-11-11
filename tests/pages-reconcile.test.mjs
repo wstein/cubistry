@@ -337,3 +337,14 @@ test('each diagnostic field is cut at 500 characters after redaction, so no toke
   return true;
  });
 });
+test('a succeeded deployment whose receipt is missing says so in the budget error',async t=>{
+ const logged=mute(t);let time=0;
+ await assert.rejects(deployPages({receipt,artifact:55,token:'test',oidc:async()=>'oidc-test',now:()=>time,timeout:25000,sleep:async ms=>{time+=ms;},attempts:60,
+  fetch:async(url,options={})=>options.method==='POST'?json({id:sha},201):new URL(url).origin==='https://api.github.com'?json({status:'succeed'}):new Response('missing',{status:404})}),
+  error=>{
+   assert.match(error.message,/^Pages deployment wait budget exhausted \(deployment [a-f0-9]{40}, last status succeed/);
+   assert(error.message.includes('deployment succeeded but receipt not found or not matching at https://wstein.github.io/cubistry/.cubistry-publication.json'));
+   return true;
+  });
+ assert.equal(logged.length,1);
+});
