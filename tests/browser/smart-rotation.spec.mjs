@@ -1,6 +1,7 @@
 // Browser regression source for #120. Verified locally with software GL (all 4 tests); see docs/SMART_ROTATION.md.
 import { test, expect } from "@playwright/test";
 import { pauseSoon } from "../helpers/pause-clock.mjs";
+import { until } from "../helpers/settle.mjs";
 test.use({ hasTouch: true });
 async function ready(page, path = "/picture3.html") {
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -10,6 +11,18 @@ async function ready(page, path = "/picture3.html") {
   else await expect(page.locator("#seconds-speed")).toBeEnabled();
   await pauseSoon(page);
   await page.clock.runFor(30);
+}
+// emulateMedia resolves before the page receives the MediaQueryList "change" event; under load the event arrives
+// 0.2 to 1.5 s later, in the middle of a later page.clock.runFor(), where the binding's preference handler
+// restarts a running 150 ms leveling and the phase is still "leveling" at the end of the run. Wait for the event
+// (a second MediaQueryList is notified after the binding's own) before acting on the new preference.
+async function emulateReducedMotion(page) {
+  await page.evaluate(() => {
+    window.__reducedMotionEvent = false;
+    matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => { window.__reducedMotionEvent = true; }, { once: true });
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await until(page, "the prefers-reduced-motion change event reached the page", () => page.evaluate(() => window.__reducedMotionEvent), { timeout: 15000 });
 }
 async function snapshot(page, kind = "picture") {
   return page.evaluate(async kind => {
@@ -73,7 +86,7 @@ test("flick inertia is capped, a tap interrupts return, and Free/Classic/reduced
   await mode(page, "classic"); await drag(page, 80, 20, 50, 0); expect((await snapshot(page)).phase).toBe("idle");
   await mode(page, "free"); await drag(page, 80, 20, 50, 0); expect((await snapshot(page)).phase).toBe("coasting"); await settleIdle(page);
   const free = await snapshot(page); expect(free.phase).toBe("idle"); expect(free.deadline).toBeNull();
-  await page.emulateMedia({ reducedMotion: "reduce" }); await mode(page, "smart"); await drag(page, 80, 20, 50, 0); await page.clock.runFor(180);
+  await emulateReducedMotion(page); await mode(page, "smart"); await drag(page, 80, 20, 50, 0); await page.clock.runFor(180);
   expect((await snapshot(page)).phase).toBe("idle"); await page.clock.runFor(2000); const end = await snapshot(page);
   expect(end.phase).toBe("idle"); expect(end.state).toBe(initial.state); expect(end.camera).toEqual(initial.camera);
 });
@@ -112,7 +125,7 @@ test("upright defaults retain vertical up through drag/coast/return; Free mode l
  expect((await snapshot(page)).orientation).toEqual(beforeTap.orientation);await page.mouse.up();await page.clock.runFor(1050);
  const up=await upright();expect(Math.abs(up[0])).toBeLessThan(1e-7);expect(up[1]).toBeGreaterThan(.049);
  expect((await snapshot(page)).state).toBe(initial.state);expect((await snapshot(page)).camera).toEqual(initial.camera);
- await mode(page,'free');await drag(page,80,40);await drag(page,-30,70);await page.emulateMedia({reducedMotion:'reduce'});
+ await mode(page,'free');await drag(page,80,40);await drag(page,-30,70);await emulateReducedMotion(page);
  await mode(page,'classic');
  expect((await snapshot(page)).phase).toBe('leveling');await page.clock.runFor(180);expect((await snapshot(page)).phase).toBe('idle');
 });
