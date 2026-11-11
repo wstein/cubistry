@@ -2,7 +2,7 @@
 // Calendar7 names layout, unit grid (owner decision of 2026-11-11): the printed content is a uniform 7 x 7 grid of unit cells
 // (the size of an inner cubie). A cubie on a thick outer layer (f = 1.8) carries exactly one unit cell on its INNER side and a
 // band of f - 1 on its outer side (white margin); the month row is a red banner (1.0 tall) in a white frame: 0.4 above and below,
-// 0.6 from the left and right cube edges; the month name sits in
+// 0.5 from the left and right cube edges; the month name sits in
 // the upper part of the banner. Everything is checked on the recorded drawing of the real print (public/calendar7/names/state.v1.json)
 // and mapped to scene units, no mock geometry.
 import { test } from "node:test";
@@ -129,14 +129,14 @@ test("every front tile, font and built-in drawing: white margin ground, the fill
       near(lt.y - rb.y, F - NAMES_TOP_STRIP - NAMES_BOTTOM_STRIP, 1e-9, `${tag} banner height 1.2`);
       near(lt.y - rb.y, 1.0, 1e-9, `${tag} banner height 1.0 (literal)`);
       near(lt.y, 3.9, 1e-9, `${tag} banner top`); near(rb.y, 2.9, 1e-9, `${tag} banner bottom`);
-      // the banner is inset by 0.6 (NAMES_MONTH_SIDE_BAND) from the cube edges, not by the 0.8 band of the other rows
-      if (f.c === 0) near(lt.x, -4.3 + NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red starts 0.6 inside the left cube edge`); if (f.c === 0) near(lt.x, -3.7, 1e-9, `${tag} red starts at x = -3.7 (literal)`); else assert.equal(cell.x0, 0);
-      if (f.c === 6) near(rb.x, 4.3 - NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red ends 0.6 inside the right cube edge`); if (f.c === 6) near(rb.x, 3.7, 1e-9, `${tag} red ends at x = 3.7 (literal)`); else assert.equal(cell.x1, g.W);
+      // the banner is inset by 0.5 (NAMES_MONTH_SIDE_BAND) from the cube edges, not by the 0.8 band of the other rows
+      if (f.c === 0) near(lt.x, -4.3 + NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red starts 0.5 inside the left cube edge`); if (f.c === 0) near(lt.x, -3.8, 1e-9, `${tag} red starts at x = -3.8 (literal)`); else assert.equal(cell.x0, 0);
+      if (f.c === 6) near(rb.x, 4.3 - NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red ends 0.5 inside the right cube edge`); if (f.c === 6) near(rb.x, 3.8, 1e-9, `${tag} red ends at x = 3.8 (literal)`); else assert.equal(cell.x1, g.W);
     }
   }
 });
 
-test("the left and right margins: 0.8 white in every row (cube edge -4.3 .. -3.5 and 3.5 .. 4.3), 0.6 in the month row (the banner sticks out 0.2 beyond the grid)", () => {
+test("the left and right margins: 0.8 white in every row (cube edge -4.3 .. -3.5 and 3.5 .. 4.3), 0.5 in the month row (the banner sticks out 0.3 beyond the grid)", () => {
   for (const f of FRONT.filter((x) => x.c === 0 || x.c === 6)) {
     const g = tileGrid(f.tile), cell = DRAWINGS.font(f).rects[1]; // [0] is the white ground, [1] the fill of the cell or banner
     const edge = f.c === 0 ? f.center.x - F / 2 : f.center.x + F / 2;
@@ -267,11 +267,11 @@ test("tileEdgeColors: along every edge of every front tile the color is the colo
   assert.ok(samples > 100000, `${samples} samples`);
 });
 
-test("owner decisions as literals: month row banner 0.4 top strip, 0.4 bottom strip, 0.6 side band, weekday words 0.08 lower, rounded banner corners 0.3", async () => {
+test("owner decisions as literals: month row banner 0.4 top strip, 0.4 bottom strip, 0.5 side band, weekday words 0.08 lower, rounded banner corners 0.3", async () => {
   const g = await import("../src/apps/calendar7/geometry.ts");
   assert.equal(g.NAMES_TOP_STRIP, 0.4);
   assert.equal(g.NAMES_BOTTOM_STRIP, 0.4);
-  assert.equal(g.NAMES_MONTH_SIDE_BAND, 0.6);
+  assert.equal(g.NAMES_MONTH_SIDE_BAND, 0.5);
   assert.equal(g.NAMES_WEEKDAY_DOWN, 0.08);
   assert.equal(g.NAMES_BANNER_RADIUS, 0.3);
 });

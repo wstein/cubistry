@@ -111,7 +111,7 @@ export const NAMES_BOTTOM_STRIP = 0.4;
  * Owner decision of 2026-11-11 (after the first preview): in the month row the red banner is inset by only this much from the
  * left and right cube edge (white band of 0.4 on the outer month cubies); the other rows keep the band of f - 1 (0.8).
  */
-export const NAMES_MONTH_SIDE_BAND = 0.6;
+export const NAMES_MONTH_SIDE_BAND = 0.5;
 /** Weekday words (SUN to SAT) sit this far below the center of their unit cell, in units (owner decision of 2026-11-11). */
 export const NAMES_WEEKDAY_DOWN = 0.08;
 /** Corner radius of the red banner at the left and right cube edge, in units: 0.3 (owner decision of 2026-11-11); 0 is square (name 2:1 above to below). */

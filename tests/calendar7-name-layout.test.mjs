@@ -115,7 +115,7 @@ test("name layout: the tile gaps follow the tracking (a middle tile fills its cu
 });
 
 // Per-font result of the solver (size, seam gap, tracking range over the tiles, in drawing px at the font's size), measured
-// 2026-11-11 on the unit grid with April as "AP" + "RIL" (the first tile has 1.2 units of content: the banner starts 0.6 inside
+// 2026-11-11 on the unit grid with April as "AP" + "RIL" (the first tile has 1.3 units of content: the banner starts 0.5 inside
 // the cube edge, its ink keeps half a seam gap from the banner edge); a change of the metrics, the geometry or the rule has to
 // change this table on purpose.
 const PINNED = {
