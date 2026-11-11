@@ -1,0 +1,38 @@
+run	setting	class	status	seconds	wall
+C-rootonly	SEED_FRAC=1.0 FREE_KEY=-3,-3,-2 IN_FRAC=1.0 salt=0 timeout=280s	-3,-3,-3	UNSAT	0	wall=14s
+C-f0.5-0	SEED_FRAC=0.5 salt=0 timeout=280s	-3,-3,-3	UNSAT	2	wall=14s
+C-f0.4-0	SEED_FRAC=0.4 salt=0 timeout=280s	-3,-3,-3	UNSAT	5	wall=17s
+C-f0.3-0	SEED_FRAC=0.3 salt=0 timeout=280s	-3,-3,-3	UNKNOWN	280	wall=294s
+C-f0.2-0	SEED_FRAC=0.2 salt=0 timeout=280s	-3,-3,-3	UNKNOWN	280	wall=294s
+C-f0.0-0	SEED_FRAC=0.0 salt=0 timeout=280s	-3,-3,-3	UNTRUSTED_SAT	173	wall=469s
+C-f0.0-0	SEED_FRAC=0.0 salt=0 timeout=280s	-3,-3,-2	UNKNOWN	280	wall=469s
+C-cornerfree	FREE_KEY=-3,-3,-3 IN_FRAC=0.0 salt=0 timeout=280s	-3,-3,-3	UNTRUSTED_SAT	167	wall=201s
+C-cornerfree	FREE_KEY=-3,-3,-3 IN_FRAC=0.0 salt=0 timeout=280s	-3,-3,-2	UNSAT	0	wall=201s
+C-cornerfree3	FREE_KEY=-3,-3,-3 IN_FRAC=0.3 salt=0 timeout=280s	-3,-3,-3	UNKNOWN	280	wall=313s
+S-f0.6	survey SEED_FRAC=0.6 salt=0 timeout=100s	-3,-3,-3	UNSAT	1	wall=21s
+S-f0.6	survey SEED_FRAC=0.6 salt=0 timeout=100s	-3,-3,-2	UNSAT	2	wall=21s
+S-f0.6	survey SEED_FRAC=0.6 salt=0 timeout=100s	-3,-3,-1	UNSAT	1	wall=21s
+S-f0.6	survey SEED_FRAC=0.6 salt=0 timeout=100s	-3,-3,0	UNTRUSTED_SAT	0	wall=21s
+S-f0.4	survey SEED_FRAC=0.4 salt=0 timeout=100s	-3,-3,-3	UNSAT	5	wall=125s
+S-f0.4	survey SEED_FRAC=0.4 salt=0 timeout=100s	-3,-3,-2	UNKNOWN	100	wall=125s
+S-f0.4	survey SEED_FRAC=0.4 salt=0 timeout=100s	-3,-3,-1	UNTRUSTED_SAT	1	wall=125s
+S-f0.4	survey SEED_FRAC=0.4 salt=0 timeout=100s	-3,-3,0	UNTRUSTED_SAT	0	wall=125s
+K1-f0.1	ONLY=-3,-3,-3 IN_FRAC=0.1 salt=0 timeout=280s	-3,-3,-3	UNKNOWN	280	wall=293s
+K2-f0.15	ONLY=-3,-3,-2 IN_FRAC=0.15 salt=0 timeout=280s	-3,-3,-2	UNKNOWN	281	wall=296s
+K2-f0.3	ONLY=-3,-3,-2 IN_FRAC=0.3 salt=0 timeout=280s	-3,-3,-2	UNKNOWN	280	wall=296s
+K2-f0.5-s1	ONLY=-3,-3,-2 IN_FRAC=0.5 salt=1 timeout=280s	-3,-3,-2	UNTRUSTED_SAT	149	wall=182s
+K2-f0.6-s1	ONLY=-3,-3,-2 IN_FRAC=0.6 salt=1 timeout=280s	-3,-3,-2	UNTRUSTED_SAT	268	wall=302s
+K2-f0.7-s1	ONLY=-3,-3,-2 IN_FRAC=0.7 salt=1 timeout=280s	-3,-3,-2	UNSAT	21	wall=49s
+K2-f0.8-s1	ONLY=-3,-3,-2 IN_FRAC=0.8 salt=1 timeout=280s	-3,-3,-2	UNSAT	4	wall=37s
+X1	survey RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.4 salt=1 timeout=100s	-3,-3,-3	UNKNOWN	100	wall=216s
+X1	survey RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.4 salt=1 timeout=100s	-3,-3,-2	UNKNOWN	100	wall=216s
+X1	survey RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.4 salt=1 timeout=100s	-3,-3,-1	UNTRUSTED_SAT	2	wall=216s
+X1	survey RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.4 salt=1 timeout=100s	-3,-3,0	UNSAT	0	wall=216s
+C1	RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=280s	-3,-3,-3	UNTRUSTED_SAT	80	wall=180s
+C1	RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=280s	-3,-3,-2	UNTRUSTED_SAT	86	wall=180s
+C1	RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=280s	-3,-3,-1	UNTRUSTED_SAT	0	wall=180s
+C1	RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.3 salt=1 timeout=280s	-3,-3,0	UNTRUSTED_SAT	0	wall=180s
+C1b	RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.2 salt=1 timeout=280s	-3,-3,-3	UNTRUSTED_SAT	82	wall=181s
+C1b	RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.2 salt=1 timeout=280s	-3,-3,-2	UNTRUSTED_SAT	86	wall=181s
+C1b	RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.2 salt=1 timeout=280s	-3,-3,-1	UNTRUSTED_SAT	0	wall=181s
+C1b	RELEASE_SURPLUS=1 CLASS_FRACS=-3,-3,-3:0.0;-3,-3,-2:0.5;-3,-3,-1:0.4;-3,-3,0:0.2 salt=1 timeout=280s	-3,-3,0	UNTRUSTED_SAT	0	wall=181s

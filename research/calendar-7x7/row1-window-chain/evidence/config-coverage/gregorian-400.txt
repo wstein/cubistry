@@ -1,0 +1,6 @@
+Gregorian 400-year check (Julia only)
+months 2026-01..2425-12	4800
+distinct configurations in the cycle	91
+months whose board differs from the board of their configuration	0
+years 1900..2200 with config(y,m) != config(y+400,m)	0
+configurations missing in 2026..2099	0

@@ -1,0 +1,4 @@
+range	calendar_months	chain_members	edges	distinct_consecutive_config_pairs
+2026-01..2050-01	289	286	285	95
+2026-05..2050-01	285	283	282	95
+2026-01..2100-01	889	880	879	97
