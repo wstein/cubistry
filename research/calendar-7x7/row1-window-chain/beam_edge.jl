@@ -50,7 +50,8 @@ end
 (;state,prefix_rows,stored_htm,stored_qtm,k,lastend)
 end
 (;state,prefix_rows,stored_htm,stored_qtm,k,lastend)=replay_prefix(ls)
-@assert stored_htm>=0 "edge $tyear-$tmonth not in the stored chain"
+# stored_htm stays -1 when the edge is not in CHAIN: CHAIN is then a candidate chain and the edge extends it (the target-month assert below fixes the month).
+if stored_htm<0;println("edge $tyear-$tmonth not in CHAIN: extending the chain by ",k," replayed edges");end
 @assert digest(state)==lastend "replayed state does not match the stored digest"
 first_id=k+1;id=k+2;target=goals[id];@assert (target.year,target.month)==(tyear,tmonth)
 for n in 1:first_id;cp(joinpath(statesdir,"state-"*lpad(string(n),2,'0')*".tsv"),joinpath(out,"state-"*lpad(string(n),2,'0')*".tsv"));end
