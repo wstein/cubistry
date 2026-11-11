@@ -263,3 +263,12 @@ test("tileEdgeColors: along every edge of every front tile the color is the colo
   }
   assert.ok(samples > 100000, `${samples} samples`);
 });
+
+test("owner decisions as literals: month row banner 0.1 top strip, 0.5 bottom strip, 0.4 side band, weekday words 0.08 lower, square banner corners", async () => {
+  const g = await import("../src/apps/calendar7/geometry.ts");
+  assert.equal(g.NAMES_TOP_STRIP, 0.1);
+  assert.equal(g.NAMES_BOTTOM_STRIP, 0.5);
+  assert.equal(g.NAMES_MONTH_SIDE_BAND, 0.4);
+  assert.equal(g.NAMES_WEEKDAY_DOWN, 0.08);
+  assert.equal(g.NAMES_BANNER_RADIUS, 0);
+});
