@@ -70,7 +70,8 @@ test("name layout: nothing is clipped at the texture edge or at the edge of the 
   for (const id of IDS) for (const word of NAME_WORDS) for (const [k, label] of word.entries()) {
     const e = edge(k);
     for (const l of nameLabelLayout(label, FONT_METRICS[id], "face")) {
-      assert.ok(l.box.x0 >= 96 - e.left + 1.5 - 1e-9 && l.box.x1 <= 96 + e.right - 1.5 + 1e-9, `${id} ${label} ${l.text}: x ${l.box.x0}..${l.box.x1} vs edge ${96 - e.left}..${96 + e.right}`);
+      const m = nameFaceTable(FONT_METRICS[id]).seamGap / 2; // the ink of the first tile keeps half a seam gap from the red banner edge, the last 1.5 px from the texture edge
+      assert.ok(l.box.x0 >= 96 - e.left + (k === 0 ? m : 1.5) - 1e-9 && l.box.x1 <= 96 + e.right - 1.5 + 1e-9, `${id} ${label} ${l.text}: x ${l.box.x0}..${l.box.x1} vs edge ${96 - e.left}..${96 + e.right}`);
       assert.ok(l.box.y0 >= 96 - e.top + 1.5 - 1e-9 && l.box.y1 <= 96 + e.bottom - 1.5 + 1e-9, `${id} ${label} ${l.text}: y ${l.box.y0}..${l.box.y1} vs banner ${96 - e.top}..${96 + e.bottom}`);
     }
   }
@@ -114,19 +115,19 @@ test("name layout: the tile gaps follow the tracking (a middle tile fills its cu
 });
 
 // Per-font result of the solver (size, seam gap, tracking range over the tiles, in drawing px at the font's size), measured
-// 2026-11-11 on the unit grid (the first tile has one unit of content, not 1.8: the 3-letter first tiles NOV and AUG are the
-// tightest tiles of nunito-sans, quicksand and comfortaa); a change of the metrics, the geometry or the rule has to change
+// 2026-11-11 on the unit grid (the first tile has one unit of content, not 1.8, and its ink keeps half a seam gap from the red
+// banner edge: the 3-letter first tiles NOV and AUG are the tightest tiles; a few fonts lose up to 1.5 px of size); a change of the metrics, the geometry or the rule has to change
 // this table on purpose.
 const PINNED = {
-  "noto": { size: 96, seamGap: 10.94, tracking: [-8.48, 4.59] },
-  "nunito": { size: 95, seamGap: 10.74, tracking: [-5.05, 3.64] },
-  "nunito-sans": { size: 95, seamGap: 10.74, tracking: [-8.04, 3.64] },
-  "quicksand": { size: 98.5, seamGap: 10.44, tracking: [-4.39, 2.37] },
+"noto": { size: 95.5, seamGap: 10.89, tracking: [-10.45, 5.09] },
+  "nunito": { size: 95, seamGap: 10.74, tracking: [-7.44, 3.64] },
+  "nunito-sans": { size: 93.5, seamGap: 10.57, tracking: [-8.56, 5.18] },
+  "quicksand": { size: 98.5, seamGap: 10.44, tracking: [-7.31, 2.37] },
   "nova-oval": { size: 91.5, seamGap: 11.99, tracking: [-11.23, 11.53] },
   "nova-square": { size: 95.5, seamGap: 16.33, tracking: [-10.92, 6.81] },
   "nova-mono": { size: 120, seamGap: 11.04, tracking: [-1.95, 3.69] },
-  "comfortaa": { size: 86.5, seamGap: 11.5, tracking: [-7.28, 8.99] },
-  "varela-round": { size: 90.25, seamGap: 11.91, tracking: [-3.04, 5.58] },
+  "comfortaa": { size: 86.25, seamGap: 11.47, tracking: [-10.92, 9.25] },
+  "varela-round": { size: 90.25, seamGap: 11.91, tracking: [-4.28, 5.58] },
   "crete-round": { size: 91.25, seamGap: 8.03, tracking: [-1.35, 13.42] },
   "dseg14classic-bold": { size: 83.5, seamGap: 15.86, tracking: [-1.14, 0.82] },
   "dseg14classic-regular": { size: 83.5, seamGap: 15.86, tracking: [-1.14, 0.82] },
@@ -150,7 +151,7 @@ test("name layout: pairs below the 2 px floor by nature are raised to it (Noto: 
   for (const [label, pair] of [["ARY", 1], ["ULY", 1]]) assert.ok(Math.abs(noto.tiles.get(label).gaps[pair] - 2) < 1e-9, `${label} gap is 2 px`);
 });
 
-test("name layout: an outer tile takes the mean tracking of the middle tiles, less only where it would leave the texture or the red banner (18 tiles, all 14 fonts)", () => {
+test("name layout: an outer tile takes the mean tracking of the middle tiles, less only where it would leave the texture or the red banner (29 tiles, all 14 fonts)", () => {
   const limited = [];
   for (const id of IDS) {
     const tiles = [...nameFaceTable(FONT_METRICS[id]).tiles.values()];
@@ -158,14 +159,14 @@ test("name layout: an outer tile takes the mean tracking of the middle tiles, le
     for (const t of tiles.filter((x) => x.anchor !== 0 && x.label.length > 1)) { // a single letter has no gap to track
       // the first tile (anchor 1) is the corner cubie of column 1; its far edge is the edge of the red banner (the band is white), the last tile's the right texture edge
       const e = edge(t.anchor === 1 ? 0 : 2), boxes = nameLabelLayout(t.label, FONT_METRICS[id], "face").map((l) => l.box);
-      const reach = t.anchor === 1 ? boxes[0].x0 - (96 - e.left + 1.5) : 96 + e.right - 1.5 - boxes.at(-1).x1;
+      const reach = t.anchor === 1 ? boxes[0].x0 - (96 - e.left + nameFaceTable(FONT_METRICS[id]).seamGap / 2) : 96 + e.right - 1.5 - boxes.at(-1).x1;
       assert.ok(t.tracking <= mean + 1e-9, `${id} ${t.label}: tracking ${t.tracking} above the mean ${mean}`);
       if (t.tracking < mean - 1e-6) { limited.push(`${id} ${t.label}`); assert.ok(Math.abs(reach) < 1e-3, `${id} ${t.label}: limited tile touches the edge margin (reach ${reach})`); }
       else assert.ok(Math.abs(t.tracking - mean) < 1e-9 && reach >= -1e-9, `${id} ${t.label}: tracking ${t.tracking} equals the mean ${mean}`);
     }
   }
   // On the unit grid the 3-letter first tiles AUG and NOV (wide capitals in one unit of content) are limited in most fonts; before, the first tile was 1.8 wide.
-  assert.deepEqual(limited.sort(), ["comfortaa AUG", "comfortaa NOV", "comfortaa UNE", "crete-round AUG", "crete-round NOV", "noto AUG", "noto NOV", "nova-mono NOV", "nova-mono UNE", "nova-mono UST", "nunito AUG", "nunito NOV", "nunito-sans ARY", "nunito-sans AUG", "nunito-sans NOV", "quicksand AUG", "quicksand NOV", "varela-round NOV"]);
+  assert.deepEqual(limited.sort(), ["comfortaa AUG","comfortaa NOV","comfortaa UNE","crete-round AUG","crete-round NOV","dseg14classic-bold APR","dseg14classic-bold AUG","dseg14classic-bold SEP","dseg14classic-regular APR","dseg14classic-regular AUG","dseg14classic-regular SEP","noto AUG","noto NOV","nova-mono APR","nova-mono AUG","nova-mono DEC","nova-mono NOV","nova-mono UNE","nova-mono UST","nunito AUG","nunito NOV","nunito-sans APR","nunito-sans ARY","nunito-sans AUG","nunito-sans NOV","quicksand AUG","quicksand NOV","varela-round AUG","varela-round NOV"]);
 });
 
 // Synthetic fonts: the real font with scaled glyph metrics (w: widths, h: heights), so the branches the 14 shipped fonts never take run.
@@ -186,9 +187,13 @@ test("name layout: the glyphs fit the height of the red banner (a tall font gets
 });
 
 test("name layout: the month size is never below the weekday size when the weekday size fits", () => {
-  const t = nameFaceTable(synth(0.9, 0.75));
+  // Narrow glyphs: the natural fill size is above the weekday size, nothing blocks. (The case "natural size below the weekday size, still fits at the weekday size"
+  // no longer occurs for a font of this shape on the unit grid: a font in that range blocks NOV at the weekday size, see the synthetic test above.)
+  const t = nameFaceTable(synth(0.88, 0.75));
   assert.equal(t.blocked.length, 0);
-  assert.ok(Math.abs(t.size - t.weekday) < 1e-9 && t.size > 106.75, `size ${t.size} equals the weekday size ${t.weekday}, above the natural fill size`);
+  assert.ok(t.size >= t.weekday && t.size > 108, `size ${t.size} vs weekday ${t.weekday}`);
+  const edge = nameFaceTable(synth(0.9, 0.75)); // just wider: the size drops below the weekday size and the table names the blocking tile
+  assert.ok(edge.size < edge.weekday && edge.blocked.map((x) => x.label).join() === "NOV");
 });
 
 test("name layout: no size fits a font with huge glyphs", () => {
