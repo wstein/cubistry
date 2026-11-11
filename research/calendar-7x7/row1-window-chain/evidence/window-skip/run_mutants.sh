@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# run_mutants.sh JULIA : applies each source mutant in place (restored afterwards) and requires the named test set to fail.
+# run_mutants.sh JULIA : applies each mutant in place (restored afterwards) and requires the named test set to fail.
 set -u
 J=${1:?julia}; here=$(cd -- "$(dirname -- "$0")" && pwd); cal=$(cd "$here/../../.." && pwd); cd "$cal"
 t=row1-window-chain/evidence/window-skip
@@ -18,3 +18,8 @@ mut coverage.jl 's/i!=p+1/i!=p+2/' "coverage runs and gaps" test_coverage.jl
 mut coverage.jl 's/x\[1\]<=idx(ROOT...)<=x\[2\]/x[1]<idx(ROOT...)<=x[2]/' "coverage runs and gaps" test_coverage.jl
 mut coverage.jl 's/r\[1\]\[2\]-r\[1\]\[1\]+1/r[1][2]-r[1][1]/' "coverage runs and gaps" test_coverage.jl
 mut coverage.jl 's/b-a+1,"\\t\\t"/b-a,"\\t\\t"/' "coverage runs and gaps" test_coverage.jl
+mut coverage.jl 's/chain=\[i for i in valid if i>=r0\]/chain=[i for i in valid if i>=r0-1]/' "coverage runs and gaps" test_coverage.jl
+mut drop_one.jl 's/r\[1\]<=23/r[1]<=22/' "drop_one.jl" test_tools.jl
+mut scan_fixed.jl 's/d.lemma ? "UNSAT" : "UNKNOWN"/d.lemma ? "UNKNOWN" : "UNSAT"/' "scan_fixed.jl" test_tools.jl
+mut compat.jl 's/get(bad,(g.year,g.month),0)+1/get(bad,(g.year,g.month),0)+2/' "compat.jl" test_tools.jl
+mut printing-S2.tsv '0,/\tblank$/s//\tband/' "pinned files" test_pins.jl
