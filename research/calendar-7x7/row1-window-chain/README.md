@@ -84,6 +84,27 @@ PRINT_OVERRIDE=$PWD/evidence/window-2029-12/printing.tsv CHAIN_OVERRIDE=$PWD/evi
 STATES_OVERRIDE=$PWD/evidence/window-2029-12/states bash run_checks.sh JULIA JAVA CHAIN_JAR SCRATCH_DIR
 ```
 
+## Beam pilot: Nov 2026 to Dec 2026
+
+The stored edge into December 2026 (greedy orbit solver) has 271 HTM and 276 QTM. `beam_edge.jl`
+re-solves this one edge from the stored November 2026 state with the global macro beam (`../global-search/search.jl`
+library, `../upright-beam/beam2.jl` core weight, orbit catalogs and exact last mile). The result,
+`evidence/beam-pilot-2026-12/`, is the stored chain up to November 2026 byte for byte plus the new
+December edge: 61 HTM, 71 QTM (`library=L5 width=40 lambda=3`, 4 threads, 38 s including the library
+build; deterministic on rerun). `runs.tsv` lists the runs of every knob tried. Julia `check.jl`,
+Flix and the independent `verify_chain.jl` accept it for `WINDOW_END=2026-12`; Julia and Flix receipts are
+byte-identical. The new December state differs from the stored one off the front, so a later edge must
+be re-solved from it; no other edge was run. Candidate tooling, not a stored witness replacement;
+independent review is pending.
+
+```sh
+julia --threads=4 beam_edge.jl OUT evidence/window-2029-12/printing.tsv evidence/window-2029-12/moves.tsv \
+  evidence/window-2029-12/states 2026 12 mode=beam library=L5 width=40
+```
+
+`mode=greedy` reproduces the stored 271 HTM edge. `test_beam_edge.jl` bounds the pilot edge at 130 HTM and
+checks the prefix, every front and the digests.
+
 ## Scope and limits
 
 This is a window witness, not a print for every calendar shape. The separate
