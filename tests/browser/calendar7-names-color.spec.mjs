@@ -21,7 +21,8 @@ async function sample(page, scheme, tilted = false, production = false, plastici
     const { loadCalendarFont } = await import("/src/apps/calendar7/fonts.ts");
     const { parseState } = await import("/src/apps/calendar7/graph.ts");
     const { schemeById } = await import("/src/apps/calendar7/schemes.ts");
-    const { tileClass, tileRoles } = await import("/src/apps/calendar7/sticker-art.ts");
+    const { isBannerClass, tileClass, tileGrid, tileRoles } = await import("/src/apps/calendar7/sticker-art.ts");
+    const { layerWidthsFor, unitGridTileOf } = await import("/src/apps/calendar7/geometry.ts");
     const { printing, pose } = parseState(await (await fetch("/calendar7/names/state.v1.json")).json());
     const host = document.createElement("div"), panel = document.createElement("div");
     host.style.cssText = "position:fixed;left:0;top:0;width:800px;height:800px";
@@ -54,7 +55,11 @@ async function sample(page, scheme, tilted = false, production = false, plastici
       o.geometry.computeBoundingBox();
       const i = ids[4] - 1, box = o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);
       const at = (x, y) => new Vector3(x, y, box.max.z).project(viewer.camera);
-      const lo = at(box.min.x, box.min.y), hi = at(box.max.x, box.max.y), mid = at((box.min.x + box.max.x) / 2, (box.min.y + box.max.y) / 2);
+      const cls0 = tileClass(printing.text[i], printing.ink[i]);
+      // Unit grid: the fill is on the unit cell (a month tile: the banner), not on the whole tile; the probe takes the middle of that rectangle.
+      const tile = unitGridTileOf(pose.pos.subarray(3 * i, 3 * i + 3), pose.normal.subarray(3 * i, 3 * i + 3), pose.up.subarray(3 * i, 3 * i + 3), layerWidthsFor(7)), g = tileGrid(tile), rect = isBannerClass(cls0) ? g.banner : g.cell;
+      const fx = (u) => box.min.x + (box.max.x - box.min.x) * u / g.W, fy = (v) => box.max.y - (box.max.y - box.min.y) * v / g.H;
+      const lo = at(fx(rect.x0), fy(rect.y1)), hi = at(fx(rect.x1), fy(rect.y0)), mid = at(fx((rect.x0 + rect.x1) / 2), fy((rect.y0 + rect.y1) / 2));
       const W = Math.abs(hi.x - lo.x) * 0.5 * cv.width, H = Math.abs(hi.y - lo.y) * 0.5 * cv.height;
       const cx = (mid.x * 0.5 + 0.5) * cv.width, cy = (1 - (mid.y * 0.5 + 0.5)) * cv.height;
       const share = tilted ? 0.3 : 0.8, w = Math.round(W * share), h = Math.round(H * share), x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
