@@ -43,7 +43,7 @@ import type { StageView } from "./player.ts";
 import { type ColorScheme, DEFAULT_SCHEME, namesGround, schemeById } from "./schemes.ts";
 import { bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, unitGridTileOf } from "./geometry.ts";
 import type { Layout } from "./layout.ts";
-import { drawFace, drawSticker, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileRoles, type Surface } from "./sticker-art.ts";
+import { drawFace, drawSticker, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileGrid, tileRoles, type Surface } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
@@ -84,12 +84,20 @@ export function faceFills(printing: Printing, scheme: ColorScheme, layout: Layou
 
 /**
  * Names layout: the edges of the month row tiles that differ from their fill. The banner has a white strip along its top and
- * bottom edge (the unit grid, geometry.ts), so a cut face that borders such an edge is white, not red.
+ * bottom edge and ends 0.1 below the cubie's top edge and 0.5 above its bottom edge (the unit grid, geometry.ts, sticker-art.ts
+ * `tileGrid`): the cut face above and below is white, and the cut face beside it is white along the two strips and the banner
+ * color between them (stops along the side edge, from the bottom up).
  */
 export function faceEdgeFills(printing: Printing, scheme: ColorScheme, layout: Layout): Map<number, FaceEdgeColors> {
   const edges = new Map<number, FaceEdgeColors>();
   if (layout !== "names") return edges;
-  for (let i = 0; i < STICKERS; i++) if (isBannerClass(tileRoles(scheme, printing.text[i], printing.ink[i], layout).cls)) edges.set(i + 1, { top: namesGround(scheme.dayFill), bottom: namesGround(scheme.dayFill) });
+  const ground = namesGround(scheme.dayFill), g = tileGrid({ w: 1, h: layerWidthsOf(layout)![0] });
+  for (let i = 0; i < STICKERS; i++) {
+    const roles = tileRoles(scheme, printing.text[i], printing.ink[i], layout);
+    if (!isBannerClass(roles.cls)) continue;
+    const side = [{ to: (g.H - g.banner.y1) / g.H, color: ground }, { to: (g.H - g.banner.y0) / g.H, color: roles.fill }, { to: 1, color: ground }];
+    edges.set(i + 1, { top: ground, bottom: ground, left: side, right: side });
+  }
   return edges;
 }
 

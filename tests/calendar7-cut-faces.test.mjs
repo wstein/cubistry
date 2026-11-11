@@ -6,10 +6,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import { PhysicalCubeScene, createPlasticMaterial, cutColorAt, cutFaceEdges, faceUvAxes, flatCutColor, paintCutPattern, CUT_TEXTURE_SIZE } from "@cubistry/cube-viewer";
+import { PhysicalCubeScene, createPlasticMaterial, cutColorAt, cutPatternKey, cutFaceEdges, faceUvAxes, flatCutColor, paintCutPattern, CUT_TEXTURE_SIZE } from "@cubistry/cube-viewer";
 
 const RED = "#e0282c", WHITE = "#fdfdfd", BLUE = "#2a2aff", BODY = "#f0f0f0";
 const hex = (c) => c.slice(1);
+const near = (a, b, eps) => assert.ok(Math.abs(a - b) <= eps, `${a} != ${b}`);
 
 // ---- the pure rule ----
 test("cutColorAt: one exterior edge colors the whole face, two neighboring edges split it on the diagonal through their shared corner, none gives the body", () => {
@@ -202,6 +203,58 @@ test("scene: the edge follows the sticker's up and right, also on a face with an
   assert.equal(colorNextTo(shell, "-y", "+x"), RED);
 });
 
+// ---- edge colors that change along the edge (stops): a red banner between two white strips ----
+const hexAt = (shell, cutFace, u, v) => {
+  const m = shell.material[FACE_INDEX[cutFace]];
+  if (!m.map) return `#${m.color.getHexString()}`;
+  const n = m.map.image.width, d = m.map.image.data, x = Math.min(n - 1, Math.floor(u * n)), y = Math.min(n - 1, Math.floor(v * n)), k = (y * n + x) * 4;
+  return `#${[0, 1, 2].map((c) => d[k + c].toString(16).padStart(2, "0")).join("")}`;
+};
+/** Color of a side cut face next to the +z face at the fraction `up` (0 bottom, 1 top of the +z face) along the edge, close to the edge. */
+function sideAt(shell, cutFace, up) {
+  const axes = faceUvAxes(new RoundedBoxGeometry(0.99, 0.99, 0.99, 1, 0.055))[FACE_INDEX[cutFace]];
+  const near = 0.05; // the nearest edge is the +z one
+  let u, v;
+  const edgeCoord = (axis, sign, towardsPositive) => (towardsPositive ? (sign > 0 ? 1 - near : near) : (sign > 0 ? near : 1 - near));
+  if (axes.uAxis === 2) { u = edgeCoord(2, axes.uSign, true); v = axes.vSign > 0 ? up : 1 - up; } // the +z edge is a u edge; the coordinate along it (v) runs along y
+  else { v = edgeCoord(2, axes.vSign, true); u = axes.uSign > 0 ? up : 1 - up; }
+  return hexAt(shell, cutFace, u, v);
+}
+test("cutColorAt and cutFaceEdges with stops: the nearest edge's color follows the position along the edge, in either direction of the uv axes", () => {
+  const stops = [{ to: 0.3, color: WHITE }, { to: 0.9, color: RED }, { to: 1, color: WHITE }];
+  const edge = [{ edge: "u1", color: WHITE, stops }];
+  assert.equal(cutColorAt(edge, 0.95, 0.1), WHITE);
+  assert.equal(cutColorAt(edge, 0.95, 0.5), RED);
+  assert.equal(cutColorAt(edge, 0.95, 0.95), WHITE);
+  assert.equal(cutColorAt([{ edge: "v0", color: WHITE, stops }], 0.6, 0.02), RED, "a v edge runs along u");
+  assert.equal(flatCutColor(edge), null, "stops are never flat");
+  assert.notEqual(cutPatternKey(edge), cutPatternKey([{ edge: "u1", color: WHITE }]));
+  const axes = faceUvAxes(new RoundedBoxGeometry(0.99, 0.99, 0.99, 1, 0.055)), ext = [null, null, null, null, RED, null]; // +z exterior, cut face +x
+  const up = [0, 1, 0], got = cutFaceEdges(0, ext, axes, [null, null, null, null, { stops, dir: up }]);
+  assert.equal(got.length, 1);
+  const q = got[0].stops, vAxisIsY = axes[0].vAxis === 1 || axes[0].uAxis === 1;
+  assert.ok(vAxisIsY);
+  const sign = (got[0].edge[0] === "u" ? axes[0].vSign : axes[0].uSign) * up[1];
+  const want = sign > 0 ? [[0.3, WHITE], [0.9, RED], [1, WHITE]] : [[0.1, WHITE], [0.7, RED], [1, WHITE]]; // reversed along the edge: to' = 1 - (previous to)
+  assert.deepEqual(q.map((x) => [Math.round(x.to * 1e9) / 1e9, x.color]), want);
+  const rev = cutFaceEdges(0, ext, axes, [null, null, null, null, { stops, dir: [0, -1, 0] }])[0].stops; // the same stops running the other way: the mirror image
+  assert.deepEqual(rev.map((x) => [Math.round(x.to * 1e9) / 1e9, x.color]), sign > 0 ? [[0.1, WHITE], [0.7, RED], [1, WHITE]] : [[0.3, WHITE], [0.9, RED], [1, WHITE]]);
+});
+test("scene: edge colors with stops: the side cut face is white along the two strips and red between them (stops run up along the +z face)", () => {
+  const stops = [{ to: 0.3, color: WHITE }, { to: 0.9, color: RED }, { to: 1, color: WHITE }];
+  const { shell } = build([["+z", RED]], new Map([[1, { top: WHITE, bottom: WHITE, left: stops, right: stops }]]));
+  for (const cut of ["+x", "-x"]) {
+    assert.equal(sideAt(shell, cut, 0.1), WHITE, `${cut}: bottom strip`);
+    assert.equal(sideAt(shell, cut, 0.6), RED, `${cut}: banner`);
+    assert.equal(sideAt(shell, cut, 0.97), WHITE, `${cut}: top strip`);
+  }
+  const { scene, shell: s2 } = build([["+z", RED]], new Map([[1, { left: stops }]]));
+  scene.setFaceColors(new Map([[1, RED]]), new Map([[1, { left: [{ to: 0.5, color: BLUE }, { to: 1, color: RED }] }]]));
+  assert.equal(sideAt(s2, "-x", 0.2), BLUE, "stops follow setFaceColors in place");
+  assert.equal(sideAt(s2, "-x", 0.8), RED);
+  assert.throws(() => scene.setFaceColors(new Map([[1, RED]]), new Map([[1, { left: [{ to: 1, color: "red" }] }]])), /Invalid face edge color/);
+});
+
 // ---- the real names print (unit grid): the cut faces under the month row ----
 import { readFileSync } from "node:fs";
 import { NAMES_BODY_WIDTH, NAMES_GAP, layerWidthsOf } from "../src/apps/calendar7/geometry.ts";
@@ -233,4 +286,11 @@ test("names print: the cut face under every month row ring cubie is one flat whi
   const edges = faceEdgeFills(printing, scheme, "names");
   assert.ok(edges.size >= 7, `edge colors for ${edges.size} banner stickers`);
   assert.equal(faceEdgeFills(printing, scheme, "standard").size, 0);
+  for (const e of edges.values()) { // beside the banner: white strip 0.5 / red 1.2 / white strip 0.1 of the 1.8 tall cubie, from the bottom up
+    for (const side of [e.left, e.right]) {
+      assert.deepEqual(side.map((x) => x.color), [namesGround(scheme.dayFill), scheme.bandFill, namesGround(scheme.dayFill)]);
+      near(side[0].to, 0.5 / 1.8, 0.03); near(side[1].to, 1 - 0.1 / 1.8, 0.03); assert.equal(side[2].to, 1);
+    }
+    assert.equal(e.top, namesGround(scheme.dayFill)); assert.equal(e.bottom, namesGround(scheme.dayFill));
+  }
 });
