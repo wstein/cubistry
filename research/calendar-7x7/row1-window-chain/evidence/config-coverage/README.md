@@ -3,8 +3,7 @@
 
 Research candidate, not certified. Independent review is pending. Julia only; no Flix check was run for anything
 here, so by the repository rule every statement below is UNKNOWN for evidence purposes (SAT, UNSAT and NOMATCH
-below are Julia verdicts, not confirmed ones). Stacked on #413 (`research/cal7-skip-capacity`, base
-`b9e66f4d`).
+below are Julia verdicts, not confirmed ones). Stacked on #413 (merged); base `research/cube-display-feasibility`. The 2037-01 print is evaluated with its own `window-2037-01/layout.tsv` (April tiles AP+RIL, since 284e196c); all other prints use `row1-revision/layout.tsv`.
 
 ## Headline
 
@@ -79,7 +78,7 @@ surfaces to that board); this PR adds an optional `ROOT=YYYY-MM` assertion that 
 the root front surfaces exempt from seed freezing (before, a frozen seed face conflicted with the new root board).
 Month list `months-C.txt`: the 286 months 2026-01 .. 2050-01 except 2026-02, 2037-02, 2043-02 (calendar order, root
 2026-01 first). The checkers (`row1-window-chain/check.jl`, `verify_chain.jl`, the Flix `Main.flix`) still pin root
-May 2026; another author generalises them. Nothing here changes them.
+May 2026; another author generalizes them. Nothing here changes them.
 
 | Fact | Value |
 |---|---|
@@ -133,9 +132,12 @@ Run from `research/calendar-7x7` with Julia 1.11.5.
 
 ```sh
 C=row1-window-chain/evidence/config-coverage
-julia --startup-file=no $C/test_config.jl          # 1 test set group, 1669 tests, about 25 s on an idle machine
+julia --startup-file=no $C/test_config.jl          # 1 test set group, 1671 tests, about 25 s on an idle machine
 julia --startup-file=no $C/test_root.jl            # 2 test sets, 6 tests, about 60 s
-$C/run_mutants.sh "$(command -v julia)"            # 27 mutants, expect KILLED for all
+julia --startup-file=no $C/test_cache.jl           # 7 tests
+julia --startup-file=no $C/test_freeze.jl          # 5 tests
+julia --startup-file=no $C/test_stages.jl          # 4 tests
+$C/run_mutants.sh "$(command -v julia)"            # 30 mutants, expect KILLED for all
 mkdir -p /tmp/cfg && julia --startup-file=no $C/config_table.jl write /tmp/cfg   # then diff -r with $C
 # receipts: for N in B old C
 M=$(julia --startup-file=no -e 'print(join([string(f[2],"-",lpad(f[3],2,"0")) for f in split.(readlines(ARGS[1])[2:end],"\t") if f[4]=="1" && f[5]=="1"],","))' $C/front-matches-config-$N.tsv)
@@ -150,12 +152,12 @@ julia design_skip.jl row1-revision/layout.tsv libz3.so OUT`. `OUT/printing.tsv` 
 | File | Purpose |
 |---|---|
 | `config_table.jl` | derives the 91 configurations, matches, lemma, chain size; `write OUTDIR` regenerates the tables |
-| `test_config.jl`, `test_root.jl`, `run_mutants.sh` | tests and 27 source/data mutants |
+| `test_config.jl`, `test_root.jl`, `test_freeze.jl`, `run_mutants.sh` | tests and 30 source/data mutants |
 | `config-table.tsv`, `failing-dates.tsv`, `gregorian-400.txt`, `lemma-config.tsv`, `chain-size.tsv` | the tables |
 | `front-matches-config-{B,old,C}.tsv`, `print-config-{B,old,C}-julia.tsv` | matchings and checker receipts per configuration |
 | `printing-C.tsv`, `months-C.txt`, `solver-C.tsv`, `redesign-C.tsv` | print C, its month list, solver log, all 20 design runs |
 | `printing-C1980.tsv`, `solver-C1980.tsv`, `front-matches-config-C1980.tsv`, `print-config-C1980-julia.tsv`, `months-C1980.txt`, `redesign-C1980.tsv`, `best-effort-feb-sunday-28.tsv`, `stage-pairs.tsv`, `stage_pairs.jl`, `test_stages.jl` | root January 1980 attempts, best-effort matchings, staged pairs |
-| `../window-skip/design_skip.jl`, `test_root.jl`, `test_cache.jl` | designer: `ROOT`, root fronts never frozen, `CLASS_FRACS`, `ONLY`, `CONTINUE`, `RELEASE_SURPLUS`, `RESULT_DIR` (solved classes stored by SMT digest, never solved twice) |
+| `../window-skip/design_skip.jl`, `test_root.jl`, `test_cache.jl` | designer: `ROOT`, root fronts never frozen, `CLASS_FRACS`, `ONLY`, `CONTINUE`, `RELEASE_SURPLUS`, `RESULT_DIR` (solved classes stored by SMT digest, never solved twice); the root-front exemption applies to every seeded run, otherwise defaults are unchanged |
 
 ## Root January 1980 (configuration January / Tuesday / 31 days), best effort, staged chains
 
@@ -167,4 +169,4 @@ Result: print C-1980 found: `printing-C1980.tsv`, sha256 `e3c7e3eeaa012a62cc3726
 
 Best effort for February/Sunday/28 (`best-effort-feb-sunday-28.tsv`, prints B, C and C1980; print `D` in the file): the maximum matching has 48 of 49 cells; exactly two cells can be the wrong one, (7,1) or (7,7) (the two blank bottom corners; any other single wrong cell leaves a deficiency), and for each choice the table lists the matching of the other 48 cells (cell, body, rotation), replayed by an independent check in `test_config.jl`. Same data for 2026-02, 2037-02 and 2043-02 (one configuration). Move-sequence tie-breaks: not run.
 
-Staged chains (`stage-pairs.tsv`, `stage_pairs.jl`, test `test_stages.jl`; Gregorian, no month skipped): stage 1 1980-01 .. 2050-01 has 841 months and already all 98 distinct consecutive configuration pairs; stages 2 (1950-01 .. 1980-01, 361 months), 3 (1900-01 .. 1950-01, 601) and 4 (2050-01 .. 2100-01, 601) add no new pair. February/Sunday/28 occurs in 8, 3, 5 and 6 months of the stages, and 2 pairs involve it (January to it, it to March). The 400-year cycle is therefore complete in 70 years.
+Staged chains (`stage-pairs.tsv`, `stage_pairs.jl`, test `test_stages.jl`; Gregorian, no month skipped): stage 1 1980-01 .. 2050-01 has 841 months and already all 98 distinct consecutive configuration pairs (counted with no month skipped; the bridged chain without February/Sunday/28 has 95 or 97, see `chain-size.tsv`); stages 2 (1950-01 .. 1980-01, 361 months), 3 (1900-01 .. 1950-01, 601) and 4 (2050-01 .. 2100-01, 601) add no new pair. February/Sunday/28 occurs in 8, 3, 5 and 6 months of the stages, and 2 pairs involve it (January to it, it to March). The 400-year cycle is therefore complete in 70 years.
