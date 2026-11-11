@@ -10,24 +10,25 @@
 #   for maximal runs of exact stages (verdict SAT, no bridge or root edge) whose junctions are all joined; every other stage is listed per stage.
 function read_receipt(path)
     t=read(path,String);@assert endswith(t,"\n") && !occursin('\r',t) "canonical receipt"
-    ls=split(chop(t),'\n');root=nothing;last=nothing;ends=nothing;verdict=nothing;jstart=nothing;jend=nothing;gappy=false;count=nothing
+    ls=split(chop(t),'\n');root=nothing;last=nothing;ends=nothing;free=false;verdict=nothing;jstart=nothing;jend=nothing;gappy=false;count=nothing
     for l in ls
         f=split(l,'\t')
         if f[1]=="root";root=(parse(Int,f[2]),parse(Int,f[3]),String(f[4]));
         elseif f[1]=="edge";last=(parse(Int,f[3]),parse(Int,f[4]));ends=String(f[10]);gappy|=any(x->x in ("BRIDGE","ROOTEDGE"),f[12:end])
+        elseif f[1]=="start" && f[2]=="free";free=true
         elseif f[1]=="join";f[2]=="start" ? (jstart=String(f[3])) : (jend=String(f[3]))
         elseif f[1]=="verdict";verdict=String(f[2]);count=parse(Int,f[4])
         end
     end
     @assert root!==nothing && last!==nothing && verdict in ("SAT","BEST_EFFORT") "receipt has root, edges and verdict"
-    (first=(root[1],root[2]),last=last,start=root[3],finish=ends,verdict=verdict,count=count,jstart=jstart,jend=jend,exact=(verdict=="SAT" && !gappy))
+    (first=(root[1],root[2]),last=last,start=root[3],finish=ends,verdict=verdict,count=count,jstart=jstart,jend=jend,free=free,exact=(verdict=="SAT" && !gappy))
 end
 mt((y,m))=string(y,'-',lpad(m,2,'0'))
 function stage_summary(stagesfile,evdir)
     rows=[split(l,'\t') for l in readlines(stagesfile)];@assert all(r->length(r)==3,rows) && !isempty(rows) "stage rows"
     st=[]
     for (n,j,f) in rows
-        a=joinpath(evdir,j);b=joinpath(evdir,f);@assert read(a)==read(b) "$n: Julia and Flix receipts byte-identical"
+        a=joinpath(evdir,j);b=joinpath(evdir,f);@assert realpath(a)!=realpath(b) "$n: Julia and Flix receipts are distinct files";@assert read(a)==read(b) "$n: Julia and Flix receipts byte-identical"
         push!(st,merge((name=String(n),),read_receipt(a)))
     end
     out=String[]
@@ -43,7 +44,7 @@ function stage_summary(stagesfile,evdir)
         if !st[i].exact;i+=1;continue;end
         j=i;while j<length(st) && joined[j] && st[j+1].exact;j+=1;end
         n=sum(s.count for s in st[i:j])-(j-i)
-        push!(out,join((j>i ? "composed" : "single",mt(st[i].first),mt(st[j].last),n,join((s.name for s in st[i:j]),',')),'\t'));runs+=1
+        push!(out,join(((st[i].free ? "free_" : "")*(j>i ? "composed" : "single"),mt(st[i].first),mt(st[j].last),n,join((s.name for s in st[i:j]),',')),'\t'));runs+=1
         i=j+1
     end
     push!(out,join(("counts","stages",length(st),"joined",count(joined),"junctions",length(joined),"exact_runs",runs),'\t'))
