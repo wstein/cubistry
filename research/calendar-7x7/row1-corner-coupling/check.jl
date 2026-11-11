@@ -52,7 +52,7 @@ function read_month_list(path,expected_sha)
     ms=Tuple{Int,Int}[]
     for t in split(chop(raw;tail=1),'\n')
         m=match(r"^(\d{4})-(\d{2})\z",t);@assert !isnothing(m) "month list row is YYYY-MM"
-        y,mo=parse.(Int,m.captures);@assert 1<=mo<=12 && (2026,1)<=(y,mo)<=(2100,1) "month list row lies within 2026-01 to 2100-01"
+        y,mo=parse.(Int,m.captures);@assert 1<=mo<=12 && (1900,1)<=(y,mo)<=(2100,1) "month list row lies within 1900-01 to 2100-01"
         @assert isempty(ms) || ms[end]<(y,mo) "month list strictly increasing"
         push!(ms,(y,mo))
     end

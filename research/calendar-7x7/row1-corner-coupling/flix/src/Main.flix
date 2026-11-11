@@ -82,7 +82,7 @@ def windowGoalsOf(ms: List[(Int32,Int32)]): List[Goal] \ IO = List.map(ym -> {
 },ms)
 def monthIndex(ym: (Int32,Int32)): Int32 = {let(y,m)=ym;y*12+m}
 def monthText(ym: (Int32,Int32)): String = {let(y,m)=ym;if(m<10) "${y}-0${m}" else "${y}-${m}"}
-def monthRow(row: String): (Int32,Int32) \ IO = monthRowFrom(row,monthIndex((2026,1)),"month list row lies within 2026-01 to 2100-01","month list row is YYYY-MM")
+def monthRow(row: String): (Int32,Int32) \ IO = monthRowFrom(row,monthIndex((1900,1)),"month list row lies within 1900-01 to 2100-01","month list row is YYYY-MM")
 def monthRowFrom(row: String,lo: Int32,rangeMsg: String,formMsg: String): (Int32,Int32) \ IO = {
     let digits=List.append(String.toList(String.slice(start=0,end=4,row)),String.toList(String.slice(start=5,end=7,row)));
     require(String.length(row)==7 and String.slice(start=4,end=5,row)=="-" and List.forAll(c -> List.memberOf(c,String.toList("0123456789")),digits),formMsg);

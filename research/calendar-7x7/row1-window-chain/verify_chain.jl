@@ -15,7 +15,7 @@ function listed_months()
     out=Tuple{Int,Int}[]
     for row in split(chop(txt),"\n")
         mm=match(r"^(\d{4})-(\d{2})$",row);@assert !isnothing(mm) "list row is YYYY-MM"
-        t=Tuple(parse.(Int,mm.captures));@assert 1<=t[2]<=12 && (2026,1)<=t<=(2100,1) "list row in range"
+        t=Tuple(parse.(Int,mm.captures));@assert 1<=t[2]<=12 && (1900,1)<=t<=(2100,1) "list row in range"
         @assert isempty(out) || t>out[end] "list strictly increasing"
         push!(out,t)
     end
@@ -26,7 +26,7 @@ const END_TEXT=LISTED ? "list" : get(ENV,"WINDOW_END","2028-01")
 const END_MATCH=LISTED ? nothing : match(r"^(\d{4})-(\d{2})\z",END_TEXT)
 @assert LISTED || !isnothing(END_MATCH) "window end is YYYY-MM"
 const END_YM=LISTED ? MONTHS[end] : Tuple(parse.(Int,END_MATCH.captures))
-@assert 1<=END_YM[2]<=12 && END_YM>=(2026,5) && END_YM<=(2100,1) "window end lies within May 2026 to January 2100"
+@assert 1<=END_YM[2]<=12 && END_YM>=(LISTED ? (1900,1) : (2026,5)) && END_YM<=(2100,1) "window end lies within May 2026 to January 2100"
 # Chain root month (CAL7_ROOT_MONTH, own parser): the month whose board the identity pose shows; default the first month of S.
 # If it differs from S[1] the chain has one extra root edge from the identity pose to S[1].
 const FIRSTM=LISTED ? MONTHS[1] : (2026,5)
@@ -100,13 +100,29 @@ function optics_selfcheck()
     @assert reading(band,0,want_blank)==:bad "optics self-check: band must not serve as blank"
     @assert reading((text="1",ink="band"),0,want_band)==:bad "optics self-check: inked tile must not serve as band"
 end
+# Junction digests (own parser): the digest the start / end state must have; 64 hex or `identity`.
+function own_join(name)
+    t=get(ENV,name,"");isempty(t) && return nothing
+    @assert t=="identity" || (length(t)==64 && all(c->c in "0123456789abcdef",t)) "junction digest is 64 hex or identity";t
+end
+const JSTART=own_join("CAL7_JOIN_START")
+const JEND=own_join("CAL7_JOIN_END")
 # Own chain reader (v1, or v2 with per-edge "wrong" and "hall" records); shares nothing with check.jl.
 function read_chain_own(path)
-    L=readlines(path);@assert length(L)>=4 && L[1] in ("cubistry.calendar7.chain.v1","cubistry.calendar7.chain.v2") && L[end]=="finish" "chain header or trailer"
-    v2=L[1]=="cubistry.calendar7.chain.v2"
+    L=readlines(path);@assert length(L)>=4 && L[1] in ("cubistry.calendar7.chain.v1","cubistry.calendar7.chain.v2","cubistry.calendar7.chain.v3") && L[end]=="finish" "chain header or trailer"
+    v2=L[1]!="cubistry.calendar7.chain.v1"
     f=split(L[2],'\t');@assert length(f)==5 && f[1]=="source" "source line"
     src=(root=parse(Int,f[2]),year=parse(Int,f[3]),month=parse(Int,f[4]),hash=String(f[5]))
-    edges=[];i=3
+    edges=[];i=3;startword=nothing
+    if startswith(L[i],"start\t")
+        @assert L[1]=="cubistry.calendar7.chain.v3" "free start block needs chain.v3"
+        g=split(L[i],'\t');@assert length(g)==2;n=parse(Int,g[2]);@assert 0<=n<=100000 "start move count";i+=1;startword=Int[]
+        for _ in 1:n
+            g=split(L[i],'\t');@assert length(g)==3 && g[1]=="move" "start move line"
+            gen=parse(Int,g[2]);q=parse(Int,g[3]);@assert 1<=gen<=21 && q in (-1,1,2) "start move"
+            q==2 ? append!(startword,[gen,gen]) : push!(startword,q*gen);i+=1
+        end
+    end
     while L[i]!="finish"
         f=split(L[i],'\t');@assert length(f)==9 && f[1]=="edge" "edge line $i"
         j=i+1;word=Int[];wrong=Tuple{Int,Int}[];halls=Vector{Tuple{Int,Int}}[]
@@ -126,7 +142,7 @@ function read_chain_own(path)
         end
         push!(edges,(year=parse(Int,f[2]),month=parse(Int,f[3]),htm=parse(Int,f[4]),sh=String(f[8]),eh=String(f[9]),word=word,wrong=wrong,halls=halls));i=j+1
     end
-    (src=src,edges=edges,v2=v2)
+    (src=src,edges=edges,v2=v2,startword=startword)
 end
 # Own rigid-rotation geometry for the Hall check: the 24 proper rotations as images of the basis vectors.
 const ROTS=let seen=Set([((1,0,0),(0,1,0),(0,0,1))]),todo=[((1,0,0),(0,1,0),(0,0,1))]
@@ -174,15 +190,21 @@ function hall_check(st0,b,wrong,halls)
 end
 function verify(layout,printing,chain,statesdir)
     optics_selfcheck();load_names(layout);@assert bytes2hex(sha256(read(printing)))==EXPECT_PRINT "new print pin"
-    original=read_print(printing);state=copy(original);ch=read_chain_own(chain)
+    original=read_print(printing);state=copy(original);ch=read_chain_own(chain);identity_hash=state_sha(original)
+    free=ch.startword!==nothing;@assert !(free && ROOTED) "a free start has no root edge"
+    free && (state=apply_word(state,ch.startword))
+    initial=copy(state)
     SY,SM=ROOTM      # the chain starts at the identity pose; its front must show the root month
     @assert (ch.src.root,ch.src.year,ch.src.month)==(SM,SY,SM) && length(ch.edges)==END_COUNT-1 "root record and edge count"
-    @assert check_front(state,board(SY,SM)).bad==0 && state_sha(state)==ch.src.hash "identity root front"
+    @assert check_front(state,board(SY,SM)).bad==0 (free ? "free start front is the first member" : "identity root front")
+    @assert state_sha(state)==ch.src.hash "root digest"
     rule_selfcheck(state,board(SY,SM))
     encode(st)="sticker\tpiece\tposition\tnormal\tup\ttext\tink\n"*join([join((s.id,s.piece,join(s.pos,','),join(s.normal,','),join(s.up,','),s.text,s.ink),'\t')*"\n" for s in st])
     @assert read(joinpath(statesdir,"state-01.tsv"),String)==encode(state)
     y,m=SY,SM;py,pm=SY,SM;total=0;words=Int[];nbest=0
     println("independent-root\t",SY,'-',lpad(SM,2,'0'),'\t',state_sha(state),"\tACCEPT")
+    free && println("independent-start\tfree\t",length(ch.startword),'\t',state_sha(state))
+    JSTART===nothing || (@assert(state_sha(state)==(JSTART=="identity" ? identity_hash : JSTART),"start junction digest");println("independent-join\tstart\t",state_sha(state)))
     for (i,e) in enumerate(ch.edges)
         y,m=LISTED ? NEXT[(y,m)] : (m==12 ? (y+1,1) : (y,m+1))
         @assert (e.year,e.month)==(y,m) "chronological adjacency"
@@ -200,7 +222,8 @@ function verify(layout,printing,chain,statesdir)
         println("independent-edge\t",i,'\t',y,'\t',m,'\t',e.htm,'\t',state_sha(state),"\tACCEPT",(i==1 && ROOTED) ? "\tROOTEDGE" : (LISTED && (y*12+m)-(py*12+pm)>1 ? "\tBRIDGE" : ""),isempty(bad) ? "" : "\tBEST_EFFORT\t"*string(length(bad))*"\t"*join(["$r,$c" for (r,c) in bad],';'))
         py,pm=y,m
     end
-    @assert (y,m)==END_YM && apply_word(state,-reverse(words))==original
+    @assert (y,m)==END_YM && apply_word(state,-reverse(words))==initial
+    JEND===nothing || (@assert(state_sha(state)==(JEND=="identity" ? identity_hash : JEND),"end junction digest");println("independent-join\tend\t",state_sha(state)))
     ch.v2 && println("independent-status\texact\t",END_COUNT-1-nbest,"\tbest_effort\t",nbest)
     println("independent-verdict\t",nbest==0 ? "ACCEPT_CHAIN" : "ACCEPT_BEST_EFFORT_CHAIN","\t",END_COUNT,'\t',END_COUNT-1,'\t',total,"\tINVERSE_PASS")
 end

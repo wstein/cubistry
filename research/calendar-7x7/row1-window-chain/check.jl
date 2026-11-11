@@ -20,6 +20,11 @@ const ROOTED=CHAIN_ROOT!=WINDOW_LIST[1]
 const CHAIN_MONTHS=ROOTED ? vcat([CHAIN_ROOT],WINDOW_LIST) : WINDOW_LIST
 const CHAIN_COUNT=length(CHAIN_MONTHS)
 const CHAIN_FLAGS=[(i==1 && ROOTED) ? "\tROOTEDGE" : ((b[1]*12+b[2])-(a[1]*12+a[2])>1 ? "\tBRIDGE" : "") for (i,(a,b)) in enumerate(zip(CHAIN_MONTHS[1:end-1],CHAIN_MONTHS[2:end]))]
+# Stages: a chain file may start at a free state (v3 `start` block) and be joined to its neighbors by digest equality.
+# CAL7_JOIN_START / CAL7_JOIN_END: 64 hex or `identity` (digest of the identity pose of the print): the digest the start (end) state must have.
+join_digest(name)=(t=get(ENV,name,"");isempty(t) ? nothing : (@assert(t=="identity" || occursin(r"^[0-9a-f]{64}\z",t),"join digest is 64 hex or identity");t))
+const JOIN_START=join_digest("CAL7_JOIN_START")
+const JOIN_END=join_digest("CAL7_JOIN_END")
 const WINDOW_PRINT_EXPECT=(!LIST_MODE && WINDOW_END=="2028-01") ? WINDOW_PRINT_SHA : get(ENV,"CAL7_WINDOW_PRINT_SHA","")
 # The layout pin is a parameter so that a window-local layout can be pinned without touching the checker.
 const WINDOW_LAYOUT_SHA=get(ENV,"CAL7_WINDOW_LAYOUT_SHA256","c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db")
@@ -31,13 +36,23 @@ function chain_lines(path)
     ls
 end
 function read_window_chain(path)
-    ls=chain_lines(path);@assert length(ls)>=4 && ls[1] in ("cubistry.calendar7.chain.v1","cubistry.calendar7.chain.v2") && ls[end]=="finish" "chain header and trailer"
-    v2=ls[1]=="cubistry.calendar7.chain.v2"          # v2 adds per-edge wrong cells and Hall witnesses (best-effort months)
+    ls=chain_lines(path);@assert length(ls)>=4 && ls[1] in ("cubistry.calendar7.chain.v1","cubistry.calendar7.chain.v2","cubistry.calendar7.chain.v3") && ls[end]=="finish" "chain header and trailer"
+    v2=ls[1]!="cubistry.calendar7.chain.v1"          # v2 adds per-edge wrong cells and Hall witnesses (best-effort months); v3 adds the free start block
     f=String.(split(ls[2],'\t'));@assert length(f)==5 && f[1]=="source"
     sy,sm=CHAIN_ROOT
     @assert canonical_integer.(f[2:4])==[sm,sy,sm] "identity root record is the root month"
     validhash(s)=occursin(r"^[0-9a-f]{64}$",s)
-    @assert validhash(f[5]);root=String(f[5]);cursor=3;edges=[];totalmoves=0
+    @assert validhash(f[5]);root=String(f[5]);cursor=3;edges=[];totalmoves=0;startmoves=nothing
+    if cursor<length(ls) && startswith(ls[cursor],"start\t")
+        @assert ls[1]=="cubistry.calendar7.chain.v3" "free start block needs chain.v3"
+        a=String.(split(ls[cursor],'\t'));cursor+=1;@assert length(a)==2;n=canonical_integer(a[2]);@assert 0<=n<=100000 "bounded start moves"
+        startmoves=Tuple{Int,Int}[]
+        for _ in 1:n
+            @assert cursor<length(ls);b=String.(split(ls[cursor],'\t'));cursor+=1
+            @assert length(b)==3 && b[1]=="move";g,e=canonical_integer.(b[2:3]);@assert 1<=g<=21 && e in (-1,1,2) "legal start move"
+            push!(startmoves,(g,e))
+        end
+    end
     while cursor<length(ls)
         f=String.(split(ls[cursor],'\t'));cursor+=1
         @assert length(f)==9 && f[1]=="edge" "edge record"
@@ -70,7 +85,7 @@ function read_window_chain(path)
         @assert length(edges)<=CHAIN_COUNT-1 "at most $(CHAIN_COUNT-1) edges"
     end
     @assert cursor==length(ls) && length(edges)==CHAIN_COUNT-1 "exactly $(CHAIN_COUNT-1) chronological edges"
-    root,edges,v2
+    root,edges,v2,startmoves
 end
 function chain_turn(v,axis)
     axis==1 ? (v[1],-v[3],v[2]) : axis==2 ? (v[3],v[2],-v[1]) : (-v[2],v[1],v[3])
@@ -125,9 +140,9 @@ function chain_hall_check(source,board,wrong,halls)
     end
     @assert all(w->w in used,wrong) "Hall sets cover every wrong cell"
 end
-function chain_selfcheck(state,goal,source,action,gens)
+function chain_selfcheck(state,goal,source,action,gens,p0=UInt16.(1:264))
     for g in 1:21,e in (-1,1,2)
-        direct=chain_move(state,g,e);p=UInt16.(1:264)
+        direct=chain_move(state,g,e);p=copy(p0)
         for _ in 1:(e==-1 ? 3 : e);p=compose(p,gens[g]);end
         @assert direct==decode_physical(source,p,action) "single-move direct294/pose264 agreement"
         @assert chain_move(direct,g,e==2 ? 2 : -e)==state "single-move inverse"
@@ -152,14 +167,24 @@ function verify_window_chain(layout,printing,path,statesdir)
     ROOTED && (goals=vcat([coupled_month_goal(labels,CHAIN_ROOT...)],goals))
     source=window_read_print(printing);action=pose_action();gens=[UInt16.(g) for g in action.generators]
     state=[(id=s.id,piece=s.piece,pos=s.home,normal=s.normal,up=s.up,text=s.text,ink=s.ink) for s in source]
-    initial=copy(state);p=UInt16.(1:264);root,edges,v2=read_window_chain(path)
-    @assert state==decode_physical(source,p,action) && chain_front_ok(state,goals[1].board) "identity root front"
-    chain_selfcheck(state,goals[1],source,action,gens)
+    p=UInt16.(1:264);root,edges,v2,startmoves=read_window_chain(path);free=!isnothing(startmoves)
+    @assert !(free && ROOTED) "a free start has no root edge"
+    @assert state==decode_physical(source,p,action) "identity pose"
+    identity_digest=chain_digest(state)
+    for (g,e) in something(startmoves,Tuple{Int,Int}[])
+        state=chain_move(state,g,e)
+        for _ in 1:(e==-1 ? 3 : e);p=compose(p,gens[g]);end
+    end
+    initial=copy(state)
+    @assert state==decode_physical(source,p,action) && chain_front_ok(state,goals[1].board) (free ? "free start front is the first member" : "identity root front")
+    chain_selfcheck(state,goals[1],source,action,gens,p)
     @assert chain_digest(state)==root "root digest"
     @assert read(joinpath(statesdir,"state-01.tsv"),String)==chain_state_text(state;header=true) "root full-state snapshot"
     println("input\t",WINDOW_LAYOUT_SHA,'\t',WINDOW_PRINT_EXPECT,'\t',bytes2hex(sha256(read(path))))
     ml=month_list_line(WINDOW_LIST);isnothing(ml) || println(ml)
     println("root\t",CHAIN_ROOT[1],'\t',CHAIN_ROOT[2],'\t',root)
+    free && println("start\tfree\t",length(startmoves),'\t',root)
+    isnothing(JOIN_START) || (@assert(root==(JOIN_START=="identity" ? identity_digest : JOIN_START),"start junction digest");println("join\tstart\t",root))
     total=(0,0,0,0);allmoves=Tuple{Int,Int}[];nbest=0
     for (i,edge) in enumerate(edges)
         goal=goals[i+1];@assert (edge.year,edge.month)==(goal.year,goal.month) "chronological month adjacency"
@@ -188,6 +213,8 @@ function verify_window_chain(layout,printing,path,statesdir)
         println("edge\t",i,'\t',goal.year,'\t',goal.month,'\t',join(metrics,'\t'),'\t',edge.source,'\t',edge.finish,"\tPASS",CHAIN_FLAGS[i],isempty(mism) ? "" : "\tBEST_EFFORT\t"*string(length(mism))*"\t"*join(["$r,$c" for (r,c) in mism],';'))
     end
     @assert (edges[end].year,edges[end].month)==(goals[end].year,goals[end].month) && length(goals)==CHAIN_COUNT "window end matches the last chain edge"
+    laststate=state
+    isnothing(JOIN_END) || (@assert(chain_digest(state)==(JOIN_END=="identity" ? identity_digest : JOIN_END),"end junction digest");println("join\tend\t",chain_digest(state)))
     for (g,e) in reverse(allmoves);state=chain_move(state,g,e==2 ? 2 : -e);end
     @assert state==initial "whole-chain inverse restores all 294 surfaces"
     v2 && println("status\texact\t",CHAIN_COUNT-1-nbest,"\tbest_effort\t",nbest)
