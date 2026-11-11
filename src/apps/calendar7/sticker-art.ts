@@ -2,7 +2,7 @@
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
 import { type Layout, NAME_SLOTS, nameSlotOffset, nameSlotStart, nameTileShift } from "./layout.ts";
 import { type FaceBands, faceFlatShare, facePixelsPerUnit, monthBanner, nameAboveShare, NAMES_BANNER_BOTTOM_OFFSET, NAMES_BANNER_HEIGHT, NAMES_BANNER_OVERHANG, NAMES_BANNER_RADIUS, NAMES_BANNER_THIN_TILE_TOP, NAMES_FACE_PX_PER_UNIT, NAMES_WEEKDAY_DOWN, outerLayerWidth, CALENDAR7_SIZE } from "./geometry.ts";
-import { type ColorScheme, namesGround, type SchemeLine } from "./schemes.ts";
+import { type ColorScheme, namesGround, type ResolvedBannerStyle, type SchemeLine, underlineInk } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
 
@@ -31,6 +31,8 @@ export interface TileRoles {
   readonly ink: string;
   readonly inkSmall: string;
   readonly line: SchemeLine | null;
+  /** Names-face artwork only; absent on the historical sheet and unmodified palettes. */
+  readonly banner?: { readonly style: ResolvedBannerStyle; readonly outline: SchemeLine | null };
 }
 
 /** Texture pixels per scheme line pixel: scheme widths are pixels of a sheet tile of about 48 px, the texture is 192 px. */
@@ -72,6 +74,34 @@ export function tileGrid(tile?: FaceTile, outer: number = outerLayerWidth(CALEND
 /** Tile classes drawn as the red banner of the month row (names layout). */
 export const isBannerClass = (cls: TileClass): boolean => cls === "month" || cls === "band";
 type GroundContext = Pick<CanvasRenderingContext2D, "fillStyle" | "fillRect"> & Partial<Pick<CanvasRenderingContext2D, "beginPath" | "roundRect" | "fill">>;
+interface BannerShape { readonly rect: PxRect; readonly radii: readonly [number, number, number, number]; readonly color: string }
+/** Outer and inner shapes share the existing banner bounds and font placement. */
+function bannerShapes(roles: TileRoles, tile: FaceTile, outer: number = outerLayerWidth(CALENDAR7_SIZE)): readonly BannerShape[] {
+  const g = tileGrid(tile, outer), r = g.banner, b = tile.band ?? NO_BAND;
+  const radius = roles.banner?.style === "square" ? 0 : NAMES_BANNER_RADIUS * g.px;
+  const radii = (rad: number): [number, number, number, number] => [b.l > 0 ? rad : 0, b.r > 0 ? rad : 0, b.r > 0 ? rad : 0, b.l > 0 ? rad : 0];
+  const shape = (rect: PxRect, rad: number, color: string): BannerShape => {
+    const corners = radii(rad), w = rect.x1 - rect.x0, h = rect.y1 - rect.y0;
+    // Canvas roundRect scales all radii together when the corner sums exceed an edge.
+    const limit = (length: number, sum: number): number => sum > 0 ? length / sum : 1;
+    const factor = Math.min(1, limit(w, corners[0] + corners[1]), limit(w, corners[2] + corners[3]), limit(h, corners[0] + corners[3]), limit(h, corners[1] + corners[2]));
+    return { rect, radii: corners.map(v => v * factor) as [number, number, number, number], color };
+  };
+  const outline = roles.banner?.outline;
+  if (!outline) return [shape(r, radius, roles.fill)];
+  const thickness = outline.px * LINE_SCALE * NAMES_LINE_FACTOR;
+  return [
+    shape(r, radius, outline.color),
+    shape({ x0: b.l > 0 ? r.x0 + thickness : r.x0 - 1, x1: b.r > 0 ? r.x1 - thickness : r.x1 + 1, y0: r.y0 + thickness, y1: r.y1 - thickness }, Math.max(0, radius - thickness), roles.fill),
+  ];
+}
+function paintShape(ctx: GroundContext, shape: BannerShape): void {
+  const { rect: r, radii, color } = shape;
+  ctx.fillStyle = color;
+  if (radii.some(v => v > 0) && ctx.roundRect && ctx.beginPath && ctx.fill) {
+    ctx.beginPath(); ctx.roundRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0, [...radii]); ctx.fill();
+  } else ctx.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+}
 /**
  * Names layout, ground of a tile of the unit grid: the white margin (the paper ground of the scheme) on the whole tile, then
  * the fill of the tile on its unit cell only (a weekend tint stays on the cell), in the month row the red banner (inset from
@@ -83,6 +113,10 @@ export function paintTileGround(ctx: GroundContext, roles: TileRoles, scheme: Co
   if (!banner && !hasBand(tile)) { ctx.fillStyle = roles.fill; ctx.fillRect(0, 0, g.W, g.H); return; }
   ctx.fillStyle = namesGround(scheme.dayFill);
   ctx.fillRect(0, 0, g.W, g.H);
+  if (banner && roles.banner) {
+    if (roles.banner.style !== "underline") for (const shape of bannerShapes(roles, tile)) paintShape(ctx, shape);
+    return;
+  }
   ctx.fillStyle = roles.fill;
   const rad = banner ? NAMES_BANNER_RADIUS * g.px : 0, b = tile.band ?? NO_BAND; // rounded outer corners of the banner (variant), only at a cube edge
   if (rad > 0 && ctx.roundRect && ctx.beginPath && ctx.fill && (b.l > 0 || b.r > 0)) {
@@ -102,6 +136,7 @@ export type TileEdgeColors = Partial<Record<"left" | "right" | "top" | "bottom",
  */
 export function tileEdgeColors(roles: TileRoles, ground: string, tile: FaceTile, outer: number = outerLayerWidth(CALENDAR7_SIZE)): TileEdgeColors | null {
   const g = tileGrid(tile, outer), banner = isBannerClass(roles.cls), r = banner ? g.banner : g.cell;
+  if (banner && roles.banner && roles.banner.style !== "underline") return bannerEdgeColors(roles, ground, tile, outer);
   const lr = roles.line ? lineRect(roles.line, "names", true, tile, banner, outer) : null; // the line runs over the edge where it reaches the tile edge
   if (!banner && !hasBand(tile) && !lr) return null;
   const along = (lo: number, hi: number, size: number): string | readonly TileEdgeStop[] => {
@@ -120,6 +155,43 @@ export function tileEdgeColors(roles: TileRoles, ground: string, tile: FaceTile,
     return out.length === 1 ? out[0].color : out;
   };
   return { left: r.x0 > 0 ? ground : withLine(up, lr !== null && lr.x <= 0.5), right: r.x1 < g.W ? ground : withLine(up, lr !== null && lr.x + lr.w >= g.W - 0.5), top: r.y0 > 0 ? ground : right, bottom: r.y1 < g.H ? ground : right };
+}
+
+/** Exact intersections of the drawn rounded rectangles with each physical tile edge. */
+function bannerEdgeColors(roles: TileRoles, ground: string, tile: FaceTile, outer: number): TileEdgeColors {
+  const g = tileGrid(tile, outer), shapes = bannerShapes(roles, tile, outer);
+  const inside = (shape: BannerShape, x: number, y: number): boolean => {
+    const { x0, x1, y0, y1 } = shape.rect;
+    if (x < x0 || x > x1 || y < y0 || y > y1) return false;
+    const corners = [[x0, y0, shape.radii[0], 1, 1], [x1, y0, shape.radii[1], -1, 1], [x1, y1, shape.radii[2], -1, -1], [x0, y1, shape.radii[3], 1, -1]];
+    return corners.every(([cx, cy, rad, sx, sy]) => !rad || (x - cx) * sx >= rad || (y - cy) * sy >= rad || Math.hypot(x - cx - sx * rad, y - cy - sy * rad) <= rad);
+  };
+  const edge = (vertical: boolean, fixed: number, size: number, reverse: boolean): string | readonly TileEdgeStop[] => {
+    const cuts = [0, size];
+    for (const { rect: r, radii } of shapes) {
+      cuts.push(...(vertical ? [r.y0, r.y1] : [r.x0, r.x1]));
+      for (const [cx, cy, rad] of [[r.x0 + radii[0], r.y0 + radii[0], radii[0]], [r.x1 - radii[1], r.y0 + radii[1], radii[1]], [r.x1 - radii[2], r.y1 - radii[2], radii[2]], [r.x0 + radii[3], r.y1 - radii[3], radii[3]]]) {
+        const distance = fixed - (vertical ? cx : cy);
+        if (rad > 0 && Math.abs(distance) <= rad) {
+          const delta = Math.sqrt(Math.max(0, rad * rad - distance * distance));
+          cuts.push((vertical ? cy : cx) - delta, (vertical ? cy : cx) + delta);
+        }
+      }
+    }
+    const sorted = [...new Set(cuts.map(v => reverse ? size - v : v).filter(v => v >= 0 && v <= size))].sort((a, b) => a - b), stops: TileEdgeStop[] = [];
+    for (let i = 1; i < sorted.length; i++) {
+      let at = (sorted[i - 1] + sorted[i]) / 2;
+      if (reverse) at = size - at;
+      const x = vertical ? fixed : at, y = vertical ? at : fixed;
+      let color = ground;
+      for (const shape of shapes) if (inside(shape, x, y)) color = shape.color;
+      const to = sorted[i] / size;
+      if (stops.at(-1)?.color === color) stops[stops.length - 1] = { to, color };
+      else stops.push({ to, color });
+    }
+    return stops.length === 1 ? stops[0].color : stops;
+  };
+  return { left: edge(true, 0, g.H, true), right: edge(true, g.W, g.H, true), top: edge(false, 0, g.W, false), bottom: edge(false, g.H, g.W, false) };
 }
 /** Weekday words (SUN to SAT) of a tile of the unit grid sit `NAMES_WEEKDAY_DOWN` below the cell center: the vertical shift in drawing px. */
 export const weekdayShift = (cls: TileClass): number => (cls === "weekday" || cls === "sunsat" ? NAMES_WEEKDAY_DOWN * namePxPerUnit() : 0);
@@ -189,6 +261,14 @@ export function tileRoles(scheme: ColorScheme, text: string, ink: string, layout
   const weekend = scheme.weekendFill ?? scheme.weekendTint ?? scheme.dayFill;
   const ground = (fill: string): string => (layout === "names" ? namesGround(fill) : fill);
   const roles = (fill: string, color: string, small = color, line: SchemeLine | null = null): TileRoles => ({ cls, fill: ground(fill), ink: color, inkSmall: small, line });
+  if (layout === "names" && isBannerClass(cls) && scheme.bannerStyle) {
+    if (scheme.bannerStyle === "underline") {
+      const color = underlineInk(scheme);
+      return { ...roles(scheme.dayFill, color, color, { color, px: scheme.lineRow1?.px ?? 3 }), banner: { style: "underline", outline: null } };
+    }
+    const outline = scheme.bandFill === null ? scheme.lineRow1 ?? { color: scheme.monthInk, px: 3 } : null;
+    return { ...roles(scheme.bandFill ?? scheme.dayFill, scheme.monthInk, scheme.monthInk), banner: { style: scheme.bannerStyle, outline } };
+  }
   switch (cls) {
     case "blank": return roles(scheme.emptyFill, scheme.dayInk);
     case "band": return roles(scheme.bandFill ?? scheme.dayFill, scheme.monthInk, scheme.monthInk, layout === "names" ? scheme.lineRow1 : null);
