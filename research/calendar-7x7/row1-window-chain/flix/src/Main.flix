@@ -68,17 +68,40 @@ def wEdges(v2: Bool,count: Int32,rows: List[String],acc: List[WEdge]): List[WEdg
     }
     case Nil => throw new IllegalArgumentException("missing chain finish")
 }
-def wRead(count: Int32,raw: String,start: (Int32,Int32)): (String,List[WEdge],Bool) \ IO = {
+// Free-start block of chain.v3: "start\tN" followed by N move records (the moves from the identity pose to the first state).
+def wTake(n: Int32,rows: List[String],acc: List[(Int32,Int32)]): (List[(Int32,Int32)],List[String]) \ IO =
+    if(n==0) (List.reverse(acc),rows) else match rows {
+        case line::rest => match fields(line) {
+            case "move"::gg::qq::Nil => {
+                let g=integer(gg);let q=integer(qq);
+                require(g>=1 and g<=21 and List.memberOf(q,List#{-1,1,2}),"legal start move");wTake(n-1,rest,(g,q)::acc)
+            }
+            case _ => throw new IllegalArgumentException("start move record")
+        }
+        case Nil => throw new IllegalArgumentException("start moves")
+    }
+def wStart(v3: Bool,rows: List[String]): (Option[List[(Int32,Int32)]],List[String]) \ IO = match rows {
+    case line::rest => match fields(line) {
+        case "start"::nn::Nil => {
+            require(v3,"free start block needs chain.v3");let n=integer(nn);require(n>=0 and n<=100000,"bounded start moves");
+            let(ms,remaining)=wTake(n,rest,Nil);(Some(ms),remaining)
+        }
+        case _ => (None,rows)
+    }
+    case Nil => (None,rows)
+}
+def wRead(count: Int32,raw: String,start: (Int32,Int32)): (String,List[WEdge],Bool,Option[List[(Int32,Int32)]]) \ IO = {
     require(String.length(raw)<=16000000,"bounded chain input");
     match lines(raw) {
         case header::source::rest => match fields(source) {
             case "source"::r::y::m::h::Nil => {
                 let(sy,sm)=start;require((integer(r),integer(y),integer(m))==(sm,sy,sm),"identity root record is the root month");require(wHash(h),"root digest");
-                require(header=="cubistry.calendar7.chain.v1" or header=="cubistry.calendar7.chain.v2","chain header and trailer");
-                let v2=header=="cubistry.calendar7.chain.v2";
-                let edges=wEdges(v2,count,rest,Nil);
+                require(header=="cubistry.calendar7.chain.v1" or header=="cubistry.calendar7.chain.v2" or header=="cubistry.calendar7.chain.v3","chain header and trailer");
+                let v2=header != "cubistry.calendar7.chain.v1";
+                let(startMoves,afterStart)=wStart(header=="cubistry.calendar7.chain.v3",rest);
+                let edges=wEdges(v2,count,afterStart,Nil);
                 let total=List.foldLeft((n,e) -> {let WEdge.E(_,_,_,_,_,moves,_,_)=e;n+List.length(moves)},0,edges);
-                require(total<=100000,"bounded total moves");(h,edges,v2)
+                require(total<=100000,"bounded total moves");(h,edges,v2,startMoves)
             }
             case _ => throw new IllegalArgumentException("source record")
         }
@@ -140,14 +163,14 @@ def wFront(st: Vector[Sticker],g: Goal): Bool \ IO = List.forAll(cell -> {
         coupledOptic(text,upAngle(u),ink)==coupledOptic(t,0,wi)
     }
 },cells())
-def wSelf(st: Vector[Sticker],g: Goal,poses: Vector[Pose],gens: List[Perm]): Unit \ IO = {
+def wSelf(st: Vector[Sticker],g: Goal,poses: Vector[Pose],gens: List[Perm],pose0: Perm,src: Vector[Sticker]): Unit \ IO = {
     // the first of the start month: first board cell with text "1"
     let ones=List.filter(p -> {let(_,x)=p;let(t,_)=x;t=="1"},List.zipWithIndex(goalBoard(g)));
 let oneIndex=match ones {case (i,_)::_ => i case Nil => throw new IllegalArgumentException("start month shows a 1")};
     let onePos=(Int32.modulo(oneIndex,7)-3,4-(oneIndex/7+1),3);
     List.forEach(index -> List.forEach(q -> {
-        let s=wMove(st,index,q);let p=wPose(permIdentity(),index,q,gens);
-        require(s==liftState(p,st,poses),"single-move direct294/pose264 agreement");
+        let s=wMove(st,index,q);let p=wPose(pose0,index,q,gens);
+        require(s==liftState(p,src,poses),"single-move direct294/pose264 agreement");
         require(wMove(s,index,wInverse(q))==st,"single-move inverse")
     },List#{-1,1,2}),List.range(1,22));
     let badOne=Vector.map(s -> {let Sticker.S(id,p,p0,n,u,text,ink)=s;
@@ -176,7 +199,10 @@ def wMetrics(moves: List[(Int32,Int32)]): (Int32,Int32,Int32,Int32) = List.foldL
 // layoutPin "" keeps the built-in layout pin; a window-local layout is pinned by passing its SHA-256.
 // rootText "" keeps the first month of the list as the root; otherwise it is the root month YYYY-MM (1900-01 .. 2100-01) whose board the
 // identity pose shows; if it differs from the first member of the list the chain gets one extra root edge from the identity pose to it.
-def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot: String,endText: String,printPin: String,monthsFile: String,monthsPin: String,layoutPin: String,rootText: String): Unit \ IO = {
+// joinStart / joinEnd: "" for none, else 64 hex or "identity": the digest the start (end) state of the chain must have (stage junction).
+def wJoin(t: String): String \ IO = {require(t=="" or t=="identity" or wHash(t),"junction digest is 64 hex or identity");t}
+def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot: String,endText: String,printPin: String,monthsFile: String,monthsPin: String,layoutPin: String,rootText: String,joinStart: String,joinEnd: String): Unit \ IO = {
+    require(wJoin(joinStart)==joinStart and wJoin(joinEnd)==joinEnd,"junction digests are checked");
     let rawLayout=read(layout);let rawPrint=read(printing);let rawChain=read(chain);
     let layoutSHA=if(layoutPin=="" or layoutPin=="-") "c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db" else layoutPin;
     let listed=if(monthsFile=="") Nil else monthListRead(monthsFile,monthsPin);
@@ -192,15 +218,24 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
     let ms=List.map(g -> {let Goal.G(y,m,_)=g;(y,m)},goals);
     let flags=List.map(p -> {let(i,pr)=p;let(a,b)=pr;if(i==0 and rooted) "\tROOTEDGE" else if(monthIndex(b)-monthIndex(a)>1) "\tBRIDGE" else ""},List.zipWithIndex(List.zip(List.take(count-1,ms),List.drop(1,ms))));
     let source=windowReadPrint(rawPrint);let poses=derivedPoses();let gens=List.map(i -> generator(i,poses),List.range(1,22));
-    let(root,edges,v2)=wRead(count,rawChain,at(ms,0));
-    require(source==liftState(permIdentity(),source,poses) and wFront(source,at(goals,0)),"identity root front");
-    wSelf(source,at(goals,0),poses,gens);
-    require(stackSha(wText(source))==root,"root digest");
+    let(root,edges,v2,startMoves)=wRead(count,rawChain,at(ms,0));
+    let free=match startMoves {case Some(_) => true case None => false};
+    require(not (free and rooted),"a free start has no root edge");
+    require(source==liftState(permIdentity(),source,poses),"identity pose");
+    let identityDigest=stackSha(wText(source));
+    let sm0=match startMoves {case Some(l) => l case None => Nil};
+    let st0=List.foldLeft((s,mv) -> {let(g,q)=mv;wMove(s,g,q)},source,sm0);
+    let p0=List.foldLeft((p,mv) -> {let(g,q)=mv;wPose(p,g,q,gens)},permIdentity(),sm0);
+    require(st0==liftState(p0,source,poses) and wFront(st0,at(goals,0)),if(free) "free start front is the first member" else "identity root front");
+    wSelf(st0,at(goals,0),poses,gens,p0,source);
+    require(stackSha(wText(st0))==root,"root digest");
     let stateHeader="sticker\tpiece\tposition\tnormal\tup\ttext\tink\n";
-    require(read(states+"/state-01.tsv")==stateHeader+wText(source),"root full-state snapshot");
+    require(read(states+"/state-01.tsv")==stateHeader+wText(st0),"root full-state snapshot");
     println("input\t${layoutSHA}\t${printSHA}\t${stackSha(rawChain)}");
     if(monthsFile != "") println(monthListLine(monthsPin,listed)) else ();
     let(sy,sm)=at(ms,0);println("root\t${sy}\t${sm}\t${root}");
+    if(free) println("start\tfree\t${List.length(sm0)}\t${root}") else ();
+    if(joinStart != "") {require(root==(if(joinStart=="identity") identityDigest else joinStart),"start junction digest");println("join\tstart\t${root}")} else ();
     let result=List.foldLeft((acc,pair) -> {
         let(st,perm,allMoves,total,nbest)=acc;let(i,edge)=pair;
         let WEdge.E(y,m,declared,sh,eh,moves,wrong,halls)=edge;let goal=at(goals,i+1);let Goal.G(yy,mm,_)=goal;
@@ -220,13 +255,14 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
         let(h,q,r,rq)=metrics;let(th,tq,tr,trq)=total;
         println("edge\t${i+1}\t${y}\t${m}\t${h}\t${q}\t${r}\t${rq}\t${sh}\t${eh}\tPASS${at(flags,i)}${if(mism==Nil) "" else "\tBEST_EFFORT\t${List.length(mism)}\t${cellsText(mism)}"}");
         (next,nextp,List.append(allMoves,moves),(th+h,tq+q,tr+r,trq+rq),if(mism==Nil) nbest else nbest+1)
-    },(source,permIdentity(),Nil,(0,0,0,0),0),List.zipWithIndex(edges));
+    },(st0,p0,Nil,(0,0,0,0),0),List.zipWithIndex(edges));
     let(final,_,allMoves,total,nbest)=result;
     let Goal.G(lastYear,lastMonth,_)=at(goals,count-1);
     let WEdge.E(edgeYear,edgeMonth,_,_,_,_,_,_)=at(edges,count-2);
     require(List.length(goals)==count and List.length(edges)==count-1 and (edgeYear,edgeMonth)==(lastYear,lastMonth) and (monthsFile != "" or (lastYear*12+lastMonth)-(2026*12+5)==count-1),"window end matches the last chain edge");
+    if(joinEnd != "") {let fd=stackSha(wText(final));require(fd==(if(joinEnd=="identity") identityDigest else joinEnd),"end junction digest");println("join\tend\t${fd}")} else ();
     let restored=List.foldLeft((s,mv) -> {let(g,q)=mv;wMove(s,g,wInverse(q))},final,List.reverse(allMoves));
-    require(restored==source,"whole-chain inverse restores all 294 surfaces");
+    require(restored==st0,"whole-chain inverse restores all 294 surfaces");
     let(h,q,r,rq)=total;
     if(v2) println("status\texact\t${count-1-nbest}\tbest_effort\t${nbest}") else ();
     println("summary\t${count}\t${count-1}\t${h}\t${q}\t${r}\t${rq}\t${if(monthsFile=="") endText else "list:${monthText(at(ms,count-1))}"}\tINVERSE_PASS");
@@ -234,11 +270,12 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
 }
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {match Sys.Env.getArgs() {
-        case layout::printing::chain::states::oldRoot::Nil => wVerify(layout,printing,chain,states,oldRoot,"2028-01","","","","","")
-        case layout::printing::chain::states::oldRoot::endText::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,endText,printPin,"","","","")
-        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,"","")
-        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,"")
-        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::rootText::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,rootText)
-        case _ => throw new IllegalArgumentException("LAYOUT PRINT CHAIN STATES_DIRECTORY ORIGINAL_EVIDENCE [WINDOW_END PRINT_SHA256 | months MONTHS_FILE MONTHS_SHA256 PRINT_SHA256 [LAYOUT_SHA256|- [ROOT_MONTH]]]")
+        case layout::printing::chain::states::oldRoot::Nil => wVerify(layout,printing,chain,states,oldRoot,"2028-01","","","","","","","")
+        case layout::printing::chain::states::oldRoot::endText::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,endText,printPin,"","","","","","")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,"","","","")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,"","","")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::rootText::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,rootText,"","")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::rootText::joinStart::joinEnd::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,if(rootText=="-") "" else rootText,if(joinStart=="-") "" else joinStart,if(joinEnd=="-") "" else joinEnd)
+        case _ => throw new IllegalArgumentException("LAYOUT PRINT CHAIN STATES_DIRECTORY ORIGINAL_EVIDENCE [WINDOW_END PRINT_SHA256 | months MONTHS_FILE MONTHS_SHA256 PRINT_SHA256 [LAYOUT_SHA256|- [ROOT_MONTH|- [JOIN_START|- JOIN_END|-]]]]")
     }} catch {case e: Exception => {println("INVALID\t${e.getMessage()}");System.exit(1)}}
 })
