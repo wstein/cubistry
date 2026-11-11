@@ -94,7 +94,7 @@ December edge: 61 HTM, 71 QTM (`library=L5 width=40 lambda=3`, 4 threads, 38 s i
 build; deterministic on rerun). `runs.tsv` lists the runs of every knob tried. Julia `check.jl`,
 Flix and the independent `verify_chain.jl` accept it for `WINDOW_END=2026-12`; Julia and Flix receipts are
 byte-identical. The new December state differs from the stored one off the front, so a later edge must
-be re-solved from it; no other edge was run. Candidate tooling, not a stored witness replacement;
+be re-solved from it (done for Jan to Jun 2027 in the next section). Candidate tooling, not a stored witness replacement;
 independent review is pending.
 
 ```sh
@@ -104,6 +104,75 @@ julia --threads=4 beam_edge.jl OUT evidence/window-2029-12/printing.tsv evidence
 
 `mode=greedy` reproduces the stored 271 HTM edge. `test_beam_edge.jl` bounds the pilot edge at 130 HTM and
 checks the prefix, every front and the digests.
+
+
+## Beam chain: Nov 2026 to Jun 2027
+
+The pilot chain continued by six edges, each re-solved by `beam_edge.jl` from the state the previous beam edge
+ended in (`evidence/beam-chain-2026-06/`: the stored chain up to Nov 2026 byte for byte, the pilot Dec 2026 edge,
+then Jan to Jun 2027; 14 states). The states differ from the stored greedy chain off the front, so no stored
+edge after Dec 2026 applies. Candidate tooling; independent review is pending.
+
+| Edge into | HTM | QTM | rot | block moves (1) | seconds (2) | stored greedy HTM / QTM |
+|---|---|---|---|---|---|---|
+| Dec 2026 (pilot) | 61 | 71 | 1 | 53 | 38 | 271 / 276 |
+| Jan 2027 | 96 | 125 | 1 | 84 | 108 | 440 / 452 |
+| Feb 2027 | 115 | 138 | 2 | 94 | 37 | 384 / 390 |
+| Mar 2027 | 34 | 49 | 0 | 26 | 25 | 60 / 62 |
+| Apr 2027 | 99 | 118 | 2 | 82 | 35 | 347 / 354 |
+| May 2027 | 121 | 148 | 1 | 101 | 37 | 342 / 348 |
+| Jun 2027 | 124 | 149 | 1 | 105 | 53 | 498 / 510 |
+| sum / mean | 650 / 92.9 | 798 / 114.0 | | 545 / 77.9 | | 2342 / 334.6 |
+
+HTM min 34 (Mar), max 124 (Jun); without Mar the mean is 102.7 (61 to 124). The six new edges: mean 98.2 HTM,
+121.2 QTM. The beam chain has 28 percent of the stored greedy HTM. (1) Block moves from the reviewer's
+independent simulator (same-axis runs, adjacent equal-angle layers merged, no middle layer), a proxy for the app's
+count: 0.76 to 0.88 of HTM, 0.84 overall. (2) In-process time of `beam_edge.jl`, 4 threads, including the library
+build; all below the 5-minute limit.
+
+Setting `library=L5 lambda=3`, `width=40`; Jan 2027 uses `width=80` (96 instead of 137 HTM at width 40). `runs.tsv`
+lists every run, including two other chains tried on the way (A: width 40 everywhere, 137 154 24 121 110 87, sum 633;
+B: Jan 96, width 80 for Feb and Mar, width 40 after, 96 124 33 163 127 108, sum 651; committed chain C: sum 589) and
+lambda=2 for Jan (125). The beam is deterministic for fixed inputs, but an edge depends on the state it starts from,
+so the per-edge HTM moves by up to about 60 between chains (Apr 99, 121, 163; Feb 115, 124, 154) and the settings are
+not tuned per edge. Whether the order of magnitude of 95 to 130 HTM per edge holds in a chain: in the committed
+chain 5 of 7 edges are inside it, Dec and Mar are below, none above; in the other two chains 3 of 11 edges (A, and B after Jan) were above
+(137, 154, 163). One chain of seven edges is a small sample, and the Mar edge (34) is unexplained: the stored greedy edge is also small (60).
+
+`beam_edge.jl` change for chaining: if the edge is not in `CHAIN`, `CHAIN` is a candidate chain, every edge of it is
+replayed and the new edge is appended (stored HTM prints as -1). The pass-through of states
+(`STATES` is the state directory of the previous run) is unchanged.
+
+```sh
+# edge Jan 2027 from the pilot chain; each later edge takes the previous OUT as CHAIN (OUT/candidate.moves.tsv) and STATES (OUT)
+julia --threads=4 beam_edge.jl OUT evidence/window-2029-12/printing.tsv evidence/beam-pilot-2026-12/moves.tsv \
+  evidence/beam-pilot-2026-12/states 2027 1 mode=beam library=L5 width=80 lambda=3
+```
+
+Checks of the chain with `WINDOW_END=2027-06`: Julia `check.jl` SAT, Flix receipt byte-identical, `verify_chain.jl`
+ACCEPT_CHAIN, negative cases of `run_checks.sh --mutations` (see the PR text for the numbers), the independent
+simulator state match for all 7 edges, and `test_beam_chain.jl` (bounds per edge, greedy chain must fail).
+
+### What Calendar7 needs to adopt this chain
+
+Nothing in the app or the public data changes in this branch. Facts about the current app (main):
+- `public/calendar7/graph.v1.json` is the strict scheme A graph (2026-05 to 2099-12, 883 edges); `public/calendar7/names/graph.v1.json`
+  is the names layout for the 21-month window May 2026 to Jan 2028 (20 edges, exported from the stored print and
+  `evidence/moves.tsv` by `scripts/export-calendar7-names.mjs`, pinned by digests). Both store per edge `from`, `to`,
+  `metrics [htm, qtm, rot, rotq]` and `moves` as one character per move (generator and exponent, alphabet in `graph.ts`).
+  `month-view.ts` plays the edge word, shows the block-move count (`playedBlocks`/`blockCounts`, with or without the middle
+  slice) as "N moves" and HTM/QTM/rotations under "Technical details". HTM is not shown as the move count.
+- The beam chain uses another print (`evidence/window-2029-12/printing.tsv`, 44 months to Dec 2029, new identity root)
+  and nodes hash different state texts, so it is not a drop-in for the names data (stored print, 21 months).
+Missing: (1) a decision for which window and print the app ships (the names window is Jan 2028 and the print differs);
+(2) a full-chain generator for all 44 months (another author builds it; only Dec 2026 to Jun 2027 exist here);
+(3) the exporter generalized to the window-2029-12 print (the 21-month constant, the digest pins and
+`research-inputs.sha256`) and new data files `state.v1.json`, `displays.v1.json`, `graph.v1.json` for it, or a new
+data folder; the exporter header and the UI notice name the 21-month window; (4) a Flix and Julia confirmation
+of the full chain and the exporter replay check (`verify:calendar7-names`); (5) the owner's choice on the displayed count:
+block moves are about 0.84 of HTM, so the app would show about 80 moves for a 95 HTM edge; (6) reverse playback
+(backward steps use the inverse edge) is unchanged. Because every later edge depends on the state before it, any change
+of an earlier edge forces a re-solve of all later edges.
 
 ## Scope and limits
 
