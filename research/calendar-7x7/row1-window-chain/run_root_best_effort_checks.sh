@@ -30,11 +30,12 @@ run_all() { # dir -> sets JR FR IR (1 = rejected)
 }
 printf 'case\tjulia\tflix\tindependent\n' > "$out/results.tsv"; na=0; nr=0; idx=0
 # GROUP=k/n runs every n-th fixture starting at k (0 <= k < n), so one run stays short; ONLY="name ..." selects by name.
-gk=${GROUP%%/*}; gn=${GROUP##*/}
+GROUP=${GROUP:-0/1}; gk=${GROUP%%/*}; gn=${GROUP##*/}
+[[ $GROUP =~ ^[0-9]+/[0-9]+$ && $gn -ge 1 && $gk -lt $gn ]] || { echo "GROUP must be k/n with 0 <= k < n" >&2; exit 2; }
 while IFS=$'\t' read -r name kind jreason freason ireason; do
     idx=$((idx+1))
     [[ -z "${ONLY:-}" || " $ONLY " == *" $name "* ]] || continue
-    [[ -z "${GROUP:-}" || $((idx % gn)) == "$gk" ]] || continue
+    [[ $((idx % gn)) == "$gk" ]] || continue
     d="$out/cases/$name"; run_all "$d"
     if [[ $kind == accept ]]; then
         [[ $JR == 0 && $FR == 0 && $IR == 0 ]] || { echo "$name rejected (julia=$JR flix=$FR independent=$IR): $(head -c 300 "$d/julia.err") $(head -c 300 "$d/flix.out") $(head -c 300 "$d/ind.err")" >&2; exit 1; }
@@ -47,7 +48,8 @@ while IFS=$'\t' read -r name kind jreason freason ireason; do
     fi
 done < "$out/cases/cases.tsv"
 # shape of the accepted receipts
-if [[ -z "${ONLY:-}" && -z "${GROUP:-}" ]]; then
+[[ $((na+nr)) -ge 1 ]] || { echo "no fixture selected (ONLY=${ONLY:-} GROUP=$GROUP)" >&2; exit 2; }
+if [[ -z "${ONLY:-}" && "$GROUP" == 0/1 ]]; then
     d="$out/cases/root-edge-2037-05"
     grep -q $'^root\t2037\t5\t' "$d/julia.out"; [[ $(grep -c $'\tROOTEDGE$' "$d/julia.out") == 1 && $(grep -c $'\tROOTEDGE$' "$d/ind.out") == 1 && $(grep -c $'\tROOTEDGE$' "$d/flix.out") == 1 ]]
     grep -q $'^verdict\tSAT\tlegal-retained-state-window-chain\t21\t20$' "$d/julia.out"
