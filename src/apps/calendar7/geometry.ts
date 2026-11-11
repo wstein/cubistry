@@ -19,7 +19,7 @@ export const OUTER_LAYER_WIDTH: Readonly<Record<number, number>> = Object.freeze
 /**
  * Local look at another outer layer factor of the 7x7: the URL parameter `outer` (for example `?outer=1.6`, from 1.2 to 2.4) replaces
  * the table value of N = 7 for this page load; without it, and outside a browser, the table is used. The names layout derives
- * the cube edge, the cell grid and the month banner from it (the banner by the three ratios of W = f).
+ * the cube edge and the cell grid from it; the month banner stays at its fixed unit-grid constants.
  */
 const outerOverride = (): number | undefined => {
   try {
