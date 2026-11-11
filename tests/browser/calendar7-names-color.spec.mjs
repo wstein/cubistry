@@ -1,0 +1,82 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Calendar7 names layout: the colors on screen are the scheme tokens. The real viewer renders the front face of the window
+// print head on (WebGL, Chromium); every tile class is sampled and compared with the token it was drawn from. The names
+// layout draws without tone mapping at the exposure that makes the lit front face reproduce its albedo (geometry.ts,
+// NAMES_EXPOSURE), so a token is rendered as itself, with the paper white (NAMES_WHITE) as the reference.
+import { test, expect } from "@playwright/test";
+
+// Tolerance in 8-bit sRGB per channel. Fills are the median of the tile interior (shading and antialiasing do not matter);
+// ink and line are the best matching pixel of the tile (thin strokes never cover whole pixels but the best one is a stroke core).
+const FILL_TOL = 4, STROKE_TOL = 6;
+const SCHEMES = ["paper-red", "paper-blue", "classic", "solarized-light", "gruvbox-light", "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast"];
+
+async function sample(page, scheme) {
+  await page.goto("/licenses.html");
+  return page.evaluate(async (scheme) => {
+    const THREE = await import("/node_modules/three/build/three.module.js");
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { loadCalendarFont } = await import("/src/apps/calendar7/fonts.ts");
+    const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const { schemeById } = await import("/src/apps/calendar7/schemes.ts");
+    const { tileClass, tileRoles } = await import("/src/apps/calendar7/sticker-art.ts");
+    const { printing, pose } = parseState(await (await fetch("/calendar7/names/state.v1.json")).json());
+    const host = document.createElement("div"), panel = document.createElement("div");
+    host.style.cssText = "position:fixed;left:0;top:0;width:800px;height:800px";
+    document.body.append(host, panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    viewer.setFont(await loadCalendarFont("noto", "/"));
+    viewer.setScheme(scheme);
+    viewer.configure(printing, pose, "face", "names");
+    viewer.presentation.rotation.set(0, 0, 0); // head on to the front face
+    viewer.presentation.updateMatrixWorld(true);
+    const cv = viewer.renderer.domElement;
+    viewer.renderer.render(viewer.scene, viewer.camera);
+    const copy = document.createElement("canvas");
+    copy.width = cv.width; copy.height = cv.height;
+    const ctx = copy.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(cv, 0, 0); // in the task of the render: the drawing buffer is not preserved
+    const sch = schemeById(scheme);
+    const rgb = (hex) => [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16));
+    const hex = (p) => "#" + p.map((v) => v.toString(16).padStart(2, "0")).join("");
+    const med = (a) => [...a].sort((x, y) => x - y)[a.length >> 1];
+    const diff = (a, b) => Math.max(...a.map((v, k) => Math.abs(v - b[k])));
+    const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+    const out = [];
+    viewer.presentation.traverse((o) => {
+      const ids = o.userData.sourceFaceStickerIds;
+      if (!ids || !Array.isArray(o.material) || ids[4] == null) return; // +Z: the front face
+      const i = ids[4] - 1, box = new THREE.Box3().setFromObject(o);
+      const at = (x, y) => new THREE.Vector3(x, y, box.max.z).project(viewer.camera);
+      const lo = at(box.min.x, box.min.y), hi = at(box.max.x, box.max.y), mid = at((box.min.x + box.max.x) / 2, (box.min.y + box.max.y) / 2);
+      const W = Math.abs(hi.x - lo.x) * 0.5 * cv.width, H = Math.abs(hi.y - lo.y) * 0.5 * cv.height;
+      const cx = (mid.x * 0.5 + 0.5) * cv.width, cy = (1 - (mid.y * 0.5 + 0.5)) * cv.height;
+      const w = Math.round(W * 0.8), h = Math.round(H * 0.8), x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
+      const d = ctx.getImageData(x0, y0, w, h).data, pix = [];
+      for (let k = 0; k < w * h; k++) pix.push([d[4 * k], d[4 * k + 1], d[4 * k + 2]]);
+      const cls = tileClass(printing.text[i], printing.ink[i]), roles = tileRoles(sch, printing.text[i], printing.ink[i], "names");
+      const fill = [0, 1, 2].map((c) => med(pix.map((p) => p[c])));
+      const best = (px, want) => px.reduce((m, p) => Math.min(m, diff(p, want)), 255);
+      const row = { cls, text: printing.text[i], want: roles.fill, got: hex(fill), fill: diff(fill, rgb(roles.fill)) };
+      if (printing.text[i] !== "" && cls !== "month" && !printing.text[i].includes("/")) { row.inkWant = roles.ink; row.ink = best(pix, rgb(roles.ink)); }
+      if (roles.line) { row.lineWant = roles.line.color; row.line = best(pix.slice(Math.floor(pix.length * 0.6)), rgb(roles.line.color)); }
+      out.push(row);
+    });
+    viewer.destroy();
+    return out;
+  }, scheme);
+}
+
+for (const scheme of SCHEMES) test(`${scheme}: the names layout renders its fills, inks and lines as the scheme tokens (within ${FILL_TOL} / ${STROKE_TOL} of 255)`, async ({ page }) => {
+  test.setTimeout(90000); // software GL: the first frame of a 218-cubie scene is slow
+  const rows = await sample(page, scheme);
+  expect(rows.length).toBeGreaterThan(40); // the 7x7 front face
+  const classes = new Set(rows.map((r) => r.cls));
+  for (const c of ["blank", "day", "weekday", "weekend", "sunsat"]) expect(classes, c).toContain(c);
+  if (process.env.C7_COLOR_TABLE) console.log(scheme + "\n" + JSON.stringify(rows));
+  for (const r of rows) {
+    const id = `${scheme} ${r.cls} "${r.text}"`;
+    expect(r.fill, `${id} fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(FILL_TOL);
+    if (r.ink !== undefined) expect(r.ink, `${id} ink vs ${r.inkWant}`).toBeLessThanOrEqual(STROKE_TOL);
+    if (r.line !== undefined) expect(r.line, `${id} line vs ${r.lineWant}`).toBeLessThanOrEqual(STROKE_TOL);
+  }
+});
