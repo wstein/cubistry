@@ -30,8 +30,12 @@ its 129 snapshots) is not stored; it is to be replaced by a beam chain.
   [corner-coupling check](../../../row1-corner-coupling/README.md): for window end 2037-02 (130 months)
   the corner demand is 24 with band peak 1 in all 130 targets, and 23 > 21. Julia and Flix report
   `UNSAT fixed-print-corner-body-matching unique-always-visible-face`; the receipts are byte-identical.
-  Within that model no permanent print covers May 2026 through February 2037, so 2037-01 is the last
-  window end under it. For 2037-01 the demand is 23 and the lemma does not apply (`UNKNOWN
+  Within that model no permanent print covers the 130 targets May 2026 through February 2037.
+- Corollary by monotonicity of the target set (the lemma is a subset certificate): any window whose
+  targets contain all 130 of these (start January 2026 through May 2026, end 2037-02 or later) also
+  has no permanent print in this model (UNSAT), because a print for it would be a print for the
+  130 targets. The receipts prove only the 130-target case directly; this extension is an argument
+  from containment, not a separate receipt. For 2037-01 the demand is 23 and the lemma does not apply (`UNKNOWN
   lemma-not-applicable`, receipts byte-identical); that says nothing against the print above.
 - The UNSAT status is by the rule of `proof-checkers/AUTHORITY.md` (both native checkers accept) with
   one caveat: the committed Flix sources fix the window length (corner checker 21 months, print
@@ -40,18 +44,19 @@ its 129 snapshots) is not stored; it is to be replaced by a beam chain.
 
 ## UNKNOWN
 
-- Any claim for start months other than May 2026 (January through April 2026 are not covered) and
-  for window ends from 2037-02 through 2050-01 is a Julia-only demand scan with no Flix
-  confirmation: UNKNOWN.
+- Windows that do not contain all 130 targets: starts after May 2026 (any end), and starts January
+  through April 2026 with an end before 2037-02. Any ceiling claimed for them comes from a
+  Julia-only demand scan with no Flix confirmation: UNKNOWN.
 - Legal retained states and a move chain for this print: not covered by this directory.
+- Provenance of `corner-2037-01-flix.tsv`: copied from the reviewer scratch of the frontier work (equal to the copy from the earlier jan2028-upward scratch). The author did not rebuild a 129-month corner jar; an independent reviewer did and reproduced it byte for byte.
 
 ## How the print was generated
 
-`design.jl` (untrusted candidate producer, Z3 5.4.0 via the native library, not committed) with an
-added seeding patch: the print for each end month was seeded from the print of the previous
+`design.jl` (untrusted candidate producer, committed at `../../../row1-window-print/design.jl`; Z3 5.4.0 via
+the native library, not committed) with an added seeding patch: the print for each end month was seeded from the print of the previous
 SAT end (2033-12, 2034-12, 2035-12, 2036-04, 2036-11, then 2037-01), freezing a hash-selected
 fraction of faces (0.8, salt 0 for 2037-01) to the seed artwork class. Z3 output is not evidence;
-only the native checkers above validate the print. The seeding patch is not in the repository.
+only the native checkers above validate the print. Only the seeding patch is not in the repository.
 
 ## Reproduction
 
@@ -71,4 +76,6 @@ and 1029 to 6321 (the three lines that state them); in the corner `Main.flix`, `
 domain,oldRoot,21)` to `...,129)`. Corner checker for 2037-02: the same call with `130`. Build with
 the existing `flix/build.sh` scripts and run the jar with `layout.tsv names-band window EVIDENCE`
 (corner) or `layout.tsv printing.tsv front-matches.tsv EVIDENCE` and `WINDOW_END=2037-01`
-(print); outputs must equal the committed receipts.
+(print). EVIDENCE is `research/calendar-7x7/english/evidence`. `WINDOW_END` has no effect on the Flix
+jars (Flix reads no environment variable; the window length is the patched constant). Outputs must
+equal the committed receipts.
