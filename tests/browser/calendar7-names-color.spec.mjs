@@ -13,7 +13,6 @@ const SCHEMES = ["paper-red", "paper-blue", "classic", "solarized-light", "gruvb
 async function sample(page, scheme) {
   await page.goto("/licenses.html");
   return page.evaluate(async (scheme) => {
-    const THREE = await import("/node_modules/three/build/three.module.js");
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
     const { loadCalendarFont } = await import("/src/apps/calendar7/fonts.ts");
     const { parseState } = await import("/src/apps/calendar7/graph.ts");
@@ -41,12 +40,13 @@ async function sample(page, scheme) {
     const med = (a) => [...a].sort((x, y) => x - y)[a.length >> 1];
     const diff = (a, b) => Math.max(...a.map((v, k) => Math.abs(v - b[k])));
     const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
-    const out = [];
+    const out = [], Vector3 = viewer.camera.position.constructor; // the viewer's own three.js classes (a second import would load a second copy)
     viewer.presentation.traverse((o) => {
       const ids = o.userData.sourceFaceStickerIds;
       if (!ids || !Array.isArray(o.material) || ids[4] == null) return; // +Z: the front face
-      const i = ids[4] - 1, box = new THREE.Box3().setFromObject(o);
-      const at = (x, y) => new THREE.Vector3(x, y, box.max.z).project(viewer.camera);
+      o.geometry.computeBoundingBox();
+      const i = ids[4] - 1, box = o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);
+      const at = (x, y) => new Vector3(x, y, box.max.z).project(viewer.camera);
       const lo = at(box.min.x, box.min.y), hi = at(box.max.x, box.max.y), mid = at((box.min.x + box.max.x) / 2, (box.min.y + box.max.y) / 2);
       const W = Math.abs(hi.x - lo.x) * 0.5 * cv.width, H = Math.abs(hi.y - lo.y) * 0.5 * cv.height;
       const cx = (mid.x * 0.5 + 0.5) * cv.width, cy = (1 - (mid.y * 0.5 + 0.5)) * cv.height;
@@ -58,7 +58,11 @@ async function sample(page, scheme) {
       const best = (px, want) => px.reduce((m, p) => Math.min(m, diff(p, want)), 255);
       const row = { cls, text: printing.text[i], want: roles.fill, got: hex(fill), fill: diff(fill, rgb(roles.fill)) };
       if (printing.text[i] !== "" && cls !== "month" && !printing.text[i].includes("/")) { row.inkWant = roles.ink; row.ink = best(pix, rgb(roles.ink)); }
-      if (roles.line) { row.lineWant = roles.line.color; row.line = best(pix.slice(Math.floor(pix.length * 0.6)), rgb(roles.line.color)); }
+      if (roles.line) { // the line sits just above the bottom edge of the flat part: the lowest 30% of the tile
+        const sh = Math.round(H * 0.3), sd = ctx.getImageData(x0, Math.round(cy + H * 0.5) - sh, w, sh).data, strip = [];
+        for (let k = 0; k < w * sh; k++) strip.push([sd[4 * k], sd[4 * k + 1], sd[4 * k + 2]]);
+        row.lineWant = roles.line.color; row.line = best(strip, rgb(roles.line.color));
+      }
       out.push(row);
     });
     viewer.destroy();
