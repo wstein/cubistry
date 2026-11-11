@@ -7,20 +7,29 @@ evidence purposes unless it says that Flix also accepted it.
 
 ## Headline
 
+The chain root is the identity pose, May 2026 (`row1-window-chain/check.jl`, `verify_chain.jl` and both Flix
+checkers pin it). Only months from the root on can be chain members. Months before the root front-match but are
+reported as `before_root`.
+
 ```
-gapless: 2026-03 .. 2037-01 (131 months)      print printing-S2.tsv, 286 valid months
-gaps:    2026-02, 2037-02, 2043-02            (3 months of 289; 2026-01 is valid but isolated)
+gapless: 2026-05 .. 2037-01 (129 months)     both prints
+2037-01 print (282 front-matching months): chain gaps 2037-02, 2037-04, 2043-02, 2043-04, 2048-04  (280 chain members)
+S2 print      (286 front-matching months): chain gaps 2037-02, 2043-02                              (283 chain members)
+before the root: 2026-01 and 2026-03 front-match on both prints, 2026-04 only on S2, 2026-02 on neither
 ```
 
-Fallback with the committed 2037-01 print unchanged (`../window-2037-01/printing.tsv`): `gapless: 2026-05 ..
-2037-01 (129 months)`, 282 valid months, 7 gaps (the three Februaries and 2026-04, 2037-04, 2043-04, 2048-04).
-The files `coverage-S2.tsv` and `coverage-S1.tsv` list every maximal run and every gap with its status.
+The gain of the S2 print is the three Aprils 2037-04, 2043-04, 2048-04 (plus 2026-04 before the root). The owner's
+wish "chain from January 2026" conflicts with the root rule: a chain that starts before May 2026 needs a new root
+(a print whose identity shows the earliest month) or a chain format with a non-identity start. That is an owner
+decision and is not decided here. `coverage-S2.tsv` and `coverage-S1.tsv` list every maximal run, every gap and
+every before-root month with its status.
 
 ## Definition
 
 A target set S is a set of calendar months (not an interval). The root month (front of the print, identity
-state) is the first month of the list; here it stays May 2026. In the skip semantics the state chain
-connects consecutive valid months directly; calendar months in between do not need to be targets.
+state) is May 2026. The month files (`months-S1.txt`, `months-S2.txt`) are sets; their line order is the target
+order of the print files (root first, then calendar order), which the print checker needs. In the skip semantics
+the state chain connects consecutive valid months directly; calendar months in between do not need to be targets.
 
 Month m can be added to S when both hold:
 
@@ -29,10 +38,12 @@ Month m can be added to S when both hold:
    artwork). Months are independent of each other once the print is fixed, so for a given print there is no
    order effect: the addable months are exactly the front-matchable months.
 2. Corner lemma (necessary condition, cheap): the corner demand of the target set is the sum over corner artwork
-   classes of the per-class peak (maximum copies at the four corner cells in one month). The corner-body
-   obstruction (`row1-corner-coupling/lemma.jl`) says UNSAT when the demand equals 24 and a class with peak 1
-   is present in every target (the band class). The demand depends on the set: it is monotone in S, so a lemma
-   UNSAT for S ∪ {m} also holds for every superset of it.
+   classes of the per-class peak (maximum copies at the four corner cells in one month). As coded
+   (`row1-corner-coupling/lemma.jl`) the lemma says UNSAT only when the demand equals exactly 24 and a class with
+   peak 1 is present in every target (the band class). Demand 25 or more is not covered by the lemma as coded.
+   The demand is monotone in S. The conclusion "no print for any superset" carries over because front matching
+   is a per-month conjunction: a print for a superset is a print for every subset, so a lemma UNSAT for
+   S ∪ {m} rules out every target set that contains S ∪ {m}.
 
 `months.jl` generalizes both Julia checkers: `WINDOW_MONTHS=YYYY-MM,...` replaces the hard-coded
 May-2026-to-`WINDOW_END` interval (`coupled_goals` is redefined). For the contiguous lists the receipts are
@@ -55,8 +66,8 @@ set. Under that requirement the three Februaries are the only months that the le
 that drops base months to admit a February is a different question; the single-drop test above does not rescue
 any February, larger drops are UNKNOWN.
 
-Valid months per year (S2): 2026=11, 2027..2036=12 each, 2037=11, 2038..2042=12 each, 2043=11, 2044..2049=12 each,
-2050=1 (January).
+Chain members per year (S2, from May 2026): 2026=8, 2027..2036=12 each, 2037=11, 2038..2042=12 each, 2043=11,
+2044..2049=12 each, 2050=1 (January). With the 2037-01 print: 2037=10, 2043=10, 2048=11, otherwise equal.
 
 ## Print freeze and chain validity
 
@@ -109,15 +120,32 @@ works directly).
 ```sh
 W=row1-window-chain/evidence/window-skip
 julia --startup-file=no $W/test_skip.jl            # 4 test sets, 20 tests, about 20 to 40 s
-julia --startup-file=no $W/test_coverage.jl        # 1 test set, 10 tests
-$W/run_mutants.sh "$(command -v julia)"            # 8 mutants, expect KILLED for all
+julia --startup-file=no $W/test_coverage.jl        # 1 test set, 14 tests
+julia --startup-file=no $W/test_pins.jl            # 2 test sets, 17 tests: SHA-256 pins and receipt replay, about 35 s
+julia --startup-file=no $W/test_tools.jl           # 3 test sets, 6 tests: scan_fixed, drop_one, compat, about 35 s
+$W/run_mutants.sh "$(command -v julia)"            # 13 mutants, expect KILLED for all
 WINDOW_MONTHS=$(paste -sd, $W/months-S2.txt) julia --startup-file=no $W/skip_check.jl print \
   row1-revision/layout.tsv $W/printing-S2.tsv $W/front-matches-S2.tsv | cmp - $W/print-S2-julia.tsv
 WINDOW_MONTHS=$(paste -sd, $W/months-S2.txt) julia --startup-file=no $W/skip_check.jl lemma \
   row1-revision/layout.tsv | cmp - $W/corner-S2-julia.tsv
 julia --startup-file=no $W/coverage.jl $W/months-S2.txt $W/status-S2.tsv | cmp - $W/coverage-S2.tsv
-BASE_MONTHS=<129 months> julia --startup-file=no $W/scan_fixed.jl row1-revision/layout.tsv \
-  row1-window-chain/evidence/window-2037-01/printing.tsv 2037-02 2050-01
+B=$(julia --startup-file=no -e 'print(join([string(2026+(m-1)÷12,"-",lpad((m-1)%12+1,2,"0")) for m in 5:133],","))')
+# scan-fixed-P1.tsv (the header plus the 2026-01..04 and 2037-02..2050-01 rows, in two calls):
+{ BASE_MONTHS=$B julia --startup-file=no $W/scan_fixed.jl row1-revision/layout.tsv \
+    row1-window-chain/evidence/window-2037-01/printing.tsv 2026-01 2026-04
+  BASE_MONTHS=$B julia --startup-file=no $W/scan_fixed.jl row1-revision/layout.tsv \
+    row1-window-chain/evidence/window-2037-01/printing.tsv 2037-02 2050-01 | tail -n +2; } | cmp - $W/scan-fixed-P1.tsv
+# scan-fixed-P2.tsv: the same two calls with BASE_MONTHS=$(paste -sd, $W/months-S2.txt) and $W/printing-S2.tsv
+# drop-one-februaries.tsv:
+julia --startup-file=no $W/drop_one.jl row1-revision/layout.tsv 2026-02,2026-04,2037-02,2037-04,2043-02,2043-04,2048-04 \
+  | grep -E "^S_valid|\(20[0-9]+, 2\)" | cut -c1-200 | cmp - $W/drop-one-februaries.tsv
+# compat-S2.txt:
+WINDOW_MONTHS=$B julia --startup-file=no $W/compat.jl row1-revision/layout.tsv \
+  row1-window-chain/evidence/window-2037-01/printing.tsv row1-window-chain/evidence/window-2037-01/front-matches.tsv \
+  $W/printing-S2.tsv | cmp - $W/compat-S2.txt
+# February receipts (target 1 is the February, a set check: the lemma does not depend on the order; the receipts
+# were produced with the February first, the print files use the root first):
+WINDOW_MONTHS="2043-02,$B" julia --startup-file=no $W/skip_check.jl lemma row1-revision/layout.tsv | cmp - $W/corner-2043-02-julia.tsv
 ```
 
 Redesign (untrusted, Z3 5.4.0 native library not committed), for `H-four-0.6-2`:
