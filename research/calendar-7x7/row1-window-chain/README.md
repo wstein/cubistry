@@ -253,11 +253,11 @@ Today the app takes the chain as contiguous: node k is month `first + k`, a mont
 checkers require chronological adjacency of consecutive edges.
 
 1. Sidecar month records (recommended). The chain stays contiguous and unchanged. `months.tsv` has one row per month of
-   the requested range: `month status reason edge method evidence`; status is one of `valid`, `unavailable_nomatch`,
+   the requested range: `month status reason edge method evidence`; status is one of `valid`, `best_effort`, `unavailable_nomatch`,
    `unavailable_unsat`, `unknown`. `valid` means the chain has an edge into the month (or it is the root); `method` is the solver
-   of that edge. An `unavailable_*` status needs a certificate confirmed by Julia and Flix (a claims file row with `confirmed=both`);
+   of that edge. An `unavailable_*` or `best_effort` status needs a certificate confirmed by Julia and Flix (a claims file row with `confirmed=both`);
    a claim confirmed by one checker is written as `unknown` with reason `claimed_<status>_<confirmed>`. Months the run did not reach
-   say `deadline`, `search_stalled` or `max_edges`; months outside the window say `before_chain_root` or `after_print_window`. The UI
+   say `deadline`, `search_stalled` or `max_edges`; months outside the chain say `before_chain_root`, `skipped_gap` or `after_month_list`. The UI
    reads the file next to the graph: a month with status other than `valid` shows the reason instead of a cube. No checker or app
    change. `months.tsv` is not verified by any checker: the checkers prove the chain only, a `valid` record is the producer's
    reading of the chain and an `unavailable_*` record points to its evidence.
