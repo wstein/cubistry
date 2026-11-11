@@ -1,0 +1,11 @@
+English 7x7 calendar cube, names layout for any date (research candidate, not certified, print B not frozen)
+Print B (research printing-S2.tsv) and the front matching of each of the 91 month-board configurations. Display only: no move sequence.
+90 configurations have a state, 1 have none (see configs.v1.json). English only.
+Created by Werner Stein with AI assistance (Codex and Claude, OpenAI and Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+Source: research/calendar-7x7/row1-revision and row1-window-chain/evidence/window-skip on research/cal7-skip-capacity
+(research commit b9e66f4dbdec7a721d13c7b522430f3482d40e39). Regenerate with scripts/export-calendar7-names-anydate.mjs.
+The files are a work separate from the Cubistry program code (AGPL-3.0-or-later). The shipped files in
+public/calendar7/ and public/calendar7/names/ are not changed by this folder.

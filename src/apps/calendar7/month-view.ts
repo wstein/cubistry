@@ -157,7 +157,7 @@ export function sheetCells(graph: Graph, table: DisplayTable, range: ChainRange,
   return table.displays[graph.nodes[k].display - 1].cells;
 }
 
-const esc = (s: string): string =>
+export const esc = (s: string): string =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
 
 /** The 7x7 sheet as an HTML table; the ink of a cell is a CSS class `c7-ink-<ink>`. */
@@ -179,6 +179,8 @@ export interface PageModel {
   readonly today: YearMonth;
   /** The front layout of the data the page was built from; absent means standard. */
   readonly layout?: Layout;
+  /** Present when the month is shown from print B without a move sequence (names layout for any date; see anydate-view.ts). */
+  readonly anyDate?: { readonly kind: "state" | "none" | "pending"; readonly key: string; readonly reason?: string };
   /** Present for an "ok" choice. */
   readonly cells?: readonly Cell[];
   readonly prev: Step | null;
