@@ -59,17 +59,19 @@ async function physical(page, letter, value) {
     })),
   );
 }
-test("all nine HSM variants wrap both ways within six moves and render fixed glyphs", async ({
-  page,
-}) => {
-  await choose(page);
-  for (const letter of ["H", "S", "M"]) {
-    await page.selectOption("#hsm-letter", letter);
-    await settled(page, 0);
-    await expect(page.locator("#status")).toContainText(`${letter} · 00`);
-    await expect(page.locator("#rotation-speed")).toHaveValue("3");
-    await expect(page.locator("#error")).toBeEmpty();
-    for (const maximum of [59, 23, 11]) {
+// One test per variant: the nine variants in a single test needed 22 to 30 s in software GL (the per-test limit
+// of the CI fast group is 30 s), so it timed out on loaded runners. The same nine variants now run separately.
+for (const letter of ["H", "S", "M"])
+  for (const maximum of [59, 23, 11])
+    test(`HSM ${letter} with maximum ${maximum} wraps both ways within six moves and renders fixed glyphs`, async ({
+      page,
+    }) => {
+      await choose(page);
+      await page.selectOption("#hsm-letter", letter);
+      await settled(page, 0);
+      await expect(page.locator("#status")).toContainText(`${letter} · 00`);
+      await expect(page.locator("#rotation-speed")).toHaveValue("3");
+      await expect(page.locator("#error")).toBeEmpty();
       await page.selectOption("#hsm-range", String(maximum));
       await page.fill("#hsm-value", String(maximum));
       await page.locator("#hsm-set-form").evaluate((f) => f.requestSubmit());
@@ -88,12 +90,10 @@ test("all nine HSM variants wrap both ways within six moves and render fixed gly
       await page.locator('[data-hsm-delta="-1"]').click();
       await settled(page, maximum);
       await physical(page, letter, maximum);
-    }
-    await page.locator("#hsm-reset").click();
-    await settled(page, 0);
-    await expect(page.locator("#status")).toContainText(`${letter} · 00`);
-  }
-});
+      await page.locator("#hsm-reset").click();
+      await settled(page, 0);
+      await expect(page.locator("#status")).toContainText(`${letter} · 00`);
+    });
 test("HSM run stop resume, validation, mobile and existing application state remain intact", async ({
   page,
 }) => {
