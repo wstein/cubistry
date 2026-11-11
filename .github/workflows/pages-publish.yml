@@ -172,6 +172,7 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           path: combined-site
+          include-hidden-files: true
       - if: steps.prepare.outputs.publish == 'true'
         run: node code/scripts/pages/publish.mjs deploy
         env:
@@ -217,6 +218,7 @@ jobs:
         with:
           name: github-pages-previews
           path: combined-site
+          include-hidden-files: true
       - if: steps.prepare.outputs.publish == 'true'
         run: node code/scripts/pages/publish.mjs deploy
         env:
