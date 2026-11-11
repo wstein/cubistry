@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Calendar7 names layout, option 4 (owner decision of 2026-11-11): one glyph size per font, uniform extra tracking per tile,
 // every seam between two name tiles in the middle of the gap between their letters. Real glyph metrics of all 14 shipped
-// fonts (tests/calendar7-font-metrics.mjs), no mock font.
+// fonts (tests/calendar7-font-metrics.mjs), no mock font. Unit grid (owner decision of 2026-11-11): every name tile has one
+// unit of content (the first tile sits on the corner cubie of column 1 with a white band on its left), the names sit in
+// the red banner of the month row (tests/calendar7-unit-grid.test.mjs).
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { NAME_WORDS } from "../src/apps/calendar7/layout.ts";
-import { faceTransform, namePxPerUnit, tileCanvasSize } from "../src/apps/calendar7/sticker-art.ts";
+import { faceTransform, namePxPerUnit, tileGrid } from "../src/apps/calendar7/sticker-art.ts";
 import { labelLayout, nameFaceTable, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
-import { outerLayerWidth, CALENDAR7_SIZE } from "../src/apps/calendar7/geometry.ts";
+import { outerLayerWidth, CALENDAR7_SIZE, monthBanner } from "../src/apps/calendar7/geometry.ts";
 import { FONT_METRICS } from "./calendar7-font-metrics.mjs";
 
 const PPU = namePxPerUnit();
@@ -16,17 +18,23 @@ const MONTHS = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", 
 const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const IDS = Object.keys(FONT_METRICS);
 const MIN_GAP = 2;
-const widthOf = (word, k) => (k === 0 ? F : 1);
-const edge = (w) => { const [W, H] = tileCanvasSize({ w, h: 1 }), t = faceTransform({ w, h: 1 }); return { x: W / 2 / t.kx, y: H / 2 / t.ky }; };
+// The tiles of the month row on the unit grid: the first one is the corner cubie of column 1 (band on the left and on top),
+// the others are ring cubies (band on top); every tile has one unit of content.
+const BAND = F - 1;
+const tileOf = (k) => (k === 0 ? { w: F, h: F, band: { l: BAND, r: 0, t: BAND, b: 0 } } : { w: 1, h: F, band: { l: 0, r: 0, t: BAND, b: 0 } });
+/** Room of a tile in drawing px from the center of its unit cell: texture edge, or the edge of the red banner on a side with a band; up/down: the red banner. */
+const edge = (k) => {
+  const g = tileGrid(tileOf(k)), kx = faceTransform(tileOf(k)).kx, b = monthBanner();
+  return { left: k === 0 ? PPU / 2 : g.cx / kx, right: (g.W - g.cx) / kx, top: b.top * PPU, bottom: -b.bottom * PPU };
+};
 
-/** Absolute x (drawing px, the first seam at 0) of every letter box of a month, per tile, plus the seam positions. */
+/** Absolute x (drawing px, the first seam at 0) of every letter box of a month, per tile, plus the seam positions: every tile is one unit wide. */
 function month(font, word) {
-  const seams = [0];
-  for (let k = 1; k < word.length - 1; k++) seams.push(seams[k - 1] + widthOf(word, k) * PPU);
+  const seams = word.slice(1).map((_, k) => k * PPU);
   const tiles = word.map((label, k) => {
-    const w = widthOf(word, k), center = k === 0 ? -w * PPU / 2 : seams[k - 1] + w * PPU / 2;
-    const boxes = nameLabelLayout(label, font, "face", w).map((l) => ({ ...l, x0: center + l.box.x0 - 96, x1: center + l.box.x1 - 96 }));
-    return { label, w, center, boxes, lo: k === 0 ? -w * PPU : seams[k - 1], hi: k === 0 ? 0 : k === word.length - 1 ? seams[k - 1] + w * PPU : seams[k] };
+    const center = (k - 0.5) * PPU;
+    const boxes = nameLabelLayout(label, font, "face").map((l) => ({ ...l, x0: center + l.box.x0 - 96, x1: center + l.box.x1 - 96 }));
+    return { label, center, boxes, lo: center - PPU / 2, hi: center + PPU / 2 };
   });
   return { tiles, seams };
 }
@@ -58,19 +66,19 @@ test("name layout: the seam gap is one value per font (equal over all months and
   assert.ok(noto > 9.5 && noto < 12.5, `Noto seam gap ${noto} is about 11 px`);
 });
 
-test("name layout: nothing is clipped at the texture edge (bevel reach allowed, 1.5 px margin), horizontally and vertically", () => {
+test("name layout: nothing is clipped at the texture edge or at the edge of the red banner (bevel reach allowed, 1.5 px margin), horizontally and vertically", () => {
   for (const id of IDS) for (const word of NAME_WORDS) for (const [k, label] of word.entries()) {
-    const w = widthOf(word, k), e = edge(w);
-    for (const l of nameLabelLayout(label, FONT_METRICS[id], "face", w)) {
-      assert.ok(l.box.x0 >= 96 - e.x + 1.5 - 1e-9 && l.box.x1 <= 96 + e.x - 1.5 + 1e-9, `${id} ${label} ${l.text}: x ${l.box.x0}..${l.box.x1} vs edge ${96 - e.x}..${96 + e.x}`);
-      assert.ok(l.box.y0 >= 96 - e.y && l.box.y1 <= 96 + e.y, `${id} ${label} ${l.text}: y`);
+    const e = edge(k);
+    for (const l of nameLabelLayout(label, FONT_METRICS[id], "face")) {
+      assert.ok(l.box.x0 >= 96 - e.left + 1.5 - 1e-9 && l.box.x1 <= 96 + e.right - 1.5 + 1e-9, `${id} ${label} ${l.text}: x ${l.box.x0}..${l.box.x1} vs edge ${96 - e.left}..${96 + e.right}`);
+      assert.ok(l.box.y0 >= 96 - e.top + 1.5 - 1e-9 && l.box.y1 <= 96 + e.bottom - 1.5 + 1e-9, `${id} ${label} ${l.text}: y ${l.box.y0}..${l.box.y1} vs banner ${96 - e.top}..${96 + e.bottom}`);
     }
   }
 });
 
 test("name layout: one glyph size per font for every name tile", () => {
   for (const id of IDS) {
-    const sizes = new Set(NAME_WORDS.flat().flatMap((label) => nameLabelLayout(label, FONT_METRICS[id], "face", label === "J" ? F : 1).map((l) => l.size)));
+    const sizes = new Set(NAME_WORDS.flat().flatMap((label) => nameLabelLayout(label, FONT_METRICS[id], "face").map((l) => l.size)));
     assert.equal(sizes.size, 1, id);
     assert.equal([...sizes][0], nameFaceTable(FONT_METRICS[id]).size, id);
   }
@@ -89,7 +97,7 @@ test("name layout: the month letters are at least as large as the weekday letter
 
 test("name layout: every ink gap inside a tile is at least 2 px", () => {
   for (const id of IDS) for (const word of NAME_WORDS) for (const [k, label] of word.entries()) {
-    const boxes = nameLabelLayout(label, FONT_METRICS[id], "face", widthOf(word, k)).map((l) => l.box);
+    const boxes = nameLabelLayout(label, FONT_METRICS[id], "face").map((l) => l.box);
     for (let i = 1; i < boxes.length; i++) assert.ok(boxes[i].x0 - boxes[i - 1].x1 >= MIN_GAP - 1e-9, `${id} ${label} ${i}: ${boxes[i].x0 - boxes[i - 1].x1}`);
   }
 });
@@ -99,23 +107,25 @@ test("name layout: the tile gaps follow the tracking (a middle tile fills its cu
     const t = nameFaceTable(FONT_METRICS[id]);
     if (t.blocked.length) continue;
     for (const label of ["ANU", "BRU", "TEM", "TOB", "EMB"]) {
-      const b = nameLabelLayout(label, FONT_METRICS[id], "face", 1).map((l) => l.box);
+      const b = nameLabelLayout(label, FONT_METRICS[id], "face").map((l) => l.box);
       assert.ok(Math.abs((b.at(-1).x1 - b[0].x0) - (PPU - t.seamGap)) < 0.05, `${id} ${label}`);
     }
   }
 });
 
 // Per-font result of the solver (size, seam gap, tracking range over the tiles, in drawing px at the font's size), measured
-// 2026-11-11; a change of the metrics, the geometry or the rule has to change this table on purpose.
+// 2026-11-11 on the unit grid (the first tile has one unit of content, not 1.8: the 3-letter first tiles NOV and AUG are the
+// tightest tiles of nunito-sans, quicksand and comfortaa); a change of the metrics, the geometry or the rule has to change
+// this table on purpose.
 const PINNED = {
   "noto": { size: 96, seamGap: 10.94, tracking: [-8.48, 4.59] },
   "nunito": { size: 95, seamGap: 10.74, tracking: [-5.05, 3.64] },
-  "nunito-sans": { size: 95, seamGap: 10.74, tracking: [-6.02, 3.64] },
-  "quicksand": { size: 98.5, seamGap: 10.44, tracking: [-2.7, 2.37] },
+  "nunito-sans": { size: 95, seamGap: 10.74, tracking: [-8.04, 3.64] },
+  "quicksand": { size: 98.5, seamGap: 10.44, tracking: [-4.39, 2.37] },
   "nova-oval": { size: 91.5, seamGap: 11.99, tracking: [-11.23, 11.53] },
   "nova-square": { size: 95.5, seamGap: 16.33, tracking: [-10.92, 6.81] },
   "nova-mono": { size: 120, seamGap: 11.04, tracking: [-1.95, 3.69] },
-  "comfortaa": { size: 86.5, seamGap: 11.5, tracking: [-3.34, 8.99] },
+  "comfortaa": { size: 86.5, seamGap: 11.5, tracking: [-7.28, 8.99] },
   "varela-round": { size: 90.25, seamGap: 11.91, tracking: [-3.04, 5.58] },
   "crete-round": { size: 91.25, seamGap: 8.03, tracking: [-1.35, 13.42] },
   "dseg14classic-bold": { size: 83.5, seamGap: 15.86, tracking: [-1.14, 0.82] },
@@ -140,21 +150,22 @@ test("name layout: pairs below the 2 px floor by nature are raised to it (Noto: 
   for (const [label, pair] of [["ARY", 1], ["ULY", 1]]) assert.ok(Math.abs(noto.tiles.get(label).gaps[pair] - 2) < 1e-9, `${label} gap is 2 px`);
 });
 
-test("name layout: an outer tile takes the mean tracking of the middle tiles, less only where it would leave the texture (4 tiles, all 14 fonts)", () => {
+test("name layout: an outer tile takes the mean tracking of the middle tiles, less only where it would leave the texture or the red banner (18 tiles, all 14 fonts)", () => {
   const limited = [];
   for (const id of IDS) {
     const tiles = [...nameFaceTable(FONT_METRICS[id]).tiles.values()];
     const middle = tiles.filter((t) => t.anchor === 0), mean = middle.reduce((s, t) => s + t.tracking, 0) / middle.length;
     for (const t of tiles.filter((x) => x.anchor !== 0 && x.label.length > 1)) { // a single letter has no gap to track
-      // the first tile (anchor 1) is the wide outer one; its far edge is the left texture edge, the last tile's the right one
-      const w = t.anchor === 1 ? F : 1, e = edge(w), boxes = nameLabelLayout(t.label, FONT_METRICS[id], "face", w).map((l) => l.box);
-      const reach = t.anchor === 1 ? boxes[0].x0 - (96 - e.x + 1.5) : 96 + e.x - 1.5 - boxes.at(-1).x1;
+      // the first tile (anchor 1) is the corner cubie of column 1; its far edge is the edge of the red banner (the band is white), the last tile's the right texture edge
+      const e = edge(t.anchor === 1 ? 0 : 2), boxes = nameLabelLayout(t.label, FONT_METRICS[id], "face").map((l) => l.box);
+      const reach = t.anchor === 1 ? boxes[0].x0 - (96 - e.left + 1.5) : 96 + e.right - 1.5 - boxes.at(-1).x1;
       assert.ok(t.tracking <= mean + 1e-9, `${id} ${t.label}: tracking ${t.tracking} above the mean ${mean}`);
       if (t.tracking < mean - 1e-6) { limited.push(`${id} ${t.label}`); assert.ok(Math.abs(reach) < 1e-3, `${id} ${t.label}: limited tile touches the edge margin (reach ${reach})`); }
       else assert.ok(Math.abs(t.tracking - mean) < 1e-9 && reach >= -1e-9, `${id} ${t.label}: tracking ${t.tracking} equals the mean ${mean}`);
     }
   }
-  assert.deepEqual(limited.sort(), ["comfortaa UNE", "nova-mono UNE", "nova-mono UST", "nunito-sans ARY"]);
+  // On the unit grid the 3-letter first tiles AUG and NOV (wide capitals in one unit of content) are limited in most fonts; before, the first tile was 1.8 wide.
+  assert.deepEqual(limited.sort(), ["comfortaa AUG", "comfortaa NOV", "comfortaa UNE", "crete-round AUG", "crete-round NOV", "noto AUG", "noto NOV", "nova-mono NOV", "nova-mono UNE", "nova-mono UST", "nunito AUG", "nunito NOV", "nunito-sans ARY", "nunito-sans AUG", "nunito-sans NOV", "quicksand AUG", "quicksand NOV", "varela-round NOV"]);
 });
 
 // Synthetic fonts: the real font with scaled glyph metrics (w: widths, h: heights), so the branches the 14 shipped fonts never take run.
@@ -163,15 +174,15 @@ const synth = (w, h) => ({ ...FONT_METRICS.noto, glyphs: Object.fromEntries(Obje
 test("name layout: a font whose tiles do not fit at the weekday size gets a smaller size and names the blocking tiles", () => {
   const t = nameFaceTable(synth(1.3, 1));
   assert.ok(t.size < t.weekday, `size ${t.size} below weekday ${t.weekday}`);
-  assert.deepEqual(t.blocked.map((b) => b.label), ["ANU", "ARY"]);
+  assert.deepEqual(t.blocked.map((b) => b.label), ["ANU", "ARY", "AUG", "NOV"]);
   assert.deepEqual(t.blocked.find((b) => b.label === "ARY").months, ["JANUARY", "FEBRUARY"]);
 });
 
-test("name layout: the glyphs fit the texture height (a tall font gets a smaller size)", () => {
-  const font = synth(1, 3), t = nameFaceTable(font), tall = Math.max(...Object.values(font.glyphs).map((g) => g.bottom - g.top));
+test("name layout: the glyphs fit the height of the red banner (a tall font gets a smaller size)", () => {
+  const font = synth(1, 3), t = nameFaceTable(font), tall = Math.max(...Object.values(font.glyphs).map((g) => g.bottom - g.top)), banner = monthBanner().height * PPU;
   assert.ok(t.size < 96 && t.blocked.length === 0, `size ${t.size}`);
-  for (const w of [F, 1]) assert.ok(tall * t.size <= 2 * edge(w).y + 1e-9, `width ${w}: glyph height ${tall * t.size} within ${2 * edge(w).y}`);
-  assert.ok(tall * 96 > 2 * edge(1).y, "the size of the shipped Noto would clip");
+  assert.ok(tall * t.size + 3 <= banner + 1e-9, `glyph height ${tall * t.size} plus the two 1.5 px margins within the banner ${banner}`);
+  assert.ok(tall * 96 + 3 > banner, "the size of the shipped Noto would clip");
 });
 
 test("name layout: the month size is never below the weekday size when the weekday size fits", () => {

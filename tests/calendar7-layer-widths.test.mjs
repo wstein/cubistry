@@ -138,8 +138,9 @@ test("texture sizes: 192 px per unit of width, a (192 w) x (192 h) canvas per ti
 });
 
 test("a 1 x 1 tile draws what the no-tile drawing draws; the standard layout and the sheet ignore the tile", () => {
-  const strip = (r) => JSON.stringify(r, (k, v) => (typeof v === "number" ? Math.round(v) : v)); // whole pixels: the flat share of the real 1 x 1 face (0.9112) differs from the old constant FACE_FLAT (0.9106) by 0.08 px
-  for (const [text, ink] of [["28", "red"], ["MON", "weekday"], ["EMB", "month"], ["", "blank"]]) {
+  // The no-tile drawing paints the ground a second time over the scaled sticker square (same color); a tile of the names layout does not: those repaints are not compared.
+  const strip = (r) => JSON.stringify({ ...r, rects: r.rects.filter((x, i) => i === 0 || x.fill !== r.rects[0].fill) }, (k, v) => (typeof v === "number" ? Math.round(v) : v)); // whole pixels: the flat share of the real 1 x 1 face (0.9112) differs from the old constant FACE_FLAT (0.9106) by 0.08 px
+  for (const [text, ink] of [["28", "red"], ["MON", "weekday"], ["", "blank"]]) { // not a month tile: its banner (strips, name in the upper part) is tests/calendar7-unit-grid.test.mjs
     assert.equal(strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "names", TILES.inner))), strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "names"))));
     assert.equal(strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "standard", TILES.corner))), strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "standard"))));
     assert.equal(strip(track((c) => drawFontSticker(c, text, ink, font, PAPER_RED, "sticker", undefined, "names", TILES.corner))), strip(track((c) => drawFontSticker(c, text, ink, font, PAPER_RED, "sticker", undefined, "names"))));
@@ -168,19 +169,19 @@ test("the weekday line spans the full width of every tile, 1.5 times as thick, a
   assert.deepEqual(lineRect(line, "names", true), { x: 0, y: 192 * (1 + 0.9106) / 2 - 12 * 1.5, w: 192, h: 18 });
 });
 
-/** On the one slot grid: letters of a word over its tiles placed in a row (column 1 is a corner of width f, the others width 1). */
+/** On the one slot grid: letters of a word over its tiles placed in a row (column 1 is a corner of width f with a band on the left, the others width 1). */
 function letterCenters(word, draw) {
   const widths = word.map((_, k) => (k === 0 ? F : 1));
   const centers = [];
   let at = 0; // the left edge of the tile in units
   word.forEach((tile, k) => {
-    const w = widths[k], [W] = tileCanvasSize({ w, h: F }), ppx = facePixelsPerUnit(w, W);
-    for (const x of draw(tile, { w, h: F })) centers.push(at + w / 2 + (x - W / 2) / ppx);
+    const w = widths[k], t = { w, h: F, band: { l: k === 0 ? F - 1 : 0, r: 0, t: F - 1, b: 0 } }, [W] = tileCanvasSize(t), ppx = facePixelsPerUnit(w, W);
+    for (const x of draw(tile, t)) centers.push(at + w / 2 + (x - W / 2) / ppx);
     at += w;
   });
   return centers;
 }
-test("names letters keep the uniform 1/3-unit pitch over a word whose first tile is a corner of width 1.8 (right-flush against its right edge), also across the tile boundaries", () => {
+test("names letters keep the uniform 1/3-unit pitch over a word whose first tile is a corner of width 1.8 (its unit cell on the right, right-flush against its right edge), also across the tile boundaries", () => {
   for (const word of NAME_WORDS) {
     if (word.length < 2) continue;
     for (const draw of [
@@ -191,20 +192,9 @@ test("names letters keep the uniform 1/3-unit pitch over a word whose first tile
     }
   }
   // The same on the unit pitch: the corner tile "MA" of MARCH ends 1/6 before the shared edge, "RCH" starts 1/6 after it.
-  const [ma, rch] = [nameLetterX("MA", 1, true, F), nameLetterX("RCH", 0, true, 1)];
-  assert.ok(ma > nameLetterX("MA", 1, true, 1), "shifted right by (f - 1) / 2");
-  near((ma - 96) / (NAMES_FACE_PX_PER_UNIT / FACE_SCALE) - nameSlotOffset("MA", 1), 0.4, 1e-9);
+  const [ma, rch] = [nameLetterX("MA", 1, true), nameLetterX("RCH", 0, true)];
+  near((ma - 96) / (NAMES_FACE_PX_PER_UNIT / FACE_SCALE), nameSlotOffset("MA", 1), 1e-9); // in the frame of the unit cell: no shift for the thick tile (the band is beside the cell)
   assert.ok(rch < 96);
-});
-
-test("letters sit vertically at the center of the taller month tile (same offset from the middle as in an inner tile)", () => {
-  for (const tile of [TILES.ring, TILES.corner]) {
-    const drawn = track((c) => drawFace(c, "ANU", "month", "strict", PAPER_RED, "names", tile)).texts;
-    const inner = track((c) => drawFace(c, "ANU", "month", "strict", PAPER_RED, "names", TILES.inner)).texts;
-    const [, H] = tileCanvasSize(tile);
-    for (const t of drawn) near(t.y - H / 2, inner[0].y - 96, 0.5, "offset from the vertical middle");
-    for (const t of drawn) assert.ok(Math.abs(t.y - H / 2) < 3, `${t.t} is centered: ${t.y} vs ${H / 2}`);
-  }
 });
 
 test("letter and digit size in px per unit are the same in every tile (within 1.2 %, the arc-length mapping of a larger face)", () => {
