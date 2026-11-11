@@ -5,6 +5,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 const text = readFileSync(new URL("../.github/workflows/window-chain.yml", import.meta.url), "utf8");
 const lines = text.split("\n");
 
@@ -238,4 +239,19 @@ test("the verified artifact is uploaded only after every verify step passed, the
 });
 test("it never commits, pushes, tags, comments or dispatches", () => {
   assert.doesNotMatch(text, /git (commit|push|tag)\b|gh (pr|issue|release|workflow)\b|submodule/);
+});
+test("every sed extraction of PROGRESS.txt in the workflow returns the right value on a sample (GNU sed basic regex)", () => {
+  const sample = "complete=false\nstop_reason=max_edges\nedges_total=12\nedges_new=5\nchain_end=2026-08\ngreedy_edges=3\nplan_end=2026-09\nroot_month=2026-05\nrooted=true\nbridge_edges=1\nbest_effort_edges=2\nseconds=9.5\n";
+  const want = { chain_end: "2026-08", edges_total: "12", complete: "false", best_effort: "2", greedy_edges: "3" };
+  const found = {};
+  for (const j of ["produce", "verify"]) for (const s of jobs[j].steps) for (const l of runLines(s)) {
+    const m = l.match(/sed -n '(s\/\^([a-z_]+)=.*\/p)'/);
+    if (!m) continue;
+    const key = l.match(/^([a-z_]+)=\$\(/)?.[1] ?? (m[2] === "edges_total" ? "edges_total" : m[2]);
+    const out = execFileSync("sed", ["-n", m[1]], { input: sample }).toString().trim();
+    const expected = want[key] ?? want[m[2]];
+    assert.equal(out, expected, `sed for ${key} (${m[2]}) returned '${out}'`);
+    found[m[2]] = true;
+  }
+  for (const k of ["chain_end", "edges_total", "complete", "best_effort_edges", "greedy_edges"]) assert.ok(found[k], `no sed extraction found for ${k}`);
 });
