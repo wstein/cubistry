@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Best effort for the month the print cannot show exactly (February with 28 days from a Sunday: 2026, 2037, 2043, ...): the cube
-// shows the best state, the one wrong cell is drawn on its cubie's face as a grey hatched field with a strike-through and a red
+// shows the best state, the one wrong cell is drawn on its cubie's face as a gray hatched field with a strike-through and a red
 // frame crossed out. The scene is WebGL, so the spec reads the projected position of the cell from `data-c7-wrong` on the canvas
 // (the viewer publishes it with every drawn frame, with the cosine of the viewing angle) and samples the pixels of the screenshot there, from three views.
 import { test, expect } from "@playwright/test";
@@ -39,7 +39,7 @@ const contrast = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 async function sample(page, cell) {
   const png = PNG.sync.read(await canvas(page).screenshot());
   const scale = png.width / (await canvas(page).evaluate((el) => el.clientWidth));
-  const out = { grey: 0, red: 0, dark: 0, total: 0, greys: [], reds: [], darks: [] };
+  const out = { gray: 0, red: 0, dark: 0, total: 0, grays: [], reds: [], darks: [] };
   const R = cell.r * 0.62 * scale;
   for (let y = Math.max(0, Math.floor(cell.y * scale - R)); y < Math.min(png.height, cell.y * scale + R); y++)
     for (let x = Math.max(0, Math.floor(cell.x * scale - R)); x < Math.min(png.width, cell.x * scale + R); x++) {
@@ -49,7 +49,7 @@ async function sample(page, cell) {
       out.total++;
       if (r > 170 && g < 70 && b < 80) { out.red++; out.reds.push([r, g, b]); }
       else if (Math.max(r, g, b) < 75) { out.dark++; out.darks.push([r, g, b]); }
-      else if (Math.abs(r - g) < 16 && Math.abs(g - b) < 16 && r > 110 && r < 235) { out.grey++; out.greys.push([r, g, b]); }
+      else if (Math.abs(r - g) < 16 && Math.abs(g - b) < 16 && r > 110 && r < 235) { out.gray++; out.grays.push([r, g, b]); }
     }
   return out;
 }
@@ -73,7 +73,7 @@ test("February 2037 and 2043 show the same best-effort cube; the page has one se
 });
 
 for (const scheme of ["paper-red", "dracula"])
-  test(`${scheme}: the wrong cell is a grey hatched field with a dark strike-through and a red frame, seen from three views`, async ({ page }) => {
+  test(`${scheme}: the wrong cell is a gray hatched field with a dark strike-through and a red frame, seen from three views`, async ({ page }) => {
     await open(page, 2037, scheme);
     const views = [];
     for (const [dx, dy] of [[0, 0], [-90, 20], [60, -30], [-120, -60]]) {
@@ -84,12 +84,12 @@ for (const scheme of ["paper-red", "dracula"])
       views.push({ cell, s });
       if (SHOTS) await page.screenshot({ path: `${SHOTS}/sample-${scheme}-view${views.length}.png` });
       expect(s.total).toBeGreaterThan(200);
-      expect(s.grey / s.total, `grey field (${JSON.stringify(cell)})`).toBeGreaterThan(0.05);
+      expect(s.gray / s.total, `gray field (${JSON.stringify(cell)})`).toBeGreaterThan(0.05);
       expect(s.red / s.total, "red frame").toBeGreaterThan(0.02);
       expect(s.dark / s.total, "strike-through").toBeGreaterThan(0.008);
-      const field = luminance(s.greys[Math.floor(s.greys.length / 2)]);
+      const field = luminance(s.grays[Math.floor(s.grays.length / 2)]);
       const mean = (list) => list.reduce((a, c) => a.map((v, k) => v + c[k] / list.length), [0, 0, 0]);
-      // Legible in a dark scheme as well: the marks (dark hatching and strike-through, red frame) stand out from the grey field in the rendered pixels.
+      // Legible in a dark scheme as well: the marks (dark hatching and strike-through, red frame) stand out from the gray field in the rendered pixels.
       expect(contrast(field, luminance(mean(s.darks))), `${scheme}: hatch and strike-through against the field`).toBeGreaterThan(2.5);
       expect(contrast(field, luminance(mean(s.reds))), `${scheme}: red frame against the field`).toBeGreaterThan(1.5);
     }

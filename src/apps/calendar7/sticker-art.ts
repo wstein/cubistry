@@ -454,7 +454,7 @@ export function drawFace(
   }
 }
 
-/** The cell a print cannot show (best effort, anydate.ts): grey field, hatching, strike-through, red frame crossed out. */
+/** The cell a print cannot show (best effort, anydate.ts): gray field, hatching, strike-through, red frame crossed out. */
 export const WRONG_CELL = { field: "#c6c6c6", hatch: "#5b5b5b", strike: "#262626", frame: "#d0021b", halo: "#ffffff" } as const;
 /** Minimal 2D context the drawing needs (a recording fake in the tests). */
 export interface WrongCellContext {
@@ -477,7 +477,7 @@ export interface WrongCellContext {
 export const HATCH_LINES = 10;
 /**
  * Draws the differing cell over the whole texture `w` x `h` of its cubie face: the texture turns with the cube, so the mark
- * is projected with the face. Order: grey field, 45 degree hatching, a dark strike-through of the field, the red frame
+ * is projected with the face. Order: gray field, 45 degree hatching, a dark strike-through of the field, the red frame
  * (with a white halo so it reads on dark schemes too) and a red strike-through of the frame.
  */
 export function drawWrongCell(ctx: WrongCellContext, w: number, h: number): void {
