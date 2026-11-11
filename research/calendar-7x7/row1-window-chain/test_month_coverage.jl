@@ -25,7 +25,9 @@ end
     ok,e=tamper("unsat-single-receipt",replace(tsv,"corner-2043-02-julia.tsv;corner-2043-02-flix.tsv"=>"corner-2043-02-julia.tsv";count=1),json);@test !ok && occursin("Julia and a Flix receipt",e)
     ok,e=tamper("unsat-unknown-receipt-file",replace(tsv,"corner-2043-02-flix.tsv"=>"corner-2043-02-nope.tsv";count=1),json);@test !ok && occursin("receipts exist",e)
     ok,e=tamper("unsat-wrong-receipt",replace(tsv,"corner-2043-02-julia.tsv;corner-2043-02-flix.tsv"=>"corner-2026-02-julia.tsv;corner-2026-02-flix.tsv";count=1),json);@test !ok && occursin("receipt contains the gap month",e)
-    ev2=mktempdir();for f in readdir(dir);cp(joinpath(dir,f),joinpath(ev2,f));end;mkpath(joinpath(ev2,"..","window-2037-01"))
+    base=mktempdir();ev2=joinpath(base,"month-list");mkpath(ev2);w37=joinpath(base,"window-2037-01");mkpath(w37)
+    for f in readdir(dir);cp(joinpath(dir,f),joinpath(ev2,f));end
+    for t in ("julia","flix");cp(joinpath(dir,"..","window-2037-01","corner-2037-02-$t.tsv"),joinpath(w37,"corner-2037-02-$t.tsv"));end
     open(joinpath(ev2,"corner-2043-02-flix.tsv"),"a") do io;println(io,"x");end
     ok,e=tamper("unsat-receipts-differ",tsv,json;ev=ev2);@test !ok && occursin("byte-identical",e)
     ok,e=tamper("before-root-flag",replace(tsv,"2026-02\t2026-02\t1\tbefore_root\tprint_member=no"=>"2026-02\t2026-02\t1\tbefore_root\tprint_member=yes";count=1),json);@test !ok && occursin("before_root mismatch",e)
