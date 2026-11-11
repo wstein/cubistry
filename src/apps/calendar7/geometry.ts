@@ -95,7 +95,9 @@ export const halfEdgeOf = (layout: Layout): number => (layout === "names" ? NAME
  *   raised exposure that makes white read white came out as #f85759 instead of #e0282c;
  * - the exposure follows the face that looks at the camera (names-exposure.ts): the inverse of the radiance a white diffuse
  *   surface gets there, 1.217 head on at the shared presentation lights;
- * - the plastic has no specular and no clearcoat there: they add about 1.3% linear white to every color (#e0282c rendered
- *   #e1373a). The tiles are printed paper; the standard layout keeps its gloss.
+ * - the shared plastic (specular 1, clearcoat 0.18) adds about 1.3% linear white to every color (#e0282c rendered #e1373a), so
+ *   the names layout has its own shading: plasticity (names-plasticity.ts, default 0.6) scales specular, clearcoat and face
+ *   shadows from none (0, flat and exact) up, and the exposure gives back what the shading takes. The standard layout keeps
+ *   its gloss.
  */
 export const STANDARD_EXPOSURE = 1;
