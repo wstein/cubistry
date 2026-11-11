@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Calendar7 names layout, unit grid (owner decision of 2026-11-11): the printed content is a uniform 7 x 7 grid of unit cells
 // (the size of an inner cubie). A cubie on a thick outer layer (f = 1.8) carries exactly one unit cell on its INNER side and a
-// band of f - 1 on its outer side (white margin); the month row has a white strip of 0.1 at the top, the red banner (1.2) and
-// a white strip of 0.5 below it, the red banner is inset by the band from the left and right cube edges; the month name sits in
+// band of f - 1 on its outer side (white margin); the month row is a red banner (1.0 tall) in a white frame: 0.4 above and below,
+// 0.6 from the left and right cube edges; the month name sits in
 // the upper part of the banner. Everything is checked on the recorded drawing of the real print (public/calendar7/names/state.v1.json)
 // and mapped to scene units, no mock geometry.
 import { test } from "node:test";
@@ -123,20 +123,20 @@ test("every front tile, font and built-in drawing: white margin ground, the fill
       if (f.tile.band.t > 0) near(lt.y, want.y + 0.5, 1e-9, `${tag} fill top`); else assert.equal(cell.y0, 0);
       if (f.tile.band.b > 0) near(rb.y, want.y - 0.5, 1e-9, `${tag} fill bottom`); else assert.equal(cell.y1, g.H);
     } else {
-      // month row: 0.2 white at the top of the cubie, banner 1.4 tall, 0.2 white below it (strips of the row: cubie top and bottom)
+      // month row: 0.4 white at the top of the cubie, banner 1.0 tall, 0.4 white below it (strips of the row: cubie top and bottom)
       near(f.center.y + F / 2 - lt.y, NAMES_TOP_STRIP, 1e-9, `${tag} top strip`);
       near(rb.y - (f.center.y - F / 2), NAMES_BOTTOM_STRIP, 1e-9, `${tag} bottom strip`);
       near(lt.y - rb.y, F - NAMES_TOP_STRIP - NAMES_BOTTOM_STRIP, 1e-9, `${tag} banner height 1.2`);
-      near(lt.y - rb.y, 1.4, 1e-9, `${tag} banner height 1.4 (literal)`);
-      near(lt.y, 4.1, 1e-9, `${tag} banner top`); near(rb.y, 2.7, 1e-9, `${tag} banner bottom`);
-      // the banner is inset by 0.4 (NAMES_MONTH_SIDE_BAND) from the cube edges, not by the 0.8 band of the other rows
-      if (f.c === 0) near(lt.x, -4.3 + NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red starts 0.4 inside the left cube edge`); else assert.equal(cell.x0, 0);
-      if (f.c === 6) near(rb.x, 4.3 - NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red ends 0.4 inside the right cube edge`); else assert.equal(cell.x1, g.W);
+      near(lt.y - rb.y, 1.0, 1e-9, `${tag} banner height 1.0 (literal)`);
+      near(lt.y, 3.9, 1e-9, `${tag} banner top`); near(rb.y, 2.9, 1e-9, `${tag} banner bottom`);
+      // the banner is inset by 0.6 (NAMES_MONTH_SIDE_BAND) from the cube edges, not by the 0.8 band of the other rows
+      if (f.c === 0) near(lt.x, -4.3 + NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red starts 0.6 inside the left cube edge`); if (f.c === 0) near(lt.x, -3.7, 1e-9, `${tag} red starts at x = -3.7 (literal)`); else assert.equal(cell.x0, 0);
+      if (f.c === 6) near(rb.x, 4.3 - NAMES_MONTH_SIDE_BAND, 1e-9, `${tag} red ends 0.6 inside the right cube edge`); if (f.c === 6) near(rb.x, 3.7, 1e-9, `${tag} red ends at x = 3.7 (literal)`); else assert.equal(cell.x1, g.W);
     }
   }
 });
 
-test("the left and right margins: 0.8 white in every row (cube edge -4.3 .. -3.5 and 3.5 .. 4.3), 0.4 in the month row (the banner sticks out 0.4 beyond the grid)", () => {
+test("the left and right margins: 0.8 white in every row (cube edge -4.3 .. -3.5 and 3.5 .. 4.3), 0.6 in the month row (the banner sticks out 0.2 beyond the grid)", () => {
   for (const f of FRONT.filter((x) => x.c === 0 || x.c === 6)) {
     const g = tileGrid(f.tile), cell = DRAWINGS.font(f).rects[1]; // [0] is the white ground, [1] the fill of the cell or banner
     const edge = f.c === 0 ? f.center.x - F / 2 : f.center.x + F / 2;
@@ -184,7 +184,7 @@ test("Saturday/Sunday tint: only the unit cell is tinted (column 1 and 7 include
 test("the month name sits in the upper part of the red banner: more red above than below (2:1 of the free height) in all 14 fonts, and the name is inside the banner", () => {
   for (const [id, font] of Object.entries(FONT_METRICS)) {
     const table = nameFaceTable(font), banner = monthBanner();
-    near(table.bannerHeight, 1.4, 1e-12, id);
+    near(table.bannerHeight, 1.0, 1e-12, id);
     const tops = [], bottoms = [];
     for (const word of ["J", "ANU", "ARY", "NOV", "EMB", "DEC", "SEP", "AUG", "UST"]) for (const l of nameLabelLayout(word, font, "face")) {
       const above = (l.box.y0 - (96 - banner.top * PPU)) / PPU, below = ((96 - banner.bottom * PPU) - l.box.y1) / PPU; // units of red above and below this glyph
@@ -199,14 +199,14 @@ test("the month name sits in the upper part of the red banner: more red above th
   }
 });
 
-test("month name on the real front: ink inside the red banner (front projection, scene units), 2:1, the red banner 0.8 inside the cube edges; font and built-in drawing", () => {
+test("month name on the real front: ink inside the red banner (front projection, scene units), 2:1, the red banner 0.4 inside the top and bottom of its row; font and built-in drawing", () => {
   const first = FRONT.filter((f) => f.r === 0 && f.text !== "");
   assert.ok(first.length >= 2, "a month name of at least two tiles");
   for (const [name, draw] of Object.entries(DRAWINGS)) for (const f of first) {
     const texts = draw(f).texts, y = texts.map((t) => runAt(name, f, t).y);
-    for (const v of y) assert.ok(v < 4.1 && v > 2.7, `${name} ${f.text}: letter center ${v} inside the banner 2.7 .. 4.1`);
-    const above = 4.1 - Math.max(...y), below = Math.min(...y) - 2.7;
-    assert.ok(above > below * 1.4, `${name} ${f.text}: red above ${above.toFixed(3)} vs below ${below.toFixed(3)}`);
+    for (const v of y) assert.ok(v < 3.9 && v > 2.9, `${name} ${f.text}: letter center ${v} inside the banner 2.9 .. 3.9`);
+    const above = 3.9 - Math.max(...y), below = Math.min(...y) - 2.9;
+    assert.ok(above > below, `${name} ${f.text}: red above ${above.toFixed(3)} vs below ${below.toFixed(3)}`);
   }
 });
 
@@ -228,7 +228,7 @@ test("other schemes follow the same geometry: ground is the scheme's day ground,
     if (f.tile.band.l + f.tile.band.r + f.tile.band.t + f.tile.band.b === 0) { assert.equal(rects[0].fill, roles.fill); continue; }
     assert.equal(rects[0].fill, namesGround(scheme.dayFill), `${scheme.id} (${f.c},${f.r}) ground`);
     assert.equal(rects[1].fill, roles.fill, `${scheme.id} (${f.c},${f.r}) fill`);
-    if (f.r === 0) near(rects[1].y1 - rects[1].y0, 1.4 * g.py, 1e-9, `${scheme.id} banner`);
+    if (f.r === 0) near(rects[1].y1 - rects[1].y0, 1.0 * g.py, 1e-9, `${scheme.id} banner`);
     void r;
   }
 });
@@ -264,11 +264,11 @@ test("tileEdgeColors: along every edge of every front tile the color is the colo
   assert.ok(samples > 100000, `${samples} samples`);
 });
 
-test("owner decisions as literals: month row banner 0.2 top strip, 0.2 bottom strip, 0.4 side band, weekday words 0.08 lower, square banner corners", async () => {
+test("owner decisions as literals: month row banner 0.4 top strip, 0.4 bottom strip, 0.6 side band, weekday words 0.08 lower, square banner corners", async () => {
   const g = await import("../src/apps/calendar7/geometry.ts");
-  assert.equal(g.NAMES_TOP_STRIP, 0.2);
-  assert.equal(g.NAMES_BOTTOM_STRIP, 0.2);
-  assert.equal(g.NAMES_MONTH_SIDE_BAND, 0.4);
+  assert.equal(g.NAMES_TOP_STRIP, 0.4);
+  assert.equal(g.NAMES_BOTTOM_STRIP, 0.4);
+  assert.equal(g.NAMES_MONTH_SIDE_BAND, 0.6);
   assert.equal(g.NAMES_WEEKDAY_DOWN, 0.08);
   assert.equal(g.NAMES_BANNER_RADIUS, 0);
 });

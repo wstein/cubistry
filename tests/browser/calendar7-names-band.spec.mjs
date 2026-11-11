@@ -43,8 +43,8 @@ async function joints(page, pitch, yaw, mode = "banner") {
       return [(p.x * 0.5 + 0.5) * cv.width, (1 - (p.y * 0.5 + 0.5)) * cv.height];
     };
     const px = (x, y) => { const d = ctx.getImageData(Math.round(x), Math.round(y), 1, 1).data; return [d[0], d[1], d[2]]; };
-    // the banner is 2.7 .. 4.1 high (units, y up from the cube center); the strips 4.1 .. 4.3 and 2.5 .. 2.7
-    const bands = { red: [2.85, 3.4, 3.95], white: [2.55, 2.65, 4.2] };
+    // the banner is 2.9 .. 3.9 high (units, y up from the cube center); the strips 3.9 .. 4.3 and 2.5 .. 2.9
+    const bands = { red: [3.0, 3.4, 3.8], white: [2.55, 2.75, 4.0, 4.2] };
     const rows = [];
     if (mode === "line") { // the weekday line (row 2): find its height on the middle of each cell, then sample across every joint
       const isRed = ([r, g]) => r - g > 60;
@@ -77,7 +77,7 @@ async function joints(page, pitch, yaw, mode = "banner") {
 for (const [name, pitch, yaw] of VIEWS) test(`month banner joints, ${name}: red across every joint of the band, white across the white strips`, async ({ page }) => {
   test.setTimeout(120000);
   const rows = await joints(page, pitch, yaw);
-  expect(rows.length).toBe(5 * 6);
+  expect(rows.length).toBe(5 * 7);
   for (const r of rows) for (const [k, [R, G, B]] of r.samples.entries()) {
     if (r.kind === "red") expect(R - G, `joint ${r.joint} y ${r.y} sample ${k}: rgb(${R}, ${G}, ${B}) is red`).toBeGreaterThan(60);
     else expect(Math.abs(R - G), `joint ${r.joint} y ${r.y} sample ${k}: rgb(${R}, ${G}, ${B}) is not red`).toBeLessThan(45);
