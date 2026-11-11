@@ -40,7 +40,7 @@ import {
   STICKERS,
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
-import { type ColorScheme, DEFAULT_SCHEME, namesGround, schemeById } from "./schemes.ts";
+import { type ColorScheme, type BannerStyle, DEFAULT_SCHEME, namesGround, parseBannerStyle, schemeById, withBannerStyle } from "./schemes.ts";
 import { CALENDAR7_SIZE, outerLayerWidth, bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, unitGridTileOf } from "./geometry.ts";
 import type { Layout } from "./layout.ts";
 import { drawFace, drawSticker, drawWrongCell, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileEdgeColors, tileRoles, type Surface, WRONG_CELL, type WrongCellContext } from "./sticker-art.ts";
@@ -130,6 +130,8 @@ export class Calendar7Viewer implements StageView {
   /** 0-based sticker indices drawn as the differing cell (best effort); empty for an exact state. */
   private wrongIds: ReadonlySet<number> = new Set();
   /** The color scheme of the labels (`setScheme`); the default scheme until one is chosen. */
+  private baseScheme: ColorScheme = DEFAULT_SCHEME;
+  private bannerStyle: BannerStyle = "theme";
   private scheme: ColorScheme = DEFAULT_SCHEME;
   private font: LoadedFont | null = null;
   /** One entry per distinct texture of the current build: redrawn in place when the scheme changes. */
@@ -268,7 +270,7 @@ export class Calendar7Viewer implements StageView {
 
   /** The scheme that is drawn now. */
   get currentScheme(): ColorScheme {
-    return this.scheme;
+    return this.baseScheme;
   }
 
   /**
@@ -280,8 +282,22 @@ export class Calendar7Viewer implements StageView {
   setScheme(id: string | null | undefined): void {
     if (this.destroyed) return;
     const next = schemeById(id);
-    if (next === this.scheme) return;
-    this.scheme = next;
+    if (next === this.baseScheme) return;
+    this.baseScheme = next;
+    this.redrawScheme();
+  }
+
+  /** Selects a banner shape without replacing any cube, pose, material or texture. */
+  setBannerStyle(style: BannerStyle): void {
+    if (this.destroyed) return;
+    const next = parseBannerStyle(style);
+    if (next === this.bannerStyle) return;
+    this.bannerStyle = next;
+    this.redrawScheme();
+  }
+
+  private redrawScheme(): void {
+    this.scheme = this.layout === "names" ? withBannerStyle(this.baseScheme, this.bannerStyle) : this.baseScheme;
     if (!this.printing || !this.pose) return;
     this.bodyStale = true;
     for (const a of this.art) {
@@ -342,6 +358,7 @@ export class Calendar7Viewer implements StageView {
     // A new print replaces the cube: a turn in progress ends first (its pivot belongs to the old cube).
     this.tween.cancel();
     this.layout = layout;
+    this.scheme = layout === "names" ? withBannerStyle(this.baseScheme, this.bannerStyle) : this.baseScheme;
     this.fitExtent(layout);
     // The shared tone mapping and exposure 1, except in the names layout: its colors are the scheme tokens (geometry.ts).
     this.renderer.toneMapping = layout === "names" ? THREE.LinearToneMapping : this.standardToneMapping;

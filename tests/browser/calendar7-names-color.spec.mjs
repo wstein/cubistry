@@ -20,7 +20,7 @@ async function sample(page, scheme, tilted = false, production = false, plastici
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
     const { loadCalendarFont } = await import("/src/apps/calendar7/fonts.ts");
     const { parseState } = await import("/src/apps/calendar7/graph.ts");
-    const { schemeById } = await import("/src/apps/calendar7/schemes.ts");
+    const { schemeById, withBannerStyle } = await import("/src/apps/calendar7/schemes.ts");
     const { isBannerClass, tileClass, tileGrid, tileRoles } = await import("/src/apps/calendar7/sticker-art.ts");
     const { layerWidthsFor, unitGridTileOf } = await import("/src/apps/calendar7/geometry.ts");
     const { printing, pose } = parseState(await (await fetch("/calendar7/names/state.v1.json")).json());
@@ -65,7 +65,7 @@ async function sample(page, scheme, tilted = false, production = false, plastici
       const share = tilted ? 0.3 : 0.8, w = Math.round(W * share), h = Math.round(H * share), x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
       const d = ctx.getImageData(x0, y0, w, h).data, pix = [];
       for (let k = 0; k < w * h; k++) pix.push([d[4 * k], d[4 * k + 1], d[4 * k + 2]]);
-      const cls = tileClass(printing.text[i], printing.ink[i]), roles = tileRoles(sch, printing.text[i], printing.ink[i], "names");
+      const cls = tileClass(printing.text[i], printing.ink[i]), roles = tileRoles(withBannerStyle(sch, "theme"), printing.text[i], printing.ink[i], "names");
       const fill = [0, 1, 2].map((c) => med(pix.map((p) => p[c])));
       const best = (px, want) => px.reduce((m, p) => Math.min(m, diff(p, want)), 255);
       const row = { cls, text: printing.text[i], want: roles.fill, got: hex(fill), fill: diff(fill, rgb(roles.fill)) };

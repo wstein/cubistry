@@ -27,7 +27,7 @@ import {
 import { FONT_STYLES, FontSelection, fontStyleById, loadCalendarFont, type LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { watchSheetTheme } from "./sheet-theme.ts";
-import { SCHEMES, schemeById } from "./schemes.ts";
+import { SCHEMES, parseBannerStyle, schemeById, type BannerStyle } from "./schemes.ts";
 import { parsePlasticity } from "./names-plasticity.ts";
 import type { Surface } from "./sticker-art.ts";
 import { Calendar7Player, DEFAULT_SLICE, DEFAULT_SPEED, SPEEDS, type PlayerSnapshot, type StageView } from "./player.ts";
@@ -39,6 +39,8 @@ export interface Stage extends StageView {
   setLabel(text: string): void;
   /** Color scheme by id (src/apps/calendar7/schemes.ts); an unknown id gives the default. Optional: a fake stage may omit it. */
   setScheme?(id: string | null | undefined): void;
+  /** Month banner shape of the names layout; optional like `setScheme`. */
+  setBannerStyle?(style: BannerStyle): void;
   setFont?(font: LoadedFont): void;
   /** Plasticity of the names layout, 0 to 1 (names-plasticity.ts). Optional: a fake stage may omit it. */
   setPlasticity?(value: number): void;
@@ -77,6 +79,8 @@ interface Dataset {
 
 /** The URL parameter that picks the color scheme of the 3D view (`?scheme=paper-blue`); unknown values use the default. */
 export const SCHEME_PARAM = "scheme";
+/** The URL parameter that overrides the month banner shape (`?banner=underline`); absent or unknown: the theme default. */
+export const BANNER_PARAM = "banner";
 /** The URL parameter that sets the plasticity of the names layout (`?plasticity=0.6`, 0 to 1; absent: the default). */
 export const PLASTICITY_PARAM = "plasticity";
 
@@ -97,6 +101,7 @@ export async function mountCalendar7(
     `<div class="c7-font-choice"><label for="c7-font-style">Font style</label><select id="c7-font-style" data-c7-font>${FONT_STYLES.map(f => `<option value="${f.id}"${f.id === fontStyleById(params.get("font")).id ? " selected" : ""}>${f.label}</option>`).join("")}</select></div>` +
     (threeD ? `<div class="c7-layout-choice"><label for="c7-layout">Cube layout</label><select id="c7-layout" data-c7="layout"><option value="standard"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "standard" ? " selected" : ""}>Standard</option><option value="names"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "names" ? " selected" : ""}>Names (preview, May 2026 - Jan 2028)</option>${params.get(LAYOUT_PARAM) === NAMES_ANY_MODE ? `<option value="${NAMES_ANY_MODE}" selected>${NAMES_ANY_LABEL}</option>` : ""}</select></div>` : "") +
     (threeD ? `<div class="c7-scheme-choice"><label for="c7-color-theme">Cube color theme</label><select id="c7-color-theme" data-c7="scheme">${SCHEMES.map(s => `<option value="${s.id}"${s.id === schemeById(params.get(SCHEME_PARAM)).id ? " selected" : ""}>${s.name}</option>`).join("")}</select></div>` : "") +
+    (threeD ? `<div class="c7-banner-choice"><label for="c7-month-banner">Month banner</label><select id="c7-month-banner" data-c7="banner">${[["theme", "Theme default"], ["rounded", "Rounded"], ["square", "Hard edges"], ["underline", "Underline"], ["boxed", "Boxed"], ["rounded-box", "Rounded box"]].map(([value, label]) => `<option value="${value}"${value === parseBannerStyle(params.get(BANNER_PARAM)) ? " selected" : ""}>${label}</option>`).join("")}</select></div>` : "") +
     '</div><p class="c7-font-status" role="status" data-c7-font-status></p>' +
     (threeD ? '<p class="c7-layout-notice" role="status" data-c7="layout-notice" hidden></p>' : "") +
     (threeD ? playerHtml(DEFAULT_SPEED) : "") +
@@ -163,6 +168,9 @@ export async function mountCalendar7(
   let selectedSpeed: number = DEFAULT_SPEED;
   let font: LoadedFont | null = null;
   let schemeId: string | null = params.get(SCHEME_PARAM);
+  let bannerStyle = parseBannerStyle(params.get(BANNER_PARAM));
+  const bannerSelect = q("banner") as HTMLSelectElement | null;
+  if (threeD) root.setAttribute("data-c7-banner", bannerStyle);
   const schemeSelect = q("scheme") as HTMLSelectElement | null;
   if (schemeSelect?.value && SCHEMES.some(s => s.id === schemeSelect.value)) schemeId = schemeSelect.value;
   /** Test hook and proof for readers: the id of the scheme the 3D view uses (an unknown id shows as the default). */
@@ -255,7 +263,7 @@ export async function mountCalendar7(
       box.hidden = false;
     }
     (q("player") as HTMLElement | null)?.removeAttribute("hidden");
-    for (const name of ["play", "skip", "speed", "reset", "slice", "orientation", "notation", "scheme", "layout"]) q(name)?.setAttribute("disabled", "");
+    for (const name of ["play", "skip", "speed", "reset", "slice", "orientation", "notation", "scheme", "layout", "banner"]) q(name)?.setAttribute("disabled", "");
     live.textContent = "The 3D view stopped. The month sheet is still shown.";
     if (sceneHost) sceneHost.hidden = true;
     console.error(error);
@@ -360,6 +368,7 @@ export async function mountCalendar7(
       }
       stage = made;
       made.setScheme?.(schemeId);
+      made.setBannerStyle?.(bannerStyle);
       made.setPlasticity?.(parsePlasticity(params.get(PLASTICITY_PARAM)));
       if (font) made.setFont?.(font);
       const port = host.closest?.(".shell-stage");
@@ -644,6 +653,17 @@ export async function mountCalendar7(
           query.set(LAYOUT_PARAM, layoutMode);
           env.replaceQuery(`?${query.toString()}`);
           show(currentParams, false);
+          break;
+        }
+        case "banner": {
+          if (e.type !== "change") break;
+          bannerStyle = parseBannerStyle((el as HTMLSelectElement).value);
+          if (bannerSelect) bannerSelect.value = bannerStyle;
+          root.setAttribute("data-c7-banner", bannerStyle);
+          stage?.setBannerStyle?.(bannerStyle);
+          const query = new URLSearchParams(env.search());
+          if (bannerStyle === "theme") query.delete(BANNER_PARAM); else query.set(BANNER_PARAM, bannerStyle);
+          env.replaceQuery(`?${query.toString()}`);
           break;
         }
         case "scheme": {
