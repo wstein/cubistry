@@ -6,7 +6,7 @@ using Test
 include(joinpath(@__DIR__,"config_table.jl"))
 const D=@__DIR__;const SKIP=joinpath(D,"..","window-skip")
 f(n)=joinpath(D,n);slurp(p)=read(p,String)
-const T=ConfigTable.build(LAYOUT,PRINT_B,PRINT_OLD,PRINT_C)
+const T=ConfigTable.build(LAYOUT,PRINT_B,PRINT_OLD,PRINT_C,PRINT_D)
 @testset "config coverage" begin
 @testset "configuration set" begin
     cs=T.configs
@@ -30,20 +30,21 @@ end
     @test slurp(f("front-matches-config-B.tsv"))==T.matches_B
     @test slurp(f("front-matches-config-old.tsv"))==T.matches_old
     @test slurp(f("front-matches-config-C.tsv"))==T.matches_C
+    @test slurp(f("front-matches-config-C1980.tsv"))==T.matches_D
     @test slurp(f("best-effort-feb-sunday-28.tsv"))==T.best_effort_tsv
     @test slurp(f("lemma-config.tsv"))==T.lemma_tsv
     @test slurp(f("gregorian-400.txt"))==T.cycle_txt
     @test slurp(f("chain-size.tsv"))==T.chain_tsv
 end
 @testset "match verdict agrees with the repository matcher" begin
-    for (nm,pr) in (("B",T.srcB),("old",T.srcOld),("C",T.srcC)),c in T.configs
+    for (nm,pr) in (("B",T.srcB),("old",T.srcOld),("C",T.srcC),("D",T.srcD)),c in T.configs
         ok=try;window_match(pr,c.board);true;catch e;e isa AssertionError ? false : rethrow();end
         r=T.result(nm,c);@test (r.status=="SAT")==ok
         ok || @test !isempty(r.unmatched) && r.hall_cells>r.hall_bodies
     end
 end
 @testset "matchings replay in the repository print checker" begin
-    for (nm,pr,mf,rf) in (("B",PRINT_B,"front-matches-config-B.tsv","print-config-B-julia.tsv"),("old",PRINT_OLD,"front-matches-config-old.tsv","print-config-old-julia.tsv"),("C",PRINT_C,"front-matches-config-C.tsv","print-config-C-julia.tsv"))
+    for (nm,pr,mf,rf) in (("B",PRINT_B,"front-matches-config-B.tsv","print-config-B-julia.tsv"),("old",PRINT_OLD,"front-matches-config-old.tsv","print-config-old-julia.tsv"),("C",PRINT_C,"front-matches-config-C.tsv","print-config-C-julia.tsv"),("D",PRINT_D,"front-matches-config-C1980.tsv","print-config-C1980-julia.tsv"))
         months=join([string(c.rep[1],'-',lpad(c.rep[2],2,'0')) for c in T.configs if T.result(nm,c).status=="SAT"],',')
         env=copy(ENV);env["WINDOW_MONTHS"]=months;out=IOBuffer()
         run(pipeline(setenv(`$(Base.julia_cmd()) --startup-file=no $(joinpath(SKIP,"skip_check.jl")) print $LAYOUT $pr $(f(mf))`,env);stdout=out))
@@ -81,8 +82,8 @@ end
     # every listed matching: 48 cells, distinct bodies, rigid rotation reaches the cell, upright art equals the board cell
     rows=[split(l,'\t') for l in split(strip(slurp(f("best-effort-feb-sunday-28.tsv"))),'\n')[2:end]]
     feb=T.byid(T.configs,2,7,28);homes=all_homes();wrongs=Set()
-    for nm in ("B","C")
-        src=Dict("B"=>T.srcB,"C"=>T.srcC)[nm];byhome=Dict(h=>filter(s->s.home==h,src) for h in homes)
+    for nm in ("B","C","D")
+        src=Dict("B"=>T.srcB,"C"=>T.srcC,"D"=>T.srcD)[nm];byhome=Dict(h=>filter(s->s.home==h,src) for h in homes)
         rs=[r for r in rows if r[1]==nm];@test !isempty(rs)
         for w in unique((r[5],r[6]) for r in rs)
             push!(wrongs,w);mine=[r for r in rs if (r[5],r[6])==w];@test length(mine)==48
@@ -100,5 +101,17 @@ end
     @test wrongs==Set([("7","1"),("7","7")])        # the two blank bottom corners; the wrong cell is a free choice between them
     # no other single wrong cell works: for any other cell x the other 48 cells do not all match
     @test all(x->!isempty(ConfigTable.match_config(T.srcB,feb.board;skip=x).unmatched),[(r,k) for r in 1:7 for k in 1:7 if (r,k) ∉ ((7,1),(7,7))])
+end
+@testset "print C1980: root January 1980" begin
+    front(src)=[(s=only(filter(s->s.home==(c-4,4-r,3) && s.normal==FRONT_NORMAL,src));(s.text,s.ink)) for r in 1:7,c in 1:7]
+    j80=T.byid(T.configs,1,2,31)
+    @test Dates.dayofweek(Date(1980,1,1))==2 && Dates.daysinmonth(Date(1980,1,1))==31      # January 1980 started on a Tuesday
+    @test front(T.srcD)==j80.board && front(T.srcD)!=front(T.srcB) && front(T.srcD)!=front(T.srcC)
+    @test bytes2hex(sha256(read(f("printing-C1980.tsv"))))=="e3c7e3eeaa012a62cc372642e796a8640c95bd5da569d2c3352bee9ecc24c3be"
+    ms=parse_months(join(split(strip(slurp(f("months-C1980.txt")))),","))
+    @test ms[1]==(2030,1) && T.config_of(T.configs,ms[1]...).board==j80.board && length(ms)==286 && length(unique(ms))==286
+    chain=[(y,m) for y in 2026:2050 for m in 1:12 if (2026,3)<=(y,m)<=(2050,1) && T.result("B",T.config_of(T.configs,y,m)).status=="SAT"]
+    @test Set(ms)==Set(vcat(chain,[(2052,2)])) && length(chain)==285
+    @test count(c->T.result("D",c).status=="SAT",T.configs)==90 && T.result("D",T.byid(T.configs,2,7,28)).status=="NOMATCH"
 end
 end

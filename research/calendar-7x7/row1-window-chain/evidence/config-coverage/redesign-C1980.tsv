@@ -37,3 +37,7 @@ D5	printing-S2	same as D4, timeout=1500s (machine load 30-40)	-3,-3,-3	UNTRUSTED
 D5	printing-S2	same as D4, timeout=1500s (machine load 30-40)	-3,-3,-2	UNKNOWN	1500	wall=1695s
 D5	printing-S2	same as D4, timeout=1500s (machine load 30-40)	-3,-3,-1	UNTRUSTED_SAT	3	wall=1695s
 D5	printing-S2	same as D4, timeout=1500s (machine load 30-40)	-3,-3,0	UNTRUSTED_SAT	0	wall=1695s
+D6	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.0;-3,-3,0:0.3 salt=1 timeout=1500s RESULT_DIR (load 7.7 at start, 27-44 during)	-3,-3,-3	UNTRUSTED_SAT	29	wall=1366s
+D6	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.0;-3,-3,0:0.3 salt=1 timeout=1500s RESULT_DIR (load 7.7 at start, 27-44 during)	-3,-3,-2	UNTRUSTED_SAT	1108	wall=1366s
+D6	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.0;-3,-3,0:0.3 salt=1 timeout=1500s RESULT_DIR (load 7.7 at start, 27-44 during)	-3,-3,-1	UNTRUSTED_SAT	7	wall=1366s
+D6	printing-S2	all classes -3,-3,-3:0.0;-3,-3,-2:0.0;-3,-3,-1:0.0;-3,-3,0:0.3 salt=1 timeout=1500s RESULT_DIR (load 7.7 at start, 27-44 during)	-3,-3,0	UNTRUSTED_SAT	0	wall=1366s

@@ -35,3 +35,4 @@ mut ../window-skip/design_skip.jl 's/digest=bytes2hex(sha256(smt));path=/digest=
 mut ../window-skip/design_skip.jl 's/if !isempty(path) \&\& isfile(path)$/if false/' "solved classes are read from the result directory" test_cache.jl
 mut ../window-skip/design_skip.jl 's/if !isempty(path) \&\& result.status==1$/if !isempty(path)/' "solved classes are read from the result directory" test_cache.jl
 mut ../window-skip/design_skip.jl 's/ls\[1\]=="digest\\t"\*digest/true/' "solved classes are read from the result directory" test_cache.jl
+mut config_table.jl 's|const PRINT_D=joinpath(@__DIR__,"printing-C1980.tsv")|const PRINT_D=PRINT_B|' "print C1980: root January 1980"
