@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { createRegistry } from "../src/apps/registry.ts";
 import { MODE_CATALOG } from "../src/apps/mode-catalog.ts";
 import { APP_SCOPED_PARAMS } from "../src/app-switch-url.mjs";
+import { PARAM_SPECS, names } from "../src/apps/param-specs.ts";
 
 // Inventory gate of stage 2/4 in knowledge/plans/unified-application.md: every URL parameter of the appendix is still
 // read by the code that read it before. The check is against the source text of the reader. Each port PR that moves a
@@ -132,7 +133,27 @@ test("a literal parameter read added anywhere in src or index.html is in the inv
   assert.deepEqual(unknown, []);
 });
 
+// Named in the plan but read by no code yet: `cube=2|3` of the Picture Cube (the appendix records that `size` replaced it).
+const PLANNED = ["cube"];
+
 test("the parameters dropped on an app switch are inventory parameters", () => {
-  const known = new Set(INVENTORY.flatMap((r) => r.params));
+  const known = new Set([...INVENTORY.flatMap((r) => r.params), ...PLANNED]);
   for (const p of APP_SCOPED_PARAMS) assert.ok(known.has(p), p);
+});
+
+test("the typed parameter specs and the inventory name the same parameters", () => {
+  const inventory = new Set(INVENTORY.flatMap((r) => r.params));
+  const specs = new Set(Object.keys(PARAM_SPECS).flatMap(names));
+  // `app` is the route key and `application` the removed selector: neither is a setup parameter.
+  assert.deepEqual([...inventory].filter((p) => !specs.has(p) && p !== "app" && p !== "application"), []);
+  assert.deepEqual([...specs].filter((p) => !inventory.has(p) && !PLANNED.includes(p)), []);
+});
+
+test("an alias group of the specs is one inventory row group, so the appendix and the parser agree", () => {
+  for (const [key, spec] of Object.entries(PARAM_SPECS)) {
+    const group = [key, ...(spec.aliases ?? [])];
+    const rows = INVENTORY.filter((r) => group.some((n) => r.params.includes(n)));
+    if (rows.length === 0) continue; // planned
+    for (const n of group) assert.ok(rows.some((r) => r.params.includes(n)), `${key}: alias ${n} has no inventory row`);
+  }
 });
