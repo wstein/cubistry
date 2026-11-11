@@ -13,7 +13,7 @@ test("names layout: every shipped font renders its 12 month names on the 3D face
     const { NAME_WORDS } = await import("/src/apps/calendar7/layout.ts");
     const { SCHEMES } = await import("/src/apps/calendar7/schemes.ts");
     const { faceTransform, namePxPerUnit, tileCanvasSize, tileGrid, tileRoles } = await import("/src/apps/calendar7/sticker-art.ts");
-    const { CALENDAR7_SIZE, bannerOf, outerLayerWidth } = await import("/src/apps/calendar7/geometry.ts");
+    const { CALENDAR7_SIZE, NAMES_BANNER_RADIUS, outerLayerWidth } = await import("/src/apps/calendar7/geometry.ts");
     const scheme = SCHEMES.find((s) => s.id === "paper-red"), F = outerLayerWidth(CALENDAR7_SIZE), ppu = namePxPerUnit();
     const out = [];
     for (const style of FONT_STYLES) {
@@ -34,7 +34,7 @@ test("names layout: every shipped font renders its 12 month names on the 3D face
           const fill = [1, 3, 5].map((i) => parseInt(tileRoles(scheme, label, "month", "names").fill.slice(i, i + 2), 16));
           const data = ctx.getImageData(0, 0, W, H).data, g = tileGrid(tile), bx0 = Math.ceil(g.banner.x0), bx1 = Math.floor(g.banner.x1), by0 = Math.ceil(g.banner.y0), by1 = Math.floor(g.banner.y1);
           let x0 = W, x1 = -1; // the ink is looked for inside the banner (the white margin around it is the ground)
-          const rad = bannerOf().radius * g.px; // the rounded outer corners of the first tile's banner are white: not ink
+          const rad = NAMES_BANNER_RADIUS * g.px; // the rounded outer corners of the first tile's banner are white: not ink
           for (let y = by0; y < by1; y++) for (let x = bx0; x < bx1; x++) {
             if (k === 0 && x < bx0 + rad && (y < by0 + rad || y >= by1 - rad)) continue;
             const i = (y * W + x) * 4;
