@@ -184,29 +184,35 @@ later edge depends on the state before it, a change of an earlier edge forces a 
 `window_chain.jl OUT PRINT [key=value ...]` loops the beam edge of `beam_edge.jl` sequentially from the retained state over
 the months of the print window (`WINDOW_END`, default 2037-01), builds the macro library once per process and falls back to the
 greedy orbit solver when the beam finds no word. `prior=DIR` continues `DIR/chain.moves.tsv` and `DIR/states` (replayed, end
-digest checked, rows copied verbatim); `GENERATE_DEADLINE_S` stops cleanly before the job limit (no new edge when the slowest
-edge so far would not fit); `max_edges=N` bounds a run. A chain that would stop exactly at 2028-01 takes one more edge, because
-`run_checks.sh` checks a 2028-01 end without the print digest. Output: `chain.moves.tsv`, `states/`, `edges.tsv`, `months.tsv`,
-`PROGRESS.txt`. Exit 3 means no new edge. The logic without the solver is tested by `test_window_chain.jl`; the workflow
-`.github/workflows/window-chain.yml` (manual, segments of at most 345 min, verify job with the three checkers) runs it.
+digest checked, rows copied verbatim) and carries `DIR/edges.tsv` forward, so the solver record of earlier segments is kept.
+`GENERATE_DEADLINE_S` stops cleanly before the job limit (no new edge when the slowest edge so far would not fit);
+`max_edges=N` bounds a run. Output: `chain.moves.tsv`, `states/`, `edges.tsv` (cumulative; column `method` is `beam`, `finishN`
+or `greedy`), `months.tsv`, `PROGRESS.txt` (incl. `greedy_edges`). Exit 3 means no new edge. A greedy edge has 300 to 400 HTM
+against about 100 for a beam edge; it is never silent: `months.tsv` has a `method` column, the verify job prints the count and
+warns, and the workflow input `fail_on_greedy` (default true) fails the verify job after the verified artifact is uploaded.
+The logic without the solver is tested by `test_window_chain.jl`; the workflow `.github/workflows/window-chain.yml` (manual,
+job limit 345 min, verify job with the three checkers) runs it and is checked statically by `tests/window-chain-workflow.test.mjs`.
+
+2028-01 rule. Both chain checkers pin the stored 2028-01 print and reject any other print for that window end (a new window end
+needs a new immutable print pin). A chain that ends at 2028-01 is therefore not checkable with a new print. The producer never stops
+there (it takes one more edge, `stop_reason` in `window_chain_lib.jl`), and the workflow rejects `end` and `print_window_end` equal to 2028-01.
 
 ### Print and months that exist
 
-A window print fixes the chain root: May 2026 is the identity pose, so a chain cannot start earlier. Committed witnesses
-exist only up to 2029-12 (`evidence/extended-window.tsv`). For the print with window end 2037-01 the following is known only from
-scratch evidence of earlier sessions (not committed here): print SHA-256 `2b5a068d2fe26d28...c4c23c6`, Julia and Flix print matching
-SAT for 129 months, and a greedy chain 2026-05 .. 2037-01 of 129 months and 128 edges (44342 HTM, about 346 per edge) whose Julia and
-Flix receipts are byte-identical and which the independent replay accepts. The print and this chain must be committed before a
-run can use them (`print_path`).
+A window print fixes the chain root: May 2026 is the identity pose, so a chain cannot start earlier. The print for window end
+2037-01 is committed in [evidence/window-2037-01](evidence/window-2037-01/README.md) with Julia and Flix receipts (print matching of
+129 months: SAT; corner lemma for the 130 targets up to 2037-02: UNSAT, both checkers, with the caveats of that README). No chain
+for this print is committed. A greedy chain 2026-05 .. 2037-01 (129 months, 128 edges, 44342 HTM, about 346 per edge; Julia and Flix
+receipts byte-identical, independent replay ACCEPT_CHAIN) exists only in scratch evidence of an earlier session; the beam chain is
+what this workflow computes. Beam edges are verified for 3 edges here (smoke), the pilot has one.
 
 | Months | Status for this print | Basis |
 | --- | --- | --- |
-| 2026-05 .. 2037-01 | SAT (greedy chain, Julia, Flix, replay) | scratch evidence, to be committed |
-| 2026-01 .. 2026-04 | UNKNOWN | Julia matchers report no front matching or corner demand excluded (April: NOMATCH); no Flix confirmation |
-| 2037-02 .. 2050-01 | UNKNOWN | Julia corner-lemma scan reports a ceiling at 2037-01; no Flix confirmation |
+| 2026-05 .. 2037-01 | print matching SAT (Julia, Flix); chain SAT in scratch (greedy), not committed | window-2037-01 README |
+| 2026-01 .. 2026-04 | UNKNOWN | no print for a window that starts there is known; the ceiling claims are Julia-only scans |
+| 2037-02 .. 2050-01 | UNSAT for every window that contains the 130 targets May 2026 .. Feb 2037 (containment argument of the window-2037-01 README) | corner-2037-02 receipts, Julia and Flix |
 
-Under the repository rule (UNSAT needs both checkers) the two outer rows are UNKNOWN, not UNSAT. The beam edges are not yet
-proven for the full range: the 6 beam edges Dec 2026 .. Jun 2027 are computed on another branch; the pilot has one edge.
+Under the repository rule a month record `unavailable_unsat` needs both checkers; the claims file carries that evidence pointer.
 
 ### How to represent a month without a solution
 
@@ -215,36 +221,43 @@ Today the app takes the chain as contiguous: node k is month `first + k`, a mont
 checkers require chronological adjacency of consecutive edges.
 
 1. Sidecar month records (recommended). The chain stays contiguous and unchanged. `months.tsv` has one row per month of
-   the requested range: `month status reason edge evidence`; status is one of `valid`, `unavailable_nomatch`,
-   `unavailable_unsat`, `unknown`. `valid` means the chain has an edge into the month (or it is the root). An `unavailable_*` status
-   needs a certificate confirmed by Julia and Flix (a claims file row with `confirmed=both`); a claim confirmed by one checker
-   is written as `unknown` with reason `claimed_<status>_<confirmed>`. Months the run did not reach say `deadline`,
-   `search_stalled` or `max_edges`; months outside the window say `before_chain_root` or `after_print_window`. The UI reads the
-   file next to the graph: a month with status other than `valid` shows the reason instead of a cube. No checker or app change; the
-   checkers prove the chain; the sidecar proves nothing itself: a `valid` record is the producer reading of the chain and an
-   `unavailable_*` record points to its evidence.
+   the requested range: `month status reason edge method evidence`; status is one of `valid`, `unavailable_nomatch`,
+   `unavailable_unsat`, `unknown`. `valid` means the chain has an edge into the month (or it is the root); `method` is the solver
+   of that edge. An `unavailable_*` status needs a certificate confirmed by Julia and Flix (a claims file row with `confirmed=both`);
+   a claim confirmed by one checker is written as `unknown` with reason `claimed_<status>_<confirmed>`. Months the run did not reach
+   say `deadline`, `search_stalled` or `max_edges`; months outside the window say `before_chain_root` or `after_print_window`. The UI
+   reads the file next to the graph: a month with status other than `valid` shows the reason instead of a cube. No checker or app
+   change. `months.tsv` is not verified by any checker: the checkers prove the chain only, a `valid` record is the producer's
+   reading of the chain and an `unavailable_*` record points to its evidence.
 2. Gap markers inside the chain. A `gap` row between edges would let valid months on both sides connect directly. It needs a new
-   chain version and changes in Julia, Flix, replay verifier and the app (adjacency is checked in all of them), and a gap edge has
-   no move word to play, so the UI cannot step across it. Not needed now: with this print the unavailable months lie before the
-   root and after the window end, not between valid months. `window_chain.jl` therefore refuses an interior gap
+   chain version and changes in Julia, Flix, replay verifier and the app (adjacency is checked in all of them). Not needed for this
+   print: its unavailable months lie before the root and after the window end. `window_chain.jl` refuses an interior gap
    (`chain_progress` errors, a stalled month ends the chain and is recorded as `unknown`).
 3. Encode status in graph nodes (a node without hash). Mixes proof data with display data and breaks the strict month-order check;
    not recommended.
 
-Recommendation: option 1, with option 2 kept for the day a print has an interior gap. Cost of option 1: a second file to ship and
-to keep consistent with the graph; the app change (read the file, show the reason) is separate.
+Recommendation: option 1, with option 2 for a print that has an interior gap. Cost of option 1: a second file to ship and to keep
+consistent with the graph; the app change (read the file, show the reason) is separate.
 
 Claims file (optional `claims=` option, `claims_path` of the workflow): TSV with header
-`month status reason evidence confirmed` (`confirmed` is `both`, `julia_only` or `none`).
+`month status reason evidence confirmed` (`confirmed` is `both`, `julia_only` or `none`); a month may appear once, a duplicate fails.
 
 ### Starting the workflow
 
-A `workflow_dispatch` workflow is dispatched only when the workflow file is on the default branch (GitHub docs: "To trigger the
-`workflow_dispatch` event, your workflow must be in the default branch"). Whether `gh workflow run window-chain.yml --ref <branch>`
-works for a file that exists only on another branch is UNKNOWN here (not tried: no workflow may be started by the author). The
-safe route is the one of `upright-chain.yml`: the workflow file lands on `main` (separate PR, only `.github/workflows/window-chain.yml`),
-and `research_ref` names the commit SHA on `research/cube-display-feasibility` that holds `window_chain.jl`, the print and the
-checker files. A prior run is continued only when it was started from `main`.
+GitHub docs ("Manually running a workflow"): "To trigger the `workflow_dispatch` event, your workflow must be in the default
+branch." To run on another branch the CLI takes `--ref`. The docs do not say whether the file may then exist only on that branch;
+that case was not tried (no workflow may be started by the author): UNKNOWN. The route that follows the docs is the one of
+`upright-chain.yml`: the workflow file lands on `main` (separate PR, only `.github/workflows/window-chain.yml`), and `research_ref`
+names the commit SHA on `research/cube-display-feasibility` that holds `window_chain.jl`, the print and the checker files. A prior
+run is continued only when it was started from `main`. The group `window-chain` runs one at a time; GitHub keeps one running and
+one pending run per group and cancels an older pending run when a newer one is dispatched, so start the next run only after the
+previous one finished.
+
+### Planned (not in this change)
+
+Skipped months with direct edges between valid months (a month list instead of a range), a coverage summary generated and checked by
+the verify job (maximal gapless runs, every gap month with status, reason and evidence, bridge edges marked in the chain data), and
+segments of about one hour each chained by `prior_run_id`, depend on the capacity research and on checker changes; see the PR text.
 
 ## Scope and limits
 
