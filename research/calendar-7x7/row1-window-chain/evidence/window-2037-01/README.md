@@ -9,17 +9,35 @@ Research candidate, not certified. Independent review is pending.
 
 | File | Bytes | SHA-256 |
 |---|---:|---|
-| `printing.tsv` | 10308 | `2b5a068d2fe26d2813f643d61bddc7adcb43d50ced881acb6dd8ed7b9c4c23c6` |
+| `printing.tsv` | 10308 | `5293fb1c525de83439e7b772f8132ae1695b17a1456fd025c56078efc15e844c` |
+| `layout.tsv` | 226 | `e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a` |
 | `front-matches.tsv` | 233751 | `5b60a91873da252f8e181a28d01f28eb1e41a7c32844c5191931c050bb16699a` |
-| `print-julia.tsv`, `print-flix.tsv` | 11335 each | `b535d4b5781a485e8b0399b336b681d41745f620320f2ab56cbd860da78ac8a5` |
-| `corner-2037-02-julia.tsv`, `corner-2037-02-flix.tsv` | 10669 each | `e402d1a2f9e0b4a217bdd8e0fdcd106b10db487cb53a87a73c0f7f030530808b` |
-| `corner-2037-01-julia.tsv`, `corner-2037-01-flix.tsv` | 10607 each | `450d2b07172c33231817f23b2b758cb338467166fc3f20ead6e59cde536a3f5e` |
+| `print-julia.tsv`, `print-flix.tsv` | 11335 each | `c61a6123a8583e3fe9edc46ec152bb5d6195a78e86c2793b2430f2a50a6b5406` |
+| `corner-2037-02-julia.tsv`, `corner-2037-02-flix.tsv` | 10658 each | `929bcccf04c0d0702be0b5e236f88e9597be094ed799ec6aa3c4cd54498da337` |
+| `corner-2037-01-julia.tsv`, `corner-2037-01-flix.tsv` | 10596 each | `fadc842d56174c66baac1cca7093d92f79bfec6692dc50986d3a894d098656ea` |
 
 `printing.tsv` is one fixed print of all 294 surfaces on 218 bodies, in the format of
 [window-2029-12](../window-2029-12/printing.tsv). `front-matches.tsv` lists 129 months times 49
 cells (6321 rows): May 2026 through January 2037, start May 2026, window end 2037-01.
 No chain is committed here. The greedy chain computed for this print (44342 HTM, about 2 MB with
 its 129 snapshots) is not stored; it is to be replaced by a beam chain.
+
+## April labels (label-only change)
+
+The owner changed the April month-name tiles from `APR`, `IL` to `AP`, `RIL`. The cubie assignment is
+unchanged and nothing was recomputed: `printing.tsv` is the earlier print (sha256
+`2b5a068d2fe26d2813f643d61bddc7adcb43d50ced881acb6dd8ed7b9c4c23c6`, kept for traceability) with two sticker texts
+renamed, `APR` to `AP` (1 sticker) and `IL` to `RIL` (1 sticker), a bijection on the same bodies. No other
+tile uses `AP` or `RIL`. `front-matches.tsv` holds no label text and is unchanged. The checkers read the target
+text from the layout, so this directory carries `layout.tsv`: `../../../row1-revision/layout.tsv` with only the
+April row changed to `AP`, `RIL`. The shared layout is not changed. Both checkers compare text by equality
+(the half-turn table holds only `0`, `6`, `9`; `AP` and `RIL` use none of them), so artwork classes and matching
+are unchanged by the rename. The receipts differ from the earlier ones only in the layout hash on the `input` line,
+the hashes of the 10 April targets (they cover the front text), and the text `APR` to `AP` in the corner receipts.
+`check-april-labels.sh` (run from the repository root) checks these statements against the earlier print.
+
+The other chain evidence (`window-2029-12`, `beam-chain-2026-06`, the demo) stays on the earlier labels
+`APR`, `IL`; its pins reference the earlier print (sha256 above) and the shared layout.
 
 ## What is established
 
@@ -48,7 +66,7 @@ its 129 snapshots) is not stored; it is to be replaced by a beam chain.
   through April 2026 with an end before 2037-02. Any ceiling claimed for them comes from a
   Julia-only demand scan with no Flix confirmation: UNKNOWN.
 - Legal retained states and a move chain for this print: not covered by this directory.
-- Provenance of `corner-2037-01-flix.tsv`: copied from the reviewer scratch of the frontier work (equal to the copy from the earlier jan2028-upward scratch). The author did not rebuild a 129-month corner jar; an independent reviewer did and reproduced it byte for byte.
+- Provenance of the Flix receipts: produced with the reviewer-built patched jars of the earlier review of this directory (Flix print checker 129 months, corner checker 129 and 130 months; their sources equal the committed ones except the constants). The author did not rebuild the jars.
 
 ## How the print was generated
 
@@ -64,9 +82,9 @@ Run from `research/calendar-7x7` with Julia 1.11.5 and JDK 21.
 
 ```sh
 E=row1-window-chain/evidence/window-2037-01   # this directory
-WINDOW_END=2037-01 julia --startup-file=no row1-window-print/check.jl row1-revision/layout.tsv \
+WINDOW_END=2037-01 julia --startup-file=no row1-window-print/check.jl $E/layout.tsv \
   $E/printing.tsv $E/front-matches.tsv | cmp - $E/print-julia.tsv
-WINDOW_END=2037-02 julia --startup-file=no row1-corner-coupling/check.jl row1-revision/layout.tsv \
+WINDOW_END=2037-02 julia --startup-file=no row1-corner-coupling/check.jl $E/layout.tsv \
   names-band window | cmp - $E/corner-2037-02-julia.tsv
 ```
 
@@ -74,8 +92,8 @@ Flix: copy `row1-window-print/flix/src/Main.flix` and `row1-corner-coupling/flix
 to a scratch tree and change the constants. Print checker: in the window `Main.flix`, 21 to 129
 and 1029 to 6321 (the three lines that state them); in the corner `Main.flix`, `coupledGoalsN(labels,profile,
 domain,oldRoot,21)` to `...,129)`. Corner checker for 2037-02: the same call with `130`. Build with
-the existing `flix/build.sh` scripts and run the jar with `layout.tsv names-band window EVIDENCE`
-(corner) or `layout.tsv printing.tsv front-matches.tsv EVIDENCE` and `WINDOW_END=2037-01`
+the existing `flix/build.sh` scripts and run the jar with `$E/layout.tsv names-band window EVIDENCE`
+(corner) or `$E/layout.tsv printing.tsv front-matches.tsv EVIDENCE` and `WINDOW_END=2037-01`
 (print). EVIDENCE is `research/calendar-7x7/english/evidence`. `WINDOW_END` has no effect on the Flix
 jars (Flix reads no environment variable; the window length is the patched constant). Outputs must
 equal the committed receipts.
