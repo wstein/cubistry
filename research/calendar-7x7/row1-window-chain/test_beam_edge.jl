@@ -4,7 +4,7 @@
 # The stored greedy edge has 271 HTM; the old design needed about 95 to 127 HTM per edge. This test
 # replays the pilot chain (evidence/beam-pilot-2026-12/moves.tsv, or env BEAM_PILOT_CHAIN) with the
 # print, checks that its prefix is the stored chain byte for byte, that every edge ends in a legal
-# front (all 49 front cells allowed) and that the Dec 2026 edge is at most MAX_HTM.
+# front (all 49 front cells allowed) and that the Dec 2026 edge is at most MAX_HTM (130, the top of the old design range).
 using Test
 const CAL=normpath(joinpath(@__DIR__,".."))
 include(joinpath(@__DIR__,"..","row1-window-print/common.jl"))
@@ -14,7 +14,7 @@ end
 const P=WindowPlanner
 apply_strict_rule!(P)
 Core.eval(P,:(image_normal(g,q,ink)=Main.coupled_optic(g,q,ink)))
-const MAX_HTM=160
+const MAX_HTM=130
 const PILOT=get(ENV,"BEAM_PILOT_CHAIN",joinpath(@__DIR__,"evidence","beam-pilot-2026-12","moves.tsv"))
 const STORED=joinpath(@__DIR__,"evidence","window-2029-12","moves.tsv")
 const PRINT=joinpath(@__DIR__,"evidence","window-2029-12","printing.tsv")
