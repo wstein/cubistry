@@ -1,0 +1,371 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Window chain
+
+# Manually dispatched producer and verifier for the month-name window chain of
+# research/calendar-7x7/row1-window-chain: optimized (global macro beam) edges, one retained physical state,
+# from May 2026 through the end of the print window. Months outside the print window get a status
+# record (months.tsv) instead of an edge; the chain itself stays contiguous.
+# It cannot be dispatched until this file is on the default branch (main); the research code is taken from
+# research_ref (a commit SHA), so the file on main does not need the research files.
+#
+# Jobs: prepare (validate inputs and the research commit), produce (window_chain.jl, 4 threads, at most
+# 345 min, no new edge after 4 h of the edge loop; stops cleanly and emits a resumable artifact), verify
+# (run_checks.sh: Julia check.jl, Flix chain checker, independent verify_chain.jl; Julia and Flix receipts must be
+# byte-identical; uploads the verified artifact). A stopped run is continued with prior_run_id.
+# No commits, no gitlinks, no PR comments; the output is an artifact only.
+
+on:
+  workflow_dispatch:
+    inputs:
+      research_ref:
+        description: Commit SHA (40 hex digits) of this repository that holds the research code and the print
+        type: string
+        required: true
+      start:
+        description: First month of months.tsv (YYYY-MM, at most 2026-05; the chain root is May 2026)
+        type: string
+        default: "2026-01"
+      end:
+        description: Last month of months.tsv and of the chain (YYYY-MM)
+        type: string
+        default: "2050-01"
+      print_path:
+        description: Repository path of the print TSV at research_ref
+        type: string
+        default: research/calendar-7x7/row1-window-chain/evidence/window-2037-01/printing.tsv
+      print_sha256:
+        description: SHA-256 of the print (64 hex digits)
+        type: string
+        required: true
+      print_window_end:
+        description: Window end of the print (YYYY-MM); months after it get no edge
+        type: string
+        default: "2037-01"
+      claims_path:
+        description: Optional repository path of a month claims TSV at research_ref (see the row1-window-chain README)
+        type: string
+        default: ""
+      library:
+        description: Beam macro library (L1, L4, L5)
+        type: string
+        default: L5
+      width:
+        description: Beam width (1-200)
+        type: string
+        default: "40"
+      lambda:
+        description: Beam lambda (1-10)
+        type: string
+        default: "3"
+      prior_run_id:
+        description: Run id of an earlier run of this workflow whose verified chain artifact is continued
+        type: string
+        default: ""
+      smoke_mode:
+        description: 3 edges, ignores prior_run_id, about 15 minutes; verifies the 3-edge chain
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  # Needed only to read the prior run and download its artifact.
+  actions: read
+
+concurrency:
+  group: window-chain
+  cancel-in-progress: false
+
+env:
+  WORKFLOW_PATH: .github/workflows/window-chain.yml
+  # A prior run is only continued when it was dispatched by hand from the default branch.
+  REQUIRED_PRIOR_EVENT: workflow_dispatch
+  REQUIRED_PRIOR_BRANCH: main
+  CAL: research/calendar-7x7
+  WC: research/calendar-7x7/row1-window-chain
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      start: ${{ steps.validate.outputs.start }}
+      end: ${{ steps.validate.outputs.end }}
+      window_end: ${{ steps.validate.outputs.window_end }}
+      prior_run_id: ${{ steps.validate.outputs.prior_run_id }}
+      max_edges: ${{ steps.validate.outputs.max_edges }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # the repository is public; prepare only fetches the research commit, no untrusted code runs here
+      - name: Validate inputs
+        id: validate
+        env:
+          IN_REF: ${{ inputs.research_ref }}
+          IN_START: ${{ inputs.start }}
+          IN_END: ${{ inputs.end }}
+          IN_PRINT_PATH: ${{ inputs.print_path }}
+          IN_PRINT_SHA: ${{ inputs.print_sha256 }}
+          IN_WINDOW_END: ${{ inputs.print_window_end }}
+          IN_CLAIMS: ${{ inputs.claims_path }}
+          IN_LIBRARY: ${{ inputs.library }}
+          IN_WIDTH: ${{ inputs.width }}
+          IN_LAMBDA: ${{ inputs.lambda }}
+          IN_PRIOR: ${{ inputs.prior_run_id }}
+          IN_SMOKE: ${{ inputs.smoke_mode }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          ym='^20[0-9]{2}-(0[1-9]|1[0-2])$'
+          path='^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$'
+          [[ "$IN_REF" =~ ^[0-9a-f]{40}$ ]] || fail "research_ref must be a 40-digit lowercase hex commit SHA"
+          [[ "$IN_START" =~ $ym && "$IN_END" =~ $ym && "$IN_WINDOW_END" =~ $ym ]] || fail "start, end and print_window_end must be YYYY-MM (2000-2099)"
+          [[ "$IN_START" < "2026-06" ]] || fail "start must be 2026-05 or earlier: the chain root is May 2026"
+          [[ "$IN_END" > "2026-05" ]] || fail "end must be after 2026-05"
+          [[ "$IN_PRINT_PATH" =~ $path ]] && [[ "$IN_PRINT_PATH" != *..* ]] || fail "print_path is not a plain repository path"
+          [ -z "$IN_CLAIMS" ] || { [[ "$IN_CLAIMS" =~ $path ]] && [[ "$IN_CLAIMS" != *..* ]]; } || fail "claims_path is not a plain repository path"
+          [[ "$IN_PRINT_SHA" =~ ^[0-9a-f]{64}$ ]] || fail "print_sha256 must be 64 lowercase hex digits"
+          [[ "$IN_LIBRARY" =~ ^L[145]$ ]] || fail "library must be L1, L4 or L5"
+          [[ "$IN_WIDTH" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$IN_WIDTH" -le 200 ] || fail "width must be 1-200"
+          [[ "$IN_LAMBDA" =~ ^([1-9]|10)$ ]] || fail "lambda must be 1-10"
+          [ -z "$IN_PRIOR" ] || [[ "$IN_PRIOR" =~ ^[0-9]{1,20}$ ]] || fail "prior_run_id must be digits"
+          max=100000; prior=$IN_PRIOR
+          if [ "$IN_SMOKE" = "true" ]; then max=3; prior=""; fi
+          { echo "start=$IN_START"; echo "end=$IN_END"; echo "window_end=$IN_WINDOW_END"; echo "prior_run_id=$prior"; echo "max_edges=$max"; } >> "$GITHUB_OUTPUT"
+      - name: Check prior run
+        if: steps.validate.outputs.prior_run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRIOR: ${{ steps.validate.outputs.prior_run_id }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          # The API path is scoped to this repository, so a foreign run id is a 404.
+          IFS=$'\t' read -r path conclusion event branch < <(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$PRIOR" --jq '[.path, .conclusion, .event, .head_branch] | @tsv')
+          [ "${path%%@*}" = "$WORKFLOW_PATH" ] || fail "run $PRIOR is not a run of $WORKFLOW_PATH ($path)"
+          [ "$event" = "$REQUIRED_PRIOR_EVENT" ] || fail "run $PRIOR was started by '$event', not '$REQUIRED_PRIOR_EVENT'"
+          [ "$branch" = "$REQUIRED_PRIOR_BRANCH" ] || fail "run $PRIOR ran from branch '$branch', not '$REQUIRED_PRIOR_BRANCH'"
+          # A failed or cancelled run can be continued when it has a verified chain artifact: that artifact is uploaded only
+          # after the three checkers accepted the cumulative chain, and the next run re-verifies the whole chain anyway.
+          n=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$PRIOR/artifacts" --paginate --jq '[.artifacts[] | select((.name | startswith("wc-chain-")) and (.expired | not))] | length' | awk '{s+=$1} END{print s+0}')
+          [ "$n" -ge 1 ] || fail "run $PRIOR ($conclusion) has no unexpired verified chain artifact"
+      - name: Check research commit
+        env:
+          SHA: ${{ inputs.research_ref }}
+          PRINT_PATH: ${{ inputs.print_path }}
+          CLAIMS_PATH: ${{ inputs.claims_path }}
+          SUMMARY_PRIOR: ${{ steps.validate.outputs.prior_run_id }}
+          SUMMARY_WINDOW_END: ${{ inputs.print_window_end }}
+          SUMMARY_START: ${{ inputs.start }}
+          SUMMARY_END: ${{ inputs.end }}
+          SUMMARY_SMOKE: ${{ inputs.smoke_mode }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          # Only a commit that exists in this repository is accepted; no URLs or fork refs.
+          git fetch --no-tags --depth=1 origin "$SHA" || fail "commit $SHA is not fetchable from $GITHUB_REPOSITORY"
+          [ "$(git rev-parse --verify "$SHA^{commit}")" = "$SHA" ] || fail "research_ref does not resolve to itself"
+          missing=0
+          for f in "$WC/window_chain.jl" "$WC/window_chain_lib.jl" "$WC/run_checks.sh" "$WC/check.jl" "$WC/verify_chain.jl" "$WC/flix/build.sh" \
+                   "$CAL/global-search/search.jl" "$CAL/upright-beam/beam2.jl" "$PRINT_PATH" ${CLAIMS_PATH:+"$CLAIMS_PATH"}; do
+            git cat-file -e "$SHA:$f" 2>/dev/null || { echo "::error::$f is missing at $SHA"; missing=1; }
+          done
+          [ "$missing" = 0 ] || fail "research commit lacks required files"
+          {
+            echo "### Window chain"
+            echo "- research SHA: \`$SHA\`"
+            echo "- print: \`$PRINT_PATH\`, window end \`$SUMMARY_WINDOW_END\`, range $SUMMARY_START .. $SUMMARY_END"
+            echo "- smoke: \`$SUMMARY_SMOKE\`, prior run: \`$SUMMARY_PRIOR\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  produce:
+    needs: [prepare]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 345
+    env:
+      SHA: ${{ inputs.research_ref }}
+      PRINT_PATH: ${{ inputs.print_path }}
+      PRINT_SHA: ${{ inputs.print_sha256 }}
+      CLAIMS_PATH: ${{ inputs.claims_path }}
+      START: ${{ needs.prepare.outputs.start }}
+      END: ${{ needs.prepare.outputs.end }}
+      WINDOW_END: ${{ needs.prepare.outputs.window_end }}
+      MAX_EDGES: ${{ needs.prepare.outputs.max_edges }}
+      LIBRARY: ${{ inputs.library }}
+      WIDTH: ${{ inputs.width }}
+      LAMBDA: ${{ inputs.lambda }}
+      # No new edge is started when the slowest edge so far would not fit before 4 h of the edge loop; the job limit is 345 min.
+      GENERATE_DEADLINE_S: "14400"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ inputs.research_ref }}
+          path: src
+          persist-credentials: false
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - name: Download prior run artifact
+        if: needs.prepare.outputs.prior_run_id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: wc-chain-*
+          path: prev
+          run-id: ${{ needs.prepare.outputs.prior_run_id }}
+          github-token: ${{ github.token }}
+      - name: Prepare work directory
+        run: |
+          set -euo pipefail
+          echo "$PRINT_SHA  src/$PRINT_PATH" | sha256sum --check --strict
+          [ -z "$CLAIMS_PATH" ] || test -f "src/$CLAIMS_PATH"
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          if [ -d "$GITHUB_WORKSPACE/prev" ]; then
+            # A prior artifact is untrusted input until its checksums and marker verify; take the verified chain with the most edges.
+            best=""; most=-1
+            while IFS= read -r marker; do
+              d=$(dirname "$marker")
+              (cd "$d" && sha256sum --check --strict SHA256SUMS >/dev/null) || { echo "::error::checksum failure in $d"; exit 1; }
+              n=$(sed -n 's/^edges_total=\([0-9]\{1,\}\)$/\1/p' "$marker" | head -n 1)
+              [ -n "$n" ] || continue
+              if [ "$n" -gt "$most" ]; then most=$n; best=$d; fi
+            done < <(find "$GITHUB_WORKSPACE/prev" -name VERIFIED.txt)
+            [ -n "$best" ] || { echo "::error::no verified chain artifact found to continue"; exit 1; }
+            grep -qx "print_sha256=$PRINT_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another print"; exit 1; }
+            # The producer reads prior/chain.moves.tsv and prior/states.
+            mkdir "$GITHUB_WORKSPACE/prior"
+            cp "$best/chain.moves.tsv" "$GITHUB_WORKSPACE/prior/"; cp -R "$best/states" "$GITHUB_WORKSPACE/prior/states"
+            echo "PRIOR_DIR=$GITHUB_WORKSPACE/prior" >> "$GITHUB_ENV"
+            echo "continuing from $best ($most edges)"
+          fi
+      - name: Produce edges
+        run: |
+          set -euo pipefail
+          out=$GITHUB_WORKSPACE/out/chain
+          args=(start="$START" end="$END" max_edges="$MAX_EDGES" library="$LIBRARY" width="$WIDTH" lambda="$LAMBDA")
+          [ -z "${PRIOR_DIR:-}" ] || args+=(prior="$PRIOR_DIR")
+          [ -z "$CLAIMS_PATH" ] || args+=(claims="$GITHUB_WORKSPACE/src/$CLAIMS_PATH")
+          julia --version; nproc
+          set +e
+          timeout 285m julia --startup-file=no --threads=4 "src/$WC/window_chain.jl" "$out" "src/$PRINT_PATH" "${args[@]}" 2>&1 | tee "$GITHUB_WORKSPACE/out/run.log"
+          rc=${PIPESTATUS[0]}
+          set -e
+          if [ "$rc" = 3 ]; then echo "::error::no new edge: the deadline passed or the search stalled before the first edge of this run (exit 3); nothing to verify or continue from"; exit 3; fi
+          [ "$rc" = 0 ] || { echo "::error::producer exited with $rc (124 = timeout)"; exit "$rc"; }
+          cat "$out/PROGRESS.txt"
+          test -s "$out/chain.moves.tsv" && test -s "$out/months.tsv"
+          cp "$GITHUB_WORKSPACE/out/run.log" "$out/run.log"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: wc-candidate-${{ github.run_id }}
+          path: out/chain/
+          retention-days: 90
+          if-no-files-found: error
+
+  verify:
+    needs: [prepare, produce]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 345
+    env:
+      SHA: ${{ inputs.research_ref }}
+      PRINT_PATH: ${{ inputs.print_path }}
+      PRINT_SHA: ${{ inputs.print_sha256 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ inputs.research_ref }}
+          path: src
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: wc-candidate-${{ github.run_id }}
+          path: cand
+      - name: Build Flix verifier jar
+        run: |
+          set -euo pipefail
+          # flixw downloads flix.jar from a GitHub release and the dependencies from Maven; a transient 5xx there fails the build,
+          # so retry (the build itself is deterministic) but never on a compile error.
+          export CALENDAR7_CHAIN_FLIX_BUILD_DIR=$RUNNER_TEMP/flix-build
+          for attempt in 1 2 3 4 5 6; do
+            if built=$(bash "src/$WC/flix/build.sh" 2>&1); then break; fi
+            printf "%s\n" "$built" | tail -n 30
+            printf "%s\n" "$built" | grep -qE 'FLIXW005|HTTP 5[0-9][0-9]' || { echo "::error::Flix build failed (not a download error)"; exit 1; }
+            [ "$attempt" -lt 6 ] || { echo "::error::Flix download failed six times"; exit 1; }
+            echo "::warning::Flix download attempt $attempt failed; retrying"; sleep $((attempt * 60))
+            rm -rf "$CALENDAR7_CHAIN_FLIX_BUILD_DIR"
+          done
+          jar=$(find "$CALENDAR7_CHAIN_FLIX_BUILD_DIR/artifact" -name "*.jar" | head -n 1)
+          test -f "$jar"
+          echo "FLIX_JAR=$jar" >> "$GITHUB_ENV"
+          sha256sum "$jar" | tee "$RUNNER_TEMP/flix-jar.sha256"
+      - name: Verify chain (Julia, Flix, independent replay)
+        run: |
+          set -euo pipefail
+          c=$GITHUB_WORKSPACE/cand
+          echo "$PRINT_SHA  src/$PRINT_PATH" | sha256sum --check --strict
+          chain_end=$(sed -n 's/^chain_end=\([0-9]\{4\}-[0-9]\{2\}\)$/\1/p' "$c/PROGRESS.txt")
+          edges_total=$(sed -n 's/^edges_total=\([0-9]\{1,\}\)$/\1/p' "$c/PROGRESS.txt")
+          complete=$(sed -n 's/^complete=\(true\|false\)$/\1/p' "$c/PROGRESS.txt")
+          [ -n "$chain_end" ] && [ -n "$edges_total" ] && [ -n "$complete" ] || { echo "::error::PROGRESS.txt is incomplete"; exit 1; }
+          [ "$edges_total" -ge 1 ] || { echo "::error::no edge to verify"; exit 1; }
+          [ "$chain_end" != 2028-01 ] || { echo "::error::a chain ending at 2028-01 is checked without the print digest; the producer must not stop there"; exit 1; }
+          # WINDOW_END of the checkers is the last month of the chain (they assert it equals the last edge).
+          export WINDOW_END=$chain_end CAL7_WINDOW_PRINT_SHA=$PRINT_SHA
+          export PRINT_OVERRIDE=$GITHUB_WORKSPACE/src/$PRINT_PATH CHAIN_OVERRIDE=$c/chain.moves.tsv STATES_OVERRIDE=$c/states
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          bash "src/$WC/run_checks.sh" "$(command -v julia)" "$(command -v java)" "$FLIX_JAR" "$GITHUB_WORKSPACE/out/checks" 2>&1 | tee "$GITHUB_WORKSPACE/out/verify.log"
+          out=$GITHUB_WORKSPACE/out/checks
+          cmp "$out/julia.tsv" "$out/flix.tsv" || { echo "::error::Julia and Flix receipts differ"; exit 1; }
+          grep -qx $'verdict\tSAT\tlegal-retained-state-window-chain\t'"$((edges_total + 1))"$'\t'"$edges_total" "$out/julia.tsv" || { echo "::error::Julia verdict line is not the exact SAT line for $edges_total edges"; exit 1; }
+          grep -q $'^independent-verdict\tACCEPT_CHAIN\t'"$((edges_total + 1))"$'\t'"$edges_total"$'\t' "$out/independent.tsv" || { echo "::error::independent verdict differs ($edges_total edges)"; exit 1; }
+          lines=$(grep -c $'^edge\t' "$c/chain.moves.tsv")
+          [ "$lines" = "$edges_total" ] || { echo "::error::chain has $lines edges, PROGRESS.txt says $edges_total"; exit 1; }
+          { echo "CHAIN_END=$chain_end"; echo "EDGES_TOTAL=$edges_total"; echo "COMPLETE=$complete"; } >> "$GITHUB_ENV"
+      - name: Package artifact
+        run: |
+          set -euo pipefail
+          c=$GITHUB_WORKSPACE/cand; out=$GITHUB_WORKSPACE/out/checks; pack=$GITHUB_WORKSPACE/pack
+          mkdir -p "$pack/states"
+          cp "$c/chain.moves.tsv" "$c/months.tsv" "$c/edges.tsv" "$c/PROGRESS.txt" "$c/run.log" "$pack/"
+          cp "$c"/states/*.tsv "$pack/states/"
+          cp "$out/julia.tsv" "$out/flix.tsv" "$out/independent.tsv" "$RUNNER_TEMP/flix-jar.sha256" "$pack/"
+          {
+            echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "print_sha256=$PRINT_SHA"
+            echo "edges_total=$EDGES_TOTAL"; echo "chain_end=$CHAIN_END"; echo "complete=$COMPLETE"
+          } > "$pack/VERIFIED.txt"
+          sums=$(cd "$pack" && find . -type f | sort | xargs sha256sum)
+          printf "%s\n" "$sums" > "$pack/SHA256SUMS"
+          {
+            echo "### Window chain verified"
+            echo "- research SHA: \`$SHA\`, print: \`$PRINT_SHA\`"
+            echo "- edges: $EDGES_TOTAL, chain end: $CHAIN_END, complete: $COMPLETE"
+            echo "- $(tail -n 1 "$out/julia.tsv" | tr '\t' ' ') / $(tail -n 1 "$out/independent.tsv" | tr '\t' ' ')"
+            echo '```'; cat "$pack/PROGRESS.txt"; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: wc-chain-${{ github.run_id }}
+          path: pack/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Collect failure logs
+        if: failure() || cancelled()
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/fail"
+          cp -f "$GITHUB_WORKSPACE"/out/verify.log "$GITHUB_WORKSPACE"/out/checks/*.tsv "$GITHUB_WORKSPACE/fail/" 2>/dev/null || true
+          # Not a chain artifact: no VERIFIED.txt, never used as a prior.
+          echo "verify failed or was cancelled; partial logs only" > "$GITHUB_WORKSPACE/fail/FAILED.txt"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure() || cancelled()
+        with:
+          name: wc-failure-${{ github.run_id }}
+          path: fail/
+          retention-days: 14
+          if-no-files-found: ignore
