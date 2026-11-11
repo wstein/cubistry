@@ -140,7 +140,7 @@ test("texture sizes: 192 px per unit of width, a (192 w) x (192 h) canvas per ti
 test("a 1 x 1 tile draws what the no-tile drawing draws; the standard layout and the sheet ignore the tile", () => {
   // The no-tile drawing paints the ground a second time over the scaled sticker square (same color); a tile of the names layout does not: those repaints are not compared.
   const strip = (r) => JSON.stringify({ ...r, rects: r.rects.filter((x, i) => i === 0 || x.fill !== r.rects[0].fill) }, (k, v) => (typeof v === "number" ? Math.round(v) : v)); // whole pixels: the flat share of the real 1 x 1 face (0.9112) differs from the old constant FACE_FLAT (0.9106) by 0.08 px
-  for (const [text, ink] of [["28", "red"], ["MON", "weekday"], ["", "blank"]]) { // not a month tile: its banner (strips, name in the upper part) is tests/calendar7-unit-grid.test.mjs
+  for (const [text, ink] of [["28", "red"], ["", "blank"]]) { // not a month tile (its banner is tests/calendar7-unit-grid.test.mjs) and not a weekday word (it sits NAMES_WEEKDAY_DOWN lower on a tile): its banner (strips, name in the upper part) is tests/calendar7-unit-grid.test.mjs
     assert.equal(strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "names", TILES.inner))), strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "names"))));
     assert.equal(strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "standard", TILES.corner))), strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "standard"))));
     assert.equal(strip(track((c) => drawFontSticker(c, text, ink, font, PAPER_RED, "sticker", undefined, "names", TILES.corner))), strip(track((c) => drawFontSticker(c, text, ink, font, PAPER_RED, "sticker", undefined, "names"))));

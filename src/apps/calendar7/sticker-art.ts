@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
 import { type Layout, NAME_SLOTS, nameSlotOffset, nameSlotStart, nameTileShift } from "./layout.ts";
-import { type FaceBands, faceFlatShare, facePixelsPerUnit, monthBanner, NAME_ABOVE_SHARE, NAMES_BOTTOM_STRIP, NAMES_FACE_PX_PER_UNIT, NAMES_TOP_STRIP } from "./geometry.ts";
+import { type FaceBands, faceFlatShare, facePixelsPerUnit, monthBanner, NAME_ABOVE_SHARE, NAMES_BANNER_RADIUS, NAMES_BOTTOM_STRIP, NAMES_FACE_PX_PER_UNIT, NAMES_MONTH_SIDE_BAND, NAMES_TOP_STRIP, NAMES_WEEKDAY_DOWN } from "./geometry.ts";
 import { type ColorScheme, namesGround, type SchemeLine } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
@@ -58,19 +58,19 @@ export interface PxRect { readonly x0: number; readonly y0: number; readonly x1:
 /**
  * The unit cell of a tile on its canvas: its center (`cx`, `cy`) and its rectangle (`cell`: a side with a band ends at the cell
  * edge, a side without one at the canvas edge; the face is flat inside, so the cell edge is exact there), with the canvas pixels
- * per unit along both axes (`px`, `py`: the flat part of the real face). `banner`: the red banner of the month row (the
- * cell horizontally; vertically the tile less the top strip and the bottom strip).
+ * per unit along both axes (`px`, `py`: the flat part of the real face). `banner`: the red banner of the month row (horizontally inset
+ * by `NAMES_MONTH_SIDE_BAND` from the cube edge on a side with a band; vertically the tile less the top strip and the bottom strip).
  */
 export function tileGrid(tile?: FaceTile): { W: number; H: number; px: number; py: number; cx: number; cy: number; cell: PxRect; banner: PxRect } {
   const [W, H] = tileCanvasSize(tile), t = tile ?? { w: 1, h: 1 }, b = t.band ?? NO_BAND;
   const px = facePixelsPerUnit(t.w, W), py = facePixelsPerUnit(t.h, H);
   const cell = { x0: b.l > 0 ? W / 2 - (t.w / 2 - b.l) * px : 0, x1: b.r > 0 ? W / 2 + (t.w / 2 - b.r) * px : W, y0: b.t > 0 ? H / 2 - (t.h / 2 - b.t) * py : 0, y1: b.b > 0 ? H / 2 + (t.h / 2 - b.b) * py : H };
-  const banner = { x0: cell.x0, x1: cell.x1, y0: H / 2 - (t.h / 2 - NAMES_TOP_STRIP) * py, y1: H / 2 + (t.h / 2 - NAMES_BOTTOM_STRIP) * py };
+  const banner = { x0: b.l > 0 ? W / 2 - (t.w / 2 - NAMES_MONTH_SIDE_BAND) * px : 0, x1: b.r > 0 ? W / 2 + (t.w / 2 - NAMES_MONTH_SIDE_BAND) * px : W, y0: H / 2 - (t.h / 2 - NAMES_TOP_STRIP) * py, y1: H / 2 + (t.h / 2 - NAMES_BOTTOM_STRIP) * py };
   return { W, H, px, py, cx: W / 2 + (b.l - b.r) / 2 * px, cy: H / 2 + (b.t - b.b) / 2 * py, cell, banner };
 }
 /** Tile classes drawn as the red banner of the month row (names layout). */
 export const isBannerClass = (cls: TileClass): boolean => cls === "month" || cls === "band";
-type GroundContext = Pick<CanvasRenderingContext2D, "fillStyle" | "fillRect">;
+type GroundContext = Pick<CanvasRenderingContext2D, "fillStyle" | "fillRect"> & Partial<Pick<CanvasRenderingContext2D, "beginPath" | "roundRect" | "fill">>;
 /**
  * Names layout, ground of a tile of the unit grid: the white margin (the paper ground of the scheme) on the whole tile, then
  * the fill of the tile on its unit cell only (a weekend tint stays on the cell), in the month row the red banner (inset from
@@ -83,8 +83,34 @@ export function paintTileGround(ctx: GroundContext, roles: TileRoles, scheme: Co
   ctx.fillStyle = namesGround(scheme.dayFill);
   ctx.fillRect(0, 0, g.W, g.H);
   ctx.fillStyle = roles.fill;
-  ctx.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+  const rad = banner ? NAMES_BANNER_RADIUS * g.px : 0, b = tile.band ?? NO_BAND; // rounded outer corners of the banner (variant), only at a cube edge
+  if (rad > 0 && ctx.roundRect && ctx.beginPath && ctx.fill && (b.l > 0 || b.r > 0)) {
+    ctx.beginPath();
+    ctx.roundRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0, [b.l > 0 ? rad : 0, b.r > 0 ? rad : 0, b.r > 0 ? rad : 0, b.l > 0 ? rad : 0]);
+    ctx.fill();
+  } else ctx.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
 }
+/** One stretch of an edge of a tile up to the fraction `to` (0..1) of its length, and the color there. */
+export interface TileEdgeStop { readonly to: number; readonly color: string }
+export type TileEdgeColors = Partial<Record<"left" | "right" | "top" | "bottom", string | readonly TileEdgeStop[]>>;
+/**
+ * The colors along the four edges of a tile of the names layout, as drawn by `paintTileGround` (what a cut face next to the edge
+ * must show): a side edge runs bottom to top, a top or bottom edge left to right. An edge that lies in the white margin is
+ * the ground, an edge along the fill is changing between the ground and the fill where the fill rectangle (the unit cell or the
+ * banner) starts and ends. null when the whole tile edge is the fill (a tile without bands or banner): the face color applies.
+ */
+export function tileEdgeColors(roles: TileRoles, ground: string, tile: FaceTile): TileEdgeColors | null {
+  const g = tileGrid(tile), banner = isBannerClass(roles.cls), r = banner ? g.banner : g.cell;
+  if (!banner && !hasBand(tile)) return null;
+  const along = (lo: number, hi: number, size: number): string | readonly TileEdgeStop[] => {
+    const stops = [{ to: lo / size, color: ground }, { to: hi / size, color: roles.fill }, { to: 1, color: ground }].filter((s, i, all) => s.to > (i === 0 ? 0 : all[i - 1].to) + 1e-9);
+    return stops.length === 1 ? stops[0].color : stops;
+  };
+  const up = along(g.H - r.y1, g.H - r.y0, g.H), right = along(r.x0, r.x1, g.W); // up: from the bottom of the face, right: from the left
+  return { left: r.x0 > 0 ? ground : up, right: r.x1 < g.W ? ground : up, top: r.y0 > 0 ? ground : right, bottom: r.y1 < g.H ? ground : right };
+}
+/** Weekday words (SUN to SAT) of a tile of the unit grid sit `NAMES_WEEKDAY_DOWN` below the cell center: the vertical shift in drawing px. */
+export const weekdayShift = (cls: TileClass): number => (cls === "weekday" || cls === "sunsat" ? NAMES_WEEKDAY_DOWN * namePxPerUnit() : 0);
 /**
  * Vertical center of the month name in the cell frame (units above the unit cell center): the free height of the banner is
  * split with `NAME_ABOVE_SHARE` above the ink (clearly more red above the name than below), `capUnits` is the ink height.
@@ -353,7 +379,7 @@ function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfil
     if (exact) {
       const at = halfTurnDigitPlacement(text, size);
       ctx.fillText(text, at.x, at.baseline);
-    } else ctx.fillText(text, TEXTURE / 2, TEXTURE / 2 + size * 0.04);
+    } else ctx.fillText(text, TEXTURE / 2, TEXTURE / 2 + size * 0.04 + (face && tile && layout === "names" && roles ? weekdayShift(roles.cls) : 0));
   }
 }
 
