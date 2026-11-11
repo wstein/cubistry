@@ -139,3 +139,48 @@ test("name layout: pairs below the 2 px floor by nature are raised to it (Noto: 
   assert.deepEqual([...noto.tiles.values()].flatMap((t) => t.raised.map((p) => `${t.label}/${p}`)), ["ARY/R-Y", "ULY/L-Y"]);
   for (const [label, pair] of [["ARY", 1], ["ULY", 1]]) assert.ok(Math.abs(noto.tiles.get(label).gaps[pair] - 2) < 1e-9, `${label} gap is 2 px`);
 });
+
+test("name layout: an outer tile takes the mean tracking of the middle tiles, less only where it would leave the texture (4 tiles, all 14 fonts)", () => {
+  const limited = [];
+  for (const id of IDS) {
+    const tiles = [...nameFaceTable(FONT_METRICS[id]).tiles.values()];
+    const middle = tiles.filter((t) => t.anchor === 0), mean = middle.reduce((s, t) => s + t.tracking, 0) / middle.length;
+    for (const t of tiles.filter((x) => x.anchor !== 0 && x.label.length > 1)) { // a single letter has no gap to track
+      // the first tile (anchor 1) is the wide outer one; its far edge is the left texture edge, the last tile's the right one
+      const w = t.anchor === 1 ? F : 1, e = edge(w), boxes = nameLabelLayout(t.label, FONT_METRICS[id], "face", w).map((l) => l.box);
+      const reach = t.anchor === 1 ? boxes[0].x0 - (96 - e.x + 1.5) : 96 + e.x - 1.5 - boxes.at(-1).x1;
+      assert.ok(t.tracking <= mean + 1e-9, `${id} ${t.label}: tracking ${t.tracking} above the mean ${mean}`);
+      if (t.tracking < mean - 1e-6) { limited.push(`${id} ${t.label}`); assert.ok(Math.abs(reach) < 1e-3, `${id} ${t.label}: limited tile touches the edge margin (reach ${reach})`); }
+      else assert.ok(Math.abs(t.tracking - mean) < 1e-9 && reach >= -1e-9, `${id} ${t.label}: tracking ${t.tracking} equals the mean ${mean}`);
+    }
+  }
+  assert.deepEqual(limited.sort(), ["comfortaa UNE", "nova-mono UNE", "nova-mono UST", "nunito-sans ARY"]);
+});
+
+// Synthetic fonts: the real font with scaled glyph metrics (w: widths, h: heights), so the branches the 14 shipped fonts never take run.
+const synth = (w, h) => ({ ...FONT_METRICS.noto, glyphs: Object.fromEntries(Object.entries(FONT_METRICS.noto.glyphs).map(([c, g]) => [c, { ...g, advance: g.advance * w, left: g.left * w, right: g.right * w, top: g.top * h, bottom: g.bottom * h }])) });
+
+test("name layout: a font whose tiles do not fit at the weekday size gets a smaller size and names the blocking tiles", () => {
+  const t = nameFaceTable(synth(1.3, 1));
+  assert.ok(t.size < t.weekday, `size ${t.size} below weekday ${t.weekday}`);
+  assert.deepEqual(t.blocked.map((b) => b.label), ["ANU", "ARY"]);
+  assert.deepEqual(t.blocked.find((b) => b.label === "ARY").months, ["JANUARY", "FEBRUARY"]);
+});
+
+test("name layout: the glyphs fit the texture height (a tall font gets a smaller size)", () => {
+  const font = synth(1, 3), t = nameFaceTable(font), tall = Math.max(...Object.values(font.glyphs).map((g) => g.bottom - g.top));
+  assert.ok(t.size < 96 && t.blocked.length === 0, `size ${t.size}`);
+  for (const w of [F, 1]) assert.ok(tall * t.size <= 2 * edge(w).y + 1e-9, `width ${w}: glyph height ${tall * t.size} within ${2 * edge(w).y}`);
+  assert.ok(tall * 96 > 2 * edge(1).y, "the size of the shipped Noto would clip");
+});
+
+test("name layout: the month size is never below the weekday size when the weekday size fits", () => {
+  const t = nameFaceTable(synth(0.9, 0.75));
+  assert.equal(t.blocked.length, 0);
+  assert.ok(Math.abs(t.size - t.weekday) < 1e-9 && t.size > 106.75, `size ${t.size} equals the weekday size ${t.weekday}, above the natural fill size`);
+});
+
+test("name layout: no size fits a font with huge glyphs", () => {
+  assert.throws(() => nameFaceTable(synth(20, 1)), /no name size fits/);
+  assert.throws(() => nameFaceTable(synth(1, 30)), /no name size fits/);
+});
