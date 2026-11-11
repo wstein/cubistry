@@ -31,3 +31,7 @@ mut stage_pairs.jl 's/Dates.dayofweek(Date(y,m,1))/Dates.dayofweek(Date(y,m,2))/
 mut stage_pairs.jl 's/("2",(1950,1),(1980,1))/("2",(1950,1),(1979,12))/' "staged chain pairs" test_stages.jl
 mut config_table.jl 's/(r,c)!=skip\]/true]/' "committed tables equal recomputed tables"
 mut best-effort-feb-sunday-28.tsv '0,/^B\t/s//C\t/' "committed tables equal recomputed tables"
+mut ../window-skip/design_skip.jl 's/digest=bytes2hex(sha256(smt));path=/digest="x";path=/' "solved classes are read from the result directory" test_cache.jl
+mut ../window-skip/design_skip.jl 's/if !isempty(path) \&\& isfile(path)$/if false/' "solved classes are read from the result directory" test_cache.jl
+mut ../window-skip/design_skip.jl 's/if !isempty(path) \&\& result.status==1$/if !isempty(path)/' "solved classes are read from the result directory" test_cache.jl
+mut ../window-skip/design_skip.jl 's/ls\[1\]=="digest\\t"\*digest/true/' "solved classes are read from the result directory" test_cache.jl
