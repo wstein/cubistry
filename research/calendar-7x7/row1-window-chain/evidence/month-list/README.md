@@ -97,8 +97,8 @@ members; best-effort months are chain members listed separately, not gaps. A bes
 list and checks the JSON. `coverage-S2.*` (list `months-S2.tsv`, start = root = 2026-05) and `coverage-chain-2026-03.*` (list `months-chain-2026-03.tsv`, root 1980-01, start 2026-03, both Februaries best-effort) are committed.
 
 ```
-coverage-S2:            planned-exact-gapless 2026-05 .. 2037-01 (129 months)   chain members 283, exact runs 3, best-effort 0, gaps 2, bridges 2, before_start 4
-coverage-chain-2026-03: planned-exact-gapless 2026-03 .. 2037-01 (131 months)   chain members 287, exact runs 3, best-effort 2 (2037-02, 2043-02), gaps 0, before_start 2
+coverage-S2:            planned-exact-gapless 2026-05 .. 2037-01 (129 months)   chain members 283, planned exact runs 3, best-effort 0, gaps 2, bridges 2, before_start 4
+coverage-chain-2026-03: planned-exact-gapless 2026-03 .. 2037-01 (131 months)   chain members 287, planned exact runs 3, best-effort 2 (2037-02, 2043-02), gaps 0, before_start 2
 ```
 
 ## Receipts (Julia and Flix byte-identical, committed here)
@@ -133,5 +133,4 @@ S2 are not run.
 - `row1-window-chain/test_month_coverage.jl` (36 tests): generator output equals the stored coverage; tampered copies are rejected; start 2026-03 gives 131 months and two before_start months; root and start are separate parameters; verified and unverified best-effort months.
 - `row1-window-chain/run_month_list_receipts.sh`: regression (committed 2028-01 chain receipts, 129-month print and corner
   receipts, 21-month print) and the S2 receipts above.
-- `row1-window-chain/run_month_list_mutants.sh`: 58 source mutants (list logic, root edge, Hall rule, start moves, junction digests in Julia, Flix and the independent verifier; coverage and stage composition), each must make its test fail.
-  Not mutation-tested: the Hall count rule `wrong cells == deficiency` in the independent verifier and in Flix (the Julia rule is covered by `test_best_effort.jl`, mutant H2).
+- `row1-window-chain/run_month_list_mutants.sh`: 59 source mutants (list logic, root edge, Hall rule, start moves, junction digests in Julia, Flix and the independent verifier; coverage and stage composition), each must make its test fail.
