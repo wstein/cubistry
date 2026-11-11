@@ -13,6 +13,9 @@ name: Window chain
 # (run_checks.sh: Julia check.jl, Flix chain checker, independent verify_chain.jl; Julia and Flix receipts must be
 # byte-identical; uploads the verified artifact). A stopped run is continued with prior_run_id.
 # No commits, no gitlinks, no PR comments; the output is an artifact only.
+# Concurrency: one run at a time. GitHub keeps at most one running and one pending run per group; a newer dispatch replaces an
+# older pending one (the replaced run is cancelled) even with cancel-in-progress false. Dispatch the next run only after the
+# previous one finished.
 
 on:
   workflow_dispatch:
@@ -61,6 +64,10 @@ on:
         description: Run id of an earlier run of this workflow whose verified chain artifact is continued
         type: string
         default: ""
+      fail_on_greedy:
+        description: Fail the verify job (after the verified artifact is uploaded) when any edge used the greedy fallback (300-400 HTM per edge)
+        type: boolean
+        default: true
       smoke_mode:
         description: 3 edges, ignores prior_run_id, about 15 minutes; verifies the 3-edge chain
         type: boolean
@@ -121,6 +128,8 @@ jobs:
           [[ "$IN_START" =~ $ym && "$IN_END" =~ $ym && "$IN_WINDOW_END" =~ $ym ]] || fail "start, end and print_window_end must be YYYY-MM (2000-2099)"
           [[ "$IN_START" < "2026-06" ]] || fail "start must be 2026-05 or earlier: the chain root is May 2026"
           [[ "$IN_END" > "2026-05" ]] || fail "end must be after 2026-05"
+          # Both chain checkers pin the stored 2028-01 print and reject any other: a chain ending at 2028-01 is not checkable with a new print.
+          [ "$IN_END" != 2028-01 ] && [ "$IN_WINDOW_END" != 2028-01 ] || fail "end and print_window_end must not be 2028-01 (new immutable print pin needed)"
           [[ "$IN_PRINT_PATH" =~ $path ]] && [[ "$IN_PRINT_PATH" != *..* ]] || fail "print_path is not a plain repository path"
           [ -z "$IN_CLAIMS" ] || { [[ "$IN_CLAIMS" =~ $path ]] && [[ "$IN_CLAIMS" != *..* ]]; } || fail "claims_path is not a plain repository path"
           [[ "$IN_PRINT_SHA" =~ ^[0-9a-f]{64}$ ]] || fail "print_sha256 must be 64 lowercase hex digits"
@@ -161,7 +170,8 @@ jobs:
         run: |
           set -euo pipefail
           fail() { echo "::error::$1"; exit 1; }
-          # Only a commit that exists in this repository is accepted; no URLs or fork refs.
+          # The commit is fetched from origin by SHA: GitHub serves any commit reachable from a ref of this repository (pull request refs included),
+          # a commit that exists only in a fork is not fetchable. The 40-digit check rules out ref names and URLs.
           git fetch --no-tags --depth=1 origin "$SHA" || fail "commit $SHA is not fetchable from $GITHUB_REPOSITORY"
           [ "$(git rev-parse --verify "$SHA^{commit}")" = "$SHA" ] || fail "research_ref does not resolve to itself"
           missing=0
@@ -220,7 +230,8 @@ jobs:
           [ -z "$CLAIMS_PATH" ] || test -f "src/$CLAIMS_PATH"
           mkdir -p "$GITHUB_WORKSPACE/out"
           if [ -d "$GITHUB_WORKSPACE/prev" ]; then
-            # A prior artifact is untrusted input until its checksums and marker verify; take the verified chain with the most edges.
+            # A prior artifact is untrusted input. SHA256SUMS and VERIFIED.txt only show that it is self-consistent; the producer replays the chain
+            # and checks its end digest, and the verify job re-checks the whole chain. Take the chain with the most edges.
             best=""; most=-1
             while IFS= read -r marker; do
               d=$(dirname "$marker")
@@ -231,9 +242,9 @@ jobs:
             done < <(find "$GITHUB_WORKSPACE/prev" -name VERIFIED.txt)
             [ -n "$best" ] || { echo "::error::no verified chain artifact found to continue"; exit 1; }
             grep -qx "print_sha256=$PRINT_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another print"; exit 1; }
-            # The producer reads prior/chain.moves.tsv and prior/states.
+            # The producer reads prior/chain.moves.tsv, prior/edges.tsv (the solver record of earlier segments) and prior/states.
             mkdir "$GITHUB_WORKSPACE/prior"
-            cp "$best/chain.moves.tsv" "$GITHUB_WORKSPACE/prior/"; cp -R "$best/states" "$GITHUB_WORKSPACE/prior/states"
+            cp "$best/chain.moves.tsv" "$best/edges.tsv" "$GITHUB_WORKSPACE/prior/"; cp -R "$best/states" "$GITHUB_WORKSPACE/prior/states"
             echo "PRIOR_DIR=$GITHUB_WORKSPACE/prior" >> "$GITHUB_ENV"
             echo "continuing from $best ($most edges)"
           fi
@@ -267,6 +278,7 @@ jobs:
     timeout-minutes: 345
     env:
       SHA: ${{ inputs.research_ref }}
+      FAIL_ON_GREEDY: ${{ inputs.fail_on_greedy }}
       PRINT_PATH: ${{ inputs.print_path }}
       PRINT_SHA: ${{ inputs.print_sha256 }}
     steps:
@@ -327,7 +339,13 @@ jobs:
           grep -q $'^independent-verdict\tACCEPT_CHAIN\t'"$((edges_total + 1))"$'\t'"$edges_total"$'\t' "$out/independent.tsv" || { echo "::error::independent verdict differs ($edges_total edges)"; exit 1; }
           lines=$(grep -c $'^edge\t' "$c/chain.moves.tsv")
           [ "$lines" = "$edges_total" ] || { echo "::error::chain has $lines edges, PROGRESS.txt says $edges_total"; exit 1; }
-          { echo "CHAIN_END=$chain_end"; echo "EDGES_TOTAL=$edges_total"; echo "COMPLETE=$complete"; } >> "$GITHUB_ENV"
+          # The solver record: edges.tsv is cumulative (column 4 is beam, finishN or greedy); PROGRESS.txt must agree with it.
+          greedy=$(awk -F'\t' 'NR>1 && $4=="greedy"' "$c/edges.tsv" | wc -l)
+          [ "$greedy" = "$(sed -n 's/^greedy_edges=\([0-9]\{1,\}\)$/\1/p' "$c/PROGRESS.txt")" ] || { echo "::error::greedy edge count of PROGRESS.txt differs from edges.tsv"; exit 1; }
+          [ "$(awk 'NR>1' "$c/edges.tsv" | wc -l)" = "$edges_total" ] || { echo "::error::edges.tsv does not list $edges_total edges"; exit 1; }
+          [ "$greedy" = 0 ] || echo "::warning::$greedy of $edges_total edges used the greedy fallback (300-400 HTM per edge)"
+          echo "greedy fallback edges: $greedy of $edges_total"
+          { echo "CHAIN_END=$chain_end"; echo "EDGES_TOTAL=$edges_total"; echo "COMPLETE=$complete"; echo "GREEDY=$greedy"; } >> "$GITHUB_ENV"
       - name: Package artifact
         run: |
           set -euo pipefail
@@ -345,7 +363,7 @@ jobs:
           {
             echo "### Window chain verified"
             echo "- research SHA: \`$SHA\`, print: \`$PRINT_SHA\`"
-            echo "- edges: $EDGES_TOTAL, chain end: $CHAIN_END, complete: $COMPLETE"
+            echo "- edges: $EDGES_TOTAL, chain end: $CHAIN_END, complete: $COMPLETE, greedy fallback edges: $GREEDY"
             echo "- $(tail -n 1 "$out/julia.tsv" | tr '\t' ' ') / $(tail -n 1 "$out/independent.tsv" | tr '\t' ' ')"
             echo '```'; cat "$pack/PROGRESS.txt"; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
@@ -355,6 +373,12 @@ jobs:
           path: pack/
           retention-days: 90
           if-no-files-found: error
+      - name: Greedy gate
+        if: env.FAIL_ON_GREEDY == 'true' && env.GREEDY != '0'
+        run: |
+          # The verified artifact is already uploaded, so a continuation with fail_on_greedy=false stays possible.
+          echo "::error::$GREEDY edge(s) used the greedy fallback; the chain is verified and uploaded, but fail_on_greedy is true"
+          exit 1
       - name: Collect failure logs
         if: failure() || cancelled()
         run: |
