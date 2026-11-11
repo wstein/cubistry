@@ -181,25 +181,57 @@ later edge depends on the state before it, a change of an earlier edge forces a 
 
 ## Long chain with month status (window_chain.jl)
 
-`window_chain.jl OUT PRINT [key=value ...]` loops the beam edge of `beam_edge.jl` sequentially from the retained state over
-the months of the print window (`WINDOW_END`, default 2037-01), builds the macro library once per process and falls back to the
-greedy orbit solver when the beam finds no word. `prior=DIR` continues `DIR/chain.moves.tsv` and `DIR/states` (replayed, end
-digest checked, rows copied verbatim) and carries `DIR/edges.tsv` forward, so the solver record of earlier segments is kept.
-`GENERATE_DEADLINE_S` stops cleanly before the job limit (no new edge when the slowest edge so far would not fit);
-`max_edges=N` bounds a run. Output: `chain.moves.tsv`, `states/`, `edges.tsv` (cumulative; column `method` is `beam`, `finishN`
-or `greedy`), `months.tsv`, `PROGRESS.txt` (incl. `greedy_edges`). Exit 3 means no new edge. A greedy edge has 300 to 400 HTM
-against about 100 for a beam edge; it is never silent: `months.tsv` has a `method` column, the verify job prints the count and
-warns, and the workflow input `fail_on_greedy` (default true) fails the verify job after the verified artifact is uploaded.
-The logic without the solver is tested by `test_window_chain.jl`; the workflow `.github/workflows/window-chain.yml` (manual,
-job limit 345 min, verify job with the three checkers) runs it and is checked statically by `tests/window-chain-workflow.test.mjs`.
+`window_chain.jl OUT PRINT [key=value ...]` loops the beam edge of `beam_edge.jl` sequentially from the retained state over the
+chain months, builds the macro library once per process and falls back to the greedy orbit solver when the beam finds no word.
+The run contract is the one of the chain checkers and is read from the same environment; nothing is fixed to one print or root:
 
-2028-01 rule. Both chain checkers pin the stored 2028-01 print and reject any other print for that window end (a new window end
-needs a new immutable print pin). A chain that ends at 2028-01 is therefore not checkable with a new print. The producer never stops
-there (it takes one more edge, `stop_reason` in `window_chain_lib.jl`), and the workflow rejects `end` and `print_window_end` equal to 2028-01.
+| Variable | Meaning |
+| --- | --- |
+| `CAL7_WINDOW_MONTHS`, `CAL7_WINDOW_MONTHS_SHA256` | month list S (one `YYYY-MM` per row, 1900-01 .. 2100-01, strictly increasing, LF, pinned by SHA-256); required |
+| `CAL7_ROOT_MONTH` | month the identity pose of the print shows; default the first month of S. A root other than S[1] adds one root edge (`ROOTEDGE`) |
+| `CAL7_WINDOW_PRINT_SHA` | SHA-256 of the print (checked by the producer when set, required by the checkers) |
+
+The chain is the root month followed by S; an edge across skipped calendar months is a bridge edge (`BRIDGE`). Options:
+`prior=DIR` continues `DIR/chain.moves.tsv` and `DIR/states` (replayed, end digest checked, rows copied verbatim) and carries
+`DIR/edges.tsv` and `DIR/segments.tsv` forward; `claims=FILE` and `best_effort=FILE` (declared best-effort months, header
+`month status wrong_cells evidence` as in the coverage tools) feed `months.tsv`; `start=`/`end=` bound the months of `months.tsv`
+(default the chain range); `max_edges=N`; `library`, `width`, `lambda` and the other beam options. `GENERATE_DEADLINE_S` (default
+3000) stops cleanly: no new edge when the slowest edge so far would not fit. Output: `chain.moves.tsv` (chain.v1), `states/`,
+`edges.tsv` (cumulative; column `method` is `beam`, `finishN` or `greedy`), `segments.tsv` (one row per run: run id, research
+commit, library, width, lambda, print and list SHA-256, root month, edge range; carried through resume), `months.tsv`,
+`PROGRESS.txt` (incl. `greedy_edges`, `root_month`, `bridge_edges`, `best_effort_edges`). Exit 3 means no new edge.
+
+Segments. A long chain runs as sequential segments of about one hour: edge-loop deadline 3000 s, workflow job limit 70 min
+(`timeout 65m` around the producer), each segment continued from the verified artifact of the previous one with
+`prior_run_id`. The verify job re-checks the whole cumulative chain after every segment; its duration is UNKNOWN (not measured for a
+long chain) and its job limit stays at 345 min. A stopped segment is checked against the members of S up to its last edge (the
+checkers require a list that ends at the last edge); the root month stays the run parameter.
+
+Months and statuses. `months.tsv` has one row per month of the range: `valid` (an edge leads into the month, or it is the root; reasons
+`root`, `root_edge`, `bridge_edge`, `chain_edge`), `unknown` with the reason `skipped_gap` (a month between chain months that is not in S),
+`before_chain_root`, `after_month_list`, the stop reason of the segment (`deadline`, `max_edges`, `search_stalled`) or
+`best_effort_month`, and the claimed statuses `unavailable_nomatch`, `unavailable_unsat`, `best_effort`, which need `confirmed=both`
+(Julia and Flix) and are otherwise written as `unknown` with reason `claimed_<status>_<confirmed>`. Best-effort months are chain
+members whose edge needs wrong cells and Hall witnesses (chain.v2); this producer writes chain.v1 only and stops before a declared
+best-effort month (`best_effort_month`), so a chain through 2037-02 or 2043-02 is not produced here. The checkers accept such chains
+(verdict `BEST_EFFORT` / `ACCEPT_BEST_EFFORT_CHAIN`) and the verify job expects that verdict when `PROGRESS.txt` says
+`best_effort_edges` greater than 0.
+
+A greedy edge has 300 to 400 HTM against about 100 for a beam edge; it is never silent: `months.tsv` has a `method` column, the verify
+job prints the count and warns, and the workflow input `fail_on_greedy` (default true) fails the verify job after the verified
+artifact is uploaded. The logic without the solver is tested by `test_window_chain.jl`; the workflow
+`.github/workflows/window-chain.yml` (manual, produce job limit 70 min, verify job with the three checkers) runs it and is checked
+statically by `tests/window-chain-workflow.test.mjs`.
+
+Inputs of the workflow: `research_ref` (a commit on `research/cube-display-feasibility`; the prepare job rejects any other commit),
+`months_path` and `months_sha256`, `root_month`, `print_path` and `print_sha256`, optional `best_effort_path`, `claims_path`, `start`,
+`end`, `library`, `width`, `lambda`, `prior_run_id`, `fail_on_greedy`, `smoke_mode`. No default names a print, month list or root.
+The old 2028-01 print pin only applies to the checkers' `WINDOW_END` mode; the list mode used here pins the print by
+`CAL7_WINDOW_PRINT_SHA` for every window end.
 
 ### Print and months that exist
 
-A window print fixes the chain root: May 2026 is the identity pose, so a chain cannot start earlier. The print for window end
+The identity pose of a print shows its root month: May 2026 for the committed 2037-01 print, so a chain on that print cannot start earlier; the root month is a run parameter (a print with root January 1980 is planned, see below). The print for window end
 2037-01 is committed in [evidence/window-2037-01](evidence/window-2037-01/README.md) with Julia and Flix receipts (print matching of
 129 months: SAT; corner lemma for the 130 targets up to 2037-02: UNSAT, both checkers, with the caveats of that README). No chain
 for this print is committed. A greedy chain 2026-05 .. 2037-01 (129 months, 128 edges, 44342 HTM, about 346 per edge; Julia and Flix
@@ -229,10 +261,10 @@ checkers require chronological adjacency of consecutive edges.
    reads the file next to the graph: a month with status other than `valid` shows the reason instead of a cube. No checker or app
    change. `months.tsv` is not verified by any checker: the checkers prove the chain only, a `valid` record is the producer's
    reading of the chain and an `unavailable_*` record points to its evidence.
-2. Gap markers inside the chain. A `gap` row between edges would let valid months on both sides connect directly. It needs a new
-   chain version and changes in Julia, Flix, replay verifier and the app (adjacency is checked in all of them). Not needed for this
-   print: its unavailable months lie before the root and after the window end. `window_chain.jl` refuses an interior gap
-   (`chain_progress` errors, a stalled month ends the chain and is recorded as `unknown`).
+2. Bridge edges inside the chain. The checkers accept a month list with interior gaps: the edge into the next member is a bridge edge
+   (`BRIDGE`), so valid months on both sides connect directly and the skipped months are `skipped_gap` rows of `months.tsv`.
+   `window_chain.jl` produces them. The app still reads the chain as contiguous: showing a gap month is an app change, not part of
+   this PR.
 3. Encode status in graph nodes (a node without hash). Mixes proof data with display data and breaks the strict month-order check;
    not recommended.
 
@@ -240,7 +272,8 @@ Recommendation: option 1, with option 2 for a print that has an interior gap. Co
 consistent with the graph; the app change (read the file, show the reason) is separate.
 
 Claims file (optional `claims=` option, `claims_path` of the workflow): TSV with header
-`month status reason evidence confirmed` (`confirmed` is `both`, `julia_only` or `none`); a month may appear once, a duplicate fails.
+`month status reason evidence confirmed` (`confirmed` is `both`, `julia_only` or `none`); a month may appear once, a duplicate fails;
+a claim on a chain month is an error (the chain decides it).
 
 ### Starting the workflow
 
@@ -255,9 +288,12 @@ previous one finished.
 
 ### Planned (not in this change)
 
-Skipped months with direct edges between valid months (a month list instead of a range), a coverage summary generated and checked by
-the verify job (maximal gapless runs, every gap month with status, reason and evidence, bridge edges marked in the chain data), and
-segments of about one hour each chained by `prior_run_id`, depend on the capacity research and on checker changes; see the PR text.
+Open inputs (not decided here, so no defaults): the SHA-256 of Print C (root January 1980, PR #417) and the final month lists of the
+stages. Each stage is its own run with its own list, root and print: 2026-01 .. 2050-01 (root 1980-01 gives a root edge), then
+1980-01 .. 2026-01 backward to the root, 1950-01 .. 1980-01, 1900-01 .. 1950-01 and 2050-01 .. 2100-01. Not supported by the producer:
+stages that start at a free state (chain.v3 `start` block) or join by digest (`CAL7_JOIN_START`, `CAL7_JOIN_END`), best-effort edges
+(chain.v2: wrong cells and Hall witnesses), and a window-local layout such as the April tiles AP|RIL (`run_checks.sh` reads
+`row1-revision/layout.tsv`). The coverage summary (`month_coverage.jl`) is not run by the verify job. The workflow was never run.
 
 ## Scope and limits
 
