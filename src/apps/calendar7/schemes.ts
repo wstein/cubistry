@@ -28,8 +28,22 @@ export interface SchemeLine {
 }
 
 /** Theme follows the cube color scheme; the other choices override its month banner shape. */
-export type BannerStyle = "theme" | "rounded" | "square" | "underline";
+export type BannerStyle = "theme" | "rounded" | "square" | "underline" | "boxed" | "rounded-box";
 export type ResolvedBannerStyle = Exclude<BannerStyle, "theme">;
+type SchemeId = "paper-red" | "paper-blue" | "classic" | "solarized-light" | "gruvbox-light" | "dracula" | "monokai" | "gruvbox-dark" | "catppuccin-mocha" | "high-contrast";
+/** Every color theme has an explicit default; filled, outlined, and underlined banners remain distinct choices. */
+const THEME_BANNERS: Readonly<Record<SchemeId, ResolvedBannerStyle>> = Object.freeze({
+  "paper-red": "rounded",
+  "paper-blue": "underline",
+  classic: "square",
+  "solarized-light": "boxed",
+  "gruvbox-light": "rounded-box",
+  dracula: "square",
+  monokai: "boxed",
+  "gruvbox-dark": "rounded-box",
+  "catppuccin-mocha": "rounded",
+  "high-contrast": "square",
+});
 
 export interface ColorScheme {
   /** Runtime artwork choice; the immutable palette tokens do not change. */
@@ -320,12 +334,12 @@ export function schemeById(id: string | null | undefined): ColorScheme {
 
 /** Invalid URL choices use the color theme's banner default. */
 export function parseBannerStyle(value: string | null | undefined): BannerStyle {
-  return value === "rounded" || value === "square" || value === "underline" ? value : "theme";
+  return value === "rounded" || value === "square" || value === "underline" || value === "boxed" || value === "rounded-box" ? value : "theme";
 }
 
 /** The color theme's shape, unless this runtime copy has an explicit shape. */
 export function resolvedBannerStyle(scheme: ColorScheme): ResolvedBannerStyle {
-  return scheme.bannerStyle ?? (scheme.id === "paper-blue" ? "square" : scheme.id === "classic" ? "underline" : "rounded");
+  return scheme.bannerStyle ?? (Object.hasOwn(THEME_BANNERS, scheme.id) ? THEME_BANNERS[scheme.id as SchemeId] : "rounded");
 }
 
 /** Resolve artwork without changing the frozen palette or retaining an old override in Theme mode. */

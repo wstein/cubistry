@@ -6,7 +6,7 @@ import { drawFace, paintTileGround, tileEdgeColors, tileGrid, tileRoles } from "
 import { contrast } from "./calendar7-contrast.mjs";
 
 const byId = (id) => SCHEMES.find((s) => s.id === id);
-const styles = ["rounded", "square", "underline"];
+const styles = ["rounded", "square", "underline", "boxed", "rounded-box"];
 const tile = { w: 1.8, h: 1.8, band: { l: 0.8, r: 0, t: 0.8, b: 0 } };
 function record() {
   const log = [];
@@ -20,10 +20,10 @@ function record() {
 }
 const groundLog = (scheme, ink = "month") => { const { ctx, log } = record(); paintTileGround(ctx, tileRoles(scheme, ink === "month" ? "NOV" : "", ink, "names"), scheme, tile); return log; };
 
-test("theme selects distinct banner shapes and parser accepts only the four choices", () => {
-  assert.equal(resolvedBannerStyle(withBannerStyle(byId("paper-red"), "theme")), "rounded");
-  assert.equal(resolvedBannerStyle(withBannerStyle(byId("paper-blue"), "theme")), "square");
-  assert.equal(resolvedBannerStyle(withBannerStyle(byId("classic"), "theme")), "underline");
+test("all ten theme defaults are explicit and parser accepts exactly six choices", () => {
+  const expected = { "paper-red": "rounded", "paper-blue": "underline", classic: "square", "solarized-light": "boxed", "gruvbox-light": "rounded-box", dracula: "square", monokai: "boxed", "gruvbox-dark": "rounded-box", "catppuccin-mocha": "rounded", "high-contrast": "square" };
+  assert.deepEqual(Object.keys(expected).sort(), SCHEMES.map(s => s.id).sort());
+  for (const base of SCHEMES) assert.equal(resolvedBannerStyle(withBannerStyle(base, "theme")), expected[base.id], base.id);
   for (const s of ["theme", ...styles]) assert.equal(parseBannerStyle(s), s);
   for (const s of [null, undefined, "", "SQUARE", "unknown", " rounded "]) assert.equal(parseBannerStyle(s), "theme");
 });
@@ -40,19 +40,38 @@ test("overrides preserve all frozen theme tokens and theme restores the chosen s
   }
 });
 
-test("rounded and square render different corners; Paper Blue retains its blue ink and light ground with an outline", () => {
-  for (const id of ["paper-red", "paper-blue"]) {
+test("rounded and square are filled banners for every palette, including Paper Blue without a band fill", () => {
+  for (const base of SCHEMES) {
+    const id = base.id;
     const rounded = groundLog(withBannerStyle(byId(id), "rounded"));
     const square = groundLog(withBannerStyle(byId(id), "square"));
     assert.ok(rounded.some((r) => r.kind === "round"), `${id}: curved corners`);
     assert.ok(square.every((r) => r.kind !== "round"), `${id}: straight corners`);
     assert.notDeepEqual(rounded, square);
+    for (const style of ["rounded", "square"]) {
+      const scheme = withBannerStyle(base, style), roles = tileRoles(scheme, "NOV", "month", "names");
+      assert.equal(roles.banner.outline, null, `${id}/${style}: filled, never outlined`);
+      assert.equal(roles.fill, namesGround(base.bandFill ?? base.monthInk));
+      assert.equal(groundLog(scheme).at(-1).color, roles.fill, `${id}/${style}: solid fill`);
+    }
   }
-  const blue = withBannerStyle(byId("paper-blue"), "square"), roles = tileRoles(blue, "NOV", "month", "names"), log = groundLog(blue);
-  assert.equal(roles.fill, namesGround(blue.dayFill));
-  assert.equal(roles.ink, blue.monthInk);
-  assert.ok(log.some((r) => r.color === blue.monthInk), "blue frame is visible");
-  assert.equal(log.at(-1).color, namesGround(blue.dayFill), "inside the outline remains light");
+  const blue = withBannerStyle(byId("paper-blue"), "square"), blueRoles = tileRoles(blue, "NOV", "month", "names");
+  assert.equal(blueRoles.fill, blue.monthInk);
+  assert.equal(blueRoles.ink, blue.dayFill);
+});
+
+test("boxed and rounded-box are readable outlines on the day ground for every palette, even those with a band fill", () => {
+  for (const base of SCHEMES) for (const style of ["boxed", "rounded-box"]) {
+    const scheme = withBannerStyle(base, style), roles = tileRoles(scheme, "NOV", "month", "names"), log = groundLog(scheme);
+    assert.equal(roles.fill, namesGround(base.dayFill), `${base.id}/${style}: unfilled`);
+    assert.ok(roles.banner.outline, `${base.id}/${style}: outline independent of bandFill`);
+    assert.equal(roles.ink, roles.banner.outline.color);
+    assert.ok(contrast(roles.banner.outline.color, roles.fill) >= 4.5, `${base.id}/${style}: readable frame`);
+    assert.ok(log.some(r => r.color === roles.banner.outline.color), `${base.id}/${style}: visible border`);
+    assert.equal(log.at(-1).color, namesGround(base.dayFill), `${base.id}/${style}: interior matches the day ground`);
+    assert.equal(log.some(r => r.kind === "round"), style === "rounded-box", `${base.id}/${style}: corner shape`);
+    assert.deepEqual(groundLog(scheme, "band"), log, `${base.id}/${style}: blank band carries the same direction marker`);
+  }
 });
 
 test("underline removes the filled banner and uses readable existing palette colors for every theme", () => {
