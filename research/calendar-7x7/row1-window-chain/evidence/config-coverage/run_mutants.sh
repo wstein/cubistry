@@ -27,3 +27,5 @@ mut ../window-skip/design_skip.jl 's/haskey(ENV,"ROOT") \&\& @assert/haskey(ENV,
 mut config_table.jl 's/ckey(y,m) in badk || push!(seq,(y,m))/push!(seq,(y,m))/' "committed tables equal recomputed tables"
 mut config_table.jl 's/lemma=d.lemma))/lemma=!d.lemma))/' "corner lemma per configuration"
 mut config_table.jl 's|const PRINT_C=joinpath(@__DIR__,"printing-C.tsv")|const PRINT_C=PRINT_B|' "identity pose and print C month list"
+mut stage_pairs.jl 's/Dates.dayofweek(Date(y,m,1))/Dates.dayofweek(Date(y,m,2))/' "staged chain pairs" test_stages.jl
+mut stage_pairs.jl 's/("2",(1950,1),(1980,1))/("2",(1950,1),(1979,12))/' "staged chain pairs" test_stages.jl
