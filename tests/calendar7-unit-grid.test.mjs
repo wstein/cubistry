@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { layerCenters } from "@cubistry/cube-viewer";
-import { CALENDAR7_SIZE, NAMES_BANNER_RADIUS_RATIO, NAMES_WEEKDAY_DOWN, bannerOf, faceBandsOf, layerWidthsFor, monthBanner, outerLayerWidth, unitGridTileOf } from "../src/apps/calendar7/geometry.ts";
+import { CALENDAR7_SIZE, NAMES_BANNER_BOTTOM_OFFSET, NAMES_BANNER_HEIGHT, NAMES_BANNER_OVERHANG, NAMES_BANNER_RADIUS, NAMES_WEEKDAY_DOWN, faceBandsOf, layerWidthsFor, monthBanner, outerLayerWidth, unitGridTileOf } from "../src/apps/calendar7/geometry.ts";
 import { NAMES_WHITE, SCHEMES, namesGround } from "../src/apps/calendar7/schemes.ts";
 import { drawFace, namePxPerUnit, nameCenterUp, tileEdgeColors, tileGrid, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { drawFontSticker, labelLayout, nameFaceTable, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
@@ -79,7 +79,7 @@ test("faceBandsOf: the band is f - 1 on the outer side of every outer cubie (lef
   const p = [-3, 3, 3], n = [0, 0, 1], up = [0, 1, 0], wide = [2.5, 1, 1, 1, 1, 1, 2.5];
   assert.deepEqual(faceBandsOf(p, n, up, wide), { l: 1.5, r: 0, t: 1.5, b: 0 });
   assert.deepEqual(faceBandsOf([3, -3, 3], n, up, wide), { l: 0, r: 1.5, t: 0, b: 1.5 });
-  near(monthBanner(2.5).top, 1.5 + 0.5 - bannerOf(2.5).topGap, 1e-12);
+  near(monthBanner().top, 0.9, 1e-12); // fixed: independent of the profile
 });
 
 test("every front tile: the unit cell is on the 7 x 7 unit grid (center and the edges beside a band), at the inner side of the cubie, all 49 faces", () => {
@@ -124,14 +124,14 @@ test("every front tile, font and built-in drawing: white margin ground, the fill
       if (f.tile.band.b > 0) near(rb.y, want.y - 0.5, 1e-9, `${tag} fill bottom`); else assert.equal(cell.y1, g.H);
     } else {
       // month row: 0.4 white at the top of the cubie, banner 1.0 tall, 0.4 white below it (strips of the row: cubie top and bottom)
-      near(f.center.y + F / 2 - lt.y, bannerOf(F).topGap, 1e-9, `${tag} top strip`);
-      near(rb.y - (f.center.y - F / 2), bannerOf(F).bottomGap, 1e-9, `${tag} bottom strip`);
-      near(lt.y - rb.y, bannerOf(F).height, 1e-9, `${tag} banner height 1.2`);
+      near(f.center.y + F / 2 - lt.y, 0.4, 1e-9, `${tag} top strip`);
+      near(rb.y - (f.center.y - F / 2), 0.4, 1e-9, `${tag} bottom strip`);
+      near(lt.y - rb.y, NAMES_BANNER_HEIGHT, 1e-9, `${tag} banner height 1.2`);
       near(lt.y - rb.y, 1.0, 1e-9, `${tag} banner height 1.0 (literal)`);
       near(lt.y, 3.9, 1e-9, `${tag} banner top`); near(rb.y, 2.9, 1e-9, `${tag} banner bottom`);
-      // the banner is inset by 0.5 (`bannerOf(f).sideBand` = f - p) from the cube edges, not by the 0.8 band of the other rows
-      if (f.c === 0) near(lt.x, -4.3 + bannerOf(F).sideBand, 1e-9, `${tag} red starts 0.5 inside the left cube edge`); if (f.c === 0) near(lt.x, -3.8, 1e-9, `${tag} red starts at x = -3.8 (literal)`); else assert.equal(cell.x0, 0);
-      if (f.c === 6) near(rb.x, 4.3 - bannerOf(F).sideBand, 1e-9, `${tag} red ends 0.5 inside the right cube edge`); if (f.c === 6) near(rb.x, 3.8, 1e-9, `${tag} red ends at x = 3.8 (literal)`); else assert.equal(cell.x1, g.W);
+      // the banner is inset by 0.5 (f - 1 - overhang 0.3 at f = 1.8) from the cube edges, not by the 0.8 band of the other rows
+      if (f.c === 0) near(lt.x, -4.3 + (F - 1 - NAMES_BANNER_OVERHANG), 1e-9, `${tag} red starts 0.5 inside the left cube edge`); if (f.c === 0) near(lt.x, -3.8, 1e-9, `${tag} red starts at x = -3.8 (literal)`); else assert.equal(cell.x0, 0);
+      if (f.c === 6) near(rb.x, 4.3 - (F - 1 - NAMES_BANNER_OVERHANG), 1e-9, `${tag} red ends 0.5 inside the right cube edge`); if (f.c === 6) near(rb.x, 3.8, 1e-9, `${tag} red ends at x = 3.8 (literal)`); else assert.equal(cell.x1, g.W);
     }
   }
 });
@@ -141,7 +141,7 @@ test("the left and right margins: 0.8 white in every row (cube edge -4.3 .. -3.5
     const g = tileGrid(f.tile), cell = DRAWINGS.font(f).rects[1]; // [0] is the white ground, [1] the fill of the cell or banner
     const edge = f.c === 0 ? f.center.x - F / 2 : f.center.x + F / 2;
     const inner = f.c === 0 ? scene(f, cell.x0, 0).x : scene(f, cell.x1, 0).x;
-    near(Math.abs(inner - edge), f.r === 0 ? bannerOf(F).sideBand : BAND, 1e-9, `row ${f.r} column ${f.c}: margin`);
+    near(Math.abs(inner - edge), f.r === 0 ? F - 1 - NAMES_BANNER_OVERHANG : BAND, 1e-9, `row ${f.r} column ${f.c}: margin`);
     assert.equal(f.c === 0 ? g.cell.x0 > 0 : g.cell.x1 < g.W, true);
   }
 });
@@ -189,12 +189,12 @@ test("month name placement of the default banner: square corners keep 2:1 above 
     for (const word of ["J", "ANU", "ARY", "NOV", "EMB", "DEC", "SEP", "AUG", "UST"]) for (const l of nameLabelLayout(word, font, "face")) {
       const above = (l.box.y0 - (96 - banner.top * PPU)) / PPU, below = ((96 - banner.bottom * PPU) - l.box.y1) / PPU; // units of red above and below this glyph
       assert.ok(above > 0.2 && below > 0.1, `${id} ${word} ${l.text}: red above ${above}, below ${below}`);
-      if (NAMES_BANNER_RADIUS_RATIO > 0) assert.ok(Math.abs(above - below) <= 4 / PPU, `${id} ${word} ${l.text}: red above ${above.toFixed(4)} and below ${below.toFixed(4)} differ by more than 4 px (a glyph with overshoot or a descender)`);
+      if (NAMES_BANNER_RADIUS > 0) assert.ok(Math.abs(above - below) <= 4 / PPU, `${id} ${word} ${l.text}: red above ${above.toFixed(4)} and below ${below.toFixed(4)} differ by more than 4 px (a glyph with overshoot or a descender)`);
       else assert.ok(above > below * 1.4, `${id} ${word} ${l.text}: clearly more red above (${above.toFixed(3)}) than below (${below.toFixed(3)})`);
       tops.push(l.box.y0); bottoms.push(l.box.y1);
     }
     const aboveAll = (Math.min(...tops) - (96 - banner.top * PPU)) / PPU, belowAll = ((96 - banner.bottom * PPU) - Math.max(...bottoms)) / PPU;
-    if (NAMES_BANNER_RADIUS_RATIO > 0) assert.ok(Math.abs(aboveAll - belowAll) <= 1 / PPU, `${id}: the ink box of the name tiles is centered in the banner: above ${(aboveAll * PPU).toFixed(2)} px, below ${(belowAll * PPU).toFixed(2)} px`);
+    if (NAMES_BANNER_RADIUS > 0) assert.ok(Math.abs(aboveAll - belowAll) <= 1 / PPU, `${id}: the ink box of the name tiles is centered in the banner: above ${(aboveAll * PPU).toFixed(2)} px, below ${(belowAll * PPU).toFixed(2)} px`);
     else near(aboveAll / belowAll, 2, 0.15, `${id}: above:below of the tallest ink over the name tiles is about 2:1 (${aboveAll.toFixed(3)} : ${belowAll.toFixed(3)})`);
     // the center line follows the formula and is one value for all tiles and months
     near(table.centerUp, nameCenterUp(Math.max(...tops.map((_, k) => bottoms[k] - tops[k])) / PPU), 0.03, id);
@@ -208,7 +208,7 @@ test("month name on the real front: ink inside the red banner (front projection,
     const texts = draw(f).texts, y = texts.map((t) => runAt(name, f, t).y);
     for (const v of y) assert.ok(v < 3.9 && v > 2.9, `${name} ${f.text}: letter center ${v} inside the banner 2.9 .. 3.9`);
     const above = 3.9 - Math.max(...y), below = Math.min(...y) - 2.9;
-    if (NAMES_BANNER_RADIUS_RATIO > 0) assert.ok(Math.abs(above - below) <= (name === "font" ? 2 / PPU : 0.03), `${name} ${f.text}: red above ${above.toFixed(4)} vs below ${below.toFixed(4)}: the letter centers are in the middle of the banner (the built-in drawing anchors on the middle baseline, not on the ink: 6 px)`);
+    if (NAMES_BANNER_RADIUS > 0) assert.ok(Math.abs(above - below) <= (name === "font" ? 2 / PPU : 0.03), `${name} ${f.text}: red above ${above.toFixed(4)} vs below ${below.toFixed(4)}: the letter centers are in the middle of the banner (the built-in drawing anchors on the middle baseline, not on the ink: 6 px)`);
     else assert.ok(above > below, `${name} ${f.text}: red above ${above.toFixed(3)} vs below ${below.toFixed(3)}`);
   }
 });
@@ -267,15 +267,15 @@ test("tileEdgeColors: along every edge of every front tile the color is the colo
   assert.ok(samples > 100000, `${samples} samples`);
 });
 
-test("owner decisions as literals: the banner ratios of W (H 5/9, bottom gap 2/9, end piece 13/18, radius 0.3 of H), weekday words 0.08 lower", async () => {
+test("owner decisions as literals: the fixed unit-grid banner (height 1.0, bottom 0.4 above the cell row, overhang 0.3, radius 0.3), weekday words 0.08 lower; no ratio constants and no bannerOf", async () => {
   const g = await import("../src/apps/calendar7/geometry.ts");
-  assert.equal(g.NAMES_BANNER_HEIGHT_RATIO, 5 / 9);
-  assert.equal(g.NAMES_BANNER_BOTTOM_GAP_RATIO, 2 / 9);
-  assert.equal(g.NAMES_BANNER_END_PIECE_RATIO, 13 / 18);
-  assert.equal(g.NAMES_BANNER_RADIUS_RATIO, 0.3);
+  assert.equal(g.NAMES_BANNER_HEIGHT, 1.0);
+  assert.equal(g.NAMES_BANNER_BOTTOM_OFFSET, 0.4);
+  assert.equal(g.NAMES_BANNER_OVERHANG, 0.3);
+  assert.equal(g.NAMES_BANNER_RADIUS, 0.3);
   assert.equal(g.NAMES_WEEKDAY_DOWN, 0.08);
-  const b = g.bannerOf(1.8); // the accepted design at f = 1.8
-  near(b.height, 1.0, 1e-12); near(b.bottomGap, 0.4, 1e-12); near(b.topGap, 0.4, 1e-12); near(b.endPiece, 1.3, 1e-12); near(b.sideBand, 0.5, 1e-12); near(b.radius, 0.3, 1e-12);
+  assert.equal(g.bannerOf, undefined);
+  assert.deepEqual(Object.keys(g).filter((k) => k.endsWith("_RATIO")), []);
 });
 
 test("weekday line: the cut faces beside every weekday tile carry the line color at the height of the line where the line reaches the tile edge (one continuous line over the seams), all schemes with a line", () => {
@@ -296,10 +296,10 @@ test("weekday line: the cut faces beside every weekday tile carry the line color
 
 test("month name placement follows the banner corner radius: square (radius 0) keeps 2:1 above to below, rounded (radius > 0, the default 0.3) centers the ink box (tolerance 1 px), all 14 fonts", async () => {
   const g = await import("../src/apps/calendar7/geometry.ts");
-  assert.equal(g.NAMES_BANNER_RADIUS_RATIO, 0.3, "rounded (0.3 of the banner height) is the default");
+  assert.equal(g.NAMES_BANNER_RADIUS, 0.3, "rounded (0.3 of the banner height) is the default");
   assert.equal(g.nameAboveShare(0), 2 / 3);
   assert.equal(g.nameAboveShare(0.3), 1 / 2);
-  assert.equal(g.nameAboveShare(), g.nameAboveShare(g.NAMES_BANNER_RADIUS_RATIO), "the default follows the switch");
+  assert.equal(g.nameAboveShare(), g.nameAboveShare(g.NAMES_BANNER_RADIUS), "the default follows the switch");
   const b = monthBanner();
   for (const [id, font] of Object.entries(FONT_METRICS)) {
     const cap = Math.max(...Object.values(font.glyphs).map((x) => x.bottom - x.top)) * nameFaceTable(font).size / PPU;

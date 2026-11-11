@@ -119,37 +119,37 @@ export const unitGridTileOf = (pos: ArrayLike<number>, normal: ArrayLike<number>
   ({ ...faceTileOf(pos, normal, up, widths), band: faceBandsOf(pos, normal, up, widths) });
 
 /**
- * The red banner of the month row is defined by ratios of the outer cubie width W (= the layer profile factor f, 1.8 for the
- * 7x7), so that the design keeps its proportions when f changes (owner decision of 2026-11-11). The values give the accepted
- * design at f = 1.8: banner height 1.0, bottom gap 0.4 (the top gap follows: W - H - b = 0.4) and end pieces of 1.3 (the start
- * and end piece of the banner inside the outer cubie, so the band to the cube edge is W - p = 0.5 and the banner spans 2 p + 5
- * unit cells on the front).
+ * The red banner of the month row in FIXED unit-grid coordinates (cube center origin, cell pitch 1), like the digits and the
+ * lines, so the print is the same at every outer layer factor f (owner decision of 2026-11-11): y 2.9 .. 3.9 (the cell row of
+ * the month row is 2.5 .. 3.5), x -3.8 .. 3.8 (0.3 beyond the cell grid edges at +-3.5), corner radius 0.3. Where the outer cubie is
+ * too small for it (the top edge of the face is at 2.5 + f: clipped for f < 1.4, the side edge likewise for f < 1.3) the art
+ * continues beyond the face and is clipped at the texture edge, as every other part of the print.
  */
-/** Banner height H as a fraction of W: 1.0 / 1.8. */
-export const NAMES_BANNER_HEIGHT_RATIO = 5 / 9;
-/** Gap between the bottom edge of the banner and the bottom of the row as a fraction of W: 0.4 / 1.8. */
-export const NAMES_BANNER_BOTTOM_GAP_RATIO = 2 / 9;
-/** Width p of the start and end piece of the banner inside the outer cubie as a fraction of W: 1.3 / 1.8. */
-export const NAMES_BANNER_END_PIECE_RATIO = 13 / 18;
-/** Corner radius of the red banner as a fraction of its height H: 0.3 (owner decision of 2026-11-11); 0 is square (name 2:1 above to below). */
-export const NAMES_BANNER_RADIUS_RATIO = 0.3;
-/** The banner of the month row for the outer cubie width `outer`, in units of an inner cubie. */
-export function bannerOf(outer: number = outerLayerWidth(CALENDAR7_SIZE)): { height: number; bottomGap: number; topGap: number; endPiece: number; sideBand: number; radius: number } {
-  const height = outer * NAMES_BANNER_HEIGHT_RATIO, bottomGap = outer * NAMES_BANNER_BOTTOM_GAP_RATIO, endPiece = outer * NAMES_BANNER_END_PIECE_RATIO;
-  return { height, bottomGap, topGap: outer - height - bottomGap, endPiece, sideBand: outer - endPiece, radius: NAMES_BANNER_RADIUS_RATIO * height };
-}
+/** Banner height in units. */
+export const NAMES_BANNER_HEIGHT = 1.0;
+/** Offset of the bottom edge of the banner above the lower edge of the cell row of the month row, in units: y = 2.5 + 0.4 = 2.9. */
+export const NAMES_BANNER_BOTTOM_OFFSET = 0.4;
+/** How far the banner reaches beyond the left and right edge of the cell grid, in units: 3.5 + 0.3 = 3.8. */
+export const NAMES_BANNER_OVERHANG = 0.3;
+/** Corner radius of the banner in units (0 is square: the name then sits 2:1 above to below). */
+export const NAMES_BANNER_RADIUS = 0.3;
+/**
+ * Banner margin from the top edge of a tile that is not in the thick month row (the tiles of the print on other faces, which
+ * carry the red banner class too; as before the unit grid banner, it is a margin from the tile edge).
+ */
+export const NAMES_BANNER_THIN_TILE_TOP = 0.4;
 /** Weekday words (SUN to SAT) sit this far below the center of their unit cell, in units (owner decision of 2026-11-11). */
 export const NAMES_WEEKDAY_DOWN = 0.08;
 /** Share of the free height of the banner that is above the month name with square corners: 2/3 (2:1 above to below, owner decision of 2026-11-11). */
 export const NAME_ABOVE_SHARE = 2 / 3;
-/** With rounded banner corners (`NAMES_BANNER_RADIUS_RATIO` > 0) the ink of the name is centered in the banner: 1/2 (owner decision of 2026-11-11). */
+/** With rounded banner corners (`NAMES_BANNER_RADIUS` > 0) the ink of the name is centered in the banner: 1/2 (owner decision of 2026-11-11). */
 export const NAME_ABOVE_SHARE_ROUNDED = 1 / 2;
 /** The share above the name for a banner corner radius: centered when rounded, 2:1 when square. */
-export const nameAboveShare = (radiusRatio: number = NAMES_BANNER_RADIUS_RATIO): number => (radiusRatio > 0 ? NAME_ABOVE_SHARE_ROUNDED : NAME_ABOVE_SHARE);
-/** The red banner of the month row relative to the unit cell center of a row 1 cubie, in units (y up): bottom and top edge. */
-export function monthBanner(outer: number = outerLayerWidth(CALENDAR7_SIZE)): { bottom: number; top: number; height: number } {
-  const b = bannerOf(outer), bottom = b.bottomGap - 0.5, top = (outer - 1) + 0.5 - b.topGap;
-  return { bottom, top, height: top - bottom };
+export const nameAboveShare = (radius: number = NAMES_BANNER_RADIUS): number => (radius > 0 ? NAME_ABOVE_SHARE_ROUNDED : NAME_ABOVE_SHARE);
+/** The red banner of the month row relative to the unit cell center of a row 1 cubie, in units (y up): bottom and top edge. The same at every f. */
+export function monthBanner(): { bottom: number; top: number; height: number } {
+  const bottom = NAMES_BANNER_BOTTOM_OFFSET - 0.5;
+  return { bottom, top: bottom + NAMES_BANNER_HEIGHT, height: NAMES_BANNER_HEIGHT };
 }
 
 export const bodyWidthFor = (layout: Layout): number => (layout === "names" ? NAMES_BODY_WIDTH : STANDARD_BODY_WIDTH);

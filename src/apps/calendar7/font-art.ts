@@ -2,7 +2,7 @@
 /** Shared 2D/3D artwork: original glyphs, with one source for each 6/9 pair. */
 import { numberLayout, type LoadedFont } from "./fonts.ts";
 import { type Layout, NAME_SLOTS, NAME_WORDS, nameAnchor } from "./layout.ts";
-import { bannerOf, CALENDAR7_SIZE, monthBanner, outerLayerWidth } from "./geometry.ts";
+import { CALENDAR7_SIZE, monthBanner, NAMES_BANNER_OVERHANG, outerLayerWidth } from "./geometry.ts";
 import { faceTransform, type FaceTile, isBannerClass, lineRect, nameCenterUp, nameLetterX, namePxPerUnit, paintTileGround, TEXT_SQUARE, weekdayShift, TEXTURE, tileCanvasSize, tileGrid, tileRoles, type Surface } from "./sticker-art.ts";
 import type { ColorScheme } from "./schemes.ts";
 
@@ -76,8 +76,8 @@ const TILES: readonly TileInfo[] = (() => {
  */
 const roomOf = (anchor: -1 | 0 | 1, OUTER: number): { left: number; right: number } => {
   const first = anchor === 1, tile: FaceTile = first ? { w: OUTER, h: OUTER, band: { l: OUTER - 1, r: 0, t: OUTER - 1, b: 0 } } : { w: 1, h: OUTER, band: { l: 0, r: 0, t: OUTER - 1, b: 0 } };
-  const g = tileGrid(tile), k = faceTransform(tile).kx, ppu = namePxPerUnit();
-  return { left: first ? (bannerOf(OUTER).endPiece - 0.5) * ppu : g.cx / k, right: (g.W - g.cx) / k }; // the first tile: the end piece p of the banner is 0.5 (half the cell) wider than the room from the cell center to the banner edge, so p - 0.5 = 0.8 at f = 1.8
+  const g = tileGrid(tile, OUTER), k = faceTransform(tile).kx, ppu = namePxPerUnit();
+  return { left: first ? Math.min((NAMES_BANNER_OVERHANG + 0.5) * ppu, g.cx / k) : g.cx / k, right: (g.W - g.cx) / k }; // the first tile: from the cell center to the banner edge 0.5 + the overhang 0.3 = 0.8, less where the texture edge is nearer (a small outer factor)
 };
 
 /** Natural geometry of a label in em: summed ink widths and the natural ink gaps between neighbors. */
@@ -112,7 +112,7 @@ export const NAMES_FIRST_TILE_FILL = false;
  * the height of the red banner.
  */
 function fitAt(font: LoadedFont, s: number, c: number, outer: number): { ok: true; m: number; taus: Map<string, number> } | { ok: false; fails: string[] } {
-  const ppu = namePxPerUnit(), fails: string[] = [], taus = new Map<string, number>(), banner = monthBanner(outer).height * ppu;
+  const ppu = namePxPerUnit(), fails: string[] = [], taus = new Map<string, number>(), banner = monthBanner().height * ppu;
   // the seam sits between two texture edges (bevel reach): ink keeps 1.5 px inside the texture on the seam side
   const m = Math.max(c * s / 2, ...TILES.flatMap(t => {
     const room = roomOf(t.anchor, outer);
@@ -168,8 +168,8 @@ export function nameFaceTable(font: LoadedFont, outer: number = outerLayerWidth(
     const raised = n.gaps.flatMap((e, i) => (size * e < NAME_MIN_INK_GAP ? [`${letters[i]}-${letters[i + 1]}`] : []));
     tiles.set(t.label, { label: t.label, anchor: t.anchor, tracking, gaps, raised, months: t.months });
   }
-  const banner = monthBanner(outer), cap = Math.max(...TILES.map(t => nat.get(t.label)!.height)) * size / ppu;
-  const face = { size, bannerHeight: banner.height, centerUp: nameCenterUp(cap, undefined, outer), weekday, seamGap: 2 * fit.m, tiles, blocked, m: fit.m };
+  const banner = monthBanner(), cap = Math.max(...TILES.map(t => nat.get(t.label)!.height)) * size / ppu;
+  const face = { size, bannerHeight: banner.height, centerUp: nameCenterUp(cap), weekday, seamGap: 2 * fit.m, tiles, blocked, m: fit.m };
   NAME_FACES.set(font, (NAME_FACES.get(font) ?? new Map()).set(outer, face));
   return face;
 }
