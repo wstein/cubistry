@@ -13,7 +13,7 @@ def cellsText(cs: List[(Int32,Int32)]): String = List.foldLeft((acc,p) -> {let(i
 def wExtras(v2: Bool,rows: List[String],wrong: List[(Int32,Int32)],halls: List[List[(Int32,Int32)]]): (List[(Int32,Int32)],List[List[(Int32,Int32)]],List[String]) \ IO = match rows {
     case line::rest => match fields(line) {
         case "wrong"::rr::cc::Nil => {
-            require(v2,"edge record");let cell=(integer(rr),integer(cc));
+            require(v2,"edge record");require(halls==Nil,"wrong record after hall record");let cell=(integer(rr),integer(cc));
             require(cellOk(cell) and cellsIncreasing(List.append(wrong,cell::Nil)),"wrong cells strictly increasing in the 7x7 front");
             wExtras(v2,rest,List.append(wrong,cell::Nil),halls)
         }
@@ -195,7 +195,7 @@ def wMetrics(moves: List[(Int32,Int32)]): (Int32,Int32,Int32,Int32) = List.foldL
     let(h,q,r,rq)=acc;let(g,e)=m;
     if(Int32.modulo(g,7)==0)(h,q,r+1,rq+Int32.abs(e)) else(h+1,q+Int32.abs(e),r,rq)
 },(0,0,0,0),moves)
-// monthsFile "" selects the window end endText; otherwise the explicit month list (first month = chain root = May 2026) pinned by monthsPin.
+// monthsFile "" selects the window end endText; otherwise the explicit month list (the chain root is rootText, default its first month) pinned by monthsPin.
 // layoutPin "" keeps the built-in layout pin; a window-local layout is pinned by passing its SHA-256.
 // rootText "" keeps the first month of the list as the root; otherwise it is the root month YYYY-MM (1900-01 .. 2100-01) whose board the
 // identity pose shows; if it differs from the first member of the list the chain gets one extra root edge from the identity pose to it.
