@@ -60,7 +60,7 @@ ctamper(t,j;kw...)=tamper(t,j;l=clist,p=cpin,start="2026-03",root="1980-01",kw..
     # best-effort months: listed separately, chain members, exact runs end before them
     ok,e=ctamper(replace(ctsv,"best_effort\t2037-02\t2037-02\t1\tbest_effort_unverified\twrong=7,7"=>"best_effort\t2037-02\t2037-02\t1\tbest_effort_unverified\twrong=1,1";count=1),cjson);@test !ok && occursin("same wrong cells",e)
     ok,e=ctamper(replace(ctsv,"run\t2026-03\t2037-01\t131"=>"run\t2026-03\t2037-02\t132";count=1),cjson);@test !ok
-    ok,e=ctamper(replace(ctsv,"\texact_runs\t3\tbest_effort\t2"=>"\texact_runs\t3\tbest_effort\t1";count=1),cjson);@test !ok && occursin("counts mismatch",e)
+    ok,e=ctamper(replace(ctsv,"\tplanned_exact_runs\t3\tbest_effort\t2"=>"\tplanned_exact_runs\t3\tbest_effort\t1";count=1),cjson);@test !ok && occursin("counts mismatch",e)
     ok,e=ctamper(replace(ctsv,"best_effort_unverified\twrong=7,7 evidence=february-hall-S2.tsv"=>"best_effort_unverified\twrong=7,7 evidence=nope.tsv";count=1),cjson);@test !ok && occursin("Hall witness table exists",e)
     ok,e=ctamper(ctsv,replace(cjson,"\"status\": \"best_effort_unverified\""=>"\"status\": \"best_effort\"";count=1));@test !ok && occursin("json",e)
     # verified best-effort month: Julia and Flix chain receipts of the best-effort fixture (two-state chain 2026-05, 2026-06)
@@ -70,7 +70,9 @@ ctamper(t,j;kw...)=tamper(t,j;l=clist,p=cpin,start="2026-03",root="1980-01",kw..
     @test occursin("headline\tplanned-exact-gapless\t2026-05\t2026-05\t1\n",t4) && occursin("best_effort\t2026-06\t2026-06\t1\tbest_effort\twrong=4,4",t4)
     d4=mktempdir();write(joinpath(d4,"c.tsv"),t4);write(joinpath(d4,"c.json"),j4)
     @test verify(joinpath(d4,"c.tsv"),joinpath(d4,"c.json");l=l2,p=p2)[1]
-    ok,e=verify(joinpath(d4,"c.tsv"),joinpath(d4,"c.json");l=l2,p=p2)  # unchanged: accepted
+    # a verified best-effort month naming one receipt twice is rejected
+    same=replace(t4,"fixture-best-effort-center-julia.tsv;fixture-best-effort-center-flix.tsv"=>"fixture-best-effort-center-julia.tsv;fixture-best-effort-center-julia.tsv")
+    @test same!=t4;write(joinpath(d4,"c3.tsv"),same);ok,e=verify(joinpath(d4,"c3.tsv"),joinpath(d4,"c.json");l=l2,p=p2);@test !ok && occursin("distinct files",e)
     for (what,bad) in (("wrong=4,4 evidence"=>"wrong=4,3 evidence"),)
         write(joinpath(d4,"c2.tsv"),replace(t4,what=>bad;count=1));ok,e=verify(joinpath(d4,"c2.tsv"),joinpath(d4,"c.json");l=l2,p=p2);@test !ok && occursin("best-effort edge line",e)
     end

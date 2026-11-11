@@ -19,6 +19,15 @@ t6() { "$J" --startup-file=no "$chain/test_best_effort.jl" > "$out/t.log" 2>&1; 
 mutate() { # id file sed-expr test-kind [ONLY list]
     local id=$1 f=$2 expr=$3 kind=$4 only=${5:-none}
     if [[ -n "${MUT_ONLY:-}" && " $MUT_ONLY " != *" ${id%%-*} "* ]]; then return; fi      # MUT_ONLY="J8 F4": run only these mutant ids
+    # the unmutated test must pass first (once per kind and fixture list), otherwise a failing runner would "kill" every mutant
+    local key="$kind|$only"
+    if [[ " $baselined " != *" $key "* ]]; then
+        cp "$out/jar0.jar" "$out/jar/artifact/jar.jar"; rm -rf "$out/run"
+        if [[ $kind == t1 ]]; then t1; elif [[ $kind == t3 ]]; then t3; elif [[ $kind == t5 ]]; then t5; elif [[ $kind == t6 ]]; then t6; elif [[ $kind == t4 || $kind == flix4 ]]; then t4 "$only"; else t2 "$only"; fi
+        if [[ $? != 0 ]]; then echo "BASELINE-FAILED $id [$kind $only]: $(tail -c 200 "$out/t.log" | tr '\n' ' ')"; bad=$((bad+1)); return; fi
+        baselined="$baselined $key"
+    fi
+    cp "$out/jar0.jar" "$out/jar/artifact/jar.jar"
     cp "$f" "$f.orig"; sed -i "$expr" "$f"
     if cmp -s "$f" "$f.orig"; then echo "NOT-APPLIED $id"; mv "$f.orig" "$f"; bad=$((bad+1)); return; fi
     if [[ $kind == flix || $kind == flix4 ]]; then
@@ -35,6 +44,7 @@ mkdir -p "$out/jar/artifact"
 if [[ -n "${MUT_JAR:-}" ]]; then cp "$MUT_JAR" "$out/jar/artifact/jar.jar"      # MUT_JAR: prebuilt baseline chain jar (skips the baseline build)
 else rm -rf "$out/jar-build"; CALENDAR7_CHAIN_FLIX_BUILD_DIR="$out/jar-build" bash "$chain/flix/build.sh" > "$out/build.log" 2>&1
 cp "$out/jar-build/artifact/"*.jar "$out/jar/artifact/jar.jar"; fi
+cp "$out/jar/artifact/jar.jar" "$out/jar0.jar"; baselined=""
 if [[ $which == julia || $which == all ]]; then
 mutate J1-increasing-check "$corner/check.jl" 's/ms\[end\]<(y,mo)/true/' t1
 mutate J2-list-hash-check "$corner/check.jl" 's/bytes2hex(sha256(bytes))==expected_sha/true/' t1
@@ -75,6 +85,7 @@ mutate SC4-stage-distinct-files "$chain/stage_coverage.jl" 's/@assert realpath(a
 mutate SC5-stage-verifier-distinct-files "$chain/verify_stage_coverage.jl" 's/@assert realpath(joinpath(evdir,j))!=realpath(joinpath(evdir,f)) /@assert true /' t5
 mutate SC6-free-start-anchor "$chain/stage_coverage.jl" 's/(st\[i\].free ? "free_" : "")/""/' t5
 mutate C5-coverage-distinct-files "$chain/verify_coverage.jl" 's/@assert realpath(a)!=realpath(b) "Julia and Flix receipts are distinct files"/@assert true "x"/' t3
+mutate C6-coverage-best-effort-distinct-files "$chain/verify_coverage.jl" '/needs a Julia and a Flix chain receipt/,/byte-identical/s/@assert realpath(a)!=realpath(b) "Julia and Flix receipts are distinct files"/@assert true "x"/' t3
 mutate C1-coverage-run-break "$chain/month_coverage.jl" 's/idx(m)==idx(p)+1 || (push!/idx(m)==idx(p)+2 || (push!/' t3
 mutate C2-coverage-before-root "$chain/month_coverage.jl" 's/i in inlist) for i in idx(FIRST)/true) for i in idx(FIRST)/' t3
 mutate C3-verify-receipts-identical "$chain/verify_coverage.jl" 's/@assert read(a)==read(b) "Julia and Flix receipts byte-identical"/@assert true/' t3
