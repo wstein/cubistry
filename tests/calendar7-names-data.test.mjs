@@ -29,7 +29,7 @@ const OWNER = [
   ["J", "ANU", "ARY"],
   ["FE", "BRU", "ARY"],
   ["MA", "RCH"],
-  ["APR", "IL"],
+  ["AP", "RIL"],
   ["MA", "Y"],
   ["J", "UNE"],
   ["J", "ULY"],
@@ -116,9 +116,9 @@ test("replay: 21 nodes, 20 edges, 7338 HTM, 7514 QTM, 368 rotations; app and ind
   });
   assert.deepEqual(sum, { htm: 7338, qtm: 7514, rot: 368, rotq: 376 });
   // Receipt of the research Julia checker (row1-window-chain/evidence/julia.tsv): the 21 digests, newline joined.
-  assert.equal(sha(hashes.join("\n") + "\n"), "af3b77a262395fe916803b6a213bfc88304784bd91cfe0547e420da07f2778bc");
-  assert.equal(hashes[0], "a13bcb71837f548c826391ae75fa1ea881e74a60432e4b2c3f91adcb01edffaa");
-  assert.equal(hashes[20], "ef2a9a8bf378cb236a895c434961c6d8cfe9b7140e3acf9bfe0d752c694fa1dc");
+  assert.equal(sha(hashes.join("\n") + "\n"), "90a6b4172ca19c76095736e1c5557606f66c19e86cd3ccd04ce21eb6e028eedd");
+  assert.equal(hashes[0], "c53df9bd500df845a25a983ee26ab9d550d7b043a3b63de4712f1f3acdeb4c60");
+  assert.equal(hashes[20], "1282ff8f829146a4ea8d3e4abc0e9ab7878aa271765143c103063e5c1fa19123");
 });
 
 test("every edge target shows its display: months chain May 2026 to January 2028", () => {

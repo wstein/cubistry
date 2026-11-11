@@ -44,6 +44,15 @@ const PINNED = {
   moves: "7db8c8a1073f79e73f1e59ab953e25fc47342d5659d5058d8ae9cf5eb8bbe1db",
   manifest: "c1adcfff7488d3bcfb08dd2161cc3ba6158333fbe1e7fd1ea75805b65058679d",
 };
+/**
+ * Owner decision of 2026-11-11: April is split "AP" + "RIL" instead of "APR" + "IL" (labels only, the bodies stay). The research
+ * print and chain use the old labels and their digests are pinned, so the whole verification runs on the research print; the
+ * files are then written with the new labels. The digest of a state includes the sticker text, so the node hashes are the
+ * digests of the same states with the new labels. `build` proves the relabeling is a bijection on the print that touches
+ * nothing else (no new label exists in the research print) and that every state of the chain reaches its front display.
+ */
+export const RELABEL = Object.freeze({ APR: "AP", IL: "RIL" });
+const relabel = (text) => (Object.hasOwn(RELABEL, text) ? RELABEL[text] : text);
 const FIRST = { year: 2026, month: 5 };
 const STATES = 21;
 const STATUS = "research candidate, not certified";
@@ -148,6 +157,7 @@ export function build(researchRoot, options = {}) {
   const displays = Array.from({ length: STATES }, (_, k) => ({ id: k + 1, ...month(k), cells: windowCells(layout, month(k).year, month(k).month) }));
   const nodes = [{ hash: chain.source.hash, display: 1, ...month(0) }];
   const edges = [];
+  const poses = [pose]; // the 21 states, for the relabeled digests below
   let state = pose;
   const front = (k) => {
     const miss = frontFailure(printing, state, displays[k].cells);
@@ -161,12 +171,32 @@ export function build(researchRoot, options = {}) {
     const got = metrics(e.moves);
     if (got.htm !== e.htm || got.qtm !== e.qtm || got.rot !== e.rot || got.rotq !== e.rotq) throw Error(`edge ${i + 1}: declared metrics differ from the words`);
     state = applyMoves(state, e.moves);
+    poses.push(state);
     if (stateDigest(printing, state) !== e.endHash) throw Error(`edge ${i + 1}: replay does not reach the stored end hash`);
     if (stateText(printing, state) !== snapshot(i + 1)) throw Error(`edge ${i + 1}: replay differs from state-${i + 2}.tsv`);
     front(i + 1);
     nodes.push({ hash: e.endHash, display: i + 2, ...m });
     edges.push({ from: i, to: i + 1, metrics: [e.htm, e.qtm, e.rot, e.rotq], moves: encodeMoves(e.moves) });
   });
+
+  // Relabel (RELABEL): a bijection on the texts of the print that no other sticker uses; the verification above ran on the research labels.
+  const used = new Set(printing.text);
+  for (const [from, to] of Object.entries(RELABEL)) {
+    if (!used.has(from) || used.has(to)) throw Error(`relabel ${from} -> ${to}: needs the old label in the print and the new one unused`);
+  }
+  if (new Set(Object.values(RELABEL)).size !== Object.keys(RELABEL).length) throw Error("relabel is not injective");
+  const printingNew = { piece: printing.piece, text: printing.text.map(relabel), ink: printing.ink };
+  const layoutNew = layout.map((row) => row.map(relabel));
+  const displaysNew = displays.map((d) => ({ ...d, cells: windowCells(layoutNew, d.year, d.month) }));
+  poses.forEach((p, k) => {
+    // the same bodies and poses: the text of every sticker differs exactly by RELABEL, and the front still equals its display
+    const was = stateText(printing, p).split("\n"), now = stateText(printingNew, p).split("\n");
+    if (now.some((line, i) => line !== was[i].split("\t").map((f, j) => (j === 5 ? relabel(f) : f)).join("\t"))) throw Error(`state ${k + 1}: relabeling changed more than the text`);
+    const miss = frontFailure(printingNew, p, displaysNew[k].cells);
+    if (miss) throw Error(`state ${k + 1}: relabeled front differs from its display at ${miss.row},${miss.column} (${miss.why})`);
+    nodes[k] = { ...nodes[k], hash: stateDigest(printingNew, p) };
+  });
+  const rootNew = root.map((s) => ({ ...s, text: relabel(s.text) }));
 
   const files = {
     "state.v1.json": serialize(
@@ -178,9 +208,9 @@ export function build(researchRoot, options = {}) {
         surface: "face",
         license: LICENSE,
         spdx: "CC-BY-SA-4.0",
-        root: { display: 1, year: FIRST.year, month: FIRST.month, hash: chain.source.hash },
+        root: { display: 1, year: FIRST.year, month: FIRST.month, hash: nodes[0].hash },
       },
-      { stickers: root.map((s) => ({ id: s.id, piece: s.piece, text: s.text, ink: s.ink, p: s.p, n: s.n, up: s.up })) },
+      { stickers: rootNew.map((s) => ({ id: s.id, piece: s.piece, text: s.text, ink: s.ink, p: s.p, n: s.n, up: s.up })) },
     ),
     "graph.v1.json": serialize(
       {
@@ -207,7 +237,7 @@ export function build(researchRoot, options = {}) {
         firstMonth: FIRST.month,
         months: displays.map((d) => d.id),
       },
-      { displays: displays.map((d) => ({ id: d.id, year: d.year, month: d.month, cells: d.cells.map((c) => `${c.ink}:${c.text}`) })) },
+      { displays: displaysNew.map((d) => ({ id: d.id, year: d.year, month: d.month, cells: d.cells.map((c) => `${c.ink}:${c.text}`) })) },
     ),
   };
   files["NOTICE.txt"] =

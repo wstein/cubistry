@@ -143,11 +143,16 @@ test("names layout: the sheet (sticker surface) keeps its 3-slot pitch of 55 px"
   const s = nameLabelLayout("EMB", font, "sticker");
   assert.ok(Math.abs(s[1].x - s[0].x - (TEXTURE * 0.86) / 3) < 1e-9, "sheet pitch as before: a third of the 86% text square");
 });
-// The 2D sheet draws the names layout as on origin/main 71aa90f (letters and size); only the 3D face drawing changed.
-test("names layout on the sheet: the letter run of every name tile is exactly the old one", () => {
+// The 2D sheet draws the names layout as on origin/main 71aa90f (letters and size); only the 3D face drawing changed. April is "AP" + "RIL"
+// since the owner decision of 2026-11-11 (before: "APR" + "IL"): the tiles of the other eleven months are exactly the old ones (hash of
+// origin/main 71aa90f without the April tiles), the April tiles are the new labels on the same slot grid.
+test("names layout on the sheet: the letter run of every name tile except April is exactly the old one", () => {
   const h = createHash("sha256");
-  for (const word of NAME_WORDS) for (const tile of word) h.update(JSON.stringify(nameLabelLayout(tile, font, "sticker")));
-  assert.equal(h.digest("hex"), "ec8e0702852b558c61fa31d6bc1a21a95296ccbf139c220fc9288d043dad11d7");
+  for (const word of NAME_WORDS) for (const tile of word) if (tile !== "AP" && tile !== "RIL") h.update(JSON.stringify(nameLabelLayout(tile, font, "sticker")));
+  assert.equal(h.digest("hex"), "7d888bf8b73a83ff8d6b30e0530244007afe9f6618b141b65658920e01f26fe8");
+  const all = createHash("sha256");
+  for (const word of NAME_WORDS) for (const tile of word) all.update(JSON.stringify(nameLabelLayout(tile, font, "sticker")));
+  assert.equal(all.digest("hex"), "9ff86f449b16200dbcde43237fc80aa3b8f2ebd06c68cd1007084873e2935160");
 });
 
 // ---- 5. the gap ----

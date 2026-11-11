@@ -22,7 +22,7 @@ export const NAME_WORDS: readonly (readonly string[])[] = [
   ["J", "ANU", "ARY"],
   ["FE", "BRU", "ARY"],
   ["MA", "RCH"],
-  ["APR", "IL"],
+  ["AP", "RIL"],
   ["MA", "Y"],
   ["J", "UNE"],
   ["J", "ULY"],
