@@ -31,8 +31,10 @@ mutate() { # id file sed-expr test-kind [ONLY list]
     if [[ $rc != 0 ]]; then echo "KILLED   $id [$kind] $(grep -m1 -E "Fail|Error|accepted|rejected|differ|cmp:|EOF" "$out/t.log" | cut -c1-100)"; ok=$((ok+1)); else echo "SURVIVED $id"; bad=$((bad+1)); fi
 }
 # the unmutated Flix jar for the Julia-only mutants and the baseline
-mkdir -p "$out/jar/artifact"; rm -rf "$out/jar-build"; CALENDAR7_CHAIN_FLIX_BUILD_DIR="$out/jar-build" bash "$chain/flix/build.sh" > "$out/build.log" 2>&1
-cp "$out/jar-build/artifact/"*.jar "$out/jar/artifact/jar.jar"
+mkdir -p "$out/jar/artifact"
+if [[ -n "${MUT_JAR:-}" ]]; then cp "$MUT_JAR" "$out/jar/artifact/jar.jar"      # MUT_JAR: prebuilt baseline chain jar (skips the baseline build)
+else rm -rf "$out/jar-build"; CALENDAR7_CHAIN_FLIX_BUILD_DIR="$out/jar-build" bash "$chain/flix/build.sh" > "$out/build.log" 2>&1
+cp "$out/jar-build/artifact/"*.jar "$out/jar/artifact/jar.jar"; fi
 if [[ $which == julia || $which == all ]]; then
 mutate J1-increasing-check "$corner/check.jl" 's/ms\[end\]<(y,mo)/true/' t1
 mutate J2-list-hash-check "$corner/check.jl" 's/bytes2hex(sha256(bytes))==expected_sha/true/' t1
@@ -52,6 +54,12 @@ mutate R2-root-edge-ignored-independent "$chain/verify_chain.jl" 's/^const ROOTE
 mutate H1-hall-deficiency-check "$chain/check.jl" 's/@assert d>=1 "Hall set has a deficiency"/@assert true "x"/' t4 best-effort-not-minimal
 mutate H2-hall-count-check "$chain/check.jl" 's/@assert count(w->w in X,wrong)==d "wrong cells in a Hall set equal its deficiency"/@assert true "x"/' t6
 mutate H3-hall-deficiency-independent "$chain/verify_chain.jl" 's/@assert d>=1 "Hall set has a deficiency"/@assert true "x"/' t4 best-effort-not-minimal
+mutate N1-hall-duplicate-check "$chain/check.jl" 's/@assert !isempty(X) \&\& isempty(intersect(used,X)) "disjoint nonempty Hall sets"/@assert true "x"/' t4 best-effort-hall-duplicate
+mutate N2-hall-duplicate-independent "$chain/verify_chain.jl" 's/@assert !isempty(X) \&\& isempty(intersect(used,X)) "disjoint nonempty Hall sets"/@assert true "x"/' t4 best-effort-hall-duplicate
+mutate N3-hall-count-check "$chain/check.jl" 's/@assert count(w->w in X,wrong)==d "wrong cells in a Hall set equal its deficiency"/@assert true "x"/' t4 best-effort-count-gt-deficiency
+mutate N4-hall-count-independent "$chain/verify_chain.jl" 's/@assert count(w->w in X,wrong)==d "wrong cells in a Hall set equal its deficiency"/@assert true "x"/' t4 best-effort-count-gt-deficiency
+mutate N5-start-exponent-check "$chain/check.jl" 's/@assert 1<=g<=21 \&\& e in (-1,1,2) "legal start move"/@assert true "x"/' t4 stage-start-exponent-3
+mutate N6-start-exponent-independent "$chain/verify_chain.jl" 's/@assert 1<=gen<=21 \&\& q in (-1,1,2) "start move"/@assert true "x"/' t4 stage-start-exponent-3
 mutate H5-wrong-cells-independent "$chain/verify_chain.jl" 's/@assert bad==e.wrong "strict row-one-name front"/@assert true "x"/' t4 best-effort-unlisted-wrong
 mutate S1-join-start-check "$chain/check.jl" 's/@assert(root==(JOIN_START=="identity" ? identity_digest : JOIN_START),"start junction digest")/@assert(true,"x")/' t4 "stage-wrong-start-digest stage-start-not-identity"
 mutate S2-join-end-check "$chain/check.jl" 's/@assert(chain_digest(state)==(JOIN_END=="identity" ? identity_digest : JOIN_END),"end junction digest")/@assert(true,"x")/' t4 "stage-wrong-end-digest stage-end-not-identity"
@@ -63,6 +71,10 @@ mutate S7-free-front-check "$chain/check.jl" 's/state==decode_physical(source,p,
 mutate SC1-stage-digest-equality "$chain/stage_coverage.jl" 's/same=a.last==b.first \&\& a.finish==b.start/same=a.last==b.first/' t5
 mutate SC2-stage-junction-lines "$chain/stage_coverage.jl" 's/(a.jend==a.finish \&\& b.jstart==b.start)/true/' t5
 mutate SC3-stage-verifier-digest "$chain/verify_stage_coverage.jl" 's/ok=a.last==b.first \&\& a.fin==b.start/ok=a.last==b.first/' t5
+mutate SC4-stage-distinct-files "$chain/stage_coverage.jl" 's/@assert realpath(a)!=realpath(b) /@assert true /' t5
+mutate SC5-stage-verifier-distinct-files "$chain/verify_stage_coverage.jl" 's/@assert realpath(joinpath(evdir,j))!=realpath(joinpath(evdir,f)) /@assert true /' t5
+mutate SC6-free-start-anchor "$chain/stage_coverage.jl" 's/(st\[i\].free ? "free_" : "")/""/' t5
+mutate C5-coverage-distinct-files "$chain/verify_coverage.jl" 's/@assert realpath(a)!=realpath(b) "Julia and Flix receipts are distinct files"/@assert true "x"/' t3
 mutate C1-coverage-run-break "$chain/month_coverage.jl" 's/idx(m)==idx(p)+1 || (push!/idx(m)==idx(p)+2 || (push!/' t3
 mutate C2-coverage-before-root "$chain/month_coverage.jl" 's/i in inlist) for i in idx(FIRST)/true) for i in idx(FIRST)/' t3
 mutate C3-verify-receipts-identical "$chain/verify_coverage.jl" 's/@assert read(a)==read(b) "Julia and Flix receipts byte-identical"/@assert true/' t3
@@ -78,6 +90,10 @@ mutate F6-flix-start-ignored "$chain/flix/src/Main.flix" 's/let(sy,sm)=start;req
 mutate FR1-flix-root-edge-ignored "$chain/flix/src/Main.flix" 's/let rooted=monthsFile != "" and rootMonth != at(listed,0);/let rooted=false;/' flix4 "root-edge-2037-05 root-edge-zero-moves"
 mutate FH1-flix-hall-deficiency "$chain/flix/src/Main.flix" 's/require(d>=1,"Hall set has a deficiency");/require(true or d>=1,"Hall set has a deficiency");/' flix4 best-effort-not-minimal
 mutate FH2-flix-wrong-cells "$chain/flix/src/Main.flix" 's/let mism=wMismatch(next,goal);require(mism==wrong,/let mism=wMismatch(next,goal);require(true or mism==wrong,/' flix4 best-effort-unlisted-wrong
+mutate NF1-flix-wrong-after-hall "$chain/flix/src/Main.flix" 's/require(halls==Nil,"wrong record after hall record");//' flix4 best-effort-wrong-after-hall
+mutate NF2-flix-hall-duplicate "$chain/flix/src/Main.flix" 's/require(x != Nil and List.forAll(cell -> not List.memberOf(cell,acc),x),/require(true or x != Nil and List.forAll(cell -> not List.memberOf(cell,acc),x),/' flix4 best-effort-hall-duplicate
+mutate NF3-flix-hall-count "$chain/flix/src/Main.flix" 's/require(List.count(w -> List.memberOf(w,x),wrong)==d,/require(true or List.count(w -> List.memberOf(w,x),wrong)==d,/' flix4 best-effort-count-gt-deficiency
+mutate NF4-flix-start-exponent "$chain/flix/src/Main.flix" 's/require(g>=1 and g<=21 and List.memberOf(q,List#{-1,1,2}),"legal start move");/require(true,"legal start move");/' flix4 stage-start-exponent-3
 mutate FS1-flix-join-start "$chain/flix/src/Main.flix" 's/require(root==(if(joinStart=="identity") identityDigest else joinStart),"start junction digest")/require(true,"start junction digest")/' flix4 "stage-wrong-start-digest stage-start-not-identity"
 mutate FS2-flix-join-end "$chain/flix/src/Main.flix" 's/require(fd==(if(joinEnd=="identity") identityDigest else joinEnd),"end junction digest")/require(true,"end junction digest")/' flix4 "stage-wrong-end-digest stage-end-not-identity"
 mutate FS3-flix-start-moves-ignored "$chain/flix/src/Main.flix" 's/let sm0=match startMoves {case Some(l) => l case None => Nil};/let sm0=match startMoves {case Some(_) => Nil case None => Nil};/' flix4 "stage-free-start stage-join-both"
