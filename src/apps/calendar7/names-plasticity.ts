@@ -14,7 +14,7 @@
  * The old look (Neutral tone mapping, exposure 2.6, shadows at 1, specular 1, clearcoat 0.18) is the comparison, not a value
  * of p: it shifts colors by up to 47 of 255.
  */
-export const DEFAULT_PLASTICITY = 0.25;
+export const DEFAULT_PLASTICITY = 0.6;
 
 export const clampPlasticity = (p: number): number => (Number.isFinite(p) ? Math.min(1, Math.max(0, p)) : DEFAULT_PLASTICITY);
 
