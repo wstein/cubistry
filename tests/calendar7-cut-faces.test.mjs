@@ -201,3 +201,36 @@ test("scene: the edge follows the sticker's up and right, also on a face with an
   assert.equal(colorNextTo(shell, "+y", "+x"), RED, "right = up x n = (0,1,0)... a side edge");
   assert.equal(colorNextTo(shell, "-y", "+x"), RED);
 });
+
+// ---- the real names print (unit grid): the cut faces under the month row ----
+import { readFileSync } from "node:fs";
+import { NAMES_BODY_WIDTH, NAMES_GAP, layerWidthsOf } from "../src/apps/calendar7/geometry.ts";
+import { SCHEMES, namesGround } from "../src/apps/calendar7/schemes.ts";
+import { parseState } from "../src/apps/calendar7/graph.ts";
+import { faceEdgeFills, faceFills } from "../src/apps/calendar7/viewer.ts";
+test("names print: the cut face under every month row ring cubie is one flat white (the banner has a white strip of 0.5 below it), the previous red is gone", () => {
+  const { printing, pose } = parseState(JSON.parse(readFileSync("public/calendar7/names/state.v1.json", "utf8")));
+  const n = printing.text.length, frames = Array.from({ length: n }, (_, i) => ({ id: i + 1, cubie: printing.piece[i], p: [...pose.pos.slice(3 * i, 3 * i + 3)], n: [...pose.normal.slice(3 * i, 3 * i + 3)], up: [...pose.up.slice(3 * i, 3 * i + 3)] }));
+  const mats = new Map(frames.map((f) => [f.id, new THREE.MeshStandardMaterial({ color: "#ffffff" })]));
+  const geo = { body: new RoundedBoxGeometry(NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, 1, 0.055), sticker: new THREE.PlaneGeometry(1, 1), stickerOffset: 0.502 };
+  const scheme = SCHEMES.find((s) => s.id === "paper-red");
+  const root = new THREE.Group();
+  const scene = new PhysicalCubeScene(root, frames, mats, createPlasticMaterial("#23272e", 0.55), 1, geo, faceFills(printing, scheme, "names"), { bodyColor: namesGround(scheme.dayFill), coreColor: namesGround(scheme.dayFill), miterCutFaces: true, faceEdgeColors: faceEdgeFills(printing, scheme, "names"), layers: { widths: layerWidthsOf("names"), body: (c) => new RoundedBoxGeometry(c[0] - NAMES_GAP, c[1] - NAMES_GAP, c[2] - NAMES_GAP, 1, 0.055) } });
+  scene.setConstruction("stickerless");
+  const shells = root.children.filter((g) => g.children[0]?.isMesh && Array.isArray(g.children[0].material)).map((g) => g.children[0]);
+  let checked = 0;
+  for (const shell of shells) {
+    const ids = shell.userData.sourceFaceStickerIds, front = ids[4]; // +z
+    if (front === null || ids[2] === null || ids.filter((x) => x !== null).length !== 2) continue; // exactly front and top: a ring piece of the month row
+    const i = front - 1;
+    if (frames[i].p[1] !== 3 || printing.text[i] === "" && printing.ink[i] !== "band") continue;
+    assert.equal(`#${shell.material[3].color.getHexString()}`, namesGround(scheme.dayFill), `cubie ${frames[i].p}: the cut face below is the white strip`);
+    assert.equal(shell.material[3].map, null, "one flat color");
+    checked++;
+  }
+  assert.ok(checked >= 5, `${checked} month row cubies checked`);
+  // the same cubies without the edge colors would be red below (the previous model)
+  const edges = faceEdgeFills(printing, scheme, "names");
+  assert.ok(edges.size >= 7, `edge colors for ${edges.size} banner stickers`);
+  assert.equal(faceEdgeFills(printing, scheme, "standard").size, 0);
+});

@@ -2,8 +2,8 @@
 /** Shared 2D/3D artwork: original glyphs, with one source for each 6/9 pair. */
 import { numberLayout, type LoadedFont } from "./fonts.ts";
 import { type Layout, NAME_SLOTS, NAME_WORDS, nameAnchor } from "./layout.ts";
-import { CALENDAR7_SIZE, outerLayerWidth } from "./geometry.ts";
-import { faceTransform, type FaceTile, lineRect, nameLetterX, namePxPerUnit, TEXT_SQUARE, TEXTURE, tileCanvasSize, tileRoles, type Surface } from "./sticker-art.ts";
+import { CALENDAR7_SIZE, monthBanner, outerLayerWidth } from "./geometry.ts";
+import { faceTransform, type FaceTile, isBannerClass, lineRect, nameCenterUp, nameLetterX, namePxPerUnit, paintTileGround, TEXT_SQUARE, TEXTURE, tileCanvasSize, tileGrid, tileRoles, type Surface } from "./sticker-art.ts";
 import type { ColorScheme } from "./schemes.ts";
 
 export interface InkBox { readonly x0: number; readonly y0: number; readonly x1: number; readonly y1: number }
@@ -46,6 +46,9 @@ export interface NameTileFit {
 }
 export interface NameFace {
   readonly size: number;
+  /** Height of the red banner of the month row in units and the center line of the names above the unit cell center (units, y up). */
+  readonly bannerHeight: number;
+  readonly centerUp: number;
   /** The largest weekday label size of the font (the month size must reach it). */
   readonly weekday: number;
   /** Ink gap at every seam between two name tiles (px); the seam is in its middle. */
@@ -55,19 +58,27 @@ export interface NameFace {
   readonly blocked: readonly { label: string; months: readonly string[] }[];
 }
 
-interface TileInfo { readonly label: string; readonly anchor: -1 | 0 | 1; readonly width: number; readonly months: readonly string[] }
+interface TileInfo { readonly label: string; readonly anchor: -1 | 0 | 1; readonly months: readonly string[] }
 const TILES: readonly TileInfo[] = (() => {
   const seen = new Map<string, TileInfo>(), names = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
   NAME_WORDS.forEach((word, i) => word.forEach(label => {
     const anchor = nameAnchor(label), old = seen.get(label);
-    seen.set(label, { label, anchor, width: anchor === 1 ? outerLayerWidth(CALENDAR7_SIZE) : 1, months: [...(old?.months ?? []), names[i] ?? word.join("")] });
+    seen.set(label, { label, anchor, months: [...(old?.months ?? []), names[i] ?? word.join("")] });
   }));
   return [...seen.values()];
 })();
 
-const textureHalf = (w: number): { x: number; y: number } => {
-  const [W, H] = tileCanvasSize({ w, h: 1 }), t = faceTransform({ w, h: 1 });
-  return { x: W / 2 / t.kx, y: H / 2 / t.ky };
+/**
+ * Room of the name tiles on the unit grid, in drawing px from the center of the unit cell (the content is one unit wide in
+ * every tile): `left`/`right` to the texture edge, or to the edge of the red banner on a side with a band (the first tile
+ * of a name sits on the corner cubie of column 1: band on the left, the seam on the right). Row 1 is a thick layer: every
+ * tile has the top band.
+ */
+const OUTER = outerLayerWidth(CALENDAR7_SIZE);
+const roomOf = (anchor: -1 | 0 | 1): { left: number; right: number } => {
+  const first = anchor === 1, tile: FaceTile = first ? { w: OUTER, h: OUTER, band: { l: OUTER - 1, r: 0, t: OUTER - 1, b: 0 } } : { w: 1, h: OUTER, band: { l: 0, r: 0, t: OUTER - 1, b: 0 } };
+  const g = tileGrid(tile), k = faceTransform(tile).kx, ppu = namePxPerUnit();
+  return { left: first ? ppu / 2 : g.cx / k, right: (g.W - g.cx) / k };
 };
 
 /** Natural geometry of a label in em: summed ink widths and the natural ink gaps between neighbors. */
@@ -89,21 +100,30 @@ function trackingFor(s: number, n: { glyphs: number; gaps: number[] }, target: n
   return lo;
 }
 
-/** The layout of all name tiles at glyph size `s`, or the tiles that do not fit. */
+/**
+ * The layout of all name tiles at glyph size `s`, or the tiles that do not fit. Every tile has one unit of content (the unit
+ * cell): a middle tile fills it between two half seam gaps, the first tile is flush right to its seam and ends 1.5 px before
+ * the red banner edge at most, the last is flush left and ends 1.5 px before the texture edge at most. The glyphs must fit
+ * the height of the red banner.
+ */
 function fitAt(font: LoadedFont, s: number, c: number): { ok: true; m: number; taus: Map<string, number> } | { ok: false; fails: string[] } {
-  const ppu = namePxPerUnit(), fails: string[] = [], taus = new Map<string, number>();
-  const m = Math.max(c * s / 2, ...TILES.map(t => t.width * ppu / 2 - textureHalf(t.width).x + NAME_EDGE_MARGIN));
+  const ppu = namePxPerUnit(), fails: string[] = [], taus = new Map<string, number>(), banner = monthBanner().height * ppu;
+  // the seam sits between two texture edges (bevel reach): ink keeps 1.5 px inside the texture on the seam side
+  const m = Math.max(c * s / 2, ...TILES.flatMap(t => {
+    const room = roomOf(t.anchor);
+    return [...(t.anchor !== -1 ? [ppu / 2 - room.right + NAME_EDGE_MARGIN] : []), ...(t.anchor !== 1 ? [ppu / 2 - room.left + NAME_EDGE_MARGIN] : [])];
+  }));
   const nat = new Map(TILES.map(t => [t.label, natural(font, t.label)]));
   for (const t of TILES) if (t.anchor === 0) {
-    const tau = trackingFor(s, nat.get(t.label)!, t.width * ppu - 2 * m);
+    const tau = trackingFor(s, nat.get(t.label)!, ppu - 2 * m);
     if (tau === null) fails.push(t.label); else taus.set(t.label, tau);
   }
   const mean = taus.size ? [...taus.values()].reduce((a, b) => a + b, 0) / taus.size : 0;
   for (const t of TILES) {
     const n = nat.get(t.label)!;
-    if (n.height * s > 2 * textureHalf(t.width).y) { fails.push(t.label); continue; }
+    if (n.height * s + 2 * NAME_EDGE_MARGIN > banner) { fails.push(t.label); continue; }
     if (t.anchor === 0) continue;
-    const limit = t.width * ppu / 2 + textureHalf(t.width).x - NAME_EDGE_MARGIN - m, tau = trackingFor(s, n, limit);
+    const room = roomOf(t.anchor), limit = ppu / 2 + (t.anchor === 1 ? room.left : room.right) - NAME_EDGE_MARGIN - m, tau = trackingFor(s, n, limit);
     if (tau === null) fails.push(t.label); else taus.set(t.label, Math.min(mean, tau));
   }
   return fails.length ? { ok: false, fails } : { ok: true, m, taus };
@@ -141,28 +161,31 @@ export function nameFaceTable(font: LoadedFont): NameFace {
     const raised = n.gaps.flatMap((e, i) => (size * e < NAME_MIN_INK_GAP ? [`${letters[i]}-${letters[i + 1]}`] : []));
     tiles.set(t.label, { label: t.label, anchor: t.anchor, tracking, gaps, raised, months: t.months });
   }
-  const face = { size, weekday, seamGap: 2 * fit.m, tiles, blocked, m: fit.m };
+  const banner = monthBanner(), cap = Math.max(...TILES.map(t => nat.get(t.label)!.height)) * size / ppu;
+  const face = { size, bannerHeight: banner.height, centerUp: nameCenterUp(cap), weekday, seamGap: 2 * fit.m, tiles, blocked, m: fit.m };
   NAME_FACES.set(font, face);
   return face;
 }
 
 /**
- * Names layout: the letters of a name tile. On the 3D face (`nameFaceTable`): the font's one size and per-tile tracking,
- * the ink of the first tile of a word flush to its right seam, of the last to its left seam, of a middle tile centered, each
- * half a seam gap away from the seam. On the sheet (`surface` "sticker"): the letters of a three-slot grid at one size (the
+ * Names layout: the letters of a name tile in the frame of its unit cell (the content of every tile is one unit wide, a
+ * thick outer cubie has a white band besides it). On the 3D face (`nameFaceTable`): the font's one size and per-tile
+ * tracking, the ink of the first tile of a word flush to its right seam, of the last to its left seam, of a middle tile
+ * centered, each half a seam gap away from the seam; vertically in the upper part of the red banner (`centerUp`). On the sheet (`surface` "sticker"): the letters of a three-slot grid at one size (the
  * cap height of a three-letter label, or smaller when the widest capital would not fit its slot); each ink is centered on its slot.
  */
-export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface = "face", tileWidth = 1): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
+export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface = "face"): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
   if (surface === "face") {
     const face = nameFaceTable(font) as NameFace & { m: number }, fit = face.tiles.get(text);
     if (fit) {
       const ppu = namePxPerUnit(), glyphs = [...text].map(c => font.glyphs[c]);
       const ink = glyphs.reduce((sum, g) => sum + (g.right - g.left) * face.size, 0) + fit.gaps.reduce((a, b) => a + b, 0);
-      let x = fit.anchor === 1 ? TEXTURE / 2 + tileWidth * ppu / 2 - face.m - ink : fit.anchor === -1 ? TEXTURE / 2 - tileWidth * ppu / 2 + face.m : TEXTURE / 2 - ink / 2;
+      const y = TEXTURE / 2 - face.centerUp * ppu; // the unit cell frame: the name sits in the upper part of the red banner
+      let x = fit.anchor === 1 ? TEXTURE / 2 + ppu / 2 - face.m - ink : fit.anchor === -1 ? TEXTURE / 2 - ppu / 2 + face.m : TEXTURE / 2 - ink / 2;
       return [...text].map((char, i) => {
         const p = numberLayout(char, font, face.size), cx = x + p.width / 2;
         x += p.width + (fit.gaps[i] ?? 0);
-        return { text: char, size: face.size, x: cx, y: 96, box: { x0: cx - p.width / 2, y0: 96 - p.height / 2, x1: cx + p.width / 2, y1: 96 + p.height / 2 } };
+        return { text: char, size: face.size, x: cx, y, box: { x0: cx - p.width / 2, y0: y - p.height / 2, x1: cx + p.width / 2, y1: y + p.height / 2 } };
       });
     }
   }
@@ -171,7 +194,7 @@ export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface
   const widest = Math.max(...[...NAME_LETTERS].map(c => numberLayout(c, font, 1).width));
   const size = Math.min(58 / capHeight, (slot * 0.95) / widest);
   return [...text].map((char, i) => {
-    const p = numberLayout(char, font, size), x = nameLetterX(text, i, surface === "face", tileWidth);
+    const p = numberLayout(char, font, size), x = nameLetterX(text, i, surface === "face");
     return { text: char, size, x, y: 96, box: { x0: x - p.width / 2, y0: 96 - p.height / 2, x1: x + p.width / 2, y1: 96 + p.height / 2 } };
   });
 }
@@ -194,21 +217,24 @@ export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink
   // The HTML sheet retains its accessible page-theme palette; the cube retains its printed scheme.
   const roles = sheetColors ? { ...printed, fill: sheetColors.fill, ink: sheetColors.ink, inkSmall: sheetColors.ink } : printed;
   const t = layout === "names" && surface === "face" ? tile : undefined; // only the cubie faces of the names layout have tiles of other sizes
-  const [W, H] = tileCanvasSize(t);
-  ctx.fillStyle = roles.fill;
-  ctx.fillRect(0, 0, W, H);
+  if (t) paintTileGround(ctx, roles, scheme, t);
+  else {
+    ctx.fillStyle = roles.fill;
+    const [W, H] = tileCanvasSize(t);
+    ctx.fillRect(0, 0, W, H);
+  }
   if (surface === "face") {
     const { cx, cy, kx, ky } = faceTransform(t);
     ctx.save();ctx.translate(cx, cy);ctx.scale(kx, ky);ctx.translate(-96, -96);
   }
-  const parts = layout === "names" && printed.cls === "month" ? nameLabelLayout(text, font, surface, t ? t.w : 1) : labelLayout(text, font);
+  const parts = layout === "names" && printed.cls === "month" ? nameLabelLayout(text, font, surface) : labelLayout(text, font);
   if (text) for (const [index, part] of parts.entries()) {
     ctx.fillStyle = index === 1 ? roles.inkSmall : roles.ink;
     drawFontRun(ctx, part.text, font, part.size, part.x, part.y);
   }
   if (surface === "face") ctx.restore();
   if (roles.line) {
-    const r = lineRect(roles.line, layout, surface === "face", t);
+    const r = lineRect(roles.line, layout, surface === "face", t, isBannerClass(roles.cls));
     ctx.fillStyle = roles.line.color;
     ctx.fillRect(r.x, r.y, r.w, r.h);
   }

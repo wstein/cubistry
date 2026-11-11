@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
 import { type Layout, NAME_SLOTS, nameSlotOffset, nameSlotStart, nameTileShift } from "./layout.ts";
-import { faceFlatShare, facePixelsPerUnit, NAMES_FACE_PX_PER_UNIT } from "./geometry.ts";
+import { type FaceBands, faceFlatShare, facePixelsPerUnit, monthBanner, NAME_ABOVE_SHARE, NAMES_BOTTOM_STRIP, NAMES_FACE_PX_PER_UNIT, NAMES_TOP_STRIP } from "./geometry.ts";
 import { type ColorScheme, namesGround, type SchemeLine } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
@@ -42,19 +42,66 @@ export const NAMES_LINE_FACTOR = 1.5;
  * Size of a tile on a cubie face of the names layout, in widths of an inner layer (the layer-width profile makes outer
  * tiles larger): `w` along the texture x axis (sticker right), `h` along y (sticker up). No tile means 1 x 1.
  */
-export interface FaceTile { readonly w: number; readonly h: number }
+export interface FaceTile {
+  readonly w: number;
+  readonly h: number;
+  /**
+   * Unit grid (names layout): the bands of the outer layers, in units, per side (`faceBandsOf`). The content is the unit cell
+   * on the inner side of the tile; the bands are white margin. Without bands the whole tile is the content cell.
+   */
+  readonly band?: FaceBands;
+}
+const NO_BAND: FaceBands = { l: 0, r: 0, t: 0, b: 0 };
+const hasBand = (tile?: FaceTile): boolean => !!tile?.band && (tile.band.l > 0 || tile.band.r > 0 || tile.band.t > 0 || tile.band.b > 0);
+/** A rectangle in canvas pixels (y down). */
+export interface PxRect { readonly x0: number; readonly y0: number; readonly x1: number; readonly y1: number }
+/**
+ * The unit cell of a tile on its canvas: its center (`cx`, `cy`) and its rectangle (`cell`: a side with a band ends at the cell
+ * edge, a side without one at the canvas edge; the face is flat inside, so the cell edge is exact there), with the canvas pixels
+ * per unit along both axes (`px`, `py`: the flat part of the real face). `banner`: the red banner of the month row (the
+ * cell horizontally; vertically the tile less the top strip and the bottom strip).
+ */
+export function tileGrid(tile?: FaceTile): { W: number; H: number; px: number; py: number; cx: number; cy: number; cell: PxRect; banner: PxRect } {
+  const [W, H] = tileCanvasSize(tile), t = tile ?? { w: 1, h: 1 }, b = t.band ?? NO_BAND;
+  const px = facePixelsPerUnit(t.w, W), py = facePixelsPerUnit(t.h, H);
+  const cell = { x0: b.l > 0 ? W / 2 - (t.w / 2 - b.l) * px : 0, x1: b.r > 0 ? W / 2 + (t.w / 2 - b.r) * px : W, y0: b.t > 0 ? H / 2 - (t.h / 2 - b.t) * py : 0, y1: b.b > 0 ? H / 2 + (t.h / 2 - b.b) * py : H };
+  const banner = { x0: cell.x0, x1: cell.x1, y0: H / 2 - (t.h / 2 - NAMES_TOP_STRIP) * py, y1: H / 2 + (t.h / 2 - NAMES_BOTTOM_STRIP) * py };
+  return { W, H, px, py, cx: W / 2 + (b.l - b.r) / 2 * px, cy: H / 2 + (b.t - b.b) / 2 * py, cell, banner };
+}
+/** Tile classes drawn as the red banner of the month row (names layout). */
+export const isBannerClass = (cls: TileClass): boolean => cls === "month" || cls === "band";
+type GroundContext = Pick<CanvasRenderingContext2D, "fillStyle" | "fillRect">;
+/**
+ * Names layout, ground of a tile of the unit grid: the white margin (the paper ground of the scheme) on the whole tile, then
+ * the fill of the tile on its unit cell only (a weekend tint stays on the cell), in the month row the red banner (inset from
+ * the left and right cube edges by the bands, a white strip at the top and the bottom). A tile without bands and without a
+ * banner is one fill of the whole canvas.
+ */
+export function paintTileGround(ctx: GroundContext, roles: TileRoles, scheme: ColorScheme, tile: FaceTile): void {
+  const g = tileGrid(tile), banner = isBannerClass(roles.cls), r = banner ? g.banner : g.cell;
+  if (!banner && !hasBand(tile)) { ctx.fillStyle = roles.fill; ctx.fillRect(0, 0, g.W, g.H); return; }
+  ctx.fillStyle = namesGround(scheme.dayFill);
+  ctx.fillRect(0, 0, g.W, g.H);
+  ctx.fillStyle = roles.fill;
+  ctx.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+}
+/**
+ * Vertical center of the month name in the cell frame (units above the unit cell center): the free height of the banner is
+ * split with `NAME_ABOVE_SHARE` above the ink (clearly more red above the name than below), `capUnits` is the ink height.
+ */
+export const nameCenterUp = (capUnits: number): number => { const b = monthBanner(); return b.top - NAME_ABOVE_SHARE * (b.height - capUnits) - capUnits / 2; };
 /** Canvas pixels of a tile: 192 per unit of width. */
 export const tileCanvasSize = (tile?: FaceTile): [number, number] => (tile ? [Math.round(TEXTURE * tile.w), Math.round(TEXTURE * tile.h)] : [TEXTURE, TEXTURE]);
 /**
  * Transform of the drawing (192 x 192 sticker coordinates) onto the canvas of a cubie face: the drawing center (96, 96) goes
- * to the canvas center, the scale is `FACE_SCALE` on a 1 x 1 face and follows the pixels per unit of the face's real geometry
+ * to the center of the unit cell of the tile (the canvas center without bands), the scale is `FACE_SCALE` on a 1 x 1 face and follows the pixels per unit of the face's real geometry
  * (the texture is mapped along the arc length of the bevel, so a larger face has slightly fewer pixels per unit). No tile:
  * exactly the historical centered `FACE_SCALE`.
  */
 export function faceTransform(tile?: FaceTile): { cx: number; cy: number; kx: number; ky: number } {
   if (!tile) return { cx: TEXTURE / 2, cy: TEXTURE / 2, kx: FACE_SCALE, ky: FACE_SCALE };
-  const [W, H] = tileCanvasSize(tile);
-  return { cx: W / 2, cy: H / 2, kx: FACE_SCALE * facePixelsPerUnit(tile.w, W) / NAMES_FACE_PX_PER_UNIT, ky: FACE_SCALE * facePixelsPerUnit(tile.h, H) / NAMES_FACE_PX_PER_UNIT };
+  const g = tileGrid(tile);
+  return { cx: g.cx, cy: g.cy, kx: FACE_SCALE * g.px / NAMES_FACE_PX_PER_UNIT, ky: FACE_SCALE * g.py / NAMES_FACE_PX_PER_UNIT };
 }
 
 /**
@@ -63,13 +110,14 @@ export function faceTransform(tile?: FaceTile): { cx: number; cy: number; kx: nu
  * full texture width, so the lines of neighboring cubies meet as one continuous line, and `NAMES_LINE_FACTOR` times as
  * thick. The sheet (sticker surface) keeps its look in both layouts.
  */
-export function lineRect(line: SchemeLine, layout: Layout, face: boolean, tile?: FaceTile): { x: number; y: number; w: number; h: number } {
+export function lineRect(line: SchemeLine, layout: Layout, face: boolean, tile?: FaceTile, banner = false): { x: number; y: number; w: number; h: number } {
   const names = layout === "names" && face;
   const h = line.px * LINE_SCALE * (names ? NAMES_LINE_FACTOR : 1);
   if (names && tile) {
-    // A tile of any size: the full tile width, at the bottom edge of the flat face (the flat share of the height).
-    const [W, H] = tileCanvasSize(tile);
-    return { x: 0, y: H * (1 + faceFlatShare(tile.h)) / 2 - h, w: W, h };
+    // A tile of any size: the width of the unit cell (the full tile width without bands), at the bottom edge of the flat face
+    // (the flat share of the height); in the month row at the bottom edge of the red banner.
+    const g = tileGrid(tile);
+    return { x: g.cell.x0, y: (banner ? g.banner.y1 : g.H * (1 + faceFlatShare(tile.h)) / 2) - h, w: g.cell.x1 - g.cell.x0, h };
   }
   const bottom = face ? TEXTURE * (1 + FACE_FLAT) / 2 : TEXTURE;
   if (face && !names) return { x: TEXTURE * (1 - FACE_FLAT) / 2, y: bottom - h, w: TEXTURE * FACE_FLAT, h };
@@ -262,8 +310,10 @@ export function drawSticker(
 }
 
 function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean, layout: Layout = "standard", face = false, tile?: FaceTile): void {
-  ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
-  ctx.fillRect(0, 0, TEXTURE, TEXTURE);
+  if (!(roles && layout === "names" && face && tile)) { // a tile of the names layout has its ground already (paintTileGround)
+    ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
+    ctx.fillRect(0, 0, TEXTURE, TEXTURE);
+  }
   if (text !== "") paintLabel(ctx, text, ink, profile, roles, layout, face, tile);
   if (roles?.line && edgeLine) {
     const r = lineRect(roles.line, layout, false);
@@ -279,7 +329,9 @@ function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfil
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = `600 ${NAME_FONT_SIZE}px ${FONT}`;
-    for (const l of nameGrid(text, face, tile ? tile.w : 1)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04);
+    // On a tile of the unit grid the drawing is in the frame of the unit cell: no shift for a thick tile, the name in the upper part of the banner.
+    const up = face && tile ? nameCenterUp(0.714 * NAME_FONT_SIZE / namePxPerUnit()) * namePxPerUnit() : 0;
+    for (const l of nameGrid(text, face, 1)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04 - up);
   } else if (profile === "strict" && isSplitLabel(text)) {
     ctx.textBaseline = "alphabetic";
     const l = splitLayout(text);
@@ -346,8 +398,8 @@ export function drawFace(
   const roles = scheme ? tileRoles(scheme, text, ink, layout) : null;
   const t = layout === "names" ? tile : undefined; // only the names layout has tiles of other sizes
   const [W, H] = tileCanvasSize(t);
-  ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
-  ctx.fillRect(0, 0, W, H);
+  if (roles && scheme && t) paintTileGround(ctx, roles, scheme, t);
+  else { ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER; ctx.fillRect(0, 0, W, H); }
   const { cx, cy, kx, ky } = faceTransform(t);
   ctx.save();
   ctx.translate(cx, cy);
@@ -357,7 +409,7 @@ export function drawFace(
   paintSticker(ctx, text, ink, profile, roles, false, layout, true, t);
   ctx.restore();
   if (roles?.line) {
-    const r = lineRect(roles.line, layout, true, t);
+    const r = lineRect(roles.line, layout, true, t, isBannerClass(roles.cls));
     ctx.fillStyle = roles.line.color;
     ctx.fillRect(r.x, r.y, r.w, r.h);
   }

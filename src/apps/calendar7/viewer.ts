@@ -26,6 +26,7 @@ import {
   type LayerProfile,
   PhysicalCubeScene,
   PRESENTATION_PRESET,
+  type FaceEdgeColors,
   type PhysicalStickerFrame,
   rotatePresentation,
   type SmartRotationBinding,
@@ -40,9 +41,9 @@ import {
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
 import { type ColorScheme, DEFAULT_SCHEME, namesGround, schemeById } from "./schemes.ts";
-import { bodyWidthFor, STANDARD_EXPOSURE, faceTileOf, halfEdgeOf, layerWidthsOf, namesBodySize } from "./geometry.ts";
+import { bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, unitGridTileOf } from "./geometry.ts";
 import type { Layout } from "./layout.ts";
-import { drawFace, drawSticker, type FaceTile, PLASTIC, tileCanvasSize, tileRoles, type Surface } from "./sticker-art.ts";
+import { drawFace, drawSticker, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileRoles, type Surface } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
@@ -75,10 +76,21 @@ export function layerProfileFor(layout: Layout): LayerProfile | undefined {
 const bodyFill = (scheme: ColorScheme, layout: Layout): string => (layout === "names" ? namesGround(scheme.dayFill) : scheme.dayFill);
 
 /** Fill of every printed tile (sticker id to color): what the exterior faces show and the cut faces next to them take (miter). */
-function faceFills(printing: Printing, scheme: ColorScheme, layout: Layout): Map<number, string> {
+export function faceFills(printing: Printing, scheme: ColorScheme, layout: Layout): Map<number, string> {
   const fills = new Map<number, string>();
   for (let i = 0; i < STICKERS; i++) fills.set(i + 1, tileRoles(scheme, printing.text[i], printing.ink[i], layout).fill);
   return fills;
+}
+
+/**
+ * Names layout: the edges of the month row tiles that differ from their fill. The banner has a white strip along its top and
+ * bottom edge (the unit grid, geometry.ts), so a cut face that borders such an edge is white, not red.
+ */
+export function faceEdgeFills(printing: Printing, scheme: ColorScheme, layout: Layout): Map<number, FaceEdgeColors> {
+  const edges = new Map<number, FaceEdgeColors>();
+  if (layout !== "names") return edges;
+  for (let i = 0; i < STICKERS; i++) if (isBannerClass(tileRoles(scheme, printing.text[i], printing.ink[i], layout).cls)) edges.set(i + 1, { top: namesGround(scheme.dayFill), bottom: namesGround(scheme.dayFill) });
+  return edges;
 }
 
 /** Camera distance relative to the fit of the bounding sphere: the cube fills the picture, the sphere keeps some air. */
@@ -245,7 +257,7 @@ export class Calendar7Viewer implements StageView {
   private applyBodyColor(): void {
     if (!this.bodyStale || this.tween.running || !this.printing || !this.pose || this.destroyed) return;
     this.cube?.setBodyColor(bodyFill(this.scheme, this.layout));
-    if (this.layout === "names") this.cube?.setFaceColors(faceFills(this.printing, this.scheme, this.layout));
+    if (this.layout === "names") this.cube?.setFaceColors(faceFills(this.printing, this.scheme, this.layout), faceEdgeFills(this.printing, this.scheme, this.layout));
     this.bodyStale = false;
   }
 
@@ -308,8 +320,8 @@ export class Calendar7Viewer implements StageView {
     const widths = layerWidthsOf(layout);
     for (let i = 0; i < STICKERS; i++) {
       // Layer profile: a tile is as large as the face of its cubie (the texture is 192 px per unit of width), so the key has the size too.
-      const tile = widths ? faceTileOf(pose.pos.subarray(3 * i, 3 * i + 3), pose.normal.subarray(3 * i, 3 * i + 3), pose.up.subarray(3 * i, 3 * i + 3), widths) : undefined;
-      const key = `${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}` : ""}`; // one surface per configure: the key needs no surface
+      const tile = widths ? unitGridTileOf(pose.pos.subarray(3 * i, 3 * i + 3), pose.normal.subarray(3 * i, 3 * i + 3), pose.up.subarray(3 * i, 3 * i + 3), widths) : undefined;
+      const key = `${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}|${tile.band.l},${tile.band.r},${tile.band.t},${tile.band.b}` : ""}`; // one surface per configure: the key needs no surface
       let material = byKey.get(key);
       if (!material) {
         const canvas = document.createElement("canvas");
@@ -343,7 +355,7 @@ export class Calendar7Viewer implements StageView {
       lightGeometry(layout),
       faceColors,
       // Stickerless: the body is the day background (owner decision); with stickers it is the plastic frame between them.
-      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), miterCutFaces: layout === "names", layers: layerProfileFor(layout) }, // names layout: cut faces colored as on a real cube (cut-faces.ts)
+      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), miterCutFaces: layout === "names", faceEdgeColors: faceEdgeFills(printing, this.scheme, layout), layers: layerProfileFor(layout) }, // names layout: cut faces colored as on a real cube (cut-faces.ts)
     );
     // A sticker is a flat sheet on its body: it needs no shadow of its own (halves the shadow pass).
     this.presentation.traverse((o) => {

@@ -81,6 +81,40 @@ export function faceTileOf(pos: ArrayLike<number>, normal: ArrayLike<number>, up
   return { w: widthAlong(right), h: widthAlong(up) };
 }
 
+/**
+ * Unit grid of the content (owner decision of 2026-11-11): the printed content of the names layout is a uniform 7 x 7 grid of
+ * cells of the size of an inner cubie (1 unit). A cubie on a thick outer layer (width w) carries exactly one unit cell on its
+ * INNER side and a band of `w - 1` on its outer side. The band of a face tile, per side, in units (0 where the cubie is not
+ * on that outer layer): `l`/`r` along the sticker's right axis, `t`/`b` along its up axis.
+ */
+export interface FaceBands { readonly l: number; readonly r: number; readonly t: number; readonly b: number }
+/** Bands of the face of a sticker (`pos`, `normal`, `up` as for `faceTileOf`): the side of the outer layer decides which band the cubie has. */
+export function faceBandsOf(pos: ArrayLike<number>, normal: ArrayLike<number>, up: ArrayLike<number>, widths: readonly number[]): FaceBands {
+  const n = widths.length, right = [up[1] * normal[2] - up[2] * normal[1], up[2] * normal[0] - up[0] * normal[2], up[0] * normal[1] - up[1] * normal[0]];
+  const bandAt = (v: ArrayLike<number>): { low: number; high: number } => {
+    const axis = [0, 1, 2].find(a => v[a] !== 0);
+    const index = axis === undefined ? NaN : v[axis] * pos[axis] + (n - 1) / 2; // layer index counted in the direction of v
+    if (!Number.isInteger(index) || index < 0 || index >= n) throw new Error("Sticker outside the layer profile");
+    return { low: index === 0 ? widths[index] - 1 : 0, high: index === n - 1 ? widths[index] - 1 : 0 };
+  };
+  const x = bandAt(right), y = bandAt(up);
+  return { l: x.low, r: x.high, t: y.high, b: y.low };
+}
+/** Tile of a face with its bands: what the art of the names layout draws on. */
+export const unitGridTileOf = (pos: ArrayLike<number>, normal: ArrayLike<number>, up: ArrayLike<number>, widths: readonly number[]): { w: number; h: number; band: FaceBands } =>
+  ({ ...faceTileOf(pos, normal, up, widths), band: faceBandsOf(pos, normal, up, widths) });
+
+/** Month row (row 1) of the names layout, in units (owner decision of 2026-11-11): white strip at the very top (no red over the cube edge), red banner, white strip below it (separates the name from the weekday row). */
+export const NAMES_TOP_STRIP = 0.1;
+export const NAMES_BOTTOM_STRIP = 0.5;
+/** Share of the free height of the banner that is above the month name (about 2:1 above to below). */
+export const NAME_ABOVE_SHARE = 2 / 3;
+/** The red banner of the month row relative to the unit cell center of a row 1 cubie, in units (y up): bottom and top edge. */
+export function monthBanner(outer: number = outerLayerWidth(CALENDAR7_SIZE)): { bottom: number; top: number; height: number } {
+  const bottom = NAMES_BOTTOM_STRIP - 0.5, top = (outer - 1) + 0.5 - NAMES_TOP_STRIP;
+  return { bottom, top, height: top - bottom };
+}
+
 export const bodyWidthFor = (layout: Layout): number => (layout === "names" ? NAMES_BODY_WIDTH : STANDARD_BODY_WIDTH);
 /** Layer widths of the Calendar7 cube per layout: the standard layout has none (unit pitch), the names layout the thick outer layers. */
 export const layerWidthsOf = (layout: Layout): number[] | null => (layout === "names" ? layerWidthsFor(CALENDAR7_SIZE) : null);
