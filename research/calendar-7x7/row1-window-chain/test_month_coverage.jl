@@ -5,9 +5,9 @@ using Test, SHA
 dir=joinpath(@__DIR__,"evidence","month-list")
 list=joinpath(dir,"months-S2.tsv");pin=bytes2hex(sha256(read(list)))
 julia=Base.julia_cmd()
-gen(kind,l=list,p=pin,status=joinpath(dir,"status-S2.tsv"),last="2050-01")=read(`$julia --startup-file=no $(joinpath(@__DIR__,"month_coverage.jl")) $kind $l $p $status $last`,String)
-function verify(tsv,json;l=list,p=pin,ev=dir)
-    err=IOBuffer();ok=success(pipeline(`$julia --startup-file=no $(joinpath(@__DIR__,"verify_coverage.jl")) $l $p $tsv $json $ev`;stderr=err,stdout=devnull))
+gen(kind,l=list,p=pin,status=joinpath(dir,"status-S2.tsv"),last="2050-01",start="2026-05")=read(`$julia --startup-file=no $(joinpath(@__DIR__,"month_coverage.jl")) $kind $l $p $status $last $start`,String)
+function verify(tsv,json;l=list,p=pin,ev=dir,start="2026-05")
+    err=IOBuffer();ok=success(pipeline(`$julia --startup-file=no $(joinpath(@__DIR__,"verify_coverage.jl")) $l $p $tsv $json $ev $start`;stderr=err,stdout=devnull))
     ok,String(take!(err))
 end
 tsv=read(joinpath(dir,"coverage-S2.tsv"),String);json=read(joinpath(dir,"coverage-S2.json"),String)
@@ -38,5 +38,12 @@ end
     st=tempname();write(st,"month\tstatus\tevidence\n2026-07\tunknown\tx\n")           # a status row for a month that is not a gap
     @test_throws ProcessFailedException gen("tsv",list,pin,st)
     @test occursin("headline\tchain-gapless\t2026-05\t2037-01\t129",gen("tsv",list,pin,joinpath(dir,"status-S2.tsv"),"2043-12"))
+    # the start month is a parameter: from 2026-03 the headline grows to 131 months and only 2026-01 and 2026-02 are before_root
+    t3=gen("tsv",list,pin,joinpath(dir,"status-S2.tsv"),"2050-01","2026-03");j3=gen("json",list,pin,joinpath(dir,"status-S2.tsv"),"2050-01","2026-03")
+    @test occursin("headline\tchain-gapless\t2026-03\t2037-01\t131\n",t3) && occursin("before_root\t2\n",t3)
+    d3=mktempdir();write(joinpath(d3,"c.tsv"),t3);write(joinpath(d3,"c.json"),j3)
+    @test verify(joinpath(d3,"c.tsv"),joinpath(d3,"c.json");start="2026-03")[1]
+    ok,e=verify(joinpath(d3,"c.tsv"),joinpath(d3,"c.json");start="2026-05");@test !ok && occursin("list line",e)
+    ok,e=verify(joinpath(dir,"coverage-S2.tsv"),joinpath(dir,"coverage-S2.json");start="2026-03");@test !ok
 end
 println("mutations: not run (opt-in)")

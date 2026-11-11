@@ -38,7 +38,12 @@ cmp "$d/julia.out" "$d/flix.out"
 [[ $(grep -c $'\tBRIDGE$' "$d/julia.out") == 1 && $(grep -c $'\tBRIDGE$' "$d/ind.out") == 1 ]]
 grep -q $'^months\t' "$d/julia.out"; grep -q $'^verdict\tSAT\tlegal-retained-state-window-chain\t20\t19$' "$d/julia.out"
 grep -q $'^independent-verdict\tACCEPT_CHAIN\t20\t19\t' "$d/ind.out"
-printf 'case\tjulia\tflix\tindependent\n' > "$out/negative.tsv"; printf 'skip-positive\tACCEPT(bridge)\tACCEPT(bridge)\tACCEPT(bridge)\n' >> "$out/negative.tsv"
+# positive with another start month: 2037-05 shows the same board as 2026-05, so the stored print is a valid root for the list 2037-05 .. 2037-12
+d="$out/cases/start-2037-05"; run_all "$d" yes
+[[ $JR == 0 && $FR == 0 && $IR == 0 ]] || { echo "start 2037-05 chain rejected (julia=$JR flix=$FR independent=$IR)" >&2; exit 1; }
+cmp "$d/julia.out" "$d/flix.out"
+grep -q $'^root\t2037\t5\t' "$d/julia.out"; grep -q $'^independent-root\t2037-05\t' "$d/ind.out"; grep -q $'^verdict\tSAT\tlegal-retained-state-window-chain\t8\t7$' "$d/julia.out"
+printf 'case\tjulia\tflix\tindependent\n' > "$out/negative.tsv"; printf 'skip-positive\tACCEPT(bridge)\tACCEPT(bridge)\tACCEPT(bridge)\nstart-2037-05\tACCEPT(start 2037-05)\tACCEPT(start 2037-05)\tACCEPT(start 2037-05)\n' >> "$out/negative.tsv"
 # negatives (ONLY="name ..." restricts them, for mutation runs)
 while IFS=$'\t' read -r name jreason freason ireason; do
     [[ -z "${ONLY:-}" || " $ONLY " == *" $name "* ]] || continue
@@ -55,4 +60,4 @@ run_all "$d" no
 grep -Fq "exactly 20 chronological edges" "$d/julia.err"; grep -Fq "exactly 20 chronological edges" "$d/flix.out"
 printf 'interior-gap-default-window-end\tREJECT\tREJECT\tREJECT\n' >> "$out/negative.tsv"
 fi
-echo "month-list chain checks: 1 positive (bridge) accepted by Julia, Flix, independent; $(($(wc -l < "$out/negative.tsv")-2)) negatives rejected by all three"
+echo "month-list chain checks: 2 positives (bridge, start 2037-05) accepted by Julia, Flix, independent; $(($(wc -l < "$out/negative.tsv")-3)) negatives rejected by all three"
