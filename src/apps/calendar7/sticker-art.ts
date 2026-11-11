@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
 import { type Layout, NAME_SLOTS, nameSlotOffset, nameSlotStart, nameTileShift } from "./layout.ts";
-import { type FaceBands, faceFlatShare, facePixelsPerUnit, monthBanner, NAME_ABOVE_SHARE, NAMES_BANNER_RADIUS, NAMES_BOTTOM_STRIP, NAMES_FACE_PX_PER_UNIT, NAMES_MONTH_SIDE_BAND, NAMES_TOP_STRIP, NAMES_WEEKDAY_DOWN } from "./geometry.ts";
+import { type FaceBands, faceFlatShare, facePixelsPerUnit, monthBanner, nameAboveShare, NAMES_BANNER_RADIUS, NAMES_BOTTOM_STRIP, NAMES_FACE_PX_PER_UNIT, NAMES_MONTH_SIDE_BAND, NAMES_TOP_STRIP, NAMES_WEEKDAY_DOWN } from "./geometry.ts";
 import { type ColorScheme, namesGround, type SchemeLine } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
@@ -124,9 +124,9 @@ export function tileEdgeColors(roles: TileRoles, ground: string, tile: FaceTile)
 export const weekdayShift = (cls: TileClass): number => (cls === "weekday" || cls === "sunsat" ? NAMES_WEEKDAY_DOWN * namePxPerUnit() : 0);
 /**
  * Vertical center of the month name in the cell frame (units above the unit cell center): the free height of the banner is
- * split with `NAME_ABOVE_SHARE` above the ink (1/2: centered), `capUnits` is the ink height.
+ * split with `nameAboveShare` above the ink (2/3 with square banner corners, 1/2 centered with rounded ones), `capUnits` is the ink height.
  */
-export const nameCenterUp = (capUnits: number): number => { const b = monthBanner(); return b.top - NAME_ABOVE_SHARE * (b.height - capUnits) - capUnits / 2; };
+export const nameCenterUp = (capUnits: number, radius: number = NAMES_BANNER_RADIUS): number => { const b = monthBanner(); return b.top - nameAboveShare(radius) * (b.height - capUnits) - capUnits / 2; };
 /** Canvas pixels of a tile: 192 per unit of width. */
 export const tileCanvasSize = (tile?: FaceTile): [number, number] => (tile ? [Math.round(TEXTURE * tile.w), Math.round(TEXTURE * tile.h)] : [TEXTURE, TEXTURE]);
 /**

@@ -179,7 +179,7 @@ export function nameFaceTable(font: LoadedFont): NameFace {
  * Names layout: the letters of a name tile in the frame of its unit cell (the content of every tile is one unit wide, a
  * thick outer cubie has a white band besides it). On the 3D face (`nameFaceTable`): the font's one size and per-tile
  * tracking, the ink of the first tile of a word flush to its right seam, of the last to its left seam, of a middle tile
- * centered, each half a seam gap away from the seam; vertically centered in the red banner (`centerUp`). On the sheet (`surface` "sticker"): the letters of a three-slot grid at one size (the
+ * centered, each half a seam gap away from the seam; vertically placed in the red banner by `centerUp` (2:1 above to below with square corners, centered with rounded ones). On the sheet (`surface` "sticker"): the letters of a three-slot grid at one size (the
  * cap height of a three-letter label, or smaller when the widest capital would not fit its slot); each ink is centered on its slot.
  */
 export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface = "face"): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
@@ -188,7 +188,7 @@ export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface
     if (fit) {
       const ppu = namePxPerUnit(), glyphs = [...text].map(c => font.glyphs[c]);
       const ink = glyphs.reduce((sum, g) => sum + (g.right - g.left) * face.size, 0) + fit.gaps.reduce((a, b) => a + b, 0);
-      const y = TEXTURE / 2 - face.centerUp * ppu; // the unit cell frame: the name is centered in the red banner
+      const y = TEXTURE / 2 - face.centerUp * ppu; // the unit cell frame: the name sits at the 2:1 or centered height of the red banner
       let x = fit.anchor === 1 ? TEXTURE / 2 + ppu / 2 - face.m - ink : fit.anchor === -1 ? TEXTURE / 2 - ppu / 2 + face.m : TEXTURE / 2 - ink / 2;
       return [...text].map((char, i) => {
         const p = numberLayout(char, font, face.size), cx = x + p.width / 2;

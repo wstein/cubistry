@@ -116,8 +116,12 @@ export const NAMES_MONTH_SIDE_BAND = 0.6;
 export const NAMES_WEEKDAY_DOWN = 0.08;
 /** Corner radius of the red banner at the left and right cube edge, in units; 0 is square (variant under review). */
 export const NAMES_BANNER_RADIUS = 0;
-/** Share of the free height of the banner that is above the month name: 1/2, the ink of the name is centered in the banner (owner decision of 2026-11-11). */
-export const NAME_ABOVE_SHARE = 1 / 2;
+/** Share of the free height of the banner that is above the month name with square corners: 2/3 (2:1 above to below, owner decision of 2026-11-11). */
+export const NAME_ABOVE_SHARE = 2 / 3;
+/** With rounded banner corners (`NAMES_BANNER_RADIUS` > 0) the ink of the name is centered in the banner: 1/2 (owner decision of 2026-11-11). */
+export const NAME_ABOVE_SHARE_ROUNDED = 1 / 2;
+/** The share above the name for a banner corner radius: centered when rounded, 2:1 when square. */
+export const nameAboveShare = (radius: number = NAMES_BANNER_RADIUS): number => (radius > 0 ? NAME_ABOVE_SHARE_ROUNDED : NAME_ABOVE_SHARE);
 /** The red banner of the month row relative to the unit cell center of a row 1 cubie, in units (y up): bottom and top edge. */
 export function monthBanner(outer: number = outerLayerWidth(CALENDAR7_SIZE)): { bottom: number; top: number; height: number } {
   const bottom = NAMES_BOTTOM_STRIP - 0.5, top = (outer - 1) + 0.5 - NAMES_TOP_STRIP;

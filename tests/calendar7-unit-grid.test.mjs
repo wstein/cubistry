@@ -2,8 +2,8 @@
 // Calendar7 names layout, unit grid (owner decision of 2026-11-11): the printed content is a uniform 7 x 7 grid of unit cells
 // (the size of an inner cubie). A cubie on a thick outer layer (f = 1.8) carries exactly one unit cell on its INNER side and a
 // band of f - 1 on its outer side (white margin); the month row is a red banner (1.0 tall) in a white frame: 0.4 above and below,
-// 0.6 from the left and right cube edges; the month name is centered
-// in the banner. Everything is checked on the recorded drawing of the real print (public/calendar7/names/state.v1.json)
+// 0.6 from the left and right cube edges; the month name sits in
+// the upper part of the banner. Everything is checked on the recorded drawing of the real print (public/calendar7/names/state.v1.json)
 // and mapped to scene units, no mock geometry.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -181,7 +181,7 @@ test("Saturday/Sunday tint: only the unit cell is tinted (column 1 and 7 include
   }
 });
 
-test("the month name is vertically centered in the red banner (ink box, tolerance 1 px of 192 per unit) in all 14 fonts, and the name is inside the banner", () => {
+test("the month name sits in the upper part of the red banner: more red above than below (2:1 of the free height) in all 14 fonts, and the name is inside the banner", () => {
   for (const [id, font] of Object.entries(FONT_METRICS)) {
     const table = nameFaceTable(font), banner = monthBanner();
     near(table.bannerHeight, 1.0, 1e-12, id);
@@ -189,24 +189,24 @@ test("the month name is vertically centered in the red banner (ink box, toleranc
     for (const word of ["J", "ANU", "ARY", "NOV", "EMB", "DEC", "SEP", "AUG", "UST"]) for (const l of nameLabelLayout(word, font, "face")) {
       const above = (l.box.y0 - (96 - banner.top * PPU)) / PPU, below = ((96 - banner.bottom * PPU) - l.box.y1) / PPU; // units of red above and below this glyph
       assert.ok(above > 0.2 && below > 0.1, `${id} ${word} ${l.text}: red above ${above}, below ${below}`);
-      assert.ok(Math.abs(above - below) <= 4 / PPU, `${id} ${word} ${l.text}: red above ${above.toFixed(4)} and below ${below.toFixed(4)} differ by more than 4 px (a glyph with overshoot or a descender)`);
+      assert.ok(above > below * 1.4, `${id} ${word} ${l.text}: clearly more red above (${above.toFixed(3)}) than below (${below.toFixed(3)})`);
       tops.push(l.box.y0); bottoms.push(l.box.y1);
     }
     const aboveAll = (Math.min(...tops) - (96 - banner.top * PPU)) / PPU, belowAll = ((96 - banner.bottom * PPU) - Math.max(...bottoms)) / PPU;
-    assert.ok(Math.abs(aboveAll - belowAll) <= 1 / PPU, `${id}: the ink box of the name tiles is centered in the banner: above ${(aboveAll * PPU).toFixed(2)} px, below ${(belowAll * PPU).toFixed(2)} px`);
+    near(aboveAll / belowAll, 2, 0.15, `${id}: above:below of the tallest ink over the name tiles is about 2:1 (${aboveAll.toFixed(3)} : ${belowAll.toFixed(3)})`);
     // the center line follows the formula and is one value for all tiles and months
     near(table.centerUp, nameCenterUp(Math.max(...tops.map((_, k) => bottoms[k] - tops[k])) / PPU), 0.03, id);
   }
 });
 
-test("month name on the real front: ink inside the red banner (front projection, scene units), centered, the red banner 0.4 inside the top and bottom of its row; font and built-in drawing", () => {
+test("month name on the real front: ink inside the red banner (front projection, scene units), 2:1, the red banner 0.4 inside the top and bottom of its row; font and built-in drawing", () => {
   const first = FRONT.filter((f) => f.r === 0 && f.text !== "");
   assert.ok(first.length >= 2, "a month name of at least two tiles");
   for (const [name, draw] of Object.entries(DRAWINGS)) for (const f of first) {
     const texts = draw(f).texts, y = texts.map((t) => runAt(name, f, t).y);
     for (const v of y) assert.ok(v < 3.9 && v > 2.9, `${name} ${f.text}: letter center ${v} inside the banner 2.9 .. 3.9`);
     const above = 3.9 - Math.max(...y), below = Math.min(...y) - 2.9;
-    assert.ok(Math.abs(above - below) <= (name === "font" ? 2 / PPU : 0.03), `${name} ${f.text}: red above ${above.toFixed(4)} vs below ${below.toFixed(4)}: the letter centers are in the middle of the banner (the built-in drawing anchors on the middle baseline, not on the ink: 6 px)`);
+    assert.ok(above > below, `${name} ${f.text}: red above ${above.toFixed(3)} vs below ${below.toFixed(3)}`);
   }
 });
 
@@ -287,4 +287,21 @@ test("weekday line: the cut faces beside every weekday tile carry the line color
     }
   }
   assert.ok(checked >= 5 * 8, `${checked} edges checked`);
+});
+
+test("month name placement follows the banner corner radius: square (the default) keeps 2:1 above to below, rounded (radius > 0) centers the ink box (tolerance 1 px), all 14 fonts", async () => {
+  const g = await import("../src/apps/calendar7/geometry.ts");
+  assert.equal(g.NAMES_BANNER_RADIUS, 0, "square is the default");
+  assert.equal(g.nameAboveShare(0), 2 / 3);
+  assert.equal(g.nameAboveShare(0.3), 1 / 2);
+  assert.equal(g.nameAboveShare(), g.nameAboveShare(g.NAMES_BANNER_RADIUS), "the default follows the switch");
+  const b = monthBanner();
+  for (const [id, font] of Object.entries(FONT_METRICS)) {
+    const cap = Math.max(...Object.values(font.glyphs).map((x) => x.bottom - x.top)) * nameFaceTable(font).size / PPU;
+    for (const [radius, ratio] of [[0, 2], [0.15, 1], [0.3, 1]]) {
+      const up = nameCenterUp(cap, radius), above = b.top - (up + cap / 2), below = up - cap / 2 - b.bottom; // units of red above and below the ink box
+      if (ratio === 1) assert.ok(Math.abs(above - below) <= 1 / PPU, `${id} radius ${radius}: centered, above ${(above * PPU).toFixed(2)} px, below ${(below * PPU).toFixed(2)} px`);
+      else near(above / below, ratio, 0.15, `${id} radius ${radius}: 2:1`);
+    }
+  }
 });
