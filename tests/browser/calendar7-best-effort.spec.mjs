@@ -2,12 +2,13 @@
 // Best effort for the month the print cannot show exactly (February with 28 days from a Sunday: 2026, 2037, 2043, ...): the cube
 // shows the best state, the one wrong cell is drawn on its cubie's face as a grey hatched field with a strike-through and a red
 // frame crossed out. The scene is WebGL, so the spec reads the projected position of the cell from `data-c7-wrong` on the canvas
-// (the viewer publishes it with every drawn frame) and samples the pixels of the screenshot there, from three views.
+// (the viewer publishes it with every drawn frame, with the cosine of the viewing angle) and samples the pixels of the screenshot there, from three views.
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 
 const ROOT = "#calendar7-root";
 const SHOTS = process.env.C7_SHOTS ?? "";
+const MIN_COS = 0.35; // cosine of the angle between the face normal and the line of sight: a cell seen more edge-on is skipped (about 70 degrees)
 const at = (page, month) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-month", month, { timeout: 30000 });
 const idle = (page) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "idle", { timeout: 30000 });
 const canvas = (page) => page.locator("#studio-scene canvas");
@@ -78,7 +79,7 @@ for (const scheme of ["paper-red", "dracula"])
     for (const [dx, dy] of [[0, 0], [-90, 20], [60, -30], [-120, -60]]) {
       if (dx || dy) await drag(page, dx, dy);
       const cell = await wrongCell(page);
-      if (!cell.facing || cell.x < 0 || cell.y < 0) continue;
+      if (!cell.facing || cell.cos < MIN_COS || cell.x < 0 || cell.y < 0) continue; // an edge-on cell has no pixels to sample
       const s = await sample(page, cell);
       views.push({ cell, s });
       if (SHOTS) await page.screenshot({ path: `${SHOTS}/sample-${scheme}-view${views.length}.png` });

@@ -237,7 +237,7 @@ export class Calendar7Viewer implements StageView {
 
   /**
    * Test hook and proof for readers: the screen position of each differing cell (center and radius in CSS pixels of the
-   * canvas, and whether its face looks at the camera) as JSON in `data-c7-wrong`, updated with every drawn frame.
+   * canvas, whether its face looks at the camera and the cosine of its viewing angle) as JSON in `data-c7-wrong`, updated with every drawn frame.
    */
   private publishWrong(): void {
     if (!this.wrongMeshes.length) return;
@@ -249,11 +249,12 @@ export class Calendar7Viewer implements StageView {
     const cells = this.wrongMeshes.map((mesh) => {
       mesh.getWorldPosition(world);
       normal.set(0, 0, 1).applyQuaternion(mesh.getWorldQuaternion(quaternion));
-      const facing = normal.dot(edge.copy(this.camera.position).sub(world)) > 0;
+      const cos = normal.dot(edge.copy(this.camera.position).sub(world).normalize());
+      const facing = cos > 0;
       edge.copy(world).addScaledVector(right, half).project(this.camera);
       const center = world.clone().project(this.camera);
       const x = ((center.x + 1) / 2) * w, y = ((1 - center.y) / 2) * h;
-      return { id: mesh.userData.stickerId, x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10, r: Math.round(Math.abs(((edge.x + 1) / 2) * w - x) * 10) / 10, facing };
+      return { id: mesh.userData.stickerId, x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10, r: Math.round(Math.abs(((edge.x + 1) / 2) * w - x) * 10) / 10, facing, cos: Math.round(cos * 1000) / 1000 };
     });
     this.renderer.domElement.setAttribute("data-c7-wrong", JSON.stringify(cells));
   }
