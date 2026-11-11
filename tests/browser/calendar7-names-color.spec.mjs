@@ -131,7 +131,7 @@ for (const [mode, production] of MODES) {
 for (const [plasticity, tol] of [[0, 4], [1, 10]]) for (const scheme of ["paper-red", "dracula"]) test(`${scheme} (production effects): plasticity ${plasticity} keeps the median fill on the token and every fill within ${tol}`, async ({ page }) => {
   test.setTimeout(90000);
   const rows = await sample(page, scheme, false, true, plasticity);
-  expect(medianFill(rows), `${scheme} ${plasticity} median`).toBeLessThanOrEqual(plasticity === 0 ? 1 : plasticity === 1 && scheme === "paper-red" ? 5 : 3); // paper-red at 1: 5, the unit cell is shaded more on the outer cubies (see PRODUCTION_MEDIAN_TOL)
+  expect(medianFill(rows), `${scheme} ${plasticity} median`).toBeLessThanOrEqual(plasticity === 0 ? 1 : plasticity === 1 && scheme === "paper-red" ? 5 : 3); // paper-red at 1: 5 on the unit cell of the outer cubies (see PRODUCTION_MEDIAN_TOL)
   for (const r of rows) expect(r.fill, `${scheme} ${plasticity} ${r.cls} "${r.text}" fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(tol);
 });
 
@@ -143,5 +143,5 @@ test("paper-red (production effects): at pitch 0.4 the fills are the tokens too 
   expect(rows.length).toBeGreaterThan(40);
   expect(medianFill(rows), "median fill delta").toBeLessThanOrEqual(3);
   if (process.env.C7_COLOR_TABLE) console.log("pitch 0.4 " + JSON.stringify(rows.slice(0, 12)));
-  for (const r of rows) expect(r.fill, `${r.cls} "${r.text}" fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(9); // 9 off at most on the unit cell of the weekend tint (outer cubies, see PRODUCTION_MEDIAN_TOL), exponent 4 gives 13 or more
+  for (const r of rows) expect(r.fill, `${r.cls} "${r.text}" fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(9); // 9 off at most: the weekend tint of an outer cubie on the unit cell renders a little lighter than its token (#fff5f7 vs #fdeeee; see PRODUCTION_MEDIAN_TOL), exponent 4 gives 13 or more
 });

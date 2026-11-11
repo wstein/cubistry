@@ -105,10 +105,10 @@ test("invariance: the cut-face edge colors of all seven columns and all four edg
         ["bottom", at(g.W * t, g.H), (p) => [inside(p.x0, -3.8, 3.8), inside(p.top, 2.9, 3.9)]],
       ];
       for (const [edge, p, test] of probes) {
-        const [ix, iy] = test(p);
-        if (ix === null || iy === null) continue;
+        const [inX, inY] = test(p);
+        if (inX === null || inY === null) continue;
         compared++;
-        assert.equal(colorAt(e[edge], t), ix && iy ? red : ground, `f ${f} column ${c} ${edge} edge at ${t}: unit-grid (${p.x0.toFixed(3)}, ${p.top.toFixed(3)})`);
+        assert.equal(colorAt(e[edge], t), inX && inY ? red : ground, `f ${f} column ${c} ${edge} edge at ${t}: unit-grid (${p.x0.toFixed(3)}, ${p.top.toFixed(3)})`);
       }
     }
   }
