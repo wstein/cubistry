@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Source mutants of the month-list logic, applied to a scratch copy of research/calendar-7x7 (never the worktree).
 #   run_month_list_mutants.sh JULIA JAVA OUT [julia|flix|all]
-# Each mutant must make the named test fail. Flix mutants rebuild the chain jar (about 2 minutes each).
+# Each mutant must make the named test fail (MUT_ONLY="J8 F4" runs only those ids). Flix mutants rebuild the chain jar (about 2 minutes each).
 set -u
 here=$(cd -- "$(dirname -- "$0")" && pwd); cal=$(cd "$here/.." && pwd)
 J=${1:?julia}; JAVA=${2:?java}; out=${3:?scratch dir}; which=${4:-all}
@@ -18,6 +18,7 @@ t5() { "$J" --startup-file=no "$chain/test_stage_coverage.jl" > "$out/t.log" 2>&
 t6() { "$J" --startup-file=no "$chain/test_best_effort.jl" > "$out/t.log" 2>&1; }
 mutate() { # id file sed-expr test-kind [ONLY list]
     local id=$1 f=$2 expr=$3 kind=$4 only=${5:-none}
+    if [[ -n "${MUT_ONLY:-}" && " $MUT_ONLY " != *" ${id%%-*} "* ]]; then return; fi      # MUT_ONLY="J8 F4": run only these mutant ids
     cp "$f" "$f.orig"; sed -i "$expr" "$f"
     if cmp -s "$f" "$f.orig"; then echo "NOT-APPLIED $id"; mv "$f.orig" "$f"; bad=$((bad+1)); return; fi
     if [[ $kind == flix || $kind == flix4 ]]; then
@@ -40,7 +41,7 @@ mutate J4-bridge-detection "$corner/check.jl" 's/>1 for (a,b)/>9 for (a,b)/' t1
 mutate J5-exclusive-window-end "$corner/check.jl" 's/@assert !haskey(ENV,"WINDOW_END") "month list and WINDOW_END are exclusive"/@assert true/' t1
 mutate J6-root-record "$chain/check.jl" 's/@assert canonical_integer.(f\[2:4\])==\[sm,sy,sm\]/@assert true/' t2 "root-mismatch start-record-mismatch"
 mutate J7-chain-adjacency "$chain/check.jl" 's/@assert (edge.year,edge.month)==(goal.year,goal.month)/@assert true/' t2 "skipped-month-with-edge bridge-edge-declares-skipped-month"
-mutate J8-bridge-flag-output "$chain/check.jl" 's/WINDOW_BRIDGES\[i\] ? "\\tBRIDGE" : ""/""/' t2 none
+mutate J8-bridge-flag-output "$chain/check.jl" 's/>1 ? "\\tBRIDGE" : ""/>1 ? "" : ""/' t2 none
 mutate J9-independent-next-member "$chain/verify_chain.jl" 's/y,m=LISTED ? NEXT\[(y,m)\] : /y,m=/' t2 none
 mutate J10-independent-increasing "$chain/verify_chain.jl" 's/@assert isempty(out) || t>out\[end\]/@assert true/' t2 "list-not-increasing"
 mutate J11-start-ignored-check "$chain/check.jl" 's/sy,sm=CHAIN_ROOT/sy,sm=(2026,5)/' t2 start-2037-05
@@ -65,13 +66,13 @@ mutate SC3-stage-verifier-digest "$chain/verify_stage_coverage.jl" 's/ok=a.last=
 mutate C1-coverage-run-break "$chain/month_coverage.jl" 's/idx(m)==idx(p)+1 || (push!/idx(m)==idx(p)+2 || (push!/' t3
 mutate C2-coverage-before-root "$chain/month_coverage.jl" 's/i in inlist) for i in idx(FIRST)/true) for i in idx(FIRST)/' t3
 mutate C3-verify-receipts-identical "$chain/verify_coverage.jl" 's/@assert read(a)==read(b) "Julia and Flix receipts byte-identical"/@assert true/' t3
-mutate C4-coverage-start-ignored "$chain/month_coverage.jl" 's/function coverage(ms,status,last,ROOT)/function coverage(ms,status,last,ROOT0)\n    ROOT=(2026,5)/' t3
+mutate C4-coverage-start-ignored "$chain/month_coverage.jl" 's/function coverage(ms,status,last,START,ROOT,best)/function coverage(ms,status,last,START0,ROOT,best)\n    START=(2026,5)/' t3
 fi
 if [[ $which == flix || $which == all ]]; then
 mutate F1-flix-increasing "$corner/flix/src/Main.flix" 's/monthIndex(a)<monthIndex(b)/monthIndex(a)<monthIndex(b) or true/' flix "list-not-increasing list-duplicate-month"
 mutate F2-flix-list-pin "$corner/flix/src/Main.flix" 's/require(stackSha(raw)==pin,"month list pin");//' flix "wrong-list-hash"
 mutate F3-flix-root-record "$chain/flix/src/Main.flix" 's/require((integer(r),integer(y),integer(m))==(sm,sy,sm),/require(true or (integer(r),integer(y),integer(m))==(sm,sy,sm),/' flix "root-mismatch start-record-mismatch"
-mutate F4-flix-bridge-flag "$chain/flix/src/Main.flix" 's/monthIndex(b)-monthIndex(a)>1},List.zip(List.take(count-1,ms)/monthIndex(b)-monthIndex(a)>99},List.zip(List.take(count-1,ms)/' flix none
+mutate F4-flix-bridge-flag "$chain/flix/src/Main.flix" 's/monthIndex(b)-monthIndex(a)>1) "\\tBRIDGE"/monthIndex(b)-monthIndex(a)>99) "\\tBRIDGE"/' flix none
 mutate F5-flix-adjacency "$chain/flix/src/Main.flix" 's/require((y,m)==(yy,mm),"chronological month adjacency");/require(true or (y,m)==(yy,mm),"chronological month adjacency");/' flix "skipped-month-with-edge bridge-edge-declares-skipped-month"
 mutate F6-flix-start-ignored "$chain/flix/src/Main.flix" 's/let(sy,sm)=start;require/let(sy,sm)=if(true) (2026,5) else start;require/' flix start-2037-05
 mutate FR1-flix-root-edge-ignored "$chain/flix/src/Main.flix" 's/let rooted=monthsFile != "" and rootMonth != at(listed,0);/let rooted=false;/' flix4 "root-edge-2037-05 root-edge-zero-moves"

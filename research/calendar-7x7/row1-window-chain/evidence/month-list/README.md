@@ -122,11 +122,16 @@ S2 are not run.
 - `row1-window-chain/test_month_list.jl`: reader, hash, structure, `coupled_goals` with a list (Julia unit tests).
 - `row1-window-chain/month_list_cases.jl` and `run_month_list_checks.sh`: the stored 21-month chain with 2027-03 skipped
   (the edges of 2027-03 and 2027-04 merged into one bridge edge, no solver) is accepted by Julia, Flix and the independent
-  verifier with identical Julia/Flix receipts; a second positive starts at 2037-05 (same calendar as 2026, stored print and first seven edges relabeled); 14 negatives (skipped month with an edge into it, missing member, wrong
+  verifier with identical Julia/Flix receipts; a second positive starts at 2037-05 (same calendar as 2026, stored print and first seven edges relabeled); 15 negatives (skipped month with an edge into it, missing member, wrong
   list hash, interior-gap chain presented as contiguous list, interior-gap chain under the default `WINDOW_END`, list not
   increasing, duplicate month, root record mismatch, start month the print does not show, 2037-05 chain under a 2026-05 list, bridge edge declaring the skipped month, wrong end digest on a bridge edge,
-  CRLF list, month out of range) are rejected by all three at the named reason.
-- `row1-window-chain/test_month_coverage.jl`: generator output equals the stored coverage; 12 tampered copies are rejected; start 2026-03 gives 131 months and two before_root months.
+  CRLF list, month after 2100-01, month before 1900-01) are rejected by all three at the named reason.
+- `row1-window-chain/root_best_effort_cases.jl` and `run_root_best_effort_checks.sh`: 26 fixtures, 9 accepted and 17 rejected by Julia, Flix and the independent verifier at the
+  named reason (root month, best-effort months, stages with free start and junction digests).
+- `row1-window-chain/test_best_effort.jl` (16 tests: `chain_root_month`, Hall witness on `printing-S2.tsv` for February 2037), `test_stage_coverage.jl` (15 tests: junction mismatch, missing
+  junction lines, different months, differing receipts, best-effort and bridge stages, verifier agreement).
+- `row1-window-chain/test_month_coverage.jl` (35 tests): generator output equals the stored coverage; tampered copies are rejected; start 2026-03 gives 131 months and two before_start months; root and start are separate parameters; verified and unverified best-effort months.
 - `row1-window-chain/run_month_list_receipts.sh`: regression (committed 2028-01 chain receipts, 129-month print and corner
   receipts, 21-month print) and the S2 receipts above.
-- `row1-window-chain/run_month_list_mutants.sh`: source mutants of the list logic (Julia, Flix, coverage), each must make its test fail.
+- `row1-window-chain/run_month_list_mutants.sh`: 44 source mutants (list logic, root edge, Hall rule, start moves, junction digests in Julia, Flix and the independent verifier; coverage and stage composition), each must make its test fail.
+  Not mutation-tested: the Hall count rule `wrong cells == deficiency` in the independent verifier and in Flix (the Julia rule is covered by `test_best_effort.jl`, mutant H2).
