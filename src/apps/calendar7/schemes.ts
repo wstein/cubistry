@@ -27,7 +27,13 @@ export interface SchemeLine {
   readonly px: number;
 }
 
+/** Theme follows the cube color scheme; the other choices override its month banner shape. */
+export type BannerStyle = "theme" | "rounded" | "square" | "underline";
+export type ResolvedBannerStyle = Exclude<BannerStyle, "theme">;
+
 export interface ColorScheme {
+  /** Runtime artwork choice; the immutable palette tokens do not change. */
+  readonly bannerStyle?: ResolvedBannerStyle;
   readonly id: string;
   readonly name: string;
   readonly kind: "light" | "dark";
@@ -310,6 +316,36 @@ export const DEFAULT_SCHEME: ColorScheme = SCHEMES.find((s) => s.isDefault) as C
 /** The scheme with this id; null, undefined and an unknown id give `DEFAULT_SCHEME` (never throws). */
 export function schemeById(id: string | null | undefined): ColorScheme {
   return SCHEMES.find((s) => s.id === id) ?? DEFAULT_SCHEME;
+}
+
+/** Invalid URL choices use the color theme's banner default. */
+export function parseBannerStyle(value: string | null | undefined): BannerStyle {
+  return value === "rounded" || value === "square" || value === "underline" ? value : "theme";
+}
+
+/** The color theme's shape, unless this runtime copy has an explicit shape. */
+export function resolvedBannerStyle(scheme: ColorScheme): ResolvedBannerStyle {
+  return scheme.bannerStyle ?? (scheme.id === "paper-blue" ? "square" : scheme.id === "classic" ? "underline" : "rounded");
+}
+
+/** Resolve artwork without changing the frozen palette or retaining an old override in Theme mode. */
+export function withBannerStyle(scheme: ColorScheme, choice: BannerStyle): ColorScheme {
+  const { bannerStyle: _old, ...palette } = scheme;
+  return { ...palette, bannerStyle: choice === "theme" ? resolvedBannerStyle(palette) : choice };
+}
+
+/** Readable ink for an unfilled banner, selected only from the existing palette. */
+export function underlineInk(scheme: ColorScheme): string {
+  const luminance = (hex: string): number => {
+    const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  };
+  const bg = luminance(namesGround(scheme.dayFill));
+  return [scheme.monthInk, scheme.bandFill, scheme.dayInk].find(color => {
+    if (!color) return false;
+    const fg = luminance(color);
+    return (Math.max(bg, fg) + 0.05) / (Math.min(bg, fg) + 0.05) >= 4.5;
+  }) ?? scheme.dayInk;
 }
 
 /**
