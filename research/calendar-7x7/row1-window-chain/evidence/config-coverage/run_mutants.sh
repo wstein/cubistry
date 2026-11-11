@@ -36,3 +36,6 @@ mut ../window-skip/design_skip.jl 's/if !isempty(path) \&\& isfile(path)$/if fal
 mut ../window-skip/design_skip.jl 's/if !isempty(path) \&\& result.status==1$/if !isempty(path)/' "solved classes are read from the result directory" test_cache.jl
 mut ../window-skip/design_skip.jl 's/ls\[1\]=="digest\\t"\*digest/true/' "solved classes are read from the result directory" test_cache.jl
 mut config_table.jl 's|const PRINT_D=joinpath(@__DIR__,"printing-C1980.tsv")|const PRINT_D=PRINT_B|' "print C1980: root January 1980"
+mut ../window-skip/design_skip.jl 's/^root_front(h,n)=h\[3\]==3 \&\& n==FRONT_NORMAL$/root_front(h,n)=h[3]==3/' "freeze rule with CLASS_FRACS" test_freeze.jl
+mut ../window-skip/design_skip.jl 's/get(CLASS_FRACS,join(bodykey(h),'"'"','"'"'),1.0)/get(CLASS_FRACS,join(bodykey(h),'"'"','"'"'),0.0)/' "freeze rule with CLASS_FRACS" test_freeze.jl
+mut config_table.jl 's/result_of(srcOld,c.board_old)/result_of(srcOld,c.board)/' "match verdict agrees with the repository matcher"
