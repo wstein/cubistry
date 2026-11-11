@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Calendar7 names layout: the colors on screen are the scheme tokens. The real viewer renders the front face of the window
-// print head on (WebGL, Chromium); every tile class is sampled and compared with the token it was drawn from. The names
-// layout draws without tone mapping at the exposure that makes the lit front face reproduce its albedo (geometry.ts,
-// NAMES_EXPOSURE), so a token is rendered as itself, with the paper white (NAMES_WHITE) as the reference.
+// print (WebGL, Chromium) head on or in the start view; every tile class is sampled and compared with the token it was drawn
+// from. The names layout uses Linear tone mapping at the exposure that makes the face looking at the camera show its albedo
+// (names-exposure.ts), no specular, and cube faces that do not receive shadows, so a token renders as itself with the paper
+// white (NAMES_WHITE) as the reference. Both effect modes are measured: the repo's test mode (cubistry-lowfx=shadows from
+// playwright.config.mjs: shadow map off) and the production effects (shadow map on, what users get).
 import { test, expect } from "@playwright/test";
 
 // Tolerance in 8-bit sRGB per channel. Fills are the median of the tile interior (shading and antialiasing do not matter);
@@ -10,9 +12,10 @@ import { test, expect } from "@playwright/test";
 const FILL_TOL = 4, STROKE_TOL = 6;
 const SCHEMES = ["paper-red", "paper-blue", "classic", "solarized-light", "gruvbox-light", "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast"];
 
-async function sample(page, scheme, tilted = false) {
+async function sample(page, scheme, tilted = false, production = false) {
   await page.goto("/licenses.html");
-  return page.evaluate(async ({ scheme, tilted }) => {
+  return page.evaluate(async ({ scheme, tilted, production }) => {
+    if (production) localStorage.removeItem("cubistry-lowfx"); // read by configurePresentationRenderer: no key = shadow map on
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
     const { loadCalendarFont } = await import("/src/apps/calendar7/fonts.ts");
     const { parseState } = await import("/src/apps/calendar7/graph.ts");
@@ -69,29 +72,33 @@ async function sample(page, scheme, tilted = false) {
     });
     viewer.destroy();
     return out;
-  }, { scheme, tilted });
+  }, { scheme, tilted, production });
 }
 
-for (const scheme of SCHEMES) test(`${scheme}: the names layout renders its fills, inks and lines as the scheme tokens (within ${FILL_TOL} / ${STROKE_TOL} of 255)`, async ({ page }) => {
-  test.setTimeout(90000); // software GL: the first frame of a 218-cubie scene is slow
-  const rows = await sample(page, scheme);
-  expect(rows.length).toBeGreaterThan(40); // the 7x7 front face
-  const classes = new Set(rows.map((r) => r.cls));
-  for (const c of ["blank", "day", "weekday", "weekend", "sunsat"]) expect(classes, c).toContain(c);
-  if (process.env.C7_COLOR_TABLE) console.log(scheme + "\n" + JSON.stringify(rows));
-  for (const r of rows) {
-    const id = `${scheme} ${r.cls} "${r.text}"`;
-    expect(r.fill, `${id} fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(FILL_TOL);
-    if (r.ink !== undefined) expect(r.ink, `${id} ink vs ${r.inkWant}`).toBeLessThanOrEqual(STROKE_TOL);
-    if (r.line !== undefined) expect(r.line, `${id} line vs ${r.lineWant}`).toBeLessThanOrEqual(STROKE_TOL);
-  }
-});
+const MODES = [["test mode", false], ["production effects", true]];
 
-// The default start view is turned (yaw 0.3, pitch 0.22): the exposure follows the face that looks at the camera, so the paper
-// white and the red are the tokens there too (fills only: the digits of a turned face are thin parallelograms).
-for (const scheme of ["paper-red", "paper-blue", "dracula"]) test(`${scheme}: the start view of the app (turned cube) renders the fills as the tokens too`, async ({ page }) => {
-  test.setTimeout(90000);
-  const rows = await sample(page, scheme, true);
-  expect(rows.length).toBeGreaterThan(40);
-  for (const r of rows) expect(r.fill, `${scheme} ${r.cls} "${r.text}" fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(FILL_TOL);
-});
+for (const [mode, production] of MODES) {
+  for (const scheme of SCHEMES) test(`${scheme} (${mode}): the names layout renders its fills, inks and lines as the scheme tokens (within ${FILL_TOL} / ${STROKE_TOL} of 255)`, async ({ page }) => {
+    test.setTimeout(90000); // software GL: the first frame of a 218-cubie scene is slow
+    const rows = await sample(page, scheme, false, production);
+    expect(rows.length).toBeGreaterThan(40); // the 7x7 front face
+    const classes = new Set(rows.map((r) => r.cls));
+    for (const c of ["blank", "day", "weekday", "weekend", "sunsat"]) expect(classes, c).toContain(c);
+    if (process.env.C7_COLOR_TABLE) console.log(`${scheme} ${mode}\n` + JSON.stringify(rows));
+    for (const r of rows) {
+      const id = `${scheme} ${r.cls} "${r.text}"`;
+      expect(r.fill, `${id} fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(FILL_TOL);
+      if (r.ink !== undefined) expect(r.ink, `${id} ink vs ${r.inkWant}`).toBeLessThanOrEqual(STROKE_TOL);
+      if (r.line !== undefined) expect(r.line, `${id} line vs ${r.lineWant}`).toBeLessThanOrEqual(STROKE_TOL);
+    }
+  });
+
+  // The default start view is turned (yaw 0.3, pitch 0.22): the exposure follows the face that looks at the camera, so the paper
+  // white and the red are the tokens there too (fills only: the digits of a turned face are thin parallelograms).
+  for (const scheme of ["paper-red", "paper-blue", "dracula"]) test(`${scheme} (${mode}): the start view of the app (turned cube) renders the fills as the tokens too`, async ({ page }) => {
+    test.setTimeout(90000);
+    const rows = await sample(page, scheme, true, production);
+    expect(rows.length).toBeGreaterThan(40);
+    for (const r of rows) expect(r.fill, `${scheme} ${r.cls} "${r.text}" fill ${r.got} vs ${r.want}`).toBeLessThanOrEqual(FILL_TOL);
+  });
+}
