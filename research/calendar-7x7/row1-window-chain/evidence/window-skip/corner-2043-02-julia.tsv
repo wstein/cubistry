@@ -1,0 +1,255 @@
+input	c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db	names-band	window	130
+subset	2000-01	2100-01	130
+geometry	24	8	3	24	96	96	136
+frame	-3,-3,-3	-1,0,0	0,1,0	0
+frame	-3,-3,-3	-1,0,0	0,-1,0	2
+frame	-3,-3,-3	-1,0,0	0,0,1	3
+frame	-3,-3,-3	-1,0,0	0,0,-1	1
+frame	-3,-3,-3	0,-1,0	1,0,0	3
+frame	-3,-3,-3	0,-1,0	-1,0,0	1
+frame	-3,-3,-3	0,-1,0	0,0,1	0
+frame	-3,-3,-3	0,-1,0	0,0,-1	2
+frame	-3,-3,-3	0,0,-1	1,0,0	0
+frame	-3,-3,-3	0,0,-1	-1,0,0	2
+frame	-3,-3,-3	0,0,-1	0,1,0	3
+frame	-3,-3,-3	0,0,-1	0,-1,0	1
+frame	-3,-3,3	-1,0,0	0,1,0	3
+frame	-3,-3,3	-1,0,0	0,-1,0	1
+frame	-3,-3,3	-1,0,0	0,0,1	2
+frame	-3,-3,3	-1,0,0	0,0,-1	0
+frame	-3,-3,3	0,-1,0	1,0,0	0
+frame	-3,-3,3	0,-1,0	-1,0,0	2
+frame	-3,-3,3	0,-1,0	0,0,1	1
+frame	-3,-3,3	0,-1,0	0,0,-1	3
+frame	-3,-3,3	0,0,1	1,0,0	3
+frame	-3,-3,3	0,0,1	-1,0,0	1
+frame	-3,-3,3	0,0,1	0,1,0	0
+frame	-3,-3,3	0,0,1	0,-1,0	2
+frame	-3,3,-3	-1,0,0	0,1,0	1
+frame	-3,3,-3	-1,0,0	0,-1,0	3
+frame	-3,3,-3	-1,0,0	0,0,1	0
+frame	-3,3,-3	-1,0,0	0,0,-1	2
+frame	-3,3,-3	0,1,0	1,0,0	0
+frame	-3,3,-3	0,1,0	-1,0,0	2
+frame	-3,3,-3	0,1,0	0,0,1	3
+frame	-3,3,-3	0,1,0	0,0,-1	1
+frame	-3,3,-3	0,0,-1	1,0,0	3
+frame	-3,3,-3	0,0,-1	-1,0,0	1
+frame	-3,3,-3	0,0,-1	0,1,0	2
+frame	-3,3,-3	0,0,-1	0,-1,0	0
+frame	-3,3,3	-1,0,0	0,1,0	2
+frame	-3,3,3	-1,0,0	0,-1,0	0
+frame	-3,3,3	-1,0,0	0,0,1	1
+frame	-3,3,3	-1,0,0	0,0,-1	3
+frame	-3,3,3	0,1,0	1,0,0	3
+frame	-3,3,3	0,1,0	-1,0,0	1
+frame	-3,3,3	0,1,0	0,0,1	2
+frame	-3,3,3	0,1,0	0,0,-1	0
+frame	-3,3,3	0,0,1	1,0,0	0
+frame	-3,3,3	0,0,1	-1,0,0	2
+frame	-3,3,3	0,0,1	0,1,0	1
+frame	-3,3,3	0,0,1	0,-1,0	3
+frame	3,-3,-3	1,0,0	0,1,0	3
+frame	3,-3,-3	1,0,0	0,-1,0	1
+frame	3,-3,-3	1,0,0	0,0,1	0
+frame	3,-3,-3	1,0,0	0,0,-1	2
+frame	3,-3,-3	0,-1,0	1,0,0	2
+frame	3,-3,-3	0,-1,0	-1,0,0	0
+frame	3,-3,-3	0,-1,0	0,0,1	3
+frame	3,-3,-3	0,-1,0	0,0,-1	1
+frame	3,-3,-3	0,0,-1	1,0,0	1
+frame	3,-3,-3	0,0,-1	-1,0,0	3
+frame	3,-3,-3	0,0,-1	0,1,0	0
+frame	3,-3,-3	0,0,-1	0,-1,0	2
+frame	3,-3,3	1,0,0	0,1,0	0
+frame	3,-3,3	1,0,0	0,-1,0	2
+frame	3,-3,3	1,0,0	0,0,1	1
+frame	3,-3,3	1,0,0	0,0,-1	3
+frame	3,-3,3	0,-1,0	1,0,0	1
+frame	3,-3,3	0,-1,0	-1,0,0	3
+frame	3,-3,3	0,-1,0	0,0,1	2
+frame	3,-3,3	0,-1,0	0,0,-1	0
+frame	3,-3,3	0,0,1	1,0,0	2
+frame	3,-3,3	0,0,1	-1,0,0	0
+frame	3,-3,3	0,0,1	0,1,0	3
+frame	3,-3,3	0,0,1	0,-1,0	1
+frame	3,3,-3	1,0,0	0,1,0	2
+frame	3,3,-3	1,0,0	0,-1,0	0
+frame	3,3,-3	1,0,0	0,0,1	3
+frame	3,3,-3	1,0,0	0,0,-1	1
+frame	3,3,-3	0,1,0	1,0,0	1
+frame	3,3,-3	0,1,0	-1,0,0	3
+frame	3,3,-3	0,1,0	0,0,1	0
+frame	3,3,-3	0,1,0	0,0,-1	2
+frame	3,3,-3	0,0,-1	1,0,0	2
+frame	3,3,-3	0,0,-1	-1,0,0	0
+frame	3,3,-3	0,0,-1	0,1,0	1
+frame	3,3,-3	0,0,-1	0,-1,0	3
+frame	3,3,3	1,0,0	0,1,0	1
+frame	3,3,3	1,0,0	0,-1,0	3
+frame	3,3,3	1,0,0	0,0,1	2
+frame	3,3,3	1,0,0	0,0,-1	0
+frame	3,3,3	0,1,0	1,0,0	2
+frame	3,3,3	0,1,0	-1,0,0	0
+frame	3,3,3	0,1,0	0,0,1	1
+frame	3,3,3	0,1,0	0,0,-1	3
+frame	3,3,3	0,0,1	1,0,0	1
+frame	3,3,3	0,0,1	-1,0,0	3
+frame	3,3,3	0,0,1	0,1,0	2
+frame	3,3,3	0,0,1	0,-1,0	0
+target	1	2043	2	FE~1~month	~2~band	~0~blank	~0~blank
+target	2	2026	5	MA~1~month	~2~band	24/31~0~red	30~3~red
+target	3	2026	6	J~1~month	~2~band	28~0~red	~0~blank
+target	4	2026	7	J~1~month	~2~band	26~0~red	~0~blank
+target	5	2026	8	AUG~1~month	~2~band	23/30~0~red	29~3~red
+target	6	2026	9	SEP~1~month	~2~band	27~0~red	~0~blank
+target	7	2026	10	OC~1~month	~2~band	25~0~red	31~3~red
+target	8	2026	11	NOV~1~month	~2~band	29~0~red	~0~blank
+target	9	2026	12	DEC~1~month	~2~band	27~0~red	~0~blank
+target	10	2027	1	J~1~month	~2~band	24/31~0~red	30~3~red
+target	11	2027	2	FE~1~month	~2~band	28~0~red	~0~blank
+target	12	2027	3	MA~1~month	~2~band	28~0~red	~0~blank
+target	13	2027	4	APR~1~month	~2~band	25~0~red	~0~blank
+target	14	2027	5	MA~1~month	~2~band	23/30~0~red	29~3~red
+target	15	2027	6	J~1~month	~2~band	27~0~red	~0~blank
+target	16	2027	7	J~1~month	~2~band	25~0~red	31~3~red
+target	17	2027	8	AUG~1~month	~2~band	29~0~red	~0~blank
+target	18	2027	9	SEP~1~month	~2~band	26~0~red	~0~blank
+target	19	2027	10	OC~1~month	~2~band	24/31~0~red	30~3~red
+target	20	2027	11	NOV~1~month	~2~band	28~0~red	~0~blank
+target	21	2027	12	DEC~1~month	~2~band	26~0~red	~0~blank
+target	22	2028	1	J~1~month	~2~band	23/30~0~red	29~3~red
+target	23	2028	2	FE~1~month	~2~band	27~0~red	~0~blank
+target	24	2028	3	MA~1~month	~2~band	26~0~red	~0~blank
+target	25	2028	4	APR~1~month	~2~band	23/30~0~red	29~3~red
+target	26	2028	5	MA~1~month	~2~band	28~0~red	~0~blank
+target	27	2028	6	J~1~month	~2~band	25~0~red	~0~blank
+target	28	2028	7	J~1~month	~2~band	23/30~0~red	29~3~red
+target	29	2028	8	AUG~1~month	~2~band	27~0~red	~0~blank
+target	30	2028	9	SEP~1~month	~2~band	24~0~red	30~3~red
+target	31	2028	10	OC~1~month	~2~band	29~0~red	~0~blank
+target	32	2028	11	NOV~1~month	~2~band	26~0~red	~0~blank
+target	33	2028	12	DEC~1~month	~2~band	24/31~0~red	30~3~red
+target	34	2029	1	J~1~month	~2~band	28~0~red	~0~blank
+target	35	2029	2	FE~1~month	~2~band	25~0~red	~0~blank
+target	36	2029	3	MA~1~month	~2~band	25~0~red	31~3~red
+target	37	2029	4	APR~1~month	~2~band	29~0~red	~0~blank
+target	38	2029	5	MA~1~month	~2~band	27~0~red	~0~blank
+target	39	2029	6	J~1~month	~2~band	24~0~red	30~3~red
+target	40	2029	7	J~1~month	~2~band	29~0~red	~0~blank
+target	41	2029	8	AUG~1~month	~2~band	26~0~red	~0~blank
+target	42	2029	9	SEP~1~month	~2~band	23/30~0~red	29~3~red
+target	43	2029	10	OC~1~month	~2~band	28~0~red	~0~blank
+target	44	2029	11	NOV~1~month	~2~band	25~0~red	~0~blank
+target	45	2029	12	DEC~1~month	~2~band	23/30~0~red	29~3~red
+target	46	2030	1	J~1~month	~2~band	27~0~red	~0~blank
+target	47	2030	2	FE~1~month	~2~band	24~0~red	~0~blank
+target	48	2030	3	MA~1~month	~2~band	24/31~0~red	30~3~red
+target	49	2030	4	APR~1~month	~2~band	28~0~red	~0~blank
+target	50	2030	5	MA~1~month	~2~band	26~0~red	~0~blank
+target	51	2030	6	J~1~month	~2~band	23/30~0~red	29~3~red
+target	52	2030	7	J~1~month	~2~band	28~0~red	~0~blank
+target	53	2030	8	AUG~1~month	~2~band	25~0~red	31~3~red
+target	54	2030	9	SEP~1~month	~2~band	29~0~red	~0~blank
+target	55	2030	10	OC~1~month	~2~band	27~0~red	~0~blank
+target	56	2030	11	NOV~1~month	~2~band	24~0~red	30~3~red
+target	57	2030	12	DEC~1~month	~2~band	29~0~red	~0~blank
+target	58	2031	1	J~1~month	~2~band	26~0~red	~0~blank
+target	59	2031	2	FE~1~month	~2~band	23~0~red	~0~blank
+target	60	2031	3	MA~1~month	~2~band	23/30~0~red	29~3~red
+target	61	2031	4	APR~1~month	~2~band	27~0~red	~0~blank
+target	62	2031	5	MA~1~month	~2~band	25~0~red	31~3~red
+target	63	2031	6	J~1~month	~2~band	29~0~red	~0~blank
+target	64	2031	7	J~1~month	~2~band	27~0~red	~0~blank
+target	65	2031	8	AUG~1~month	~2~band	24/31~0~red	30~3~red
+target	66	2031	9	SEP~1~month	~2~band	28~0~red	~0~blank
+target	67	2031	10	OC~1~month	~2~band	26~0~red	~0~blank
+target	68	2031	11	NOV~1~month	~2~band	23/30~0~red	29~3~red
+target	69	2031	12	DEC~1~month	~2~band	28~0~red	~0~blank
+target	70	2032	1	J~1~month	~2~band	25~0~red	31~3~red
+target	71	2032	2	FE~1~month	~2~band	29~0~red	~0~blank
+target	72	2032	3	MA~1~month	~2~band	28~0~red	~0~blank
+target	73	2032	4	APR~1~month	~2~band	25~0~red	~0~blank
+target	74	2032	5	MA~1~month	~2~band	23/30~0~red	29~3~red
+target	75	2032	6	J~1~month	~2~band	27~0~red	~0~blank
+target	76	2032	7	J~1~month	~2~band	25~0~red	31~3~red
+target	77	2032	8	AUG~1~month	~2~band	29~0~red	~0~blank
+target	78	2032	9	SEP~1~month	~2~band	26~0~red	~0~blank
+target	79	2032	10	OC~1~month	~2~band	24/31~0~red	30~3~red
+target	80	2032	11	NOV~1~month	~2~band	28~0~red	~0~blank
+target	81	2032	12	DEC~1~month	~2~band	26~0~red	~0~blank
+target	82	2033	1	J~1~month	~2~band	23/30~0~red	29~3~red
+target	83	2033	2	FE~1~month	~2~band	27~0~red	~0~blank
+target	84	2033	3	MA~1~month	~2~band	27~0~red	~0~blank
+target	85	2033	4	APR~1~month	~2~band	24~0~red	30~3~red
+target	86	2033	5	MA~1~month	~2~band	29~0~red	~0~blank
+target	87	2033	6	J~1~month	~2~band	26~0~red	~0~blank
+target	88	2033	7	J~1~month	~2~band	24/31~0~red	30~3~red
+target	89	2033	8	AUG~1~month	~2~band	28~0~red	~0~blank
+target	90	2033	9	SEP~1~month	~2~band	25~0~red	~0~blank
+target	91	2033	10	OC~1~month	~2~band	23/30~0~red	29~3~red
+target	92	2033	11	NOV~1~month	~2~band	27~0~red	~0~blank
+target	93	2033	12	DEC~1~month	~2~band	25~0~red	31~3~red
+target	94	2034	1	J~1~month	~2~band	29~0~red	~0~blank
+target	95	2034	2	FE~1~month	~2~band	26~0~red	~0~blank
+target	96	2034	3	MA~1~month	~2~band	26~0~red	~0~blank
+target	97	2034	4	APR~1~month	~2~band	23/30~0~red	29~3~red
+target	98	2034	5	MA~1~month	~2~band	28~0~red	~0~blank
+target	99	2034	6	J~1~month	~2~band	25~0~red	~0~blank
+target	100	2034	7	J~1~month	~2~band	23/30~0~red	29~3~red
+target	101	2034	8	AUG~1~month	~2~band	27~0~red	~0~blank
+target	102	2034	9	SEP~1~month	~2~band	24~0~red	30~3~red
+target	103	2034	10	OC~1~month	~2~band	29~0~red	~0~blank
+target	104	2034	11	NOV~1~month	~2~band	26~0~red	~0~blank
+target	105	2034	12	DEC~1~month	~2~band	24/31~0~red	30~3~red
+target	106	2035	1	J~1~month	~2~band	28~0~red	~0~blank
+target	107	2035	2	FE~1~month	~2~band	25~0~red	~0~blank
+target	108	2035	3	MA~1~month	~2~band	25~0~red	31~3~red
+target	109	2035	4	APR~1~month	~2~band	29~0~red	~0~blank
+target	110	2035	5	MA~1~month	~2~band	27~0~red	~0~blank
+target	111	2035	6	J~1~month	~2~band	24~0~red	30~3~red
+target	112	2035	7	J~1~month	~2~band	29~0~red	~0~blank
+target	113	2035	8	AUG~1~month	~2~band	26~0~red	~0~blank
+target	114	2035	9	SEP~1~month	~2~band	23/30~0~red	29~3~red
+target	115	2035	10	OC~1~month	~2~band	28~0~red	~0~blank
+target	116	2035	11	NOV~1~month	~2~band	25~0~red	~0~blank
+target	117	2035	12	DEC~1~month	~2~band	23/30~0~red	29~3~red
+target	118	2036	1	J~1~month	~2~band	27~0~red	~0~blank
+target	119	2036	2	FE~1~month	~2~band	24~0~red	~0~blank
+target	120	2036	3	MA~1~month	~2~band	23/30~0~red	29~3~red
+target	121	2036	4	APR~1~month	~2~band	27~0~red	~0~blank
+target	122	2036	5	MA~1~month	~2~band	25~0~red	31~3~red
+target	123	2036	6	J~1~month	~2~band	29~0~red	~0~blank
+target	124	2036	7	J~1~month	~2~band	27~0~red	~0~blank
+target	125	2036	8	AUG~1~month	~2~band	24/31~0~red	30~3~red
+target	126	2036	9	SEP~1~month	~2~band	28~0~red	~0~blank
+target	127	2036	10	OC~1~month	~2~band	26~0~red	~0~blank
+target	128	2036	11	NOV~1~month	~2~band	23/30~0~red	29~3~red
+target	129	2036	12	DEC~1~month	~2~band	28~0~red	~0~blank
+target	130	2037	1	J~1~month	~2~band	25~0~red	31~3~red
+class		0	blank	2	1
+class		2	band	1	1
+class	23	0	red	1	59
+class	23/30	0	red	1	5
+class	24	0	red	1	30
+class	24/31	0	red	1	2
+class	25	0	red	1	7
+class	26	0	red	1	4
+class	27	0	red	1	6
+class	28	0	red	1	3
+class	29	0	red	1	8
+class	29	3	red	1	5
+class	30	3	red	1	2
+class	31	3	red	1	7
+class	APR	1	month	1	13
+class	AUG	1	month	1	5
+class	DEC	1	month	1	9
+class	FE	1	month	1	1
+class	J	1	month	1	3
+class	MA	1	month	1	2
+class	NOV	1	month	1	8
+class	OC	1	month	1	7
+class	SEP	1	month	1	6
+demand	23	24	24
+anchor		2	band	1	130	23	21	CONTRADICTION
+verdict	UNSAT	fixed-print-corner-body-matching	unique-always-visible-face
