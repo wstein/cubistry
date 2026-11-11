@@ -15,31 +15,39 @@ function parse_list(s)
     end
     @assert length(unique(xs))==length(xs) "distinct months";sort!(xs)
 end
+# The chain root is the identity pose, May 2026: months before it are not chain members. Runs and
+# gaps are computed on 2026-05 .. 2050-01 only; earlier months are reported as `before_root`.
 function runs_and_gaps(valid)
+    r0=idx(ROOT...);chain=[i for i in valid if i>=r0]
     runs=Tuple{Int,Int}[];s=nothing;p=nothing
-    for i in valid
+    for i in chain
         if p===nothing || i!=p+1;s!==nothing && push!(runs,(s,p));s=i;end
         p=i
     end
     s!==nothing && push!(runs,(s,p))
-    all=Set(valid);gaps=[i for i in 1:idx(LAST...) if !(i in all)]
+    all=Set(chain);gaps=[i for i in r0:idx(LAST...) if !(i in all)]
     runs,gaps
 end
+before_root(valid)=[(i,i in Set(valid)) for i in 1:idx(ROOT...)-1]
 function headline(runs)
     r=[x for x in runs if x[1]<=idx(ROOT...)<=x[2]]
     isempty(r) ? "gapless: none (root month 2026-05 not valid)" : string("gapless: ",fmt(r[1][1])," .. ",fmt(r[1][2])," (",r[1][2]-r[1][1]+1," months)")
 end
 function report(io,valid,status)
-    runs,gaps=runs_and_gaps(valid)
+    runs,gaps=runs_and_gaps(valid);chain=[i for i in valid if i>=idx(ROOT...)]
     println(io,headline(runs))
-    println(io,"valid\t",length(valid),"\tgaps\t",length(gaps),"\truns\t",length(runs))
+    println(io,"chain_members\t",length(chain),"\tgaps\t",length(gaps),"\truns\t",length(runs),"\tbefore_root_front_matching\t",count(last,before_root(valid)))
     println(io,"kind\tfrom\tto\tcount\tstatus\tevidence")
     for (a,b) in runs;println(io,"run\t",fmt(a),'\t',fmt(b),'\t',b-a+1,"\t\t");end
     for g in gaps
         st,ev=get(status,fmt(g),("unknown (not tested)",""))
         println(io,"gap\t",fmt(g),'\t',fmt(g),"\t1\t",st,'\t',ev)
     end
-    println(io,"valid_per_year\t",join([string(y,'=',count(i->ym(i)[1]==y,valid)) for y in 2026:2050]," "))
+    for (i,ok) in before_root(valid)
+        st,ev=get(status,fmt(i),("",""))
+        println(io,"before_root\t",fmt(i),'\t',fmt(i),"\t1\tnot a chain member (front_match=",ok ? "yes" : "no",")",isempty(st) ? "" : "; "*st,'\t',ev)
+    end
+    println(io,"chain_members_per_year\t",join([string(y,'=',count(i->ym(i)[1]==y,chain)) for y in 2026:2050]," "))
 end
 function read_status(path)
     d=Dict{String,Tuple{String,String}}()

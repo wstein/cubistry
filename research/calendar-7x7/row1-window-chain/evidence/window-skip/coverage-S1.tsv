@@ -1,19 +1,19 @@
 gapless: 2026-05 .. 2037-01 (129 months)
-valid	282	gaps	7	runs	8
+chain_members	280	gaps	5	runs	6	before_root_front_matching	2
 kind	from	to	count	status	evidence
-run	2026-01	2026-01	1		
-run	2026-03	2026-03	1		
 run	2026-05	2037-01	129		
 run	2037-03	2037-03	1		
 run	2037-05	2043-01	69		
 run	2043-03	2043-03	1		
 run	2043-05	2048-03	59		
 run	2048-05	2050-01	21		
-gap	2026-02	2026-02	1	unknown	corner lemma UNSAT on base+2026-02 (130 targets), Julia only, Flix not run: corner-2026-02-julia.tsv
-gap	2026-04	2026-04	1	unavailable_nomatch	no rigid front matching on the 2037-01 print (scan-fixed-P1.tsv); fits printing-S2.tsv; not a proof for other prints
 gap	2037-02	2037-02	1	unavailable_unsat	corner lemma UNSAT on base+2037-02 (130 targets), Julia and Flix: ../window-2037-01/corner-2037-02-julia.tsv, corner-2037-02-flix.tsv
 gap	2037-04	2037-04	1	unavailable_nomatch	no rigid front matching on the 2037-01 print (scan-fixed-P1.tsv); fits printing-S2.tsv; not a proof for other prints
 gap	2043-02	2043-02	1	unknown	corner lemma UNSAT on base+2043-02 (130 targets), Julia only, Flix not run: corner-2043-02-julia.tsv
 gap	2043-04	2043-04	1	unavailable_nomatch	no rigid front matching on the 2037-01 print (scan-fixed-P1.tsv); fits printing-S2.tsv; not a proof for other prints
 gap	2048-04	2048-04	1	unavailable_nomatch	no rigid front matching on the 2037-01 print (scan-fixed-P1.tsv); fits printing-S2.tsv; not a proof for other prints
-valid_per_year	2026=10 2027=12 2028=12 2029=12 2030=12 2031=12 2032=12 2033=12 2034=12 2035=12 2036=12 2037=10 2038=12 2039=12 2040=12 2041=12 2042=12 2043=10 2044=12 2045=12 2046=12 2047=12 2048=11 2049=12 2050=1
+before_root	2026-01	2026-01	1	not a chain member (front_match=yes)	
+before_root	2026-02	2026-02	1	not a chain member (front_match=no); unknown	corner lemma UNSAT on base+2026-02 (130 targets), Julia only, Flix not run: corner-2026-02-julia.tsv
+before_root	2026-03	2026-03	1	not a chain member (front_match=yes)	
+before_root	2026-04	2026-04	1	not a chain member (front_match=no); unavailable_nomatch	no rigid front matching on the 2037-01 print (scan-fixed-P1.tsv); fits printing-S2.tsv; not a proof for other prints
+chain_members_per_year	2026=8 2027=12 2028=12 2029=12 2030=12 2031=12 2032=12 2033=12 2034=12 2035=12 2036=12 2037=10 2038=12 2039=12 2040=12 2041=12 2042=12 2043=10 2044=12 2045=12 2046=12 2047=12 2048=11 2049=12 2050=1
