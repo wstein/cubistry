@@ -12,7 +12,7 @@ test("names layout: every shipped font renders its 12 month names on the 3D face
     const { drawFontSticker, labelLayout, nameFaceTable } = await import("/src/apps/calendar7/font-art.ts");
     const { NAME_WORDS } = await import("/src/apps/calendar7/layout.ts");
     const { SCHEMES } = await import("/src/apps/calendar7/schemes.ts");
-    const { faceTransform, namePxPerUnit, tileCanvasSize, tileRoles } = await import("/src/apps/calendar7/sticker-art.ts");
+    const { faceTransform, namePxPerUnit, tileCanvasSize, tileGrid, tileRoles } = await import("/src/apps/calendar7/sticker-art.ts");
     const { CALENDAR7_SIZE, outerLayerWidth } = await import("/src/apps/calendar7/geometry.ts");
     const scheme = SCHEMES.find((s) => s.id === "paper-red"), F = outerLayerWidth(CALENDAR7_SIZE), ppu = namePxPerUnit();
     const out = [];
@@ -26,19 +26,19 @@ test("names layout: every shipped font renders its 12 month names on the 3D face
         for (let k = 1; k < word.length - 1; k++) seams.push(seams[k - 1] + ppu);
         const ink = [];
         word.forEach((label, k) => {
-          const w = k === 0 ? F : 1, tile = { w, h: F }, [W, H] = tileCanvasSize(tile), { kx } = faceTransform(tile);
+          const w = k === 0 ? F : 1, tile = k === 0 ? { w, h: F, band: { l: F - 1, r: 0, t: F - 1, b: 0 } } : { w, h: F, band: { l: 0, r: 0, t: F - 1, b: 0 } }, [W, H] = tileCanvasSize(tile), { kx } = faceTransform(tile);
           const c = document.createElement("canvas");
           c.width = W; c.height = H;
           const ctx = c.getContext("2d", { willReadFrequently: true });
           drawFontSticker(ctx, label, "month", font, scheme, "face", undefined, "names", tile);
           const fill = [1, 3, 5].map((i) => parseInt(tileRoles(scheme, label, "month", "names").fill.slice(i, i + 2), 16));
-          const data = ctx.getImageData(0, 0, W, H).data, rowsMax = Math.floor(H * 0.8); // the weekday-style line sits at the bottom
-          let x0 = W, x1 = -1;
-          for (let y = 0; y < rowsMax; y++) for (let x = 0; x < W; x++) {
+          const data = ctx.getImageData(0, 0, W, H).data, g = tileGrid(tile), bx0 = Math.ceil(g.banner.x0), bx1 = Math.floor(g.banner.x1), by0 = Math.ceil(g.banner.y0), by1 = Math.floor(g.banner.y1);
+          let x0 = W, x1 = -1; // the ink is looked for inside the banner (the white margin around it is the ground)
+          for (let y = by0; y < by1; y++) for (let x = bx0; x < bx1; x++) {
             const i = (y * W + x) * 4;
             if (fill.some((v, j) => Math.abs(data[i + j] - v) > 40)) {
               x0 = Math.min(x0, x); x1 = Math.max(x1, x + 1);
-              if (x === 0 || x === W - 1 || y === 0) touching++;
+              if (x === bx0 && k === 0 || x === bx1 - 1 && k === word.length - 1 || y === by0 || y === by1 - 1) touching++; // at the banner edge (a seam is a tile edge inside the banner: the ink gap check covers it)
             }
           }
           const center = k === 0 ? -w * ppu / 2 : seams[k - 1] + w * ppu / 2;
