@@ -60,6 +60,10 @@ ms_skip=[m for (i,m) in enumerate(months) if i!=K]
 idx_skip=[i for i in 1:length(months) if i!=K]
 write_fixture("skip-positive",ms_skip,chain_text(bridged);statesidx=idx_skip)
 write(joinpath(out,"skipped.txt"),mtext(skipped)*"\n")
+# positive with another start: 2037-05 shows the same board as 2026-05 (same weekday and leap pattern), so the stored print and the first
+# seven stored edges are a chain 2037-05 .. 2037-12 once the edge months are relabeled.
+rh0=split(rows[2],'\t')
+write_fixture("start-2037-05",[(2037,5+k) for k in 0:7],chain_text([(ym=(2037,5+k),src=full[k].src,fin=full[k].fin,moves=full[k].moves) for k in 1:7];head=[rows[1],join(["source","5","2037","5",rh0[5]],'\t')]);statesidx=1:8)
 cases=String[]
 add(name,j,f,ind)=push!(cases,join((name,j,f,ind),'\t'))
 # 1. a skipped month with an edge into it: S loses the month and gains a later one (same count); the original chain still has the edge into it.
@@ -81,9 +85,18 @@ add("list-not-increasing","month list strictly increasing","month list strictly 
 # 6. duplicate member
 du=copy(ms_skip);du[4]=du[3];write_fixture("list-duplicate-month",du,chain_text(bridged);statesidx=idx_skip)
 add("list-duplicate-month","month list strictly increasing","month list strictly increasing","list strictly increasing")
-# 7. root mismatch: the list starts at June 2026
+# 7. start mismatch: the list starts at June 2026 but the chain record says May 2026
 write_fixture("root-mismatch",ms_skip[2:end],chain_text(bridged);statesidx=idx_skip)
-add("root-mismatch","chain root month is May 2026","chain root month is May 2026","chain root month")
+add("root-mismatch","identity root record is the first month of S","identity root record is the first month of S","root record")
+# 7b. the start month is a parameter, but the identity front of the print shows May: a list starting at April 2026 with a matching record is rejected at the front
+rh=split(rows[2],'\t');head_apr=[rows[1],join(["source","4","2026","4",rh[5]],'\t')]
+write_fixture("start-front-mismatch",vcat([(2026,4)],ms_skip[2:end]),chain_text(bridged;head=head_apr);statesidx=idx_skip)
+add("start-front-mismatch","identity root front","identity root front","identity root front")
+# 7c. start 2037-05 chain presented with the list of 2026-05
+rel(e,k)=(ym=(2037,5+k),src=e.src,fin=e.fin,moves=e.moves)
+shifted=[rel(full[k],k) for k in 1:7]
+write_fixture("start-record-mismatch",months[1:8],chain_text(shifted;head=[rows[1],join(["source","5","2037","5",rh[5]],'\t')]);statesidx=1:8)
+add("start-record-mismatch","identity root record is the first month of S","identity root record is the first month of S","root record")
 # 8. bridge edge declares the skipped month instead of the next member
 wrong=(ym=skipped,src=merged.src,fin=merged.fin,moves=merged.moves)
 write_fixture("bridge-edge-declares-skipped-month",ms_skip,chain_text(vcat(full[1:K-2],[wrong],full[K+1:end]));statesidx=idx_skip)
