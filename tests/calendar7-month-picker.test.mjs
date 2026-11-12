@@ -226,7 +226,10 @@ test("setValue with the current value keeps an open picker, a different value cl
   // Same year, different month: close (kills a mutant that compares only the year).
   f.picker.setValue({year:2026,month:12});assert.equal(f.picker.model.open,false);assert.equal(f.dialog.hidden,true);
   f.click("toggle");assert.equal(f.picker.model.open,true);
-  // Different year still closes.
+  // Same month, different year: close (kills a mutant that compares only the month).
+  f.picker.setValue({year:2027,month:12});assert.equal(f.picker.model.open,false);assert.equal(f.dialog.hidden,true);
+  f.click("toggle");assert.equal(f.picker.model.open,true);
+  // Different year and month still closes.
   f.picker.setValue({year:2027,month:1});assert.equal(f.picker.model.open,false);assert.equal(f.dialog.hidden,true);
   // null replaces a concrete value and closes; a second null is unchanged and keeps an open picker.
   f.click("toggle");f.picker.setValue(null);assert.equal(f.picker.model.open,false);assert.equal(f.picker.model.value,null);
