@@ -218,3 +218,9 @@ test("the picker works without a 3D stage and keeps the selected date in its per
   assert.equal(f.hostEvents.size, 0);
   assert.equal(f.docEvents.size, 0);
 });
+
+test("setValue with the current value keeps an open picker, a different value closes it",()=>{
+  const f=domFixture();f.click("toggle");assert.equal(f.picker.model.open,true);
+  f.picker.setValue({year:2026,month:11});assert.equal(f.picker.model.open,true);assert.equal(f.dialog.hidden,false);
+  f.picker.setValue({year:2027,month:1});assert.equal(f.picker.model.open,false);assert.equal(f.dialog.hidden,true);f.picker.dispose();
+});
