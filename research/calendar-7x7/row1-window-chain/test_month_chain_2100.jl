@@ -78,13 +78,15 @@ const PC=joinpath(EV,"print-c")
         @test b[1]==["month","status","wrong_cells","evidence"] && length(b)==1+length(NOT_EXACT)
         @test [r[1] for r in b[2:end]]==NOT_EXACT                              # exactly the months that are not exact, in order
         @test all(r[2:4]==["best_effort_unverified","7,1",HALL] for r in b[2:end])   # wrong cell (7,1) only: the workflow has no best_effort_cell input
-        @test sha(joinpath(OLDML,OLD_BEST))==OLD_BEST_PIN && b[1:2]==rows(joinpath(OLDML,OLD_BEST))   # the first row is the best-effort file of the first chain
+        @test sha(joinpath(OLDML,OLD_BEST))==OLD_BEST_PIN && b[2][1:3]==rows(joinpath(OLDML,OLD_BEST))[2][1:3]   # the 2026-02 row of the first chain's best-effort file (its evidence names the older table)
         @test issorted([r[1] for r in b[2:end]]) && all(r[1] in lines for r in b[2:end])
         @test any(l->l==sha(joinpath(ML,BEST))*"  "*BEST,readlines(joinpath(ML,"sha256.txt")))
         h=rows(joinpath(ML,HALL))
         @test h[1]==["month","class","deficiency","wrong_cells","hall_cells","neighbor_bodies"]
-        @test [r[1] for r in h[2:end-1]]==NOT_EXACT && all(r[2:6]==["-3,-3,-3","1","7,1","7,1;7,7","1"] for r in h[2:end-1])
-        @test h[end][1]=="#total"
+        d=[r for r in h[2:end] if r[1]!="#total"];t=[r for r in h[2:end] if r[1]=="#total"]
+        @test [r[1] for r in d]==NOT_EXACT && all(r[2:6]==["-3,-3,-3","1","7,1","7,1;7,7","1"] for r in d)   # class, deficiency 1, wrong cell (7,1)
+        @test t==[["#total",m,"1"] for m in NOT_EXACT] && length(h)==1+2*length(NOT_EXACT)
+        @test rows(joinpath(OLDML,"february-hall-C.tsv"))[2]==d[1]            # the 2026-02 row of the first chain's table
     end
     @testset "stage plan" begin
         s=rows(joinpath(ML,STAGES))
