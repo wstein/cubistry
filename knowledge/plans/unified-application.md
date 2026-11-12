@@ -333,6 +333,7 @@ Slots the design fills per registered mode (`src/apps/shell/slot-map.ts`, compar
 | `clock` | 1, 2, 3, 4, 5 | pending |
 | `ms-timer` | 1, 2, 3, 4, 5 | pending |
 | `calendar` | 1, 2, 3, 4, 5 | pending |
+| `playground` | 1, 2, 3, 4, 5 | migrated |
 | `hm-clock` | 1, 2, 3, 4, 5 | pending |
 | `tenth` | 1, 2, 3, 4 | migrated |
 | `counter` | 1, 2, 3, 4, 5 | pending |
@@ -345,6 +346,8 @@ Slots the design fills per registered mode (`src/apps/shell/slot-map.ts`, compar
 | `ci` | 1, 2 | migrated |
 
 `ci` fills slots 1 and 2 as the design row does and labels them "Simulated events" and "Workflow" (the design row lists "Refresh status" and "Workflow list"; there is no external status to refresh). The quarter-turn time sits in slot 2, because the design row has no Motion slot for this cube. This deviation is accepted (owner decision 2026-11-12: local simulation has no external refresh or workflow list) and recorded as `ACCEPTED_DEVIATIONS` in `src/apps/shell/slot-map.ts`.
+
+`playground` (Picture Cube) fills slots 1 to 5 as the D9 row of the design: Scramble (primary action Solve), 18 turn buttons, size control with Undo and Redo, Move time, Design; the picture upload, fit check and net template are a content region below the cube, not slots. The design row was changed to these slots (D9, owner decision 2026-11-12), so no deviation is recorded.
 
 `tenth` fills slots 1 to 4 with Step, Value, Direction and Step speed; the design row lists Run / Stop, Stop after and Wrap, which this mode does not have. This deviation is accepted (owner decision 5, 2026-11-08) and recorded as `ACCEPTED_DEVIATIONS` in `src/apps/shell/slot-map.ts`.
 
