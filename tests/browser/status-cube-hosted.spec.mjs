@@ -160,8 +160,10 @@ test("rapid real animation finishes only active legal turn then uses latest actu
     "data-sync",
     "moving",
   );
-  await choose(page, "test", "blocked");
-  await choose(page, "build", "error");
+  // dispatchEvent skips Playwright's actionability waits, so both requests arrive within the first quarter turn
+  // (a select option changed in one step before; a click on a chip waits for the element to be stable first).
+  await chipOf(page, "test", "blocked").dispatchEvent("click");
+  await chipOf(page, "build", "error").dispatchEvent("click");
   await exact(page, ["error", "blocked", "open", "open"]);
   const replay = await page.evaluate(async () => {
     const { statusController: c, statusDefinition: d } = await import(
