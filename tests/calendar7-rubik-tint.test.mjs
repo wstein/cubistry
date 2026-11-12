@@ -7,22 +7,28 @@ import assert from "node:assert/strict";
 import { contrast } from "./calendar7-contrast.mjs";
 import { layoutFixture } from "./calendar7-fixture.mjs";
 import {
-  BAND, BAND_INK, FACES, MIN_BAND_CONTRAST, MIN_PAIR_DE2000, MIN_PRINT_CONTRAST, PRINT, RUBIK, deltaE2000Lab, measure, optimize, tintOf,
+  BAND, BAND_INK, FACES, MIN_BAND_CONTRAST, MIN_PAIR_DE2000, MIN_PRINT_CONTRAST, MIN_WEEKEND_CONTRAST, MIN_WEEKEND_DE2000, PRINT, RUBIK, WEEKEND_DARKEN, deltaE2000Lab, measure, optimize, tintOf, weekendOf,
 } from "../scripts/calendar7-rubik-tint.mjs";
 import { SCHEMES, schemeById, withBannerStyle, namesGround } from "../src/apps/calendar7/schemes.ts";
-import { HOME_ORIENTATION, RUBIK_TINTS, faceFillsByHome, homeFaceOfNormal, homeFacesOf, schemeForHome, usesHomeTints } from "../src/apps/calendar7/home-tint.ts";
+import { HOME_ORIENTATION, HOME_WEEKEND_DARKEN, RUBIK_TINTS, faceFillsByHome, homeFaceOfNormal, homeFacesOf, schemeForHome, usesHomeTints, weekendGroundOf } from "../src/apps/calendar7/home-tint.ts";
 import { tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 
 const HEX = /^#[0-9a-f]{6}$/;
 const scheme = () => SCHEMES.find((s) => s.id === "rubik-tint");
 
-// Gates. Print contrast 12:1 is the owner's floor (the strongest tint that keeps it is what the search below finds); the pair
-// distance 15 CIEDE2000 is just under the best any strengths reach (15.18, white against blue, whose luminance is what limits
-// the tint): chosen as the largest whole number the optimum clears, so no weaker value is accepted.
-test("gate values are the owner's floor and the measured optimum", () => {
+// Gates. Print contrast 12:1 is the owner's floor on the weekday ground, on the weekend ground and for the band lettering.
+// The weekend ground is the tint darkened by WEEKEND_DARKEN toward black; every step of darkening lowers the room the 12:1 floor
+// leaves the tints, so the search trades tint distance against weekend contrast (scripts/calendar7-rubik-tint.mjs, table in the
+// docs): at 0.08 the weekend ground differs from the weekday ground of its face by at least 4 CIEDE2000 (clearly visible on
+// adjacent tiles; 8 would leave the tints almost white, minimum pair distance 3.9) and the tints still differ by at least 10.
+test("gate values and the weekend darkening", () => {
   assert.equal(MIN_PRINT_CONTRAST, 12);
   assert.equal(MIN_BAND_CONTRAST, 12);
-  assert.equal(MIN_PAIR_DE2000, 15);
+  assert.equal(MIN_WEEKEND_CONTRAST, 12);
+  assert.equal(MIN_WEEKEND_DE2000, 4);
+  assert.equal(MIN_PAIR_DE2000, 10);
+  assert.equal(WEEKEND_DARKEN, 0.08);
+  assert.equal(HOME_WEEKEND_DARKEN, WEEKEND_DARKEN);
 });
 
 test("CIEDE2000 matches the published test pairs of Sharma et al. 2005", () => {
@@ -46,11 +52,21 @@ test("white lettering on the black band reads 12:1", () => {
   assert.equal(scheme().monthInk, BAND_INK);
 });
 
-test("every two tints, white and yellow included, differ by at least 15 CIEDE2000", () => {
+test("every two tints, white and yellow included, differ by at least 10 CIEDE2000", () => {
   const m = measure(RUBIK_TINTS);
   assert.equal(m.pairs.length, 15);
   for (const p of m.pairs) assert.ok(p.de >= MIN_PAIR_DE2000, `${p.a}-${p.b} ${p.de}`);
   assert.ok(m.toWhite.yellow >= MIN_PAIR_DE2000, `yellow vs white ${m.toWhite.yellow}`);
+});
+
+test("weekend ground: black print reads 12:1 on it for all six tints and it differs from the weekday ground by at least 4 CIEDE2000", () => {
+  const m = measure(RUBIK_TINTS);
+  for (const f of FACES) {
+    assert.equal(weekendGroundOf(RUBIK_TINTS[f]), weekendOf(RUBIK_TINTS[f]), f);
+    assert.ok(m.weekendContrast[f] >= MIN_WEEKEND_CONTRAST, `${f} ${m.weekendContrast[f]}`);
+    assert.ok(m.weekendDE[f] >= MIN_WEEKEND_DE2000, `${f} ${m.weekendDE[f]}`);
+  }
+  assert.ok(m.minWeekend >= MIN_WEEKEND_CONTRAST && m.minWeekendDE >= MIN_WEEKEND_DE2000);
 });
 
 test("the shipped tints are what the deterministic search finds (reproducible)", () => {
@@ -60,7 +76,7 @@ test("the shipped tints are what the deterministic search finds (reproducible)",
   for (const f of FACES) assert.equal(tintOf(RUBIK[f], f === "white" ? 0 : r.strengths[f]), RUBIK_TINTS[f]);
 });
 
-test("catalog: one more scheme, black print, black band, no weekend shading, Rounded banner", () => {
+test("catalog: one more scheme, black print, black band, grey weekend ground, Rounded banner", () => {
   assert.equal(SCHEMES.length, 11);
   assert.equal(SCHEMES.filter((s) => s.isDefault).length, 1);
   const s = scheme();
@@ -68,7 +84,8 @@ test("catalog: one more scheme, black print, black band, no weekend shading, Rou
   assert.equal(s.kind, "light");
   assert.equal(s.style, "band");
   for (const r of ["dayInk", "weekdayInk", "weekendInk", "weekendInkSmall", "sunSatInk"]) assert.equal(s[r], PRINT, r);
-  assert.equal(s.weekendFill, s.dayFill); // no weekend shading
+  assert.equal(s.weekendFill, weekendGroundOf(RUBIK_TINTS.white)); // the white face's weekend ground
+  assert.notEqual(s.weekendFill, s.dayFill);
   assert.equal(s.weekendTint, null);
   assert.equal(s.dayFill, RUBIK_TINTS.white);
   assert.equal(schemeById("rubik-tint"), s);
@@ -107,10 +124,10 @@ test("schemeForHome: the ground is the tint of the home face, the print stays bl
   for (const f of FACES) {
     const d = schemeForHome(s, f);
     const ground = namesGround(RUBIK_TINTS[f]);
-    const cases = [["7", "dark"], ["SUN", "red"], ["23/30", "red"], ["MON", "weekday"], ["", "blank"]];
+    const cases = [["7", "dark"], ["SUN", "red"], ["23/30", "red"], ["14", "red"], ["MON", "weekday"], ["", "blank"]];
     for (const [text, ink] of cases) {
       const r = tileRoles(d, text, ink, "names");
-      assert.equal(r.fill, ground, `${f} ${text}`);
+      assert.equal(r.fill, ink === "red" ? namesGround(weekendGroundOf(RUBIK_TINTS[f])) : ground, `${f} ${text}`);
       assert.equal(r.ink, PRINT, `${f} ${text}`);
       assert.equal(r.inkSmall, PRINT, `${f} ${text}`);
     }
@@ -130,9 +147,9 @@ test("solved pose: every non-banner front tile of the fill map is the white tint
   assert.equal(fills.size, 294);
   for (let i = 0; i < 294; i++) {
     const banner = printing.ink[i] === "month";
-    const want = banner ? BAND : namesGround(RUBIK_TINTS[homes[i]]);
+    const want = banner ? BAND : namesGround(printing.ink[i] === "red" ? weekendGroundOf(RUBIK_TINTS[homes[i]]) : RUBIK_TINTS[homes[i]]);
     assert.equal(fills.get(i + 1), want, `sticker ${i + 1} ${homes[i]}`);
-    if (homes[i] === "white" && !banner) assert.equal(fills.get(i + 1), namesGround("#ffffff"));
+    if (homes[i] === "white" && !banner && printing.ink[i] !== "red") assert.equal(fills.get(i + 1), namesGround("#ffffff"));
   }
-  assert.equal(new Set([...fills.values()]).size, 7);
+  assert.ok(new Set([...fills.values()]).size > 7); // seven grounds plus the weekend grounds of the faces that carry red tiles
 });
