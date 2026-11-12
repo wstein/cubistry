@@ -36,7 +36,7 @@ const LEAKS = [
   ["hsm-counter", "timer", "range=23&unit=H&lettering=words-pascal&font=dseg7&speed=300", "font=dseg7&speed=300"],
   ["tenth", "counter", "display=dseg7&marker=all&speed=300&dir=down&val=3", "display=dseg7&marker=all&speed=300"],
   ["clock", "ms-counter", "hours-speed=2&minutes-speed=3&lettering=words-pascal", "lettering=words-pascal"],
-  ["calendar7", "counter", "date=2026-11-10&lang=de&design=de-a&cube=3&size=4&font=quicksand", ""],
+  ["calendar7", "counter", "date=2026-11-10&lang=de&design=de-a&size=4&font=quicksand", ""],
   ["counter", "calendar7", "font=dseg7&display=dseg7&scheme=x", ""],
   // single-cube family: the display, marker and speed controls exist on every page, so they travel between the apps
   ["hsm-counter", "ms-counter", "font=dseg7&marker=all&speed=300", "font=dseg7&marker=all&speed=300"],
@@ -63,6 +63,11 @@ test("calendar7 keeps nothing of its look when it is left, and its font is not t
     assert.equal(got.toString(), "", target);
   }
   assert.equal(to(`${base}?app=counter&font=dseg7`, "counter", "calendar7").has("font"), false);
+});
+
+test("design is a per-mode value: it does not travel between Calendar and Print", () => {
+  assert.equal(to(`${base}?app=calendar&design=de-a&lang=de`, "calendar", "print").has("design"), false);
+  assert.equal(to(`${base}?app=print&design=de-a`, "print", "calendar").has("design"), false);
 });
 
 test("a key stray in the URL of an app that does not own it is dropped even if the target owns it", () => {

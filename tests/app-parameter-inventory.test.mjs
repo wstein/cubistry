@@ -138,9 +138,6 @@ test("a literal parameter read added anywhere in src or index.html is in the inv
   assert.deepEqual(unknown, []);
 });
 
-// Named in the plan but read by no code yet: `cube=2|3` of the Picture Cube (the appendix records that `size` replaced it).
-const PLANNED = ["cube"];
-
 test("a parameter key held in a constant (NAME_PARAM = \"key\") is in the inventory", () => {
   const walk = (dir) =>
     readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
@@ -157,7 +154,7 @@ test("a parameter key held in a constant (NAME_PARAM = \"key\") is in the invent
 });
 
 test("the parameters dropped on an app switch are inventory parameters", () => {
-  const known = new Set([...INVENTORY.flatMap((r) => r.params), ...PLANNED]);
+  const known = new Set([...INVENTORY.flatMap((r) => r.params)]);
   for (const p of APP_SCOPED_PARAMS) assert.ok(known.has(p), p);
 });
 
@@ -166,14 +163,14 @@ test("the typed parameter specs and the inventory name the same parameters", () 
   const specs = new Set(Object.keys(PARAM_SPECS).flatMap(names));
   // `app` is the route key and `application` the removed selector: neither is a setup parameter.
   assert.deepEqual([...inventory].filter((p) => !specs.has(p) && p !== "app" && p !== "application"), []);
-  assert.deepEqual([...specs].filter((p) => !inventory.has(p) && !PLANNED.includes(p)), []);
+  assert.deepEqual([...specs].filter((p) => !inventory.has(p)), []);
 });
 
 test("an alias group of the specs is one inventory row group, so the appendix and the parser agree", () => {
   for (const [key, spec] of Object.entries(PARAM_SPECS)) {
     const group = names(key);
     const rows = INVENTORY.filter((r) => group.some((n) => r.params.includes(n)));
-    if (rows.length === 0) continue; // planned
+    assert.ok(rows.length > 0, `${key} has no inventory row`);
     for (const n of group) assert.ok(rows.some((r) => r.params.includes(n)), `${key}: alias ${n} has no inventory row`);
   }
 });
