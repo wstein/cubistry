@@ -168,3 +168,35 @@ test("the banner style accepts exactly its six values and is not a per-mode valu
   assert.deepEqual(bad.invalid, ["banner"]);
   assert.ok(sharedParams("calendar7", "calendar7").includes("banner"));
 });
+
+test("speed is global: it survives a switch between any two apps, also to apps that do not use it", () => {
+  const ids = MODE_CATALOG.map((m) => m.id);
+  for (const from of ids) {
+    for (const target of ids.filter((id) => id !== from)) {
+      assert.equal(to(`${base}?app=${from}&speed=300`, from, target).get("speed"), "300", `${from} -> ${target}`);
+    }
+  }
+  for (const [from, target] of [["counter", "clock"], ["ms-timer", "hm-clock"], ["calendar7", "clock"], ["clock", "calendar7"]]) {
+    if (ids.includes(from) && ids.includes(target)) assert.equal(to(`${base}?app=${from}&speed=50`, from, target).get("speed"), "50");
+  }
+  // not owned by any mode, and not dropped from a pending app either
+  assert.ok(GLOBAL_PARAMS.includes("speed"));
+  assert.ok(!APP_SCOPED_PARAMS.includes("speed"));
+  for (const m of MODE_CATALOG) assert.ok(!m.params.includes("speed"), m.id);
+  assert.equal(to(`${base}?app=calendar&speed=300`, "calendar", "counter").get("speed"), "300");
+});
+
+test("speed is the only addition to the global keys; other keys are still dropped as before", () => {
+  assert.deepEqual([...GLOBAL_PARAMS].sort(), ["kiosk", "nerd", "speed"]);
+  const got = to(`${base}?app=counter&speed=300&dir=down&display=dseg7&rate=10&hours-speed=2`, "counter", "clock");
+  assert.deepEqual([...got.keys()].sort(), ["app", "speed"]);
+});
+
+test("speed keeps its value domain for every app and is not reported as foreign", () => {
+  for (const id of ["counter", "clock", "calendar7", "ms-timer"]) {
+    assert.deepEqual(parseRoute(`?app=${id}&speed=250`, registry, "clock").setup.speed, 250, id);
+    assert.deepEqual(parseRoute(`?app=${id}&speed=250`, registry, "clock").foreign, [], id);
+    assert.deepEqual(parseRoute(`?app=${id}&speed=0`, registry, "clock").invalid, ["speed"], id);
+    assert.deepEqual(parseRoute(`?app=${id}&speed=abc`, registry, "clock").invalid, ["speed"], id);
+  }
+});

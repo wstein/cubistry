@@ -100,13 +100,17 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
   banner: { parse: oneOf(["theme", "rounded", "square", "underline", "boxed", "rounded-box"]) },
   size: { parse: int(2, 7) },
   // Global flags: every app reads them, so they are never owned by one mode and survive a switch.
+  // `speed` is in `GLOBAL_PARAMS` too: no app switch drops it.
   // The shell opens the Nerd drawer for `nerd=1` only; every other value leaves it closed.
   nerd: { parse: (raw) => raw === "1", default: false },
   kiosk: { aliases: ["presentation"], parse: bool, default: false },
 };
 
-/** Global flags of the shell. Deliberately retained on an app switch; no mode owns them. */
-export const GLOBAL_PARAMS: readonly string[] = ["nerd", "kiosk"];
+/**
+ * Global keys: deliberately retained on an app switch; no mode owns them. `speed` (turn duration of the single-cube
+ * family, owner decision 2026-11-12) is parsed for every app and ignored by those that have no turn speed.
+ */
+export const GLOBAL_PARAMS: readonly string[] = ["nerd", "kiosk", "speed"];
 
 /**
  * Setup parameters of applications that are not registered modes yet (stage 4 ports them). They are listed so a
