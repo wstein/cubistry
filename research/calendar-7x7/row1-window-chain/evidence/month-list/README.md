@@ -220,3 +220,68 @@ The workflow on main has neither `direction` nor `join_end` and cuts the list of
 
 Tests: `test_window_chain_backward.jl` (44 checks, lib), `test_month_chain_back.jl` (42 checks, data), `check_join_forwarding.sh` (7 cases), `check_backward_refusals.sh` (3 cases),
 `run_backward_e2e.sh` (end to end on a tiny list, opt-in, see its header) and `run_backward_mutants.sh` (44 mutants, `ONLY=name` selects one).
+
+## Second chain: January 2036 .. January 2100 (preparation; no run yet)
+
+Research candidate, not certified. Julia only for the list, Hall table and coverage; no solver or workflow ran for this list (UNKNOWN as evidence).
+The second chain continues the verified first chain (204 edges, run 43307881914) as one cumulative chain with the same root, print and layout.
+
+| File | Content |
+|---|---|
+| `months-chain-2019-01-2100-01.tsv` | 973 months 2019-01 .. 2100-01, no gap; the first 205 rows are `months-chain-2019-01-2036-01.tsv` byte for byte; SHA-256 `05691e207922d28669b9eb12ee99c666a13d076312eff1a049fc9b4430504ad1` |
+| `best-effort-chain-2019-01-2100-01.tsv` | `best_effort_path` file: 9 months, wrong cell (7,1), evidence `february-hall-C-2100.tsv`; SHA-256 `8acf0308680cf1ff784f29cd917b1481c8df4237ca9cc1c5f6a3ea1853bceb29` |
+| `february-hall-C-2100.tsv` | Hall witness table of print C for the 9 months (Julia only, `february_hall.jl`; class -3,-3,-3, deficiency 1, Hall set 7,1;7,7) |
+| `stages-chain-2036-01-2100-01.tsv` | stage plan (data only): stages 6 .. 18 |
+| `coverage-chain-2019-01-2100-01.{tsv,json}` | `month_coverage.jl` (root 2019-01, start 2019-01, last 2100-01); `verify_coverage.jl` accepts it |
+| `../../test_month_chain_2100.jl`, `../../run_chain2100_mutants.sh` | test (45 checks) and 18 data mutants |
+
+Months print C cannot show exactly. The test matches the board of every month of the list against print C (`ConfigTable.match_config`, 91 distinct boards, 90 matchable).
+The only unmatchable configuration is February, Sunday, 28 days: 2026-02 (first chain), 2037-02, 2043-02, 2054-02, 2065-02, 2071-02, 2082-02, 2093-02, 2099-02 (8 in the new range).
+These 9 months are the best-effort months (digit 29 in cell (7,1), one wrong cell); the other 964 members are exact on print C. All 29-day Februaries (2036, 2040, .. 2096) and the
+other 28-day Februaries are exact. 2100 is no leap year; 2100-02 is not a member (the last month is 2100-01, the limit of the checkers and the workflow). Exactness of a month means a
+front matching of its board, not a chain edge: whether the solver reaches each state is UNKNOWN until the chain is run.
+
+Edges: 972 in total (973 members, no root edge), 204 done, 768 new. Measured times of the first chain (runs 43292017378 .. 43307881914, produce job 19 to 25 min, edge loop 27 to 37 s per edge, verify job 55 to 69 s; greedy edges 0):
+64 edges take about 1700 to 2400 s of the 3000 s edge loop (job limit 70 min), so a run of 64 edges stays inside the limits; a stop at the deadline is clean but breaks the planned `expect_prior_edges` (then read `edges_total` from the artifact).
+
+| Stage | Edges | max_edges | expect_prior_edges | Start month | End month |
+|---|---|---|---|---|---|
+| 6 (continuation smoke) | 205 .. 207 | 3 | 204 | 2036-01 | 2036-04 |
+| 7 .. 17 | 208 .. 911, 64 each | 64 | 207, 271, 335, 399, 463, 527, 591, 655, 719, 783, 847 | 2036-04 | 2094-12 |
+| 18 | 912 .. 972 | 61 | 911 | 2094-12 | 2100-01 |
+
+13 runs (stages 6 to 18). Stage 6 is the first real continuation and is kept: its artifact is the prior of stage 7 (a run needs the artifact of the previous run, one run at a time).
+
+Workflow contract (`window-chain.yml` on main, checked at the state of 2026-11-12). The inputs of the first chain's runs: root_month empty (the first member of the list is 2019-01; the prior artifact records `root_month=-`, so
+`root_month=2019-01` would be rejected as another root), `layout_path` and `layout_sha256` of print C, `best_effort_29` true, `fail_on_greedy` true, `library` L5, `width` 40, `lambda` 3.
+The producer (`window_chain.jl`) accepts the longer list: it requires the months of the prior chain to equal the first months of the plan (`prior chain months do not match the plan`) and writes the month list pin of every segment into `segments.tsv`.
+The workflow does not accept this continuation as it is: the job `produce`, step "Prepare work directory", requires in the prior `VERIFIED.txt` (1) `months_sha256` equal to the `months_sha256` input (the prior is `4ad43a59...`, the new list `05691e20...`),
+(2) `best_effort_sha256` equal to the hash of the new best-effort file (prior `00b721b1...`, new `8acf0308...`) and (3) `complete=false` (the prior ends at the last month of its list, `complete=true`). A change of the workflow on main is needed before stage 6;
+it is not part of this change. Smallest change: optional inputs `prior_months_sha256` and `prior_best_effort_sha256` that replace the comparison values of (1) and (2) when set, and the check (3) skipped when `prior_months_sha256` is set (the producer's prefix check and the verify job re-check the whole chain).
+With the workflow unchanged only a fresh chain from the root fits the contract (972 new edges, about 16 runs of 64), which recomputes the 204 verified edges.
+
+Inputs common to every run (paths at the research commit that contains this change; `research_ref` must be that commit on `research/cube-display-feasibility`):
+
+| Input | Value |
+|---|---|
+| months_path | `research/calendar-7x7/row1-window-chain/evidence/month-list/months-chain-2019-01-2100-01.tsv` |
+| months_sha256 | `05691e207922d28669b9eb12ee99c666a13d076312eff1a049fc9b4430504ad1` |
+| root_month | empty (S[1] = 2019-01) |
+| print_path, print_sha256 | `research/calendar-7x7/row1-window-chain/evidence/print-c/printing.tsv`, `0119ca3ba1266f9c3e4d7c27753801aca30eb4af514f491615666dcd9f92a8fc` |
+| layout_path, layout_sha256 | `research/calendar-7x7/row1-window-chain/evidence/print-c/layout.tsv`, `e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a` |
+| best_effort_path | `research/calendar-7x7/row1-window-chain/evidence/month-list/best-effort-chain-2019-01-2100-01.tsv` |
+| library, width, lambda, best_effort_29, fail_on_greedy | L5, 40, 3, true, true (defaults) |
+
+Smoke runs (not executed here). (a) With the workflow unchanged: `smoke_mode=true` (3 edges from the root, ignores the prior; about 15 min) checks the list pin, the best-effort file, the layout and the research commit through prepare, produce and verify:
+
+```
+gh workflow run window-chain.yml --ref main -f research_ref=<SHA> -f months_path=research/calendar-7x7/row1-window-chain/evidence/month-list/months-chain-2019-01-2100-01.tsv -f months_sha256=05691e207922d28669b9eb12ee99c666a13d076312eff1a049fc9b4430504ad1 -f print_path=research/calendar-7x7/row1-window-chain/evidence/print-c/printing.tsv -f print_sha256=0119ca3ba1266f9c3e4d7c27753801aca30eb4af514f491615666dcd9f92a8fc -f layout_path=research/calendar-7x7/row1-window-chain/evidence/print-c/layout.tsv -f layout_sha256=e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a -f best_effort_path=research/calendar-7x7/row1-window-chain/evidence/month-list/best-effort-chain-2019-01-2100-01.tsv -f smoke_mode=true
+```
+
+(b) Stage 6, the continuation smoke, after the workflow change (input names of the change as proposed above; the three edges 2036-02, 2036-03, 2036-04 are exact months):
+the same command with `-f smoke_mode=false -f prior_run_id=43307881914 -f expect_prior_edges=204 -f max_edges=3 -f prior_months_sha256=4ad43a5997ec019fd0383d7d853589213d09c2bb4e20179e1cdb94df5c6a66c3 -f prior_best_effort_sha256=00b721b107cb7ad64c5b1d2ae90c0f7cbda6930f8d306492b5f98b2c3b33fbbe`.
+Stage 7: `-f prior_run_id=<run id of stage 6> -f expect_prior_edges=207 -f max_edges=64` and without the two `prior_*_sha256` inputs (the prior of stage 7 on has the new list and file); then only `prior_run_id`, `expect_prior_edges` and `max_edges` change, as in the table above.
+
+Local producer check (Julia 1.13.3, 4 threads, load about 30): `window_chain.jl` with the new list, print C, layout C, the new best-effort file, `prior=` the artifact of run 43307881914 (204 edges) and `max_edges=1` accepted the prior (replay, end digest, plan prefix), wrote edge 206 (2036-02, beam, 131 HTM, 172 s) and stopped at `max_edges`; 302 s in total, library build 126 s. No checker ran on that chain.
+
+Not run: the workflow, a chain of more than one new edge, the three checkers on a chain of the new list, Flix on the Hall table. Stage 6 is the first time the checkers see a chain of this list.
