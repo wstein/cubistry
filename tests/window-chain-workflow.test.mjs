@@ -58,6 +58,9 @@ const GATES = {
   "[[ \"$IN_WIDTH\" =~ ^[1-9][0-9]{0,2}$ ]] && [ \"$IN_WIDTH\" -le 200 ] || fail \"width must be 1-200\"",
   "[[ \"$IN_LAMBDA\" =~ ^([1-9]|10)$ ]] || fail \"lambda must be 1-10\"",
   "[ -z \"$IN_PRIOR\" ] || [[ \"$IN_PRIOR\" =~ ^[0-9]{1,20}$ ]] || fail \"prior_run_id must be digits\"",
+  "[ -z \"$IN_PRIOR_MONTHS_SHA\" ] || [[ \"$IN_PRIOR_MONTHS_SHA\" =~ ^[0-9a-f]{64}$ ]] || fail \"prior_months_sha256 must be 64 lowercase hex digits\"",
+  "[ -z \"$IN_PRIOR_BEST_SHA\" ] || [[ \"$IN_PRIOR_BEST_SHA\" =~ ^[0-9a-f]{64}$ ]] || fail \"prior_best_effort_sha256 must be 64 lowercase hex digits\"",
+  "[ -z \"$IN_PRIOR_MONTHS_SHA$IN_PRIOR_BEST_SHA\" ] || [ -n \"$IN_PRIOR\" ] || fail \"prior_*_sha256 need prior_run_id\"",
   "ym='^(19[0-9]{2}|20[0-9]{2}|2100)-(0[1-9]|1[0-2])$'",
   "path='^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$'",
   "if [ \"$IN_SMOKE\" = \"true\" ]; then max=3; prior=\"\"; fi",
@@ -84,7 +87,7 @@ const GATES = {
   "[ -n \"$best\" ] || { echo \"::error::no verified chain artifact found to continue\"; exit 1; }",
   "grep -qx \"print_sha256=$PRINT_SHA\" \"$best/VERIFIED.txt\" || { echo \"::error::the prior chain was produced with another print\"; exit 1; }",
   "echo \"$MONTHS_SHA  src/$MONTHS_PATH\" | sha256sum --check --strict",
-  "grep -qx \"months_sha256=$MONTHS_SHA\" \"$best/VERIFIED.txt\" || { echo \"::error::the prior chain was produced with another month list\"; exit 1; }",
+  "grep -qx \"months_sha256=${PRIOR_MONTHS_SHA:-$MONTHS_SHA}\" \"$best/VERIFIED.txt\" || { echo \"::error::the prior chain was produced with another month list\"; exit 1; }",
   "grep -qx \"root_month=${ROOT_MONTH:--}\" \"$best/VERIFIED.txt\" || { echo \"::error::the prior chain was produced with another root month\"; exit 1; }",
   "export CAL7_WINDOW_MONTHS=\"$GITHUB_WORKSPACE/src/$MONTHS_PATH\" CAL7_WINDOW_MONTHS_SHA256=\"$MONTHS_SHA\" CAL7_WINDOW_PRINT_SHA=\"$PRINT_SHA\"",
   "[ -z \"$ROOT_MONTH\" ] || export CAL7_ROOT_MONTH=\"$ROOT_MONTH\"",
@@ -259,7 +262,7 @@ test("expect_prior_edges: a continuation checks the edge count of the prior chai
     '[ "$IN_SMOKE" = "true" ] || [ -z "$IN_PRIOR" ] || [ -n "$IN_EXPECT" ] || fail "prior_run_id needs expect_prior_edges (the edge count of the prior chain)"']) assert.ok(l.includes(x), x);
   requireJobLines("produce", [
     '[ -z "$EXPECT_PRIOR" ] || [ "$most" = "$EXPECT_PRIOR" ] || { echo "::error::the prior chain has $most edges, expect_prior_edges is $EXPECT_PRIOR"; exit 1; }',
-    'grep -qx "complete=false" "$best/VERIFIED.txt" || { echo "::error::the prior chain is complete; there is nothing to continue"; exit 1; }']);
+    '[ "${PRIOR_MONTHS_SHA:-$MONTHS_SHA}" != "$MONTHS_SHA" ] || grep -qx "complete=false" "$best/VERIFIED.txt" || { echo "::error::the prior chain is complete; there is nothing to continue"; exit 1; }']);
 });
 test("29 rule: opt-in input (default true), gate by word in prepare, exported to the checkers, compared on resume", () => {
   const head = text.split("\njobs:")[0];
@@ -273,7 +276,7 @@ test("29 rule: opt-in input (default true), gate by word in prepare, exported to
   assert.ok(w.includes('echo "best_effort_29=$BEST29"') && w.includes('echo "best_effort_sha256=$BEST_SHA"'));
   requireJobLines("produce", [
     'grep -qx "best_effort_29=$BEST29" "$best/VERIFIED.txt" || { echo "::error::the prior chain was checked with another best_effort_29 setting"; exit 1; }',
-    'grep -qx "best_effort_sha256=$BEST_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another best-effort file"; exit 1; }']);
+    'grep -qx "best_effort_sha256=${PRIOR_BEST_SHA:-$BEST_SHA}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another best-effort file"; exit 1; }']);
 });
 test("the 29 gate in prepare passes only when each checker names CAL7_BEST_EFFORT_29 as a word, and is off with best_effort_29=false", () => {
   const gates = runLines(step("prepare", "Check research commit")).filter(l => l.startsWith('[ "$BEST29" != true ] || git grep'));
@@ -318,7 +321,7 @@ test("no workflow expression inside any run block (script injection)", () => {
 });
 test("every input reaches the scripts through env, with the exact mapping", () => {
   const v = step("prepare", "Validate inputs").env;
-  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_MONTHS_PATH: "months_path", IN_MONTHS_SHA: "months_sha256", IN_ROOT: "root_month", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_LAYOUT_PATH: "layout_path", IN_LAYOUT_SHA: "layout_sha256", IN_BEST: "best_effort_path", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode", IN_MAX: "max_edges", IN_EXPECT: "expect_prior_edges" };
+  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_MONTHS_PATH: "months_path", IN_MONTHS_SHA: "months_sha256", IN_ROOT: "root_month", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_LAYOUT_PATH: "layout_path", IN_LAYOUT_SHA: "layout_sha256", IN_BEST: "best_effort_path", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode", IN_MAX: "max_edges", IN_EXPECT: "expect_prior_edges", IN_PRIOR_MONTHS_SHA: "prior_months_sha256", IN_PRIOR_BEST_SHA: "prior_best_effort_sha256" };
   assert.deepEqual(Object.keys(v).sort(), Object.keys(want).sort());
   for (const [k, input] of Object.entries(want)) assert.equal(v[k], `\${{ inputs.${input} }}`, k);
   const inputsDeclared = [...text.matchAll(/^      ([a-z_0-9]+):\n        description:/gm)].map(m => m[1]).sort();
@@ -326,6 +329,8 @@ test("every input reaches the scripts through env, with the exact mapping", () =
   assert.equal(jobs.verify.env.BEST29, "${{ inputs.best_effort_29 }}");
   assert.equal(jobs.produce.env.BEST29, "${{ inputs.best_effort_29 }}");
   assert.equal(jobs.produce.env.EXPECT_PRIOR, "${{ needs.prepare.outputs.expect_prior_edges }}");
+  assert.equal(jobs.produce.env.PRIOR_MONTHS_SHA, "${{ inputs.prior_months_sha256 }}");
+  assert.equal(jobs.produce.env.PRIOR_BEST_SHA, "${{ inputs.prior_best_effort_sha256 }}");
   assert.equal(jobs.prepare.steps.find(s => s.name === "Check research commit").env.BEST29, "${{ inputs.best_effort_29 }}");
   assert.equal(jobs.verify.env.FAIL_ON_GREEDY, "${{ inputs.fail_on_greedy }}");
   assert.equal(jobs.produce.env.SHA, "${{ inputs.research_ref }}");
