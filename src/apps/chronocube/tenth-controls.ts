@@ -1,14 +1,8 @@
+import { createStopSlider } from "../shell/choice-controls.ts";
 import type { ModeShell } from "../shell/slot-api.ts";
 
 /** Step intervals of the 1/10-Second Counter in milliseconds; 250 ms is the default quarter-turn time. */
 export const TENTH_STEP_INTERVALS = [50, 100, 250, 500] as const;
-
-const INTERVAL_LABELS: Readonly<Record<(typeof TENTH_STEP_INTERVALS)[number], string>> = {
-  50: "50 ms (Fast)",
-  100: "100 ms",
-  250: "250 ms (Default)",
-  500: "500 ms",
-};
 
 export interface TenthControlHandlers {
   /** Jumps to a digit 0 to 9. */
@@ -82,14 +76,15 @@ export function mountTenthControls(shell: ModeShell, doc: Doc, handlers: TenthCo
     }),
   });
 
-  shell.setSlot(4, {
-    label: "Step speed",
-    element: select(
-      "tenth-speed-select",
-      "Quarter-turn time",
-      TENTH_STEP_INTERVALS.map((ms) => [String(ms), INTERVAL_LABELS[ms]] as [string, string]),
-      "250",
-      (v) => handlers.setStepInterval(Number(v)),
-    ),
+  // Slow to fast, left to right, like the quarter-turn time slider of the other modes.
+  const speed = createStopSlider(doc, (target, type, handler) => shell.listen(target, type, handler), {
+    id: "tenth-speed-select",
+    label: "Quarter-turn time",
+    stops: [...TENTH_STEP_INTERVALS].reverse(),
+    value: 250,
+    ends: ["slow", "fast"],
+    format: (ms) => `${ms} ms`,
+    onChange: (ms) => handlers.setStepInterval(ms),
   });
+  shell.setSlot(4, { label: "Step speed", element: speed.element });
 }
