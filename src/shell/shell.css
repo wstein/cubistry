@@ -443,6 +443,9 @@ body:has(> aside + .shell) > .shell {
 /* Chip radio group and stop slider (src/apps/shell/choice-controls.ts). Chips carry a symbol and a word, so color is
    never the only signal; tap targets are at least 44 px and the row wraps instead of overflowing. Tones are the state
    colors of the CI Quality Cube print (docs/STATUS_CUBE.md); the checked chip is filled with white text. */
+.shell .shell-slot-body .shell-quick-choice {
+  min-height: 44px;
+}
 .shell .shell-field-label {
   color: var(--ink);
   font: 500 var(--t-sm) var(--f-ui);
@@ -461,7 +464,7 @@ body:has(> aside + .shell) > .shell {
   gap: var(--sp-1);
   min-width: 44px;
   min-height: 44px;
-  padding: 0 var(--sp-3);
+  padding: 0 var(--sp-2);
   border-radius: var(--r-pill);
   white-space: nowrap;
 }
@@ -489,6 +492,7 @@ body:has(> aside + .shell) > .shell {
 .shell .shell-stop-slider {
   width: 100%;
   min-height: 44px;
+  margin: 0;
   padding: 0;
   accent-color: var(--accent);
 }
