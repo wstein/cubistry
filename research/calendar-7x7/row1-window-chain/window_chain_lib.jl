@@ -6,15 +6,16 @@
 module WindowChainLib
 using SHA
 export parse_ym, ym_str, ym_index, month_range, read_month_list, root_month, chain_plan, chain_flags, month_records, write_months,
-    read_claims, read_best_effort, next_best_effort, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row, read_segments, layout_input, check_segments_layout,
-    STATUSES, EDGES_HEADER, MONTHS_HEADER, SEGMENTS_HEADER, DEFAULT_DEADLINE_S, YM_MIN, YM_MAX
+    read_claims, read_best_effort, best_effort_cell, best_effort_ink, best_effort_art, art_stickers, best_effort_board, best_effort_hall, best_effort_edge_lines, shows_art, chain_header, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row, read_segments, layout_input, check_segments_layout,
+    BEST_EFFORT_CORNERS, BEST_EFFORT_TEXT, STATUSES, EDGES_HEADER, MONTHS_HEADER, SEGMENTS_HEADER, DEFAULT_DEADLINE_S, YM_MIN, YM_MAX
 
 const YM_MIN=(1900,1)
 const YM_MAX=(2100,1)
 # Month status vocabulary. A month is `valid` only when the chain has an edge into it (or it is the root).
 # `unavailable_*` and `best_effort` claim a certificate and need confirmed=both (Julia and Flix); everything else is `unknown`.
-# `best_effort` is a chain member whose edge has wrong cells with Hall witnesses (chain.v2); this producer writes chain.v1 only
-# and never produces one, so it appears only through a claims file.
+# `best_effort` is a chain member whose edge has wrong cells with Hall witnesses (chain.v2). The producer writes such an edge for a
+# declared best-effort month (best_effort=FILE) but cannot confirm it (Julia and Flix receipts do), so it records that month as `unknown`
+# with the reason `best_effort_edge_unconfirmed`; `best_effort` appears only through a claims file.
 const STATUSES=("valid","best_effort","unavailable_nomatch","unavailable_unsat","unknown")
 const EDGES_HEADER="id\tyear\tmonth\tmethod\thtm\tqtm\tseconds\tsource_sha256\tend_sha256"
 const MONTHS_HEADER="month\tstatus\treason\tedge\tmethod\tevidence"
@@ -84,19 +85,57 @@ function read_best_effort(path)
     end
     d
 end
-"The next chain month to produce (plan[produced+1]) when it is a declared best-effort month, else nothing."
-function next_best_effort(plan,produced,best)
-    produced<length(plan) && haskey(best,plan[produced+1]) ? plan[produced+1] : nothing
+# Best-effort edge rule (February/Sunday/28 and the like). Owner decision 2026-11-12: the front shows the board with exactly one wrong
+# cell, and that cell shows the digit 29, so it looks like a 29-day month. The wrong cell is one of the two corner cells (7,1), (7,7);
+# (7,1) is the default and (7,7) is a fallback that is only used when it is named (best_effort_cell=7,7), never silently.
+const BEST_EFFORT_CORNERS=((7,1),(7,7))
+const BEST_EFFORT_TEXT="29"
+
+"A cell `r,c` of the best-effort file or of the switch; only the corner cells (7,1) and (7,7) are best-effort cells."
+function parse_cell(s)
+    m=match(r"^([1-7]),([1-7])\z",s);m===nothing && error("best-effort cell must be r,c (one cell): $s")
+    c=(parse(Int,m.captures[1]),parse(Int,m.captures[2]))
+    c in BEST_EFFORT_CORNERS || error("best-effort cell $s is not a corner cell of $(BEST_EFFORT_CORNERS)")
+    c
 end
+"The wrong cell of a best-effort month: the switch `best_effort_cell` (empty: not given) wins over the `wrong_cells` field of the best-effort file. Both must name one corner cell."
+function best_effort_cell(file_cells,switch="")
+    c=parse_cell(isempty(switch) ? file_cells : switch)
+    isempty(switch) || parse_cell(file_cells)   # the file must name a corner cell too (not a list)
+    c
+end
+"Ink of a day digit in column c as the boards print it (red columns 1 and 7: `red_column` of pure-split-states/stacked_common.jl)."
+best_effort_ink(c)=c in (1,7) ? "red" : "dark"
+"The artwork the wrong cell shows: text `29` in the ink of the column. Two print stickers of one corner body may carry it; the solver may use any of them (art_stickers)."
+best_effort_art(cell)=(BEST_EFFORT_TEXT,best_effort_ink(cell[2]))
+"Ids of all print stickers that carry the art (text and ink equal). Stickers with equal text and ink are one artwork but stay separate stickers: the list is not deduplicated by (text, ink)."
+art_stickers(source,art)=[s.id for s in source if s.text==art[1] && s.ink==art[2]]
+"A front sticker (text, ink) shows the art: the same text and ink, not merely an equal optic image."
+shows_art(sticker,art)=sticker.text==art[1] && sticker.ink==art[2]
+"The board of the best-effort target: the true board with the art in the wrong cell. The true cell must be empty and must not already show the art."
+function best_effort_board(board,cell)
+    art=best_effort_art(cell);r,c=cell
+    board[r,c]==art && error("cell $cell already shows $(art[1]): not a wrong cell")
+    isempty(board[r,c][1]) || error("cell $cell is not empty on the true board ($(board[r,c][1])): not a 29 replacement")
+    b=copy(board);b[r,c]=art;b
+end
+"Hall set X written to the edge: both corner cells (deficiency 1 on February/Sunday/28, see best-effort-corner)."
+best_effort_hall()=collect(BEST_EFFORT_CORNERS)
+"The `wrong` and `hall` lines of a chain.v2 edge (between the edge line and its moves): one wrong cell, one Hall set."
+best_effort_edge_lines(cell)=["wrong\t$(cell[1])\t$(cell[2])","hall\t"*join(("$r,$c" for (r,c) in best_effort_hall()),';')]
+"Header of a chain: v2 as soon as an edge carries wrong cells, else v1."
+chain_header(has_best_effort)=has_best_effort ? "cubistry.calendar7.chain.v2" : "cubistry.calendar7.chain.v1"
+
 
 """
 Status record of every month of start..fin. `produced` months (in chain order) are valid; the first `stop` (nothing when the
 chain is complete) names why the rest of the chain months have no edge. A month outside the chain is `unknown` unless a claim
 says more (before_chain_root, skipped_gap between chain months, after_month_list); an `unavailable_*` or `best_effort` claim
 without confirmed=both is downgraded to `unknown` (AGENTS.md: UNSAT needs both checkers). A claim on a chain month is an error. `rooted` says that the first edge is the root edge.
-Declared best-effort months that were not produced say `best_effort_month` with their evidence.
+A produced best-effort month (`best_edges`, the months whose edge carries a wrong cell) is `unknown` with the reason `best_effort_edge_unconfirmed`, its edge and method, and the evidence of the best-effort file;
+a declared one that was not produced says the stop reason and the same evidence.
 """
-function month_records(start,fin,plan,produced,stop;methods,rooted=false,claims=Dict{Tuple{Int,Int},NTuple{4,String}}(),best=Dict{Tuple{Int,Int},NTuple{3,String}}())
+function month_records(start,fin,plan,produced,stop;methods,rooted=false,best_edges=Set{Tuple{Int,Int}}(),claims=Dict{Tuple{Int,Int},NTuple{4,String}}(),best=Dict{Tuple{Int,Int},NTuple{3,String}}())
     np=length(produced)
     np<=length(plan) && all(produced[i]==plan[i] for i in 1:np) || error("produced months are not the chain prefix")
     length(methods)==max(np-1,0) || error("one solver method per edge is required")
@@ -106,11 +145,14 @@ function month_records(start,fin,plan,produced,stop;methods,rooted=false,claims=
     rows=NTuple{6,String}[]
     for ym in month_range(start,fin)
         i=findfirst(==(ym),plan)
-        if i!==nothing && i<=np
+        if i!==nothing && i<=np && i>1 && ym in best_edges
+            haskey(best,ym) || error("best-effort edge into $(ym_str(ym)) without a best-effort row")
+            push!(rows,(ym_str(ym),"unknown","best_effort_edge_unconfirmed",string(i-1),methods[i-1],best[ym][3]))
+        elseif i!==nothing && i<=np
             reason=i==1 ? "root" : (i==2 && rooted ? "root_edge" : (ym_index(ym)-ym_index(plan[i-1])>1 ? "bridge_edge" : "chain_edge"))
             push!(rows,(ym_str(ym),"valid",reason,i==1 ? "0" : string(i-1),i==1 ? "-" : methods[i-1],"-"))
         elseif i!==nothing
-            haskey(best,ym) ? push!(rows,(ym_str(ym),"unknown","best_effort_month","-","-",best[ym][3])) : push!(rows,(ym_str(ym),"unknown",stop,"-","-","-"))
+            haskey(best,ym) ? push!(rows,(ym_str(ym),"unknown",stop,"-","-",best[ym][3])) : push!(rows,(ym_str(ym),"unknown",stop,"-","-","-"))
         else
             default=ym_index(ym)<ym_index(plan[1]) ? "before_chain_root" : ym_index(ym)>ym_index(plan[end]) ? "after_month_list" : "skipped_gap"
             c=get(claims,ym,nothing)
@@ -135,7 +177,7 @@ Edge months of a chain file (lines) checked against the plan: header chain.v1, t
 field twice and the year), the edges are the plan months after the root, in order. (months, edge count).
 """
 function chain_progress(ls,plan)
-    ls[1]=="cubistry.calendar7.chain.v1" && ls[end]=="finish" || error("chain header (chain.v1 only) or finish row")
+    ls[1] in ("cubistry.calendar7.chain.v1","cubistry.calendar7.chain.v2") && ls[end]=="finish" || error("chain header (chain.v1 or chain.v2) or finish row")
     src=split(ls[2],'\t');root=plan[1]
     (src[1]=="source" && length(src)==5 && (parse(Int,src[2]),parse(Int,src[3]),parse(Int,src[4]))==(root[2],root[1],root[2])) || error("chain source is not the root month $(ym_str(root))")
     months=[(parse(Int,f[2]),parse(Int,f[3])) for f in (split(l,'\t') for l in ls if startswith(l,"edge\t"))]
@@ -147,9 +189,8 @@ end
 "Start another edge only when the slowest edge so far still fits before the deadline (seconds)."
 may_start_edge(elapsed,slowest,deadline)=elapsed+1.25*slowest<=deadline
 
-"Why no new edge starts, or nothing: a declared best-effort month as next target (the producer cannot write its edge), max_edges, the deadline rule."
-function stop_reason(done,max_edges,elapsed,slowest,deadline,next;next_best=nothing)
-    next_best===nothing || return "best_effort_month"
+"Why no new edge starts, or nothing: max_edges, the deadline rule. A declared best-effort month is no reason to stop (its edge is written, see best_effort_cell)."
+function stop_reason(done,max_edges,elapsed,slowest,deadline,next)
     done>=max_edges && return "max_edges"
     may_start_edge(elapsed,slowest,deadline) || return "deadline"
     nothing
