@@ -92,11 +92,12 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
   year: { parse: int(1, 9999), perMode: true },
   month: { parse: int(1, 12), perMode: true },
   outer: { parse: num(1.2, 2.4) },
-  // 7x7 Calendar look (src/apps/calendar7/mount.ts, layout.ts). `banner` joins with the banner PR.
+  // 7x7 Calendar look (src/apps/calendar7/mount.ts, layout.ts). `banner` is the banner style.
   "c7-font": { name: "font", parse: word },
   layout: { parse: oneOf(["standard", "names", "names-any"]) },
   scheme: { parse: word },
   plasticity: { parse: num(0, 1) },
+  banner: { parse: oneOf(["theme", "rounded", "square", "underline", "boxed", "rounded-box"]) },
   size: { parse: int(2, 7) },
   // Global flags: every app reads them, so they are never owned by one mode and survive a switch.
   // The shell opens the Nerd drawer for `nerd=1` only; every other value leaves it closed.
