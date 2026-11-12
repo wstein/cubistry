@@ -40,6 +40,7 @@ import {
   STICKERS,
 } from "./engine.ts";
 import type { StageView } from "./player.ts";
+import { type HomeFace, faceEdgeFillsByHome, faceFillsByHome, homeFacesOf, schemeForHome, usesHomeTints } from "./home-tint.ts";
 import { type ColorScheme, type BannerStyle, DEFAULT_SCHEME, namesGround, parseBannerStyle, schemeById, withBannerStyle } from "./schemes.ts";
 import { CALENDAR7_SIZE, outerLayerWidth, bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, unitGridTileOf } from "./geometry.ts";
 import { type Layout, type NameWords, NAME_WORDS, printNameWords } from "./layout.ts";
@@ -137,6 +138,14 @@ export class Calendar7Viewer implements StageView {
   /** One entry per distinct texture of the current build: redrawn in place when the scheme changes. */
   /** Face tile of every sticker at the pose the cube was built from (undefined without a layer profile). */
   private tiles: (FaceTile | undefined)[] = [];
+  /** Home face of every sticker (`setHomePose`, the identity pose of the print); empty until set. Only the Rubik-Tint scheme reads it. */
+  private homes: HomeFace[] = [];
+  /** Home face of the sticker a canvas was drawn for (set only while the cube is built per home face). */
+  private homeOf = new WeakMap<HTMLCanvasElement, HomeFace>();
+  /** The cube was built with one texture per home face (the active scheme colors the stones by their home face). */
+  private builtByHome = false;
+  /** The active scheme crossed the home-tint boundary during a move: the cube is rebuilt at its end. */
+  private homeStale = false;
   private art: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; text: string; ink: string; tile?: FaceTile; wrong?: boolean; wrongEdge?: WrongEdge }[] = [];
   /** Sticker meshes of the cells that differ from the board (best effort): their screen position is published as `data-c7-wrong`. */
   private wrongMeshes: THREE.Object3D[] = [];
@@ -299,6 +308,11 @@ export class Calendar7Viewer implements StageView {
   private redrawScheme(): void {
     this.scheme = this.layout === "names" ? withBannerStyle(this.baseScheme, this.bannerStyle) : this.baseScheme;
     if (!this.printing || !this.pose) return;
+    if (this.useHome() !== this.builtByHome) { // the textures are shared per print, not per home face: build the cube again
+      this.homeStale = this.bodyStale = true;
+      this.applyBodyColor();
+      return;
+    }
     this.bodyStale = true;
     for (const a of this.art) {
       this.draw(a.canvas, a.text, a.ink, a.tile, a.wrong, a.wrongEdge);
@@ -308,11 +322,38 @@ export class Calendar7Viewer implements StageView {
     this.dirty = true;
   }
 
+  /** True when the active scheme colors the stones by their home face and the home faces are known. */
+  private useHome(): boolean {
+    return usesHomeTints(this.baseScheme) && this.homes.length === STICKERS;
+  }
+
+  private fills(printing: Printing, layout: Layout): Map<number, string> {
+    return this.useHome() ? faceFillsByHome(printing, this.scheme, layout, this.homes) : faceFills(printing, this.scheme, layout, this.wrongIds);
+  }
+
+  private edgeFills(printing: Printing, layout: Layout): Map<number, FaceEdgeColors> {
+    return this.useHome() ? faceEdgeFillsByHome(printing, this.scheme, layout, this.tiles, this.homes) : faceEdgeFills(printing, this.scheme, layout, this.tiles);
+  }
+
+  /**
+   * The identity pose of the print (the names data): its sticker normals are the home faces the Rubik-Tint scheme colors by; null
+   * when the solved pose is not known (every stone then shows the tint of the white face). Call it before `configure`; it takes
+   * effect with the next build (a cube that exists keeps its textures).
+   */
+  setHomePose(root: Pose | null): void {
+    if (!this.destroyed) this.homes = root ? homeFacesOf(root) : [];
+  }
+
   /** Updates a stickerless cube whose body color is stale; only between moves, with the pose the cube shows. */
   private applyBodyColor(): void {
     if (!this.bodyStale || this.tween.running || !this.printing || !this.pose || this.destroyed) return;
+    if (this.homeStale) {
+      this.homeStale = false;
+      this.configure(this.printing, this.pose, "face", this.layout, [...this.wrongIds]);
+      return;
+    }
     this.cube?.setBodyColor(bodyFill(this.scheme, this.layout));
-    if (this.layout === "names") this.cube?.setFaceColors(faceFills(this.printing, this.scheme, this.layout, this.wrongIds), faceEdgeFills(this.printing, this.scheme, this.layout, this.tiles));
+    if (this.layout === "names") this.cube?.setFaceColors(this.fills(this.printing, this.layout), this.edgeFills(this.printing, this.layout));
     this.bodyStale = false;
   }
 
@@ -328,9 +369,10 @@ export class Calendar7Viewer implements StageView {
 
   private draw(canvas: HTMLCanvasElement, text: string, ink: string, tile?: FaceTile, wrong = false, wrongEdge: WrongEdge = "bottom"): void {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-    if (this.font) drawFontSticker(ctx, text, ink, this.font, this.scheme, this.surface, undefined, this.layout, tile, this.nameWords);
-    else if (this.surface === "face") drawFace(ctx, text, ink, undefined, this.scheme, this.layout, tile, this.nameWords);
-    else drawSticker(ctx, text, ink, undefined, this.scheme, this.layout);
+    const scheme = schemeForHome(this.scheme, this.homeOf.get(canvas)); // the tint of the stone's home face (Rubik-Tint only)
+    if (this.font) drawFontSticker(ctx, text, ink, this.font, scheme, this.surface, undefined, this.layout, tile, this.nameWords);
+    else if (this.surface === "face") drawFace(ctx, text, ink, undefined, scheme, this.layout, tile, this.nameWords);
+    else drawSticker(ctx, text, ink, undefined, scheme, this.layout);
     if (wrong) drawWrongCell(ctx as unknown as WrongCellContext, canvas.width, canvas.height, tile, wrongEdge);
   }
 
@@ -382,6 +424,9 @@ export class Calendar7Viewer implements StageView {
     const materials = new Map<number, THREE.Material>();
     const byKey = new Map<string, THREE.Material>();
     const widths = layerWidthsOf(layout);
+    const byHome = this.useHome();
+    this.builtByHome = byHome;
+    this.homeStale = false;
     this.tiles = [];
     for (let i = 0; i < STICKERS; i++) {
       // Layer profile: a tile is as large as the face of its cubie (the texture is 192 px per unit of width), so the key has the size too.
@@ -389,11 +434,12 @@ export class Calendar7Viewer implements StageView {
       this.tiles[i] = tile;
       const isWrong = this.wrongIds.has(i);
       const wrongEdge = isWrong ? wrongStripEdge(pose.up.subarray(3 * i, 3 * i + 3)) : undefined;
-      const key = `${isWrong ? `wrong|${wrongEdge}|` : ""}${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}|${tile.band.l},${tile.band.r},${tile.band.t},${tile.band.b}` : ""}`; // one surface per configure: the key needs no surface
+      const key = `${isWrong ? `wrong|${wrongEdge}|` : ""}${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}|${tile.band.l},${tile.band.r},${tile.band.t},${tile.band.b}` : ""}${byHome ? `|home:${this.homes[i]}` : ""}`; // one surface per configure: the key needs no surface
       let material = byKey.get(key);
       if (!material) {
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = tileCanvasSize(tile);
+        if (byHome) this.homeOf.set(canvas, this.homes[i]);
         this.draw(canvas, printing.text[i], printing.ink[i], tile, isWrong, wrongEdge);
         const texture = new THREE.CanvasTexture(canvas);
         this.art.push({ canvas, texture, text: printing.text[i], ink: printing.ink[i], tile, wrong: isWrong, wrongEdge });
@@ -413,7 +459,7 @@ export class Calendar7Viewer implements StageView {
       up: [0, 0, 0],
     }));
     this.writeFrames(pose);
-    const faceColors = faceFills(printing, this.scheme, layout, this.wrongIds);
+    const faceColors = this.fills(printing, layout);
     this.cube = new PhysicalCubeScene(
       this.presentation,
       this.frames as unknown as readonly PhysicalStickerFrame[],
@@ -423,7 +469,7 @@ export class Calendar7Viewer implements StageView {
       lightGeometry(layout),
       faceColors,
       // Stickerless: the body is the day background (owner decision); with stickers it is the plastic frame between them.
-      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), miterCutFaces: layout === "names", faceEdgeColors: faceEdgeFills(printing, this.scheme, layout, this.tiles), layers: layerProfileFor(layout) }, // names layout: cut faces colored as on a real cube (cut-faces.ts)
+      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), miterCutFaces: layout === "names", faceEdgeColors: this.edgeFills(printing, layout), layers: layerProfileFor(layout) }, // names layout: cut faces colored as on a real cube (cut-faces.ts)
     );
     // A sticker is a flat sheet on its body: it needs no shadow of its own (halves the shadow pass).
     this.presentation.traverse((o) => {
