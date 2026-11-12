@@ -18,7 +18,7 @@ const KNOWN_ERRORS = {};
 
 // On the CI runners (software GL, shared CPU) a step takes 4 to 9 times its local time, so the ready wait is 30 s
 // (it includes ensureProof and the design fetches), and a test gets the slow limit (3 x 30 s). The
-// all-modes test loads fourteen modes in one session and gets an explicit limit of 13 x 30 s.
+// all-modes test loads fourteen modes in one session and gets an explicit limit of 14 x 30 s.
 const LOAD_MS = 30000;
 const SETTLE_MS = 1500;
 
