@@ -45,7 +45,7 @@ ms=ym.(lines)
         @test length(Set(keys_))==88                                  # distinct configurations
         @test length(Set(zip(keys_[1:end-1],keys_[2:end])))==92       # distinct configuration pairs
         @test ckey(2019,1)==(1,2,31)==ckey(1980,1)==ckey(2030,1)      # root board: January / Tuesday / 31
-        # best-effort file: exactly the NOMATCH month, wrong cell (7,1), evidence file exists and names (7,1) and (7,7) for print D
+        # best-effort file: exactly the NOMATCH month, wrong cell (7,1); the config-coverage file exists and names (7,1) and (7,7) for print C
         b=rows(joinpath(ML,"best-effort-chain-2019-01-2036-01.tsv"))
         @test b[1]==["month","status","wrong_cells","evidence"] && length(b)==2
         @test b[2][1]=="2026-02" && b[2][2]=="best_effort_unverified" && b[2][3]=="7,1" && isfile(joinpath(CC,"best-effort-feb-sunday-28.tsv"))
