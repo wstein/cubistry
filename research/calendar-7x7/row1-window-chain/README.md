@@ -224,11 +224,11 @@ artifact is uploaded. The logic without the solver is tested by `test_window_cha
 statically by `tests/window-chain-workflow.test.mjs`.
 
 Layout input. The producers `window_chain.jl` and `beam_edge.jl` read `row1-revision/layout.tsv` by default (unchanged). `CAL7_WINDOW_LAYOUT` (path)
-with `CAL7_WINDOW_LAYOUT_SHA256` (the names `run_checks.sh` and the checkers use) selects a window-local layout such as the April tiles AP|RIL;
+with `CAL7_WINDOW_LAYOUT_SHA256` (the names `run_checks.sh` (#435; test `check_layout_input.sh`) and the checkers use) selects a window-local layout such as the April tiles AP|RIL;
 the pin is required, a wrong SHA-256 is an error before any output, and the layout SHA-256 is recorded in `PROGRESS.txt`, `segments.tsv` and the
 `beam_edge.jl` result line. A resumed chain (`prior=`) must carry the same layout SHA-256 in its earlier segments. Test: `test_window_chain_layout.jl`
-(unit tests and smoke runs without edges; `CAL7_LAYOUT_TEST_EDGE=1` adds one real edge into April 2027 with AP|RIL, about 2 minutes with 4 threads).
-The workflow does not pass the layout variables yet; the print and the month list are separate inputs.
+(unit tests, both producers as processes, one real edge into April 2027 with AP|RIL and a resume with the same and another layout; about 2 minutes with 4 threads).
+A `segments.tsv` of an older run has 10 columns and is rejected by `prior=` (no such run exists). Workflow input of the layout: PR #436.
 
 Inputs of the workflow: `research_ref` (a commit on `research/cube-display-feasibility`; the prepare job rejects any other commit),
 `months_path` and `months_sha256`, `root_month`, `print_path` and `print_sha256`, optional `best_effort_path`, `claims_path`, `start`,
@@ -263,7 +263,7 @@ Print B is `printing-S2` ([window-skip](evidence/window-skip/README.md), PR #413
 | Layout (April = `AP`, `RIL`; same file as the 2037-01 layout) | `research/calendar-7x7/row1-window-chain/evidence/print-b/layout.tsv` | `e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a` |
 | `printing-S2` (unchanged, `APR`, `IL`) | `evidence/window-skip/printing-S2.tsv` | `5808fcac697ffc600d87b60f39f459de47d2aac05b4b2bd5be86bae9b0f6edd3` |
 
-All hashes are in `evidence/print-b/sha256.txt`. The checkers read the target text from the layout, so Print B runs with its own layout: `check.jl` default and the producer still pin `row1-revision/layout.tsv` (`APR`, `IL`) and the workflow has no layout input. `run_checks.sh` takes a layout from `CAL7_WINDOW_LAYOUT` (month list mode), but the producer does not read it until cubistry #437 is merged, so no chain run uses Print B yet. Receipts
+All hashes are in `evidence/print-b/sha256.txt`. The checkers read the target text from the layout, so Print B runs with its own layout: `check.jl` and the producer default to `row1-revision/layout.tsv` (`APR`, `IL`). `run_checks.sh` takes a layout from `CAL7_WINDOW_LAYOUT` with `CAL7_WINDOW_LAYOUT_SHA256` (month list mode) and the producers `window_chain.jl` and `beam_edge.jl` read the same variables (see Layout input); the workflow input is cubistry #436 (on `main`). No chain run uses Print B yet. Receipts
 (Julia and Flix byte-identical): print matching of the 286 months of `months-S2.tsv` (SAT, legal states UNKNOWN, chain NOT_RUN) and the corner-lemma lists
 S2, S2-chain, 2026-02 and 2043-02. Layout hash and the April target hashes differ from the `printing-S2` receipts. Whether Print B is frozen is the
 owner's decision; this change does not state it. No chain was computed for Print B.
@@ -316,9 +316,7 @@ Open inputs (not decided here, so no defaults): the SHA-256 of Print C (root Jan
 stages. Each stage is its own run with its own list, root and print: 2026-01 .. 2050-01 (root 1980-01 gives a root edge), then
 1980-01 .. 2026-01 backward to the root, 1950-01 .. 1980-01, 1900-01 .. 1950-01 and 2050-01 .. 2100-01. Not supported by the producer:
 stages that start at a free state (chain.v3 `start` block) or join by digest (`CAL7_JOIN_START`, `CAL7_JOIN_END`), best-effort edges
-(chain.v2: wrong cells and Hall witnesses), and a window-local layout such as the April tiles AP|RIL of Print B in the producer
-(`window_chain.jl` and `beam_edge.jl` read `row1-revision/layout.tsv`). `run_checks.sh` takes another layout from
-`CAL7_WINDOW_LAYOUT` with `CAL7_WINDOW_LAYOUT_SHA256` (month list mode only; test: `check_layout_input.sh`). The coverage summary (`month_coverage.jl`) is not run by the verify job. The workflow was never run.
+(chain.v2: wrong cells and Hall witnesses). A window-local layout such as the April tiles AP|RIL of Print B is supported (see Layout input). The coverage summary (`month_coverage.jl`) is not run by the verify job. The workflow was never run.
 
 ## Scope and limits
 
