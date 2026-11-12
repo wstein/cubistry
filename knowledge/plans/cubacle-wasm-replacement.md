@@ -119,10 +119,16 @@ coordinator session, as recorded there):
   file is a follow-up PR with a compatibility check). This plan states no license
   for them and does not contradict it.
 
-**SM2** (V2 as the compact token derived from the canonical model, owned by
-flix-orbit64) and **SM8** (one ReScript Orbit64 V2 module in PuzlWerk) are marked
-as open proposals in that record at `0bd5f72e` (**P**, not **O**); this plan follows
-them only as proposals. Until the cubacle plan is updated for SM1 and SM4 (a
+- **SM2:** Orbit64 V2 is a derived compact token (codec from and to wire-v1,
+  backed by vectors), not a model of its own.
+- **SM8:** the ReScript ports of the Facelet and V2 codecs in CubeLab and
+  CubeAssembler are replaced by generated codecs once the generator and the vectors
+  exist; one PR per repository, each with owner approval.
+
+SM2 and SM8 are owner answers of 2026-11-12 given as a multiple-choice answer to
+the coordinator. The source is that coordinator session; puzlwerk#49 at
+`0bd5f72e` still lists them as open and has not caught up yet. Until the cubacle
+plan is updated for SM1 and SM4 (a
 follow-up docs PR in `wstein/cubacle`, puzlwerk#49 plan.md section 3):
 
 - **Do not start** cubacle stacks **B** (own `kpuzzle` algebra) or **M** (target modes).
