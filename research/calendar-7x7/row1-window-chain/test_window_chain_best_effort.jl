@@ -51,7 +51,7 @@ st(rows,m)=only(r for r in rows if r[1]==m)
         @test_throws "not empty" best_effort_board(board,(6,1))
         full=copy(board);full[7,1]=("29","red");@test_throws "already shows" best_effort_board(full,(7,1))
     end
-    @testset "edge lines and header (chain.v2 as the three checkers read it)" begin
+    @testset "edge lines and header" begin
         @test best_effort_edge_lines((7,1))==["wrong\t7\t1","hall\t7,1;7,7"]
         @test best_effort_edge_lines((7,7))==["wrong\t7\t7","hall\t7,1;7,7"]
         @test chain_header(false)=="cubistry.calendar7.chain.v1" && chain_header(true)=="cubistry.calendar7.chain.v2"
@@ -103,7 +103,7 @@ function state_rows(path)       # a state file as the decoded state of the check
     [(id=parse(Int,f[1]),piece=parse(Int,f[2]),pos=t(f[3]),normal=t(f[4]),up=t(f[5]),text=f[6],ink=f[7]) for f in (split(l,'\t';keepempty=true) for l in readlines(path)[2:end])]
 end
 if get(ENV,"CAL7_BE_REAL","1")!="0"
-@testset "real best-effort edge 2026-02 on print C (root 2019-01 identity pose, edge 1 best-effort, edge 2 exact)" begin
+@testset "real best-effort edge 2026-02" begin
     mktempdir() do d
         months=joinpath(d,"months.tsv");write(months,"2026-02\n2026-03\n")
         best=joinpath(d,"best.tsv");write(best,"month\tstatus\twrong_cells\tevidence\n2026-02\tbest_effort_unverified\t7,1\tevidence/config-coverage/best-effort-feb-sunday-28.tsv\n")
