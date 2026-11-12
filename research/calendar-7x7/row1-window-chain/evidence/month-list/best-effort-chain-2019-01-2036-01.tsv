@@ -1,2 +1,2 @@
 month	status	wrong_cells	evidence
-2026-02	best_effort_unverified	7,1	../config-coverage/best-effort-feb-sunday-28.tsv (print C rows; fallback 7,7)
+2026-02	best_effort_unverified	7,1	february-hall-C.tsv
