@@ -594,6 +594,10 @@ test("host presentation keeps the committed face and the viewer, and the Escape 
   const before = await page.locator("#calendar-front").textContent();
   await page.locator("#presentation-btn").click();
   await expect(page.locator("body")).toHaveClass(/presentation-mode/);
+  await expect(page.locator("#calendar-digital")).toBeVisible();
+  for (const id of ["#calendar-design", "#calendar-date", "#calendar-decrement", "#calendar-increment", "#calendar-live", "#calendar-speed"]) {
+    await expect(page.locator(id)).not.toBeVisible();
+  }
   await expect(page.locator("#calendar-viewer canvas")).toHaveCount(1);
   const canvas = await page.locator("#calendar-viewer canvas").boundingBox();
   const viewport = page.viewportSize();

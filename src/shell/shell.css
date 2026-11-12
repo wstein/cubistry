@@ -773,6 +773,11 @@ body.presentation-mode .shell .shell-primary,
 body.presentation-mode .shell .shell-controls.clock-control .hud-header {
   display: none;
 }
+/* The calendar panel keeps only the digital date; its print, date and speed controls hide. */
+body.presentation-mode .shell .shell-controls:has(.calendar-controls) .hud-header,
+body.presentation-mode .shell .calendar-controls > :not(#calendar-digital) {
+  display: none;
+}
 body.presentation-mode .shell .shell-footer {
   position: fixed;
   bottom: var(--sp-4);
