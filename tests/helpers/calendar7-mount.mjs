@@ -66,7 +66,8 @@ export const attr = async (root, name, want) => {
   for (let i = 0; i < 200000 && root.getAttribute(name) !== want; i++) await Promise.resolve();
   assert.equal(root.getAttribute(name), want);
 };
-export const setup = ({ fail = false, search: initialSearch = "", now = new Date(2026, 10, 10), createStage } = {}) => {
+/** `dir`: the data folder served as the canonical data (default the long chain C; the former names demo folder has no best-effort file and gets an empty list). */
+export const setup = ({ fail = false, search: initialSearch = "", now = new Date(2026, 10, 10), createStage, dir = "chain-c" } = {}) => {
   const stage = fakeStage();
   const host = { hidden: false };
   const calls = { fetched: [], query: [] };
@@ -76,8 +77,9 @@ export const setup = ({ fail = false, search: initialSearch = "", now = new Date
     fetchJson: async (url) => {
       calls.fetched.push(url);
       if (fail) throw new Error("HTTP 404");
-      const dir = "public/calendar7/names-demo/";
-      return json(dir + url.split("/").pop());
+      const name = url.split("/").pop();
+      if (name === "best-effort.v1.json" && dir !== "chain-c") return { schema: "cubistry.calendar7.best-effort", version: 1, months: [] };
+      return json(`public/calendar7/${dir}/${name}`);
     },
     now: () => now,
     search: () => search,

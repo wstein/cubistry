@@ -14,7 +14,12 @@ export { moveToken, rawToken } from "./notation.ts";
 import { type Move } from "./engine.ts";
 import type { Cell } from "./display.ts";
 import type { DisplayTable, Edge, Graph } from "./graph.ts";
-import { type Layout, NAMES_DEMO_LABEL } from "./layout.ts";
+import { type Layout, CHAIN_C_LABEL } from "./layout.ts";
+import { bestEffortSentence } from "./anydate.ts";
+import type { BestEffortMonth } from "./graph.ts";
+
+/** Month table of a best-effort page: the cube is the display, so the table is text for screen readers only (visually hidden). */
+export const HIDDEN_SHEET_CLASS = "c7-sr-only";
 
 export interface YearMonth {
   readonly year: number;
@@ -181,8 +186,8 @@ export interface PageModel {
   readonly layout?: Layout;
   /** Present when the month is shown from print B without a move sequence (names layout for any date; see anydate-view.ts). */
   readonly anyDate?: { readonly kind: "state" | "best-effort" | "none" | "pending"; readonly key: string; readonly wrong?: readonly (readonly [number, number])[] };
-  /** True for the names demo data (beam chain, print window-2029-12): the range line says so. */
-  readonly demo?: boolean;
+  /** True for a page of the canonical long chain C data: the range line says so. */
+  readonly longChain?: boolean;
   /** Present for an "ok" choice. */
   readonly cells?: readonly Cell[];
   readonly prev: Step | null;
@@ -278,12 +283,15 @@ export function pageHtml(model: PageModel, options: WordOptions = DEFAULT_WORD_O
   }
   return (
     `<div class="c7-page"><h2 class="c7-month" tabindex="-1" data-focus data-month="${ymKey(choice.ym)}">${esc(monthLabel(choice.ym))}</h2>` +
-    sheetHtml(model.cells as readonly Cell[], `7x7 calendar sheet, ${monthLabel(choice.ym)}`) +
+    (model.anyDate?.kind === "best-effort"
+      ? `<p class="c7-best-effort" role="status" data-c7-best-effort>${esc(bestEffortSentence(model.anyDate.wrong ?? []))}</p>` +
+        `<div class="${HIDDEN_SHEET_CLASS}" data-c7-sheet-hidden>${sheetHtml(model.cells as readonly Cell[], `7x7 calendar sheet, ${monthLabel(choice.ym)}`)}</div>`
+      : sheetHtml(model.cells as readonly Cell[], `7x7 calendar sheet, ${monthLabel(choice.ym)}`)) +
     `<div class="c7-steps">${stepHtml(model.prev, "Previous", `No earlier month: ${monthLabel(range.first)} is the start of the chain.`, options)}` +
     `${stepHtml(model.next, "Next", `No later month: ${monthLabel(range.last)} is the end of the chain.`, options)}` +
     `<p class="c7-legend" data-c7-legend>${LEGEND}</p></div>` +
-    (model.demo
-      ? `<p class="c7-range" data-c7-demo>DEMO, not a final print: ${esc(NAMES_DEMO_LABEL)}. Window: ${esc(rangeText)}, ${range.edges} steps (May to Nov 2026 stored greedy edges, Dec 2026 to Jun 2027 beam edges). Research candidate, not certified.</p>`
+    (model.longChain
+      ? `<p class="c7-range" data-c7-chain>${esc(CHAIN_C_LABEL)}. Chain: ${esc(rangeText)}, ${range.edges} steps. Research candidate, not certified; print C is not frozen.</p>`
       : model.layout === "names"
       ? `<p class="c7-range">Names layout window: ${esc(rangeText)}, ${range.edges} steps. Research candidate, not certified; not proven outside this window.</p>`
       : `<p class="c7-range">Proven chain: ${esc(rangeText)}, ${range.edges} steps.</p>`) + `${status}</div>`
@@ -297,16 +305,19 @@ export function buildModel(
   choice: MonthChoice,
   today: YearMonth,
   layout: Layout = "standard",
-  demo = false,
+  longChain = false,
+  bestEffort: readonly BestEffortMonth[] = [],
 ): PageModel {
   const range = chainRange(graph);
-  if (choice.kind !== "ok") return { choice, range, today, layout, demo, prev: null, next: null };
+  if (choice.kind !== "ok") return { choice, range, today, layout, longChain, prev: null, next: null };
+  const wrong = bestEffort.find((b) => b.year === choice.ym.year && b.month === choice.ym.month)?.wrong;
   return {
     choice,
     range,
     today,
     layout,
-    demo,
+    longChain,
+    ...(wrong ? { anyDate: { kind: "best-effort" as const, key: "", wrong } } : {}),
     cells: sheetCells(graph, table, range, choice.ym),
     prev: stepFrom(graph, range, choice.ym, -1),
     next: stepFrom(graph, range, choice.ym, 1),

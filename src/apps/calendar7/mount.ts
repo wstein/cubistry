@@ -5,7 +5,7 @@ import type { Block } from "./blocks.ts";
 import type { RotationPlacement } from "./deferral.ts";
 import { revealPlayback, resetPlaybackVisibility } from "./playback-visibility.ts";
 import type { ModeInstance } from "../registry.ts";
-import { type DisplayTable, type Graph, namesWindowContains, parseDisplays, parseGraph, parseState, type Start } from "./graph.ts";
+import { type BestEffortMonth, type DisplayTable, type Graph, namesWindowContains, parseBestEffort, parseDisplays, parseGraph, parseState, type Start } from "./graph.ts";
 import { printNameWords, type Layout, DEMO_DISPLAY_ONLY_NOTICE, LAYOUT_PARAM } from "./layout.ts";
 import { type AnyData, type AnyState, chooseAnyMonth, previewForDate, stateForDate, wrongStickerIndices } from "./anydate.ts";
 import { anyDateModel, anyDatePageHtml } from "./anydate-view.ts";
@@ -74,9 +74,9 @@ const MY_PARAMS = ["year", "month"];
 /** The data of one layout: its graph, displays and (with a 3D view) the print and the pose of the chain root. */
 interface Dataset {
   readonly layout: Layout;
-  /** True for the names demo data (beam chain): same rendering as `names`, another data folder, labeled as a demo. */
-  readonly demo?: boolean;
   readonly graph: Graph;
+  /** Chain months the print cannot show exactly (the wrong cells of the cube). */
+  readonly bestEffort: readonly BestEffortMonth[];
   readonly table: DisplayTable;
   readonly start: Start | null;
   readonly range: ChainRange;
@@ -123,17 +123,19 @@ export async function mountCalendar7(
     '<div class="c7-view"><p class="c7-loading">Loading the 7x7 calendar data…</p></div>';
   const view = root.querySelector(".c7-view") as HTMLElement;
   const live = root.querySelector(".c7-live") as HTMLElement;
-  const [graphJson, displaysJson, stateJson] = await Promise.all([
-    env.fetchJson(`${env.base}calendar7/names-demo/graph.v1.json`),
-    env.fetchJson(`${env.base}calendar7/names-demo/displays.v1.json`),
-    env.fetchJson(`${env.base}calendar7/names-demo/state.v1.json`),
+  // The canonical data: the long chain on print C (docs/CALENDAR7_CHAIN_C.md). Fetched when the mode opens, never bundled.
+  const [graphJson, displaysJson, stateJson, bestEffortJson] = await Promise.all([
+    env.fetchJson(`${env.base}calendar7/chain-c/graph.v1.json`),
+    env.fetchJson(`${env.base}calendar7/chain-c/displays.v1.json`),
+    env.fetchJson(`${env.base}calendar7/chain-c/state.v1.json`),
+    env.fetchJson(`${env.base}calendar7/chain-c/best-effort.v1.json`),
   ]);
   if (!env.isCurrent()) return;
   const canonicalGraph = parseGraph(graphJson);
   const canonical: Dataset = {
     layout: "names",
-    demo: true,
     graph: canonicalGraph,
+    bestEffort: parseBestEffort(bestEffortJson),
     table: parseDisplays(displaysJson),
     start: parseState(stateJson),
     range: chainRange(canonicalGraph),
@@ -163,6 +165,8 @@ export async function mountCalendar7(
   let anyWrongKey = "";
   /** True while the cube is configured with the fixed preview print for the any-date display (the player is then disposed). */
   let anyBound = false;
+  /** The wrong stickers the cube was built with while the player owns it (best-effort chain month); "" for none. */
+  let stageWrong = "";
   let anyBoundStart: Start | null = null;
   let activeAnyData: AnyData | null = null;
   let anyLabel = "";
@@ -347,6 +351,7 @@ export async function mountCalendar7(
     setInactive(q("reset"), !player);
     if (target) stage?.setLabel(`7x7 calendar cube showing ${monthLabel(target)}`);
     if (!active && player) {
+      setWrong(snap.index);
       root.setAttribute("data-c7-state", "idle");
       // Test hook and proof for readers: the digest of the pose the view shows, computed here, not copied from the graph.
       root.setAttribute("data-c7-digest", stateDigest((played.start as { printing: Printing }).printing, player.shownPose));
@@ -412,6 +417,7 @@ export async function mountCalendar7(
     anyBoundStart = null;
     made.setHomePose?.(data.layout === "names" ? s.pose : null); // the root pose of the standard print is a setup, not the solved cube
     made.configure(s.printing, s.pose, "face", data.layout);
+    stageWrong = "";
     player = new Calendar7Player({
       graph: data.graph,
       printing: s.printing,
@@ -424,6 +430,20 @@ export async function mountCalendar7(
       orientation: wordOptions.orientation,
     });
     player.setSpeed(selectedSpeed);
+  };
+
+  /** Rebuilds the cube at the pose it shows when the wrong cells of node `index` differ from those it was built with (the cube is idle). */
+  const setWrong = (index: number, clear = false): void => {
+    const made = stage, p = player;
+    if (!made || !p) return;
+    const node = played.graph.nodes[index];
+    const entry = clear ? undefined : played.bestEffort.find((b) => b.year === node.year && b.month === node.month);
+    const wrong = entry ? wrongStickerIndices(p.shownPose, entry.wrong) : [];
+    const key = wrong.join(",");
+    if (key === stageWrong) return;
+    const s = played.start as NonNullable<Dataset["start"]>;
+    stageWrong = key;
+    made.configure(s.printing, clonePose(p.shownPose), "face", played.layout, wrong);
   };
 
   const syncStage = async (index: number | null, data: Dataset = shown): Promise<void> => {
@@ -448,6 +468,8 @@ export async function mountCalendar7(
       if (wanted === null) return;
       bind(wantedData);
       if (!player) return;
+      // Leaving a best-effort month: the cube is rebuilt without its wrong cell before the step starts (only between moves).
+      if (stageWrong !== "" && player.snapshot.phase === "idle" && player.snapshot.index !== wanted) setWrong(player.snapshot.index, true);
       player.go(wanted);
     } catch (error) {
       if (alive()) fail(error as Error);
@@ -472,7 +494,7 @@ export async function mountCalendar7(
     activeAnyData = data;
     const choice = chooseAnyMonth(p, today);
     const state = choice.kind === "ok" ? stateForDate(data, choice.ym.year, choice.ym.month) : null;
-    const model = { ...anyDateModel(choice, state, today, canonical.range, printNameWords(data.start.printing)), demo: true };
+    const model = { ...anyDateModel(choice, state, today, canonical.range, printNameWords(data.start.printing)), longChain: true };
     anyActive = true;
     anyWanted = state?.kind === "state" || state?.kind === "best-effort" ? state : null;
     currentModel = model;
@@ -549,8 +571,8 @@ export async function mountCalendar7(
     activeAnyData = null;
     shown = canonical;
     currentModel = choice.kind === "ok"
-      ? buildModel(canonical.graph, canonical.table, chooseMonth(p, today, canonical.range), today, "names", true)
-      : { ...anyDateModel(choice, null, today, canonical.range), demo: true };
+      ? buildModel(canonical.graph, canonical.table, chooseMonth(p, today, canonical.range), today, "names", true, canonical.bestEffort)
+      : { ...anyDateModel(choice, null, today, canonical.range), longChain: true };
     if (threeD) {
       root.setAttribute("data-c7-layout", "names");
       root.setAttribute("data-c7-layout-mode", "names");

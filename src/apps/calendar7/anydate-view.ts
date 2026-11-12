@@ -2,12 +2,11 @@
 /** Page body of the names layout for any date (display only, print B). Pure HTML strings, DOM-free. */
 import { ANY_FIRST_YEAR, ANY_LAST_YEAR, GREGORIAN_FROM_YEAR, bestEffortSentence, cellWhere, namesCells, type AnyState, type AnyChoice } from "./anydate.ts";
 import { ANY_DISPLAY_ONLY_NOTICE, DEMO_DISPLAY_ONLY_NOTICE, NAME_WORDS, type NameWords } from "./layout.ts";
-import { esc, MONTH_NAMES_EN, monthLabel, sheetHtml, ymKey, type PageModel, type ChainRange, type YearMonth } from "./month-view.ts";
+import { esc, HIDDEN_SHEET_CLASS, MONTH_NAMES_EN, monthLabel, sheetHtml, ymKey, type PageModel, type ChainRange, type YearMonth } from "./month-view.ts";
 
 const WEEKDAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 export const NO_STATE_LEAD = "No state for this date with the print.";
-/** Month table of a best-effort page: the cube is the display, so the table is text for screen readers only (visually hidden). */
-export const HIDDEN_SHEET_CLASS = "c7-sr-only";
+export { HIDDEN_SHEET_CLASS };
 
 /** The model of an any-date page. `range` is only carried for the shared model type. */
 export function anyDateModel(choice: AnyChoice, state: AnyState | null, today: YearMonth, range: ChainRange, words: NameWords = NAME_WORDS): PageModel {
@@ -50,7 +49,7 @@ export function anyDatePageHtml(model: PageModel): string {
     );
   const any = model.anyDate;
   const label = monthLabel(choice.ym);
-  const mismatch = model.demo
+  const mismatch = model.longChain
     ? `Preview mismatch: ${ (any?.wrong ?? []).map(([r, c]) => `cell ${cellWhere(r, c)}`).join("; ") } differs.`
     : bestEffortSentence(any?.wrong ?? []);
   const verdict =
@@ -68,7 +67,7 @@ export function anyDatePageHtml(model: PageModel): string {
     `<div class="c7-page" data-c7-any><h2 class="c7-month" tabindex="-1" data-focus data-month="${ymKey(choice.ym)}">${esc(label)}</h2>` +
     verdict +
     (any?.kind === "best-effort" ? `<div class="${HIDDEN_SHEET_CLASS}" data-c7-sheet-hidden>${sheet}</div>` : sheet) +
-    `<p class="c7-range" data-c7-any-range>${esc(model.demo ? DEMO_DISPLAY_ONLY_NOTICE : ANY_DISPLAY_ONLY_NOTICE)} Board configuration: ${esc(any ? configText(any.key) : "")}. ` +
-    `Years ${ANY_FIRST_YEAR} to ${ANY_LAST_YEAR}.${calendar} ${model.demo ? "Same beam preview print. Move reachability is unverified. DEMO, not a final print." : "Print B is not frozen."} Research candidate, not certified.</p></div>`
+    `<p class="c7-range" data-c7-any-range>${esc(model.longChain ? DEMO_DISPLAY_ONLY_NOTICE : ANY_DISPLAY_ONLY_NOTICE)} Board configuration: ${esc(any ? configText(any.key) : "")}. ` +
+    `Years ${ANY_FIRST_YEAR} to ${ANY_LAST_YEAR}.${calendar} ${model.longChain ? "Same print C. Move reachability is unverified. Print C is not frozen." : "Print B is not frozen."} Research candidate, not certified.</p></div>`
   );
 }
