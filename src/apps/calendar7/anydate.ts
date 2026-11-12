@@ -11,7 +11,7 @@
 import { type Cell, cellFailure, daysInMonth, firstWeekday, IMAGE_UPS, monthCells } from "./display.ts";
 import { type Pose, type Printing, STICKERS } from "./engine.ts";
 import { parseState, type Start } from "./graph.ts";
-import { NAME_WORDS } from "./layout.ts";
+import { NAME_WORDS, printNameWords, type NameWords } from "./layout.ts";
 
 export const CONFIGS_SCHEMA = "cubistry.calendar7.configs";
 /** Years accepted: 1 to 9999, proleptic Gregorian calendar (the rule of `firstWeekday` and `daysInMonth`). */
@@ -45,9 +45,9 @@ export function allConfigs(): Config[] {
 }
 
 /** The 49 cells of the names layout of a month: the month name tiles and band tiles in row 1, then the calendar rows. */
-export function namesCells(year: number, month: number): Cell[] {
+export function namesCells(year: number, month: number, words: NameWords = NAME_WORDS): Cell[] {
   const row1: Cell[] = Array.from({ length: 7 }, (_, c) => {
-    const text = NAME_WORDS[month - 1][c] ?? "";
+    const text = words[month - 1][c] ?? "";
     return { text, ink: text === "" ? "band" : "month" };
   });
   return row1.concat(monthCells(year, month).slice(7));
@@ -337,6 +337,16 @@ export interface AnyData {
   readonly start: Start;
   readonly entries: ReadonlyMap<string, AnyEntry>;
 }
+/** One requested board on an existing print; application matching only, no move reachability claim or stored corpus. */
+export function previewForDate(start: Start, year: number, month: number): AnyData {
+  const config = configOf(year, month);
+  const matching = bestEffortFront(start.printing, start.pose, namesCells(year, month, printNameWords(start.printing)));
+  const entry: AnyEntry = matching.wrong.length
+    ? { key: config.key, status: "best-effort", source: "application-matching", front: matching.front, wrong: matching.wrong, reason: "Application front matching only; move reachability is unverified." }
+    : { key: config.key, status: "match", source: "application-matching", front: matching.front };
+  return { start, entries: new Map([[config.key, entry]]) };
+}
+
 type Json = Record<string, unknown>;
 
 /** Parses names-any/state.v1.json (print B and its identity pose) and configs.v1.json; all 91 configurations must be present once. */
