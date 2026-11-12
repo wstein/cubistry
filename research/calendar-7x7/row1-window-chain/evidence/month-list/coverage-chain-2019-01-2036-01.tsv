@@ -1,0 +1,7 @@
+headline	planned-exact-gapless	2019-01	2026-01	85
+list	4ad43a5997ec019fd0383d7d853589213d09c2bb4e20179e1cdb94df5c6a66c3	205	root	2019-01	start	2019-01	range	2026-01	2036-01
+counts	chain_members	205	planned_exact_runs	2	best_effort	1	gaps	0	bridges	0	before_start	0
+kind	from	to	count	status	evidence
+run	2019-01	2026-01	85	planned_exact	
+run	2026-03	2036-01	119	planned_exact	
+best_effort	2026-02	2026-02	1	best_effort_unverified	wrong=7,1 evidence=../config-coverage/best-effort-feb-sunday-28.tsv (print C rows; fallback 7,7)
