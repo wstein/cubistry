@@ -17,9 +17,14 @@ if [[ -n "${CAL7_WINDOW_MONTHS:-}" ]]; then
     export CAL7_WINDOW_MONTHS CAL7_WINDOW_MONTHS_SHA256="${CAL7_WINDOW_MONTHS_SHA256:?month list SHA-256}" CAL7_WINDOW_PRINT_SHA="${CAL7_WINDOW_PRINT_SHA:?print SHA-256}"
     flix_extra=(months "$CAL7_WINDOW_MONTHS" "$CAL7_WINDOW_MONTHS_SHA256" "$CAL7_WINDOW_PRINT_SHA"); [[ -z "${CAL7_WINDOW_LAYOUT_SHA256:-}" ]] || { export CAL7_WINDOW_LAYOUT_SHA256; flix_extra+=("$CAL7_WINDOW_LAYOUT_SHA256"); }
     if [[ -n "${CAL7_ROOT_MONTH:-}" ]]; then export CAL7_ROOT_MONTH; [[ -n "${CAL7_WINDOW_LAYOUT_SHA256:-}" ]] || flix_extra+=(-); flix_extra+=("$CAL7_ROOT_MONTH"); fi
-    # CAL7_BEST_EFFORT_29=1: the 29 rule of the best-effort edge (Julia checkers: environment; Flix: last argument 29, junction digests -).
-    if [[ "${CAL7_BEST_EFFORT_29:-}" == 1 ]]; then
-        export CAL7_BEST_EFFORT_29; while (( ${#flix_extra[@]} < 6 )); do flix_extra+=(-); done; flix_extra+=(- - 29)
+    # CAL7_BEST_EFFORT_29=1: the 29 rule of the best-effort edge (Julia checkers: environment; Flix: last argument 29).
+    # CAL7_JOIN_START / CAL7_JOIN_END (64 hex or identity): the digest the start (end) state must have; the Julia checkers read the environment, Flix takes them as the two
+    # arguments after the root month (- for none). A backward chain (window_chain.jl direction=backward) is checked with CAL7_JOIN_END=identity.
+    js=${CAL7_JOIN_START:-}; je=${CAL7_JOIN_END:-}
+    if [[ -n "$js$je" || "${CAL7_BEST_EFFORT_29:-}" == 1 ]]; then
+        while (( ${#flix_extra[@]} < 6 )); do flix_extra+=(-); done; flix_extra+=("${js:--}" "${je:--}")
+        [[ -z "$js" ]] || export CAL7_JOIN_START; [[ -z "$je" ]] || export CAL7_JOIN_END
+        [[ "${CAL7_BEST_EFFORT_29:-}" != 1 ]] || { export CAL7_BEST_EFFORT_29; flix_extra+=(29); }
     fi
 else
     window_end=${WINDOW_END:-2028-01}; export WINDOW_END="$window_end"
