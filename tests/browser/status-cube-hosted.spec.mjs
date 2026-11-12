@@ -244,7 +244,8 @@ for (const resource of ["distances.u8", "quality-build-open.svg"])
     );
     await page.goto("/index.html?app=ci");
     await expect(errorText(page)).toContainText("integrity");
-    await expect(readout(page).nth(0)).toHaveText("Not configured");
+    await expect(chip(page)).toContainText("Initialization failed");
+    await expect(page.locator("#status-viewer")).toHaveAttribute("data-current", "");
     await expect(page.locator("#status-build")).toBeDisabled();
     await expect(primary(page)).toHaveText("Reload application");
   });
@@ -416,8 +417,8 @@ test("the mode registers under ?app=ci, reports ready and keeps the shell region
   await expect(page.locator('[data-slot="1"]')).toBeVisible();
   await expect(page.locator('[data-slot="2"]')).toBeVisible();
   for (const n of [3, 4, 5]) await expect(page.locator(`[data-slot="${n}"]`)).toBeHidden();
-  await expect(readout(page)).toHaveCount(3);
-  await expect(readout(page).nth(0)).toHaveText("BUILD: Open · TEST: Open · ANALYZE: Open · REVIEW: Open");
+  await expect(readout(page)).toHaveText(["0 / 0 HTM", "0"]);
+  await expect(chip(page)).toContainText("In sync · BUILD: Open · TEST: Open · ANALYZE: Open · REVIEW: Open");
   expect(errors).toEqual([]);
 });
 
@@ -428,11 +429,12 @@ test("URL parameters turn, build, test, analyze and review set the speed and the
   await expect(page.locator("#status-viewer")).toHaveAttribute("data-current", "ok,error,open,open", { timeout: 30000 });
   await expect(page.locator("#status-viewer")).toHaveAttribute("data-sync", "idle");
   await expect(page.locator("#status-analyze")).toHaveValue("open");
-  // The address bar follows the user's choices without a history entry.
-  const entries = await page.evaluate(() => history.length);
-  await page.selectOption("#status-review", "blocked");
-  await expect(page).toHaveURL(/[?&]review=blocked(&|$)/);
+  // The category parameters are a one-time request and leave the address bar; turn follows the control, with no history entry.
+  await expect(page).not.toHaveURL(/[?&](build|test|analyze|review)=/);
   await expect(page).toHaveURL(/[?&]turn=50(&|$)/);
+  const entries = await page.evaluate(() => history.length);
+  await page.selectOption("#status-speed", "100");
+  await expect(page).toHaveURL(/[?&]turn=100(&|$)/);
   expect(await page.evaluate(() => history.length)).toBe(entries);
 });
 

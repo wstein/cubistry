@@ -172,7 +172,16 @@ function fixture({ current = () => true, definitionRaw, configureError = false }
   };
   const root = new El("div");
   const ctx = { isCurrent: current, shell };
-  return { env, root, ctx, shell, log, slots, pending, counts, release, get primary() { return primary; }, guarded };
+  const find = (id) => {
+    for (const spec of [{ element: root }, ...Object.values(slots)]) {
+      for (const el of [spec.element].flat()) {
+        const hit = el.find?.(id);
+        if (hit) return hit;
+      }
+    }
+    return null;
+  };
+  return { env, root, ctx, shell, log, slots, pending, counts, release, find, get primary() { return primary; }, guarded };
 }
 async function step(f) {
   assert.equal(f.pending.length, 1);
@@ -188,7 +197,7 @@ test("mount fills dock slots 1 and 2, the chip, primary action, readout and the 
   const loading = mountStatus(f.root, q(""), f.ctx, f.env);
   await flush();
   assert.deepEqual(f.shell.chip, { state: "sync", text: "Loading the fixed workflow print…" });
-  assert.equal(f.root.find("status-build").disabled, true, "controls wait for the print");
+  assert.equal(f.find("status-build").disabled, true, "controls wait for the print");
   f.release();
   const instance = await loading;
   assert.equal(typeof instance?.dispose, "function");
@@ -197,40 +206,47 @@ test("mount fills dock slots 1 and 2, the chip, primary action, readout and the 
   assert.equal(f.slots[2].label, "Workflow");
   assert.equal(f.primary.spec.label, "Send event");
   assert.equal(f.primary.disabled, false);
-  assert.deepEqual(f.shell.readout, ["BUILD: Open · TEST: Open · ANALYZE: Open · REVIEW: Open", "BUILD: Open · TEST: Open · ANALYZE: Open · REVIEW: Open", "0 / 0 HTM · Session 0"]);
+  assert.deepEqual(f.shell.readout, ["0 / 0 HTM", "0"]);
+  assert.match(f.shell.chip.text, /^In sync · BUILD: Open · TEST: Open · ANALYZE: Open · REVIEW: Open$/);
   assert.equal(f.shell.nerd.title, "Recent local events");
+  const drawer = new El("div");
+  f.shell.nerd.render(drawer);
+  const [facts] = drawer.children;
+  assert.deepEqual(facts.children.map((c) => c.textContent), ["Last completed snapshot", "BUILD: Open · TEST: Open · ANALYZE: Open · REVIEW: Open", "Requested snapshot", "BUILD: Open · TEST: Open · ANALYZE: Open · REVIEW: Open"]);
   assert.equal(f.shell.chip.state, "done");
-  assert.equal(f.root.find("status-viewer").dataset.sync, "idle");
-  assert.equal(f.root.find("status-viewer").dataset.current, "open,open,open,open");
-  assert.equal(f.root.find("status-front").textContent, "BUILD OFFEN · TEST OFFEN · ANALYZE OFFEN · REVIEW OFFEN");
+  assert.equal(f.find("status-viewer").dataset.sync, "idle");
+  assert.equal(f.find("status-viewer").dataset.appearanceDock, "view-controls");
+  assert.equal(f.find("status-viewer").dataset.current, "open,open,open,open");
+  assert.equal(f.find("status-front").textContent, "BUILD OFFEN · TEST OFFEN · ANALYZE OFFEN · REVIEW OFFEN");
   assert.ok(statusController, "the controller hook is set while mounted");
   instance.dispose();
   assert.equal(statusController, null, "the hook is cleared on dispose");
 });
 
-test("a send event action moves the cube, writes history to the Nerd drawer and keeps the URL parameters in sync", async () => {
+test("a send event action moves the cube, writes history to the Nerd drawer and leaves the URL parameters alone", async () => {
   const f = fixture();
   f.release();
   const instance = await mountStatus(f.root, q(""), f.ctx, f.env);
-  f.root.find("status-event").value = "start";
+  f.find("status-event").value = "start";
   f.primary.spec.onClick();
   await flush();
-  assert.equal(f.root.find("status-viewer").dataset.requested, "running,open,open,open");
-  assert.equal(f.root.find("status-viewer").dataset.sync, "moving");
+  assert.equal(f.find("status-viewer").dataset.requested, "running,open,open,open");
+  assert.equal(f.find("status-viewer").dataset.sync, "moving");
   assert.equal(f.shell.chip.state, "moving");
-  assert.equal(f.env.urlOwn, "build=running");
+  assert.equal(f.env.urlOwn, "", "the address bar only follows turn; a reload recovers to the initial snapshot");
   assert.ok(f.log.includes("nerd-refresh"));
   const body = new El("div");
   f.shell.nerd.render(body);
-  assert.match(body.children[0].children.map((li) => li.textContent).join("|"), /build: Start or retry/);
+  assert.match(body.children[1].children.map((li) => li.textContent).join("|"), /build: Start or retry/);
+  assert.equal(body.children[0].children[3].textContent, "BUILD: Running · TEST: Open · ANALYZE: Open · REVIEW: Open", "the drawer shows the requested snapshot");
   await settle(f);
-  assert.equal(f.root.find("status-viewer").dataset.current, "running,open,open,open");
+  assert.equal(f.find("status-viewer").dataset.current, "running,open,open,open");
   // A transition that the workflow rejects shows an error row and leaves the cube alone.
-  f.root.find("status-event").value = "passed";
-  f.root.find("status-event-category").value = "test";
+  f.find("status-event").value = "passed";
+  f.find("status-event-category").value = "test";
   f.primary.spec.onClick();
   assert.match(f.shell.errorRow.text, /not allowed/);
-  assert.equal(f.root.find("status-viewer").dataset.requested, "running,open,open,open");
+  assert.equal(f.find("status-viewer").dataset.requested, "running,open,open,open");
   instance.dispose();
 });
 
@@ -239,15 +255,17 @@ test("URL parameters set the quarter-turn time and the requested snapshot after 
   f.release();
   const instance = await mountStatus(f.root, q("turn=100&build=ok&review=blocked"), f.ctx, f.env);
   assert.deepEqual(f.counts.speed[0], [75 / 100, "quarter-turn"]);
-  assert.equal(f.root.find("status-speed").value, "100");
-  assert.equal(f.root.find("status-viewer").dataset.requested, "ok,open,open,blocked");
-  assert.equal(f.root.find("status-build").value, "ok");
+  assert.equal(f.find("status-speed").value, "100");
+  assert.equal(f.env.urlOwn, "turn=100", "the category parameters are consumed and leave the address bar");
+  assert.deepEqual(f.env.urlKeys, ["turn", "build", "test", "analyze", "review"]);
+  assert.equal(f.find("status-viewer").dataset.requested, "ok,open,open,blocked");
+  assert.equal(f.find("status-build").value, "ok");
   await settle(f);
-  assert.equal(f.root.find("status-viewer").dataset.current, "ok,open,open,blocked");
-  f.root.find("status-speed").value = "50";
-  f.root.find("status-speed").fire("change");
+  assert.equal(f.find("status-viewer").dataset.current, "ok,open,open,blocked");
+  f.find("status-speed").value = "50";
+  f.find("status-speed").fire("change");
   assert.deepEqual(f.counts.speed.at(-1), [75 / 50, "quarter-turn"]);
-  assert.equal(f.env.urlOwn, "turn=50&build=ok&review=blocked");
+  assert.equal(f.env.urlOwn, "turn=50");
   instance.dispose();
 });
 
@@ -255,9 +273,9 @@ test("invalid URL parameters leave the defaults and request nothing", async () =
   const f = fixture();
   f.release();
   const instance = await mountStatus(f.root, q("turn=7&build=bogus"), f.ctx, f.env);
-  assert.equal(f.root.find("status-speed").value, "250");
+  assert.equal(f.find("status-speed").value, "250");
   assert.equal(f.pending.length, 0);
-  assert.equal(f.root.find("status-viewer").dataset.requested, "open,open,open,open");
+  assert.equal(f.find("status-viewer").dataset.requested, "open,open,open,open");
   instance.dispose();
 });
 
@@ -297,9 +315,9 @@ test("dispose stops a running demo", async () => {
   f.env.wait = () => new Promise((r) => setImmediate(r));
   f.release();
   const instance = await mountStatus(f.root, q(""), f.ctx, f.env);
-  f.root.find("status-demo").fire("click");
+  f.find("status-demo").fire("click");
   await flush();
-  assert.equal(f.root.find("status-demo").textContent, "Stop demo");
+  assert.equal(f.find("status-demo").textContent, "Stop demo");
   instance.dispose();
   await settle(f);
   for (let i = 0; i < 5; i++) await flush();
@@ -316,9 +334,11 @@ test("a failed print load keeps the controls off, shows the error and offers Rel
   assert.equal(typeof instance?.dispose, "function");
   assert.equal(f.shell.chip.state, "error");
   assert.match(f.shell.errorRow.text, /integrity/);
-  assert.equal(f.shell.readout[0], "Not configured");
-  assert.equal(f.root.find("status-build").disabled, true);
-  assert.equal(f.root.find("status-viewer").dataset.sync, "failed");
+  const drawer = new El("div");
+  f.shell.nerd.render(drawer);
+  assert.equal(drawer.children[0].children[1].textContent, "Not configured");
+  assert.equal(f.find("status-build").disabled, true);
+  assert.equal(f.find("status-viewer").dataset.sync, "failed");
   assert.equal(f.primary.spec.label, "Reload application");
   assert.equal(f.primary.disabled, false);
   f.primary.spec.onClick();
