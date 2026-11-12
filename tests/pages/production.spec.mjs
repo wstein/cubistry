@@ -163,6 +163,13 @@ test("published proof and design bytes retain canonical identity and missing pat
   expect((await request.get("/counter-design.v2.json")).status()).toBe(404);
 });
 
+test("the retired calendar page is not built and its URL answers 404, while the host mode is built", async ({
+  request,
+}) => {
+  expect((await request.get("calendar.html")).status()).toBe(404);
+  expect((await request.get("index.html?app=calendar")).status()).toBe(200);
+});
+
 test("built project-path optimized print loads its pinned certificate and executes the canonical first edge", async ({
   page,
 }) => {
