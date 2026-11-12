@@ -87,10 +87,10 @@ list_file(d,months;name="s.tsv")=(p=joinpath(d,name);write(p,join(months,'\n')*"
     @testset "best-effort months are declared, never claimed valid by the producer" begin
         S=month_range(ym("2037-01"),ym("2037-04"));plan=chain_plan(S,(2037,1))
         best=Dict(ym("2037-02")=>("best_effort_unverified","7,7","february-hall-S2.tsv"))
-        rows=month_records(ym("2037-01"),ym("2037-04"),plan,plan[1:1],"best_effort_month";methods=String[],best)
-        @test st(rows,"2037-02")==("2037-02","unknown","best_effort_month","-","-","february-hall-S2.tsv")
-        @test st(rows,"2037-03")[2:3]==("unknown","best_effort_month")       # not reached behind the stop
-        @test_throws "not a chain month" month_records(ym("2037-01"),ym("2037-04"),plan,plan[1:1],"best_effort_month";methods=String[],best=Dict(ym("2030-01")=>("best_effort","1,1","x")))
+        rows=month_records(ym("2037-01"),ym("2037-04"),plan,plan[1:1],"deadline";methods=String[],best)
+        @test st(rows,"2037-02")==("2037-02","unknown","deadline","-","-","february-hall-S2.tsv")
+        @test st(rows,"2037-03")[2:3]==("unknown","deadline")       # not reached behind the stop
+        @test_throws "not a chain month" month_records(ym("2037-01"),ym("2037-04"),plan,plan[1:1],"deadline";methods=String[],best=Dict(ym("2030-01")=>("best_effort","1,1","x")))
         mktempdir() do d
             hdr="month\tstatus\twrong_cells\tevidence\n";p=joinpath(d,"b.tsv")
             write(p,hdr*"2037-02\tbest_effort_unverified\t7,7\tfebruary-hall-S2.tsv\n2043-02\tbest_effort\t7,1\te\n")
