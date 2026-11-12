@@ -108,6 +108,11 @@ const homeActive = (scheme: ColorScheme, homes?: readonly HomeFace[]): boolean =
 /** Camera distance relative to the fit of the bounding sphere: the cube fills the picture, the sphere keeps some air. */
 const ZOOM = 0.9;
 
+/** Cache key of one sticker texture: marked cells, print, tile and (Rubik-Tint) the home face each get their own texture. */
+export function textureKey(wrong: boolean, ink: string, text: string, tile: ReturnType<typeof unitGridTileOf> | undefined, home?: HomeFace): string {
+  return `${wrong ? "wrong|" : ""}${ink}|${text}${tile ? `|${tile.w}x${tile.h}|${tile.band.l},${tile.band.r},${tile.band.t},${tile.band.b}` : ""}${home !== undefined ? `|home:${home}` : ""}`;
+}
+
 export class Calendar7Viewer implements StageView {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
@@ -431,7 +436,7 @@ export class Calendar7Viewer implements StageView {
       const tile = widths ? unitGridTileOf(pose.pos.subarray(3 * i, 3 * i + 3), pose.normal.subarray(3 * i, 3 * i + 3), pose.up.subarray(3 * i, 3 * i + 3), widths) : undefined;
       this.tiles[i] = tile;
       const isWrong = this.wrongIds.has(i);
-      const key = `${isWrong ? "wrong|" : ""}${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}|${tile.band.l},${tile.band.r},${tile.band.t},${tile.band.b}` : ""}${byHome ? `|home:${this.homes[i]}` : ""}`; // one surface per configure: the key needs no surface
+      const key = textureKey(isWrong, printing.ink[i], printing.text[i], tile, byHome ? this.homes[i] : undefined); // one surface per configure: the key needs no surface
       let material = byKey.get(key);
       if (!material) {
         const canvas = document.createElement("canvas");
