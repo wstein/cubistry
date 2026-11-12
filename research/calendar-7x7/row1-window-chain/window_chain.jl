@@ -79,11 +79,11 @@ if haskey(opts,"prior")
         elseif f[1]=="move";g,q=parse(Int,f[2]),parse(Int,f[3]);for _ in 1:(q==-1 ? 3 : q);state=P.compose(state,gens[g]);end;end
     end
     @assert digest(state)==lastend "resume: replayed prior end state does not match its end digest"
-    for i in 1:k+1;cp(joinpath(opts["prior"],"states","state-"*lpad(string(i),2,'0')*".tsv"),statepath(i));end
     rows=ls[1:end-1];edges_before=k
     prior_methods=read_edges(joinpath(opts["prior"],"edges.tsv"),k)   # the solver record of earlier segments is carried forward
     prior_segments=read_segments(joinpath(opts["prior"],"segments.tsv"))   # so are the inputs of earlier segments
     check_segments_layout(prior_segments,layout_sha)
+    for i in 1:k+1;cp(joinpath(opts["prior"],"states","state-"*lpad(string(i),2,'0')*".tsv"),statepath(i));end
 else
     state=P.identity_perm();h0=snapshot(state,1,goals[1])
     prior_segments=String[]
