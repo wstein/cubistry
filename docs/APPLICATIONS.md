@@ -21,7 +21,7 @@ link. Entry points are relative to the site root, for example
 | 7x7 Calendar | English monthly calendar on one 7x7 cube with a 3D view, Jan 2028 to Jan 2076, adjacent months only (research candidate) | chooser (`index.html?app=calendar7`) | [7x7 calendar](CALENDAR_7X7.md) |
 | Calendar | German and English calendar cubes (3x3) | `index.html?app=calendar`, `calendar.html` | [Calendar cubes](CALENDAR_CUBES.md) |
 | CI Quality Cube | Six-face workflow status prototype | `index.html?app=ci`, `status.html` | [Status Cube](STATUS_CUBE.md) |
-| Picture Cube | Free-play 2x2 with picture stickers | `playground.html` | [Picture Cube](PICTURE_PLAYGROUND.md) |
+| Picture Cube | Free-play 2x2 with picture stickers | `index.html?app=playground&size=2`, `playground.html` | [Picture Cube](PICTURE_PLAYGROUND.md) |
 | 3x3 Super Picture Cube | Picture cube on a 3x3 | `picture3.html` | [Super Picture Cube](SUPER_PICTURE_CUBE.md) |
 | Print stickers | Vector print/cut sheets | `print.html` | [Print stickers](PRINT_STICKERS.md) |
 | Library example, solver acceptance | Development-only M1 demos | `library-example.html`, `solver-acceptance.html` | [M1 acceptance](M1_ACCEPTANCE.md) |
@@ -80,7 +80,7 @@ cut contours, licenses and reproducible custom-size exports.
 
 ## Picture Cube
 
-Open `playground.html` or choose Picture Cube in the application chooser. The
+Open `index.html?app=playground&size=2`, `playground.html` or choose Picture Cube in the application chooser. The
 other pages' choosers still list it as Picture Puzzle Playground until the old
 URL is redirected. Explore a physical 2×2 with original landscape stickers or classic
 colors, legal face turns, seeded scrambles, undo/redo and verified exact Solve.

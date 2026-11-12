@@ -7,7 +7,7 @@ and `size=2` to `size=7` in the URL, but **only 2×2 is playable**. The shared m
 run size 2 only. A larger size is shown disabled, and `size=3` to `size=7` keep the 2×2 with a note.
 The default size is 2 for now and becomes 3 when 3×3 is playable here.
 
-The [playground](../playground.html) combines manual legal turns, repeatable
+The Picture Cube is a mode of the host (`index.html?app=playground&size=2`; `playground.html` stays until it is retired). The [playground](../playground.html) combines manual legal turns, repeatable
 scrambles, exact Solve, undo/redo, and move history for a physical 2×2 cube.
 It is a reference application for [issue #85](https://github.com/wstein/cubistry/issues/85),
 not a new renderer or general application framework.
