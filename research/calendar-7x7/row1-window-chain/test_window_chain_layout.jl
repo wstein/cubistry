@@ -59,7 +59,7 @@ sha(p)=bytes2hex(sha256(read(p)))
             @test "AP" in texts && "RIL" in texts && !("APR" in texts)
             # resume (prior=) on the same layout runs through; on another layout it fails hard at the segment layout check
             c5,e5=producer(joinpath(d,"resume-same"),"prior=$o4";layout=ALT_LAYOUT,pin=sha(ALT_LAYOUT));@test c5==0 && progress(joinpath(d,"resume-same"))["edges_total"]=="1" && progress(joinpath(d,"resume-same"))["layout_sha256"]==sha(ALT_LAYOUT)
-            c6,e6=producer(joinpath(d,"resume-other"),"prior=$o4");@test c6!=0 && occursin("layout of prior segment 1",e6)
+            c6,e6=producer(joinpath(d,"resume-other"),"prior=$o4");@test c6!=0 && occursin("layout of prior segment 1",e6) && !isfile(joinpath(d,"resume-other","states","state-01.tsv"))   # the check precedes the copy of the prior states
         end
     end
     @testset "beam_edge.jl as a process (greedy edge 2026-12 of the stored 2029-12 chain)" begin
@@ -77,6 +77,26 @@ sha(p)=bytes2hex(sha256(read(p)))
             @test c2==0 && occursin(" HTM=271 ",l2) && occursin("RESULT layout_sha256=$(sha(DEFAULT_LAYOUT)) ",l2)
             o3=joinpath(d,"wrong");c3,l3=beam_edge(o3;layout=DEFAULT_LAYOUT,pin="0"^64)
             @test c3!=0 && occursin("differs from CAL7_WINDOW_LAYOUT_SHA256",l3) && !ispath(o3)
+        end
+    end
+    # The stored 2029-12 chain has the APR|IL print, so beam_edge.jl cannot run it with AP|RIL. The AP|RIL print of window-2037-01 has no stored chain; the
+    # fixture is its identity state (window_chain.jl max_edges=0), month list [2026-05, 2027-04] (one bridge edge), beam library L5 width 40 as the producer.
+    @testset "beam_edge.jl with the AP|RIL layout (edge 2027-04, month list)" begin
+        mktempdir() do d
+            months=joinpath(d,"months.tsv");write(months,"2026-05\n2027-04\n")
+            menv=("CAL7_WINDOW_MONTHS"=>months,"CAL7_WINDOW_MONTHS_SHA256"=>sha(months),"CAL7_WINDOW_PRINT_SHA"=>sha(ALT_PRINT),"CAL7_WINDOW_LAYOUT"=>ALT_LAYOUT)
+            fix=joinpath(d,"fixture")
+            @test run(pipeline(ignorestatus(addenv(`$(Base.julia_cmd()) --startup-file=no --threads=4 $(joinpath(@__DIR__,"window_chain.jl")) $fix $ALT_PRINT max_edges=0`,menv...,"CAL7_WINDOW_LAYOUT_SHA256"=>sha(ALT_LAYOUT)));stdout=devnull,stderr=devnull)).exitcode==3
+            function beam_edge(out,pin)
+                c=addenv(`$(Base.julia_cmd()) --startup-file=no --threads=4 $(joinpath(@__DIR__,"beam_edge.jl")) $out $ALT_PRINT $(joinpath(fix,"chain.moves.tsv")) $(joinpath(fix,"states")) 2027 4 mode=beam library=L5 width=40`,menv...,"CAL7_WINDOW_LAYOUT_SHA256"=>pin)
+                log=joinpath(d,"log-"*basename(out));code=run(pipeline(ignorestatus(c);stdout=log,stderr=log)).exitcode
+                code,read(log,String)
+            end
+            c1,l1=beam_edge(joinpath(d,"ok"),sha(ALT_LAYOUT))
+            @test c1==0 && occursin("RESULT layout_sha256=$(sha(ALT_LAYOUT)) ",l1)
+            texts=Set(split(l,'\t')[6] for l in readlines(joinpath(d,"ok","state-02.tsv"))[2:end])      # the target state of the edge
+            @test "AP" in texts && "RIL" in texts && !("APR" in texts)
+            c2,l2=beam_edge(joinpath(d,"wrong"),"0"^64);@test c2!=0 && occursin("differs from CAL7_WINDOW_LAYOUT_SHA256",l2) && !ispath(joinpath(d,"wrong"))
         end
     end
 end
