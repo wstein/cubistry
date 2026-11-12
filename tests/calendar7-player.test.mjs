@@ -437,7 +437,11 @@ function fakeStage(opts) {
     surfaces: [],
     schemes: [],
     setScheme: (id) => stage.schemes.push(id),
+    homePoses: [],
+    setHomePose: (pose) => { stage.homePoses.push(pose); stage.order.push("home"); },
+    order: [],
     configure(_printing, _pose, surface) {
+      stage.order.push("configure");
       stage.schemes.push("configure");
       stage.configured++;
       stage.surfaces.push(surface);
@@ -474,6 +478,18 @@ const q = (s) => new URLSearchParams(s);
 const idle = async (root) => {
   for (let i = 0; i < 100000 && root.getAttribute("data-c7-state") !== "idle"; i++) await Promise.resolve();
 };
+
+test("mount: the identity pose of the names print reaches the stage before each configure (home faces of the Rubik-Tint scheme)", async () => {
+  const root = fakeRoot();
+  const { env, stage } = mountEnv();
+  const inst = await mountCalendar7(root, q("year=2027&month=3&scheme=rubik-tint"), env);
+  await idle(root);
+  assert.deepEqual(stage.order, ["home", "configure"]);
+  const start = parseState(json("public/calendar7/names-demo/state.v1.json"));
+  assert.deepEqual([...stage.homePoses[0].normal], [...start.pose.normal]);
+  assert.equal(root.getAttribute("data-c7-scheme"), "rubik-tint");
+  inst.dispose();
+});
 
 test("mount: the scheme parameter reaches the stage before it is configured; setScheme forwards the id", async () => {
   const root = fakeRoot();
