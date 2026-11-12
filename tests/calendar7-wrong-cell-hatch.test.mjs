@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// The differing cell carries translucent hatching over its whole flat face (owner decision, marker design #412 cut B).
+// The differing cell carries translucent hatching over the day field only: the unit cell that holds the numeral, inside the flat face (owner decision, marker design #412 cut B).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { drawWrongCell, wrongCellRect, HATCH_LINES, WRONG_CELL } from '../src/apps/calendar7/sticker-art.ts';
+import { drawWrongCell, wrongCellRect, tileGrid, HATCH_LINES, WRONG_CELL } from '../src/apps/calendar7/sticker-art.ts';
 import { faceFlatShare } from '../src/apps/calendar7/geometry.ts';
 
-const TILES = [[192, 192, undefined], [192, 346, { w: 1, h: 1.8 }], [346, 346, { w: 1.8, h: 1.8 }]];
+const BANDED = { w: 1.8, h: 1.8, band: { l: 0, r: 0.8, t: 0, b: 0.8 } }; // thick corner tile: the numeral sits in the unit cell, upper left
+const TILES = [[192, 192, undefined], [192, 346, { w: 1, h: 1.8 }], [346, 346, { w: 1.8, h: 1.8 }], [346, 346, BANDED]];
 const alpha = (color) => Number(/^rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)$/.exec(color)?.[1] ?? 1);
 
 // Records the strokes in order: [{ style, width, segments: [[x0, y0, x1, y1], ...] }], plus every other call.
@@ -39,12 +40,16 @@ const distance = (px, py, [x0, y0, x1, y1]) => {
   return Math.hypot(px - (x0 + t * dx), py - (y0 + t * dy));
 };
 
-test('the hatch is clipped to the whole flat face, not to a strip', () => {
+test('the hatch is clipped to the day field: the unit cell with the numeral inside the flat face', () => {
   for (const [w, h, tile] of TILES) {
-    const { clips } = run(w, h, tile), r = wrongCellRect(w, h, tile);
+    const { clips } = run(w, h, tile), r = wrongCellRect(w, h, tile), flatW = w * faceFlatShare(tile?.w ?? 1), flatH = h * faceFlatShare(tile?.h ?? 1);
+    const g = tileGrid(tile), face = { x0: (w - flatW) / 2, x1: (w + flatW) / 2, y0: (h - flatH) / 2, y1: (h + flatH) / 2 };
     assert.deepEqual(clips, [r]);
-    assert.ok(Math.abs(r.w - w * faceFlatShare(tile?.w ?? 1)) < 1e-9 && Math.abs(r.h - h * faceFlatShare(tile?.h ?? 1)) < 1e-9, 'the flat face of the tile');
-    assert.ok(r.h > h * 0.7 && r.w > w * 0.7, 'covers the tile, not one tenth of it');
+    const expected = { x0: Math.max(face.x0, g.cell.x0), x1: Math.min(face.x1, g.cell.x1), y0: Math.max(face.y0, g.cell.y0), y1: Math.min(face.y1, g.cell.y1) };
+    for (const [key, value] of [["x0", r.x], ["x1", r.x + r.w], ["y0", r.y], ["y1", r.y + r.h]]) assert.ok(Math.abs(expected[key] - value) < 1e-6, `x: `);
+    assert.ok(r.w > 0.5 * flatW * (g.cell.x1 - g.cell.x0) / w && r.w <= flatW + 1e-9 && r.h <= flatH + 1e-9);
+    if (!tile?.band) assert.ok(Math.abs(r.w - flatW) < 1e-9 && Math.abs(r.h - flatH) < 1e-9, "no bands: the day field is the whole flat face");
+    else assert.ok(r.w < flatW * 0.7 && r.h < flatH * 0.7, "a banded tile hatches only its unit cell, not the whole face");
   }
 });
 
@@ -78,7 +83,7 @@ test('light halo and dark hatch are both translucent and share the same lines', 
   assert.ok(strokes[0].width >= strokes[1].width + 2, 'the halo edge stays resolved on dark schemes');
 });
 
-test('hatching leaves most of the central half of the flat face unpainted (a density measure, not the label itself)', () => {
+test('hatching leaves most of the central half of the day field unpainted', () => {
   for (const [w, h, tile] of TILES) {
     const { strokes, clips } = run(w, h, tile), r = clips[0];
     const lines = strokes[0].segments.map((s) => clipped(s, r)).filter((l) => l && (l[0] !== l[2] || l[1] !== l[3])), half = strokes[0].width / 2;
@@ -87,7 +92,7 @@ test('hatching leaves most of the central half of the flat face unpainted (a den
       const x = r.x + r.w * (0.25 + 0.5 * (i + 0.5) / 40), y = r.y + r.h * (0.25 + 0.5 * (j + 0.5) / 40);
       n++; if (lines.every((l) => distance(x, y, l) > half)) free++;
     }
-    assert.ok(free / n >= 0.4, `${w}x${h}: at least 40 percent of the central half stays unpainted (${(free / n).toFixed(2)})`);
+    assert.ok(free / n >= 0.4, `${w}x${h}: at least 40 percent of the central half of the day field stays unpainted (${(free / n).toFixed(2)})`);
   }
 });
 
