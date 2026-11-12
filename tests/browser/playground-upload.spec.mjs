@@ -31,8 +31,8 @@ const netFile = (cell = 100, name = "net.png") => ({
 
 // Every upload is decoded, sanitized and measured in the page. On the CI runners (software GL, shared CPU)
 // a step takes 4 to 9 times its local time (run 42297733991: 3.7 s against 0.8 s, 31 s against 4.6 s), so
-// the waits for a finished upload use the page's own bounds: 30 s per measurement (pictures.ts) and 8 s per
-// SVG check (upload-browser.ts), and a test gets the slow limit (3 x 30 s) like the timing group.
+// the waits for a finished upload use a 30 s CI-load bound (runners are much slower than local), not a product
+// limit from pictures.ts or upload-browser.ts, and a test gets the slow limit (3 x 30 s) like the timing group.
 const UPLOAD_MS = 30000;
 test.beforeEach(() => {
   test.slow();

@@ -1,7 +1,9 @@
 // The cube canvas fills the window and the HUD panels, header, dock and footer float above it, so an
 // element screenshot of the canvas also captures their pixels (hover, checkbox and focus states
 // included). Pixel assertions about the rendered cube hide them for the capture only.
-export const HIDE_OVERLAYS = [
+// Local to this helper: PR #230 found most of these selectors match nothing on
+// solver-acceptance.html; keep the list for the pages that still float overlays.
+const HIDE_OVERLAYS = [
   "aside",
   "header",
   "footer",

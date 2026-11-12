@@ -10,7 +10,7 @@ import { test, expect } from "@playwright/test";
 
 // Tolerance in 8-bit sRGB per channel. Fills are the median of the tile interior (shading and antialiasing do not matter);
 // ink and line are the best matching pixel of the tile (thin strokes never cover whole pixels but the best one is a stroke core).
-const FILL_TOL = 7, STROKE_TOL = 6; // at the default plasticity 0.6: it shades the faces (a tile can be a few levels off: Paper Red 6, Dracula 7), the median of all tiles is checked at 2
+const FILL_TOL = 7, STROKE_TOL = 6; // at the default plasticity 0.6: it shades the faces (a tile can be a few levels off: Paper Red 6, Dracula 7); per-tile fill uses FILL_TOL, medians use medianTol / PRODUCTION_MEDIAN_TOL
 const SCHEMES = ["paper-red", "paper-blue", "classic", "solarized-light", "gruvbox-light", "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast"];
 
 async function sample(page, scheme, tilted = false, production = false, plasticity = undefined) {

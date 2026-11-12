@@ -44,7 +44,7 @@ test("word print replaces large unit symbols and keeps the counter value", async
   // Under SwiftShader the page's render loop keeps the main thread busy: each
   // of the three bounds() evaluations took 4.0 to 4.8 s, the fullPage
   // screenshot 2.1 s, and passing runs of this test take 18 to 26 s. Budget:
-  // 3x the slowest passing run.
+  // 90 s is 3x the default 30 s Playwright timeout (about 3x a slow passing run).
   test.setTimeout(90000);
   await page.goto("/counter.html?application=hsm-counter");
   await expect(page.locator("#cube")).toHaveAttribute(

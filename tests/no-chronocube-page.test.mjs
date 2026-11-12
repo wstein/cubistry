@@ -37,7 +37,8 @@ test("scripts, docs, workflows, public files and src name no chronocube.html", (
   for (const root of ["src", "scripts", "docs", ".github", "public"]) {
     if (!existsSync(root)) continue;
     for (const f of walk(root)) {
-      if (/\.(png|jpe?g|svg|woff2?|bin|pdf|ico|wasm|gz|zip)$/i.test(f)) continue;
+      // Skip binary fonts and archives; .svg stays text and is scanned.
+      if (/\.(png|jpe?g|woff2?|ttf|otf|u8|bin|pdf|ico|wasm|gz|zip)$/i.test(f)) continue;
       if (readFileSync(f, "utf8").includes("chronocube.html")) hits.push(f);
     }
   }

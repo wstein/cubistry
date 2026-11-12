@@ -45,12 +45,12 @@ const rig = (start, mountFor) => {
 test("Back and Forward within the same app remount with the parameters of the restored URL", async () => {
   const r = rig(`${BASE}?app=calendar7&year=2026&month=11`);
   await r.router.start();
-  // The month picker pushes a new URL of the same app and remounts; the router does not see that push as a pop.
+  // The fake has no history stack: each browserTo is delivered as a popstate. Steps: pop to 12, pop to 11, pop to 2027-1.
   await r.browserTo(`${BASE}?app=calendar7&year=2026&month=12`);
-  await r.browserTo(`${BASE}?app=calendar7&year=2026&month=11`); // Back
+  await r.browserTo(`${BASE}?app=calendar7&year=2026&month=11`);
   assert.equal(r.router.current(), "calendar7");
   assert.equal(r.log.at(-1), "mount 2026-11");
-  await r.browserTo(`${BASE}?app=calendar7&year=2027&month=1`); // Forward to an entry with other year and month
+  await r.browserTo(`${BASE}?app=calendar7&year=2027&month=1`);
   assert.equal(r.log.at(-1), "mount 2027-1");
   assert.deepEqual(r.log, ["mount 2026-11", "dispose 2026-11", "mount 2026-12", "dispose 2026-12", "mount 2026-11", "dispose 2026-11", "mount 2027-1"]);
   assert.deepEqual(r.state.pushed, [], "a pop never pushes");

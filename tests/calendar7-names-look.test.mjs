@@ -74,7 +74,7 @@ test("standard layout: body width stays 0.99 and the scene builds its cut faces 
   new PhysicalCubeScene(root, frames, mats, createPlasticMaterial("#23272e", 0.55), 1, geometry, new Map(), { bodyColor: "#ffffff", coreColor: "#ffffff" }).setConstruction("stickerless");
   const cut = new Set();
   root.traverse((o) => { if (o.isMesh && Array.isArray(o.material)) for (const m of o.material) cut.add(m.color.getHexString()); });
-  assert.deepEqual([...cut], ["ffffff"], "without cutColors every cut face is the body color");
+  assert.deepEqual([...cut], ["ffffff"], "without miter face colors every cut face is the body color");
 });
 
 // ---- 1. near-white token ----
@@ -82,7 +82,7 @@ test("names layout: white fields (weekday row, date cells, empty days) use the o
   assert.match(NAMES_WHITE, /^#[0-9a-f]{6}$/);
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(NAMES_WHITE.slice(i, i + 2), 16));
   assert.ok(r === g && g === b, "neutral: no warm or cool tint");
-  assert.ok(r >= 0xf8 && r < 0xff, "near-white, not grey and not a pure-white literal");
+  assert.ok(r >= 0xf8 && r < 0xff, "near-white, not gray and not a pure-white literal");
   for (const [text, ink] of [["MON", "weekday"], ["SUN", "red"], ["SAT", "red"], ["7", "dark"], ["", "blank"]])
     assert.equal(tileRoles(PAPER_RED, text, ink, "names").fill, NAMES_WHITE, `${text}/${ink}`);
   assert.equal(tileRoles(PAPER_RED, "J", "month", "names").fill, PAPER_RED.bandFill);

@@ -157,15 +157,18 @@ test("an unknown app resolves to the fallback and keeps no mode setup", () => {
   assert.deepEqual(r.setup, { kiosk: true });
 });
 
-test("the banner style accepts exactly its six values and is not a per-mode value", () => {
-  for (const v of ["theme", "rounded", "square", "underline", "boxed", "rounded-box"]) {
+test("the banner style accepts its listed values and rejects others; it is not a per-mode value", () => {
+  const styles = ["theme", "rounded", "square", "underline", "boxed", "rounded-box"];
+  for (const v of styles) {
     const r = parseRoute(`?app=calendar7&banner=${v}`, registry, "clock");
     assert.deepEqual(r.setup, { banner: v }, v);
     assert.deepEqual(r.invalid, [], v);
   }
-  const bad = parseRoute("?app=calendar7&banner=extra", registry, "clock");
-  assert.deepEqual(bad.setup, {});
-  assert.deepEqual(bad.invalid, ["banner"]);
+  for (const v of ["extra", "round", "box", "themes", ""]) {
+    const bad = parseRoute(`?app=calendar7&banner=${v}`, registry, "clock");
+    assert.deepEqual(bad.setup, {}, v);
+    assert.deepEqual(bad.invalid, ["banner"], v);
+  }
   assert.ok(sharedParams("calendar7", "calendar7").includes("banner"));
 });
 
@@ -176,10 +179,6 @@ test("speed is global: it survives a switch between any two apps, also to apps t
       assert.equal(to(`${base}?app=${from}&speed=300`, from, target).get("speed"), "300", `${from} -> ${target}`);
     }
   }
-  for (const [from, target] of [["counter", "clock"], ["ms-timer", "hm-clock"], ["calendar7", "clock"], ["clock", "calendar7"]]) {
-    if (ids.includes(from) && ids.includes(target)) assert.equal(to(`${base}?app=${from}&speed=50`, from, target).get("speed"), "50");
-  }
-  // not owned by any mode, and not dropped from a pending app either
   assert.ok(GLOBAL_PARAMS.includes("speed"));
   assert.ok(!APP_SCOPED_PARAMS.includes("speed"));
   for (const m of MODE_CATALOG) assert.ok(!m.params.includes("speed"), m.id);

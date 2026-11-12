@@ -64,7 +64,7 @@ test("404 returns null and is not retried", async () => {
   assert.equal(await client().api.request("contents/x"), null);
   assert.equal(calls.length, 1);
 });
-test("other 4xx fail at once without retry", async () => {
+test("other statuses fail at once without retry", async () => {
   for (const status of [400, 401, 403, 422, 429, 500]) {
     const calls = mock([status]);
     await assert.rejects(client().api.request("pages"), {

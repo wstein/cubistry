@@ -107,9 +107,8 @@ hard 8-second worker deadline covers cold startup, the direct search and the
 center portfolio, so on a very slow machine, where cold startup plus attempts
 exceed 5 seconds, the guard can still cut the search short. The route is then
 less optimized than after a full search, never longer than the direct route.
-Timeout, worker errors, invalid
-results, or a candidate that is not strictly shorter preserve the checked
-fallback. A single worker handles one solve and one replaceable pending request;
+Timeout, worker errors, invalid results, or a candidate that is not strictly
+shorter preserve the checked fallback. A single worker handles one solve and one replaceable pending request;
 no unbounded queue of solver jobs is retained. Browser restoration from the
 back/forward cache preserves the provider. The solver is `cubing@0.66.1`;
 production builds use ES worker chunks with module-relative asset paths. Shared

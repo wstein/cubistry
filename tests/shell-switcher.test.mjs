@@ -19,6 +19,11 @@ function rule(selector) {
 
 const selectRule = () => rule(".shell .shell-switcher select");
 const chevronRule = () => rule(".shell .shell-switcher::after");
+const switcherRule = () => rule(".shell .shell-switcher");
+
+test("switcher is a positioning context for the chevron", () => {
+  assert.match(switcherRule(), /(^|[\s;])position:\s*relative/);
+});
 
 test("switcher select drops the native arrow", () => {
   const select = selectRule();
@@ -29,8 +34,15 @@ test("switcher select drops the native arrow", () => {
 test("switcher select reserves room for the chevron and ellipsizes long labels", () => {
   const select = selectRule();
   const chevron = chevronRule();
-  const pad = select.match(/padding:\s*0\s+(\d+)px\s+0\s+(\d+)px/);
-  assert(pad, "padding: 0 <right>px 0 <left>px expected");
+  // Accept shorthand or the longhand form; the chevron needs a right inset at least this large.
+  const pad =
+    select.match(/padding:\s*0\s+(\d+)px\s+0\s+(\d+)px/) ||
+    (() => {
+      const right = select.match(/padding-right:\s*(\d+)px/)?.[1];
+      const left = select.match(/padding-left:\s*(\d+)px/)?.[1];
+      return right && left ? [null, right, left] : null;
+    })();
+  assert(pad, "padding-right and padding-left (or padding shorthand) expected");
   const [right, left] = [Number(pad[1]), Number(pad[2])];
   assert(left >= 16, `left padding ${left}px must follow the pill curvature (>= 16px)`);
   const right_inset = Number(chevron.match(/right:\s*(\d+)px/)?.[1]);

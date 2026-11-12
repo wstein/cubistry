@@ -367,11 +367,11 @@ export function underlineInk(scheme: ColorScheme): string {
 
 /**
  * The white of the names layout: the grounds of the weekday row, the date cells and the empty days. Neutral (no warm tint)
- * and lighter than the grey #ececec of the weekday row in the standard layout.
+ * and lighter than the gray #ececec of the weekday row in the standard layout.
  */
 export const NAMES_WHITE = "#fdfdfd";
 
-/** Names layout: a neutral light ground (white or light grey) becomes `NAMES_WHITE`; every other fill stays. */
+/** Names layout: a neutral light ground (white or light gray) becomes `NAMES_WHITE`; every other fill stays. */
 export const namesGround = (fill: string): string => {
   const m = /^#([0-9a-f]{2})\1\1$/i.exec(fill);
   return m && parseInt(m[1], 16) >= 0xec ? NAMES_WHITE : fill;

@@ -189,7 +189,7 @@ test("calendar physical motion continues through presentation and reference-view
   // 30 s default expired inside the second screenshot, 5.1 s after it began.
   // The planning gate took 5.2 s, the first-turn wait 6.4 s and the first
   // screenshot 5.4 s under SwiftShader; passing runs take 15 to 23 s.
-  // Budget: 3x the slowest passing run.
+  // Budget: 90 s is 3x the default 30 s Playwright timeout (about 3x a slow passing run).
   test.setTimeout(90000);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.addInitScript(() => {

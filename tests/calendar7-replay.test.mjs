@@ -304,14 +304,20 @@ test("negative controls: every corruption is rejected", () => {
   const wrongPin = structuredClone(pin);
   const file = Object.keys(wrongPin.runtime)[0];
   wrongPin.runtime[file] = "0".repeat(64);
-  assert.throws(() => check(wrongPin), /pin/);
+  assert.throws(() => check(wrongPin), /does not match its pin/);
   // A wrong print hash in the pin.
   const wrongPrint = structuredClone(pin);
   wrongPrint.sources[Object.keys(wrongPrint.copies)[0]] = "f".repeat(64);
-  assert.throws(() => check(wrongPrint), /pin/);
+  assert.throws(() => check(wrongPrint), /does not match its pin/);
   // Parsers refuse malformed data.
-  assert.throws(() => parseGraph({ ...json("public/calendar7/graph.v1.json"), alphabet: "x" }));
-  assert.throws(() => parseState({ ...json("public/calendar7/state.v1.json"), version: 2 }));
+  assert.throws(
+    () => parseGraph({ ...json("public/calendar7/graph.v1.json"), alphabet: "x" }),
+    /move alphabet differs from the engine/,
+  );
+  assert.throws(
+    () => parseState({ ...json("public/calendar7/state.v1.json"), version: 2 }),
+    /expected .* version 1/,
+  );
 });
 
 test("checkPose requires all stickers of one piece to share one position", () => {

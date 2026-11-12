@@ -39,7 +39,7 @@ export interface Stage extends StageView {
   setLabel(text: string): void;
   /** Color scheme by id (src/apps/calendar7/schemes.ts); an unknown id gives the default. Optional: a fake stage may omit it. */
   setScheme?(id: string | null | undefined): void;
-  /** Banner style shape of the names layout; optional like `setScheme`. */
+  /** Banner style of the names layout; optional like `setScheme`. */
   setBannerStyle?(style: BannerStyle): void;
   setFont?(font: LoadedFont): void;
   /** Plasticity of the names layout, 0 to 1 (names-plasticity.ts). Optional: a fake stage may omit it. */

@@ -35,8 +35,8 @@ for (const [name, code] of Object.entries(modes)) {
 }
 
 test("M/S Timer and H-M Wall Clock render no unit headings", () => {
-  assert(!/<h2>/.test(modes["M/S Timer"]));
-  assert(!/<h2>/.test(modes["H-M Wall Clock"]));
+  assert(!/<h2[\s>]/.test(modes["M/S Timer"]));
+  assert(!/<h2[\s>]/.test(modes["H-M Wall Clock"]));
 });
 
 test("M/S Timer and H-M Wall Clock host bare cubes like the Live Clock: no wrapper cards, no stuck aria-busy", () => {
