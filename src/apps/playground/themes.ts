@@ -15,6 +15,7 @@ import { spaceFaces } from "./theme-assets/space.ts";
 import { martinFaces } from "./theme-assets/martin.ts";
 import { bremenFaces } from "./theme-assets/bremen.ts";
 import { seasonsFaces } from "./theme-assets/seasons.ts";
+import { friedenFaces } from "./theme-assets/frieden.ts";
 export const FACE_IDS = ["F", "B", "R", "L", "U", "D"] as const;
 export type FaceId = (typeof FACE_IDS)[number];
 /** One whole face image. `size` is its decoded edge length in pixels (SVG user units for SVG). */
@@ -52,6 +53,7 @@ const REGISTRY = [
   { id: "christmas", name: "Christmas", faces: christmasFaces },
   { id: "easter", name: "Easter", faces: easterFaces },
   { id: "halloween", name: "Halloween", faces: halloweenFaces },
+  { id: "frieden", name: "Frieden", faces: friedenFaces },
 ] as const satisfies readonly FaceSet[];
 /** Literal union of the registered ids; it is what makes `Style` and `createDesign` type-checked. */
 export type ThemeId = (typeof REGISTRY)[number]["id"];

@@ -1,0 +1,23 @@
+{
+  "design": "frieden",
+  "faces": {
+    "F": {
+      "sha256": "39379afa4ae7a54c668f6d09bad74273ff014cf64d00b11128b59e810731a7da"
+    },
+    "B": {
+      "sha256": "1128d6f2940c20ad79c72936cba2aac1a1d4bddc13fa2a8094591ecdd8c211b3"
+    },
+    "R": {
+      "sha256": "924854d3eba969eb89e9e022ef4d2c78be74480d084c9140e0c059da59def8ba"
+    },
+    "L": {
+      "sha256": "89c78af307c40a3f0ca05b6b178a24daa52d07a9e6e136c054485d9a56927e3a"
+    },
+    "U": {
+      "sha256": "ca1239eb57b35b530348af136f765c0854a2e1b82fe1564e61e865310152bb4a"
+    },
+    "D": {
+      "sha256": "6fe2c56a8b6fd5a69af5fca56fba936614cf87bcd93966ee782700b98ae6b0c6"
+    }
+  }
+}
