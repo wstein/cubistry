@@ -117,8 +117,8 @@ export class FakeElement {
   listenerCount(type) {
     return this._listeners.get(type)?.size ?? 0;
   }
-  fire(type) {
-    for (const fn of [...(this._listeners.get(type) ?? [])]) fn({ type, target: this });
+  fire(type, extra = {}) {
+    for (const fn of [...(this._listeners.get(type) ?? [])]) fn({ type, target: this, preventDefault() {}, ...extra });
   }
   click() {
     this.fire("click");
