@@ -221,6 +221,16 @@ test("the picker works without a 3D stage and keeps the selected date in its per
 
 test("setValue with the current value keeps an open picker, a different value closes it",()=>{
   const f=domFixture();f.click("toggle");assert.equal(f.picker.model.open,true);
+  // Unchanged year and month: stay open (and kill a mutant that always closes).
   f.picker.setValue({year:2026,month:11});assert.equal(f.picker.model.open,true);assert.equal(f.dialog.hidden,false);
-  f.picker.setValue({year:2027,month:1});assert.equal(f.picker.model.open,false);assert.equal(f.dialog.hidden,true);f.picker.dispose();
+  // Same year, different month: close (kills a mutant that compares only the year).
+  f.picker.setValue({year:2026,month:12});assert.equal(f.picker.model.open,false);assert.equal(f.dialog.hidden,true);
+  f.click("toggle");assert.equal(f.picker.model.open,true);
+  // Different year still closes.
+  f.picker.setValue({year:2027,month:1});assert.equal(f.picker.model.open,false);assert.equal(f.dialog.hidden,true);
+  // null replaces a concrete value and closes; a second null is unchanged and keeps an open picker.
+  f.click("toggle");f.picker.setValue(null);assert.equal(f.picker.model.open,false);assert.equal(f.picker.model.value,null);
+  f.click("toggle");assert.equal(f.picker.model.open,true);
+  f.picker.setValue(null);assert.equal(f.picker.model.open,true);assert.equal(f.dialog.hidden,false);
+  f.picker.dispose();
 });
