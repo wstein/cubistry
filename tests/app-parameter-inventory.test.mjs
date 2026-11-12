@@ -67,10 +67,11 @@ const INVENTORY = [
   row(["design"], "src/print.mjs", ["print.html"]),
   row(["year", "month"], "src/apps/calendar7/month-view.ts", ["calendar7"]),
   row(["outer"], "src/apps/calendar7/geometry.ts", ["calendar7"]),
-  // calendar7 reads these through constants (LAYOUT_PARAM, SCHEME_PARAM, PLASTICITY_PARAM) and `font` directly
+  // calendar7 reads these through constants (LAYOUT_PARAM, SCHEME_PARAM, PLASTICITY_PARAM, BANNER_PARAM) and `font` directly
   row(["layout"], "src/apps/calendar7/layout.ts", ["calendar7"], /LAYOUT_PARAM = "layout"/),
   row(["scheme"], "src/apps/calendar7/mount.ts", ["calendar7"], /SCHEME_PARAM = "scheme"/),
   row(["plasticity"], "src/apps/calendar7/mount.ts", ["calendar7"], /PLASTICITY_PARAM = "plasticity"/),
+  row(["banner"], "src/apps/calendar7/mount.ts", ["calendar7"], /BANNER_PARAM = "banner"/),
   row(["font"], "src/apps/calendar7/mount.ts", ["calendar7"]),
   row(["size"], "src/playground.mjs", ["playground"]),
 ];

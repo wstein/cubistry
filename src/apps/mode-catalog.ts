@@ -114,6 +114,6 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "7x7 Calendar",
     group: "cubes",
     help: "docs/CALENDAR_7X7.md",
-    params: ["year", "month", "outer", "c7-font", "layout", "scheme", "plasticity"],
+    params: ["year", "month", "outer", "c7-font", "layout", "scheme", "plasticity", "banner"],
   },
 ];
