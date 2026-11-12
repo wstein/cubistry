@@ -9,6 +9,7 @@
 #   julia --threads=4 beam_edge.jl OUT PRINT CHAIN STATES YEAR MONTH [key=value ...]
 # Options: mode=beam|greedy library=L1|L4|L5 width lambda fanout maxdepth patience corew nsnap
 #          finish_depth. Env WINDOW_END must be the window of PRINT (default 2029-12).
+#          Env CAL7_WINDOW_LAYOUT + CAL7_WINDOW_LAYOUT_SHA256: layout file instead of row1-revision/layout.tsv (pinned; default unchanged).
 @assert length(ARGS)>=6 "usage: beam_edge.jl OUT PRINT CHAIN STATES YEAR MONTH [key=value ...]"
 ENV["WINDOW_END"]=get(ENV,"WINDOW_END","2029-12")
 const CAL=normpath(joinpath(@__DIR__,".."))
@@ -28,7 +29,8 @@ opts=Dict(String.(split(x,'='))[1]=>String.(split(x,'='))[2] for x in ARGS[7:end
 mode=get(opts,"mode","beam");@assert mode in ("beam","greedy")
 @assert !ispath(out) "Use a new scratch output directory";mkpath(out)
 
-labels=coupled_labels(read(joinpath(CAL,"row1-revision/layout.tsv"),String))
+layout_path,layout_sha=layout_input(joinpath(CAL,"row1-revision/layout.tsv"))   # CAL7_WINDOW_LAYOUT + CAL7_WINDOW_LAYOUT_SHA256, default the built-in layout
+labels=coupled_labels(read(layout_path,String))
 goals=coupled_goals(labels,"names-band","window")
 source=window_read_print(printpath)
 action=P.pose_action();gens=[UInt16.(g) for g in action.generators];a=G.M.Algebra(action)
@@ -92,4 +94,4 @@ rows=copy(prefix_rows)
 push!(rows,join(("edge",tyear,tmonth,m.htm,m.qtm,m.rotations,m.rotation_qtm,before,digest(next)),'\t'))
 append!(rows,["move\t$g\t$q" for (g,q) in P.macro_moves(word)]);push!(rows,"end","finish")
 write(joinpath(out,"candidate.moves.tsv"),join(rows,'\n')*"\n")
-println("RESULT mode=",mode," method=",method," edge ",tyear,"-",tmonth," HTM=",m.htm," QTM=",m.qtm," rot=",m.rotations," seconds=",round(secs;digits=1)," stored_greedy_HTM=",stored_htm," stored_QTM=",stored_qtm)
+println("RESULT layout_sha256=",layout_sha," mode=",mode," method=",method," edge ",tyear,"-",tmonth," HTM=",m.htm," QTM=",m.qtm," rot=",m.rotations," seconds=",round(secs;digits=1)," stored_greedy_HTM=",stored_htm," stored_QTM=",stored_qtm)

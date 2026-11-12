@@ -11,6 +11,8 @@
 #   CAL7_ROOT_MONTH                                 month the identity pose shows (default: first member of S); a root other than
 #                                                   S[1] adds one root edge from the identity pose to S[1]
 #   CAL7_WINDOW_PRINT_SHA                           SHA-256 of PRINT (checked here when set)
+#   CAL7_WINDOW_LAYOUT, CAL7_WINDOW_LAYOUT_SHA256   layout file instead of row1-revision/layout.tsv; needs the pin (a wrong SHA-256 is an error). Default: the built-in
+#                                                   layout. Its SHA-256 is written to PROGRESS.txt (layout_sha256) and segments.tsv.
 # GENERATE_DEADLINE_S: no new edge starts when the slowest edge so far would not fit before this many seconds (default 3000,
 # one segment of about an hour).
 # Options: start=YYYY-MM end=YYYY-MM (range of months.tsv; default the chain range) prior=DIR (continue DIR/chain.moves.tsv
@@ -48,7 +50,8 @@ claims=haskey(opts,"claims") ? read_claims(opts["claims"]) : Dict{Tuple{Int,Int}
 best=haskey(opts,"best_effort") ? read_best_effort(opts["best_effort"]) : Dict{Tuple{Int,Int},NTuple{3,String}}()
 @assert !ispath(out) "Use a new scratch output directory";mkpath(joinpath(out,"states"))
 
-labels=coupled_labels(read(joinpath(CAL,"row1-revision/layout.tsv"),String))
+layout_path,layout_sha=layout_input(joinpath(CAL,"row1-revision/layout.tsv"))   # CAL7_WINDOW_LAYOUT + CAL7_WINDOW_LAYOUT_SHA256, default the built-in layout
+labels=coupled_labels(read(layout_path,String))
 goals=coupled_goals(labels,"names-band","window")      # the members of S
 rooted && (goals=vcat([coupled_month_goal(labels,root...)],goals))   # the root month is not a member: its goal comes first
 @assert [(g.year,g.month) for g in goals]==plan "goals follow the chain plan"
@@ -79,6 +82,7 @@ if haskey(opts,"prior")
     rows=ls[1:end-1];edges_before=k
     prior_methods=read_edges(joinpath(opts["prior"],"edges.tsv"),k)   # the solver record of earlier segments is carried forward
     prior_segments=read_segments(joinpath(opts["prior"],"segments.tsv"))   # so are the inputs of earlier segments
+    check_segments_layout(prior_segments,layout_sha)
 else
     state=P.identity_perm();h0=snapshot(state,1,goals[1])
     prior_segments=String[]
@@ -135,14 +139,14 @@ write_months(joinpath(out,"months.tsv"),month_records(range_start,range_end,plan
 open(joinpath(out,"segments.tsv"),"w") do io
     println(io,SEGMENTS_HEADER);foreach(r->println(io,r),prior_segments)
     println(io,segment_row(run_id=get(opts,"run_id","local"),research_ref=get(opts,"research_ref","local"),library=get(opts,"library","L5"),width=get(opts,"width","40"),lambda=get(opts,"lambda","3"),
-        print_sha=bytes2hex(sha256(read(printpath))),months_sha=ENV["CAL7_WINDOW_MONTHS_SHA256"],root=ym_str(root),edges_from=edges_before,edges_to=edges_before+done))
+        print_sha=bytes2hex(sha256(read(printpath))),months_sha=ENV["CAL7_WINDOW_MONTHS_SHA256"],root=ym_str(root),edges_from=edges_before,edges_to=edges_before+done,layout_sha=layout_sha))
 end
 open(joinpath(out,"PROGRESS.txt"),"w") do io
     println(io,"complete=",complete);println(io,"stop_reason=",complete ? "-" : something(stop,"deadline"))
     println(io,"edges_total=",edges_before+done);println(io,"edges_new=",done);println(io,"chain_end=",ym_str(produced[end]))
     println(io,"greedy_edges=",greedy_count(vcat(prior_methods,new_methods)))
     println(io,"plan_end=",ym_str(plan[end]));println(io,"root_month=",ym_str(root));println(io,"rooted=",rooted);println(io,"bridge_edges=",count(==("BRIDGE"),flags))
-println(io,"best_effort_edges=0");println(io,"seconds=",round(time()-T0;digits=1))
+println(io,"layout_sha256=",layout_sha);println(io,"best_effort_edges=0");println(io,"seconds=",round(time()-T0;digits=1))
 end
 println("RESULT complete=",complete," greedy=",greedy_count(vcat(prior_methods,new_methods))," stop=",complete ? "-" : something(stop,"deadline")," edges_total=",edges_before+done," chain_end=",ym_str(produced[end])," seconds=",round(time()-T0;digits=1))
 done==0 && !complete && exit(3)
