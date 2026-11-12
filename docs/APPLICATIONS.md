@@ -20,7 +20,7 @@ link. Entry points are relative to the site root, for example
 | M/S Timer | Countdown or stopwatch on two cubes (minutes, seconds), 00:00-59:59 | `ms-timer.html`, chooser | [M/S Timer](MS_TIMER.md) |
 | 7x7 Calendar | English monthly calendar on one 7x7 cube with a 3D view, Jan 2028 to Jan 2076, adjacent months only (research candidate) | chooser (`index.html?app=calendar7`) | [7x7 calendar](CALENDAR_7X7.md) |
 | Calendar | German and English calendar cubes (3x3) | `calendar.html` | [Calendar cubes](CALENDAR_CUBES.md) |
-| CI Quality Cube | Six-face workflow status prototype | `status.html` | [Status Cube](STATUS_CUBE.md) |
+| CI Quality Cube | Six-face workflow status prototype | `index.html?app=ci`, `status.html` | [Status Cube](STATUS_CUBE.md) |
 | Picture Cube | Free-play 2x2 with picture stickers | `playground.html` | [Picture Cube](PICTURE_PLAYGROUND.md) |
 | 3x3 Super Picture Cube | Picture cube on a 3x3 | `picture3.html` | [Super Picture Cube](SUPER_PICTURE_CUBE.md) |
 | Print stickers | Vector print/cut sheets | `print.html` | [Print stickers](PRINT_STICKERS.md) |
