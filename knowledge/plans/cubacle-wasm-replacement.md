@@ -123,9 +123,13 @@ wasm package). It does **not** by itself pass G2 or authorize removing Cubing.js
 (G3). Slice M still waits for D12 (fixture list) at M1 start; L waits until stack A
 is merged.
 
-C1 facade measurement work already landed on cubacle `develop` (PRs #33 / #34).
-Stack A continues from that base (`feat/wasm-build-1` …). Implementation PRs stay
-in `wstein/cubacle`.
+C1 facade measurement work already landed on cubacle (PRs #33 / #34). Stack A
+continues from that tip (`feat/wasm-build-1` …). **All cubacle implementation PRs
+land on `main`**, not `develop`; `develop` is retired (owner, 2026-11-12). Until
+remote `main` is fast-forwarded to the former `develop` tip (plan merge
+`bb92669` and C1), stack branches are prepared against that tip and opened with
+base `main` only after the migration. Implementation PRs stay in
+`wstein/cubacle`.
 
 ## Constraints
 
