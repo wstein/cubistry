@@ -34,29 +34,49 @@ sha(p)=bytes2hex(sha256(read(p)))
             @test_throws "layout" check_segments_layout([r],"e"^64)
         end
     end
-    @testset "producer smoke (max_edges=0, no edge solved)" begin
+    @testset "window_chain.jl as a process" begin
         mktempdir() do d
             months=joinpath(d,"months.tsv");write(months,"2027-04\n")
-            producer(out,args...;layout=nothing,pin=nothing)=begin
-                c=addenv(`$(Base.julia_cmd()) --startup-file=no --threads=2 $(joinpath(@__DIR__,"window_chain.jl")) $out $ALT_PRINT $args`,
+            function producer(out,args...;layout=nothing,pin=nothing)      # (exit code, stderr text)
+                c=addenv(`$(Base.julia_cmd()) --startup-file=no --threads=4 $(joinpath(@__DIR__,"window_chain.jl")) $out $ALT_PRINT $args`,
                     "CAL7_WINDOW_MONTHS"=>months,"CAL7_WINDOW_MONTHS_SHA256"=>sha(months),"CAL7_ROOT_MONTH"=>"2026-05","CAL7_WINDOW_PRINT_SHA"=>sha(ALT_PRINT),
                     (layout===nothing ? () : ("CAL7_WINDOW_LAYOUT"=>layout,))...,(pin===nothing ? () : ("CAL7_WINDOW_LAYOUT_SHA256"=>pin,))...)
-                run(pipeline(ignorestatus(c);stdout=devnull,stderr=devnull)).exitcode
+                err=joinpath(d,"err-"*basename(out));code=run(pipeline(ignorestatus(c);stdout=devnull,stderr=err)).exitcode
+                code,read(err,String)
             end
             progress(out)=Dict(String.(split(l,'='))[1]=>String.(split(l,'='))[2] for l in readlines(joinpath(out,"PROGRESS.txt")))
             # alternative layout with its pin: recorded in PROGRESS.txt and segments.tsv (exit 3: no edge was requested)
-            o1=joinpath(d,"alt");@test producer(o1,"max_edges=0";layout=ALT_LAYOUT,pin=sha(ALT_LAYOUT))==3
+            o1=joinpath(d,"alt");@test producer(o1,"max_edges=0";layout=ALT_LAYOUT,pin=sha(ALT_LAYOUT))[1]==3
             @test progress(o1)["layout_sha256"]==sha(ALT_LAYOUT)
             @test split(read_segments(joinpath(o1,"segments.tsv"))[1],'\t')[end]==sha(ALT_LAYOUT)
-            # wrong pin: hard error before any output
-            o2=joinpath(d,"wrong");@test !(producer(o2,"max_edges=0";layout=ALT_LAYOUT,pin="0"^64) in (0,3)) && !isfile(joinpath(o2,"PROGRESS.txt"))
+            # wrong pin: hard error before any output (OUT is not even created)
+            o2=joinpath(d,"wrong");c2,e2=producer(o2,"max_edges=0";layout=ALT_LAYOUT,pin="0"^64);@test !(c2 in (0,3)) && occursin("differs from CAL7_WINDOW_LAYOUT_SHA256",e2) && !ispath(o2)
             # no layout variables: the built-in layout, whose SHA-256 is recorded (behavior unchanged)
-            o3=joinpath(d,"default");@test producer(o3,"max_edges=0")==3 && progress(o3)["layout_sha256"]==sha(DEFAULT_LAYOUT)
-            if get(ENV,"CAL7_LAYOUT_TEST_EDGE","")=="1"      # one real edge into April 2027 with the AP|RIL layout: the new state shows AP and RIL
-                o4=joinpath(d,"edge");@test producer(o4,"max_edges=1";layout=ALT_LAYOUT,pin=sha(ALT_LAYOUT))==0
-                texts=Set(split(l,'\t')[6] for l in readlines(joinpath(o4,"states","state-02.tsv"))[2:end])
-                @test "AP" in texts && "RIL" in texts && !("APR" in texts)
+            o3=joinpath(d,"default");@test producer(o3,"max_edges=0")[1]==3 && progress(o3)["layout_sha256"]==sha(DEFAULT_LAYOUT)
+            # one real edge into April 2027 with the AP|RIL layout: the new state shows AP and RIL
+            o4=joinpath(d,"edge");@test producer(o4,"max_edges=1";layout=ALT_LAYOUT,pin=sha(ALT_LAYOUT))[1]==0
+            texts=Set(split(l,'\t')[6] for l in readlines(joinpath(o4,"states","state-02.tsv"))[2:end])
+            @test "AP" in texts && "RIL" in texts && !("APR" in texts)
+            # resume (prior=) on the same layout runs through; on another layout it fails hard at the segment layout check
+            c5,e5=producer(joinpath(d,"resume-same"),"prior=$o4";layout=ALT_LAYOUT,pin=sha(ALT_LAYOUT));@test c5==0 && isempty(strip(e5))
+            c6,e6=producer(joinpath(d,"resume-other"),"prior=$o4");@test c6!=0 && occursin("layout of prior segment 1",e6)
+        end
+    end
+    @testset "beam_edge.jl as a process (greedy edge 2026-12 of the stored 2029-12 chain)" begin
+        mktempdir() do d
+            w=joinpath(@__DIR__,"evidence","window-2029-12")
+            function beam_edge(out;layout=nothing,pin=nothing)
+                c=addenv(`$(Base.julia_cmd()) --startup-file=no $(joinpath(@__DIR__,"beam_edge.jl")) $out $(joinpath(w,"printing.tsv")) $(joinpath(w,"moves.tsv")) $(joinpath(w,"states")) 2026 12 mode=greedy`,
+                    (layout===nothing ? () : ("CAL7_WINDOW_LAYOUT"=>layout,))...,(pin===nothing ? () : ("CAL7_WINDOW_LAYOUT_SHA256"=>pin,))...)
+                log=joinpath(d,"log-"*basename(out));code=run(pipeline(ignorestatus(c);stdout=log,stderr=log)).exitcode
+                code,read(log,String)
             end
+            c1,l1=beam_edge(joinpath(d,"default"))      # same result as the base: HTM=271, now with the layout SHA-256
+            @test c1==0 && occursin(" HTM=271 ",l1) && occursin("RESULT layout_sha256=$(sha(DEFAULT_LAYOUT)) ",l1)
+            c2,l2=beam_edge(joinpath(d,"pinned");layout=DEFAULT_LAYOUT,pin=sha(DEFAULT_LAYOUT))
+            @test c2==0 && occursin(" HTM=271 ",l2) && occursin("RESULT layout_sha256=$(sha(DEFAULT_LAYOUT)) ",l2)
+            o3=joinpath(d,"wrong");c3,l3=beam_edge(o3;layout=DEFAULT_LAYOUT,pin="0"^64)
+            @test c3!=0 && occursin("differs from CAL7_WINDOW_LAYOUT_SHA256",l3) && !ispath(o3)
         end
     end
 end
