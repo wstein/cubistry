@@ -9,9 +9,9 @@ sticker 63 `APR` to `AP` and sticker 235 `IL` to `RIL` (one sticker each, same b
 SHA-256 values: `sha256.txt`. The old evidence files are unchanged.
 
 Root of the long chain: the solved cube, January 2019 (first chain January 2019 to January 2036). The identity front of this print
-is the January/Tuesday/31 board; January 1980, January 2019 and January 2030 share that configuration. `months.jl` accepts months from
-2026-01 only, so the test builds the identity board with 2030-01 (same configuration) and checks weekday and length of 2019-01 and
-1980-01 with `Dates`. No run with root 2019-01 was made.
+is the January/Tuesday/31 board; January 1980, January 2019 and January 2030 share that configuration. `../window-skip/months.jl` (the print checker) accepts months from
+2026-01 only, so `test_print_c.jl` builds the identity board with 2030-01 (same configuration) and checks weekday and length of 2019-01 and
+1980-01 with `Dates`. The chain checkers (`check.jl`, `verify_chain.jl`, Flix) do accept the root 2019-01: two small chains from the solved cube of this print are in `../root-2019/` (README of the window chain, section checks of the first chain).
 
 Receipt `print-config-C-julia.tsv`: the repository print checker (`../window-skip/skip_check.jl print`) on the new layout and print,
 with the 90 months of `../config-coverage/front-matches-config-C1980.tsv` (one month per matchable configuration): SAT, 90 targets,
@@ -20,8 +20,8 @@ gives a byte-identical `front-matches-config-C1980.tsv`. The receipt differs fro
 only in the `input` line (layout and print hash) and in the seven April target hashes.
 February/Sunday/28 stays NOMATCH (best effort), as in `config-table.tsv` column `C1980_status`; not recomputed here.
 
-Not verified: Flix receipts (a separate later PR; nothing here is Flix-confirmed, so it is UNKNOWN as evidence); legal cube states;
-any chain run (root 2019-01 or other); the 286-month matching of the designer; the best-effort cells of February/Sunday/28 on this
+Not verified: Flix receipts of the print itself (nothing here is Flix-confirmed for the 90 configurations, so it is UNKNOWN as evidence); the long chain;
+the 286-month matching of the designer; the best-effort cells of February/Sunday/28 on this
 print; spelling and link checks, CI, workflows.
 
 `julia test_print_c.jl` (Julia 1.11.5 or 1.13.3, about 50 s) checks the two-row difference, the layout pin, the hash file, the identity

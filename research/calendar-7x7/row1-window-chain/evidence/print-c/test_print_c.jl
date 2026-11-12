@@ -4,7 +4,7 @@
 # Checks the print, the layout pin, the hash file, the identity front (January/Tuesday/31) and replays the Julia
 # receipt of the 90 front-matchable configurations. Run from anywhere: julia test_print_c.jl
 # months.jl accepts months from 2026-01 only; the identity board is built with 2030-01 (same configuration as 2019-01
-# and 1980-01) and the weekday/length facts of 2019-01 and 1980-01 are checked with Dates. No run with root 2019-01.
+# and 1980-01) and the weekday/length facts of 2019-01 and 1980-01 are checked with Dates. The chain checkers accept root 2019-01 (../root-2019/).
 using Test, SHA, Dates
 const PC=@__DIR__
 const EV=normpath(joinpath(PC,".."))
