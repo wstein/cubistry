@@ -193,6 +193,7 @@ export async function mountStatus(
       action(() => definition.categories.forEach((category, i) => workflow.select(category.id, preset.states[i]))),
     ),
   );
+  for (const b of presetButtons) b.className = "shell-quick-choice";
   controls.push(...presetButtons);
   const presetRow = make("div");
   presetRow.className = "shell-btn-row";
