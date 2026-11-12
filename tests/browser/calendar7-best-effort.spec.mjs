@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// A mismatch preserves its actual printing and adds only a transparent hatch strip at the bottom tenth of the flat face.
+// A mismatch preserves its actual printing and adds only translucent hatching over the whole flat face.
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 
@@ -64,17 +64,15 @@ async function rawStrip(page) {
     const a = ctx.getImageData(0, 0, actual.width, actual.height).data;
     const b = original.getImageData(0, 0, actual.width, actual.height).data;
     const W = actual.width, H = actual.height;
-    // This rectangle is independently derived from the physical flat-face contract, not from wrongStripRect().
+    // This rectangle is independently derived from the physical flat-face contract, not from wrongCellRect().
     const flatW = W * faceFlatShare(tile?.w ?? 1), flatH = H * faceFlatShare(tile?.h ?? 1);
-    const up = [...v.pose.up.slice(3 * i, 3 * i + 3)];
-    // Physical printing can be quarter-turned; the annotation remains at the calendar grid's bottom.
-    const edge = up[1] === 1 ? "bottom" : up[0] === -1 ? "left" : up[1] === -1 ? "top" : "right";
     const rect = { x: (W - flatW) / 2, y: (H - flatH) / 2, w: flatW, h: flatH };
-    if (edge === "left" || edge === "right") { rect.w = flatW * 0.1; if (edge === "right") rect.x += flatW * 0.9; }
-    else { rect.h = flatH * 0.1; if (edge === "bottom") rect.y += flatH * 0.9; }
+    // The numeral box: the middle half of the flat face, where the printed label sits.
+    const label = { x0: rect.x + rect.w / 4, x1: rect.x + rect.w * 3 / 4, y0: rect.y + rect.h / 4, y1: rect.y + rect.h * 3 / 4 };
+    let labelPixels = 0, labelKept = 0;
     const role = tileRoles(v.scheme, text, ink, "names"), grid = tileGrid(tile);
     const color = [1, 3, 5].map((j) => parseInt(role.ink.slice(j, j + 2), 16));
-    let outsideChanged = 0, lanePixels = 0, laneChanged = 0, originalInkPixels = 0, light = 0, dark = 0;
+    let inkKept = 0, outsideChanged = 0, lanePixels = 0, laneChanged = 0, originalInkPixels = 0, light = 0, dark = 0;
     const lightColors = [], darkColors = [], scan = [];
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const p = (y * W + x) * 4, changed = [0, 1, 2, 3].some((k) => a[p + k] !== b[p + k]);
@@ -82,15 +80,14 @@ async function rawStrip(page) {
       const aroundLane = x >= Math.floor(rect.x) - 1 && x <= Math.ceil(rect.x + rect.w) + 1 && y >= Math.floor(rect.y) - 1 && y <= Math.ceil(rect.y + rect.h) + 1;
       const inLane = x >= Math.ceil(rect.x) && x < Math.floor(rect.x + rect.w) && y >= Math.ceil(rect.y) && y < Math.floor(rect.y + rect.h);
       if (!aroundLane && changed) outsideChanged++;
-      if (!aroundLane && x >= Math.ceil(grid.cell.x0) && x < Math.floor(grid.cell.x1) && color.every((c, k) => Math.abs(b[p + k] - c) < 16)) originalInkPixels++;
+      if (x >= Math.ceil(grid.cell.x0) && x < Math.floor(grid.cell.x1) && color.every((c, k) => Math.abs(b[p + k] - c) < 16)) { originalInkPixels++; if (!changed) inkKept++; }
+      if (x >= label.x0 && x < label.x1 && y >= label.y0 && y < label.y1) { labelPixels++; if (!changed) labelKept++; }
       if (inLane) {
         lanePixels++; if (changed) laneChanged++;
         if (changed && Math.min(a[p], a[p + 1], a[p + 2]) > 230) { light++; lightColors.push([a[p], a[p + 1], a[p + 2]]); }
         if (changed && Math.max(a[p], a[p + 1], a[p + 2]) < 125) { dark++; darkColors.push([a[p], a[p + 1], a[p + 2]]); }
       }
-      if (edge === "left" || edge === "right") {
-        if (x === Math.floor(rect.x + rect.w / 2) && y >= Math.ceil(rect.y) && y < Math.floor(rect.y + rect.h)) scan.push(changed);
-      } else if (y === Math.floor(rect.y + rect.h / 2) && x >= Math.ceil(rect.x) && x < Math.floor(rect.x + rect.w)) scan.push(changed);
+      if (y === Math.floor(rect.y + rect.h / 2) && x >= Math.ceil(rect.x) && x < Math.floor(rect.x + rect.w)) scan.push(changed);
     }
     let runs = 0; for (let k = 0; k < scan.length; k++) if (scan[k] && !scan[k - 1]) runs++;
     // Prove repeated transparent gaps instead of imposing an arbitrary unchanged-area percentage.
@@ -105,7 +102,7 @@ async function rawStrip(page) {
     window.markerArtwork = v.art.find((entry) => entry.canvas === actual);
     const row = 4 - v.pose.pos[3 * i + 1], column = v.pose.pos[3 * i] + 4;
     const desired = document.querySelectorAll(".c7-sheet tr")[row - 1].children[column - 1].textContent;
-    return { id, text, desired, ink, W, H, rect, flatH, flatW, edge, up, outsideChanged, lanePixels, laneChanged, originalInkPixels, light, dark, lightColors, darkColors, runs, gaps, expectedFill: role.fill, actualFill: v.cube.faceColorOf.get(id), stable: ctx.getContextAttributes().willReadFrequently && original.getContextAttributes().willReadFrequently };
+    return { id, text, desired, ink, W, H, rect, flatH, flatW, labelPixels, labelKept, inkKept, outsideChanged, lanePixels, laneChanged, originalInkPixels, light, dark, lightColors, darkColors, runs, gaps, expectedFill: role.fill, actualFill: v.cube.faceColorOf.get(id), stable: ctx.getContextAttributes().willReadFrequently && original.getContextAttributes().willReadFrequently };
   });
 }
 
@@ -124,7 +121,7 @@ async function projectedStrip(page) {
     const w = flat(quarterTurned ? tile.h : tile.w), h = flat(quarterTurned ? tile.w : tile.h), W = v.host.clientWidth, H = v.host.clientHeight;
     const point = (x, y) => { const p = center.clone().addScaledVector(right, x).addScaledVector(up, y).project(v.camera); return { x: (p.x + 1) * W / 2, y: (1 - p.y) * H / 2 }; };
     const cos = normal.dot(v.camera.position.clone().sub(center).normalize());
-    return { cos, corners: [point(-w / 2, -h / 2), point(w / 2, -h / 2), point(w / 2, -h * 0.4), point(-w / 2, -h * 0.4)] };
+    return { cos, corners: [point(-w / 2, -h / 2), point(w / 2, -h / 2), point(w / 2, h / 2), point(-w / 2, h / 2)] };
   });
 }
 async function unmark(page, restore) {
@@ -184,16 +181,18 @@ test("February 2037 and 2043 keep one mismatch sentence and the accessible inten
   expect(errors).toEqual([]);
 });
 
-for (const scheme of ["paper-red", "dracula"]) test(`${scheme}: the original printed face keeps only a transparent bottom-tenth hatch strip through three views`, async ({ page }) => {
+for (const scheme of ["paper-red", "dracula"]) test(`${scheme}: the original printed face keeps only a translucent whole-face hatch through three views`, async ({ page }) => {
   const errors = []; page.on("pageerror", (error) => errors.push(error.message));
   await stableCanvasReadback(page); await open(page, 2037, scheme); await captureViewer(page);
   const raw = await rawStrip(page);
   expect(raw.stable).toBe(true);
   expect(raw.text).not.toBe(raw.desired);
-  expect(raw.outsideChanged, "no gray wash, frame, slash or changed printing above/outside the strip").toBe(0);
-  expect(raw.originalInkPixels, "the actual printed label remains above the strip").toBeGreaterThan(30);
+  expect(raw.outsideChanged, "no gray wash, frame or changed printing outside the flat face").toBe(0);
+  expect(raw.inkKept, "pixels of the printed label stay exactly as printed between the hatch lines").toBeGreaterThan(30);
+  expect(raw.inkKept / raw.originalInkPixels, "the hatch leaves at least 35 percent of the label ink untouched").toBeGreaterThan(0.35);
+  expect(raw.labelKept / raw.labelPixels, "the hatch leaves at least 40 percent of the label area untouched").toBeGreaterThan(0.4);
+  expect(raw.lanePixels, "the hatch covers the whole flat face").toBeGreaterThan(raw.flatW * raw.flatH * 0.9);
   expect(raw.actualFill, "the cut faces retain the original role fill").toBe(raw.expectedFill);
-  expect(raw.edge === "left" || raw.edge === "right" ? raw.rect.w / raw.flatW : raw.rect.h / raw.flatH).toBeCloseTo(0.1, 10);
   expect(raw.laneChanged).toBeGreaterThan(raw.lanePixels * 0.05);
   expect(raw.gaps.length, "at least six internal transparent gaps each preserve two exact original pixels").toBeGreaterThanOrEqual(6);
   expect(raw.runs, "repeated hatch lines instead of one diagonal").toBeGreaterThanOrEqual(6);
@@ -205,15 +204,15 @@ for (const scheme of ["paper-red", "dracula"]) test(`${scheme}: the original pri
     const geometry = await projectedStrip(page);
     if (geometry.cos < MIN_COS) continue;
     const photo = await photograph(page, geometry); views.push(photo);
-    expect(photo.inside, "the strip is visible on the projected physical face").toBeGreaterThan(8);
-    expect(photo.outside, "no marker outside the bottom strip").toBe(0);
+    expect(photo.inside, "the hatch is visible on the projected physical face").toBeGreaterThan(8);
+    expect(photo.outside, "no marker outside the flat face").toBe(0);
     expect(photo.contrast, "light/dark hatch contrast after perspective and lighting").toBeGreaterThan(1.5);
   }
   expect(views.length).toBeGreaterThanOrEqual(3);
   expect(errors).toEqual([]);
 });
 
-test("an exact month removes the strip and its mismatch metadata", async ({ page }) => {
+test("an exact month removes the hatch and its mismatch metadata", async ({ page }) => {
   await open(page, 2037);
   await page.getByRole("button", { name: /^Choose month and year/ }).click();
   await page.getByRole("button", { name: "Choose year", exact: true }).click();
