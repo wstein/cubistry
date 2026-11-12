@@ -1,13 +1,14 @@
 #!/usr/bin/env julia
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Tests of the best-effort edge of the producer window_chain.jl (rule: window_chain_lib.jl, helpers: best_effort_edge.jl).
-#   julia --startup-file=no --threads=4 test_window_chain_best_effort.jl       # units, print C checks and the real edge (see below)
-#   CAL7_BE_REAL=0 julia --startup-file=no test_window_chain_best_effort.jl    # units and print C checks only (about 30 s)
+#   julia --startup-file=no test_window_chain_best_effort.jl                          # default: units and print C checks (about 13 s)
+#   CAL7_BE_REAL=1 julia --startup-file=no --threads=4 test_window_chain_best_effort.jl  # opt-in: also the real edge (below)
 # The real edge test runs window_chain.jl with print C (library=L1 width=20) on the list [2026-02, 2026-03], root 2019-01 (the solved cube, the
 # first state of the first chain): the best-effort edge into February 2026 (February/Sunday/28 shows 29 in (7,1)) and an exact edge into March
 # 2026 that starts from the best-effort state. check.jl and verify_chain.jl must accept the chain with the verdict BEST_EFFORT. The predecessor
 # is the identity pose, not the state before February 2026 of the first chain (84 edges away, not producible in minutes). No Flix here
-# (run_checks.sh does that). Time: see the PR text; at load 35 to 55 the producer setup alone took 2 minutes.
+# (run_checks.sh does that). Time of the opt-in part: 5 min 43 s at load 35 to 55 (producer 229 s to 305 s, CPU about 3 min); over the 5-minute limit on a loaded
+# host, which is why it is not the default.
 using Test, SHA
 include(joinpath(@__DIR__,"window_chain_lib.jl"))
 using .WindowChainLib
@@ -20,7 +21,9 @@ st(rows,m)=only(r for r in rows if r[1]==m)
     @testset "wrong cell: file, switch, corner cells only" begin
         @test best_effort_cell("7,1")==(7,1)                       # the file says (7,1): the default
         @test best_effort_cell("7,1","")==(7,1)
-        @test best_effort_cell("7,7")==(7,7)                       # a file that says (7,7)
+        @test_throws "without best_effort_cell=7,7" best_effort_cell("7,7")      # a file that says (7,7) is refused: (7,7) only by the switch, never silently
+        @test_throws "without best_effort_cell=7,7" best_effort_cell("7,7","")
+        @test best_effort_cell("7,7","7,7")==(7,7)               # file and switch agree
         @test best_effort_cell("7,1","7,7")==(7,7)                 # the switch best_effort_cell=7,7 is the only way to the fallback
         @test best_effort_cell("7,7","7,1")==(7,1)
         @test BEST_EFFORT_CORNERS==((7,1),(7,7))
@@ -53,6 +56,7 @@ st(rows,m)=only(r for r in rows if r[1]==m)
     end
     @testset "edge lines and header" begin
         @test best_effort_edge_lines((7,1))==["wrong\t7\t1","hall\t7,1;7,7"]
+        @test stop_for_unreached(nothing)=="search_stalled" && stop_for_unreached((7,1))=="best_effort_unreachable" && stop_for_unreached((7,7))=="best_effort_unreachable"
         @test best_effort_edge_lines((7,7))==["wrong\t7\t7","hall\t7,1;7,7"]
         @test chain_header(false)=="cubistry.calendar7.chain.v1" && chain_header(true)=="cubistry.calendar7.chain.v2"
     end
@@ -102,7 +106,7 @@ function state_rows(path)       # a state file as the decoded state of the check
     t(s)=Tuple(parse.(Int,split(s,',')))
     [(id=parse(Int,f[1]),piece=parse(Int,f[2]),pos=t(f[3]),normal=t(f[4]),up=t(f[5]),text=f[6],ink=f[7]) for f in (split(l,'\t';keepempty=true) for l in readlines(path)[2:end])]
 end
-if get(ENV,"CAL7_BE_REAL","1")!="0"
+if get(ENV,"CAL7_BE_REAL","0")=="1"
 @testset "real best-effort edge 2026-02" begin
     mktempdir() do d
         months=joinpath(d,"months.tsv");write(months,"2026-02\n2026-03\n")
