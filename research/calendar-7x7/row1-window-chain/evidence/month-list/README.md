@@ -134,3 +134,46 @@ S2 are not run.
 - `row1-window-chain/run_month_list_receipts.sh`: regression (committed 2028-01 chain receipts, 129-month print and corner
   receipts, 21-month print) and the S2 receipts above.
 - `row1-window-chain/run_month_list_mutants.sh`: 59 source mutants (list logic, root edge, Hall rule, start moves, junction digests in Julia, Flix and the independent verifier; coverage and stage composition), each must make its test fail.
+
+## First chain: January 2019 .. January 2036 (owner decision 2026-11-12)
+
+Research candidate, not certified. Julia only; no Flix check, chain, solver or workflow was run for anything here (UNKNOWN as evidence).
+Stacked on #446 (print C, `../print-c/`, `printing.tsv` SHA-256 `0119ca3b...f9a92f8fc`, layout `e9a409ea...2b62a`).
+
+| File | Content |
+|---|---|
+| `months-chain-2019-01-2036-01.tsv` | 205 months, strictly ascending, 2019-01 .. 2036-01, no gap; SHA-256 `4ad43a5997ec019fd0383d7d853589213d09c2bb4e20179e1cdb94df5c6a66c3` (`sha256.txt`) |
+| `stages-chain-2019-01-2036-01.tsv` | five stages of 41, 41, 41, 41, 40 edges (data only) |
+| `best-effort-chain-2019-01-2036-01.tsv` | `best_effort_path` file: 2026-02, wrong cell (7,1) |
+| `coverage-chain-2019-01-2036-01.{tsv,json}` | output of `month_coverage.jl` (root 2019-01, start 2019-01, last 2036-01) |
+| `../../test_month_chain_2019.jl`, `../../run_chain2019_mutants.sh` | test (29 checks) and 11 data mutants |
+
+Root and edges (stage reading B of the owner plan): the root is the solved cube, which shows January 2019 (January, Tuesday, 31 days;
+the same board as January 1980 and January 2030). 2019-01 is S[1], so there is no root edge. A chain of 205 members has 204 edges;
+edge i leads from S[i] to S[i+1]. `CAL7_ROOT_MONTH` is the default (S[1]). The checkers' root fixtures use 2037-05 and the
+repository generators accept months from 2026-01 only in `months.jl`; `month_coverage.jl`, `read_list` and the producer library accept 2019 (range 1900-01 .. 2100-01).
+
+| Stage | Edges | Count | Start state month (S[first edge]) | End month (S[last edge + 1]) |
+|---|---|---|---|---|
+| 1 | 1 .. 41 | 41 | 2019-01 (root) | 2022-06 |
+| 2 | 42 .. 82 | 41 | 2022-06 | 2025-11 |
+| 3 | 83 .. 123 | 41 | 2025-11 | 2029-04 |
+| 4 | 124 .. 164 | 41 | 2029-04 | 2032-09 |
+| 5 | 165 .. 204 | 40 | 2032-09 | 2036-01 |
+
+Consecutive stages join in the boundary month (stages 2 to 5 start at a free state, chain.v3 `start` block, joined by digest). 2026-02 is edge 85 (stage 3).
+
+Coverage (`month_coverage.jl`, list pinned by hash): 205 chain members, planned exact runs 2 (2019-01 .. 2026-01: 85 months, 2026-03 .. 2036-01: 119 months), best-effort 1 (2026-02, `best_effort_unverified`), gaps 0, bridges 0, before_start 0.
+The `range` field of that output prints the generator's constant `2026-01` (`FIRST`) and is not a statement about the list. `verify_coverage.jl` was run and rejects this
+coverage with `Hall witness table exists`: it expects `february-hall-S2.tsv` (print S2) in the evidence directory and a Hall table for print C does not exist, so the coverage is verified by the generator and the test only.
+
+Configurations (Julia, `Dates`, weekday of the 1st and month length; lookup in `../config-coverage/config-table.tsv` column `C1980_status`, the matchings of print C are the
+ones of print C-1980, `../print-c/README.md`): 88 of the 91 configurations occur, 87 of them front-match print C, 92 distinct consecutive configuration pairs.
+204 of 205 months have a matching configuration (exact); the only month without one is 2026-02 (February, Sunday, 28 days), the best-effort month. It is the only February/Sunday/28 in the range (the previous one is 2015-02, the next 2037-02).
+
+Best-effort data: the maximum matching of February/Sunday/28 on print C has 48 of 49 cells; the wrong cell is (7,1) (the corner must show the digit 29) with (7,7) as fallback and a note
+(`../config-coverage/best-effort-feb-sunday-28.tsv`, print `C`). The file has the format `month status wrong_cells evidence` of `read_best_effort` (`window_chain_lib.jl`); the producer does not write a best-effort edge and
+stops before the month (`best_effort_month`); a producer rule for it is a separate change. No claims file: `claims_path` rows are for months that are not chain members, and a claim on a chain member is an error (`read_claims`/`month_records`).
+No fixed full state is stored for any configuration.
+
+Not run: Flix on any of this; the long chain; `stage_coverage.jl` (needs Julia and Flix stage receipts); the workflow; a receipt of the 205 months against print C (the print receipt covers the 90 configurations of print C-1980).
