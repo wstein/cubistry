@@ -394,9 +394,12 @@ test.describe("high-density calendar framing", () => {
         expect(canvas.y + canvas.height).toBeLessThanOrEqual(
           host.y + host.height + 1,
         );
+        // The host docks the controls beside the stage (wide) or below it (phone); the page put them above it.
         expect(
           canvas.x + canvas.width <= controls.x ||
-            controls.y + controls.height <= canvas.y,
+            controls.x + controls.width <= canvas.x ||
+            controls.y + controls.height <= canvas.y ||
+            canvas.y + canvas.height <= controls.y,
         ).toBe(true);
         expect(
           await page.locator("html").evaluate((e) => e.scrollWidth),
@@ -583,4 +586,22 @@ test("date picking starts legal motion immediately and day buttons preserve late
     timeout: PLANNING_TIMEOUT,
   });
   await expect(page.locator("#calendar-increment")).toBeDisabled();
+});
+test("host presentation keeps the committed face and the viewer, and the Escape key leaves it", async ({
+  page,
+}) => {
+  await ready(page, "2026-01-03T11:00:00Z");
+  const before = await page.locator("#calendar-front").textContent();
+  await page.locator("#presentation-btn").click();
+  await expect(page.locator("body")).toHaveClass(/presentation-mode/);
+  await expect(page.locator("#calendar-viewer canvas")).toHaveCount(1);
+  const canvas = await page.locator("#calendar-viewer canvas").boundingBox();
+  const viewport = page.viewportSize();
+  expect(canvas.width).toBeGreaterThan(viewport.width * 0.5);
+  expect(canvas.x + canvas.width).toBeLessThanOrEqual(viewport.width + 1);
+  await expect(page.locator("#calendar-front")).toHaveText(before);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("body")).not.toHaveClass(/presentation-mode/);
+  await expect(page.locator("#calendar-date")).toBeVisible();
+  await expect(page.locator("#calendar-front")).toHaveText(before);
 });

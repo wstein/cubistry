@@ -268,7 +268,7 @@ test("dispose releases the planner, the viewer, the timers and every listener, a
   assert.deepEqual(Object.keys(r.log.hooks), []);
 });
 
-test("dispose during a turn stops the route and destroys the viewer when the turn has ended", async () => {
+test("dispose during a turn stops the route after that turn and destroys the viewer once it has ended", async () => {
   const r = rig();
   const instance = await r.mount();
   r.dock.el("calendar-increment").fire("click");
@@ -276,13 +276,12 @@ test("dispose during a turn stops the route and destroys the viewer when the tur
   instance.dispose();
   assert.equal(r.log.destroyed, 0, "not while the viewer turns");
   assert.equal(r.log.later.length, 1, "the destroy is deferred");
-  await until(() => !r.viewer.animating);
+  const turns = r.log.animated.length;
+  for (let i = 0; i < 5; i++) await flush();
+  assert.equal(r.viewer.animating, false);
+  assert.equal(r.log.animated.length, turns, "no further turn after dispose");
   r.log.later.shift()();
   assert.equal(r.log.destroyed, 1);
-  const turns = r.log.animated.length;
-  await flush();
-  await flush();
-  assert.equal(r.log.animated.length, turns, "no further turn after dispose");
 });
 
 test("in live mode the date follows midnight, an inspected date does not, and resume checks again", async () => {
