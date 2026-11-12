@@ -16,8 +16,9 @@ name: Window chain
 # (run_checks.sh: Julia check.jl, Flix chain checker, independent verify_chain.jl; Julia and Flix receipts must be
 # byte-identical; uploads the verified artifact). Segments run one after another: a stopped run is continued with prior_run_id,
 # and segments.tsv records research_ref, library, width and lambda of every segment.
-# Optional layout_path + layout_sha256: the verify job checks the chain against that layout (CAL7_WINDOW_LAYOUT of run_checks.sh); the
-# producer (window_chain.jl) still reads research/calendar-7x7/row1-revision/layout.tsv. Without the inputs nothing changes.
+# Optional layout_path + layout_sha256: the producer (window_chain.jl) and the verify job (run_checks.sh) read that layout through
+# CAL7_WINDOW_LAYOUT and CAL7_WINDOW_LAYOUT_SHA256. prepare refuses the run when window_chain.jl or run_checks.sh at research_ref
+# does not mention CAL7_WINDOW_LAYOUT (fail closed). Without the inputs nothing is exported and nothing changes.
 # No commits, no gitlinks, no PR comments; the output is an artifact only.
 # Concurrency: one run at a time. GitHub keeps at most one running and one pending run per group; a newer dispatch replaces an
 # older pending one (the replaced run is cancelled) even with cancel-in-progress false. Dispatch the next run only after the
@@ -51,7 +52,7 @@ on:
         type: string
         required: true
       layout_path:
-        description: Optional repository path of a window-local layout TSV at research_ref (for example the April tiles AP|RIL); empty keeps row1-revision/layout.tsv. Only the verify job reads it
+        description: Optional repository path of a window-local layout TSV at research_ref; empty keeps row1-revision/layout.tsv. The producer and the verify job both read it (CAL7_WINDOW_LAYOUT); the run stops in prepare when research_ref has a producer or run_checks.sh that does not
         type: string
         default: ""
       layout_sha256:
@@ -222,6 +223,8 @@ jobs:
             git cat-file -e "$SHA:$f" 2>/dev/null || { echo "::error::$f is missing at $SHA"; missing=1; }
           done
           [ -z "$LAYOUT_PATH" ] || git cat-file -e "$SHA:$LAYOUT_PATH" || fail "$LAYOUT_PATH is missing at $SHA"
+          [ -z "$LAYOUT_PATH" ] || git grep -q CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/window_chain.jl" || fail "layout_path is set, but the producer at research_ref does not read CAL7_WINDOW_LAYOUT"
+          [ -z "$LAYOUT_PATH" ] || git grep -q CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/run_checks.sh" || fail "layout_path is set, but run_checks.sh at research_ref does not read CAL7_WINDOW_LAYOUT"
           [ "$missing" = 0 ] || fail "research commit lacks required files"
           [ "$(git show "$SHA:$MONTHS_PATH" | sha256sum | cut -d' ' -f1)" = "$MONTHS_SHA" ] || fail "month list differs from months_sha256"
           {
@@ -245,6 +248,8 @@ jobs:
       ROOT_MONTH: ${{ inputs.root_month }}
       BEST_PATH: ${{ inputs.best_effort_path }}
       CLAIMS_PATH: ${{ inputs.claims_path }}
+      LAYOUT_PATH: ${{ inputs.layout_path }}
+      LAYOUT_SHA: ${{ inputs.layout_sha256 }}
       START: ${{ needs.prepare.outputs.start }}
       END: ${{ needs.prepare.outputs.end }}
       MAX_EDGES: ${{ needs.prepare.outputs.max_edges }}
@@ -316,6 +321,8 @@ jobs:
           # The run contract of the checkers: month list S, its pin, the print pin and the root month.
           export CAL7_WINDOW_MONTHS="$GITHUB_WORKSPACE/src/$MONTHS_PATH" CAL7_WINDOW_MONTHS_SHA256="$MONTHS_SHA" CAL7_WINDOW_PRINT_SHA="$PRINT_SHA"
           [ -z "$ROOT_MONTH" ] || export CAL7_ROOT_MONTH="$ROOT_MONTH"
+          # An optional window-local layout, read by the producer: checked against its pin here.
+          [ -z "$LAYOUT_PATH" ] || { echo "$LAYOUT_SHA  src/$LAYOUT_PATH" | sha256sum --check --strict; export CAL7_WINDOW_LAYOUT="$GITHUB_WORKSPACE/src/$LAYOUT_PATH" CAL7_WINDOW_LAYOUT_SHA256="$LAYOUT_SHA"; }
           julia --version; nproc
           set +e
           timeout 65m julia --startup-file=no --threads=4 "src/$WC/window_chain.jl" "$out" "src/$PRINT_PATH" "${args[@]}" 2>&1 | tee "$GITHUB_WORKSPACE/out/run.log"
