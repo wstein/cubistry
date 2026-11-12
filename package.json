@@ -34,6 +34,7 @@
     "verify:calendar7": "node scripts/prepare-calendar7.mjs --check",
     "verify:calendar7-names": "node scripts/export-calendar7-names.mjs --check",
     "verify:calendar7-names-demo": "node scripts/export-calendar7-names-demo.mjs --check",
+    "verify:calendar7-chain-c": "node scripts/export-calendar7-chain-c.mjs --check",
     "verify:calendar7-names-anydate": "node scripts/export-calendar7-names-anydate.mjs --check"
   },
   "dependencies": {
