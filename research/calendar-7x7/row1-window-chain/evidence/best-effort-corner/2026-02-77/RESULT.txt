@@ -1,0 +1,1 @@
+RESULT month=2026-02 wrong=7,7 replacement=29|red cand=1 of 1 HTM=443 QTM=456 rot=22 seconds=2.9
