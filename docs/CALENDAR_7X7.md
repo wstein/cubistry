@@ -14,11 +14,13 @@ the next month.
 
 - URL parameters: `year` and `month` (1 to 12), only together. Without them the
   current month is used.
-- The view uses one fixed names printing, `public/calendar7/names-demo/`, for every date.
-  The checked move chain covers **May 2026 to June 2027**. Its May-to-November 2026
-  prefix retains the longer greedy edges; the seven November 2026-to-June 2027
-  transitions use the shorter beam words. November to December 2026 is 51 block
-  moves with the middle slice counted (61 HTM), not 197 block moves.
+- The view uses one fixed names printing, print C, `public/calendar7/chain-c/`, for every date.
+  The checked move chain covers **January 2019 to January 2036** (205 states, 204 edges; the root,
+  January 2019, is the solved cube). February 2026 is the one best-effort month: the cube
+  shows the red 29 in row 7, column 1, marked as a differing cell. Format, size and source
+  digests: [CALENDAR7_CHAIN_C.md](CALENDAR7_CHAIN_C.md). The former names demo folder
+  (`public/calendar7/names-demo/`, May 2026 to June 2027) is no longer read by the app; it
+  remains as test data.
 - Other dates, years 1 to 9999, show a display-only preview on the **same print**.
   An application matching places the front bodies and completes the other body poses.
   This is not a move sequence or a proof of reachability. Actual mismatching cells
@@ -43,7 +45,7 @@ the next month.
 - **The 3D view (stage 2).** The studio scene shows the cube with its 218 surface bodies
   and 294 printed faces in the pose of the displayed month. Calendar7 always draws labels directly
   on the cubie faces, without visible sticker meshes. Each face shows the text and ink
-  of the fixed names print (`names-demo/state.v1.json`), including the letters `MON` and `FRI`.
+  of the fixed names print (`chain-c/state.v1.json`), including the letters `MON` and `FRI`.
   Letters and digits are distinct; `I` is not `1` and `O` is not `0`. The cube sits slightly turned
   so that three faces show; drag it, or use the Rotation selector and Reset view, to look
   around. The month sheet below stays the reference for what the front face must show.
@@ -411,7 +413,7 @@ Former `layout=standard`, `layout=names`, `layout=names-demo` and `layout=names-
 URLs select this same view; the obsolete parameter is removed while year, month, font,
 color scheme and unrelated parameters are retained.
 
-The mode reads only the three `names-demo` files. In-chain dates use its checked
+The mode reads only the four `chain-c` files (state, graph, displays, best-effort), fetched when it opens. In-chain dates use its checked
 retained-state words; other dates use the existing rigid-front matching code on
 that exact printing. Actual front mismatches keep their original sticker color
 and printed label. Translucent light/dark hatch lines cover the day field of the differing cell: the unit
@@ -480,7 +482,7 @@ The tile class `band` exists in the names layout (see above): there a blank tile
 
 The scheme `rubik-tint` (`?scheme=rubik-tint`, last in the selector) is a hint, not information. The background of a sticker is a very light tint of the standard Rubik color of its **home face**, the face it lies on in the solved cube; the tint travels with the stone. The print (numerals, weekday names) is always #111111, the month band (row 1) is black with white lettering (banner style Rounded), and weekend (red class) tiles have a grey-shifted ground (below), so the colors carry nothing and the scheme is color-blind safe by design. In the solved pose the front is white-tinted.
 
-- **Home face.** The identity pose of the print (the root pose of `names-demo/state.v1.json`, same bodies and normals as `names/` and `names-any/`, state field "identity pose") gives it: the normal of a sticker there. The mount passes that pose to the viewer (`setHomePose`) before every `configure`; `home-tint.ts` maps the normal to a face. Only the names print has a known solved pose. The root pose of the standard print is a setup from a root word, not the solved cube, so its home faces are unknown: the mount passes null and every stone shows the tint of the white face. The standard print is not reachable in the app today (one names view).
+- **Home face.** The identity pose of the print (the root pose of `chain-c/state.v1.json`, same bodies and normals as `names/` and `names-any/`, state field "identity pose") gives it: the normal of a sticker there. The mount passes that pose to the viewer (`setHomePose`) before every `configure`; `home-tint.ts` maps the normal to a face. Only the names print has a known solved pose. The root pose of the standard print is a setup from a root word, not the solved cube, so its home faces are unknown: the mount passes null and every stone shows the tint of the white face. The standard print is not reachable in the app today (one names view).
 - **Orientation (one constant, `HOME_ORIENTATION` in `home-tint.ts`).** White front, red right, blue top, green bottom, orange left, yellow back: white opposite yellow, red opposite orange, blue opposite green. The owner's wording "white front, green top, red right" is the mirror image of a standard cube (a standard cube has orange right when white is front and green top), so the constant keeps white front and red right and takes blue on top; changing the constant is the only edit needed.
 - **Tints.** `tintOf(color, t)` is the Rubik color (white #ffffff, yellow #ffd500, red #b71234, orange #ff5800, blue #0046ad, green #009b48) mixed into white by the share t: white 0, yellow 0.19, red 0.13, orange 0.23, blue 0.16, green 0.14, giving #ffffff, #fff7cf, #f6e0e5, #ffd9c4, #d6e1f2, #dbf1e5 (`RUBIK_TINTS`). The strengths come from `optimize()` in [scripts/calendar7-rubik-tint.mjs](../scripts/calendar7-rubik-tint.mjs): a deterministic search that maximizes the smallest CIEDE2000 distance between any two tints (white included) while black #111111 print reads at least 12:1 on every weekday AND weekend ground. The weekend ground is the limit: without it the same search gives tints up to 0.37 strong and a least distance of 15.18.
 - **Weekend ground (owner decision 2026-11-12).** Weekend days are the ink class red (Sunday first; SUN and SAT labels too), so this is a scheme token: the weekend ground is the home tint darkened toward black on the neutral scale by `WEEKEND_DARKEN` = 0.08 (`weekendGroundOf`, #ebebeb for white), the print stays #111111. It travels with the tile like every other tile-class property; print, layout and chain are unchanged. Trade-off measured by the search (darkening g, least pair distance of the tints, least weekend-to-weekday distance of a face, all CIEDE2000; 12:1 kept everywhere): 0.02: 14.14 / 1.00; 0.04: 12.41 / 1.96; 0.06: 11.07 / 3.05; **0.08: 10.19 / 4.10**; 0.10: 8.16 / 5.18; 0.12: 6.98 / 6.39; 0.15: 3.88 / 8.07; 0.18: 0.61 / 9.94. A weekend-to-weekday distance of 8 would leave the tints almost white (pair distance 3.9), so the gates are 4 for the weekend step (clearly visible on adjacent tiles, about twice the just-noticeable 2) and 10 for the tints; 0.08 is the largest darkening that keeps the pair gate. A stronger weekend step costs tint distinction; the constant (`HOME_WEEKEND_DARKEN`, equal to the script's `WEEKEND_DARKEN`, checked by the test) is the one place to change it.
