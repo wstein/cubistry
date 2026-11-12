@@ -9,6 +9,7 @@ import { type DisplayTable, type Graph, namesWindowContains, parseDisplays, pars
 import { type Layout, type LayoutMode, ANY_DISPLAY_ONLY_NOTICE, LAYOUT_PARAM, NAMES_ANY_LABEL, NAMES_ANY_LOAD_NOTICE, NAMES_ANY_MODE, NAMES_LOAD_NOTICE, parseLayoutMode } from "./layout.ts";
 import { type AnyData, type AnyState, chooseAnyMonth, parseAnyData, stateForDate, wrongStickerIndices } from "./anydate.ts";
 import { anyDateModel, anyDatePageHtml } from "./anydate-view.ts";
+import { MonthPicker } from "./month-picker.ts";
 import { type Pose, type Printing, stateDigest } from "./engine.ts";
 import {
   announce,
@@ -97,6 +98,7 @@ export async function mountCalendar7(
   const threeD = Boolean(env.sceneHost && env.createStage);
   root.innerHTML =
     '<div class="c7-live" role="status" aria-live="polite"></div>' +
+    '<div class="c7-date-choice" data-c7-month-picker></div>' +
     '<div class="c7-appearance-choices">' +
     `<div class="c7-font-choice"><label for="c7-font-style">Font style</label><select id="c7-font-style" data-c7-font>${FONT_STYLES.map(f => `<option value="${f.id}"${f.id === fontStyleById(params.get("font")).id ? " selected" : ""}>${f.label}</option>`).join("")}</select></div>` +
     (threeD ? `<div class="c7-layout-choice"><label for="c7-layout">Cube layout</label><select id="c7-layout" data-c7="layout"><option value="standard"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "standard" ? " selected" : ""}>Standard</option><option value="names"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "names" ? " selected" : ""}>Names (preview, May 2026 - Jan 2028)</option>${params.get(LAYOUT_PARAM) === NAMES_ANY_MODE ? `<option value="${NAMES_ANY_MODE}" selected>${NAMES_ANY_LABEL}</option>` : ""}</select></div>` : "") +
@@ -165,6 +167,7 @@ export async function mountCalendar7(
   let previous: PlayerSnapshot | null = null;
   let wordOptions: WordOptions = { ...DEFAULT_WORD_OPTIONS };
   let currentModel: PageModel | null = null;
+  let monthPicker: MonthPicker | null = null;
   let selectedSpeed: number = DEFAULT_SPEED;
   let font: LoadedFont | null = null;
   let schemeId: string | null = params.get(SCHEME_PARAM);
@@ -447,6 +450,8 @@ export async function mountCalendar7(
   const refreshPreviews = (): void => {
     if (!currentModel) return;
     view.innerHTML = anyActive ? anyDatePageHtml(currentModel) : pageHtml(currentModel, wordOptions);
+    const shown = currentModel.choice;
+    monthPicker?.setValue(shown.kind === "invalid" ? null : shown.ym);
     paintSheet();
     const active = player && player.snapshot.phase !== "idle";
     view.querySelectorAll?.(".c7-word-panel").forEach((el) => ((el as HTMLElement).hidden = Boolean(active)));
@@ -608,6 +613,23 @@ export async function mountCalendar7(
     };
     step();
   };
+  const pickerHost = root.querySelector<HTMLElement>("[data-c7-month-picker]");
+  // A test fake that does not model this host has no ownerDocument; the real page and the picker tests do.
+  if (pickerHost?.ownerDocument) {
+    monthPicker = new MonthPicker(pickerHost, null, {
+      today,
+      onSelect: (ym) => {
+        if (!alive()) return;
+        const shown = currentModel?.choice;
+        if (shown && shown.kind !== "invalid" && shown.ym.year === ym.year && shown.ym.month === ym.month) return;
+        const keep = new URLSearchParams(env.search());
+        keep.set("year", String(ym.year));
+        keep.set("month", String(ym.month));
+        env.replaceQuery(`?${keep.toString()}`);
+        show(new URLSearchParams({ year: String(ym.year), month: String(ym.month) }), false);
+      },
+    });
+  }
   onFont();
   show(params, false);
 
@@ -725,6 +747,7 @@ export async function mountCalendar7(
     setScheme: applyScheme,
     dispose: () => {
       disposed = true;
+      monthPicker?.dispose();
       stopSheetTheme?.();
       fontChoice?.dispose();fontSelect?.removeEventListener("change", onFont);
       root.removeEventListener("click", onClick);
