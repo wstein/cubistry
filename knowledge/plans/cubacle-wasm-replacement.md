@@ -92,6 +92,41 @@ Numbers from [cubacle `docs/wasm.md`](https://github.com/wstein/cubacle/blob/134
 Open: whether the 2×2 cold start (about 93 ms in Node, 109 ms in Chromium) and the
 21.4 MB of memory are acceptable.
 
+## C2 to C5 go (owner, 2026-11-12)
+
+**O** Owner instruction "go also with C2-5" against the cubacle Browser WebAssembly
+plan ([wstein/cubacle#38](https://github.com/wstein/cubacle/pull/38), draft on
+`docs/plan-c1-c5`). This is the approval that section 6 **D1** of that plan asks for:
+stacks **A** and **B** may start now. It is also acceptance of that plan's
+**Recommended** choices for the decisions those stacks need:
+
+| Decision | Choice taken |
+| --- | --- |
+| D1 | Approve stacks A and B now; L after D4 and D11; M after D9, D12, D13 and D14 |
+| D2 | Commit plus `sha512` for the wasm tarball; tag pin unchanged for native binaries |
+| D3 | Cubing.js numbering for 2×2×2 and 3×3×3 (fixture + license check still required) |
+| D4 | Tables built in the module; hashes pinned in tests |
+| D5 | xtask checks one `rustc` version; no repo-wide `rust-toolchain.toml` |
+| D6 | Rust tarball writer in xtask (`tar` + gzip crates) |
+| D7 | Package name `cubacle-wasm`, unscoped, unpublished |
+| D8 | Yes: optional `cli` feature for `clap`, `sysinfo`, `toml` |
+| D9 | Fix-up after ignore-centers; center fix-up words computed in cubacle |
+| D10 | Yes: light-lane wasm CI job after A3 |
+| D11 | Terminate the worker plus `budgetMs`; no shared-memory cancel flag |
+| D12 | Owner names or approves the Calendar fixture list in the M1 pull request |
+| D13 | Algebra public in Rust; JS package exposes definition data, conversion, `solvePattern`, `capabilities` only |
+| D14 | Yes: `src/kpuzzle` and `src/targets` modules and `RULES` as in the cubacle plan |
+
+This advances cubacle plan steps that map to Cubistry approach steps 4 to 5
+(exact-frame / ignore-centers targets, pattern algebra, table loading, reproducible
+wasm package). It does **not** by itself pass G2 or authorize removing Cubing.js
+(G3). Slice M still waits for D12 (fixture list) at M1 start; L waits until stack A
+is merged.
+
+C1 facade measurement work already landed on cubacle `develop` (PRs #33 / #34).
+Stack A continues from that base (`feat/wasm-build-1` …). Implementation PRs stay
+in `wstein/cubacle`.
+
 ## Constraints
 
 - Pin cubacle by commit hash and integrity, as `puzlwerk-source.json` does; never
