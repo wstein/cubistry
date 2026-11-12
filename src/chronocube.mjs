@@ -852,6 +852,24 @@ async function initCalendar7Mode(isCurrent, params) {
   return instance ? () => instance.dispose() : undefined;
 }
 
+// -------------------------------------------------------------
+// Mode: CI Quality Cube (local simulation; src/apps/status/mount.ts). Loaded on demand.
+// -------------------------------------------------------------
+async function initCiMode(isCurrent, params, shell) {
+  const [{ mountStatus }, { browserStatusEnv }] = await Promise.all([
+    import("./apps/status/mount.ts"),
+    import("./apps/status/browser-env.ts"),
+  ]);
+  if (!isCurrent()) return;
+  $("studio-cards").setAttribute("data-count", "1");
+  const instance = await mountStatus($("studio-scene"), params, { isCurrent, shell }, browserStatusEnv(base));
+  if (!isCurrent()) {
+    if (instance) instance.dispose();
+    return;
+  }
+  return instance ? () => instance.dispose() : undefined;
+}
+
 const MODE_INITS = {
   clock: (isCurrent, params, shell) => initClockMode(isCurrent, params, shell),
   "ms-timer": (isCurrent) => initMsTimerMode(isCurrent),
@@ -864,6 +882,7 @@ const MODE_INITS = {
   "ms-counter": (isCurrent) => initHsmSingleMode("ms", isCurrent),
   "hm-one-cube": (isCurrent) => initHsmSingleMode("hm", isCurrent),
   calendar7: (isCurrent, params) => initCalendar7Mode(isCurrent, params),
+  ci: (isCurrent, params, shell) => initCiMode(isCurrent, params, shell),
 };
 
 const registry = createRegistry(

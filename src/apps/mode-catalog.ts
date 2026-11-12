@@ -3,7 +3,7 @@ import type { ModeMeta } from "./registry.ts";
 /**
  * The modes that exist today, in studio order. The ids are the unified `app` keys: the legacy `application` key
  * `certified` is `counter` and `tenth-counter` is `tenth`. Titles follow the design proposal
- * (docs/design/README.md). Applications without a mode yet (calendar, playground, picture3, status) join in stage 4.
+ * (docs/design/README.md). Applications without a mode yet (calendar, playground, picture3) join in stage 4.
  */
 export const MODE_CATALOG: readonly ModeMeta[] = [
   {
@@ -115,5 +115,15 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     group: "cubes",
     help: "docs/CALENDAR_7X7.md",
     params: ["year", "month", "outer", "c7-font", "layout", "scheme", "plasticity", "banner"],
+  },
+  {
+    id: "ci",
+    title: "CI Quality Cube",
+    subtitle: "Build, test, analyze and review states on one 3x3 cube (local simulated events).",
+    cubes: 1,
+    badge: "CI Quality",
+    group: "cubes",
+    help: "docs/STATUS_CUBE.md",
+    params: ["turn", "build", "test", "analyze", "review"],
   },
 ];

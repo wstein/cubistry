@@ -31,14 +31,15 @@ const table = parseDisplays(json("public/calendar7/displays.v1.json"));
 const range = chainRange(graph);
 const q = (s) => new URLSearchParams(s);
 
-test("the catalog lists calendar7 as a one-cube mode that is the last chooser entry", () => {
+test("the catalog lists calendar7 as a one-cube mode that is the chooser entry before the CI Quality Cube", () => {
   const m = MODE_CATALOG.find((x) => x.id === "calendar7");
   assert.ok(m);
   assert.equal(m.title, "7x7 Calendar");
   assert.equal(m.cubes, 1);
   assert.equal(m.group, "cubes");
   assert.equal(m.help, "docs/CALENDAR_7X7.md");
-  assert.equal(MODE_CATALOG.at(-1).id, "calendar7");
+  assert.equal(MODE_CATALOG.at(-2).id, "calendar7");
+  assert.equal(MODE_CATALOG.at(-1).id, "ci");
   const reg = createRegistry(MODE_CATALOG.map((x) => ({ ...x, mount: async () => {} })));
   assert.ok(reg.has("calendar7"));
 });

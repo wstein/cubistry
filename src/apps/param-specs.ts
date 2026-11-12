@@ -50,6 +50,7 @@ const oneOfNumbers = (values: readonly number[]) => (raw: string) => {
   const n = /^\d+$/.test(raw) ? Number(raw) : NaN;
   return values.includes(n) ? n : undefined;
 };
+const state = oneOf(["open", "running", "ok", "error", "blocked"]);
 const word = (raw: string) => (/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(raw) ? raw : undefined);
 const isoDate = (raw: string) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
@@ -99,6 +100,12 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
   plasticity: { parse: num(0, 1) },
   banner: { parse: oneOf(["theme", "rounded", "square", "underline", "boxed", "rounded-box"]) },
   size: { parse: int(2, 7) },
+  // CI Quality Cube (src/apps/status/params.ts): quarter-turn time in ms; the category states are a one-time request.
+  turn: { parse: oneOfNumbers([500, 250, 100, 50]) },
+  build: { parse: state, perMode: true },
+  test: { parse: state, perMode: true },
+  analyze: { parse: state, perMode: true },
+  review: { parse: state, perMode: true },
   // Global flags: every app reads them, so they are never owned by one mode and survive a switch.
   // `speed` is in `GLOBAL_PARAMS` too: no app switch drops it.
   // The shell opens the Nerd drawer for `nerd=1` only; every other value leaves it closed.
