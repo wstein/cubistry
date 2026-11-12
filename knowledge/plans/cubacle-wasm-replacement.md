@@ -131,6 +131,22 @@ remote `main` is fast-forwarded to the former `develop` tip (plan merge
 base `main` only after the migration. Implementation PRs stay in
 `wstein/cubacle`.
 
+### Focused work items (one PR each, stacked)
+
+| WI | Branch | Depends on | Notes |
+| --- | --- | --- | --- |
+| WI-A1 | `feat/wasm-build-1` | `main` | C1 facade split + `cubacle_abi_version` |
+| WI-A2 | `feat/wasm-build-2` | A1 | optional `cli` + `wasm-deps` |
+| WI-A3 | `feat/wasm-build-3` | A2 | `cargo xtask wasm` + sorted manifest (D5) |
+| WI-A4 | `feat/wasm-build-4` | A3 | deterministic tarball (D2, D6, D7) |
+| WI-B1 | `feat/kpuzzle-1` | `main` | pattern algebra (parallel to A) |
+| WI-B2 | `feat/kpuzzle-2` | B1 | `alg` / Facelets bridge |
+| WI-L1…L3 | `feat/wasm-loader-*` | A merged | after A; need D4, D11 for L |
+| WI-M1…M3 | `feat/target-modes-*` | B+L merged | M1 also needs D12 fixture list |
+
+Local patches for A1–A3 (rebased on tip `bb92669`) live with the cloud agent
+artifacts until cubacle write access exists; do not open against `develop`.
+
 ## Constraints
 
 - Pin cubacle by commit hash and integrity, as `puzlwerk-source.json` does; never
