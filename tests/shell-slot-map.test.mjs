@@ -65,7 +65,7 @@ test("migration status: every registered mode is listed; only the 1/10-Second Co
 });
 
 test("accepted deviations: the 1/10-Second Counter maps Step, Value, Direction, Step speed instead of the design row (owner decision 5, 2026-11-08)", () => {
-  assert.deepEqual(Object.keys(ACCEPTED_DEVIATIONS), ["tenth"]);
+  assert.deepEqual(Object.keys(ACCEPTED_DEVIATIONS).sort(), ["ci", "tenth"]);
   const design = SLOT_MAP.find((r) => r.modes.includes("tenth"));
   const actual = ACCEPTED_DEVIATIONS.tenth;
   assert.deepEqual([...actual.slots], ["Step", "Value", "Direction", "Step speed", null]);
@@ -81,10 +81,20 @@ test("accepted deviations: the 1/10-Second Counter maps Step, Value, Direction, 
   assert.match(plan, /Run \/ Stop, Stop after and Wrap, which this mode does not have\. This deviation is accepted/);
 });
 
-test("the CI Quality Cube fills the design's slots 1 and 2 through the shell with its own labels", () => {
+test("accepted deviations: the CI Quality Cube uses Simulated events and Workflow (owner decision 2026-11-12)", () => {
+  const design = SLOT_MAP.find((r) => r.modes.includes("ci"));
+  const actual = ACCEPTED_DEVIATIONS.ci;
+  assert.deepEqual([...actual.slots], ["Simulated events", "Workflow", null, null, null]);
+  assert.notDeepEqual([...actual.slots], [...design.slots], "a deviation differs from the design");
+  assert.deepEqual(actual.omitted, ["Refresh status", "Workflow list"]);
+  assert.match(actual.decision, /2026-11-12/);
   assert.deepEqual(slotsOf("ci"), [1, 2]);
   const mount = readFileSync("src/apps/status/mount.ts", "utf8");
-  assert.match(mount, /shell\.setSlot\(1, \{ label: "Simulated events"/);
-  assert.match(mount, /shell\.setSlot\(2, \{ label: "Workflow"/);
+  for (const label of actual.slots.filter(Boolean)) {
+    assert.ok(mount.includes(`label: "${label}"`), `${label} is a slot label of the mode`);
+  }
   assert.doesNotMatch(mount, /shell\.setSlot\([345],/);
+  const plan = readFileSync("knowledge/plans/unified-application.md", "utf8");
+  assert.match(plan, /labels them "Simulated events" and "Workflow"/);
+  assert.match(plan, /This deviation is accepted \(owner decision 2026-11-12/);
 });

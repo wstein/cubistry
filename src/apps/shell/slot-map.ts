@@ -100,6 +100,11 @@ export const ACCEPTED_DEVIATIONS: Readonly<Record<string, AcceptedDeviation>> = 
     omitted: ["Run / Stop", "Stop after", "Wrap"],
     decision: "owner decision 5, 2026-11-08",
   },
+  ci: {
+    slots: ["Simulated events", "Workflow", null, null, null],
+    omitted: ["Refresh status", "Workflow list"],
+    decision: "owner decision 2026-11-12: local simulation has no external refresh or workflow list",
+  },
 };
 
 /**
