@@ -17,14 +17,14 @@ async function pickDate(page, year, month) {
 const ROOT = "#calendar7-root";
 const at = (page, month) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-month", month, { timeout: 30000 });
 const idle = (page) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "idle", { timeout: 30000 });
-const NOTICE = "Display only: no move sequence for this date (beam preview print).";
+const NOTICE = "Display only: no move sequence for this date (print C).";
 
 /** Recompute the displayed front from the canonical physical print, not from a second any-date dataset. */
 const faceOf = (page, year, month) => page.evaluate(async ([y, m]) => {
   const { previewForDate, stateForDate } = await import("/src/apps/calendar7/anydate.ts");
   const { parseState } = await import("/src/apps/calendar7/graph.ts");
   const { stateDigest } = await import("/src/apps/calendar7/engine.ts");
-  const start = parseState(await (await fetch("/calendar7/names-demo/state.v1.json")).json());
+  const start = parseState(await (await fetch("/calendar7/chain-c/state.v1.json")).json());
   const state = stateForDate(previewForDate(start, y, m), y, m);
   if (state.kind !== "state" && state.kind !== "best-effort") return { kind: state.kind };
   const front = new Map();
@@ -55,9 +55,9 @@ test("September 1967 shows SEPTEMBER and a Friday start on the canonical print, 
   expect(errors).toEqual([]);
 });
 
-test("February 2026 marks its actual mismatch without claiming UNSAT or exposing technical diagnostics", async ({ page }) => {
-  await page.goto("/index.html?app=calendar7&layout=names&year=2026&month=2");
-  await at(page, "2026-02"); await idle(page);
+test("February 2037 (off the chain) marks its actual mismatch without claiming UNSAT or exposing technical diagnostics", async ({ page }) => {
+  await page.goto("/index.html?app=calendar7&layout=names&year=2037&month=2");
+  await at(page, "2037-02"); await idle(page);
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "best-effort");
   await expect(page.locator("[data-c7-best-effort]")).toHaveText("Preview mismatch: cell bottom right (row 7, column 7) differs.");
   await expect(page.locator("#studio-scene")).toBeVisible();
