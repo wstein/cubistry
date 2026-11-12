@@ -11,7 +11,7 @@ import { test, expect } from "@playwright/test";
 // Tolerance in 8-bit sRGB per channel. Fills are the median of the tile interior (shading and antialiasing do not matter);
 // ink and line are the best matching pixel of the tile (thin strokes never cover whole pixels but the best one is a stroke core).
 const FILL_TOL = 7, STROKE_TOL = 6; // at the default plasticity 0.6: it shades the faces (a tile can be a few levels off: Paper Red 6, Dracula 7), the median of all tiles is checked at 2
-const SCHEMES = ["paper-red", "paper-blue", "classic", "solarized-light", "gruvbox-light", "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast"];
+const SCHEMES = ["paper-red", "paper-blue", "classic", "solarized-light", "gruvbox-light", "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast", "rubik-tint"];
 
 async function sample(page, scheme, tilted = false, production = false, plasticity = undefined) {
   await page.goto("/licenses.html");
@@ -30,6 +30,7 @@ async function sample(page, scheme, tilted = false, production = false, plastici
     const viewer = new Calendar7Viewer(host, panel);
     viewer.setFont(await loadCalendarFont("noto", "/"));
     viewer.setScheme(scheme);
+    viewer.setHomePose(pose); // home faces of the Rubik-Tint scheme (the identity pose of the print)
     if (plasticity !== undefined) viewer.setPlasticity(plasticity);
     viewer.configure(printing, pose, "face", "names");
     // Head on to the front face, or the default start view of the app (yaw 0.3, pitch 0.22: the cube as the page first shows it).
@@ -94,7 +95,7 @@ const MEDIAN_TOL = { "high-contrast": 5, "gruvbox-light": 4 };
  * measured above 2 are raised to the cell values (paper-red 4, paper-blue 3, classic 4, solarized-light 4); the limits of the
  * single fills stay.
  */
-const PRODUCTION_MEDIAN_TOL = { "paper-red": 4, "paper-blue": 3, classic: 4, "solarized-light": 4 };
+const PRODUCTION_MEDIAN_TOL = { "paper-red": 4, "paper-blue": 3, classic: 4, "solarized-light": 4, "rubik-tint": 4 };
 const medianTol = (scheme, production = false) => (production ? PRODUCTION_MEDIAN_TOL[scheme] : undefined) ?? MEDIAN_TOL[scheme] ?? 2;
 
 const MODES = [["test mode", false], ["production effects", true]];
