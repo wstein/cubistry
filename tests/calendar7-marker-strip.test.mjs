@@ -3,8 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Calendar7Viewer, faceFills } from '../src/apps/calendar7/viewer.ts';
-import { drawWrongCell, wrongStripRect, wrongStripEdge } from '../src/apps/calendar7/sticker-art.ts';
-import { faceFlatShare } from '../src/apps/calendar7/geometry.ts';
+import { drawWrongCell, wrongCellRect } from '../src/apps/calendar7/sticker-art.ts';
 import { printNameWords } from '../src/apps/calendar7/layout.ts';
 import { parseState } from '../src/apps/calendar7/graph.ts';
 import { schemeById, withBannerStyle } from '../src/apps/calendar7/schemes.ts';
@@ -32,18 +31,8 @@ test('mismatch overlay preserves the entire original drawing before hatching in 
     assert.deepEqual(marked.log.slice(0, normal.log.length), normal.log, `${id}: original artwork must be drawn unchanged`);
     const overlay = marked.log.slice(normal.log.length);
     assert.ok(overlay.some(call => call[0] === 'stroke'), 'overlay cannot be absent');
-    assert.ok(!overlay.some(call => ['fillRect', 'fillText', 'strokeRect'].includes(call[0])), 'only transparent hatch strokes may be added');
+    assert.ok(!overlay.some(call => ['fillRect', 'fillText', 'strokeRect'].includes(call[0])), 'only translucent hatch strokes may be added');
     assert.ok(normal.log.some(call => call[0] === 'fillText'), 'the actual wrong numeral remains visible');
-  }
-});
-
-test('strip height follows the real flat face and ends before its bevel', () => {
-  for (const tile of [{ w: 1, h: 1 }, { w: 1, h: 1.8 }, { w: 1.8, h: 1.8 }]) {
-    const w = Math.round(tile.w * 192), h = Math.round(tile.h * 192), r = wrongStripRect(w, h, tile);
-    const flat = h * faceFlatShare(tile.h);
-    assert.ok(Math.abs(r.h / flat - .1) < 1e-12);
-    assert.ok(Math.abs(r.y + r.h - (h + flat) / 2) < 1e-10);
-    assert.ok(r.y > h * .8, 'a small strip cannot cover the numeral');
   }
 });
 
@@ -54,50 +43,29 @@ test('mismatches preserve original role colors on mitered cut faces', () => {
   }
 });
 
-test('the annotation stays on the calendar bottom for four physical sticker rotations', () => {
-  for (const tile of [{ w: 1, h: 1 }, { w: 1, h: 1.8 }, { w: 1.8, h: 1.8 }]) {
-    const w = Math.round(tile.w * 192), h = Math.round(tile.h * 192);
-    for (const [angle, edge] of ['bottom', 'left', 'top', 'right'].entries()) {
-      const r = wrongStripRect(w, h, tile, edge);
-      const x = ((r.x + r.w / 2) / w - .5) * tile.w;
-      const y = (.5 - (r.y + r.h / 2) / h) * tile.h;
-      const [frontX, frontY] = [[x, y], [-y, x], [-x, -y], [y, -x]][angle];
-      assert.ok(Math.abs(frontX) < 1e-12 && frontY < 0, `${edge}: marker must be centered on calendar bottom`);
-      const thickness = angle % 2 ? r.w / w / faceFlatShare(tile.w) : r.h / h / faceFlatShare(tile.h);
-      assert.ok(Math.abs(thickness - .1) < 1e-12, `${edge}: exactly the lower tenth in the display frame`);
-    }
-  }
-});
-
-test('front up vectors choose the annotation edge without rotating the original artwork', () => {
-  for (const [up, edge] of [[[0,1,0],'bottom'],[[-1,0,0],'left'],[[0,-1,0],'top'],[[1,0,0],'right']])
-    assert.equal(wrongStripEdge(up),edge);
-  assert.throws(() => wrongStripEdge([0,0,1]), /no front image orientation/);
-});
-
-test('font and scheme redraws retain the annotation edge on the stored art', () => {
+test('font and scheme redraws repaint the whole-face hatch on the stored art', () => {
   const { canvas, log } = record(), tile = { w: 1.8, h: 1.8, band: { l: .8, r: 0, t: 0, b: .8 } };
   const viewer = {
     destroyed: false, font: null, scheme: withBannerStyle(schemeById('paper-red'), 'theme'),
     baseScheme: schemeById('paper-red'), bannerStyle: 'theme', layout: 'names', surface: 'face', nameWords: words,
     printing: start.printing, pose: start.pose, applyBodyColor() {},
-    art: [{ canvas, texture: {}, text: '25', ink: 'red', tile, wrong: true, wrongEdge: 'left' }],
+    art: [{ canvas, texture: {}, text: '25', ink: 'red', tile, wrong: true }],
     draw: Calendar7Viewer.prototype.draw, redrawScheme: Calendar7Viewer.prototype.redrawScheme,
   };
-  const r = wrongStripRect(canvas.width, canvas.height, tile, 'left');
+  const r = wrongCellRect(canvas.width, canvas.height, tile);
   const expected = ['rect', r.x, r.y, r.w, r.h];
   Calendar7Viewer.prototype.setBannerStyle.call(viewer, 'boxed');
-  assert.deepEqual(log.filter(call => call[0] === 'rect').at(-1), expected, 'scheme redraw cannot restore intrinsic bottom');
+  assert.deepEqual(log.filter(call => call[0] === 'rect').at(-1), expected, 'scheme redraw repaints the face hatch');
   log.length = 0;
   Calendar7Viewer.prototype.setFont.call(viewer, fontFixture);
-  assert.deepEqual(log.filter(call => call[0] === 'rect').at(-1), expected, 'font redraw cannot restore intrinsic bottom');
+  assert.deepEqual(log.filter(call => call[0] === 'rect').at(-1), expected, 'font redraw repaints the face hatch');
 });
 
 test('paired strokes resolve at the measured 56-pixel face scale', () => {
   const widths = [], ctx = new Proxy({}, { get: () => () => {}, set: (target, key, value) => { if (key === 'lineWidth') widths.push(value); return true; } });
   for (const size of [192, 346]) {
     widths.length = 0;drawWrongCell(ctx, size, size);
-    assert.equal(widths.length, 2);
+    assert.equal(widths.length, 4, 'hatch pair and strike pair');
     const [halo, dark] = widths;
     assert.ok(dark * 56 / size >= 1, 'the dark hatch must resolve beyond a subpixel stroke');
     assert.ok(halo >= dark + 2, 'the light stroke needs a resolved edge on dark surfaces');

@@ -16,7 +16,7 @@ import {
 import { anyDatePageHtml, anyDateModel, dateFormHtml, HIDDEN_SHEET_CLASS, NO_STATE_LEAD } from "../src/apps/calendar7/anydate-view.ts";
 import { checkPose, stateDigest } from "../src/apps/calendar7/engine.ts";
 import { frontFailure, frontFailures } from "../src/apps/calendar7/display.ts";
-import { drawWrongCell, HATCH_LINES, WRONG_CELL, wrongStripRect } from "../src/apps/calendar7/sticker-art.ts";
+import { drawWrongCell, HATCH_LINES, WRONG_CELL, wrongCellRect } from "../src/apps/calendar7/sticker-art.ts";
 import { ANY_DISPLAY_ONLY_NOTICE, NAMES_ANY_LABEL, NAMES_ANY_LOAD_NOTICE, parseLayout, parseLayoutMode } from "../src/apps/calendar7/layout.ts";
 import { parseDisplays, parseState } from "../src/apps/calendar7/graph.ts";
 import { chainRange, monthLabel } from "../src/apps/calendar7/month-view.ts";
@@ -349,22 +349,20 @@ test("a configuration without any state shows the short line without a reason", 
   assert.ok(html.includes(`${NO_STATE_LEAD}</p>`));
   assert.doesNotMatch(html, /Reason/);
 });
-test("the differing sticker keeps its artwork and receives only a narrow bottom hatch overlay", () => {
+test("the differing sticker keeps its artwork and receives translucent hatching over its whole flat face", () => {
   for (const [w, h, tile] of [[192, 192, undefined], [192, 346, { w: 1, h: 1.8 }], [346, 346, { w: 1.8, h: 1.8 }]]) {
     const log = [];
     const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : (...a) => log.push([String(k), ...a])), set: (t, k, v) => { t[k] = v; log.push(["set", k, v]); return true; } });
     drawWrongCell(ctx, w, h, tile);
     const calls = name => log.filter(l => l[0] === name);
-    const strip = wrongStripRect(w, h, tile);
+    const face = wrongCellRect(w, h, tile);
     assert.equal(calls("fillRect").length, 0, "the actual sticker background is never covered");
     assert.equal(calls("strokeRect").length, 0, "no red box or outline");
-    assert.deepEqual(calls("rect")[0].slice(1), [strip.x, strip.y, strip.w, strip.h]);
-    assert.ok(strip.y > h * .8 && strip.h < h * .11, "only the lower tenth of the flat face");
-    assert.ok(calls("moveTo").length >= HATCH_LINES, "a readable hatch strip");
-    assert.ok(calls("moveTo").every(l => l[2] >= strip.y), "no large diagonal across the sticker");
-    assert.ok(calls("lineTo").every(l => l[2] >= strip.y), "all hatch endpoints stay in the strip");
-    assert.deepEqual(log.filter(l => l[0] === "set" && l[1] === "strokeStyle").map(l => l[2]), [WRONG_CELL.halo, WRONG_CELL.hatch]);
-    assert.equal(calls("stroke").length, 2, "paired light and dark strokes work on either theme");
+    assert.deepEqual(calls("rect")[0].slice(1), [face.x, face.y, face.w, face.h]);
+    assert.ok(face.y < h * .15 && face.y + face.h > h * .85, "the hatch spans the flat face top to bottom, not a strip");
+    assert.ok(calls("moveTo").length >= 2 * HATCH_LINES, "a readable hatch over the whole face");
+    assert.deepEqual(log.filter(l => l[0] === "set" && l[1] === "strokeStyle").map(l => l[2]), [WRONG_CELL.halo, WRONG_CELL.hatch, WRONG_CELL.halo, WRONG_CELL.strike]);
+    assert.equal(calls("stroke").length, 4, "paired light and dark strokes work on either theme");
   }
 });
 test("an invalid month keeps its reason without duplicating the persistent picker", () => {
