@@ -31,7 +31,7 @@ text=read(joinpath(ML,LIST),String)
 lines=split(chop(text;tail=1),'\n')
 ms=ym.(lines)
 include(joinpath(EV,"config-coverage","config_table.jl"))   # ConfigTable.board_of / match_config (the repository print checker code); no top-level run
-const PC=joinpath(EV,"print-c")
+const PC=get(ENV,"CAL7_CHAIN2100_PRINTC",joinpath(EV,"print-c"))   # a mutated copy of print C in the print-mutant test
 @testset "month list 2019-01 .. 2100-01" begin
     @testset "pin and format" begin
         @test sha(joinpath(ML,LIST))==PIN
@@ -50,7 +50,7 @@ const PC=joinpath(EV,"print-c")
         @test lines[205]=="2036-01" && lines[206]=="2036-02"                   # the continuation starts at the end of the first chain
         @test isleapyear(2096) && !isleapyear(2100) && isleapyear(2036)   # 2100 is no leap year; February 2100 is not a member anyway
     end
-    @testset "months print C shows exactly (every month board matched against the print)" begin
+    @testset "months print C shows exactly" begin
         labels=coupled_labels(read(joinpath(PC,"layout.tsv"),String));src=window_read_print(joinpath(PC,"printing.tsv"))
         @test sha(joinpath(PC,"printing.tsv"))=="0119ca3ba1266f9c3e4d7c27753801aca30eb4af514f491615666dcd9f92a8fc"
         cache=Dict{String,Bool}();exact=Dict{String,Bool}()
