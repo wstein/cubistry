@@ -826,13 +826,13 @@ test("mount always requests stickerless faces while retaining the raw state sche
   }
 });
 
-test('mount: color theme offers exactly ten named schemes with Paper Red and URL fallback',async()=>{
+test('mount: color theme offers exactly eleven named schemes with Paper Red and URL fallback',async()=>{
  for(const [input,want]of[['','paper-red'],['paper-blue','paper-blue'],['unknown','paper-red']]){
   const root=fakeRoot(),{env}=mountEnv();const inst=await mountCalendar7(root,q(`year=2027&month=3&scheme=${input}`),env);await idle(root);
   assert.match(root.html,/Cube color theme/);
   const html=root.html.match(/<select[^>]+data-c7="scheme"[^>]*>([\s\S]*?)<\/select>/)?.[1];assert(html,'a labeled scheme select exists');
   assert.deepEqual([...html.matchAll(/<option value="([^"]+)"/g)].map(m=>m[1]),SCHEMES.map(s=>s.id));
-  assert.equal(SCHEMES.length,10);assert.deepEqual([...html.matchAll(/<option value="([^"]+)" selected>/g)].map(m=>m[1]),[want]);assert.equal(root.el('scheme').value,want);assert.equal(root.getAttribute('data-c7-scheme'),want);inst.dispose();
+  assert.equal(SCHEMES.length,11);assert.deepEqual([...html.matchAll(/<option value="([^"]+)" selected>/g)].map(m=>m[1]),[want]);assert.equal(root.el('scheme').value,want);assert.equal(root.getAttribute('data-c7-scheme'),want);inst.dispose();
  }
 });
 test('mount: color theme changes synchronize stage and picker while preserving unrelated query parameters',async()=>{

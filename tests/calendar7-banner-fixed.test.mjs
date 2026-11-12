@@ -31,7 +31,7 @@ const tileDump = () => {
   const out = [];
   for (let i = 0; i < STICKERS; i++) {
     const tile = unitGridTileOf(at(pose.pos, i), at(pose.normal, i), at(pose.up, i), WIDTHS), g = tileGrid(tile);
-    for (const scheme of SCHEMES) out.push({ i, scheme: scheme.id, g, edges: tileEdgeColors(tileRoles(scheme, printing.text[i], printing.ink[i], "names"), namesGround(scheme.dayFill), tile) });
+    for (const scheme of SCHEMES.filter((s) => s.id !== "rubik-tint")) out.push({ i, scheme: scheme.id, g, edges: tileEdgeColors(tileRoles(scheme, printing.text[i], printing.ink[i], "names"), namesGround(scheme.dayFill), tile) });
   }
   return out;
 };

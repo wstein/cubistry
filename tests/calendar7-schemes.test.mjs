@@ -20,7 +20,7 @@ const LINE_EXCEPTIONS = {};
 
 const ORDER = [
   "paper-red", "paper-blue", "classic", "solarized-light", "gruvbox-light",
-  "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast",
+  "dracula", "monokai", "gruvbox-dark", "catppuccin-mocha", "high-contrast", "rubik-tint",
 ];
 const COLOR_ROLES = ["dayFill", "dayInk", "weekdayInk", "weekendInk", "weekendInkSmall", "monthInk", "emptyFill", "seam", "sunSatInk"];
 const NULLABLE_COLOR_ROLES = ["weekendFill", "weekendTint", "bandFill", "weekdayRowFill"];
@@ -39,19 +39,19 @@ const grounds = (s) => ({
 
 const textPairs = (s) => Object.entries(grounds(s)).map(([role, ground]) => ({ role, fg: s[role], bg: ground }));
 
-test("ten schemes in the agreed order, unique ids and names", () => {
-  assert.equal(SCHEMES.length, 10);
+test("eleven schemes in the agreed order, unique ids and names", () => {
+  assert.equal(SCHEMES.length, 11);
   assert.deepEqual(SCHEMES.map((s) => s.id), ORDER);
-  assert.equal(new Set(SCHEMES.map((s) => s.id)).size, 10);
-  assert.equal(new Set(SCHEMES.map((s) => s.name)).size, 10);
+  assert.equal(new Set(SCHEMES.map((s) => s.id)).size, 11);
+  assert.equal(new Set(SCHEMES.map((s) => s.name)).size, 11);
 });
 
 test("exactly one default scheme, paper-red", () => {
   assert.deepEqual(SCHEMES.filter((s) => s.isDefault).map((s) => s.id), ["paper-red"]);
 });
 
-test("five light and five dark schemes", () => {
-  assert.equal(SCHEMES.filter((s) => s.kind === "light").length, 5);
+test("six light and five dark schemes", () => {
+  assert.equal(SCHEMES.filter((s) => s.kind === "light").length, 6);
   assert.equal(SCHEMES.filter((s) => s.kind === "dark").length, 5);
   for (const s of SCHEMES) assert.ok(["light", "dark"].includes(s.kind) && ["band", "line"].includes(s.style), s.id);
 });
