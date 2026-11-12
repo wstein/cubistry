@@ -198,8 +198,8 @@ The chain is the root month followed by S; an edge across skipped calendar month
 (default the chain range); `max_edges=N`; `library`, `width`, `lambda` and the other beam options. `GENERATE_DEADLINE_S` (default
 3000) stops cleanly: no new edge when the slowest edge so far would not fit. Output: `chain.moves.tsv` (chain.v1), `states/`,
 `edges.tsv` (cumulative; column `method` is `beam`, `finishN` or `greedy`), `segments.tsv` (one row per run: run id, research
-commit, library, width, lambda, print and list SHA-256, root month, edge range; carried through resume), `months.tsv`,
-`PROGRESS.txt` (incl. `greedy_edges`, `root_month`, `bridge_edges`, `best_effort_edges`). Exit 3 means no new edge.
+commit, library, width, lambda, print and list SHA-256, root month, edge range, layout SHA-256; carried through resume), `months.tsv`,
+`PROGRESS.txt` (incl. `greedy_edges`, `root_month`, `bridge_edges`, `layout_sha256`, `best_effort_edges`). Exit 3 means no new edge.
 
 Segments. A long chain runs as sequential segments of about one hour: edge-loop deadline 3000 s, workflow job limit 70 min
 (`timeout 65m` around the producer), each segment continued from the verified artifact of the previous one with
@@ -222,6 +222,13 @@ job prints the count and warns, and the workflow input `fail_on_greedy` (default
 artifact is uploaded. The logic without the solver is tested by `test_window_chain.jl`; the workflow
 `.github/workflows/window-chain.yml` (manual, produce job limit 70 min, verify job with the three checkers) runs it and is checked
 statically by `tests/window-chain-workflow.test.mjs`.
+
+Layout input. The producers `window_chain.jl` and `beam_edge.jl` read `row1-revision/layout.tsv` by default (unchanged). `CAL7_WINDOW_LAYOUT` (path)
+with `CAL7_WINDOW_LAYOUT_SHA256` (the names `run_checks.sh` and the checkers use) selects a window-local layout such as the April tiles AP|RIL;
+the pin is required, a wrong SHA-256 is an error before any output, and the layout SHA-256 is recorded in `PROGRESS.txt`, `segments.tsv` and the
+`beam_edge.jl` result line. A resumed chain (`prior=`) must carry the same layout SHA-256 in its earlier segments. Test: `test_window_chain_layout.jl`
+(unit tests and smoke runs without edges; `CAL7_LAYOUT_TEST_EDGE=1` adds one real edge into April 2027 with AP|RIL, about 2 minutes with 4 threads).
+The workflow does not pass the layout variables yet; the print and the month list are separate inputs.
 
 Inputs of the workflow: `research_ref` (a commit on `research/cube-display-feasibility`; the prepare job rejects any other commit),
 `months_path` and `months_sha256`, `root_month`, `print_path` and `print_sha256`, optional `best_effort_path`, `claims_path`, `start`,
