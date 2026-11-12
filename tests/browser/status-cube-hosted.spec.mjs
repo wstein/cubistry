@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { chipOf, choose, setSpeed } from "../helpers/status-chips.mjs";
 import { PNG } from "pngjs";
 // Canonical URL of the hosted CI Quality Cube. The cases below are the cases of status-cube.spec.mjs (legacy page
 // /status.html, kept unchanged until the page is retired) with the locators of the host: error row, status chip,
@@ -10,7 +11,7 @@ const readout = (page) => page.locator('[data-region="readout"] .shell-readout-v
 const primary = (page) => page.locator('[data-region="primary-action"] button');
 async function ready(page) {
   await page.goto("/index.html?app=ci");
-  await expect(page.locator("#status-build")).toBeEnabled();
+  await expect(page.locator("#status-build-open")).toBeEnabled();
   await expect(page.locator("#status-viewer")).toHaveAttribute(
     "data-sync",
     "idle",
@@ -49,10 +50,10 @@ test("five fixed vector states render for all four categories, with native keybo
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await ready(page);
-  await page.locator("#status-build").focus();
-  await page.keyboard.press("ArrowDown");
-  await page.keyboard.press("Enter");
-  await page.keyboard.press("Tab");
+  await chipOf(page, "build", "open").focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(chipOf(page, "build", "running")).toBeFocused();
+  await expect(chipOf(page, "build", "running")).toHaveAttribute("aria-checked", "true");
   await exact(page, ["running", "open", "open", "open"]);
   const categories = ["build", "test", "analyze", "review"];
   for (const [state, word, color] of [
@@ -63,7 +64,7 @@ test("five fixed vector states render for all four categories, with native keybo
     ["blocked", "BLOCKIERT", "#855600"],
   ]) {
     for (const category of categories)
-      await page.selectOption(`#status-${category}`, state);
+      await choose(page, category, state);
     await exact(page, Array(4).fill(state));
     await expect(page.locator("#status-front")).toHaveText(
       categories.map((c) => `${c.toUpperCase()} ${word}`).join(" · "),
@@ -125,7 +126,7 @@ test("events enforce requested transitions and distinguish failure from unavaila
   await primary(page).click();
   await exact(page, ["error", "open", "open", "open"]);
   await expect(chip(page)).toContainText("attempt failed");
-  await page.selectOption("#status-build", "open");
+  await choose(page, "build", "open");
   await page.selectOption("#status-event-category", "test");
   await page.selectOption("#status-event", "blocked");
   await primary(page).click();
@@ -144,7 +145,7 @@ test("rapid real animation finishes only active legal turn then uses latest actu
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await ready(page);
-  await page.selectOption("#status-speed", "500");
+  await setSpeed(page, 500);
   await page.evaluate(async () => {
     const { statusController: c } = await import("/src/apps/status/mount.ts");
     const animate = c.view.animate.bind(c.view);
@@ -154,13 +155,13 @@ test("rapid real animation finishes only active legal turn then uses latest actu
       return animate(p);
     };
   });
-  await page.selectOption("#status-build", "running");
+  await choose(page, "build", "running");
   await expect(page.locator("#status-viewer")).toHaveAttribute(
     "data-sync",
     "moving",
   );
-  await page.selectOption("#status-test", "blocked");
-  await page.selectOption("#status-build", "error");
+  await choose(page, "test", "blocked");
+  await choose(page, "build", "error");
   await exact(page, ["error", "blocked", "open", "open"]);
   const replay = await page.evaluate(async () => {
     const { statusController: c, statusDefinition: d } = await import(
@@ -205,7 +206,7 @@ test("animation failure freezes last committed pose and explicit reload recovers
       await animate(p);
     };
   });
-  await page.selectOption("#status-build", "running");
+  await choose(page, "build", "running");
   await expect(errorText(page)).toHaveText("Injected animation failure");
   await expect(page.locator("#status-viewer")).toHaveAttribute(
     "data-sync",
@@ -215,7 +216,7 @@ test("animation failure freezes last committed pose and explicit reload recovers
     "data-session-moves",
     "1",
   );
-  await expect(page.locator("#status-build")).toBeDisabled();
+  await expect(chipOf(page, "build", "open")).toBeDisabled();
   expect(
     await page.evaluate(async () => {
       const { statusController: c } = await import("/src/apps/status/mount.ts");
@@ -246,7 +247,7 @@ for (const resource of ["distances.u8", "quality-build-open.svg"])
     await expect(errorText(page)).toContainText("integrity");
     await expect(chip(page)).toContainText("Initialization failed");
     await expect(page.locator("#status-viewer")).toHaveAttribute("data-current", "");
-    await expect(page.locator("#status-build")).toBeDisabled();
+    await expect(chipOf(page, "build", "open")).toBeDisabled();
     await expect(primary(page)).toHaveText("Reload application");
   });
 // A drag that should turn the camera must start and stay on the canvas itself. At 390 px the workflow controls
@@ -369,7 +370,7 @@ for (const [name, viewport] of [
       })).toEqual(before.camera);
       expect(after.state).toBe(before.state);
       expect(after.moves).toBe(before.moves);
-      await page.selectOption("#status-build", "running");
+      await choose(page, "build", "running");
       await exact(page, ["running", "open", "open", "open"]);
       for (const [category, state] of [
         ["build", "blocked"],
@@ -377,7 +378,7 @@ for (const [name, viewport] of [
         ["analyze", "error"],
         ["review", "ok"],
       ]) {
-        await page.selectOption(`#status-${category}`, state);
+        await choose(page, category, state);
       }
       await exact(page, ["blocked", "running", "error", "ok"]);
       await page.evaluate(async () => {

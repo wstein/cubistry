@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { choose } from "../helpers/status-chips.mjs";
 test("built hosted Quality Cube (index.html?app=ci) loads certificate and20 vector assets below Pages prefix and performs category events", async ({
   page,
 }) => {
@@ -14,10 +15,10 @@ test("built hosted Quality Cube (index.html?app=ci) loads certificate and20 vect
     if (u.protocol === "http:") paths.push(u.pathname);
   });
   await page.goto("./index.html?app=ci");
-  await expect(page.locator("#status-build")).toBeEnabled();
+  await expect(page.locator("#status-build-open")).toBeEnabled();
   await expect(page.locator("canvas")).toHaveCount(1);
   for (const state of ["running", "ok", "error", "blocked", "open"]) {
-    await page.selectOption("#status-build", state);
+    await choose(page, "build", state);
     await expect(page.locator("#status-viewer")).toHaveAttribute(
       "data-current",
       `${state},open,open,open`,
