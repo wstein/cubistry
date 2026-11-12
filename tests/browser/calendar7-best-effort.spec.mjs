@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// A mismatch preserves its actual printing and adds only translucent hatching over the whole flat face.
+// A mismatch preserves its actual printing and adds only translucent hatching over the day field (the unit cell with the numeral) of the flat face.
 import { test, expect } from "@playwright/test";
 import { PNG } from "pngjs";
 
@@ -64,13 +64,14 @@ async function rawFace(page) {
     const a = ctx.getImageData(0, 0, actual.width, actual.height).data;
     const b = original.getImageData(0, 0, actual.width, actual.height).data;
     const W = actual.width, H = actual.height;
-    // This rectangle is independently derived from the physical flat-face contract, not from wrongCellRect().
-    const flatW = W * faceFlatShare(tile?.w ?? 1), flatH = H * faceFlatShare(tile?.h ?? 1);
-    const rect = { x: (W - flatW) / 2, y: (H - flatH) / 2, w: flatW, h: flatH };
-    // Central half of the flat face (hatch density measure only; the label ink itself is measured through originalInkPixels/inkKept).
+    // Independent of wrongCellRect(): the flat face from the physical contract, cut to the unit cell (the day field) that tileGrid() reports for the numeral.
+    const grid = tileGrid(tile), flatW = W * faceFlatShare(tile?.w ?? 1), flatH = H * faceFlatShare(tile?.h ?? 1);
+    const fx0 = Math.max((W - flatW) / 2, grid.cell.x0), fx1 = Math.min((W + flatW) / 2, grid.cell.x1), fy0 = Math.max((H - flatH) / 2, grid.cell.y0), fy1 = Math.min((H + flatH) / 2, grid.cell.y1);
+    const rect = { x: fx0, y: fy0, w: fx1 - fx0, h: fy1 - fy0 };
+    // Central half of the day field (hatch density measure only; the label ink itself is measured through originalInkPixels/inkKept).
     const center = { x0: rect.x + rect.w / 4, x1: rect.x + rect.w * 3 / 4, y0: rect.y + rect.h / 4, y1: rect.y + rect.h * 3 / 4 };
     let centerPixels = 0, centerKept = 0;
-    const role = tileRoles(v.scheme, text, ink, "names"), grid = tileGrid(tile);
+    const role = tileRoles(v.scheme, text, ink, "names");
     const color = [1, 3, 5].map((j) => parseInt(role.ink.slice(j, j + 2), 16));
     const bands = Array.from({ length: 4 }, () => ({ pixels: 0, changed: 0 }));
     let inkKept = 0, outsideChanged = 0, lanePixels = 0, laneChanged = 0, originalInkPixels = 0, light = 0, dark = 0;
@@ -183,22 +184,22 @@ test("February 2037 and 2043 keep one mismatch sentence and the accessible inten
   expect(errors).toEqual([]);
 });
 
-for (const scheme of ["paper-red", "dracula"]) test(`${scheme}: the original printed face keeps only a translucent whole-face hatch through three views`, async ({ page }) => {
+for (const scheme of ["paper-red", "dracula"]) test(`${scheme}: the original printed face keeps only a translucent day-field hatch through three views`, async ({ page }) => {
   const errors = []; page.on("pageerror", (error) => errors.push(error.message));
   await stableCanvasReadback(page); await open(page, 2037, scheme); await captureViewer(page);
   const raw = await rawFace(page);
   expect(raw.stable).toBe(true);
   expect(raw.text).not.toBe(raw.desired);
-  expect(raw.outsideChanged, "no gray wash, frame or changed printing outside the flat face").toBe(0);
+  expect(raw.outsideChanged, "no gray wash, frame or changed printing outside the day field").toBe(0);
   expect(raw.inkKept, "pixels of the printed label stay exactly as printed between the hatch lines").toBeGreaterThan(30);
   expect(raw.inkKept / raw.originalInkPixels, "the hatch leaves at least 35 percent of the label ink untouched").toBeGreaterThan(0.35);
-  expect(raw.centerKept / raw.centerPixels, "the hatch leaves at least 40 percent of the central half of the flat face untouched").toBeGreaterThan(0.4);
-  expect(raw.lanePixels, "the measured area is the whole flat face").toBeGreaterThan(raw.flatW * raw.flatH * 0.9);
-  for (const [k, band] of raw.bands.entries()) expect(band.changed / band.pixels, `the hatch changes pixels in band ${k + 1} of 4 of the flat face (top to bottom)`).toBeGreaterThan(0.5 * raw.laneChanged / raw.lanePixels);
+  expect(raw.centerKept / raw.centerPixels, "the hatch leaves at least 40 percent of the central half of the day field untouched").toBeGreaterThan(0.4);
+  expect(raw.lanePixels, "the measured area is the whole day field").toBeGreaterThan(raw.rect.w * raw.rect.h * 0.9);
+  for (const [k, band] of raw.bands.entries()) expect(band.changed / band.pixels, `the hatch changes pixels in band ${k + 1} of 4 of the day field (top to bottom)`).toBeGreaterThan(0.5 * raw.laneChanged / raw.lanePixels);
   expect(raw.actualFill, "the cut faces retain the original role fill").toBe(raw.expectedFill);
   expect(raw.laneChanged).toBeGreaterThan(raw.lanePixels * 0.05);
-  expect(raw.gaps.length, "at least six internal transparent gaps each preserve two exact original pixels").toBeGreaterThanOrEqual(6);
-  expect(raw.runs, "repeated hatch lines instead of one diagonal").toBeGreaterThanOrEqual(6);
+  expect(raw.gaps.length, "at least four internal transparent gaps (the day field spans about half the face) each preserve two exact original pixels").toBeGreaterThanOrEqual(4);
+  expect(raw.runs, "repeated hatch lines instead of one diagonal").toBeGreaterThanOrEqual(5);
   expect(raw.light).toBeGreaterThan(10); expect(raw.dark).toBeGreaterThan(10);
   expect(contrast(quantile(raw.lightColors.map(luminance), 0.5), quantile(raw.darkColors.map(luminance), 0.5))).toBeGreaterThan(4.5);
   const views = [];
@@ -208,7 +209,7 @@ for (const scheme of ["paper-red", "dracula"]) test(`${scheme}: the original pri
     if (geometry.cos < MIN_COS) continue;
     const photo = await photograph(page, geometry); views.push(photo);
     expect(photo.inside, "the hatch is visible on the projected physical face").toBeGreaterThan(8);
-    expect(photo.outside, "no marker outside the flat face").toBe(0);
+    expect(photo.outside, "no marker outside the flat face, so none on the rest of the face").toBe(0);
     expect(photo.contrast, "light/dark hatch contrast after perspective and lighting").toBeGreaterThan(1.5);
   }
   expect(views.length).toBeGreaterThanOrEqual(3);

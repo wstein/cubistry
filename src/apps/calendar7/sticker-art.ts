@@ -560,13 +560,15 @@ export interface WrongCellContext {
 }
 /** Number of hatch lines across a tile of the width `w` (one per `w / HATCH_LINES`). */
 export const HATCH_LINES = 10;
-/** The whole flat face of the tile (inside the bevel), in the texture frame. */
+/** The day field in the texture frame: the unit cell that holds the numeral (`tileGrid().cell`), inside the flat face (bevel excluded). Without bands the unit cell is the whole tile, so the field is the whole flat face. */
 export function wrongCellRect(w: number, h: number, tile?: FaceTile): { x: number; y: number; w: number; h: number } {
-  const flatW = w * faceFlatShare(tile?.w ?? 1), flatH = h * faceFlatShare(tile?.h ?? 1);
-  return { x: (w - flatW) / 2, y: (h - flatH) / 2, w: flatW, h: flatH };
+  const flatW = w * faceFlatShare(tile?.w ?? 1), flatH = h * faceFlatShare(tile?.h ?? 1), g = tileGrid(tile);
+  const x0 = Math.max((w - flatW) / 2, g.cell.x0 * w / g.W), x1 = Math.min((w + flatW) / 2, g.cell.x1 * w / g.W);
+  const y0 = Math.max((h - flatH) / 2, g.cell.y0 * h / g.H), y1 = Math.min((h + flatH) / 2, g.cell.y1 * h / g.H);
+  return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
 }
 /**
- * Translucent hatching over the whole flat face of the original sticker (the texture turns with the cubie): light halo and dark
+ * Translucent hatching over the day field (the unit cell with the numeral, inside the flat face) of the original sticker (the texture turns with the cubie): light halo and dark
  * lines on the same 45 degree pitch. Line width and pitch
  * follow the tile size, so the mark looks the same on every tile; nothing is filled and the printed label stays readable.
  */
