@@ -20,7 +20,10 @@ test("tenth: slots 1 to 4 are labeled groups in order, slot 5 stays hidden, the 
   await expect(page.locator('[data-slot="5"]')).toBeHidden();
   await expect(page.locator("#studio-controls")).toBeEmpty();
   await expect(page.locator("#tenth-step-plus5")).toBeVisible();
-  await expect(page.locator("#tenth-speed-select")).toHaveValue("250");
+  await expect(page.locator("#tenth-speed-select")).toHaveAttribute("data-value", "250");
+  await page.locator("#tenth-speed-select").focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#tenth-speed-select")).toHaveAttribute("data-value", "100");
   await expect(page.locator('[data-region="nerd-drawer"]')).toBeHidden();
   await expect(page.locator("#nerd-toggle")).toBeHidden();
 });

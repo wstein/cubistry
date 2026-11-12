@@ -60,36 +60,47 @@ test("the step buttons move five steps back or forth, following the direction se
   assert.deepEqual(calls, [["step", 5], ["step", -5], ["step", -5], ["step", 5]]);
 });
 
-test("the step speed select offers the four intervals, defaults to 250 ms and reports the chosen number", () => {
+test("the step speed is a slider over the four intervals, slow to fast, defaults to 250 ms and reports the chosen number", () => {
   const { all, calls } = rig();
-  const speed = all(4).find((e) => e.tagName === "SELECT");
-  assert.deepEqual(speed.children.map((o) => o.getAttribute("value")), TENTH_STEP_INTERVALS.map(String));
+  const speed = all(4).find((e) => e.tagName === "INPUT");
+  assert.equal(speed.id, "tenth-speed-select");
+  assert.equal(speed.getAttribute("type"), "range");
+  assert.equal(all(4).some((e) => e.tagName === "SELECT"), false, "no select is left in the speed slot");
   assert.deepEqual([...TENTH_STEP_INTERVALS], [50, 100, 250, 500]);
-  assert.equal(speed.value, "250");
-  speed.value = "250";
-  speed.fire("change");
-  assert.deepEqual(calls, [["interval", 250]]);
+  assert.equal(speed.getAttribute("max"), String(TENTH_STEP_INTERVALS.length - 1));
+  assert.equal(speed.dataset.value, "250");
+  const stops = [500, 250, 100, 50];
+  stops.forEach((ms, i) => {
+    speed.value = String(i);
+    speed.fire("input");
+    assert.equal(speed.dataset.value, String(ms));
+  });
+  assert.deepEqual(calls, [["interval", 500], ["interval", 250], ["interval", 100], ["interval", 50]]);
+  assert.deepEqual(all(4).filter((e) => e.tagName === "SPAN").map((e) => e.textContent), ["slow", "fast"]);
 });
 
-test("each select has a label that points at it", () => {
+test("each labeled control points its label at itself", () => {
   const { all } = rig();
-  for (const n of [3, 4]) {
+  for (const [n, tag] of [[3, "SELECT"], [4, "INPUT"]]) {
     const elements = all(n);
-    const select = elements.find((e) => e.tagName === "SELECT");
+    const control = elements.find((e) => e.tagName === tag);
     const label = elements.find((e) => e.tagName === "LABEL");
-    assert.ok(select.id);
-    assert.equal(label.getAttribute("for"), select.id);
+    assert.ok(control.id);
+    assert.equal(label.getAttribute("for"), control.id);
+    assert.equal(label.textContent, n === 4 ? "Quarter-turn time" : "Direction");
   }
 });
 
 test("a mode switch removes the controls and their listeners; a stale click does nothing", () => {
   const { regions, host, all, calls } = rig();
   const buttons = [1, 2].flatMap((n) => all(n).filter((e) => e.tagName === "BUTTON"));
-  const selects = [3, 4].flatMap((n) => all(n).filter((e) => e.tagName === "SELECT"));
+  const selects = [all(3).find((e) => e.tagName === "SELECT")];
+  const slider = all(4).find((e) => e.tagName === "INPUT");
   host.begin(() => true);
   for (const n of [1, 2, 3, 4]) assert.equal(regions.slots[n].hidden, true);
   for (const b of buttons) assert.equal(b.listenerCount("click"), 0);
   for (const s of selects) assert.equal(s.listenerCount("change"), 0);
+  assert.equal(slider.listenerCount("input"), 0);
   buttons[0].click();
   assert.deepEqual(calls, []);
 });
