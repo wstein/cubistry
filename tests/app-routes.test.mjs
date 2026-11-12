@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createRegistry } from "../src/apps/registry.ts";
 import { MODE_CATALOG } from "../src/apps/mode-catalog.ts";
 import { APP_SCOPED_PARAMS, urlAfterAppSwitch } from "../src/app-switch-url.mjs";
-import { GLOBAL_PARAMS, PENDING_APP_PARAMS, PARAM_SPECS } from "../src/apps/param-specs.ts";
+import { GLOBAL_PARAMS, PENDING_APP_PARAMS, PARAM_SPECS, sharedParams } from "../src/apps/param-specs.ts";
 import { parseRoute, serializeRoute } from "../src/apps/routes.ts";
 
 const registry = createRegistry(MODE_CATALOG.map((m) => ({ ...m, mount: async () => {} })));
@@ -31,7 +31,7 @@ test("APP_SCOPED_PARAMS is the union of every owned key and alias, without the g
 
 // Expected values are written out, not derived from the ownership code under test.
 const LEAKS = [
-  ["calendar7", "clock", "year=2027&month=3&outer=1.8&font=quicksand&layout=names&scheme=paper-blue&plasticity=0.6", ""],
+  ["calendar7", "clock", "year=2027&month=3&outer=1.8&font=quicksand&layout=names&scheme=paper-blue&plasticity=0.6&banner=boxed", ""],
   ["ms-counter", "calendar7", "unit=S&dir=down&val=5&pad=0&font=dseg7", ""],
   ["hsm-counter", "timer", "range=23&unit=H&lettering=words-pascal&font=dseg7&speed=300", "font=dseg7&speed=300"],
   ["tenth", "counter", "display=dseg7&marker=all&speed=300&dir=down&val=3", "display=dseg7&marker=all&speed=300"],
@@ -56,7 +56,7 @@ test("a parameter owned by one app does not leak to another app on a switch", ()
 });
 
 test("calendar7 keeps nothing of its look when it is left, and its font is not the single-cube display", () => {
-  const q = "year=2026&month=3&outer=1.8&font=quicksand&layout=names&scheme=paper-blue&plasticity=0.6";
+  const q = "year=2026&month=3&outer=1.8&font=quicksand&layout=names&scheme=paper-blue&plasticity=0.6&banner=boxed";
   for (const target of MODE_CATALOG.map((m) => m.id).filter((id) => id !== "calendar7")) {
     const got = to(`${base}?app=calendar7&${q}`, "calendar7", target);
     got.delete("app");
@@ -136,14 +136,14 @@ test("defaults are omitted when serializing and the route round-trips", () => {
   }
 });
 
-test("calendar7 owns its font, layout, scheme and plasticity; font is not reported as foreign there", () => {
-  const r = parseRoute("?app=calendar7&font=quicksand&layout=names-any&scheme=paper-blue&plasticity=0.6&display=dseg7", registry, "clock");
-  assert.deepEqual(r.setup, { "c7-font": "quicksand", layout: "names-any", scheme: "paper-blue", plasticity: 0.6 });
+test("calendar7 owns its font, layout, scheme, plasticity and banner; font is not reported as foreign there", () => {
+  const r = parseRoute("?app=calendar7&font=quicksand&layout=names-any&scheme=paper-blue&plasticity=0.6&banner=rounded-box&display=dseg7", registry, "clock");
+  assert.deepEqual(r.setup, { "c7-font": "quicksand", layout: "names-any", scheme: "paper-blue", plasticity: 0.6, banner: "rounded-box" });
   assert.deepEqual(r.foreign, ["display"]);
   const c = parseRoute("?app=counter&font=DSEG7&layout=names", registry, "clock");
   assert.deepEqual(c.setup, { display: "dseg7" });
   assert.deepEqual(c.foreign, ["layout"]);
-  assert.equal(serializeRoute({ app: "calendar7", setup: r.setup }), "?app=calendar7&font=quicksand&layout=names-any&scheme=paper-blue&plasticity=0.6");
+  assert.equal(serializeRoute({ app: "calendar7", setup: r.setup }), "?app=calendar7&font=quicksand&layout=names-any&scheme=paper-blue&plasticity=0.6&banner=rounded-box");
 });
 
 test("nerd is true only for 1, like the shell", () => {
@@ -155,4 +155,16 @@ test("an unknown app resolves to the fallback and keeps no mode setup", () => {
   const r = parseRoute("?app=nope&year=2026&kiosk=1", registry, "clock");
   assert.deepEqual(r.app, { id: "clock", known: false });
   assert.deepEqual(r.setup, { kiosk: true });
+});
+
+test("the banner style accepts exactly its six values and is not a per-mode value", () => {
+  for (const v of ["theme", "rounded", "square", "underline", "boxed", "rounded-box"]) {
+    const r = parseRoute(`?app=calendar7&banner=${v}`, registry, "clock");
+    assert.deepEqual(r.setup, { banner: v }, v);
+    assert.deepEqual(r.invalid, [], v);
+  }
+  const bad = parseRoute("?app=calendar7&banner=extra", registry, "clock");
+  assert.deepEqual(bad.setup, {});
+  assert.deepEqual(bad.invalid, ["banner"]);
+  assert.ok(sharedParams("calendar7", "calendar7").includes("banner"));
 });
