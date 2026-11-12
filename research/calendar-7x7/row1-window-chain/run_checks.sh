@@ -10,12 +10,17 @@ mode=${5:-}
 # (PRINT_OVERRIDE), its chain and states (CHAIN_OVERRIDE, STATES_OVERRIDE) and its SHA-256 (CAL7_WINDOW_PRINT_SHA); both checkers and verify_chain.jl read them.
 # Month list S: CAL7_WINDOW_MONTHS (path) and CAL7_WINDOW_MONTHS_SHA256 replace WINDOW_END; the chain root is CAL7_ROOT_MONTH (default: its first month); a root other than the first month adds the root edge.
 # The print SHA-256 (CAL7_WINDOW_PRINT_SHA) is required; CAL7_WINDOW_LAYOUT_SHA256 pins a window-local layout (default: the built-in pin).
+# CAL7_BEST_EFFORT_29=1 (month list mode): the 29 rule for best-effort edges in all three checkers (one wrong cell, (7,1) or (7,7), showing the digit 29 in red); default off.
 # CAL7_WINDOW_LAYOUT (path; needs the month list mode and CAL7_WINDOW_LAYOUT_SHA256) replaces row1-revision/layout.tsv for all three checkers.
 if [[ -n "${CAL7_WINDOW_MONTHS:-}" ]]; then
     [[ -z "${WINDOW_END:-}" ]] || { echo "month list and WINDOW_END are exclusive" >&2; exit 2; }
     export CAL7_WINDOW_MONTHS CAL7_WINDOW_MONTHS_SHA256="${CAL7_WINDOW_MONTHS_SHA256:?month list SHA-256}" CAL7_WINDOW_PRINT_SHA="${CAL7_WINDOW_PRINT_SHA:?print SHA-256}"
     flix_extra=(months "$CAL7_WINDOW_MONTHS" "$CAL7_WINDOW_MONTHS_SHA256" "$CAL7_WINDOW_PRINT_SHA"); [[ -z "${CAL7_WINDOW_LAYOUT_SHA256:-}" ]] || { export CAL7_WINDOW_LAYOUT_SHA256; flix_extra+=("$CAL7_WINDOW_LAYOUT_SHA256"); }
     if [[ -n "${CAL7_ROOT_MONTH:-}" ]]; then export CAL7_ROOT_MONTH; [[ -n "${CAL7_WINDOW_LAYOUT_SHA256:-}" ]] || flix_extra+=(-); flix_extra+=("$CAL7_ROOT_MONTH"); fi
+    # CAL7_BEST_EFFORT_29=1: the 29 rule of the best-effort edge (Julia checkers: environment; Flix: last argument 29, junction digests -).
+    if [[ "${CAL7_BEST_EFFORT_29:-}" == 1 ]]; then
+        export CAL7_BEST_EFFORT_29; while (( ${#flix_extra[@]} < 6 )); do flix_extra+=(-); done; flix_extra+=(- - 29)
+    fi
 else
     window_end=${WINDOW_END:-2028-01}; export WINDOW_END="$window_end"
     flix_extra=(); [[ "$window_end" == 2028-01 ]] || flix_extra=("$window_end" "${CAL7_WINDOW_PRINT_SHA:?print SHA-256 for a window end after 2028-01}")

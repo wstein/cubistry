@@ -146,6 +146,16 @@ def wHall(source: Vector[Sticker],g: Goal,wrong: List[(Int32,Int32)],halls: List
     },Nil,halls);
     require(List.forAll(w -> List.memberOf(w,used),wrong),"Hall sets cover every wrong cell")
 }
+// The 29 rule (argument 29 after the junction digests; CAL7_BEST_EFFORT_29=1 in the Julia checkers): the best-effort edge has exactly one wrong cell, (7,1) or (7,7),
+// and its front sticker shows the digit 29 (text 29, ink red, upright).
+def w29(st: Vector[Sticker],wrong: List[(Int32,Int32)]): Unit \ IO = {
+    require(wrong==(7,1)::Nil or wrong==(7,7)::Nil,"best-effort wrong cell shows the digit 29: one wrong cell, (7,1) or (7,7)");
+    let(r,c)=at(wrong,0);
+    let found=List.filter(s -> {let Sticker.S(_,_,p,n,_,_,_)=s;p==(c-4,4-r,3) and n==(0,0,1)},Vector.toList(st));
+    require(List.length(found)==1,"one front sticker per cell");
+    let Sticker.S(_,_,_,_,u,text,ink)=at(found,0);
+    require(text=="29" and ink=="red" and upAngle(u)==0,"best-effort wrong cell shows the digit 29: text 29, ink red, upright")
+}
 def wMove(st: Vector[Sticker],g: Int32,q: Int32): Vector[Sticker] \ IO =
     List.foldLeft((s,_) -> Vector.map(x -> directQuarter(x,g),s),st,List.range(0,if(q== -1)3 else q))
 def wPose(p: Perm,g: Int32,q: Int32,gens: List[Perm]): Perm \ IO =
@@ -201,8 +211,8 @@ def wMetrics(moves: List[(Int32,Int32)]): (Int32,Int32,Int32,Int32) = List.foldL
 // identity pose shows; if it differs from the first member of the list the chain gets one extra root edge from the identity pose to it.
 // joinStart / joinEnd: "" for none, else 64 hex or "identity": the digest the start (end) state of the chain must have (stage junction).
 def wJoin(t: String): String \ IO = {require(t=="" or t=="identity" or wHash(t),"junction digest is 64 hex or identity");t}
-def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot: String,endText: String,printPin: String,monthsFile: String,monthsPin: String,layoutPin: String,rootText: String,joinStart: String,joinEnd: String): Unit \ IO = {
-    require(wJoin(joinStart)==joinStart and wJoin(joinEnd)==joinEnd,"junction digests are checked");
+def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot: String,endText: String,printPin: String,monthsFile: String,monthsPin: String,layoutPin: String,rootText: String,joinStart: String,joinEnd: String,rule: String): Unit \ IO = {
+    require(rule=="" or rule=="29","rule is 29 or empty");require(wJoin(joinStart)==joinStart and wJoin(joinEnd)==joinEnd,"junction digests are checked");
     let rawLayout=read(layout);let rawPrint=read(printing);let rawChain=read(chain);
     let layoutSHA=if(layoutPin=="" or layoutPin=="-") "c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db" else layoutPin;
     let listed=if(monthsFile=="") Nil else monthListRead(monthsFile,monthsPin);
@@ -247,6 +257,7 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
         require(stackSha(wText(next))==eh,"edge end digest");
         let mism=wMismatch(next,goal);require(mism==wrong,"strict month front including band line");
         if(mism==Nil) require(halls==Nil,"Hall witnesses without wrong cells") else wHall(source,goal,mism,halls);
+        if(rule=="29" and mism != Nil) w29(next,mism) else ();
         let index=i+2;let suffix=if(index<10)"0${index}" else"${index}";
         require(read(states+"/state-${suffix}.tsv")==stateHeader+wText(next),"complete immutable-art state snapshot");
         let back=List.foldLeft((s,mv) -> {let(g,q)=mv;wMove(s,g,wInverse(q))},next,List.reverse(moves));
@@ -270,12 +281,13 @@ def wVerify(layout: String,printing: String,chain: String,states: String,oldRoot
 }
 def main(): Unit \ IO = Sys.Env.runWithIO(() -> {
     try {match Sys.Env.getArgs() {
-        case layout::printing::chain::states::oldRoot::Nil => wVerify(layout,printing,chain,states,oldRoot,"2028-01","","","","","","","")
-        case layout::printing::chain::states::oldRoot::endText::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,endText,printPin,"","","","","","")
-        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,"","","","")
-        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,"","","")
-        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::rootText::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,rootText,"","")
-        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::rootText::joinStart::joinEnd::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,if(rootText=="-") "" else rootText,if(joinStart=="-") "" else joinStart,if(joinEnd=="-") "" else joinEnd)
-        case _ => throw new IllegalArgumentException("LAYOUT PRINT CHAIN STATES_DIRECTORY ORIGINAL_EVIDENCE [WINDOW_END PRINT_SHA256 | months MONTHS_FILE MONTHS_SHA256 PRINT_SHA256 [LAYOUT_SHA256|- [ROOT_MONTH|- [JOIN_START|- JOIN_END|-]]]]")
+        case layout::printing::chain::states::oldRoot::Nil => wVerify(layout,printing,chain,states,oldRoot,"2028-01","","","","","","","","")
+        case layout::printing::chain::states::oldRoot::endText::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,endText,printPin,"","","","","","","")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,"","","","","")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,"","","","")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::rootText::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,rootText,"","","")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::rootText::joinStart::joinEnd::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,if(rootText=="-") "" else rootText,if(joinStart=="-") "" else joinStart,if(joinEnd=="-") "" else joinEnd,"")
+        case layout::printing::chain::states::oldRoot::"months"::monthsFile::monthsPin::printPin::layoutPin::rootText::joinStart::joinEnd::rule::Nil => wVerify(layout,printing,chain,states,oldRoot,"",printPin,monthsFile,monthsPin,layoutPin,if(rootText=="-") "" else rootText,if(joinStart=="-") "" else joinStart,if(joinEnd=="-") "" else joinEnd,if(rule=="-") "" else rule)
+        case _ => throw new IllegalArgumentException("LAYOUT PRINT CHAIN STATES_DIRECTORY ORIGINAL_EVIDENCE [WINDOW_END PRINT_SHA256 | months MONTHS_FILE MONTHS_SHA256 PRINT_SHA256 [LAYOUT_SHA256|- [ROOT_MONTH|- [JOIN_START|- JOIN_END|- [29|-]]]]]")
     }} catch {case e: Exception => {println("INVALID\t${e.getMessage()}");System.exit(1)}}
 })

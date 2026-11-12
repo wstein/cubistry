@@ -107,6 +107,8 @@ function own_join(name)
 end
 const JSTART=own_join("CAL7_JOIN_START")
 const JEND=own_join("CAL7_JOIN_END")
+# CAL7_BEST_EFFORT_29=1: the 29 rule for best-effort edges (own reading, shares nothing with check.jl): one wrong cell, (7,1) or (7,7), showing 29 upright in red.
+const RULE29=get(ENV,"CAL7_BEST_EFFORT_29","")=="1"
 # Own chain reader (v1, or v2 with per-edge "wrong" and "hall" records); shares nothing with check.jl.
 function read_chain_own(path)
     L=readlines(path);@assert length(L)>=4 && L[1] in ("cubistry.calendar7.chain.v1","cubistry.calendar7.chain.v2","cubistry.calendar7.chain.v3") && L[end]=="finish" "chain header or trailer"
@@ -188,6 +190,11 @@ function hall_check(st0,b,wrong,halls)
     end
     @assert all(w->w in used,wrong) "Hall sets cover every wrong cell"
 end
+function rule29_check(state,bad)
+    @assert length(bad)==1 && bad[1] in ((7,1),(7,7)) "best-effort wrong cell shows the digit 29: one wrong cell, (7,1) or (7,7)"
+    r,c=bad[1];hits=[s for s in state if s.pos==(c-4,4-r,3) && s.normal==(0,0,1)];@assert length(hits)==1 "one front sticker per cell"
+    s=hits[1];a=findfirst(==(s.up),UPS);@assert a!==nothing && reading(s,a-1,("29","red"))==:upright "best-effort wrong cell shows the digit 29: text 29, ink red, upright"
+end
 function verify(layout,printing,chain,statesdir)
     optics_selfcheck();load_names(layout);@assert bytes2hex(sha256(read(printing)))==EXPECT_PRINT "new print pin"
     original=read_print(printing);state=copy(original);ch=read_chain_own(chain);identity_hash=state_sha(original)
@@ -214,6 +221,7 @@ function verify(layout,printing,chain,statesdir)
         @assert bad==e.wrong "strict row-one-name front"
         isempty(bad) ? @assert(isempty(e.halls),"Hall witnesses without wrong cells") : hall_check(original,board(y,m),bad,e.halls)
         isempty(bad) || (nbest+=1)
+        RULE29 && !isempty(bad) && rule29_check(state,bad)
         @assert state_sha(state)==e.eh && htm(e.word)==e.htm "end hash and HTM"
         @assert length(unique((s.pos,s.normal) for s in state))==294 "complete surface permutation"
         @assert apply_word(state,-reverse(e.word))==before "edge inverse restores full state"

@@ -25,6 +25,9 @@ const CHAIN_FLAGS=[(i==1 && ROOTED) ? "\tROOTEDGE" : ((b[1]*12+b[2])-(a[1]*12+a[
 join_digest(name)=(t=get(ENV,name,"");isempty(t) ? nothing : (@assert(t=="identity" || occursin(r"^[0-9a-f]{64}\z",t),"join digest is 64 hex or identity");t))
 const JOIN_START=join_digest("CAL7_JOIN_START")
 const JOIN_END=join_digest("CAL7_JOIN_END")
+# CAL7_BEST_EFFORT_29=1 turns on the 29 rule for best-effort edges (chain.v2): the edge has exactly one wrong cell, (7,1) or (7,7), and its front sticker
+# shows the digit 29 (text 29, ink red, upright), so the month looks like a 29-day month. Off by default (older evidence chains show other artwork).
+const BEST_EFFORT_29=get(ENV,"CAL7_BEST_EFFORT_29","")=="1"
 const WINDOW_PRINT_EXPECT=(!LIST_MODE && WINDOW_END=="2028-01") ? WINDOW_PRINT_SHA : get(ENV,"CAL7_WINDOW_PRINT_SHA","")
 # The layout pin is a parameter so that a window-local layout can be pinned without touching the checker.
 const WINDOW_LAYOUT_SHA=get(ENV,"CAL7_WINDOW_LAYOUT_SHA256","c5671d7551295fc62dff5cf73fce31bfd774ee90865e7dc384b073d0b22844db")
@@ -140,6 +143,12 @@ function chain_hall_check(source,board,wrong,halls)
     end
     @assert all(w->w in used,wrong) "Hall sets cover every wrong cell"
 end
+# The 29 rule (BEST_EFFORT_29): own reading of the front sticker of the wrong cell; independent of the producer (best_effort_edge.jl).
+function chain_best_effort_29(state,wrong)
+    @assert length(wrong)==1 && only(wrong) in ((7,1),(7,7)) "best-effort wrong cell shows the digit 29: one wrong cell, (7,1) or (7,7)"
+    r,c=only(wrong);ss=filter(s->s.pos==(c-4,4-r,3) && s.normal==FRONT_NORMAL,state);@assert length(ss)==1 "one front sticker per cell"
+    s=only(ss);@assert s.text=="29" && s.ink=="red" && findfirst(==(s.up),IMAGE_UPS)==1 "best-effort wrong cell shows the digit 29: text 29, ink red, upright"
+end
 function chain_selfcheck(state,goal,source,action,gens,p0=UInt16.(1:264))
     for g in 1:21,e in (-1,1,2)
         direct=chain_move(state,g,e);p=copy(p0)
@@ -202,6 +211,7 @@ function verify_window_chain(layout,printing,path,statesdir)
         @assert mism==edge.wrong "strict month front including band line"
         isempty(mism) ? @assert(isempty(edge.halls),"Hall witnesses without wrong cells") : chain_hall_check(source,goal.board,mism,edge.halls)
         isempty(mism) || (nbest+=1)
+        BEST_EFFORT_29 && !isempty(mism) && chain_best_effort_29(state,mism)
         @assert read(joinpath(statesdir,"state-"*lpad(string(i+1),2,'0')*".tsv"),String)==chain_state_text(state;header=true) "complete immutable-art state snapshot"
         inverse=copy(state);inversep=copy(p)
         for (g,e) in reverse(edge.moves)
