@@ -105,16 +105,24 @@ test("picture themes: unique prints, pinned size-independent faces and the vecto
     let total = 0;
     for (const face of FACE_IDS) {
       const { url, format, sha256, size } = theme.faces[face];
-      assert.equal(url, `/playground-${theme.id}/${face}.svg`);
-      assert.equal(format, "svg");
-      assert.equal(size, 320);
-      const bytes = readFileSync(new URL(`../public${url}`, import.meta.url)),
-        source = bytes.toString("utf8");
+      assert.equal(url, `/playground-${theme.id}/${face}.${format}`);
+      assert.ok(format === "svg" || format === "webp");
+      const bytes = readFileSync(new URL(`../public${url}`, import.meta.url));
       total += bytes.length;
       assert.equal(createHash("sha256").update(bytes).digest("hex"), sha256);
+      assert.ok(bytes.length <= 262144, `${face} exceeds the asset loader's per-file limit`);
+      if (format === "webp") {
+        // A lossy WebP face: RIFF signature, square, within the working edge (the loader reads the same header).
+        assert.equal(bytes.toString("latin1", 0, 4) + bytes.toString("latin1", 8, 16), "RIFFWEBPVP8 ");
+        assert.equal(bytes.readUInt16LE(26) & 16383, size);
+        assert.equal(bytes.readUInt16LE(28) & 16383, size);
+        assert.ok(size >= 2 && size <= 1024);
+        continue;
+      }
+      assert.equal(size, 320);
+      const source = bytes.toString("utf8");
       assert.ok(!/<(?:text|clipPath|image|script|style|use|filter|foreignObject|linearGradient|radialGradient|pattern|mask)\b|<!|href=|url\(|@import|data:|style=|stroke-dasharray/i.test(source));
       assert.ok(source.startsWith('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">'));
-      assert.ok(bytes.length <= 262144, `${face} exceeds the asset loader's per-file limit`);
     }
     assert.ok(total <= 4194304, `${theme.id} exceeds the asset loader's total byte budget`);
     // Art and print version go together: changing a face needs a new version and a new pin.

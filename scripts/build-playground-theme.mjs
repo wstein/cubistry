@@ -1,13 +1,14 @@
 /** Writes the integrity manifest and the typed face list for a playground picture theme.
  * Usage: node scripts/build-playground-theme.mjs [--check] <id>...
- * Input:  public/playground-<id>/<F|B|R|L|U|D>.svg, the six whole 320 x 320 faces. They are the only
+ * Input:  public/playground-<id>/<F|B|R|L|U|D>.svg, the six whole 320 x 320 faces, or the six faces as lossy
+ *         .webp, square and at most 1024 px (one format per theme). They are the only
  *         artwork a theme ships: the app cuts them into N x N stickers at run time (themes.ts), so one
  *         theme serves every cube size.
  * Output: public/playground-<id>/manifest.json and src/apps/playground/theme-assets/<id>.ts
  * With --check nothing is written; the command fails if either output is out of date.
  * It prints the theme's face digest, which tests/fixtures/playground-theme-pins.json pins per print version.
  * The illustrations are authored elsewhere; this script only pins them by SHA-256. */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 
 const args = process.argv.slice(2);
@@ -21,11 +22,21 @@ let stale = 0;
 for (const id of ids) {
   if (!/^[a-z]+$/.test(id)) throw Error(`Theme id must be lowercase letters: ${id}`);
   const dir = new URL(`../public/playground-${id}/`, import.meta.url);
+  const format = existsSync(new URL("F.webp", dir)) ? "webp" : "svg";
   const faces = Object.fromEntries([..."FBRLUD"].map((face) => {
-    const svg = readFileSync(new URL(`${face}.svg`, dir));
-    if (!svg.toString("utf8").startsWith('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">'))
-      throw Error(`${id}/${face}.svg must be a 320 x 320 face with viewBox 0 0 320 320`);
-    return [face, { url: `/playground-${id}/${face}.svg`, format: "svg", sha256: createHash("sha256").update(svg).digest("hex"), size: 320 }];
+    const bytes = readFileSync(new URL(`${face}.${format}`, dir));
+    let size = 320;
+    if (format === "svg") {
+      if (!bytes.toString("utf8").startsWith('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">'))
+        throw Error(`${id}/${face}.svg must be a 320 x 320 face with viewBox 0 0 320 320`);
+    } else {
+      if (bytes.toString("latin1", 0, 4) + bytes.toString("latin1", 8, 16) !== "RIFFWEBPVP8 ")
+        throw Error(`${id}/${face}.webp must be a lossy WebP`);
+      size = bytes.readUInt16LE(26) & 16383;
+      if (size !== (bytes.readUInt16LE(28) & 16383) || size > 1024)
+        throw Error(`${id}/${face}.webp must be square and at most 1024 px`);
+    }
+    return [face, { url: `/playground-${id}/${face}.${format}`, format, sha256: createHash("sha256").update(bytes).digest("hex"), size }];
   }));
   const outputs = [
     [
