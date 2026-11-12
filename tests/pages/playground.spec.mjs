@@ -12,7 +12,10 @@ test("built playground mode resolves picture tiles and authenticated solver unde
     if (r.url().startsWith("http")) requests.push(new URL(r.url()).pathname);
   });
   await page.goto("./counter.html");
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  // The counter page loads its cube before the host mode is chosen; on a loaded machine this took more than the 5 s default.
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false", {
+    timeout: 15000,
+  });
   await page.locator("#application").selectOption("playground");
   // Selecting the application starts a full page navigation to the host mode. In three Pages runs this URL check
   // failed at the 5 s default with `Received string: ""` while the log showed "waiting for navigation
