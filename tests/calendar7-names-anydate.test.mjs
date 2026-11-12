@@ -11,12 +11,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { build, check, DEFAULTS, IMPOSSIBLE_KEY, parseFlags, parseFronts } from "../scripts/export-calendar7-names-anydate.mjs";
 import {
-  ANY_FIRST_YEAR, ANY_LAST_YEAR, ROTATIONS, allConfigs, assignPieces, bestEffortFront, bestEffortSentence, cellWhere, chooseAnyMonth, configOf, matchFront, namesCells, parseAnyData, parseFront, poseFromFront, rotationOf, stateForDate, wrongStickerIndices,
+  ANY_FIRST_YEAR, ANY_LAST_YEAR, ROTATIONS, allConfigs, assignPieces, bestEffortFront, bestEffortSentence, cellWhere, chooseAnyMonth, configOf, matchFront, namesCells, parseAnyData, parseFront, poseFromFront, previewForDate, rotationOf, stateForDate, wrongStickerIndices,
 } from "../src/apps/calendar7/anydate.ts";
-import { anyDatePageHtml, anyDateModel, HIDDEN_SHEET_CLASS, NO_STATE_LEAD } from "../src/apps/calendar7/anydate-view.ts";
+import { anyDatePageHtml, anyDateModel, dateFormHtml, HIDDEN_SHEET_CLASS, NO_STATE_LEAD } from "../src/apps/calendar7/anydate-view.ts";
 import { checkPose, stateDigest } from "../src/apps/calendar7/engine.ts";
 import { frontFailure, frontFailures } from "../src/apps/calendar7/display.ts";
-import { drawWrongCell, HATCH_LINES, WRONG_CELL } from "../src/apps/calendar7/sticker-art.ts";
+import { drawWrongCell, HATCH_LINES, WRONG_CELL, wrongStripRect } from "../src/apps/calendar7/sticker-art.ts";
 import { ANY_DISPLAY_ONLY_NOTICE, NAMES_ANY_LABEL, NAMES_ANY_LOAD_NOTICE, parseLayout, parseLayoutMode } from "../src/apps/calendar7/layout.ts";
 import { parseDisplays, parseState } from "../src/apps/calendar7/graph.ts";
 import { chainRange, monthLabel } from "../src/apps/calendar7/month-view.ts";
@@ -320,14 +320,13 @@ const page = (year, month) => {
   const choice = chooseAnyMonth(new URLSearchParams(`year=${year}&month=${month}`), today);
   return anyDatePageHtml(anyDateModel(choice, stateForDate(data, year, month), today, graphRange));
 };
-test("the any-date page shows the sheet, the display-only line and the date form, with no step links and no chain text", () => {
+test("the any-date page shows the sheet and display-only line without duplicating persistent picker controls", () => {
   const html = page(1967, 9);
   assert.match(html, /data-month="1967-09">September 1967<\/h2>/);
   assert.match(html, />SEP<\/td>|>SEP</);
   assert.ok(html.includes(ANY_DISPLAY_ONLY_NOTICE));
   assert.match(html, /Board configuration: September, the 1st on a Friday, 30 days\./);
-  assert.match(html, /name="year" min="1" max="9999"/);
-  assert.match(html, /<option value="9" selected>September<\/option>/);
+  assert.doesNotMatch(html, /data-c7-date-form|name="year"|>Show</);
   assert.doesNotMatch(html, /data-step=|outside the proven chain|Open May 2026|c7-nav/);
   assert.doesNotMatch(html, /data-c7-no-state/);
   assert.doesNotMatch(html, /proleptic/, "1967 is later than 1582: no proleptic note");
@@ -350,241 +349,79 @@ test("a configuration without any state shows the short line without a reason", 
   assert.ok(html.includes(`${NO_STATE_LEAD}</p>`));
   assert.doesNotMatch(html, /Reason/);
 });
-test("the differing cell is drawn as a gray hatched field with a strike-through and a red frame crossed out", () => {
-  const log = [];
-  const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : (...a) => log.push([String(k), ...a, t.strokeStyle, t.fillStyle])), set: (t, k, v) => { t[k] = v; log.push(["set", k, v]); return true; } });
-  drawWrongCell(ctx, 346, 346);
-  const calls = (name) => log.filter((l) => l[0] === name);
-  assert.deepEqual(calls("fillRect")[0].slice(1, 5), [0, 0, 346, 346]);
-  assert.equal(log.find((l) => l[0] === "set" && l[1] === "fillStyle")[2], WRONG_CELL.field);
-  assert.ok(calls("moveTo").length >= HATCH_LINES, "hatching: one line per step");
-  const strokes = log.filter((l) => l[0] === "set" && l[1] === "strokeStyle").map((l) => l[2]);
-  assert.deepEqual(strokes, [WRONG_CELL.hatch, WRONG_CELL.strike, WRONG_CELL.halo, WRONG_CELL.frame]);
-  assert.equal(calls("strokeRect").length, 2, "the frame, with its halo");
-  assert.equal(calls("stroke").length, 4, "hatching, strike-through, and the cross-out of the frame with its halo");
+test("the differing sticker keeps its artwork and receives only a narrow bottom hatch overlay", () => {
+  for (const [w, h, tile] of [[192, 192, undefined], [192, 346, { w: 1, h: 1.8 }], [346, 346, { w: 1.8, h: 1.8 }]]) {
+    const log = [];
+    const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : (...a) => log.push([String(k), ...a])), set: (t, k, v) => { t[k] = v; log.push(["set", k, v]); return true; } });
+    drawWrongCell(ctx, w, h, tile);
+    const calls = name => log.filter(l => l[0] === name);
+    const strip = wrongStripRect(w, h, tile);
+    assert.equal(calls("fillRect").length, 0, "the actual sticker background is never covered");
+    assert.equal(calls("strokeRect").length, 0, "no red box or outline");
+    assert.deepEqual(calls("rect")[0].slice(1), [strip.x, strip.y, strip.w, strip.h]);
+    assert.ok(strip.y > h * .8 && strip.h < h * .11, "only the lower tenth of the flat face");
+    assert.ok(calls("moveTo").length >= HATCH_LINES, "a readable hatch strip");
+    assert.ok(calls("moveTo").every(l => l[2] >= strip.y), "no large diagonal across the sticker");
+    assert.ok(calls("lineTo").every(l => l[2] >= strip.y), "all hatch endpoints stay in the strip");
+    assert.deepEqual(log.filter(l => l[0] === "set" && l[1] === "strokeStyle").map(l => l[2]), [WRONG_CELL.halo, WRONG_CELL.hatch]);
+    assert.equal(calls("stroke").length, 2, "paired light and dark strokes work on either theme");
+  }
 });
-test("an invalid month shows the reason and keeps the date form", () => {
+test("an invalid month keeps its reason without duplicating the persistent picker", () => {
   const html = anyDatePageHtml(anyDateModel(chooseAnyMonth(new URLSearchParams("year=0&month=5"), today), null, today, graphRange));
   assert.match(html, /Invalid month: year must be from 1 to 9999\./);
-  assert.match(html, /data-c7-date-form/);
+  assert.doesNotMatch(html, /data-c7-date-form|>Show</);
 });
 
-// ---- the mount ----
-class El {
-  constructor(attrs = {}) { this.attrs = { ...attrs }; this.textContent = ""; this.hidden = false; this.disabled = false; this.value = ""; this.innerHTML = ""; }
-  querySelector() { return { focus() {} }; }
-  setAttribute(k, v) { this.attrs[k] = String(v); if (k === "hidden") this.hidden = true; if (k === "disabled") this.disabled = true; }
-  removeAttribute(k) { delete this.attrs[k]; if (k === "hidden") this.hidden = false; }
-  getAttribute(k) { return this.attrs[k] ?? null; }
-  focus() {}
-}
-function fakeRoot() {
-  const listeners = { click: new Set(), change: new Set(), submit: new Set() };
-  const els = new Map();
-  const view = new El();
-  const get = (name) => { if (!els.has(name)) els.set(name, new El({ "data-c7": name })); return els.get(name); };
-  return {
-    attrs: {}, html: "", view, el: get, listeners,
-    set innerHTML(h) { this.html = h; },
-    querySelector(sel) {
-      if (sel === ".c7-view") return view;
-      if (sel === ".c7-live") return new El();
-      const m = sel.match(/^\[data-c7="([a-z-]+)"\]$/);
-      return m ? get(m[1]) : null;
-    },
-    contains: () => true,
-    addEventListener: (t, l) => listeners[t].add(l),
-    removeEventListener: (t, l) => listeners[t].delete(l),
-    setAttribute(k, v) { this.attrs[k] = String(v); },
-    getAttribute(k) { return this.attrs[k] ?? null; },
-    choose(name, value) {
-      const el = get(name);
-      el.value = value;
-      for (const l of [...listeners.change]) l({ type: "change", target: { closest: () => el } });
-    },
-    submit(year, month) {
-      const form = { querySelector: (sel) => ({ value: sel.includes("year") ? String(year) : String(month) }) };
-      let prevented = false;
-      for (const l of [...listeners.submit]) l({ type: "submit", target: { closest: () => form }, preventDefault: () => (prevented = true) });
-      return prevented;
-    },
-  };
-}
-const fakeStage = () => {
-  const stage = { configs: [], shows: [], show: (pose) => stage.shows.push(pose), turn: () => Promise.resolve(), setScheme() {}, setLabel: (t) => (stage.label = t), resetView() {}, destroy() {}, configure(printing, pose, surface, layout, wrong) { stage.configs.push({ printing, layout, wrong }); } };
-  return stage;
-};
-const settle = async (root, want) => {
-  for (let i = 0; i < 200000; i++) {
-    if (root.getAttribute("data-c7-state") === "idle" && root.getAttribute("data-c7-month") === want) return;
-    await Promise.resolve();
-  }
-  throw new Error(`not idle at ${want}: ${root.getAttribute("data-c7-state")} ${root.getAttribute("data-c7-month")}`);
-};
-const attr = async (root, name, want) => {
-  for (let i = 0; i < 200000 && root.getAttribute(name) !== want; i++) await Promise.resolve();
-  assert.equal(root.getAttribute(name), want);
-};
-const setup = ({ failAny = false } = {}) => {
-  const stage = fakeStage();
-  const host = { hidden: false };
-  const calls = { fetched: [], query: [] };
-  let search = "";
-  const env = {
-    base: "/",
-    fetchJson: async (url) => {
-      calls.fetched.push(url);
-      if (failAny && url.includes("/names-any/")) throw new Error("HTTP 404");
-      const dir = url.includes("/names-any/") ? "public/calendar7/names-any/" : url.includes("/names/") ? "public/calendar7/names/" : "public/calendar7/";
-      return json(dir + url.split("/").pop());
-    },
-    now: () => new Date(2026, 10, 10),
-    search: () => search,
-    replaceQuery: (s) => { search = s; calls.query.push(s); },
-    isCurrent: () => true,
-    sceneHost: () => host,
-    createStage: async () => stage,
-    reducedMotion: () => false,
-  };
-  return { env, stage, host, calls };
-};
-const names = { graph: parseGraph(json("public/calendar7/names/graph.v1.json")) };
-
-test("mount with layout=names-any shows September 1967 from print B: one cube build, the pose of its configuration, notice, no player, no chain files", async () => {
-  const root = fakeRoot();
-  const { env, stage, host, calls } = setup();
-  const inst = await mountCalendar7(root, new URLSearchParams("year=1967&month=9&layout=names-any"), env);
-  await settle(root, "1967-09");
-  assert.deepEqual(calls.fetched.filter((u) => u.includes("names-any")).map((u) => u.split("/").pop()).sort(), ["configs.v1.json", "state.v1.json"]);
-  assert.equal(calls.fetched.filter((u) => u.includes("/names/")).length, 0, "the chain data is not read");
-  assert.equal(stage.configs.length, 1);
-  assert.equal(stage.configs[0].layout, "names");
-  assert.deepEqual([...stage.configs[0].printing.text], [...printing.text]);
-  const want = stateForDate(data, 1967, 9).pose;
-  assert.equal(stage.shows.length, 1);
-  assert.deepEqual([...stage.shows[0].pos], [...want.pos]);
-  assert.equal(root.getAttribute("data-c7-digest"), stateDigest(printing, want));
-  assert.equal(root.getAttribute("data-c7-any"), "state");
-  assert.equal(root.getAttribute("data-c7-layout"), "names");
-  assert.equal(root.getAttribute("data-c7-layout-mode"), "names-any");
-  assert.equal(root.el("layout-notice").textContent, ANY_DISPLAY_ONLY_NOTICE);
-  assert.equal(root.el("layout-notice").hidden, false);
-  assert.equal(root.el("player").hidden, true, "no move controls");
-  assert.equal(host.hidden, false);
-  assert.match(stage.label, /September 1967, display only/);
-  assert.ok(root.html.includes(`<option value="names-any" selected>${NAMES_ANY_LABEL}</option>`));
-  assert.doesNotMatch(root.view.innerHTML, /outside the proven chain|data-step=/);
-  inst.dispose();
+test("the historical pure date-form export retains its bounded year and selected month", () => {
+  const html = dateFormHtml({year:1967,month:9});
+  assert.match(html, /name="year" min="1" max="9999"/);
+  assert.match(html, /<option value="9" selected>September<\/option>/);
 });
 
-test("February 2026 builds the best-effort cube with the wrong cell marked, shows one sentence and keeps the notice", async () => {
-  const root = fakeRoot();
-  const { env, stage, host } = setup();
-  const inst = await mountCalendar7(root, new URLSearchParams("year=2026&month=2&layout=names-any"), env);
-  await settle(root, "2026-02");
-  assert.equal(root.getAttribute("data-c7-any"), "best-effort");
-  assert.equal(stage.configs.length, 1);
-  const s = stateForDate(data, 2026, 2);
-  assert.deepEqual(stage.configs[0].wrong, wrongStickerIndices(s.pose, s.wrong), "the sticker on the wrong cell is the one marked");
-  assert.equal(stage.configs[0].wrong.length, 1);
-  assert.equal(host.hidden, false);
-  assert.equal(root.getAttribute("data-c7-digest"), stateDigest(printing, s.pose));
-  assert.match(root.view.innerHTML, /Not exactly possible with this print: cell bottom right \(row 7, column 7\) differs\./);
-  assert.doesNotMatch(root.view.innerHTML, /scan-fixed|corner demand|Julia/);
-  assert.equal(root.el("layout-notice").textContent, ANY_DISPLAY_ONLY_NOTICE);
-  assert.equal(root.el("player").hidden, true, "no move controls");
-  inst.dispose();
-});
+// ---- canonical one-print mount; old print-B data tests above remain historical artifact checks ----
+import { fakeRoot, setup, settle } from "./helpers/calendar7-mount.mjs";
+const canonicalStart = parseState(json("public/calendar7/names-demo/state.v1.json"));
+const canonicalGraph = parseGraph(json("public/calendar7/names-demo/graph.v1.json"));
+const canonicalState = (y,m) => stateForDate(previewForDate(canonicalStart,y,m),y,m);
+const flush = async()=>{for(let i=0;i<100;i++)await Promise.resolve();};
 
-test("an invalid year builds no cube and says so", async () => {
-  for (const q of ["year=0&month=5", "year=10000&month=5", "year=2026&month=13"]) {
-    const root = fakeRoot();
-    const { env, stage } = setup();
-    const inst = await mountCalendar7(root, new URLSearchParams(`${q}&layout=names-any`), env);
-    for (let i = 0; i < 2000; i++) await Promise.resolve();
-    assert.equal(root.getAttribute("data-c7-any"), "invalid", q);
-    assert.match(root.view.innerHTML, /Invalid month/, q);
-    assert.equal(stage.configs.length, 0);
-    inst.dispose();
-  }
-});
-
-test("the date form changes the month without rebuilding the cube, updates the address bar and keeps other parameters", async () => {
-  const root = fakeRoot();
-  const { env, stage, calls } = setup();
-  const inst = await mountCalendar7(root, new URLSearchParams("year=1967&month=9&layout=names-any&kiosk=1"), env);
-  await settle(root, "1967-09");
-  const before = root.getAttribute("data-c7-digest");
-  assert.equal(root.submit(2100, 2), true);
-  await settle(root, "2100-02");
-  assert.equal(stage.configs.length, 1, "same print: the cube is not rebuilt");
-  assert.equal(stage.shows.length, 2);
-  assert.notEqual(root.getAttribute("data-c7-digest"), before);
-  assert.equal(root.getAttribute("data-c7-digest"), stateDigest(printing, stateForDate(data, 2100, 2).pose));
-  assert.deepEqual(calls.query, ["?year=2100&month=2"]);
-  assert.equal(root.submit(2026, 2), true);
-  await settle(root, "2026-02");
-  assert.equal(root.getAttribute("data-c7-any"), "best-effort");
-  assert.equal(stage.configs.length, 2, "a different set of wrong stickers is another build");
-  assert.equal(stage.configs[1].wrong.length, 1);
-  assert.equal(root.submit(2028, 2), true);
-  await settle(root, "2028-02");
-  assert.equal(root.getAttribute("data-c7-any"), "state");
-  assert.equal(stage.configs.length, 3);
-  assert.deepEqual(stage.configs[2].wrong, []);
-  inst.dispose();
-  assert.equal(root.listeners.submit.size, 0);
-});
-
-test("names inside the window keeps the chain (no print B file is read); leaving it shows print B and coming back rebuilds the chain cube", async () => {
-  const root = fakeRoot();
-  const { env, stage, calls } = setup();
-  const inst = await mountCalendar7(root, new URLSearchParams("year=2027&month=3&layout=names"), env);
-  await settle(root, "2027-03");
-  assert.equal(calls.fetched.filter((u) => u.includes("names-any")).length, 0);
-  assert.equal(root.getAttribute("data-c7-any"), "off");
-  assert.equal(root.getAttribute("data-c7-digest"), names.graph.nodes[10].hash);
-  assert.match(root.view.innerHTML, /data-step="next"/);
-  root.choose("layout", "names-any");
-  await attr(root, "data-c7-any", "state");
-  await settle(root, "2027-03");
-  assert.equal(stage.configs.length, 2);
-  assert.deepEqual([...stage.configs[1].printing.text], [...printing.text]);
-  assert.doesNotMatch(root.view.innerHTML, /data-step=/);
-  root.choose("layout", "names");
-  await attr(root, "data-c7-any", "off");
-  await settle(root, "2027-03");
-  assert.equal(stage.configs.length, 3, "the chain cube is rebuilt from the chain print");
-  assert.equal(root.getAttribute("data-c7-digest"), names.graph.nodes[10].hash);
-  inst.dispose();
-});
-
-test("a failed print B download falls back to the standard layout with a notice and no thrown error", async () => {
-  const root = fakeRoot();
-  const { env, stage } = setup({ failAny: true });
-  const inst = await mountCalendar7(root, new URLSearchParams("year=1967&month=9&layout=names-any"), env);
-  for (let i = 0; i < 5000; i++) await Promise.resolve();
-  assert.equal(root.el("layout-notice").textContent, NAMES_ANY_LOAD_NOTICE);
-  assert.equal(root.el("layout-notice").hidden, false);
-  assert.equal(root.getAttribute("data-c7-layout"), "standard");
-  assert.equal(stage.configs.length, 0, "no cube for a month outside the standard chain");
-  assert.notEqual(root.getAttribute("data-c7-state"), "failed");
-  inst.dispose();
-});
-
-test("the standard layout never reads print B", async () => {
-  const root = fakeRoot();
-  const { env, calls } = setup();
-  const inst = await mountCalendar7(root, new URLSearchParams("year=2027&month=3"), env);
-  await settle(root, "2027-03");
-  assert.equal(calls.fetched.filter((u) => u.includes("names-any")).length, 0);
-  assert.equal(monthLabel({ year: 1967, month: 9 }), "September 1967");
-  inst.dispose();
-});
+test("the former names-any URL uses the canonical print for September 1967 without loading print B",async()=>{const root=fakeRoot(),{env,stage,calls}=setup();const inst=await mountCalendar7(root,new URLSearchParams("year=1967&month=9&layout=names-any"),env);await settle(root,"1967-09");assert.equal(calls.fetched.length,3);assert.ok(calls.fetched.every(u=>u.includes("/names-demo/")));assert.equal(stage.configs.length,1);assert.deepEqual([...stage.configs[0].printing.text],[...canonicalStart.printing.text]);const want=canonicalState(1967,9);assert.equal(root.getAttribute("data-c7-digest"),stateDigest(canonicalStart.printing,want.pose));assert.equal(root.el("player").hidden,true);assert.equal(root.getAttribute("data-c7-layout-mode"),"names");assert.doesNotMatch(root.html,/Cube layout/);inst.dispose();});
+test("February 2026 marks precisely the actual wrong front sticker with no UNSAT claim",async()=>{const root=fakeRoot(),{env,stage}=setup();const inst=await mountCalendar7(root,new URLSearchParams("year=2026&month=2&layout=names"),env);await settle(root,"2026-02");const s=canonicalState(2026,2);assert.equal(root.getAttribute("data-c7-any"),"best-effort");assert.deepEqual(stage.configs[0].wrong,wrongStickerIndices(s.pose,s.wrong));assert.equal(stage.configs[0].wrong.length,1);assert.equal(root.getAttribute("data-c7-digest"),stateDigest(canonicalStart.printing,s.pose));assert.match(root.view.innerHTML,/Preview mismatch: cell bottom right \(row 7, column 7\) differs/);assert.doesNotMatch(root.view.innerHTML,/UNSAT|Not exactly possible|Print B/);assert.equal(root.el("player").hidden,true);inst.dispose();});
+test("an invalid URL year or month builds no cube and says so",async()=>{for(const q of["year=0&month=5","year=10000&month=5","year=2026&month=13"]){const root=fakeRoot(),{env,stage}=setup();const inst=await mountCalendar7(root,new URLSearchParams(q),env);await flush();assert.equal(root.getAttribute("data-c7-any"),"invalid");assert.match(root.view.innerHTML,/Invalid month/);assert.equal(stage.configs.length,0);inst.dispose();}});
+test("instant date changes reuse the print, refresh differing-sticker masks and preserve other URL parameters",async()=>{const root=fakeRoot(),{env,stage,calls}=setup({search:"?app=calendar7&kiosk=1&scheme=paper-blue&font=nunito"});const inst=await mountCalendar7(root,new URLSearchParams("year=1967&month=9"),env);await settle(root,"1967-09");for(const[y,m]of[[2100,2],[2026,2],[2028,2]]){root.date(y,m);await settle(root,y+"-"+String(m).padStart(2,"0"));const state=canonicalState(y,m);assert.equal(root.getAttribute("data-c7-digest"),stateDigest(canonicalStart.printing,state.pose));assert.deepEqual(stage.configs.at(-1).wrong,state.kind==="best-effort"?wrongStickerIndices(state.pose,state.wrong):[]);}assert.ok(stage.configs.every(c=>c.printing===stage.configs[0].printing));assert.equal(calls.fetched.length,3);const q=new URLSearchParams(env.search());for(const[k,v]of[["year","2028"],["month","2"],["kiosk","1"],["scheme","paper-blue"],["font","nunito"]])assert.equal(q.get(k),v);inst.dispose();assert.equal(root.listeners.submit.size,0);});
+test("leaving and returning to the chain restores playback without another print or old pose",async()=>{const root=fakeRoot(),{env,stage,calls}=setup();const inst=await mountCalendar7(root,new URLSearchParams("year=2027&month=3"),env);await settle(root,"2027-03");assert.equal(root.getAttribute("data-c7-digest"),canonicalGraph.nodes[10].hash);root.date(2099,12);await settle(root,"2099-12");assert.equal(root.el("player").hidden,true);root.date(2027,3);await settle(root,"2027-03");assert.equal(root.getAttribute("data-c7-digest"),canonicalGraph.nodes[10].hash);assert.equal(root.el("player").hidden,false);assert.ok(stage.configs.every(c=>c.printing===stage.configs[0].printing));assert.equal(calls.fetched.length,3);inst.dispose();});
+test("a failed canonical download cannot fall back to print B or the retired standard layout",async()=>{const root=fakeRoot(),{env,stage,calls}=setup({fail:true});await assert.rejects(mountCalendar7(root,new URLSearchParams("year=1967&month=9"),env),/HTTP 404/);assert.equal(stage.configs.length,0);assert.ok(calls.fetched.every(u=>u.includes("/names-demo/")));});
+test("December 2099 remains a names board on the same print, with no old standard chain replay",async()=>{const root=fakeRoot(),{env,calls}=setup();const inst=await mountCalendar7(root,new URLSearchParams("year=2099&month=12&layout=standard"),env);await settle(root,"2099-12");assert.equal(root.getAttribute("data-c7-layout"),"names");assert.equal(root.el("player").hidden,true);assert.match(root.view.innerHTML,/December 2099/);assert.doesNotMatch(root.view.innerHTML,/data-step=|data-nav=/);assert.ok(calls.fetched.every(u=>u.includes("/names-demo/")));inst.dispose();});
 
 test("assignPieces moves an earlier cell to another piece when a later cell needs its first choice (augmenting path)", () => {
   // Cell 0 takes piece 1 first; cell 1 accepts only piece 1, so cell 0 must move to piece 2. Greedy matching leaves cell 1 unmatched.
   assert.deepEqual(assignPieces([[{ piece: 1 }, { piece: 2 }], [{ piece: 1 }]]), [1, 0]);
   // A chain of two moves, and a cell no piece can serve stays unmatched next to a maximum matching of the others.
   assert.deepEqual(assignPieces([[{ piece: 1 }, { piece: 2 }], [{ piece: 2 }, { piece: 3 }], [{ piece: 1 }], [{ piece: 1 }]]), [1, 1, 0, -1]);
+});
+
+test("invalid URL dates recover through the persistent real month picker without a cube or legacy form", async () => {
+  for (const query of ["year=0&month=5", "year=10000&month=5", "year=2026&month=13"]) {
+    const root = fakeRoot(), {env,stage} = setup({search:"?app=calendar7&"+query});
+    const instance = await mountCalendar7(root,new URLSearchParams(query),env);
+    await flush();
+    assert.equal(root.getAttribute("data-c7-any"),"invalid");
+    assert.match(root.view.innerHTML,/Invalid month/);
+    assert.equal(stage.configs.length,0);
+    assert.ok(root.html.indexOf("data-c7-month-picker") < root.html.indexOf('class="c7-view"'), "picker host must survive view replacement");
+    assert.match(root.picker.host.innerHTML,/aria-label="Choose month and year"/);
+    assert.doesNotMatch(root.view.innerHTML,/data-c7-date-form|>Show</);
+    root.picker.click("toggle");
+    assert.equal(root.picker.trigger.getAttribute("aria-expanded"),"true");
+    root.date(2099,12);
+    await settle(root,"2099-12");
+    assert.equal(root.picker.label.textContent,"December 2099");
+    assert.doesNotMatch(root.view.innerHTML,/Invalid month|data-c7-date-form|>Show</);
+    assert.equal(root.getAttribute("data-c7-digest"),stateDigest(canonicalStart.printing,canonicalState(2099,12).pose));
+    assert.equal(stage.configs.length,1);
+    const params = new URLSearchParams(env.search());
+    assert.equal(params.get("app"),"calendar7");assert.equal(params.get("year"),"2099");assert.equal(params.get("month"),"12");
+    instance.dispose();
+  }
 });

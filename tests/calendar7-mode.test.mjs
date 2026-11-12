@@ -4,6 +4,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { pickerDom } from "./helpers/calendar7-picker-dom.mjs";
 import { MODE_CATALOG } from "../src/apps/mode-catalog.ts";
 import { createRegistry } from "../src/apps/registry.ts";
 import { monthCells } from "../src/apps/calendar7/display.ts";
@@ -189,6 +190,7 @@ test("a month outside the chain shows a not-available message and no sheet", () 
 });
 
 function fakeRoot() {
+  const picker = pickerDom();
   const listeners = new Set();
   const focused = [];
   const view = { innerHTML: "", querySelector: () => ({ focus: () => focused.push(view.innerHTML.match(/data-month="([^"]+)"/)?.[1] ?? "other") }) };
@@ -199,7 +201,7 @@ function fakeRoot() {
     live,
     focused,
     listeners,
-    querySelector: (sel) => (sel === ".c7-view" ? view : live),
+    querySelector: (sel) => (sel === "[data-c7-month-picker]" ? picker.host : sel === ".c7-view" ? view : live),
     contains: () => true,
     addEventListener: (_t, l) => listeners.add(l),
     removeEventListener: (_t, l) => listeners.delete(l),
@@ -217,7 +219,7 @@ const env = (over = {}) => {
   return {
     calls,
     base: "/",
-    fetchJson: async (url) => (url.endsWith("graph.v1.json") ? json("public/calendar7/graph.v1.json") : json("public/calendar7/displays.v1.json")),
+    fetchJson: async (url) => json("public" + url),
     now: () => new Date(2026, 10, 7),
     search: () => "?app=calendar7&year=2028&month=1&kiosk=1",
     replaceQuery: (s) => calls.query.push(s),

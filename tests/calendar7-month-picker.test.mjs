@@ -151,7 +151,8 @@ test("mounted picker preserves URL settings and moves along the chain without ad
   const root = mountRoot(f.host, { threeD: true });
   const { env, stage } = mountEnv({
     threeD: true,
-    search: "?app=calendar7&year=2026&month=11&layout=standard&scheme=paper-blue&banner=boxed&font=nunito&extra=keep",
+    // Unified names view drops legacy layout= from the URL on picker navigation.
+    search: "?app=calendar7&year=2026&month=11&scheme=paper-blue&banner=boxed&font=nunito&extra=keep",
   });
   const inst = await mountCalendar7(root, new URLSearchParams(env.search()), env);
   await settle(root, "2026-11");
@@ -166,9 +167,10 @@ test("mounted picker preserves URL settings and moves along the chain without ad
   await settle(root, "2026-12");
   const params = new URLSearchParams(env.search());
   for (const [key, value] of [
-    ["app", "calendar7"], ["layout", "standard"], ["scheme", "paper-blue"], ["banner", "boxed"],
+    ["app", "calendar7"], ["scheme", "paper-blue"], ["banner", "boxed"],
     ["font", "nunito"], ["extra", "keep"], ["year", "2026"], ["month", "12"],
   ]) assert.equal(params.get(key), value, key);
+  assert.equal(params.get("layout"), null);
   assert.equal(root.getAttribute("data-c7-any"), "off");
   assert.ok(stage.configs.length >= 1);
   inst.dispose();
@@ -176,7 +178,7 @@ test("mounted picker preserves URL settings and moves along the chain without ad
   assert.equal(f.docEvents.size, 0);
 });
 
-test("a month outside the chain keeps the existing outside page and does not claim an any-date state", async () => {
+test("a month outside the beam window shows the same-print display-only preview", async () => {
   const f = pickerDom();
   const root = mountRoot(f.host, { threeD: true });
   const { env } = mountEnv({ threeD: true, search: "?app=calendar7&year=2026&month=11&banner=underline&extra=keep" });
@@ -192,9 +194,9 @@ test("a month outside the chain keeps the existing outside page and does not cla
   assert.equal(params.get("month"), "1");
   assert.equal(params.get("banner"), "underline");
   assert.equal(params.get("extra"), "keep");
-  assert.match(root.view.innerHTML, /outside the proven chain/);
-  assert.equal(root.getAttribute("data-c7-any"), "off");
-  assert.equal(root.getAttribute("data-c7-month"), "2026-11", "the cube stays on the chain month");
+  assert.match(root.view.innerHTML, /Display only: no move sequence for this date/);
+  assert.equal(root.getAttribute("data-c7-any"), "state");
+  assert.equal(root.getAttribute("data-c7-month"), "1-01");
   assert.equal(f.label.textContent, "January 1");
   inst.dispose();
 });
