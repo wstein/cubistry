@@ -287,6 +287,11 @@ test("names print: the cut face under every month row ring cubie is one flat whi
   const edges = faceEdgeFills(printing, scheme, "names", tiles);
   assert.ok(edges.size >= 7, `edge colors for ${edges.size} banner stickers`);
   assert.equal(faceEdgeFills(printing, scheme, "standard", tiles).size, 0);
+  // Wrong cells keep WRONG_CELL.field on cut faces: skip them so edge colors do not override.
+  const sampleId = [...edges.keys()][0];
+  const withWrong = faceEdgeFills(printing, scheme, "names", tiles, new Set([sampleId - 1]));
+  assert.equal(withWrong.has(sampleId), false, `sticker id ${sampleId} is skipped when marked wrong`);
+  assert.equal(withWrong.size, edges.size - 1);
   for (let i = 0; i < n; i++) { // beside the banner: white strip 0.4 / red 1.0 / white strip 0.4 of the 1.8 tall cubie, from the bottom up
     if (printing.ink[i] !== "month" && printing.ink[i] !== "band") continue;
     const e = edges.get(i + 1);

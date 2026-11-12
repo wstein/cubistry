@@ -236,6 +236,11 @@ test('freshness pagination stops exactly at the receipt run or at a short page',
  const b=make([short]);
  assert.equal(await currentNotification(b,note,{fetch:async()=>json(receipt)}),true);
  assert.deepEqual(b.reads,[1]);
+ // Threshold: length < 100 ends paging. 99 (not only 5) must stop; a mutant of 100 -> 99 survives without this.
+ const almost=Array.from({length:99},(_,i)=>({id:400-i,event:'workflow_run',conclusion:'skipped'}));
+ const c=make([almost,Array.from({length:100},(_,i)=>({id:301-i,event:'workflow_run',conclusion:'skipped'}))]);
+ assert.equal(await currentNotification(c,note,{fetch:async()=>json(receipt)}),true);
+ assert.deepEqual(c.reads,[1],'a 99-entry page is short and must not read page 2');
 });
 // Fake status endpoint that never leaves in_progress; the fake clock advances only through sleep.
 function stuckFetch({delay=0,body={status:'deployment_in_progress'}}={}){
@@ -284,6 +289,20 @@ function budgetRun({token='ghs_TOK',oidcValue='oidc-secret-jwt',timeout,attempts
 }
 const abortError=name=>()=>new DOMException(`${name} for test`,name);
 const mute=t=>{const logged=[];t.mock.method(console,'error',(...args)=>logged.push(args.join(' ')));return logged;};
+test('an empty-string OIDC token is not treated as a secret to redact',async t=>{
+ // secrets.filter(Boolean) drops ""; removing it would make every string split on "" and redact itself.
+ const logged=mute(t);
+ let time=0;
+ const body={status:'deployment_in_progress',message:'still working'};
+ await assert.rejects(deployPages({receipt,artifact:55,token:'ghs_TOK',oidc:async()=>'',now:()=>time,timeout:25000,sleep:async ms=>{time+=ms;},attempts:60,fetch:stuckFetch({body})}),
+  error=>{
+   assert.match(error.message,/Pages deployment wait budget exhausted/);
+   assert.match(error.message,/still working/);
+   assert.doesNotMatch(error.message,/\[redacted\]still/);
+   for(const text of [error.message,...logged])assert(!text.includes('ghs_TOK'));
+   return true;
+  });
+});
 test('attempts cap at default attempts and timeout carries the full diagnostics',async t=>{
  const logged=mute(t);
  await assert.rejects(budgetRun({timeout:600000,attempts:60,body:{status:'deployment_in_progress',errors:['E5marker']}}),error=>{

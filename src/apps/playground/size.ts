@@ -19,8 +19,16 @@ export interface SizeChoice {
   note: string;
 }
 
-/** Notes that the size control shows next to the segments. */
-export const sizeNote = () => "Sizes 3 to 7 are not playable yet. This page turns the 2×2 only.";
+/** Notes that the size control shows next to the segments. Derived from `CUBE_SIZES` and `PLAYABLE_SIZES`. */
+export const sizeNote = (): string => {
+  const pending = CUBE_SIZES.filter((n) => !PLAYABLE_SIZES.includes(n));
+  if (pending.length === 0) return "";
+  const first = pending[0];
+  const last = pending[pending.length - 1];
+  const range = first === last ? String(first) : `${first} to ${last}`;
+  const playable = PLAYABLE_SIZES.map((n) => `${n}×${n}`).join(", ");
+  return `Sizes ${range} are not playable yet. This page turns the ${playable} only.`;
+};
 
 /** Reads the value of `size=`: a whole number from 2 to 7 is valid, anything else falls back to the default. */
 export function resolveSize(raw: string | null): SizeChoice {

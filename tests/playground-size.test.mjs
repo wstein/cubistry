@@ -49,7 +49,15 @@ test("sizeSearch sets size= and keeps the other parameters", () => {
 });
 
 test("sizeNote names every size that is not playable", () => {
+  const pending = CUBE_SIZES.filter((n) => !PLAYABLE_SIZES.includes(n));
+  assert.deepEqual(pending, [3, 4, 5, 6, 7]);
   assert.match(sizeNote(), /Sizes 3 to 7 are not playable yet/);
+  assert.match(sizeNote(), new RegExp(`This page turns the ${PLAYABLE_SIZES.map((n) => `${n}×${n}`).join(", ")} only`));
+  // A literal that ignores PLAYABLE_SIZES would keep saying "2×2 only" after the engine grows.
+  assert.equal(
+    sizeNote(),
+    `Sizes ${pending[0]} to ${pending.at(-1)} are not playable yet. This page turns the ${PLAYABLE_SIZES.map((n) => `${n}×${n}`).join(", ")} only.`,
+  );
 });
 const html = readFileSync("playground.html", "utf8");
 const script = readFileSync("src/playground.mjs", "utf8");

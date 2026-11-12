@@ -29,9 +29,8 @@ const FACES = [
   { name: "D", n: [0, -1, 0], r: [1, 0, 0], u: [0, 0, 1], col: 1, row: 2 },
 ];
 
-export function buildTenthPrint() {
-  const sourceRaw = readFileSync(path(SOURCE_PATH));
-  const source = JSON.parse(sourceRaw.toString("utf8"));
+/** Builds the assembly net. `source` is the tenth print JSON; omitted reads the shipped file. */
+export function buildTenthPrint(source = JSON.parse(readFileSync(path(SOURCE_PATH), "utf8"))) {
 
   // Load digit glyphs
   const digitGlyphs = {};
@@ -56,6 +55,8 @@ export function buildTenthPrint() {
   const netCells = [];
   for (const f of FACES) {
     const faceStickers = source.printing.filter((s) => same(s.n, f.n));
+    if (faceStickers.length !== 4)
+      throw new Error(`Face ${f.name} needs 4 stickers, found ${faceStickers.length}`);
     for (const s of faceStickers) {
       const col = dot(s.p, f.r) > 0 ? 1 : 0;
       const row = dot(s.p, f.u) > 0 ? 0 : 1;
@@ -70,6 +71,7 @@ export function buildTenthPrint() {
             : same(s.up, neg(f.r))
               ? 270
               : null;
+      if (rot === null) throw new Error(`Sticker ${s.id}: up not in face plane`);
       const glyph = s.image ? digitGlyphs[s.image] : "";
       const art = s.image
         ? `<g transform="rotate(${rot} 128 128)">${glyph}</g>`

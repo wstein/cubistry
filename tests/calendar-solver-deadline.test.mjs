@@ -126,10 +126,12 @@ test("the Pages spec sets the same hook to a finite deadline below its busy wait
   );
   const hook = page.match(/window\.(__calendarSolverTimeoutMs)/)?.[1];
   assert.ok(hook, "calendar.mjs reads the hook");
-  const set = [...spec.matchAll(/window\.(\w+)\s*=\s*([\d_]+)\s*;/g)].filter(
+  // Only live assignments: a commented-out `// window.__calendarSolverTimeoutMs = 13000;` must not count.
+  const set = [...spec.matchAll(/^[ \t]*window\.(\w+)\s*=\s*([\d_]+)\s*;/gm)].filter(
     (m) => m[1] === hook,
   );
   assert.equal(set.length, 1, `spec sets window.${hook} exactly once`);
+  assert.match(spec, new RegExp(`^[ \\t]*window\\.${hook}\\s*=\\s*${set[0][2]}\\s*;`, "m"));
   const deadline = Number(set[0][2].replaceAll("_", ""));
   const busy = Number(
     spec.match(/"aria-busy",\s*"false",\s*\{\s*timeout:\s*(\d+)/)?.[1],

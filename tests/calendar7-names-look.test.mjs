@@ -260,6 +260,8 @@ test("plasticity: 0 is the flat look, the parts grow with it, the default is in 
   assert.equal(DEFAULT_PLASTICITY, 0.6); // owner decision 2026-11-11
   assert.equal(clampPlasticity(-3), 0); assert.equal(clampPlasticity(7), 1); assert.equal(clampPlasticity(Number.NaN), DEFAULT_PLASTICITY);
   assert.equal(parsePlasticity(null), DEFAULT_PLASTICITY); assert.equal(parsePlasticity(""), DEFAULT_PLASTICITY); assert.equal(parsePlasticity("0.6"), 0.6); assert.equal(parsePlasticity("x"), DEFAULT_PLASTICITY);
+  // Trailing letters are invalid (Number gives NaN; a parseFloat mutant would wrongly accept "0.5abc" as 0.5).
+  assert.equal(parsePlasticity("0.5abc"), DEFAULT_PLASTICITY);
   // Out of range clamps, whether finite or not; only NaN (garbage) gives the default.
   for (const [text, want] of [["7", 1], ["1e9", 1], ["Infinity", 1], ["-Infinity", 0], ["-1", 0], ["NaN", DEFAULT_PLASTICITY]]) assert.equal(parsePlasticity(text), want, text);
   assert.equal(clampPlasticity(Infinity), 1); assert.equal(clampPlasticity(-Infinity), 0);
