@@ -181,18 +181,18 @@ Cubing.js numbering. Each row below stays on hold until the follow-up docs PR in
 
 C1 facade measurement work already landed on cubacle (PRs #33 / #34; plan #38
 merged as `bb92669c`). Stack A continues from that tip (`feat/wasm-build-1` …).
-**UNKNOWN:** the target branch for cubacle implementation PRs. No repository source
-records an owner decision on it. **V** GitHub lists `develop` as cubacle's default
+**O** The target branch for cubacle implementation PRs is `develop` (owner answer to
+the coordinator, 2026-11-12). **V** GitHub lists `develop` as cubacle's default
 branch (tip `bb92669c`); `main` (`5f41eb06`) and `develop` have diverged
-(compare: 807 commits ahead, 3 behind), so `main` cannot be fast-forwarded to the
-`develop` tip. The owner decides the base branch before any stack PR is opened.
+(compare: `develop` is 807 commits ahead of and 3 behind `main`), so `main` cannot be
+fast-forwarded to the `develop` tip. Reconciling `main` belongs to the owner.
 Implementation PRs stay in `wstein/cubacle`.
 
 ### Focused work items (one PR each, stacked)
 
 | WI | Branch | Depends on | Notes |
 | --- | --- | --- | --- |
-| WI-A1 | `feat/wasm-build-1` | `main` | C1 facade split + `cubacle_abi_version` |
+| WI-A1 | `feat/wasm-build-1` | `develop` | C1 facade split + `cubacle_abi_version` |
 | WI-A2 | `feat/wasm-build-2` | A1 | optional `cli` + `wasm-deps` |
 | WI-A3 | `feat/wasm-build-3` | A2 | `cargo xtask wasm` + sorted manifest (D5) |
 | WI-A4 | `feat/wasm-build-4` | A3 | deterministic tarball (D2, D6, D7) |
@@ -202,8 +202,7 @@ Implementation PRs stay in `wstein/cubacle`.
 | WI-M1…M3 | `feat/target-modes-*` | **hold** | wait on the cubacle plan update for SM1/SM4 + D12/D13 |
 
 No local patches for A1–A4 are recorded in any repository; cubacle write access is
-needed before stack A can be opened, and not against `develop` until the base branch
-is decided. Do not land a cubacle `kpuzzle` module from parked drafts.
+needed before stack A can be opened; its PRs target `develop`. Do not land a cubacle `kpuzzle` module from parked drafts.
 
 ## Constraints
 
