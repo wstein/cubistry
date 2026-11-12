@@ -8,10 +8,10 @@
 # window chain ending at TARGET and runs through the unchanged checkers with WINDOW_END=TARGET.
 #   julia --threads=4 beam_edge.jl OUT PRINT CHAIN STATES YEAR MONTH [key=value ...]
 # Options: mode=beam|greedy library=L1|L4|L5 width lambda fanout maxdepth patience corew nsnap
-#          finish_depth. Env WINDOW_END must be the window of PRINT (default 2029-12).
+#          finish_depth. Env WINDOW_END must be the window of PRINT (default 2029-12), or CAL7_WINDOW_MONTHS + CAL7_WINDOW_MONTHS_SHA256 (+ CAL7_WINDOW_PRINT_SHA) instead.
 #          Env CAL7_WINDOW_LAYOUT + CAL7_WINDOW_LAYOUT_SHA256: layout file instead of row1-revision/layout.tsv (pinned; default unchanged).
 @assert length(ARGS)>=6 "usage: beam_edge.jl OUT PRINT CHAIN STATES YEAR MONTH [key=value ...]"
-ENV["WINDOW_END"]=get(ENV,"WINDOW_END","2029-12")
+isempty(get(ENV,"CAL7_WINDOW_MONTHS","")) && (ENV["WINDOW_END"]=get(ENV,"WINDOW_END","2029-12"))   # a month list (CAL7_WINDOW_MONTHS) replaces WINDOW_END
 const CAL=normpath(joinpath(@__DIR__,".."))
 include(joinpath(@__DIR__,"window_chain_lib.jl"));using .WindowChainLib
 include(joinpath(CAL,"row1-window-print/common.jl"))
