@@ -104,28 +104,49 @@ proposal until the owner confirms it on that PR. Later the same day the owner
 sharpened the 2026-11-08 rule: **all components share one cube model and one
 abstraction**. The comparison Draft is
 [puzlwerk#49](https://github.com/wstein/puzlwerk/pull/49) on `docs/shared-model-comparison`
-(head `608822aa`, `specs/006-shared-model/`). Opus writes the comparison; the owner
-decides the canonical model (**SM1**). Until SM1 (and the linked SM decisions):
+(`specs/006-shared-model/`; the PR is a Draft and its head moves, so this plan names
+no SHA). Its decision record (README.md, plan.md section 4, read at head `0bd5f72e`)
+lists these owner answers of 2026-11-12 (**O**, source: owner answer in the
+coordinator session, as recorded there):
+
+- **SM1:** PuzlWerk wire-v1 is the canonical model; the Cubacle fixed frame is the
+  Rust implementation of the same semantics; Orbit64 V2 is a codec only.
+- **SM3:** appearance is a separate document per sticker ID; wire-v1 revision 1
+  stays unchanged.
+- **SM4:** a schema generator; one schema generates the types and codecs for Rust
+  and ReScript/TypeScript. This needs its own plan (generator steps G1/G2 there).
+- **SM11:** the shared core and the generator are licensed EUPL-1.2 (the `LICENSE`
+  file is a follow-up PR with a compatibility check). This plan states no license
+  for them and does not contradict it.
+
+**SM2** (V2 as the compact token derived from the canonical model, owned by
+flix-orbit64) and **SM8** (one ReScript Orbit64 V2 module in PuzlWerk) are marked
+as open proposals in that record at `0bd5f72e` (**P**, not **O**); this plan follows
+them only as proposals. Until the cubacle plan is updated for SM1 and SM4 (a
+follow-up docs PR in `wstein/cubacle`, puzlwerk#49 plan.md section 3):
 
 - **Do not start** cubacle stacks **B** (own `kpuzzle` algebra) or **M** (target modes).
-- **Do not take** cubacle plan **D3**, **D12** or **D13** as approved.
+- **Do not take** cubacle plan **D3**, **D12**, **D13** or **D14** as approved.
 - Any earlier blanket “D1–D14 as Recommended” reading is **withdrawn** for those holds
   (and for any D1 reading that starts B/M). Accepting D13 as Recommended would add a
   second public algebra and break the shared-model rule.
 
-Narrowing per puzlwerk#49 §3 / SM6 (**P** until SM1): record **A**, **L2**, **L3** and
-**D14** as the intended go set; keep B, M, D3, D12 and D13 waiting. L1 may proceed only
+These holds stay in force until that cubacle plan update lands; SM1 being decided
+does not lift them.
+
+Narrowing per puzlwerk#49 section 3 / SM6 (**P**): record **A**, **L2** and **L3** as
+the intended go set; keep B, M, D3, D12, D13 and D14 on hold. L1 may proceed only
 with a capability/error-code mapping to the PuzlWerk
 [solver contract](https://github.com/wstein/puzlwerk/blob/main/specs/001-core-foundation/contracts/solver.md)
 (puzlwerk#49 §3 “change”). Cubacle C2–C4 are approach **step 4** of the cubacle plan
 (section 1); approach **step 5** (move Picture 3×3 and Calendar onto cubacle) stays a
 separate decision (unified-application.md D3/E0) and is not approved here.
 
-### Still in force if the go is confirmed (stack A, L2, L3, D14; L after A once D4/D11 are explicit)
+### Still in force if the go is confirmed (stack A, L2, L3; L after A once D4/D11 are explicit)
 
 | Decision | Choice taken |
 | --- | --- |
-| D1 (narrow) | Stack **A** may proceed; **B** and **M** wait on SM1 / SM5 |
+| D1 (narrow) | Stack **A** may proceed; **B** and **M** wait on the cubacle plan update for SM1/SM4 and on SM5 |
 | D2 | Commit plus `sha512` for the wasm tarball; tag pin unchanged for native binaries |
 | D4 | Tables built in the module; hashes pinned in tests (needed before L3); does not decide G1 |
 | D5 | xtask checks one `rustc` version; no repo-wide `rust-toolchain.toml` |
@@ -134,17 +155,21 @@ separate decision (unified-application.md D3/E0) and is not approved here.
 | D8 | Yes: optional `cli` feature for `clap`, `sysinfo`, `toml` |
 | D10 | Yes: light-lane wasm CI job after A3 |
 | D11 | Terminate the worker plus `budgetMs`; no shared-memory cancel flag |
-| D14 | Module placement `src/kpuzzle` / `src/targets` plus `RULES` when B/M start (model-neutral; does not authorize starting B/M) |
 | L2, L3 | JS glue, table hashes, loader/worker/abort — model independent; proceed after A |
 
-### On hold until the shared-model decision (SM1 and linked SMs)
+### On hold until the cubacle plan is updated for SM1 and SM4
+
+SM1 and SM4 are decided, but the cubacle plan still assumes its own algebra and
+Cubing.js numbering. Each row below stays on hold until the follow-up docs PR in
+`wstein/cubacle` lands (puzlwerk#49 plan.md section 3).
 
 | Decision | Was Recommended | Hold reason |
 | --- | --- | --- |
-| D3 | Cubing.js numbering | Fifth numbering; wait for SM1/SM5 (prefer Orbit64 V2 slots + vectors) |
+| D3 | Cubing.js numbering | Numbering derives from wire-v1 piece IDs, checked by vectors; Orbit64 V2 is a codec only (SM1); Cubing.js numbering only as a test-side mapping (puzlwerk#49 plan.md section 3, SM5 open) |
 | D9 | Fix-up after ignore-centers | Target-mode route; stack M |
-| D12 | Calendar fixture list at M1 | Express as corpus rows (wire-v1 + Orbit64 V2) after SM1 |
-| D13 | Rust algebra + limited JS surface | Would fork the public model; wait for SM1 / step 4 |
+| D12 | Calendar fixture list at M1 | Express as corpus rows (wire-v1 state + Orbit64 V2 token) after the plan update |
+| D13 | Rust algebra + limited JS surface | Would fork the public model; types and codecs come from the SM4 generator, which needs its own plan |
+| D14 | Module placement `src/kpuzzle` / `src/targets` plus `RULES` | Names modules for an algebra that is on hold; revisited in the plan update (puzlwerk#49 plan.md section 3) |
 
 C1 facade measurement work already landed on cubacle (PRs #33 / #34; plan #38
 merged). Stack A continues from that tip (`feat/wasm-build-1` …). **All cubacle
@@ -164,8 +189,8 @@ Implementation PRs stay in `wstein/cubacle`.
 | WI-A4 | `feat/wasm-build-4` | A3 | deterministic tarball (D2, D6, D7) |
 | WI-L2…L3 | `feat/wasm-loader-*` | A merged | proceed; model independent |
 | WI-L1 | `feat/wasm-loader-1` | A merged | **change**: map capabilities/error codes to the PuzlWerk solver contract |
-| WI-B1…B2 | `feat/kpuzzle-*` | **hold** | wait on SM1/SM5; D14 placement only |
-| WI-M1…M3 | `feat/target-modes-*` | **hold** | wait on SM1 + D12/D13 |
+| WI-B1…B2 | `feat/kpuzzle-*` | **hold** | wait on the cubacle plan update for SM1/SM4, SM5 and D14 |
+| WI-M1…M3 | `feat/target-modes-*` | **hold** | wait on the cubacle plan update for SM1/SM4 + D12/D13 |
 
 Local patches for A1–A4 (rebased on tip `bb92669`) live with the cloud agent
 artifacts until cubacle write access exists; do not open against `develop`. Do
