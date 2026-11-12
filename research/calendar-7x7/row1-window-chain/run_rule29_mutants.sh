@@ -22,11 +22,12 @@ run() { # name, kind (unit|case:NAME), file to mutate, sed expression
     local jar="$out/good.jar"
     if [ "$file" = flix/src/Main.flix ]; then
       CALENDAR7_CHAIN_FLIX_BUILD_DIR="$out/build-$name" bash "$t/row1-window-chain/flix/build.sh" > "$out/$name.build.log" 2>&1 || { echo "BUILD FAILED $name"; bad=1; rm -rf "$t"; return; }
-      jar="$out/build-$name/artifact/flixbuild.jar"
+      jar=$(ls "$out/build-$name"/artifact/*.jar | head -1)
     fi
     (cd /tmp && ONLY="${kind#case:}" bash "$t/row1-window-chain/run_root2019_checks.sh" "$julia" "$java" "$jar" "$out/run-$name" > "$out/$name.log" 2>&1); rc=$?
-    # the case is a reject case: a surviving mutant is an accepting checker, which the runner reports as "accepted"
-    if [ $rc -ne 0 ] && grep -q "accepted (julia rejected=" "$out/$name.log"; then res=KILLED; else res=SURVIVED; fi
+    # the case is a reject case: a surviving mutant is an accepting checker, which the runner reports as "accepted (julia rejected=J flix rejected=F independent rejected=I)"
+    local who=julia; [ "$file" = verify_chain.jl ] && who=independent; [ "$file" = flix/src/Main.flix ] && who=flix
+    if [ $rc -ne 0 ] && grep -q "accepted (.*$who rejected=0" "$out/$name.log"; then res=KILLED; else res=SURVIVED; fi
   fi
   echo "$res   $name ($kind)"; [ $res = KILLED ] || bad=1
   rm -rf "$t"
@@ -34,12 +35,12 @@ run() { # name, kind (unit|case:NAME), file to mutate, sed expression
 C=check.jl; V=verify_chain.jl; F=flix/src/Main.flix
 run check-wiring-off      case:corner-2026-02-71-rule29 $C 's/^        BEST_EFFORT_29 \&\& !isempty(mism)/        false \&\& !isempty(mism)/'
 run check-cell-any        unit                          $C 's/only(wrong) in ((7,1),(7,7))/true/'
-run check-text-ignored    unit                          $C 's/ \&\& s.text=="29" \&\& s.ink=="red"/ \&\& s.ink=="red"/'
+run check-text-ignored    unit                          $C 's/@assert s.text=="29" \&\& s.ink=="red"/@assert s.ink=="red"/'
 run check-ink-ignored     unit                          $C 's/s.text=="29" \&\& s.ink=="red" \&\& findfirst/s.text=="29" \&\& findfirst/'
 run check-upright-ignored unit                          $C 's/ \&\& findfirst(==(s.up),IMAGE_UPS)==1 "best-effort wrong cell shows/ "best-effort wrong cell shows/'
 run verify-wiring-off     case:corner-2026-02-71-rule29 $V 's/^        RULE29 \&\& !isempty(bad)/        false \&\& !isempty(bad)/'
 run verify-art-ignored    case:rule29-text-28           $V 's/reading(s,a-1,("29","red"))==:upright/reading(s,a-1,(s.text,s.ink))==:upright/'
 run flix-wiring-off       case:corner-2026-02-71-rule29 $F 's/if(rule=="29" and mism != Nil) w29/if(rule=="x" and mism != Nil) w29/'
-run flix-text-ignored     case:rule29-text-28           $F 's/require(text=="29" and ink=="red" and upAngle(u)==0/require(ink=="red" and upAngle(u)==0/'
+run flix-text-ignored     case:rule29-text-28           $F 's/require(text=="29" and ink=="red" and upAngle(u)==0/require(text==text and ink=="red" and upAngle(u)==0/'
 [ $n -ge 1 ] || { echo "no mutant selected (ONLY=${ONLY:-})" >&2; exit 2; }
 exit $bad
