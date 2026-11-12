@@ -469,6 +469,7 @@ export async function mountPlayground(
     shell.setStatus("error", `Unable to start: ${(error as Error).message}. Reload to try again.`);
     shell.updateReadout(2, "Unavailable");
     shell.updateReadout(3, "Unavailable");
+    for (const el of [...manual, undoButton, redoButton, scrambleButton, newSession]) el.disabled = true;
     return { dispose };
   }
   if (!alive()) {

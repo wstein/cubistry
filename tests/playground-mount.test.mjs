@@ -242,6 +242,19 @@ test("a mount that is replaced while its assets load writes nothing: no viewer, 
   assert.equal(f.counts.picturesDisposed, 1);
 });
 
+test("a failed start reports the error and leaves no enabled control", async () => {
+  const f = fixture();
+  f.env.loadAssets = () => Promise.reject(Error("untrusted asset"));
+  const instance = await f.start();
+  await flush();
+  assert.equal(typeof instance.dispose, "function");
+  assert.equal(f.counts.created, 0, "no viewer without assets");
+  assert.match(f.shell.chip.text, /Unable to start: untrusted asset/);
+  const ids = ["playground-apply", "playground-notation", "playground-undo", "playground-redo", "playground-scramble", "playground-new-session", "playground-move-R"];
+  for (const id of ids) assert.equal(f.find(id).disabled, true, id);
+  instance.dispose();
+});
+
 test("dispose releases the viewer, the assets and the pictures panel once", async () => {
   const f = fixture();
   const instance = await f.start();
