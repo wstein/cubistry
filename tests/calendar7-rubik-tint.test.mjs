@@ -68,7 +68,7 @@ test("catalog: one more scheme, black print, black band, no weekend shading, Rou
   assert.equal(s.kind, "light");
   assert.equal(s.style, "band");
   for (const r of ["dayInk", "weekdayInk", "weekendInk", "weekendInkSmall", "sunSatInk"]) assert.equal(s[r], PRINT, r);
-  assert.equal(s.weekendFill, null);
+  assert.equal(s.weekendFill, s.dayFill); // no weekend shading
   assert.equal(s.weekendTint, null);
   assert.equal(s.dayFill, RUBIK_TINTS.white);
   assert.equal(schemeById("rubik-tint"), s);

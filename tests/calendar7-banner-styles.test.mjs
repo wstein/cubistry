@@ -20,8 +20,8 @@ function record() {
 }
 const groundLog = (scheme, ink = "month") => { const { ctx, log } = record(); paintTileGround(ctx, tileRoles(scheme, ink === "month" ? "NOV" : "", ink, "names"), scheme, tile); return log; };
 
-test("all ten theme defaults are explicit and parser accepts exactly six choices", () => {
-  const expected = { "paper-red": "rounded", "paper-blue": "underline", classic: "square", "solarized-light": "boxed", "gruvbox-light": "rounded-box", dracula: "square", monokai: "boxed", "gruvbox-dark": "rounded-box", "catppuccin-mocha": "rounded", "high-contrast": "square" };
+test("all eleven theme defaults are explicit and parser accepts exactly six choices", () => {
+  const expected = { "paper-red": "rounded", "paper-blue": "underline", classic: "square", "solarized-light": "boxed", "gruvbox-light": "rounded-box", dracula: "square", monokai: "boxed", "gruvbox-dark": "rounded-box", "catppuccin-mocha": "rounded", "high-contrast": "square", "rubik-tint": "rounded" };
   assert.deepEqual(Object.keys(expected).sort(), SCHEMES.map(s => s.id).sort());
   for (const base of SCHEMES) assert.equal(resolvedBannerStyle(withBannerStyle(base, "theme")), expected[base.id], base.id);
   for (const s of ["theme", ...styles]) assert.equal(parseBannerStyle(s), s);

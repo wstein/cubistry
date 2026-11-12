@@ -50,7 +50,7 @@ const rects = (log) => log.filter((e) => e[0] === "fillRect");
 const TILES = [["SUN", "red"], ["MON", "weekday"], ["SAT", "red"], ["1", "dark"], ["28", "red"], ["23/30", "red"], ["J", "month"], ["DEC", "month"], ["", "blank"], ["", "dark"]];
 const standardGolden = () => {
   const h = createHash("sha256");
-  for (const scheme of SCHEMES) for (const [text, ink] of TILES) {
+  for (const scheme of SCHEMES.filter((s) => s.id !== "rubik-tint")) for (const [text, ink] of TILES) { // the pinned hash covers the ten schemes of origin/main 71aa90f
     h.update(JSON.stringify([scheme.id, text, ink,
       record((c) => drawSticker(c, text, ink, "strict", scheme)),
       record((c) => drawFace(c, text, ink, "strict", scheme)),

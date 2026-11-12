@@ -30,7 +30,7 @@ export interface SchemeLine {
 /** Theme follows the cube color scheme; the other choices override its month banner shape. */
 export type BannerStyle = "theme" | "rounded" | "square" | "underline" | "boxed" | "rounded-box";
 export type ResolvedBannerStyle = Exclude<BannerStyle, "theme">;
-type SchemeId = "paper-red" | "paper-blue" | "classic" | "solarized-light" | "gruvbox-light" | "dracula" | "monokai" | "gruvbox-dark" | "catppuccin-mocha" | "high-contrast";
+type SchemeId = "paper-red" | "paper-blue" | "classic" | "solarized-light" | "gruvbox-light" | "dracula" | "monokai" | "gruvbox-dark" | "catppuccin-mocha" | "high-contrast" | "rubik-tint";
 /**
  * Theme-default month banner shape per color scheme (owner decision 2026-11-12).
  * Filled, outlined and underlined banners stay distinct across the set.
@@ -46,6 +46,7 @@ const THEME_BANNERS: Readonly<Record<SchemeId, ResolvedBannerStyle>> = Object.fr
   "gruvbox-dark": "rounded-box",
   "catppuccin-mocha": "rounded",
   "high-contrast": "square",
+  "rubik-tint": "rounded",
 });
 
 export interface ColorScheme {
@@ -324,6 +325,30 @@ export const SCHEMES: readonly ColorScheme[] = deepFreeze([
     lineRow1: null,
     lineRow2: line("#828282", 2),
     sunSatInk: "#000000",
+  },
+  {
+    id: "rubik-tint",
+    name: "Rubik-Tint",
+    kind: "light",
+    style: "band",
+    isDefault: false,
+    source: "Own design (owner 2026-11-12). Black print on a very light tint of the standard Rubik color of the stone's home face (home-tint.ts); black month band with white lettering; the color is a hint only. dayFill and weekendFill are the tint of the white face (no weekend shading), used where no home face is known (2D sheet).",
+    inspiredBy: null,
+    dayFill: "#ffffff",
+    dayInk: "#111111",
+    weekdayInk: "#111111",
+    weekendFill: "#ffffff",
+    weekendInk: "#111111",
+    weekendInkSmall: "#111111",
+    weekendTint: null,
+    bandFill: "#111111",
+    monthInk: "#ffffff",
+    weekdayRowFill: null,
+    emptyFill: "#ffffff",
+    seam: "#d4d4d4",
+    lineRow1: null,
+    lineRow2: null,
+    sunSatInk: "#111111",
   },
 ]);
 

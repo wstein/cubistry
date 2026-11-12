@@ -13,7 +13,7 @@ export const BAND_INK = "#ffffff";
 /** Gates: contrast of the print on every tint, of the band lettering on the band, and the least CIEDE2000 distance of any two tints (white included). */
 export const MIN_PRINT_CONTRAST = 12;
 export const MIN_BAND_CONTRAST = 12;
-export const MIN_PAIR_DE2000 = 8;
+export const MIN_PAIR_DE2000 = 15;
 
 /** The tint of a color: `t` (0..1) of the color mixed into white, rounded to #rrggbb. */
 export const tintOf = (hex, t) => mix("#ffffff", hex, t);
