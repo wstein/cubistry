@@ -1,0 +1,8 @@
+selfcheck	63	direct-pose-inverse	4	strict-optics	PASS
+input	e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a	5ac2e92e5b1d1d333006409bd29258adb3071a9bf6341b561a42b095b5e4e18c	3bcfdb14d22ed03c6dc5ecf580e36da94211d347c5bb8ffb5f1df818c2b77d85
+months	0bca747716591b320d67ea8c49b3a5156efa2faf0dd03e691a57b033f266be3a	1	2043-02	2043-02	0
+root	2026	5	bc8bffd85c634c3b609b09262b72ece6af6d94cd6dbe66a02b0864e382cd7cda
+edge	1	2043	2	436	446	22	23	bc8bffd85c634c3b609b09262b72ece6af6d94cd6dbe66a02b0864e382cd7cda	da37976c2e843af404772726aa3152b0186ea3efecc8660c56be5d414f89b519	PASS	ROOTEDGE	BEST_EFFORT	1	7,1
+status	exact	0	best_effort	1
+summary	2	1	436	446	22	23	list:2043-02	INVERSE_PASS
+verdict	BEST_EFFORT	legal-retained-state-window-chain	2	1

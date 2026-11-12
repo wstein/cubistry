@@ -1,0 +1,5 @@
+rule-selfcheck	strict	half-turned-glyph=REJECT	I-as-1=REJECT
+independent-root	2026-05	bc8bffd85c634c3b609b09262b72ece6af6d94cd6dbe66a02b0864e382cd7cda	ACCEPT
+independent-edge	1	2037	2	436	da37976c2e843af404772726aa3152b0186ea3efecc8660c56be5d414f89b519	ACCEPT	ROOTEDGE	BEST_EFFORT	1	7,1
+independent-status	exact	0	best_effort	1
+independent-verdict	ACCEPT_BEST_EFFORT_CHAIN	2	1	436	INVERSE_PASS
