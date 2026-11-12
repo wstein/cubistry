@@ -1,5 +1,6 @@
 import { MODE_CATALOG } from "./mode-catalog.ts";
 import type { ModeMeta } from "./registry.ts";
+import { SPEED_CHOICES } from "./status/params.ts";
 
 /** A parsed setup value: what the mode receives instead of a raw string. */
 export type ParamValue = string | number | boolean;
@@ -50,7 +51,8 @@ const oneOfNumbers = (values: readonly number[]) => (raw: string) => {
   const n = /^\d+$/.test(raw) ? Number(raw) : NaN;
   return values.includes(n) ? n : undefined;
 };
-const state = oneOf(["open", "running", "ok", "error", "blocked"]);
+// Exact ids, as src/apps/status/params.ts reads them (no lowercasing).
+const state = (raw: string) => (["open", "running", "ok", "error", "blocked"].includes(raw) ? raw : undefined);
 const word = (raw: string) => (/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(raw) ? raw : undefined);
 const isoDate = (raw: string) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
@@ -74,7 +76,8 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
     default: "up",
   },
   range: { parse: oneOfNumbers([59, 23, 11]), default: 59 },
-  speed: { parse: num(0.001, 100_000) },
+  // Canonical decimal spelling only, as src/apps/status/params.ts reads it.
+  speed: { parse: (raw) => SPEED_CHOICES.find((choice) => String(choice) === raw) },
   "timer-speed": { aliases: ["rate"], parse: oneOfNumbers([1, 10, 20, 50, 100]) },
   lettering: { parse: word },
   display: { aliases: ["font"], parse: oneOf(["dseg7", "dseg14", "noto-sans", "quicksand", "outfit", "classic"]) },
