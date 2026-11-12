@@ -23,6 +23,13 @@ name: Window chain
 # Stages: max_edges bounds the edges of one run (a stage of the first chain: 41 edges); start and end only bound the months of months.tsv.
 # A stage after the first continues the verified artifact of the previous run (prior_run_id); expect_prior_edges (required with prior_run_id) names the edge count that
 # artifact must have (stage 2: 41), so a wrong run id fails in produce before an edge is computed.
+# Continuing on a longer month list or another best-effort file: prior_months_sha256 and prior_best_effort_sha256 (optional, need prior_run_id)
+# name the month list and best-effort file the prior chain was produced with; they replace months_sha256 and the hash of best_effort_path in the
+# comparison with the prior VERIFIED.txt (empty means the value of this run, as before). A set prior_months_sha256 that differs from
+# months_sha256 also lifts the complete=false requirement (the prior chain is complete for its shorter list). All other VERIFIED.txt fields
+# (print, root month, layout, 29 rule) must still match, and expect_prior_edges still applies. The pins only select which prior artifact is
+# accepted; the producer still replays the chain and requires the prior months to be the first months of the new list, and the verify job
+# re-checks the whole chain against months_sha256 and the best-effort file of this run. scripts/ci/window-chain-prior.test.sh probes the checks.
 # best_effort_29 (default true) turns the 29 rule of the best-effort edge on in all three checkers (CAL7_BEST_EFFORT_29=1; the Flix checker gets
 # the last argument 29 from run_checks.sh); prepare refuses a research_ref whose checkers do not read it. When state_report.sh exists at
 # research_ref the verify job adds its report as a second artifact (wc-state-report-<run id>), which is never a prior.
@@ -105,6 +112,14 @@ on:
         description: Number of edges the prior chain must have; required with prior_run_id (not with smoke_mode); a different count stops the run before any edge is computed
         type: string
         default: ""
+      prior_months_sha256:
+        description: Optional SHA-256 of the month list of the prior chain, when it differs from months_sha256 (the new list continues it); empty means months_sha256. The producer requires the prior chain months to be the first months of the new list
+        type: string
+        default: ""
+      prior_best_effort_sha256:
+        description: Optional SHA-256 of the best-effort file of the prior chain, when it differs from the file of this run; empty means the file of this run
+        type: string
+        default: ""
       best_effort_29:
         description: The 29 rule of the best-effort edge (one wrong cell, the digit 29 in red) in all three checkers; the research commit must contain it
         type: boolean
@@ -173,6 +188,8 @@ jobs:
           IN_SMOKE: ${{ inputs.smoke_mode }}
           IN_MAX: ${{ inputs.max_edges }}
           IN_EXPECT: ${{ inputs.expect_prior_edges }}
+          IN_PRIOR_MONTHS_SHA: ${{ inputs.prior_months_sha256 }}
+          IN_PRIOR_BEST_SHA: ${{ inputs.prior_best_effort_sha256 }}
         run: |
           set -euo pipefail
           fail() { echo "::error::$1"; exit 1; }
@@ -199,6 +216,9 @@ jobs:
           [ -z "$IN_MAX" ] || { [[ "$IN_MAX" =~ ^[1-9][0-9]{0,4}$ ]] && [ "$IN_MAX" -le 100000 ]; } || fail "max_edges must be 1-100000"
           [ -z "$IN_EXPECT" ] || [[ "$IN_EXPECT" =~ ^[1-9][0-9]{0,4}$ ]] || fail "expect_prior_edges must be a positive number"
           [ -z "$IN_EXPECT" ] || [ -n "$IN_PRIOR" ] || fail "expect_prior_edges needs prior_run_id"
+          [ -z "$IN_PRIOR_MONTHS_SHA" ] || [[ "$IN_PRIOR_MONTHS_SHA" =~ ^[0-9a-f]{64}$ ]] || fail "prior_months_sha256 must be 64 lowercase hex digits"
+          [ -z "$IN_PRIOR_BEST_SHA" ] || [[ "$IN_PRIOR_BEST_SHA" =~ ^[0-9a-f]{64}$ ]] || fail "prior_best_effort_sha256 must be 64 lowercase hex digits"
+          [ -z "$IN_PRIOR_MONTHS_SHA$IN_PRIOR_BEST_SHA" ] || [ -n "$IN_PRIOR" ] || fail "prior_*_sha256 need prior_run_id"
           [ "$IN_SMOKE" = "true" ] || [ -z "$IN_PRIOR" ] || [ -n "$IN_EXPECT" ] || fail "prior_run_id needs expect_prior_edges (the edge count of the prior chain)"
           max=${IN_MAX:-100000}; prior=$IN_PRIOR
           if [ "$IN_SMOKE" = "true" ]; then max=3; prior=""; fi
@@ -276,6 +296,8 @@ jobs:
       PRINT_SHA: ${{ inputs.print_sha256 }}
       MONTHS_PATH: ${{ inputs.months_path }}
       MONTHS_SHA: ${{ inputs.months_sha256 }}
+      PRIOR_MONTHS_SHA: ${{ inputs.prior_months_sha256 }}
+      PRIOR_BEST_SHA: ${{ inputs.prior_best_effort_sha256 }}
       ROOT_MONTH: ${{ inputs.root_month }}
       BEST_PATH: ${{ inputs.best_effort_path }}
       CLAIMS_PATH: ${{ inputs.claims_path }}
@@ -332,13 +354,14 @@ jobs:
             done < <(find "$GITHUB_WORKSPACE/prev" -name VERIFIED.txt)
             [ -n "$best" ] || { echo "::error::no verified chain artifact found to continue"; exit 1; }
             grep -qx "print_sha256=$PRINT_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another print"; exit 1; }
-            grep -qx "months_sha256=$MONTHS_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another month list"; exit 1; }
+            grep -qx "months_sha256=${PRIOR_MONTHS_SHA:-$MONTHS_SHA}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another month list"; exit 1; }
             grep -qx "root_month=${ROOT_MONTH:--}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another root month"; exit 1; }
             grep -qx "layout_sha256=${LAYOUT_SHA:--}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another layout"; exit 1; }
-            grep -qx "complete=false" "$best/VERIFIED.txt" || { echo "::error::the prior chain is complete; there is nothing to continue"; exit 1; }
+            # A prior chain on another (shorter) month list is complete for that list; it is continued, so only an unchanged list needs complete=false.
+            [ "${PRIOR_MONTHS_SHA:-$MONTHS_SHA}" != "$MONTHS_SHA" ] || grep -qx "complete=false" "$best/VERIFIED.txt" || { echo "::error::the prior chain is complete; there is nothing to continue"; exit 1; }
             [ -z "$EXPECT_PRIOR" ] || [ "$most" = "$EXPECT_PRIOR" ] || { echo "::error::the prior chain has $most edges, expect_prior_edges is $EXPECT_PRIOR"; exit 1; }
             grep -qx "best_effort_29=$BEST29" "$best/VERIFIED.txt" || { echo "::error::the prior chain was checked with another best_effort_29 setting"; exit 1; }
-            grep -qx "best_effort_sha256=$BEST_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another best-effort file"; exit 1; }
+            grep -qx "best_effort_sha256=${PRIOR_BEST_SHA:-$BEST_SHA}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another best-effort file"; exit 1; }
             # The producer reads prior/chain.moves.tsv, prior/edges.tsv (the solver record of earlier segments), prior/segments.tsv
             # (the inputs of earlier segments) and prior/states.
             mkdir "$GITHUB_WORKSPACE/prior"
