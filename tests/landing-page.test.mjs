@@ -27,8 +27,8 @@ test("every registered id is reachable through index.html?app=<id>", () => {
 test("the landing sections place the live clock in the hero and every other mode in exactly one section", () => {
   const { hero, apps, cubes } = landingSections(MODE_CATALOG);
   assert.equal(hero.id, "clock");
-  assert.deepEqual(apps.map((m) => m.id), ["ms-timer", "calendar"]);
-  assert.deepEqual(cubes.map((m) => m.id), IDS.filter((id) => !["clock", "ms-timer", "calendar"].includes(id)));
+  assert.deepEqual(apps.map((m) => m.id), ["ms-timer", "calendar", "playground"]);
+  assert.deepEqual(cubes.map((m) => m.id), IDS.filter((id) => !["clock", "ms-timer", "calendar", "playground"].includes(id)));
   assert.deepEqual([hero, ...apps, ...cubes].map((m) => m.id).sort(), [...IDS].sort());
   assert.ok(apps.every((m) => m.group === "apps") && cubes.every((m) => m.group === "cubes"));
 });

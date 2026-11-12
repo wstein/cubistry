@@ -16,7 +16,7 @@ const ALL_IDS = registry.ids();
 // Single-cube family: the pages that load src/main.mjs, by their unified id.
 const SINGLE_CUBE = ["counter", "tenth", "timer", "five-second-timer", "hsm-counter", "ms-counter", "hm-one-cube"];
 // Applications that read parameters but have no registered mode yet (stage 4 ports them).
-const PENDING_MODES = ["playground"];
+const PENDING_MODES = [];
 // Pages that stay pages (print.html: owner decision 10).
 const PAGES = ["print.html"];
 
@@ -76,6 +76,8 @@ const INVENTORY = [
   row(["banner"], "src/apps/calendar7/mount.ts", ["calendar7"], /BANNER_PARAM = "banner"/),
   row(["font"], "src/apps/calendar7/mount.ts", ["calendar7"]),
   row(["size"], "src/playground.mjs", ["playground"]),
+  // The Picture Cube mode of the host (src/apps/playground/mount.ts) reads the same name as the page playground.html.
+  row(["size"], "src/apps/playground/mount.ts", ["playground"]),
   row(["speed"], "src/apps/status/params.ts", ["ci"]),
   row(["build", "test", "analyze", "review"], "src/apps/status/params.ts", ["ci"], /params\.get\(\s*category\.id\s*\)/),
 ];

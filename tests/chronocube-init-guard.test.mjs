@@ -33,8 +33,8 @@ const isStaleCheck = (stmt, file) =>
   ts.isIfStatement(stmt) &&
   /^!isCurrent\(\)$/.test(stmt.expression.getText(file));
 
-test("the studio has ten mode init functions, each taking isCurrent", () => {
-  assert.equal(inits.length, 10); // initHsmSingleMode and initTimerMode each serve several modes; initCiMode and initCalendarMode load their mounts lazily
+test("the studio has eleven mode init functions, each taking isCurrent", () => {
+  assert.equal(inits.length, 11); // initHsmSingleMode and initTimerMode each serve several modes; initCiMode, initCalendarMode and initPlaygroundMode load their mounts lazily
   assert.match(delegate, /function initClockMode\(isCurrent, params, shell\) \{\s*return mountLiveClock\(clockStudio, params, shell, isCurrent\);/);
   for (const fn of inits)
     assert.ok(
