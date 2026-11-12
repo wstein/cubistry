@@ -6,7 +6,7 @@
 module WindowChainLib
 using SHA
 export parse_ym, ym_str, ym_index, month_range, read_month_list, root_month, chain_plan, chain_flags, month_records, write_months,
-    read_claims, read_best_effort, best_effort_cell, best_effort_ink, best_effort_art, art_stickers, best_effort_board, best_effort_hall, best_effort_edge_lines, shows_art, chain_header, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row, read_segments, layout_input, check_segments_layout,
+    read_claims, read_best_effort, best_effort_cell, stop_for_unreached, best_effort_ink, best_effort_art, art_stickers, best_effort_board, best_effort_hall, best_effort_edge_lines, shows_art, chain_header, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row, read_segments, layout_input, check_segments_layout,
     BEST_EFFORT_CORNERS, BEST_EFFORT_TEXT, STATUSES, EDGES_HEADER, MONTHS_HEADER, SEGMENTS_HEADER, DEFAULT_DEADLINE_S, YM_MIN, YM_MAX
 
 const YM_MIN=(1900,1)
@@ -98,12 +98,15 @@ function parse_cell(s)
     c in BEST_EFFORT_CORNERS || error("best-effort cell $s is not a corner cell of $(BEST_EFFORT_CORNERS)")
     c
 end
-"The wrong cell of a best-effort month: the switch `best_effort_cell` (empty: not given) wins over the `wrong_cells` field of the best-effort file. Both must name one corner cell."
+"The wrong cell of a best-effort month. The `wrong_cells` field of the best-effort file must name one corner cell. Without the switch `best_effort_cell` the cell is (7,1);
+a file that names (7,7) is an error without the switch (owner rule: (7,7) only by an explicit switch, never silently). With the switch the switch wins."
 function best_effort_cell(file_cells,switch="")
-    c=parse_cell(isempty(switch) ? file_cells : switch)
-    isempty(switch) || parse_cell(file_cells)   # the file must name a corner cell too (not a list)
-    c
+    f=parse_cell(file_cells)
+    isempty(switch) && f==(7,7) && error("the best-effort file names (7,7) without best_effort_cell=7,7: (7,7) is only used by the explicit switch")
+    isempty(switch) ? f : parse_cell(switch)
 end
+"Stop reason when no solver reaches the target of an edge: a best-effort target is `best_effort_unreachable`, an exact one `search_stalled`."
+stop_for_unreached(wrong)=isnothing(wrong) ? "search_stalled" : "best_effort_unreachable"
 "Ink of a day digit in column c as the boards print it (red columns 1 and 7: `red_column` of pure-split-states/stacked_common.jl)."
 best_effort_ink(c)=c in (1,7) ? "red" : "dark"
 "The artwork the wrong cell shows: text `29` in the ink of the column. Two print stickers of one corner body may carry it; the solver may use any of them (art_stickers)."

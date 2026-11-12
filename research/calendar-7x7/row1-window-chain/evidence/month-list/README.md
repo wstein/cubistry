@@ -172,8 +172,7 @@ ones of print C-1980, `../print-c/README.md`): 88 of the 91 configurations occur
 204 of 205 months have a matching configuration (exact); the only month without one is 2026-02 (February, Sunday, 28 days), the best-effort month. It is the only February/Sunday/28 in the range (the previous one is 2015-02, the next 2037-02).
 
 Best-effort data: the maximum matching of February/Sunday/28 on print C has 48 of 49 cells; the wrong cell is (7,1) (the corner must show the digit 29) with (7,7) as fallback and a note
-(`../config-coverage/best-effort-feb-sunday-28.tsv`, print `C`). The file has the format `month status wrong_cells evidence` of `read_best_effort` (`window_chain_lib.jl`); the producer does not write a best-effort edge and
-stops before the month (`best_effort_month`); a producer rule for it is a separate change. No claims file: `claims_path` rows are for months that are not chain members, and a claim on a chain member is an error (`read_claims`/`month_records`).
+(`../config-coverage/best-effort-feb-sunday-28.tsv`, print `C`). The file has the format `month status wrong_cells evidence` of `read_best_effort` (`window_chain_lib.jl`); the producer writes a best-effort edge for it (digit 29 in (7,1), rule in `../../README.md`; a file entry (7,7) needs the switch `best_effort_cell=7,7`). No claims file: `claims_path` rows are for months that are not chain members, and a claim on a chain member is an error (`read_claims`/`month_records`).
 No fixed full state is stored for any configuration.
 
 Not run: Flix on any of this; the long chain; `stage_coverage.jl` (needs Julia and Flix stage receipts); the workflow; a receipt of the 205 months against print C (the print receipt covers the 90 configurations of print C-1980).

@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # UNTRUSTED producer helpers of the best-effort edge (window_chain.jl). Needs ../row1-window-print/common.jl (all_homes, bodykey,
-# window_piece_options, coupled_optic, FRONT_NORMAL, IMAGE_UPS) and the rules of window_chain_lib.jl. The checkers recompute all of
-# this with their own code; these functions only keep the producer from writing an edge they would reject.
+# window_piece_options, coupled_optic, FRONT_NORMAL, IMAGE_UPS) and the rules of window_chain_lib.jl. The checkers verify the wrong cells
+# (strict optics) and the Hall witness with their own code, but NOT that the wrong cell shows the digit 29: check.jl and verify_chain.jl accept any wrong
+# cell with a valid Hall witness. The 29 rule is enforced by the producer only (re-check in window_chain.jl, tests).
 
 "The front sticker (text, ink, up, ...) of cell (r,c) of a decoded state."
 function front_sticker(state,cell)

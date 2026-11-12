@@ -220,8 +220,8 @@ only with Julia and Flix receipts of the chain); all other months are unchanged.
 Best-effort edge (owner decision 2026-11-12; code `window_chain_lib.jl` and `best_effort_edge.jl`, test `test_window_chain_best_effort.jl`):
 
 - Target. The true board of the month with exactly one wrong cell, and the wrong cell shows the digit 29, so the month looks like a 29-day month
-  (February/Sunday/28: the 29th would stand in row 7 of the Sunday column). The cell is the `wrong_cells` field of the best-effort file (one cell, (7,1) or (7,7));
-  `best_effort_cell=7,7` is the only way to the fallback (7,7), there is no automatic fallback. Other cells and lists are errors.
+  (February/Sunday/28: the 29th would stand in row 7 of the Sunday column). The cell is (7,1), the `wrong_cells` field of the best-effort file (one corner cell);
+  `best_effort_cell=7,7` is the only way to the fallback (7,7); a file entry `7,7` without the switch is an error (the committed `evidence/month-list/best-effort-chain.tsv` lists 2037-02 and 2043-02 with 7,7 and must be used with the switch). No automatic fallback. Other cells and lists are errors.
 - What counts as 29. A print sticker with text `29` and ink `red` (the ink of the digits in columns 1 and 7, `red_column`); a dark 29, another number and an
   equal optic image of another text do not. Every sticker that carries it counts (print C: stickers 2 and 3, both on corner piece 1; on print B stickers 14 and 219):
   the target names the artwork (`29`, red), the solver chooses sticker and body. After the edge the producer re-checks the end state with its own code:
