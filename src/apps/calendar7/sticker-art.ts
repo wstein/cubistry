@@ -543,7 +543,7 @@ export function drawFace(
 
 /** A display mismatch overlay; it makes no reachability or UNSAT claim. */
 /** Translucent strokes: the printed numeral stays readable through the hatch; the red strike-through is thin. */
-export const WRONG_CELL = { hatch: "rgba(91, 91, 91, 0.8)", halo: "rgba(255, 255, 255, 0.75)", strike: "rgba(208, 2, 27, 0.85)" } as const;
+export const WRONG_CELL = { hatch: "rgba(91, 91, 91, 0.9)", halo: "rgba(255, 255, 255, 0.85)", strike: "rgba(208, 2, 27, 0.85)" } as const;
 /** Minimal 2D context the drawing needs (a recording fake in the tests). */
 export interface WrongCellContext {
   strokeStyle: string | CanvasGradient | CanvasPattern;
