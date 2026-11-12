@@ -29,7 +29,10 @@ name: Window chain
 # months_sha256 also lifts the complete=false requirement (the prior chain is complete for its shorter list). All other VERIFIED.txt fields
 # (print, root month, layout, 29 rule) must still match, and expect_prior_edges still applies. The pins only select which prior artifact is
 # accepted; the producer still replays the chain and requires the prior months to be the first months of the new list, and the verify job
-# re-checks the whole chain against months_sha256 and the best-effort file of this run. scripts/ci/window-chain-prior.test.sh probes the checks.
+# checks the whole chain against the month list of this run. Limit: the verify job does not read the best-effort file (only its hash goes into
+# VERIFIED.txt); the producer takes earlier best-effort edges from the prior unchecked, and the checkers verify the 29 rule only from the rows of
+# chain.v2. With prior_best_effort_sha256 nothing checks the old edges against the new file (UNKNOWN), although the new VERIFIED.txt names the new
+# hash for the whole chain. scripts/ci/window-chain-prior.test.sh probes the input checks.
 # best_effort_29 (default true) turns the 29 rule of the best-effort edge on in all three checkers (CAL7_BEST_EFFORT_29=1; the Flix checker gets
 # the last argument 29 from run_checks.sh); prepare refuses a research_ref whose checkers do not read it. When state_report.sh exists at
 # research_ref the verify job adds its report as a second artifact (wc-state-report-<run id>), which is never a prior.
