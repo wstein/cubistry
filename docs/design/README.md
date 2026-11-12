@@ -25,7 +25,7 @@ Every region has a `data-region` attribute: `header`, `app-switcher`, `stage`, `
 | 1/10-Second Counter | Run / Stop | Value, Set | Stop after, Wrap | Move time | — |
 | H/M/S, M/S, H/M Counters | Run / Stop | Value, Set | Unit, Stop after, Wrap | Move time | Leading zero |
 | Calendar | Today | Show date | Sticker language DE / EN | Move time | Display font |
-| Playground (2×2 or 3×3) | Scramble / Solve | 12 quarter-turn buttons | Cube 2×2 / 3×3, Undo, Redo | Move time | — |
+| Picture Cube (2×2 to 7×7) | Scramble / Solve | 18 turn buttons | Cube size 2-7, Undo, Redo | Move time | Design, Your pictures |
 | CI Quality Cube | Refresh status | Workflow list | — | — | — |
 
 ## Design tokens
