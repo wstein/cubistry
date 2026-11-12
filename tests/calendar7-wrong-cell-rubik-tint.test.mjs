@@ -3,7 +3,7 @@
 // then hatches it with the scheme-independent halo and hatch colors; nothing repaints the ground afterwards.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Calendar7Viewer } from "../src/apps/calendar7/viewer.ts";
+import { Calendar7Viewer, textureKey } from "../src/apps/calendar7/viewer.ts";
 import { SCHEMES, withBannerStyle, namesGround } from "../src/apps/calendar7/schemes.ts";
 import { FACES } from "../scripts/calendar7-rubik-tint.mjs";
 import { RUBIK_TINTS } from "../src/apps/calendar7/home-tint.ts";
@@ -33,4 +33,13 @@ test("viewer.draw: a marked cell has the tint of its home face as ground, the ha
     assert.ok(!hatch.some((e) => e[1] === "fillRect" || e[1] === "fillText" || (e[0] === "set" && e[1] === "fillStyle")), `${face}: the hatch paints no ground and no text`);
     assert.deepEqual(hatch.filter((e) => e[0] === "set" && e[1] === "strokeStyle").map((e) => e[2]), [WRONG_CELL.halo, WRONG_CELL.hatch], `${face}: halo and hatch keep their own colors`);
   }
+});
+
+test("textureKey: a marked cell does not share its texture with an unmarked one or with another home face", () => {
+  const tile = { w: 1.8, h: 1.8, band: { l: 0, r: 0.8, t: 0, b: 0.8 } };
+  const keys = new Set();
+  for (const wrong of [false, true]) for (const home of FACES) keys.add(textureKey(wrong, "dark", "14", tile, home));
+  assert.equal(keys.size, 2 * FACES.length, "marked and unmarked, each per home face: one texture each");
+  assert.notEqual(textureKey(true, "dark", "14", tile, "red"), textureKey(true, "dark", "14", tile, "blue"));
+  assert.equal(textureKey(true, "dark", "14", undefined, undefined), "wrong|dark|14", "without home tints the key has no home part");
 });
