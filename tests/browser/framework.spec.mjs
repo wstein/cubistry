@@ -12,6 +12,8 @@ async function ready(page) {
   await booted(page);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
 }
+// Budget for the held Counter replacement (2 s idle, up to 12 s pinned to one busy core, issue #432); below the test budget.
+const PHASE_BUDGET_MS = 60000;
 for (const [field, value] of [
   ["schema", "bad"],
   ["version", 999],
@@ -141,22 +143,17 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
   const evil =
       '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><script>alert(1)</script></svg>',
     sha = createHash("sha256").update(evil).digest("hex");
+  // The route callback only signals and waits. Page work runs in the test body, so a slow page cannot
+  // leave a page.evaluate pending inside the callback when the test times out (issue #432).
+  let holdEntered, release;
+  const entered = new Promise((resolve) => (holdEntered = resolve)),
+    released = new Promise((resolve) => (release = resolve));
   await page.route("**/assets/test/evil.svg", async (r) => {
-    // Hold rejection until a real Counter asset replacement has closed assets.
-    await page.evaluate(() =>
-      document.getElementById("tenth-display").dispatchEvent(new Event("change")),
-    );
-    await page.waitForFunction(() => window.__counterBitmapClosed);
-    const ownedBeforeReject = await page.evaluate(
-      () => window.__unsafeOwnedCloseCount,
-    );
-    await page.evaluate(() => {
-      window.__unsafeFontsBeforeReject = document.fonts.size;
-    });
+    holdEntered();
+    await released;
     await r.fulfill({ body: evil, contentType: "image/svg+xml" });
-    expect(ownedBeforeReject).toBe(0);
   });
-  const result = await page.evaluate(
+  const resultPromise = page.evaluate(
     async ({ sha }) => {
       const { loadAssets } = await import("/packages/cube-assets/src/index.ts");
       const wire = await (await fetch("/counter-design.v2.json")).json();
@@ -230,6 +227,31 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
     },
     { sha },
   );
+  resultPromise.catch(() => {}); // a failure below must not leave this rejection unhandled
+  // Hold rejection until a real Counter asset replacement has closed assets.
+  await entered;
+  await page.evaluate(() =>
+    document.getElementById("tenth-display").dispatchEvent(new Event("change")),
+  );
+  await page
+    .waitForFunction(() => window.__counterBitmapClosed, undefined, {
+      polling: 100,
+      timeout: PHASE_BUDGET_MS,
+    })
+    .catch((e) => {
+      throw new Error(
+        `Counter replacement did not close assets within ${PHASE_BUDGET_MS} ms: ${e.message}`,
+      );
+    });
+  const ownedBeforeReject = await page.evaluate(
+    () => window.__unsafeOwnedCloseCount,
+  );
+  await page.evaluate(() => {
+    window.__unsafeFontsBeforeReject = document.fonts.size;
+  });
+  release();
+  const result = await resultPromise;
+  expect(ownedBeforeReject).toBe(0);
   expect(result.error).toContain("Unsafe SVG");
   expect(result.closed).toEqual([1]);
   expect(result.after).toBe(result.before);
