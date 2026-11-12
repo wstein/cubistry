@@ -113,8 +113,9 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
 };
 
 /**
- * Global keys: deliberately retained on an app switch; no mode owns them. `speed` (turn duration of the single-cube
- * family, owner decision 2026-11-12) is parsed for every app and ignored by those that have no turn speed.
+ * Global keys: deliberately retained on an app switch; no mode owns them. `speed` (turn duration for the single-cube
+ * family and the CI Quality Cube, owner decision 2026-11-12) is parsed for every app and ignored by those that have
+ * no turn speed.
  */
 export const GLOBAL_PARAMS: readonly string[] = ["nerd", "kiosk", "speed"];
 
