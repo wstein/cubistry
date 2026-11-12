@@ -133,6 +133,9 @@ test("generic text assets honor declared weight and scaled line height and relea
 test("later unsafe SVG failure is transactional and existing counter remains usable", async ({
   page,
 }) => {
+  // Cause of the occasional 30 s timeout is UNKNOWN (issue #432); runs hang in the
+  // route callback at page.evaluate. The 90 s budget is a safeguard only and does
+  // not explain the slowdown. Assertions are unchanged.
   test.setTimeout(90000);
   await ready(page);
   const evil =
