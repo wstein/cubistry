@@ -153,6 +153,7 @@ for (const mode of ["unsupported", "rejected"])
     await page.locator("#presentation-btn").click();
     await expect(page.locator("body")).toHaveClass(/presentation-mode/);
     await expect(page.locator("#calendar-digital")).toBeVisible();
+    await expect(page.locator("#calendar-date")).not.toBeVisible();
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 900 });
       await frame(page, "calendar");
