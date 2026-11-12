@@ -124,6 +124,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "CI Quality",
     group: "cubes",
     help: "docs/STATUS_CUBE.md",
-    params: ["speed", "build", "test", "analyze", "review"],
+    // `speed` is global (owner decision 2026-11-12); category keys are one-time requests.
+    params: ["build", "test", "analyze", "review"],
   },
 ];

@@ -63,7 +63,7 @@ test("URL parameters speed, build, test, analyze and review set the speed and th
   await expect(page.locator("#status-viewer")).toHaveAttribute("data-current", "ok,error,open,open", { timeout: 30000 });
   await expect(page.locator("#status-viewer")).toHaveAttribute("data-sync", "idle");
   await expect(page.locator("#status-analyze")).toHaveValue("open");
-  // The category parameters are a one-time request and leave the address bar; turn follows the control, with no history entry.
+  // The category parameters are a one-time request and leave the address bar; speed follows the control, with no history entry.
   await expect(page).not.toHaveURL(/[?&](build|test|analyze|review)=/);
   await expect(page).toHaveURL(/[?&]speed=50(&|$)/);
   const entries = await page.evaluate(() => history.length);

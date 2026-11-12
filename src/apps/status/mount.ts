@@ -43,8 +43,9 @@ export interface StatusEnv {
 }
 
 /**
- * Test hooks only (tests/status-mode.test.mjs, tests/browser/status-cube-hosted.spec.mjs); nothing in the product reads
- * them. They are mutable module state like `statusController` in src/status.mjs and are cleared on dispose.
+ * Test hooks only (tests/status-mode.test.mjs, tests/browser/status-cube-hosted.spec.mjs,
+ * tests/browser/status-cube-hosted-shell.spec.mjs); nothing in the product reads them. They are
+ * mutable module state like `statusController` in src/status.mjs and are cleared on dispose.
  */
 export let statusController: StatusController | null = null;
 export let statusDefinition: StatusDefinition | null = null;
