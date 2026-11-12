@@ -27,7 +27,7 @@ import {
   inverseMoves,
 } from "./engine.ts";
 import type { Surface } from "./sticker-art.ts";
-import { type Cell, type Display, frontFailure, INKS, INKS_WITH_BAND, type Ink } from "./display.ts";
+import { type Cell, type Display, frontFailure, frontFailures, INKS, INKS_WITH_BAND, type Ink } from "./display.ts";
 
 export const STATE_SCHEMA = "cubistry.calendar7.state";
 export const GRAPH_SCHEMA = "cubistry.calendar7.graph";
@@ -85,6 +85,11 @@ export interface DisplayTable {
   /** Month (1-12) of `months[0]`; absent means 1 (January). Only window tables (names layout) set it. */
   readonly firstMonth?: number;
 }
+
+/** First year a window table, a node or a root may name (the long chain starts in January 2019); the shipped 888-month table starts in 2026. */
+export const WINDOW_FIRST_YEAR = 2019;
+/** A window table has one display per month (at most 1201 months); the shipped table has 91 displays. */
+const MAX_DISPLAYS = 1201;
 
 type Json = Record<string, unknown>;
 const obj = (v: unknown, what: string): Json => {
@@ -153,7 +158,7 @@ export function parseState(json: unknown): Start {
   const r = obj(j.root, "root");
   const node: Node = {
     hash: hash(r.hash, "root hash"),
-    display: int(r.display, "root display", 1, 91),
+    display: int(r.display, "root display", 1, MAX_DISPLAYS),
     year: int(r.year, "root year", 1, 9999),
     month: int(r.month, "root month", 1, 12),
   };
@@ -187,7 +192,7 @@ export function parseDisplays(json: unknown): DisplayTable {
     if (cells.length !== 49) throw new Error("49 cells per display");
     return {
       id: i + 1,
-      year: int(d.year, "year", 2026, 2099),
+      year: int(d.year, "year", window ? WINDOW_FIRST_YEAR : 2026, 2099),
       month: int(d.month, "month", 1, 12),
       cells,
     };
@@ -200,7 +205,7 @@ export function parseDisplays(json: unknown): DisplayTable {
     return { displays, months, firstYear };
   }
   const firstMonth = int(j.firstMonth, "firstMonth", 1, 12);
-  const firstYear = int(j.firstYear, "firstYear", 2026, 2099);
+  const firstYear = int(j.firstYear, "firstYear", WINDOW_FIRST_YEAR, 2099);
   const months = arr(j.months, "months").map((x) => int(x, "month id", 1, displays.length));
   if (months.length < 1 || months.length > 1201) throw new Error("a window has 1 to 1201 months");
   if (displays.length < 1 || displays.length > months.length) throw new Error("a window has 1 display per month at most");
@@ -231,6 +236,29 @@ export function namesWindowContains(table: DisplayTable, year: number, month: nu
   return index >= 0 && index < table.months.length;
 }
 
+export const BEST_EFFORT_SCHEMA = "cubistry.calendar7.best-effort";
+/** A chain month the print cannot show exactly: the front differs from its display in the cells `wrong` ([row, column], 1-based, row-major). */
+export interface BestEffortMonth {
+  readonly year: number;
+  readonly month: number;
+  readonly wrong: readonly (readonly [number, number])[];
+}
+/** Parse best-effort.v1.json: the months of a chain whose state shows a wrong cell. */
+export function parseBestEffort(json: unknown): BestEffortMonth[] {
+  const j = obj(json, "best-effort");
+  schema(j, BEST_EFFORT_SCHEMA);
+  return arr(j.months, "months").map((raw, i): BestEffortMonth => {
+    const m = obj(raw, `best-effort month ${i}`);
+    const wrong = arr(m.wrong, "wrong").map((c): [number, number] => {
+      const rc = arr(c, "wrong cell");
+      if (rc.length !== 2) throw new Error("a wrong cell is [row, column]");
+      return [int(rc[0], "row", 1, 7), int(rc[1], "column", 1, 7)];
+    });
+    if (wrong.length < 1) throw new Error("a best-effort month names at least one wrong cell");
+    return { year: int(m.year, "year", WINDOW_FIRST_YEAR, 2099), month: int(m.month, "month", 1, 12), wrong };
+  });
+}
+
 /** Parse graph.v1.json. */
 export function parseGraph(json: unknown): Graph {
   const j = obj(json, "graph");
@@ -240,8 +268,8 @@ export function parseGraph(json: unknown): Graph {
     const n = obj(raw, `node ${i}`);
     return {
       hash: hash(n.hash, "node hash"),
-      display: int(n.display, "display", 1, 91),
-      year: int(n.year, "year", 2026, 2099),
+      display: int(n.display, "display", 1, MAX_DISPLAYS),
+      year: int(n.year, "year", WINDOW_FIRST_YEAR, 2099),
       month: int(n.month, "month", 1, 12),
     };
   });
@@ -293,6 +321,7 @@ export function verifyEdge(
   graph: Graph,
   edgeIndex: number,
   from: Pose,
+  wrong?: readonly (readonly [number, number])[],
 ): EdgeResult {
   const edge = graph.edges[edgeIndex] ?? fail(`no edge ${edgeIndex}`);
   const source = graph.nodes[edge.from];
@@ -307,9 +336,17 @@ export function verifyEdge(
   const display = table.displays[target.display - 1];
   if (displayIdOf(table, target.year, target.month) !== target.display)
     fail(`edge ${edgeIndex}: node ${edge.to} names the wrong display for its month`);
-  const miss = frontFailure(printing, end, display.cells);
-  if (miss)
-    fail(`edge ${edgeIndex}: front differs from display ${display.id} at ${miss.row},${miss.column} (${miss.why})`);
+  if (wrong) {
+    // Best effort: the front differs from the display in exactly the listed cells, no more and no fewer.
+    const want = wrong.map(([r, c]) => `${r},${c}`).join(" ");
+    const got = frontFailures(printing, end, display.cells).map((f) => `${f.row},${f.column}`).join(" ");
+    if (got !== want)
+      fail(`edge ${edgeIndex}: the cells that differ from display ${display.id} are [${got}], the best-effort entry lists [${want}]`);
+  } else {
+    const miss = frontFailure(printing, end, display.cells);
+    if (miss)
+      fail(`edge ${edgeIndex}: front differs from display ${display.id} at ${miss.row},${miss.column} (${miss.why})`);
+  }
   const endHash = stateDigest(printing, end);
   if (endHash !== target.hash)
     fail(`edge ${edgeIndex}: end hash differs from node ${edge.to}`);
@@ -337,6 +374,7 @@ export function verifyChain(
   root: Pose,
   table: DisplayTable,
   graph: Graph,
+  bestEffort: readonly BestEffortMonth[] = [],
 ): ChainResult {
   const { nodes, edges } = graph;
   if (nodes.length !== edges.length + 1 || edges.length < 1) fail("a chain has one edge fewer than nodes");
@@ -348,6 +386,12 @@ export function verifyChain(
     fail("node 0 names the wrong display for its month");
   const miss = frontFailure(printing, root, first.cells);
   if (miss) fail(`root front differs from display ${first.id} at ${miss.row},${miss.column}`);
+  const wrongOf = new Map<number, readonly (readonly [number, number])[]>();
+  for (const b of bestEffort) {
+    const k = nodes.findIndex((n) => n.year === b.year && n.month === b.month);
+    if (k < 1) fail(`best-effort month ${b.year}-${b.month} is not an edge target of the chain`);
+    wrongOf.set(k, b.wrong);
+  }
   let state = root;
   const results: (EdgeResult & { index: number; year: number; month: number })[] = [];
   const all: Move[] = [];
@@ -356,7 +400,7 @@ export function verifyChain(
     const [y, m] = nextMonth(nodes[i].year, nodes[i].month);
     if (nodes[i + 1].year !== y || nodes[i + 1].month !== m)
       fail(`edge ${i}: chronological adjacency required`);
-    const r = verifyEdge(printing, table, graph, i, state);
+    const r = verifyEdge(printing, table, graph, i, state, wrongOf.get(i + 1));
     results.push({ ...r, index: i + 1, year: nodes[i + 1].year, month: nodes[i + 1].month });
     state = r.state;
     for (const move of edge.moves) all.push(move);

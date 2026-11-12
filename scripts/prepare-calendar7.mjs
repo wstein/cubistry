@@ -128,7 +128,7 @@ export function parseDisplaysTsv(text) {
 /** The research chain file (cubistry.calendar7.chain.v1). */
 export function parseChain(text) {
   const rows = lines(text, "chain");
-  if (rows[0] !== "cubistry.calendar7.chain.v1") throw Error("chain header");
+  if (rows[0] !== "cubistry.calendar7.chain.v1" && rows[0] !== "cubistry.calendar7.chain.v2") throw Error("chain header");
   const f0 = rows[1].split("\t");
   if (f0.length !== 5 || f0[0] !== "source") throw Error("chain source line");
   const source = { root: int(f0[1], "root"), year: int(f0[2], "year"), month: int(f0[3], "month"), hash: f0[4] };
@@ -139,13 +139,23 @@ export function parseChain(text) {
     if (f.length !== 9 || f[0] !== "edge") throw Error(`chain edge line ${cursor}`);
     const [year, month, htm, qtm, rot, rotq] = f.slice(1, 7).map((x) => int(x, "edge"));
     const moves = [];
+    // Header v2 (best-effort edge): optional `wrong<TAB>row<TAB>column` lines (the cells that differ) and one `hall<TAB>cells` line
+    // (the cells of the Hall violation), before the moves. A v1 chain has neither.
+    const wrong = [];
+    let hall = null;
+    while (rows[0] === "cubistry.calendar7.chain.v2" && (rows[cursor].startsWith("wrong\t") || rows[cursor].startsWith("hall\t"))) {
+      const w = rows[cursor++].split("\t");
+      if (w[0] === "wrong" && w.length === 3) wrong.push([int(w[1], "row"), int(w[2], "column")]);
+      else if (w[0] === "hall" && w.length === 2 && hall === null) hall = w[1];
+      else throw Error(`chain best-effort line ${cursor}`);
+    }
     while (rows[cursor] !== "end") {
       const m = rows[cursor++].split("\t");
       if (m.length !== 3 || m[0] !== "move") throw Error(`chain move line ${cursor}`);
       moves.push([int(m[1], "g"), int(m[2], "q")]);
     }
     cursor++;
-    edges.push({ year, month, htm, qtm, rot, rotq, sourceHash: f[7], endHash: f[8], moves });
+    edges.push({ year, month, htm, qtm, rot, rotq, sourceHash: f[7], endHash: f[8], moves, ...(wrong.length ? { wrong, hall } : {}) });
   }
   if (cursor !== rows.length - 1) throw Error("chain trailing lines");
   return { source, edges };
