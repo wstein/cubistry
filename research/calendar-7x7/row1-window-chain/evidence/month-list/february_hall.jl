@@ -2,14 +2,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # february_hall.jl LAYOUT PRINT YYYY-MM ... : per month the smallest number of wrong front cells over all states of the print
 # (cells minus the maximum whole-body matching per body class) with the Hall witness: for each deficient class the alternating-path
-# set X (cells) with its neighbor bodies N(X), |X|-|N(X)| = deficiency. Output is chain format (wrong / hall lines) plus a summary
+# set X (cells) with its neighbor bodies N(X), |X|-|N(X)| = deficiency. A month may be given as YYYY-MM@R,C: for a class of deficiency 1 the wrong
+# cell is then R,C (it must be inside X) instead of the cell the matching leaves open; chain_hall_check verifies the table row either way. Output is chain format (wrong / hall lines) plus a summary
 # row; the witness is checked by chain_hall_check of check.jl (Julia only; no Flix check of these rows, so the numbers are UNKNOWN
 # as proofs until the Flix and independent checkers have read them from a chain).
 include(joinpath(@__DIR__,"..","..","check.jl"))
 layout,printp=ARGS[1:2];labels=coupled_labels(read(layout,String));source=window_read_print(printp)
 homes=all_homes();byhome=Dict(h=>filter(s->s.home==h,source) for h in homes)
 println("month\tclass\tdeficiency\twrong_cells\thall_cells\tneighbor_bodies")
-for t in ARGS[3:end]
+for t0 in ARGS[3:end]
+    t,pref=occursin('@',t0) ? String.(split(t0,'@')) : (t0,"");prefc=isempty(pref) ? nothing : Tuple(parse.(Int,split(pref,',')))
     y,m=parse.(Int,split(t,'-'));g=coupled_month_goal(labels,y,m);gb=g.board
     wrong=Tuple{Int,Int}[];halls=Vector{Tuple{Int,Int}}[];rows=String[]
     for key in sort!(unique(bodykey(h) for h in homes))
@@ -35,6 +37,10 @@ for t in ARGS[3:end]
             end
         end
         X=sort([cells[i] for i in xs],by=rc->rc[1]*7+rc[2]);W=sort([cells[i] for i in un],by=rc->rc[1]*7+rc[2])
+        if !isnothing(prefc)
+            (length(W)==1 && prefc in X) || error("preferred wrong cell $prefc needs a class of deficiency 1 whose Hall set contains it")
+            W=[prefc]
+        end
         append!(wrong,W);push!(halls,X)
         println(t,'\t',join(key,','),'\t',length(un),'\t',join(["$r,$c" for (r,c) in W],';'),'\t',join(["$r,$c" for (r,c) in X],';'),'\t',length(ns))
     end
