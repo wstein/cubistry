@@ -8,6 +8,7 @@ import type { loadAssets } from "@cubistry/cube-assets";
 import { stickerPoses } from "@cubistry/cube-mechanics";
 import type { ModeInstance, MountContext } from "../registry.ts";
 import type { PhysicalView } from "../shared/playback.ts";
+import { createChipGroup, createStopSlider } from "../shell/choice-controls.ts";
 import type { PrimaryActionHandle } from "../shell/slot-api.ts";
 import { StatusController } from "./controller.ts";
 import {
@@ -51,6 +52,14 @@ export let statusController: StatusController | null = null;
 export let statusDefinition: StatusDefinition | null = null;
 
 const DEMO_STEP_MS = 500;
+/** Symbols of the five states, as on the cube's print (hollow circle, circular arrow, check, cross, slashed circle). */
+const STATE_SYMBOLS: Readonly<Record<string, string>> = { open: "○", running: "↻", ok: "✓", error: "✕", blocked: "⊘" };
+/** The quick choices above the chip rows; `states` follow the category order of the definition (build, test, analyze, review). */
+const PRESETS = [
+  { id: "status-preset-open", label: "All open", states: ["open", "open", "open", "open"] },
+  { id: "status-preset-ok", label: "All ok", states: ["ok", "ok", "ok", "ok"] },
+  { id: "status-preset-test-fails", label: "Test fails", states: ["ok", "error", "blocked", "open"] },
+] as const;
 
 export async function mountStatus(
   root: HTMLElement,
@@ -95,6 +104,7 @@ export async function mountStatus(
 
   const controls: HTMLButtonElement[] = [];
   const selects: HTMLSelectElement[] = [];
+  const toggles: { setDisabled(disabled: boolean): void }[] = [];
   const field = (id: string, label: string, options: readonly (readonly [string, string])[], onChange: (value: string) => void) => {
     const wrap = make("div");
     wrap.className = "shell-field";
@@ -165,28 +175,44 @@ export async function mountStatus(
   );
   selects.push(eventCategory.select, eventChoice.select);
 
-  const categorySelects = definition.categories.map((category, i) => {
-    const f = field(
-      `status-${category.id}`,
-      category.label,
-      definition.states.map((s) => [s.id, s.label] as const),
-      (value) => action(() => workflow.select(category.id, value)),
-    );
-    f.select.value = definition.initial[i];
-    selects.push(f.select);
-    return f;
+  // Chip rows instead of selects: one radio group per category (ids status-build, ...), all states visible at once.
+  const chipRows = definition.categories.map((category, i) => {
+    const row = createChipGroup(env.doc, (target, type, handler) => shell.listen(target, type, handler), {
+      id: `status-${category.id}`,
+      label: category.label,
+      options: definition.states.map((s) => ({ value: s.id, label: s.label, symbol: STATE_SYMBOLS[s.id] ?? "•", tone: s.id })),
+      value: definition.initial[i],
+      onChange: (value) => action(() => workflow.select(category.id, value)),
+    });
+    toggles.push(row);
+    return row;
   });
-  const speed = field(
-    "status-speed",
-    "Quarter-turn time",
-    SPEED_CHOICES.map((ms) => [String(ms), `${ms} ms`] as const),
-    (value) => {
-      turnMs = Number(value);
+  // A preset takes the manual path for each category and requests the resulting snapshot once.
+  const presetButtons = PRESETS.map((preset) =>
+    button(preset.id, preset.label, () =>
+      action(() => definition.categories.forEach((category, i) => workflow.select(category.id, preset.states[i]))),
+    ),
+  );
+  controls.push(...presetButtons);
+  const presetRow = make("div");
+  presetRow.className = "shell-btn-row";
+  presetRow.setAttribute("role", "group");
+  presetRow.setAttribute("aria-label", "Quick choices");
+  presetRow.append(...presetButtons);
+  const speed = createStopSlider(env.doc, (target, type, handler) => shell.listen(target, type, handler), {
+    id: "status-speed",
+    label: "Quarter-turn time",
+    stops: SPEED_CHOICES,
+    value: turnMs,
+    ends: ["slow", "fast"],
+    format: (ms) => `${ms} ms`,
+    onChange: (ms) => {
+      turnMs = ms;
       viewer?.setAnimationSpeed(env.baseMoveMs / turnMs, "quarter-turn");
       syncUrl();
     },
-  );
-  speed.select.value = String(turnMs);
+  });
+  toggles.push(speed);
 
   const eventBody = make("div");
   eventBody.className = "shell-stack";
@@ -195,7 +221,7 @@ export async function mountStatus(
   row.append(demoButton, burstButton);
   eventBody.append(eventCategory.wrap, eventChoice.wrap, row, finishButton);
   shell.setSlot(1, { label: "Simulated events", element: eventBody });
-  shell.setSlot(2, { label: "Workflow", element: [...categorySelects.map((f) => f.wrap), speed.wrap] });
+  shell.setSlot(2, { label: "Workflow", element: [presetRow, ...chipRows.map((f) => f.element), speed.element] });
   primary = shell.setPrimaryAction({
     label: "Send event",
     disabled: true,
@@ -231,9 +257,7 @@ export async function mountStatus(
       p = c.progress;
     shell.updateReadout(0, `${p.completed} / ${p.total} HTM`);
     shell.updateReadout(1, String(p.sessionTotal));
-    definition.categories.forEach((category, i) => {
-      categorySelects[i].select.value = workflow.requested[i];
-    });
+    chipRows.forEach((row, i) => row.set(workflow.requested[i]));
     if (fatal) shell.setStatus("error", c.state ? "Playback failed. Reload to recover." : "Initialization failed. Reload to recover.");
     else if (!ready) shell.setStatus("sync", "Loading the fixed workflow print…");
     else if (c.busy) shell.setStatus("moving", "Moving toward the requested snapshot.");
@@ -265,6 +289,7 @@ export async function mountStatus(
     const off = !ready || fatal;
     for (const b of controls) b.disabled = off;
     for (const s of selects) s.disabled = off;
+    for (const t of toggles) t.setDisabled(off);
     finishButton.disabled = off || !c.busy;
     const demoLabel = demoRunning ? "Stop demo" : "Run demo";
     if (demoButton.textContent !== demoLabel) demoButton.textContent = demoLabel;
