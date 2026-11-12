@@ -244,6 +244,24 @@ what this workflow computes. Beam edges are verified for 3 edges here (smoke), t
 | 2026-01 .. 2026-04 | UNKNOWN | no print for a window that starts there is known; the ceiling claims are Julia-only scans |
 | 2037-02 .. 2050-01 | UNSAT for every window that contains the 130 targets May 2026 .. Feb 2037 (containment argument of the window-2037-01 README) | corner-2037-02 receipts, Julia and Flix |
 
+### Print B (owner decision 2026-11-11)
+
+Print B is `printing-S2` ([window-skip](evidence/window-skip/README.md), PR #413) with the April tiles renamed `APR`, `IL` to `AP`, `RIL`
+(label only: one sticker each, same bodies, same cubie assignment; the edge computation is unchanged). Files in
+[evidence/print-b](evidence/print-b/README.md):
+
+| Item | Path | SHA-256 |
+| --- | --- | --- |
+| Print B | `research/calendar-7x7/row1-window-chain/evidence/print-b/printing.tsv` | `5ac2e92e5b1d1d333006409bd29258adb3071a9bf6341b561a42b095b5e4e18c` |
+| Layout (April = `AP`, `RIL`; same file as the 2037-01 layout) | `research/calendar-7x7/row1-window-chain/evidence/print-b/layout.tsv` | `e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a` |
+| `printing-S2` (unchanged, `APR`, `IL`) | `evidence/window-skip/printing-S2.tsv` | `5808fcac697ffc600d87b60f39f459de47d2aac05b4b2bd5be86bae9b0f6edd3` |
+
+All hashes are in `evidence/print-b/sha256.txt`. The checkers read the target text from the layout, so Print B runs with its own layout: `run_checks.sh` and the
+`check.jl` default still pin `row1-revision/layout.tsv` (`APR`, `IL`) and the workflow has no layout input, so no chain run uses Print B yet. Receipts
+(Julia and Flix byte-identical): print matching of the 286 months of `months-S2.tsv` (SAT, legal states UNKNOWN, chain NOT_RUN) and the corner-lemma lists
+S2, S2-chain, 2026-02 and 2043-02. Layout hash and the April target hashes differ from the `printing-S2` receipts. Whether Print B is frozen is the
+owner's decision; this change does not state it. No chain was computed for Print B.
+
 Under the repository rule a month record `unavailable_unsat` needs both checkers; the claims file carries that evidence pointer.
 
 ### How to represent a month without a solution
@@ -292,7 +310,7 @@ Open inputs (not decided here, so no defaults): the SHA-256 of Print C (root Jan
 stages. Each stage is its own run with its own list, root and print: 2026-01 .. 2050-01 (root 1980-01 gives a root edge), then
 1980-01 .. 2026-01 backward to the root, 1950-01 .. 1980-01, 1900-01 .. 1950-01 and 2050-01 .. 2100-01. Not supported by the producer:
 stages that start at a free state (chain.v3 `start` block) or join by digest (`CAL7_JOIN_START`, `CAL7_JOIN_END`), best-effort edges
-(chain.v2: wrong cells and Hall witnesses), and a window-local layout such as the April tiles AP|RIL (`run_checks.sh` reads
+(chain.v2: wrong cells and Hall witnesses), and a window-local layout such as the April tiles AP|RIL of Print B (`run_checks.sh` reads
 `row1-revision/layout.tsv`). The coverage summary (`month_coverage.jl`) is not run by the verify job. The workflow was never run.
 
 ## Scope and limits
