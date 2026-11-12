@@ -21,7 +21,7 @@ name: Window chain
 # does not mention the word CAL7_WINDOW_LAYOUT (fail closed; a comment with the name is enough, the check is a gate, not a proof). Without the inputs nothing is exported and nothing changes.
 # No commits, no gitlinks, no PR comments; the output is an artifact only.
 # Stages: max_edges bounds the edges of one run (a stage of the first chain: 41 edges); start and end only bound the months of months.tsv.
-# A stage after the first continues the verified artifact of the previous run (prior_run_id); expect_prior_edges names the edge count that
+# A stage after the first continues the verified artifact of the previous run (prior_run_id); expect_prior_edges (required with prior_run_id) names the edge count that
 # artifact must have (stage 2: 41), so a wrong run id fails in produce before an edge is computed.
 # best_effort_29 (default true) turns the 29 rule of the best-effort edge on in all three checkers (CAL7_BEST_EFFORT_29=1; the Flix checker gets
 # the last argument 29 from run_checks.sh); prepare refuses a research_ref whose checkers do not read it. When state_report.sh exists at
@@ -102,7 +102,7 @@ on:
         type: string
         default: ""
       expect_prior_edges:
-        description: Optional number of edges the prior chain must have (needs prior_run_id); a different count stops the run before any edge is computed
+        description: Number of edges the prior chain must have; required with prior_run_id (not with smoke_mode); a different count stops the run before any edge is computed
         type: string
         default: ""
       best_effort_29:
@@ -199,6 +199,7 @@ jobs:
           [ -z "$IN_MAX" ] || { [[ "$IN_MAX" =~ ^[1-9][0-9]{0,4}$ ]] && [ "$IN_MAX" -le 100000 ]; } || fail "max_edges must be 1-100000"
           [ -z "$IN_EXPECT" ] || [[ "$IN_EXPECT" =~ ^[1-9][0-9]{0,4}$ ]] || fail "expect_prior_edges must be a positive number"
           [ -z "$IN_EXPECT" ] || [ -n "$IN_PRIOR" ] || fail "expect_prior_edges needs prior_run_id"
+          [ "$IN_SMOKE" = "true" ] || [ -z "$IN_PRIOR" ] || [ -n "$IN_EXPECT" ] || fail "prior_run_id needs expect_prior_edges (the edge count of the prior chain)"
           max=${IN_MAX:-100000}; prior=$IN_PRIOR
           if [ "$IN_SMOKE" = "true" ]; then max=3; prior=""; fi
           expect=$IN_EXPECT; [ -n "$prior" ] || expect=""
@@ -472,21 +473,6 @@ jobs:
           [ "$greedy" = 0 ] || echo "::warning::$greedy of $edges_total edges used the greedy fallback (300-400 HTM per edge)"
           echo "greedy fallback edges: $greedy of $edges_total"
           { echo "CHAIN_END=$chain_end"; echo "EDGES_TOTAL=$edges_total"; echo "COMPLETE=$complete"; echo "GREEDY=$greedy"; } >> "$GITHUB_ENV"
-      - name: State report
-        run: |
-          set -euo pipefail
-          # Extra artifact, not part of the verified chain: repeated start/end states, pairs and configuration transitions of the whole chain.
-          # Tools from research commits without it are skipped; a failing report does not fail the run (the chain is already verified).
-          mkdir -p "$GITHUB_WORKSPACE/report"
-          if [ -f "src/$WC/state_report.sh" ]; then
-            if bash "src/$WC/state_report.sh" "$GITHUB_WORKSPACE/cand/chain.moves.tsv" "$GITHUB_WORKSPACE/cand/states" "$(command -v julia)" > "$GITHUB_WORKSPACE/report/state-report.txt" 2> "$GITHUB_WORKSPACE/report/state-report.err"; then
-              { echo "### State report"; echo '```'; head -n 60 "$GITHUB_WORKSPACE/report/state-report.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-            else
-              echo "::warning::state_report.sh failed (see state-report.err); the chain is verified"
-            fi
-          else
-            echo "::notice::state_report.sh does not exist at research_ref; no state report"
-          fi
       - name: Package artifact
         run: |
           set -euo pipefail
@@ -520,6 +506,23 @@ jobs:
           path: pack/
           retention-days: 90
           if-no-files-found: error
+      - name: State report
+        timeout-minutes: 10
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          # Runs after the verified chain artifact is uploaded, so a hang (10 min limit) or a failure cannot lose a stage. Extra artifact, not part of the verified chain: repeated start/end states, pairs and configuration transitions of the whole chain.
+          # Tools from research commits without it are skipped; a failing report does not fail the run (the chain is already verified).
+          mkdir -p "$GITHUB_WORKSPACE/report"
+          if [ -f "src/$WC/state_report.sh" ]; then
+            if bash "src/$WC/state_report.sh" "$GITHUB_WORKSPACE/cand/chain.moves.tsv" "$GITHUB_WORKSPACE/cand/states" "$(command -v julia)" > "$GITHUB_WORKSPACE/report/state-report.txt" 2> "$GITHUB_WORKSPACE/report/state-report.err"; then
+              { echo "### State report"; echo '```'; head -n 60 "$GITHUB_WORKSPACE/report/state-report.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::warning::state_report.sh failed (see state-report.err); the chain is verified"
+            fi
+          else
+            echo "::notice::state_report.sh does not exist at research_ref; no state report"
+          fi
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: wc-state-report-${{ github.run_id }}

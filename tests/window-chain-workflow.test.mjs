@@ -30,7 +30,7 @@ function parseJobs() {
     if (!step) { if (map && (m = line.match(/^      ([A-Za-z_0-9]+): (.*)$/))) map[m[1]] = m[2]; continue; }
     if ((m = line.match(/^        (env|with):$/))) { map = step[m[1]]; continue; }
     if ((m = line.match(/^        run: \|$/))) { block = { step, indent: 10 }; map = null; continue; }
-    if ((m = line.match(/^        (name|uses|if): (.*)$/))) { step[m[1]] = m[2]; map = null; continue; }
+    if ((m = line.match(/^        (name|uses|if|timeout-minutes|continue-on-error): (.*)$/))) { step[m[1]] = m[2]; map = null; continue; }
     if (map && (m = line.match(/^          ([A-Za-z_0-9-]+): (.*)$/))) map[m[1]] = m[2];
   }
   return jobs;
@@ -255,7 +255,8 @@ test("expect_prior_edges: a continuation checks the edge count of the prior chai
   const l = runLines(step("prepare", "Validate inputs"));
   for (const x of [
     '[ -z "$IN_EXPECT" ] || [[ "$IN_EXPECT" =~ ^[1-9][0-9]{0,4}$ ]] || fail "expect_prior_edges must be a positive number"',
-    '[ -z "$IN_EXPECT" ] || [ -n "$IN_PRIOR" ] || fail "expect_prior_edges needs prior_run_id"']) assert.ok(l.includes(x), x);
+    '[ -z "$IN_EXPECT" ] || [ -n "$IN_PRIOR" ] || fail "expect_prior_edges needs prior_run_id"',
+    '[ "$IN_SMOKE" = "true" ] || [ -z "$IN_PRIOR" ] || [ -n "$IN_EXPECT" ] || fail "prior_run_id needs expect_prior_edges (the edge count of the prior chain)"']) assert.ok(l.includes(x), x);
   requireJobLines("produce", [
     '[ -z "$EXPECT_PRIOR" ] || [ "$most" = "$EXPECT_PRIOR" ] || { echo "::error::the prior chain has $most edges, expect_prior_edges is $EXPECT_PRIOR"; exit 1; }',
     'grep -qx "complete=false" "$best/VERIFIED.txt" || { echo "::error::the prior chain is complete; there is nothing to continue"; exit 1; }']);
@@ -296,9 +297,14 @@ test("the 29 gate in prepare passes only when each checker names CAL7_BEST_EFFOR
 test("state report: extra artifact after the checks, only when state_report.sh exists at research_ref, never part of the chain artifact", () => {
   const names = jobs.verify.steps.map(s => s.name ?? s.uses.split("@")[0]);
   const i = names.indexOf("State report"), v = names.indexOf("Verify chain (Julia, Flix, independent replay)"), p = names.indexOf("Package artifact");
-  assert.ok(v >= 0 && v < i && i < p, "state report runs after the checkers and before packaging");
+  const upc = names.indexOf(jobs.verify.steps.find(x => x.with.name === "wc-chain-${{ github.run_id }}").uses.split("@")[0]);
+  const chainUp = jobs.verify.steps.findIndex(x => x.with.name === "wc-chain-${{ github.run_id }}");
+  assert.ok(v >= 0 && p > v && chainUp > p && i > chainUp, "state report runs after the verified chain artifact is uploaded, so a hang or failure cannot lose the stage");
+  assert.ok(upc >= 0);
   const s = jobs.verify.steps[i], r = runLines(s);
   assert.equal(s.if, undefined);
+  assert.equal(s["timeout-minutes"], "10");
+  assert.equal(s["continue-on-error"], "true");
   assert.ok(r.includes('if [ -f "src/$WC/state_report.sh" ]; then'));
   assert.ok(r.some(x => x.startsWith('if bash "src/$WC/state_report.sh" "$GITHUB_WORKSPACE/cand/chain.moves.tsv" "$GITHUB_WORKSPACE/cand/states" "$(command -v julia)" >')));
   const up = jobs.verify.steps.find(x => x.with.name === "wc-state-report-${{ github.run_id }}");
