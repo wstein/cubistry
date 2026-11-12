@@ -1,4 +1,4 @@
-import{i as e}from"./src-Cud8UHPW.js";import{t}from"./src-SzBsgNum.js";import{t as n}from"./pictures-BUVxO-Rt.js";var r=`<h2 class="pg-region-title">Your pictures</h2>
+import{i as e}from"./src-Cud8UHPW.js";import{t}from"./src-SzBsgNum.js";import{t as n}from"./pictures-DvpVVisG.js";var r=`<h2 class="pg-region-title">Your pictures</h2>
 <details id="pictures" class="pictures">
   <summary>Pictures: fit, upload, template</summary>
   <div class="pictures-body">
