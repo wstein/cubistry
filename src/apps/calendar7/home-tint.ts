@@ -34,18 +34,25 @@ export const HOME_ORIENTATION: Readonly<Record<string, HomeFace>> = Object.freez
 });
 
 /**
- * Tint of each face: the Rubik color mixed into white, with the strengths found by `optimize()` of the script (white 0, yellow 0.25,
- * red 0.22, orange 0.37, blue 0.25, green 0.22). Measured: black #111111 print at least 12.04:1 on every tint, least CIEDE2000
- * distance of any two tints 15.18.
+ * Tint of each face: the Rubik color mixed into white, with the strengths found by `optimize()` of the script (white 0, yellow 0.19,
+ * red 0.13, orange 0.23, blue 0.16, green 0.14). Measured: black #111111 print at least 14.31:1 on every tint and 12.02:1 on every
+ * weekend ground, least CIEDE2000 distance of any two tints 10.19, of a weekend ground to the weekday ground of its face 4.10.
  */
 export const RUBIK_TINTS: Readonly<Record<HomeFace, string>> = Object.freeze({
   white: "#ffffff",
-  yellow: "#fff5bf",
-  red: "#efcbd2",
-  orange: "#ffc1a1",
-  blue: "#bfd1eb",
-  green: "#c7e9d7",
+  yellow: "#fff7cf",
+  red: "#f6e0e5",
+  orange: "#ffd9c4",
+  blue: "#d6e1f2",
+  green: "#dbf1e5",
 });
+
+/** Share of black mixed into a tint to give the weekend ground (equal to WEEKEND_DARKEN of the measuring script, which the test checks). */
+export const HOME_WEEKEND_DARKEN = 0.08;
+
+/** Weekend (red class) ground of a tint: the tint darkened toward black on the neutral scale, per channel rounded like the script. */
+export const weekendGroundOf = (tint: string): string =>
+  "#" + [1, 3, 5].map((i) => { const v = parseInt(tint.slice(i, i + 2), 16); return Math.round(v + (0 - v) * HOME_WEEKEND_DARKEN).toString(16).padStart(2, "0"); }).join("");
 
 /** Home face of a sticker normal. */
 export function homeFaceOfNormal(normal: ArrayLike<number>): HomeFace {
@@ -65,7 +72,7 @@ export const usesHomeTints = (scheme: ColorScheme): boolean => scheme.id === RUB
 const derived = new WeakMap<ColorScheme, Map<HomeFace, ColorScheme>>();
 
 /**
- * The scheme as one stone of this home face sees it: every ground that is not the month band is the tint of the face. Any other
+ * The scheme as one stone of this home face sees it: every ground that is not the month band is the tint of the face, the weekend ground (red class) is that tint darkened. Any other
  * scheme, or an unknown home face, gives the scheme itself.
  */
 export function schemeForHome(scheme: ColorScheme, home: HomeFace | undefined): ColorScheme {
@@ -75,7 +82,7 @@ export function schemeForHome(scheme: ColorScheme, home: HomeFace | undefined): 
   let s = byFace.get(home);
   if (!s) {
     const tint = RUBIK_TINTS[home];
-    byFace.set(home, (s = Object.freeze({ ...scheme, dayFill: tint, emptyFill: tint, weekendFill: tint, weekendTint: null, weekdayRowFill: null })));
+    byFace.set(home, (s = Object.freeze({ ...scheme, dayFill: tint, emptyFill: tint, weekendFill: weekendGroundOf(tint), weekendTint: null, weekdayRowFill: null })));
   }
   return s;
 }

@@ -10,10 +10,20 @@ export const FACES = Object.freeze(Object.keys(RUBIK));
 export const PRINT = "#111111";
 export const BAND = "#111111";
 export const BAND_INK = "#ffffff";
-/** Gates: contrast of the print on every tint, of the band lettering on the band, and the least CIEDE2000 distance of any two tints (white included). */
+/**
+ * Weekend ground = the tint darkened toward black by this share (neutral grey scale). One constant; 0.08 is the largest value for
+ * which the search below still leaves the tints a least pair distance of 10 (see the table in docs/CALENDAR_7X7.md).
+ */
+export const WEEKEND_DARKEN = 0.08;
+/** Gates: contrast of the print on every weekday and weekend ground and of the band lettering, the least CIEDE2000 distance of any two tints (white included) and of a weekend ground to the weekday ground of its face. */
 export const MIN_PRINT_CONTRAST = 12;
 export const MIN_BAND_CONTRAST = 12;
-export const MIN_PAIR_DE2000 = 15;
+export const MIN_WEEKEND_CONTRAST = 12;
+export const MIN_WEEKEND_DE2000 = 4;
+export const MIN_PAIR_DE2000 = 10;
+
+/** The weekend ground of a tint. */
+export const weekendOf = (hex, k = WEEKEND_DARKEN) => mix(hex, "#000000", k);
 
 /** The tint of a color: `t` (0..1) of the color mixed into white, rounded to #rrggbb. */
 export const tintOf = (hex, t) => mix("#ffffff", hex, t);
@@ -59,13 +69,19 @@ export function measure(tints) {
   const toWhite = Object.fromEntries(FACES.filter((f) => f !== "white").map((f) => [f, deltaE2000(tints.white, tints[f])]));
   const pairs = [];
   for (let i = 0; i < FACES.length; i++) for (let j = i + 1; j < FACES.length; j++) pairs.push({ a: FACES[i], b: FACES[j], de: deltaE2000(tints[FACES[i]], tints[FACES[j]]) });
-  return { printContrast, bandContrast: contrast(BAND_INK, BAND), toWhite, pairs, minPrint: Math.min(...Object.values(printContrast)), minPair: Math.min(...pairs.map((p) => p.de)) };
+  const weekendContrast = Object.fromEntries(FACES.map((f) => [f, contrast(PRINT, weekendOf(tints[f]))]));
+  const weekendDE = Object.fromEntries(FACES.map((f) => [f, deltaE2000(tints[f], weekendOf(tints[f]))]));
+  return {
+    printContrast, bandContrast: contrast(BAND_INK, BAND), toWhite, pairs, weekendContrast, weekendDE,
+    minPrint: Math.min(...Object.values(printContrast)), minPair: Math.min(...pairs.map((p) => p.de)),
+    minWeekend: Math.min(...Object.values(weekendContrast)), minWeekendDE: Math.min(...Object.values(weekendDE)),
+  };
 }
 
 /** Deterministic search: coarse grid over the strengths of the five colors (white stays white), then a one-percent coordinate ascent. */
 export function optimize() {
   const colors = FACES.filter((f) => f !== "white");
-  const ok = (f, t) => contrast(PRINT, tintOf(RUBIK[f], t)) >= MIN_PRINT_CONTRAST;
+  const ok = (f, t) => contrast(PRINT, weekendOf(tintOf(RUBIK[f], t))) >= MIN_WEEKEND_CONTRAST; // the weekend ground is the darker one
   const cap = Object.fromEntries(colors.map((f) => { let t = 0; while (t < 1 && ok(f, Math.min(1, t + 0.01))) t = Math.min(1, +(t + 0.01).toFixed(2)); return [f, t]; }));
   const score = (s) => measure(Object.fromEntries(FACES.map((f) => [f, f === "white" ? RUBIK.white : tintOf(RUBIK[f], s[f])]))).minPair;
   const levels = (f) => { const n = 8; return Array.from({ length: n + 1 }, (_, k) => +(cap[f] * k / n).toFixed(2)); };
@@ -89,8 +105,8 @@ export function optimize() {
 
 export function table(tints) {
   const m = measure(tints), f2 = (v) => v.toFixed(2);
-  const lines = ["face    tint     print  dE00 to white", ...FACES.map((f) => `${f.padEnd(7)} ${tints[f]}  ${f2(m.printContrast[f]).padStart(5)}  ${f === "white" ? "-" : f2(m.toWhite[f])}`)];
-  lines.push(`band: ${BAND_INK} on ${BAND} ${f2(m.bandContrast)}:1`, "pair dE00:", ...m.pairs.map((p) => `  ${p.a}-${p.b} ${f2(p.de)}`), `min print contrast ${f2(m.minPrint)}, min pair dE00 ${f2(m.minPair)}`);
+  const lines = ["face    tint     print  dE00 to white  weekend  print  dE00 to tint", ...FACES.map((f) => `${f.padEnd(7)} ${tints[f]}  ${f2(m.printContrast[f]).padStart(5)}  ${(f === "white" ? "-" : f2(m.toWhite[f])).padEnd(12)}  ${weekendOf(tints[f])}  ${f2(m.weekendContrast[f]).padStart(5)}  ${f2(m.weekendDE[f])}`)];
+  lines.push(`band: ${BAND_INK} on ${BAND} ${f2(m.bandContrast)}:1`, "pair dE00:", ...m.pairs.map((p) => `  ${p.a}-${p.b} ${f2(p.de)}`), `min print contrast ${f2(m.minPrint)}, min weekend contrast ${f2(m.minWeekend)}, min weekend dE00 ${f2(m.minWeekendDE)}, min pair dE00 ${f2(m.minPair)}`);
   return lines.join("\n");
 }
 
