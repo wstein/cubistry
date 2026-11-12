@@ -414,11 +414,12 @@ color scheme and unrelated parameters are retained.
 The mode reads only the three `names-demo` files. In-chain dates use its checked
 retained-state words; other dates use the existing rigid-front matching code on
 that exact printing. Actual front mismatches keep their original sticker color
-and printed label. A transparent light/dark hatch strip marks the bottom 10% of
-the logical calendar face, including thick outer-layer tiles. A rotated wrong
-sticker keeps its original orientation while the annotation stays at calendar
-bottom; it does not add a red frame,
-a large diagonal, or an opaque gray field. This is a preview-mismatch marker,
+and printed label. Translucent light/dark hatch lines cover the whole flat face of the
+differing cell (also on thick outer-layer tiles) with a thin red strike-through
+from corner to corner; line width and pitch scale with the tile size (pitch one tenth
+of the tile). The marker is texture on the cubie face and turns with the cubie. The
+printed label stays readable through the gaps; the strokes are translucent and no gray
+field, frame or opaque fill is drawn. This is a preview-mismatch marker,
 not an UNSAT result. Outside the chain, playback is hidden and move reachability is
 unverified. A missing canonical data file reports a load error rather than
 substituting another physical printing.
