@@ -295,6 +295,7 @@ jobs:
             grep -qx "print_sha256=$PRINT_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another print"; exit 1; }
             grep -qx "months_sha256=$MONTHS_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another month list"; exit 1; }
             grep -qx "root_month=${ROOT_MONTH:--}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another root month"; exit 1; }
+            grep -qx "layout_sha256=${LAYOUT_SHA:--}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another layout"; exit 1; }
             # The producer reads prior/chain.moves.tsv, prior/edges.tsv (the solver record of earlier segments), prior/segments.tsv
             # (the inputs of earlier segments) and prior/states.
             mkdir "$GITHUB_WORKSPACE/prior"
@@ -434,6 +435,7 @@ jobs:
           {
             echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "print_sha256=$PRINT_SHA"
             echo "months_sha256=$MONTHS_SHA"; echo "root_month=${ROOT_MONTH:--}"
+            echo "layout_sha256=${LAYOUT_SHA:--}"
             echo "edges_total=$EDGES_TOTAL"; echo "chain_end=$CHAIN_END"; echo "complete=$COMPLETE"
           } > "$pack/VERIFIED.txt"
           sums=$(cd "$pack" && find . -type f | sort | xargs sha256sum)
@@ -441,6 +443,7 @@ jobs:
           {
             echo "### Window chain verified"
             echo "- research SHA: \`$SHA\`, print: \`$PRINT_SHA\`"
+            echo "- layout: \`${LAYOUT_PATH:--}\`, \`${LAYOUT_SHA:--}\`"
             echo "- edges: $EDGES_TOTAL, chain end: $CHAIN_END, complete: $COMPLETE, greedy fallback edges: $GREEDY"
             echo "- $(tail -n 1 "$out/julia.tsv" | tr '\t' ' ') / $(tail -n 1 "$out/independent.tsv" | tr '\t' ' ')"
             echo '```'; cat "$pack/PROGRESS.txt"; echo '```'
