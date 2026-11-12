@@ -120,7 +120,7 @@ The cube stays a local simulation: there is no external CI service and no token.
 | Shell region | Content |
 | --- | --- |
 | Slot 1 "Simulated events" | Event category, simulated agent event, Run demo / Stop demo, Send rapid sequence, Finish active snapshot (accepted deviation from the design label "Refresh status"; owner decision 2026-11-12) |
-| Slot 2 "Workflow" | BUILD, TEST, ANALYZE, REVIEW selects and the quarter-turn time (accepted deviation from the design label "Workflow list"; same decision) |
+| Slot 2 "Workflow" | Quick choices (All open, All ok, Test fails), one chip row per category (BUILD, TEST, ANALYZE, REVIEW; a radio group with the five states as symbol and word chips, in the state colors of the print) and the quarter-turn time as a slider over the seven stops (accepted deviation from the design label "Workflow list"; same decision) |
 | Primary action | Send event; Reload application after a fatal failure |
 | Status chip | Loading, Moving, In sync, a workflow fault (failed attempt, unavailable prerequisite), or the error state after a load or playback failure |
 | Error row | A rejected event or the failure message |
