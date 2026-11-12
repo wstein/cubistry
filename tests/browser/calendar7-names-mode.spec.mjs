@@ -17,7 +17,7 @@ async function pickDate(page, year, month) {
 const ROOT = "#calendar7-root";
 const at = (page, month) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-month", month, { timeout: 30000 });
 const row1 = (page) => page.locator(".c7-sheet tr:first-child td .c7-cell-text").allTextContents();
-const NOTICE = "Display only: no move sequence for this date (beam preview print).";
+const NOTICE = "Display only: no move sequence for this date (print C).";
 
 test("the one view renders full month names without a layout control and keeps its print across date changes", async ({ page }) => {
   const errors = []; page.on("pageerror", (e) => errors.push(String(e)));
@@ -37,7 +37,7 @@ test("the one view renders full month names without a layout control and keeps i
 
 test("an off-chain date uses the same print and the instant picker returns to the stored chain", async ({ page }) => {
   const errors = []; page.on("pageerror", (e) => errors.push(String(e)));
-  await page.goto("/index.html?app=calendar7&year=2030&month=5&layout=names"); await at(page, "2030-05");
+  await page.goto("/index.html?app=calendar7&year=2040&month=5&layout=names"); await at(page, "2040-05");
   const notice = page.getByRole("status").filter({ hasText: NOTICE });
   await expect(notice).toBeVisible(); await expect(notice).toHaveText(NOTICE);
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names");

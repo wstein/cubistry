@@ -136,7 +136,7 @@ for (const viewport of [{width:1280,height:1000},{width:900,height:700},{width:3
 for (const loading of ["viewer","data"]) test(`all playback selections made while the ${loading} loads are retained by the first step`,async({page})=>{
   let release,reached;
   const held=new Promise(r=>{release=r}),requested=new Promise(r=>{reached=r});
-  await page.route(loading==='viewer'?'**/src/apps/calendar7/viewer.ts*':'**/calendar7/names-demo/graph.v1.json*',async route=>{reached();await held;await route.continue()});
+  await page.route(loading==='viewer'?'**/src/apps/calendar7/viewer.ts*':'**/calendar7/chain-c/graph.v1.json*',async route=>{reached();await held;await route.continue()});
   try{
     await page.goto('/index.html?app=calendar7&year=2026&month=11',{waitUntil:'domcontentloaded'});await requested;
     if(loading==='data') {
