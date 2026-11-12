@@ -193,9 +193,9 @@ Implementation PRs stay in `wstein/cubacle`.
 | WI-B1…B2 | `feat/kpuzzle-*` | **hold** | wait on the cubacle plan update for SM1/SM4, SM5 and D14 |
 | WI-M1…M3 | `feat/target-modes-*` | **hold** | wait on the cubacle plan update for SM1/SM4 + D12/D13 |
 
-Local patches for A1–A4 (rebased on tip `bb92669`) live with the cloud agent
-artifacts until cubacle write access exists; do not open against `develop`. Do
-not land a cubacle `kpuzzle` module from parked drafts.
+No local patches for A1–A4 are recorded in any repository; cubacle write access is
+needed before stack A can be opened, and not against `develop` until the base branch
+is decided. Do not land a cubacle `kpuzzle` module from parked drafts.
 
 ## Constraints
 
