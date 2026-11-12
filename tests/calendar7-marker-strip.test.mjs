@@ -65,7 +65,7 @@ test('paired strokes resolve at the measured 56-pixel face scale', () => {
   const widths = [], ctx = new Proxy({}, { get: () => () => {}, set: (target, key, value) => { if (key === 'lineWidth') widths.push(value); return true; } });
   for (const size of [192, 346]) {
     widths.length = 0;drawWrongCell(ctx, size, size);
-    assert.equal(widths.length, 4, 'hatch pair and strike pair');
+    assert.equal(widths.length, 2, 'hatch pair');
     const [halo, dark] = widths;
     assert.ok(dark * 56 / size >= 1, 'the dark hatch must resolve beyond a subpixel stroke');
     assert.ok(halo >= dark + 2, 'the light stroke needs a resolved edge on dark surfaces');

@@ -361,8 +361,8 @@ test("the differing sticker keeps its artwork and receives translucent hatching 
     assert.deepEqual(calls("rect")[0].slice(1), [face.x, face.y, face.w, face.h]);
     assert.ok(face.y < h * .15 && face.y + face.h > h * .85, "the hatch spans the flat face top to bottom, not a strip");
     assert.ok(calls("moveTo").length >= 2 * HATCH_LINES, "a readable hatch over the whole face");
-    assert.deepEqual(log.filter(l => l[0] === "set" && l[1] === "strokeStyle").map(l => l[2]), [WRONG_CELL.halo, WRONG_CELL.hatch, WRONG_CELL.halo, WRONG_CELL.strike]);
-    assert.equal(calls("stroke").length, 4, "paired light and dark strokes work on either theme");
+    assert.deepEqual(log.filter(l => l[0] === "set" && l[1] === "strokeStyle").map(l => l[2]), [WRONG_CELL.halo, WRONG_CELL.hatch]);
+    assert.equal(calls("stroke").length, 2, "paired light and dark strokes work on either theme");
   }
 });
 test("an invalid month keeps its reason without duplicating the persistent picker", () => {

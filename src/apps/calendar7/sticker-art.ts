@@ -542,8 +542,8 @@ export function drawFace(
 }
 
 /** A display mismatch overlay; it makes no reachability or UNSAT claim. */
-/** Translucent strokes: the printed numeral stays readable through the hatch; the red strike-through is thin. */
-export const WRONG_CELL = { hatch: "rgba(91, 91, 91, 0.9)", halo: "rgba(255, 255, 255, 0.85)", strike: "rgba(208, 2, 27, 0.85)" } as const;
+/** Translucent strokes: the printed numeral stays readable through the hatch. */
+export const WRONG_CELL = { hatch: "rgba(91, 91, 91, 0.9)", halo: "rgba(255, 255, 255, 0.85)" } as const;
 /** Minimal 2D context the drawing needs (a recording fake in the tests). */
 export interface WrongCellContext {
   strokeStyle: string | CanvasGradient | CanvasPattern;
@@ -567,7 +567,7 @@ export function wrongCellRect(w: number, h: number, tile?: FaceTile): { x: numbe
 }
 /**
  * Translucent hatching over the whole flat face of the original sticker (the texture turns with the cubie): light halo and dark
- * lines on the same 45 degree pitch, then a red strike-through from corner to corner with its own halo. Line width and pitch
+ * lines on the same 45 degree pitch. Line width and pitch
  * follow the tile size, so the mark looks the same on every tile; nothing is filled and the printed label stays readable.
  */
 export function drawWrongCell(ctx: WrongCellContext, w: number, h: number, tile?: FaceTile): void {
@@ -585,14 +585,6 @@ export function drawWrongCell(ctx: WrongCellContext, w: number, h: number, tile?
       ctx.moveTo(x, r.y + r.h);
       ctx.lineTo(x + r.h, r.y);
     }
-    ctx.stroke();
-  }
-  for (const [color, width] of [[WRONG_CELL.halo, unit / 28], [WRONG_CELL.strike, unit / 56]] as const) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width;
-    ctx.beginPath();
-    ctx.moveTo(r.x, r.y);
-    ctx.lineTo(r.x + r.w, r.y + r.h);
     ctx.stroke();
   }
   ctx.restore();

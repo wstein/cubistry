@@ -415,8 +415,7 @@ The mode reads only the three `names-demo` files. In-chain dates use its checked
 retained-state words; other dates use the existing rigid-front matching code on
 that exact printing. Actual front mismatches keep their original sticker color
 and printed label. Translucent light/dark hatch lines cover the whole flat face of the
-differing cell (also on thick outer-layer tiles) with a thin red strike-through
-from corner to corner; line width and pitch scale with the tile size (pitch one tenth
+differing cell (also on thick outer-layer tiles); line width and pitch scale with the tile size (pitch one tenth
 of the tile). The marker is texture on the cubie face and turns with the cubie. The
 printed label stays readable through the gaps; the strokes are translucent and no gray
 field, frame or opaque fill is drawn. This is a preview-mismatch marker,
