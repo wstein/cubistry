@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// The "Your pictures" region of the Picture Cube mode: the markup of the pictures panel of playground.html (fit check,
+// The "Your pictures" region of the Picture Cube mode: the markup of the pictures panel (fit check,
 // upload, blank net template) and its wiring through `initPictures`, scoped to the region the mount gives it. The markup
 // is a fixed string; nothing from a file or an upload is ever written as markup (see pictures.ts).
 import { initPictures, type PicturesHooks } from "./pictures.ts";

@@ -30,7 +30,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         picture3: fileURLToPath(new URL("./picture3.html", import.meta.url)),
-        playground: fileURLToPath(new URL("./playground.html", import.meta.url)),
         status: fileURLToPath(new URL("./status.html", import.meta.url)),
         print: fileURLToPath(new URL("./print.html", import.meta.url)),
         msTimer: fileURLToPath(new URL("./ms-timer.html", import.meta.url)),
