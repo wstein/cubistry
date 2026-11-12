@@ -89,37 +89,45 @@ Numbers from [cubacle `docs/wasm.md`](https://github.com/wstein/cubacle/blob/134
 - **Not measured.** Firefox and Safari, warm code cache, the other Calendar page
   files. The comparison is a hint for G2, not a parity result.
 
-Open: whether the 2×2 cold start (about 93 ms in Node, 109 ms in Chromium) and the
-21.4 MB of memory are acceptable.
+Open (G1): whether the 2×2 cold start (about 93 ms in Node, 109 ms in Chromium) and the
+21.4 MB of memory are acceptable. Decision **D4** (tables in-module, hashes in tests) does
+**not** close this G1 open point.
 
-## C2 to C5 go (owner, 2026-11-12; narrowed twice the same day)
+## C2 to C5 go (2026-11-12; narrowed twice the same day)
 
-**O** Owner instruction "go also with C2-5" against the cubacle Browser WebAssembly
-plan ([wstein/cubacle#38](https://github.com/wstein/cubacle/pull/38), merged). Later
-the same day the owner sharpened the 2026-11-08 rule: **all components share one cube
-model and one abstraction**. The comparison Draft is
+**P** (pending owner confirmation on [Cubistry #430](https://github.com/wstein/cubistry/pull/430)):
+the cloud-agent session was told "go also with C2-5" against the cubacle Browser
+WebAssembly plan ([wstein/cubacle#38](https://github.com/wstein/cubacle/pull/38), merged
+as `bb92669c`, plan revision [`78539646`](https://github.com/wstein/cubacle/commit/78539646)).
+No matching owner quote is yet in a repository comment or issue; treat the go as
+proposal until the owner confirms it on that PR. Later the same day the owner
+sharpened the 2026-11-08 rule: **all components share one cube model and one
+abstraction**. The comparison Draft is
 [puzlwerk#49](https://github.com/wstein/puzlwerk/pull/49) on `docs/shared-model-comparison`
 (head `608822aa`, `specs/006-shared-model/`). Opus writes the comparison; the owner
 decides the canonical model (**SM1**). Until SM1 (and the linked SM decisions):
 
 - **Do not start** cubacle stacks **B** (own `kpuzzle` algebra) or **M** (target modes).
-- **Do not take** cubacle #38 decisions **D3**, **D12** or **D13** as approved.
-- This plan's earlier blanket “D1–D14 as Recommended” is **withdrawn** for those holds
+- **Do not take** cubacle plan **D3**, **D12** or **D13** as approved.
+- Any earlier blanket “D1–D14 as Recommended” reading is **withdrawn** for those holds
   (and for any D1 reading that starts B/M). Accepting D13 as Recommended would add a
   second public algebra and break the shared-model rule.
 
-Narrowing per puzlwerk#49 §3 / SM6: record **A**, **L2**, **L3** and **D14** as go;
-keep B, M, D3, D12 and D13 waiting. L1 may proceed only with a capability/error-code
-mapping to the PuzlWerk [solver contract](https://github.com/wstein/puzlwerk/blob/main/specs/001-core-foundation/contracts/solver.md)
-(puzlwerk#49 §3 “change”).
+Narrowing per puzlwerk#49 §3 / SM6 (**P** until SM1): record **A**, **L2**, **L3** and
+**D14** as the intended go set; keep B, M, D3, D12 and D13 waiting. L1 may proceed only
+with a capability/error-code mapping to the PuzlWerk
+[solver contract](https://github.com/wstein/puzlwerk/blob/main/specs/001-core-foundation/contracts/solver.md)
+(puzlwerk#49 §3 “change”). Cubacle C2–C4 are approach **step 4** of the cubacle plan
+(section 1); approach **step 5** (move Picture 3×3 and Calendar onto cubacle) stays a
+separate decision (unified-application.md D3/E0) and is not approved here.
 
-### Still in force (stack A, L2, L3, D14; L after A once D4/D11 are explicit)
+### Still in force if the go is confirmed (stack A, L2, L3, D14; L after A once D4/D11 are explicit)
 
 | Decision | Choice taken |
 | --- | --- |
 | D1 (narrow) | Stack **A** may proceed; **B** and **M** wait on SM1 / SM5 |
 | D2 | Commit plus `sha512` for the wasm tarball; tag pin unchanged for native binaries |
-| D4 | Tables built in the module; hashes pinned in tests (needed before L3) |
+| D4 | Tables built in the module; hashes pinned in tests (needed before L3); does not decide G1 |
 | D5 | xtask checks one `rustc` version; no repo-wide `rust-toolchain.toml` |
 | D6 | Rust tarball writer in xtask (`tar` + gzip crates) |
 | D7 | Package name `cubacle-wasm`, unscoped, unpublished |
