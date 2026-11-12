@@ -92,36 +92,44 @@ Numbers from [cubacle `docs/wasm.md`](https://github.com/wstein/cubacle/blob/134
 Open: whether the 2×2 cold start (about 93 ms in Node, 109 ms in Chromium) and the
 21.4 MB of memory are acceptable.
 
-## C2 to C5 go (owner, 2026-11-12)
+## C2 to C5 go (owner, 2026-11-12; narrowed 2026-11-12)
 
 **O** Owner instruction "go also with C2-5" against the cubacle Browser WebAssembly
-plan ([wstein/cubacle#38](https://github.com/wstein/cubacle/pull/38), draft on
-`docs/plan-c1-c5`). This is the approval that section 6 **D1** of that plan asks for:
-stacks **A** and **B** may start now. It is also acceptance of that plan's
-**Recommended** choices for the decisions those stacks need:
+plan ([wstein/cubacle#38](https://github.com/wstein/cubacle/pull/38)). Later the same
+day the owner sharpened the 2026-11-08 rule: **all components share one cube model
+and one abstraction**. A Draft comparison lands in public `wstein/puzlwerk` on
+`docs/shared-model-comparison` (Opus writes the comparison; it does **not** pick
+the canonical model). Until that decision:
+
+- **Do not start** cubacle stacks **B** (own `kpuzzle` algebra) or **M** (target modes).
+- **Do not take** cubacle #38 decisions **D13** or **D14** as approved.
+- This plan's earlier blanket “D1–D14 as Recommended” is **withdrawn for D13 and D14**
+  (and for any D1 reading that starts B/M). Accepting D13 as Recommended would add a
+  second public algebra and break the shared-model rule.
+
+### Still in force for stack A (and L after A, once D4/D11 are explicit)
 
 | Decision | Choice taken |
 | --- | --- |
-| D1 | Approve stacks A and B now; L after D4 and D11; M after D9, D12, D13 and D14 |
+| D1 (narrow) | Stack **A** may proceed; **B** and **M** wait on the shared-model decision |
 | D2 | Commit plus `sha512` for the wasm tarball; tag pin unchanged for native binaries |
-| D3 | Cubing.js numbering for 2×2×2 and 3×3×3 (fixture + license check still required) |
-| D4 | Tables built in the module; hashes pinned in tests |
+| D4 | Tables built in the module; hashes pinned in tests (needed before L3) |
 | D5 | xtask checks one `rustc` version; no repo-wide `rust-toolchain.toml` |
 | D6 | Rust tarball writer in xtask (`tar` + gzip crates) |
 | D7 | Package name `cubacle-wasm`, unscoped, unpublished |
 | D8 | Yes: optional `cli` feature for `clap`, `sysinfo`, `toml` |
-| D9 | Fix-up after ignore-centers; center fix-up words computed in cubacle |
 | D10 | Yes: light-lane wasm CI job after A3 |
 | D11 | Terminate the worker plus `budgetMs`; no shared-memory cancel flag |
-| D12 | Owner names or approves the Calendar fixture list in the M1 pull request |
-| D13 | Algebra public in Rust; JS package exposes definition data, conversion, `solvePattern`, `capabilities` only |
-| D14 | Yes: `src/kpuzzle` and `src/targets` modules and `RULES` as in the cubacle plan |
 
-This advances cubacle plan steps that map to Cubistry approach steps 4 to 5
-(exact-frame / ignore-centers targets, pattern algebra, table loading, reproducible
-wasm package). It does **not** by itself pass G2 or authorize removing Cubing.js
-(G3). Slice M still waits for D12 (fixture list) at M1 start; L waits until stack A
-is merged.
+### On hold until the shared-model decision
+
+| Decision | Was Recommended | Hold reason |
+| --- | --- | --- |
+| D3 | Cubing.js numbering | Piece numbering is part of the shared model |
+| D9 | Fix-up after ignore-centers | Target-mode route; stack M |
+| D12 | Calendar fixture list at M1 | Stack M |
+| D13 | Rust algebra + limited JS surface | Would fork the public model |
+| D14 | `src/kpuzzle` / `src/targets` + `RULES` | New modules before the shared abstraction |
 
 C1 facade measurement work already landed on cubacle (PRs #33 / #34). Stack A
 continues from that tip (`feat/wasm-build-1` …). **All cubacle implementation PRs
@@ -139,13 +147,13 @@ base `main` only after the migration. Implementation PRs stay in
 | WI-A2 | `feat/wasm-build-2` | A1 | optional `cli` + `wasm-deps` |
 | WI-A3 | `feat/wasm-build-3` | A2 | `cargo xtask wasm` + sorted manifest (D5) |
 | WI-A4 | `feat/wasm-build-4` | A3 | deterministic tarball (D2, D6, D7) |
-| WI-B1 | `feat/kpuzzle-1` | `main` | pattern algebra (parallel to A) |
-| WI-B2 | `feat/kpuzzle-2` | B1 | `alg` / Facelets bridge |
-| WI-L1…L3 | `feat/wasm-loader-*` | A merged | after A; need D4, D11 for L |
-| WI-M1…M3 | `feat/target-modes-*` | B+L merged | M1 also needs D12 fixture list |
+| WI-L1…L3 | `feat/wasm-loader-*` | A merged | after A; need D4, D11; no new cube algebra |
+| WI-B1…B2 | `feat/kpuzzle-*` | **hold** | wait on shared-model decision (not D13/D14) |
+| WI-M1…M3 | `feat/target-modes-*` | **hold** | wait on shared-model decision + D12 |
 
-Local patches for A1–A3 (rebased on tip `bb92669`) live with the cloud agent
-artifacts until cubacle write access exists; do not open against `develop`.
+Local patches for A1–A4 (rebased on tip `bb92669`) live with the cloud agent
+artifacts until cubacle write access exists; do not open against `develop`. Do
+not land a cubacle `kpuzzle` module from parked drafts.
 
 ## Constraints
 
