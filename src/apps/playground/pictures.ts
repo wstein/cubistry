@@ -33,6 +33,8 @@ export type UseUploadResult = { readonly ok: true } | { readonly ok: false; read
 
 export interface PicturesHooks {
   readonly baseUrl: string;
+  /** The element that holds the panel; the page passes nothing and the panel is found in the document. */
+  readonly root?: ParentNode;
   /**
    * Called with a finished upload, or null when the user removes it. Resolves when the pictures are
    * loaded as a design (ok) or could not be (error); in the latter case nothing has changed.
@@ -70,7 +72,8 @@ interface Measured {
 }
 
 export function initPictures(hooks: PicturesHooks) {
-  const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const scope: ParentNode = hooks.root ?? document;
+  const el = <T extends HTMLElement = HTMLElement>(id: string) => scope.querySelector(`#${id}`) as T;
   const details = el<HTMLDetailsElement>("pictures"),
     sizeSelect = el<HTMLSelectElement>("picture-size"),
     fit = el("fit"),
