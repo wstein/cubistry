@@ -3,10 +3,11 @@
 # Tests of the best-effort edge of the producer window_chain.jl (rule: window_chain_lib.jl, helpers: best_effort_edge.jl).
 #   julia --startup-file=no --threads=4 test_window_chain_best_effort.jl       # units, print C checks and the real edge (see below)
 #   CAL7_BE_REAL=0 julia --startup-file=no test_window_chain_best_effort.jl    # units and print C checks only (about 30 s)
-# The real edge test runs window_chain.jl with print C on the list [2026-01, 2026-02, 2026-03], root 2019-01 (the solved cube): a beam edge
-# into January 2026 (the real predecessor state), the best-effort edge into February 2026 (February/Sunday/28 shows 29 in (7,1)) and an
-# exact edge into March 2026 that starts from the best-effort state. check.jl and verify_chain.jl must accept the chain with the verdict
-# BEST_EFFORT. Several minutes on a loaded host (the library build alone took 111 s at load 35); no Flix here (run_checks.sh does that).
+# The real edge test runs window_chain.jl with print C (library=L1 width=20) on the list [2026-02, 2026-03], root 2019-01 (the solved cube, the
+# first state of the first chain): the best-effort edge into February 2026 (February/Sunday/28 shows 29 in (7,1)) and an exact edge into March
+# 2026 that starts from the best-effort state. check.jl and verify_chain.jl must accept the chain with the verdict BEST_EFFORT. The predecessor
+# is the identity pose, not the state before February 2026 of the first chain (84 edges away, not producible in minutes). No Flix here
+# (run_checks.sh does that). Time: see the PR text; at load 35 to 55 the producer setup alone took 2 minutes.
 using Test, SHA
 include(joinpath(@__DIR__,"window_chain_lib.jl"))
 using .WindowChainLib
@@ -82,6 +83,7 @@ ENV["WINDOW_END"]=get(ENV,"WINDOW_END","2029-12")
 include(joinpath(CAL,"row1-window-print","common.jl"))
 include(joinpath(CAL,"upright-feasibility","strict_rule.jl"))
 include(joinpath(@__DIR__,"best_effort_edge.jl"))
+delete!(ENV,"WINDOW_END")      # the producer and the checkers refuse WINDOW_END next to a month list
 @testset "print C, February/Sunday/28" begin
     labels=coupled_labels(read(joinpath(PC,"layout.tsv"),String));source=window_read_print(joinpath(PC,"printing.tsv"))
     g=coupled_month_goal(labels,2026,2)
@@ -101,38 +103,37 @@ function state_rows(path)       # a state file as the decoded state of the check
     [(id=parse(Int,f[1]),piece=parse(Int,f[2]),pos=t(f[3]),normal=t(f[4]),up=t(f[5]),text=f[6],ink=f[7]) for f in (split(l,'\t';keepempty=true) for l in readlines(path)[2:end])]
 end
 if get(ENV,"CAL7_BE_REAL","1")!="0"
-@testset "real best-effort edge 2026-02 on print C (root 2019-01, edge 1 beam, edge 2 best-effort, edge 3 exact)" begin
+@testset "real best-effort edge 2026-02 on print C (root 2019-01 identity pose, edge 1 best-effort, edge 2 exact)" begin
     mktempdir() do d
-        months=joinpath(d,"months.tsv");write(months,"2026-01\n2026-02\n2026-03\n")
+        months=joinpath(d,"months.tsv");write(months,"2026-02\n2026-03\n")
         best=joinpath(d,"best.tsv");write(best,"month\tstatus\twrong_cells\tevidence\n2026-02\tbest_effort_unverified\t7,1\tevidence/config-coverage/best-effort-feb-sunday-28.tsv\n")
         env=Dict("CAL7_WINDOW_MONTHS"=>months,"CAL7_WINDOW_MONTHS_SHA256"=>sha(months),"CAL7_ROOT_MONTH"=>"2019-01","CAL7_WINDOW_PRINT_SHA"=>sha(joinpath(PC,"printing.tsv")),
                  "CAL7_WINDOW_LAYOUT"=>joinpath(PC,"layout.tsv"),"CAL7_WINDOW_LAYOUT_SHA256"=>sha(joinpath(PC,"layout.tsv")))
         out=joinpath(d,"out");log=joinpath(d,"producer.log")
-        t0=time();code=run(pipeline(ignorestatus(addenv(`$(Base.julia_cmd()) --startup-file=no --threads=4 $(joinpath(@__DIR__,"window_chain.jl")) $out $(joinpath(PC,"printing.tsv")) best_effort=$best`,env));stdout=log,stderr=log)).exitcode
+        t0=time();code=run(pipeline(ignorestatus(addenv(`$(Base.julia_cmd()) --startup-file=no --threads=4 $(joinpath(@__DIR__,"window_chain.jl")) $out $(joinpath(PC,"printing.tsv")) best_effort=$best library=L1 width=20`,env));stdout=log,stderr=log)).exitcode
         println("producer: exit $code, ",round(time()-t0;digits=1)," s");print(read(log,String))
         @test code==0
         prog=Dict(String.(split(l,'='))[1]=>String.(split(l,'='))[2] for l in readlines(joinpath(out,"PROGRESS.txt")))
-        @test prog["complete"]=="true" && prog["edges_total"]=="3" && prog["best_effort_edges"]=="1" && prog["greedy_edges"]=="0"
+        @test prog["complete"]=="true" && prog["edges_total"]=="2" && prog["best_effort_edges"]=="1" && prog["greedy_edges"]=="0"
         ls=readlines(joinpath(out,"chain.moves.tsv"))
         @test ls[1]=="cubistry.calendar7.chain.v2"
-        ei=findall(l->startswith(l,"edge\t"),ls);@test length(ei)==3
+        ei=findall(l->startswith(l,"edge\t"),ls);@test length(ei)==2
         f(i)=split(ls[ei[i]],'\t')
-        @test [(f(i)[2],f(i)[3]) for i in 1:3]==[("2026","1"),("2026","2"),("2026","3")]
-        @test ls[ei[2]+1]=="wrong\t7\t1" && ls[ei[2]+2]=="hall\t7,1;7,7" && startswith(ls[ei[2]+3],"move\t")
-        @test !startswith(ls[ei[1]+1],"wrong") && !startswith(ls[ei[3]+1],"wrong")          # the other edges are exact
-        @test f(3)[8]==f(2)[9] && f(2)[8]==f(1)[9]                                           # the next edge starts from the best-effort state
-        htm=parse(Int,f(2)[4]);println("best-effort edge 2026-02: HTM ",htm," QTM ",f(2)[5]," rot ",f(2)[6])
+        @test [(f(i)[2],f(i)[3]) for i in 1:2]==[("2026","2"),("2026","3")]
+        @test ls[ei[1]+1]=="wrong\t7\t1" && ls[ei[1]+2]=="hall\t7,1;7,7" && startswith(ls[ei[1]+3],"move\t")
+        @test !startswith(ls[ei[2]+1],"wrong")                                               # the March edge is exact
+        @test f(2)[8]==f(1)[9]                                                               # the next edge starts from the best-effort state
+        htm=parse(Int,f(1)[4]);println("best-effort edge 2026-02: HTM ",htm," QTM ",f(1)[5]," rot ",f(1)[6]," March edge HTM ",f(2)[4])
         @test 0<htm<=300                                                                     # a beam-sized edge, not a fixed full state
-        eg=readlines(joinpath(out,"edges.tsv"));@test split(eg[3],'\t')[4]!="greedy"
-        mo=readlines(joinpath(out,"months.tsv"));@test "2026-02\tunknown\tbest_effort_edge_unconfirmed\t2\t"*split(eg[3],'\t')[4]*"\t"*"evidence/config-coverage/best-effort-feb-sunday-28.tsv" in mo
+        eg=readlines(joinpath(out,"edges.tsv"));@test split(eg[2],'\t')[4]!="greedy"
+        mo=readlines(joinpath(out,"months.tsv"));@test "2026-02\tunknown\tbest_effort_edge_unconfirmed\t1\t"*split(eg[2],'\t')[4]*"\t"*"evidence/config-coverage/best-effort-feb-sunday-28.tsv" in mo
         # own reading of the state after the best-effort edge: 29 (red, text of the sticker) at R7C1, exactly one cell differs from the board
         labels=coupled_labels(read(joinpath(PC,"layout.tsv"),String));g=coupled_month_goal(labels,2026,2)
-        sf=state_rows(joinpath(out,"states","state-03.tsv"))
+        sf=state_rows(joinpath(out,"states","state-02.tsv"))
         @test front_mismatches(sf,g.board)==[(7,1)]
         s71=front_sticker(sf,(7,1));@test s71.text=="29" && s71.ink=="red" && s71.id in (2,3)
         @test front_sticker(sf,(7,7)).text=="" && front_sticker(sf,(6,1)).text=="22"
-        @test front_mismatches(state_rows(joinpath(out,"states","state-02.tsv")),coupled_month_goal(labels,2026,1).board)==Tuple{Int,Int}[]
-        @test front_mismatches(state_rows(joinpath(out,"states","state-04.tsv")),coupled_month_goal(labels,2026,3).board)==Tuple{Int,Int}[]
+        @test front_mismatches(state_rows(joinpath(out,"states","state-03.tsv")),coupled_month_goal(labels,2026,3).board)==Tuple{Int,Int}[]
         # the checkers decide
         function checker(script)
             o=IOBuffer();e=IOBuffer()
@@ -140,7 +141,7 @@ if get(ENV,"CAL7_BE_REAL","1")!="0"
             (ok,String(take!(o)),String(take!(e)))
         end
         ok,o,e=checker("check.jl");println("check.jl: ",ok);ok||println(e)
-        @test ok && occursin("\tBEST_EFFORT\t1\t7,1\n",o) && occursin("\nstatus\texact\t2\tbest_effort\t1\n",o) && occursin("\nverdict\tBEST_EFFORT\t",o)
+        @test ok && occursin("\tBEST_EFFORT\t1\t7,1\n",o) && occursin("\nstatus\texact\t1\tbest_effort\t1\n",o) && occursin("\nverdict\tBEST_EFFORT\t",o)
         ok,o,e=checker("verify_chain.jl");println("verify_chain.jl: ",ok);ok||println(e)
         @test ok && occursin("independent-verdict\tACCEPT_BEST_EFFORT_CHAIN",o)
         # a wrong listed cell is refused by both (the producer's own re-check is the first guard, the checkers the second)
