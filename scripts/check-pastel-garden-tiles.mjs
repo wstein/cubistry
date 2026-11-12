@@ -3,13 +3,13 @@
  * and it must differ from its own 90/180/270 degree rotations (so orientation is readable).
  * Run: node scripts/check-pastel-garden-tiles.mjs [--sizes] [pastel|<theme id>...]   (needs Playwright's Chromium)
  * Without set names it checks Pastel Garden (plus its Up/Down proposals) and every public/playground-<id>/ theme.
- * A theme stores six whole faces; its stickers are the n x n viewBox crops of each face (the run-time slicing).
+ * A theme stores six whole faces (SVG, or lossy WebP); its stickers are the n x n crops of each face (the run-time slicing).
  * Size 2 is checked tile by tile and gates the exit code. With --sizes the sizes 3..7 are also measured with the
  * same thresholds and reported as one summary line per size: stickers that are mostly flat, stickers that are
  * (nearly) rotation symmetric, and stickers that render identically to another sticker of the theme. Those
  * counts are information about the artwork, not failures.
  */
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { measureRgba, SAMPLE, MIN_DETAIL, MIN_ROT_DIFF } from "../src/apps/playground/suitability.ts";
@@ -44,6 +44,20 @@ async function measure(svg) {
   const { detail, minRot, hash } = measureRgba(pixels, SAMPLE);
   return { detail, minRot, hash };
 }
+// A sticker of a raster face: the pixel crop [x, y, w, h] of the whole face, drawn at the sample size.
+async function measureCrop(bytes, crop) {
+  const pixels = await page.evaluate(async ({ b64, crop, n }) => {
+    const img = new Image();
+    img.src = "data:image/webp;base64," + b64;
+    await img.decode();
+    const cv = new OffscreenCanvas(n, n);
+    const cx = cv.getContext("2d", { willReadFrequently: true });
+    cx.drawImage(img, ...crop, 0, 0, n, n);
+    return Array.from(cx.getImageData(0, 0, n, n).data);
+  }, { b64: bytes.toString("base64"), crop, n: SAMPLE });
+  const { detail, minRot, hash } = measureRgba(pixels, SAMPLE);
+  return { detail, minRot, hash };
+}
 function report(label, r) {
   const ok = r.detail >= MIN_DETAIL && r.minRot >= MIN_ROT_DIFF;
   if (!ok) failed++;
@@ -65,6 +79,15 @@ async function measureTheme(theme, n) {
   const dir = new URL(`../public/playground-${theme}/`, import.meta.url);
   const out = [];
   for (const f of faces) {
+    if (existsSync(new URL(`${f}.webp`, dir))) {
+      // Whole square raster face: same rounded edges as tileEdges() in themes.ts, on its pixel size.
+      const bytes = readFileSync(new URL(`${f}.webp`, dir));
+      const size = bytes.readUInt16LE(26) & 16383;
+      const e = Array.from({ length: n + 1 }, (_, k) => Math.round((k * size) / n));
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++)
+        out.push({ id: `${f}_${r}_${c}`, ...(await measureCrop(bytes, [e[c], e[r], e[c + 1] - e[c], e[r + 1] - e[r]])) });
+      continue;
+    }
     const face = readFileSync(new URL(`${f}.svg`, dir), "utf8");
     const edges = Array.from({ length: n + 1 }, (_, k) => Math.round((k * 320) / n));
     for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
