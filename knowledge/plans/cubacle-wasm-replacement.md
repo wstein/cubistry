@@ -92,26 +92,32 @@ Numbers from [cubacle `docs/wasm.md`](https://github.com/wstein/cubacle/blob/134
 Open: whether the 2×2 cold start (about 93 ms in Node, 109 ms in Chromium) and the
 21.4 MB of memory are acceptable.
 
-## C2 to C5 go (owner, 2026-11-12; narrowed 2026-11-12)
+## C2 to C5 go (owner, 2026-11-12; narrowed twice the same day)
 
 **O** Owner instruction "go also with C2-5" against the cubacle Browser WebAssembly
-plan ([wstein/cubacle#38](https://github.com/wstein/cubacle/pull/38)). Later the same
-day the owner sharpened the 2026-11-08 rule: **all components share one cube model
-and one abstraction**. A Draft comparison lands in public `wstein/puzlwerk` on
-`docs/shared-model-comparison` (Opus writes the comparison; it does **not** pick
-the canonical model). Until that decision:
+plan ([wstein/cubacle#38](https://github.com/wstein/cubacle/pull/38), merged). Later
+the same day the owner sharpened the 2026-11-08 rule: **all components share one cube
+model and one abstraction**. The comparison Draft is
+[puzlwerk#49](https://github.com/wstein/puzlwerk/pull/49) on `docs/shared-model-comparison`
+(head `608822aa`, `specs/006-shared-model/`). Opus writes the comparison; the owner
+decides the canonical model (**SM1**). Until SM1 (and the linked SM decisions):
 
 - **Do not start** cubacle stacks **B** (own `kpuzzle` algebra) or **M** (target modes).
-- **Do not take** cubacle #38 decisions **D13** or **D14** as approved.
-- This plan's earlier blanket “D1–D14 as Recommended” is **withdrawn for D13 and D14**
+- **Do not take** cubacle #38 decisions **D3**, **D12** or **D13** as approved.
+- This plan's earlier blanket “D1–D14 as Recommended” is **withdrawn** for those holds
   (and for any D1 reading that starts B/M). Accepting D13 as Recommended would add a
   second public algebra and break the shared-model rule.
 
-### Still in force for stack A (and L after A, once D4/D11 are explicit)
+Narrowing per puzlwerk#49 §3 / SM6: record **A**, **L2**, **L3** and **D14** as go;
+keep B, M, D3, D12 and D13 waiting. L1 may proceed only with a capability/error-code
+mapping to the PuzlWerk [solver contract](https://github.com/wstein/puzlwerk/blob/main/specs/001-core-foundation/contracts/solver.md)
+(puzlwerk#49 §3 “change”).
+
+### Still in force (stack A, L2, L3, D14; L after A once D4/D11 are explicit)
 
 | Decision | Choice taken |
 | --- | --- |
-| D1 (narrow) | Stack **A** may proceed; **B** and **M** wait on the shared-model decision |
+| D1 (narrow) | Stack **A** may proceed; **B** and **M** wait on SM1 / SM5 |
 | D2 | Commit plus `sha512` for the wasm tarball; tag pin unchanged for native binaries |
 | D4 | Tables built in the module; hashes pinned in tests (needed before L3) |
 | D5 | xtask checks one `rustc` version; no repo-wide `rust-toolchain.toml` |
@@ -120,24 +126,25 @@ the canonical model). Until that decision:
 | D8 | Yes: optional `cli` feature for `clap`, `sysinfo`, `toml` |
 | D10 | Yes: light-lane wasm CI job after A3 |
 | D11 | Terminate the worker plus `budgetMs`; no shared-memory cancel flag |
+| D14 | Module placement `src/kpuzzle` / `src/targets` plus `RULES` when B/M start (model-neutral; does not authorize starting B/M) |
+| L2, L3 | JS glue, table hashes, loader/worker/abort — model independent; proceed after A |
 
-### On hold until the shared-model decision
+### On hold until the shared-model decision (SM1 and linked SMs)
 
 | Decision | Was Recommended | Hold reason |
 | --- | --- | --- |
-| D3 | Cubing.js numbering | Piece numbering is part of the shared model |
+| D3 | Cubing.js numbering | Fifth numbering; wait for SM1/SM5 (prefer Orbit64 V2 slots + vectors) |
 | D9 | Fix-up after ignore-centers | Target-mode route; stack M |
-| D12 | Calendar fixture list at M1 | Stack M |
-| D13 | Rust algebra + limited JS surface | Would fork the public model |
-| D14 | `src/kpuzzle` / `src/targets` + `RULES` | New modules before the shared abstraction |
+| D12 | Calendar fixture list at M1 | Express as corpus rows (wire-v1 + Orbit64 V2) after SM1 |
+| D13 | Rust algebra + limited JS surface | Would fork the public model; wait for SM1 / step 4 |
 
-C1 facade measurement work already landed on cubacle (PRs #33 / #34). Stack A
-continues from that tip (`feat/wasm-build-1` …). **All cubacle implementation PRs
-land on `main`**, not `develop`; `develop` is retired (owner, 2026-11-12). Until
-remote `main` is fast-forwarded to the former `develop` tip (plan merge
-`bb92669` and C1), stack branches are prepared against that tip and opened with
-base `main` only after the migration. Implementation PRs stay in
-`wstein/cubacle`.
+C1 facade measurement work already landed on cubacle (PRs #33 / #34; plan #38
+merged). Stack A continues from that tip (`feat/wasm-build-1` …). **All cubacle
+implementation PRs land on `main`**, not `develop` (owner, 2026-11-12). **V** GitHub
+still lists `develop` as cubacle's default branch (tip `bb92669`); remote `main`
+(`5f41eb06`) has not absorbed that tip yet. Stack branches are prepared against the
+former `develop` tip and opened with base `main` only after that fast-forward.
+Implementation PRs stay in `wstein/cubacle`.
 
 ### Focused work items (one PR each, stacked)
 
@@ -147,9 +154,10 @@ base `main` only after the migration. Implementation PRs stay in
 | WI-A2 | `feat/wasm-build-2` | A1 | optional `cli` + `wasm-deps` |
 | WI-A3 | `feat/wasm-build-3` | A2 | `cargo xtask wasm` + sorted manifest (D5) |
 | WI-A4 | `feat/wasm-build-4` | A3 | deterministic tarball (D2, D6, D7) |
-| WI-L1…L3 | `feat/wasm-loader-*` | A merged | after A; need D4, D11; no new cube algebra |
-| WI-B1…B2 | `feat/kpuzzle-*` | **hold** | wait on shared-model decision (not D13/D14) |
-| WI-M1…M3 | `feat/target-modes-*` | **hold** | wait on shared-model decision + D12 |
+| WI-L2…L3 | `feat/wasm-loader-*` | A merged | proceed; model independent |
+| WI-L1 | `feat/wasm-loader-1` | A merged | **change**: map capabilities/error codes to the PuzlWerk solver contract |
+| WI-B1…B2 | `feat/kpuzzle-*` | **hold** | wait on SM1/SM5; D14 placement only |
+| WI-M1…M3 | `feat/target-modes-*` | **hold** | wait on SM1 + D12/D13 |
 
 Local patches for A1–A4 (rebased on tip `bb92669`) live with the cloud agent
 artifacts until cubacle write access exists; do not open against `develop`. Do
