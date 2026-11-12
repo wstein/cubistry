@@ -15,7 +15,12 @@
 #                                                   layout. Its SHA-256 is written to PROGRESS.txt (layout_sha256) and segments.tsv.
 # GENERATE_DEADLINE_S: no new edge starts when the slowest edge so far would not fit before this many seconds (default 3000,
 # one segment of about an hour).
-# Options: start=YYYY-MM end=YYYY-MM (range of months.tsv; default the chain range) prior=DIR (continue DIR/chain.moves.tsv
+# direction=backward: the search starts at the identity pose, which shows the LAST member of S (CAL7_ROOT_MONTH must be empty), and goes to earlier months
+#   (plan = S reversed). OUT then holds the forward-reading chain.v3 (free start = the search words, edges = reversed inverse words, ending at the identity
+#   pose; check it with CAL7_JOIN_END=identity); the search-order files are OUT.search. prior=DIR reads such a chain.v3 and continues it to earlier months.
+#   edges.tsv, segments.tsv and months.tsv are in search order (edge 1 leaves the identity pose). PROGRESS.txt: chain_end = last member of S, chain_start = earliest
+#   month reached. A best-effort month at the tip is never a stop (the chain would start there, and a free start shows its month exactly): one more edge is produced.
+# Options: direction=forward|backward (default forward) start=YYYY-MM end=YYYY-MM (range of months.tsv; default the chain range) prior=DIR (continue DIR/chain.moves.tsv
 # with DIR/edges.tsv, and DIR/states) claims=FILE best_effort=FILE (declared best-effort months: the edge into such a month is written
 # into a best-effort target, see below) best_effort_cell=7,1|7,7 (switch, default the cell of the best-effort file) max_edges=N
 # library=L1|L4|L5 width lambda corew fanout maxdepth patience nsnap finish_depth.
@@ -47,21 +52,30 @@ const P=G.P
 
 out,printpath=ARGS[1:2]
 opts=Dict(String.(split(x,'='))[1]=>String.(split(x,'='))[2] for x in ARGS[3:end])
+BACKWARD=get(opts,"direction","forward");BACKWARD in ("forward","backward") || error("direction must be forward or backward");backward=BACKWARD=="backward"
+final_out=out;backward && (out=final_out*".search")
 members=read_month_list(ENV["CAL7_WINDOW_MONTHS"],get(ENV,"CAL7_WINDOW_MONTHS_SHA256",""))
 @assert members==window_month_list() "producer and checker readers disagree on the month list"
-root=root_month(get(ENV,"CAL7_ROOT_MONTH",""),members);rooted=root!=members[1]
-plan=chain_plan(members,root);flags=chain_flags(members,root)
-range_start=isempty(get(opts,"start","")) ? min(plan[1],members[1]) : parse_ym(opts["start"]);range_end=isempty(get(opts,"end","")) ? plan[end] : parse_ym(opts["end"])
+if backward
+    root=backward_root(members,get(ENV,"CAL7_ROOT_MONTH",""));rooted=false;plan=backward_plan(members)
+    flags=[abs(ym_index(b)-ym_index(a))>1 ? "BRIDGE" : "" for (a,b) in zip(plan[1:end-1],plan[2:end])]
+else
+    root=root_month(get(ENV,"CAL7_ROOT_MONTH",""),members);rooted=root!=members[1]
+    plan=chain_plan(members,root);flags=chain_flags(members,root)
+end
+range_start=isempty(get(opts,"start","")) ? min(plan[1],members[1]) : parse_ym(opts["start"]);range_end=isempty(get(opts,"end","")) ? (backward ? members[end] : plan[end]) : parse_ym(opts["end"])
 max_edges=parse(Int,get(opts,"max_edges","100000"));deadline=parse(Float64,get(ENV,"GENERATE_DEADLINE_S",string(DEFAULT_DEADLINE_S)))
 claims=haskey(opts,"claims") ? read_claims(opts["claims"]) : Dict{Tuple{Int,Int},NTuple{4,String}}()
 best=haskey(opts,"best_effort") ? read_best_effort(opts["best_effort"]) : Dict{Tuple{Int,Int},NTuple{3,String}}()
 layout_path,layout_sha=layout_input(joinpath(CAL,"row1-revision/layout.tsv"))   # CAL7_WINDOW_LAYOUT + CAL7_WINDOW_LAYOUT_SHA256, default the built-in layout
 
-@assert !ispath(out) "Use a new scratch output directory";mkpath(joinpath(out,"states"))
+backward && haskey(best,members[1]) && error("the earliest month $(ym_str(members[1])) is declared best-effort: a backward chain starts there and a free start must show its month exactly")
+@assert !ispath(out) && !ispath(final_out) "Use a new scratch output directory";mkpath(joinpath(out,"states"))
 
 labels=coupled_labels(read(layout_path,String))
 goals=coupled_goals(labels,"names-band","window")      # the members of S
-rooted && (goals=vcat([coupled_month_goal(labels,root...)],goals))   # the root month is not a member: its goal comes first
+rooted && (goals=vcat([coupled_month_goal(labels,root...)],goals))
+backward && (goals=reverse(goals))   # the search goes from the identity pose (last member) to the first member   # the root month is not a member: its goal comes first
 @assert [(g.year,g.month) for g in goals]==plan "goals follow the chain plan"
 isempty(get(ENV,"CAL7_WINDOW_PRINT_SHA","")) || @assert bytes2hex(sha256(read(printpath)))==ENV["CAL7_WINDOW_PRINT_SHA"] "print SHA-256 differs from CAL7_WINDOW_PRINT_SHA"
 source=window_read_print(printpath)
@@ -77,6 +91,14 @@ function snapshot(state,id,g)
     P.state_digest(actual)
 end
 # Start: identity (the root month) or a prior chain, replayed with the print; its rows and snapshots are copied verbatim.
+if backward && haskey(opts,"prior")   # the prior is a forward-reading chain.v3: convert it to the search order (OUT.search.prior)
+    pd=opts["prior"];pls=backward_import(String.(split(chop(read(joinpath(pd,"chain.moves.tsv"),String);tail=1),'\n')))
+    n0=count(startswith("edge\t"),pls);tmp=out*".prior";mkpath(joinpath(tmp,"states"))
+    write(joinpath(tmp,"chain.moves.tsv"),join(pls,'\n')*"\n")
+    for i in 1:n0+1;cp(joinpath(pd,"states","state-"*lpad(string(backward_state_index(n0,i)),2,'0')*".tsv"),joinpath(tmp,"states","state-"*lpad(string(i),2,'0')*".tsv"));end
+    for f in ("edges.tsv","segments.tsv");cp(joinpath(pd,f),joinpath(tmp,f));end
+    opts["prior"]=tmp
+end
 if haskey(opts,"prior")
     ls=String.(split(chop(read(joinpath(opts["prior"],"chain.moves.tsv"),String);tail=1),'\n'))
     months,k=chain_progress(ls,plan);@assert months==plan[1:k+1] "prior chain months do not match the plan (month list or root changed)"
@@ -120,6 +142,7 @@ done=0;slowest=0.0;stop=nothing;loop0=time()
 for id in edges_before+2:length(plan)
     global state,done,slowest,stop
     stop=stop_reason(done,max_edges,time()-loop0,slowest,deadline,plan[edges_before+1+done])
+    backward && stop!==nothing && backward_must_continue(plan[edges_before+1+done],best) && (stop=nothing)   # never stop at a best-effort tip
     stop===nothing || break
     true_goal=goals[id];@assert (true_goal.year,true_goal.month)==plan[id] "goal order";t=time();before=digest(state)
     wrong=nothing;target=true_goal
@@ -156,7 +179,7 @@ for id in edges_before+2:length(plan)
 end
 close(elog)
 produced=plan[1:edges_before+1+done];complete=length(produced)==length(plan)
-write_months(joinpath(out,"months.tsv"),month_records(range_start,range_end,plan,produced,complete ? nothing : something(stop,"deadline");claims,best,rooted,best_edges=union(best_edges,prior_best_edges),methods=vcat(prior_methods,new_methods)))
+write_months(joinpath(out,"months.tsv"),month_records(range_start,range_end,plan,produced,complete ? nothing : something(stop,"deadline");claims,best,rooted,backward,best_edges=union(best_edges,prior_best_edges),methods=vcat(prior_methods,new_methods)))
 # Provenance of this segment next to those of the earlier ones (run id and research commit come from the workflow; library, beam width
 # and lambda are the options of this run).
 open(joinpath(out,"segments.tsv"),"w") do io
@@ -166,10 +189,19 @@ open(joinpath(out,"segments.tsv"),"w") do io
 end
 open(joinpath(out,"PROGRESS.txt"),"w") do io
     println(io,"complete=",complete);println(io,"stop_reason=",complete ? "-" : something(stop,"deadline"))
-    println(io,"edges_total=",edges_before+done);println(io,"edges_new=",done);println(io,"chain_end=",ym_str(produced[end]))
+    println(io,"edges_total=",edges_before+done);println(io,"edges_new=",done);println(io,"chain_end=",ym_str(backward ? members[end] : produced[end]))
+    backward && (println(io,"direction=backward");println(io,"chain_start=",ym_str(produced[end])))
     println(io,"greedy_edges=",greedy_count(vcat(prior_methods,new_methods)))
     println(io,"plan_end=",ym_str(plan[end]));println(io,"root_month=",ym_str(root));println(io,"rooted=",rooted);println(io,"bridge_edges=",count(==("BRIDGE"),flags))
 println(io,"layout_sha256=",layout_sha);println(io,"best_effort_edges=",length(best_edges)+length(prior_best_edges));println(io,"seconds=",round(time()-T0;digits=1))
 end
 println("RESULT complete=",complete," greedy=",greedy_count(vcat(prior_methods,new_methods))," stop=",complete ? "-" : something(stop,"deadline")," edges_total=",edges_before+done," chain_end=",ym_str(produced[end])," seconds=",round(time()-T0;digits=1))
+if backward && done>0   # forward-reading chain.v3, snapshots renumbered, the run files copied next to it
+    n=edges_before+done;ls=String.(split(chop(read(joinpath(out,"chain.moves.tsv"),String);tail=1),'\n'))
+    exported=backward_export(ls);mkpath(joinpath(final_out,"states"))
+    write(joinpath(final_out,"chain.moves.tsv"),join(exported,'\n')*"\n")
+    for j in 1:n+1;cp(statepath(backward_state_index(n,j)),joinpath(final_out,"states","state-"*lpad(string(j),2,'0')*".tsv"));end
+    for f in ("months.tsv","edges.tsv","segments.tsv","PROGRESS.txt");cp(joinpath(out,f),joinpath(final_out,f));end
+    println("exported ",n," edges to ",final_out)
+end
 done==0 && !complete && exit(3)
