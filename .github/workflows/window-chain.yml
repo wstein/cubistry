@@ -20,6 +20,12 @@ name: Window chain
 # CAL7_WINDOW_LAYOUT and CAL7_WINDOW_LAYOUT_SHA256. prepare refuses the run when window_chain.jl or run_checks.sh at research_ref
 # does not mention the word CAL7_WINDOW_LAYOUT (fail closed; a comment with the name is enough, the check is a gate, not a proof). Without the inputs nothing is exported and nothing changes.
 # No commits, no gitlinks, no PR comments; the output is an artifact only.
+# Stages: max_edges bounds the edges of one run (a stage of the first chain: 41 edges); start and end only bound the months of months.tsv.
+# A stage after the first continues the verified artifact of the previous run (prior_run_id); expect_prior_edges names the edge count that
+# artifact must have (stage 2: 41), so a wrong run id fails in produce before an edge is computed.
+# best_effort_29 (default true) turns the 29 rule of the best-effort edge on in all three checkers (CAL7_BEST_EFFORT_29=1; the Flix checker gets
+# the last argument 29 from run_checks.sh); prepare refuses a research_ref whose checkers do not read it. When state_report.sh exists at
+# research_ref the verify job adds its report as a second artifact (wc-state-report-<run id>), which is never a prior.
 # Concurrency: one run at a time. GitHub keeps at most one running and one pending run per group; a newer dispatch replaces an
 # older pending one (the replaced run is cancelled) even with cancel-in-progress false. Dispatch the next run only after the
 # previous one finished.
@@ -60,7 +66,7 @@ on:
         type: string
         default: ""
       best_effort_path:
-        description: Optional repository path of the declared best-effort months TSV at research_ref; the run stops before such a month
+        description: Optional repository path of the declared best-effort months TSV at research_ref; the producer writes the best-effort edge into such a month (wrong cell 7,1 showing 29)
         type: string
         default: ""
       claims_path:
@@ -73,6 +79,10 @@ on:
         default: ""
       end:
         description: Optional last month of months.tsv (YYYY-MM); empty means the last chain month
+        type: string
+        default: ""
+      max_edges:
+        description: Optional maximum number of new edges of this run (a stage); empty means as many as the deadline allows. The smoke run uses 3
         type: string
         default: ""
       library:
@@ -91,6 +101,14 @@ on:
         description: Run id of an earlier run of this workflow whose verified chain artifact is continued
         type: string
         default: ""
+      expect_prior_edges:
+        description: Optional number of edges the prior chain must have (needs prior_run_id); a different count stops the run before any edge is computed
+        type: string
+        default: ""
+      best_effort_29:
+        description: The 29 rule of the best-effort edge (one wrong cell, the digit 29 in red) in all three checkers; the research commit must contain it
+        type: boolean
+        default: true
       fail_on_greedy:
         description: Fail the verify job (after the verified artifact is uploaded) when any edge used the greedy fallback (300-400 HTM per edge)
         type: boolean
@@ -128,6 +146,7 @@ jobs:
       end: ${{ steps.validate.outputs.end }}
       prior_run_id: ${{ steps.validate.outputs.prior_run_id }}
       max_edges: ${{ steps.validate.outputs.max_edges }}
+      expect_prior_edges: ${{ steps.validate.outputs.expect_prior_edges }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -152,6 +171,8 @@ jobs:
           IN_LAMBDA: ${{ inputs.lambda }}
           IN_PRIOR: ${{ inputs.prior_run_id }}
           IN_SMOKE: ${{ inputs.smoke_mode }}
+          IN_MAX: ${{ inputs.max_edges }}
+          IN_EXPECT: ${{ inputs.expect_prior_edges }}
         run: |
           set -euo pipefail
           fail() { echo "::error::$1"; exit 1; }
@@ -175,9 +196,13 @@ jobs:
           [[ "$IN_WIDTH" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$IN_WIDTH" -le 200 ] || fail "width must be 1-200"
           [[ "$IN_LAMBDA" =~ ^([1-9]|10)$ ]] || fail "lambda must be 1-10"
           [ -z "$IN_PRIOR" ] || [[ "$IN_PRIOR" =~ ^[0-9]{1,20}$ ]] || fail "prior_run_id must be digits"
-          max=100000; prior=$IN_PRIOR
+          [ -z "$IN_MAX" ] || { [[ "$IN_MAX" =~ ^[1-9][0-9]{0,4}$ ]] && [ "$IN_MAX" -le 100000 ]; } || fail "max_edges must be 1-100000"
+          [ -z "$IN_EXPECT" ] || [[ "$IN_EXPECT" =~ ^[1-9][0-9]{0,4}$ ]] || fail "expect_prior_edges must be a positive number"
+          [ -z "$IN_EXPECT" ] || [ -n "$IN_PRIOR" ] || fail "expect_prior_edges needs prior_run_id"
+          max=${IN_MAX:-100000}; prior=$IN_PRIOR
           if [ "$IN_SMOKE" = "true" ]; then max=3; prior=""; fi
-          { echo "start=$IN_START"; echo "end=$IN_END"; echo "prior_run_id=$prior"; echo "max_edges=$max"; } >> "$GITHUB_OUTPUT"
+          expect=$IN_EXPECT; [ -n "$prior" ] || expect=""
+          { echo "start=$IN_START"; echo "end=$IN_END"; echo "prior_run_id=$prior"; echo "max_edges=$max"; echo "expect_prior_edges=$expect"; } >> "$GITHUB_OUTPUT"
       - name: Check prior run
         if: steps.validate.outputs.prior_run_id != ''
         env:
@@ -204,6 +229,7 @@ jobs:
           MONTHS_SHA: ${{ inputs.months_sha256 }}
           BEST_PATH: ${{ inputs.best_effort_path }}
           CLAIMS_PATH: ${{ inputs.claims_path }}
+          BEST29: ${{ inputs.best_effort_29 }}
           SUMMARY_PRIOR: ${{ steps.validate.outputs.prior_run_id }}
           SUMMARY_ROOT: ${{ inputs.root_month }}
           SUMMARY_SMOKE: ${{ inputs.smoke_mode }}
@@ -225,6 +251,10 @@ jobs:
           [ -z "$LAYOUT_PATH" ] || git cat-file -e "$SHA:$LAYOUT_PATH" || fail "$LAYOUT_PATH is missing at $SHA"
           [ -z "$LAYOUT_PATH" ] || git grep -qw CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/window_chain.jl" || fail "layout_path is set, but the producer at research_ref does not read CAL7_WINDOW_LAYOUT"
           [ -z "$LAYOUT_PATH" ] || git grep -qw CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/run_checks.sh" || fail "layout_path is set, but run_checks.sh at research_ref does not read CAL7_WINDOW_LAYOUT"
+          # The 29 rule is read by the three checkers at research_ref; a commit without it would accept a best-effort edge on any wrong cell.
+          [ "$BEST29" != true ] || git grep -qw CAL7_BEST_EFFORT_29 "$SHA" -- "$WC/run_checks.sh" || fail "best_effort_29 is set, but run_checks.sh at research_ref does not read CAL7_BEST_EFFORT_29"
+          [ "$BEST29" != true ] || git grep -qw CAL7_BEST_EFFORT_29 "$SHA" -- "$WC/check.jl" || fail "best_effort_29 is set, but check.jl at research_ref does not read CAL7_BEST_EFFORT_29"
+          [ "$BEST29" != true ] || git grep -qw CAL7_BEST_EFFORT_29 "$SHA" -- "$WC/verify_chain.jl" || fail "best_effort_29 is set, but verify_chain.jl at research_ref does not read CAL7_BEST_EFFORT_29"
           [ "$missing" = 0 ] || fail "research commit lacks required files"
           [ "$(git show "$SHA:$MONTHS_PATH" | sha256sum | cut -d' ' -f1)" = "$MONTHS_SHA" ] || fail "month list differs from months_sha256"
           {
@@ -232,7 +262,7 @@ jobs:
             echo "- research SHA: \`$SHA\`"
             echo "- print: \`$PRINT_PATH\`, month list \`$MONTHS_PATH\` (\`$MONTHS_SHA\`), root \`${SUMMARY_ROOT:-first month of the list}\`"
             echo "- layout: \`${LAYOUT_PATH:-row1-revision/layout.tsv (default)}\`"
-            echo "- smoke: \`$SUMMARY_SMOKE\`, prior run: \`$SUMMARY_PRIOR\`"
+            echo "- smoke: \`$SUMMARY_SMOKE\`, prior run: \`$SUMMARY_PRIOR\`, 29 rule: \`$BEST29\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
   produce:
@@ -253,6 +283,8 @@ jobs:
       START: ${{ needs.prepare.outputs.start }}
       END: ${{ needs.prepare.outputs.end }}
       MAX_EDGES: ${{ needs.prepare.outputs.max_edges }}
+      EXPECT_PRIOR: ${{ needs.prepare.outputs.expect_prior_edges }}
+      BEST29: ${{ inputs.best_effort_29 }}
       LIBRARY: ${{ inputs.library }}
       WIDTH: ${{ inputs.width }}
       LAMBDA: ${{ inputs.lambda }}
@@ -285,6 +317,7 @@ jobs:
           [ -z "$CLAIMS_PATH" ] || test -f "src/$CLAIMS_PATH"
           [ -z "$BEST_PATH" ] || test -f "src/$BEST_PATH"
           mkdir -p "$GITHUB_WORKSPACE/out"
+          BEST_SHA=-; [ -z "$BEST_PATH" ] || BEST_SHA=$(sha256sum "src/$BEST_PATH" | cut -d' ' -f1)
           if [ -d "$GITHUB_WORKSPACE/prev" ]; then
             # A prior artifact is untrusted input. SHA256SUMS and VERIFIED.txt only show that it is self-consistent; the producer replays the chain
             # and checks its end digest, and the verify job re-checks the whole chain. Take the chain with the most edges.
@@ -301,6 +334,10 @@ jobs:
             grep -qx "months_sha256=$MONTHS_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another month list"; exit 1; }
             grep -qx "root_month=${ROOT_MONTH:--}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another root month"; exit 1; }
             grep -qx "layout_sha256=${LAYOUT_SHA:--}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another layout"; exit 1; }
+            grep -qx "complete=false" "$best/VERIFIED.txt" || { echo "::error::the prior chain is complete; there is nothing to continue"; exit 1; }
+            [ -z "$EXPECT_PRIOR" ] || [ "$most" = "$EXPECT_PRIOR" ] || { echo "::error::the prior chain has $most edges, expect_prior_edges is $EXPECT_PRIOR"; exit 1; }
+            grep -qx "best_effort_29=$BEST29" "$best/VERIFIED.txt" || { echo "::error::the prior chain was checked with another best_effort_29 setting"; exit 1; }
+            grep -qx "best_effort_sha256=$BEST_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another best-effort file"; exit 1; }
             # The producer reads prior/chain.moves.tsv, prior/edges.tsv (the solver record of earlier segments), prior/segments.tsv
             # (the inputs of earlier segments) and prior/states.
             mkdir "$GITHUB_WORKSPACE/prior"
@@ -347,6 +384,8 @@ jobs:
     env:
       SHA: ${{ inputs.research_ref }}
       FAIL_ON_GREEDY: ${{ inputs.fail_on_greedy }}
+      BEST29: ${{ inputs.best_effort_29 }}
+      BEST_PATH: ${{ inputs.best_effort_path }}
       PRINT_PATH: ${{ inputs.print_path }}
       LAYOUT_PATH: ${{ inputs.layout_path }}
       LAYOUT_SHA: ${{ inputs.layout_sha256 }}
@@ -413,11 +452,13 @@ jobs:
           export PRINT_OVERRIDE=$GITHUB_WORKSPACE/src/$PRINT_PATH CHAIN_OVERRIDE=$c/chain.moves.tsv STATES_OVERRIDE=$c/states
           # An optional window-local layout: checked against its pin here, then read by all three checkers through run_checks.sh.
           [ -z "$LAYOUT_PATH" ] || { echo "$LAYOUT_SHA  src/$LAYOUT_PATH" | sha256sum --check --strict; export CAL7_WINDOW_LAYOUT="$GITHUB_WORKSPACE/src/$LAYOUT_PATH" CAL7_WINDOW_LAYOUT_SHA256="$LAYOUT_SHA"; }
+          # The 29 rule of the best-effort edge: the Julia checkers read the variable, run_checks.sh gives the Flix checker the last argument 29.
+          [ "$BEST29" != true ] || export CAL7_BEST_EFFORT_29=1
           mkdir -p "$GITHUB_WORKSPACE/out"
           bash "src/$WC/run_checks.sh" "$(command -v julia)" "$(command -v java)" "$FLIX_JAR" "$GITHUB_WORKSPACE/out/checks" 2>&1 | tee "$GITHUB_WORKSPACE/out/verify.log"
           out=$GITHUB_WORKSPACE/out/checks
           cmp "$out/julia.tsv" "$out/flix.tsv" || { echo "::error::Julia and Flix receipts differ"; exit 1; }
-          # An exact chain has the SAT verdict; a chain with best-effort edges (chain.v2, not written by the producer) has BEST_EFFORT and its status line.
+          # An exact chain has the SAT verdict; a chain with best-effort edges (chain.v2, written by the producer for the months of the best-effort file) has BEST_EFFORT and its status line.
           if [ "$best_effort" = 0 ]; then jv=SAT; iv=ACCEPT_CHAIN; else jv=BEST_EFFORT; iv=ACCEPT_BEST_EFFORT_CHAIN; fi
           grep -qx $'verdict\t'"$jv"$'\tlegal-retained-state-window-chain\t'"$((edges_total + 1))"$'\t'"$edges_total" "$out/julia.tsv" || { echo "::error::Julia verdict line is not the exact $jv line for $edges_total edges"; exit 1; }
           grep -q $'^independent-verdict\t'"$iv"$'\t'"$((edges_total + 1))"$'\t'"$edges_total"$'\t' "$out/independent.tsv" || { echo "::error::independent verdict differs ($edges_total edges)"; exit 1; }
@@ -431,6 +472,21 @@ jobs:
           [ "$greedy" = 0 ] || echo "::warning::$greedy of $edges_total edges used the greedy fallback (300-400 HTM per edge)"
           echo "greedy fallback edges: $greedy of $edges_total"
           { echo "CHAIN_END=$chain_end"; echo "EDGES_TOTAL=$edges_total"; echo "COMPLETE=$complete"; echo "GREEDY=$greedy"; } >> "$GITHUB_ENV"
+      - name: State report
+        run: |
+          set -euo pipefail
+          # Extra artifact, not part of the verified chain: repeated start/end states, pairs and configuration transitions of the whole chain.
+          # Tools from research commits without it are skipped; a failing report does not fail the run (the chain is already verified).
+          mkdir -p "$GITHUB_WORKSPACE/report"
+          if [ -f "src/$WC/state_report.sh" ]; then
+            if bash "src/$WC/state_report.sh" "$GITHUB_WORKSPACE/cand/chain.moves.tsv" "$GITHUB_WORKSPACE/cand/states" "$(command -v julia)" > "$GITHUB_WORKSPACE/report/state-report.txt" 2> "$GITHUB_WORKSPACE/report/state-report.err"; then
+              { echo "### State report"; echo '```'; head -n 60 "$GITHUB_WORKSPACE/report/state-report.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::warning::state_report.sh failed (see state-report.err); the chain is verified"
+            fi
+          else
+            echo "::notice::state_report.sh does not exist at research_ref; no state report"
+          fi
       - name: Package artifact
         run: |
           set -euo pipefail
@@ -438,11 +494,14 @@ jobs:
           mkdir -p "$pack/states"
           cp "$c/chain.moves.tsv" "$c/months.tsv" "$c/edges.tsv" "$c/segments.tsv" "$c/PROGRESS.txt" "$c/run.log" "$pack/"
           cp "$c"/states/*.tsv "$pack/states/"
+          BEST_SHA=-; [ -z "$BEST_PATH" ] || BEST_SHA=$(sha256sum "src/$BEST_PATH" | cut -d' ' -f1)
           cp "$out/julia.tsv" "$out/flix.tsv" "$out/independent.tsv" "$RUNNER_TEMP/flix-jar.sha256" "$pack/"
           {
             echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "print_sha256=$PRINT_SHA"
             echo "months_sha256=$MONTHS_SHA"; echo "root_month=${ROOT_MONTH:--}"
             echo "layout_sha256=${LAYOUT_SHA:--}"
+            echo "best_effort_29=$BEST29"
+            echo "best_effort_sha256=$BEST_SHA"
             echo "edges_total=$EDGES_TOTAL"; echo "chain_end=$CHAIN_END"; echo "complete=$COMPLETE"
           } > "$pack/VERIFIED.txt"
           sums=$(cd "$pack" && find . -type f | sort | xargs sha256sum)
@@ -461,6 +520,12 @@ jobs:
           path: pack/
           retention-days: 90
           if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: wc-state-report-${{ github.run_id }}
+          path: report/
+          retention-days: 90
+          if-no-files-found: ignore
       - name: Greedy gate
         if: env.FAIL_ON_GREEDY == 'true' && env.GREEDY != '0'
         run: |
