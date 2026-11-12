@@ -70,10 +70,11 @@ const FORWARD=["cubistry.calendar7.chain.v3","source\t12\t2036\t12\tD3","start\t
         # the start word must be the search words in order: one move changed
         @test_throws "start word" backward_import(replace(FORWARD,"move\t2\t-1"=>"move\t2\t1";count=1))
         @test_throws "start word" backward_import(vcat(FORWARD[1:2],["start\t4"],FORWARD[4:7],FORWARD[9:end]))
-        @test_throws "continuity" backward_import(replace(FORWARD,"\tD3\tD2"=>"\tD4\tD2";count=1))
-        @test_throws "source" backward_import(replace(FORWARD,"source\t12\t2036\t12\tD3"=>"source\t11\t2036\t11\tD3";count=1))
+        @test_throws "continuity" backward_import(replace(FORWARD,"edge\t2037\t2\t4\t5\t0\t0\tD2\tD1"=>"edge\t2037\t2\t4\t5\t0\t0\tD5\tD1"))
+        @test_throws "source" backward_import(replace(FORWARD,"source\t12\t2036\t12\tD3"=>"source\t12\t2036\t11\tD3";count=1))   # month field and month field differ
         @test_throws "source" backward_import(replace(FORWARD,"source\t12\t2036\t12\tD3"=>"source\t12\t2036\t12\tD9";count=1))
-        @test_throws "best-effort month" backward_import(vcat(FORWARD[1:2],FORWARD[3:8],["edge\t2037\t1\t6\t7\t0\t0\tD3\tD2","wrong\t7\t1","hall\t7,1;7,7"],FORWARD[10:end]))
+        # the last forward edge ends at the identity pose, which is exact: wrong cells there are rejected
+        @test_throws "best-effort month" backward_import(vcat(FORWARD[1:18],["wrong\t7\t1","hall\t7,1;7,7"],FORWARD[19:end]))
     end
     @testset "month records of a decreasing plan" begin
         plan=backward_plan([(2037,1),(2037,2),(2041,1)])
