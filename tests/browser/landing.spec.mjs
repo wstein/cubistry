@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 // Landing page of index.html (stage 3 of knowledge/plans/unified-application.md). Expected ids in catalog order.
-const APPS = ["ms-timer"];
+const APPS = ["ms-timer", "calendar"];
 const CUBES = ["hm-clock", "tenth", "counter", "timer", "five-second-timer", "hsm-counter", "ms-counter", "hm-one-cube", "calendar7", "ci"];
 
 test.beforeEach(() => {
