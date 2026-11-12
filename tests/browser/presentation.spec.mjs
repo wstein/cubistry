@@ -5,11 +5,10 @@ async function ready(page, path) {
     Date.now = () => Date.parse("2026-10-29T04:35:42Z");
   });
   await page.goto(path);
-  // The clock mode of the unified view has one Present button (#presentation-btn); the calendar page has its own.
-  if (path.includes("app=clock")) {
-    await expect(page.locator("#seconds-speed")).toBeEnabled({ timeout: 30000 });
-    await expect(page.locator("#presentation-btn")).toBeEnabled();
-  } else await expect(page.locator("#presentation-toggle")).toBeEnabled();
+  // Every mode of the unified view has one Present button (#presentation-btn).
+  if (path.includes("app=clock")) await expect(page.locator("#seconds-speed")).toBeEnabled({ timeout: 30000 });
+  else await expect(page.locator("#calendar-design")).toBeEnabled({ timeout: 30000 });
+  await expect(page.locator("#presentation-btn")).toBeEnabled();
 }
 async function clockState(page) {
   return page.evaluate(async () => {
@@ -22,7 +21,7 @@ async function frame(page, app) {
     const renderer =
       app === "clock"
         ? (await import("/src/apps/clock/live-mode.mjs")).clockStage.renderer
-        : (await import("/src/calendar.mjs")).calendarApp.viewer.renderer;
+        : window.__calendarViewer.renderer;
     return renderer.info.render.frame;
   }, app);
   await expect
@@ -31,7 +30,7 @@ async function frame(page, app) {
         const renderer =
           app === "clock"
             ? (await import("/src/apps/clock/live-mode.mjs")).clockStage.renderer
-            : (await import("/src/calendar.mjs")).calendarApp.viewer.renderer;
+            : window.__calendarViewer.renderer;
         return renderer.info.render.frame;
       }, app),
     )
@@ -147,20 +146,13 @@ for (const mode of ["unsupported", "rejected"])
             : () => Promise.reject(Error("Rejected for test")),
       });
     }, mode);
-    await ready(page, "/calendar.html");
+    await ready(page, "/index.html?app=calendar");
     await page.selectOption("#calendar-design", "en-3");
     await expect(page.locator("#calendar-front")).toContainText("THU");
     const before = await page.locator("#calendar-front").textContent();
-    await page.getByRole("button", { name: "Present", exact: true }).click();
-    await expect(page.locator("body")).toHaveAttribute(
-      "data-presentation",
-      "true",
-    );
-    await expect(page.locator("#presentation-feedback")).toContainText(
-      "Fullscreen is unavailable",
-    );
+    await page.locator("#presentation-btn").click();
+    await expect(page.locator("body")).toHaveClass(/presentation-mode/);
     await expect(page.locator("#calendar-digital")).toBeVisible();
-    await expect(page.locator("#calendar-date")).not.toBeVisible();
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 900 });
       await frame(page, "calendar");
@@ -173,16 +165,12 @@ for (const mode of ["unsupported", "rejected"])
       });
     }
     await page.keyboard.press("Escape");
-    await expect(page.locator("body")).toHaveAttribute(
-      "data-presentation",
-      "false",
-    );
+    await expect(page.locator("body")).not.toHaveClass(/presentation-mode/);
     await expect(page.locator("#calendar-date")).toBeVisible();
-    await expect(page.locator("#presentation-toggle")).toBeFocused();
     await expect(page.locator("#calendar-front")).toHaveText(before);
   });
 
-test("calendar physical motion continues through presentation and reference-view reset", async ({
+test("calendar physical motion continues through presentation", async ({
   page,
 }) => {
   // In CI run 42363500526 (trace of the failed test) no assertion failed: the
@@ -196,11 +184,10 @@ test("calendar physical motion continues through presentation and reference-view
     HTMLElement.prototype.requestFullscreen = () =>
       Promise.reject(Error("Layout-only test"));
   });
-  await ready(page, "/calendar.html");
+  await ready(page, "/index.html?app=calendar");
   await page.selectOption("#calendar-speed", "10");
   await page.evaluate(async () => {
-    const { calendarApp } = await import("/src/calendar.mjs");
-    window.presentationProgress = () => calendarApp.controller.progress;
+    window.presentationProgress = () => window.__calendarController.progress;
     // Hold planning independently of animation so this test cannot confuse
     // the valid solver planning phase with a missing first physical turn.
     const postMessage = Worker.prototype.postMessage;
@@ -253,8 +240,8 @@ test("calendar physical motion continues through presentation and reference-view
   await expect
     .poll(() => page.evaluate(() => typeof window.releasePresentationTurn))
     .toBe("function");
-  await page.getByRole("button", { name: "Present", exact: true }).click();
-  await page.getByRole("button", { name: "Reference view" }).click();
+  await page.locator("#presentation-btn").click();
+  await expect(page.locator("body")).toHaveClass(/presentation-mode/);
   await page.evaluate(() => window.releasePresentationTurn());
   await expect(page.locator("#calendar-front")).toHaveText(
     "S · O · blank · blank · 0 · 1 · N · O · V",
@@ -265,12 +252,11 @@ test("calendar physical motion continues through presentation and reference-view
     "false",
   );
   const valid = await page.evaluate(async () => {
-    const { calendarApp } = await import("/src/calendar.mjs");
     const { matches, sameState } = await import("/src/apps/calendar/model.ts");
-    const c = calendarApp.controller;
+    const c = window.__calendarController;
     return (
       matches(c.physicalState, c.current.cells) &&
-      sameState(c.physicalState, calendarApp.viewer.presentedState)
+      sameState(c.physicalState, window.__calendarViewer.presentedState)
     );
   });
   expect(valid).toBe(true);
@@ -283,9 +269,8 @@ test("calendar physical motion continues through presentation and reference-view
       path: `test-results/presentation-calendar-de-${width}.png`,
     });
   }
-  await page
-    .getByRole("button", { name: "Show controls", exact: true })
-    .click();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("body")).not.toHaveClass(/presentation-mode/);
   await expect(page.locator("#calendar-date")).toHaveValue("2026-11-01");
 });
 

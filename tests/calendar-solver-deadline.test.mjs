@@ -103,14 +103,14 @@ test("solverTimeoutMs accepts only a finite positive number and otherwise yields
     assert.equal(solverTimeoutMs(value), 8000, String(value));
 });
 
-test("the calendar page takes the deadline from an internal test hook, not from the URL", () => {
+test("the calendar mode takes the deadline from an internal test hook, not from the URL", () => {
   const source = readFileSync(
-    new URL("../src/calendar.mjs", import.meta.url),
+    new URL("../src/apps/calendar/browser-env.ts", import.meta.url),
     "utf8",
   );
   assert.match(
     source,
-    /new CalendarOptimizer\(\s*undefined,\s*solverTimeoutMs\(window\.__calendarSolverTimeoutMs\),?\s*\)/,
+    /new CalendarOptimizer\(\s*undefined,\s*solverTimeoutMs\(\(window as any\)\.__calendarSolverTimeoutMs\),?\s*\)/,
   );
   assert.doesNotMatch(source, /params\.get\(["']solver/i);
 });
@@ -121,11 +121,11 @@ test("the Pages spec sets the same hook to a finite deadline below its busy wait
     "utf8",
   );
   const page = readFileSync(
-    new URL("../src/calendar.mjs", import.meta.url),
+    new URL("../src/apps/calendar/browser-env.ts", import.meta.url),
     "utf8",
   );
-  const hook = page.match(/window\.(__calendarSolverTimeoutMs)/)?.[1];
-  assert.ok(hook, "calendar.mjs reads the hook");
+  const hook = page.match(/\.(__calendarSolverTimeoutMs)/)?.[1];
+  assert.ok(hook, "browser-env.ts reads the hook");
   const set = [...spec.matchAll(/window\.(\w+)\s*=\s*([\d_]+)\s*;/g)].filter(
     (m) => m[1] === hook,
   );
