@@ -10,7 +10,7 @@ import { MODE_CATALOG } from "../src/apps/mode-catalog.ts";
 import { createRegistry } from "../src/apps/registry.ts";
 import { QualityPolicy } from "../src/apps/status/policy.ts";
 import { validateStatusDefinition } from "../src/apps/status/definition.ts";
-import { DEFAULT_TURN_MS, TURN_CHOICES, parseStatusParams, serializeStatusParams } from "../src/apps/status/params.ts";
+import { DEFAULT_TURN_MS, SPEED_CHOICES, parseStatusParams, serializeStatusParams } from "../src/apps/status/params.ts";
 import { mountStatus, statusController } from "../src/apps/status/mount.ts";
 import { urlAfterAppSwitch } from "../src/app-switch-url.mjs";
 
@@ -26,6 +26,8 @@ test("the catalog lists ci as a one-cube mode in the cubes group with the status
   assert.equal(m.cubes, 1);
   assert.equal(m.group, "cubes");
   assert.equal(m.help, "docs/STATUS_CUBE.md");
+  const size = definition.print.topology.size;
+  assert.match(m.subtitle, new RegExp(`\\b${size}x${size} cube`), "the subtitle names the real cube size");
   assert.ok(existsSync(m.help));
   assert.ok(createRegistry(MODE_CATALOG.map((x) => ({ ...x, mount: async () => {} }))).has("ci"));
 });
@@ -41,23 +43,30 @@ test("parameters: defaults, valid values, invalid values per parameter, and the 
   assert.equal(d.turnMs, DEFAULT_TURN_MS);
   assert.equal(DEFAULT_TURN_MS, 250);
   assert.deepEqual([...d.snapshot], [...definition.initial]);
-  assert.deepEqual([...TURN_CHOICES], [500, 250, 100, 50]);
+  assert.deepEqual([...SPEED_CHOICES], [2000, 1000, 500, 250, 100, 50, 10]);
+  // Same name, values and meaning as the single-cube pages (src/main.mjs): quarter-turn time in milliseconds.
+  const main = readFileSync("src/main.mjs", "utf8");
+  const durations = JSON.parse(main.match(/const durations = (\[[^\]]*\])/)[1]);
+  assert.deepEqual([...SPEED_CHOICES], durations);
+  assert.match(main, /params\.get\("speed"\)/);
+  assert.equal(parseStatusParams(q("speed=2000"), definition).turnMs, 2000);
+  assert.equal(parseStatusParams(q("speed=10"), definition).turnMs, 10);
 
-  const v = parseStatusParams(q("turn=100&build=ok&test=running&analyze=error&review=blocked"), definition);
+  const v = parseStatusParams(q("speed=100&build=ok&test=running&analyze=error&review=blocked"), definition);
   assert.equal(v.turnMs, 100);
   assert.deepEqual([...v.snapshot], ["ok", "running", "error", "blocked"]);
 
   // An invalid value falls back for that parameter only.
-  const bad = parseStatusParams(q("turn=123&build=nope&test=ok&analyze=&review=OK"), definition);
+  const bad = parseStatusParams(q("speed=123&build=nope&test=ok&analyze=&review=OK"), definition);
   assert.equal(bad.turnMs, 250);
   assert.deepEqual([...bad.snapshot], ["open", "ok", "open", "open"]);
-  assert.equal(parseStatusParams(q("turn=50x"), definition).turnMs, 250);
-  assert.equal(parseStatusParams(q("turn=050"), definition).turnMs, 250);
-  assert.equal(parseStatusParams(q("turn=500&turn=50"), definition).turnMs, 500, "the first value counts");
+  assert.equal(parseStatusParams(q("speed=50x"), definition).turnMs, 250);
+  assert.equal(parseStatusParams(q("speed=050"), definition).turnMs, 250);
+  assert.equal(parseStatusParams(q("speed=500&speed=50"), definition).turnMs, 500, "the first value counts");
 
   // Serialization leaves defaults out and parses back to the same value.
   assert.equal(serializeStatusParams(d, definition).toString(), "");
-  assert.equal(serializeStatusParams(v, definition).toString(), "turn=100&build=ok&test=running&analyze=error&review=blocked");
+  assert.equal(serializeStatusParams(v, definition).toString(), "speed=100&build=ok&test=running&analyze=error&review=blocked");
   for (const value of [d, v, bad]) {
     const back = parseStatusParams(serializeStatusParams(value, definition), definition);
     assert.equal(back.turnMs, value.turnMs);
@@ -66,10 +75,11 @@ test("parameters: defaults, valid values, invalid values per parameter, and the 
   assert.equal(serializeStatusParams({ turnMs: 250, snapshot: ["open", "ok", "open", "open"] }, definition).toString(), "test=ok");
 });
 
-test("the status parameters belong to the application and are dropped on an app switch", () => {
-  const href = "http://x/index.html?app=ci&turn=100&build=ok&test=ok&analyze=ok&review=ok&nerd=1";
+test("the category parameters belong to the application and are dropped on an app switch; speed stays between the apps that own it", () => {
+  const href = "http://x/index.html?app=ci&speed=100&build=ok&test=ok&analyze=ok&review=ok&nerd=1";
+  assert.equal(urlAfterAppSwitch(href, "ci", "counter"), "/index.html?app=ci&speed=100&nerd=1");
   assert.equal(urlAfterAppSwitch(href, "ci", "clock"), "/index.html?app=ci&nerd=1");
-  assert.equal(urlAfterAppSwitch(href, "ci", "ci"), "/index.html?app=ci&turn=100&build=ok&test=ok&analyze=ok&review=ok&nerd=1");
+  assert.equal(urlAfterAppSwitch(href, "ci", "ci"), "/index.html?app=ci&speed=100&build=ok&test=ok&analyze=ok&review=ok&nerd=1");
 });
 
 // ----- a small fake DOM and a recording shell
@@ -250,14 +260,27 @@ test("a send event action moves the cube, writes history to the Nerd drawer and 
   instance.dispose();
 });
 
+test("an action after dispose changes nothing", async () => {
+  const f = fixture();
+  f.release();
+  const instance = await mountStatus(f.root, q(""), f.ctx, f.env);
+  instance.dispose();
+  f.find("status-event").value = "start";
+  f.primary.spec.onClick();
+  const body = new El("div");
+  f.shell.nerd.render(body);
+  assert.deepEqual(body.children[1].children, [], "the workflow did not record the event");
+  assert.equal(f.pending.length, 0);
+});
+
 test("URL parameters set the quarter-turn time and the requested snapshot after loading", async () => {
   const f = fixture();
   f.release();
-  const instance = await mountStatus(f.root, q("turn=100&build=ok&review=blocked"), f.ctx, f.env);
+  const instance = await mountStatus(f.root, q("speed=100&build=ok&review=blocked"), f.ctx, f.env);
   assert.deepEqual(f.counts.speed[0], [75 / 100, "quarter-turn"]);
   assert.equal(f.find("status-speed").value, "100");
-  assert.equal(f.env.urlOwn, "turn=100", "the category parameters are consumed and leave the address bar");
-  assert.deepEqual(f.env.urlKeys, ["turn", "build", "test", "analyze", "review"]);
+  assert.equal(f.env.urlOwn, "speed=100", "the category parameters are consumed and leave the address bar");
+  assert.deepEqual(f.env.urlKeys, ["speed", "build", "test", "analyze", "review"]);
   assert.equal(f.find("status-viewer").dataset.requested, "ok,open,open,blocked");
   assert.equal(f.find("status-build").value, "ok");
   await settle(f);
@@ -265,14 +288,14 @@ test("URL parameters set the quarter-turn time and the requested snapshot after 
   f.find("status-speed").value = "50";
   f.find("status-speed").fire("change");
   assert.deepEqual(f.counts.speed.at(-1), [75 / 50, "quarter-turn"]);
-  assert.equal(f.env.urlOwn, "turn=50");
+  assert.equal(f.env.urlOwn, "speed=50");
   instance.dispose();
 });
 
 test("invalid URL parameters leave the defaults and request nothing", async () => {
   const f = fixture();
   f.release();
-  const instance = await mountStatus(f.root, q("turn=7&build=bogus"), f.ctx, f.env);
+  const instance = await mountStatus(f.root, q("speed=7&build=bogus"), f.ctx, f.env);
   assert.equal(f.find("status-speed").value, "250");
   assert.equal(f.pending.length, 0);
   assert.equal(f.find("status-viewer").dataset.requested, "open,open,open,open");

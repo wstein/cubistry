@@ -156,7 +156,33 @@ test("an unknown app resolves to the fallback and keeps no mode setup", () => {
   assert.deepEqual(r.app, { id: "clock", known: false });
   assert.deepEqual(r.setup, { kiosk: true });
 });
+test("ci owns the four category parameters, typed; speed stays global", () => {
+  const ci = MODE_CATALOG.find((m) => m.id === "ci");
+  assert.deepEqual([...ci.params].sort(), ["analyze", "build", "review", "test"]);
+  for (const key of ["build", "test", "analyze", "review"]) assert.equal(PARAM_SPECS[key].perMode, true, key);
+  assert.ok(!ci.params.includes("speed"));
+  assert.ok(GLOBAL_PARAMS.includes("speed"));
+  const r = parseRoute("?app=ci&speed=100&build=ok&test=blocked&analyze=bogus&val=3", registry, "clock");
+  assert.deepEqual(r.setup, { speed: 100, build: "ok", test: "blocked" });
+  assert.deepEqual(r.invalid, ["analyze"]);
+  assert.deepEqual(r.foreign, ["val"]);
+  assert.equal(serializeRoute({ app: "ci", setup: r.setup }), "?app=ci&speed=100&build=ok&test=blocked");
+});
 
+test("ci keeps global speed on a switch and drops the one-time category parameters", () => {
+  const q = "speed=100&build=ok&test=error&analyze=running&review=blocked";
+  assert.equal(decodeURIComponent(to(`${base}?app=ci&${q}`, "ci", "counter").toString()), "app=ci&speed=100");
+  assert.equal(decodeURIComponent(to(`${base}?app=counter&speed=100&build=ok`, "counter", "ci").toString()), "app=counter&speed=100");
+  for (const target of ["calendar7", "clock"]) {
+    assert.equal(
+      decodeURIComponent(to(`${base}?app=ci&${q}`, "ci", target).toString()),
+      "app=ci&speed=100",
+      target,
+    );
+  }
+});
+
+test("the banner style accepts exactly its six values and is not a per-mode value", () => {
   for (const v of ["theme", "rounded", "square", "underline", "boxed", "rounded-box"]) {
     const r = parseRoute(`?app=calendar7&banner=${v}`, registry, "clock");
     assert.deepEqual(r.setup, { banner: v }, v);
@@ -175,10 +201,16 @@ test("speed is global: it survives a switch between any two apps, also to apps t
       assert.equal(to(`${base}?app=${from}&speed=300`, from, target).get("speed"), "300", `${from} -> ${target}`);
     }
   }
-  for (const [from, target] of [["counter", "clock"], ["ms-timer", "hm-clock"], ["calendar7", "clock"], ["clock", "calendar7"]]) {
-    if (ids.includes(from) && ids.includes(target)) assert.equal(to(`${base}?app=${from}&speed=50`, from, target).get("speed"), "50");
+  for (const [from, target] of [
+    ["counter", "clock"],
+    ["ms-timer", "hm-clock"],
+    ["calendar7", "clock"],
+    ["clock", "calendar7"],
+  ]) {
+    if (ids.includes(from) && ids.includes(target)) {
+      assert.equal(to(`${base}?app=${from}&speed=50`, from, target).get("speed"), "50");
+    }
   }
-  // not owned by any mode, and not dropped from a pending app either
   assert.ok(GLOBAL_PARAMS.includes("speed"));
   assert.ok(!APP_SCOPED_PARAMS.includes("speed"));
   for (const m of MODE_CATALOG) assert.ok(!m.params.includes("speed"), m.id);
@@ -192,28 +224,10 @@ test("speed is the only addition to the global keys; other keys are still droppe
 });
 
 test("speed keeps its value domain for every app and is not reported as foreign", () => {
-  for (const id of ["counter", "clock", "calendar7", "ms-timer"]) {
+  for (const id of ["counter", "clock", "calendar7", "ms-timer", "ci"]) {
     assert.deepEqual(parseRoute(`?app=${id}&speed=250`, registry, "clock").setup.speed, 250, id);
     assert.deepEqual(parseRoute(`?app=${id}&speed=250`, registry, "clock").foreign, [], id);
     assert.deepEqual(parseRoute(`?app=${id}&speed=0`, registry, "clock").invalid, ["speed"], id);
     assert.deepEqual(parseRoute(`?app=${id}&speed=abc`, registry, "clock").invalid, ["speed"], id);
   }
-});
-});
-
-  const ci = MODE_CATALOG.find((m) => m.id === "ci");
-  assert.deepEqual([...ci.params].sort(), ["analyze", "build", "review", "test", "turn"]);
-  for (const key of ["build", "test", "analyze", "review"]) assert.equal(PARAM_SPECS[key].perMode, true, key);
-  assert.notEqual(PARAM_SPECS.turn.perMode, true);
-  const r = parseRoute("?app=ci&turn=100&build=ok&test=blocked&analyze=bogus&val=3", registry, "clock");
-  assert.deepEqual(r.setup, { turn: 100, build: "ok", test: "blocked" });
-  assert.deepEqual(r.invalid, ["analyze"]);
-  assert.deepEqual(r.foreign, ["val"]);
-  assert.equal(serializeRoute({ app: "ci", setup: r.setup }), "?app=ci&turn=100&build=ok&test=blocked");
-});
-
-test("ci keeps nothing of its setup when it is left: turn is its own, the category parameters are one-time", () => {
-  const q = "turn=100&build=ok&test=error&analyze=running&review=blocked";
-  for (const target of ["counter", "calendar7", "clock"]) assert.equal(to(`${base}?app=ci&${q}`, "ci", target).toString(), "app=ci", target);
-  assert.equal(to(`${base}?app=counter&turn=100&build=ok`, "counter", "ci").toString(), "app=counter");
 });

@@ -18,7 +18,7 @@ import {
   type Snapshot,
   type StatusDefinition,
 } from "./definition.ts";
-import { TURN_CHOICES, parseStatusParams, serializeStatusParams } from "./params.ts";
+import { SPEED_CHOICES, parseStatusParams, serializeStatusParams } from "./params.ts";
 import type { QualityPolicy } from "./policy.ts";
 
 export interface StatusViewer extends PhysicalView {
@@ -42,7 +42,10 @@ export interface StatusEnv {
   wait(ms: number): Promise<void>;
 }
 
-/** Test hooks (tests/browser/status-cube-hosted.spec.mjs): the controller and definition of the mounted mode. */
+/**
+ * Test hooks only (tests/status-mode.test.mjs, tests/browser/status-cube-hosted.spec.mjs); nothing in the product reads
+ * them. They are mutable module state like `statusController` in src/status.mjs and are cleared on dispose.
+ */
 export let statusController: StatusController | null = null;
 export let statusDefinition: StatusDefinition | null = null;
 
@@ -58,7 +61,7 @@ export async function mountStatus(
   const definition = validateStatusDefinition(env.definition);
   const workflow = new StatusWorkflow(definition);
   const wanted = parseStatusParams(params, definition);
-  const ownKeys = ["turn", ...definition.categories.map((c) => c.id)];
+  const ownKeys = ["speed", ...definition.categories.map((c) => c.id)];
   let ready = false,
     fatal = false,
     disposed = false,
@@ -124,7 +127,7 @@ export async function mountStatus(
     demoRunning = false;
   }
 
-  /** The address bar keeps `turn`; the category parameters are a one-time request and leave it once applied. */
+  /** The address bar keeps `speed`; the category parameters are a one-time request and leave it once applied. */
   function syncUrl(): void {
     if (!alive()) return;
     env.replaceParams?.(serializeStatusParams({ turnMs, snapshot: definition.initial }, definition), ownKeys);
@@ -175,7 +178,7 @@ export async function mountStatus(
   const speed = field(
     "status-speed",
     "Quarter-turn time",
-    TURN_CHOICES.map((ms) => [String(ms), `${ms} ms`] as const),
+    SPEED_CHOICES.map((ms) => [String(ms), `${ms} ms`] as const),
     (value) => {
       turnMs = Number(value);
       viewer?.setAnimationSpeed(env.baseMoveMs / turnMs, "quarter-turn");

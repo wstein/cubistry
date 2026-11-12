@@ -122,20 +122,21 @@ The cube stays a local simulation: there is no external CI service and no token.
 | Slot 1 "Simulated events" | Event category, simulated agent event, Run demo / Stop demo, Send rapid sequence, Finish active snapshot (accepted deviation from the design label "Refresh status"; owner decision 2026-11-12) |
 | Slot 2 "Workflow" | BUILD, TEST, ANALYZE, REVIEW selects and the quarter-turn time (accepted deviation from the design label "Workflow list"; same decision) |
 | Primary action | Send event; Reload application after a fatal failure |
-| Status chip | Loading, Moving, In sync, a workflow fault (failed attempt, unavailable prerequisite), or the stopped state |
+| Status chip | Loading, Moving, In sync, a workflow fault (failed attempt, unavailable prerequisite), or the error state after a load or playback failure |
 | Error row | A rejected event or the failure message |
-| Readout | Last completed snapshot, requested snapshot, committed HTM and session moves |
-| Nerd drawer | Recent local events (`nerd=1` opens it) |
+| Readout | Committed HTM of the active snapshot and session moves |
+| Nerd drawer | Last completed and requested snapshot, recent local events (`nerd=1` opens it) |
 
-URL parameters (`src/apps/status/params.ts`; all are dropped on an app switch). `turn`
-follows the speed control in the address bar without a history entry. The four
+URL parameters (`src/apps/status/params.ts`). `speed` follows the speed control in the
+address bar without a history entry and, like on the other pages, survives an app
+switch. The category parameters are dropped on an app switch. The four
 category parameters are a one-time request: once the print has loaded and the
 snapshot is requested they leave the address bar, so a reload starts from the
 initial snapshot:
 
 | Parameter | Values | Default |
 | --- | --- | --- |
-| `turn` | Quarter-turn time in ms: `500`, `250`, `100`, `50` | `250` |
+| `speed` | Quarter-turn time in ms, as on the single-cube pages: `2000`, `1000`, `500`, `250`, `100`, `50`, `10` | `250` |
 | `build`, `test`, `analyze`, `review` | `open`, `running`, `ok`, `error`, `blocked` | `open` |
 
 An invalid value falls back to the default of that parameter only. A requested
