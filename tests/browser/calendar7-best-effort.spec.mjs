@@ -44,7 +44,7 @@ async function captureViewer(page) {
   await page.getByRole("combobox", { name: "Banner style", exact: true }).selectOption("theme");
 }
 
-async function rawStrip(page) {
+async function rawFace(page) {
   return page.evaluate(async () => {
     const v = window.markerViewer, i = [...v.wrongIds][0], id = i + 1;
     const { faceFlatShare } = await import("/src/apps/calendar7/geometry.ts");
@@ -67,11 +67,12 @@ async function rawStrip(page) {
     // This rectangle is independently derived from the physical flat-face contract, not from wrongCellRect().
     const flatW = W * faceFlatShare(tile?.w ?? 1), flatH = H * faceFlatShare(tile?.h ?? 1);
     const rect = { x: (W - flatW) / 2, y: (H - flatH) / 2, w: flatW, h: flatH };
-    // The numeral box: the middle half of the flat face, where the printed label sits.
-    const label = { x0: rect.x + rect.w / 4, x1: rect.x + rect.w * 3 / 4, y0: rect.y + rect.h / 4, y1: rect.y + rect.h * 3 / 4 };
-    let labelPixels = 0, labelKept = 0;
+    // Central half of the flat face (hatch density measure only; the label ink itself is measured through originalInkPixels/inkKept).
+    const center = { x0: rect.x + rect.w / 4, x1: rect.x + rect.w * 3 / 4, y0: rect.y + rect.h / 4, y1: rect.y + rect.h * 3 / 4 };
+    let centerPixels = 0, centerKept = 0;
     const role = tileRoles(v.scheme, text, ink, "names"), grid = tileGrid(tile);
     const color = [1, 3, 5].map((j) => parseInt(role.ink.slice(j, j + 2), 16));
+    const bands = Array.from({ length: 4 }, () => ({ pixels: 0, changed: 0 }));
     let inkKept = 0, outsideChanged = 0, lanePixels = 0, laneChanged = 0, originalInkPixels = 0, light = 0, dark = 0;
     const lightColors = [], darkColors = [], scan = [];
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
@@ -81,9 +82,10 @@ async function rawStrip(page) {
       const inLane = x >= Math.ceil(rect.x) && x < Math.floor(rect.x + rect.w) && y >= Math.ceil(rect.y) && y < Math.floor(rect.y + rect.h);
       if (!aroundLane && changed) outsideChanged++;
       if (x >= Math.ceil(grid.cell.x0) && x < Math.floor(grid.cell.x1) && color.every((c, k) => Math.abs(b[p + k] - c) < 16)) { originalInkPixels++; if (!changed) inkKept++; }
-      if (x >= label.x0 && x < label.x1 && y >= label.y0 && y < label.y1) { labelPixels++; if (!changed) labelKept++; }
+      if (x >= center.x0 && x < center.x1 && y >= center.y0 && y < center.y1) { centerPixels++; if (!changed) centerKept++; }
       if (inLane) {
         lanePixels++; if (changed) laneChanged++;
+        const band = bands[Math.min(3, Math.floor((y - rect.y) / rect.h * 4))]; band.pixels++; if (changed) band.changed++;
         if (changed && Math.min(a[p], a[p + 1], a[p + 2]) > 230) { light++; lightColors.push([a[p], a[p + 1], a[p + 2]]); }
         if (changed && Math.max(a[p], a[p + 1], a[p + 2]) < 125) { dark++; darkColors.push([a[p], a[p + 1], a[p + 2]]); }
       }
@@ -102,11 +104,11 @@ async function rawStrip(page) {
     window.markerArtwork = v.art.find((entry) => entry.canvas === actual);
     const row = 4 - v.pose.pos[3 * i + 1], column = v.pose.pos[3 * i] + 4;
     const desired = document.querySelectorAll(".c7-sheet tr")[row - 1].children[column - 1].textContent;
-    return { id, text, desired, ink, W, H, rect, flatH, flatW, labelPixels, labelKept, inkKept, outsideChanged, lanePixels, laneChanged, originalInkPixels, light, dark, lightColors, darkColors, runs, gaps, expectedFill: role.fill, actualFill: v.cube.faceColorOf.get(id), stable: ctx.getContextAttributes().willReadFrequently && original.getContextAttributes().willReadFrequently };
+    return { id, text, desired, ink, W, H, rect, flatH, flatW, centerPixels, centerKept, inkKept, outsideChanged, lanePixels, laneChanged, bands, originalInkPixels, light, dark, lightColors, darkColors, runs, gaps, expectedFill: role.fill, actualFill: v.cube.faceColorOf.get(id), stable: ctx.getContextAttributes().willReadFrequently && original.getContextAttributes().willReadFrequently };
   });
 }
 
-async function projectedStrip(page) {
+async function projectedFace(page) {
   return page.evaluate(async () => {
     const v = window.markerViewer, mesh = v.wrongMeshes[0];
     const Vector3 = v.camera.position.constructor, Quaternion = v.camera.quaternion.constructor;
@@ -184,14 +186,15 @@ test("February 2037 and 2043 keep one mismatch sentence and the accessible inten
 for (const scheme of ["paper-red", "dracula"]) test(`${scheme}: the original printed face keeps only a translucent whole-face hatch through three views`, async ({ page }) => {
   const errors = []; page.on("pageerror", (error) => errors.push(error.message));
   await stableCanvasReadback(page); await open(page, 2037, scheme); await captureViewer(page);
-  const raw = await rawStrip(page);
+  const raw = await rawFace(page);
   expect(raw.stable).toBe(true);
   expect(raw.text).not.toBe(raw.desired);
   expect(raw.outsideChanged, "no gray wash, frame or changed printing outside the flat face").toBe(0);
   expect(raw.inkKept, "pixels of the printed label stay exactly as printed between the hatch lines").toBeGreaterThan(30);
   expect(raw.inkKept / raw.originalInkPixels, "the hatch leaves at least 35 percent of the label ink untouched").toBeGreaterThan(0.35);
-  expect(raw.labelKept / raw.labelPixels, "the hatch leaves at least 40 percent of the label area untouched").toBeGreaterThan(0.4);
-  expect(raw.lanePixels, "the hatch covers the whole flat face").toBeGreaterThan(raw.flatW * raw.flatH * 0.9);
+  expect(raw.centerKept / raw.centerPixels, "the hatch leaves at least 40 percent of the central half of the flat face untouched").toBeGreaterThan(0.4);
+  expect(raw.lanePixels, "the measured area is the whole flat face").toBeGreaterThan(raw.flatW * raw.flatH * 0.9);
+  for (const [k, band] of raw.bands.entries()) expect(band.changed / band.pixels, `the hatch changes pixels in band ${k + 1} of 4 of the flat face (top to bottom)`).toBeGreaterThan(0.5 * raw.laneChanged / raw.lanePixels);
   expect(raw.actualFill, "the cut faces retain the original role fill").toBe(raw.expectedFill);
   expect(raw.laneChanged).toBeGreaterThan(raw.lanePixels * 0.05);
   expect(raw.gaps.length, "at least six internal transparent gaps each preserve two exact original pixels").toBeGreaterThanOrEqual(6);
@@ -201,7 +204,7 @@ for (const scheme of ["paper-red", "dracula"]) test(`${scheme}: the original pri
   const views = [];
   for (const [dx, dy] of [[0, 0], [-90, 20], [60, -30], [-120, -60]]) {
     if (dx || dy) await drag(page, dx, dy);
-    const geometry = await projectedStrip(page);
+    const geometry = await projectedFace(page);
     if (geometry.cos < MIN_COS) continue;
     const photo = await photograph(page, geometry); views.push(photo);
     expect(photo.inside, "the hatch is visible on the projected physical face").toBeGreaterThan(8);
