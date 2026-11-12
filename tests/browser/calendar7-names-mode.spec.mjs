@@ -47,9 +47,11 @@ test("outside the window the names layout shows the month from print B, display 
   await expect(page.getByRole("combobox", { name: "Cube layout", exact: true })).toHaveValue("names");
   expect(await row1(page)).toEqual(["MA", "Y", "", "", "", "", ""]);
   // The date form moves into the window: January 2028 is on the chain (names layout, Previous and Next, no notice).
-  await page.getByLabel("Year").fill("2028");
-  await page.getByLabel("Month").selectOption("1");
-  await page.getByRole("button", { name: "Show" }).click();
+  // Exact names: the month picker trigger contains the substrings "month" and "year".
+  // The Month control is a combobox; its label text also lists every option.
+  await page.getByLabel("Year", { exact: true }).fill("2028");
+  await page.getByRole("combobox", { name: "Month", exact: true }).selectOption("1");
+  await page.getByRole("button", { name: "Show", exact: true }).click();
   await at(page, "2028-01");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "off", { timeout: 30000 });
   await expect(notice).toBeHidden();

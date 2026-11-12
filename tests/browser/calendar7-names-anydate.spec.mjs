@@ -68,9 +68,9 @@ test("February 2000, 2024 (leap) and 2100 (not leap) show their own boards; the 
   const digests = new Set([await page.locator(ROOT).getAttribute("data-c7-digest")]);
   expect(digests.has((await faceOf(page, 2100, 2)).digest)).toBe(true);
   for (const [year, label] of [[2000, "2000"], [2024, "2024"]]) {
-    await page.getByLabel("Year").fill(label);
-    await page.getByLabel("Month").selectOption("2");
-    await page.getByRole("button", { name: "Show" }).click();
+    await page.getByLabel("Year", { exact: true }).fill(label);
+    await page.getByRole("combobox", { name: "Month", exact: true }).selectOption("2");
+    await page.getByRole("button", { name: "Show", exact: true }).click();
     await at(page, `${year}-02`);
     await idle(page);
     await expect(page).toHaveURL(new RegExp(`year=${year}&month=2`));

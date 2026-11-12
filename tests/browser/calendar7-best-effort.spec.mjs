@@ -98,9 +98,9 @@ for (const scheme of ["paper-red", "dracula"])
 
 test("an exact month shows no hatched cell and publishes none; going from best effort to an exact month removes it", async ({ page }) => {
   await open(page, 2037);
-  await page.getByLabel("Year").fill("2024");
-  await page.getByLabel("Month").selectOption("2");
-  await page.getByRole("button", { name: "Show" }).click();
+  await page.getByLabel("Year", { exact: true }).fill("2024");
+  await page.getByRole("combobox", { name: "Month", exact: true }).selectOption("2");
+  await page.getByRole("button", { name: "Show", exact: true }).click();
   await at(page, "2024-02");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "state");
   await expect(canvas(page)).not.toHaveAttribute("data-c7-wrong", /.+/);

@@ -319,3 +319,31 @@
 .c7-sheet td { position: relative; }
 .c7-sheet td canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
 .c7-cell-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* The month picker stays outside the calendar body so date updates preserve its trigger and focus. */
+.c7-date-choice { position: relative; width: fit-content; max-width: 100%; margin-block: .5rem 1rem; z-index: 5; }
+.c7-picker-trigger { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; box-sizing: border-box; min-height: 44px; min-width: min(15rem, 100%); max-width: 100%; padding: .6rem .9rem; color: var(--ink, #153b61); background: var(--surface, #fffdf6); border: 1px solid var(--line, #c8c5b9); border-radius: .6rem; font: inherit; }
+.c7-picker-popup { position: fixed; inset: auto; z-index: 50; width: min(27rem, calc(100vw - 1rem)); max-height: min(36rem, 80vh); overflow: auto; box-sizing: border-box; padding: .6rem; color: var(--ink, #153b61); background: var(--surface, #fffdf6); border: 1px solid var(--line, #c8c5b9); border-radius: .65rem; box-shadow: 0 .5rem 1.5rem #0003; }
+.c7-picker-popup[hidden] { display: none; }
+.c7-picker-header { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; text-align: center; gap: .25rem; }
+.c7-picker-popup button { min-height: 44px; min-width: 0; padding: .3rem; border: 1px solid transparent; border-radius: .35rem; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.c7-picker-popup button:hover { background: color-mix(in srgb, currentColor 8%, transparent); }
+.c7-picker-popup button:focus-visible, .c7-picker-trigger:focus-visible, .c7-picker-footer input:focus-visible { outline: 3px solid var(--focus, #9e0b5c); outline-offset: 2px; }
+.c7-picker-popup button[aria-selected="true"] { background: #9e0b5c; color: #ffffff; }
+.c7-picker-popup button:disabled { opacity: .4; cursor: default; }
+.c7-picker-body { display: flex; gap: .4rem; }
+.c7-picker-grid { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: .15rem; }
+.c7-picker-months > [role="row"] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .15rem; }
+.c7-picker-years > [role="row"] { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .15rem; }
+.c7-picker-decades { display: flex; flex-direction: column; flex: 0 0 5.2rem; border-right: 1px solid var(--line, #c8c5b9); }
+.c7-picker-decades button { font-size: .8em; }
+.c7-picker-decades [aria-current="true"] { color: #9e0b5c; font-weight: 700; }
+.c7-picker-footer { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .4rem; border-top: 1px solid var(--line, #c8c5b9); padding-top: .4rem; }
+.c7-picker-footer label { display: flex; gap: .4rem; align-items: center; font-size: .85em; }
+.c7-picker-footer input { box-sizing: border-box; width: 5.5rem; min-height: 44px; color: inherit; background: var(--surface, #fffdf6); border: 1px solid var(--line, #c8c5b9); border-radius: .3rem; font: inherit; }
+@media (max-width: 400px) { .c7-picker-popup { font-size: .86rem; } .c7-picker-decades { flex-basis: 4.5rem; } }
+/* Phones scroll the cube with the page. Keep the trigger's touch size and spend less vertical space so playback still fits the stage. */
+@media (max-width: 699px) {
+  .c7-date-choice { margin-block: 0 .25rem; }
+  .c7-picker-trigger { padding-block: .25rem; }
+}
