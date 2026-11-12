@@ -39,13 +39,14 @@ test.beforeEach(() => {
 });
 
 const open = async (page) => {
-  await page.goto("/playground.html");
-  await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
+  await page.goto("/index.html?app=playground");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-ready", "true");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("aria-busy", "false");
   await page.locator("#pictures > summary").click();
 };
 const loaded = async (page) => {
-  await expect(page.locator("#cube")).toHaveAttribute("data-style", "upload", { timeout: 30000 });
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-style", "upload", { timeout: 30000 });
+  await expect(page.locator("#playground-cube")).toHaveAttribute("aria-busy", "false");
 };
 // The average color of a slot preview, read back through a canvas.
 const slotColor = (page, face) =>
@@ -64,27 +65,27 @@ test("six PNG files named by face load as a new design and can be played", async
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("request", (r) => requests.push(r.url()));
   await open(page);
-  await expect(page.locator('#design option[value="upload"]')).toHaveJSProperty("disabled", true);
+  await expect(page.locator('#playground-design option[value="upload"]')).toHaveJSProperty("disabled", true);
   const before = requests.length;
   await page.locator("#upload-input").setInputFiles(six());
   await loaded(page);
   await expect(page.locator("#upload-status")).toContainText("All six faces are ready", { timeout: UPLOAD_MS });
-  await expect(page.locator("#design")).toHaveValue("upload");
-  await expect(page.locator('#design option[value="upload"]')).toHaveJSProperty("disabled", false);
+  await expect(page.locator("#playground-design")).toHaveValue("upload");
+  await expect(page.locator('#playground-design option[value="upload"]')).toHaveJSProperty("disabled", false);
   for (const f of FACES) await expect(page.locator(`#upload-net [data-face="${f}"]`)).toHaveAttribute("data-filled", "true");
-  await page.locator("#notation").fill("R U");
-  await page.locator("#notation").press("Enter");
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  await expect(page.locator("#cube")).toHaveAttribute("data-cursor", "2");
+  await page.locator("#playground-notation").fill("R U");
+  await page.locator("#playground-notation").press("Enter");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-cursor", "2");
   // Nothing was sent anywhere: no request after the upload left this page's origin.
   const after = requests.slice(before).filter((u) => !u.startsWith("blob:") && !u.startsWith("data:"));
   expect(after.filter((u) => !u.startsWith("http://127.0.0.1"))).toEqual([]);
   expect(errors).toEqual([]);
   // Removing the pictures returns to a built-in design.
   await page.locator("#upload-clear").click();
-  await expect(page.locator("#design")).toHaveValue("picture");
-  await expect(page.locator("#cube")).toHaveAttribute("data-style", "picture");
-  await expect(page.locator('#design option[value="upload"]')).toHaveJSProperty("disabled", true);
+  await expect(page.locator("#playground-design")).toHaveValue("picture");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-style", "picture");
+  await expect(page.locator('#playground-design option[value="upload"]')).toHaveJSProperty("disabled", true);
 });
 
 test("one net image in the cross layout is cut into the six faces", async ({ page }) => {
@@ -107,7 +108,7 @@ test("a net that is not 4:3 falls back to the six slots without changing the des
   const odd = { name: "odd.png", mimeType: "image/png", buffer: pngOf(300, 300, () => [10, 20, 30]) };
   await page.locator("#upload-input").setInputFiles(odd);
   await expect(page.locator("#upload-status")).toContainText("not a 4:3 cross", { timeout: UPLOAD_MS });
-  await expect(page.locator("#cube")).toHaveAttribute("data-style", "picture");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-style", "picture");
   await expect(page.locator('#upload-net [data-face="U"]')).toBeFocused();
 });
 
@@ -155,7 +156,7 @@ test("untrusted files are refused with a reason and never change the design", as
   }
   await input.setInputFiles(Array.from({ length: 7 }, (_, i) => faceFile("F", 8)).map((f, i) => ({ ...f, name: `${i}.png` })));
   await expect(page.locator("#upload-status")).toContainText("not 7 files", { timeout: UPLOAD_MS });
-  await expect(page.locator("#cube")).toHaveAttribute("data-style", "picture");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-style", "picture");
   await expect(page.locator("#upload-status")).toHaveAttribute("data-tone", "error");
 });
 
@@ -195,10 +196,10 @@ test("resolution hint warns about small PNG faces for the chosen cube size", asy
 test("suitability display: built-in set at N=2 and N=5, and an uploaded set", async ({ page }) => {
   test.slow();
   await open(page);
-  await page.locator("#design").selectOption("seasons");
+  await page.locator("#playground-design").selectOption("seasons");
   // Loading a picture set takes a while under software GL: wait for the condition, not for a time.
-  await expect(page.locator("#cube")).toHaveAttribute("data-style", "seasons", { timeout: 60000 });
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false", { timeout: 60000 });
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-style", "seasons", { timeout: 60000 });
+  await expect(page.locator("#playground-cube")).toHaveAttribute("aria-busy", "false", { timeout: 60000 });
   await expect(page.locator("#fit")).toHaveAttribute("aria-busy", "false", { timeout: 60000 });
   await expect(page.locator("#fit-summary")).toContainText(/Good fit\. 0 stickers flat, 0 identical groups, 0 rotation-ambiguous/, { timeout: UPLOAD_MS });
   await expect(page.locator("#fit")).toHaveAttribute("data-light", "green");
@@ -215,7 +216,7 @@ test("suitability display: built-in set at N=2 and N=5, and an uploaded set", as
   // one live region for the whole panel
   await expect(page.locator("#pictures [role=status]")).toHaveCount(1);
   // advice never blocks: the puzzle can still be played at N=5 in the display
-  await expect(page.locator("#design")).toBeEnabled();
+  await expect(page.locator("#playground-design")).toBeEnabled();
   // An uploaded set made of flat faces is a poor fit and shows thumbnails of its stickers.
   await page.locator("#picture-size").selectOption("2");
   const flat = FACES.map((f) => ({ name: `${f}.png`, mimeType: "image/png", buffer: pngOf(200, 200, () => HUES[f]) }));
@@ -272,8 +273,8 @@ test("a failed load is reported, changes nothing and leaves nothing selectable",
   await page.locator("#upload-input").setInputFiles(huge);
   await expect(page.locator("#upload-status")).toContainText(/too large|could not be loaded|rejected/, { timeout: 30000 });
   await expect(page.locator("#upload-status")).toHaveAttribute("data-tone", "error");
-  await expect(page.locator('#design option[value="upload"]')).toHaveJSProperty("disabled", true);
-  await expect(page.locator("#design")).toHaveValue("picture");
+  await expect(page.locator('#playground-design option[value="upload"]')).toHaveJSProperty("disabled", true);
+  await expect(page.locator("#playground-design")).toHaveValue("picture");
   for (const f of FACES) await expect(page.locator(`#upload-net [data-face="${f}"]`)).toHaveAttribute("data-filled", "false");
 });
 
@@ -290,7 +291,7 @@ test("replacing pictures is atomic, and removing them is queued behind a running
   await page.locator("#upload-input").setInputFiles(six(160));
   await page.locator("#upload-clear").click();
   await expect(page.locator("#upload-status")).toContainText("Your pictures were removed", { timeout: 30000 });
-  await expect(page.locator("#design")).toHaveValue("picture");
+  await expect(page.locator("#playground-design")).toHaveValue("picture");
   for (const f of FACES) await expect(page.locator(`#upload-net [data-face="${f}"]`)).toHaveAttribute("data-filled", "false");
 });
 

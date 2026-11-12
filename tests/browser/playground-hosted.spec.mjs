@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
-// The Picture Cube as a mode of the host (index.html?app=playground). The old page /playground.html keeps its own spec
-// (playground.spec.mjs) unchanged until the page is retired; these cases cover what the mount adds: the dock slots,
-// the lifecycle on an app switch and the address bar.
+// The Picture Cube as a mode of the host (index.html?app=playground). playground.spec.mjs and
+// playground-upload.spec.mjs cover the 2x2 functions and the pictures panel; these cases cover what the mount adds:
+// the dock slots, the lifecycle on an app switch and the address bar.
 const cube = (page) => page.locator("#playground-cube");
 async function ready(page, search = "?app=playground") {
   await page.goto(`/index.html${search}`);
