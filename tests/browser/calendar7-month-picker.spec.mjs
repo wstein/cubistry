@@ -55,16 +55,17 @@ test("year browsing reaches years 1 and 9999 and rejects invalid edits without n
   await at(page, "2026-11");
   await page.getByRole("gridcell", { name: "January 2028", exact: true }).click();
   await at(page, "2028-01");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "off");
+  // The beam window is May 2026 to June 2027: later months show a display-only preview (kind "state"), not a chain month ("off").
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "state");
+  await expect(page.locator("[data-c7-any-range]")).toContainText("Display only: no move sequence for this date");
   await trigger(page).click();
   await page.getByRole("button", { name: "Choose year", exact: true }).click();
   await jump.fill("1");
   await jump.press("Enter");
   await page.getByRole("gridcell", { name: "1", exact: true }).click();
   await page.getByRole("gridcell", { name: "January 1", exact: true }).click();
-  await expect(page.getByText("January 1 is outside the proven chain")).toBeVisible();
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "off");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-month", "2028-01");
+  await at(page, "1-01");
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "state");
   await trigger(page).click();
   await expect(page.getByRole("button", { name: "Previous year", exact: true })).toBeDisabled();
   await page.keyboard.press("Escape");
@@ -73,7 +74,8 @@ test("year browsing reaches years 1 and 9999 and rejects invalid edits without n
   await jump.press("Enter");
   await page.getByRole("gridcell", { name: "9999", exact: true }).click();
   await page.getByRole("gridcell", { name: "December 9999", exact: true }).click();
-  await expect(page.getByText("December 9999 is outside the proven chain")).toBeVisible();
+  await at(page, "9999-12");
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "state");
   await trigger(page).click();
   await expect(page.getByRole("button", { name: "Next year", exact: true })).toBeDisabled();
   expect(errors).toEqual([]);
