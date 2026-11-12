@@ -1,0 +1,12 @@
+{
+"schema":"cubistry.calendar7.best-effort",
+"version":1,
+"status":"research candidate, not certified, not for release",
+"license":"Created by Werner Stein with AI assistance (Codex and Claude, OpenAI and Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.",
+"spdx":"CC-BY-SA-4.0",
+"wrong":"[row, column], 1-based, row-major: the front cells that differ from the display of the month (the fewest the print allows); the red digit shown there is the sticker text",
+"evidence":"months.tsv of the artifact: status unknown, reason best_effort_edge_unconfirmed (the edge is replay-checked here; the Julia and Flix chain checkers report it as best effort, not as a confirmed edge)",
+"months":[
+  {"year":2026,"month":2,"wrong":[[7,1]],"text":"29","ink":"red"}
+]
+}

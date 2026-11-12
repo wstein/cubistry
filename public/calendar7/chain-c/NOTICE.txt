@@ -1,0 +1,9 @@
+Names (long chain, print C, January 2019 - January 2036)
+Long chain from the solved cube (January 2019, "Magic Date") to January 2036: 205 states, 204 edges, 23315 HTM, 27548 QTM. One best-effort month, February 2026: the front differs from its display in row 7, column 1 (the red 29).
+Status: research candidate, not certified, not for release. Print C is not frozen. The best-effort edge is not confirmed by the checkers (months.tsv: unknown). No shortest-route, global-print or build-certification claim.
+Created by Werner Stein with AI assistance (Codex and Claude, OpenAI and Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+Source: research/calendar-7x7/row1-window-chain evidence/print-c on research/cube-display-feasibility (549c07b0ee843d2e07eed2b71ad9b7418e965a8d); chain artifact of workflow run 43307881914.
+Regenerate with scripts/export-calendar7-chain-c.mjs. The shipped files public/calendar7/names/*, names-demo/*, state.v1.json, graph.v1.json and displays.v1.json are not changed by this folder.
