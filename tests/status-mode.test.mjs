@@ -101,8 +101,11 @@ class El {
   removeEventListener(type, fn) {
     this.listeners[type] = (this.listeners[type] ?? []).filter((f) => f !== fn);
   }
-  fire(type) {
-    for (const fn of this.listeners[type] ?? []) fn({ type });
+  focus() {
+    El.focused = this;
+  }
+  fire(type, extra = {}) {
+    for (const fn of this.listeners[type] ?? []) fn({ type, preventDefault() {}, ...extra });
   }
   find(id) {
     if (this.id === id) return this;
@@ -209,7 +212,7 @@ test("mount fills dock slots 1 and 2, the chip, primary action, readout and the 
   const loading = mountStatus(f.root, q(""), f.ctx, f.env);
   await flush();
   assert.deepEqual(f.shell.chip, { state: "sync", text: "Loading the fixed workflow print…" });
-  assert.equal(f.find("status-build").disabled, true, "controls wait for the print");
+  assert.equal(f.find("status-build").attrs["aria-disabled"], "true", "controls wait for the print");
   f.release();
   const instance = await loading;
   assert.equal(typeof instance?.dispose, "function");
@@ -280,15 +283,16 @@ test("URL parameters set the quarter-turn time and the requested snapshot after 
   f.release();
   const instance = await mountStatus(f.root, q("speed=100&build=ok&review=blocked"), f.ctx, f.env);
   assert.deepEqual(f.counts.speed[0], [75 / 100, "quarter-turn"]);
-  assert.equal(f.find("status-speed").value, "100");
+  assert.equal(f.find("status-speed").dataset.value, "100");
+  assert.equal(f.find("status-speed").value, "4", "the slider sits on the stop of 100 ms");
   assert.equal(f.env.urlOwn, "speed=100", "the category parameters are consumed and leave the address bar");
   assert.deepEqual(f.env.urlKeys, ["speed", "build", "test", "analyze", "review"]);
   assert.equal(f.find("status-viewer").dataset.requested, "ok,open,open,blocked");
-  assert.equal(f.find("status-build").value, "ok");
+  assert.equal(f.find("status-build").dataset.value, "ok");
   await settle(f);
   assert.equal(f.find("status-viewer").dataset.current, "ok,open,open,blocked");
-  f.find("status-speed").value = "50";
-  f.find("status-speed").fire("change");
+  f.find("status-speed").value = "5";
+  f.find("status-speed").fire("input");
   assert.deepEqual(f.counts.speed.at(-1), [75 / 50, "quarter-turn"]);
   assert.equal(f.env.urlOwn, "speed=50");
   instance.dispose();
@@ -298,7 +302,7 @@ test("invalid URL parameters leave the defaults and request nothing", async () =
   const f = fixture();
   f.release();
   const instance = await mountStatus(f.root, q("speed=7&build=bogus"), f.ctx, f.env);
-  assert.equal(f.find("status-speed").value, "250");
+  assert.equal(f.find("status-speed").dataset.value, "250");
   assert.equal(f.pending.length, 0);
   assert.equal(f.find("status-viewer").dataset.requested, "open,open,open,open");
   instance.dispose();
@@ -362,11 +366,121 @@ test("a failed print load keeps the controls off, shows the error and offers Rel
   const drawer = new El("div");
   f.shell.nerd.render(drawer);
   assert.equal(drawer.children[0].children[1].textContent, "Not configured");
-  assert.equal(f.find("status-build").disabled, true);
+  assert.equal(f.find("status-build").attrs["aria-disabled"], "true");
+  assert.ok(f.find("status-build-ok").disabled);
   assert.equal(f.find("status-viewer").dataset.sync, "failed");
   assert.equal(f.primary.spec.label, "Reload application");
   assert.equal(f.primary.disabled, false);
   f.primary.spec.onClick();
   assert.equal(f.counts.reloads, 1);
+  instance.dispose();
+});
+
+// ----- chip rows, presets and the speed slider of slot 2
+const CATEGORIES = ["build", "test", "analyze", "review"];
+const STATES = ["open", "running", "ok", "error", "blocked"];
+const chipOf = (f, category, state) => f.find(`status-${category}-${state}`);
+const requested = (f) => f.find("status-viewer").dataset.requested;
+
+test("slot 2 has one radio group per category with all five states as chips, in slot order, then the speed slider", async () => {
+  const f = fixture();
+  f.release();
+  const instance = await mountStatus(f.root, q(""), f.ctx, f.env);
+  const [presets, ...rest] = f.slots[2].element.map((e) => e);
+  assert.deepEqual(rest.map((e) => e.children[1]?.id ?? e.children[0]?.id), ["status-build", "status-test", "status-analyze", "status-review", "status-speed"]);
+  assert.deepEqual(presets.children.map((b) => b.id), ["status-preset-open", "status-preset-ok", "status-preset-test-fails"]);
+  for (const category of CATEGORIES) {
+    const group = f.find(`status-${category}`);
+    assert.equal(group.attrs.role, "radiogroup");
+    assert.deepEqual(group.children.map((c) => c.dataset.value), STATES);
+    assert.deepEqual(group.children.map((c) => c.children[1].textContent), ["Open", "Running", "OK", "Error", "Blocked"]);
+    assert.ok(group.children.every((c) => c.children[0].textContent.length > 0), "every chip has a symbol");
+    assert.equal(group.dataset.value, "open");
+  }
+  instance.dispose();
+});
+
+test("clicking a chip requests that state for that category only, for every chip", async () => {
+  for (const category of CATEGORIES)
+    for (const state of STATES) {
+      const f = fixture();
+      f.release();
+      const instance = await mountStatus(f.root, q(""), f.ctx, f.env);
+      chipOf(f, category, state).fire("click");
+      const want = CATEGORIES.map((c) => (c === category ? state : "open")).join(",");
+      assert.equal(requested(f), want, `${category} ${state}`);
+      assert.equal(f.find(`status-${category}`).dataset.value, state);
+      instance.dispose();
+    }
+});
+
+test("arrow keys on a chip request the neighbor state through the same action", async () => {
+  const f = fixture();
+  f.release();
+  const instance = await mountStatus(f.root, q(""), f.ctx, f.env);
+  chipOf(f, "test", "open").fire("keydown", { key: "ArrowRight" });
+  assert.equal(requested(f), "open,running,open,open");
+  assert.equal(El.focused, chipOf(f, "test", "running"));
+  chipOf(f, "test", "running").fire("keydown", { key: "ArrowLeft" });
+  assert.equal(requested(f), "open,open,open,open");
+  instance.dispose();
+});
+
+test("the URL parameters check the chips of the requested snapshot", async () => {
+  const f = fixture();
+  f.release();
+  const instance = await mountStatus(f.root, q("build=ok&review=blocked"), f.ctx, f.env);
+  assert.deepEqual(CATEGORIES.map((c) => f.find(`status-${c}`).dataset.value), ["ok", "open", "open", "blocked"]);
+  assert.equal(chipOf(f, "build", "ok").attrs["aria-checked"], "true");
+  assert.equal(chipOf(f, "build", "open").attrs["aria-checked"], "false");
+  instance.dispose();
+});
+
+test("presets set all four categories through the manual path: All open, All ok, Test fails", async () => {
+  const f = fixture();
+  f.release();
+  const instance = await mountStatus(f.root, q(""), f.ctx, f.env);
+  f.find("status-preset-ok").fire("click");
+  assert.equal(requested(f), "ok,ok,ok,ok");
+  assert.deepEqual(CATEGORIES.map((c) => f.find(`status-${c}`).dataset.value), ["ok", "ok", "ok", "ok"], "the chips follow");
+  await settle(f);
+  f.find("status-preset-test-fails").fire("click");
+  assert.equal(requested(f), "ok,error,blocked,open", "build=ok, test=error, analyze=blocked, review=open");
+  assert.deepEqual(CATEGORIES.map((c) => f.find(`status-${c}`).dataset.value), ["ok", "error", "blocked", "open"]);
+  await settle(f);
+  assert.equal(f.find("status-viewer").dataset.current, "ok,error,blocked,open");
+  f.find("status-preset-open").fire("click");
+  assert.equal(requested(f), "open,open,open,open");
+  await settle(f);
+  const body = new El("div");
+  f.shell.nerd.render(body);
+  assert.match(body.children[1].children.map((li) => li.textContent).join("|"), /Manual: test → error/, "the same history note as a manual choice");
+  instance.dispose();
+});
+
+test("presets and chips are off while the print loads and after a failure", async () => {
+  const f = fixture();
+  const loading = mountStatus(f.root, q(""), f.ctx, f.env);
+  await flush();
+  for (const id of ["status-preset-open", "status-preset-ok", "status-preset-test-fails", "status-build-ok", "status-speed"]) assert.equal(f.find(id).disabled, true, id);
+  f.release();
+  const instance = await loading;
+  for (const id of ["status-preset-open", "status-build-ok", "status-speed"]) assert.equal(f.find(id).disabled, false, id);
+  instance.dispose();
+});
+
+test("the speed slider sets the viewer speed and the address bar for every stop", async () => {
+  const f = fixture();
+  f.release();
+  const instance = await mountStatus(f.root, q(""), f.ctx, f.env);
+  const input = f.find("status-speed");
+  assert.equal(input.attrs.type, "range");
+  for (const [i, ms] of [2000, 1000, 500, 250, 100, 50, 10].entries()) {
+    input.value = String(i);
+    input.fire("input");
+    assert.deepEqual(f.counts.speed.at(-1), [75 / ms, "quarter-turn"], `${ms} ms`);
+    assert.equal(f.env.urlOwn, ms === 250 ? "" : `speed=${ms}`);
+    assert.equal(input.dataset.value, String(ms));
+  }
   instance.dispose();
 });
