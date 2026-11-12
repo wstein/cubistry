@@ -22,20 +22,21 @@ async function sameGround(page){return page.evaluate(()=>{const cells=[...docume
  return css.every((v,k)=>v===pixel[k]);
 });});}
 
-// One test per theme and half of the font list: a single 28-step loop took 22 s on a CI runner and 31 s on a loaded one (limit 30 s, issue #444).
-const FONT_COUNT=14,CHUNK=7;
+// One test per theme and four fonts: a single 28-step loop took 22 s on a CI runner and 31 s on a loaded one (limit 30 s, issue #444).
+const FONT_COUNT=14,CHUNK=4;
 async function openAugust(page,theme){
  await page.emulateMedia({colorScheme:'light'});
  await page.goto('/index.html?app=calendar7&year=2026&month=8');
  await expect(page.locator('[data-c7-month]')).toHaveAttribute('data-c7-month','2026-08',{timeout:30000});
+ const digest=await page.locator('[data-c7-digest]').getAttribute('data-c7-digest');
  const ids=await page.getByLabel('Font style',{exact:true}).locator('option').evaluateAll(options=>options.map(o=>o.value));expect(ids).toHaveLength(FONT_COUNT);
  await page.emulateMedia({colorScheme:theme});
  await expect.poll(()=>sameGround(page),{message:`canvas follows ${theme} before changing fonts`}).toBe(true);
- return ids;
+ return {ids,digest};
 }
 for(const theme of ['light','dark'])for(let from=0;from<FONT_COUNT;from+=CHUNK){
- test(`font styles ${from + 1} to ${from + CHUNK} retain the accessible HTML palette in the ${theme} theme`,async({page})=>{
-  const ids=(await openAugust(page,theme)).slice(from,from+CHUNK);expect(ids).toHaveLength(CHUNK);
+ test(`font styles ${from + 1} to ${Math.min(from + CHUNK,FONT_COUNT)} retain the accessible HTML palette in the ${theme} theme`,async({page})=>{
+  const ids=(await openAugust(page,theme)).ids.slice(from,from+CHUNK);expect(ids.length).toBeGreaterThan(0);
   for(const id of ids){
    await page.getByLabel('Font style',{exact:true}).selectOption(id);await expect(page.locator('[data-c7-font]').filter({has:page.locator('.c7-sheet')})).toHaveAttribute('data-c7-font',id);
    for(const cell of await sample(page)){
@@ -48,8 +49,10 @@ for(const theme of ['light','dark'])for(let from=0;from<FONT_COUNT;from+=CHUNK){
 }
 
 test('an explicit theme redraws the canvases without changing the month digest',async({page})=>{
- await openAugust(page,'light');
- const digest=await page.locator('[data-c7-digest]').getAttribute('data-c7-digest');
+ const {ids,digest}=await openAugust(page,'dark');
+ const last=ids[FONT_COUNT-1];
+ await page.getByLabel('Font style',{exact:true}).selectOption(last);
+ await expect(page.locator('[data-c7-font]').filter({has:page.locator('.c7-sheet')})).toHaveAttribute('data-c7-font',last);
  for(const theme of ['light','dark']){
   await page.evaluate(t=>document.documentElement.dataset.theme=t,theme);
   await expect.poll(()=>sameGround(page),{message:`canvas follows explicit ${theme}`}).toBe(true);
