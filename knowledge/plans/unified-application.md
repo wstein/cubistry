@@ -429,7 +429,7 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | `unit`, `letter` | `src/main.mjs:1022` | single-cube pages |
 | `dir`, `direction` | `src/main.mjs:1034` | single-cube pages |
 | `range` | `src/main.mjs:1042` | single-cube pages |
-| `speed` | `src/main.mjs:1049` | single-cube pages |
+| `speed` | `src/main.mjs:1049` | single-cube pages (global key: kept on every app switch, owner decision 2026-11-12) |
 | `timer-speed`, `rate` | `src/main.mjs:1099` | single-cube pages |
 | `lettering` | `src/main.mjs:63`, `:1059`, `src/apps/clock/params.ts` | single-cube pages, clock mode |
 | `display`, `font` | `src/main.mjs:688`, `:1066` | single-cube pages |
@@ -447,6 +447,6 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | `font`, `layout`, `scheme`, `plasticity`, `banner` | `src/apps/calendar7/mount.ts`, `layout.ts` (`LAYOUT_PARAM`, `SCHEME_PARAM`, `PLASTICITY_PARAM`, `BANNER_PARAM`) | 7x7 calendar mode (`calendar7`; `font` here is the font style, not the single-cube `font` alias of `display`) |
 | `size` | `src/playground.mjs` (`resolveSize` in `src/apps/playground/size.ts`) | Picture Cube page (`playground.html`; owner decision 2026-11-10: cube size 2 to 7 as `size=`, replacing the proposed `cube` parameter with the values 2 and 3; only 2 is playable until an engine for larger sizes is in the page, others fall back with a note) |
 
-Owner decision 7 sets `app` as the key of the application in `index.html?app=<id>`; it replaces `application` (and the application meaning of `mode`). The names of the other parameters are not changed by it. `src/app-switch-url.mjs` derives its list of app-scoped parameters from the `params` each mode declares in `src/apps/mode-catalog.ts` (typed in `src/apps/param-specs.ts`; Calendar and Playground keys are listed there until they are modes). On a switch a parameter survives only when both apps own it and it is not a per-mode value (`val`, `value`, `duration`, `year`, `month`, `design`); `nerd` and `kiosk` are global and stay. `picture3.html` and `status.html` read none by this search (not further verified); `playground.html` reads only `size`.
+Owner decision 7 sets `app` as the key of the application in `index.html?app=<id>`; it replaces `application` (and the application meaning of `mode`). The names of the other parameters are not changed by it. `src/app-switch-url.mjs` derives its list of app-scoped parameters from the `params` each mode declares in `src/apps/mode-catalog.ts` (typed in `src/apps/param-specs.ts`; Calendar and Playground keys are listed there until they are modes). On a switch a parameter survives only when both apps own it and it is not a per-mode value (`val`, `value`, `duration`, `year`, `month`, `design`); `nerd`, `kiosk` and `speed` are global and stay (`speed` is read by the single-cube pages and ignored elsewhere). `picture3.html` and `status.html` read none by this search (not further verified); `playground.html` reads only `size`.
 
 Back to [Plans](index.md).
