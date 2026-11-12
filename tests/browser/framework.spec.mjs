@@ -12,8 +12,27 @@ async function ready(page) {
   await booted(page);
   await expect(page.locator("#cube")).toHaveAttribute("data-value", "0");
 }
-// Budget for the held Counter replacement (2 s idle, up to 12 s pinned to one busy core, issue #432); below the test budget.
-const PHASE_BUDGET_MS = 60000;
+// Phase budgets of the held-fetch test below. ready() takes up to about 10 s under CPU contention
+// (issue #432), so ready + 30 + 30 s stays below the 90 s test budget and a named phase error
+// appears before the test timeout.
+const ENTER_BUDGET_MS = 30000,
+  CLOSE_BUDGET_MS = 30000;
+async function phase(name, ms, promise) {
+  let timer;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(`${name} did not finish within ${ms} ms`)),
+          ms,
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
 for (const [field, value] of [
   ["schema", "bad"],
   ["version", 999],
@@ -135,9 +154,10 @@ test("generic text assets honor declared weight and scaled line height and relea
 test("later unsafe SVG failure is transactional and existing counter remains usable", async ({
   page,
 }) => {
-  // Cause of the occasional 30 s timeout is UNKNOWN (issue #432); runs hang in the
-  // route callback at page.evaluate. The 90 s budget is a safeguard only and does
-  // not explain the slowdown. Assertions are unchanged.
+  // Cause of the occasional 30 s timeout is UNKNOWN (issue #432). Known: the phases of this test
+  // (ready, held fetch reached, Counter replacement closed assets) scale with CPU share; a hang
+  // of page.evaluate in the route callback was not reproduced. The 90 s budget is a safeguard
+  // only; the phase budgets above name the phase that is too slow.
   test.setTimeout(90000);
   await ready(page);
   const evil =
@@ -229,20 +249,32 @@ test("later unsafe SVG failure is transactional and existing counter remains usa
   );
   resultPromise.catch(() => {}); // a failure below must not leave this rejection unhandled
   // Hold rejection until a real Counter asset replacement has closed assets.
-  await entered;
+  await phase(
+    "Held fetch of evil.svg",
+    ENTER_BUDGET_MS,
+    Promise.race([
+      entered,
+      resultPromise.then(
+        (r) => {
+          throw new Error(`loadAssets settled before the held fetch: ${JSON.stringify(r)}`);
+        },
+        (e) => {
+          throw new Error(`loadAssets failed before the held fetch: ${e.message}`);
+        },
+      ),
+    ]),
+  );
   await page.evaluate(() =>
     document.getElementById("tenth-display").dispatchEvent(new Event("change")),
   );
-  await page
-    .waitForFunction(() => window.__counterBitmapClosed, undefined, {
+  await phase(
+    "Counter replacement closing assets",
+    CLOSE_BUDGET_MS,
+    page.waitForFunction(() => window.__counterBitmapClosed, undefined, {
       polling: 100,
-      timeout: PHASE_BUDGET_MS,
-    })
-    .catch((e) => {
-      throw new Error(
-        `Counter replacement did not close assets within ${PHASE_BUDGET_MS} ms: ${e.message}`,
-      );
-    });
+      timeout: CLOSE_BUDGET_MS + 1000,
+    }),
+  );
   const ownedBeforeReject = await page.evaluate(
     () => window.__unsafeOwnedCloseCount,
   );
