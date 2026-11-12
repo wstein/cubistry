@@ -13,8 +13,6 @@ export const LAYOUT_PARAM = "layout";
 export const parseLayout = (value: string | null | undefined): Layout => (value === "names" ? "names" : "standard");
 
 /**
- * DEMO selection (not a layout of its own: the front is rendered as `names`). `?layout=names-demo` reads the demo data
- * folder public/calendar7/names-demo (beam chain, print window-2029-12). Not part of the shipped modes: the dropdown
  * Historical mode ids remain for artifact and renderer compatibility; the app now uses one names printing.
  * `parseLayout` never returns it.
  *
@@ -24,13 +22,12 @@ export const parseLayout = (value: string | null | undefined): Layout => (value 
  */
 export type LayoutMode = Layout | "names-demo" | "names-any";
 export const NAMES_DEMO_MODE = "names-demo";
-export const DEMO_DISPLAY_ONLY_NOTICE = "Display only: no move sequence for this date (beam preview print).";
+export const DEMO_DISPLAY_ONLY_NOTICE = "Display only: no move sequence for this date (print C).";
 export const NAMES_ANY_MODE = "names-any";
 export const parseLayoutMode = (value: string | null | undefined): LayoutMode =>
   value === NAMES_DEMO_MODE ? NAMES_DEMO_MODE : value === NAMES_ANY_MODE ? NAMES_ANY_MODE : parseLayout(value);
-export const NAMES_DEMO_LABEL = "Names (demo, beam chain, print window-2029-12, May 2026 - Jun 2027)";
-export const NAMES_DEMO_NOTICE = "Demo data covers May 2026 to June 2027 (beam chain, print window-2029-12). Showing the standard layout.";
-export const NAMES_DEMO_LOAD_NOTICE = "The names demo data could not be loaded. Showing the standard layout.";
+/** The canonical data: the long chain on print C (public/calendar7/chain-c). */
+export const CHAIN_C_LABEL = "Names (long chain, print C, January 2019 - January 2036)";
 export const NAMES_ANY_LABEL = "Names (any date, print B, display only)";
 export const NAMES_ANY_LOAD_NOTICE = "The names layout data for any date could not be loaded. Showing the standard layout.";
 /** Shown for every date displayed from print B (the names layout outside its chain window, and `names-any`). */

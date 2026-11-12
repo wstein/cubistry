@@ -373,7 +373,9 @@ class El {
     this.focused++;
   }
 }
-const mountedGraph = parseGraph(json("public/calendar7/names-demo/graph.v1.json"));
+const mountedGraph = parseGraph(json("public/calendar7/chain-c/graph.v1.json"));
+/** Index of May 2026 in the chain C graph: the tests were written for a window that started there. */
+const MAY_2026 = 88;
 function fakeRoot() {
   const listeners = { click: new Set(), change: new Set(), submit: new Set() };
   const els = new Map();
@@ -459,7 +461,7 @@ const mountEnv = (over = {}) => {
   const env = {
     base: "/",
     fetchJson: async (url) =>
-      url.endsWith("graph.v1.json") ? json("public/calendar7/names-demo/graph.v1.json") : url.endsWith("state.v1.json") ? json("public/calendar7/names-demo/state.v1.json") : json("public/calendar7/names-demo/displays.v1.json"),
+      url.endsWith("graph.v1.json") ? json("public/calendar7/chain-c/graph.v1.json") : url.endsWith("state.v1.json") ? json("public/calendar7/chain-c/state.v1.json") : url.endsWith("best-effort.v1.json") ? json("public/calendar7/chain-c/best-effort.v1.json") : json("public/calendar7/chain-c/displays.v1.json"),
     now: () => new Date(2026, 10, 7),
     search: () => "?app=calendar7&year=2027&month=3",
     replaceQuery: (s) => calls.query.push(s),
@@ -485,7 +487,7 @@ test("mount: the identity pose of the names print reaches the stage before each 
   const inst = await mountCalendar7(root, q("year=2027&month=3&scheme=rubik-tint"), env);
   await idle(root);
   assert.deepEqual(stage.order, ["home", "configure"]);
-  const start = parseState(json("public/calendar7/names-demo/state.v1.json"));
+  const start = parseState(json("public/calendar7/chain-c/state.v1.json"));
   assert.deepEqual([...stage.homePoses[0].normal], [...start.pose.normal]);
   assert.equal(root.getAttribute("data-c7-scheme"), "rubik-tint");
   inst.dispose();
@@ -522,14 +524,14 @@ test("mount with a 3D view: the shown digest equals the stored hash for the URL 
   assert.equal(stage.configured, 1);
   assert.equal(host.hidden, false);
   assert.equal(root.getAttribute("data-c7-month"), "2027-03");
-  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[10].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[10 + MAY_2026].hash);
   assert.match(stage.labels.at(-1), /March 2027/);
   // Next, then Previous twice, then to the chain start.
   for (const [month, k] of [[4, 3], [3, 2], [2, 1], [1, 0]]) {
     assert.equal(root.clickLink(href({ year: 2027, month })), true);
     await flush();
     await idle(root);
-    assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[k + 8].hash, `month ${month}`);
+    assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[k + 8 + MAY_2026].hash, `month ${month}`);
     assert.equal(root.getAttribute("data-c7-month"), `2027-0${month}`);
   }
   assert.ok(stage.log.turns.length > 100, "the steps were played move by move");
@@ -551,7 +553,7 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   await flush();
   assert.equal(root.el("play").textContent, "Pause");
   assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", false);
-  assert.match(root.el("progress").textContent, new RegExp(`^Turning to February 2027: move 1 of ${playedBlocks(mountedGraph.edges[8].moves, { slice: true, defer: true }).blocks.length}$`));
+  assert.match(root.el("progress").textContent, new RegExp(`^Turning to February 2027: move 1 of ${playedBlocks(mountedGraph.edges[8 + MAY_2026].moves, { slice: true, defer: true }).blocks.length}$`));
   root.press("play"); // pause
   assert.equal(root.el("play").textContent, "Play");
   root.choose("speed", "1000");
@@ -559,7 +561,7 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   root.press("play"); // resume
   assert.equal(root.el("play").textContent, "Pause");
   root.press("skip");
-  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9 + MAY_2026].hash);
   assert.match(root.el("progress").textContent, /The cube shows February 2027/);
   // A link during a step: the step ends at once and the next one plays.
   root.clickLink(href({ year: 2027, month: 3 }));
@@ -580,7 +582,7 @@ test("mount: the middle slice option plays rule-c blocks (rotations deferred) by
   await idle(root);
   root.choose("orientation", "after");
   assert.match(root.html, /data-c7="slice" checked/, "the option is offered and on");
-  const [first, second] = [mountedGraph.edges[8].moves, mountedGraph.edges[9].moves];
+  const [first, second] = [mountedGraph.edges[8 + MAY_2026].moves, mountedGraph.edges[9 + MAY_2026].moves];
   root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
   assert.match(root.el("progress").textContent, new RegExp(`move 1 of ${playedBlocks(first, { slice: true, defer: true }).blocks.length}$`));
@@ -592,14 +594,14 @@ test("mount: the middle slice option plays rule-c blocks (rotations deferred) by
   await flush();
   assert.match(root.el("progress").textContent, new RegExp(`move 1 of ${playedBlocks(second, { defer: true }).blocks.length}$`), "plain blocks of the next step");
   root.press("skip");
-  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[10].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[10 + MAY_2026].hash);
   root.el("slice").checked = true;
   root.choose("slice", "");
   root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
   assert.match(root.el("progress").textContent, new RegExp(`move 1 of ${playedBlocks(inverseMoves(second), { slice: true, defer: true }).blocks.length}$`));
   root.press("skip");
-  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9 + MAY_2026].hash);
   inst.dispose();
 });
 
@@ -612,21 +614,21 @@ test("mount: After moves is available; the alignment is shown apart from the pro
   root.choose("orientation", "after");
   assert.match(root.html, /value="after">After moves/);
   assert.equal(root.el("alignment").hidden, true);
-  const aligned = playedBlocks(mountedGraph.edges[8].moves, { slice: true, defer: true });
+  const aligned = playedBlocks(mountedGraph.edges[8 + MAY_2026].moves, { slice: true, defer: true });
   root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
   assert.equal(root.el("alignment").textContent, `Orientation at the end (free): ${alignmentText(aligned.alignment)}.`);
   assert.ok(stage.log.turns.every((t) => t.block.kind !== "rotation"), "no rotation mid-word");
   root.press("skip");
   assert.equal(root.el("alignment").hidden, true);
-  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9 + MAY_2026].hash);
   root.choose("orientation", "stored");
   root.clickLink(href({ year: 2027, month: 3 }));
   await flush();
   assert.match(root.el("progress").textContent, /whole-cube rotation \(free\)|move 1 of/);
   assert.equal(root.el("alignment").textContent, "Whole-cube rotations stay in the word (free).");
   root.press("skip");
-  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[10].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[10 + MAY_2026].hash);
   inst.dispose();
 });
 
@@ -639,7 +641,7 @@ test("mount under reduced motion: no animation, the controls say so, the state i
   await flush();
   await idle(root);
   assert.equal(stage.log.turns.length, 0);
-  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9 + MAY_2026].hash);
   assert.equal(root.el("note").hidden, false);
   assert.equal(root.el("play").getAttribute("aria-disabled") === "true", true);
   assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", true);
@@ -650,7 +652,7 @@ test("mount under reduced motion: no animation, the controls say so, the state i
 test("mount: a month outside the chain builds a display-only preview on the same print; a chain month restores playback", async () => {
   const root = fakeRoot();
   const { env, host, calls } = mountEnv();
-  const inst = await mountCalendar7(root, q("year=2026&month=4"), env); // April 2026 is outside
+  const inst = await mountCalendar7(root, q("year=2018&month=12"), env); // December 2018 is outside
   await flush();
   assert.equal(calls.created, 1);
   assert.equal(host.hidden, false);
@@ -710,12 +712,12 @@ test("mount respects isCurrent after every await: a stale mount builds nothing a
 
 test("mount: a digest mismatch stops the 3D view for good: scene hidden, controls off, state failed, later steps do not restart it", async () => {
   const root = fakeRoot();
-  const tampered = json("public/calendar7/names-demo/graph.v1.json");
-  tampered.nodes[9].hash = "0".repeat(64);
+  const tampered = json("public/calendar7/chain-c/graph.v1.json");
+  tampered.nodes[9 + MAY_2026].hash = "0".repeat(64);
   const stage = fakeStage();
   const { env, host } = mountEnv({
     stage,
-    fetchJson: async (url) => (url.endsWith("graph.v1.json") ? tampered : url.endsWith("state.v1.json") ? json("public/calendar7/names-demo/state.v1.json") : json("public/calendar7/names-demo/displays.v1.json")),
+    fetchJson: async (url) => (url.endsWith("graph.v1.json") ? tampered : url.endsWith("state.v1.json") ? json("public/calendar7/chain-c/state.v1.json") : url.endsWith("best-effort.v1.json") ? json("public/calendar7/chain-c/best-effort.v1.json") : json("public/calendar7/chain-c/displays.v1.json")),
   });
   const orig = console.error;
   console.error = () => {};
@@ -726,7 +728,7 @@ test("mount: a digest mismatch stops the 3D view for good: scene hidden, control
     root.clickLink(href({ year: 2027, month: 2 }));
     for (let i = 0; i < 100000 && root.getAttribute("data-c7-state") !== "failed"; i++) await Promise.resolve();
     assert.equal(root.getAttribute("data-c7-state"), "failed");
-    assert.match(root.el("error").textContent, /no whole-cube orientation turns the cube into the stored state of node 9/);
+    assert.match(root.el("error").textContent, /no whole-cube orientation turns the cube into the stored state of node 97/);
     assert.match(root.el("error").textContent, /sheet below/);
     assert.equal(root.el("error").hidden, false);
     assert.equal(host.hidden, true);
@@ -829,11 +831,11 @@ test("the page text keeps the status: research candidate, not certified, no solv
 });
 
 test("mount always requests stickerless faces while retaining the raw state schema", async () => {
-  const state = json("public/calendar7/names-demo/state.v1.json");
+  const state = json("public/calendar7/chain-c/state.v1.json");
   for (const [field, want] of [[{}, "face"], [{ surface: "face" }, "face"], [{ surface: "sticker" }, "face"]]) {
     const { env, stage } = mountEnv({
       fetchJson: async (url) =>
-        url.endsWith("graph.v1.json") ? json("public/calendar7/names-demo/graph.v1.json") : url.endsWith("state.v1.json") ? { ...state, ...field } : json("public/calendar7/names-demo/displays.v1.json"),
+        url.endsWith("graph.v1.json") ? json("public/calendar7/chain-c/graph.v1.json") : url.endsWith("state.v1.json") ? { ...state, ...field } : url.endsWith("best-effort.v1.json") ? json("public/calendar7/chain-c/best-effort.v1.json") : json("public/calendar7/chain-c/displays.v1.json"),
     });
     const inst = await mountCalendar7(fakeRoot(), q("year=2027&month=3"), env);
     await flush();
