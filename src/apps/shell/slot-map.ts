@@ -79,7 +79,7 @@ export const SLOT_MAP: readonly SlotMapRow[] = [
   {
     designRow: "CI Quality Cube",
     modes: ["ci"],
-    registered: false,
+    registered: true,
     slots: ["Refresh status", "Workflow list", null, null, null],
   },
 ];
@@ -123,6 +123,7 @@ export const MIGRATION: Readonly<Record<string, MigrationStatus>> = {
   "ms-counter": "pending",
   "hm-one-cube": "pending",
   calendar7: "pending",
+  ci: "migrated",
 };
 
 /** The slot numbers the design fills for a mode (also for modes that are not in the registry yet). */

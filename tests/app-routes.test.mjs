@@ -157,7 +157,6 @@ test("an unknown app resolves to the fallback and keeps no mode setup", () => {
   assert.deepEqual(r.setup, { kiosk: true });
 });
 
-test("the banner style accepts exactly its six values and is not a per-mode value", () => {
   for (const v of ["theme", "rounded", "square", "underline", "boxed", "rounded-box"]) {
     const r = parseRoute(`?app=calendar7&banner=${v}`, registry, "clock");
     assert.deepEqual(r.setup, { banner: v }, v);
@@ -199,4 +198,22 @@ test("speed keeps its value domain for every app and is not reported as foreign"
     assert.deepEqual(parseRoute(`?app=${id}&speed=0`, registry, "clock").invalid, ["speed"], id);
     assert.deepEqual(parseRoute(`?app=${id}&speed=abc`, registry, "clock").invalid, ["speed"], id);
   }
+});
+});
+
+  const ci = MODE_CATALOG.find((m) => m.id === "ci");
+  assert.deepEqual([...ci.params].sort(), ["analyze", "build", "review", "test", "turn"]);
+  for (const key of ["build", "test", "analyze", "review"]) assert.equal(PARAM_SPECS[key].perMode, true, key);
+  assert.notEqual(PARAM_SPECS.turn.perMode, true);
+  const r = parseRoute("?app=ci&turn=100&build=ok&test=blocked&analyze=bogus&val=3", registry, "clock");
+  assert.deepEqual(r.setup, { turn: 100, build: "ok", test: "blocked" });
+  assert.deepEqual(r.invalid, ["analyze"]);
+  assert.deepEqual(r.foreign, ["val"]);
+  assert.equal(serializeRoute({ app: "ci", setup: r.setup }), "?app=ci&turn=100&build=ok&test=blocked");
+});
+
+test("ci keeps nothing of its setup when it is left: turn is its own, the category parameters are one-time", () => {
+  const q = "turn=100&build=ok&test=error&analyze=running&review=blocked";
+  for (const target of ["counter", "calendar7", "clock"]) assert.equal(to(`${base}?app=ci&${q}`, "ci", target).toString(), "app=ci", target);
+  assert.equal(to(`${base}?app=counter&turn=100&build=ok`, "counter", "ci").toString(), "app=counter");
 });
