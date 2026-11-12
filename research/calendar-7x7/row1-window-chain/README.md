@@ -210,12 +210,30 @@ checkers require a list that ends at the last edge); the root month stays the ru
 Months and statuses. `months.tsv` has one row per month of the range: `valid` (an edge leads into the month, or it is the root; reasons
 `root`, `root_edge`, `bridge_edge`, `chain_edge`), `unknown` with the reason `skipped_gap` (a month between chain months that is not in S),
 `before_chain_root`, `after_month_list`, the stop reason of the segment (`deadline`, `max_edges`, `search_stalled`) or
-`best_effort_month`, and the claimed statuses `unavailable_nomatch`, `unavailable_unsat`, `best_effort`, which need `confirmed=both`
+`best_effort_unreachable` (the target of a best-effort month is not reached), and the claimed statuses `unavailable_nomatch`, `unavailable_unsat`, `best_effort`, which need `confirmed=both`
 (Julia and Flix) and are otherwise written as `unknown` with reason `claimed_<status>_<confirmed>`. Best-effort months are chain
-members whose edge needs wrong cells and Hall witnesses (chain.v2); this producer writes chain.v1 only and stops before a declared
-best-effort month (`best_effort_month`), so a chain through 2037-02 or 2043-02 is not produced here. The checkers accept such chains
-(verdict `BEST_EFFORT` / `ACCEPT_BEST_EFFORT_CHAIN`) and the verify job expects that verdict when `PROGRESS.txt` says
-`best_effort_edges` greater than 0.
+members whose edge needs wrong cells and Hall witnesses (chain.v2). For a month of the `best_effort=` file the producer writes that edge and goes on
+(rule below); the checkers accept such chains (verdict `BEST_EFFORT` / `ACCEPT_BEST_EFFORT_CHAIN`) and the verify job expects that verdict when `PROGRESS.txt` says
+`best_effort_edges` greater than 0. A produced best-effort month is `unknown` with the reason `best_effort_edge_unconfirmed` in `months.tsv` (it becomes `best_effort`
+only with Julia and Flix receipts of the chain); all other months are unchanged.
+
+Best-effort edge (owner decision 2026-11-12; code `window_chain_lib.jl` and `best_effort_edge.jl`, test `test_window_chain_best_effort.jl`):
+
+- Target. The true board of the month with exactly one wrong cell, and the wrong cell shows the digit 29, so the month looks like a 29-day month
+  (February/Sunday/28: the 29th would stand in row 7 of the Sunday column). The cell is the `wrong_cells` field of the best-effort file (one cell, (7,1) or (7,7));
+  `best_effort_cell=7,7` is the only way to the fallback (7,7), there is no automatic fallback. Other cells and lists are errors.
+- What counts as 29. A print sticker with text `29` and ink `red` (the ink of the digits in columns 1 and 7, `red_column`); a dark 29, another number and an
+  equal optic image of another text do not. Every sticker that carries it counts (print C: stickers 2 and 3, both on corner piece 1; on print B stickers 14 and 219):
+  the target names the artwork (`29`, red), the solver chooses sticker and body. After the edge the producer re-checks the end state with its own code:
+  exactly the chosen cell differs from the true board, and its front sticker has text `29` and ink `red`.
+- Edge format. chain.v2 (the header becomes v2 with the first best-effort edge; an exact-only chain stays v1): after the edge line `wrong r c` and `hall 7,1;7,7`, then the
+  moves. This is the format the three checkers accept; no checker is changed. Before writing, the producer recomputes the Hall deficiency of {(7,1),(7,7)} on the true
+  board; it must be 1, else the run stops with an error.
+- Objective. Among the states that show the target the solver (beam, greedy fallback) returns its shortest word from the retained state: free hidden bodies, no fixed
+  state per configuration, `library`/`width`/`lambda` as for exact months. Tie rule: none beyond the solver's own deterministic order (no second search over the two 29
+  stickers or the two corners; (7,1) is the default and (7,7) is chosen by the switch, not by cost). The next edge starts from the state this edge ends in.
+- Unreachable. A target that neither beam nor greedy reaches stops the run with the stop reason `best_effort_unreachable`; then try `best_effort_cell=7,7`.
+- `beam_edge.jl` is unchanged: it accepts chain.v1 only, so it stops at the header of a chain with a best-effort edge (it neither writes nor replays one).
 
 A greedy edge has 300 to 400 HTM against about 100 for a beam edge; it is never silent: `months.tsv` has a `method` column, the verify
 job prints the count and warns, and the workflow input `fail_on_greedy` (default true) fails the verify job after the verified
@@ -315,8 +333,8 @@ previous one finished.
 Open inputs (not decided here, so no defaults): the SHA-256 of Print C (root January 1980, PR #417) and the final month lists of the
 stages. Each stage is its own run with its own list, root and print: 2026-01 .. 2050-01 (root 1980-01 gives a root edge), then
 1980-01 .. 2026-01 backward to the root, 1950-01 .. 1980-01, 1900-01 .. 1950-01 and 2050-01 .. 2100-01. Not supported by the producer:
-stages that start at a free state (chain.v3 `start` block) or join by digest (`CAL7_JOIN_START`, `CAL7_JOIN_END`), best-effort edges
-(chain.v2: wrong cells and Hall witnesses). A window-local layout such as the April tiles AP|RIL of Print B is supported (see Layout input). The coverage summary (`month_coverage.jl`) is not run by the verify job. The workflow was never run.
+stages that start at a free state (chain.v3 `start` block) or join by digest (`CAL7_JOIN_START`, `CAL7_JOIN_END`). Best-effort edges
+(chain.v2: wrong cells and Hall witnesses) are supported, see the rule above. A window-local layout such as the April tiles AP|RIL of Print B is supported (see Layout input). The coverage summary (`month_coverage.jl`) is not run by the verify job. The workflow was never run.
 
 ## Scope and limits
 
