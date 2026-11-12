@@ -75,10 +75,12 @@ test("parameters: defaults, valid values, invalid values per parameter, and the 
   assert.equal(serializeStatusParams({ turnMs: 250, snapshot: ["open", "ok", "open", "open"] }, definition).toString(), "test=ok");
 });
 
-test("the category parameters belong to the application and are dropped on an app switch; speed stays between the apps that own it", () => {
+test("the category parameters belong to the application and are dropped on an app switch; speed is global and stays", () => {
   const href = "http://x/index.html?app=ci&speed=100&build=ok&test=ok&analyze=ok&review=ok&nerd=1";
   assert.equal(urlAfterAppSwitch(href, "ci", "counter"), "/index.html?app=ci&speed=100&nerd=1");
-  assert.equal(urlAfterAppSwitch(href, "ci", "clock"), "/index.html?app=ci&nerd=1");
+  // speed is global (owner 2026-11-12), so it also survives a switch to apps that ignore it
+  assert.equal(urlAfterAppSwitch(href, "ci", "clock"), "/index.html?app=ci&speed=100&nerd=1");
+  assert.equal(urlAfterAppSwitch(href, "ci", "calendar7"), "/index.html?app=ci&speed=100&nerd=1");
   assert.equal(urlAfterAppSwitch(href, "ci", "ci"), "/index.html?app=ci&speed=100&build=ok&test=ok&analyze=ok&review=ok&nerd=1");
 });
 
