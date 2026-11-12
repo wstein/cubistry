@@ -59,10 +59,10 @@ const settle = async (root) => {
 };
 const params = (env) => new URLSearchParams(env.search());
 
-test("Month banner offers six choices, Theme default first and selected, and tells the stage before the first configure", async () => {
+test("Banner style offers six choices, Theme default first and selected, and tells the stage before the first configure", async () => {
   const root = fakeRoot(), { env, stage } = setup("?app=calendar7&year=2026&month=11");
   const inst = await mountCalendar7(root, params(env), env); await settle(root);
-  assert.match(root.html, /<label for="c7-month-banner">Month banner<\/label>/);
+  assert.match(root.html, /<label for="c7-banner-style">Banner style<\/label>/);
   const select = root.html.match(/<select[^>]*data-c7="banner"[^>]*>([\s\S]*?)<\/select>/)[1];
   assert.deepEqual([...select.matchAll(/<option value="([^"]+)"/g)].map((m) => m[1]), ["theme", "rounded", "square", "underline", "boxed", "rounded-box"]);
   assert.match(select, /<option value="theme" selected>Theme default/);

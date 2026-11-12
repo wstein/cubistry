@@ -39,7 +39,7 @@ export interface Stage extends StageView {
   setLabel(text: string): void;
   /** Color scheme by id (src/apps/calendar7/schemes.ts); an unknown id gives the default. Optional: a fake stage may omit it. */
   setScheme?(id: string | null | undefined): void;
-  /** Month banner shape of the names layout; optional like `setScheme`. */
+  /** Banner style shape of the names layout; optional like `setScheme`. */
   setBannerStyle?(style: BannerStyle): void;
   setFont?(font: LoadedFont): void;
   /** Plasticity of the names layout, 0 to 1 (names-plasticity.ts). Optional: a fake stage may omit it. */
@@ -101,7 +101,7 @@ export async function mountCalendar7(
     `<div class="c7-font-choice"><label for="c7-font-style">Font style</label><select id="c7-font-style" data-c7-font>${FONT_STYLES.map(f => `<option value="${f.id}"${f.id === fontStyleById(params.get("font")).id ? " selected" : ""}>${f.label}</option>`).join("")}</select></div>` +
     (threeD ? `<div class="c7-layout-choice"><label for="c7-layout">Cube layout</label><select id="c7-layout" data-c7="layout"><option value="standard"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "standard" ? " selected" : ""}>Standard</option><option value="names"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "names" ? " selected" : ""}>Names (preview, May 2026 - Jan 2028)</option>${params.get(LAYOUT_PARAM) === NAMES_ANY_MODE ? `<option value="${NAMES_ANY_MODE}" selected>${NAMES_ANY_LABEL}</option>` : ""}</select></div>` : "") +
     (threeD ? `<div class="c7-scheme-choice"><label for="c7-color-theme">Cube color theme</label><select id="c7-color-theme" data-c7="scheme">${SCHEMES.map(s => `<option value="${s.id}"${s.id === schemeById(params.get(SCHEME_PARAM)).id ? " selected" : ""}>${s.name}</option>`).join("")}</select></div>` : "") +
-    (threeD ? `<div class="c7-banner-choice"><label for="c7-month-banner">Month banner</label><select id="c7-month-banner" data-c7="banner">${[["theme", "Theme default"], ["rounded", "Rounded"], ["square", "Hard edges"], ["underline", "Underline"], ["boxed", "Boxed"], ["rounded-box", "Rounded box"]].map(([value, label]) => `<option value="${value}"${value === parseBannerStyle(params.get(BANNER_PARAM)) ? " selected" : ""}>${label}</option>`).join("")}</select></div>` : "") +
+    (threeD ? `<div class="c7-banner-choice"><label for="c7-banner-style">Banner style</label><select id="c7-banner-style" data-c7="banner">${[["theme", "Theme default"], ["rounded", "Rounded"], ["square", "Hard edges"], ["underline", "Underline"], ["boxed", "Boxed"], ["rounded-box", "Rounded box"]].map(([value, label]) => `<option value="${value}"${value === parseBannerStyle(params.get(BANNER_PARAM)) ? " selected" : ""}>${label}</option>`).join("")}</select></div>` : "") +
     '</div><p class="c7-font-status" role="status" data-c7-font-status></p>' +
     (threeD ? '<p class="c7-layout-notice" role="status" data-c7="layout-notice" hidden></p>' : "") +
     (threeD ? playerHtml(DEFAULT_SPEED) : "") +
