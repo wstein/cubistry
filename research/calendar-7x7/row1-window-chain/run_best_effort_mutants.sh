@@ -26,5 +26,5 @@ run digit-29-not-required    "what counts as 29: text and ink, every sticker tha
 run dedup-by-text-and-ink    "what counts as 29: text and ink, every sticker that carries it" 0 $L 's/^art_stickers(source,art)=\[s.id for s in source if s.text==art\[1\] && s.ink==art\[2\]\]/art_stickers(source,art)=first.(values(Dict((s.text,s.ink)=>[s.id] for s in reverse(source) if s.text==art[1] \&\& s.ink==art[2])))/'
 run hall-line-missing        "edge lines and header"                               0 $L 's/,"hall\\t"\*join(("\$r,\$c" for (r,c) in best_effort_hall()),'"';'"')\]/]/'
 run ink-not-in-rule          "what counts as 29: text and ink, every sticker that carries it" 0 $L 's/^best_effort_ink(c)=c in (1,7) ? "red" : "dark"/best_effort_ink(c)="dark"/'
-run stop-before-best-effort  "real best-effort edge 2026-02 on print C"            1 window_chain.jl 's/^    stop===nothing || break$/    stop===nothing \&\& haskey(best,plan[edges_before+2+done]) \&\& (stop="best_effort_month")\n    stop===nothing || break/'
+run stop-before-best-effort  "real best-effort edge 2026-02"            1 window_chain.jl 's/^    stop===nothing || break$/    stop===nothing \&\& haskey(best,plan[edges_before+2+done]) \&\& (stop="best_effort_month")\n    stop===nothing || break/'
 exit $bad
