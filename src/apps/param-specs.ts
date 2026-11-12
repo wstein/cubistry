@@ -9,7 +9,15 @@ export type ParamValue = string | number | boolean;
  * `default` is the value a mode uses when the key is absent, so it is not written back into a URL.
  */
 export interface ParamSpec {
-  /** Alternative names that parse to this canonical key. Serialization always writes the canonical key. */
+  /**
+   * The URL name when it differs from the canonical key. Two apps can then use one URL name for different things:
+   * `font` is an alias of `display` for the single-cube family and the font style of the 7x7 Calendar (`c7-font`).
+   */
+  name?: string;
+  /**
+   * Alternative names that parse to this canonical key. Serialization always writes the canonical key. When both names
+   * are present the readers of the pages prefer the alias (presentation, font, rate); here the canonical key wins.
+   */
   aliases?: readonly string[];
   parse(raw: string): ParamValue | undefined;
   default?: ParamValue;
@@ -72,6 +80,7 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
   marker: { parse: oneOf(["off", "auto", "all", "line-auto", "line-all"]) },
   pad: { aliases: ["padding"], parse: bool, default: true },
   print: { parse: word },
+  // src/main.mjs starts on `run=1|true` or `autoplay=1`; a value such as `autoplay=true` is valid here but not read there.
   autoplay: { aliases: ["run"], parse: bool, default: false },
   "hours-speed": { parse: num(0.001, 100_000) },
   "minutes-speed": { parse: num(0.001, 100_000) },
@@ -82,10 +91,16 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
   year: { parse: int(1, 9999), perMode: true },
   month: { parse: int(1, 12), perMode: true },
   outer: { parse: num(1.2, 2.4) },
+  // 7x7 Calendar look (src/apps/calendar7/mount.ts, layout.ts). `banner` joins with the banner PR.
+  "c7-font": { name: "font", parse: word },
+  layout: { parse: oneOf(["standard", "names", "names-any"]) },
+  scheme: { parse: word },
+  plasticity: { parse: num(0, 1) },
   size: { parse: int(2, 7) },
   cube: { parse: oneOfNumbers([2, 3]) },
   // Global flags: every app reads them, so they are never owned by one mode and survive a switch.
-  nerd: { parse: bool, default: false },
+  // The shell opens the Nerd drawer for `nerd=1` only; every other value leaves it closed.
+  nerd: { parse: (raw) => raw === "1", default: false },
   kiosk: { aliases: ["presentation"], parse: bool, default: false },
 };
 
@@ -102,7 +117,7 @@ export const PENDING_APP_PARAMS: Readonly<Record<string, readonly string[]>> = {
   playground: ["size", "cube"],
 };
 
-export const names = (key: string): string[] => [key, ...(PARAM_SPECS[key]?.aliases ?? [])];
+export const names = (key: string): string[] => [PARAM_SPECS[key]?.name ?? key, ...(PARAM_SPECS[key]?.aliases ?? [])];
 
 /** Canonical keys an app owns: the `params` of its mode, or the pending entry; `undefined` for an unknown id. */
 export function appKeys(id: string, modes: readonly ModeMeta[] = MODE_CATALOG): readonly string[] | undefined {
@@ -123,5 +138,5 @@ export function sharedParams(from: string, to: string, modes: readonly ModeMeta[
 /** Every name that some app owns, global flags excluded: the keys an app switch may have to drop. */
 export function scopedParams(modes: readonly ModeMeta[] = MODE_CATALOG): string[] {
   const keys = new Set([...modes.flatMap((m) => m.params ?? []), ...Object.values(PENDING_APP_PARAMS).flat()]);
-  return [...keys].filter((k) => !GLOBAL_PARAMS.includes(k)).flatMap(names);
+  return [...new Set([...keys].filter((k) => !GLOBAL_PARAMS.includes(k)).flatMap(names))];
 }
