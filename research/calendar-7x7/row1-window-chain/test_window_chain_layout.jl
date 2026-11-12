@@ -58,7 +58,7 @@ sha(p)=bytes2hex(sha256(read(p)))
             texts=Set(split(l,'\t')[6] for l in readlines(joinpath(o4,"states","state-02.tsv"))[2:end])
             @test "AP" in texts && "RIL" in texts && !("APR" in texts)
             # resume (prior=) on the same layout runs through; on another layout it fails hard at the segment layout check
-            c5,e5=producer(joinpath(d,"resume-same"),"prior=$o4";layout=ALT_LAYOUT,pin=sha(ALT_LAYOUT));@test c5==0 && isempty(strip(e5))
+            c5,e5=producer(joinpath(d,"resume-same"),"prior=$o4";layout=ALT_LAYOUT,pin=sha(ALT_LAYOUT));@test c5==0 && progress(joinpath(d,"resume-same"))["edges_total"]=="1" && progress(joinpath(d,"resume-same"))["layout_sha256"]==sha(ALT_LAYOUT)
             c6,e6=producer(joinpath(d,"resume-other"),"prior=$o4");@test c6!=0 && occursin("layout of prior segment 1",e6)
         end
     end
