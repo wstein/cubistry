@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # End-to-end test of window_chain.jl direction=backward on a tiny list (print C, layout C). Opt-in: it builds the beam library twice and computes 3 edges.
-#   run_backward_e2e.sh JULIA JAVA CHAIN_JAR OUT        (OUT: a new scratch directory; time: see the README of evidence/month-list, UNKNOWN until measured)
+#   [E2E_RUNS="a b"] run_backward_e2e.sh JULIA JAVA CHAIN_JAR OUT   (OUT: a new scratch directory; E2E_RUNS=b repeats run B alone on an existing OUT that holds run A)
 # Run A: list 2037-01, 2037-02, 2041-01 (root = identity pose = 2041-01, Jan/Tue/31 like 2019-01). The first edge is a bridge edge (2037-02 is 47 months earlier) into
 #        the best-effort month 2037-02 (February, Sunday, 28 days; max_edges=1 must not stop at that tip), the second edge goes to 2037-01.
 # Run B: list 2036-12 .. 2041-01 with prior = the exported chain of run A and max_edges=1 (one new edge into 2036-12): the continuation.
@@ -10,8 +10,11 @@
 set -uo pipefail
 here=$(cd -- "$(dirname -- "$0")" && pwd)
 J=${1:?Julia executable}; JAVA=${2:?Java executable}; JAR=${3:?Flix chain checker jar}; OUT=${4:?new scratch directory}
-[[ ! -e "$OUT" ]] || { echo "OUT exists: $OUT" >&2; exit 2; }
+runs=${E2E_RUNS:-a b}
+[[ -n "${E2E_RUNS:-}" ]] || [[ ! -e "$OUT" ]] || { echo "OUT exists: $OUT" >&2; exit 2; }
 mkdir -p "$OUT"
+has() { [[ " $runs " == *" $1 "* ]]; }
+if has b; then rm -rf "$OUT/b" "$OUT/b.search" "$OUT/b.search.prior" "$OUT/b.chk" "$OUT/b.log"; fi
 PR=$here/evidence/print-c/printing.tsv; LAY=$here/evidence/print-c/layout.tsv
 PS=0119ca3ba1266f9c3e4d7c27753801aca30eb4af514f491615666dcd9f92a8fc; LS=e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a
 IDENT=780201ff253bd9769cfeee9c7f3f66e94bc988db83d97e25e258df20e12c4d72   # digest of the identity pose of print C (the root of the first chain)
@@ -46,6 +49,7 @@ accept() { # name list edges best_edges: the three checkers on OUT/name
   grep -q $'\tBRIDGE' "$c/julia.tsv" && ok "$name: the edge into the identity pose is a bridge edge" || fail "$name: no BRIDGE flag"
 }
 # ---- run A -------------------------------------------------------------------------------------------------------------------------
+if has a; then
 producer a "$OUT/list-a.tsv" direction=backward best_effort="$OUT/best.tsv" max_edges=1 && ok "run A: producer finished (exit 0)" || fail "run A: producer: $(tail -c 400 "$OUT/a.log")"
 [[ -f "$OUT/a/chain.moves.tsv" ]] || { echo "no chain from run A"; exit 1; }
 head -1 "$OUT/a/chain.moves.tsv" | grep -qx cubistry.calendar7.chain.v3 && ok "run A: chain.v3" || fail "run A: header"
@@ -70,7 +74,10 @@ reject() { # name, expected text in the output, env assignments...  (all three c
 }
 reject wrong-join-end "end junction digest" CAL7_JOIN_END=aec0c66defe82197da48ddb6c15e269902f474d1d00fd5aab49f62e9fe82821c
 reject root-month "root" CAL7_ROOT_MONTH=2041-01
+fi
 # ---- run B: the continuation ----------------------------------------------------------------------------------------------------------
+if has b; then
+[[ -f "$OUT/a/chain.moves.tsv" ]] || { echo "run B needs the chain of run A in $OUT/a" >&2; exit 2; }
 producer b "$OUT/list-b.tsv" direction=backward best_effort="$OUT/best.tsv" max_edges=1 prior="$OUT/a" && ok "run B: producer finished (exit 0)" || fail "run B: producer: $(tail -c 400 "$OUT/b.log")"
 grep -qx 'edges_total=3' "$OUT/b/PROGRESS.txt" && grep -qx 'edges_new=1' "$OUT/b/PROGRESS.txt" && grep -qx 'chain_start=2036-12' "$OUT/b/PROGRESS.txt" && grep -qx 'complete=true' "$OUT/b/PROGRESS.txt" && ok "run B: one new edge into 2036-12, 3 edges in total" || fail "run B: progress: $(tr '\n' ' ' < "$OUT/b/PROGRESS.txt")"
 accept b "$OUT/list-b.tsv" 3 1
@@ -78,6 +85,7 @@ accept b "$OUT/list-b.tsv" 3 1
 a1=$(grep -c '^move' "$OUT/a/chain.moves.tsv"); b1=$(grep -c '^move' "$OUT/b/chain.moves.tsv"); [[ $b1 -gt $a1 ]] && ok "run B: more moves than run A ($a1 -> $b1)" || fail "run B: moves"
 cmp -s <(sed -n '1,/^edge/p' "$OUT/a.search/chain.moves.tsv" | head -2) <(sed -n '1,/^edge/p' "$OUT/b.search/chain.moves.tsv" | head -2) && ok "run B: the search chain keeps the root record of run A" || fail "run B: root record"
 cmp -s "$OUT/a.search/states/state-01.tsv" "$OUT/b.search/states/state-01.tsv" && ok "run B: identity snapshot unchanged" || fail "run B: snapshot"
+fi
 # ---- producer refusals (fast: they stop before the library is built) ----------------------------------------------------------------------
 ( export CAL7_ROOT_MONTH=2041-01; producer c "$OUT/list-a.tsv" direction=backward ) ; grep -q "root_month must be empty" "$OUT/c.log" && ok "producer: a root month is refused" || fail "producer: root month accepted: $(tail -c 200 "$OUT/c.log")"
 producer d "$OUT/list-a.tsv" direction=sideways; grep -q "direction must be forward or backward" "$OUT/d.log" && ok "producer: unknown direction is refused" || fail "producer: direction: $(tail -c 200 "$OUT/d.log")"
