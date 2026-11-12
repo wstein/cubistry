@@ -102,6 +102,9 @@ export function faceEdgeFills(printing: Printing, scheme: ColorScheme, layout: L
   return edges;
 }
 
+/** True when the active scheme colors the stones by their home face and the home faces are known. */
+const homeActive = (scheme: ColorScheme, homes?: readonly HomeFace[]): boolean => usesHomeTints(scheme) && homes?.length === STICKERS;
+
 /** Camera distance relative to the fit of the bounding sphere: the cube fills the picture, the sphere keeps some air. */
 const ZOOM = 0.9;
 
@@ -308,7 +311,7 @@ export class Calendar7Viewer implements StageView {
   private redrawScheme(): void {
     this.scheme = this.layout === "names" ? withBannerStyle(this.baseScheme, this.bannerStyle) : this.baseScheme;
     if (!this.printing || !this.pose) return;
-    if (this.useHome() !== this.builtByHome) { // the textures are shared per print, not per home face: build the cube again
+    if (homeActive(this.baseScheme, this.homes) !== Boolean(this.builtByHome)) { // the textures are shared per print, not per home face: build the cube again
       this.homeStale = this.bodyStale = true;
       this.applyBodyColor();
       return;
@@ -322,17 +325,12 @@ export class Calendar7Viewer implements StageView {
     this.dirty = true;
   }
 
-  /** True when the active scheme colors the stones by their home face and the home faces are known. */
-  private useHome(): boolean {
-    return usesHomeTints(this.baseScheme) && this.homes.length === STICKERS;
-  }
-
   private fills(printing: Printing, layout: Layout): Map<number, string> {
-    return this.useHome() ? faceFillsByHome(printing, this.scheme, layout, this.homes) : faceFills(printing, this.scheme, layout, this.wrongIds);
+    return homeActive(this.baseScheme, this.homes) ? faceFillsByHome(printing, this.scheme, layout, this.homes) : faceFills(printing, this.scheme, layout, this.wrongIds);
   }
 
   private edgeFills(printing: Printing, layout: Layout): Map<number, FaceEdgeColors> {
-    return this.useHome() ? faceEdgeFillsByHome(printing, this.scheme, layout, this.tiles, this.homes) : faceEdgeFills(printing, this.scheme, layout, this.tiles);
+    return homeActive(this.baseScheme, this.homes) ? faceEdgeFillsByHome(printing, this.scheme, layout, this.tiles, this.homes) : faceEdgeFills(printing, this.scheme, layout, this.tiles);
   }
 
   /**
@@ -369,7 +367,7 @@ export class Calendar7Viewer implements StageView {
 
   private draw(canvas: HTMLCanvasElement, text: string, ink: string, tile?: FaceTile, wrong = false, wrongEdge: WrongEdge = "bottom"): void {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-    const scheme = schemeForHome(this.scheme, this.homeOf.get(canvas)); // the tint of the stone's home face (Rubik-Tint only)
+    const scheme = schemeForHome(this.scheme, this.homeOf?.get(canvas)); // the tint of the stone's home face (Rubik-Tint only)
     if (this.font) drawFontSticker(ctx, text, ink, this.font, scheme, this.surface, undefined, this.layout, tile, this.nameWords);
     else if (this.surface === "face") drawFace(ctx, text, ink, undefined, scheme, this.layout, tile, this.nameWords);
     else drawSticker(ctx, text, ink, undefined, scheme, this.layout);
@@ -424,7 +422,7 @@ export class Calendar7Viewer implements StageView {
     const materials = new Map<number, THREE.Material>();
     const byKey = new Map<string, THREE.Material>();
     const widths = layerWidthsOf(layout);
-    const byHome = this.useHome();
+    const byHome = homeActive(this.baseScheme, this.homes);
     this.builtByHome = byHome;
     this.homeStale = false;
     this.tiles = [];
