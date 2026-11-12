@@ -227,13 +227,30 @@ Best-effort edge (owner decision 2026-11-12; code `window_chain_lib.jl` and `bes
   the target names the artwork (`29`, red), the solver chooses sticker and body. After the edge the producer re-checks the end state with its own code:
   exactly the chosen cell differs from the true board, and its front sticker has text `29` and ink `red`.
 - Edge format. chain.v2 (the header becomes v2 with the first best-effort edge; an exact-only chain stays v1): after the edge line `wrong r c` and `hall 7,1;7,7`, then the
-  moves. This is the format the three checkers accept; no checker is changed. Before writing, the producer recomputes the Hall deficiency of {(7,1),(7,7)} on the true
+  moves. This is the format the three checkers accept. The checkers do not require the 29 unless the rule below is switched on. Before writing, the producer recomputes the Hall deficiency of {(7,1),(7,7)} on the true
   board; it must be 1, else the run stops with an error.
 - Objective. Among the states that show the target the solver (beam, greedy fallback) returns its shortest word from the retained state: free hidden bodies, no fixed
   state per configuration, `library`/`width`/`lambda` as for exact months. Tie rule: none beyond the solver's own deterministic order (no second search over the two 29
   stickers or the two corners; (7,1) is the default and (7,7) is chosen by the switch, not by cost). The next edge starts from the state this edge ends in.
 - Unreachable. A target that neither beam nor greedy reaches stops the run with the stop reason `best_effort_unreachable`; then try `best_effort_cell=7,7`.
 - `beam_edge.jl` is unchanged: it accepts chain.v1 only, so it stops at the header of a chain with a best-effort edge (it neither writes nor replays one).
+
+Checks of the first chain, root 2019-01 and the 29 rule (research candidate; print C `evidence/print-c/`):
+
+- Root 2019-01. The identity pose of print C is the solved cube and shows January 2019 (January, Tuesday, 31). `check.jl`, `verify_chain.jl` and the Flix checker accept the root
+  month 2019-01 (`CAL7_ROOT_MONTH` or the first member of the list); `months.jl` in `evidence/window-skip` (print checker, 2026-01 and later) is not part of the chain checkers. Fixtures
+  `evidence/root-2019/exact-2019-03` (list 2019-01 .. 2019-03, 2 exact edges, 189 and 23 HTM, no root edge) and `best-effort-2026-02` (list 2026-02, 2026-03, root edge from the
+  identity pose into 2026-02 with wrong cell (7,1), 197 HTM, then an exact edge of 15 HTM) come from `window_chain.jl` (library=L1 width=20). Receipts `julia.tsv`, `flix.tsv`, `independent.tsv`; Julia equals Flix byte for byte.
+- Negative controls (`root2019_cases.jl`, `run_root2019_checks.sh JULIA JAVA JAR OUT`, 14 cases, about 3 minutes): wrong root (record and list say 2019-02, or the record does not match the root), wrong cell (declared on an exact edge, or (7,1) changed to (7,7)),
+  wrong print (print B under the pin of print C, a print C with an edited front sticker) are rejected by all three at the named reason.
+- 29 rule (opt-in: `CAL7_BEST_EFFORT_29=1`, `run_checks.sh` passes it to Flix as the last argument `29`): a best-effort edge has exactly one wrong cell, (7,1) or (7,7), and the front sticker of that cell shows
+  text `29`, ink `red`, upright. Off by default: the stored corner evidence of print B (`evidence/best-effort-corner`, (7,1) shows `24`) is accepted without it. Implemented independently in `check.jl`,
+  `verify_chain.jl` and `flix/src/Main.flix`. Cases `corner-2026-02-71-rule29`, `rule29-text-28`, `rule29-ink-dark` are rejected by all three, `best-effort-2026-02-rule29` and `corner-2026-02-77-rule29` accepted; unit test `test_best_effort_29.jl`
+  (cell set, text, ink and orientation of the sticker, `check.jl` only); source mutants `run_rule29_mutants.sh`. Not covered by a negative control in `verify_chain.jl` and Flix: the cell set and the orientation (UNKNOWN beyond reading the code).
+  The producer, not the checkers, chooses between (7,1) and (7,7) (`best_effort_cell=7,7`); the checkers accept both. A fixed full state per configuration is not stored or required.
+- State report (`state_report.sh CHAIN [STATES_DIRECTORY]`, Julia, `test_state_report.jl`, `run_state_report_mutants.sh`): per chain the number of edges, distinct start and end state digests and how many are shared by several edges,
+  distinct (start,end) pairs and the repeated ones, and the configuration transitions (configuration = month, weekday of the 1st and length, 91 possible) with how often each repeats. It reads digests, not legality.
+  Meant to run after stage 1 of the first chain (41 edges) on its `chain.moves.tsv` and `states`, and again on the 204 edges; the chain itself is verified by the checkers. Run on the two fixtures above (2 edges each: no repeat).
 
 A greedy edge has 300 to 400 HTM against about 100 for a beam edge; it is never silent: `months.tsv` has a `method` column, the verify
 job prints the count and warns, and the workflow input `fail_on_greedy` (default true) fails the verify job after the verified

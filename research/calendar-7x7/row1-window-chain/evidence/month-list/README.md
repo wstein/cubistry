@@ -137,21 +137,21 @@ S2 are not run.
 
 ## First chain: January 2019 .. January 2036 (owner decision 2026-11-12)
 
-Research candidate, not certified. Julia only; no Flix check, chain, solver or workflow was run for anything here (UNKNOWN as evidence).
-Stacked on #446 (print C, `../print-c/`, `printing.tsv` SHA-256 `0119ca3b...f9a92f8fc`, layout `e9a409ea...2b62a`).
+Research candidate, not certified. Julia only for the month list, Hall table and coverage; no solver or workflow was run for them (UNKNOWN as evidence). Chains and Flix receipts for root 2019-01: `../root-2019/`.
+Print C is merged (#446): `../print-c/`, `printing.tsv` SHA-256 `0119ca3b...f9a92f8fc`, layout `e9a409ea...2b62a`.
 
 | File | Content |
 |---|---|
 | `months-chain-2019-01-2036-01.tsv` | 205 months, strictly ascending, 2019-01 .. 2036-01, no gap; SHA-256 `4ad43a5997ec019fd0383d7d853589213d09c2bb4e20179e1cdb94df5c6a66c3` (`sha256.txt`) |
 | `stages-chain-2019-01-2036-01.tsv` | five stages of 41, 41, 41, 41, 40 edges (data only) |
-| `best-effort-chain-2019-01-2036-01.tsv` | `best_effort_path` file: 2026-02, wrong cell (7,1) |
+| `best-effort-chain-2019-01-2036-01.tsv` | `best_effort_path` file: 2026-02, wrong cell (7,1), evidence `february-hall-C.tsv` |
+| `february-hall-C.tsv` | Hall witness table of print C for 2026-02 (Julia only), read by `verify_coverage.jl` |
 | `coverage-chain-2019-01-2036-01.{tsv,json}` | output of `month_coverage.jl` (root 2019-01, start 2019-01, last 2036-01) |
-| `../../test_month_chain_2019.jl`, `../../run_chain2019_mutants.sh` | test (29 checks) and 11 data mutants |
+| `../../test_month_chain_2019.jl`, `../../run_chain2019_mutants.sh` | tests (`test_month_chain_2019.jl` 29 checks, `test_hall_table_c.jl` 10 checks) and 14 data mutants (`ONLY=name` selects one) |
 
 Root and edges (stage reading B of the owner plan): the root is the solved cube, which shows January 2019 (January, Tuesday, 31 days;
 the same board as January 1980 and January 2030). 2019-01 is S[1], so there is no root edge. A chain of 205 members has 204 edges;
-edge i leads from S[i] to S[i+1]. `CAL7_ROOT_MONTH` is the default (S[1]). The checkers' root fixtures use 2037-05 and the
-repository generators accept months from 2026-01 only in `months.jl`; `month_coverage.jl`, `read_list` and the producer library accept 2019 (range 1900-01 .. 2100-01).
+edge i leads from S[i] to S[i+1]. `CAL7_ROOT_MONTH` is the default (S[1]). The older root fixtures of the checkers use 2037-05; root 2019-01 is accepted by the three chain checkers (fixtures `../root-2019/`, run `../../run_root2019_checks.sh`). Only `../window-skip/months.jl` (print checker) accepts months from 2026-01 only; `month_coverage.jl`, `read_list` and the producer library accept 2019 (range 1900-01 .. 2100-01).
 
 | Stage | Edges | Count | Start state month (S[first edge]) | End month (S[last edge + 1]) |
 |---|---|---|---|---|
@@ -164,8 +164,8 @@ repository generators accept months from 2026-01 only in `months.jl`; `month_cov
 Consecutive stages join in the boundary month (stages 2 to 5 start at a free state, chain.v3 `start` block, joined by digest). 2026-02 is edge 85 (stage 3).
 
 Coverage (`month_coverage.jl`, list pinned by hash): 205 chain members, planned exact runs 2 (2019-01 .. 2026-01: 85 months, 2026-03 .. 2036-01: 119 months), best-effort 1 (2026-02, `best_effort_unverified`), gaps 0, bridges 0, before_start 0.
-The `range` field of that output prints the generator's constant `2026-01` (`FIRST`) and is not a statement about the list. `verify_coverage.jl` was run and rejects this
-coverage with `Hall witness table exists`: it expects `february-hall-S2.tsv` (print S2) in the evidence directory and a Hall table for print C does not exist, so the coverage is verified by the generator and the test only.
+The `range` field of that output prints the generator's constant `2026-01` (`FIRST`) and is not a statement about the list. `verify_coverage.jl` first rejected this
+coverage with `Hall witness table exists`: the `evidence` field of the best-effort file was free text (a path of `../config-coverage/` with a note), not the name of a file in this directory, and `../config-coverage/best-effort-feb-sunday-28.tsv` is keyed by print and cell, not by month. Now the field is `february-hall-C.tsv`, the Hall witness table of print C (`february_hall.jl LAYOUT PRINT 2026-02@7,1`: class `-3,-3,-3`, deficiency 1, wrong cell `7,1`, Hall set `7,1;7,7`, one neighbor body; the witness is checked by `chain_hall_check` of `check.jl`), and `verify_coverage.jl` accepts the coverage (`../../test_hall_table_c.jl`). The fallback cell (7,7) is the second cell of the Hall set in that table.
 
 Configurations (Julia, `Dates`, weekday of the 1st and month length; lookup in `../config-coverage/config-table.tsv` column `C1980_status`, the matchings of print C are the
 ones of print C-1980, `../print-c/README.md`): 88 of the 91 configurations occur, 87 of them front-match print C, 92 distinct consecutive configuration pairs.
@@ -175,4 +175,4 @@ Best-effort data: the maximum matching of February/Sunday/28 on print C has 48 o
 (`../config-coverage/best-effort-feb-sunday-28.tsv`, print `C`). The file has the format `month status wrong_cells evidence` of `read_best_effort` (`window_chain_lib.jl`); the producer writes a best-effort edge for it (digit 29 in (7,1), rule in `../../README.md`; a file entry (7,7) needs the switch `best_effort_cell=7,7`). No claims file: `claims_path` rows are for months that are not chain members, and a claim on a chain member is an error (`read_claims`/`month_records`).
 No fixed full state is stored for any configuration.
 
-Not run: Flix on any of this; the long chain; `stage_coverage.jl` (needs Julia and Flix stage receipts); the workflow; a receipt of the 205 months against print C (the print receipt covers the 90 configurations of print C-1980).
+Not run: Flix on the month list, Hall table and coverage (Flix ran only on the root-2019 fixtures); the long chain; `stage_coverage.jl` (needs Julia and Flix stage receipts); the workflow; a receipt of the 205 months against print C (the print receipt covers the 90 configurations of print C-1980).
