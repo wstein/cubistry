@@ -349,7 +349,7 @@ test("a configuration without any state shows the short line without a reason", 
   assert.ok(html.includes(`${NO_STATE_LEAD}</p>`));
   assert.doesNotMatch(html, /Reason/);
 });
-test("the differing sticker keeps its artwork and receives translucent hatching over its whole flat face", () => {
+test("the differing sticker keeps its artwork and receives translucent hatching over its day field", () => {
   for (const [w, h, tile] of [[192, 192, undefined], [192, 346, { w: 1, h: 1.8 }], [346, 346, { w: 1.8, h: 1.8 }]]) {
     const log = [];
     const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : (...a) => log.push([String(k), ...a])), set: (t, k, v) => { t[k] = v; log.push(["set", k, v]); return true; } });
