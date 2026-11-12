@@ -1,13 +1,22 @@
 import { test, expect } from "@playwright/test";
-const ready = async (page) => {
-  await page.goto("/playground.html");
-  await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
+// The Picture Cube is the host mode index.html?app=playground. The legacy panel ids became the mode's ids
+// (#playground-*), the status text is the shell chip, Exact/Rotation are readout values, the primary action is
+// "Solve exact target" and the move list is in the Nerd drawer (nerd=1 opens it).
+const chip = (page) => page.locator('[data-region="status-zone"] .shell-chip');
+const readout = (page, index) => page.locator('[data-region="readout"] .shell-readout-value').nth(index);
+const solve = (page) => page.locator('[data-region="primary-action"] button');
+const moves = (page) => page.locator('[data-region="nerd-drawer"] ol[aria-label="Committed moves"] li');
+const ready = async (page, search = "?app=playground&nerd=1") => {
+  await page.goto(`/index.html${search}`);
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-ready", "true");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("canvas")).toHaveCount(1);
 };
 const idle = async (page) =>
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("aria-busy", "false");
 const word = async (page, text) => {
-  await page.locator("#notation").fill(text);
-  await page.locator("#notation").press("Enter");
+  await page.locator("#playground-notation").fill(text);
+  await page.locator("#playground-notation").press("Enter");
   await idle(page);
 };
 test("keyboard manual turns, invalid words, seeded scramble history roundtrip and exact solve in every design", async ({
@@ -20,62 +29,62 @@ test("keyboard manual turns, invalid words, seeded scramble history roundtrip an
   await ready(page);
   await expect(page.locator("canvas")).toHaveCount(1);
   await word(page, "R L'");
-  await expect(page.locator("#cube")).toHaveAttribute("data-exact", "false");
-  await expect(page.locator("#cube")).toHaveAttribute(
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "false");
+  await expect(page.locator("#playground-cube")).toHaveAttribute(
     "data-equivalent",
     "true",
   );
-  await page.locator("#solve").click();
+  await solve(page).click();
   await idle(page);
-  await expect(page.locator("#cube")).toHaveAttribute(
+  await expect(page.locator("#playground-cube")).toHaveAttribute(
     "data-solver",
     "Verified",
   );
-  await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "true");
   for (const style of ["picture", "pastel", "classic"]) {
-    await page.locator("#design").selectOption(style);
+    await page.locator("#playground-design").selectOption(style);
     await idle(page);
-    await expect(page.locator("#history li")).toHaveCount(0);
-    await page.locator("#notation").fill("Rw U");
-    await page.locator("#notation").press("Enter");
-    await expect(page.locator("#status")).toContainText("Invalid");
-    await expect(page.locator("#history li")).toHaveCount(0);
-    await page.locator("h1").click();
+    await expect(moves(page)).toHaveCount(0);
+    await page.locator("#playground-notation").fill("Rw U");
+    await page.locator("#playground-notation").press("Enter");
+    await expect(chip(page)).toContainText("Invalid");
+    await expect(moves(page)).toHaveCount(0);
+    await page.locator("#studio-heading").click();
     await page.keyboard.press("r");
     await idle(page);
-    await expect(page.locator("#cube")).toHaveAttribute("data-cursor", "1");
+    await expect(page.locator("#playground-cube")).toHaveAttribute("data-cursor", "1");
     await page.getByRole("button", { name: "Turn U2", exact: true }).focus();
     await page.keyboard.press("Enter");
     await idle(page);
-    await page.locator("#undo").click();
+    await page.locator("#playground-undo").click();
     await idle(page);
-    await page.locator("#redo").click();
+    await page.locator("#playground-redo").click();
     await idle(page);
-    await expect(page.locator("#cube")).toHaveAttribute("data-cursor", "2");
-    await page.locator("#new-session").click();
+    await expect(page.locator("#playground-cube")).toHaveAttribute("data-cursor", "2");
+    await page.locator("#playground-new-session").click();
     await idle(page);
-    await page.locator("#seed").fill("0");
-    await page.locator("#count").fill("5");
-    await page.locator("#scramble").click();
+    await page.locator("#playground-seed").fill("0");
+    await page.locator("#playground-count").fill("5");
+    await page.locator("#playground-scramble").click();
     await idle(page);
-    const history = await page.locator("#history li").allTextContents();
+    const history = await moves(page).allTextContents();
     for (let i = 0; i < 5; i++) {
-      await page.locator("#undo").click();
+      await page.locator("#playground-undo").click();
       await idle(page);
     }
-    await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
+    await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "true");
     for (let i = 0; i < 5; i++) {
-      await page.locator("#redo").click();
+      await page.locator("#playground-redo").click();
       await idle(page);
     }
-    await expect(page.locator("#history li")).toHaveText(history);
-    await page.locator("#solve").click();
+    await expect(moves(page)).toHaveText(history);
+    await solve(page).click();
     await idle(page);
-    await expect(page.locator("#cube")).toHaveAttribute(
+    await expect(page.locator("#playground-cube")).toHaveAttribute(
       "data-solver",
       "Verified",
     );
-    await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
+    await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "true");
   }
   expect(errors).toEqual([]);
 });
@@ -84,34 +93,34 @@ test("cancel and Solve replace a moving word after its active legal turn; design
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await ready(page);
-  await page.locator("#speed").fill("500");
-  await page.locator("#count").fill("100");
-  await page.locator("#scramble").click();
-  await expect(page.locator("#cube")).toHaveAttribute("data-turning", "true");
-  await expect(page.locator("#apply")).toBeDisabled();
-  await expect(page.locator("#undo")).toBeDisabled();
-  await page.locator("#cancel").click();
+  await page.locator("#playground-speed").fill("500");
+  await page.locator("#playground-count").fill("100");
+  await page.locator("#playground-scramble").click();
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-turning", "true");
+  await expect(page.locator("#playground-apply")).toBeDisabled();
+  await expect(page.locator("#playground-undo")).toBeDisabled();
+  await page.locator("#playground-cancel").click();
   await idle(page);
-  await expect(page.locator("#history li")).toHaveCount(1);
-  await expect(page.locator("#cube")).toHaveAttribute("data-cursor", "1");
-  await page.locator("#scramble").click();
-  await expect(page.locator("#cube")).toHaveAttribute("data-turning", "true");
-  await page.locator("#solve").click();
-  await page.locator("#speed").fill("10");
+  await expect(moves(page)).toHaveCount(1);
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-cursor", "1");
+  await page.locator("#playground-scramble").click();
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-turning", "true");
+  await solve(page).click();
+  await page.locator("#playground-speed").fill("10");
   await idle(page);
-  await expect(page.locator("#cube")).toHaveAttribute(
+  await expect(page.locator("#playground-cube")).toHaveAttribute(
     "data-solver",
     "Verified",
   );
-  await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
-  await page.locator("#speed").fill("500");
-  await page.locator("#scramble").click();
-  await expect(page.locator("#cube")).toHaveAttribute("data-turning", "true");
-  await page.locator("#design").selectOption("classic");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "true");
+  await page.locator("#playground-speed").fill("500");
+  await page.locator("#playground-scramble").click();
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-turning", "true");
+  await page.locator("#playground-design").selectOption("classic");
   await idle(page);
-  await expect(page.locator("#cube")).toHaveAttribute("data-style", "classic");
-  await expect(page.locator("#history li")).toHaveCount(0);
-  await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-style", "classic");
+  await expect(moves(page)).toHaveCount(0);
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "true");
   await expect(page.locator("canvas")).toHaveCount(1);
 });
 test("every picture theme loads on demand and starts a fresh session", async ({
@@ -125,20 +134,20 @@ test("every picture theme loads on demand and starts a fresh session", async ({
   });
   await ready(page);
   const themes = (
-    await page.locator("#design option").evaluateAll((os) => os.filter((o) => !o.disabled).map((o) => o.value))
+    await page.locator("#playground-design option").evaluateAll((os) => os.filter((o) => !o.disabled).map((o) => o.value))
   ).filter((v) => !["classic", "picture", "pastel"].includes(v)); // "upload" stays disabled until pictures are added
   for (const theme of themes) {
-    await page.locator("#design").selectOption(theme);
-    await expect(page.locator("#cube")).toHaveAttribute("data-style", theme, {
+    await page.locator("#playground-design").selectOption(theme);
+    await expect(page.locator("#playground-cube")).toHaveAttribute("data-style", theme, {
       timeout: 30000,
     });
     await idle(page);
-    await expect(page.locator("#history li")).toHaveCount(0);
+    await expect(moves(page)).toHaveCount(0);
     await word(page, "R U");
-    await expect(page.locator("#cube")).toHaveAttribute("data-exact", "false");
-    await page.locator("#solve").click();
+    await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "false");
+    await solve(page).click();
     await idle(page);
-    await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
+    await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "true");
     await expect(page.locator("canvas")).toHaveCount(1);
   }
   expect(errors).toEqual([]);
@@ -149,7 +158,7 @@ test("a pending theme load is fetched once and blocks moves on the old puzzle un
   test.slow();
   await ready(page);
   const themes = (
-    await page.locator("#design option").evaluateAll((os) => os.map((o) => o.value))
+    await page.locator("#playground-design option").evaluateAll((os) => os.map((o) => o.value))
   ).filter((v) => !["classic", "picture", "pastel"].includes(v));
   if (!themes.length) return; // no registered theme: nothing to load
   const theme = themes[0];
@@ -163,27 +172,28 @@ test("a pending theme load is fetched once and blocks moves on the old puzzle un
     await route.continue();
   });
   await word(page, "R U");
-  await page.locator("#design").selectOption(theme);
-  await expect(page.locator("#status")).toContainText("Loading");
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "true");
-  await expect(page.locator("#design")).toHaveValue(theme);
-  for (const id of ["#apply", "#notation", "#undo", "#redo", "#solve", "#scramble", "#new-session"])
+  await page.locator("#playground-design").selectOption(theme);
+  await expect(chip(page)).toContainText("Loading");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("aria-busy", "true");
+  await expect(page.locator("#playground-design")).toHaveValue(theme);
+  for (const id of ["#playground-apply", "#playground-notation", "#playground-undo", "#playground-redo", "#playground-scramble", "#playground-new-session"])
     await expect(page.locator(id)).toBeDisabled();
+  await expect(solve(page)).toBeDisabled();
   await expect(page.getByRole("button", { name: "Turn R", exact: true })).toBeDisabled();
-  await page.locator("h1").click();
+  await page.locator("#studio-heading").click();
   await page.keyboard.press("r");
-  await expect(page.locator("#history li")).toHaveCount(2);
+  await expect(moves(page)).toHaveCount(2);
   // Choosing another design cancels the pending one; choosing the theme again must not fetch it twice.
-  await page.locator("#design").selectOption("picture");
+  await page.locator("#playground-design").selectOption("picture");
   await idle(page);
-  await expect(page.locator("#cube")).toHaveAttribute("data-style", "picture");
-  await page.locator("#design").selectOption(theme);
-  await expect(page.locator("#status")).toContainText("Loading");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-style", "picture");
+  await page.locator("#playground-design").selectOption(theme);
+  await expect(chip(page)).toContainText("Loading");
   release();
-  await expect(page.locator("#cube")).toHaveAttribute("data-style", theme, { timeout: 30000 });
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-style", theme, { timeout: 30000 });
   await idle(page);
-  await expect(page.locator("#history li")).toHaveCount(0);
-  await expect(page.locator("#apply")).toBeEnabled();
+  await expect(moves(page)).toHaveCount(0);
+  await expect(page.locator("#playground-apply")).toBeEnabled();
   expect(Object.keys(counts)).toHaveLength(6);
   expect(Object.values(counts)).toEqual([1, 1, 1, 1, 1, 1]);
 });
@@ -199,13 +209,13 @@ test("corrupt solver table fails explicitly without moving or changing history",
   );
   await ready(page);
   await word(page, "R U");
-  await page.locator("#solve").click();
+  await solve(page).click();
   await idle(page);
-  await expect(page.locator("#cube")).toHaveAttribute("data-solver", "Unavailable"); // hash failures are recoverable (docs/PLAYGROUND_SOLVER_TABLE.md)
-  await expect(page.locator("#cube")).toHaveAttribute("data-cursor", "2");
-  await expect(page.locator("#history li")).toHaveCount(2);
-  await expect(page.locator("#cube")).toHaveAttribute("data-exact", "false");
-  await expect(page.locator("#status")).toContainText("SHA-256");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-solver", "Unavailable"); // hash failures are recoverable (docs/PLAYGROUND_SOLVER_TABLE.md)
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-cursor", "2");
+  await expect(moves(page)).toHaveCount(2);
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "false");
+  await expect(chip(page)).toContainText("SHA-256");
 });
 for (const mobile of [false, true])
   test(`DPR2 ${mobile ? "mobile" : "desktop"} canvas fits viewport, camera changes only view, resources load`, async ({
@@ -226,9 +236,9 @@ for (const mobile of [false, true])
       if (r.status() >= 400) errors.push(r.url());
     });
     await ready(page);
-    await page.locator("#cube canvas").scrollIntoViewIfNeeded();
-    const host = await page.locator("#cube").boundingBox(),
-      canvas = await page.locator("#cube canvas").boundingBox();
+    await page.locator("#playground-cube canvas").scrollIntoViewIfNeeded();
+    const host = await page.locator("#playground-cube").boundingBox(),
+      canvas = await page.locator("#playground-cube canvas").boundingBox();
     expect(canvas.width).toBeCloseTo(host.width, 0);
     expect(canvas.height).toBeCloseTo(host.height, 0);
     expect(
@@ -244,9 +254,9 @@ for (const mobile of [false, true])
       { steps: 8 },
     );
     await page.mouse.up();
-    await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
-    await expect(page.locator("#cube")).toHaveAttribute("data-cursor", "0");
-    await page.locator("#camera").click();
+    await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "true");
+    await expect(page.locator("#playground-cube")).toHaveAttribute("data-cursor", "0");
+    await page.locator("#playground-reset-view").click();
     await page.screenshot({
       path: testInfo.outputPath(
         `playground-${mobile ? "mobile" : "desktop"}.png`,
@@ -270,34 +280,34 @@ test("obsolete solver load cannot play after a new session; viewer failure freez
   });
   await ready(page);
   await word(page, "R U");
-  await page.locator("#solve").click();
+  await solve(page).click();
   await expect.poll(() => requested).toBe(true);
-  await expect(page.locator("#cube")).toHaveAttribute("data-solver", "Loading");
-  await page.locator("#design").selectOption("classic");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-solver", "Loading");
+  await page.locator("#playground-design").selectOption("classic");
   await idle(page);
   await word(page, "F");
   release();
-  await expect(page.locator("#status")).toContainText("Manual");
+  await expect(chip(page)).toContainText("Manual");
   // Load the same authenticated table for a fresh request: the obsolete request
   // must not animate its old source while this request solves the actual pose.
-  await page.locator("#solve").click();
+  await solve(page).click();
   await idle(page);
-  await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
-  expect((await page.locator("#history li").allTextContents())[0]).toBe("F");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "true");
+  expect((await moves(page).allTextContents())[0]).toBe("F");
   await page.evaluate(async () => {
     const { CubeViewer } = await import("/packages/cube-viewer/src/index.ts");
     CubeViewer.prototype.animate = async () => {
       throw Error("Injected rendering failure");
     };
   });
-  const cursor = await page.locator("#cube").getAttribute("data-cursor");
+  const cursor = await page.locator("#playground-cube").getAttribute("data-cursor");
   await page.getByRole("button", { name: "Turn R", exact: true }).click();
-  await expect(page.locator("#cube")).toHaveAttribute("data-frozen", "true");
-  await expect(page.locator("#cube")).toHaveAttribute("data-cursor", cursor);
-  await expect(page.locator("#status")).toContainText("Reload");
-  await expect(page.locator("#exact")).toHaveText("Unknown");
-  await expect(page.locator("#equivalent")).toHaveText("Unknown");
-  await expect(page.locator("#solve")).toBeDisabled();
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-frozen", "true");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-cursor", cursor);
+  await expect(chip(page)).toContainText("Reload");
+  await expect(readout(page, 2)).toHaveText("Unknown");
+  await expect(readout(page, 3)).toHaveText("Unknown");
+  await expect(solve(page)).toBeDisabled();
 });
 
 test("untrusted picture assets fail startup explicitly without a canvas or enabled turns", async ({
@@ -310,37 +320,35 @@ test("untrusted picture assets fail startup explicitly without a canvas or enabl
       body: '<svg xmlns="http://www.w3.org/2000/svg"><script/></svg>',
     }),
   );
-  await page.goto("/playground.html");
-  await expect(page.locator("#status")).toContainText("Unable to start");
-  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
-  await expect(page.locator("#exact")).toHaveText("Unavailable");
+  await page.goto("/index.html?app=playground");
+  await expect(chip(page)).toContainText("Unable to start");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("aria-busy", "false");
+  await expect(readout(page, 2)).toHaveText("Unavailable");
   await expect(page.locator("canvas")).toHaveCount(0);
-  await expect(page.locator("#apply")).toBeDisabled();
+  await expect(page.locator("#playground-apply")).toBeDisabled();
 });
 
 test("the size control offers 2 to 7, plays 2x2 only and keeps size= honest", async ({
   page,
 }) => {
   await ready(page);
-  await expect(page.locator("h1")).toHaveText("Picture Cube");
+  await expect(page.locator("#studio-heading")).toHaveText("Picture Cube");
   await expect(page).toHaveTitle(/Picture Cube/);
-  const radios = page.locator("#size-control [role=radio]");
+  const radios = page.locator("#playground-size-control [role=radio]");
   await expect(radios).toHaveText(["2×2", "3×3", "4×4", "5×5", "6×6", "7×7"]);
   await expect(radios.nth(0)).toBeEnabled();
   await expect(radios.nth(0)).toHaveAttribute("aria-checked", "true");
   for (const i of [1, 2, 3, 4, 5]) await expect(radios.nth(i)).toBeDisabled();
-  await expect(page.locator("#size-note")).toContainText("Sizes 3 to 7 are not playable yet");
-  await expect(page.locator("#cube")).toHaveAttribute("data-size", "2");
+  await expect(page.locator("#playground-size-note")).toContainText("Sizes 3 to 7 are not playable yet");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-size", "2");
   await radios.nth(0).click();
   expect(new URL(page.url()).searchParams.get("size")).toBe("2");
   // A valid size the engine cannot turn: the 2x2 stays, the page says why.
-  await page.goto("/playground.html?size=5");
-  await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
-  await expect(page.locator("#cube")).toHaveAttribute("data-size", "2");
-  await expect(page.locator("#size-note")).toContainText("5×5 is not playable yet");
-  await expect(page.locator("#size-control [aria-checked=true]")).toHaveText("2×2");
+  await ready(page, "?app=playground&size=5");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-size", "2");
+  await expect(page.locator("#playground-size-note")).toContainText("5×5 is not playable yet");
+  await expect(page.locator("#playground-size-control [aria-checked=true]")).toHaveText("2×2");
   // An invalid value falls back with a note.
-  await page.goto("/playground.html?size=9");
-  await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
-  await expect(page.locator("#size-note")).toContainText("size= must be a whole number from 2 to 7");
+  await ready(page, "?app=playground&size=9");
+  await expect(page.locator("#playground-size-note")).toContainText("size= must be a whole number from 2 to 7");
 });
