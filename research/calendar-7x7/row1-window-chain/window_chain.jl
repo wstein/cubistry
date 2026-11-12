@@ -20,12 +20,12 @@
 # into a best-effort target, see below) best_effort_cell=7,1|7,7 (switch, default the cell of the best-effort file) max_edges=N
 # library=L1|L4|L5 width lambda corew fanout maxdepth patience nsnap finish_depth.
 # Best-effort edge (chain.v2): the target is the true board of the month with the digit 29 (red, the ink of the column) in the one wrong
-# cell, (7,1) as the file says; (7,7) only when best_effort_cell=7,7 is given. The edge line is followed by `wrong r c` and
+# cell, (7,1); (7,7) only when best_effort_cell=7,7 is given (a file that names (7,7) without the switch is an error). The edge line is followed by `wrong r c` and
 # `hall 7,1;7,7`, and the next edge starts from the state this edge ends in. Objective: the same solver as for an exact month
 # (beam, greedy fallback) on that target, i.e. the fewest moves it finds from the retained state; ties are the beam's deterministic order.
 # The wrong cells of the end state are recomputed (must be exactly the chosen cell), and so is the Hall deficiency (must be 1); a target
 # that no solver reaches stops the run with the reason best_effort_unreachable (name best_effort_cell=7,7 to try the other corner).
-# Output OUT: chain.moves.tsv (chain.v1), states/state-NN.tsv, months.tsv, edges.tsv (cumulative with prior=, column method: beam,
+# Output OUT: chain.moves.tsv (chain.v1; chain.v2 once an edge is a best-effort edge), states/state-NN.tsv, months.tsv, edges.tsv (cumulative with prior=, column method: beam,
 # finishN or greedy), PROGRESS.txt (incl. greedy_edges).
 # Exit: 0 chain complete or stopped cleanly (PROGRESS.txt says which), 3 no new edge was produced, otherwise error.
 @assert length(ARGS)>=2 "usage: window_chain.jl OUT PRINT [key=value ...]"
@@ -133,7 +133,7 @@ for id in edges_before+2:length(plan)
     word=r.word;method=r.method
     if isnothing(word)      # greedy fallback: valid but longer
         g=orbit_solve(P,source,state,target,action,catalogs)
-        isnothing(g) && (stop=isnothing(wrong) ? "search_stalled" : "best_effort_unreachable";break)
+        isnothing(g) && (stop=stop_for_unreached(wrong);break)
         word=P.macro_normalize(g.word);method="greedy"
     else
         word=P.macro_normalize(word)
