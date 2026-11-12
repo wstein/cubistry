@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 /** Shared 2D/3D artwork: original glyphs, with one source for each 6/9 pair. */
 import { numberLayout, type LoadedFont } from "./fonts.ts";
-import { type Layout, NAME_SLOTS, NAME_WORDS, nameAnchor } from "./layout.ts";
+import { type Layout, NAME_SLOTS, NAME_WORDS, nameAnchor, type NameWords } from "./layout.ts";
 import { CALENDAR7_SIZE, monthBanner, NAMES_BANNER_OVERHANG, outerLayerWidth } from "./geometry.ts";
 import { faceTransform, type FaceTile, isBannerClass, lineRect, nameCenterUp, nameLetterX, namePxPerUnit, paintTileGround, TEXT_SQUARE, weekdayShift, TEXTURE, tileCanvasSize, tileGrid, tileRoles, type Surface } from "./sticker-art.ts";
 import type { ColorScheme } from "./schemes.ts";
@@ -59,14 +59,14 @@ export interface NameFace {
 }
 
 interface TileInfo { readonly label: string; readonly anchor: -1 | 0 | 1; readonly months: readonly string[] }
-const TILES: readonly TileInfo[] = (() => {
+const tilesOf = (words: NameWords): readonly TileInfo[] => {
   const seen = new Map<string, TileInfo>(), names = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-  NAME_WORDS.forEach((word, i) => word.forEach(label => {
-    const anchor = nameAnchor(label), old = seen.get(label);
+  words.forEach((word, i) => word.forEach(label => {
+    const anchor = nameAnchor(label, words), old = seen.get(label);
     seen.set(label, { label, anchor, months: [...(old?.months ?? []), names[i] ?? word.join("")] });
   }));
   return [...seen.values()];
-})();
+};
 
 /**
  * Room of the name tiles on the unit grid, in drawing px from the center of the unit cell (the content is one unit wide in
@@ -111,7 +111,7 @@ export const NAMES_FIRST_TILE_FILL = false;
  * (as at a seam) from the red banner edge at most, the last is flush left and ends 1.5 px before the texture edge at most. The glyphs must fit
  * the height of the red banner.
  */
-function fitAt(font: LoadedFont, s: number, c: number, outer: number): { ok: true; m: number; taus: Map<string, number> } | { ok: false; fails: string[] } {
+function fitAt(font: LoadedFont, s: number, c: number, outer: number, TILES: readonly TileInfo[]): { ok: true; m: number; taus: Map<string, number> } | { ok: false; fails: string[] } {
   const ppu = namePxPerUnit(), fails: string[] = [], taus = new Map<string, number>(), banner = monthBanner().height * ppu;
   // the seam sits between two texture edges (bevel reach): ink keeps 1.5 px inside the texture on the seam side
   const m = Math.max(c * s / 2, ...TILES.flatMap(t => {
@@ -136,7 +136,7 @@ function fitAt(font: LoadedFont, s: number, c: number, outer: number): { ok: tru
   return fails.length ? { ok: false, fails } : { ok: true, m, taus };
 }
 
-const NAME_FACES = new WeakMap<LoadedFont, Map<number, NameFace & { m: number }>>();
+const NAME_FACES = new WeakMap<LoadedFont, Map<string, NameFace & { m: number }>>();
 /**
  * Names layout on the cubie faces (owner decision of 2026-11-11, "option 4"): one glyph size per font and per tile one
  * uniform extra tracking, solved from the font's real metrics. The seam between two tiles is in the middle of the ink gap
@@ -145,8 +145,9 @@ const NAME_FACES = new WeakMap<LoadedFont, Map<number, NameFace & { m: number }>
  * No ink gap inside a tile is below `NAME_MIN_INK_GAP`. The size is the one that fills the middle tiles with the median
  * natural gap, at least the weekday size, and smaller only when a tile cannot fit; `blocked` then names it.
  */
-export function nameFaceTable(font: LoadedFont, outer: number = outerLayerWidth(CALENDAR7_SIZE)): NameFace {
-  const cached = NAME_FACES.get(font)?.get(outer);
+export function nameFaceTable(font: LoadedFont, outer: number = outerLayerWidth(CALENDAR7_SIZE), words: NameWords = NAME_WORDS): NameFace {
+  const key = JSON.stringify([outer, words]), TILES = tilesOf(words);
+  const cached = NAME_FACES.get(font)?.get(key);
   if (cached) return cached;
   const ppu = namePxPerUnit(), nat = new Map(TILES.map(t => [t.label, natural(font, t.label)]));
   const all = [...nat.values()].flatMap(n => n.gaps).sort((a, b) => a - b);
@@ -154,11 +155,11 @@ export function nameFaceTable(font: LoadedFont, outer: number = outerLayerWidth(
   const middle = TILES.filter(t => t.anchor === 0);
   const ref = middle.reduce((sum, t) => { const n = nat.get(t.label)!; return sum + ppu / (n.glyphs + n.gaps.reduce((a, b) => a + b, 0) + c); }, 0) / middle.length;
   const weekday = Math.max(...WEEKDAY_LABELS.map(d => labelLayout(d, font)[0].size));
-  let size = Math.max(Math.floor(ref * 4) / 4, weekday), fit = fitAt(font, size, c, outer);
-  while (!fit.ok && size > 10) { size -= 0.25; fit = fitAt(font, size, c, outer); }
+  let size = Math.max(Math.floor(ref * 4) / 4, weekday), fit = fitAt(font, size, c, outer, TILES);
+  while (!fit.ok && size > 10) { size -= 0.25; fit = fitAt(font, size, c, outer, TILES); }
   if (!fit.ok) throw new Error("no name size fits");
   const blocked = size >= weekday ? [] : (() => {
-    const at = fitAt(font, weekday, c, outer);
+    const at = fitAt(font, weekday, c, outer, TILES);
     return at.ok ? [] : at.fails.map(label => ({ label, months: TILES.find(t => t.label === label)!.months }));
   })();
   const tiles = new Map<string, NameTileFit>();
@@ -170,7 +171,7 @@ export function nameFaceTable(font: LoadedFont, outer: number = outerLayerWidth(
   }
   const banner = monthBanner(), cap = Math.max(...TILES.map(t => nat.get(t.label)!.height)) * size / ppu;
   const face = { size, bannerHeight: banner.height, centerUp: nameCenterUp(cap), weekday, seamGap: 2 * fit.m, tiles, blocked, m: fit.m };
-  NAME_FACES.set(font, (NAME_FACES.get(font) ?? new Map()).set(outer, face));
+  NAME_FACES.set(font, (NAME_FACES.get(font) ?? new Map()).set(key, face));
   return face;
 }
 
@@ -181,9 +182,9 @@ export function nameFaceTable(font: LoadedFont, outer: number = outerLayerWidth(
  * centered, each half a seam gap away from the seam; vertically placed in the red banner by `centerUp` (2:1 above to below with square corners, centered with rounded ones). On the sheet (`surface` "sticker"): the letters of a three-slot grid at one size (the
  * cap height of a three-letter label, or smaller when the widest capital would not fit its slot); each ink is centered on its slot.
  */
-export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface = "face"): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
+export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface = "face", words: NameWords = NAME_WORDS): readonly { text: string; size: number; x: number; y: number; box: InkBox }[] {
   if (surface === "face") {
-    const face = nameFaceTable(font) as NameFace & { m: number }, fit = face.tiles.get(text);
+    const face = nameFaceTable(font, undefined, words) as NameFace & { m: number }, fit = face.tiles.get(text);
     if (fit) {
       const ppu = namePxPerUnit(), glyphs = [...text].map(c => font.glyphs[c]);
       const ink = glyphs.reduce((sum, g) => sum + (g.right - g.left) * face.size, 0) + fit.gaps.reduce((a, b) => a + b, 0);
@@ -201,7 +202,7 @@ export function nameLabelLayout(text: string, font: LoadedFont, surface: Surface
   const widest = Math.max(...[...NAME_LETTERS].map(c => numberLayout(c, font, 1).width));
   const size = Math.min(58 / capHeight, (slot * 0.95) / widest);
   return [...text].map((char, i) => {
-    const p = numberLayout(char, font, size), x = nameLetterX(text, i, surface === "face");
+    const p = numberLayout(char, font, size), x = nameLetterX(text, i, surface === "face", 1, words);
     return { text: char, size, x, y: 96, box: { x0: x - p.width / 2, y0: 96 - p.height / 2, x1: x + p.width / 2, y1: 96 + p.height / 2 } };
   });
 }
@@ -219,7 +220,7 @@ export function drawFontRun(ctx: CanvasRenderingContext2D, text: string, font: L
   }
 }
 /** Redraws existing canvases. The physical sticker identity and frame never change. */
-export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink: string, font: LoadedFont, scheme: ColorScheme, surface: Surface = "sticker", sheetColors?: { readonly fill: string; readonly ink: string }, layout: Layout = "standard", tile?: FaceTile): void {
+export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink: string, font: LoadedFont, scheme: ColorScheme, surface: Surface = "sticker", sheetColors?: { readonly fill: string; readonly ink: string }, layout: Layout = "standard", tile?: FaceTile, words: NameWords = NAME_WORDS): void {
   const printed = tileRoles(scheme, text, ink, layout);
   // The HTML sheet retains its accessible page-theme palette; the cube retains its printed scheme.
   const roles = sheetColors ? { ...printed, fill: sheetColors.fill, ink: sheetColors.ink, inkSmall: sheetColors.ink } : printed;
@@ -234,7 +235,7 @@ export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink
     const { cx, cy, kx, ky } = faceTransform(t);
     ctx.save();ctx.translate(cx, cy);ctx.scale(kx, ky);ctx.translate(-96, -96);
   }
-  const parts = layout === "names" && printed.cls === "month" ? nameLabelLayout(text, font, surface) : labelLayout(text, font);
+  const parts = layout === "names" && printed.cls === "month" ? nameLabelLayout(text, font, surface, words) : labelLayout(text, font);
   if (text) for (const [index, part] of parts.entries()) {
     ctx.fillStyle = index === 1 ? roles.inkSmall : roles.ink;
     drawFontRun(ctx, part.text, font, part.size, part.x, part.y + (t ? weekdayShift(roles.cls) : 0)); // weekday words a little below the cell center

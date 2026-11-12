@@ -6,11 +6,11 @@ import type { RotationPlacement } from "./deferral.ts";
 import { revealPlayback, resetPlaybackVisibility } from "./playback-visibility.ts";
 import type { ModeInstance } from "../registry.ts";
 import { type DisplayTable, type Graph, namesWindowContains, parseDisplays, parseGraph, parseState, type Start } from "./graph.ts";
-import { type Layout, type LayoutMode, ANY_DISPLAY_ONLY_NOTICE, LAYOUT_PARAM, NAMES_ANY_LABEL, NAMES_ANY_LOAD_NOTICE, NAMES_ANY_MODE, NAMES_LOAD_NOTICE, parseLayoutMode } from "./layout.ts";
-import { type AnyData, type AnyState, chooseAnyMonth, parseAnyData, stateForDate, wrongStickerIndices } from "./anydate.ts";
+import { printNameWords, type Layout, DEMO_DISPLAY_ONLY_NOTICE, LAYOUT_PARAM } from "./layout.ts";
+import { type AnyData, type AnyState, chooseAnyMonth, previewForDate, stateForDate, wrongStickerIndices } from "./anydate.ts";
 import { anyDateModel, anyDatePageHtml } from "./anydate-view.ts";
 import { MonthPicker } from "./month-picker.ts";
-import { type Pose, type Printing, stateDigest } from "./engine.ts";
+import { clonePose, type Pose, type Printing, stateDigest } from "./engine.ts";
 import {
   announce,
   buildModel,
@@ -72,6 +72,8 @@ const MY_PARAMS = ["year", "month"];
 /** The data of one layout: its graph, displays and (with a 3D view) the print and the pose of the chain root. */
 interface Dataset {
   readonly layout: Layout;
+  /** True for the names demo data (beam chain): same rendering as `names`, another data folder, labeled as a demo. */
+  readonly demo?: boolean;
   readonly graph: Graph;
   readonly table: DisplayTable;
   readonly start: Start | null;
@@ -96,12 +98,21 @@ export async function mountCalendar7(
   env: MountEnv,
 ): Promise<Calendar7Instance | void> {
   const threeD = Boolean(env.sceneHost && env.createStage);
+  // Former layout URLs address the same physical print; preserve all other query values.
+  if (params.has(LAYOUT_PARAM) || (params.has(BANNER_PARAM) && parseBannerStyle(params.get(BANNER_PARAM)) === "theme")) {
+    params = new URLSearchParams(params);
+    params.delete(LAYOUT_PARAM);
+    if (parseBannerStyle(params.get(BANNER_PARAM)) === "theme") params.delete(BANNER_PARAM);
+    const currentQuery = new URLSearchParams(env.search());
+    currentQuery.delete(LAYOUT_PARAM);
+    if (parseBannerStyle(params.get(BANNER_PARAM)) === "theme") currentQuery.delete(BANNER_PARAM);
+    env.replaceQuery(currentQuery.size ? `?${currentQuery.toString()}` : "");
+  }
   root.innerHTML =
     '<div class="c7-live" role="status" aria-live="polite"></div>' +
     '<div class="c7-date-choice" data-c7-month-picker></div>' +
     '<div class="c7-appearance-choices">' +
     `<div class="c7-font-choice"><label for="c7-font-style">Font style</label><select id="c7-font-style" data-c7-font>${FONT_STYLES.map(f => `<option value="${f.id}"${f.id === fontStyleById(params.get("font")).id ? " selected" : ""}>${f.label}</option>`).join("")}</select></div>` +
-    (threeD ? `<div class="c7-layout-choice"><label for="c7-layout">Cube layout</label><select id="c7-layout" data-c7="layout"><option value="standard"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "standard" ? " selected" : ""}>Standard</option><option value="names"${parseLayoutMode(params.get(LAYOUT_PARAM)) === "names" ? " selected" : ""}>Names (preview, May 2026 - Jan 2028)</option>${params.get(LAYOUT_PARAM) === NAMES_ANY_MODE ? `<option value="${NAMES_ANY_MODE}" selected>${NAMES_ANY_LABEL}</option>` : ""}</select></div>` : "") +
     (threeD ? `<div class="c7-scheme-choice"><label for="c7-color-theme">Cube color theme</label><select id="c7-color-theme" data-c7="scheme">${SCHEMES.map(s => `<option value="${s.id}"${s.id === schemeById(params.get(SCHEME_PARAM)).id ? " selected" : ""}>${s.name}</option>`).join("")}</select></div>` : "") +
     (threeD ? `<div class="c7-banner-choice"><label for="c7-banner-style">Banner style</label><select id="c7-banner-style" data-c7="banner">${[["theme", "Theme default"], ["rounded", "Rounded"], ["square", "Hard edges"], ["underline", "Underline"], ["boxed", "Boxed"], ["rounded-box", "Rounded box"]].map(([value, label]) => `<option value="${value}"${value === parseBannerStyle(params.get(BANNER_PARAM)) ? " selected" : ""}>${label}</option>`).join("")}</select></div>` : "") +
     '</div><p class="c7-font-status" role="status" data-c7-font-status></p>' +
@@ -111,18 +122,19 @@ export async function mountCalendar7(
   const view = root.querySelector(".c7-view") as HTMLElement;
   const live = root.querySelector(".c7-live") as HTMLElement;
   const [graphJson, displaysJson, stateJson] = await Promise.all([
-    env.fetchJson(`${env.base}calendar7/graph.v1.json`),
-    env.fetchJson(`${env.base}calendar7/displays.v1.json`),
-    threeD ? env.fetchJson(`${env.base}calendar7/state.v1.json`) : undefined,
+    env.fetchJson(`${env.base}calendar7/names-demo/graph.v1.json`),
+    env.fetchJson(`${env.base}calendar7/names-demo/displays.v1.json`),
+    env.fetchJson(`${env.base}calendar7/names-demo/state.v1.json`),
   ]);
   if (!env.isCurrent()) return;
-  const standardGraph = parseGraph(graphJson);
-  const standard: Dataset = {
-    layout: "standard",
-    graph: standardGraph,
+  const canonicalGraph = parseGraph(graphJson);
+  const canonical: Dataset = {
+    layout: "names",
+    demo: true,
+    graph: canonicalGraph,
     table: parseDisplays(displaysJson),
-    start: threeD ? parseState(stateJson) : null,
-    range: chainRange(standardGraph),
+    start: parseState(stateJson),
+    range: chainRange(canonicalGraph),
   };
   const d = env.now();
   const today: YearMonth = { year: d.getFullYear(), month: d.getMonth() + 1 };
@@ -138,36 +150,25 @@ export async function mountCalendar7(
   let pending: Promise<void> | null = null;
   let wanted: number | null = null;
   /** The data of the page shown, of the cube the player owns, and of the month the cube is wanted at. A different print is a different physical state: the player is rebuilt, never reused. */
-  let shown: Dataset = standard;
-  let played: Dataset = standard;
-  let wantedData: Dataset = standard;
-  /** The selected layout (control and URL); the layout in effect is `shown.layout` (the standard layout outside the names window). */
-  let layoutMode: LayoutMode = threeD ? parseLayoutMode(params.get(LAYOUT_PARAM)) : "standard";
-  const layoutSelect = q("layout") as HTMLSelectElement | null;
-  if (layoutSelect?.value) layoutMode = parseLayoutMode(layoutSelect.value);
+  let shown: Dataset = canonical;
+  let played: Dataset = canonical;
+  let wantedData: Dataset = canonical;
   const layoutNotice = q("layout-notice");
-  /** The names data: loaded once, only when the mode is selected; `namesFailed` after a failed load (the standard layout is shown). */
-  let names: Dataset | null = null;
-  let namesLoading: Promise<void> | null = null;
-  let namesFailed = false;
-  /** The print B data of the any-date display (public/calendar7/names-any): same life cycle as the names data. */
-  let anyData: AnyData | null = null;
-  let anyLoading: Promise<void> | null = null;
-  let anyFailed = false;
-  /** True while the page shows a month from print B without a move sequence; `anyWanted` is the state the cube shows then (null: no cube). */
+  /** True while the page shows a month from the fixed preview print without a move sequence; `anyWanted` is the state the cube shows then (null: no cube). */
   let anyActive = false;
   let anyWanted: Extract<AnyState, { kind: "state" | "best-effort" }> | null = null;
   /** The wrong stickers the cube was built with (best effort); another set means another build. */
   let anyWrongKey = "";
-  /** True while the cube is configured with print B for the any-date display (the player is then disposed). */
+  /** True while the cube is configured with the fixed preview print for the any-date display (the player is then disposed). */
   let anyBound = false;
+  let anyBoundStart: Start | null = null;
+  let activeAnyData: AnyData | null = null;
   let anyLabel = "";
   let currentParams: URLSearchParams = params;
-  let showSeq = 0;
+  let monthPicker: MonthPicker | null = null;
   let previous: PlayerSnapshot | null = null;
   let wordOptions: WordOptions = { ...DEFAULT_WORD_OPTIONS };
   let currentModel: PageModel | null = null;
-  let monthPicker: MonthPicker | null = null;
   let selectedSpeed: number = DEFAULT_SPEED;
   let font: LoadedFont | null = null;
   let schemeId: string | null = params.get(SCHEME_PARAM);
@@ -195,7 +196,7 @@ export async function mountCalendar7(
       td.style.height = `${height / em}em`;
       canvas.width = canvas.height = 192;canvas.setAttribute("aria-hidden", "true");
       const ctx = canvas.getContext("2d");if (!ctx) return;
-      drawFontSticker(ctx, cell.text, cell.ink, chosen, schemeById(schemeId), "sticker", { fill: colors.backgroundColor, ink: colors.color }, currentModel?.layout ?? "standard");
+      drawFontSticker(ctx, cell.text, cell.ink, chosen, schemeById(schemeId), "sticker", { fill: colors.backgroundColor, ink: colors.color }, currentModel?.layout ?? "standard", undefined, canonical.start ? printNameWords(canonical.start.printing) : undefined);
       label.className = "c7-cell-text";label.textContent = cell.text;
       td.replaceChildren(label, canvas);
     });
@@ -266,7 +267,7 @@ export async function mountCalendar7(
       box.hidden = false;
     }
     (q("player") as HTMLElement | null)?.removeAttribute("hidden");
-    for (const name of ["play", "skip", "speed", "reset", "slice", "orientation", "notation", "scheme", "layout", "banner"]) q(name)?.setAttribute("disabled", "");
+    for (const name of ["play", "skip", "speed", "reset", "slice", "orientation", "notation", "scheme", "banner"]) q(name)?.setAttribute("disabled", "");
     live.textContent = "The 3D view stopped. The month sheet is still shown.";
     if (sceneHost) sceneHost.hidden = true;
     console.error(error);
@@ -406,6 +407,7 @@ export async function mountCalendar7(
     root.setAttribute("data-c7-state", "building");
     played = data;
     anyBound = false;
+    anyBoundStart = null;
     made.configure(s.printing, s.pose, "face", data.layout);
     player = new Calendar7Player({
       graph: data.graph,
@@ -426,6 +428,8 @@ export async function mountCalendar7(
     wanted = index;
     wantedData = data;
     if (index === null) {
+      player?.dispose();
+      player = null;
       if (sceneHost) sceneHost.hidden = true;
       (q("player") as HTMLElement | null)?.setAttribute("hidden", "");
       return;
@@ -456,57 +460,29 @@ export async function mountCalendar7(
     const active = player && player.snapshot.phase !== "idle";
     view.querySelectorAll?.(".c7-word-panel").forEach((el) => ((el as HTMLElement).hidden = Boolean(active)));
   };
-  /** Loads the names data once, only when the names layout is selected. A failure is remembered: the standard layout is shown with a notice. */
-  const loadNames = (): Promise<void> => {
-    const dir = `${env.base}calendar7/names/`;
-    namesLoading ??= Promise.all([env.fetchJson(`${dir}graph.v1.json`), env.fetchJson(`${dir}displays.v1.json`), env.fetchJson(`${dir}state.v1.json`)])
-      .then(([g, d, st]) => {
-        const graph = parseGraph(g);
-        names = { layout: "names", graph, table: parseDisplays(d), start: parseState(st), range: chainRange(graph) };
-      })
-      .catch(() => {
-        namesFailed = true;
-      });
-    return namesLoading;
-  };
-  /** Loads the print B data of the any-date display once, when it is first needed. A failure is remembered: the standard layout is shown with a notice. */
-  const loadAny = (): Promise<void> => {
-    const dir = `${env.base}calendar7/names-any/`;
-    anyLoading ??= Promise.all([env.fetchJson(`${dir}state.v1.json`), env.fetchJson(`${dir}configs.v1.json`)])
-      .then(([st, cfg]) => {
-        anyData = parseAnyData(st, cfg);
-      })
-      .catch(() => {
-        anyFailed = true;
-      });
-    return anyLoading;
-  };
-  /** True when the month of `p` is shown from print B: always in `names-any`, and in `names` for a month outside the chain window. */
-  const wantsAny = (p: URLSearchParams): boolean => {
-    if (layoutMode === NAMES_ANY_MODE) return true;
-    if (layoutMode !== "names" || !names) return false;
-    const m = chooseMonth(p, today, standard.range);
-    return m.kind !== "invalid" && !namesWindowContains(names.table, m.ym.year, m.ym.month);
-  };
-  /** Shows print B (display only) for the month of `p`; the cube shows the state of the month's configuration, or no cube when there is none. */
-  const applyAny = (p: URLSearchParams, moveFocus: boolean): void => {
-    const data = anyData as AnyData;
+  /** Shows the fixed preview print (display only) for the month of `p`; the cube shows the state of the month's configuration, or no cube when there is none. */
+  const applyAny = (p: URLSearchParams, moveFocus: boolean, data: AnyData): void => {
+    player?.dispose();
+    player = null;
+    previous = null;
+    activeWord = null;
+    activeAnyData = data;
     const choice = chooseAnyMonth(p, today);
     const state = choice.kind === "ok" ? stateForDate(data, choice.ym.year, choice.ym.month) : null;
-    const model = anyDateModel(choice, state, today, standard.range);
+    const model = { ...anyDateModel(choice, state, today, canonical.range, printNameWords(data.start.printing)), demo: true };
     anyActive = true;
     anyWanted = state?.kind === "state" || state?.kind === "best-effort" ? state : null;
     currentModel = model;
     if (threeD) {
       root.setAttribute("data-c7-layout", "names");
-      root.setAttribute("data-c7-layout-mode", layoutMode);
+      root.setAttribute("data-c7-layout-mode", "names");
       root.setAttribute("data-c7-any", state ? state.kind : "invalid");
       root.setAttribute("data-c7-state", anyWanted ? "building" : "idle");
       if (choice.kind === "ok") root.setAttribute("data-c7-month", ymKey(choice.ym));
     }
     anyLabel = choice.kind === "ok" ? monthLabel(choice.ym) : "";
     if (layoutNotice) {
-      layoutNotice.textContent = ANY_DISPLAY_ONLY_NOTICE;
+      layoutNotice.textContent = DEMO_DISPLAY_ONLY_NOTICE;
       layoutNotice.hidden = false;
     }
     refreshPreviews();
@@ -514,13 +490,14 @@ export async function mountCalendar7(
     if (moveFocus) (view.querySelector("[data-focus]") as HTMLElement | null)?.focus({ preventScroll: true });
     if (threeD) void syncAny();
   };
-  /** The cube of the any-date display: print B, the pose of the month's configuration, no player and no moves. */
+  /** The cube of the any-date display: the fixed preview print, the pose of the month's configuration, no player and no moves. */
   const syncAny = async (): Promise<void> => {
     if (!threeD || failed) return;
     wanted = null; // a chain month that is still waiting for the stage is dropped
     const target = anyWanted;
+    const data = activeAnyData;
     const controls = q("player") as HTMLElement;
-    if (!target) {
+    if (!target || !data) {
       (sceneHost as HTMLElement).hidden = true;
       controls.hidden = true;
       return;
@@ -531,11 +508,11 @@ export async function mountCalendar7(
     try {
       await ensure();
       if (!alive()) return;
-      if (failed || anyWanted !== target) return;
-      const data = anyData as AnyData;
+      if (failed || anyWanted !== target || activeAnyData !== data) return;
       const made = stage as Stage;
       const wrong = target.kind === "best-effort" ? wrongStickerIndices(target.pose, target.wrong) : [];
-      if (!anyBound || anyWrongKey !== wrong.join()) {
+      const wrongKey = wrong.map(i => `${i}:${target.pose.up.subarray(3 * i, 3 * i + 3).join(",")}`).join("|");
+      if (!anyBound || anyBoundStart !== data.start || anyWrongKey !== wrongKey) {
         player?.dispose();
         player = null;
         activeWord = null;
@@ -543,9 +520,10 @@ export async function mountCalendar7(
         const wordBox = q("active-word"), activePanel = q("active-step");
         if (wordBox) wordBox.innerHTML = "";
         if (activePanel) activePanel.hidden = true;
-        made.configure(data.start.printing, data.start.pose, "face", "names", wrong);
+        made.configure(data.start.printing, clonePose(target.pose), "face", "names", wrong);
         anyBound = true;
-        anyWrongKey = wrong.join();
+        anyBoundStart = data.start;
+        anyWrongKey = wrongKey;
       }
       made.show(target.pose);
       made.setLabel(`7x7 calendar cube showing ${anyLabel}, display only`);
@@ -555,63 +533,31 @@ export async function mountCalendar7(
       if (alive()) fail(error as Error);
     }
   };
-  /**
-   * The month shown is the month of the URL (`year` and `month`), else today's month. The names layout is in effect only
-   * when it is selected, its data is loaded and that month is inside its window; otherwise the standard layout is shown
-   * (with a notice when the names layout was selected).
-   */
-  const apply = (p: URLSearchParams, moveFocus: boolean): void => {
-    focusPlayback = moveFocus;
-    const wantedMonth = chooseMonth(p, today, standard.range);
-    let data: Dataset = standard;
-    let note = "";
-    if (layoutMode === NAMES_ANY_MODE) {
-      if (!anyData) note = NAMES_ANY_LOAD_NOTICE;
-    } else if (layoutMode === "names") {
-      if (!names) note = NAMES_LOAD_NOTICE;
-      else if (wantedMonth.kind === "invalid" || namesWindowContains(names.table, wantedMonth.ym.year, wantedMonth.ym.month)) data = names;
-      else if (!anyData) note = NAMES_ANY_LOAD_NOTICE;
-    }
-    if (anyData && wantsAny(p)) return applyAny(p, moveFocus);
-    anyActive = false;
-    anyWanted = null;
-    const choice = chooseMonth(p, today, data.range);
-    shown = data;
-    const model = buildModel(data.graph, data.table, choice, today, data.layout);
-    currentModel = model;
-    if (threeD) {
-      // Test hooks and proof for readers: the layout in effect and the layout selected.
-      root.setAttribute("data-c7-layout", data.layout);
-      root.setAttribute("data-c7-layout-mode", layoutMode);
-      root.setAttribute("data-c7-any", "off");
-    }
-    if (layoutNotice) {
-      layoutNotice.textContent = note;
-      layoutNotice.hidden = note === "";
-    }
-    refreshPreviews();
-    live.textContent = announce(model);
-    // The link that was clicked is gone after the re-render: keep the keyboard position at the new month.
-    // No scroll: the cube above must stay in view while the step plays.
-    if (moveFocus) (view.querySelector("[data-focus]") as HTMLElement | null)?.focus({ preventScroll: true });
-    if (threeD) {
-      // A sheet exists exactly when the month is on the chain; the cube follows the same month.
-      const k = choice.kind === "ok" ? nodeIndex(data.range, choice.ym) : -1;
-      void syncStage(k >= 0 ? k : null, data);
-    }
-  };
+  /** One print for every date: play the checked chain where present, otherwise show a front preview without moves. */
   const show = (p: URLSearchParams, moveFocus: boolean): void => {
     currentParams = p;
-    const seq = ++showSeq;
-    const step = (): void => {
-      const loading = layoutMode === "names" && !names && !namesFailed ? loadNames() : wantsAny(p) && !anyData && !anyFailed ? loadAny() : null;
-      if (!loading) return apply(p, moveFocus);
-      live.textContent = "Loading the names layout…";
-      void loading.then(() => {
-        if (alive() && seq === showSeq) step();
-      });
-    };
-    step();
+    focusPlayback = moveFocus;
+    const choice = chooseAnyMonth(p, today);
+    if (choice.kind === "ok" && !namesWindowContains(canonical.table, choice.ym.year, choice.ym.month))
+      return applyAny(p, moveFocus, previewForDate(canonical.start as Start, choice.ym.year, choice.ym.month));
+    anyActive = choice.kind === "invalid";
+    anyWanted = null;
+    activeAnyData = null;
+    shown = canonical;
+    currentModel = choice.kind === "ok"
+      ? buildModel(canonical.graph, canonical.table, chooseMonth(p, today, canonical.range), today, "names", true)
+      : { ...anyDateModel(choice, null, today, canonical.range), demo: true };
+    if (threeD) {
+      root.setAttribute("data-c7-layout", "names");
+      root.setAttribute("data-c7-layout-mode", "names");
+      root.setAttribute("data-c7-any", choice.kind === "invalid" ? "invalid" : "off");
+      if (choice.kind === "invalid") root.setAttribute("data-c7-state", "idle");
+    }
+    if (layoutNotice) { layoutNotice.textContent = ""; layoutNotice.hidden = true; }
+    refreshPreviews();
+    live.textContent = announce(currentModel);
+    if (moveFocus) (view.querySelector("[data-focus]") as HTMLElement | null)?.focus({ preventScroll: true });
+    if (threeD) void syncStage(choice.kind === "ok" ? nodeIndex(canonical.range, choice.ym) : null, canonical);
   };
   const pickerHost = root.querySelector<HTMLElement>("[data-c7-month-picker]");
   // A test fake that does not model this host has no ownerDocument; the real page and the picker tests do.
@@ -620,13 +566,14 @@ export async function mountCalendar7(
       today,
       onSelect: (ym) => {
         if (!alive()) return;
-        const shown = currentModel?.choice;
-        if (shown && shown.kind !== "invalid" && shown.ym.year === ym.year && shown.ym.month === ym.month) return;
+        const next = new URLSearchParams({ year: String(ym.year), month: String(ym.month) });
+        const current = chooseAnyMonth(currentParams, today);
+        if (current.kind === "ok" && current.ym.year === ym.year && current.ym.month === ym.month) return;
         const keep = new URLSearchParams(env.search());
-        keep.set("year", String(ym.year));
-        keep.set("month", String(ym.month));
+        keep.delete(LAYOUT_PARAM);
+        for (const k of MY_PARAMS) keep.set(k, next.get(k) as string);
         env.replaceQuery(`?${keep.toString()}`);
-        show(new URLSearchParams({ year: String(ym.year), month: String(ym.month) }), false);
+        show(next, false);
       },
     });
   }
@@ -640,26 +587,13 @@ export async function mountCalendar7(
     e.preventDefault();
     const next = new URL(a.getAttribute("href") as string, "http://x/").searchParams;
     const keep = new URLSearchParams(env.search());
+    keep.delete(LAYOUT_PARAM);
     for (const k of MY_PARAMS) keep.delete(k);
     for (const k of MY_PARAMS) if (next.has(k)) keep.set(k, next.get(k) as string);
     env.replaceQuery(`?${keep.toString()}`);
     show(next, true);
   };
   root.addEventListener("click", onClick);
-  /** The date form of the any-date page: year and month go to the address bar and the page shows that month. */
-  const onSubmit = (e: Event): void => {
-    if (e.type !== "submit") return;
-    const form = (e.target as Element | null)?.closest?.("[data-c7-date-form]") as HTMLFormElement | null;
-    if (!form || !root.contains(form)) return;
-    e.preventDefault();
-    const field = (name: string): string => ((form.querySelector(`[name="${name}"]`) as HTMLInputElement | null)?.value ?? "").trim();
-    const next = new URLSearchParams({ year: field("year"), month: field("month") });
-    const keep = new URLSearchParams(env.search());
-    for (const k of MY_PARAMS) keep.set(k, next.get(k) as string);
-    env.replaceQuery(`?${keep.toString()}`);
-    show(next, true);
-  };
-  root.addEventListener("submit", onSubmit);
 
   const onControl = (e: Event): void => {
     const el = (e.target as Element | null)?.closest?.("[data-c7]") as HTMLElement | null;
@@ -667,14 +601,16 @@ export async function mountCalendar7(
     if (el.getAttribute("aria-disabled") === "true") return;
     try {
       switch (el.getAttribute("data-c7")) {
-        case "layout": {
+        case "banner": {
           if (e.type !== "change") break;
-          layoutMode = parseLayoutMode((el as HTMLSelectElement).value);
-          (el as HTMLSelectElement).value = layoutMode;
+          bannerStyle = parseBannerStyle((el as HTMLSelectElement).value);
+          if (bannerSelect) bannerSelect.value = bannerStyle;
+          root.setAttribute("data-c7-banner", bannerStyle);
+          stage?.setBannerStyle?.(bannerStyle);
           const query = new URLSearchParams(env.search());
-          query.set(LAYOUT_PARAM, layoutMode);
+          query.delete(LAYOUT_PARAM);
+          if (bannerStyle === "theme") query.delete(BANNER_PARAM); else query.set(BANNER_PARAM, bannerStyle);
           env.replaceQuery(`?${query.toString()}`);
-          show(currentParams, false);
           break;
         }
         case "banner": {
@@ -692,6 +628,7 @@ export async function mountCalendar7(
           if (e.type !== "change") break;
           applyScheme((el as HTMLSelectElement).value);
           const query = new URLSearchParams(env.search());
+          query.delete(LAYOUT_PARAM);
           query.set(SCHEME_PARAM, schemeById(schemeId).id);
           env.replaceQuery(`?${query.toString()}`);
           break;
@@ -748,10 +685,11 @@ export async function mountCalendar7(
     dispose: () => {
       disposed = true;
       monthPicker?.dispose();
+      activeAnyData = null;
+      anyWanted = null;
       stopSheetTheme?.();
       fontChoice?.dispose();fontSelect?.removeEventListener("change", onFont);
       root.removeEventListener("click", onClick);
-      root.removeEventListener("submit", onSubmit);
       if (threeD) {
         root.removeEventListener("click", onControl);
         root.removeEventListener("change", onControl);

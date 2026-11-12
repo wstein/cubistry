@@ -14,7 +14,7 @@ export { moveToken, rawToken } from "./notation.ts";
 import { type Move } from "./engine.ts";
 import type { Cell } from "./display.ts";
 import type { DisplayTable, Edge, Graph } from "./graph.ts";
-import type { Layout } from "./layout.ts";
+import { type Layout, NAMES_DEMO_LABEL } from "./layout.ts";
 
 export interface YearMonth {
   readonly year: number;
@@ -181,6 +181,8 @@ export interface PageModel {
   readonly layout?: Layout;
   /** Present when the month is shown from print B without a move sequence (names layout for any date; see anydate-view.ts). */
   readonly anyDate?: { readonly kind: "state" | "best-effort" | "none" | "pending"; readonly key: string; readonly wrong?: readonly (readonly [number, number])[] };
+  /** True for the names demo data (beam chain, print window-2029-12): the range line says so. */
+  readonly demo?: boolean;
   /** Present for an "ok" choice. */
   readonly cells?: readonly Cell[];
   readonly prev: Step | null;
@@ -280,7 +282,9 @@ export function pageHtml(model: PageModel, options: WordOptions = DEFAULT_WORD_O
     `<div class="c7-steps">${stepHtml(model.prev, "Previous", `No earlier month: ${monthLabel(range.first)} is the start of the chain.`, options)}` +
     `${stepHtml(model.next, "Next", `No later month: ${monthLabel(range.last)} is the end of the chain.`, options)}` +
     `<p class="c7-legend" data-c7-legend>${LEGEND}</p></div>` +
-    (model.layout === "names"
+    (model.demo
+      ? `<p class="c7-range" data-c7-demo>DEMO, not a final print: ${esc(NAMES_DEMO_LABEL)}. Window: ${esc(rangeText)}, ${range.edges} steps (May to Nov 2026 stored greedy edges, Dec 2026 to Jun 2027 beam edges). Research candidate, not certified.</p>`
+      : model.layout === "names"
       ? `<p class="c7-range">Names layout window: ${esc(rangeText)}, ${range.edges} steps. Research candidate, not certified; not proven outside this window.</p>`
       : `<p class="c7-range">Proven chain: ${esc(rangeText)}, ${range.edges} steps.</p>`) + `${status}</div>`
   );
@@ -293,14 +297,16 @@ export function buildModel(
   choice: MonthChoice,
   today: YearMonth,
   layout: Layout = "standard",
+  demo = false,
 ): PageModel {
   const range = chainRange(graph);
-  if (choice.kind !== "ok") return { choice, range, today, layout, prev: null, next: null };
+  if (choice.kind !== "ok") return { choice, range, today, layout, demo, prev: null, next: null };
   return {
     choice,
     range,
     today,
     layout,
+    demo,
     cells: sheetCells(graph, table, range, choice.ym),
     prev: stepFrom(graph, range, choice.ym, -1),
     next: stepFrom(graph, range, choice.ym, 1),
