@@ -124,11 +124,10 @@ export const GLOBAL_PARAMS: readonly string[] = ["nerd", "kiosk", "speed"];
 
 /**
  * Setup parameters of applications that are not registered modes yet (stage 4 ports them). They are listed so a
- * parameter of Print or the Picture Cube cannot flow into another app before that app is a mode. An entry moves
+ * parameter of Print cannot flow into another app before that app is a mode. An entry moves
  * into the `params` of its mode when the mode is registered.
  */
 export const PENDING_APP_PARAMS: Readonly<Record<string, readonly string[]>> = {
-  playground: ["size"],
   print: ["design"],
 };
 

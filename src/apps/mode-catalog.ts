@@ -3,7 +3,7 @@ import type { ModeMeta } from "./registry.ts";
 /**
  * The modes that exist today, in studio order. The ids are the unified `app` keys: the legacy `application` key
  * `certified` is `counter` and `tenth-counter` is `tenth`. Titles follow the design proposal
- * (docs/design/README.md). Applications without a mode yet (playground, picture3) join in stage 4.
+ * (docs/design/README.md). Applications without a mode yet (picture3, which folds into the playground mode) join in stage 4.
  */
 export const MODE_CATALOG: readonly ModeMeta[] = [
   {
@@ -35,6 +35,17 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     group: "apps",
     help: "docs/CALENDAR_CUBES.md",
     params: ["date", "lang", "design", "pad"],
+  },
+  {
+    id: "playground",
+    title: "Picture Cube",
+    subtitle: "Picture designs on a 2x2 cube.",
+    cubes: 1,
+    badge: "2x2",
+    group: "apps",
+    help: "docs/PICTURE_PLAYGROUND.md",
+    // Sizes 3 to 7 are listed in the size control but not playable yet (docs/PICTURE_PLAYGROUND.md).
+    params: ["size"],
   },
   {
     id: "hm-clock",

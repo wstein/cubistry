@@ -895,10 +895,31 @@ async function initCalendarMode(isCurrent, params) {
   };
 }
 
+// -------------------------------------------------------------
+// Mode: Picture Cube, the 2x2 playground (src/apps/playground/mount.ts). The mount, its stylesheet and the browser env
+// load on demand, so the landing page and the other modes fetch no playground payload.
+// -------------------------------------------------------------
+async function initPlaygroundMode(isCurrent, params, shell) {
+  const [{ mountPlayground }, { browserPlaygroundEnv }] = await Promise.all([
+    import("./apps/playground/mount.ts"),
+    import("./apps/playground/browser-env.ts"),
+    import("./apps/playground/host.css"),
+  ]);
+  if (!isCurrent()) return;
+  $("studio-cards").setAttribute("data-count", "1");
+  const instance = await mountPlayground($("studio-scene"), params, { isCurrent, shell }, browserPlaygroundEnv(base));
+  if (!isCurrent()) {
+    if (instance) instance.dispose();
+    return;
+  }
+  return instance ? () => instance.dispose() : undefined;
+}
+
 const MODE_INITS = {
   clock: (isCurrent, params, shell) => initClockMode(isCurrent, params, shell),
   "ms-timer": (isCurrent) => initMsTimerMode(isCurrent),
   calendar: (isCurrent, params) => initCalendarMode(isCurrent, params),
+  playground: (isCurrent, params, shell) => initPlaygroundMode(isCurrent, params, shell),
   "hm-clock": (isCurrent) => initHmClockMode(isCurrent),
   tenth: (isCurrent, _params, shell) => initTenthMode(isCurrent, shell),
   counter: (isCurrent) => initCounterMode(isCurrent),
