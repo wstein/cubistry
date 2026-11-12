@@ -21,6 +21,19 @@ body.chronocube-page:has(#shell) {
   overflow: hidden;
 }
 
+/* The non-production banner of a PR preview sits above the shell; the shell takes the rest of the window instead of
+   being pushed 100dvh down, which cut off the bottom of the stage. Production pages have no banner. */
+body:has(> aside + .shell) {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+body:has(> aside + .shell) > .shell {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto;
+}
+
 .shell :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
