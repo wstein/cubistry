@@ -1,6 +1,6 @@
 // The playground's "Pictures" panel: the live suitability display, picture upload (six faces by file
 // name, one cross-layout net, or drag-and-drop onto face slots) and the blank net template. It owns
-// the panel's DOM and the upload state; playground.mjs only learns about a finished upload (an
+// the panel's DOM and the upload state; the mount only learns about a finished upload (an
 // ordinary FaceSet plus its in-memory bytes) or its removal through `useUpload`, which reports whether
 // the pictures could be loaded. A new set replaces the slots only after it has loaded, so a failed
 // upload changes nothing. All content shown here is written with textContent/attributes and canvas

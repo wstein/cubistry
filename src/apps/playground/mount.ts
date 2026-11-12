@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 /**
- * The Picture Cube as a mode of the unified host (`index.html?app=playground`). It mounts the 2x2 of playground.html
- * with the same controller, designs, solver and pictures panel, and fills the dock slots (D9 of the Picture Cube host
+ * The Picture Cube as a mode of the unified host (`index.html?app=playground`). It mounts the 2x2 with the
+ * same controller, designs, solver and pictures panel, and fills the dock slots (D9 of the Picture Cube host
  * plan), status chip, primary action, readout and Nerd drawer through the `ModeShell`.
  *
  * Lifecycle: all DOM is built inside `root` or the shell's regions; key handling goes through `shell.listen`; every

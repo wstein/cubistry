@@ -1,5 +1,4 @@
 import test from "node:test";
-import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import {
   CUBE_SIZES,
@@ -50,21 +49,4 @@ test("sizeSearch sets size= and keeps the other parameters", () => {
 
 test("sizeNote names every size that is not playable", () => {
   assert.match(sizeNote(), /Sizes 3 to 7 are not playable yet/);
-});
-const html = readFileSync("playground.html", "utf8");
-const script = readFileSync("src/playground.mjs", "utf8");
-
-test("the page is named Picture Cube and carries the size control", () => {
-  assert.match(html, /<title>Picture Cube · Cubistry<\/title>/);
-  assert.match(html, /<h1 class="hud-title">Picture Cube<\/h1>/);
-  assert.doesNotMatch(html, /Picture Puzzle Playground/);
-  assert.match(html, /id="size-control"[^>]*role="radiogroup"/);
-  assert.match(html, /id="size-note"/);
-  assert.doesNotMatch(html, /<span class="badge">2 × 2<\/span>/);
-});
-
-test("the page script builds the control from CUBE_SIZES and reads size=", () => {
-  assert.match(script, /resolveSize\(\s*new URLSearchParams\(location\.search\)\.get\("size"\)\s*\)/);
-  assert.match(script, /CUBE_SIZES/);
-  assert.match(script, /dataset\.size/);
 });

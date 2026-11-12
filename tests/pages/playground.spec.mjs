@@ -43,3 +43,12 @@ test("built playground mode resolves picture tiles and authenticated solver unde
   expect(requests.every((p) => p.startsWith("/cubistry/"))).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test("the retired page playground.html is not built: its URL answers 404 and the host mode answers 200", async ({
+  request,
+}) => {
+  const old = await request.get("/cubistry/playground.html");
+  expect(old.status()).toBe(404);
+  const host = await request.get("/cubistry/index.html?app=playground");
+  expect(host.status()).toBe(200);
+});
