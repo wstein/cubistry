@@ -173,6 +173,26 @@ test("optional layout input: validated, checked against its SHA-256, handed to r
   assert.ok(l[call].endsWith('"$GITHUB_WORKSPACE/out/checks" 2>&1 | tee "$GITHUB_WORKSPACE/out/verify.log"'), "run_checks.sh call is unchanged");
   assert.ok(runLines(step("prepare", "Check research commit")).includes('[ -z "$LAYOUT_PATH" ] || git cat-file -e "$SHA:$LAYOUT_PATH" || fail "$LAYOUT_PATH is missing at $SHA"'));
 });
+test("layout input reaches the producer too, and prepare refuses early when the producer at research_ref cannot read it", () => {
+  const head = text.split("\njobs:")[0];
+  assert.doesNotMatch(head, /Only the verify job reads it|for example the April tiles/);
+  assert.match(head, /^      layout_path:\n        description: [^\n]*producer[^\n]*\n/m);
+  assert.equal(jobs.produce.env.LAYOUT_PATH, "${{ inputs.layout_path }}");
+  assert.equal(jobs.produce.env.LAYOUT_SHA, "${{ inputs.layout_sha256 }}");
+  const exp = '[ -z "$LAYOUT_PATH" ] || { echo "$LAYOUT_SHA  src/$LAYOUT_PATH" | sha256sum --check --strict; export CAL7_WINDOW_LAYOUT="$GITHUB_WORKSPACE/src/$LAYOUT_PATH" CAL7_WINDOW_LAYOUT_SHA256="$LAYOUT_SHA"; }';
+  const p = runLines(step("produce", "Produce edges"));
+  const e = p.indexOf(exp), j = p.findIndex(x => x.startsWith("timeout 65m julia"));
+  assert.ok(e >= 0 && e < j, "produce exports the layout before the producer starts");
+  const prep = runLines(step("prepare", "Check research commit"));
+  const g = 'git grep -q CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/window_chain.jl" || fail "layout_path is set, but the producer at research_ref does not read CAL7_WINDOW_LAYOUT"';
+  const g2 = 'git grep -q CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/run_checks.sh" || fail "layout_path is set, but run_checks.sh at research_ref does not read CAL7_WINDOW_LAYOUT"';
+  for (const x of [g, g2]) assert.ok(prep.includes('[ -z "$LAYOUT_PATH" ] || ' + x), x);
+});
+test("the layout pin is recorded in VERIFIED.txt and the summary, and a continuation compares it", () => {
+  assert.ok(step("verify", "Package artifact").run.includes('echo "layout_sha256=${LAYOUT_SHA:--}"'));
+  assert.ok(step("verify", "Package artifact").run.includes('layout: \\`${LAYOUT_PATH:--}\\`, \\`${LAYOUT_SHA:--}\\`'));
+  requireJobLines("produce", ['grep -qx "layout_sha256=${LAYOUT_SHA:--}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another layout"; exit 1; }']);
+});
 test("research_ref must lie on the research branch", () => {
   assert.match(text, /^  RESEARCH_BRANCH: research\/cube-display-feasibility$/m);
   const prep = step("prepare", "Check research commit");
