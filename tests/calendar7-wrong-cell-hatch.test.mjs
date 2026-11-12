@@ -91,13 +91,10 @@ test('hatching leaves most of the central half of the flat face unpainted (a den
   }
 });
 
-test('a strike-through crosses the whole face in red, drawn with its own halo', () => {
-  const { strokes, clips } = run(346, 346, { w: 1.8, h: 1.8 }), r = clips[0];
-  assert.equal(strokes.length, 4, 'hatch halo, hatch, strike halo, strike');
-  assert.equal(strokes[3].style, WRONG_CELL.strike);
-  assert.equal(strokes[2].style, WRONG_CELL.halo);
-  assert.ok(alpha(WRONG_CELL.strike) < 1, "the red strike-through is translucent");
-  assert.ok(strokes[2].width > strokes[3].width);
-  const [x0, y0, x1, y1] = strokes[3].segments[0];
-  assert.ok(Math.abs(Math.abs(x1 - x0) - r.w) < 1e-9 && Math.abs(Math.abs(y1 - y0) - r.h) < 1e-9, 'corner to corner of the flat face');
+test('only the hatch is drawn: two strokes (halo, hatch), no strike-through', () => {
+  for (const [w, h, tile] of TILES) {
+    const { strokes } = run(w, h, tile);
+    assert.deepEqual(strokes.map((s) => s.style), [WRONG_CELL.halo, WRONG_CELL.hatch]);
+  }
+  assert.equal('strike' in WRONG_CELL, false);
 });
