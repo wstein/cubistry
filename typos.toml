@@ -21,6 +21,7 @@ extend-exclude = [
   "public/calendar7/graph.v1.json",
   "public/calendar7/names/graph.v1.json",
   "public/calendar7/names-demo/graph.v1.json",
+  "public/calendar7/chain-c/graph.v1.json",
   # Exact upstream notices: retain their original legal wording verbatim.
   "third-party/cubing/xyzzy-kilominx-NOTICE.txt",
   "third-party/cubing/fto-MIT-NOTICE.txt",
