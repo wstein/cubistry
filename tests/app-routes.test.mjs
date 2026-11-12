@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createRegistry } from "../src/apps/registry.ts";
 import { MODE_CATALOG } from "../src/apps/mode-catalog.ts";
 import { APP_SCOPED_PARAMS, urlAfterAppSwitch } from "../src/app-switch-url.mjs";
-import { GLOBAL_PARAMS, PENDING_APP_PARAMS, PARAM_SPECS, sharedParams } from "../src/apps/param-specs.ts";
+import { GLOBAL_PARAMS, PENDING_APP_PARAMS, PARAM_SPECS } from "../src/apps/param-specs.ts";
 import { parseRoute, serializeRoute } from "../src/apps/routes.ts";
 
 const registry = createRegistry(MODE_CATALOG.map((m) => ({ ...m, mount: async () => {} })));
@@ -23,28 +23,46 @@ test("every mode of the catalog declares the setup parameters it owns, all of th
 
 test("APP_SCOPED_PARAMS is the union of every owned key and alias, without the global ones", () => {
   const owned = new Set([...MODE_CATALOG.flatMap((m) => m.params), ...Object.values(PENDING_APP_PARAMS).flat()]);
-  const expected = new Set([...owned].flatMap((p) => [p, ...(PARAM_SPECS[p].aliases ?? [])]));
+  const expected = new Set([...owned].flatMap((p) => [PARAM_SPECS[p].name ?? p, ...(PARAM_SPECS[p].aliases ?? [])]));
   assert.deepEqual([...APP_SCOPED_PARAMS].sort(), [...expected].sort());
   for (const g of GLOBAL_PARAMS) assert.ok(!APP_SCOPED_PARAMS.includes(g));
   for (const key of ["val", "value", "duration", "year", "month"]) assert.ok(APP_SCOPED_PARAMS.includes(key), key);
 });
 
+// Expected values are written out, not derived from the ownership code under test.
+const LEAKS = [
+  ["calendar7", "clock", "year=2027&month=3&outer=1.8&font=quicksand&layout=names&scheme=paper-blue&plasticity=0.6", ""],
+  ["ms-counter", "calendar7", "unit=S&dir=down&val=5&pad=0&font=dseg7", ""],
+  ["hsm-counter", "timer", "range=23&unit=H&lettering=words-pascal&font=dseg7&speed=300", "font=dseg7&speed=300"],
+  ["tenth", "counter", "display=dseg7&marker=all&speed=300&dir=down&val=3", "display=dseg7&marker=all&speed=300"],
+  ["clock", "ms-counter", "hours-speed=2&minutes-speed=3&lettering=words-pascal", "lettering=words-pascal"],
+  ["calendar7", "counter", "date=2026-11-10&lang=de&design=de-a&cube=3&size=4&font=quicksand", ""],
+  ["counter", "calendar7", "font=dseg7&display=dseg7&scheme=x", ""],
+  // single-cube family: the display, marker and speed controls exist on every page, so they travel between the apps
+  ["hsm-counter", "ms-counter", "font=dseg7&marker=all&speed=300", "font=dseg7&marker=all&speed=300"],
+  ["timer", "five-second-timer", "font=dseg7&rate=10&duration=00:05", "font=dseg7&rate=10"],
+  // aliases of shared keys travel under their own name
+  ["ms-counter", "hsm-counter", "letter=S&direction=down&val=4", "letter=S&direction=down"],
+  // stray: the target owns the key, the previous app does not
+  ["hsm-counter", "counter", "print=blank-top", ""],
+];
+
 test("a parameter owned by one app does not leak to another app on a switch", () => {
-  const leaks = [
-    ["calendar7", "clock", "year=2027&month=3&outer=1.8"],
-    ["ms-counter", "calendar7", "unit=S&dir=down&val=5&pad=0"],
-    ["hsm-counter", "timer", "range=23&unit=H&lettering=words-pascal"],
-    ["tenth", "counter", "display=dseg7&marker=all&speed=300"],
-    ["clock", "ms-counter", "hours-speed=2&minutes-speed=3&lettering=words-pascal"],
-    ["calendar7", "counter", "date=2026-11-10&lang=de&design=de-a&cube=3&size=4"],
-  ];
-  for (const [from, target, query] of leaks) {
-    const kept = to(`${base}?app=${from}&${query}`, from, target);
-    const both = new Set(sharedParams(from, target));
-    for (const key of new URLSearchParams(query).keys()) {
-      assert.equal(kept.has(key), both.has(key), `${from} -> ${target}: ${key}`);
-    }
+  for (const [from, target, query, kept] of LEAKS) {
+    const got = to(`${base}?app=${from}&${query}`, from, target);
+    got.delete("app");
+    assert.equal(decodeURIComponent(got.toString()), kept, `${from} -> ${target}`);
   }
+});
+
+test("calendar7 keeps nothing of its look when it is left, and its font is not the single-cube display", () => {
+  const q = "year=2026&month=3&outer=1.8&font=quicksand&layout=names&scheme=paper-blue&plasticity=0.6";
+  for (const target of MODE_CATALOG.map((m) => m.id).filter((id) => id !== "calendar7")) {
+    const got = to(`${base}?app=calendar7&${q}`, "calendar7", target);
+    got.delete("app");
+    assert.equal(got.toString(), "", target);
+  }
+  assert.equal(to(`${base}?app=counter&font=dseg7`, "counter", "calendar7").has("font"), false);
 });
 
 test("a key stray in the URL of an app that does not own it is dropped even if the target owns it", () => {
@@ -84,21 +102,22 @@ test("parseRoute returns canonical typed setup for the app and drops what the ap
 });
 
 test("aliases parse to the canonical key", () => {
-  const r = parseRoute("?app=ms-counter&value=45&letter=s&direction=-1&padding=off&run=true", registry, "clock");
-  assert.deepEqual(r.setup, { val: 45, unit: "S", dir: "down", pad: false, autoplay: true });
+  const r = parseRoute("?app=ms-counter&value=45&letter=s&direction=-1&font=DSEG7&run=true", registry, "clock");
+  assert.deepEqual(r.setup, { val: 45, unit: "S", dir: "down", display: "dseg7", autoplay: true });
+  assert.deepEqual(parseRoute("?app=counter&padding=off", registry, "clock").setup, { pad: false });
 });
 
 test("invalid values are reported and left out, so the mode default applies", () => {
-  const r = parseRoute("?app=calendar7&year=abc&month=13&outer=9&nerd=maybe", registry, "clock");
+  const r = parseRoute("?app=calendar7&year=abc&month=13&outer=9&kiosk=maybe", registry, "clock");
   assert.deepEqual(r.setup, {});
-  assert.deepEqual(r.invalid.sort(), ["month", "nerd", "outer", "year"]);
+  assert.deepEqual(r.invalid.sort(), ["kiosk", "month", "outer", "year"]);
 });
 
 test("defaults are omitted when serializing and the route round-trips", () => {
   assert.equal(serializeRoute({ app: "ms-counter", setup: { dir: "up", pad: true, unit: "S", val: 45 } }), "?app=ms-counter&val=45&unit=S");
   const cases = [
     "?app=calendar7&year=2026&month=11&outer=1.8",
-    "?app=ms-counter&val=45&unit=S&dir=down&pad=0",
+    "?app=counter&val=45&pad=0&display=dseg7",
     "?app=timer&duration=00:30&mode=countdown&rate=10&kiosk=1",
     "?app=hsm-counter&range=23&unit=H&lettering=words-pascal&nerd=1",
     "?app=clock&hours-speed=2&lettering=words-pascal",
@@ -110,6 +129,21 @@ test("defaults are omitted when serializing and the route round-trips", () => {
     assert.deepEqual(again.setup, a.setup, q);
     assert.deepEqual(again.app, a.app, q);
   }
+});
+
+test("calendar7 owns its font, layout, scheme and plasticity; font is not reported as foreign there", () => {
+  const r = parseRoute("?app=calendar7&font=quicksand&layout=names-any&scheme=paper-blue&plasticity=0.6&display=dseg7", registry, "clock");
+  assert.deepEqual(r.setup, { "c7-font": "quicksand", layout: "names-any", scheme: "paper-blue", plasticity: 0.6 });
+  assert.deepEqual(r.foreign, ["display"]);
+  const c = parseRoute("?app=counter&font=DSEG7&layout=names", registry, "clock");
+  assert.deepEqual(c.setup, { display: "dseg7" });
+  assert.deepEqual(c.foreign, ["layout"]);
+  assert.equal(serializeRoute({ app: "calendar7", setup: r.setup }), "?app=calendar7&font=quicksand&layout=names-any&scheme=paper-blue&plasticity=0.6");
+});
+
+test("nerd is true only for 1, like the shell", () => {
+  assert.deepEqual(parseRoute("?app=clock&nerd=1", registry, "clock").setup, { nerd: true });
+  assert.deepEqual(parseRoute("?app=clock&nerd=true", registry, "clock").setup, { nerd: false });
 });
 
 test("an unknown app resolves to the fallback and keeps no mode setup", () => {

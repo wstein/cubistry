@@ -67,6 +67,11 @@ const INVENTORY = [
   row(["design"], "src/print.mjs", ["print.html"]),
   row(["year", "month"], "src/apps/calendar7/month-view.ts", ["calendar7"]),
   row(["outer"], "src/apps/calendar7/geometry.ts", ["calendar7"]),
+  // calendar7 reads these through constants (LAYOUT_PARAM, SCHEME_PARAM, PLASTICITY_PARAM) and `font` directly
+  row(["layout"], "src/apps/calendar7/layout.ts", ["calendar7"], /LAYOUT_PARAM = "layout"/),
+  row(["scheme"], "src/apps/calendar7/mount.ts", ["calendar7"], /SCHEME_PARAM = "scheme"/),
+  row(["plasticity"], "src/apps/calendar7/mount.ts", ["calendar7"], /PLASTICITY_PARAM = "plasticity"/),
+  row(["font"], "src/apps/calendar7/mount.ts", ["calendar7"]),
   row(["size"], "src/playground.mjs", ["playground"]),
 ];
 
@@ -136,6 +141,21 @@ test("a literal parameter read added anywhere in src or index.html is in the inv
 // Named in the plan but read by no code yet: `cube=2|3` of the Picture Cube (the appendix records that `size` replaced it).
 const PLANNED = ["cube"];
 
+test("a parameter key held in a constant (NAME_PARAM = \"key\") is in the inventory", () => {
+  const walk = (dir) =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+      e.name === "vendor" ? [] : e.isDirectory() ? walk(join(dir, e.name)) : [join(dir, e.name)],
+    );
+  const known = new Set(INVENTORY.flatMap((r) => r.params));
+  const unknown = [];
+  for (const file of walk("src").filter((f) => /\.(mjs|ts)$/.test(f))) {
+    for (const m of read(file).matchAll(/\bconst [A-Z][A-Z0-9_]*_PARAM = "([A-Za-z-]+)"/g)) {
+      if (!known.has(m[1])) unknown.push(`${file}: ${m[1]}`);
+    }
+  }
+  assert.deepEqual(unknown, []);
+});
+
 test("the parameters dropped on an app switch are inventory parameters", () => {
   const known = new Set([...INVENTORY.flatMap((r) => r.params), ...PLANNED]);
   for (const p of APP_SCOPED_PARAMS) assert.ok(known.has(p), p);
@@ -151,7 +171,7 @@ test("the typed parameter specs and the inventory name the same parameters", () 
 
 test("an alias group of the specs is one inventory row group, so the appendix and the parser agree", () => {
   for (const [key, spec] of Object.entries(PARAM_SPECS)) {
-    const group = [key, ...(spec.aliases ?? [])];
+    const group = names(key);
     const rows = INVENTORY.filter((r) => group.some((n) => r.params.includes(n)));
     if (rows.length === 0) continue; // planned
     for (const n of group) assert.ok(rows.some((r) => r.params.includes(n)), `${key}: alias ${n} has no inventory row`);
