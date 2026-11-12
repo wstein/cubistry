@@ -1,83 +1,70 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// Calendar7 "Names layout" mode (research candidate, not certified): mode switch, notice outside the window, 390 px fit,
-// band tile colors per scheme, class travel with the tiles after a scramble, URL round trip.
+// One Calendar7 view: fixed printing, date transitions, mobile appearance controls and retained artwork contracts.
 import { test, expect } from "@playwright/test";
+
+
+const pickerTrigger = (page) => page.getByRole("button", { name: /^Choose month and year/ });
+async function pickDate(page, year, month) {
+  await pickerTrigger(page).click();
+  await page.getByRole("button", { name: "Choose year", exact: true }).click();
+  const jump = page.getByRole("spinbutton", { name: "Jump to year" });
+  await jump.fill(String(year)); await jump.press("Enter");
+  await page.getByRole("gridcell", { name: String(year), exact: true }).click();
+  const name = new Intl.DateTimeFormat("en-US", { month: "long", timeZone: "UTC" }).format(new Date(Date.UTC(2000, month - 1, 1)));
+  await page.getByRole("gridcell", { name: name + " " + year, exact: true }).click();
+}
 
 const ROOT = "#calendar7-root";
 const at = (page, month) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-month", month, { timeout: 30000 });
 const row1 = (page) => page.locator(".c7-sheet tr:first-child td .c7-cell-text").allTextContents();
-const NOTICE = "Display only: no move sequence for this date (print B).";
+const NOTICE = "Display only: no move sequence for this date (beam preview print).";
 
-test("the layout control switches row 1 between the standard letters and the month name, and rebuilds the cube from the new print", async ({ page }) => {
-  const errors = [];
-  page.on("pageerror", (e) => errors.push(String(e)));
-  await page.goto("/index.html?app=calendar7&year=2027&month=3");
-  await at(page, "2027-03");
-  const select = page.getByRole("combobox", { name: "Cube layout", exact: true });
-  await expect(select).toHaveValue("standard");
-  await expect(select.locator("option")).toHaveText(["Standard", "Names (preview, May 2026 - Jan 2028)"]);
-  const standard = await row1(page);
-  const digest = await page.locator(ROOT).getAttribute("data-c7-digest");
-  await select.selectOption("names");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names", { timeout: 30000 });
-  await expect(page.locator(ROOT)).not.toHaveAttribute("data-c7-digest", digest, { timeout: 30000 });
-  await at(page, "2027-03");
+test("the one view renders full month names without a layout control and keeps its print across date changes", async ({ page }) => {
+  const errors = []; page.on("pageerror", (e) => errors.push(String(e)));
+  await page.goto("/index.html?app=calendar7&year=2027&month=3"); await at(page, "2027-03");
+  await expect(page.getByRole("combobox", { name: "Cube layout", exact: true })).toHaveCount(0);
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names");
   expect(await row1(page)).toEqual(["MA", "RCH", "", "", "", "", ""]);
   await expect(page.locator(".c7-sheet tr:first-child td.c7-ink-band")).toHaveCount(5);
-  await expect(page.locator(".c7-layout-notice")).toBeHidden();
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "idle");
-  await select.selectOption("standard");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "standard", { timeout: 30000 });
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", digest, { timeout: 30000 });
-  expect(await row1(page)).toEqual(standard);
+  const digest = await page.locator(ROOT).getAttribute("data-c7-digest");
+  await pickDate(page, 2027, 4); await at(page, "2027-04");
+  expect(await row1(page)).toEqual(["APR", "IL", "", "", "", "", ""]);
+  await pickDate(page, 2027, 3); await at(page, "2027-03");
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", digest);
   expect(errors).toEqual([]);
 });
 
-test("outside the window the names layout shows the month from print B, display only, with the notice and no standard fallback; stepping into the window shows the chain", async ({ page }) => {
-  const errors = [];
-  page.on("pageerror", (e) => errors.push(String(e)));
-  await page.goto("/index.html?app=calendar7&year=2030&month=5&layout=names");
-  await at(page, "2030-05");
+test("an off-chain date uses the same print and the instant picker returns to the stored chain", async ({ page }) => {
+  const errors = []; page.on("pageerror", (e) => errors.push(String(e)));
+  await page.goto("/index.html?app=calendar7&year=2030&month=5&layout=names"); await at(page, "2030-05");
   const notice = page.getByRole("status").filter({ hasText: NOTICE });
-  await expect(notice).toBeVisible();
-  await expect(notice).toHaveText(NOTICE);
+  await expect(notice).toBeVisible(); await expect(notice).toHaveText(NOTICE);
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "state");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout-mode", "names");
-  await expect(page.getByRole("combobox", { name: "Cube layout", exact: true })).toHaveValue("names");
   expect(await row1(page)).toEqual(["MA", "Y", "", "", "", "", ""]);
-  // The date form moves into the window: January 2028 is on the chain (names layout, Previous and Next, no notice).
-  // Exact names: the month picker trigger contains the substrings "month" and "year".
-  // The Month control is a combobox; its label text also lists every option.
-  await page.getByLabel("Year", { exact: true }).fill("2028");
-  await page.getByRole("combobox", { name: "Month", exact: true }).selectOption("1");
-  await page.getByRole("button", { name: "Show", exact: true }).click();
-  await at(page, "2028-01");
+  await pickDate(page, 2026, 5); await at(page, "2026-05");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "off", { timeout: 30000 });
-  await expect(notice).toBeHidden();
-  expect(await row1(page)).toEqual(["J", "ANU", "ARY", "", "", "", ""]);
+  await expect(notice).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Show", exact: true })).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 
-for (const width of [320, 360, 390]) test(`the three appearance selects share one touch-sized row at ${width} px and keep their names`, async ({ page }) => {
+for (const width of [320, 360, 390]) test(`appearance controls remain touch-sized and do not overflow at ${width} px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 844 });
-  await page.goto("/index.html?app=calendar7&year=2026&month=11");
-  await at(page, "2026-11");
+  await page.goto("/index.html?app=calendar7&year=2026&month=11"); await at(page, "2026-11");
   const boxes = [];
-  for (const name of ["Font style", "Cube layout", "Cube color theme"]) boxes.push(await page.getByRole("combobox", { name, exact: true }).boundingBox());
-  for (const b of boxes) {
-    expect(Math.abs(b.y - boxes[0].y), "same row").toBeLessThan(1);
-    expect(b.height).toBeGreaterThanOrEqual(44);
-    expect(b.x).toBeGreaterThanOrEqual(0);
-    expect(b.x + b.width).toBeLessThanOrEqual(width);
+  for (const name of ["Font style", "Cube color theme", "Banner style"]) {
+    const box = await page.getByRole("combobox", { name, exact: true }).boundingBox();
+    boxes.push(box);
+    expect(box.height).toBeGreaterThanOrEqual(44); expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(width);
   }
+  for (const box of boxes) expect(Math.abs(box.y - boxes[0].y), "same appearance row").toBeLessThan(1);
+  await expect(page.getByRole("combobox", { name: "Cube layout", exact: true })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
-  if (width === 390) {
-    await page.getByRole("combobox", { name: "Cube layout", exact: true }).selectOption("names");
-    await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names", { timeout: 30000 });
-    await page.waitForTimeout(1500);
-    await page.screenshot({ path: process.env.NAMES_SHOT ?? test.info().outputPath("names-390.png") });
-  }
+  if (width === 390) await page.screenshot({ path: process.env.NAMES_SHOT ?? test.info().outputPath("names-390.png") });
 });
 
 // ---- artwork: the real viewer with the window print ----
@@ -162,27 +149,17 @@ test("after a scramble the band and month classes (fill and line) stay with thei
   }
 });
 
-test("the layout survives a reload through the URL and unknown values give the standard layout", async ({ page }) => {
-  await page.goto("/index.html?app=calendar7&year=2027&month=3&extra=keep");
-  await at(page, "2027-03");
-  const select = page.getByRole("combobox", { name: "Cube layout", exact: true });
-  await select.selectOption("names");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names", { timeout: 30000 });
-  let query = new URL(page.url()).searchParams;
-  expect(query.get("layout")).toBe("names");
-  for (const [k, v] of [["year", "2027"], ["month", "3"], ["extra", "keep"]]) expect(query.get(k)).toBe(v);
-  await page.reload();
-  await at(page, "2027-03");
-  await expect(select).toHaveValue("names");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names", { timeout: 30000 });
-  await select.selectOption("standard");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "standard", { timeout: 30000 });
-  query = new URL(page.url()).searchParams;
-  expect(query.get("layout")).toBe("standard");
-  await page.goto("/index.html?app=calendar7&year=2027&month=3&layout=bogus");
-  await at(page, "2027-03");
-  await expect(select).toHaveValue("standard");
-  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "standard");
+for (const layout of ["names", "standard", "names-demo", "names-any", "bogus"]) test(`the canonical calendar survives reload of ${layout} without losing preferences`, async ({ page }) => {
+    await page.goto(`/index.html?app=calendar7&year=2027&month=3&layout=${layout}&scheme=paper-blue&font=quicksand&extra=keep`);
+    await at(page, "2027-03");
+    await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names");
+    const query = new URL(page.url()).searchParams;
+    expect(query.has("layout")).toBe(false);
+    for (const [key, value] of [["app", "calendar7"], ["year", "2027"], ["month", "3"], ["scheme", "paper-blue"], ["font", "quicksand"], ["extra", "keep"]]) expect(query.get(key)).toBe(value);
+    const digest = await page.locator(ROOT).getAttribute("data-c7-digest");
+    await page.reload(); await at(page, "2027-03");
+    await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", digest);
+    await expect(page.getByRole("combobox", { name: "Cube layout", exact: true })).toHaveCount(0);
 });
 
 test("the renderer uses Linear tone mapping at the face-following exposure in the names layout only and is the shared Neutral at 1 in the standard layout, also after switching back", async ({ page }) => {

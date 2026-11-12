@@ -2,7 +2,7 @@
 import { test, expect } from "@playwright/test";
 const ROOT="#calendar7-root";
 const idle=(page,month)=>expect(page.locator(ROOT)).toHaveAttribute("data-c7-month",month,{timeout:30000});
-async function controlled(page, ym="2028&month=1") {
+async function controlled(page, ym="2026&month=11") {
   await page.goto(`/index.html?app=calendar7&year=${ym}`);
   await idle(page,ym.replace("&month=","-").replace(/-(\d)$/,"-0$1"));
   await page.emulateMedia({reducedMotion:"no-preference"});
@@ -29,7 +29,7 @@ test("default prefix is free x/y orientation and the active word keeps its actua
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-phase","orientation");
   expect(await page.evaluate(()=>window.c7turns[0].kind)).toBe("rotation");
   expect(await page.evaluate(()=>window.c7turns[0].axis)).toBeLessThan(2);
-  await expect(page.locator('[data-c7="active-title"]')).toContainText("January 2028 → February 2028");
+  await expect(page.locator('[data-c7="active-title"]')).toContainText("November 2026 → December 2026");
   await expect(page.locator('[data-c7="progress"]')).toContainText("orienting before moves (free)");
   await expect(page.locator('.c7-word-panel:visible')).toHaveCount(0);
   await enterBlocks(page);
@@ -59,7 +59,7 @@ test("default prefix is free x/y orientation and the active word keeps its actua
   expect(await page.locator('[data-c7="active-word"]').innerHTML()).toBe(before);
   await expect(page.locator('[data-c7="active-title"]')).toContainText("Blocks");
   await page.locator('[data-c7="skip"]').click();
-  await idle(page,"2028-02");
+  await idle(page,"2026-12");
   await expect(page.locator('[data-c7="active-step"]')).toBeHidden();
   await expect(page.locator('[data-c7="active-word"] [aria-current]')).toHaveCount(0);
   await page.evaluate(()=>window.c7release());
@@ -79,11 +79,11 @@ test("raw expansions map legal generators to the actual animated block and exclu
   expect(tokens.map(t=>t.replace(' (free)',''))).toEqual(expected);
   for(const t of tokens)expect(Number(/^g(\d+):/.exec(t)[1])).toBeLessThanOrEqual(21);
   await expect(page.locator('[data-c7="progress"]')).toContainText("move 1 of");
-  await page.locator('[data-c7="skip"]').click();await idle(page,"2028-02");
+  await page.locator('[data-c7="skip"]').click();await idle(page,"2026-12");
 });
-test("long seam words follow only inside their container, preserve focus and clear highlights after interruption",async({page})=>{
+test("long prefix words follow only inside their container, preserve focus and clear highlights after interruption",async({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await controlled(page,"2027&month=12");
+  await controlled(page,"2026&month=10");
   await page.locator('a[data-nav="next"]').click();await enterBlocks(page);
   await page.locator('[data-c7="play"]').click(); // pause while a block is in flight
   await page.evaluate(()=>window.c7release());
@@ -106,8 +106,8 @@ test("long seam words follow only inside their container, preserve focus and cle
   await expect(page.locator('[data-c7="play"]')).toBeFocused();
   expect(await page.locator('[data-c7="active-word"] .c7-past').count()).toBeGreaterThan(100);
   await page.locator('a[data-nav="previous"]').click(); // completes the old plan and replaces it
-  await expect(page.locator('[data-c7="active-title"]')).toContainText("January 2028 → December 2027");
-  await page.locator('[data-c7="skip"]').click();await idle(page,"2027-12");
+  await expect(page.locator('[data-c7="active-title"]')).toContainText("November 2026 → October 2026");
+  await page.locator('[data-c7="skip"]').click();await idle(page,"2026-10");
   await expect(page.locator('[data-c7="active-word"] [aria-current]')).toHaveCount(0);
 });
 
@@ -129,16 +129,16 @@ for (const viewport of [{width:1280,height:1000},{width:900,height:700},{width:3
   });
   for(const g of geometry){expect(g.top,g.name).toBeGreaterThanOrEqual(g.sceneBottom-.5);expect(g.bottom,g.name).toBeLessThanOrEqual(g.portBottom+.5);expect(g.canvas,g.name).toBe(false);expect(g.hit,g.name).toBe(true)}
   await expect(page.locator('[data-c7="active-title"]')).toBeFocused();
-  if(viewport.width===1280) await page.screenshot({path:"/tmp/calendar7-playback-codex-author/review-navigation-fixed.png"});
+  if(viewport.width===1280) await page.screenshot({path:test.info().outputPath("review-navigation.png")});
   await page.locator('[data-c7="skip"]').click();await idle(page,'2026-12');
 });
 
 for (const loading of ["viewer","data"]) test(`all playback selections made while the ${loading} loads are retained by the first step`,async({page})=>{
   let release,reached;
   const held=new Promise(r=>{release=r}),requested=new Promise(r=>{reached=r});
-  await page.route(loading==='viewer'?'**/src/apps/calendar7/viewer.ts*':'**/calendar7/graph.v1.json*',async route=>{reached();await held;await route.continue()});
+  await page.route(loading==='viewer'?'**/src/apps/calendar7/viewer.ts*':'**/calendar7/names-demo/graph.v1.json*',async route=>{reached();await held;await route.continue()});
   try{
-    await page.goto('/index.html?app=calendar7&year=2028&month=1',{waitUntil:'domcontentloaded'});await requested;
+    await page.goto('/index.html?app=calendar7&year=2026&month=11',{waitUntil:'domcontentloaded'});await requested;
     if(loading==='data') {
       // Hidden initial controls can receive browser-restored values before handlers attach.
       await page.evaluate(()=>{for(const [name,value] of Object.entries({orientation:"after",notation:"raw",speed:"500"})) document.querySelector(`[data-c7="${name}"]`).value=value;document.querySelector('[data-c7="slice"]').checked=false});
@@ -148,7 +148,7 @@ for (const loading of ["viewer","data"]) test(`all playback selections made whil
       await page.locator('[data-c7="slice"]').uncheck();
       await page.locator('[data-c7="speed"]').selectOption('500');
     }
-    release();await idle(page,'2028-01');
+    release();await idle(page,'2026-11');
     await expect(page.locator('[data-c7="speed"]')).toHaveValue('500');
     await expect(page.locator('[data-c7="orientation"]')).toHaveValue('after');
     await expect(page.locator('[data-c7="notation"]')).toHaveValue('raw');
@@ -160,6 +160,6 @@ for (const loading of ["viewer","data"]) test(`all playback selections made whil
     await expect(page.locator('[data-c7="active-title"]')).toContainText('Raw generators (equivalent expansion)');
     await expect(page.locator('[data-c7="active-note"]')).toContainText('generators 1–21');
     await expect(page.locator('[data-c7="alignment"]')).toContainText('at the end');
-    await page.locator('[data-c7="skip"]').click();await idle(page,'2028-02');
+    await page.locator('[data-c7="skip"]').click();await idle(page,'2026-12');
   }finally{release()}
 });
