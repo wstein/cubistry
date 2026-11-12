@@ -53,7 +53,7 @@ application chooser in the page header switches between these:
 | 60-Minute and 5-Second Timers | Countdown and stopwatch | `timer.html`, `five-second-timer.html` ([docs](docs/WORKSHOP_TIMER.md), [docs](docs/FIVE_SECOND_TIMER.md)) |
 | M/S Timer | Countdown and stopwatch on two cubes, 00:00-59:59 | `ms-timer.html` ([docs](docs/MS_TIMER.md)) |
 | Calendar | German and English calendar cubes | `calendar.html` ([docs](docs/CALENDAR_CUBES.md)) |
-| CI Quality Cube | Workflow status on six faces | `status.html` ([docs](docs/STATUS_CUBE.md)) |
+| CI Quality Cube | Workflow status on six faces | `index.html?app=ci`, `status.html` ([docs](docs/STATUS_CUBE.md)) |
 | Picture Cube | Free-play 2x2 with picture stickers; size control 2 to 7 (only 2x2 playable yet) | `playground.html` ([docs](docs/PICTURE_PLAYGROUND.md)) |
 
 More pages, including sticker sheet export, are listed in
