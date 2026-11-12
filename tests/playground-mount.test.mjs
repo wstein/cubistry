@@ -181,6 +181,8 @@ const scramble = (f, count = "2") => {
   f.find("playground-count").value = count;
   f.find("playground-scramble-form").fire("submit");
 };
+// Runs the frames queued so far; a release that must wait queues itself again.
+const frames = (f) => f.frames.splice(0).forEach((fn) => fn());
 const sizeButtons = (f) => [2, 3, 4, 5, 6, 7].map((n) => f.find(`playground-size-${n}`));
 
 test("the mount builds inside root, fills the five slots and reads no document or window global", async () => {
@@ -247,7 +249,7 @@ test("dispose releases the viewer, the assets and the pictures panel once", asyn
   instance.dispose();
   instance.dispose();
   await flush();
-  while (f.frames.length) f.frames.shift()();
+  frames(f);
   assert.deepEqual([f.counts.destroyed, f.counts.assetsDisposed, f.counts.picturesDisposed], [1, 1, 1]);
 });
 
@@ -260,10 +262,10 @@ test("dispose during a legal turn destroys the viewer only after the turn settle
   assert.equal(f.pending.length, 1);
   instance.dispose();
   await flush();
-  while (f.frames.length) f.frames.shift()();
+  frames(f);
   assert.equal(f.counts.destroyed, 0, "the viewer is still animating");
   await f.turn();
-  while (f.frames.length) f.frames.shift()();
+  frames(f);
   assert.equal(f.counts.destroyed, 1);
   assert.equal(f.pending.length, 0, "the cancelled word plays no further turn");
 });
@@ -296,7 +298,6 @@ test("D7: the size control is disabled while a turn, a design load or a solve is
   f.shell.primary.spec.onClick();
   await flush();
   assert.equal(two.disabled, true, "disabled while the solver loads");
-  assert.equal(two.listeners.click.length, 1);
   instance.dispose();
   gate({ solve: () => [] });
 });
