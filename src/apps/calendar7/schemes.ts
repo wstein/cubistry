@@ -31,7 +31,10 @@ export interface SchemeLine {
 export type BannerStyle = "theme" | "rounded" | "square" | "underline" | "boxed" | "rounded-box";
 export type ResolvedBannerStyle = Exclude<BannerStyle, "theme">;
 type SchemeId = "paper-red" | "paper-blue" | "classic" | "solarized-light" | "gruvbox-light" | "dracula" | "monokai" | "gruvbox-dark" | "catppuccin-mocha" | "high-contrast";
-/** Every color theme has an explicit default; filled, outlined, and underlined banners remain distinct choices. */
+/**
+ * Theme-default month banner shape per color scheme (owner decision 2026-11-12).
+ * Filled, outlined and underlined banners stay distinct across the set.
+ */
 const THEME_BANNERS: Readonly<Record<SchemeId, ResolvedBannerStyle>> = Object.freeze({
   "paper-red": "rounded",
   "paper-blue": "underline",
