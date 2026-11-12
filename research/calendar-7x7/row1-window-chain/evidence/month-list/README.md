@@ -176,3 +176,47 @@ Best-effort data: the maximum matching of February/Sunday/28 on print C has 48 o
 No fixed full state is stored for any configuration.
 
 Not run: Flix on the month list, Hall table and coverage (Flix ran only on the root-2019 fixtures); the long chain; `stage_coverage.jl` (needs Julia and Flix stage receipts); the workflow; a receipt of the 205 months against print C (the print receipt covers the 90 configurations of print C-1980).
+
+## Backward chain: January 2019 .. January 1980 (owner decision 2026-11-12)
+
+Research candidate, not certified. Julia only for the list, Hall table and coverage; no chain of this list was produced (UNKNOWN as evidence).
+The identity pose of print C (the solved cube, January 2019, the root of the first chain) stays the root. The next chain goes backward in time from it; the forward chain after it is computed later.
+
+How the direction is represented (`window_chain.jl direction=backward`, `../../README.md`): the producer searches from the identity pose to earlier months (the plan is the list reversed; `CAL7_ROOT_MONTH` must be empty).
+OUT then holds a forward-reading chain.v3: the free start is the search words in order (identity pose -> state of the first member), the edges are the reversed inverse words, the last edge ends at the identity pose.
+The three checkers read it unchanged with `CAL7_JOIN_END=identity` (`run_checks.sh` passes the variable to Flix too, `check_join_forwarding.sh`). The checker root month stays empty: a free start has no root edge.
+The first member of the list is the free start, so its month must be exact: a best-effort month at the tip of the search is never a stop (one more edge is produced), and a best-effort first member of the list is refused.
+`prior=DIR` reads such a chain.v3, converts it back to the search order and continues it to earlier months. edges.tsv, segments.tsv and months.tsv are in search order (edge 1 leaves the identity pose).
+PROGRESS.txt of a backward run: `direction=backward`, `chain_end` = the last member of the list (the identity pose), `chain_start` = the earliest month reached.
+
+| File | Content |
+|---|---|
+| `months-back-1980-01-2019-01.tsv` | 469 months 1980-01 .. 2019-01 (increasing, no gap); SHA-256 `d99f668118ecd2b094b188cb94d8bd9057a62f934e635e56bec8304b2a331041` |
+| `best-effort-back-1980-01-2019-01.tsv` | `best_effort_path` file: 1981-02, 1987-02, 1998-02, 2009-02, 2015-02, wrong cell (7,1); SHA-256 `dde09fef9c08575d4a6dbcbb10b2e016d066818b491f2899123816ad744ebdeb` |
+| `february-hall-C-back.tsv` | Hall witness table of print C for these 5 months (Julia only, `february_hall.jl`; class -3,-3,-3, deficiency 1, Hall set 7,1;7,7) |
+| `stages-back-1980-01-2019-01.tsv` | stage plan (data only) |
+| `coverage-back-1980-01-2019-01.{tsv,json}` | `month_coverage.jl` (root = start 1980-01, last 2019-01); `verify_coverage.jl` accepts it |
+
+Months print C cannot show exactly: the test matches the board of every month against print C (91 boards, 90 matchable). Only February, Sunday, 28 days fails: 1981-02, 1987-02, 1998-02, 2009-02, 2015-02
+(the leap years 1980, 1984, .., 2016, also 2000, are exact; 1900 is outside the list). 1980-01 and 2019-01 are January/Tuesday/31 (the identity front). Whether the solver reaches every state is UNKNOWN.
+
+468 edges. The stage plan keeps the measured basis of the first chain (27 to 37 s per edge, 64 edges in 1700 to 2400 s of the 3000 s edge loop); the times of backward edges are UNKNOWN.
+The artifact of every stage starts at an exact month (a free start shows its month exactly). `expect_prior_edges` is the edge count of the exported chain before the stage.
+
+| Stage | Search edges | max_edges | expect_prior_edges | Start month of the artifact |
+|---|---|---|---|---|
+| 1 | 1 .. 64 | 64 | none (no prior) | 2013-09 |
+| 2 | 65 .. 128 | 64 | 64 | 2008-05 |
+| 3 | 129 .. 192 | 64 | 128 | 2003-01 |
+| 4 | 193 .. 256 | 64 | 192 | 1997-09 |
+| 5 | 257 .. 320 | 64 | 256 | 1992-05 |
+| 6 | 321 .. 384 | 64 | 320 | 1987-01 |
+| 7 | 385 .. 448 | 64 | 384 | 1981-09 |
+| 8 | 449 .. 468 | 20 | 448 | 1980-01 |
+
+Inputs of every run: months_path `research/calendar-7x7/row1-window-chain/evidence/month-list/months-back-1980-01-2019-01.tsv`, months_sha256 `d99f6681...3041`, root_month empty, print and layout of print C
+(`evidence/print-c/`), best_effort_path `.../best-effort-back-1980-01-2019-01.tsv`, library L5, width 40, lambda 3, best_effort_29 true, `direction=backward`, `join_end=identity`.
+The workflow on main has neither `direction` nor `join_end` and cuts the list of the verify job at the late end: it cannot run this chain yet (proposal: a separate workflow change).
+
+Tests: `test_window_chain_backward.jl` (44 checks, lib), `test_month_chain_back.jl` (42 checks, data), `check_join_forwarding.sh` (7 cases), `check_backward_refusals.sh` (3 cases),
+`run_backward_e2e.sh` (end to end on a tiny list, opt-in, see its header) and `run_backward_mutants.sh` (44 mutants, `ONLY=name` selects one).
