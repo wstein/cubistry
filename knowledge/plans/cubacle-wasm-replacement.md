@@ -128,8 +128,8 @@ coordinator session, as recorded there):
   exist; one PR per repository, each with owner approval.
 
 SM2 and SM8 are owner answers of 2026-11-12 given as a multiple-choice answer to
-the coordinator. The source is that coordinator session; puzlwerk#49 at
-`0bd5f72e` still lists them as open and has not caught up yet. Until the cubacle
+the coordinator. The source is that coordinator session; puzlwerk#49 records both
+since `6d64f286`. Until the cubacle
 plan is updated for SM1 and SM4 (a
 follow-up docs PR in `wstein/cubacle`, puzlwerk#49 plan.md section 3):
 
