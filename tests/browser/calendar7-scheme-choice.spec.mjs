@@ -42,7 +42,7 @@ test('the color picker works by keyboard at 360px, preserves fonts and sheet col
  await page.setViewportSize({width:360,height:800});
  await page.goto('/index.html?app=calendar7&year=2026&month=11&font=nunito&scheme=unknown&extra=keep&construction=stickered');
  const root=page.locator('#calendar7-root'),select=page.getByLabel('Cube color theme',{exact:true});await expect(root).toHaveAttribute('data-c7-month','2026-11',{timeout:30000});
- await expect(select).toHaveValue('paper-red');await expect(select.locator('option')).toHaveCount(10);await expect(select).toBeEnabled();await expect(page.locator('[data-c7="speed"]')).toBeDisabled();
+ await expect(select).toHaveValue('paper-red');await expect(select.locator('option')).toHaveCount(11);await expect(select).toBeEnabled();await expect(page.locator('[data-c7="speed"]')).toBeDisabled();
  const digest=await root.getAttribute('data-c7-digest'),saved=await page.evaluate(()=>localStorage.getItem('cubistry-viewer-appearance-v1:/index.html'));
  await page.getByLabel('Font style',{exact:true}).selectOption('quicksand');await expect(root).toHaveAttribute('data-c7-font','quicksand');
  const palette=()=>page.locator('.c7-sheet td').evaluateAll(cells=>cells.map(c=>{const s=getComputedStyle(c);return[s.color,s.backgroundColor];}));const before=await palette();
