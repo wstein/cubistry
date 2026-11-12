@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Data mutants of test_month_chain_2019.jl and test_hall_table_c.jl: each mutated copy of evidence/month-list must make the named test set fail.
 # Usage: [ONLY=mutant-name] run_chain2019_mutants.sh [julia]
-# Time: one mutant of test_month_chain_2019.jl about 25 s, one of test_hall_table_c.jl about 20 s at load 25 to 50 (the full run of 14 mutants takes about 6 min,
-# more than the 5-minute limit of one command: run it in the background, or select one mutant with ONLY=name).
+# Time: the full run of 14 mutants takes 88 s at load 25 to 50 (a mutant of test_month_chain_2019.jl about 5 s, one of test_hall_table_c.jl about 25 s); ONLY=name selects one.
 set -u
 here=$(cd "$(dirname "$0")" && pwd); julia=${1:-julia}; src=$here/evidence/month-list; bad=0; n=0
 L=months-chain-2019-01-2036-01.tsv; B=best-effort-chain-2019-01-2036-01.tsv; S=stages-chain-2019-01-2036-01.tsv; C=coverage-chain-2019-01-2036-01; H=february-hall-C.tsv
