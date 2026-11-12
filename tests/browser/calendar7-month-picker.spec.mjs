@@ -34,7 +34,7 @@ test("month selection commits instantly and preserves the persistent trigger and
   for (const [key, value] of Object.entries({ app: "calendar7", year: "2026", month: "12", scheme: "paper-blue", font: "nunito", banner: "boxed", extra: "keep" })) expect(q.get(key)).toBe(value);
 });
 
-test("year browsing supports the chain ends and rejects invalid edits without navigating", async ({ page }) => {
+test("year browsing reaches years 1 and 9999 and rejects invalid edits without navigating", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await open(page);
