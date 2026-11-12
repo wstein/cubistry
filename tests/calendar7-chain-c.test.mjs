@@ -164,20 +164,42 @@ test("root month 2019-01: the root pose is the identity pose of the print, every
   assert.equal(new Set(start.printing.piece).size, 218);
 });
 
-test("root month 2019-01: all 6 faces show one color, the front face is white in the Rubik-Tint scheme, and the front shows January 2019", () => {
-  const scheme = SCHEMES.find((s) => s.id === "rubik-tint");
-  const homes = homeFacesOf(start.pose);
-  const faces = new Map();
+/**
+ * Home face of every sticker, derived from the print alone (not from the pose under test): the stickers of piece p are numbered in
+ * the order of the x, y, z faces of its home cell (the p-th cell of the surface), each facing outward on that axis.
+ */
+function independentHomes(printing) {
+  const seen = new Map();
+  return printing.piece.map((p) => {
+    const home = surface[p - 1], k = seen.get(p) ?? 0;
+    seen.set(p, k + 1);
+    const axis = [0, 1, 2].filter((a) => Math.abs(home[a]) === 3)[k];
+    const normal = [0, 0, 0];
+    normal[axis] = Math.sign(home[axis]);
+    return homeFaceOfNormal(normal);
+  });
+}
+/** The faces of a pose (by the normal the stickers face now): the home colors found on each, and which faces are not one color. */
+function faceColors(printing, pose) {
+  const homes = independentHomes(printing), faces = new Map();
   for (let i = 0; i < 294; i++) {
-    const o = 3 * i, key = `${start.pose.normal[o]},${start.pose.normal[o + 1]},${start.pose.normal[o + 2]}`;
+    const o = 3 * i, key = `${pose.normal[o]},${pose.normal[o + 1]},${pose.normal[o + 2]}`;
     (faces.get(key) ?? faces.set(key, []).get(key)).push(i);
   }
+  const mixed = [...faces].filter(([, ids]) => new Set(ids.map((i) => homes[i])).size !== 1).map(([key]) => key);
+  return { homes, faces, mixed };
+}
+
+test("root month 2019-01: all 6 faces show one color, the front face is white in the Rubik-Tint scheme, and the front shows January 2019", () => {
+  const scheme = SCHEMES.find((s) => s.id === "rubik-tint");
+  const { homes, faces, mixed } = faceColors(start.printing, start.pose);
   assert.equal(faces.size, 6);
+  assert.deepEqual(mixed, [], "every face shows one home color");
   const tints = new Map();
   for (const [key, ids] of faces) {
     assert.equal(ids.length, 49, `face ${key} has 49 stickers`);
-    // Every sticker of the face has the home face of the face it lies on: one color per face.
-    assert.deepEqual([...new Set(ids.map((i) => homes[i]))], [homeFaceOfNormal(key.split(",").map(Number))], `face ${key} is one color`);
+    // The one color of the face is the home color of that face (solved), not any other.
+    assert.equal(homes[ids[0]], homeFaceOfNormal(key.split(",").map(Number)), `face ${key} shows its own color`);
     // The ground the viewer paints: the face tint (weekdays, blanks) or its darkened weekend ground (red class), nothing else.
     const grounds = new Set(ids.map((i) => { const s = schemeForHome(scheme, homes[i]); return start.printing.ink[i] === "red" ? s.weekendFill : s.dayFill; }));
     assert.ok(grounds.size <= 2, `face ${key} has at most the tint and its weekend ground`);
@@ -187,6 +209,15 @@ test("root month 2019-01: all 6 faces show one color, the front face is white in
   assert.equal(tints.get("0,0,1"), "#ffffff", "front face: Rubik-Tint white");
   assert.equal(schemeForHome(scheme, homes[faces.get("0,0,1")[0]]).dayFill, "#ffffff");
   assert.deepEqual(frontFailures(start.printing, start.pose, table.displays[0].cells), [], "the front shows the January 2019 board");
+  // The independent homes agree with the library's classification of the root pose (identity pose of the print).
+  assert.deepEqual(homes, homeFacesOf(start.pose));
+});
+
+test("the face-color check fails for the pose of 2019-02, a quarter turn and a scrambled root", () => {
+  assert.notDeepEqual(faceColors(start.printing, poses[1]).mixed, [], "2019-02");
+  assert.notDeepEqual(faceColors(start.printing, applyMoves(start.pose, [[1, 1]])).mixed, [], "one quarter turn");
+  const scrambled = applyMoves(start.pose, graph.edges[2].moves);
+  assert.notDeepEqual(faceColors(start.printing, scrambled).mixed, [], "scrambled");
 });
 
 test("the solved check is not trivially true: one quarter turn, or one sticker turned to another face, is not the solved cube", () => {
