@@ -119,11 +119,11 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
   {
     id: "ci",
     title: "CI Quality Cube",
-    subtitle: "Build, test, analyze and review states on one 3x3 cube (local simulated events).",
+    subtitle: "Build, test, analyze and review states on one 2x2 cube (local simulated events).",
     cubes: 1,
     badge: "CI Quality",
     group: "cubes",
     help: "docs/STATUS_CUBE.md",
-    params: ["turn", "build", "test", "analyze", "review"],
+    params: ["speed", "build", "test", "analyze", "review"],
   },
 ];
