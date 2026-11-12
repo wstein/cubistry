@@ -1,7 +1,7 @@
 // Measures and chooses the six tints of the Calendar7 color scheme "Rubik-Tint" (owner design 2026-11-12).
 // Usage: node scripts/calendar7-rubik-tint.mjs            prints the table for the shipped tints
 //        node scripts/calendar7-rubik-tint.mjs --optimize  searches the strengths (deterministic) and prints them
-// Colour difference: CIEDE2000 (Sharma et al. 2005, kL = kC = kH = 1), D65, sRGB. Contrast: WCAG 2.x.
+// Color difference: CIEDE2000 (Sharma et al. 2005, kL = kC = kH = 1), D65, sRGB. Contrast: WCAG 2.x.
 import { contrast, mix } from "../tests/calendar7-contrast.mjs";
 
 /** Standard Rubik colors (the common sticker values; white opposite yellow, red opposite orange, blue opposite green). */
