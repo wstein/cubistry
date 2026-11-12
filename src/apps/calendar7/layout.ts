@@ -13,13 +13,24 @@ export const LAYOUT_PARAM = "layout";
 export const parseLayout = (value: string | null | undefined): Layout => (value === "names" ? "names" : "standard");
 
 /**
+ * DEMO selection (not a layout of its own: the front is rendered as `names`). `?layout=names-demo` reads the demo data
+ * folder public/calendar7/names-demo (beam chain, print window-2029-12). Not part of the shipped modes: the dropdown
+ * Historical mode ids remain for artifact and renderer compatibility; the app now uses one names printing.
+ * `parseLayout` never returns it.
+ *
  * Any-date selection (not a layout of its own: the front is rendered as `names`). `?layout=names-any` shows print B
  * (public/calendar7/names-any) for every date, display only. The `names` layout uses the same display for every month
  * outside its chain window. `parseLayout` never returns it; the dropdown lists the option only while it is selected through the URL.
  */
-export type LayoutMode = Layout | "names-any";
+export type LayoutMode = Layout | "names-demo" | "names-any";
+export const NAMES_DEMO_MODE = "names-demo";
+export const DEMO_DISPLAY_ONLY_NOTICE = "Display only: no move sequence for this date (beam preview print).";
 export const NAMES_ANY_MODE = "names-any";
-export const parseLayoutMode = (value: string | null | undefined): LayoutMode => (value === NAMES_ANY_MODE ? NAMES_ANY_MODE : parseLayout(value));
+export const parseLayoutMode = (value: string | null | undefined): LayoutMode =>
+  value === NAMES_DEMO_MODE ? NAMES_DEMO_MODE : value === NAMES_ANY_MODE ? NAMES_ANY_MODE : parseLayout(value);
+export const NAMES_DEMO_LABEL = "Names (demo, beam chain, print window-2029-12, May 2026 - Jun 2027)";
+export const NAMES_DEMO_NOTICE = "Demo data covers May 2026 to June 2027 (beam chain, print window-2029-12). Showing the standard layout.";
+export const NAMES_DEMO_LOAD_NOTICE = "The names demo data could not be loaded. Showing the standard layout.";
 export const NAMES_ANY_LABEL = "Names (any date, print B, display only)";
 export const NAMES_ANY_LOAD_NOTICE = "The names layout data for any date could not be loaded. Showing the standard layout.";
 /** Shown for every date displayed from print B (the names layout outside its chain window, and `names-any`). */
@@ -61,7 +72,11 @@ for (const word of NAME_WORDS) {
     ALIGN.set(tile, role);
   });
 }
-export const nameAlign = (label: string): NameAlign => ALIGN.get(label) ?? "center";
+export const nameAlign = (label: string, words: NameWords = NAME_WORDS): NameAlign => {
+  if (words === NAME_WORDS) return ALIGN.get(label) ?? "center";
+  const word = words.find(w => w.includes(label)), k = word?.indexOf(label) ?? -1;
+  return !word ? "center" : label.length === NAME_SLOTS ? "full" : word.length === 1 ? "center" : k === 0 ? "right" : k === word.length - 1 ? "left" : "full";
+};
 
 /**
  * Edge a name tile is anchored to when it is wider than a cubie pitch (a tile on a thick outer layer of the names layout):
@@ -77,23 +92,48 @@ for (const word of NAME_WORDS) {
     ANCHOR.set(tile, anchor);
   });
 }
-export const nameAnchor = (label: string): -1 | 0 | 1 => ANCHOR.get(label) ?? 0;
+export const nameAnchor = (label: string, words: NameWords = NAME_WORDS): -1 | 0 | 1 => {
+  if (words === NAME_WORDS) return ANCHOR.get(label) ?? 0;
+  const word = words.find(w => w.includes(label));
+  return !word || word.length === 1 ? 0 : word[0] === label ? 1 : word.at(-1) === label ? -1 : 0;
+};
 /** Shift (cubie pitches) of the letters of a tile of width `width` (in cubie pitches) from the 1-wide placement: anchor * (width - 1) / 2. */
-export const nameTileShift = (label: string, width: number): number => (nameAnchor(label) * (width - 1)) / 2;
+export const nameTileShift = (label: string, width: number, words: NameWords = NAME_WORDS): number => (nameAnchor(label, words) * (width - 1)) / 2;
 
 /**
  * Offset of letter `i` of a name tile from the tile center, in cubie pitches (scene units). The slots are thirds of the
  * cubie pitch, so the letter pitch is 1/3 over the whole row of tiles, across tile boundaries too (a middle tile of three
  * letters fills its pitch exactly). The one place of the slot math (sticker art and font art).
  */
-export const nameSlotOffset = (label: string, i: number): number => (nameSlotStart(label) + i + 0.5) / NAME_SLOTS - 0.5;
+export const nameSlotOffset = (label: string, i: number, words: NameWords = NAME_WORDS): number => (nameSlotStart(label, words) + i + 0.5) / NAME_SLOTS - 0.5;
 
 /** First slot (0-based, may be fractional for a centered tile) of the letters of a name tile. */
-export function nameSlotStart(label: string): number {
+export function nameSlotStart(label: string, words: NameWords = NAME_WORDS): number {
   const n = Math.min(label.length, NAME_SLOTS);
-  switch (nameAlign(label)) {
+  switch (nameAlign(label, words)) {
     case "right": return NAME_SLOTS - n;
     case "center": return (NAME_SLOTS - n) / 2;
     default: return 0;
   }
+}
+
+/** Resolve the month vocabulary of one physical printing, without relabeling it.
+ * Partial renderer fixtures retain the historical words for months absent from the print.
+ * Multiple complete segmentations are rejected instead of choosing a different physical label.
+ */
+export type NameWords = readonly (readonly string[])[];
+export function printNameWords(printing: { readonly text: readonly string[]; readonly ink: readonly string[] }): NameWords {
+  const labels = new Set(printing.text.filter((_, i) => printing.ink[i] === "month"));
+  return NAME_WORDS.map(fallback => {
+    const full = fallback.join("");
+    const split = (rest: string, parts: string[]): string[][] => {
+      if (!rest) return [parts];
+      if (parts.length === 3) return [];
+      return [...labels].filter(label => label && rest.startsWith(label))
+        .flatMap(label => split(rest.slice(label.length), [...parts, label]));
+    };
+    const choices = split(full, []);
+    if (choices.length > 1) throw new Error(`ambiguous physical month vocabulary: ${full}`);
+    return choices[0] ?? fallback;
+  });
 }

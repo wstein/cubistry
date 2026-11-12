@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+import { IMAGE_UPS } from "./display.ts";
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
-import { type Layout, NAME_SLOTS, nameSlotOffset, nameSlotStart, nameTileShift } from "./layout.ts";
+import { type Layout, NAME_SLOTS, nameSlotOffset, type NameWords, NAME_WORDS, nameSlotStart, nameTileShift } from "./layout.ts";
 import { type FaceBands, faceFlatShare, facePixelsPerUnit, monthBanner, nameAboveShare, NAMES_BANNER_BOTTOM_OFFSET, NAMES_BANNER_HEIGHT, NAMES_BANNER_OVERHANG, NAMES_BANNER_RADIUS, NAMES_BANNER_THIN_TILE_TOP, NAMES_FACE_PX_PER_UNIT, NAMES_WEEKDAY_DOWN, outerLayerWidth, CALENDAR7_SIZE } from "./geometry.ts";
 import { type ColorScheme, namesGround, type ResolvedBannerStyle, type SchemeLine, underlineInk } from "./schemes.ts";
 
@@ -318,17 +319,17 @@ export const namePxPerUnit = (): number => NAMES_FACE_PX_PER_UNIT / FACE_SCALE;
  * Center x (drawing coordinates) of letter `i` of a name tile. On a cubie face (the 3D cube): the slot grid of layout.ts,
  * thirds of the cubie pitch, uniform across tiles. On a sticker (the 2D sheet): as before, three slots of the text square.
  */
-export const nameLetterX = (text: string, i: number, face: boolean, tileWidth = 1): number =>
+export const nameLetterX = (text: string, i: number, face: boolean, tileWidth = 1, words: NameWords = NAME_WORDS): number =>
   face
-    ? TEXTURE / 2 + (nameSlotOffset(text, i) + nameTileShift(text, tileWidth)) * namePxPerUnit()
-    : TEXTURE / 2 - TEXT_SQUARE / 2 + (nameSlotStart(text) + i + 0.5) * (TEXT_SQUARE / NAME_SLOTS);
+    ? TEXTURE / 2 + (nameSlotOffset(text, i, words) + nameTileShift(text, tileWidth, words)) * namePxPerUnit()
+    : TEXTURE / 2 - TEXT_SQUARE / 2 + (nameSlotStart(text, words) + i + 0.5) * (TEXT_SQUARE / NAME_SLOTS);
 
 /**
  * Letters of a name tile on the one uniform grid of the whole name row: a third of a cubie pitch between two letters, also
  * across tile boundaries, independent of the glyph widths (first tile right-flush, last left-flush, see layout.ts).
  */
-export function nameGrid(text: string, face = true, tileWidth = 1): readonly NameLetter[] {
-  return [...text].map((char, i) => ({ char, x: nameLetterX(text, i, face, tileWidth), size: NAME_FONT_SIZE }));
+export function nameGrid(text: string, face = true, tileWidth = 1, words: NameWords = NAME_WORDS): readonly NameLetter[] {
+  return [...text].map((char, i) => ({ char, x: nameLetterX(text, i, face, tileWidth, words), size: NAME_FONT_SIZE }));
 }
 
 /** Normal font size of a one-line label by its length (shared by the one-line fit and the big split number). */
@@ -433,12 +434,12 @@ export function drawSticker(
   paintSticker(ctx, text, ink, profile, scheme ? tileRoles(scheme, text, ink, layout) : null, true, layout, false);
 }
 
-function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean, layout: Layout = "standard", face = false, tile?: FaceTile): void {
+function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, edgeLine: boolean, layout: Layout = "standard", face = false, tile?: FaceTile, words: NameWords = NAME_WORDS): void {
   if (!(roles && layout === "names" && face && tile)) { // a tile of the names layout has its ground already (paintTileGround)
     ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER;
     ctx.fillRect(0, 0, TEXTURE, TEXTURE);
   }
-  if (text !== "") paintLabel(ctx, text, ink, profile, roles, layout, face, tile);
+  if (text !== "") paintLabel(ctx, text, ink, profile, roles, layout, face, tile, words);
   if (roles?.line && edgeLine) {
     const r = lineRect(roles.line, layout, false);
     ctx.fillStyle = roles.line.color;
@@ -446,7 +447,7 @@ function paintSticker(ctx: Context, text: string, ink: string, profile: RuleProf
   }
 }
 
-function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, layout: Layout, face: boolean, tile?: FaceTile): void {
+function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfile, roles: TileRoles | null, layout: Layout, face: boolean, tile?: FaceTile, words: NameWords = NAME_WORDS): void {
   const big = roles ? roles.ink : (INK_COLORS[ink] ?? INK_COLORS.dark);
   ctx.fillStyle = big;
   if (layout === "names" && ink === "month") {
@@ -455,7 +456,7 @@ function paintLabel(ctx: Context, text: string, ink: string, profile: RuleProfil
     ctx.font = `600 ${NAME_FONT_SIZE}px ${FONT}`;
     // On a tile of the unit grid the drawing is in the frame of the unit cell: no shift for a thick tile, the name centered in the banner.
     const up = face && tile ? nameCenterUp(0.714 * NAME_FONT_SIZE / namePxPerUnit()) * namePxPerUnit() : 0;
-    for (const l of nameGrid(text, face, 1)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04 - up);
+    for (const l of nameGrid(text, face, 1, words)) ctx.fillText(l.char, l.x, TEXTURE / 2 + l.size * 0.04 - up);
   } else if (profile === "strict" && isSplitLabel(text)) {
     ctx.textBaseline = "alphabetic";
     const l = splitLayout(text);
@@ -518,6 +519,7 @@ export function drawFace(
   scheme?: ColorScheme,
   layout: Layout = "standard",
   tile?: FaceTile,
+  words: NameWords = NAME_WORDS,
 ): void {
   const roles = scheme ? tileRoles(scheme, text, ink, layout) : null;
   const t = layout === "names" ? tile : undefined; // only the names layout has tiles of other sizes
@@ -530,7 +532,7 @@ export function drawFace(
   ctx.scale(kx, ky);
   ctx.translate(-TEXTURE / 2, -TEXTURE / 2);
   // paintSticker paints the same ground again over the scaled square (same color), then the label.
-  paintSticker(ctx, text, ink, profile, roles, false, layout, true, t);
+  paintSticker(ctx, text, ink, profile, roles, false, layout, true, t, words);
   ctx.restore();
   if (roles?.line) {
     const r = lineRect(roles.line, layout, true, t, isBannerClass(roles.cls));
@@ -539,18 +541,15 @@ export function drawFace(
   }
 }
 
-/** The cell a print cannot show (best effort, anydate.ts): gray field, hatching, strike-through, red frame crossed out. */
-export const WRONG_CELL = { field: "#c6c6c6", hatch: "#5b5b5b", strike: "#262626", frame: "#d0021b", halo: "#ffffff" } as const;
+/** A display mismatch overlay; it makes no reachability or UNSAT claim. */
+export const WRONG_CELL = { hatch: "#5b5b5b", halo: "#ffffff" } as const;
 /** Minimal 2D context the drawing needs (a recording fake in the tests). */
 export interface WrongCellContext {
-  fillStyle: string | CanvasGradient | CanvasPattern;
   strokeStyle: string | CanvasGradient | CanvasPattern;
   lineWidth: number;
   lineCap: CanvasLineCap;
   save(): void;
   restore(): void;
-  fillRect(x: number, y: number, w: number, h: number): void;
-  strokeRect(x: number, y: number, w: number, h: number): void;
   beginPath(): void;
   moveTo(x: number, y: number): void;
   lineTo(x: number, y: number): void;
@@ -560,44 +559,38 @@ export interface WrongCellContext {
 }
 /** Number of hatch lines across a tile of the width `w` (one per `w / HATCH_LINES`). */
 export const HATCH_LINES = 10;
-/**
- * Draws the differing cell over the whole texture `w` x `h` of its cubie face: the texture turns with the cube, so the mark
- * is projected with the face. Order: gray field, 45 degree hatching, a dark strike-through of the field, the red frame
- * (with a white halo so it reads on dark schemes too) and a red strike-through of the frame.
- */
-export function drawWrongCell(ctx: WrongCellContext, w: number, h: number): void {
-  const unit = Math.min(w, h);
+export type WrongEdge = "bottom" | "left" | "top" | "right";
+/** Texture edge that appears at the logical calendar front's bottom. */
+export function wrongStripEdge(up: ArrayLike<number>): WrongEdge {
+  const angle = IMAGE_UPS.findIndex(v => v.every((value, i) => value === up[i]));
+  if (angle < 0) throw new Error("mismatch sticker has no front image orientation");
+  return (["bottom", "left", "top", "right"] as const)[angle];
+}
+/** Bottom tenth of the actual flat face in the display frame, inset from the bevel. */
+export function wrongStripRect(w: number, h: number, tile?: FaceTile, edge: WrongEdge = "bottom"): { x: number; y: number; w: number; h: number } {
+  const flatW = w * faceFlatShare(tile?.w ?? 1), flatH = h * faceFlatShare(tile?.h ?? 1);
+  const x = (w - flatW) / 2, y = (h - flatH) / 2;
+  if (edge === "left") return { x, y, w: flatW * .1, h: flatH };
+  if (edge === "right") return { x: x + flatW * .9, y, w: flatW * .1, h: flatH };
+  if (edge === "top") return { x, y, w: flatW, h: flatH * .1 };
+  return { x, y: y + flatH * .9, w: flatW, h: flatH * .1 };
+}
+/** Transparent paired hatching over the original sticker; nothing above the strip is changed. */
+export function drawWrongCell(ctx: WrongCellContext, w: number, h: number, tile?: FaceTile, edge: WrongEdge = "bottom"): void {
+  const r = wrongStripRect(w, h, tile, edge), unit = Math.min(w, h), step = unit / HATCH_LINES;
   ctx.save();
-  ctx.fillStyle = WRONG_CELL.field;
-  ctx.fillRect(0, 0, w, h);
   ctx.beginPath();
-  ctx.rect(0, 0, w, h);
+  ctx.rect(r.x, r.y, r.w, r.h);
   ctx.clip();
-  ctx.strokeStyle = WRONG_CELL.hatch;
-  ctx.lineWidth = Math.max(2, unit / 48);
-  ctx.beginPath();
-  const step = unit / HATCH_LINES;
-  for (let d = -h; d < w; d += step) {
-    ctx.moveTo(d, h);
-    ctx.lineTo(d + h, 0);
-  }
-  ctx.stroke();
-  ctx.lineCap = "round";
-  ctx.strokeStyle = WRONG_CELL.strike;
-  ctx.lineWidth = unit / 14;
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(w, h);
-  ctx.stroke();
-  const inset = unit * 0.14;
-  const line = unit / 11;
-  for (const [color, width] of [[WRONG_CELL.halo, line * 1.9], [WRONG_CELL.frame, line]] as const) {
+  ctx.lineCap = "butt";
+  for (const [color, width] of [[WRONG_CELL.halo, Math.max(4, unit / 24)], [WRONG_CELL.hatch, Math.max(2, unit / 48)]] as const) {
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
-    ctx.strokeRect(inset, inset, w - 2 * inset, h - 2 * inset);
     ctx.beginPath();
-    ctx.moveTo(w - inset, inset);
-    ctx.lineTo(inset, h - inset);
+    for (let x = r.x - r.h; x < r.x + r.w; x += step) {
+      ctx.moveTo(x, r.y + r.h);
+      ctx.lineTo(x + r.h, r.y);
+    }
     ctx.stroke();
   }
   ctx.restore();
