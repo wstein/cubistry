@@ -48,6 +48,9 @@ const GATES = {
   "[[ \"$IN_PRINT_PATH\" =~ $path ]] && [[ \"$IN_PRINT_PATH\" != *..* ]] || fail \"print_path is not a plain repository path\"",
   "[ -z \"$IN_CLAIMS\" ] || { [[ \"$IN_CLAIMS\" =~ $path ]] && [[ \"$IN_CLAIMS\" != *..* ]]; } || fail \"claims_path is not a plain repository path\"",
   "[[ \"$IN_PRINT_SHA\" =~ ^[0-9a-f]{64}$ ]] || fail \"print_sha256 must be 64 lowercase hex digits\"",
+  "[ -z \"$IN_LAYOUT_PATH\" ] || { [[ \"$IN_LAYOUT_PATH\" =~ $path ]] && [[ \"$IN_LAYOUT_PATH\" != *..* ]]; } || fail \"layout_path is not a plain repository path\"",
+  "[ -z \"$IN_LAYOUT_PATH\" ] || [[ \"$IN_LAYOUT_SHA\" =~ ^[0-9a-f]{64}$ ]] || fail \"layout_path needs layout_sha256 (64 lowercase hex digits)\"",
+  "[ -n \"$IN_LAYOUT_PATH\" ] || [ -z \"$IN_LAYOUT_SHA\" ] || fail \"layout_sha256 needs layout_path\"",
   "[[ \"$IN_LIBRARY\" =~ ^L[145]$ ]] || fail \"library must be L1, L4 or L5\"",
   "[[ \"$IN_WIDTH\" =~ ^[1-9][0-9]{0,2}$ ]] && [ \"$IN_WIDTH\" -le 200 ] || fail \"width must be 1-200\"",
   "[[ \"$IN_LAMBDA\" =~ ^([1-9]|10)$ ]] || fail \"lambda must be 1-10\"",
@@ -156,6 +159,20 @@ test("run contract: month list, root month and print are inputs, nothing is hard
   assert.equal(jobs.verify.env.MONTHS_SHA, "${{ inputs.months_sha256 }}");
   assert.equal(jobs.produce.env.MONTHS_SHA, "${{ inputs.months_sha256 }}");
 });
+test("optional layout input: validated, checked against its SHA-256, handed to run_checks.sh only when set", () => {
+  const head = text.split("\njobs:")[0];
+  for (const i of ["layout_path", "layout_sha256"]) assert.match(head, new RegExp(`^      ${i}:\n        description: [^\n]*\n        type: string\n        default: ""\n`, "m"), i);
+  assert.equal(jobs.verify.env.LAYOUT_PATH, "${{ inputs.layout_path }}");
+  assert.equal(jobs.verify.env.LAYOUT_SHA, "${{ inputs.layout_sha256 }}");
+  assert.equal(jobs.prepare.steps.find(s => s.name === "Check research commit").env.LAYOUT_PATH, "${{ inputs.layout_path }}");
+  const v = step("verify", "Verify chain (Julia, Flix, independent replay)"), l = runLines(v);
+  // without the inputs nothing is exported: the checkers keep their built-in layout and pin
+  assert.ok(l.includes('[ -z "$LAYOUT_PATH" ] || { echo "$LAYOUT_SHA  src/$LAYOUT_PATH" | sha256sum --check --strict; export CAL7_WINDOW_LAYOUT="$GITHUB_WORKSPACE/src/$LAYOUT_PATH" CAL7_WINDOW_LAYOUT_SHA256="$LAYOUT_SHA"; }'));
+  const call = l.findIndex(x => x.startsWith('bash "src/$WC/run_checks.sh"'));
+  assert.ok(l.indexOf('[ -z "$LAYOUT_PATH" ] || { echo "$LAYOUT_SHA  src/$LAYOUT_PATH" | sha256sum --check --strict; export CAL7_WINDOW_LAYOUT="$GITHUB_WORKSPACE/src/$LAYOUT_PATH" CAL7_WINDOW_LAYOUT_SHA256="$LAYOUT_SHA"; }') < call);
+  assert.ok(l[call].endsWith('"$GITHUB_WORKSPACE/out/checks" 2>&1 | tee "$GITHUB_WORKSPACE/out/verify.log"'), "run_checks.sh call is unchanged");
+  assert.ok(runLines(step("prepare", "Check research commit")).includes('[ -z "$LAYOUT_PATH" ] || git cat-file -e "$SHA:$LAYOUT_PATH" || fail "$LAYOUT_PATH is missing at $SHA"'));
+});
 test("research_ref must lie on the research branch", () => {
   assert.match(text, /^  RESEARCH_BRANCH: research\/cube-display-feasibility$/m);
   const prep = step("prepare", "Check research commit");
@@ -179,7 +196,7 @@ test("no workflow expression inside any run block (script injection)", () => {
 });
 test("every input reaches the scripts through env, with the exact mapping", () => {
   const v = step("prepare", "Validate inputs").env;
-  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_MONTHS_PATH: "months_path", IN_MONTHS_SHA: "months_sha256", IN_ROOT: "root_month", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_BEST: "best_effort_path", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode" };
+  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_MONTHS_PATH: "months_path", IN_MONTHS_SHA: "months_sha256", IN_ROOT: "root_month", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_LAYOUT_PATH: "layout_path", IN_LAYOUT_SHA: "layout_sha256", IN_BEST: "best_effort_path", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode" };
   assert.deepEqual(Object.keys(v).sort(), Object.keys(want).sort());
   for (const [k, input] of Object.entries(want)) assert.equal(v[k], `\${{ inputs.${input} }}`, k);
   const inputsDeclared = [...text.matchAll(/^      ([a-z_0-9]+):\n        description:/gm)].map(m => m[1]).sort();
