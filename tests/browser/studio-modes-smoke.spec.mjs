@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-// Smoke test for the thirteen Chronocube Studio modes (src/chronocube.mjs, MODES and switchMode). Per mode it asserts the
+// Smoke test for the fourteen Chronocube Studio modes (src/chronocube.mjs, MODES and switchMode). Per mode it asserts the
 // observable load signals only: no text in #studio-error (switchMode writes "Failed to load mode <id>: ..." there),
 // no uncaught page error, no console.error, and a canvas with a non-zero box in #studio-scene. The canvas is
 // mounted when an init function starts, before its designs and controllers load, so it is no ready signal. Ready
@@ -10,7 +10,7 @@ import { test, expect } from "@playwright/test";
 
 // Same order and ids as the <option> values of #studio-application (index.html);
 // the first test compares this list with the page.
-const MODES = ["clock", "ms-timer", "calendar", "hm-clock", "tenth", "counter", "timer", "five-second-timer", "hsm-counter", "ms-counter", "hm-one-cube", "calendar7", "ci"];
+const MODES = ["clock", "ms-timer", "calendar", "playground", "hm-clock", "tenth", "counter", "timer", "five-second-timer", "hsm-counter", "ms-counter", "hm-one-cube", "calendar7", "ci"];
 
 // Console errors a mode is known to log on the current code. Everything else fails. An entry is the exact
 // message fragment and the issue that tracks the defect; remove it when the issue is fixed.
@@ -18,7 +18,7 @@ const KNOWN_ERRORS = {};
 
 // On the CI runners (software GL, shared CPU) a step takes 4 to 9 times its local time, so the ready wait is 30 s
 // (it includes ensureProof and the design fetches), and a test gets the slow limit (3 x 30 s). The
-// all-modes test loads thirteen modes in one session and gets an explicit limit of 13 x 30 s.
+// all-modes test loads fourteen modes in one session and gets an explicit limit of 13 x 30 s.
 const LOAD_MS = 30000;
 const SETTLE_MS = 1500;
 
@@ -87,7 +87,7 @@ for (const id of MODES) {
 }
 
 test("switching through all modes in one session loads each without errors", async ({ page }) => {
-  test.setTimeout(13 * 30000);
+  test.setTimeout(14 * 30000);
   const seen = watch(page);
   await page.goto(`/index.html?app=${MODES[0]}`);
   await assertLoaded(page, seen, MODES[0]);
