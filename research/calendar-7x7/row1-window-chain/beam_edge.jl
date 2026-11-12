@@ -13,6 +13,7 @@
 @assert length(ARGS)>=6 "usage: beam_edge.jl OUT PRINT CHAIN STATES YEAR MONTH [key=value ...]"
 ENV["WINDOW_END"]=get(ENV,"WINDOW_END","2029-12")
 const CAL=normpath(joinpath(@__DIR__,".."))
+include(joinpath(@__DIR__,"window_chain_lib.jl"));using .WindowChainLib
 include(joinpath(CAL,"row1-window-print/common.jl"))
 include(joinpath(CAL,"global-search","search.jl"))
 include(joinpath(CAL,"upright-feasibility","strict_rule.jl"))
@@ -27,9 +28,10 @@ out,printpath,chainpath,statesdir=ARGS[1:4]
 tyear,tmonth=parse(Int,ARGS[5]),parse(Int,ARGS[6])
 opts=Dict(String.(split(x,'='))[1]=>String.(split(x,'='))[2] for x in ARGS[7:end])
 mode=get(opts,"mode","beam");@assert mode in ("beam","greedy")
+layout_path,layout_sha=layout_input(joinpath(CAL,"row1-revision/layout.tsv"))   # CAL7_WINDOW_LAYOUT + CAL7_WINDOW_LAYOUT_SHA256, default the built-in layout
+
 @assert !ispath(out) "Use a new scratch output directory";mkpath(out)
 
-layout_path,layout_sha=layout_input(joinpath(CAL,"row1-revision/layout.tsv"))   # CAL7_WINDOW_LAYOUT + CAL7_WINDOW_LAYOUT_SHA256, default the built-in layout
 labels=coupled_labels(read(layout_path,String))
 goals=coupled_goals(labels,"names-band","window")
 source=window_read_print(printpath)

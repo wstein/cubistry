@@ -48,9 +48,10 @@ range_start=isempty(get(opts,"start","")) ? min(plan[1],members[1]) : parse_ym(o
 max_edges=parse(Int,get(opts,"max_edges","100000"));deadline=parse(Float64,get(ENV,"GENERATE_DEADLINE_S",string(DEFAULT_DEADLINE_S)))
 claims=haskey(opts,"claims") ? read_claims(opts["claims"]) : Dict{Tuple{Int,Int},NTuple{4,String}}()
 best=haskey(opts,"best_effort") ? read_best_effort(opts["best_effort"]) : Dict{Tuple{Int,Int},NTuple{3,String}}()
+layout_path,layout_sha=layout_input(joinpath(CAL,"row1-revision/layout.tsv"))   # CAL7_WINDOW_LAYOUT + CAL7_WINDOW_LAYOUT_SHA256, default the built-in layout
+
 @assert !ispath(out) "Use a new scratch output directory";mkpath(joinpath(out,"states"))
 
-layout_path,layout_sha=layout_input(joinpath(CAL,"row1-revision/layout.tsv"))   # CAL7_WINDOW_LAYOUT + CAL7_WINDOW_LAYOUT_SHA256, default the built-in layout
 labels=coupled_labels(read(layout_path,String))
 goals=coupled_goals(labels,"names-band","window")      # the members of S
 rooted && (goals=vcat([coupled_month_goal(labels,root...)],goals))   # the root month is not a member: its goal comes first
