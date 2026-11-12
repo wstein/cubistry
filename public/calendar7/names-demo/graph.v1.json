@@ -1,0 +1,40 @@
+{
+"schema":"cubistry.calendar7.graph",
+"version":1,
+"status":"DEMO, research candidate, not certified, not for release",
+"license":"Created by Werner Stein with AI assistance (Codex and Claude, OpenAI and Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.",
+"spdx":"CC-BY-SA-4.0",
+"alphabet":"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+",
+"encoding":"one character per move: index = (generator - 1) * 3 + {1: 0, -1: 1, 2: 2}",
+"nodes":[
+  {"hash":"0e131528852992475143ad927fc9bdc2b51a722c05376150bdcb38e8520bfe7a","display":1,"year":2026,"month":5},
+  {"hash":"fc596d50787184f2f353aa07d27a2bc1dce599d2a0360d88b9ec64359aaaff3b","display":2,"year":2026,"month":6},
+  {"hash":"dd22d2e63f1f09db16782367924abbdcd0a28e99fe6619291b46b709ceedc509","display":3,"year":2026,"month":7},
+  {"hash":"b5bd0162ef3ec99f90ebd383d7e83dd8aab8dc24022edbbb5759a2ee692bf92c","display":4,"year":2026,"month":8},
+  {"hash":"d5d222556caa90d63b2056cfe44377fa3310cc82d3564e5d6f4102fe04881279","display":5,"year":2026,"month":9},
+  {"hash":"87dd024c074bf02aad4c432ebe67a6a817c0fa3ccdc5605e376cbe2f64149c02","display":6,"year":2026,"month":10},
+  {"hash":"e4947da679d5bd9b972f5d88f9fb4d00da94b47aab910544bd1213af2249435e","display":7,"year":2026,"month":11},
+  {"hash":"11701fa4552ce70fb6609f2d37a12e5ac7fe612dfeef0ee1c0518016b626152f","display":8,"year":2026,"month":12},
+  {"hash":"4d7e2ad73f46cf5e7e1fe9c0bf50db8ac1e7707270d3e21074aaa1f47a2fab2e","display":9,"year":2027,"month":1},
+  {"hash":"664f5925ffd31fab97573d9bcce705c7740727c56e694363301910c865412b6b","display":10,"year":2027,"month":2},
+  {"hash":"037b3cfa1d7e355168b3acb1600423693d318bcf806a2e24c118abd2ebc474c3","display":11,"year":2027,"month":3},
+  {"hash":"3bf9263910bd2f31f39c3d9f7ed8623eb503ab609e6ff6c62391c95a2d1bdde9","display":12,"year":2027,"month":4},
+  {"hash":"9861b62a396258984001242b80302749d154aac0932e62a94d31f22d7edc5527","display":13,"year":2027,"month":5},
+  {"hash":"0082afeeda4f95cd5f32341e3a92dbd81df0c6d41fe25c33c07135b9fd7b5524","display":14,"year":2027,"month":6}
+],
+"edges":[
+  {"from":0,"to":1,"metrics":[485,496,26,26],"moves":"n8skql5krl6s6kql5krlBqArPqBrQArVAWMVBWNkqkrhqlrilqhqPkQhPlQiriPltkrlukqQfBqGrAqHrexk5lwk6l5V6b5W6cBJqK5JrK6A6kHkPlGkQm5A6J5B6K5qIqH5GrH6HrAWSBEHKNQVBWPMJGDATV5A6SBEHKNQ5B6PMJGDATRqQ8rux036PrQ52zwtq9QXqW8rux036VrW52zwtq9WuD5EtD6EYPZDYQZEtkuYtluZ2k3h2l3iEcwAxDwBxEbDxD5EwD6EZwZqYxZra52zwtq9MA8rux036BhA52zwtq9BiN8rux036EltnWZcfiluktkhebYVouDPYPZSBEHKNQYQZPMJGDATQ0D5EzD6EAbB2AcB3wAYBwAZBy6KkMlJkNl5xb5cwb6cJwK5JxK6GxG5HwG6IdVJWwVKWxd5bJ6nWZcfilPkhebYVoJnWZcfilQkhebYVoK5Kc6KVSBEHKNQWJVPMJGDATWqerSBEHKNQqfrPMJGDAT"},
+  {"from":1,"to":2,"metrics":[477,492,21,22],"moves":"U6A6P5B6Q7Q5A6P5B6qP5QqP6QsW6qkrVqlrW5VOqPkQhPlQirO6NkPlMkQl53k5l2k6lPYQVPZQWB5h6k5i6lArPkQbPlQcqWP6PkQePlQf5QXPbQVPcQX1qerVqfrW1BJqK5JrK6AeA5G6A5H6CfPVQnWZcfilPWQkhebYVokPlSBEHKNQkQlPMJGDATBsPrSBEHKNQqQrPMJGDATrAN2A3M2B3EYPZDYQZhQtMuPtNui6DhPiDhQiF50YzZ5Y0Z6ztWtbuVtcvhQtJuPtKuikSBEHKNQltkPMJGDATlu5Y6nWZcfil5Z6khebYVoWAnWZcfilBtAkhebYVoBuVhQtSBEHKNQuPtPMJGDATuifP2QeP3QFeEVDfEWELhKVJiKWKhQtGuPtHui0kGlzkHlBzJ0AzK0JxAwKxBw7cPeQbPfQ5Je8rux036f5e52zwtq9f6K5qnWZcfilrJqkhebYVorKPbPcSBEHKNQbQcPMJGDATQ"},
+  {"from":2,"to":3,"metrics":[430,446,22,22],"moves":"S97VPWAVQWB7lPVQkPWQ5rkqkrVqlrWlq6qlYPZAYQZBkQ2k3V2l3WPrlPhQkPiQB2P3A2Q35Q5D6P5E7QbPkQbPlQdPGrXqWwVrWxWqHyqbrVqcrWyRqkrbqlrcRk6Pkwl5kxl6Q7PMJGDAT5P6SBEHKNQ5Q7l5kQqkrnWZcfilqlrkhebYVoPl6B2M3A2N3kDl2kEl3XDWMVEWNWqEkMlDkNlrN5M6G5N6HMB2J3A2K3SBEHKNQ2A2BnWZcfilA3BkhebYVo3PMJGDATrPMJGDATkMlSBEHKNQkNlql5SBEHKNQ6M5PMJGDAT6NkG2A2BbA3Bc3HNePfMeQfHbPcGbQcGzH5G0H60qbrJqcrKzsGePfGeQfIs52zwtq9VSBEHKNQWJVPMJGDATWK8rux036H5SBEHKNQ6G5PMJGDAT6rgqf8rux036erf52zwtq9fq"},
+  {"from":3,"to":4,"metrics":[435,444,23,24],"moves":"UVPVQkPWQlVqW5VrWmql2krl3l6WPrMqQrNqkQhPlQiP6D5B6E5VMWAVNWBhPiAhQiRqkrhqlriR5VAWGVBWHkqkrbqlrcl6brVqcrWq5b6k5c6lWzWqV0WrXcAwBqAxBrbB8rux036P8rux036Q5P52zwtq9Q2zwtq9APMJGDATkPlSBEHKNQkQm5PVQnWZcfilPWQkhebYVo6k3qYrMqZrN2hQtMuPtNui6DhPiDhQiF5VDWGVEWHxMwQxNwPhQtJuPtKuiqnWZcfilrDqkhebYVorEtkSBEHKNQltkPMJGDATlvWAnWZcfilBtAkhebYVoBuVhQtSBEHKNQuPtPMJGDATui6b2c5b3PcDbQcEtWteuVtfvhQtGuPtHuibQzk0bzl0cPcK5PMJGDAT5J6SBEHKNQ5K7JqSBEHKNQrbqPMJGDATrc5G6SBEHKNQ5H6PMJGDAT"},
+  {"from":4,"to":5,"metrics":[442,450,21,21],"moves":"TqkrVqlrW6kqP5QqP6Qsl5Ak6k5lqk6lr5lBPVqhrVqirXQiQtkuVtluWPhA6M5B6N5tl5kul6k5V6Y5W6Z6RqQ2PrQ3Q5PKkPlJkQlQlBl5J6P5K6QkAkHVPWGVQWH5P6G5Q6BVGWAVHWmAwB5AxB6mPXAWSBEHKNQVBWPMJGDATWR8rux036k52zwtq9V8rux036l52zwtq9WPD6M5E6N5uD5EtD6EZDVEYDWE6YPZDYQZE5ZAe5fte6fuBYQbPiQcPhZAnWZcfil5khebYVotnWZcfil6khebYVouBYqnWZcfilrMqkhebYVorN5Y6nWZcfil5Z6khebYVofuVDWJVEWKteG6M5H6N5gqfterfufKlJ5KzJ6K0kJ0kGlzkHl6qHkJlGkKlr5J5VSBEHKNQWJVPMJGDATWK6KPMJGDATePfSBEHKNQeQfqnWZcfilrGqkhebYVorH"},
+  {"from":5,"to":6,"metrics":[458,466,23,24],"moves":"U6A6P5B6Q7lBqPrAqQrkAlP6kql5krlQkBQlYVPWMVQWNZkPtl5kul6kEVAWDVBWBVMWAVNWPYQVPZQWmQhPlQiPl6kNkPlMkQm7P6J5Q6KrbJ5KqJ6KrcqA6J5B6K5WqerVqfr6RqQzPrQ0Q5k5QWkql8rux036krl52zwtq9VPl8rux036k6l52zwtq96RkQnWZcfilPlQkhebYVoQ5YPZMYQZNhQtMuPtNui6DhPiDhQiF5hRYQePZQfQiqbrMqcrNhQtJuPtKuiM8rux036PnWZcfilQhPkhebYVoQi52zwtq9N35nWZcfil6Y5khebYVo6Z2hQtSBEHKNQuPtPMJGDATui3J5K2J6KP0MzQ0NzYPZJYQZKhQtGuPtHui6ePfGeQfH5wf5exf6ecPeQbPfQwnWZcfilwkhebYVo5nWZcfilxkhebYVo6xPMJGDAT6ePfSBEHKNQeQfPMJGDAT5SBEHKNQ"},
+  {"from":6,"to":7,"metrics":[61,71,1,1],"moves":"kP6VMWRrP1PrPzZqYzDmEGlCH7Cw7cgxAemBqgriDhEMVYbehktWGWZcfilxVT"},
+  {"from":7,"to":8,"metrics":[96,125,1,2],"moves":"j7gj7frmsXIKsRjPjRwhJaKa6Y5eu3dhqfiqAsBc2clvy4Vkx1We0fMsJNz2KPqQVCWAsChB2iN2MkylrVYbehkFWZcfilqv+"},
+  {"from":8,"to":9,"metrics":[115,138,2,3],"moves":"7WZQk2Lg36k7l27IQcqjrbO25O36d1bzAD1BEzMPVvW5H7GRr5eqfugteLe3P2hHitLquKsOqlQmKYl2E3FVbehkwWZcfilJqWqVYbehkBVAWZcfilsUn"},
+  {"from":9,"to":10,"metrics":[34,49,0,0],"moves":"DqElumqlBqAVzWA1B0kzCFILORXCFILORk"},
+  {"from":10,"to":11,"metrics":[99,118,2,2],"moves":"z6MkP2ADqBEr2VxXwVI7m7m4IN4MrvKqJvfkNy6P5MQtauAaCalwAceHfGuxdrthq0lzKkADGLMiBEHKNQuQqWZcfilPVYbehkRT8"},
+  {"from":11,"to":12,"metrics":[121,148,1,1],"moves":"lJM36KN25kLW4Rs7XMRVu16It5X6M1KN1JktlNWcOP7i7hNQ7F6Ff6CRwRxAVAWQVPuWt2g3BeA5Y6IqIrPqPrHRqJrAGKVYbehk5Vcfilrux036Fqtwz25XYS"},
+  {"from":12,"to":13,"metrics":[124,149,1,2],"moves":"EsjmsjmDqZrlBf3kr0VqAc6BZ7B7AWGlHYkGdHdFV6l5kFbv5cGz3Hex3fNuxDM3F2D3BxCvCvAskIlIYrux036EqEqtwz25YsBEHKNQgADGJMPr1BlrWqlrVqmAU"}
+]
+}
