@@ -343,7 +343,7 @@ Slots the design fills per registered mode (`src/apps/shell/slot-map.ts`, compar
 | `calendar7` | none | pending |
 | `ci` | 1, 2 | migrated |
 
-`ci` fills slots 1 and 2 as the design row does and labels them "Simulated events" and "Workflow" (the design row lists "Refresh status" and "Workflow list"; there is no external status to refresh). The quarter-turn time sits in slot 2, because the design row has no Motion slot for this cube. These labels are not yet an owner decision and are not recorded in `ACCEPTED_DEVIATIONS`.
+`ci` fills slots 1 and 2 as the design row does and labels them "Simulated events" and "Workflow" (the design row lists "Refresh status" and "Workflow list"; there is no external status to refresh). The quarter-turn time sits in slot 2, because the design row has no Motion slot for this cube. This deviation is accepted (owner decision 2026-11-12: local simulation has no external refresh or workflow list) and recorded as `ACCEPTED_DEVIATIONS` in `src/apps/shell/slot-map.ts`.
 
 `tenth` fills slots 1 to 4 with Step, Value, Direction and Step speed; the design row lists Run / Stop, Stop after and Wrap, which this mode does not have. This deviation is accepted (owner decision 5, 2026-11-08) and recorded as `ACCEPTED_DEVIATIONS` in `src/apps/shell/slot-map.ts`.
 

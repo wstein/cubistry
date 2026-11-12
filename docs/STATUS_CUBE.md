@@ -119,8 +119,8 @@ The cube stays a local simulation: there is no external CI service and no token.
 
 | Shell region | Content |
 | --- | --- |
-| Slot 1 "Simulated events" | Event category, simulated agent event, Run demo / Stop demo, Send rapid sequence, Finish active snapshot |
-| Slot 2 "Workflow" | BUILD, TEST, ANALYZE, REVIEW selects and the quarter-turn time |
+| Slot 1 "Simulated events" | Event category, simulated agent event, Run demo / Stop demo, Send rapid sequence, Finish active snapshot (accepted deviation from the design label "Refresh status"; owner decision 2026-11-12) |
+| Slot 2 "Workflow" | BUILD, TEST, ANALYZE, REVIEW selects and the quarter-turn time (accepted deviation from the design label "Workflow list"; same decision) |
 | Primary action | Send event; Reload application after a fatal failure |
 | Status chip | Loading, Moving, In sync, a workflow fault (failed attempt, unavailable prerequisite), or the stopped state |
 | Error row | A rejected event or the failure message |
