@@ -64,5 +64,37 @@ id=parse(Int,only(r for r in s1 if r[3]=="-3,3,3" && r[4]=="0,0,1")[1])
 pl=readlines(joinpath(PC,"printing.tsv"));f=split(pl[id+1],'\t');f[6]=f[6]=="X" ? "Y" : "X";pl[id+1]=join(f,'\t')
 fixture("wrong-print-edited";list=lA,ptext=join(pl,"\n")*"\n",chain=chA,statesdir=joinpath(A,"states"))
 add("wrong-print-edited","reject","identity root front","identity root front","identity root front")
+# the 29 rule on a state that is legal for a changed print: sticker 2 (the red 29 of the corner piece shown in (7,1) after the best-effort edge) gets another
+# text or ink; the chain digests and state files are recomputed for that print, so only the rule can refuse the chain.
+include(joinpath(HERE,"check.jl"))
+function rebuild(ptext,chain)      # only the first edge (the best-effort edge into 2026-02) is kept
+    chain=join(vcat(split(chop(chain),'\n')[1:findfirst(==("end"),split(chop(chain),'\n'))],["finish"]),"\n")*"\n"
+    f=tempname();write(f,ptext);src=window_read_print(f);st=[(id=s.id,piece=s.piece,pos=s.home,normal=s.normal,up=s.up,text=s.text,ink=s.ink) for s in src]
+    ls=split(chop(chain),'\n');states=[chain_state_text(st;header=true)];out=String[];i=1
+    while i<=length(ls)
+        l=ls[i];g=split(l,'\t')
+        if g[1]=="source"
+            g[5]=chain_digest(st);push!(out,join(g,'\t'))
+        elseif g[1]=="edge"
+            g[8]=chain_digest(st);j=i+1;while ls[j]!="end";g2=split(ls[j],'\t');g2[1]=="move" && (st=chain_move(st,parse(Int,g2[2]),parse(Int,g2[3])));j+=1;end
+            g[9]=chain_digest(st);push!(out,join(g,'\t'));append!(out,ls[i+1:j]);push!(states,chain_state_text(st;header=true));i=j
+        else
+            push!(out,l)
+        end
+        i+=1
+    end
+    join(out,"\n")*"\n",states
+end
+function fixture_states(name,ptext,list,root,chain,states)
+    sd=mktempdir();for (k,t) in enumerate(states);write(joinpath(sd,"state-"*lpad(k,2,'0')*".tsv"),t);end
+    fixture(name;list=list,ptext=ptext,chain=chain,statesdir=sd,root=root,rule29=true)
+end
+function edit_sticker(id,field,value)
+    pl=readlines(joinpath(PC,"printing.tsv"));f=split(pl[id+1],'\t');f[field]=value;pl[id+1]=join(f,'\t');join(pl,"\n")*"\n"
+end
+pt28=edit_sticker(2,6,"28");c,s=rebuild(pt28,chB);fixture_states("rule29-text-28",pt28,"2026-02\n","2019-01",c,s)
+add("rule29-text-28","reject","best-effort wrong cell shows the digit 29","best-effort wrong cell shows the digit 29","best-effort wrong cell shows the digit 29")
+pdk=edit_sticker(2,7,"dark");c,s=rebuild(pdk,chB);fixture_states("rule29-ink-dark",pdk,"2026-02\n","2019-01",c,s)
+add("rule29-ink-dark","reject","best-effort wrong cell shows the digit 29","best-effort wrong cell shows the digit 29","best-effort wrong cell shows the digit 29")
 open(joinpath(out,"cases.tsv"),"w") do io;for c in cases;println(io,c);end;end
 println("cases\t",length(cases))
