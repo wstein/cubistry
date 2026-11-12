@@ -27,11 +27,11 @@ function parseJobs() {
     if ((m = line.match(/^    ([a-z-]+): (.*)$/))) { job[m[1]] = m[2]; map = null; step = null; continue; }
     if (line === "    env:") { map = job.env; continue; }
     if ((m = line.match(/^      - (name|uses): (.*)$/))) { step = { env: {}, with: {}, run: "", index: job.steps.length }; step[m[1]] = m[2]; job.steps.push(step); map = null; continue; }
-    if (!step) { if (map && (m = line.match(/^      ([A-Za-z_]+): (.*)$/))) map[m[1]] = m[2]; continue; }
+    if (!step) { if (map && (m = line.match(/^      ([A-Za-z_0-9]+): (.*)$/))) map[m[1]] = m[2]; continue; }
     if ((m = line.match(/^        (env|with):$/))) { map = step[m[1]]; continue; }
     if ((m = line.match(/^        run: \|$/))) { block = { step, indent: 10 }; map = null; continue; }
     if ((m = line.match(/^        (name|uses|if): (.*)$/))) { step[m[1]] = m[2]; map = null; continue; }
-    if (map && (m = line.match(/^          ([A-Za-z_]+): (.*)$/))) map[m[1]] = m[2];
+    if (map && (m = line.match(/^          ([A-Za-z_0-9-]+): (.*)$/))) map[m[1]] = m[2];
   }
   return jobs;
 }
@@ -61,7 +61,7 @@ const GATES = {
   "ym='^(19[0-9]{2}|20[0-9]{2}|2100)-(0[1-9]|1[0-2])$'",
   "path='^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$'",
   "if [ \"$IN_SMOKE\" = \"true\" ]; then max=3; prior=\"\"; fi",
-  "max=100000; prior=$IN_PRIOR"
+  "max=${IN_MAX:-100000}; prior=$IN_PRIOR"
  ],
  "prior": [
   "IFS=$'\\t' read -r path conclusion event branch < <(gh api \"repos/$GITHUB_REPOSITORY/actions/runs/$PRIOR\" --jq '[.path, .conclusion, .event, .head_branch] | @tsv')",
@@ -237,17 +237,90 @@ test("every segment records research_ref, library, width and lambda (segments.ts
   assert.ok(pk.run.includes('"$c/segments.tsv"'));
   assert.ok(pk.run.includes('echo "months_sha256=$MONTHS_SHA"; echo "root_month=${ROOT_MONTH:--}"'));
 });
+
+test("max_edges bounds the edges of one run (a stage); the smoke run is always 3 edges without a prior", () => {
+  const head = text.split("\njobs:")[0];
+  assert.match(head, /^      max_edges:\n        description: [^\n]*\n        type: string\n        default: ""\n/m);
+  const l = runLines(step("prepare", "Validate inputs"));
+  for (const x of [
+    '[ -z "$IN_MAX" ] || { [[ "$IN_MAX" =~ ^[1-9][0-9]{0,4}$ ]] && [ "$IN_MAX" -le 100000 ]; } || fail "max_edges must be 1-100000"',
+    'max=${IN_MAX:-100000}; prior=$IN_PRIOR',
+    'if [ "$IN_SMOKE" = "true" ]; then max=3; prior=""; fi']) assert.ok(l.includes(x), x);
+  assert.ok(l.indexOf('max=${IN_MAX:-100000}; prior=$IN_PRIOR') < l.indexOf('if [ "$IN_SMOKE" = "true" ]; then max=3; prior=""; fi'), "smoke overrides max_edges");
+  assert.ok(runLines(step("produce", "Produce edges")).some(x => x.startsWith('args=(max_edges="$MAX_EDGES"')));
+});
+test("expect_prior_edges: a continuation checks the edge count of the prior chain before the producer starts", () => {
+  const head = text.split("\njobs:")[0];
+  assert.match(head, /^      expect_prior_edges:\n        description: [^\n]*\n        type: string\n        default: ""\n/m);
+  const l = runLines(step("prepare", "Validate inputs"));
+  for (const x of [
+    '[ -z "$IN_EXPECT" ] || [[ "$IN_EXPECT" =~ ^[1-9][0-9]{0,4}$ ]] || fail "expect_prior_edges must be a positive number"',
+    '[ -z "$IN_EXPECT" ] || [ -n "$IN_PRIOR" ] || fail "expect_prior_edges needs prior_run_id"']) assert.ok(l.includes(x), x);
+  requireJobLines("produce", [
+    '[ -z "$EXPECT_PRIOR" ] || [ "$most" = "$EXPECT_PRIOR" ] || { echo "::error::the prior chain has $most edges, expect_prior_edges is $EXPECT_PRIOR"; exit 1; }',
+    'grep -qx "complete=false" "$best/VERIFIED.txt" || { echo "::error::the prior chain is complete; there is nothing to continue"; exit 1; }']);
+});
+test("29 rule: opt-in input (default true), gate by word in prepare, exported to the checkers, compared on resume", () => {
+  const head = text.split("\njobs:")[0];
+  assert.match(head, /^      best_effort_29:\n        description: [^\n]*\n        type: boolean\n        default: true\n/m);
+  const prep = runLines(step("prepare", "Check research commit"));
+  for (const f of ["run_checks.sh", "check.jl", "verify_chain.jl"]) assert.ok(prep.includes(`[ "$BEST29" != true ] || git grep -qw CAL7_BEST_EFFORT_29 "$SHA" -- "$WC/${f}" || fail "best_effort_29 is set, but ${f} at research_ref does not read CAL7_BEST_EFFORT_29"`), f);
+  const v = runLines(step("verify", "Verify chain (Julia, Flix, independent replay)"));
+  const e = v.indexOf('[ "$BEST29" != true ] || export CAL7_BEST_EFFORT_29=1'), c = v.findIndex(x => x.startsWith('bash "src/$WC/run_checks.sh"'));
+  assert.ok(e >= 0 && e < c, "exported before run_checks.sh");
+  const w = step("verify", "Package artifact").run;
+  assert.ok(w.includes('echo "best_effort_29=$BEST29"') && w.includes('echo "best_effort_sha256=$BEST_SHA"'));
+  requireJobLines("produce", [
+    'grep -qx "best_effort_29=$BEST29" "$best/VERIFIED.txt" || { echo "::error::the prior chain was checked with another best_effort_29 setting"; exit 1; }',
+    'grep -qx "best_effort_sha256=$BEST_SHA" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another best-effort file"; exit 1; }']);
+});
+test("the 29 gate in prepare passes only when each checker names CAL7_BEST_EFFORT_29 as a word, and is off with best_effort_29=false", () => {
+  const gates = runLines(step("prepare", "Check research commit")).filter(l => l.startsWith('[ "$BEST29" != true ] || git grep'));
+  assert.equal(gates.length, 3);
+  const repo = mkdtempSync(join(tmpdir(), "wc-gate29-")), wc = "research/x";
+  mkdirSync(join(repo, wc), { recursive: true });
+  const git = (...a) => execFileSync("git", ["-C", repo, "-c", "user.name=t", "-c", "user.email=t@example.com", ...a]).toString().trim();
+  git("init", "-q");
+  const commit = (a, b, c) => { for (const [n, s] of [["run_checks.sh", a], ["check.jl", b], ["verify_chain.jl", c]]) writeFileSync(join(repo, wc, n), s); git("add", "-A"); git("commit", "-q", "-m", "x"); return git("rev-parse", "HEAD"); };
+  const gate = (sha, on) => spawnSync("bash", ["-c", 'fail() { echo "$1"; exit 1; }; ' + gates.join("\n")], { cwd: repo, env: { ...process.env, SHA: sha, WC: wc, BEST29: on } });
+  const all = commit("x=${CAL7_BEST_EFFORT_29:-}\n", 'ENV["CAL7_BEST_EFFORT_29"]\n', 'ENV["CAL7_BEST_EFFORT_29"]\n');
+  assert.equal(gate(all, "true").status, 0);
+  const none = commit("x\n", "y\n", "z\n");
+  assert.equal(gate(none, "false").status, 0, "off: no gate");
+  assert.equal(gate(none, "true").status, 1);
+  const noVerify = commit("x=${CAL7_BEST_EFFORT_29:-}\n", 'ENV["CAL7_BEST_EFFORT_29"]\n', 'ENV["CAL7_BEST_EFFORT_29_X"]\n');
+  const r = gate(noVerify, "true");
+  assert.equal(r.status, 1, "a file that only names a longer variable does not pass");
+  assert.match(r.stdout.toString(), /verify_chain\.jl at research_ref/);
+});
+test("state report: extra artifact after the checks, only when state_report.sh exists at research_ref, never part of the chain artifact", () => {
+  const names = jobs.verify.steps.map(s => s.name ?? s.uses.split("@")[0]);
+  const i = names.indexOf("State report"), v = names.indexOf("Verify chain (Julia, Flix, independent replay)"), p = names.indexOf("Package artifact");
+  assert.ok(v >= 0 && v < i && i < p, "state report runs after the checkers and before packaging");
+  const s = jobs.verify.steps[i], r = runLines(s);
+  assert.equal(s.if, undefined);
+  assert.ok(r.includes('if [ -f "src/$WC/state_report.sh" ]; then'));
+  assert.ok(r.some(x => x.startsWith('if bash "src/$WC/state_report.sh" "$GITHUB_WORKSPACE/cand/chain.moves.tsv" "$GITHUB_WORKSPACE/cand/states" "$(command -v julia)" >')));
+  const up = jobs.verify.steps.find(x => x.with.name === "wc-state-report-${{ github.run_id }}");
+  assert.ok(up && up.index > i && up.with["if-no-files-found"] === "ignore");
+  assert.doesNotMatch(step("verify", "Package artifact").run, /state-report/);
+  assert.equal(jobs.produce.steps.find(x => x.name === "Download prior run artifact").with.pattern, "wc-chain-*", "a state report is never taken as a prior");
+});
 test("no workflow expression inside any run block (script injection)", () => {
   for (const [name, j] of Object.entries(jobs)) for (const s of j.steps) assert.doesNotMatch(s.run, /\$\{\{/, `${name}/${s.name ?? s.uses}: expression in run`);
   assert.doesNotMatch(text, /^\s+run: [^|]/m, "run blocks use the | form only");
 });
 test("every input reaches the scripts through env, with the exact mapping", () => {
   const v = step("prepare", "Validate inputs").env;
-  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_MONTHS_PATH: "months_path", IN_MONTHS_SHA: "months_sha256", IN_ROOT: "root_month", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_LAYOUT_PATH: "layout_path", IN_LAYOUT_SHA: "layout_sha256", IN_BEST: "best_effort_path", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode" };
+  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_MONTHS_PATH: "months_path", IN_MONTHS_SHA: "months_sha256", IN_ROOT: "root_month", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_LAYOUT_PATH: "layout_path", IN_LAYOUT_SHA: "layout_sha256", IN_BEST: "best_effort_path", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode", IN_MAX: "max_edges", IN_EXPECT: "expect_prior_edges" };
   assert.deepEqual(Object.keys(v).sort(), Object.keys(want).sort());
   for (const [k, input] of Object.entries(want)) assert.equal(v[k], `\${{ inputs.${input} }}`, k);
   const inputsDeclared = [...text.matchAll(/^      ([a-z_0-9]+):\n        description:/gm)].map(m => m[1]).sort();
-  assert.deepEqual(inputsDeclared, [...Object.values(want), "fail_on_greedy"].sort());
+  assert.deepEqual(inputsDeclared, [...Object.values(want), "fail_on_greedy", "best_effort_29"].sort());
+  assert.equal(jobs.verify.env.BEST29, "${{ inputs.best_effort_29 }}");
+  assert.equal(jobs.produce.env.BEST29, "${{ inputs.best_effort_29 }}");
+  assert.equal(jobs.produce.env.EXPECT_PRIOR, "${{ needs.prepare.outputs.expect_prior_edges }}");
+  assert.equal(jobs.prepare.steps.find(s => s.name === "Check research commit").env.BEST29, "${{ inputs.best_effort_29 }}");
   assert.equal(jobs.verify.env.FAIL_ON_GREEDY, "${{ inputs.fail_on_greedy }}");
   assert.equal(jobs.produce.env.SHA, "${{ inputs.research_ref }}");
   assert.equal(jobs.verify.env.SHA, "${{ inputs.research_ref }}");
