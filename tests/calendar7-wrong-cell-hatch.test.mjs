@@ -23,7 +23,7 @@ function run(w, h, tile) {
   drawWrongCell(ctx, w, h, tile);
   return { strokes, other, clips };
 }
-// Distance from the point to the segment, clipped to the clip rectangle.
+// The part of the segment inside the clip rectangle, as [x0, y0, x1, y1], or null when it lies outside.
 function clipped(seg, r) {
   let [x0, y0, x1, y1] = seg, t0 = 0, t1 = 1;
   const dx = x1 - x0, dy = y1 - y0;
@@ -78,7 +78,7 @@ test('light halo and dark hatch are both translucent and share the same lines', 
   assert.ok(strokes[0].width >= strokes[1].width + 2, 'the halo edge stays resolved on dark schemes');
 });
 
-test('hatching leaves most of the numeral area unpainted', () => {
+test('hatching leaves most of the central half of the flat face unpainted (a density measure, not the label itself)', () => {
   for (const [w, h, tile] of TILES) {
     const { strokes, clips } = run(w, h, tile), r = clips[0];
     const lines = strokes[0].segments.map((s) => clipped(s, r)).filter((l) => l && (l[0] !== l[2] || l[1] !== l[3])), half = strokes[0].width / 2;
@@ -87,7 +87,7 @@ test('hatching leaves most of the numeral area unpainted', () => {
       const x = r.x + r.w * (0.25 + 0.5 * (i + 0.5) / 40), y = r.y + r.h * (0.25 + 0.5 * (j + 0.5) / 40);
       n++; if (lines.every((l) => distance(x, y, l) > half)) free++;
     }
-    assert.ok(free / n >= 0.4, `${w}x${h}: at least 40 percent of the label area stays unpainted (${(free / n).toFixed(2)})`);
+    assert.ok(free / n >= 0.4, `${w}x${h}: at least 40 percent of the central half stays unpainted (${(free / n).toFixed(2)})`);
   }
 });
 
@@ -96,6 +96,7 @@ test('a strike-through crosses the whole face in red, drawn with its own halo', 
   assert.equal(strokes.length, 4, 'hatch halo, hatch, strike halo, strike');
   assert.equal(strokes[3].style, WRONG_CELL.strike);
   assert.equal(strokes[2].style, WRONG_CELL.halo);
+  assert.ok(alpha(WRONG_CELL.strike) < 1, "the red strike-through is translucent");
   assert.ok(strokes[2].width > strokes[3].width);
   const [x0, y0, x1, y1] = strokes[3].segments[0];
   assert.ok(Math.abs(Math.abs(x1 - x0) - r.w) < 1e-9 && Math.abs(Math.abs(y1 - y0) - r.h) < 1e-9, 'corner to corner of the flat face');
