@@ -91,7 +91,6 @@ list_file(d,months;name="s.tsv")=(p=joinpath(d,name);write(p,join(months,'\n')*"
         @test st(rows,"2037-02")==("2037-02","unknown","best_effort_month","-","-","february-hall-S2.tsv")
         @test st(rows,"2037-03")[2:3]==("unknown","best_effort_month")       # not reached behind the stop
         @test_throws "not a chain month" month_records(ym("2037-01"),ym("2037-04"),plan,plan[1:1],"best_effort_month";methods=String[],best=Dict(ym("2030-01")=>("best_effort","1,1","x")))
-        @test next_best_effort(plan,1,best)==ym("2037-02") && next_best_effort(plan,2,best)===nothing && next_best_effort(plan,1,Dict{Tuple{Int,Int},NTuple{3,String}}())===nothing
         mktempdir() do d
             hdr="month\tstatus\twrong_cells\tevidence\n";p=joinpath(d,"b.tsv")
             write(p,hdr*"2037-02\tbest_effort_unverified\t7,7\tfebruary-hall-S2.tsv\n2043-02\tbest_effort\t7,1\te\n")
@@ -149,9 +148,9 @@ list_file(d,months;name="s.tsv")=(p=joinpath(d,name);write(p,join(months,'\n')*"
         @test stop_reason(0,5,0,0,100,nothing)===nothing
         @test stop_reason(5,5,0,0,100,nothing)=="max_edges"
         @test stop_reason(0,5,90,40,100,nothing)=="deadline"
-        # a declared best-effort month is the next target: no solver time is spent on it, whichever limit applies
-        @test stop_reason(0,5,0,0,100,nothing;next_best=ym("2037-02"))=="best_effort_month"
-        @test stop_reason(5,5,0,0,100,nothing;next_best=ym("2037-02"))=="best_effort_month"
+        # a declared best-effort month as the next target is no reason to stop: the producer writes its edge (test_window_chain_best_effort.jl)
+        @test stop_reason(0,5,0,0,100,ym("2037-02"))===nothing
+        @test stop_reason(5,5,0,0,100,ym("2037-02"))=="max_edges"
     end
     @testset "resume bookkeeping against the plan (source month = root month, bridges and root edge allowed)" begin
         h="cubistry.calendar7.chain.v1"
@@ -167,7 +166,7 @@ list_file(d,months;name="s.tsv")=(p=joinpath(d,name);write(p,join(months,'\n')*"
         @test_throws "chain source" chain_progress(vcat([h,"source\t5\t2026\t5\taa"],["finish"]),plan)
         @test_throws "chain source" chain_progress(vcat([h,"source\t6\t1980\t1\taa"],["finish"]),plan)   # first field is the month too
         @test_throws "finish row" chain_progress(vcat([h,src],e(2026,3)),plan)
-        @test_throws "chain.v1" chain_progress(vcat(["cubistry.calendar7.chain.v2",src],e(2026,3),["finish"]),plan)
+        @test_throws "chain.v1 or chain.v2" chain_progress(vcat(["cubistry.calendar7.chain.v3",src],e(2026,3),["finish"]),plan)   # v2 resumes (best-effort edges), v3 does not
         # the old May 2026 root still resumes
         old=chain_plan(month_range(ym("2026-05"),ym("2026-08")),(2026,5))
         ms,n=chain_progress(vcat([h,"source\t5\t2026\t5\taa"],e(2026,6),e(2026,7),["finish"]),old);@test n==2 && ms[end]==(2026,7)
