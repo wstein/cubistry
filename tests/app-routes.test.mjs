@@ -231,3 +231,21 @@ test("speed keeps its value domain for every app and is not reported as foreign"
     assert.deepEqual(parseRoute(`?app=${id}&speed=abc`, registry, "clock").invalid, ["speed"], id);
   }
 });
+
+test("the typed speed and category specs accept exactly what the CI Quality Cube reads", async () => {
+  const { SPEED_CHOICES } = await import("../src/apps/status/params.ts");
+  const definition = JSON.parse((await import("node:fs")).readFileSync("src/apps/status/definition.json", "utf8"));
+  const statusParams = (await import("../src/apps/status/params.ts")).parseStatusParams;
+  const speedOf = (raw) => parseRoute(`?app=ci&speed=${raw}`, registry, "clock").setup.speed;
+  for (const ms of SPEED_CHOICES) assert.equal(speedOf(String(ms)), ms, String(ms));
+  for (const raw of ["300", "0.001", "100000", "1e3", "050", "2000.5"]) {
+    assert.equal(speedOf(raw), undefined, raw);
+    assert.equal(statusParams(new URLSearchParams(`speed=${raw}`), definition).turnMs, 250, raw);
+  }
+  const stateOf = (raw) => parseRoute(`?app=ci&build=${raw}`, registry, "clock").setup.build;
+  for (const s of definition.states) assert.equal(stateOf(s.id), s.id, s.id);
+  for (const raw of ["OK", "Running", "BLOCKED"]) {
+    assert.equal(stateOf(raw), undefined, raw);
+    assert.equal(statusParams(new URLSearchParams(`build=${raw}`), definition).snapshot[0], definition.initial[0], raw);
+  }
+});
