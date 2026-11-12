@@ -193,8 +193,9 @@ Registered themes:
 - `christmas`, Christmas: a gingerbread cookie, a snowman by a cottage, a reindeer under a lamp post and a teddy bear on a snowy night, with an aurora and a smiling star above and a lantern with gifts on a sled below.
 - `easter`, Easter: a snail with a watering can, a bunny with an egg basket, a chick hatching from its egg and a sleepy lamb holding an egg, with an egg balloon and a kite above and a nest of eggs below.
 - `halloween`, Halloween: a cat in a witch hat, a smiling pumpkin, a ghost and a hanging bat on a moonlit night, with bats and a crescent moon above and a spider, candy and pumpkins below.
+- `frieden`, Frieden: painted scenes of calm, a wren on a blossoming fence, two women at a cafe table, a rowing boat on a lake at sunset, a sleeping dog by a rainy window, a shepherd with sheep and a dog, and a bench under a tree. The faces are lossy WebP images (at most 1024 px, under 256 KiB each) instead of SVG; only the 2x2 Picture Cube uses the theme today.
 
-To add a theme: copy the six faces (`F`, `B`, `R`, `L`, `U`, `D` `.svg`) and a `NOTICE.txt`
+To add a theme: copy the six faces (`F`, `B`, `R`, `L`, `U`, `D` `.svg`, or `.webp` for a raster theme) and a `NOTICE.txt`
 into `public/playground-<id>/`; run `node scripts/build-playground-theme.mjs <id>` to
 write `manifest.json` and `src/apps/playground/theme-assets/<id>.ts` and to print the face
 digest; add the entry to `themes.ts` and the digest to the pins file.
