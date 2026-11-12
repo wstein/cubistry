@@ -42,3 +42,12 @@ test("the Calendar parameters are owned by the Calendar: date, language, padding
   assert.equal(urlAfterAppSwitch(`${base}?app=calendar7&year=2026&month=3&date=2026-01-01`, "calendar7", "calendar"), "/index.html?app=calendar7");
   assert.equal(urlAfterAppSwitch(`${base}?app=counter&val=5&display=dseg7`, "counter", "calendar"), "/index.html?app=counter");
 });
+
+test("the Picture Cube owns size: it does not flow out to other apps, and a stray size is dropped on the way in; design stays the Calendar's", () => {
+  const pg = `${base}?app=playground&size=2&speed=100&nerd=1`;
+  assert.equal(urlAfterAppSwitch(pg, "playground", "clock"), "/index.html?app=playground&speed=100&nerd=1");
+  assert.equal(urlAfterAppSwitch(pg, "playground", "calendar"), "/index.html?app=playground&speed=100&nerd=1");
+  assert.equal(urlAfterAppSwitch(pg, "playground", "playground"), "/index.html?app=playground&size=2&speed=100&nerd=1");
+  assert.equal(urlAfterAppSwitch(`${base}?app=counter&val=5&size=4`, "counter", "playground"), "/index.html?app=counter");
+  assert.equal(urlAfterAppSwitch(`${base}?app=calendar&design=en-3&size=3`, "calendar", "playground"), "/index.html?app=calendar");
+});

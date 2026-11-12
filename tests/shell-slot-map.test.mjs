@@ -43,7 +43,7 @@ test("every registered mode has exactly one row or is listed as a mode without a
   }
   assert.deepEqual(
     SLOT_MAP.filter((r) => !r.registered).flatMap((r) => r.modes),
-    ["playground"],
+    [],
   );
 });
 
@@ -57,11 +57,11 @@ test("slotsOf lists the filled slot numbers of a mode and rejects an unknown id"
   for (const row of SLOT_MAP) assert.ok(slotsOf(row.modes[0]).every((n) => SLOT_NUMBERS.includes(n)));
 });
 
-test("migration status: every registered mode is listed; only the 1/10-Second Counter and the CI Quality Cube have been migrated", () => {
+test("migration status: every registered mode is listed; only the 1/10-Second Counter, the CI Quality Cube and the Picture Cube have been migrated", () => {
   assert.deepEqual(Object.keys(MIGRATION).sort(), MODE_CATALOG.map((m) => m.id).sort());
   for (const status of Object.values(MIGRATION)) assert.ok(["pending", "migrated"].includes(status));
   const migrated = Object.entries(MIGRATION).filter(([, s]) => s === "migrated").map(([id]) => id);
-  assert.deepEqual(migrated, ["tenth", "ci"]);
+  assert.deepEqual(migrated, ["tenth", "ci", "playground"]);
 });
 
 test("accepted deviations: the 1/10-Second Counter maps Step, Value, Direction, Step speed instead of the design row (owner decision 5, 2026-11-08)", () => {
@@ -104,4 +104,18 @@ test("the Calendar row is registered, keeps its design slots and the mode still 
   assert.equal(row.registered, true);
   assert.deepEqual(slotsOf("calendar"), [1, 2, 3, 4, 5]);
   assert.equal(MIGRATION.calendar, "pending");
+});
+
+test("the Picture Cube row follows the accepted D9 slots: 18 turn buttons, size control with Undo/Redo, design and pictures", () => {
+  const row = SLOT_MAP.find((r) => r.modes.includes("playground"));
+  assert.equal(row.registered, true);
+  assert.deepEqual([...row.slots], ["Scramble / Solve", "18 turn buttons", "Cube size 2-7, Undo, Redo", "Move time", "Design, Your pictures"]);
+  assert.deepEqual(slotsOf("playground"), [1, 2, 3, 4, 5]);
+  assert.equal(MIGRATION.playground, "migrated");
+  assert.equal("playground" in ACCEPTED_DEVIATIONS, false, "the design README carries the D9 row, so no deviation is left");
+  assert.doesNotMatch(readme, /12 quarter-turn buttons/);
+  const mount = readFileSync("src/apps/playground/mount.ts", "utf8");
+  for (const label of ["Scramble", "Turns", "Size and history", "Move time", "Design"]) {
+    assert.ok(mount.includes(`label: "${label}"`), `${label} is a slot label of the mode`);
+  }
 });
