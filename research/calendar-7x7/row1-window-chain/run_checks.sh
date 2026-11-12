@@ -10,6 +10,7 @@ mode=${5:-}
 # (PRINT_OVERRIDE), its chain and states (CHAIN_OVERRIDE, STATES_OVERRIDE) and its SHA-256 (CAL7_WINDOW_PRINT_SHA); both checkers and verify_chain.jl read them.
 # Month list S: CAL7_WINDOW_MONTHS (path) and CAL7_WINDOW_MONTHS_SHA256 replace WINDOW_END; the chain root is CAL7_ROOT_MONTH (default: its first month); a root other than the first month adds the root edge.
 # The print SHA-256 (CAL7_WINDOW_PRINT_SHA) is required; CAL7_WINDOW_LAYOUT_SHA256 pins a window-local layout (default: the built-in pin).
+# CAL7_WINDOW_LAYOUT (path; needs the month list mode and CAL7_WINDOW_LAYOUT_SHA256) replaces row1-revision/layout.tsv for all three checkers.
 if [[ -n "${CAL7_WINDOW_MONTHS:-}" ]]; then
     [[ -z "${WINDOW_END:-}" ]] || { echo "month list and WINDOW_END are exclusive" >&2; exit 2; }
     export CAL7_WINDOW_MONTHS CAL7_WINDOW_MONTHS_SHA256="${CAL7_WINDOW_MONTHS_SHA256:?month list SHA-256}" CAL7_WINDOW_PRINT_SHA="${CAL7_WINDOW_PRINT_SHA:?print SHA-256}"
@@ -21,7 +22,12 @@ else
 fi
 [[ "$mode" == "" || "$mode" == --mutations ]] || exit 2
 mkdir -p "$out"
-layout="$here/../row1-revision/layout.tsv"
+layout=${CAL7_WINDOW_LAYOUT:-"$here/../row1-revision/layout.tsv"}
+if [[ -n "${CAL7_WINDOW_LAYOUT:-}" ]]; then
+    [[ -n "${CAL7_WINDOW_MONTHS:-}" ]] || { echo "CAL7_WINDOW_LAYOUT needs the month list mode (CAL7_WINDOW_MONTHS)" >&2; exit 2; }
+    [[ -f "$layout" ]] || { echo "layout not found: $layout" >&2; exit 2; }
+    [[ "$(sha256sum "$layout" | cut -d' ' -f1)" == "${CAL7_WINDOW_LAYOUT_SHA256:?CAL7_WINDOW_LAYOUT needs CAL7_WINDOW_LAYOUT_SHA256}" ]] || { echo "layout differs from CAL7_WINDOW_LAYOUT_SHA256" >&2; exit 2; }
+fi
 printing=${PRINT_OVERRIDE:-"$here/../row1-window-print/evidence/printing.tsv"}
 chain=${CHAIN_OVERRIDE:-"$here/evidence/moves.tsv"}; states=${STATES_OVERRIDE:-"$here/evidence/states"}
 evidence="$repo/research/calendar-7x7/english/evidence"
