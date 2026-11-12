@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Source mutants of the 29 rule (check.jl, verify_chain.jl, flix/src/Main.flix): each mutated copy must be caught, by test_best_effort_29.jl (unit, Julia)
 # or by run_root2019_checks.sh on the named case (end to end; a Flix mutant builds its own jar). Usage: [ONLY=name] run_rule29_mutants.sh JULIA JAVA OUT
-# Time: 9 mutants, about 15 s (unit) to 60 s (end to end) each at load 25; Flix mutants add the jar build (about 15 s). The whole run takes about 6 min:
+# Time: 9 mutants, about 15 s (unit) to 60 s (end to end, Flix mutants with the jar build) each at load 25; the whole run takes about 4 min:
 # run it in the background or select one mutant with ONLY=name.
 set -u
 here=$(cd "$(dirname "$0")" && pwd); cal=$(dirname "$here"); julia=${1:?Julia executable}; java=${2:?Java executable}; out=${3:?scratch directory}; bad=0; n=0
