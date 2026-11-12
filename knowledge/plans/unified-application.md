@@ -122,7 +122,7 @@ This is an intentional breaking URL change. Before publication, README, `docs/AP
 
 ## Picture Cube host plan (proposal, 2026-11-11)
 
-This section is the plan for the Picture Cube inside the host. It extends the rows `playground.html` and `picture3.html`, the `Pictures` state row and slices P1/P2 above; it is not a second plan. It records the owner decisions of 2026-11-10 through 2026-11-12 (Picture Cube for sizes 2 to 7, default size 3, plan before stack PR 2, 404 without redirects for the old URLs, D1 to D9). Nothing here authorizes implementation by itself; slices still need their PRs.
+This section is the plan for the Picture Cube inside the host. It extends the rows `playground.html` and `picture3.html`, the `Pictures` state row and slices P1/P2 above; it is not a second plan. It records the owner decisions of 2026-11-10 through 2026-11-12 (Picture Cube for sizes 2 to 7, default size 3, plan before stack PR 2, 404 without redirects for the old URLs, D1 to D9). D1 to D9 are decided; the own engine for sizes 4 to 7 (E1) is decided after stack PR 4. Nothing here authorizes implementation by itself; slices still need their PRs.
 
 Markers: **O** owner decision (MCQ 2026-11-11), **V** verified in the repository at `origin/main` `a255079e` (file:line), **P** proposed, **U** UNKNOWN (not measured or not found). Stack PR 1 (size control and name, #420) is merged **V** (`src/apps/playground/size.ts:4-11`, `tests/browser/playground.spec.mjs:321`).
 
@@ -219,7 +219,7 @@ Stack order, heavy lane only on the stack top. The numbers in brackets are the o
 
 | Slice | Content | Depends on | Files (estimate) |
 |---|---|---|---|
-| S0a | `mount.ts` for the existing 2x2 page, catalog entry, `MODE_INITS` hook, `app-switch-url` rows, mount tests; `playground.html` stays | PR 1; first slice, before S2 | 8 to 10 |
+| S0a | `mount.ts` for the existing 2x2 page, catalog entry, `MODE_INITS` hook, `app-switch-url` rows, mount tests; update the accepted slot map at `docs/design/README.md:27` to the D9 slots (18 turn buttons in slot 2, design choice in slot 5); `playground.html` stays | PR 1; first slice, before S2 | 8 to 10 |
 | S0b | Retire `playground.html`: Vite input, `mpa-routing` test, specs to the new URL, README and docs, built-artifact 404 check | S0a | 6 to 10 |
 | S1 | Characterization browser spec for `picture3.html` | none (can run in parallel) | 1 to 3 |
 | S2 [2] | Paste, camera, JPEG by canvas, local only | S0a and H1 (owner decision D2) | 6 to 9 |
@@ -236,15 +236,15 @@ Docs that change with the slices: `docs/PICTURE_PLAYGROUND.md:81-97` ("3x3 evalu
 
 | # | Question | Decision |
 |---|---|---|
-| D1 | URL parameter `size` or `cube`? | Decided by the owner 2026-11-11: `size`; `cube=2|3` is superseded |
-| D2 | Order: mount first or page first? | Decided by the owner 2026-11-11: M2, mount first as an extra PR before stack PR 2; PR 2 waits for H1 |
-| D3 | Sizes 4 to 7 | Decided by the owner 2026-11-11: E0 now (suitability display only, no solver claim); E1 is decided after stack PR 4 |
-| D4 | One picture set and library shared by all sizes, sessions per cube (narrows "cube-specific" in the `Pictures` row)? | Decided by the owner 2026-11-12: yes, shared library and current pictures; sessions stay per cube |
-| D5 | Old URLs `playground.html` and `picture3.html` after the move | Decided by the owner 2026-11-12: 404, no redirect; the "redirect" in the 2026-11-11 stack notes is void |
-| D6 | One image model: the `FaceSet` of the 2x2 page, with the crop editor producing faces for it; the second pipeline of picture3 goes away? | Decided by the owner 2026-11-12: yes; one `FaceSet` pipeline; picture3's second pipeline is removed in the fold-in |
-| D7 | Size switch while a turn, solve or load is pending: disabled (not cancel)? | Decided by the owner 2026-11-12: disabled (not cancel) |
-| D8 | Size switch history entry: replace now, push once the route-update hook exists? | Decided by the owner 2026-11-12: replace now; push once the route-update hook exists |
-| D9 | Slot map: 18 turn buttons in slot 2 and the design choice in slot 5, instead of 12 quarter-turn buttons and an empty slot 5 (`docs/design/README.md:27`)? | Decided by the owner 2026-11-12: accept; update the README map in S0a |
+| D1 | URL parameter `size` or `cube`? | **O** Decided by the owner 2026-11-11: `size`; `cube=2|3` is superseded |
+| D2 | Order: mount first or page first? | **O** Decided by the owner 2026-11-11: M2, mount first as an extra PR before stack PR 2; PR 2 waits for H1 |
+| D3 | Sizes 4 to 7 | **O** Decided by the owner 2026-11-11: E0 now (suitability display only, no solver claim); E1 is decided after stack PR 4 |
+| D4 | One picture set and library shared by all sizes, sessions per cube (narrows "cube-specific" in the `Pictures` row)? | **O** Decided by the owner 2026-11-12: yes, shared library and current pictures; sessions stay per cube |
+| D5 | Old URLs `playground.html` and `picture3.html` after the move | **O** Decided by the owner 2026-11-12: 404, no redirect; the "redirect" in the 2026-11-11 stack notes is void |
+| D6 | One image model: the `FaceSet` of the 2x2 page, with the crop editor producing faces for it; the second pipeline of picture3 goes away? | **O** Decided by the owner 2026-11-12: yes; one `FaceSet` pipeline; picture3's second pipeline is removed in the fold-in |
+| D7 | Size switch while a turn, solve or load is pending: disabled (not cancel)? | **O** Decided by the owner 2026-11-12: disabled (not cancel) |
+| D8 | Size switch history entry: replace now, push once the route-update hook exists? | **O** Decided by the owner 2026-11-12: replace now; push once the route-update hook exists |
+| D9 | Slot map: 18 turn buttons in slot 2 and the design choice in slot 5, instead of 12 quarter-turn buttons and an empty slot 5 (`docs/design/README.md:27`)? | **O** Decided by the owner 2026-11-12: accept; update the README map in S0a |
 
 ## Historical decisions and evidence (2026-11-07–08)
 
