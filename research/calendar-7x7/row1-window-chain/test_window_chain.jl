@@ -187,12 +187,12 @@ list_file(d,months;name="s.tsv")=(p=joinpath(d,name);write(p,join(months,'\n')*"
         end
     end
     @testset "segment provenance record" begin
-        r=segment_row(run_id="123",research_ref="a"^40,library="L5",width="40",lambda="3",print_sha="b"^64,months_sha="c"^64,root="1980-01",edges_from=0,edges_to=7)
-        @test r==join(("123","a"^40,"L5","40","3","b"^64,"c"^64,"1980-01","0","7"),'\t')
-        @test SEGMENTS_HEADER=="run_id\tresearch_ref\tlibrary\twidth\tlambda\tprint_sha256\tmonths_sha256\troot_month\tedges_from\tedges_to"
-        @test_throws "tab" segment_row(run_id="1\t2",research_ref="a"^40,library="L5",width="40",lambda="3",print_sha="b"^64,months_sha="c"^64,root="1980-01",edges_from=0,edges_to=7)
+        r=segment_row(run_id="123",research_ref="a"^40,library="L5",width="40",lambda="3",print_sha="b"^64,months_sha="c"^64,root="1980-01",edges_from=0,edges_to=7,layout_sha="d"^64)
+        @test r==join(("123","a"^40,"L5","40","3","b"^64,"c"^64,"1980-01","0","7","d"^64),'\t')
+        @test SEGMENTS_HEADER=="run_id\tresearch_ref\tlibrary\twidth\tlambda\tprint_sha256\tmonths_sha256\troot_month\tedges_from\tedges_to\tlayout_sha256"
+        @test_throws "tab" segment_row(run_id="1\t2",research_ref="a"^40,library="L5",width="40",lambda="3",print_sha="b"^64,months_sha="c"^64,root="1980-01",edges_from=0,edges_to=7,layout_sha="d"^64)
         mktempdir() do d
-            p=joinpath(d,"segments.tsv");r2=segment_row(run_id="124",research_ref="d"^40,library="L4",width="60",lambda="2",print_sha="b"^64,months_sha="c"^64,root="1980-01",edges_from=7,edges_to=14)
+            p=joinpath(d,"segments.tsv");r2=segment_row(run_id="124",research_ref="d"^40,library="L4",width="60",lambda="2",print_sha="b"^64,months_sha="c"^64,root="1980-01",edges_from=7,edges_to=14,layout_sha="d"^64)
             write(p,join([SEGMENTS_HEADER,r,r2],'\n')*"\n");@test read_segments(p)==[r,r2]
             write(p,"run_id\n");@test_throws "segments.tsv header" read_segments(p)
             write(p,SEGMENTS_HEADER*"\n1\t2\n");@test_throws "has 2 fields" read_segments(p)

@@ -6,7 +6,7 @@
 module WindowChainLib
 using SHA
 export parse_ym, ym_str, ym_index, month_range, read_month_list, root_month, chain_plan, chain_flags, month_records, write_months,
-    read_claims, read_best_effort, next_best_effort, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row, read_segments,
+    read_claims, read_best_effort, next_best_effort, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row, read_segments, layout_input, check_segments_layout,
     STATUSES, EDGES_HEADER, MONTHS_HEADER, SEGMENTS_HEADER, DEFAULT_DEADLINE_S, YM_MIN, YM_MAX
 
 const YM_MIN=(1900,1)
@@ -18,7 +18,7 @@ const YM_MAX=(2100,1)
 const STATUSES=("valid","best_effort","unavailable_nomatch","unavailable_unsat","unknown")
 const EDGES_HEADER="id\tyear\tmonth\tmethod\thtm\tqtm\tseconds\tsource_sha256\tend_sha256"
 const MONTHS_HEADER="month\tstatus\treason\tedge\tmethod\tevidence"
-const SEGMENTS_HEADER="run_id\tresearch_ref\tlibrary\twidth\tlambda\tprint_sha256\tmonths_sha256\troot_month\tedges_from\tedges_to"
+const SEGMENTS_HEADER="run_id\tresearch_ref\tlibrary\twidth\tlambda\tprint_sha256\tmonths_sha256\troot_month\tedges_from\tedges_to\tlayout_sha256"
 # A segment is about one hour: no new edge after 3000 s of the edge loop; the workflow job limit (about 70 min) covers setup and slack.
 const DEFAULT_DEADLINE_S=3000.0
 
@@ -174,14 +174,38 @@ greedy_count(methods)=count(==("greedy"),methods)
 function read_segments(path)
     ls=split(chomp(read(path,String)),'\n')
     ls[1]==SEGMENTS_HEADER || error("segments.tsv header")
-    for (i,l) in enumerate(ls[2:end]);length(split(l,'\t'))==10 || error("segments.tsv row $i has $(length(split(l,'\t'))) fields");end
+    for (i,l) in enumerate(ls[2:end]);length(split(l,'\t'))==11 || error("segments.tsv row $i has $(length(split(l,'\t'))) fields");end
     String.(ls[2:end])
 end
 
 "One row of segments.tsv: the inputs of one run, so a continued chain shows which research commit, library and beam parameters made each segment."
-function segment_row(;run_id,research_ref,library,width,lambda,print_sha,months_sha,root,edges_from,edges_to)
-    f=string.((run_id,research_ref,library,width,lambda,print_sha,months_sha,root,edges_from,edges_to))
+function segment_row(;run_id,research_ref,library,width,lambda,print_sha,months_sha,root,edges_from,edges_to,layout_sha)
+    f=string.((run_id,research_ref,library,width,lambda,print_sha,months_sha,root,edges_from,edges_to,layout_sha))
     any(x->occursin(r"[\t\n\r]",x),f) && error("segment field contains a tab or line break")
     join(f,'\t')
+end
+
+"Layout path and its SHA-256 for a producer. CAL7_WINDOW_LAYOUT (path) replaces the built-in layout and needs CAL7_WINDOW_LAYOUT_SHA256, the same
+names as run_checks.sh and the checkers; a mismatch is an error. Without CAL7_WINDOW_LAYOUT the built-in layout is used (a pin is checked if set)."
+function layout_input(default,env=ENV)
+    path=get(env,"CAL7_WINDOW_LAYOUT","");pin=get(env,"CAL7_WINDOW_LAYOUT_SHA256","")
+    if isempty(path)
+        path=default
+    else
+        isempty(pin) && error("CAL7_WINDOW_LAYOUT needs CAL7_WINDOW_LAYOUT_SHA256")
+        isfile(path) || error("layout not found: $path")
+    end
+    isempty(pin) || occursin(r"^[0-9a-f]{64}$",pin) || error("CAL7_WINDOW_LAYOUT_SHA256 must be 64 lowercase hex digits")
+    got=bytes2hex(sha256(read(path)))
+    isempty(pin) || got==pin || error("layout SHA-256 $got differs from CAL7_WINDOW_LAYOUT_SHA256 $pin")
+    (path,got)
+end
+
+"A continued chain must use the layout of its earlier segments (last column of segments.tsv)."
+function check_segments_layout(rows,layout_sha)
+    for (i,r) in enumerate(rows);f=split(r,'\t')[end]
+        f==layout_sha || error("layout of prior segment $i ($f) differs from the layout of this run ($layout_sha)")
+    end
+    nothing
 end
 end
