@@ -5,18 +5,22 @@ import { createHash } from "node:crypto";
 test("calendar print downloads preserve the selected physical print and exact preset bytes", async ({
   page,
 }) => {
-  await page.goto("/calendar.html");
+  await page.goto("/index.html?app=calendar");
   await expect(page.locator("#calendar-design")).toBeEnabled();
   await page.selectOption("#calendar-design", "en-3");
-  await page.locator("#print-stickers").click();
-  await expect(page.locator("#print-design")).toBeEnabled();
-  await expect(page.locator("#print-design")).toHaveValue("en-3");
-  await expect(page.locator("#print-size")).toHaveValue("16");
-  await expect(page.locator("#print-summary")).toHaveText(
+  // The shared header link opens the sheet in a new tab.
+  const [sheet] = await Promise.all([
+    page.waitForEvent("popup"),
+    page.locator("#print-stickers").click(),
+  ]);
+  await expect(sheet.locator("#print-design")).toBeEnabled();
+  await expect(sheet.locator("#print-design")).toHaveValue("en-3");
+  await expect(sheet.locator("#print-size")).toHaveValue("16");
+  await expect(sheet.locator("#print-summary")).toHaveText(
     "2 complete cubes · 108 stickers · 1 A4 sheet",
   );
-  const downloadPromise = page.waitForEvent("download");
-  await page.locator("#print-pdf").click();
+  const downloadPromise = sheet.waitForEvent("download");
+  await sheet.locator("#print-pdf").click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe("en-3-16mm-2sets-print.pdf");
   const bytes = readFileSync(await download.path());
@@ -25,17 +29,17 @@ test("calendar print downloads preserve the selected physical print and exact pr
   expect(createHash("sha256").update(bytes).digest("hex")).toBe(
     entry.files["print.pdf"],
   );
-  await page.selectOption("#print-size", "15");
-  await expect(page.locator("#print-pdf")).toHaveAttribute(
+  await sheet.selectOption("#print-size", "15");
+  await expect(sheet.locator("#print-pdf")).toHaveAttribute(
     "href",
     /en-3-15mm-2sets\/print\.pdf$/,
   );
-  await page.setViewportSize({ width: 390, height: 844 });
+  await sheet.setViewportSize({ width: 390, height: 844 });
   expect(
-    await page.locator("html").evaluate((el) => el.scrollWidth),
+    await sheet.locator("html").evaluate((el) => el.scrollWidth),
   ).toBeLessThanOrEqual(390);
-  await expect(page.locator("#print-pdf")).toBeVisible();
-  await page.screenshot({
+  await expect(sheet.locator("#print-pdf")).toBeVisible();
+  await sheet.screenshot({
     path: "test-results/print-page-mobile.png",
     fullPage: true,
   });

@@ -70,7 +70,7 @@ test("face colors use explicit metadata and image-backed art is never sampled or
   assert.equal(sourceFaceColor("picture", manifest, "#abcdef"), "#abcdef");
 });
 test("per-page appearance preferences are bounded, fail closed, and reset to the style default", () => {
-  assert.notEqual(appearanceStorageKey("/ms-timer.html"), appearanceStorageKey("/calendar.html"));
+  assert.notEqual(appearanceStorageKey("/ms-timer.html"), appearanceStorageKey("/timer.html"));
   assert(appearanceStorageKey("x".repeat(1000)).length < 240);
   const valid = { version: 1, construction: "stickerless", frameColor: "#1a2b3c" };
   assert.deepEqual(readAppearance({ getItem: () => JSON.stringify(valid) }, "k"),

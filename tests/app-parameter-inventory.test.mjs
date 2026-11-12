@@ -47,13 +47,11 @@ const INVENTORY = [
   row(["lettering"], "src/apps/clock/params.ts", ["clock"]),
   row(["display", "font"], MAIN, SINGLE_CUBE),
   row(["pad", "padding"], MAIN, SINGLE_CUBE),
-  row(["pad", "padding"], "src/calendar.mjs", ["calendar"]),
   row(["marker"], MAIN, SINGLE_CUBE),
   row(["print"], MAIN, SINGLE_CUBE),
   row(["autoplay", "run"], MAIN, SINGLE_CUBE),
   row(["autoplay", "run"], "src/ms-timer.mjs", ["ms-timer"]),
   row(["kiosk", "presentation"], MAIN, SINGLE_CUBE),
-  row(["kiosk", "presentation"], "src/calendar.mjs", ["calendar"]),
   row(["kiosk", "presentation"], "src/ms-timer.mjs", ["ms-timer"]),
   row(["kiosk", "presentation"], "src/chronocube.mjs", ALL_IDS),
   row(["nerd"], "src/apps/shell/slot-api.ts", ALL_IDS, /get\("nerd"\) === "1"/),
@@ -63,8 +61,7 @@ const INVENTORY = [
     ["clock"],
     /CLOCK_UNIT_NAMES\s*=\s*\[\s*"hours",\s*"minutes",\s*"seconds"\s*\][\s\S]*params\.get\(\s*name\s*\+\s*"-speed"\s*\)/,
   ),
-  row(["date", "lang", "language", "design"], "src/calendar.mjs", ["calendar"]),
-  // The Calendar mode of the host (src/apps/calendar/mount.ts) reads the same names as the page calendar.html.
+  // The Calendar mode of the host (src/apps/calendar/mount.ts) reads the names the former page calendar.html read.
   row(["date", "lang", "language", "design", "pad", "padding"], "src/apps/calendar/mount.ts", ["calendar"]),
   row(["design"], "src/print.mjs", ["print.html"]),
   row(["year", "month"], "src/apps/calendar7/month-view.ts", ["calendar7"]),
