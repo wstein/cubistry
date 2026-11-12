@@ -4,7 +4,7 @@ async function ready(page) {
   await page.addInitScript(() => {
     Date.now = () => new Date("2026-10-28T11:00:00Z").getTime();
   });
-  await page.goto("/calendar.html");
+  await page.goto("/index.html?app=calendar");
   await expect(page.locator("#calendar-design")).toBeEnabled();
 }
 async function pick(page, iso) {
@@ -16,7 +16,7 @@ async function pick(page, iso) {
     .poll(
       () =>
         page.evaluate(async (date) => {
-          const { calendarApp } = await import("/src/calendar.mjs");
+          const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
           const c = calendarApp.controller;
           const [, month, day] = date.split("-").map(Number);
           return !c.busy && c.current.month === month && c.current.day === day;
@@ -40,7 +40,7 @@ for (const design of ["de-a", "en-3"])
         window.calendarFirstMoveTimes.push(performance.now());
         return animate.apply(this, args);
       };
-      const { calendarApp } = await import("/src/calendar.mjs");
+      const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
       return calendarApp.controller.design.printing;
     });
     const records = [];
@@ -62,7 +62,7 @@ for (const design of ["de-a", "en-3"])
           /Optimized physical route|Verified baseline route/,
         );
       const state = await page.evaluate(async () => {
-        const { calendarApp } = await import("/src/calendar.mjs");
+        const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
         const { matches } = await import("/src/apps/calendar/model.ts");
         const c = calendarApp.controller;
         return {
@@ -129,7 +129,7 @@ test("a blocked worker visibly uses the verified baseline rather than claiming o
     "Verified baseline route",
   );
   const result = await page.evaluate(async () => {
-    const { calendarApp } = await import("/src/calendar.mjs");
+    const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
     const { matches } = await import("/src/apps/calendar/model.ts");
     const c = calendarApp.controller;
     return {
@@ -179,7 +179,7 @@ test("changing a date during motion finishes one turn then replans from that exa
         !sameState(apply(from, token), to)
       )
         throw Error("Broken partial-route frame");
-      const { calendarApp } = await import("/src/calendar.mjs");
+      const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
       const day = calendarApp.controller.progress.target.day;
       if (first) {
         first = false;
@@ -217,7 +217,7 @@ test("changing a date during motion finishes one turn then replans from that exa
     { timeout: 15000 },
   );
   const result = await page.evaluate(async () => {
-    const { calendarApp } = await import("/src/calendar.mjs");
+    const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
     const { matches, sameState } = await import("/src/apps/calendar/model.ts");
     const c = calendarApp.controller,
       trace = window.interruptedMoves;

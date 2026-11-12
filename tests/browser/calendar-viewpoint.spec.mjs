@@ -10,7 +10,7 @@ for (const design of ["de-a", "en-3"])
     await page.addInitScript(() => {
       Date.now = () => Date.parse("2026-10-29T12:00:00Z");
     });
-    await page.goto("/calendar.html");
+    await page.goto("/index.html?app=calendar");
     await expect(page.locator("#calendar-design")).toBeEnabled();
     if (design === "en-3") await page.selectOption("#calendar-design", design);
     const front =
@@ -22,7 +22,7 @@ for (const design of ["de-a", "en-3"])
       await page.setViewportSize({ width, height: 1000 });
       const frame = () =>
         page.evaluate(async () => {
-          const { calendarApp } = await import("/src/calendar.mjs");
+          const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
           return calendarApp.viewer.renderer.info.render.frame;
         });
       const before = await frame();
@@ -35,7 +35,7 @@ for (const design of ["de-a", "en-3"])
         timeout: 30000,
       });
       const camera = await page.evaluate(async () => {
-        const { calendarApp } = await import("/src/calendar.mjs");
+        const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
         const v = calendarApp.viewer,
           p = v.camera.position;
         const corners = [-1.5, 1.5].flatMap((x) =>

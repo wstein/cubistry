@@ -16,7 +16,7 @@ const ALL_IDS = registry.ids();
 // Single-cube family: the pages that load src/main.mjs, by their unified id.
 const SINGLE_CUBE = ["counter", "tenth", "timer", "five-second-timer", "hsm-counter", "ms-counter", "hm-one-cube"];
 // Applications that read parameters but have no registered mode yet (stage 4 ports them).
-const PENDING_MODES = ["calendar", "playground"];
+const PENDING_MODES = ["playground"];
 // Pages that stay pages (print.html: owner decision 10).
 const PAGES = ["print.html"];
 
@@ -64,6 +64,8 @@ const INVENTORY = [
     /CLOCK_UNIT_NAMES\s*=\s*\[\s*"hours",\s*"minutes",\s*"seconds"\s*\][\s\S]*params\.get\(\s*name\s*\+\s*"-speed"\s*\)/,
   ),
   row(["date", "lang", "language", "design"], "src/calendar.mjs", ["calendar"]),
+  // The Calendar mode of the host (src/apps/calendar/mount.ts) reads the same names as the page calendar.html.
+  row(["date", "lang", "language", "design", "pad", "padding"], "src/apps/calendar/mount.ts", ["calendar"]),
   row(["design"], "src/print.mjs", ["print.html"]),
   row(["year", "month"], "src/apps/calendar7/month-view.ts", ["calendar7"]),
   row(["outer"], "src/apps/calendar7/geometry.ts", ["calendar7"]),

@@ -28,3 +28,17 @@ test("a switch to the same application keeps the URL", () => {
   const deep = `${base}?duration=05:00&val=12#top`;
   assert.equal(urlAfterAppSwitch(deep, "timer", "timer"), "/index.html?duration=05:00&val=12#top");
 });
+
+test("the Calendar parameters are owned by the Calendar: date, language, padding and design do not flow in or out", () => {
+  const cal = `${base}?app=calendar&date=2026-11-12&lang=en&design=en-3&pad=0&speed=100&nerd=1`;
+  assert.equal(urlAfterAppSwitch(cal, "calendar", "clock"), "/index.html?app=calendar&speed=100&nerd=1");
+  assert.equal(urlAfterAppSwitch(cal, "calendar", "calendar7"), "/index.html?app=calendar&speed=100&nerd=1");
+  assert.equal(urlAfterAppSwitch(cal, "calendar", "ci"), "/index.html?app=calendar&speed=100&nerd=1");
+  assert.equal(
+    urlAfterAppSwitch(cal, "calendar", "calendar"),
+    "/index.html?app=calendar&date=2026-11-12&lang=en&design=en-3&pad=0&speed=100&nerd=1",
+  );
+  // stray keys of another app are dropped on the way in
+  assert.equal(urlAfterAppSwitch(`${base}?app=calendar7&year=2026&month=3&date=2026-01-01`, "calendar7", "calendar"), "/index.html?app=calendar7");
+  assert.equal(urlAfterAppSwitch(`${base}?app=counter&val=5&display=dseg7`, "counter", "calendar"), "/index.html?app=counter");
+});
