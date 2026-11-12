@@ -95,12 +95,14 @@ Open (G1): whether the 2×2 cold start (about 93 ms in Node, 109 ms in Chromium)
 
 ## C2 to C5 go (2026-11-12; narrowed twice the same day)
 
-**P** (pending owner confirmation on [Cubistry #430](https://github.com/wstein/cubistry/pull/430)):
-the cloud-agent session was told "go also with C2-5" against the cubacle Browser
+**O** (go given by the owner 2026-11-12, answer to the coordinator, recorded here; PR
+[Cubistry #430](https://github.com/wstein/cubistry/pull/430)): the cloud-agent session
+was told "go also with C2-5" against the cubacle Browser
 WebAssembly plan ([wstein/cubacle#38](https://github.com/wstein/cubacle/pull/38), merged
 as `bb92669c`, plan revision [`78539646`](https://github.com/wstein/cubacle/commit/78539646)).
-No matching owner quote is yet in a repository comment or issue; treat the go as
-proposal until the owner confirms it on that PR. Later the same day the owner
+The owner confirmed the go for the model-independent slices only (see the narrowing
+below). No owner quote is in a repository comment or issue; the source is the owner
+answer to the coordinator. Later the same day the owner
 sharpened the 2026-11-08 rule: **all components share one cube model and one
 abstraction**. The comparison Draft is
 [puzlwerk#49](https://github.com/wstein/puzlwerk/pull/49) on `docs/shared-model-comparison`
@@ -140,15 +142,15 @@ follow-up docs PR in `wstein/cubacle`, puzlwerk#49 plan.md section 3):
 These holds stay in force until that cubacle plan update lands; SM1 being decided
 does not lift them.
 
-Narrowing per puzlwerk#49 section 3 / SM6 (**P**): record **A**, **L2** and **L3** as
-the intended go set; keep B, M, D3, D12, D13 and D14 on hold. L1 may proceed only
+Narrowing per puzlwerk#49 section 3 / SM6 (**O**): the go covers **A**, **L2** and
+**L3**; B, M, D3, D12, D13 and D14 stay on hold. L1 may proceed only
 with a capability/error-code mapping to the PuzlWerk
 [solver contract](https://github.com/wstein/puzlwerk/blob/main/specs/001-core-foundation/contracts/solver.md)
 (puzlwerk#49 §3 “change”). Cubacle C2–C4 are approach **step 4** of the cubacle plan
 (section 1); approach **step 5** (move Picture 3×3 and Calendar onto cubacle) stays a
 separate decision (unified-application.md D3/E0) and is not approved here.
 
-### Still in force if the go is confirmed (stack A, L2, L3; L after A once D4/D11 are explicit)
+### In force with the go (stack A, L2, L3; L after A once D4/D11 are explicit)
 
 | Decision | Choice taken |
 | --- | --- |
