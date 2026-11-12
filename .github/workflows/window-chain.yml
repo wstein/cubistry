@@ -16,6 +16,8 @@ name: Window chain
 # (run_checks.sh: Julia check.jl, Flix chain checker, independent verify_chain.jl; Julia and Flix receipts must be
 # byte-identical; uploads the verified artifact). Segments run one after another: a stopped run is continued with prior_run_id,
 # and segments.tsv records research_ref, library, width and lambda of every segment.
+# Optional layout_path + layout_sha256: the verify job checks the chain against that layout (CAL7_WINDOW_LAYOUT of run_checks.sh); the
+# producer (window_chain.jl) still reads research/calendar-7x7/row1-revision/layout.tsv. Without the inputs nothing changes.
 # No commits, no gitlinks, no PR comments; the output is an artifact only.
 # Concurrency: one run at a time. GitHub keeps at most one running and one pending run per group; a newer dispatch replaces an
 # older pending one (the replaced run is cancelled) even with cancel-in-progress false. Dispatch the next run only after the
@@ -48,6 +50,14 @@ on:
         description: SHA-256 of the print (64 hex digits)
         type: string
         required: true
+      layout_path:
+        description: Optional repository path of a window-local layout TSV at research_ref (for example the April tiles AP|RIL); empty keeps row1-revision/layout.tsv. Only the verify job reads it
+        type: string
+        default: ""
+      layout_sha256:
+        description: SHA-256 of that layout (64 hex digits); required with layout_path
+        type: string
+        default: ""
       best_effort_path:
         description: Optional repository path of the declared best-effort months TSV at research_ref; the run stops before such a month
         type: string
@@ -132,6 +142,8 @@ jobs:
           IN_ROOT: ${{ inputs.root_month }}
           IN_PRINT_PATH: ${{ inputs.print_path }}
           IN_PRINT_SHA: ${{ inputs.print_sha256 }}
+          IN_LAYOUT_PATH: ${{ inputs.layout_path }}
+          IN_LAYOUT_SHA: ${{ inputs.layout_sha256 }}
           IN_BEST: ${{ inputs.best_effort_path }}
           IN_CLAIMS: ${{ inputs.claims_path }}
           IN_LIBRARY: ${{ inputs.library }}
@@ -155,6 +167,9 @@ jobs:
           [ -z "$IN_BEST" ] || { [[ "$IN_BEST" =~ $path ]] && [[ "$IN_BEST" != *..* ]]; } || fail "best_effort_path is not a plain repository path"
           [ -z "$IN_CLAIMS" ] || { [[ "$IN_CLAIMS" =~ $path ]] && [[ "$IN_CLAIMS" != *..* ]]; } || fail "claims_path is not a plain repository path"
           [[ "$IN_PRINT_SHA" =~ ^[0-9a-f]{64}$ ]] || fail "print_sha256 must be 64 lowercase hex digits"
+          [ -z "$IN_LAYOUT_PATH" ] || { [[ "$IN_LAYOUT_PATH" =~ $path ]] && [[ "$IN_LAYOUT_PATH" != *..* ]]; } || fail "layout_path is not a plain repository path"
+          [ -z "$IN_LAYOUT_PATH" ] || [[ "$IN_LAYOUT_SHA" =~ ^[0-9a-f]{64}$ ]] || fail "layout_path needs layout_sha256 (64 lowercase hex digits)"
+          [ -n "$IN_LAYOUT_PATH" ] || [ -z "$IN_LAYOUT_SHA" ] || fail "layout_sha256 needs layout_path"
           [[ "$IN_LIBRARY" =~ ^L[145]$ ]] || fail "library must be L1, L4 or L5"
           [[ "$IN_WIDTH" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$IN_WIDTH" -le 200 ] || fail "width must be 1-200"
           [[ "$IN_LAMBDA" =~ ^([1-9]|10)$ ]] || fail "lambda must be 1-10"
@@ -183,6 +198,7 @@ jobs:
         env:
           SHA: ${{ inputs.research_ref }}
           PRINT_PATH: ${{ inputs.print_path }}
+          LAYOUT_PATH: ${{ inputs.layout_path }}
           MONTHS_PATH: ${{ inputs.months_path }}
           MONTHS_SHA: ${{ inputs.months_sha256 }}
           BEST_PATH: ${{ inputs.best_effort_path }}
@@ -205,12 +221,14 @@ jobs:
                    "$CAL/global-search/search.jl" "$CAL/upright-beam/beam2.jl" "$PRINT_PATH" "$MONTHS_PATH" ${BEST_PATH:+"$BEST_PATH"} ${CLAIMS_PATH:+"$CLAIMS_PATH"}; do
             git cat-file -e "$SHA:$f" 2>/dev/null || { echo "::error::$f is missing at $SHA"; missing=1; }
           done
+          [ -z "$LAYOUT_PATH" ] || git cat-file -e "$SHA:$LAYOUT_PATH" || fail "$LAYOUT_PATH is missing at $SHA"
           [ "$missing" = 0 ] || fail "research commit lacks required files"
           [ "$(git show "$SHA:$MONTHS_PATH" | sha256sum | cut -d' ' -f1)" = "$MONTHS_SHA" ] || fail "month list differs from months_sha256"
           {
             echo "### Window chain"
             echo "- research SHA: \`$SHA\`"
             echo "- print: \`$PRINT_PATH\`, month list \`$MONTHS_PATH\` (\`$MONTHS_SHA\`), root \`${SUMMARY_ROOT:-first month of the list}\`"
+            echo "- layout: \`${LAYOUT_PATH:-row1-revision/layout.tsv (default)}\`"
             echo "- smoke: \`$SUMMARY_SMOKE\`, prior run: \`$SUMMARY_PRIOR\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -322,6 +340,8 @@ jobs:
       SHA: ${{ inputs.research_ref }}
       FAIL_ON_GREEDY: ${{ inputs.fail_on_greedy }}
       PRINT_PATH: ${{ inputs.print_path }}
+      LAYOUT_PATH: ${{ inputs.layout_path }}
+      LAYOUT_SHA: ${{ inputs.layout_sha256 }}
       PRINT_SHA: ${{ inputs.print_sha256 }}
       MONTHS_PATH: ${{ inputs.months_path }}
       MONTHS_SHA: ${{ inputs.months_sha256 }}
@@ -383,6 +403,8 @@ jobs:
           export CAL7_WINDOW_MONTHS=$cut CAL7_WINDOW_MONTHS_SHA256=$cut_sha CAL7_WINDOW_PRINT_SHA=$PRINT_SHA
           [ -z "$ROOT_MONTH" ] || export CAL7_ROOT_MONTH=$ROOT_MONTH
           export PRINT_OVERRIDE=$GITHUB_WORKSPACE/src/$PRINT_PATH CHAIN_OVERRIDE=$c/chain.moves.tsv STATES_OVERRIDE=$c/states
+          # An optional window-local layout: checked against its pin here, then read by all three checkers through run_checks.sh.
+          [ -z "$LAYOUT_PATH" ] || { echo "$LAYOUT_SHA  src/$LAYOUT_PATH" | sha256sum --check --strict; export CAL7_WINDOW_LAYOUT="$GITHUB_WORKSPACE/src/$LAYOUT_PATH" CAL7_WINDOW_LAYOUT_SHA256="$LAYOUT_SHA"; }
           mkdir -p "$GITHUB_WORKSPACE/out"
           bash "src/$WC/run_checks.sh" "$(command -v julia)" "$(command -v java)" "$FLIX_JAR" "$GITHUB_WORKSPACE/out/checks" 2>&1 | tee "$GITHUB_WORKSPACE/out/verify.log"
           out=$GITHUB_WORKSPACE/out/checks
