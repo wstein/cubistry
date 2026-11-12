@@ -22,15 +22,20 @@ async function sameGround(page){return page.evaluate(()=>{const cells=[...docume
  return css.every((v,k)=>v===pixel[k]);
 });});}
 
-test('all font styles retain the accessible HTML palette in both themes and redraw on theme changes',async({page})=>{
+// One test per theme and half of the font list: a single 28-step loop took 22 s on a CI runner and 31 s on a loaded one (limit 30 s, issue #444).
+const FONT_COUNT=14,CHUNK=7;
+async function openAugust(page,theme){
  await page.emulateMedia({colorScheme:'light'});
  await page.goto('/index.html?app=calendar7&year=2026&month=8');
  await expect(page.locator('[data-c7-month]')).toHaveAttribute('data-c7-month','2026-08',{timeout:30000});
- const digest=await page.locator('[data-c7-digest]').getAttribute('data-c7-digest');
- const ids=await page.getByLabel('Font style',{exact:true}).locator('option').evaluateAll(options=>options.map(o=>o.value));expect(ids).toHaveLength(14);
- for(const theme of ['light','dark']){
-  await page.emulateMedia({colorScheme:theme});
-  await expect.poll(()=>sameGround(page),{message:`canvas follows ${theme} before changing fonts`}).toBe(true);
+ const ids=await page.getByLabel('Font style',{exact:true}).locator('option').evaluateAll(options=>options.map(o=>o.value));expect(ids).toHaveLength(FONT_COUNT);
+ await page.emulateMedia({colorScheme:theme});
+ await expect.poll(()=>sameGround(page),{message:`canvas follows ${theme} before changing fonts`}).toBe(true);
+ return ids;
+}
+for(const theme of ['light','dark'])for(let from=0;from<FONT_COUNT;from+=CHUNK){
+ test(`font styles ${from + 1} to ${from + CHUNK} retain the accessible HTML palette in the ${theme} theme`,async({page})=>{
+  const ids=(await openAugust(page,theme)).slice(from,from+CHUNK);expect(ids).toHaveLength(CHUNK);
   for(const id of ids){
    await page.getByLabel('Font style',{exact:true}).selectOption(id);await expect(page.locator('[data-c7-font]').filter({has:page.locator('.c7-sheet')})).toHaveAttribute('data-c7-font',id);
    for(const cell of await sample(page)){
@@ -39,7 +44,12 @@ test('all font styles retain the accessible HTML palette in both themes and redr
     if(cell.text){expect(cell.inkCount,`${theme}/${id}/${cell.role} actual ink`).toBeGreaterThan(0);expect(cell.ratio,`${theme}/${id}/${cell.role} actual contrast`).toBeGreaterThanOrEqual(4.5);}
    }
   }
- }
+ });
+}
+
+test('an explicit theme redraws the canvases without changing the month digest',async({page})=>{
+ await openAugust(page,'light');
+ const digest=await page.locator('[data-c7-digest]').getAttribute('data-c7-digest');
  for(const theme of ['light','dark']){
   await page.evaluate(t=>document.documentElement.dataset.theme=t,theme);
   await expect.poll(()=>sameGround(page),{message:`canvas follows explicit ${theme}`}).toBe(true);
