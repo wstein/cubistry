@@ -1,1 +1,0 @@
-function e({physical:e,logical:t,busy:n,activeTarget:r,anticipatedTarget:i=null,catchingUp:a=!1}){return a&&(n||e!==t)?`synchronizing`:n?r!==null&&r!==t&&r!==i?`synchronizing`:`moving`:e===t||e===i?`idle`:`synchronizing`}export{e as t};
