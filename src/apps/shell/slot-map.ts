@@ -67,7 +67,7 @@ export const SLOT_MAP: readonly SlotMapRow[] = [
   {
     designRow: "Calendar",
     modes: ["calendar"],
-    registered: false,
+    registered: true,
     slots: ["Today", "Show date", "Sticker language DE / EN", "Move time", "Display font"],
   },
   {
@@ -127,6 +127,7 @@ export const MIGRATION: Readonly<Record<string, MigrationStatus>> = {
   "hsm-counter": "pending",
   "ms-counter": "pending",
   "hm-one-cube": "pending",
+  calendar: "pending",
   calendar7: "pending",
   ci: "migrated",
 };

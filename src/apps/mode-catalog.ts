@@ -3,7 +3,7 @@ import type { ModeMeta } from "./registry.ts";
 /**
  * The modes that exist today, in studio order. The ids are the unified `app` keys: the legacy `application` key
  * `certified` is `counter` and `tenth-counter` is `tenth`. Titles follow the design proposal
- * (docs/design/README.md). Applications without a mode yet (calendar, playground, picture3) join in stage 4.
+ * (docs/design/README.md). Applications without a mode yet (playground, picture3) join in stage 4.
  */
 export const MODE_CATALOG: readonly ModeMeta[] = [
   {
@@ -25,6 +25,16 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     group: "apps",
     help: "docs/MS_TIMER.md",
     params: ["autoplay"],
+  },
+  {
+    id: "calendar",
+    title: "Calendar",
+    subtitle: "Today's date, or any date, on a 3x3 cube in German A or English 3.",
+    cubes: 1,
+    badge: "Date · DE / EN",
+    group: "apps",
+    help: "docs/CALENDAR_CUBES.md",
+    params: ["date", "lang", "design", "pad"],
   },
   {
     id: "hm-clock",

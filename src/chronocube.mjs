@@ -870,9 +870,35 @@ async function initCiMode(isCurrent, params, shell) {
   return instance ? () => instance.dispose() : undefined;
 }
 
+// -------------------------------------------------------------
+// Mode: Calendar, German A and English 3 date cubes (src/apps/calendar/mount.ts). The mount, its stylesheet and the
+// browser env load on demand; the solver bundle loads in a worker when the first date is planned.
+// -------------------------------------------------------------
+async function initCalendarMode(isCurrent, params) {
+  const [{ mountCalendar }, { browserCalendarEnv }] = await Promise.all([
+    import("./apps/calendar/mount.ts"),
+    import("./apps/calendar/browser-env.ts"),
+    import("./apps/calendar/host.css"),
+  ]);
+  if (!isCurrent()) return;
+  $("studio-cards").setAttribute("data-count", "1");
+  const instance = await mountCalendar($("studio-scene"), params, { isCurrent }, browserCalendarEnv(base, $("studio-controls")));
+  if (!isCurrent()) {
+    if (instance) instance.dispose();
+    return;
+  }
+  if (!instance) return;
+  activeViewer = instance;
+  return () => {
+    if (activeViewer === instance) activeViewer = null;
+    instance.dispose();
+  };
+}
+
 const MODE_INITS = {
   clock: (isCurrent, params, shell) => initClockMode(isCurrent, params, shell),
   "ms-timer": (isCurrent) => initMsTimerMode(isCurrent),
+  calendar: (isCurrent, params) => initCalendarMode(isCurrent, params),
   "hm-clock": (isCurrent) => initHmClockMode(isCurrent),
   tenth: (isCurrent, _params, shell) => initTenthMode(isCurrent, shell),
   counter: (isCurrent) => initCounterMode(isCurrent),

@@ -1126,7 +1126,7 @@ async function switchApplication(requested, { initial = false } = {}) {
   const externalMap = {
     "index.html?app=clock": "index.html?app=clock",
     "playground": "playground.html",
-    "calendar": "calendar.html",
+    "calendar": "index.html?app=calendar",
     "status-cube": "status.html",
     "ms-timer": "ms-timer.html",
     "picture3": "picture3.html",
