@@ -373,6 +373,7 @@ class El {
     this.focused++;
   }
 }
+const mountedGraph = parseGraph(json("public/calendar7/names-demo/graph.v1.json"));
 function fakeRoot() {
   const listeners = { click: new Set(), change: new Set(), submit: new Set() };
   const els = new Map();
@@ -454,9 +455,9 @@ const mountEnv = (over = {}) => {
   const env = {
     base: "/",
     fetchJson: async (url) =>
-      url.endsWith("graph.v1.json") ? json("public/calendar7/graph.v1.json") : url.endsWith("state.v1.json") ? json("public/calendar7/state.v1.json") : json("public/calendar7/displays.v1.json"),
+      url.endsWith("graph.v1.json") ? json("public/calendar7/names-demo/graph.v1.json") : url.endsWith("state.v1.json") ? json("public/calendar7/names-demo/state.v1.json") : json("public/calendar7/names-demo/displays.v1.json"),
     now: () => new Date(2026, 10, 7),
-    search: () => "?app=calendar7&year=2028&month=3",
+    search: () => "?app=calendar7&year=2027&month=3",
     replaceQuery: (s) => calls.query.push(s),
     isCurrent: () => true,
     sceneHost: () => host,
@@ -477,7 +478,7 @@ const idle = async (root) => {
 test("mount: the scheme parameter reaches the stage before it is configured; setScheme forwards the id", async () => {
   const root = fakeRoot();
   const { env, stage } = mountEnv();
-  const inst = await mountCalendar7(root, q("year=2028&month=3&scheme=paper-blue"), env);
+  const inst = await mountCalendar7(root, q("year=2027&month=3&scheme=paper-blue"), env);
   await idle(root);
   assert.deepEqual(stage.schemes, ["paper-blue", "configure"]);
   assert.equal(root.getAttribute("data-c7-scheme"), "paper-blue");
@@ -490,7 +491,7 @@ test("mount: the scheme parameter reaches the stage before it is configured; set
   // No parameter: the stage gets null (the default scheme).
   const second = mountEnv();
   const root2 = fakeRoot();
-  const inst2 = await mountCalendar7(root2, q("year=2028&month=3"), second.env);
+  const inst2 = await mountCalendar7(root2, q("year=2027&month=3"), second.env);
   await idle(root2);
   assert.deepEqual(second.stage.schemes.slice(0, 1), [null]);
   inst2.dispose();
@@ -499,24 +500,24 @@ test("mount: the scheme parameter reaches the stage before it is configured; set
 test("mount with a 3D view: the shown digest equals the stored hash for the URL month and after each step, both ways", async () => {
   const root = fakeRoot();
   const { env, stage, host, calls } = mountEnv();
-  const inst = await mountCalendar7(root, q("year=2028&month=3"), env);
+  const inst = await mountCalendar7(root, q("year=2027&month=3"), env);
   await idle(root);
   assert.equal(calls.created, 1);
   assert.equal(stage.configured, 1);
   assert.equal(host.hidden, false);
-  assert.equal(root.getAttribute("data-c7-month"), "2028-03");
-  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[22].hash);
-  assert.match(stage.labels.at(-1), /March 2028/);
+  assert.equal(root.getAttribute("data-c7-month"), "2027-03");
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[10].hash);
+  assert.match(stage.labels.at(-1), /March 2027/);
   // Next, then Previous twice, then to the chain start.
   for (const [month, k] of [[4, 3], [3, 2], [2, 1], [1, 0]]) {
-    assert.equal(root.clickLink(href({ year: 2028, month })), true);
+    assert.equal(root.clickLink(href({ year: 2027, month })), true);
     await flush();
     await idle(root);
-    assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[k + 20].hash, `month ${month}`);
-    assert.equal(root.getAttribute("data-c7-month"), `2028-0${month}`);
+    assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[k + 8].hash, `month ${month}`);
+    assert.equal(root.getAttribute("data-c7-month"), `2027-0${month}`);
   }
   assert.ok(stage.log.turns.length > 100, "the steps were played move by move");
-  assert.match(root.live.textContent, /The cube has turned to January 2028/);
+  assert.match(root.live.textContent, /The cube has turned to January 2027/);
   assert.equal(calls.created, 1, "the stage is built once");
   inst.dispose();
 });
@@ -526,15 +527,15 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   const stage = fakeStage({ manual: true });
   const view = stage;
   const { env } = mountEnv({ stage });
-  const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+  const inst = await mountCalendar7(root, q("year=2027&month=1"), env);
   await idle(root);
   root.choose("orientation", "after");
   assert.equal(root.el("play").getAttribute("aria-disabled") === "true", true, "nothing to play yet");
-  root.clickLink(href({ year: 2028, month: 2 }));
+  root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
   assert.equal(root.el("play").textContent, "Pause");
   assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", false);
-  assert.match(root.el("progress").textContent, new RegExp(`^Turning to February 2028: move 1 of ${playedBlocks(graph.edges[20].moves, { slice: true, defer: true }).blocks.length}$`));
+  assert.match(root.el("progress").textContent, new RegExp(`^Turning to February 2027: move 1 of ${playedBlocks(mountedGraph.edges[8].moves, { slice: true, defer: true }).blocks.length}$`));
   root.press("play"); // pause
   assert.equal(root.el("play").textContent, "Play");
   root.choose("speed", "1000");
@@ -542,14 +543,14 @@ test("mount: Play/Pause, Skip to end and Speed drive the player; Previous/Next d
   root.press("play"); // resume
   assert.equal(root.el("play").textContent, "Pause");
   root.press("skip");
-  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[21].hash);
-  assert.match(root.el("progress").textContent, /The cube shows February 2028/);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9].hash);
+  assert.match(root.el("progress").textContent, /The cube shows February 2027/);
   // A link during a step: the step ends at once and the next one plays.
-  root.clickLink(href({ year: 2028, month: 3 }));
+  root.clickLink(href({ year: 2027, month: 3 }));
   await flush();
-  root.clickLink(href({ year: 2028, month: 2 }));
+  root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
-  assert.match(root.el("progress").textContent, /Turning to February 2028/);
+  assert.match(root.el("progress").textContent, /Turning to February 2027/);
   root.press("reset");
   assert.equal(stage.resets, 1);
   inst.dispose();
@@ -559,30 +560,30 @@ test("mount: the middle slice option plays rule-c blocks (rotations deferred) by
   const root = fakeRoot();
   const stage = fakeStage({ manual: true });
   const { env } = mountEnv({ stage });
-  const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+  const inst = await mountCalendar7(root, q("year=2027&month=1"), env);
   await idle(root);
   root.choose("orientation", "after");
   assert.match(root.html, /data-c7="slice" checked/, "the option is offered and on");
-  const [first, second] = [graph.edges[20].moves, graph.edges[21].moves];
-  root.clickLink(href({ year: 2028, month: 2 }));
+  const [first, second] = [mountedGraph.edges[8].moves, mountedGraph.edges[9].moves];
+  root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
   assert.match(root.el("progress").textContent, new RegExp(`move 1 of ${playedBlocks(first, { slice: true, defer: true }).blocks.length}$`));
   root.press("skip");
   assert.equal(root.getAttribute("data-c7-state"), "idle");
   root.el("slice").checked = false;
   root.choose("slice", "");
-  root.clickLink(href({ year: 2028, month: 3 }));
+  root.clickLink(href({ year: 2027, month: 3 }));
   await flush();
   assert.match(root.el("progress").textContent, new RegExp(`move 1 of ${playedBlocks(second, { defer: true }).blocks.length}$`), "plain blocks of the next step");
   root.press("skip");
-  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[22].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[10].hash);
   root.el("slice").checked = true;
   root.choose("slice", "");
-  root.clickLink(href({ year: 2028, month: 2 }));
+  root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
   assert.match(root.el("progress").textContent, new RegExp(`move 1 of ${playedBlocks(inverseMoves(second), { slice: true, defer: true }).blocks.length}$`));
   root.press("skip");
-  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[21].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9].hash);
   inst.dispose();
 });
 
@@ -590,39 +591,39 @@ test("mount: After moves is available; the alignment is shown apart from the pro
   const root = fakeRoot();
   const stage = fakeStage({ manual: true });
   const { env } = mountEnv({ stage });
-  const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+  const inst = await mountCalendar7(root, q("year=2027&month=1"), env);
   await idle(root);
   root.choose("orientation", "after");
   assert.match(root.html, /value="after">After moves/);
   assert.equal(root.el("alignment").hidden, true);
-  const aligned = playedBlocks(graph.edges[20].moves, { slice: true, defer: true });
-  root.clickLink(href({ year: 2028, month: 2 }));
+  const aligned = playedBlocks(mountedGraph.edges[8].moves, { slice: true, defer: true });
+  root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
   assert.equal(root.el("alignment").textContent, `Orientation at the end (free): ${alignmentText(aligned.alignment)}.`);
   assert.ok(stage.log.turns.every((t) => t.block.kind !== "rotation"), "no rotation mid-word");
   root.press("skip");
   assert.equal(root.el("alignment").hidden, true);
-  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[21].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9].hash);
   root.choose("orientation", "stored");
-  root.clickLink(href({ year: 2028, month: 3 }));
+  root.clickLink(href({ year: 2027, month: 3 }));
   await flush();
   assert.match(root.el("progress").textContent, /whole-cube rotation \(free\)|move 1 of/);
   assert.equal(root.el("alignment").textContent, "Whole-cube rotations stay in the word (free).");
   root.press("skip");
-  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[22].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[10].hash);
   inst.dispose();
 });
 
 test("mount under reduced motion: no animation, the controls say so, the state is still the stored one", async () => {
   const root = fakeRoot();
   const { env, stage } = mountEnv({ reducedMotion: () => true });
-  const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+  const inst = await mountCalendar7(root, q("year=2027&month=1"), env);
   await idle(root);
-  root.clickLink(href({ year: 2028, month: 2 }));
+  root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
   await idle(root);
   assert.equal(stage.log.turns.length, 0);
-  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[21].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[9].hash);
   assert.equal(root.el("note").hidden, false);
   assert.equal(root.el("play").getAttribute("aria-disabled") === "true", true);
   assert.equal(root.el("skip").getAttribute("aria-disabled") === "true", true);
@@ -630,14 +631,15 @@ test("mount under reduced motion: no animation, the controls say so, the state i
   inst.dispose();
 });
 
-test("mount: a month outside the chain builds no stage and hides the scene; a month of the chain shows it", async () => {
+test("mount: a month outside the chain builds a display-only preview on the same print; a chain month restores playback", async () => {
   const root = fakeRoot();
   const { env, host, calls } = mountEnv();
   const inst = await mountCalendar7(root, q("year=2026&month=4"), env); // April 2026 is outside
   await flush();
-  assert.equal(calls.created, 0);
-  assert.equal(host.hidden, true);
-  root.clickLink(href({ year: 2028, month: 1 }));
+  assert.equal(calls.created, 1);
+  assert.equal(host.hidden, false);
+  assert.equal(root.el("player").hidden, true);
+  root.clickLink(href({ year: 2027, month: 1 }));
   await flush();
   await idle(root);
   assert.equal(host.hidden, false);
@@ -650,10 +652,10 @@ test("dispose removes every listener, destroys the stage, stops the loop and res
   const stage = fakeStage({ manual: true });
   const view = stage;
   const { env, host } = mountEnv({ stage });
-  const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+  const inst = await mountCalendar7(root, q("year=2027&month=1"), env);
   await idle(root);
   assert.ok(root.count() >= 3);
-  root.clickLink(href({ year: 2028, month: 2 }));
+  root.clickLink(href({ year: 2027, month: 2 }));
   await flush();
   assert.equal(stage.log.turns.length, 1);
   inst.dispose();
@@ -668,7 +670,7 @@ test("dispose removes every listener, destroys the stage, stops the loop and res
 test("mount respects isCurrent after every await: a stale mount builds nothing and destroys a stage built late", async () => {
   const a = fakeRoot();
   const stale1 = mountEnv({ isCurrent: () => false });
-  assert.equal(await mountCalendar7(a, q("year=2028&month=1"), stale1.env), undefined);
+  assert.equal(await mountCalendar7(a, q("year=2027&month=1"), stale1.env), undefined);
   assert.equal(stale1.calls.created, 0);
   assert.equal(stale1.host.hidden, false);
   // The mode is replaced while the stage is being built.
@@ -681,7 +683,7 @@ test("mount respects isCurrent after every await: a stale mount builds nothing a
       return late.stage;
     },
   });
-  const inst = await mountCalendar7(b, q("year=2028&month=1"), late.env);
+  const inst = await mountCalendar7(b, q("year=2027&month=1"), late.env);
   await flush();
   assert.equal(late.stage.destroyed, 1, "the late stage is destroyed");
   assert.equal(late.stage.configured, 0);
@@ -692,32 +694,32 @@ test("mount respects isCurrent after every await: a stale mount builds nothing a
 
 test("mount: a digest mismatch stops the 3D view for good: scene hidden, controls off, state failed, later steps do not restart it", async () => {
   const root = fakeRoot();
-  const tampered = json("public/calendar7/graph.v1.json");
-  tampered.nodes[21].hash = "0".repeat(64);
+  const tampered = json("public/calendar7/names-demo/graph.v1.json");
+  tampered.nodes[9].hash = "0".repeat(64);
   const stage = fakeStage();
   const { env, host } = mountEnv({
     stage,
-    fetchJson: async (url) => (url.endsWith("graph.v1.json") ? tampered : url.endsWith("state.v1.json") ? json("public/calendar7/state.v1.json") : json("public/calendar7/displays.v1.json")),
+    fetchJson: async (url) => (url.endsWith("graph.v1.json") ? tampered : url.endsWith("state.v1.json") ? json("public/calendar7/names-demo/state.v1.json") : json("public/calendar7/names-demo/displays.v1.json")),
   });
   const orig = console.error;
   console.error = () => {};
   try {
-    const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+    const inst = await mountCalendar7(root, q("year=2027&month=1"), env);
     await idle(root);
     root.choose("orientation", "after");
-    root.clickLink(href({ year: 2028, month: 2 }));
+    root.clickLink(href({ year: 2027, month: 2 }));
     for (let i = 0; i < 100000 && root.getAttribute("data-c7-state") !== "failed"; i++) await Promise.resolve();
     assert.equal(root.getAttribute("data-c7-state"), "failed");
-    assert.match(root.el("error").textContent, /no whole-cube orientation turns the cube into the stored state of node 21/);
+    assert.match(root.el("error").textContent, /no whole-cube orientation turns the cube into the stored state of node 9/);
     assert.match(root.el("error").textContent, /sheet below/);
     assert.equal(root.el("error").hidden, false);
     assert.equal(host.hidden, true);
     assert.equal(stage.destroyed, 1);
     const turns = stage.log.turns.length;
-    root.clickLink(href({ year: 2028, month: 1 }));
+    root.clickLink(href({ year: 2027, month: 1 }));
     root.press("play");
     await flush();
-    assert.match(root.view.innerHTML, /data-month="2028-01"/, "the sheet still follows the month");
+    assert.match(root.view.innerHTML, /data-month="2027-01"/, "the sheet still follows the month");
     assert.equal(stage.log.turns.length, turns, "no new turn");
     assert.equal(host.hidden, true);
     assert.equal(root.getAttribute("data-c7-state"), "failed");
@@ -738,9 +740,9 @@ test("a failing stage (no WebGL) leaves the month sheet and reports the error", 
   const orig = console.error;
   console.error = () => {};
   try {
-    const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+    const inst = await mountCalendar7(root, q("year=2027&month=1"), env);
     await flush();
-    assert.match(root.view.innerHTML, /data-month="2028-01"/);
+    assert.match(root.view.innerHTML, /data-month="2027-01"/);
     assert.match(root.el("error").textContent, /WebGL is not available/);
     assert.equal(root.el("error").hidden, false);
     assert.equal(host.hidden, true);
@@ -750,15 +752,16 @@ test("a failing stage (no WebGL) leaves the month sheet and reports the error", 
   }
 });
 
-test("mount without a 3D environment is the plain page of stage 1 (no extra listeners, no state fetch)", async () => {
+test("mount without a 3D environment keeps the canonical sheet and instant date controls without building a stage", async () => {
   const root = fakeRoot();
   const { env } = mountEnv({ sceneHost: undefined, createStage: undefined });
   const fetched = [];
-  env.fetchJson = async (u) => (fetched.push(u), u.endsWith("graph.v1.json") ? json("public/calendar7/graph.v1.json") : json("public/calendar7/displays.v1.json"));
-  const inst = await mountCalendar7(root, q("year=2028&month=1"), env);
+  env.fetchJson = async (u) => (fetched.push(u), json("public" + u));
+  const inst = await mountCalendar7(root, q("year=2027&month=1"), env);
   assert.equal(root.listeners.click.size, 1);
   assert.equal(root.listeners.change.size, 0);
-  assert.ok(!fetched.some((u) => u.includes("state.v1")));
+  assert.match(root.html, /data-c7-month-picker/);
+  assert.equal(fetched.filter((u) => u.includes("state.v1")).length, 1);
   inst.dispose();
   assert.equal(root.count(), 0);
 });
@@ -805,18 +808,18 @@ test("the page text keeps the status: research candidate, not certified, no solv
   const text = readFileSync("src/apps/calendar7/month-view.ts", "utf8");
   assert.match(text, /Research candidate, not certified\. Stage 2/);
   assert.match(text, /No solver and no jumps/);
-  assert.equal(monthLabel({ year: 2028, month: 1 }), "January 2028");
+  assert.equal(monthLabel({ year: 2027, month: 1 }), "January 2027");
   assert.ok(table.displays.length === 91);
 });
 
 test("mount always requests stickerless faces while retaining the raw state schema", async () => {
-  const state = json("public/calendar7/state.v1.json");
+  const state = json("public/calendar7/names-demo/state.v1.json");
   for (const [field, want] of [[{}, "face"], [{ surface: "face" }, "face"], [{ surface: "sticker" }, "face"]]) {
     const { env, stage } = mountEnv({
       fetchJson: async (url) =>
-        url.endsWith("graph.v1.json") ? json("public/calendar7/graph.v1.json") : url.endsWith("state.v1.json") ? { ...state, ...field } : json("public/calendar7/displays.v1.json"),
+        url.endsWith("graph.v1.json") ? json("public/calendar7/names-demo/graph.v1.json") : url.endsWith("state.v1.json") ? { ...state, ...field } : json("public/calendar7/names-demo/displays.v1.json"),
     });
-    const inst = await mountCalendar7(fakeRoot(), q("year=2028&month=3"), env);
+    const inst = await mountCalendar7(fakeRoot(), q("year=2027&month=3"), env);
     await flush();
     assert.deepEqual(stage.surfaces, [want], JSON.stringify(field));
     inst.dispose();
@@ -825,7 +828,7 @@ test("mount always requests stickerless faces while retaining the raw state sche
 
 test('mount: color theme offers exactly ten named schemes with Paper Red and URL fallback',async()=>{
  for(const [input,want]of[['','paper-red'],['paper-blue','paper-blue'],['unknown','paper-red']]){
-  const root=fakeRoot(),{env}=mountEnv();const inst=await mountCalendar7(root,q(`year=2028&month=3&scheme=${input}`),env);await idle(root);
+  const root=fakeRoot(),{env}=mountEnv();const inst=await mountCalendar7(root,q(`year=2027&month=3&scheme=${input}`),env);await idle(root);
   assert.match(root.html,/Cube color theme/);
   const html=root.html.match(/<select[^>]+data-c7="scheme"[^>]*>([\s\S]*?)<\/select>/)?.[1];assert(html,'a labeled scheme select exists');
   assert.deepEqual([...html.matchAll(/<option value="([^"]+)"/g)].map(m=>m[1]),SCHEMES.map(s=>s.id));
@@ -833,10 +836,10 @@ test('mount: color theme offers exactly ten named schemes with Paper Red and URL
  }
 });
 test('mount: color theme changes synchronize stage and picker while preserving unrelated query parameters',async()=>{
- const root=fakeRoot();let search='?app=calendar7&year=2028&month=3&font=nunito&extra=keep';const{env,stage}=mountEnv({search:()=>search,replaceQuery:s=>search=s});
+ const root=fakeRoot();let search='?app=calendar7&year=2027&month=3&font=nunito&extra=keep';const{env,stage}=mountEnv({search:()=>search,replaceQuery:s=>search=s});
  const inst=await mountCalendar7(root,q(search),env);await idle(root);const before=root.getAttribute('data-c7-digest');
  root.choose('scheme','dracula');assert.equal(stage.schemes.at(-1),'dracula');assert.equal(root.el('scheme').value,'dracula');
- const selected=new URLSearchParams(search);assert.equal(selected.get('scheme'),'dracula');for(const[k,v]of[['year','2028'],['month','3'],['font','nunito'],['extra','keep']])assert.equal(selected.get(k),v);
+ const selected=new URLSearchParams(search);assert.equal(selected.get('scheme'),'dracula');for(const[k,v]of[['year','2027'],['month','3'],['font','nunito'],['extra','keep']])assert.equal(selected.get(k),v);
  const current=search;inst.setScheme('paper-blue');assert.equal(root.el('scheme').value,'paper-blue');assert.equal(stage.schemes.at(-1),'paper-blue');assert.equal(search,current,'the programmatic setter stays in memory');
  inst.setScheme('bad');assert.equal(root.el('scheme').value,'paper-red');assert.equal(root.getAttribute('data-c7-scheme'),'paper-red');
  assert.equal(root.getAttribute('data-c7-digest'),before);assert.equal(stage.configured,1);const n=stage.schemes.length;root.press('scheme');assert.equal(stage.schemes.length,n,'opening a select is not a change');
@@ -844,7 +847,7 @@ test('mount: color theme changes synchronize stage and picker while preserving u
 });
 test('mount: color theme selected while the viewer loads is used on its first configure',async()=>{
  const root=fakeRoot(),stage=fakeStage();let release;const gate=new Promise(r=>release=r);
- const{env}=mountEnv({createStage:()=>gate});const inst=await mountCalendar7(root,q('year=2028&month=3&scheme=paper-blue'),env);
+ const{env}=mountEnv({createStage:()=>gate});const inst=await mountCalendar7(root,q('year=2027&month=3&scheme=paper-blue'),env);
  root.choose('scheme','dracula');assert.equal(root.getAttribute('data-c7-scheme'),'dracula');release(stage);await idle(root);
  assert.deepEqual(stage.schemes,['dracula','configure']);assert.equal(stage.configured,1);inst.dispose();
 });
