@@ -172,11 +172,12 @@ Cubing.js numbering. Each row below stays on hold until the follow-up docs PR in
 | D14 | Module placement `src/kpuzzle` / `src/targets` plus `RULES` | Names modules for an algebra that is on hold; revisited in the plan update (puzlwerk#49 plan.md section 3) |
 
 C1 facade measurement work already landed on cubacle (PRs #33 / #34; plan #38
-merged). Stack A continues from that tip (`feat/wasm-build-1` …). **All cubacle
-implementation PRs land on `main`**, not `develop` (owner, 2026-11-12). **V** GitHub
-still lists `develop` as cubacle's default branch (tip `bb92669`); remote `main`
-(`5f41eb06`) has not absorbed that tip yet. Stack branches are prepared against the
-former `develop` tip and opened with base `main` only after that fast-forward.
+merged as `bb92669c`). Stack A continues from that tip (`feat/wasm-build-1` …).
+**UNKNOWN:** the target branch for cubacle implementation PRs. No repository source
+records an owner decision on it. **V** GitHub lists `develop` as cubacle's default
+branch (tip `bb92669c`); `main` (`5f41eb06`) and `develop` have diverged
+(compare: 807 commits ahead, 3 behind), so `main` cannot be fast-forwarded to the
+`develop` tip. The owner decides the base branch before any stack PR is opened.
 Implementation PRs stay in `wstein/cubacle`.
 
 ### Focused work items (one PR each, stacked)
