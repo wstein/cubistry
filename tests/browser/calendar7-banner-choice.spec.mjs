@@ -46,7 +46,7 @@ test("the banner selector draws five distinct overrides, preserves the physical 
   await stableCanvasReadback(page);
   const errors = []; page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/index.html?app=calendar7&layout=names&year=2026&month=11"); await at(page, "2026-11");
-  const select = page.getByRole("combobox", { name: "Month banner", exact: true });
+  const select = page.getByRole("combobox", { name: "Banner style", exact: true });
   await expect(select).toHaveValue("theme");
   await expect(select.locator("option")).toHaveText(["Theme default", "Rounded", "Hard edges", "Underline", "Boxed", "Rounded box"]);
   expect(new URL(page.url()).searchParams.has("banner")).toBe(false);
@@ -81,7 +81,7 @@ test("a manual banner survives a scheme change and a reload", async ({ page }) =
   const errors = []; page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/index.html?app=calendar7&layout=names&year=2027&month=2&banner=underline&scheme=paper-blue&font=quicksand&extra=keep");
   await at(page, "2027-02");
-  const select = page.getByRole("combobox", { name: "Month banner", exact: true });
+  const select = page.getByRole("combobox", { name: "Banner style", exact: true });
   await expect(select).toHaveValue("underline");
   await page.getByRole("combobox", { name: "Cube color theme", exact: true }).selectOption("dracula");
   await expect(select).toHaveValue("underline");
@@ -106,7 +106,7 @@ test("the theme default follows representative scheme styles, including the hard
       return original.call(this, style);
     };
   });
-  const banner = page.getByRole("combobox", { name: "Month banner", exact: true });
+  const banner = page.getByRole("combobox", { name: "Banner style", exact: true });
   const scheme = page.getByRole("combobox", { name: "Cube color theme", exact: true });
   const digest = await page.locator(ROOT).getAttribute("data-c7-digest");
   for (const [theme, shape] of [["paper-red", "rounded"], ["paper-blue", "underline"], ["classic", "square"], ["solarized-light", "boxed"], ["gruvbox-light", "rounded-box"]]) {
