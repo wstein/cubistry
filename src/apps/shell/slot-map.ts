@@ -71,10 +71,10 @@ export const SLOT_MAP: readonly SlotMapRow[] = [
     slots: ["Today", "Show date", "Sticker language DE / EN", "Move time", "Display font"],
   },
   {
-    designRow: "Playground (2×2 or 3×3)",
+    designRow: "Picture Cube (2×2 to 7×7)",
     modes: ["playground"],
-    registered: false,
-    slots: ["Scramble / Solve", "12 quarter-turn buttons", "Cube 2×2 / 3×3, Undo, Redo", "Move time", null],
+    registered: true,
+    slots: ["Scramble / Solve", "18 turn buttons", "Cube size 2-7, Undo, Redo", "Move time", "Design, Your pictures"],
   },
   {
     designRow: "CI Quality Cube",
@@ -130,6 +130,7 @@ export const MIGRATION: Readonly<Record<string, MigrationStatus>> = {
   calendar: "pending",
   calendar7: "pending",
   ci: "migrated",
+  playground: "migrated",
 };
 
 /** The slot numbers the design fills for a mode (also for modes that are not in the registry yet). */

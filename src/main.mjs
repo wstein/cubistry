@@ -1125,7 +1125,7 @@ async function switchApplication(requested, { initial = false } = {}) {
   const targetKey = normalizeAppKey(requested);
   const externalMap = {
     "index.html?app=clock": "index.html?app=clock",
-    "playground": "playground.html",
+    "playground": "index.html?app=playground",
     "calendar": "index.html?app=calendar",
     "status-cube": "status.html",
     "ms-timer": "ms-timer.html",
