@@ -16,9 +16,9 @@ name: Window chain
 # (run_checks.sh: Julia check.jl, Flix chain checker, independent verify_chain.jl; Julia and Flix receipts must be
 # byte-identical; uploads the verified artifact). Segments run one after another: a stopped run is continued with prior_run_id,
 # and segments.tsv records research_ref, library, width and lambda of every segment.
-# Optional layout_path + layout_sha256: the producer (window_chain.jl) and the verify job (run_checks.sh) read that layout through
+# Optional layout_path + layout_sha256: the producer (window_chain.jl) and the verify job (run_checks.sh) get that layout through
 # CAL7_WINDOW_LAYOUT and CAL7_WINDOW_LAYOUT_SHA256. prepare refuses the run when window_chain.jl or run_checks.sh at research_ref
-# does not mention CAL7_WINDOW_LAYOUT (fail closed). Without the inputs nothing is exported and nothing changes.
+# does not mention the word CAL7_WINDOW_LAYOUT (fail closed; a comment with the name is enough, the check is a gate, not a proof). Without the inputs nothing is exported and nothing changes.
 # No commits, no gitlinks, no PR comments; the output is an artifact only.
 # Concurrency: one run at a time. GitHub keeps at most one running and one pending run per group; a newer dispatch replaces an
 # older pending one (the replaced run is cancelled) even with cancel-in-progress false. Dispatch the next run only after the
@@ -52,7 +52,7 @@ on:
         type: string
         required: true
       layout_path:
-        description: Optional repository path of a window-local layout TSV at research_ref; empty keeps row1-revision/layout.tsv. The producer and the verify job both read it (CAL7_WINDOW_LAYOUT); the run stops in prepare when research_ref has a producer or run_checks.sh that does not
+        description: Optional repository path of a window-local layout TSV at research_ref; empty keeps row1-revision/layout.tsv. The producer and the verify job both get it (CAL7_WINDOW_LAYOUT); the run stops in prepare when the producer or run_checks.sh at research_ref does not mention that name
         type: string
         default: ""
       layout_sha256:
@@ -223,8 +223,8 @@ jobs:
             git cat-file -e "$SHA:$f" 2>/dev/null || { echo "::error::$f is missing at $SHA"; missing=1; }
           done
           [ -z "$LAYOUT_PATH" ] || git cat-file -e "$SHA:$LAYOUT_PATH" || fail "$LAYOUT_PATH is missing at $SHA"
-          [ -z "$LAYOUT_PATH" ] || git grep -q CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/window_chain.jl" || fail "layout_path is set, but the producer at research_ref does not read CAL7_WINDOW_LAYOUT"
-          [ -z "$LAYOUT_PATH" ] || git grep -q CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/run_checks.sh" || fail "layout_path is set, but run_checks.sh at research_ref does not read CAL7_WINDOW_LAYOUT"
+          [ -z "$LAYOUT_PATH" ] || git grep -qw CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/window_chain.jl" || fail "layout_path is set, but the producer at research_ref does not read CAL7_WINDOW_LAYOUT"
+          [ -z "$LAYOUT_PATH" ] || git grep -qw CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/run_checks.sh" || fail "layout_path is set, but run_checks.sh at research_ref does not read CAL7_WINDOW_LAYOUT"
           [ "$missing" = 0 ] || fail "research commit lacks required files"
           [ "$(git show "$SHA:$MONTHS_PATH" | sha256sum | cut -d' ' -f1)" = "$MONTHS_SHA" ] || fail "month list differs from months_sha256"
           {
