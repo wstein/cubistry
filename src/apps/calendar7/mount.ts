@@ -38,6 +38,8 @@ export interface Stage extends StageView {
   /** Builds the cube of one print; `layout` selects the tile classes of the names layout (`band`, row 1 line). */
   configure(printing: Printing, pose: Pose, surface?: Surface, layout?: Layout, wrong?: readonly number[]): void;
   setLabel(text: string): void;
+  /** The identity pose of the print (the names data): the home faces of the stickers, read by the Rubik-Tint scheme at the next `configure`; null when it is not known. Optional like `setScheme`. */
+  setHomePose?(root: Pose | null): void;
   /** Color scheme by id (src/apps/calendar7/schemes.ts); an unknown id gives the default. Optional: a fake stage may omit it. */
   setScheme?(id: string | null | undefined): void;
   /** Banner style shape of the names layout; optional like `setScheme`. */
@@ -408,6 +410,7 @@ export async function mountCalendar7(
     played = data;
     anyBound = false;
     anyBoundStart = null;
+    made.setHomePose?.(data.layout === "names" ? s.pose : null); // the root pose of the standard print is a setup, not the solved cube
     made.configure(s.printing, s.pose, "face", data.layout);
     player = new Calendar7Player({
       graph: data.graph,
@@ -520,6 +523,7 @@ export async function mountCalendar7(
         const wordBox = q("active-word"), activePanel = q("active-step");
         if (wordBox) wordBox.innerHTML = "";
         if (activePanel) activePanel.hidden = true;
+        made.setHomePose?.(data.start.pose);
         made.configure(data.start.printing, clonePose(target.pose), "face", "names", wrong);
         anyBound = true;
         anyBoundStart = data.start;
