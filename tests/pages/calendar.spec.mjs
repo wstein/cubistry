@@ -22,7 +22,7 @@ for (const [design, moves, front, sourceIso, targetIso] of [
     "2026-11-04",
   ],
 ])
-  test(`built calendar ${design} ${targetIso} loads its nested solver workers beneath the deployment base`, async ({
+  test(`built calendar mode ${design} ${targetIso} loads its nested solver workers beneath the deployment base`, async ({
     page,
   }) => {
     await page.addInitScript((iso) => {
@@ -33,7 +33,7 @@ for (const [design, moves, front, sourceIso, targetIso] of [
     }, sourceIso);
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await page.goto("calendar.html");
+    await page.goto("index.html?app=calendar");
     await expect(page.locator("#calendar-design")).toBeEnabled();
     if (design === "en-3") await page.selectOption("#calendar-design", design);
     await page.fill("#calendar-date", targetIso);

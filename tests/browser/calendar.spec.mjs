@@ -26,13 +26,13 @@ async function ready(page, time = "2026-01-03T11:00:00Z") {
   const target = new Date(time);
   await page.clock.install({ time: new Date(target.getTime() - 10_000) });
   await page.clock.pauseAt(target);
-  await page.goto("/calendar.html");
+  await page.goto("/index.html?app=calendar");
   await expect(page.locator("#calendar-design")).toBeEnabled();
   await page.clock.runFor(100);
 }
 async function physical(page) {
   return page.evaluate(async () => {
-    const { calendarApp } = await import("/src/calendar.mjs");
+    const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
     const { front, matches } = await import("/src/apps/calendar/model.ts");
     const c = calendarApp.controller;
     return {
@@ -46,7 +46,7 @@ async function physical(page) {
 }
 async function artFits(page) {
   const bad = await page.evaluate(async () => {
-    const { calendarApp } = await import("/src/calendar.mjs");
+    const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
     const { stickerArt } = await import("/src/apps/calendar/artwork.ts");
     const ctx = document.createElement("canvas").getContext("2d");
     return calendarApp.controller.design.printing
@@ -110,7 +110,7 @@ test("English 3 keeps the day adjacent and removes the zero with legal moves", a
   ]);
   await artFits(page);
   const source = await page.evaluate(async () => {
-    const { calendarApp } = await import("/src/calendar.mjs");
+    const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
     return calendarApp.controller.design.printing;
   });
   // Hold the first unpadded runtime fetch so the test observes the load window.
@@ -148,7 +148,7 @@ test("English 3 keeps the day adjacent and removes the zero with legal moves", a
   );
   expect(
     await page.evaluate(async () => {
-      const { calendarApp } = await import("/src/calendar.mjs");
+      const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
       return calendarApp.controller.design.printing;
     }),
   ).toEqual(source);
@@ -206,7 +206,7 @@ test("real 3 by 3 animation preserves every legal intermediate pose", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/calendar.html");
+  await page.goto("/index.html?app=calendar");
   await expect(page.locator("#calendar-design")).toBeEnabled();
   await page.selectOption("#calendar-speed", "10");
   await page.evaluate(async () => {
@@ -239,7 +239,7 @@ test("real 3 by 3 animation preserves every legal intermediate pose", async ({
   expect(trace.length).toBeGreaterThan(0);
   expect(trace.every((m) => m.ok)).toBe(true);
   const evidence = await page.evaluate(async () => {
-    const { calendarApp } = await import("/src/calendar.mjs");
+    const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
     return {
       printing: calendarApp.controller.design.printing,
       moves: window.calendarMoves,
@@ -261,13 +261,32 @@ test("calendar rejects altered runtime and retains navigation", async ({
       body: (await r.text()).replace("MON", "XYZ") + " ",
     });
   });
-  await page.goto("/calendar.html");
+  await page.goto("/index.html?app=calendar");
   await expect(page.locator("#calendar-error")).toHaveText(
     "Calendar integrity mismatch",
   );
   await expect(page.locator("#calendar-design")).toBeDisabled();
-  await page.selectOption("#calendar-application", "ms-timer.html");
-  await expect(page).toHaveURL(/ms-timer.html$/);
+  // The host chooser stays usable and leaves the Calendar without keeping its parameters.
+  await page.selectOption("#studio-application", "ms-timer");
+  await expect(page).toHaveURL(/index\.html\?app=ms-timer$/);
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "ms-timer");
+  await expect(page.locator("#calendar-viewer")).toHaveCount(0);
+});
+test("the host chooser offers the Calendar and the design parameter does not follow the app switch", async ({
+  page,
+}) => {
+  await page.goto("/index.html?app=calendar&lang=en&design=en-3&date=2026-11-07");
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "calendar");
+  await expect(page.locator("#studio-application")).toHaveValue("calendar");
+  await expect(page.locator("#calendar-design")).toHaveValue("en-3");
+  await page.selectOption("#studio-application", "counter");
+  await expect(page).toHaveURL(/index\.html\?app=counter$/);
+  await expect(page.locator("#calendar-viewer")).toHaveCount(0);
+  await page.goBack();
+  await expect(page).toHaveURL(/app=calendar&lang=en&design=en-3&date=2026-11-07$/);
+  await expect(page.locator("#shell")).toHaveAttribute("data-mode-ready", "calendar");
+  await expect(page.locator("#calendar-design")).toHaveValue("en-3");
+  await expect(page.locator("#calendar-viewer canvas")).toHaveCount(1);
 });
 test("selecting today refreshes Live and Inspecting status without moving stickers", async ({
   page,
@@ -318,7 +337,7 @@ test.describe("high-density calendar framing", () => {
       const epoch = Date.parse("2026-11-07T11:00:00Z");
       Date.now = () => epoch;
     });
-    await page.goto("/calendar.html");
+    await page.goto("/index.html?app=calendar");
     await expect(page.locator("#calendar-design")).toBeEnabled();
     await page.locator("#calendar-date").dispatchEvent("change");
     for (const design of ["de-a", "en-3"]) {
@@ -346,7 +365,7 @@ test.describe("high-density calendar framing", () => {
         { width: 390, height: 844 },
       ]) {
         const previousFrame = await page.evaluate(async () => {
-          const { calendarApp } = await import("/src/calendar.mjs");
+          const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
           return calendarApp.viewer.renderer.info.render.frame;
         });
         await page.setViewportSize(viewport);
@@ -355,7 +374,7 @@ test.describe("high-density calendar framing", () => {
           .poll(
             async () =>
               page.evaluate(async () => {
-                const { calendarApp } = await import("/src/calendar.mjs");
+                const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
                 return calendarApp.viewer.renderer.info.render.frame;
               }),
             { timeout: 15000 },
@@ -383,7 +402,7 @@ test.describe("high-density calendar framing", () => {
           await page.locator("html").evaluate((e) => e.scrollWidth),
         ).toBeLessThanOrEqual(viewport.width);
         const framing = await page.evaluate(async () => {
-          const { calendarApp } = await import("/src/calendar.mjs");
+          const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
           const viewer = calendarApp.viewer;
           viewer.camera.updateMatrixWorld();
           const projected = [-1.55, 1.55].flatMap((x) =>
@@ -437,7 +456,7 @@ test("English Saturday and both Sunday source stickers stay permanently red and 
     await page.locator("#calendar-date").dispatchEvent("change");
     await idleShowing(page, image, (front) => front.split(" · ")[0] === image);
     const actual = await page.evaluate(async () => {
-      const { calendarApp } = await import("/src/calendar.mjs");
+      const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
       const { front } = await import("/src/apps/calendar/model.ts");
       const sticker = front(calendarApp.controller.physicalState)[0];
       let texture;
@@ -540,7 +559,7 @@ test("date picking starts legal motion immediately and day buttons preserve late
     "R",
   ]);
   const state = await page.evaluate(async () => {
-    const { calendarApp } = await import("/src/calendar.mjs");
+    const calendarApp = { controller: window.__calendarController, viewer: window.__calendarViewer };
     return { p: calendarApp.controller.progress, trace: window.dateMoveTrace };
   });
   expect(state.p.completed).toEqual(state.p.total);

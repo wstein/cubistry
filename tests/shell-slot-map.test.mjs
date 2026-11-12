@@ -43,7 +43,7 @@ test("every registered mode has exactly one row or is listed as a mode without a
   }
   assert.deepEqual(
     SLOT_MAP.filter((r) => !r.registered).flatMap((r) => r.modes),
-    ["calendar", "playground"],
+    ["playground"],
   );
 });
 
@@ -97,4 +97,11 @@ test("accepted deviations: the CI Quality Cube uses Simulated events and Workflo
   const plan = readFileSync("knowledge/plans/unified-application.md", "utf8");
   assert.match(plan, /labels them "Simulated events" and "Workflow"/);
   assert.match(plan, /This deviation is accepted \(owner decision 2026-11-12/);
+});
+
+test("the Calendar row is registered, keeps its design slots and the mode still renders its own controls", () => {
+  const row = SLOT_MAP.find((r) => r.modes.includes("calendar"));
+  assert.equal(row.registered, true);
+  assert.deepEqual(slotsOf("calendar"), [1, 2, 3, 4, 5]);
+  assert.equal(MIGRATION.calendar, "pending");
 });

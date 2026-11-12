@@ -249,3 +249,28 @@ test("the typed speed and category specs accept exactly what the CI Quality Cube
     assert.equal(statusParams(new URLSearchParams(`build=${raw}`), definition).snapshot[0], definition.initial[0], raw);
   }
 });
+
+test("calendar is a registered mode that owns date, lang, design and pad; the pending entry is gone", () => {
+  const m = MODE_CATALOG.find((x) => x.id === "calendar");
+  assert.deepEqual([...m.params].sort(), ["date", "design", "lang", "pad"]);
+  assert.equal("calendar" in PENDING_APP_PARAMS, false);
+  assert.equal(PARAM_SPECS.design.perMode, true);
+  const r = parseRoute("?app=calendar&date=2026-02-29&lang=EN&language=de&design=en-3&padding=0&val=3&kiosk=1", registry, "clock");
+  assert.deepEqual(r.app, { id: "calendar", known: true });
+  assert.deepEqual(r.setup, { lang: "en", design: "en-3", pad: false, kiosk: true });
+  assert.deepEqual(r.invalid, ["date"]);
+  assert.deepEqual(r.foreign, ["val"]);
+  assert.equal(serializeRoute({ app: "calendar", setup: { date: "2026-11-12", lang: "en", pad: false } }), "?app=calendar&pad=0&date=2026-11-12&lang=en");
+});
+
+test("the Calendar design is a per-mode value: it leaves with the Calendar and never enters Print, Counter or the 7x7 Calendar", () => {
+  for (const target of MODE_CATALOG.map((x) => x.id).filter((id) => id !== "calendar")) {
+    const got = to(`${base}?app=calendar&design=de-a&lang=de&date=2026-11-12&pad=0`, "calendar", target);
+    assert.equal(got.has("design"), false, target);
+    assert.equal(got.has("lang"), false, target);
+    assert.equal(got.has("date"), false, target);
+  }
+  for (const from of MODE_CATALOG.map((x) => x.id).filter((id) => id !== "calendar")) {
+    assert.equal(to(`${base}?app=${from}&design=de-a&date=2026-01-01&lang=en`, from, "calendar").has("design"), false, from);
+  }
+});
