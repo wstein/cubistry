@@ -7,6 +7,7 @@ module WindowChainLib
 using SHA
 export parse_ym, ym_str, ym_index, month_range, read_month_list, root_month, chain_plan, chain_flags, month_records, write_months,
     read_claims, read_best_effort, best_effort_cell, stop_for_unreached, best_effort_ink, best_effort_art, art_stickers, best_effort_board, best_effort_hall, best_effort_edge_lines, shows_art, chain_header, chain_progress, may_start_edge, stop_reason, read_edges, greedy_count, segment_row, read_segments, layout_input, check_segments_layout,
+    backward_plan, backward_root, backward_export, backward_import, backward_state_index, backward_must_continue,
     BEST_EFFORT_CORNERS, BEST_EFFORT_TEXT, STATUSES, EDGES_HEADER, MONTHS_HEADER, SEGMENTS_HEADER, DEFAULT_DEADLINE_S, YM_MIN, YM_MAX
 
 const YM_MIN=(1900,1)
@@ -138,7 +139,7 @@ without confirmed=both is downgraded to `unknown` (AGENTS.md: UNSAT needs both c
 A produced best-effort month (`best_edges`, the months whose edge carries a wrong cell) is `unknown` with the reason `best_effort_edge_unconfirmed`, its edge and method, and the evidence of the best-effort file;
 a declared one that was not produced says the stop reason and the same evidence.
 """
-function month_records(start,fin,plan,produced,stop;methods,rooted=false,best_edges=Set{Tuple{Int,Int}}(),claims=Dict{Tuple{Int,Int},NTuple{4,String}}(),best=Dict{Tuple{Int,Int},NTuple{3,String}}())
+function month_records(start,fin,plan,produced,stop;methods,rooted=false,backward=false,best_edges=Set{Tuple{Int,Int}}(),claims=Dict{Tuple{Int,Int},NTuple{4,String}}(),best=Dict{Tuple{Int,Int},NTuple{3,String}}())
     np=length(produced)
     np<=length(plan) && all(produced[i]==plan[i] for i in 1:np) || error("produced months are not the chain prefix")
     length(methods)==max(np-1,0) || error("one solver method per edge is required")
@@ -152,12 +153,16 @@ function month_records(start,fin,plan,produced,stop;methods,rooted=false,best_ed
             haskey(best,ym) || error("best-effort edge into $(ym_str(ym)) without a best-effort row")
             push!(rows,(ym_str(ym),"unknown","best_effort_edge_unconfirmed",string(i-1),methods[i-1],best[ym][3]))
         elseif i!==nothing && i<=np
-            reason=i==1 ? "root" : (i==2 && rooted ? "root_edge" : (ym_index(ym)-ym_index(plan[i-1])>1 ? "bridge_edge" : "chain_edge"))
+            reason=i==1 ? "root" : (i==2 && rooted ? "root_edge" : (abs(ym_index(ym)-ym_index(plan[i-1]))>1 ? "bridge_edge" : "chain_edge"))
             push!(rows,(ym_str(ym),"valid",reason,i==1 ? "0" : string(i-1),i==1 ? "-" : methods[i-1],"-"))
         elseif i!==nothing
             haskey(best,ym) ? push!(rows,(ym_str(ym),"unknown",stop,"-","-",best[ym][3])) : push!(rows,(ym_str(ym),"unknown",stop,"-","-","-"))
         else
-            default=ym_index(ym)<ym_index(plan[1]) ? "before_chain_root" : ym_index(ym)>ym_index(plan[end]) ? "after_month_list" : "skipped_gap"
+            default=if backward   # the plan runs from the root (latest month) down to the first member of the list
+                ym_index(ym)<ym_index(plan[end]) ? "before_month_list" : ym_index(ym)>ym_index(plan[1]) ? "after_chain_root" : "skipped_gap"
+            else
+                ym_index(ym)<ym_index(plan[1]) ? "before_chain_root" : ym_index(ym)>ym_index(plan[end]) ? "after_month_list" : "skipped_gap"
+            end
             c=get(claims,ym,nothing)
             if c===nothing
                 push!(rows,(ym_str(ym),"unknown",default,"-","-","-"))
@@ -251,5 +256,89 @@ function check_segments_layout(rows,layout_sha)
         f==layout_sha || error("layout of prior segment $i ($f) differs from the layout of this run ($layout_sha)")
     end
     nothing
+end
+
+# ---- backward mode (direction=backward) -------------------------------------------------------------------------------------------
+# The producer searches from the identity pose of the print (the latest month, S[end]) to earlier months: the plan is the list reversed.
+# Its search-order files (chain.v1/v2 with the identity as source, edges into earlier months) are exported as a forward-reading chain.v3:
+#   source = the earliest month and the digest of its state, `start` = the search words in order (identity pose -> first member),
+#   edges = reversed inverse words (a state of month m_k to the state of the next earlier search month), ending at the identity pose.
+# The checkers read that chain unchanged with CAL7_JOIN_END=identity. The wrong/hall records of a state belong to the forward edge that ends there.
+
+"Search plan of a backward run: the (increasing) month list reversed; the first entry is the identity pose."
+backward_plan(members)=reverse(members)
+"Root of a backward run: the last member of the list. The checker root month stays empty (a free start has no root edge), so a root month is an error."
+function backward_root(members,root_text)
+    isempty(root_text) || error("backward chain: root_month must be empty (the identity pose is the last member $(ym_str(members[end])) of the list)")
+    members[end]
+end
+"File number (1-based, forward reading) of the search snapshot: forward state j is the search snapshot n+2-j (n edges; snapshot 1 is the identity pose)."
+function backward_state_index(n,j)
+    1<=j<=n+1 || error("state number $j outside 1..$(n+1)")
+    n+2-j
+end
+"A best-effort month at the tip of the search is no place to stop: the exported chain starts there and a free start must show its month exactly."
+backward_must_continue(tip,best)=haskey(best,tip)
+
+invert_move(l)=(f=split(l,'\t');length(f)==3 && f[1]=="move" || error("move record: $l");e=parse(Int,f[3]);"move\t$(f[2])\t$(e==2 ? 2 : -e)")
+function chain_blocks(ls,what)
+    i=3;bs=Vector{NamedTuple}()
+    while i<length(ls)
+        startswith(ls[i],"edge\t") || error("edge record expected at line $i of the $what chain")
+        f=split(ls[i],'\t');length(f)==9 || error("edge record of the $what chain has $(length(f)) fields")
+        j=i+1;extra=String[];mv=String[]
+        while j<=length(ls) && ls[j]!="end";startswith(ls[j],"move\t") ? push!(mv,ls[j]) : push!(extra,ls[j]);j+=1;end
+        j<=length(ls) || error("edge block without end in the $what chain")
+        push!(bs,(f=String.(f),extra=extra,moves=mv));i=j+1
+    end
+    ls[end]=="finish" || error("finish row missing in the $what chain")
+    bs
+end
+function source_record(ls)
+    length(ls)>=2 && startswith(ls[2],"source\t") || error("chain source record missing")
+    f=split(ls[2],'\t');length(f)==5 && f[2]==f[4] || error("chain source record: $(ls[2])")
+    String.(f)
+end
+"Forward-reading chain.v3 of a search-order chain (lines incl. `finish`)."
+function backward_export(ls)
+    length(ls)>=3 && ls[1] in ("cubistry.calendar7.chain.v1","cubistry.calendar7.chain.v2") || error("search chain must be chain.v1 or chain.v2")
+    ls[end]=="finish" || error("finish row missing in the search chain")
+    src=source_record(ls);bs=chain_blocks(ls,"search");n=length(bs);n>=1 || error("no edge to export")
+    prev=src[5]
+    for (k,b) in enumerate(bs);b.f[8]==prev || error("edge $k does not start at the end state of the edge before (continuity)");prev=b.f[9];end
+    any(startswith(l,"wrong\t") for l in bs[n].extra) && error("the earliest month $(bs[n].f[2])-$(bs[n].f[3]) is a best-effort month: a free start must show its month exactly")
+    out=["cubistry.calendar7.chain.v3","source\t$(bs[n].f[3])\t$(bs[n].f[2])\t$(bs[n].f[3])\t$(bs[n].f[9])"]
+    start=vcat((b.moves for b in bs)...);push!(out,"start\t$(length(start))");append!(out,start)
+    for k in n:-1:1
+        b=bs[k];y,m=k>=2 ? (bs[k-1].f[2],bs[k-1].f[3]) : (src[3],src[2])
+        push!(out,join(("edge",y,m,b.f[4],b.f[5],b.f[6],b.f[7],b.f[9],b.f[8]),'\t'))
+        k>=2 && append!(out,bs[k-1].extra)
+        append!(out,[invert_move(l) for l in reverse(b.moves)]);push!(out,"end")
+    end
+    push!(out,"finish");out
+end
+"Search-order chain of a forward-reading chain.v3 written by `backward_export` (the prior of a continued backward run)."
+function backward_import(ls)
+    length(ls)>=4 && ls[1]=="cubistry.calendar7.chain.v3" || error("a backward prior must be a chain.v3")
+    ls[end]=="finish" || error("finish row missing in the prior chain")
+    src=source_record(ls);length(ls)>=3 && startswith(ls[3],"start\t") || error("the prior chain has no start block")
+    a=split(ls[3],'\t');length(a)==2 || error("start record");n0=parse(Int,a[2]);start=ls[4:3+n0]
+    length(start)==n0 && all(startswith(l,"move\t") for l in start) || error("start word is shorter than its record")
+    body=vcat(ls[1:2],ls[4+n0:end]);bs=chain_blocks(body,"prior");n=length(bs);n>=1 || error("no edge in the prior chain")
+    bs[1].f[8]==src[5] || error("source digest differs from the first edge (continuity of the start state)")
+    for j in 1:n-1;bs[j].f[9]==bs[j+1].f[8] || error("edge $(j+1) does not start at the end state of the edge before (continuity)");end
+    any(startswith(l,"wrong\t") for l in bs[n].extra) && error("the identity pose is exact: best-effort month at the end of the prior chain")
+    words=[[invert_move(l) for l in reverse(bs[n-k+1].moves)] for k in 1:n]
+    vcat(words...)==start || error("the start word is not the search words in order")
+    search=Vector{String}();best=false
+    out=String[];push!(out,"")   # header decided below
+    push!(out,"source\t$(bs[n].f[3])\t$(bs[n].f[2])\t$(bs[n].f[3])\t$(bs[n].f[9])")
+    for k in 1:n
+        b=bs[n-k+1];y,m=k<n ? (bs[n-k].f[2],bs[n-k].f[3]) : (src[3],src[2]);ex=k<n ? bs[n-k].extra : String[]
+        any(startswith(l,"wrong\t") for l in ex) && (best=true)
+        push!(out,join(("edge",y,m,b.f[4],b.f[5],b.f[6],b.f[7],b.f[9],b.f[8]),'\t'));append!(out,ex)
+        append!(out,words[k]);push!(out,"end")
+    end
+    out[1]=chain_header(best);push!(out,"finish");out
 end
 end
