@@ -440,6 +440,69 @@ body:has(> aside + .shell) > .shell {
 .shell .shell-btn-row > * {
   flex: 1 1 0;
 }
+/* Chip radio group and stop slider (src/apps/shell/choice-controls.ts). Chips carry a symbol and a word, so color is
+   never the only signal; tap targets are at least 44 px and the row wraps instead of overflowing. Tones are the state
+   colors of the CI Quality Cube print (docs/STATUS_CUBE.md); the checked chip is filled with white text. */
+.shell .shell-field-label {
+  color: var(--ink);
+  font: 500 var(--t-sm) var(--f-ui);
+}
+.shell .shell-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.shell .shell-slot-body .shell-choice {
+  --tone: var(--ink-2);
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--sp-3);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.shell .shell-choice[data-tone="open"] { --tone: #56616a; }
+.shell .shell-choice[data-tone="running"] { --tone: #145a91; }
+.shell .shell-choice[data-tone="ok"] { --tone: #187044; }
+.shell .shell-choice[data-tone="error"] { --tone: #b12c2c; }
+.shell .shell-choice[data-tone="blocked"] { --tone: #855600; }
+.shell .shell-choice-symbol {
+  color: color-mix(in srgb, var(--tone) 55%, var(--ink));
+  font-weight: 700;
+}
+.shell .shell-slot-body .shell-choice[aria-checked="true"] {
+  border-color: var(--tone);
+  background: var(--tone);
+  color: #fff;
+}
+.shell .shell-choice[aria-checked="true"] .shell-choice-symbol {
+  color: inherit;
+}
+.shell .shell-slot-body .shell-choice:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.shell .shell-stop-slider {
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  accent-color: var(--accent);
+}
+.shell .shell-stop-ends {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  color: var(--ink-2);
+  font: var(--t-sm) var(--f-ui);
+}
+.shell .shell-stop-value {
+  color: var(--ink);
+  font: 500 var(--t-sm) var(--f-num);
+}
 .shell .shell-quick-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
