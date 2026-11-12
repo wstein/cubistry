@@ -5,7 +5,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
+import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 const text = readFileSync(new URL("../.github/workflows/window-chain.yml", import.meta.url), "utf8");
 const lines = text.split("\n");
 
@@ -184,9 +187,33 @@ test("layout input reaches the producer too, and prepare refuses early when the 
   const e = p.indexOf(exp), j = p.findIndex(x => x.startsWith("timeout 65m julia"));
   assert.ok(e >= 0 && e < j, "produce exports the layout before the producer starts");
   const prep = runLines(step("prepare", "Check research commit"));
-  const g = 'git grep -q CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/window_chain.jl" || fail "layout_path is set, but the producer at research_ref does not read CAL7_WINDOW_LAYOUT"';
-  const g2 = 'git grep -q CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/run_checks.sh" || fail "layout_path is set, but run_checks.sh at research_ref does not read CAL7_WINDOW_LAYOUT"';
+  const g = 'git grep -qw CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/window_chain.jl" || fail "layout_path is set, but the producer at research_ref does not read CAL7_WINDOW_LAYOUT"';
+  const g2 = 'git grep -qw CAL7_WINDOW_LAYOUT "$SHA" -- "$WC/run_checks.sh" || fail "layout_path is set, but run_checks.sh at research_ref does not read CAL7_WINDOW_LAYOUT"';
   for (const x of [g, g2]) assert.ok(prep.includes('[ -z "$LAYOUT_PATH" ] || ' + x), x);
+});
+test("the prepare gate matches the variable by word: a file that only names CAL7_WINDOW_LAYOUT_SHA256 does not pass", () => {
+  const gates = runLines(step("prepare", "Check research commit")).filter(l => l.startsWith('[ -z "$LAYOUT_PATH" ] || git grep'));
+  assert.equal(gates.length, 2);
+  const repo = mkdtempSync(join(tmpdir(), "wc-gate-"));
+  const wc = "research/x";
+  mkdirSync(join(repo, wc), { recursive: true });
+  const git = (...a) => execFileSync("git", ["-C", repo, "-c", "user.name=t", "-c", "user.email=t@example.com", ...a]).toString().trim();
+  git("init", "-q");
+  const commit = (producer, checks) => {
+    writeFileSync(join(repo, wc, "window_chain.jl"), producer); writeFileSync(join(repo, wc, "run_checks.sh"), checks);
+    git("add", "-A"); git("commit", "-q", "-m", "x"); return git("rev-parse", "HEAD");
+  };
+  const gate = (sha, layout) => spawnSync("bash", ["-c", 'fail() { echo "$1"; exit 1; }; ' + gates.join("\n")], { cwd: repo, env: { ...process.env, SHA: sha, WC: wc, LAYOUT_PATH: layout } });
+  const both = commit("x = ENV[\"CAL7_WINDOW_LAYOUT\"]\n", "layout=${CAL7_WINDOW_LAYOUT:-d}\n");
+  assert.equal(gate(both, "l.tsv").status, 0, "both files name the variable");
+  assert.equal(gate(both, "").status, 0, "no layout input: no gate");
+  const pinOnly = commit("x = ENV[\"CAL7_WINDOW_LAYOUT\"]\n", "pin=${CAL7_WINDOW_LAYOUT_SHA256:-}\n");
+  const r = gate(pinOnly, "l.tsv");
+  assert.equal(r.status, 1, "run_checks.sh that only names the pin must not pass");
+  assert.match(r.stdout.toString(), /run_checks\.sh at research_ref/);
+  const pinOnlyProducer = commit("x = ENV[\"CAL7_WINDOW_LAYOUT_SHA256\"]\n", "layout=${CAL7_WINDOW_LAYOUT:-d}\n");
+  assert.match(gate(pinOnlyProducer, "l.tsv").stdout.toString(), /producer at research_ref/);
+  assert.equal(gate(pinOnly, "").status, 0);
 });
 test("the layout pin is recorded in VERIFIED.txt and the summary, and a continuation compares it", () => {
   assert.ok(step("verify", "Package artifact").run.includes('echo "layout_sha256=${LAYOUT_SHA:--}"'));
