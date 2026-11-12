@@ -228,7 +228,7 @@ with `CAL7_WINDOW_LAYOUT_SHA256` (the names `run_checks.sh` (#435; test `check_l
 the pin is required, a wrong SHA-256 is an error before any output, and the layout SHA-256 is recorded in `PROGRESS.txt`, `segments.tsv` and the
 `beam_edge.jl` result line. A resumed chain (`prior=`) must carry the same layout SHA-256 in its earlier segments. Test: `test_window_chain_layout.jl`
 (unit tests, both producers as processes, one real edge into April 2027 with AP|RIL and a resume with the same and another layout; about 2 minutes with 4 threads).
-A `segments.tsv` of an older run has 10 columns and is rejected by `prior=` (no such run exists). Workflow input of the layout: PR #436.
+`beam_edge.jl` also takes a month list (`CAL7_WINDOW_MONTHS`) instead of `WINDOW_END`. A `segments.tsv` of an older run has 10 columns and is rejected by `prior=` (no such run exists). Workflow input of the layout: PR #436.
 
 Inputs of the workflow: `research_ref` (a commit on `research/cube-display-feasibility`; the prepare job rejects any other commit),
 `months_path` and `months_sha256`, `root_month`, `print_path` and `print_sha256`, optional `best_effort_path`, `claims_path`, `start`,
