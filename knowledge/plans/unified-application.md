@@ -122,7 +122,7 @@ This is an intentional breaking URL change. Before publication, README, `docs/AP
 
 ## Picture Cube host plan (proposal, 2026-11-11)
 
-This section is the plan for the Picture Cube inside the host. It extends the rows `playground.html` and `picture3.html`, the `Pictures` state row and slices P1/P2 above; it is not a second plan. It records the owner decisions of 2026-11-10 and 2026-11-11 (Picture Cube for sizes 2 to 7, default size 3, plan before stack PR 2; the 404-without-shims policy comes from the amendment above and is still to be confirmed against the owner's "redirect" stack notes, D5) and proposes the rest. Nothing here authorizes implementation; the decisions still open at the end of the section are D4 to D9 (D5 needs his explicit confirmation).
+This section is the plan for the Picture Cube inside the host. It extends the rows `playground.html` and `picture3.html`, the `Pictures` state row and slices P1/P2 above; it is not a second plan. It records the owner decisions of 2026-11-10 and 2026-11-11 (Picture Cube for sizes 2 to 7, default size 3, plan before stack PR 2, 404 without redirects for the old URLs, D5) and proposes the rest. Nothing here authorizes implementation; the decisions still open at the end of the section are D4 and D6 to D9.
 
 Markers: **O** owner decision (MCQ 2026-11-11), **V** verified in the repository at `origin/main` `a255079e` (file:line), **P** proposed, **U** UNKNOWN (not measured or not found). Stack PR 1 (size control and name, #420) is merged **V** (`src/apps/playground/size.ts:4-11`, `tests/browser/playground.spec.mjs:321`).
 
@@ -148,7 +148,7 @@ Markers: **O** owner decision (MCQ 2026-11-11), **V** verified in the repository
 
 **Storage ownership (P).** The mount owns the picture library. **V** the existing library is the IndexedDB database `cubistry-picture-sets` version 1, 10 sets and 64 MB at most (`src/apps/picture3/storage.ts:2,17`). Reuse that database and record format so saved sets survive the migration (persistence row above). A face set is size-independent (**V** `src/apps/playground/themes.ts:1-7,66-80`: slicing happens per cube), so the current pictures and the library are shared by all sizes; only sessions are per cube. This narrows the wording "cube-specific" of the `Pictures` row: see D4. The IndexedDB connection is opened at mount, closed on dispose, a failed open leaves the pictures usable (as today, `src/apps/picture3/storage.ts:12`).
 
-**Old URLs (amendment above; D5 open).** `playground.html` and `picture3.html` are deleted and return 404; no redirect, alias or compatibility page (this plan, amendment, first bullets). The merged PR 1 text and the four-PR brief mention "redirects" in PR 4; that item conflicts with this plan and is not decided: the owner's own 2026-11-11 stack notes also mention "redirect", so D5 needs his explicit confirmation before PR 4. The canonical entries are `index.html?app=playground&size=2` and `index.html?app=playground&size=3`; there is no `picture3` id.
+**Old URLs (owner decision 2026-11-12, D5; the amendment above says the same).** `playground.html` and `picture3.html` are deleted and return 404; no redirect, alias or compatibility page (this plan, amendment, first bullets). **O** The owner decided on 2026-11-12 (D5) that both URLs return 404 after the move and that there is no redirect; the "redirect" in the merged PR 1 text, the four-PR brief and his 2026-11-11 stack notes is void. The canonical entries are `index.html?app=playground&size=2` and `index.html?app=playground&size=3`; there is no `picture3` id.
 
 ### 2. Mapping of stack PR 2 to 4 onto the host mount
 
@@ -240,7 +240,7 @@ Docs that change with the slices: `docs/PICTURE_PLAYGROUND.md:81-97` ("3x3 evalu
 | D2 | Order: mount first or page first? | Decided by the owner 2026-11-11: M2, mount first as an extra PR before stack PR 2; PR 2 waits for H1 |
 | D3 | Sizes 4 to 7 | Decided by the owner 2026-11-11: E0 now (suitability display only, no solver claim); E1 is decided after stack PR 4 |
 | D4 | One picture set and library shared by all sizes, sessions per cube (narrows "cube-specific" in the `Pictures` row)? | Yes, shared |
-| D5 | Confirm: no redirect in PR 4 (404 for `playground.html` and `picture3.html`), the "redirect" item of the four-PR brief is void? | Yes; needs the owner's explicit confirmation because his 2026-11-11 stack notes mention "redirect" |
+| D5 | Old URLs `playground.html` and `picture3.html` after the move | Decided by the owner 2026-11-12: 404, no redirect; the "redirect" in the 2026-11-11 stack notes is void |
 | D6 | One image model: the `FaceSet` of the 2x2 page, with the crop editor producing faces for it; the second pipeline of picture3 goes away? | Yes |
 | D7 | Size switch while a turn, solve or load is pending: disabled (not cancel)? | Disabled |
 | D8 | Size switch history entry: replace now, push once the route-update hook exists? | Yes |
