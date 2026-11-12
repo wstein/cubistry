@@ -33,7 +33,6 @@ export default defineConfig({
         playground: fileURLToPath(new URL("./playground.html", import.meta.url)),
         status: fileURLToPath(new URL("./status.html", import.meta.url)),
         print: fileURLToPath(new URL("./print.html", import.meta.url)),
-        calendar: fileURLToPath(new URL("./calendar.html", import.meta.url)),
         msTimer: fileURLToPath(new URL("./ms-timer.html", import.meta.url)),
         index: fileURLToPath(new URL("./index.html", import.meta.url)),
         counter: fileURLToPath(new URL("./counter.html", import.meta.url)),

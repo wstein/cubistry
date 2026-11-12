@@ -129,7 +129,7 @@ test("the catalog lists calendar as a one-cube mode of the Apps group with the c
   assert.ok(createRegistry(MODE_CATALOG.map((x) => ({ ...x, mount: async () => {} }))).has("calendar"));
 });
 
-test("the host lists the mode, loads its mount lazily and no legacy page or Vite input remains", () => {
+test("the host lists the mode and loads its mount lazily", () => {
   assert.match(readFileSync("index.html", "utf8"), /<option value="calendar">[^<]*Calendar[^<]*<\/option>/);
   const host = readFileSync("src/chronocube.mjs", "utf8");
   assert.match(host, /calendar: \(isCurrent, params\) => initCalendarMode\(isCurrent, params\)/);
@@ -138,8 +138,6 @@ test("the host lists the mode, loads its mount lazily and no legacy page or Vite
   const mount = readFileSync("src/apps/calendar/mount.ts", "utf8");
   assert.doesNotMatch(mount, /^import (?!type)[^;]*optimizer/m, "the mount takes the optimizer from its env");
   assert.match(readFileSync("src/main.mjs", "utf8"), /"calendar": "index\.html\?app=calendar"/);
-  assert.ok(!existsSync("calendar.html"));
-  assert.doesNotMatch(readFileSync("vite.config.mjs", "utf8"), /calendar\.html/);
 });
 
 test("printOf reads lang, language and design like the page did; anything unknown is German A", () => {

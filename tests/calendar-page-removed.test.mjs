@@ -32,11 +32,14 @@ test("no legacy page offers calendar.html and each chooser links to the host mod
   assert.match(read("print.html"), /href="index\.html\?app=calendar"/);
 });
 
+// These two name the URL only to assert that it is gone.
+const ASSERTS_ABSENCE = new Set(["tests/calendar-page-removed.test.mjs", "tests/pages/production.spec.mjs"]);
+
 test("no tracked file outside the plans names calendar.html as a way to open the calendar", () => {
   const tracked = execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" }).split("\0").filter(Boolean);
   const hits = [];
   for (const file of tracked) {
-    if (/^knowledge\//.test(file) || file === "tests/calendar-page-removed.test.mjs") continue;
+    if (/^knowledge\//.test(file) || ASSERTS_ABSENCE.has(file)) continue;
     if (/\.(png|jpe?g|webp|svg|woff2?|bin|pdf|ico|wasm|gz|zip|json|ttf|otf|mp4|webm)$/i.test(file)) continue;
     if (!existsSync(file)) continue;
     // A sentence may say that the former page is gone.
