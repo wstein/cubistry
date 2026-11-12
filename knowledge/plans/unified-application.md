@@ -332,6 +332,7 @@ Slots the design fills per registered mode (`src/apps/shell/slot-map.ts`, compar
 |---|---|---|
 | `clock` | 1, 2, 3, 4, 5 | pending |
 | `ms-timer` | 1, 2, 3, 4, 5 | pending |
+| `calendar` | 1, 2, 3, 4, 5 | pending |
 | `hm-clock` | 1, 2, 3, 4, 5 | pending |
 | `tenth` | 1, 2, 3, 4 | migrated |
 | `counter` | 1, 2, 3, 4, 5 | pending |
@@ -443,7 +444,7 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | `kiosk`, `presentation` | `src/main.mjs:1109`, `src/calendar.mjs:363`, `src/ms-timer.mjs:451`, `src/chronocube.mjs:1182` | all of these |
 | `nerd` | `src/apps/shell/slot-api.ts` (`nerdOpenFromSearch`) | all modes (opens the Nerd drawer; the aliases `dev` and `expert` of the former Clock page are not read) |
 | `hours-speed`, `minutes-speed`, `seconds-speed` | `src/apps/clock/params.ts` | clock mode |
-| `date`, `lang`, `language`, `design` | `src/calendar.mjs:344`, `:331` | calendar |
+| `date`, `lang`, `language`, `design` | `src/calendar.mjs:344`, `:331`, `src/apps/calendar/mount.ts` | calendar |
 | `design` | `src/print.mjs:75` | print |
 | `year`, `month` | `src/apps/calendar7/month-view.ts` (`chooseMonth`) | 7x7 calendar mode (`calendar7`) |
 | `outer` | `src/apps/calendar7/geometry.ts` (`outerOverride`) | 7x7 calendar mode (`calendar7`; local look at another outer layer factor, 1.2 to 2.4) |
