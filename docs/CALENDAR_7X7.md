@@ -2,7 +2,7 @@
 
 **Status: research candidate, not certified.** This page describes the data, the
 pin, the replay test and the user interface (month sheet and 3D cube) of the English 7×7 monthly
-calendar cube. The 3×3 [calendar page](../calendar.html) and its
+calendar cube. The 3×3 [calendar mode](CALENDAR_CUBES.md) (`index.html?app=calendar`) and its
 [documentation](CALENDAR_CUBES.md) are unchanged.
 
 ## The calendar view

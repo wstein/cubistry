@@ -36,7 +36,7 @@ Counts are **tracked UTF-8 text files / literal substring occurrences**, obtaine
 | Existing root document | Current entry / public functions | Canonical destination and port gap | Parity tests and retirement dependency | Files / occurrences |
 |---|---|---|---|---|
 | `index.html` | `src/index.mjs`; landing, catalog, studio host | Keep the only product HTML host; no `app` means landing; integrate utility views without a second router | `landing`, `app-router`, `shell-router-integration`, Pages production; host foundation first | 77 / 226 |
-| `calendar.html` | `src/calendar.mjs`; DE A/EN 3 physical prints, inspect date, ±day, Today/live tick, English padding, move speed, route/progress/errors, presentation | `index.html?app=calendar`; mount existing model/controller/viewer/optimizer in slots; remove document globals and one-time window initialization; distinguish it from monthly `calendar7` | Browser `calendar`, `calendar-viewpoint`, `calendar-optimizer`; Pages `calendar`; preserve date bounds, actual poses and pinned runtime hashes | 30 / 35 |
+| `calendar.html` (deleted, stage 4) | `src/calendar.mjs` (deleted); DE A/EN 3 physical prints, inspect date, ±day, Today/live tick, English padding, move speed, route/progress/errors, presentation | `index.html?app=calendar`; mount existing model/controller/viewer/optimizer in slots; remove document globals and one-time window initialization; distinguish it from monthly `calendar7` | Browser `calendar`, `calendar-viewpoint`, `calendar-optimizer`; Pages `calendar`; preserve date bounds, actual poses and pinned runtime hashes | 30 / 35 |
 | `counter.html` | `src/main.mjs`; certified counter, Set/Run/Stop, ±1/±10, target, Wrap, leading zero/physical print variant, move counts/speed, restore, family chooser | `index.html?app=counter`; replace thin `initCounterMode`; port controls, setup-mode distinction, interruption/restore and parameter reader; remove this shared legacy host last in its family | `certified-counter`, `counter`, `counter-blank-top`, `cube-first-ui`, `leading-zero`, `target-interruption`, `move-progress`, shared-solver and Pages production | 45 / 142 |
 | `five-second-timer.html` | `src/main.mjs`; countdown/stopwatch, duration, start/pause/resume/reset, speed, schedule/sync/failure | `index.html?app=five-second-timer`; replace thin timer controls, retain driver and certified five-second route | `five-second-timer`, presentation/timing and trace replay; family extraction before deleting this page | 18 / 20 |
 | `hm-one-cube.html` | `src/main.mjs`; H/M unit/range/direction, Set/Run/Reset/steps, lettering, speed/format | `index.html?app=hm-one-cube`; full H/M single-cube controls and query/state adapter | `hm-one-cube`, family interruption/lettering and physical state regressions | 17 / 19 |
@@ -440,14 +440,14 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | `timer-speed`, `rate` | `src/main.mjs:1099` | single-cube pages |
 | `lettering` | `src/main.mjs:63`, `:1059`, `src/apps/clock/params.ts` | single-cube pages, clock mode |
 | `display`, `font` | `src/main.mjs:688`, `:1066` | single-cube pages |
-| `pad`, `padding` | `src/main.mjs:1086`, `src/calendar.mjs:340` | single-cube pages, calendar |
+| `pad`, `padding` | `src/main.mjs:1086`, `src/apps/calendar/mount.ts` | single-cube pages, calendar |
 | `marker` | `src/main.mjs:1078` | single-cube pages |
 | `print` | `src/main.mjs:1757` | single-cube pages |
 | `autoplay`, `run` | `src/main.mjs:1117`, `src/ms-timer.mjs:455` | single-cube pages, M/S Timer |
-| `kiosk`, `presentation` | `src/main.mjs:1109`, `src/calendar.mjs:363`, `src/ms-timer.mjs:451`, `src/chronocube.mjs:1182` | all of these |
+| `kiosk`, `presentation` | `src/main.mjs:1109`, `src/ms-timer.mjs:451`, `src/chronocube.mjs:1182` | all of these |
 | `nerd` | `src/apps/shell/slot-api.ts` (`nerdOpenFromSearch`) | all modes (opens the Nerd drawer; the aliases `dev` and `expert` of the former Clock page are not read) |
 | `hours-speed`, `minutes-speed`, `seconds-speed` | `src/apps/clock/params.ts` | clock mode |
-| `date`, `lang`, `language`, `design` | `src/calendar.mjs:344`, `:331`, `src/apps/calendar/mount.ts` | calendar |
+| `date`, `lang`, `language`, `design` | `src/apps/calendar/mount.ts` | calendar |
 | `design` | `src/print.mjs:75` | print |
 | `year`, `month` | `src/apps/calendar7/month-view.ts` (`chooseMonth`) | 7x7 calendar mode (`calendar7`) |
 | `outer` | `src/apps/calendar7/geometry.ts` (`outerOverride`) | 7x7 calendar mode (`calendar7`; local look at another outer layer factor, 1.2 to 2.4) |
