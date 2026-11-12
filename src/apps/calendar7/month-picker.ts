@@ -107,6 +107,9 @@ export class MonthPicker {
     host.ownerDocument.addEventListener("scroll", this.position, true);host.ownerDocument.defaultView?.addEventListener("resize", this.position);
   }
   setValue(value: YearMonth | null): void {
+    const v = this.model.value;
+    // Re-applying the shown value (an async apply after data loads) must not close a picker the user opened meanwhile.
+    if (v === null ? value === null : value !== null && v.year === value.year && v.month === value.month) return;
     this.request++;this.model.value = value ? { ...value } : null;this.updateLabel();
     // A navigation elsewhere closes the old browsing transaction without stealing its focus.
     this.close(false);
