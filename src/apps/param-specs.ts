@@ -87,7 +87,8 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
   "seconds-speed": { parse: num(0.001, 100_000) },
   date: { parse: isoDate },
   lang: { aliases: ["language"], parse: (raw) => (/^[A-Za-z]{2,3}(-[A-Za-z0-9]+)*$/.test(raw) ? raw.toLowerCase() : undefined) },
-  design: { parse: word },
+  // Calendar and Print both own `design`, and a design id of one is not valid in the other.
+  design: { parse: word, perMode: true },
   year: { parse: int(1, 9999), perMode: true },
   month: { parse: int(1, 12), perMode: true },
   outer: { parse: num(1.2, 2.4) },
@@ -97,7 +98,6 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
   scheme: { parse: word },
   plasticity: { parse: num(0, 1) },
   size: { parse: int(2, 7) },
-  cube: { parse: oneOfNumbers([2, 3]) },
   // Global flags: every app reads them, so they are never owned by one mode and survive a switch.
   // The shell opens the Nerd drawer for `nerd=1` only; every other value leaves it closed.
   nerd: { parse: (raw) => raw === "1", default: false },
@@ -114,7 +114,8 @@ export const GLOBAL_PARAMS: readonly string[] = ["nerd", "kiosk"];
  */
 export const PENDING_APP_PARAMS: Readonly<Record<string, readonly string[]>> = {
   calendar: ["date", "lang", "design", "pad"],
-  playground: ["size", "cube"],
+  playground: ["size"],
+  print: ["design"],
 };
 
 export const names = (key: string): string[] => [PARAM_SPECS[key]?.name ?? key, ...(PARAM_SPECS[key]?.aliases ?? [])];
