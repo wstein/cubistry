@@ -32,7 +32,6 @@ test("all navigation selects use clean HTML URLs for single-cube applications", 
   const htmlFiles = [
     "counter.html",
     "ms-timer.html",
-    "calendar.html",
     "playground.html",
     "picture3.html",
     "status.html",

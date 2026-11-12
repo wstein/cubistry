@@ -1,11 +1,11 @@
 # German and English calendar cubes
 
 The Calendar mode (`index.html?app=calendar`, chooser entry "Calendar") implements #63 with two
-separate fixed 3×3 prints. The former page [calendar.html](../calendar.html) remains until a follow-up removes it.
+separate fixed 3×3 prints. The former page `calendar.html` is removed; its URL answers 404 and has no redirect.
 URL parameters: `date` (`YYYY-MM-DD`; absent or `today` follows the local date), `lang` (`de` or
 `en`; aliases `language`, `design`), `pad` (`0` removes the leading zero in English; alias `padding`).
 The mode loads its planner and solver bundle only when it opens, and `design` does not follow an app switch.
-The mode mounts the existing calendar viewer; moving it onto the shared view is separate work. They are not a bilingual print and do not replace the existing counters,
+The mode mounts the existing calendar viewer; moving it onto the shared view is separate work. The two prints are not a bilingual print, and the mode does not replace the existing counters,
 timers, or live clock.
 
 | Print     | Top row                                        | Middle row                 | Bottom row                 |
