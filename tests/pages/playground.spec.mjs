@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-test("built playground resolves picture tiles and authenticated solver under project base", async ({
+test("built playground mode resolves picture tiles and authenticated solver under project base", async ({
   page,
 }) => {
   const errors = [],
@@ -14,27 +14,27 @@ test("built playground resolves picture tiles and authenticated solver under pro
   await page.goto("./counter.html");
   await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
   await page.locator("#application").selectOption("playground");
-  // Selecting the application starts a full page navigation. In three Pages runs this URL check
+  // Selecting the application starts a full page navigation to the host mode. In three Pages runs this URL check
   // failed at the 5 s default with `Received string: ""` while the log showed "waiting for navigation
   // to finish". Those runs took 12.9-13.3 s for the whole test; five passing runs took 10.3-14.8 s.
   // The cause is unknown (no trace was uploaded), so 15 s is a bounded allowance, not a diagnosis.
-  await expect(page).toHaveURL(/\/cubistry\/playground.html$/, {
+  await expect(page).toHaveURL(/\/cubistry\/index\.html\?app=playground$/, {
     timeout: 15000,
   });
-  await expect(page.locator("#cube")).toHaveAttribute("data-ready", "true");
-  await page.locator("#notation").fill("R L'");
-  await page.locator("#notation").press("Enter");
-  await expect(page.locator("#cube")).toHaveAttribute(
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-ready", "true");
+  await page.locator("#playground-notation").fill("R L'");
+  await page.locator("#playground-notation").press("Enter");
+  await expect(page.locator("#playground-cube")).toHaveAttribute(
     "data-equivalent",
     "true",
   );
-  await expect(page.locator("#cube")).toHaveAttribute("data-exact", "false");
-  await page.locator("#solve").click();
-  await expect(page.locator("#cube")).toHaveAttribute(
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "false");
+  await page.locator('[data-region="primary-action"] button').click();
+  await expect(page.locator("#playground-cube")).toHaveAttribute(
     "data-solver",
     "Verified",
   );
-  await expect(page.locator("#cube")).toHaveAttribute("data-exact", "true");
+  await expect(page.locator("#playground-cube")).toHaveAttribute("data-exact", "true");
   await expect(page.locator("canvas")).toHaveCount(1);
   expect(requests.some((p) => p.startsWith("/cubistry/playground/F_"))).toBe(
     true,
