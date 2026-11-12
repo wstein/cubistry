@@ -44,7 +44,7 @@ import { type HomeFace, faceEdgeFillsByHome, faceFillsByHome, homeFacesOf, schem
 import { type ColorScheme, type BannerStyle, DEFAULT_SCHEME, namesGround, parseBannerStyle, schemeById, withBannerStyle } from "./schemes.ts";
 import { CALENDAR7_SIZE, outerLayerWidth, bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, unitGridTileOf } from "./geometry.ts";
 import { type Layout, type NameWords, NAME_WORDS, printNameWords } from "./layout.ts";
-import { drawFace, drawSticker, drawWrongCell, wrongStripEdge, type WrongEdge, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileEdgeColors, tileRoles, type Surface, type WrongCellContext } from "./sticker-art.ts";
+import { drawFace, drawSticker, drawWrongCell, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileEdgeColors, tileRoles, type Surface, type WrongCellContext } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
@@ -149,7 +149,7 @@ export class Calendar7Viewer implements StageView {
   private builtByHome = false;
   /** The active scheme crossed the home-tint boundary during a move: the cube is rebuilt at its end. */
   private homeStale = false;
-  private art: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; text: string; ink: string; tile?: FaceTile; wrong?: boolean; wrongEdge?: WrongEdge }[] = [];
+  private art: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; text: string; ink: string; tile?: FaceTile; wrong?: boolean }[] = [];
   /** Sticker meshes of the cells that differ from the board (best effort): their screen position is published as `data-c7-wrong`. */
   private wrongMeshes: THREE.Object3D[] = [];
   /** Reused every sync: frames are rewritten in place, so a move allocates no frame objects. */
@@ -318,7 +318,7 @@ export class Calendar7Viewer implements StageView {
     }
     this.bodyStale = true;
     for (const a of this.art) {
-      this.draw(a.canvas, a.text, a.ink, a.tile, a.wrong, a.wrongEdge);
+      this.draw(a.canvas, a.text, a.ink, a.tile, a.wrong);
       a.texture.needsUpdate = true;
     }
     this.applyBodyColor();
@@ -359,19 +359,19 @@ export class Calendar7Viewer implements StageView {
   setFont(font: LoadedFont): void {
     if (this.destroyed || this.font === font) return;
     this.font = font;
-    for (const a of this.art) { this.draw(a.canvas, a.text, a.ink, a.tile, a.wrong, a.wrongEdge); a.texture.needsUpdate = true; }
+    for (const a of this.art) { this.draw(a.canvas, a.text, a.ink, a.tile, a.wrong); a.texture.needsUpdate = true; }
     this.dirty = true;
   }
 
   private nameWords: NameWords = NAME_WORDS;
 
-  private draw(canvas: HTMLCanvasElement, text: string, ink: string, tile?: FaceTile, wrong = false, wrongEdge: WrongEdge = "bottom"): void {
+  private draw(canvas: HTMLCanvasElement, text: string, ink: string, tile?: FaceTile, wrong = false): void {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     const scheme = schemeForHome(this.scheme, this.homeOf?.get(canvas)); // the tint of the stone's home face (Rubik-Tint only)
     if (this.font) drawFontSticker(ctx, text, ink, this.font, scheme, this.surface, undefined, this.layout, tile, this.nameWords);
     else if (this.surface === "face") drawFace(ctx, text, ink, undefined, scheme, this.layout, tile, this.nameWords);
     else drawSticker(ctx, text, ink, undefined, scheme, this.layout);
-    if (wrong) drawWrongCell(ctx as unknown as WrongCellContext, canvas.width, canvas.height, tile, wrongEdge);
+    if (wrong) drawWrongCell(ctx as unknown as WrongCellContext, canvas.width, canvas.height, tile);
   }
 
   /** The studio and the camera follow the cube size of the layout (the names layout is a larger cube: thick outer layers). */
@@ -431,16 +431,15 @@ export class Calendar7Viewer implements StageView {
       const tile = widths ? unitGridTileOf(pose.pos.subarray(3 * i, 3 * i + 3), pose.normal.subarray(3 * i, 3 * i + 3), pose.up.subarray(3 * i, 3 * i + 3), widths) : undefined;
       this.tiles[i] = tile;
       const isWrong = this.wrongIds.has(i);
-      const wrongEdge = isWrong ? wrongStripEdge(pose.up.subarray(3 * i, 3 * i + 3)) : undefined;
-      const key = `${isWrong ? `wrong|${wrongEdge}|` : ""}${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}|${tile.band.l},${tile.band.r},${tile.band.t},${tile.band.b}` : ""}${byHome ? `|home:${this.homes[i]}` : ""}`; // one surface per configure: the key needs no surface
+      const key = `${isWrong ? "wrong|" : ""}${printing.ink[i]}|${printing.text[i]}${tile ? `|${tile.w}x${tile.h}|${tile.band.l},${tile.band.r},${tile.band.t},${tile.band.b}` : ""}${byHome ? `|home:${this.homes[i]}` : ""}`; // one surface per configure: the key needs no surface
       let material = byKey.get(key);
       if (!material) {
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = tileCanvasSize(tile);
         if (byHome) this.homeOf.set(canvas, this.homes[i]);
-        this.draw(canvas, printing.text[i], printing.ink[i], tile, isWrong, wrongEdge);
+        this.draw(canvas, printing.text[i], printing.ink[i], tile, isWrong);
         const texture = new THREE.CanvasTexture(canvas);
-        this.art.push({ canvas, texture, text: printing.text[i], ink: printing.ink[i], tile, wrong: isWrong, wrongEdge });
+        this.art.push({ canvas, texture, text: printing.text[i], ink: printing.ink[i], tile, wrong: isWrong });
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = anisotropy;
         material = createStickerMaterial(texture);

@@ -542,7 +542,8 @@ export function drawFace(
 }
 
 /** A display mismatch overlay; it makes no reachability or UNSAT claim. */
-export const WRONG_CELL = { hatch: "#5b5b5b", halo: "#ffffff" } as const;
+/** Translucent strokes: the printed numeral stays readable through the hatch; the red strike-through is thin. */
+export const WRONG_CELL = { hatch: "rgba(91, 91, 91, 0.8)", halo: "rgba(255, 255, 255, 0.75)", strike: "rgba(208, 2, 27, 0.85)" } as const;
 /** Minimal 2D context the drawing needs (a recording fake in the tests). */
 export interface WrongCellContext {
   strokeStyle: string | CanvasGradient | CanvasPattern;
@@ -559,31 +560,24 @@ export interface WrongCellContext {
 }
 /** Number of hatch lines across a tile of the width `w` (one per `w / HATCH_LINES`). */
 export const HATCH_LINES = 10;
-export type WrongEdge = "bottom" | "left" | "top" | "right";
-/** Texture edge that appears at the logical calendar front's bottom. */
-export function wrongStripEdge(up: ArrayLike<number>): WrongEdge {
-  const angle = IMAGE_UPS.findIndex(v => v.every((value, i) => value === up[i]));
-  if (angle < 0) throw new Error("mismatch sticker has no front image orientation");
-  return (["bottom", "left", "top", "right"] as const)[angle];
-}
-/** Bottom tenth of the actual flat face in the display frame, inset from the bevel. */
-export function wrongStripRect(w: number, h: number, tile?: FaceTile, edge: WrongEdge = "bottom"): { x: number; y: number; w: number; h: number } {
+/** The whole flat face of the tile (inside the bevel), in the texture frame. */
+export function wrongCellRect(w: number, h: number, tile?: FaceTile): { x: number; y: number; w: number; h: number } {
   const flatW = w * faceFlatShare(tile?.w ?? 1), flatH = h * faceFlatShare(tile?.h ?? 1);
-  const x = (w - flatW) / 2, y = (h - flatH) / 2;
-  if (edge === "left") return { x, y, w: flatW * .1, h: flatH };
-  if (edge === "right") return { x: x + flatW * .9, y, w: flatW * .1, h: flatH };
-  if (edge === "top") return { x, y, w: flatW, h: flatH * .1 };
-  return { x, y: y + flatH * .9, w: flatW, h: flatH * .1 };
+  return { x: (w - flatW) / 2, y: (h - flatH) / 2, w: flatW, h: flatH };
 }
-/** Transparent paired hatching over the original sticker; nothing above the strip is changed. */
-export function drawWrongCell(ctx: WrongCellContext, w: number, h: number, tile?: FaceTile, edge: WrongEdge = "bottom"): void {
-  const r = wrongStripRect(w, h, tile, edge), unit = Math.min(w, h), step = unit / HATCH_LINES;
+/**
+ * Translucent hatching over the whole flat face of the original sticker (the texture turns with the cubie): light halo and dark
+ * lines on the same 45 degree pitch, then a red strike-through from corner to corner with its own halo. Line width and pitch
+ * follow the tile size, so the mark looks the same on every tile; nothing is filled and the printed label stays readable.
+ */
+export function drawWrongCell(ctx: WrongCellContext, w: number, h: number, tile?: FaceTile): void {
+  const r = wrongCellRect(w, h, tile), unit = Math.min(w, h), step = unit / HATCH_LINES;
   ctx.save();
   ctx.beginPath();
   ctx.rect(r.x, r.y, r.w, r.h);
   ctx.clip();
   ctx.lineCap = "butt";
-  for (const [color, width] of [[WRONG_CELL.halo, Math.max(4, unit / 24)], [WRONG_CELL.hatch, Math.max(2, unit / 48)]] as const) {
+  for (const [color, width] of [[WRONG_CELL.halo, Math.max(4, unit / 32)], [WRONG_CELL.hatch, Math.max(2, unit / 48)]] as const) {
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
     ctx.beginPath();
@@ -591,6 +585,14 @@ export function drawWrongCell(ctx: WrongCellContext, w: number, h: number, tile?
       ctx.moveTo(x, r.y + r.h);
       ctx.lineTo(x + r.h, r.y);
     }
+    ctx.stroke();
+  }
+  for (const [color, width] of [[WRONG_CELL.halo, unit / 28], [WRONG_CELL.strike, unit / 56]] as const) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(r.x, r.y);
+    ctx.lineTo(r.x + r.w, r.y + r.h);
     ctx.stroke();
   }
   ctx.restore();
