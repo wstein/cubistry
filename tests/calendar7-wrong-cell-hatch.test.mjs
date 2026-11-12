@@ -51,7 +51,7 @@ test('the hatch is clipped to the whole flat face, not to a strip', () => {
 test('every part of the tile lies within one hatch pitch of a hatch line', () => {
   for (const [w, h, tile] of TILES) {
     const { strokes, clips } = run(w, h, tile), r = clips[0], step = Math.min(w, h) / HATCH_LINES;
-    const lines = strokes[0].segments.map((s) => clipped(s, r)).filter(Boolean);
+    const lines = strokes[0].segments.map((s) => clipped(s, r)).filter((l) => l && (l[0] !== l[2] || l[1] !== l[3]));
     for (let i = 0; i < 12; i++) for (let j = 0; j < 12; j++) {
       const x = r.x + (i + 0.5) * r.w / 12, y = r.y + (j + 0.5) * r.h / 12;
       assert.ok(Math.min(...lines.map((l) => distance(x, y, l))) <= step / 2 + 1e-9, `${w}x${h}: cell ${i},${j} is hatched`);
@@ -81,7 +81,7 @@ test('light halo and dark hatch are both translucent and share the same lines', 
 test('hatching leaves most of the numeral area unpainted', () => {
   for (const [w, h, tile] of TILES) {
     const { strokes, clips } = run(w, h, tile), r = clips[0];
-    const lines = strokes[0].segments.map((s) => clipped(s, r)).filter(Boolean), half = strokes[0].width / 2;
+    const lines = strokes[0].segments.map((s) => clipped(s, r)).filter((l) => l && (l[0] !== l[2] || l[1] !== l[3])), half = strokes[0].width / 2;
     let free = 0, n = 0;
     for (let i = 0; i < 40; i++) for (let j = 0; j < 40; j++) {
       const x = r.x + r.w * (0.25 + 0.5 * (i + 0.5) / 40), y = r.y + r.h * (0.25 + 0.5 * (j + 0.5) / 40);
