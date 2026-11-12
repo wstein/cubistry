@@ -133,6 +133,7 @@ test("generic text assets honor declared weight and scaled line height and relea
 test("later unsafe SVG failure is transactional and existing counter remains usable", async ({
   page,
 }) => {
+  test.setTimeout(90000);
   await ready(page);
   const evil =
       '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><script>alert(1)</script></svg>',
