@@ -79,6 +79,7 @@ test("German A without the leading zero: the center-aware planner reaches blank-
         maximumDepth: 6,
         maximumNodes: 200000,
       });
+    assert.equal(result.method, "center-aware", iso);
     assert(matches(apply(ctx.from, result.word), target.cells), iso);
     assert.deepEqual(
       apply(ctx.from, result.word).map((s) => s.image),

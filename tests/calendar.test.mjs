@@ -29,7 +29,7 @@ const designs = Object.keys(pin.runtime).map((file) => {
   );
   return validateDesign(JSON.parse(bytes));
 });
-test("all 7686 selected calendar witnesses replay with every nonblank sticker upright", () => {
+test("all 10248 selected calendar witnesses replay with every nonblank sticker upright", () => {
   for (const d of designs)
     for (const t of d.targets) {
       const state = sourcePose(d, t);
