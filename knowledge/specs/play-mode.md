@@ -23,13 +23,14 @@ PuzlWerk `PwMove` (SM7), so that gestures act on the final state model.
 
 In scope: the two interaction modes of the cube viewer, the drag gesture that turns a layer, the commit rule, mode
 activation and per-application availability. Out of scope: code, solver changes, keyboard move buttons (none are added),
-modifier-key play, hit-decides-layer-or-orbit, the touch split (one finger layer, two fingers orbit); each needs its own
-decision.
+the gesture for a whole-cube rotation (deferred, see Open decisions).
 
 ## Domain definitions
 
 - **View mode**: drag, trackpad and touch gestures rotate the whole cube (orbit, see [SMART_ROTATION](../../docs/SMART_ROTATION.md)).
-- **Play mode**: a drag on a cubie turns one layer; a drag on the background orbits. One state machine owns both.
+- **Play mode**: a gesture that starts on the cube is a move gesture; a gesture that starts outside the cube orbits the
+  camera as outside play mode. One state machine owns both.
+- **Wide turn**: a turn of all layers between and including two touched layers of the same axis.
 - **Net turn**: the layer angle after release, rounded to the nearest quarter turn, as a signed number of quarter turns.
 
 ## Requirements
@@ -38,13 +39,19 @@ decision.
 2. Play mode is a viewer toggle. It is also a persisted setting and a `play` URL parameter following the `speed` pattern
    (survives an app switch; an invalid value falls back to the default, which is view mode). Whether toggle, setting or both
    ship is an open decision.
-3. The interaction machine has the states Idle, Pending, Orbiting, Turning, Settling. A hit on a cubie (raycast in the cube's
-   local frame) starts Turning; a hit on the background starts Orbiting. The axis is decided after 6 to 10 CSS px of movement.
-4. While Turning, the layer follows the pointer by any angle in both directions, including past the point already passed
+3. The interaction machine has the states Idle, Pending, Orbiting, Turning, Settling. A gesture that starts on the cube
+   (raycast in the cube's local frame) starts a move gesture; a gesture that starts outside the cube starts Orbiting.
+4. One finger on a sticker (owner decision 1 and 2): the touched sticker is signaled (highlight). Layer and axis are derived
+   from the gesture direction after a dead zone of about 8 px; the rule for gestures along sticker edges is to be specified.
+   While Turning, the layer follows the finger freely in either direction, including back past the point already passed
    (half turn, three-quarter turn, full turn and more in one gesture).
-5. On release the layer eases to the nearest quarter turn from angle and release speed (rubber band, start value 100 to
+5. At every 90 degrees a magnet/snap effect is shown (visual; haptics only where the platform has them, iOS has none). On
+   release the layer eases to the nearest quarter turn from angle and release speed (rubber band, start value 100 to
    180 ms, tuned on mouse and phone).
-6. One commit per gesture: the net number of quarter turns, applied once; net 0 commits no move. After the commit all bodies are
+5a. Layer choice on N = 4 to 7: by hit depth of the touched sticker. Two fingers on two layers of the same axis turn all
+    layers between and including both together (wide turn); fingers on different axes are invalid.
+6. One commit per gesture, at release: the net number of quarter turns, applied once. Net 0 commits no move, also when the
+   layer is dragged back to the start without releasing. After the commit all bodies are
    re-synced to the computed state.
 7. The state after a gesture equals the state after the same move applied through `PwMove`.
 8. Touch: no page scroll during a drag (`touch-action`, pointer capture, cancel handling).
@@ -55,13 +62,23 @@ decision.
 11. A cube turned by hand can be reset or solved again. Proposed (not decided): undo history of the session plus one jump to the
     application's target state; no solver call.
 
-## Owner decisions
+## Owner decisions (2026-11-13)
 
-- **Whole-cube turns are moves (owner, 2026-11-13).** A whole-cube rotation counts as a move, like a layer turn: rotations
-  are x/y/z moves in the move list. This changes the move model (rotations are part of the move list, not only presentation).
-  Consequences recorded here, no further decision: the net turn of a gesture (requirement 6) can be a rotation move; the
-  state-equality check (requirement 7) covers rotations; view-mode orbit stays a presentation change and is not a move. The
-  gesture that selects a whole-cube turn, and its interplay with layer choice on N = 4 to 7, are open (Open decisions, item 5).
+1. **Where a gesture starts.** In play mode a gesture that starts outside the cube orbits the camera (point of view) as outside
+   play mode; a gesture that starts on the cube is a move gesture.
+2. **One finger on a sticker.** The touched sticker is signaled (highlight). Layer and axis are derived from the gesture
+   direction (dead zone about 8 px; the rule for sticker edges is to be specified). The layer follows the finger freely in
+   either direction and back. At every 90 degrees a magnet/snap effect (visual; haptics only where available, iOS has none).
+   On release the net rotation rounds to the nearest 90 degrees; net 0, also when returning to the start without releasing, is
+   no move.
+3. **Layer on N = 4 to 7.** By hit depth of the touched sticker.
+4. **Wide turns.** Two fingers on two layers of the same axis rotate all layers between and including both together
+   (generalized wide turn); fingers on different axes are invalid. Mouse equivalent, proposed and not decided: Shift+drag is a
+   wide turn.
+5. **Whole-cube rotation is a move (model decision, kept).** Rotations are x/y/z moves in the move list; this changes the move
+   model. Consequences: the net turn of a gesture can be a rotation move; the state-equality check (requirement 7) covers
+   rotations; view-mode orbit stays presentation only and is not a move. The gesture for it is deferred (Open decisions).
+   This replaces the earlier open item on the gesture and on layer choice, which decisions 3 and 4 answer.
 
 ## Per-application availability (design draft, not decided)
 
@@ -71,13 +88,12 @@ a hand turn leaves the shown date. Counter and clock: no manual moves proposed.
 
 ## Open decisions (owner)
 
-Items 1 to 4 are unchanged from #461.
-
-1. Layers on N = 4 to 7: single layer by hit depth only, or also wide turns?
-2. Reset target for print-bound cubes: home state (solved) or the state the application currently shows?
+1. Reset target for print-bound cubes: home state (solved) or the state the application currently shows?
+2. Activation: viewer toggle, persisted setting, or both.
 3. Which applications allow manual moves; date applications: disabled or free play with reset.
-4. Activation: viewer toggle, persisted setting, or both.
-5. Gesture for a whole-cube turn in play mode, and layer choice on N = 4 to 7 under the owner decision above (not derivable from #461): which hit or gesture selects a whole-cube turn instead of a layer, and how that relates to the single-layer-by-depth question (item 1).
+4. Gesture for a whole-cube rotation. The three-finger gesture is rejected (iOS system gestures). Candidates, not decided: two
+   fingers outside the cube; Alt+drag with the mouse.
+5. Sticker-edge rule for deriving layer and axis from the gesture direction (to be specified).
 
 ## Invariants
 
