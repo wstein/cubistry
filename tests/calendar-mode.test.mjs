@@ -10,7 +10,7 @@ import { civilDate, findTarget, front, validateDesign } from "../src/apps/calend
 import { mountCalendar, printOf, runtimeId } from "../src/apps/calendar/mount.ts";
 
 const designs = Object.fromEntries(
-  ["de-a", "en-3-zero", "en-3-unpadded"].map((id) => [id, JSON.parse(readFileSync(`public/calendar/${id}.json`, "utf8"))]),
+  ["de-a", "de-a-unpadded", "en-3-zero", "en-3-unpadded"].map((id) => [id, JSON.parse(readFileSync(`public/calendar/${id}.json`, "utf8"))]),
 );
 const q = (s) => new URLSearchParams(s);
 const flush = () => new Promise((resolve) => setImmediate(resolve));
@@ -143,7 +143,7 @@ test("the host lists the mode and loads its mount lazily", () => {
 test("printOf reads lang, language and design like the page did; anything unknown is German A", () => {
   for (const [s, p] of [["lang=en", "en-3"], ["language=English", "en-3"], ["design=en-3", "en-3"], ["lang=de", "de-a"], ["language=deutsch", "de-a"], ["design=de-a", "de-a"], ["lang=fr", "de-a"], ["", "de-a"], ["lang=de&design=en-3", "de-a"]])
     assert.equal(printOf(q(s)), p, s);
-  assert.deepEqual([runtimeId("de-a", false), runtimeId("en-3", true), runtimeId("en-3", false)], ["de-a", "en-3-zero", "en-3-unpadded"]);
+  assert.deepEqual([runtimeId("de-a", true), runtimeId("de-a", false), runtimeId("en-3", true), runtimeId("en-3", false)], ["de-a", "de-a-unpadded", "en-3-zero", "en-3-unpadded"]);
 });
 
 test("mount with no parameters shows today on German A and enables the controls", async () => {
@@ -157,7 +157,8 @@ test("mount with no parameters shows today on German A and enables the controls"
   assert.equal(r.stage.el("calendar-viewer").attrs["aria-busy"], "false");
   assert.equal(r.dock.el("calendar-design").value, "de-a");
   assert.equal(r.dock.el("calendar-design").disabled, false);
-  assert.equal(r.dock.el("calendar-padding-label").hidden, true);
+  assert.equal(r.dock.el("calendar-padding-label").hidden, false);
+  assert.equal(r.dock.el("calendar-padding").checked, true);
   assert.equal(r.dock.el("calendar-date").value, "2026-10-29");
   assert.equal(r.dock.el("calendar-live").attrs["aria-pressed"], "true");
   assert.deepEqual(r.log.print, ["de-a"]);
@@ -185,6 +186,18 @@ test("parameters choose print, padding and a fixed date; an invalid date and tod
     assert.equal(r.dock.el("calendar-date").value, "2026-10-29", search);
     assert.equal(r.stage.el("calendar-state").textContent, "Live · local date", search);
   }
+});
+
+test("German A without the leading zero: pad=0 loads de-a-unpadded and shows a blank tens cell for days 1 to 9", async () => {
+  const r = rig();
+  await r.mount("lang=de&pad=0&date=2026-11-07");
+  assert.deepEqual(r.log.loaded, ["de-a-unpadded"]);
+  assert.equal(r.dock.el("calendar-padding").checked, false);
+  assert.equal(r.dock.el("calendar-padding-label").hidden, false);
+  assert.deepEqual(r.log.print, ["de-a"]);
+  assert.equal(r.stage.el("calendar-front").textContent, faceOf("de-a-unpadded", "2026-11-07").replace(/^SA\b/, "S · A"));
+  assert.deepEqual(front(r.viewer.presentedState).map((s) => s.image), findTarget(validateDesign(designs["de-a-unpadded"]), civilDate("2026-11-07")).cells);
+  assert.equal(front(r.viewer.presentedState).map((s) => s.image).join("|").includes("0"), false);
 });
 
 test("+1 day, -1 day and Today move the cube by legal turns and keep the controls in step", async () => {

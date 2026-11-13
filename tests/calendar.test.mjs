@@ -59,6 +59,21 @@ test("calendar dates are Gregorian and cover an entire 400-year cycle", () => {
   ])
     assert.throws(() => civilDate(x));
 });
+test("German A without the leading zero is the same print and shows days 1 to 9 with a blank tens cell", () => {
+  const padded = designs.find((d) => d.id === "de-a"),
+    plain = designs.find((d) => d.id === "de-a-unpadded");
+  assert.deepEqual(plain.printing, padded.printing);
+  assert.equal(plain.targets.length, 2562);
+  for (const iso of ["2026-01-03", "2026-11-09", "2026-11-10", "2028-02-29"]) {
+    const date = civilDate(iso),
+      zero = front(sourcePose(padded, findTarget(padded, date))).map((s) => s.image),
+      none = front(sourcePose(plain, findTarget(plain, date))).map((s) => s.image);
+    // Day row is cells 3 to 5; the tens digit is cell 4.
+    assert.equal(zero[4], date.day < 10 ? "0" : String(Math.floor(date.day / 10)), iso);
+    assert.equal(none[4], date.day < 10 ? "" : zero[4], iso);
+    assert.deepEqual(none.filter((_, i) => i !== 4), zero.filter((_, i) => i !== 4), iso);
+  }
+});
 test("same English print shows adjacent day with real optional blank", () => {
   const [a, b] = designs.filter((d) => d.id.startsWith("en"));
   assert.deepEqual(a.printing, b.printing);
