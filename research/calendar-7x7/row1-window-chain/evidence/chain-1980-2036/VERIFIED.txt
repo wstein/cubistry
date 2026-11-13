@@ -1,0 +1,17 @@
+chain=1980-01 .. 2036-01 (673 months, 672 edges), root = solved cube of print D = January 1980
+research_base=53b93e2a7d33c221b22b75e80dd75309fe0099d3 (root_change.jl at the commit of this directory)
+print_d_sha256=48ff9c8bc60c10908762573c02429fc258c1afc54b431c8c5e3049f11b4b475c
+layout_sha256=e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a
+chain_sha256=399de6a13e21dd6e182fee0ae52964cc07826f32050d9718a134d0c627d47e46
+months_sha256=e2fa147790d411eec602feba82ef41efefa07e35d5b5799467beda63ca7f1484
+identity_digest_print_d=d1a110db1529c07bdf51a5f8ac1fb8f5f5fe0a83f05077ca9142c294551551eb
+source_backward=run 43414242499 (window-chain, direction=backward, stage 8), chain.moves.tsv sha256 fe9f9fac8a2d0359d188df755e8e55336dcb4ec1a5d18119dfd422d5727214e3
+source_forward=run 43307881914 (window-chain, stage 5), chain.moves.tsv sha256 b6cb3c525f12e8e2511cc04e5adc84e013e9f052ffd2ff8b454742ab44e5e2e6
+source_print=print C, sha256 0119ca3ba1266f9c3e4d7c27753801aca30eb4af514f491615666dcd9f92a8fc
+exact_edges=666
+best_effort_edges=6 (1981-02, 1987-02, 1998-02, 2009-02, 2015-02, 2026-02; wrong cell 7,1)
+julia=check.jl: summary 673 672 76262 90379 1018 1320 list:2036-01 INVERSE_PASS (julia.tsv)
+flix=chain verifier jar built from this tree (jar sha256 7bcd5cc0f1aa4294e4462badd88f072d8fe2da41e40c7a0451984267da8cc225), byte-identical to julia.tsv (flix.tsv)
+independent=verify_chain.jl: ACCEPT_BEST_EFFORT_CHAIN 673 672 76262 INVERSE_PASS, exact 666, best_effort 6 (independent.tsv)
+negative_control=the same chain against print C: INVALID root digest
+not_run=print checker, Hall table and coverage files on print D; CI workflow run; matching file of the 90 configurations for print D
