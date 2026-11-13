@@ -7,9 +7,12 @@ created: 2026-11-13
 ---
 # Play mode (hand-play by dragging layers)
 
-Source: [wstein/cubistry#461](https://github.com/wstein/cubistry/issues/461) (body, owner update 2026-11-12, owner
-requirement and design draft 2026-11-13). This spec restates those texts; it adds no decision. Decisions the owner has not
-taken are listed under "Open decisions".
+Sources: [wstein/cubistry#461](https://github.com/wstein/cubistry/issues/461) (body and comments up to 2026-11-13: owner
+update 2026-11-12, owner requirement and design draft 2026-11-13) and the
+[owner decision comment of 2026-11-13](https://github.com/wstein/cubistry/issues/461#issuecomment-6866210592), cited below as "decision comment".
+This spec restates those texts. Each decision is marked **owner** (stated by the owner) or **proposal accepted** (proposed by
+the coordinator, accepted by the owner in conversation). Text marked "rationale" or "derived" is the author's, not a decision.
+Whatever is undecided is listed under "Open decisions".
 
 ## Scheduling gate
 
@@ -31,68 +34,76 @@ the gesture for a whole-cube rotation (deferred, see Open decisions).
 - **Play mode**: a gesture that starts on the cube is a move gesture; a gesture that starts outside the cube orbits the
   camera as outside play mode. One state machine owns both.
 - **Wide turn**: a turn of all layers between and including two touched layers of the same axis.
-- **Net turn**: the layer angle after release, rounded to the nearest quarter turn, as a signed number of quarter turns.
+- **Net turn**: the signed number of quarter turns committed for a gesture: the layer angle at release rounded to the nearest
+  90 degrees (D8a).
 
 ## Requirements
 
 1. The viewer starts in view mode everywhere. Play mode is switched on explicitly; leaving it returns to view mode.
-2. Play mode is a viewer toggle and is not persisted: every page load starts outside play mode (owner decision 7). It is
-   therefore neither a stored setting nor a URL parameter.
+2. Play mode is a viewer toggle and is not persisted: every page load starts outside play mode (D6). Whether a `play` URL
+   parameter is allowed is open (Open decisions, item 4).
 3. The interaction machine has the states Idle, Pending, Orbiting, Turning, Settling. A gesture that starts on the cube
-   (raycast in the cube's local frame) starts a move gesture; a gesture that starts outside the cube starts Orbiting.
-4. One finger on a sticker (owner decision 1 and 2): the touched sticker is signaled (highlight). Layer and axis are derived
-   from the gesture direction after a dead zone of about 8 px; the rule for gestures along sticker edges is to be specified.
-   While Turning, the layer follows the finger freely in either direction, including back past the point already passed
-   (half turn, three-quarter turn, full turn and more in one gesture).
-5. At every 90 degrees a magnet/snap effect is shown (visual; haptics only where the platform has them, iOS has none). On
-   release the layer eases to the nearest quarter turn from angle and release speed (rubber band, start value 100 to
-   180 ms, tuned on mouse and phone).
-5a. Layer choice on N = 4 to 7: by hit depth of the touched sticker. Two fingers on two layers of the same axis turn all
-    layers between and including both together (wide turn); fingers on different axes are invalid.
-6. One commit per gesture, at release: the net number of quarter turns, applied once. Net 0 commits no move, also when the
-   layer is dragged back to the start without releasing. After the commit all bodies are
-   re-synced to the computed state.
-7. The state after a gesture equals the state after the same move applied through `PwMove`.
-8. Touch: no page scroll during a drag (`touch-action`, pointer capture, cancel handling).
-9. No new keyboard buttons for moves.
-10. Layering: the pure state machine and the move decision belong to the shared core (PuzlWerk); pointer events, raycast and
+   (raycast in the cube's local frame) starts a move gesture; a gesture that starts outside the cube starts Orbiting (D1).
+4. One finger on a sticker (D2): the touched sticker is signaled (highlight). Layer and axis are derived from the gesture
+   direction after a dead zone of about 8 px (D8b); the rule for gestures along sticker edges is open. While Turning, the layer
+   follows the finger freely in either direction, including back past the point already passed (half turn, three-quarter turn,
+   full turn and more in one gesture).
+5. At every 90 degrees a magnet/snap effect is shown (D2), visual; haptics only where the platform provides them (rationale:
+   iOS provides none; not in the decision comment). On release the layer eases to the nearest quarter turn (D8a; rubber band,
+   start value 100 to 180 ms, tuned on mouse and phone, from the owner update of 2026-11-12). The owner update also names
+   release speed as an input; its effect on the target is not specified.
+6. Layer choice on N = 4 to 7: by hit depth of the touched sticker (D8c). Two fingers on two layers of the same axis turn all
+   layers between and including both together (wide turn, D3). Two fingers on different axes are invalid (D8d).
+7. One commit per gesture, at release: the net number of quarter turns, applied once. Nothing is committed while dragging. Net 0
+   commits no move, including when the layer was dragged back to the start (D2). After the commit all bodies are re-synced to
+   the computed state.
+8. The state after a gesture equals the state after the same move applied through `PwMove`.
+9. Touch: no page scroll during a drag (`touch-action`, pointer capture, cancel handling).
+10. No new keyboard buttons for moves.
+11. Layering: the pure state machine and the move decision belong to the shared core (PuzlWerk); pointer events, raycast and
     pivot binding stay in the TypeScript viewer package. The viewer shows a caller-validated legal selection and angle on a
     temporary turn pivot; controllers own state, deadlines and commit ([VIEWER_RENDERING](../../docs/VIEWER_RENDERING.md)).
-11. A cube turned by hand can be reset to the state shown when play mode started (entry state; owner decision 6). Whether the
-    reset is one jump or an undo history of the session is not decided; no solver call.
+12. Reset on print-bound cubes returns to the state shown when play mode started (entry state, D5). Whether this is one jump or
+    an undo history is open (Open decisions, item 3). Reset for other cubes is not decided (derived extension, not a decision). No
+    solver call.
 
-## Owner decisions (2026-11-13)
+## Decisions (2026-11-13)
 
-1. **Where a gesture starts.** In play mode a gesture that starts outside the cube orbits the camera (point of view) as outside
-   play mode; a gesture that starts on the cube is a move gesture.
-2. **One finger on a sticker.** The touched sticker is signaled (highlight). Layer and axis are derived from the gesture
-   direction (dead zone about 8 px; the rule for sticker edges is to be specified). The layer follows the finger freely in
-   either direction and back. At every 90 degrees a magnet/snap effect (visual; haptics only where available, iOS has none).
-   On release the net rotation rounds to the nearest 90 degrees; net 0, also when returning to the start without releasing, is
-   no move.
-3. **Layer on N = 4 to 7.** By hit depth of the touched sticker.
-4. **Wide turns.** Two fingers on two layers of the same axis rotate all layers between and including both together
-   (generalized wide turn); fingers on different axes are invalid. Mouse equivalent, proposed and not decided: Shift+drag is a
-   wide turn.
-5. **Whole-cube rotation is a move (model decision, kept).** Rotations are x/y/z moves in the move list; this changes the move
-   model. Consequences: the net turn of a gesture can be a rotation move; the state-equality check (requirement 7) covers
-   rotations; view-mode orbit stays presentation only and is not a move. The gesture for it is deferred (Open decisions).
-   This replaces the earlier open item on the gesture and on layer choice, which decisions 3 and 4 answer.
-6. **Reset target on print-bound cubes.** The state shown when play mode started (entry state).
-7. **Activation.** Viewer toggle, not persisted; every page load starts outside play mode.
-8. **Apps allowed first.** Playground and Picture Cube. All others later; calendar apps not yet.
+Source for all: the decision comment.
+
+D1. **owner** Where a gesture starts. In play mode a gesture that starts outside the cube changes the camera as outside play
+   mode; a gesture that starts on the cube is a move gesture.
+D2. **owner** One finger on a sticker. The touched sticker is signaled; layer and axis follow from the gesture direction; the layer
+   follows the finger freely in both directions and back; a magnet effect at every 90 degrees; returning to the start without
+   releasing counts as no move.
+D3. **owner** Two fingers on two layers rotate all layers between them (generalized wide turn).
+D4. **owner** Whole-cube rotation counts as a move (x/y/z moves in the move list; this changes the move model). Its gesture is
+   deferred; the three-finger gesture is rejected; a solution is still to be found. Candidate to investigate, not decided: two
+   fingers outside the cube.
+   - Derived, not decided: the net turn of a gesture can then be a rotation move; the equality check (requirement 8) covers
+     rotations; view-mode orbit stays presentation only. Rationale (author's): the three-finger gesture collides with iOS system
+     gestures; two fingers outside the cube collide with camera pinch-zoom and need a rule.
+D5. **owner** Reset target on print-bound cubes: the state shown when play mode started.
+D6. **owner** Activation: viewer toggle, not persisted.
+D7. **owner** First apps: Playground and Picture Cube. Others later; calendar apps not yet.
+D8. **proposal accepted** ("we agree on the new gesture control"): (a) release rounds to the nearest 90 degrees; (b) dead zone of
+   about 8 px; (c) layer choice on N >= 4 by hit depth; (d) two fingers on different axes are invalid.
+   Proposal only, not decided: (e) Shift+drag is the mouse equivalent of the wide turn.
 
 ## Per-application availability
 
-First release: Playground and Picture Cube (decision 8). Other applications follow later; calendar apps (Calendar7, calendar,
+First release: Playground and Picture Cube (D7). Other applications follow later; calendar apps (Calendar7, calendar,
 clock, status cube) are not yet in scope, so the "reset to the date" question does not arise for now.
 
 ## Open decisions (owner)
 
-1. Sticker-edge rule for deriving layer and axis from the gesture direction (to be specified in the implementation step).
-2. Gesture for a whole-cube rotation: deferred. The three-finger gesture is rejected (iOS system gestures). Investigation
-   candidate, not decided: two fingers outside the cube, counted as an x/y/z move in 90 degree steps; it conflicts with camera
-   pinch-zoom and needs a rule. Alt+drag with the mouse is a candidate for the mouse.
+1. Sticker-edge rule for deriving layer and axis from the gesture direction (implementation step).
+2. Gesture for a whole-cube rotation (deferred). Candidate to investigate: two fingers outside the cube, counted as an x/y/z
+   move in 90 degree steps; it conflicts with camera pinch-zoom and needs a rule. Alt+drag with the mouse is a candidate from
+   the earlier coordinator draft, not from the decision comment.
+3. Reset as one jump or as an undo history of the session.
+4. Whether a `play` URL parameter is allowed (the owner has decided only that play mode is not persisted).
+5. Mouse equivalent of the wide turn: Shift+drag is a proposal only (D8e).
 
 ## Invariants
 
@@ -109,5 +120,5 @@ clock, status cube) are not yet in scope, so the "reset to the date" question do
 
 ## References / decisions
 
-- [wstein/cubistry#461](https://github.com/wstein/cubistry/issues/461), related #110, #120, #85, #21, wstein/puzlwerk specs/006-shared-model (SM1, SM4, SM7)
+- [wstein/cubistry#461](https://github.com/wstein/cubistry/issues/461), related wstein/cubistry#110, wstein/cubistry#120, wstein/cubistry#85, wstein/cubistry#21, wstein/puzlwerk specs/006-shared-model (SM1, SM4, SM7)
 - [ADR index](../adr/index.md)
