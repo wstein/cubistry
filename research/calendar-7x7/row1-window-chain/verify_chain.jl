@@ -105,6 +105,8 @@ function own_join(name)
     t=get(ENV,name,"");isempty(t) && return nothing
     @assert t=="identity" || (length(t)==64 && all(c->c in "0123456789abcdef",t)) "junction digest is 64 hex or identity";t
 end
+# Format bound on the free start block (own constant; shares nothing with check.jl).
+const MAX_START_MOVES=1_000_000
 const JSTART=own_join("CAL7_JOIN_START")
 const JEND=own_join("CAL7_JOIN_END")
 # CAL7_BEST_EFFORT_29=1: the 29 rule for best-effort edges (own reading, shares nothing with check.jl): one wrong cell, (7,1) or (7,7), showing 29 upright in red.
@@ -118,7 +120,7 @@ function read_chain_own(path)
     edges=[];i=3;startword=nothing
     if startswith(L[i],"start\t")
         @assert L[1]=="cubistry.calendar7.chain.v3" "free start block needs chain.v3"
-        g=split(L[i],'\t');@assert length(g)==2;n=parse(Int,g[2]);@assert 0<=n<=100000 "start move count";i+=1;startword=Int[]
+        g=split(L[i],'\t');@assert length(g)==2;n=parse(Int,g[2]);@assert 0<=n<=MAX_START_MOVES "start move count";i+=1;startword=Int[]
         for _ in 1:n
             g=split(L[i],'\t');@assert length(g)==3 && g[1]=="move" "start move line"
             gen=parse(Int,g[2]);q=parse(Int,g[3]);@assert 1<=gen<=21 && q in (-1,1,2) "start move"
