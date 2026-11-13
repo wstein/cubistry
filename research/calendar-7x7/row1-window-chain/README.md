@@ -91,6 +91,13 @@ in `check.jl`, `verify_chain.jl`, the Flix chain jar and `run_checks.sh`. The li
 (`BRIDGE` on the receipt line). The root month (`CAL7_ROOT_MONTH`, the month the identity pose shows) is separate from the first member; a different root adds a root edge (`ROOTEDGE`).
 Chain format v2 adds per-edge wrong cells with Hall witnesses (best-effort months); v3 adds a free start state (`start` block) for stages, and `CAL7_JOIN_START` / `CAL7_JOIN_END` pin the start and end digest of a stage
 (Flix: arguments after the root month). Format, root rule, stages, best-effort rule, coverage and receipts: [evidence/month-list/README.md](evidence/month-list/README.md).
+
+Move-count bound. The free start block (`start N`), the total of all edge moves and, in Flix, the moves of one edge are each bounded by `MAX_CHAIN_MOVES` = 1000000
+(`check.jl`: `MAX_CHAIN_MOVES`; Flix: `maxChainMoves()`; `verify_chain.jl`: `MAX_START_MOVES`, start block only). The bound is a format limit, not a mathematical one: it was 100000, which a backward chain
+from 2019-01 reaches after about 910 edges (about 110 moves per edge; run 43485831480 had 104899 start moves). A chain 1900-01 to 2100-01 has about 2600 edges and about 300000 moves, a file of about 6.5 MB by extrapolation from 2.2 MB for 916 edges
+(bound 16000000 bytes unchanged). Per-edge metrics (HTM 100000, QTM 200000) are unchanged. Test: `check_move_bound.sh JULIA JAVA CHAIN_JAR NEW_SCRATCH_DIR` (about 1 minute; start block and edge-move total of 100001 are accepted,
+1000001 rejected at the named reason); mutants: `run_move_bound_mutants.sh JULIA JAVA NEW_SCRATCH_DIR` (eight, three Flix builds; run niced). `verify_chain.jl` has no total bound.
+
 Tests: `test_month_list.jl`, `run_month_list_checks.sh` (two positives, a bridge chain and a chain starting at 2037-05, and 15 negatives; Julia, Flix and the independent verifier),
 `test_month_coverage.jl`, `test_best_effort.jl`, `test_stage_coverage.jl`, `run_root_best_effort_checks.sh` (root, best-effort and stage fixtures, three checkers). `generate.jl` and `beam_edge.jl` take their targets from the same goals and were not changed or run for a list.
 
