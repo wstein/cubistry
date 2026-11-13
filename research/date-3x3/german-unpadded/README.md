@@ -58,7 +58,7 @@ V acts on corners/edges as `r^-1`.
   (identity, 3 half turns, 8 diagonal 120 degree turns); `x`, `y`, `z` quarter turns do not
   (corners even, edges odd), so no face-turn word realizes them ([results/analysis.txt](results/analysis.txt), section A).
 - Twist: the sum of center quarter-turn twists is even iff the corner permutation is even. Checked on
-  all 36 generators and 3,000 random words (matches the handover statement); **not proven**. W has
+  all 36 generators and 3,000 random words; **not proven**. W has
   corner permutation identity and an even twist sum.
 - Existence is shown by the explicit words, replayed; the invariants only explain which rotations can occur.
 
@@ -109,7 +109,7 @@ Transitions: `transition-jobs.mjs` or `transition-jobs-year.mjs`, then `plan-tra
 `verify_transitions.jl`, `summarize_transitions.jl`.
 
 `Cube.jl`, `Replay.jl` (Julia) and `flix/src/Main.flix` are separate implementations of the move
-engine; Flix was written without reading the Julia sources and reproduces the three Julia reports
+engine; Flix reproduces the three Julia reports
 byte for byte. The generator geometry (`../geometry.mjs`) is used only for planning. Python is not used.
 The lower bound 8 (outer HTM) and the slice minimum 4 are computed by Julia only; Flix repeats the
 slice-word counts up to length 4 but not the meet-in-the-middle search.
