@@ -38,7 +38,7 @@ export interface CalendarOptimizerLike {
 export interface CalendarEnv {
   /** Element that receives the controls (the dock `#studio-controls` of the host). */
   controls: HTMLElement;
-  /** Verified runtime of one print: `de-a`, `en-3-zero` or `en-3-unpadded`. Rejects with the reason shown to the user. */
+  /** Verified runtime of one print: `de-a`, `de-a-unpadded`, `en-3-zero` or `en-3-unpadded`. Rejects with the reason shown to the user. */
   loadDesign(id: string): Promise<Design>;
   now(): number;
   /** Resolves when the fonts of the sticker artwork are usable; rejects otherwise. */
@@ -73,7 +73,8 @@ export function printOf(params: URLSearchParams): Print {
 }
 
 export function runtimeId(print: Print, padded: boolean): string {
-  return print === "de-a" ? "de-a" : padded ? "en-3-zero" : "en-3-unpadded";
+  if (print === "de-a") return padded ? "de-a" : "de-a-unpadded";
+  return padded ? "en-3-zero" : "en-3-unpadded";
 }
 
 const CONTROLS = `
@@ -238,7 +239,7 @@ export async function mountCalendar(
 
   function controls() {
     const english = currentPrint() === "en-3";
-    el("calendar-padding-label").hidden = !english;
+    el("calendar-padding-label").hidden = false;
     setText(
       "calendar-layout",
       english

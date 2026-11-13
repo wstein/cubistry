@@ -151,7 +151,7 @@ export function validateDesign(raw: unknown): Design {
   demand(
     d?.schema === "cubistry.calendar-runtime" &&
       d.version === 1 &&
-      ["de-a", "en-3-zero", "en-3-unpadded"].includes(d.id),
+      ["de-a", "de-a-unpadded", "en-3-zero", "en-3-unpadded"].includes(d.id),
     "Invalid calendar runtime",
   );
   demand(

@@ -69,6 +69,24 @@ test("goal-relative center conversion solves rotated, nonzero printed targets wi
   }
 });
 
+test("German A without the leading zero: the center-aware planner reaches blank-front and zero-free targets from a rotated pose", () => {
+  const design = load("de-a-unpadded");
+  for (const iso of ["2026-01-03", "2026-11-09", "2026-11-10", "2026-12-31"]) {
+    const target = findTarget(design, civilDate(iso)),
+      ctx = context(design, target, target.word + " R U F' x"),
+      result = tryCenterAware(ctx, ctx.fallbackWord + " R L R' L'", {
+        threshold: 0,
+        maximumDepth: 6,
+        maximumNodes: 200000,
+      });
+    assert(matches(apply(ctx.from, result.word), target.cells), iso);
+    assert.deepEqual(
+      apply(ctx.from, result.word).map((s) => s.image),
+      design.printing.map((s) => s.image),
+    );
+  }
+});
+
 test("actual printed goal avoids the posthoc center repair and improves the recorded German fixture", () => {
   const design = load("de-a"),
     a = findTarget(design, civilDate("2026-10-28")),
