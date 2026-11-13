@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Native retained-state replay: independent direct294 and pose264 actions.
 include(joinpath(@__DIR__,"..","row1-window-print/common.jl"))
+# Format bound on move counts: the free start block and the total of all edge moves (a chain of about 2600 edges at about 110 moves each has about 300000).
+const MAX_CHAIN_MOVES=1_000_000
 const WINDOW_PRINT_SHA="0cb44a28c4bf84c25616fc248f9565df2e49e41feb479225e43166b1b8a2d127"
 # Window end YYYY-MM (env WINDOW_END, default 2028-01). The 21-month print stays pinned; a longer
 # window needs its own print, whose SHA-256 must be supplied in CAL7_WINDOW_PRINT_SHA.
@@ -48,7 +50,7 @@ function read_window_chain(path)
     @assert validhash(f[5]);root=String(f[5]);cursor=3;edges=[];totalmoves=0;startmoves=nothing
     if cursor<length(ls) && startswith(ls[cursor],"start\t")
         @assert ls[1]=="cubistry.calendar7.chain.v3" "free start block needs chain.v3"
-        a=String.(split(ls[cursor],'\t'));cursor+=1;@assert length(a)==2;n=canonical_integer(a[2]);@assert 0<=n<=100000 "bounded start moves"
+        a=String.(split(ls[cursor],'\t'));cursor+=1;@assert length(a)==2;n=canonical_integer(a[2]);@assert 0<=n<=MAX_CHAIN_MOVES "bounded start moves"
         startmoves=Tuple{Int,Int}[]
         for _ in 1:n
             @assert cursor<length(ls);b=String.(split(ls[cursor],'\t'));cursor+=1
@@ -81,7 +83,7 @@ function read_window_chain(path)
             a=String.(split(ls[cursor],'\t'));cursor+=1
             @assert length(a)==3 && a[1]=="move" "move record"
             g,e=canonical_integer.(a[2:3]);@assert 1<=g<=21 && e in (-1,1,2) "legal generator and exponent; no middle slice"
-            push!(moves,(g,e));totalmoves+=1;@assert totalmoves<=100000 "bounded total moves"
+            push!(moves,(g,e));totalmoves+=1;@assert totalmoves<=MAX_CHAIN_MOVES "bounded total moves"
         end
         @assert cursor<length(ls) && ls[cursor]=="end";cursor+=1
         push!(edges,(year=y,month=m,metrics=(h,q,r,rq),source=f[8],finish=f[9],moves=moves,wrong=wrong,halls=halls))
